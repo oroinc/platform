@@ -385,9 +385,7 @@ define(function(require) {
             }
 
             if (!this.themeOptions.disableStickedScrollbar) {
-                if (tools.isMobile()) {
-                    plugins.push(StickedScrollbarPlugin);
-                } else if (!tools.isMobile() && !this.metadata.enableFullScreenLayout) {
+                if (tools.isMobile() || !this.metadata.enableFullScreenLayout) {
                     plugins.push(StickedScrollbarPlugin);
                 }
             }

@@ -63,6 +63,7 @@ define(function(require) {
             this.enableCustomScrollbar();
 
             this.listenTo(mediator, 'layout:reposition', this.updateCustomScrollbar);
+            this.listenTo(mediator, 'gridHeaderCellWidth:beforeUpdate', this.onGridHeaderCellWidthBeforeUpdate);
             this.listenTo(mediator, 'gridHeaderCellWidth:updated', this.updateCustomScrollbar);
             this.listenTo(this.grid, 'content:update', this.updateCustomScrollbar);
 
@@ -83,8 +84,7 @@ define(function(require) {
         setupCache: function() {
             this.setupDomCache();
             this.timeouts = {
-                resizeTimeout: 50,
-                scrollTimeout: 40
+                resizeTimeout: 50
             };
             this.scrollState = {
                 display: true,
@@ -104,7 +104,8 @@ define(function(require) {
                 $grid: this.grid.$grid,
                 $container: this.grid.$grid.parents('.grid-scrollable-container:first'),
                 $scrollbar: this.grid.$grid.find('.mCSB_scrollTools'),
-                $spyScroll: this.grid.$grid.parents('[data-spy="scroll"]'),
+                $spyScroll: this.grid.$grid.parents('[data-spy="scroll"]:first'),
+                $collapsible: this.grid.$grid.parents('.collapse:first'),
                 $thead: this.grid.$grid.find('thead:first')
             };
         },
@@ -113,14 +114,16 @@ define(function(require) {
             /*
             * For cases, when layout has full screen container with own scrollbar and window doesn't have scrollbar
             */
-            if (this.domCache.$spyScroll) {
-                this.domCache.$spyScroll.on('scroll',
-                    _.debounce(_.bind(this.manageScroll, this), this.timeouts.scrollTimeout)
-                );
+            if (!_.isEmpty(this.domCache.$spyScroll)) {
+                this.domCache.$spyScroll.on('scroll', _.bind(this.manageScroll, this));
             }
-            this.domCache.$document.on('scroll',
-                _.debounce(_.bind(this.manageScroll, this), this.timeouts.scrollTimeout)
-            );
+            /*
+            * For cases when grid is under collapsible block
+            */
+            if (!_.isEmpty(this.domCache.$collapsible)) {
+                this.domCache.$collapsible.on('hidden.bs.collapse shown.bs.collapse', _.bind(this.manageScroll, this));
+            }
+            this.domCache.$document.on('scroll', _.bind(this.manageScroll, this));
             this.domCache.$window.on('resize',
                 _.debounce(_.bind(this.updateCustomScrollbar, this), this.timeouts.resizeTimeout)
             );
@@ -146,7 +149,7 @@ define(function(require) {
         detectScrollbar: function() {
             var $grid = this.domCache.$grid;
             var $container = this.domCache.$container;
-            return this.scrollState.display = $grid.width() > $container.width();
+            this.scrollState.display = $grid.width() > $container.width();
         },
 
         updateViewport: function() {
@@ -154,9 +157,16 @@ define(function(require) {
                 return;
             }
 
-            this.viewport.top = this.domCache.$container.offset().top - this.domCache.$window.scrollTop();
-            this.viewport.bottom = this.domCache.$window.height() - this.viewport.top - this.domCache.$container.height();
-            this.viewport.lowLevel = this.domCache.$window.height() + this.domCache.$window.scrollTop() - this.domCache.$thead.height() - this.domCache.$scrollbar.height();
+            var containerOffsetTop = this.domCache.$container.offset().top;
+            var containerHeight = this.domCache.$container.height();
+            var windowHeight = this.domCache.$window.height();
+            var windowScrollTop = this.domCache.$window.scrollTop();
+            var tHeadHeight = this.domCache.$thead.height();
+            var scrollBarHeight = this.domCache.$scrollbar.height();
+
+            this.viewport.top = containerOffsetTop - windowScrollTop;
+            this.viewport.bottom = windowHeight - this.viewport.top - containerHeight;
+            this.viewport.lowLevel = windowHeight + windowScrollTop - tHeadHeight - scrollBarHeight;
         },
 
         enableCustomScrollbar: function() {
@@ -172,11 +182,19 @@ define(function(require) {
             this.domCache.$container.mCustomScrollbar('update');
         },
 
+        onGridHeaderCellWidthBeforeUpdate: function() {
+            if (!this.domCache) {
+                return;
+            }
+
+            this.domCache.$grid.parents('.mCSB_container:first').css({width: ''});
+        },
+
         attachScrollbar: function() {
             var $scrollbar = this.domCache.$container.find('.mCSB_scrollTools');
             $scrollbar.removeAttr('style');
 
-            if (!this.scrollState.display) {
+            if (!this.scrollState.display || this.isGridHiddenUnderCollapse()) {
                 $scrollbar.css('display', 'none');
             }
 
@@ -188,6 +206,7 @@ define(function(require) {
             var containerWidth = this.domCache.$container.width();
             var containerLeftOffset = this.domCache.$container.offset().left;
             var documentWidth = this.domCache.$document.width();
+            $scrollbar.removeAttr('style');
 
             $scrollbar.css({
                 'position': 'fixed',
@@ -199,7 +218,17 @@ define(function(require) {
                 'width': containerWidth + 'px'
             });
 
+            if (!this.scrollState.display || this.isGridHiddenUnderCollapse()) {
+                $scrollbar.css('display', 'none');
+            }
+
             this.scrollState.state = 'detached';
+        },
+
+        isGridHiddenUnderCollapse: function() {
+            return _.some(this.domCache.$grid.parents(), function(el) {
+                return $(el).height() === 0;
+            });
         },
 
         /**
@@ -210,7 +239,12 @@ define(function(require) {
                 return;
             }
 
-            this.domCache.$spyScroll.off('scroll', _.bind(this.manageScroll, this));
+            if (!_.isEmpty(this.domCache.$spyScroll)) {
+                this.domCache.$spyScroll.off('scroll', _.bind(this.manageScroll, this));
+            }
+            if (!_.isEmpty(this.domCache.$collapsible)) {
+                this.domCache.$collapsible.off('hidden.bs.collapse shown.bs.collapse', _.bind(this.manageScroll, this));
+            }
             this.domCache.$document.off('scroll', _.bind(this.manageScroll, this));
             this.domCache.$window.off('resize', _.bind(this.updateCustomScrollbar, this));
 

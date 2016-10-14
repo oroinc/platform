@@ -123,6 +123,8 @@ define(function(require) {
         },
 
         fixHeaderCellWidth: function() {
+            mediator.trigger('gridHeaderCellWidth:beforeUpdate');
+
             this.isHeaderCellWidthFixed = true;
             this.setupCache();
             var headerCells = this.domCache.headerCells;
@@ -136,8 +138,6 @@ define(function(require) {
             headerCells.attr('style', '');
             firstRowCells.attr('style', '');
             this.$grid.css({width: ''});
-            /* @TODO: fix direct using of mcsb plugin css class '.mCSB_container' */
-            this.domCache.gridContainer.parents('.mCSB_container').css({width: ''});
             this.domCache.gridContainer.css({width: ''});
             this.$el.removeClass('floatThead');
 
