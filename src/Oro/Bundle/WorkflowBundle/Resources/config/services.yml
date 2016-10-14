@@ -342,3 +342,7 @@ services:
         tags:
             - { name: oro_filter.extension.orm_filter.filter, type: workflow, datasource: orm }
 
+    oro_workflow.translation_route.helper:
+        class: 'Oro\Bundle\WorkflowBundle\Helper\WorkflowTranslationRouteHelper'
+        arguments:
+            - '@oro_datagrid.route.helper'

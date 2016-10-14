@@ -318,3 +318,8 @@ services:
             - @oro_datagrid.configuration.provider
         tags:
             - { name: kernel.cache_warmer }
+
+    oro_datagrid.route.helper:
+        class: 'Oro\Bundle\DataGridBundle\Tools\DatagridRouteHelper'
+        arguments:
+            - '@router.default'
