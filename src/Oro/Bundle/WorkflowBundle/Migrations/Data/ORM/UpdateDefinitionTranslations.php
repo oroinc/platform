@@ -31,6 +31,10 @@ class UpdateDefinitionTranslations extends AbstractFixture implements ContainerA
 
             $definition->setConfiguration($configuration);
             $definition->setLabel($configuration['label']);
+
+            foreach ($definition->getSteps() as $step) {
+                $step->setLabel($configuration['steps'][$step->getName()]['label']);
+            }
         }
 
         $manager->flush();
