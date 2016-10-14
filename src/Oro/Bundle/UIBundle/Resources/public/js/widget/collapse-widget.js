@@ -9,6 +9,7 @@ define(['jquery', 'oroui/js/mediator', 'underscore', 'jquery-ui'], function($, m
             container: '[data-collapse-container]',
             storageKey: '',
             open: null,
+            forcedState: null,
             uid: '',
             openClass: 'expanded',
             animationSpeed: 250
@@ -28,7 +29,9 @@ define(['jquery', 'oroui/js/mediator', 'underscore', 'jquery-ui'], function($, m
             this.$trigger = this.$el.find(this.options.trigger);
             this.$container = this.$el.find(this.options.container);
 
-            this.options.open = _.isBoolean(storedState) ? storedState : this.options.open;
+            this.options.open = _.isBoolean(this.options.forcedState)
+                    ? this.options.forcedState
+                    : (_.isBoolean(storedState) ? storedState : this.options.open);
 
             this.$el.toggleClass(this.options.openClass, this.options.open);
 

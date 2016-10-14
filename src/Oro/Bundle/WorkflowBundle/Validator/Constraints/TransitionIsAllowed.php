@@ -22,6 +22,7 @@ class TransitionIsAllowed extends Constraint
     public $notStartTransitionMessage = '"{{ transition }}" is not start transition.';
     public $stepHasNotAllowedTransitionMessage = '"{{ transition }}" transition is not allowed at step "{{ step }}".';
     public $someConditionsNotMetMessage = 'Some transition conditions are not met.';
+    public static $workflowCanceledByTransitionMessage = 'Workflow was canceled by transition';
 
     /**
      * @param WorkflowItem $workflowItem

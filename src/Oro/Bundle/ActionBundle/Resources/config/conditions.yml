@@ -36,6 +36,13 @@ services:
         tags:
             - { name: oro_action.condition, alias: configurable }
 
+    oro_action.condition.extendable:
+        class: Oro\Component\Action\Condition\ExtendableCondition
+        arguments:
+            - '@event_dispatcher'
+        tags:
+            - { name: oro_action.condition, alias: extendable }
+
     oro_action.expression.andx:
         class: Oro\Component\ConfigExpression\Condition\Andx
         tags:

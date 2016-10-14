@@ -51,29 +51,37 @@ class TransitionIsAllowedValidator extends ConstraintValidator
             switch ($e->getCode()) {
                 case InvalidTransitionException::UNKNOWN_TRANSITION:
                     $errors->add(
-                        array(
+                        [
                             'message' => $constraint->unknownTransitionMessage,
-                            'parameters' => array('{{ transition }}' => $transitionName)
-                        )
+                            'parameters' => ['{{ transition }}' => $transitionName],
+                        ]
                     );
                     break;
                 case InvalidTransitionException::NOT_START_TRANSITION:
                     $errors->add(
-                        array(
+                        [
                             'message' => $constraint->notStartTransitionMessage,
-                            'parameters' => array('{{ transition }}' => $transitionName)
-                        )
+                            'parameters' => ['{{ transition }}' => $transitionName],
+                        ]
                     );
                     break;
                 case InvalidTransitionException::STEP_HAS_NO_ALLOWED_TRANSITION:
                     $errors->add(
-                        array(
+                        [
                             'message' => $constraint->stepHasNotAllowedTransitionMessage,
-                            'parameters' => array(
+                            'parameters' => [
                                 '{{ transition }}' => $transitionName,
-                                '{{ step }}' => $workflowItem->getCurrentStep()->getName()
-                            )
-                        )
+                                '{{ step }}' => $workflowItem->getCurrentStep()->getName(),
+                            ],
+                        ]
+                    );
+                    break;
+                case InvalidTransitionException::WORKFLOW_CANCELED_BY_TRANSITION:
+                    $errors->add(
+                        [
+                            'message' => $constraint::$workflowCanceledByTransitionMessage,
+                            'parameters' => [],
+                        ]
                     );
                     break;
             }

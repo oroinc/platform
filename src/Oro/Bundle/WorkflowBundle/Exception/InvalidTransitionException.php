@@ -7,6 +7,7 @@ class InvalidTransitionException extends WorkflowException
     const UNKNOWN_TRANSITION = 1;
     const NOT_START_TRANSITION = 2;
     const STEP_HAS_NO_ALLOWED_TRANSITION = 3;
+    const WORKFLOW_CANCELED_BY_TRANSITION = 4;
 
     public static function unknownTransition($transitionName)
     {
@@ -34,6 +35,23 @@ class InvalidTransitionException extends WorkflowException
                 $transitionName
             ),
             self::STEP_HAS_NO_ALLOWED_TRANSITION
+        );
+    }
+
+    /**
+     * @param string $workflowName
+     * @param string $stepName
+     * @return InvalidTransitionException
+     */
+    public static function workflowCanceledByTransition($workflowName, $stepName)
+    {
+        return new self(
+            sprintf(
+                'Workflow "%s" was canceled by transition on step "%s"',
+                $workflowName,
+                $stepName
+            ),
+            self::WORKFLOW_CANCELED_BY_TRANSITION
         );
     }
 }
