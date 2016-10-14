@@ -1,4 +1,4 @@
-@name = auto_deactivate_failed_logins
+@name = auto_deactivate_daily_failed_logins
 @entityName = Oro\Bundle\UserBundle\Entity\User
 @subject = Deactivation Notice
 @isSystem = 1
@@ -20,7 +20,7 @@
             <span style="font-family: Arial, Helvetica, sans-serif; font-size: 14pt; line-height: 14pt; color: #444444">Dear {{ entity|oro_format_name }},</span>
             <div style="height: 10pt; line-height: 10pt">&nbsp;</div>
             <p style="color: #444444; font-size: 10pt; font-family: Arial, Helvetica, sans-serif; font-weight: normal; margin: 5pt 0 10pt 0;">
-                To reactivate your account, please contact your system administrator.
+                You have reached the maximum number of failed login attempts allowed for one day. Please, try again tomorrow or contact your system administrator for assistance.
             </p>
         </td>
     </tr>

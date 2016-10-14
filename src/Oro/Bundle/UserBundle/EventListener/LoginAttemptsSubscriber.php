@@ -108,9 +108,22 @@ class LoginAttemptsSubscriber implements EventSubscriberInterface
     {
         $user->setEnabled(false);
 
-        $this->mailProcessor->sendAutoDeactivateEmail(
-            $user,
-            $this->loginAttemptsProvider->getExceedLimit($user)
-        );
+        if ($this->loginAttemptsProvider->getRemainingCumulativeLoginAttempts($user) <= 0) {
+            $this->mailProcessor->sendAutoDeactivateEmail(
+                $user,
+                $this->loginAttemptsProvider->getMaxCumulativeLoginAttempts($user)
+            );
+
+            return;
+        }
+
+        if ($this->loginAttemptsProvider->getRemainingDailyLoginAttempts($user) <= 0) {
+            $this->mailProcessor->sendAutoDeactivateDailyEmail(
+                $user,
+                $this->loginAttemptsProvider->getMaxDailyLoginAttempts($user)
+            );
+
+            return;
+        }
     }
 }
