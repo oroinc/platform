@@ -26,12 +26,15 @@ class SecurityController extends Controller
         $helper           = $this->get('security.authentication_utils');
         $csrfTokenManager = $this->get('security.csrf.token_manager');
         $attemptsProvider = $this->get('oro_user.security.login_attempts_provider');
+        $userManager      = $this->get('oro_user.manager');
 
         $remainingAttempts = null;
         if ($helper->getLastAuthenticationError(false) instanceof BadCredentialsException
             && $helper->getLastUsername()
         ) {
-            $remainingAttempts = $attemptsProvider->getByUsername($helper->getLastUsername());
+            if ($user = $userManager->findUserByUsernameOrEmail($helper->getLastUsername())) {
+                $remainingAttempts = $attemptsProvider->getByUser($user);
+            }
         }
 
         return [

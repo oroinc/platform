@@ -31,29 +31,4 @@ interface LoginInfoInterface
      * @return $this
      */
     public function setLoginCount($count);
-
-
-    /**
-     * @param int $count New failed login count value
-     *
-     * @return $this
-     */
-    public function setFailedLoginCount($count);
-
-    /**
-     * @return int
-     */
-    public function getFailedLoginCount();
-
-    /**
-     * @param int $count New daily failed login count value
-     *
-     * @return $this
-     */
-    public function setDailyFailedLoginCount($count);
-
-    /**
-     * @return int
-     */
-    public function getDailyFailedLoginCount();
 }

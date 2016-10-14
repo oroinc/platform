@@ -26,6 +26,7 @@ class AddFailedLoginColumns implements Migration
     public static function updateOroUserTable(Schema $schema)
     {
         $table = $schema->getTable('oro_user');
+        $table->addColumn('last_failed_login', 'datetime', ['notnull' => false, 'precision' => 0]);
         $table->addColumn('failed_login_count', 'integer', ['default' => '0', 'precision' => 0, 'unsigned' => true]);
         $table->addColumn(
             'daily_failed_login_count',

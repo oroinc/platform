@@ -2,58 +2,57 @@
 
 namespace Oro\Bundle\UserBundle\Tests\Unit\EventListener;
 
-use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
-use Symfony\Component\Security\Core\Event\AuthenticationFailureEvent;
-
 use Oro\Bundle\UserBundle\Entity\BaseUserManager;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\UserBundle\Entity\UserInterface;
 use Oro\Bundle\UserBundle\EventListener\LoginAttemptsSubscriber;
 use Oro\Bundle\UserBundle\Mailer\Processor;
+use Oro\Bundle\UserBundle\Manager\LoginAttemptsManager;
 use Oro\Bundle\UserBundle\Security\LoginAttemptsProvider;
+use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
+use Symfony\Component\Security\Core\Event\AuthenticationFailureEvent;
+use Symfony\Component\Security\Http\Event\InteractiveLoginEvent;
 
 class LoginAttemptsSubscriberTest extends \PHPUnit_Framework_TestCase
 {
-    public function testDoesNotDisableUserOnRemainingAttempts()
+    public function testDoesNotTrackUnknownUsernames()
     {
-        $user = $this->getUser();
-        $subscriber = $this->getSubscriber(3, $user);
-        $event = $this->getEvent($user->getUsername());
+        $subscriber = $this->getSubscriber(null);
+        $event = $this->getFailureEvent('john');
 
         $subscriber->onAuthenticationFailure($event);
-
-        $this->assertTrue($user->isEnabled());
     }
 
-    public function testIncrementCountersOnFailedLogin()
+    public function testDoesNotTrackUsersWithoutFailedLoginInfoOnFailure()
     {
-        $user = $this->getUser();
-        $subscriber = $this->getSubscriber(3, $user);
-        $event = $this->getEvent($user->getUsername());
+        $subscriber = $this->getSubscriber(new \stdClass());
+        $event = $this->getFailureEvent('john');
 
         $subscriber->onAuthenticationFailure($event);
-
-        $this->assertSame(1, $user->getDailyFailedLoginCount());
-        $this->assertSame(1, $user->getFailedLoginCount());
     }
 
-    public function testDisableUser()
+    public function testDoesNotTrackUsersWithoutFailedLoginInfoOnSuccess()
     {
-        $user = $this->getUser();
-        $subscriber = $this->getSubscriber(0, $user);
-        $event = $this->getEvent($user->getUsername());
+        $subscriber = $this->getSubscriber();
+        $event = $this->getInteractiveLoginEvent(new \stdClass());
 
-        $subscriber->onAuthenticationFailure($event);
-
-        $this->assertFalse($user->isEnabled());
+        $subscriber->onInteractiveLogin($event);
     }
 
-    public function testDoesNotLogEmptyUsernames()
+    public function shouldTrackFailures()
     {
-        $subscriber = $this->getSubscriber(0, null);
-        $event = $this->getEvent('john');
+        $subscriber = $this->getSubscriber(new User(), 1);
+        $event = $this->getFailureEvent('john');
 
         $subscriber->onAuthenticationFailure($event);
+    }
+
+    public function testShouldTrackInteractiveLogins()
+    {
+        $subscriber = $this->getSubscriber(new User(), 0, 1);
+        $event = $this->getInteractiveLoginEvent(new User());
+
+        $subscriber->onInteractiveLogin($event);
     }
 
     /**
@@ -69,31 +68,10 @@ class LoginAttemptsSubscriberTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @param int $remainingAttempts
-     * @return LoginAttemptsProvider
-     */
-    private function getLoginAttemptsProvider($remainingAttempts)
-    {
-        $provider = $this->getMockBuilder(LoginAttemptsProvider::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-        
-        $provider->expects($this->any())
-            ->method('getByUser')
-            ->willReturn($remainingAttempts);
-
-        $provider->expects($this->any())
-            ->method('hasRemainingAttempts')
-            ->willReturn(0 !== $remainingAttempts);
-
-        return $provider;
-    }
-
-    /**
-     * @param UserInterface|null $user
+     * @param object|null $user
      * @return BaseUserManager
      */
-    private function getUserManager(UserInterface $user = null)
+    private function getUserManager($user = null)
     {
         $manager = $this->getMockBuilder(BaseUserManager::class)
             ->disableOriginalConstructor()
@@ -107,20 +85,30 @@ class LoginAttemptsSubscriberTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return Processor
+     * @param int $failCalls
+     * @param int $successCalls
+     * @return LoginAttemptsManager
      */
-    private function getMailProcessor()
+    private function getAttemptsManager($failCalls = 0, $successCalls = 0)
     {
-        return $this->getMockBuilder(Processor::class)
+        $manager = $this->getMockBuilder(LoginAttemptsManager::class)
             ->disableOriginalConstructor()
             ->getMock();
+
+        $manager->expects($this->exactly($failCalls))
+            ->method('trackLoginFailure');
+
+        $manager->expects($this->exactly($successCalls))
+            ->method('trackLoginSuccess');
+
+        return $manager;
     }
 
     /**
      * @param string $username
      * @return AuthenticationFailureEvent
      */
-    private function getEvent($username)
+    private function getFailureEvent($username)
     {
         $token = $this->getMockBuilder(TokenInterface::class)
             ->disableOriginalConstructor()
@@ -142,16 +130,41 @@ class LoginAttemptsSubscriberTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @param int $remainingAttempts
-     * @param UserInterface|null $user
+     * @param object $user
+     * @return InteractiveLoginEvent
+     */
+    private function getInteractiveLoginEvent($user)
+    {
+        $token = $this->getMockBuilder(TokenInterface::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $token->expects($this->any())
+            ->method('getUser')
+            ->willReturn($user);
+
+        $event = $this->getMockBuilder(InteractiveLoginEvent::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $event->expects($this->any())
+            ->method('getAuthenticationToken')
+            ->willReturn($token);
+
+        return $event;
+    }
+
+    /**
+     * @param object|null $user
+     * @param int $failCalls
+     * @param int $successCalls
      * @return LoginAttemptsSubscriber
      */
-    private function getSubscriber($remainingAttempts, UserInterface $user = null)
+    private function getSubscriber($user = null, $failCalls = 0, $successCalls = 0)
     {
         return new LoginAttemptsSubscriber(
-            $this->getLoginAttemptsProvider($remainingAttempts),
             $this->getUserManager($user),
-            $this->getMailProcessor()
+            $this->getAttemptsManager($failCalls, $successCalls)
         );
     }
 }

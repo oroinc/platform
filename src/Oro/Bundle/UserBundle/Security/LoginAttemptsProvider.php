@@ -2,11 +2,8 @@
 
 namespace Oro\Bundle\UserBundle\Security;
 
-use Symfony\Component\Security\Core\User\UserInterface;
-
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
-use Oro\Bundle\UserBundle\Entity\BaseUserManager;
-use Oro\Bundle\UserBundle\Entity\Repository\LoginHistoryRepository;
+use Oro\Bundle\UserBundle\Entity\FailedLoginInfoInterface;
 
 class LoginAttemptsProvider
 {
@@ -16,42 +13,22 @@ class LoginAttemptsProvider
     /** @var  ConfigManager */
     protected $configManager;
 
-    /** @var BaseUserManager */
-    protected $userManager;
-
     /**
      * @param Registry        $registry
      * @param ConfigManager   $configManager
-     * @param BaseUserManager $userManager
      */
-    public function __construct(
-        ConfigManager $configManager,
-        BaseUserManager $userManager
-    ) {
-        $this->configManager = $configManager;
-        $this->userManager = $userManager;
-    }
-
-    /**
-     * @param  string $username
-     * @return int|null Return null if user with supplied username does not exists
-     */
-    public function getByUsername($username)
+    public function __construct(ConfigManager $configManager)
     {
-        if ($user = $this->userManager->findUserByUsername($username)) {
-            return $this->getByUser($user);
-        }
-
-        return null;
+        $this->configManager = $configManager;
     }
 
     /**
      * Get remaining login attempts by used
      *
-     * @param  UserInterface $user
+     * @param  FailedLoginInfoInterface $user
      * @return int
      */
-    public function getByUser(UserInterface $user)
+    public function getByUser(FailedLoginInfoInterface $user)
     {
         $remainingCumulative = $this->getRemainingCumulativeLoginAttempts($user);
         $remainingDaily = $this->getRemainingDailyLoginAttempts($user);
@@ -63,10 +40,10 @@ class LoginAttemptsProvider
      * Get exceed login attempts limit - daily or cumulative.
      * Return zero when limits are not exceed.
      *
-     * @param  UserInterface $user
+     * @param  FailedLoginInfoInterface $user
      * @return int
      */
-    public function getExceedLimit(UserInterface $user)
+    public function getExceedLimit(FailedLoginInfoInterface $user)
     {
         if ($this->getRemainingCumulativeLoginAttempts($user) <= 0) {
             return $this->getMaxCumulativeLoginAttempts();
@@ -79,25 +56,25 @@ class LoginAttemptsProvider
         return 0;
     }
 
-    public function hasRemainingAttempts(UserInterface $user)
+    public function hasRemainingAttempts(FailedLoginInfoInterface $user)
     {
         return 0 !== $this->getByUser($user);
     }
 
     /**
-     * @param  UserInterface $user
+     * @param  FailedLoginInfoInterface $user
      * @return int
      */
-    public function getRemainingCumulativeLoginAttempts(UserInterface $user)
+    public function getRemainingCumulativeLoginAttempts(FailedLoginInfoInterface $user)
     {
         return $this->getMaxCumulativeLoginAttempts() - $user->getFailedLoginCount();
     }
 
     /**
-     * @param  UserInterface $user
+     * @param  FailedLoginInfoInterface $user
      * @return int
      */
-    public function getRemainingDailyLoginAttempts(UserInterface $user)
+    public function getRemainingDailyLoginAttempts(FailedLoginInfoInterface $user)
     {
         return $this->getMaxDailyLoginAttempts() - $user->getDailyFailedLoginCount();
     }

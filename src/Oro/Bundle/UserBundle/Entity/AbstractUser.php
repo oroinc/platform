@@ -22,6 +22,7 @@ use Oro\Bundle\OrganizationBundle\Entity\OrganizationInterface;
 abstract class AbstractUser implements
     UserInterface,
     LoginInfoInterface,
+    FailedLoginInfoInterface,
     \Serializable,
     OrganizationAwareUserInterface,
     PasswordRecoveryInterface
@@ -120,6 +121,20 @@ abstract class AbstractUser implements
      * @ORM\Column(name="login_count", type="integer", options={"default"=0, "unsigned"=true})
      */
     protected $loginCount;
+
+    /**
+     * @var \DateTime
+     *
+     * @ORM\Column(name="last_failed_login", type="datetime", nullable=true)
+     * @ConfigField(
+     *      defaultValues={
+     *          "importexport"={
+     *              "excluded"=true
+     *          }
+     *      }
+     * )
+     */
+    protected $lastFailedLogin;
 
     /**
      * @var int
@@ -354,6 +369,26 @@ abstract class AbstractUser implements
     public function setLoginCount($count)
     {
         $this->loginCount = $count;
+
+        return $this;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getLastFailedLogin()
+    {
+        return $this->lastFailedLogin;
+    }
+
+    /**
+     * {@inheritdoc}
+     *
+     * @return $this
+     */
+    public function setLastFailedLogin(\DateTime $time = null)
+    {
+        $this->lastFailedLogin = $time;
 
         return $this;
     }

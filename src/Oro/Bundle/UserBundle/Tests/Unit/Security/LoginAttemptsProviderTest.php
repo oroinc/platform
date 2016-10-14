@@ -2,37 +2,12 @@
 
 namespace Oro\Bundle\UserBundle\Tests\Unit\Security;
 
-use Symfony\Component\Security\Core\User\UserInterface;
-
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
-use Oro\Bundle\UserBundle\Entity\BaseUserManager;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\UserBundle\Security\LoginAttemptsProvider;
 
 class LoginAttemptsProviderTest extends \PHPUnit_Framework_TestCase
 {
-    public function testShouldReturnNullForUnknownUsername()
-    {
-        $provider = new LoginAttemptsProvider(
-            $this->getConfigManager(10, 20),
-            $this->getUserManager(null)
-        );
-
-        $this->assertNull($provider->getByUsername('john_doe'));
-    }
-
-    public function testShouldReturnAttemptsByUsername()
-    {
-        $user = $this->getUser(1, 1);
-
-        $provider = new LoginAttemptsProvider(
-            $this->getConfigManager(10, 20),
-            $this->getUserManager($user)
-        );
-
-        $this->assertSame(9, $provider->getByUsername($user->getUsername()));
-    }
-
     /**
      * @dataProvider exceedLoginAttemptsProvider
      */
@@ -45,8 +20,7 @@ class LoginAttemptsProviderTest extends \PHPUnit_Framework_TestCase
     ) {
         $user = $this->getUser($dailyAttempts, $cumulativeAttempts);
         $provider = new LoginAttemptsProvider(
-            $this->getConfigManager($dailyLimit, $cumulativeLimit),
-            $this->getUserManager($user)
+            $this->getConfigManager($dailyLimit, $cumulativeLimit)
         );
 
         $this->assertSame($expected, $provider->getExceedLimit($user));
@@ -76,8 +50,7 @@ class LoginAttemptsProviderTest extends \PHPUnit_Framework_TestCase
     ) {
         $user = $this->getUser($dailyAttempts, $cumulativeAttempts);
         $provider = new LoginAttemptsProvider(
-            $this->getConfigManager($dailyLimit, $cumulativeLimit),
-            $this->getUserManager($user)
+            $this->getConfigManager($dailyLimit, $cumulativeLimit)
         );
 
         $this->assertSame($expected, $provider->getByUser($user));
@@ -129,23 +102,6 @@ class LoginAttemptsProviderTest extends \PHPUnit_Framework_TestCase
                 [LoginAttemptsProvider::MAX_LOGIN_ATTEMPTS, false, false, null, $maxAttempts],
                 [LoginAttemptsProvider::MAX_DAILY_LOGIN_ATTEMPTS, false, false, null, $maxDailyAttempts]
             ]));
-
-        return $manager;
-    }
-
-    /**
-     * @param UserInterface|null $user
-     * @return BaseUserManager
-     */
-    private function getUserManager(UserInterface $user = null)
-    {
-        $manager = $this->getMockBuilder(BaseUserManager::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $manager->expects($this->any())
-            ->method('findUserByUsername')
-            ->willReturn($user);
 
         return $manager;
     }
