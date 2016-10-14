@@ -9,7 +9,6 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
 class ConfigUpgradeCommand extends ContainerAwareCommand
-
 {
     const COMMAND_NAME = 'oro:platform:upgrade20:db-configs';
 
@@ -39,9 +38,8 @@ class ConfigUpgradeCommand extends ContainerAwareCommand
         $force = $input->getOption('force');
 
         if ($force) {
-            /** @var NamespaceMigration $migration */
-            $migration = $this->getContainer()->get('oro_installer.namespace_migration');
-            $migration->migrate();
+            $this->getContainer()->get('oro_installer.namespace_migration')->migrate();
+            $this->getContainer()->get('oro_entity_config.config_manager')->clear();
         } else {
             $output->writeln(
                 '<comment>ATTENTION</comment>: Database backup is highly recommended before executing this command.'

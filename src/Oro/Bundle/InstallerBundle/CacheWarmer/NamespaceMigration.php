@@ -6,16 +6,12 @@ use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Types\Type;
 
-use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\Id\ConfigIdInterface;
 
 class NamespaceMigration
 {
     /** @var ManagerRegistry */
     private $managerRegistry;
-
-    /** @var ConfigManager */
-    private $configManager;
 
     /** @var NamespaceMigrationProviderInterface[] */
     protected $providers = [];
@@ -25,12 +21,10 @@ class NamespaceMigration
 
     /**
      * @param ManagerRegistry $managerRegistry
-     * @param ConfigManager $configManager
      */
-    public function __construct(ManagerRegistry $managerRegistry, ConfigManager $configManager)
+    public function __construct(ManagerRegistry $managerRegistry)
     {
         $this->managerRegistry = $managerRegistry;
-        $this->configManager = $configManager;
     }
 
     /**
@@ -87,8 +81,6 @@ class NamespaceMigration
             $searchConnection->rollBack();
             throw $e;
         }
-
-        $this->configManager->clear();
     }
 
     /**
