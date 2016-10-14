@@ -102,8 +102,8 @@ services:
         tags:
             - { name: oro.api.processor, action: get_config, extra: descriptions&definition, priority: -210 }
 
-    oro_api.get_config.complete_descriptions_for_primary_fields:
-        class: Oro\Bundle\ApiBundle\Processor\Config\Shared\CompleteDesctiptionForPrimaryFields
+    oro_api.get_config.complete_description_for_primary_fields:
+        class: Oro\Bundle\ApiBundle\Processor\Config\Shared\CompleteDescriptionForPrimaryFields
         arguments:
             - '@oro_api.entity_description_provider'
             - '@oro_api.resource_doc_provider'
