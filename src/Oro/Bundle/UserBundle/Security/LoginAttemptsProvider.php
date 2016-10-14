@@ -107,7 +107,7 @@ class LoginAttemptsProvider
      */
     public function getMaxCumulativeLoginAttempts()
     {
-        return $this->configManager->get(self::MAX_LOGIN_ATTEMPTS);
+        return (int) $this->configManager->get(self::MAX_LOGIN_ATTEMPTS);
     }
 
     /**
@@ -115,6 +115,6 @@ class LoginAttemptsProvider
      */
     public function getMaxDailyLoginAttempts()
     {
-        return $this->configManager->get(self::MAX_DAILY_LOGIN_ATTEMPTS);
+        return (int) $this->configManager->get(self::MAX_DAILY_LOGIN_ATTEMPTS);
     }
 }
