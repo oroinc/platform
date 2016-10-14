@@ -6,7 +6,9 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 use Knp\Menu\FactoryInterface;
 use Knp\Menu\ItemInterface;
+use Knp\Menu\Loader\ArrayLoader;
 use Knp\Menu\Provider\MenuProviderInterface;
+use Knp\Menu\Util\MenuManipulator;
 
 use Oro\Bundle\NavigationBundle\Event\ConfigureMenuEvent;
 use Oro\Bundle\NavigationBundle\Menu\BuilderInterface;
@@ -37,6 +39,16 @@ class BuilderChainProvider implements MenuProviderInterface
     private $factory;
 
     /**
+     * @var ArrayLoader
+     */
+    private $loader;
+
+    /**
+     * @var MenuManipulator
+     */
+    private $manipulator;
+
+    /**
      * @var \Doctrine\Common\Cache\CacheProvider
      */
     private $cache;
@@ -46,10 +58,16 @@ class BuilderChainProvider implements MenuProviderInterface
      */
     private $eventDispatcher;
 
-    public function __construct(FactoryInterface $factory, EventDispatcherInterface $eventDispatcher)
-    {
+    public function __construct(
+        FactoryInterface $factory,
+        EventDispatcherInterface $eventDispatcher,
+        ArrayLoader $loader,
+        MenuManipulator $manipulator
+    ) {
         $this->factory = $factory;
         $this->eventDispatcher = $eventDispatcher;
+        $this->loader = $loader;
+        $this->manipulator = $manipulator;
     }
 
     /**
@@ -93,7 +111,7 @@ class BuilderChainProvider implements MenuProviderInterface
         if (!array_key_exists($alias, $this->menus)) {
             if ($this->cache && $this->cache->contains($alias)) {
                 $menuData = $this->cache->fetch($alias);
-                $this->menus[$alias] = $this->factory->createFromArray($menuData);
+                $this->menus[$alias] = $this->loader->load($menuData);
             } else {
                 $menu = $this->factory->createItem($alias);
 
@@ -121,7 +139,7 @@ class BuilderChainProvider implements MenuProviderInterface
 
                 $this->sort($menu);
                 if ($this->cache) {
-                    $this->cache->save($alias, $menu->toArray());
+                    $this->cache->save($alias, $this->manipulator->toArray($menu));
                 }
             }
         }

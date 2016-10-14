@@ -235,6 +235,9 @@ and constructor signature changed to `DeferredScheduler $deferredScheduler`.
 - Added interface `Oro\Bundle\DataGridBundle\Datasource\Orm\Configs\ConfigProcessorInterface`
 - `Oro\Bundle\DataGridBundle\Datasource\Orm\OrmDatasource::getParameterBinder` was deprecated
 - `Oro\Bundle\DataGridBundle\Datasource\ParameterBinderAwareInterface::getParameterBinder` was deprecated
+- Class `Oro/Bundle/DataGridBundle/Extension/MassAction/DeleteMassActionHandler.php`
+    - construction signature was changed now it takes new argument:
+        `MessageProducerInterface` $producer
 
 ####SecurityBundle
 - Removed layout context configurator `Oro\Bundle\SecurityBundle\Layout\Extension\SecurityFacadeContextConfigurator`.
@@ -246,6 +249,7 @@ and constructor signature changed to `DeferredScheduler $deferredScheduler`.
 ####ImportExportBundle
 - Added new event `AFTER_JOB_EXECUTION`, for details please check out [documentation](./src/Oro/Bundle/ImportExportBundle/Resources/doc/reference/events.md).
 - For `Oro\Bundle\ImportExportBundle\Job\JobExecutor` added new public method `setEventDispatcher` for setting Event Dispatcher.
+- Options for import/export buttons configuration `dataGridName` was renamed to `datagridName`
 
 ####TranslationBundle
 - Added controller `Oro\Bundle\TranslationBundle\Controller\LanguageController` for manage Languages.
@@ -403,6 +407,12 @@ placeholders:
 - Added class `Oro\Bundle\NavigationBundle\Entity\Repository\MenuUpdateRepository` repository for `Oro\Bundle\NavigationBundle\Entity\MenuUpdate` entity.
 - Added class `Oro\Bundle\NavigationBundle\Exception\ProviderNotFoundException`.
 - Added class `Oro\Bundle\NavigationBundle\Provider\DefaultMenuUpdateProvider` with service `oro_navigation.menu_update_provider.default`.
+- Class `Oro\Bundle\NavigationBundle\Provider\BuilderChainProvider`
+    - construction signature was changed now it takes next arguments:
+        - `FactoryInterface` $factory,
+        - `EventDispatcherInterface` $eventDispatcher,
+        - `ArrayLoader` $loader,
+        - `MenuManipulator` $manipulator
 
 ####EmailBundle
 - Constructor of `Oro\Bundle\EmailBundle\Form\DataTransformer\EmailTemplateTransformer` changed. Removed the arguments.

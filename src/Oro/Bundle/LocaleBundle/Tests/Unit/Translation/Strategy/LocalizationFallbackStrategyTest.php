@@ -7,6 +7,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\EntityManager;
 
+use Oro\Bundle\LocaleBundle\DependencyInjection\Configuration;
 use Oro\Component\Testing\Unit\EntityTrait;
 
 use Oro\Bundle\LocaleBundle\Entity\Repository\LocalizationRepository;
@@ -118,8 +119,10 @@ class LocalizationFallbackStrategyTest extends \PHPUnit_Framework_TestCase
             'childLocalizations' => new ArrayCollection([$firstLevelRu])
         ]);
         $localizations = [
-            'en' => ['en' => ['en' => []]],
-            'ru' => ['ru' => []],
+            Configuration::DEFAULT_LOCALE => [
+                'en' => ['en' => ['en' => []]],
+                'ru' => ['ru' => []],
+            ]
         ];
         return [
             ['entities' => [$en, $ru], 'localizations' => $localizations],

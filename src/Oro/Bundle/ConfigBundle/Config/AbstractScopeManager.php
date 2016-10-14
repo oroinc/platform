@@ -228,6 +228,8 @@ abstract class AbstractScopeManager
         $this->cache->save($this->getCacheKey($entity, $entityId), $settings);
         $this->storedSettings[$entityId] = $settings;
 
+        $em->detach($config);
+
         return [$updated, $removed];
     }
 
