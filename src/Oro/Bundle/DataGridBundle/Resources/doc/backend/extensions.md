@@ -18,6 +18,7 @@ Here's list of already implemented extensions:
 - [Export](extensions/export.md) - responsible for export grid data
 - [Field ACL](extensions/field_acl.md) - allow to protect entity fields with ACL
 - [Board](extensions/board.md) - responsible for adding Kanban board views for datagrids
+- [Filter](http://github.com/orocrm/platform/blob/master/src/Oro/Bundle/FilterBundle/Resources/doc/reference/grid_extension.md) - responsible for adding filtering and filter widgets to grid
 
 Customization
 -------------

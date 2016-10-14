@@ -26,7 +26,7 @@ class CompleteDescriptions implements ProcessorInterface
     const PLACEHOLDER_INHERIT_DOC = '{@inheritdoc}';
 
     /** @var EntityDescriptionProvider */
-    protected $entityDescriptionProvider;
+    protected $entityDocProvider;
 
     /** @var ResourceDocProviderInterface */
     protected $resourceDocProvider;
@@ -38,18 +38,18 @@ class CompleteDescriptions implements ProcessorInterface
     protected $translator;
 
     /**
-     * @param EntityDescriptionProvider    $entityDescriptionProvider
+     * @param EntityDescriptionProvider    $entityDocProvider
      * @param ResourceDocProviderInterface $resourceDocProvider
      * @param MarkdownApiDocParser         $apiDocParser
      * @param TranslatorInterface          $translator
      */
     public function __construct(
-        EntityDescriptionProvider $entityDescriptionProvider,
+        EntityDescriptionProvider $entityDocProvider,
         ResourceDocProviderInterface $resourceDocProvider,
         MarkdownApiDocParser $apiDocParser,
         TranslatorInterface $translator
     ) {
-        $this->entityDescriptionProvider = $entityDescriptionProvider;
+        $this->entityDocProvider = $entityDocProvider;
         $this->resourceDocProvider = $resourceDocProvider;
         $this->apiDocParser = $apiDocParser;
         $this->translator = $translator;
@@ -148,7 +148,7 @@ class CompleteDescriptions implements ProcessorInterface
         if ($processInheritDoc && $definition->hasDocumentation()) {
             $documentation = $definition->getDocumentation();
             if (false !== strpos($documentation, self::PLACEHOLDER_INHERIT_DOC)) {
-                $entityDocumentation = $this->entityDescriptionProvider->getEntityDocumentation($entityClass);
+                $entityDocumentation = $this->entityDocProvider->getEntityDocumentation($entityClass);
                 $definition->setDocumentation(
                     str_replace(self::PLACEHOLDER_INHERIT_DOC, $entityDocumentation, $documentation)
                 );
@@ -281,7 +281,7 @@ class CompleteDescriptions implements ProcessorInterface
                         $this->processInheritDocForField($description, $entityClass, $fieldName, $propertyPath)
                     );
                 } else {
-                    $description = $this->entityDescriptionProvider->getFieldDescription($entityClass, $propertyPath);
+                    $description = $this->entityDocProvider->getFieldDocumentation($entityClass, $propertyPath);
                     if ($description) {
                         $field->setDescription($description);
                     }
@@ -346,10 +346,7 @@ class CompleteDescriptions implements ProcessorInterface
         if (false !== strpos($description, self::PLACEHOLDER_INHERIT_DOC)) {
             $commonDescription = $this->apiDocParser->getFieldDocumentation($entityClass, $fieldName);
             if (!$commonDescription) {
-                $commonDescription = $this->entityDescriptionProvider->getFieldDescription(
-                    $entityClass,
-                    $propertyPath
-                );
+                $commonDescription = $this->entityDocProvider->getFieldDocumentation($entityClass, $propertyPath);
             }
             $description = str_replace(self::PLACEHOLDER_INHERIT_DOC, $commonDescription, $description);
         }
@@ -373,23 +370,13 @@ class CompleteDescriptions implements ProcessorInterface
                 $description = $this->apiDocParser->getFilterDocumentation($entityClass, $fieldName);
                 if ($description) {
                     $field->setDescription($description);
-                    continue;
-                }
-
-                $fieldsDefinition = $definition->getField($fieldName);
-                if ($fieldsDefinition && $fieldsDefinition->hasTargetEntity()) {
-                    $description = sprintf(
-                        'Filter records by \'%s\' relationship.',
-                        $fieldName
-                    );
-                    $field->setDescription($description);
-                    continue;
-                }
-
-                $propertyPath = $field->getPropertyPath($fieldName);
-                $description = $this->entityDescriptionProvider->getFieldDescription($entityClass, $propertyPath);
-                if ($description) {
-                    $field->setDescription($description);
+                } else {
+                    $fieldsDefinition = $definition->getField($fieldName);
+                    if ($fieldsDefinition && $fieldsDefinition->hasTargetEntity()) {
+                        $field->setDescription(sprintf('Filter records by \'%s\' relationship.', $fieldName));
+                    } else {
+                        $field->setDescription(sprintf('Filter records by \'%s\' field.', $fieldName));
+                    }
                 }
             } else {
                 $description = $field->getDescription();
@@ -400,7 +387,6 @@ class CompleteDescriptions implements ProcessorInterface
                     $description = $this->apiDocParser->getFilterDocumentation($entityClass, $fieldName);
                     if ($description) {
                         $field->setDescription($description);
-                        continue;
                     }
                 }
             }
@@ -416,8 +402,8 @@ class CompleteDescriptions implements ProcessorInterface
     protected function getEntityDescription($entityClass, $isCollection)
     {
         return $isCollection
-            ? $this->entityDescriptionProvider->getEntityPluralDescription($entityClass)
-            : $this->entityDescriptionProvider->getEntityDescription($entityClass);
+            ? $this->entityDocProvider->getEntityPluralDescription($entityClass)
+            : $this->entityDocProvider->getEntityDescription($entityClass);
     }
 
     /**
@@ -427,7 +413,7 @@ class CompleteDescriptions implements ProcessorInterface
      */
     protected function getAssociationDescription($associationName)
     {
-        return $this->entityDescriptionProvider->humanizeAssociationName($associationName);
+        return $this->entityDocProvider->humanizeAssociationName($associationName);
     }
 
     /**

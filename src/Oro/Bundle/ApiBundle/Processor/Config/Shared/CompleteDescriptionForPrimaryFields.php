@@ -7,11 +7,11 @@ use Oro\Component\ChainProcessor\ProcessorInterface;
 use Oro\Bundle\ApiBundle\Processor\Config\ConfigContext;
 
 /**
- * Adds human-readable descriptions for the primary field of the entity.
+ * Adds human-readable description for the primary field of the entity.
  */
-class CompleteDesctiptionForPrimaryFields implements ProcessorInterface
+class CompleteDescriptionForPrimaryFields implements ProcessorInterface
 {
-    const PRIMARY_FIELD_DESCRIPTION = 'The identifier of an entity';
+    const ID_DESCRIPTION = 'The identifier of an entity';
 
     /**
      * @param ContextInterface $context
@@ -35,8 +35,8 @@ class CompleteDesctiptionForPrimaryFields implements ProcessorInterface
         $identifierFieldName = reset($identifierFieldNames);
         if ($definition->hasField($identifierFieldName)) {
             $primaryField = $definition->getField($identifierFieldName);
-            if (empty($primaryField->getDescription())) {
-                $primaryField->setDescription(self::PRIMARY_FIELD_DESCRIPTION);
+            if (!$primaryField->hasDescription()) {
+                $primaryField->setDescription(self::ID_DESCRIPTION);
             }
         }
     }
