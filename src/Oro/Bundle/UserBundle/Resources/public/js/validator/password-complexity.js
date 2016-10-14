@@ -36,7 +36,7 @@ define(['underscore', 'orotranslation/js/translator'
                 messages.push(param.requireNumbersKey);
             }
 
-            if (Boolean(param.requireSpecialCharacter) && !value.match(/[\W_]/)) {
+            if (Boolean(param.requireSpecialCharacter) && !value.match(/[^A-Za-z0-9]/)) {
                 messages.push(param.requireSpecialCharacterKey);
             }
 

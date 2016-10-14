@@ -16,7 +16,7 @@ class PasswordComplexityValidator extends ConstraintValidator
 {
     const REGEX_UPPER_CASE = '/[A-Z]/u';
     const REGEX_NUMBERS = '/\d/u';
-    const REGEX_SPECIAL_CHARS = '/[\W_]/u';
+    const REGEX_SPECIAL_CHARS = '/[^A-Za-z0-9]/u';
 
     /** @var PasswordComplexityConfigProvider */
     private $configProvider;
