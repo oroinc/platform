@@ -51,6 +51,12 @@ class ResetPasswordActionHandler implements MassActionHandlerInterface
     /** @var string */
     protected $errorMessage = 'oro.user.password.force_reset.mass_action.failure';
 
+    /**
+     * @param EmailNotificationProcessor $mailerProcessor
+     * @param UserManager $userManager
+     * @param TranslatorInterface $translator
+     * @param LoggerInterface $logger
+     */
     public function __construct(
         EmailNotificationProcessor $mailerProcessor,
         UserManager $userManager,
@@ -123,7 +129,7 @@ class ResetPasswordActionHandler implements MassActionHandlerInterface
      */
     protected function getTemplate()
     {
-        if (null == $this->template) {
+        if (null === $this->template) {
             $this->template = $this->em
                 ->getRepository('OroEmailBundle:EmailTemplate')
                 ->findOneBy(['name' => self::TEMPLATE_NAME]);

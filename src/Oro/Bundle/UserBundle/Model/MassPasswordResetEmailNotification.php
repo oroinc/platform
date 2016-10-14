@@ -62,7 +62,7 @@ class MassPasswordResetEmailNotification implements EmailNotificationInterface, 
     }
 
     /**
-     * @return string|null
+     * @return string
      */
     public function getSenderEmail()
     {
@@ -70,7 +70,7 @@ class MassPasswordResetEmailNotification implements EmailNotificationInterface, 
     }
 
     /**
-     * @return string|null
+     * @return string
      */
     public function getSenderName()
     {

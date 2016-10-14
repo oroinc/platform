@@ -39,7 +39,7 @@ class ResetController extends Controller
         }
 
         if ($user->isPasswordRequestNonExpired($this->container->getParameter('oro_user.reset.ttl'))) {
-            if (!($frontend && null == $user->getPasswordRequestedAt())) {
+            if (!($frontend && null === $user->getPasswordRequestedAt())) {
                 $this->get('session')->getFlashBag()->add(
                     'warn',
                     'oro.user.password.reset.ttl_already_requested.message'

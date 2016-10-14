@@ -15,9 +15,7 @@ class ResetPasswordExtention extends AbstractExtension
 {
     const USERS_GRID_NAME = 'users-grid';
 
-    /**
-     * @var RequestStack
-     */
+    /** @var RequestStack */
     protected $requestStack;
 
     /**
