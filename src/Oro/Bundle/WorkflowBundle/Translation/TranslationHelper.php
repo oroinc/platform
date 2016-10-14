@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\WorkflowBundle\Translation;
 
+use Oro\Bundle\TranslationBundle\Entity\Translation;
 use Oro\Bundle\TranslationBundle\Manager\TranslationManager;
 use Oro\Bundle\TranslationBundle\Translation\Translator;
 
@@ -40,8 +41,12 @@ class TranslationHelper
         if (!$this->currentLocale) {
             $this->currentLocale = $this->translator->getLocale();
         }
-        $this->translationManager
-            ->saveValue($key, $value, $this->currentLocale, self::WORKFLOWS_DOMAIN);
+
+        if ($this->currentLocale !== Translation::DEFAULT_LOCALE) {
+            //todo ensure there is translation for default locale in database otherwise store current $value
+        }
+
+        $this->translationManager->saveValue($key, $value, $this->currentLocale, self::WORKFLOWS_DOMAIN);
     }
 
     /**
