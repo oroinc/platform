@@ -118,10 +118,7 @@ class ResetPasswordActionHandler implements MassActionHandlerInterface
 
         $responseMessage = $massActionOptions->offsetGetByPath('[messages][success]', $this->successMessage);
 
-        return new MassActionResponse(
-            true,
-            $this->translator->trans($responseMessage)
-        );
+        return new MassActionResponse(true, $this->translator->trans($responseMessage));
     }
 
     /**
