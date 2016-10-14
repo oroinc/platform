@@ -1,8 +1,7 @@
 .wrapper {
     height: inherit;
-    min-height: 100%;
 
     &__content {
-        height: inherit;
+        min-height: 100%;
     }
 }
