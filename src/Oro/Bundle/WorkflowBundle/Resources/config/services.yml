@@ -345,6 +345,13 @@ services:
             - '@translator'
             - '@oro_workflow.manager'
 
+    oro_workflow.translation.helper:
+        class: 'Oro\Bundle\WorkflowBundle\Translation\Helper'
+        arguments:
+            - '@translator.default'
+            - '@oro_translation.helper.translation'
+            - '@oro_translation.generator.translation_key'
+
     oro_workflow.filter.workflow:
         class: 'Oro\Bundle\WorkflowBundle\Filter\WorkflowFilter'
         arguments:
