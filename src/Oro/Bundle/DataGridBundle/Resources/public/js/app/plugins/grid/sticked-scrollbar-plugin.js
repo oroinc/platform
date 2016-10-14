@@ -118,7 +118,7 @@ define(function(require) {
                 this.domCache.$spyScroll.on('scroll', _.bind(this.manageScroll, this));
             }
             /*
-            * For cases when grid is under collapsible block
+            * For cases when grid is inside collapsible block
             */
             if (!_.isEmpty(this.domCache.$collapsible)) {
                 this.domCache.$collapsible.on('hidden.bs.collapse shown.bs.collapse', _.bind(this.manageScroll, this));
