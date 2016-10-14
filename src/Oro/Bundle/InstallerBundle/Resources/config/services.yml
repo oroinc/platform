@@ -34,8 +34,3 @@ services:
         class: 'Oro\Bundle\InstallerBundle\CacheWarmer\NamespaceMigration'
         arguments:
             - '@doctrine'
-
-    oro_installer.namespace_migration_provider:
-        class: 'Oro\Bundle\InstallerBundle\CacheWarmer\NamespaceMigrationProvider'
-        tags:
-            - {name: oro_installer.namespace_migration_provider}
