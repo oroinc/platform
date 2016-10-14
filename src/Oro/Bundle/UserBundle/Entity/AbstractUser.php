@@ -692,8 +692,8 @@ abstract class AbstractUser implements
     {
         $passwordRequestAt = $this->getPasswordRequestedAt();
 
-        return $passwordRequestAt == null || $passwordRequestAt instanceof \DateTime
-        && $this->getPasswordRequestedAt()->getTimestamp() + $ttl > time();
+        return $passwordRequestAt === null || ($passwordRequestAt instanceof \DateTime
+        && $this->getPasswordRequestedAt()->getTimestamp() + $ttl > time());
     }
 
     /**
