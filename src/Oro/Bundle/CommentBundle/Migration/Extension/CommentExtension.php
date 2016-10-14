@@ -66,6 +66,8 @@ class CommentExtension implements ExtendExtensionAwareInterface
      * @param string $targetTableName
      *
      * @return bool
+     *
+     * @throws SchemaException if valid primary key does not exist
      */
     public function hasCommentAssociation(Schema $schema, $targetTableName)
     {
@@ -75,8 +77,23 @@ class CommentExtension implements ExtendExtensionAwareInterface
         $associationName = ExtendHelper::buildAssociationName(
             $this->extendExtension->getEntityClassByTableName($targetTableName)
         );
-        $primaryKeyColumnName = $this->extendExtension->getPrimaryKeyColumnName($targetTable);
-        $selfColumnName       = $this->extendExtension->nameGenerator->generateRelationColumnName(
+
+        if (!$targetTable->hasPrimaryKey()) {
+            throw new SchemaException(
+                sprintf('The table "%s" must have a primary key.', $targetTable->getName())
+            );
+        }
+        $primaryKeyColumns = $targetTable->getPrimaryKey()->getColumns();
+        if (count($primaryKeyColumns) !== 1) {
+            throw new SchemaException(
+                sprintf('A primary key of "%s" table must include only one column.', $targetTable->getName())
+            );
+        }
+
+        $primaryKeyColumnName = array_pop($primaryKeyColumns);
+
+        $nameGenerator = $this->extendExtension->getNameGenerator();
+        $selfColumnName = $nameGenerator->generateRelationColumnName(
             $associationName,
             '_' . $primaryKeyColumnName
         );
