@@ -42,6 +42,5 @@ class MigrateRelations implements Migration
             'orocrm',
             'oro'
         ));
-
     }
 }
