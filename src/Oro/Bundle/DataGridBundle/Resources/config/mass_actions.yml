@@ -20,6 +20,7 @@ services:
             - '@oro_datagrid.extension.mass_action.actions.ajax.mass_delete_limiter'
             - '@request_stack'
             - '@oro_platform.optional_listeners.manager'
+            - '@oro_message_queue.client.message_producer'
 
     oro_datagrid.mass_action.parameters_parser:
         class: %oro_datagrid.mass_action.parameters_parser.class%
