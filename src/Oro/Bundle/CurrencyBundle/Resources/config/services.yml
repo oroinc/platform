@@ -1,0 +1,59 @@
+parameters:
+    oro_currency.price.model: Oro\Bundle\CurrencyBundle\Entity\Price
+    oro_currency.twig.currency.class: Oro\Bundle\CurrencyBundle\Twig\CurrencyExtension
+
+services:
+    oro_currency.twig.currency:
+        class: %oro_currency.twig.currency.class%
+        arguments:
+            - '@oro_locale.formatter.number'
+            - '@oro_currency.provider.view_type'
+        tags:
+            - { name: twig.extension }
+
+    oro_currency.service.abstract_rounding:
+        class: 'Oro\Bundle\CurrencyBundle\Rounding\AbstractRoundingService'
+        public: false
+        abstract: true
+        arguments:
+            - "@oro_config.manager"
+
+    oro_currency.rounding.price_rounding_service:
+        class: 'Oro\Bundle\CurrencyBundle\Rounding\PriceRoundingService'
+        public: false
+        parent: oro_currency.service.abstract_rounding
+
+    #currencyConfig
+    oro_currency.config.currency:
+        class: 'Oro\Bundle\CurrencyBundle\Config\CurrencyConfigManager'
+        lazy: true
+        arguments:
+            - '@oro_config.manager'
+
+    oro_currency.provider.view_type:
+        class: Oro\Bundle\CurrencyBundle\Provider\ViewTypeConfigProvider
+        public: false
+        lazy: true
+        arguments:
+            - '@oro_config.manager'
+
+    oro_currency.helper.currency_name:
+        class: Oro\Bundle\CurrencyBundle\Utils\CurrencyNameHelper
+        arguments:
+            - '@oro_locale.settings'
+            - '@oro_currency.provider.view_type'
+            - '@oro_currency.config.currency'
+
+    oro_currency.datagrid.inline_edit_column_options.multi_currency_guesser:
+        class: Oro\Bundle\CurrencyBundle\Datagrid\InlineEditing\InlineEditColumnOptions\MultiCurrencyGuesser
+        arguments:
+            - '@oro_currency.helper.currency_name'
+        tags:
+            - { name: oro_datagrid.inline_edit_column_options_guesser, priority: 91 }
+
+    oro_currency.datagrid.column_options_guesser:
+            class: Oro\Bundle\CurrencyBundle\Grid\CurrencyColumnOptionsGuesser
+            arguments:
+                - '@oro_currency.helper.currency_name'
+            tags:
+                - { name: oro_datagrid.column_options_guesser }
