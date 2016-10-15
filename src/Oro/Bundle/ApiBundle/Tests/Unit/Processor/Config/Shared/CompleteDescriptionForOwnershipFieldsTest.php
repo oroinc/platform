@@ -36,7 +36,6 @@ class CompleteDescriptionForOwnershipFieldsTest extends ConfigProcessorTestCase
             'identifier_field_names' => ['id'],
             'fields'                 => [
                 'id'           => null,
-                'name'         => null,
                 'owner'        => null,
                 'organization' => null,
             ]
@@ -47,18 +46,17 @@ class CompleteDescriptionForOwnershipFieldsTest extends ConfigProcessorTestCase
 
         $this->assertConfig(
             $config,
-            $this->context->getResult()->toArray()
+            $this->context->getResult()
         );
     }
 
-    public function testWithNonConfigurableEntity()
+    public function testForNonConfigurableEntity()
     {
         $config = [
             'exclusion_policy'       => 'all',
             'identifier_field_names' => ['id'],
             'fields'                 => [
                 'id'           => null,
-                'name'         => null,
                 'owner'        => null,
                 'organization' => null,
             ]
@@ -70,18 +68,17 @@ class CompleteDescriptionForOwnershipFieldsTest extends ConfigProcessorTestCase
 
         $this->assertConfig(
             $config,
-            $this->context->getResult()->toArray()
+            $this->context->getResult()
         );
     }
 
-    public function testWithNoConfiguredOwnershipFields()
+    public function testWithoutConfiguredOwnershipFields()
     {
         $config = [
             'exclusion_policy'       => 'all',
             'identifier_field_names' => ['id'],
             'fields'                 => [
                 'id'           => null,
-                'name'         => null,
                 'owner'        => null,
                 'organization' => null,
             ]
@@ -106,7 +103,7 @@ class CompleteDescriptionForOwnershipFieldsTest extends ConfigProcessorTestCase
 
         $this->assertConfig(
             $config,
-            $this->context->getResult()->toArray()
+            $this->context->getResult()
         );
     }
 
@@ -117,7 +114,6 @@ class CompleteDescriptionForOwnershipFieldsTest extends ConfigProcessorTestCase
             'identifier_field_names' => ['id'],
             'fields'                 => [
                 'id'           => null,
-                'name'         => null,
                 'owner'        => null,
                 'organization' => null,
             ]
@@ -151,15 +147,14 @@ class CompleteDescriptionForOwnershipFieldsTest extends ConfigProcessorTestCase
                 'identifier_field_names' => ['id'],
                 'fields'                 => [
                     'id'           => null,
-                    'name'         => null,
                     'owner'        => [
-                        'description' => CompleteDescriptionForOwnershipFields::OWNER_FIELD_DESCRIPTION
+                        'description' => 'An Owner record represents the ownership capabilities of the record'
                     ],
                     'organization' => null,
                 ]
 
             ],
-            $this->context->getResult()->toArray()
+            $this->context->getResult()
         );
     }
 
@@ -170,7 +165,6 @@ class CompleteDescriptionForOwnershipFieldsTest extends ConfigProcessorTestCase
             'identifier_field_names' => ['id'],
             'fields'                 => [
                 'id'           => null,
-                'name'         => null,
                 'owner'        => null,
                 'organization' => null,
             ]
@@ -204,27 +198,26 @@ class CompleteDescriptionForOwnershipFieldsTest extends ConfigProcessorTestCase
                 'identifier_field_names' => ['id'],
                 'fields'                 => [
                     'id'           => null,
-                    'name'         => null,
                     'owner'        => null,
                     'organization' => [
-                        'description' => CompleteDescriptionForOwnershipFields::ORGANIZATION_FIELD_DESCRIPTION
+                        'description' => 'An Organization record represents a real enterprise, business, firm, '
+                            . 'company or another organization, to which the record belongs'
                     ]
                 ]
 
             ],
-            $this->context->getResult()->toArray()
+            $this->context->getResult()
         );
     }
 
-    public function testDescriptionIsSetForAllOwnershipFields()
+    public function testDescriptionIsSetForRenamedOwnerField()
     {
         $config = [
             'exclusion_policy'       => 'all',
             'identifier_field_names' => ['id'],
             'fields'                 => [
                 'id'           => null,
-                'name'         => null,
-                'owner'        => null,
+                'owner2'       => ['property_path' => 'owner1'],
                 'organization' => null,
             ]
         ];
@@ -238,8 +231,7 @@ class CompleteDescriptionForOwnershipFieldsTest extends ConfigProcessorTestCase
         $entityConfig = new Config(
             $entityConfigId,
             [
-                'owner_field_name'        => 'owner',
-                'organization_field_name' => 'organization'
+                'owner_field_name' => 'owner1'
             ]
         );
 
@@ -258,32 +250,27 @@ class CompleteDescriptionForOwnershipFieldsTest extends ConfigProcessorTestCase
                 'identifier_field_names' => ['id'],
                 'fields'                 => [
                     'id'           => null,
-                    'name'         => null,
-                    'owner'        => [
-                        'description' => CompleteDescriptionForOwnershipFields::OWNER_FIELD_DESCRIPTION
+                    'owner2'       => [
+                        'property_path' => 'owner1',
+                        'description'   => 'An Owner record represents the ownership capabilities of the record'
                     ],
-                    'organization' => [
-                        'description' => CompleteDescriptionForOwnershipFields::ORGANIZATION_FIELD_DESCRIPTION
-                    ]
+                    'organization' => null,
                 ]
 
             ],
-            $this->context->getResult()->toArray()
+            $this->context->getResult()
         );
     }
 
-    public function testDescriptionIsSetForAllOwnershipFieldsWithDifferentNames()
+    public function testDescriptionIsSetForRenamedOrganizationField()
     {
         $config = [
             'exclusion_policy'       => 'all',
             'identifier_field_names' => ['id'],
             'fields'                 => [
-                'id'                     => null,
-                'name'                   => null,
-                'owner'                  => null,
-                'different_owner'        => null,
-                'organization'           => null,
-                'different_organization' => null
+                'id'            => null,
+                'owner'         => null,
+                'organization2' => ['property_path' => 'organization1'],
             ]
         ];
 
@@ -296,8 +283,7 @@ class CompleteDescriptionForOwnershipFieldsTest extends ConfigProcessorTestCase
         $entityConfig = new Config(
             $entityConfigId,
             [
-                'owner_field_name'        => 'different_owner',
-                'organization_field_name' => 'different_organization'
+                'organization_field_name' => 'organization1'
             ]
         );
 
@@ -315,20 +301,17 @@ class CompleteDescriptionForOwnershipFieldsTest extends ConfigProcessorTestCase
                 'exclusion_policy'       => 'all',
                 'identifier_field_names' => ['id'],
                 'fields'                 => [
-                    'id'                     => null,
-                    'name'                   => null,
-                    'owner'                  => null,
-                    'different_owner'        => [
-                        'description' => CompleteDescriptionForOwnershipFields::OWNER_FIELD_DESCRIPTION
-                    ],
-                    'organization'           => null,
-                    'different_organization' => [
-                        'description' => CompleteDescriptionForOwnershipFields::ORGANIZATION_FIELD_DESCRIPTION
+                    'id'            => null,
+                    'owner'         => null,
+                    'organization2' => [
+                        'property_path' => 'organization1',
+                        'description'   => 'An Organization record represents a real enterprise, business, firm, '
+                            . 'company or another organization, to which the record belongs'
                     ]
                 ]
 
             ],
-            $this->context->getResult()->toArray()
+            $this->context->getResult()
         );
     }
 }

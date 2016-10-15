@@ -20,44 +20,11 @@ class CompleteDescriptionForCreatedUpdatedFieldsTest extends ConfigProcessorTest
         $this->processor = new CompleteDescriptionForCreatedUpdatedFields();
     }
 
-    public function testDescriptionForCreatedUpdateFields()
+    public function testDescriptionForCreatedAtField()
     {
         $config = [
             'fields' => [
                 'id'        => null,
-                'name'      => null,
-                'createdAt' => null,
-                'updatedAt' => null,
-            ]
-        ];
-
-        $this->context->setTargetAction('get_list');
-        $this->context->setResult($this->createConfigObject($config));
-        $this->processor->process($this->context);
-
-        $this->assertConfig(
-            [
-                'fields' => [
-                    'id'        => null,
-                    'name'      => null,
-                    'createdAt' => [
-                        'description' => CompleteDescriptionForCreatedUpdatedFields::CREATED_AT_DESCRIPTION
-                    ],
-                    'updatedAt' => [
-                        'description' => CompleteDescriptionForCreatedUpdatedFields::UPDATED_AT_DESCRIPTION
-                    ]
-                ]
-            ],
-            $this->context->getResult()->toArray()
-        );
-    }
-
-    public function testDescriptionForCreatedField()
-    {
-        $config = [
-            'fields' => [
-                'id'        => null,
-                'name'      => null,
                 'createdAt' => null,
             ]
         ];
@@ -70,22 +37,48 @@ class CompleteDescriptionForCreatedUpdatedFieldsTest extends ConfigProcessorTest
             [
                 'fields' => [
                     'id'        => null,
-                    'name'      => null,
                     'createdAt' => [
-                        'description' => CompleteDescriptionForCreatedUpdatedFields::CREATED_AT_DESCRIPTION
+                        'description' => 'The date and time of resource record creation'
                     ]
                 ]
             ],
-            $this->context->getResult()->toArray()
+            $this->context->getResult()
         );
     }
 
-    public function testDescriptionForUpdateField()
+    public function testDescriptionForCreatedAtFieldWhenItAlreadyHasDescription()
     {
         $config = [
             'fields' => [
                 'id'        => null,
-                'name'      => null,
+                'createdAt' => [
+                    'description' => 'existing description'
+                ],
+            ]
+        ];
+
+        $this->context->setTargetAction('get_list');
+        $this->context->setResult($this->createConfigObject($config));
+        $this->processor->process($this->context);
+
+        $this->assertConfig(
+            [
+                'fields' => [
+                    'id'        => null,
+                    'createdAt' => [
+                        'description' => 'existing description'
+                    ]
+                ]
+            ],
+            $this->context->getResult()
+        );
+    }
+
+    public function testDescriptionForUpdatedAtField()
+    {
+        $config = [
+            'fields' => [
+                'id'        => null,
                 'created'   => null,
                 'updatedAt' => null,
             ]
@@ -99,14 +92,41 @@ class CompleteDescriptionForCreatedUpdatedFieldsTest extends ConfigProcessorTest
             [
                 'fields' => [
                     'id'        => null,
-                    'name'      => null,
                     'created'   => null,
                     'updatedAt' => [
-                        'description' => CompleteDescriptionForCreatedUpdatedFields::UPDATED_AT_DESCRIPTION
+                        'description' => 'The date and time of the last update of the resource record'
                     ]
                 ]
             ],
-            $this->context->getResult()->toArray()
+            $this->context->getResult()
+        );
+    }
+
+    public function testDescriptionForUpdatedAtFieldWhenItAlreadyHasDescription()
+    {
+        $config = [
+            'fields' => [
+                'id'        => null,
+                'updatedAt' => [
+                    'description' => 'existing description'
+                ],
+            ]
+        ];
+
+        $this->context->setTargetAction('get_list');
+        $this->context->setResult($this->createConfigObject($config));
+        $this->processor->process($this->context);
+
+        $this->assertConfig(
+            [
+                'fields' => [
+                    'id'        => null,
+                    'updatedAt' => [
+                        'description' => 'existing description'
+                    ]
+                ]
+            ],
+            $this->context->getResult()
         );
     }
 
@@ -117,7 +137,6 @@ class CompleteDescriptionForCreatedUpdatedFieldsTest extends ConfigProcessorTest
             'identifier_field_names' => ['id'],
             'fields'                 => [
                 'id'        => null,
-                'name'      => null,
                 'createdAt' => null,
                 'updatedAt' => null,
             ]
@@ -132,12 +151,11 @@ class CompleteDescriptionForCreatedUpdatedFieldsTest extends ConfigProcessorTest
                 'identifier_field_names' => ['id'],
                 'fields'                 => [
                     'id'        => null,
-                    'name'      => null,
                     'createdAt' => null,
                     'updatedAt' => null,
                 ]
             ],
-            $this->context->getResult()->toArray()
+            $this->context->getResult()
         );
     }
 }

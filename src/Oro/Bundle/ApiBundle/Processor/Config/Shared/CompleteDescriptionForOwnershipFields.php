@@ -4,7 +4,9 @@ namespace Oro\Bundle\ApiBundle\Processor\Config\Shared;
 
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
+use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 use Oro\Bundle\ApiBundle\Processor\Config\ConfigContext;
+use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 
 /**
@@ -12,10 +14,6 @@ use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
  */
 class CompleteDescriptionForOwnershipFields implements ProcessorInterface
 {
-    const OWNER_FIELD_DESCRIPTION = 'An Owner record represents the ownership capabilities of the record';
-    const ORGANIZATION_FIELD_DESCRIPTION = 'An Organization record represents a real enterprise, business, firm,
-        company or another organization, to which the record belongs';
-
     /** @var ConfigProvider */
     protected $entityConfigProvider;
 
@@ -43,26 +41,47 @@ class CompleteDescriptionForOwnershipFields implements ProcessorInterface
         $entityClass = $context->getClassName();
 
         if (!$this->entityConfigProvider->hasConfig($entityClass)) {
-            // ownership fields are not available for non configurable entities
+            // ownership fields are available only for configurable entities
             return;
         }
 
-        $entityConfig = $this->entityConfigProvider->getConfig($entityClass);
         $definition = $context->getResult();
+        $entityConfig = $this->entityConfigProvider->getConfig($entityClass);
+        $this->updateOwnershipFieldDescription(
+            $definition,
+            $entityConfig,
+            'owner_field_name',
+            'An Owner record represents the ownership capabilities of the record'
+        );
+        $this->updateOwnershipFieldDescription(
+            $definition,
+            $entityConfig,
+            'organization_field_name',
+            'An Organization record represents a real enterprise, business, firm, '
+            . 'company or another organization, to which the record belongs'
+        );
+    }
 
-        $ownerFieldName = $entityConfig->get('owner_field_name');
-        if ($definition->hasField($ownerFieldName)) {
-            $ownerField = $definition->getField($ownerFieldName);
-            if (empty($ownerField->getDescription())) {
-                $ownerField->setDescription(self::OWNER_FIELD_DESCRIPTION);
-            }
-        }
-
-        $organizationFieldName = $entityConfig->get('organization_field_name');
-        if ($definition->hasField($organizationFieldName)) {
-            $organizationField = $definition->getField($organizationFieldName);
-            if (empty($organizationField->getDescription())) {
-                $organizationField->setDescription(self::ORGANIZATION_FIELD_DESCRIPTION);
+    /**
+     * @param EntityDefinitionConfig $definition
+     * @param ConfigInterface        $entityConfig
+     * @param string                 $configKey
+     * @param string                 $description
+     */
+    protected function updateOwnershipFieldDescription(
+        EntityDefinitionConfig $definition,
+        ConfigInterface $entityConfig,
+        $configKey,
+        $description
+    ) {
+        $propertyPath = $entityConfig->get($configKey);
+        if ($propertyPath) {
+            $field = $definition->findField($propertyPath, true);
+            if (null !== $field) {
+                $existingDescription = $field->getDescription();
+                if (empty($existingDescription)) {
+                    $field->setDescription($description);
+                }
             }
         }
     }

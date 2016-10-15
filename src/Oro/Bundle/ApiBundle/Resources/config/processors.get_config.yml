@@ -115,12 +115,12 @@ services:
         arguments:
             - '@oro_entity_config.provider.ownership'
         tags:
-            - { name: oro.api.processor, action: get_config, extra: descriptions&definition, priority: -225 }
+            - { name: oro.api.processor, action: get_config, extra: descriptions&definition, priority: -220 }
 
     oro_api.get_config.complete_descriptions_for_createdupdated_fields:
         class: Oro\Bundle\ApiBundle\Processor\Config\Shared\CompleteDescriptionForCreatedUpdatedFields
         tags:
-            - { name: oro.api.processor, action: get_config, extra: descriptions&definition, priority: -230 }
+            - { name: oro.api.processor, action: get_config, extra: descriptions&definition, priority: -220 }
 
     #
     # get_relation_config

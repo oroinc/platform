@@ -4,6 +4,7 @@ namespace Oro\Bundle\ApiBundle\Processor\Config\Shared;
 
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
+use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 use Oro\Bundle\ApiBundle\Processor\Config\ConfigContext;
 
 /**
@@ -11,11 +12,6 @@ use Oro\Bundle\ApiBundle\Processor\Config\ConfigContext;
  */
 class CompleteDescriptionForCreatedUpdatedFields implements ProcessorInterface
 {
-    const CREATED_AT_FIELD_NAME  = 'createdAt';
-    const CREATED_AT_DESCRIPTION = 'The date and time of resource record creation';
-    const UPDATED_AT_FIELD_NAME  = 'updatedAt';
-    const UPDATED_AT_DESCRIPTION = 'The date and time of the last update of the resource record';
-
     /**
      * @param ContextInterface $context
      */
@@ -30,18 +26,30 @@ class CompleteDescriptionForCreatedUpdatedFields implements ProcessorInterface
         }
 
         $definition = $context->getResult();
+        $this->updateFieldDescription(
+            $definition,
+            'createdAt',
+            'The date and time of resource record creation'
+        );
+        $this->updateFieldDescription(
+            $definition,
+            'updatedAt',
+            'The date and time of the last update of the resource record'
+        );
+    }
 
-        if ($definition->hasField(self::CREATED_AT_FIELD_NAME)) {
-            $createdAtField = $definition->getField(self::CREATED_AT_FIELD_NAME);
-            if (empty($createdAtField->getDescription())) {
-                $createdAtField->setDescription(self::CREATED_AT_DESCRIPTION);
-            }
-        }
-
-        if ($definition->hasField(self::UPDATED_AT_FIELD_NAME)) {
-            $updatedAtField = $definition->getField(self::UPDATED_AT_FIELD_NAME);
-            if (empty($updatedAtField->getDescription())) {
-                $updatedAtField->setDescription(self::UPDATED_AT_DESCRIPTION);
+    /**
+     * @param EntityDefinitionConfig $definition
+     * @param string                 $fieldName
+     * @param string                 $description
+     */
+    protected function updateFieldDescription(EntityDefinitionConfig $definition, $fieldName, $description)
+    {
+        $field = $definition->getField($fieldName);
+        if (null !== $field) {
+            $existingDescription = $field->getDescription();
+            if (empty($existingDescription)) {
+                $field->setDescription($description);
             }
         }
     }

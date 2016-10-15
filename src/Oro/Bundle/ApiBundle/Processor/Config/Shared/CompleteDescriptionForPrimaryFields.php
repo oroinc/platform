@@ -11,8 +11,6 @@ use Oro\Bundle\ApiBundle\Processor\Config\ConfigContext;
  */
 class CompleteDescriptionForPrimaryFields implements ProcessorInterface
 {
-    const ID_DESCRIPTION = 'The identifier of an entity';
-
     /**
      * @param ContextInterface $context
      */
@@ -29,14 +27,15 @@ class CompleteDescriptionForPrimaryFields implements ProcessorInterface
         $definition = $context->getResult();
         $identifierFieldNames = $definition->getIdentifierFieldNames();
         if (1 !== count($identifierFieldNames)) {
+            // keep descriptions for composite identifier as is
             return;
         }
 
         $identifierFieldName = reset($identifierFieldNames);
         if ($definition->hasField($identifierFieldName)) {
-            $primaryField = $definition->getField($identifierFieldName);
-            if (!$primaryField->hasDescription()) {
-                $primaryField->setDescription(self::ID_DESCRIPTION);
+            $identifierField = $definition->getField($identifierFieldName);
+            if (!$identifierField->hasDescription()) {
+                $identifierField->setDescription('The identifier of an entity');
             }
         }
     }

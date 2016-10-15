@@ -20,7 +20,7 @@ class CompleteDescriptionForPrimaryFieldsTest extends ConfigProcessorTestCase
         $this->processor = new CompleteDescriptionForPrimaryFields();
     }
 
-    public function testDescriptionForPrimaryField()
+    public function testDescriptionForIdentifierField()
     {
         $config = [
             'identifier_field_names' => ['id'],
@@ -43,7 +43,7 @@ class CompleteDescriptionForPrimaryFieldsTest extends ConfigProcessorTestCase
                 'exclusion_policy'       => 'all',
                 'fields'                 => [
                     'id'     => [
-                        'description' => CompleteDescriptionForPrimaryFields::ID_DESCRIPTION
+                        'description' => 'The identifier of an entity'
                     ],
                     'field1' => null,
                     'field2' => null,
@@ -54,7 +54,7 @@ class CompleteDescriptionForPrimaryFieldsTest extends ConfigProcessorTestCase
         );
     }
 
-    public function testDescriptionForPrimaryFieldWithDifferentName()
+    public function testDescriptionForIdentifierFieldWithDifferentName()
     {
         $config = [
             'identifier_field_names' => ['first_name'],
@@ -78,7 +78,7 @@ class CompleteDescriptionForPrimaryFieldsTest extends ConfigProcessorTestCase
                 'fields'                 => [
                     'id'         => null,
                     'first_name' => [
-                        'description' => CompleteDescriptionForPrimaryFields::ID_DESCRIPTION
+                        'description' => 'The identifier of an entity'
                     ],
                     'field2'     => null,
                     'field3'     => null
@@ -88,7 +88,7 @@ class CompleteDescriptionForPrimaryFieldsTest extends ConfigProcessorTestCase
         );
     }
 
-    public function testDescriptionNotSetForMultiplePrimaryField()
+    public function testDescriptionNotSetForMultipleIdentifierField()
     {
         $config = [
             'identifier_field_names' => ['first_name', 'last_name'],
@@ -120,7 +120,7 @@ class CompleteDescriptionForPrimaryFieldsTest extends ConfigProcessorTestCase
         );
     }
 
-    public function testWithNoPrimaryField()
+    public function testWithNoIdentifierField()
     {
         $config = [
             'exclusion_policy' => 'all',
