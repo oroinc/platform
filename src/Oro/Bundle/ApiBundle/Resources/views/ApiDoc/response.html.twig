@@ -1,5 +1,5 @@
 <h4>Output</h4>
-<table class='fullwidth'>
+<table class='fullwidth output'>
     <thead>
     <tr>
         <th>Name</th>
@@ -11,19 +11,8 @@
         {% for name, infos in data %}
             <tr>
                 <td>{{ name }}</td>
-                <td>
-                    {% if infos.dataType is defined %}
-                        {% if infos.isCollection is defined and infos.isCollection and infos.dataType not in ['array', 'scalar'] %}
-                            array of
-                        {% endif %}
-                        {% if infos.isRelation is defined and infos.isRelation %}
-                            <a href="#get--api-{{ infos.dataType }}" onclick="return gotoResource('get--api-{{ infos.dataType }}');">{{ infos.dataType }}</a>
-                        {% else %}
-                            {{ infos.dataType }}
-                        {% endif %}
-                    {% endif %}
-                </td>
-                <td>{{ infos.description|extra_markdown }}</td>
+                <td>{{ infos.dataType is defined ? infos.dataType : '' }}</td>
+                <td>{{ infos.description is defined ? infos.description|extra_markdown : '' }}</td>
             </tr>
         {% endfor %}
         </tbody>
