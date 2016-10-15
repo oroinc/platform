@@ -33,7 +33,7 @@ pages:
     route: 'oro_user_security_login'
 
   User Profile View:
-    class: Oro\Bundle\UserBundle\Tests\Behat\Page\ProfileView
+    class: Oro\Bundle\UserBundle\Tests\Behat\Page\UserProfileView
     route: 'oro_user_profile_view'
 
   User Profile Configuration:

@@ -26,3 +26,8 @@ elements:
   QuickMenuContentItem:
     selector: 'ul li'
     class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Element
+
+pages:
+  Shortcut Actionslist:
+    class: Oro\Bundle\NavigationBundle\Tests\Behat\Page\ShortcutActionslist
+    route: 'oro_shortcut_actionslist'

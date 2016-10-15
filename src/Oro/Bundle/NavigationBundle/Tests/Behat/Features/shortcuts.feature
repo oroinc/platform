@@ -7,13 +7,13 @@ Feature: Shortcuts feature
     Given I login as administrator
     And I follow "Shortcuts"
     And I follow "See full list"
-    And I should be on "/shortcutactionslist"
+    And I should be on Shortcut Actionslist page
 
   Scenario: Choose shortcut from search
     Given I follow "Shortcuts"
     When I type "Create" in "Enter shortcut action"
     And click "Create new user" in shortcuts search results
-    Then I should be on "/user/create"
+    Then I should be on User Create page
 
   Scenario: Compose email from shortcut
     Given I follow "Shortcuts"

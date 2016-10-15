@@ -106,8 +106,8 @@ services:
             - '@oro_element_factory'
             - []
 
-    oro_behat_element_factory_initializer:
-        class: 'Oro\Bundle\TestFrameworkBundle\Behat\Context\Initializer\ElementFactoryInitializer'
+    oro_behat_page_object_initializer:
+        class: 'Oro\Bundle\TestFrameworkBundle\Behat\Context\Initializer\OroPageObjectInitializer'
         arguments:
             - '@oro_element_factory'
             - '@oro_page_factory'

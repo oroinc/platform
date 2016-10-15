@@ -8,7 +8,7 @@ use Oro\Bundle\TestFrameworkBundle\Behat\Element\OroElementFactory;
 use Oro\Bundle\TestFrameworkBundle\Behat\Element\OroPageFactory;
 use Oro\Bundle\TestFrameworkBundle\Behat\Element\OroPageObjectAware;
 
-class ElementFactoryInitializer implements ContextInitializer
+class OroPageObjectInitializer implements ContextInitializer
 {
     /**
      * @var OroElementFactory
