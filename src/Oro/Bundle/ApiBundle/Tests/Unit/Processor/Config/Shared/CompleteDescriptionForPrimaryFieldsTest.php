@@ -2,12 +2,12 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\Config\Shared;
 
-use Oro\Bundle\ApiBundle\Processor\Config\Shared\CompleteDesctiptionForPrimaryFields;
+use Oro\Bundle\ApiBundle\Processor\Config\Shared\CompleteDescriptionForPrimaryFields;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\Config\ConfigProcessorTestCase;
 
-class CompleteDesctiptionForPrimaryFieldsTest extends ConfigProcessorTestCase
+class CompleteDescriptionForPrimaryFieldsTest extends ConfigProcessorTestCase
 {
-    /** @var CompleteDesctiptionForPrimaryFields */
+    /** @var CompleteDescriptionForPrimaryFields */
     protected $processor;
 
     /**
@@ -17,7 +17,7 @@ class CompleteDesctiptionForPrimaryFieldsTest extends ConfigProcessorTestCase
     {
         parent::setUp();
 
-        $this->processor = new CompleteDesctiptionForPrimaryFields();
+        $this->processor = new CompleteDescriptionForPrimaryFields();
     }
 
     public function testDescriptionForPrimaryField()
@@ -43,7 +43,7 @@ class CompleteDesctiptionForPrimaryFieldsTest extends ConfigProcessorTestCase
                 'exclusion_policy'       => 'all',
                 'fields'                 => [
                     'id'     => [
-                        'description' => CompleteDesctiptionForPrimaryFields::PRIMARY_FIELD_DESCRIPTION
+                        'description' => CompleteDescriptionForPrimaryFields::ID_DESCRIPTION
                     ],
                     'field1' => null,
                     'field2' => null,
@@ -78,7 +78,7 @@ class CompleteDesctiptionForPrimaryFieldsTest extends ConfigProcessorTestCase
                 'fields'                 => [
                     'id'         => null,
                     'first_name' => [
-                        'description' => CompleteDesctiptionForPrimaryFields::PRIMARY_FIELD_DESCRIPTION
+                        'description' => CompleteDescriptionForPrimaryFields::ID_DESCRIPTION
                     ],
                     'field2'     => null,
                     'field3'     => null
