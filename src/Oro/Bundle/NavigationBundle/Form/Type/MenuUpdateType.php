@@ -53,16 +53,15 @@ class MenuUpdateType extends AbstractType
                         ]
                     );
                 }
-                if($menuUpdate->isCustom()) {
-                    $form->add(
-                        'uri',
-                        'text',
-                        [
-                            'required' => true,
-                            'label' => 'oro.navigation.menuupdate.uri.label',
-                        ]
-                    );
-                }
+                $form->add(
+                    'uri',
+                    'text',
+                    [
+                        'disabled' => false === $menuUpdate->isCustom(),
+                        'required' => true,
+                        'label' => 'oro.navigation.menuupdate.uri.label',
+                    ]
+                );
             }
         );
     }
@@ -80,7 +79,7 @@ class MenuUpdateType extends AbstractType
                     $groups = ['Default'];
                     /** @var MenuUpdate $menuUpdate */
                     $menuUpdate = $form->getData();
-                    if (null === $menuUpdate || false == $menuUpdate->isCustom()) {
+                    if (null === $menuUpdate || true === $menuUpdate->isCustom()) {
                         $groups[] = 'UserDefined';
                     }
 

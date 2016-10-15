@@ -425,7 +425,6 @@ services:
             - { name: oro_menu.builder, priority: 100 }
 
     oro_navigation.repository.menu_update:
-        class: 'Doctrine\ORM\EntityRepository'
         parent: oro_entity.abstract_repository
         arguments:
             - '%oro_navigation.entity.menu_update.class%'
