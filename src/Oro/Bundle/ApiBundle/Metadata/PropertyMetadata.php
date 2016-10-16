@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\ApiBundle\Metadata;
 
-use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 use Oro\Component\ChainProcessor\ParameterBag;
+use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 
 abstract class PropertyMetadata extends ParameterBag
 {
