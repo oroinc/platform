@@ -20,7 +20,7 @@ class OroSecurityBundleInstaller implements Installation, ContainerAwareInterfac
      */
     public function getMigrationVersion()
     {
-        return 'v2_0';
+        return 'v1_2';
     }
 
     /**

@@ -65,6 +65,10 @@ class NamespaceMigration
             $this->migrateTableColumn($defaultConnection, 'oro_migrations', 'bundle', $from, $to);
             $this->migrateTableColumn($defaultConnection, 'oro_migrations_data', 'class_name', $from, $to);
 
+            $this->migrateTableColumn($defaultConnection, 'oro_navigation_title', 'route', $from, $to);
+            $this->migrateTableColumn($defaultConnection, 'acl_classes', 'class_type', $from, $to);
+            $this->migrateTableColumn($defaultConnection, 'oro_security_permission_entity', 'name', $from, $to);
+
             $this->migrateTableColumn($searchConnection, 'oro_search_item', 'entity', $from, $to);
             $this->migrateTableColumn($searchConnection, 'oro_search_item', 'alias', $from, $to);
             $this->migrateTableColumn($searchConnection, 'oro_search_index_integer', 'field', $from, $to);
