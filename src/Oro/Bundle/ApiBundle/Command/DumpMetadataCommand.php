@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\ApiBundle\Command;
 
+use Oro\Bundle\ApiBundle\Metadata\ActionMetadataExtra;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -87,6 +88,9 @@ class DumpMetadataCommand extends AbstractDebugCommand
         $configExtras = [
             new EntityDefinitionConfigExtra($action)
         ];
+        $metadataExtras = [
+            new ActionMetadataExtra($action)
+        ];
 
         $config   = $configProvider->getConfig($entityClass, $version, $requestType, $configExtras);
         $metadata = $metadataProvider->getMetadata(
@@ -94,7 +98,7 @@ class DumpMetadataCommand extends AbstractDebugCommand
             $version,
             $requestType,
             $config->getDefinition(),
-            []
+            $metadataExtras
         );
 
         return [

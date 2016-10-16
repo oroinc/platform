@@ -7,6 +7,7 @@ use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfigExtra;
 use Oro\Bundle\ApiBundle\Config\FilterFieldsConfigExtra;
 use Oro\Bundle\ApiBundle\Exception\RuntimeException;
+use Oro\Bundle\ApiBundle\Metadata\ActionMetadataExtra;
 use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
 use Oro\Bundle\ApiBundle\Metadata\MetadataExtraInterface;
 use Oro\Bundle\ApiBundle\Processor\Context;
@@ -360,7 +361,13 @@ class SubresourceContext extends Context
      */
     protected function createParentMetadataExtras()
     {
-        return [];
+        $extras = [];
+        $action = $this->getAction();
+        if ($action) {
+            $extras[] = new ActionMetadataExtra($action);
+        }
+
+        return $extras;
     }
 
     /**
