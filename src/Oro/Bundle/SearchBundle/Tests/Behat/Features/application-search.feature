@@ -10,7 +10,7 @@ Feature: Application search
     And type "Common" in "search"
     And I should see 4 search suggestions
     When I press "Go"
-    Then I should be on "/search/"
+    Then I should be on Search Result page
     And I should see following search entity types:
       | Type            | N | isSelected |
       | All             | 4 | yes        |
@@ -72,7 +72,7 @@ Feature: Application search
 
   Scenario: View entity from search results
     Given I follow "Common Business Unit"
-    Then I should be on "/organization/business_unit/view/2"
+    Then I should be on Business Unit View page
 
   Scenario: View entity from search suggestion
     Given I follow "Search"
@@ -80,7 +80,7 @@ Feature: Application search
     And I type "John" in "search"
     And I should see 1 search suggestion
     And I follow "admin"
-    And I should be on "/user/view/1"
+    And I should be on User View page
 
   Scenario: No results search
     Given I follow "Search"

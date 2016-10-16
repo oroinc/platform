@@ -3,6 +3,26 @@ Oro\Bundle\EmailBundle\Entity\EmailBody:
     bodyContent: '<sentences(3, true)>'
     bodyIsText: true
 
+Oro\Bundle\UserBundle\Entity\User:
+  userCharlie:
+    firstName: Charlie
+    lastName: Sheen
+    username (unique): <username()>
+    organization: '@organization'
+    organizations: ['@organization']
+    roles: ['@adminRole']
+    owner: '@business_unit'
+    businessUnits: ['@business_unit']
+    email (unique): <email()>
+    password: password
+    salt: salt
+
+OroEntityProxy\OroEmailBundle\EmailAddressProxy:
+  charlieAddress:
+    owner: '@userCharlie'
+    email: charlie@sheen.com
+    hasOwner: true
+
 Oro\Bundle\EmailBundle\Entity\EmailRecipient:
   emailRecipient{1..5}:
     name: '"John Doe" <admin@example.com>'

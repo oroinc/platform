@@ -1,4 +1,3 @@
-@fixture-user.yml
 Feature: My emails widget
   I order to have quick notifications and quick access about new emails
   As a crm user
@@ -19,7 +18,7 @@ Feature: My emails widget
 
   Scenario: View email
     Given I click on "Merry Christmas" email title
-    And I should be on "/email/view/thread/1"
+    And I should be on Email View page
     When I click on email notification icon
     Then 3 emails in email list must be new
 
@@ -32,5 +31,5 @@ Feature: My emails widget
     Then I should see an email form
     And it must contains next values:
       | From    | "John Doe" <admin@example.com>       |
-      | To      | "Charlie Sheen" <charlie1@sheen.com> |
+      | To      | "Charlie Sheen" <charlie@sheen.com> |
       | Subject | Re: Merry Christmas                  |

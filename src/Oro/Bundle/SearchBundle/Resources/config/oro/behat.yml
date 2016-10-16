@@ -10,3 +10,8 @@ elements:
   SearchSuggestionsDropdown:
     selector: '#search-dropdown ul'
     class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Element
+
+pages:
+  Search Result:
+    class: Oro\Bundle\SearchBundle\Tests\Behat\Page\SearchResult
+    route: 'oro_search_results'

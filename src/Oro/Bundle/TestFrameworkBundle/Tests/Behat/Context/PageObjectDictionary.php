@@ -55,7 +55,7 @@ trait PageObjectDictionary
     }
 
     /**
-     * @return Page|DocumentElement
+     * @return Page|OroElement
      */
     public function getPage($name = null)
     {

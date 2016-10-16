@@ -14,8 +14,8 @@ class FeatureContext extends OroFeatureContext
         $windowNames = $this->getSession()->getWindowNames();
         $this->getSession()->switchToWindow($windowNames[1]);
         self::assertContains(
-            'Community Documentation - OroCRM - Open-Source CRM',
-            $this->getSession()->getPage()->find('css', 'title')->getHtml()
+            'www.orocrm.com/documentation/index',
+            $this->getSession()->getCurrentUrl()
         );
     }
 }

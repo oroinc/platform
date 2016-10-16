@@ -47,3 +47,7 @@ pages:
   User Create:
     class: Oro\Bundle\UserBundle\Tests\Behat\Page\UserCreate
     route: 'oro_user_create'
+
+  User View:
+    class: Oro\Bundle\UserBundle\Tests\Behat\Page\UserView
+    route: 'oro_user_view'

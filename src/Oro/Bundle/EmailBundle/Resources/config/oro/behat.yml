@@ -36,3 +36,7 @@ pages:
   User Emails:
     class: Oro\Bundle\EmailBundle\Tests\Behat\Page\UserEmails
     route: 'oro_email_user_emails'
+
+  Email View:
+    class: Oro\Bundle\EmailBundle\Tests\Behat\Page\EmailView
+    route: 'oro_email_thread_view'

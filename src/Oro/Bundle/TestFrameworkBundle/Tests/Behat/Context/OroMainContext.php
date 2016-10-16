@@ -526,6 +526,15 @@ class OroMainContext extends MinkContext implements
     }
 
     /**
+     * @Then /^(?P<label>[\w\s]+) is a required field$/
+     */
+    public function fieldIsRequired($label)
+    {
+        $labelElement = $this->getPage()->findElementContains('Label', $label);
+        self::assertTrue($labelElement->hasClass('required'));
+    }
+
+        /**
      * @When /^(?:|I )type "(?P<value>(?:[^"]|\\")*)" in "(?P<field>(?:[^"]|\\")*)"$/
      */
     public function iTypeInFieldWith($locator, $value)
