@@ -14,7 +14,8 @@ define(function(require) {
             order: 0,
             allowed_transitions: null,
             _is_start: false,
-            _is_clone: false
+            _is_clone: false,
+            translateLinks: null
         },
 
         initialize: function() {

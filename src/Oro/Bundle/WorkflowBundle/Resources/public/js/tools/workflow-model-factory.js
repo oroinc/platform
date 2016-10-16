@@ -36,8 +36,23 @@ define(function(require) {
          */
         _createWorkflowModel: function(options) {
             var configuration = options.entity.configuration;
-            configuration.steps = new StepCollection(_.map(configuration.steps, this._mergeName));
-            configuration.transitions = new TransitionCollection(_.map(configuration.transitions, this._mergeName));
+            var translateLinks = options.entity.translateLinks;
+            var stepsConfig = _.map(configuration.steps, this._mergeName);
+            if (translateLinks) {
+                _.each(stepsConfig, function (step) {
+                    step.translateLinks = translateLinks.steps[step.name];
+                });
+            }
+            configuration.steps = new StepCollection(stepsConfig);
+
+            var transitionConfig = _.map(configuration.transitions, this._mergeName);
+            if (translateLinks) {
+                _.each(transitionConfig, function (transition) {
+                    transition.translateLinks = translateLinks.steps[transition.name];
+                });
+            }
+            configuration.transitions = new TransitionCollection(transitionConfig);
+
             configuration.transition_definitions = new TransitionDefinitionCollection(
                 _.map(configuration.transition_definitions, this._mergeName));
             configuration.attributes = new AttributeCollection(_.map(configuration.attributes, this._mergeName));
@@ -100,6 +115,20 @@ define(function(require) {
          */
         _mergeName: function(config, name) {
             config.name = name;
+            return config;
+        },
+
+        /**
+         * Helper function for links to manage translations. Callback for _.map;
+         *
+         * @param {Object} config
+         * @param {array} translateLinks
+         * @returns {Object}
+         * @private
+         */
+        _processTranslateLinks: function(config, translateLinks) {
+            config.translateLinks = translateLinks;
+
             return config;
         }
     };

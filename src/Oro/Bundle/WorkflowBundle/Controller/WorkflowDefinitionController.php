@@ -11,6 +11,7 @@ use Symfony\Component\Translation\TranslatorInterface;
 
 use Oro\Bundle\SecurityBundle\Annotation\Acl;
 use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
+use Oro\Bundle\WorkflowBundle\Configuration\WorkflowConfiguration;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Form\Type\WorkflowReplacementSelectType;
 use Oro\Bundle\WorkflowBundle\Model\Workflow;
@@ -81,7 +82,21 @@ class WorkflowDefinitionController extends Controller
         if ($workflowDefinition->isSystem()) {
             throw new AccessDeniedHttpException('System workflow definitions are not editable');
         }
+        $configuration = $workflowDefinition->getConfiguration();
 
+        $translateLinks = [];
+        $routeHelper = $this->get('oro_workflow.translation_route.helper');
+        foreach ($configuration[WorkflowConfiguration::NODE_STEPS] as $name => $step) {
+            $translateLinks[WorkflowConfiguration::NODE_STEPS][$name]['label_translate_link'] = $routeHelper
+                ->generate(['key' => $step['label']]);
+        }
+
+        foreach ($configuration[WorkflowConfiguration::NODE_TRANSITIONS] as $name => $transition) {
+            $translateLinks[WorkflowConfiguration::NODE_TRANSITIONS][$name]['label_translate_link'] = $routeHelper
+                ->generate(['key' => $transition['label']]);
+            $translateLinks[WorkflowConfiguration::NODE_TRANSITIONS][$name]['message_translate_link'] = $routeHelper
+                ->generate(['key' => $transition['message']]);
+        }
         $form = $this->get('oro_workflow.form.workflow_definition');
         $form->setData($workflowDefinition);
 
@@ -91,6 +106,7 @@ class WorkflowDefinitionController extends Controller
             'workflowConfiguration' => $this->prepareConfiguration($workflowDefinition),
             'system_entities' => $this->get('oro_entity.entity_provider')->getEntities(),
             'delete_allowed' => true,
+            'translateLinks' => $translateLinks,
         );
     }
 
