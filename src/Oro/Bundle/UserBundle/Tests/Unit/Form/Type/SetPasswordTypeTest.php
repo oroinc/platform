@@ -22,16 +22,14 @@ class SetPasswordTypeTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
         $this->optionsProvider->expects($this->any())
-            ->method('getOptions')
+            ->method('getHintOption')
+            ->willReturn('test');
+        $this->optionsProvider->expects($this->any())
+            ->method('getSuggestPasswordOptions')
             ->willReturn(
                 [
-                    'required' => true,
-                    'label' => 'oro.user.new_password.label',
-                    'hint' => null,
-                    'attr' => [
-                        'data-suggest-length' => '',
-                        'data-suggest-rules' => '',
-                    ],
+                    'data-suggest-length' => '',
+                    'data-suggest-rules' => '',
                 ]
             );
         $this->formType = new SetPasswordType($this->optionsProvider);
@@ -47,10 +45,14 @@ class SetPasswordTypeTest extends \PHPUnit_Framework_TestCase
             ->with('password', 'password', [
                 'required'      => true,
                 'label'         => 'oro.user.new_password.label',
-                'hint'       => null,
+                'tooltip' => 'test',
                 'attr' => [
                     'data-suggest-length' => '',
                     'data-suggest-rules' => '',
+                ],
+                'constraints' => [
+                    new NotBlank(),
+                    new PasswordComplexity($this->optionsProvider->getPasswordComplexityConstraintOptions()),
                 ]
             ]);
         $this->formType->buildForm($builder, []);

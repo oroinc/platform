@@ -29,17 +29,20 @@ class SetPasswordType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $builder->add('password', 'password', $this->optionsProvider->getOptions(
+        $builder->add(
+            'password',
+            'password',
             [
                 'required' => true,
                 'label' => 'oro.user.new_password.label',
                 'attr' => $this->optionsProvider->getSuggestPasswordOptions(),
+                'tooltip' => $this->optionsProvider->getHintOption(),
                 'constraints' => [
                     new NotBlank(),
                     new PasswordComplexity($this->optionsProvider->getPasswordComplexityConstraintOptions())
                 ]
             ]
-        ));
+        );
     }
 
     /**

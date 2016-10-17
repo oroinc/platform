@@ -256,10 +256,13 @@ oro:
 
         system_configuration:
             groups:
-                security_options.title: Security options
+                security_settings.title: Security Settings
                 password_complexity_rules.title: Password complexity restrictions
             fields:
                 password_min_length.label: Minimal password length
                 password_numbers.label: Require a number
                 password_upper_case.label: Require an uppercase letter
-                password_special_chars.label: Require a special character
+                password_special_chars:
+                    label: Require a special character
+                    tooltip: >
+                        Special chars: !"#$%&'()*+,-./:;<=>?@[\]^_`{|}~ and space

@@ -16,7 +16,7 @@ class PasswordComplexityValidator extends ConstraintValidator
 {
     const REGEX_UPPER_CASE = '/\p{Lu}/u';
     const REGEX_NUMBERS = '/\p{N}/u';
-    const REGEX_SPECIAL_CHARS = '/[\s!"#$%&\'()*+,-.\/:;<=>?@\[\\\]^_`{|}~]/u';
+    const REGEX_SPECIAL_CHARS = '/[\s!-\/:-@\[-`{|}~]/u'; // !"#$%&'()*+,-./:;<=>?@[\]^_`{|}~ + spacing
 
     /** @var PasswordComplexityConfigProvider */
     private $configProvider;
