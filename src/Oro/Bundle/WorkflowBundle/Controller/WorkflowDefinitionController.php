@@ -82,7 +82,7 @@ class WorkflowDefinitionController extends Controller
         if ($workflowDefinition->isSystem()) {
             throw new AccessDeniedHttpException('System workflow definitions are not editable');
         }
-        $translateLinks = $this->getWorkflowTranslateLinks($workflowDefinition->getConfiguration());
+        $translateLinks = $this->getWorkflowTranslateLinks($workflowDefinition);
         $form = $this->get('oro_workflow.form.workflow_definition');
         $form->setData($workflowDefinition);
 
@@ -129,7 +129,7 @@ class WorkflowDefinitionController extends Controller
      */
     public function viewAction(WorkflowDefinition $workflowDefinition)
     {
-        $translateLinks = $this->getWorkflowTranslateLinks($workflowDefinition->getConfiguration());
+        $translateLinks = $this->getWorkflowTranslateLinks($workflowDefinition);
 
         return array(
             'entity' => $workflowDefinition,
@@ -231,13 +231,14 @@ class WorkflowDefinitionController extends Controller
     }
 
     /**
-     * @param array $configuration
+     * @param WorkflowDefinition $definition
      *
      * @return array
      */
-    public function getWorkflowTranslateLinks(array $configuration)
+    public function getWorkflowTranslateLinks(WorkflowDefinition $definition)
     {
-        $translateLinks = [];
+        $configuration = $definition->getConfiguration();
+        $translateLinks = ['label' => $definition->getLabel()];
         $translateLinks[WorkflowConfiguration::NODE_STEPS] = $this->getWorkflowNodeTranslateLinks(
             $configuration,
             WorkflowConfiguration::NODE_STEPS,

@@ -1,11 +1,12 @@
 <?php
 
-namespace Oro\Bundle\WorkflowBundle\Helper;
+namespace Oro\Bundle\TranslationBundle\Helper;
 
-use Oro\Bundle\DataGridBundle\Tools\DatagridRouteHelper;
 use Symfony\Bundle\FrameworkBundle\Routing\Router;
 
-class WorkflowTranslationRouteHelper
+use Oro\Bundle\DataGridBundle\Tools\DatagridRouteHelper;
+
+class TranslationRouteHelper
 {
     const TRANSLATION_GRID_ROUTE_NAME = 'oro_translation_translation_index';
     const TRANSLATION_GRID_NAME = 'oro-translation-translations-grid';
@@ -33,16 +34,16 @@ class WorkflowTranslationRouteHelper
      */
     public function generate(array $filters, $referenceType = Router::ABSOLUTE_PATH)
     {
-        $f = [];
+        $params = ['f' => []];
 
         foreach ($filters as $filterName => $filterCriteria) {
-            $f[$filterName]['value'] = (string)$filterCriteria;
+            $params['f'][$filterName]['value'] = (string)$filterCriteria;
         }
 
         return $this->datagridRouteHelper->generate(
             self::TRANSLATION_GRID_ROUTE_NAME,
             self::TRANSLATION_GRID_NAME,
-            ['f' => $f],
+            $params,
             $referenceType
         );
     }
