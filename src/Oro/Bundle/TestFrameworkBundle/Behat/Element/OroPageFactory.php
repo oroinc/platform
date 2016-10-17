@@ -28,6 +28,10 @@ class OroPageFactory
         $this->config = $config;
     }
 
+    /**
+     * @param $name
+     * @return Page
+     */
     public function getPage($name)
     {
         if (!$this->hasPage($name)) {
