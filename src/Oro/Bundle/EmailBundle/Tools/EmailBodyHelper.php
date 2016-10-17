@@ -30,7 +30,9 @@ class EmailBodyHelper
                 $body = $bodyText[1];
             }
         }
+        // Clear style ans script tags
         $body = strip_tags(html_entity_decode(preg_replace('/<(style|script).*?>.*?<\/\1>/su', '', $body)));
+        // Clear non printed symbols
         $body = preg_replace('/(?>[\x00-\x1F]|\xC2[\x80-\x9F]|\xE2[\x80-\x8F]{2}|'
             . '\xE2\x80[\xA4-\xA8]|\xE2\x81[\x9F-\xAF])/u', ' ', $body);
 
