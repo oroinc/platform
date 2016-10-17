@@ -2,11 +2,12 @@
 
 namespace Oro\Bundle\WorkflowBundle\Translation;
 
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+
 use Oro\Bundle\WorkflowBundle\Configuration\Handler\ConfigurationHandlerInterface;
 use Oro\Bundle\WorkflowBundle\Configuration\WorkflowDefinitionBuilderExtensionInterface;
 use Oro\Bundle\WorkflowBundle\Event\WorkflowChangesEvent;
 use Oro\Bundle\WorkflowBundle\Event\WorkflowEvents;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class TranslationProcessor implements
     ConfigurationHandlerInterface,
@@ -90,6 +91,9 @@ class TranslationProcessor implements
         }
     }
 
+    /**
+     * @param WorkflowChangesEvent $changesEvent
+     */
     public function clearTranslationKeys(WorkflowChangesEvent $changesEvent)
     {
 

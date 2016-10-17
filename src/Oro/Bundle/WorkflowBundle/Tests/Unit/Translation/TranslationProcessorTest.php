@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Translation;
 
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+
 use Oro\Bundle\WorkflowBundle\Configuration\Handler\ConfigurationHandlerInterface;
 use Oro\Bundle\WorkflowBundle\Configuration\WorkflowDefinitionBuilderExtensionInterface;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
@@ -10,8 +12,10 @@ use Oro\Bundle\WorkflowBundle\Event\WorkflowEvents;
 use Oro\Bundle\WorkflowBundle\Translation\TranslationHelper;
 use Oro\Bundle\WorkflowBundle\Translation\TranslationProcessor;
 use Oro\Bundle\WorkflowBundle\Translation\WorkflowTranslationFieldsIterator;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class TranslationProcessorTest extends \PHPUnit_Framework_TestCase
 {
     /** @var TranslationProcessor */
@@ -32,6 +36,11 @@ class TranslationProcessorTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()->getMock();
 
         $this->processor = new TranslationProcessor($this->fieldsIterator, $this->translationHelper);
+    }
+
+    protected function tearDown()
+    {
+        unset($this->fieldsIterator, $this->translationHelper, $this->processor);
     }
 
     public function testImplementsBuilderExtension()

@@ -27,6 +27,11 @@ class TranslationHelperTest extends \PHPUnit_Framework_TestCase
         $this->helper = new TranslationHelper($this->translator, $this->manager);
     }
 
+    protected function tearDown()
+    {
+        unset($this->translator, $this->manager, $this->helper);
+    }
+
     public function testSaveTranslation()
     {
         // current locale retrieve only once
@@ -49,7 +54,7 @@ class TranslationHelperTest extends \PHPUnit_Framework_TestCase
     public function testRemoveTranslationKey()
     {
         $key = 'key_to_remove';
-
         $this->manager->expects($this->once())->method('removeTranslationKey')->with($key, 'workflows');
+        $this->helper->removeTranslationKey($key);
     }
 }
