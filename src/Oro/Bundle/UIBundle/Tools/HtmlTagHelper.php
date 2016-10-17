@@ -31,6 +31,8 @@ class HtmlTagHelper
     }
 
     /**
+     * Remove html elements except allowed
+     *
      * @param string $string
      *
      * @return string
@@ -46,6 +48,8 @@ class HtmlTagHelper
     }
 
     /**
+     * Remove all html elements but leave new lines
+     *
      * @param string $string
      * @return string
      */
@@ -59,17 +63,23 @@ class HtmlTagHelper
     }
 
     /**
+     * Remove all html elements
+     *
      * @param string $string
      * @param bool $uiAllowedTags
      * @return string
      */
     public function stripTags($string, $uiAllowedTags = false)
     {
+        $string = str_replace('>', '> ', $string);
+
         if ($uiAllowedTags) {
             return strip_tags($string, $this->htmlTagProvider->getAllowedTags());
         }
 
-        return trim(strip_tags($string));
+        $result = trim(strip_tags($string));
+
+        return preg_replace('/\s+/u', ' ', $result);
     }
 
     /**

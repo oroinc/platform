@@ -15,5 +15,5 @@ interface QueryFactoryInterface
      * @param array             $config
      * @return SearchQueryInterface
      */
-    public function create(DatagridInterface $grid, array $config);
+    public function create(array $config = []);
 }

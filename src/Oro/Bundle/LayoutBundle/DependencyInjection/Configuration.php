@@ -22,6 +22,9 @@ class Configuration implements ConfigurationInterface
         $rootNode    = $treeBuilder->root('oro_layout');
 
         SettingsBuilder::append($rootNode, [
+            'development_settings_feature_enabled' => [
+                'value' => '%kernel.debug%'
+            ],
             'debug_block_info' => [
                 'value' => false
             ],

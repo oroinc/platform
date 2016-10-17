@@ -59,7 +59,6 @@ class UserSubscriber implements EventSubscriberInterface
                 if (!$email['email']) {
                     unset($submittedData['emails'][$id]);
                 }
-
             }
         }
 

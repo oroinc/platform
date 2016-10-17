@@ -4,19 +4,25 @@ namespace Oro\Bundle\LocaleBundle\Manager;
 
 use Doctrine\Common\Cache\ArrayCache;
 use Doctrine\Common\Cache\CacheProvider;
-use Doctrine\Common\Persistence\ObjectRepository;
 
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 
+use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\LocaleBundle\DependencyInjection\Configuration;
 use Oro\Bundle\LocaleBundle\Entity\Localization;
+use Oro\Bundle\LocaleBundle\Entity\Repository\LocalizationRepository;
 
 class LocalizationManager
 {
     const CACHE_NAMESPACE = 'ORO_LOCALE_LOCALIZATION_DATA';
 
     /**
-     * @var ObjectRepository
+     * @var DoctrineHelper
+     */
+    protected $doctrineHelper;
+
+    /**
+     * @var LocalizationRepository
      */
     protected $repository;
 
@@ -31,12 +37,12 @@ class LocalizationManager
     protected $cache;
 
     /**
-     * @param ObjectRepository $repository
+     * @param DoctrineHelper $doctrineHelper
      * @param ConfigManager $configManager
      */
-    public function __construct(ObjectRepository $repository, ConfigManager $configManager)
+    public function __construct(DoctrineHelper $doctrineHelper, ConfigManager $configManager)
     {
-        $this->repository = $repository;
+        $this->doctrineHelper = $doctrineHelper;
         $this->configManager = $configManager;
 
         /** used to minimize SQL Queries */
@@ -65,7 +71,7 @@ class LocalizationManager
         $cache = $this->cache ? $this->cache->fetch(self::CACHE_NAMESPACE) : false;
 
         if ($cache === false) {
-            $cache = $this->repository->findBy([], ['name' => 'ASC']);
+            $cache = $this->getRepository()->findBy([], ['name' => 'ASC']);
             $cache = array_combine(
                 array_map(
                     function (Localization $element) {
@@ -134,5 +140,17 @@ class LocalizationManager
         if ($this->cache) {
             $this->cache->delete(self::CACHE_NAMESPACE);
         }
+    }
+
+    /**
+     * @return LocalizationRepository
+     */
+    protected function getRepository()
+    {
+        if (!$this->repository) {
+            $this->repository = $this->doctrineHelper->getEntityRepositoryForClass(Localization::class);
+        }
+
+        return $this->repository;
     }
 }

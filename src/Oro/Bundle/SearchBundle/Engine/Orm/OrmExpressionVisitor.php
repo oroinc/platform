@@ -117,7 +117,6 @@ class OrmExpressionVisitor extends ExpressionVisitor
                         $operator,
                         $value
                     );
-
                 }
                 $expressionObjectList[$key] = $combinedExpression;
             }
@@ -167,7 +166,6 @@ class OrmExpressionVisitor extends ExpressionVisitor
         );
 
         return Criteria::implodeFieldTypeName($type, $fieldsString);
-
     }
 
     /**

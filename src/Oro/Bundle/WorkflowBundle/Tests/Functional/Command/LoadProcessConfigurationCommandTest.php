@@ -76,9 +76,7 @@ class LoadProcessConfigurationCommandTest extends WebTestCase
                     'process trigger: test_definition [create] - created',
                     'process trigger: test_definition [delete] - created',
                     'process trigger: test_definition [cron:*/1 * * * *] - created',
-                    'process triggers modifications stored in DB',
-                    'process trigger cron schedule [*/1 * * * *]',
-                    'process trigger schedule modification persisted.',
+                    'process triggers modifications stored in DB'
                 ],
                 'expectedDefinitions' => [
                     'test_definition',

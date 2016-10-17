@@ -28,6 +28,9 @@ class SystemConfigurationPassTest extends \PHPUnit_Framework_TestCase
         unset($this->compiler, $this->container);
     }
 
+    /**
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
+     */
     public function testProcess()
     {
         $bundle  = new TestBundle();
@@ -105,7 +108,27 @@ class SystemConfigurationPassTest extends \PHPUnit_Framework_TestCase
             ->with($this->equalTo(0), $this->isType('array'));
         $configBagServiceDef->expects($this->once())
             ->method('replaceArgument')
-            ->with($this->equalTo(0), $this->isType('array'));
+            ->with($this->equalTo(0), $this->isType('array'))
+            ->willReturnCallback(
+                function ($index, $argument) {
+                    self::assertEquals(
+                        ['Test\Class::method'],
+                        $argument['groups']['group_with_scalar_configurator_and_handler']['configurator']
+                    );
+                    self::assertEquals(
+                        ['Test\Class::method'],
+                        $argument['groups']['group_with_scalar_configurator_and_handler']['handler']
+                    );
+                    self::assertEquals(
+                        ['Test\Class::method'],
+                        $argument['groups']['group_with_array_configurator_and_handler']['configurator']
+                    );
+                    self::assertEquals(
+                        ['Test\Class::method'],
+                        $argument['groups']['group_with_array_configurator_and_handler']['handler']
+                    );
+                }
+            );
         $this->compiler->process($this->container);
     }
 }

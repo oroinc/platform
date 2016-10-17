@@ -19,7 +19,6 @@ class SoapClient extends BasicSoapClient
     {
         $this->client = $client;
         parent::__construct($wsdl, $options);
-
     }
 
     public function __destruct()

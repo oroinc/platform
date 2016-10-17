@@ -29,7 +29,6 @@ parameters:
 
     # services used only for ORM search engine
     oro_search.fulltext_index_manager.class:                      Oro\Bundle\SearchBundle\Engine\FulltextIndexManager
-    oro_search.event_listener.update_schema_listener.class:       Oro\Bundle\SearchBundle\EventListener\UpdateSchemaDoctrineListener
     oro_search.event_listener.orm.fulltext_index_listener.class:  Oro\Bundle\SearchBundle\EventListener\ORM\FulltextIndexListener
 
     # search sorter
@@ -61,9 +60,8 @@ services:
         class:                        %oro_search.index_listener.class%
         arguments:
             - '@oro_entity.doctrine_helper'
-            - '@oro_search.search.engine'
+            - '@oro_search.async.indexer'
         calls:
-            - [setRealTimeUpdate, [%oro_search.realtime_update%]]
             - [setEntitiesConfig, [%oro_search.entities_config%]]
             - [setMappingProvider,  ['@oro_search.provider.search_mapping']]
         tags:
@@ -160,18 +158,10 @@ services:
             - '%oro_search.drivers%'
             - 'oro_search_index_text'
 
-    oro_search.event_listener.update_schema_listener:
-        class: %oro_search.event_listener.update_schema_listener.class%
-        arguments:
-            - '@doctrine'
-        tags:
-            - { name: kernel.event_listener, event: console.terminate, name: onConsoleTerminate }
-            - { name: kernel.event_listener, event: console.exception, method: onConsoleException }
-
     oro_search.event_listener.demo_data_listener:
         class: %oro_search.event_listener.demo_data_listener.class%
         arguments:
-            - '@oro_search.search.engine'
+            - '@oro_search.async.indexer'
             - '@oro_search.index_listener'
         tags:
             - { name: kernel.event_listener, event: console.command, method: onConsoleCommand }
@@ -223,6 +213,58 @@ services:
             - { name: kernel.cache_warmer }
             - { name: kernel.cache_clearer }
 
+    oro_search.async.message_processor.index_entity:
+        class: 'Oro\Bundle\SearchBundle\Async\IndexEntityMessageProcessor'
+        arguments:
+            - '@oro_search.search.engine.indexer'
+            - '@doctrine'
+            - '@monolog.logger'
+        tags:
+            - { name: 'oro_message_queue.client.message_processor' }
+
+    oro_search.async.message_processor.index_entities_by_id:
+        class: 'Oro\Bundle\SearchBundle\Async\IndexEntitiesByIdMessageProcessor'
+        arguments:
+            - '@oro_message_queue.client.message_producer'
+            - '@monolog.logger'
+        tags:
+            - { name: 'oro_message_queue.client.message_processor' }
+
+    oro_search.async.message_processor.index_entities_by_type:
+        class: 'Oro\Bundle\SearchBundle\Async\IndexEntitiesByTypeMessageProcessor'
+        arguments:
+            - '@doctrine'
+            - '@oro_message_queue.job.runner'
+            - '@oro_message_queue.client.message_producer'
+            - '@monolog.logger'
+        tags:
+            - { name: 'oro_message_queue.client.message_processor' }
+
+    oro_search.async.message_processor.index_entities_by_range:
+        class: 'Oro\Bundle\SearchBundle\Async\IndexEntitiesByRangeMessageProcessor'
+        arguments:
+            - '@doctrine'
+            - '@oro_search.search.engine.indexer'
+            - '@oro_message_queue.job.runner'
+            - '@monolog.logger'
+        tags:
+            - { name: 'oro_message_queue.client.message_processor' }
+
+    oro_search.async.message_processor.reindex_entity:
+        class: 'Oro\Bundle\SearchBundle\Async\ReindexEntityMessageProcessor'
+        arguments:
+            - '@oro_search.search.engine.indexer'
+            - '@oro_message_queue.job.runner'
+            - '@oro_message_queue.client.message_producer'
+        tags:
+            - { name: 'oro_message_queue.client.message_processor' }
+
+    oro_search.async.indexer:
+        class: 'Oro\Bundle\SearchBundle\Async\Indexer'
+        arguments:
+            - '@oro_message_queue.client.message_producer'
+            - '@oro_entity.doctrine_helper'
+
     oro_search.resolver.entity_title.title_fields:
         public: false
         class: Oro\Bundle\SearchBundle\Resolver\EntityFieldsTitleResolver
@@ -252,10 +294,3 @@ services:
         arguments: ["@translator"]
         tags:
             - { name: form.type, alias: oro_search_type_string_filter }
-
-    oro_search.async_messaging.search_message.processor:
-        class: Oro\Bundle\SearchBundle\Engine\AsyncMessaging\SearchMessageProcessor
-        arguments:
-            - '@oro_search.index'
-        tags:
-            - { name: 'oro_message_queue.client.message_processor', 'topicName': 'oro_search.indexing' }
