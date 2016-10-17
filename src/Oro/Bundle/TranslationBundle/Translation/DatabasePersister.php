@@ -2,38 +2,38 @@
 
 namespace Oro\Bundle\TranslationBundle\Translation;
 
+use Doctrine\Common\Persistence\ManagerRegistry;
+use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Platforms\MySqlPlatform;
-use Doctrine\ORM\EntityManager;
+use Doctrine\DBAL\Types\Type;
 
+use Oro\Bundle\EntityBundle\ORM\NativeQueryExecutorHelper;
 use Oro\Bundle\TranslationBundle\Entity\Translation;
-use Oro\Bundle\TranslationBundle\Entity\Repository\TranslationRepository;
 
 class DatabasePersister
 {
-    /** @var int */
-    private $batchSize = 200;
-
-    /** @var EntityManager */
-    private $em;
-
     /** @var DynamicTranslationMetadataCache */
     private $metadataCache;
 
-    /** @var TranslationRepository */
-    private $repository;
+    /** @var ManagerRegistry */
+    private $doctrine;
 
-    /** @var array */
-    private $toWrite = [];
+    /** @var NativeQueryExecutorHelper */
+    private $nativeQueryExecutorHelper;
 
     /**
-     * @param EntityManager                   $em
+     * @param ManagerRegistry                 $doctrine
+     * @param NativeQueryExecutorHelper       $nativeQueryExecutorHelper
      * @param DynamicTranslationMetadataCache $metadataCache
      */
-    public function __construct(EntityManager $em, DynamicTranslationMetadataCache $metadataCache)
-    {
-        $this->em            = $em;
+    public function __construct(
+        ManagerRegistry $doctrine,
+        NativeQueryExecutorHelper $nativeQueryExecutorHelper,
+        DynamicTranslationMetadataCache $metadataCache
+    ) {
+        $this->doctrine = $doctrine;
+        $this->nativeQueryExecutorHelper = $nativeQueryExecutorHelper;
         $this->metadataCache = $metadataCache;
-        $this->repository    = $em->getRepository(Translation::ENTITY_NAME);
     }
 
     /**
@@ -46,77 +46,84 @@ class DatabasePersister
      */
     public function persist($locale, array $data)
     {
+        /** @var Connection $connection */
+        $connection = $this->doctrine->getConnection();
         $writeCount = 0;
+
         try {
-            $this->em->beginTransaction();
+            $connection->beginTransaction();
+            $translationsTableName = $this->nativeQueryExecutorHelper->getTableName(Translation::ENTITY_NAME);
+
             foreach ($data as $domain => $domainData) {
+                $fetchStatement = 'SELECT id, `key`, `value` FROM ' . $translationsTableName .
+                    ' WHERE locale = :locale' .
+                    ' AND domain = :domain' .
+                    ' AND scope = :scope';
+                $existings = $connection->fetchAll(
+                    $fetchStatement,
+                    [
+                        'locale' => $locale,
+                        'domain' => $domain,
+                        'scope'  => Translation::SCOPE_SYSTEM
+                    ],
+                    [
+                        Type::STRING,
+                        Type::STRING,
+                        Type::STRING
+                    ]
+                );
+
+                $existingTranslationKeys = array_column($existings, 'id', 'key');
+                $existingTranslationValues = array_column($existings, 'value', 'key');
+
                 foreach ($domainData as $key => $translation) {
                     if (strlen($key) > MySqlPlatform::LENGTH_LIMIT_TINYTEXT) {
                         continue;
                     }
 
-                    $writeCount++;
-                    $this->toWrite[] = $this->getTranslationObject($key, $locale, $domain, $translation);
-                    if (0 === $writeCount % $this->batchSize) {
-                        $this->write($this->toWrite);
-
-                        $this->toWrite = [];
+                    $existingTranslationKey = array_key_exists($key, $existingTranslationKeys);
+                    if (!$existingTranslationKey) {
+                        $connection->insert(
+                            $translationsTableName,
+                            [
+                                $connection->quoteIdentifier('key')   => $key,
+                                $connection->quoteIdentifier('value') => $translation,
+                                'locale'                              => $locale,
+                                'domain'                              => $domain,
+                                'scope'                               => Translation::SCOPE_SYSTEM
+                            ],
+                            [
+                                Type::STRING,
+                                Type::STRING,
+                                Type::STRING,
+                                Type::STRING,
+                                Type::SMALLINT,
+                            ]
+                        );
+                    } elseif ($existingTranslationKey && $existingTranslationValues[$key] !== $translation) {
+                        $connection->update(
+                            $translationsTableName,
+                            [$connection->quoteIdentifier('value') => $translation],
+                            ['id' => $existingTranslationKeys[$key]]
+                        );
+                    } else {
+                        continue;
                     }
+
+                    $writeCount++;
                 }
             }
 
-            if (count($this->toWrite) > 0) {
-                $this->write($this->toWrite);
+            if ($writeCount) {
+                $connection->commit();
             }
-
-            $this->em->commit();
         } catch (\Exception $exception) {
-            $this->em->rollback();
+            $connection->rollBack();
 
             throw $exception;
         }
 
         // update timestamp in case when persist succeed
         $this->metadataCache->updateTimestamp($locale);
-    }
-
-    /**
-     * Do persist into EntityManager
-     *
-     * @param array $items
-     */
-    private function write(array $items)
-    {
-        foreach ($items as $item) {
-            $this->em->persist($item);
-        }
-        $this->em->flush();
-        $this->em->clear();
-    }
-
-    /**
-     * Find existing translation in database
-     *
-     * @param string $key
-     * @param string $locale
-     * @param string $domain
-     * @param string $value
-     *
-     * @return Translation
-     */
-    private function getTranslationObject($key, $locale, $domain, $value)
-    {
-        $object = $this->repository->findValue($key, $locale, $domain);
-        if (null === $object) {
-            $object = new Translation();
-            $object->setScope(Translation::SCOPE_SYSTEM);
-            $object->setLocale($locale);
-            $object->setDomain($domain);
-            $object->setKey($key);
-        }
-
-        $object->setValue($value);
-
-        return $object;
     }
 }
