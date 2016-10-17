@@ -5,9 +5,10 @@ namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Helper;
 use Symfony\Bundle\FrameworkBundle\Routing\Router;
 
 use Oro\Bundle\DataGridBundle\Tools\DatagridRouteHelper;
-use Oro\Bundle\WorkflowBundle\Helper\WorkflowTranslationRouteHelper;
 
-class WorkflowTranslationRouteHelperTest extends \PHPUnit_Framework_TestCase
+use Oro\Bundle\TranslationBundle\Helper\TranslationRouteHelper;
+
+class TranslationRouteHelperTest extends \PHPUnit_Framework_TestCase
 {
     /**
      * @var DatagridRouteHelper|\PHPUnit_Framework_MockObject_MockObject
@@ -32,13 +33,13 @@ class WorkflowTranslationRouteHelperTest extends \PHPUnit_Framework_TestCase
         $data = ['f' => ['workflow' => ['value' => $workflowName]]];
 
         $this->datagridRouteHelperMock->expects($this->once())->method('generate')->with(
-            WorkflowTranslationRouteHelper::TRANSLATION_GRID_ROUTE_NAME,
-            WorkflowTranslationRouteHelper::TRANSLATION_GRID_NAME,
+            TranslationRouteHelper::TRANSLATION_GRID_ROUTE_NAME,
+            TranslationRouteHelper::TRANSLATION_GRID_NAME,
             $data,
             Router::ABSOLUTE_PATH
         )->willReturn(uniqid('', true));
 
-        $helper = new WorkflowTranslationRouteHelper($this->datagridRouteHelperMock);
+        $helper = new TranslationRouteHelper($this->datagridRouteHelperMock);
 
         $result = $helper->generate(['workflow' => $workflowName]);
 
