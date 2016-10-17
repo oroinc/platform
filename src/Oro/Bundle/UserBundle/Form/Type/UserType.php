@@ -116,12 +116,17 @@ class UserType extends AbstractType
                     'label'          => 'oro.user.password.label',
                     'type'           => 'password',
                     'required'       => true,
-                    'first_options' => $this->optionsProvider->getOptions(
-                        [
-                            'label' => 'oro.user.password.label',
+                    'first_options' => [
+                        'label' => 'oro.user.password.label',
+                        'hint' => $this->optionsProvider->getHintOption(),
+                        'hint_position' => 'after_input',
+                        'attr' => [
+                            'data-validation' => $this->optionsProvider->getDataValidationOption()
                         ]
-                    ),
-                    'second_options' => ['label' => 'oro.user.password_re.label'],
+                    ],
+                    'second_options' => [
+                        'label' => 'oro.user.password_re.label',
+                    ],
                 ]
             )
             ->add(

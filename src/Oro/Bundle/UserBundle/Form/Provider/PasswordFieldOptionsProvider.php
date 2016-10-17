@@ -38,26 +38,6 @@ class PasswordFieldOptionsProvider
     }
 
     /**
-     * Add defaults for missing password field options
-     *
-     * @param array $options
-     *
-     * @return array
-     */
-    public function getOptions(array $options = [])
-    {
-        if (!isset($options['hint'])) {
-            $options['hint'] = $this->getHintOption();
-        }
-
-        if (!isset($options['attr']['data-validation'])) {
-            $options['attr']['data-validation'] = $this->getDataValidationOption();
-        }
-
-        return $options;
-    }
-
-    /**
      * Generate hint string
      *
      * @return string

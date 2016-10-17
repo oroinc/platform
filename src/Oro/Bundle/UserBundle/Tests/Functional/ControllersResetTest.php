@@ -38,7 +38,7 @@ class ControllersResetTest extends WebTestCase
 
         $form = $crawler->selectButton('Save')->form();
 
-        $form['oro_set_password_form[password]'] = $this->generateRandomString(8);
+        $form['oro_set_password_form[password]'] = $this->generateRandomString(8) . '1Q';
 
         $this->client->submit($form);
         $result = $this->client->getResponse();

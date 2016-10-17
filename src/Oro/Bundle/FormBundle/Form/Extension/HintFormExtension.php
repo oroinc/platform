@@ -7,23 +7,27 @@ use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-use Oro\Bundle\FormBundle\Form\Extension\Traits\FormExtendedTypeTrait;
-
 /**
  * Adds hint support for fields
- * Specify text in the 'hint' option and html attributes in `hint_attr`
+ * Options:
+ * `hint` specifies the text
+ * `hint_attr` specifies html attributes of the div
+ * `hint_position` option controls the DOM position of the hint block relative to the field (inside .control-group div)
+ *  - 'above' will render it above the input row
+ *  - 'below' will render it below the input row
+ *  - 'after_input' will render it after the input field (inside the filed wrapper)
  */
 class HintFormExtension extends AbstractTypeExtension
 {
-    use FormExtendedTypeTrait;
-
     /**
      * {@inheritdoc}
      */
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefined(['hint']);
-        $resolver->setDefaults(['hint_attr' => ['class' => 'oro-hint']]);
+        $resolver->setDefault('hint_position', 'after_input');
+        $resolver->setAllowedValues('hint_position', ['above', 'below', 'after_input']);
+        $resolver->setDefaults(['hint_attr' => ['class' => 'oro-hint oro-hint-info']]);
     }
 
     /**
@@ -40,5 +44,14 @@ class HintFormExtension extends AbstractTypeExtension
         }
         $view->vars['hint'] = $options['hint'];
         $view->vars['hint_attr'] = $options['hint_attr'];
+        $view->vars['hint_position'] = $options['hint_position'];
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getExtendedType()
+    {
+        return 'Symfony\Component\Form\Extension\Core\Type\FormType';
     }
 }

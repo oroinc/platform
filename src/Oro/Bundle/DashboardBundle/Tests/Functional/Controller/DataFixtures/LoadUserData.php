@@ -16,7 +16,7 @@ use Oro\Bundle\OrganizationBundle\Entity\Manager\OrganizationManager;
 class LoadUserData extends AbstractFixture implements ContainerAwareInterface
 {
     const USER_NAME     = 'user_wo_permissions';
-    const USER_PASSWORD = 'user_api_key';
+    const USER_PASSWORD = 'user_api_key1Q';
 
     /**
      * @var ContainerInterface
@@ -52,7 +52,7 @@ class LoadUserData extends AbstractFixture implements ContainerAwareInterface
 
         $apiKey = new UserApi();
         $apiKey
-            ->setApiKey(self::USER_PASSWORD)
+            ->setApiKey('user_api_key')
             ->setUser($user)
             ->setOrganization($org);
 

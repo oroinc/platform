@@ -27,7 +27,7 @@ class HintFormExtensionTest extends \PHPUnit_Framework_TestCase
             ->with(['hint']);
         $resolver->expects($this->once())
             ->method('setDefaults')
-            ->with(['hint_attr' => ['class' => 'oro-hint'],]);
+            ->with(['hint_attr' => ['class' => 'oro-hint oro-hint-info'],]);
 
         $extension = new HintFormExtension();
         $extension->configureOptions($resolver);

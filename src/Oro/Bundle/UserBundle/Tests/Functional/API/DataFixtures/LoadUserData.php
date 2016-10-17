@@ -15,7 +15,7 @@ use Oro\Bundle\UserBundle\Entity\UserApi;
 class LoadUserData extends AbstractFixture implements ContainerAwareInterface
 {
     const USER_NAME = 'user_wo_permissions';
-    const USER_PASSWORD = 'user_api_key';
+    const USER_PASSWORD = 'user_api_key1Q';
 
     /**
      * @var ContainerInterface

@@ -61,12 +61,16 @@ class ChangePasswordType extends AbstractType
                             'class' => 'password-field'
                         ]
                     ],
-                    'first_options' => $this->optionsProvider->getOptions(
-                        [
-                            'label' => $options['first_options_label'],
-                        ]
-                    ),
-                    'second_options' => ['label' => $options['second_options_label']],
+                    'first_options' => [
+                        'label' => $options['first_options_label'],
+                        'attr' => [
+                            'data-validation' => $this->optionsProvider->getDataValidationOption(),
+                        ],
+                        'hint' => $this->optionsProvider->getHintOption(),
+                        'hint_position' => 'below',
+                    ],
+                    'second_options' => ['label' => $options['second_options_label'],
+                    ],
                     'mapped' => false,
                     'cascade_validation' => true,
                 ]
