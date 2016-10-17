@@ -5,6 +5,7 @@ namespace Oro\Component\Action\Condition;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 use Oro\Component\Action\Event\ExtendableConditionEvent;
+use Oro\Component\Action\Exception\ExtendableEventNameMissingException;
 use Oro\Component\ConfigExpression\ContextAccessorAwareInterface;
 use Oro\Component\ConfigExpression\ContextAccessorAwareTrait;
 
@@ -12,12 +13,17 @@ class ExtendableCondition extends AbstractCondition implements ContextAccessorAw
 {
     use ContextAccessorAwareTrait;
 
-    const NAME = 'workflow_extendable';
+    const NAME = 'extendable';
 
     /**
      * @var EventDispatcherInterface
      */
     protected $eventDispatcher;
+
+    /**
+     * @var string[]
+     */
+    protected $subscribedEvents = [];
 
     /**
      * @param EventDispatcherInterface $eventDispatcher
@@ -32,22 +38,16 @@ class ExtendableCondition extends AbstractCondition implements ContextAccessorAw
      */
     public function isConditionAllowed($context)
     {
-        if (is_object($context)) {
-            $class = get_class($context);
-            $sections = explode('\\', $class);
-            $eventSubName = end($sections);
-        } else {
-            $eventSubName = 'general';
-        }
-        $eventName = sprintf('%s.%s', ExtendableConditionEvent::NAME, $eventSubName);
-        if (!$this->eventDispatcher->hasListeners($eventName)) {
-            return true;
-        }
-
         $event = new ExtendableConditionEvent($context);
-        $this->eventDispatcher->dispatch($eventName, $event);
+        foreach ($this->subscribedEvents as $eventName) {
+            if (!$this->eventDispatcher->hasListeners($eventName)) {
+                continue;
+            }
 
-        return !$event->hasErrors();
+            $this->eventDispatcher->dispatch($eventName, $event);
+        }
+
+        return false == $event->hasErrors();
     }
 
     /**
@@ -65,6 +65,12 @@ class ExtendableCondition extends AbstractCondition implements ContextAccessorAw
      */
     public function initialize(array $options)
     {
-        return;
+        if (empty($options)) {
+            throw new ExtendableEventNameMissingException(
+                sprintf('You need to specify a list of event names for the "@%s" condition type', self::NAME)
+            );
+        }
+
+        $this->subscribedEvents = $options;
     }
 }
