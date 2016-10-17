@@ -42,6 +42,7 @@ class WorkflowHandlerTest extends \PHPUnit_Framework_TestCase
             'simple configuration' => array(
                 'expected' => array(
                     'name' => 'test_workflow',
+                    'label' => 'Test Workflow',
                     'entity' => '\DateTime',
                 ),
                 'input' => array(
@@ -54,6 +55,7 @@ class WorkflowHandlerTest extends \PHPUnit_Framework_TestCase
                 'expected' => array(
                     'name' => 'test_workflow',
                     'entity' => '\DateTime',
+                    'label' => 'Test Workflow',
                     'is_system' => false,
                     'start_step' => null,
                     'entity_attribute' => 'entity',
@@ -75,8 +77,6 @@ class WorkflowHandlerTest extends \PHPUnit_Framework_TestCase
                     WorkflowConfiguration::NODE_ATTRIBUTES => array(),
                     WorkflowConfiguration::NODE_TRANSITIONS => array(),
                     WorkflowConfiguration::NODE_TRANSITION_DEFINITIONS => array(),
-                    'unknown_first' => 'first_value',
-                    'unknown_second' => 'second_value',
                 ),
             )
         );

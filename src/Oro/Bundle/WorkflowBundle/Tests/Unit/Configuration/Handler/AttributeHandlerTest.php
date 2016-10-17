@@ -53,6 +53,7 @@ class AttributeHandlerTest extends \PHPUnit_Framework_TestCase
                     WorkflowConfiguration::NODE_ATTRIBUTES => array(
                         array(
                             'name' => 'test_attribute',
+                            'label' => 'Test Attribute', //should be kept as filtering disposed to another class
                             'type' => 'entity',
                             'entity_acl' => array(
                                 'delete' => false,
@@ -70,9 +71,7 @@ class AttributeHandlerTest extends \PHPUnit_Framework_TestCase
                             'entity_acl' => array(
                                 'delete' => false,
                             ),
-                            'property_path' => 'entity.test_attribute',
-                            'unknown_first' => 'first_value',
-                            'unknown_second' => 'second_value',
+                            'property_path' => 'entity.test_attribute'
                         )
                     ),
                 ),

@@ -337,7 +337,7 @@ services:
             - '@oro_workflow.translation.helper'
         public: false
         tags:
-            - { name: oro.workflow.configuration.handler, priority: -100 }
+            - { name: oro.workflow.configuration.handler, priority: 150 }
             - { name: oro.workflow.definition_builder.extension }
             - { name: oro_workflow.changes.subscriber }
 
