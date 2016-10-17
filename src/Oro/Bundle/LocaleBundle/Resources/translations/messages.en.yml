@@ -80,7 +80,7 @@ oro.locale:
     system_configuration:
         groups:
             localization.title: 'Localization'
-            language_settings.title: 'Language settings'
+            language_settings.title: 'Language Settings'
             language_languages.title: 'Languages'
             locale_settings.title: 'Localization options'
             map_settings.title: 'Map options'
