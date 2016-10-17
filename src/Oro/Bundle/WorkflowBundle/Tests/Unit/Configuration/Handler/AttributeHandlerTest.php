@@ -53,7 +53,6 @@ class AttributeHandlerTest extends \PHPUnit_Framework_TestCase
                     WorkflowConfiguration::NODE_ATTRIBUTES => array(
                         array(
                             'name' => 'test_attribute',
-                            'label' => 'Test Attribute',
                             'type' => 'entity',
                             'entity_acl' => array(
                                 'delete' => false,

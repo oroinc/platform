@@ -14,6 +14,7 @@ class EntityDescriptionProvider
 {
     const DESCRIPTION        = 'description';
     const PLURAL_DESCRIPTION = 'plural_description';
+    const DOCUMENTATION      = 'documentation';
     const MANAGEABLE         = 'manageable';
     const CONFIGURABLE       = 'configurable';
     const FIELDS             = 'fields';
@@ -82,9 +83,6 @@ class EntityDescriptionProvider
         }
 
         $result = $this->entityClassNameProvider->getEntityClassName($entityClass);
-        if ($result) {
-            $result = $this->normalizeEntityDescription($result);
-        }
         $this->cache[$entityClass][self::DESCRIPTION] = $result;
 
         return $result;
@@ -107,10 +105,29 @@ class EntityDescriptionProvider
         }
 
         $result = $this->entityClassNameProvider->getEntityClassPluralName($entityClass);
-        if ($result) {
-            $result = $this->normalizeEntityDescription($result);
-        }
         $this->cache[$entityClass][self::PLURAL_DESCRIPTION] = $result;
+
+        return $result;
+    }
+
+    /**
+     * Returns the detailed documentation in English of the given entity type.
+     *
+     * @param string $entityClass
+     *
+     * @return string|null
+     */
+    public function getEntityDocumentation($entityClass)
+    {
+        if (!isset($this->cache[$entityClass])) {
+            $this->cache[$entityClass] = [];
+        }
+        if (array_key_exists(self::DOCUMENTATION, $this->cache[$entityClass])) {
+            return $this->cache[$entityClass][self::DOCUMENTATION];
+        }
+
+        $result = $this->findEntityDocumentation($entityClass);
+        $this->cache[$entityClass][self::DOCUMENTATION] = $result;
 
         return $result;
     }
@@ -144,10 +161,7 @@ class EntityDescriptionProvider
                 $result = $this->findFieldDescription($entityClass, $propertyPath);
             }
         }
-        if (!$result) {
-            $result = $this->humanizePropertyPath($propertyPath);
-        }
-        $result = $this->normalizeFieldDescription($result);
+
         $this->cache[$entityClass][self::FIELDS][$propertyPath] = $result;
 
         return $result;
@@ -162,9 +176,29 @@ class EntityDescriptionProvider
      */
     public function humanizeAssociationName($associationName)
     {
-        return $this->normalizeAssociationDescription(
-            $this->humanizePropertyPath($associationName)
-        );
+        return $this->humanizePropertyPath($associationName);
+    }
+
+    /**
+     * @param string $entityClass
+     *
+     * @return string|null
+     */
+    protected function findEntityDocumentation($entityClass)
+    {
+        $result = null;
+        $config = $this->getEntityConfig($entityClass);
+        if (null !== $config) {
+            $label = $config->get('description');
+            if ($label) {
+                $result = $this->translator->trans($label);
+                if ($result === $label) {
+                    $result = '';
+                }
+            }
+        }
+
+        return $result;
     }
 
     /**
@@ -178,10 +212,12 @@ class EntityDescriptionProvider
         $result = null;
         $config = $this->findFieldConfig($entityClass, $propertyPath);
         if (null !== $config) {
-            $label = $config->get('label');
+            $label = $config->get('description');
             if ($label) {
-                $translated = $this->translator->trans($label);
-                $result = $translated ?: $label;
+                $result = $this->translator->trans($label);
+                if ($result === $label) {
+                    $result = '';
+                }
             }
         }
 
@@ -211,6 +247,18 @@ class EntityDescriptionProvider
 
     /**
      * @param string $entityClass
+     *
+     * @return ConfigInterface|null
+     */
+    protected function getEntityConfig($entityClass)
+    {
+        return $this->entityConfigProvider->hasConfig($entityClass)
+            ? $this->entityConfigProvider->getConfig($entityClass)
+            : null;
+    }
+
+    /**
+     * @param string $entityClass
      * @param string $fieldName
      *
      * @return ConfigInterface|null
@@ -234,35 +282,5 @@ class EntityDescriptionProvider
             ' $1',
             strtr($propertyPath, ['_' => ' ', '-' => ' '])
         );
-    }
-
-    /**
-     * @param string $description
-     *
-     * @return string
-     */
-    protected function normalizeEntityDescription($description)
-    {
-        return ucwords($description);
-    }
-
-    /**
-     * @param string $description
-     *
-     * @return string
-     */
-    protected function normalizeFieldDescription($description)
-    {
-        return ucwords($description);
-    }
-
-    /**
-     * @param string $description
-     *
-     * @return string
-     */
-    protected function normalizeAssociationDescription($description)
-    {
-        return ucwords($description);
     }
 }

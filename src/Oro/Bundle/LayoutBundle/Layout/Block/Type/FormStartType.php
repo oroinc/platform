@@ -12,6 +12,8 @@ class FormStartType extends AbstractFormType
 {
     const NAME = 'form_start';
 
+    const SHORT_NAME = 'start';
+
     /**
      * {@inheritdoc}
      */
