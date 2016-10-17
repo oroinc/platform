@@ -3,8 +3,10 @@
 namespace Oro\Bundle\EmailBundle\Migrations\Schema\v1_29;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
+use Doctrine\DBAL\Connection;
 
 use Oro\Bundle\EmailBundle\Tools\EmailBodyHelper;
+use Oro\Bundle\EntityBundle\ORM\NativeQueryExecutorHelper;
 use Oro\Component\MessageQueue\Client\MessageProducerInterface;
 use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
 use Oro\Component\MessageQueue\Transport\MessageInterface;
@@ -21,14 +23,22 @@ class UpgradeEmailBodyMessageProcessor implements MessageProcessorInterface
     /** @var ManagerRegistry */
     protected $doctrine;
 
+    /** @var NativeQueryExecutorHelper */
+    protected $queryHelper;
+
     /**
-     * @param MessageProducerInterface $messageProducer
-     * @param ManagerRegistry          $doctrine
+     * @param MessageProducerInterface  $messageProducer
+     * @param ManagerRegistry           $doctrine
+     * @param NativeQueryExecutorHelper $queryHelper
      */
-    public function __construct(MessageProducerInterface $messageProducer, ManagerRegistry $doctrine)
-    {
+    public function __construct(
+        MessageProducerInterface $messageProducer,
+        ManagerRegistry $doctrine,
+        NativeQueryExecutorHelper $queryHelper
+    ) {
         $this->messageProducer = $messageProducer;
         $this->doctrine = $doctrine;
+        $this->queryHelper = $queryHelper;
     }
 
     /**
@@ -50,6 +60,7 @@ class UpgradeEmailBodyMessageProcessor implements MessageProcessorInterface
      */
     protected function scheduleMigrateProcesses()
     {
+        /** @var Connection $connection */
         $connection = $this->doctrine->getConnection();
         $maxItemNumber = $connection
             ->executeQuery(
@@ -76,26 +87,29 @@ class UpgradeEmailBodyMessageProcessor implements MessageProcessorInterface
         $startId = self::BATCH_SIZE * $pageNumber;
         $endId = $startId + self::BATCH_SIZE;
 
-        $selectQuery = 'SELECT id, body FROM oro_email_body '
+        $tableName = $this->queryHelper->getTableName('Oro\Bundle\EmailBundle\Entity\EmailBody');
+
+        $selectQuery = 'SELECT id, body FROM '
+            . $tableName
             . 'WHERE body IS NOT NULL AND text_body is NULL AND id BETWEEN :startId AND :endID';
 
-        $updateQuery = 'update oro_email_body set text_body = :textBody where id = :id';
 
         try {
+            /** @var Connection $connection */
             $connection = $this->doctrine->getConnection();
             $data = $connection
-                ->executeQuery(
+                ->fetchAll(
                     $selectQuery,
                     ['startId' => $startId, 'endID' => $endId],
                     ['startId' => 'integer', 'endID' => 'integer']
-                )
-                ->fetchAll();
+                );
 
             foreach ($data as $dataArray) {
-                $connection->executeQuery(
-                    $updateQuery,
-                    ['id' => $dataArray['id'], 'textBody' => $emailBodyHelper->getTrimmedClearText($dataArray['body'])],
-                    ['id' => 'integer', 'textBody' => 'string']
+                $connection->update(
+                    $tableName,
+                    ['text_body' => $emailBodyHelper->getTrimmedClearText($dataArray['body'])],
+                    ['id' => $dataArray['id']],
+                    ['textBody' => 'string']
                 );
             }
         } catch (\Exception $e) {
