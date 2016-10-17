@@ -63,10 +63,12 @@ class UpgradeEmailBodyMessageProcessor implements MessageProcessorInterface
         /** @var Connection $connection */
         $connection = $this->doctrine->getConnection();
         $maxItemNumber = $connection
-            ->executeQuery(
-                'select max(id) from oro_email_body'
-            )
-            ->fetchColumn();
+            ->fetchColumn(
+                sprintf(
+                    'select max(id) from %s',
+                    $this->queryHelper->getTableName('Oro\Bundle\EmailBundle\Entity\EmailBody')
+                )
+            );
         $jobsCount = floor((int)$maxItemNumber / self::BATCH_SIZE);
         for ($i = 0; $i <= $jobsCount; $i++) {
             $this->messageProducer->send(self::TOPIC_NAME, $i);
@@ -89,10 +91,8 @@ class UpgradeEmailBodyMessageProcessor implements MessageProcessorInterface
 
         $tableName = $this->queryHelper->getTableName('Oro\Bundle\EmailBundle\Entity\EmailBody');
 
-        $selectQuery = 'SELECT id, body FROM '
-            . $tableName
+        $selectQuery = 'SELECT id, body FROM ' . $tableName
             . 'WHERE body IS NOT NULL AND text_body is NULL AND id BETWEEN :startId AND :endID';
-
 
         try {
             /** @var Connection $connection */
