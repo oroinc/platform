@@ -114,6 +114,9 @@ oro:
         last_login.label:            Last logged in
         last_name.label:             Last name
         login_count.label:           Login count
+        daily_failed_login_count.label: Daily failed login count
+        failed_login_count.label:    Failed login count
+        last_failed_login.label:     Last failed login
         middle_name.label:           Middle name
         name_prefix.label:           Name prefix
         name_suffix.label:           Name suffix

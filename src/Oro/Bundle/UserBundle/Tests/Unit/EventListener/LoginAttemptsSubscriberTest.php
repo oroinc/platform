@@ -2,16 +2,17 @@
 
 namespace Oro\Bundle\UserBundle\Tests\Unit\EventListener;
 
+use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
+use Symfony\Component\Security\Core\Event\AuthenticationFailureEvent;
+use Symfony\Component\Security\Http\Event\InteractiveLoginEvent;
+
 use Oro\Bundle\UserBundle\Entity\BaseUserManager;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\UserBundle\Entity\UserInterface;
 use Oro\Bundle\UserBundle\EventListener\LoginAttemptsSubscriber;
 use Oro\Bundle\UserBundle\Mailer\Processor;
-use Oro\Bundle\UserBundle\Manager\LoginAttemptsManager;
+use Oro\Bundle\UserBundle\Security\LoginAttemptsManager;
 use Oro\Bundle\UserBundle\Security\LoginAttemptsProvider;
-use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
-use Symfony\Component\Security\Core\Event\AuthenticationFailureEvent;
-use Symfony\Component\Security\Http\Event\InteractiveLoginEvent;
 
 class LoginAttemptsSubscriberTest extends \PHPUnit_Framework_TestCase
 {
