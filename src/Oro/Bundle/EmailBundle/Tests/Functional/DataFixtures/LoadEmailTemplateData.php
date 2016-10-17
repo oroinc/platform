@@ -58,7 +58,6 @@ class LoadEmailTemplateData extends AbstractFixture implements ContainerAwareInt
         $emailTemplate5->setIsSystem(false);
         $emailTemplate5->setOrganization($owner->getOrganization());
 
-        $manager->persist($event);
         $manager->persist($emailTemplate1);
         $manager->persist($emailTemplate2);
         $manager->persist($emailTemplate3);
