@@ -7,7 +7,6 @@ use Doctrine\DBAL\Types\Type;
 
 use Oro\Bundle\TranslationBundle\Entity\Repository\TranslationRepository;
 use Oro\Bundle\TranslationBundle\Entity\Translation;
-
 use Oro\Bundle\TranslationBundle\Manager\TranslationManager;
 
 //todo cover DB queries by functional tests in BAP-12113
