@@ -27,7 +27,7 @@ class ConvertEmailBodyToTextBody extends ContainerAwareCommand
     {
         $this
             ->setName(static::COMMAND_NAME)
-            ->setDescription('Converts email body');
+            ->setDescription('Converts emails body. Generates and stores textual email body representation.');
 
         parent::configure();
     }
@@ -37,7 +37,7 @@ class ConvertEmailBodyToTextBody extends ContainerAwareCommand
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $output->writeln('<info>Start convert body.</info>');
+        $output->writeln('<info>Conversion of emails body is started.</info>');
 
         /** @var Connection $connection */
         $connection = $this->getContainer()->get('doctrine')->getConnection();
