@@ -14,9 +14,17 @@ use Oro\Bundle\ApiBundle\Config\EntityDefinitionFieldConfig;
 use Oro\Bundle\ApiBundle\Config\FiltersConfig;
 use Oro\Bundle\ApiBundle\Model\Label;
 use Oro\Bundle\ApiBundle\Processor\Config\ConfigContext;
+use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
+use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 
 /**
- * Adds human-readable descriptions for the entity, fields and filters.
+ * Adds human-readable descriptions for:
+ * * entity
+ * * fields
+ * * filters
+ * * identifier field
+ * * "createdAt" and "updatedAt" fields
+ * * ownership fields (e.g. owner, organization).
  * By performance reasons all these actions are done in one processor.
  *
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
@@ -37,22 +45,28 @@ class CompleteDescriptions implements ProcessorInterface
     /** @var TranslatorInterface */
     protected $translator;
 
+    /** @var ConfigProvider */
+    protected $ownershipConfigProvider;
+
     /**
      * @param EntityDescriptionProvider    $entityDocProvider
      * @param ResourceDocProviderInterface $resourceDocProvider
      * @param MarkdownApiDocParser         $apiDocParser
      * @param TranslatorInterface          $translator
+     * @param ConfigProvider               $ownershipConfigProvider
      */
     public function __construct(
         EntityDescriptionProvider $entityDocProvider,
         ResourceDocProviderInterface $resourceDocProvider,
         MarkdownApiDocParser $apiDocParser,
-        TranslatorInterface $translator
+        TranslatorInterface $translator,
+        ConfigProvider $ownershipConfigProvider
     ) {
         $this->entityDocProvider = $entityDocProvider;
         $this->resourceDocProvider = $resourceDocProvider;
         $this->apiDocParser = $apiDocParser;
         $this->translator = $translator;
+        $this->ownershipConfigProvider = $ownershipConfigProvider;
     }
 
     /**
@@ -80,6 +94,10 @@ class CompleteDescriptions implements ProcessorInterface
             $context->getParentClassName()
         );
         $this->setDescriptionsForFields($definition, $entityClass, $targetAction);
+        $this->setDescriptionForIdentifierField($definition);
+        $this->setDescriptionForCreatedAtField($definition);
+        $this->setDescriptionForUpdatedAtField($definition);
+        $this->setDescriptionsForOwnershipFields($definition, $entityClass);
         $filters = $context->getFilters();
         if (null !== $filters) {
             $this->setDescriptionsForFilters($filters, $definition, $entityClass);
@@ -436,5 +454,114 @@ class CompleteDescriptions implements ProcessorInterface
         return is_string($resource) && !empty($resource)
             ? $this->apiDocParser->parseDocumentationResource($resource)
             : false;
+    }
+
+    /**
+     * @param EntityDefinitionConfig $definition
+     */
+    protected function setDescriptionForIdentifierField(EntityDefinitionConfig $definition)
+    {
+        $identifierFieldNames = $definition->getIdentifierFieldNames();
+        if (1 !== count($identifierFieldNames)) {
+            // keep descriptions for composite identifier as is
+            return;
+        }
+
+        $this->updateFieldDescription(
+            $definition,
+            reset($identifierFieldNames),
+            'The identifier of an entity'
+        );
+    }
+
+    /**
+     * @param EntityDefinitionConfig $definition
+     */
+    protected function setDescriptionForCreatedAtField(EntityDefinitionConfig $definition)
+    {
+        $this->updateFieldDescription(
+            $definition,
+            'createdAt',
+            'The date and time of resource record creation'
+        );
+    }
+
+    /**
+     * @param EntityDefinitionConfig $definition
+     */
+    protected function setDescriptionForUpdatedAtField(EntityDefinitionConfig $definition)
+    {
+        $this->updateFieldDescription(
+            $definition,
+            'updatedAt',
+            'The date and time of the last update of the resource record'
+        );
+    }
+
+    /**
+     * @param EntityDefinitionConfig $definition
+     * @param string                 $entityClass
+     */
+    protected function setDescriptionsForOwnershipFields(EntityDefinitionConfig $definition, $entityClass)
+    {
+        if (!$this->ownershipConfigProvider->hasConfig($entityClass)) {
+            // ownership fields are available only for configurable entities
+            return;
+        }
+
+        $entityConfig = $this->ownershipConfigProvider->getConfig($entityClass);
+        $this->updateOwnershipFieldDescription(
+            $definition,
+            $entityConfig,
+            'owner_field_name',
+            'An Owner record represents the ownership capabilities of the record'
+        );
+        $this->updateOwnershipFieldDescription(
+            $definition,
+            $entityConfig,
+            'organization_field_name',
+            'An Organization record represents a real enterprise, business, firm, '
+            . 'company or another organization, to which the record belongs'
+        );
+    }
+
+    /**
+     * @param EntityDefinitionConfig $definition
+     * @param string                 $fieldName
+     * @param string                 $description
+     */
+    protected function updateFieldDescription(EntityDefinitionConfig $definition, $fieldName, $description)
+    {
+        $field = $definition->getField($fieldName);
+        if (null !== $field) {
+            $existingDescription = $field->getDescription();
+            if (empty($existingDescription)) {
+                $field->setDescription($description);
+            }
+        }
+    }
+
+    /**
+     * @param EntityDefinitionConfig $definition
+     * @param ConfigInterface        $entityConfig
+     * @param string                 $configKey
+     * @param string                 $description
+     */
+    protected function updateOwnershipFieldDescription(
+        EntityDefinitionConfig $definition,
+        ConfigInterface $entityConfig,
+        $configKey,
+        $description
+    ) {
+        $propertyPath = $entityConfig->get($configKey);
+        if ($propertyPath) {
+            $field = $definition->findField($propertyPath, true);
+            if (null !== $field) {
+                $existingDescription = $field->getDescription();
+                if (empty($existingDescription)) {
+                    $field->setDescription($description);
+                }
+            }
+        }
     }
 }

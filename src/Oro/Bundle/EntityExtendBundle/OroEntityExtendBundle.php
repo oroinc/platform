@@ -123,7 +123,12 @@ class OroEntityExtendBundle extends Bundle
                 $process = $pb->getProcess();
                 $exitStatusCode = $process->run();
                 if ($exitStatusCode) {
-                    throw new \RuntimeException($process->getErrorOutput());
+                    $output = $process->getErrorOutput();
+
+                    if (empty($output)) {
+                        $output = $process->getOutput();
+                    }
+                    throw new \RuntimeException($output);
                 }
 
                 return;
