@@ -23,7 +23,7 @@ class WorkflowTranslationFieldsIteratorTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals(
             $readResultExpected,
-            iterator_to_array($iterator->iterateConfigFields($workflowName, $config))
+            iterator_to_array($iterator->iterateConfigTranslationFields($workflowName, $config))
         );
     }
 
@@ -99,7 +99,7 @@ class WorkflowTranslationFieldsIteratorTest extends \PHPUnit_Framework_TestCase
     {
         $iterator = new WorkflowTranslationFieldsIterator(new TranslationKeyGenerator());
         $i = 0;
-        foreach ($iterator->iterateConfigFields($workflowName, $config) as $source => &$value) {
+        foreach ($iterator->iterateConfigTranslationFields($workflowName, $config) as $source => &$value) {
             /**@var TranslationKeySourceInterface $source */
             $value = (string)$i++;
         }

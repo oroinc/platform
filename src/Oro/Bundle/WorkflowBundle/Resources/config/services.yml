@@ -323,13 +323,22 @@ services:
         arguments:
             - '@oro_workflow.generator.translation_key'
 
+    oro_workflow.translation.helper:
+        class: 'Oro\Bundle\WorkflowBundle\Translation\TranslationHelper'
+        arguments:
+            - '@translator.default'
+            - '@oro_translation.manager.translation'
+
     oro_workflow.translation.processor:
         class: 'Oro\Bundle\WorkflowBundle\Translation\TranslationProcessor'
-        arguments: ['@oro_workflow.translation.fields_iterator']
+        arguments:
+            - '@oro_workflow.translation.fields_iterator'
+            - '@oro_workflow.translation.helper'
         public: false
         tags:
-            - { name: oro.workflow.configuration.handler, priority: -10 }
+            - { name: oro.workflow.configuration.handler, priority: -100 }
             - { name: oro.workflow.definition_builder.extension }
+            - { name: oro_workflow.changes.subscriber }
 
     oro_workflow.extension.translation_context_resolver:
         class: 'Oro\Bundle\WorkflowBundle\Extension\TranslationContextResolver'

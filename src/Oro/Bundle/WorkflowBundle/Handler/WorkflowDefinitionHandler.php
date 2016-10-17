@@ -55,24 +55,24 @@ class WorkflowDefinitionHandler
         WorkflowDefinition $newDefinition = null
     ) {
         $em = $this->getEntityManager();
-        $created = false;
+        $previous = null;
 
         if ($newDefinition) {
+            $previous = (new WorkflowDefinition())->import($workflowDefinition);
             $workflowDefinition->import($newDefinition);
         } else {
             /** @var WorkflowDefinition $existingDefinition */
             $existingDefinition = $this->getEntityRepository()->find($workflowDefinition->getName());
             if ($existingDefinition) {
+                $previous = (new WorkflowDefinition())->import($existingDefinition);
                 $workflowDefinition = $existingDefinition->import($workflowDefinition);
-            } else {
-                $created = true;
             }
         }
         $this->workflowAssembler->assemble($workflowDefinition);
 
         $this->eventDispatcher->dispatch(
-            $created ? WorkflowEvents::WORKFLOW_BEFORE_CREATE : WorkflowEvents::WORKFLOW_BEFORE_UPDATE,
-            new WorkflowChangesEvent($workflowDefinition)
+            $previous === null ? WorkflowEvents::WORKFLOW_BEFORE_CREATE : WorkflowEvents::WORKFLOW_BEFORE_UPDATE,
+            new WorkflowChangesEvent($workflowDefinition, $previous)
         );
 
         $em->persist($workflowDefinition);
@@ -87,8 +87,8 @@ class WorkflowDefinitionHandler
         }
 
         $this->eventDispatcher->dispatch(
-            $created ? WorkflowEvents::WORKFLOW_AFTER_CREATE : WorkflowEvents::WORKFLOW_AFTER_UPDATE,
-            new WorkflowChangesEvent($workflowDefinition)
+            $previous === null ? WorkflowEvents::WORKFLOW_AFTER_CREATE : WorkflowEvents::WORKFLOW_AFTER_UPDATE,
+            new WorkflowChangesEvent($workflowDefinition, $previous)
         );
     }
 

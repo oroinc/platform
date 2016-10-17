@@ -1,6 +1,5 @@
 <?php
 
-use Oro\Bundle\WorkflowBundle\Form\Type\WorkflowStepType;
 use Oro\Bundle\WorkflowBundle\Form\Type\WorkflowTransitionType;
 
 return array(
