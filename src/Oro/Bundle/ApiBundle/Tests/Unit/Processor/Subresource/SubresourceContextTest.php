@@ -6,6 +6,7 @@ use Oro\Bundle\ApiBundle\Config\Config;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfigExtra;
 use Oro\Bundle\ApiBundle\Config\FilterFieldsConfigExtra;
+use Oro\Bundle\ApiBundle\Metadata\ActionMetadataExtra;
 use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
 use Oro\Bundle\ApiBundle\Processor\Subresource\SubresourceContext;
 use Oro\Bundle\ApiBundle\Request\RequestType;
@@ -313,6 +314,23 @@ class SubresourceContextTest extends \PHPUnit_Framework_TestCase
         );
         $this->assertEquals(
             [],
+            $this->context->get(SubresourceContext::PARENT_METADATA_EXTRAS)
+        );
+    }
+
+    public function testGetParentMetadataExtrasWhenActionExistsInContext()
+    {
+        $action = 'test_action';
+        $this->context->setAction($action);
+
+        $this->assertNull($this->context->get(SubresourceContext::PARENT_METADATA_EXTRAS));
+
+        $this->assertEquals(
+            [new ActionMetadataExtra($action)],
+            $this->context->getParentMetadataExtras()
+        );
+        $this->assertEquals(
+            [new ActionMetadataExtra($action)],
             $this->context->get(SubresourceContext::PARENT_METADATA_EXTRAS)
         );
     }
