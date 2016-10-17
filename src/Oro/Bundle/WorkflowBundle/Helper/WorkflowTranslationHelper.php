@@ -11,7 +11,6 @@ use Oro\Bundle\TranslationBundle\Translation\KeySource\TranslationKeySource;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Translation\KeyTemplate\WorkflowTemplate;
 
-
 class WorkflowTranslationHelper
 {
     const TRANSLATION_DOMAIN = 'workflows';
