@@ -2,6 +2,7 @@
 namespace Oro\Bundle\DataAuditBundle\Tests\Functional\Listener;
 
 use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\Event\PostFlushEventArgs;
 use Oro\Bundle\DataAuditBundle\Async\Topics;
 use Oro\Bundle\DataAuditBundle\EventListener\SendChangedEntitiesToMessageQueueListener;
 use Oro\Bundle\MessageQueueBundle\Test\Functional\MessageQueueExtension;
@@ -65,6 +66,18 @@ class SendChangedEntitiesToMessageQueueListenerTest extends WebTestCase
         $em->flush();
 
         $this->assertEmpty(self::getSentMessages());
+    }
+
+    /**
+     * Emulates case when the following chain of events happens:
+     * onFlush -> onFlush -> postFlush -> postFlush
+     */
+    public function testShouldPostFlushNotThrowExceptionIfFlushIsCalledInPostFlushListener()
+    {
+        /** @var SendChangedEntitiesToMessageQueueListener $listener */
+        $listener = $this->getContainer()->get('oro_dataaudit.listener.send_changed_entities_to_message_queue');
+
+        $listener->postFlush(new PostFlushEventArgs($this->getEntityManager()));
     }
 
     public function testShouldSendEntitiesChangedMessageWithExpectedStructure()
