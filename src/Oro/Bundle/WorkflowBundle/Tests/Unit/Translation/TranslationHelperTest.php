@@ -54,7 +54,9 @@ class TranslationHelperTest extends \PHPUnit_Framework_TestCase
     public function testRemoveTranslationKey()
     {
         $key = 'key_to_remove';
+
         $this->manager->expects($this->once())->method('removeTranslationKey')->with($key, 'workflows');
+
         $this->helper->removeTranslationKey($key);
     }
 }

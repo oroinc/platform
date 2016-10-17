@@ -46,6 +46,7 @@ class TransitionHandlerTest extends \PHPUnit_Framework_TestCase
                     WorkflowConfiguration::NODE_TRANSITIONS => array(
                         array(
                             'name' => 'test_transition',
+                            'label' => 'Test Transition', //should be kept as filtering comes in separate service
                             'step_to' => 'test_step',
                             'transition_definition' => 'test_transition_definition',
                             'form_options' => array(
@@ -114,6 +115,7 @@ class TransitionHandlerTest extends \PHPUnit_Framework_TestCase
                             'frontend_options' => array('class' => 'btn-primary'),
                             'form_type' => 'oro_workflow_transition',
                             'display_type' => 'dialog',
+                            'label' => 'Test Transition',
                             'form_options' => array(
                                 'attribute_fields' => array(
                                     'test_attribute' => null,
@@ -150,9 +152,7 @@ class TransitionHandlerTest extends \PHPUnit_Framework_TestCase
                                 'attribute_fields' => array(
                                     'test_attribute' => null
                                 )
-                            ),
-                            'unknown_first' => 'first_value',
-                            'unknown_second' => 'second_value',
+                            )
                         )
                     ),
                     WorkflowConfiguration::NODE_TRANSITION_DEFINITIONS => array(

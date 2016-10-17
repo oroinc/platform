@@ -2,27 +2,8 @@
 
 namespace Oro\Bundle\WorkflowBundle\Configuration\Handler;
 
-use Oro\Bundle\WorkflowBundle\Configuration\WorkflowConfiguration;
-
 class WorkflowHandler extends AbstractHandler
 {
-    /**
-     * @var array
-     */
-    protected $workflowKeys = array(
-        'name',
-        'entity',
-        'is_system',
-        'start_step',
-        'entity_attribute',
-        'steps_display_ordered',
-        WorkflowConfiguration::NODE_STEPS,
-        WorkflowConfiguration::NODE_ATTRIBUTES,
-        WorkflowConfiguration::NODE_TRANSITIONS,
-        WorkflowConfiguration::NODE_TRANSITION_DEFINITIONS,
-        WorkflowConfiguration::NODE_ENTITY_RESTRICTIONS,
-    );
-
     /**
      * @var ConfigurationHandlerInterface[]
      */
@@ -64,6 +45,6 @@ class WorkflowHandler extends AbstractHandler
             unset($workflow['entity']);
         }
 
-        return $this->filterKeys($workflow, $this->workflowKeys);
+        return $workflow;
     }
 }
