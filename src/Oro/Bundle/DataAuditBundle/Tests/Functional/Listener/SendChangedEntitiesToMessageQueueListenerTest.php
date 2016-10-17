@@ -51,16 +51,13 @@ class SendChangedEntitiesToMessageQueueListenerTest extends WebTestCase
         $this->assertAttributeEquals(true, 'enabled', $listener);
     }
 
-    public function testShouldDoNothingIfNothingChanged()
+    public function testShouldDoNothingIfListenerDisabled()
     {
         $em = $this->getEntityManager();
 
         /** @var SendChangedEntitiesToMessageQueueListener $listener */
         $listener = $this->getContainer()->get('oro_dataaudit.listener.send_changed_entities_to_message_queue');
         $listener->setEnabled(false);
-
-        //guard
-        $this->assertAttributeEquals(false, 'enabled', $listener);
 
         $owner = new TestAuditDataOwner();
         $owner->setStringProperty('aString');
