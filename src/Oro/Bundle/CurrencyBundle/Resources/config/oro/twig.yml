@@ -1,0 +1,2 @@
+bundles:
+    - OroCurrencyBundle:Form:fields.html.twig

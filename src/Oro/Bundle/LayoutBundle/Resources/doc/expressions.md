@@ -63,7 +63,7 @@ Here we can see that *visible* option depends on context value, let's review how
         $view->vars['visible'] =  $options->get('visible', false);
     }
     
-    public function finishView(BlockView $view, BlockInterface $block, Options $options)
+    public function finishView(BlockView $view, BlockInterface $block)
     {
        // we will depends on `expressions_evaluate` option we will have
        var_dump($view->vars['visible']);

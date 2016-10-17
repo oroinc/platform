@@ -2,13 +2,14 @@
 
 namespace Oro\Bundle\ApiBundle\Processor\Shared;
 
-use Doctrine\Common\Persistence\Mapping\ClassMetadata;
+use Doctrine\ORM\Mapping\ClassMetadata;
 
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Bundle\ApiBundle\Exception\RuntimeException;
 use Oro\Bundle\ApiBundle\Filter\FieldAwareFilterInterface;
 use Oro\Bundle\ApiBundle\Filter\FilterFactoryInterface;
 use Oro\Bundle\ApiBundle\Filter\StandaloneFilter;
+use Oro\Bundle\ApiBundle\Filter\ComparisonFilter;
 use Oro\Bundle\ApiBundle\Processor\Context;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 
@@ -72,6 +73,19 @@ class RegisterConfiguredFilters extends RegisterFilters
                         $filter->setSupportedOperators([StandaloneFilter::EQ]);
                     }
                 }
+
+                /**
+                 * For filtering by relations only EQ and NEQ operators should be available.
+                 */
+                if (null !== $metadata
+                    && in_array($fieldName, array_keys($this->doctrineHelper->getIndexedAssociations($metadata)))
+                ) {
+                    $filter->setSupportedOperators([
+                        ComparisonFilter::EQ,
+                        ComparisonFilter::NEQ
+                    ]);
+                }
+
                 $filters->add($fieldName, $filter);
             }
         }

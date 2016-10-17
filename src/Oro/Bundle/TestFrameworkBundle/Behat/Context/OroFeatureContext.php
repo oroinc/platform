@@ -14,8 +14,14 @@ class OroFeatureContext extends RawMinkContext
      */
     public function waitForAjax($time = 60000)
     {
-        /** @var OroSelenium2Driver $driver */
-        $driver = $this->getSession()->getDriver();
-        $driver->waitForAjax($time);
+        $this->getDriver()->waitForAjax($time);
+    }
+
+    /**
+     * @return OroSelenium2Driver
+     */
+    protected function getDriver()
+    {
+        return $this->getSession()->getDriver();
     }
 }
