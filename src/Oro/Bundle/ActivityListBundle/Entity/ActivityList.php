@@ -324,7 +324,7 @@ class ActivityList extends ExtendActivityList implements DatesAwareInterface, Up
     }
 
     /**
-     * Set a subject of the related record
+     * Set a subject of the related record. The subject cutes to 250 symbols.
      *
      * @param string $subject
      *
@@ -332,7 +332,7 @@ class ActivityList extends ExtendActivityList implements DatesAwareInterface, Up
      */
     public function setSubject($subject)
     {
-        $this->subject = substr($subject, 0, 255);
+        $this->subject = mb_substr($subject, 0, 250, mb_detect_encoding($subject));
 
         return $this;
     }

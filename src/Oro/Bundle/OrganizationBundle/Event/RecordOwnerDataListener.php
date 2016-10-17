@@ -4,18 +4,15 @@ namespace Oro\Bundle\OrganizationBundle\Event;
 
 use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ORM\Event\LifecycleEventArgs;
-
+use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
+use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
+use Oro\Bundle\OrganizationBundle\Form\Type\OwnershipType;
+use Oro\Bundle\SecurityBundle\Authentication\Token\OrganizationContextTokenInterface;
+use Oro\Bundle\UserBundle\Entity\User;
+use Oro\Component\DependencyInjection\ServiceLink;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\SecurityContextInterface;
-
-use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
-use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
-use Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink;
-
-use Oro\Bundle\OrganizationBundle\Form\Type\OwnershipType;
-
-use Oro\Bundle\SecurityBundle\Authentication\Token\OrganizationContextTokenInterface;
 
 class RecordOwnerDataListener
 {
@@ -63,19 +60,7 @@ class RecordOwnerDataListener
                 && in_array($ownerType, [OwnershipType::OWNER_TYPE_ORGANIZATION, OwnershipType::OWNER_TYPE_USER])
                 && !$accessor->getValue($entity, $ownerFieldName)
             ) {
-                $owner = null;
-                if (OwnershipType::OWNER_TYPE_USER == $ownerType) {
-                    $owner = $user;
-                } elseif (OwnershipType::OWNER_TYPE_ORGANIZATION == $ownerType
-                    && $token instanceof OrganizationContextTokenInterface
-                ) {
-                    $owner = $token->getOrganizationContext();
-                }
-                $accessor->setValue(
-                    $entity,
-                    $ownerFieldName,
-                    $owner
-                );
+                $this->setOwner($ownerType, $entity, $token, $ownerFieldName);
             }
             //set organization
             $this->setDefaultOrganization($token, $config, $entity);
@@ -102,11 +87,45 @@ class RecordOwnerDataListener
         }
     }
 
+
     /**
      * @return SecurityContextInterface
      */
     protected function getSecurityContext()
     {
         return $this->securityContextLink->getService();
+    }
+
+    /**
+     * @param string $ownerType
+     * @param object $entity
+     * @param TokenInterface $token
+     * @param string $ownerFieldName
+     */
+    protected function setOwner($ownerType, $entity, TokenInterface $token, $ownerFieldName)
+    {
+        $user = $token->getUser();
+        $accessor = PropertyAccess::createPropertyAccessor();
+        $owner = null;
+        if (OwnershipType::OWNER_TYPE_USER == $ownerType) {
+            $owner = null;
+            if ($user instanceof User) {
+                $owner = $user;
+            } elseif ($user->getOwner() instanceof User) {
+                $owner = $user->getOwner();
+            }
+        }
+        if (OwnershipType::OWNER_TYPE_ORGANIZATION == $ownerType
+            && $token instanceof OrganizationContextTokenInterface
+        ) {
+            $owner = $token->getOrganizationContext();
+        }
+        if ($owner) {
+            $accessor->setValue(
+                $entity,
+                $ownerFieldName,
+                $owner
+            );
+        }
     }
 }

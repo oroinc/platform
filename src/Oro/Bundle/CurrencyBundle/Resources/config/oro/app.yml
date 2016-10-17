@@ -1,0 +1,4 @@
+doctrine:
+    dbal:
+        types:
+            currency: Oro\Bundle\CurrencyBundle\DoctrineExtension\Dbal\Types\CurrencyType
