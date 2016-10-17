@@ -42,7 +42,6 @@ class WorkflowHandlerTest extends \PHPUnit_Framework_TestCase
             'simple configuration' => array(
                 'expected' => array(
                     'name' => 'test_workflow',
-                    'label' => 'Test Workflow',
                     'entity' => '\DateTime',
                 ),
                 'input' => array(
@@ -54,7 +53,6 @@ class WorkflowHandlerTest extends \PHPUnit_Framework_TestCase
             'filtered configuration' => array(
                 'expected' => array(
                     'name' => 'test_workflow',
-                    'label' => 'Test Workflow',
                     'entity' => '\DateTime',
                     'is_system' => false,
                     'start_step' => null,
@@ -93,10 +91,8 @@ class WorkflowHandlerTest extends \PHPUnit_Framework_TestCase
         $result = $this->handler->handle($configuration);
 
         $this->assertArrayHasKey('name', $result);
-        $this->assertArrayHasKey('label', $result);
         $this->assertArrayNotHasKey('entity', $result);
 
         $this->assertStringStartsWith('workflow_', $result['name']);
-        $this->assertEquals($result['name'], $result['label']);
     }
 }

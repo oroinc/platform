@@ -18,6 +18,10 @@ oro:
                     choices:
                         no: No
                         yes: Yes
+        feature:
+            development_settings:
+                label: Development Settings
+                description: Development Settings is enabled only in dev environment
 
         profiler:
             title: Layout

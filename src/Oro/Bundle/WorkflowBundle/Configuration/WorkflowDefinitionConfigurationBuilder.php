@@ -14,6 +14,9 @@ class WorkflowDefinitionConfigurationBuilder extends AbstractConfigurationBuilde
     /** @var WorkflowAssembler */
     protected $workflowAssembler;
 
+    /** @var WorkflowDefinitionBuilderExtensionInterface[] */
+    protected $extensions = [];
+
     /**
      * @param WorkflowAssembler $workflowAssembler
      */
@@ -43,7 +46,11 @@ class WorkflowDefinitionConfigurationBuilder extends AbstractConfigurationBuilde
      */
     public function buildOneFromConfiguration($name, array $configuration)
     {
-        $this->assertConfigurationOptions($configuration, array('label', 'entity'));
+        foreach ($this->extensions as $extension) {
+            $configuration = $extension->prepare($name, $configuration);
+        }
+
+        $this->assertConfigurationOptions($configuration, ['entity']);
 
         $system = $this->getConfigurationOption($configuration, 'is_system', false);
         $startStepName = $this->getConfigurationOption($configuration, 'start_step', null);
@@ -183,5 +190,13 @@ class WorkflowDefinitionConfigurationBuilder extends AbstractConfigurationBuilde
         );
 
         return array_intersect_key($configuration, array_flip($configurationKeys));
+    }
+
+    /**
+     * @param WorkflowDefinitionBuilderExtensionInterface $extension
+     */
+    public function addExtension(WorkflowDefinitionBuilderExtensionInterface $extension)
+    {
+        $this->extensions[] = $extension;
     }
 }

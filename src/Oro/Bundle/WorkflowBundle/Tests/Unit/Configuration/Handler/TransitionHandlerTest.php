@@ -46,7 +46,6 @@ class TransitionHandlerTest extends \PHPUnit_Framework_TestCase
                     WorkflowConfiguration::NODE_TRANSITIONS => array(
                         array(
                             'name' => 'test_transition',
-                            'label' => 'Test Transition',
                             'step_to' => 'test_step',
                             'transition_definition' => 'test_transition_definition',
                             'form_options' => array(
@@ -105,14 +104,12 @@ class TransitionHandlerTest extends \PHPUnit_Framework_TestCase
                     WorkflowConfiguration::NODE_TRANSITIONS => array(
                         array(
                             'name' => 'test_transition',
-                            'label' => 'Test Transition',
                             'step_to' => 'test_step',
                             'is_start' => false,
                             'is_hidden' => false,
                             'is_unavailable_hidden' => true,
                             'acl_resource' => null,
                             'acl_message' => null,
-                            'message' => null,
                             'transition_definition' => 'test_transition_definition',
                             'frontend_options' => array('class' => 'btn-primary'),
                             'form_type' => 'oro_workflow_transition',
@@ -145,7 +142,6 @@ class TransitionHandlerTest extends \PHPUnit_Framework_TestCase
                             'is_unavailable_hidden' => true,
                             'acl_resource' => null,
                             'acl_message' => null,
-                            'message' => null,
                             'transition_definition' => 'test_transition_definition',
                             'frontend_options' => array('class' => 'btn-primary'),
                             'form_type' => 'oro_workflow_transition',
@@ -187,11 +183,9 @@ class TransitionHandlerTest extends \PHPUnit_Framework_TestCase
         $transition = current($transitions);
 
         $this->assertArrayHasKey('name', $transition);
-        $this->assertArrayHasKey('label', $transition);
         $this->assertArrayHasKey('transition_definition', $transition);
 
         $this->assertStringStartsWith('transition_', $transition['name']);
-        $this->assertEquals($transition['name'], $transition['label']);
 
         $this->assertStringStartsWith('transition_definition_', $transition['transition_definition']);
         $this->assertArrayHasKey(WorkflowConfiguration::NODE_TRANSITION_DEFINITIONS, $result);

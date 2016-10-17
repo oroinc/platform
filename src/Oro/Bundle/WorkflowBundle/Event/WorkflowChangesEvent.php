@@ -12,12 +12,18 @@ class WorkflowChangesEvent extends Event
     private $definition;
 
     /**
-     * WorkflowChangesEvent constructor.
-     * @param WorkflowDefinition $definition
+     * @var WorkflowDefinition
      */
-    public function __construct(WorkflowDefinition $definition)
+    private $previous;
+
+    /**
+     * @param WorkflowDefinition $definition
+     * @param WorkflowDefinition $previous
+     */
+    public function __construct(WorkflowDefinition $definition, WorkflowDefinition $previous = null)
     {
         $this->definition = $definition;
+        $this->previous = $previous;
     }
 
     /**
@@ -26,5 +32,13 @@ class WorkflowChangesEvent extends Event
     public function getDefinition()
     {
         return $this->definition;
+    }
+
+    /**
+     * @return WorkflowDefinition
+     */
+    public function getPrevious()
+    {
+        return $this->previous;
     }
 }
