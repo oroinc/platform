@@ -31,7 +31,7 @@ interface ItemFieldInterface
      * @param AbstractItem $item
      * @return ItemFieldInterface
      */
-    public function setItem(AbstractItem $item = null);
+    public function setItem(AbstractItem $item);
 
     /**
      * @return AbstractItem

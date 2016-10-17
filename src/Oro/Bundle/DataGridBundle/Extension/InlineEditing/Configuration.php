@@ -18,9 +18,11 @@ class Configuration implements ConfigurationInterface
 
     const CONFIG_ENABLE_KEY             = 'enable';
     const BASE_CONFIG_KEY               = 'inline_editing';
+    const CONFIG_ACL_KEY                = 'acl_resource';
     const CONFIG_ENTITY_KEY             = 'entity_name';
     const CONFIG_EXTENDED_ENTITY_KEY    = 'extended_entity_name';
     const AUTOCOMPLETE_API_ACCESSOR_KEY = 'autocomplete_api_accessor';
+    const SAVE_API_ACCESSOR_KEY         = 'save_api_accessor';
     const CLASS_KEY                     = 'class';
     const EDITOR_KEY                    = 'editor';
     const VIEW_KEY                      = 'view';
@@ -73,6 +75,7 @@ class Configuration implements ConfigurationInterface
             ->end()
             ->children()
                 ->booleanNode('enable')->defaultFalse()->end()
+                ->scalarNode(self::CONFIG_ACL_KEY)->end()
                 ->scalarNode(self::CONFIG_ENTITY_KEY)->end()
                 ->enumNode('behaviour')
                     ->values($this->behaviourConfigValues)

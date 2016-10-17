@@ -98,7 +98,7 @@ class WorkflowControllerTest extends WebTestCase
         $this->assertInactiveWorkflow($testEntity, LoadWorkflowDefinitions::WITH_START_STEP);
 
         $processes = $repositoryProcess->findAll();
-        $this->assertCount(count($processesBefore) - 1, $processes);
+        $this->assertCount(count($processesBefore), $processes);
 
         $this->assertEmpty($this->getWorkflowItem($testEntity, LoadWorkflowDefinitions::WITH_START_STEP));
 

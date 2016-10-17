@@ -112,7 +112,6 @@ datagrids:
                 type:     callback
                 callable: "@oro_calendar.datagrid.helper.calendar_event_grid->getDeleteLinkProperty"
                 route:    oro_calendar_event_delete
-                params:   [ id ]
             accept_link:
                 type:       url
                 route:      oro_calendar_event_accepted

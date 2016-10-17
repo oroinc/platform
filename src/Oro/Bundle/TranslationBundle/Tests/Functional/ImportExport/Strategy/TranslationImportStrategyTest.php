@@ -3,6 +3,7 @@
 namespace Oro\Bundle\TranslationBundle\Tests\Functional\ImportExport\Strategy;
 
 use Oro\Bundle\TranslationBundle\Entity\Translation;
+use Oro\Bundle\TranslationBundle\Entity\TranslationKey;
 use Oro\Bundle\TranslationBundle\ImportExport\Strategy\TranslationImportStrategy;
 use Oro\Bundle\TranslationBundle\Tests\Functional\DataFixtures\LoadLanguages;
 use Oro\Bundle\TranslationBundle\Tests\Functional\DataFixtures\LoadTranslations;
@@ -16,10 +17,12 @@ class TranslationImportStrategyTest extends AbstractTranslationImportStrategyTes
     {
         $oldTranslationsCnt = $this->getTranslationsByLocaleCount(LoadLanguages::LANGUAGE1);
         $translation = new Translation();
+        $translationKey = (new TranslationKey())->setKey('new_key')->setDomain('new_domain');
+        $translationKey = $this->processTranslationKey($translationKey);
+
         $translation
-            ->setLocale(LoadLanguages::LANGUAGE1)
-            ->setDomain('new_domain')
-            ->setKey('new_key')
+            ->setLanguage($this->getReference(LoadLanguages::LANGUAGE1))
+            ->setTranslationKey($translationKey)
             ->setValue('new_value');
 
         $this->processTranslation($translation);
@@ -36,9 +39,8 @@ class TranslationImportStrategyTest extends AbstractTranslationImportStrategyTes
         $oldTranslationsCnt = $this->getTranslationsByLocaleCount(LoadLanguages::LANGUAGE1);
         $translation = new Translation();
         $translation
-            ->setLocale($translationForReplace->getLocale())
-            ->setDomain($translationForReplace->getDomain())
-            ->setKey($translationForReplace->getKey())
+            ->setLanguage($translationForReplace->getLanguage())
+            ->setTranslationKey($translationForReplace->getTranslationKey())
             ->setValue('new_value');
 
         $translation = $this->processTranslation($translation);

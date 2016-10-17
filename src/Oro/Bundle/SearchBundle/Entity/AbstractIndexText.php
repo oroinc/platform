@@ -20,7 +20,7 @@ abstract class AbstractIndexText implements ItemFieldInterface
 
     /**
      * @ORM\ManyToOne(targetEntity="Item", inversedBy="textFields")
-     * @ORM\JoinColumn(name="item_id", referencedColumnName="id", nullable=false, onDelete="CASCADE")
+     * @ORM\JoinColumn(name="item_id", referencedColumnName="id", nullable=false)
      */
     protected $item;
 
@@ -87,7 +87,7 @@ abstract class AbstractIndexText implements ItemFieldInterface
     /**
      * {@inheritdoc}
      */
-    public function setItem(AbstractItem $item = null)
+    public function setItem(AbstractItem $item)
     {
         $this->item = $item;
 

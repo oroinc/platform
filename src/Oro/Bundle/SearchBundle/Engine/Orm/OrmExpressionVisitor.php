@@ -8,6 +8,7 @@ use Doctrine\Common\Collections\Expr\ExpressionVisitor;
 use Doctrine\Common\Collections\Expr\Value;
 use Doctrine\ORM\QueryBuilder;
 
+use Oro\Bundle\SearchBundle\Query\Criteria\Comparison as SearchComparison;
 use Oro\Bundle\SearchBundle\Query\Criteria\Criteria;
 use Oro\Bundle\SearchBundle\Query\Query;
 
@@ -65,6 +66,10 @@ class OrmExpressionVisitor extends ExpressionVisitor
             }
         }
 
+        if (in_array($comparison->getOperator(), SearchComparison::$filteringOperators)) {
+            return $this->driver->addFilteringField($this->qb, $index, $searchCondition);
+        }
+
         return $this->driver->addNonTextField($this->qb, $index, $searchCondition);
     }
 
@@ -112,7 +117,6 @@ class OrmExpressionVisitor extends ExpressionVisitor
                         $operator,
                         $value
                     );
-
                 }
                 $expressionObjectList[$key] = $combinedExpression;
             }
@@ -162,7 +166,6 @@ class OrmExpressionVisitor extends ExpressionVisitor
         );
 
         return Criteria::implodeFieldTypeName($type, $fieldsString);
-
     }
 
     /**

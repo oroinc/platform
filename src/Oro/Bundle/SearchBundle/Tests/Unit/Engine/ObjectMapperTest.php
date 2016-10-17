@@ -330,7 +330,7 @@ class ObjectMapperTest extends \PHPUnit_Framework_TestCase
 
     public function testNonExistsConfig()
     {
-        $this->assertEquals(false, $this->mapper->getEntityConfig('non exists entity'));
+        $this->assertEquals([], $this->mapper->getEntityConfig('non exists entity'));
     }
 
     public function testSelectedData()

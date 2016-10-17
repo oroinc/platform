@@ -23,8 +23,13 @@ trait EntityTrait
     protected function getEntity($className, array $properties = [], array $constructorArgs = null)
     {
         $reflectionClass = new \ReflectionClass($className);
+        $reflectionMethod = null;
 
         if ($reflectionClass->hasMethod('__construct')) {
+            $reflectionMethod = new \ReflectionMethod($className, '__construct');
+        }
+
+        if ($reflectionMethod && $reflectionMethod->isPublic()) {
             $entity = $reflectionClass->newInstance($constructorArgs);
         } else {
             $entity = $reflectionClass->newInstanceWithoutConstructor();

@@ -4,7 +4,6 @@ namespace Oro\Bundle\SearchBundle\Datagrid\Datasource;
 
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
-use Oro\Bundle\SearchBundle\Query\Result\Item;
 use Oro\Bundle\DataGridBundle\Datagrid\DatagridInterface;
 use Oro\Bundle\DataGridBundle\Datasource\DatasourceInterface;
 use Oro\Bundle\DataGridBundle\Datasource\ResultRecord;
@@ -62,10 +61,10 @@ class SearchDatasource implements DatasourceInterface
      */
     public function getResults()
     {
-        $results = $this->searchQuery->execute();
-
         $event = new SearchResultBefore($this->datagrid, $this->searchQuery);
         $this->dispatcher->dispatch(SearchResultBefore::NAME, $event);
+
+        $results = $this->searchQuery->execute();
 
         $rows = [];
         foreach ($results as $result) {
