@@ -57,36 +57,13 @@ class PlatformUpdateCommand extends AbstractCommand
                     array(
                         '--process-isolation' => true,
                         '--force'             => true,
-                        '--timeout'           => $commandExecutor->getDefaultOption('process-timeout'),
-                        '--disabled-listeners' => [
-                            'oro_dataaudit.listener.send_changed_entities_to_message_queue'
-                        ]
+                        '--timeout'           => $commandExecutor->getDefaultOption('process-timeout')
                     )
                 )
-                ->runCommand(LoadPermissionConfigurationCommand::NAME, array(
-                    '--process-isolation' => true,
-                    '--disabled-listeners' => [
-                        'oro_dataaudit.listener.send_changed_entities_to_message_queue'
-                    ]
-                ))
-                ->runCommand('oro:workflow:definitions:load', array(
-                    '--process-isolation' => true,
-                    '--disabled-listeners' => [
-                        'oro_dataaudit.listener.send_changed_entities_to_message_queue'
-                    ]
-                ))
-                ->runCommand('oro:process:configuration:load', array(
-                    '--process-isolation' => true,
-                    '--disabled-listeners' => [
-                        'oro_dataaudit.listener.send_changed_entities_to_message_queue'
-                    ]
-                ))
-                ->runCommand('oro:migration:data:load', array(
-                    '--process-isolation' => true,
-                    '--disabled-listeners' => [
-                        'oro_dataaudit.listener.send_changed_entities_to_message_queue'
-                    ]
-                ))
+                ->runCommand(LoadPermissionConfigurationCommand::NAME, array('--process-isolation' => true))
+                ->runCommand('oro:workflow:definitions:load', array('--process-isolation' => true))
+                ->runCommand('oro:process:configuration:load', array('--process-isolation' => true))
+                ->runCommand('oro:migration:data:load', array('--process-isolation' => true))
                 ->runCommand('oro:translation:load', ['--process-isolation' => true])
                 ->runCommand('oro:navigation:init', array('--process-isolation' => true))
                 ->runCommand('router:cache:clear', array('--process-isolation' => true))

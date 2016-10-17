@@ -29,12 +29,7 @@ class SchemaStep extends AbstractStep
             case 'schema-update':
                 return $this->handleAjaxAction('oro:migration:load', array('--force' => true));
             case 'fixtures':
-                return $this->handleAjaxAction('oro:migration:data:load', array(
-                    '--no-interaction' => true,
-                    '--disabled-listeners' => array(
-                        'oro_dataaudit.listener.send_changed_entities_to_message_queue'
-                    )
-                ));
+                return $this->handleAjaxAction('oro:migration:data:load', array('--no-interaction' => true));
             case 'permissions':
                 return $this->handleAjaxAction(LoadPermissionConfigurationCommand::NAME);
             case 'workflows':

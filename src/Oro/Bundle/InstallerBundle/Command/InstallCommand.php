@@ -443,47 +443,32 @@ class InstallCommand extends AbstractCommand implements InstallCommandInterface
                 [
                     '--force'             => true,
                     '--process-isolation' => true,
-                    '--timeout'           => $commandExecutor->getDefaultOption('process-timeout'),
-                    '--disabled-listeners' => [
-                        'oro_dataaudit.listener.send_changed_entities_to_message_queue'
-                    ]
+                    '--timeout'           => $commandExecutor->getDefaultOption('process-timeout')
                 ]
             )
             ->runCommand(
                 LoadPermissionConfigurationCommand::NAME,
                 [
-                    '--process-isolation' => true,
-                    '--disabled-listeners' => [
-                        'oro_dataaudit.listener.send_changed_entities_to_message_queue'
-                    ]
+                    '--process-isolation' => true
                 ]
             )
             ->runCommand(
                 'oro:workflow:definitions:load',
                 [
-                    '--process-isolation' => true,
-                    '--disabled-listeners' => [
-                        'oro_dataaudit.listener.send_changed_entities_to_message_queue'
-                    ]
+                    '--process-isolation' => true
                 ]
             )
             ->runCommand(
                 'oro:process:configuration:load',
                 [
-                    '--process-isolation' => true,
-                    '--disabled-listeners' => [
-                        'oro_dataaudit.listener.send_changed_entities_to_message_queue'
-                    ]
+                    '--process-isolation' => true
                 ]
             )
             ->runCommand(
                 'oro:migration:data:load',
                 [
                     '--process-isolation' => true,
-                    '--no-interaction'    => true,
-                    '--disabled-listeners' => [
-                        'oro_dataaudit.listener.send_changed_entities_to_message_queue'
-                    ]
+                    '--no-interaction'    => true
                 ]
             );
 
@@ -507,10 +492,7 @@ class InstallCommand extends AbstractCommand implements InstallCommandInterface
                 'oro:migration:data:load',
                 array(
                     '--process-isolation'  => true,
-                    '--fixtures-type'      => 'demo',
-                    '--disabled-listeners' => [
-                        'oro_dataaudit.listener.send_changed_entities_to_message_queue'
-                    ]
+                    '--fixtures-type'      => 'demo'
                 )
             );
         }

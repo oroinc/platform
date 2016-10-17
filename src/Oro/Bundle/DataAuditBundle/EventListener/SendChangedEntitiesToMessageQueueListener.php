@@ -10,8 +10,10 @@ use Doctrine\ORM\PersistentCollection;
 use Oro\Bundle\DataAuditBundle\Async\Topics;
 use Oro\Bundle\DataAuditBundle\Service\ConvertEntityToArrayForMessageQueueService;
 use Oro\Bundle\DataAuditBundle\Service\GetEntityAuditMetadataService;
+use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\PlatformBundle\EventListener\OptionalListenerInterface;
 use Oro\Bundle\SecurityBundle\Authentication\Token\OrganizationContextTokenInterface;
+use Oro\Bundle\SecurityBundle\Tools\UUIDGenerator;
 use Oro\Bundle\UserBundle\Entity\AbstractUser;
 use Oro\Component\MessageQueue\Client\Message;
 use Oro\Component\MessageQueue\Client\MessagePriority;
@@ -71,7 +73,7 @@ class SendChangedEntitiesToMessageQueueListener implements OptionalListenerInter
     /**
      * @var boolean
      */
-    private $enabled;
+    private $enabled = true;
 
     /**
      * @param MessageProducerInterface $messageProducer
@@ -94,8 +96,14 @@ class SendChangedEntitiesToMessageQueueListener implements OptionalListenerInter
         $this->allUpdates = new \SplObjectStorage;
         $this->allDeletions = new \SplObjectStorage;
         $this->allCollectionUpdates = new \SplObjectStorage;
+    }
 
-        $this->setEnabled(true);
+    /**
+     * {@inheritdoc}
+     */
+    public function setEnabled($enabled = true)
+    {
+        $this->enabled = $enabled;
     }
 
     /**
@@ -103,10 +111,10 @@ class SendChangedEntitiesToMessageQueueListener implements OptionalListenerInter
      */
     public function onFlush(OnFlushEventArgs $eventArgs)
     {
-        if (false == $this->enabled) {
+        if (!$this->enabled) {
             return;
         }
-        
+
         $em = $eventArgs->getEntityManager();
 
         $this->findAuditableInsertions($em);
@@ -120,7 +128,7 @@ class SendChangedEntitiesToMessageQueueListener implements OptionalListenerInter
      */
     public function postFlush(PostFlushEventArgs $eventArgs)
     {
-        if (false == $this->enabled) {
+        if (!$this->enabled) {
             return;
         }
 
@@ -134,25 +142,20 @@ class SendChangedEntitiesToMessageQueueListener implements OptionalListenerInter
         try {
             $body = [
                 'timestamp' => time(),
-                'transaction_id' => uniqid().'-'.uniqid().'-'.uniqid(),
+                'transaction_id' => UUIDGenerator::v4(),
                 'entities_updated' => [],
                 'entities_inserted' => [],
                 'entities_deleted' => [],
                 'collections_updated' => [],
             ];
 
-            $token = $this->securityTokenStorage->getToken();
-            if ($token && $token->getUser() instanceof AbstractUser) {
-                /** @var AbstractUser $user */
-                $user = $token->getUser();
-
+            $user = $this->getUser();
+            if (null !== $user) {
                 $body['user_id'] = $user->getId();
                 $body['user_class'] = ClassUtils::getClass($user);
             }
-
-            if ($token instanceof OrganizationContextTokenInterface) {
-                $organization = $token->getOrganizationContext();
-
+            $organization = $this->getOrganization();
+            if (null !== $organization) {
                 $body['organization_id'] = $organization->getId();
             }
 
@@ -251,7 +254,7 @@ class SendChangedEntitiesToMessageQueueListener implements OptionalListenerInter
     /**
      * @param EntityManager $em
      */
-    public function findAuditableCollectionUpdates(EntityManager $em)
+    private function findAuditableCollectionUpdates(EntityManager $em)
     {
         $uow = $em->getUnitOfWork();
 
@@ -282,7 +285,7 @@ class SendChangedEntitiesToMessageQueueListener implements OptionalListenerInter
      *
      * @return array
      */
-    public function processInsertions(EntityManager $em)
+    private function processInsertions(EntityManager $em)
     {
         $insertions = [];
         foreach ($this->allInsertions[$em] as $entity) {
@@ -299,7 +302,7 @@ class SendChangedEntitiesToMessageQueueListener implements OptionalListenerInter
      *
      * @return array
      */
-    public function processUpdates(EntityManager $em)
+    private function processUpdates(EntityManager $em)
     {
         $updates = [];
         foreach ($this->allUpdates[$em] as $entity) {
@@ -316,7 +319,7 @@ class SendChangedEntitiesToMessageQueueListener implements OptionalListenerInter
      *
      * @return array
      */
-    public function processDeletions(EntityManager $em)
+    private function processDeletions(EntityManager $em)
     {
         $deletions = [];
         foreach ($this->allDeletions[$em] as $entity) {
@@ -331,7 +334,7 @@ class SendChangedEntitiesToMessageQueueListener implements OptionalListenerInter
      *
      * @return array
      */
-    public function processCollectionUpdates(EntityManager $em)
+    private function processCollectionUpdates(EntityManager $em)
     {
         $collectionUpdates = [];
 
@@ -360,10 +363,34 @@ class SendChangedEntitiesToMessageQueueListener implements OptionalListenerInter
     }
 
     /**
-     * {@inheritdoc}
+     * @return AbstractUser|null
      */
-    public function setEnabled($enabled = true)
+    private function getUser()
     {
-        $this->enabled = $enabled;
+        $securityToken = $this->securityTokenStorage->getToken();
+        if (null === $securityToken) {
+            return null;
+        }
+        $user = $securityToken->getUser();
+        if (!$user instanceof AbstractUser) {
+            return null;
+        }
+
+        return $user;
+    }
+
+    /**
+     * @return Organization|null
+     */
+    private function getOrganization()
+    {
+        $securityToken = $this->securityTokenStorage->getToken();
+        if (null === $securityToken) {
+            return null;
+        }
+
+        return $securityToken instanceof OrganizationContextTokenInterface
+            ? $securityToken->getOrganizationContext()
+            : null;
     }
 }
