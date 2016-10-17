@@ -86,6 +86,11 @@ class FilterHandler implements ConfigurationHandlerInterface
         return $this->filterKeys($configuration, self::$workflowKeys);
     }
 
+    /**
+     * @param string $nodeKey
+     * @param array $keys
+     * @param array $configuration
+     */
     private function filterConfigNode($nodeKey, array $keys, array &$configuration)
     {
         if (!empty($configuration[$nodeKey]) && is_array($configuration[$nodeKey])) {
