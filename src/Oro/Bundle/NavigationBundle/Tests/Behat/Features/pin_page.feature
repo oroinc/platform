@@ -23,7 +23,7 @@ Feature: Pin page
     Then Users link must be in pin holder
 
   Scenario: Follow pinned link
-# Remove or uncomment after BAP-11232
+# @todo Remove or uncomment. BAP-11782
 #    Given I reset First name filter
 #    And reset Last name filter
 #    And there are 7 records in grid
@@ -45,7 +45,7 @@ Feature: Pin page
     And I sort grid by First name
     And Beatrice Walker must be first record
     When I pin page
-# Remove or uncomment after BAP-11232
+# @todo Remove or uncomment. BAP-11782
 #    And go to Dashboards/Dashboard
 #    And I go to System/User Management/Users
 #    Then John Doe must be first record
@@ -104,7 +104,7 @@ Feature: Pin page
     And I should be on User Create page
     And I should see "This value is already used."
 
-# Remove or uncomment after BAP-11232
+# @todo Remove or uncomment. BAP-11782
 #  Scenario: View blank form
 #    Given I go to System/User Management/Users
 #    When press Create User button
