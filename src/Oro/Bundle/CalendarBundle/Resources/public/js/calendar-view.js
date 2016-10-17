@@ -163,8 +163,11 @@ define(function(require) {
         },
 
         onWindowResize: function() {
-            this.setTimeline();
-            this.updateLayout();
+            // fullCalendar might be not rendered yet
+            if (this.getCalendarElement().data('fullCalendar')) {
+                this.setTimeline();
+                this.updateLayout();
+            }
         },
 
         /**
@@ -771,9 +774,10 @@ define(function(require) {
 
             self = this;
             options.eventAfterAllRender = function() {
-                _.delay(_.bind(self.setTimeline, self));
+                var setTimeline = _.bind(self.setTimeline, self);
+                _.delay(setTimeline);
                 clearInterval(self.timelineUpdateIntervalId);
-                self.timelineUpdateIntervalId = setInterval(function() { self.setTimeline(); }, 60 * 1000);
+                self.timelineUpdateIntervalId = setInterval(setTimeline, 60 * 1000);
             };
 
             options.eventAfterRender = _.bind(function(fcEvent, $el) {

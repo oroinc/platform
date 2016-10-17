@@ -56,7 +56,7 @@ class TransitionTriggerMessageTest extends \PHPUnit_Framework_TestCase
             ],
             [
                 'json' => 'data',
-                'expectedMessage' => 'The malformed json given. Error 4 and message Syntax error'
+                'expectedMessage' => 'The malformed json given'
             ],
             [
                 'json' => '',
