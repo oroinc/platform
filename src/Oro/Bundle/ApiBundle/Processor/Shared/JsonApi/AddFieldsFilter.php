@@ -23,7 +23,7 @@ class AddFieldsFilter implements ProcessorInterface
     const FILTER_KEY          = 'fields';
     const FILTER_KEY_TEMPLATE = 'fields[%s]';
 
-    const FILTER_DESCRIPTION_TEMPLATE = 'A list of fields for the \'%s\' entity to be returned.';
+    const FILTER_DESCRIPTION_TEMPLATE = 'A list of fields of \'%s\' entity that will be returned in the response.';
 
     /** @var ValueNormalizer */
     protected $valueNormalizer;
