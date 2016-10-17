@@ -2,9 +2,11 @@
 
 namespace Oro\Bundle\EmailBundle\Migrations\Schema\v1_29;
 
-use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\DBAL\Connection;
 
+use Psr\Log\LoggerInterface;
+
+use Oro\Bundle\EmailBundle\Entity\EmailBody;
 use Oro\Bundle\EmailBundle\Tools\EmailBodyHelper;
 use Oro\Bundle\EntityBundle\ORM\NativeQueryExecutorHelper;
 use Oro\Component\MessageQueue\Client\MessageProducerInterface;
@@ -20,25 +22,24 @@ class UpgradeEmailBodyMessageProcessor implements MessageProcessorInterface
     /** @var MessageProducerInterface */
     protected $messageProducer;
 
-    /** @var ManagerRegistry */
-    protected $doctrine;
-
     /** @var NativeQueryExecutorHelper */
     protected $queryHelper;
 
+    /** @var LoggerInterface */
+    protected $logger;
+
     /**
      * @param MessageProducerInterface  $messageProducer
-     * @param ManagerRegistry           $doctrine
      * @param NativeQueryExecutorHelper $queryHelper
      */
     public function __construct(
         MessageProducerInterface $messageProducer,
-        ManagerRegistry $doctrine,
-        NativeQueryExecutorHelper $queryHelper
+        NativeQueryExecutorHelper $queryHelper,
+        LoggerInterface $logger
     ) {
         $this->messageProducer = $messageProducer;
-        $this->doctrine = $doctrine;
         $this->queryHelper = $queryHelper;
+        $this->logger = $logger;
     }
 
     /**
@@ -47,10 +48,12 @@ class UpgradeEmailBodyMessageProcessor implements MessageProcessorInterface
     public function process(MessageInterface $message, SessionInterface $session)
     {
         if ($message->getBody() !== '') {
-            return $this->processBatch((int)$message->getBody());
+            // we have page number we should process, so now process this page
+            $this->processBatch((int)$message->getBody());
+        } else {
+            // we have no page number we should process, so now split work to batches
+            $this->scheduleMigrateProcesses();
         }
-
-        $this->scheduleMigrateProcesses();
 
         return self::ACK;
     }
@@ -61,12 +64,12 @@ class UpgradeEmailBodyMessageProcessor implements MessageProcessorInterface
     protected function scheduleMigrateProcesses()
     {
         /** @var Connection $connection */
-        $connection = $this->doctrine->getConnection();
+        $connection = $this->queryHelper->getManager(EmailBody::class)->getConnection();
         $maxItemNumber = $connection
             ->fetchColumn(
                 sprintf(
                     'select max(id) from %s',
-                    $this->queryHelper->getTableName('Oro\Bundle\EmailBundle\Entity\EmailBody')
+                    $this->queryHelper->getTableName(EmailBody::class)
                 )
             );
         $jobsCount = floor((int)$maxItemNumber / self::BATCH_SIZE);
@@ -79,8 +82,6 @@ class UpgradeEmailBodyMessageProcessor implements MessageProcessorInterface
      * Process one data batch
      *
      * @param integer $pageNumber
-     *
-     * @return string
      */
     protected function processBatch($pageNumber)
     {
@@ -89,34 +90,27 @@ class UpgradeEmailBodyMessageProcessor implements MessageProcessorInterface
         $startId = self::BATCH_SIZE * $pageNumber;
         $endId = $startId + self::BATCH_SIZE;
 
-        $tableName = $this->queryHelper->getTableName('Oro\Bundle\EmailBundle\Entity\EmailBody');
+        $tableName = $this->queryHelper->getTableName(EmailBody::class);
 
         $selectQuery = 'SELECT id, body FROM ' . $tableName
-            . 'WHERE body IS NOT NULL AND text_body is NULL AND id BETWEEN :startId AND :endID';
+            . ' WHERE body IS NOT NULL AND text_body is NULL AND id BETWEEN :startId AND :endID';
 
-        try {
-            /** @var Connection $connection */
-            $connection = $this->doctrine->getConnection();
-            $data = $connection
-                ->fetchAll(
-                    $selectQuery,
-                    ['startId' => $startId, 'endID' => $endId],
-                    ['startId' => 'integer', 'endID' => 'integer']
-                );
+        /** @var Connection $connection */
+        $connection = $this->queryHelper->getManager(EmailBody::class)->getConnection();
+        $data = $connection
+            ->fetchAll(
+                $selectQuery,
+                ['startId' => $startId, 'endID' => $endId],
+                ['startId' => 'integer', 'endID' => 'integer']
+            );
 
-            foreach ($data as $dataArray) {
-                $connection->update(
-                    $tableName,
-                    ['text_body' => $emailBodyHelper->getTrimmedClearText($dataArray['body'])],
-                    ['id' => $dataArray['id']],
-                    ['textBody' => 'string']
-                );
-            }
-        } catch (\Exception $e) {
-            // in case if something goes wrong - requeue current process
-            return self::REQUEUE;
+        foreach ($data as $dataArray) {
+            $connection->update(
+                $tableName,
+                ['text_body' => $emailBodyHelper->getTrimmedClearText($dataArray['body'])],
+                ['id' => $dataArray['id']],
+                ['textBody' => 'string']
+            );
         }
-
-        return self::ACK;
     }
 }

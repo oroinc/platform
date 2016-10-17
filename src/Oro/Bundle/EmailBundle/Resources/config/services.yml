@@ -1058,7 +1058,7 @@ services:
         class: Oro\Bundle\EmailBundle\Migrations\Schema\v1_29\UpgradeEmailBodyMessageProcessor
         arguments:
             - '@oro_message_queue.message_producer'
-            - '@doctrine'
             - '@oro_entity.orm.native_query_executor_helper'
+            - '@logger'
         tags:
             - { name: 'oro_message_queue.client.message_processor', topicName: 'oro_email.migrate_email_body' }
