@@ -25,7 +25,7 @@ class RestDataAuditApiTest extends WebTestCase
                 'username'      => 'user_' . mt_rand(),
                 'email'         => 'test_' . mt_rand() . '@test.com',
                 'enabled'       => '1',
-                'plainPassword' => '1231231q',
+                'plainPassword' => '1231231Q',
                 'namePrefix'    => 'Mr',
                 'firstName'     => 'firstName',
                 'middleName'    => 'middleName',

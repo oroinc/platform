@@ -25,7 +25,7 @@ class RestUsersTest extends WebTestCase
                 "email"         => 'test_' . mt_rand() . '@test.com',
                 "phone"         => '123-123',
                 "enabled"       => '1',
-                "plainPassword" => '1231231q',
+                "plainPassword" => '1231231Q',
                 "firstName"     => "firstName",
                 "lastName"      => "lastName",
                 "roles"         => ["3"],

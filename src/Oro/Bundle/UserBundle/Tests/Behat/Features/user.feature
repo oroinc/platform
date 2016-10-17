@@ -10,8 +10,8 @@ Feature: User
     And press "Create User"
     When I fill "User" form with:
           | Username          | userName       |
-          | Password          | 123123q        |
-          | Re-Enter Password | 123123q        |
+          | Password          | 123123Q        |
+          | Re-Enter Password | 123123Q        |
           | First Name        | First Name     |
           | Last Name         | Last Name      |
           | Primary Email     | email@test.com |
