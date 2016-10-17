@@ -13,6 +13,7 @@ use Knp\Menu\ItemInterface;
 
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 
+use Oro\Bundle\NavigationBundle\Entity\MenuUpdateInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -60,7 +61,7 @@ class MenuController extends Controller
         /** @var EntityManager $entityManager */
         $entityManager = $this->getDoctrine()->getManagerForClass(MenuUpdate::class);
 
-        if (!$menuUpdate->isExistsInNavigationYml()) {
+        if ($menuUpdate->isCustom()) {
             $entityManager->remove($menuUpdate);
         } else {
             $menuUpdate->setActive(false);
@@ -156,7 +157,7 @@ class MenuController extends Controller
 
         $errors = [];
         foreach ($updates as $update) {
-            $errors = $this->get('validator')->validate($currentUpdate);
+            $errors = $this->get('validator')->validate($currentUpdate, 'move');
             if (count($errors)) {
                 break;
             }

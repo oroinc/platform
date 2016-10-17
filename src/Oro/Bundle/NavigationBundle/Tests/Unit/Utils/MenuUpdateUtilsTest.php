@@ -26,7 +26,6 @@ class MenuUpdateUtilsTest extends \PHPUnit_Framework_TestCase
         $expectedUpdate->setParentKey('item-1-1');
         $expectedUpdate->setMenu('menu');
         $expectedUpdate->setDefaultTitle('item-1-1-1');
-        $expectedUpdate->setExistsInNavigationYml(true);
 
         MenuUpdateUtils::updateMenuUpdate($update, $item, 'menu');
         $this->assertEquals($expectedUpdate, $update);
@@ -47,7 +46,6 @@ class MenuUpdateUtilsTest extends \PHPUnit_Framework_TestCase
         $expectedItem = $this->createItem('item-1-1-1');
         $expectedItem->setParent($menu->getChild('item-2'));
         $expectedItem->setUri('URI');
-        $expectedItem->setExtra('editable', true);
 
         /** @var LocalizationHelper|\PHPUnit_Framework_MockObject_MockObject $localizationHelper */
         $localizationHelper = $this->getMock(LocalizationHelper::class, [], [], '', false);
@@ -65,11 +63,27 @@ class MenuUpdateUtilsTest extends \PHPUnit_Framework_TestCase
         $update->setParentKey('item-2');
         $update->setUri('URI');
 
+        /** @var LocalizationHelper|\PHPUnit_Framework_MockObject_MockObject $localizationHelper */
+        $localizationHelper = $this->getMock(LocalizationHelper::class, [], [], '', false);
+        MenuUpdateUtils::updateMenuItem($update, $menu, $localizationHelper);
+
+        $this->assertNull($menu->getChild('item-2')->getChild('item-1-1-1-1'));
+    }
+
+    public function testUpdateMenuItemWithoutItemIsCustom()
+    {
+        $menu = $this->getMenu();
+
+        $update = new MenuUpdateStub();
+        $update->setKey('item-1-1-1-1');
+        $update->setParentKey('item-2');
+        $update->setUri('URI');
+        $update->setCustom(true);
+
         $expectedItem = $this->createItem('item-1-1-1-1');
         $expectedItem->setParent($menu->getChild('item-2'));
         $expectedItem->setUri('URI');
-        $expectedItem->setExtra('userDefined', true);
-        $expectedItem->setExtra('editable', true);
+        $update->setCustom(true);
 
         /** @var LocalizationHelper|\PHPUnit_Framework_MockObject_MockObject $localizationHelper */
         $localizationHelper = $this->getMock(LocalizationHelper::class, [], [], '', false);
