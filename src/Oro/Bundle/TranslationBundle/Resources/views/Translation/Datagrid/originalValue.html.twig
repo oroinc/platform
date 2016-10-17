@@ -1,2 +1,1 @@
-{% set originalValue = record.getValue('key')|trans({}, record.getValue('domain'), 'en') %}
-{{ originalValue == record.getValue('key') ? '' : originalValue }}
+{{ record.getValue('key')|trans({}, record.getValue('domain'), 'en') }}

@@ -11,7 +11,7 @@ use Oro\Bundle\TranslationBundle\Translation\KeySource\TranslationKeySource;
 use Oro\Bundle\TranslationBundle\Translation\TranslationKeyGenerator;
 
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
-use Oro\Bundle\WorkflowBundle\Translation\Helper as TranslationHelper;
+use Oro\Bundle\WorkflowBundle\Helper\WorkflowTranslationHelper;
 use Oro\Bundle\WorkflowBundle\Translation\KeyTemplate\WorkflowTemplate;
 
 class WorkflowFilter extends EntityFilter
@@ -19,20 +19,20 @@ class WorkflowFilter extends EntityFilter
     /** @var TranslationKeyGenerator */
     protected $generator;
 
-    /** @var TranslationHelper */
+    /** @var WorkflowTranslationHelper */
     protected $translationHelper;
 
     /**
      * @param FormFactoryInterface $factory
      * @param FilterUtility $util
      * @param TranslationKeyGenerator $generator
-     * @param TranslationHelper $translationHelper
+     * @param WorkflowTranslationHelper $translationHelper
      */
     public function __construct(
         FormFactoryInterface $factory,
         FilterUtility $util,
         TranslationKeyGenerator $generator,
-        TranslationHelper $translationHelper
+        WorkflowTranslationHelper $translationHelper
     ) {
         parent::__construct($factory, $util);
 

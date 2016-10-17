@@ -12,8 +12,8 @@ use Oro\Bundle\SecurityBundle\Annotation\Acl;
 use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Form\Type\WorkflowReplacementSelectType;
+use Oro\Bundle\WorkflowBundle\Helper\WorkflowTranslationHelper;
 use Oro\Bundle\WorkflowBundle\Model\Workflow;
-use Oro\Bundle\WorkflowBundle\Translation\TranslationHelper;
 
 /**
  * @Route("/workflowdefinition")
@@ -208,10 +208,10 @@ class WorkflowDefinitionController extends Controller
     }
 
     /**
-     * @return TranslationHelper
+     * @return WorkflowTranslationHelper
      */
     protected function getTranslationHelper()
     {
-        return $this->get('oro_workflow.translation.helper');
+        return $this->get('oro_workflow.helper.translation');
     }
 }

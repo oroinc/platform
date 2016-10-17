@@ -1,38 +1,47 @@
 <?php
 
-namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Translation;
-
-use Symfony\Component\Translation\TranslatorInterface;
+namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Helper;
 
 use Oro\Bundle\TranslationBundle\Helper\TranslationHelper;
+use Oro\Bundle\TranslationBundle\Manager\TranslationManager;
+use Oro\Bundle\TranslationBundle\Translation\Translator;
 use Oro\Bundle\TranslationBundle\Translation\KeySource\TranslationKeySource;
 use Oro\Bundle\TranslationBundle\Translation\TranslationKeyGenerator;
+
+use Oro\Bundle\WorkflowBundle\Helper\WorkflowTranslationHelper;
 
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowStep;
 use Oro\Bundle\WorkflowBundle\Translation\Helper;
 use Oro\Bundle\WorkflowBundle\Translation\KeyTemplate\WorkflowTemplate;
 
-class HelperTest extends \PHPUnit_Framework_TestCase
+class WorkflowTranslationHelperTest extends \PHPUnit_Framework_TestCase
 {
-    /** @var TranslatorInterface|\PHPUnit_Framework_MockObject_MockObject */
-    protected $translator;
+    const NODE = 'test_node';
+    const ATTRIBUTE_NAME = 'test_attr_name';
+
+    /** @var Translator|\PHPUnit_Framework_MockObject_MockObject */
+    private $translator;
 
     /** @var TranslationHelper|\PHPUnit_Framework_MockObject_MockObject */
-    protected $translationHelper;
+    private $translationHelper;
 
     /** @var TranslationKeyGenerator|\PHPUnit_Framework_MockObject_MockObject */
-    protected $keyGenerator;
+    private $keyGenerator;
 
-    /** @var Helper */
-    protected $helper;
+    /** @var TranslationManager|\PHPUnit_Framework_MockObject_MockObject */
+    private $manager;
+
+    /** @var WorkflowTranslationHelper */
+    private $helper;
 
     /**
      * {@inheritdoc}
      */
     protected function setUp()
     {
-        $this->translator = $this->getMock(TranslatorInterface::class);
+        $this->translator = $this->getMockBuilder(Translator::class)->disableOriginalConstructor()->getMock();
+        $this->manager = $this->getMockBuilder(TranslationManager::class)->disableOriginalConstructor()->getMock();
 
         $this->translationHelper = $this->getMockBuilder(TranslationHelper::class)
             ->disableOriginalConstructor()
@@ -42,7 +51,42 @@ class HelperTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->helper = new Helper($this->translator, $this->translationHelper, $this->keyGenerator);
+        $this->helper = new WorkflowTranslationHelper(
+            $this->translator,
+            $this->manager,
+            $this->translationHelper,
+            $this->keyGenerator
+        );
+    }
+
+    protected function tearDown()
+    {
+        unset($this->translator, $this->manager, $this->helper, $this->translationHelper, $this->keyGenerator);
+    }
+
+    public function testSaveTranslation()
+    {
+        $this->translator->expects($this->exactly(2))->method('getLocale')->willReturn('en');
+        $this->manager
+            ->expects($this->exactly(2))
+            ->method('saveValue')
+            ->with('test_key', 'test_value', 'en', WorkflowTranslationHelper::TRANSLATION_DOMAIN);
+        $this->helper->saveTranslation('test_key', 'test_value');
+        $this->helper->saveTranslation('test_key', 'test_value');
+    }
+
+    public function testEnsureTranslationKey()
+    {
+        $key = 'key_to_be_sure_that_exists';
+        $this->manager->expects($this->once())->method('findTranslationKey')->with($key, 'workflows');
+        $this->helper->ensureTranslationKey($key);
+    }
+
+    public function testRemoveTranslationKey()
+    {
+        $key = 'key_to_remove';
+        $this->manager->expects($this->once())->method('removeTranslationKey')->with($key, 'workflows');
+        $this->helper->removeTranslationKey($key);
     }
 
     public function testPrepareTranslations()

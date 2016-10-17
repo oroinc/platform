@@ -12,7 +12,7 @@ use Oro\Bundle\TranslationBundle\Translation\TranslationKeyGenerator;
 
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Filter\WorkflowFilter;
-use Oro\Bundle\WorkflowBundle\Translation\Helper as TranslationHelper;
+use Oro\Bundle\WorkflowBundle\Helper\WorkflowTranslationHelper;
 use Oro\Bundle\WorkflowBundle\Translation\KeyTemplate\WorkflowTemplate;
 
 class WorkflowFilterTest extends \PHPUnit_Framework_TestCase
@@ -23,7 +23,7 @@ class WorkflowFilterTest extends \PHPUnit_Framework_TestCase
     /** @var TranslationKeyGenerator|\PHPUnit_Framework_MockObject_MockObject */
     protected $generator;
 
-    /** @var TranslationHelper|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var WorkflowTranslationHelper|\PHPUnit_Framework_MockObject_MockObject */
     protected $translationHelper;
 
     /** @var FilterDatasourceAdapterInterface|\PHPUnit_Framework_MockObject_MockObject */
@@ -42,7 +42,7 @@ class WorkflowFilterTest extends \PHPUnit_Framework_TestCase
     {
         $this->formFactory = $this->getMock(FormFactoryInterface::class);
         $this->generator = $this->getMock(TranslationKeyGenerator::class);
-        $this->translationHelper = $this->getMockBuilder(TranslationHelper::class)
+        $this->translationHelper = $this->getMockBuilder(WorkflowTranslationHelper::class)
             ->disableOriginalConstructor()
             ->getMock();
         $this->datasourceAdapter = $this->getMock(FilterDatasourceAdapterInterface::class);
