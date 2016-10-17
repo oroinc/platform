@@ -48,7 +48,7 @@ class DynamicTranslationKeySourceTest extends \PHPUnit_Framework_TestCase
     {
         $this->setExpectedException(
             \InvalidArgumentException::class,
-            'Expected not empty value for key "some_key" in data, null given'
+            'Expected not empty value for key "some_key" in data, null given for template '
         );
 
         $templateMock = $this->getMock(TranslationKeyTemplateInterface::class);
