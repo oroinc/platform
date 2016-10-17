@@ -96,8 +96,6 @@ config:
             'jquery.multiselect': 'jquery.multiselect'
         'oroui/js/extend/jquery.multiselect-filter':
             'jquery.multiselect.filter': 'jquery.multiselect.filter'
-        'oroui/js/extend/jquery-ui':
-            'jquery-ui': 'jquery-ui'
         'oroui/js/extend/chaplin':
             'chaplin': 'chaplin'
         'oroui/js/extend/underscore':
@@ -128,12 +126,12 @@ config:
         'json': 'bundles/oroui/lib/json2.js'
         'base64': 'bundles/oroui/lib/base64.js'
         'jquery': 'bundles/components/jquery/jquery.js'
-        'jquery-ui': 'bundles/oroui/lib/jquery-ui-1.11.2.js'
+        'jquery-ui': 'bundles/oroui/js/extend/jquery-ui.js'
         'jquery-outer-html': 'bundles/oroui/lib/outerHTML-2.1.0-min.js'
         'jquery.mousewheel': 'bundles/oroui/lib/jquery/jquery.mousewheel.js'
         'jquery.numeric': 'bundles/oroui/lib/jquery/jquery.numeric.js'
         'jquery.uniform': 'bundles/oroui/lib/jquery/jquery.uniform.min.js'
-        'jquery.select2': 'bundles/oroui/lib/jquery/select2.js'
+        'jquery.select2': 'bundles/components/select2/select2.js'
         'jquery.multiselect': 'bundles/oroui/lib/multiselect/jquery.multiselect.js'
         'jquery.multiselect.filter': 'bundles/oroui/lib/multiselect/jquery.multiselect.filter.js'
         'jquery.simplecolorpicker': 'bundles/oroui/lib/simplecolorpicker/jquery.simplecolorpicker.js'

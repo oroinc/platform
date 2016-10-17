@@ -19,7 +19,9 @@
         "components/jquery": "2.1.*",
         "components/underscore": "1.7.*",
         "components/backbone": "1.1.*",
-        "vakata/jstree": "^3.2"
+        "vakata/jstree": "^3.2",
+        "components/jqueryui": "1.11.2",
+        "bower-asset/select2": "3.4.1"
     },
     "autoload": {
         "psr-0": { "Oro\\Bundle\\UIBundle": "" }

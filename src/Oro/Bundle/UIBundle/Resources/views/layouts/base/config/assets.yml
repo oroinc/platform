@@ -6,7 +6,7 @@ styles:
         - 'bundles/oroui/css/mcustomscrollbar/jquery.mCustomScrollbar.css'
         - 'bundles/oroui/css/mcustomscrollbar/customize/jquery.mCustomScrollbar.css'
         - 'bundles/oroui/css/jquery-ui.grid.css'
-        - 'bundles/oroui/css/jquery-ui-1.10.2.custom.css'
+        - 'bundles/oroui/css/jquery-ui.custom.css'
         - 'bundles/oroui/css/less/uniform.less'
         - 'bundles/oroui/css/less/font-awesome.less'
         - 'bundles/oroui/css/less/base.less'
