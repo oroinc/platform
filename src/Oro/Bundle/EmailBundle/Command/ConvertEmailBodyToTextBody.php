@@ -11,12 +11,12 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Oro\Bundle\EmailBundle\Tools\EmailBodyHelper;
 
 /**
- * Collects email body representations.
+ * Converts email body representations.
  * Will be deleted in 2.0
  */
-class MigrateEmailBodyCommand extends ContainerAwareCommand
+class ConvertEmailBodyToTextBody extends ContainerAwareCommand
 {
-    const COMMAND_NAME = 'oro:email:migrate-email-body';
+    const COMMAND_NAME = 'oro:email:convert-body-to-text';
 
     const BATCH_SIZE = 500;
 
@@ -27,7 +27,7 @@ class MigrateEmailBodyCommand extends ContainerAwareCommand
     {
         $this
             ->setName(static::COMMAND_NAME)
-            ->setDescription('Migrates email body');
+            ->setDescription('Converts email body');
 
         parent::configure();
     }
@@ -41,18 +41,19 @@ class MigrateEmailBodyCommand extends ContainerAwareCommand
 
         /** @var Connection $connection */
         $connection = $this->getContainer()->get('doctrine')->getConnection();
-        $selectQuery = 'select id, body from oro_email_body where body is not null and text_body is null '
+
+        $tableName = $this->queryHelper->getTableName('Oro\Bundle\EmailBundle\Entity\EmailBody');
+        $selectQuery = 'select id, body from ' . $tableName . ' where body is not null and text_body is null '
             . 'order by created desc limit :limit offset :offset';
-        $updateQuery = 'update oro_email_body set text_body = :textBody where id = :id';
         $pageNumber = 0;
         $emailBodyHelper = new EmailBodyHelper();
         while (true) {
             $output->writeln(sprintf('<info>Process page %s.</info>', $pageNumber + 1));
-            $data = $connection->executeQuery(
+            $data = $connection->fetchAll(
                 $selectQuery,
                 ['limit' => self::BATCH_SIZE, 'offset' => self::BATCH_SIZE * $pageNumber],
                 ['limit' => 'integer', 'offset' => 'integer']
-            )->fetchAll();
+            );
 
             // exit if we have no data anymore
             if (count($data) === 0) {
@@ -60,10 +61,11 @@ class MigrateEmailBodyCommand extends ContainerAwareCommand
             }
 
             foreach ($data as $dataArray) {
-                $connection->executeQuery(
-                    $updateQuery,
-                    ['id' => $dataArray['id'], 'textBody' => $emailBodyHelper->getTrimmedClearText($dataArray['body'])],
-                    ['id' => 'integer', 'textBody' => 'text']
+                $connection->update(
+                    $tableName,
+                    ['text_body' => $emailBodyHelper->getTrimmedClearText($dataArray['body'])],
+                    ['id' => $dataArray['id']],
+                    ['textBody' => 'string']
                 );
             }
 
