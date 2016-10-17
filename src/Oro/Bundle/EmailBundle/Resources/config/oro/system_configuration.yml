@@ -4,6 +4,10 @@ system_configuration:
             icon:  icon-envelope
             title: oro.email.system_configuration.email_configuration
 
+        email_settings:
+            title: oro.email.system_configuration.email_settings
+            priority: 130
+
         email_autocomplete_configuration:
             title: oro.email.system_configuration.email_autocomplete_configuration.label
             priority: 120
@@ -41,6 +45,12 @@ system_configuration:
             priority: 100
 
     fields:
+        oro_email.feature_enabled:
+            data_type: boolean
+            type: oro_config_checkbox
+            priority: 110
+            options:
+                label: oro.email.system_configuration.feature_enabled.label
         oro_email.minimum_input_length:
             data_type: integer
             type: number
@@ -148,6 +158,9 @@ system_configuration:
                                             - oro_email.show_recent_emails_in_user_bar
                             email_configuration:
                                 children:
+                                    email_settings:
+                                        children:
+                                            - oro_email.feature_enabled
                                     email_autocomplete_configuration:
                                         children:
                                             - oro_email.minimum_input_length
