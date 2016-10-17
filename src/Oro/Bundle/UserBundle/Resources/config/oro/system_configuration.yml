@@ -3,23 +3,43 @@ system_configuration:
        security_settings:
            icon:  icon-key
            title: oro.user.system_configuration.groups.security_settings.title
-       login_attempts:
+       failed_login_limit:
            icon: icon-signin
-           title: oro.user.system_configuration.groups.login_attempts.title
+           title: oro.user.system_configuration.groups.failed_login_limit.title
 
     fields:
-        oro_user.login_attempts:
-            data_type: integer
-            type: integer
-            priority: 60
+        oro_user.failed_login_limit_enabled:
+            data_type: boolean
+            type: oro_config_checkbox
+            priority: 80
             options:
-                label: oro.user.system_configuration.fields.login_attempts.label
-        oro_user.daily_login_attempts:
+                required: false
+                label: oro.user.system_configuration.fields.failed_login_limit_enabled.label
+        oro_user.failed_login_limit:
             data_type: integer
             type: integer
             priority: 70
             options:
-                label: oro.user.system_configuration.fields.daily_login_attempts.label
+                label: oro.user.system_configuration.fields.failed_login_limit.label
+                constraints:
+                    - GreaterThan:
+                        value: 0
+        oro_user.failed_daily_login_limit_enabled:
+            data_type: boolean
+            type: oro_config_checkbox
+            priority: 60
+            options:
+                required: false
+                label: oro.user.system_configuration.fields.failed_daily_login_limit_enabled.label
+        oro_user.failed_daily_login_limit:
+            data_type: integer
+            type: integer
+            priority: 50
+            options:
+                label: oro.user.system_configuration.fields.failed_daily_login_limit.label
+                constraints:
+                    - GreaterThan:
+                        value: 0
 
     tree:
         system_configuration:
@@ -30,7 +50,9 @@ system_configuration:
                             security_settings:
                                 priority: 90
                                 children:
-                                    login_attempts:
+                                    failed_login_limit:
                                         children:
-                                            - oro_user.login_attempts
-                                            - oro_user.daily_login_attempts
+                                            - oro_user.failed_login_limit_enabled
+                                            - oro_user.failed_login_limit
+                                            - oro_user.failed_daily_login_limit_enabled
+                                            - oro_user.failed_daily_login_limit

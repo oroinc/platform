@@ -238,8 +238,10 @@ oro:
         system_configuration:
             groups:
                 security_settings.title: Security Settings
-                login_attempts.title: Login attempts
+                failed_login_limit.title: Login attempts
             fields:
-                login_attempts.label: Max login attempts
-                daily_login_attempts.label: Max daily login attempts
+                failed_login_limit_enabled.label: Enable failed logins limit
+                failed_login_limit.label: Max login attempts
+                failed_daily_login_limit_enabled.label: Enable daily failed logins limit
+                failed_daily_login_limit.label: Max daily login attempts
 

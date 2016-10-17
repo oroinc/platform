@@ -7,8 +7,10 @@ use Oro\Bundle\UserBundle\Entity\FailedLoginInfoInterface;
 
 class LoginAttemptsProvider
 {
-    const MAX_LOGIN_ATTEMPTS = 'oro_user.login_attempts';
-    const MAX_DAILY_LOGIN_ATTEMPTS = 'oro_user.daily_login_attempts';
+    const LIMIT_ENABLED = 'oro_user.failed_login_limit_enabled';
+    const LIMIT = 'oro_user.failed_login_limit';
+    const DAILY_LIMIT_ENABLED = 'oro_user.failed_daily_login_limit_enabled';
+    const DAILY_LIMIT = 'oro_user.failed_daily_login_limit';
 
     /** @var  ConfigManager */
     protected $configManager;
@@ -23,42 +25,17 @@ class LoginAttemptsProvider
     }
 
     /**
-     * Get remaining login attempts by used
+     * Get remaining login attempts by user
      *
      * @param  FailedLoginInfoInterface $user
      * @return int
      */
-    public function getByUser(FailedLoginInfoInterface $user)
+    public function getRemaining(FailedLoginInfoInterface $user)
     {
         $remainingCumulative = $this->getRemainingCumulativeLoginAttempts($user);
         $remainingDaily = $this->getRemainingDailyLoginAttempts($user);
 
         return max(0, min($remainingCumulative, $remainingDaily));
-    }
-
-    /**
-     * Get exceed login attempts limit - daily or cumulative.
-     * Return zero when limits are not exceed.
-     *
-     * @param  FailedLoginInfoInterface $user
-     * @return int
-     */
-    public function getExceedLimit(FailedLoginInfoInterface $user)
-    {
-        if ($this->getRemainingCumulativeLoginAttempts($user) <= 0) {
-            return $this->getMaxCumulativeLoginAttempts();
-        }
-
-        if ($this->getRemainingDailyLoginAttempts($user) <= 0) {
-            return $this->getMaxDailyLoginAttempts();
-        }
-
-        return 0;
-    }
-
-    public function hasRemainingAttempts(FailedLoginInfoInterface $user)
-    {
-        return 0 !== $this->getByUser($user);
     }
 
     /**
@@ -84,7 +61,7 @@ class LoginAttemptsProvider
      */
     public function getMaxCumulativeLoginAttempts()
     {
-        return (int) $this->configManager->get(self::MAX_LOGIN_ATTEMPTS);
+        return (int) $this->configManager->get(self::LIMIT);
     }
 
     /**
@@ -92,6 +69,48 @@ class LoginAttemptsProvider
      */
     public function getMaxDailyLoginAttempts()
     {
-        return (int) $this->configManager->get(self::MAX_DAILY_LOGIN_ATTEMPTS);
+        return (int) $this->configManager->get(self::DAILY_LIMIT);
+    }
+
+    /**
+     * @return bool
+     */
+    public function hasCumulativeLimit()
+    {
+        return (bool) $this->configManager->get(self::LIMIT_ENABLED);
+    }
+
+    /**
+     * @return bool
+     */
+    public function hasDailyLimit()
+    {
+        return (bool) $this->configManager->get(self::DAILY_LIMIT_ENABLED);
+    }
+
+    /**
+     * @return bool
+     */
+    public function hasLimits()
+    {
+        return $this->hasCumulativeLimit() || $this->hasDailyLimit();
+    }
+
+    /**
+     * @param  FailedLoginInfoInterface $user
+     * @return bool
+     */
+    public function hasReachedCumulativeLimit(FailedLoginInfoInterface $user)
+    {
+        return $this->hasCumulativeLimit() && $user->getFailedLoginCount() >= $this->getMaxCumulativeLoginAttempts();
+    }
+
+    /**
+     * @param  FailedLoginInfoInterface $user
+     * @return bool
+     */
+    public function hasReachedDailyLimit(FailedLoginInfoInterface $user)
+    {
+        return $this->hasDailyLimit() && $user->getDailyFailedLoginCount() >= $this->getMaxDailyLoginAttempts();
     }
 }

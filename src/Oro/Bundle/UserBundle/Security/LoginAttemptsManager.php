@@ -48,20 +48,23 @@ class LoginAttemptsManager
      */
     public function trackLoginFailure(AbstractUser $user)
     {
-        // reset daily counter if last failed login was before midnight
-        $midnight = new \DateTime('midnight', new \DateTimeZone('UTC'));
-        if ($user->getLastFailedLogin() < $midnight) {
-            $user->setDailyFailedLoginCount(0);
+        if ($this->attemptsProvider->hasDailyLimit()) {
+            // reset daily counter if last failed login was before midnight
+            $midnight = new \DateTime('midnight', new \DateTimeZone('UTC'));
+            if ($user->getLastFailedLogin() && $user->getLastFailedLogin() < $midnight) {
+                $user->setDailyFailedLoginCount(0);
+            }
+
+            $user->setDailyFailedLoginCount($user->getDailyFailedLoginCount() + 1);
         }
+
+        if ($this->attemptsProvider->hasCumulativeLimit()) {
+            $user->setFailedLoginCount($user->getFailedLoginCount() + 1);
+        }
+
+        $this->processDeactivation($user);
 
         $user->setLastFailedLogin(new \DateTime('now', new \DateTimeZone('UTC')));
-        $user->setFailedLoginCount($user->getFailedLoginCount() + 1);
-        $user->setDailyFailedLoginCount($user->getDailyFailedLoginCount() + 1);
-
-        if (!$this->attemptsProvider->hasRemainingAttempts($user)) {
-            $this->deactivateUser($user);
-        }
-
         $this->userManager->updateUser($user);
     }
 
@@ -70,33 +73,42 @@ class LoginAttemptsManager
      */
     protected function resetFailedLoginCounters(AbstractUser $user)
     {
-        $user->setFailedLoginCount(0);
-        $user->setDailyFailedLoginCount(0);
-        $this->userManager->updateUser($user);
+        if ($this->attemptsProvider->hasCumulativeLimit()) {
+            $user->setFailedLoginCount(0);
+        }
+
+        if ($this->attemptsProvider->hasDailyLimit()) {
+            $user->setDailyFailedLoginCount(0);
+        }
+
+        // either limit is enabled
+        if ($this->attemptsProvider->hasLimits()) {
+            $this->userManager->updateUser($user);
+        }
     }
 
     /**
-     * Disable/Deactivate an user and sends notification email to them and to administrators
+     * Disable/Deactivate a user and sends notification email to them and to administrators
      *
      * @param AbstractUser $user
      */
-    protected function deactivateUser(AbstractUser $user)
+    protected function processDeactivation(AbstractUser $user)
     {
-        $user->setEnabled(false);
-
-        if ($this->attemptsProvider->getRemainingCumulativeLoginAttempts($user) <= 0) {
+        if ($this->attemptsProvider->hasReachedCumulativeLimit($user)) {
+            $user->setEnabled(false);
             $this->mailProcessor->sendAutoDeactivateEmail(
                 $user,
-                $this->attemptsProvider->getMaxCumulativeLoginAttempts($user)
+                $this->attemptsProvider->getMaxCumulativeLoginAttempts()
             );
 
             return;
         }
 
-        if ($this->attemptsProvider->getRemainingDailyLoginAttempts($user) <= 0) {
+        if ($this->attemptsProvider->hasReachedDailyLimit($user)) {
+            $user->setEnabled(false);
             $this->mailProcessor->sendAutoDeactivateDailyEmail(
                 $user,
-                $this->attemptsProvider->getMaxDailyLoginAttempts($user)
+                $this->attemptsProvider->getMaxDailyLoginAttempts()
             );
 
             return;
