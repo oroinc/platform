@@ -108,7 +108,7 @@ class TranslationProcessorTest extends \PHPUnit_Framework_TestCase
         $config = [];
         $this->setExpectedException(
             \InvalidArgumentException::class,
-            'Workflow configuration for handler must contain `name` node.'
+            'Workflow configuration for handler must contain valid `name` node.'
         );
 
         $this->processor->handle($config);
