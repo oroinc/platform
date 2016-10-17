@@ -4,7 +4,7 @@
 <div class="widget-content">
     <div class="row-fluid form-horizontal">
         <div class="responsive-block">
-            {{ UI.renderHtmlProperty('oro.workflow.workflowdefinition.label.label'|trans, entity.label ~ workflowMacros.renderGoToTranslationsIconByLink(entity.name) ) }}
+            {{ UI.renderProperty('oro.workflow.workflowdefinition.label.label'|trans, entity.label ~ workflowMacros.renderGoToTranslationsIconByLink(translateLinks.label) ) }}
 
             {{ UI.renderProperty(
                 'oro.workflow.workflowdefinition.related_entity.label'|trans,

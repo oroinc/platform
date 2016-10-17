@@ -1,6 +1,7 @@
 {% extends 'OroUIBundle:actions:update.html.twig' %}
 {% import 'OroQueryDesignerBundle::macros.html.twig' as QD %}
 {% import 'OroWorkflowBundle::macros.html.twig' as workflowMacros %}
+{% form_theme form with ['OroWorkflowBundle:Form:fields.html.twig'] %}
 
     {% set pageComponent = {
             module: 'oroworkflow/js/app/components/workflow-editor-component',

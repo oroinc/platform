@@ -136,7 +136,7 @@
         <td class="step-name workflow-translatable-label">
             {{ stepData.label }}
             {% if stepData.is_final %}
-                <strong title="{{ "oro.workflow.workflowdefinition.step.is_final.tooltip"|trans({}, "tooltips") }}">
+                <strong title="{{ "oro.workflow.workflowdefinition.step.is_final.tooltip"|trans }}">
                     ({{ "Final"|trans }})
                 </strong>
             {% endif %}
@@ -156,14 +156,14 @@
                                 {{ workflowMacros.renderGoToTranslationsIconByLink(translateLinks.transitions[transitionName].label) }}
                             {% endif %}
                             <i class="icon-long-arrow-right"></i>
-                            <span title="{{ "oro.workflow.workflowdefinition.transition.step_to.tooltip"|trans({}, "tooltips") }}">{{ toStep.label }}</span>
+                            <span title="{{ "oro.workflow.workflowdefinition.transition.step_to.tooltip"|trans }}">{{ toStep.label }}</span>
                         </li>
                     {% endfor %}
                 </ul>
             {% endif %}
         </td>
         <td>
-            <span title="{{ "oro.workflow.workflowdefinition.step.order.tooltip"|trans({}, "tooltips") }}">
+            <span title="{{ "oro.workflow.workflowdefinition.step.order.tooltip"|trans }}">
                 {{ stepData.order }}
             </span>
         </td>
@@ -216,7 +216,7 @@
                                         <th class="label-column"><span>{{ "Step"|trans }}</span></th>
                                         <th><span>{{ "Transitions"|trans }}</span></th>
                                         <th>
-                                            <span title="{{ "oro.workflow.workflowdefinition.step.order.tooltip"|trans({}, "tooltips") }}">
+                                            <span title="{{ "oro.workflow.workflowdefinition.step.order.tooltip"|trans }}">
                                                 {{ "Position"|trans }}
                                             </span>
                                         </th>
