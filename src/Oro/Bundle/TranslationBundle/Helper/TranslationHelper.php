@@ -10,6 +10,7 @@ use Oro\Bundle\TranslationBundle\Entity\Translation;
 
 use Oro\Bundle\TranslationBundle\Manager\TranslationManager;
 
+//todo cover DB queries by functional tests in BAP-12113
 class TranslationHelper
 {
     /** @var Registry */
