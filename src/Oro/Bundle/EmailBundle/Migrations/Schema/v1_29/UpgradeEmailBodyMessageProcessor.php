@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\EmailBundle\Migrations\Schema\v1_28;
+namespace Oro\Bundle\EmailBundle\Migrations\Schema\v1_29;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
 
