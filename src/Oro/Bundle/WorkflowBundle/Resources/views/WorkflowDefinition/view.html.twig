@@ -130,7 +130,7 @@
     </div>
 {% endblock breadcrumbs %}
 
-{% macro view_step_row(stepData, entity) %}
+{% macro view_step_row(stepData, entity, translateLinks) %}
     {% import 'OroWorkflowBundle::macros.html.twig' as workflowMacros %}
     <tr>
         <td class="step-name workflow-translatable-label">
@@ -140,8 +140,8 @@
                     ({{ "Final"|trans }})
                 </strong>
             {% endif %}
-            {% if stepData.order >= 0 %}
-                {{ workflowMacros.renderGoToTranslationsIcon(entity.name) }}
+            {% if stepData.order >= 0 and translateLinks %}
+                {{ workflowMacros.renderGoToTranslationsIconByLink(translateLinks.steps[stepData.name].label) }}
             {% endif %}
         </td>
         <td class="step-transitions">
@@ -152,7 +152,9 @@
                         {% set toStep = entity.configuration.steps[currentTransition.step_to] %}
                         <li>
                             <span>{{ currentTransition.label }}</span>
-                            {{ workflowMacros.renderGoToTranslationsIcon(entity.name) }}
+                            {% if (translateLinks) %}
+                                {{ workflowMacros.renderGoToTranslationsIconByLink(translateLinks.transitions[transitionName].label) }}
+                            {% endif %}
                             <i class="icon-long-arrow-right"></i>
                             <span title="{{ "oro.workflow.workflowdefinition.transition.step_to.tooltip"|trans({}, "tooltips") }}">{{ toStep.label }}</span>
                         </li>
@@ -221,16 +223,17 @@
                                     </tr>
                                 </thead>
                                 <tbody class="item-container">
-                                {%- for stepData in entity.configuration.steps -%}
+                                {%- for stepName, stepData in entity.configuration.steps -%}
                                     {#
                                         System workflows wont have (Start) step stored into database.
                                         So we need to force show it for UI.
                                     #}
+                                    {% set stepData = stepData|merge({'name': stepName}) %}
                                     {% if loop.first and entity.isSystem %}
                                         {{ _self.view_start_step_row(entity) }}
                                     {% endif %}
 
-                                    {{ _self.view_step_row(stepData, entity) }}
+                                    {{ _self.view_step_row(stepData, entity, translateLinks) }}
                                 {%- else -%}
                                     {{ _self.view_start_step_row(entity) }}
                                 {%- endfor -%}

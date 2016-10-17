@@ -45,17 +45,24 @@ define(function(require) {
             }
             configuration.steps = new StepCollection(stepsConfig);
 
-            var transitionConfig = _.map(configuration.transitions, this._mergeName);
+            var transitionsConfig = _.map(configuration.transitions, this._mergeName);
             if (translateLinks) {
-                _.each(transitionConfig, function (transition) {
-                    transition.translateLinks = translateLinks.steps[transition.name];
+                _.each(transitionsConfig, function (transition) {
+                    transition.translateLinks = translateLinks.transitions[transition.name];
                 });
             }
-            configuration.transitions = new TransitionCollection(transitionConfig);
+            configuration.transitions = new TransitionCollection(transitionsConfig);
 
             configuration.transition_definitions = new TransitionDefinitionCollection(
                 _.map(configuration.transition_definitions, this._mergeName));
-            configuration.attributes = new AttributeCollection(_.map(configuration.attributes, this._mergeName));
+
+            var attributesConfig = _.map(configuration.attributes, this._mergeName);
+            if (translateLinks) {
+                _.each(attributesConfig, function (attribute) {
+                    attribute.translateLinks = translateLinks.attributes[attribute.name];
+                });
+            }
+            configuration.attributes = new AttributeCollection(attributesConfig);
 
             configuration.name = options.entity.name;
             configuration.label = options.entity.label;
@@ -115,20 +122,6 @@ define(function(require) {
          */
         _mergeName: function(config, name) {
             config.name = name;
-            return config;
-        },
-
-        /**
-         * Helper function for links to manage translations. Callback for _.map;
-         *
-         * @param {Object} config
-         * @param {array} translateLinks
-         * @returns {Object}
-         * @private
-         */
-        _processTranslateLinks: function(config, translateLinks) {
-            config.translateLinks = translateLinks;
-
             return config;
         }
     };

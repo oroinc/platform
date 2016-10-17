@@ -202,7 +202,8 @@ define(function(require) {
                     'attribute_name': attributeName,
                     'property_path': propertyPath,
                     'required': isRequired,
-                    'label': label
+                    'label': label,
+                    'translateLinks': attribute.attributes.translateLinks
                 });
             }, this);
 

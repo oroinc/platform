@@ -82,21 +82,7 @@ class WorkflowDefinitionController extends Controller
         if ($workflowDefinition->isSystem()) {
             throw new AccessDeniedHttpException('System workflow definitions are not editable');
         }
-        $configuration = $workflowDefinition->getConfiguration();
-
-        $translateLinks = [];
-        $routeHelper = $this->get('oro_workflow.translation_route.helper');
-        foreach ($configuration[WorkflowConfiguration::NODE_STEPS] as $name => $step) {
-            $translateLinks[WorkflowConfiguration::NODE_STEPS][$name]['label_translate_link'] = $routeHelper
-                ->generate(['key' => $step['label']]);
-        }
-
-        foreach ($configuration[WorkflowConfiguration::NODE_TRANSITIONS] as $name => $transition) {
-            $translateLinks[WorkflowConfiguration::NODE_TRANSITIONS][$name]['label_translate_link'] = $routeHelper
-                ->generate(['key' => $transition['label']]);
-            $translateLinks[WorkflowConfiguration::NODE_TRANSITIONS][$name]['message_translate_link'] = $routeHelper
-                ->generate(['key' => $transition['message']]);
-        }
+        $translateLinks = $this->getWorkflowTranslateLinks($workflowDefinition->getConfiguration());
         $form = $this->get('oro_workflow.form.workflow_definition');
         $form->setData($workflowDefinition);
 
@@ -143,10 +129,13 @@ class WorkflowDefinitionController extends Controller
      */
     public function viewAction(WorkflowDefinition $workflowDefinition)
     {
+        $translateLinks = $this->getWorkflowTranslateLinks($workflowDefinition->getConfiguration());
+
         return array(
             'entity' => $workflowDefinition,
             'workflowConfiguration' => $this->prepareConfiguration($workflowDefinition),
-            'system_entities' => $this->get('oro_entity.entity_provider')->getEntities()
+            'system_entities' => $this->get('oro_entity.entity_provider')->getEntities(),
+            'translateLinks' => $translateLinks,
         );
     }
 
@@ -203,7 +192,7 @@ class WorkflowDefinitionController extends Controller
                     $workflowsToDeactivation
                 )
             );
-            
+
             $deactivated = [];
             foreach ($workflowNames as $workflowName) {
                 if ($workflowName && $workflowManager->isActiveWorkflow($workflowName)) {
@@ -215,7 +204,7 @@ class WorkflowDefinitionController extends Controller
                     $deactivated[] = $workflow->getLabel();
                 }
             }
-            
+
             $response['deactivated'] = $deactivated;
 
             $workflowManager->activateWorkflow($workflowDefinition->getName());
@@ -239,5 +228,53 @@ class WorkflowDefinitionController extends Controller
                 return $workflow->getName() !== $workflowDefinition->getName();
             }
         );
+    }
+
+    /**
+     * @param array $configuration
+     *
+     * @return array
+     */
+    public function getWorkflowTranslateLinks(array $configuration)
+    {
+        $translateLinks = [];
+        $translateLinks[WorkflowConfiguration::NODE_STEPS] = $this->getWorkflowNodeTranslateLinks(
+            $configuration,
+            WorkflowConfiguration::NODE_STEPS,
+            ['label']
+        );
+        $translateLinks[WorkflowConfiguration::NODE_TRANSITIONS] = $this->getWorkflowNodeTranslateLinks(
+            $configuration,
+            WorkflowConfiguration::NODE_TRANSITIONS,
+            ['label', 'message']
+        );
+        $translateLinks[WorkflowConfiguration::NODE_ATTRIBUTES] = $this->getWorkflowNodeTranslateLinks(
+            $configuration,
+            WorkflowConfiguration::NODE_ATTRIBUTES,
+            ['label']
+        );
+
+        return $translateLinks;
+    }
+
+    /**
+     * @param array $configuration
+     * @param string $node
+     * @param array $attributes
+     *
+     * @return array
+     */
+    private function getWorkflowNodeTranslateLinks(array $configuration, $node, array $attributes)
+    {
+        $translateLinks = [];
+        $routeHelper = $this->get('oro_workflow.translation_route.helper');
+        foreach ($configuration[$node] as $name => $item) {
+            foreach ($attributes as $attribute) {
+                $translateLinks[$name][$attribute] = $routeHelper
+                    ->generate(['key' => $item[$attribute]]);
+            }
+        }
+
+        return $translateLinks;
     }
 }
