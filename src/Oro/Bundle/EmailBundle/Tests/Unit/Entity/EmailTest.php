@@ -185,7 +185,7 @@ class EmailTest extends \PHPUnit_Framework_TestCase
             . 'justo ultrices at. Curabitur purus diam, aliquet sit amet ante a, aliquet faucibus metus. Nam efficitur'
             . ' tincidunt urna tincidunt tincidunt. Maecenas et dictum enim. Maecenas pellentesque purus et sapien '
             . 'vulputate efficitur. Curabitur egestas gravida venenatis. Nullam efficitur nulla eu augue vestibulum, '
-            . 'ut imperdiet nibh pellentesque. Cras ultrices luctus magna vel sodales. Curabitur eget nullam.'
+            . 'ut imperdiet nibh pellentesque. Cras ultrices luctus magna vel sodales. Curabituä eget nullam.'
         );
 
         self::assertEquals(
@@ -198,7 +198,7 @@ class EmailTest extends \PHPUnit_Framework_TestCase
             . 'justo ultrices at. Curabitur purus diam, aliquet sit amet ante a, aliquet faucibus metus. Nam efficitur'
             . ' tincidunt urna tincidunt tincidunt. Maecenas et dictum enim. Maecenas pellentesque purus et sapien '
             . 'vulputate efficitur. Curabitur egestas gravida venenatis. Nullam efficitur nulla eu augue vestibulum, '
-            . 'ut imperdiet nibh pellentesque. Cras ultrices luctus magna vel sodales. Curabitur',
+            . 'ut imperdiet nibh pellentesque. Cras ultrices luctus magna vel sodales. Curabituä',
             $activityList->getSubject()
         );
     }
