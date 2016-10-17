@@ -6,7 +6,6 @@ use Symfony\Component\Security\Core\Security;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
@@ -16,9 +15,6 @@ use Oro\Bundle\UserBundle\Exception\PasswordChangedException;
 
 class DisabledLoginSubscriber implements EventSubscriberInterface
 {
-    /** @var ContainerInterface */
-    protected $container;
-
     /** @var TokenStorageInterface */
     protected $tokenStorage  = false;
 

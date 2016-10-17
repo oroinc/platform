@@ -109,7 +109,6 @@ class ResetPasswordActionHandler implements MassActionHandlerInterface
                 }
             }
 
-            $this->counter++;
             $results->next();
         }
 

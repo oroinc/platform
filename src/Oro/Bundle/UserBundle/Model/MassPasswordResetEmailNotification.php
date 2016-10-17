@@ -2,17 +2,12 @@
 
 namespace Oro\Bundle\UserBundle\Model;
 
-use Doctrine\Common\Persistence\ManagerRegistry;
-
 use Oro\Bundle\EmailBundle\Model\EmailTemplateInterface;
 use Oro\Bundle\NotificationBundle\Processor\EmailNotificationInterface;
 use Oro\Bundle\NotificationBundle\Processor\SenderAwareEmailNotificationInterface;
 
 class MassPasswordResetEmailNotification implements EmailNotificationInterface, SenderAwareEmailNotificationInterface
 {
-    /** @var ManagerRegistry */
-    protected $managerRegistry;
-
     /** @var  array */
     protected $emails = [];
 
