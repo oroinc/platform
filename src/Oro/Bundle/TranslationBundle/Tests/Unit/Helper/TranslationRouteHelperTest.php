@@ -1,8 +1,8 @@
 <?php
 
-namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Helper;
+namespace Oro\Bundle\TranslationBundle\Tests\Unit\Helper;
 
-use Symfony\Bundle\FrameworkBundle\Routing\Router;
+use Symfony\Component\Routing\RouterInterface;
 
 use Oro\Bundle\DataGridBundle\Tools\DatagridRouteHelper;
 
@@ -10,39 +10,41 @@ use Oro\Bundle\TranslationBundle\Helper\TranslationRouteHelper;
 
 class TranslationRouteHelperTest extends \PHPUnit_Framework_TestCase
 {
-    /**
-     * @var DatagridRouteHelper|\PHPUnit_Framework_MockObject_MockObject
-     */
+    /** @var DatagridRouteHelper|\PHPUnit_Framework_MockObject_MockObject */
     protected $datagridRouteHelperMock;
 
+    /** @var TranslationRouteHelper */
+    protected $helper;
+
+    /**
+     * {@inheritdoc}
+     */
     protected function setUp()
     {
-        $this->datagridRouteHelperMock = $this->getMockBuilder(DatagridRouteHelper::class)
+        $this->datagridRouteHelper = $this->getMockBuilder(DatagridRouteHelper::class)
             ->disableOriginalConstructor()
             ->getMock();
+
+        $this->helper = new TranslationRouteHelper($this->datagridRouteHelper);
     }
 
+    /**
+     * {@inheritdoc}
+     */
     protected function tearDown()
     {
-        unset($this->datagridRouteHelperMock);
+        unset($this->datagridRouteHelper, $this->helper);
     }
 
     public function testGenerate()
     {
-        $workflowName = 'SAMPLE_WF_NAME';
-        $data = ['f' => ['workflow' => ['value' => $workflowName]]];
-
-        $this->datagridRouteHelperMock->expects($this->once())->method('generate')->with(
+        $this->datagridRouteHelper->expects($this->once())->method('generate')->with(
             TranslationRouteHelper::TRANSLATION_GRID_ROUTE_NAME,
             TranslationRouteHelper::TRANSLATION_GRID_NAME,
-            $data,
-            Router::ABSOLUTE_PATH
-        )->willReturn(uniqid('', true));
+            ['f' => ['filterName' => ['value' => '10']]],
+            RouterInterface::ABSOLUTE_PATH
+        )->willReturn('generatedValue');
 
-        $helper = new TranslationRouteHelper($this->datagridRouteHelperMock);
-
-        $result = $helper->generate(['workflow' => $workflowName]);
-
-        $this->assertInternalType('string', $result);
+        $this->assertEquals('generatedValue', $this->helper->generate(['filterName' => 10]));
     }
 }

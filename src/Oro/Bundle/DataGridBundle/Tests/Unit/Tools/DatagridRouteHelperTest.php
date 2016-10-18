@@ -2,26 +2,31 @@
 
 namespace Oro\Bundle\DataGridBundle\Tests\Unit\Tools;
 
+use Symfony\Component\Routing\RouterInterface;
+
 use Oro\Bundle\DataGridBundle\Tools\DatagridRouteHelper;
-use Symfony\Bundle\FrameworkBundle\Routing\Router;
 
 class DatagridRouteHelperTest extends \PHPUnit_Framework_TestCase
 {
-    /** @var Router|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var RouterInterface|\PHPUnit_Framework_MockObject_MockObject */
     protected $router;
 
     /** @var DatagridRouteHelper */
     protected $routeHelper;
 
+    /**
+     * {@inheritdoc}
+     */
     protected function setUp()
     {
-        $this->router = $this->getMockBuilder(Router::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->router = $this->getMock(RouterInterface::class);
 
         $this->routeHelper = new DatagridRouteHelper($this->router);
     }
 
+    /**
+     * {@inheritdoc}
+     */
     protected function tearDown()
     {
         unset($this->router);
@@ -29,7 +34,18 @@ class DatagridRouteHelperTest extends \PHPUnit_Framework_TestCase
 
     public function testGenerate()
     {
-        $this->router->expects($this->atLeastOnce())->method('generate');
-        $this->routeHelper->generate(uniqid("", true), uniqid("", true));
+        $this->router->expects($this->once())
+            ->method('generate')
+            ->with(
+                'routeName',
+                ['grid' => ['gridName' => http_build_query(['param1' => 'value1'])]],
+                RouterInterface::ABSOLUTE_URL
+            )
+            ->willReturn('generatedValue');
+
+        $this->assertEquals(
+            'generatedValue',
+            $this->routeHelper->generate('routeName', 'gridName', ['param1' => 'value1'], RouterInterface::ABSOLUTE_URL)
+        );
     }
 }
