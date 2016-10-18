@@ -111,7 +111,7 @@ class WorkflowTranslationFieldsIterator
             foreach ($configuration[WorkflowConfiguration::NODE_TRANSITIONS] as $transitionKey => $transitionConfig) {
                 $data = [
                     'workflow_name' => $workflowName,
-                    'transition_name' => $this->resolveName($rawTransition, $transitionKey)
+                    'transition_name' => $this->resolveName($transitionConfig, $transitionKey)
                 ];
                 yield $this->makeKey(TransitionLabelTemplate::class, $data) => $transitionConfig['label'];
                 yield $this->makeKey(TransitionWarningMessageTemplate::class, $data) => $transitionConfig['message'];
