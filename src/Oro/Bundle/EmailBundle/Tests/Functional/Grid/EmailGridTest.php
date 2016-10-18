@@ -11,7 +11,7 @@ use Oro\Bundle\UserBundle\Entity\User;
 class EmailGridTest extends AbstractDatagridTestCase
 {
     const AUTH_USER = 'simple_user';
-    const AUTH_PW = 'simple_password';
+    const AUTH_PW = 'simple_password1Q';
 
     /**
      * @var User

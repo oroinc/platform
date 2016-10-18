@@ -52,7 +52,7 @@ class LoadUserData extends AbstractFixture implements ContainerAwareInterface
 
         $apiKey = new UserApi();
         $apiKey
-            ->setApiKey('user_api_key')
+            ->setApiKey(self::USER_PASSWORD)
             ->setUser($user)
             ->setOrganization($org);
 
