@@ -69,11 +69,10 @@ class MenuUpdateType extends AbstractType
             'descriptions',
             TranslatedLocalizedFallbackValueCollectionType::class,
             [
-                'required' => true,
+                'required' => false,
                 'label' => 'oro.navigation.menuupdate.description.label',
                 'type' => 'textarea',
                 'field' => 'text',
-                'options' => ['constraints' => [new NotBlank()]]
             ]
         );
 

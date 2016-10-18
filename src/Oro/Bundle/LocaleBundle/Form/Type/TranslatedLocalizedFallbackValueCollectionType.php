@@ -21,15 +21,20 @@ class TranslatedLocalizedFallbackValueCollectionType extends AbstractType
     /** @var TranslatorInterface */
     private $translator;
 
+    /** @var string */
+    private $defaultLocale;
+
     /** @var PropertyAccessor */
     private $propertyAccessor;
 
     /**
      * @param TranslatorInterface $translator
+     * @param string              $defaultLocale
      */
-    public function __construct(TranslatorInterface $translator)
+    public function __construct(TranslatorInterface $translator, $defaultLocale)
     {
         $this->translator = $translator;
+        $this->defaultLocale = $defaultLocale;
     }
 
     /**
@@ -78,7 +83,7 @@ class TranslatedLocalizedFallbackValueCollectionType extends AbstractType
 
         $field = $event->getForm()->getConfig()->getOption('field');
 
-        foreach ($collection->toArray() as $fallbackValue) {
+        foreach ($collection as $fallbackValue) {
             if (!$fallbackValue instanceof LocalizedFallbackValue) {
                 throw new \InvalidArgumentException(sprintf(
                     'ArrayCollection must contain only "%s".',
@@ -91,7 +96,7 @@ class TranslatedLocalizedFallbackValueCollectionType extends AbstractType
             }
 
             $localization = $fallbackValue->getLocalization();
-            $locale = $localization ? $localization->getFormattingCode() : null;
+            $locale = $localization ? $localization->getLanguageCode() : $this->defaultLocale;
 
             $value = $this->getPropertyAccessor()->getValue($fallbackValue, $field);
 
