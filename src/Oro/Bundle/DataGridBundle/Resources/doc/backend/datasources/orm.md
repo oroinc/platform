@@ -20,7 +20,7 @@ datagrids:
                     - g.id
                     - g.label
                 from:
-                    - { table: OroCRMContactBundle:Group, alias: g }
+                    - { table: OroContactBundle:Group, alias: g }
 ```
 
 Query hints
@@ -36,7 +36,7 @@ datagrids:
                 select:
                     - partial g.{id, label}
                 from:
-                    - { table: OroCRMContactBundle:Group, alias: g }
+                    - { table: OroContactBundle:Group, alias: g }
             hints:
                 - HINT_FORCE_PARTIAL_LOAD
 ```

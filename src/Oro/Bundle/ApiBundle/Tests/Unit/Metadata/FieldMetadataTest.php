@@ -3,6 +3,7 @@
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Metadata;
 
 use Oro\Bundle\ApiBundle\Metadata\FieldMetadata;
+use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 
 class FieldMetadataTest extends \PHPUnit_Framework_TestCase
 {
@@ -10,6 +11,7 @@ class FieldMetadataTest extends \PHPUnit_Framework_TestCase
     {
         $fieldMetadata = new FieldMetadata();
         $fieldMetadata->setName('testName');
+        $fieldMetadata->setPropertyPath('testPropertyPath');
         $fieldMetadata->setDataType('testDataType');
         $fieldMetadata->setIsNullable(true);
         $fieldMetadata->setMaxLength(123);
@@ -23,16 +25,18 @@ class FieldMetadataTest extends \PHPUnit_Framework_TestCase
     {
         $fieldMetadata = new FieldMetadata();
         $fieldMetadata->setName('testName');
+        $fieldMetadata->setPropertyPath('testPropertyPath');
         $fieldMetadata->setDataType('testDataType');
         $fieldMetadata->setIsNullable(true);
         $fieldMetadata->setMaxLength(123);
 
         $this->assertEquals(
             [
-                'name'       => 'testName',
-                'data_type'  => 'testDataType',
-                'nullable'   => true,
-                'max_length' => 123,
+                'name'          => 'testName',
+                'property_path' => 'testPropertyPath',
+                'data_type'     => 'testDataType',
+                'nullable'      => true,
+                'max_length'    => 123,
             ],
             $fieldMetadata->toArray()
         );
@@ -64,6 +68,21 @@ class FieldMetadataTest extends \PHPUnit_Framework_TestCase
         $this->assertNull($fieldMetadata->getName());
         $fieldMetadata->setName('fieldName');
         $this->assertEquals('fieldName', $fieldMetadata->getName());
+    }
+
+    public function testPropertyPath()
+    {
+        $fieldMetadata = new FieldMetadata();
+
+        $this->assertNull($fieldMetadata->getPropertyPath());
+        $fieldMetadata->setName('name');
+        $this->assertEquals('name', $fieldMetadata->getPropertyPath());
+        $fieldMetadata->setPropertyPath('propertyPath');
+        $this->assertEquals('propertyPath', $fieldMetadata->getPropertyPath());
+        $fieldMetadata->setPropertyPath(ConfigUtil::IGNORE_PROPERTY_PATH);
+        $this->assertNull($fieldMetadata->getPropertyPath());
+        $fieldMetadata->setPropertyPath(null);
+        $this->assertEquals('name', $fieldMetadata->getPropertyPath());
     }
 
     public function testDataType()

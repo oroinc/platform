@@ -56,7 +56,7 @@ class FooMessageProcessor implements MessageProcessor, TopicSubscriberInterface
 Register it as a container service and subscribe to the topic:
 
 ```yaml
-orocrm_channel.async.change_integration_status_processor:
+oro_channel.async.change_integration_status_processor:
     class: 'FooMessageProcessor'
     tags:
         - { name: 'oro_message_queue.client.message_processor' }

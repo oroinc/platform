@@ -29,7 +29,6 @@ class WorkflowColumnListener
             'label' => 'oro.workflow.translation.workflow.label',
             'type' => 'workflow',
             'data_name' => 'translationKey',
-            'enabled' => false,
         ];
 
         $config->offsetSetByPath('[filters][columns]', $filters);
