@@ -7,10 +7,10 @@ use Oro\Bundle\TranslationBundle\Translation\TranslationKeyGenerator;
 use Oro\Bundle\TranslationBundle\Translation\TranslationKeyTemplateInterface;
 use Oro\Bundle\WorkflowBundle\Configuration\WorkflowConfiguration;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
-use Oro\Bundle\WorkflowBundle\Translation\KeyTemplate\AttributeLabelTemplate;
 use Oro\Bundle\WorkflowBundle\Translation\KeyTemplate\StepLabelTemplate;
 use Oro\Bundle\WorkflowBundle\Translation\KeyTemplate\TransitionLabelTemplate;
 use Oro\Bundle\WorkflowBundle\Translation\KeyTemplate\TransitionWarningMessageTemplate;
+use Oro\Bundle\WorkflowBundle\Translation\KeyTemplate\WorkflowAttributeLabelTemplate;
 use Oro\Bundle\WorkflowBundle\Translation\KeyTemplate\WorkflowLabelTemplate;
 
 class WorkflowTranslationFieldsIterator
@@ -70,7 +70,7 @@ class WorkflowTranslationFieldsIterator
                     'workflow_name' => $workflowName,
                     'attribute_name' => $attributeName
                 ];
-                yield $this->makeKey(AttributeLabelTemplate::class, $data) => $rawAttribute['label'];
+                yield $this->makeKey(WorkflowAttributeLabelTemplate::class, $data) => $rawAttribute['label'];
             }
             unset($rawAttribute);
         }
@@ -114,7 +114,7 @@ class WorkflowTranslationFieldsIterator
             foreach ($configuration[WorkflowConfiguration::NODE_ATTRIBUTES] as $attributeKey => $attributeConfig) {
                 $attributeName = !empty($rawAttribute['name']) ? $rawAttribute['name'] : $attributeKey;
                 $key = $this->makeKey(
-                    AttributeLabelTemplate::class, [
+                    WorkflowAttributeLabelTemplate::class, [
                         'workflow_name' => $workflowName,
                         'attribute_name' => $attributeName
                     ]

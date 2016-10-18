@@ -2,24 +2,24 @@
 
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Translation\KeyTemplate;
 
-use Oro\Bundle\WorkflowBundle\Translation\KeyTemplate\AttributeLabelTemplate;
+use Oro\Bundle\WorkflowBundle\Translation\KeyTemplate\WorkflowAttributeTemplate;
 
-class AttributeLabelTemplateTest extends TemplateTestCase
+class WorkflowAttributeTemplateTest extends TemplateTestCase
 {
     /** {@inheritdoc} */
     public function getTemplateInstance()
     {
-        return new AttributeLabelTemplate();
+        return new WorkflowAttributeTemplate();
     }
 
     public function testGetName()
     {
-        $this->assertEquals(AttributeLabelTemplate::NAME, $this->getTemplateInstance()->getName());
+        $this->assertName(WorkflowAttributeTemplate::NAME);
     }
 
     public function testGetTemplate()
     {
-        $this->assertTemplate('oro.workflow.{{ workflow_name }}.attribute.{{ attribute_name }}.label');
+        $this->assertTemplate('oro.workflow.{{ workflow_name }}.attribute.{{ attribute_name }}');
     }
 
     public function testGetRequiredKeys()
