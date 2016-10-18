@@ -67,7 +67,7 @@ imports:
 workflows:
     b2b_flow_lead:
         label: 'Unqualified Sales Lead'
-        entity: OroCRM\Bundle\SalesBundle\Entity\Lead
+        entity: Oro\Bundle\SalesBundle\Entity\Lead
         entity_attribute: lead
         start_step: new
 ```
@@ -147,7 +147,7 @@ workflows:                                                    # Root elements
         label: B2B Sales Flow                                 # This will be shown in UI
         defaults:
             active: true                                      # Active by default (when config is loaded)
-        entity: OroCRM\Bundle\SalesBundle\Entity\Opportunity  # Workflow will be used for this entity
+        entity: Oro\Bundle\SalesBundle\Entity\Opportunity  # Workflow will be used for this entity
         entity_attribute: opportunity                         # Attribute name used to store root entity
         is_system: true                                       # Workflow is system, i.e. not editable and not deletable
         start_step: qualify                                   # Name of start step
@@ -241,7 +241,7 @@ workflows:
             entity_acl:
                 delete: false
             options:
-                class: OroCRM\Bundle\AccountBundle\Entity\Account
+                class: Oro\Bundle\AccountBundle\Entity\Account
         new_company_name:
             label: 'Company name'
             type: string

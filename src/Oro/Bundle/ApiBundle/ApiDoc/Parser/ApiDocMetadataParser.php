@@ -110,6 +110,9 @@ class ApiDocMetadataParser implements ParserInterface
                     $fieldData['isRelation'] = false;
                     $fields[$associationName] = $fieldData;
                 } else {
+                    if ($associationMetadata->isCollection()) {
+                        $fieldData['dataType'] = sprintf('array of %s', $fieldData['dataType']);
+                    }
                     $relations[$associationName] = $fieldData;
                 }
             }

@@ -5,7 +5,6 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\ApiDoc\Parser;
 use Oro\Bundle\ApiBundle\ApiDoc\Parser\ApiDocMetadata;
 use Oro\Bundle\ApiBundle\ApiDoc\Parser\ApiDocMetadataParser;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
-use Oro\Bundle\ApiBundle\Config\EntityDefinitionFieldConfig;
 use Oro\Bundle\ApiBundle\Metadata\AssociationMetadata;
 use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
 use Oro\Bundle\ApiBundle\Metadata\FieldMetadata;
@@ -122,7 +121,7 @@ class ApiDocMetadataParserTest extends \PHPUnit_Framework_TestCase
             ],
             'contacts' => [
                 'required' => true,
-                'dataType' => 'contacts',
+                'dataType' => 'array of contacts',
                 'description' => 'contacts Field',
                 'readonly' => false,
                 'isRelation' => true,
