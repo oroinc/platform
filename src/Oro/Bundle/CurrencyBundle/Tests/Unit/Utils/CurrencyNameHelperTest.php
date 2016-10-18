@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\CurrencyBundle\Tests\Units\Utils;
+namespace Oro\Bundle\CurrencyBundle\Tests\Unit\Utils;
 
 use Oro\Bundle\CurrencyBundle\Tests\Unit\Provider\CurrencyStubProvider;
 use Oro\Bundle\CurrencyBundle\Utils\CurrencyNameHelper;

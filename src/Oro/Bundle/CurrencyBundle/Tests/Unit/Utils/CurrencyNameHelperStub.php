@@ -1,10 +1,10 @@
 <?php
 
-namespace Oro\Bundle\CurrencyBundle\Tests\Units\Utils;
+namespace Oro\Bundle\CurrencyBundle\Tests\Unit\Utils;
 
-use Oro\Bundle\CurrencyBundle\Provider\ViewTypeProviderInterface;
 use Symfony\Component\Intl\Intl;
 
+use Oro\Bundle\CurrencyBundle\Provider\ViewTypeProviderInterface;
 use Oro\Bundle\CurrencyBundle\Utils\CurrencyNameHelper;
 
 class CurrencyNameHelperStub extends CurrencyNameHelper

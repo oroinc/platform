@@ -15,6 +15,9 @@ class MetadataContext extends ApiContext
     /** FQCN of an entity */
     const CLASS_NAME = 'class';
 
+    /** the name of the action for which the metadata is built */
+    const TARGET_ACTION = 'targetAction';
+
     /** a list of requests for additional metadata information that should be retrieved */
     const EXTRA = 'extra';
 
@@ -54,6 +57,30 @@ class MetadataContext extends ApiContext
     public function setClassName($className)
     {
         $this->set(self::CLASS_NAME, $className);
+    }
+
+    /**
+     * Gets the name of the action for which the metadata is built
+     *
+     * @return string|null
+     */
+    public function getTargetAction()
+    {
+        return $this->get(self::TARGET_ACTION);
+    }
+
+    /**
+     * Sets the name of the action for which the metadata is built
+     *
+     * @param string|null $action
+     */
+    public function setTargetAction($action)
+    {
+        if ($action) {
+            $this->set(self::TARGET_ACTION, $action);
+        } else {
+            $this->remove(self::TARGET_ACTION);
+        }
     }
 
     /**

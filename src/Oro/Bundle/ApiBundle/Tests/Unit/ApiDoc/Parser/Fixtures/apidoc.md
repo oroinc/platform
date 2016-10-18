@@ -2,26 +2,26 @@
 
 ## ACTIONS
 
-### GET
+### get
 
 Description for GET action
 
 - list item 1
 - list item 2
 
-### GET_LIST
+### get_list
 
 Description for GET_LIST action
 
 **text in bold**
 
-### CREATE
+### create
 
 Description for CREATE action
 
 _text in italic_
 
-### UPDATE
+### update
 
 Description for UPDATE action
 
@@ -37,23 +37,19 @@ Description for ID field
 
 Description for NAME field
 
-#### CREATE
+#### create, update
 
-Description for NAME field for CREATE action
+Description for NAME field for CREATE and UPDATE actions
 
-#### UPDATE
-
-Description for NAME field for UPDATE action
-
-#### DELETE
+#### delete
 
 Description for NAME field for DELETE action
 
 ### createdAt
 
-#### CREATE
+#### create
 
-#### UPDATE
+#### update
 
 ### updatedAt
 
@@ -75,9 +71,12 @@ Description for CREATEDAT filter
 
 Description for UPDATEDAT filter
 
+## SUBRESOURCES
 
-# Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Category
+### contacts
 
-# Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Company
+#### get_subresource
+
+Description for *contacts GET_SUBRESOURCE* sub-resource
 
 # Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Group
