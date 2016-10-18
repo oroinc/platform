@@ -1,5 +1,5 @@
 request:
-    query: "from oro_test_item where integer integerValue exists order_by stringValue max_results 100"
+    query: "from oro_test_item where text stringValue exists order_by stringValue max_results 100"
 response:
     records_count: 9
     count: 9
