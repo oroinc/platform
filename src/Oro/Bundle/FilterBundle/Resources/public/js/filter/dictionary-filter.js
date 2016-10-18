@@ -58,6 +58,8 @@ define(function(require) {
 
         class: null,
 
+        select2ConfigData: null,
+
         isInitSelect2: false,
 
         previousData: [],
@@ -66,6 +68,16 @@ define(function(require) {
          * Data of selected values
          */
         selectedData: {},
+
+        /**
+         * Route name for dictionary values filter
+         */
+        dictionaryValueRoute: 'oro_dictionary_value',
+
+        /**
+         * Route name for dictionary search
+         */
+        dictionarySearchRoute: 'oro_dictionary_search',
 
         /**
          * @inheritDoc
@@ -114,23 +126,34 @@ define(function(require) {
          */
         loadValuesById: function(successEventName) {
             var self = this;
-            $.ajax({
-                url: routing.generate(
-                    'oro_dictionary_value',
-                    {
-                        dictionary: this.dictionaryClass
+            if (this.select2ConfigData === null) {
+                $.ajax({
+                    url: routing.generate(
+                        self.dictionaryValueRoute,
+                        {
+                            dictionary: this.dictionaryClass
+                        }
+                    ),
+                    data: {
+                        'keys': this.value.value
+                    },
+                    success: function(response) {
+                        self.trigger(successEventName, response);
+                    },
+                    error: function(jqXHR) {
+                        messenger.showErrorMessage(__('Sorry, unexpected error was occurred'), jqXHR.responseJSON);
                     }
-                ),
-                data: {
-                    'keys': this.value.value
-                },
-                success: function(response) {
-                    self.trigger(successEventName, response);
-                },
-                error: function(jqXHR) {
-                    messenger.showErrorMessage(__('Sorry, unexpected error was occurred'), jqXHR.responseJSON);
-                }
-            });
+                });
+            } else {
+                var select2ConfigData = this.select2ConfigData;
+                var value = this.value.value;
+                var result = {
+                    results: _.filter(select2ConfigData, function(item) {
+                        return _.indexOf(value, item.id) !== -1;
+                    })
+                };
+                self.trigger(successEventName, result);
+            }
         },
 
         /**
@@ -244,9 +267,16 @@ define(function(require) {
             var config =  {
                 multiple: true,
                 containerCssClass: 'dictionary-filter',
-                ajax: {
+                dropdownAutoWidth: true,
+                escapeMarkup: function(markup) { return markup; }, // let our custom formatter work
+                minimumInputLength: 0,
+                placeholder: __('Choose values')
+            };
+
+            if (this.select2ConfigData === null) {
+                config.ajax = {
                     url: routing.generate(
-                        'oro_dictionary_search',
+                        this.dictionarySearchRoute,
                         {
                             dictionary: this.dictionaryClass
                         }
@@ -264,12 +294,12 @@ define(function(require) {
                             results: data.results
                         };
                     }
-                },
-                dropdownAutoWidth: true,
-                escapeMarkup: function(markup) { return markup; }, // let our custom formatter work
-                minimumInputLength: 0,
-                placeholder: __('Choose values')
-            };
+                };
+            } else {
+                config.data = {
+                    results: this.select2ConfigData
+                };
+            }
 
             if (this.templateTheme === '') {
                 config.width = 'resolve';

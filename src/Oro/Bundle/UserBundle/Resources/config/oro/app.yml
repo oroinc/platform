@@ -39,3 +39,6 @@ security:
                 lifetime:                   1209600   # stay logged for two weeks
                 httponly:                   true
             anonymous:                      false
+            guard:
+                authenticators:
+                    - oro_user.impersonation_authenticator

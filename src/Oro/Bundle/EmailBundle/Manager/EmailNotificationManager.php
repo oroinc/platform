@@ -8,7 +8,6 @@ use Symfony\Bundle\FrameworkBundle\Routing\Router;
 use Symfony\Component\Routing\Exception\RouteNotFoundException;
 
 use Oro\Bundle\EmailBundle\Entity\Email;
-use Oro\Bundle\EmailBundle\Tools\EmailBodyHelper;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\UIBundle\Tools\HtmlTagHelper;
@@ -22,9 +21,6 @@ class EmailNotificationManager
 {
     /** @var HtmlTagHelper */
     protected $htmlTagHelper;
-
-    /** @var EmailBodyHelper */
-    protected $emailBodyHelper;
 
     /** @var Router */
     protected $router;
@@ -40,20 +36,17 @@ class EmailNotificationManager
      * @param HtmlTagHelper $htmlTagHelper
      * @param Router $router
      * @param ConfigManager $configManager
-     * @param EmailBodyHelper $emailBodyHelper
      */
     public function __construct(
         EntityManager $entityManager,
         HtmlTagHelper $htmlTagHelper,
         Router $router,
-        ConfigManager $configManager,
-        EmailBodyHelper $emailBodyHelper
+        ConfigManager $configManager
     ) {
         $this->em = $entityManager;
         $this->htmlTagHelper = $htmlTagHelper;
         $this->router = $router;
         $this->configManager = $configManager;
-        $this->emailBodyHelper = $emailBodyHelper;
     }
 
     /**
@@ -80,9 +73,7 @@ class EmailNotificationManager
             $bodyContent = '';
             $emailBody = $email->getEmailBody();
             if ($emailBody) {
-                $bodyContent = $this->htmlTagHelper->shorten(
-                    $this->emailBodyHelper->getClearBody($emailBody->getBodyContent())
-                );
+                $bodyContent = $emailBody->getTextBody();
             }
 
             $emailId = $email->getId();

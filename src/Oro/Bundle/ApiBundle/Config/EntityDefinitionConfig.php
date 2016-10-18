@@ -27,8 +27,11 @@ class EntityDefinitionConfig extends EntityConfig implements EntityConfigInterfa
     /** a short, human-readable description of API resource */
     const DESCRIPTION = 'description';
 
-    /** a detailed documentation of API resource */
+    /** a detailed documentation of API resource or link to a .md file that will be used to retrieve a documentation */
     const DOCUMENTATION = 'documentation';
+
+    /** resource link to a .md file that will be used to retrieve a documentation */
+    const DOCUMENTATION_RESOURCE = 'documentation_resource';
 
     /** the name of ACL resource */
     const ACL_RESOURCE = 'acl_resource';
@@ -305,6 +308,42 @@ class EntityDefinitionConfig extends EntityConfig implements EntityConfigInterfa
             $this->items[self::DELETE_HANDLER] = $handler;
         } else {
             unset($this->items[self::DELETE_HANDLER]);
+        }
+    }
+
+    /**
+     * Indicates whether a link to documentation file exists.
+     *
+     * @return bool
+     */
+    public function hasDocumentationResource()
+    {
+        return array_key_exists(self::DOCUMENTATION_RESOURCE, $this->items);
+    }
+
+    /**
+     * Gets a link to file contains the documentation for API resource.
+     *
+     * @return string|null
+     */
+    public function getDocumentationResource()
+    {
+        return array_key_exists(self::DOCUMENTATION_RESOURCE, $this->items)
+            ? $this->items[self::DOCUMENTATION_RESOURCE]
+            : null;
+    }
+
+    /**
+     * Sets a link to file contains the documentation for API resource.
+     *
+     * @param string|null $resource
+     */
+    public function setDocumentationResource($resource)
+    {
+        if ($resource) {
+            $this->items[self::DOCUMENTATION_RESOURCE] = $resource;
+        } else {
+            unset($this->items[self::DOCUMENTATION_RESOURCE]);
         }
     }
 }

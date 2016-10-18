@@ -1,0 +1,8 @@
+features:
+    development_settings:
+        label: oro.layout.feature.development_settings.label
+        description: oro.layout.feature.development_settings.description
+        toggle: oro_layout.development_settings_feature_enabled
+        configuration:
+            - 'development_settings'
+            - 'development_layout_settings'

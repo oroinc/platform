@@ -2,12 +2,32 @@
 
 namespace Oro\Bundle\TagBundle\Filter;
 
+use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Component\Form\FormFactoryInterface;
+
+use Oro\Bundle\FilterBundle\Filter\FilterUtility;
+use Oro\Bundle\FilterBundle\Form\Type\Filter\DictionaryFilterType;
 use Oro\Bundle\TagBundle\Entity\Tag;
 use Oro\Bundle\TagBundle\Form\Type\EntityTagsFilterType;
-use Oro\Bundle\FilterBundle\Filter\FilterUtility;
 
 class EntityTagsFilter extends AbstractTagsFilter
 {
+    /** @var TranslatorInterface  */
+    protected $translator;
+
+    /**
+     * Constructor
+     *
+     * @param FormFactoryInterface $factory
+     * @param FilterUtility        $util
+     * @param TranslatorInterface  $translator
+     */
+    public function __construct(FormFactoryInterface $factory, FilterUtility $util, TranslatorInterface $translator)
+    {
+        parent::__construct($factory, $util);
+
+        $this->translator = $translator;
+    }
     /**
      * {@inheritdoc}
      */
@@ -56,7 +76,10 @@ class EntityTagsFilter extends AbstractTagsFilter
             'name'         => $this->getName(),
             'translatable' => true,
             'enabled'      => true,
-            'choices'      => $fieldView->vars['choices'],
+            'choices'      => [
+                DictionaryFilterType::TYPE_IN => $this->translator->trans('oro.filter.form.label_type_in'),
+                DictionaryFilterType::TYPE_NOT_IN => $this->translator->trans('oro.filter.form.label_type_not_in'),
+            ],
             'lazy'         => $this->isLazy(),
         ];
 
@@ -65,7 +88,17 @@ class EntityTagsFilter extends AbstractTagsFilter
             array_flip($this->util->getExcludeParams())
         );
         $metadata         = $this->mapParams($metadata);
-        $metadata['type'] = 'multichoice';
+        $metadata['type'] = 'dictionary';
+        $metadata['class'] = '';
+        $preparedData = [];
+        foreach ($fieldView->vars['choices'] as $choice) {
+            $preparedData[] = [
+                'id' => $choice->value,
+                'value' => $choice->value,
+                'text' => $choice->label,
+            ];
+        }
+        $metadata['select2ConfigData'] = $preparedData;
 
         $metadata = array_merge($defaultMetadata, $metadata);
 
