@@ -2,4 +2,4 @@ oro:
     notification:
           validators:
               recipient_list:
-                  empty.message: At least on recipient must be specified.
+                  empty.message: At least one Recipient must be specified.

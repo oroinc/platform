@@ -5,7 +5,7 @@ namespace Oro\Bundle\AttachmentBundle\Tests\Unit\Api\Processor;
 use Gaufrette\Exception\FileNotFound;
 
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
-use Oro\Bundle\ApiBundle\Processor\CustomizeLoadedDataContext;
+use Oro\Bundle\ApiBundle\Processor\CustomizeLoadedData\CustomizeLoadedDataContext;
 use Oro\Bundle\AttachmentBundle\Api\Processor\ComputeFileContent;
 
 class ComputeFileContentTest extends \PHPUnit_Framework_TestCase

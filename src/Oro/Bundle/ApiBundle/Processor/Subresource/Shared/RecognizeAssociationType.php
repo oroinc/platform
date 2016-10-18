@@ -53,23 +53,7 @@ class RecognizeAssociationType implements ProcessorInterface
             return;
         }
 
-        $version = $context->getVersion();
-        $requestType = $context->getRequestType();
-        $parentEntityClass = $context->getParentClassName();
-
-        $entitySubresources = $this->subresourcesProvider->getSubresources(
-            $parentEntityClass,
-            $version,
-            $requestType
-        );
-        $subresource = $entitySubresources
-            ? $entitySubresources->getSubresource($associationName)
-            : null;
-
-        if ($subresource) {
-            $context->setClassName($subresource->getTargetClassName());
-            $context->setIsCollection($subresource->isCollection());
-        } else {
+        if (!$this->setAssociationType($context, $associationName)) {
             $context->addError(
                 Error::createValidationError(
                     Constraint::RELATIONSHIP,
@@ -77,5 +61,36 @@ class RecognizeAssociationType implements ProcessorInterface
                 )
             );
         }
+    }
+
+    /**
+     * @param SubresourceContext $context
+     * @param string             $associationName
+     *
+     * @return bool
+     */
+    protected function setAssociationType(SubresourceContext $context, $associationName)
+    {
+        $entitySubresources = $this->subresourcesProvider->getSubresources(
+            $context->getParentClassName(),
+            $context->getVersion(),
+            $context->getRequestType()
+        );
+        if (null === $entitySubresources) {
+            return false;
+        }
+        $subresource = $entitySubresources->getSubresource($associationName);
+        if (null === $subresource) {
+            return false;
+        }
+        $targetClassName = $subresource->getTargetClassName();
+        if (!$targetClassName) {
+            return false;
+        }
+
+        $context->setClassName($targetClassName);
+        $context->setIsCollection($subresource->isCollection());
+
+        return true;
     }
 }

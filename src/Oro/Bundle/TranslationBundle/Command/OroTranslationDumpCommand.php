@@ -40,9 +40,6 @@ class OroTranslationDumpCommand extends ContainerAwareCommand
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $locales = $input->getArgument('locale');
-        if (empty($locales)) {
-            $locales[] = $this->getContainer()->getParameter('kernel.default_locale');
-        }
 
         $dumper = $this->getContainer()->get('oro_translation.js_dumper');
         $dumper->setLogger(new OutputLogger($output));

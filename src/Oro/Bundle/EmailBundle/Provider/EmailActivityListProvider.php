@@ -22,7 +22,6 @@ use Oro\Bundle\EmailBundle\Entity\Email;
 use Oro\Bundle\EmailBundle\Entity\EmailOwnerInterface;
 use Oro\Bundle\EmailBundle\Entity\EmailUser;
 use Oro\Bundle\EmailBundle\Entity\Provider\EmailThreadProvider;
-use Oro\Bundle\EmailBundle\Tools\EmailBodyHelper;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityBundle\Provider\EntityNameResolver;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
@@ -84,9 +83,6 @@ class EmailActivityListProvider implements
     /** @var CommentAssociationHelper */
     protected $commentAssociationHelper;
 
-    /** @var EmailBodyHelper */
-    protected $emailBodyHelper;
-
     /**
      * @param DoctrineHelper            $doctrineHelper
      * @param ServiceLink               $doctrineRegistryLink
@@ -99,7 +95,6 @@ class EmailActivityListProvider implements
      * @param ServiceLink               $mailboxProcessStorageLink
      * @param ActivityAssociationHelper $activityAssociationHelper
      * @param CommentAssociationHelper  $commentAssociationHelper
-     * @param EmailBodyHelper           $emailBodyHelper
      *
      * @SuppressWarnings(PHPMD.ExcessiveParameterList)
      */
@@ -114,8 +109,7 @@ class EmailActivityListProvider implements
         ServiceLink $securityFacadeLink,
         ServiceLink $mailboxProcessStorageLink,
         ActivityAssociationHelper $activityAssociationHelper,
-        CommentAssociationHelper $commentAssociationHelper,
-        EmailBodyHelper $emailBodyHelper
+        CommentAssociationHelper $commentAssociationHelper
     ) {
         $this->doctrineHelper            = $doctrineHelper;
         $this->doctrineRegistryLink      = $doctrineRegistryLink;
@@ -128,7 +122,6 @@ class EmailActivityListProvider implements
         $this->mailboxProcessStorageLink = $mailboxProcessStorageLink;
         $this->activityAssociationHelper = $activityAssociationHelper;
         $this->commentAssociationHelper  = $commentAssociationHelper;
-        $this->emailBodyHelper           = $emailBodyHelper;
     }
 
     /**
@@ -194,11 +187,7 @@ class EmailActivityListProvider implements
     {
         /** @var $entity Email */
         if ($entity->getEmailBody()) {
-            $body = $entity->getEmailBody()->getBodyContent();
-            $content = $this->emailBodyHelper->getClearBody($body);
-            $content = $this->htmlTagHelper->shorten($content);
-
-            return $content;
+            return $entity->getEmailBody()->getTextBody();
         }
 
         return null;
@@ -317,7 +306,7 @@ class EmailActivityListProvider implements
      */
     public function getTemplate()
     {
-        return 'OroEmailBundle:Email:js/activityItemTemplate.js.twig';
+        return 'OroEmailBundle:Email:js/activityItemTemplate.html.twig';
     }
 
     /**
@@ -325,7 +314,7 @@ class EmailActivityListProvider implements
      */
     public function getGroupedTemplate()
     {
-        return 'OroEmailBundle:Email:js/groupedActivityItemTemplate.js.twig';
+        return 'OroEmailBundle:Email:js/groupedActivityItemTemplate.html.twig';
     }
 
     /**

@@ -103,8 +103,6 @@ class DoctrineParamConverterTest extends \PHPUnit_Framework_TestCase
         if ($isGranted === 0) {
             $this->assertTrue($request->attributes->get('_oro_access_checked'));
         }
-
-
     }
 
     public function idsProvider()

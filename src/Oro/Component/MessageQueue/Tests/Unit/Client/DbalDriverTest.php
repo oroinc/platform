@@ -167,11 +167,6 @@ class DbalDriverTest extends \PHPUnit_Framework_TestCase
             ->with('queue')
             ->will($this->returnValue($queue))
         ;
-        $session
-            ->expects($this->once())
-            ->method('declareQueue')
-            ->with($this->identicalTo($queue))
-        ;
         $driver = new DbalDriver($session, new Config('', '', '', ''));
         $this->assertSame($queue, $driver->createQueue('queue'));
     }

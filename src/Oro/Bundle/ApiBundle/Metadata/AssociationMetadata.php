@@ -4,39 +4,28 @@ namespace Oro\Bundle\ApiBundle\Metadata;
 
 use Oro\Component\ChainProcessor\ToArrayInterface;
 
-class AssociationMetadata implements ToArrayInterface
+class AssociationMetadata extends PropertyMetadata implements ToArrayInterface
 {
     /** @var string */
-    protected $name;
-
-    /** @var string */
-    protected $dataType;
-
-    /** @var string */
-    protected $targetClass;
+    private $targetClass;
 
     /** @var string[] */
-    protected $acceptableTargetClasses = [];
+    private $acceptableTargetClasses = [];
 
     /** @var string */
-    protected $associationType;
+    private $associationType;
 
     /** @var bool */
-    protected $collection = false;
+    private $collection = false;
 
     /** @var bool */
-    protected $nullable = false;
+    private $nullable = false;
+
+    /** @var bool */
+    private $collapsed = false;
 
     /** @var EntityMetadata|null */
     private $targetMetadata;
-
-    /**
-     * @param string|null $name
-     */
-    public function __construct($name = null)
-    {
-        $this->name = $name;
-    }
 
     /**
      * Makes a deep copy of the object.
@@ -55,70 +44,26 @@ class AssociationMetadata implements ToArrayInterface
      */
     public function toArray()
     {
-        $result = ['name' => $this->name];
-        if ($this->dataType) {
-            $result['data_type'] = $this->dataType;
-        }
+        $result = array_merge(
+            parent::toArray(),
+            [
+                'nullable'         => $this->nullable,
+                'collapsed'        => $this->collapsed,
+                'association_type' => $this->associationType,
+                'collection'       => $this->collection
+            ]
+        );
         if ($this->targetClass) {
             $result['target_class'] = $this->targetClass;
         }
         if ($this->acceptableTargetClasses) {
             $result['acceptable_target_classes'] = $this->acceptableTargetClasses;
         }
-        if ($this->associationType) {
-            $result['association_type'] = $this->associationType;
-        }
-        if ($this->collection) {
-            $result['collection'] = $this->collection;
-        }
-        if ($this->nullable) {
-            $result['nullable'] = $this->nullable;
-        }
         if (null !== $this->targetMetadata) {
             $result['target_metadata'] = $this->targetMetadata->toArray();
         }
 
         return $result;
-    }
-
-    /**
-     * Gets the name of the association.
-     *
-     * @return string
-     */
-    public function getName()
-    {
-        return $this->name;
-    }
-
-    /**
-     * Sets the name of the association.
-     *
-     * @param string $name
-     */
-    public function setName($name)
-    {
-        $this->name = $name;
-    }
-
-    /**
-     * Gets the data-type of the association identifier field.
-     *
-     * @return string
-     */
-    public function getDataType()
-    {
-        return $this->dataType;
-    }
-
-    /**
-     * Sets the data-type of the association identifier field.
-     *
-     * @param string $dataType
-     */
-    public function setDataType($dataType)
-    {
-        $this->dataType = $dataType;
     }
 
     /**
@@ -269,5 +214,25 @@ class AssociationMetadata implements ToArrayInterface
     public function setIsNullable($value)
     {
         $this->nullable = $value;
+    }
+
+    /**
+     * Indicates whether the association should be collapsed to a scalar.
+     *
+     * @return bool
+     */
+    public function isCollapsed()
+    {
+        return $this->collapsed;
+    }
+
+    /**
+     * Sets a flag indicates whether the association should be collapsed to a scalar.
+     *
+     * @param bool $collapsed
+     */
+    public function setCollapsed($collapsed = true)
+    {
+        $this->collapsed = $collapsed;
     }
 }

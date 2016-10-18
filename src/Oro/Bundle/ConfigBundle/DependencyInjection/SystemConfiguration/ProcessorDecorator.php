@@ -46,7 +46,7 @@ class ProcessorDecorator
         // validate variable names
         if (isset($result[self::FIELDS_ROOT])) {
             foreach ($result[self::FIELDS_ROOT] as $varName => $varData) {
-                if (!isset($this->variables[$varName]) && empty($varData['ui_only'])) {
+                if (!$this->isVariableNameValid($varName, $varData)) {
                     throw new InvalidConfigurationException(
                         sprintf(
                             'The system configuration variable "%s" is not defined.'
@@ -93,6 +93,13 @@ class ProcessorDecorator
                             $node
                         );
                         break;
+                    // groups need to be merged manually due to 'configurator' and 'handler' options
+                    case self::GROUPS_NODE:
+                        $source[self::ROOT][$nodeName] = $this->mergeGroups(
+                            $source[self::ROOT][$nodeName],
+                            $node
+                        );
+                        break;
                     // replace all overrides in other nodes
                     default:
                         $source[self::ROOT][$nodeName] = array_replace_recursive(
@@ -104,6 +111,47 @@ class ProcessorDecorator
         }
 
         return $source;
+    }
+
+    /**
+     * @param array $existing
+     * @param mixed $new
+     *
+     * @return array
+     */
+    protected function mergeGroups(array $existing, $new)
+    {
+        if (!empty($new) && is_array($new)) {
+            foreach ($new as $key => $value) {
+                $existing[$key] = $this->mergeGroup(
+                    isset($existing[$key]) ? $existing[$key] : [],
+                    $value
+                );
+            }
+        }
+
+        return $existing;
+    }
+
+    /**
+     * @param array $existing
+     * @param mixed $new
+     *
+     * @return array
+     */
+    protected function mergeGroup(array $existing, $new)
+    {
+        if (!empty($new) && is_array($new)) {
+            foreach ($new as $key => $value) {
+                if (('configurator' === $key || 'handler' === $key) && isset($existing[$key])) {
+                    $existing[$key] = array_merge((array)$existing[$key], (array)$new[$key]);
+                } else {
+                    $existing[$key] = $value;
+                }
+            }
+        }
+
+        return $existing;
     }
 
     /**
@@ -156,7 +204,24 @@ class ProcessorDecorator
                     ->scalarNode('title')->isRequired()->end()
                     ->scalarNode('icon')->end()
                     ->scalarNode('description')->end()
-                    ->scalarNode('configurator')->end()
+                    ->arrayNode('configurator')
+                        ->beforeNormalization()
+                            ->ifString()
+                            ->then(function ($value) {
+                                return [$value];
+                            })
+                        ->end()
+                        ->prototype('scalar')->end()
+                    ->end()
+                    ->arrayNode('handler')
+                        ->beforeNormalization()
+                            ->ifString()
+                            ->then(function ($value) {
+                                return [$value];
+                            })
+                        ->end()
+                        ->prototype('scalar')->end()
+                    ->end()
                     ->booleanNode('page_reload')
                         ->defaultValue(false)
                     ->end()
@@ -185,6 +250,7 @@ class ProcessorDecorator
                     ->end()
                     ->scalarNode('data_transformer')->end()
                     ->scalarNode('acl_resource')->end()
+                    ->scalarNode('property_path')->end()
                     ->integerNode('priority')->end()
                     ->booleanNode('ui_only')->end()
                 ->end()
@@ -287,5 +353,23 @@ class ProcessorDecorator
 
             $data = array_merge($data, ['section' => true]);
         }
+    }
+
+    /**
+     * Validates field name and properties with existing settings tree
+     *
+     * @param string $fieldName
+     * @param $filedOptions
+     * @return bool
+     *
+     */
+    protected function isVariableNameValid($fieldName, $filedOptions)
+    {
+        $isFieldInConfig = isset($this->variables[$fieldName]);
+        $isNotPersistentField = !empty($filedOptions['ui_only']);
+        $isAliasForAnotherFieldInConfig =
+            isset($filedOptions['property_path']) && isset($this->variables[$filedOptions['property_path']]);
+
+        return ($isFieldInConfig || $isNotPersistentField || $isAliasForAnotherFieldInConfig);
     }
 }

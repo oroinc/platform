@@ -835,7 +835,6 @@ class AclPrivilegeRepository
                     }
                 }
             }
-
         }
     }
 

@@ -53,3 +53,8 @@ services:
             - ['delete', 'delete_list', 'create', 'update']
         tags:
             - { name: oro.api.processor, action: collect_resources, priority: -120 }
+
+    oro_api.collect_resources.load_accessible_resources:
+        class: Oro\Bundle\ApiBundle\Processor\CollectResources\LoadAccessibleResources
+        tags:
+            - { name: oro.api.processor, action: collect_resources, priority: -200 }

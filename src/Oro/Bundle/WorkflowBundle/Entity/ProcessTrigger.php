@@ -4,10 +4,9 @@ namespace Oro\Bundle\WorkflowBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 
-use JMS\JobQueueBundle\Entity\Job;
-
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
+use Oro\Bundle\WorkflowBundle\Configuration\ProcessPriority;
 
 /**
  * @ORM\Table(
@@ -38,12 +37,8 @@ use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
  *      }
  * )
  */
-class ProcessTrigger
+class ProcessTrigger implements EventTriggerInterface
 {
-    const EVENT_CREATE = 'create';
-    const EVENT_UPDATE = 'update';
-    const EVENT_DELETE = 'delete';
-
     /**
      * @var integer
      *
@@ -72,7 +67,7 @@ class ProcessTrigger
      *
      * @ORM\Column(name="priority", type="smallint")
      */
-    protected $priority = Job::PRIORITY_DEFAULT;
+    protected $priority = ProcessPriority::PRIORITY_DEFAULT;
 
     /**
      * Whether process should be queued or processed immediately
@@ -136,7 +131,7 @@ class ProcessTrigger
     protected $updatedAt;
 
     /**
-     * @return integer
+     * {@inheritdoc}
      */
     public function getId()
     {
@@ -185,7 +180,7 @@ class ProcessTrigger
     }
 
     /**
-     * @return string
+     * {@inheritdoc}
      */
     public function getField()
     {
@@ -293,6 +288,14 @@ class ProcessTrigger
     public function getDefinition()
     {
         return $this->definition;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getEntityClass()
+    {
+        return $this->getDefinition() ? $this->getDefinition()->getRelatedEntity() : null;
     }
 
     /**

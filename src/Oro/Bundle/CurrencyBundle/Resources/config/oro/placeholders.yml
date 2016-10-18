@@ -1,0 +1,10 @@
+placeholders:
+    placeholders:
+        scripts_after:
+            items:
+                currency_settings:
+                    order: 500
+
+    items:
+        currency_settings:
+            template: OroCurrencyBundle::currency_settings.html.twig

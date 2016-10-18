@@ -102,7 +102,6 @@ class ItemTest extends \PHPUnit_Framework_TestCase
         $this->item->removeTextField($index);
         $fields = $this->item->getTextFields();
         $this->assertEquals(0, $fields->count());
-
     }
 
     public function testDatetimeField()

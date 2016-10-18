@@ -4,23 +4,13 @@ Feature: User login
   I need to be able to authenticate
 
 Scenario: Success login
-  Given I am on "/user/login"
-  And I fill "Login" form with:
-      | Username | admin |
-      | Password | admin |
+  Given I am on Login page
+  And I fill "Login Form" with:
+    | Username | admin |
+    | Password | admin |
   And I press "Log in"
-  And I should be on "/"
+  And I should be on Admin Dashboard page
 
-Scenario Outline: Fail login
-  Given I am on "/user/login"
-  And I fill "Login" form with:
-      | Username | <login>    |
-      | Password | <password> |
-  And I press "Log in"
-  And I should be on "/user/login"
+Scenario: Fail login
+  Given I login as "user" user
   And I should see "Invalid user name or password."
-
-  Examples:
-  | login | password |
-  | user  | pass     |
-  | user2 | pass2    |

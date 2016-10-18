@@ -32,6 +32,15 @@ class MetadataContextTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('test', $this->context->get(MetadataContext::CLASS_NAME));
     }
 
+    public function testTargetAction()
+    {
+        $this->assertNull($this->context->getTargetAction());
+
+        $this->context->setTargetAction('test');
+        $this->assertEquals('test', $this->context->getTargetAction());
+        $this->assertEquals('test', $this->context->get(MetadataContext::TARGET_ACTION));
+    }
+
     public function testConfig()
     {
         $this->assertNull($this->context->getConfig());
@@ -76,5 +85,14 @@ class MetadataContextTest extends \PHPUnit_Framework_TestCase
     public function testSetInvalidExtras()
     {
         $this->context->setExtras([new \stdClass()]);
+    }
+
+    public function testWithExcludedProperties()
+    {
+        $this->assertFalse($this->context->getWithExcludedProperties());
+
+        $this->context->setWithExcludedProperties(true);
+        $this->assertTrue($this->context->getWithExcludedProperties());
+        $this->assertTrue($this->context->get(MetadataContext::WITH_EXCLUDED_PROPERTIES));
     }
 }

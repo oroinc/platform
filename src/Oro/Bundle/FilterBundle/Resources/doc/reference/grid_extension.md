@@ -18,7 +18,7 @@ For example:
                     - g.id
                     - g.label
                 from:
-                    - { table: OroCRMContactBundle:Group, alias: g }
+                    - { table: OroContactBundle:Group, alias: g }
 
         filters:
             columns:
