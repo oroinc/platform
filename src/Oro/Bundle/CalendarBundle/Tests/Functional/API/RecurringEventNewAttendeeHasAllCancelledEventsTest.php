@@ -26,7 +26,7 @@ class RecurringEventNewAttendeeHasAllCancelledEventsTest extends AbstractUseCase
         $this->checkPreconditions();
 
         /** @var User $attendeeUser1 */
-        $attendeeUser1 = $this->getReference('Simple_user_1');
+        $attendeeUser1 = $this->getReference('simple_user_1');
         $attendee1 = [
             'displayName' => sprintf('%s %s', $attendeeUser1->getFirstName(), $attendeeUser1->getLastName()),
             'email'       => $attendeeUser1->getEmail(),
