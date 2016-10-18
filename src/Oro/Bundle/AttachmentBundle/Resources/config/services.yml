@@ -31,6 +31,8 @@ parameters:
     oro_attachment.attachments_dir:                              attachment
     oro_attachment.imagine.cache.resolver.custom_web_path.name:  custom_web_path
 
+    liip_imagine.meta_data.reader.class:                         Imagine\Image\Metadata\DefaultMetadataReader
+
 services:
     oro_attachment.manager:
         class: %oro_attachment.manager.attachment_manager.class%

@@ -120,7 +120,7 @@ datagrids:
             entityHint: call
         source:
             type: orm
-            acl_resource: orocrm_call_view
+            acl_resource: oro_call_view
             query:
                 select:
                     - call.id
@@ -129,7 +129,7 @@ datagrids:
                     - call.callDateTime as dateTime
                     - directionType.name as callDirection
                 from:
-                    - { table: %orocrm_call.call.entity.class%, alias: call }
+                    - { table: %oro_call.call.entity.class%, alias: call }
                 join:
                     left:
                         - { join: call.direction, alias: directionType }
@@ -143,7 +143,7 @@ datagrids:
                 type: twig
                 label: ~
                 frontend_type: html
-                template: OroCRMCallBundle:Datagrid:Column/direction.html.twig
+                template: OroCallBundle:Datagrid:Column/direction.html.twig
             dateTime:
                 label: orocrm.call.datagrid.date_time
                 frontend_type: datetime
@@ -151,7 +151,7 @@ datagrids:
                 type: twig
                 label: orocrm.call.subject.label
                 frontend_type: html
-                template: OroCRMCallBundle:Datagrid:Column/subject.html.twig
+                template: OroCallBundle:Datagrid:Column/subject.html.twig
             phone:
                 label: orocrm.call.phone_number.label
         sorters:
@@ -182,7 +182,7 @@ Next you need to create a TWIG template renders your grid. This template should 
  
 {% block actions %}
     {% set actions = [{
-        'url': path('orocrm_call_index'),
+        'url': path('oro_call_index'),
         'type': 'link',
         'label': 'orocrm.dashboard.recent_calls.view_all'|trans
     }] %}
@@ -198,8 +198,8 @@ dashboards:
         recent_calls:                               # register a widget
             label:      orocrm.dashboard.recent_calls.title
             route:      oro_dashboard_widget        # you can use existing controller to render your TWIG template
-            route_parameters: { bundle: OroCRMCallBundle, name: recentCalls }   # just specify a bundle and a TWIG template name
-            acl:        orocrm_call_view
+            route_parameters: { bundle: OroCallBundle, name: recentCalls }   # just specify a bundle and a TWIG template name
+            acl:        oro_call_view
 ```
  
 Also there are some additional TWIG templates for mostly used widgets, for example `tabbed`, `itemized` (a widget contains some items, for example links), `chart` and others.

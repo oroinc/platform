@@ -242,16 +242,19 @@ define([
          */
         _onValueUpdated: function(newValue, oldValue) {
             // synchronize choice selector with new value
-            var $menu = this.$('.choice-filter .dropdown-menu').filter('[data-role-type]');
+            this.$('.choice-filter .dropdown-menu').each(function() {
+                var $menu = $(this);
+                var name = $menu.data('name') || 'type';
 
-            $menu.find('li a').each(function() {
-                var item = $(this);
-                if (item.data('value').toString() === oldValue.type && item.parent().hasClass('active')) {
-                    item.parent().removeClass('active');
-                } else if (item.data('value').toString() === newValue.type && !item.parent().hasClass('active')) {
-                    item.parent().addClass('active');
-                    $menu.parent().find('button').html(item.html() + '<span class="caret"></span>');
-                }
+                $menu.find('li a').each(function() {
+                    var item = $(this);
+                    if (item.data('value').toString() === oldValue[name] && item.parent().hasClass('active')) {
+                        item.parent().removeClass('active');
+                    } else if (item.data('value').toString() === newValue[name] && !item.parent().hasClass('active')) {
+                        item.parent().addClass('active');
+                        $menu.parent().find('button').html(item.html() + '<span class="caret"></span>');
+                    }
+                });
             });
 
             ChoiceFilter.__super__._onValueUpdated.apply(this, arguments);

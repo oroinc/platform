@@ -165,17 +165,20 @@ class LanguageOperationsTest extends ActionTestCase
     /**
      * @param Language $language
      * @param string $operationName
-     * @return Client
+     * @return string
      */
     private function getOperationDialogUrl(Language $language, $operationName)
     {
-        return $this->getUrl($this->getOperationDialogRoute(), array_merge([
-            'operationName' => $operationName,
-            'entityId' => $language->getId(),
-            'entityClass' => Language::class,
-            '_widgetContainer' => 'dialog',
-            '_wid' => 'test-uuid',
-        ], []));
+        return $this->getUrl(
+            $this->getOperationDialogRoute(),
+            [
+                'operationName' => $operationName,
+                'entityId' => $language->getId(),
+                'entityClass' => Language::class,
+                '_widgetContainer' => 'dialog',
+                '_wid' => 'test-uuid',
+            ]
+        );
     }
 
     /**
