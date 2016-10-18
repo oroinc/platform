@@ -447,6 +447,9 @@ abstract class AbstractEmailSynchronizer implements LoggerAwareInterface
         $min = clone $now;
         $min->sub(new \DateInterval('P1Y'));
 
+        // time shift in minutes for fails origins
+        $timeShift = 30;
+
         // rules:
         // - items with earlier sync code modification dates have higher priority
         // - previously failed items are shifted at 30 minutes back (it means that if sync failed
@@ -457,9 +460,8 @@ abstract class AbstractEmailSynchronizer implements LoggerAwareInterface
             ->select(
                 'o'
                 . ', CASE WHEN o.syncCode = :inProcess THEN 0 ELSE 1 END AS HIDDEN p1'
-                . ', (COALESCE(o.syncCode, 1000) * 30'
-                . ' + TIMESTAMPDIFF(MINUTE, COALESCE(o.syncCodeUpdatedAt, :min), :now)'
-                . ' / (CASE o.syncCode WHEN :success THEN 100 ELSE 1 END)) AS HIDDEN p2'
+                . ', (TIMESTAMPDIFF(MINUTE, COALESCE(o.syncCodeUpdatedAt, :min), :now)'
+                . ' - (CASE o.syncCode WHEN :success THEN 0 ELSE :timeShift END)) AS HIDDEN p2'
             )
             ->where('o.isActive = :isActive AND (o.syncCodeUpdatedAt IS NULL OR o.syncCodeUpdatedAt <= :border)')
             ->orderBy('p1, p2 DESC, o.syncCodeUpdatedAt')
@@ -469,6 +471,7 @@ abstract class AbstractEmailSynchronizer implements LoggerAwareInterface
             ->setParameter('now', $now)
             ->setParameter('min', $min)
             ->setParameter('border', $border)
+            ->setParameter('timeShift', $timeShift)
             ->setMaxResults($maxConcurrentTasks + 1)
             ->getQuery();
 

@@ -17,7 +17,6 @@ class TransitionHandler extends AbstractHandler
         'is_unavailable_hidden',
         'acl_resource',
         'acl_message',
-        'message',
         'transition_definition',
         'frontend_options',
         'form_type',

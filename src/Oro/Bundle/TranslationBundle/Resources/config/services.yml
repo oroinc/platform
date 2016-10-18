@@ -17,7 +17,6 @@ parameters:
     oro_translation.oro_translation.adapter.class:              Oro\Bundle\TranslationBundle\Provider\OroTranslationAdapter
     oro_translation.guzzle_client.class:                        Guzzle\Http\Client
 
-    oro_translation.twig.translation.extension.class:           Oro\Bundle\TranslationBundle\Twig\TranslationExtension
     oro_translation.packages_provider.class:                    Oro\Bundle\TranslationBundle\Provider\PackagesProvider
     oro_translation.event_listener.language_change.class:       Oro\Bundle\TranslationBundle\EventListener\LanguageChangeListener
 
@@ -132,9 +131,10 @@ services:
         lazy: true
 
     oro_translation.twig.translation.extension:
-        class: %oro_translation.twig.translation.extension.class%
+        class: 'Oro\Bundle\TranslationBundle\Twig\TranslationExtension'
         arguments:
-            - %oro_translation.debug_translator%
+            - '%oro_translation.debug_translator%'
+            - '@oro_translation.helper.translation_route'
         tags:
             - { name: twig.extension }
 
@@ -245,3 +245,8 @@ services:
     oro_translation.generator.translation_key:
         class: 'Oro\Bundle\TranslationBundle\Translation\TranslationKeyGenerator'
         public: false
+
+    oro_translation.helper.translation_route:
+        class: 'Oro\Bundle\TranslationBundle\Helper\TranslationRouteHelper'
+        arguments:
+            - '@oro_datagrid.helper.route'

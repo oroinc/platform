@@ -34,7 +34,8 @@ class WorkflowDefinitionHandleBuilderTest extends \PHPUnit_Framework_TestCase
             ->with($processedConfiguration['name'], $processedConfiguration)
             ->will($this->returnValue($workflowDefinition));
 
-        $handleBuilder = new WorkflowDefinitionHandleBuilder($handler, $configuration, $configurationBuilder);
+        $handleBuilder = new WorkflowDefinitionHandleBuilder($configuration, $configurationBuilder);
+        $handleBuilder->addHandler($handler);
         $this->assertEquals($workflowDefinition, $handleBuilder->buildFromRawConfiguration($rawConfiguration));
     }
 }
