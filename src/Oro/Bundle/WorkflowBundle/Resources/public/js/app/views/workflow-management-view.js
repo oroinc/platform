@@ -48,6 +48,11 @@ define(function(require) {
 
         render: function() {
             this.renderSteps();
+            if (this.model.translateLinkLabel) {
+                var template = _.template($('#workflow-translate-link-template').html());
+                $('#workflow_translate_link_label').html(template({translateLink: this.model.translateLinkLabel}));
+            }
+
             return this;
         },
 
