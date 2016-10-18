@@ -25,6 +25,16 @@ class UserOrganizationGuesser
             return $token->getOrganizationContext();
         }
 
+        return $this->guessByUser($user);
+    }
+
+    /**
+     * @param OrganizationAwareUserInterface $user
+     *
+     * @return null|Organization
+     */
+    public function guessByUser(OrganizationAwareUserInterface $user)
+    {
         $activeOrganizations = $user->getOrganizations(true);
         $creatorOrganization = $user->getOrganization();
 

@@ -143,7 +143,7 @@ class GridView implements ViewInterface
     /**
      * Collection of users who have chosen this grid view as default.
      *
-     * @var ArrayCollection|User[]
+     * @var ArrayCollection|GridViewUser[]
      *
      * @ORM\OneToMany(
      *      targetEntity="Oro\Bundle\DataGridBundle\Entity\GridViewUser",
@@ -421,7 +421,7 @@ class GridView implements ViewInterface
     }
 
     /**
-     * @return ArrayCollection|User[]
+     * @return ArrayCollection|GridViewUser[]
      */
     public function getUsers()
     {
@@ -429,11 +429,11 @@ class GridView implements ViewInterface
     }
 
     /**
-     * @param User $user
+     * @param GridViewUser $user
      *
      * @return $this
      */
-    public function addUser(User $user)
+    public function addUser(GridViewUser $user)
     {
         if (!$this->users->contains($user)) {
             $this->users->add($user);
@@ -443,9 +443,9 @@ class GridView implements ViewInterface
     }
 
     /**
-     * @param User $user
+     * @param GridViewUser $user
      */
-    public function removeUser(User $user)
+    public function removeUser(GridViewUser $user)
     {
         $this->users->removeElement($user);
     }

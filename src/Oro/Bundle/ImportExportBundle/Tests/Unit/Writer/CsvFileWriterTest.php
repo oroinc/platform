@@ -183,7 +183,6 @@ class CsvFileWriterTest extends \PHPUnit_Framework_TestCase
         $actualContent = preg_replace('/\r\n?/', "\n", $actualContent);
 
         $this->assertEquals($expectedContent, $actualContent);
-
     }
 
     /**

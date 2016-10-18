@@ -6,7 +6,11 @@ use Symfony\Component\Intl\Intl;
 
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\LocaleBundle\DependencyInjection\Configuration as LocaleConfiguration;
+use Oro\Bundle\CurrencyBundle\DependencyInjection\Configuration as CurrencyConfiguration;
 
+/**
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
+ */
 class LocaleSettings
 {
     const ADDRESS_FORMAT_KEY  = 'format';
@@ -290,9 +294,9 @@ class LocaleSettings
     public function getCurrency()
     {
         if (null === $this->currency) {
-            $this->currency = $this->configManager->get('oro_locale.currency');
+            $this->currency = $this->configManager->get('oro_currency.default_currency');
             if (!$this->currency) {
-                $this->currency = LocaleConfiguration::DEFAULT_CURRENCY;
+                $this->currency = CurrencyConfiguration::DEFAULT_CURRENCY;
             }
         }
         return $this->currency;
@@ -427,6 +431,23 @@ class LocaleSettings
         }
 
         return LocaleConfiguration::DEFAULT_COUNTRY;
+    }
+
+    /**
+     * Get locale and return currency
+     * If locale have 2 symbol like "eq"
+     * method has returned default currency
+     *
+     * @param string $locale
+     * @return string currency ISO code
+     */
+    public static function getCurrencyByLocale($locale)
+    {
+        if (strlen($locale) === 2) {
+            $locale = sprintf("%s_%s", $locale, self::getCountryByLocale($locale));
+        }
+        $formatter = new \NumberFormatter($locale, \NumberFormatter::CURRENCY);
+        return $formatter->getTextAttribute(\NumberFormatter::CURRENCY_CODE);
     }
 
     /**

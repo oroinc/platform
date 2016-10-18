@@ -132,7 +132,7 @@
                                 <div class="control-group">
                                     {{ _self.render_label("oro.workflow.form.name.label"|trans, true, "oro.workflow.workflowdefinition.transition.name.tooltip") }}
                                     <div class="controls">
-                                        <input type="text" name="label" value="<%= label %>" data-validation="{{ requiredConstraint|json_encode }}">
+                                        <input type="text" name="label" value="<%- label %>" data-validation="{{ requiredConstraint|json_encode }}">
                                     </div>
                                 </div>
 
@@ -148,10 +148,10 @@
                                         <option value=""></option>
                                         <% _.each(allowedStepsFrom, function (step) { %>
                                         <option
-                                            value="<%= step.get('name') %>"
+                                            value="<%- step.get('name') %>"
                                             <% if (step.get('name') == stepFromName) { %>selected="selected"<% } %>
                                         >
-                                            <%= step.get('label') %>
+                                            <%- step.get('label') %>
                                         </option>
                                         <% }); %>
                                         </select>
@@ -165,10 +165,10 @@
                                             <option value=""></option>
                                                 <% _.each(allowedStepsTo, function (step) { %>
                                             <option
-                                                value="<%= step.get('name') %>"
+                                                value="<%- step.get('name') %>"
                                                 <% if (step.get('name') == step_to) { %>selected="selected"<% } %>
                                             >
-                                                <%= step.get('label') %>
+                                                <%- step.get('label') %>
                                             </option>
                                             <% }); %>
                                         </select>
@@ -196,7 +196,7 @@
 
                                 <% print('<sc' + 'ript>'); %>
                                 require(['jquery'], function($) {
-                                $('#{{ form.transition_prototype_icon.vars.id }}').inputWidget('val', '<%= buttonIcon %>');
+                                $('#{{ form.transition_prototype_icon.vars.id }}').inputWidget('val', '<%- buttonIcon %>');
                                 });
                                 <% print('</sc' + 'ript>'); %>
 
@@ -205,9 +205,9 @@
                                     <div class="controls">
                                         <select name="button_color">
                                             <% _.each(allowedButtonStyles, function (style) { %>
-                                            <option value="<%= style.name %>"
+                                            <option value="<%- style.name %>"
                                             <% if (buttonStyle == style.name) { %>selected="selected"<% } %>
-                                            ><%= style.label %></option>
+                                            ><%- style.label %></option>
                                             <% }); %>
                                         </select>
                                     </div>
@@ -265,14 +265,14 @@
                                 <div class="control-group">
                                     {{ _self.render_label("oro.workflow.form.name.label"|trans, true, "oro.workflow.workflowdefinition.step.name.tooltip") }}
                                     <div class="controls">
-                                        <input type="text" name="label" value="<%= label %>" data-validation="{{ requiredConstraint|json_encode }}">
+                                        <input type="text" name="label" value="<%- label %>" data-validation="{{ requiredConstraint|json_encode }}">
                                     </div>
                                 </div>
 
                                 <div class="control-group">
                                     {{ _self.render_label("oro.workflow.form.position.label"|trans, false, "oro.workflow.workflowdefinition.step.order.tooltip") }}
                                     <div class="controls">
-                                        <input type="text" name="order" value="<%= order %>" data-validation="{{ orderConstraints|json_encode }}">
+                                        <input type="text" name="order" value="<%- order %>" data-validation="{{ orderConstraints|json_encode }}">
                                     </div>
                                 </div>
 
@@ -324,14 +324,14 @@
     <script type="text/template" id="step-row-template">
         <td class="step-name">
             <% if (_is_start) { %>
-            <%= label %>
+            <%- label %>
             <% } else { %>
-            <a href="#" class="edit-step" title="{{ 'Update this step'|trans}}"><%= label %></a>
+            <a href="#" class="edit-step" title="{{ 'Update this step'|trans}}"><%- label %></a>
             <% } %>
             <% if (is_final) { %>&nbsp;<strong title="{{ "oro.workflow.workflowdefinition.step.is_final.tooltip"|trans({}, "tooltips") }}">({{ "Final"|trans }})</strong><% } %>
         </td>
         <td class="step-transitions"></td>
-        <td><span title="{{ "oro.workflow.workflowdefinition.step.order.tooltip"|trans({}, "tooltips") }}"><%= order %></span></td>
+        <td><span title="{{ "oro.workflow.workflowdefinition.step.order.tooltip"|trans({}, "tooltips") }}"><%- order %></span></td>
         <td class="step-actions">
             <div class="pull-right">
                 <a href="#" class="add-step-transition" title="{{ 'Add transition to this step'|trans}}" class="action"><i class="icon-plus-sign hide-text"/></a>
@@ -345,11 +345,11 @@
     </script>
 
     <script type="text/template" id="transition-row-short-template">
-        <a href="#" class="edit-transition" title="{{ 'Update this transition'|trans }}"><%= label %></a>
+        <a href="#" class="edit-transition" title="{{ 'Update this transition'|trans }}"><%- label %></a>
         <a href="#" class="clone-transition action" title="{{ 'Clone this transition'|trans }}"><i class="icon-copy hide-text"></i></a>
         <a href="#" class="delete-transition action" title="{{ 'Delete this transition'|trans }}"><i class="icon-trash hide-text"></i></a>
         <i class="icon-long-arrow-right"/>
-        <span title="{{ "oro.workflow.workflowdefinition.transition.step_to.tooltip"|trans({}, "tooltips") }}"><%= stepToLabel %></span>
+        <span title="{{ "oro.workflow.workflowdefinition.transition.step_to.tooltip"|trans({}, "tooltips") }}"><%- stepToLabel %></span>
     </script>
 
     <script type="text/template" id="attribute-form-option-edit-template">
@@ -365,7 +365,7 @@
                 <div class="control-group">
                     {{ _self.render_label("oro.workflow.form.label.label"|trans, false, "oro.workflow.workflowdefinition.attribute.label.tooltip") }}
                     <div class="controls">
-                        <input type="text" name="label" value="<%= label %>" placeholder="{{ 'Leave empty for system value'|trans }}"/>
+                        <input type="text" name="label" value="<%- label %>" placeholder="{{ 'Leave empty for system value'|trans }}"/>
                     </div>
                 </div>
 
@@ -404,13 +404,13 @@
 
     <script type="text/template" id="attribute-form-option-row-template">
         <td>
-            <%= entityField %>
+            <%- entityField %>
             <% if (!is_entity_attribute) { %>
             <span class="muted">({{ 'System'|trans }})</span>
             <% } %>
         </td>
         <td>
-            <%= label %>
+            <%- label %>
             <% if (isSystemLabel) { %><span class="muted">({{ 'System'|trans }})</span><% } %>
         </td>
         <td>
@@ -455,9 +455,9 @@
 
     <script type="text/template" id="transition-row-template">
         <td class="transition-name">
-            <span title="{{ "oro.workflow.workflowdefinition.transition.name.tooltip"|trans({}, "tooltips") }}"><%= label %></span>
+            <span title="{{ "oro.workflow.workflowdefinition.transition.name.tooltip"|trans({}, "tooltips") }}"><%- label %></span>
         </td>
-        <td><span title="{{ "oro.workflow.workflowdefinition.transition.step_to.tooltip"|trans({}, "tooltips") }}"><%= stepToLabel %></span></td>
+        <td><span title="{{ "oro.workflow.workflowdefinition.transition.step_to.tooltip"|trans({}, "tooltips") }}"><%- stepToLabel %></span></td>
         <td class="transition-actions">
             <div class="pull-right">
                 <a href="#" class="delete-transition action" title="{{ 'Delete this transition'|trans }}"><i class="icon-trash hide-text"/></a>

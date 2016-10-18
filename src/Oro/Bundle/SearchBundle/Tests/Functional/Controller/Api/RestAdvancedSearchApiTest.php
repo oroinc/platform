@@ -2,18 +2,25 @@
 
 namespace Oro\Bundle\SearchBundle\Tests\Functional\Controller\Api;
 
+use Oro\Bundle\SearchBundle\Tests\Functional\Controller\DataFixtures\LoadSearchItemData;
+use Oro\Bundle\TestFrameworkBundle\Entity\Item;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
+use Oro\Component\Testing\SearchExtensionTrait;
 
 /**
- * @dbIsolation
- * @dbReindex
+ * @dbIsolationPerTest
  */
 class RestAdvancedSearchApiTest extends WebTestCase
 {
+    use SearchExtensionTrait;
+
     protected function setUp()
     {
-        $this->initClient([], $this->generateWsseAuthHeader());
-        $this->loadFixtures(['Oro\Bundle\SearchBundle\Tests\Functional\Controller\DataFixtures\LoadSearchItemData']);
+        parent::setUp();
+
+        $this->initClient([], $this->generateWsseAuthHeader(), true);
+        $this->loadFixtures([LoadSearchItemData::class], true);
+        $this->getSearchIndexer()->reindex(Item::class);
     }
 
     /**
@@ -24,6 +31,7 @@ class RestAdvancedSearchApiTest extends WebTestCase
      */
     public function testAdvancedSearch(array $request, array $response)
     {
+        $this->addOroDefaultPrefixToUrlInParameterArray($response['rest']['data'], 'record_url');
         $requestUrl = $request['query'];
         $this->client->request(
             'GET',

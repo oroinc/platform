@@ -29,6 +29,15 @@ class ConfigContextTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('test', $this->context->get(ConfigContext::CLASS_NAME));
     }
 
+    public function testTargetAction()
+    {
+        $this->assertNull($this->context->getTargetAction());
+
+        $this->context->setTargetAction('test');
+        $this->assertEquals('test', $this->context->getTargetAction());
+        $this->assertEquals('test', $this->context->get(ConfigContext::TARGET_ACTION));
+    }
+
     public function testMaxRelatedEntities()
     {
         $this->assertNull($this->context->getMaxRelatedEntities());
