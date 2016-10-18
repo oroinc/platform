@@ -21,7 +21,7 @@ class SendEmailMessageProcessor implements MessageProcessorInterface, TopicSubsc
     /**
      * @var Processor
      */
-    private $mailProcessor;
+    private $mailerProcessor;
 
     /**
      * @var LoggerInterface
@@ -29,13 +29,15 @@ class SendEmailMessageProcessor implements MessageProcessorInterface, TopicSubsc
     private $logger;
 
     /**
-     * @param DirectMailer $mailer
+     *
+     * @param DirectMailer    $mailer
+     * @param Processor       $processor
      * @param LoggerInterface $logger
      */
     public function __construct(DirectMailer $mailer, Processor $processor, LoggerInterface $logger)
     {
         $this->mailer = $mailer;
-        $this->mailProcessor = $processor;
+        $this->mailerProcessor = $processor;
         $this->logger = $logger;
     }
 
@@ -78,7 +80,7 @@ class SendEmailMessageProcessor implements MessageProcessorInterface, TopicSubsc
         $emailMessage->setFrom($data['fromEmail'], $data['fromName']);
         $emailMessage->setTo($data['toEmail']);
 
-        $this->mailProcessor->processEmbeddedImages($emailMessage);
+        $this->mailerProcessor->processEmbeddedImages($emailMessage);
 
         if (! $this->mailer->send($emailMessage)) {
             $this->logger->critical(
