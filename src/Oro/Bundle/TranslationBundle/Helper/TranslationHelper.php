@@ -3,7 +3,6 @@
 namespace Oro\Bundle\TranslationBundle\Helper;
 
 use Doctrine\Bundle\DoctrineBundle\Registry;
-use Doctrine\DBAL\Types\Type;
 
 use Oro\Bundle\TranslationBundle\Entity\Repository\TranslationRepository;
 use Oro\Bundle\TranslationBundle\Entity\Translation;
@@ -85,14 +84,9 @@ class TranslationHelper
      */
     public function findValue($key, $locale, $domain)
     {
-        $queryBuilder = $this->getTranslationRepository()->createQueryBuilder('t')
-            ->select('t.value')
-            ->join('t.language', 'l')
-            ->join('t.translationKey', 'k')
-            ->where('l.code = :code AND k.key = :key AND k.domain = :domain')
-            ->setParameter('code', $locale, Type::STRING)
-            ->setParameter('key', $key, Type::STRING)
-            ->setParameter('domain', $domain, Type::STRING);
+        $queryBuilder = $this->getTranslationRepository()
+            ->getFindValueQueryBuilder($key, $locale, $domain)
+            ->select('t.value');
 
         $result = $queryBuilder->getQuery()->getOneOrNullResult();
 

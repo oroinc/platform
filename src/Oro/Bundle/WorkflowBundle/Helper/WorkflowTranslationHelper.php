@@ -2,14 +2,15 @@
 
 namespace Oro\Bundle\WorkflowBundle\Helper;
 
+use Oro\Bundle\TranslationBundle\Translation\KeySource\TranslationKeySource;
 use Oro\Bundle\TranslationBundle\Helper\TranslationHelper;
 use Oro\Bundle\TranslationBundle\Manager\TranslationManager;
-use Oro\Bundle\TranslationBundle\Translation\Translator;
 use Oro\Bundle\TranslationBundle\Translation\TranslationKeyGenerator;
-use Oro\Bundle\TranslationBundle\Translation\KeySource\TranslationKeySource;
+use Oro\Bundle\TranslationBundle\Translation\Translator;
 
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Translation\KeyTemplate\WorkflowTemplate;
+use Oro\Bundle\WorkflowBundle\Translation\WorkflowTranslationFieldsIterator;
 
 class WorkflowTranslationHelper
 {
@@ -27,23 +28,28 @@ class WorkflowTranslationHelper
     /** @var TranslationKeyGenerator */
     protected $translationKeyGenerator;
 
-    /** @var array */
-    protected $translations = [];
+    /** @var WorkflowTranslationFieldsIterator */
+    protected $translationFieldsIterator;
 
     /**
      * @param Translator $translator
      * @param TranslationManager $translationManager
+     * @param TranslationHelper $translationHelper
+     * @param TranslationKeyGenerator $translationKeyGenerator
+     * @param WorkflowTranslationFieldsIterator $translationFieldsIterator
      */
     public function __construct(
         Translator $translator,
         TranslationManager $translationManager,
         TranslationHelper $translationHelper,
-        TranslationKeyGenerator $translationKeyGenerator
+        TranslationKeyGenerator $translationKeyGenerator,
+        WorkflowTranslationFieldsIterator $translationFieldsIterator
     ) {
         $this->translator = $translator;
         $this->translationManager = $translationManager;
         $this->translationHelper = $translationHelper;
         $this->translationKeyGenerator = $translationKeyGenerator;
+        $this->translationFieldsIterator = $translationFieldsIterator;
     }
 
     /**
@@ -113,28 +119,16 @@ class WorkflowTranslationHelper
      */
     public function extractTranslations(WorkflowDefinition $definition, $workflowName = null)
     {
-        $this->prepareTranslations($workflowName ?: $definition->getName());
-
+        $workflowName = $workflowName ?: $definition->getName();
+        $this->prepareTranslations($workflowName);
         $definition->setLabel($this->getTranslation($definition->getLabel()));
-
         $configuration = $definition->getConfiguration();
 
-        foreach ($configuration['steps'] as &$value) {
-            $value['label'] = $this->getTranslation($value['label']);
+        $keys = $this->translationFieldsIterator->iterateConfigTranslationFields($workflowName, $configuration);
+        foreach ($keys as &$item) {
+            $item = $this->getTranslation($item);
         }
-
-        foreach ($configuration['transitions'] as &$value) {
-            $value['label'] = $this->getTranslation($value['label']);
-            $value['message'] = $this->getTranslation($value['message']);
-        }
-
-        foreach ($configuration['attributes'] as &$value) {
-            $value['label'] = $this->getTranslation($value['label']);
-        }
-
-        foreach ($definition->getSteps() as $step) {
-            $step->setLabel($this->getTranslation($step->getLabel()));
-        }
+        unset($item);
 
         $definition->setConfiguration($configuration);
     }

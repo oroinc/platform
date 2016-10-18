@@ -4,6 +4,7 @@ namespace Oro\Bundle\TranslationBundle\Entity\Repository;
 
 use Doctrine\DBAL\Types\Type;
 use Doctrine\ORM\EntityRepository;
+use Doctrine\ORM\QueryBuilder;
 
 use Oro\Bundle\TranslationBundle\Entity\Language;
 use Oro\Bundle\TranslationBundle\Entity\Translation;
@@ -14,19 +15,28 @@ class TranslationRepository extends EntityRepository
      * @param string $key
      * @param string $locale
      * @param string $domain
-     * @return Translation|null
+     *
+     * @return QueryBuilder
      */
-    public function findValue($key, $locale, $domain)
+    public function getFindValueQueryBuilder($key, $locale, $domain)
     {
-        $qb = $this->createQueryBuilder('t')
+        return $this->createQueryBuilder('t')
             ->join('t.language', 'l')
             ->join('t.translationKey', 'k')
             ->where('l.code = :code AND k.key = :key AND k.domain = :domain')
             ->setParameter('code', $locale, Type::STRING)
             ->setParameter('key', $key, Type::STRING)
             ->setParameter('domain', $domain, Type::STRING);
-
-        return $qb->getQuery()->getOneOrNullResult();
+    }
+    /**
+     * @param string $key
+     * @param string $locale
+     * @param string $domain
+     * @return Translation|null
+     */
+    public function findValue($key, $locale, $domain)
+    {
+        $this->getFindValueQueryBuilder($key, $locale, $domain)->getQuery()->getOneOrNullResult();
     }
 
     /**
