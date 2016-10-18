@@ -3,6 +3,7 @@
 namespace Oro\Bundle\NotificationBundle\Tests\Unit\Async;
 
 use Oro\Bundle\EmailBundle\Mailer\DirectMailer;
+use Oro\Bundle\EmailBundle\Mailer\Processor;
 use Oro\Bundle\NotificationBundle\Async\SendEmailMessageProcessor;
 use Oro\Bundle\NotificationBundle\Async\Topics;
 use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
@@ -14,7 +15,11 @@ class SendEmailMessageProcessorTest extends \PHPUnit_Framework_TestCase
 {
     public function testShouldConstructWithRequiredArguments()
     {
-        new SendEmailMessageProcessor($this->createMailerMock(), $this->createLoggerMock());
+        new SendEmailMessageProcessor(
+            $this->createMailerMock(),
+            $this->createEmailProcessorMock(),
+            $this->createLoggerMock()
+        );
     }
 
     public function testShouldBeSubscribedForTopics()
@@ -37,6 +42,7 @@ class SendEmailMessageProcessorTest extends \PHPUnit_Framework_TestCase
 
         $processor = new SendEmailMessageProcessor(
             $this->createMailerMock(),
+            $this->createEmailProcessorMock(),
             $logger
         );
 
@@ -61,6 +67,7 @@ class SendEmailMessageProcessorTest extends \PHPUnit_Framework_TestCase
 
         $processor = new SendEmailMessageProcessor(
             $this->createMailerMock(),
+            $this->createEmailProcessorMock(),
             $logger
         );
 
@@ -93,6 +100,7 @@ class SendEmailMessageProcessorTest extends \PHPUnit_Framework_TestCase
 
         $processor = new SendEmailMessageProcessor(
             $mailer,
+            $this->createEmailProcessorMock(),
             $logger
         );
 
@@ -124,6 +132,7 @@ class SendEmailMessageProcessorTest extends \PHPUnit_Framework_TestCase
 
         $processor = new SendEmailMessageProcessor(
             $mailer,
+            $this->createEmailProcessorMock(),
             $logger
         );
 
@@ -165,5 +174,17 @@ class SendEmailMessageProcessorTest extends \PHPUnit_Framework_TestCase
     private function createSessionMock()
     {
         return $this->getMock(SessionInterface::class);
+    }
+
+    /**
+     * @return \PHPUnit_Framework_MockObject_MockObject | Processor
+     */
+    private function createEmailProcessorMock()
+    {
+        return $this
+            ->getMockBuilder(Processor::class)
+            ->disableOriginalConstructor()
+            ->getMock()
+        ;
     }
 }

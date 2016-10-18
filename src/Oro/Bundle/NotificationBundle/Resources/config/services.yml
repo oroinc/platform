@@ -203,6 +203,7 @@ services:
         class: 'Oro\Bundle\NotificationBundle\Async\SendEmailMessageProcessor'
         arguments:
             - '@oro_email.direct_mailer'
+            - '@oro_email.mailer.processor'
             - '@logger'
         tags:
             - { name: 'oro_message_queue.client.message_processor' }

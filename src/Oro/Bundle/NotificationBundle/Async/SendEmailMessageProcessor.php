@@ -3,6 +3,7 @@
 namespace Oro\Bundle\NotificationBundle\Async;
 
 use Oro\Bundle\EmailBundle\Mailer\DirectMailer;
+use Oro\Bundle\EmailBundle\Mailer\Processor;
 use Oro\Component\MessageQueue\Client\TopicSubscriberInterface;
 use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
 use Oro\Component\MessageQueue\Transport\MessageInterface;
@@ -18,6 +19,11 @@ class SendEmailMessageProcessor implements MessageProcessorInterface, TopicSubsc
     private $mailer;
 
     /**
+     * @var Processor
+     */
+    private $mailProcessor;
+
+    /**
      * @var LoggerInterface
      */
     private $logger;
@@ -26,9 +32,10 @@ class SendEmailMessageProcessor implements MessageProcessorInterface, TopicSubsc
      * @param DirectMailer $mailer
      * @param LoggerInterface $logger
      */
-    public function __construct(DirectMailer $mailer, LoggerInterface $logger)
+    public function __construct(DirectMailer $mailer, Processor $processor, LoggerInterface $logger)
     {
         $this->mailer = $mailer;
+        $this->mailProcessor = $processor;
         $this->logger = $logger;
     }
 
@@ -71,6 +78,7 @@ class SendEmailMessageProcessor implements MessageProcessorInterface, TopicSubsc
         $emailMessage->setFrom($data['fromEmail'], $data['fromName']);
         $emailMessage->setTo($data['toEmail']);
 
+        $this->mailProcessor->processEmbeddedImages($emailMessage);
 
         if (! $this->mailer->send($emailMessage)) {
             $this->logger->critical(
