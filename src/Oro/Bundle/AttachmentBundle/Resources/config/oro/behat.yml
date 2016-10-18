@@ -1,5 +1,5 @@
 elements:
-  Attachment:
+  Attachment Form:
     selector: 'form[id^="oro_attachment"]'
     class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Form
     options:

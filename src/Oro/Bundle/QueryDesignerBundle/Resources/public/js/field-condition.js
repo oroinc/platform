@@ -83,7 +83,7 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'orofilter/js/ma
             }
 
             // @TODO temporary workaround. Will by fixed in BAP-8112
-            if (conditions.entity === 'OroCRM\\Bundle\\AccountBundle\\Entity\\Account' &&
+            if (conditions.entity === 'Oro\\Bundle\\AccountBundle\\Entity\\Account' &&
                 conditions.field === 'lifetimeValue') {
                 filter = {
                     type: 'none',

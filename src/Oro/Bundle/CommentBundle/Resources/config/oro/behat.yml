@@ -1,5 +1,5 @@
 elements:
-  Comment:
+  Comment Form:
     selector: 'form.comment-form'
     class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Form
     options:
