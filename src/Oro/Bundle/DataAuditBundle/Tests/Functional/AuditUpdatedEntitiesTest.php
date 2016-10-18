@@ -32,7 +32,7 @@ class AuditUpdatedEntitiesTest extends WebTestCase
         self::$loadedFixtures = [];
     }
 
-    public function testShouldCreateAuditEntityForUpdatedEntityWithoutChanges()
+    public function testShouldNotCreateAuditEntityForUpdatedEntityWithoutChanges()
     {
         $message = $this->createDummyMessage([
             'entities_updated' => [
@@ -49,9 +49,7 @@ class AuditUpdatedEntitiesTest extends WebTestCase
 
         $processor->process($message, new NullSession());
 
-        $this->assertStoredAuditCount(1);
-        $audit = $this->findLastStoredAudit();
-        $this->assertCount(0, $audit->getFields());
+        $this->assertStoredAuditCount(0);
     }
 
     public function testShouldCreateAuditForUpdatedEntity()
@@ -402,7 +400,7 @@ class AuditUpdatedEntitiesTest extends WebTestCase
         $this->assertEquals($expectedOldVal, $auditField->getOldValue());
     }
 
-    public function testShouldStillCreateAuditEntityForUpdatedEntityIfOnlyNotAuditableFieldChangedButEntityAuditable()
+    public function testShouldNotCreateAuditEntityForUpdatedEntityIfOnlyNotAuditableFieldChangedButEntityAuditable()
     {
         $message = $this->createDummyMessage([
             'entities_updated' => [
@@ -421,9 +419,7 @@ class AuditUpdatedEntitiesTest extends WebTestCase
 
         $processor->process($message, new NullSession());
 
-        $this->assertStoredAuditCount(1);
-        $audit = $this->findLastStoredAudit();
-        $this->assertCount(0, $audit->getFields());
+        $this->assertStoredAuditCount(0);
     }
 
     public function testShouldCreateAuditEntityForUpdatedEntityIgnoringNotAuditableFields()

@@ -41,11 +41,11 @@ class ConvertEntityChangesToAuditService
     private $convertChangeSetToAuditFieldsService;
 
     /**
-     * @param ManagerRegistry $doctrine
-     * @param SetNewAuditVersionService $setNewAuditVersionService
-     * @param FindOrCreateAuditService $findOrCreateAuditService
-     * @param GetEntityAuditMetadataService $getEntityAuditMetadataService
-     * @param GetHumanReadableEntityNameService $getHumanReadableEntityNameService
+     * @param ManagerRegistry                      $doctrine
+     * @param SetNewAuditVersionService            $setNewAuditVersionService
+     * @param FindOrCreateAuditService             $findOrCreateAuditService
+     * @param GetEntityAuditMetadataService        $getEntityAuditMetadataService
+     * @param GetHumanReadableEntityNameService    $getHumanReadableEntityNameService
      * @param ConvertChangeSetToAuditFieldsService $convertChangeSetToAuditFieldsService
      */
     public function __construct(
@@ -65,10 +65,10 @@ class ConvertEntityChangesToAuditService
     }
 
     /**
-     * @param array $entitiesChanges
-     * @param $transactionId
-     * @param \DateTime $loggedAt
-     * @param $auditDefaultAction
+     * @param array             $entitiesChanges
+     * @param string            $transactionId
+     * @param \DateTime         $loggedAt
+     * @param string|null       $auditDefaultAction
      * @param AbstractUser|null $user
      * @param Organization|null $organization
      */
@@ -87,20 +87,23 @@ class ConvertEntityChangesToAuditService
             $entityId = $entityChange['entity_id'];
             /** @var EntityManagerInterface $entityManager */
             $entityManager = $this->doctrine->getManagerForClass($entityClass);
-            $entityMeta = $entityManager->getClassMetadata($entityClass);
-            $entityAuditMeta = $this->getEntityAuditMetadataService->getMetadata($entityClass);
-            if (false == $entityAuditMeta) {
+            $entityMetadata = $entityManager->getClassMetadata($entityClass);
+            $entityAuditMetadata = $this->getEntityAuditMetadataService->getMetadata($entityClass);
+            if (null === $entityAuditMetadata) {
                 continue;
             }
 
             $fields = $this->convertChangeSetToAuditFieldsService->convert(
-                $entityAuditMeta,
-                $entityMeta,
+                $entityAuditMetadata,
+                $entityMetadata,
                 $entityChange['change_set']
             );
+            if (empty($fields)) {
+                continue;
+            }
 
             $audit = $this->findOrCreateAuditService->findOrCreate($user, $entityId, $entityClass, $transactionId);
-            if (false == $audit->getVersion()) {
+            if (!$audit->getVersion()) {
                 $audit->setUser($user);
                 $audit->setOrganization($organization);
                 $audit->setLoggedAt($loggedAt);
@@ -110,14 +113,14 @@ class ConvertEntityChangesToAuditService
                 $this->setNewAuditVersionService->setVersion($audit);
             }
 
-            if (false == $audit->getAction()) {
+            if (!$audit->getAction()) {
                 $audit->setAction($this->guessAuditAction($audit, $auditDefaultAction));
                 $auditEntityManager->flush();
             }
 
             foreach ($fields as $newField) {
                 $currentField = $audit->getField($newField->getField());
-                if ($currentField && $entityMeta->isCollectionValuedAssociation($currentField->getField())) {
+                if ($currentField && $entityMetadata->isCollectionValuedAssociation($currentField->getField())) {
                     $currentField->mergeCollectionField($newField);
                 } else {
                     $audit->addField($newField);
@@ -131,10 +134,10 @@ class ConvertEntityChangesToAuditService
     }
 
     /**
-     * @param array $entitiesChanges
-     * @param $transactionId
-     * @param $auditDefaultAction
-     * @param \DateTime $loggedAt
+     * @param array             $entitiesChanges
+     * @param string            $transactionId
+     * @param string            $auditDefaultAction
+     * @param \DateTime         $loggedAt
      * @param AbstractUser|null $user
      * @param Organization|null $organization
      */
@@ -152,13 +155,13 @@ class ConvertEntityChangesToAuditService
             $entityClass = $entityChange['entity_class'];
             $entityId = $entityChange['entity_id'];
             /** @var EntityManagerInterface $entityManager */
-            $entityAuditMeta = $this->getEntityAuditMetadataService->getMetadata($entityClass);
-            if (false == $entityAuditMeta) {
+            $entityAuditMetadata = $this->getEntityAuditMetadataService->getMetadata($entityClass);
+            if (null === $entityAuditMetadata) {
                 continue;
             }
 
             $audit = $this->findOrCreateAuditService->findOrCreate($user, $entityId, $entityClass, $transactionId);
-            if (false == $audit->getAction()) {
+            if (!$audit->getAction()) {
                 // a new audit entity
                 $audit->setAction($auditDefaultAction);
                 $audit->setUser($user);

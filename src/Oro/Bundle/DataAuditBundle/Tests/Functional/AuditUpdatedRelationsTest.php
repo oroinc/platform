@@ -29,7 +29,7 @@ class AuditUpdatedRelationsTest extends WebTestCase
         self::$loadedFixtures = [];
     }
 
-    public function testShouldStillCreateAuditEntityForUpdatedCollectionWithoutChangesButEntityAuditable()
+    public function testShouldNotCreateAuditEntityForUpdatedCollectionWithoutChangesButEntityAuditable()
     {
         $message = $this->createDummyMessage([
             'collections_updated' => [
@@ -46,9 +46,7 @@ class AuditUpdatedRelationsTest extends WebTestCase
 
         $processor->process($message, new NullSession());
 
-        $this->assertStoredAuditCount(1);
-        $audit = $this->findLastStoredAudit();
-        $this->assertCount(0, $audit->getFields());
+        $this->assertStoredAuditCount(0);
     }
 
     public function testShouldUsePreviouslyCreatedAuditWithSameTransaction()
