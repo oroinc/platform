@@ -56,7 +56,7 @@ class FooMessageProcessor implements MessageProcessor, TopicSubscriberInterface
 Register it as a container service and subscribe to the topic:
 
 ```yaml
-orocrm_channel.async.change_integration_status_processor:
+oro_channel.async.change_integration_status_processor:
     class: 'FooMessageProcessor'
     tags:
         - { name: 'oro_message_queue.client.message_processor' }
@@ -128,3 +128,72 @@ You have to provide an implementation for them
 * [TopicSubscriberInterface](../../Component/MessageQueue/Client/TopicSubscriberInterface.php) - Kind of EventSubscriberInterface. It allows you to keep a processing code and topics it is subscribed to in one place.
 * [MessageConsumeCommand](../../Component/MessageQueue/Client/ConsumeMessagesCommand.php) - A command you use to consume messages.
 * [QueueConsumer](../../Component/MessageQueue/Consumption/QueueConsumer.php) - A class that works inside the command and watch for a new message and once it is get it pass it to a message processor.
+
+## Functional tests
+
+To functionally test that a message was sent, you can use [MessageQueueExtension](./Test/Functional/MessageQueueExtension.php). Also, in case if you need custom logic for manage sent messages, you can use [MessageQueueAssertTrait](./Test/Functional/MessageQueueAssertTrait.php). 
+
+But before you start, you need to register `oro_message_queue.test.message_collector` service for `test` environment.
+
+```yaml
+# app/config/config_test.yml
+
+services:
+    oro_message_queue.test.message_collector:
+        class: Oro\Bundle\MessageQueueBundle\Test\Functional\MessageCollector
+        decorates: oro_message_queue.client.message_producer
+        arguments:
+            - '@oro_message_queue.test.message_collector.inner'
+```
+
+The following example shows how to test whether a message was sent.
+
+```php
+<?php
+namespace Acme\Bundle\AcmeBundle\Tests\Functional;
+
+use Oro\Bundle\MessageQueueBundle\Test\Functional\MessageQueueExtension;
+use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
+
+class SomeTest extends WebTestCase
+{
+    use MessageQueueExtension;
+
+    public function testSingleMessage()
+    {
+        // assert that a message was sent to a topic
+        self::assertMessageSent('aFooTopic', 'Something has happened');
+    }
+
+    public function testSeveralMessages()
+    {
+        // assert that exactly given messages were sent to a topic
+        self::assertMessagesSent(
+            'aFooTopic',
+            [
+                'Something has happened',
+                'Something else has happened',
+            ]
+        );
+    }
+
+    public function testNoMessages()
+    {
+        // assert that no any message was sent to a topic
+        self::assertEmptyMessages('aFooTopic');
+    }
+
+    public function testAllMessages()
+    {
+        // assert that exactly given messages were sent
+        // NOTE: use this assertion with caution because it is possible
+        // that messages not related to a testing functionality were sent as well
+        self::assertAllMessagesSent(
+            [
+                ['topic' => 'aFooTopic', 'message' => 'Something has happened'],
+                ['topic' => 'aFooTopic', 'message' => 'Something else has happened'],
+            ]
+        );
+    }
+}
+```

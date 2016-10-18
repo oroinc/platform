@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\WorkflowBundle\Tests\Functional\Entity\Repository;
 
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\Query\Expr\Join;
 
@@ -193,6 +194,25 @@ class WorkflowItemRepositoryTest extends WebTestCase
         }
     }
 
+    public function testFindByStepNamesAndEntityClass()
+    {
+        $items = $this->repository->findByStepNamesAndEntityClass(
+            new ArrayCollection(['second_point']),
+            'Oro\\Bundle\\TestFrameworkBundle\\Entity\\WorkflowAwareEntity',
+            'id'
+        );
+
+        $this->assertCount(LoadWorkflowAwareEntities::COUNT, $items);
+
+        $expected = [];
+        // 21 because "test_multistep_flow" was second loaded workflows in fixtures
+        for ($i = 21; $i < 21 + LoadWorkflowAwareEntities::COUNT; $i++) {
+            $item = $this->getReference('test_multistep_flow_item.' . $i);
+            
+            $this->assertContains($item, $items);
+        }
+    }
+
     public function testResetWorkflowData()
     {
         // assert input state
@@ -211,7 +231,7 @@ class WorkflowItemRepositoryTest extends WebTestCase
 
         // reset only WITH_START_STEP workflow data with more than one batch
         $this->repository->resetWorkflowData(
-            $this->getWorkflowDefinitionByName(LoadWorkflowDefinitions::WITH_START_STEP),
+            LoadWorkflowDefinitions::WITH_START_STEP,
             LoadWorkflowAwareEntities::COUNT - 1
         );
 
@@ -231,12 +251,8 @@ class WorkflowItemRepositoryTest extends WebTestCase
         );
 
         // reset only NO_START_STEP workflow data with single execution
-        $this->repository->resetWorkflowData(
-            $this->getWorkflowDefinitionByName(LoadWorkflowDefinitions::NO_START_STEP)
-        );
-        $this->repository->resetWorkflowData(
-            $this->getWorkflowDefinitionByName(LoadWorkflowDefinitions::MULTISTEP)
-        );
+        $this->repository->resetWorkflowData(LoadWorkflowDefinitions::NO_START_STEP);
+        $this->repository->resetWorkflowData(LoadWorkflowDefinitions::MULTISTEP);
 
         // assert state: both NO_START_STEP and WITH_START_STEP workflow entities were reset
         // - 60 entities without workflow items
@@ -343,7 +359,7 @@ class WorkflowItemRepositoryTest extends WebTestCase
      * @param $workflowDefinitionName
      * @return null|WorkflowDefinition
      */
-    protected function getWorkflowDefinitionByName($workflowDefinitionName)
+    private function getWorkflowDefinitionByName($workflowDefinitionName)
     {
         $registry = $this->getContainer()->get('doctrine');
         $registry->getManager()->clear();

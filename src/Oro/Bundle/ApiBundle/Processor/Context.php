@@ -17,6 +17,7 @@ use Oro\Bundle\ApiBundle\Exception\RuntimeException;
 use Oro\Bundle\ApiBundle\Filter\FilterCollection;
 use Oro\Bundle\ApiBundle\Filter\FilterValueAccessorInterface;
 use Oro\Bundle\ApiBundle\Filter\NullFilterValueAccessor;
+use Oro\Bundle\ApiBundle\Metadata\ActionMetadataExtra;
 use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
 use Oro\Bundle\ApiBundle\Metadata\MetadataExtraInterface;
 use Oro\Bundle\ApiBundle\Model\Error;
@@ -642,10 +643,14 @@ class Context extends ApiContext implements ContextInterface
     public function getMetadataExtras()
     {
         $extras = $this->get(self::METADATA_EXTRAS);
+        $extras = null !== $extras ? $extras : [];
+        $action = $this->getAction();
+        if ($action && (empty($extras) || !$this->hasActionMetadataExtra($extras))) {
+            $extras[] = new ActionMetadataExtra($action);
+            $this->set(self::METADATA_EXTRAS, $extras);
+        }
 
-        return null !== $extras
-            ? $extras
-            : [];
+        return $extras;
     }
 
     /**
@@ -743,6 +748,22 @@ class Context extends ApiContext implements ContextInterface
         } else {
             $this->remove(self::METADATA);
         }
+    }
+
+    /**
+     * @param MetadataExtraInterface[] $extras
+     *
+     * @return bool
+     */
+    protected function hasActionMetadataExtra(array $extras)
+    {
+        foreach ($extras as $extra) {
+            if ($extra->getName() === ActionMetadataExtra::NAME) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**

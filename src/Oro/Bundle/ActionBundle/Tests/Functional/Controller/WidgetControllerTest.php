@@ -315,14 +315,14 @@ class WidgetControllerTest extends WebTestCase
                 'label' => $label,
                 'enabled' => true,
                 'order' => 10,
-                'applications' => ['backend', 'frontend'],
+                'applications' => ['default', 'test'],
                 'frontend_options' => [],
                 'entities' => [],
                 'routes' => [],
             ]
         ];
 
-        return [
+        $configuration = [
             'existing entity right conditions' => [
                 'config' => array_merge_recursive(
                     $config,
@@ -489,6 +489,34 @@ class WidgetControllerTest extends WebTestCase
                 ],
             ]
         ];
+
+        return array_map(
+            function ($item) {
+                $item['config'] = array_map(
+                    function ($config) {
+                        return array_merge(
+                            [
+                                'enabled' => true,
+                                'applications' => [],
+                                'groups' => [],
+                                'entities' => [],
+                                'exclude_entities' => [],
+                                'for_all_entities' => false,
+                                'routes' => [],
+                                'datagrids' => [],
+                                'exclude_datagrids' => [],
+                                'for_all_datagrids' => false
+                            ],
+                            $config
+                        );
+                    },
+                    $item['config']
+                );
+
+                return $item;
+            },
+            $configuration
+        );
     }
 
     /**

@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\SearchBundle\Tests\Unit\Engine;
 
+use Oro\Bundle\SearchBundle\Engine\EngineV2Interface;
 use Oro\Bundle\SearchBundle\Engine\Indexer;
 use Oro\Bundle\SearchBundle\Engine\ObjectMapper;
 use Oro\Bundle\SearchBundle\Provider\SearchMappingProvider;
@@ -34,7 +35,7 @@ class IndexerTest extends \PHPUnit_Framework_TestCase
         $this->config        = require rtrim(__DIR__, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR . 'searchConfig.php';
         $this->entityManager = $this->getMockBuilder('Doctrine\ORM\EntityManager')
             ->disableOriginalConstructor()->getMock();
-        $this->engine        = $this->getMock('Oro\Bundle\SearchBundle\Engine\EngineInterface');
+        $this->engine        = $this->getMock(EngineV2Interface::class);
         $this->mapper        = new ObjectMapper(
             $this->getMock('Symfony\Component\EventDispatcher\EventDispatcherInterface'),
             $this->config
@@ -84,7 +85,6 @@ class IndexerTest extends \PHPUnit_Framework_TestCase
 
         $this->assertAttributeEquals($this->entityManager, 'em', $query);
         $this->assertEquals($this->config, $query->getMappingConfig());
-        $this->assertEquals('select', $query->getQuery());
     }
 
     public function testQuery()
@@ -115,59 +115,59 @@ class IndexerTest extends \PHPUnit_Framework_TestCase
     public function simpleSearchDataProvider()
     {
         return [
-            'no extra parameters'             => [
-                'expectedQuery' => 'select from * where text all_text ~ "qwerty"',
+            'no extra parameters' => [
+                'expectedQuery' => 'from * where text all_text ~ "qwerty"',
                 'string'        => 'qwerty',
             ],
-            'custom offset'                   => [
-                'expectedQuery' => 'select from * where text all_text ~ "qwerty" offset 10',
+            'custom offset' => [
+                'expectedQuery' => 'from * where text all_text ~ "qwerty" offset 10',
                 'string'        => 'qwerty',
                 'offset'        => 10,
             ],
             'custom offset custom maxResults' => [
-                'expectedQuery' => 'select from * where text all_text ~ "qwerty" limit 200 offset 10',
+                'expectedQuery' => 'from * where text all_text ~ "qwerty" limit 200 offset 10',
                 'string'        => 'qwerty',
                 'offset'        => 10,
                 'maxResults'    => 200,
             ],
-            'custom from'                     => [
-                'expectedQuery' => 'select from test_customer where text all_text ~ "qwerty"',
+            'custom from' => [
+                'expectedQuery' => 'from test_customer where text all_text ~ "qwerty"',
                 'string'        => 'qwerty',
                 'offset'        => 0,
                 'maxResults'    => 0,
                 'from'          => 'test_customer',
             ],
-            'all custom parameters'           => [
-                'expectedQuery' => 'select from test_customer where text all_text ~ "qwerty" limit 200 offset 400',
+            'all custom parameters' => [
+                'expectedQuery' => 'from test_customer where text all_text ~ "qwerty" limit 200 offset 400',
                 'string'        => 'qwerty',
                 'offset'        => 10,
                 'maxResults'    => 200,
                 'from'          => 'test_customer',
                 'page'          => 3,
             ],
-            'search by inherited entity'      => [
-                'expectedQuery' => 'select from concrete_customer where text all_text ~ "qwerty"',
+            'search by inherited entity' => [
+                'expectedQuery' => 'from concrete_customer where text all_text ~ "qwerty"',
                 'string'        => 'qwerty',
                 'offset'        => null,
                 'maxResults'    => null,
                 'from'          => 'concrete_customer',
             ],
-            'search by superclass entity, mode including descendants'     => [
-                'expectedQuery' => 'select from customer, concrete_customer where text all_text ~ "qwerty"',
+            'search by superclass entity, mode including descendants' => [
+                'expectedQuery' => 'from customer, concrete_customer where text all_text ~ "qwerty"',
                 'string'        => 'qwerty',
                 'offset'        => null,
                 'maxResults'    => null,
                 'from'          => 'customer',
             ],
-            'search by abstract entity, mode descendants only'     => [
-                'expectedQuery' => 'select from repeatable_task, scheduled_task where text all_text ~ "qwerty"',
+            'search by abstract entity, mode descendants only' => [
+                'expectedQuery' => 'from repeatable_task, scheduled_task where text all_text ~ "qwerty"',
                 'string'        => 'qwerty',
                 'offset'        => null,
                 'maxResults'    => null,
                 'from'          => 'task',
             ],
-            'unknown from'                    => [
-                'expectedQuery' => 'select from unknown_entity where text all_text ~ "qwerty"',
+            'unknown from' => [
+                'expectedQuery' => 'from unknown_entity where text all_text ~ "qwerty"',
                 'string'        => 'qwerty',
                 'offset'        => 0,
                 'maxResults'    => 0,
@@ -209,6 +209,7 @@ class IndexerTest extends \PHPUnit_Framework_TestCase
             $this->assertEmpty($result->getElements());
             $this->assertEquals(0, $result->getRecordsCount());
         }
+
         $this->assertEquals($actualQuery, $expectedQuery);
     }
 
@@ -229,7 +230,7 @@ class IndexerTest extends \PHPUnit_Framework_TestCase
         $sourceQuery = 'from test_product' .
             ' where (name ~ "test string" and integer count > 10 and (decimal price = 10 or integer qty in (2, 5)))' .
             ' order_by name offset 10 max_results 5';
-        $expectedQuery = 'select from test_product where ((integer qty in (2, 5) or decimal price = 10) '
+        $expectedQuery = 'from test_product where ((integer qty in (2, 5) or decimal price = 10) '
             .'and integer count > 10 and text name ~ "test string") order by name ASC limit 5 offset 10';
 
         $result = $this->indexService->advancedSearch($sourceQuery);

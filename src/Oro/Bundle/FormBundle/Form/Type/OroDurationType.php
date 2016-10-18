@@ -21,6 +21,15 @@ class OroDurationType extends AbstractType
 {
     const NAME = 'oro_duration';
 
+    const VALIDATION_REGEX_JIRA   = '/^
+                                    (?:(?:(\d+(?:[\.,]\d{0,2})?)?)h
+                                    (?:[\s]*|$))?(?:(?:(\d+(?:[\.,]\d{0,2})?)?)m
+                                    (?:[\s]*|$))?(?:(?:(\d+(?:[\.,]\d{0,2})?)?)s?)?
+                                    $/ix';
+
+    const VALIDATION_REGEX_COLUMN = '/^
+                                    ((\d{1,3}:)?\d{1,3}:)?\d{1,3}
+                                    $/ix';
 
     /**
      * {@inheritdoc}
@@ -53,18 +62,8 @@ class OroDurationType extends AbstractType
      */
     protected function isValidDuration($value)
     {
-        $regexJIRAFormat =
-            '/^' .
-            '(?:(?:(\d+(?:\.\d)?)?)h(?:[\s]*|$))?' .
-            '(?:(?:(\d+(?:\.\d)?)?)m(?:[\s]*|$))?' .
-            '(?:(?:(\d+(?:\.\d)?)?)s?)?' .
-            '$/i';
-        $regexColumnFormat =
-            '/^' .
-            '((\d{1,3}:)?\d{1,3}:)?\d{1,3}' .
-            '$/i';
-
-        return preg_match($regexJIRAFormat, $value) || preg_match($regexColumnFormat, $value);
+        return preg_match(self::VALIDATION_REGEX_JIRA, $value) ||
+               preg_match(self::VALIDATION_REGEX_COLUMN, $value);
     }
 
     /**

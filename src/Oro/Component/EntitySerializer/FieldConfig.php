@@ -149,13 +149,15 @@ class FieldConfig
     /**
      * Gets the path of the field value.
      *
+     * @param string|null $defaultValue
+     *
      * @return string|null
      */
-    public function getPropertyPath()
+    public function getPropertyPath($defaultValue = null)
     {
-        return array_key_exists(self::PROPERTY_PATH, $this->items)
+        return !empty($this->items[self::PROPERTY_PATH])
             ? $this->items[self::PROPERTY_PATH]
-            : null;
+            : $defaultValue;
     }
 
     /**

@@ -11,7 +11,7 @@ Example
 -------
 
 ``` yaml
-datagrid:
+datagrids:
     DATAGRID_NAME_HERE:
         source:
             type: orm
@@ -20,7 +20,7 @@ datagrid:
                     - g.id
                     - g.label
                 from:
-                    - { table: OroCRMContactBundle:Group, alias: g }
+                    - { table: OroContactBundle:Group, alias: g }
 ```
 
 Query hints
@@ -28,7 +28,7 @@ Query hints
 The following example shows how [query hints](https://doctrine-orm.readthedocs.org/en/latest/reference/dql-doctrine-query-language.html#query-hints) can be set:
 
 ``` yaml
-datagrid:
+datagrids:
     DATAGRID_NAME_HERE:
         source:
             type: orm
@@ -36,7 +36,7 @@ datagrid:
                 select:
                     - partial g.{id, label}
                 from:
-                    - { table: OroCRMContactBundle:Group, alias: g }
+                    - { table: OroContactBundle:Group, alias: g }
             hints:
                 - HINT_FORCE_PARTIAL_LOAD
 ```
@@ -44,7 +44,7 @@ datagrid:
 If you need to set hint's value you can use the following syntax:
 
 ``` yaml
-datagrid:
+datagrids:
     DATAGRID_NAME_HERE:
         source:
             type: orm

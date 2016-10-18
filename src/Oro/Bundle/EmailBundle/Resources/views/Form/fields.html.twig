@@ -1,3 +1,16 @@
+{% block _email_configuration_oro_email___attachment_sync_max_size_value_widget %}
+    {{ form_widget(form) }}
+    {% if resource_granted('oro_config_system') %}
+    <span class="help-block">
+        <a class="btn btn-danger"
+           href="{{ path('oro_email_purge_emails_attachments') }}"
+           data-page-component-module="{{ 'oroui/js/app/components/hidden-redirect-component' }}"
+           data-page-component-options="{{ {showLoading: true}|json_encode }}"
+        >{{ 'oro.email.system_configuration.attachment_configuration.remove_larger_attachments.label'|trans }}</a>
+    </span>
+    {% endif %}
+{% endblock %}
+
 {% block _oro_email_autoresponserule_conditions_entry_field_row %}
     {{ form_widget(form) }}
 {% endblock %}
@@ -37,7 +50,7 @@
     </script>
     <script type="text/template" id="emailtemplate-chooser-template">
         <% _.each(entities, function(entity, i) { %>
-        <option value="<%= entity.get('id') %>"><%= entity.get('name') %></option>
+        <option value="<%- entity.get('id') %>"><%- entity.get('name') %></option>
         <% }); %>
     </script>
 
@@ -75,14 +88,14 @@
 {% block oro_email_attachments_row %}
     <script type="text/template" id="email-attachment-item">
         <div class="attachment-item" style="border: none">
-            <span data-id="<%= id %>" class="filename">
-                <i class="fa <%= icon %>"></i>
-                <span class="filename-label"><%= fileName %></span>
+            <span data-id="<%- id %>" class="filename">
+                <i class="fa <%- icon %>"></i>
+                <span class="filename-label"><%- fileName %></span>
                 <i class="icon-remove"></i>
             </span>
-            <input name="<%= inputName %>[<%= cid %>][id]" type="text" value="<%= id %>"/>
-            <input name="<%= inputName %>[<%= cid %>][type]" type="text" value="<%= type %>" class="attachment-type"/>
-            <input name="<%= inputName %>[<%= cid %>][file]" type="file"/>
+            <input name="<%- inputName %>[<%- cid %>][id]" type="text" value="<%- id %>"/>
+            <input name="<%- inputName %>[<%- cid %>][type]" type="text" value="<%- type %>" class="attachment-type"/>
+            <input name="<%- inputName %>[<%- cid %>][file]" type="file"/>
         </div>
     </script>
 
@@ -121,15 +134,15 @@
             <a href="javascript:void(0);"
                 <% if (preview) { %>
                     data-toggle="popover"
-                    data-content="<img src='<%= preview %>' width='110' class='img-rounded' alt='' >"
+                    data-content="<img src='<%- preview %>' width='110' class='img-rounded' alt='' >"
                     data-placement="bottom"
                     data-trigger="hover"
                     data-noscroll="1"
                 <% } %>
             >
-                <%= fileName %>
+                <%- fileName %>
             </a>
-            <span>(<%= fileSize %>, <%= modified %>)</span>
+            <span>(<%- fileSize %>, <%- modified %>)</span>
         </div>
     </script>
 

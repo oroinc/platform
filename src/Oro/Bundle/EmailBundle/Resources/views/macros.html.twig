@@ -576,13 +576,13 @@
 {% endmacro %}
 
 {#
-    Strips email body from HTML-tags, removes sequence of '-' chars and cuts to fit the length
+    Removes sequence of '-' chars and cuts to fit the length
     Parameters:
         emailBody - email body entity Oro\Bundle\EmailBundle\Entity\EmailBody
 #}
 {% macro email_short_body(emailBody, length) %}
     {%- set length = length|default(150) -%}
-    {{ emailBody.bodyContent|oro_html_purify|striptags|oro_preg_replace('/\-{2,}/', '--')[:length]|replace({'--': '&mdash;'})|raw }}
+    {{ emailBody.textBody|oro_preg_replace('/\-{2,}/', '--')[:length]|replace({'--': '&mdash;'})|raw }}
 {% endmacro %}
 
 {#

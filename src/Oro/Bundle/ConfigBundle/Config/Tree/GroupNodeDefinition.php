@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\ConfigBundle\Config\Tree;
 
+use Oro\Component\PhpUtils\ArrayUtil;
+
 class GroupNodeDefinition extends AbstractNodeDefinition implements \Countable, \IteratorAggregate
 {
     /** @var array */
@@ -85,12 +87,7 @@ class GroupNodeDefinition extends AbstractNodeDefinition implements \Countable, 
      */
     public function resort()
     {
-        usort(
-            $this->children,
-            function (AbstractNodeDefinition $a, AbstractNodeDefinition $b) {
-                return $a->getPriority() > $b->getPriority() ? -1 : 1;
-            }
-        );
+        ArrayUtil::sortBy($this->children, true);
     }
 
     /**
@@ -104,7 +101,7 @@ class GroupNodeDefinition extends AbstractNodeDefinition implements \Countable, 
             $this->getName() => array_intersect_key(
                 $this->definition,
                 array_flip(
-                    ['title', 'priority', 'description', 'configurator', 'page_reload', 'tooltip']
+                    ['title', 'priority', 'description', 'configurator', 'handler', 'page_reload', 'tooltip']
                 )
             )
         );

@@ -2,9 +2,11 @@
 
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Datagrid;
 
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Query\Parameter;
 use Oro\Bundle\DataGridBundle\Datagrid\ParameterBag;
 use Oro\Bundle\DataGridBundle\Datasource\DatasourceInterface;
+use Oro\Bundle\DataGridBundle\Datasource\Orm\OrmDatasource;
 use Oro\Bundle\DataGridBundle\Datasource\ResultRecord;
 use Oro\Bundle\DataGridBundle\Event\BuildAfter;
 use Oro\Bundle\DataGridBundle\Event\BuildBefore;
@@ -15,6 +17,7 @@ use Oro\Bundle\WorkflowBundle\Entity\Repository\WorkflowItemRepository;
 use Oro\Bundle\WorkflowBundle\Form\Type\WorkflowDefinitionSelectType;
 use Oro\Bundle\WorkflowBundle\Form\Type\WorkflowStepSelectType;
 use Oro\Bundle\WorkflowBundle\Model\Workflow;
+use Oro\Bundle\WorkflowBundle\Model\WorkflowRegistry;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
@@ -37,9 +40,9 @@ class WorkflowStepColumnListenerTest extends \PHPUnit_Framework_TestCase
     protected $configProvider;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var \Oro\Bundle\WorkflowBundle\Model\WorkflowRegistry|\PHPUnit_Framework_MockObject_MockObject
      */
-    protected $workflowManager;
+    protected $workflowRegistry;
 
     /**
      * @var WorkflowStepColumnListener
@@ -56,20 +59,20 @@ class WorkflowStepColumnListenerTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->workflowManager = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Model\WorkflowManager')
+        $this->workflowRegistry = $this->getMockBuilder(WorkflowRegistry::class)
             ->disableOriginalConstructor()
             ->getMock();
 
         $this->listener = new WorkflowStepColumnListener(
             $this->doctrineHelper,
             $this->configProvider,
-            $this->workflowManager
+            $this->workflowRegistry
         );
     }
 
     protected function tearDown()
     {
-        unset($this->listener, $this->doctrineHelper, $this->configProvider, $this->workflowManager);
+        unset($this->listener, $this->doctrineHelper, $this->configProvider, $this->workflowRegistry);
     }
 
     public function testAddWorkflowStepColumn()
@@ -102,7 +105,7 @@ class WorkflowStepColumnListenerTest extends \PHPUnit_Framework_TestCase
     public function testBuildBeforeNoUpdate(array $config, $hasWorkflow = true, $hasConfig = true, $isShowStep = true)
     {
         $this->setUpEntityManagerMock(self::ENTITY, self::ENTITY);
-        $this->setUpWorkflowManagerMock(self::ENTITY, $hasWorkflow);
+        $this->setUpWorkflowRegistryMock(self::ENTITY, $hasWorkflow);
         $this->setUpConfigProviderMock(self::ENTITY, $hasConfig, $isShowStep);
 
         $this->listener->addWorkflowStepColumn(self::COLUMN);
@@ -194,7 +197,7 @@ class WorkflowStepColumnListenerTest extends \PHPUnit_Framework_TestCase
     public function testBuildBeforeAddColumn(array $inputConfig, array $expectedConfig, $multiWorkflows = true)
     {
         $this->setUpEntityManagerMock(self::ENTITY, self::ENTITY_FULL_NAME);
-        $this->setUpWorkflowManagerMock(self::ENTITY_FULL_NAME, true, $multiWorkflows);
+        $this->setUpWorkflowRegistryMock(self::ENTITY_FULL_NAME, true, $multiWorkflows);
         $this->setUpConfigProviderMock(self::ENTITY_FULL_NAME);
 
         $event = $this->createBuildBeforeEvent($inputConfig);
@@ -218,6 +221,7 @@ class WorkflowStepColumnListenerTest extends \PHPUnit_Framework_TestCase
                             ],
                             'from' => [['table' => self::ENTITY, 'alias' => self::ALIAS]],
                         ],
+                        'type' => OrmDatasource::TYPE,
                     ],
                     'columns' => [
                         'rootField' => ['label' => 'Root field'],
@@ -231,6 +235,7 @@ class WorkflowStepColumnListenerTest extends \PHPUnit_Framework_TestCase
                             ],
                             'from' => [['table' => self::ENTITY, 'alias' => self::ALIAS]]
                         ],
+                        'type' => OrmDatasource::TYPE,
                     ],
                     'columns' => [
                         'rootField' => ['label' => 'Root field'],
@@ -258,6 +263,7 @@ class WorkflowStepColumnListenerTest extends \PHPUnit_Framework_TestCase
                                 'left' => [['join' => self::ALIAS . '.c', 'alias' => 'c']],
                             ],
                         ],
+                        'type' => OrmDatasource::TYPE,
                     ],
                     'columns' => [
                         'rootField' => ['label' => 'Root field'],
@@ -293,6 +299,7 @@ class WorkflowStepColumnListenerTest extends \PHPUnit_Framework_TestCase
                                 'left' => [['join' => self::ALIAS . '.c', 'alias' => 'c']]
                             ],
                         ],
+                        'type' => OrmDatasource::TYPE,
                     ],
                     'columns' => [
                         'rootField' => ['label' => 'Root field'],
@@ -360,6 +367,7 @@ class WorkflowStepColumnListenerTest extends \PHPUnit_Framework_TestCase
                                 'left' => [['join' => self::ALIAS . '.c', 'alias' => 'c']],
                             ],
                         ],
+                        'type' => OrmDatasource::TYPE,
                     ],
                     'columns' => [
                         'rootField' => ['label' => 'Root field'],
@@ -412,6 +420,7 @@ class WorkflowStepColumnListenerTest extends \PHPUnit_Framework_TestCase
                                 ]
                             ],
                         ],
+                        'type' => OrmDatasource::TYPE,
                     ],
                     'columns' => [
                         'rootField' => ['label' => 'Root field'],
@@ -465,7 +474,7 @@ class WorkflowStepColumnListenerTest extends \PHPUnit_Framework_TestCase
     public function testBuildBeforeRemoveColumn(array $inputConfig, array $expectedConfig)
     {
         $this->setUpEntityManagerMock(self::ENTITY, self::ENTITY_FULL_NAME);
-        $this->setUpWorkflowManagerMock(self::ENTITY_FULL_NAME);
+        $this->setUpWorkflowRegistryMock(self::ENTITY_FULL_NAME);
         $this->setUpConfigProviderMock(self::ENTITY_FULL_NAME, true, false);
 
         $event = $this->createBuildBeforeEvent($inputConfig);
@@ -497,6 +506,7 @@ class WorkflowStepColumnListenerTest extends \PHPUnit_Framework_TestCase
                                 ],
                             ],
                         ],
+                        'type' => OrmDatasource::TYPE,
                     ],
                     'columns' => [
                         'rootField' => ['label' => 'Root field'],
@@ -543,6 +553,7 @@ class WorkflowStepColumnListenerTest extends \PHPUnit_Framework_TestCase
                                 ],
                             ],
                         ],
+                        'type' => OrmDatasource::TYPE,
                     ],
                     'columns' => [
                         'rootField' => ['label' => 'Root field'],
@@ -733,6 +744,9 @@ class WorkflowStepColumnListenerTest extends \PHPUnit_Framework_TestCase
             ->with(self::ENTITY_FULL_NAME, [42, 100])
             ->willReturn([42 => $data]);
 
+        $this->workflowRegistry->expects($this->once())->method('getActiveWorkflowsByEntityClass')
+            ->with(WorkflowStepColumnListenerTest::ENTITY_FULL_NAME)->willReturn(new ArrayCollection());
+
         $this->listener->onResultAfter($event);
 
         $this->assertEquals($data, $recordOne->getValue(WorkflowStepColumnListener::WORKFLOW_STEP_COLUMN));
@@ -803,26 +817,24 @@ class WorkflowStepColumnListenerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @param string $entity
+     * @param string $entityClass
      * @param bool $hasWorkflow
      * @param bool $multiWorkflow
      */
-    protected function setUpWorkflowManagerMock($entity, $hasWorkflow = true, $multiWorkflow = true)
+    protected function setUpWorkflowRegistryMock($entityClass, $hasWorkflow = true, $multiWorkflow = true)
     {
-        $this->workflowManager->expects($this->any())
-            ->method('hasApplicableWorkflows')
-            ->with($entity)
-            ->willReturn($hasWorkflow);
+        $workflows = new ArrayCollection();
 
-        $workflows = [$this->getWorkflowMock()];
-
-        if ($multiWorkflow) {
-            $workflows[] = $this->getWorkflowMock();
+        if ($hasWorkflow) {
+            $workflows->add($this->getWorkflowMock());
+            if ($multiWorkflow) {
+                $workflows->add($this->getWorkflowMock());
+            }
         }
 
-        $this->workflowManager->expects($this->any())
-            ->method('getApplicableWorkflows')
-            ->with($entity)
+        $this->workflowRegistry->expects($this->any())
+            ->method('getActiveWorkflowsByEntityClass')
+            ->with($entityClass)
             ->willReturn($workflows);
     }
 

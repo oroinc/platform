@@ -6,6 +6,7 @@ use Doctrine\ORM\EntityManager;
 use Nelmio\Alice\Instances\Collection as AliceCollection;
 use Oro\Bundle\EntityBundle\ORM\Registry;
 use Oro\Bundle\UserBundle\Entity\Repository\RoleRepository;
+use Oro\Bundle\UserBundle\Entity\Role;
 use Oro\Bundle\UserBundle\Entity\User;
 
 class ReferenceRepositoryInitializer
@@ -40,26 +41,10 @@ class ReferenceRepositoryInitializer
         $user = $this->getDefaultUser();
 
         $this->referenceRepository->set('admin', $user);
-        $this->referenceRepository->set('adminRole', $user->getRole(User::ROLE_ADMINISTRATOR));
+        $this->referenceRepository->set('userRole', $this->getRole(User::ROLE_DEFAULT));
+        $this->referenceRepository->set('adminRole', $this->getRole(User::ROLE_ADMINISTRATOR));
         $this->referenceRepository->set('organization', $user->getOrganization());
         $this->referenceRepository->set('business_unit', $user->getOwner());
-    }
-
-    /**
-     * References must be refreshed after each kernel shutdown
-     * @throws \Doctrine\ORM\ORMException
-     */
-    public function refresh()
-    {
-        $references = $this->referenceRepository->toArray();
-        $this->referenceRepository->clear();
-
-        foreach ($references as $key => $object) {
-            $class = get_class($object);
-            $newReference = $this->em->getReference($class, $object->getId());
-
-            $this->referenceRepository->set($key, $newReference);
-        }
     }
 
     /**
@@ -68,6 +53,11 @@ class ReferenceRepositoryInitializer
     public function clear()
     {
         $this->referenceRepository->clear();
+    }
+
+    public function getRole($role)
+    {
+        return $this->em->getRepository(Role::class)->findOneBy(['role' => $role]);
     }
 
     /**

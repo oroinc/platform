@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\WorkflowBundle\Datagrid;
 
+use Doctrine\Common\Collections\ArrayCollection;
+
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\DataGridBundle\Datagrid\DatagridInterface;
 use Oro\Bundle\DataGridBundle\Datasource\Orm\OrmDatasource;
@@ -17,7 +19,7 @@ use Oro\Bundle\WorkflowBundle\Entity\Repository\WorkflowItemRepository;
 use Oro\Bundle\WorkflowBundle\Form\Type\WorkflowDefinitionSelectType;
 use Oro\Bundle\WorkflowBundle\Form\Type\WorkflowStepSelectType;
 use Oro\Bundle\WorkflowBundle\Helper\WorkflowQueryTrait;
-use Oro\Bundle\WorkflowBundle\Model\WorkflowManager;
+use Oro\Bundle\WorkflowBundle\Model\WorkflowRegistry;
 
 class WorkflowStepColumnListener
 {
@@ -39,9 +41,9 @@ class WorkflowStepColumnListener
     protected $configProvider;
 
     /**
-     * @var WorkflowManager
+     * @var WorkflowRegistry
      */
-    protected $workflowManager;
+    protected $workflowRegistry;
 
     /**
      * @var array
@@ -49,23 +51,23 @@ class WorkflowStepColumnListener
     protected $workflowStepColumns = [self::WORKFLOW_STEP_COLUMN];
 
     /**
-     * @var array
+     * @var ArrayCollection[] key(Entity Class) => value(ArrayCollection of Workflow instances)
      */
     protected $workflows = [];
 
     /**
      * @param DoctrineHelper  $doctrineHelper
      * @param ConfigProvider  $configProvider
-     * @param WorkflowManager $workflowManager
+     * @param WorkflowRegistry $workflowRegistry
      */
     public function __construct(
         DoctrineHelper $doctrineHelper,
         ConfigProvider $configProvider,
-        WorkflowManager $workflowManager
+        WorkflowRegistry $workflowRegistry
     ) {
         $this->doctrineHelper = $doctrineHelper;
         $this->configProvider = $configProvider;
-        $this->workflowManager = $workflowManager;
+        $this->workflowRegistry = $workflowRegistry;
     }
 
     /**
@@ -85,6 +87,11 @@ class WorkflowStepColumnListener
     {
         $config = $event->getConfig();
 
+        // datasource type other than ORM is not supported yet
+        if ($config->getDatasourceType() !== OrmDatasource::TYPE) {
+            return;
+        }
+
         // get root entity
         list($rootEntity, $rootEntityAlias) = $this->getRootEntityNameAndAlias($config);
 
@@ -93,7 +100,7 @@ class WorkflowStepColumnListener
         }
 
         // whether entity has active workflow and entity should render workflow step field
-        $isShowWorkflowStep = $this->workflowManager->hasApplicableWorkflows($rootEntity)
+        $isShowWorkflowStep = $this->getWorkflows($rootEntity)->isEmpty() === false
             && $this->isShowWorkflowStep($rootEntity);
 
         // check whether grid contains workflow step column
@@ -368,12 +375,12 @@ class WorkflowStepColumnListener
 
     /**
      * @param string $className
-     * @return array
+     * @return ArrayCollection
      */
     protected function getWorkflows($className)
     {
         if (!array_key_exists($className, $this->workflows)) {
-            $this->workflows[$className] = $this->workflowManager->getApplicableWorkflows($className);
+            $this->workflows[$className] = $this->workflowRegistry->getActiveWorkflowsByEntityClass($className);
         }
 
         return $this->workflows[$className];
@@ -385,6 +392,6 @@ class WorkflowStepColumnListener
      */
     protected function isEntityHaveMoreThanOneWorkflow($className)
     {
-        return count($this->getWorkflows($className)) > 1;
+        return $this->getWorkflows($className)->count() > 1;
     }
 }

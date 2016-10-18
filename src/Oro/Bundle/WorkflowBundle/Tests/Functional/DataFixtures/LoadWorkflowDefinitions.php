@@ -16,6 +16,8 @@ class LoadWorkflowDefinitions extends AbstractFixture implements ContainerAwareI
     const START_TRANSITION = 'start_transition';
     const MULTISTEP_START_TRANSITION = 'starting_point_transition';
     const MULTISTEP = 'test_multistep_flow';
+    const WITH_GROUPS1 = 'test_groups_flow1';
+    const WITH_GROUPS2 = 'test_groups_flow2';
 
     /**
      * @var ContainerInterface
@@ -40,7 +42,7 @@ class LoadWorkflowDefinitions extends AbstractFixture implements ContainerAwareI
         $listConfiguration = $this->container->get('oro_workflow.configuration.config.workflow_list');
         $configurationBuilder = $this->container->get('oro_workflow.configuration.builder.workflow_definition');
 
-        $workflowConfiguration = Yaml::parse(file_get_contents(__DIR__ . '/config/workflows.yml')) ? : [];
+        $workflowConfiguration = $this->getWorkflowConfiguration();
         $workflowConfiguration = $listConfiguration->processConfiguration($workflowConfiguration);
         $workflowDefinitions = $configurationBuilder->buildFromConfiguration($workflowConfiguration);
 
@@ -54,11 +56,20 @@ class LoadWorkflowDefinitions extends AbstractFixture implements ContainerAwareI
             }
 
             $manager->persist($workflowDefinition);
+            $this->addReference('workflow.' . $workflowDefinition->getName(), $workflowDefinition);
             $hasDefinitions = true;
         }
 
         if ($hasDefinitions) {
             $manager->flush();
         }
+    }
+
+    /**
+     * @return array
+     */
+    protected function getWorkflowConfiguration()
+    {
+        return Yaml::parse(file_get_contents(__DIR__ . '/config/oro/workflows.yml')) ? : [];
     }
 }

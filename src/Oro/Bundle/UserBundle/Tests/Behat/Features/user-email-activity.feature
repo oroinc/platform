@@ -9,7 +9,7 @@ Scenario: Send email
     | Charlie   | Sheen    | charlie@sheen.com | charlie  |
     | Brad      | Pitt     | brad@pitt.com     | brad     |
     | Bruce     | Willis   | bruce@willis.com  | bruce    |
-  And I login as "admin" user with "admin" password
+  And I login as administrator
   And I go to System/User Management/Users
   And click view Charlie in grid
   And follow "More actions"
@@ -81,4 +81,4 @@ Scenario: Add contexts
   Then I should see "The context has been added" flash message
   When I go to System/User Management/Users
   And click view Charlie in grid
-  Then I should see "Work for you" email in activity list
+  Then I should see "Fwd: Re: Work for you" email in activity list

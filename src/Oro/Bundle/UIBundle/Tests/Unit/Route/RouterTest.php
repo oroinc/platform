@@ -300,7 +300,7 @@ class RouterTest extends \PHPUnit_Framework_TestCase
                 'expected' => [
                     'route' => 'test_route',
                     'parameters' => [
-                        'testStaticParameter' => 'OroCRM\Bundle\CallBundle\Entity\Call',
+                        'testStaticParameter' => 'Oro\Bundle\CallBundle\Entity\Call',
                         'id' => $expectedId,
                         'testQueryParameter' => 'foo'
                     ]
@@ -309,7 +309,7 @@ class RouterTest extends \PHPUnit_Framework_TestCase
                     'actionParameters' => [
                         'route' => 'test_route',
                         'params' => [
-                            'testStaticParameter' => 'OroCRM\Bundle\CallBundle\Entity\Call',
+                            'testStaticParameter' => 'Oro\Bundle\CallBundle\Entity\Call',
                             'id' => '$id'
                         ]
                     ],
@@ -323,7 +323,7 @@ class RouterTest extends \PHPUnit_Framework_TestCase
                 'expected' => [
                     'route' => 'test_route',
                     'parameters' => [
-                        'testStaticParameter' => 'OroCRM\Bundle\CallBundle\Entity\Call',
+                        'testStaticParameter' => 'Oro\Bundle\CallBundle\Entity\Call',
                         'id' => $expectedId,
                     ]
                 ],
@@ -331,7 +331,7 @@ class RouterTest extends \PHPUnit_Framework_TestCase
                     'actionParameters' => [
                         'route' => 'test_route',
                         'params' => [
-                            'testStaticParameter' => 'OroCRM\Bundle\CallBundle\Entity\Call',
+                            'testStaticParameter' => 'Oro\Bundle\CallBundle\Entity\Call',
                             'id' => '$id'
                         ]
                     ],
@@ -345,7 +345,7 @@ class RouterTest extends \PHPUnit_Framework_TestCase
                 'expected' => [
                     'route' => 'test_route',
                     'parameters' => [
-                        'testStaticParameter' => 'OroCRM\Bundle\CallBundle\Entity\Call',
+                        'testStaticParameter' => 'Oro\Bundle\CallBundle\Entity\Call',
                         'id' => $expectedId
                     ]
                 ],
@@ -353,7 +353,7 @@ class RouterTest extends \PHPUnit_Framework_TestCase
                     'actionParameters' => [
                         'route' => 'test_route',
                         'params' => [
-                            'testStaticParameter' => 'OroCRM\Bundle\CallBundle\Entity\Call',
+                            'testStaticParameter' => 'Oro\Bundle\CallBundle\Entity\Call',
                             'id' => '$id'
                         ]
                     ],
@@ -365,7 +365,7 @@ class RouterTest extends \PHPUnit_Framework_TestCase
                 'expected' => [
                     'route' => 'test_route',
                     'parameters' => [
-                        'testStaticParameter' => 'OroCRM\Bundle\CallBundle\Entity\Call',
+                        'testStaticParameter' => 'Oro\Bundle\CallBundle\Entity\Call',
                         'id' => $expectedId,
                         'secondId' => $expectedSecondEntityId
                     ]
@@ -374,7 +374,7 @@ class RouterTest extends \PHPUnit_Framework_TestCase
                     'actionParameters' => [
                         'route' => 'test_route',
                         'params' => [
-                            'testStaticParameter' => 'OroCRM\Bundle\CallBundle\Entity\Call',
+                            'testStaticParameter' => 'Oro\Bundle\CallBundle\Entity\Call',
                             'id' => '$firstEntity.id',
                             'secondId' => '$secondEntity.id'
                         ]

@@ -1,0 +1,41 @@
+namespace Test;
+
+class Entity implements \Oro\Bundle\EntityExtendBundle\Entity\ExtendEntityInterface
+{
+    /**
+     * @deprecated since 1.10. Use removeOwner instead
+     */
+    public function removeOwners($value)
+    {
+        $this->removeOwner($value);
+    }
+
+    public function removeOwner($value)
+    {
+        if ($this->owners && $this->owners->contains($value)) {
+            $this->owners->removeElement($value);
+            $value->removeTarget($this);
+        }
+    }
+
+    /**
+     * @deprecated since 1.10. Use addOwner instead
+     */
+    public function addOwners($value)
+    {
+        $this->addOwner($value);
+    }
+
+    public function addOwner($value)
+    {
+        if (!$this->owners->contains($value)) {
+            $this->owners->add($value);
+            $value->addTarget($this);
+        }
+    }
+
+    public function __construct()
+    {
+        $this->owners = new \Doctrine\Common\Collections\ArrayCollection();
+    }
+}

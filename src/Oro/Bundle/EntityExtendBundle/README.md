@@ -26,7 +26,7 @@ The existing entity can be extended using migration scripts. To create new exten
 ``` php
 <?php
 
-namespace OroCRM\Bundle\AccountBundle\Migrations\Schema\v1_0;
+namespace Oro\Bundle\AccountBundle\Migrations\Schema\v1_0;
 
 use Doctrine\DBAL\Schema\Schema;
 use Oro\Bundle\MigrationBundle\Migration\Migration;
@@ -34,7 +34,7 @@ use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 use Oro\Bundle\EntityBundle\EntityConfig\DatagridScope;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 
-class OroCRMAccountBundle implements Migration
+class OroAccountBundle implements Migration
 {
     public function up(Schema $schema, QueryBag $queries)
     {
@@ -91,7 +91,7 @@ Creating relations is more complex task than creation of regular field. Oro Plat
 ``` php
 <?php
 
-namespace OroCRM\Bundle\SalesBundle\Migrations\Schema\v1_0;
+namespace Oro\Bundle\SalesBundle\Migrations\Schema\v1_0;
 
 use Doctrine\DBAL\Schema\Schema;
 use Oro\Bundle\EntityExtendBundle\Migration\Extension\ExtendExtension;
@@ -100,7 +100,7 @@ use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\MigrationBundle\Migration\Migration;
 use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 
-class OroCRMSalesBundle implements Migration, ExtendExtensionAwareInterface
+class OroSalesBundle implements Migration, ExtendExtensionAwareInterface
 {
     protected $extendExtension;
 
@@ -140,7 +140,7 @@ The option sets are quite complex types, but to understand how they work you nee
 ``` php
 <?php
 
-namespace OroCRM\Bundle\SalesBundle\Migrations\Schema\v1_0;
+namespace Oro\Bundle\SalesBundle\Migrations\Schema\v1_0;
 
 use Doctrine\DBAL\Schema\Schema;
 use Oro\Bundle\EntityExtendBundle\Migration\Extension\ExtendExtension;
@@ -149,7 +149,7 @@ use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\MigrationBundle\Migration\Migration;
 use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 
-class OroCRMSalesBundle implements Migration, ExtendExtensionAwareInterface
+class OroSalesBundle implements Migration, ExtendExtensionAwareInterface
 {
     protected $extendExtension;
 
@@ -185,7 +185,7 @@ To load a list of options you can use data fixtures, for example:
 
 <?php
 
-namespace OroCRM\Bundle\DemoDataBundle\Migrations\Data\Demo\ORM;
+namespace Oro\Bundle\DemoDataBundle\Migrations\Data\Demo\ORM;
 
 use Doctrine\Common\DataFixtures\AbstractFixture;
 use Doctrine\Common\Persistence\ObjectManager;
@@ -238,7 +238,7 @@ If by some reasons you create system option sets and you have to render it manua
 
  - [TWIG extension](Twig/EnumExtension.php) to sort and translate options. It can be used in the following way: `optionIds|sort_enum(enumCode)`, `optionId|trans_enum(enumCode)`.
  - Symfony form types which can be used to build forms contain option set fields: [EnumChoiceType](Form/Type/EnumChoiceType.php) and [EnumSelectType](Form/Type/EnumSelectType.php).
- - Grid filters: [EnumFilter](Filter/EnumFilter.php) and [MultiEnumFilter](Filter/MultiEnumFilter.php). Some help how to use these filters in `datagrid.yml` and how to configure datagrid formatters for option sets you can find in [ExtendColumnOptionsGuesser](Grid/ExtendColumnOptionsGuesser.php). Please take in account that this class pass the class name as the option set identifier, but you can use the enum code as well.
+ - Grid filters: [EnumFilter](Filter/EnumFilter.php) and [MultiEnumFilter](Filter/MultiEnumFilter.php). Some help how to use these filters in `datagrids.yml` and how to configure datagrid formatters for option sets you can find in [ExtendColumnOptionsGuesser](Grid/ExtendColumnOptionsGuesser.php). Please take in account that this class pass the class name as the option set identifier, but you can use the enum code as well.
 
 Create custom entity
 --------------------

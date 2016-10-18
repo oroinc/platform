@@ -1,0 +1,25 @@
+dashboards:
+    widgets:
+        quick_launchpad:
+            route:      quick_launchpad_test_route
+            route_parameters: { bundle: TestBundle, name: quickLaunchpad }
+            items:
+                index:
+                    label:      List
+                    route:      oro_sales_opportunity_index
+                    acl:        oro_sales_opportunity_view
+                create:
+                    label:      Create opportunity
+                    route:      oro_sales_opportunity_create
+                    acl:        oro_sales_opportunity_create
+                test1:
+                    label:      Test1
+                    route:      test1
+                    position:   -100
+                test2:
+                    label:      Test2
+                    route:      test2
+                    position:   100
+    dashboards:
+        main:
+            twig: OroDashboardBundle:Index:default.html.twig

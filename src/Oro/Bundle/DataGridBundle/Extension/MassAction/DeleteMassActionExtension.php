@@ -3,6 +3,7 @@
 namespace Oro\Bundle\DataGridBundle\Extension\MassAction;
 
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
+use Oro\Bundle\DataGridBundle\Datasource\Orm\OrmDatasource;
 use Oro\Bundle\DataGridBundle\Extension\AbstractExtension;
 use Oro\Bundle\DataGridBundle\Tools\GridConfigurationHelper;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
@@ -43,6 +44,10 @@ class DeleteMassActionExtension extends AbstractExtension
      */
     public function isApplicable(DatagridConfiguration $config)
     {
+        if ($config->getDatasourceType() !== OrmDatasource::TYPE) {
+            return false;
+        }
+
         // validate configuration and fill default values
         $options = $this->validateConfiguration(
             new DeleteMassActionConfiguration(),
@@ -88,7 +93,7 @@ class DeleteMassActionExtension extends AbstractExtension
     {
         $actions = $config->offsetGetOr($key, []);
         foreach ($actions as $action) {
-            if ($action[static::ACTION_TYPE_KEY] == static::ACTION_TYPE_DELETE) {
+            if ($action[static::ACTION_TYPE_KEY] === static::ACTION_TYPE_DELETE) {
                 return true;
             }
         }

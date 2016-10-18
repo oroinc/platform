@@ -3,6 +3,7 @@
 namespace Oro\Bundle\DataGridBundle\Extension\Board;
 
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
+use Oro\Bundle\DataGridBundle\Datasource\Orm\OrmDatasource;
 use Oro\Bundle\DataGridBundle\Tools\GridConfigurationHelper;
 use Oro\Bundle\UIBundle\Provider\UserAgentProvider;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowRegistry;
@@ -41,10 +42,13 @@ class RestrictionManager
      */
     public function boardViewEnabled(DatagridConfiguration $config)
     {
-        $entityName = $this->gridConfigurationHelper->getEntity($config);
-        $enabled = $this->userAgentProvider->getUserAgent()->isDesktop() &&
-            (!$entityName || !$this->workflowRegistry->hasActiveWorkflowsByEntityClass($entityName));
+        if ($config->getDatasourceType() !== OrmDatasource::TYPE) {
+            return false;
+        }
 
-        return $enabled;
+        $entityName = $this->gridConfigurationHelper->getEntity($config);
+
+        return $this->userAgentProvider->getUserAgent()->isDesktop() &&
+            (!$entityName || $this->workflowRegistry->getActiveWorkflowsByEntityClass($entityName)->isEmpty());
     }
 }

@@ -14,11 +14,10 @@ use Oro\Bundle\SearchBundle\Exception\ExpressionSyntaxError;
  */
 class Query
 {
-    const SELECT = 'select';
-
     const ORDER_ASC  = 'asc';
     const ORDER_DESC = 'desc';
 
+    const KEYWORD_SELECT      = 'select';
     const KEYWORD_FROM        = 'from';
     const KEYWORD_WHERE       = 'where';
     const KEYWORD_AND         = 'and';
@@ -26,6 +25,7 @@ class Query
     const KEYWORD_OFFSET      = 'offset';
     const KEYWORD_MAX_RESULTS = 'max_results';
     const KEYWORD_ORDER_BY    = 'order_by';
+    const KEYWORD_AS          = 'as';
 
     const OPERATOR_EQUALS              = '=';
     const OPERATOR_NOT_EQUALS          = '!=';
@@ -48,8 +48,8 @@ class Query
 
     const DELIMITER = ' ';
 
-    /** @var  string */
-    protected $query;
+    /** @var array */
+    protected $select = [];
 
     /** @var array */
     protected $from;
@@ -60,18 +60,16 @@ class Query
     /** @var array */
     protected $fields;
 
+    /** @var array */
+    protected $selectAliases = [];
+
     /** @var Criteria */
     protected $criteria;
 
     /**
-     * @param null|string $queryType
      */
-    public function __construct($queryType = null)
+    public function __construct()
     {
-        if ($queryType) {
-            $this->createQuery($queryType);
-        }
-
         $this->maxResults = 0;
         $this->from       = false;
 
@@ -160,11 +158,45 @@ class Query
     }
 
     /**
-     * Insert entities array to query from
+     * Insert list of required fields to query select
      *
-     * @param array|string $entities
+     * @param mixed  $field
+     *
+     * @param string $enforcedFieldType
      *
      * @return Query
+     */
+    public function select($field, $enforcedFieldType = null)
+    {
+        $this->select = [];
+
+        if (is_array($field)) {
+            foreach ($field as $_field) {
+                $this->addSelect($_field, $enforcedFieldType);
+            }
+
+            return $this;
+        }
+
+        $this->addSelect($field, $enforcedFieldType);
+
+        return $this;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function addSelect($fieldNames, $enforcedFieldType = null)
+    {
+        foreach ((array) $fieldNames as $fieldName) {
+            $fieldName = $this->parseFieldAliasing($fieldName);
+
+            $this->addToSelect($fieldName, $enforcedFieldType);
+        }
+    }
+
+    /**
+     * {@inheritdoc}
      */
     public function from($entities)
     {
@@ -277,11 +309,13 @@ class Query
     }
 
     /**
-     * @return string
+     * Get fields to select
+     *
+     * @return array
      */
-    public function getQuery()
+    public function getSelect()
     {
-        return $this->query;
+        return array_values($this->select);
     }
 
     /**
@@ -302,7 +336,7 @@ class Query
      */
     public function getOptions()
     {
-        throw new \Exception('Method getOptions is depricated for Query class. Please use getCriteria method');
+        throw new \Exception('Method getOptions is deprecated for Query class. Please use getCriteria method');
     }
 
     /**
@@ -408,7 +442,7 @@ class Query
      */
     public function getOrderBy()
     {
-        $orders = array_keys($this->criteria->getOrderings());
+        $orders    = array_keys($this->criteria->getOrderings());
         $fieldName = array_pop($orders);
 
         return Criteria::explodeFieldTypeName($fieldName)[1];
@@ -423,7 +457,7 @@ class Query
      */
     public function getOrderType()
     {
-        $orders = array_keys($this->criteria->getOrderings());
+        $orders    = array_keys($this->criteria->getOrderings());
         $fieldName = array_pop($orders);
 
         return Criteria::explodeFieldTypeName($fieldName)[0];
@@ -475,15 +509,13 @@ class Query
      */
     public function getStringQuery()
     {
-        $selectString = $this->getQuery();
-
         $fromString = '';
+
         if ($this->getFrom()) {
-            $fromString .=  ' from ' . implode(', ', $this->getFrom());
+            $fromString .= 'from ' . implode(', ', $this->getFrom());
         }
 
-        $visitor = new QueryStringExpressionVisitor();
-        $whereString = ' where ' . $this->criteria->getWhereExpression()->visit($visitor);
+        $whereString = $this->getWhereString();
 
         $orderByString = '';
         if ($this->getOrderBy()) {
@@ -506,7 +538,99 @@ class Query
             $offsetString .= ' offset ' . $this->getFirstResult();
         }
 
-        return $selectString . $fromString. $whereString . $orderByString . $limitString . $offsetString;
+        $selectColumnsString = $this->getStringColumns();
+
+        $selectString = '';
+        if (!empty($selectColumnsString)) {
+            $selectString = trim('select ' . $selectColumnsString) . ' ';
+        }
+
+        return $selectString
+               . $fromString
+               . $whereString
+               . $orderByString
+               . $limitString
+               . $offsetString;
+    }
+
+    /**
+     * @return array
+     */
+    public function getSelectAliases()
+    {
+        return $this->selectAliases;
+    }
+
+    /**
+     * @param $fieldName
+     * @param null $enforcedFieldType
+     * @return $this
+     */
+    private function addToSelect($fieldName, $enforcedFieldType = null)
+    {
+        if (!$fieldName) {
+            return $this;
+        }
+
+        $fieldType = self::TYPE_TEXT;
+
+        list($explodedType, $explodedName) = Criteria::explodeFieldTypeName($fieldName);
+
+        if (!empty($explodedType) && !empty($explodedName)) {
+            $fieldType = $explodedType;
+            $fieldName = $explodedName;
+        }
+
+        if ($enforcedFieldType !== null) {
+            $fieldType = $enforcedFieldType;
+        }
+
+        $field = Criteria::implodeFieldTypeName($fieldType, $fieldName);
+
+        if (!is_string($field)) {
+            return $this;
+        }
+
+        $this->select[$field] = $field; // do not allow repeating fields
+
+        return $this;
+    }
+
+
+    /**
+     * Returns the WHERE string part for getStringQuery.
+     *
+     * @return string
+     */
+    private function getWhereString()
+    {
+        $whereString = '';
+        if (null !== $whereExpr = $this->criteria->getWhereExpression()) {
+            $visitor     = new QueryStringExpressionVisitor();
+            $whereString = ' where ' . $whereExpr->visit($visitor);
+        }
+
+        return $whereString;
+    }
+
+    /**
+     * @return string
+     */
+    private function getStringColumns()
+    {
+        $selects = $this->select;
+
+        if (empty($selects)) {
+            return '';
+        }
+
+        $result = implode(', ', $selects);
+
+        if (count($selects) > 1) {
+            $result = '(' . $result . ')';
+        }
+
+        return $result;
     }
 
     /**
@@ -547,5 +671,29 @@ class Query
         }
 
         return $fields;
+    }
+
+    /**
+     * Parse field name and check if there is an alias declared in it.
+     *
+     * @param $field
+     * @return string
+     */
+    private function parseFieldAliasing($field)
+    {
+        $part = strrev(trim($field));
+        $part = preg_split('/ sa /im', $part, 2);
+        if (count($part) > 1) {
+            // splitting with ' ' and taking first word as a field name - does not allow spaces in field name
+            $rev = strrev($part[1]);
+            $rev = explode(' ', $rev);
+            $field = array_shift($rev);
+
+            $alias = strrev($part[0]);
+
+            $this->selectAliases[$field] = $alias;
+        }
+
+        return $field;
     }
 }

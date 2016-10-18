@@ -100,7 +100,7 @@ class CalendarEventActivityListProvider implements
     public function getDescription($entity)
     {
         /** @var $entity CalendarEvent */
-        return $entity->getDescription();
+        return trim(strip_tags($entity->getDescription()));
     }
 
     /**
@@ -148,7 +148,7 @@ class CalendarEventActivityListProvider implements
      */
     public function getTemplate()
     {
-        return 'OroCalendarBundle:CalendarEvent:js/activityItemTemplate.js.twig';
+        return 'OroCalendarBundle:CalendarEvent:js/activityItemTemplate.html.twig';
     }
 
     /**

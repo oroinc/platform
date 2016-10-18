@@ -42,11 +42,11 @@ class OrmExpressionVisitor extends ExpressionVisitor
         $value = $comparison->getValue()->getValue();
         list($type, $field) = $this->explodeCombinedFieldString($comparison->getField());
 
-        $index = str_replace('.', '_', uniqid('', true));
-
-        $joinField = sprintf('search.%sFields', $type);
+        $index     = $this->driver->getUniqueId();
+        $joinField = $this->driver->getJoinField($type);
         $joinAlias = $this->driver->getJoinAlias($type, $index);
-        $this->qb->leftJoin($joinField, $joinAlias);
+
+        $this->qb->innerJoin($joinField, $joinAlias);
 
         $searchCondition = [
             'fieldName'  => $field,
@@ -112,7 +112,6 @@ class OrmExpressionVisitor extends ExpressionVisitor
                         $operator,
                         $value
                     );
-
                 }
                 $expressionObjectList[$key] = $combinedExpression;
             }
@@ -162,7 +161,6 @@ class OrmExpressionVisitor extends ExpressionVisitor
         );
 
         return Criteria::implodeFieldTypeName($type, $fieldsString);
-
     }
 
     /**

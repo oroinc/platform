@@ -14,6 +14,7 @@ Table of Contents
    - [Example](#example-2)
  - [Transitions Configuration](#transitions-configuration)
    - [Example](#example-3)
+ - [Transition Triggers Configuration](#transition-triggers-configuration)
  - [Transition Definition Configuration](#transition-definition-configuration)
    - [Example](#example-4)
  - [Conditions Configuration](#conditions-configuration)
@@ -41,18 +42,18 @@ Structure of configuration is declared in class Oro\Bundle\WorkflowBundle\Config
 Configuration File
 ==================
 
-Configuration must be placed in a file named Resources/config/workflow.yml. For example
-src/Acme/DemoWorkflowBundle/Resources/config/workflow.yml.
+Configuration must be placed in a file named Resources/config/oro/workflows.yml. For example
+src/Acme/DemoWorkflowBundle/Resources/config/oro/workflows.yml.
 
 Configuration file may be split by parts. All included parts must be placed under imports section. Imports may be used
 in any part of workflow configuration.
 
-**Example - workflow.yml**
+**Example - workflows.yml**
 ```
 imports:
-    - { resource: 'oro/workflow/b2b_flow_lead.yml' }
-    - { resource: 'oro/workflow/b2b_flow_sales.yml' }
-    - { resource: 'oro/workflow/b2b_flow_sales_funnel.yml' }
+    - { resource: 'workflows/b2b_flow_lead.yml' }
+    - { resource: 'workflows/b2b_flow_sales.yml' }
+    - { resource: 'workflows/b2b_flow_sales_funnel.yml' }
 ```
 
 **Example - b2b_flow_lead.yml**
@@ -66,7 +67,7 @@ imports:
 workflows:
     b2b_flow_lead:
         label: 'Unqualified Sales Lead'
-        entity: OroCRM\Bundle\SalesBundle\Entity\Lead
+        entity: Oro\Bundle\SalesBundle\Entity\Lead
         entity_attribute: lead
         start_step: new
 ```
@@ -128,8 +129,15 @@ Single workflow configuration has next properties:
     Contains configuration for Transitions
 * **transition_definitions**
     Contains configuration for Transition Definitions
+* **priority** - integer value of current workflow dominance level in part of automatically performed tasks (ordering, exclusiveness). It is recommended to use high degree integer values to give a scope for 3rd party integrators.
+* **exclusive_active_groups** - list of group names for which current workflow should be active exclusively
+* **exclusive_record_groups** - list of group names for which current workflow can not be performed together with other workflows with one of specified groups. E.g., no concurrent transitions are possible among workflows in same exclusive_record_group. 
 * **entity_restrictions**
     Contains configuration for Workflow Restrictions
+* **defaults** - node for default workflow configuration values that can be changed in UI later. 
+    * **active** - determine if workflow should be active right after first load of configuration.
+
+
 
 Example
 -------
@@ -137,11 +145,17 @@ Example
 workflows:                                                    # Root elements
     b2b_flow_sales:                                           # A unique name of workflow
         label: B2B Sales Flow                                 # This will be shown in UI
-        entity: OroCRM\Bundle\SalesBundle\Entity\Opportunity  # Workflow will be used for this entity
+        defaults:
+            active: true                                      # Active by default (when config is loaded)
+        entity: Oro\Bundle\SalesBundle\Entity\Opportunity  # Workflow will be used for this entity
         entity_attribute: opportunity                         # Attribute name used to store root entity
         is_system: true                                       # Workflow is system, i.e. not editable and not deletable
         start_step: qualify                                   # Name of start step
         steps_display_ordered: true                           # Show all steps in step widget
+        priority: 100                                         # Priority level
+        exclusive_active_groups: [b2b_sales]                  # Only one active workflow from 'b2b_sales' group can be active
+        exclusive_record_groups:
+            - sales                                           # Only one workflow from group 'sales' can be started at time for the entity
         attributes:                                           # configuration for Attributes
                                                               # ...
         steps:                                                # configuration for Steps
@@ -227,7 +241,7 @@ workflows:
             entity_acl:
                 delete: false
             options:
-                class: OroCRM\Bundle\AccountBundle\Entity\Account
+                class: Oro\Bundle\AccountBundle\Entity\Account
         new_company_name:
             label: 'Company name'
             type: string
@@ -288,7 +302,7 @@ workflows:
                     owner:
                         update: false
                         delete: false
-             start_conversation:
+            start_conversation:
                 label: 'Call Phone Conversation'
                 allowed_transitions:
                     - end_conversation
@@ -355,23 +369,11 @@ Transition configuration has next options:
 * **form_options**
     These options will be passed to form type of transition, they can contain options for form types of attributes that
     will be shown when user clicks transition button.
-* **schedule**
-    These options can be used to configure the schedule for performing transition. This block can contain following sub-options:
-    - **cron** (*string*) - cron-definition for scheduling time for performing transition.
-    - **filter** (*string*) - "WHERE" part of DQL expression. This option used to filter entities that will be used in transition.
-    Following aliases are available:
-        - **e** - entity
-        - **wd** - WorkflowDefinition
-        - **wi** - WorkflowItem
-        - **ws** - WorkflowStep
-
-    - **check_conditions_before_job_creation** (*boolean*, default = false) - whether to check conditions of transition before creating new `Job` for transition performing.
-    
-    Transition for entity can be performed by schedule, when entity is on the appropriate step and all defined conditions are met.
-
 * **transition_definition**
     *string*
     Name of associated transition definition.
+* **triggers**
+    Contains configuration for Workflow Transition Triggers
 
 Example
 -------
@@ -387,9 +389,6 @@ workflows:
                                                             # when transition will be performed
 
                 transition_definition: connected_definition # A reference to Transition Definition configuration
-                schedule:
-                    cron: '0 * * * *'                       # try to perform transition every hour
-                    filter: "e.expired = 1"                 # transition by schedule will be executed only for entities that have field `expired` = true
                 frontend_options:
                     icon: 'icon-ok'                         # add icon to transition button with class "icon-ok"
                     class: 'btn-primary'                    # add css class "btn-primary" to transition button
@@ -407,6 +406,93 @@ workflows:
                 label: 'End conversation'
                 step_to: end_call
                 transition_definition: end_conversation_definition
+                triggers:
+                    -
+                        cron: '* * * * *'
+                        filter: "e.someStatus = 'OPEN'"
+```
+
+Transition Triggers Configuration
+=================================
+
+Transition Triggers are used to perform Transition by Event or by cron-definition.
+
+Please note that transition can be performed by trigger even if Workflow not started for the entity yet. 
+
+There are 2 types of triggers:
+
+Event trigger:
+--------------
+
+Event trigger configuration has next options.
+
+* **entity_class**
+    Class of entity that can trigger transition.
+* **event**
+    Type of the event, can have the following values: `create`, `update`, `delete`.
+* **field**
+    Only for `update` event - field name that should be updated to handle trigger.
+* **queue**
+    [boolean, default = true] Handle trigger in queue (if `true`), or in realtime (if `false`) 
+* **require**
+    String of Symfony Language Expression that should much to handle the trigger. Following aliases are available:
+    * `entity` - Entity object, that dispatched event,
+    * `mainEntity` - Entity object of triggers' workflow,
+    * `wd` - Workflow Definition object,
+    * `wi` - Workflow Item object.
+* **relation**
+    Property path to `mainEntity` relative to `entity` if they are different.
+    
+Example
+-------
+
+```
+workflows:
+    phone_call:
+        # ...
+        transitions:
+            connected:
+                ...
+                triggers:
+                    -
+                        entity_class: Oro\Bundle\SaleBundle\Entity\Quote    # entity class
+                        event: update                                       # event type
+                        field: status                                       # updated field
+                        queued: false                                       # handle trigger not in queue
+                        relation: call                                      # relation to Workflow entity
+                        require: "entity.status = 'pending'"                # expression language condition
+```
+
+Cron trigger:
+--------------
+
+Cron trigger configuration has next options.
+
+* **cron**
+    Cron definition.
+* **queue**
+    [boolean, default = true] Handle trigger in queue (if `true`), or in realtime (if `false`) 
+* **filter**
+    String of Symfony Language Expression that should much to handle the trigger. Following aliases are available:
+    * `e` - Entity,
+    * `wd` - Workflow Definition,
+    * `wi` - Workflow Item,
+    * `ws` - Current Workflow Step.
+    
+Example
+-------
+
+```
+workflows:
+    phone_call:
+        # ...
+        transitions:
+            connected:
+                ...
+                triggers:
+                    -
+                        cron: '* * * * *'                                   # cron definition
+                        filter: "e.someStatus = 'OPEN'"                     # dql-filter
 ```
 
 Transition Definition Configuration
@@ -419,14 +505,20 @@ Transition definition configuration has next options.
 
 * **preactions**
     Configuration of Pre Actions that must be performed before Pre Conditions check.
-* **pre_conditions**
+* **preconditions**
     Configuration of Pre Conditions that must satisfy to allow displaying transition.
 * **conditions**
     Configuration of Conditions that must satisfy to allow transition.
-* **post_actions**
+* **actions**
     Configuration of Post Actions that must be performed after transit to next step will be performed.
+* **form_init**
+    Configuration of Form Init Actions that may be performed on workflow item before conditions and actions.
+* **pre_conditions**
+    Deprecated, use `preconditions` instead.
 * **init_actions**
-    Configuration of Init Actions that may be performed on workflow item before conditions and post actions.
+    Deprecated, use `form_init` instead.
+* **post_actions**
+    Deprecated, use `actions` instead.
 
 Example
 -------
@@ -444,9 +536,9 @@ workflows:
                 conditions:
                     @not_blank: [$call_timeout]
                 # Set call_successfull = true
-                post_actions:
+                actions:
                     - @assign_value: [$call_successfull, true]
-                init_actions:
+                form_init:
                     - @increment_value: [$call_attempt]
             not_answered_definition: # Callee did not answer
                 # Set timeout value
@@ -458,7 +550,7 @@ workflows:
                         - @not_blank: [$call_timeout]
                         - @ge: [$call_timeout, 60]
                 # Set call_successfull = false
-                post_actions:
+                actions:
                     - @assign_value: [$call_successfull, false]
             end_conversation_definition:
                 conditions:
@@ -469,7 +561,7 @@ workflows:
                         - @not_blank: [$conversation_successful]
                 # Create PhoneConversation and set it's properties
                 # Pass data from workflow to conversation
-                post_actions:
+                actions:
                     - @create_entity: # create PhoneConversation
                         class: Acme\Bundle\DemoWorkflowBundle\Entity\PhoneConversation
                         attribute: $conversation
@@ -576,7 +668,7 @@ workflows:
         transition_definitions:
             # some transition definition
             qualify_call:
-                pre_conditions:
+                preconditions:
                     @equal: [$status, "in_progress"]
                 conditions:
                     # empty($call_timeout) || (($call_timeout >= 60 && $call_timeout < 100) || ($call_timeout > 0 && $call_timeout <= 30))
@@ -625,9 +717,9 @@ workflows:
             # some transition definition
                 preactions:
                     - @some_action: ~
-                init_actions:
+                form_init:
                     - @assign_value: [$call_attempt, 1]
-                post_actions:
+                actions:
                     - @create_entity: # create an entity PhoneConversation
                         class: Acme\Bundle\DemoWorkflowBundle\Entity\PhoneConversation
                         attribute: $conversation
@@ -661,7 +753,6 @@ workflows:
     phone_call:
         label: 'Demo Call Workflow'
         entity: Acme\Bundle\DemoWorkflowBundle\Entity\PhoneCall
-        enabled: true
         start_step: start_call
         steps:
             start_call:
@@ -721,7 +812,7 @@ workflows:
                 conditions:
                     @not_blank: [$call_timeout]
                 # Set call_successfull = true
-                post_actions:
+                actions:
                     - @assign_value:
                         parameters: [$call_successfull, true]
             not_answered_definition: # Callee did not answer
@@ -731,7 +822,7 @@ workflows:
                         - @not_blank: [$call_timeout]
                         - @ge: [$call_timeout, 60]
                 # Set call_successfull = false
-                post_actions:
+                actions:
                     - @assign_value:
                         parameters: [$call_successfull, false]
             end_conversation_definition:
@@ -743,7 +834,7 @@ workflows:
                         - @not_blank: [$conversation_successful]
                 # Create PhoneConversation and set it's properties
                 # Pass data from workflow to conversation
-                post_actions:
+                actions:
                     - @create_entity: # create PhoneConversation
                         parameters:
                             class: Acme\Bundle\DemoWorkflowBundle\Entity\PhoneConversation

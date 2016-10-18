@@ -2,14 +2,32 @@
 
 namespace Oro\Bundle\SearchBundle\Tests\Unit\Query\Result;
 
+use Doctrine\Common\Persistence\ObjectManager;
+use Doctrine\Common\Persistence\ObjectRepository;
 use Oro\Bundle\SearchBundle\Query\Result\Item;
 use Oro\Bundle\SearchBundle\Tests\Unit\Fixture\Entity\Product;
 
 class ItemTest extends \PHPUnit_Framework_TestCase
 {
+    /**
+     * @var ObjectManager|\PHPUnit_Framework_MockObject_MockObject
+     */
     protected $om;
+
+    /**
+     * @var Item|\PHPUnit_Framework_MockObject_MockObject
+     */
     protected $item;
+
+    /**
+     * @var Product
+     */
     protected $product;
+
+    /**
+     * @var ObjectRepository|\PHPUnit_Framework_MockObject_MockObject
+     */
+    protected $repository;
 
     protected function setUp()
     {
@@ -30,16 +48,17 @@ class ItemTest extends \PHPUnit_Framework_TestCase
             1,
             'test title',
             'http://example.com',
-            array(
-                 'alias' => 'test_product',
-                 'label' => 'test product',
-                 'fields' => array(
-                     array(
-                         'name'          => 'name',
-                         'target_type'   => 'text',
-                     ),
-                 ),
-            )
+            [],
+            [
+                'alias'  => 'test_product',
+                'label'  => 'test product',
+                'fields' => [
+                    [
+                        'name'        => 'name',
+                        'target_type' => 'text',
+                    ],
+                ],
+            ]
         );
 
         $this->om->expects($this->any())
@@ -90,6 +109,12 @@ class ItemTest extends \PHPUnit_Framework_TestCase
     {
         $this->item->setRecordUrl('http://example.com');
         $this->assertEquals('http://example.com', $this->item->getRecordUrl());
+    }
+
+    public function testSelectedData()
+    {
+        $this->item->setSelectedData(['sku' => 'abc123']);
+        $this->assertEquals(['sku' => 'abc123'], $this->item->getSelectedData());
     }
 
     public function testGetEntityConfig()

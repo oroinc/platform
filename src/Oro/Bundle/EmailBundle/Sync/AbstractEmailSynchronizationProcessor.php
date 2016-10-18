@@ -16,6 +16,7 @@ use Oro\Bundle\EmailBundle\Entity\Mailbox;
 use Oro\Bundle\EmailBundle\Exception\SyncFolderTimeoutException;
 use Oro\Bundle\EmailBundle\Model\EmailHeader;
 use Oro\Bundle\EmailBundle\Model\FolderType;
+use Oro\Bundle\EmailBundle\Sync\Model\SynchronizationProcessorSettings;
 use Oro\Bundle\EmailBundle\Tools\EmailAddressHelper;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\OrganizationBundle\Entity\OrganizationInterface;
@@ -51,6 +52,9 @@ abstract class AbstractEmailSynchronizationProcessor implements LoggerAwareInter
     /** @var OrganizationInterface */
     protected $currentOrganization;
 
+    /** @var SynchronizationProcessorSettings */
+    protected $settings;
+
     /**
      * Constructor
      *
@@ -66,6 +70,7 @@ abstract class AbstractEmailSynchronizationProcessor implements LoggerAwareInter
         $this->em                       = $em;
         $this->emailEntityBuilder       = $emailEntityBuilder;
         $this->knownEmailAddressChecker = $knownEmailAddressChecker;
+        $this->settings = new SynchronizationProcessorSettings();
     }
 
     /**
@@ -121,7 +126,7 @@ abstract class AbstractEmailSynchronizationProcessor implements LoggerAwareInter
     protected function checkOrganization(EmailHeader $email, $folderType, $organization)
     {
         $helper = new EmailAddressHelper();
-        $repo = $this->em->getRepository('OroCRMContactBundle:ContactEmail');
+        $repo = $this->em->getRepository('OroContactBundle:ContactEmail');
         $qb = $repo->createQueryBuilder('ce');
 
         if ($folderType === FolderType::SENT) {
@@ -450,5 +455,21 @@ abstract class AbstractEmailSynchronizationProcessor implements LoggerAwareInter
             $mailboxId,
             $email->getFrom()
         );
+    }
+
+    /**
+     * @param SynchronizationProcessorSettings $settings
+     */
+    public function setSettings(SynchronizationProcessorSettings $settings)
+    {
+        $this->settings = $settings;
+    }
+
+    /**
+     * @return SynchronizationProcessorSettings
+     */
+    public function getSettings()
+    {
+        return $this->settings;
     }
 }

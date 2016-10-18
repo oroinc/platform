@@ -2,22 +2,30 @@
 
 namespace Oro\Bundle\WorkflowBundle\Configuration;
 
-use Symfony\Component\Config\Definition\Processor;
-use Symfony\Component\Config\Definition\ConfigurationInterface;
+use Cron\CronExpression;
+
+use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\Config\Definition\Builder\NodeBuilder;
-use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\Builder\NodeDefinition;
+use Symfony\Component\Config\Definition\Builder\TreeBuilder;
+use Symfony\Component\Config\Definition\ConfigurationInterface;
+use Symfony\Component\Config\Definition\Processor;
 
-use Oro\Bundle\WorkflowBundle\Form\Type\WorkflowTransitionType;
+use Oro\Bundle\WorkflowBundle\Entity\EventTriggerInterface;
+use Oro\Bundle\WorkflowBundle\Entity\TransitionEventTrigger;
 use Oro\Bundle\WorkflowBundle\Exception\WorkflowException;
+use Oro\Bundle\WorkflowBundle\Form\Type\WorkflowTransitionType;
 
-class WorkflowConfiguration implements ConfigurationInterface
+class WorkflowConfiguration extends AbstractConfiguration implements ConfigurationInterface
 {
     const NODE_STEPS = 'steps';
     const NODE_ATTRIBUTES = 'attributes';
     const NODE_TRANSITIONS = 'transitions';
     const NODE_TRANSITION_DEFINITIONS = 'transition_definitions';
     const NODE_ENTITY_RESTRICTIONS = 'entity_restrictions';
+    const NODE_EXCLUSIVE_ACTIVE_GROUPS = 'exclusive_active_groups';
+    const NODE_EXCLUSIVE_RECORD_GROUPS = 'exclusive_record_groups';
+    const NODE_TRANSITION_TRIGGERS = 'triggers';
 
     const DEFAULT_TRANSITION_DISPLAY_TYPE = 'dialog';
     const DEFAULT_ENTITY_ATTRIBUTE = 'entity';
@@ -74,11 +82,24 @@ class WorkflowConfiguration implements ConfigurationInterface
             ->booleanNode('steps_display_ordered')
                 ->defaultFalse()
             ->end()
+            ->arrayNode('defaults')
+                ->addDefaultsIfNotSet()
+                ->children()
+                    ->booleanNode('active')
+                        ->defaultFalse()
+                    ->end()
+                ->end()
+            ->end()
+            ->integerNode('priority')
+                ->defaultValue(0)
+            ->end()
             ->append($this->getStepsNode())
             ->append($this->getAttributesNode())
             ->append($this->getTransitionsNode())
             ->append($this->getTransitionDefinitionsNode())
-            ->append($this->getEntityRestrictionsNode());
+            ->append($this->getEntityRestrictionsNode())
+            ->append($this->getGroupsNode(self::NODE_EXCLUSIVE_ACTIVE_GROUPS))
+            ->append($this->getGroupsNode(self::NODE_EXCLUSIVE_RECORD_GROUPS));
 
         return $nodeBuilder;
     }
@@ -232,15 +253,6 @@ class WorkflowConfiguration implements ConfigurationInterface
                     ->scalarNode('acl_message')
                         ->defaultNull()
                     ->end()
-                    ->arrayNode('schedule')
-                        ->children()
-                            ->scalarNode('cron')->end()
-                            ->scalarNode('filter')->end()
-                            ->booleanNode('check_conditions_before_job_creation')
-                                ->defaultFalse()
-                            ->end()
-                        ->end()
-                    ->end()
                     ->scalarNode('message')
                         ->defaultNull()
                     ->end()
@@ -261,6 +273,13 @@ class WorkflowConfiguration implements ConfigurationInterface
                     ->arrayNode('form_options')
                         ->prototype('variable')
                         ->end()
+                        ->beforeNormalization()
+                            ->always(function ($config) {
+                                return $this->mergeConfigs([
+                                    'form_init' => 'init_actions',
+                                ], $config);
+                            })
+                        ->end()
                     ->end()
                     ->scalarNode('page_template')
                         ->defaultNull()
@@ -268,6 +287,7 @@ class WorkflowConfiguration implements ConfigurationInterface
                     ->scalarNode('dialog_template')
                         ->defaultNull()
                     ->end()
+                    ->append($this->getTransitionTriggers())
                 ->end()
                 ->validate()
                     ->always(
@@ -287,6 +307,101 @@ class WorkflowConfiguration implements ConfigurationInterface
     }
 
     /**
+     * @return ArrayNodeDefinition|NodeDefinition
+     */
+    protected function getTransitionTriggers()
+    {
+        $builder = new TreeBuilder();
+        $triggersNode = $builder->root(self::NODE_TRANSITION_TRIGGERS);
+        $triggersNode
+            ->prototype('array')
+                ->children()
+                    ->enumNode('event')
+                        ->defaultNull()
+                        ->values(TransitionEventTrigger::getAllowedEvents())
+                    ->end()
+                    ->scalarNode('field')
+                        ->defaultNull()
+                    ->end()
+                    ->scalarNode('require')
+                        ->defaultNull()
+                    ->end()
+                    ->booleanNode('queued')
+                        ->defaultTrue()
+                    ->end()
+                    ->scalarNode('entity_class')
+                        ->defaultNull()
+                    ->end()
+                    ->scalarNode('relation')
+                        ->defaultNull()
+                    ->end()
+                    ->scalarNode('cron')
+                        ->defaultNull()
+                        ->validate()
+                        ->always(
+                            function ($value) {
+                                if ($value !== null) {
+                                    // validate expression string
+                                    CronExpression::factory($value);
+                                }
+                                return $value;
+                            }
+                        )
+                        ->end()
+                    ->end()
+                    ->scalarNode('filter')
+                        ->info('DQL "where" part to filter entities that match for cron trigger.')
+                        ->defaultNull()
+                    ->end()
+                ->end()
+                ->validate()
+                    ->ifTrue(
+                        function ($data) {
+                            return $data['event'] && $data['cron'];
+                        }
+                    )
+                    ->thenInvalid('Only one child node "event" or "cron" must be configured.')
+                ->end()
+                ->validate()
+                    ->always(
+                        function ($data) {
+                            $eventFields = ['relation', 'field', 'entity_class', 'require'];
+                            if ($data['cron']) {
+                                foreach ($eventFields as $field) {
+                                    if ($data[$field]) {
+                                        throw new \LogicException(
+                                            sprintf('Field "%s" only allowed for event node', $field)
+                                        );
+                                    }
+                                }
+                            }
+
+                            return $data;
+                        }
+                    )
+                ->end()
+                ->validate()
+                    ->ifTrue(
+                        function ($data) {
+                            return $data['field'] && $data['event'] !== EventTriggerInterface::EVENT_UPDATE;
+                        }
+                    )->thenInvalid('The "field" option is only allowed for update event.')
+                ->end()
+                ->validate()
+                    ->ifTrue(
+                        function ($data) {
+                            return $data['relation'] && !$data['entity_class'];
+                        }
+                    )
+                    ->thenInvalid(
+                        'Field `entity_class` is mandatory for custom (non-workflow related) entity.'
+                    )
+                ->end()
+            ->end();
+
+        return $triggersNode;
+    }
+    /**
      * @return NodeDefinition
      */
     protected function getTransitionDefinitionsNode()
@@ -304,18 +419,28 @@ class WorkflowConfiguration implements ConfigurationInterface
                         ->prototype('variable')
                         ->end()
                     ->end()
-                    ->arrayNode('pre_conditions')
+                    ->arrayNode('preconditions')
                         ->prototype('variable')
                         ->end()
                     ->end()
+                    ->arrayNode('pre_conditions')->end() // deprecated, use `preconditions` instead
                     ->arrayNode('conditions')
                         ->prototype('variable')
                         ->end()
                     ->end()
-                    ->arrayNode('post_actions')
+                    ->arrayNode('actions')
                         ->prototype('variable')
                         ->end()
                     ->end()
+                    ->arrayNode('post_actions')->end() // deprecated, use `actions` instead
+                ->end()
+                ->beforeNormalization()
+                    ->always(function ($config) {
+                        return $this->mergeConfigs([
+                            'preconditions' => 'pre_conditions',
+                            'actions' => 'post_actions',
+                        ], $config);
+                    })
                 ->end()
             ->end();
 
@@ -353,6 +478,27 @@ class WorkflowConfiguration implements ConfigurationInterface
                         ->end()
                     ->end()
                 ->end()
+            ->end();
+
+        return $rootNode;
+    }
+
+    /**
+     * @param string $nodeName
+     * @return NodeDefinition
+     */
+    protected function getGroupsNode($nodeName)
+    {
+        $treeBuilder = new TreeBuilder();
+        $rootNode = $treeBuilder->root($nodeName);
+        $rootNode
+            ->beforeNormalization()
+                ->always()
+                ->then(function ($v) {
+                    return array_map('strtolower', $v);
+                })
+            ->end()
+            ->prototype('scalar')
             ->end();
 
         return $rootNode;

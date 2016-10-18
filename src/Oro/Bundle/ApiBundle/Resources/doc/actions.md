@@ -17,6 +17,7 @@ Table of Contents
    - [**add_relationship** action](#add_relationship-action)
    - [**delete_relationship** action](#delete_relationship-action)
    - [**customize_loaded_data** action](#customize_loaded_data-action)
+   - [**customize_form_data** action](#customize_form_data-action)
    - [**get_config** action](#get_config-action)
    - [**get_relation_config** action](#get_relation_config-action)
    - [**get_metadata** action](#get_metadata-action)
@@ -55,6 +56,7 @@ The following table shows all actions provided out of the box:
 | [add_relationship](#add_relationship-action) | Adds one or several entities to a relationship. This action is applicable only for "to-many" relationships |
 | [delete_relationship](#delete_relationship-action) | Deletes one or several entities from a relationship. This action is applicable only for "to-many" relationships |
 | [customize_loaded_data](#customize_loaded_data-action) | Makes modifications of data loaded by [get](#get-action), [get_list](#get_list-action) and [get_subresource](#get_subresource-action) actions |
+| [customize_form_data](#customize_form_data-action) | Makes modifications of submitted form data for [create](#create-action) and [update](#update-action) actions |
 | [get_config](#get_config-action) | Returns a configuration of an entity |
 | [get_relation_config](#get_relation_config-action) | Returns a configuration of an entity if it is used in a relationship |
 | [get_metadata](#get_metadata-action) | Returns a metadata of an entity |
@@ -170,7 +172,7 @@ This action is intended to delete a list of entities.
 The entities list is built based on input filters. Please take into account that at least one filter must be specified, otherwise an error raises.
 
 By default the maximum number of entities that can be deleted by one request is 100. This limit was introduced to minimize impact on the server.
-You can change this limit for an entity in `Resources/config/acl.yml`, but please test your limit carefully because a big limit may make a big impact to the server.
+You can change this limit for an entity in `Resources/config/oro/api.yml`, but please test your limit carefully because a big limit may make a big impact to the server.
 An example how to change default limit you can read at [how-to](how_to.md#change-the-maximum-number-of-entities-that-can-be-deleted-by-one-request).
 
 The route name for REST API: `oro_rest_api_cdelete`.
@@ -431,113 +433,22 @@ customize_loaded_data Action
 
 This action is intended to make modifications of data loaded by [get](#get-action), [get_list](#get_list-action) and [get_subresource](#get_subresource-action) actions.
 
-The context class: [CustomizeLoadedDataContext](../../Processor/CollectResources/CustomizeLoadedDataContext.php).
+The context class: [CustomizeLoadedDataContext](../../Processor/CustomizeLoadedData/CustomizeLoadedDataContext.php).
 
 The main processor class: [CustomizeLoadedDataProcessor](../../Processor/CustomizeLoadedDataProcessor.php).
 
-There are no worker processors in ApiBundle. To see existing worker processors from other bundles run `php app/console oro:api:debug customize_loaded_data`.
+As example of a processor is used to modify loaded data you can see [ComputePrimaryField](../../Processor/CustomizeLoadedData/ComputePrimaryField.php). Also you can run `php app/console oro:api:debug customize_loaded_data` to see other processors registered in this action.
 
-An example of a processor to modify loaded data:
+customize_form_data Action
+--------------------------
 
-```php
-<?php
+This action is intended to make modifications of submitted form data for [create](#create-action) and [update](#update-action) actions.
 
-namespace Oro\Bundle\AttachmentBundle\Api\Processor;
+The context class: [CustomizeFormDataContext](../../Processor/CustomizeFormData/CustomizeFormDataContext.php).
 
-use Gaufrette\Exception\FileNotFound;
+The main processor class: [CustomizeFormDataProcessor](../../Processor/CustomizeFormDataProcessor.php).
 
-use Psr\Log\LoggerInterface;
-
-use Oro\Component\ChainProcessor\ContextInterface;
-use Oro\Component\ChainProcessor\ProcessorInterface;
-use Oro\Bundle\ApiBundle\Processor\CustomizeLoadedDataContext;
-use Oro\Bundle\AttachmentBundle\Manager\FileManager;
-
-/**
- * Computes a value of "content" field for File entity.
- */
-class ComputeFileContent implements ProcessorInterface
-{
-    /** @var FileManager */
-    protected $fileManager;
-
-    /** @var LoggerInterface */
-    protected $logger;
-
-    /**
-     * @param FileManager     $fileManager
-     * @param LoggerInterface $logger
-     */
-    public function __construct(FileManager $fileManager, LoggerInterface $logger)
-    {
-        $this->fileManager = $fileManager;
-        $this->logger = $logger;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function process(ContextInterface $context)
-    {
-        /** @var CustomizeLoadedDataContext $context */
-
-        $data = $context->getResult();
-        if (!is_array($data)) {
-            return;
-        }
-
-        $config = $context->getConfig();
-        $contentField = $config->getField('content');
-        if (!$contentField || $contentField->isExcluded()) {
-            return;
-        }
-
-        if (empty($data['filename'])) {
-            return;
-        }
-
-        $content = $this->getFileContent($data['filename']);
-        if (null !== $content) {
-            $data[$contentField->getPropertyPath()] = $content;
-            $context->setResult($data);
-        }
-    }
-
-    /**
-     * @param string $fileName
-     *
-     * @return string|null
-     */
-    protected function getFileContent($fileName)
-    {
-        $content = null;
-        try {
-            $content = $this->fileManager->getContent($fileName);
-        } catch (FileNotFound $e) {
-            $this->logger->error(
-                sprintf('The content for "%s" file cannot be loaded.', $fileName),
-                ['exception' => $e]
-            );
-        }
-        if (null !== $content) {
-            $content = base64_encode($content);
-        }
-
-        return $content;
-    }
-}
-```
-
-```yaml
-    oro_attachment.api.customize_loaded_data.compute_file_content:
-        class: Oro\Bundle\AttachmentBundle\Api\Processor\ComputeFileContent
-        arguments:
-            - '@oro_attachment.manager'
-            - '@logger'
-        tags:
-            - { name: oro.api.processor, action: customize_loaded_data, class: Oro\Bundle\AttachmentBundle\Entity\File }
-            - { name: monolog.logger, channel: api }
-```
+As example of a processor is used to modify loaded data you can see [MapPrimaryField](../../Processor/CustomizeFormData/MapPrimaryField.php). Also you can run `php app/console oro:api:debug customize_form_data` to see other processors registered in this action.
 
 get_config Action
 -----------------
@@ -642,8 +553,11 @@ Example of usage:
 /** @var ResourcesProvider $resourcesProvider */
 $resourcesProvider = $container->get('oro_api.resources_provider');
 // get all Data API resources
+// (all resources are configured to be used in Data API, including not accessible resources)
 $resources = $resourcesProvider->getResources($version, $requestType);
-// check whether an entity type is accessible through Data API
+// check whether an entity is configured to be used in Data API
+$isKnown = $resourcesProvider->isResourceKnown($entityClass, $version, $requestType);
+// check whether an entity is accessible through Data API
 $isAccessible = $resourcesProvider->isResourceAccessible($entityClass, $version, $requestType);
 ```
 

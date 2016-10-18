@@ -39,6 +39,9 @@ class RestoreDefaultFormExtensionTest extends FormProcessorTestCase
         $this->metadataTypeGuesser->expects($this->once())
             ->method('setMetadataAccessor')
             ->with(null);
+        $this->metadataTypeGuesser->expects($this->once())
+            ->method('setConfigAccessor')
+            ->with(null);
 
         $this->processor->process($this->context);
     }

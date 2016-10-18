@@ -37,6 +37,7 @@ services:
         class: %oro_migration.migrations.executor.class%
         arguments:
             - '@oro_migration.migrations.query_executor'
+            - '@oro_cache.oro_data_cache_manager'
         calls:
             - [setExtensionManager, ['@oro_migration.migrations.extension_manager']]
             - [setNameGenerator, ['@oro_migration.db_id_name_generator']]

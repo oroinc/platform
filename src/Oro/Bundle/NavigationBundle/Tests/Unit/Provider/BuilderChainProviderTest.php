@@ -2,6 +2,9 @@
 namespace Oro\Bundle\NavigationBundle\Tests\Unit\Provider;
 
 use Knp\Menu\FactoryInterface;
+use Knp\Menu\Loader\ArrayLoader;
+use Knp\Menu\Util\MenuManipulator;
+
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Oro\Bundle\NavigationBundle\Provider\BuilderChainProvider;
 use Oro\Bundle\NavigationBundle\Menu\BuilderInterface;
@@ -19,6 +22,16 @@ class BuilderChainProviderTest extends \PHPUnit_Framework_TestCase
     protected $eventDispatcher;
 
     /**
+     * @var \PHPUnit_Framework_MockObject_MockObject|ArrayLoader
+     */
+    protected $loader;
+
+    /**
+     * @var \PHPUnit_Framework_MockObject_MockObject|MenuManipulator
+     */
+    protected $manipulator;
+
+    /**
      * @var BuilderChainProvider
      */
     protected $provider;
@@ -29,7 +42,19 @@ class BuilderChainProviderTest extends \PHPUnit_Framework_TestCase
             ->getMock();
         $this->eventDispatcher = $this->getMockBuilder('Symfony\Component\EventDispatcher\EventDispatcherInterface')
             ->getMock();
-        $this->provider = new BuilderChainProvider($this->factory, $this->eventDispatcher);
+
+        $this->loader = $this->getMockBuilder('Knp\Menu\Loader\ArrayLoader')
+            ->setConstructorArgs([$this->factory])
+            ->getMock();
+        $this->manipulator = $this->getMockBuilder('Knp\Menu\Util\MenuManipulator')
+            ->getMock();
+
+        $this->provider = new BuilderChainProvider(
+            $this->factory,
+            $this->eventDispatcher,
+            $this->loader,
+            $this->manipulator
+        );
     }
 
     public function testAddBuilder()
@@ -135,8 +160,8 @@ class BuilderChainProviderTest extends \PHPUnit_Framework_TestCase
             ->with($alias)
             ->will($this->returnValue($items));
 
-        $this->factory->expects($this->once())
-            ->method('createFromArray')
+        $this->loader->expects($this->once())
+            ->method('load')
             ->with($items)
             ->will($this->returnValue($menu));
 

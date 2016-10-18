@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\Subresource\Shared;
 
+use Oro\Bundle\ApiBundle\Request\ConstraintTextExtractor;
 use Symfony\Component\Validator\Constraints;
 
 use Oro\Bundle\ApiBundle\Model\Error;
@@ -21,7 +22,7 @@ class CollectFormErrorsTest extends ChangeRelationshipTestCase
     {
         parent::setUp();
 
-        $this->processor = new CollectFormErrors();
+        $this->processor = new CollectFormErrors(new ConstraintTextExtractor());
     }
 
     public function testErrorPropertyPathShouldBeEmptyStringForToOneAssociationRelatedError()

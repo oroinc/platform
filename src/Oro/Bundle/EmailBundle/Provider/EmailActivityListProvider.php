@@ -187,12 +187,7 @@ class EmailActivityListProvider implements
     {
         /** @var $entity Email */
         if ($entity->getEmailBody()) {
-            $body = $entity->getEmailBody()->getBodyContent();
-            $content = $this->htmlTagHelper->purify($body);
-            $content = $this->htmlTagHelper->stripTags($content);
-            $content = $this->htmlTagHelper->shorten($content);
-
-            return $content;
+            return $entity->getEmailBody()->getTextBody();
         }
 
         return null;
@@ -311,7 +306,7 @@ class EmailActivityListProvider implements
      */
     public function getTemplate()
     {
-        return 'OroEmailBundle:Email:js/activityItemTemplate.js.twig';
+        return 'OroEmailBundle:Email:js/activityItemTemplate.html.twig';
     }
 
     /**
@@ -319,7 +314,7 @@ class EmailActivityListProvider implements
      */
     public function getGroupedTemplate()
     {
-        return 'OroEmailBundle:Email:js/groupedActivityItemTemplate.js.twig';
+        return 'OroEmailBundle:Email:js/groupedActivityItemTemplate.html.twig';
     }
 
     /**

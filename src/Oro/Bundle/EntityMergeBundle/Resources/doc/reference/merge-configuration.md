@@ -19,7 +19,7 @@ Entity can be configure on entity level and on fields level
 Entity level configuration
 
 ```
-oro_entity_config:
+entity_config:
     # Scope of entity merge
     merge:
         # Attributes applicable on entity level
@@ -54,7 +54,7 @@ Example:
 Fields Level configuration
 
 ```
-oro_entity_config:
+entity_config:
     # Scope of entity merge
     merge:
         # Attributes applicable on entity fields level
@@ -87,8 +87,8 @@ oro_entity_config:
                 # As Account doesn't have access to collection of calls the only possible place to configure calls merging
                 # for account is this field in Call entity
                 inverse_display: ~
-                # Same as merge_mode but used for relation entity
-                inverse_modes: ~
+                # Same as merge_modes but used for relation entity
+                inverse_merge_modes: ~
                 # Same as label but used for relation entity
                 inverse_label: ~
                 # Same as cast_method but used for relation entity
@@ -114,6 +114,10 @@ oro_entity_config:
                 # Date Time pattern
                 # Example m/d/Y
                 render_datetime_pattern: ~
+                # Control escaping of the value when rendered in Merge table.
+                # Use 'false' to disable escaping for the field (i.e. RichText) or set a Twig 'escape' method to enable:
+                # 'html' (or true), 'html_attr', 'css', 'js', 'url'
+                autoescape: true
 ```
 
 Example:
@@ -138,7 +142,7 @@ class Account
 Example of merge mass action:
 
 ```
-datagrid:
+datagrids:
     accounts-grid:
         mass_actions:
             merge:

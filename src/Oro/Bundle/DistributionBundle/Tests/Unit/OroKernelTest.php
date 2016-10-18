@@ -35,21 +35,21 @@ class OroKernelTest extends \PHPUnit_Framework_TestCase
         return [
             [
                 [
-                    ['name' => 'OroCRMCallBundle', 'priority' => 30],
+                    ['name' => 'OroCallBundle', 'priority' => 30],
                     ['name' => 'OroCRMTestBundle', 'priority' => 30],
                 ],
                 [
-                    'OroCRMCallBundle',
+                    'OroCallBundle',
                     'OroCRMTestBundle'
                 ]
             ],
             [
                 [
                     ['name' => 'OroCRMTestBundle', 'priority' => 30],
-                    ['name' => 'OroCRMCallBundle', 'priority' => 30],
+                    ['name' => 'OroCallBundle', 'priority' => 30],
                 ],
                 [
-                    'OroCRMCallBundle',
+                    'OroCallBundle',
                     'OroCRMTestBundle'
                 ]
             ],
@@ -75,22 +75,22 @@ class OroKernelTest extends \PHPUnit_Framework_TestCase
             ],
             [
                 [
-                    ['name' => 'OroCRMCallBundle', 'priority' => 30],
+                    ['name' => 'OroCallBundle', 'priority' => 30],
                     ['name' => 'OroTestBundle', 'priority' => 30],
                 ],
                 [
-                    'OroTestBundle',
-                    'OroCRMCallBundle'
+                    'OroCallBundle',
+                    'OroTestBundle'
                 ]
             ],
             [
                 [
                     ['name' => 'OroTestBundle', 'priority' => 30],
-                    ['name' => 'OroCRMCallBundle', 'priority' => 30],
+                    ['name' => 'OroCallBundle', 'priority' => 30],
                 ],
                 [
-                    'OroTestBundle',
-                    'OroCRMCallBundle'
+                    'OroCallBundle',
+                    'OroTestBundle'
                 ]
             ],
             [

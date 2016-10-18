@@ -73,11 +73,7 @@ class EmailNotificationManager
             $bodyContent = '';
             $emailBody = $email->getEmailBody();
             if ($emailBody) {
-                $bodyContent = $this->htmlTagHelper->shorten(
-                    $this->htmlTagHelper->stripTags(
-                        $this->htmlTagHelper->purify($emailBody->getBodyContent())
-                    )
-                );
+                $bodyContent = $emailBody->getTextBody();
             }
 
             $emailId = $email->getId();
@@ -87,7 +83,7 @@ class EmailNotificationManager
                 'forwardRoute' => $this->router->generate('oro_email_email_forward', ['id' => $emailId]),
                 'id' => $emailId,
                 'seen' => $emailUser->isSeen(),
-                'subject' => $email->getSubject(),
+                'subject' => $this->htmlTagHelper->stripTags($email->getSubject()),
                 'bodyContent' => $bodyContent,
                 'fromName' => $email->getFromName(),
                 'linkFromName' => $this->getFromNameLink($email)

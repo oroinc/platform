@@ -7,6 +7,7 @@ use Oro\Bundle\EmailBundle\Entity\EmailBody;
 use Oro\Bundle\EmailBundle\Entity\EmailAttachment;
 use Oro\Bundle\EmailBundle\Entity\EmailAttachmentContent;
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
+use Oro\Bundle\EmailBundle\Tools\EmailBodyHelper;
 
 /**
  * A helper class allows you to easy build EmailBody entity
@@ -23,6 +24,9 @@ class EmailBodyBuilder
 
     /** @var ConfigManager */
     protected $configManager;
+
+    /** @var EmailBodyHelper */
+    private $emailBodyHelper;
 
     /**
      * @param ConfigManager $configManager
@@ -58,7 +62,8 @@ class EmailBodyBuilder
         $this->emailBody = new EmailBody();
         $this->emailBody
             ->setBodyContent($content)
-            ->setBodyIsText($bodyIsText);
+            ->setBodyIsText($bodyIsText)
+            ->setTextBody($this->getEmailBodyHelper()->getTrimmedClearText($content));
     }
 
     /**
@@ -129,11 +134,12 @@ class EmailBodyBuilder
         }
 
         if ($this->configManager) {
+            /** Maximum sync attachment size, Mb. */
             $attachmentSyncMaxSize = $this->configManager->get(self::ORO_EMAIL_ATTACHMENT_SYNC_MAX_SIZE);
         }
 
         // unlimited or size < configured max size
-        return $attachmentSyncMaxSize === 0 || $size / 1024 / 1024 <= $attachmentSyncMaxSize;
+        return $attachmentSyncMaxSize === 0 || $size / 1000 / 1000 <= $attachmentSyncMaxSize;
     }
 
     /**
@@ -157,5 +163,17 @@ class EmailBodyBuilder
         }
 
         return $contentSize;
+    }
+
+    /**
+     * @return EmailBodyHelper
+     */
+    protected function getEmailBodyHelper()
+    {
+        if (!$this->emailBodyHelper) {
+            $this->emailBodyHelper = new EmailBodyHelper();
+        }
+
+        return $this->emailBodyHelper;
     }
 }

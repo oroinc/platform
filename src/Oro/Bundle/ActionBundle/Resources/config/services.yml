@@ -12,7 +12,6 @@ parameters:
     oro_action.options_assembler.class: Oro\Bundle\ActionBundle\Model\OptionsAssembler
     oro_action.form_manager.class: Oro\Bundle\ActionBundle\Model\OperationFormManager
     oro_action.api_manager.class: Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager
-    oro_action.datagrid.operation_extension.class: Oro\Bundle\ActionBundle\Datagrid\Extension\OperationExtension
     oro_action.datagrid.action.action_widget_action.class: Oro\Bundle\ActionBundle\Datagrid\Action\ActionWidgetAction
     oro_action.datagrid.mass_action_provider.registry.class: Oro\Bundle\ActionBundle\Datagrid\Provider\MassActionProviderRegistry
     oro_action.layout.data_provider.actions_data_rpovider.class: Oro\Bundle\ActionBundle\Layout\DataProvider\ActionsProvider
@@ -68,6 +67,7 @@ services:
             - '@oro_action.configuration.provider.operations'
             - '@oro_action.assembler.operation'
             - '@oro_action.helper.applications'
+            - '@oro_entity.doctrine_helper'
 
     oro_action.action_group_registry:
         class: %oro_action.action_group_registry.class%
@@ -137,8 +137,8 @@ services:
             - ''
             - '@doctrine.orm.entity_manager'
 
-    oro_action.datagrid.extension.operation:
-        class: %oro_action.datagrid.operation_extension.class%
+    oro_action.datagrid.event_listener.operation:
+        class: 'Oro\Bundle\ActionBundle\Datagrid\EventListener\OperationListener'
         arguments:
             - '@oro_action.operation_manager'
             - '@oro_action.helper.context'
@@ -148,8 +148,7 @@ services:
         calls:
             - [setGroups, [['', 'datagridRowAction']]]
         tags:
-            - { name: oro_datagrid.extension }
-        lazy: true
+            - { name: kernel.event_listener, event: oro_datagrid.datagrid.extension.action.configure-actions.before, method: onConfigureActions }
 
     oro_action.datagrid.extension.delete_mass_action:
         class: Oro\Bundle\ActionBundle\Datagrid\Extension\DeleteMassActionExtension
@@ -161,7 +160,6 @@ services:
             - [setGroups, [['', 'datagridRowAction']]]
         tags:
             - { name: oro_datagrid.extension }
-        lazy: true
 
     oro_action.datagrid.action.action_widget_action:
         class: %oro_action.datagrid.action.action_widget_action.class%
@@ -191,3 +189,17 @@ services:
             - '@oro_entity.doctrine_helper'
         tags:
             - { name: layout.data_provider, alias: action_buttons }
+
+    oro_action.condition.route_exists:
+        class: 'Oro\Bundle\ActionBundle\Condition\RouteExists'
+        arguments:
+            - '@router'
+        tags:
+            - { name: oro_action.condition, alias: 'route_exists' }
+
+    oro_action.condition.service_exists:
+        class: 'Oro\Bundle\ActionBundle\Condition\ServiceExists'
+        arguments:
+            - '@service_container'
+        tags:
+            - { name: oro_action.condition, alias: 'service_exists' }

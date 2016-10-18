@@ -17,6 +17,7 @@ use Psr\Log\NullLogger;
 use Oro\Bundle\CronBundle\Entity\Manager\JobManager;
 use Oro\Bundle\EmailBundle\Entity\EmailOrigin;
 use Oro\Bundle\EmailBundle\Exception\SyncFolderTimeoutException;
+use Oro\Bundle\EmailBundle\Sync\Model\SynchronizationProcessorSettings;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\SecurityBundle\Authentication\Token\OrganizationToken;
 
@@ -106,6 +107,7 @@ abstract class AbstractEmailSynchronizer implements LoggerAwareInterface
      * @param int $maxTasks             The maximum number of email origins which can be synchronized
      *                                  Set -1 to unlimited
      *                                  Defaults to 1
+     *
      * @return int
      *
      * @throws \Exception
@@ -153,7 +155,7 @@ abstract class AbstractEmailSynchronizer implements LoggerAwareInterface
 
             $processedOrigins[$origin->getId()] = true;
             try {
-                $this->doSyncOrigin($origin);
+                $this->doSyncOrigin($origin, new SynchronizationProcessorSettings());
             } catch (SyncFolderTimeoutException $ex) {
                 break;
             } catch (\Exception $ex) {
@@ -175,9 +177,11 @@ abstract class AbstractEmailSynchronizer implements LoggerAwareInterface
      * Performs a synchronization of emails for the given email origins.
      *
      * @param int[] $originIds
+     * @param SynchronizationProcessorSettings $settings
+     *
      * @throws \Exception
      */
-    public function syncOrigins(array $originIds)
+    public function syncOrigins(array $originIds, SynchronizationProcessorSettings $settings = null)
     {
         if ($this->logger === null) {
             $this->logger = new NullLogger();
@@ -192,7 +196,7 @@ abstract class AbstractEmailSynchronizer implements LoggerAwareInterface
             $origin = $this->findOrigin($originId);
             if ($origin !== null) {
                 try {
-                    $this->doSyncOrigin($origin);
+                    $this->doSyncOrigin($origin, $settings);
                 } catch (SyncFolderTimeoutException $ex) {
                     break;
                 } catch (\Exception $ex) {
@@ -258,9 +262,11 @@ abstract class AbstractEmailSynchronizer implements LoggerAwareInterface
      * Performs a synchronization of emails for the given email origin.
      *
      * @param EmailOrigin $origin
+     * @param SynchronizationProcessorSettings $settings
+     *
      * @throws \Exception
      */
-    protected function doSyncOrigin(EmailOrigin $origin)
+    protected function doSyncOrigin(EmailOrigin $origin, SynchronizationProcessorSettings $settings = null)
     {
         $this->impersonateOrganization($origin->getOrganization());
         try {
@@ -279,6 +285,9 @@ abstract class AbstractEmailSynchronizer implements LoggerAwareInterface
         try {
             if ($this->changeOriginSyncState($origin, self::SYNC_CODE_IN_PROCESS)) {
                 $syncStartTime = $this->getCurrentUtcDateTime();
+                if ($settings) {
+                    $processor->setSettings($settings);
+                }
                 $processor->process($origin, $syncStartTime);
                 $this->changeOriginSyncState($origin, self::SYNC_CODE_SUCCESS, $syncStartTime);
             } else {
@@ -438,6 +447,9 @@ abstract class AbstractEmailSynchronizer implements LoggerAwareInterface
         $min = clone $now;
         $min->sub(new \DateInterval('P1Y'));
 
+        // time shift in minutes for fails origins
+        $timeShift = 30;
+
         // rules:
         // - items with earlier sync code modification dates have higher priority
         // - previously failed items are shifted at 30 minutes back (it means that if sync failed
@@ -448,9 +460,8 @@ abstract class AbstractEmailSynchronizer implements LoggerAwareInterface
             ->select(
                 'o'
                 . ', CASE WHEN o.syncCode = :inProcess THEN 0 ELSE 1 END AS HIDDEN p1'
-                . ', (COALESCE(o.syncCode, 1000) * 30'
-                . ' + TIMESTAMPDIFF(MINUTE, COALESCE(o.syncCodeUpdatedAt, :min), :now)'
-                . ' / (CASE o.syncCode WHEN :success THEN 100 ELSE 1 END)) AS HIDDEN p2'
+                . ', (TIMESTAMPDIFF(MINUTE, COALESCE(o.syncCodeUpdatedAt, :min), :now)'
+                . ' - (CASE o.syncCode WHEN :success THEN 0 ELSE :timeShift END)) AS HIDDEN p2'
             )
             ->where('o.isActive = :isActive AND (o.syncCodeUpdatedAt IS NULL OR o.syncCodeUpdatedAt <= :border)')
             ->orderBy('p1, p2 DESC, o.syncCodeUpdatedAt')
@@ -460,6 +471,7 @@ abstract class AbstractEmailSynchronizer implements LoggerAwareInterface
             ->setParameter('now', $now)
             ->setParameter('min', $min)
             ->setParameter('border', $border)
+            ->setParameter('timeShift', $timeShift)
             ->setMaxResults($maxConcurrentTasks + 1)
             ->getQuery();
 

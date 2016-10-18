@@ -10,17 +10,27 @@ use Symfony\Component\Validator\ConstraintViolation;
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
 use Oro\Bundle\ApiBundle\Processor\FormContext;
+use Oro\Bundle\ApiBundle\Request\ConstraintTextExtractorInterface;
 use Oro\Bundle\ApiBundle\Model\Error;
 use Oro\Bundle\ApiBundle\Model\ErrorSource;
 use Oro\Bundle\ApiBundle\Request\Constraint;
-use Oro\Bundle\ApiBundle\Validator\Constraints\ConstraintWithStatusCodeInterface;
-use Oro\Bundle\ApiBundle\Util\ValueNormalizerUtil;
 
 /**
  * Collects errors occurred during the the form submit and adds them into the Context.
  */
 class CollectFormErrors implements ProcessorInterface
 {
+    /** @var ConstraintTextExtractorInterface */
+    protected $constraintTextExtractor;
+
+    /**
+     * @param ConstraintTextExtractorInterface $constraintTextExtractor
+     */
+    public function __construct(ConstraintTextExtractorInterface $constraintTextExtractor)
+    {
+        $this->constraintTextExtractor = $constraintTextExtractor;
+    }
+
     /**
      * {@inheritdoc}
      */
@@ -115,7 +125,12 @@ class CollectFormErrors implements ProcessorInterface
 
         $cause = $error->getCause();
         if ($cause instanceof ConstraintViolation) {
-            $result = $this->getConstraintViolationPropertyPath($cause);
+            $path = $this->getFormFieldPath($field);
+            $causePath = $this->getConstraintViolationPath($cause);
+            if (count($causePath) > count($path)) {
+                $path = $causePath;
+            }
+            $result = implode('.', $path);
         }
         if (!$result) {
             $result = $field->getName();
@@ -131,14 +146,44 @@ class CollectFormErrors implements ProcessorInterface
      */
     protected function getConstraintViolationPropertyPath(ConstraintViolation $constraintViolation)
     {
+        $path = $this->getConstraintViolationPath($constraintViolation);
+
+        return !empty($path)
+            ? implode('.', $path)
+            : null;
+    }
+
+    /**
+     * @param ConstraintViolation $constraintViolation
+     *
+     * @return string[]
+     */
+    protected function getConstraintViolationPath(ConstraintViolation $constraintViolation)
+    {
         $propertyPath = $constraintViolation->getPropertyPath();
         if (!$propertyPath) {
-            return null;
+            return [];
         }
 
         $path = new ViolationPath($propertyPath);
 
-        return implode('.', $path->getElements());
+        return $path->getElements();
+    }
+
+    /**
+     * @param FormInterface $field
+     *
+     * @return string[]
+     */
+    protected function getFormFieldPath(FormInterface $field)
+    {
+        $path = [];
+        while (null !== $field->getParent()) {
+            $path[] = $field->getName();
+            $field = $field->getParent();
+        }
+
+        return array_reverse($path);
     }
 
     /**
@@ -176,7 +221,7 @@ class CollectFormErrors implements ProcessorInterface
                 return Constraint::EXTRA_FIELDS;
             }
 
-            return ValueNormalizerUtil::humanizeClassName(get_class($cause->getConstraint()), 'Constraint');
+            return $this->constraintTextExtractor->getConstraintType($cause->getConstraint());
         }
 
         // undefined constraint type
@@ -193,9 +238,7 @@ class CollectFormErrors implements ProcessorInterface
         $cause = $formError->getCause();
         if ($cause instanceof ConstraintViolation) {
             $constraint = $cause->getConstraint();
-            if ($constraint instanceof ConstraintWithStatusCodeInterface) {
-                return $constraint->getStatusCode();
-            }
+            return $this->constraintTextExtractor->getConstraintStatusCode($constraint);
         }
 
         return null;

@@ -14,7 +14,9 @@ use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
 use Oro\Bundle\ApiBundle\Metadata\EntityMetadataFactory;
 use Oro\Bundle\ApiBundle\Metadata\FieldMetadata;
 use Oro\Bundle\ApiBundle\Metadata\MetaPropertyMetadata;
+use Oro\Bundle\ApiBundle\Metadata\PropertyMetadata;
 use Oro\Bundle\ApiBundle\Provider\MetadataProvider;
+use Oro\Bundle\ApiBundle\Request\ApiActions;
 use Oro\Bundle\ApiBundle\Request\DataType;
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
@@ -74,11 +76,21 @@ class LoadMetadata implements ProcessorInterface
         $entityClass = $context->getClassName();
         $config = $context->getConfig();
         if ($this->doctrineHelper->isManageableEntityClass($entityClass)) {
-            $entityMetadata = $this->loadEntityMetadata($entityClass, $config);
+            $entityMetadata = $this->loadEntityMetadata(
+                $entityClass,
+                $config,
+                $context->getWithExcludedProperties(),
+                $context->getTargetAction()
+            );
             $this->completeAssociationMetadata($entityMetadata, $config, $context);
             $context->setResult($entityMetadata);
         } elseif ($config->hasFields()) {
-            $entityMetadata = $this->loadObjectMetadata($entityClass, $config);
+            $entityMetadata = $this->loadObjectMetadata(
+                $entityClass,
+                $config,
+                $context->getWithExcludedProperties(),
+                $context->getTargetAction()
+            );
             $this->completeAssociationMetadata($entityMetadata, $config, $context);
             $context->setResult($entityMetadata);
         }
@@ -87,20 +99,26 @@ class LoadMetadata implements ProcessorInterface
     /**
      * @param string                 $entityClass
      * @param EntityDefinitionConfig $config
+     * @param bool                   $withExcludedProperties
+     * @param string                 $targetAction
      *
      * @return EntityMetadata
      */
-    protected function loadEntityMetadata($entityClass, EntityDefinitionConfig $config)
-    {
+    protected function loadEntityMetadata(
+        $entityClass,
+        EntityDefinitionConfig $config,
+        $withExcludedProperties,
+        $targetAction
+    ) {
         // filter excluded fields on this stage though there is another processor doing the same
         // it is done due to performance reasons
-        $allowedFields = $this->getAllowedFields($config);
+        $allowedFields = $this->getAllowedFields($config, $withExcludedProperties);
 
         $classMetadata = $this->doctrineHelper->getEntityMetadataForClass($entityClass);
         $entityMetadata = $this->createEntityMetadata($classMetadata, $config);
-        $this->loadFields($entityMetadata, $classMetadata, $allowedFields, $config);
-        $this->loadAssociations($entityMetadata, $classMetadata, $allowedFields, $config);
-        $this->loadPropertiesFromConfig($entityMetadata, $config);
+        $this->loadFields($entityMetadata, $classMetadata, $allowedFields, $config, $targetAction);
+        $this->loadAssociations($entityMetadata, $classMetadata, $allowedFields, $config, $targetAction);
+        $this->loadPropertiesFromConfig($entityMetadata, $config, $withExcludedProperties, $targetAction);
 
         return $entityMetadata;
     }
@@ -134,12 +152,14 @@ class LoadMetadata implements ProcessorInterface
      * @param ClassMetadata          $classMetadata
      * @param array                  $allowedFields
      * @param EntityDefinitionConfig $config
+     * @param string                 $targetAction
      */
     protected function loadFields(
         EntityMetadata $entityMetadata,
         ClassMetadata $classMetadata,
         array $allowedFields,
-        EntityDefinitionConfig $config
+        EntityDefinitionConfig $config,
+        $targetAction
     ) {
         $fields = $classMetadata->getFieldNames();
         foreach ($fields as $propertyPath) {
@@ -157,6 +177,7 @@ class LoadMetadata implements ProcessorInterface
                 if ($propertyPath !== $fieldName) {
                     $metaPropertyMetadata->setName($fieldName);
                 }
+                $this->setPropertyPath($metaPropertyMetadata, $fieldName, $field, $targetAction);
                 $entityMetadata->addMetaProperty($metaPropertyMetadata);
             } else {
                 $fieldMetadata = $this->entityMetadataFactory->createFieldMetadata(
@@ -167,6 +188,7 @@ class LoadMetadata implements ProcessorInterface
                 if ($propertyPath !== $fieldName) {
                     $fieldMetadata->setName($fieldName);
                 }
+                $this->setPropertyPath($fieldMetadata, $fieldName, $field, $targetAction);
                 $entityMetadata->addField($fieldMetadata);
             }
         }
@@ -177,12 +199,14 @@ class LoadMetadata implements ProcessorInterface
      * @param ClassMetadata          $classMetadata
      * @param array                  $allowedFields
      * @param EntityDefinitionConfig $config
+     * @param string                 $targetAction
      */
     protected function loadAssociations(
         EntityMetadata $entityMetadata,
         ClassMetadata $classMetadata,
         array $allowedFields,
-        EntityDefinitionConfig $config
+        EntityDefinitionConfig $config,
+        $targetAction
     ) {
         $associations = $classMetadata->getAssociationNames();
         foreach ($associations as $propertyPath) {
@@ -199,6 +223,8 @@ class LoadMetadata implements ProcessorInterface
             if ($propertyPath !== $associationName) {
                 $associationMetadata->setName($associationName);
             }
+            $this->setPropertyPath($associationMetadata, $associationName, $field, $targetAction);
+            $associationMetadata->setCollapsed($field->isCollapsed());
             $entityMetadata->addAssociation($associationMetadata);
         }
     }
@@ -206,15 +232,19 @@ class LoadMetadata implements ProcessorInterface
     /**
      * @param EntityMetadata         $entityMetadata
      * @param EntityDefinitionConfig $config
+     * @param bool                   $withExcludedProperties
+     * @param string                 $targetAction
      */
     protected function loadPropertiesFromConfig(
         EntityMetadata $entityMetadata,
-        EntityDefinitionConfig $config
+        EntityDefinitionConfig $config,
+        $withExcludedProperties,
+        $targetAction
     ) {
         $entityClass = $entityMetadata->getClassName();
         $fields = $config->getFields();
         foreach ($fields as $fieldName => $field) {
-            if ($field->isExcluded()) {
+            if (!$withExcludedProperties && $field->isExcluded()) {
                 continue;
             }
             if (!$field->isMetaProperty()) {
@@ -225,13 +255,31 @@ class LoadMetadata implements ProcessorInterface
                 ) {
                     $targetClass = $field->getTargetClass();
                     if ($targetClass) {
-                        $this->addAssociationMetadata($entityMetadata, $entityClass, $fieldName, $field);
+                        $this->addAssociationMetadata(
+                            $entityMetadata,
+                            $entityClass,
+                            $fieldName,
+                            $field,
+                            $targetAction
+                        );
                     } else {
-                        $this->addFieldMetadata($entityMetadata, $entityClass, $fieldName, $field);
+                        $this->addFieldMetadata(
+                            $entityMetadata,
+                            $entityClass,
+                            $fieldName,
+                            $field,
+                            $targetAction
+                        );
                     }
                 }
             } elseif (!$entityMetadata->hasMetaProperty($fieldName)) {
-                $this->addMetaPropertyMetadata($entityMetadata, $entityClass, $fieldName, $field);
+                $this->addMetaPropertyMetadata(
+                    $entityMetadata,
+                    $entityClass,
+                    $fieldName,
+                    $field,
+                    $targetAction
+                );
             }
         }
     }
@@ -241,14 +289,17 @@ class LoadMetadata implements ProcessorInterface
      * @param string                      $entityClass
      * @param string                      $fieldName
      * @param EntityDefinitionFieldConfig $field
+     * @param string                      $targetAction
      */
     protected function addMetaPropertyMetadata(
         EntityMetadata $entityMetadata,
         $entityClass,
         $fieldName,
-        EntityDefinitionFieldConfig $field
+        EntityDefinitionFieldConfig $field,
+        $targetAction
     ) {
         $metaPropertyMetadata = $entityMetadata->addMetaProperty(new MetaPropertyMetadata($fieldName));
+        $this->setPropertyPath($metaPropertyMetadata, $fieldName, $field, $targetAction);
         $metaPropertyMetadata->setDataType(
             $this->assertDataType($field->getDataType(), $entityClass, $fieldName)
         );
@@ -259,14 +310,17 @@ class LoadMetadata implements ProcessorInterface
      * @param string                      $entityClass
      * @param string                      $fieldName
      * @param EntityDefinitionFieldConfig $field
+     * @param string                      $targetAction
      */
     protected function addFieldMetadata(
         EntityMetadata $entityMetadata,
         $entityClass,
         $fieldName,
-        EntityDefinitionFieldConfig $field
+        EntityDefinitionFieldConfig $field,
+        $targetAction
     ) {
         $fieldMetadata = $entityMetadata->addField(new FieldMetadata($fieldName));
+        $this->setPropertyPath($fieldMetadata, $fieldName, $field, $targetAction);
         $fieldMetadata->setDataType(
             $this->assertDataType($field->getDataType(), $entityClass, $fieldName)
         );
@@ -278,33 +332,60 @@ class LoadMetadata implements ProcessorInterface
      * @param string                      $entityClass
      * @param string                      $fieldName
      * @param EntityDefinitionFieldConfig $field
+     * @param string                      $targetAction
      */
     protected function addAssociationMetadata(
         EntityMetadata $entityMetadata,
         $entityClass,
         $fieldName,
-        EntityDefinitionFieldConfig $field
+        EntityDefinitionFieldConfig $field,
+        $targetAction
     ) {
         $targetClass = $field->getTargetClass();
         $dataType = $this->assertDataType($field->getDataType(), $entityClass, $fieldName);
         $associationMetadata = $entityMetadata->addAssociation(new AssociationMetadata($fieldName));
+        $this->setPropertyPath($associationMetadata, $fieldName, $field, $targetAction);
         $associationMetadata->setTargetClassName($targetClass);
         $associationMetadata->setIsNullable(true);
-        if (0 !== strpos($dataType, 'association:')) {
-            $associationMetadata->setDataType($dataType);
-            $this->setAssociationType($associationMetadata, $field->isCollectionValuedAssociation());
-            $associationMetadata->addAcceptableTargetClassName($targetClass);
-        } else {
-            list(, $associationType, $associationKind) = array_pad(explode(':', $dataType, 3), 3, null);
-            $targets = $this->getExtendedAssociationTargets(
-                $entityClass,
-                $associationType,
-                $associationKind
-            );
+        $associationMetadata->setCollapsed($field->isCollapsed());
+        if (DataType::isExtendedAssociation($dataType)) {
+            list($associationType, $associationKind) = DataType::parseExtendedAssociation($dataType);
+            $targets = $this->getExtendedAssociationTargets($entityClass, $associationType, $associationKind);
             $this->setAssociationDataType($associationMetadata, $field);
             $associationMetadata->setAssociationType($associationType);
             $associationMetadata->setAcceptableTargetClassNames(array_keys($targets));
             $associationMetadata->setIsCollection((bool)$field->isCollectionValuedAssociation());
+        } else {
+            $associationMetadata->setDataType($dataType);
+            $this->setAssociationType($associationMetadata, $field->isCollectionValuedAssociation());
+            $associationMetadata->addAcceptableTargetClassName($targetClass);
+        }
+    }
+
+    /**
+     * @param PropertyMetadata            $propertyMetadata
+     * @param string                      $fieldName
+     * @param EntityDefinitionFieldConfig $field
+     * @param string                      $targetAction
+     */
+    protected function setPropertyPath(
+        PropertyMetadata $propertyMetadata,
+        $fieldName,
+        EntityDefinitionFieldConfig $field,
+        $targetAction
+    ) {
+        $propertyPath = null;
+        if (in_array($targetAction, [ApiActions::CREATE, ApiActions::UPDATE], true)) {
+            $formOptions = $field->getFormOptions();
+            if (!empty($formOptions) && array_key_exists('property_path', $formOptions)) {
+                $propertyPath = $formOptions['property_path'];
+            }
+        }
+        if (!$propertyPath) {
+            $propertyPath = $field->getPropertyPath($fieldName);
+        }
+        if ($propertyPath !== $fieldName) {
+            $propertyMetadata->setPropertyPath($propertyPath);
         }
     }
 
@@ -352,16 +433,17 @@ class LoadMetadata implements ProcessorInterface
 
     /**
      * @param EntityDefinitionConfig $config
+     * @param bool                   $withExcludedProperties
      *
      * @return array [property path => field name, ...]
      */
-    protected function getAllowedFields(EntityDefinitionConfig $config)
+    protected function getAllowedFields(EntityDefinitionConfig $config, $withExcludedProperties)
     {
         $result = [];
         $fields = $config->getFields();
         foreach ($fields as $fieldName => $field) {
-            if (!$field->isExcluded()) {
-                $propertyPath = $field->getPropertyPath() ?: $fieldName;
+            if ($withExcludedProperties || !$field->isExcluded()) {
+                $propertyPath = $field->getPropertyPath($fieldName);
                 $result[$propertyPath] = $fieldName;
             }
         }
@@ -372,38 +454,50 @@ class LoadMetadata implements ProcessorInterface
     /**
      * @param string                 $entityClass
      * @param EntityDefinitionConfig $config
+     * @param bool                   $withExcludedProperties
+     * @param string                 $targetAction
      *
      * @return EntityMetadata
      */
-    protected function loadObjectMetadata($entityClass, EntityDefinitionConfig $config)
-    {
+    protected function loadObjectMetadata(
+        $entityClass,
+        EntityDefinitionConfig $config,
+        $withExcludedProperties,
+        $targetAction
+    ) {
         $entityMetadata = new EntityMetadata();
         $entityMetadata->setClassName($entityClass);
         $idFieldNames = $config->getIdentifierFieldNames();
         $entityMetadata->setIdentifierFieldNames($idFieldNames);
         $fields = $config->getFields();
         foreach ($fields as $fieldName => $field) {
-            if ($field->isExcluded()) {
+            if (!$withExcludedProperties && $field->isExcluded()) {
                 continue;
             }
             $targetClass = $field->getTargetClass();
             if ($targetClass) {
                 $associationMetadata = $entityMetadata->addAssociation(new AssociationMetadata($fieldName));
+                $this->setPropertyPath($associationMetadata, $fieldName, $field, $targetAction);
                 if (!$field->getDataType()) {
                     $this->setAssociationDataType($associationMetadata, $field);
+                } else {
+                    $associationMetadata->setDataType($field->getDataType());
                 }
                 $this->setAssociationType($associationMetadata, $field->isCollectionValuedAssociation());
                 $associationMetadata->setIsNullable(true);
+                $associationMetadata->setCollapsed($field->isCollapsed());
                 $associationMetadata->setTargetClassName($targetClass);
                 $associationMetadata->addAcceptableTargetClassName($targetClass);
             } elseif ($field->isMetaProperty()) {
                 $metaPropertyMetadata = $entityMetadata->addMetaProperty(new MetaPropertyMetadata($fieldName));
+                $this->setPropertyPath($metaPropertyMetadata, $fieldName, $field, $targetAction);
                 $metaPropertyMetadata->setDataType($field->getDataType());
                 if (ConfigUtil::CLASS_NAME === $fieldName) {
                     $entityMetadata->setInheritedType(true);
                 }
             } else {
                 $fieldMetadata = $entityMetadata->addField(new FieldMetadata($fieldName));
+                $this->setPropertyPath($fieldMetadata, $fieldName, $field, $targetAction);
                 $fieldMetadata->setDataType($field->getDataType());
                 $fieldMetadata->setIsNullable(!in_array($fieldName, $idFieldNames, true));
             }

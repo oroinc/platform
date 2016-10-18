@@ -5,6 +5,8 @@ namespace Oro\Bundle\SearchBundle\Engine;
 use Symfony\Component\Security\Core\Util\ClassUtils;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
+use Oro\Bundle\SearchBundle\Query\Criteria\Criteria;
+use Oro\Bundle\SearchBundle\Query\Query;
 use Oro\Bundle\SearchBundle\Query\Mode;
 use Oro\Bundle\SearchBundle\Event\PrepareEntityMapEvent;
 use Oro\Bundle\SearchBundle\Exception\InvalidConfigurationException;
@@ -148,6 +150,51 @@ class ObjectMapper extends AbstractMapper
         }
 
         return false;
+    }
+
+    /**
+     * Gathers additionally selected fields from the search index
+     * into an output array.
+     *
+     * @param Query $query
+     * @param array $item
+     * @return array|null
+     */
+    public function mapSelectedData(Query $query, $item)
+    {
+        $selects = $query->getSelect();
+
+        if (empty($selects)) {
+            return null;
+        }
+
+        $result = [];
+        $selectAliases = $query->getSelectAliases();
+
+        foreach ($selects as $select) {
+            list ($type, $name) = Criteria::explodeFieldTypeName($select);
+
+            if (isset($selectAliases[$name])) {
+                $resultName = $selectAliases[$name];
+            } elseif (isset($selectAliases[$select])) {
+                $resultName = $selectAliases[$select];
+            } else {
+                $resultName = $name;
+            }
+
+            $result[$resultName] = '';
+
+            if (isset($item[$name])) {
+                $value = $item[$name];
+                if (is_array($value)) {
+                    $value = array_shift($value);
+                }
+
+                $result[$resultName] = $value;
+            }
+        }
+
+        return $result;
     }
 
     /**

@@ -67,7 +67,7 @@
             'use strict';
 
             $(function() {
-                var container = $('#{{ blockId }}').closest('.page-title');
+                var container = $('#{{ blockId }}');
                 {% for data in transitionsData %}
                 (function(transitionBtn) {
                     if (transitionBtn.data('enabled')) {

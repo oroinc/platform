@@ -32,6 +32,7 @@ class EmailBodyBuilderTest extends \PHPUnit_Framework_TestCase
         $body = $this->emailBodyBuilder->getEmailBody();
         $this->assertEquals(true, $body->getBodyIsText());
         $this->assertEquals('test', $body->getBodyContent());
+        $this->assertEquals('test', $body->getTextBody());
     }
 
     /**
@@ -141,7 +142,7 @@ class EmailBodyBuilderTest extends \PHPUnit_Framework_TestCase
                 'data' => [
                     'contentTransferEncoding' => 'base64',
                     'embeddedContentId' => 123,
-                    'contentSize' => 1024 * 1024 * 5,
+                    'contentSize' => 1000 * 1000 * 5,
                 ],
                 'configSyncEnabled' => true,
                 'configSyncMaxSize' => 0.1,
@@ -151,7 +152,7 @@ class EmailBodyBuilderTest extends \PHPUnit_Framework_TestCase
                 'data' => [
                     'contentTransferEncoding' => 'base64',
                     'embeddedContentId' => 123,
-                    'contentSize' => 1024 * 1024 * 0.49 * 4 / 3,
+                    'contentSize' => 1000 * 1000 * 0.49 * 4 / 3,
                 ],
                 'configSyncEnabled' => true,
                 'configSyncMaxSize' => 0.5,

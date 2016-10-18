@@ -40,13 +40,14 @@ class Parser
     public function __construct($query = null)
     {
         if (null === $query) {
-            $this->query = new Query(Query::SELECT);
+            $this->query = new Query();
             $this->query->from(['*']);
         } else {
             $this->query = $query;
         }
 
         $this->keywords = [
+            Query::KEYWORD_SELECT,
             Query::KEYWORD_FROM,
             Query::KEYWORD_WHERE,
 
@@ -55,7 +56,9 @@ class Parser
 
             Query::KEYWORD_OFFSET,
             Query::KEYWORD_MAX_RESULTS,
-            Query::KEYWORD_ORDER_BY
+            Query::KEYWORD_ORDER_BY,
+
+            Query::KEYWORD_AS
         ];
 
         $this->operators = [
@@ -154,6 +157,9 @@ class Parser
     protected function parseKeywords()
     {
         switch ($this->stream->current->value) {
+            case Query::KEYWORD_SELECT:
+                $this->parseSelectExpression();
+                break;
             case Query::KEYWORD_FROM:
                 $this->parseFromExpression();
                 break;
@@ -176,6 +182,42 @@ class Parser
                         $this->stream->current->type,
                         $this->stream->current->value
                     ),
+                    $this->stream->current->cursor
+                );
+        }
+    }
+
+    /**
+     *  Parse select statement of expression and fills Query's select.
+     */
+    protected function parseSelectExpression()
+    {
+        $this->stream->expect(Token::KEYWORD_TYPE, Query::KEYWORD_SELECT);
+        switch (true) {
+            // if got string token after "select" - pass it directly into Query
+            case (true === $this->stream->current->test(Token::STRING_TYPE)):
+                $fieldDeclaration = $this->stream->current->value;
+                $this->stream->next();
+
+                if ($this->stream->expect(Token::KEYWORD_TYPE, Query::KEYWORD_AS, null, false)) {
+                    $aliasName = $this->stream->current->value;
+
+                    $fieldDeclaration .= ' '.Query::KEYWORD_AS.' '.$aliasName;
+
+                    $this->stream->next();
+                }
+
+                $this->query->select($fieldDeclaration);
+                break;
+
+            // if got opening bracket (punctuation '(') - collect all arguments
+            case (true === $this->stream->current->test(Token::PUNCTUATION_TYPE, '(')):
+                $this->query->select($this->parseSelectKeywordArguments());
+                break;
+
+            default:
+                throw new ExpressionSyntaxError(
+                    sprintf('Wrong "select" statement of the expression.'),
                     $this->stream->current->cursor
                 );
         }
@@ -499,6 +541,40 @@ class Parser
             $args[] = $this->stream->current->value;
             $this->stream->next();
         }
+        $this->stream->expect(Token::PUNCTUATION_TYPE, ')', 'A list of arguments must be closed by a parenthesis');
+
+        return $args;
+    }
+
+    /**
+     * @return array
+     */
+    public function parseSelectKeywordArguments()
+    {
+        $args = [];
+        $this->stream->expect(
+            Token::PUNCTUATION_TYPE,
+            '(',
+            'A list of arguments must begin with an opening parenthesis'
+        );
+        while (!$this->stream->current->test(Token::PUNCTUATION_TYPE, ')')) {
+            if (!empty($args)) {
+                $this->stream->expect(Token::PUNCTUATION_TYPE, ',', 'Arguments must be separated by a comma');
+            }
+
+            $fieldDeclaration = $this->stream->current->value;
+            $this->stream->next();
+
+            if ($this->stream->expect(Token::KEYWORD_TYPE, Query::KEYWORD_AS, null, false)) {
+                $aliasName = $this->stream->current->value;
+
+                $fieldDeclaration .= ' '.Query::KEYWORD_AS.' '.$aliasName;
+                $this->stream->next();
+            }
+
+            $args[] = $fieldDeclaration;
+        }
+
         $this->stream->expect(Token::PUNCTUATION_TYPE, ')', 'A list of arguments must be closed by a parenthesis');
 
         return $args;

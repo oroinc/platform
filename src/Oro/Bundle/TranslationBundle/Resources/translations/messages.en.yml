@@ -1,13 +1,89 @@
 oro.translation:
     download:
         error: 'Error while downloading package'
-
-    system_configuration:
-        fields:
-            available_translations.label: 'Available translations'
+        
+    context:
+        ui_label: 'UI Label'
 
     action:
-        download: 'Download'
-        enable: 'Enable'
         disable: 'Disable'
+        enable: 'Enable'
+        download: 'Download'
+        install: 'Install'
         update: 'Update'
+        import: 'Upload Translation File'
+        export: 'Download Translation File'
+        add: 'Add Language'
+        translation_completeness.label: 'Translation Completeness:'
+        install.title: 'Install "%language%" language'
+        update.title: 'Update "%language%" language'
+        rebuild_cache.label: 'Update Cache'
+
+    language:
+        entity_label: 'Language'
+        entity_plural_label: 'Languages'
+
+        id.label: 'Id'
+        code.label: 'Code'
+        enabled.label: 'Status'
+        installed_build_date.label: 'Installed Build Date'
+        owner.label: 'Owner'
+        organization.label: 'Organization'
+        status:
+            enabled: 'Enabled'
+            disabled: 'Disabled'
+        translation_status:
+            label: 'Updates'
+            up_to_date: 'Up to date'
+            update_available: 'Update is available'
+            install_available: 'Can be installed'
+        translation_completeness.label: 'Translation Completeness'
+
+        message:
+            disabled: 'Language has been disabled'
+            enabled: 'Language has been enabled'
+            added: 'Language has been added'
+            installed: 'Language has been installed'
+            updated: 'Language has been updated'
+
+        error:
+            install: 'Language not installed'
+            update: 'Language not updated'
+        permission:
+            translate:
+                label: Translate
+    translation:
+        entity_label: 'Translation'
+        entity_plural_label: 'Translations'
+
+        id.label: 'Id'
+        language.label: 'Language'
+        value.label: 'Translated Value'
+        original_value.label: 'Original Value'
+        context.label: 'Context'
+        status.label: 'Translated'
+        message:
+            rebuild_cache: 'Translation Cache has been updated'
+
+    translation_key:
+        entity_label: 'Translation Key'
+        entity_plural_label: 'Translation Keys'
+
+        id.label: 'Id'
+        key.label: 'Key'
+        domain.label: 'Domain'
+
+    menu:
+        languages.label: Languages
+        translations.label: Translations
+
+    form:
+        tooltip:
+            translation_completeness: "Translation coverage indicator relates to translation package volume. Some bundles may still not be translated."
+
+# TODO: ImportExport doesn't support customize prefixes for processor labels https://magecore.atlassian.net/browse/BAP-11704
+oro.importexport:
+    import:
+        oro_translation_translation:
+            add_or_replace: 'Add and Replace'
+            reset: 'Reset and Add'

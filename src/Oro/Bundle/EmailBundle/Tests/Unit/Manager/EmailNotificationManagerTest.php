@@ -8,6 +8,7 @@ use Oro\Bundle\EmailBundle\Entity\EmailUser;
 use Oro\Bundle\EmailBundle\Manager\EmailNotificationManager;
 use Oro\Bundle\EmailBundle\Tests\Unit\Fixtures\Entity\Email;
 use Oro\Bundle\EmailBundle\Tests\Unit\Fixtures\Entity\EmailAddress;
+use Oro\Bundle\EmailBundle\Tools\EmailBodyHelper;
 use Oro\Bundle\UIBundle\Tools\HtmlTagHelper;
 
 /**
@@ -70,48 +71,82 @@ class EmailNotificationManagerTest extends \PHPUnit_Framework_TestCase
             $this->entityManager,
             $this->htmlTagHelper,
             $this->router,
-            $this->configManager
+            $this->configManager,
+            new EmailBodyHelper($this->htmlTagHelper)
         );
     }
 
-    public function testGetEmails()
+    /**
+     * @dataProvider getEmails
+     */
+    public function testGetEmails($user, $emails, $expectedResult)
     {
-        $user = $this->getMockBuilder('Oro\Bundle\UserBundle\Entity\User')->disableOriginalConstructor()->getMock();
         $organization = $this->getMockBuilder('Oro\Bundle\OrganizationBundle\Entity\Organization')
             ->disableOriginalConstructor()
             ->getMock();
-        $testEmails = $this->getEmails($user);
-        $this->repository->expects($this->once())->method('getNewEmails')->willReturn($testEmails);
+        $this->repository->expects($this->once())->method('getNewEmails')->willReturn($emails);
         $maxEmailsDisplay = 1;
         $emails = $this->emailNotificationManager->getEmails($user, $organization, $maxEmailsDisplay, null);
 
-        $this->assertEquals(
-            [
+        $this->assertEquals($expectedResult, $emails);
+    }
+
+    /**
+     * @return array
+     */
+    public function getEmails()
+    {
+        $user = $this->getMockBuilder('Oro\Bundle\UserBundle\Entity\User')->disableOriginalConstructor()->getMock();
+
+        $emails = [
+            $this->prepareEmailUser(
                 [
-                    'replyRoute' => 'oro_email_email_reply',
-                    'replyAllRoute' => 'oro_email_email_reply',
-                    'forwardRoute' => 'oro_email_email_reply',
-                    'id' => 1,
-                    'seen' => 0,
-                    'subject' => 'subject',
-                    'bodyContent' => 'bodyContent',
-                    'fromName' => 'fromName',
-                    'linkFromName' => 'oro_email_email_reply',
+                    'getId'          => 1,
+                    'getSubject'     => 'subject',
+                    'getFromName'    => 'fromName',
+                    'getBodyContent' => 'bodyContent',
                 ],
+                $user,
+                false
+            ),
+            $this->prepareEmailUser(
                 [
-                    'replyRoute' => 'oro_email_email_reply',
-                    'replyAllRoute' => 'oro_email_email_reply',
-                    'forwardRoute' => 'oro_email_email_reply',
-                    'id' => 2,
-                    'seen' => 1,
-                    'subject' => 'subject_1',
-                    'bodyContent' => 'bodyContent_1',
-                    'fromName' => 'fromName_1',
-                    'linkFromName' => 'oro_email_email_reply',
-                ]
+                    'getId'          => 2,
+                    'getSubject'     => 'subject_1',
+                    'getBodyContent' => 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer',
+                    'getFromName'    => 'fromName_1',
+                ],
+                $user,
+                true
+            )
+        ];
+
+        $expectedResult = [
+            [
+                'replyRoute' => 'oro_email_email_reply',
+                'replyAllRoute' => 'oro_email_email_reply',
+                'forwardRoute' => 'oro_email_email_reply',
+                'id' => 1,
+                'seen' => 0,
+                'subject' => 'subject',
+                'bodyContent' => 'bodyContent',
+                'fromName' => 'fromName',
+                'linkFromName' => 'oro_email_email_reply',
             ],
-            $emails
-        );
+            [
+                'replyRoute' => 'oro_email_email_reply',
+                'replyAllRoute' => 'oro_email_email_reply',
+                'forwardRoute' => 'oro_email_email_reply',
+                'id' => 2,
+                'seen' => 1,
+                'subject' => 'subject_1',
+                'bodyContent' => 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer',
+                'fromName' => 'fromName_1',
+                'linkFromName' => 'oro_email_email_reply',
+            ]
+        ];
+
+        return [[$user, $emails, $expectedResult]];
     }
 
     public function testGetCountNewEmails()
@@ -126,39 +161,6 @@ class EmailNotificationManagerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @param EmailOwnerInterface $user
-     *
-     * @return array
-     */
-    protected function getEmails($user)
-    {
-        $firstEmail = $this->prepareEmailUser(
-            [
-                'getId'          => 1,
-                'getSubject'     => 'subject',
-                'getFromName'    => 'fromName',
-                'getBodyContent' => 'bodyContent',
-            ],
-            $user,
-            false
-        );
-
-        $secondEmail = $this->prepareEmailUser(
-            [
-                'getId'          => 2,
-                'getSubject'     => 'subject_1',
-                'getBodyContent' => 'bodyContent_1',
-                'getFromName'    => 'fromName_1',
-
-            ],
-            $user,
-            true
-        );
-
-        return [$firstEmail, $secondEmail];
-    }
-
-    /**
      * @param array $values
      * @param EmailOwnerInterface $user
      * @param bool $seen
@@ -168,7 +170,7 @@ class EmailNotificationManagerTest extends \PHPUnit_Framework_TestCase
     protected function prepareEmailUser($values, $user, $seen)
     {
         $emailBody = new EmailBody();
-        $emailBody->setBodyContent($values['getBodyContent']);
+        $emailBody->setTextBody($values['getBodyContent']);
 
         $email = new Email();
         $email->setId($values['getId']);

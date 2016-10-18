@@ -138,4 +138,115 @@ class QueryTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals($testString, $result);
     }
+
+    public function testAddingSelect()
+    {
+        $query = new Query();
+        $query->addSelect('name', Query::TYPE_TEXT);
+        $query->addSelect('name', Query::TYPE_TEXT); // testing handing doubles
+        $query->addSelect('datetime.date', Query::TYPE_DECIMAL); // enforced type
+        $query->addSelect('integer.number'); // type guessing by prefix
+        $query->addSelect('sku'); // default type should be `text`
+
+        $this->assertCount(4, $query->getSelect());
+        $this->assertEquals(
+            [
+                'text.name',
+                'decimal.date',
+                'integer.number',
+                'text.sku'
+            ],
+            $query->getSelect()
+        );
+
+        $query->addSelect('');
+        $this->assertCount(4, $query->getSelect());
+    }
+
+    public function testAddSelectArray()
+    {
+        $query = new Query();
+        $query->addSelect([
+            'name',
+            'name', // testing handing doubles
+            'integer.number', // type guessing by prefix
+            'sku', // default type should be `text`
+        ]);
+
+        $this->assertEquals(
+            [
+                'text.name',
+                'integer.number',
+                'text.sku'
+            ],
+            $query->getSelect()
+        );
+
+        $query->addSelect('');
+        $this->assertCount(3, $query->getSelect());
+    }
+
+    public function testStringQueryWithSelect()
+    {
+        $query = new Query();
+        $this->assertEquals('', $query->getStringQuery());
+        $query->from('*');
+        $this->assertEquals('from *', $query->getStringQuery());
+        $query->select('language');
+        $this->assertEquals('select text.language from *', $query->getStringQuery());
+        $query->addSelect('organization', 'integer');
+        $this->assertEquals('select (text.language, integer.organization) from *', $query->getStringQuery());
+    }
+
+    public function testSelectingWithAliases()
+    {
+        $query = new Query();
+        $query->addSelect('text.foo as bar');
+        $query->addSelect('text.fooNoAlias');
+        $query->addSelect('text.foo bar as  ');
+        $query->addSelect('  as bar');
+
+        $reflectionObject = new \ReflectionObject($query);
+
+        $selectFieldsProperty = $reflectionObject->getProperty('select');
+        $selectFieldsProperty->setAccessible(true);
+
+        $aliasesProperty = $reflectionObject->getProperty('selectAliases');
+        $aliasesProperty->setAccessible(true);
+
+        $fields = $selectFieldsProperty->getValue($query);
+        $aliases = $aliasesProperty->getValue($query);
+
+        $this->assertContains('text.foo', $fields);
+        $this->assertContains('text.fooNoAlias', $fields);
+        $this->assertContains('bar', $aliases);
+
+        $this->assertTrue(count($aliases) < 2);
+
+        foreach ($selectFieldsProperty as $field) {
+            $this->assertNotTrue(strpos($field, ' ') > 0);
+        }
+    }
+
+    public function testGetSelectWithAliases()
+    {
+        $query = new Query();
+        $query->addSelect('text.foo as bar');
+        $query->addSelect('text.faa as bor');
+
+        $select = $query->getSelect();
+
+        $this->assertSame(['text.foo', 'text.faa'], $select);
+    }
+
+    public function testGetAliases()
+    {
+        $query = new Query();
+        $query->addSelect('text.foo as bar');
+        $query->addSelect('text.faa as bor');
+
+        $aliases = $query->getSelectAliases();
+
+        $this->assertSame(['text.foo' => 'bar', 'text.faa' => 'bor'], $aliases);
+    }
 }

@@ -87,13 +87,13 @@ class OrganizationsSelectType extends AbstractType
         $builder->addEventListener(
             FormEvents::PRE_SUBMIT,
             function (FormEvent $event) {
-                $data = is_string($event->getData()) ? json_decode($event->getData(), true) : $event->getData();
-                if (isset($data['organizations'])) {
-                    $organizations = json_decode(reset($data['organizations']));
-                    $data['organizations'] = is_object($organizations)
-                        ? $organizations->organizations
-                        : $data['organizations'];
+                $data = $event->getData();
+
+                if (!empty($data['organizations'])) {
+                    $organizations = json_decode(reset($data['organizations']), true);
+                    $data['organizations'] = $organizations['organizations'];
                 }
+
                 $event->setData($data);
             }
         );

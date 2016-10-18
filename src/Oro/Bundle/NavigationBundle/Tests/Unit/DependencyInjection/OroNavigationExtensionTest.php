@@ -139,6 +139,7 @@ class OroNavigationExtensionTest extends \PHPUnit_Framework_TestCase
                 ),
                 'bundles' => array(),
                 'expectedMenu' => array(
+                    'areas' => array(),
                     'items' => array(
                         'items_sub2' => array_merge(array('label' => 'Sub2'), $defaultItemParameters)
                     ),
@@ -189,6 +190,10 @@ class OroNavigationExtensionTest extends \PHPUnit_Framework_TestCase
                     $bundle2->getName() => get_class($bundle2),
                 ),
                 'expectedMenu' => array(
+                    'areas' => array(
+                        'default' => array('application_menu', 'quicklinks'),
+                        'custom' => array('shortcuts'),
+                    ),
                     'items' => array(
                         'customers_tab' => array_merge(array('label' => 'Customers'), $defaultItemParameters),
                         'call_list' => array_merge(array('label' => 'Calls RENAMED'), $defaultItemParameters),
@@ -196,6 +201,10 @@ class OroNavigationExtensionTest extends \PHPUnit_Framework_TestCase
                         'to_move_top' => array_merge(array('label' => 'To move'), $defaultItemParameters),
                         'to_move_child' => array_merge(array('label' => 'To move child'), $defaultItemParameters),
                         'shortcut_call_list' => array_merge(array('label' => 'Show list'), $defaultItemParameters),
+                        'quicklinks_request_quote' => array_merge(
+                            array('label' => 'Request Quote'),
+                            $defaultItemParameters
+                        ),
                         'items_sub2' => array_merge(array('label' => 'Sub2'), $defaultItemParameters)
                     ),
                     'tree' => array(
@@ -241,6 +250,16 @@ class OroNavigationExtensionTest extends \PHPUnit_Framework_TestCase
                                 )
                             ),
                             'extras' => array(),
+                        ),
+                        'quicklinks' => array(
+                            'type' => 'quicklinks',
+                            'children' => array(
+                                'quicklinks_request_quote' => array(
+                                    'children' => array(),
+                                    'merge_strategy' => 'append'
+                                )
+                            ),
+                            'extras' => array(),
                         )
                     ),
                     'templates' => array(),
@@ -263,7 +282,7 @@ class OroNavigationExtensionTest extends \PHPUnit_Framework_TestCase
                     )
                 ),
                 'expectedTitles' => array(
-                    'orocrm_call_index' => 'Calls'
+                    'oro_call_index' => 'Calls'
                 )
             )
         );

@@ -7,7 +7,8 @@
     "license": "MIT",
     "require": {
         "php": ">=5.5.9",
-        "symfony/symfony": "2.8.*",
+        "ext-zip" : "*",
+        "symfony/symfony": "2.8.*, !=2.8.10",
         "doctrine/data-fixtures": "@dev",
         "doctrine/doctrine-fixtures-bundle": "@dev",
         "gedmo/doctrine-extensions": "2.3.*",

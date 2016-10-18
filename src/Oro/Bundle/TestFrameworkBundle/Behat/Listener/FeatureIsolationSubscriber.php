@@ -4,7 +4,6 @@ namespace Oro\Bundle\TestFrameworkBundle\Behat\Listener;
 
 use Behat\Behat\EventDispatcher\Event\AfterFeatureTested;
 use Behat\Behat\EventDispatcher\Event\BeforeFeatureTested;
-use Behat\Behat\EventDispatcher\Event\ScenarioTested;
 use Behat\Testwork\EventDispatcher\Event\BeforeSuiteTested;
 use Oro\Bundle\TestFrameworkBundle\Behat\Element\OroElementFactory;
 use Oro\Bundle\TestFrameworkBundle\Behat\Fixtures\FixtureLoader;
@@ -60,7 +59,6 @@ class FeatureIsolationSubscriber implements EventSubscriberInterface
             BeforeSuiteTested::BEFORE => ['injectSuite', 5],
             BeforeFeatureTested::BEFORE  => ['beforeFeature', 100],
             AfterFeatureTested::AFTER  => ['afterFeature', -100],
-            ScenarioTested::BEFORE => ['beforeScenario', 100]
         ];
     }
 
@@ -93,11 +91,6 @@ class FeatureIsolationSubscriber implements EventSubscriberInterface
         $this->shutdownKernel();
     }
 
-    public function beforeScenario()
-    {
-        $this->refreshDependencies();
-    }
-
     public function bootKernel()
     {
         $this->kernelServiceFactory->boot();
@@ -117,7 +110,7 @@ class FeatureIsolationSubscriber implements EventSubscriberInterface
             return strpos($tag, 'fixture-') === 0;
         });
 
-        if (empty($fixturesTags)) {
+        if (0 === count($fixturesTags)) {
             return;
         }
 
@@ -142,10 +135,5 @@ class FeatureIsolationSubscriber implements EventSubscriberInterface
     public function shutdownKernel()
     {
         $this->kernelServiceFactory->shutdown();
-    }
-
-    protected function refreshDependencies()
-    {
-        $this->referenceRepositoryInitializer->refresh();
     }
 }

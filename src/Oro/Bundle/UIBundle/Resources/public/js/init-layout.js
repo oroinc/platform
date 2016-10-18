@@ -193,7 +193,21 @@ require(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/tools
             }).not(clickingTarget).trigger('tohide.bs.dropdown');
         }, true);
 
-        $('#main-menu').mouseover(function() {
+        var mainMenu = $('#main-menu');
+        var activeDropdownsSelector = $('.dropdown, .dropup, .oro-drop', mainMenu);
+
+        // trigger refresh of current page if active dropdown is clicked, despite the Backbone router limitations
+        $(activeDropdownsSelector).on('click', $('li.active a'), function(e) {
+            var $target = $(e.target).closest('a');
+            if (!$target.hasClass('unclickable') && $target[0] !== undefined && 'pathname' in $target[0]) {
+                if (mediator.execute('compareUrl', $target[0].pathname)) {
+                    mediator.execute('refreshPage');
+                    return false;
+                }
+            }
+        });
+
+        mainMenu.mouseover(function() {
             $(openDropdownsSelector).trigger('tohide.bs.dropdown');
         });
 

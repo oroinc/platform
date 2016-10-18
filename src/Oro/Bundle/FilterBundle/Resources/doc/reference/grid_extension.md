@@ -5,7 +5,7 @@ Overview
 --------
 
 Filter bundle provides extension for data grid with ORM datasource.
-Filters could be added to datagrid in the datagrid.yml file for specified datagrid under `filters` node.
+Filters could be added to datagrid in the `datagrids.yml` file for specified datagrid under `filters` node.
 Definition of any filter has required option `data_name` that should be reference to column in query and type - filter type.
 For example:
 
@@ -18,7 +18,7 @@ For example:
                     - g.id
                     - g.label
                 from:
-                    - { table: OroCRMContactBundle:Group, alias: g }
+                    - { table: OroContactBundle:Group, alias: g }
 
         filters:
             columns:

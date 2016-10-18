@@ -14,6 +14,7 @@ use Oro\Bundle\EntityExtendBundle\DependencyInjection\Compiler\EntityExtendPass;
 use Oro\Bundle\EntityExtendBundle\DependencyInjection\Compiler\EntityManagerPass;
 use Oro\Bundle\EntityExtendBundle\DependencyInjection\Compiler\EntityMetadataBuilderPass;
 use Oro\Bundle\EntityExtendBundle\DependencyInjection\Compiler\MigrationConfigPass;
+use Oro\Bundle\EntityExtendBundle\DependencyInjection\Compiler\WarmerPass;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendClassLoadingUtils;
 use Oro\Bundle\EntityExtendBundle\DependencyInjection\Compiler\ExtensionPass;
 use Oro\Bundle\InstallerBundle\CommandExecutor;
@@ -81,11 +82,13 @@ class OroEntityExtendBundle extends Bundle
             )
         );
         $container->addCompilerPass(new ExtensionPass());
+        $container->addCompilerPass(new WarmerPass());
     }
 
     private function ensureInitialized()
     {
-        if (!CommandExecutor::isCurrentCommand('oro:entity-extend:cache:', true)) {
+        if (!CommandExecutor::isCurrentCommand('oro:entity-extend:cache:', true)
+            && !CommandExecutor::isCurrentCommand('oro:platform:upgrade20', true)) {
             ExtendClassLoadingUtils::ensureDirExists(ExtendClassLoadingUtils::getEntityCacheDir($this->cacheDir));
             if (!file_exists(ExtendClassLoadingUtils::getAliasesPath($this->cacheDir))) {
                 $this->checkConfigs();
@@ -117,7 +120,16 @@ class OroEntityExtendBundle extends Bundle
                     return;
                 }
 
-                $pb->getProcess()->run();
+                $process = $pb->getProcess();
+                $exitStatusCode = $process->run();
+                if ($exitStatusCode) {
+                    $output = $process->getErrorOutput();
+
+                    if (empty($output)) {
+                        $output = $process->getOutput();
+                    }
+                    throw new \RuntimeException($output);
+                }
 
                 return;
             } else {
@@ -151,7 +163,11 @@ class OroEntityExtendBundle extends Bundle
                     return;
                 }
 
-                $pb->getProcess()->run();
+                $process = $pb->getProcess();
+                $exitStatusCode = $process->run();
+                if ($exitStatusCode) {
+                    throw new \RuntimeException($process->getErrorOutput());
+                }
 
                 return;
             } else {

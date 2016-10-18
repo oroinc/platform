@@ -2,7 +2,9 @@
 
 namespace Oro\Bundle\WorkflowBundle\Entity\Repository;
 
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\EntityRepository;
+use Doctrine\ORM\Query;
 use Doctrine\ORM\Query\Expr\Join;
 use Doctrine\ORM\QueryBuilder;
 
@@ -32,15 +34,15 @@ class WorkflowItemRepository extends EntityRepository
     /**
      * Returns named workflow item by given entity id & entity class
      *
-     * @param $entityClass
-     * @param $entityIdentifier
-     * @param $workflowName
-     * @return array|WorkflowItem[]
+     * @param string $entityClass
+     * @param string $entityIdentifier
+     * @param string $workflowName
+     * @return null|object|WorkflowItem
      */
     public function findOneByEntityMetadata($entityClass, $entityIdentifier, $workflowName)
     {
         return $this->findOneBy([
-            'entityId' => $entityIdentifier,
+            'entityId' => (string)$entityIdentifier,
             'entityClass' => $entityClass,
             'workflowName' => $workflowName,
         ]);
@@ -90,12 +92,12 @@ class WorkflowItemRepository extends EntityRepository
     }
 
     /**
-     * @param WorkflowDefinition $workflowDefinition
+     * @param string $workflowName
      * @param int|null $batchSize
      *
      * @throws \Exception
      */
-    public function resetWorkflowData(WorkflowDefinition $workflowDefinition, $batchSize = null)
+    public function resetWorkflowData($workflowName, $batchSize = null)
     {
         $entityManager = $this->getEntityManager();
         $batchSize = (int) ($batchSize ?: self::DELETE_BATCH_SIZE);
@@ -105,7 +107,7 @@ class WorkflowItemRepository extends EntityRepository
         $queryBuilder->select('workflowItem.id')
             ->from('OroWorkflowBundle:WorkflowItem', 'workflowItem')
             ->innerJoin('workflowItem.definition', 'workflowDefinition', Join::WITH, 'workflowDefinition.name = ?1')
-            ->setParameter(1, $workflowDefinition->getName())
+            ->setParameter(1, $workflowName)
             ->orderBy('workflowItem.id');
 
         $iterator = new DeletionQueryResultIterator($queryBuilder);
@@ -237,5 +239,59 @@ class WorkflowItemRepository extends EntityRepository
             },
             $qb->getQuery()->getArrayResult()
         );
+    }
+
+    /**
+     * @param Collection $stepNames
+     * @param string $entityClass
+     * @param string $entityIdentifier
+     * @param null $dqlFilter
+     * @return QueryBuilder
+     */
+    public function findByStepNamesAndEntityClassQueryBuilder(
+        Collection $stepNames,
+        $entityClass,
+        $entityIdentifier,
+        $dqlFilter = null
+    ) {
+        $queryBuilder = $this->createQueryBuilder('wi')
+            ->select('wi')
+            ->innerJoin('wi.currentStep', 'ws')
+            ->innerJoin(
+                $entityClass,
+                'e',
+                Query\Expr\Join::WITH,
+                sprintf('CAST(wi.entityId as string) = CAST(e.%s as string)', $entityIdentifier)
+            );
+
+        $queryBuilder->where($queryBuilder->expr()->in('ws.name', ':workflowSteps'))
+            ->setParameter('workflowSteps', $stepNames->getValues());
+
+        $queryBuilder->andWhere('wi.entityClass = :entityClass')
+            ->setParameter('entityClass', $entityClass);
+
+        if ($dqlFilter) {
+            $queryBuilder->andWhere($dqlFilter);
+        }
+
+        return $queryBuilder;
+    }
+
+    /**
+     * @param Collection $stepNames
+     * @param string $entityClass
+     * @param string $entityIdentifier
+     * @param null $dqlFilter
+     * @return array|\Oro\Bundle\WorkflowBundle\Entity\WorkflowItem[]
+     */
+    public function findByStepNamesAndEntityClass(
+        Collection $stepNames,
+        $entityClass,
+        $entityIdentifier,
+        $dqlFilter = null
+    ) {
+        return $this->findByStepNamesAndEntityClassQueryBuilder($stepNames, $entityClass, $entityIdentifier, $dqlFilter)
+            ->getQuery()
+            ->getResult();
     }
 }

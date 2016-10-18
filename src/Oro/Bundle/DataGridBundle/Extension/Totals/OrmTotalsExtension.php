@@ -2,13 +2,12 @@
 
 namespace Oro\Bundle\DataGridBundle\Extension\Totals;
 
-use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Query\Expr;
 use Doctrine\ORM\QueryBuilder;
 
-use Oro\Component\DoctrineUtils\ORM\QueryUtils;
 use Symfony\Component\Translation\TranslatorInterface;
 
+use Oro\Component\DoctrineUtils\ORM\QueryUtils;
 use Oro\Component\PhpUtils\ArrayUtil;
 
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
@@ -179,7 +178,6 @@ class OrmTotalsExtension extends AbstractExtension
         }
 
         return $this->groupParts;
-
     }
 
     /**
@@ -360,7 +358,6 @@ class OrmTotalsExtension extends AbstractExtension
 
             $dataQueryBuilder->andWhere($dataQueryBuilder->expr()->in($field, $ids));
         }
-
     }
 
     /**
@@ -438,7 +435,6 @@ class OrmTotalsExtension extends AbstractExtension
             unset($totalRows[$rowName][Configuration::TOTALS_EXTEND_KEY]);
 
             $totalRows[$rowName] = $rowConfig;
-
         }
 
         return $rowConfig;

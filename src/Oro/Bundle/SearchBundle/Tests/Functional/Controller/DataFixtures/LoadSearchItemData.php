@@ -6,7 +6,6 @@ use Doctrine\Common\DataFixtures\AbstractFixture;
 use Doctrine\Common\DataFixtures\OrderedFixtureInterface;
 use Doctrine\Common\Persistence\ObjectManager;
 
-use Oro\Bundle\SearchBundle\Query\Query;
 use Oro\Bundle\SecurityBundle\Tools\UUIDGenerator;
 
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
@@ -14,51 +13,14 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 
 use Oro\Bundle\TestFrameworkBundle\Entity\Item;
 
-/**
- * Load customers
- *
- * Execute with "php app/console doctrine:fixtures:load"
- */
-class LoadSearchItemData extends AbstractFixture implements OrderedFixtureInterface, ContainerAwareInterface
+class LoadSearchItemData extends AbstractFixture implements OrderedFixtureInterface
 {
     const COUNT = 9;
-
-    /**
-     * @var ContainerInterface
-     */
-    protected $container;
-
-    /**
-     * {@inheritDoc}
-     */
-    public function setContainer(ContainerInterface $container = null)
-    {
-        $this->container = $container;
-    }
 
     /**
      * {@inheritDoc}
      */
     public function load(ObjectManager $manager)
-    {
-        $this->loadItems($manager);
-        $this->ensureItemsLoaded();
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getOrder()
-    {
-        return 4;
-    }
-
-    /**
-     * Load items
-     *
-     * @param ObjectManager $manager
-     */
-    public function loadItems($manager)
     {
         for ($ind = 1; $ind <= self::COUNT; $ind++) {
             //create item
@@ -95,27 +57,10 @@ class LoadSearchItemData extends AbstractFixture implements OrderedFixtureInterf
     }
 
     /**
-     * Ensure that items loaded to search index
-     *
-     * @throws \LogicException
+     * {@inheritdoc}
      */
-    protected function ensureItemsLoaded()
+    public function getOrder()
     {
-        $query = new Query();
-        $query->from('oro_test_item');
-
-        $requestCounts = 20;
-        do {
-            $result = $this->container->get('oro_search.search.engine')->search($query);
-            $isLoaded = $result->getRecordsCount() == self::COUNT;
-            if (!$isLoaded) {
-                $requestCounts++;
-                sleep(1);
-            }
-        } while (!$isLoaded && $requestCounts > 0);
-
-        if (!$isLoaded) {
-            throw new \LogicException('Search items are not loaded');
-        }
+        return 4;
     }
 }
