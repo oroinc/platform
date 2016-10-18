@@ -492,7 +492,6 @@ class AclAwareMenuFactoryExtensionTest extends \PHPUnit_Framework_TestCase
         $item = $this->factory->createItem('test', $options);
         $this->assertTrue($item->getExtra('isAllowed'));
         $this->assertInstanceOf('Knp\Menu\MenuItem', $item);
-
     }
 
     /**
@@ -552,7 +551,6 @@ class AclAwareMenuFactoryExtensionTest extends \PHPUnit_Framework_TestCase
         $item = $this->factory->createItem('test', $options);
         $this->assertTrue($item->getExtra('isAllowed'));
         $this->assertInstanceOf('Knp\Menu\MenuItem', $item);
-
     }
 
     /**

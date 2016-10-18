@@ -47,7 +47,6 @@ class MutableAclProvider extends BaseMutableAclProvider
     ) {
         $this->permissionStrategy = $permissionGrantingStrategy;
         parent::__construct($connection, $permissionGrantingStrategy, $options, $cache);
-
     }
 
     /**

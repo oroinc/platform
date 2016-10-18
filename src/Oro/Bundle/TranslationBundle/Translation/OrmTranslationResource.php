@@ -46,7 +46,7 @@ class OrmTranslationResource implements ResourceInterface, DynamicResourceInterf
      */
     public function getResource()
     {
-        return Translation::ENTITY_NAME . $this->locale;
+        return Translation::class . $this->locale;
     }
 
     /**
@@ -54,6 +54,6 @@ class OrmTranslationResource implements ResourceInterface, DynamicResourceInterf
      */
     public function __toString()
     {
-        return Translation::ENTITY_NAME . $this->locale;
+        return Translation::class . $this->locale;
     }
 }

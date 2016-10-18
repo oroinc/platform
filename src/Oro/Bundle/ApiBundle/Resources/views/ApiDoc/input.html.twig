@@ -1,0 +1,21 @@
+<h4>Input</h4>
+<table class='fullwidth input'>
+    <thead>
+    <tr>
+        <th>Name</th>
+        <th>Type</th>
+        <th>Description</th>
+    </tr>
+    </thead>
+        <tbody>
+        {% for name, infos in data %}
+            {% if not infos.readonly %}
+                <tr>
+                    <td>{{ name }}</td>
+                    <td>{{ infos.dataType is defined ? infos.dataType : '' }}</td>
+                    <td>{{ infos.description is defined ? infos.description|extra_markdown : '' }}</td>
+                </tr>
+            {% endif %}
+        {% endfor %}
+        </tbody>
+</table>

@@ -4,27 +4,18 @@ namespace Oro\Bundle\SecurityBundle\Migrations\Data\ORM;
 
 use Doctrine\Common\DataFixtures\AbstractFixture;
 use Doctrine\Common\Persistence\ObjectManager;
-
 use Doctrine\ORM\EntityManager;
 
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
-use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\DependencyInjection\ContainerAwareTrait;
 
+use Oro\Bundle\SearchBundle\Engine\Indexer;
 use Oro\Bundle\SearchBundle\Engine\IndexerInterface;
 use Oro\Bundle\UserBundle\Entity\User;
 
 class AddSearchReindexJob extends AbstractFixture implements ContainerAwareInterface
 {
-    /** @var ContainerInterface */
-    protected $container;
-
-    /**
-     * {@inheritdoc}
-     */
-    public function setContainer(ContainerInterface $container = null)
-    {
-        $this->container = $container;
-    }
+    use ContainerAwareTrait;
 
     /**
      * {@inheritdoc}
@@ -47,7 +38,7 @@ class AddSearchReindexJob extends AbstractFixture implements ContainerAwareInter
             return;
         }
 
-        $searchResult = $this->container->get('oro_search.index')->advancedSearch(
+        $searchResult = $this->getIndexer()->advancedSearch(
             sprintf(
                 'from oro_user where username ~ %s and integer oro_user_owner = %d',
                 $user->getUsername(),
@@ -60,8 +51,15 @@ class AddSearchReindexJob extends AbstractFixture implements ContainerAwareInter
             return;
         }
 
-        // sync reindex as this is a fixture
         $this->getSearchIndexer()->reindex();
+    }
+
+    /**
+     * @return Indexer
+     */
+    protected function getIndexer()
+    {
+        return $this->container->get('oro_search.index');
     }
 
     /**
@@ -69,6 +67,6 @@ class AddSearchReindexJob extends AbstractFixture implements ContainerAwareInter
      */
     protected function getSearchIndexer()
     {
-        return $this->container->get('oro_search.search.engine.indexer');
+        return $this->container->get('oro_search.async.indexer');
     }
 }

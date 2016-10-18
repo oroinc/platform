@@ -20,6 +20,7 @@ use Oro\Bundle\ApiBundle\Util\DependencyInjectionUtil;
 class OroApiExtension extends Extension implements PrependExtensionInterface
 {
     const API_DOC_VIEWS_PARAMETER_NAME = 'oro_api.api_doc.views';
+    const API_DOC_PARH = 'oro_api.api_doc.path';
 
     const ACTION_PROCESSOR_BAG_SERVICE_ID             = 'oro_api.action_processor_bag';
     const ACTION_PROCESSOR_TAG                        = 'oro.api.action_processor';
@@ -229,6 +230,7 @@ class OroApiExtension extends Extension implements PrependExtensionInterface
             ->getDefinition(self::CONFIG_EXTENSION_REGISTRY_SERVICE_ID)
             ->replaceArgument(0, $config['config_max_nesting_level']);
         $container->setParameter(self::API_DOC_VIEWS_PARAMETER_NAME, $config['api_doc_views']);
+        $container->setParameter(self::API_DOC_PARH, $config['documentation_path']);
     }
 
     /**
