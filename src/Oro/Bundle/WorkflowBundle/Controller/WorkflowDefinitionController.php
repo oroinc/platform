@@ -82,7 +82,7 @@ class WorkflowDefinitionController extends Controller
         if ($workflowDefinition->isSystem()) {
             throw new AccessDeniedHttpException('System workflow definitions are not editable');
         }
-        $translateLinks = $this->get('oro_workflow.translation.helper')->getWorkflowTranslateLinks($workflowDefinition);
+        $translateLinks = $this->getTranslateLinks($workflowDefinition);
         $form = $this->get('oro_workflow.form.workflow_definition');
         $form->setData($workflowDefinition);
 
@@ -129,7 +129,7 @@ class WorkflowDefinitionController extends Controller
      */
     public function viewAction(WorkflowDefinition $workflowDefinition)
     {
-        $translateLinks = $this->get('oro_workflow.translation.helper')->getWorkflowTranslateLinks($workflowDefinition);
+        $translateLinks = $this->getTranslateLinks($workflowDefinition);
 
         return array(
             'entity' => $workflowDefinition,
@@ -228,5 +228,19 @@ class WorkflowDefinitionController extends Controller
                 return $workflow->getName() !== $workflowDefinition->getName();
             }
         );
+    }
+
+    /**
+     * @param WorkflowDefinition $workflowDefinition
+     * @return array
+     */
+    protected function getTranslateLinks(WorkflowDefinition $workflowDefinition)
+    {
+        // show translate links only if any language is available for current user
+        if (0 === count($this->get('oro_translation.provider.language')->getAvailableLanguages())) {
+            return [];
+        }
+
+        return $this->get('oro_workflow.translation.helper')->getWorkflowTranslateLinks($workflowDefinition);
     }
 }
