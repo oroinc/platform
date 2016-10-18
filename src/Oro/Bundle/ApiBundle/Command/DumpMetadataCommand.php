@@ -10,6 +10,7 @@ use Symfony\Component\Yaml\Yaml;
 
 use Oro\Component\ChainProcessor\ProcessorBagInterface;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfigExtra;
+use Oro\Bundle\ApiBundle\Metadata\ActionMetadataExtra;
 use Oro\Bundle\ApiBundle\Provider\ConfigProvider;
 use Oro\Bundle\ApiBundle\Provider\MetadataProvider;
 use Oro\Bundle\ApiBundle\Request\RequestType;
@@ -87,6 +88,9 @@ class DumpMetadataCommand extends AbstractDebugCommand
         $configExtras = [
             new EntityDefinitionConfigExtra($action)
         ];
+        $metadataExtras = [
+            new ActionMetadataExtra($action)
+        ];
 
         $config   = $configProvider->getConfig($entityClass, $version, $requestType, $configExtras);
         $metadata = $metadataProvider->getMetadata(
@@ -94,7 +98,7 @@ class DumpMetadataCommand extends AbstractDebugCommand
             $version,
             $requestType,
             $config->getDefinition(),
-            []
+            $metadataExtras
         );
 
         return [
