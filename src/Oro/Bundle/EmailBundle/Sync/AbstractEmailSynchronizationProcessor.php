@@ -126,7 +126,7 @@ abstract class AbstractEmailSynchronizationProcessor implements LoggerAwareInter
     protected function checkOrganization(EmailHeader $email, $folderType, $organization)
     {
         $helper = new EmailAddressHelper();
-        $repo = $this->em->getRepository('OroCRMContactBundle:ContactEmail');
+        $repo = $this->em->getRepository('OroContactBundle:ContactEmail');
         $qb = $repo->createQueryBuilder('ce');
 
         if ($folderType === FolderType::SENT) {

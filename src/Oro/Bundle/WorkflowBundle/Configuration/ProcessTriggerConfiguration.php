@@ -4,8 +4,6 @@ namespace Oro\Bundle\WorkflowBundle\Configuration;
 
 use Cron\CronExpression;
 
-use JMS\JobQueueBundle\Entity\Job;
-
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
@@ -22,7 +20,7 @@ class ProcessTriggerConfiguration implements ConfigurationInterface
     public function processConfiguration(array $configs)
     {
         $processor = new Processor();
-        return $processor->processConfiguration($this, array($configs));
+        return $processor->processConfiguration($this, [$configs]);
     }
 
     /**
@@ -44,7 +42,7 @@ class ProcessTriggerConfiguration implements ConfigurationInterface
                     ->defaultNull()
                 ->end()
                 ->integerNode('priority')
-                    ->defaultValue(Job::PRIORITY_DEFAULT)
+                    ->defaultValue(ProcessPriority::PRIORITY_DEFAULT)
                 ->end()
                 ->booleanNode('queued')
                     ->defaultFalse()

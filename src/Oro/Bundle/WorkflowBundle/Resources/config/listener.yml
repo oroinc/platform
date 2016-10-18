@@ -51,6 +51,7 @@ services:
             - '@oro_workflow.process.logger'
             - '@oro_workflow.cache.process_trigger'
             - '@oro_workflow.process.schedule_policy'
+            - '@oro_message_queue.message_producer'
         tags:
             - { name: oro_workflow.listener.event_trigger_collector.extension }
 
