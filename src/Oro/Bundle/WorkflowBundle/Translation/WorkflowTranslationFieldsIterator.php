@@ -35,7 +35,7 @@ class WorkflowTranslationFieldsIterator
      * Iteration values are current values under the field.
      * @param string $workflowName
      * @param array $configuration
-     * @return array|\Generator ($translationKey => &$fieldValue)
+     * @return \Generator|array($translationKey => &$fieldValue)
      * @throws \InvalidArgumentException
      */
     public function &iterateConfigTranslationFields($workflowName, array &$configuration)

@@ -97,7 +97,6 @@ class TranslationProcessor implements
      */
     public function clearTranslationKeys(WorkflowChangesEvent $changesEvent)
     {
-
         $previousDefinition = $changesEvent->getPrevious();
 
         if ($previousDefinition === null) {
