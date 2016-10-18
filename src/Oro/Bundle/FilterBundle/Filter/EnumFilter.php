@@ -11,6 +11,8 @@ use Oro\Bundle\FilterBundle\Datasource\FilterDatasourceAdapterInterface;
 
 class EnumFilter extends BaseMultiChoiceFilter
 {
+    const FILTER_TYPE_NAME = 'enum';
+
     /** @var DictionaryApiEntityManager */
     protected $dictionaryApiEntityManager;
 
@@ -47,6 +49,7 @@ class EnumFilter extends BaseMultiChoiceFilter
             $params['class'] = ExtendHelper::buildEnumValueClassName($params['enum_code']);
             unset($params['enum_code']);
         }
+
         parent::init($name, $params);
     }
 

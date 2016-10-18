@@ -107,7 +107,7 @@ datagrids:
                     - translation.value as value
                     - translationKey.key as key
                     - translationKey.domain as domain
-                    - (CASE WHEN translation.value IS NULL THEN 0 ELSE 1 END) as status
+                    - (CASE WHEN translation.value IS NULL THEN false ELSE true END) as status
                 from:
                     - { table: '%oro_translation.entity.language.class%', alias: language }
                 join:
@@ -185,7 +185,7 @@ datagrids:
                             multiple: true
                 status:
                     type: boolean
-                    data_name: CAST(status as int)
+                    data_name: status
                 value:
                     type: string
                     data_name: value

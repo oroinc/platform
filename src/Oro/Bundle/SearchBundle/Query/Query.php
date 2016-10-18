@@ -37,6 +37,8 @@ class Query
     const OPERATOR_NOT_CONTAINS        = '!~';
     const OPERATOR_IN                  = 'in';
     const OPERATOR_NOT_IN              = '!in';
+    const OPERATOR_EXISTS              = 'exists';
+    const OPERATOR_NOT_EXISTS          = 'notexists';
 
     const TYPE_TEXT     = 'text';
     const TYPE_INTEGER  = 'integer';

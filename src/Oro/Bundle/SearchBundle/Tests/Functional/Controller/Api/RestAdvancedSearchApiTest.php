@@ -47,6 +47,7 @@ class RestAdvancedSearchApiTest extends WebTestCase
         //compare result
         $this->assertEquals($response['records_count'], $result['records_count']);
         $this->assertEquals($response['count'], $result['count']);
+
         $this->assertSameSize($response['rest']['data'], $result['data']);
 
         // remove ID references
