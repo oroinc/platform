@@ -1,2 +1,3 @@
 "sync.connection.lost": "]-Inf,0]Synchronizer can't connect to server. Please contact your Administrator.|{1,2}Synchronizer has lost connection to the server. {{ remain }} reconnections attempts remain.|{3}Synchronizer has lost connection to the server. {{ remain }} reconnections attempt remain."
 "sync.connection.established": "Synchronizer has established connection"
+"sync.message.content.outdated": "Content of {{ title }} page is outdated, please <a href='#' data-action='page-refresh'>refresh the page</a>"
