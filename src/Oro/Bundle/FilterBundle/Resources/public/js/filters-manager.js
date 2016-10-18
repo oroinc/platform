@@ -131,8 +131,9 @@ define(function(require) {
             }, this);
 
             if ('filtersStateElement' in options) {
+                var $container = this.$el.closest('body, .ui-dialog');
                 var filtersStateView = new FiltersStateView({
-                    el: $(options.filtersStateElement),
+                    el: $container.find(options.filtersStateElement).first(),
                     filters: options.filters
                 });
 

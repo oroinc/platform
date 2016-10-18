@@ -10,6 +10,8 @@ define(function(require) {
     var mapFilterModuleName = require('orofilter/js/map-filter-module-name');
     var FiltersManager = require('orofilter/js/collection-filters-manager');
     var FiltersTogglePlugin = require('orofilter/js/plugins/filters-toggle-plugin');
+    var module = require('module');
+    var moduleConfigs = module.config();
     var cachedFilters = {};
 
     var methods = {
@@ -47,7 +49,9 @@ define(function(require) {
             var options = methods.combineOptions.call(this);
             options.collection = this.collection;
             options.el = $('<div/>').prependTo(this.$el);
-            options.filtersStateElement = '.page-title-center';
+            if (this.enableToggleFilters) {
+                options.filtersStateElement = '.page-title-center, .filters-view-container';
+            }
             filtersList = new FiltersManager(options);
             filtersList.render();
             mediator.trigger('datagrid_filters:rendered', this.collection, this.$el);
@@ -158,9 +162,16 @@ define(function(require) {
                 $el: options.$el,
                 gridName: options.gridName,
                 metadata: options.metadata,
+                enableToggleFilters: options.enableToggleFilters,
                 collection: null,
                 modules: null
             };
+
+            if ('enableToggleFilters' in options) {
+                self.enableToggleFilters = options.enableToggleFilters;
+            } else if ('enableToggleFilters' in moduleConfigs) {
+                self.enableToggleFilters = moduleConfigs.enableToggleFilters;
+            }
 
             methods.initBuilder.call(self);
 
@@ -176,7 +187,9 @@ define(function(require) {
             if (!_.isArray(options.metadata.plugins)) {
                 options.metadata.plugins = [];
             }
-            options.metadata.plugins.push(FiltersTogglePlugin);
+            if (options.enableToggleFilters) {
+                options.metadata.plugins.push(FiltersTogglePlugin);
+            }
             deferred.resolve();
         }
     };

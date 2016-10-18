@@ -29,6 +29,11 @@
         {% set data     = oro_datagrid_data(datagrid) %}
         {% set gridId   = oro_datagrid_generate_element_id(datagrid) %}
         {% set enableFilters = renderParams.enableFilters is defined ? renderParams.enableFilters : true %}
+        {% if renderParams.enableToggleFilters is defined %}
+            {% set enableToggleFilters = renderParams.enableToggleFilters %}
+        {% else %}
+            {% set enableToggleFilters = isDesktopVersion() %}
+        {% endif %}
         {% set options  = {
             el: '#' ~ gridId,
             gridName: oro_datagrid_build_fullname(datagrid.name, datagrid.scope),
@@ -36,6 +41,7 @@
             metadata: metaData,
             data: data,
             enableFilters: enableFilters,
+            enableToggleFilters: enableToggleFilters,
             enableViews: renderParams.enableViews is defined ? renderParams.enableViews : enableFilters,
             showViewsInNavbar: renderParams.showViewsInNavbar is defined ? renderParams.showViewsInNavbar : false,
             inputName: oro_datagrid_build_inputname(datagrid.name),
