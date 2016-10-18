@@ -44,7 +44,7 @@ class UpdateUserCommandEventListener
             $user = $this->userManager->loadUserByUsername($userName);
             $user
                 ->setUsername('admin')
-                ->setPlainPassword('admin')
+                ->setPlainPassword('admin1Q')
                 ->setFirstName('John')
                 ->setLastName('Doe')
                 ->setEmail('admin@example.com')

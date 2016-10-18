@@ -32,7 +32,7 @@ class LoadUserData extends AbstractFixture implements ContainerAwareInterface
 
         $user = $userManager->createUser();
         $user->setUsername('simple_user')
-            ->setPlainPassword('simple_password')
+            ->setPlainPassword('simple_password1Q')
             ->setEmail('simple_user@example.com')
             ->setFirstName("First Name")
             ->setLastName("Last Name")
@@ -45,7 +45,7 @@ class LoadUserData extends AbstractFixture implements ContainerAwareInterface
 
         $user = $userManager->createUser();
         $user->setUsername('simple_user2')
-            ->setPlainPassword('simple_password2')
+            ->setPlainPassword('simple_password21Q')
             ->setEmail('simple_user2@example.com')
             ->setFirstName("First Name")
             ->setLastName("Last Name")

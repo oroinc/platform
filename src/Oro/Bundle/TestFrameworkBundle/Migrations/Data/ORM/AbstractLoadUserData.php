@@ -37,7 +37,7 @@ abstract class AbstractLoadUserData extends AbstractFixture implements Container
         }
 
         $admin
-            ->setPlainPassword('admin')
+            ->setPlainPassword('admin1Q')
             ->setFirstName('John')
             ->setLastName('Doe')
             ->setEmail('admin@example.com')
@@ -48,7 +48,7 @@ abstract class AbstractLoadUserData extends AbstractFixture implements Container
             $organizationRepo = $manager->getRepository('OroOrganizationBundle:Organization');
             $organization = $organizationRepo->getFirst();
             $api = new Entity\UserApi();
-            $api->setApiKey('admin_api_key1Q')
+            $api->setApiKey('admin_api_key')
                 ->setUser($admin)
                 ->setOrganization($organization);
 
