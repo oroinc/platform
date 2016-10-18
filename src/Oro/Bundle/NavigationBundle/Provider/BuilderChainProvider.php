@@ -51,19 +51,13 @@ class BuilderChainProvider implements MenuProviderInterface
      */
     private $cache;
 
-    /**
-     * @param FactoryInterface $factory
-     */
-    private $eventDispatcher;
 
     public function __construct(
         FactoryInterface $factory,
-        EventDispatcherInterface $eventDispatcher,
         ArrayLoader $loader,
         MenuManipulator $manipulator
     ) {
         $this->factory = $factory;
-        $this->eventDispatcher = $eventDispatcher;
         $this->loader = $loader;
         $this->manipulator = $manipulator;
     }

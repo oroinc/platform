@@ -83,7 +83,6 @@ services:
         class: '%oro_menu.builder_chain.class%'
         arguments:
             - '@oro_menu.factory'
-            - '@event_dispatcher'
             - '@oro_menu.array_loader'
             - '@oro_menu.manipulator'
         tags:
