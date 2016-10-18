@@ -8,8 +8,8 @@ use Doctrine\ORM\Event\PostFlushEventArgs;
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
 use Doctrine\ORM\PersistentCollection;
 use Oro\Bundle\DataAuditBundle\Async\Topics;
+use Oro\Bundle\DataAuditBundle\Provider\AuditConfigProvider;
 use Oro\Bundle\DataAuditBundle\Service\ConvertEntityToArrayForMessageQueueService;
-use Oro\Bundle\DataAuditBundle\Service\GetEntityAuditMetadataService;
 use Oro\Bundle\PlatformBundle\EventListener\OptionalListenerInterface;
 use Oro\Bundle\SecurityBundle\Authentication\Token\OrganizationContextTokenInterface;
 use Oro\Bundle\SecurityBundle\Tools\UUIDGenerator;
@@ -45,9 +45,9 @@ class SendChangedEntitiesToMessageQueueListener implements OptionalListenerInter
     private $entityToArrayConverter;
 
     /**
-     * @var GetEntityAuditMetadataService
+     * @var AuditConfigProvider
      */
-    private $entityAuditMetadataProvider;
+    private $configProvider;
 
     /**
      * @var \SplObjectStorage
@@ -78,18 +78,18 @@ class SendChangedEntitiesToMessageQueueListener implements OptionalListenerInter
      * @param MessageProducerInterface $messageProducer
      * @param TokenStorageInterface $securityTokenStorage
      * @param ConvertEntityToArrayForMessageQueueService $entityToArrayConverter
-     * @param GetEntityAuditMetadataService $entityAuditMetadataProvider
+     * @param AuditConfigProvider $configProvider
      */
     public function __construct(
         MessageProducerInterface $messageProducer,
         TokenStorageInterface $securityTokenStorage,
         ConvertEntityToArrayForMessageQueueService $entityToArrayConverter,
-        GetEntityAuditMetadataService $entityAuditMetadataProvider
+        AuditConfigProvider $configProvider
     ) {
         $this->messageProducer = $messageProducer;
         $this->securityTokenStorage = $securityTokenStorage;
         $this->entityToArrayConverter = $entityToArrayConverter;
-        $this->entityAuditMetadataProvider = $entityAuditMetadataProvider;
+        $this->configProvider = $configProvider;
 
         $this->allInsertions = new \SplObjectStorage;
         $this->allUpdates = new \SplObjectStorage;
@@ -190,7 +190,7 @@ class SendChangedEntitiesToMessageQueueListener implements OptionalListenerInter
 
         $insertions = new \SplObjectStorage();
         foreach ($uow->getScheduledEntityInsertions() as $entity) {
-            if (!$this->isAuditableEntity(get_class($entity))) {
+            if (!$this->configProvider->isAuditableEntity(ClassUtils::getClass($entity))) {
                 continue;
             }
 
@@ -209,7 +209,7 @@ class SendChangedEntitiesToMessageQueueListener implements OptionalListenerInter
 
         $updates = new \SplObjectStorage();
         foreach ($uow->getScheduledEntityUpdates() as $entity) {
-            if (!$this->isAuditableEntity(get_class($entity))) {
+            if (!$this->configProvider->isAuditableEntity(ClassUtils::getClass($entity))) {
                 continue;
             }
 
@@ -228,17 +228,19 @@ class SendChangedEntitiesToMessageQueueListener implements OptionalListenerInter
 
         $deletions = new \SplObjectStorage();
         foreach ($uow->getScheduledEntityDeletions() as $entity) {
-            if (!$this->isAuditableEntity(get_class($entity))) {
+            $entityClass = ClassUtils::getClass($entity);
+            if (!$this->configProvider->isAuditableEntity($entityClass)) {
                 continue;
             }
 
             $changeSet = [];
-            $entityMeta = $em->getClassMetadata(get_class($entity));
+            $entityMeta = $em->getClassMetadata($entityClass);
 
             // in order to audit many to one inverse side we have to store some info to change set.
             foreach ($entityMeta->associationMappings as $filedName => $mapping) {
-                if (ClassMetadataInfo::MANY_TO_ONE == $mapping['type']) {
-                    if ($relatedEntity = $entityMeta->getFieldValue($entity, $filedName)) {
+                if (ClassMetadataInfo::MANY_TO_ONE === $mapping['type']) {
+                    $relatedEntity = $entityMeta->getFieldValue($entity, $filedName);
+                    if ($relatedEntity) {
                         $changeSet[$filedName] = [
                             $this->convertEntityToArray($em, $relatedEntity, []),
                             null
@@ -263,7 +265,7 @@ class SendChangedEntitiesToMessageQueueListener implements OptionalListenerInter
         $collectionUpdates = new \SplObjectStorage();
         foreach ($uow->getScheduledCollectionUpdates() as $collection) {
             /** @var $collection PersistentCollection */
-            if (!$this->isAuditableEntity($collection->getTypeClass()->getName())) {
+            if (!$this->configProvider->isAuditableEntity($collection->getTypeClass()->getName())) {
                 continue;
             }
 
@@ -387,16 +389,6 @@ class SendChangedEntitiesToMessageQueueListener implements OptionalListenerInter
     private function hasChanges(\SplObjectStorage $storage, EntityManager $em)
     {
         return $storage->contains($em) && count($storage[$em]) > 0;
-    }
-
-    /**
-     * @param string $entityClass
-     *
-     * @return bool
-     */
-    private function isAuditableEntity($entityClass)
-    {
-        return null !== $this->entityAuditMetadataProvider->getMetadata($entityClass);
     }
 
     /**

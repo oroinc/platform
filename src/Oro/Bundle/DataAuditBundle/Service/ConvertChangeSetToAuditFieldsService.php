@@ -3,73 +3,75 @@ namespace Oro\Bundle\DataAuditBundle\Service;
 
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Oro\Bundle\DataAuditBundle\Entity\AuditField;
-use Metadata\ClassMetadata as AuditClassMetadata;
+use Oro\Bundle\DataAuditBundle\Provider\AuditConfigProvider;
+use Oro\Bundle\DataAuditBundle\Provider\EntityNameProvider;
 
 class ConvertChangeSetToAuditFieldsService
 {
-    /**
-     * @var GetHumanReadableEntityNameService
-     */
-    private $getHumanReadableEntityNameService;
+    /** @var AuditConfigProvider */
+    private $configProvider;
+
+    /** @var EntityNameProvider */
+    private $entityNameProvider;
 
     /**
-     * @param GetHumanReadableEntityNameService $getHumanReadableEntityNameService
+     * @param AuditConfigProvider $configProvider
+     * @param EntityNameProvider  $entityNameProvider
      */
-    public function __construct(GetHumanReadableEntityNameService $getHumanReadableEntityNameService)
-    {
-        $this->getHumanReadableEntityNameService = $getHumanReadableEntityNameService;
+    public function __construct(
+        AuditConfigProvider $configProvider,
+        EntityNameProvider $entityNameProvider
+    ) {
+        $this->configProvider = $configProvider;
+        $this->entityNameProvider = $entityNameProvider;
     }
 
     /**
-     * @param AuditClassMetadata $entityAuditMeta
-     * @param ClassMetadata $entityMeta
-     * @param array $changeSet
+     * @param ClassMetadata $entityMetadata
+     * @param array         $changeSet
      *
      * @return AuditField[]
      */
-    public function convert(AuditClassMetadata $entityAuditMeta, ClassMetadata $entityMeta, array $changeSet)
+    public function convert(ClassMetadata $entityMetadata, array $changeSet)
     {
         $fields = [];
         foreach ($changeSet as $fieldName => $change) {
-            // is field auditable?
-            if (false == isset($entityAuditMeta->propertyMetadata[$fieldName])) {
-                continue;
+            if ($this->configProvider->isAuditableField($entityMetadata->name, $fieldName)) {
+                $this->convertChangeSet($entityMetadata, $fieldName, $change, $fields);
             }
-
-            $this->convertChangeSet($fieldName, $change, $entityMeta, $fields);
         }
 
         return $fields;
     }
 
     /**
+     * @param ClassMetadata $entityMetadata
      * @param string $fieldName
      * @param array $change
-     * @param ClassMetadata $entityMeta
      * @param array $fields
      */
     private function convertChangeSet(
+        ClassMetadata $entityMetadata,
         $fieldName,
         $change,
-        ClassMetadata $entityMeta,
         &$fields
     ) {
         list($old, $new) = $change;
 
-        if ($entityMeta->hasField($fieldName)) {
-            $fieldMapping = $entityMeta->getFieldMapping($fieldName);
+        if ($entityMetadata->hasField($fieldName)) {
+            $fieldMapping = $entityMetadata->getFieldMapping($fieldName);
             $fieldType = $fieldMapping['type'];
 
-            if (in_array($fieldType, ['date', 'datetime']) && $old) {
+            if ($old && in_array($fieldType, ['date', 'datetime'], true)) {
                 $old = \DateTime::createFromFormat(DATE_ISO8601, $old);
             }
 
-            if (in_array($fieldType, ['date', 'datetime']) && $new) {
+            if ($new && in_array($fieldType, ['date', 'datetime'], true)) {
                 $new = \DateTime::createFromFormat(DATE_ISO8601, $new);
             }
 
             $fields[$fieldName] = new AuditField($fieldName, $fieldType, $new, $old);
-        } elseif (isset($entityMeta->associationMappings[$fieldName]) &&
+        } elseif (isset($entityMetadata->associationMappings[$fieldName]) &&
             is_array($new) &&
             array_key_exists('inserted', $new) &&
             array_key_exists('deleted', $new)
@@ -80,13 +82,13 @@ class ConvertChangeSetToAuditFieldsService
             $this->processChanged($new, $field);
 
             $field->calculateNewValue();
-        } elseif (isset($entityMeta->associationMappings[$fieldName])) {
+        } elseif (isset($entityMetadata->associationMappings[$fieldName])) {
             $newName = $new ?
-                $this->getHumanReadableEntityNameService->getName($new['entity_class'], $new['entity_id']) :
+                $this->entityNameProvider->getEntityName($new['entity_class'], $new['entity_id']) :
                 null;
 
             $oldName = $old ?
-                $this->getHumanReadableEntityNameService->getName($old['entity_class'], $old['entity_id']) :
+                $this->entityNameProvider->getEntityName($old['entity_class'], $old['entity_id']) :
                 null;
 
             $fields[$fieldName] = new AuditField($fieldName, 'text', $newName, $oldName);
@@ -110,7 +112,7 @@ class ConvertChangeSetToAuditFieldsService
             $field->addEntityAddedToCollection(
                 $entity['entity_class'],
                 $entity['entity_id'],
-                $this->getHumanReadableEntityNameService->getName(
+                $this->entityNameProvider->getEntityName(
                     $entity['entity_class'],
                     $entity['entity_id']
                 )
@@ -129,7 +131,7 @@ class ConvertChangeSetToAuditFieldsService
                 $field->addEntityRemovedFromCollection(
                     $entity['entity_class'],
                     $entity['entity_id'],
-                    $this->getHumanReadableEntityNameService->getName(
+                    $this->entityNameProvider->getEntityName(
                         $entity['entity_class'],
                         $entity['entity_id']
                     )
@@ -149,7 +151,7 @@ class ConvertChangeSetToAuditFieldsService
                 $field->addEntityChangedInCollection(
                     $entity['entity_class'],
                     $entity['entity_id'],
-                    $this->getHumanReadableEntityNameService->getName(
+                    $this->entityNameProvider->getEntityName(
                         $entity['entity_class'],
                         $entity['entity_id']
                     )

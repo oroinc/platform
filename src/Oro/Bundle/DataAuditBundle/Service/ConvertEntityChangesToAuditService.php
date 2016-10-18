@@ -5,7 +5,9 @@ use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\EntityManagerInterface;
 use Oro\Bundle\DataAuditBundle\Entity\AbstractAudit;
 use Oro\Bundle\DataAuditBundle\Entity\Audit;
+use Oro\Bundle\DataAuditBundle\Provider\AuditConfigProvider;
 use Oro\Bundle\DataAuditBundle\Model\EntityReference;
+use Oro\Bundle\DataAuditBundle\Provider\EntityNameProvider;
 
 class ConvertEntityChangesToAuditService
 {
@@ -25,14 +27,14 @@ class ConvertEntityChangesToAuditService
     private $findOrCreateAuditService;
 
     /**
-     * @var GetEntityAuditMetadataService
+     * @var AuditConfigProvider
      */
-    private $getEntityAuditMetadataService;
+    private $configProvider;
 
     /**
-     * @var GetHumanReadableEntityNameService
+     * @var EntityNameProvider
      */
-    private $getHumanReadableEntityNameService;
+    private $entityNameProvider;
 
     /**
      * @var ConvertChangeSetToAuditFieldsService
@@ -43,23 +45,23 @@ class ConvertEntityChangesToAuditService
      * @param ManagerRegistry                      $doctrine
      * @param SetNewAuditVersionService            $setNewAuditVersionService
      * @param FindOrCreateAuditService             $findOrCreateAuditService
-     * @param GetEntityAuditMetadataService        $getEntityAuditMetadataService
-     * @param GetHumanReadableEntityNameService    $getHumanReadableEntityNameService
+     * @param AuditConfigProvider                  $configProvider
+     * @param EntityNameProvider                   $entityNameProvider
      * @param ConvertChangeSetToAuditFieldsService $convertChangeSetToAuditFieldsService
      */
     public function __construct(
         ManagerRegistry $doctrine,
         SetNewAuditVersionService $setNewAuditVersionService,
         FindOrCreateAuditService $findOrCreateAuditService,
-        GetEntityAuditMetadataService $getEntityAuditMetadataService,
-        GetHumanReadableEntityNameService $getHumanReadableEntityNameService,
+        AuditConfigProvider $configProvider,
+        EntityNameProvider $entityNameProvider,
         ConvertChangeSetToAuditFieldsService $convertChangeSetToAuditFieldsService
     ) {
         $this->doctrine = $doctrine;
         $this->setNewAuditVersionService = $setNewAuditVersionService;
         $this->findOrCreateAuditService = $findOrCreateAuditService;
-        $this->getEntityAuditMetadataService = $getEntityAuditMetadataService;
-        $this->getHumanReadableEntityNameService = $getHumanReadableEntityNameService;
+        $this->configProvider = $configProvider;
+        $this->entityNameProvider = $entityNameProvider;
         $this->convertChangeSetToAuditFieldsService = $convertChangeSetToAuditFieldsService;
     }
 
@@ -87,13 +89,11 @@ class ConvertEntityChangesToAuditService
             /** @var EntityManagerInterface $entityManager */
             $entityManager = $this->doctrine->getManagerForClass($entityClass);
             $entityMetadata = $entityManager->getClassMetadata($entityClass);
-            $entityAuditMetadata = $this->getEntityAuditMetadataService->getMetadata($entityClass);
-            if (null === $entityAuditMetadata) {
+            if (!$this->configProvider->isAuditableEntity($entityClass)) {
                 continue;
             }
 
             $fields = $this->convertChangeSetToAuditFieldsService->convert(
-                $entityAuditMetadata,
                 $entityMetadata,
                 $entityChange['change_set']
             );
@@ -106,7 +106,7 @@ class ConvertEntityChangesToAuditService
                 $audit->setUser($this->getEntityByReference($user));
                 $audit->setOrganization($this->getEntityByReference($organization));
                 $audit->setLoggedAt($loggedAt);
-                $audit->setObjectName($this->getHumanReadableEntityNameService->getName($entityClass, $entityId));
+                $audit->setObjectName($this->entityNameProvider->getEntityName($entityClass, $entityId));
                 $auditEntityManager->flush();
 
                 $this->setNewAuditVersionService->setVersion($audit);
@@ -153,9 +153,7 @@ class ConvertEntityChangesToAuditService
         foreach ($entitiesChanges as $entityChange) {
             $entityClass = $entityChange['entity_class'];
             $entityId = $entityChange['entity_id'];
-            /** @var EntityManagerInterface $entityManager */
-            $entityAuditMetadata = $this->getEntityAuditMetadataService->getMetadata($entityClass);
-            if (null === $entityAuditMetadata) {
+            if (!$this->configProvider->isAuditableEntity($entityClass)) {
                 continue;
             }
 
@@ -166,7 +164,7 @@ class ConvertEntityChangesToAuditService
                 $audit->setUser($this->getEntityByReference($user));
                 $audit->setOrganization($this->getEntityByReference($organization));
                 $audit->setLoggedAt($loggedAt);
-                $audit->setObjectName($this->getHumanReadableEntityNameService->getName($entityClass, $entityId));
+                $audit->setObjectName($this->entityNameProvider->getEntityName($entityClass, $entityId));
                 $auditEntityManager->flush();
 
                 $this->setNewAuditVersionService->setVersion($audit);
@@ -213,8 +211,8 @@ class ConvertEntityChangesToAuditService
     ) {
         return $this->findOrCreateAuditService->findOrCreate(
             $this->getEntityByReference($user),
-            $entityId,
             $entityClass,
+            $entityId,
             $transactionId
         );
     }

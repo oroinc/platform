@@ -1,25 +1,22 @@
 <?php
-namespace Oro\Bundle\DataAuditBundle\Service;
+
+namespace Oro\Bundle\DataAuditBundle\Provider;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Oro\Bundle\DataAuditBundle\Entity\AbstractAudit;
 use Oro\Bundle\DataAuditBundle\Entity\Repository\AuditRepository;
 use Oro\Bundle\EntityBundle\Provider\EntityNameResolver;
 
-class GetHumanReadableEntityNameService
+class EntityNameProvider
 {
-    /**
-     * @var ManagerRegistry
-     */
+    /** @var ManagerRegistry */
     private $doctrine;
 
-    /**
-     * @var EntityNameResolver
-     */
+    /** @var EntityNameResolver */
     private $entityNameResolver;
 
     /**
-     * @param ManagerRegistry $doctrine
+     * @param ManagerRegistry    $doctrine
      * @param EntityNameResolver $entityNameResolver
      */
     public function __construct(ManagerRegistry $doctrine, EntityNameResolver $entityNameResolver)
@@ -29,12 +26,14 @@ class GetHumanReadableEntityNameService
     }
 
     /**
+     * Gets a human-readable representation of the entity.
+     *
      * @param string $entityClass
-     * @param int $entityId
+     * @param int    $entityId
      *
      * @return string
      */
-    public function getName($entityClass, $entityId)
+    public function getEntityName($entityClass, $entityId)
     {
         $entity = $this->doctrine->getManagerForClass($entityClass)->find($entityClass, $entityId);
         if ($entity) {

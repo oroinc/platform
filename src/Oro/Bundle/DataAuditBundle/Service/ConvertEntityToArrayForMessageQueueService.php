@@ -71,9 +71,8 @@ class ConvertEntityToArrayForMessageQueueService
      */
     private function getEntityId(EntityManagerInterface $em, $entity)
     {
-        $entityMeta = $em->getClassMetadata(get_class($entity));
-        $idFieldName = $entityMeta->getSingleIdentifierFieldName();
-
-        return $entityMeta->getReflectionProperty($idFieldName)->getValue($entity);
+        return $em->getClassMetadata(ClassUtils::getClass($entity))
+            ->getSingleIdReflectionProperty()
+            ->getValue($entity);
     }
 }

@@ -476,9 +476,10 @@ to the [Fallback documentation](./src/Oro/Bundle/EntityBundle/Resources/doc/enti
 - Added trait `Oro\Component\DependencyInjection\Compiler\TaggedServicesCompilerPassTrait`
 
 ####DataAuditBundle
-- LoggableManager was removed. Some logic moved to SendChangedEntitiesToMessageQueueListener class and some backend processors.
-- EntityListener was removed. Similar logic could be found in SendChangedEntitiesToMessageQueueListener class.
-- KernelListener was removed.
-- AnnotationDriver was removed.
-- ExtendMetadataFactory was removed.
-- Loggable and Versioned annotations were removed. Use entity config auditable option instead.
+- `Oro\Bundle\DataAuditBundle\Loggable\LoggableManager` was removed. Some logic moved to `Oro\Bundle\DataAuditBundle\EventListener\SendChangedEntitiesToMessageQueueListener` class and some backend processors.
+- `Oro\Bundle\DataAuditBundle\EventListener\EntityListener` was removed. Similar logic could be found in `Oro\Bundle\DataAuditBundle\EventListener\SendChangedEntitiesToMessageQueueListener` class.
+- `Oro\Bundle\DataAuditBundle\EventListener\KernelListener` was removed.
+- `Oro\Bundle\DataAuditBundle\Metadata\Driver\AnnotationDriver` was removed.
+- `Oro\Bundle\DataAuditBundle\Metadata\ExtendMetadataFactory` was removed.
+- `Loggable` and `Versioned` annotations were removed. Use entity config auditable option instead.
+- `Oro\Bundle\DataAuditBundle\EventListener\AuditGridListener` was removed. Similar functionality can be found in `Oro\Bundle\DataAuditBundle\Datagrid\EntityTypeProvider`.

@@ -29,7 +29,7 @@ services:
             - '@oro_message_queue.message_producer'
             - '@security.token_storage'
             - '@oro_dataaudit.convert_entity_to_array_for_message_queue'
-            - '@oro_dataaudit.get_entity_audit_metadata'
+            - '@oro_dataaudit.audit_config_provider'
         tags:
             - { name: doctrine.event_listener, event: onFlush, priority: -255 }
             - { name: doctrine.event_listener, event: postFlush, priority: -255 }
@@ -38,10 +38,11 @@ services:
     oro_dataaudit.listener.entity_listener:
         alias: oro_dataaudit.listener.send_changed_entities_to_message_queue
 
-    oro_dataaudit.dataaudit_grid_service:
-        class: 'Oro\Bundle\DataAuditBundle\EventListener\AuditGridListener'
+    oro_dataaudit.datagrid.entity_type_provider:
+        class: 'Oro\Bundle\DataAuditBundle\Datagrid\EntityTypeProvider'
         arguments:
-            - '@doctrine.orm.entity_manager'
+            - '@oro_entity.entity_class_name_provider'
+            - '@oro_dataaudit.audit_config_provider'
 
     oro_dataaudit.event_listener.dataaudit_history_grid_listener:
         class: 'Oro\Bundle\DataAuditBundle\EventListener\AuditHistoryGridListener'
@@ -98,13 +99,15 @@ services:
             - '@doctrine.orm.entity_manager'
             - '@oro_dataaudit.loggable.audit_entity_mapper'
 
-    oro_dataaudit.get_entity_audit_metadata:
-        class: 'Oro\Bundle\DataAuditBundle\Service\GetEntityAuditMetadataService'
+    oro_dataaudit.audit_config_provider:
+        class: 'Oro\Bundle\DataAuditBundle\Provider\AuditConfigProvider'
+        public: false
         arguments:
             - '@oro_entity_config.provider.dataaudit'
 
-    oro_dataaudit.get_human_readable_entity_name:
-        class: 'Oro\Bundle\DataAuditBundle\Service\GetHumanReadableEntityNameService'
+    oro_dataaudit.entity_name_provider:
+        class: 'Oro\Bundle\DataAuditBundle\Provider\EntityNameProvider'
+        public: false
         arguments:
             - '@doctrine'
             - '@oro_entity.entity_name_resolver'
@@ -113,7 +116,8 @@ services:
         class: 'Oro\Bundle\DataAuditBundle\Service\ConvertChangeSetToAuditFieldsService'
         public: false
         arguments:
-            - '@oro_dataaudit.get_human_readable_entity_name'
+            - '@oro_dataaudit.audit_config_provider'
+            - '@oro_dataaudit.entity_name_provider'
 
     oro_dataaudit.convert_entity_changes_to_audit:
         class: 'Oro\Bundle\DataAuditBundle\Service\ConvertEntityChangesToAuditService'
@@ -122,8 +126,8 @@ services:
             - '@doctrine'
             - '@oro_dataaudit.set_new_audit_version'
             - '@oro_dataaudit.find_or_create_audit'
-            - '@oro_dataaudit.get_entity_audit_metadata'
-            - '@oro_dataaudit.get_human_readable_entity_name'
+            - '@oro_dataaudit.audit_config_provider'
+            - '@oro_dataaudit.entity_name_provider'
             - '@oro_dataaudit.convert_change_set_to_audit_fields'
 
     oro_dataaudit.async.audit_changed_entities:

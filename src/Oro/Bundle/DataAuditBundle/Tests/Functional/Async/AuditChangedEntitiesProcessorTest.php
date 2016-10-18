@@ -190,6 +190,50 @@ class AuditChangedEntitiesProcessorTest extends WebTestCase
         $this->assertStoredAuditCount(1);
     }
 
+    public function testShouldTryGetEntityNameFromPreviousAuditEntryForDeletedEntity()
+    {
+        $audit = new Audit();
+        $audit->setObjectName('theExpectedEntityName');
+        $audit->setObjectClass(TestAuditDataOwner::class);
+        $audit->setObjectId(123);
+        $audit->setTransactionId('previousTransactionId');
+        $audit->setVersion(1);
+        $this->getEntityManager()->persist($audit);
+        $this->getEntityManager()->flush();
+
+        $expectedLoggedAt = new \DateTime('2012-02-01 03:02:01+0000');
+
+        $message = $this->createMessage([
+            'timestamp' => $expectedLoggedAt->getTimestamp(),
+            'transaction_id' => 'aTransactionId',
+            'entities_inserted' => [],
+            'entities_updated' => [],
+            'entities_deleted' => [
+                [
+                    'entity_class' => TestAuditDataOwner::class,
+                    'entity_id' => 123,
+                    'change_set' => [],
+                ]
+            ],
+            'collections_updated' => [],
+        ]);
+
+        /** @var AuditChangedEntitiesProcessor $processor */
+        $processor = $this->getContainer()->get('oro_dataaudit.async.audit_changed_entities');
+
+        $processor->process($message, new NullSession());
+
+        //guard
+        $this->assertStoredAuditCount(2);
+
+        $audit = $this->findLastStoredAudit();
+
+        //guard
+        $this->assertEquals(2, $audit->getVersion());
+
+        $this->assertEquals('theExpectedEntityName', $audit->getObjectName());
+    }
+
     public function testShouldProcessAllChangedEntities()
     {
         $message = $this->createMessage([

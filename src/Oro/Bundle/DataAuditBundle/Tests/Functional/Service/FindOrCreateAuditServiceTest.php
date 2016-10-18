@@ -45,7 +45,7 @@ class FindOrCreateAuditServiceTest extends WebTestCase
         $objectClass = 'aClass';
         $transactionId = 'aTransaction';
 
-        $audit = $service->findOrCreate($user, $objectId, $objectClass, $transactionId);
+        $audit = $service->findOrCreate($user, $objectClass, $objectId, $transactionId);
 
         $this->assertInstanceOf(AbstractAudit::class, $audit);
         $this->assertGreaterThan(0, $audit->getId());
@@ -75,7 +75,7 @@ class FindOrCreateAuditServiceTest extends WebTestCase
         $this->getEntityManager()->persist($audit);
         $this->getEntityManager()->flush();
 
-        $foundAudit = $service->findOrCreate($user, $objectId, $objectClass, $transactionId);
+        $foundAudit = $service->findOrCreate($user, $objectClass, $objectId, $transactionId);
 
         $this->assertSame($audit, $foundAudit);
     }
@@ -89,7 +89,7 @@ class FindOrCreateAuditServiceTest extends WebTestCase
         $objectClass = 'aClass';
         $transactionId = 'aTransaction';
 
-        $foundAudit = $service->findOrCreate(null, $objectId, $objectClass, $transactionId);
+        $foundAudit = $service->findOrCreate(null, $objectClass, $objectId, $transactionId);
 
         $this->assertInstanceOf(Audit::class, $foundAudit);
         $this->assertNull($foundAudit->getUser());

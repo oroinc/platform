@@ -30,21 +30,20 @@ class FindOrCreateAuditService
 
     /**
      * @param AbstractUser|null $user
-     * @param string $objectId
      * @param string $objectClass
+     * @param string $objectId
      * @param string $transactionId
      *
      * @return AbstractAudit
      */
-    public function findOrCreate($user, $objectId, $objectClass, $transactionId)
+    public function findOrCreate($user, $objectClass, $objectId, $transactionId)
     {
         $auditClass = $this->auditEntityMapper->getAuditEntryClass($user);
-        $auditMeta = $this->entityManager->getClassMetadata($auditClass);
 
-        $qb = $this->entityManager->createQueryBuilder();
-        $query = $qb
+        $query = $this->entityManager
+            ->createQueryBuilder()
             ->select('log')
-            ->from($auditMeta->name, 'log')
+            ->from($auditClass, 'log')
             ->andWhere('log.objectId = :objectId')
             ->andWhere('log.objectClass = :objectClass')
             ->andWhere('log.transactionId = :transactionId')
