@@ -1,5 +1,5 @@
 {% import 'OroEmailBundle::macros.html.twig' as EA %}
-{% set emailBody = {bodyContent: record.getValue('body_content')} %}
+{% set emailBody = {textBody: record.getValue('body_content')} %}
 {% set isNew = record.getValue('is_new') %}
 {% set valueToShow = value ? value : 'oro.email.subject.no_subject.label'|trans %}
 
@@ -10,7 +10,7 @@
         {% else %}
             <span class="email-subject">{{ valueToShow }}</span>
         {% endif %}
-        {% if emailBody.bodyContent is defined %}
+        {% if emailBody.textBody is defined %}
             <div class="email-body">{{ EA.email_short_body(emailBody) }}</div>
         {% endif %}
     </div>

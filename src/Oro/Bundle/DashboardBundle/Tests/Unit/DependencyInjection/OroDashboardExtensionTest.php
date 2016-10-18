@@ -77,15 +77,15 @@ class OroDashboardExtensionTest extends \PHPUnit_Framework_TestCase
                                 ],
                                 'index'  => [
                                     'label'            => 'List',
-                                    'route'            => 'orocrm_sales_opportunity_index',
-                                    'acl'              => 'orocrm_sales_opportunity_view',
+                                    'route'            => 'oro_sales_opportunity_index',
+                                    'acl'              => 'oro_sales_opportunity_view',
                                     'route_parameters' => [],
                                     'enabled'          => true
                                 ],
                                 'create' => [
                                     'label'            => 'Create opportunity',
-                                    'route'            => 'orocrm_sales_opportunity_create',
-                                    'acl'              => 'orocrm_sales_opportunity_create',
+                                    'route'            => 'oro_sales_opportunity_create',
+                                    'acl'              => 'oro_sales_opportunity_create',
                                     'route_parameters' => [],
                                     'enabled'          => true
                                 ],
