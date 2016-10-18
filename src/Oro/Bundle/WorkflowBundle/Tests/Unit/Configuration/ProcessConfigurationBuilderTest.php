@@ -2,9 +2,8 @@
 
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Configuration;
 
-use JMS\JobQueueBundle\Entity\Job;
-
 use Oro\Bundle\WorkflowBundle\Configuration\ProcessConfigurationBuilder;
+use Oro\Bundle\WorkflowBundle\Configuration\ProcessPriority;
 use Oro\Bundle\WorkflowBundle\Entity\ProcessDefinition;
 use Oro\Bundle\WorkflowBundle\Entity\ProcessTrigger;
 
@@ -83,42 +82,42 @@ class ProcessConfigurationBuilderTest extends \PHPUnit_Framework_TestCase
      */
     public function buildProcessDefinitionDataProvider()
     {
-        return array(
-            'minimum data' => array(
+        return [
+            'minimum data' => [
                 'name' => 'minimum_name',
-                'configuration' => array(
+                'configuration' => [
                     'label' => 'My Label',
                     'entity' => 'My\Entity',
-                ),
-                'expected' => array(
+                ],
+                'expected' => [
                     'label' => 'My Label',
                     'entity' => 'My\Entity',
                     'enabled' => true,
                     'order' => 0,
-                    'exclude_definitions' => array(),
-                    'actions_configuration' => array(),
-                ),
-            ),
-            'maximum data' => array(
+                    'exclude_definitions' => [],
+                    'actions_configuration' => [],
+                ],
+            ],
+            'maximum data' => [
                 'name' => 'maximum_name',
-                'configuration' => array(
+                'configuration' => [
                     'label' => 'My Label',
                     'enabled' => false,
                     'entity' => 'My\Entity',
                     'order' => 10,
-                    'exclude_definitions' => array('test_definition'),
-                    'actions_configuration' => array('key' => 'value'),
-                ),
-                'expected' => array(
+                    'exclude_definitions' => ['test_definition'],
+                    'actions_configuration' => ['key' => 'value'],
+                ],
+                'expected' => [
                     'label' => 'My Label',
                     'enabled' => false,
                     'entity' => 'My\Entity',
                     'order' => 10,
-                    'exclude_definitions' => array('test_definition'),
-                    'actions_configuration' => array('key' => 'value'),
-                ),
-            ),
-        );
+                    'exclude_definitions' => ['test_definition'],
+                    'actions_configuration' => ['key' => 'value'],
+                ],
+            ],
+        ];
     }
 
     /**
@@ -145,20 +144,20 @@ class ProcessConfigurationBuilderTest extends \PHPUnit_Framework_TestCase
     {
         $basicDataProvider = $this->buildProcessDefinitionDataProvider();
 
-        $configuration = array();
-        $expected = array();
+        $configuration = [];
+        $expected = [];
         foreach ($basicDataProvider as $dataSet) {
             $definitionName = $dataSet['name'];
             $configuration[$definitionName] = $dataSet['configuration'];
             $expected[$definitionName] = $dataSet['expected'];
         }
 
-        return array(
-            array(
+        return [
+            [
                 'configuration' => $configuration,
                 'expected' => $expected,
-            )
-        );
+            ]
+        ];
     }
 
     /**
@@ -179,53 +178,53 @@ class ProcessConfigurationBuilderTest extends \PHPUnit_Framework_TestCase
      */
     public function buildProcessTriggerDataProvider()
     {
-        return array(
-            'minimum data' => array(
-                'configuration' => array(
+        return [
+            'minimum data' => [
+                'configuration' => [
                     'event' => ProcessTrigger::EVENT_CREATE,
-                ),
-                'expected' => array(
+                ],
+                'expected' => [
                     'event'      => ProcessTrigger::EVENT_CREATE,
                     'field'      => null,
-                    'priority'   => Job::PRIORITY_DEFAULT,
+                    'priority'   => ProcessPriority::PRIORITY_DEFAULT,
                     'queued'     => false,
                     'time_shift' => null,
                     'cron' => null
-                ),
-            ),
-            'integer time shift' => array(
-                'configuration' => array(
+                ],
+            ],
+            'integer time shift' => [
+                'configuration' => [
                     'event'      => ProcessTrigger::EVENT_UPDATE,
                     'field'      => 'status',
-                    'priority'   => Job::PRIORITY_HIGH,
+                    'priority'   => ProcessPriority::PRIORITY_HIGH,
                     'queued'     => true,
                     'time_shift' => 12345,
                     'cron' => null
-                ),
-                'expected' => array(
+                ],
+                'expected' => [
                     'event'      => ProcessTrigger::EVENT_UPDATE,
                     'field'      => 'status',
-                    'priority'   => Job::PRIORITY_HIGH,
+                    'priority'   => ProcessPriority::PRIORITY_HIGH,
                     'queued'     => true,
                     'time_shift' => 12345,
                     'cron' => null
-                ),
-            ),
-            'date interval time shift' => array(
-                'configuration' => array(
+                ],
+            ],
+            'date interval time shift' => [
+                'configuration' => [
                     'event'      => ProcessTrigger::EVENT_DELETE,
                     'queued'     => true,
                     'time_shift' => new \DateInterval('P1D'),
-                ),
-                'expected' => array(
+                ],
+                'expected' => [
                     'event'      => ProcessTrigger::EVENT_DELETE,
                     'field'      => null,
-                    'priority'   => Job::PRIORITY_DEFAULT,
+                    'priority'   => ProcessPriority::PRIORITY_DEFAULT,
                     'queued'     => true,
                     'time_shift' => 24 * 3600,
                     'cron' => null
-                ),
-            ),
+                ],
+            ],
             'cron expression' => [
                 'configuration' => [
                     'cron' => '* * * * *'
@@ -233,13 +232,13 @@ class ProcessConfigurationBuilderTest extends \PHPUnit_Framework_TestCase
                 'expected' => [
                     'event' => null,
                     'field' => null,
-                    'priority' => Job::PRIORITY_DEFAULT,
+                    'priority' => ProcessPriority::PRIORITY_DEFAULT,
                     'queued' => false,
                     'time_shift' => null,
                     'cron' => '* * * * *'
                 ]
             ]
-        );
+        ];
     }
 
     /**
@@ -259,30 +258,30 @@ class ProcessConfigurationBuilderTest extends \PHPUnit_Framework_TestCase
      */
     public function buildProcessTriggerExceptionDataProvider()
     {
-        return array(
-            'not allowed event' => array(
-                'configuration' => array(
+        return [
+            'not allowed event' => [
+                'configuration' => [
                     'event' => 'my_custom_event',
-                ),
+                ],
                 'exception' => 'Oro\Component\Action\Exception\InvalidParameterException',
                 'message'   => 'Event "my_custom_event" is not allowed'
-            ),
-            'incorrect time shift' => array(
-                'configuration' => array(
+            ],
+            'incorrect time shift' => [
+                'configuration' => [
                     'event' => ProcessTrigger::EVENT_CREATE,
                     'time_shift' => 'invalid_value',
-                ),
+                ],
                 'exception' => 'Oro\Component\Action\Exception\InvalidParameterException',
                 'message'   => 'Time shift parameter must be either integer or DateInterval'
-            ),
-            'field is not allowed' => array(
-                'configuration' => array(
+            ],
+            'field is not allowed' => [
+                'configuration' => [
                     'event' => ProcessTrigger::EVENT_CREATE,
                     'field' => 'someField',
-                ),
+                ],
                 'exception' => 'Oro\Component\Action\Exception\InvalidParameterException',
                 'message'   => 'Field is only allowed for update event'
-            ),
+            ],
             'invalid cron expression' => [
                 'configuration' => [
                     'cron' => 'invalid string'
@@ -298,7 +297,7 @@ class ProcessConfigurationBuilderTest extends \PHPUnit_Framework_TestCase
                 'exception' => 'Oro\Component\Action\Exception\InvalidParameterException',
                 'message'   => 'Only one parameter "event" or "cron" must be configured.'
             ]
-        );
+        ];
     }
 
     /**
@@ -310,11 +309,11 @@ class ProcessConfigurationBuilderTest extends \PHPUnit_Framework_TestCase
     {
         $testDefinition = new ProcessDefinition();
         $testDefinition->setName(self::TEST_DEFINITION_NAME);
-        $definitionsByName = array(self::TEST_DEFINITION_NAME => $testDefinition);
+        $definitionsByName = [self::TEST_DEFINITION_NAME => $testDefinition];
 
         $triggers = $this->builder->buildProcessTriggers($configuration, $definitionsByName);
 
-        $expectedTriggers = array();
+        $expectedTriggers = [];
 
         $this->assertSameSize($expected, $configuration);
         foreach ($configuration as $definitionName => $configurationData) {
@@ -348,19 +347,19 @@ class ProcessConfigurationBuilderTest extends \PHPUnit_Framework_TestCase
         $definitionName = self::TEST_DEFINITION_NAME;
         $basicDataProvider = $this->buildProcessTriggerDataProvider();
 
-        $configuration = array();
-        $expected = array();
+        $configuration = [];
+        $expected = [];
         foreach ($basicDataProvider as $dataSet) {
             $configuration[$definitionName][] = $dataSet['configuration'];
             $expected[$definitionName][] = $dataSet['expected'];
         }
 
-        return array(
-            array(
+        return [
+            [
                 'configuration' => $configuration,
                 'expected' => $expected,
-            )
-        );
+            ]
+        ];
     }
 
     /**
@@ -370,8 +369,8 @@ class ProcessConfigurationBuilderTest extends \PHPUnit_Framework_TestCase
     public function testBuildProcessTriggersException()
     {
         $this->builder->buildProcessTriggers(
-            array('not_existing_definition' => array('triggers', 'configuration')),
-            array('existing_definition' => new ProcessDefinition())
+            ['not_existing_definition' => ['triggers', 'configuration']],
+            ['existing_definition' => new ProcessDefinition()]
         );
     }
 }
