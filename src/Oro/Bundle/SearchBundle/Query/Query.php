@@ -195,6 +195,8 @@ class Query
 
             $this->addToSelect($fieldName, $enforcedFieldType);
         }
+
+        return $this;
     }
 
     /**
