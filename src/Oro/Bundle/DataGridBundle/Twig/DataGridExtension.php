@@ -2,12 +2,12 @@
 
 namespace Oro\Bundle\DataGridBundle\Twig;
 
-use Oro\Bundle\DataGridBundle\Tools\DatagridRouteHelper;
 use Symfony\Component\Routing\RouterInterface;
 
 use Oro\Bundle\DataGridBundle\Datagrid\DatagridInterface;
 use Oro\Bundle\DataGridBundle\Datagrid\ManagerInterface;
 use Oro\Bundle\DataGridBundle\Datagrid\NameStrategyInterface;
+use Oro\Bundle\DataGridBundle\Tools\DatagridRouteHelper;
 
 use Oro\Bundle\SecurityBundle\SecurityFacade;
 

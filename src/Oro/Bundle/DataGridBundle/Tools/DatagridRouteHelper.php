@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\DataGridBundle\Tools;
 
-use Symfony\Bundle\FrameworkBundle\Routing\Router;
+use Symfony\Component\Routing\RouterInterface;
 
 use Symfony\Component\Routing\Exception\InvalidParameterException;
 use Symfony\Component\Routing\Exception\MissingMandatoryParametersException;
@@ -10,15 +10,13 @@ use Symfony\Component\Routing\Exception\RouteNotFoundException;
 
 class DatagridRouteHelper
 {
-    /** @var Router */
+    /** @var RouterInterface */
     protected $router;
 
     /**
-     * DatagridRouteHelper constructor.
-     *
-     * @param Router $router
+     * @param RouterInterface $router
      */
-    public function __construct(Router $router)
+    public function __construct(RouterInterface $router)
     {
         $this->router = $router;
     }
@@ -34,9 +32,8 @@ class DatagridRouteHelper
      * @throws RouteNotFoundException              If the named route doesn't exist
      * @throws MissingMandatoryParametersException When some parameters are missing that are mandatory for the route
      * @throws InvalidParameterException           When a parameter value for a placeholder is not correct because
-     *                                             it does not match the requirement
      */
-    public function generate($name, $gridName, $params = [], $referenceType = Router::ABSOLUTE_PATH)
+    public function generate($name, $gridName, $params = [], $referenceType = RouterInterface::ABSOLUTE_PATH)
     {
         return $this->router->generate(
             $name,

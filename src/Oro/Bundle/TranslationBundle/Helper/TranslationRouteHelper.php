@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\TranslationBundle\Helper;
 
-use Symfony\Bundle\FrameworkBundle\Routing\Router;
+use Symfony\Component\Routing\RouterInterface;
 
 use Oro\Bundle\DataGridBundle\Tools\DatagridRouteHelper;
 
@@ -32,7 +32,7 @@ class TranslationRouteHelper
      *
      * @return string
      */
-    public function generate(array $filters, $referenceType = Router::ABSOLUTE_PATH)
+    public function generate(array $filters, $referenceType = RouterInterface::ABSOLUTE_PATH)
     {
         $params = ['f' => []];
 
