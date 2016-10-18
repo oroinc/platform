@@ -87,6 +87,8 @@ class Parser
                 Query::OPERATOR_NOT_CONTAINS,
                 Query::OPERATOR_EQUALS,
                 Query::OPERATOR_NOT_EQUALS,
+                Query::OPERATOR_EXISTS,
+                Query::OPERATOR_NOT_EXISTS,
             ],
             QUERY::TYPE_INTEGER  => [
                 Query::OPERATOR_GREATER_THAN,

@@ -56,6 +56,10 @@ class OrmExpressionVisitor extends ExpressionVisitor
             'fieldType'  => $type
         ];
 
+        if (in_array($comparison->getOperator(), SearchComparison::$filteringOperators)) {
+            return $this->driver->addFilteringField($this->qb, $index, $searchCondition);
+        }
+
         if ($type === Query::TYPE_TEXT) {
             if ($searchCondition['fieldValue'] === '') {
                 $this->qb->setParameter('field' . $index, $searchCondition['fieldName']);
@@ -64,10 +68,6 @@ class OrmExpressionVisitor extends ExpressionVisitor
             } else {
                 return $this->driver->addTextField($this->qb, $index, $searchCondition, $this->setOrderBy);
             }
-        }
-
-        if (in_array($comparison->getOperator(), SearchComparison::$filteringOperators)) {
-            return $this->driver->addFilteringField($this->qb, $index, $searchCondition);
         }
 
         return $this->driver->addNonTextField($this->qb, $index, $searchCondition);
