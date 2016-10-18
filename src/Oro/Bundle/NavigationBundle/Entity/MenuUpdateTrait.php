@@ -98,15 +98,17 @@ trait MenuUpdateTrait
 
     /**
      * @var boolean
-     */
-    protected $existsInNavigationYml = false;
-
-    /**
-     * @var boolean
      *
      * @ORM\Column(name="is_divider", type="boolean")
      */
     protected $divider = false;
+
+    /**
+     * @var boolean
+     *
+     * @ORM\Column(name="is_custom", type="boolean")
+     */
+    protected $custom = false;
 
     /**
      * @return int
@@ -351,26 +353,6 @@ trait MenuUpdateTrait
     /**
      * @return boolean
      */
-    public function isExistsInNavigationYml()
-    {
-        return $this->existsInNavigationYml;
-    }
-
-    /**
-     * @param boolean $existsInNavigationYml
-     *
-     * @return MenuUpdateInterface
-     */
-    public function setExistsInNavigationYml($existsInNavigationYml)
-    {
-        $this->existsInNavigationYml = $existsInNavigationYml;
-
-        return $this;
-    }
-
-    /**
-     * @return boolean
-     */
     public function isDivider()
     {
         return $this->divider;
@@ -384,6 +366,44 @@ trait MenuUpdateTrait
     public function setDivider($divider)
     {
         $this->divider = $divider;
+
+        return $this;
+    }
+
+    /**
+     * @ORM\PrePersist
+     */
+    public function prePersist()
+    {
+        if ($this->key === null) {
+            $this->key = $this->generateKey();
+        }
+    }
+
+    /**
+     * @return string
+     */
+    private function generateKey()
+    {
+        return uniqid('menu_item_');
+    }
+
+    /**
+     * @return boolean
+     */
+    public function isCustom()
+    {
+        return $this->custom;
+    }
+
+    /**
+     * @param boolean $custom
+     *
+     * @return MenuUpdateInterface
+     */
+    public function setCustom($custom)
+    {
+        $this->custom = $custom;
 
         return $this;
     }

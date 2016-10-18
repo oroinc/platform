@@ -4,7 +4,6 @@ namespace Oro\Bundle\NavigationBundle\JsTree;
 
 use Knp\Menu\ItemInterface;
 
-use Oro\Bundle\NavigationBundle\Entity\MenuUpdateInterface;
 use Symfony\Component\Translation\TranslatorInterface;
 
 use Oro\Component\Tree\Handler\AbstractTreeHandler;
@@ -61,10 +60,8 @@ class MenuUpdateTreeHandler extends AbstractTreeHandler
 
         /** @var ItemInterface $child */
         foreach ($root->getChildren() as $child) {
-            if ($child->isDisplayed()) {
-                $nodes[] = $child;
-                $nodes = array_merge($nodes, $this->getNodes($child, false));
-            }
+            $nodes[] = $child;
+            $nodes = array_merge($nodes, $this->getNodes($child, false));
         }
 
         return $nodes;
@@ -106,8 +103,9 @@ class MenuUpdateTreeHandler extends AbstractTreeHandler
             'text' => $text,
             'state' => [
                 'opened' => $entity->getParent() === null,
-                'disabled' => !$entity->getExtra('editable', false)
-            ]
+                'disabled' => $entity->getExtra('read_only', false)
+            ],
+            'li_attr' => !$entity->isDisplayed() ? ['class' => 'hidden'] : []
         ];
     }
 }

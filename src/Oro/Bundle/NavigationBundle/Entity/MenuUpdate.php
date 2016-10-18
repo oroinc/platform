@@ -55,6 +55,8 @@ use Oro\Bundle\NavigationBundle\Model\ExtendMenuUpdate;
  *          )
  *      )
  * })
+ * @ORM\HasLifecycleCallbacks
+ *
  * @Config(
  *      routeName="oro_navigation_menu_update_index",
  *      defaultValues={
@@ -86,7 +88,6 @@ class MenuUpdate extends ExtendMenuUpdate implements
     public function getExtras()
     {
         $extras = [
-            'existsInNavigationYml' => $this->isExistsInNavigationYml(),
             'divider' => $this->isDivider()
         ];
 

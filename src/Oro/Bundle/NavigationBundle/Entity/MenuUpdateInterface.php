@@ -175,18 +175,6 @@ interface MenuUpdateInterface
     public function setActive($active);
 
     /**
-     * @return boolean
-     */
-    public function isExistsInNavigationYml();
-
-    /**
-     * @param boolean $existsInNavigationYml
-     *
-     * @return MenuUpdateInterface
-     */
-    public function setExistsInNavigationYml($existsInNavigationYml);
-
-    /**
      * @return int
      */
     public function getPriority();
@@ -209,6 +197,20 @@ interface MenuUpdateInterface
      * @return MenuUpdateInterface
      */
     public function setDivider($divider);
+
+    /**
+     * @return boolean
+     */
+    public function isCustom();
+
+    /**
+     * Check is new created item or it's update on existed item
+     *
+     * @param boolean $custom
+     *
+     * @return MenuUpdateInterface
+     */
+    public function setCustom($custom);
 
     /**
      * Get array of extra data that is not declared in MenuUpdateInterface model

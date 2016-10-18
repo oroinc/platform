@@ -13,6 +13,7 @@ use Knp\Menu\ItemInterface;
 
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 
+use Oro\Bundle\NavigationBundle\Entity\MenuUpdateInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -32,7 +33,7 @@ class MenuController extends Controller
      * @Delete("/menu/{ownershipType}/{menuName}/{key}")
      *
      * @ApiDoc(
-     *  description="Delete menu item in specified scope."
+     *  description="Delete or hide menu item."
      * )
      *
      * @param string $ownershipType
@@ -52,7 +53,6 @@ class MenuController extends Controller
             $ownershipType,
             $this->getCurrentOwnerId($ownershipType)
         );
-
         if ($menuUpdate === null) {
             throw $this->createNotFoundException();
         }
@@ -60,7 +60,7 @@ class MenuController extends Controller
         /** @var EntityManager $entityManager */
         $entityManager = $this->getDoctrine()->getManagerForClass(MenuUpdate::class);
 
-        if (!$menuUpdate->isExistsInNavigationYml()) {
+        if ($menuUpdate->isCustom()) {
             $entityManager->remove($menuUpdate);
         } else {
             $menuUpdate->setActive(false);
@@ -70,6 +70,50 @@ class MenuController extends Controller
         $entityManager->flush($menuUpdate);
 
         return new JsonResponse(null, Response::HTTP_NO_CONTENT);
+    }
+
+    /**
+     * @Put("/menu/show/{ownershipType}/{menuName}/{key}")
+     *
+     * @ApiDoc(
+     *  description="Make menu item visible."
+     * )
+     *
+     * @param string $ownershipType
+     * @param string $menuName
+     * @param string $key
+     *
+     * @return Response
+     */
+    public function showAction($ownershipType, $menuName, $key)
+    {
+        /** @var MenuUpdateManager $manager */
+        $manager = $this->get('oro_navigation.manager.menu_update_default');
+        $manager->showMenuItem($menuName, $key, $ownershipType, $this->getCurrentOwnerId($ownershipType));
+
+        return new JsonResponse(null, Response::HTTP_OK);
+    }
+
+    /**
+     * @Put("/menu/hide/{ownershipType}/{menuName}/{key}")
+     *
+     * @ApiDoc(
+     *  description="Make menu item hidden."
+     * )
+     *
+     * @param string $ownershipType
+     * @param string $menuName
+     * @param string $key
+     *
+     * @return Response
+     */
+    public function hideAction($ownershipType, $menuName, $key)
+    {
+        /** @var MenuUpdateManager $manager */
+        $manager = $this->get('oro_navigation.manager.menu_update_default');
+        $manager->hideMenuItem($menuName, $key, $ownershipType, $this->getCurrentOwnerId($ownershipType));
+
+        return new JsonResponse(null, Response::HTTP_OK);
     }
 
     /**
@@ -93,14 +137,14 @@ class MenuController extends Controller
             $this->getCurrentOwnerId($ownershipType)
         );
 
-        /** @var EntityManager $entityManager */
-        $entityManager = $this->getDoctrine()->getManagerForClass(MenuUpdate::class);
+        /** @var EntityManager $em */
+        $em = $this->getDoctrine()->getManagerForClass(MenuUpdate::class);
 
         foreach ($updates as $update) {
-            $entityManager->remove($update);
+            $em->remove($update);
         }
 
-        $entityManager->flush($updates);
+        $em->flush($updates);
 
         return new JsonResponse(null, Response::HTTP_NO_CONTENT);
     }
@@ -146,8 +190,8 @@ class MenuController extends Controller
             }
         }
 
-        /** @var EntityManager $entityManager */
-        $entityManager = $this->getDoctrine()->getManagerForClass(MenuUpdate::class);
+        /** @var EntityManager $em */
+        $em = $this->getDoctrine()->getManagerForClass(MenuUpdate::class);
 
         $updates = array_merge(
             [$currentUpdate],
@@ -156,16 +200,16 @@ class MenuController extends Controller
 
         $errors = [];
         foreach ($updates as $update) {
-            $errors = $this->get('validator')->validate($currentUpdate);
+            $errors = $this->get('validator')->validate($currentUpdate, 'move');
             if (count($errors)) {
                 break;
             }
 
-            $entityManager->persist($update);
+            $em->persist($update);
         }
 
         if (!count($errors)) {
-            $entityManager->flush($updates);
+            $em->flush($updates);
             return new JsonResponse(['status' => true], Response::HTTP_OK);
         }
 

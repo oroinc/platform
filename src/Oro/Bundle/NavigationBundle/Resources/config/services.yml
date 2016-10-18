@@ -86,7 +86,6 @@ services:
         class: %oro_menu.builder_chain.class%
         arguments:
             - '@oro_menu.factory'
-            - '@event_dispatcher'
         tags:
             - { name: knp_menu.provider }
 
@@ -99,6 +98,8 @@ services:
         class: %oro_menu.configuration_builder.class%
         arguments:
             - '@oro_menu.configuration_resolver'
+            - '@oro_menu.factory'
+            - '@event_dispatcher'
         tags:
             - { name: oro_menu.builder }
 
@@ -421,10 +422,9 @@ services:
         arguments:
             - '@oro_locale.helper.localization'
         tags:
-            - { name: oro_menu.builder }
+            - { name: oro_menu.builder, priority: 100 }
 
     oro_navigation.repository.menu_update:
-        class: 'Doctrine\ORM\EntityRepository'
         parent: oro_entity.abstract_repository
         arguments:
             - '%oro_navigation.entity.menu_update.class%'

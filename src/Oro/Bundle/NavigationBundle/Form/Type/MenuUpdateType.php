@@ -2,8 +2,12 @@
 
 namespace Oro\Bundle\NavigationBundle\Form\Type;
 
+use Knp\Menu\ItemInterface;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\Form\FormEvent;
+use Symfony\Component\Form\FormEvents;
+use Symfony\Component\Form\FormInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
@@ -19,43 +23,60 @@ class MenuUpdateType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $builder
-            ->add(
-                'titles',
-                TranslatedLocalizedFallbackValueCollectionType::class,
-                [
-                    'required' => true,
-                    'label' => 'oro.navigation.menuupdate.title.label',
-                    'options' => ['constraints' => [new NotBlank()]]
-                ]
-            )
-            ->add(
-                'descriptions',
-                TranslatedLocalizedFallbackValueCollectionType::class,
-                [
-                    'required' => true,
-                    'label' => 'oro.navigation.menuupdate.description.label',
-                    'type' => 'textarea',
-                    'field' => 'text',
-                    'options' => ['constraints' => [new NotBlank()]]
-                ]
-            )
-            ->add(
-                'uri',
-                'text',
-                [
-                    'required' => true,
-                    'label' => 'oro.navigation.menuupdate.uri.label',
-                ]
-            )
-            ->add(
-                'active',
-                'checkbox',
-                [
-                    'label' => 'oro.navigation.menuupdate.active.label',
-                ]
-            )
-        ;
+        $builder->add(
+            'titles',
+            TranslatedLocalizedFallbackValueCollectionType::class,
+            [
+                'required' => true,
+                'label' => 'oro.navigation.menuupdate.title.label',
+                'options' => ['constraints' => [new NotBlank()]]
+            ]
+        );
+
+        $builder->addEventListener(
+            FormEvents::PRE_SET_DATA,
+            function (FormEvent $event) use ($options) {
+                $form = $event->getForm();
+                /** @var ItemInterface $menuItem */
+                $menuItem = $options['menu_item'];
+                /** @var MenuUpdate $menuUpdate */
+                $menuUpdate = $event->getData();
+                $form->add(
+                    'uri',
+                    'text',
+                    [
+                        'disabled' => false === $menuUpdate->isCustom(),
+                        'required' => true,
+                        'label' => 'oro.navigation.menuupdate.uri.label',
+                    ]
+                );
+                if (null !== $options['menu_item'] && !empty($menuItem->getExtra('aclResourceId'))) {
+                    $form->add(
+                        'aclResourceId',
+                        'text',
+                        [
+                            'label' => 'oro.navigation.menuupdate.acl_resource_id.label',
+                            'mapped' => false,
+                            'disabled' => true,
+                            'data' => $menuItem->getExtra('aclResourceId'),
+                        ]
+                    );
+                }
+            }
+        );
+
+        $builder->add(
+            'descriptions',
+            TranslatedLocalizedFallbackValueCollectionType::class,
+            [
+                'required' => true,
+                'label' => 'oro.navigation.menuupdate.description.label',
+                'type' => 'textarea',
+                'field' => 'text',
+                'options' => ['constraints' => [new NotBlank()]]
+            ]
+        );
+
     }
 
     /**
@@ -63,9 +84,22 @@ class MenuUpdateType extends AbstractType
      */
     public function configureOptions(OptionsResolver $resolver)
     {
-        $resolver->setDefaults([
-            'data_class' => MenuUpdate::class,
-        ]);
+        $resolver->setDefaults(
+            [
+                'data_class' => MenuUpdate::class,
+                'menu_item' => null,
+                'validation_groups' => function (FormInterface $form) {
+                    $groups = ['Default'];
+                    /** @var MenuUpdate $menuUpdate */
+                    $menuUpdate = $form->getData();
+                    if (null === $menuUpdate || true === $menuUpdate->isCustom()) {
+                        $groups[] = 'UserDefined';
+                    }
+
+                    return $groups;
+                }
+            ]
+        );
     }
 
     /**

@@ -34,7 +34,8 @@ class OroNavigationBundle implements Migration
     {
         $table = $schema->getTable('oro_navigation_menu_upd');
         $table->changeColumn('ownership_type', ['type' => StringType::getType('string')]);
-        $table->addColumn('is_active', 'boolean', []);
+        $table->addColumn('is_divider', 'boolean', []);
+        $table->addColumn('is_custom', 'boolean', []);
     }
 
     /**

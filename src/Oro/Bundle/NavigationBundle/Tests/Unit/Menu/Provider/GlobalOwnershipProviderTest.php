@@ -36,6 +36,5 @@ class GlobalOwnershipProviderTest extends \PHPUnit_Framework_TestCase
     public function testGetType()
     {
         $this->assertEquals('global', $this->provider->getType());
-
     }
 }

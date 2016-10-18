@@ -7,6 +7,8 @@ config:
                 - 'jquery'
         'url':
             exports: 'Url'
+    map:
+        'oronavigation/js/init-layout': 'bundles/oronavigation/js/init-layout.js'
     paths:
         'routing': 'bundles/fosjsrouting/js/router.js'
         'jquery.form': 'bundles/oronavigation/lib/jquery.form.js'
