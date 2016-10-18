@@ -116,7 +116,7 @@ class FormIntegrationTestCase extends BaseTestCase
     {
         $formName = $form->getName();
         $this->assertTrue(
-            $form->offsetExists('aclResourceId'),
+            $form->offsetExists($expectedFieldName),
             "Failed asserting that {$expectedFieldName} field exists at {$formName} form."
         );
     }
@@ -129,7 +129,7 @@ class FormIntegrationTestCase extends BaseTestCase
     {
         $formName = $form->getName();
         $this->assertFalse(
-            $form->offsetExists('aclResourceId'),
+            $form->offsetExists($expectedFieldName),
             "Failed asserting that {$expectedFieldName} field not exists at {$formName} form."
         );
     }
