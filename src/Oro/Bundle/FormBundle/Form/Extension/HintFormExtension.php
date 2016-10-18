@@ -27,7 +27,7 @@ class HintFormExtension extends AbstractTypeExtension
         $resolver->setDefined(['hint']);
         $resolver->setDefault('hint_position', 'after_input');
         $resolver->setAllowedValues('hint_position', ['above', 'below', 'after_input']);
-        $resolver->setDefaults(['hint_attr' => ['class' => 'oro-hint oro-hint-info']]);
+        $resolver->setDefaults(['hint_attr' => ['class' => 'oro-hint']]);
     }
 
     /**

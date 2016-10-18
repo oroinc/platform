@@ -119,7 +119,8 @@ class UserType extends AbstractType
                     'first_options' => [
                         'label' => 'oro.user.password.label',
                         'hint' => $this->optionsProvider->getHintOption(),
-                        'hint_position' => 'after_input',
+                        'hint_position' => 'above',
+                        'hint_attr' => ['class' => 'oro-hint oro-hint-above'],
                         'attr' => [
                             'data-validation' => $this->optionsProvider->getDataValidationOption()
                         ]
