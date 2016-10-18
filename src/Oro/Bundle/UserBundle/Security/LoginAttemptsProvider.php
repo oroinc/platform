@@ -16,7 +16,6 @@ class LoginAttemptsProvider
     protected $configManager;
 
     /**
-     * @param Registry        $registry
      * @param ConfigManager   $configManager
      */
     public function __construct(ConfigManager $configManager)
@@ -32,10 +31,17 @@ class LoginAttemptsProvider
      */
     public function getRemaining(FailedLoginInfoInterface $user)
     {
-        $remainingCumulative = $this->getRemainingCumulativeLoginAttempts($user);
-        $remainingDaily = $this->getRemainingDailyLoginAttempts($user);
+        $limits = [];
 
-        return max(0, min($remainingCumulative, $remainingDaily));
+        if ($this->hasCumulativeLimit()) {
+            $limits[] = $this->getRemainingCumulativeLoginAttempts($user);
+        }
+
+        if ($this->hasDailyLimit()) {
+            $limits[] = $this->getRemainingDailyLoginAttempts($user);
+        }
+
+        return empty($limits) ? 0 : min($limits);
     }
 
     /**
@@ -44,7 +50,7 @@ class LoginAttemptsProvider
      */
     public function getRemainingCumulativeLoginAttempts(FailedLoginInfoInterface $user)
     {
-        return $this->getMaxCumulativeLoginAttempts() - $user->getFailedLoginCount();
+        return max(0, $this->getMaxCumulativeLoginAttempts() - $user->getFailedLoginCount());
     }
 
     /**
@@ -53,7 +59,7 @@ class LoginAttemptsProvider
      */
     public function getRemainingDailyLoginAttempts(FailedLoginInfoInterface $user)
     {
-        return $this->getMaxDailyLoginAttempts() - $user->getDailyFailedLoginCount();
+        return max(0, $this->getMaxDailyLoginAttempts() - $user->getDailyFailedLoginCount());
     }
 
     /**
@@ -102,7 +108,7 @@ class LoginAttemptsProvider
      */
     public function hasReachedCumulativeLimit(FailedLoginInfoInterface $user)
     {
-        return $this->hasCumulativeLimit() && $user->getFailedLoginCount() >= $this->getMaxCumulativeLoginAttempts();
+        return $this->hasCumulativeLimit() && 0 == $this->getRemainingCumulativeLoginAttempts($user);
     }
 
     /**
@@ -111,6 +117,6 @@ class LoginAttemptsProvider
      */
     public function hasReachedDailyLimit(FailedLoginInfoInterface $user)
     {
-        return $this->hasDailyLimit() && $user->getDailyFailedLoginCount() >= $this->getMaxDailyLoginAttempts();
+        return $this->hasDailyLimit() && 0 == $this->getRemainingDailyLoginAttempts($user);
     }
 }

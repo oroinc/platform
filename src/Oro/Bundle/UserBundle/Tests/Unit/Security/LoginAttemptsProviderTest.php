@@ -37,6 +37,9 @@ class LoginAttemptsProviderTest extends \PHPUnit_Framework_TestCase
             'exceed daily logins' => [3, 5, 3, 99, 0],
             'exceed cumulative logins' => [1, 101, 99, 100, 0],
             'always return 0 on exceed' => [5, 100, 10, 70, 0],
+            'only cumulative limit' => [0, 7, 0, 10, 3],
+            'only daily limit' => [5, 0, 10, 0, 5],
+            'no limits' => [0, 0, 0, 0, 0],
         ];
     }
 
@@ -69,8 +72,10 @@ class LoginAttemptsProviderTest extends \PHPUnit_Framework_TestCase
         $manager->expects($this->any())
             ->method('get')
             ->will($this->returnValueMap([
+                [LoginAttemptsProvider::LIMIT_ENABLED, false, false, null, (0 !== $maxAttempts)],
                 [LoginAttemptsProvider::LIMIT, false, false, null, $maxAttempts],
-                [LoginAttemptsProvider::DAILY_LIMIT, false, false, null, $maxDailyAttempts]
+                [LoginAttemptsProvider::DAILY_LIMIT_ENABLED, false, false, null, (0 !== $maxDailyAttempts)],
+                [LoginAttemptsProvider::DAILY_LIMIT, false, false, null, $maxDailyAttempts],
             ]));
 
         return $manager;
