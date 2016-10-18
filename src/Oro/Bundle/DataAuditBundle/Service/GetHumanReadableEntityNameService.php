@@ -4,7 +4,6 @@ namespace Oro\Bundle\DataAuditBundle\Service;
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Oro\Bundle\DataAuditBundle\Entity\AbstractAudit;
 use Oro\Bundle\DataAuditBundle\Entity\Repository\AuditRepository;
-use Oro\Bundle\EntityBundle\Provider\EntityNameProvider;
 use Oro\Bundle\EntityBundle\Provider\EntityNameResolver;
 
 class GetHumanReadableEntityNameService
@@ -15,7 +14,7 @@ class GetHumanReadableEntityNameService
     private $doctrine;
 
     /**
-     * @var EntityNameProvider
+     * @var EntityNameResolver
      */
     private $entityNameResolver;
 
@@ -39,22 +38,14 @@ class GetHumanReadableEntityNameService
     {
         $entity = $this->doctrine->getManagerForClass($entityClass)->find($entityClass, $entityId);
         if ($entity) {
-            if (method_exists($entity, '__toString')) {
-                return (string) $entity;
-            }
-            
-            if ($entityName = $this->entityNameResolver->getName($entity)) {
-                return $entityName;
-            }
+            return $this->entityNameResolver->getName($entity);
         }
 
-        if (!$entity) {
-            /** @var AuditRepository $auditRepository */
-            $auditRepository = $this->doctrine->getRepository(AbstractAudit::class);
-            $entityAudit = $auditRepository->findLastAuditForEntity($entityClass, $entityId);
-            if ($entityAudit && $entityAudit->getObjectName()) {
-                return $entityAudit->getObjectName();
-            }
+        /** @var AuditRepository $auditRepository */
+        $auditRepository = $this->doctrine->getRepository(AbstractAudit::class);
+        $entityAudit = $auditRepository->findLastAuditForEntity($entityClass, $entityId);
+        if ($entityAudit && $entityAudit->getObjectName()) {
+            return $entityAudit->getObjectName();
         }
 
         return sprintf('%s::%s', (new \ReflectionClass($entityClass))->getShortName(), $entityId);
