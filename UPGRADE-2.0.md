@@ -475,3 +475,6 @@ to the [Fallback documentation](./src/Oro/Bundle/EntityBundle/Resources/doc/enti
 
 ####Component
 - Added trait `Oro\Component\DependencyInjection\Compiler\TaggedServicesCompilerPassTrait`
+
+####UserBundle
+- User password requirements are more restrictive by default and require 5 characters, an upper case letter, and a number
