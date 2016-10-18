@@ -10,6 +10,9 @@ class TranslationExtensionTest extends \PHPUnit_Framework_TestCase
     /** @var TranslationRouteHelper|\PHPUnit_Framework_MockObject_MockObject */
     protected $translationRouteHelper;
 
+    /**
+     * {@inheritdoc}
+     */
     protected function setUp()
     {
         $this->translationRouteHelper = $this->getMockBuilder(TranslationRouteHelper::class)
@@ -17,6 +20,9 @@ class TranslationExtensionTest extends \PHPUnit_Framework_TestCase
             ->getMock();
     }
 
+    /**
+     * {@inheritdoc}
+     */
     protected function tearDown()
     {
         unset($this->translationRouteHelper);

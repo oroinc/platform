@@ -21,7 +21,7 @@ class DatagridRouteHelperTest extends \PHPUnit_Framework_TestCase
     {
         $this->router = $this->getMock(RouterInterface::class);
 
-        $this->routeHelper = new DatagridRouteHelper($this->router);
+        $this->helper = new DatagridRouteHelper($this->router);
     }
 
     /**
@@ -29,7 +29,7 @@ class DatagridRouteHelperTest extends \PHPUnit_Framework_TestCase
      */
     protected function tearDown()
     {
-        unset($this->router);
+        unset($this->router, $this->helper);
     }
 
     public function testGenerate()
@@ -45,7 +45,7 @@ class DatagridRouteHelperTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals(
             'generatedValue',
-            $this->routeHelper->generate('routeName', 'gridName', ['param1' => 'value1'], RouterInterface::ABSOLUTE_URL)
+            $this->helper->generate('routeName', 'gridName', ['param1' => 'value1'], RouterInterface::ABSOLUTE_URL)
         );
     }
 }
