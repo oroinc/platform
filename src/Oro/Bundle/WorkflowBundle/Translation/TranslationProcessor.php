@@ -93,6 +93,7 @@ class TranslationProcessor implements
 
     /**
      * @param WorkflowChangesEvent $changesEvent
+     * @throws \LogicException
      */
     public function clearTranslationKeys(WorkflowChangesEvent $changesEvent)
     {
