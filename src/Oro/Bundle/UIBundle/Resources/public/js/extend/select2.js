@@ -103,7 +103,7 @@ define(function(require) {
         };
 
         parent.attr('id', parent.attr('id') || ('select2container_' + Date.now()));
-        container.on('click.collapse.data-api', '[data-toggle=collapse]', function() {
+        container.on('click.collapse.data-api', '[data-toggle=collapse]', function(e) {
             var $this = $(this);
             var target = $this.attr('data-target');
             var option = $(target).data('collapse') ? 'toggle' : $this.data();
@@ -182,7 +182,6 @@ define(function(require) {
         var close = prototype.close;
         var prepareOpts = prototype.prepareOpts;
         var init = prototype.init;
-        var triggerChange = prototype.triggerChange;
         prototype.prepareOpts = function(options) {
             if (options.collapsibleResults) {
                 options.populateResults = populateCollapsibleResults;
@@ -241,24 +240,21 @@ define(function(require) {
             }
         };
 
-        prototype.triggerChange = function(details) {
+        prototype.triggerChange = _.wrap(prototype.triggerChange, function(original, details) {
             if (details.added.manually) {
                 details.manually = true;
             }
-            triggerChange.apply(this, arguments);
-            delete details.added.manually;
-            delete details.manually;
-        };
+            original.apply(this, _.rest(arguments));
+        });
 
     }(Select2['class'].abstract.prototype));
 
     (function(prototype) {
-        var onSelect = prototype.onSelect;
         var updateResults = prototype.updateResults;
         var clear = prototype.clear;
         var isPlaceholderOptionSelected = prototype.isPlaceholderOptionSelected;
 
-        prototype.onSelect = function(data, options) {
+        prototype.onSelect = _.wrap(prototype.onSelect, function(original, data, options) {
             if (data.id === undefined && data.pagePath) {
                 this.pagePath = data.pagePath;
                 this.search.val('');
@@ -267,14 +263,14 @@ define(function(require) {
             }
 
             data.manually = true;
-            onSelect.apply(this, arguments);
+            original.apply(this, _.rest(arguments));
             delete data.manually;
 
             // @todo BAP-3928, remove this method override after upgrade select2 to v3.4.6, fix code is taken from there
             if ((!options || !options.noFocus) && this.opts.minimumResultsForSearch >= 0) {
                 this.focusser.focus();
             }
-        };
+        });
 
         // Overriding method to avoid bug with placeholder in version 3.4.1
         // see https://github.com/select2/select2/issues/1542
