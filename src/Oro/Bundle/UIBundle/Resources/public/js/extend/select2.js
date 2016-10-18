@@ -103,7 +103,7 @@ define(function(require) {
         };
 
         parent.attr('id', parent.attr('id') || ('select2container_' + Date.now()));
-        container.on('click.collapse.data-api', '[data-toggle=collapse]', function(e) {
+        container.on('click.collapse.data-api', '[data-toggle=collapse]', function() {
             var $this = $(this);
             var target = $this.attr('data-target');
             var option = $(target).data('collapse') ? 'toggle' : $this.data();
@@ -182,6 +182,7 @@ define(function(require) {
         var close = prototype.close;
         var prepareOpts = prototype.prepareOpts;
         var init = prototype.init;
+        var triggerChange = prototype.triggerChange;
         prototype.prepareOpts = function(options) {
             if (options.collapsibleResults) {
                 options.populateResults = populateCollapsibleResults;
@@ -240,6 +241,15 @@ define(function(require) {
             }
         };
 
+        prototype.triggerChange = function(details) {
+            if (details.added.manually) {
+                details.manually = true;
+            }
+            triggerChange.apply(this, arguments);
+            delete details.added.manually;
+            delete details.manually;
+        };
+
     }(Select2['class'].abstract.prototype));
 
     (function(prototype) {
@@ -256,7 +266,9 @@ define(function(require) {
                 return;
             }
 
+            data.manually = true;
             onSelect.apply(this, arguments);
+            delete data.manually;
 
             // @todo BAP-3928, remove this method override after upgrade select2 to v3.4.6, fix code is taken from there
             if ((!options || !options.noFocus) && this.opts.minimumResultsForSearch >= 0) {
