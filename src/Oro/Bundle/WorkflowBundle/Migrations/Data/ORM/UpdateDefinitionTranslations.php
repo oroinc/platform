@@ -30,7 +30,6 @@ class UpdateDefinitionTranslations extends AbstractFixture implements ContainerA
             $configuration = $this->process($processor, $definition);
 
             $definition->setConfiguration($configuration);
-            $definition->setLabel($configuration['label']);
 
             foreach ($definition->getSteps() as $step) {
                 $step->setLabel($configuration['steps'][$step->getName()]['label']);
@@ -47,7 +46,7 @@ class UpdateDefinitionTranslations extends AbstractFixture implements ContainerA
      */
     protected function process(TranslationProcessor $processor, WorkflowDefinition $definition)
     {
-        $configuration = array_merge(
+        $sourceConfiguration = array_merge(
             $definition->getConfiguration(),
             [
                 'name' => $definition->getName(),
@@ -55,6 +54,12 @@ class UpdateDefinitionTranslations extends AbstractFixture implements ContainerA
             ]
         );
 
-        return $processor->prepare($definition->getName(), $processor->handle($configuration));
+        $preparedConfiguration = $processor->prepare($definition->getName(), $processor->handle($sourceConfiguration));
+
+        $definition->setLabel($preparedConfiguration['label']);
+
+        unset($preparedConfiguration['label'], $preparedConfiguration['name']);
+
+        return $preparedConfiguration;
     }
 }
