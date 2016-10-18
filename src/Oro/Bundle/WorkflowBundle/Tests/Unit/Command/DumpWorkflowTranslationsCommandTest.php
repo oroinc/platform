@@ -2,8 +2,6 @@
 
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Command;
 
-use Oro\Bundle\WorkflowBundle\Command\DumpWorkflowTranslationsCommand;
-
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -12,10 +10,10 @@ use Symfony\Component\Yaml\Yaml;
 use Oro\Bundle\TranslationBundle\Entity\Translation;
 use Oro\Bundle\TranslationBundle\Translation\Translator;
 
+use Oro\Bundle\WorkflowBundle\Command\DumpWorkflowTranslationsCommand;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Model\Workflow;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowManager;
-use Oro\Bundle\WorkflowBundle\Tests\Unit\Command\Stub\TestOutput;
 
 class DumpWorkflowTranslationsCommandTest extends \PHPUnit_Framework_TestCase
 {
@@ -93,7 +91,7 @@ class DumpWorkflowTranslationsCommandTest extends \PHPUnit_Framework_TestCase
         $this->assertNotEmpty($this->command->getDescription());
         $this->assertNotEmpty($this->command->getName());
         $this->assertTrue($this->command->getDefinition()->hasArgument('workflow'));
-        $this->assertTrue($this->command->getDefinition()->hasArgument('locale'));
+        $this->assertTrue($this->command->getDefinition()->hasOption('locale'));
     }
 
     public function testExecute()
@@ -125,11 +123,16 @@ class DumpWorkflowTranslationsCommandTest extends \PHPUnit_Framework_TestCase
                 ],
             ]);
 
-        $this->input->expects($this->exactly(2))
+        $this->input->expects($this->exactly(1))
             ->method('getArgument')
             ->will($this->returnValueMap([
-                ['locale', 'locale1'],
                 ['workflow', 'workflow1'],
+            ]));
+
+        $this->input->expects($this->exactly(1))
+            ->method('getOption')
+            ->will($this->returnValueMap([
+                ['locale', 'locale1'],
             ]));
 
         $this->workflowManager->expects($this->once())
@@ -137,9 +140,7 @@ class DumpWorkflowTranslationsCommandTest extends \PHPUnit_Framework_TestCase
             ->with('workflow1')
             ->willReturn($this->workflow);
 
-        $this->workflow->expects($this->once())
-            ->method('getDefinition')
-            ->willReturn($definition);
+        $this->workflow->expects($this->once())->method('getDefinition')->willReturn($definition);
 
         $domain = DumpWorkflowTranslationsCommand::TRANSLATION_DOMAIN;
         $defaultLocale = Translation::DEFAULT_LOCALE;
