@@ -311,16 +311,16 @@ class Imap extends \Zend\Mail\Storage\Imap
         }
 
         $response = $this->protocol->requestAndResponse('UID SEARCH', $criteria);
+        if (!is_array($response)) {
+            throw new BaseException\RuntimeException('Cannot search messages.');
+        }
+
         foreach ($response as $ids) {
             if ($ids[0] === 'SEARCH') {
                 array_shift($ids);
 
                 return $ids;
             }
-        }
-
-        if (!is_array($response)) {
-            throw new BaseException\RuntimeException('Cannot search messages.');
         }
 
         return $response;

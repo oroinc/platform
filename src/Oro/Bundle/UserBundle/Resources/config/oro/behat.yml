@@ -1,5 +1,5 @@
 elements:
-  Login:
+  Login Form:
     selector: '#login-form'
     class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Form
     options:
@@ -7,7 +7,7 @@ elements:
         Username: '_username'
         Password: '_password'
 
-  User:
+  User Form:
     selector: 'div#container'
     class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Form
     options:
@@ -26,3 +26,28 @@ elements:
   UserRoleForm:
     selector: "form[id^='oro_user_role_form']"
     class: Oro\Bundle\UserBundle\Tests\Behat\Element\UserRoleForm
+
+pages:
+  Login:
+    class: Oro\Bundle\UserBundle\Tests\Behat\Page\Login
+    route: 'oro_user_security_login'
+
+  User Profile View:
+    class: Oro\Bundle\UserBundle\Tests\Behat\Page\UserProfileView
+    route: 'oro_user_profile_view'
+
+  User Profile Configuration:
+    class: Oro\Bundle\UserBundle\Tests\Behat\Page\UserProfileConfiguration
+    route: 'oro_user_profile_configuration'
+
+  User Index:
+    class: Oro\Bundle\UserBundle\Tests\Behat\Page\UserIndex
+    route: 'oro_user_index'
+
+  User Create:
+    class: Oro\Bundle\UserBundle\Tests\Behat\Page\UserCreate
+    route: 'oro_user_create'
+
+  User View:
+    class: Oro\Bundle\UserBundle\Tests\Behat\Page\UserView
+    route: 'oro_user_view'

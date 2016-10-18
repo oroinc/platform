@@ -354,14 +354,19 @@ class RestDocHandler implements HandlerInterface
     {
         foreach ($filters as $key => $filter) {
             if ($filter instanceof StandaloneFilter) {
+                $dataType = $filter->getDataType();
+                $isArrayAllowed = $filter->isArrayAllowed();
                 $options = [
-                    'description' => $filter->getDescription(),
+                    'description' => $this->getFilterDescription($filter->getDescription()),
                     'requirement' => $this->valueNormalizer->getRequirement(
-                        $filter->getDataType(),
+                        $dataType,
                         $this->docViewDetector->getRequestType(),
-                        $filter->isArrayAllowed()
+                        $isArrayAllowed
                     )
                 ];
+                if ($filter instanceof FieldAwareFilterInterface) {
+                    $options['type'] = $this->getFilterType($dataType, $isArrayAllowed);
+                }
                 $operators = $filter->getSupportedOperators();
                 if (!empty($operators) && !(count($operators) === 1 && $operators[0] === StandaloneFilter::EQ)) {
                     $options['operators'] = implode(',', $operators);
@@ -376,14 +381,9 @@ class RestDocHandler implements HandlerInterface
                 if ($filter instanceof FieldAwareFilterInterface) {
                     $association = $metadata->getAssociation($filter->getField());
                     if (null !== $association && !DataType::isAssociationAsField($association->getDataType())) {
-                        $targetClassNames = $association->getAcceptableTargetClassNames();
-                        $targetEntityTypes = [];
-                        foreach ($targetClassNames as $targetClassName) {
-                            $targetEntityType = $this->getEntityType($targetClassName);
-                            if ($targetEntityType) {
-                                $targetEntityTypes[] = $targetEntityType;
-                            }
-                        }
+                        $targetEntityTypes = $this->getFilterTargetEntityTypes(
+                            $association->getAcceptableTargetClassNames()
+                        );
                         if (!empty($targetEntityTypes)) {
                             $options['relation'] = implode(',', $targetEntityTypes);
                         }
@@ -393,6 +393,49 @@ class RestDocHandler implements HandlerInterface
                 $annotation->addFilter($key, $options);
             }
         }
+    }
+
+    /**
+     * @param string|null $description
+     *
+     * @return string
+     */
+    protected function getFilterDescription($description)
+    {
+        return null !== $description
+            ? $description
+            : '';
+    }
+
+    /**
+     * @param string $dataType
+     * @param bool   $isArrayAllowed
+     *
+     * @return string
+     */
+    protected function getFilterType($dataType, $isArrayAllowed)
+    {
+        return $isArrayAllowed
+            ? sprintf('%1$s or array of %1$s', $dataType)
+            : $dataType;
+    }
+
+    /**
+     * @param string[] $targetClassNames
+     *
+     * @return string[]
+     */
+    protected function getFilterTargetEntityTypes($targetClassNames)
+    {
+        $targetEntityTypes = [];
+        foreach ($targetClassNames as $targetClassName) {
+            $targetEntityType = $this->getEntityType($targetClassName);
+            if ($targetEntityType) {
+                $targetEntityTypes[] = $targetEntityType;
+            }
+        }
+
+        return $targetEntityTypes;
     }
 
     /**
