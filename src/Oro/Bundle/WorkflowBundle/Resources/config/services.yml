@@ -354,7 +354,6 @@ services:
         class: 'Oro\Bundle\WorkflowBundle\Translation\KeyTemplateParametersResolver'
         arguments:
             - '@translator'
-            - '@oro_workflow.manager'
 
     oro_workflow.filter.workflow:
         class: 'Oro\Bundle\WorkflowBundle\Filter\WorkflowFilter'
