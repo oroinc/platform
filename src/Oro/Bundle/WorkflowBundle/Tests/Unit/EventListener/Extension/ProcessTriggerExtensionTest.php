@@ -2,18 +2,17 @@
 
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\EventListener\Extension;
 
-use JMS\JobQueueBundle\Entity\Job;
+use Oro\Component\MessageQueue\Client\MessageProducerInterface;
 
-use Oro\Bundle\WorkflowBundle\Command\ExecuteProcessJobCommand;
 use Oro\Bundle\WorkflowBundle\Entity\EventTriggerInterface;
 use Oro\Bundle\WorkflowBundle\Entity\ProcessDefinition;
 use Oro\Bundle\WorkflowBundle\Entity\ProcessJob;
 use Oro\Bundle\WorkflowBundle\Entity\ProcessTrigger;
 use Oro\Bundle\WorkflowBundle\Entity\Repository\ProcessJobRepository;
 use Oro\Bundle\WorkflowBundle\Entity\Repository\ProcessTriggerRepository;
+use Oro\Bundle\WorkflowBundle\EventListener\Extension\ProcessTriggerExtension;
 use Oro\Bundle\WorkflowBundle\Model\ProcessData;
 use Oro\Bundle\WorkflowBundle\Model\ProcessHandler;
-use Oro\Bundle\WorkflowBundle\EventListener\Extension\ProcessTriggerExtension;
 use Oro\Bundle\WorkflowBundle\Model\ProcessLogger;
 use Oro\Bundle\WorkflowBundle\Model\ProcessSchedulePolicy;
 
@@ -33,6 +32,9 @@ class ProcessTriggerExtensionTest extends AbstractEventTriggerExtensionTest
 
     /** @var \PHPUnit_Framework_MockObject_MockObject|ProcessSchedulePolicy */
     protected $schedulePolicy;
+
+    /** @var \PHPUnit_Framework_MockObject_MockObject|MessageProducerInterface */
+    protected $messageProducer;
 
     protected function setUp()
     {
@@ -63,12 +65,18 @@ class ProcessTriggerExtensionTest extends AbstractEventTriggerExtensionTest
 
         $this->schedulePolicy = $this->getMock(ProcessSchedulePolicy::class);
 
+        $this->messageProducer = $this->getMockBuilder(MessageProducerInterface::class)
+            ->disableOriginalConstructor()
+            ->getMock()
+        ;
+
         $this->extension = new ProcessTriggerExtension(
             $this->doctrineHelper,
             $this->handler,
             $this->logger,
             $this->triggerCache,
-            $this->schedulePolicy
+            $this->schedulePolicy,
+            $this->messageProducer
         );
     }
 
@@ -398,9 +406,8 @@ class ProcessTriggerExtensionTest extends AbstractEventTriggerExtensionTest
     /**
      * @dataProvider postFlushQueuedProcessJobProvider
      * @param array $entityParams
-     * @param array $expected
      */
-    public function testProcessQueuedProcessJob($entityParams, $expected)
+    public function testProcessQueuedProcessJob($entityParams)
     {
         $callOrder    = 0;
         $expectedData = $this->createProcessData(['data' => $this->getMainEntity()]);
@@ -426,12 +433,6 @@ class ProcessTriggerExtensionTest extends AbstractEventTriggerExtensionTest
 
             $this->assertProcessJobPersist($this->entityManager, $entityParams, $iteration);
             $callOrder = $iteration;
-        }
-
-        $this->entityManager->expects($this->at(++$callOrder))->method('flush');
-
-        foreach ($expected as $jmsParams) {
-            $this->assertJMSJobPersist($this->entityManager, $jmsParams, ++$callOrder);
         }
 
         $this->entityManager->expects($this->at(++$callOrder))->method('flush');
@@ -469,13 +470,6 @@ class ProcessTriggerExtensionTest extends AbstractEventTriggerExtensionTest
                         'priority'  => 10,
                         'timeShift' => 60,
                     ]
-                ],
-                'expected' => [
-                    [
-                        'commandArgs' => ['--id=1', '--id=2', '--id=3'],
-                        'priority'    => 10,
-                        'timeShift'   => 60
-                    ]
                 ]
             ],
             'one with different priority (2 batch)' => [
@@ -497,18 +491,6 @@ class ProcessTriggerExtensionTest extends AbstractEventTriggerExtensionTest
                         'event'     => EventTriggerInterface::EVENT_DELETE,
                         'priority'  => 10,
                         'timeShift' => 60
-                    ]
-                ],
-                'expected' => [
-                    [
-                        'commandArgs' => ['--id=1'],
-                        'priority'    => 90,
-                        'timeShift'   => 60
-                    ],
-                    [
-                        'commandArgs' => ['--id=2', '--id=3'],
-                        'priority'    => 10,
-                        'timeShift'   => 60
                     ]
                 ]
             ],
@@ -532,23 +514,6 @@ class ProcessTriggerExtensionTest extends AbstractEventTriggerExtensionTest
                         'priority'  => 10,
                         'timeShift' => 30
                     ]
-                ],
-                'expected' => [
-                    [
-                        'commandArgs' => ['--id=1'],
-                        'priority'    => 10,
-                        'timeShift'   => 10
-                    ],
-                    [
-                        'commandArgs' => ['--id=2'],
-                        'priority'    => 10,
-                        'timeShift'   => 20
-                    ],
-                    [
-                        'commandArgs' => ['--id=3'],
-                        'priority'    => 10,
-                        'timeShift'   => 30
-                    ]
                 ]
             ],
             'all with same priority and only one with different timeShift (2 batch)' => [
@@ -571,18 +536,6 @@ class ProcessTriggerExtensionTest extends AbstractEventTriggerExtensionTest
                         'priority'  => 10,
                         'timeShift' => 60
                     ]
-                ],
-                'expected' => [
-                    [
-                        'commandArgs' => ['--id=1'],
-                        'priority'    => 10,
-                        'timeShift'   => 10
-                    ],
-                    [
-                        'commandArgs' => ['--id=2', '--id=3'],
-                        'priority'    => 10,
-                        'timeShift'   => 60
-                    ]
                 ]
             ]
         ];
@@ -604,8 +557,8 @@ class ProcessTriggerExtensionTest extends AbstractEventTriggerExtensionTest
         $this->callPreFunctionByEventName(ProcessTrigger::EVENT_CREATE, $this->getMainEntity());
 
         // there is no need to check all trace - just ensure that job was queued
-        $this->entityManager->expects($this->exactly(3))->method('persist');
-        $this->entityManager->expects($this->exactly(3))->method('flush');
+        $this->entityManager->expects($this->exactly(1))->method('persist');
+        $this->entityManager->expects($this->exactly(1))->method('flush');
 
         $this->handler->expects($this->never())->method('handleTrigger');
 
@@ -741,41 +694,15 @@ class ProcessTriggerExtensionTest extends AbstractEventTriggerExtensionTest
     protected function assertProcessJobPersist($entityManager, array $entityParams, $callOrder)
     {
         $entityManager->expects($this->at($callOrder))->method('persist')
-            ->with($this->isInstanceOf('Oro\Bundle\WorkflowBundle\Entity\ProcessJob'))
+            ->with($this->isInstanceOf(ProcessJob::class))
             ->will(
                 $this->returnCallback(
                     function (ProcessJob $processJob) use ($entityParams) {
                         $event = $processJob->getProcessTrigger()->getEvent();
 
-                        $idReflection = new \ReflectionProperty('Oro\Bundle\WorkflowBundle\Entity\ProcessJob', 'id');
+                        $idReflection = new \ReflectionProperty(ProcessJob::class, 'id');
                         $idReflection->setAccessible(true);
                         $idReflection->setValue($processJob, $entityParams[$event]['id']);
-                    }
-                )
-            );
-    }
-
-    /**
-     * @param \PHPUnit_Framework_MockObject_MockObject $entityManager
-     * @param array $expected
-     * @param int $callOrder
-     */
-    protected function assertJMSJobPersist($entityManager, array $expected, $callOrder)
-    {
-        $entityManager->expects($this->at($callOrder))->method('persist')
-            ->with($this->isInstanceOf('JMS\JobQueueBundle\Entity\Job'))
-            ->will(
-                $this->returnCallback(
-                    function (Job $jmsJob) use ($expected) {
-                        $this->assertEquals(ExecuteProcessJobCommand::NAME, $jmsJob->getCommand());
-                        $this->assertEquals($expected['commandArgs'], $jmsJob->getArgs());
-                        $this->assertEquals($expected['priority'], $jmsJob->getPriority());
-
-                        $timeShiftInterval = ProcessTrigger::convertSecondsToDateInterval($expected['timeShift']);
-                        $executeAfter = new \DateTime('now', new \DateTimeZone('UTC'));
-                        $executeAfter->add($timeShiftInterval);
-
-                        $this->assertLessThanOrEqual($executeAfter, $jmsJob->getExecuteAfter());
                     }
                 )
             );
