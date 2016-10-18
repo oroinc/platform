@@ -3,9 +3,9 @@ namespace Oro\Bundle\DataAuditBundle\Async;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\EntityManagerInterface;
+use Oro\Bundle\DataAuditBundle\Model\EntityReference;
 use Oro\Bundle\DataAuditBundle\Service\ConvertEntityChangesToAuditService;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
-use Oro\Bundle\UserBundle\Entity\AbstractUser;
 use Oro\Component\MessageQueue\Client\TopicSubscriberInterface;
 use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
 use Oro\Component\MessageQueue\Transport\MessageInterface;
@@ -46,16 +46,14 @@ class AuditChangedEntitiesInverseRelationsProcessor implements MessageProcessorI
         $loggedAt = \DateTime::createFromFormat('U', $body['timestamp']);
         $transactionId = $body['transaction_id'];
 
-        /** @var AbstractUser|null $user */
-        $user = null;
+        $user = new EntityReference();
         if (isset($body['user_id'])) {
-            $user = $this->doctrine->getRepository($body['user_class'])->find($body['user_id']);
+            $user = new EntityReference($body['user_class'], $body['user_id']);
         }
 
-        /** @var Organization|null $organization */
-        $organization = null;
+        $organization = new EntityReference();
         if (isset($body['organization_id'])) {
-            $organization = $this->doctrine->getRepository(Organization::class)->find($body['organization_id']);
+            $organization = new EntityReference(Organization::class, $body['organization_id']);
         }
 
         $map = [];
@@ -75,7 +73,6 @@ class AuditChangedEntitiesInverseRelationsProcessor implements MessageProcessorI
             $map,
             $transactionId,
             $loggedAt,
-            null,
             $user,
             $organization
         );

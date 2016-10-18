@@ -3,9 +3,9 @@ namespace Oro\Bundle\DataAuditBundle\Async;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Oro\Bundle\DataAuditBundle\Entity\Audit;
+use Oro\Bundle\DataAuditBundle\Model\EntityReference;
 use Oro\Bundle\DataAuditBundle\Service\ConvertEntityChangesToAuditService;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
-use Oro\Bundle\UserBundle\Entity\AbstractUser;
 use Oro\Component\MessageQueue\Client\Message;
 use Oro\Component\MessageQueue\Client\MessagePriority;
 use Oro\Component\MessageQueue\Client\MessageProducerInterface;
@@ -57,43 +57,41 @@ class AuditChangedEntitiesProcessor implements MessageProcessorInterface, TopicS
         $loggedAt = \DateTime::createFromFormat('U', $body['timestamp']);
         $transactionId = $body['transaction_id'];
 
-        /** @var AbstractUser|null $user */
-        $user = null;
+        $user = new EntityReference();
         if (isset($body['user_id'])) {
-            $user = $this->doctrine->getRepository($body['user_class'])->find($body['user_id']);
+            $user = new EntityReference($body['user_class'], $body['user_id']);
         }
 
-        /** @var Organization|null $organization */
-        $organization = null;
+        $organization = new EntityReference();
         if (isset($body['organization_id'])) {
-            $organization = $this->doctrine->getRepository(Organization::class)->find($body['organization_id']);
+            $organization = new EntityReference(Organization::class, $body['organization_id']);
         }
 
         $this->convertEntityChangesToAuditService->convert(
             $body['entities_inserted'],
             $transactionId,
             $loggedAt,
-            Audit::ACTION_CREATE,
             $user,
-            $organization
+            $organization,
+            Audit::ACTION_CREATE
         );
 
         $this->convertEntityChangesToAuditService->convert(
             $body['entities_updated'],
             $transactionId,
             $loggedAt,
-            Audit::ACTION_UPDATE,
             $user,
-            $organization
+            $organization,
+            Audit::ACTION_UPDATE
         );
 
         $this->convertEntityChangesToAuditService->convertSkipFields(
             $body['entities_deleted'],
             $transactionId,
-            Audit::ACTION_REMOVE,
             $loggedAt,
             $user,
-            $organization
+            $organization,
+            Audit::ACTION_REMOVE
         );
 
         $message = new Message();
