@@ -48,7 +48,7 @@ abstract class AbstractLoadUserData extends AbstractFixture implements Container
             $organizationRepo = $manager->getRepository('OroOrganizationBundle:Organization');
             $organization = $organizationRepo->getFirst();
             $api = new Entity\UserApi();
-            $api->setApiKey('admin_api_key')
+            $api->setApiKey('admin_api_key1Q')
                 ->setUser($admin)
                 ->setOrganization($organization);
 

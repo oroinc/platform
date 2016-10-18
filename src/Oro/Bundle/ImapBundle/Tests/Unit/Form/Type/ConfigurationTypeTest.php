@@ -18,7 +18,7 @@ use Oro\Bundle\SecurityBundle\SecurityFacade;
 
 class ConfigurationTypeTest extends FormIntegrationTestCase
 {
-    const TEST_PASSWORD = 'somePassword';
+    const TEST_PASSWORD = 'somePassword1Q';
 
     /** @var Mcrypt */
     protected $encryptor;
