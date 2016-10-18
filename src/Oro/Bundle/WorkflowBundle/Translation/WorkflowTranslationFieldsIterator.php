@@ -91,6 +91,9 @@ class WorkflowTranslationFieldsIterator
     }
 
     /**
+     * Iterates over translatable fields in WorkflowDefinition.
+     * Iteration keys are generated translationKey for current field.
+     * Iteration values are current values under the field.
      * @param WorkflowDefinition $definition
      * @return \Generator|array($translationKey => $fieldValue)
      * @throws \InvalidArgumentException
