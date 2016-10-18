@@ -6,6 +6,8 @@ use Symfony\Component\DependencyInjection\Compiler\PassConfig;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 
+use Oro\Bundle\MessageQueueBundle\DependencyInjection\Compiler\AddTopicMetaPass;
+use Oro\Bundle\WorkflowBundle\Async\Topics;
 use Oro\Bundle\WorkflowBundle\DependencyInjection\Compiler\AddAttributeNormalizerCompilerPass;
 use Oro\Bundle\WorkflowBundle\DependencyInjection\Compiler\AddConditionAndActionCompilerPass;
 use Oro\Bundle\WorkflowBundle\DependencyInjection\Compiler\AddWorkflowValidationLoaderCompilerPass;
@@ -30,5 +32,10 @@ class OroWorkflowBundle extends Bundle
         $container->addCompilerPass(new EventTriggerExtensionCompilerPass());
         $container->addCompilerPass(new WorkflowConfigurationHandlerCompilerPass);
         $container->addCompilerPass(new WorkflowDefinitionBuilderExtensionCompilerPass);
+
+        $addTopicMetaPass = AddTopicMetaPass::create();
+        $addTopicMetaPass->add(Topics::EXECUTE_PROCESS_JOB);
+
+        $container->addCompilerPass($addTopicMetaPass);
     }
 }

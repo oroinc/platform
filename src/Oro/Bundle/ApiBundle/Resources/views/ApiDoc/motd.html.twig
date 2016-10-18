@@ -9,6 +9,27 @@
     div.motd div.documentation a { font-size: 1.2em; text-decoration: none; }
 </style>
 <script type="text/javascript">
+    handleResourceLinks = function ($el) {
+        var value = $el.text(),
+            arrayOfPrefix = 'array of ',
+            isArrayOf = (0 === value.indexOf(arrayOfPrefix)),
+            links = [], elements, i, resourceId;
+        if (value && value.substr((isArrayOf ? arrayOfPrefix.length : 0), 2) !== '<a') {
+            $el.text('');
+            elements = (isArrayOf ? value.substr(arrayOfPrefix.length) : value).split(',');
+            for (i = 0; i < elements.length; i++) {
+                resourceId = 'get--api-' + elements[i].trim();
+                if ($('#' + resourceId).length) {
+                    links.push('<a href="#' + resourceId
+                        + '" onclick="return gotoResource(\'' + resourceId + '\');">'
+                        + elements[i] + '</a>');
+                } else {
+                    links.push(elements[i]);
+                }
+            }
+            $el.append((isArrayOf ? arrayOfPrefix : '') + links.join(', '));
+        }
+    };
     gotoResource = function (resourceId) {
         var $section = $('#' + resourceId).closest('.section'),
             $toggler = $('#' + resourceId + ' > .toggler');
@@ -191,26 +212,17 @@
              * Add relation links
              */
             $filters.find('td:contains(Relation)').each(function (index, el) {
-                var $el = $(el),
-                    $relationEl = $el.next(),
-                    relationText = $relationEl.text(),
-                    relations, links, resourceId;
-                if (relationText && relationText.substring(0, 2) !== '<a') {
-                    relations = relationText.split(',');
-                    links = [];
-                    for (var i = 0; i < relations.length; i++) {
-                        resourceId = 'get--api-' + relations[i].trim();
-                        if ($('#' + resourceId).length) {
-                            links.push('<a href="#' + resourceId
-                                + '" onclick="return gotoResource(\'' + resourceId + '\');">'
-                                + relations[i] + '</a>');
-                        } else {
-                            links.push(relations[i]);
-                        }
-                    }
-                    $relationEl.text('');
-                    $relationEl.append(links.join(', '));
-                }
+                handleResourceLinks($(el).next());
+            });
+            $container.find('.pane.content table.input>tbody>tr').each(function (parentIndex, parentEl) {
+                $(parentEl).find('td:eq(1)').each(function (index, el) {
+                    handleResourceLinks($(el));
+                });
+            });
+            $container.find('.pane.content table.output>tbody>tr').each(function (parentIndex, parentEl) {
+                $(parentEl).find('td:eq(1)').each(function (index, el) {
+                    handleResourceLinks($(el));
+                });
             });
 
             /**
