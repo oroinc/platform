@@ -47,7 +47,6 @@ interface BlockTypeInterface
      *
      * @param BlockView      $view
      * @param BlockInterface $block
-     * @param Options        $options
      */
     public function finishView(BlockView $view, BlockInterface $block);
 

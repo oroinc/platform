@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\EmailBundle\Workflow\Action;
 
+use Oro\Bundle\EmailBundle\Entity\EmailUser;
 use Oro\Bundle\EmailBundle\Tools\EmailAddressHelper;
 use Oro\Bundle\EmailBundle\Form\Model\Email;
 use Oro\Bundle\EmailBundle\Mailer\Processor;
@@ -93,12 +94,19 @@ class SendEmail extends AbstractSendEmail
         }
         $emailModel->setType($type);
 
-        $emailUser = $this->emailProcessor->process(
-            $emailModel,
-            $this->emailProcessor->getEmailOrigin($emailModel->getFrom(), $emailModel->getOrganization())
-        );
+        $emailUser = null;
+        try {
+            $emailUser = $this->emailProcessor->process(
+                $emailModel,
+                $this->emailProcessor->getEmailOrigin($emailModel->getFrom(), $emailModel->getOrganization())
+            );
+        } catch (\Swift_SwiftException $exception) {
+            if (null !== $this->logger) {
+                $this->logger->error('Workflow send email action.', ['exception' => $exception]);
+            }
+        }
 
-        if (array_key_exists('attribute', $this->options)) {
+        if (array_key_exists('attribute', $this->options) && $emailUser instanceof EmailUser) {
             $this->contextAccessor->setValue($context, $this->options['attribute'], $emailUser->getEmail());
         }
     }

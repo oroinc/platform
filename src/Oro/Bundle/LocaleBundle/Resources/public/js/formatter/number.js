@@ -1,6 +1,10 @@
-define(['numeral', '../locale-settings', 'underscore'
-    ], function(numeral, localeSettings, _) {
+define(function(require) {
     'use strict';
+
+    var _ = require('underscore');
+    var numeral = require('numeral');
+    var localeSettings = require('../locale-settings');
+    var configuration = require('oroconfig/js/configuration');
 
     /**
      * Number Formatter
@@ -73,10 +77,16 @@ define(['numeral', '../locale-settings', 'underscore'
                 return formattedNumber.replace('%', '');
             },
             replaceCurrency: function(formattedNumber, options) {
-                return formattedNumber.replace(
-                    options.currency_symbol,
-                    localeSettings.getCurrencySymbol(options.currency_code)
-                );
+                var currencyLayout = configuration.get('currency-view-type') === 'symbol' ?
+                    localeSettings.getCurrencySymbol(options.currency_code) : options.currency_code;
+
+                var isPrepend = configuration.get('is-currency-symbol-prepend');
+
+                if (configuration.get('currency-view-type') !== 'symbol' && isPrepend) {
+                    currencyLayout += '\u00A0';
+                }
+
+                return formattedNumber.replace(options.currency_symbol, currencyLayout);
             }
         };
 
@@ -92,6 +102,18 @@ define(['numeral', '../locale-settings', 'underscore'
         return {
             formatDecimal: function(value) {
                 var options = localeSettings.getNumberFormats('decimal');
+                options.style = 'decimal';
+                var formattersChain = [
+                    formatters.numeralFormat,
+                    formatters.addPrefixSuffix
+                ];
+                return doFormat(value, options, formattersChain);
+            },
+            formatMonetary: function(value) {
+                var options = localeSettings.getNumberFormats('decimal');
+                var fractionDigitsOptions = _.pick(localeSettings.getNumberFormats('currency'),
+                    ['max_fraction_digits', 'min_fraction_digits']);
+                _.extend(options, fractionDigitsOptions);
                 options.style = 'decimal';
                 var formattersChain = [
                     formatters.numeralFormat,
@@ -121,6 +143,10 @@ define(['numeral', '../locale-settings', 'underscore'
                 return doFormat(value, options, formattersChain);
             },
             formatCurrency: function(value, currency) {
+                if (_.isString(value)) {
+                    return value;
+                }
+
                 var options = localeSettings.getNumberFormats('currency');
                 if (!currency) {
                     currency = localeSettings.getCurrency();
@@ -179,6 +205,12 @@ define(['numeral', '../locale-settings', 'underscore'
                 numeral.language(originLanguage);
 
                 return result;
+            },
+            unformatStrict: function(value) {
+                var numberFormats = localeSettings.getNumberFormats('decimal');
+                value = String(value).split(numberFormats.grouping_separator_symbol).join('');
+                value = value.replace(numberFormats.decimal_separator_symbol, '.');
+                return Number(value);
             }
         };
     };

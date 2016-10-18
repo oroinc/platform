@@ -5,6 +5,7 @@ namespace Oro\Bundle\LocaleBundle\Translation\Strategy;
 use Doctrine\Common\Cache\CacheProvider;
 use Doctrine\Common\Persistence\ManagerRegistry;
 
+use Oro\Bundle\LocaleBundle\DependencyInjection\Configuration;
 use Oro\Bundle\LocaleBundle\Entity\Localization;
 use Oro\Bundle\LocaleBundle\Entity\Repository\LocalizationRepository;
 use Oro\Bundle\TranslationBundle\Strategy\TranslationStrategyInterface;
@@ -67,6 +68,9 @@ class LocalizationFallbackStrategy implements TranslationStrategyInterface
         $fallbacks = array_reduce($this->getRootLocalizations(), function ($result, Localization $localization) {
             return array_merge($result, $this->localizationToArray($localization));
         }, []);
+        /** All localizations always should have only one parent that equals to default language */
+        $fallbacks = [Configuration::DEFAULT_LOCALE => $fallbacks];
+
         $this->cacheProvider->save($key, $fallbacks);
         return $fallbacks;
     }

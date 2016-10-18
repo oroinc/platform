@@ -389,6 +389,7 @@ class AbstractEmailSynchronizerTest extends \PHPUnit_Framework_TestCase
         $maxConcurrentTasks = 2;
         $minExecPeriodInMin = 1;
 
+        $timeShift = 30;
         $now = new \DateTime('now', new \DateTimeZone('UTC'));
         $border = clone $now;
         if ($minExecPeriodInMin > 0) {
@@ -419,9 +420,8 @@ class AbstractEmailSynchronizerTest extends \PHPUnit_Framework_TestCase
             ->with(
                 'o'
                 . ', CASE WHEN o.syncCode = :inProcess THEN 0 ELSE 1 END AS HIDDEN p1'
-                . ', (COALESCE(o.syncCode, 1000) * 30'
-                . ' + TIMESTAMPDIFF(MINUTE, COALESCE(o.syncCodeUpdatedAt, :min), :now)'
-                . ' / (CASE o.syncCode WHEN :success THEN 100 ELSE 1 END)) AS HIDDEN p2'
+                . ', (TIMESTAMPDIFF(MINUTE, COALESCE(o.syncCodeUpdatedAt, :min), :now)'
+                . ' - (CASE o.syncCode WHEN :success THEN 0 ELSE :timeShift END)) AS HIDDEN p2'
             )
             ->will($this->returnValue($qb));
         $qb->expects($this->at($index++))
@@ -455,6 +455,10 @@ class AbstractEmailSynchronizerTest extends \PHPUnit_Framework_TestCase
         $qb->expects($this->at($index++))
             ->method('setParameter')
             ->with('border', $this->equalTo($border))
+            ->will($this->returnValue($qb));
+        $qb->expects($this->at($index++))
+            ->method('setParameter')
+            ->with('timeShift', $this->equalTo($timeShift))
             ->will($this->returnValue($qb));
         $qb->expects($this->at($index++))
             ->method('setMaxResults')

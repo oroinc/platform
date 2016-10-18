@@ -1,0 +1,37 @@
+parameters:
+    oro_currency.form.type.currency_selection.class: Oro\Bundle\CurrencyBundle\Form\Type\CurrencySelectionType
+    oro_currency.form.type.price.class: Oro\Bundle\CurrencyBundle\Form\Type\PriceType
+    oro_currency.form.type.currency.class: Oro\Bundle\CurrencyBundle\Form\Type\CurrencyType
+
+services:
+    oro_currency.form.type.currency_selection:
+        class: %oro_currency.form.type.currency_selection.class%
+        arguments:
+            - '@oro_currency.config.currency'
+            - '@oro_locale.settings'
+            - '@oro_currency.helper.currency_name'
+        tags:
+            - { name: form.type, alias: oro_currency_selection }
+
+    oro_currency.form.type.price:
+        class: %oro_currency.form.type.price.class%
+        arguments:
+            - '@oro_currency.rounding.price_rounding_service'
+        calls:
+            - [setDataClass, [%oro_currency.price.model%]]
+        tags:
+            - { name: form.type, alias: oro_currency_price }
+
+    oro_currency.form.type.multicurrency:
+        class: Oro\Bundle\CurrencyBundle\Form\Type\MultiCurrencyType
+        arguments:
+            - '@oro_currency.rounding.price_rounding_service'
+        calls:
+            - [setDataClass, [Oro\Bundle\CurrencyBundle\Entity\MultiCurrency]]
+        tags:
+            - { name: form.type, alias: oro_multicurrency }
+
+    oro_currency.form.type.currency:
+        class: '%oro_currency.form.type.currency.class%'
+        tags:
+            - { name: form.type, alias: oro_currency }

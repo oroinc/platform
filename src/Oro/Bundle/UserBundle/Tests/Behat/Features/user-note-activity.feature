@@ -31,6 +31,10 @@ Scenario: Add note
 Scenario: View note
   When I collapse "Charlie works hard" in activity list
   Then I should see note-attachment.jpg text in activity
+  And I click on "note-attachment.jpg" attachment thumbnail
+  And I should see large image
+  And I close large image preview
+  And download link for "note-attachment.jpg" attachment should work
 
 Scenario: Edit note in view page
   And I click "Update note" on "Charlie works hard" in activity list

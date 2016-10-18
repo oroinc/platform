@@ -15,7 +15,7 @@ OroAddressBundle has specific validators that can be used to validate addresses 
 Validation configuration should be placed in file Resources/config/validation.yml in appropriate bundle.
 
 ```
-OroCRM\Bundle\ContactBundle\Entity\Contact:
+Oro\Bundle\ContactBundle\Entity\Contact:
     properties:
         addresses:
             - Oro\Bundle\AddressBundle\Validator\Constraints\UniqueAddressTypes: ~
