@@ -1,0 +1,16 @@
+.entity-fallback-container div.selector {
+    width: auto!important;
+}
+
+.entity-fallback-container div.selector span {
+    width: auto!important;
+    padding-right: 30px;
+}
+
+.entity-fallback-container .use-fallback-checkbox {
+    margin-top: -2px;
+}
+
+.entity-fallback-container .fallback-item-use-fallback {
+    padding: 0 6px;
+}

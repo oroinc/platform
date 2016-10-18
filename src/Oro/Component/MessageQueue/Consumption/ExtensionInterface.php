@@ -4,7 +4,7 @@ namespace Oro\Component\MessageQueue\Consumption;
 interface ExtensionInterface
 {
     /**
-     * Executed only once at the very begining of the consumption.
+     * Executed only once at the very beginning of the consumption.
      * At this stage the context does not contain processor, consumer and queue.
      *
      * @param Context $context

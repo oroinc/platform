@@ -141,7 +141,6 @@ class ConfigurationProvider implements ConfigurationProviderInterface
                 } elseif (is_string($mixins)) {
                     $aggregatedConfig[$mixins] = $this->rawConfiguration[$mixins];
                 }
-
             }
             $this->cache->save($gridName.'_'.self::CACHE_POSTFIX, $aggregatedConfig);
         }

@@ -175,6 +175,7 @@ class EmailEntityBuilderTest extends \PHPUnit_Framework_TestCase
         $body = $this->builder->body('testContent', true, true);
 
         $this->assertEquals('testContent', $body->getBodyContent());
+        $this->assertEquals('testContent', $body->getTextBody());
         $this->assertFalse($body->getBodyIsText());
         $this->assertTrue($body->getPersistent());
     }
