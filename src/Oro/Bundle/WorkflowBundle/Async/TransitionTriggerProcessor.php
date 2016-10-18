@@ -59,11 +59,11 @@ class TransitionTriggerProcessor implements MessageProcessorInterface
             return self::ACK;
         } catch (\Exception $e) {
             $this->logger->error(
-                sprintf(
-                    'Message could not be processed: %s. Original message: "%s"',
-                    $e->getMessage(),
-                    $message->getBody()
-                )
+                'Message could not be processed.',
+                [
+                    'exception' => $e,
+                    'originalMessage' => $message->getBody(),
+                ]
             );
 
             return self::REJECT;
