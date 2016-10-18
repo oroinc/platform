@@ -159,6 +159,7 @@ class NormalizeMetadata implements ProcessorInterface
                     $linkedProperty
                 );
                 $associationMetadata->setName($propertyName);
+                $associationMetadata->setPropertyPath($linkedProperty);
                 $linkedPropertyPath = array_merge($propertyPath, [$linkedProperty]);
                 $associationMetadata->setTargetMetadata(
                     $this->getMetadata(
@@ -181,6 +182,7 @@ class NormalizeMetadata implements ProcessorInterface
                     $linkedProperty
                 );
                 $fieldMetadata->setName($propertyName);
+                $fieldMetadata->setPropertyPath($linkedProperty);
                 $entityMetadata->addField($fieldMetadata);
             }
             $addedPropertyName = $linkedProperty;

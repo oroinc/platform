@@ -18,7 +18,7 @@ class WidgetOwnersType extends AbstractType
             'businessUnits',
             'oro_type_widget_business_unit_select',
             [
-                'label'    => 'orocrm.sales.dashboard.forecast_of_opportunities.business_unit',
+                'label'    => 'oro.sales.dashboard.forecast_of_opportunities.business_unit',
                 'required' => false,
             ]
         );
@@ -26,7 +26,7 @@ class WidgetOwnersType extends AbstractType
             'roles',
             'oro_type_widget_role_select',
             [
-                'label'    => 'orocrm.sales.dashboard.forecast_of_opportunities.role',
+                'label'    => 'oro.sales.dashboard.forecast_of_opportunities.role',
                 'required' => false
             ]
         );
@@ -34,7 +34,7 @@ class WidgetOwnersType extends AbstractType
             'users',
             'oro_type_widget_user_select',
             [
-                'label'    => 'orocrm.sales.dashboard.forecast_of_opportunities.owner',
+                'label'    => 'oro.sales.dashboard.forecast_of_opportunities.owner',
                 'required' => false
             ]
         );

@@ -88,7 +88,7 @@ oro:
             view_sql.label: View SQL query of a report/segment
         system_configuration:
             groups:
-                report_settings.title: Reports settings
+                report_settings.title: Reports Settings
             fields:
                 display_sql_query.label: Display SQL in Reports and Segments
                 display_sql_query.tooltip: Displays SQL query of a report or segment on its View page
