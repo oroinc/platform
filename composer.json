@@ -80,7 +80,13 @@
         "symfony/polyfill-php70":"1.*",
         "liuggio/excelbundle": "~2.1",
         "components/jqueryui": "1.11.2",
-        "bower-asset/select2": "3.4.1"
+        "bower-asset/select2": "3.4.1",
+        "bower-asset/chaplin": "1.0.0",
+        "bower-asset/jquery-cookie": "1.4.1",
+        "bower-asset/jquery-ajax-queue": "0.0.1",
+        "bower-asset/autobahnjs": "0.8.0",
+        "bower-asset/when": "2.4.0",
+        "bower-asset/crypto-js": "3.1.7"
     },
     "require-dev": {
         "sensio/generator-bundle": "2.5.3",

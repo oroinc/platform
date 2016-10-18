@@ -22,9 +22,6 @@ config:
         'jstree/jquery.jstree.min':
             deps:
                 - 'jquery'
-        'jquery.cookie':
-            deps:
-                - 'jquery'
         'bootstrap':
             deps:
                 - 'jquery'
@@ -38,28 +35,9 @@ config:
                 - 'jquery'
                 - 'underscore'
                 - 'backbone'
-        'jquery.ajax.queue':
-            deps:
-                - 'jquery'
         'oroui/lib/jquery.datepair-0.4.4/jquery.datepair':
             deps:
                 - 'oroui/lib/jquery.datepair-0.4.4/datepair'
-        'cryptojs/enc-base64':
-            deps:
-                - 'cryptojs/core'
-            exports: 'CryptoJS'
-        'cryptojs/hmac':
-            deps:
-                - 'cryptojs/core'
-            exports: 'CryptoJS'
-        'cryptojs/sha256':
-            deps:
-                - 'cryptojs/core'
-            exports: 'CryptoJS'
-        'cryptojs/pbkdf2':
-            deps:
-                - 'cryptojs/core'
-            exports: 'CryptoJS'
         'jquery.multiselect':
             deps:
                 - 'jquery-ui'
@@ -131,26 +109,27 @@ config:
         'jquery.mousewheel': 'bundles/oroui/lib/jquery/jquery.mousewheel.js'
         'jquery.numeric': 'bundles/oroui/lib/jquery/jquery.numeric.js'
         'jquery.uniform': 'bundles/oroui/lib/jquery/jquery.uniform.min.js'
-        'jquery.select2': 'bundles/components/select2/select2.js'
+        'jquery.select2': 'bundles/bowerassets/select2/select2.js'
         'jquery.multiselect': 'bundles/oroui/lib/multiselect/jquery.multiselect.js'
         'jquery.multiselect.filter': 'bundles/oroui/lib/multiselect/jquery.multiselect.filter.js'
         'jquery.simplecolorpicker': 'bundles/oroui/lib/simplecolorpicker/jquery.simplecolorpicker.js'
         'jquery.minicolors': 'bundles/oroui/lib/minicolors/jquery.minicolors.js'
-        'jquery.cookie': 'bundles/oroui/lib/jquery/jquery.cookie.js'
-        'jquery.ajax.queue': 'bundles/oroui/lib/jquery/jquery.ajaxQueue.min.js'
+        'jquery.cookie': 'bundles/bowerassets/jquery-cookie/jquery.cookie.js'
         'jquery.mCustomScrollbar': 'bundles/oroui/lib/jquery/jquery.mCustomScrollbar.min.js'
         'bootstrap': 'bundles/oroui/lib/bootstrap.min.js'
 #        'bootstrap': 'bundles/oroui/js/bootstrap-dev.js'
         'underscore': 'bundles/components/underscore/underscore.js'
         'backbone': 'bundles/components/backbone/backbone.js'
-        'chaplin': 'bundles/oroui/lib/chaplin-1.0.0.js'
+        'chaplin': 'bundles/bowerassets/chaplin/chaplin.js'
         'backbone-bootstrap-modal': 'bundles/oroui/lib/backbone.bootstrap-modal.js'
         'oroui/lib/jquery.timepicker-1.4.13/jquery.timepicker': 'bundles/oroui/lib/jquery.timepicker-1.4.13/jquery.timepicker.min.js'
-        'cryptojs/core': 'bundles/oroui/lib/cryptojs/core-min.js'
-        'cryptojs/enc-base64': 'bundles/oroui/lib/cryptojs/enc-base64-min.js'
-        'cryptojs/hmac': 'bundles/oroui/lib/cryptojs/hmac-min.js'
-        'cryptojs/sha256': 'bundles/oroui/lib/cryptojs/sha256-min.js'
-        'cryptojs/pbkdf2': 'bundles/oroui/lib/cryptojs/pbkdf2-min.js'
+        'cryptojs/core': 'bundles/bowerassets/crypto-js/core.js'
+        'cryptojs/enc-base64': 'bundles/bowerassets/crypto-js/enc-base64.js'
+        'cryptojs/pbkdf2': 'bundles/bowerassets/crypto-js/pbkdf2.js'
+        'cryptojs/hmac-sha256': 'bundles/bowerassets/crypto-js/hmac-sha256.js'
+        'cryptojs/sha1': 'bundles/bowerassets/crypto-js/sha1.js'
+        'cryptojs/hmac': 'bundles/bowerassets/crypto-js/hmac.js'
+        'cryptojs/sha256': 'bundles/bowerassets/crypto-js/sha256.js'
         'lightgallery': 'bundles/oroui/lib/lightgallery/js/lightgallery-all.js'
         'lightgallery.print': 'bundles/oroui/js/lightgallery/lg-print.js'
 
@@ -246,9 +225,6 @@ build:
 #       therefore it's excluded
         'backbone-bootstrap-modal': 'empty:'
         'oroui/lib/jquery.datepair-0.4.4/jquery.datepair': 'empty:'
-        'cryptojs/enc-base64': 'empty:'
-        'cryptojs/hmac': 'empty:'
-        'cryptojs/pbkdf2': 'empty:'
 #       jQuery.UI after v.1.11.2 started to support AMD. And that broke a js-build with
 #       files which does not support AMD. jquery.multiselect and jquery.multiselect.filter
 #       use AMD without dependency, therefore it's excluded

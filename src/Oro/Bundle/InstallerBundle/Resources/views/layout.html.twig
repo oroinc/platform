@@ -9,8 +9,8 @@
     <title>{% block title %}{{ 'title'|trans }}{% endblock %}</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" type="text/css" href="{{ asset('bundles/oroinstaller/css/style.css') }}" />
-    <script type="text/javascript" src="{{ asset('bundles/oroinstaller/lib/jquery-2.0.3.min.js') }}"></script>
-    <script type="text/javascript" src="{{ asset('bundles/oroinstaller/lib/jquery.ajaxQueue.min.js') }}"></script>
+    <script type="text/javascript" src="{{ asset('bundles/components/jquery/jquery.min.js') }}"></script>
+    <script type="text/javascript" src="{{ asset('bundles/bowerassets/jquery-ajax-queue/ajaxQueue.min.js') }}"></script>
     {% block javascript %}
     <script type="text/javascript">
         $(function() {
@@ -45,44 +45,46 @@
                             aborted = true;
                             jqXHR.abort();
                         }
-                    }
-                }).done(function(data) {
-                    var curRes = typeof data.result != 'undefined' && data.result,
-                        exitCode = typeof data.exitCode != 'undefined' ? data.exitCode : 0,
-                        finRes = finRes || curRes;
+                    },
+                    success: function(data) {
+                        var curRes = typeof data.result != 'undefined' && data.result,
+                            exitCode = typeof data.exitCode != 'undefined' ? data.exitCode : 0,
+                            finRes = finRes || curRes;
 
-                    stepCon
-                        .removeClass('icon-wait')
-                        .addClass('icon-' + (curRes ? (exitCode == 0 ? 'yes' : 'warning') : 'no'))
-                        .closest('tr')
+                        stepCon
+                            .removeClass('icon-wait')
+                            .addClass('icon-' + (curRes ? (exitCode == 0 ? 'yes' : 'warning') : 'no'))
+                            .closest('tr')
                             .find('td:last').text(
                                 curRes
                                     ? (exitCode == 0 ? '{{ 'passed'|trans }}' : '{{ 'skipped'|trans }}')
                                     : '{{ 'failed'|trans }}'
                             ).end()
-                        .closest('tr').next()
+                            .closest('tr').next()
                             .find('td:last').text('{{ 'progress'|trans }}').end()
                             .find('span').addClass('icon-wait');
 
-                    if (i == actions.length - 1 && finRes) {
-                        $('a.back').removeClass('disabled');
-                        $('a.primary').removeClass('disabled').attr('href', url);
-                    }
-                }).fail(function() {
-                    if (aborted) {
-                        stepCon
-                            .removeClass('icon-wait')
-                            .addClass('icon-warning')
-                            .closest('tr').find('td:last').text('{{ 'skipped'|trans }}');
-                    } else {
-                        finRes = false;
-                        stepCon
-                            .removeClass('icon-wait')
-                            .addClass('icon-no')
-                            .closest('tr').find('td:last').text('{{ 'failed'|trans }}');
-                    }
-                    if (i == actions.length - 1) {
-                        $('a.back').removeClass('disabled');
+                        if (i == actions.length - 1 && finRes) {
+                            $('a.back').removeClass('disabled');
+                            $('a.primary').removeClass('disabled').attr('href', url);
+                        }
+                    },
+                    error: function() {
+                        if (aborted) {
+                            stepCon
+                                .removeClass('icon-wait')
+                                .addClass('icon-warning')
+                                .closest('tr').find('td:last').text('{{ 'skipped'|trans }}');
+                        } else {
+                            finRes = false;
+                            stepCon
+                                .removeClass('icon-wait')
+                                .addClass('icon-no')
+                                .closest('tr').find('td:last').text('{{ 'failed'|trans }}');
+                        }
+                        if (i == actions.length - 1) {
+                            $('a.back').removeClass('disabled');
+                        }
                     }
                 });
             });
