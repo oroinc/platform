@@ -2,18 +2,18 @@
 
 namespace Oro\Bundle\EmailBundle\Command;
 
-use Exception;
-
 use Doctrine\Bundle\DoctrineBundle\Registry;
-use Doctrine\Common\Persistence\ObjectManager;
 
-use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
-use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Input\InputOption;
-use Symfony\Component\Console\Output\OutputInterface;
+use Doctrine\Common\Persistence\ObjectManager;
+use Exception;
 
 use Oro\Bundle\EmailBundle\Manager\EmailFlagManager;
 use Oro\Component\Log\OutputLogger;
+use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
+use Symfony\Component\Console\Input\InputInterface;
+
+use Symfony\Component\Console\Input\InputOption;
+use Symfony\Component\Console\Output\OutputInterface;
 
 class EmailFlagSyncCommand extends ContainerAwareCommand
 {
@@ -47,6 +47,13 @@ class EmailFlagSyncCommand extends ContainerAwareCommand
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
+        $featureChecker = $this->getContainer()->get('oro_featuretoggle.checker.feature_checker');
+        if (!$featureChecker->isFeatureEnabled('email')) {
+            $output->writeln('The email feature is disabled. The command will not run.');
+
+            return 0;
+        }
+
         $logger = new OutputLogger($output);
 
         /** @var EmailFlagManager $emailFlagManager */

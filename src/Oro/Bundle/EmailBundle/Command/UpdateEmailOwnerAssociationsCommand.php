@@ -2,12 +2,12 @@
 
 namespace Oro\Bundle\EmailBundle\Command;
 
+use Oro\Bundle\EmailBundle\Command\Manager\AssociationManager;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Output\OutputInterface;
 
-use Oro\Bundle\EmailBundle\Command\Manager\AssociationManager;
+use Symfony\Component\Console\Output\OutputInterface;
 
 class UpdateEmailOwnerAssociationsCommand extends ContainerAwareCommand
 {
@@ -37,6 +37,13 @@ class UpdateEmailOwnerAssociationsCommand extends ContainerAwareCommand
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
+        $featureChecker = $this->getContainer()->get('oro_featuretoggle.checker.feature_checker');
+        if (!$featureChecker->isFeatureEnabled('email')) {
+            $output->writeln('The email feature is disabled. The command will not run.');
+
+            return 0;
+        }
+
         $ownerClassName = $input->getArgument(static::OWNER_CLASS_ARGUMENT);
         $ownerId = $input->getArgument(static::OWNER_ID_ARGUMENT);
 

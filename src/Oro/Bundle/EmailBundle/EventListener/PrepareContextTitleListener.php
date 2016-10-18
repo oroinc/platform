@@ -2,14 +2,18 @@
 
 namespace Oro\Bundle\EmailBundle\EventListener;
 
-use Symfony\Component\Routing\Router;
+use Oro\Bundle\ActivityBundle\Event\PrepareContextTitleEvent;
 
 use Oro\Bundle\EmailBundle\Entity\Email;
-use Oro\Bundle\ActivityBundle\Event\PrepareContextTitleEvent;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
+use Oro\Bundle\FeatureToggleBundle\Checker\FeatureCheckerHolderTrait;
+use Oro\Bundle\FeatureToggleBundle\Checker\FeatureToggleableInterface;
+use Symfony\Component\Routing\Router;
 
-class PrepareContextTitleListener
+class PrepareContextTitleListener implements FeatureToggleableInterface
 {
+    use FeatureCheckerHolderTrait;
+
     /** @var Router */
     protected $router;
 
@@ -35,6 +39,10 @@ class PrepareContextTitleListener
      */
     public function prepareEmailContextTitleEvent(PrepareContextTitleEvent $event)
     {
+        if (!$this->isFeaturesEnabled()) {
+            return;
+        }
+
         if ($event->getTargetClass() === Email::ENTITY_CLASS) {
             $item = $event->getItem();
             /** @var Email $email */
