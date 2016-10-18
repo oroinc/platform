@@ -41,6 +41,7 @@ oro:
             menu.label: Menu
             title.label: Title
             titles.label: Title
+            description.label: Description
             uri.label: Uri
             active.label: Active
             priority.label: Priority

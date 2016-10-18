@@ -18,12 +18,16 @@ class MenuUpdateStub implements MenuUpdateInterface
     /** @var string */
     protected $defaultTitle;
 
+    /** @var string */
+    protected $defaultDescription;
+
     /**
      * MenuUpdateStub constructor.
      */
     public function __construct()
     {
         $this->titles = new ArrayCollection();
+        $this->descriptions = new ArrayCollection();
     }
 
     /**
@@ -65,6 +69,31 @@ class MenuUpdateStub implements MenuUpdateInterface
      * {@inheritdoc}
      */
     public function setDefaultTitle($value)
+    {
+        $this->defaultTitle = $value;
+
+        return $this;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getDescription(Localization $localization = null)
+    {
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getDefaultDescription()
+    {
+        return $this->defaultTitle;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setDefaultDescription($value)
     {
         $this->defaultTitle = $value;
 

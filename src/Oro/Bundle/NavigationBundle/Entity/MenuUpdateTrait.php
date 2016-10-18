@@ -44,6 +44,17 @@ trait MenuUpdateTrait
     protected $titles;
 
     /**
+     * @var Collection|LocalizedFallbackValue[]
+     *
+     * @ORM\ManyToMany(
+     *      targetEntity="Oro\Bundle\LocaleBundle\Entity\LocalizedFallbackValue",
+     *      cascade={"ALL"},
+     *      orphanRemoval=true
+     * )
+     */
+    protected $descriptions;
+
+    /**
      * @var string
      *
      * @ORM\Column(name="uri", type="string", length=255, nullable=true)
@@ -176,6 +187,42 @@ trait MenuUpdateTrait
     {
         if ($this->titles->contains($title)) {
             $this->titles->removeElement($title);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|LocalizedFallbackValue[]
+     */
+    public function getDescriptions()
+    {
+        return $this->descriptions;
+    }
+
+    /**
+     * @param LocalizedFallbackValue $description
+     *
+     * @return MenuUpdateInterface
+     */
+    public function addDescription(LocalizedFallbackValue $description)
+    {
+        if (!$this->descriptions->contains($description)) {
+            $this->descriptions->add($description);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param LocalizedFallbackValue $description
+     *
+     * @return MenuUpdateInterface
+     */
+    public function removeDescription(LocalizedFallbackValue $description)
+    {
+        if ($this->descriptions->contains($description)) {
+            $this->descriptions->removeElement($description);
         }
 
         return $this;

@@ -57,6 +57,32 @@ class MenuUpdateTraitTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals([$secondTitle], array_values($update->getTitles()->toArray()));
     }
 
+    public function testDescriptionAccessors()
+    {
+        $update = new MenuUpdateStub();
+        $this->assertEmpty($update->getDescriptions()->toArray());
+
+        $firstDescription = $this->createLocalizedValue();
+
+        $secondDescription = $this->createLocalizedValue();
+
+        $update->addDescription($firstDescription)
+            ->addDescription($secondDescription)
+            ->addDescription($secondDescription);
+
+        $this->assertCount(2, $update->getDescriptions()->toArray());
+
+        $this->assertEquals(
+            [$firstDescription, $secondDescription],
+            array_values($update->getDescriptions()->toArray())
+        );
+
+        $update->removeDescription($firstDescription)
+            ->removeDescription($firstDescription);
+
+        $this->assertEquals([$secondDescription], array_values($update->getDescriptions()->toArray()));
+    }
+
     /**
      * @param boolean $default
      *

@@ -5,33 +5,14 @@ namespace Oro\Bundle\NavigationBundle\Form\Type;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-use Symfony\Component\Translation\TranslatorInterface;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
-use Oro\Bundle\LocaleBundle\Form\Type\LocalizedFallbackValueCollectionType;
-use Oro\Bundle\LocaleBundle\Helper\LocalizationHelper;
+use Oro\Bundle\LocaleBundle\Form\Type\TranslatedLocalizedFallbackValueCollectionType;
 use Oro\Bundle\NavigationBundle\Entity\MenuUpdate;
-use Oro\Bundle\NavigationBundle\Form\DataTransformer\MenuUpdateTransformer;
 
 class MenuUpdateType extends AbstractType
 {
     const NAME = 'oro_navigation_menu_update';
-
-    /** @var TranslatorInterface */
-    private $translator;
-
-    /** @var LocalizationHelper */
-    private $localizationHelper;
-
-    /**
-     * @param TranslatorInterface $translator
-     * @param LocalizationHelper $localizationHelper
-     */
-    public function __construct(TranslatorInterface $translator, LocalizationHelper $localizationHelper)
-    {
-        $this->translator = $translator;
-        $this->localizationHelper = $localizationHelper;
-    }
 
     /**
      * {@inheritdoc}
@@ -41,10 +22,21 @@ class MenuUpdateType extends AbstractType
         $builder
             ->add(
                 'titles',
-                LocalizedFallbackValueCollectionType::NAME,
+                TranslatedLocalizedFallbackValueCollectionType::class,
                 [
                     'required' => true,
                     'label' => 'oro.navigation.menuupdate.title.label',
+                    'options' => ['constraints' => [new NotBlank()]]
+                ]
+            )
+            ->add(
+                'descriptions',
+                TranslatedLocalizedFallbackValueCollectionType::class,
+                [
+                    'required' => true,
+                    'label' => 'oro.navigation.menuupdate.description.label',
+                    'type' => 'textarea',
+                    'field' => 'text',
                     'options' => ['constraints' => [new NotBlank()]]
                 ]
             )
@@ -64,10 +56,6 @@ class MenuUpdateType extends AbstractType
                 ]
             )
         ;
-
-        $builder->addViewTransformer(
-            new MenuUpdateTransformer($this->translator, $this->localizationHelper)
-        );
     }
 
     /**

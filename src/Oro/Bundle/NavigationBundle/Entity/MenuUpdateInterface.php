@@ -77,6 +77,44 @@ interface MenuUpdateInterface
     public function setDefaultTitle($value);
 
     /**
+     * @return Collection|LocalizedFallbackValue[]
+     */
+    public function getDescriptions();
+
+    /**
+     * @param LocalizedFallbackValue $description
+     *
+     * @return MenuUpdateInterface
+     */
+    public function addDescription(LocalizedFallbackValue $description);
+
+    /**
+     * @param LocalizedFallbackValue $description
+     *
+     * @return MenuUpdateInterface
+     */
+    public function removeDescription(LocalizedFallbackValue $description);
+
+    /**
+     * @param Localization $localization
+     *
+     * @return LocalizedFallbackValue
+     */
+    public function getDescription(Localization $localization = null);
+
+    /**
+     * @return LocalizedFallbackValue
+     */
+    public function getDefaultDescription();
+
+    /**
+     * @param string $value
+     *
+     * @return LocalizedFallbackValue
+     */
+    public function setDefaultDescription($value);
+
+    /**
      * @return string
      */
     public function getUri();

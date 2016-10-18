@@ -83,6 +83,13 @@ services:
         tags:
             - { name: form.type, alias: oro_locale_localized_fallback_value_collection }
 
+    oro_locale.form.type.translated_localized_fallback_value_colection:
+        class: Oro\Bundle\LocaleBundle\Form\Type\TranslatedLocalizedFallbackValueCollectionType
+        arguments:
+            - '@translator'
+        tags:
+            - { name: form.type, alias: oro_locale_translated_localized_fallback_value_collection }
+
     oro_locale.form.type.localization:
         class: Oro\Bundle\LocaleBundle\Form\Type\LocalizationType
         tags:
