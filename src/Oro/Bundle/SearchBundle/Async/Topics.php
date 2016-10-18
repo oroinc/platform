@@ -1,4 +1,5 @@
 <?php
+
 namespace Oro\Bundle\SearchBundle\Async;
 
 class Topics

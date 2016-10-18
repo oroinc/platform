@@ -115,7 +115,8 @@ Used with new class `Oro\Bundle\WorkflowBundle\Model\WorkflowExclusiveRecordGrou
 * Added methods `getExclusiveRecordGroups` and `getExclusiveActiveGroups` to `Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition`
 * `getName`, `getLabel` and `isActive` methods of `Oro\Bundle\WorkflowBundle\Model\Workflow` now are proxy methods to its `Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition` instance.
 * Removed method `getStartTransitions` from `Oro\Bundle\WorkflowBundle\Model\WorkflowManager` -  `$workflow->getTransitionManager()->getStartTransitions()` can be used instead
-* Entity config `workflow.active_workflows` was removed. Use workflows configuration boolean node `defaults.active` instead.
+* Entity config `workflow.active_workflows` was removed. Use workfows configuration boolean node `defaults.active` instead.
+* The command `oro:process:execute:job` was removed.
 * Processes configuration file now loads from `Resorces/config/oro/processes.yml` file instead of `Resources/config/oro/process.yml`
 * Processes configuration in `oro/processes.yml` file now gathered under `processes: ...` root node.
 - `oro_workflow.repository.workflow_item` inherits `oro_entity.abstract_repository`.
@@ -125,8 +126,8 @@ Used with new class `Oro\Bundle\WorkflowBundle\Model\WorkflowExclusiveRecordGrou
 - Service `oro_workflow.transition_schedule.query_factory` (`Oro\Bundle\WorkflowBundle\Model\TransitionSchedule\TransitionQueryFactory`) removed.
 - Service `oro_workflow.cache.process_trigger` (`Oro\Bundle\WorkflowBundle\Cache\ProcessTriggerCache`) removed.
 - Model `Oro\Bundle\WorkflowBundle\Model\TransitionSchedule\ScheduledTransitionProcessName` removed.
-- Class `Oro\Bundle\WorkflowBundle\Model\ProcessTriggerCronScheduler` moved to `Oro\Bundle\WorkflowBundle\Cron\ProcessTriggerCronScheduler` 
-and constructor signature changed to `DeferredScheduler $deferredScheduler`. 
+- Class `Oro\Bundle\WorkflowBundle\Model\ProcessTriggerCronScheduler` moved to `Oro\Bundle\WorkflowBundle\Cron\ProcessTriggerCronScheduler`
+and constructor signature changed to `DeferredScheduler $deferredScheduler`.
 - Added new entity `Oro\Bundle\WorkflowBundle\Entity\TransitionCronTrigger`.
 - Added new entity `Oro\Bundle\WorkflowBundle\Entity\TransitionEventTrigger`.
 - Added new interface `Oro\Bundle\WorkflowBundle\Entity\EventTriggerInterface`.
@@ -235,6 +236,9 @@ and constructor signature changed to `DeferredScheduler $deferredScheduler`.
 - Added interface `Oro\Bundle\DataGridBundle\Datasource\Orm\Configs\ConfigProcessorInterface`
 - `Oro\Bundle\DataGridBundle\Datasource\Orm\OrmDatasource::getParameterBinder` was deprecated
 - `Oro\Bundle\DataGridBundle\Datasource\ParameterBinderAwareInterface::getParameterBinder` was deprecated
+- Class `Oro/Bundle/DataGridBundle/Extension/MassAction/DeleteMassActionHandler.php`
+    - construction signature was changed now it takes new argument:
+        `MessageProducerInterface` $producer
 
 ####SecurityBundle
 - Removed layout context configurator `Oro\Bundle\SecurityBundle\Layout\Extension\SecurityFacadeContextConfigurator`.
@@ -246,6 +250,7 @@ and constructor signature changed to `DeferredScheduler $deferredScheduler`.
 ####ImportExportBundle
 - Added new event `AFTER_JOB_EXECUTION`, for details please check out [documentation](./src/Oro/Bundle/ImportExportBundle/Resources/doc/reference/events.md).
 - For `Oro\Bundle\ImportExportBundle\Job\JobExecutor` added new public method `setEventDispatcher` for setting Event Dispatcher.
+- Options for import/export buttons configuration `dataGridName` was renamed to `datagridName`
 
 ####TranslationBundle
 - Added controller `Oro\Bundle\TranslationBundle\Controller\LanguageController` for manage Languages.
@@ -418,6 +423,12 @@ placeholders:
 - Moved JS file `js/content-manager.js` to `SyncBundle`.
 - Moved DOC file `doc/content_outdating.md` to `SyncBundle`.
 - Moved DOC file `doc/mediator-handlers.md` to `SyncBundle`.
+- Class `Oro\Bundle\NavigationBundle\Provider\BuilderChainProvider`
+    - construction signature was changed now it takes next arguments:
+        - `FactoryInterface` $factory,
+        - `EventDispatcherInterface` $eventDispatcher,
+        - `ArrayLoader` $loader,
+        - `MenuManipulator` $manipulator
 
 ####EmailBundle
 - Constructor of `Oro\Bundle\EmailBundle\Form\DataTransformer\EmailTemplateTransformer` changed. Removed the arguments.

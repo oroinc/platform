@@ -20,7 +20,7 @@ Started index update for entities.
 
 Multiple entities indexation:
 ```
-> php app/console oro:search:index "OroCRM\Bundle\ContactBundle\Entity\Contact" 1 2 3 4 5 6 7 8 9 10
+> php app/console oro:search:index "Oro\Bundle\ContactBundle\Entity\Contact" 1 2 3 4 5 6 7 8 9 10
 Started index update for entities.
 
 ```
