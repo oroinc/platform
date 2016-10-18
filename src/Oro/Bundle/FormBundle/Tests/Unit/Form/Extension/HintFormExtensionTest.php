@@ -37,6 +37,7 @@ class HintFormExtensionTest extends \PHPUnit_Framework_TestCase
     {
         $options = [
             'hint' => 'test',
+            'hint_position' => 'after_input',
             'hint_attr' => ['class' => 'test'],
         ];
         $view = new FormView();

@@ -38,7 +38,7 @@ abstract class WebTestCase extends BaseWebTestCase
 
     /** Default WSSE credentials */
     const USER_NAME     = 'admin';
-    const USER_PASSWORD = 'admin_api_key';
+    const USER_PASSWORD = 'admin_api_key1Q';
 
     /**  Default user name and password */
     const AUTH_USER         = 'admin@example.com';
