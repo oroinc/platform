@@ -128,4 +128,17 @@ class EntityReferenceTest extends \PHPUnit_Framework_TestCase
         $reference = new EntityReference(get_class(new \stdClass()), 'testId');
         $reference->setEntity(new EntityReference());
     }
+
+    /**
+     * @expectedException \LogicException
+     * @expectedExceptionMessage The entity is already loaded.
+     */
+    public function testShouldNotBePossibleToChangeAlreadySetEntity()
+    {
+        $entity = new \stdClass();
+        $reference = new EntityReference(get_class($entity), 'testId');
+        $reference->setEntity($entity);
+        // test
+        $reference->setEntity($entity);
+    }
 }
