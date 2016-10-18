@@ -5,6 +5,9 @@ namespace Oro\Component\Log;
 use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Output\OutputInterface;
 
+/**
+ * @deprecated Will be removed in 2.0
+ */
 class ConsoleProgressLogger implements ProgressLoggerInterface
 {
     /** @var OutputInterface */

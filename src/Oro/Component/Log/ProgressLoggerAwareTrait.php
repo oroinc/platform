@@ -2,6 +2,9 @@
 
 namespace Oro\Component\Log;
 
+/**
+ * @deprecated Will be removed in 2.0
+ */
 trait ProgressLoggerAwareTrait
 {
     /** @var ProgressLoggerInterface */
