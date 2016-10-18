@@ -83,15 +83,13 @@ class IntegrationController extends Controller
         $status  = Codes::HTTP_OK;
         $response = [
             'successful' => true,
-            'message'    => '',
+            'message'    => $this->get('translator')->trans('oro.integration.progress'),
         ];
 
         try {
             $this->getSyncScheduler()->schedule($integration->getId(), null, [
                 'force' => (bool) $request->get('force', false)
             ]);
-
-            // TODO CRM-5838 previous version returned a link to the job.
         } catch (\Exception $e) {
             $status  = Codes::HTTP_BAD_REQUEST;
 
