@@ -1,4 +1,4 @@
-Feature: Pin page
+  Feature: Pin page
   In order to have fast access to some pages in system
   As crm user
   I need pin some page and return to it with the same state later
@@ -84,8 +84,8 @@ Feature: Pin page
 
   Scenario: Save form and view pinned form
     Given I fill "User Form" with:
-      | Password          | 123123q |
-      | Re-Enter Password | 123123q |
+      | Password          | 123123Q |
+      | Re-Enter Password | 123123Q |
     And I save and close form
     And I should see "User saved" flash message
     When I follow Create User link in pin holder
