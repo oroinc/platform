@@ -13,17 +13,19 @@ trait MessageQueueAssertTrait
 {
     /**
      * Asserts that a message was sent to a topic.
+     * If the message is not provided this method checks that at least one message was sent to a topic.
      *
-     * @param string               $expectedTopic   The expected topic name
-     * @param string|array|Message $expectedMessage The expected message
+     * @param string                    $expectedTopic   The expected topic name
+     * @param string|array|Message|null $expectedMessage The expected message or NULL if a message is not matter
      */
-    protected static function assertMessageSent($expectedTopic, $expectedMessage)
+    protected static function assertMessageSent($expectedTopic, $expectedMessage = null)
     {
-        $constraint = new SentMessageConstraint(
-            ['topic' => $expectedTopic, 'message' => $expectedMessage]
-        );
+        $message = ['topic' => $expectedTopic];
+        if (null !== $expectedMessage) {
+            $message['message'] = $expectedMessage;
+        }
 
-        self::assertThat(self::getSentMessages(), $constraint);
+        self::assertThat(self::getSentMessages(), new SentMessageConstraint($message));
     }
 
     /**
@@ -55,13 +57,58 @@ trait MessageQueueAssertTrait
     }
 
     /**
+     * Asserts the number of messages are sent to a topic.
+     *
+     * @param string $expectedTopic The expected topic name
+     * @param int    $expectedCount The expected number of messages
+     */
+    protected static function assertMessagesCount($expectedTopic, $expectedCount)
+    {
+        $topicMessages = [];
+        $sentMessages = self::getSentMessages();
+        foreach ($sentMessages as $sentMessage) {
+            if ($sentMessage['topic'] === $expectedTopic) {
+                $topicMessages[] = $sentMessage['message'];
+            }
+        }
+        self::assertCount(
+            $expectedCount,
+            $topicMessages,
+            sprintf('Failed asserting that the given number of messages were sent to "%s" topic.', $expectedTopic)
+        );
+    }
+
+    /**
+     * Asserts the number of messages are sent to a topic.
+     * This is an alias for assertMessagesCount method
+     *
+     * @param string $expectedTopic The expected topic name
+     * @param int    $expectedCount The expected number of messages
+     */
+    protected static function assertCountMessages($expectedTopic, $expectedCount)
+    {
+        self::assertMessagesCount($expectedTopic, $expectedCount);
+    }
+
+    /**
      * Asserts that no any message was sent to a topic.
+     *
+     * @param string $expectedTopic The expected topic name
+     */
+    protected static function assertMessagesEmpty($expectedTopic)
+    {
+        self::assertMessagesSent($expectedTopic, []);
+    }
+
+    /**
+     * Asserts that no any message was sent to a topic.
+     * This is an alias for assertMessagesEmpty method
      *
      * @param string $expectedTopic The expected topic name
      */
     protected static function assertEmptyMessages($expectedTopic)
     {
-        self::assertMessagesSent($expectedTopic, []);
+        self::assertMessagesEmpty($expectedTopic);
     }
 
     /**

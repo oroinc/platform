@@ -23,7 +23,9 @@ class MessageProducer implements MessageProducerInterface
      */
     public function send($topic, $message)
     {
-        if (false == $message instanceof Message) {
+        if ($message instanceof Message) {
+            $message = clone $message;
+        } else {
             $body = $message;
             $message = new Message();
             $message->setBody($body);

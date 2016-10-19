@@ -455,7 +455,7 @@ class InstallCommand extends AbstractCommand implements InstallCommandInterface
             ->runCommand(
                 'oro:workflow:definitions:load',
                 [
-                    '--process-isolation' => true,
+                    '--process-isolation' => true
                 ]
             )
             ->runCommand(
@@ -468,7 +468,7 @@ class InstallCommand extends AbstractCommand implements InstallCommandInterface
                 'oro:migration:data:load',
                 [
                     '--process-isolation' => true,
-                    '--no-interaction'    => true,
+                    '--no-interaction'    => true
                 ]
             );
 
@@ -492,12 +492,7 @@ class InstallCommand extends AbstractCommand implements InstallCommandInterface
                 'oro:migration:data:load',
                 array(
                     '--process-isolation'  => true,
-                    '--fixtures-type'      => 'demo',
-                    '--disabled-listeners' =>
-                        [
-                            'oro_dataaudit.listener.entity_listener',
-                            'oro_dataaudit.listener.deprecated_audit_data_listener'
-                        ]
+                    '--fixtures-type'      => 'demo'
                 )
             );
         }

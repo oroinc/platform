@@ -9,8 +9,6 @@ ACL implementation from Oro UserBundle.
 
 * [Your first menu](#first-menu)
 * [Rendering Menus](#rendering-menus)
-* [Content Outdating Notifications](./Resources/doc/content_outdating.md)
-* [Mediator Handlers](./Resources/doc/mediator-handlers.md)
 
 <a name="first-menu"></a>
 

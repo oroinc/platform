@@ -11,7 +11,6 @@ use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
 
 use Oro\Bundle\ActivityListBundle\Model\ExtendActivityList;
-use Oro\Bundle\DataAuditBundle\Metadata\Annotation as Oro;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\EntityBundle\EntityProperty\DatesAwareInterface;
@@ -324,7 +323,7 @@ class ActivityList extends ExtendActivityList implements DatesAwareInterface, Up
     }
 
     /**
-     * Set a subject of the related record
+     * Set a subject of the related record. The subject cutes to 250 symbols.
      *
      * @param string $subject
      *
@@ -332,7 +331,7 @@ class ActivityList extends ExtendActivityList implements DatesAwareInterface, Up
      */
     public function setSubject($subject)
     {
-        $this->subject = substr($subject, 0, 255);
+        $this->subject = mb_substr($subject, 0, 250, mb_detect_encoding($subject));
 
         return $this;
     }
