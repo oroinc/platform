@@ -67,7 +67,8 @@ class MenuUpdateManager
         } else {
             $entity->setKey($this->generateKey());
         }
-
+        $isCustom = isset($options['custom']) && $options['custom'];
+        $entity->setCustom($isCustom);
         if ($options['parentKey']) {
             $parent = $this->getMenuUpdateByKeyAndScope(
                 $options['menu'],
@@ -164,16 +165,108 @@ class MenuUpdateManager
         }
 
         foreach ($orderedChildren as $priority => $child) {
-            $update = $this->createMenuUpdate($ownershipType, $ownerId);
-            $update->setKey($child->getName());
-            $update->setMenu($menuName);
-            $parentKey = $child->getParent()->getName();
-            $update->setParentKey($parentKey != $menuName ? $parentKey : null);
+            $update = $this->createMenuUpdate($ownershipType, $ownerId, $child->getName());
+            MenuUpdateUtils::updateMenuUpdate($update, $child, $menuName);
             $update->setPriority($priority);
             $updates[] = $update;
         }
         
         return $updates;
+    }
+
+    /**
+     * @param string $menuName
+     * @param string $key
+     * @param string $ownershipType
+     * @param int $ownerId
+     */
+    public function showMenuItem($menuName, $key, $ownershipType, $ownerId)
+    {
+        $item = MenuUpdateUtils::findMenuItem($this->getMenu($menuName), $key);
+        if ($item !== null) {
+            $update = $this->getMenuUpdateByKeyAndScope($menuName, $item->getName(), $ownershipType, $ownerId);
+            $update->setActive(true);
+            $this->getEntityManager()->persist($update);
+
+            $this->showMenuItemParents($menuName, $item, $ownershipType, $ownerId);
+            $this->showMenuItemChildren($menuName, $item, $ownershipType, $ownerId);
+
+            $this->getEntityManager()->flush();
+        }
+    }
+
+    /**
+     * @param string $menuName
+     * @param ItemInterface $item
+     * @param string $ownershipType
+     * @param int $ownerId
+     */
+    private function showMenuItemParents($menuName, $item, $ownershipType, $ownerId)
+    {
+        $parent = $item->getParent();
+        if ($parent !== null && !$parent->isDisplayed()) {
+            $update = $this->getMenuUpdateByKeyAndScope($menuName, $parent->getName(), $ownershipType, $ownerId);
+            $update->setActive(true);
+            $this->getEntityManager()->persist($update);
+
+            $this->showMenuItemParents($menuName, $parent, $ownershipType, $ownerId);
+        }
+    }
+
+    /**
+     * @param string $menuName
+     * @param ItemInterface $item
+     * @param string $ownershipType
+     * @param int $ownerId
+     */
+    private function showMenuItemChildren($menuName, $item, $ownershipType, $ownerId)
+    {
+        /** @var ItemInterface $child */
+        foreach ($item->getChildren() as $child) {
+            $update = $this->getMenuUpdateByKeyAndScope($menuName, $child->getName(), $ownershipType, $ownerId);
+            $update->setActive(true);
+            $this->getEntityManager()->persist($update);
+
+            $this->showMenuItemChildren($menuName, $child, $ownershipType, $ownerId);
+        }
+    }
+
+    /**
+     * @param string $menuName
+     * @param string $key
+     * @param string $ownershipType
+     * @param int $ownerId
+     */
+    public function hideMenuItem($menuName, $key, $ownershipType, $ownerId)
+    {
+        $item = MenuUpdateUtils::findMenuItem($this->getMenu($menuName), $key);
+        if ($item !== null) {
+            $update = $this->getMenuUpdateByKeyAndScope($menuName, $item->getName(), $ownershipType, $ownerId);
+            $update->setActive(false);
+            $this->getEntityManager()->persist($update);
+
+            $this->hideMenuItemChildren($menuName, $item, $ownershipType, $ownerId);
+
+            $this->getEntityManager()->flush();
+        }
+    }
+
+    /**
+     * @param string $menuName
+     * @param ItemInterface $item
+     * @param string $ownershipType
+     * @param int $ownerId
+     */
+    private function hideMenuItemChildren($menuName, $item, $ownershipType, $ownerId)
+    {
+        /** @var ItemInterface $child */
+        foreach ($item->getChildren() as $child) {
+            $update = $this->getMenuUpdateByKeyAndScope($menuName, $child->getName(), $ownershipType, $ownerId);
+            $update->setActive(false);
+            $this->getEntityManager()->persist($update);
+
+            $this->hideMenuItemChildren($menuName, $child, $ownershipType, $ownerId);
+        }
     }
 
     /**
@@ -225,6 +318,8 @@ class MenuUpdateManager
 
         if ($item) {
             MenuUpdateUtils::updateMenuUpdate($update, $item, $menuName);
+        } else {
+            $update->setCustom(true);
         }
 
         return $update;

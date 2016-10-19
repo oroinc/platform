@@ -63,11 +63,14 @@ class MenuUpdateBuilder implements BuilderInterface
             $options[self::OWNERSHIP_TYPE_OPTION] : null;
         $area = $menu->getExtra('area', ConfigurationBuilder::DEFAULT_AREA);
         $menuName = $menu->getName();
-        foreach ($this->getUpdates($area, $menuName, $ownershipType) as $update) {
+        $updates = $this->getUpdates($area, $menuName, $ownershipType);
+        foreach ($updates as $update) {
             if ($update->getMenu() == $menuName) {
                 MenuUpdateUtils::updateMenuItem($update, $menu, $this->localizationHelper);
             }
         }
+
+        $this->applyDivider($menu);
 
         /** @var ItemInterface $item */
         foreach ($menu->getChildren() as $item) {
@@ -132,9 +135,9 @@ class MenuUpdateBuilder implements BuilderInterface
      * Return ordered list of ownership providers started by $ownershipType
      * @param string      $area
      * @param string|null $ownershipType
-     * @return \Oro\Bundle\NavigationBundle\Menu\Provider\OwnershipProviderInterface[]
+     * @return OwnershipProviderInterface[]
      */
-    protected function getProviders($area, $ownershipType = null)
+    private function getProviders($area, $ownershipType = null)
     {
         if (!isset($this->providers[$area])) {
             return [];
@@ -161,4 +164,18 @@ class MenuUpdateBuilder implements BuilderInterface
         return $result;
     }
 
+    /**
+     * @param ItemInterface $item
+     */
+    private function applyDivider(ItemInterface $item)
+    {
+        if ($item->getExtra('divider', false)) {
+            $class = trim(sprintf("%s %s", $item->getAttribute('class', ''), 'divider'));
+            $item->setAttribute('class', $class);
+        }
+
+        foreach ($item->getChildren() as $child) {
+            $this->applyDivider($child);
+        }
+    }
 }

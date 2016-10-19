@@ -5,10 +5,13 @@ namespace Oro\Bundle\NavigationBundle\Entity;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
+use Oro\Bundle\LocaleBundle\Entity\FallbackTrait;
 use Oro\Bundle\LocaleBundle\Entity\LocalizedFallbackValue;
 
 trait MenuUpdateTrait
 {
+    use FallbackTrait;
+
     /**
      * @var int
      *
@@ -42,6 +45,17 @@ trait MenuUpdateTrait
      * )
      */
     protected $titles;
+
+    /**
+     * @var Collection|LocalizedFallbackValue[]
+     *
+     * @ORM\ManyToMany(
+     *      targetEntity="Oro\Bundle\LocaleBundle\Entity\LocalizedFallbackValue",
+     *      cascade={"ALL"},
+     *      orphanRemoval=true
+     * )
+     */
+    protected $descriptions;
 
     /**
      * @var string
@@ -87,15 +101,17 @@ trait MenuUpdateTrait
 
     /**
      * @var boolean
-     */
-    protected $existsInNavigationYml = false;
-
-    /**
-     * @var boolean
      *
      * @ORM\Column(name="is_divider", type="boolean")
      */
     protected $divider = false;
+
+    /**
+     * @var boolean
+     *
+     * @ORM\Column(name="is_custom", type="boolean")
+     */
+    protected $custom = false;
 
     /**
      * @return int
@@ -176,6 +192,63 @@ trait MenuUpdateTrait
     {
         if ($this->titles->contains($title)) {
             $this->titles->removeElement($title);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|LocalizedFallbackValue[]
+     */
+    public function getDescriptions()
+    {
+        return $this->descriptions;
+    }
+
+    /**
+     * @param string $value
+     * @return MenuUpdateInterface
+     */
+    public function setDefaultDescription($value)
+    {
+        $oldValue = $this->getLocalizedFallbackValue($this->descriptions);
+
+        if ($oldValue && $this->descriptions->contains($oldValue)) {
+            $this->descriptions->removeElement($oldValue);
+        }
+        $newValue = new LocalizedFallbackValue();
+        $newValue->setText($value);
+
+        if (!$this->descriptions->contains($newValue)) {
+            $this->descriptions->add($newValue);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param LocalizedFallbackValue $description
+     *
+     * @return MenuUpdateInterface
+     */
+    public function addDescription(LocalizedFallbackValue $description)
+    {
+        if (!$this->descriptions->contains($description)) {
+            $this->descriptions->add($description);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param LocalizedFallbackValue $description
+     *
+     * @return MenuUpdateInterface
+     */
+    public function removeDescription(LocalizedFallbackValue $description)
+    {
+        if ($this->descriptions->contains($description)) {
+            $this->descriptions->removeElement($description);
         }
 
         return $this;
@@ -304,26 +377,6 @@ trait MenuUpdateTrait
     /**
      * @return boolean
      */
-    public function isExistsInNavigationYml()
-    {
-        return $this->existsInNavigationYml;
-    }
-
-    /**
-     * @param boolean $existsInNavigationYml
-     *
-     * @return MenuUpdateInterface
-     */
-    public function setExistsInNavigationYml($existsInNavigationYml)
-    {
-        $this->existsInNavigationYml = $existsInNavigationYml;
-
-        return $this;
-    }
-
-    /**
-     * @return boolean
-     */
     public function isDivider()
     {
         return $this->divider;
@@ -337,6 +390,44 @@ trait MenuUpdateTrait
     public function setDivider($divider)
     {
         $this->divider = $divider;
+
+        return $this;
+    }
+
+    /**
+     * @ORM\PrePersist
+     */
+    public function prePersist()
+    {
+        if ($this->key === null) {
+            $this->key = $this->generateKey();
+        }
+    }
+
+    /**
+     * @return string
+     */
+    private function generateKey()
+    {
+        return uniqid('menu_item_');
+    }
+
+    /**
+     * @return boolean
+     */
+    public function isCustom()
+    {
+        return $this->custom;
+    }
+
+    /**
+     * @param boolean $custom
+     *
+     * @return MenuUpdateInterface
+     */
+    public function setCustom($custom)
+    {
+        $this->custom = $custom;
 
         return $this;
     }

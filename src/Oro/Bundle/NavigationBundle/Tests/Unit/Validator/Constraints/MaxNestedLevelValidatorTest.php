@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\NavigationBundle\Tests\Unit\Validator\Constraints;
 
-use Oro\Bundle\FrontendNavigationBundle\Tests\Unit\Entity\Stub\MenuUpdateStub;
+use Oro\Bundle\CommerceMenuBundle\Tests\Unit\Entity\Stub\MenuUpdateStub;
 use Oro\Bundle\LocaleBundle\Helper\LocalizationHelper;
 use Oro\Bundle\NavigationBundle\Provider\BuilderChainProvider;
 use Oro\Bundle\NavigationBundle\Tests\Unit\MenuItemTestTrait;
@@ -93,6 +93,7 @@ class MaxNestedLevelValidatorTest extends \PHPUnit_Framework_TestCase
         $update->setKey('item-1-1-1-1');
         $update->setParentKey('item-1-1-1');
         $update->setUri('#');
+        $update->setCustom(true);
 
         $this->builderChainProvider
             ->expects($this->once())

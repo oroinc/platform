@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\ApiBundle\Tests\Unit\Form;
+namespace Oro\Bundle\ApiBundle\Tests\Unit\Form\Type;
 
 use Symfony\Component\Form\Test\TypeTestCase;
 

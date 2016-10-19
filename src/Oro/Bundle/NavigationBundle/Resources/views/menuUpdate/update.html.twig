@@ -10,16 +10,6 @@
 {% endif %}
 
 {% block navButtons %}
-    {% if entity.existsInNavigationYml == true or entity.id is not null %}
-        {{ UI.deleteButton({
-            'dataUrl': path('oro_api_delete_menuupdates', {ownershipType: ownershipType, menuName: entity.menu, key: entity.key}),
-            'dataRedirect': menuViewPath,
-            'aCss': 'no-hash remove-button',
-            'id': 'btn-remove-attribute',
-            'entity_label': 'oro.navigation.menuupdate.entity_label'|trans,
-        }) }}
-    {% endif %}
-
     {% if entity.isDivider == false or entity.id is null %}
         {% set html = UI.saveAndStayButton({
             'action': menuUpdatePath
@@ -32,8 +22,54 @@
         {{ UI.dropdownSaveButton({'html': html}) }}
     {% endif %}
 
-    {% if entity.isDivider == false and (entity.existsInNavigationYml or entity.id is not null) %}
-        {{ UI.buttonSeparator() }}
+    {% if entity.isDivider == false and (not entity.isCustom or entity.id is not null) %}
+        {% if entity.key %}
+            {% if entity.isCustom and entity.id is not null %}
+                {#Delete button #}
+                {{ UI.deleteButton({
+                    'label': 'oro.navigation.menuupdate.delete'|trans(),
+                    'dataUrl': path('oro_api_delete_menuupdates', {ownershipType: ownershipType, menuName: menuName, key: app.request.get('key')}),
+                    'dataRedirect': path(routePrefix ~ 'view', {menuName: menuName}),
+                    'aCss': 'no-hash remove-button',
+                    'id': 'btn-remove-attribute',
+                    'entity_label': 'oro.navigation.menuupdate.entity_label'|trans,
+                }) }}
+            {% else %}
+                {% if menuItem.displayed %}
+                    {# Hide button #}
+                    <div class="pull-right btn-group icons-holder">
+                        {{ UI.link({
+                            'label': 'oro.navigation.menuupdate.hide'|trans(),
+                            'title': 'oro.navigation.menuupdate.hide'|trans(),
+                            'data': {
+                                'method': 'PUT',
+                                'url': path('oro_api_hide_menuupdates', {ownershipType: ownershipType, menuName: menuName, key: app.request.get('key')}),
+                                'successMessage': 'oro.navigation.menuupdate.hide_success_message'|trans()
+                            },
+                            'aCss': 'no-hash btn icons-holder-text menu-visibility-toggle-button',
+                            'iCss': 'icon-eye-close',
+                            'path': 'javascript:void(0);'
+                        }) }}
+                    </div>
+                {% else %}
+                    {# Show button #}
+                    <div class="pull-right btn-group icons-holder">
+                        {{ UI.link({
+                            'label': 'oro.navigation.menuupdate.show'|trans(),
+                            'title': 'oro.navigation.menuupdate.show'|trans(),
+                            'data': {
+                                'method': 'PUT',
+                                'url': path('oro_api_show_menuupdates', {ownershipType: ownershipType, menuName: menuName, key: app.request.get('key')}),
+                                'successMessage': 'oro.navigation.menuupdate.show_success_message'|trans()
+                            },
+                            'aCss': 'no-hash btn icons-holder-text menu-visibility-toggle-button',
+                            'iCss': 'icon-eye-open',
+                            'path': 'javascript:void(0);'
+                        }) }}
+                    </div>
+                {% endif %}
+            {% endif %}
+        {% endif %}
 
         {% set html = UI.button({
             'path' : menuCreatePath,
@@ -60,6 +96,8 @@
         } %}
 
         {{ UI.pinnedDropdownButton(parameters) }}
+
+        {{ UI.buttonSeparator() }}
     {% endif %}
 {% endblock navButtons %}
 
@@ -76,8 +114,9 @@
                     'title': '',
                     'data': [
                         form_row(form.titles),
-                        form_row(form.uri),
-                        form_row(form.active)
+                        form.uri is defined ? form_row(form.uri) : null,
+                        form.aclResourceId is defined ? form_row(form.aclResourceId) : null,
+                        form_row(form.descriptions)
                     ]
                 }
             ]
@@ -125,4 +164,7 @@
     <div class="menuitem-data">
         {{ parent() }}
     </div>
+    <script type="text/javascript">
+        require(['oronavigation/js/init-layout']);
+    </script>
 {% endblock content_data %}

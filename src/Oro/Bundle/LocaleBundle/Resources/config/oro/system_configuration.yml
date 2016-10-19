@@ -175,7 +175,6 @@ system_configuration:
                                             - oro_locale.country
                                             - oro_locale.format_address_by_address_country
                                             - oro_locale.timezone
-                                            - oro_locale.currency
                                             - oro_locale.quarter_start
                                     map_settings:
                                         priority: 50
@@ -209,7 +208,6 @@ system_configuration:
                                             - oro_locale.country
                                             - oro_locale.format_address_by_address_country
                                             - oro_locale.timezone
-                                            - oro_locale.currency
                                     map_settings:
                                         priority: 50
                                         children:

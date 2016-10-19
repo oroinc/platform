@@ -32,8 +32,31 @@ use Oro\Bundle\NavigationBundle\Model\ExtendMenuUpdate;
  *                  )
  *              }
  *          )
+ *      ),
+ *      @ORM\AssociationOverride(
+ *          name="descriptions",
+ *          joinTable=@ORM\JoinTable(
+ *              name="oro_navigation_menu_upd_descr",
+ *              joinColumns={
+ *                  @ORM\JoinColumn(
+ *                      name="menu_update_id",
+ *                      referencedColumnName="id",
+ *                      onDelete="CASCADE"
+ *                  )
+ *              },
+ *              inverseJoinColumns={
+ *                  @ORM\JoinColumn(
+ *                      name="localized_value_id",
+ *                      referencedColumnName="id",
+ *                      onDelete="CASCADE",
+ *                      unique=true
+ *                  )
+ *              }
+ *          )
  *      )
  * })
+ * @ORM\HasLifecycleCallbacks
+ *
  * @Config(
  *      routeName="oro_navigation_menu_update_index",
  *      defaultValues={
@@ -56,6 +79,7 @@ class MenuUpdate extends ExtendMenuUpdate implements
         parent::__construct();
 
         $this->titles = new ArrayCollection();
+        $this->descriptions = new ArrayCollection();
     }
 
     /**
@@ -64,7 +88,6 @@ class MenuUpdate extends ExtendMenuUpdate implements
     public function getExtras()
     {
         $extras = [
-            'existsInNavigationYml' => $this->isExistsInNavigationYml(),
             'divider' => $this->isDivider()
         ];
 

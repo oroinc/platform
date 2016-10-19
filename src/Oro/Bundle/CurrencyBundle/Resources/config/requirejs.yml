@@ -1,0 +1,5 @@
+config:
+    paths:
+        'orocurrency/js/app/views/multicurrency-control-view': 'orocurrency/js/app/views/multicurrency-control-view.js'
+        'orocurrency/js/app/views/editor/multi-currency-editor-view': 'orocurrency/js/app/views/editor/multi-currency-editor-view.js'
+        'oro/datagrid/cell/multi-currency-cell': 'orocurrency/js/datagrid/cell/multi-currency-cell.js'

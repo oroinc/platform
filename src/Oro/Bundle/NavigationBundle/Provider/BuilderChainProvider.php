@@ -2,16 +2,14 @@
 
 namespace Oro\Bundle\NavigationBundle\Provider;
 
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-
 use Doctrine\Common\Cache\CacheProvider;
 
 use Knp\Menu\FactoryInterface;
 use Knp\Menu\ItemInterface;
-use Knp\Menu\MenuItem;
+use Knp\Menu\Loader\ArrayLoader;
 use Knp\Menu\Provider\MenuProviderInterface;
+use Knp\Menu\Util\MenuManipulator;
 
-use Oro\Bundle\NavigationBundle\Event\ConfigureMenuEvent;
 use Oro\Bundle\NavigationBundle\Menu\BuilderInterface;
 
 class BuilderChainProvider implements MenuProviderInterface
@@ -22,16 +20,16 @@ class BuilderChainProvider implements MenuProviderInterface
     /**
      * Collection of builders grouped by alias.
      *
-     * @var array
+     * @var BuilderInterface[]
      */
-    protected $builders = array();
+    protected $builders = [];
 
     /**
      * Collection of menus.
      *
-     * @var array
+     * @var ItemInterface[]
      */
-    protected $menus = array();
+    protected $menus = [];
 
     /**
      * @var FactoryInterface
@@ -39,19 +37,29 @@ class BuilderChainProvider implements MenuProviderInterface
     private $factory;
 
     /**
+     * @var ArrayLoader
+     */
+    private $loader;
+
+    /**
+     * @var MenuManipulator
+     */
+    private $manipulator;
+
+    /**
      * @var CacheProvider
      */
     private $cache;
 
-    /**
-     * @var EventDispatcherInterface
-     */
-    private $eventDispatcher;
 
-    public function __construct(FactoryInterface $factory, EventDispatcherInterface $eventDispatcher)
-    {
+    public function __construct(
+        FactoryInterface $factory,
+        ArrayLoader $loader,
+        MenuManipulator $manipulator
+    ) {
         $this->factory = $factory;
-        $this->eventDispatcher = $eventDispatcher;
+        $this->loader = $loader;
+        $this->manipulator = $manipulator;
     }
 
     /**
@@ -76,8 +84,9 @@ class BuilderChainProvider implements MenuProviderInterface
         $this->assertAlias($alias);
 
         if (!array_key_exists($alias, $this->builders)) {
-            $this->builders[$alias] = array();
+            $this->builders[$alias] = [];
         }
+
         $this->builders[$alias][] = $builder;
     }
 
@@ -88,7 +97,7 @@ class BuilderChainProvider implements MenuProviderInterface
      * @param  array         $options
      * @return ItemInterface
      */
-    public function get($alias, array $options = array())
+    public function get($alias, array $options = [])
     {
         $this->assertAlias($alias);
 
@@ -97,7 +106,7 @@ class BuilderChainProvider implements MenuProviderInterface
         if (!array_key_exists($alias, $this->menus)) {
             if (!$ignoreCache && $this->cache && $this->cache->contains($alias)) {
                 $menuData = $this->cache->fetch($alias);
-                $this->menus[$alias] = $this->factory->createFromArray($menuData);
+                $this->menus[$alias] = $this->loader->load($menuData);
             } else {
                 $menu = $this->factory->createItem($alias);
 
@@ -118,15 +127,10 @@ class BuilderChainProvider implements MenuProviderInterface
 
                 $this->menus[$alias] = $menu;
 
-                $this->eventDispatcher->dispatch(
-                    ConfigureMenuEvent::getEventName($alias),
-                    new ConfigureMenuEvent($this->factory, $menu)
-                );
-
                 $this->sort($menu);
-                $this->applyDivider($menu);
+
                 if ($this->cache) {
-                    $this->cache->save($alias, $menu->toArray());
+                    $this->cache->save($alias, $this->manipulator->toArray($menu));
                 }
             }
         }
@@ -142,8 +146,8 @@ class BuilderChainProvider implements MenuProviderInterface
     protected function sort(ItemInterface $menu)
     {
         if ($menu->hasChildren() && $menu->getDisplayChildren()) {
-            $orderedChildren = array();
-            $unorderedChildren = array();
+            $orderedChildren = [];
+            $unorderedChildren = [];
             $hasOrdering = false;
             $children = $menu->getChildren();
             foreach ($children as &$child) {
@@ -172,7 +176,7 @@ class BuilderChainProvider implements MenuProviderInterface
      * @param  array   $options
      * @return boolean
      */
-    public function has($alias, array $options = array())
+    public function has($alias, array $options = [])
     {
         $this->assertAlias($alias);
 
@@ -189,21 +193,6 @@ class BuilderChainProvider implements MenuProviderInterface
     {
         if (empty($alias)) {
             throw new \InvalidArgumentException('Menu alias was not set.');
-        }
-    }
-
-    /**
-     * @param ItemInterface $item
-     */
-    private function applyDivider(ItemInterface $item)
-    {
-        if ($item->getExtra('divider', false)) {
-            $class = trim(sprintf("%s %s", $item->getAttribute('class', ''), 'divider'));
-            $item->setAttribute('class', $class);
-        }
-
-        foreach ($item->getChildren() as $child) {
-            $this->applyDivider($child);
         }
     }
 }

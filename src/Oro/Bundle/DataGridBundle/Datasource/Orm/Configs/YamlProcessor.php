@@ -19,7 +19,6 @@ class YamlProcessor implements ConfigProcessorInterface
     public function __construct(ManagerRegistry $registry)
     {
         $this->registry = $registry;
-
     }
 
     /**
@@ -31,7 +30,6 @@ class YamlProcessor implements ConfigProcessorInterface
             $queryConfig = $config['query'];
             $converter = new YamlConverter();
             return $converter->parse(['query' => $queryConfig], $this->registry);
-
         } elseif (array_key_exists('entity', $config) && array_key_exists('repository_method', $config)) {
             $entity = $config['entity'];
             $method = $config['repository_method'];
@@ -53,7 +51,6 @@ class YamlProcessor implements ConfigProcessorInterface
             } else {
                 throw new DatasourceException(sprintf('%s has no method %s', get_class($repository), $method));
             }
-
         } else {
             throw new DatasourceException(get_class($this).' expects to be configured with query or repository method');
         }

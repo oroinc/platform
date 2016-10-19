@@ -2,142 +2,206 @@
 
 namespace Oro\Bundle\NavigationBundle\Tests\Functional\Form\Type;
 
-use Doctrine\Common\Collections\Collection;
-use Oro\Bundle\LocaleBundle\Entity\Localization;
+use Doctrine\Common\Persistence\ManagerRegistry;
+use Knp\Menu\ItemInterface;
+use Symfony\Component\Form\PreloadedExtension;
+use Symfony\Component\Validator\Constraint;
+use Symfony\Component\Validator\ConstraintValidatorFactoryInterface;
+use Symfony\Component\Translation\TranslatorInterface;
+
+use Oro\Component\Testing\Unit\FormIntegrationTestCase;
 use Oro\Bundle\LocaleBundle\Entity\LocalizedFallbackValue;
-use Oro\Bundle\LocaleBundle\Model\FallbackType;
+use Oro\Bundle\LocaleBundle\Form\Type\LocalizationCollectionType;
+use Oro\Bundle\LocaleBundle\Form\Type\LocalizedFallbackValueCollectionType;
+use Oro\Bundle\LocaleBundle\Form\Type\LocalizedPropertyType;
+use Oro\Bundle\LocaleBundle\Tests\Unit\Form\Type\Stub\LocalizationCollectionTypeStub;
+use Oro\Bundle\NavigationBundle\Validator\Constraints\MaxNestedLevelValidator;
 use Oro\Bundle\NavigationBundle\Entity\MenuUpdate;
 use Oro\Bundle\NavigationBundle\Form\Type\MenuUpdateType;
-use Symfony\Component\Form\FormFactoryInterface;
-use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
+use Oro\Bundle\LocaleBundle\Form\Type\TranslatedLocalizedFallbackValueCollectionType;
 
-use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
-
-/**
- * @dbIsolation
- */
-class MenuUpdateTypeTest extends WebTestCase
+class MenuUpdateTypeTest extends FormIntegrationTestCase
 {
-    /**
-     * @var FormFactoryInterface
-     */
-    protected $formFactory;
+    const TEST_TITLE = 'Test Title';
+    const TEST_URI = 'http://test_uri';
+    const TEST_ACL_RESCOURCE_ID = 'test_acl_rescource_id';
 
     /**
-     * @var CsrfTokenManagerInterface
+     * {@inheritdoc}
      */
-    protected $tokenManager;
-
-    protected function setUp()
+    protected function getExtensions()
     {
-        $this->initClient();
-        $this->loadFixtures(['Oro\Bundle\CatalogBundle\Tests\Functional\DataFixtures\LoadCategoryProductData']);
 
-        $this->formFactory = $this->getContainer()->get('form.factory');
-        $this->tokenManager = $this->getContainer()->get('security.csrf.token_manager');
-    }
+        $registry = $this->getMock(ManagerRegistry::class);
 
-    /**
-     * @dataProvider submitProvider
-     *
-     * @param array $submitData
-     * @param bool $expectedFormIsValid
-     * @param bool $doAssertEntity
-     */
-    public function testSubmit($submitData, $expectedFormIsValid, $doAssertEntity)
-    {
-        $doctrine = $this->getContainer()->get('doctrine');
-        $localizationRepository = $doctrine->getRepository('OroLocaleBundle:Localization');
+        $translator = $this->getMock(TranslatorInterface::class);
 
-        /** @var Localization[] $localizations */
-        $localizations = $localizationRepository->findAll();
-
-        $submitData = array_merge_recursive(
-            ['_token' => $this->tokenManager->getToken(MenuUpdateType::NAME)->getValue()],
-            $submitData
-        );
-
-        foreach ($localizations as $localization) {
-            $localizationId = $localization->getId();
-            $submitData['titles']['values']['localizations'][$localizationId] = [
-                'use_fallback' => true,
-                'fallback' => FallbackType::SYSTEM
-            ];
-        }
-
-        $form = $this->formFactory->create(MenuUpdateType::NAME, new MenuUpdate());
-        $form->submit($submitData);
-        $this->assertEquals($expectedFormIsValid, $form->isValid());
-
-        if ($doAssertEntity) {
-            /** @var MenuUpdate $menuUpdate */
-            $menuUpdate = $form->getData();
-            $this->assertInstanceOf('Oro\Bundle\NavigationBundle\Entity\MenuUpdate', $menuUpdate);
-            $this->assertEquals($submitData['titles']['values']['default'], (string)$menuUpdate->getDefaultTitle());
-            $this->assertEquals($submitData['uri'], $menuUpdate->getUri());
-
-            foreach ($localizations as $localization) {
-                $this->assertLocalization($localization, $menuUpdate);
-            }
-        }
-    }
-
-    public function submitProvider()
-    {
         return [
-            'update' => [
-                'submitData' => [
-                    'titles' => ['values' => ['default' => 'Item Title']],
-                    'uri'    => '/some/path',
+            new PreloadedExtension(
+                [
+                    TranslatedLocalizedFallbackValueCollectionType::NAME => new TranslatedLocalizedFallbackValueCollectionType(
+                        $translator
+                    ),
+                    LocalizedFallbackValueCollectionType::NAME => new LocalizedFallbackValueCollectionType($registry),
+                    LocalizedPropertyType::NAME => new LocalizedPropertyType(),
+                    LocalizationCollectionType::NAME => new LocalizationCollectionTypeStub(),
                 ],
-                'expectedFormIsValid' => true,
-                'doAssertEntity' => true,
-            ],
-            'update without titles should fail' => [
-                'submitData' => [
-                    'titles' => null,
-                    'uri'    => '/some/path',
-                ],
-                'expectedFormIsValid' => false,
-                'doAssertEntity' => false,
-            ],
-            'update without uri should fail' => [
-                'submitData' => [
-                    'titles' => ['values' => ['default' => 'Item Title']],
-                    'uri'    => null,
-                ],
-                'expectedFormIsValid' => false,
-                'doAssertEntity' => false,
-            ],
+                []
+            ),
+            $this->getValidatorExtension(true)
         ];
     }
 
-    /**
-     * @param Collection|LocalizedFallbackValue[] $values
-     * @param Localization $localization
-     * @return LocalizedFallbackValue|null
-     */
-    protected function getValueByLocalization($values, Localization $localization)
+    public function testSubmitValid()
     {
-        $localizationId = $localization->getId();
-        foreach ($values as $value) {
-            if ($value->getLocalization()->getId() == $localizationId) {
-                return $value;
-            }
-        }
+        $menuUpdate = new MenuUpdate();
+        $form = $this->factory->create(new MenuUpdateType(), $menuUpdate);
 
-        return null;
+        $form->submit(
+            [
+                'titles' => [
+                    'values' => [
+                        'default' => self::TEST_TITLE
+                    ]
+                ]
+            ]
+        );
+
+        $expected = new MenuUpdate();
+        $expectedTitle = (new LocalizedFallbackValue)->setString(self::TEST_TITLE);
+        $expected->addTitle($expectedTitle);
+
+        $expected->addDescription(new LocalizedFallbackValue);
+
+        $this->assertFormOptionEqual(true, 'disabled', $form->get('uri'));
+        $this->assertFormNotContainsField('aclResourceId', $form);
+
+        $this->assertFormIsValid($form);
+        $this->assertEquals($expected, $form->getData());
+    }
+
+    public function testSubmitIsCustom()
+    {
+        $menuUpdate = new MenuUpdate();
+        $menuUpdate->setCustom(true);
+
+        $form = $this->factory->create(new MenuUpdateType(), $menuUpdate);
+
+        $form->submit(
+            [
+                'titles' => [
+                    'values' => [
+                        'default' => self::TEST_TITLE
+                    ]
+                ],
+                'uri' => self::TEST_URI
+            ]
+        );
+
+        $expected = new MenuUpdate();
+        $expectedTitle = (new LocalizedFallbackValue)->setString(self::TEST_TITLE);
+        $expected
+            ->setCustom(true)
+            ->addTitle($expectedTitle)
+            ->addDescription(new LocalizedFallbackValue)
+            ->setUri(self::TEST_URI);
+
+        $this->assertFormIsValid($form);
+        $this->assertEquals($expected, $form->getData());
+    }
+
+    public function testSubmitEmptyTitle()
+    {
+        $menuUpdate = new MenuUpdate();
+        $form = $this->factory->create(new MenuUpdateType(), $menuUpdate);
+
+        $form->submit([]);
+
+        $expected = new MenuUpdate();
+        $expectedTitle = (new LocalizedFallbackValue);
+        $expected->addTitle($expectedTitle);
+        $expected->addDescription(new LocalizedFallbackValue);
+
+        $this->assertFormIsNotValid($form);
+        $this->assertEquals($expected, $form->getData());
+    }
+
+    public function testSubmitCustomWithEmptyUri()
+    {
+        $menuUpdate = new MenuUpdate();
+        $menuUpdate->setCustom(true);
+        $form = $this->factory->create(new MenuUpdateType(), $menuUpdate);
+
+        $form->submit(
+            [
+                'titles' => [
+                    'values' => [
+                        'default' => self::TEST_TITLE
+                    ]
+                ],
+            ]
+        );
+
+        $expected = new MenuUpdate();
+        $expectedTitle = (new LocalizedFallbackValue)->setString(self::TEST_TITLE);
+        $expected
+            ->setCustom(true)
+            ->addDescription(new LocalizedFallbackValue)
+            ->addTitle($expectedTitle);
+
+        $this->assertFormIsNotValid($form);
+        $this->assertEquals($expected, $form->getData());
+    }
+
+    public function testAclResourceIdShouldExist()
+    {
+        $menuUpdate = new MenuUpdate();
+        $menuItem = $this->getMock(ItemInterface::class);
+        $menuItem->expects($this->any())
+            ->method('getExtra')
+            ->with('aclResourceId')
+            ->willReturn(self::TEST_ACL_RESCOURCE_ID);
+
+        $form = $this->factory->create(new MenuUpdateType(), $menuUpdate, ['menu_item' => $menuItem]);
+
+        $expected = new MenuUpdate();
+        $expectedTitle = (new LocalizedFallbackValue)->setString(self::TEST_TITLE);
+        $expected->addTitle($expectedTitle);
+        $expected->addDescription(new LocalizedFallbackValue);
+
+        $this->assertFormContainsField('aclResourceId', $form);
+        $this->assertFormOptionEqual(true, 'disabled', $form->get('aclResourceId'));
     }
 
     /**
-     * @param Localization $localization
-     * @param MenuUpdate $menuUpdate
+     * @return \PHPUnit_Framework_MockObject_MockObject|ConstraintValidatorFactoryInterface
      */
-    protected function assertLocalization($localization, $menuUpdate)
+    protected function getConstraintValidatorFactory()
     {
-        $localizedTitle = $this->getValueByLocalization($menuUpdate->getTitles(), $localization);
-        $this->assertNotEmpty($localizedTitle);
-        $this->assertEmpty($localizedTitle->getString());
-        $this->assertEquals(FallbackType::SYSTEM, $localizedTitle->getFallback());
+        /* @var $factory \PHPUnit_Framework_MockObject_MockObject|ConstraintValidatorFactoryInterface */
+        $factory = $this->getMock('Symfony\Component\Validator\ConstraintValidatorFactoryInterface');
+        $factory->expects($this->any())
+            ->method('getInstance')
+            ->willReturnCallback(
+                function (Constraint $constraint) {
+                    $className = $constraint->validatedBy();
+
+                    if ($className === MaxNestedLevelValidator::class) {
+                        $this->validators[$className] = $this->getMockBuilder(MaxNestedLevelValidator::class)
+                            ->disableOriginalConstructor()
+                            ->getMock();
+                    }
+
+                    if (!isset($this->validators[$className]) ||
+                        $className === 'Symfony\Component\Validator\Constraints\CollectionValidator'
+                    ) {
+                        $this->validators[$className] = new $className();
+                    }
+
+                    return $this->validators[$className];
+                }
+            );
+
+        return $factory;
     }
 }

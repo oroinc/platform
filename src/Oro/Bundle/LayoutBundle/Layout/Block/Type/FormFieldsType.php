@@ -10,6 +10,8 @@ use Oro\Component\Layout\BlockView;
 use Oro\Component\Layout\BlockInterface;
 use Oro\Component\Layout\BlockBuilderInterface;
 use Oro\Component\Layout\Block\OptionsResolver\OptionsResolver;
+use Oro\Component\Layout\Block\Type\Options as LayoutOptions;
+use Oro\Component\Layout\Util\BlockUtils;
 
 use Oro\Bundle\LayoutBundle\Layout\Form\ConfigurableFormAccessorInterface;
 use Oro\Bundle\LayoutBundle\Layout\Form\FormLayoutBuilderInterface;
@@ -25,6 +27,8 @@ use Oro\Bundle\LayoutBundle\Layout\Form\FormLayoutBuilderInterface;
 class FormFieldsType extends AbstractFormType
 {
     const NAME = 'form_fields';
+
+    const SHORT_NAME = 'fields';
 
     /** @var FormLayoutBuilderInterface */
     protected $formLayoutBuilder;
@@ -77,22 +81,30 @@ class FormFieldsType extends AbstractFormType
     /**
      * {@inheritdoc}
      */
-    public function buildBlock(BlockBuilderInterface $builder, array $options)
+    public function buildBlock(BlockBuilderInterface $builder, LayoutOptions $options)
     {
-        $formAccessor = $this->getFormAccessor($builder->getContext(), $options);
         if ($options['split_to_fields']) {
+            $formAccessor = $this->getFormAccessor($builder->getContext(), $options);
             $this->formLayoutBuilder->build($formAccessor, $builder, $options);
         }
+    }
+
+
+    /**
+     * {@inheritdoc}
+     */
+    public function buildView(BlockView $view, BlockInterface $block, LayoutOptions $options)
+    {
+        BlockUtils::setViewVarsFromOptions($view, $options, ['form_data', 'split_to_fields']);
+        parent::buildView($view, $block, $options);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function buildView(BlockView $view, BlockInterface $block, array $options)
+    public function finishView(BlockView $view, BlockInterface $block)
     {
-        $view->vars['form_data'] = isset($options['form_data']) ? $options['form_data'] : null;
-
-        $formAccessor = $this->getFormAccessor($block->getContext(), $options);
+        $formAccessor = $this->getFormAccessor($block->getContext(), $view->vars);
         if ($formAccessor instanceof ConfigurableFormAccessorInterface) {
             $formAccessor->setFormData($view->vars['form_data']);
         }
@@ -103,18 +115,9 @@ class FormFieldsType extends AbstractFormType
         $this->setClassPrefixToFormView($formView, $view->vars['class_prefix']);
         $view->vars['form'] = $formView;
 
-        $view->vars['split_to_fields'] = $options['split_to_fields'];
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function finishView(BlockView $view, BlockInterface $block, array $options)
-    {
-        if (!$options['split_to_fields']) {
+        if (!$view->vars['split_to_fields']) {
             return;
         }
-        $formAccessor = $this->getFormAccessor($block->getContext(), $options);
 
         // prevent form fields rendering by form_rest() method,
         // if the corresponding layout block has been removed

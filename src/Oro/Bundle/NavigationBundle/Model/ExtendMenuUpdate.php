@@ -50,4 +50,35 @@ abstract class ExtendMenuUpdate implements
     public function setDefaultTitle($value)
     {
     }
+
+    /**
+     * The real implementation of this method is auto generated.
+     *
+     * @param Localization|null $localization
+     *
+     * @return LocalizedFallbackValue
+     */
+    public function getDescription(Localization $localization = null)
+    {
+    }
+
+    /**
+     * The real implementation of this method is auto generated.
+     *
+     * @return LocalizedFallbackValue
+     */
+    public function getDefaultDescription()
+    {
+    }
+
+    /**
+     * The real implementation of this method is auto generated.
+     *
+     * @param string $value
+     *
+     * @return LocalizedFallbackValue
+     */
+    public function setDefaultDescription($value)
+    {
+    }
 }

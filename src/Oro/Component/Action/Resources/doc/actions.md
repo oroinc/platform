@@ -239,21 +239,21 @@ Find Entity
     conditions:
         # optional condition configuration
     parameters:
-        class: OroCRM\Bundle\SalesBundle\Entity\OpportunityCloseReason
+        class: Oro\Bundle\SalesBundle\Entity\OpportunityCloseReason
         identifier: 'won'
         attribute: $close_reason
 
 OR
 
 - @find_entity:
-    class: OroCRM\Bundle\SalesBundle\Entity\OpportunityCloseReason
+    class: Oro\Bundle\SalesBundle\Entity\OpportunityCloseReason
     identifier: 'won'
     attribute: $close_reason
 
 OR
 
 - @find_entity:
-    class: OroCRM\Bundle\AccountBundle\Entity\Account
+    class: Oro\Bundle\AccountBundle\Entity\Account
     attribute: $account
     where:
         name: $company_name

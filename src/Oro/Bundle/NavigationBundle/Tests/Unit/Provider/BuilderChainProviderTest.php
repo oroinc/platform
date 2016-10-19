@@ -2,6 +2,9 @@
 namespace Oro\Bundle\NavigationBundle\Tests\Unit\Provider;
 
 use Knp\Menu\FactoryInterface;
+use Knp\Menu\Loader\ArrayLoader;
+use Knp\Menu\Util\MenuManipulator;
+
 use Oro\Bundle\NavigationBundle\Tests\Unit\Entity\Stub\MenuItemStub;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Oro\Bundle\NavigationBundle\Provider\BuilderChainProvider;
@@ -20,6 +23,16 @@ class BuilderChainProviderTest extends \PHPUnit_Framework_TestCase
     protected $eventDispatcher;
 
     /**
+     * @var \PHPUnit_Framework_MockObject_MockObject|ArrayLoader
+     */
+    protected $loader;
+
+    /**
+     * @var \PHPUnit_Framework_MockObject_MockObject|MenuManipulator
+     */
+    protected $manipulator;
+
+    /**
      * @var BuilderChainProvider
      */
     protected $provider;
@@ -30,7 +43,19 @@ class BuilderChainProviderTest extends \PHPUnit_Framework_TestCase
             ->getMock();
         $this->eventDispatcher = $this->getMockBuilder('Symfony\Component\EventDispatcher\EventDispatcherInterface')
             ->getMock();
-        $this->provider = new BuilderChainProvider($this->factory, $this->eventDispatcher);
+
+        $this->loader = $this->getMockBuilder('Knp\Menu\Loader\ArrayLoader')
+            ->setConstructorArgs([$this->factory])
+            ->getMock();
+        $this->manipulator = $this->getMockBuilder('Knp\Menu\Util\MenuManipulator')
+            ->getMock();
+
+        $this->provider = new BuilderChainProvider(
+            $this->factory,
+            $this->eventDispatcher,
+            $this->loader,
+            $this->manipulator
+        );
     }
 
     public function testAddBuilder()
@@ -88,7 +113,6 @@ class BuilderChainProviderTest extends \PHPUnit_Framework_TestCase
         $options = [];
 
         $item = new MenuItemStub();
-        $item->setExtra('divider', true);
 
         $menu = new MenuItemStub();
         $menu->addChild($item);
@@ -104,18 +128,10 @@ class BuilderChainProviderTest extends \PHPUnit_Framework_TestCase
             ->with($menu, $options, $menuName);
         $this->provider->addBuilder($builder, $alias);
 
-        $this->eventDispatcher->expects($this->once())
-            ->method('dispatch')
-            ->with(
-                'oro_menu.configure.' . $menuName,
-                $this->isInstanceOf('Oro\Bundle\NavigationBundle\Event\ConfigureMenuEvent')
-            );
-
         $this->assertInstanceOf('Knp\Menu\ItemInterface', $this->provider->get($menuName, $options));
         $this->assertInstanceOf('Knp\Menu\ItemInterface', $this->provider->get($menuName, $options));
 
         $this->assertAttributeCount(1, 'menus', $this->provider);
-        $this->assertEquals('divider', $item->getAttribute('class'));
     }
 
     public function testGetCached()
@@ -140,8 +156,8 @@ class BuilderChainProviderTest extends \PHPUnit_Framework_TestCase
             ->with($alias)
             ->will($this->returnValue($items));
 
-        $this->factory->expects($this->once())
-            ->method('createFromArray')
+        $this->loader->expects($this->once())
+            ->method('load')
             ->with($items)
             ->will($this->returnValue($menu));
 
@@ -151,9 +167,6 @@ class BuilderChainProviderTest extends \PHPUnit_Framework_TestCase
         $builder = $this->getMenuBuilderMock();
         $builder->expects($this->never())
             ->method('build');
-
-        $this->eventDispatcher->expects($this->never())
-            ->method('dispatch');
 
         $this->provider->addBuilder($builder, $alias);
         $this->provider->setCache($cache);
@@ -244,18 +257,14 @@ class BuilderChainProviderTest extends \PHPUnit_Framework_TestCase
     {
         $child = $this->getMockBuilder('Knp\Menu\ItemInterface')
             ->getMock();
-        $child->expects($this->exactly(2))
+        $child->expects($this->exactly(1))
             ->method('getExtra')
             ->will($this->returnValueMap([
-                ['position', null, $position],
-                ['divider', false, false]
+                ['position', null, $position]
             ]));
         $child->expects($this->once())
             ->method('getName')
             ->will($this->returnValue($name));
-        $child->expects($this->once())
-            ->method('getChildren')
-            ->will($this->returnValue([]));
 
         return $child;
     }

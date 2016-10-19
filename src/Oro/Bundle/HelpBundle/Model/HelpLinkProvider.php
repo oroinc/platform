@@ -323,7 +323,6 @@ class HelpLinkProvider
                     unset($rawConfiguration['alias']);
                 }
                 $resultConfig = array_merge($resultConfig, $rawConfiguration);
-
             }
         }
     }

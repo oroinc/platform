@@ -120,6 +120,23 @@ class OperationManager
 
     /**
      * @param string $operationName
+     * @param array $context
+     * @return bool
+     */
+    public function hasOperation($operationName, array $context)
+    {
+        $operation = $this->operationRegistry->findByName($operationName);
+        if (!$operation instanceof Operation) {
+            return false;
+        }
+
+        $actionData = $this->contextHelper->getActionData($context);
+
+        return $operation->isAvailable($actionData);
+    }
+
+    /**
+     * @param string $operationName
      * @param array|null $context
      * @return string
      */

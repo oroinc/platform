@@ -1,0 +1,61 @@
+.inline-editor-wrapper.multi-currency-editor {
+  &.multi-currency-editor__single-currency {
+    min-width: 168px;
+    .inline-editor__fields.input-append>.add-on {
+      min-width: initial;
+      padding-left: 9px;
+      padding-right: 9px;
+      display: inline-block;
+    }
+    .inline-editor__actions {
+      background-color: #fff;
+      border: 1px solid #ddd;
+      border-left-width: 0;
+      padding-left: 3px;
+      left: 100%;
+      right: initial;
+      width: 52px;
+    }
+    .inline-editor__action-item {
+      height: 28px;
+    }
+  }
+  &.multi-currency-editor__multi-currency {
+    min-width: 240px;
+    .inline-editor__fields.input-append>.add-on {
+      display: none;
+    }
+    .select2-choice {
+      padding-right: 52px;
+      .select2-arrow {
+        right: 60px;
+      }
+      &:after {
+        content: '';
+        display: block;
+        position: absolute;
+        height: 100%;
+        width: 1px;
+        background-color: #ddd;
+        right: 52px;
+        top: 0;
+      }
+    }
+    .select2-dropdown-open .select2-choice {
+      &:after {
+        background-color: #aaa;
+      };
+    }
+    .select2-container {
+      border-radius: 0;
+      width: auto;
+    }
+  }
+  .inline-editor__fields {
+    display: flex;
+  }
+  input[name=value] {
+    text-align: right;
+    padding-right: 6px;
+  }
+}

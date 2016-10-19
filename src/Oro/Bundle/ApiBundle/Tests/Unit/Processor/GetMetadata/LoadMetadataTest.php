@@ -12,6 +12,9 @@ use Oro\Bundle\ApiBundle\Metadata\MetaPropertyMetadata;
 use Oro\Bundle\ApiBundle\Model\EntityIdentifier;
 use Oro\Bundle\ApiBundle\Processor\GetMetadata\LoadMetadata;
 
+/**
+ * @SuppressWarnings(PHPMD.ExcessiveClassLength)
+ */
 class LoadMetadataTest extends MetadataProcessorTestCase
 {
     /** @var \PHPUnit_Framework_MockObject_MockObject */
@@ -89,6 +92,7 @@ class LoadMetadataTest extends MetadataProcessorTestCase
      * @param bool     $isCollection
      * @param string   $dataType
      * @param string[] $acceptableTargetClasses
+     * @param bool     $collapsed
      *
      * @return AssociationMetadata
      */
@@ -98,7 +102,8 @@ class LoadMetadataTest extends MetadataProcessorTestCase
         $associationType,
         $isCollection,
         $dataType,
-        array $acceptableTargetClasses
+        array $acceptableTargetClasses,
+        $collapsed = false
     ) {
         $associationMetadata = new AssociationMetadata();
         $associationMetadata->setName($associationName);
@@ -108,6 +113,7 @@ class LoadMetadataTest extends MetadataProcessorTestCase
         $associationMetadata->setDataType($dataType);
         $associationMetadata->setAcceptableTargetClassNames($acceptableTargetClasses);
         $associationMetadata->setIsNullable(true);
+        $associationMetadata->setCollapsed($collapsed);
 
         return $associationMetadata;
     }
@@ -156,8 +162,7 @@ class LoadMetadataTest extends MetadataProcessorTestCase
                     'exclude'   => true
                 ],
                 'field3'        => [
-                    'data_type'     => 'string',
-                    'property_path' => 'realField3'
+                    'data_type' => 'string',
                 ],
                 'metaProperty1' => [
                     'meta_property' => true,
@@ -167,11 +172,6 @@ class LoadMetadataTest extends MetadataProcessorTestCase
                     'meta_property' => true,
                     'data_type'     => 'string',
                     'exclude'       => true
-                ],
-                'metaProperty3' => [
-                    'meta_property' => true,
-                    'data_type'     => 'string',
-                    'property_path' => 'realMetaProperty3'
                 ],
                 'association1'  => [
                     'target_class'           => 'Test\Association1Target',
@@ -205,7 +205,6 @@ class LoadMetadataTest extends MetadataProcessorTestCase
         $expectedMetadata->addField($this->createFieldMetadata('field1', 'integer'))->setIsNullable(false);
         $expectedMetadata->addField($this->createFieldMetadata('field3', 'string'))->setIsNullable(true);
         $expectedMetadata->addMetaProperty($this->createMetaPropertyMetadata('metaProperty1', 'integer'));
-        $expectedMetadata->addMetaProperty($this->createMetaPropertyMetadata('metaProperty3', 'string'));
         $expectedMetadata->addAssociation(
             $this->createAssociationMetadata(
                 'association1',
@@ -214,6 +213,179 @@ class LoadMetadataTest extends MetadataProcessorTestCase
                 false,
                 'integer',
                 ['Test\Association1Target']
+            )
+        );
+
+        $this->assertEquals($expectedMetadata, $this->context->getResult());
+    }
+
+    /**
+     * @dataProvider processForRenamedPropertiesProvider
+     */
+    public function testProcessForNotManageableEntityForRenamedProperties($targetAction, $propertyPathPrefix)
+    {
+        $config = [
+            'exclusion_policy'       => 'all',
+            'identifier_field_names' => ['id'],
+            'fields'                 => [
+                'id'            => [
+                    'data_type' => 'integer'
+                ],
+                'field1'        => [
+                    'data_type'     => 'string',
+                    'property_path' => 'realField1',
+                    'form_options'  => ['property_path' => 'formField1']
+                ],
+                'metaProperty1' => [
+                    'meta_property' => true,
+                    'data_type'     => 'string',
+                    'property_path' => 'realMetaProperty1',
+                    'form_options'  => ['property_path' => 'formMetaProperty1']
+                ],
+                'association1'  => [
+                    'property_path'          => 'realAssociation1',
+                    'form_options'           => ['property_path' => 'formAssociation1'],
+                    'target_class'           => 'Test\Association1Target',
+                    'identifier_field_names' => ['id'],
+                    'fields'                 => [
+                        'id' => [
+                            'data_type' => 'integer'
+                        ]
+                    ]
+                ],
+            ]
+        ];
+
+        $this->doctrineHelper->expects($this->once())
+            ->method('isManageableEntityClass')
+            ->with(self::TEST_CLASS_NAME)
+            ->willReturn(false);
+
+        $this->context->setTargetAction($targetAction);
+        $this->context->setConfig($this->createConfigObject($config));
+        $this->processor->process($this->context);
+
+        $this->assertNotNull($this->context->getResult());
+
+        $expectedMetadata = new EntityMetadata();
+        $expectedMetadata->setClassName(self::TEST_CLASS_NAME);
+        $expectedMetadata->setIdentifierFieldNames(['id']);
+        $expectedMetadata->addField($this->createFieldMetadata('id', 'integer'))->setIsNullable(false);
+        $expectedField1 = $expectedMetadata->addField($this->createFieldMetadata('field1', 'string'));
+        $expectedField1->setPropertyPath($propertyPathPrefix . 'Field1');
+        $expectedField1->setIsNullable(true);
+        $expectedMetaProperty1 = $expectedMetadata->addMetaProperty(
+            $this->createMetaPropertyMetadata('metaProperty1', 'string')
+        );
+        $expectedMetaProperty1->setPropertyPath($propertyPathPrefix . 'MetaProperty1');
+        $expectedAssociation1 = $expectedMetadata->addAssociation(
+            $this->createAssociationMetadata(
+                'association1',
+                'Test\Association1Target',
+                'manyToOne',
+                false,
+                'integer',
+                ['Test\Association1Target']
+            )
+        );
+        $expectedAssociation1->setPropertyPath($propertyPathPrefix . 'Association1');
+
+        $this->assertEquals($expectedMetadata, $this->context->getResult());
+    }
+
+    public function processForRenamedPropertiesProvider()
+    {
+        return [
+            'get action'    => ['get', 'real'],
+            'create action' => ['create', 'form'],
+            'update action' => ['update', 'form'],
+        ];
+    }
+
+    public function testProcessForNotManageableEntityWithExcludedProperties()
+    {
+        $config = [
+            'exclusion_policy'       => 'all',
+            'identifier_field_names' => ['field1'],
+            'fields'                 => [
+                'field1' => [
+                    'data_type' => 'string'
+                ],
+                'field2' => [
+                    'data_type' => 'string',
+                    'exclude'   => true
+                ],
+            ]
+        ];
+
+        $this->doctrineHelper->expects($this->once())
+            ->method('isManageableEntityClass')
+            ->with(self::TEST_CLASS_NAME)
+            ->willReturn(false);
+
+        $this->context->setConfig($this->createConfigObject($config));
+        $this->context->setWithExcludedProperties(true);
+        $this->processor->process($this->context);
+
+        $this->assertNotNull($this->context->getResult());
+
+        $expectedMetadata = new EntityMetadata();
+        $expectedMetadata->setClassName(self::TEST_CLASS_NAME);
+        $expectedMetadata->setIdentifierFieldNames(['field1']);
+        $expectedMetadata->addField($this->createFieldMetadata('field1', 'string'))->setIsNullable(false);
+        $expectedMetadata->addField($this->createFieldMetadata('field2', 'string'))->setIsNullable(true);
+
+        $this->assertEquals($expectedMetadata, $this->context->getResult());
+    }
+
+    public function testProcessCollapsedArrayAssociationForNotManageableEntity()
+    {
+        $config = [
+            'exclusion_policy'       => 'all',
+            'identifier_field_names' => ['field1'],
+            'fields'                 => [
+                'field1'       => [
+                    'data_type' => 'integer'
+                ],
+                'association1' => [
+                    'data_type'              => 'array',
+                    'exclusion_policy'       => 'all',
+                    'collapsed'              => true,
+                    'target_class'           => 'Test\Association1Target',
+                    'target_type'            => 'to-many',
+                    'identifier_field_names' => ['id'],
+                    'fields'                 => [
+                        'name' => [
+                            'data_type' => 'string'
+                        ]
+                    ]
+                ],
+            ]
+        ];
+
+        $this->doctrineHelper->expects($this->once())
+            ->method('isManageableEntityClass')
+            ->with(self::TEST_CLASS_NAME)
+            ->willReturn(false);
+
+        $this->context->setConfig($this->createConfigObject($config));
+        $this->processor->process($this->context);
+
+        $this->assertNotNull($this->context->getResult());
+
+        $expectedMetadata = new EntityMetadata();
+        $expectedMetadata->setClassName(self::TEST_CLASS_NAME);
+        $expectedMetadata->setIdentifierFieldNames(['field1']);
+        $expectedMetadata->addField($this->createFieldMetadata('field1', 'integer'))->setIsNullable(false);
+        $expectedMetadata->addAssociation(
+            $this->createAssociationMetadata(
+                'association1',
+                'Test\Association1Target',
+                'manyToMany',
+                true,
+                'array',
+                ['Test\Association1Target'],
+                true
             )
         );
 
@@ -232,9 +404,7 @@ class LoadMetadataTest extends MetadataProcessorTestCase
                 'field2'        => [
                     'exclude' => true
                 ],
-                'field3'        => [
-                    'property_path' => 'realField3'
-                ],
+                'field3'        => null,
                 'metaProperty1' => [
                     'meta_property' => true
                 ],
@@ -242,17 +412,11 @@ class LoadMetadataTest extends MetadataProcessorTestCase
                     'meta_property' => true,
                     'exclude'       => true
                 ],
-                'metaProperty3' => [
-                    'meta_property' => true,
-                    'property_path' => 'realMetaProperty3'
-                ],
                 'association1'  => null,
                 'association2'  => [
                     'exclude' => true
                 ],
-                'association3'  => [
-                    'property_path' => 'realAssociation3'
-                ],
+                'association3'  => null,
             ]
         ];
 
@@ -270,20 +434,18 @@ class LoadMetadataTest extends MetadataProcessorTestCase
                 [
                     'field1',
                     'field2',
-                    'realField3',
+                    'field3',
                     'metaProperty1',
                     'metaProperty2',
-                    'realMetaProperty3',
                 ]
             );
-        $classMetadata->expects($this->exactly(4))
+        $classMetadata->expects($this->exactly(3))
             ->method('getTypeOfField')
             ->willReturnMap(
                 [
                     ['field1', 'integer'],
-                    ['realField3', 'string'],
+                    ['field3', 'string'],
                     ['metaProperty1', 'integer'],
-                    ['realMetaProperty3', 'string'],
                 ]
             );
         $classMetadata->expects($this->once())
@@ -292,7 +454,7 @@ class LoadMetadataTest extends MetadataProcessorTestCase
                 [
                     'association1',
                     'association2',
-                    'realAssociation3',
+                    'association3',
                 ]
             );
         $classMetadata->expects($this->exactly(2))
@@ -300,7 +462,7 @@ class LoadMetadataTest extends MetadataProcessorTestCase
             ->willReturnMap(
                 [
                     ['association1', 'Test\Association1Target'],
-                    ['realAssociation3', 'Test\Association3Target'],
+                    ['association3', 'Test\Association3Target'],
                 ]
             );
         $classMetadata->expects($this->exactly(2))
@@ -308,7 +470,7 @@ class LoadMetadataTest extends MetadataProcessorTestCase
             ->willReturnMap(
                 [
                     ['association1', false],
-                    ['realAssociation3', true],
+                    ['association3', true],
                 ]
             );
         $classMetadata->expects($this->exactly(2))
@@ -316,7 +478,7 @@ class LoadMetadataTest extends MetadataProcessorTestCase
             ->willReturnMap(
                 [
                     ['association1', ['type' => ClassMetadata::MANY_TO_ONE]],
-                    ['realAssociation3', ['type' => ClassMetadata::MANY_TO_MANY]],
+                    ['association3', ['type' => ClassMetadata::MANY_TO_MANY]],
                 ]
             );
 
@@ -368,7 +530,6 @@ class LoadMetadataTest extends MetadataProcessorTestCase
         $expectedMetadata->addField($this->createFieldMetadata('field1', 'integer'));
         $expectedMetadata->addField($this->createFieldMetadata('field3', 'string'));
         $expectedMetadata->addMetaProperty($this->createMetaPropertyMetadata('metaProperty1', 'integer'));
-        $expectedMetadata->addMetaProperty($this->createMetaPropertyMetadata('metaProperty3', 'string'));
         $expectedMetadata->addAssociation(
             $this->createAssociationMetadata(
                 'association1',
@@ -389,6 +550,218 @@ class LoadMetadataTest extends MetadataProcessorTestCase
                 ['Test\Association3Target1', 'Test\Association3Target2']
             )
         );
+
+        $this->assertEquals($expectedMetadata, $this->context->getResult());
+    }
+
+    /**
+     * @dataProvider processForRenamedPropertiesProvider
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
+     */
+    public function testProcessForManageableEntityForRenamedProperties($targetAction, $propertyPathPrefix)
+    {
+        $config = [
+            'exclusion_policy' => 'all',
+            'fields'           => [
+                'id'            => null,
+                'field1'        => [
+                    'property_path' => 'realField1',
+                    'form_options'  => ['property_path' => 'formField1']
+                ],
+                'metaProperty1' => [
+                    'meta_property' => true,
+                    'property_path' => 'realMetaProperty1',
+                    'form_options'  => ['property_path' => 'formMetaProperty1']
+                ],
+                'association1'  => [
+                    'property_path' => 'realAssociation1',
+                    'form_options'  => ['property_path' => 'formAssociation1']
+                ],
+            ]
+        ];
+
+        $classMetadata = $this->getClassMetadataMock(self::TEST_CLASS_NAME);
+        $classMetadata->expects($this->once())
+            ->method('getIdentifierFieldNames')
+            ->willReturn(['id']);
+        $classMetadata->expects($this->once())
+            ->method('usesIdGenerator')
+            ->willReturn(false);
+
+        $classMetadata->expects($this->once())
+            ->method('getFieldNames')
+            ->willReturn(
+                [
+                    'realField1',
+                    'realMetaProperty1',
+                ]
+            );
+        $classMetadata->expects($this->exactly(2))
+            ->method('getTypeOfField')
+            ->willReturnMap(
+                [
+                    ['realField1', 'string'],
+                    ['realMetaProperty1', 'string'],
+                ]
+            );
+        $classMetadata->expects($this->once())
+            ->method('getAssociationNames')
+            ->willReturn(
+                [
+                    'realAssociation1',
+                ]
+            );
+        $classMetadata->expects($this->once())
+            ->method('getAssociationTargetClass')
+            ->willReturnMap(
+                [
+                    ['realAssociation1', 'Test\Association1Target'],
+                ]
+            );
+        $classMetadata->expects($this->once())
+            ->method('isCollectionValuedAssociation')
+            ->willReturnMap(
+                [
+                    ['realAssociation1', false],
+                ]
+            );
+        $classMetadata->expects($this->once())
+            ->method('getAssociationMapping')
+            ->willReturnMap(
+                [
+                    ['realAssociation1', ['type' => ClassMetadata::MANY_TO_ONE]],
+                ]
+            );
+
+        $association1ClassMetadata = $this->getClassMetadataMock('Test\Association1Target');
+        $association1ClassMetadata->expects($this->once())
+            ->method('getIdentifierFieldNames')
+            ->willReturn(['id']);
+        $association1ClassMetadata->expects($this->once())
+            ->method('getTypeOfField')
+            ->with('id')
+            ->willReturn('integer');
+
+        $this->doctrineHelper->expects($this->once())
+            ->method('isManageableEntityClass')
+            ->with(self::TEST_CLASS_NAME)
+            ->willReturn(true);
+        $this->doctrineHelper->expects($this->exactly(2))
+            ->method('getEntityMetadataForClass')
+            ->willReturnMap(
+                [
+                    [self::TEST_CLASS_NAME, true, $classMetadata],
+                    ['Test\Association1Target', true, $association1ClassMetadata],
+                ]
+            );
+
+        $this->context->setTargetAction($targetAction);
+        $this->context->setConfig($this->createConfigObject($config));
+        $this->processor->process($this->context);
+
+        $this->assertNotNull($this->context->getResult());
+
+        $expectedMetadata = new EntityMetadata();
+        $expectedMetadata->setClassName(self::TEST_CLASS_NAME);
+        $expectedMetadata->setInheritedType(false);
+        $expectedMetadata->setIdentifierFieldNames(['id']);
+        $expectedMetadata->setHasIdentifierGenerator(false);
+        $expectedField1 = $expectedMetadata->addField($this->createFieldMetadata('field1', 'string'));
+        $expectedField1->setPropertyPath($propertyPathPrefix . 'Field1');
+        $expectedMetaProperty1 = $expectedMetadata->addMetaProperty(
+            $this->createMetaPropertyMetadata('metaProperty1', 'string')
+        );
+        $expectedMetaProperty1->setPropertyPath($propertyPathPrefix . 'MetaProperty1');
+        $expectedAssociation1 = $expectedMetadata->addAssociation(
+            $this->createAssociationMetadata(
+                'association1',
+                'Test\Association1Target',
+                'manyToOne',
+                false,
+                'integer',
+                ['Test\Association1Target']
+            )
+        );
+        $expectedAssociation1->setPropertyPath($propertyPathPrefix . 'Association1');
+
+        $this->assertEquals($expectedMetadata, $this->context->getResult());
+    }
+
+    public function testProcessForManageableEntityWithExcludedProperties()
+    {
+        $config = [
+            'exclusion_policy' => 'all',
+            'fields'           => [
+                'field1'        => null,
+                'field2'        => [
+                    'exclude' => true
+                ],
+                'metaProperty1' => [
+                    'meta_property' => true
+                ],
+                'metaProperty2' => [
+                    'meta_property' => true,
+                    'exclude'       => true
+                ],
+            ]
+        ];
+
+        $classMetadata = $this->getClassMetadataMock(self::TEST_CLASS_NAME);
+        $classMetadata->expects($this->once())
+            ->method('getIdentifierFieldNames')
+            ->willReturn(['field1']);
+        $classMetadata->expects($this->once())
+            ->method('usesIdGenerator')
+            ->willReturn(true);
+
+        $classMetadata->expects($this->once())
+            ->method('getFieldNames')
+            ->willReturn(
+                [
+                    'field1',
+                    'field2',
+                    'metaProperty1',
+                    'metaProperty2',
+                ]
+            );
+        $classMetadata->expects($this->exactly(4))
+            ->method('getTypeOfField')
+            ->willReturnMap(
+                [
+                    ['field1', 'string'],
+                    ['field2', 'string'],
+                    ['metaProperty1', 'string'],
+                    ['metaProperty2', 'string'],
+                ]
+            );
+        $classMetadata->expects($this->once())
+            ->method('getAssociationNames')
+            ->willReturn([]);
+
+        $this->doctrineHelper->expects($this->once())
+            ->method('isManageableEntityClass')
+            ->with(self::TEST_CLASS_NAME)
+            ->willReturn(true);
+        $this->doctrineHelper->expects($this->once())
+            ->method('getEntityMetadataForClass')
+            ->with(self::TEST_CLASS_NAME, true)
+            ->willReturn($classMetadata);
+
+        $this->context->setConfig($this->createConfigObject($config));
+        $this->context->setWithExcludedProperties(true);
+        $this->processor->process($this->context);
+
+        $this->assertNotNull($this->context->getResult());
+
+        $expectedMetadata = new EntityMetadata();
+        $expectedMetadata->setClassName(self::TEST_CLASS_NAME);
+        $expectedMetadata->setInheritedType(false);
+        $expectedMetadata->setIdentifierFieldNames(['field1']);
+        $expectedMetadata->setHasIdentifierGenerator(true);
+        $expectedMetadata->addField($this->createFieldMetadata('field1', 'string'));
+        $expectedMetadata->addField($this->createFieldMetadata('field2', 'string'));
+        $expectedMetadata->addMetaProperty($this->createMetaPropertyMetadata('metaProperty1', 'string'));
+        $expectedMetadata->addMetaProperty($this->createMetaPropertyMetadata('metaProperty2', 'string'));
 
         $this->assertEquals($expectedMetadata, $this->context->getResult());
     }
@@ -651,7 +1024,8 @@ class LoadMetadataTest extends MetadataProcessorTestCase
         $expectedMetadata->setInheritedType(false);
         $expectedMetadata->setIdentifierFieldNames(['renamedId']);
         $expectedMetadata->setHasIdentifierGenerator(true);
-        $expectedMetadata->addField($this->createFieldMetadata('renamedId', 'integer'));
+        $expectedField = $expectedMetadata->addField($this->createFieldMetadata('renamedId', 'integer'));
+        $expectedField->setPropertyPath('realId');
 
         $this->assertEquals($expectedMetadata, $this->context->getResult());
     }
@@ -848,13 +1222,105 @@ class LoadMetadataTest extends MetadataProcessorTestCase
         $this->assertEquals($expectedMetadata, $this->context->getResult());
     }
 
+    public function testProcessCollapsedArrayAssociationForManageableEntity()
+    {
+        $config = [
+            'exclusion_policy' => 'all',
+            'fields'           => [
+                'id'           => null,
+                'association1' => [
+                    'data_type'        => 'array',
+                    'exclusion_policy' => 'all',
+                    'collapsed'        => true,
+                    'fields'           => [
+                        'name' => null
+                    ]
+                ],
+            ]
+        ];
+
+        $classMetadata = $this->getClassMetadataMock(self::TEST_CLASS_NAME);
+        $classMetadata->expects($this->once())
+            ->method('getIdentifierFieldNames')
+            ->willReturn(['id']);
+        $classMetadata->expects($this->once())
+            ->method('usesIdGenerator')
+            ->willReturn(true);
+
+        $classMetadata->expects($this->once())
+            ->method('getFieldNames')
+            ->willReturn(['id']);
+        $classMetadata->expects($this->once())
+            ->method('getTypeOfField')
+            ->with('id')
+            ->willReturn('integer');
+        $classMetadata->expects($this->once())
+            ->method('getAssociationNames')
+            ->willReturn(['association1']);
+        $classMetadata->expects($this->once())
+            ->method('getAssociationTargetClass')
+            ->with('association1')
+            ->willReturn('Test\Association1Target');
+        $classMetadata->expects($this->once())
+            ->method('isCollectionValuedAssociation')
+            ->with('association1')
+            ->willReturn(true);
+        $classMetadata->expects($this->once())
+            ->method('getAssociationMapping')
+            ->with('association1')
+            ->willReturn(['type' => ClassMetadata::MANY_TO_MANY]);
+
+        $association1ClassMetadata = $this->getClassMetadataMock('Test\Association1Target');
+        $association1ClassMetadata->expects($this->never())
+            ->method('getIdentifierFieldNames');
+        $association1ClassMetadata->expects($this->never())
+            ->method('getTypeOfField');
+
+        $this->doctrineHelper->expects($this->once())
+            ->method('isManageableEntityClass')
+            ->with(self::TEST_CLASS_NAME)
+            ->willReturn(true);
+        $this->doctrineHelper->expects($this->exactly(2))
+            ->method('getEntityMetadataForClass')
+            ->willReturnMap(
+                [
+                    [self::TEST_CLASS_NAME, true, $classMetadata],
+                    ['Test\Association1Target', true, $association1ClassMetadata],
+                ]
+            );
+
+        $this->context->setConfig($this->createConfigObject($config));
+        $this->processor->process($this->context);
+
+        $this->assertNotNull($this->context->getResult());
+
+        $expectedMetadata = new EntityMetadata();
+        $expectedMetadata->setClassName(self::TEST_CLASS_NAME);
+        $expectedMetadata->setIdentifierFieldNames(['id']);
+        $expectedMetadata->setHasIdentifierGenerator(true);
+        $expectedMetadata->addField($this->createFieldMetadata('id', 'integer'))->setIsNullable(false);
+        $expectedMetadata->addAssociation(
+            $this->createAssociationMetadata(
+                'association1',
+                'Test\Association1Target',
+                'manyToMany',
+                true,
+                'array',
+                ['Test\Association1Target'],
+                true
+            )
+        );
+
+        $this->assertEquals($expectedMetadata, $this->context->getResult());
+    }
+
     public function testProcessForExtendedAssociation()
     {
         $config = [
             'exclusion_policy' => 'all',
             'fields'           => [
-                'id'            => null,
-                'association1'  => [
+                'id'           => null,
+                'association1' => [
                     'exclusion_policy'       => 'all',
                     'data_type'              => 'association:manyToOne',
                     'target_class'           => EntityIdentifier::class,
@@ -922,7 +1388,8 @@ class LoadMetadataTest extends MetadataProcessorTestCase
                 'manyToOne',
                 false,
                 'string',
-                ['Test\Association1Target']
+                ['Test\Association1Target'],
+                true
             )
         );
 

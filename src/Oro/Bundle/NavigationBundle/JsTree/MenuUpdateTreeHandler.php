@@ -64,10 +64,8 @@ class MenuUpdateTreeHandler
 
         /** @var ItemInterface $child */
         foreach ($root->getChildren() as $child) {
-            if ($child->isDisplayed()) {
-                $nodes[] = $child;
-                $nodes = array_merge($nodes, $this->getNodes($child, false));
-            }
+            $nodes[] = $child;
+            $nodes = array_merge($nodes, $this->getNodes($child, false));
         }
 
         return $nodes;
@@ -114,8 +112,9 @@ class MenuUpdateTreeHandler
             'text' => $text,
             'state' => [
                 'opened' => $entity->getParent() === null,
-                'disabled' => !$entity->getExtra('editable', false)
-            ]
+                'disabled' => $entity->getExtra('read_only', false)
+            ],
+            'li_attr' => !$entity->isDisplayed() ? ['class' => 'hidden'] : []
         ];
     }
 }

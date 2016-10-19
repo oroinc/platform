@@ -3,9 +3,13 @@
 namespace Oro\Bundle\NavigationBundle\Tests\Unit\Menu;
 
 use Knp\Menu\MenuFactory;
+
+use Oro\Component\DependencyInjection\ServiceLink;
 use Oro\Bundle\NavigationBundle\Menu\AclAwareMenuFactoryExtension;
+
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\Routing\Exception\ResourceNotFoundException;
+
 use Doctrine\Common\Cache\CacheProvider;
 
 class AclAwareMenuFactoryExtensionTest extends \PHPUnit_Framework_TestCase
@@ -19,6 +23,11 @@ class AclAwareMenuFactoryExtensionTest extends \PHPUnit_Framework_TestCase
      * @var \PHPUnit_Framework_MockObject_MockObject
      */
     protected $securityFacade;
+
+    /**
+     * @var \PHPUnit_Framework_MockObject_MockObject
+     */
+    protected $securityFacadeLink;
 
     /**
      * @var MenuFactory
@@ -59,9 +68,36 @@ class AclAwareMenuFactoryExtensionTest extends \PHPUnit_Framework_TestCase
             ->method('getToken')
             ->willReturn($this->getMock('Symfony\Component\Security\Core\Authentication\Token\TokenInterface'));
 
-        $this->factoryExtension = new AclAwareMenuFactoryExtension($this->router, $this->securityFacade);
+        $this->factoryExtension = new AclAwareMenuFactoryExtension(
+            $this->router,
+            $this->getSecurityFacadeLink($this->securityFacade)
+        );
+
         $this->factory = new MenuFactory();
         $this->factory->addExtension($this->factoryExtension);
+    }
+
+    /**
+     * @param \PHPUnit_Framework_MockObject_MockObject $securityFacade
+     *
+     * @return \PHPUnit_Framework_MockObject_MockObject
+     */
+    protected function getSecurityFacadeLink(\PHPUnit_Framework_MockObject_MockObject $securityFacade)
+    {
+        /**
+         * @var ServiceLink
+         */
+        $securityFacadeLink = $this
+            ->getMockBuilder('Oro\Component\DependencyInjection\ServiceLink')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $securityFacadeLink
+            ->expects($this->any())
+            ->method('getService')
+            ->willReturn($securityFacade);
+
+        return $securityFacadeLink;
     }
 
     /**
@@ -138,7 +174,11 @@ class AclAwareMenuFactoryExtensionTest extends \PHPUnit_Framework_TestCase
             ->method('hasLoggedUser')
             ->willReturn(false);
 
-        $factoryExtension = new AclAwareMenuFactoryExtension($this->router, $securityFacade);
+        $factoryExtension = new AclAwareMenuFactoryExtension(
+            $this->router,
+            $this->getSecurityFacadeLink($securityFacade)
+        );
+
         $factory = new MenuFactory();
         $factory->addExtension($factoryExtension);
 
