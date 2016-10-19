@@ -196,7 +196,7 @@ services:
         tags:
             - { name: kernel.event_listener, event: oro_email.send_email_transport, method: setSmtpTransport }
 
-    oro_imap.async.processor.clear_inactive_mailbox:
+    oro_imap.async.clear_inactive_mailbox_message_processor:
         class: 'Oro\Bundle\ImapBundle\Async\ClearInactiveMailboxMessageProcessor'
         arguments:
             - '@oro_imap.manager.clear'

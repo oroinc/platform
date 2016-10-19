@@ -2,32 +2,27 @@
 
 namespace Oro\Bundle\ImapBundle\Async;
 
-use Oro\Bundle\ImapBundle\Manager\ImapClearManager;
+use Psr\Log\LoggerInterface;
+
 use Oro\Component\MessageQueue\Client\TopicSubscriberInterface;
 use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
 use Oro\Component\MessageQueue\Job\JobRunner;
 use Oro\Component\MessageQueue\Transport\MessageInterface;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
 use Oro\Component\MessageQueue\Util\JSON;
-use Psr\Log\LoggerInterface;
+
+use Oro\Bundle\ImapBundle\Manager\ImapClearManager;
 
 class ClearInactiveMailboxMessageProcessor implements MessageProcessorInterface, TopicSubscriberInterface
 {
-    /**
-     * @var ImapClearManager
-     */
+    /** @var ImapClearManager */
     private $clearManager;
 
-    /**
-     * @var JobRunner
-     */
+    /** @var JobRunner */
     private $jobRunner;
 
-    /**
-     * @var LoggerInterface
-     */
+    /** @var LoggerInterface */
     private $logger;
-
 
     /**
      * @param ImapClearManager $clearManager
@@ -42,7 +37,7 @@ class ClearInactiveMailboxMessageProcessor implements MessageProcessorInterface,
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function process(MessageInterface $message, SessionInterface $session)
     {
@@ -57,7 +52,7 @@ class ClearInactiveMailboxMessageProcessor implements MessageProcessorInterface,
 
         $this->jobRunner->runUnique(
             $message->getMessageId(),
-            'oro:imap:clear-mailbox',
+            Topics::CLEAR_INACTIVE_MAILBOX,
             function () use ($originId) {
                 $this->clearManager->clear($originId);
 
@@ -69,7 +64,7 @@ class ClearInactiveMailboxMessageProcessor implements MessageProcessorInterface,
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public static function getSubscribedTopics()
     {

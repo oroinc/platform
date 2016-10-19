@@ -51,7 +51,7 @@ class ClearInactiveMailboxMessageProcessorTest extends \PHPUnit_Framework_TestCa
         $jobRunner
             ->expects($this->once())
             ->method('runUnique')
-            ->with('12345', 'oro:imap:clear-mailbox')
+            ->with('12345', 'oro.imap.clear_inactive_mailbox')
         ;
 
         $processor = new ClearInactiveMailboxMessageProcessor($clearManager, $jobRunner, $logger);

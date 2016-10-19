@@ -16,7 +16,7 @@ class ClearInactiveMailboxMessageProcessorTest extends WebTestCase
 
     public function testCouldBeConstructedByContainer()
     {
-        $instance = $this->getContainer()->get('oro_imap.async.processor.clear_inactive_mailbox');
+        $instance = $this->getContainer()->get('oro_imap.async.clear_inactive_mailbox_message_processor');
 
         $this->assertInstanceOf(ClearInactiveMailboxMessageProcessor::class, $instance);
     }
