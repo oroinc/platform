@@ -1,0 +1,54 @@
+{% block oro_currency_price_widget %}
+    {% if hide_currency %}
+        {{ form_widget(form.value) }}
+        {{ form_widget(form.currency) }}
+        {{ form_errors(form.value) }}
+        {{ form_errors(form.currency) }}
+    {% else %}
+        <table>
+            <tr>
+                <td>
+                    {{ form_widget(form.value) }}
+                    {{ form_errors(form.value) }}
+                </td>
+                <td>
+                    {{ form_widget(form.currency) }}
+                    {{ form_errors(form.currency) }}
+                </td>
+            </tr>
+        </table>
+    {% endif %}
+{% endblock %}
+
+{% block oro_multicurrency_row %}
+    <div class="control-group">
+        <div class="control-label wrap">
+            {{ form_label(form) }}
+        </div>
+        <div class="controls{% if errors|length > 0 %} validation-error{% endif %}">
+            {% import 'OroUIBundle::macros.html.twig' as UI %}
+            <div class="currency-select-enabled" {{ UI.renderPageComponentAttributes({
+                module: 'oroui/js/app/components/view-component',
+                options: {
+                    view: 'orocurrency/js/app/views/multicurrency-control-view',
+                    autoRender: true,
+                    rates: {'USD': 1, 'UAH': 0.04, 'EUR': 1.1}
+                }
+            }) }}>
+                <div class="input-append">
+                    {{ form_widget(form.value) }}
+                    {% if form.currency.vars.hidden_field %}
+                        <span class="add-on">{{ form.currency.vars.choices[0].label }}</span>
+                        <input name="{{ form.currency.vars.full_name }}" type="hidden" value="{{ form.currency.vars.value }}">
+                    {% else %}
+                        {{ form_widget(form.currency) }}
+                    {% endif %}
+                </div>
+                <div class="default-currency-equivalent" data-name="default-currency-equivalent"></div>
+                {{ form_errors(form.currency) }}
+                {{ form_errors(form.value) }}
+            </div>
+        </div>
+    </div>
+{% endblock %}
+

@@ -88,7 +88,6 @@ class NavigationListener
                 $entitiesMenuItem->addChild($child['label'], $child['options']);
             }
         }
-
     }
 
     /**

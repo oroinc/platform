@@ -6,21 +6,11 @@ use Behat\Gherkin\Node\TableNode;
 use Oro\Bundle\TestFrameworkBundle\Behat\Context\OroFeatureContext;
 use Oro\Bundle\TestFrameworkBundle\Behat\Fixtures\FixtureLoader;
 use Oro\Bundle\TestFrameworkBundle\Behat\Fixtures\FixtureLoaderAwareInterface;
+use Oro\Bundle\TestFrameworkBundle\Behat\Fixtures\FixtureLoaderDictionary;
 
 class FixturesContext extends OroFeatureContext implements FixtureLoaderAwareInterface
 {
-    /**
-     * @var FixtureLoader
-     */
-    protected $fixtureLoader;
-
-    /**
-     * {@inheritdoc}
-     */
-    public function setFixtureLoader(FixtureLoader $fixtureLoader)
-    {
-        $this->fixtureLoader = $fixtureLoader;
-    }
+    use FixtureLoaderDictionary;
 
     /**
      * Load entity with some data
@@ -37,6 +27,7 @@ class FixturesContext extends OroFeatureContext implements FixtureLoaderAwareInt
         $this->fixtureLoader->loadTable($name, $table);
     }
 
+    //@codingStandardsIgnoreStart
     /**
      * Load random entities in database
      * Example: I have 6 contacts
@@ -45,9 +36,10 @@ class FixturesContext extends OroFeatureContext implements FixtureLoaderAwareInt
      * Example: And there are 5 calls
      * Example: I have 3 accounts
      *
-     * @Given /^there (?:is|are) (?P<numberOfEntities>(?:\d+)) (?P<name>(?:(?!from|records in activity list)(\D*)))$/
+     * @Given /^there (?:is|are) (?P<numberOfEntities>(?:\d+)) (?P<name>(?:(?!from|records in activity list|records in grid)(\D*)))$/
      * @Given /^(?:|I )have (?P<numberOfEntities>(?:\d+)) (?P<name>(?:(?!from)(\D*)))$/
      */
+    //@codingStandardsIgnoreEnd
     public function thereIs($numberOfEntities, $name)
     {
         $this->fixtureLoader->loadRandomEntities($name, $numberOfEntities);

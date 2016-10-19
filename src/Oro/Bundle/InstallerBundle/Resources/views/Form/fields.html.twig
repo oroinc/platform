@@ -22,3 +22,31 @@
 </script>
 {{ block('form_row') }}
 {% endblock %}
+
+{% block _oro_installer_configuration_database_oro_installer_database_driver_row %}
+<script type="text/javascript">
+    $(function () {
+        var $container = $('div[data-ftid=oro_installer_configuration_database] .control-group:first');
+        var $select = $container.find('select');
+
+        checkDatabase();
+        $select.change(checkDatabase);
+
+        function checkDatabase() {
+            $help = $container.find('.help-block');
+
+            if ($select.val() != 'pdo_mysql') {
+                // hide the recommendation for non MySQL drivers
+                $help.remove();
+                return;
+            }
+
+            if (0 === $help.length) {
+                $container
+                    .append('<p class="help-block">' + $select.data('mysql-hint') + '</p>');
+            }
+        }
+    });
+</script>
+{{ block('form_row') }}
+{% endblock %}

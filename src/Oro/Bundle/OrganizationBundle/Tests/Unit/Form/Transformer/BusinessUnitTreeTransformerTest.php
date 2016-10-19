@@ -23,7 +23,6 @@ class BusinessUnitTreeTransformerTest extends \PHPUnit_Framework_TestCase
             ->getMock();
 
         $this->transformer = new BusinessUnitTreeTransformer($this->buManager);
-
     }
 
     public function testTransform()
@@ -34,7 +33,6 @@ class BusinessUnitTreeTransformerTest extends \PHPUnit_Framework_TestCase
         $bu2 = new BusinessUnit();
         $bu1->setId(2);
         $this->assertTrue(in_array(2, $this->transformer->transform([$bu1, $bu2])));
-
     }
 
     public function testPlainValueTransform()

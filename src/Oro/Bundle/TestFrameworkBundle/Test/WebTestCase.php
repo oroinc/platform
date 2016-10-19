@@ -149,7 +149,7 @@ abstract class WebTestCase extends BaseWebTestCase
             if (self::getDbIsolationSetting() || self::getDbIsolationPerTestSetting()) {
                 //This is a workaround for MyISAM search tables that are not transactional
                 if (self::getDbReindexSetting()) {
-                    self::getContainer()->get('oro_search.search.engine')->reindex();
+                    self::getContainer()->get('oro_search.search.engine.indexer')->reindex();
                 }
 
                 $this->startTransaction();
@@ -418,7 +418,6 @@ abstract class WebTestCase extends BaseWebTestCase
      */
     protected function postFixtureLoad()
     {
-
     }
 
     /**

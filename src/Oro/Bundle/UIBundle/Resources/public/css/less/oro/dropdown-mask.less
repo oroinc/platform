@@ -12,5 +12,6 @@
   opacity: 0;
   z-index: @oroZindexDropdown - 1;
   background-color: #fff;
-  .opacity(0);
+  // opacity should not be zero for valid scroll work on IOS
+  .opacity(0.1);
 }

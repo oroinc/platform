@@ -26,7 +26,7 @@ The existing entity can be extended using migration scripts. To create new exten
 ``` php
 <?php
 
-namespace OroCRM\Bundle\AccountBundle\Migrations\Schema\v1_0;
+namespace Oro\Bundle\AccountBundle\Migrations\Schema\v1_0;
 
 use Doctrine\DBAL\Schema\Schema;
 use Oro\Bundle\MigrationBundle\Migration\Migration;
@@ -34,7 +34,7 @@ use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 use Oro\Bundle\EntityBundle\EntityConfig\DatagridScope;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 
-class OroCRMAccountBundle implements Migration
+class OroAccountBundle implements Migration
 {
     public function up(Schema $schema, QueryBag $queries)
     {
@@ -91,7 +91,7 @@ Creating relations is more complex task than creation of regular field. Oro Plat
 ``` php
 <?php
 
-namespace OroCRM\Bundle\SalesBundle\Migrations\Schema\v1_0;
+namespace Oro\Bundle\SalesBundle\Migrations\Schema\v1_0;
 
 use Doctrine\DBAL\Schema\Schema;
 use Oro\Bundle\EntityExtendBundle\Migration\Extension\ExtendExtension;
@@ -100,7 +100,7 @@ use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\MigrationBundle\Migration\Migration;
 use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 
-class OroCRMSalesBundle implements Migration, ExtendExtensionAwareInterface
+class OroSalesBundle implements Migration, ExtendExtensionAwareInterface
 {
     protected $extendExtension;
 
@@ -140,7 +140,7 @@ The option sets are quite complex types, but to understand how they work you nee
 ``` php
 <?php
 
-namespace OroCRM\Bundle\SalesBundle\Migrations\Schema\v1_0;
+namespace Oro\Bundle\SalesBundle\Migrations\Schema\v1_0;
 
 use Doctrine\DBAL\Schema\Schema;
 use Oro\Bundle\EntityExtendBundle\Migration\Extension\ExtendExtension;
@@ -149,7 +149,7 @@ use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\MigrationBundle\Migration\Migration;
 use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 
-class OroCRMSalesBundle implements Migration, ExtendExtensionAwareInterface
+class OroSalesBundle implements Migration, ExtendExtensionAwareInterface
 {
     protected $extendExtension;
 
@@ -185,7 +185,7 @@ To load a list of options you can use data fixtures, for example:
 
 <?php
 
-namespace OroCRM\Bundle\DemoDataBundle\Migrations\Data\Demo\ORM;
+namespace Oro\Bundle\DemoDataBundle\Migrations\Data\Demo\ORM;
 
 use Doctrine\Common\DataFixtures\AbstractFixture;
 use Doctrine\Common\Persistence\ObjectManager;

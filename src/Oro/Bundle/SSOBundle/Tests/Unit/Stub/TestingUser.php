@@ -11,6 +11,5 @@ class TestingUser extends User
      */
     public function setGoogleId($id)
     {
-        
     }
 }

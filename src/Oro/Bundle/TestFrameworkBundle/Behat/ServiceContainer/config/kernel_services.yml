@@ -17,3 +17,8 @@ services:
         class: Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProvider
         factory: ['@oro_test.kernel_service_factory', get]
         arguments: ['oro_security.owner.metadata_provider.chain']
+
+    oro_config.global:
+        class: Oro\Bundle\ConfigBundle\Config\GlobalScopeManager
+        factory: ['@oro_test.kernel_service_factory', get]
+        arguments: ['oro_config.global']

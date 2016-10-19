@@ -104,9 +104,18 @@ define(function(require) {
         _isFocused: false,
 
         constructor: function(options) {
-            // className adjustment cannot be done in initialize()
+            var optionsClassName;
+            var prototypeClassName;
             if (options.className) {
-                options.className += ' ' + _.result(this, 'className');
+                // takes in account both class names: passed over options and defined in view's prototype
+                optionsClassName = options.className;
+                prototypeClassName = this.className;
+                options.className = _.bind(function() {
+                    var classes = [];
+                    classes.push(_.isFunction(optionsClassName) ? optionsClassName.call(this) : optionsClassName);
+                    classes.push(_.isFunction(prototypeClassName) ? prototypeClassName.call(this) : prototypeClassName);
+                    return classes.join(' ');
+                }, this);
             }
             TextEditorView.__super__.constructor.apply(this, arguments);
         },

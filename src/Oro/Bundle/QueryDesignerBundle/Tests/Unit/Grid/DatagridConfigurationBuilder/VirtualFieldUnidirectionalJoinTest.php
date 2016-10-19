@@ -42,7 +42,7 @@ class VirtualFieldUnidirectionalJoinTest extends DatagridConfigurationBuilderTes
                         'join'   => [
                             'left' => [
                                 [
-                                    'join'  => 'OroCRM\Bundle\ChannelBundle\Entity\LifetimeValueHistory',
+                                    'join'  => 'Oro\Bundle\ChannelBundle\Entity\LifetimeValueHistory',
                                     'alias' => 'h'
                                 ]
                             ]
@@ -106,7 +106,7 @@ class VirtualFieldUnidirectionalJoinTest extends DatagridConfigurationBuilderTes
                     'join'   => [
                         'left' => [
                             [
-                                'join'  => 'OroCRM\Bundle\ChannelBundle\Entity\LifetimeValueHistory',
+                                'join'  => 'Oro\Bundle\ChannelBundle\Entity\LifetimeValueHistory',
                                 'alias' => 't2'
                             ],
                             [
@@ -119,7 +119,7 @@ class VirtualFieldUnidirectionalJoinTest extends DatagridConfigurationBuilderTes
                 'query_config' => [
                     'table_aliases'  => [
                         '' => 't1',
-                        'OroCRM\Bundle\ChannelBundle\Entity\LifetimeValueHistory|left' => 't2',
+                        'Oro\Bundle\ChannelBundle\Entity\LifetimeValueHistory|left' => 't2',
                         't1.country|left' => 't3'
                     ],
                     'column_aliases' => [

@@ -1,7 +1,7 @@
 {% set isWidgetContext = isWidgetContext is defined ? isWidgetContext : false %}
 {% extends isWidgetContext ? 'OroFormBundle:Layout:widgetForm.html.twig' : bap.layout %}
 
-{% import 'OroNavigationBundle:Include:contentTags.html.twig' as navigationMacro %}
+{% import 'OroSyncBundle:Include:contentTags.html.twig' as syncMacro %}
 {% import 'OroUIBundle::macros.html.twig' as UI %}
 
 {% set entity = entity is defined ? entity : null %}
@@ -60,7 +60,11 @@
                                                     <span class="separator">/</span>
                                                     {% endfor %}
                                                 {% endif %}
-                                                <h1 class="user-name">{{ breadcrumbs.entityTitle|raw }}</h1>
+                                                {% if breadcrumbs.rawEntityTitle is defined and breadcrumbs.rawEntityTitle %}
+                                                    <h1 class="user-name">{{ breadcrumbs.entityTitle|raw }}</h1>
+                                                {% else %}
+                                                    <h1 class="user-name">{{ breadcrumbs.entityTitle }}</h1>
+                                                {% endif %}
                                             </div>
                                             {% block breadcrumbMessage %}{% endblock breadcrumbMessage %}
                                         {% endblock breadcrumbs %}
@@ -202,9 +206,9 @@
                 {{ UI.scrollData(id, data, form) }}
             {% endblock content_data %}
         </div>
-        {% block navigation_content_tags %}
+        {% block sync_content_tags %}
             {# block added just for possibility to disable it in child templates if needed #}
-            {{ navigationMacro.navigationContentTags(form.vars.value) }}
+            {{ syncMacro.syncContentTags(form.vars.value) }}
         {% endblock %}
     </form>
     {{ oro_form_js_validation(form) }}

@@ -46,6 +46,9 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
     /** @var ImapEmailRemoveManager */
     protected $removeManager;
 
+    /** @var int */
+    private $processStartTime;
+
     /**
      * Constructor
      *
@@ -76,7 +79,7 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
         $this->emailEntityBuilder->clear();
 
         $this->initEnv($origin);
-        $processStartTime = time();
+        $this->processStartTime = time();
         // iterate through all folders enabled for sync and do a synchronization of emails for each one
         $imapFolders = $this->getSyncEnabledImapFolders($origin, true);
         foreach ($imapFolders as $imapFolder) {
@@ -104,7 +107,6 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
                 $this->checkFlags($imapFolder, $checkStartDate);
 
                 $this->removeManager->removeRemotelyRemovedEmails($imapFolder, $folder, $this->manager);
-
             } catch (UnselectableFolderException $e) {
                 $this->processUnselectableFolderException($folder);
             } catch (InvalidEmailFormatException $e) {
@@ -117,9 +119,7 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
 
             $this->cleanUp(true, $imapFolder->getFolder());
 
-            $processSpentTime = time() - $processStartTime;
-
-            if (false === $this->getSettings()->isForceMode() && $processSpentTime > self::MAX_ORIGIN_SYNC_TIME) {
+            if ($this->isTimeout()) {
                 break;
             }
         }
@@ -166,7 +166,7 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
         $lastSynchronizedAt = $folder->getSynchronizedAt();
         $emails = $this->getEmailIterator($origin, $imapFolder, $folder);
         $count = $processed = $invalid = $totalInvalid = 0;
-        $emails->setIterationOrder(true);
+        $emails->setIterationOrder(false);
         $emails->setBatchSize(self::READ_BATCH_SIZE);
         $emails->setConvertErrorCallback(
             function (\Exception $e) use (&$invalid) {
@@ -210,6 +210,9 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
                 );
                 $count = 0;
                 $batch = [];
+            }
+            if ($this->isTimeout()) {
+                break;
             }
         }
         if ($count > 0) {
@@ -597,5 +600,17 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
                 )
             );
         }
+    }
+
+    /**
+     * Check timeout for done work with current origin
+     * Exclude force mode
+     *
+     * @return bool
+     */
+    protected function isTimeout()
+    {
+        return false === $this->getSettings()->isForceMode()
+            && time() - $this->processStartTime > self::MAX_ORIGIN_SYNC_TIME;
     }
 }
