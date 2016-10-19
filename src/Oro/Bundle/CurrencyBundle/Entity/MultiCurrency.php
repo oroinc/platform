@@ -3,7 +3,6 @@ namespace Oro\Bundle\CurrencyBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 
-use Oro\Bundle\DataAuditBundle\Metadata\Annotation as Oro;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
 
@@ -15,7 +14,6 @@ class MultiCurrency
      * @var double
      *
      * @ORM\Column(name="value", type="money", nullable=true)
-     * @Oro\Versioned
      * @ConfigField(
      *  defaultValues={
      *      "form"={

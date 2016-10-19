@@ -67,6 +67,7 @@ class PlatformUpdateCommand extends AbstractCommand
                 ->runCommand('oro:translation:load', ['--process-isolation' => true])
                 ->runCommand('oro:navigation:init', array('--process-isolation' => true))
                 ->runCommand('router:cache:clear', array('--process-isolation' => true))
+                ->runCommand('oro:message-queue:create-queues', array('--process-isolation' => true))
             ;
 
             if (!$input->getOption('skip-assets')) {
