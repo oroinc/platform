@@ -94,7 +94,8 @@ class WorkflowTranslationHelperTest extends \PHPUnit_Framework_TestCase
                 'test_key1',
                 'test_value1',
                 Translation::DEFAULT_LOCALE,
-                WorkflowTranslationHelper::TRANSLATION_DOMAIN
+                WorkflowTranslationHelper::TRANSLATION_DOMAIN,
+                Translation::SCOPE_UI
             );
 
         //case test_key2
@@ -113,7 +114,8 @@ class WorkflowTranslationHelperTest extends \PHPUnit_Framework_TestCase
                 'test_key2',
                 'test_value2',
                 Translation::DEFAULT_LOCALE,
-                WorkflowTranslationHelper::TRANSLATION_DOMAIN
+                WorkflowTranslationHelper::TRANSLATION_DOMAIN,
+                Translation::SCOPE_UI
             );
 
         //case test_key3

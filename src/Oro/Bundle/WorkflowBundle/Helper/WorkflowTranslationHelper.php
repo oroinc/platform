@@ -109,7 +109,8 @@ class WorkflowTranslationHelper
                     $key,
                     $value,
                     Translation::DEFAULT_LOCALE,
-                    self::TRANSLATION_DOMAIN
+                    self::TRANSLATION_DOMAIN,
+                    Translation::SCOPE_UI
                 );
             }
         }
