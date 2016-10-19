@@ -35,6 +35,10 @@ class MenuUpdateUtils
             self::setValue($accessor, $update, 'defaultTitle', $item->getLabel());
         }
 
+        if ($update->getDescriptions()->count() <= 0 && null !== $item->getExtra('description')) {
+            self::setValue($accessor, $update, 'defaultDescription', $item->getExtra('description'));
+        }
+
         $parent = $item->getParent();
         if ($parent) {
             $parentKey = $parent->getName() !== $menuName ? $parent->getName() : null;
@@ -45,6 +49,9 @@ class MenuUpdateUtils
         $update->setMenu($menuName);
 
         foreach ($item->getExtras() as $key => $value) {
+            if ($key === 'description') {
+                continue;
+            }
             if (array_key_exists($key, $extrasMapping)) {
                 $key = $extrasMapping[$key];
             }
