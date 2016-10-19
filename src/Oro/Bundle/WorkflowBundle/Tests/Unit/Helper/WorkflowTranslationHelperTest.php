@@ -9,7 +9,6 @@ use Oro\Bundle\TranslationBundle\Translation\KeySource\TranslationKeySource;
 use Oro\Bundle\TranslationBundle\Translation\TranslationKeyGenerator;
 
 use Oro\Bundle\WorkflowBundle\Helper\WorkflowTranslationHelper;
-
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowStep;
 use Oro\Bundle\WorkflowBundle\Translation\KeyTemplate\WorkflowTemplate;
@@ -170,37 +169,26 @@ class WorkflowTranslationHelperTest extends \PHPUnit_Framework_TestCase
             ->setName('definition1')
             ->setLabel('definition1.label-locale1.workflows')
             ->setSteps([
-                (new WorkflowStep())->setLabel('step2.label-locale1.workflows'),
+                (new WorkflowStep())->setLabel('step2.label'),
             ])
-            ->setConfiguration([
-                'steps' => [
-                    'step1' => ['label' => 'step1.label-locale1.workflows']
-                ],
-                'transitions' => [
-                    'transition1' => [
-                        'label' => 'transition1.label-locale1.workflows',
-                        'message' => 'transition1.message-locale1.workflows',
-                    ]
-                ],
-                'attributes' => [
-                    'attribute1' => ['label' => 'attribute1.label-locale1.workflows']
-                ],
-            ]);
+            ->setConfiguration($definition->getConfiguration());
 
         $translationKeySource = $this->getWorkflowSource('workflow1');
-
         $this->keyGenerator->expects($this->once())->method('generate')->with($translationKeySource);
         $this->translator->expects($this->any())->method('getLocale')->willReturn('locale1');
         $this->translationHelper->expects($this->once())->method('prepareValues');
-
-        $this->translationHelper->expects($this->exactly(6))
+        $iteratedKeys = ['key1' => 'val1', 'key2' => 'val2'];
+        // label + iterated keys
+        $this->translationHelper->expects($this->exactly(count($iteratedKeys) + 1))
             ->method('getValue')
             ->will($this->returnCallback(function ($key, $locale, $domain) {
                 return sprintf('%s-%s.%s', $key, $locale, $domain);
             }));
 
-        $this->fieldsIterator->expects($this->once())->method('iterateConfigTranslationFields')
-            ->willReturn([]);
+        $this->fieldsIterator
+            ->expects($this->once())
+            ->method('iterateConfigTranslationFields')
+            ->willReturn($iteratedKeys);
 
         $this->helper->extractTranslations($definition, 'workflow1');
 
