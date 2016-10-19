@@ -26,6 +26,7 @@ class AuditFieldTypeRegistry
         'decimal'    => 'float',
         'float'      => 'float',
         'money'      => 'float',
+        'money_value'=> 'float',
         'percent'    => 'float',
         'date'       => 'date',
         'time'       => 'time',
