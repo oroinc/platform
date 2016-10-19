@@ -506,8 +506,15 @@ to the [Fallback documentation](./src/Oro/Bundle/EntityBundle/Resources/doc/enti
 - Added DOC file `doc/content_outdating.md` moved from `NavigationBundle`.
 - Added DOC file `doc/mediator-handlers.md` moved from `NavigationBundle`.
 
-####Component
+####DependencyInjection Component
 - Added trait `Oro\Component\DependencyInjection\Compiler\TaggedServicesCompilerPassTrait`
+
+####EntitySerializer Component
+- Changed signature of `transform` method of `Oro\Component\EntitySerializer\DataTransformerInterface`. Added `array $context` as the last parameter.
+- Changed signature of `post_serialize` callbacks for the EntitySerializer. Added `array $context` as the last parameter.
+- Changed signature of `post_serialize` callbacks for the EntitySerializer. Added `array $context` as the last parameter.
+- Changed signature of `serialize` method of `Oro\Component\EntitySerializer\EntitySerializer`. Added `array $context = []` as the last parameter.
+- Changed signature of `serializeEntities` method of `Oro\Component\EntitySerializer\EntitySerializer`. Added `array $context = []` as the last parameter.
 
 ####DataAuditBundle
 - `Oro\Bundle\DataAuditBundle\Loggable\LoggableManager` was removed. Some logic moved to `Oro\Bundle\DataAuditBundle\EventListener\SendChangedEntitiesToMessageQueueListener` class and some backend processors.
