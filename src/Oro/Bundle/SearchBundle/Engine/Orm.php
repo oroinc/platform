@@ -2,16 +2,17 @@
 
 namespace Oro\Bundle\SearchBundle\Engine;
 
-use JMS\JobQueueBundle\Entity\Job;
-
 use Oro\Bundle\EntityBundle\ORM\OroEntityManager;
-
+use Oro\Bundle\SearchBundle\Engine\Orm\DbalStorer;
 use Oro\Bundle\SearchBundle\Entity\Item;
 use Oro\Bundle\SearchBundle\Entity\Repository\SearchIndexRepository;
 use Oro\Bundle\SearchBundle\Query\Mode;
 use Oro\Bundle\SearchBundle\Query\Query;
 use Oro\Bundle\SearchBundle\Query\Result\Item as ResultItem;
 
+/**
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
+ */
 class Orm extends AbstractEngine
 {
     /** @var SearchIndexRepository */
@@ -29,12 +30,23 @@ class Orm extends AbstractEngine
     /** @var bool */
     protected $needFlush = true;
 
+    /** @var DbalStorer */
+    protected $dbalStorer;
+
     /**
      * @param array $drivers
      */
     public function setDrivers(array $drivers)
     {
         $this->drivers = $drivers;
+    }
+
+    /**
+     * @param DbalStorer $dbalStorer
+     */
+    public function setDbalStorer(DbalStorer $dbalStorer)
+    {
+        $this->dbalStorer = $dbalStorer;
     }
 
     /**
@@ -123,7 +135,10 @@ class Orm extends AbstractEngine
         $hasSavedEntities = $this->saveItemData($entities);
 
         if ($hasSavedEntities && $this->needFlush) {
-            $this->flush();
+            $this->getIndexManager()->getConnection()->transactional(function () {
+                $this->dbalStorer->store();
+                $this->getIndexManager()->clear();
+            });
         }
 
         return $hasSavedEntities;
@@ -166,7 +181,7 @@ class Orm extends AbstractEngine
                 ->setChanged(false)
                 ->saveItemData($data);
 
-            $this->getIndexManager()->persist($item);
+            $this->dbalStorer->addItem($item);
 
             $hasSavedEntities = true;
         }
