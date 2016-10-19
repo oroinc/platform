@@ -14,26 +14,22 @@ use Oro\Component\MessageQueue\Util\JSON;
 
 class AuditChangedEntitiesInverseRelationsProcessor implements MessageProcessorInterface, TopicSubscriberInterface
 {
-    /**
-     * @var ManagerRegistry
-     */
+    /** @var ManagerRegistry */
     private $doctrine;
     
-    /**
-     * @var ConvertEntityChangesToAuditService
-     */
-    private $convertEntityChangesToAuditService;
+    /** @var ConvertEntityChangesToAuditService */
+    private $entityChangesToAuditEntryConverter;
 
     /**
-     * @param ManagerRegistry $doctrine
-     * @param ConvertEntityChangesToAuditService $convertEntityChangesToAuditService
+     * @param ManagerRegistry                    $doctrine
+     * @param ConvertEntityChangesToAuditService $entityChangesToAuditEntryConverter
      */
     public function __construct(
         ManagerRegistry $doctrine,
-        ConvertEntityChangesToAuditService $convertEntityChangesToAuditService
+        ConvertEntityChangesToAuditService $entityChangesToAuditEntryConverter
     ) {
         $this->doctrine = $doctrine;
-        $this->convertEntityChangesToAuditService = $convertEntityChangesToAuditService;
+        $this->entityChangesToAuditEntryConverter = $entityChangesToAuditEntryConverter;
     }
 
     /**
@@ -69,7 +65,7 @@ class AuditChangedEntitiesInverseRelationsProcessor implements MessageProcessorI
         $this->processManyToOneAndManyToManyAndOneToOneRelations($sourceEntitiesData, $map);
         $this->processEntityFromCollectionUpdated($body['entities_updated'], $map);
 
-        $this->convertEntityChangesToAuditService->convert(
+        $this->entityChangesToAuditEntryConverter->convert(
             $map,
             $transactionId,
             $loggedAt,
@@ -80,6 +76,10 @@ class AuditChangedEntitiesInverseRelationsProcessor implements MessageProcessorI
         return self::ACK;
     }
 
+    /**
+     * @param array $sourceEntitiesData
+     * @param array $map
+     */
     private function processManyToOneAndManyToManyAndOneToOneRelations(array $sourceEntitiesData, array &$map)
     {
         foreach ($sourceEntitiesData as $sourceEntityData) {
@@ -277,6 +277,10 @@ class AuditChangedEntitiesInverseRelationsProcessor implements MessageProcessorI
         }
     }
 
+    /**
+     * @param array $sourceEntitiesData
+     * @param array $map
+     */
     private function processEntityFromCollectionUpdated(array $sourceEntitiesData, array &$map)
     {
         // many to one. updated entity is part of a collection on inversed side of relation.
@@ -336,7 +340,6 @@ class AuditChangedEntitiesInverseRelationsProcessor implements MessageProcessorI
      * @param array $change
      *
      * @return array
-     *
      */
     private function addChangeSetToMap(array &$map, $entityClass, $entityId, $fieldName, array $change)
     {

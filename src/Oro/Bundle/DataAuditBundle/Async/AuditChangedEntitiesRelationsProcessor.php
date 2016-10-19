@@ -13,26 +13,22 @@ use Oro\Component\MessageQueue\Util\JSON;
 
 class AuditChangedEntitiesRelationsProcessor implements MessageProcessorInterface, TopicSubscriberInterface
 {
-    /**
-     * @var ManagerRegistry
-     */
+    /** @var ManagerRegistry */
     private $doctrine;
 
-    /**
-     * @var ConvertEntityChangesToAuditService
-     */
-    private $convertEntityChangesToAuditService;
+    /** @var ConvertEntityChangesToAuditService */
+    private $entityChangesToAuditEntryConverter;
 
     /**
-     * @param ManagerRegistry $doctrine
-     * @param ConvertEntityChangesToAuditService $convertEntityChangesToAuditService
+     * @param ManagerRegistry                    $doctrine
+     * @param ConvertEntityChangesToAuditService $entityChangesToAuditEntryConverter
      */
     public function __construct(
         ManagerRegistry $doctrine,
-        ConvertEntityChangesToAuditService $convertEntityChangesToAuditService
+        ConvertEntityChangesToAuditService $entityChangesToAuditEntryConverter
     ) {
         $this->doctrine = $doctrine;
-        $this->convertEntityChangesToAuditService = $convertEntityChangesToAuditService;
+        $this->entityChangesToAuditEntryConverter = $entityChangesToAuditEntryConverter;
     }
 
     /**
@@ -55,7 +51,7 @@ class AuditChangedEntitiesRelationsProcessor implements MessageProcessorInterfac
             $organization = new EntityReference(Organization::class, $body['organization_id']);
         }
 
-        $this->convertEntityChangesToAuditService->convert(
+        $this->entityChangesToAuditEntryConverter->convert(
             $body['collections_updated'],
             $transactionId,
             $loggedAt,

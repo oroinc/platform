@@ -16,10 +16,14 @@ services:
         class: 'Oro\Bundle\DataAuditBundle\Loggable\AuditEntityMapper'
         public: false
         calls:
-            - ['addAuditEntryClass', ['%oro_user.entity.class%', '%oro_dataaudit.loggable.entity.class%']]
-            - ['addAuditEntryFieldClass', ['%oro_user.entity.class%', '%oro_dataaudit.loggable.entity_field.class%']]
+            -
+                - 'addAuditEntryClasses'
+                -
+                    - '%oro_user.entity.class%'
+                    - '%oro_dataaudit.loggable.entity.class%'
+                    - '%oro_dataaudit.loggable.entity_field.class%'
 
-    oro_dataaudit.convert_entity_to_array_for_message_queue:
+    oro_dataaudit.converter.entity_to_entity_change_array:
         class: 'Oro\Bundle\DataAuditBundle\Service\ConvertEntityToArrayForMessageQueueService'
         public: false
 
@@ -28,7 +32,7 @@ services:
         arguments:
             - '@oro_message_queue.message_producer'
             - '@security.token_storage'
-            - '@oro_dataaudit.convert_entity_to_array_for_message_queue'
+            - '@oro_dataaudit.converter.entity_to_entity_change_array'
             - '@oro_dataaudit.audit_config_provider'
         tags:
             - { name: doctrine.event_listener, event: onFlush, priority: -255 }
@@ -93,12 +97,6 @@ services:
         arguments:
             - '@doctrine.orm.entity_manager'
 
-    oro_dataaudit.find_or_create_audit:
-        class: 'Oro\Bundle\DataAuditBundle\Service\FindOrCreateAuditService'
-        arguments:
-            - '@doctrine.orm.entity_manager'
-            - '@oro_dataaudit.loggable.audit_entity_mapper'
-
     oro_dataaudit.audit_config_provider:
         class: 'Oro\Bundle\DataAuditBundle\Provider\AuditConfigProvider'
         public: false
@@ -112,29 +110,30 @@ services:
             - '@doctrine'
             - '@oro_entity.entity_name_resolver'
 
-    oro_dataaudit.convert_change_set_to_audit_fields:
+    oro_dataaudit.converter.change_set_to_audit_fields:
         class: 'Oro\Bundle\DataAuditBundle\Service\ConvertChangeSetToAuditFieldsService'
         public: false
         arguments:
+            - '@oro_dataaudit.loggable.audit_entity_mapper'
             - '@oro_dataaudit.audit_config_provider'
             - '@oro_dataaudit.entity_name_provider'
 
-    oro_dataaudit.convert_entity_changes_to_audit:
+    oro_dataaudit.converter.entity_changes_to_audit_entry:
         class: 'Oro\Bundle\DataAuditBundle\Service\ConvertEntityChangesToAuditService'
         public: false
         arguments:
             - '@doctrine'
-            - '@oro_dataaudit.set_new_audit_version'
-            - '@oro_dataaudit.find_or_create_audit'
+            - '@oro_dataaudit.loggable.audit_entity_mapper'
             - '@oro_dataaudit.audit_config_provider'
             - '@oro_dataaudit.entity_name_provider'
-            - '@oro_dataaudit.convert_change_set_to_audit_fields'
+            - '@oro_dataaudit.set_new_audit_version'
+            - '@oro_dataaudit.converter.change_set_to_audit_fields'
 
     oro_dataaudit.async.audit_changed_entities:
         class: 'Oro\Bundle\DataAuditBundle\Async\AuditChangedEntitiesProcessor'
         arguments:
             - '@doctrine'
-            - '@oro_dataaudit.convert_entity_changes_to_audit'
+            - '@oro_dataaudit.converter.entity_changes_to_audit_entry'
             - '@oro_message_queue.message_producer'
         tags:
             - { name: 'oro_message_queue.client.message_processor' }
@@ -143,7 +142,7 @@ services:
         class: 'Oro\Bundle\DataAuditBundle\Async\AuditChangedEntitiesRelationsProcessor'
         arguments:
             - '@doctrine'
-            - '@oro_dataaudit.convert_entity_changes_to_audit'
+            - '@oro_dataaudit.converter.entity_changes_to_audit_entry'
         tags:
             - { name: 'oro_message_queue.client.message_processor' }
 
@@ -151,6 +150,6 @@ services:
         class: 'Oro\Bundle\DataAuditBundle\Async\AuditChangedEntitiesInverseRelationsProcessor'
         arguments:
             - '@doctrine'
-            - '@oro_dataaudit.convert_entity_changes_to_audit'
+            - '@oro_dataaudit.converter.entity_changes_to_audit_entry'
         tags:
             - { name: 'oro_message_queue.client.message_processor' }

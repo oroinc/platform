@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\DataAuditBundle\Model;
 
-use Oro\Bundle\DataAuditBundle\Entity\AbstractAudit;
 use Oro\Bundle\DataAuditBundle\Entity\AbstractAuditField;
 
 class ExtendAuditField extends AbstractAuditField

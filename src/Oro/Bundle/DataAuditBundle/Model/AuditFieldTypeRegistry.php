@@ -39,8 +39,8 @@ class AuditFieldTypeRegistry
     ];
 
     /**
-     * @param type $doctrineType
-     * @param type $auditType
+     * @param string $doctrineType
+     * @param string $auditType
      *
      * @throws LogicException
      */

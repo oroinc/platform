@@ -2,7 +2,7 @@
 namespace Oro\Bundle\DataAuditBundle\Async;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
-use Oro\Bundle\DataAuditBundle\Entity\Audit;
+use Oro\Bundle\DataAuditBundle\Entity\AbstractAudit;
 use Oro\Bundle\DataAuditBundle\Model\EntityReference;
 use Oro\Bundle\DataAuditBundle\Service\ConvertEntityChangesToAuditService;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
@@ -17,33 +17,27 @@ use Oro\Component\MessageQueue\Util\JSON;
 
 class AuditChangedEntitiesProcessor implements MessageProcessorInterface, TopicSubscriberInterface
 {
-    /**
-     * @var ManagerRegistry
-     */
+    /** @var ManagerRegistry */
     private $doctrine;
 
-    /**
-     * @var ConvertEntityChangesToAuditService
-     */
-    private $convertEntityChangesToAuditService;
+    /** @var ConvertEntityChangesToAuditService */
+    private $entityChangesToAuditEntryConverter;
 
-    /**
-     * @var MessageProducerInterface
-     */
+    /** @var MessageProducerInterface */
     private $messageProducer;
 
     /**
-     * @param ManagerRegistry $doctrine
-     * @param ConvertEntityChangesToAuditService $convertEntityChangesToAuditService
-     * @param MessageProducerInterface $messageProducer
+     * @param ManagerRegistry                    $doctrine
+     * @param ConvertEntityChangesToAuditService $entityChangesToAuditEntryConverter
+     * @param MessageProducerInterface           $messageProducer
      */
     public function __construct(
         ManagerRegistry $doctrine,
-        ConvertEntityChangesToAuditService $convertEntityChangesToAuditService,
+        ConvertEntityChangesToAuditService $entityChangesToAuditEntryConverter,
         MessageProducerInterface $messageProducer
     ) {
         $this->doctrine = $doctrine;
-        $this->convertEntityChangesToAuditService = $convertEntityChangesToAuditService;
+        $this->entityChangesToAuditEntryConverter = $entityChangesToAuditEntryConverter;
         $this->messageProducer = $messageProducer;
     }
 
@@ -67,31 +61,31 @@ class AuditChangedEntitiesProcessor implements MessageProcessorInterface, TopicS
             $organization = new EntityReference(Organization::class, $body['organization_id']);
         }
 
-        $this->convertEntityChangesToAuditService->convert(
+        $this->entityChangesToAuditEntryConverter->convert(
             $body['entities_inserted'],
             $transactionId,
             $loggedAt,
             $user,
             $organization,
-            Audit::ACTION_CREATE
+            AbstractAudit::ACTION_CREATE
         );
 
-        $this->convertEntityChangesToAuditService->convert(
+        $this->entityChangesToAuditEntryConverter->convert(
             $body['entities_updated'],
             $transactionId,
             $loggedAt,
             $user,
             $organization,
-            Audit::ACTION_UPDATE
+            AbstractAudit::ACTION_UPDATE
         );
 
-        $this->convertEntityChangesToAuditService->convertSkipFields(
+        $this->entityChangesToAuditEntryConverter->convertSkipFields(
             $body['entities_deleted'],
             $transactionId,
             $loggedAt,
             $user,
             $organization,
-            Audit::ACTION_REMOVE
+            AbstractAudit::ACTION_REMOVE
         );
 
         $message = new Message();

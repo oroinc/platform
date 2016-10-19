@@ -2,71 +2,61 @@
 namespace Oro\Bundle\DataAuditBundle\Service;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
+use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\EntityRepository;
 use Oro\Bundle\DataAuditBundle\Entity\AbstractAudit;
-use Oro\Bundle\DataAuditBundle\Entity\Audit;
+use Oro\Bundle\DataAuditBundle\Loggable\AuditEntityMapper;
 use Oro\Bundle\DataAuditBundle\Provider\AuditConfigProvider;
-use Oro\Bundle\DataAuditBundle\Model\EntityReference;
 use Oro\Bundle\DataAuditBundle\Provider\EntityNameProvider;
+use Oro\Bundle\DataAuditBundle\Model\EntityReference;
 
 class ConvertEntityChangesToAuditService
 {
-    /**
-     * @var ManagerRegistry
-     */
+    /** @var ManagerRegistry */
     private $doctrine;
 
-    /**
-     * @var SetNewAuditVersionService
-     */
-    private $setNewAuditVersionService;
+    /** @var AuditEntityMapper */
+    private $auditEntityMapper;
 
-    /**
-     * @var FindOrCreateAuditService
-     */
-    private $findOrCreateAuditService;
-
-    /**
-     * @var AuditConfigProvider
-     */
+    /** @var AuditConfigProvider */
     private $configProvider;
 
-    /**
-     * @var EntityNameProvider
-     */
+    /** @var EntityNameProvider */
     private $entityNameProvider;
 
-    /**
-     * @var ConvertChangeSetToAuditFieldsService
-     */
-    private $convertChangeSetToAuditFieldsService;
+    /** @var SetNewAuditVersionService */
+    private $setNewAuditVersionService;
+
+    /** @var ConvertChangeSetToAuditFieldsService */
+    private $changeSetToAuditFieldsConverter;
 
     /**
      * @param ManagerRegistry                      $doctrine
-     * @param SetNewAuditVersionService            $setNewAuditVersionService
-     * @param FindOrCreateAuditService             $findOrCreateAuditService
+     * @param AuditEntityMapper                    $auditEntityMapper
      * @param AuditConfigProvider                  $configProvider
      * @param EntityNameProvider                   $entityNameProvider
-     * @param ConvertChangeSetToAuditFieldsService $convertChangeSetToAuditFieldsService
+     * @param SetNewAuditVersionService            $setNewAuditVersionService
+     * @param ConvertChangeSetToAuditFieldsService $changeSetToAuditFieldsConverter
      */
     public function __construct(
         ManagerRegistry $doctrine,
-        SetNewAuditVersionService $setNewAuditVersionService,
-        FindOrCreateAuditService $findOrCreateAuditService,
+        AuditEntityMapper $auditEntityMapper,
         AuditConfigProvider $configProvider,
         EntityNameProvider $entityNameProvider,
-        ConvertChangeSetToAuditFieldsService $convertChangeSetToAuditFieldsService
+        SetNewAuditVersionService $setNewAuditVersionService,
+        ConvertChangeSetToAuditFieldsService $changeSetToAuditFieldsConverter
     ) {
         $this->doctrine = $doctrine;
-        $this->setNewAuditVersionService = $setNewAuditVersionService;
-        $this->findOrCreateAuditService = $findOrCreateAuditService;
+        $this->auditEntityMapper = $auditEntityMapper;
         $this->configProvider = $configProvider;
         $this->entityNameProvider = $entityNameProvider;
-        $this->convertChangeSetToAuditFieldsService = $convertChangeSetToAuditFieldsService;
+        $this->setNewAuditVersionService = $setNewAuditVersionService;
+        $this->changeSetToAuditFieldsConverter = $changeSetToAuditFieldsConverter;
     }
 
     /**
-     * @param array           $entitiesChanges
+     * @param array           $entityChanges
      * @param string          $transactionId
      * @param \DateTime       $loggedAt
      * @param EntityReference $user
@@ -74,16 +64,17 @@ class ConvertEntityChangesToAuditService
      * @param string|null     $auditDefaultAction
      */
     public function convert(
-        array $entitiesChanges,
+        array $entityChanges,
         $transactionId,
         \DateTime $loggedAt,
         EntityReference $user,
         EntityReference $organization,
         $auditDefaultAction = null
     ) {
-        $auditEntityManager = $this->doctrine->getManagerForClass(Audit::class);
+        $auditEntryClass = $this->auditEntityMapper->getAuditEntryClass($this->getEntityByReference($user));
+        $auditEntityManager = $this->doctrine->getManagerForClass($auditEntryClass);
 
-        foreach ($entitiesChanges as $entityChange) {
+        foreach ($entityChanges as $entityChange) {
             $entityClass = $entityChange['entity_class'];
             $entityId = $entityChange['entity_id'];
             /** @var EntityManagerInterface $entityManager */
@@ -93,7 +84,8 @@ class ConvertEntityChangesToAuditService
                 continue;
             }
 
-            $fields = $this->convertChangeSetToAuditFieldsService->convert(
+            $fields = $this->changeSetToAuditFieldsConverter->convert(
+                $auditEntryClass,
                 $entityMetadata,
                 $entityChange['change_set']
             );
@@ -101,76 +93,77 @@ class ConvertEntityChangesToAuditService
                 continue;
             }
 
-            $audit = $this->findOrCreateAuditEntity($transactionId, $user, $entityClass, $entityId);
-            if (!$audit->getVersion()) {
-                $audit->setUser($this->getEntityByReference($user));
-                $audit->setOrganization($this->getEntityByReference($organization));
-                $audit->setLoggedAt($loggedAt);
-                $audit->setObjectName($this->entityNameProvider->getEntityName($entityClass, $entityId));
-                $auditEntityManager->flush();
-
-                $this->setNewAuditVersionService->setVersion($audit);
+            $audit = $this->findAuditEntity($auditEntryClass, $transactionId, $entityClass, $entityId);
+            if (null === $audit) {
+                $audit = $this->createAuditEntity(
+                    $auditEntityManager,
+                    $auditEntryClass,
+                    $transactionId,
+                    $entityClass,
+                    $entityId,
+                    $loggedAt,
+                    $user,
+                    $organization
+                );
             }
-
             if (!$audit->getAction()) {
                 $audit->setAction($this->guessAuditAction($audit, $auditDefaultAction));
                 $auditEntityManager->flush();
             }
 
-            foreach ($fields as $newField) {
-                $currentField = $audit->getField($newField->getField());
-                if ($currentField && $entityMetadata->isCollectionValuedAssociation($currentField->getField())) {
-                    $currentField->mergeCollectionField($newField);
+            foreach ($fields as $field) {
+                $existingField = $audit->getField($field->getField());
+                if ($existingField && $entityMetadata->isCollectionValuedAssociation($existingField->getField())) {
+                    $existingField->mergeCollectionField($field);
                 } else {
-                    $audit->addField($newField);
+                    $audit->addField($field);
                 }
             }
-
-            $auditEntityManager->persist($audit);
         }
 
         $auditEntityManager->flush();
     }
 
     /**
-     * @param array             $entitiesChanges
-     * @param string            $transactionId
-     * @param \DateTime         $loggedAt
-     * @param EntityReference   $user
-     * @param EntityReference   $organization
-     * @param string            $auditDefaultAction
+     * @param array           $entityChanges
+     * @param string          $transactionId
+     * @param \DateTime       $loggedAt
+     * @param EntityReference $user
+     * @param EntityReference $organization
+     * @param string          $auditDefaultAction
      */
     public function convertSkipFields(
-        array $entitiesChanges,
+        array $entityChanges,
         $transactionId,
         \DateTime $loggedAt,
         EntityReference $user,
         EntityReference $organization,
         $auditDefaultAction
     ) {
-        $auditEntityManager = $this->doctrine->getManagerForClass(Audit::class);
+        $auditEntryClass = $this->auditEntityMapper->getAuditEntryClass($this->getEntityByReference($user));
+        $auditEntityManager = $this->doctrine->getManagerForClass($auditEntryClass);
 
-        foreach ($entitiesChanges as $entityChange) {
+        foreach ($entityChanges as $entityChange) {
             $entityClass = $entityChange['entity_class'];
             $entityId = $entityChange['entity_id'];
             if (!$this->configProvider->isAuditableEntity($entityClass)) {
                 continue;
             }
 
-            $audit = $this->findOrCreateAuditEntity($transactionId, $user, $entityClass, $entityId);
-            if (!$audit->getAction()) {
-                // a new audit entity
-                $audit->setAction($auditDefaultAction);
-                $audit->setUser($this->getEntityByReference($user));
-                $audit->setOrganization($this->getEntityByReference($organization));
-                $audit->setLoggedAt($loggedAt);
-                $audit->setObjectName($this->entityNameProvider->getEntityName($entityClass, $entityId));
-                $auditEntityManager->flush();
-
-                $this->setNewAuditVersionService->setVersion($audit);
+            $audit = $this->findAuditEntity($auditEntryClass, $transactionId, $entityClass, $entityId);
+            if (null === $audit) {
+                $this->createAuditEntity(
+                    $auditEntityManager,
+                    $auditEntryClass,
+                    $transactionId,
+                    $entityClass,
+                    $entityId,
+                    $loggedAt,
+                    $user,
+                    $organization,
+                    $auditDefaultAction
+                );
             }
-
-            $auditEntityManager->persist($audit);
         }
 
         $auditEntityManager->flush();
@@ -178,43 +171,21 @@ class ConvertEntityChangesToAuditService
 
     /**
      * @param AbstractAudit $audit
-     * @param $defaultAction
+     * @param string|null   $defaultAction
      *
      * @return string
      */
-    protected function guessAuditAction(AbstractAudit $audit, $defaultAction)
+    private function guessAuditAction(AbstractAudit $audit, $defaultAction)
     {
         if ($audit->getAction()) {
             return $audit->getAction();
         }
 
         if ($audit->getVersion() < 2) {
-            return $defaultAction ?: Audit::ACTION_CREATE;
+            return $defaultAction ?: AbstractAudit::ACTION_CREATE;
         }
 
-        return $defaultAction ?: Audit::ACTION_UPDATE;
-    }
-
-    /**
-     * @param string          $transactionId
-     * @param EntityReference $user
-     * @param string          $entityClass
-     * @param string          $entityId
-     *
-     * @return AbstractAudit
-     */
-    private function findOrCreateAuditEntity(
-        $transactionId,
-        EntityReference $user,
-        $entityClass,
-        $entityId
-    ) {
-        return $this->findOrCreateAuditService->findOrCreate(
-            $this->getEntityByReference($user),
-            $entityClass,
-            $entityId,
-            $transactionId
-        );
+        return $defaultAction ?: AbstractAudit::ACTION_UPDATE;
     }
 
     /**
@@ -231,5 +202,81 @@ class ConvertEntityChangesToAuditService
         }
 
         return $reference->getEntity();
+    }
+
+    /**
+     * @param string $auditEntryClass
+     * @param string $transactionId
+     * @param string $entityClass
+     * @param string $entityId
+     *
+     * @return AbstractAudit
+     */
+    private function findAuditEntity($auditEntryClass, $transactionId, $entityClass, $entityId)
+    {
+        return $this->getAuditRepository($auditEntryClass)
+            ->createQueryBuilder('a')
+            ->select('a')
+            ->where('a.transactionId = :transactionId AND a.objectClass = :objectClass AND a.objectId = :objectId')
+            ->setParameter('transactionId', $transactionId)
+            ->setParameter('objectClass', $entityClass)
+            ->setParameter('objectId', $entityId)
+            ->getQuery()
+            ->getOneOrNullResult();
+    }
+
+    /**
+     * @param EntityManager   $auditEntityManager
+     * @param string          $auditEntryClass
+     * @param string          $transactionId
+     * @param string          $entityClass
+     * @param int             $entityId
+     * @param \DateTime       $loggedAt
+     * @param EntityReference $user
+     * @param EntityReference $organization
+     * @param string|null     $action
+     *
+     * @return AbstractAudit
+     */
+    private function createAuditEntity(
+        EntityManager $auditEntityManager,
+        $auditEntryClass,
+        $transactionId,
+        $entityClass,
+        $entityId,
+        \DateTime $loggedAt,
+        EntityReference $user,
+        EntityReference $organization,
+        $action = null
+    ) {
+        /** @var AbstractAudit $audit */
+        $audit = $auditEntityManager->getClassMetadata($auditEntryClass)->newInstance();
+        $audit->setTransactionId($transactionId);
+        $audit->setObjectClass($entityClass);
+        $audit->setObjectId($entityId);
+        $audit->setLoggedAt($loggedAt);
+        $audit->setUser($this->getEntityByReference($user));
+        $audit->setOrganization($this->getEntityByReference($organization));
+        $audit->setObjectName(
+            $this->entityNameProvider->getEntityName($auditEntryClass, $entityClass, $entityId)
+        );
+        $audit->setAction($action);
+
+        $auditEntityManager->persist($audit);
+        $auditEntityManager->flush();
+
+        $this->setNewAuditVersionService->setVersion($audit);
+
+        return $audit;
+    }
+
+    /**
+     * @param string $auditEntryClass
+     *
+     * @return EntityRepository
+     */
+    private function getAuditRepository($auditEntryClass)
+    {
+        return $this->doctrine->getRepository($auditEntryClass);
     }
 }
