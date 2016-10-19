@@ -5,7 +5,8 @@ Oro ExpressionLanguage extends [Symfony ExpressionLanguage Component](https://sy
 
 ## Why do I need it?
 ### * It's user-friendly and business oriented
-When you need your B2B Commerce site to be flexibile when it comes to managing visibility of workflow steps and, for exmaple, checkout options, and you need minimum IT expertise and not special skills to modify it in the Oro commerce web UI, your explerssion language has to be user friendly and business oriented. Your B2B commerce admin won't necesserily have development background. 
+With Oro ExpressionLanguage, you can include evaluating expressions into your application workflows and be sure that your business users need minimum learning and no IT expertise or special skills to master the language. For example, when you need a flexibile solution for managing visibility of workflow steps and checkout options in the B2B Commerce, the eCommerce administrator can modify the visibility conditions in the Oro commerce web UI. They won't need any development background, as Oro ExplerssionLanguage is user friendly and business oriented.
+
 ### * It supports collection validation with OR/AND logics 
 When you have to validate all items in the collection (say, products in the order being submitted), or ensure that at least one value has a particular quality (for example meets bulk quantity requirements), you can easily check these facts using items.all(sub-condition) and items.any(sub-condition) phrases, where sub-condition is an expression that applies to every item. With the Symfony ExpressionLanguage, we would need to implement special functions or methods of collections and it would not necessarily be flexible and reusable. The expression would move from the UI to the code, which will cause difficulties in understanding for non-technical users. Finally, implementing a compex multi-level nested expression in the code might be really time-consuming challenge. All these considerations urged us to develop this improved component.
 
@@ -27,7 +28,7 @@ Finally, we valuate a boolean parameter: `product.enabled`; it should be *true* 
 
 ## What is the difference between Oro ExpressionLanguage and Symfony ExpressionLanguage?
 
-1. In Oro ExpressionLanguage, `==`, `===`, `!==` operators were removed and replaced with PHP Identical and Not identical operators we are used to: '=' (which stands for *equal*) and '!=' (which stands for *not equal*).
+1. In Oro ExpressionLanguage, `==` operator was removed and the `===` and `!==` operators were replaced with '=' (which stands for *identical*) and '!=' (which stands for *not identical*) respectively.
 2. Oro ExpressionLanguage component uses *\Oro\Component\PropertyAccess\PropertyAccessor* to access the object properties.
 3. `all` and `any` methods were added for arrays and *\Traversable* objects. A nested expression can act as an arguments for these methods, like in `product.units.any(unit = 'item')`. Note there are no quotes around the expression. 
 4. Oro ExpressionLanguage does not allow to call custom methods (other than `any` and `all`).
@@ -42,7 +43,7 @@ When you are using `all` or `any` method, Oro ExpressionLanguage Component autom
 
 Now, let's see what actually happens when you call `all` and `any` methods. These methods generally follow the `and` and `or` logics when evaluating the nested expression for every element of array.
 
-`items.all(nested_expression)` is `true` when the nested condition is satisfied for every item in the collection. If at least one item results in `false` evaluation, the `items.all()` returns `false` wihtout processing the remaining items. 
+`items.all(nested_expression)` is `true` when the nested condition is satisfied for every item in the collection. When an item evaluation results in `false`, the `items.all()` immediately returns `false` wihtout processing the remaining items. 
 
 Vise versa, `items.any(nested_expression)` is `true` if a nested expression evaluates to `true` for at least one item. Remaining items are not processed too.
 
