@@ -408,6 +408,21 @@ placeholders:
 - Added class `Oro\Bundle\NavigationBundle\Entity\Repository\MenuUpdateRepository` repository for `Oro\Bundle\NavigationBundle\Entity\MenuUpdate` entity.
 - Added class `Oro\Bundle\NavigationBundle\Exception\ProviderNotFoundException`.
 - Added class `Oro\Bundle\NavigationBundle\Provider\DefaultMenuUpdateProvider` with service `oro_navigation.menu_update_provider.default`.
+- Moved class `Oro\Bundle\NavigationBundle\Menu\FeatureAwareMenuFactoryExtension` to `Oro\Bundle\FeatureToggleBundle\Menu\FeatureAwareMenuFactoryExtension`.
+- Moved class `Oro\Bundle\NavigationBundle\Event\DoctrineTagEventListener` to `Oro\Bundle\SyncBundle\Event\DoctrineTagEventListener`.
+- Moved class `Oro\Bundle\NavigationBundle\Twig\ContentTagsExtension` to `Oro\Bundle\SyncBundle\Twig\ContentTagsExtension`.
+- Moved class `Oro\Bundle\NavigationBundle\Content\TagGeneratorChain` to `Oro\Bundle\SyncBundle\Content\TagGeneratorChain`.
+- Moved class `Oro\Bundle\NavigationBundle\Content\DoctrineTagGenerator` to `Oro\Bundle\SyncBundle\Content\DoctrineTagGenerator`.
+- Moved class `Oro\Bundle\NavigationBundle\Content\SimpleTagGenerator` to `Oro\Bundle\SyncBundle\Content\SimpleTagGenerator`.
+- Moved class `Oro\Bundle\NavigationBundle\Content\DataGridTagListener` to `Oro\Bundle\SyncBundle\Content\DataGridTagListener`.
+- Moved class `Oro\Bundle\NavigationBundle\Content\TopicSender` to `Oro\Bundle\SyncBundle\Content\TopicSender`.
+- Added class `Oro\Bundle\NavigationBundle\DependencyInjection\Compiler\MenuExtensionPass` compiler pass for registering menu factory extensions by tag `oro_navigation.menu_extension`.
+- Moved twig template `OroNavigationBundle:Include:contentTags.html.twig` to `OroSyncBundle:Include:contentTags.html.twig`.
+- Moved JS file `js/app/modules/content-manager-module.js` to `SyncBundle`.
+- Moved JS file `js/content/grid-builder.js` to `SyncBundle`.
+- Moved JS file `js/content-manager.js` to `SyncBundle`.
+- Moved DOC file `doc/content_outdating.md` to `SyncBundle`.
+- Moved DOC file `doc/mediator-handlers.md` to `SyncBundle`.
 - Class `Oro\Bundle\NavigationBundle\Provider\BuilderChainProvider`
     - construction signature was changed now it takes next arguments:
         - `FactoryInterface` $factory,
@@ -472,6 +487,25 @@ to the [Fallback documentation](./src/Oro/Bundle/EntityBundle/Resources/doc/enti
 
 ####MigrationBundle
 - `Oro\Bundle\MigrationBundle\Migration\MigrationExecutor` now clears cache at all cache providers after successful migration load
+
+####FeatureToggleBundle
+- Added class `Oro\Bundle\FeatureToggleBundle\Menu\FeatureAwareMenuFactoryExtension` moved from `NavigationBundle`.
+
+####SyncBundle
+- Added class `Oro\Bundle\SyncBundle\DependencyInjection\Compiler\SkipTagTrackingPass` compiler pass that add skipped entity classes to `oro_sync.event_listener.doctrine_tag` service.
+- Added class `Oro\Bundle\SyncBundle\Event\DoctrineTagEventListener` moved from `NavigationBundle`.
+- Added class `Oro\Bundle\SyncBundle\Twig\ContentTagsExtension` moved from `NavigationBundle`.
+- Added class `Oro\Bundle\SyncBundle\Content\TagGeneratorChain` moved from `NavigationBundle`.
+- Added class `Oro\Bundle\SyncBundle\Content\DoctrineTagGenerator` moved from `NavigationBundle`.
+- Added class `Oro\Bundle\SyncBundle\Content\SimpleTagGenerator` moved from `NavigationBundle`.
+- Added class `Oro\Bundle\SyncBundle\Content\DataGridTagListener` moved from `NavigationBundle`.
+- Added class `Oro\Bundle\SyncBundle\Content\TopicSender` moved from `NavigationBundle`.
+- Added twig template `OroSyncBundle:Include:contentTags.html.twig` moved from `NavigationBundle`.
+- Added JS file `js/app/modules/content-manager-module.js` moved from `NavigationBundle`.
+- Added JS file `js/content/grid-builder.js` moved from `NavigationBundle`.
+- Added JS file `js/content-manager.js` moved from `NavigationBundle`.
+- Added DOC file `doc/content_outdating.md` moved from `NavigationBundle`.
+- Added DOC file `doc/mediator-handlers.md` moved from `NavigationBundle`.
 
 ####Component
 - Added trait `Oro\Component\DependencyInjection\Compiler\TaggedServicesCompilerPassTrait`

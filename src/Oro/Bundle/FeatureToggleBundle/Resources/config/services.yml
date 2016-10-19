@@ -94,3 +94,10 @@ services:
         tags:
             - { name: kernel.event_listener, event: oro_config.settings_before_save, method: onSettingsSaveBefore }
             - { name: kernel.event_listener, event: oro_config.update_after, method: onUpdateAfter }
+
+    oro_featuretoggle.menu.feature_extension:
+        class: 'Oro\Bundle\FeatureToggleBundle\Menu\FeatureAwareMenuFactoryExtension'
+        arguments:
+            - '@oro_featuretoggle.checker.feature_checker'
+        tags:
+            - { name: oro_navigation.menu_extension, priority: 90 }
