@@ -69,7 +69,7 @@ class TransitionTriggerProcessorTest extends \PHPUnit_Framework_TestCase
         $message = TransitionTriggerMessage::create($trigger, self::MAIN_ENTITY_ID);
 
         $this->setUpObjectManager($trigger);
-        $this->setUpLogger(null, null);
+        $this->setUpLogger();
 
         $this->handler->expects($this->once())->method('process')->with($trigger, $message)->willReturn(true);
 
@@ -85,7 +85,7 @@ class TransitionTriggerProcessorTest extends \PHPUnit_Framework_TestCase
         $message = $this->getMessageMock();
 
         $this->setUpObjectManager($trigger);
-        $this->setUpLogger('Transition not allowed', $message->getBody());
+        $this->setUpLogger('Transition not allowed');
 
         $this->handler->expects($this->once())->method('process')->willReturn(false);
 
@@ -105,7 +105,7 @@ class TransitionTriggerProcessorTest extends \PHPUnit_Framework_TestCase
         $message = $this->getMessageMock($data);
 
         $this->setUpObjectManager($trigger);
-        $this->setUpLogger($expectedMessage, $message->getBody());
+        $this->setUpLogger($expectedMessage);
 
         $this->assertEquals(MessageProcessorInterface::REJECT, $this->processor->process($message, $this->session));
     }
@@ -181,14 +181,11 @@ class TransitionTriggerProcessorTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @param null|string $message
-     * @param null|string $body
      */
-    private function setUpLogger($message, $body)
+    private function setUpLogger($message = null)
     {
         if ($message) {
-            $this->logger->expects($this->once())
-                ->method('error')
-                ->with(sprintf('Message could not be processed: %s. Original message: "%s"', $message, $body));
+            $this->logger->expects($this->once())->method('error');
         } else {
             $this->logger->expects($this->never())->method($this->anything());
         }
