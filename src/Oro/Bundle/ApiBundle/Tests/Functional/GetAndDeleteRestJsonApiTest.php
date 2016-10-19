@@ -19,6 +19,9 @@ class GetAndDeleteRestJsonApiTest extends RestJsonApiTestCase
             return;
         }
 
+        // guard
+        $this->assertTrue($this->isEntityEnabled($entityClass));
+
         $entityType = $this->getEntityType($entityClass);
 
         // test "get list" request
@@ -26,22 +29,17 @@ class GetAndDeleteRestJsonApiTest extends RestJsonApiTestCase
             'GET',
             $this->getUrl('oro_rest_api_cget', ['entity' => $entityType, 'page[size]' => 1])
         );
+        $this->assertApiResponseStatusCodeEquals($response, 200, $entityType, 'get list');
 
-        if (!$this->isEntityEnabled($entityClass)) {
-            $this->assertApiResponseStatusCodeEquals($response, 403, $entityType, 'get list');
-        } else {
-            $this->assertApiResponseStatusCodeEquals($response, 200, $entityType, 'get list');
-
-            $id = $this->getGetEntityId($this->jsonToArray($response->getContent()));
-            if (null !== $id) {
-                // test "get" request
-                if (!in_array('get', $excludedActions, true)) {
-                    $this->checkGetRequest($entityType, $id, 200);
-                }
-                // test "delete" request
-                if (!in_array('delete', $excludedActions, true)) {
-                    $this->checkDeleteRequest($entityType, $id, $excludedActions);
-                }
+        $id = $this->getGetEntityId($this->jsonToArray($response->getContent()));
+        if (null !== $id) {
+            // test "get" request
+            if (!in_array('get', $excludedActions, true)) {
+                $this->checkGetRequest($entityType, $id, 200);
+            }
+            // test "delete" request
+            if (!in_array('delete', $excludedActions, true)) {
+                $this->checkDeleteRequest($entityType, $id, $excludedActions);
             }
         }
     }

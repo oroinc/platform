@@ -386,10 +386,29 @@ placeholders:
     items: ...
 ```
 - Main menu dropdown active item is now triggering a page refresh, despite the Backbone router limitations
+- Class `Oro\Bundle\UIBundle\Placeholder\PlaceholderProvider`
+    - construction signature was changed now it takes next arguments:
+        - `array` $placeholders
+        - `ResolverInterface` $resolver
+        - `SecurityFacade` $securityFacade
+        - `FeatureChecker` $featureChecker
 
 ####DashboardBundle:
 - Dashboards configurations now loads from `Resources/config/oro/dashboards.yml` instead of `Resources/config/dashboard.yml` file.
 - Root node for dashboards configuration in `Resources/config/oro/dashboards.yml` file were changed from `oro_dashboard_config` to `dashboards`.
+- Class `Oro\Bundle\DashboardBundle\Model\WidgetConfigs`
+    - construction signature was changed now it takes next arguments:
+        - `ConfigProvider` $configProvider
+        - `SecurityFacade` $securityFacade
+        - `ResolverInterface` $resolver
+        - `EntityManagerInterface` $entityManager
+        - `ConfigValueProvider` $valueProvider
+        - `TranslatorInterface` $translator
+        - `EventDispatcherInterface` $eventDispatcher
+        - `FeatureChecker` $featureChecker
+    - method `filterWidgets` signature was changed now it takes next arguments:
+        - `array` $items
+        - $widgetName = null
 
 ####NavigationBundle:
 - Navigation configuration now loads form `Resources/config/oro/navigation.yml` instead of `Resources/config/navigation.yml` file.

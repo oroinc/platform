@@ -3,6 +3,7 @@
 namespace Oro\Bundle\DashboardBundle\Tests\Unit\Model;
 
 use Oro\Bundle\DashboardBundle\Model\WidgetConfigs;
+use Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker;
 
 class WidgetAttributesTest extends \PHPUnit_Framework_TestCase
 {
@@ -26,6 +27,9 @@ class WidgetAttributesTest extends \PHPUnit_Framework_TestCase
 
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $eventDispatcher;
+
+    /** @var \PHPUnit_Framework_MockObject_MockObject|FeatureChecker */
+    protected $featureChecker;
 
     protected function setUp()
     {
@@ -51,6 +55,13 @@ class WidgetAttributesTest extends \PHPUnit_Framework_TestCase
 
         $this->eventDispatcher = $this->getMock('Symfony\Component\EventDispatcher\EventDispatcherInterface');
 
+        $this->featureChecker = $this->getMockBuilder('Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $this->featureChecker->expects($this->any())
+            ->method('isResourceEnabled')
+            ->will($this->returnValue(true));
+
         $this->target = new WidgetConfigs(
             $this->configProvider,
             $this->securityFacade,
@@ -58,7 +69,8 @@ class WidgetAttributesTest extends \PHPUnit_Framework_TestCase
             $em,
             $this->valueProvider,
             $this->translator,
-            $this->eventDispatcher
+            $this->eventDispatcher,
+            $this->featureChecker
         );
     }
 
@@ -128,7 +140,7 @@ class WidgetAttributesTest extends \PHPUnit_Framework_TestCase
             ->with($expectedWidgetName)
             ->will($this->returnValue(['items' => $configs]));
 
-        $this->securityFacade->expects($this->exactly(3))
+        $this->securityFacade->expects($this->any())
             ->method('isGranted')
             ->will(
                 $this->returnValueMap(

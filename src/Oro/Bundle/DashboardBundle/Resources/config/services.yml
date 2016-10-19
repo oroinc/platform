@@ -61,6 +61,7 @@ services:
             - '@oro_dashboard.widget_config_value.provider'
             - '@translator'
             - '@event_dispatcher'
+            - '@oro_featuretoggle.checker.feature_checker'
         calls:
             - [setRequest, ["@?request="]]
 
@@ -315,3 +316,8 @@ services:
         class: Oro\Bundle\DashboardBundle\Form\Type\WidgetFilterType
         tags:
             - { name: form.type, alias: oro_dashboard_query_filter }
+
+    oro_dashboard.config_extension.feature:
+        class: 'Oro\Bundle\DashboardBundle\Configuration\FeatureConfigurationExtension'
+        tags:
+            - { name: oro_feature.config_extension }
