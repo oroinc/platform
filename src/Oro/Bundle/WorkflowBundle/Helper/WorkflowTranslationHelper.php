@@ -58,10 +58,7 @@ class WorkflowTranslationHelper
      */
     public function prepareTranslations($workflowName)
     {
-        $translationKeySource = new TranslationKeySource(
-            new WorkflowTemplate(),
-            ['workflow_name' => $workflowName]
-        );
+        $translationKeySource = new TranslationKeySource(new WorkflowTemplate(), ['workflow_name' => $workflowName]);
 
         $this->translationHelper->prepareValues(
             $this->translationKeyGenerator->generate($translationKeySource),
@@ -76,7 +73,7 @@ class WorkflowTranslationHelper
      */
     public function findTranslation($key)
     {
-        return $this->translationHelper->findValue($key, $this->translator->getLocale(), self::TRANSLATION_DOMAIN);
+        return $this->findValue($key, $this->translator->getLocale());
     }
 
     /**
@@ -95,29 +92,13 @@ class WorkflowTranslationHelper
     public function saveTranslation($key, $value)
     {
         $currentLocale = $this->translator->getLocale();
-        $this->translationManager->saveValue(
-            $key,
-            $value,
-            $currentLocale,
-            self::TRANSLATION_DOMAIN,
-            Translation::SCOPE_UI
-        );
+        $this->saveValue($key, $value, $currentLocale);
 
         if ($currentLocale !== Translation::DEFAULT_LOCALE) {
-            $existingValue = $this->translationHelper->findValue(
-                $key,
-                Translation::DEFAULT_LOCALE,
-                self::TRANSLATION_DOMAIN
-            );
+            $existingValue = $this->findValue($key);
 
             if ($existingValue === $key) {
-                $this->translationManager->saveValue(
-                    $key,
-                    $value,
-                    Translation::DEFAULT_LOCALE,
-                    self::TRANSLATION_DOMAIN,
-                    Translation::SCOPE_UI
-                );
+                $this->saveValue($key, $value);
             }
         }
     }
@@ -156,5 +137,25 @@ class WorkflowTranslationHelper
         unset($item);
 
         $definition->setConfiguration($configuration);
+    }
+
+    /**
+     * @param string $key
+     * @param string $value
+     * @param string $locale
+     */
+    private function saveValue($key, $value, $locale = Translation::DEFAULT_LOCALE)
+    {
+        $this->translationManager->saveValue($key, $value, $locale, self::TRANSLATION_DOMAIN, Translation::SCOPE_UI);
+    }
+
+    /**
+     * @param string $key
+     * @param string $locale
+     * @return string
+     */
+    private function findValue($key, $locale = Translation::DEFAULT_LOCALE)
+    {
+        return $this->translationHelper->findValue($key, $locale, self::TRANSLATION_DOMAIN);
     }
 }

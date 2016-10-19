@@ -72,47 +72,70 @@ class WorkflowTranslationHelperTest extends \PHPUnit_Framework_TestCase
         unset($this->translator, $this->manager, $this->helper, $this->translationHelper, $this->keyGenerator);
     }
 
-    public function testSaveTranslation()
+    public function testSaveTranslationNoTranslationForDefaultLocale()
     {
-        $this->translator->expects($this->exactly(2))->method('getLocale')->willReturn('pl');
+        $locale = 'pl';
+        $domain = WorkflowTranslationHelper::TRANSLATION_DOMAIN;
+        $key = 'test_key';
+        $value = 'test_value';
 
-        $this->assertNotEquals('pl', Translation::DEFAULT_LOCALE, 'test custom locale should be changed from pl');
+        $this->assertNotEquals($locale, Translation::DEFAULT_LOCALE, 'Test custom locale should be changed from pl');
 
-        //case test_key2
+        $this->translator->expects($this->once())->method('getLocale')->willReturn($locale);
+
         $this->manager->expects($this->at(0))
             ->method('saveValue')
-            ->with('test_key2', 'test_value2', 'pl', WorkflowTranslationHelper::TRANSLATION_DOMAIN);
-
-        $this->translationHelper->expects($this->at(0))
-            ->method('findValue')
-            ->with('test_key2', Translation::DEFAULT_LOCALE, WorkflowTranslationHelper::TRANSLATION_DOMAIN)
-            ->willReturn('test_key2'); //case when it returns key itself (so no value in db)
-
+            ->with($key, $value, $locale, $domain, Translation::SCOPE_UI);
         $this->manager->expects($this->at(1))
             ->method('saveValue')
-            ->with(
-                'test_key2',
-                'test_value2',
-                Translation::DEFAULT_LOCALE,
-                WorkflowTranslationHelper::TRANSLATION_DOMAIN,
-                Translation::SCOPE_UI
-            );
+            ->with($key, $value, Translation::DEFAULT_LOCALE, $domain, Translation::SCOPE_UI);
 
-        //case test_key3
-        $this->manager->expects($this->at(2))
-            ->method('saveValue')
-            ->with('test_key3', 'test_value3', 'pl', WorkflowTranslationHelper::TRANSLATION_DOMAIN);
-
-        $this->translationHelper->expects($this->at(1))
+        $this->translationHelper->expects($this->once())
             ->method('findValue')
-            ->with('test_key3', Translation::DEFAULT_LOCALE, WorkflowTranslationHelper::TRANSLATION_DOMAIN)
-            ->willReturn('some translation string'); //case when it returns a value
+            ->with($key, Translation::DEFAULT_LOCALE, $domain)
+            ->willReturn($key); //case when it returns key itself (so no value in db)
 
-        //would not save in case of real translation value already exists in db
+        $this->helper->saveTranslation($key, $value);
+    }
 
-        //run
-        $this->helper->saveTranslation('test_key2', 'test_value2');
-        $this->helper->saveTranslation('test_key3', 'test_value3');
+    public function testSaveTranslationWithTranslationForDefaultLocale()
+    {
+        $locale = 'pl';
+        $domain = WorkflowTranslationHelper::TRANSLATION_DOMAIN;
+        $key = 'test_key';
+        $value = 'test_value';
+
+        $this->translator->expects($this->once())->method('getLocale')->willReturn($locale);
+
+        $this->manager->expects($this->once())
+            ->method('saveValue')
+            ->with($key, $value, $locale, $domain, Translation::SCOPE_UI);
+
+        //case when it returns a value would not save in case of real translation value already exists in db
+        $this->translationHelper->expects($this->once())
+            ->method('findValue')
+            ->with($key, Translation::DEFAULT_LOCALE, $domain)
+            ->willReturn('some translation string');
+
+        $this->helper->saveTranslation($key, $value);
+    }
+
+    public function testSaveTranslationForDefaultLocale()
+    {
+        $locale = Translation::DEFAULT_LOCALE;
+        $domain = WorkflowTranslationHelper::TRANSLATION_DOMAIN;
+        $key = 'test_key';
+        $value = 'test_value';
+
+        $this->translator->expects($this->once())->method('getLocale')->willReturn($locale);
+
+        $this->manager->expects($this->once())
+            ->method('saveValue')
+            ->with($key, $value, $locale, $domain, Translation::SCOPE_UI);
+
+        $this->translationHelper->expects($this->never())->method('findValue');
+
+        $this->helper->saveTranslation($key, $value);
     }
 
     public function testEnsureTranslationKey()
