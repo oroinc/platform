@@ -62,6 +62,19 @@ class Element extends NodeElement
     }
 
     /**
+     * @param string $key
+     * @return string|array
+     */
+    public function getOption($key)
+    {
+        if (!isset($this->options[$key])) {
+            self::fail("Option with '$key' key not found'");
+        }
+
+        return $this->options[$key];
+    }
+
+    /**
      * @param string $name
      * @param array  $arguments
      */

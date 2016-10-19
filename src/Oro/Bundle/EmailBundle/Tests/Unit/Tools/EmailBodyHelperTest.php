@@ -26,7 +26,7 @@ class EmailBodyHelperTest extends \PHPUnit_Framework_TestCase
      */
     public function testGetClearBody($bodyText, $expectedResult)
     {
-        $this->assertEquals($expectedResult, $this->bodyHelper->getClearBody($bodyText));
+        $this->assertEquals($expectedResult, $this->bodyHelper->getTrimmedClearText($bodyText));
     }
 
     public function bodyData()

@@ -1,7 +1,7 @@
 {% set isWidgetContext = isWidgetContext is defined ? isWidgetContext : false %}
 {% extends isWidgetContext ? 'OroFormBundle:Layout:widgetForm.html.twig' : bap.layout %}
 
-{% import 'OroNavigationBundle:Include:contentTags.html.twig' as navigationMacro %}
+{% import 'OroSyncBundle:Include:contentTags.html.twig' as syncMacro %}
 {% import 'OroUIBundle::macros.html.twig' as UI %}
 
 {% set entity = entity is defined ? entity : null %}
@@ -206,9 +206,9 @@
                 {{ UI.scrollData(id, data, form) }}
             {% endblock content_data %}
         </div>
-        {% block navigation_content_tags %}
+        {% block sync_content_tags %}
             {# block added just for possibility to disable it in child templates if needed #}
-            {{ navigationMacro.navigationContentTags(form.vars.value) }}
+            {{ syncMacro.syncContentTags(form.vars.value) }}
         {% endblock %}
     </form>
     {{ oro_form_js_validation(form) }}
