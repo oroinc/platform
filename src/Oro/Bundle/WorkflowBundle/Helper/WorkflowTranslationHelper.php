@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\WorkflowBundle\Helper;
 
+use Oro\Bundle\TranslationBundle\Entity\Translation;
 use Oro\Bundle\TranslationBundle\Translation\KeySource\TranslationKeySource;
 use Oro\Bundle\TranslationBundle\Helper\TranslationHelper;
 use Oro\Bundle\TranslationBundle\Manager\TranslationManager;
@@ -90,11 +91,28 @@ class WorkflowTranslationHelper
     /**
      * @param string $key
      * @param string $value
-     *
      */
     public function saveTranslation($key, $value)
     {
-        $this->translationManager->saveValue($key, $value, $this->translator->getLocale(), self::TRANSLATION_DOMAIN);
+        $currentLocale = $this->translator->getLocale();
+        $this->translationManager->saveValue($key, $value, $currentLocale, self::TRANSLATION_DOMAIN);
+
+        if ($currentLocale !== Translation::DEFAULT_LOCALE) {
+            $existingValue = $this->translationHelper->findValue(
+                $key,
+                Translation::DEFAULT_LOCALE,
+                self::TRANSLATION_DOMAIN
+            );
+
+            if (!$existingValue || $existingValue === $key) {
+                $this->translationManager->saveValue(
+                    $key,
+                    $value,
+                    Translation::DEFAULT_LOCALE,
+                    self::TRANSLATION_DOMAIN
+                );
+            }
+        }
     }
 
     /**
