@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\NotificationBundle\Processor;
+namespace Oro\Bundle\NotificationBundle\Model;
 
 use Oro\Bundle\EmailBundle\Model\EmailTemplateInterface;
 

@@ -16,7 +16,7 @@ class EntityCacheWarmerTest extends \PHPUnit_Framework_TestCase
         $oroCrmProvider = $this->getMock('Oro\Bundle\EmailBundle\Entity\Provider\EmailOwnerProviderInterface');
         $oroCrmProvider->expects($this->any())
             ->method('getEmailOwnerClass')
-            ->will($this->returnValue('OroCRM\TestContact'));
+            ->will($this->returnValue('Oro\TestContact'));
 
         $acmeProvider = $this->getMock('Oro\Bundle\EmailBundle\Entity\Provider\EmailOwnerProviderInterface');
         $acmeProvider->expects($this->any())
@@ -87,7 +87,7 @@ class EntityCacheWarmerTest extends \PHPUnit_Framework_TestCase
                                 'fieldName'    => 'owner1'
                             ),
                             array(
-                                'targetEntity' => 'OroCRM\TestContact',
+                                'targetEntity' => 'Oro\TestContact',
                                 'columnName'   => 'owner_testcontact_id',
                                 'fieldName'    => 'owner2'
                             ),
