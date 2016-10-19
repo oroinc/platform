@@ -68,108 +68,42 @@ class WorkflowDefinitionHandlerTest extends \PHPUnit_Framework_TestCase
         );
     }
 
-    /**
-     * @dataProvider updateWorkflowDefinitionDataProvider
-     *
-     * @param WorkflowDefinition $definition
-     * @param WorkflowDefinition $existingDefinition
-     * @param WorkflowDefinition $newDefinition
-     * @param WorkflowDefinition $previous
-     *
-     * @SuppressWarnings(PHPMD.NPathComplexity)
-     */
-    public function testUpdateWorkflowDefinition(
-        WorkflowDefinition $definition,
-        WorkflowDefinition $existingDefinition = null,
-        WorkflowDefinition $newDefinition = null,
-        WorkflowDefinition $previous = null
-    ) {
-        $this->assertNotEquals($definition, $newDefinition);
+    public function testCreateWorkflowDefinition()
+    {
+        $newDefinition = new WorkflowDefinition();
 
-        if ($existingDefinition) {
-            $this->assertNotEquals($definition, $existingDefinition);
-            $this->entityRepository
-                ->expects($this->once())
-                ->method('find')
-                ->willReturn($existingDefinition);
-        }
+        $this->entityManager->expects($this->once())->method('persist')->with($newDefinition);
 
-        if (!$existingDefinition && !$newDefinition) {
-            $this->entityManager->expects($this->once())->method('persist')->with($definition);
-        }
+        $changes = new WorkflowChangesEvent($newDefinition);
 
-        $changes = new WorkflowChangesEvent($definition, $previous);
-
-        $beforeEvent = $previous ? WorkflowEvents::WORKFLOW_BEFORE_UPDATE : WorkflowEvents::WORKFLOW_BEFORE_CREATE;
-        $afterEvent = $previous ? WorkflowEvents::WORKFLOW_AFTER_UPDATE : WorkflowEvents::WORKFLOW_AFTER_CREATE;
+        $beforeEvent = WorkflowEvents::WORKFLOW_BEFORE_CREATE;
+        $afterEvent = WorkflowEvents::WORKFLOW_AFTER_CREATE;
 
         $this->eventDispatcher->expects($this->at(0))->method('dispatch')->with($beforeEvent, $changes);
         $this->eventDispatcher->expects($this->at(1))->method('dispatch')->with($afterEvent, $changes);
 
-        $this->handler->updateWorkflowDefinition($definition, $newDefinition);
-
-        if ($newDefinition) {
-            $this->assertEquals($definition, $newDefinition);
-        }
-
-        if ($existingDefinition) {
-            $this->assertEquals($definition, $existingDefinition);
-        }
+        $this->handler->createWorkflowDefinition($newDefinition);
     }
 
-    /**
-     * @return array
-     */
-    public function updateWorkflowDefinitionDataProvider()
+    public function testUpdateWorkflowDefinition()
     {
-        $definition1 = new WorkflowDefinition();
-        $definition1
-            ->setName('definition1')
-            ->setLabel('label1');
+        $existingDefinition = (new WorkflowDefinition())->setName('existing');
+        $newDefinition = (new WorkflowDefinition())->setName('updated');
 
-        $definition2 = new WorkflowDefinition();
-        $definition2
-            ->setName('definition2')
-            ->setLabel('label2');
 
-        $definition3 = new WorkflowDefinition();
-        $definition3
-            ->setName('definition3')
-            ->setLabel('label3');
+        $changes = new WorkflowChangesEvent($existingDefinition, (new WorkflowDefinition())->setName('existing'));
 
-        $definition4 = new WorkflowDefinition();
-        $definition4
-            ->setName('definition4')
-            ->setLabel('label4');
+        $beforeEvent = WorkflowEvents::WORKFLOW_BEFORE_UPDATE;
+        $afterEvent = WorkflowEvents::WORKFLOW_AFTER_UPDATE;
 
-        $definition5 = new WorkflowDefinition();
+        $this->eventDispatcher->expects($this->at(0))->method('dispatch')->with($beforeEvent, $changes);
+        $this->eventDispatcher->expects($this->at(1))->method('dispatch')->with($afterEvent, $changes);
 
-        return [
-            'with new definition' => [
-                'definition' => $definition1,
-                'existingDefinition' => null,
-                'newDefinition' => $definition2,
-                'previous' => (new WorkflowDefinition())->import($definition1)
-            ],
-            'with existing definition' => [
-                'definition' => $definition3,
-                'existingDefinition' => $definition4,
-                'newDefinition' => null,
-                'previous' => (new WorkflowDefinition())->import($definition4)
-            ],
-            'created definition' => [
-                'definition' => $definition1,
-                'existingDefinition' => null,
-                'newDefinition' => null,
-                'previous' => null
-            ],
-            'with new definition without name' => [
-                'definition' => $definition5,
-                'existingDefinition' => null,
-                'newDefinition' => $definition2,
-                'previous' => (new WorkflowDefinition())->import($definition5)
-            ],
-        ];
+        $this->handler->updateWorkflowDefinition($existingDefinition, $newDefinition);
+
+        if ($newDefinition) {
+            $this->assertEquals($existingDefinition, $newDefinition);
+        }
     }
 
     /**

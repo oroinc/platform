@@ -8,13 +8,14 @@ use Oro\Bundle\WorkflowBundle\Configuration\Handler\ConfigurationHandlerInterfac
 use Oro\Bundle\WorkflowBundle\Configuration\WorkflowDefinitionBuilderExtensionInterface;
 use Oro\Bundle\WorkflowBundle\Event\WorkflowChangesEvent;
 use Oro\Bundle\WorkflowBundle\Event\WorkflowEvents;
+use Oro\Bundle\WorkflowBundle\Helper\WorkflowTranslationHelper;
 
 class TranslationProcessor implements
     ConfigurationHandlerInterface,
     WorkflowDefinitionBuilderExtensionInterface,
     EventSubscriberInterface
 {
-    /** @var TranslationHelper */
+    /** @var WorkflowTranslationHelper */
     private $translationHelper;
 
     /** @var WorkflowTranslationFieldsIterator */
@@ -22,11 +23,11 @@ class TranslationProcessor implements
 
     /**
      * @param WorkflowTranslationFieldsIterator $translationFieldsIterator
-     * @param TranslationHelper $translationHelper
+     * @param WorkflowTranslationHelper $translationHelper
      */
     public function __construct(
         WorkflowTranslationFieldsIterator $translationFieldsIterator,
-        TranslationHelper $translationHelper
+        WorkflowTranslationHelper $translationHelper
     ) {
         $this->translationFieldsIterator = $translationFieldsIterator;
         $this->translationHelper = $translationHelper;
@@ -97,7 +98,6 @@ class TranslationProcessor implements
      */
     public function clearTranslationKeys(WorkflowChangesEvent $changesEvent)
     {
-
         $previousDefinition = $changesEvent->getPrevious();
 
         if ($previousDefinition === null) {
