@@ -55,7 +55,8 @@ class WorkflowDefinitionHandler
     ) {
         $em = $this->getEntityManager();
 
-        $previous = (new WorkflowDefinition())->import($existingDefinition);
+        $previous = new WorkflowDefinition();
+        $previous->import($existingDefinition);
 
         $existingDefinition->import($newDefinition);
 
