@@ -2,9 +2,9 @@
 
 namespace Oro\Bundle\WorkflowBundle\Translation\KeyTemplate;
 
-class AttributeLabelTemplate extends AttributeTemplate
+class WorkflowAttributeLabelTemplate extends WorkflowAttributeTemplate
 {
-    const NAME = 'attribute_label';
+    const NAME = 'workflow_attribute_label';
 
     /**
      * @return string

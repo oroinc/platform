@@ -86,14 +86,23 @@ class TranslationContextResolverTest extends \PHPUnit_Framework_TestCase
                 'resolvedId' => $templatePrefix . 'transition_warning_message',
                 'resolvedParams' => ['workflow_name' => 'workflow1', 'transition_name' => 'transition1'],
             ],
+            'transition_attribute_label' => [
+                'input' => $keyPrefix . '.workflow1.transition.transition1.attribute.attribute1.label',
+                'resolvedId' => $templatePrefix . 'transition_attribute_label',
+                'resolvedParams' => [
+                    'workflow_name' => 'workflow1',
+                    'transition_name' => 'transition1',
+                    'attribute_name' => 'attribute1',
+                ],
+            ],
             'step_label' => [
                 'input' => $keyPrefix . '.workflow1.step.step1.label',
                 'resolvedId' => $templatePrefix . 'step_label',
                 'resolvedParams' => ['workflow_name' => 'workflow1', 'step_name' => 'step1'],
             ],
-            'attribute_label' => [
+            'workflow_attribute_label' => [
                 'input' => $keyPrefix . '.workflow1.attribute.attribute1.label',
-                'resolvedId' => $templatePrefix . 'attribute_label',
+                'resolvedId' => $templatePrefix . 'workflow_attribute_label',
                 'resolvedParams' => ['workflow_name' => 'workflow1', 'attribute_name' => 'attribute1'],
             ],
         ];
@@ -134,6 +143,13 @@ class TranslationContextResolverTest extends \PHPUnit_Framework_TestCase
             ],
             'unknown transition key 3' => [
                 'input' => WorkflowTemplate::KEY_PREFIX . '.workflow1.transition.transition1.unknown_key',
+            ],
+            'unknown transition attribute key 1' => [
+                'input' => WorkflowTemplate::KEY_PREFIX . '.workflow1.transition.transition1.attribute',
+            ],
+            'unknown transition attribute key 2' => [
+                'input' => WorkflowTemplate::KEY_PREFIX .
+                    '.workflow1.transition.transition1.attribute.attribute1.unknown_key',
             ],
             'unknown step key' => [
                 'input' => WorkflowTemplate::KEY_PREFIX . '.workflow1.step',

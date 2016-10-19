@@ -6,10 +6,10 @@ use Symfony\Component\Translation\TranslatorInterface;
 
 use Oro\Bundle\TranslationBundle\Translation\TranslationKeyTemplateInterface;
 
-use Oro\Bundle\WorkflowBundle\Model\WorkflowManager;
-use Oro\Bundle\WorkflowBundle\Translation\KeyTemplate\AttributeLabelTemplate;
 use Oro\Bundle\WorkflowBundle\Translation\KeyTemplate\StepLabelTemplate;
+use Oro\Bundle\WorkflowBundle\Translation\KeyTemplate\TransitionAttributeLabelTemplate;
 use Oro\Bundle\WorkflowBundle\Translation\KeyTemplate\TransitionLabelTemplate;
+use Oro\Bundle\WorkflowBundle\Translation\KeyTemplate\WorkflowAttributeLabelTemplate;
 use Oro\Bundle\WorkflowBundle\Translation\KeyTemplate\WorkflowLabelTemplate;
 
 class KeyTemplateParametersResolver
@@ -19,26 +19,22 @@ class KeyTemplateParametersResolver
     /** @var TranslatorInterface */
     protected $translator;
 
-    /** @var WorkflowManager */
-    protected $workflowManager;
-
     /** @var TranslationKeyTemplateInterface[] */
     protected $templates;
 
     /**
      * @param TranslatorInterface $translator
-     * @param WorkflowManager $workflowManager
      */
-    public function __construct(TranslatorInterface $translator, WorkflowManager $workflowManager)
+    public function __construct(TranslatorInterface $translator)
     {
         $this->translator = $translator;
-        $this->workflowManager = $workflowManager;
 
         $this->templates = [
             new WorkflowLabelTemplate(),
             new TransitionLabelTemplate(),
             new StepLabelTemplate(),
-            new AttributeLabelTemplate(),
+            new TransitionAttributeLabelTemplate(),
+            new WorkflowAttributeLabelTemplate(),
         ];
     }
 
@@ -50,33 +46,11 @@ class KeyTemplateParametersResolver
     {
         $resolved = [];
 
-        $this->resolveTransitionByAttribute($parameters);
-
         foreach ($this->templates as $template) {
             $this->resolveParameter($template, $resolved, $parameters);
         }
 
         return $resolved;
-    }
-
-    /**
-     * @param array $parameters
-     */
-    protected function resolveTransitionByAttribute(array &$parameters)
-    {
-        if (!array_key_exists('attribute_name', $parameters)) {
-            return;
-        }
-
-        $workflow = $this->workflowManager->getWorkflow($parameters['workflow_name']);
-
-        foreach ($workflow->getTransitionManager()->getTransitions() as $transition) {
-            $formOptions = $transition->getFormOptions();
-            if (array_key_exists($parameters['attribute_name'], $formOptions['attribute_fields'])) {
-                $parameters['transition_name'] = $transition->getName();
-                break;
-            }
-        }
     }
 
     /**
