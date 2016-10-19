@@ -441,3 +441,8 @@ services:
             - '@doctrine.orm.entity_manager'
             - '@request_stack'
             - '@security.context'
+
+    oro_user.listener.password_listener:
+        class: Oro\Bundle\UserBundle\EventListener\UserPasswordListener
+        tags:
+            - { name: doctrine.event_listener, event: onFlush }
