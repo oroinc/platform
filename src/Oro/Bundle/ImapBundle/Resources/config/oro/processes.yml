@@ -8,7 +8,7 @@ processes:
             actions_configuration:
                 - '@assign_constant_value':
                     attribute: $.topic
-                    value: 'Oro\Bundle\ImapBundle\Async::CLEAR_INACTIVE_MAILBOX'
+                    value: 'Oro\Bundle\ImapBundle\Async\Topics::CLEAR_INACTIVE_MAILBOX'
                 - '@call_service_method':
                     service: 'oro_message_queue.message_producer'
                     method: 'send'
@@ -26,7 +26,7 @@ processes:
             actions_configuration:
                 - '@assign_constant_value':
                     attribute: $.topic
-                    value: 'Oro\Bundle\ImapBundle\Async::CLEAR_INACTIVE_MAILBOX'
+                    value: 'Oro\Bundle\ImapBundle\Async\Topics::CLEAR_INACTIVE_MAILBOX'
                 - '@call_service_method':
                     service: 'oro_message_queue.message_producer'
                     method: 'send'
