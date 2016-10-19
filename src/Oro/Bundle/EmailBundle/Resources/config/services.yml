@@ -646,7 +646,6 @@ services:
             - '@oro_email.mailbox.process_storage'
             - '@oro_security.security_facade'
             - '@oro_email.related_emails.provider'
-            - '@oro_email.tools.email_body_helper'
         tags:
             - { name: twig.extension }
 
@@ -677,7 +676,6 @@ services:
            - '@oro_email.mailbox.process_storage.link'
            - '@oro_activity.association_helper'
            - '@oro_comment.association_helper'
-           - '@oro_email.tools.email_body_helper'
         calls:
            - [ setSecurityContextLink, ['@security.context.link'] ]
         tags:
@@ -861,7 +859,6 @@ services:
             - '@oro_ui.html_tag_helper'
             - '@router'
             - '@oro_entity_config.config_manager'
-            - '@oro_email.tools.email_body_helper'
 
     oro_email.datagrid.origin_folder.provider:
         class: %oro_email.datagrid.origin_folder.provider.class%
@@ -1056,8 +1053,3 @@ services:
             - '@oro_email.email.activity.manager'
             - '@oro_email.provider.emailowners.provider'
             - '@oro_email.email.manager'
-
-    oro_email.tools.email_body_helper:
-        class: Oro\Bundle\EmailBundle\Tools\EmailBodyHelper
-        arguments:
-            - '@oro_ui.html_tag_helper'
