@@ -27,7 +27,7 @@ define(function(require) {
         },
 
         render: function() {
-            if (this.rates) {
+            if (!_.isEmpty(this.rates)) {
                 var rate;
                 var value = this._toNumber(this.$('[name$="[value]"]').val());
                 var currency = this.$('[name$="[currency]"]').val();
