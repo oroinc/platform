@@ -323,17 +323,20 @@ services:
         arguments:
             - '@oro_workflow.generator.translation_key'
 
-    oro_workflow.translation.helper:
-        class: 'Oro\Bundle\WorkflowBundle\Translation\TranslationHelper'
+    oro_workflow.helper.translation:
+        class: 'Oro\Bundle\WorkflowBundle\Helper\WorkflowTranslationHelper'
         arguments:
             - '@translator.default'
             - '@oro_translation.manager.translation'
+            - '@oro_translation.helper.translation'
+            - '@oro_translation.generator.translation_key'
+            - '@oro_workflow.translation.fields_iterator'
 
     oro_workflow.translation.processor:
         class: 'Oro\Bundle\WorkflowBundle\Translation\TranslationProcessor'
         arguments:
             - '@oro_workflow.translation.fields_iterator'
-            - '@oro_workflow.translation.helper'
+            - '@oro_workflow.helper.translation'
         public: false
         tags:
             - { name: oro.workflow.configuration.handler, priority: 150 }
@@ -359,6 +362,7 @@ services:
             - '@form.factory'
             - '@oro_filter.filter_utility'
             - '@oro_translation.generator.translation_key'
+            - '@oro_workflow.helper.translation'
         tags:
             - { name: oro_filter.extension.orm_filter.filter, type: workflow, datasource: orm }
 

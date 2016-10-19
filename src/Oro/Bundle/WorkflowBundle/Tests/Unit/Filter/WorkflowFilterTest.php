@@ -12,6 +12,7 @@ use Oro\Bundle\TranslationBundle\Translation\TranslationKeyGenerator;
 
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Filter\WorkflowFilter;
+use Oro\Bundle\WorkflowBundle\Helper\WorkflowTranslationHelper;
 use Oro\Bundle\WorkflowBundle\Translation\KeyTemplate\WorkflowTemplate;
 
 class WorkflowFilterTest extends \PHPUnit_Framework_TestCase
@@ -21,6 +22,9 @@ class WorkflowFilterTest extends \PHPUnit_Framework_TestCase
 
     /** @var TranslationKeyGenerator|\PHPUnit_Framework_MockObject_MockObject */
     protected $generator;
+
+    /** @var WorkflowTranslationHelper|\PHPUnit_Framework_MockObject_MockObject */
+    protected $translationHelper;
 
     /** @var FilterDatasourceAdapterInterface|\PHPUnit_Framework_MockObject_MockObject */
     protected $datasourceAdapter;
@@ -38,10 +42,18 @@ class WorkflowFilterTest extends \PHPUnit_Framework_TestCase
     {
         $this->formFactory = $this->getMock(FormFactoryInterface::class);
         $this->generator = $this->getMock(TranslationKeyGenerator::class);
+        $this->translationHelper = $this->getMockBuilder(WorkflowTranslationHelper::class)
+            ->disableOriginalConstructor()
+            ->getMock();
         $this->datasourceAdapter = $this->getMock(FilterDatasourceAdapterInterface::class);
         $this->expressionBuilder = $this->getMock(ExpressionBuilderInterface::class);
 
-        $this->filter = new WorkflowFilter($this->formFactory, new FilterUtility(), $this->generator);
+        $this->filter = new WorkflowFilter(
+            $this->formFactory,
+            new FilterUtility(),
+            $this->generator,
+            $this->translationHelper
+        );
     }
 
     /**
@@ -49,7 +61,7 @@ class WorkflowFilterTest extends \PHPUnit_Framework_TestCase
      */
     protected function tearDown()
     {
-        unset($this->formFactory, $this->generator, $this->filter);
+        unset($this->formFactory, $this->generator, $this->translationHelper, $this->filter);
     }
 
     public function testInit()
@@ -61,6 +73,7 @@ class WorkflowFilterTest extends \PHPUnit_Framework_TestCase
                     'field_options' => [
                         'class' => WorkflowDefinition::class,
                         'multiple' => false,
+                        'choice_label' => [$this->filter, 'getLabel'],
                     ],
                 ],
                 FilterUtility::FRONTEND_TYPE_KEY => 'choice',
@@ -68,6 +81,18 @@ class WorkflowFilterTest extends \PHPUnit_Framework_TestCase
             'params',
             $this->filter
         );
+    }
+
+    public function testGetLabel()
+    {
+        $definition = (new WorkflowDefinition())->setLabel('label');
+
+        $this->translationHelper->expects($this->once())
+            ->method('findTranslation')
+            ->with('label')
+            ->willReturn('translated-label');
+
+        $this->assertEquals('translated-label', $this->filter->getLabel($definition));
     }
 
     public function testApply()

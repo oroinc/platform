@@ -9,7 +9,7 @@ use Oro\Bundle\WorkflowBundle\Configuration\WorkflowDefinitionBuilderExtensionIn
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Event\WorkflowChangesEvent;
 use Oro\Bundle\WorkflowBundle\Event\WorkflowEvents;
-use Oro\Bundle\WorkflowBundle\Translation\TranslationHelper;
+use Oro\Bundle\WorkflowBundle\Helper\WorkflowTranslationHelper;
 use Oro\Bundle\WorkflowBundle\Translation\TranslationProcessor;
 use Oro\Bundle\WorkflowBundle\Translation\WorkflowTranslationFieldsIterator;
 
@@ -24,7 +24,7 @@ class TranslationProcessorTest extends \PHPUnit_Framework_TestCase
     /** @var WorkflowTranslationFieldsIterator|\PHPUnit_Framework_MockObject_MockObject */
     private $fieldsIterator;
 
-    /** @var TranslationHelper|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var WorkflowTranslationHelper|\PHPUnit_Framework_MockObject_MockObject */
     private $translationHelper;
 
     protected function setUp()
@@ -32,7 +32,7 @@ class TranslationProcessorTest extends \PHPUnit_Framework_TestCase
         $this->fieldsIterator = $this->getMockBuilder(WorkflowTranslationFieldsIterator::class)
             ->disableOriginalConstructor()->getMock();
 
-        $this->translationHelper = $this->getMockBuilder(TranslationHelper::class)
+        $this->translationHelper = $this->getMockBuilder(WorkflowTranslationHelper::class)
             ->disableOriginalConstructor()->getMock();
 
         $this->processor = new TranslationProcessor($this->fieldsIterator, $this->translationHelper);
