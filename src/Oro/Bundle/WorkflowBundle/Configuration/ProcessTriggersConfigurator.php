@@ -79,7 +79,6 @@ class ProcessTriggersConfigurator implements LoggerAwareInterface
      * @param array $triggersConfiguration
      * @param array|ProcessDefinition[] $definitions array of definitions for triggers
      *
-     * @return ProcessTrigger[]
      * @throws \LogicException
      */
     public function configureTriggers(array $triggersConfiguration, array $definitions)
@@ -200,6 +199,10 @@ class ProcessTriggersConfigurator implements LoggerAwareInterface
      */
     private function notify($action, ProcessTrigger $trigger)
     {
+        if (!$this->logger) {
+            return;
+        }
+
         $this->logger->info(
             sprintf(
                 '>> process trigger: %s [%s] - %s',
@@ -258,7 +261,9 @@ class ProcessTriggersConfigurator implements LoggerAwareInterface
             
             $objectManager->flush();
 
-            $this->logger->info('>> process triggers modifications stored in DB');
+            if ($this->logger) {
+                $this->logger->info('>> process triggers modifications stored in DB');
+            }
             $this->dirty = false;
             
             foreach ($this->triggers as $trigger) {

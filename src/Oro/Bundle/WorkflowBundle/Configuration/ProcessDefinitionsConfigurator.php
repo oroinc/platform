@@ -125,9 +125,13 @@ class ProcessDefinitionsConfigurator implements LoggerAwareInterface
             
             $objectManager->flush();
             $this->dirty = false;
-            $this->logger->info('Process definitions configuration updates are stored into database');
+            $message = 'Process definitions configuration updates are stored into database';
         } else {
-            $this->logger->info('No process definitions configuration updates detected. Nothing flushed into DB');
+            $message = 'No process definitions configuration updates detected. Nothing flushed into DB';
+        }
+
+        if ($this->logger) {
+            $this->logger->info($message);
         }
     }
 
@@ -137,6 +141,10 @@ class ProcessDefinitionsConfigurator implements LoggerAwareInterface
      */
     protected function notify($action, ProcessDefinition $definition)
     {
+        if (!$this->logger) {
+            return;
+        }
+
         $this->logger->info(sprintf('> process definition: "%s" - %s', $definition->getName(), $action));
     }
 

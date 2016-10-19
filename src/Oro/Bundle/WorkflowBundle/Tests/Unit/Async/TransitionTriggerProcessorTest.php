@@ -4,6 +4,7 @@ namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Async;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\Common\Persistence\ObjectManager;
+use Doctrine\ORM\EntityNotFoundException;
 
 use Psr\Log\LoggerInterface;
 
@@ -85,7 +86,15 @@ class TransitionTriggerProcessorTest extends \PHPUnit_Framework_TestCase
         $message = $this->getMessageMock();
 
         $this->setUpObjectManager($trigger);
-        $this->setUpLogger('Transition not allowed');
+        $this->setUpLogger(
+            true,
+            '[TransitionTriggerProcessor] Transition not allowed',
+            [
+                'message_body' => $message->getBody(),
+                'trigger' => $trigger
+            ],
+            'warning'
+        );
 
         $this->handler->expects($this->once())->method('process')->willReturn(false);
 
@@ -96,16 +105,23 @@ class TransitionTriggerProcessorTest extends \PHPUnit_Framework_TestCase
      * @dataProvider processWithInvalidMessageProvider
      *
      * @param array $data
-     * @param string $expectedMessage
+     * @param \Exception $expectedException
      * @param bool $isTrigger
      */
-    public function testProcessWithInvalidMessage(array $data, $expectedMessage, $isTrigger = false)
+    public function testProcessWithInvalidMessage(array $data, $expectedException, $isTrigger = false)
     {
         $trigger = $isTrigger ? $this->getTriggerMock() : null;
         $message = $this->getMessageMock($data);
 
         $this->setUpObjectManager($trigger);
-        $this->setUpLogger($expectedMessage);
+        $this->setUpLogger(
+            true,
+            '[TransitionTriggerProcessor] Queue message could not be processed.',
+            [
+                'message_body' => $message->getBody(),
+                'exception' => $expectedException
+            ]
+        );
 
         $this->assertEquals(MessageProcessorInterface::REJECT, $this->processor->process($message, $this->session));
     }
@@ -118,19 +134,25 @@ class TransitionTriggerProcessorTest extends \PHPUnit_Framework_TestCase
         return [
             'empty data' => [
                 'data' => [],
-                'expectedMessage' => 'Given json should not be empty'
+                'expectedException' => new \InvalidArgumentException('Given json should not be empty')
             ],
             'without trigger id' => [
                 'data' => ['test' => 1],
-                'expectedMessage' => 'Message should contain valid transition trigger id'
+                'expectedException' => new \InvalidArgumentException(
+                    'Message should contain valid transition trigger id'
+                )
             ],
             'empty trigger id' => [
                 'data' => [TransitionTriggerMessage::TRANSITION_TRIGGER => null],
-                'expectedMessage' => 'Message should contain valid transition trigger id'
+                'expectedException' => new \InvalidArgumentException(
+                    'Message should contain valid transition trigger id'
+                )
             ],
             'trigger id, without trigger entity' => [
                 'data' => [TransitionTriggerMessage::TRANSITION_TRIGGER => self::TRIGGER_ID],
-                'expectedMessage' => sprintf('Transition trigger entity with identifier %d not found', self::TRIGGER_ID)
+                'expectedException' => new EntityNotFoundException(
+                    sprintf('Transition trigger entity with identifier %d not found', self::TRIGGER_ID)
+                )
             ]
         ];
     }
@@ -180,12 +202,32 @@ class TransitionTriggerProcessorTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @param null|string $message
+     * @param bool $called
+     * @param string $expectedMessage
+     * @param array $expectedContext
+     * @param string $type
      */
-    private function setUpLogger($message = null)
+    private function setUpLogger($called = false, $expectedMessage = '', array $expectedContext = [], $type = 'error')
     {
-        if ($message) {
-            $this->logger->expects($this->once())->method('error');
+        if ($called) {
+            $this->logger->expects($this->once())
+                ->method($type)
+                ->willReturnCallback(
+                    function ($message, array $context) use ($expectedMessage, $expectedContext) {
+                        $this->assertEquals($expectedMessage, $message);
+
+                        foreach ($expectedContext as $key => $value) {
+                            $this->assertArrayHasKey($key, $context);
+
+                            if ($value instanceof \Exception) {
+                                $this->assertInstanceOf(get_class($value), $context[$key]);
+                                $this->assertEquals($value->getMessage(), $context[$key]->getMessage());
+                            } else {
+                                $this->assertEquals($value, $context[$key]);
+                            }
+                        }
+                    }
+                );
         } else {
             $this->logger->expects($this->never())->method($this->anything());
         }
