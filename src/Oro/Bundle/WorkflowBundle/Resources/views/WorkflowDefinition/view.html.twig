@@ -1,5 +1,6 @@
 {% extends 'OroUIBundle:actions:view.html.twig' %}
 {% import 'OroUIBundle::macros.html.twig' as macros %}
+{% import 'OroWorkflowBundle::macros.html.twig' as workflowMacros %}
 
 {% oro_title_set({params : {"%workflow_definition.label%": entity.label} }) %}
 
@@ -189,10 +190,7 @@
 
 {% block content_data %}
     {% set workflowDefinitionInfo %}
-        {{ oro_widget_render({
-            'widgetType': 'block',
-            'url': path('oro_workflow_definition_info', {name: entity.name}),
-        }) }}
+        {% include 'OroWorkflowBundle:WorkflowDefinition:widget/info.html.twig' with { entity: entity } %}
     {% endset %}
 
     {% set workflowStepsAndTransitions %}

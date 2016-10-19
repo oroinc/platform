@@ -8,7 +8,7 @@
             options: {
                 entity: {
                     configuration: entity.configuration,
-                    translateLinks: translateLinks|default(null),
+                    translateLinks: translateLinks|default([]),
                     name: entity.name,
                     label: entity.label,
                     entity: entity.relatedEntity,
@@ -140,7 +140,9 @@
                                     {{ _self.render_label("oro.workflow.form.name.label"|trans, true, "oro.workflow.workflowdefinition.transition.name.tooltip") }}
                                     <div class="controls">
                                         <input type="text" name="label" value="<%- label %>" data-validation="{{ requiredConstraint|json_encode }}">
-                                        <% if (name && !_is_clone && translateLinks) { %>{{ workflowMacros.renderGoToTranslationsIconByLink('<%- translateLinks.label %>', true) }}<% } %>
+                                        <% if (name && !_is_clone && typeof translateLinks !== 'undefined' && translateLinks.label) { %>
+                                            {{ workflowMacros.renderGoToTranslationsIconByLink('<%- translateLinks.label %>', true) }}
+                                        <% } %>
                                     </div>
                                 </div>
 
@@ -197,7 +199,7 @@
                                     {{ _self.render_label("oro.workflow.form.warning_message.label"|trans, false, "oro.workflow.workflowdefinition.transition.message.tooltip") }}
                                     <div class="controls">
                                         <textarea name="message"><%= message %></textarea>
-                                        <% if (name && !_is_clone && translateLinks) { %>
+                                        <% if (name && !_is_clone && typeof translateLinks !== 'undefined' && translateLinks.message) { %>
                                             {{ workflowMacros.renderGoToTranslationsIconByLink('<%- translateLinks.message %>', true) }}
                                         <% } %>
                                     </div>
@@ -277,7 +279,7 @@
                                     {{ _self.render_label("oro.workflow.form.name.label"|trans, true, "oro.workflow.workflowdefinition.step.name.tooltip") }}
                                     <div class="controls">
                                         <input type="text" name="label" value="<%- label %>" data-validation="{{ requiredConstraint|json_encode }}">
-                                        <% if (name && !_is_clone && translateLinks) { %>
+                                        <% if (name && !_is_clone && typeof translateLinks !== 'undefined' && translateLinks.label) { %>
                                             {{ workflowMacros.renderGoToTranslationsIconByLink('<%- translateLinks.label %>', true) }}
                                         <% } %>
                                     </div>
@@ -342,7 +344,7 @@
             <% } else { %>
             <a href="#" class="edit-step" title="{{ 'Update this step'|trans}}"><%- label %></a>
             <% if (is_final) { %>&nbsp;<strong title="{{ "oro.workflow.workflowdefinition.step.is_final.tooltip"|trans({}, "tooltips") }}">({{ "Final"|trans }})</strong><% } %>
-                <% if (name && !_is_clone && translateLinks) { %>
+                <% if (name && !_is_clone && typeof translateLinks !== 'undefined' && translateLinks.label) { %>
                     {{ workflowMacros.renderGoToTranslationsIconByLink('<%- translateLinks.label %>') }}
                 <% } %>
             <% } %>
@@ -363,7 +365,7 @@
 
     <script type="text/template" id="transition-row-short-template">
         <a href="#" class="edit-transition" title="{{ 'Update this transition'|trans }}"><%- label %></a>
-            <% if (name && !_is_clone && translateLinks) { %>
+            <% if (name && !_is_clone && typeof translateLinks !== 'undefined' && translateLinks.label) { %>
                 {{ workflowMacros.renderGoToTranslationsIconByLink('<%- translateLinks.label %>') }}
             <% } %>
         <a href="#" class="clone-transition action" title="{{ 'Clone this transition'|trans }}"><i class="icon-copy hide-text"></i></a>
@@ -432,7 +434,9 @@
         <td>
             <%- label %>
             <% if (isSystemLabel) { %><span class="muted">({{ 'System'|trans }})</span><% } %>
-            <% if (translateLinks) { %>{{ workflowMacros.renderGoToTranslationsIconByLink('<%- translateLinks.label %>') }}<% } %>
+            <% if (typeof translateLinks !== 'undefined' && translateLinks.label) { %>
+                {{ workflowMacros.renderGoToTranslationsIconByLink('<%- translateLinks.label %>') }}
+            <% } %>
         </td>
         <td>
             <% if (required) { %>

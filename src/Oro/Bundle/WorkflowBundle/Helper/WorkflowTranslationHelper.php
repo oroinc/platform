@@ -148,8 +148,7 @@ class WorkflowTranslationHelper
     public function getWorkflowTranslateLinks(WorkflowDefinition $definition)
     {
         $configuration = $definition->getConfiguration();
-        $translateLinks['label'] = $this->translationRouteHelper
-            ->generate(['key' => $definition->getLabel()]);
+        $translateLinks['label'] = $this->translationRouteHelper->generate(['key' => $definition->getLabel()]);
         $translateLinks[WorkflowConfiguration::NODE_STEPS] = $this->getWorkflowNodeTranslateLinks(
             $configuration,
             WorkflowConfiguration::NODE_STEPS,

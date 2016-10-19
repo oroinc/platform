@@ -17,7 +17,7 @@ class TranslationRouteHelper
     protected $datagridRouteHelper;
 
     /**
-     * WorkflowTranslationRouteHelper constructor.
+     * TranslationRouteHelper constructor.
      *
      * @param DatagridRouteHelper $datagridRouteHelper
      */

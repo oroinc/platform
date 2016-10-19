@@ -133,8 +133,11 @@ class WorkflowDefinitionController extends Controller
      */
     public function infoAction(WorkflowDefinition $workflowDefinition)
     {
+        $translateLinks = $this->getTranslateLinks($workflowDefinition);
+
         return array(
-            'entity' => $workflowDefinition
+            'entity' => $workflowDefinition,
+            'translateLinks' => $translateLinks,
         );
     }
 
@@ -222,7 +225,7 @@ class WorkflowDefinitionController extends Controller
             return [];
         }
 
-        return $this->get('oro_workflow.translation.helper')->getWorkflowTranslateLinks($workflowDefinition);
+        return $this->get('oro_workflow.helper.translation')->getWorkflowTranslateLinks($workflowDefinition);
     }
 
     /**

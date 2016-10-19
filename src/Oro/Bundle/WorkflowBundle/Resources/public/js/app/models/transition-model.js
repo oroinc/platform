@@ -17,7 +17,7 @@ define(function(require) {
             is_unavailable_hidden: true,
             transition_definition: null,
             _is_clone: false,
-            translateLinks: null
+            translateLinks: []
         },
 
         initialize: function() {

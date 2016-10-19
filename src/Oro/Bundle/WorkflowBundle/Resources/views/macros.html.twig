@@ -134,11 +134,9 @@
 {% endmacro %}
 
 {% macro renderGoToTranslationsIconByLink(link, large) %}
-    {% if link %}
-        <span class="workflow-translatable-field">
-            <a target="_blank" href="{{ link|raw }}" title="{{ 'oro.workflow.action.workflow.go_to_translations'|trans}}">
-                <i class="fa fa-language{% if large %} large-icon{% endif %}"></i>
-            </a>
-        </span>
-    {% endif %}
+    <span class="workflow-translatable-field">
+        <a target="_blank" href="{{ link|raw }}" title="{{ 'oro.workflow.action.workflow.go_to_translations'|trans}}">
+            <i class="fa fa-language{% if large %} large-icon{% endif %}"></i>
+        </a>
+    </span>
 {% endmacro %}

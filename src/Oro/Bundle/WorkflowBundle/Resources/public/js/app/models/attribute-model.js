@@ -12,7 +12,7 @@ define(function(require) {
             type: null,
             property_path: null,
             options: null,
-            translateLinks: null
+            translateLinks: []
         },
 
         initialize: function() {
