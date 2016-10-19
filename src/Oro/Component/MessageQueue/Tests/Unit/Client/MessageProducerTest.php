@@ -42,10 +42,7 @@ class MessageProducerTest extends \PHPUnit_Framework_TestCase
         $driver
             ->expects($this->once())
             ->method('send')
-            ->with(self::identicalTo($queue))
-            ->willReturnCallback(function ($queue, $message) {
-                $this->assertInstanceOf(Message::class, $message);
-            });
+            ->with(self::identicalTo($queue), self::isInstanceOf(Message::class))
         ;
 
         $producer = new MessageProducer($driver);
@@ -58,6 +55,7 @@ class MessageProducerTest extends \PHPUnit_Framework_TestCase
         $queue = new NullQueue('queue');
 
         $message = new Message();
+        $sentMessage = null;
 
         $driver = $this->createDriverStub($config, $queue);
         $driver
@@ -68,8 +66,14 @@ class MessageProducerTest extends \PHPUnit_Framework_TestCase
         $driver
             ->expects($this->once())
             ->method('send')
-            ->with(self::identicalTo($queue))
-            ->willReturnCallback(function ($queue, $message) {
+            ->with(self::identicalTo($queue), self::isInstanceOf(Message::class))
+            ->will($this->returnCallback(function (NullQueue $queue, Message $message) use (&$sentMessage) {
+                $sentMessage = $message;
+            }))
+        ;
+
+        $producer = new MessageProducer($driver);
+        $producer->send('theTopic', $message);
 
                 $expectedProperties = [
                     'oro.message_queue.client.topic_name' => 'theTopic',
@@ -77,12 +81,8 @@ class MessageProducerTest extends \PHPUnit_Framework_TestCase
                     'oro.message_queue.client.queue_name' => 'therouterqueue',
                 ];
 
-                self::assertEquals($expectedProperties, $message->getProperties());
-            });
-        ;
-
-        $producer = new MessageProducer($driver);
-        $producer->send('theTopic', $message);
+        self::assertEmpty($message->getProperties());
+        self::assertEquals($expectedProperties, $sentMessage->getProperties());
     }
 
     public function testShouldSendMessageWithNormalPriorityByDefault()
@@ -91,20 +91,23 @@ class MessageProducerTest extends \PHPUnit_Framework_TestCase
         $queue = new NullQueue('queue');
 
         $message = new Message();
+        $sentMessage = null;
 
         $driver = $this->createDriverStub($config, $queue);
         $driver
             ->expects($this->once())
             ->method('send')
-            ->with(self::identicalTo($queue))
-            ->willReturnCallback(function ($queue, $message) {
-
-                self::assertSame(MessagePriority::NORMAL, $message->getPriority());
-            });
+            ->with(self::identicalTo($queue), self::isInstanceOf(Message::class))
+            ->will($this->returnCallback(function (NullQueue $queue, Message $message) use (&$sentMessage) {
+                $sentMessage = $message;
+            }))
         ;
 
         $producer = new MessageProducer($driver);
         $producer->send('topic', $message);
+
+        self::assertNull($message->getPriority());
+        self::assertEquals(MessagePriority::NORMAL, $sentMessage->getPriority());
     }
 
     public function testShouldSendMessageWithCustomPriority()
@@ -114,20 +117,23 @@ class MessageProducerTest extends \PHPUnit_Framework_TestCase
 
         $message = new Message();
         $message->setPriority(MessagePriority::HIGH);
+        $sentMessage = null;
 
         $driver = $this->createDriverStub($config, $queue);
         $driver
             ->expects($this->once())
             ->method('send')
-            ->with(self::identicalTo($queue))
-            ->willReturnCallback(function ($queue, $message) {
-
-                self::assertSame(MessagePriority::HIGH, $message->getPriority());
-            });
+            ->with(self::identicalTo($queue), self::isInstanceOf(Message::class))
+            ->will($this->returnCallback(function (NullQueue $queue, Message $message) use (&$sentMessage) {
+                $sentMessage = $message;
+            }))
         ;
 
         $producer = new MessageProducer($driver);
         $producer->send('topic', $message);
+
+        self::assertSame(MessagePriority::HIGH, $message->getPriority());
+        self::assertSame(MessagePriority::HIGH, $sentMessage->getPriority());
     }
 
     public function testShouldSendMessageWithGeneratedMessageId()
@@ -136,20 +142,23 @@ class MessageProducerTest extends \PHPUnit_Framework_TestCase
         $queue = new NullQueue('queue');
 
         $message = new Message();
+        $sentMessage = null;
 
         $driver = $this->createDriverStub($config, $queue);
         $driver
             ->expects($this->once())
             ->method('send')
-            ->with(self::identicalTo($queue))
-            ->willReturnCallback(function ($queue, $message) {
-
-                self::assertNotEmpty($message->getMessageId());
-            });
+            ->with(self::identicalTo($queue), self::isInstanceOf(Message::class))
+            ->will($this->returnCallback(function (NullQueue $queue, Message $message) use (&$sentMessage) {
+                $sentMessage = $message;
+            }))
         ;
 
         $producer = new MessageProducer($driver);
         $producer->send('topic', $message);
+
+        self::assertEmpty($message->getMessageId());
+        self::assertNotEmpty($sentMessage->getMessageId());
     }
 
     public function testShouldSendMessageWithCustomMessageId()
@@ -159,20 +168,23 @@ class MessageProducerTest extends \PHPUnit_Framework_TestCase
 
         $message = new Message();
         $message->setMessageId('theCustomMessageId');
+        $sentMessage = null;
 
         $driver = $this->createDriverStub($config, $queue);
         $driver
             ->expects($this->once())
             ->method('send')
-            ->with(self::identicalTo($queue))
-            ->willReturnCallback(function ($queue, $message) {
-
-                self::assertSame('theCustomMessageId', $message->getMessageId());
-            });
+            ->with(self::identicalTo($queue), self::isInstanceOf(Message::class))
+            ->will($this->returnCallback(function (NullQueue $queue, Message $message) use (&$sentMessage) {
+                $sentMessage = $message;
+            }))
         ;
 
         $producer = new MessageProducer($driver);
         $producer->send('topic', $message);
+
+        self::assertSame('theCustomMessageId', $message->getMessageId());
+        self::assertSame('theCustomMessageId', $sentMessage->getMessageId());
     }
 
     public function testShouldSendMessageWithGeneratedTimestamp()
@@ -186,15 +198,17 @@ class MessageProducerTest extends \PHPUnit_Framework_TestCase
         $driver
             ->expects($this->once())
             ->method('send')
-            ->with(self::identicalTo($queue))
-            ->willReturnCallback(function ($queue, $message) {
-
-                self::assertNotEmpty($message->getTimestamp());
-            });
+            ->with(self::identicalTo($queue), self::isInstanceOf(Message::class))
+            ->will($this->returnCallback(function (NullQueue $queue, Message $message) use (&$sentMessage) {
+                $sentMessage = $message;
+            }))
         ;
 
         $producer = new MessageProducer($driver);
         $producer->send('topic', $message);
+
+        self::assertEmpty($message->getTimestamp());
+        self::assertNotEmpty($sentMessage->getTimestamp());
     }
 
     public function testShouldSendMessageWithCustomTimestamp()
@@ -209,15 +223,17 @@ class MessageProducerTest extends \PHPUnit_Framework_TestCase
         $driver
             ->expects($this->once())
             ->method('send')
-            ->with(self::identicalTo($queue))
-            ->willReturnCallback(function ($queue, $message) {
-
-                self::assertSame('theCustomTimestamp', $message->getTimestamp());
-            });
+            ->with(self::identicalTo($queue), self::isInstanceOf(Message::class))
+            ->will($this->returnCallback(function (NullQueue $queue, Message $message) use (&$sentMessage) {
+                $sentMessage = $message;
+            }))
         ;
 
         $producer = new MessageProducer($driver);
         $producer->send('topic', $message);
+
+        self::assertSame('theCustomTimestamp', $message->getTimestamp());
+        self::assertSame('theCustomTimestamp', $sentMessage->getTimestamp());
     }
 
     public function testShouldSendStringAsPlainText()
