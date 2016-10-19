@@ -1,6 +1,5 @@
 parameters:
     oro_locale.form.type.country.class:  Oro\Bundle\LocaleBundle\Form\Type\CountryType
-    oro_locale.form.type.currency.class: Oro\Bundle\LocaleBundle\Form\Type\CurrencyType
     oro_locale.form.type.locale.class:   Oro\Bundle\LocaleBundle\Form\Type\LocaleType
     oro_locale.form.type.language.class: Oro\Bundle\LocaleBundle\Form\Type\LanguageType
     oro_locale.form.type.name_format.class: Oro\Bundle\LocaleBundle\Form\Type\NameFormatType
@@ -19,11 +18,6 @@ services:
         class: '%oro_locale.form.type.country.class%'
         tags:
             - { name: form.type, alias: oro_locale_country }
-
-    oro_locale.form.type.currency:
-        class: '%oro_locale.form.type.currency.class%'
-        tags:
-            - { name: form.type, alias: oro_currency }
 
     oro_locale.form.type.locale:
         class: '%oro_locale.form.type.locale.class%'

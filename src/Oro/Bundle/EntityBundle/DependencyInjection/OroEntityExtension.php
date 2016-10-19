@@ -31,6 +31,8 @@ class OroEntityExtension extends Extension
         $loader->load('orm.yml');
         $loader->load('form_type.yml');
         $loader->load('services.yml');
+        $loader->load('fallbacks.yml');
+        $loader->load('twig.yml');
 
         $container->setParameter('oro_entity.exclusions', $config['exclusions']);
         $container->setParameter('oro_entity.virtual_fields', $config['virtual_fields']);
@@ -112,7 +114,7 @@ class OroEntityExtension extends Extension
     protected function mergeEntityConfiguration(CumulativeResourceInfo $resource, $section, array $data)
     {
         if (!empty($resource->data['oro_entity'][$section])) {
-            $data = array_merge(
+            $data = array_merge_recursive(
                 $data,
                 $resource->data['oro_entity'][$section]
             );

@@ -261,3 +261,6 @@ entity_config:
                 representation_field: # string
                     options:
                         auditable: false
+    fallback:
+        entity:
+            items: ~

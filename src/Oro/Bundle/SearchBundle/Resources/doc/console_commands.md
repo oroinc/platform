@@ -14,14 +14,14 @@ for queued indexation.
 Single entity indexation:
 ```
 > php app/console oro:search:index OroUserBundle:User 1
-Entities successfully updated in index
+Started index update for entities.
 
 ```
 
 Multiple entities indexation:
 ```
-> php app/console oro:search:index "OroCRM\Bundle\ContactBundle\Entity\Contact" 1 2 3 4 5 6 7 8 9 10
-Entities successfully updated in index
+> php app/console oro:search:index "Oro\Bundle\ContactBundle\Entity\Contact" 1 2 3 4 5 6 7 8 9 10
+Started index update for entities.
 
 ```
 
@@ -37,14 +37,13 @@ Reindexation itself might takes lots of time for big amount of data, so it would
 All entities reindexation:
 ```
 > php app/console oro:search:reindex
-Starting reindex task for all mapped entities
-Total indexed items: 733
+Started reindex task for all mapped entities
+
 ```
 
 One entity reindexation:
 ```
 > app/console oro:search:reindex OroUserBundle:User
-Starting reindex task for "OroUserBundle:User" entity
-Total indexed items: 53
+Started reindex task for "OroUserBundle:User" entity
 
 ```

@@ -23,19 +23,16 @@ class ChangeSetBuilder
                 && !$this->inArray($package, $previousInstalled, [$this, 'equalsByName'])
             ) {
                 $justInstalled[] = $package;
-
             } elseif (!$this->inArray($package, $currentlyInstalled, [$this, 'equalsByName'])
                 && $this->inArray($package, $previousInstalled, [$this, 'equalsByName'])
             ) {
                 $justUninstalled[] = $package;
-
             } elseif ($this->inArray($package, $currentlyInstalled, [$this, 'equalsByName'])
                 && $this->inArray($package, $previousInstalled, [$this, 'equalsByName'])
                 && $this->inArray($package, $currentlyInstalled, [$this, 'equalsBySourceReference'])
                 && !$this->inArray($package, $previousInstalled, [$this, 'equalsBySourceReference'])
             ) {
                 $justUpdated[] = $package;
-
             }
         }
 

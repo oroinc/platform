@@ -29,7 +29,7 @@ class ArrayOptionValueBuilder implements OptionValueBuilderInterface
     protected function prepareValueType($value)
     {
         if (is_array($value)) {
-            return array_values($value);
+            return $value;
         }
 
         if ($this->allowScalarValues) {

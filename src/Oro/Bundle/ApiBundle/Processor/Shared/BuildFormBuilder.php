@@ -9,6 +9,7 @@ use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionFieldConfig;
+use Oro\Bundle\ApiBundle\Form\Extension\CustomizeFormDataExtension;
 use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
 use Oro\Bundle\ApiBundle\Processor\FormContext;
 
@@ -81,6 +82,7 @@ class BuildFormBuilder implements ProcessorInterface
         if (!array_key_exists('extra_fields_message', $options)) {
             $options['extra_fields_message'] = 'This form should not contain extra fields: "{{ extra_fields }}"';
         }
+        $options[CustomizeFormDataExtension::API_CONTEXT] = $context;
 
         return $options;
     }
@@ -101,7 +103,7 @@ class BuildFormBuilder implements ProcessorInterface
             $formBuilder->add(
                 $name,
                 $fieldConfig->getFormType(),
-                $this->getFormFieldOptions($fieldConfig)
+                $this->getFormFieldOptions($fieldConfig, $name, $field->getPropertyPath())
             );
         }
         $associations = $metadata->getAssociations();
@@ -111,24 +113,30 @@ class BuildFormBuilder implements ProcessorInterface
             $formBuilder->add(
                 $name,
                 $fieldConfig->getFormType(),
-                $this->getFormFieldOptions($fieldConfig)
+                $this->getFormFieldOptions($fieldConfig, $name, $association->getPropertyPath())
             );
         }
     }
 
     /**
      * @param EntityDefinitionFieldConfig $fieldConfig
+     * @param string                      $fieldName
+     * @param string|null                 $propertyPath
      *
      * @return array
      */
-    protected function getFormFieldOptions(EntityDefinitionFieldConfig $fieldConfig)
-    {
+    protected function getFormFieldOptions(
+        EntityDefinitionFieldConfig $fieldConfig,
+        $fieldName,
+        $propertyPath
+    ) {
         $options = $fieldConfig->getFormOptions();
         if (null === $options) {
             $options = [];
         }
-        $propertyPath = $fieldConfig->getPropertyPath();
-        if ($propertyPath) {
+        if (!$propertyPath) {
+            $options['mapped'] = false;
+        } elseif ($propertyPath !== $fieldName) {
             $options['property_path'] = $propertyPath;
         }
 

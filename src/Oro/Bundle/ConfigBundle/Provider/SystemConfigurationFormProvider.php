@@ -138,7 +138,7 @@ class SystemConfigurationFormProvider extends Provider
         $name = str_replace(
             ConfigManager::SECTION_MODEL_SEPARATOR,
             ConfigManager::SECTION_VIEW_SEPARATOR,
-            $fieldDefinition->getName()
+            $fieldDefinition->getPropertyPath()
         );
 
         // take config field options form field definition

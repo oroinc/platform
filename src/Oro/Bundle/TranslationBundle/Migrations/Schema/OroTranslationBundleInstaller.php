@@ -14,7 +14,7 @@ class OroTranslationBundleInstaller implements Installation
      */
     public function getMigrationVersion()
     {
-        return 'v1_2';
+        return 'v1_3';
     }
 
     /**
@@ -25,9 +25,11 @@ class OroTranslationBundleInstaller implements Installation
         /** Tables generation **/
         $this->createOroLanguageTable($schema);
         $this->createOroTranslationTable($schema);
+        $this->createOroTranslationKeyTable($schema);
 
         /** Foreign keys generation **/
         $this->addOroLanguageForeignKeys($schema);
+        $this->addOroTranslationForeignKeys($schema);
     }
 
     /**
@@ -59,14 +61,32 @@ class OroTranslationBundleInstaller implements Installation
     {
         $table = $schema->createTable('oro_translation');
         $table->addColumn('id', 'integer', ['autoincrement' => true]);
-        $table->addColumn('key', 'string', ['length' => 255]);
+        $table->addColumn('translation_key_id', 'integer', []);
+        $table->addColumn('language_id', 'integer', []);
         $table->addColumn('value', 'text', ['notnull' => false]);
-        $table->addColumn('locale', 'string', ['length' => 5]);
-        $table->addColumn('domain', 'string', ['length' => 255]);
         $table->addColumn('scope', 'smallint', []);
         $table->setPrimaryKey(['id']);
-        $table->addIndex(['locale', 'domain'], 'MESSAGES_IDX', []);
-        $table->addIndex(['`key`'], 'MESSAGE_IDX', []);
+        $table->addUniqueIndex(['language_id', 'translation_key_id'], 'language_key_uniq');
+    }
+
+    /**
+     * Create oro_translation_key table
+     *
+     * @param Schema $schema
+     */
+    protected function createOroTranslationKeyTable(Schema $schema)
+    {
+        $table = $schema->createTable('oro_translation_key');
+        $table->addColumn('id', 'integer', ['autoincrement' => true]);
+        $table->addColumn('key', 'string', ['length' => 255]);
+        $table->addColumn('domain', 'string', ['default' => 'messages', 'length' => 255]);
+        $table->setPrimaryKey(['id']);
+        $table->addUniqueIndex(['key', 'domain'], 'key_domain_uniq');
+        /**
+         * Required to support Case Sensitive keys in MySQL
+         */
+        $table->addOption('charset', 'utf8');
+        $table->addOption('collate', 'utf8_bin');
     }
 
     /**
@@ -88,6 +108,28 @@ class OroTranslationBundleInstaller implements Installation
             ['user_owner_id'],
             ['id'],
             ['onDelete' => 'SET NULL', 'onUpdate' => null]
+        );
+    }
+
+    /**
+     * Add oro_translation foreign keys.
+     *
+     * @param Schema $schema
+     */
+    protected function addOroTranslationForeignKeys(Schema $schema)
+    {
+        $table = $schema->getTable('oro_translation');
+        $table->addForeignKeyConstraint(
+            $schema->getTable('oro_translation_key'),
+            ['translation_key_id'],
+            ['id'],
+            ['onDelete' => 'CASCADE', 'onUpdate' => null]
+        );
+        $table->addForeignKeyConstraint(
+            $schema->getTable('oro_language'),
+            ['language_id'],
+            ['id'],
+            ['onDelete' => 'CASCADE', 'onUpdate' => null]
         );
     }
 }

@@ -100,7 +100,7 @@ datagrids:
                 select:
                     - partial eu.{id, email}
                     - e
-                    - eb.bodyContent AS body_content
+                    - eb.textBody AS body_content
                     - >
                         (SELECT COUNT(_ec.id)
                         FROM OroEmailBundle:Email _ec

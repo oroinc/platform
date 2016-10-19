@@ -87,9 +87,10 @@ class NormalizeMetadata implements ProcessorInterface
         MetadataContext $context
     ) {
         $linkedPropertyNames = [];
+        $withExcludedProperties = $context->getWithExcludedProperties();
         $fields = $config->getFields();
         foreach ($fields as $fieldName => $field) {
-            if ($field->isExcluded()) {
+            if (!$withExcludedProperties && $field->isExcluded()) {
                 $entityMetadata->removeProperty($fieldName);
             } else {
                 $propertyPath = $field->getPropertyPath();
@@ -158,13 +159,22 @@ class NormalizeMetadata implements ProcessorInterface
                     $linkedProperty
                 );
                 $associationMetadata->setName($propertyName);
+                $associationMetadata->setPropertyPath($linkedProperty);
+                $linkedPropertyPath = array_merge($propertyPath, [$linkedProperty]);
                 $associationMetadata->setTargetMetadata(
                     $this->getMetadata(
                         $associationMetadata->getTargetClassName(),
-                        $this->getTargetConfig($config, $propertyName, array_merge($propertyPath, [$linkedProperty])),
+                        $this->getTargetConfig($config, $propertyName, $linkedPropertyPath),
                         $context
                     )
                 );
+                $targetFieldConfig = $this->findFieldByPropertyPath($config, $linkedPropertyPath);
+                if (null !== $targetFieldConfig) {
+                    $associationMetadata->setCollapsed($targetFieldConfig->isCollapsed());
+                    if ($targetFieldConfig->getDataType()) {
+                        $associationMetadata->setDataType($targetFieldConfig->getDataType());
+                    }
+                }
                 $entityMetadata->addAssociation($associationMetadata);
             } else {
                 $fieldMetadata = $this->entityMetadataFactory->createFieldMetadata(
@@ -172,6 +182,7 @@ class NormalizeMetadata implements ProcessorInterface
                     $linkedProperty
                 );
                 $fieldMetadata->setName($propertyName);
+                $fieldMetadata->setPropertyPath($linkedProperty);
                 $entityMetadata->addField($fieldMetadata);
             }
             $addedPropertyName = $linkedProperty;

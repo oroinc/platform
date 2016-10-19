@@ -34,9 +34,6 @@ workflows:
                 label: 'Start transition'
                 step_to: open
                 transition_definition: start_transiotion_definition
-                schedule:
-                    cron: '* * * * *'
-                    filter: 'e.id = 7'
 
     test_multistep_flow:
         label: 'Test MultiStep Flow'
@@ -88,7 +85,7 @@ workflows:
                  label: '(Start)'
                  order: -1
                  _is_start: true
-                 allowed_transitions: ['starting_point_transition']
+                 allowed_transitions: ['starting_point_transition', 'second_point_transition']
             second_point:
                   label: '(Second)'
                   order: 0
@@ -97,7 +94,7 @@ workflows:
                   label: '(Final)'
                   order: 1
                   is_final: true
-                  allowed_transitions: ['ssecond_point_transition']
+                  allowed_transitions: ['second_point_transition']
         transition_definitions:
             starting_point_transition_definition: ~
             second_point_transition_definition: ~
@@ -136,7 +133,7 @@ workflows:
                   label: '(Final)'
                   order: 1
                   is_final: true
-                  allowed_transitions: ['ssecond_point_transition']
+                  allowed_transitions: ['second_point_transition']
         transition_definitions:
             starting_point_transition_definition: ~
             second_point_transition_definition: ~
@@ -156,7 +153,7 @@ workflows:
         entity: Oro\Bundle\TestFrameworkBundle\Entity\WorkflowAwareEntity
         defaults:
             active: true
-        priority: 20
+        priority: 10
         steps:
             step1:
                 label: 'Step1'
@@ -174,7 +171,7 @@ workflows:
         entity: Oro\Bundle\TestFrameworkBundle\Entity\WorkflowAwareEntity
         defaults:
             active: true
-        priority: 10
+        priority: 20
         steps:
             step1:
                 label: 'Step1'

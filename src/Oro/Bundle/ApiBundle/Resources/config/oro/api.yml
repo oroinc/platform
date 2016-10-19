@@ -15,14 +15,7 @@ api:
                 id:
                     data_type: string
             # this entity does not have own Data API resource
-            actions:
-                get: false
-                get_list: false
-                update: false
-                create: false
-                delete: false
-                delete_list: false
-
+            actions: false
         Oro\Bundle\ApiBundle\Model\EntityDescriptor:
             identifier_field_names: [id]
             disable_fieldset: true
@@ -44,10 +37,4 @@ api:
                     meta_property: true
             # this entity does not have own Data API resource
             # and should be used only as a sub-resource of other entities
-            actions:
-                get: false
-                get_list: false
-                update: false
-                create: false
-                delete: false
-                delete_list: false
+            actions: false

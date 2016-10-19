@@ -47,6 +47,13 @@ services:
         tags:
             - { name: event_dispatcher.subscriber, priority: 10 }
 
+    oro_test.listener.set_locale_subscriber:
+        class: Oro\Bundle\TestFrameworkBundle\Behat\Listener\SetLocaleSubscriber
+        arguments:
+            - '@oro_config.global'
+        tags:
+            - { name: event_dispatcher.subscriber, priority: 50 }
+
     oro_test.listener.feature_isolation_subscriber:
         class: Oro\Bundle\TestFrameworkBundle\Behat\Listener\FeatureIsolationSubscriber
         arguments:
@@ -55,6 +62,14 @@ services:
             - '@oro_element_factory'
             - '@oro_test.kernel_service_factory'
             - '@oro_test.reference_repository_initializer'
+            - '@doctrine'
+        tags:
+            - { name: 'event_dispatcher.subscriber' }
+
+    oro_test.listener.message_queue_consumer_process_subscriber:
+        class: 'Oro\Bundle\TestFrameworkBundle\Behat\Listener\MessageQueueConsumerProcessSubscriber'
+        arguments:
+            - '@symfony2_extension.kernel'
         tags:
             - { name: 'event_dispatcher.subscriber' }
 
@@ -84,12 +99,19 @@ services:
         arguments:
             - '@mink'
             - '@mink.selectors_handler'
-            - ~
+            - []
 
-    oro_behat_element_factory_initializer:
-        class: 'Oro\Bundle\TestFrameworkBundle\Behat\Context\Initializer\ElementFactoryInitializer'
+    oro_page_factory:
+        class: 'Oro\Bundle\TestFrameworkBundle\Behat\Element\OroPageFactory'
         arguments:
             - '@oro_element_factory'
+            - []
+
+    oro_behat_page_object_initializer:
+        class: 'Oro\Bundle\TestFrameworkBundle\Behat\Context\Initializer\OroPageObjectInitializer'
+        arguments:
+            - '@oro_element_factory'
+            - '@oro_page_factory'
         tags:
             - { name: 'context.initializer' }
 
@@ -131,3 +153,12 @@ services:
 
     oro_test.alice_loader:
         class: Oro\Bundle\TestFrameworkBundle\Behat\Fixtures\OroAliceLoader
+        calls:
+            - [setDoctrine, ['@doctrine']]
+
+    oro_test.environment.handler.scenario_environment_handlre:
+        class: Oro\Bundle\TestFrameworkBundle\Behat\Environment\Handler\FeatureEnvironmentHandler
+        arguments:
+            - '@context.factory'
+        tags:
+            - { name: 'environment.handler', priority: 100 }

@@ -3,6 +3,10 @@ elements:
     selector: 'form'
     class: Oro\Bundle\FormBundle\Tests\Behat\Element\OroForm
 
+  Label:
+    selector: 'label'
+    class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Element
+
   Action Button Chooser:
     selector: 'div.title-buttons-container a.dropdown-toggle'
     class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Element
@@ -21,3 +25,15 @@ elements:
 
   GroupChoiceField:
     class: Oro\Bundle\TestFrameworkBundle\Behat\Element\GroupChoiceField
+
+  EntitySelector:
+    selector: '.select2-chosen'
+    class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Element
+
+  SelectToResultLabel:
+    selector: 'div.select2-result-label'
+    class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Element
+
+  Select2Entity:
+    selector: '.select2-offscreen'
+    class: Oro\Bundle\FormBundle\Tests\Behat\Element\Select2Entity

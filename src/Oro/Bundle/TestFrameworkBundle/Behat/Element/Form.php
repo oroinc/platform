@@ -22,6 +22,19 @@ class Form extends Element
         }
     }
 
+    public function assertFields(TableNode $table)
+    {
+        foreach ($table->getRows() as $row) {
+            $locator = isset($this->options['mapping'][$row[0]]) ? $this->options['mapping'][$row[0]] : $row[0];
+            $field = $this->findField($locator);
+            self::assertNotNull($field, "Field with '$locator' locator not found");
+
+            $expectedValue = $this->normalizeValue($row[1]);
+            $fieldValue = $this->normalizeValue($field->getValue());
+            self::assertEquals($expectedValue, $fieldValue, sprintf('Field "%s" value is not as expected', $locator));
+        }
+    }
+
     /**
      * Find last embed form in collection of fieldset
      * See collection address in Contact (CRM) form for example
@@ -85,6 +98,8 @@ class Form extends Element
 
     /**
      * {@inheritdoc}
+     * @todo Move behat elements to Driver layer. BAP-11887.
+     * @SuppressWarnings(PHPMD.NPathComplexity)
      */
     public function findField($locator)
     {
@@ -99,6 +114,10 @@ class Form extends Element
 
             if ($field->hasAttribute('type') && 'checkbox' === $field->getAttribute('type')) {
                 return $this->elementFactory->wrapElement('Checkbox', $field);
+            }
+
+            if ($field->hasClass('select2-offscreen')) {
+                return $this->elementFactory->wrapElement('Select2Entity', $field);
             }
 
             return $field;
@@ -139,6 +158,8 @@ class Form extends Element
                 return $sndParent->find('css', 'input[type=checkbox]');
             } elseif ($sndParent->hasClass('control-group-choice')) {
                 return $this->elementFactory->wrapElement('GroupChoiceField', $sndParent->find('css', '.controls'));
+            } elseif ($field = $this->getPage()->find('css', '#'.$label->getAttribute('for'))) {
+                return $field;
             } else {
                 self::fail(sprintf('Find label "%s", but can\'t determine field type', $locator));
             }
@@ -148,11 +169,19 @@ class Form extends Element
     }
 
     /**
-     * @param string $value
+     * @param array|string $value
      * @return array|string
      */
     protected function normalizeValue($value)
     {
+        if (is_array($value)) {
+            foreach ($value as $key => $item) {
+                $value[$key] = $this->normalizeValue($item);
+            }
+
+            return $value;
+        }
+
         $value = trim($value);
 
         if (0 === strpos($value, '[')) {

@@ -39,7 +39,7 @@ navigation:
                     quicklinks_request_quote: ~
 
     titles:
-        orocrm_call_index: Calls
+        oro_call_index: Calls
 
 
     navigation_elements:
