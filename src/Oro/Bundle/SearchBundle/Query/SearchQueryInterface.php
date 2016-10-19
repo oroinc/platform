@@ -4,6 +4,7 @@ namespace Oro\Bundle\SearchBundle\Query;
 
 use Doctrine\Common\Collections\Expr\Expression;
 
+use Oro\Bundle\SearchBundle\Query\Criteria\Criteria;
 use Oro\Bundle\SearchBundle\Query\Result\Item;
 
 interface SearchQueryInterface
@@ -41,7 +42,7 @@ interface SearchQueryInterface
      *
      * @param      $fieldName
      * @param null $enforcedFieldType
-     * @return mixed
+     * @return SearchQueryInterface
      */
     public function addSelect($fieldName, $enforcedFieldType = null);
 
@@ -72,6 +73,13 @@ interface SearchQueryInterface
      * @return array
      */
     public function getSelectDataFields();
+
+    /**
+     * Returning the WHERE clause parts.
+     *
+     * @return Criteria
+     */
+    public function getCriteria();
 
     /**
      * Same as from(). Added for clarity.

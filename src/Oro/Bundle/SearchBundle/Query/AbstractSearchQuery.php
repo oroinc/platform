@@ -205,4 +205,12 @@ abstract class AbstractSearchQuery implements SearchQueryInterface
     {
         return $this->query->getSelectDataFields();
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getCriteria()
+    {
+        return $this->query->getCriteria();
+    }
 }
