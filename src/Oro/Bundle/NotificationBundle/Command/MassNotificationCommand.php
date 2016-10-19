@@ -2,6 +2,8 @@
 
 namespace  Oro\Bundle\NotificationBundle\Command;
 
+use Oro\Bundle\NotificationBundle\Model\MassNotificationSender;
+
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -84,10 +86,18 @@ class MassNotificationCommand extends ContainerAwareCommand
             $message = file_get_contents($filePath);
         }
 
-        $sender = $this->getContainer()->get('oro_notification.mass_notification_sender');
+        $sender = $this->getMassNotificationSender();
 
         $count = $sender->send($message, $subject, $senderEmail, $senderName);
 
         $output->writeln(sprintf('%s notifications have been added to the queue', $count));
+    }
+
+    /**
+     * @return MassNotificationSender
+     */
+    private function getMassNotificationSender()
+    {
+        return $this->getContainer()->get('oro_notification.mass_notification_sender');
     }
 }
