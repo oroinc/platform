@@ -24,7 +24,7 @@ class MenuUpdateUtils
         MenuUpdateInterface $update,
         ItemInterface $item,
         $menuName,
-        array $extrasMapping = ['position' => 'priority']
+        array $extrasMapping = ['position' => 'priority', 'description' => 'defaultDescription']
     ) {
         $accessor = PropertyAccess::createPropertyAccessor();
 

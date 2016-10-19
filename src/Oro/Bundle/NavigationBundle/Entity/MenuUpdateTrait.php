@@ -5,10 +5,13 @@ namespace Oro\Bundle\NavigationBundle\Entity;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
+use Oro\Bundle\LocaleBundle\Entity\FallbackTrait;
 use Oro\Bundle\LocaleBundle\Entity\LocalizedFallbackValue;
 
 trait MenuUpdateTrait
 {
+    use FallbackTrait;
+
     /**
      * @var int
      *
@@ -42,6 +45,17 @@ trait MenuUpdateTrait
      * )
      */
     protected $titles;
+
+    /**
+     * @var Collection|LocalizedFallbackValue[]
+     *
+     * @ORM\ManyToMany(
+     *      targetEntity="Oro\Bundle\LocaleBundle\Entity\LocalizedFallbackValue",
+     *      cascade={"ALL"},
+     *      orphanRemoval=true
+     * )
+     */
+    protected $descriptions;
 
     /**
      * @var string
@@ -178,6 +192,63 @@ trait MenuUpdateTrait
     {
         if ($this->titles->contains($title)) {
             $this->titles->removeElement($title);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|LocalizedFallbackValue[]
+     */
+    public function getDescriptions()
+    {
+        return $this->descriptions;
+    }
+
+    /**
+     * @param string $value
+     * @return MenuUpdateInterface
+     */
+    public function setDefaultDescription($value)
+    {
+        $oldValue = $this->getLocalizedFallbackValue($this->descriptions);
+
+        if ($oldValue && $this->descriptions->contains($oldValue)) {
+            $this->descriptions->removeElement($oldValue);
+        }
+        $newValue = new LocalizedFallbackValue();
+        $newValue->setText($value);
+
+        if (!$this->descriptions->contains($newValue)) {
+            $this->descriptions->add($newValue);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param LocalizedFallbackValue $description
+     *
+     * @return MenuUpdateInterface
+     */
+    public function addDescription(LocalizedFallbackValue $description)
+    {
+        if (!$this->descriptions->contains($description)) {
+            $this->descriptions->add($description);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param LocalizedFallbackValue $description
+     *
+     * @return MenuUpdateInterface
+     */
+    public function removeDescription(LocalizedFallbackValue $description)
+    {
+        if ($this->descriptions->contains($description)) {
+            $this->descriptions->removeElement($description);
         }
 
         return $this;

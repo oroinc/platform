@@ -7,6 +7,7 @@ use Knp\Menu\ItemInterface;
 use Symfony\Component\Form\PreloadedExtension;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidatorFactoryInterface;
+use Symfony\Component\Translation\TranslatorInterface;
 
 use Oro\Component\Testing\Unit\FormIntegrationTestCase;
 use Oro\Bundle\LocaleBundle\Entity\LocalizedFallbackValue;
@@ -17,6 +18,7 @@ use Oro\Bundle\LocaleBundle\Tests\Unit\Form\Type\Stub\LocalizationCollectionType
 use Oro\Bundle\NavigationBundle\Validator\Constraints\MaxNestedLevelValidator;
 use Oro\Bundle\NavigationBundle\Entity\MenuUpdate;
 use Oro\Bundle\NavigationBundle\Form\Type\MenuUpdateType;
+use Oro\Bundle\LocaleBundle\Form\Type\TranslatedLocalizedFallbackValueCollectionType;
 
 class MenuUpdateTypeTest extends FormIntegrationTestCase
 {
@@ -32,9 +34,14 @@ class MenuUpdateTypeTest extends FormIntegrationTestCase
 
         $registry = $this->getMock(ManagerRegistry::class);
 
+        $translator = $this->getMock(TranslatorInterface::class);
+
         return [
             new PreloadedExtension(
                 [
+                    TranslatedLocalizedFallbackValueCollectionType::NAME => new TranslatedLocalizedFallbackValueCollectionType(
+                        $translator
+                    ),
                     LocalizedFallbackValueCollectionType::NAME => new LocalizedFallbackValueCollectionType($registry),
                     LocalizedPropertyType::NAME => new LocalizedPropertyType(),
                     LocalizationCollectionType::NAME => new LocalizationCollectionTypeStub(),
@@ -63,6 +70,8 @@ class MenuUpdateTypeTest extends FormIntegrationTestCase
         $expected = new MenuUpdate();
         $expectedTitle = (new LocalizedFallbackValue)->setString(self::TEST_TITLE);
         $expected->addTitle($expectedTitle);
+
+        $expected->addDescription(new LocalizedFallbackValue);
 
         $this->assertFormOptionEqual(true, 'disabled', $form->get('uri'));
         $this->assertFormNotContainsField('aclResourceId', $form);
@@ -94,6 +103,7 @@ class MenuUpdateTypeTest extends FormIntegrationTestCase
         $expected
             ->setCustom(true)
             ->addTitle($expectedTitle)
+            ->addDescription(new LocalizedFallbackValue)
             ->setUri(self::TEST_URI);
 
         $this->assertFormIsValid($form);
@@ -110,6 +120,8 @@ class MenuUpdateTypeTest extends FormIntegrationTestCase
         $expected = new MenuUpdate();
         $expectedTitle = (new LocalizedFallbackValue);
         $expected->addTitle($expectedTitle);
+        $expected->addDescription(new LocalizedFallbackValue);
+
         $this->assertFormIsNotValid($form);
         $this->assertEquals($expected, $form->getData());
     }
@@ -134,6 +146,7 @@ class MenuUpdateTypeTest extends FormIntegrationTestCase
         $expectedTitle = (new LocalizedFallbackValue)->setString(self::TEST_TITLE);
         $expected
             ->setCustom(true)
+            ->addDescription(new LocalizedFallbackValue)
             ->addTitle($expectedTitle);
 
         $this->assertFormIsNotValid($form);
@@ -154,11 +167,11 @@ class MenuUpdateTypeTest extends FormIntegrationTestCase
         $expected = new MenuUpdate();
         $expectedTitle = (new LocalizedFallbackValue)->setString(self::TEST_TITLE);
         $expected->addTitle($expectedTitle);
+        $expected->addDescription(new LocalizedFallbackValue);
 
         $this->assertFormContainsField('aclResourceId', $form);
         $this->assertFormOptionEqual(true, 'disabled', $form->get('aclResourceId'));
     }
-
 
     /**
      * @return \PHPUnit_Framework_MockObject_MockObject|ConstraintValidatorFactoryInterface

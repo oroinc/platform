@@ -11,7 +11,7 @@ use Symfony\Component\Form\FormInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
-use Oro\Bundle\LocaleBundle\Form\Type\LocalizedFallbackValueCollectionType;
+use Oro\Bundle\LocaleBundle\Form\Type\TranslatedLocalizedFallbackValueCollectionType;
 use Oro\Bundle\NavigationBundle\Entity\MenuUpdate;
 
 class MenuUpdateType extends AbstractType
@@ -25,11 +25,11 @@ class MenuUpdateType extends AbstractType
     {
         $builder->add(
             'titles',
-            LocalizedFallbackValueCollectionType::NAME,
+            TranslatedLocalizedFallbackValueCollectionType::class,
             [
                 'required' => true,
                 'label' => 'oro.navigation.menuupdate.title.label',
-                'options' => ['constraints' => [new NotBlank()]],
+                'options' => ['constraints' => [new NotBlank()]]
             ]
         );
 
@@ -41,6 +41,15 @@ class MenuUpdateType extends AbstractType
                 $menuItem = $options['menu_item'];
                 /** @var MenuUpdate $menuUpdate */
                 $menuUpdate = $event->getData();
+                $form->add(
+                    'uri',
+                    'text',
+                    [
+                        'disabled' => false === $menuUpdate->isCustom(),
+                        'required' => true,
+                        'label' => 'oro.navigation.menuupdate.uri.label',
+                    ]
+                );
                 if (null !== $options['menu_item'] && !empty($menuItem->getExtra('aclResourceId'))) {
                     $form->add(
                         'aclResourceId',
@@ -53,17 +62,20 @@ class MenuUpdateType extends AbstractType
                         ]
                     );
                 }
-                $form->add(
-                    'uri',
-                    'text',
-                    [
-                        'disabled' => false === $menuUpdate->isCustom(),
-                        'required' => true,
-                        'label' => 'oro.navigation.menuupdate.uri.label',
-                    ]
-                );
             }
         );
+
+        $builder->add(
+            'descriptions',
+            TranslatedLocalizedFallbackValueCollectionType::class,
+            [
+                'required' => false,
+                'label' => 'oro.navigation.menuupdate.description.label',
+                'type' => 'textarea',
+                'field' => 'text',
+            ]
+        );
+
     }
 
     /**
