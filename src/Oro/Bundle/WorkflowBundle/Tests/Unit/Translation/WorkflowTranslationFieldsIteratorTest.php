@@ -61,7 +61,17 @@ class WorkflowTranslationFieldsIteratorTest extends \PHPUnit_Framework_TestCase
                         'transition_3' => [
                             'message' => 'transition_3_message'
                         ],
-                        'transition_four' => []
+                        'transition_four' => [
+                            'form_options' => [
+                                'attribute_fields' => [
+                                    'attribute_1' => [
+                                        'options' => [
+                                            'label' => 'TAL'
+                                        ]
+                                    ]
+                                ]
+                            ]
+                        ]
                     ],
                     'steps' => [
                         'step_1' => [
@@ -82,6 +92,7 @@ class WorkflowTranslationFieldsIteratorTest extends \PHPUnit_Framework_TestCase
                     'oro.workflow.test_workflow.transition.transition_3.warning_message' => 'transition_3_message',
                     'oro.workflow.test_workflow.transition.transition_four.label' => null,
                     'oro.workflow.test_workflow.transition.transition_four.warning_message' => null,
+                    'oro.workflow.test_workflow.transition.transition_four.attribute.attribute_1.label' => 'TAL',
                     'oro.workflow.test_workflow.step.step_1.label' => 'step_1_label',
                     'oro.workflow.test_workflow.step.step_2.label' => null,
                 ]
@@ -140,7 +151,17 @@ class WorkflowTranslationFieldsIteratorTest extends \PHPUnit_Framework_TestCase
                         'transition_3' => [
                             'message' => 'transition_3_message'
                         ],
-                        'transition_four' => []
+                        'transition_four' => [
+                            'form_options' => [
+                                'attribute_fields' => [
+                                    'attribute_1' => [
+                                        'options' => [
+                                            'label' => 'transition_attribute_1_field_label'
+                                        ]
+                                    ]
+                                ]
+                            ]
+                        ]
                     ],
                     'steps' => [
                         'step_1' => [
@@ -166,23 +187,32 @@ class WorkflowTranslationFieldsIteratorTest extends \PHPUnit_Framework_TestCase
                         ],
                         'transition_four' => [
                             'label' => '7',
-                            'message' => '8'
+                            'message' => '8',
+                            'form_options' => [
+                                'attribute_fields' => [
+                                    'attribute_1' => [
+                                        'options' => [
+                                            'label' => '9'
+                                        ]
+                                    ]
+                                ]
+                            ]
                         ]
                     ],
                     'steps' => [
                         'step_1' => [
-                            'label' => '9'
+                            'label' => '10'
                         ],
                         'step_2' => [
-                            'label' => '10'
+                            'label' => '11'
                         ]
                     ],
                     'attributes' => [
                         'attribute_1' => [
-                            'label' => '11'
+                            'label' => '12'
                         ],
                         'attribute_2' => [
-                            'label' => '12'
+                            'label' => '13'
                         ]
                     ],
                 ]
@@ -202,7 +232,16 @@ class WorkflowTranslationFieldsIteratorTest extends \PHPUnit_Framework_TestCase
                 'transitions' => [
                     'transition_1' => [
                         'label' => 'transition_1_label',
-                        'message' => 'transition_1_message'
+                        'message' => 'transition_1_message',
+                        'form_options' => [
+                            'attribute_fields' => [
+                                'attribute_1' => [
+                                    'options' => [
+                                        'label' => 'TAL'
+                                    ]
+                                ]
+                            ]
+                        ]
                     ]
                 ],
                 'attributes' => [
@@ -219,6 +258,7 @@ class WorkflowTranslationFieldsIteratorTest extends \PHPUnit_Framework_TestCase
             'oro.workflow.test_workflow.label' => 'workflow_label',
             'oro.workflow.test_workflow.transition.transition_1.label' => 'transition_1_label',
             'oro.workflow.test_workflow.transition.transition_1.warning_message' => 'transition_1_message',
+            'oro.workflow.test_workflow.transition.transition_1.attribute.attribute_1.label' => 'TAL',
             'oro.workflow.test_workflow.step.step_1.label' => 'step_1_label',
             'oro.workflow.test_workflow.step.step_2.label' => 'step_2_label',
             'oro.workflow.test_workflow.attribute.attribute_1.label' => 'attribute_1_label',

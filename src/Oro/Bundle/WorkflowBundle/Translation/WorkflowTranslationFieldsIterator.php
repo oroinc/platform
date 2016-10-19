@@ -8,6 +8,7 @@ use Oro\Bundle\TranslationBundle\Translation\TranslationKeyTemplateInterface;
 use Oro\Bundle\WorkflowBundle\Configuration\WorkflowConfiguration;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Translation\KeyTemplate\StepLabelTemplate;
+use Oro\Bundle\WorkflowBundle\Translation\KeyTemplate\TransitionAttributeLabelTemplate;
 use Oro\Bundle\WorkflowBundle\Translation\KeyTemplate\TransitionLabelTemplate;
 use Oro\Bundle\WorkflowBundle\Translation\KeyTemplate\TransitionWarningMessageTemplate;
 use Oro\Bundle\WorkflowBundle\Translation\KeyTemplate\WorkflowAttributeLabelTemplate;
@@ -40,42 +41,90 @@ class WorkflowTranslationFieldsIterator
      */
     public function &iterateConfigTranslationFields($workflowName, array &$configuration)
     {
-        $data = ['workflow_name' => $workflowName];
+        $context = new \ArrayObject(['workflow_name' => $workflowName]);
 
-        yield $this->makeKey(WorkflowLabelTemplate::class, $data) => $configuration['label'];
+        yield $this->makeKey(WorkflowLabelTemplate::class, $context) => $configuration['label'];
 
-        if ($this->hasArrayNode(WorkflowConfiguration::NODE_TRANSITIONS, $configuration)) {
-            foreach ($configuration[WorkflowConfiguration::NODE_TRANSITIONS] as $transitionKey => &$rawTransition) {
-                $data = [
-                    'workflow_name' => $workflowName,
-                    'transition_name' => $this->resolveName($rawTransition, $transitionKey)
-                ];
-                yield $this->makeKey(TransitionLabelTemplate::class, $data) => $rawTransition['label'];
-                yield $this->makeKey(TransitionWarningMessageTemplate::class, $data) => $rawTransition['message'];
-            }
-            unset($rawTransition);
+        foreach ($this->transitionFields($configuration, $context) as $translationKey => &$transitionFieldValue) {
+            yield $translationKey => $transitionFieldValue;
         }
+        unset($transitionFieldValue);
 
         if ($this->hasArrayNode(WorkflowConfiguration::NODE_STEPS, $configuration)) {
             foreach ($configuration[WorkflowConfiguration::NODE_STEPS] as $stepKey => &$rawStep) {
-                $data = [
-                    'workflow_name' => $workflowName,
-                    'step_name' => $this->resolveName($rawStep, $stepKey)
-                ];
-                yield $this->makeKey(StepLabelTemplate::class, $data) => $rawStep['label'];
+                $context['step_name'] = $this->resolveName($rawStep, $stepKey);
+                yield $this->makeKey(StepLabelTemplate::class, $context) => $rawStep['label'];
+                unset($context['step_name']);
             }
             unset($rawStep);
         }
 
+        foreach ($this->attributeFields($configuration, $context) as $translationKey => &$attributeFieldValue) {
+            yield $translationKey => $attributeFieldValue;
+        }
+        unset($attributeFieldValue);
+    }
+
+    /**
+     * @param array $configuration
+     * @param \ArrayObject $context
+     * @return \Generator
+     * @throws \InvalidArgumentException
+     */
+    private function &attributeFields(array &$configuration, \ArrayObject $context)
+    {
         if ($this->hasArrayNode(WorkflowConfiguration::NODE_ATTRIBUTES, $configuration)) {
             foreach ($configuration[WorkflowConfiguration::NODE_ATTRIBUTES] as $attributeKey => &$rawAttribute) {
-                $data = [
-                    'workflow_name' => $workflowName,
-                    'attribute_name' => $this->resolveName($rawAttribute, $attributeKey)
-                ];
-                yield $this->makeKey(WorkflowAttributeLabelTemplate::class, $data) => $rawAttribute['label'];
+                $context['attribute_name'] = $this->resolveName($rawAttribute, $attributeKey);
+                yield $this->makeKey(WorkflowAttributeLabelTemplate::class, $context) => $rawAttribute['label'];
+                unset($context['attribute_name']);
             }
             unset($rawAttribute);
+        }
+    }
+
+    /**
+     * @param array $configuration
+     * @param \ArrayObject $context
+     * @return \Generator
+     * @throws \InvalidArgumentException
+     */
+    private function &transitionFields(array &$configuration, \ArrayObject $context)
+    {
+        if ($this->hasArrayNode(WorkflowConfiguration::NODE_TRANSITIONS, $configuration)) {
+            /** @var array[] $configuration */
+            foreach ($configuration[WorkflowConfiguration::NODE_TRANSITIONS] as $transitionKey => &$rawTransition) {
+                $context['transition_name'] = $this->resolveName($rawTransition, $transitionKey);
+                yield $this->makeKey(TransitionLabelTemplate::class, $context) => $rawTransition['label'];
+                yield $this->makeKey(TransitionWarningMessageTemplate::class, $context) => $rawTransition['message'];
+
+                foreach ($this->transitionAttributeFields($rawTransition, $context) as $key => &$attrValue) {
+                    yield $key => $attrValue;
+                }
+                unset($attrValue, $context['transition_name']);
+            }
+            unset($rawTransition);
+        }
+    }
+
+    /**
+     * @param array $transitionConfig
+     * @param \ArrayObject $context
+     * @return \Generator
+     */
+    private function &transitionAttributeFields(array &$transitionConfig, \ArrayObject $context)
+    {
+        if ($this->hasArrayNode('form_options', $transitionConfig)
+            && $this->hasArrayNode('attribute_fields', $transitionConfig['form_options'])
+        ) {
+            foreach ($transitionConfig['form_options']['attribute_fields'] as $attributeName => &$attributeConfig) {
+                if (isset($attributeConfig['options']['label'])) {
+                    $context['attribute_name'] = $attributeName;
+                    $key = $this->makeKey(TransitionAttributeLabelTemplate::class, $context);
+                    yield $key => $attributeConfig['options']['label'];
+                    unset($context['attribute_name']);
+                }
+            }
         }
     }
 
@@ -87,7 +136,7 @@ class WorkflowTranslationFieldsIterator
      */
     private function resolveName(array &$node, $fallBackName)
     {
-        return (string) !empty($node['name']) ? $node['name'] : $fallBackName;
+        return (string)!empty($node['name']) ? $node['name'] : $fallBackName;
     }
 
     /**
@@ -100,44 +149,28 @@ class WorkflowTranslationFieldsIterator
      */
     public function iterateWorkflowDefinition(WorkflowDefinition $definition)
     {
-        $workflowName = $definition->getName();
-
-        $key = $this->makeKey(WorkflowLabelTemplate::class, ['workflow_name' => $workflowName]);
-        yield  $key => $definition->getLabel();
+        $context = new \ArrayObject(['workflow_name' => $definition->getName()]);
+        $translationKey = $this->makeKey(WorkflowLabelTemplate::class, $context);
+        yield  $translationKey => $definition->getLabel();
 
         $configuration = $definition->getConfiguration();
 
-        if ($this->hasArrayNode(WorkflowConfiguration::NODE_TRANSITIONS, $configuration)) {
-            foreach ($configuration[WorkflowConfiguration::NODE_TRANSITIONS] as $transitionKey => $transitionConfig) {
-                $data = [
-                    'workflow_name' => $workflowName,
-                    'transition_name' => $this->resolveName($transitionConfig, $transitionKey)
-                ];
-                yield $this->makeKey(TransitionLabelTemplate::class, $data) => $transitionConfig['label'];
-                yield $this->makeKey(TransitionWarningMessageTemplate::class, $data) => $transitionConfig['message'];
-            }
+        foreach ($this->transitionFields($configuration, $context) as $translationKey => &$transitionFieldValue) {
+            yield $translationKey => $transitionFieldValue;
         }
+        unset($transitionFieldValue);
 
         foreach ($definition->getSteps() as $step) {
-            $key = $this->makeKey(
-                StepLabelTemplate::class,
-                ['workflow_name' => $workflowName, 'step_name' => $step->getName()]
-            );
-            yield $key => $step->getLabel();
+            $context['step_name'] = $step->getName();
+            $translationKey = $this->makeKey(StepLabelTemplate::class, $context);
+            yield $translationKey => $step->getLabel();
+            unset($context['step_name']);
         }
 
-        if ($this->hasArrayNode(WorkflowConfiguration::NODE_ATTRIBUTES, $configuration)) {
-            foreach ($configuration[WorkflowConfiguration::NODE_ATTRIBUTES] as $attributeKey => $attributeConfig) {
-                $key = $this->makeKey(
-                    WorkflowAttributeLabelTemplate::class,
-                    [
-                        'workflow_name' => $workflowName,
-                        'attribute_name' => $this->resolveName($attributeConfig, $attributeKey)
-                    ]
-                );
-                yield $key => $attributeConfig['label'];
-            }
+        foreach ($this->attributeFields($configuration, $context) as $translationKey => &$attributeFieldValue) {
+            yield $translationKey => $attributeFieldValue;
         }
+        unset($attributeFieldValue);
     }
 
     /**
@@ -152,24 +185,24 @@ class WorkflowTranslationFieldsIterator
 
     /**
      * @param string $templateClass
-     * @param array $data
+     * @param \ArrayObject $context
      * @return string
      * @throws \InvalidArgumentException
      */
-    private function makeKey($templateClass, array $data)
+    private function makeKey($templateClass, \ArrayObject $context)
     {
-        return $this->keyGenerator->generate($this->makeSource($templateClass, $data));
+        return $this->keyGenerator->generate($this->makeSource($templateClass, $context));
     }
 
     /**
      * @param $templateClass
-     * @param array $data
+     * @param \ArrayObject $context
      * @return TranslationKeySource
      * @throws \InvalidArgumentException
      */
-    private function makeSource($templateClass, array $data = [])
+    private function makeSource($templateClass, \ArrayObject $context)
     {
-        return new TranslationKeySource($this->getTemplate($templateClass), $data);
+        return new TranslationKeySource($this->getTemplate($templateClass), $context->getArrayCopy());
     }
 
     /**
