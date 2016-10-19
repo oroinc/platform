@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\TranslationBundle\Helper;
 
-use Doctrine\Bundle\DoctrineBundle\Registry;
+use Doctrine\Common\Persistence\ManagerRegistry;
 
 use Oro\Bundle\TranslationBundle\Entity\Repository\TranslationRepository;
 use Oro\Bundle\TranslationBundle\Entity\Translation;
@@ -11,7 +11,7 @@ use Oro\Bundle\TranslationBundle\Manager\TranslationManager;
 //todo cover DB queries by functional tests in BAP-12113
 class TranslationHelper
 {
-    /** @var Registry */
+    /** @var ManagerRegistry */
     protected $registry;
 
     /** @var TranslationManager */
@@ -21,10 +21,10 @@ class TranslationHelper
     protected $values = [];
 
     /**
-     * @param Registry $registry
+     * @param ManagerRegistry $registry
      * @param TranslationManager $translationManager
      */
-    public function __construct(Registry $registry, TranslationManager $translationManager)
+    public function __construct(ManagerRegistry $registry, TranslationManager $translationManager)
     {
         $this->registry = $registry;
         $this->translationManager = $translationManager;
