@@ -42,7 +42,7 @@
                 };
                 var requireLength = $passwordInput.data('suggest-length') || 1;
                 var requirements = $passwordInput.data('suggest-rules') || '';
-                var length = requireLength ? Math.max(requireLength, 8) : 8;
+                var length = Math.max(requireLength, 8);
                 var charsets = {
                     'lower_case': 'abcdefghijklnopqrstuvwxyz',
                     'upper_case':'ABCDEFGHIJKLMNOPQRSTUVWXYZ',
@@ -52,20 +52,20 @@
                 var rules = requirements.split(',');
                 var pass = '';
 
-                {# make sure we have at least one symbol for each rule #}
+                // make sure we have at least one symbol for each rule
                 rules.forEach(function(rule) {
                     if (charsets.hasOwnProperty(rule)) {
                         pass += charsets[rule].charAt(getRnd(charsets[rule].length));
                     }
                 });
 
-                {# create a pool for picking random chars that is reasonably strong #}
+                // create a pool for picking random chars that is reasonably strong
                 var charset = charsets['lower_case'] + charsets['upper_case'] + charsets['numbers'];
 
-                {# fill up to the minLength with random symbols #}
+                // fill up to the minLength with random symbols
                 for (var i = pass.length; i < length; ++i) {
                     var randChar = charset.charAt(getRnd(charset.length));
-                    {# make sure required chars are mixed #}
+                    // make sure required chars are mixed
                     pass = !!getRnd(1) ? randChar + pass : pass + randChar;
                 }
 

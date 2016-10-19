@@ -1,4 +1,4 @@
-  Feature: Pin page
+Feature: Pin page
   In order to have fast access to some pages in system
   As crm user
   I need pin some page and return to it with the same state later
