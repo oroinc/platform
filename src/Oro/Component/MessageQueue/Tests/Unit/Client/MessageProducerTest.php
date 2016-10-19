@@ -75,11 +75,11 @@ class MessageProducerTest extends \PHPUnit_Framework_TestCase
         $producer = new MessageProducer($driver);
         $producer->send('theTopic', $message);
 
-                $expectedProperties = [
-                    'oro.message_queue.client.topic_name' => 'theTopic',
-                    'oro.message_queue.client.processor_name' => 'theRouteMessageProcessor',
-                    'oro.message_queue.client.queue_name' => 'therouterqueue',
-                ];
+        $expectedProperties = [
+            'oro.message_queue.client.topic_name' => 'theTopic',
+            'oro.message_queue.client.processor_name' => 'theRouteMessageProcessor',
+            'oro.message_queue.client.queue_name' => 'therouterqueue',
+        ];
 
         self::assertEmpty($message->getProperties());
         self::assertEquals($expectedProperties, $sentMessage->getProperties());
