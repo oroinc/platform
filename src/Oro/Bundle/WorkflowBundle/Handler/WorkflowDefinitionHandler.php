@@ -4,7 +4,6 @@ namespace Oro\Bundle\WorkflowBundle\Handler;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\EntityManager;
-use Doctrine\ORM\EntityRepository;
 
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
@@ -46,32 +45,57 @@ class WorkflowDefinitionHandler
     }
 
     /**
-     * @param WorkflowDefinition $workflowDefinition
+     * @param WorkflowDefinition $existingDefinition
      * @param WorkflowDefinition|null $newDefinition
      * @throws \Exception
      */
     public function updateWorkflowDefinition(
-        WorkflowDefinition $workflowDefinition,
-        WorkflowDefinition $newDefinition = null
+        WorkflowDefinition $existingDefinition,
+        WorkflowDefinition $newDefinition
     ) {
         $em = $this->getEntityManager();
-        $created = false;
 
-        if ($newDefinition) {
-            $workflowDefinition->import($newDefinition);
-        } else {
-            /** @var WorkflowDefinition $existingDefinition */
-            $existingDefinition = $this->getEntityRepository()->find($workflowDefinition->getName());
-            if ($existingDefinition) {
-                $workflowDefinition = $existingDefinition->import($workflowDefinition);
-            } else {
-                $created = true;
-            }
+        $previous = new WorkflowDefinition();
+        $previous->import($existingDefinition);
+
+        $existingDefinition->import($newDefinition);
+
+        $this->workflowAssembler->assemble($existingDefinition);
+
+        $this->eventDispatcher->dispatch(
+            WorkflowEvents::WORKFLOW_BEFORE_UPDATE,
+            new WorkflowChangesEvent($existingDefinition, $previous)
+        );
+
+        $em->persist($existingDefinition);
+
+        $em->beginTransaction();
+        try {
+            $em->flush($existingDefinition);
+            $em->commit();
+        } catch (\Exception $exception) {
+            $em->rollback();
+            throw $exception;
         }
+
+        $this->eventDispatcher->dispatch(
+            WorkflowEvents::WORKFLOW_AFTER_UPDATE,
+            new WorkflowChangesEvent($existingDefinition, $previous)
+        );
+    }
+
+    /**
+     * @param WorkflowDefinition $workflowDefinition
+     * @throws \Exception
+     */
+    public function createWorkflowDefinition(WorkflowDefinition $workflowDefinition)
+    {
+        $em = $this->getEntityManager();
+
         $this->workflowAssembler->assemble($workflowDefinition);
 
         $this->eventDispatcher->dispatch(
-            $created ? WorkflowEvents::WORKFLOW_BEFORE_CREATE : WorkflowEvents::WORKFLOW_BEFORE_UPDATE,
+            WorkflowEvents::WORKFLOW_BEFORE_CREATE,
             new WorkflowChangesEvent($workflowDefinition)
         );
 
@@ -87,7 +111,7 @@ class WorkflowDefinitionHandler
         }
 
         $this->eventDispatcher->dispatch(
-            $created ? WorkflowEvents::WORKFLOW_AFTER_CREATE : WorkflowEvents::WORKFLOW_AFTER_UPDATE,
+            WorkflowEvents::WORKFLOW_AFTER_CREATE,
             new WorkflowChangesEvent($workflowDefinition)
         );
     }
@@ -95,6 +119,8 @@ class WorkflowDefinitionHandler
     /**
      * @param WorkflowDefinition $workflowDefinition
      * @return bool
+     * @throws \Doctrine\ORM\OptimisticLockException
+     * @throws \Doctrine\ORM\ORMInvalidArgumentException
      */
     public function deleteWorkflowDefinition(WorkflowDefinition $workflowDefinition)
     {
@@ -120,13 +146,5 @@ class WorkflowDefinitionHandler
     private function getEntityManager()
     {
         return $this->managerRegistry->getManagerForClass($this->entityClass);
-    }
-
-    /**
-     * @return EntityRepository
-     */
-    private function getEntityRepository()
-    {
-        return $this->getEntityManager()->getRepository($this->entityClass);
     }
 }

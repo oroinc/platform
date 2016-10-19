@@ -98,6 +98,27 @@ class ACLContext extends OroFeatureContext implements OroElementFactoryAware, Ke
         $this->getMink()->setDefaultSessionName('first_session');
     }
 
+    /**
+     * @Then /^(?:|I )click update schema$/
+     */
+    public function iClickUpdateSchema()
+    {
+        $page = $this->getPage();
+
+        $page->clickLink('Update schema');
+        $this->waitForAjax();
+        $page->clickLink('Yes, Proceed');
+        $this->waitForAjax(120000);
+    }
+
+    /**
+     * @Given /^(?:|I |I'm )edit entity$/
+     */
+    public function iMEditEntity()
+    {
+        $this->createElement('Entity Edit Button')->click();
+    }
+
     protected function loginAsAdmin()
     {
         $this->oroMainContext->loginAsUserWithPassword();

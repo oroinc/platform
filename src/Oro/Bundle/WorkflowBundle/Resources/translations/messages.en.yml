@@ -75,6 +75,15 @@ Show Transition Labels: Show Transition Labels
 
 oro:
     workflow:
+        translation:
+            workflow.label: Workflow
+            context:
+                workflow_label: 'Workflow "{{ workflow_label }}" -> Name'
+                step_label: 'Workflow "{{ workflow_label }}" -> Step "{{ step_label }}" -> Label'
+                transition_label: 'Workflow "{{ workflow_label }}" -> Transition "{{ transition_label }}" -> Label'
+                transition_warning_message: 'Workflow "{{ workflow_label }}" -> Transition "{{ transition_label }}" -> Warning Message'
+                transition_attribute_label: 'Workflow "{{ workflow_label }}" -> Transition "{{ transition_label }}" -> Attribute "{{ transition_attribute_label }}"'
+                workflow_attribute_label: 'Workflow "{{ workflow_label }}" -> Attribute "{{ workflow_attribute_label }}"'
         action:
             process:
                 activate:   Activate

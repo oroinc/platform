@@ -4,6 +4,7 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Metadata;
 
 use Oro\Bundle\ApiBundle\Metadata\AssociationMetadata;
 use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
+use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 
 class AssociationMetadataTest extends \PHPUnit_Framework_TestCase
 {
@@ -21,6 +22,7 @@ class AssociationMetadataTest extends \PHPUnit_Framework_TestCase
     {
         $associationMetadata = new AssociationMetadata();
         $associationMetadata->setName('testName');
+        $associationMetadata->setPropertyPath('testPropertyPath');
         $associationMetadata->setDataType('testDataType');
         $associationMetadata->setTargetClassName('targetClassName');
         $associationMetadata->setAcceptableTargetClassNames(['targetClassName1']);
@@ -52,6 +54,7 @@ class AssociationMetadataTest extends \PHPUnit_Framework_TestCase
     {
         $associationMetadata = new AssociationMetadata();
         $associationMetadata->setName('testName');
+        $associationMetadata->setPropertyPath('testPropertyPath');
         $associationMetadata->setDataType('testDataType');
         $associationMetadata->setTargetClassName('targetClassName');
         $associationMetadata->setAcceptableTargetClassNames(['targetClassName1', 'targetClassName2']);
@@ -64,6 +67,7 @@ class AssociationMetadataTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(
             [
                 'name'                      => 'testName',
+                'property_path'             => 'testPropertyPath',
                 'data_type'                 => 'testDataType',
                 'nullable'                  => true,
                 'collapsed'                 => true,
@@ -88,7 +92,6 @@ class AssociationMetadataTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(
             [
                 'name'             => 'testName',
-                'data_type'        => null,
                 'nullable'         => false,
                 'collapsed'        => false,
                 'association_type' => null,
@@ -111,6 +114,21 @@ class AssociationMetadataTest extends \PHPUnit_Framework_TestCase
         $this->assertNull($associationMetadata->getName());
         $associationMetadata->setName('associationName');
         $this->assertEquals('associationName', $associationMetadata->getName());
+    }
+
+    public function testPropertyPath()
+    {
+        $associationMetadata = new AssociationMetadata();
+
+        $this->assertNull($associationMetadata->getPropertyPath());
+        $associationMetadata->setName('name');
+        $this->assertEquals('name', $associationMetadata->getPropertyPath());
+        $associationMetadata->setPropertyPath('propertyPath');
+        $this->assertEquals('propertyPath', $associationMetadata->getPropertyPath());
+        $associationMetadata->setPropertyPath(ConfigUtil::IGNORE_PROPERTY_PATH);
+        $this->assertNull($associationMetadata->getPropertyPath());
+        $associationMetadata->setPropertyPath(null);
+        $this->assertEquals('name', $associationMetadata->getPropertyPath());
     }
 
     public function testDataType()

@@ -37,7 +37,7 @@ datagrids:
                   expr: 'SUM(o.probability)'
                   formatter: percent
               statusLabel:
-                  label: orocrm.sales.opportunity.status.label
+                  label: oro.sales.opportunity.status.label
 ```
 
 **Notes:**

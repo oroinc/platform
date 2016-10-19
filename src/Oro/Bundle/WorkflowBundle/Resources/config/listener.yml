@@ -51,6 +51,7 @@ services:
             - '@oro_workflow.process.logger'
             - '@oro_workflow.cache.process_trigger'
             - '@oro_workflow.process.schedule_policy'
+            - '@oro_message_queue.message_producer'
         tags:
             - { name: oro_workflow.listener.event_trigger_collector.extension }
 
@@ -65,8 +66,8 @@ services:
         tags:
             - { name: oro_workflow.listener.event_trigger_collector.extension }
 
-    oro_workflow.entity_listener.activation_validator:
-        class: Oro\Bundle\WorkflowBundle\EventListener\WorkflowActivationValidatorEntityListener
+    oro_workflow.entity_listener.workflow_definition:
+        class: 'Oro\Bundle\WorkflowBundle\EventListener\WorkflowDefinitionEntityListener'
         arguments:
             - '@oro_workflow.registry'
         tags:

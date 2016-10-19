@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\LayoutBundle\Tests\Unit\Layout\Block\Type;
 
-use Oro\Component\Layout\Block\Type\BaseType;
+use Oro\Component\Layout\Block\Type\ContainerType;
 use Oro\Component\Layout\Block\Type\Options;
 use Oro\Component\Layout\BlockBuilderInterface;
 
@@ -30,7 +30,7 @@ class FormTypeTest extends BlockTypeTestCase
             ->method('add')
             ->withConsecutive(
                 [
-                    'form_id_form_start',
+                    'form_id_start',
                     'form_id',
                     'form_start',
                     [
@@ -39,11 +39,12 @@ class FormTypeTest extends BlockTypeTestCase
                         'form_route_parameters' => ['test_param' => true],
                         'form_method'           => 'POST',
                         'form_enctype'          => 'application/json',
-
+                        'instance_name'         => '',
+                        'additional_block_prefixes' => [],
                     ],
                 ],
                 [
-                    'form_id_form_fields',
+                    'form_id_fields',
                     'form_id',
                     'form_fields',
                     [
@@ -55,16 +56,19 @@ class FormTypeTest extends BlockTypeTestCase
                         'split_to_fields'   => true,
                         'form_data'         => ['test'],
                         'preferred_fields'  => 'first_name',
-
+                        'instance_name'         => '',
+                        'additional_block_prefixes' => [],
                     ],
                 ],
                 [
-                    'form_id_form_end',
+                    'form_id_end',
                     'form_id',
                     'form_end',
                     [
                         'form_name'   => 'test_form',
                         'render_rest' => true,
+                        'instance_name' => '',
+                        'additional_block_prefixes' => [],
                     ],
                 ]
             );
@@ -85,6 +89,7 @@ class FormTypeTest extends BlockTypeTestCase
                 'preferred_fields'      => 'first_name',
                 'groups'                => ['main', 'additional'],
                 'split_to_fields'       => true,
+                'additional_block_prefixes' => [],
             ]
         );
 
@@ -102,6 +107,6 @@ class FormTypeTest extends BlockTypeTestCase
     {
         $type = $this->getBlockType(FormType::NAME);
 
-        $this->assertSame(BaseType::NAME, $type->getParent());
+        $this->assertSame(ContainerType::NAME, $type->getParent());
     }
 }

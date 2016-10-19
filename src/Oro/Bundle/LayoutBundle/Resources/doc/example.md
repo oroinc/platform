@@ -860,10 +860,18 @@ class ContainerExtension extends AbstractBlockTypeExtension
     /**
      * {@inheritdoc}
      */
-    public function finishView(BlockView $view, BlockInterface $block, Options $options)
+    public function buildView(BlockView $view, BlockInterface $block, Options $options)
     {
-        if (!empty($options['type'])) {
-            BlockUtils::registerPlugin($view, $options['type'] . '_' . $block->getTypeName());
+        BlockUtils::setViewVarsFromOptions($view, $options, ['type']);
+    }
+    
+    /**
+     * {@inheritdoc}
+     */
+    public function finishView(BlockView $view, BlockInterface $block)
+    {
+        if (!$view->vars['type']) {
+            BlockUtils::registerPlugin($view, $view->vars['type'] . '_' . $block->getTypeName());
         }
     }
 
