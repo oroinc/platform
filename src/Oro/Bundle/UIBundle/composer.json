@@ -24,7 +24,15 @@
         "bower-asset/select2": "3.4.1",
         "bower-asset/chaplin": "1.0.0",
         "bower-asset/crypto-js": "3.1.7",
-        "bower-asset/jquery-cookie": "1.4.1"
+        "bower-asset/jquery-cookie": "1.4.1",
+        "bower-asset/jquery-mousewheel": "3.1.13",
+        "bower-asset/jquery.numeric": "1.4.1",
+        "bower-asset/uniform": "2.1.1",
+        "bower-asset/malihu-custom-scrollbar-plugin": "3.1.5",
+        "bower-asset/timepicker": "1.4.13",
+        "bower-asset/datepair": "0.4.4",
+        "bower-asset/lightgallery": "1.2.18",
+        "bower-asset/less": "2.5.*"
     },
     "autoload": {
         "psr-0": { "Oro\\Bundle\\UIBundle": "" }

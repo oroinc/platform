@@ -1,11 +1,5 @@
 config:
     shim:
-        'jquery.mousewheel':
-            deps:
-                - 'jquery'
-        'jquery.numeric':
-            deps:
-                - 'jquery'
         'jquery.uniform':
             deps:
                 - 'jquery'
@@ -35,9 +29,10 @@ config:
                 - 'jquery'
                 - 'underscore'
                 - 'backbone'
-        'oroui/lib/jquery.datepair-0.4.4/jquery.datepair':
+        'jquery.datepair':
             deps:
-                - 'oroui/lib/jquery.datepair-0.4.4/datepair'
+                - 'jquery'
+                - 'datepair'
         'jquery.multiselect':
             deps:
                 - 'jquery-ui'
@@ -62,7 +57,7 @@ config:
             'backbone': 'oroui/js/extend/backbone'
             'bootstrap': 'oroui/js/extend/bootstrap'
             'jquery-ui': 'oroui/js/jquery-ui-datepicker-l10n'
-            'oroui/lib/jquery.timepicker-1.4.13/jquery.timepicker': 'oroui/js/extend/jquery.timepicker'
+            'jquery.timepicker': 'oroui/js/extend/jquery.timepicker'
             'base64': 'oroui/js/extend/base64'
         'oroui/js/extend/jquery':
             'jquery': 'jquery'
@@ -85,9 +80,9 @@ config:
         'oroui/js/jquery-ui-datepicker-l10n':
             'jquery-ui': 'oroui/js/extend/jquery-ui'
         'oroui/js/jquery-timepicker-l10n':
-            'oroui/lib/jquery.timepicker-1.4.13/jquery.timepicker': 'oroui/lib/jquery.timepicker-1.4.13/jquery.timepicker'
+            'jquery.timepicker': 'jquery.timepicker'
         'oroui/js/extend/jquery.timepicker':
-            'oroui/lib/jquery.timepicker-1.4.13/jquery.timepicker': 'oroui/lib/jquery.timepicker-1.4.13/jquery.timepicker'
+            'jquery.timepicker': 'jquery.timepicker'
         'chaplin':
             'backbone': 'backbone'
         'oroui/js/app/components/base/component':
@@ -105,24 +100,25 @@ config:
         'base64': 'bundles/oroui/lib/base64.js'
         'jquery': 'bundles/components/jquery/jquery.js'
         'jquery-ui': 'bundles/oroui/js/extend/jquery-ui.js'
-        'jquery-outer-html': 'bundles/oroui/lib/outerHTML-2.1.0-min.js'
-        'jquery.mousewheel': 'bundles/oroui/lib/jquery/jquery.mousewheel.js'
-        'jquery.numeric': 'bundles/oroui/lib/jquery/jquery.numeric.js'
-        'jquery.uniform': 'bundles/oroui/lib/jquery/jquery.uniform.min.js'
+        'jquery.mousewheel': 'bundles/bowerassets/jquery-mousewheel/jquery.mousewheel.js'
+        'jquery.numeric': 'bundles/bowerassets/jquery.numeric/jquery.numeric.js'
+        'jquery.uniform': 'bundles/bowerassets/uniform/jquery.uniform.js'
         'jquery.select2': 'bundles/bowerassets/select2/select2.js'
         'jquery.multiselect': 'bundles/oroui/lib/multiselect/jquery.multiselect.js'
         'jquery.multiselect.filter': 'bundles/oroui/lib/multiselect/jquery.multiselect.filter.js'
         'jquery.simplecolorpicker': 'bundles/oroui/lib/simplecolorpicker/jquery.simplecolorpicker.js'
         'jquery.minicolors': 'bundles/oroui/lib/minicolors/jquery.minicolors.js'
         'jquery.cookie': 'bundles/bowerassets/jquery-cookie/jquery.cookie.js'
-        'jquery.mCustomScrollbar': 'bundles/oroui/lib/jquery/jquery.mCustomScrollbar.min.js'
+        'jquery.mCustomScrollbar': 'bundles/bowerassets/malihu-custom-scrollbar-plugin/jquery.mCustomScrollbar.js'
         'bootstrap': 'bundles/oroui/lib/bootstrap.min.js'
 #        'bootstrap': 'bundles/oroui/js/bootstrap-dev.js'
         'underscore': 'bundles/components/underscore/underscore.js'
         'backbone': 'bundles/components/backbone/backbone.js'
         'chaplin': 'bundles/bowerassets/chaplin/chaplin.js'
         'backbone-bootstrap-modal': 'bundles/oroui/lib/backbone.bootstrap-modal.js'
-        'oroui/lib/jquery.timepicker-1.4.13/jquery.timepicker': 'bundles/oroui/lib/jquery.timepicker-1.4.13/jquery.timepicker.min.js'
+        'jquery.timepicker': 'bundles/bowerassets/timepicker/jquery.timepicker.js'
+        'jquery.datepair': 'bundles/bowerassets/datepair/dist/jquery.datepair.js'
+        'datepair': 'bundles/bowerassets/datepair/dist/datepair.js'
         'cryptojs/core': 'bundles/bowerassets/crypto-js/core.js'
         'cryptojs/enc-base64': 'bundles/bowerassets/crypto-js/enc-base64.js'
         'cryptojs/pbkdf2': 'bundles/bowerassets/crypto-js/pbkdf2.js'
@@ -130,7 +126,7 @@ config:
         'cryptojs/sha1': 'bundles/bowerassets/crypto-js/sha1.js'
         'cryptojs/hmac': 'bundles/bowerassets/crypto-js/hmac.js'
         'cryptojs/sha256': 'bundles/bowerassets/crypto-js/sha256.js'
-        'lightgallery': 'bundles/oroui/lib/lightgallery/js/lightgallery-all.js'
+        'lightgallery': 'bundles/bowerassets/lightgallery/dist/js/lightgallery-all.js'
         'lightgallery.print': 'bundles/oroui/js/lightgallery/lg-print.js'
 
         'ready': 'bundles/oroui/js/requirejs/ready.js'
@@ -224,7 +220,6 @@ build:
 #       files which does not support AMD. backbone-bootstrap-modal use AMD without dependency,
 #       therefore it's excluded
         'backbone-bootstrap-modal': 'empty:'
-        'oroui/lib/jquery.datepair-0.4.4/jquery.datepair': 'empty:'
 #       jQuery.UI after v.1.11.2 started to support AMD. And that broke a js-build with
 #       files which does not support AMD. jquery.multiselect and jquery.multiselect.filter
 #       use AMD without dependency, therefore it's excluded

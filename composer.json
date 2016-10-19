@@ -86,7 +86,15 @@
         "bower-asset/jquery-ajax-queue": "0.0.1",
         "bower-asset/autobahnjs": "0.8.0",
         "bower-asset/when": "2.4.0",
-        "bower-asset/crypto-js": "3.1.7"
+        "bower-asset/crypto-js": "3.1.7",
+        "bower-asset/jquery-mousewheel": "3.1.13",
+        "bower-asset/jquery.numeric": "1.4.1",
+        "bower-asset/uniform": "2.1.1",
+        "bower-asset/malihu-custom-scrollbar-plugin": "3.1.5",
+        "bower-asset/timepicker": "1.4.13",
+        "bower-asset/datepair": "0.4.4",
+        "bower-asset/lightgallery": "1.2.18",
+        "bower-asset/less": "2.5.*"
     },
     "require-dev": {
         "sensio/generator-bundle": "2.5.3",

@@ -1,7 +1,7 @@
 assets:
     css:
         'timepicker':
-            - 'bundles/oroui/lib/jquery.timepicker-1.4.13/jquery.timepicker.css'
+            - 'bundles/bowerassets/timepicker/jquery.timepicker.css'
         'oroui':
             - 'bundles/jstree/themes/default/style.min.css'
             # libraries' styles
@@ -10,9 +10,9 @@ assets:
             - 'bundles/oroui/lib/simplecolorpicker/jquery.simplecolorpicker.css'
             - 'bundles/oroui/lib/simplecolorpicker/jquery.simplecolorpicker-fontawesome.css'
             - 'bundles/oroui/lib/minicolors/jquery.minicolors.css'
-            - 'bundles/oroui/lib/lightgallery/css/lg-transitions.css'
-            - 'bundles/oroui/lib/lightgallery/css/lightgallery.css'
-            - 'bundles/oroui/css/mcustomscrollbar/jquery.mCustomScrollbar.css'
+            - 'bundles/bowerassets/lightgallery/dist/css/lg-transitions.css'
+            - 'bundles/bowerassets/lightgallery/dist/css/lightgallery.css'
+            - 'bundles/bowerassets/malihu-custom-scrollbar-plugin/jquery.mCustomScrollbar.css'
             # customized libraries' styles
             - 'bundles/oroui/css/font-awesome-4.3/font-awesome.css'
             - 'bundles/oroui/css/jquery-ui.grid.css'
