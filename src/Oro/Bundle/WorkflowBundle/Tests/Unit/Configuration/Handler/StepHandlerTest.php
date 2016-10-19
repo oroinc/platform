@@ -49,6 +49,7 @@ class StepHandlerTest extends \PHPUnit_Framework_TestCase
                         [
                             'name' => 'first_step',
                             'order' => 10,
+                            'label' => 'First Step',
                             '_is_start' => false,
                             'is_final' => true,
                             'allowed_transitions' => [],
@@ -100,6 +101,7 @@ class StepHandlerTest extends \PHPUnit_Framework_TestCase
                         [
                             'name' => 'first_step',
                             'order' => 10,
+                            'label' => 'First Step',
                             '_is_start' => false,
                             'is_final' => false,
                             'entity_acl' => ['attribute' => ['delete' => false]],
@@ -143,8 +145,6 @@ class StepHandlerTest extends \PHPUnit_Framework_TestCase
                             'is_final' => false,
                             'entity_acl' => ['attribute' => ['delete' => false]],
                             'allowed_transitions' => ['regular_transition', 'unknown_transition'],
-                            'unknown_first' => 'first_value',
-                            'unknown_second' => 'second_value',
                             'position' => [1, 100]
                         ],
                         [

@@ -133,7 +133,7 @@ entity_config:
                 # 'activity' => [
                 #     'activities' => [
                 #         ['Oro\Bundle\EmailBundle\Entity\Email'],
-                #         ['OroCRM\Bundle\TaskBundle\Entity\Task'],
+                #         ['Oro\Bundle\TaskBundle\Entity\Task'],
                 #     ],
                 # ],
                 #

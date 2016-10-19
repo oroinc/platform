@@ -7,24 +7,6 @@ use Oro\Bundle\WorkflowBundle\Configuration\WorkflowConfiguration;
 class TransitionHandler extends AbstractHandler
 {
     /**
-     * @var array
-     */
-    protected $transitionKeys = array(
-        'name',
-        'step_to',
-        'is_start',
-        'is_hidden',
-        'is_unavailable_hidden',
-        'acl_resource',
-        'acl_message',
-        'transition_definition',
-        'frontend_options',
-        'form_type',
-        'display_type',
-        'form_options'
-    );
-
-    /**
      * {@inheritDoc}
      */
     public function handle(array $configuration)
@@ -72,8 +54,6 @@ class TransitionHandler extends AbstractHandler
         if (!empty($transition['form_options'])) {
             $transition['form_options'] = $this->handleFormOptions($configuration, $transition['form_options']);
         }
-
-        $transition = $this->filterKeys($transition, $this->transitionKeys);
 
         return $transition;
     }

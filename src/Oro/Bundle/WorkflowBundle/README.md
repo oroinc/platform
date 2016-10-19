@@ -12,6 +12,6 @@ related entities.
 
 Processes provide possibility to automate tasks related to entity management. They are used main doctrine events
 to perform described tasks at the right time. Each process can be performed immediately or after some timeout.
-Processes use JMS Job bundle to provide possibility of delayed execution.
+Processes use OroMessageQueue component and the bundle to provide possibility of delayed execution.
 
 Please see [documentation](./Resources/doc/index.md) for more details.

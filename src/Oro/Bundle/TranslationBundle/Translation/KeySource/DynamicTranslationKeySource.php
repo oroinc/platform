@@ -42,7 +42,11 @@ class DynamicTranslationKeySource implements TranslationKeySourceInterface
         foreach ($keyTemplate->getRequiredKeys() as $key) {
             if (!array_key_exists($key, $this->data) || empty($this->data[$key])) {
                 throw new \InvalidArgumentException(
-                    sprintf('Expected not empty value for key "%s" in data, null given', $key)
+                    sprintf(
+                        'Expected not empty value for key "%s" in data, null given for template %s',
+                        $key,
+                        get_class($keyTemplate)
+                    )
                 );
             }
         }

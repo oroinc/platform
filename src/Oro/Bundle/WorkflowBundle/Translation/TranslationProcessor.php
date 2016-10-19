@@ -38,8 +38,8 @@ class TranslationProcessor implements
      */
     public function handle(array $configuration)
     {
-        if (!array_key_exists('name', $configuration)) {
-            throw new \InvalidArgumentException('Workflow configuration for handler must contain `name` node.');
+        if (empty($configuration['name'])) {
+            throw new \InvalidArgumentException('Workflow configuration for handler must contain valid `name` node.');
         }
 
         $workflowName = $configuration['name'];
@@ -93,10 +93,10 @@ class TranslationProcessor implements
 
     /**
      * @param WorkflowChangesEvent $changesEvent
+     * @throws \LogicException
      */
     public function clearTranslationKeys(WorkflowChangesEvent $changesEvent)
     {
-
         $previousDefinition = $changesEvent->getPrevious();
 
         if ($previousDefinition === null) {

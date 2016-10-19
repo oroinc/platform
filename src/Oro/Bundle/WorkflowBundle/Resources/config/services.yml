@@ -336,7 +336,7 @@ services:
             - '@oro_workflow.translation.helper'
         public: false
         tags:
-            - { name: oro.workflow.configuration.handler, priority: -100 }
+            - { name: oro.workflow.configuration.handler, priority: 150 }
             - { name: oro.workflow.definition_builder.extension }
             - { name: oro_workflow.changes.subscriber }
 
@@ -361,3 +361,12 @@ services:
             - '@oro_translation.generator.translation_key'
         tags:
             - { name: oro_filter.extension.orm_filter.filter, type: workflow, datasource: orm }
+
+    oro_workflow.async.execute_process_job:
+        class: 'Oro\Bundle\WorkflowBundle\Async\ExecuteProcessJobProcessor'
+        arguments:
+            - '@oro_entity.doctrine_helper'
+            - '@oro_workflow.process.process_handler'
+            - '@logger'
+        tags:
+            - { name: 'oro_message_queue.client.message_processor' }

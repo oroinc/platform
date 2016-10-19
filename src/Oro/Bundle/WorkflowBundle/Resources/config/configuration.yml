@@ -46,6 +46,11 @@ services:
         tags:
             - { name: oro.workflow.configuration.handler, priority: 0 }
 
+    oro_workflow.configuration.handler.filter:
+        class: Oro\Bundle\WorkflowBundle\Configuration\Handler\FilterHandler
+        tags:
+            - { name: oro.workflow.configuration.handler, priority: 300 }
+
     oro_workflow.configuration.config.process_definition_sole:
         class: %oro_workflow.configuration.config.process_definition_sole.class%
 
