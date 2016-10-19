@@ -22,7 +22,7 @@ class RestInvalidUsersTest extends WebTestCase
                 "username" => 'user_' . mt_rand(),
                 "email" => 'test_'  . mt_rand() . '@test.com',
                 "enabled" => 'true',
-                "plainPassword" => '1231231Q',
+                "plainPassword" => '1231231q',
                 "firstName" => "firstName",
                 "lastName" => "lastName",
                 "roles" => array("1")
@@ -47,7 +47,7 @@ class RestInvalidUsersTest extends WebTestCase
                 "username" => 'user_' . mt_rand(),
                 "email" => 'test_'  . mt_rand() . '@test.com',
                 "enabled" => 'true',
-                "plainPassword" => '1231231Q',
+                "plainPassword" => '1231231q',
                 "firstName" => "firstName",
                 "lastName" => "lastName",
                 "roles" => array("1")

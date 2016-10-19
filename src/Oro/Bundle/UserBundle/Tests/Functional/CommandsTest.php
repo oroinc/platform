@@ -93,7 +93,7 @@ class CommandsTest extends WebTestCase
                 "username" => 'user_' . mt_rand(),
                 "email" => 'test_'  . mt_rand() . '@test.com',
                 "enabled" => '1',
-                "plainPassword" => '1231231Q',
+                "plainPassword" => '1231231q',
                 "firstName" => "firstName",
                 "lastName" => "lastName",
                 "roles" => array("3"),

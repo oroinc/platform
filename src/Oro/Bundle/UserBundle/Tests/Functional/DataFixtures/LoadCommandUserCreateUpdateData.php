@@ -63,7 +63,7 @@ class LoadCommandUserCreateUpdateData extends AbstractFixture implements Contain
         $user = $userManager->createUser();
         $user
             ->setUsername('test_user_main')
-            ->setPlainPassword('admin1Q')
+            ->setPlainPassword('test1Q')
             ->setEmail('test_user_main@example.com')
             ->setEnabled(true)
         ;

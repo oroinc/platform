@@ -196,7 +196,7 @@ class AbstractUserTest extends \PHPUnit_Framework_TestCase
     public function testPassword()
     {
         $user = $this->getUser();
-        $pass = 'anotherPassword1Q';
+        $pass = 'anotherPassword';
 
         $user->setPassword($pass);
         $user->setPlainPassword($pass);

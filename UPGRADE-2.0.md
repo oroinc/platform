@@ -520,4 +520,9 @@ to the [Fallback documentation](./src/Oro/Bundle/EntityBundle/Resources/doc/enti
 - `Oro\Bundle\DataAuditBundle\Loggable\AuditEntityMapper` was renamed to `Oro\Bundle\DataAuditBundle\Provider\AuditEntityMapper`.
 
 ####UserBundle
-- User password requirements are more restrictive by default and require 5 characters, an upper case letter, and a number
+- User password requirements are more restrictive by default and require 5 characters, an upper case letter, and a number.
+- For new installs:
+    - All demo users will have passwords ending with '1Q'
+- For existing installs:
+    - Any new users or changing of existing passwords need to meet the password requirements specified in System config/General Setup/Security Settings
+    - Existing user passwords are not affected

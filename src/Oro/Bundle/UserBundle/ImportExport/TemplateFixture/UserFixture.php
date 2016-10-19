@@ -48,7 +48,7 @@ class UserFixture extends AbstractTemplateRepository implements TemplateFixtureI
                     ->setUsername('admin')
                     ->setLoginCount(101)
                     ->setId(1)
-                    ->setPlainPassword('admin_password1Q')
+                    ->setPlainPassword('admin_password')
                     ->setFirstname('John')
                     ->setMiddleName('Awesome')
                     ->setLastname('Doe')

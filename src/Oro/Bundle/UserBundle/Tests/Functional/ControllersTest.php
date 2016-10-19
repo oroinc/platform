@@ -39,8 +39,8 @@ class ControllersTest extends WebTestCase
         $form = $crawler->selectButton('Save and Close')->form();
         $form['oro_user_user_form[enabled]'] = 1;
         $form['oro_user_user_form[username]'] = 'testUser1';
-        $form['oro_user_user_form[plainPassword][first]'] = '123123Q';
-        $form['oro_user_user_form[plainPassword][second]'] = '123123Q';
+        $form['oro_user_user_form[plainPassword][first]'] = 'password';
+        $form['oro_user_user_form[plainPassword][second]'] = 'password';
         $form['oro_user_user_form[firstName]'] = 'First Name';
         $form['oro_user_user_form[lastName]'] = 'Last Name';
         $form['oro_user_user_form[birthday]'] = '2013-01-01';

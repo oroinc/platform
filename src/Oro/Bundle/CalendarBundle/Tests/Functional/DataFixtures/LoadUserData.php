@@ -45,7 +45,7 @@ class LoadUserData extends AbstractFixture implements DependentFixtureInterface,
         foreach (['simple_user_1', 'simple_user_2', 'simple_user_3'] as $username) {
             $user = $userManager->createUser();
             $user->setUsername($username)
-                ->setPlainPassword($username . '1Q')
+                ->setPlainPassword($username)
                 ->setEmail(sprintf('%s@example.com', $username))
                 ->setFirstName($username)
                 ->setLastName($username)

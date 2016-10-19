@@ -20,7 +20,7 @@ class ProcessorTest extends AbstractProcessorTest
         $this->user = new User();
         $this->user
             ->setEmail('email_to@example.com')
-            ->setPlainPassword('testPassword1Q');
+            ->setPlainPassword('TestPassword');
 
         $this->mailProcessor = new Processor(
             $this->managerRegistry,

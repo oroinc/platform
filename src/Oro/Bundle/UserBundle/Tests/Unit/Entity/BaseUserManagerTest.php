@@ -105,7 +105,7 @@ class BaseUserManagerTest extends \PHPUnit_Framework_TestCase
 
     public function testUpdateUser()
     {
-        $password = 'password1Q';
+        $password = 'password';
         $encodedPassword = 'encodedPassword';
 
         $user = $this->getUser(true);

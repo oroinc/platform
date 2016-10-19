@@ -121,7 +121,7 @@ class UserManagerTest extends \PHPUnit_Framework_TestCase
 
     public function testUpdateUser()
     {
-        $password = 'password1Q';
+        $password = 'password';
         $encodedPassword = 'encodedPassword';
         $email = 'test@test.com';
 
