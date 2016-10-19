@@ -2,6 +2,7 @@
 namespace Oro\Bundle\DataAuditBundle\Service;
 
 use Doctrine\ORM\Mapping\ClassMetadata;
+use Doctrine\DBAL\Types\Type as DbalType;
 use Oro\Bundle\DataAuditBundle\Entity\AbstractAuditField;
 use Oro\Bundle\DataAuditBundle\Loggable\AuditEntityMapper;
 use Oro\Bundle\DataAuditBundle\Provider\AuditConfigProvider;
@@ -71,6 +72,9 @@ class ChangeSetToAuditFieldsConverter
         if ($entityMetadata->hasField($fieldName)) {
             $fieldMapping = $entityMetadata->getFieldMapping($fieldName);
             $fieldType = $fieldMapping['type'];
+            if ($fieldType instanceof DbalType) {
+                $fieldType = $fieldType->getName();
+            }
 
             if ($old && in_array($fieldType, ['date', 'datetime'], true)) {
                 $old = \DateTime::createFromFormat(DATE_ISO8601, $old);
