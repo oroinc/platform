@@ -74,41 +74,21 @@ class WorkflowTranslationHelperTest extends \PHPUnit_Framework_TestCase
 
     public function testSaveTranslation()
     {
-        $this->translator->expects($this->exactly(3))->method('getLocale')->willReturn('pl');
+        $this->translator->expects($this->exactly(2))->method('getLocale')->willReturn('pl');
 
         $this->assertNotEquals('pl', Translation::DEFAULT_LOCALE, 'test custom locale should be changed from pl');
 
-        //case test_key1
-        $this->manager->expects($this->at(0))
-            ->method('saveValue')
-            ->with('test_key1', 'test_value1', 'pl', WorkflowTranslationHelper::TRANSLATION_DOMAIN);
-
-        $this->translationHelper->expects($this->at(0))
-            ->method('findValue')
-            ->with('test_key1', Translation::DEFAULT_LOCALE, WorkflowTranslationHelper::TRANSLATION_DOMAIN)
-            ->willReturn(null); //case when empty value comes from db
-
-        $this->manager->expects($this->at(1))
-            ->method('saveValue')
-            ->with(
-                'test_key1',
-                'test_value1',
-                Translation::DEFAULT_LOCALE,
-                WorkflowTranslationHelper::TRANSLATION_DOMAIN,
-                Translation::SCOPE_UI
-            );
-
         //case test_key2
-        $this->manager->expects($this->at(2))
+        $this->manager->expects($this->at(0))
             ->method('saveValue')
             ->with('test_key2', 'test_value2', 'pl', WorkflowTranslationHelper::TRANSLATION_DOMAIN);
 
-        $this->translationHelper->expects($this->at(1))
+        $this->translationHelper->expects($this->at(0))
             ->method('findValue')
             ->with('test_key2', Translation::DEFAULT_LOCALE, WorkflowTranslationHelper::TRANSLATION_DOMAIN)
-            ->willReturn('test_key2'); //case when it returns key itself
+            ->willReturn('test_key2'); //case when it returns key itself (so no value in db)
 
-        $this->manager->expects($this->at(3))
+        $this->manager->expects($this->at(1))
             ->method('saveValue')
             ->with(
                 'test_key2',
@@ -119,19 +99,18 @@ class WorkflowTranslationHelperTest extends \PHPUnit_Framework_TestCase
             );
 
         //case test_key3
-        $this->manager->expects($this->at(4))
+        $this->manager->expects($this->at(2))
             ->method('saveValue')
             ->with('test_key3', 'test_value3', 'pl', WorkflowTranslationHelper::TRANSLATION_DOMAIN);
 
-        $this->translationHelper->expects($this->at(2))
+        $this->translationHelper->expects($this->at(1))
             ->method('findValue')
             ->with('test_key3', Translation::DEFAULT_LOCALE, WorkflowTranslationHelper::TRANSLATION_DOMAIN)
-            ->willReturn('some translation string'); //case when it returns key itself
+            ->willReturn('some translation string'); //case when it returns a value
 
         //would not save in case of real translation value already exists in db
 
         //run
-        $this->helper->saveTranslation('test_key1', 'test_value1');
         $this->helper->saveTranslation('test_key2', 'test_value2');
         $this->helper->saveTranslation('test_key3', 'test_value3');
     }

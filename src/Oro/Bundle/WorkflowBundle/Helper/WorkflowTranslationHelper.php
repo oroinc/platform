@@ -95,7 +95,13 @@ class WorkflowTranslationHelper
     public function saveTranslation($key, $value)
     {
         $currentLocale = $this->translator->getLocale();
-        $this->translationManager->saveValue($key, $value, $currentLocale, self::TRANSLATION_DOMAIN);
+        $this->translationManager->saveValue(
+            $key,
+            $value,
+            $currentLocale,
+            self::TRANSLATION_DOMAIN,
+            Translation::SCOPE_UI
+        );
 
         if ($currentLocale !== Translation::DEFAULT_LOCALE) {
             $existingValue = $this->translationHelper->findValue(
@@ -104,7 +110,7 @@ class WorkflowTranslationHelper
                 self::TRANSLATION_DOMAIN
             );
 
-            if (!$existingValue || $existingValue === $key) {
+            if ($existingValue === $key) {
                 $this->translationManager->saveValue(
                     $key,
                     $value,
