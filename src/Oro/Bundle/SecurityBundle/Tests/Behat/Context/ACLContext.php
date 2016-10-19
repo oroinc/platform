@@ -11,16 +11,16 @@ use Oro\Bundle\DataGridBundle\Tests\Behat\Element\Grid;
 use Oro\Bundle\DataGridBundle\Tests\Behat\Element\GridFilterStringItem;
 use Oro\Bundle\NavigationBundle\Tests\Behat\Element\MainMenu;
 use Oro\Bundle\TestFrameworkBundle\Behat\Context\OroFeatureContext;
-use Oro\Bundle\TestFrameworkBundle\Behat\Element\OroElementFactoryAware;
-use Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context\ElementFactoryDictionary;
+use Oro\Bundle\TestFrameworkBundle\Behat\Element\OroPageObjectAware;
+use Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context\PageObjectDictionary;
 use Oro\Bundle\UserBundle\Entity\Role;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\UserBundle\Tests\Behat\Element\UserRoleForm;
 use Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context\OroMainContext;
 
-class ACLContext extends OroFeatureContext implements OroElementFactoryAware, KernelAwareContext
+class ACLContext extends OroFeatureContext implements OroPageObjectAware, KernelAwareContext
 {
-    use ElementFactoryDictionary, KernelDictionary;
+    use PageObjectDictionary, KernelDictionary;
 
     /**
      * @var OroMainContext

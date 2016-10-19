@@ -9,6 +9,7 @@ use Oro\Bundle\ApiBundle\Config\FiltersConfig;
 use Oro\Bundle\ApiBundle\Config\FiltersConfigExtra;
 use Oro\Bundle\ApiBundle\Config\SortersConfig;
 use Oro\Bundle\ApiBundle\Config\SortersConfigExtra;
+use Oro\Bundle\ApiBundle\Metadata\ActionMetadataExtra;
 use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
 use Oro\Bundle\ApiBundle\Model\Error;
 use Oro\Bundle\ApiBundle\Processor\Context;
@@ -17,6 +18,7 @@ use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 
 /**
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
+ * @SuppressWarnings(PHPMD.ExcessiveClassLength)
  */
 class ContextTest extends \PHPUnit_Framework_TestCase
 {
@@ -926,6 +928,40 @@ class ContextTest extends \PHPUnit_Framework_TestCase
         $this->context->setMetadataExtras([]);
         $this->assertSame([], $this->context->getMetadataExtras());
         $this->assertNull($this->context->get(Context::METADATA_EXTRAS));
+    }
+
+    public function testMetadataExtrasWhenActionExistsInContext()
+    {
+        $action = 'test_action';
+        $this->context->setAction($action);
+
+        $this->assertNull($this->context->get(Context::METADATA_EXTRAS));
+
+        $this->assertEquals(
+            [new ActionMetadataExtra($action)],
+            $this->context->getMetadataExtras()
+        );
+        $this->assertEquals(
+            [new ActionMetadataExtra($action)],
+            $this->context->get(Context::METADATA_EXTRAS)
+        );
+
+        // test that ActionMetadataExtra is not added twice
+        $this->assertEquals(
+            [new ActionMetadataExtra($action)],
+            $this->context->getMetadataExtras()
+        );
+    }
+
+    /**
+     * @expectedException \InvalidArgumentException
+     * @expectedExceptionMessage The "action" metadata extra already exists.
+     */
+    public function testActionMetadataExtrasCannotBeOverridden()
+    {
+        $action = 'test_action';
+        $this->context->setAction($action);
+        $this->context->addMetadataExtra(new ActionMetadataExtra('other_action'));
     }
 
     /**

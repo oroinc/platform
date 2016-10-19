@@ -115,7 +115,8 @@ Used with new class `Oro\Bundle\WorkflowBundle\Model\WorkflowExclusiveRecordGrou
 * Added methods `getExclusiveRecordGroups` and `getExclusiveActiveGroups` to `Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition`
 * `getName`, `getLabel` and `isActive` methods of `Oro\Bundle\WorkflowBundle\Model\Workflow` now are proxy methods to its `Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition` instance.
 * Removed method `getStartTransitions` from `Oro\Bundle\WorkflowBundle\Model\WorkflowManager` -  `$workflow->getTransitionManager()->getStartTransitions()` can be used instead
-* Entity config `workflow.active_workflows` was removed. Use workflows configuration boolean node `defaults.active` instead.
+* Entity config `workflow.active_workflows` was removed. Use workfows configuration boolean node `defaults.active` instead.
+* The command `oro:process:execute:job` was removed.
 * Processes configuration file now loads from `Resorces/config/oro/processes.yml` file instead of `Resources/config/oro/process.yml`
 * Processes configuration in `oro/processes.yml` file now gathered under `processes: ...` root node.
 - `oro_workflow.repository.workflow_item` inherits `oro_entity.abstract_repository`.
@@ -125,8 +126,7 @@ Used with new class `Oro\Bundle\WorkflowBundle\Model\WorkflowExclusiveRecordGrou
 - Service `oro_workflow.transition_schedule.query_factory` (`Oro\Bundle\WorkflowBundle\Model\TransitionSchedule\TransitionQueryFactory`) removed.
 - Service `oro_workflow.cache.process_trigger` (`Oro\Bundle\WorkflowBundle\Cache\ProcessTriggerCache`) removed.
 - Model `Oro\Bundle\WorkflowBundle\Model\TransitionSchedule\ScheduledTransitionProcessName` removed.
-- Class `Oro\Bundle\WorkflowBundle\Model\ProcessTriggerCronScheduler` moved to `Oro\Bundle\WorkflowBundle\Cron\ProcessTriggerCronScheduler` 
-and constructor signature changed to `DeferredScheduler $deferredScheduler`. 
+- Class `Oro\Bundle\WorkflowBundle\Model\ProcessTriggerCronScheduler` moved to `Oro\Bundle\WorkflowBundle\Cron\ProcessTriggerCronScheduler` and constructor signature changed to `DeferredScheduler $deferredScheduler`.
 - Added new entity `Oro\Bundle\WorkflowBundle\Entity\TransitionCronTrigger`.
 - Added new entity `Oro\Bundle\WorkflowBundle\Entity\TransitionEventTrigger`.
 - Added new interface `Oro\Bundle\WorkflowBundle\Entity\EventTriggerInterface`.
@@ -407,6 +407,21 @@ placeholders:
 - Added class `Oro\Bundle\NavigationBundle\Entity\Repository\MenuUpdateRepository` repository for `Oro\Bundle\NavigationBundle\Entity\MenuUpdate` entity.
 - Added class `Oro\Bundle\NavigationBundle\Exception\ProviderNotFoundException`.
 - Added class `Oro\Bundle\NavigationBundle\Provider\DefaultMenuUpdateProvider` with service `oro_navigation.menu_update_provider.default`.
+- Moved class `Oro\Bundle\NavigationBundle\Menu\FeatureAwareMenuFactoryExtension` to `Oro\Bundle\FeatureToggleBundle\Menu\FeatureAwareMenuFactoryExtension`.
+- Moved class `Oro\Bundle\NavigationBundle\Event\DoctrineTagEventListener` to `Oro\Bundle\SyncBundle\Event\DoctrineTagEventListener`.
+- Moved class `Oro\Bundle\NavigationBundle\Twig\ContentTagsExtension` to `Oro\Bundle\SyncBundle\Twig\ContentTagsExtension`.
+- Moved class `Oro\Bundle\NavigationBundle\Content\TagGeneratorChain` to `Oro\Bundle\SyncBundle\Content\TagGeneratorChain`.
+- Moved class `Oro\Bundle\NavigationBundle\Content\DoctrineTagGenerator` to `Oro\Bundle\SyncBundle\Content\DoctrineTagGenerator`.
+- Moved class `Oro\Bundle\NavigationBundle\Content\SimpleTagGenerator` to `Oro\Bundle\SyncBundle\Content\SimpleTagGenerator`.
+- Moved class `Oro\Bundle\NavigationBundle\Content\DataGridTagListener` to `Oro\Bundle\SyncBundle\Content\DataGridTagListener`.
+- Moved class `Oro\Bundle\NavigationBundle\Content\TopicSender` to `Oro\Bundle\SyncBundle\Content\TopicSender`.
+- Added class `Oro\Bundle\NavigationBundle\DependencyInjection\Compiler\MenuExtensionPass` compiler pass for registering menu factory extensions by tag `oro_navigation.menu_extension`.
+- Moved twig template `OroNavigationBundle:Include:contentTags.html.twig` to `OroSyncBundle:Include:contentTags.html.twig`.
+- Moved JS file `js/app/modules/content-manager-module.js` to `SyncBundle`.
+- Moved JS file `js/content/grid-builder.js` to `SyncBundle`.
+- Moved JS file `js/content-manager.js` to `SyncBundle`.
+- Moved DOC file `doc/content_outdating.md` to `SyncBundle`.
+- Moved DOC file `doc/mediator-handlers.md` to `SyncBundle`.
 - Class `Oro\Bundle\NavigationBundle\Provider\BuilderChainProvider`
     - construction signature was changed now it takes next arguments:
         - `FactoryInterface` $factory,
@@ -472,8 +487,37 @@ to the [Fallback documentation](./src/Oro/Bundle/EntityBundle/Resources/doc/enti
 ####MigrationBundle
 - `Oro\Bundle\MigrationBundle\Migration\MigrationExecutor` now clears cache at all cache providers after successful migration load
 
+####FeatureToggleBundle
+- Added class `Oro\Bundle\FeatureToggleBundle\Menu\FeatureAwareMenuFactoryExtension` moved from `NavigationBundle`.
+
+####SyncBundle
+- Added class `Oro\Bundle\SyncBundle\DependencyInjection\Compiler\SkipTagTrackingPass` compiler pass that add skipped entity classes to `oro_sync.event_listener.doctrine_tag` service.
+- Added class `Oro\Bundle\SyncBundle\Event\DoctrineTagEventListener` moved from `NavigationBundle`.
+- Added class `Oro\Bundle\SyncBundle\Twig\ContentTagsExtension` moved from `NavigationBundle`.
+- Added class `Oro\Bundle\SyncBundle\Content\TagGeneratorChain` moved from `NavigationBundle`.
+- Added class `Oro\Bundle\SyncBundle\Content\DoctrineTagGenerator` moved from `NavigationBundle`.
+- Added class `Oro\Bundle\SyncBundle\Content\SimpleTagGenerator` moved from `NavigationBundle`.
+- Added class `Oro\Bundle\SyncBundle\Content\DataGridTagListener` moved from `NavigationBundle`.
+- Added class `Oro\Bundle\SyncBundle\Content\TopicSender` moved from `NavigationBundle`.
+- Added twig template `OroSyncBundle:Include:contentTags.html.twig` moved from `NavigationBundle`.
+- Added JS file `js/app/modules/content-manager-module.js` moved from `NavigationBundle`.
+- Added JS file `js/content/grid-builder.js` moved from `NavigationBundle`.
+- Added JS file `js/content-manager.js` moved from `NavigationBundle`.
+- Added DOC file `doc/content_outdating.md` moved from `NavigationBundle`.
+- Added DOC file `doc/mediator-handlers.md` moved from `NavigationBundle`.
+
 ####Component
 - Added trait `Oro\Component\DependencyInjection\Compiler\TaggedServicesCompilerPassTrait`
 
 ####CalendarBundle:
 - CalendarBundle moved to a separate package
+
+####DataAuditBundle
+- `Oro\Bundle\DataAuditBundle\Loggable\LoggableManager` was removed. Some logic moved to `Oro\Bundle\DataAuditBundle\EventListener\SendChangedEntitiesToMessageQueueListener` class and some backend processors.
+- `Oro\Bundle\DataAuditBundle\EventListener\EntityListener` was removed. Similar logic could be found in `Oro\Bundle\DataAuditBundle\EventListener\SendChangedEntitiesToMessageQueueListener` class.
+- `Oro\Bundle\DataAuditBundle\EventListener\KernelListener` was removed.
+- `Oro\Bundle\DataAuditBundle\Metadata\Driver\AnnotationDriver` was removed.
+- `Oro\Bundle\DataAuditBundle\Metadata\ExtendMetadataFactory` was removed.
+- `Loggable` and `Versioned` annotations were removed. Use entity config auditable option instead.
+- `Oro\Bundle\DataAuditBundle\EventListener\AuditGridListener` was removed. Similar functionality can be found in `Oro\Bundle\DataAuditBundle\Datagrid\EntityTypeProvider`.
+- `Oro\Bundle\DataAuditBundle\Loggable\AuditEntityMapper` was renamed to `Oro\Bundle\DataAuditBundle\Provider\AuditEntityMapper`.

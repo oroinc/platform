@@ -159,4 +159,21 @@ class ActivityListTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse($activityList->isUpdatedBySet());
         $this->assertFalse($activityList->isUpdatedAtSet());
     }
+
+    public function testSetSubjectOnLongString()
+    {
+        $activityList = new ActivityList();
+        $activityList->setSubject(
+            'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Curabitur eget elementum velit, ac tempor orci. '
+            . 'Cras aliquet massa id dignissim bibendum. Interdum et malesuada fames ac ante ipsum primis in faucibus.'
+            .' Aenean ac libero magna. Proin eu tristiqäue est. Donec convallis pretium congue. Nullam sed.'
+        );
+
+        self::assertEquals(
+            'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Curabitur eget elementum velit, ac tempor orci. '
+            . 'Cras aliquet massa id dignissim bibendum. Interdum et malesuada fames ac ante ipsum primis in faucibus.'
+            . ' Aenean ac libero magna. Proin eu tristiqä',
+            $activityList->getSubject()
+        );
+    }
 }

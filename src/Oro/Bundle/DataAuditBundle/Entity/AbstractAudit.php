@@ -1,49 +1,85 @@
 <?php
-
 namespace Oro\Bundle\DataAuditBundle\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
-
-use Gedmo\Loggable\Entity\MappedSuperclass\AbstractLogEntry;
-
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\UserBundle\Entity\AbstractUser;
 
 /**
- * @ORM\Entity()
- * @ORM\Table(name="oro_audit", indexes={
- *      @ORM\Index(name="idx_oro_audit_logged_at", columns={"logged_at"}),
- *      @ORM\Index(name="idx_oro_audit_type", columns={"type"}),
- *      @ORM\Index(name="idx_oro_audit_object_class", columns={"object_class"})
- * })
+ * @ORM\Entity(repositoryClass="Oro\Bundle\DataAuditBundle\Entity\Repository\AuditRepository")
+ * @ORM\Table(
+ *     name="oro_audit",
+ *     indexes={
+ *         @ORM\Index(name="idx_oro_audit_logged_at", columns={"logged_at"}),
+ *         @ORM\Index(name="idx_oro_audit_type", columns={"type"}),
+ *         @ORM\Index(name="idx_oro_audit_object_class", columns={"object_class"})
+ *     },
+ *     uniqueConstraints={
+ *         @ORM\UniqueConstraint(name="idx_oro_audit_version", columns={"object_id", "object_class", "version"})
+ *     }
+ * )
  * @ORM\InheritanceType("SINGLE_TABLE")
  * @ORM\DiscriminatorColumn(name="type", type="string")
  * @ORM\DiscriminatorMap({"audit" = "Oro\Bundle\DataAuditBundle\Entity\Audit"})
  */
-abstract class AbstractAudit extends AbstractLogEntry
+abstract class AbstractAudit
 {
-    /**
-     * @var string $objectName
-     *
-     * @ORM\Column(name="object_name", type="string", length=255)
-     */
-    protected $objectName;
+    const ACTION_CREATE = 'create';
+    const ACTION_UPDATE = 'update';
+    const ACTION_REMOVE = 'remove';
 
     /**
-     * @var int $objectId
+     * @var integer $id
+     *
+     * @ORM\Column(type="integer")
+     * @ORM\Id
+     * @ORM\GeneratedValue
+     */
+    protected $id;
+
+    /**
+     * @var string $action
+     *
+     * @ORM\Column(type="string", length=8, nullable=true)
+     */
+    protected $action;
+
+    /**
+     * @var string $loggedAt
+     *
+     * @ORM\Column(name="logged_at", type="datetime", nullable=true)
+     */
+    protected $loggedAt;
+
+    /**
+     * @var string $objectId
      *
      * @ORM\Column(name="object_id", type="integer", nullable=true)
      */
     protected $objectId;
 
     /**
-     * Redefined parent property to remove the column from db
+     * @var string $objectClass
      *
-     * @var array
+     * @ORM\Column(name="object_class", type="string", length=255)
      */
-    protected $data;
+    protected $objectClass;
+
+    /**
+     * @var string $objectName
+     *
+     * @ORM\Column(name="object_name", type="string", length=255, nullable=true)
+     */
+    protected $objectName;
+
+    /**
+     * @var integer $version
+     *
+     * @ORM\Column(type="integer", nullable=true)
+     */
+    protected $version;
 
     /**
      * @var AbstractAuditField[]|Collection
@@ -57,17 +93,19 @@ abstract class AbstractAudit extends AbstractLogEntry
     protected $fields;
 
     /**
-     * @var string $username
-     */
-    protected $username;
-
-    /**
      * @var Organization
      *
      * @ORM\ManyToOne(targetEntity="Oro\Bundle\OrganizationBundle\Entity\Organization")
      * @ORM\JoinColumn(name="organization_id", referencedColumnName="id", onDelete="SET NULL")
      */
     protected $organization;
+
+    /**
+     * @var string $transactionId
+     *
+     * @ORM\Column(name="transaction_id", type="string", length=255)
+     */
+    protected $transactionId;
 
     /**
      * Set user
@@ -85,19 +123,6 @@ abstract class AbstractAudit extends AbstractLogEntry
     abstract public function getUser();
 
     /**
-     * @param AbstractAudit $audit
-     * @param string $field
-     * @param string $dataType
-     * @param mixed $newValue
-     * @param mixed $oldValue
-     * @return AbstractAuditField
-     */
-    protected function getAuditFieldInstance(AbstractAudit $audit, $field, $dataType, $newValue, $oldValue)
-    {
-        return new AuditField($audit, $field, $dataType, $newValue, $oldValue);
-    }
-
-    /**
      * Constructor
      */
     public function __construct()
@@ -106,39 +131,39 @@ abstract class AbstractAudit extends AbstractLogEntry
     }
 
     /**
-     * Create field
+     * Get id
      *
-     * @param string $field
-     * @param string $dataType
-     * @param mixed $newValue
-     * @param mixed $oldValue
-     * @return Audit
+     * @return integer
      */
-    public function createField($field, $dataType, $newValue, $oldValue)
+    public function getId()
     {
-        if ($this->fields === null) {
-            $this->fields = new ArrayCollection();
-        }
+        return $this->id;
+    }
 
-        $existingField = $this->getField($field);
+    /**
+     * @param AuditField $field
+     *
+     * @return $this
+     */
+    public function addField(AuditField $field)
+    {
+        $existingField = $this->getField($field->getField());
         if ($existingField) {
-            $this->fields->removeElement($existingField);
+            $this->getFields()->removeElement($existingField);
         }
-
-        $auditField = $this->getAuditFieldInstance($this, $field, $dataType, $newValue, $oldValue);
-        $this->fields->add($auditField);
+        
+        $this->getFields()->add($field);
+        $field->setAudit($this);
 
         return $this;
     }
 
     /**
-     * Get fields
-     *
      * @return AbstractAuditField[]|Collection
      */
     public function getFields()
     {
-        if ($this->fields === null) {
+        if (false == $this->fields) {
             $this->fields = new ArrayCollection();
         }
 
@@ -146,8 +171,6 @@ abstract class AbstractAudit extends AbstractLogEntry
     }
 
     /**
-     * Get visible fields
-     *
      * @return AbstractAuditField[]|Collection
      */
     protected function getVisibleFields()
@@ -166,43 +189,9 @@ abstract class AbstractAudit extends AbstractLogEntry
      */
     public function getField($field)
     {
-        return $this->fields
-            ->filter(
-                function (AbstractAuditField $auditField) use ($field) {
-                    return $auditField->getField() === $field;
-                }
-            )
-            ->first();
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getData()
-    {
-        $data = [];
-        foreach ($this->getVisibleFields() as $field) {
-            $newValue = $field->getNewValue();
-            $oldValue = $field->getOldValue();
-            if (in_array($field->getDataType(), ['date', 'datetime', 'array', 'jsonarray'], true)) {
-                $newValue = [
-                    'value' => $newValue,
-                    'type'  => $field->getDataType(),
-                ];
-
-                $oldValue = [
-                    'value' => $oldValue,
-                    'type'  => $field->getDataType(),
-                ];
-            }
-
-            $data[$field->getField()] = [
-                'old' => $oldValue,
-                'new' => $newValue,
-            ];
-        }
-
-        return $data;
+        return $this->getFields()->filter(function (AbstractAuditField $auditField) use ($field) {
+            return $auditField->getField() === $field;
+        })->first();
     }
 
     /**
@@ -249,5 +238,144 @@ abstract class AbstractAudit extends AbstractLogEntry
         $this->objectName = $objectName;
 
         return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getTransactionId()
+    {
+        return $this->transactionId;
+    }
+
+    /**
+     * @param string $transactionId
+     */
+    public function setTransactionId($transactionId)
+    {
+        $this->transactionId = $transactionId;
+    }
+
+    /**
+     * @return \DateTime
+     */
+    public function getLoggedAt()
+    {
+        return $this->loggedAt;
+    }
+
+    /**
+     * @param \DateTime|null $loggedAt
+     */
+    public function setLoggedAt(\DateTime $loggedAt = null)
+    {
+        $this->loggedAt = $loggedAt ?: new \DateTime();
+    }
+
+    /**
+     * Get action
+     *
+     * @return string
+     */
+    public function getAction()
+    {
+        return $this->action;
+    }
+
+    /**
+     * Set action
+     *
+     * @param string $action
+     */
+    public function setAction($action)
+    {
+        $this->action = $action;
+    }
+
+    /**
+     * Get object class
+     *
+     * @return string
+     */
+    public function getObjectClass()
+    {
+        return $this->objectClass;
+    }
+
+    /**
+     * Set object class
+     *
+     * @param string $objectClass
+     */
+    public function setObjectClass($objectClass)
+    {
+        $this->objectClass = $objectClass;
+    }
+
+    /**
+     * Get object id
+     *
+     * @return string
+     */
+    public function getObjectId()
+    {
+        return $this->objectId;
+    }
+
+    /**
+     * Set object id
+     *
+     * @param string $objectId
+     */
+    public function setObjectId($objectId)
+    {
+        $this->objectId = $objectId;
+    }
+
+    /**
+     * Set current version
+     *
+     * @param integer $version
+     */
+    public function setVersion($version)
+    {
+        $this->version = $version;
+    }
+
+    /**
+     * Get current version
+     *
+     * @return integer
+     */
+    public function getVersion()
+    {
+        return $this->version;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getData()
+    {
+        $data = [];
+        foreach ($this->getVisibleFields() as $field) {
+            $newValue = $field->getNewValue();
+            $oldValue = $field->getOldValue();
+            if (in_array($field->getDataType(), ['date', 'datetime', 'array', 'jsonarray'], true)) {
+                $newValue = [
+                    'value' => $newValue,
+                    'type'  => $field->getDataType(),
+                ];
+                $oldValue = [
+                    'value' => $oldValue,
+                    'type'  => $field->getDataType(),
+                ];
+            }
+            $data[$field->getField()] = [
+                'old' => $oldValue,
+                'new' => $newValue,
+            ];
+        }
+        return $data;
     }
 }
