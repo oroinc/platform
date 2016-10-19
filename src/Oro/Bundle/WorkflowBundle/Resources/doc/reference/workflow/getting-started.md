@@ -114,7 +114,7 @@ workflows:
         label: B2B Sales Flow
         defaults:
             active: true #workflow will be automatically activated during installation
-        entity: OroCRM\Bundle\SalesBundle\Entity\Opportunity
+        entity: Oro\Bundle\SalesBundle\Entity\Opportunity
         entity_attribute: opportunity
 ```
 

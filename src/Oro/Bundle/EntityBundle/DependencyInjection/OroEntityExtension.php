@@ -114,7 +114,7 @@ class OroEntityExtension extends Extension
     protected function mergeEntityConfiguration(CumulativeResourceInfo $resource, $section, array $data)
     {
         if (!empty($resource->data['oro_entity'][$section])) {
-            $data = array_merge(
+            $data = array_merge_recursive(
                 $data,
                 $resource->data['oro_entity'][$section]
             );

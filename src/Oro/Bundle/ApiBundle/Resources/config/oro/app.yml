@@ -4,6 +4,7 @@ fos_rest:
         mime_types: {'json': ['application/json', 'application/x-json', 'application/vnd.api+json']}
 
 nelmio_api_doc:
+    name: 'REST API'
     motd:
         template: OroApiBundle::ApiDoc/motd.html.twig
     default_sections_opened: false
@@ -26,6 +27,7 @@ security:
 
 oro_api:
     api_doc_views: ['default', 'rest_json_api', 'rest_plain']
+    documentation_path: https://www.orocrm.com/documentation/index/current/book/data-api
 
     filters:
         string: ~

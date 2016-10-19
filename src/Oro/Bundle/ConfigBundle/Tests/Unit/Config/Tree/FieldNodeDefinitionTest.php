@@ -64,4 +64,17 @@ class FieldNodeDefinitionTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(0, $node->getPriority());
         $this->assertInternalType('array', $node->getOptions());
     }
+
+    public function testPropertyPathIsApplied()
+    {
+        $nodeWithoutPropertyPath = new FieldNodeDefinition(self::TEST_NAME, $this->testDefinition);
+        $this->assertEquals(self::TEST_NAME, $nodeWithoutPropertyPath->getPropertyPath());
+
+        $testDeffinitions = array_merge($this->testDefinition, [
+            'property_path' => 'test_path'
+        ]);
+
+        $nodeWithProperttyPath = new FieldNodeDefinition(self::TEST_NAME, $testDeffinitions);
+        $this->assertEquals('test_path', $nodeWithProperttyPath->getPropertyPath());
+    }
 }

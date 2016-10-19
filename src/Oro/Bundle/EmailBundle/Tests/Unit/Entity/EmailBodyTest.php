@@ -68,4 +68,12 @@ class EmailBodyTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(false, $entity->getPersistent());
         $this->assertGreaterThanOrEqual($createdAt, $entity->getCreated());
     }
+
+    public function testTextBodyGetterAndSetter()
+    {
+        $entity = new EmailBody();
+        self::assertNull($entity->getTextBody());
+        $entity->setTextBody('some text');
+        self::assertEquals('some text', $entity->getTextBody());
+    }
 }
