@@ -12,7 +12,7 @@ use BeSimple\SoapBundle\ServiceDefinition\Annotation as Soap;
 use Oro\Bundle\UserBundle\Entity\AbstractUser;
 
 /**
- * @ORM\Entity(repositoryClass="Oro\Bundle\DataAuditBundle\Entity\Repository\AuditRepository")
+ * @ORM\Entity()
  */
 class Audit extends AbstractAudit
 {
@@ -29,7 +29,7 @@ class Audit extends AbstractAudit
     /**
      * @var string $loggedAt
      *
-     * @ORM\Column(name="logged_at", type="datetime")
+     * @ORM\Column(name="logged_at", type="datetime", nullable=true)
      * @Soap\ComplexType("dateTime", nillable=true)
      */
     protected $loggedAt;
@@ -53,7 +53,7 @@ class Audit extends AbstractAudit
     /**
      * @var string $objectName
      *
-     * @ORM\Column(name="object_name", type="string", length=255)
+     * @ORM\Column(name="object_name", type="string", length=255, nullable=true)
      * @Soap\ComplexType("string", nillable=true)
      */
     protected $objectName;
@@ -61,7 +61,7 @@ class Audit extends AbstractAudit
     /**
      * @var integer $version
      *
-     * @ORM\Column(type="integer")
+     * @ORM\Column(type="integer", nullable=true)
      * @Soap\ComplexType("string", nillable=true)
      */
     protected $version;
@@ -109,25 +109,5 @@ class Audit extends AbstractAudit
     public function getUsername()
     {
         return $this->getUser() ? $this->getUser()->getUsername() : '';
-    }
-
-    /**
-     * {@inheritdoc}
-     *
-     * @deprecated 1.8.0:2.1.0 Use method createField instead
-     */
-    public function setData($data)
-    {
-        parent::setData($data);
-    }
-
-    /**
-     * @deprecated 1.8.0:2.1.0 This method is for internal use only. Use method getData or getFields instead
-     *
-     * @return array|null
-     */
-    public function getDeprecatedData()
-    {
-        return $this->data;
     }
 }
