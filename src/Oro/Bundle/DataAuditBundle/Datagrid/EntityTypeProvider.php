@@ -52,6 +52,7 @@ class EntityTypeProvider
         foreach ($classNames as $className) {
             $result[$className] = $this->entityClassNameProvider->getEntityClassName($className);
         }
+        asort($result, SORT_STRING | SORT_FLAG_CASE);
 
         return $result;
     }
