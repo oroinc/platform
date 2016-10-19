@@ -24,7 +24,7 @@ class MenuUpdateUtils
         MenuUpdateInterface $update,
         ItemInterface $item,
         $menuName,
-        array $extrasMapping = ['position' => 'priority']
+        array $extrasMapping = ['position' => 'priority', 'description' => 'defaultDescription']
     ) {
         $accessor = PropertyAccess::createPropertyAccessor();
 
@@ -33,10 +33,6 @@ class MenuUpdateUtils
 
         if ($update->getTitles()->count() <= 0) {
             self::setValue($accessor, $update, 'defaultTitle', $item->getLabel());
-        }
-
-        if ($update->getDescriptions()->count() <= 0 && null !== $item->getExtra('description')) {
-            self::setValue($accessor, $update, 'defaultDescription', $item->getExtra('description'));
         }
 
         $parent = $item->getParent();
@@ -49,9 +45,6 @@ class MenuUpdateUtils
         $update->setMenu($menuName);
 
         foreach ($item->getExtras() as $key => $value) {
-            if ($key === 'description') {
-                continue;
-            }
             if (array_key_exists($key, $extrasMapping)) {
                 $key = $extrasMapping[$key];
             }

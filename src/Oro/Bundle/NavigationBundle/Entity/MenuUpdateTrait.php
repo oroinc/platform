@@ -5,10 +5,13 @@ namespace Oro\Bundle\NavigationBundle\Entity;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
+use Oro\Bundle\LocaleBundle\Entity\FallbackTrait;
 use Oro\Bundle\LocaleBundle\Entity\LocalizedFallbackValue;
 
 trait MenuUpdateTrait
 {
+    use FallbackTrait;
+
     /**
      * @var int
      *
@@ -200,6 +203,27 @@ trait MenuUpdateTrait
     public function getDescriptions()
     {
         return $this->descriptions;
+    }
+
+    /**
+     * @param string $value
+     * @return MenuUpdateInterface
+     */
+    public function setDefaultDescription($value)
+    {
+        $oldValue = $this->getLocalizedFallbackValue($this->descriptions);
+
+        if ($oldValue && $this->descriptions->contains($oldValue)) {
+            $this->descriptions->removeElement($oldValue);
+        }
+        $newValue = new LocalizedFallbackValue();
+        $newValue->setText($value);
+
+        if (!$this->descriptions->contains($newValue)) {
+            $this->descriptions->add($newValue);
+        }
+
+        return $this;
     }
 
     /**

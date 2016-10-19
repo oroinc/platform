@@ -5,6 +5,7 @@ namespace Oro\Bundle\NavigationBundle\Tests\Unit\Entity\Stub;
 use Doctrine\Common\Collections\ArrayCollection;
 
 use Oro\Bundle\LocaleBundle\Entity\Localization;
+use Oro\Bundle\LocaleBundle\Entity\LocalizedFallbackValue;
 use Oro\Bundle\NavigationBundle\Entity\MenuUpdateInterface;
 use Oro\Bundle\NavigationBundle\Entity\MenuUpdateTrait;
 
@@ -14,12 +15,6 @@ class MenuUpdateStub implements MenuUpdateInterface
 
     /** @var array */
     protected $extras = [];
-
-    /** @var string */
-    protected $defaultTitle;
-
-    /** @var string */
-    protected $defaultDescription;
 
     /**
      * MenuUpdateStub constructor.
@@ -50,53 +45,51 @@ class MenuUpdateStub implements MenuUpdateInterface
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getTitle(Localization $localization = null)
+    public function setImage($value)
     {
+        $this->image = $value; return $this;
     }
 
     /**
-     * {@inheritdoc}
-     */
-    public function getDefaultTitle()
-    {
-        return $this->defaultTitle;
-    }
-
-    /**
-     * {@inheritdoc}
+     * @param string $value
+     * @return $this
      */
     public function setDefaultTitle($value)
     {
-        $this->defaultTitle = $value;
-
-        return $this;
+        return $this->setDefaultFallbackValue($this->titles, $value);
     }
 
     /**
-     * {@inheritdoc}
+     * @param Localization|null $localization
+     * @return LocalizedFallbackValue|null
      */
-    public function getDescription(Localization $localization = null)
+    public function getTitle(\Oro\Bundle\LocaleBundle\Entity\Localization $localization = NULL)
     {
+        return $this->getFallbackValue($this->titles, $localization);
     }
 
     /**
-     * {@inheritdoc}
+     * @param Localization|null $localization
+     * @return LocalizedFallbackValue|null
+     */
+    public function getDescription(\Oro\Bundle\LocaleBundle\Entity\Localization $localization = NULL)
+    {
+        return $this->getFallbackValue($this->descriptions, $localization);
+    }
+
+    /**
+     * @return LocalizedFallbackValue|null
+     */
+    public function getDefaultTitle()
+    {
+        return $this->getDefaultFallbackValue($this->titles);
+    }
+
+    /**
+     * @return LocalizedFallbackValue|null
      */
     public function getDefaultDescription()
     {
-        return $this->defaultTitle;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function setDefaultDescription($value)
-    {
-        $this->defaultTitle = $value;
-
-        return $this;
+        return $this->getDefaultFallbackValue($this->descriptions);
     }
 }

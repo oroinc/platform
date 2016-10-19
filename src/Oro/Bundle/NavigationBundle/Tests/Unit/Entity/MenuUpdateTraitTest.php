@@ -80,6 +80,10 @@ class MenuUpdateTraitTest extends \PHPUnit_Framework_TestCase
             ->removeDescription($firstDescription);
 
         $this->assertEquals([$secondDescription], array_values($update->getDescriptions()->toArray()));
+
+        $defaultDescriptionString = 'default description string';
+        $update->setDefaultDescription($defaultDescriptionString);
+        $this->assertEquals($defaultDescriptionString, $update->getDefaultDescription()->getText());
     }
 
     /**
