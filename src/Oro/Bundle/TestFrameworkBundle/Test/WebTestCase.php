@@ -42,7 +42,7 @@ abstract class WebTestCase extends BaseWebTestCase
 
     /**  Default user name and password */
     const AUTH_USER         = 'admin@example.com';
-    const AUTH_PW           = 'admin';
+    const AUTH_PW           = 'admin1Q';
     const AUTH_ORGANIZATION = 1;
 
     /**
