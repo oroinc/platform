@@ -11,7 +11,7 @@ use Oro\Bundle\DataAuditBundle\Provider\AuditConfigProvider;
 use Oro\Bundle\DataAuditBundle\Provider\EntityNameProvider;
 use Oro\Bundle\DataAuditBundle\Model\EntityReference;
 
-class ConvertEntityChangesToAuditService
+class EntityChangesToAuditEntryConverter
 {
     /** @var ManagerRegistry */
     private $doctrine;
@@ -28,16 +28,16 @@ class ConvertEntityChangesToAuditService
     /** @var SetNewAuditVersionService */
     private $setNewAuditVersionService;
 
-    /** @var ConvertChangeSetToAuditFieldsService */
+    /** @var ChangeSetToAuditFieldsConverter */
     private $changeSetToAuditFieldsConverter;
 
     /**
-     * @param ManagerRegistry                      $doctrine
-     * @param AuditEntityMapper                    $auditEntityMapper
-     * @param AuditConfigProvider                  $configProvider
-     * @param EntityNameProvider                   $entityNameProvider
-     * @param SetNewAuditVersionService            $setNewAuditVersionService
-     * @param ConvertChangeSetToAuditFieldsService $changeSetToAuditFieldsConverter
+     * @param ManagerRegistry                 $doctrine
+     * @param AuditEntityMapper               $auditEntityMapper
+     * @param AuditConfigProvider             $configProvider
+     * @param EntityNameProvider              $entityNameProvider
+     * @param SetNewAuditVersionService       $setNewAuditVersionService
+     * @param ChangeSetToAuditFieldsConverter $changeSetToAuditFieldsConverter
      */
     public function __construct(
         ManagerRegistry $doctrine,
@@ -45,7 +45,7 @@ class ConvertEntityChangesToAuditService
         AuditConfigProvider $configProvider,
         EntityNameProvider $entityNameProvider,
         SetNewAuditVersionService $setNewAuditVersionService,
-        ConvertChangeSetToAuditFieldsService $changeSetToAuditFieldsConverter
+        ChangeSetToAuditFieldsConverter $changeSetToAuditFieldsConverter
     ) {
         $this->doctrine = $doctrine;
         $this->auditEntityMapper = $auditEntityMapper;

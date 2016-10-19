@@ -3,7 +3,7 @@ namespace Oro\Bundle\DataAuditBundle\Async;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Oro\Bundle\DataAuditBundle\Model\EntityReference;
-use Oro\Bundle\DataAuditBundle\Service\ConvertEntityChangesToAuditService;
+use Oro\Bundle\DataAuditBundle\Service\EntityChangesToAuditEntryConverter;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Component\MessageQueue\Client\TopicSubscriberInterface;
 use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
@@ -16,16 +16,16 @@ class AuditChangedEntitiesRelationsProcessor implements MessageProcessorInterfac
     /** @var ManagerRegistry */
     private $doctrine;
 
-    /** @var ConvertEntityChangesToAuditService */
+    /** @var EntityChangesToAuditEntryConverter */
     private $entityChangesToAuditEntryConverter;
 
     /**
      * @param ManagerRegistry                    $doctrine
-     * @param ConvertEntityChangesToAuditService $entityChangesToAuditEntryConverter
+     * @param EntityChangesToAuditEntryConverter $entityChangesToAuditEntryConverter
      */
     public function __construct(
         ManagerRegistry $doctrine,
-        ConvertEntityChangesToAuditService $entityChangesToAuditEntryConverter
+        EntityChangesToAuditEntryConverter $entityChangesToAuditEntryConverter
     ) {
         $this->doctrine = $doctrine;
         $this->entityChangesToAuditEntryConverter = $entityChangesToAuditEntryConverter;

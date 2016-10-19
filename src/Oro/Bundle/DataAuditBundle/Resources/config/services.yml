@@ -24,7 +24,7 @@ services:
                     - '%oro_dataaudit.loggable.entity_field.class%'
 
     oro_dataaudit.converter.entity_to_entity_change_array:
-        class: 'Oro\Bundle\DataAuditBundle\Service\ConvertEntityToArrayForMessageQueueService'
+        class: 'Oro\Bundle\DataAuditBundle\Service\EntityToEntityChangeArrayConverter'
         public: false
 
     oro_dataaudit.listener.send_changed_entities_to_message_queue:
@@ -111,7 +111,7 @@ services:
             - '@oro_entity.entity_name_resolver'
 
     oro_dataaudit.converter.change_set_to_audit_fields:
-        class: 'Oro\Bundle\DataAuditBundle\Service\ConvertChangeSetToAuditFieldsService'
+        class: 'Oro\Bundle\DataAuditBundle\Service\ChangeSetToAuditFieldsConverter'
         public: false
         arguments:
             - '@oro_dataaudit.loggable.audit_entity_mapper'
@@ -119,7 +119,7 @@ services:
             - '@oro_dataaudit.entity_name_provider'
 
     oro_dataaudit.converter.entity_changes_to_audit_entry:
-        class: 'Oro\Bundle\DataAuditBundle\Service\ConvertEntityChangesToAuditService'
+        class: 'Oro\Bundle\DataAuditBundle\Service\EntityChangesToAuditEntryConverter'
         public: false
         arguments:
             - '@doctrine'

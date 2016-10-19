@@ -4,7 +4,7 @@ namespace Oro\Bundle\DataAuditBundle\Service;
 use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ORM\EntityManagerInterface;
 
-class ConvertEntityToArrayForMessageQueueService
+class EntityToEntityChangeArrayConverter
 {
     /**
      * @param EntityManagerInterface $em

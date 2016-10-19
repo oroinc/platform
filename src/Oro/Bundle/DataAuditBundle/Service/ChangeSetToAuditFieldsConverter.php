@@ -7,7 +7,7 @@ use Oro\Bundle\DataAuditBundle\Loggable\AuditEntityMapper;
 use Oro\Bundle\DataAuditBundle\Provider\AuditConfigProvider;
 use Oro\Bundle\DataAuditBundle\Provider\EntityNameProvider;
 
-class ConvertChangeSetToAuditFieldsService
+class ChangeSetToAuditFieldsConverter
 {
     /** @var AuditEntityMapper */
     private $auditEntityMapper;

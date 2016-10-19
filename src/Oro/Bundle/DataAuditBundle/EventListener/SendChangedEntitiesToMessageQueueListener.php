@@ -9,7 +9,7 @@ use Doctrine\ORM\Mapping\ClassMetadataInfo;
 use Doctrine\ORM\PersistentCollection;
 use Oro\Bundle\DataAuditBundle\Async\Topics;
 use Oro\Bundle\DataAuditBundle\Provider\AuditConfigProvider;
-use Oro\Bundle\DataAuditBundle\Service\ConvertEntityToArrayForMessageQueueService;
+use Oro\Bundle\DataAuditBundle\Service\EntityToEntityChangeArrayConverter;
 use Oro\Bundle\PlatformBundle\EventListener\OptionalListenerInterface;
 use Oro\Bundle\SecurityBundle\Authentication\Token\OrganizationContextTokenInterface;
 use Oro\Bundle\SecurityBundle\Tools\UUIDGenerator;
@@ -40,7 +40,7 @@ class SendChangedEntitiesToMessageQueueListener implements OptionalListenerInter
     private $securityTokenStorage;
 
     /**
-     * @var ConvertEntityToArrayForMessageQueueService
+     * @var EntityToEntityChangeArrayConverter
      */
     private $entityToArrayConverter;
 
@@ -77,13 +77,13 @@ class SendChangedEntitiesToMessageQueueListener implements OptionalListenerInter
     /**
      * @param MessageProducerInterface $messageProducer
      * @param TokenStorageInterface $securityTokenStorage
-     * @param ConvertEntityToArrayForMessageQueueService $entityToArrayConverter
+     * @param EntityToEntityChangeArrayConverter $entityToArrayConverter
      * @param AuditConfigProvider $configProvider
      */
     public function __construct(
         MessageProducerInterface $messageProducer,
         TokenStorageInterface $securityTokenStorage,
-        ConvertEntityToArrayForMessageQueueService $entityToArrayConverter,
+        EntityToEntityChangeArrayConverter $entityToArrayConverter,
         AuditConfigProvider $configProvider
     ) {
         $this->messageProducer = $messageProducer;
