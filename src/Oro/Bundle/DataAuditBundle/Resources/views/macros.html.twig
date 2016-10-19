@@ -1,17 +1,19 @@
 {% macro renderFieldValue(fieldValue) %}
-    {% set type = null %}
-    {% if fieldValue.type is defined %}
+    {%- set type = null %}
+    {%- if fieldValue.type is defined -%}
         {% set type = fieldValue.type %}
-    {% endif %}
-    {% if fieldValue.value is defined %}
+    {%- endif %}
+    {%- if fieldValue.value is defined -%}
         {% set fieldValue = fieldValue.value %}
-    {% endif %}
+    {%- endif %}
 
     {%- if fieldValue.timestamp is defined -%}
         {{ type == 'date' ? fieldValue|oro_format_date : fieldValue|oro_format_datetime }}
     {%- elseif type == 'array' or type == 'jsonarray' -%}
         {{ fieldValue is not null ? fieldValue|json_encode(constant('JSON_FORCE_OBJECT')) }}
-    {% else %}
+    {%- elseif type == 'boolean' or fieldValue is same as(true) or fieldValue is same as(false) -%}
+        {{ fieldValue ? 'Yes'|trans : 'No'|trans }}
+    {%- else -%}
         {% if fieldValue is iterable %}{{ fieldValue|join(', ') }}{% else %}{{ fieldValue|default('') }}{% endif %}
     {%- endif -%}
 {% endmacro %}
