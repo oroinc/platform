@@ -27,16 +27,18 @@ define(function(require) {
         },
 
         render: function() {
-            var rate;
-            var value = this._toNumber(this.$('[name$="[value]"]').val());
-            var currency = this.$('[name$="[currency]"]').val();
-            var $equivalent = this.$('[data-name="default-currency-equivalent"]');
-            if (currency === localeSettings.getCurrency() || isNaN(value) || value === 0) {
-                $equivalent.hide().text('');
-            } else {
-                rate = _.result(this.rates, currency) || 1;
-                value = formatter.formatCurrency(value * rate);
-                $equivalent.show().text(value);
+            if (this.rates) {
+                var rate;
+                var value = this._toNumber(this.$('[name$="[value]"]').val());
+                var currency = this.$('[name$="[currency]"]').val();
+                var $equivalent = this.$('[data-name="default-currency-equivalent"]');
+                if (currency === localeSettings.getCurrency() || isNaN(value) || value === 0) {
+                    $equivalent.hide().text('');
+                } else {
+                    rate = _.result(this.rates, currency) || 1;
+                    value = formatter.formatCurrency(value * rate);
+                    $equivalent.show().text(value);
+                }
             }
         },
 

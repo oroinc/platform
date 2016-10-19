@@ -43,7 +43,7 @@ services:
     oro_importexport.formatter.locale_number:
         class: Oro\Bundle\ImportExportBundle\Formatter\NumberTypeFormatter
         arguments:
-            - '@oro_locale.settings'
+            - '@oro_locale.formatter.number'
         tags:
             - { name: oro_importexport.formatter.formatter, data_type: currency, format_type: excel }
             - { name: oro_importexport.formatter.formatter, data_type: percent, format_type: excel }
