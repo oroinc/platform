@@ -2,7 +2,10 @@
 
 namespace Oro\Bundle\AttachmentBundle\Controller;
 
+use Doctrine\Common\Collections\Collection;
+
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\PropertyAccess\PropertyAccess;
@@ -11,8 +14,6 @@ use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 
 use Oro\Bundle\AttachmentBundle\Entity\File;
-
-use Doctrine\Common\Collections\Collection;
 
 class FileController extends Controller
 {
@@ -72,7 +73,7 @@ class FileController extends Controller
      *   requirements={"id"="\d+", "width"="\d+", "height"="\d+"}
      * )
      */
-    public function getResizedAttachmentImageAction($id, $width, $height, $filename)
+    public function getResizedAttachmentImageAction($id, $width, $height, $filename, Request $request)
     {
         $file = $this->getFileByIdAndFileName($id, $filename);
         $thumbnail = $this->get('oro_attachment.thumbnail_factory')->createThumbnail(
@@ -81,11 +82,17 @@ class FileController extends Controller
             $height
         );
 
-        return $this->get('liip_imagine.cache.manager')->store(
-            new Response((string)$thumbnail->getImage(), 200, ['Content-Type' => $file->getMimeType()]),
-            substr($this->getRequest()->getPathInfo(), 1),
-            $thumbnail->getFilter()
+        $customResolver = $this->getParameter('oro_attachment.imagine.cache.resolver.custom_web_path.name');
+        $image = $thumbnail->getBinary();
+
+        $this->get('liip_imagine.cache.manager')->store(
+            $image,
+            $request->getPathInfo(),
+            $thumbnail->getFilter(),
+            $customResolver
         );
+
+        return new Response($image->getContent(), Response::HTTP_OK, ['Content-Type' => $image->getMimeType()]);
     }
 
     /**
@@ -94,19 +101,18 @@ class FileController extends Controller
      *   requirements={"id"="\d+"}
      * )
      */
-    public function getFilteredImageAction($id, $filter, $filename)
+    public function getFilteredImageAction($id, $filter, $filename, Request $request)
     {
         $file = $this->getFileByIdAndFileName($id, $filename);
+        $customResolver = $this->getParameter('oro_attachment.imagine.cache.resolver.custom_web_path.name');
         $image = $this->get('oro_attachment.image_factory')->createImage(
             $this->get('oro_attachment.file_manager')->getContent($file),
             $filter
         );
 
-        return $this->get('liip_imagine.cache.manager')->store(
-            new Response((string)$image, 200, ['Content-Type' => $file->getMimeType()]),
-            substr($this->getRequest()->getPathInfo(), 1),
-            $filter
-        );
+        $this->get('liip_imagine.cache.manager')->store($image, $request->getPathInfo(), $filter, $customResolver);
+
+        return new Response($image->getContent(), Response::HTTP_OK, ['Content-Type' => $image->getMimeType()]);
     }
 
     /**

@@ -56,7 +56,7 @@
             </div>
             {% placeholder oro_user_login_form %}
         </fieldset>
-        <input type="hidden" name="_target_path" value="" />
+        <input type="hidden" name="_target_path" value="{{ url('oro_default') }}" />
         <input type="hidden" name="_csrf_token" value="{{ csrf_token }}" />
     </form>
 </div>

@@ -62,7 +62,6 @@ class OroClassMetadataFactory extends ClassMetadataFactory
         }
 
         return $result;
-
     }
 
     /**

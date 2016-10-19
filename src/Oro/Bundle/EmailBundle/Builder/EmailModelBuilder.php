@@ -102,7 +102,7 @@ class EmailModelBuilder
 
         if ($this->request && $this->request->getMethod() === 'GET') {
             $this->applyRequest($emailModel);
-            if (!$emailModel->getContexts()) {
+            if (!count($emailModel->getContexts())) {
                 $entityClass = $this->request->get('entityClass');
                 $entityId = $this->request->get('entityId');
                 if ($entityClass && $entityId) {

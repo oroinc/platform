@@ -163,8 +163,11 @@ define(function(require) {
         },
 
         onWindowResize: function() {
-            this.setTimeline();
-            this.updateLayout();
+            // fullCalendar might be not rendered yet
+            if (this.getCalendarElement().data('fullCalendar')) {
+                this.setTimeline();
+                this.updateLayout();
+            }
         },
 
         /**
@@ -702,6 +705,9 @@ define(function(require) {
             // prepare options for jQuery FullCalendar control
             options = { // prepare options for jQuery FullCalendar control
                 timezone: this.options.timezone,
+                displayEventEnd: {
+                    month: true
+                },
                 selectHelper: true,
                 events: _.bind(this.loadEvents, this),
                 select: _.bind(this.onFcSelect, this),
@@ -768,9 +774,10 @@ define(function(require) {
 
             self = this;
             options.eventAfterAllRender = function() {
-                _.delay(_.bind(self.setTimeline, self));
+                var setTimeline = _.bind(self.setTimeline, self);
+                _.delay(setTimeline);
                 clearInterval(self.timelineUpdateIntervalId);
-                self.timelineUpdateIntervalId = setInterval(function() { self.setTimeline(); }, 60 * 1000);
+                self.timelineUpdateIntervalId = setInterval(setTimeline, 60 * 1000);
             };
 
             options.eventAfterRender = _.bind(function(fcEvent, $el) {

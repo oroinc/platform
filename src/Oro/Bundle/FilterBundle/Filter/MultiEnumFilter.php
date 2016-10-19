@@ -11,6 +11,8 @@ use Oro\Bundle\FilterBundle\Form\Type\Filter\DictionaryFilterType;
 
 class MultiEnumFilter extends BaseMultiChoiceFilter
 {
+    const FILTER_TYPE_NAME = 'multi_enum';
+
     /** @var ManyRelationBuilder */
     protected $manyRelationBuilder;
 

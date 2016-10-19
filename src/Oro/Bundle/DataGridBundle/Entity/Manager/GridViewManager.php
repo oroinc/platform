@@ -105,17 +105,10 @@ class GridViewManager
      */
     protected function isViewDefault(ViewInterface $view, User $user)
     {
-        if ($view instanceof GridView) {
-            $isDefault = $view->getUsers()->contains($user);
-        } else {
-            $defaultViews = $this->registry
-                ->getManagerForClass('OroDataGridBundle:GridViewUser')
-                ->getRepository('OroDataGridBundle:GridViewUser')
-                ->findBy(['user' => $user, 'alias' => $view->getName(), 'gridName' => $view->getGridName()]);
-            $isDefault = count($defaultViews) ? true : false;
-        }
-
-        return $isDefault;
+        return (bool) $this->registry
+            ->getManagerForClass('OroDataGridBundle:GridViewUser')
+            ->getRepository('OroDataGridBundle:GridViewUser')
+            ->findOneBy(['user' => $user, 'alias' => $view->getName(), 'gridName' => $view->getGridName()]);
     }
 
     /**

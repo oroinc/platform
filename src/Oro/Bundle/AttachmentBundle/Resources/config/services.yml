@@ -1,32 +1,37 @@
 parameters:
-    oro_attachment.manager.attachment_manager.class:      Oro\Bundle\AttachmentBundle\Manager\AttachmentManager
-    oro_attachment.listener.file_listener.class:          Oro\Bundle\AttachmentBundle\EventListener\FileListener
+    oro_attachment.manager.attachment_manager.class:             Oro\Bundle\AttachmentBundle\Manager\AttachmentManager
+    oro_attachment.listener.file_listener.class:                 Oro\Bundle\AttachmentBundle\EventListener\FileListener
 
-    oro_attachment.entity.class:                          Oro\Bundle\AttachmentBundle\Entity\Attachment
-    oro_attachment.file.entity.class:                     Oro\Bundle\AttachmentBundle\Entity\File
-    oro_attachment.manager.api.class:                     Oro\Bundle\AttachmentBundle\Entity\Manager\AttachmentApiEntityManager
-    oro_attachment.manager.file.api.class:                Oro\Bundle\AttachmentBundle\Entity\Manager\FileApiEntityManager
+    oro_attachment.entity.class:                                 Oro\Bundle\AttachmentBundle\Entity\Attachment
+    oro_attachment.file.entity.class:                            Oro\Bundle\AttachmentBundle\Entity\File
+    oro_attachment.manager.api.class:                            Oro\Bundle\AttachmentBundle\Entity\Manager\AttachmentApiEntityManager
+    oro_attachment.manager.file.api.class:                       Oro\Bundle\AttachmentBundle\Entity\Manager\FileApiEntityManager
 
-    oro_attachment.twig.file_extension.class:             Oro\Bundle\AttachmentBundle\Twig\FileExtension
+    oro_attachment.twig.file_extension.class:                    Oro\Bundle\AttachmentBundle\Twig\FileExtension
 
-    oro_attachment.entity_config_dumper.extension.file.class:  Oro\Bundle\AttachmentBundle\Tools\FileEntityConfigDumperExtension
-    oro_attachment.entity_config_dumper.extension.class:  Oro\Bundle\AttachmentBundle\Tools\AttachmentConfigDumperExtension
-    oro_attachment.entity_generator.extension.class:      Oro\Bundle\AttachmentBundle\Tools\AttachmentEntityGeneratorExtension
-    oro_attachment.migration.extension.attachment.class:  Oro\Bundle\AttachmentBundle\Migration\Extension\AttachmentExtension
+    oro_attachment.entity_config_dumper.extension.file.class:    Oro\Bundle\AttachmentBundle\Tools\FileEntityConfigDumperExtension
+    oro_attachment.entity_config_dumper.extension.class:         Oro\Bundle\AttachmentBundle\Tools\AttachmentConfigDumperExtension
+    oro_attachment.entity_generator.extension.class:             Oro\Bundle\AttachmentBundle\Tools\AttachmentEntityGeneratorExtension
+    oro_attachment.migration.extension.attachment.class:         Oro\Bundle\AttachmentBundle\Migration\Extension\AttachmentExtension
 
-    oro_attachment.serializer.file_normalizer.class:      Oro\Bundle\AttachmentBundle\ImportExport\FileNormalizer
+    oro_attachment.serializer.file_normalizer.class:             Oro\Bundle\AttachmentBundle\ImportExport\FileNormalizer
 
-    oro_attachment.placeholder.filter.class:              Oro\Bundle\AttachmentBundle\Placeholder\PlaceholderFilter
-    oro_attachment.attachment_grid_listener:              Oro\Bundle\AttachmentBundle\EventListener\AttachmentGridListener
+    oro_attachment.placeholder.filter.class:                     Oro\Bundle\AttachmentBundle\Placeholder\PlaceholderFilter
+    oro_attachment.attachment_grid_listener:                     Oro\Bundle\AttachmentBundle\EventListener\AttachmentGridListener
 
-    oro_attachment.datagrid.action.dialog.class:          Oro\Bundle\AttachmentBundle\DataGrid\Action\DialogAction
+    oro_attachment.datagrid.action.dialog.class:                 Oro\Bundle\AttachmentBundle\DataGrid\Action\DialogAction
 
-    oro_attachment.provider.attachment.class:             Oro\Bundle\AttachmentBundle\Provider\AttachmentProvider
-    oro_attachment.config.class:                          Oro\Bundle\AttachmentBundle\EntityConfig\AttachmentConfig
+    oro_attachment.provider.attachment.class:                    Oro\Bundle\AttachmentBundle\Provider\AttachmentProvider
+    oro_attachment.config.class:                                 Oro\Bundle\AttachmentBundle\EntityConfig\AttachmentConfig
 
-    oro_attachment.formatter.image_encoded.class:         Oro\Bundle\AttachmentBundle\Formatter\ImageEncodedFormatter
-    oro_attachment.formatter.image_link.class:            Oro\Bundle\AttachmentBundle\Formatter\ImageLinkFormatter
-    oro_attachment.formatter.image_src.class:             Oro\Bundle\AttachmentBundle\Formatter\ImageSrcFormatter
+    oro_attachment.formatter.image_encoded.class:                Oro\Bundle\AttachmentBundle\Formatter\ImageEncodedFormatter
+    oro_attachment.formatter.image_link.class:                   Oro\Bundle\AttachmentBundle\Formatter\ImageLinkFormatter
+    oro_attachment.formatter.image_src.class:                    Oro\Bundle\AttachmentBundle\Formatter\ImageSrcFormatter
+
+    oro_attachment.attachments_dir:                              attachment
+    oro_attachment.imagine.cache.resolver.custom_web_path.name:  custom_web_path
+
+    liip_imagine.meta_data.reader.class:                         Imagine\Image\Metadata\DefaultMetadataReader
 
 services:
     oro_attachment.manager:
@@ -46,8 +51,9 @@ services:
     oro_attachment.image_factory:
         class: Oro\Bundle\AttachmentBundle\Tools\ImageFactory
         arguments:
-          - '@liip_imagine'
           - '@liip_imagine.filter.manager'
+          - '@liip_imagine.binary.mime_type_guesser'
+          - '@liip_imagine.extension_guesser'
 
     oro_attachment.thumbnail_factory:
         class: Oro\Bundle\AttachmentBundle\Tools\ThumbnailFactory
@@ -208,3 +214,23 @@ services:
           - '@oro_attachment.manager'
         tags:
           - { name: oro_formatter, formatter: image_src }
+
+    oro_attachment.imagine.cache.resolver.custom_web_path:
+        class: 'Oro\Bundle\AttachmentBundle\Imagine\Cache\Resolver\CustomWebPathResolver'
+        arguments:
+          - '@filesystem'
+          - '@router.request_context'
+          - '%kernel.root_dir%/../web'
+        tags:
+          - { name: liip_imagine.cache.resolver, resolver: %oro_attachment.imagine.cache.resolver.custom_web_path.name% }
+
+    oro_attachment.image_resizer:
+        class: 'Oro\Bundle\AttachmentBundle\Resizer\ImageResizer'
+        arguments:
+            - '@oro_attachment.manager'
+            - '@liip_imagine.cache.manager'
+            - '@oro_attachment.file_manager'
+            - '@oro_attachment.image_factory'
+            - '%oro_attachment.imagine.cache.resolver.custom_web_path.name%'
+        calls:
+            - [setLogger, ['@logger']]
