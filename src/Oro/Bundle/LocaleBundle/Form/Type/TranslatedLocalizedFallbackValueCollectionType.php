@@ -21,20 +21,15 @@ class TranslatedLocalizedFallbackValueCollectionType extends AbstractType
     /** @var TranslatorInterface */
     private $translator;
 
-    /** @var string */
-    private $defaultLocale;
-
     /** @var PropertyAccessor */
     private $propertyAccessor;
 
     /**
      * @param TranslatorInterface $translator
-     * @param string              $defaultLocale
      */
-    public function __construct(TranslatorInterface $translator, $defaultLocale)
+    public function __construct(TranslatorInterface $translator)
     {
         $this->translator = $translator;
-        $this->defaultLocale = $defaultLocale;
     }
 
     /**
@@ -96,7 +91,7 @@ class TranslatedLocalizedFallbackValueCollectionType extends AbstractType
             }
 
             $localization = $fallbackValue->getLocalization();
-            $locale = $localization ? $localization->getLanguageCode() : $this->defaultLocale;
+            $locale = $localization ? $localization->getLanguageCode() : null;
 
             $value = $this->getPropertyAccessor()->getValue($fallbackValue, $field);
 

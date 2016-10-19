@@ -87,7 +87,6 @@ services:
         class: 'Oro\Bundle\LocaleBundle\Form\Type\TranslatedLocalizedFallbackValueCollectionType'
         arguments:
             - '@translator'
-            - '%kernel.default_locale%'
         tags:
             - { name: form.type, alias: oro_locale_translated_localized_fallback_value_collection }
 

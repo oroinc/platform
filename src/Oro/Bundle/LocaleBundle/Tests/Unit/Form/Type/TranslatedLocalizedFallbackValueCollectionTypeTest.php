@@ -22,8 +22,6 @@ class TranslatedLocalizedFallbackValueCollectionTypeTest extends \PHPUnit_Framew
 {
     use EntityTrait;
 
-    const DEFAULT_LOCALE = 'en';
-
     /** @var Translator|\PHPUnit_Framework_MockObject_MockObject */
     protected $translator;
 
@@ -37,7 +35,7 @@ class TranslatedLocalizedFallbackValueCollectionTypeTest extends \PHPUnit_Framew
     {
         $this->translator = $this->getMock(Translator::class, [], [], '', false);
 
-        $this->type = new TranslatedLocalizedFallbackValueCollectionType($this->translator, self::DEFAULT_LOCALE);
+        $this->type = new TranslatedLocalizedFallbackValueCollectionType($this->translator);
     }
 
     public function testGetName()

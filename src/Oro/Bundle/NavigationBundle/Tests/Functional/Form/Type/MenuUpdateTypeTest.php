@@ -40,8 +40,7 @@ class MenuUpdateTypeTest extends FormIntegrationTestCase
             new PreloadedExtension(
                 [
                     TranslatedLocalizedFallbackValueCollectionType::NAME => new TranslatedLocalizedFallbackValueCollectionType(
-                        $translator,
-                        'en'
+                        $translator
                     ),
                     LocalizedFallbackValueCollectionType::NAME => new LocalizedFallbackValueCollectionType($registry),
                     LocalizedPropertyType::NAME => new LocalizedPropertyType(),
