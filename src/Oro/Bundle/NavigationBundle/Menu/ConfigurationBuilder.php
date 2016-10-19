@@ -133,8 +133,10 @@ class ConfigurationBuilder implements BuilderInterface
                 if (!empty($itemData['position'])) {
                     $itemOptions['extras']['position'] = $itemData['position'];
                 }
+
                 $this->moveToExtras($itemOptions, 'translateDomain');
                 $this->moveToExtras($itemOptions, 'translateParameters');
+                $this->moveToExtras($itemOptions, 'aclResourceId');
 
                 $newMenuItem = $menu->addChild($itemOptions['name'], array_merge($itemOptions, $options));
 

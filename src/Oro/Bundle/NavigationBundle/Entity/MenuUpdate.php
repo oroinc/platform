@@ -34,6 +34,8 @@ use Oro\Bundle\NavigationBundle\Model\ExtendMenuUpdate;
  *          )
  *      )
  * })
+ * @ORM\HasLifecycleCallbacks
+ *
  * @Config(
  *      routeName="oro_navigation_menu_update_index",
  *      defaultValues={

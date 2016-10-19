@@ -3,9 +3,9 @@
 {% if translationCompleteness is not null %}
     <div class="translation-completeness">
         <div class="progress">
-            <div class="bar bar-success" style="width: {{ translationCompleteness }}%;"></div>
+            <div class="bar bar-success" style="width: {{ translationCompleteness * 100 }}%;"></div>
         </div>
-        <b>{{ (translationCompleteness / 100)|oro_format_percent }}</b>
+        <b>{{ (translationCompleteness * 100)|round(0, 'floor') }}%</b>
     </div>
 {% else %}
     {{ 'N/A'|trans }}

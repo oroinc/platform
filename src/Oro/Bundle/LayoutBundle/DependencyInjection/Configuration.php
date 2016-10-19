@@ -22,6 +22,9 @@ class Configuration implements ConfigurationInterface
         $rootNode    = $treeBuilder->root('oro_layout');
 
         SettingsBuilder::append($rootNode, [
+            'development_settings_feature_enabled' => [
+                'value' => '%kernel.debug%'
+            ],
             'debug_block_info' => [
                 'value' => false
             ],
@@ -207,6 +210,10 @@ class Configuration implements ConfigurationInterface
                 ->end()
             ->end();
 
+        $widthHeightValidator = function ($value) {
+            return !is_null($value) && !is_int($value);
+        };
+
         $imagesNode
             ->children()
                 ->arrayNode('types')
@@ -214,8 +221,30 @@ class Configuration implements ConfigurationInterface
                     ->prototype('array')
                         ->children()
                             ->scalarNode('label')->cannotBeEmpty()->end()
-                            ->scalarNode('dimensions')->defaultNull()->end()
                             ->scalarNode('max_number')->defaultNull()->end()
+                            ->arrayNode('dimensions')
+                                ->prototype('scalar')->end()
+                            ->end()
+                        ->end()
+                    ->end()
+                ->end()
+
+                ->arrayNode('dimensions')
+                    ->useAttributeAsKey('name')
+                    ->prototype('array')
+                        ->children()
+                            ->scalarNode('width')
+                                ->validate()
+                                    ->ifTrue($widthHeightValidator)
+                                    ->thenInvalid('Width value can be null or integer only')
+                                ->end()
+                            ->end()
+                            ->scalarNode('height')
+                                ->validate()
+                                    ->ifTrue($widthHeightValidator)
+                                    ->thenInvalid('Height value can be null or integer only')
+                                ->end()
+                            ->end()
                         ->end()
                     ->end()
                 ->end()

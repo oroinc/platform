@@ -6,7 +6,6 @@ use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityRepository;
 
-use Oro\Bundle\NavigationBundle\Entity\MenuUpdate;
 use Oro\Bundle\NavigationBundle\Manager\MenuUpdateManager;
 use Oro\Bundle\NavigationBundle\Menu\Provider\GlobalOwnershipProvider;
 use Oro\Bundle\NavigationBundle\Provider\BuilderChainProvider;
@@ -107,6 +106,7 @@ class MenuUpdateManagerTest extends \PHPUnit_Framework_TestCase
             ->setOwnershipType($ownershipType)
             ->setOwnerId($ownerId)
             ->setKey($key)
+            ->setCustom(false)
         ;
 
         $menu = $this->getMenu();
@@ -236,6 +236,122 @@ class MenuUpdateManagerTest extends \PHPUnit_Framework_TestCase
             [$update1, $update3, $update0, $update2],
             $this->manager->getReorderedMenuUpdates('menu', $orderedChildren, $ownershipType, $ownerId)
         );
+    }
+
+    public function testShowMenuItem()
+    {
+        $ownershipType = GlobalOwnershipProvider::TYPE;
+        $ownerId = 1;
+        $menuName = 'menu';
+
+        $this->manager->setEntityClass(MenuUpdateStub::class);
+
+        $menu = $this->getMenu();
+        $menu->getChild('item-1')->setDisplay(false);
+        $menu->getChild('item-1')->getChild('item-1-1')->setDisplay(false);
+        $menu->getChild('item-1')->getChild('item-1-1')->getChild('item-1-1-1')->setDisplay(false);
+
+        $this->builderChainProvider
+            ->expects($this->any())
+            ->method('get')
+            ->with($menuName)
+            ->will($this->returnValue($menu));
+
+        $update1 = new MenuUpdateStub();
+        $update1
+            ->setMenu($menuName)
+            ->setOwnershipType($ownershipType)
+            ->setOwnerId($ownerId)
+            ->setKey('item-1')
+            ->setParentKey($menuName)
+            ->setCustom(false)
+            ->setActive(true)
+            ->setDefaultTitle('item-1')
+        ;
+
+        $update11 = new MenuUpdateStub();
+        $update11
+            ->setMenu($menuName)
+            ->setOwnershipType($ownershipType)
+            ->setOwnerId($ownerId)
+            ->setKey('item-1-1')
+            ->setParentKey('item-1')
+            ->setCustom(false)
+            ->setActive(true)
+            ->setDefaultTitle('item-1-1')
+        ;
+
+        $update111 = new MenuUpdateStub();
+        $update111
+            ->setMenu($menuName)
+            ->setOwnershipType($ownershipType)
+            ->setOwnerId($ownerId)
+            ->setKey('item-1-1-1')
+            ->setParentKey('item-1-1')
+            ->setCustom(false)
+            ->setActive(true)
+            ->setDefaultTitle('item-1-1-1')
+        ;
+
+        $this->entityManager->expects($this->exactly(3))
+            ->method('persist')
+            ->with($this->logicalOr(
+                $this->equalTo($update1),
+                $this->equalTo($update11),
+                $this->equalTo($update111)
+            ));
+
+        $this->manager->showMenuItem($menuName, 'item-1-1', $ownershipType, $ownerId);
+    }
+
+    public function testHideMenuItem()
+    {
+        $ownershipType = GlobalOwnershipProvider::TYPE;
+        $ownerId = 1;
+        $menuName = 'menu';
+
+        $this->manager->setEntityClass(MenuUpdateStub::class);
+
+        $menu = $this->getMenu();
+
+        $this->builderChainProvider
+            ->expects($this->any())
+            ->method('get')
+            ->with($menuName)
+            ->will($this->returnValue($menu));
+
+        $update11 = new MenuUpdateStub();
+        $update11
+            ->setMenu($menuName)
+            ->setOwnershipType($ownershipType)
+            ->setOwnerId($ownerId)
+            ->setKey('item-1-1')
+            ->setParentKey('item-1')
+            ->setCustom(true)
+            ->setActive(false)
+            ->setDefaultTitle('item-1-1')
+        ;
+
+        $update111 = new MenuUpdateStub();
+        $update111
+            ->setMenu($menuName)
+            ->setOwnershipType($ownershipType)
+            ->setOwnerId($ownerId)
+            ->setKey('item-1-1-1')
+            ->setParentKey('item-1-1')
+            ->setCustom(true)
+            ->setActive(false)
+            ->setDefaultTitle('item-1-1-1')
+        ;
+
+        $this->entityManager->expects($this->exactly(2))
+            ->method('persist')
+            ->with($this->logicalOr(
+                $this->equalTo($update11),
+                $this->equalTo($update111)
+            ));
+
+        $this->manager->hideMenuItem($menuName, 'item-1-1', $ownershipType, $ownerId);
     }
 
     public function testGetMenu()

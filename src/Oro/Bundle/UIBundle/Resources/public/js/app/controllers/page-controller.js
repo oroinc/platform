@@ -53,6 +53,7 @@ define([
             mediator.setHandler('isInAction', function() {
                 return isInAction;
             });
+            this._setNavigationHandlers();
         },
 
         /**
@@ -79,7 +80,6 @@ define([
             var cacheItem;
 
             var url = this._combineRouteUrl(route);
-            this._setNavigationHandlers(url);
             var args = {// collect arguments to reuse in events of page_fetch state change
                 params: params,
                 route: route,
@@ -305,10 +305,9 @@ define([
         /**
          * Register handler for page reload and redirect
          *
-         * @param {string} url
          * @private
          */
-        _setNavigationHandlers: function(url) {
+        _setNavigationHandlers: function() {
             mediator.setHandler('redirectTo', function(pathDesc, params, options) {
                 var queue = [];
                 mediator.trigger('page:beforeRedirectTo', queue, pathDesc, params, options);
@@ -324,7 +323,7 @@ define([
                 _.defaults(options, {forceStartup: true, force: true});
                 $.when.apply($, queue).done(_.bind(function(customOptions) {
                     _.extend(options, customOptions || {});
-                    this._processRedirect({url: url}, options);
+                    this._processRedirect({url: location.href}, options);
                     mediator.trigger('page:afterRefresh');
                 }, this));
             }, this);

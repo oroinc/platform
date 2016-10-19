@@ -3,6 +3,7 @@
 namespace Oro\Component\Layout;
 
 use Oro\Component\Layout\Block\OptionsResolver\OptionsResolver;
+use Oro\Component\Layout\Block\Type\Options;
 
 interface BlockTypeInterface
 {
@@ -13,9 +14,9 @@ interface BlockTypeInterface
      * top most type. Type extensions can further modify the block.
      *
      * @param BlockBuilderInterface $builder
-     * @param array                 $options
+     * @param Options               $options
      */
-    public function buildBlock(BlockBuilderInterface $builder, array $options);
+    public function buildBlock(BlockBuilderInterface $builder, Options $options);
 
     /**
      * Builds the block view.
@@ -29,9 +30,9 @@ interface BlockTypeInterface
      *
      * @param BlockView      $view
      * @param BlockInterface $block
-     * @param array          $options
+     * @param Options        $options
      */
-    public function buildView(BlockView $view, BlockInterface $block, array $options);
+    public function buildView(BlockView $view, BlockInterface $block, Options $options);
 
     /**
      * Finishes the block view.
@@ -46,9 +47,8 @@ interface BlockTypeInterface
      *
      * @param BlockView      $view
      * @param BlockInterface $block
-     * @param array          $options
      */
-    public function finishView(BlockView $view, BlockInterface $block, array $options);
+    public function finishView(BlockView $view, BlockInterface $block);
 
     /**
      * Sets the default options for this type.

@@ -100,7 +100,6 @@ class TagManagerTest extends \PHPUnit_Framework_TestCase
         if ($shouldWorkWithDB) {
             $this->assertContainsOnlyInstancesOf('Oro\Bundle\TagBundle\Entity\Tag', $result);
         }
-
     }
 
     /**

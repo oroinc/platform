@@ -1,0 +1,46 @@
+{% extends '@WebProfiler/Profiler/layout.html.twig' %}
+
+{% block toolbar %}
+{% endblock %}
+
+{% block menu %}
+    <span class="label {{ collector.sentMessages is empty ? 'disabled' }}">
+        <strong>Message Queue</strong>
+    </span>
+{% endblock %}
+
+{% block panel %}
+    {% if collector.sentMessages|length %}
+        {{ block('sentMessages') }}
+    {% else %}
+        <h2>Message Queue</h2>
+        <div class="empty">
+            <p>No messages were sent during this request.</p>
+        </div>
+    {% endif %}
+{% endblock %}
+
+{% block sentMessages %}
+    <h2>Sent messages</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>#</th>
+                <th>Topic</th>
+                <th>Message</th>
+                <th>Priority</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for sentMessage in collector.sentMessages %}
+                <tr>
+                    <td>{{ loop.index }}</td>
+                    <td>{{ sentMessage.topic }}</td>
+                    <td><pre>{{ collector.prettyPrintMessage(sentMessage.message)|raw }}</pre></td>
+                    <td><span title="{{ sentMessage.priority is defined ? sentMessage.priority : '' }}">{{ sentMessage.priority is defined ? collector.prettyPrintPriority(sentMessage.priority) : '' }}</span></td>
+                </tr>
+            {% endfor %}
+        </tbody>
+
+    </table>
+{% endblock sentMessages %}

@@ -16,9 +16,6 @@ class ErrorCompleterTest extends \PHPUnit_Framework_TestCase
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $exceptionTextExtractor;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
-    protected $metadata;
-
     /** @var ErrorCompleter */
     protected $errorCompleter;
 
@@ -26,27 +23,7 @@ class ErrorCompleterTest extends \PHPUnit_Framework_TestCase
     {
         $this->exceptionTextExtractor = $this->getMock('Oro\Bundle\ApiBundle\Request\ExceptionTextExtractorInterface');
 
-        $this->metadata = $this->getMockBuilder('Oro\Bundle\ApiBundle\Metadata\EntityMetadata')
-            ->disableOriginalConstructor()
-            ->getMock();
-
         $this->errorCompleter = new ErrorCompleter($this->exceptionTextExtractor);
-
-        $this->metadata = new EntityMetadata();
-        $this->metadata->setIdentifierFieldNames(['id']);
-        $idField = new FieldMetadata();
-        $idField->setName('id');
-        $this->metadata->addField($idField);
-        $firstNameField = new FieldMetadata();
-        $firstNameField->setName('firstName');
-        $this->metadata->addField($firstNameField);
-        $userAssociation = new AssociationMetadata();
-        $userAssociation->setName('user');
-        $this->metadata->addAssociation($userAssociation);
-        $groupsAssociation = new AssociationMetadata();
-        $groupsAssociation->setName('groups');
-        $groupsAssociation->setIsCollection(true);
-        $this->metadata->addAssociation($groupsAssociation);
     }
 
     public function testCompleteErrorWithoutInnerException()
@@ -197,9 +174,7 @@ class ErrorCompleterTest extends \PHPUnit_Framework_TestCase
         $error->setSource(ErrorSource::createByPropertyPath($property));
 
         $expectedError = new Error();
-        if (array_key_exists('detail', $expectedResult)) {
-            $expectedError->setDetail($expectedResult['detail']);
-        }
+        $expectedError->setDetail($expectedResult['detail']);
 
         $this->errorCompleter->complete($error);
         $this->assertEquals($expectedError, $error);
@@ -235,77 +210,243 @@ class ErrorCompleterTest extends \PHPUnit_Framework_TestCase
         ];
     }
 
-    /**
-     * @dataProvider completeErrorWithPropertyPathDataProvider
-     */
-    public function testCompleteErrorWithPropertyPath($property, $expectedResult)
+    public function testCompleteErrorForIdentifier()
     {
+        $metadata = new EntityMetadata();
+        $metadata->setIdentifierFieldNames(['id']);
+        $idField = new FieldMetadata();
+        $idField->setName('id');
+        $metadata->addField($idField);
+
         $error = new Error();
         $error->setDetail('test detail');
-        $error->setSource(ErrorSource::createByPropertyPath($property));
+        $error->setSource(ErrorSource::createByPropertyPath('id'));
 
         $expectedError = new Error();
-        if (array_key_exists('detail', $expectedResult)) {
-            $expectedError->setDetail($expectedResult['detail']);
-        }
-        if (array_key_exists('source', $expectedResult)) {
-            $expectedSource = $expectedResult['source'];
-            $expectedError->setSource(new ErrorSource());
-            if (array_key_exists('pointer', $expectedSource)) {
-                $expectedError->getSource()->setPointer($expectedSource['pointer']);
-            } elseif (array_key_exists('property', $expectedSource)) {
-                $expectedError->getSource()->setPropertyPath($expectedSource['property']);
-            }
-        }
+        $expectedError->setDetail('test detail');
+        $expectedError->setSource(ErrorSource::createByPointer('/data/id'));
 
-        $this->errorCompleter->complete($error, $this->metadata);
+        $this->errorCompleter->complete($error, $metadata);
         $this->assertEquals($expectedError, $error);
     }
 
-    public function completeErrorWithPropertyPathDataProvider()
+    public function testCompleteErrorForField()
     {
-        return [
-            [
-                'id',
-                [
-                    'detail' => 'test detail',
-                    'source' => ['pointer' => '/data/id']
-                ]
-            ],
-            [
-                'firstName',
-                [
-                    'detail' => 'test detail',
-                    'source' => ['pointer' => '/data/attributes/firstName']
-                ]
-            ],
-            [
-                'user',
-                [
-                    'detail' => 'test detail',
-                    'source' => ['pointer' => '/data/relationships/user/data']
-                ]
-            ],
-            [
-                'groups',
-                [
-                    'detail' => 'test detail',
-                    'source' => ['pointer' => '/data/relationships/groups/data']
-                ]
-            ],
-            [
-                'groups.2',
-                [
-                    'detail' => 'test detail',
-                    'source' => ['pointer' => '/data/relationships/groups/data/2']
-                ]
-            ],
-            [
-                'nonMappedPointer',
-                [
-                    'detail' => 'test detail. Source: nonMappedPointer.'
-                ]
-            ]
-        ];
+        $metadata = new EntityMetadata();
+        $firstNameField = new FieldMetadata();
+        $firstNameField->setName('firstName');
+        $metadata->addField($firstNameField);
+
+        $error = new Error();
+        $error->setDetail('test detail');
+        $error->setSource(ErrorSource::createByPropertyPath('firstName'));
+
+        $expectedError = new Error();
+        $expectedError->setDetail('test detail');
+        $expectedError->setSource(ErrorSource::createByPointer('/data/attributes/firstName'));
+
+        $this->errorCompleter->complete($error, $metadata);
+        $this->assertEquals($expectedError, $error);
+    }
+
+    public function testCompleteErrorForToOneAssociation()
+    {
+        $metadata = new EntityMetadata();
+        $userAssociation = new AssociationMetadata();
+        $userAssociation->setName('user');
+        $metadata->addAssociation($userAssociation);
+
+        $error = new Error();
+        $error->setDetail('test detail');
+        $error->setSource(ErrorSource::createByPropertyPath('user'));
+
+        $expectedError = new Error();
+        $expectedError->setDetail('test detail');
+        $expectedError->setSource(ErrorSource::createByPointer('/data/relationships/user/data'));
+
+        $this->errorCompleter->complete($error, $metadata);
+        $this->assertEquals($expectedError, $error);
+    }
+
+    public function testCompleteErrorForToManyAssociation()
+    {
+        $metadata = new EntityMetadata();
+        $groupsAssociation = new AssociationMetadata();
+        $groupsAssociation->setName('groups');
+        $groupsAssociation->setIsCollection(true);
+        $metadata->addAssociation($groupsAssociation);
+
+        $error = new Error();
+        $error->setDetail('test detail');
+        $error->setSource(ErrorSource::createByPropertyPath('groups'));
+
+        $expectedError = new Error();
+        $expectedError->setDetail('test detail');
+        $expectedError->setSource(ErrorSource::createByPointer('/data/relationships/groups/data'));
+
+        $this->errorCompleter->complete($error, $metadata);
+        $this->assertEquals($expectedError, $error);
+    }
+
+    public function testCompleteErrorForChildOfToManyAssociation()
+    {
+        $metadata = new EntityMetadata();
+        $groupsAssociation = new AssociationMetadata();
+        $groupsAssociation->setName('groups');
+        $groupsAssociation->setIsCollection(true);
+        $metadata->addAssociation($groupsAssociation);
+
+        $error = new Error();
+        $error->setDetail('test detail');
+        $error->setSource(ErrorSource::createByPropertyPath('groups.2'));
+
+        $expectedError = new Error();
+        $expectedError->setDetail('test detail');
+        $expectedError->setSource(ErrorSource::createByPointer('/data/relationships/groups/data/2'));
+
+        $this->errorCompleter->complete($error, $metadata);
+        $this->assertEquals($expectedError, $error);
+    }
+
+    public function testCompleteErrorForNotMappedPointer()
+    {
+        $error = new Error();
+        $error->setDetail('test detail');
+        $error->setSource(ErrorSource::createByPropertyPath('notMappedPointer'));
+
+        $expectedError = new Error();
+        $expectedError->setDetail('test detail. Source: notMappedPointer.');
+
+        $this->errorCompleter->complete($error, new EntityMetadata());
+        $this->assertEquals($expectedError, $error);
+    }
+
+    public function testCompleteErrorForCollapsedArrayAssociation()
+    {
+        $metadata = new EntityMetadata();
+        $groupsAssociation = new AssociationMetadata();
+        $groupsAssociation->setName('groups');
+        $groupsAssociation->setIsCollection(true);
+        $groupsAssociation->setDataType('array');
+        $groupsAssociation->setCollapsed();
+        $metadata->addAssociation($groupsAssociation);
+
+        $error = new Error();
+        $error->setDetail('test detail');
+        $error->setSource(ErrorSource::createByPropertyPath('groups'));
+
+        $expectedError = new Error();
+        $expectedError->setDetail('test detail');
+        $expectedError->setSource(ErrorSource::createByPointer('/data/attributes/groups'));
+
+        $this->errorCompleter->complete($error, $metadata);
+        $this->assertEquals($expectedError, $error);
+    }
+
+    public function testCompleteErrorForChildOfCollapsedArrayAssociation()
+    {
+        $metadata = new EntityMetadata();
+        $groupsAssociation = new AssociationMetadata();
+        $groupsAssociation->setName('groups');
+        $groupsAssociation->setIsCollection(true);
+        $groupsAssociation->setDataType('array');
+        $groupsAssociation->setCollapsed();
+        $metadata->addAssociation($groupsAssociation);
+
+        $error = new Error();
+        $error->setDetail('test detail');
+        $error->setSource(ErrorSource::createByPropertyPath('groups.1'));
+
+        $expectedError = new Error();
+        $expectedError->setDetail('test detail');
+        $expectedError->setSource(ErrorSource::createByPointer('/data/attributes/groups/1'));
+
+        $this->errorCompleter->complete($error, $metadata);
+        $this->assertEquals($expectedError, $error);
+    }
+
+    public function testCompleteErrorForChildFieldOfCollapsedArrayAssociation()
+    {
+        $metadata = new EntityMetadata();
+        $groupsAssociation = new AssociationMetadata();
+        $groupsAssociation->setName('groups');
+        $groupsAssociation->setIsCollection(true);
+        $groupsAssociation->setDataType('array');
+        $groupsAssociation->setCollapsed();
+        $metadata->addAssociation($groupsAssociation);
+
+        $error = new Error();
+        $error->setDetail('test detail');
+        $error->setSource(ErrorSource::createByPropertyPath('groups.1.name'));
+
+        $expectedError = new Error();
+        $expectedError->setDetail('test detail');
+        $expectedError->setSource(ErrorSource::createByPointer('/data/attributes/groups/1'));
+
+        $this->errorCompleter->complete($error, $metadata);
+        $this->assertEquals($expectedError, $error);
+    }
+
+    public function testCompleteErrorForNotCollapsedArrayAssociation()
+    {
+        $metadata = new EntityMetadata();
+        $groupsAssociation = new AssociationMetadata();
+        $groupsAssociation->setName('groups');
+        $groupsAssociation->setIsCollection(true);
+        $groupsAssociation->setDataType('array');
+        $metadata->addAssociation($groupsAssociation);
+
+        $error = new Error();
+        $error->setDetail('test detail');
+        $error->setSource(ErrorSource::createByPropertyPath('groups'));
+
+        $expectedError = new Error();
+        $expectedError->setDetail('test detail');
+        $expectedError->setSource(ErrorSource::createByPointer('/data/attributes/groups'));
+
+        $this->errorCompleter->complete($error, $metadata);
+        $this->assertEquals($expectedError, $error);
+    }
+
+    public function testCompleteErrorForChildOfNotCollapsedArrayAssociation()
+    {
+        $metadata = new EntityMetadata();
+        $groupsAssociation = new AssociationMetadata();
+        $groupsAssociation->setName('groups');
+        $groupsAssociation->setIsCollection(true);
+        $groupsAssociation->setDataType('array');
+        $metadata->addAssociation($groupsAssociation);
+
+        $error = new Error();
+        $error->setDetail('test detail');
+        $error->setSource(ErrorSource::createByPropertyPath('groups.1'));
+
+        $expectedError = new Error();
+        $expectedError->setDetail('test detail');
+        $expectedError->setSource(ErrorSource::createByPointer('/data/attributes/groups/1'));
+
+        $this->errorCompleter->complete($error, $metadata);
+        $this->assertEquals($expectedError, $error);
+    }
+
+    public function testCompleteErrorForChildFieldOfNotCollapsedArrayAssociation()
+    {
+        $metadata = new EntityMetadata();
+        $groupsAssociation = new AssociationMetadata();
+        $groupsAssociation->setName('groups');
+        $groupsAssociation->setIsCollection(true);
+        $groupsAssociation->setDataType('array');
+        $metadata->addAssociation($groupsAssociation);
+
+        $error = new Error();
+        $error->setDetail('test detail');
+        $error->setSource(ErrorSource::createByPropertyPath('groups.1.name'));
+
+        $expectedError = new Error();
+        $expectedError->setDetail('test detail');
+        $expectedError->setSource(ErrorSource::createByPointer('/data/attributes/groups/1/name'));
+
+        $this->errorCompleter->complete($error, $metadata);
+        $this->assertEquals($expectedError, $error);
     }
 }

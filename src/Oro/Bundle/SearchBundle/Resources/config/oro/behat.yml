@@ -1,0 +1,17 @@
+elements:
+  TypeSelectButton:
+    selector: '#search-bar-button'
+    class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Element
+
+  TypeSelector:
+    selector: '#search-bar-dropdown'
+    class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Element
+
+  SearchSuggestionsDropdown:
+    selector: '#search-dropdown ul'
+    class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Element
+
+pages:
+  Search Result:
+    class: Oro\Bundle\SearchBundle\Tests\Behat\Page\SearchResult
+    route: 'oro_search_results'

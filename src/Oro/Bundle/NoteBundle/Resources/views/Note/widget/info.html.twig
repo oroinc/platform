@@ -1,3 +1,4 @@
+{## activity action template#}
 {% import 'OroUIBundle::macros.html.twig' as UI %}
 <div class="widget-content form-horizontal box-content row-fluid">
     <div class="responsive-block">
@@ -12,7 +13,7 @@
             <div class="attachment-item">
                 <div class="thumbnail">
                     {% if attachment.attachmentThumbnail  %}
-                        <a href="{{ attachment.attachmentURL }}" class="no-hash" title="{{ attachment.attachmentFileName }}">
+                        <a href="{{ attachment.attachmentURL }}" data-gallery="note-view-{{ entity.id }}" class="no-hash" title="{{ attachment.attachmentFileName }}">
                             <span class="thumbnail" style="background: url('{{ attachment.attachmentThumbnail  }}') 50% 50% no-repeat;"></span>
                         </a>
                     {% else  %}
@@ -23,6 +24,11 @@
                     <a class="no-hash dropdown-toggle file-menu" href="javascript: void(0);" data-toggle="dropdown">
                         <i class="fa {{ attachment.attachmentIcon }}"></i> {{ attachment.attachmentFileName }}
                     </a>
+                    <ul class="dropdown-menu file-menu" role="menu" aria-labelledby="dropdownMenu">
+                        <a class="no-hash" tabindex="-1" href="{{ attachment.attachmentURL }}">
+                            {{ 'oro.translation.action.download'|trans }}<span>{{ attachment.attachmentSize }}</span>
+                        </a>
+                    </ul>
                 </div>
             </div>
         </div>

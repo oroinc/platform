@@ -1,0 +1,18 @@
+oro.currency:
+    system_configuration:
+        groups:
+            currency.title: 'Currency'
+            currency_settings.title: 'Currency settings'
+        fields:
+            allowed_currencies.label: 'Allowed Currencies'
+            default_currency.lable: 'Default Currency'
+            currency_display:
+                  label: 'Display format'
+                  choices:
+                      iso_code: 'Currency Code'
+                      symbol: 'Currency Symbol'
+    currency.form.choose: 'Choose Currency...'
+    form:
+        tooltip:
+            currency: "Select the default currency"
+            currency_display: 'Dispaly currency ISO code like "USD" or currency symbol like "$"'

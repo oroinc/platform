@@ -157,7 +157,6 @@ class AclConditionalFactorBuilder
                 );
 
                 return $resultCondition;
-
             } else {
                 $leftExpression                              = new ArithmeticExpression();
                 $leftExpression->simpleArithmeticExpression  = $pathExpression;

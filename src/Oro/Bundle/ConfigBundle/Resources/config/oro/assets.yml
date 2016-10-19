@@ -1,0 +1,4 @@
+assets:
+    css:
+        'oroconfig':
+          - 'bundles/oroconfig/css/less/config.less'

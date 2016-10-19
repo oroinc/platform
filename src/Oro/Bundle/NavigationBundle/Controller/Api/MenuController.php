@@ -33,7 +33,7 @@ class MenuController extends Controller
      * @Delete("/menu/{ownershipType}/{menuName}/{key}")
      *
      * @ApiDoc(
-     *  description="Delete menu item in specified scope."
+     *  description="Delete or hide menu item."
      * )
      *
      * @param string $ownershipType
@@ -53,7 +53,6 @@ class MenuController extends Controller
             $ownershipType,
             $this->getCurrentOwnerId($ownershipType)
         );
-
         if ($menuUpdate === null) {
             throw $this->createNotFoundException();
         }
@@ -71,6 +70,50 @@ class MenuController extends Controller
         $entityManager->flush($menuUpdate);
 
         return new JsonResponse(null, Response::HTTP_NO_CONTENT);
+    }
+
+    /**
+     * @Put("/menu/show/{ownershipType}/{menuName}/{key}")
+     *
+     * @ApiDoc(
+     *  description="Make menu item visible."
+     * )
+     *
+     * @param string $ownershipType
+     * @param string $menuName
+     * @param string $key
+     *
+     * @return Response
+     */
+    public function showAction($ownershipType, $menuName, $key)
+    {
+        /** @var MenuUpdateManager $manager */
+        $manager = $this->get('oro_navigation.manager.menu_update_default');
+        $manager->showMenuItem($menuName, $key, $ownershipType, $this->getCurrentOwnerId($ownershipType));
+
+        return new JsonResponse(null, Response::HTTP_OK);
+    }
+
+    /**
+     * @Put("/menu/hide/{ownershipType}/{menuName}/{key}")
+     *
+     * @ApiDoc(
+     *  description="Make menu item hidden."
+     * )
+     *
+     * @param string $ownershipType
+     * @param string $menuName
+     * @param string $key
+     *
+     * @return Response
+     */
+    public function hideAction($ownershipType, $menuName, $key)
+    {
+        /** @var MenuUpdateManager $manager */
+        $manager = $this->get('oro_navigation.manager.menu_update_default');
+        $manager->hideMenuItem($menuName, $key, $ownershipType, $this->getCurrentOwnerId($ownershipType));
+
+        return new JsonResponse(null, Response::HTTP_OK);
     }
 
     /**
@@ -94,14 +137,14 @@ class MenuController extends Controller
             $this->getCurrentOwnerId($ownershipType)
         );
 
-        /** @var EntityManager $entityManager */
-        $entityManager = $this->getDoctrine()->getManagerForClass(MenuUpdate::class);
+        /** @var EntityManager $em */
+        $em = $this->getDoctrine()->getManagerForClass(MenuUpdate::class);
 
         foreach ($updates as $update) {
-            $entityManager->remove($update);
+            $em->remove($update);
         }
 
-        $entityManager->flush($updates);
+        $em->flush($updates);
 
         return new JsonResponse(null, Response::HTTP_NO_CONTENT);
     }
@@ -147,8 +190,8 @@ class MenuController extends Controller
             }
         }
 
-        /** @var EntityManager $entityManager */
-        $entityManager = $this->getDoctrine()->getManagerForClass(MenuUpdate::class);
+        /** @var EntityManager $em */
+        $em = $this->getDoctrine()->getManagerForClass(MenuUpdate::class);
 
         $updates = array_merge(
             [$currentUpdate],
@@ -162,11 +205,11 @@ class MenuController extends Controller
                 break;
             }
 
-            $entityManager->persist($update);
+            $em->persist($update);
         }
 
         if (!count($errors)) {
-            $entityManager->flush($updates);
+            $em->flush($updates);
             return new JsonResponse(['status' => true], Response::HTTP_OK);
         }
 

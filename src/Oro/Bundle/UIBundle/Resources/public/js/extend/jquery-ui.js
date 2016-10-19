@@ -1,5 +1,9 @@
-define(['jquery', 'jquery-ui'], function($) {
+define(function(require) {
     'use strict';
+
+    var $ = require('jquery');
+    var mask = require('oroui/js/dropdown-mask');
+    require('jquery-ui');
 
     /* datepicker extend:start */
     (function() {
@@ -73,6 +77,14 @@ define(['jquery', 'jquery-ui'], function($) {
 
         var _showDatepicker = $.datepicker.constructor.prototype._showDatepicker;
         var _hideDatepicker = $.datepicker.constructor.prototype._hideDatepicker;
+        var _attachments = $.datepicker.constructor.prototype._attachments;
+
+        $.datepicker.constructor.prototype._attachments = function($input, inst) {
+            $input
+                .off('click', this._showDatepicker)
+                .click(this._showDatepicker);
+            _attachments.call(this, $input, inst);
+        };
 
         /**
          * Bind update position method after datepicker is opened
@@ -87,6 +99,10 @@ define(['jquery', 'jquery-ui'], function($) {
             var input = elem.target || elem;
             var $input = $(input);
             var events = getEvents($input.id);
+
+            var inst = $.datepicker._getInst(input);
+            // set bigger zIndex difference between dropdown and input, to have place for dropdown mask
+            inst.dpDiv.css('z-index', Number(inst.dpDiv.css('z-index')) + 2);
 
             $input
                 .removeClass(dropdownClassName + ' ' + dropupClassName)
@@ -140,8 +156,9 @@ define(['jquery', 'jquery-ui'], function($) {
             if (!this._curInst) {
                 return;
             }
-            if (this._curInst.dpDiv) {
-                this._curInst.dpDiv.remove();
+            if (this._curInst.input) {
+                this._curInst.input.datepicker('hide')
+                    .off('click', this._showDatepicker);
             }
             original._destroyDatepicker.apply(this, arguments);
         };
@@ -151,6 +168,18 @@ define(['jquery', 'jquery-ui'], function($) {
             $.datepicker._hideDatepicker();
         }
     });
+    $(document)
+        .on('datepicker:dialogShow', function(e) {
+            var $input = $(e.target);
+            var zIndex = $.datepicker._getInst(e.target).dpDiv.css('zIndex');
+            mask.show(zIndex - 1)
+                .onhide(function() {
+                    $input.datepicker('hide');
+                });
+        })
+        .on('datepicker:dialogHide', function(e) {
+            mask.hide();
+        });
     /* datepicker extend:end */
 
     /* dialog extend:start*/

@@ -146,7 +146,6 @@ class ConfigurableAddOrReplaceStrategy extends AbstractImportStrategy
                         $this->newEntitiesHelper->incrementEntityUsage($this->getEntityHashKey($existingEntity));
                     }
                 }
-
             }
 
             $this->databaseHelper->resetIdentifier($entity);
