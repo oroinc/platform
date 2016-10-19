@@ -11,6 +11,7 @@ use Oro\Bundle\TranslationBundle\Translation\KeySource\TranslationKeySource;
 use Oro\Bundle\TranslationBundle\Translation\TranslationKeyGenerator;
 
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
+use Oro\Bundle\WorkflowBundle\Helper\WorkflowTranslationHelper;
 use Oro\Bundle\WorkflowBundle\Translation\KeyTemplate\WorkflowTemplate;
 
 class WorkflowFilter extends EntityFilter
@@ -18,16 +19,25 @@ class WorkflowFilter extends EntityFilter
     /** @var TranslationKeyGenerator */
     protected $generator;
 
+    /** @var WorkflowTranslationHelper */
+    protected $translationHelper;
+
     /**
      * @param FormFactoryInterface $factory
      * @param FilterUtility $util
      * @param TranslationKeyGenerator $generator
+     * @param WorkflowTranslationHelper $translationHelper
      */
-    public function __construct(FormFactoryInterface $factory, FilterUtility $util, TranslationKeyGenerator $generator)
-    {
+    public function __construct(
+        FormFactoryInterface $factory,
+        FilterUtility $util,
+        TranslationKeyGenerator $generator,
+        WorkflowTranslationHelper $translationHelper
+    ) {
         parent::__construct($factory, $util);
 
         $this->generator = $generator;
+        $this->translationHelper = $translationHelper;
     }
 
     /**
@@ -37,8 +47,18 @@ class WorkflowFilter extends EntityFilter
     {
         $params[FilterUtility::FORM_OPTIONS_KEY]['field_options']['class'] = WorkflowDefinition::class;
         $params[FilterUtility::FORM_OPTIONS_KEY]['field_options']['multiple'] = false;
+        $params[FilterUtility::FORM_OPTIONS_KEY]['field_options']['choice_label'] = [$this, 'getLabel'];
 
         parent::init($name, $params);
+    }
+
+    /**
+     * @param WorkflowDefinition $definition
+     * @return string
+     */
+    public function getLabel(WorkflowDefinition $definition)
+    {
+        return $this->translationHelper->findTranslation($definition->getLabel());
     }
 
     /**

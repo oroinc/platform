@@ -236,6 +236,12 @@ services:
             - '@doctrine'
             - '@oro_translation.database_translation.metadata.cache'
 
+    oro_translation.helper.translation:
+        class: 'Oro\Bundle\TranslationBundle\Helper\TranslationHelper'
+        arguments:
+            - '@doctrine'
+            - '@oro_translation.manager.translation'
+
     oro_translation.filter.language:
         class: 'Oro\Bundle\TranslationBundle\Filter\LanguageFilter'
         parent: oro_filter.entity_filter

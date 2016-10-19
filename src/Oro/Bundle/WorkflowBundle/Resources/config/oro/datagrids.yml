@@ -121,6 +121,10 @@ datagrids:
         columns:
             label:
                 label:         oro.workflow.workflowdefinition.label.label
+                type:          callback
+                callable:      ["@oro_workflow.helper.translation", "findTranslation"]
+                params:
+                    - label
             relatedEntity:
                 label:         oro.workflow.workflowdefinition.related_entity.label
                 data_name:     relatedEntity

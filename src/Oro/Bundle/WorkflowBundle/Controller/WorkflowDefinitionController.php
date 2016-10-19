@@ -7,12 +7,12 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
-use Symfony\Component\Translation\TranslatorInterface;
 
 use Oro\Bundle\SecurityBundle\Annotation\Acl;
 use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Form\Type\WorkflowReplacementSelectType;
+use Oro\Bundle\WorkflowBundle\Helper\WorkflowTranslationHelper;
 use Oro\Bundle\WorkflowBundle\Model\Workflow;
 
 /**
@@ -82,36 +82,17 @@ class WorkflowDefinitionController extends Controller
             throw new AccessDeniedHttpException('System workflow definitions are not editable');
         }
 
+        $this->getTranslationHelper()->extractTranslations($workflowDefinition);
+
         $form = $this->get('oro_workflow.form.workflow_definition');
         $form->setData($workflowDefinition);
 
         return array(
             'form' => $form->createView(),
             'entity' => $workflowDefinition,
-            'workflowConfiguration' => $this->prepareConfiguration($workflowDefinition),
             'system_entities' => $this->get('oro_entity.entity_provider')->getEntities(),
             'delete_allowed' => true,
         );
-    }
-
-    /**
-     * Prepares workflow configuration to display. Translates attribute labels.
-     *
-     * @param WorkflowDefinition $workflowDefinition
-     * @return array
-     */
-    protected function prepareConfiguration(WorkflowDefinition $workflowDefinition)
-    {
-        /** @var TranslatorInterface $translator */
-        $translator = $this->get('translator');
-        $configuration = $workflowDefinition->getConfiguration();
-
-        if (isset($configuration['attributes'])) {
-            foreach ($configuration['attributes'] as $attrName => $attrConfig) {
-                $configuration['attributes'][$attrName]['translated_label'] = $translator->trans($attrConfig['label']);
-            }
-        }
-        return $configuration;
     }
 
     /**
@@ -127,9 +108,10 @@ class WorkflowDefinitionController extends Controller
      */
     public function viewAction(WorkflowDefinition $workflowDefinition)
     {
+        $this->getTranslationHelper()->extractTranslations($workflowDefinition);
+
         return array(
             'entity' => $workflowDefinition,
-            'workflowConfiguration' => $this->prepareConfiguration($workflowDefinition),
             'system_entities' => $this->get('oro_entity.entity_provider')->getEntities()
         );
     }
@@ -187,7 +169,7 @@ class WorkflowDefinitionController extends Controller
                     $workflowsToDeactivation
                 )
             );
-            
+
             $deactivated = [];
             foreach ($workflowNames as $workflowName) {
                 if ($workflowName && $workflowManager->isActiveWorkflow($workflowName)) {
@@ -199,7 +181,7 @@ class WorkflowDefinitionController extends Controller
                     $deactivated[] = $workflow->getLabel();
                 }
             }
-            
+
             $response['deactivated'] = $deactivated;
 
             $workflowManager->activateWorkflow($workflowDefinition->getName());
@@ -223,5 +205,13 @@ class WorkflowDefinitionController extends Controller
                 return $workflow->getName() !== $workflowDefinition->getName();
             }
         );
+    }
+
+    /**
+     * @return WorkflowTranslationHelper
+     */
+    protected function getTranslationHelper()
+    {
+        return $this->get('oro_workflow.helper.translation');
     }
 }
