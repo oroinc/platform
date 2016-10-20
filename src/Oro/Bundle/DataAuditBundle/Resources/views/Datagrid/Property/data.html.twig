@@ -5,7 +5,7 @@
     {% if fieldKey == 'auditData' %}
         {% for collKey, collValue in fieldValue.new %}
         <li>
-            <b>{{ collKey }}:</b>
+            <b>{{ oro_field_config_value(record.getValue('objectClass'), collKey, 'label')|default(collKey)|trans }}:</b>
             {% if fieldValue.old|length %}
                 <s>{{ fieldValue.old[collKey] }}</s>
             {% endif %}
@@ -14,7 +14,7 @@
         {% endfor %}
     {% else %}
         <li>
-            <b>{{ fieldKey }}:</b>
+            <b>{{ oro_field_config_value(record.getValue('objectClass'), fieldKey, 'label')|default(fieldKey)|trans }}:</b>
             <s>{{ dataAudit.renderFieldValue(fieldValue.old) }}</s>
             {{ dataAudit.renderFieldValue(fieldValue.new) }}
         </li>

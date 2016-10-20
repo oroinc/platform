@@ -8,16 +8,17 @@ namespace Oro\Bundle\CurrencyBundle\Converter;
 class CurrencyToString
 {
     /**
-     * @return callback
+     * @param string $moneyValue
+     * @param string $currency
+     *
+     * @return string
      */
-    public static function getConverterCallback()
+    public function convert($moneyValue, $currency)
     {
-        return function ($moneyValue, $currency) {
-            if ($currency !== null && $moneyValue !== null) {
-                return sprintf('%s%d', $currency, $moneyValue);
-            } else {
-                return '';
-            }
-        };
+        if ($currency !== null && $moneyValue !== null) {
+            return sprintf('%s%s', $currency, $moneyValue);
+        }
+
+        return '';
     }
 }
