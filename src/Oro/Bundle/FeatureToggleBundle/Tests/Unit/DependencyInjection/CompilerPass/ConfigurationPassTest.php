@@ -3,6 +3,7 @@
 namespace Oro\Bundle\FeatureToggleBundle\Tests\Unit\DependencyInjection\CompilerPass;
 
 use Doctrine\Common\Cache\ClearableCache;
+use Oro\Bundle\ConfigBundle\DependencyInjection\Compiler\SystemConfigurationPass;
 use Oro\Bundle\FeatureToggleBundle\DependencyInjection\CompilerPass\ConfigurationPass;
 use Oro\Bundle\FeatureToggleBundle\Tests\Unit\Fixtures\Bundles\TestBundle1\TestBundle1;
 use Oro\Bundle\FeatureToggleBundle\Tests\Unit\Fixtures\Bundles\TestBundle2\TestBundle2;
@@ -88,6 +89,10 @@ class ConfigurationPassTest extends \PHPUnit_Framework_TestCase
             ->method('addMethodCall')
             ->with('addExtension', [new Reference('testConfigExtension')]);
 
+        $configBagDefinition = $this->getMockBuilder('Symfony\Component\DependencyInjection\Definition')
+            ->disableOriginalConstructor()
+            ->getMock();
+
         $container->expects($this->exactly(2))
             ->method('hasDefinition')
             ->withConsecutive(
@@ -95,16 +100,18 @@ class ConfigurationPassTest extends \PHPUnit_Framework_TestCase
                 [ConfigurationPass::PROVIDER]
             )
             ->willReturn(true);
-        $container->expects($this->exactly(2))
+        $container->expects($this->exactly(3))
             ->method('getDefinition')
             ->withConsecutive(
                 [ConfigurationPass::CONFIGURATION_SERVICE],
-                [ConfigurationPass::PROVIDER]
+                [ConfigurationPass::PROVIDER],
+                [SystemConfigurationPass::CONFIG_BAG_SERVICE]
             )
             ->willReturnMap(
                 [
                     [ConfigurationPass::CONFIGURATION_SERVICE, $configDefinition],
-                    [ConfigurationPass::PROVIDER, $providerDefinition]
+                    [ConfigurationPass::PROVIDER, $providerDefinition],
+                    [SystemConfigurationPass::CONFIG_BAG_SERVICE, $configBagDefinition],
                 ]
             );
         $container->expects($this->once())

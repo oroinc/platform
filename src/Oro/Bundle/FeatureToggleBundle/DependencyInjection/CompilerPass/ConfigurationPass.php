@@ -2,12 +2,14 @@
 
 namespace Oro\Bundle\FeatureToggleBundle\DependencyInjection\CompilerPass;
 
-use Oro\Bundle\FeatureToggleBundle\Configuration\FeatureToggleConfiguration;
-use Oro\Component\Config\Loader\CumulativeConfigLoader;
-use Oro\Component\Config\Loader\YamlCumulativeFileLoader;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
+
+use Oro\Bundle\ConfigBundle\DependencyInjection\Compiler\SystemConfigurationPass;
+use Oro\Bundle\FeatureToggleBundle\Configuration\FeatureToggleConfiguration;
+use Oro\Component\Config\Loader\CumulativeConfigLoader;
+use Oro\Component\Config\Loader\YamlCumulativeFileLoader;
 
 class ConfigurationPass implements CompilerPassInterface
 {
@@ -63,7 +65,39 @@ class ConfigurationPass implements CompilerPassInterface
 
             $providerDef = $container->getDefinition(self::PROVIDER);
             $providerDef->replaceArgument(0, $rawConfiguration);
+            $this->updateSystemConfiguration($container, $rawConfiguration);
         }
+    }
+
+    /**
+     * Updates fields for which we need to reload page when their value changes
+     *
+     * @param ContainerBuilder $container
+     * @param array $featuresConfigurations
+     */
+    protected function updateSystemConfiguration(ContainerBuilder $container, array $featuresConfigurations)
+    {
+        $togglesRequiringPageReload = [];
+        foreach ($featuresConfigurations as $featuresConfig) {
+            foreach ($featuresConfig as $featureConfig) {
+                if (!isset($featureConfig['toggle'], $featureConfig['configuration'])) {
+                    continue;
+                }
+
+                $togglesRequiringPageReload[] = $featureConfig['toggle'];
+            }
+        }
+
+        if (!$togglesRequiringPageReload) {
+            return;
+        }
+
+        $configBagDef = $container->getDefinition(SystemConfigurationPass::CONFIG_BAG_SERVICE);
+        $systemConfiguration = $configBagDef->getArgument(0);
+        foreach ($togglesRequiringPageReload as $toggle) {
+            $systemConfiguration['fields'][$toggle]['page_reload'] = true;
+        }
+        $configBagDef->replaceArgument(0, $systemConfiguration);
     }
 
     /**

@@ -22,6 +22,7 @@ class FormFieldType extends AbstractType
         $resolver->setDefaults(
             [
                 'target_field_options' => [],
+                'use_parent_field_options' => [],
                 'target_field_type'    => 'text',
                 'resettable'           => true,
                 'cascade_validation'   => true,
@@ -35,7 +36,7 @@ class FormFieldType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $useParentOptions = [];
+        $useParentOptions = $options['use_parent_field_options'];
         $useParentType    = 'oro_config_parent_scope_checkbox_type';
         if (!$options['resettable']) {
             $useParentOptions = ['data' => 0];
