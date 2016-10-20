@@ -1,5 +1,4 @@
 {% extends 'OroUIBundle:actions:view.html.twig' %}
-{% import 'OroUIBundle::macros.html.twig' as macros %}
 {% import 'OroWorkflowBundle::macros.html.twig' as workflowMacros %}
 
 {% oro_title_set({params : {"%workflow_definition.label%": entity.label} }) %}
@@ -190,7 +189,49 @@
 
 {% block content_data %}
     {% set workflowDefinitionInfo %}
-        {% include 'OroWorkflowBundle:WorkflowDefinition:widget/info.html.twig' with { entity: entity } %}
+    <div class="widget-content">
+        <div class="row-fluid form-horizontal">
+            <div class="responsive-block">
+                {{ UI.renderHtmlProperty('oro.workflow.workflowdefinition.label.label'|trans, entity.label ~ workflowMacros.renderGoToTranslationsIconByLink(translateLinks.label) ) }}
+
+                {{ UI.renderProperty(
+                    'oro.workflow.workflowdefinition.related_entity.label'|trans,
+                    oro_entity_config_value(entity.relatedEntity, 'label')|trans
+                ) }}
+                {{ UI.renderProperty(
+                    'oro.workflow.block.view.workflow.default_step'|trans,
+                    entity.startStep ? entity.startStep.label : ''
+                ) }}
+                {{ UI.renderProperty(
+                    'oro.workflow.workflowdefinition.steps_display_ordered.label'|trans,
+                    entity.stepsDisplayOrdered ? 'Yes'|trans : 'No'|trans
+                ) }}
+                {{ UI.renderProperty(
+                    'oro.workflow.workflowdefinition.priority.label'|trans,
+                    entity.priority
+                ) }}
+
+                {% set activeGroups %}
+                    {% if entity.exclusiveActiveGroups is not empty %}
+                        {{ UI.renderList(entity.exclusiveActiveGroups) }}
+                    {% else %}
+                        {{ 'N/A'|trans }}
+                    {% endif %}
+                {% endset %}
+
+                {% set recordGroups %}
+                    {% if entity.exclusiveRecordGroups is not empty %}
+                        {{ UI.renderList(entity.exclusiveRecordGroups) }}
+                    {% else %}
+                        {{ 'N/A'|trans }}
+                    {% endif %}
+                {% endset %}
+
+                {{ UI.renderHtmlProperty('oro.workflow.workflowdefinition.exclusive_active_groups.label'|trans, activeGroups) }}
+                {{ UI.renderHtmlProperty('oro.workflow.workflowdefinition.exclusive_record_groups.label'|trans, recordGroups) }}
+            </div>
+        </div>
+    </div>
     {% endset %}
 
     {% set workflowStepsAndTransitions %}

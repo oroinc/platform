@@ -121,27 +121,6 @@ class WorkflowDefinitionController extends Controller
     }
 
     /**
-     * @Route(
-     *      "/info/{name}",
-     *      name="oro_workflow_definition_info"
-     * )
-     * @AclAncestor("oro_workflow_definition_view")
-     * @Template
-     *
-     * @param WorkflowDefinition $workflowDefinition
-     * @return array
-     */
-    public function infoAction(WorkflowDefinition $workflowDefinition)
-    {
-        $translateLinks = $this->getTranslateLinks($workflowDefinition);
-
-        return array(
-            'entity' => $workflowDefinition,
-            'translateLinks' => $translateLinks,
-        );
-    }
-
-    /**
      * Activate WorkflowDefinition form
      *
      * @Route("/activate-form/{name}", name="oro_workflow_definition_activate_from_widget")

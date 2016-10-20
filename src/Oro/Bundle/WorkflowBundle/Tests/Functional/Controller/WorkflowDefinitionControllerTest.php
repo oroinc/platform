@@ -72,31 +72,14 @@ class WorkflowDefinitionControllerTest extends WebTestCase
         $this->assertHtmlResponseStatusCodeEquals($response, 200);
 
         $this->assertNotEmpty($crawler->html());
-        $this->assertContains(LoadWorkflowDefinitions::MULTISTEP, $crawler->html());
-    }
 
-    public function testInfoAction()
-    {
-        $crawler = $this->client->request(
-            'GET',
-            $this->getUrl('oro_workflow_definition_info', [
-                '_widgetContainer' => 'dialog',
-                'name' => LoadWorkflowDefinitions::WITH_GROUPS1
-            ]),
-            [],
-            [],
-            $this->generateBasicAuthHeader()
-        );
-        $response = $this->client->getResponse();
-        $this->assertHtmlResponseStatusCodeEquals($response, 200);
+        $workflow = $this->workflowManager->getWorkflow(LoadWorkflowDefinitions::MULTISTEP);
 
-        $this->assertNotEmpty($crawler->html());
-        $workflow = $this->workflowManager->getWorkflow(LoadWorkflowDefinitions::WITH_GROUPS1);
         $this->assertContains($workflow->getLabel(), $crawler->html());
+
         if ($workflow->getStepManager()->getStartStep()) {
             $this->assertContains($workflow->getStepManager()->getStartStep()->getLabel(), $crawler->html());
         }
-        $this->assertContainGroups($crawler->html());
     }
 
     public function testActivateFormAction()

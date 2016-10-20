@@ -37,32 +37,20 @@ define(function(require) {
         _createWorkflowModel: function(options) {
             var configuration = options.entity.configuration;
             var translateLinks = options.entity.translateLinks;
-            var stepsConfig = _.map(configuration.steps, this._mergeName);
-            if (translateLinks) {
-                _.each(stepsConfig, function (step) {
-                    step.translateLinks = translateLinks.steps[step.name];
-                });
-            }
-            configuration.steps = new StepCollection(stepsConfig);
 
-            var transitionsConfig = _.map(configuration.transitions, this._mergeName);
-            if (translateLinks) {
-                _.each(transitionsConfig, function (transition) {
-                    transition.translateLinks = translateLinks.transitions[transition.name];
-                });
-            }
-            configuration.transitions = new TransitionCollection(transitionsConfig);
+            configuration.steps = new StepCollection(this._getNodeConfiguration(configuration, 'steps', translateLinks));
+
+            configuration.transitions = new TransitionCollection(
+                this._getNodeConfiguration(configuration, 'transitions', translateLinks)
+            );
+
+            configuration.attributes = new AttributeCollection(
+                this._getNodeConfiguration(configuration, 'attributes', translateLinks)
+            );
 
             configuration.transition_definitions = new TransitionDefinitionCollection(
-                _.map(configuration.transition_definitions, this._mergeName));
-
-            var attributesConfig = _.map(configuration.attributes, this._mergeName);
-            if (translateLinks) {
-                _.each(attributesConfig, function (attribute) {
-                    attribute.translateLinks = translateLinks.attributes[attribute.name];
-                });
-            }
-            configuration.attributes = new AttributeCollection(attributesConfig);
+                this._getNodeConfiguration(configuration, 'transition_definitions', translateLinks)
+            );
 
             configuration.name = options.entity.name;
             configuration.label = options.entity.label;
@@ -75,7 +63,7 @@ define(function(require) {
             workflowModel.setSystemEntities(options.system_entities);
 
             workflowModel.url = options._sourceElement.attr('action');
-            if (translateLinks) {
+            if (translateLinks && 'label' in translateLinks) {
                 workflowModel.translateLinkLabel = translateLinks.label;
             }
 
@@ -119,13 +107,35 @@ define(function(require) {
          * Helper function. Callback for _.map;
          *
          * @param {Object} config
-         * @param {string} name
+         * @param {string} node
+         * @param {Object} translateLinks
+         * @returns {Object}
+         * @private
+         */
+
+        /**
+         * Helper function. Callback for _.map;
+         *
+         * @param {Object} config
+         * @param {string} node
          * @returns {Object}
          * @private
          */
         _mergeName: function(config, name) {
             config.name = name;
             return config;
+        },
+        _getNodeConfiguration: function(config, node, translateLinks) {
+            var updateConfig = [];
+            _.each(config[node], function (item, name) {
+                item.name = name;
+                if (translateLinks && node in translateLinks && name in translateLinks[node]) {
+                    item.translateLinks = translateLinks[node][name];
+                }
+                updateConfig.push(item);
+            });
+
+            return updateConfig;
         }
     };
 });
