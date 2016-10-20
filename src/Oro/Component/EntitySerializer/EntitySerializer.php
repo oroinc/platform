@@ -185,18 +185,24 @@ class EntitySerializer
     }
 
     /**
-     * @param QueryBuilder       $qb     A query builder is used to get data
-     * @param EntityConfig|array $config Serialization rules
+     * @param QueryBuilder       $qb      A query builder is used to get data
+     * @param EntityConfig|array $config  Serialization rules
+     * @param array              $context Options post serializers and data transformers have access to
      *
      * @return array
      */
-    public function serialize(QueryBuilder $qb, $config)
+    public function serialize(QueryBuilder $qb, $config, array $context = [])
     {
         $entityConfig = $this->normalizeConfig($config);
 
         $this->updateQuery($qb, $entityConfig);
         $data = $this->queryFactory->getQuery($qb, $entityConfig)->getResult();
-        $data = $this->serializeItems((array)$data, $this->doctrineHelper->getRootEntityClass($qb), $entityConfig);
+        $data = $this->serializeItems(
+            (array)$data,
+            $this->doctrineHelper->getRootEntityClass($qb),
+            $entityConfig,
+            $context
+        );
 
         return $this->dataNormalizer->normalizeData($data, $entityConfig);
     }
@@ -205,14 +211,15 @@ class EntitySerializer
      * @param object[]           $entities    The list of entities to be serialized
      * @param string             $entityClass The entity class name
      * @param EntityConfig|array $config      Serialization rules
+     * @param array              $context     Options post serializers and data transformers have access to
      *
      * @return array
      */
-    public function serializeEntities(array $entities, $entityClass, $config)
+    public function serializeEntities(array $entities, $entityClass, $config, array $context = [])
     {
         $entityConfig = $this->normalizeConfig($config);
 
-        $data = $this->serializeItems($entities, $entityClass, $entityConfig);
+        $data = $this->serializeItems($entities, $entityClass, $entityConfig, $context);
 
         return $this->dataNormalizer->normalizeData($data, $entityConfig);
     }
@@ -244,12 +251,18 @@ class EntitySerializer
      * @param object[]     $entities    The list of entities to be serialized
      * @param string       $entityClass The entity class name
      * @param EntityConfig $config      Serialization rules
+     * @param array        $context     Options post serializers and data transformers have access to
      * @param bool         $useIdAsKey  Defines whether the entity id should be used as a key of the result array
      *
      * @return array
      */
-    protected function serializeItems(array $entities, $entityClass, EntityConfig $config, $useIdAsKey = false)
-    {
+    protected function serializeItems(
+        array $entities,
+        $entityClass,
+        EntityConfig $config,
+        array $context,
+        $useIdAsKey = false
+    ) {
         if (empty($entities)) {
             return [];
         }
@@ -260,20 +273,26 @@ class EntitySerializer
         if ($useIdAsKey) {
             foreach ($entities as $entity) {
                 $id          = $this->dataAccessor->getValue($entity, $idFieldName);
-                $result[$id] = $this->serializeItem($entity, $entityClass, $config);
+                $result[$id] = $this->serializeItem($entity, $entityClass, $config, $context);
             }
         } else {
             foreach ($entities as $entity) {
-                $result[] = $this->serializeItem($entity, $entityClass, $config);
+                $result[] = $this->serializeItem($entity, $entityClass, $config, $context);
             }
         }
 
-        $this->loadRelatedData($result, $entityClass, $this->getEntityIds($entities, $idFieldName), $config);
+        $this->loadRelatedData(
+            $result,
+            $entityClass,
+            $this->getEntityIds($entities, $idFieldName),
+            $config,
+            $context
+        );
 
         $postSerializeHandler = $config->getPostSerializeHandler();
         if (null !== $postSerializeHandler) {
             foreach ($result as &$resultItem) {
-                $resultItem = $this->postSerialize($resultItem, $postSerializeHandler);
+                $resultItem = $this->postSerialize($resultItem, $postSerializeHandler, $context);
             }
         }
 
@@ -284,13 +303,14 @@ class EntitySerializer
      * @param mixed        $entity
      * @param string       $entityClass
      * @param EntityConfig $config
+     * @param array        $context
      *
      * @return array
      *
      * @SuppressWarnings(PHPMD.NPathComplexity)
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
-    protected function serializeItem($entity, $entityClass, EntityConfig $config)
+    protected function serializeItem($entity, $entityClass, EntityConfig $config, array $context)
     {
         if (!$entity) {
             return [];
@@ -329,21 +349,27 @@ class EntitySerializer
                                 $this->doctrineHelper->getEntityIdFieldName($targetEntityClass)
                             );
 
-                            $value = $this->serializeItem($value, $targetEntityClass, $targetConfig);
+                            $value = $this->serializeItem($value, $targetEntityClass, $targetConfig, $context);
                             $items = [$value];
-                            $this->loadRelatedData($items, $targetEntityClass, [$targetEntityId], $targetConfig);
+                            $this->loadRelatedData(
+                                $items,
+                                $targetEntityClass,
+                                [$targetEntityId],
+                                $targetConfig,
+                                $context
+                            );
                             $value = reset($items);
 
                             $postSerializeHandler = $targetConfig->getPostSerializeHandler();
                             if (null !== $postSerializeHandler) {
-                                $value = $this->postSerialize($value, $postSerializeHandler);
+                                $value = $this->postSerialize($value, $postSerializeHandler, $context);
                             }
                         } else {
-                            $value = $this->transformValue($entityClass, $field, $value, $fieldConfig);
+                            $value = $this->transformValue($entityClass, $field, $value, $context, $fieldConfig);
                         }
                     }
                 } else {
-                    $value = $this->transformValue($entityClass, $field, $value, $fieldConfig);
+                    $value = $this->transformValue($entityClass, $field, $value, $context, $fieldConfig);
                 }
                 $result[$field] = $value;
             } elseif (null !== $fieldConfig) {
@@ -474,8 +500,9 @@ class EntitySerializer
      * @param string       $entityClass
      * @param array        $entityIds
      * @param EntityConfig $config
+     * @param array        $context
      */
-    protected function loadRelatedData(array &$result, $entityClass, $entityIds, EntityConfig $config)
+    protected function loadRelatedData(array &$result, $entityClass, $entityIds, EntityConfig $config, array $context)
     {
         $relatedData    = [];
         $entityMetadata = $this->doctrineHelper->getEntityMetadata($entityClass);
@@ -489,8 +516,8 @@ class EntitySerializer
             $targetConfig = $this->getTargetEntity($config, $field);
 
             $relatedData[$field] = $this->isSingleStepLoading($mapping['targetEntity'], $targetConfig)
-                ? $this->loadRelatedItemsForSimpleEntity($entityIds, $mapping, $targetConfig)
-                : $this->loadRelatedItems($entityIds, $mapping, $targetConfig);
+                ? $this->loadRelatedItemsForSimpleEntity($entityIds, $mapping, $targetConfig, $context)
+                : $this->loadRelatedItems($entityIds, $mapping, $targetConfig, $context);
         }
         if (!empty($relatedData)) {
             $this->applyRelatedData($result, $entityClass, $relatedData);
@@ -542,10 +569,11 @@ class EntitySerializer
      * @param array        $entityIds
      * @param array        $mapping
      * @param EntityConfig $config
+     * @param array        $context
      *
      * @return array [entityId => [field => value, ...], ...]
      */
-    protected function loadRelatedItems($entityIds, $mapping, EntityConfig $config)
+    protected function loadRelatedItems($entityIds, $mapping, EntityConfig $config, array $context)
     {
         $result = [];
 
@@ -560,7 +588,7 @@ class EntitySerializer
             foreach ($relatedItemIds as $relatedItemId) {
                 $relatedItem = [$resultFieldName => $relatedItemId];
                 if (null !== $postSerializeHandler) {
-                    $relatedItem = $this->postSerialize($relatedItem, $postSerializeHandler);
+                    $relatedItem = $this->postSerialize($relatedItem, $postSerializeHandler, $context);
                 }
                 $items[$relatedItemId] = $relatedItem;
             }
@@ -572,7 +600,7 @@ class EntitySerializer
             $this->updateQuery($qb, $config);
             $data = $this->queryFactory->getQuery($qb, $config)->getResult();
             if (!empty($data)) {
-                $items = $this->serializeItems((array)$data, $entityClass, $config, true);
+                $items = $this->serializeItems((array)$data, $entityClass, $config, $context, true);
             }
         }
         if (!empty($items)) {
@@ -665,11 +693,16 @@ class EntitySerializer
      * @param array        $entityIds
      * @param array        $mapping
      * @param EntityConfig $config
+     * @param array        $context
      *
      * @return array [entityId => [field => value, ...], ...]
      */
-    protected function loadRelatedItemsForSimpleEntity($entityIds, $mapping, EntityConfig $config)
-    {
+    protected function loadRelatedItemsForSimpleEntity(
+        $entityIds,
+        $mapping,
+        EntityConfig $config,
+        array $context
+    ) {
         $qb = $this->queryFactory->getToManyAssociationQueryBuilder($mapping, $entityIds);
 
         $orderBy = $config->getOrderBy();
@@ -689,13 +722,14 @@ class EntitySerializer
             if (null !== $postSerializeHandler) {
                 foreach ($items as $item) {
                     $result[$item['entityId']][] = $this->postSerialize(
-                        $this->serializeItem($item[0], $entityClass, $config),
-                        $postSerializeHandler
+                        $this->serializeItem($item[0], $entityClass, $config, $context),
+                        $postSerializeHandler,
+                        $context
                     );
                 }
             } else {
                 foreach ($items as $item) {
-                    $result[$item['entityId']][] = $this->serializeItem($item[0], $entityClass, $config);
+                    $result[$item['entityId']][] = $this->serializeItem($item[0], $entityClass, $config, $context);
                 }
             }
         } else {
@@ -708,13 +742,14 @@ class EntitySerializer
             if (null !== $postSerializeHandler) {
                 foreach ($items as $item) {
                     $result[$item['entityId']][] = $this->postSerialize(
-                        $this->serializeItem($item, $entityClass, $config),
-                        $postSerializeHandler
+                        $this->serializeItem($item, $entityClass, $config, $context),
+                        $postSerializeHandler,
+                        $context
                     );
                 }
             } else {
                 foreach ($items as $item) {
-                    $result[$item['entityId']][] = $this->serializeItem($item, $entityClass, $config);
+                    $result[$item['entityId']][] = $this->serializeItem($item, $entityClass, $config, $context);
                 }
             }
         }
@@ -813,43 +848,52 @@ class EntitySerializer
      * @param string           $entityClass
      * @param string           $fieldName
      * @param mixed            $fieldValue
+     * @param array            $context
      * @param FieldConfig|null $fieldConfig
      *
      * @return mixed
      */
-    protected function transformValue($entityClass, $fieldName, $fieldValue, FieldConfig $fieldConfig = null)
-    {
+    protected function transformValue(
+        $entityClass,
+        $fieldName,
+        $fieldValue,
+        array $context,
+        FieldConfig $fieldConfig = null
+    ) {
         return $this->dataTransformer->transform(
             $entityClass,
             $fieldName,
             $fieldValue,
-            null !== $fieldConfig ? $fieldConfig->toArray(true) : []
+            null !== $fieldConfig ? $fieldConfig->toArray(true) : [],
+            $context
         );
     }
 
     /**
      * @param array    $item
      * @param callable $handler
+     * @param array    $context
      *
      * @return array
      */
-    protected function postSerialize(array $item, $handler)
+    protected function postSerialize(array $item, $handler, array $context)
     {
-        // @deprecated since 1.9. New signature of 'post_serialize' callback is function (array $item) : array
+        // @deprecated since 1.9. New signature of 'post_serialize' callback is
+        // function (array $item, array $context) : array
         // Old signature was function (array &$item) : void
         // The following implementation supports both new and old signature of the callback
         // Remove this implementation when a support of old signature will not be required
         if ($handler instanceof \Closure) {
-            $handleResult = $handler($item);
+            $handleResult = $handler($item, $context);
             if (null !== $handleResult) {
                 $item = $handleResult;
             }
         } else {
-            $item = call_user_func($handler, $item);
+            $item = call_user_func($handler, $item, $context);
         }
 
         /* New implementation, uncomment it when a support of old signature will not be required
-        $item = call_user_func($handler, $item);
+        $item = call_user_func($handler, $item, $context);
         */
 
         return $item;
