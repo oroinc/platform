@@ -630,6 +630,59 @@
 {% endmacro %}
 
 {#
+    A button that sends request to server
+    Parameters - array:
+        [
+            'class' - default class
+            'aCss' - additional css class for 'a' tag
+            'iCss' - additional css class for 'i' tag
+            'dataId' - data-id parameter
+            'dataMethod' - request http method
+            'dataUrl' - data-url parameter
+            'dataRedirect' - url to redirect after an operation finished
+            'successMessage' - a message which will be shown after an operation finished
+            'title' - button title
+            'label' - button label
+            'visible' - determined whether the button is visible or not. Defaults to true
+        ]
+#}
+{% macro ajaxButton(parameters) %}
+    <div class="pull-left btn-group icons-holder">
+        {{ _self.ajaxLink(parameters|merge({'class': 'btn icons-holder-text'})) }}
+    </div>
+{% endmacro %}
+
+{#
+    A link that sends request to server
+    Parameters - array:
+        [
+            'class' - default class
+            'aCss' - additional css class for 'a' tag
+            'iCss' - additional css class for 'i' tag
+            'dataId' - data-id parameter
+            'dataMethod' - request http method
+            'dataUrl' - data-url parameter
+            'dataRedirect' - url to redirect after an operation finished
+            'successMessage' - a message which will be shown after an operation finished
+            'title' - button title
+            'label' - button label
+            'visible' - determined whether the link is visible or not. Defaults to true
+        ]
+#}
+{% macro ajaxLink(parameters) %}
+    {% set dataAttributes = {
+        'page-component-module': 'oroui/js/app/components/ajax-button',
+        'page-component-options': {
+        'method': parameters.dataMethod is defined ? parameters.dataMethod : 'GET',
+        'redirect': parameters.dataRedirect,
+        'errorMessage': parameters.errorMessage
+        }|json_encode,
+    } %}
+
+    {{ _self.clientLink(parameters|merge({'dataAttributes': dataAttributes})) }}
+{% endmacro %}
+
+{#
     A button with javascript handler
     Parameters - array:
         [
