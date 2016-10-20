@@ -19,7 +19,7 @@ oro:
         system_configuration:
             groups:
                 platform.title: "System configuration"
-                general_setup.title: "General Setup"
+                general_setup.title: "General setup"
             use_default: "Use default"
         acl:
             action:
