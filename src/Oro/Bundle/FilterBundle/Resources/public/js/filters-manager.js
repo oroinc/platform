@@ -140,9 +140,9 @@ define(function(require) {
                 });
 
                 this.subview('filters-state', filtersStateView);
-                this.listenTo(filtersStateView, 'setManageViewMode', _.bind(function() {
+                this.listenTo(filtersStateView, 'clicked', function() {
                     this.setViewMode(FiltersManager.MANAGE_VIEW_MODE);
-                }, this));
+                });
             }
 
             FiltersManager.__super__.initialize.apply(this, arguments);

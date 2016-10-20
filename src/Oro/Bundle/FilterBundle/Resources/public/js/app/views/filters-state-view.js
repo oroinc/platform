@@ -3,7 +3,6 @@ define(function(require) {
 
     var FiltersStateView;
     var _ = require('underscore');
-    var $ = require('jquery');
     var BaseView = require('oroui/js/app/views/base/view');
 
     FiltersStateView = BaseView.extend({
@@ -19,10 +18,6 @@ define(function(require) {
             'click .filters-state': 'onClick',
             'mouseenter .filters-state': 'onMouseEnter',
             'mouseleave .filters-state': 'onMouseLeave'
-        },
-
-        listen: {
-            'layout:reposition mediator': 'onLayoutReposition'
         },
 
         initialize: function(options) {
@@ -100,26 +95,7 @@ define(function(require) {
         },
 
         onClick: function() {
-            this.trigger('setManageViewMode');
-        },
-
-        onLayoutReposition: function() {
-            var leftBlockRect;
-            var rightBlockRect;
-            this.$el.siblings().each(function() {
-                if ($(this).css('float') === 'left' && !leftBlockRect) {
-                    leftBlockRect = this.getBoundingClientRect();
-                } else if ($(this).css('float') === 'right' && !rightBlockRect) {
-                    rightBlockRect = this.getBoundingClientRect();
-                }
-            });
-            if (leftBlockRect && rightBlockRect) {
-                if (leftBlockRect.bottom <= rightBlockRect.top && leftBlockRect.width > rightBlockRect.width) {
-                    this.$('.filters-state').addClass('under-title');
-                } else {
-                    this.$('.filters-state').removeClass('under-title');
-                }
-            }
+            this.trigger('clicked');
         }
     });
 

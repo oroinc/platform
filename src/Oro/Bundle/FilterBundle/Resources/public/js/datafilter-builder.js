@@ -166,10 +166,7 @@ define(function(require) {
                 modules: null
             };
 
-            _.extend(self,
-                _.pick(options, 'filtersStateElement', 'enableToggleFilters'),
-                _.pick(moduleConfigs, 'enableToggleFilters')
-            );
+            _.extend(self, _.pick(options, 'filtersStateElement', 'enableToggleFilters'));
 
             methods.initBuilder.call(self);
 
@@ -186,7 +183,10 @@ define(function(require) {
             if (!_.isArray(options.metadata.plugins)) {
                 options.metadata.plugins = [];
             }
-            if (options.enableToggleFilters && _.result(moduleConfigs, 'enableToggleFilters') !== false) {
+            if (_.result(moduleConfigs, 'enableToggleFilters') === false) {
+                options.enableToggleFilters = false;
+            }
+            if (options.enableToggleFilters) {
                 options.metadata.plugins.push(FiltersTogglePlugin);
             }
             deferred.resolve();

@@ -9,6 +9,6 @@
     </div>
     <div class="filters-view-container"></div>
 
-    {{ dataGrid.renderGrid(gridName, params, {'enableViews': false}|merge(renderParams)) }}
+    {{ dataGrid.renderGrid(gridName, params, {'enableViews': false, 'enableToggleFilters': false}|merge(renderParams)) }}
     {% endblock %}
 </div>
