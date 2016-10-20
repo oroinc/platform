@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\TestFrameworkBundle\Test;
 
-use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Driver\PDOConnection;
 
 use Symfony\Component\HttpFoundation\JsonResponse;

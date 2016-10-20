@@ -78,6 +78,7 @@ services:
         arguments:                    ['@event_dispatcher', %oro_search.entities_config%]
         calls:
             - [setMappingProvider,  ['@oro_search.provider.search_mapping']]
+            - [setPropertyAccessor,  ['@property_accessor']]
 
     oro_search.provider.result_statistics_provider:
         class:                        %oro_search.provider.result_statistics_provider.class%
