@@ -52,7 +52,7 @@
                 var rules = requirements.split(',');
                 var pass = '';
 
-                // make sure we have at least one symbol for each rule
+                // make sure we have at least one symbol for each rule, shuffle them later
                 rules.forEach(function(rule) {
                     if (charsets.hasOwnProperty(rule)) {
                         pass += charsets[rule].charAt(getRnd(charsets[rule].length));
@@ -64,10 +64,13 @@
 
                 // fill up to the minLength with random symbols
                 for (var i = pass.length; i < length; ++i) {
-                    var randChar = charset.charAt(getRnd(charset.length));
-                    // make sure required chars are mixed
-                    pass = !!getRnd(1) ? randChar + pass : pass + randChar;
+                    pass = pass + charset.charAt(getRnd(charset.length));
                 }
+
+                // shuffle the password
+                pass = pass.split('').sort(function() {
+                    return 0.5 - Math.random()
+                }).join('');
 
                 $passwordInput.val(pass);
             });
