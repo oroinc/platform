@@ -78,7 +78,7 @@ class AcmeDemoBundle implements Migration, AttachmentExtensionAwareInterface
     {
         $this->attachmentExtension->addImageRelation(
             $schema,
-            'entity_table_name', // entity table, e.g. oro_user, orocrm_contact etc.
+            'entity_table_name', // entity table, e.g. oro_user, oro_contact etc.
             'new_field_name', // field name
             [], //additional options for relation
             7, // max allowed file size in megabytes, can be omitted, by default 1 Mb
@@ -123,7 +123,7 @@ class AcmeDemoBundle implements Migration, AttachmentExtensionAwareInterface
     {
         $this->attachmentExtension->addAttachmentAssociation(
             $schema,
-            'entity_table_name', // entity table, e.g. oro_user, orocrm_contact etc.
+            'entity_table_name', // entity table, e.g. oro_user, oro_contact etc.
             [], // optional, allowed MIME types of attached files, if empty - global configuration will be used
             2 // optional, max allowed file size in megabytes, by default 1 Mb
         );

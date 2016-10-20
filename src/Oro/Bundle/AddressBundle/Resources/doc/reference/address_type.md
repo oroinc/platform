@@ -19,7 +19,7 @@ must be defined in specific class:
  *
  * @ORM\ManyToMany(targetEntity="Oro\Bundle\AddressBundle\Entity\AddressType")
  * @ORM\JoinTable(
- *     name="orocrm_contact_address_to_address_type",
+ *     name="oro_contact_address_to_address_type",
  *     joinColumns={@ORM\JoinColumn(name="contact_address_id", referencedColumnName="id")},
  *     inverseJoinColumns={@ORM\JoinColumn(name="type_name", referencedColumnName="name")}
  * )
