@@ -13,3 +13,13 @@
         {{- form_errors(form) -}}
     </div>
 {%- endblock form_row -%}
+
+{%- block form_errors -%}
+    {%- if errors|length > 0 -%}
+        <ul class="notifications notifications--error">
+            {%- for error in errors -%}
+                <li>{{ error.message|trans }}</li>
+            {%- endfor -%}
+        </ul>
+    {%- endif -%}
+{%- endblock form_errors -%}
