@@ -63,7 +63,8 @@ class OroEmailBundle extends Bundle
         $container->addCompilerPass(new MailboxProcessPass());
 
         $addTopicPass = AddTopicMetaPass::create()
-            ->add(Topics::SEND_AUTO_RESPONSE, 'Send auto responses')
+            ->add(Topics::SEND_AUTO_RESPONSE, 'Send auto response for single email')
+            ->add(Topics::SEND_AUTO_RESPONSES, 'Send auto response for multiple emails')
             ->add(Topics::ADD_ASSOCIATION_TO_EMAILS, 'Add association to emails')
             ->add(Topics::UPDATE_EMAIL_OWNER_ASSOCIATIONS, 'Updates emails for email owner')
             ->add(Topics::SYNC_EMAIL_SEEN_FLAG, 'Synchronization email flags')

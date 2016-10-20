@@ -3,6 +3,9 @@ namespace Oro\Bundle\EmailBundle\Tests\Unit\Async;
 
 use Doctrine\Bundle\DoctrineBundle\Registry;
 use Doctrine\ORM\EntityRepository;
+
+use Psr\Log\LoggerInterface;
+
 use Oro\Bundle\EmailBundle\Async\AutoResponseMessageProcessor;
 use Oro\Bundle\EmailBundle\Async\Topics;
 use Oro\Bundle\EmailBundle\Entity\Email;
@@ -10,7 +13,6 @@ use Oro\Bundle\EmailBundle\Manager\AutoResponseManager;
 use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
 use Oro\Component\MessageQueue\Transport\Null\NullMessage;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
-use Psr\Log\LoggerInterface;
 
 class AutoResponseMessageProcessorTest extends \PHPUnit_Framework_TestCase
 {
@@ -80,14 +82,14 @@ class AutoResponseMessageProcessorTest extends \PHPUnit_Framework_TestCase
         );
 
         $message = new NullMessage();
-        $message->setBody(json_encode(['ids' => [123]]));
+        $message->setBody(json_encode(['id' => 123]));
 
         $result = $processor->process($message, $this->createSessionMock());
 
         $this->assertEquals(MessageProcessorInterface::ACK, $result);
     }
 
-    public function testShouldSkipIdIfEmailWasNotFound()
+    public function testShouldRejectMessageIfEmailWasNotFound()
     {
         $repository = $this->createEntityRepositoryMock();
         $repository
@@ -125,11 +127,11 @@ class AutoResponseMessageProcessorTest extends \PHPUnit_Framework_TestCase
         );
 
         $message = new NullMessage();
-        $message->setBody(json_encode(['ids' => [123]]));
+        $message->setBody(json_encode(['id' => 123]));
 
         $result = $processor->process($message, $this->createSessionMock());
 
-        $this->assertEquals(MessageProcessorInterface::ACK, $result);
+        $this->assertEquals(MessageProcessorInterface::REJECT, $result);
     }
 
     public function testShouldReturnSubscribedTopics()

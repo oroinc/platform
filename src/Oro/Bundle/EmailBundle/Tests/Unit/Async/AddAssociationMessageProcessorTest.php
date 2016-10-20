@@ -22,7 +22,8 @@ class AddAssociationToEmailsMessageProcessorTest extends \PHPUnit_Framework_Test
         $logger
             ->expects($this->once())
             ->method('critical')
-            ->with('[AddAssociationToEmailsMessageProcessor] Got invalid message: "{"targetClass":"class","targetId":123}"')
+            ->with('[AddAssociationToEmailsMessageProcessor]'
+                .' Got invalid message: "{"targetClass":"class","targetId":123}"')
         ;
 
         $message = new NullMessage();
@@ -72,7 +73,8 @@ class AddAssociationToEmailsMessageProcessorTest extends \PHPUnit_Framework_Test
         $logger
             ->expects($this->once())
             ->method('critical')
-            ->with('[AddAssociationToEmailsMessageProcessor] Got invalid message: "{"emailIds":[],"targetClass":"class"}"')
+            ->with('[AddAssociationToEmailsMessageProcessor]'
+                .' Got invalid message: "{"emailIds":[],"targetClass":"class"}"')
         ;
 
         $message = new NullMessage();
@@ -125,7 +127,10 @@ class AddAssociationToEmailsMessageProcessorTest extends \PHPUnit_Framework_Test
 
     public function testShouldReturnSubscribedTopics()
     {
-        $this->assertEquals([Topics::ADD_ASSOCIATION_TO_EMAILS], AddAssociationToEmailsMessageProcessor::getSubscribedTopics());
+        $this->assertEquals(
+            [Topics::ADD_ASSOCIATION_TO_EMAILS],
+            AddAssociationToEmailsMessageProcessor::getSubscribedTopics()
+        );
     }
 
     /**

@@ -322,6 +322,14 @@ services:
         tags:
             - { name: 'oro_message_queue.client.message_processor' }
 
+    oro_email.async.processor.auto_responses:
+        class: 'Oro\Bundle\EmailBundle\Async\AutoResponsesMessageProcessor'
+        arguments:
+            - '@oro_message_queue.client.message_producer'
+            - '@logger'
+        tags:
+            - { name: 'oro_message_queue.client.message_processor' }
+
     oro_email.async.processor.add_association_to_emails:
         class: 'Oro\Bundle\EmailBundle\Async\AddAssociationToEmailsMessageProcessor'
         arguments:

@@ -3,6 +3,9 @@ namespace Oro\Bundle\EmailBundle\Async;
 
 use Doctrine\Bundle\DoctrineBundle\Registry;
 use Doctrine\ORM\EntityRepository;
+
+use Psr\Log\LoggerInterface;
+
 use Oro\Bundle\EmailBundle\Entity\Email;
 use Oro\Bundle\EmailBundle\Manager\AutoResponseManager;
 use Oro\Component\MessageQueue\Client\TopicSubscriberInterface;
@@ -10,7 +13,6 @@ use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
 use Oro\Component\MessageQueue\Transport\MessageInterface;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
 use Oro\Component\MessageQueue\Util\JSON;
-use Psr\Log\LoggerInterface;
 
 class AutoResponseMessageProcessor implements MessageProcessorInterface, TopicSubscriberInterface
 {
@@ -48,7 +50,7 @@ class AutoResponseMessageProcessor implements MessageProcessorInterface, TopicSu
     {
         $data = JSON::decode($message->getBody());
 
-        if (! isset($data['ids']) || ! is_array($data['ids'])) {
+        if (! isset($data['id'])) {
             $this->logger->critical(sprintf(
                 '[AutoResponseMessageProcessor] Got invalid message. "%s"',
                 $message->getBody()
@@ -57,20 +59,18 @@ class AutoResponseMessageProcessor implements MessageProcessorInterface, TopicSu
             return self::REJECT;
         }
 
-        foreach ($data['ids'] as $id) {
-            /** @var Email $email */
-            $email = $this->getEmailRepository()->find($id);
-            if (! $email) {
-                $this->logger->error(sprintf(
-                    '[AutoResponseMessageProcessor] Email was not found. id: "%s"',
-                    $id
-                ));
+        /** @var Email $email */
+        $email = $this->getEmailRepository()->find($data['id']);
+        if (! $email) {
+            $this->logger->error(sprintf(
+                '[AutoResponseMessageProcessor] Email was not found. id: "%s"',
+                $data['id']
+            ));
 
-                continue;
-            }
-
-            $this->autoResponseManager->sendAutoResponses($email);
+            return self::REJECT;
         }
+
+        $this->autoResponseManager->sendAutoResponses($email);
 
         return self::ACK;
     }

@@ -41,7 +41,7 @@ class AutoResponseListener extends MailboxEmailListener
             return;
         }
         
-        $this->producer->send(Topics::SEND_AUTO_RESPONSE, [
+        $this->producer->send(Topics::SEND_AUTO_RESPONSES, [
             'ids' => $emailIds,
         ]);
     }

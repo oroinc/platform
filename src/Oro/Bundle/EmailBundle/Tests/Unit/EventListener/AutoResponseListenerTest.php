@@ -39,7 +39,7 @@ class AutoResponseListenerTest extends \PHPUnit_Framework_TestCase
         $producer
             ->expects($this->once())
             ->method('send')
-            ->with(Topics::SEND_AUTO_RESPONSE, ['ids' => [123, 12345]])
+            ->with(Topics::SEND_AUTO_RESPONSES, ['ids' => [123, 12345]])
         ;
 
         $email1 = new Email();
@@ -104,7 +104,7 @@ class AutoResponseListenerTest extends \PHPUnit_Framework_TestCase
         $producer
             ->expects($this->once())
             ->method('send')
-            ->with(Topics::SEND_AUTO_RESPONSE, ['ids' => [12345]])
+            ->with(Topics::SEND_AUTO_RESPONSES, ['ids' => [12345]])
         ;
 
         $email1 = new Email();
