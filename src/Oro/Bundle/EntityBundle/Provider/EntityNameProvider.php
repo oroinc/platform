@@ -28,17 +28,11 @@ class EntityNameProvider implements EntityNameProviderInterface
     public function getName($format, $locale, $entity)
     {
         if ($format === self::SHORT) {
-            $fieldName = $this->getFieldName(ClassUtils::getClass($entity));
-            if ($fieldName) {
-                return $this->getFieldValue($entity, $fieldName);
-            }
+            return $this->getConstructedName($entity, [$this->getFieldName(ClassUtils::getClass($entity))]);
         }
 
         if ($format === self::FULL) {
-            $fieldNames = $this->getFieldNames(ClassUtils::getClass($entity));
-            if (count($fieldNames) > 0) {
-                return implode(' ', $fieldNames);
-            }
+            return $this->getConstructedName($entity, $this->getFieldNames(ClassUtils::getClass($entity)));
         }
 
         return false;
@@ -62,7 +56,7 @@ class EntityNameProvider implements EntityNameProviderInterface
                 return false;
             }
 
-            // append table alias
+            // prepend table alias
             $fieldNames = array_map(function ($fieldName) use ($alias) {
                 return $alias . '.' . $fieldName;
             }, $fieldNames);
@@ -113,7 +107,13 @@ class EntityNameProvider implements EntityNameProviderInterface
      */
     protected function getFieldValue($entity, $fieldName)
     {
-        return $entity->{'get' . Inflector::camelize($fieldName)}();
+        $getterName = 'get' . Inflector::classify($fieldName);
+
+        if (method_exists($entity, $getterName)) {
+            return $entity->$getterName();
+        }
+
+        return null;
     }
 
     /**
@@ -128,10 +128,34 @@ class EntityNameProvider implements EntityNameProviderInterface
         }
 
         $metadata = $manager->getClassMetadata($className);
-        $fieldNames = $metadata->getFieldNames();
+        $fieldNames = (array)$metadata->getFieldNames();
 
         return array_filter($fieldNames, function ($fieldName) use ($metadata) {
             return 'string' === $metadata->getTypeOfField($fieldName);
         });
+    }
+
+    /**
+     * Constructs and returns a name from the values of the fieldNames
+     *
+     * @param $entity
+     * @param $fieldNames
+     *
+     * @return string|bool Constructed Name or FALSE if fails
+     */
+    protected function getConstructedName($entity, $fieldNames)
+    {
+        $fieldValues = [];
+        foreach ($fieldNames as $field) {
+            $fieldValues[] = $this->getFieldValue($entity, $field);
+        }
+
+        $fieldValues = array_filter($fieldValues);
+
+        if (0 === count($fieldValues)) {
+            return false;
+        }
+
+        return implode(' ', $fieldValues);
     }
 }

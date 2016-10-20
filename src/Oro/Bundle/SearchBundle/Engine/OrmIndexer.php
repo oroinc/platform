@@ -1,12 +1,10 @@
 <?php
+
 namespace Oro\Bundle\SearchBundle\Engine;
 
-use Doctrine\Common\Persistence\ManagerRegistry;
-use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityBundle\ORM\OroEntityManager;
 use Oro\Bundle\SearchBundle\Entity\Item;
 use Oro\Bundle\SearchBundle\Entity\Repository\SearchIndexRepository;
-use Oro\Bundle\SearchBundle\Resolver\EntityTitleResolverInterface;
 
 class OrmIndexer extends AbstractIndexer
 {
@@ -18,21 +16,6 @@ class OrmIndexer extends AbstractIndexer
 
     /** @var OroEntityManager */
     private $indexManager;
-
-    /**
-     * @param ManagerRegistry              $registry
-     * @param DoctrineHelper               $doctrineHelper
-     * @param ObjectMapper                 $mapper
-     * @param EntityTitleResolverInterface $entityTitleResolver
-     */
-    public function __construct(
-        ManagerRegistry $registry,
-        DoctrineHelper $doctrineHelper,
-        ObjectMapper $mapper,
-        EntityTitleResolverInterface $entityTitleResolver
-    ) {
-        parent::__construct($registry, $doctrineHelper, $mapper, $entityTitleResolver);
-    }
 
     /**
      * @param array $drivers

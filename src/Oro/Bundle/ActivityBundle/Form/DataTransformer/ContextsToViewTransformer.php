@@ -13,8 +13,8 @@ use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInt
 use Symfony\Component\Translation\TranslatorInterface;
 
 use Oro\Bundle\ActivityBundle\Event\PrepareContextTitleEvent;
+use Oro\Bundle\EntityBundle\Provider\EntityNameResolver;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
-use Oro\Bundle\SearchBundle\Resolver\EntityTitleResolverInterface;
 
 class ContextsToViewTransformer implements DataTransformerInterface
 {
@@ -33,8 +33,8 @@ class ContextsToViewTransformer implements DataTransformerInterface
     /** @var EventDispatcherInterface */
     protected $dispatcher;
 
-    /** @var EntityTitleResolverInterface */
-    protected $entityTitleResolver;
+    /** @var EntityNameResolver */
+    protected $entityNameResolver;
 
     /** @var bool */
     protected $collectionModel;
@@ -45,7 +45,7 @@ class ContextsToViewTransformer implements DataTransformerInterface
      * @param TranslatorInterface   $translator
      * @param TokenStorageInterface $securityTokenStorage
      * @param EventDispatcherInterface $dispatcher
-     * @param EntityTitleResolverInterface $entityTitleResolver
+     * @param EntityNameResolver $entityNameResolver
      * @param bool $collectionModel True if result should be Collection instead of array
      */
     public function __construct(
@@ -54,7 +54,7 @@ class ContextsToViewTransformer implements DataTransformerInterface
         TranslatorInterface $translator,
         TokenStorageInterface $securityTokenStorage,
         EventDispatcherInterface $dispatcher,
-        EntityTitleResolverInterface $entityTitleResolver,
+        EntityNameResolver $entityNameResolver,
         $collectionModel = false
     ) {
         $this->entityManager        = $entityManager;
@@ -62,7 +62,7 @@ class ContextsToViewTransformer implements DataTransformerInterface
         $this->translator           = $translator;
         $this->securityTokenStorage = $securityTokenStorage;
         $this->dispatcher           = $dispatcher;
-        $this->entityTitleResolver  = $entityTitleResolver;
+        $this->entityNameResolver  = $entityNameResolver;
         $this->collectionModel      = $collectionModel;
     }
 
@@ -87,7 +87,8 @@ class ContextsToViewTransformer implements DataTransformerInterface
                     continue;
                 }
 
-                $title = $this->entityTitleResolver->resolve($target);
+                $title = $this->entityNameResolver->getName($target)
+                    ?: $this->translator->trans('oro.entity.item', ['%id%' => $target->getId()]);
                 if ($label = $this->getClassLabel($targetClass)) {
                     $title .= ' (' . $label . ')';
                 }

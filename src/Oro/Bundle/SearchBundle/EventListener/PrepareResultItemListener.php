@@ -5,10 +5,11 @@ namespace Oro\Bundle\SearchBundle\EventListener;
 use Doctrine\ORM\EntityManager;
 
 use Symfony\Component\Routing\Router;
+use Symfony\Component\Translation\TranslatorInterface;
 
+use Oro\Bundle\EntityBundle\Provider\EntityNameResolver;
 use Oro\Bundle\SearchBundle\Engine\ObjectMapper;
 use Oro\Bundle\SearchBundle\Event\PrepareResultItemEvent;
-use Oro\Bundle\SearchBundle\Resolver\EntityTitleResolverInterface;
 
 class PrepareResultItemListener
 {
@@ -27,24 +28,33 @@ class PrepareResultItemListener
      */
     protected $em;
 
+    /** @var EntityNameResolver */
+    protected $entityNameResolver;
+
+    /** @var TranslatorInterface */
+    protected $translator;
+
     /**
      * Constructor
      *
      * @param Router $router
      * @param ObjectMapper $mapper
      * @param EntityManager $em
-     * @param EntityTitleResolverInterface $entityTitleResolver
+     * @param EntityNameResolver $entityNameResolver
+     * @param TranslatorInterface $translator
      */
     public function __construct(
         Router $router,
         ObjectMapper $mapper,
         EntityManager $em,
-        EntityTitleResolverInterface $entityTitleResolver
+        EntityNameResolver $entityNameResolver,
+        TranslatorInterface $translator
     ) {
         $this->router = $router;
         $this->mapper = $mapper;
         $this->em = $em;
-        $this->entityTitleResolver = $entityTitleResolver;
+        $this->entityNameResolver = $entityNameResolver;
+        $this->translator = $translator;
     }
 
     /**
@@ -134,7 +144,8 @@ class PrepareResultItemListener
             $entity = $this->em->getRepository($name)->find($item->getRecordId());
         }
 
-        return $this->entityTitleResolver->resolve($entity);
+        return $this->entityNameResolver->getName($entity)
+            ?: $this->translator->trans('oro.entity.item', ['%id%' => $entity->getId()]);
     }
 
     /**

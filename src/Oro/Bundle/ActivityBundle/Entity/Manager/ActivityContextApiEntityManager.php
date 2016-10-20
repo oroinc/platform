@@ -8,6 +8,7 @@ use Doctrine\Common\Util\ClassUtils;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
+use Symfony\Component\Translation\TranslatorInterface;
 
 use Oro\Bundle\ActivityBundle\Event\PrepareContextTitleEvent;
 use Oro\Bundle\ActivityBundle\Manager\ActivityManager;
@@ -18,7 +19,6 @@ use Oro\Bundle\EntityBundle\Provider\EntityNameResolver;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 use Oro\Bundle\SearchBundle\Engine\ObjectMapper;
-use Oro\Bundle\SearchBundle\Resolver\EntityTitleResolverInterface;
 use Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager;
 
 class ActivityContextApiEntityManager extends ApiEntityManager
@@ -38,11 +38,14 @@ class ActivityContextApiEntityManager extends ApiEntityManager
     /** @var EntityAliasResolver */
     protected $entityAliasResolver;
 
-    /** @var EntityTitleResolverInterface */
-    protected $entityTitleResolver;
+    /** @var EntityNameResolver */
+    protected $entityNameResolver;
 
     /** @var DoctrineHelper */
     protected $doctrineHelper;
+
+    /** @var TranslatorInterface */
+    protected $translator;
 
     /**
      * @param ObjectManager                 $om
@@ -51,8 +54,9 @@ class ActivityContextApiEntityManager extends ApiEntityManager
      * @param ConfigManager                 $configManager
      * @param RouterInterface               $router
      * @param EntityAliasResolver           $entityAliasResolver
-     * @param EntityTitleResolverInterface  $entityTitleResolver
+     * @param EntityNameResolver            $entityNameResolver
      * @param DoctrineHelper                $doctrineHelper
+     * @param TranslatorInterface           $translator
      */
     public function __construct(
         ObjectManager $om,
@@ -61,8 +65,9 @@ class ActivityContextApiEntityManager extends ApiEntityManager
         ConfigManager $configManager,
         RouterInterface $router,
         EntityAliasResolver $entityAliasResolver,
-        EntityTitleResolverInterface $entityTitleResolver,
-        DoctrineHelper $doctrineHelper
+        EntityNameResolver $entityNameResolver,
+        DoctrineHelper $doctrineHelper,
+        TranslatorInterface $translator
     ) {
         parent::__construct(null, $om);
 
@@ -71,8 +76,9 @@ class ActivityContextApiEntityManager extends ApiEntityManager
         $this->configManager        = $configManager;
         $this->router               = $router;
         $this->entityAliasResolver  = $entityAliasResolver;
-        $this->entityTitleResolver  = $entityTitleResolver;
+        $this->entityNameResolver   = $entityNameResolver;
         $this->doctrineHelper       = $doctrineHelper;
+        $this->translator           = $translator;
     }
 
     /**
@@ -109,7 +115,7 @@ class ActivityContextApiEntityManager extends ApiEntityManager
             $config        = $entityProvider->getConfig($targetClass);
             $safeClassName = $this->entityClassNameHelper->getUrlSafeClassName($targetClass);
 
-            $item['title'] = $this->entityTitleResolver->resolve($target);
+            $item['title'] = $this->entityNameResolver->getName($target);
 
             $item['activityClassAlias'] = $this->entityAliasResolver->getPluralAlias($class);
             $item['entityId']           = $id;

@@ -43,6 +43,10 @@ class WidgetEntitySelectConverterTest extends \PHPUnit_Framework_TestCase
             ->setMethods(['getResult'])
             ->getMockForAbstractClass();
 
+        $translator = $this->getMockBuilder('Symfony\Component\Translation\TranslatorInterface')
+            ->disableOriginalConstructor()
+            ->getMock();
+
         $aclHelper = $this->getMockBuilder('Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper')
             ->disableOriginalConstructor()
             ->getMock();
@@ -85,7 +89,8 @@ class WidgetEntitySelectConverterTest extends \PHPUnit_Framework_TestCase
             $entityNameResolver,
             $doctrineHelper,
             $entityManager,
-            'Oro\Bundle\UserBundle\Entity\User'
+            'Oro\Bundle\UserBundle\Entity\User',
+            $translator
         );
     }
 

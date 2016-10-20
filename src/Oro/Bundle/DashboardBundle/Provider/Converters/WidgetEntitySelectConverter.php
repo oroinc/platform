@@ -4,11 +4,11 @@ namespace Oro\Bundle\DashboardBundle\Provider\Converters;
 
 use Doctrine\ORM\EntityManager;
 
-use Oro\Bundle\DashboardBundle\Provider\ConfigValueConverterAbstract;
+use Symfony\Component\Translation\TranslatorInterface;
 
+use Oro\Bundle\DashboardBundle\Provider\ConfigValueConverterAbstract;
 use Oro\Bundle\EntityBundle\Provider\EntityNameResolver;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
-
 use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
 
 class WidgetEntitySelectConverter extends ConfigValueConverterAbstract
@@ -28,25 +28,31 @@ class WidgetEntitySelectConverter extends ConfigValueConverterAbstract
     /** @var string */
     protected $entityClass;
 
+    /** @var TranslatorInterface */
+    protected $translator;
+
     /**
-     * @param AclHelper          $aclHelper
+     * @param AclHelper $aclHelper
      * @param EntityNameResolver $entityNameResolver
-     * @param DoctrineHelper     $doctrineHelper
-     * @param EntityManager      $entityManager
-     * @param string             $entityClass
+     * @param DoctrineHelper $doctrineHelper
+     * @param EntityManager $entityManager
+     * @param string $entityClass
+     * @param TranslatorInterface $translator
      */
     public function __construct(
         AclHelper $aclHelper,
         EntityNameResolver $entityNameResolver,
         DoctrineHelper $doctrineHelper,
         EntityManager $entityManager,
-        $entityClass
+        $entityClass,
+        TranslatorInterface $translator
     ) {
         $this->aclHelper          = $aclHelper;
         $this->entityNameResolver = $entityNameResolver;
         $this->doctrineHelper     = $doctrineHelper;
         $this->entityManager      = $entityManager;
         $this->entityClass        = $entityClass;
+        $this->translator = $translator;
     }
 
     /**
@@ -58,7 +64,8 @@ class WidgetEntitySelectConverter extends ConfigValueConverterAbstract
 
         $names = [];
         foreach ($entities as $entity) {
-            $names[] = $this->entityNameResolver->getName($entity);
+            $names[] = $this->entityNameResolver->getName($entity)
+                ?: $this->translator->trans('oro.entity.item', ['%id%' => $entity->getId()]);
         }
 
         return empty($names) ? null : implode('; ', $names);

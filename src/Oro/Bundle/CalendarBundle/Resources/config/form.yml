@@ -198,7 +198,7 @@ services:
             - '@security.token_storage'
             - '@event_dispatcher'
             - '@oro_calendar.attendee_relation_manager'
-            - '@oro_activity.resolver.entity_title'
+            - '@oro_entity.entity_name_resolver'
 
     oro_calendar.user_ids_to_users.tranformer:
         class: %oro_calendar.user_ids_to_users.tranformer.class%

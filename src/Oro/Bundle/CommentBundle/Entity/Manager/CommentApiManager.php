@@ -11,6 +11,7 @@ use Doctrine\ORM\QueryBuilder;
 
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\PropertyAccess\PropertyAccess;
+use Symfony\Component\Translation\TranslatorInterface;
 
 use Oro\Bundle\AttachmentBundle\Provider\AttachmentProvider;
 use Oro\Bundle\CommentBundle\Entity\Comment;
@@ -50,15 +51,19 @@ class CommentApiManager extends ApiEntityManager
     /** @var aclHelper */
     protected $configManager;
 
+    /** @var TranslatorInterface */
+    protected $translator;
+
     /**
-     * @param Registry                 $doctrine
-     * @param SecurityFacade           $securityFacade
-     * @param EntityNameResolver       $entityNameResolver
-     * @param Pager                    $pager
+     * @param Registry $doctrine
+     * @param SecurityFacade $securityFacade
+     * @param EntityNameResolver $entityNameResolver
+     * @param Pager $pager
      * @param EventDispatcherInterface $eventDispatcher
-     * @param AttachmentProvider       $attachmentProvider
-     * @param AclHelper                $aclHelper
-     * @param ConfigManager            $configManager
+     * @param AttachmentProvider $attachmentProvider
+     * @param AclHelper $aclHelper
+     * @param ConfigManager $configManager
+     * @param TranslatorInterface $translator
      */
     public function __construct(
         Registry $doctrine,
@@ -68,7 +73,8 @@ class CommentApiManager extends ApiEntityManager
         EventDispatcherInterface $eventDispatcher,
         AttachmentProvider $attachmentProvider,
         AclHelper $aclHelper,
-        ConfigManager $configManager
+        ConfigManager $configManager,
+        TranslatorInterface $translator
     ) {
         $this->em                 = $doctrine->getManager();
         $this->securityFacade     = $securityFacade;
@@ -77,6 +83,7 @@ class CommentApiManager extends ApiEntityManager
         $this->attachmentProvider = $attachmentProvider;
         $this->aclHelper          = $aclHelper;
         $this->configManager      = $configManager;
+        $this->translator = $translator;
 
         parent::__construct(Comment::ENTITY_NAME, $this->em);
 
@@ -179,16 +186,18 @@ class CommentApiManager extends ApiEntityManager
         $ownerId   = '';
 
         if ($entity->getOwner()) {
-            $ownerName = $this->entityNameResolver->getName($entity->getOwner());
             $ownerId   = $entity->getOwner()->getId();
+            $ownerName = $this->entityNameResolver->getName($entity->getOwner())
+                ?: $this->translator->trans('oro.entity.item', ['%id%' => $ownerId]);
         }
 
         $editorName = '';
         $editorId   = '';
 
         if ($entity->getUpdatedBy()) {
-            $editorName = $this->entityNameResolver->getName($entity->getUpdatedBy());
             $editorId   = $entity->getUpdatedBy()->getId();
+            $editorName = $this->entityNameResolver->getName($entity->getUpdatedBy())
+                ?: $this->translator->trans('oro.entity.item', ['%id%' => $editorId]);
         }
 
         $result = [
