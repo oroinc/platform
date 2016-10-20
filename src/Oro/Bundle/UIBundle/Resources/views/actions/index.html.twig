@@ -40,6 +40,7 @@
                 'enableFullScreenLayout': true,
                 'enableViews': true,
                 'showViewsInNavbar': true,
+                'filtersStateElement': '.page-title-center'
             }
             |merge(renderParams|default({})) %}
             {{ dataGrid.renderGrid(gridName, params|default({}), renderParams) }}

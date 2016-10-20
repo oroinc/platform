@@ -50,7 +50,7 @@ define(function(require) {
             options.collection = this.collection;
             options.el = $('<div/>').prependTo(this.$el);
             if (this.enableToggleFilters) {
-                options.filtersStateElement = '.page-title-center, .filters-view-container';
+                options.filtersStateElement = this.filtersStateElement || $('<div/>').prependTo(this.$el);
             }
             filtersList = new FiltersManager(options);
             filtersList.render();
@@ -162,16 +162,14 @@ define(function(require) {
                 $el: options.$el,
                 gridName: options.gridName,
                 metadata: options.metadata,
-                enableToggleFilters: options.enableToggleFilters,
                 collection: null,
                 modules: null
             };
 
-            if ('enableToggleFilters' in options) {
-                self.enableToggleFilters = options.enableToggleFilters;
-            } else if ('enableToggleFilters' in moduleConfigs) {
-                self.enableToggleFilters = moduleConfigs.enableToggleFilters;
-            }
+            _.extend(self,
+                _.pick(options, 'filtersStateElement', 'enableToggleFilters'),
+                _.pick(moduleConfigs, 'enableToggleFilters')
+            );
 
             methods.initBuilder.call(self);
 
@@ -183,11 +181,12 @@ define(function(require) {
                 deferred.reject();
             });
         },
+
         processDatagridOptions: function(deferred, options) {
             if (!_.isArray(options.metadata.plugins)) {
                 options.metadata.plugins = [];
             }
-            if (options.enableToggleFilters) {
+            if (options.enableToggleFilters && _.result(moduleConfigs, 'enableToggleFilters') !== false) {
                 options.metadata.plugins.push(FiltersTogglePlugin);
             }
             deferred.resolve();

@@ -7,8 +7,6 @@ define(function(require) {
     var FiltersManager = require('orofilter/js/filters-manager');
 
     ToggleFiltersAction =  AbstractAction.extend({
-        filterManagerMode: NaN,
-
         initialize: function(options) {
             var opts = options || {};
 
@@ -17,21 +15,23 @@ define(function(require) {
             }
 
             opts.datagrid.on('filterManager:connected', _.bind(function() {
-                this.onFilterManagerModeChange(this.datagrid.filterManager.getMode());
-                this.listenTo(this.datagrid.filterManager, 'changeMode', _.bind(this.onFilterManagerModeChange, this));
+                this.onFilterManagerModeChange(this.datagrid.filterManager.getViewMode());
+                this.listenTo(this.datagrid.filterManager, 'changeViewMode',
+                    _.bind(this.onFilterManagerModeChange, this)
+                );
             }, this));
 
             ToggleFiltersAction.__super__.initialize.apply(this, arguments);
         },
 
         execute: function() {
-            var newMode = this.datagrid.filterManager.getMode() === FiltersManager.VIEW_MODE ?
-                FiltersManager.MANAGE_MODE : FiltersManager.VIEW_MODE;
-            this.datagrid.filterManager.setMode(newMode);
+            var newMode = this.datagrid.filterManager.getViewMode() === FiltersManager.STATE_VIEW_MODE ?
+                FiltersManager.MANAGE_VIEW_MODE : FiltersManager.STATE_VIEW_MODE;
+            this.datagrid.filterManager.setViewMode(newMode);
         },
 
         onFilterManagerModeChange: function(mode) {
-            this.launcherInstanse.$el.toggleClass('pressed', mode === FiltersManager.MANAGE_MODE);
+            this.launcherInstanse.$el.toggleClass('pressed', mode === FiltersManager.MANAGE_VIEW_MODE);
         }
     });
 

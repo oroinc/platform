@@ -12,6 +12,7 @@ define(function(require) {
     var MultiselectDecorator = require('./multiselect-decorator');
     var filterWrapper = require('./datafilter-wrapper');
     var FiltersStateView = require('./app/views/filters-state-view');
+    var persistentStorage = require('oroui/js/persistent-storage');
 
     /**
      * View that represents all grid filters
@@ -49,7 +50,7 @@ define(function(require) {
          * @type {Integer}
          * @property
          */
-        mode: NaN,
+        viewMode: NaN,
 
         /**
          * Filter list input selector
@@ -101,7 +102,8 @@ define(function(require) {
          * @param {String} [options.addButtonHint]
          */
         initialize: function(options) {
-            this.mode = FiltersManager.MANAGE_MODE;
+            var storedMode = persistentStorage.getItem(FiltersManager.STORAGE_KEY);
+            this.viewMode = storedMode !== null ? Number(storedMode) : FiltersManager.STATE_VIEW_MODE;
             this.template = _.template($(this.templateSelector).html());
 
             this.filters = {};
@@ -138,6 +140,9 @@ define(function(require) {
                 });
 
                 this.subview('filters-state', filtersStateView);
+                this.listenTo(filtersStateView, 'setManageViewMode', _.bind(function() {
+                    this.setViewMode(FiltersManager.MANAGE_VIEW_MODE);
+                }, this));
             }
 
             FiltersManager.__super__.initialize.apply(this, arguments);
@@ -342,12 +347,13 @@ define(function(require) {
             } else {
                 this._initializeSelectWidget();
             }
-
             var filtersStateView = this.subview('filters-state');
             if (filtersStateView) {
                 filtersStateView.render();
-                if (this.mode === FiltersManager.MANAGE_MODE) {
+                if (this.viewMode === FiltersManager.MANAGE_VIEW_MODE) {
                     filtersStateView.hide();
+                } else if (this.viewMode === FiltersManager.STATE_VIEW_MODE) {
+                    this.$el.hide();
                 }
             }
 
@@ -485,15 +491,18 @@ define(function(require) {
             _.defer(_.bind(filter.off, filter, 'update', this.closeDropdown, this));
         },
 
-        getMode: function() {
-            return this.mode;
+        getViewMode: function() {
+            return this.viewMode;
         },
 
-        setMode: function(mode) {
-            if (mode === FiltersManager.VIEW_MODE) {
+        setViewMode: function(mode) {
+            if (this.viewMode === mode) {
+                return;
+            }
+            if (mode === FiltersManager.STATE_VIEW_MODE) {
                 this.$el.hide();
                 _.result(this.subview('filters-state'), 'show');
-            } else if (mode === FiltersManager.MANAGE_MODE) {
+            } else if (mode === FiltersManager.MANAGE_VIEW_MODE) {
                 if (!_.isEmpty(this.filters)) {
                     this.$el.show();
                 }
@@ -501,14 +510,16 @@ define(function(require) {
             } else {
                 return;
             }
-            this.mode = mode;
-            this.trigger('changeMode', mode);
+            this.viewMode = mode;
+            persistentStorage.setItem(FiltersManager.STORAGE_KEY, mode);
+            this.trigger('changeViewMode', mode);
         }
     });
 
     _.extend(FiltersManager, {
-        MANAGE_MODE: 0,
-        VIEW_MODE: 1
+        MANAGE_VIEW_MODE: 0,
+        STATE_VIEW_MODE: 1,
+        STORAGE_KEY: 'filter-view-mode-state'
     });
 
     return FiltersManager;

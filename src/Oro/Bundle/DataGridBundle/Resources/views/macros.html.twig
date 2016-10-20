@@ -42,6 +42,7 @@
             data: data,
             enableFilters: enableFilters,
             enableToggleFilters: enableToggleFilters,
+            filtersStateElement: renderParams.filtersStateElement is defined ? renderParams.filtersStateElement : false,
             enableViews: renderParams.enableViews is defined ? renderParams.enableViews : enableFilters,
             showViewsInNavbar: renderParams.showViewsInNavbar is defined ? renderParams.showViewsInNavbar : false,
             inputName: oro_datagrid_build_inputname(datagrid.name),

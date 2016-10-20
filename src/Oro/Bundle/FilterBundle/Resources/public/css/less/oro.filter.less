@@ -123,15 +123,27 @@
 }
 
 .filters-state {
-  text-align: center;
   color: #aaa;
   font-size: 14px;
-  padding: 5px 10px 2px;
+  padding: 0 20px;
+  line-height: 31px;
   min-width: 160px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
   cursor: pointer;
+  .page-title-center & {
+    text-align: center;
+    padding-left: 50px;
+    padding-right: 50px;
+  }
+  &.under-title {
+    clear: left;
+    position: relative;
+    top: 8px;
+    padding-left: 20px;
+    text-align: left;
+  }
 }
 
 .filters-state-popover {

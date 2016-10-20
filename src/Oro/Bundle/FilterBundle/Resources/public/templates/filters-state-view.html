@@ -1,5 +1,7 @@
-<div class="filters-state">
-<% _.each(filters, function(filter, i) { %>
-<% if (i > 0) { %>, <% } %><span><%=filter.label %> <span><%=filter.hint %></span></span>
-<% }) %>
-</div>
+<div class="filters-state"><%
+    _.each(filters, function(filter, i) {
+        if (i > 0) {
+            %>, <%
+        }
+        %><span><%=filter.label %> <span><%=filter.hint %></span></span><%
+    }) %></div>
