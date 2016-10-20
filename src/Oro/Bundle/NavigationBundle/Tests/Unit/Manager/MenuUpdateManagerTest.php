@@ -266,7 +266,7 @@ class MenuUpdateManagerTest extends \PHPUnit_Framework_TestCase
             ->setOwnershipType($ownershipType)
             ->setOwnerId($ownerId)
             ->setKey('item-1')
-            ->setParentKey($menuName)
+            ->setParentKey(null)
             ->setCustom(false)
             ->setActive(true)
             ->setDefaultTitle('item-1')
@@ -330,7 +330,7 @@ class MenuUpdateManagerTest extends \PHPUnit_Framework_TestCase
             ->setOwnerId($ownerId)
             ->setKey('item-1-1')
             ->setParentKey('item-1')
-            ->setCustom(true)
+            ->setCustom(false)
             ->setActive(false)
             ->setDefaultTitle('item-1-1')
         ;
@@ -342,7 +342,7 @@ class MenuUpdateManagerTest extends \PHPUnit_Framework_TestCase
             ->setOwnerId($ownerId)
             ->setKey('item-1-1-1')
             ->setParentKey('item-1-1')
-            ->setCustom(true)
+            ->setCustom(false)
             ->setActive(false)
             ->setDefaultTitle('item-1-1-1')
         ;
