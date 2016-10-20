@@ -102,6 +102,8 @@ class WorkflowDefinitionTest extends \PHPUnit_Framework_TestCase
             !empty($groups[20]),
             $this->workflowDefinition->hasExclusiveRecordGroups()
         );
+
+        $this->assertEquals($groups, $this->workflowDefinition->getGroups());
     }
 
     /**
