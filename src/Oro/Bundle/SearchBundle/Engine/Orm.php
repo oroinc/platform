@@ -2,18 +2,30 @@
 
 namespace Oro\Bundle\SearchBundle\Engine;
 
-use JMS\JobQueueBundle\Entity\Job;
+use Doctrine\Common\Persistence\ManagerRegistry;
 
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+
+use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityBundle\ORM\OroEntityManager;
-
+use Oro\Bundle\SearchBundle\Engine\Orm\DbalStorer;
 use Oro\Bundle\SearchBundle\Entity\Item;
 use Oro\Bundle\SearchBundle\Entity\Repository\SearchIndexRepository;
 use Oro\Bundle\SearchBundle\Query\Mode;
 use Oro\Bundle\SearchBundle\Query\Query;
 use Oro\Bundle\SearchBundle\Query\Result\Item as ResultItem;
+use Oro\Bundle\SearchBundle\Resolver\EntityTitleResolverInterface;
+use Oro\Component\Log\NullProgressLogger;
+use Oro\Component\Log\ProgressLoggerAwareInterface;
+use Oro\Component\Log\ProgressLoggerAwareTrait;
 
-class Orm extends AbstractEngine
+/**
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
+ */
+class Orm extends AbstractEngine implements ProgressLoggerAwareInterface
 {
+    use ProgressLoggerAwareTrait;
+
     /** @var SearchIndexRepository */
     private $indexRepository;
 
@@ -29,12 +41,37 @@ class Orm extends AbstractEngine
     /** @var bool */
     protected $needFlush = true;
 
+    /** @var DbalStorer */
+    protected $dbalStorer;
+
+    /**
+     * {@inheritdoc}
+     */
+    public function __construct(
+        ManagerRegistry $registry,
+        EventDispatcherInterface $eventDispatcher,
+        DoctrineHelper $doctrineHelper,
+        ObjectMapper $mapper,
+        EntityTitleResolverInterface $entityTitleResolver
+    ) {
+        parent::__construct($registry, $eventDispatcher, $doctrineHelper, $mapper, $entityTitleResolver);
+        $this->progressLogger = new NullProgressLogger();
+    }
+
     /**
      * @param array $drivers
      */
     public function setDrivers(array $drivers)
     {
         $this->drivers = $drivers;
+    }
+
+    /**
+     * @param DbalStorer $dbalStorer
+     */
+    public function setDbalStorer(DbalStorer $dbalStorer)
+    {
+        $this->dbalStorer = $dbalStorer;
     }
 
     /**
@@ -61,13 +98,20 @@ class Orm extends AbstractEngine
             }
         }
 
+        $totalRecords = 0;
+        foreach ($entityNames as $entityName) {
+            $totalRecords += $this->getNumberOfRecordsToReindex($entityName, $offset, $limit);
+        }
+
         // index data by mapping config
         $recordsCount = 0;
 
+        $this->progressLogger->logSteps($totalRecords);
         while ($class = array_shift($entityNames)) {
             $itemsCount = $this->reindexSingleEntity($class, $offset, $limit);
             $recordsCount += $itemsCount;
         }
+        $this->progressLogger->logFinish();
 
         return $recordsCount;
     }
@@ -123,10 +167,21 @@ class Orm extends AbstractEngine
         $hasSavedEntities = $this->saveItemData($entities);
 
         if ($hasSavedEntities && $this->needFlush) {
-            $this->flush();
+            $this->getIndexManager()->getConnection()->transactional(function () {
+                $this->dbalStorer->store();
+                $this->getIndexManager()->clear();
+            });
         }
 
         return $hasSavedEntities;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function recordProcessed()
+    {
+        $this->progressLogger->logAdvance(1);
     }
 
     /**
@@ -166,7 +221,7 @@ class Orm extends AbstractEngine
                 ->setChanged(false)
                 ->saveItemData($data);
 
-            $this->getIndexManager()->persist($item);
+            $this->dbalStorer->addItem($item);
 
             $hasSavedEntities = true;
         }

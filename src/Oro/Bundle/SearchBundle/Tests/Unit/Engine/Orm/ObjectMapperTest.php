@@ -1,6 +1,8 @@
 <?php
 namespace Oro\Bundle\SearchBundle\Tests\Unit\Engine\Orm;
 
+use Symfony\Component\PropertyAccess\PropertyAccess;
+
 use Oro\Bundle\SearchBundle\Engine\Indexer;
 use Oro\Bundle\SearchBundle\Engine\ObjectMapper;
 use Oro\Bundle\SearchBundle\Provider\SearchMappingProvider;
@@ -181,6 +183,7 @@ class ObjectMapperTest extends \PHPUnit_Framework_TestCase
 
         $this->mapper = new ObjectMapper($this->dispatcher, $this->mappingConfig);
         $this->mapper->setMappingProvider($mapperProvider);
+        $this->mapper->setPropertyAccessor(PropertyAccess::createPropertyAccessor());
     }
 
     /**
