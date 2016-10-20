@@ -32,6 +32,7 @@ class EmailBodyBuilderTest extends \PHPUnit_Framework_TestCase
         $body = $this->emailBodyBuilder->getEmailBody();
         $this->assertEquals(true, $body->getBodyIsText());
         $this->assertEquals('test', $body->getBodyContent());
+        $this->assertEquals('test', $body->getTextBody());
     }
 
     /**

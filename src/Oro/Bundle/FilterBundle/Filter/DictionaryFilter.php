@@ -10,6 +10,8 @@ use Oro\Bundle\FilterBundle\Datasource\Orm\OrmFilterDatasourceAdapter;
 
 class DictionaryFilter extends BaseMultiChoiceFilter
 {
+    const FILTER_TYPE_NAME = 'dictionary';
+
     /**
      * {@inheritdoc}
      */
@@ -24,6 +26,7 @@ class DictionaryFilter extends BaseMultiChoiceFilter
             $params[FilterUtility::FORM_OPTIONS_KEY]['dictionary_code'] = $params['dictionary_code'];
             unset($params['dictionary_code']);
         }
+
         parent::init($name, $params);
     }
 

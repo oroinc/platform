@@ -70,7 +70,6 @@ class JobRunnerTest extends \PHPUnit_Framework_TestCase
 
         $jobRunner = new JobRunner($jobProcessor);
         $jobRunner->runUnique('owner-id', 'job-name', function () {
-
         });
     }
 
@@ -98,7 +97,6 @@ class JobRunnerTest extends \PHPUnit_Framework_TestCase
 
         $jobRunner = new JobRunner($jobProcessor);
         $jobRunner->runUnique('owner-id', 'job-name', function () {
-
         });
     }
 

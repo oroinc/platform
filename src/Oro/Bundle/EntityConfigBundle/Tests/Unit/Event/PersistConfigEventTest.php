@@ -21,7 +21,6 @@ class PersistConfigEventTest extends \PHPUnit_Framework_TestCase
             ->getMock();
 
         $this->configManager->expects($this->any())->method('flush')->will($this->returnValue(true));
-
     }
 
     public function testEvent()
