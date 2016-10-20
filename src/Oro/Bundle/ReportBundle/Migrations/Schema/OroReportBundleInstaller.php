@@ -67,6 +67,7 @@ class OroReportBundleInstaller implements Installation
         $table->addColumn('updatedat', 'datetime', ['comment' => '(DC2Type:datetime)']);
         $table->addColumn('chart_options', 'json_array', ['notnull' => false, 'comment' => '(DC2Type:json_array)']);
         $table->addIndex(['business_unit_owner_id'], 'idx_b48821b659294170', []);
+        $table->addColumn('internalId', 'string', ['length' => 30, 'notnull' => false]);
         $table->addIndex(['organization_id'], 'idx_b48821b632c8a3de', []);
         $table->addIndex(['type'], 'idx_b48821b68cde5729', []);
         $table->setPrimaryKey(['id']);

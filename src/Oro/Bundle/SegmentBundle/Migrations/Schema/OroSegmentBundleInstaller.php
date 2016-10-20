@@ -17,7 +17,7 @@ class OroSegmentBundleInstaller implements Installation
      */
     public function getMigrationVersion()
     {
-        return 'v1_5';
+        return 'v1_6';
     }
 
     /**
@@ -88,6 +88,7 @@ class OroSegmentBundleInstaller implements Installation
         $table->addColumn('createdat', 'datetime', ['comment' => '(DC2Type:datetime)']);
         $table->addColumn('updatedat', 'datetime', ['comment' => '(DC2Type:datetime)']);
         $table->addColumn('last_run', 'datetime', ['notnull' => false, 'comment' => '(DC2Type:datetime)']);
+        $table->addColumn('internalId', 'string', ['length' => 30, 'notnull' => false]);
         $table->addIndex(['organization_id'], 'idx_d02603b332c8a3de', []);
         $table->addIndex(['business_unit_owner_id'], 'idx_d02603b359294170', []);
         $table->addUniqueIndex(['name'], 'uniq_d02603b35e237e06');
