@@ -73,9 +73,6 @@ config:
             deps:
                 - 'lightgallery'
                 - 'jquery'
-        'jquery.mCustomScrollbar':
-            deps:
-                - 'jquery'
     map:
         '*':
             'jquery': 'oroui/js/extend/jquery'
