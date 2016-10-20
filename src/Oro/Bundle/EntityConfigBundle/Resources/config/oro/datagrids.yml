@@ -54,8 +54,7 @@ datagrids:
             columns:
                 updated:
                     data_name: ce.updated
-            default:
-                entity: %oro_datagrid.extension.orm_sorter.class%::DIRECTION_ASC
+            disable_default_sorting: true
         filters:
             columns:
                 updated:
