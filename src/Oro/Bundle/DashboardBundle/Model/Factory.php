@@ -4,7 +4,7 @@ namespace Oro\Bundle\DashboardBundle\Model;
 
 use Oro\Bundle\DashboardBundle\Entity\Dashboard;
 use Oro\Bundle\DashboardBundle\Entity\Widget;
-use Oro\Component\Config\Resolver\ResolverInterface;
+use Oro\Bundle\DashboardBundle\Model\WidgetConfigs;
 
 class Factory
 {
@@ -14,22 +14,22 @@ class Factory
     /** @var StateManager */
     protected $stateManager;
 
-    /** @var ResolverInterface */
-    protected $resolver;
+    /** @var WidgetConfigs */
+    protected $widgetConfigs;
 
     /**
      * @param ConfigProvider    $configProvider
      * @param StateManager      $stateManager
-     * @param ResolverInterface $resolver
+     * @param WidgetConfigs     $widgetConfigs
      */
     public function __construct(
         ConfigProvider $configProvider,
         StateManager $stateManager,
-        ResolverInterface $resolver
+        WidgetConfigs $widgetConfigs
     ) {
         $this->configProvider = $configProvider;
         $this->stateManager   = $stateManager;
-        $this->resolver       = $resolver;
+        $this->widgetConfigs  = $widgetConfigs;
     }
 
     /**
@@ -72,15 +72,12 @@ class Factory
      */
     public function createVisibleWidgetModel(Widget $widget)
     {
-        $widgetConfig = $this->configProvider->getWidgetConfig($widget->getName());
-        $widgetState  = $this->stateManager->getWidgetState($widget);
-        if (isset($widgetConfig['applicable'])) {
-            $resolved   = $this->resolver->resolve([$widgetConfig['applicable']]);
-            $applicable = reset($resolved);
-            if (!$applicable) {
-                return null;
-            }
+        $widgetConfig = $this->widgetConfigs->getWidgetConfig($widget->getName());
+        if (!$widgetConfig) {
+            return null;
         }
+
+        $widgetState  = $this->stateManager->getWidgetState($widget);
 
         return new WidgetModel($widget, $widgetConfig, $widgetState);
     }

@@ -174,6 +174,22 @@ class WidgetConfigs
     }
 
     /**
+     * Returns widget configuration or null
+     * based on applicable flags and acl
+     *
+     * @param string $widgetName
+     *
+     * @return array|null
+     */
+    public function getWidgetConfig($widgetName)
+    {
+        $configs = $this->filterWidgets([$widgetName => $this->configProvider->getWidgetConfig($widgetName)]);
+        $config = reset($configs);
+
+        return $config ?: null;
+    }
+
+    /**
      * Returns a list of items for the given widget
      *
      * @param string $widgetName The name of widget
