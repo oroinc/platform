@@ -45,7 +45,6 @@ class WorkflowDefinitionCloner
             ->setEntityAttributeName($source->getEntityAttributeName())
             ->setConfiguration($source->getConfiguration())
             ->setStepsDisplayOrdered($source->isStepsDisplayOrdered())
-            ->setEntityAcls($source->getEntityAcls())
             ->setSystem($source->isSystem())
             ->setPriority($source->getPriority())
             ->setGroups($source->getGroups());
