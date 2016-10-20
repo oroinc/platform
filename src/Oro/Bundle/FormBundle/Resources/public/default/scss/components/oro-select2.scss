@@ -96,7 +96,8 @@
             color: $base-font-color;
         }
 
-        .select2-no-results {
+        .select2-no-results,
+        .select2-searching {
             padding: 0 ($offset-x-m / 2) ($offset-y-m / 2);
         }
 
