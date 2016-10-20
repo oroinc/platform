@@ -253,6 +253,6 @@ services:
         public: false
 
     oro_translation.helper.translation_route:
-        class: 'Oro\Bundle\TranslationBundle\Helper\TranslationRouteHelper'
+        class: 'Oro\Bundle\TranslationBundle\Helper\TranslationsDatagridRouteHelper'
         arguments:
             - '@oro_datagrid.helper.route'

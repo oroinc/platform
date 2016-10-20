@@ -6,7 +6,7 @@ use Symfony\Component\Routing\RouterInterface;
 
 use Oro\Bundle\DataGridBundle\Tools\DatagridRouteHelper;
 
-class TranslationRouteHelper
+class TranslationsDatagridRouteHelper
 {
     const TRANSLATION_GRID_ROUTE_NAME = 'oro_translation_translation_index';
     const TRANSLATION_GRID_NAME = 'oro-translation-translations-grid';
@@ -17,8 +17,6 @@ class TranslationRouteHelper
     protected $datagridRouteHelper;
 
     /**
-     * WorkflowTranslationRouteHelper constructor.
-     *
      * @param DatagridRouteHelper $datagridRouteHelper
      */
     public function __construct(DatagridRouteHelper $datagridRouteHelper)
@@ -27,12 +25,17 @@ class TranslationRouteHelper
     }
 
     /**
+     * Generates URL or URI to "Manage Translations" page with properly configured query string
+     * to apply filter criteria.
+     *
+     * Param 'filters' uses next format ['filterName' => 'filterCriterion', ... , 'filterNameN' => 'filterCriterionN']
+     *
      * @param array $filters
      * @param int $referenceType
      *
      * @return string
      */
-    public function generate(array $filters, $referenceType = RouterInterface::ABSOLUTE_PATH)
+    public function generate(array $filters = [], $referenceType = RouterInterface::ABSOLUTE_PATH)
     {
         $params = ['f' => []];
 
