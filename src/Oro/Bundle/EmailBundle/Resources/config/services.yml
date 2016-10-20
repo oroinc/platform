@@ -556,6 +556,8 @@ services:
         class: %oro_email.listener.datagrid.email.class%
         arguments:
             - '@oro_email.datagrid_query_factory'
+            - '@oro_security.security_facade'
+            - '@oro_datagrid.grid_view.manager'
         tags:
             - { name: kernel.event_listener, event: oro_datagrid.datagrid.build.after.base-email-grid, method: onBuildAfter }
             - { name: kernel.event_listener, event: oro_datagrid.orm_datasource.result.before_query.base-email-grid, method: onResultBeforeQuery, priority: -255 }
