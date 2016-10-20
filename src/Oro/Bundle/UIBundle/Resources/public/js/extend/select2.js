@@ -241,7 +241,8 @@ define(function(require) {
         };
 
         prototype.triggerChange = _.wrap(prototype.triggerChange, function(original, details) {
-            if (details.added.manually) {
+            details = details || {};
+            if (this.changedManually) {
                 details.manually = true;
             }
             original.apply(this, _.rest(arguments));
@@ -262,9 +263,9 @@ define(function(require) {
                 return;
             }
 
-            data.manually = true;
+            this.changedManually = true;
             original.apply(this, _.rest(arguments));
-            delete data.manually;
+            delete this.changedManually;
 
             // @todo BAP-3928, remove this method override after upgrade select2 to v3.4.6, fix code is taken from there
             if ((!options || !options.noFocus) && this.opts.minimumResultsForSearch >= 0) {
