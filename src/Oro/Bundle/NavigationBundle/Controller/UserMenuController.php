@@ -79,7 +79,7 @@ class UserMenuController extends AbstractMenuController
     }
 
     /**
-     * {@inheritDoc}
+     * @return int|null
      */
     protected function getOwnerId()
     {
