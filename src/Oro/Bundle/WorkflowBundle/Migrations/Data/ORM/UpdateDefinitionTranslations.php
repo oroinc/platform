@@ -52,7 +52,7 @@ class UpdateDefinitionTranslations extends AbstractFixture implements ContainerA
             ]
         );
 
-        $preparedConfiguration = $processor->prepare($definition->getName(), $sourceConfiguration);
+        $preparedConfiguration = $processor->prepare($definition->getName(), $processor->handle($sourceConfiguration));
 
         $definition->setLabel($preparedConfiguration['label']);
 

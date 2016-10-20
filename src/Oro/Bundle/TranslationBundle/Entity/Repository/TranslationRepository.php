@@ -36,7 +36,7 @@ class TranslationRepository extends EntityRepository
      */
     public function findValue($key, $locale, $domain)
     {
-        $this->getFindValueQueryBuilder($key, $locale, $domain)->getQuery()->getOneOrNullResult();
+        return $this->getFindValueQueryBuilder($key, $locale, $domain)->getQuery()->getOneOrNullResult();
     }
 
     /**
