@@ -105,8 +105,6 @@ services:
     oro_navigation.tree.menu_update_tree_handler:
         class: 'Oro\Bundle\NavigationBundle\JsTree\MenuUpdateTreeHandler'
         arguments:
-            - '%oro_navigation.entity.menu_update.class%'
-            - "@doctrine"
             - '@translator'
 
     oro_menu.twig.extension:

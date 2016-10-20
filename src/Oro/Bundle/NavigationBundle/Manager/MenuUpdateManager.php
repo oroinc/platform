@@ -79,7 +79,6 @@ class MenuUpdateManager
             if($parent) {
                 $entity->setParentKey($options['parentKey']);
             }
-            // todo consider to create not found exception
         }
 
         $entity->setMenu($options['menu']);
@@ -167,7 +166,7 @@ class MenuUpdateManager
         }
 
         foreach ($orderedChildren as $priority => $child) {
-            $update = $this->createMenuUpdate($ownershipType, $ownerId, $child->getName());
+            $update = $this->createMenuUpdate($ownershipType, $ownerId, ['menu' => $child->getName()]);
             MenuUpdateUtils::updateMenuUpdate($update, $child, $menuName);
             $update->setPriority($priority);
             $updates[] = $update;

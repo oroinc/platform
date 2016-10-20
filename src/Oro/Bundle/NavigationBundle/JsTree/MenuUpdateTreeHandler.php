@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\NavigationBundle\JsTree;
 
-use Doctrine\Common\Persistence\ManagerRegistry;
 use Knp\Menu\ItemInterface;
 
 use Symfony\Component\Translation\TranslatorInterface;
@@ -13,33 +12,19 @@ class MenuUpdateTreeHandler
     const ROOT_PARENT_VALUE = '#';
 
     /**
-     * @var ManagerRegistry
-     */
-    protected $managerRegistry;
-
-    /**
-     * @var string
-     */
-    protected $entityClass;
-
-    /**
      * @var TranslatorInterface
      */
     protected $translator;
 
 
     /**
-     * @param string          $entityClass
-     * @param ManagerRegistry $managerRegistry
      */
-    public function __construct($entityClass, ManagerRegistry $managerRegistry, TranslatorInterface $translator)
+    public function __construct(TranslatorInterface $translator)
     {
-        $this->entityClass = $entityClass;
-        $this->managerRegistry = $managerRegistry;
         $this->translator = $translator;
     }
 
-    public function createTree($root = null, $includeRoot = true)
+    public function createTree(ItemInterface $root = null, $includeRoot = true)
     {
         if ($root === null) {
             return [];
@@ -55,7 +40,7 @@ class MenuUpdateTreeHandler
      * @param bool          $includeRoot
      * @return array
      */
-    protected function getNodes($root, $includeRoot)
+    protected function getNodes(ItemInterface $root, $includeRoot)
     {
         $nodes = [];
         if ($includeRoot) {
@@ -104,6 +89,7 @@ class MenuUpdateTreeHandler
     protected function formatEntity($entity)
     {
         $isDivider = $entity->getExtra('divider', false);
+        // todo consider to remove translator from here
         $text = $isDivider ? self::MENU_ITEM_DIVIDER_LABEL : $this->translator->trans($entity->getLabel());
 
         return [
