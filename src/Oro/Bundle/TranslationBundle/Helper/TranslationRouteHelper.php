@@ -27,12 +27,17 @@ class TranslationRouteHelper
     }
 
     /**
+     * Generates URL or URI to "Manage Translations" page with properly configured query sting
+     * to apply filter criteria.
+     *
+     * Param 'filters' uses next format ['filterName' => 'filterCriterion', ... , 'filterNameN' => 'filterCriterionN']
+     *
      * @param array $filters
      * @param int $referenceType
      *
      * @return string
      */
-    public function generate(array $filters, $referenceType = RouterInterface::ABSOLUTE_PATH)
+    public function generate(array $filters = [], $referenceType = RouterInterface::ABSOLUTE_PATH)
     {
         $params = ['f' => []];
 

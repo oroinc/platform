@@ -22,7 +22,10 @@ class DatagridRouteHelper
     }
 
     /**
-     * @param string $name
+     * Generates URL or URI to the page where Datagrid placed with properly configured query sting
+     * to apply filter criteria
+     *
+     * @param string $routeName
      * @param string $gridName
      * @param array $params
      * @param int $referenceType
@@ -32,11 +35,12 @@ class DatagridRouteHelper
      * @throws RouteNotFoundException              If the named route doesn't exist
      * @throws MissingMandatoryParametersException When some parameters are missing that are mandatory for the route
      * @throws InvalidParameterException           When a parameter value for a placeholder is not correct because
+     *                                             it does not match the requirement
      */
-    public function generate($name, $gridName, $params = [], $referenceType = RouterInterface::ABSOLUTE_PATH)
+    public function generate($routeName, $gridName, array $params = [], $referenceType = RouterInterface::ABSOLUTE_PATH)
     {
         return $this->router->generate(
-            $name,
+            $routeName,
             ['grid' => [$gridName => http_build_query($params)]],
             $referenceType
         );
