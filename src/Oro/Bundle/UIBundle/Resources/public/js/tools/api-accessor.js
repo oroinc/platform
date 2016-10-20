@@ -159,7 +159,7 @@ define(function(require) {
                 url: this.getUrl(urlParameters),
                 data: JSON.stringify(this.formatBody(body))
             });
-            var resultPromise = promise.then(_.bind(this.formatResult, this));
+            var resultPromise = promise.then(_.bind(this.formatResult, this), _.bind(this.onAjaxError, this));
             if (options && options.processingMessage) {
                 mediator.execute('showProcessingMessage', options.processingMessage, resultPromise);
             }
@@ -292,6 +292,10 @@ define(function(require) {
             }
 
             return response;
+        },
+
+        onAjaxError: function(xhr) {
+            return xhr;
         }
     });
 

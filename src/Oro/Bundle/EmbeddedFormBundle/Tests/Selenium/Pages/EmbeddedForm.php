@@ -6,7 +6,7 @@ use Oro\Bundle\TestFrameworkBundle\Pages\AbstractPageEntity;
 
 /**
  * Class EmbeddedForm
- * @package OroCRM\Bundle\EmbeddedFormBundle\Tests\Selenium\Pages
+ * @package Oro\Bundle\EmbeddedFormBundle\Tests\Selenium\Pages
  * {@inheritdoc}
  */
 class EmbeddedForm extends AbstractPageEntity

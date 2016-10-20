@@ -7,6 +7,9 @@ system_configuration:
             title: oro.layout.system_configuration.groups.development_layout_settings.title
 
     fields:
+        oro_layout.development_settings_feature_enabled:
+            data_type: boolean
+            type: hidden
         oro_layout.debug_block_info:
             data_type: boolean
             type: choice

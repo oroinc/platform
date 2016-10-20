@@ -9,7 +9,6 @@ use Oro\Bundle\EmailBundle\Model\EmailHolderInterface;
 use Oro\Bundle\NotificationBundle\Entity\NotificationEmailInterface;
 use Oro\Bundle\OrganizationBundle\Model\ExtendBusinessUnit;
 use Oro\Bundle\UserBundle\Entity\User;
-use Oro\Bundle\DataAuditBundle\Metadata\Annotation as Oro;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
 
@@ -19,7 +18,6 @@ use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
  * @ORM\Table("oro_business_unit")
  * @ORM\Entity(repositoryClass="Oro\Bundle\OrganizationBundle\Entity\Repository\BusinessUnitRepository")
  * @ORM\HasLifecycleCallbacks()
- * @Oro\Loggable
  * @Config(
  *      routeName="oro_business_unit_index",
  *      routeView="oro_business_unit_view",
@@ -72,7 +70,6 @@ class BusinessUnit extends ExtendBusinessUnit implements
      * @var string
      *
      * @ORM\Column(name="name", type="string", length=255)
-     * @Oro\Versioned
      * @ConfigField(
      *  defaultValues={
      *    "importexport"={
@@ -95,7 +92,6 @@ class BusinessUnit extends ExtendBusinessUnit implements
      * @var string
      *
      * @ORM\Column(name="phone", type="string", length=100, nullable=true)
-     * @Oro\Versioned
      */
     protected $phone;
 
@@ -103,7 +99,6 @@ class BusinessUnit extends ExtendBusinessUnit implements
      * @var string
      *
      * @ORM\Column(name="website", type="string", length=255, nullable=true)
-     * @Oro\Versioned
      */
     protected $website;
 
@@ -111,7 +106,6 @@ class BusinessUnit extends ExtendBusinessUnit implements
      * @var string
      *
      * @ORM\Column(name="email", type="string", length=255, nullable=true)
-     * @Oro\Versioned
      */
     protected $email;
 
@@ -119,7 +113,6 @@ class BusinessUnit extends ExtendBusinessUnit implements
      * @var string
      *
      * @ORM\Column(name="fax", type="string", length=255, nullable=true)
-     * @Oro\Versioned
      */
     protected $fax;
 

@@ -55,6 +55,7 @@ class DelayRedeliveredMessageExtension extends AbstractExtension
         $delayedMessage->setHeaders($message->getHeaders());
         $delayedMessage->setProperties($properties);
         $delayedMessage->setDelay($this->delay);
+        $delayedMessage->setMessageId($message->getMessageId());
 
         $queue = $context->getSession()->createQueue($context->getQueueName());
 

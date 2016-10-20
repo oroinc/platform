@@ -7,7 +7,7 @@ use Oro\Bundle\TestFrameworkBundle\Pages\AbstractPageEntity;
 
 /**
  * Class Integration
- * @package OroCRM\Bundle\IntegrationBundle\Tests\Selenium\Pages
+ * @package Oro\Bundle\IntegrationBundle\Tests\Selenium\Pages
  * {@inheritdoc}
  */
 class Integration extends AbstractPageEntity
