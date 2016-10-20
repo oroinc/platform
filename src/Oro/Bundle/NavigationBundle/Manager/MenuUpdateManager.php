@@ -80,9 +80,9 @@ class MenuUpdateManager
                 $entity->setParentKey($options['parentKey']);
             }
         }
-
-        $entity->setMenu($options['menu']);
-
+        if (isset($options['menu'])) {
+            $entity->setMenu($options['menu']);
+        }
         if (isset($options['isDivider']) && $options['isDivider']) {
             $entity->setDivider(true);
             $entity->setDefaultTitle(MenuUpdateTreeHandler::MENU_ITEM_DIVIDER_LABEL);
@@ -166,7 +166,7 @@ class MenuUpdateManager
         }
 
         foreach ($orderedChildren as $priority => $child) {
-            $update = $this->createMenuUpdate($ownershipType, $ownerId, ['menu' => $child->getName()]);
+            $update = $this->createMenuUpdate($ownershipType, $ownerId, ['key' => $child->getName()]);
             MenuUpdateUtils::updateMenuUpdate($update, $child, $menuName);
             $update->setPriority($priority);
             $updates[] = $update;

@@ -155,7 +155,10 @@ class MenuUpdateUtils
     private static function setValue(PropertyAccessor $accessor, MenuUpdateInterface $update, $key, $value)
     {
         if ($accessor->isWritable($update, $key)) {
-            $accessor->setValue($update, $key, $value);
+            $currentValue = $accessor->getValue($update, $key);
+            if ($currentValue === null || is_bool($currentValue)) {
+                $accessor->setValue($update, $key, $value);
+            }
         }
     }
 }
