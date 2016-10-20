@@ -80,6 +80,7 @@ class ResetPasswordActionHandler implements MassActionHandlerInterface
      */
     public function handle(MassActionHandlerArgs $args)
     {
+        $this->user = $this->getCurrentUser();
         $massActionOptions = $args->getMassAction()->getOptions();
 
         /** @var IterableResult $results */

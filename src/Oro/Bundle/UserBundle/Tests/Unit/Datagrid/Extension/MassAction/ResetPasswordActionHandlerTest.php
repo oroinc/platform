@@ -21,7 +21,15 @@ class ResetPasswordActionHandlerTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $processor = $this->getMockBuilder('Oro\Bundle\NotificationBundle\Processor\EmailNotificationProcessor')
+        $securityFacade = $this->getMockBuilder('Oro\Bundle\SecurityBundle\SecurityFacade')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $securityFacade
+            ->expects($this->atLeastOnce())
+            ->method('getLoggedUser')
+            ->willReturn(new User());
+
+        $processor = $this->getMockBuilder('Oro\Bundle\NotificationBundle\Manager\EmailNotificationManager')
             ->disableOriginalConstructor()
             ->getMock();
         $processor
@@ -44,7 +52,13 @@ class ResetPasswordActionHandlerTest extends \PHPUnit_Framework_TestCase
             ->getMock();
 
         $this->methodCalls = 0;
-        $this->handler = new ResetPasswordActionHandler($processor, $userManager, $this->translator, $logger);
+        $this->handler = new ResetPasswordActionHandler(
+            $processor,
+            $userManager,
+            $this->translator,
+            $logger,
+            $securityFacade
+        );
     }
 
     public function testHandle()
