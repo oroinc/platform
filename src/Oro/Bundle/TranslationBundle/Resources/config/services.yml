@@ -99,7 +99,8 @@ services:
     oro_translation.database_translation.persister:
         class: %oro_translation.database_translation.persister.class%
         arguments:
-            - '@doctrine.orm.entity_manager'
+            - '@doctrine'
+            - '@oro_entity.orm.native_query_executor_helper'
             - '@oro_translation.database_translation.metadata.cache'
 
     oro_translation.database_translation.loader:

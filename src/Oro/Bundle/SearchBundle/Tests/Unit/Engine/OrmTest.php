@@ -150,7 +150,12 @@ class OrmTest extends \PHPUnit_Framework_TestCase
 
         return $this->getMockBuilder('Oro\Bundle\SearchBundle\Engine\Orm')
             ->setConstructorArgs($arguments)
-            ->setMethods(['clearAllSearchIndexes', 'clearSearchIndexForEntity', 'reindexSingleEntity'])
+            ->setMethods([
+                'clearAllSearchIndexes',
+                'clearSearchIndexForEntity',
+                'reindexSingleEntity',
+                'getNumberOfRecordsToReindex'
+            ])
             ->getMock();
     }
 }

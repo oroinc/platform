@@ -45,6 +45,9 @@ abstract class AbstractEngine implements EngineInterface
     /** @var bool */
     protected $logQueries = false;
 
+    /** @var \Iterator[]|\Countable[] */
+    protected $iteratorCache = [];
+
     /**
      * @param ManagerRegistry               $registry
      * @param EventDispatcherInterface      $eventDispatcher
@@ -176,56 +179,105 @@ abstract class AbstractEngine implements EngineInterface
      * @param string       $entityName
      * @param integer|null $offset
      * @param integer|null $limit
+     *
      * @return int
      */
     protected function reindexSingleEntity($entityName, $offset = null, $limit = null)
     {
-        /** @var EntityManager $entityManager */
-        $entityManager = $this->registry->getManagerForClass($entityName);
-        $entityManager->getConnection()->getConfiguration()->setSQLLogger(null);
-
-        $pk = $entityManager->getClassMetadata($entityName)->getIdentifier();
-
-        $orderingsExpr = new OrderBy();
-        foreach ($pk as $fieldName) {
-            $orderingsExpr->add('entity.' . $fieldName);
-        }
-
-        $queryBuilder = $entityManager->getRepository($entityName)
-            ->createQueryBuilder('entity')
-            ->orderBy($orderingsExpr);
-
-        if (null !== $offset) {
-            $queryBuilder->setFirstResult($offset);
-        }
-        if (null !== $limit) {
-            $queryBuilder->setMaxResults($limit);
-        }
-
-        $iterator = new BufferedQueryResultIterator($queryBuilder);
-        $iterator->setBufferSize(static::BATCH_SIZE);
+        $iterator = $this->createIterator($entityName, $offset, $limit);
 
         $itemsCount = 0;
-        $entities   = [];
-
         foreach ($iterator as $entity) {
-            $entities[] = $entity;
+            $this->recordProcessed();
             $itemsCount++;
-
-            if (0 == $itemsCount % static::BATCH_SIZE) {
-                $this->save($entities, true);
-                $entityManager->clear();
-                $entities = [];
-                gc_collect_cycles();
-            }
-        }
-
-        if ($itemsCount % static::BATCH_SIZE > 0) {
-            $this->save($entities, true);
-            $entityManager->clear();
         }
 
         return $itemsCount;
+    }
+
+    /**
+     * Called each time record was processed to keep track of progress
+     */
+    protected function recordProcessed()
+    {
+    }
+
+    /**
+     * @return int
+     */
+    protected function getNumberOfRecordsToReindex($entityName, $offset = null, $limit = null)
+    {
+        return count($this->createIterator($entityName, $offset, $limit, true));
+    }
+
+    /**
+     * @param string       $entityName
+     * @param integer|null $offset
+     * @param integer|null $limit
+     * @param bool         $cache
+     *
+     * @return \Iterator|\Countable
+     */
+    protected function createIterator($entityName, $offset = null, $limit = null, $cache = false)
+    {
+        $key = $this->createIteratorCacheKey($entityName, $offset, $limit);
+        if (!isset($this->iteratorCache[$key])) {
+            /** @var EntityManager $entityManager */
+            $entityManager = $this->registry->getManagerForClass($entityName);
+            $entityManager->getConnection()->getConfiguration()->setSQLLogger(null);
+
+            $pk = $entityManager->getClassMetadata($entityName)->getIdentifier();
+
+            $orderingsExpr = new OrderBy();
+            foreach ($pk as $fieldName) {
+                $orderingsExpr->add('entity.' . $fieldName);
+            }
+
+            $queryBuilder = $entityManager->getRepository($entityName)
+                ->createQueryBuilder('entity')
+                ->orderBy($orderingsExpr);
+
+            if (null !== $offset) {
+                $queryBuilder->setFirstResult($offset);
+            }
+            if (null !== $limit) {
+                $queryBuilder->setMaxResults($limit);
+            }
+
+            $iterator = new BufferedQueryResultIterator($queryBuilder);
+            $iterator->setBufferSize(static::BATCH_SIZE);
+            $iterator->setPageLoadedCallback(function (array $entities) use ($entityManager) {
+                $this->save($entities, true);
+                $entityManager->clear();
+                gc_collect_cycles();
+
+                return $entities;
+            });
+
+            if ($cache) {
+                $this->iteratorCache[$key] = $iterator;
+            }
+        } else {
+            $iterator = $this->iteratorCache[$key];
+        }
+
+        if (!$cache) {
+            unset($this->iteratorCache[$key]);
+        }
+
+        return $iterator;
+    }
+
+    /**
+     * @param string       $entityName
+     * @param integer|null $offset
+     * @param integer|null $limit
+     *
+     * @return string
+     */
+    protected function createIteratorCacheKey($entityName, $offset = null, $limit = null)
+    {
+        return sprintf('%d.%d.%d', $entityName, $offset, $limit);
     }
 
     /**

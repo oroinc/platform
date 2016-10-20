@@ -2,6 +2,12 @@ parameters:
     oro_search.engine.class:         Oro\Bundle\SearchBundle\Engine\Orm
 
 services:
+    oro_search.search.engine.storer:
+        class: Oro\Bundle\SearchBundle\Engine\Orm\DbalStorer
+        arguments:
+            - '@oro_entity.doctrine_helper'
+        public: false
+
     oro_search.search.engine:
         class: %oro_search.engine.class%
         arguments:
@@ -13,3 +19,4 @@ services:
         calls:
             - [setLogQueries, [%oro_search.log_queries%]]
             - [setDrivers, [%oro_search.drivers%]]
+            - [setDbalStorer, ['@oro_search.search.engine.storer']]
