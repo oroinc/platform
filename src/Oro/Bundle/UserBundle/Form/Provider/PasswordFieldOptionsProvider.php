@@ -38,11 +38,11 @@ class PasswordFieldOptionsProvider
     }
 
     /**
-     * Generate hint string
+     * Generate a tooltip string with password requirements
      *
      * @return string
      */
-    public function getHintOption()
+    public function getTooltip()
     {
         return $this->passwordTooltip->getTooltip();
     }

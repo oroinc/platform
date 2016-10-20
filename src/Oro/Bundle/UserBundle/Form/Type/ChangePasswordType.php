@@ -63,12 +63,10 @@ class ChangePasswordType extends AbstractType
                     ],
                     'first_options' => [
                         'label' => $options['first_options_label'],
+                        'tooltip' => $this->optionsProvider->getTooltip(),
                         'attr' => [
                             'data-validation' => $this->optionsProvider->getDataValidationOption(),
                         ],
-                        'hint' => $this->optionsProvider->getHintOption(),
-                        'hint_position' => 'above',
-                        'hint_attr' => ['class' => 'oro-hint oro-hint-above'],
                     ],
                     'second_options' => ['label' => $options['second_options_label'],
                     ],

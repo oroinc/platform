@@ -39,8 +39,9 @@ class ResetType extends AbstractType
                 'attr' => [
                     'data-validation' => $this->optionsProvider->getDataValidationOption(),
                 ],
-                'hint' => $this->optionsProvider->getHintOption(),
+                'hint' => $this->optionsProvider->getTooltip(),
                 'hint_position' => 'above',
+                'hint_attr' => ['class' => 'oro-hint oro-hint-above'],
             ],
             'second_options'  => [
                 'label' => 'oro.user.password.enter_new_password_again.label',

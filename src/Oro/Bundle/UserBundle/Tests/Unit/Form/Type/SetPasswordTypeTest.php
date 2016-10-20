@@ -22,7 +22,7 @@ class SetPasswordTypeTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
         $this->optionsProvider->expects($this->any())
-            ->method('getHintOption')
+            ->method('getTooltip')
             ->willReturn('test');
         $this->optionsProvider->expects($this->any())
             ->method('getSuggestPasswordOptions')

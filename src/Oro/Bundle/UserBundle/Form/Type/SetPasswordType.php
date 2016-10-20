@@ -36,7 +36,7 @@ class SetPasswordType extends AbstractType
                 'required' => true,
                 'label' => 'oro.user.new_password.label',
                 'attr' => $this->optionsProvider->getSuggestPasswordOptions(),
-                'tooltip' => $this->optionsProvider->getHintOption(),
+                'tooltip' => $this->optionsProvider->getTooltip(),
                 'constraints' => [
                     new NotBlank(),
                     new PasswordComplexity($this->optionsProvider->getPasswordComplexityConstraintOptions())
