@@ -27,7 +27,7 @@ class TranslationRouteHelper
     }
 
     /**
-     * Generates URL or URI to "Manage Translations" page with properly configured query sting
+     * Generates URL or URI to "Manage Translations" page with properly configured query string
      * to apply filter criteria.
      *
      * Param 'filters' uses next format ['filterName' => 'filterCriterion', ... , 'filterNameN' => 'filterCriterionN']

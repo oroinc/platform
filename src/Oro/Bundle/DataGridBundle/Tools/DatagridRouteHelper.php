@@ -22,7 +22,7 @@ class DatagridRouteHelper
     }
 
     /**
-     * Generates URL or URI to the page where Datagrid placed with properly configured query sting
+     * Generates URL or URI to the page where Datagrid placed with properly configured query string
      * to apply filter criteria
      *
      * @param string $routeName
