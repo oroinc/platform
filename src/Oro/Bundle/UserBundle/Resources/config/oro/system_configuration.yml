@@ -1,8 +1,8 @@
 system_configuration:
     groups:
-        security_settings:
+        user_settings:
             icon:  icon-key
-            title: oro.user.system_configuration.groups.security_settings.title
+            title: oro.user.system_configuration.groups.user_settings.title
 
         password_complexity_rules:
             icon:  icon-usd
@@ -50,7 +50,7 @@ system_configuration:
                 children:
                     general_setup:
                         children:
-                            security_settings:
+                            user_settings:
                                 priority: 100
                                 children:
                                     password_complexity_rules:
