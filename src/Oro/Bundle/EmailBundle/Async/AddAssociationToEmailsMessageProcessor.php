@@ -9,7 +9,7 @@ use Oro\Component\MessageQueue\Transport\SessionInterface;
 use Oro\Component\MessageQueue\Util\JSON;
 use Psr\Log\LoggerInterface;
 
-class AddAssociationMessageProcessor implements MessageProcessorInterface, TopicSubscriberInterface
+class AddAssociationToEmailsMessageProcessor implements MessageProcessorInterface, TopicSubscriberInterface
 {
     /**
      * @var AssociationManager
@@ -38,9 +38,9 @@ class AddAssociationMessageProcessor implements MessageProcessorInterface, Topic
     {
         $data = JSON::decode($message->getBody());
 
-        if (! isset($data['emailIds']) || ! isset($data['targetClass']) || ! isset($data['targetId'])) {
+        if (! isset($data['emailIds'], $data['targetClass'], $data['targetId']) || ! is_array($data['emailIds'])) {
             $this->logger->critical(sprintf(
-                '[AddAssociationMessageProcessor] Got invalid message: "%s"',
+                '[AddAssociationToEmailsMessageProcessor] Got invalid message: "%s"',
                 $message->getBody()
             ));
 
@@ -57,6 +57,6 @@ class AddAssociationMessageProcessor implements MessageProcessorInterface, Topic
      */
     public static function getSubscribedTopics()
     {
-        return [Topics::ADD_ASSOCIATION];
+        return [Topics::ADD_ASSOCIATION_TO_EMAILS];
     }
 }

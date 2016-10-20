@@ -8,7 +8,6 @@ use Doctrine\ORM\Query;
 
 use FOS\RestBundle\Util\Codes;
 
-use Oro\Bundle\EmailBundle\Async\Topics;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -19,6 +18,7 @@ use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 
+use Oro\Bundle\EmailBundle\Async\Topics;
 use Oro\Bundle\EmailBundle\Cache\EmailCacheManager;
 use Oro\Bundle\EmailBundle\Entity\Manager\EmailManager;
 use Oro\Bundle\EmailBundle\Entity\Email;
@@ -34,6 +34,7 @@ use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\DataGridBundle\Extension\MassAction\MassActionDispatcher;
 use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
 use Oro\Bundle\EmailBundle\Provider\EmailRecipientsHelper;
+use Oro\Component\MessageQueue\Client\MessageProducer;
 
 /**
  * Class EmailController
@@ -808,7 +809,7 @@ class EmailController extends Controller
     }
 
     /**
-     * @return \Oro\Component\MessageQueue\Client\MessageProducer
+     * @return MessageProducer
      */
     private function getMessageProducer()
     {

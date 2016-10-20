@@ -14,7 +14,7 @@ class OroImapBundle extends Bundle
     public function build(ContainerBuilder $container)
     {
         $addTopicPass = AddTopicMetaPass::create()
-            ->add(Topics::SYNC_EMAIL, 'Emails synchronization')
+            ->add(Topics::SYNC_EMAIL, 'Synchronization emails via IMAP')
         ;
 
         $container->addCompilerPass($addTopicPass);

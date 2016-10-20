@@ -1,7 +1,7 @@
 <?php
 namespace Oro\Bundle\EmailBundle\Tests\Unit\Async;
 
-use Oro\Bundle\EmailBundle\Async\AddAssociationMessageProcessor;
+use Oro\Bundle\EmailBundle\Async\AddAssociationToEmailsMessageProcessor;
 use Oro\Bundle\EmailBundle\Async\Topics;
 use Oro\Bundle\EmailBundle\Command\Manager\AssociationManager;
 use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
@@ -9,11 +9,11 @@ use Oro\Component\MessageQueue\Transport\Null\NullMessage;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
 use Psr\Log\LoggerInterface;
 
-class AddAssociationMessageProcessorTest extends \PHPUnit_Framework_TestCase
+class AddAssociationToEmailsMessageProcessorTest extends \PHPUnit_Framework_TestCase
 {
     public function testCouldBeConstructedWithRequiredArguments()
     {
-        new AddAssociationMessageProcessor($this->createAssociationManagerMock(), $this->createLoggerMock());
+        new AddAssociationToEmailsMessageProcessor($this->createAssociationManagerMock(), $this->createLoggerMock());
     }
 
     public function testShouldRejectMessageIfEmailIdIsMissing()
@@ -22,7 +22,7 @@ class AddAssociationMessageProcessorTest extends \PHPUnit_Framework_TestCase
         $logger
             ->expects($this->once())
             ->method('critical')
-            ->with('[AddAssociationMessageProcessor] Got invalid message: "{"targetClass":"class","targetId":123}"')
+            ->with('[AddAssociationToEmailsMessageProcessor] Got invalid message: "{"targetClass":"class","targetId":123}"')
         ;
 
         $message = new NullMessage();
@@ -31,7 +31,7 @@ class AddAssociationMessageProcessorTest extends \PHPUnit_Framework_TestCase
             'targetId' => 123,
         ]));
 
-        $processor = new AddAssociationMessageProcessor(
+        $processor = new AddAssociationToEmailsMessageProcessor(
             $this->createAssociationManagerMock(),
             $logger
         );
@@ -47,7 +47,7 @@ class AddAssociationMessageProcessorTest extends \PHPUnit_Framework_TestCase
         $logger
             ->expects($this->once())
             ->method('critical')
-            ->with('[AddAssociationMessageProcessor] Got invalid message: "{"emailIds":[],"targetId":123}"')
+            ->with('[AddAssociationToEmailsMessageProcessor] Got invalid message: "{"emailIds":[],"targetId":123}"')
         ;
 
         $message = new NullMessage();
@@ -56,7 +56,7 @@ class AddAssociationMessageProcessorTest extends \PHPUnit_Framework_TestCase
             'targetId' => 123,
         ]));
 
-        $processor = new AddAssociationMessageProcessor(
+        $processor = new AddAssociationToEmailsMessageProcessor(
             $this->createAssociationManagerMock(),
             $logger
         );
@@ -72,7 +72,7 @@ class AddAssociationMessageProcessorTest extends \PHPUnit_Framework_TestCase
         $logger
             ->expects($this->once())
             ->method('critical')
-            ->with('[AddAssociationMessageProcessor] Got invalid message: "{"emailIds":[],"targetClass":"class"}"')
+            ->with('[AddAssociationToEmailsMessageProcessor] Got invalid message: "{"emailIds":[],"targetClass":"class"}"')
         ;
 
         $message = new NullMessage();
@@ -81,7 +81,7 @@ class AddAssociationMessageProcessorTest extends \PHPUnit_Framework_TestCase
             'targetClass' => 'class',
         ]));
 
-        $processor = new AddAssociationMessageProcessor(
+        $processor = new AddAssociationToEmailsMessageProcessor(
             $this->createAssociationManagerMock(),
             $logger
         );
@@ -113,7 +113,7 @@ class AddAssociationMessageProcessorTest extends \PHPUnit_Framework_TestCase
             'targetId' => 123,
         ]));
 
-        $processor = new AddAssociationMessageProcessor(
+        $processor = new AddAssociationToEmailsMessageProcessor(
             $manager,
             $logger
         );
@@ -125,7 +125,7 @@ class AddAssociationMessageProcessorTest extends \PHPUnit_Framework_TestCase
 
     public function testShouldReturnSubscribedTopics()
     {
-        $this->assertEquals([Topics::ADD_ASSOCIATION], AddAssociationMessageProcessor::getSubscribedTopics());
+        $this->assertEquals([Topics::ADD_ASSOCIATION_TO_EMAILS], AddAssociationToEmailsMessageProcessor::getSubscribedTopics());
     }
 
     /**

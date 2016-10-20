@@ -322,8 +322,8 @@ services:
         tags:
             - { name: 'oro_message_queue.client.message_processor' }
 
-    oro_email.async.processor.add_association:
-        class: 'Oro\Bundle\EmailBundle\Async\AddAssociationMessageProcessor'
+    oro_email.async.processor.add_association_to_emails:
+        class: 'Oro\Bundle\EmailBundle\Async\AddAssociationToEmailsMessageProcessor'
         arguments:
             - '@oro_email.command.association_manager'
             - '@logger'

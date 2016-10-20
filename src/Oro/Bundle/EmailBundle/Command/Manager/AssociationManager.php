@@ -76,12 +76,12 @@ class AssociationManager
     /**
      * Process of command oro:email:update-email-owner-associations
      *
-     * @param $ownerClassName
-     * @param $ownerId
+     * @param string $ownerClassName
+     * @param array $ownerId
      *
      * @return int
      */
-    public function processUpdateEmailOwner($ownerClassName, $ownerId)
+    public function processUpdateEmailOwner($ownerClassName, array $ownerId)
     {
         $ownerQb = $this->createOwnerQb($ownerClassName, $ownerId);
         $owners = $this->getOwnerIterator($ownerQb);
@@ -91,29 +91,29 @@ class AssociationManager
 
             /** @var QueryBuilder $emailQB */
             foreach ($emailsQB as $emailQB) {
-                $emailId = [];
+                $emailIds = [];
                 $emails = (new BufferedQueryResultIterator($emailQB))
                     ->setBufferSize(self::EMAIL_BUFFER_SIZE)
                     ->setPageCallback(function () use (
                         &$owner,
-                        &$emailId,
+                        &$emailIds,
                         &$ownerClassName,
                         &$countNewMessages
                     ) {
                         $this->clear();
 
-                        $this->producer->send(Topics::ADD_ASSOCIATION, [
-                            'emailIds' => $emailId,
+                        $this->producer->send(Topics::ADD_ASSOCIATION_TO_EMAILS, [
+                            'emailIds' => $emailIds,
                             'targetClass' => $ownerClassName,
                             'targetId' => $owner->getId(),
                         ]);
 
-                        $emailId = [];
+                        $emailIds = [];
                         $countNewMessages++;
                     });
 
                 foreach ($emails as $email) {
-                    $emailId[] = $email->getId();
+                    $emailIds[] = $email->getId();
                 }
             }
         }

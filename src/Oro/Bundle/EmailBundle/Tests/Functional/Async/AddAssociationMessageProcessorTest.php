@@ -1,10 +1,10 @@
 <?php
 namespace Oro\Bundle\EmailBundle\Tests\Functional\Async;
 
-use Oro\Bundle\EmailBundle\Async\AddAssociationMessageProcessor;
+use Oro\Bundle\EmailBundle\Async\AddAssociationToEmailsMessageProcessor;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
-class AddAssociationMessageProcessorTest extends WebTestCase
+class AddAssociationToEmailsMessageProcessorTest extends WebTestCase
 {
     protected function setUp()
     {
@@ -13,8 +13,8 @@ class AddAssociationMessageProcessorTest extends WebTestCase
 
     public function testCouldBeConstructedByContainer()
     {
-        $service = $this->getContainer()->get('oro_email.async.processor.add_association');
+        $service = $this->getContainer()->get('oro_email.async.processor.add_association_to_emails');
 
-        $this->assertInstanceOf(AddAssociationMessageProcessor::class, $service);
+        $this->assertInstanceOf(AddAssociationToEmailsMessageProcessor::class, $service);
     }
 }

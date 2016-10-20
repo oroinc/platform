@@ -18,7 +18,6 @@ use Oro\Bundle\EmailBundle\Entity\Manager\EmailThreadManager;
 use Oro\Bundle\EmailBundle\Model\EmailActivityUpdates;
 use Oro\Component\MessageQueue\Client\MessageProducerInterface;
 
-// EntityListener -> EmailActivityUpdates -> UpdateEmailOwnerAssociationsCommand -> AddAssociationCommand
 class EntityListener
 {
     /** @var EmailOwnerManager */
@@ -146,7 +145,6 @@ class EntityListener
             return;
         }
         
-        // group entity id by class
         $entitiesIdsByClass = [];
         foreach ($entities as $entity) {
             $class = ClassUtils::getClass($entity);
