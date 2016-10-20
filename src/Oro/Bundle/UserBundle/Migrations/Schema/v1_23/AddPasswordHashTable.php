@@ -15,6 +15,7 @@ class AddPasswordHashTable implements Migration
     public function up(Schema $schema, QueryBag $queries)
     {
         static::createOroUserPasswordHashTable($schema);
+        $queries->addPostQuery(new MigrateUserPasswords());
     }
 
     /**
