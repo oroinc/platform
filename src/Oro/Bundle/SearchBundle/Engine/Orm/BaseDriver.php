@@ -544,10 +544,10 @@ abstract class BaseDriver
             ->from($this->entityName, 'filter')
             ->join($subJoinField, $subJoinAlias)
             ->andWhere(sprintf(
-                           '%s.field = :field%s',
-                           $subJoinAlias,
-                           $index
-                       ));
+                '%s.field = :field%s',
+                $subJoinAlias,
+                $index
+            ));
 
         $queryString = '(search.id %s (%s))';
 
