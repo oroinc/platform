@@ -275,31 +275,7 @@ class Parser
         while (!$this->stream->isEOF() && !$exit) {
             /** @var Token $token */
             $token = $this->stream->current;
-            switch ($token->type) {
-                case Token::PUNCTUATION_TYPE && $token->test(Token::PUNCTUATION_TYPE, '('):
-                    /** @var CompositeExpression $expr */
-                    $expr = $this->parseCompositeCondition();
-                    if ($expr instanceof CompositeExpression) {
-                        $this->query->getCriteria()->{strtolower($expr->getType()).'Where'}($expr);
-                    }
-                    break;
-                case Token::STRING_TYPE:
-                    list ($type, $expr) = $this->parseSimpleCondition();
-                    $this->query->getCriteria()->{$type}($expr);
-                    break;
-                case Token::OPERATOR_TYPE && in_array($token->value, [Query::KEYWORD_AND, Query::KEYWORD_OR]):
-                    list ($type, $expr) = $this->parseSimpleCondition($token->value);
-                    $this->query->getCriteria()->{$type}($expr);
-                    break;
-                case Token::KEYWORD_TYPE:
-                    $exit = true;
-                    break;
-                default:
-                    throw new ExpressionSyntaxError(
-                        sprintf('Unexpected token "%s" in where statement', $this->stream->current->type),
-                        $this->stream->current->cursor
-                    );
-            }
+            $exit = $this->parseToken($token);
         }
     }
 
@@ -591,5 +567,41 @@ class Parser
         $this->stream->expect(Token::PUNCTUATION_TYPE, ')', 'A list of arguments must be closed by a parenthesis');
 
         return $args;
+    }
+
+    /**
+     * @param Token $token
+     * @return bool
+     */
+    private function parseToken(Token $token)
+    {
+        $exit = false;
+        switch ($token->type) {
+            case Token::PUNCTUATION_TYPE && $token->test(Token::PUNCTUATION_TYPE, '('):
+                /** @var CompositeExpression $expr */
+                $expr = $this->parseCompositeCondition();
+                if ($expr instanceof CompositeExpression) {
+                    $this->query->getCriteria()->{strtolower($expr->getType()) . 'Where'}($expr);
+                }
+                break;
+            case Token::STRING_TYPE:
+                list ($type, $expr) = $this->parseSimpleCondition();
+                $this->query->getCriteria()->{$type}($expr);
+                break;
+            case Token::OPERATOR_TYPE && in_array($token->value, [Query::KEYWORD_AND, Query::KEYWORD_OR]):
+                list ($type, $expr) = $this->parseSimpleCondition($token->value);
+                $this->query->getCriteria()->{$type}($expr);
+                break;
+            case Token::KEYWORD_TYPE:
+                $exit = true;
+                break;
+            default:
+                throw new ExpressionSyntaxError(
+                    sprintf('Unexpected token "%s" in where statement', $this->stream->current->type),
+                    $this->stream->current->cursor
+                );
+        }
+
+        return $exit;
     }
 }
