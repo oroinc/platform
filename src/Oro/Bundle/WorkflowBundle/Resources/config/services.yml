@@ -329,9 +329,7 @@ services:
             - '@translator.default'
             - '@oro_translation.manager.translation'
             - '@oro_translation.helper.translation'
-            - '@oro_translation.generator.translation_key'
             - '@oro_translation.helper.translation_route'
-            - '@oro_workflow.translation.fields_iterator'
 
     oro_workflow.translation.processor:
         class: 'Oro\Bundle\WorkflowBundle\Translation\TranslationProcessor'
