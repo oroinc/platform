@@ -12,7 +12,6 @@ parameters:
 
     oro_organization.form.listener.class:                      Oro\Bundle\OrganizationBundle\Event\FormListener
     oro_organization.entity_ownership.listener.class:          Oro\Bundle\OrganizationBundle\Event\RecordOwnerDataListener
-    oro_organization.business_unit.listener.class:             Oro\Bundle\OrganizationBundle\Event\BusinessUnitListener
     oro_organization.import_strategy.listener.class:           Oro\Bundle\OrganizationBundle\Event\ImportStrategyListener
     oro_organization.listener.choice_tree_filter_load_data_listener.class: Oro\Bundle\OrganizationBundle\EventListener\ChoiceTreeFilterLoadDataListener
 
