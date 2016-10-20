@@ -3,8 +3,8 @@
 namespace Oro\Bundle\UserBundle\Model;
 
 use Oro\Bundle\EmailBundle\Model\EmailTemplateInterface;
-use Oro\Bundle\NotificationBundle\Processor\EmailNotificationInterface;
-use Oro\Bundle\NotificationBundle\Processor\SenderAwareEmailNotificationInterface;
+use Oro\Bundle\NotificationBundle\Model\EmailNotificationInterface;
+use Oro\Bundle\NotificationBundle\Model\SenderAwareEmailNotificationInterface;
 
 class MassPasswordResetEmailNotification implements EmailNotificationInterface, SenderAwareEmailNotificationInterface
 {
