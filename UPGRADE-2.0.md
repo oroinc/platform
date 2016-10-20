@@ -515,8 +515,33 @@ to the [Fallback documentation](./src/Oro/Bundle/EntityBundle/Resources/doc/enti
 - Added DOC file `doc/content_outdating.md` moved from `NavigationBundle`.
 - Added DOC file `doc/mediator-handlers.md` moved from `NavigationBundle`.
 
-####Component
+####DependencyInjection Component
 - Added trait `Oro\Component\DependencyInjection\Compiler\TaggedServicesCompilerPassTrait`
+
+####EntitySerializer Component
+- Changed signature of `transform` method of `Oro\Component\EntitySerializer\DataTransformerInterface`. Added `array $context` as the last parameter.
+- Changed signature of `post_serialize` callbacks for the EntitySerializer. Added `array $context` as the last parameter.
+- Changed signature of `post_serialize` callbacks for the EntitySerializer. Added `array $context` as the last parameter.
+- Changed signature of `serialize` method of `Oro\Component\EntitySerializer\EntitySerializer`. Added `array $context = []` as the last parameter.
+- Changed signature of `serializeEntities` method of `Oro\Component\EntitySerializer\EntitySerializer`. Added `array $context = []` as the last parameter.
+
+####NotificationBundle
+- Moved interface `Oro\Bundle\NotificationBundle\Processor\EmailNotificationInterface` to `Oro\Bundle\NotificationBundle\Model` namespace
+- Moved interface `Oro\Bundle\NotificationBundle\Processor\SenderAwareEmailNotificationInterface` to `Oro\Bundle\NotificationBundle\Model` namespace
+- Removed class `Oro\Bundle\NotificationBundle\Processor\AbstractNotificationProcessor`
+- Removed service @oro_notifications.manager.email_notification and its class `Oro\Bundle\NotificationBundle\Processor\EmailNotificationProcessor` as now the email notifications are processed asynchronously with `Oro\Bundle\NotificationBundle\Async\SendEmailMessageProcessor`
+- Added class `Oro\Bundle\NotificationBundle\Manager\EmailNotificationManager`; some logic from `Oro\Bundle\NotificationBundle\Processor\EmailNotificationProcessor` was moved there
+- Added class `Oro\Bundle\NotificationBundle\Manager\EmailNotificationSender`; some logic from `Oro\Bundle\NotificationBundle\Processor\EmailNotificationProcessor` was moved there
+- Added class `Oro\Bundle\NotificationBundle\Async\Topics`
+- Added class `Oro\Bundle\NotificationBundle\Async\SendEmailMessageProcessor`
+- Constructor of `Oro\Bundle\NotificationBundle\Event\Handler\EmailNotificationHandler` changed: the first argument type is `Oro\Bundle\NotificationBundle\Manager\EmailNotificationManager` instead of `Oro\Bundle\NotificationBundle\Processor\EmailNotificationProcessor`
+- Constructor of `Oro\Bundle\NotificationBundle\Model\MassNotificationSender` changed: the first argument type is `Oro\Bundle\NotificationBundle\Manager\EmailNotificationManager` instead of `Oro\Bundle\NotificationBundle\Processor\EmailNotificationProcessor`
+
+####CalendarBundle
+- Constructor of `Oro\Bundle\CalendarBundle\Model\Email\EmailSendProcessor` changed: the first argument type is `Oro\Bundle\NotificationBundle\Manager\EmailNotificationManager` instead of `Oro\Bundle\NotificationBundle\Processor\EmailNotificationProcessor`
+
+####ReminderBundle
+- Constructor of `Oro\Bundle\ReminderBundle\Model\Email\EmailSendProcessor` changed: the first argument type is `Oro\Bundle\NotificationBundle\Manager\EmailNotificationManager` instead of `Oro\Bundle\NotificationBundle\Processor\EmailNotificationProcessor`
 
 ####DataAuditBundle
 - `Oro\Bundle\DataAuditBundle\Loggable\LoggableManager` was removed. Some logic moved to `Oro\Bundle\DataAuditBundle\EventListener\SendChangedEntitiesToMessageQueueListener` class and some backend processors.
@@ -527,3 +552,6 @@ to the [Fallback documentation](./src/Oro/Bundle/EntityBundle/Resources/doc/enti
 - `Loggable` and `Versioned` annotations were removed. Use entity config auditable option instead.
 - `Oro\Bundle\DataAuditBundle\EventListener\AuditGridListener` was removed. Similar functionality can be found in `Oro\Bundle\DataAuditBundle\Datagrid\EntityTypeProvider`.
 - `Oro\Bundle\DataAuditBundle\Loggable\AuditEntityMapper` was renamed to `Oro\Bundle\DataAuditBundle\Provider\AuditEntityMapper`.
+
+####ImapBundle
+ - The command `oro:imap:clear-mailbox` was removed. Produce message to the topic `Oro\Bundle\ImapBundle\Async\Topics::CLEAR_INACTIVE_MAILBOX` instead.

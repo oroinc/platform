@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\WorkflowBundle\Handler;
 
-use Exception;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
 use Oro\Bundle\WorkflowBundle\Exception\ForbiddenTransitionException;
 use Oro\Bundle\WorkflowBundle\Exception\InvalidTransitionException;
@@ -48,7 +47,7 @@ class TransitionHandler
     public function handle(Transition $transition, WorkflowItem $workflowItem)
     {
         if ($transition->getPageTemplate() || $transition->getDialogTemplate()) {
-            return;
+            return null;
         }
 
         $responseCode = null;
@@ -61,12 +60,19 @@ class TransitionHandler
             $responseCode = 400;
         } catch (ForbiddenTransitionException $e) {
             $responseCode = 403;
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             $responseCode = 500;
         }
 
         if (isset($e)) {
-            $this->logger->error($e->getMessage(), $e->getTrace());
+            $this->logger->error(
+                '[TransitionHandler] Could not perform transition.',
+                [
+                    'exception' => $e,
+                    'transition' => $transition,
+                    'workflowItem' => $workflowItem
+                ]
+            );
         }
 
         return $this->transitionHelper->createCompleteResponse($workflowItem, $responseCode);
