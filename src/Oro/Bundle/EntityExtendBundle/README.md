@@ -38,7 +38,7 @@ class OroAccountBundle implements Migration
 {
     public function up(Schema $schema, QueryBag $queries)
     {
-        $table = $schema->createTable('oro_account');
+        $table = $schema->createTable('orocrm_account');
         $table->addColumn(
             'description',
             'text',
@@ -111,7 +111,7 @@ class OroSalesBundle implements Migration, ExtendExtensionAwareInterface
 
     public function up(Schema $schema, QueryBag $queries)
     {
-        $table = $schema->createTable('oro_sales_lead');
+        $table = $schema->createTable('orocrm_sales_lead');
         $this->extendExtension->addManyToOneRelation(
             $schema,
             $table,
@@ -160,7 +160,7 @@ class OroSalesBundle implements Migration, ExtendExtensionAwareInterface
 
     public function up(Schema $schema, QueryBag $queries)
     {
-        $table = $schema->createTable('oro_sales_lead');
+        $table = $schema->createTable('orocrm_sales_lead');
         $this->extendExtension->addEnumField(
             $schema,
             $table,
