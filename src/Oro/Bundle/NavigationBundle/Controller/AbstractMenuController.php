@@ -18,6 +18,9 @@ abstract class AbstractMenuController extends Controller
      */
     protected $manager;
 
+    /**
+     * @return string
+     */
     abstract protected function getOwnershipType();
 
     /**
@@ -32,25 +35,25 @@ abstract class AbstractMenuController extends Controller
     }
 
     /**
-     * @param $menuName
-     * @param $response
-     * @return mixed
+     * @param string $menuName
+     * @return array
      */
     protected function view($menuName)
     {
         $menu = $this->getMenu($menuName);
+
         return [
             'entity' => $menu,
-            'ownershipType'=> $this->getOwnershipType(),
+            'ownershipType' => $this->getOwnershipType(),
             'tree' => $this->createMenuTree($menu)
         ];
     }
 
     /**
-     * @param string $menuName
-     * @param string $parentKey
+     * @param string  $menuName
+     * @param string  $parentKey
+     * @param integer $ownerId
      * @return array|RedirectResponse
-     *
      */
     protected function create($menuName, $parentKey, $ownerId)
     {
@@ -70,10 +73,10 @@ abstract class AbstractMenuController extends Controller
     }
 
     /**
-     * @param $menuName
-     * @param $key
+     * @param string  $menuName
+     * @param string  $key
+     * @param integer $ownerId
      * @return array|RedirectResponse
-     *
      */
     protected function update($menuName, $key, $ownerId)
     {
@@ -120,6 +123,7 @@ abstract class AbstractMenuController extends Controller
                 $response['menuItem'] = MenuUpdateUtils::findMenuItem($menu, $menuUpdate->getKey());
             }
         }
+
         return $response;
     }
 

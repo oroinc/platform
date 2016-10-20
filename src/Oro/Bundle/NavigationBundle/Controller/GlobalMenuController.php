@@ -88,7 +88,7 @@ class GlobalMenuController extends AbstractMenuController
     }
 
     /**
-     * {@inheritDoc}
+     * @return int
      */
     protected function getOwnerId()
     {

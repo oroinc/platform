@@ -18,12 +18,18 @@ class MenuUpdateTreeHandler
 
 
     /**
+     * @param TranslatorInterface $translator
      */
     public function __construct(TranslatorInterface $translator)
     {
         $this->translator = $translator;
     }
 
+    /**
+     * @param ItemInterface|null $root
+     * @param bool               $includeRoot
+     * @return array
+     */
     public function createTree(ItemInterface $root = null, $includeRoot = true)
     {
         if ($root === null) {
@@ -57,9 +63,9 @@ class MenuUpdateTreeHandler
     }
 
     /**
-     * @param array          $entities
-     * @param  ItemInterface $root
-     * @param  string        $includeRoot
+     * @param array         $entities
+     * @param ItemInterface $root
+     * @param string        $includeRoot
      * @return array
      */
     protected function formatTree(array $entities, $root, $includeRoot)
@@ -85,6 +91,7 @@ class MenuUpdateTreeHandler
 
     /**
      * @param ItemInterface $entity
+     * @return array
      */
     protected function formatEntity($entity)
     {

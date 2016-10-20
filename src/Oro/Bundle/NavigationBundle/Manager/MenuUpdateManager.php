@@ -9,6 +9,8 @@ use Doctrine\ORM\EntityRepository;
 use Knp\Menu\ItemInterface;
 
 use Oro\Bundle\NavigationBundle\Entity\MenuUpdateInterface;
+use Oro\Bundle\NavigationBundle\Exception\NotFoundMenuException;
+use Oro\Bundle\NavigationBundle\Exception\NotFoundParentException;
 use Oro\Bundle\NavigationBundle\JsTree\MenuUpdateTreeHandler;
 use Oro\Bundle\NavigationBundle\Provider\BuilderChainProvider;
 use Oro\Bundle\NavigationBundle\Utils\MenuUpdateUtils;
@@ -76,11 +78,15 @@ class MenuUpdateManager
                 $ownershipType,
                 $ownerId
             );
-            if($parent) {
-                $entity->setParentKey($options['parentKey']);
+            if (!$parent) {
+                throw new NotFoundParentException(sprintf('Parent with "%s" id not found.', $options['parentKey']));
             }
+            $entity->setParentKey($options['parentKey']);
         }
         if (isset($options['menu'])) {
+            if (!$this->builderChainProvider->has($options['menu'])) {
+                throw new NotFoundMenuException(sprintf('Menu with "%s" id not found.', $options['menu']));
+            }
             $entity->setMenu($options['menu']);
         }
         if (isset($options['isDivider']) && $options['isDivider']) {
@@ -127,7 +133,7 @@ class MenuUpdateManager
             'ownershipType' => $ownershipType,
             'ownerId' => $ownerId,
         ]);
-        
+
         if (!$update) {
             $update = $this->createMenuUpdate($ownershipType, $ownerId, ['key' => $key, 'menu' => $menuName]);
         }
@@ -151,7 +157,7 @@ class MenuUpdateManager
         foreach ($orderedChildren as $priority => $child) {
             $order[$child->getName()] = $priority;
         }
-        
+
         /** @var MenuUpdateInterface[] $updates */
         $updates = $this->getRepository()->findBy([
             'menu' => $menuName,
@@ -159,7 +165,7 @@ class MenuUpdateManager
             'ownershipType' => $ownershipType,
             'ownerId' => $ownerId,
         ]);
-        
+
         foreach ($updates as $update) {
             $update->setPriority($order[$update->getKey()]);
             unset($orderedChildren[$order[$update->getKey()]]);
@@ -171,7 +177,7 @@ class MenuUpdateManager
             $update->setPriority($priority);
             $updates[] = $update;
         }
-        
+
         return $updates;
     }
 
