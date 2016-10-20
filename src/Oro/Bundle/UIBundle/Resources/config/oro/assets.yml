@@ -3,10 +3,10 @@ assets:
         'timepicker':
             - 'bundles/bowerassets/timepicker/jquery.timepicker.css'
         'oroui':
-            - 'bundles/jstree/themes/default/style.min.css'
+            - 'bundles/components/jstree/dist/themes/default/style.min.css'
             # libraries' styles
-            - 'bundles/oroui/lib/bootstrap/bootstrap.less'
-            - 'bundles/oroui/lib/font-awesome/css/font-awesome.css'
+            - 'bundles/bowerassets/bootstrap/less/bootstrap.less'
+            - 'bundles/bowerassets/font-awesome/css/font-awesome.css'
             - 'bundles/oroui/lib/simplecolorpicker/jquery.simplecolorpicker.css'
             - 'bundles/oroui/lib/simplecolorpicker/jquery.simplecolorpicker-fontawesome.css'
             - 'bundles/oroui/lib/minicolors/jquery.minicolors.css'

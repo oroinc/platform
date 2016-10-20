@@ -96,7 +96,9 @@
         "bower-asset/lightgallery": "1.2.18",
         "bower-asset/less": "2.5.*",
         "bower-asset/jquery-ui-multiselect-widget": "1.14",
-        "bower-asset/Autolinker.js": "0.11.0"
+        "bower-asset/Autolinker.js": "0.11.0",
+        "bower-asset/font-awesome": "3.2.1",
+        "bower-asset/bootstrap": "2.3.0"
     },
     "require-dev": {
         "sensio/generator-bundle": "2.5.3",

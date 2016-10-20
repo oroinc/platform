@@ -13,17 +13,9 @@ config:
         'jquery.minicolors':
             deps:
                 - 'jquery'
-        'jstree/jquery.jstree.min':
+        'bootstrap-popover':
             deps:
-                - 'jquery'
-        'bootstrap':
-            deps:
-                - 'jquery'
-        'oroui/lib/bootstrap/js/bootstrap-popover':
-            deps:
-                - 'oroui/lib/bootstrap/js/bootstrap-tooltip'
-        'underscore':
-            exports: '_'
+                - 'bootstrap-tooltip'
         'backbone-bootstrap-modal':
             deps:
                 - 'jquery'
@@ -110,8 +102,21 @@ config:
         'jquery.minicolors': 'bundles/oroui/lib/minicolors/jquery.minicolors.js'
         'jquery.cookie': 'bundles/bowerassets/jquery-cookie/jquery.cookie.js'
         'jquery.mCustomScrollbar': 'bundles/bowerassets/malihu-custom-scrollbar-plugin/jquery.mCustomScrollbar.js'
-        'bootstrap': 'bundles/oroui/lib/bootstrap.min.js'
-#        'bootstrap': 'bundles/oroui/js/bootstrap-dev.js'
+        'jquery.jstree': 'bundles/components/jstree/dist/jstree.js'
+        'bootstrap-affix': 'bowerassets/bootstrap/docs/assets/js/bootstrap-affix.js'
+        'bootstrap-alert': 'bowerassets/bootstrap/docs/assets/js/bootstrap-alert.js'
+        'bootstrap-button': 'bowerassets/bootstrap/docs/assets/js/bootstrap-button.js'
+        'bootstrap-carousel': 'bowerassets/bootstrap/docs/assets/js/bootstrap-carousel.js'
+        'bootstrap-collapse': 'bowerassets/bootstrap/docs/assets/js/bootstrap-collapse.js'
+        'bootstrap-dropdown': 'bowerassets/bootstrap/docs/assets/js/bootstrap-dropdown.js'
+        'bootstrap-modal': 'bowerassets/bootstrap/docs/assets/js/bootstrap-modal.js'
+        'bootstrap-popover': 'bowerassets/bootstrap/docs/assets/js/bootstrap-popover.js'
+        'bootstrap-scrollspy': 'bowerassets/bootstrap/docs/assets/js/bootstrap-scrollspy.js'
+        'bootstrap-tab': 'bowerassets/bootstrap/docs/assets/js/bootstrap-tab.js'
+        'bootstrap-tooltip': 'bowerassets/bootstrap/docs/assets/js/bootstrap-tooltip.js'
+        'bootstrap-transition': 'bowerassets/bootstrap/docs/assets/js/bootstrap-transition.js'
+        'bootstrap-typeahead': 'bowerassets/bootstrap/docs/assets/js/bootstrap-typeahead.js'
+        'bootstrap': 'bundles/oroui/lib/bootstrap.js'
         'underscore': 'bundles/components/underscore/underscore.js'
         'backbone': 'bundles/components/backbone/backbone.js'
         'chaplin': 'bundles/bowerassets/chaplin/chaplin.js'
@@ -215,7 +220,6 @@ config:
 
 build:
     paths:
-        'jstree/jquery.jstree.min': 'empty:'
 #       Backbone after v.1.1.1 started to support AMD. And that broke a js-build with
 #       files which does not support AMD. backbone-bootstrap-modal use AMD without dependency,
 #       therefore it's excluded
