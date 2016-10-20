@@ -104,7 +104,7 @@ define(function(require) {
         },
 
         /**
-         * Helper function. Callback for _.map;
+         * Get and process configuration node;
          *
          * @param {Object} config
          * @param {string} node
