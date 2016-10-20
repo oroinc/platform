@@ -20,8 +20,7 @@ class WorkflowDefinitionCloner
     {
         $steps = self::copySteps($definition->getSteps());
 
-        $newDefinition = new WorkflowDefinition();
-        $newDefinition->import($definition)->setSteps($steps);
+        $newDefinition = self::copyDefinition(new WorkflowDefinition(), $definition)->setSteps($steps);
 
         $startStep = $definition->getStartStep();
         $startStep = $steps->get($startStep ? $startStep->getName() : null);
@@ -30,6 +29,28 @@ class WorkflowDefinitionCloner
         $restrictions = self::copyRestrictions($definition);
 
         return $newDefinition->setStartStep($startStep)->setEntityAcls($entityAcls)->setRestrictions($restrictions);
+    }
+
+    /**
+     * @param WorkflowDefinition $definition
+     * @param WorkflowDefinition $source
+     * @return WorkflowDefinition
+     */
+    private static function copyDefinition(WorkflowDefinition $definition, WorkflowDefinition $source)
+    {
+        $definition
+            ->setName($source->getName())
+            ->setLabel($source->getLabel())
+            ->setRelatedEntity($source->getRelatedEntity())
+            ->setEntityAttributeName($source->getEntityAttributeName())
+            ->setConfiguration($source->getConfiguration())
+            ->setStepsDisplayOrdered($source->isStepsDisplayOrdered())
+            ->setEntityAcls($source->getEntityAcls())
+            ->setSystem($source->isSystem())
+            ->setPriority($source->getPriority())
+            ->setGroups($source->getGroups());
+
+        return $definition;
     }
 
     /**

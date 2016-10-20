@@ -8,8 +8,11 @@ use Doctrine\ORM\EntityManager;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
+use Oro\Bundle\WorkflowBundle\Entity\WorkflowStep;
 use Oro\Bundle\WorkflowBundle\Event\WorkflowChangesEvent;
 use Oro\Bundle\WorkflowBundle\Event\WorkflowEvents;
+use Oro\Bundle\WorkflowBundle\Handler\Helper\WorkflowDefinitionCloner;
+use Oro\Bundle\WorkflowBundle\Model\Workflow;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowAssembler;
 
 class WorkflowDefinitionHandler
@@ -55,23 +58,21 @@ class WorkflowDefinitionHandler
     ) {
         $em = $this->getEntityManager();
 
-        $previous = new WorkflowDefinition();
-        $previous->import($existingDefinition);
+        $previous = WorkflowDefinitionCloner::cloneDefinition($existingDefinition);
 
         $existingDefinition->import($newDefinition);
 
-        $this->workflowAssembler->assemble($existingDefinition);
+        $workflow = $this->workflowAssembler->assemble($existingDefinition);
+        $this->setSteps($existingDefinition, $workflow);
 
         $this->eventDispatcher->dispatch(
             WorkflowEvents::WORKFLOW_BEFORE_UPDATE,
             new WorkflowChangesEvent($existingDefinition, $previous)
         );
 
-        $em->persist($existingDefinition);
-
         $em->beginTransaction();
         try {
-            $em->flush($existingDefinition);
+            $em->flush();
             $em->commit();
         } catch (\Exception $exception) {
             $em->rollback();
@@ -92,7 +93,8 @@ class WorkflowDefinitionHandler
     {
         $em = $this->getEntityManager();
 
-        $this->workflowAssembler->assemble($workflowDefinition);
+        $workflow = $this->workflowAssembler->assemble($workflowDefinition);
+        $this->setSteps($workflowDefinition, $workflow);
 
         $this->eventDispatcher->dispatch(
             WorkflowEvents::WORKFLOW_BEFORE_CREATE,
@@ -103,7 +105,7 @@ class WorkflowDefinitionHandler
 
         $em->beginTransaction();
         try {
-            $em->flush($workflowDefinition);
+            $em->flush();
             $em->commit();
         } catch (\Exception $exception) {
             $em->rollback();
@@ -138,6 +140,27 @@ class WorkflowDefinitionHandler
         );
 
         return true;
+    }
+
+    /**
+     * @param WorkflowDefinition $workflowDefinition
+     * @param Workflow $workflow
+     */
+    protected function setSteps(WorkflowDefinition $workflowDefinition, Workflow $workflow)
+    {
+        $workflowSteps = array();
+        foreach ($workflow->getStepManager()->getSteps() as $step) {
+            $workflowStep = new WorkflowStep();
+            $workflowStep
+                ->setName($step->getName())
+                ->setLabel($step->getLabel())
+                ->setStepOrder($step->getOrder())
+                ->setFinal($step->isFinal());
+
+            $workflowSteps[] = $workflowStep;
+        }
+
+        $workflowDefinition->setSteps($workflowSteps);
     }
 
     /**

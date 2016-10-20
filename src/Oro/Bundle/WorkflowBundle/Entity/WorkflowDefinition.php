@@ -768,6 +768,14 @@ class WorkflowDefinition implements DomainObjectInterface
     }
 
     /**
+     * @return array
+     */
+    public function getGroups()
+    {
+        return $this->groups;
+    }
+
+    /**
      * @param array $groups
      * @return $this
      */
