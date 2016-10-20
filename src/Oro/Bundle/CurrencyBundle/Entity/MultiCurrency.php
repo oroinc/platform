@@ -3,47 +3,28 @@ namespace Oro\Bundle\CurrencyBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 
-use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
-use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
+use Oro\Bundle\DataAuditBundle\Metadata\Annotation as Oro;
 
 class MultiCurrency
 {
     use CurrencyAwareTrait;
 
-    /**
-     * @var double
-     *
-     * @ORM\Column(name="value", type="money", nullable=true)
-     * @ConfigField(
-     *  defaultValues={
-     *      "form"={
-     *          "form_type"="oro_money",
-     *          "form_options"={
-     *              "constraints"={{"Range":{"min":0}}},
-     *          }
-     *      },
-     *      "dataaudit"={
-     *          "auditable"=true
-     *      },
-     *      "importexport"={
-     *          "order"=50
-     *      }
-     *  }
-     * )
-     */
     protected $value;
+    protected $rate;
 
     /**
      * @param string $value
      * @param string $currency
+     * @param float $rate | null
      * @return MultiCurrency
      */
-    public static function create($value, $currency)
+    public static function create($value, $currency, $rate = null)
     {
         /* @var $multiCurrency self */
         $multiCurrency = new static();
         $multiCurrency->setValue($value)
-            ->setCurrency($currency);
+            ->setCurrency($currency)
+            ->setRate($rate);
 
         return $multiCurrency;
     }
@@ -63,6 +44,25 @@ class MultiCurrency
     public function setValue($value)
     {
         $this->value = $value;
+
+        return $this;
+    }
+
+    /**
+     * @return float
+     */
+    public function getRate()
+    {
+        return $this->rate;
+    }
+
+    /**
+     * @param float $rate
+     * @return $this
+     */
+    public function setRate($rate)
+    {
+        $this->rate = $rate;
 
         return $this;
     }

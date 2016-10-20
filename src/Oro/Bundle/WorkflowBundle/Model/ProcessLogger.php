@@ -37,7 +37,7 @@ class ProcessLogger
     public function debug($message, ProcessTrigger $trigger, ProcessData $data)
     {
         if ($this->logger) {
-            $context = array('definition' => $trigger->getDefinition()->getName());
+            $context = ['definition' => $trigger->getDefinition()->getName()];
             if ($trigger->getEvent()) {
                 $context['event'] = $trigger->getEvent();
             }

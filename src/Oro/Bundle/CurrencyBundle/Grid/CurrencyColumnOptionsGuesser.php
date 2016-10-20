@@ -29,7 +29,7 @@ class CurrencyColumnOptionsGuesser extends AbstractColumnOptionsGuesser
                 'type' => 'choice',
                 'options' => [
                     'field_options' => [
-                        'choices' => $this->currencyHelper->getCurrencyChoices(),
+                        'choices' => $this->currencyHelper->getCurrencyChoices('full_name'),
                         'multiple' => true
                     ]
                 ]

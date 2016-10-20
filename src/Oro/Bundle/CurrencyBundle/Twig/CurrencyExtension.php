@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\CurrencyBundle\Twig;
 
+use Oro\Bundle\CurrencyBundle\Utils\CurrencyNameHelper;
 use Symfony\Component\Intl\Intl;
 
 use Oro\Bundle\CurrencyBundle\Entity\Price;
@@ -21,13 +22,22 @@ class CurrencyExtension extends \Twig_Extension
     protected $provider;
 
     /**
+     * @var CurrencyNameHelper
+     */
+    protected $currencyNameHelper;
+
+    /**
      * @param NumberFormatter           $formatter
      * @param ViewTypeProviderInterface $provider
      */
-    public function __construct(NumberFormatter $formatter, ViewTypeProviderInterface $provider)
-    {
+    public function __construct(
+        NumberFormatter $formatter,
+        ViewTypeProviderInterface $provider,
+        CurrencyNameHelper $currencyNameHelper
+    ) {
         $this->formatter = $formatter;
         $this->provider  = $provider;
+        $this->currencyNameHelper = $currencyNameHelper;
     }
 
     /**
@@ -37,6 +47,11 @@ class CurrencyExtension extends \Twig_Extension
     {
         return [
             new \Twig_SimpleFunction('oro_currency_view_type', array($this->provider, 'getViewType')),
+            new \Twig_SimpleFunction(
+                'oro_currency_symbol_collection',
+                [$this, 'getSymbolCollection'],
+                ['is_safe' => ['html']]
+            ),
         ];
     }
 
@@ -93,6 +108,24 @@ class CurrencyExtension extends \Twig_Extension
         $locale = $this->getOption($options, 'locale');
 
         return $this->formatter->formatCurrency($value, $currency, $attributes, $textAttributes, $symbols, $locale);
+    }
+
+    /**
+     * Returns symbols for active currencies
+     *
+     * @return string json object with active currency symbols
+     */
+    public function getSymbolCollection()
+    {
+        $currencySymbolCollection = $this->currencyNameHelper->getCurrencyChoices(
+            ViewTypeProviderInterface::VIEW_TYPE_SYMBOL
+        );
+        
+        $currencySymbolCollection = array_map(function ($symbol) {
+            return ['symbol' => $symbol];
+        }, $currencySymbolCollection);
+
+        return json_encode($currencySymbolCollection);
     }
 
     /**
