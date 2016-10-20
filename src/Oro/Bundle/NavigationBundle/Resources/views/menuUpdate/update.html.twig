@@ -4,7 +4,7 @@
 {% set entityId = entity.id %}
 
 {% if entity.key %}
-    {% set breadcrumbs = breadcrumbs|merge({'entityTitle': entity.title|trans()}) %}
+    {% set breadcrumbs = breadcrumbs|merge({'entityTitle': entity.isDivider ? 'oro.navigation.menuupdate.divider'|trans : entity.title|trans()}) %}
 {% else %}
     {% set breadcrumbs = breadcrumbs|merge({'entityTitle': 'oro.ui.create_entity'|trans({'%entityName%': 'oro.navigation.menuupdate.entity_label'|trans})}) %}
 {% endif %}
@@ -153,6 +153,7 @@
         <div class="menuitem menuitem-tree tree-component">
             {% set treeOptions = {
                 'data' : tree,
+                'nodeId': entity.key,
                 'menu' : entity.menu,
                 'ownershipType' : ownershipType,
                 'ownerId' : ownerId,
