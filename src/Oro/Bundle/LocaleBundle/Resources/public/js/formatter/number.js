@@ -101,7 +101,9 @@ define(function(require) {
 
         return {
             formatDecimal: function(value) {
+                var formatOptions = this.formatOptions || {};
                 var options = localeSettings.getNumberFormats('decimal');
+                _.extend(options, formatOptions);
                 options.style = 'decimal';
                 var formattersChain = [
                     formatters.numeralFormat,
@@ -143,10 +145,6 @@ define(function(require) {
                 return doFormat(value, options, formattersChain);
             },
             formatCurrency: function(value, currency) {
-                if (_.isString(value)) {
-                    return value;
-                }
-
                 var options = localeSettings.getNumberFormats('currency');
                 if (!currency) {
                     currency = localeSettings.getCurrency();

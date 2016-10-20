@@ -42,6 +42,13 @@ services:
         tags:
             - { name: twig.extension }
 
+    oro_sync.twig.content.tags_extension:
+        class: Oro\Bundle\SyncBundle\Twig\ContentTagsExtension
+        arguments:
+            - '@oro_sync.content.tag_generator_chain'
+        tags:
+            - { name: twig.extension }
+
     kernel.listener.maintenance.event:
         class: %oro_wamp.listener.maintenance.class%
         arguments:
@@ -51,3 +58,52 @@ services:
         tags:
             - { name: kernel.event_listener, event: maintenance.on, method: onModeOn }
             - { name: kernel.event_listener, event: maintenance.off, method: onModeOff }
+
+    oro_sync.content.listener.datagrid_tag:
+        class: Oro\Bundle\SyncBundle\Content\DataGridTagListener
+        arguments:
+            - '@oro_sync.content.tag_generator_chain'
+        tags:
+            - { name: kernel.event_listener, event: oro_datagrid.datagrid.build.after, method: buildAfter }
+
+    oro_sync.event_listener.doctrine_tag:
+        class: Oro\Bundle\SyncBundle\EventListener\DoctrineTagEventListener
+        arguments:
+            - '@oro_sync.content.topic_sender'
+            - %installed%
+        tags:
+            - { name: doctrine.event_listener, event: onFlush, connection: default }
+            - { name: doctrine.event_listener, event: postFlush, connection: default }
+
+    oro_sync.content.tag_generator_chain:
+        class: Oro\Bundle\SyncBundle\Content\TagGeneratorChain
+        arguments:
+            - []
+
+    oro_sync.content.tag_generator.doctrine:
+        class: Oro\Bundle\SyncBundle\Content\DoctrineTagGenerator
+        arguments:
+            - '@doctrine'
+        tags:
+            - { name: oro_sync.tag_generator }
+
+    oro_sync.content.tag_generator.simple:
+        class: Oro\Bundle\SyncBundle\Content\SimpleTagGenerator
+        tags:
+            - { name: oro_sync.tag_generator }
+
+    oro_sync.content.security.context.link:
+        tags:
+            - { name: oro_service_link, service: security.context }
+
+    oro_sync.content.tag_generator_chain.link:
+        tags:
+            - { name: oro_service_link, service: oro_sync.content.tag_generator_chain }
+
+    oro_sync.content.topic_sender:
+        class: Oro\Bundle\SyncBundle\Content\TopicSender
+        arguments:
+            - '@oro_wamp.publisher'
+            - '@oro_sync.content.tag_generator_chain.link'
+            - '@oro_sync.content.security.context.link'
+            - '@logger'

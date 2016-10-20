@@ -31,7 +31,7 @@ Let's consider an example when you have an Email entity which can be owned eithe
 	    } elseif ($owner instanceof Oro\Bundle\UserBundle\Entity\User) {
 	        $this->contact = null;
 	        $this->user = $owner;
-	    } elseif ($owner instanceof OroCRM\Bundle\ContactBundle\Entity\Contact) {
+	    } elseif ($owner instanceof Oro\Bundle\ContactBundle\Entity\Contact) {
 	        $this->user = null;
 	        $this->contact = $owner;
 	    } else {

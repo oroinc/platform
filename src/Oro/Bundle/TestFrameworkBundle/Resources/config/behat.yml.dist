@@ -14,6 +14,7 @@ default: &default
         Behat\Symfony2Extension:
             kernel:
                 env: 'prod'
+                debug: false
             context:
                 path_suffix: 'Tests/Behat/Features'
                 class_suffix: 'Tests\Behat\Context\FeatureContext'
