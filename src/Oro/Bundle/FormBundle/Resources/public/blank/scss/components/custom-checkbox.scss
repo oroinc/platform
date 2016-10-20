@@ -11,19 +11,22 @@
         opacity: 0;
 
         &:hover {
-            ~ .custom-checkbox__icon{
+            ~ .custom-checkbox__icon,
+            ~ .custom-checkbox .custom-checkbox__icon {
                 border: $checkbox-icon-border-focus-state
             }
         }
 
         &:focus {
-            ~ .custom-checkbox__icon {
+            ~ .custom-checkbox__icon,
+            ~ .custom-checkbox .custom-checkbox__icon {
                 border: $checkbox-icon-border-hover-state;
             }
         }
 
         &:checked {
-            ~ .custom-checkbox__icon {
+            ~ .custom-checkbox__icon,
+            ~ .custom-checkbox .custom-checkbox__icon {
                 border: $checkbox-icon-border-focus-state;
                 background-color: $checkbox-icon-bg-color-focus-state;
             }

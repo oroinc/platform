@@ -1,44 +1,33 @@
 .custom-checkbox {
     &__input {
-        &:focus {
-            ~ .custom-checkbox__icon {
-                color: transparentize(get-color('ui', 'normal'), .45);
-            }
-        }
-
         &:checked {
-            ~ .custom-checkbox__icon {
-                color: get-color('ui', 'focus');
-
+            ~ .custom-checkbox__icon,
+            ~ .custom-checkbox .custom-checkbox__icon {
                 &:before {
-                    content: '\e834';
-                }
-            }
+                    content: '';
 
-            &:focus {
-                ~ .custom-checkbox__icon {
-                    outline: $checkbox-outline-checked-focus-state;
-                    outline-offset: $checkbox-outline-offset-checked-focus-state;
+                    position: absolute;
+                    top: $checkbox-icon-check-position-top;
+                    left: $checkbox-icon-check-position-left;
+                    transform: $checkbox-icon-check-transform-translate $checkbox-icon-check-transform-rotate;
+
+                    width: $checkbox-icon-check-width;
+                    height: $checkbox-icon-check-height;
+
+                    border-left: $checkbox-icon-check-thickness solid $checkbox-icon-check-color;
+                    border-bottom: $checkbox-icon-check-thickness solid $checkbox-icon-check-color;
                 }
             }
         }
     }
 
     &__icon {
-        color: get-color('additional', 'middle');
+        position: relative;
 
-        &:before {
-            content: '\e835';
-
-            display: inline-block;
-
-            font-family: $base-font-icon;
-            font-size: 17px;
-            line-height: 1;
-        }
+        border-radius: 3px;
     }
 
     &__text {
-        margin-left: $offset-x-s / 2;
+        margin-left: $offset-x-s;
     }
 }
