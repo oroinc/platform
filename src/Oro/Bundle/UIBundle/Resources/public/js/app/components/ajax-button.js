@@ -5,19 +5,18 @@ define(function(require) {
     var _ = require('underscore');
     var __ = require('orotranslation/js/translator');
     var mediator = require('oroui/js/mediator');
-    var options = {
-        method: 'GET',
-        successMessage: '',
-        errorMessage: 'oro.ui.unexpected_error',
-        redirect: '/'
-    };
+    var options = {};
 
     function onClick(e) {
-        var method, url;
+        var method, url, redirect, successMessage, errorMessage;
+
         e.preventDefault();
 
-        method = $(e.target).data('method');
-        url = $(e.target).data('url');
+        method         = $(e.currentTarget).data('method');
+        url            = $(e.currentTarget).data('url');
+        redirect       = $(e.currentTarget).data('redirect');
+        successMessage = $(e.currentTarget).data('success-message');
+        errorMessage   = $(e.currentTarget).data('error-message');
 
         mediator.execute('showLoading');
 
@@ -25,12 +24,12 @@ define(function(require) {
             url: url,
             type: method,
             success: function(data) {
-                mediator.execute('showFlashMessage', 'success', data.message);
-                mediator.execute('redirectTo', {url: options.redirect}, {redirect: true});
+                mediator.execute('showFlashMessage', 'success', data.message ? data.message : __(successMessage));
+                mediator.execute('redirectTo', {url: redirect}, {redirect: true});
                 mediator.execute('hideLoading');
             },
             error: function() {
-                mediator.execute('showFlashMessage', 'error', __(options.errorMessage));
+                mediator.execute('showFlashMessage', 'error', __(errorMessage));
                 mediator.execute('hideLoading');
             }
         });

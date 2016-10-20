@@ -38,33 +38,31 @@
                 {% if menuItem.displayed %}
                     {# Hide button #}
                     <div class="pull-right btn-group icons-holder">
-                        {{ UI.link({
-                            'label': 'oro.navigation.menuupdate.hide'|trans(),
-                            'title': 'oro.navigation.menuupdate.hide'|trans(),
-                            'data': {
-                                'method': 'PUT',
-                                'url': path('oro_api_hide_menuupdates', {ownershipType: ownershipType, menuName: menuName, key: app.request.get('key')}),
-                                'successMessage': 'oro.navigation.menuupdate.hide_success_message'|trans()
-                            },
-                            'aCss': 'no-hash btn icons-holder-text menu-visibility-toggle-button',
-                            'iCss': 'icon-eye-close',
-                            'path': 'javascript:void(0);'
+                        {{ UI.ajaxButton({
+                            'aCss':  'no-hash',
+                            'iCss':  'icon-eye-close',
+                            'label': 'oro.navigation.menuupdate.hide'|trans,
+                            'title': 'oro.navigation.menuupdate.hide'|trans,
+                            'dataId': entity.id,
+                            'dataMethod': 'PUT',
+                            'dataUrl': path('oro_api_hide_menuupdates', {ownershipType: ownershipType, menuName: menuName, key: app.request.get('key')}),
+                            'dataRedirect': app.request.uri,
+                            'successMessage': 'oro.navigation.menuupdate.hide_success_message'|trans()
                         }) }}
                     </div>
                 {% else %}
                     {# Show button #}
                     <div class="pull-right btn-group icons-holder">
-                        {{ UI.link({
-                            'label': 'oro.navigation.menuupdate.show'|trans(),
-                            'title': 'oro.navigation.menuupdate.show'|trans(),
-                            'data': {
-                                'method': 'PUT',
-                                'url': path('oro_api_show_menuupdates', {ownershipType: ownershipType, menuName: menuName, key: app.request.get('key')}),
-                                'successMessage': 'oro.navigation.menuupdate.show_success_message'|trans()
-                            },
-                            'aCss': 'no-hash btn icons-holder-text menu-visibility-toggle-button',
-                            'iCss': 'icon-eye-open',
-                            'path': 'javascript:void(0);'
+                        {{ UI.ajaxButton({
+                            'aCss':  'no-hash',
+                            'iCss':  'icon-eye-open',
+                            'label': 'oro.navigation.menuupdate.show'|trans,
+                            'title': 'oro.navigation.menuupdate.show'|trans,
+                            'dataId': entity.id,
+                            'dataMethod': 'PUT',
+                            'dataUrl': path('oro_api_show_menuupdates', {ownershipType: ownershipType, menuName: menuName, key: app.request.get('key')}),
+                            'dataRedirect': app.request.uri,
+                            'successMessage': 'oro.navigation.menuupdate.show_success_message'|trans()
                         }) }}
                     </div>
                 {% endif %}

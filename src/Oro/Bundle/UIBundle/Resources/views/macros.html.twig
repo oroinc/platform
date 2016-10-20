@@ -641,6 +641,7 @@
             'dataUrl' - data-url parameter
             'dataRedirect' - url to redirect after an operation finished
             'successMessage' - a message which will be shown after an operation finished
+            'errorMessage' - a message which will be shown if operation failed
             'title' - button title
             'label' - button label
             'visible' - determined whether the button is visible or not. Defaults to true
@@ -664,22 +665,24 @@
             'dataUrl' - data-url parameter
             'dataRedirect' - url to redirect after an operation finished
             'successMessage' - a message which will be shown after an operation finished
+            'errorMessage' - a message which will be shown if operation failed
             'title' - button title
             'label' - button label
             'visible' - determined whether the link is visible or not. Defaults to true
         ]
 #}
 {% macro ajaxLink(parameters) %}
-    {% set dataAttributes = {
-        'page-component-module': 'oroui/js/app/components/ajax-button',
-        'page-component-options': {
-        'method': parameters.dataMethod is defined ? parameters.dataMethod : 'GET',
-        'redirect': parameters.dataRedirect,
-        'errorMessage': parameters.errorMessage
-        }|json_encode,
+    {% set additionalParameters = {
+        'pageComponent': {
+            'module': 'oroui/js/app/components/ajax-button'
+        },
+        'dataAttributes': {
+            'method': parameters.dataMethod is defined ? parameters.dataMethod : 'GET',
+            'error-message': parameters.errorMessage is defined ? parameters.errorMessage : 'oro.ui.unexpected_error'
+        }
     } %}
 
-    {{ _self.clientLink(parameters|merge({'dataAttributes': dataAttributes})) }}
+    {{ _self.clientLink(parameters|merge(additionalParameters)) }}
 {% endmacro %}
 
 {#
