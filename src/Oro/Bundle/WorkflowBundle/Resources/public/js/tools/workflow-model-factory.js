@@ -112,19 +112,6 @@ define(function(require) {
          * @returns {Object}
          * @private
          */
-
-        /**
-         * Helper function. Callback for _.map;
-         *
-         * @param {Object} config
-         * @param {string} node
-         * @returns {Object}
-         * @private
-         */
-        _mergeName: function(config, name) {
-            config.name = name;
-            return config;
-        },
         _getNodeConfiguration: function(config, node, translateLinks) {
             var updateConfig = [];
             _.each(config[node], function (item, name) {
