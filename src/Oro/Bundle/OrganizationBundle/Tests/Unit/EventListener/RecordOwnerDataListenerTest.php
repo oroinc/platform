@@ -1,5 +1,5 @@
 <?php
-namespace Oro\Bundle\OrganizationBundle\Tests\Unit\Form\EventListener;
+namespace Oro\Bundle\OrganizationBundle\Tests\Unit\EventListener;
 
 use Doctrine\ORM\Event\LifecycleEventArgs;
 
