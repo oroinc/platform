@@ -21,7 +21,7 @@ config:
         'oroui/js/tools':
             'chaplin': 'chaplin'
     paths:
-        'json': 'bundles/oroui/lib/json2.js'
+        'json': 'bundles/bowerassets/json2/json2.js'
         'jquery': 'bundles/components/jquery/jquery.js'
         'underscore': 'bundles/components/underscore/underscore.js'
         'backbone': 'bundles/components/backbone/backbone.js'

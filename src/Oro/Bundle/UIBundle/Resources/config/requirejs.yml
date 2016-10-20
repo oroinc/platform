@@ -38,6 +38,8 @@ config:
             deps:
                 - 'lightgallery'
                 - 'jquery'
+        'json':
+            exports: 'JSON'
     map:
         '*':
             'jquery': 'oroui/js/extend/jquery'
@@ -50,7 +52,6 @@ config:
             'bootstrap': 'oroui/js/extend/bootstrap'
             'jquery-ui': 'oroui/js/jquery-ui-datepicker-l10n'
             'jquery.timepicker': 'oroui/js/extend/jquery.timepicker'
-            'base64': 'oroui/js/extend/base64'
         'oroui/js/extend/jquery':
             'jquery': 'jquery'
         'oroui/js/extend/select2':
@@ -80,16 +81,14 @@ config:
         'oroui/js/app/components/base/component':
             'backbone': 'backbone'
             'chaplin': 'chaplin'
-        'oroui/js/extend/base64':
-            'base64': 'base64'
         'oroui/js/mediator':
             'chaplin': 'chaplin'
         'oroui/js/tools':
             'chaplin': 'chaplin'
     paths:
-        'text': 'bundles/oroui/lib/text.js'
-        'json': 'bundles/oroui/lib/json2.js'
-        'base64': 'bundles/oroui/lib/base64.js'
+        'text': 'bundles/bowerassets/text/text.js'
+        'json': 'bundles/bowerassets/json2/json2.js'
+        'base64': 'oroui/js/extend/base64.js'
         'jquery': 'bundles/components/jquery/jquery.js'
         'jquery-ui': 'bundles/oroui/js/extend/jquery-ui.js'
         'jquery.mousewheel': 'bundles/bowerassets/jquery-mousewheel/jquery.mousewheel.js'
