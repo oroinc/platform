@@ -104,8 +104,8 @@ config:
         'jquery.numeric': 'bundles/bowerassets/jquery.numeric/jquery.numeric.js'
         'jquery.uniform': 'bundles/bowerassets/uniform/jquery.uniform.js'
         'jquery.select2': 'bundles/bowerassets/select2/select2.js'
-        'jquery.multiselect': 'bundles/oroui/lib/multiselect/jquery.multiselect.js'
-        'jquery.multiselect.filter': 'bundles/oroui/lib/multiselect/jquery.multiselect.filter.js'
+        'jquery.multiselect': 'bundles/bowerassets/jquery-ui-multiselect-widget/src/jquery.multiselect.min.js'
+        'jquery.multiselect.filter': 'bundles/bowerassets/jquery-ui-multiselect-widget/src/jquery.multiselect.filter.min.js'
         'jquery.simplecolorpicker': 'bundles/oroui/lib/simplecolorpicker/jquery.simplecolorpicker.js'
         'jquery.minicolors': 'bundles/oroui/lib/minicolors/jquery.minicolors.js'
         'jquery.cookie': 'bundles/bowerassets/jquery-cookie/jquery.cookie.js'
@@ -203,7 +203,7 @@ config:
         'oroui/js/app/models/widget-picker/widget-picker-filter-model': 'bundles/oroui/js/app/models/widget-picker/widget-picker-filter-model.js'
         'oroui/js/app/models/widget-picker/widget-picker-model': 'bundles/oroui/js/app/models/widget-picker/widget-picker-model.js'
 
-        'autolinker': 'bundles/oroui/lib/autolinker.min.js'
+        'autolinker': 'bundles/bowerassets/Autolinker.js/dist/Autolinker.js'
 
         'oroui/js/extend/polyfill': 'oroui/js/extend/polyfill'
     appmodules:

@@ -13,12 +13,12 @@ assets:
             - 'bundles/bowerassets/lightgallery/dist/css/lg-transitions.css'
             - 'bundles/bowerassets/lightgallery/dist/css/lightgallery.css'
             - 'bundles/bowerassets/malihu-custom-scrollbar-plugin/jquery.mCustomScrollbar.css'
+            - 'bundles/bowerassets/jquery-ui-multiselect-widget/jquery.multiselect.css'
+            - 'bundles/bowerassets/jquery-ui-multiselect-widget/jquery.multiselect.filter.css'
             # customized libraries' styles
             - 'bundles/oroui/css/font-awesome-4.3/font-awesome.css'
             - 'bundles/oroui/css/jquery-ui.grid.css'
             - 'bundles/oroui/css/jquery-ui.custom.css'
-            - 'bundles/oroui/lib/multiselect/jquery.multiselect.css'
-            - 'bundles/oroui/lib/multiselect/jquery.multiselect.filter.css'
             - 'bundles/oroui/css/lightgallery/lightgallery.css'
             - 'bundles/oroui/css/mcustomscrollbar/customize/jquery.mCustomScrollbar.css'
             # custom styles

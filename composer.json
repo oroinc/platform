@@ -94,7 +94,9 @@
         "bower-asset/timepicker": "1.4.13",
         "bower-asset/datepair": "0.4.4",
         "bower-asset/lightgallery": "1.2.18",
-        "bower-asset/less": "2.5.*"
+        "bower-asset/less": "2.5.*",
+        "bower-asset/jquery-ui-multiselect-widget": "1.14",
+        "bower-asset/Autolinker.js": "0.11.0"
     },
     "require-dev": {
         "sensio/generator-bundle": "2.5.3",
