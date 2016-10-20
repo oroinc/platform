@@ -223,7 +223,7 @@ class RunnerTest extends WebTestCase
         $logger->expects($this->exactly(2))
             ->method('info');
         $runner = $this->createRunner(null, $logger);
-
+        $runner->timeout = 1200;
         $runner->runPlatformUpdate();
     }
 

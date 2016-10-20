@@ -46,7 +46,8 @@ class ChannelType extends AbstractType
             'oro_integration_type_select',
             [
                 'required' => true,
-                'label'    => 'oro.integration.integration.type.label'
+                'label'    => 'oro.integration.integration.type.label',
+                'choices_as_values' => true
             ]
         );
         $builder->add('name', 'text', ['required' => true, 'label' => 'oro.integration.integration.name.label']);
@@ -72,7 +73,8 @@ class ChannelType extends AbstractType
                 'label'       => 'oro.integration.integration.transport.label',
                 'choices'     => [], //will be filled in event listener
                 'mapped'      => false,
-                'constraints' => new NotBlank()
+                'constraints' => new NotBlank(),
+                'choices_as_values' => true
             ]
         );
 
@@ -86,6 +88,7 @@ class ChannelType extends AbstractType
                 'multiple' => true,
                 'choices'  => [], //will be filled in event listener
                 'required' => false,
+                'choices_as_values' => true
             ]
         );
 

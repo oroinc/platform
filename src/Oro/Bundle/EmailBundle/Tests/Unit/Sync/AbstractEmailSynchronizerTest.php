@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\EmailBundle\Tests\Unit\Sync;
 
+use Doctrine\ORM\ORMException;
+
 use Oro\Bundle\EmailBundle\Sync\AbstractEmailSynchronizer;
 use Oro\Bundle\EmailBundle\Tests\Unit\Fixtures\Entity\TestEmailOrigin;
 use Oro\Bundle\EmailBundle\Tests\Unit\Sync\Fixtures\TestEmailSynchronizer;
@@ -96,6 +98,50 @@ class AbstractEmailSynchronizerTest extends \PHPUnit_Framework_TestCase
             ->method('findOriginToSync')
             ->with($maxConcurrentTasks, $minExecPeriodInMin)
             ->will($this->returnValue(null));
+        $sync->expects($this->never())
+            ->method('createSynchronizationProcessor');
+
+        $sync->sync($maxConcurrentTasks, $minExecPeriodInMin);
+    }
+
+    /**
+     * @expectedException \Exception
+     */
+    public function testSyncOriginWithDoctrineError()
+    {
+        $now = new \DateTime('now', new \DateTimeZone('UTC'));
+        $maxConcurrentTasks = 3;
+        $minExecPeriodInMin = 1;
+        $origin = new TestEmailOrigin(123);
+
+        $sync = $this->getMockBuilder('Oro\Bundle\EmailBundle\Tests\Unit\Sync\Fixtures\TestEmailSynchronizer')
+            ->disableOriginalConstructor()
+            ->setMethods(
+                [
+                    'resetHangedOrigins',
+                    'findOriginToSync',
+                    'createSynchronizationProcessor',
+                    'changeOriginSyncState',
+                    'getCurrentUtcDateTime',
+                    'doSyncOrigin'
+                ]
+            )
+            ->getMock();
+        $sync->setLogger($this->logger);
+
+        $sync->expects($this->once())
+            ->method('getCurrentUtcDateTime')
+            ->will($this->returnValue($now));
+        $sync->expects($this->once())
+            ->method('resetHangedOrigins');
+        $sync->expects($this->once())
+            ->method('findOriginToSync')
+            ->with($maxConcurrentTasks, $minExecPeriodInMin)
+            ->will($this->returnValue($origin));
+        $sync->expects($this->once())
+            ->method('doSyncOrigin')
+            ->with($origin, $this->isInstanceOf('Oro\Bundle\EmailBundle\Sync\Model\SynchronizationProcessorSettings'))
+            ->will($this->throwException(new ORMException()));
         $sync->expects($this->never())
             ->method('createSynchronizationProcessor');
 
@@ -390,6 +436,7 @@ class AbstractEmailSynchronizerTest extends \PHPUnit_Framework_TestCase
         $maxConcurrentTasks = 2;
         $minExecPeriodInMin = 1;
 
+        $timeShift = 30;
         $now = new \DateTime('now', new \DateTimeZone('UTC'));
         $border = clone $now;
         if ($minExecPeriodInMin > 0) {
@@ -419,10 +466,9 @@ class AbstractEmailSynchronizerTest extends \PHPUnit_Framework_TestCase
             ->method('select')
             ->with(
                 'o'
-                . ', CASE WHEN o.syncCode = :inProcess THEN 0 ELSE 1 END AS HIDDEN p1'
-                . ', (COALESCE(o.syncCode, 1000) * 30'
-                . ' + TIMESTAMPDIFF(MINUTE, COALESCE(o.syncCodeUpdatedAt, :min), :now)'
-                . ' / (CASE o.syncCode WHEN :success THEN 100 ELSE 1 END)) AS HIDDEN p2'
+                . ', CASE WHEN o.syncCode = :inProcess OR o.syncCode = :inProcessForce THEN 0 ELSE 1 END AS HIDDEN p1'
+                . ', (TIMESTAMPDIFF(MINUTE, COALESCE(o.syncCodeUpdatedAt, :min), :now)'
+                . ' - (CASE o.syncCode WHEN :success THEN 0 ELSE :timeShift END)) AS HIDDEN p2'
             )
             ->will($this->returnValue($qb));
         $qb->expects($this->at($index++))
@@ -436,6 +482,10 @@ class AbstractEmailSynchronizerTest extends \PHPUnit_Framework_TestCase
         $qb->expects($this->at($index++))
             ->method('setParameter')
             ->with('inProcess', AbstractEmailSynchronizer::SYNC_CODE_IN_PROCESS)
+            ->will($this->returnValue($qb));
+        $qb->expects($this->at($index++))
+            ->method('setParameter')
+            ->with('inProcessForce', AbstractEmailSynchronizer::SYNC_CODE_IN_PROCESS_FORCE)
             ->will($this->returnValue($qb));
         $qb->expects($this->at($index++))
             ->method('setParameter')
@@ -456,6 +506,10 @@ class AbstractEmailSynchronizerTest extends \PHPUnit_Framework_TestCase
         $qb->expects($this->at($index++))
             ->method('setParameter')
             ->with('border', $this->equalTo($border))
+            ->will($this->returnValue($qb));
+        $qb->expects($this->at($index++))
+            ->method('setParameter')
+            ->with('timeShift', $this->equalTo($timeShift))
             ->will($this->returnValue($qb));
         $qb->expects($this->at($index++))
             ->method('setMaxResults')

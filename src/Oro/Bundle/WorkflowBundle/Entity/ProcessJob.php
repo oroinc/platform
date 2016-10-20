@@ -42,14 +42,14 @@ class ProcessJob
      *
      * @ORM\Column(name="entity_id", type="integer", nullable=true)
      */
-    protected $entityId = null;
+    protected $entityId;
 
     /**
      * @var string
      *
      * @ORM\Column(name="entity_hash", type="string", length=255, nullable=true)
      */
-    protected $entityHash = null;
+    protected $entityHash;
 
     /**
      * @var string
@@ -128,7 +128,7 @@ class ProcessJob
     }
 
     /**
-     * @return array
+     * @return int
      */
     public function getEntityId()
     {
@@ -136,7 +136,7 @@ class ProcessJob
     }
 
     /**
-     * @param integer $entityId
+     * @param int $entityId
      * @return ProcessJob
      * @throws \LogicException
      */

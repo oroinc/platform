@@ -10,14 +10,34 @@ datagrids:
                     - language.enabled
                     - language.createdAt
                     - language.updatedAt
+                    - CONCAT_WS(' ', languageOwner.firstName, languageOwner.lastName) as ownerName
+                    - languageOwner.id as owner
                 from:
-                    - { table: %oro_translation.entity.language.class%, alias: language }
+                    - { table: '%oro_translation.entity.language.class%', alias: language }
+                join:
+                    left:
+                        - { join: language.owner, alias: languageOwner }
+        inline_editing:
+            enable: true
+            behaviour: enable_selected
+            entity_name: '%oro_translation.entity.language.class%'
         columns:
-            code:
+            language:
                 label: oro.translation.language.entity_label
-                type: twig
-                frontend_type: html
-                template: OroTranslationBundle:Language:Datagrid/code.html.twig
+            ownerName:
+                label: oro.translation.language.owner.label
+                frontend_type: relation
+                inline_editing:
+                    enable: true
+                    editor:
+                        view: oroform/js/app/views/editor/related-id-relation-editor-view
+                        view_options:
+                            value_field_name: owner
+                    autocomplete_api_accessor:
+                        class: orouser/js/tools/acl-users-search-api-accessor
+                        permission_check_entity_name: Oro_Bundle_TranslationBundle_Entity_Language
+                        permission: EDIT
+                renderable: false
             enabled:
                 label: oro.translation.language.enabled.label
                 type: twig
@@ -41,24 +61,22 @@ datagrids:
                     data_name: language.createdAt
                 updatedAt:
                     data_name: language.updatedAt
-            default:
-                code: %oro_datagrid.extension.orm_sorter.class%::DIRECTION_DESC
         filters:
             columns:
-                code:
-                    type: choice
-                    data_name: language.code
+                language:
+                    type: language
+                    data_name: language
                     options:
                         field_options:
-                            choices: "@oro_translation.provider.language->getAvailableLanguages"
+                            multiple: true
                 enabled:
                     type: choice
                     data_name: CAST(language.enabled as int)
                     options:
                         field_options:
                             choices:
-                                true: oro.translation.language.enabled.label
-                                false: oro.translation.language.disabled.label
+                                true: oro.translation.language.status.enabled
+                                false: oro.translation.language.status.disabled
                 createdAt:
                     type:      datetime
                     data_name: language.createdAt
@@ -69,3 +87,128 @@ datagrids:
                     enabled:   false
         properties:
             id: ~
+            owner: ~
+            language:
+                type: callback
+                callable: ["@oro_locale.formatter.language_code", "formatLocale"]
+                params:
+                    - code
+
+    oro-translation-translations-grid:
+        acl_resource: oro_translation_translation_index
+        source:
+            type: orm
+            query:
+                # aliases `value`, `key` and `domain` is required for filters and building right condition
+                select:
+                    - translation.id
+                    - language.code
+                    - translation.value as value
+                    - translationKey.key as key
+                    - translationKey.domain as domain
+                    - (CASE WHEN translation.value IS NULL THEN false ELSE true END) as status
+                from:
+                    - { table: '%oro_translation.entity.language.class%', alias: language }
+                join:
+                    inner:
+                        -
+                            join: '%oro_translation.entity.translation_key.class%'
+                            alias: translationKey
+                            conditionType: WITH
+                            condition: 1 = 1 # always true (required for DQLBuilder due require conditionType when joining on Entity class)
+                    left:
+                        -
+                            join: '%oro_translation.entity.translation.class%'
+                            alias: translation
+                            conditionType: WITH
+                            condition: 'translation.language = language AND translation.translationKey = translationKey'
+        inline_editing:
+            enable: true
+            behaviour: enable_selected
+            entity_name: '%oro_translation.entity.translation.class%'
+            acl_resource: oro_translation_language_translate
+        columns:
+            id:
+                label: oro.translation.translation.id.label
+                renderable: false
+            language:
+                label: oro.translation.translation.language.label
+            status:
+                label: oro.translation.translation.status.label
+                frontend_type: boolean
+            originalValue:
+                label: oro.translation.translation.original_value.label
+                type: twig
+                frontend_type: html
+                template: OroTranslationBundle:Translation:Datagrid/originalValue.html.twig
+            value:
+                label: oro.translation.translation.value.label
+                inline_editing:
+                    enable: true
+                    editor:
+                        view: orotranslation/js/app/views/editor/text-editor-view
+                    save_api_accessor:
+                        route: oro_api_patch_translation
+                        query_parameter_names:
+                            - key
+                            - locale
+                            - domain 
+            key:
+                label: oro.translation.translation_key.key.label
+            domain:
+                label: oro.translation.translation_key.domain.label
+            context:
+                label: oro.translation.translation.context.label
+        sorters:
+            multiple_sorting: true
+            columns:
+                language:
+                    data_name: language.id
+                status:
+                    data_name: status
+                value:
+                    data_name: value
+                key:
+                    data_name: key
+                domain:
+                    data_name: domain
+            default:
+                language: %oro_datagrid.extension.orm_sorter.class%::DIRECTION_ASC                    
+        filters:
+            columns:
+                language:
+                    type: language
+                    data_name: language
+                    options:
+                        field_options:
+                            multiple: true
+                status:
+                    type: boolean
+                    data_name: status
+                value:
+                    type: string
+                    data_name: value
+                key:
+                    type: string
+                    data_name: key
+                domain:
+                    type: choice
+                    data_name: domain
+                    options:
+                        field_options:
+                            choices: "@oro_translation.manager.translation->getAvailableDomains"
+                            multiple: true
+        properties:
+            id: ~
+            context:
+                type: callback
+                callable: ["@oro_translation.provider.translation_context", "resolveContext"]
+                params:
+                    - key
+            locale:
+                data_name: code
+            language:
+                type: callback
+                callable: ["@oro_locale.formatter.language_code", "formatLocale"]
+                params:
+                    - code

@@ -111,7 +111,7 @@ class OrganizationRepository extends EntityRepository
     /**
      * Update all records in given table with organization id
      *
-     * @param string  $tableName    table name to update, example: OroCRMAccountBundle:Account or OroUserBundle:Group
+     * @param string  $tableName    table name to update, example: OroAccountBundle:Account or OroUserBundle:Group
      * @param integer $id           Organization id
      * @param string  $relationName relation name to update. By default 'organization'
      * @param bool    $onlyEmpty    Update data only for the records with empty relation

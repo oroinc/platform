@@ -2,13 +2,12 @@
 
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Entity;
 
-use JMS\JobQueueBundle\Entity\Job;
-
+use Oro\Bundle\WorkflowBundle\Configuration\ProcessPriority;
 use Oro\Bundle\WorkflowBundle\Entity\ProcessDefinition;
 use Oro\Bundle\WorkflowBundle\Entity\ProcessTrigger;
 
 /**
- * @SuppressWarnings(PHPMD.TooManyMethods)
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
 class ProcessTriggerTest extends \PHPUnit_Framework_TestCase
 {
@@ -159,7 +158,7 @@ class ProcessTriggerTest extends \PHPUnit_Framework_TestCase
         $importedEntity
             ->setEvent(ProcessTrigger::EVENT_UPDATE)
             ->setField('testField')
-            ->setPriority(Job::PRIORITY_HIGH)
+            ->setPriority(ProcessPriority::PRIORITY_HIGH)
             ->setQueued(true)
             ->setTimeShift(123)
             ->setDefinition($importedDefinition)
@@ -295,5 +294,17 @@ class ProcessTriggerTest extends \PHPUnit_Framework_TestCase
         }
 
         return $trigger;
+    }
+
+    public function testGetEntityClass()
+    {
+        $this->assertNull($this->entity->getEntityClass());
+
+        $definition = new ProcessDefinition();
+        $definition->setRelatedEntity('test class name');
+
+        $this->entity->setDefinition($definition);
+
+        $this->assertEquals($definition->getRelatedEntity(), $this->entity->getEntityClass());
     }
 }

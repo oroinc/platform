@@ -149,7 +149,7 @@ abstract class WebTestCase extends BaseWebTestCase
             if (self::getDbIsolationSetting() || self::getDbIsolationPerTestSetting()) {
                 //This is a workaround for MyISAM search tables that are not transactional
                 if (self::getDbReindexSetting()) {
-                    self::getContainer()->get('oro_search.search.engine')->reindex();
+                    self::getContainer()->get('oro_search.search.engine.indexer')->reindex();
                 }
 
                 $this->startTransaction();
@@ -418,7 +418,6 @@ abstract class WebTestCase extends BaseWebTestCase
      */
     protected function postFixtureLoad()
     {
-
     }
 
     /**
@@ -512,6 +511,32 @@ abstract class WebTestCase extends BaseWebTestCase
         }
 
         return self::$clientInstance;
+    }
+
+    /**
+     * Add value from 'oro_default' route to the url
+     *
+     * @param array $data
+     * @param string $urlParameterKey
+     */
+    public function addOroDefaultPrefixToUrlInParameterArray(&$data, $urlParameterKey)
+    {
+        $oroDefaultPrefix = $this->getUrl('oro_default');
+        
+        $replaceOroDefaultPrefixCallback = function (&$value) use ($oroDefaultPrefix, $urlParameterKey) {
+            if (!is_null($value[$urlParameterKey])) {
+                $value[$urlParameterKey] = str_replace(
+                    '%oro_default_prefix%',
+                    $oroDefaultPrefix,
+                    $value[$urlParameterKey]
+                );
+            }
+        };
+
+        array_walk(
+            $data,
+            $replaceOroDefaultPrefixCallback
+        );
     }
 
     /**

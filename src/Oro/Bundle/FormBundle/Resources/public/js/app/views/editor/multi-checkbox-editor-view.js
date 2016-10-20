@@ -79,7 +79,7 @@ define(function(require) {
         onShow: function() {
             this.multiselect = this.$('select').multiselect({
                 autoOpen: true,
-                classes: this.className,
+                classes: _.result(this, 'className'),
                 header: '',
                 height: 'auto',
                 position: {

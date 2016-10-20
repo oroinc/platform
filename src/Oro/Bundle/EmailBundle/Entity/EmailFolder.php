@@ -33,6 +33,8 @@ class EmailFolder
     const DIRECTION_OUTGOING = 'outgoing';
     const DIRECTION_BOTH = 'both';
 
+    const MAX_FAILED_COUNT = 10;
+
     /**
      * @var integer
      *
@@ -144,6 +146,13 @@ class EmailFolder
      */
     protected $emailUsers;
 
+    /**
+     * @var integer
+     *
+     * @ORM\Column(name="failed_count", type="integer", nullable=false, options={"default" = "0"})
+     */
+    protected $failedCount = 0;
+
     public function __construct()
     {
         $this->subFolders = new ArrayCollection();
@@ -252,6 +261,7 @@ class EmailFolder
     public function setSyncEnabled($syncEnabled)
     {
         $this->syncEnabled = (bool)$syncEnabled;
+        $this->setFailedCount(0);
 
         return $this;
     }
@@ -481,5 +491,29 @@ class EmailFolder
     public function __toString()
     {
         return sprintf('EmailFolder(%s)', $this->fullName);
+    }
+
+    /**
+     * Returns the number of failed attempts to select folder
+     *
+     * @return integer
+     */
+    public function getFailedCount()
+    {
+        return $this->failedCount;
+    }
+
+    /**
+     * Sets the number of failed attempts to select folder
+     *
+     * @param integer $failedCount
+     *
+     * @return EmailFolder
+     */
+    public function setFailedCount($failedCount)
+    {
+        $this->failedCount = $failedCount;
+
+        return $this;
     }
 }

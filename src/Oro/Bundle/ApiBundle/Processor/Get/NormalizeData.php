@@ -5,6 +5,7 @@ namespace Oro\Bundle\ApiBundle\Processor\Get;
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
 use Oro\Bundle\ApiBundle\Normalizer\ObjectNormalizer;
+use Oro\Bundle\ApiBundle\Processor\Context;
 
 class NormalizeData implements ProcessorInterface
 {
@@ -39,6 +40,16 @@ class NormalizeData implements ProcessorInterface
 
         $config = $context->getConfig();
 
-        $context->setResult($this->objectNormalizer->normalizeObject($data, $config));
+        $context->setResult(
+            $this->objectNormalizer->normalizeObject(
+                $data,
+                $config,
+                [
+                    Context::ACTION       => $context->getAction(),
+                    Context::VERSION      => $context->getVersion(),
+                    Context::REQUEST_TYPE => $context->getRequestType()
+                ]
+            )
+        );
     }
 }

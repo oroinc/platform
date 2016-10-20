@@ -156,11 +156,15 @@ services:
 
     oro_imap.form.type.google_sync_checkbox:
         class: %oro_imap.form.type.google_sync_checkbox.class%
-        arguments:
-            - '@doctrine.orm.entity_manager'
-            - '@oro_imap.imap_email_google_oauth2_manager'
         tags:
             - { name: form.type, alias: oro_config_google_imap_sync_checkbox }
+
+    oro_imap.form.google_imap_config_handler:
+        class: Oro\Bundle\ImapBundle\Form\Handler\GoogleImapConfigHandler
+        arguments:
+            - '@doctrine'
+            - '@oro_imap.imap_email_google_oauth2_manager'
+            - '@logger'
 
     oro_imap.imap_email_google_oauth2_manager:
         class: %oro_imap.imap_email_google_oauth2_manager.class%
@@ -191,6 +195,15 @@ services:
             - '@oro_imap.imap_email_google_oauth2_manager'
         tags:
             - { name: kernel.event_listener, event: oro_email.send_email_transport, method: setSmtpTransport }
+
+    oro_imap.async.clear_inactive_mailbox_message_processor:
+        class: 'Oro\Bundle\ImapBundle\Async\ClearInactiveMailboxMessageProcessor'
+        arguments:
+            - '@oro_imap.manager.clear'
+            - '@oro_message_queue.job.runner'
+            - '@logger'
+        tags:
+            - { name: 'oro_message_queue.client.message_processor' }
 
     oro_imap.async.processor.sync_email:
         scope: prototype
