@@ -6,14 +6,14 @@ use Symfony\Component\Routing\RouterInterface;
 
 use Oro\Bundle\DataGridBundle\Tools\DatagridRouteHelper;
 
-use Oro\Bundle\TranslationBundle\Helper\TranslationRouteHelper;
+use Oro\Bundle\TranslationBundle\Helper\TranslationsDatagridRouteHelper;
 
-class TranslationRouteHelperTest extends \PHPUnit_Framework_TestCase
+class TranslationsDatagridRouteHelperTest extends \PHPUnit_Framework_TestCase
 {
     /** @var DatagridRouteHelper|\PHPUnit_Framework_MockObject_MockObject */
-    protected $datagridRouteHelperMock;
+    protected $datagridRouteHelper;
 
-    /** @var TranslationRouteHelper */
+    /** @var TranslationsDatagridRouteHelper */
     protected $helper;
 
     /**
@@ -25,7 +25,7 @@ class TranslationRouteHelperTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->helper = new TranslationRouteHelper($this->datagridRouteHelper);
+        $this->helper = new TranslationsDatagridRouteHelper($this->datagridRouteHelper);
     }
 
     /**
@@ -39,8 +39,8 @@ class TranslationRouteHelperTest extends \PHPUnit_Framework_TestCase
     public function testGenerate()
     {
         $this->datagridRouteHelper->expects($this->once())->method('generate')->with(
-            TranslationRouteHelper::TRANSLATION_GRID_ROUTE_NAME,
-            TranslationRouteHelper::TRANSLATION_GRID_NAME,
+            TranslationsDatagridRouteHelper::TRANSLATION_GRID_ROUTE_NAME,
+            TranslationsDatagridRouteHelper::TRANSLATION_GRID_NAME,
             ['f' => ['filterName' => ['value' => '10']]],
             RouterInterface::ABSOLUTE_PATH
         )->willReturn('generatedValue');

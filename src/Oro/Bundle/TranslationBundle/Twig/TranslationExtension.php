@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\TranslationBundle\Twig;
 
-use Oro\Bundle\TranslationBundle\Helper\TranslationRouteHelper;
+use Oro\Bundle\TranslationBundle\Helper\TranslationsDatagridRouteHelper;
 
 class TranslationExtension extends \Twig_Extension
 {
@@ -14,15 +14,15 @@ class TranslationExtension extends \Twig_Extension
     protected $debugTranslator = false;
 
     /**
-     * @var TranslationRouteHelper
+     * @var TranslationsDatagridRouteHelper
      */
     protected $translationRouteHelper;
 
     /**
      * @param bool $debugTranslator
-     * @param TranslationRouteHelper $translationRouteHelper
+     * @param TranslationsDatagridRouteHelper $translationRouteHelper
      */
-    public function __construct($debugTranslator, TranslationRouteHelper $translationRouteHelper)
+    public function __construct($debugTranslator, TranslationsDatagridRouteHelper $translationRouteHelper)
     {
         $this->debugTranslator = $debugTranslator;
         $this->translationRouteHelper = $translationRouteHelper;
