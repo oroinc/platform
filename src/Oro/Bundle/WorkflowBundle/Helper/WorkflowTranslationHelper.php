@@ -145,21 +145,16 @@ class WorkflowTranslationHelper
     {
         $configuration = $definition->getConfiguration();
         $translateLinks['label'] = $this->translationsDatagridRouteHelper->generate(['key' => $definition->getLabel()]);
-        $translateLinks[WorkflowConfiguration::NODE_STEPS] = $this->getWorkflowNodeTranslateLinks(
-            $configuration,
-            WorkflowConfiguration::NODE_STEPS,
-            ['label']
-        );
-        $translateLinks[WorkflowConfiguration::NODE_TRANSITIONS] = $this->getWorkflowNodeTranslateLinks(
-            $configuration,
-            WorkflowConfiguration::NODE_TRANSITIONS,
-            ['label', 'message']
-        );
-        $translateLinks[WorkflowConfiguration::NODE_ATTRIBUTES] = $this->getWorkflowNodeTranslateLinks(
-            $configuration,
-            WorkflowConfiguration::NODE_ATTRIBUTES,
-            ['label']
-        );
+
+        $linksData = [
+            WorkflowConfiguration::NODE_STEPS => ['label'],
+            WorkflowConfiguration::NODE_TRANSITIONS => ['label', 'message'],
+            WorkflowConfiguration::NODE_ATTRIBUTES => ['label'],
+        ];
+
+        foreach ($linksData as $node => $attributes) {
+            $translateLinks[$node] = $this->getWorkflowNodeTranslateLinks($configuration, $node, $attributes);
+        }
 
         return $translateLinks;
     }
