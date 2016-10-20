@@ -544,3 +544,9 @@ to the [Fallback documentation](./src/Oro/Bundle/EntityBundle/Resources/doc/enti
 - For existing installs:
     - Any new users or changing of existing passwords need to meet the password requirements specified in System config/General Setup/Security Settings
     - Existing user passwords are not affected
+
+####ImapBundle
+ - The command `oro:imap:clear-mailbox` was removed. Produce message to the topic `Oro\Bundle\ImapBundle\Async\Topics::CLEAR_INACTIVE_MAILBOX` instead.
+
+####ImapBundle
+ - The command `oro:imap:clear-mailbox` was removed. Produce message to the topic `Oro\Bundle\ImapBundle\Async\Topics::CLEAR_INACTIVE_MAILBOX` instead.
