@@ -2,22 +2,9 @@
 
 namespace Oro\Bundle\EmailBundle\Tools;
 
-use Oro\Bundle\UIBundle\Tools\HtmlTagHelper;
-
 class EmailBodyHelper
 {
-    /** @var HtmlTagHelper */
-    protected $htmlTagHelper;
-
-    /**
-     * EmailBodyHelper constructor.
-     *
-     * @param HtmlTagHelper $htmlTagHelper
-     */
-    public function __construct(HtmlTagHelper $htmlTagHelper)
-    {
-        $this->htmlTagHelper = $htmlTagHelper;
-    }
+    const MAX_STRING_LENGTH = 500;
 
     /**
      * Returns the plain text representation of email body
@@ -26,11 +13,8 @@ class EmailBodyHelper
      *
      * @return string
      */
-    public function getClearBody($bodyContent)
+    public function getTrimmedClearText($bodyContent)
     {
-        /**
-         * @todo: Should be refactored or deleted in scope of BAP-11622
-         */
         if (extension_loaded('tidy')) {
             $config = [
                 'show-body-only' => true,
@@ -38,7 +22,7 @@ class EmailBodyHelper
                 'hide-comments'  => true
             ];
             $tidy = new \tidy();
-            $body = $tidy->repairString($bodyContent, $config, 'UTF8');
+            $body = $tidy->repairString($bodyContent, $config, 'utf8');
         } else {
             $body = $bodyContent;
             // get `body` content in case of html text
@@ -46,10 +30,22 @@ class EmailBodyHelper
                 $body = $bodyText[1];
             }
         }
+        // Clear style and script tags
+        $body = strip_tags(html_entity_decode(preg_replace('/<(style|script).*?>.*?<\/\1>/su', '', $body)));
+        // Clear non printed symbols
+        $body = preg_replace('/(?>[\x00-\x1F]|\xC2[\x80-\x9F]|\xE2[\x80-\x8F]{2}|'
+            . '\xE2\x80[\xA4-\xA8]|\xE2\x81[\x9F-\xAF])/u', ' ', $body);
 
-        // clear `script` and `style` tags from content
-        $body = preg_replace('/<(style|script).*?>.*?<\/\1>/s', '', $body);
+        $body = trim(preg_replace('/(\s\s+|\n+)/u', ' ', $body));
+        // trim the text content
+        if (strlen($body) > self::MAX_STRING_LENGTH) {
+            $body = substr($body, 0, self::MAX_STRING_LENGTH);
+            $lastOccurrencePos = strrpos($body, ' ', null);
+            if ($lastOccurrencePos !== false) {
+                $body = substr($body, 0, $lastOccurrencePos);
+            }
+        }
 
-        return preg_replace('/(\s\s+|\n+|[^[:print:]])/', ' ', $this->htmlTagHelper->stripTags($body));
+        return $body;
     }
 }

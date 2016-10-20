@@ -13,6 +13,7 @@ class AuditFieldTypeRegistry
         'boolean'    => 'boolean',
         'text'       => 'text',
         'string'     => 'text',
+        'currency'   => 'text',
         'guid'       => 'text',
         'manyToOne'  => 'text',
         'enum'       => 'text',
@@ -34,11 +35,12 @@ class AuditFieldTypeRegistry
         'array'      => 'array',
         'simple_array' => 'simplearray',
         'json_array'   => 'jsonarray',
+        'collection' => 'text'
     ];
 
     /**
-     * @param type $doctrineType
-     * @param type $auditType
+     * @param string $doctrineType
+     * @param string $auditType
      *
      * @throws LogicException
      */

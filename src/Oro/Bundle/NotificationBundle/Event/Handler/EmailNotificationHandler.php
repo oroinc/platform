@@ -7,14 +7,14 @@ use Doctrine\ORM\EntityManager;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\NotificationBundle\Event\NotificationEvent;
 use Oro\Bundle\NotificationBundle\Entity\EmailNotification;
-use Oro\Bundle\NotificationBundle\Processor\EmailNotificationProcessor;
+use Oro\Bundle\NotificationBundle\Manager\EmailNotificationManager;
 
 class EmailNotificationHandler implements EventHandlerInterface
 {
     /**
-     * @var EmailNotificationProcessor
+     * @var EmailNotificationManager
      */
-    protected $processor;
+    protected $manager;
 
     /**
      * @var EntityManager
@@ -27,16 +27,16 @@ class EmailNotificationHandler implements EventHandlerInterface
     /**
      * Constructor
      *
-     * @param EmailNotificationProcessor $processor
+     * @param EmailNotificationManager $manager
      * @param EntityManager              $em
      * @param ConfigProvider             $configProvider
      */
     public function __construct(
-        EmailNotificationProcessor $processor,
+        EmailNotificationManager $manager,
         EntityManager $em,
         ConfigProvider $configProvider
     ) {
-        $this->processor      = $processor;
+        $this->manager      = $manager;
         $this->em             = $em;
         $this->configProvider = $configProvider;
     }
@@ -64,6 +64,6 @@ class EmailNotificationHandler implements EventHandlerInterface
         }
 
         // send notifications
-        $this->processor->process($entity, $notifications);
+        $this->manager->process($entity, $notifications);
     }
 }
