@@ -1,19 +1,37 @@
 <?php
 
-namespace Oro\Bundle\CurrencyBundle\Tests\Unit\Utils;
+namespace Oro\Bundle\CurrencyBundle\Tests\Units\Utils;
 
+use Oro\Bundle\CurrencyBundle\Entity\Price;
+use Oro\Bundle\CurrencyBundle\Provider\ViewTypeProviderInterface;
 use Oro\Bundle\CurrencyBundle\Tests\Unit\Provider\CurrencyStubProvider;
 use Oro\Bundle\CurrencyBundle\Utils\CurrencyNameHelper;
-use Oro\Bundle\CurrencyBundle\Provider\ViewTypeProviderInterface;
 
 class CurrencyNameHelperTest extends \PHPUnit_Framework_TestCase implements ViewTypeProviderInterface
 {
     /** @var  string */
     private $viewType;
 
+    /**
+     * @var \PHPUnit_Framework_MockObject_MockObject|\Oro\Bundle\LocaleBundle\Formatter\NumberFormatter
+     */
+    protected $formatter;
+
+    public function setUp()
+    {
+        $this->formatter = $this->getMockBuilder('Oro\Bundle\LocaleBundle\Formatter\NumberFormatter')
+            ->disableOriginalConstructor()
+            ->getMock();
+    }
+
     public function testGetCurrencyName()
     {
-        $currencyNameHelper = new CurrencyNameHelper($this->getLocaleStub('en'), $this, new CurrencyStubProvider());
+        $currencyNameHelper = new CurrencyNameHelper(
+            $this->getLocaleStub('en'),
+            $this->formatter,
+            $this,
+            new CurrencyStubProvider()
+        );
 
         $this->viewType = ViewTypeProviderInterface::VIEW_TYPE_ISO_CODE;
         $this->assertEquals('USD', $currencyNameHelper->getCurrencyName('USD'));
@@ -24,7 +42,12 @@ class CurrencyNameHelperTest extends \PHPUnit_Framework_TestCase implements View
 
     public function testGetCurrencyNameForFrenchLocale()
     {
-        $currencyNameHelper = new CurrencyNameHelper($this->getLocaleStub('fr'), $this, new CurrencyStubProvider());
+        $currencyNameHelper = new CurrencyNameHelper(
+            $this->getLocaleStub('fr'),
+            $this->formatter,
+            $this,
+            new CurrencyStubProvider()
+        );
 
         $this->viewType = ViewTypeProviderInterface::VIEW_TYPE_ISO_CODE;
         $this->assertEquals('USD', $currencyNameHelper->getCurrencyName('USD'));
@@ -35,7 +58,12 @@ class CurrencyNameHelperTest extends \PHPUnit_Framework_TestCase implements View
 
     public function testGetCurrencyNameForLocalCurrencies()
     {
-        $currencyNameHelper = new CurrencyNameHelper($this->getLocaleStub('en'), $this, new CurrencyStubProvider());
+        $currencyNameHelper = new CurrencyNameHelper(
+            $this->getLocaleStub('en'),
+            $this->formatter,
+            $this,
+            new CurrencyStubProvider()
+        );
 
         $this->viewType = ViewTypeProviderInterface::VIEW_TYPE_SYMBOL;
         $this->assertEquals('₴', $currencyNameHelper->getCurrencyName('UAH'));
@@ -47,7 +75,12 @@ class CurrencyNameHelperTest extends \PHPUnit_Framework_TestCase implements View
         $currencyProvider = new CurrencyStubProvider();
         $currencyProvider->setCurrencyList(['USD', 'EUR']);
 
-        $currencyNameHelper = new CurrencyNameHelper($this->getLocaleStub('en'), $this, $currencyProvider);
+        $currencyNameHelper = new CurrencyNameHelper(
+            $this->getLocaleStub('en'),
+            $this->formatter,
+            $this,
+            new CurrencyStubProvider()
+        );
 
         $this->assertEquals(['USD' => '$', 'EUR' => '€'], $currencyNameHelper->getCurrencyChoices());
     }
@@ -78,5 +111,53 @@ class CurrencyNameHelperTest extends \PHPUnit_Framework_TestCase implements View
             ]));
 
         return $localeSettings;
+    }
+
+    /**
+     * @param Price $price
+     * @param array $options
+     * @param string $expected
+     * @dataProvider formatCurrencyDataProvider
+     */
+    public function testFormatCurrency(Price $price, array $options, $expected)
+    {
+        $currencyNameHelper = new CurrencyNameHelper(
+            $this->getLocaleStub('en'),
+            $this->formatter,
+            $this,
+            new CurrencyStubProvider()
+        );
+
+        $this->formatter->expects($this->once())->method('formatCurrency')
+            ->with(
+                $price->getValue(),
+                $price->getCurrency(),
+                $options['attributes'],
+                $options['textAttributes'],
+                $options['symbols'],
+                $options['locale']
+            )
+            ->will($this->returnValue($expected));
+
+        $this->assertEquals($expected, $currencyNameHelper->formatPrice($price, $options));
+    }
+
+    /**
+     * @return array
+     */
+    public function formatCurrencyDataProvider()
+    {
+        return [
+            '$1,234.5' => [
+                'price' => new Price(1234.5, 'USD'),
+                'options' => [
+                    'attributes' => ['grouping_size' => 3],
+                    'textAttributes' => ['grouping_separator_symbol' => ','],
+                    'symbols' => ['symbols' => '$'],
+                    'locale' => 'en_US'
+                ],
+                'expected' => '$1,234.5'
+            ]
+        ];
     }
 }
