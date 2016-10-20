@@ -86,7 +86,7 @@ class ProcessDefinitionsConfigurator implements LoggerAwareInterface
         $definition = $this->getRepository()->find($name);
         $this->toRemove[] = $definition;
         $this->dirty = true;
-        $this->notify('deleted', $definition);
+        $this->notify($definition, 'deleted');
     }
 
     /**
@@ -97,7 +97,7 @@ class ProcessDefinitionsConfigurator implements LoggerAwareInterface
     {
         $existingDefinition->import($newDefinition);
         $this->dirty = true;
-        $this->notify('updated', $existingDefinition);
+        $this->notify($existingDefinition, 'updated');
     }
 
     /**
@@ -107,7 +107,7 @@ class ProcessDefinitionsConfigurator implements LoggerAwareInterface
     {
         $this->toPersist[] = $newDefinition;
         $this->dirty = true;
-        $this->notify('created', $newDefinition);
+        $this->notify($newDefinition, 'created');
     }
 
     public function flush()
@@ -136,10 +136,10 @@ class ProcessDefinitionsConfigurator implements LoggerAwareInterface
     }
 
     /**
-     * @param string $action
      * @param ProcessDefinition $definition
+     * @param string $action
      */
-    protected function notify($action, ProcessDefinition $definition)
+    protected function notify(ProcessDefinition $definition, $action)
     {
         if (!$this->logger) {
             return;

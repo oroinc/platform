@@ -170,7 +170,7 @@ class ProcessTriggersConfigurator implements LoggerAwareInterface
     {
         $existingTrigger->import($newTrigger);
         $this->dirty = true;
-        $this->notify('updated', $existingTrigger);
+        $this->notify($existingTrigger, 'updated');
     }
 
     /**
@@ -180,7 +180,7 @@ class ProcessTriggersConfigurator implements LoggerAwareInterface
     {
         $this->forPersist[] = $newTrigger;
         $this->dirty = true;
-        $this->notify('created', $newTrigger);
+        $this->notify($newTrigger, 'created');
     }
 
     /**
@@ -190,14 +190,14 @@ class ProcessTriggersConfigurator implements LoggerAwareInterface
     {
         $this->forRemove[] = $processTrigger;
         $this->dirty = true;
-        $this->notify('deleted', $processTrigger);
+        $this->notify($processTrigger, 'deleted');
     }
 
     /**
-     * @param string $action
      * @param ProcessTrigger $trigger
+     * @param string $action
      */
-    private function notify($action, ProcessTrigger $trigger)
+    private function notify(ProcessTrigger $trigger, $action)
     {
         if (!$this->logger) {
             return;
