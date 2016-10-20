@@ -12,6 +12,7 @@ use Oro\Bundle\EntityExtendBundle\Migration\Extension\ExtendExtensionAwareInterf
 use Oro\Bundle\EntityExtendBundle\Migration\OroOptions;
 use Oro\Bundle\MigrationBundle\Migration\Installation;
 use Oro\Bundle\MigrationBundle\Migration\QueryBag;
+use Oro\Component\MessageQueue\Transport\Exception\Exception;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyMethods)
@@ -65,9 +66,12 @@ class OroTestFrameworkBundleInstaller implements
         $this->createTestSearchItemValueTable($schema);
         $this->createTestSearchProductTable($schema);
         $this->createTestActivityTable($schema);
+
         $this->createTestCustomEntityTables($schema);
+
         $this->createTestDepartmentTable($schema);
         $this->createTestPersonTable($schema);
+
         $this->createTestProductTable($schema);
         $this->createTestProductTypeTable($schema);
         $this->createTestAuditDataTables($schema);
