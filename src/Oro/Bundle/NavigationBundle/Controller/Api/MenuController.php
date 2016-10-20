@@ -4,6 +4,7 @@ namespace Oro\Bundle\NavigationBundle\Controller\Api;
 
 use Doctrine\ORM\EntityManager;
 
+use FOS\RestBundle\Controller\Annotations\Post;
 use FOS\RestBundle\Controller\Annotations\Put;
 use FOS\RestBundle\Controller\Annotations\Delete;
 use FOS\RestBundle\Controller\Annotations\NamePrefix;
@@ -13,7 +14,6 @@ use Knp\Menu\ItemInterface;
 
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 
-use Oro\Bundle\NavigationBundle\Entity\MenuUpdateInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -30,6 +30,38 @@ use Oro\Bundle\NavigationBundle\Manager\MenuUpdateManager;
 class MenuController extends Controller
 {
     /**
+     * @Post("/menu/{menuName}/{parentKey}/{ownershipType}")
+     *
+     * @ApiDoc(
+     *  description="Create menu item."
+     * )
+     *
+     * @param string $ownershipType
+     * @param string $menuName
+     * @param string $parentKey
+     *
+     * @return Response
+     */
+    public function createAction(Request $request, $ownershipType, $menuName, $parentKey)
+    {
+        $menuUpdate = $this->get('oro_navigation.manager.menu_update_default')->createMenuUpdate(
+            $ownershipType,
+            $this->getCurrentOwnerId($ownershipType, $request->get('ownerId')),
+            [
+                'menu' => $menuName,
+                'parentKey' => $parentKey,
+                'isDivider'=> $request->get('isDivider'),
+                'custom' => true
+            ]
+        );
+        $em = $this->getDoctrine()->getManagerForClass(MenuUpdate::class);
+        $em->persist($menuUpdate);
+        $em->flush();
+
+        return new JsonResponse(null, Response::HTTP_NO_CONTENT);
+    }
+
+    /**
      * @Delete("/menu/{ownershipType}/{menuName}/{key}")
      *
      * @ApiDoc(
@@ -42,7 +74,7 @@ class MenuController extends Controller
      *
      * @return Response
      */
-    public function deleteAction($ownershipType, $menuName, $key)
+    public function deleteAction(Request $request, $menuName, $key, $ownershipType)
     {
         /** @var MenuUpdateManager $manager */
         $manager = $this->get('oro_navigation.manager.menu_update_default');
@@ -51,7 +83,7 @@ class MenuController extends Controller
             $menuName,
             $key,
             $ownershipType,
-            $this->getCurrentOwnerId($ownershipType)
+            $this->getCurrentOwnerId($ownershipType, $request->get('ownerId'))
         );
         if ($menuUpdate === null) {
             throw $this->createNotFoundException();
@@ -85,11 +117,16 @@ class MenuController extends Controller
      *
      * @return Response
      */
-    public function showAction($ownershipType, $menuName, $key)
+    public function showAction(Request $request, $menuName, $key, $ownershipType)
     {
         /** @var MenuUpdateManager $manager */
         $manager = $this->get('oro_navigation.manager.menu_update_default');
-        $manager->showMenuItem($menuName, $key, $ownershipType, $this->getCurrentOwnerId($ownershipType));
+        $manager->showMenuItem(
+            $menuName,
+            $key,
+            $ownershipType,
+            $this->getCurrentOwnerId($ownershipType, $request->get('ownerId'))
+        );
 
         return new JsonResponse(null, Response::HTTP_OK);
     }
@@ -107,11 +144,16 @@ class MenuController extends Controller
      *
      * @return Response
      */
-    public function hideAction($ownershipType, $menuName, $key)
+    public function hideAction(Request $request, $menuName, $key, $ownershipType)
     {
         /** @var MenuUpdateManager $manager */
         $manager = $this->get('oro_navigation.manager.menu_update_default');
-        $manager->hideMenuItem($menuName, $key, $ownershipType, $this->getCurrentOwnerId($ownershipType));
+        $manager->hideMenuItem(
+            $menuName,
+            $key,
+            $ownershipType,
+            $this->getCurrentOwnerId($ownershipType, $request->get('ownerId'))
+        );
 
         return new JsonResponse(null, Response::HTTP_OK);
     }
@@ -126,7 +168,7 @@ class MenuController extends Controller
      *
      * @return Response
      */
-    public function resetAction($ownershipType, $menuName)
+    public function resetAction(Request $request, $menuName, $ownershipType)
     {
         /** @var MenuUpdateManager $manager */
         $manager = $this->get('oro_navigation.manager.menu_update_default');
@@ -134,7 +176,7 @@ class MenuController extends Controller
         $updates = $manager->getMenuUpdatesByMenuAndScope(
             $menuName,
             $ownershipType,
-            $this->getCurrentOwnerId($ownershipType)
+            $this->getCurrentOwnerId($ownershipType, $request->get('ownerId'))
         );
 
         /** @var EntityManager $em */
@@ -160,12 +202,12 @@ class MenuController extends Controller
      *
      * @return Response
      */
-    public function moveAction(Request $request, $ownershipType, $menuName)
+    public function moveAction(Request $request, $menuName, $ownershipType)
     {
         /** @var MenuUpdateManager $manager */
         $manager = $this->get('oro_navigation.manager.menu_update_default');
 
-        $ownerId = $this->getCurrentOwnerId($ownershipType);
+        $ownerId = $this->getCurrentOwnerId($ownershipType, $request->get('ownerId'));
 
         $key = $request->get('key');
         $currentUpdate = $manager->getMenuUpdateByKeyAndScope($menuName, $key, $ownershipType, $ownerId);
@@ -220,8 +262,11 @@ class MenuController extends Controller
      * @param string $ownershipType
      * @return int
      */
-    private function getCurrentOwnerId($ownershipType)
+    private function getCurrentOwnerId($ownershipType, $ownerId = null)
     {
+        if ($ownerId) {
+            return $ownerId;
+        }
         $area = ConfigurationBuilder::DEFAULT_AREA;
         $provider = $this->get('oro_navigation.menu_update.builder')->getProvider($area, $ownershipType);
 

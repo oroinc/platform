@@ -8,7 +8,6 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
-use Oro\Bundle\NavigationBundle\Entity\MenuUpdate;
 use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
 
 /**
@@ -53,29 +52,14 @@ class GlobalMenuController extends AbstractMenuController
      *
      * @param string $menuName
      * @param string|null $parentKey
-     * @param bool $isDivider
      *
      * @return array|RedirectResponse
      */
-    public function createAction($menuName, $parentKey = null, $isDivider = false)
+    public function createAction($menuName, $parentKey = null)
     {
         $this->checkAcl();
 
         return parent::create($menuName, $parentKey, $this->getOwnerId());
-    }
-
-    /**
-     * @Route("/{menuName}/create_divider/{parentKey}", name="oro_navigation_global_menu_create_divider")
-     * @Template("OroNavigationBundle:GlobalMenu:update.html.twig")
-     *
-     * @param string $menuName
-     * @param string $parentKey
-     *
-     * @return RedirectResponse
-     */
-    public function createDividerAction($menuName, $parentKey = null)
-    {
-        return $this->createAction($menuName, $parentKey, true);
     }
 
     /**

@@ -5,10 +5,10 @@ namespace Oro\Bundle\NavigationBundle\Controller;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 
+use Oro\Bundle\NavigationBundle\Utils\MenuUpdateUtils;
 use Oro\Bundle\NavigationBundle\Entity\MenuUpdateInterface;
 use Oro\Bundle\NavigationBundle\Entity\MenuUpdate;
 use Oro\Bundle\NavigationBundle\Form\Type\MenuUpdateType;
-use Oro\Bundle\NavigationBundle\JsTree\MenuUpdateTreeHandler;
 use Oro\Bundle\NavigationBundle\Manager\MenuUpdateManager;
 
 abstract class AbstractMenuController extends Controller
@@ -49,11 +49,10 @@ abstract class AbstractMenuController extends Controller
     /**
      * @param string $menuName
      * @param string $parentKey
-     * @param bool $isDivider
      * @return array|RedirectResponse
      *
      */
-    protected function create($menuName, $parentKey, $ownerId, $isDivider = false)
+    protected function create($menuName, $parentKey, $ownerId)
     {
         /** @var MenuUpdate $menuUpdate */
         $menuUpdate = $this->getManager()->createMenuUpdate(
@@ -62,7 +61,7 @@ abstract class AbstractMenuController extends Controller
             [
                 'menu' => $menuName,
                 'parentKey' => $parentKey,
-                'isDivider'=> $isDivider
+                'custom' => true
             ]
         );
 
@@ -114,6 +113,12 @@ abstract class AbstractMenuController extends Controller
             $response['ownershipType'] = $this->getOwnershipType();
             $response['menuName'] = $menu->getName();
             $response['tree'] = $this->createMenuTree($menu);
+
+            if ($menuUpdate->isCustom()) {
+                $response['menuItem'] = null;
+            } else {
+                $response['menuItem'] = MenuUpdateUtils::findMenuItem($menu, $menuUpdate->getKey());
+            }
         }
         return $response;
     }

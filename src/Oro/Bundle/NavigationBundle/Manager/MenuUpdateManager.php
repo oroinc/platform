@@ -69,15 +69,17 @@ class MenuUpdateManager
         }
         $isCustom = isset($options['custom']) && $options['custom'];
         $entity->setCustom($isCustom);
-        if ($options['parentKey']) {
+        if (isset($options['parentKey'])) {
             $parent = $this->getMenuUpdateByKeyAndScope(
                 $options['menu'],
                 $options['parentKey'],
                 $ownershipType,
                 $ownerId
             );
-            if(!$parent)
+            if($parent) {
                 $entity->setParentKey($options['parentKey']);
+            }
+            // todo consider to create not found exception
         }
 
         $entity->setMenu($options['menu']);
@@ -128,7 +130,7 @@ class MenuUpdateManager
         ]);
         
         if (!$update) {
-            $update = $this->createMenuUpdate($ownershipType, $ownerId, ['parentKey' => $key, 'menu' => $menuName]);
+            $update = $this->createMenuUpdate($ownershipType, $ownerId, ['key' => $key, 'menu' => $menuName]);
         }
 
         return $this->getMenuUpdateFromMenu($update, $menuName, $key, $ownershipType);

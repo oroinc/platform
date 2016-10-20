@@ -91,10 +91,10 @@ navigation:
         oro_navigation_user_menu_view: '%%title%% - Menus - %%username%%'
         oro_navigation_user_menu_create: 'Create Menu Item - Menus - %%username%%'
         oro_navigation_user_menu_update: '%%title%% - Edit - Menus - %%username%%'
-        oro_navigation_global_menu_index: ~
-        oro_navigation_global_menu_view: '%%title%%'
-        oro_navigation_global_menu_create: 'Create Menu Item'
-        oro_navigation_global_menu_update: '%%title%% - Edit'
+        oro_navigation_global_menu_index: 'Menus'
+        oro_navigation_global_menu_view: '%%title%% - Menus'
+        oro_navigation_global_menu_create: 'Create Menu Item - Menus'
+        oro_navigation_global_menu_update: '%%title%% - Edit - Menus'
 
     navigation_elements:
         pinButton:
