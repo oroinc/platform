@@ -1,0 +1,58 @@
+system_configuration:
+    groups:
+        user_settings:
+            icon:  icon-key
+            title: oro.user.system_configuration.groups.user_settings.title
+
+        mandatory_password_change:
+            icon:  icon-repeat
+            title: oro.user.system_configuration.groups.mandatory_password_change.title
+
+    fields:
+        oro_user.days_before_change_enabled:
+            data_type: boolean
+            type: oro_config_checkbox
+            priority: 99
+            options:
+                required: false
+                label: oro.user.system_configuration.fields.days_before_change_enabled.label
+        oro_user.days_before_change:
+            data_type: integer
+            type: integer
+            priority: 89
+            options:
+                label: oro.user.system_configuration.fields.days_before_change.label
+                constraints:
+                    - GreaterThan:
+                        value: 0
+        oro_user.match_old_passwords_enabled:
+            data_type: boolean
+            type: oro_config_checkbox
+            priority: 79
+            options:
+                required: false
+                label: oro.user.system_configuration.fields.match_old_passwords_enabled.label
+        oro_user.match_old_passwords_number:
+            data_type: integer
+            type: integer
+            priority: 69
+            options:
+                label: oro.user.system_configuration.fields.match_old_passwords_number.label
+                constraints:
+                    - GreaterThan:
+                        value: 0
+    tree:
+        system_configuration:
+            platform:
+                children:
+                    general_setup:
+                        children:
+                            user_settings:
+                                priority: 100
+                                children:
+                                    mandatory_password_change:
+                                        children:
+                                            - oro_user.days_before_change_enabled
+                                            - oro_user.days_before_change
+                                            - oro_user.match_old_passwords_enabled
+                                            - oro_user.match_old_passwords_number

@@ -233,3 +233,13 @@ oro:
             all_owners: All owners
             business_unit: Business Unit
             current_user: Current User
+
+        system_configuration:
+            groups:
+                user_settings.title: User Settings
+                mandatory_password_change.title: Mandatory password change
+            fields:
+                days_before_change_enabled.label: Enable days before change limit
+                days_before_change.label: Days before change
+                match_old_passwords_enabled.label: Enable match old passwords
+                match_old_passwords_number.label: Number of old passwords to match

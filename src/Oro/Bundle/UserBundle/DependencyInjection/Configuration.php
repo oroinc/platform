@@ -5,6 +5,8 @@ namespace Oro\Bundle\UserBundle\DependencyInjection;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
 
+use Oro\Bundle\ConfigBundle\DependencyInjection\SettingsBuilder;
+
 class Configuration implements ConfigurationInterface
 {
     /**
@@ -64,6 +66,16 @@ class Configuration implements ConfigurationInterface
                     )
                 ->end()
             ->end();
+
+        SettingsBuilder::append(
+            $rootNode,
+            [
+                'days_before_change_enabled' => ['value' => false, 'type' => 'boolean'],
+                'days_before_change' => ['value' => 30, 'type' => 'scalar'],
+                'match_old_passwords_enabled' => ['value' => false, 'type' => 'boolean'],
+                'match_old_passwords_number' => ['value' => 12, 'type' => 'scalar']
+            ]
+        );
 
         return $builder;
     }
