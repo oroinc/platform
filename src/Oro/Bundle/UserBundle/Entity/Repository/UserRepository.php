@@ -170,23 +170,4 @@ class UserRepository extends EntityRepository implements EmailAwareRepository
             ->getQuery()
             ->getResult();
     }
-
-
-    /**
-     * @param  string $role
-     *
-     * @return User[]
-     */
-    public function findActiveUsersByRole($role)
-    {
-        return $this
-            ->createQueryBuilder('u')
-            ->join('u.roles', 'role')
-            ->where('role.role = :role')
-            ->andWhere('u.enabled = :enabled')
-            ->setParameter('role', $role)
-            ->setParameter('enabled', true)
-            ->getQuery()
-            ->getResult();
-    }
 }

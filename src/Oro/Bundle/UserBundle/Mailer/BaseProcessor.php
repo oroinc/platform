@@ -73,11 +73,10 @@ class BaseProcessor
      * @param UserInterface $user
      * @param array         $templateData
      * @param string        $type
-     * @param string[]      $bcc
      *
      * @return int          The return value is the number of recipients who were accepted for delivery
      */
-    protected function sendEmail(UserInterface $user, array $templateData, $type, array $bcc = [])
+    protected function sendEmail(UserInterface $user, array $templateData, $type)
     {
         list($subjectRendered, $templateRendered) = $templateData;
 
@@ -90,7 +89,6 @@ class BaseProcessor
             ->setSubject($subjectRendered)
             ->setFrom($senderEmail, $senderName)
             ->setTo($email)
-            ->setBcc($bcc)
             ->setBody($templateRendered, $type);
 
         return $this->mailer->send($message);

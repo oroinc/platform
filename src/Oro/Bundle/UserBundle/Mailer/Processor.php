@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\UserBundle\Mailer;
 
-use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\UserBundle\Entity\UserInterface;
 
 class Processor extends BaseProcessor
@@ -77,36 +76,10 @@ class Processor extends BaseProcessor
      */
     public function sendAutoDeactivateEmail(UserInterface $user, $limit)
     {
-        $emailTemplate = $this->findEmailTemplateByName(static::TEMPLATE_USER_AUTO_DEACTIVATE);
-
-        return $this->sendEmail(
+        return $this->getEmailTemplateAndSendEmail(
             $user,
-            $this->renderer->compileMessage(
-                $emailTemplate,
-                ['entity' => $user, 'limit' => $limit]
-            ),
-            $this->getEmailTemplateType($emailTemplate),
-            $this->getUserEmails(User::ROLE_ADMINISTRATOR)
-        );
-    }
-
-    /**
-     * @param string $roleName
-     *
-     * @return string[]
-     */
-    protected function getUserEmails($roleName)
-    {
-        $users = $this->managerRegistry
-            ->getManagerForClass('OroUserBundle:User')
-            ->getRepository('OroUserBundle:User')
-            ->findActiveUsersByRole($roleName);
-
-        return array_map(
-            function ($user) {
-                return $user->getEmail();
-            },
-            $users
+            static::TEMPLATE_USER_AUTO_DEACTIVATE,
+            ['entity' => $user, 'limit' => $limit]
         );
     }
 }
