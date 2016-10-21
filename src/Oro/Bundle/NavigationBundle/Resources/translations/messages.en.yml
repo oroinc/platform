@@ -58,6 +58,9 @@ oro:
             hide_success_message: Menu item is hidden now.
             show_success_message: Menu item is visible now.
             divider: Divider
+            custom.label: Is Custom
+            divider.label: Is Divider
+            descriptions.label: Description
         action:
             manage_menus:
                 label: Manage Menus

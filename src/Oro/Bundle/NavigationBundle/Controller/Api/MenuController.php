@@ -200,7 +200,7 @@ class MenuController extends Controller
 
         $errors = [];
         foreach ($updates as $update) {
-            $errors = $this->get('validator')->validate($currentUpdate, 'move');
+            $errors = $this->get('validator')->validate($update, 'move');
             if (count($errors)) {
                 break;
             }

@@ -9,6 +9,7 @@ use Doctrine\ORM\EntityRepository;
 use Knp\Menu\ItemInterface;
 
 use Oro\Bundle\NavigationBundle\Entity\MenuUpdateInterface;
+use Oro\Bundle\NavigationBundle\Menu\Provider\OwnershipProviderInterface;
 use Oro\Bundle\NavigationBundle\Provider\BuilderChainProvider;
 use Oro\Bundle\NavigationBundle\Utils\MenuUpdateUtils;
 
@@ -324,7 +325,7 @@ class MenuUpdateManager
      */
     public function generateKey()
     {
-        return uniqid('menu_item_');
+        return uniqid('menu_item_', false);
     }
 
     /**
