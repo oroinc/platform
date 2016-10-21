@@ -546,3 +546,6 @@ to the [Fallback documentation](./src/Oro/Bundle/EntityBundle/Resources/doc/enti
 
 ####ImapBundle
  - The command `oro:imap:clear-mailbox` was removed. Produce message to the topic `Oro\Bundle\ImapBundle\Async\Topics::CLEAR_INACTIVE_MAILBOX` instead.
+
+####UserBundle
+- Removed service @oro_user.password_reset.widget_provider.actions (replaced by @oro_user.forced_password_reset.widget_provider.actions)
