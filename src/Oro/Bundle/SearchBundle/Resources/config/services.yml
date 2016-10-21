@@ -271,4 +271,4 @@ services:
         arguments:
             - '@oro_search.mapper'
         tags:
-            - { name: oro_entity.name_provider, priority: -80 }
+            - { name: oro_entity.name_provider, priority: -90 }
