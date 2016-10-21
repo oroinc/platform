@@ -265,7 +265,7 @@ oro:
         system_configuration:
             groups:
                 user_settings.title: User Settings
-                password_complexity_rules.title: Password complexity restrictions
+                password_complexity_rules.title: Password restrictions
             fields:
                 password_min_length.label: Minimal password length
                 password_numbers.label: Require a number
