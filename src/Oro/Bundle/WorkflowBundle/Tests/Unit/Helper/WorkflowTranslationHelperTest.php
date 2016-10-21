@@ -56,7 +56,7 @@ class WorkflowTranslationHelperTest extends \PHPUnit_Framework_TestCase
 
         $this->assertNotEquals($locale, Translation::DEFAULT_LOCALE, 'Test custom locale should be changed from pl');
 
-        $this->translator->expects($this->once())->method('getLocale')->willReturn($locale);
+        $this->translator->expects($this->any())->method('getLocale')->willReturn($locale);
 
         $this->manager->expects($this->at(0))
             ->method('saveValue')
@@ -80,7 +80,7 @@ class WorkflowTranslationHelperTest extends \PHPUnit_Framework_TestCase
         $key = 'test_key';
         $value = 'test_value';
 
-        $this->translator->expects($this->once())->method('getLocale')->willReturn($locale);
+        $this->translator->expects($this->any())->method('getLocale')->willReturn($locale);
 
         $this->manager->expects($this->once())
             ->method('saveValue')
@@ -174,11 +174,11 @@ class WorkflowTranslationHelperTest extends \PHPUnit_Framework_TestCase
             ->setName('definition1')
             ->setLabel('definition1.label')
             ->setSteps([
-                (new WorkflowStep())->setLabel('step2.label'),
+                (new WorkflowStep())->setName('step2')->setLabel('step2.label'),
             ])
             ->setConfiguration([
                 'steps' => [
-                    'step1' => ['label' => 'step1.label'],
+                    'step2' => ['label' => 'step2.label'],
                 ],
                 'transitions' => [
                     'transition1' => [
@@ -195,11 +195,11 @@ class WorkflowTranslationHelperTest extends \PHPUnit_Framework_TestCase
             ->setName('definition1')
             ->setLabel('definition1.label-locale1.workflows')
             ->setSteps([
-                (new WorkflowStep())->setLabel('step2.label'),
+                (new WorkflowStep())->setName('step2')->setLabel('step2.label-locale1.workflows'),
             ])
             ->setConfiguration([
                 'steps' => [
-                    'step1' => ['label' => 'step1.label-locale1.workflows'],
+                    'step2' => ['label' => 'step2.label-locale1.workflows'],
                 ],
                 'transitions' => [
                     'transition1' => [
@@ -209,9 +209,7 @@ class WorkflowTranslationHelperTest extends \PHPUnit_Framework_TestCase
                 ],
                 'attributes' => [
                     'attribute1' => ['label' => 'attribute1.label-locale1.workflows'],
-                ],
-                // @todo: update in BAP-12019
-                'label' => '-locale1.workflows',
+                ]
             ]);
 
         $this->translator->expects($this->any())->method('getLocale')->willReturn('locale1');
@@ -219,13 +217,13 @@ class WorkflowTranslationHelperTest extends \PHPUnit_Framework_TestCase
 
         // label + iterated keys
         // @todo: update in BAP-12019
-        $this->translationHelper->expects($this->exactly(6))
+        $this->translationHelper->expects($this->exactly(5))
             ->method('getValue')
             ->will($this->returnCallback(function ($key, $locale, $domain) {
                 return sprintf('%s-%s.%s', $key, $locale, $domain);
             }));
 
-        $this->helper->extractTranslations($definition, 'workflow1');
+        $this->helper->extractTranslations($definition);
 
         $this->assertEquals($expectedDefinition, $definition);
     }

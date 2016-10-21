@@ -74,7 +74,7 @@ class WorkflowFilter extends EntityFilter
             $ds->expr()->like(sprintf('%s.key', $fieldName), $keyParameter, true)
         );
 
-        $key = $this->generator->generate(
+        $key = $this->getGenerator()->generate(
             new TranslationKeySource(new WorkflowTemplate(), ['workflow_name' => $definition->getName()])
         );
 
