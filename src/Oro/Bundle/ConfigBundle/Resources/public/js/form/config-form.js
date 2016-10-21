@@ -57,7 +57,7 @@ define([
             ConfigForm.__super__.dispose.apply(this, arguments);
         },
 
-        _onNeedsReloadChange: function (e) {
+        _onNeedsReloadChange: function(e) {
             var $input = $(e.target);
             var name = $input.attr('name');
 

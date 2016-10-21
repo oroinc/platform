@@ -23,6 +23,9 @@ class ConfigurationPassTest extends \PHPUnit_Framework_TestCase
         $this->configurationPass = new ConfigurationPass();
     }
 
+    /**
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
+     */
     public function testProcess()
     {
         $expectedConfiguration = [
