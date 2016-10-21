@@ -15,7 +15,7 @@ services:
         tags:
             - { name: oro_action.action, alias: start_workflow }
 
-    oro_workflow.workflow.action.transit_workflow:
+    oro_workflow.action.transit_workflow:
         class: 'Oro\Bundle\WorkflowBundle\Model\Action\TransitWorkflow'
         arguments:
             - '@oro_action.context_accessor'

@@ -22,6 +22,7 @@ services:
             - "@?logger"
         tags:
             - { name: oro_action.action, alias: tree }
+            - { name: monolog.logger, channel: oro_workflow }
 
     oro_action.action.configurable:
         class: 'Oro\Component\Action\Action\Configurable'
