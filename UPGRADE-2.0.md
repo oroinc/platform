@@ -20,6 +20,9 @@ UPGRADE FROM 1.10 to 2.0
 - The `oro.api.action_processor` DI tag was removed. To add a new action processor, use `oro_api.actions` section of the ApiBundle configuration.
 - The `oro_api.config_extension` DI tag was removed. To add a new configuration extension, use `oro_api.config_extensions` section of the ApiBundle configuration.
 
+#### ImportExportBundle
+- ImportExportBundle/Field/FieldHelper.php was moved to EntityBundle/Helper/
+
 ####WorkflowBundle
 - Class `Oro\Bundle\WorkflowBundle\Model\WorkflowManager`
     - construction signature was changed, now it takes the next arguments:
