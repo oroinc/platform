@@ -142,7 +142,7 @@ services:
             - %oro_entity.hidden_fields%
         calls:
             - [setEntityProvider, ['@oro_entity.entity_provider']]
-            - [setVirtualFieldProvider, ['@oro_entity.virtual_field_provider']]
+            - [setVirtualFieldProvider, ['@oro_entity.virtual_field_provider.chain']]
             - [setVirtualRelationProvider, ['@oro_entity.virtual_relation_provider.chain']]
             - [setExclusionProvider, ['@oro_entity.exclusion_provider']]
 
