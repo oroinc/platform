@@ -11,7 +11,8 @@
         "oro/config": "dev-master",
         "components/jquery": "2.1.*",
         "bower-asset/jquery-cookie": "1.4.1",
-        "bower-asset/bootstrap": "2.3.0"
+        "npm-asset/bootstrap": "3.0.3",
+        "npm-asset/bootbox": "4.1.0"
     },
     "autoload": {
         "psr-0": { "Oro\\Bundle\\DistributionBundle": "" }
