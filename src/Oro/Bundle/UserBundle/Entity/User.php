@@ -84,7 +84,8 @@ class User extends ExtendUser implements
     EmailHolderInterface,
     FullNameInterface,
     NotificationEmailInterface,
-    AdvancedApiUserInterface
+    AdvancedApiUserInterface,
+    FailedLoginInfoInterface
 {
     const ROLE_DEFAULT = 'ROLE_USER';
     const ROLE_ADMINISTRATOR = 'ROLE_ADMINISTRATOR';
@@ -425,6 +426,13 @@ class User extends ExtendUser implements
     protected $updatedAt;
 
     /**
+     * @var int
+     *
+     * @ORM\Column(name="failed_login_count", type="integer", options={"default"=0, "unsigned"=true})
+     */
+    protected $failedLoginCount;
+
+    /**
      * @var OrganizationInterface
      *
      * Organization that user logged in
@@ -441,6 +449,7 @@ class User extends ExtendUser implements
         $this->emailOrigins = new ArrayCollection();
         $this->apiKeys = new ArrayCollection();
         $this->groups = new ArrayCollection();
+        $this->failedLoginCount = 0;
     }
 
     /**
@@ -1184,5 +1193,40 @@ class User extends ExtendUser implements
     public function getFullName()
     {
         return sprintf('%s %s', $this->getFirstName(), $this->getLastName());
+    }
+
+    /**
+     * {@inheritdoc}
+     *
+     * @return $this
+     */
+    public function setFailedLoginCount($count)
+    {
+        $this->failedLoginCount = $count;
+
+        return $this;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getFailedLoginCount()
+    {
+        return $this->failedLoginCount;
+    }
+
+    /**
+     * @param bool $enabled User state
+     *
+     * @return $this
+     */
+    public function setEnabled($enabled)
+    {
+        // reset failed logins counter when user is re-activated
+        if ($enabled && !$this->enabled) {
+            $this->setFailedLoginCount(0);
+        }
+
+        return parent::setEnabled($enabled);
     }
 }

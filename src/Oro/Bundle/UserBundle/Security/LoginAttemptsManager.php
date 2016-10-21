@@ -3,7 +3,7 @@
 namespace Oro\Bundle\UserBundle\Security;
 
 use Oro\Bundle\UserBundle\Entity\BaseUserManager;
-use Oro\Bundle\UserBundle\Entity\AbstractUser;
+use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\UserBundle\Mailer\Processor;
 use Oro\Bundle\UserBundle\Security\LoginAttemptsProvider;
 
@@ -34,9 +34,9 @@ class LoginAttemptsManager
     }
 
     /**
-     * @param AbstractUser $user
+     * @param User $user
      */
-    public function trackLoginSuccess(AbstractUser $user)
+    public function trackLoginSuccess(User $user)
     {
         $this->resetFailedLoginCounters($user);
     }
@@ -44,9 +44,9 @@ class LoginAttemptsManager
     /**
      * Update login counter and deactivate the user when limits are exceeded
      *
-     * @param AbstractUser $user
+     * @param User $user
      */
-    public function trackLoginFailure(AbstractUser $user)
+    public function trackLoginFailure(User $user)
     {
         if (!$this->attemptsProvider->hasLimit()) {
             return;
@@ -63,9 +63,9 @@ class LoginAttemptsManager
     }
 
     /**
-     * @param AbstractUser $user
+     * @param User $user
      */
-    protected function resetFailedLoginCounters(AbstractUser $user)
+    protected function resetFailedLoginCounters(User $user)
     {
         if ($this->attemptsProvider->hasLimit()) {
             $user->setFailedLoginCount(0);

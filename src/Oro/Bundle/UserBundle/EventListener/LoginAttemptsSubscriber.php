@@ -9,8 +9,8 @@ use Symfony\Component\Security\Http\Event\InteractiveLoginEvent;
 use Symfony\Component\Security\Http\SecurityEvents;
 
 use Oro\Bundle\UserBundle\Entity\BaseUserManager;
-use Oro\Bundle\UserBundle\Entity\FailedLoginInfoInterface;
 use Oro\Bundle\UserBundle\Security\LoginAttemptsManager;
+use Oro\Bundle\UserBundle\Entity\User;
 
 class LoginAttemptsSubscriber implements EventSubscriberInterface
 {
@@ -49,7 +49,7 @@ class LoginAttemptsSubscriber implements EventSubscriberInterface
         $username = $event->getAuthenticationToken()->getUser();
         $user = $this->userManager->findUserByUsernameOrEmail($username);
 
-        if ($user instanceof FailedLoginInfoInterface) {
+        if ($user instanceof User) {
             $this->attemptsManager->trackLoginFailure($user);
         }
     }
@@ -61,7 +61,7 @@ class LoginAttemptsSubscriber implements EventSubscriberInterface
     {
         $user = $event->getAuthenticationToken()->getUser();
 
-        if ($user instanceof FailedLoginInfoInterface) {
+        if ($user instanceof User) {
             $this->attemptsManager->trackLoginSuccess($user);
         }
     }

@@ -22,7 +22,6 @@ use Oro\Bundle\OrganizationBundle\Entity\OrganizationInterface;
 abstract class AbstractUser implements
     UserInterface,
     LoginInfoInterface,
-    FailedLoginInfoInterface,
     \Serializable,
     OrganizationAwareUserInterface,
     PasswordRecoveryInterface
@@ -121,13 +120,6 @@ abstract class AbstractUser implements
      * @ORM\Column(name="login_count", type="integer", options={"default"=0, "unsigned"=true})
      */
     protected $loginCount;
-
-    /**
-     * @var int
-     *
-     * @ORM\Column(name="failed_login_count", type="integer", options={"default"=0, "unsigned"=true})
-     */
-    protected $failedLoginCount;
 
     /**
      * @var bool
@@ -242,7 +234,6 @@ abstract class AbstractUser implements
         $this->salt = base_convert(sha1(uniqid(mt_rand(), true)), 16, 36);
         $this->roles = new ArrayCollection();
         $this->organizations = new ArrayCollection();
-        $this->failedLoginCount = 0;
     }
 
     /**
@@ -352,26 +343,6 @@ abstract class AbstractUser implements
     }
 
     /**
-     * {@inheritdoc}
-     *
-     * @return AbstractUser
-     */
-    public function setFailedLoginCount($count)
-    {
-        $this->failedLoginCount = $count;
-
-        return $this;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function getFailedLoginCount()
-    {
-        return $this->failedLoginCount;
-    }
-
-    /**
      * {@inheritDoc}
      */
     public function getSalt()
@@ -458,12 +429,6 @@ abstract class AbstractUser implements
      */
     public function setEnabled($enabled)
     {
-        // reset failed logins counter when user is re-activated
-        if ($enabled && !$this->enabled) {
-            $this->setFailedLoginCount(0);
-            $this->setDailyFailedLoginCount(0);
-        }
-
         $this->enabled = (bool)$enabled;
 
         return $this;
