@@ -10,7 +10,6 @@ use Symfony\Component\OptionsResolver\Options;
 
 use Oro\Bundle\WorkflowBundle\Helper\WorkflowTranslationHelper;
 use Oro\Bundle\WorkflowBundle\Validator\Constraints\TransitionIsAllowed;
-use Symfony\Component\VarDumper\VarDumper;
 
 class WorkflowTransitionType extends AbstractType
 {
