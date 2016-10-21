@@ -324,7 +324,6 @@ services:
     oro_workflow.translation.processor:
         class: 'Oro\Bundle\WorkflowBundle\Translation\TranslationProcessor'
         arguments:
-            - '@oro_workflow.translation.fields_iterator'
             - '@oro_workflow.helper.translation'
         public: false
         tags:

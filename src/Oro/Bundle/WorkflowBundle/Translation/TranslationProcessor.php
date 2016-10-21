@@ -18,18 +18,12 @@ class TranslationProcessor implements
     /** @var WorkflowTranslationHelper */
     private $translationHelper;
 
-    /** @var WorkflowTranslationFieldsIterator */
-    protected $translationFieldsIterator;
-
     /**
-     * @param WorkflowTranslationFieldsIterator $translationFieldsIterator
      * @param WorkflowTranslationHelper $translationHelper
      */
     public function __construct(
-        WorkflowTranslationFieldsIterator $translationFieldsIterator,
         WorkflowTranslationHelper $translationHelper
     ) {
-        $this->translationFieldsIterator = $translationFieldsIterator;
         $this->translationHelper = $translationHelper;
     }
 
@@ -45,15 +39,11 @@ class TranslationProcessor implements
 
         $workflowName = $configuration['name'];
 
-        /** @noinspection ReferenceMismatchInspection */
-        $translationFieldsIterator = $this->translationFieldsIterator->iterateConfigTranslationFields(
-            $workflowName,
-            $configuration
-        );
+        $translationFieldsIterator = new WorkflowConfigurationTranslationFieldsIterator($workflowName, $configuration);
 
-        foreach ($translationFieldsIterator as $key => &$value) {
-            if ($key !== $value && (string)$value !== '') {
-                $this->translationHelper->saveTranslation($key, $value);
+        foreach ($translationFieldsIterator as $translationKey => $value) {
+            if ($translationKey !== $value && (string)$value !== '') {
+                $this->translationHelper->saveTranslation($translationKey, $value);
             }
         }
 
@@ -66,15 +56,11 @@ class TranslationProcessor implements
      */
     public function prepare($workflowName, array $configuration)
     {
-        /** @noinspection ReferenceMismatchInspection */
-        $translationFieldsIterator = $this->translationFieldsIterator->iterateConfigTranslationFields(
-            $workflowName,
-            $configuration
-        );
+        $translationFieldsIterator = new WorkflowConfigurationTranslationFieldsIterator($workflowName, $configuration);
 
-        //fill by reference translatable fields with correct translation keys
-        foreach ($translationFieldsIterator as $key => &$value) {
-            $value = $key;
+        //fill translatable fields with it's translation keys
+        foreach ($translationFieldsIterator as $translationKey => $value) {
+            $translationFieldsIterator->writeCurrent($translationKey);
         }
 
         return $configuration;
@@ -86,8 +72,8 @@ class TranslationProcessor implements
      */
     public function ensureTranslationKeys(WorkflowChangesEvent $changesEvent)
     {
-        $keys = $this->translationFieldsIterator->iterateWorkflowDefinition($changesEvent->getDefinition());
-        foreach ($keys as $translationKey) {
+        $newWorkflowDefinitionFields = new WorkflowDefinitionTranslationFieldsIterator($changesEvent->getDefinition());
+        foreach ($newWorkflowDefinitionFields as $translationKey) {
             $this->translationHelper->ensureTranslationKey($translationKey);
         }
     }
@@ -104,11 +90,9 @@ class TranslationProcessor implements
             throw new \LogicException('Previous WorkflowDefinition expected. But got null.');
         }
 
-        $updatedDefinitionKeys = $this->translationFieldsIterator->iterateWorkflowDefinition(
-            $changesEvent->getDefinition()
-        );
+        $updatedDefinitionKeys = new WorkflowDefinitionTranslationFieldsIterator($changesEvent->getDefinition());
 
-        $previousDefinitionKeys = $this->translationFieldsIterator->iterateWorkflowDefinition($previousDefinition);
+        $previousDefinitionKeys = new WorkflowDefinitionTranslationFieldsIterator($previousDefinition);
 
         $newKeys = [];
         foreach ($updatedDefinitionKeys as $newTranslationKey) {
@@ -129,12 +113,10 @@ class TranslationProcessor implements
      */
     public function deleteTranslationKeys(WorkflowChangesEvent $workflowChangesEvent)
     {
-        $keysForRemoval = $this->translationFieldsIterator->iterateWorkflowDefinition(
-            $workflowChangesEvent->getDefinition()
-        );
+        $deletedDefinition = new WorkflowDefinitionTranslationFieldsIterator($workflowChangesEvent->getDefinition());
 
-        foreach ($keysForRemoval as $translationKey) {
-            $this->translationHelper->removeTranslationKey($translationKey);
+        foreach ($deletedDefinition as $translationKeyForRemove) {
+            $this->translationHelper->removeTranslationKey($translationKeyForRemove);
         }
     }
 
