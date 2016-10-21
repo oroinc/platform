@@ -124,7 +124,7 @@ class ActionDataTest extends \PHPUnit_Framework_TestCase
 
         $url = 'my/test/url';
 
-        $data->offsetSet('result.redirectUrl', $url);
+        $data->offsetSet('redirectUrl', $url);
         $this->assertEquals($url, $data->getRedirectUrl());
     }
 

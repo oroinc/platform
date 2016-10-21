@@ -5,8 +5,8 @@ namespace Oro\Component\Action\Model;
 use Doctrine\Common\Persistence\Proxy;
 use Doctrine\ORM\EntityNotFoundException;
 use Oro\Component\PropertyAccess\PropertyAccessor;
-use Symfony\Component\PropertyAccess\Exception\AccessException;
 use Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException;
+use Symfony\Component\PropertyAccess\Exception\RuntimeException;
 use Symfony\Component\PropertyAccess\PropertyPath;
 use Symfony\Component\PropertyAccess\PropertyPathInterface;
 
@@ -37,6 +37,7 @@ abstract class AbstractStorage implements \ArrayAccess, \IteratorAggregate, \Cou
     {
         $this->data = $data;
         $this->modified = false;
+        $this->propertyAccessor = new PropertyAccessor();
     }
 
     /**
@@ -70,19 +71,17 @@ abstract class AbstractStorage implements \ArrayAccess, \IteratorAggregate, \Cou
      */
     public function set($name, $value, $changeModified = true)
     {
-        $propertyAccessor = $this->getPropertyAccessor();
-
         try {
             $propertyPath = $this->getMappedPath($name);
             if ($changeModified &&
-                (!$this->has($name) || $propertyAccessor->getValue($this->data, $propertyPath) !== $value)
+                (!$this->has($name) || $this->propertyAccessor->getValue($this->data, $propertyPath) !== $value)
             ) {
                 $this->modified = true;
             }
-            $propertyAccessor->setValue($this->data, $propertyPath, $value);
+            $this->propertyAccessor->setValue($this->data, $propertyPath, $value);
 
             return $this;
-        } catch (AccessException $e) {
+        } catch (RuntimeException $e) {
             return $this;
         }
     }
@@ -110,11 +109,9 @@ abstract class AbstractStorage implements \ArrayAccess, \IteratorAggregate, \Cou
      */
     public function get($name)
     {
-        $propertyAccessor = $this->getPropertyAccessor();
-
         try {
             $propertyPath = $this->getMappedPath($name);
-            $value = $propertyAccessor->getValue($this->data, $propertyPath);
+            $value = $this->propertyAccessor->getValue($this->data, $propertyPath);
             if ($value instanceof Proxy && !$value->__isInitialized()) {
                 // set value as null if entity is not exist
                 $value = $this->extractProxyEntity($value);
@@ -122,7 +119,7 @@ abstract class AbstractStorage implements \ArrayAccess, \IteratorAggregate, \Cou
             }
 
             return $value;
-        } catch (AccessException $e) {
+        } catch (RuntimeException $e) {
             return null;
         }
     }
@@ -160,7 +157,7 @@ abstract class AbstractStorage implements \ArrayAccess, \IteratorAggregate, \Cou
             return true;
         } else {
             try {
-                $this->getPropertyAccessor()->getValue($this->data, $this->getMappedPath($name));
+                $this->propertyAccessor->getValue($this->data, $this->getMappedPath($name));
             } catch (NoSuchPropertyException $e) {
                 return false;
             }
@@ -283,18 +280,6 @@ abstract class AbstractStorage implements \ArrayAccess, \IteratorAggregate, \Cou
     public function getIterator()
     {
         return new \ArrayIterator($this->data);
-    }
-
-    /**
-     * @return PropertyAccessor
-     */
-    protected function getPropertyAccessor()
-    {
-        if (!$this->propertyAccessor) {
-            $this->propertyAccessor = new PropertyAccessor();
-        }
-
-        return $this->propertyAccessor;
     }
 
     /**
