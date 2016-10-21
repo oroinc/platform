@@ -30,15 +30,17 @@ class GenuineSyncScheduler
      */
     public function schedule($integrationId, $connector = null, array $connectorParameters = [])
     {
-        $message = new Message();
-        $message->setPriority(MessagePriority::VERY_LOW);
-        $message->setBody([
-            'integration_id' => $integrationId,
-            'connector_parameters' => $connectorParameters,
-            'connector' => $connector,
-            'transport_batch_size' => 100,
-        ]);
-
-        $this->producer->send(Topics::SYNC_INTEGRATION, $message);
+        $this->producer->send(
+            Topics::SYNC_INTEGRATION,
+            new Message(
+                [
+                    'integration_id'       => $integrationId,
+                    'connector_parameters' => $connectorParameters,
+                    'connector'            => $connector,
+                    'transport_batch_size' => 100,
+                ],
+                MessagePriority::VERY_LOW
+            )
+        );
     }
 }

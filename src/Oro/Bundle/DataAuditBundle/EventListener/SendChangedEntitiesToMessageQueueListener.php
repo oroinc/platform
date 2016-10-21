@@ -168,11 +168,10 @@ class SendChangedEntitiesToMessageQueueListener implements OptionalListenerInter
             $body['entities_deleted'] = $this->processDeletions($em);
             $body['collections_updated'] = $this->processCollectionUpdates($em);
 
-            $message = new Message();
-            $message->setPriority(MessagePriority::VERY_LOW);
-            $message->setBody($body);
-
-            $this->messageProducer->send(Topics::ENTITIES_CHANGED, $message);
+            $this->messageProducer->send(
+                Topics::ENTITIES_CHANGED,
+                new Message($body, MessagePriority::VERY_LOW)
+            );
         } finally {
             $this->allInsertions->detach($em);
             $this->allUpdates->detach($em);
