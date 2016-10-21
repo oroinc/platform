@@ -9,8 +9,8 @@ Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Account:
       common: '<p>Description for ID field</p>'
     name:
       common: '<p>Description for NAME field</p>'
-      create: '<p>Description for NAME field for CREATE action</p>'
-      update: '<p>Description for NAME field for UPDATE action</p>'
+      create: '<p>Description for NAME field for CREATE and UPDATE actions</p>'
+      update: '<p>Description for NAME field for CREATE and UPDATE actions</p>'
       delete: '<p>Description for NAME field for DELETE action</p>'
     createdat: []
     updatedat: []
@@ -19,6 +19,7 @@ Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Account:
     name: 'Description for NAME filter'
     createdat: 'Description for CREATEDAT filter'
     updatedat: 'Description for UPDATEDAT filter'
-Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Category: []
-Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Company: []
+  subresources:
+    contacts:
+        get_subresource: '<p>Description for <em>contacts GET_SUBRESOURCE</em> sub-resource</p>'
 Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Group: []

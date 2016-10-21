@@ -55,6 +55,13 @@ class EmailBody
     protected $bodyIsText;
 
     /**
+     * @var string
+     *
+     * @ORM\Column(name="text_body", type="text", nullable=true)
+     */
+    protected $textBody;
+
+    /**
      * @var bool
      *
      * @ORM\Column(name="has_attachments", type="boolean")
@@ -270,5 +277,24 @@ class EmailBody
     public function __toString()
     {
         return (string)$this->getId();
+    }
+
+    /**
+     * @return string
+     */
+    public function getTextBody()
+    {
+        return $this->textBody;
+    }
+
+    /**
+     * @param string $textBody
+     * @return $this
+     */
+    public function setTextBody($textBody)
+    {
+        $this->textBody = $textBody;
+
+        return $this;
     }
 }

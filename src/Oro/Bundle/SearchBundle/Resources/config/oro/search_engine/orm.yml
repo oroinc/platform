@@ -13,6 +13,12 @@ services:
             - [setLogQueries, [%oro_search.log_queries%]]
             - [setDrivers, [%oro_search.drivers%]]
 
+    oro_search.search.engine.storer:
+        class: Oro\Bundle\SearchBundle\Engine\Orm\DbalStorer
+        arguments:
+            - '@oro_entity.doctrine_helper'
+        public: false
+
     oro_search.search.engine.indexer:
         class: '%oro_search.engine.indexer.class%'
         arguments:
@@ -20,5 +26,6 @@ services:
             - '@oro_entity.doctrine_helper'
             - '@oro_search.mapper'
             - '@oro_search.resolver.entity_title'
+            - '@oro_search.search.engine.storer'
         calls:
             - ['setDrivers', ['%oro_search.drivers%']]

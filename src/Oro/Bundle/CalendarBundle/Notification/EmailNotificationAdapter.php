@@ -3,7 +3,7 @@
 namespace Oro\Bundle\CalendarBundle\Notification;
 
 use Oro\Bundle\EmailBundle\Model\EmailTemplateInterface;
-use Oro\Bundle\NotificationBundle\Processor\EmailNotificationInterface;
+use Oro\Bundle\NotificationBundle\Model\EmailNotificationInterface;
 
 class EmailNotificationAdapter implements EmailNotificationInterface
 {

@@ -1,6 +1,7 @@
 <?php
 namespace Oro\Bundle\TestFrameworkBundle\Behat\Listener;
 
+use Behat\Behat\EventDispatcher\Event\AfterFeatureTested;
 use Behat\Behat\EventDispatcher\Event\BeforeFeatureTested;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpKernel\KernelInterface;
@@ -27,9 +28,13 @@ class MessageQueueConsumerProcessSubscriber implements EventSubscriberInterface
         $this->process = new Process($command, $kernel->getRootDir());
     }
 
-    public function restartMessageConsumer()
+    public function stopMessageConsumer()
     {
         $this->process->stop();
+    }
+
+    public function startMessageConsumer()
+    {
         $this->process->start();
     }
 
@@ -40,7 +45,9 @@ class MessageQueueConsumerProcessSubscriber implements EventSubscriberInterface
     {
         return [
             // must be after FeatureIsolationSubscriber::beforeFeature
-            BeforeFeatureTested::BEFORE  => 'restartMessageConsumer',
+            BeforeFeatureTested::BEFORE  => ['startMessageConsumer', 90],
+            // must be before FeatureIsolationSubscriber::afterFeature
+            AfterFeatureTested::AFTER  => ['stopMessageConsumer', -90],
         ];
     }
 }

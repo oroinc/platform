@@ -10,7 +10,6 @@ use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionFieldConfig;
 use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
 use Oro\Bundle\ApiBundle\Request\DataType;
-use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 
 class CompoundEntityType extends AbstractType
 {
@@ -30,7 +29,7 @@ class CompoundEntityType extends AbstractType
             $builder->add(
                 $name,
                 $fieldConfig->getFormType(),
-                $this->getFormFieldOptions($fieldConfig)
+                $this->getFormFieldOptions($fieldConfig, $name, $field->getPropertyPath())
             );
         }
         $associations = $metadata->getAssociations();
@@ -40,7 +39,7 @@ class CompoundEntityType extends AbstractType
                 $builder->add(
                     $name,
                     $fieldConfig->getFormType(),
-                    $this->getFormFieldOptions($fieldConfig)
+                    $this->getFormFieldOptions($fieldConfig, $name, $association->getPropertyPath())
                 );
             }
         }
@@ -75,22 +74,24 @@ class CompoundEntityType extends AbstractType
 
     /**
      * @param EntityDefinitionFieldConfig $fieldConfig
+     * @param string                      $fieldName
+     * @param string|null                 $propertyPath
      *
      * @return array
      */
-    protected function getFormFieldOptions(EntityDefinitionFieldConfig $fieldConfig)
-    {
+    protected function getFormFieldOptions(
+        EntityDefinitionFieldConfig $fieldConfig,
+        $fieldName,
+        $propertyPath
+    ) {
         $options = $fieldConfig->getFormOptions();
         if (null === $options) {
             $options = [];
         }
-        $propertyPath = $fieldConfig->getPropertyPath();
-        if ($propertyPath) {
-            if (ConfigUtil::IGNORE_PROPERTY_PATH === $propertyPath) {
-                $options['mapped'] = false;
-            } else {
-                $options['property_path'] = $propertyPath;
-            }
+        if (!$propertyPath) {
+            $options['mapped'] = false;
+        } elseif ($propertyPath !== $fieldName) {
+            $options['property_path'] = $propertyPath;
         }
 
         return $options;
