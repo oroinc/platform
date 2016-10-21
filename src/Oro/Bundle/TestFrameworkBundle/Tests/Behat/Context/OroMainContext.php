@@ -11,6 +11,7 @@ use Behat\Symfony2Extension\Context\KernelAwareContext;
 use Behat\Symfony2Extension\Context\KernelDictionary;
 use Doctrine\Common\Inflector\Inflector;
 use Oro\Bundle\AttachmentBundle\Tests\Behat\Element\AttachmentItem;
+use Oro\Bundle\DataGridBundle\Tests\Behat\Element\Grid;
 use Oro\Bundle\FormBundle\Tests\Behat\Element\OroForm;
 use Oro\Bundle\NavigationBundle\Tests\Behat\Element\MainMenu;
 use Oro\Bundle\TestFrameworkBundle\Behat\Driver\OroSelenium2Driver;
@@ -387,6 +388,14 @@ class OroMainContext extends MinkContext implements
     }
 
     /**
+     * @Given /^(?:|I )open (?P<pageName>[\w\s\/]+) page$/
+     */
+    public function openPage($pageName)
+    {
+        $this->getPage($pageName)->open();
+    }
+
+    /**
      * @Given press select entity button on :field field
      */
     public function pressSelectEntityButton($field)
@@ -442,7 +451,7 @@ class OroMainContext extends MinkContext implements
      * Find and assert field value
      * It's valid for entity edit or entity view page
      *
-     * @When /^([\w\s]*) field should have ([\w\s]*) value$/
+     * @When /^(?P<fieldName>[\w\s]*) field should has (?P<fieldValue>.+) value$/
      */
     public function fieldShouldHaveValue($fieldName, $fieldValue)
     {
@@ -525,6 +534,18 @@ class OroMainContext extends MinkContext implements
         $field = $this->fixStepArgument($field);
         $value = $this->fixStepArgument($value);
         $this->createOroForm()->fillField($field, $value);
+    }
+
+    /**
+     * Inline edit field
+     *
+     * @When /^(?:|I )edit "(?P<entityTitle>[^"]+)" (?P<field>.+) as "(?P<value>.*)"$/
+     */
+    public function inlineEditField($field, $value, $entityTitle)
+    {
+        /** @var Grid $grid */
+        $grid = $this->createElement('Grid');
+        $grid->getRowByContent($entityTitle)->setCellValue($field, $value);
     }
 
     /**

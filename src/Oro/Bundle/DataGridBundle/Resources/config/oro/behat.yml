@@ -9,7 +9,7 @@ elements:
 
   GridRow:
     selector: 'tbody tr'
-    class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Element
+    class: Oro\Bundle\DataGridBundle\Tests\Behat\Element\GridRow
 
   GridHeaderLink:
     selector: 'th a'

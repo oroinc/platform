@@ -176,8 +176,11 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
     //@codingStandardsIgnoreEnd
     public function compareRowValues($column, $comparison, $rowNumber1, $rowNumber2)
     {
-        $value1 = $this->getGrid()->getRowValue($column, $this->getNumberFromString($rowNumber1));
-        $value2 = $this->getGrid()->getRowValue($column, $this->getNumberFromString($rowNumber2));
+        $rowNumber1 = $this->getNumberFromString($rowNumber1);
+        $rowNumber2 = $this->getNumberFromString($rowNumber2);
+
+        $value1 = $this->getGrid()->getRowByNumber($rowNumber1)->getCellValue($column);
+        $value2 = $this->getGrid()->getRowByNumber($rowNumber2)->getCellValue($column);
 
         switch ($comparison) {
             case 'lower':

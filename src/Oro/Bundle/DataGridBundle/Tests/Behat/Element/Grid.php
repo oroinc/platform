@@ -22,27 +22,10 @@ class Grid extends Element
     }
 
     /**
-     * Get column value by column header and row number
-     *
-     * @param string $header Header of grid column
-     * @param int $rowNumber Number of grid record starting from 1
-     * @return string
-     */
-    public function getRowValue($header, $rowNumber)
-    {
-        $columns = $this->getRowByNumber($rowNumber)->findAll('css', 'td');
-        /** @var GridHeader $gridHeader */
-        $gridHeader = $this->getElement('GridHeader');
-        $columnNumber = $gridHeader->getColumnNumber($header);
-
-        return $this->normalizeValueByGuessingType($columns[$columnNumber]->getText());
-    }
-
-    /**
      * Get Element tr by row number
      *
      * @param int $rowNumber Number of grid record starting from 1
-     * @return NodeElement tr element of grid
+     * @return GridRow tr element of grid
      */
     public function getRowByNumber($rowNumber)
     {
@@ -62,7 +45,7 @@ class Grid extends Element
      * Get Element tr by row content
      *
      * @param string $content Any content that can identify row
-     * @return Element tr element of grid
+     * @return GridRow tr element of grid
      */
     public function getRowByContent($content)
     {
@@ -86,9 +69,7 @@ class Grid extends Element
         );
 
         for ($i = 0; $i < $number; $i++) {
-            /** @var NodeElement $row */
-            $row = $rows[$i];
-            $this->checkRowCheckbox($row);
+            $rows[$i]->checkMassActionCheckbox();
         }
     }
 
@@ -97,8 +78,7 @@ class Grid extends Element
      */
     public function checkRecord($content)
     {
-        $row = $this->getRowByContent($content);
-        $this->checkRowCheckbox($row);
+        $this->getRowByContent($content)->checkMassActionCheckbox();
     }
 
     /**
@@ -108,6 +88,7 @@ class Grid extends Element
     public function getMassActionButton()
     {
         $massActionsButton = $this->findButton('Mass Actions');
+
         if (!$massActionsButton || !$massActionsButton->isVisible()) {
             throw ElementNotVisible::factory(
                 ElementNotVisible::ELEMENT_NOT_VISIBLE,
@@ -150,7 +131,7 @@ class Grid extends Element
 
     public function assertNoRecords()
     {
-        \PHPUnit_Framework_Assert::assertCount(0, $this->getRows());
+        self::assertCount(0, $this->getRows());
     }
 
     /**
@@ -189,11 +170,13 @@ class Grid extends Element
     }
 
     /**
-     * @return NodeElement[]
+     * @return GridRow[]
      */
     public function getRows()
     {
-        return $this->findAll('css', 'tbody tr');
+        return array_map(function (NodeElement $element) {
+            return $this->elementFactory->wrapElement('GridRow', $element);
+        }, $this->findAll('css', 'tbody tr'));
     }
 
     /**
@@ -201,7 +184,7 @@ class Grid extends Element
      * @param string $value
      * @return \DateTime|int|string
      */
-    protected function normalizeValueByGuessingType($value)
+    private function normalizeValueByGuessingType($value)
     {
         $value = trim($value);
 
@@ -214,17 +197,5 @@ class Grid extends Element
         }
 
         return $value;
-    }
-
-    /**
-     * @param NodeElement $row
-     */
-    protected function checkRowCheckbox(NodeElement $row)
-    {
-        $rowCheckbox = $row->find('css', '[type="checkbox"]');
-
-        self::assertNotNull($rowCheckbox, sprintf('No mass action checkbox found for "%s"', $row->getText()));
-
-        $rowCheckbox->click();
     }
 }
