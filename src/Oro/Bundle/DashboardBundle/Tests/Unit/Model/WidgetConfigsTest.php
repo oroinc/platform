@@ -32,16 +32,9 @@ class WidgetConfigsTest extends \PHPUnit_Framework_TestCase
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $eventDispatcher;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|FeatureChecker */
-    protected $featureChecker;
-
     public function setUp()
     {
         $this->configProvider = $this->getMockBuilder('Oro\Bundle\DashboardBundle\Model\ConfigProvider')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $securityFacade = $this->getMockBuilder('Oro\Bundle\SecurityBundle\SecurityFacade')
             ->disableOriginalConstructor()
             ->getMock();
 
@@ -67,22 +60,22 @@ class WidgetConfigsTest extends \PHPUnit_Framework_TestCase
 
         $this->eventDispatcher = $this->getMock('Symfony\Component\EventDispatcher\EventDispatcherInterface');
 
-        $this->featureChecker = $this->getMockBuilder('Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker')
+        $widgetConfigVisibilityFilter = $this
+            ->getMockBuilder('Oro\Bundle\DashboardBundle\Filter\WidgetConfigVisibilityFilter')
             ->disableOriginalConstructor()
             ->getMock();
-        $this->featureChecker->expects($this->any())
-            ->method('isResourceEnabled')
-            ->will($this->returnValue(true));
+        $widgetConfigVisibilityFilter->expects($this->any())
+            ->method('filterConfigs')
+            ->will($this->returnArgument(0));
 
         $this->widgetConfigs = new WidgetConfigs(
             $this->configProvider,
-            $securityFacade,
             $resolver,
             $this->em,
             $this->valueProvider,
             $this->translator,
             $this->eventDispatcher,
-            $this->featureChecker
+            $widgetConfigVisibilityFilter
         );
 
         $this->widgetRepository = $this->getMockBuilder('Doctrine\ORM\EntityRepository')

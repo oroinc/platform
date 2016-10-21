@@ -11,22 +11,15 @@ use Symfony\Component\Translation\TranslatorInterface;
 use Oro\Bundle\DashboardBundle\Form\Type\WidgetItemsChoiceType;
 use Oro\Bundle\DashboardBundle\Event\WidgetItemsLoadDataEvent;
 use Oro\Bundle\DashboardBundle\Entity\Widget;
+use Oro\Bundle\DashboardBundle\Filter\WidgetConfigVisibilityFilter;
 use Oro\Bundle\DashboardBundle\Provider\ConfigValueProvider;
-use Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker;
-use Oro\Bundle\SecurityBundle\SecurityFacade;
 
 use Oro\Component\Config\Resolver\ResolverInterface;
 
-/**
- * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
- */
 class WidgetConfigs
 {
     /** @var ConfigProvider */
     protected $configProvider;
-
-    /** @var SecurityFacade */
-    protected $securityFacade;
 
     /** @var ResolverInterface */
     protected $resolver;
@@ -46,40 +39,37 @@ class WidgetConfigs
     /** @var EventDispatcherInterface */
     protected $eventDispatcher;
 
-    /** @var FeatureChecker */
-    protected $featureChecker;
+    /** @var WidgetConfigVisibilityFilter */
+    protected $visibilityFilter;
 
     /** @var array */
     protected $widgetOptionsById = [];
 
     /**
-     * @param ConfigProvider           $configProvider
-     * @param SecurityFacade           $securityFacade
-     * @param ResolverInterface        $resolver
-     * @param EntityManagerInterface   $entityManager
-     * @param ConfigValueProvider      $valueProvider
-     * @param TranslatorInterface      $translator
-     * @param EventDispatcherInterface $eventDispatcher
-     * @param FeatureChecker           $featureChecker
+     * @param ConfigProvider               $configProvider
+     * @param ResolverInterface            $resolver
+     * @param EntityManagerInterface       $entityManager
+     * @param ConfigValueProvider          $valueProvider
+     * @param TranslatorInterface          $translator
+     * @param EventDispatcherInterface     $eventDispatcher
+     * @param WidgetConfigVisibilityFilter $visibilityFilter
      */
     public function __construct(
         ConfigProvider $configProvider,
-        SecurityFacade $securityFacade,
         ResolverInterface $resolver,
         EntityManagerInterface $entityManager,
         ConfigValueProvider $valueProvider,
         TranslatorInterface $translator,
         EventDispatcherInterface $eventDispatcher,
-        FeatureChecker $featureChecker
+        WidgetConfigVisibilityFilter $visibilityFilter
     ) {
         $this->configProvider = $configProvider;
-        $this->securityFacade = $securityFacade;
         $this->resolver = $resolver;
         $this->entityManager = $entityManager;
         $this->valueProvider = $valueProvider;
         $this->translator = $translator;
         $this->eventDispatcher = $eventDispatcher;
-        $this->featureChecker = $featureChecker;
+        $this->visibilityFilter = $visibilityFilter;
     }
 
     /**
@@ -104,6 +94,12 @@ class WidgetConfigs
         ];
 
         $widget = $this->configProvider->getWidgetConfig($widgetName);
+        if (isset($widget['data_items'])) {
+            $widget['data_items'] = $this->visibilityFilter->filterConfigs(
+                $widget['data_items'],
+                $widgetName
+            );
+        }
         unset($widget['route']);
         unset($widget['route_parameters']);
         unset($widget['acl']);
@@ -170,7 +166,7 @@ class WidgetConfigs
      */
     public function getWidgetConfigs()
     {
-        return $this->filterWidgets($this->configProvider->getWidgetConfigs());
+        return $this->visibilityFilter->filterConfigs($this->configProvider->getWidgetConfigs());
     }
 
     /**
@@ -183,7 +179,9 @@ class WidgetConfigs
      */
     public function getWidgetConfig($widgetName)
     {
-        $configs = $this->filterWidgets([$widgetName => $this->configProvider->getWidgetConfig($widgetName)]);
+        $configs = $this->visibilityFilter->filterConfigs([
+            $widgetName => $this->configProvider->getWidgetConfig($widgetName)
+        ]);
         $config = reset($configs);
 
         return $config ?: null;
@@ -200,10 +198,10 @@ class WidgetConfigs
     {
         $widgetConfig = $this->configProvider->getWidgetConfig($widgetName);
 
-        $items = isset($widgetConfig['items']) ? $widgetConfig['items'] : [];
-        $items = $this->filterWidgets($items, $widgetName);
-
-        return $items;
+        return $items = $this->visibilityFilter->filterConfigs(
+            isset($widgetConfig['items']) ? $widgetConfig['items'] : [],
+            $widgetName
+        );
     }
 
     /**
@@ -216,8 +214,10 @@ class WidgetConfigs
         $widgetConfig  = $this->configProvider->getWidgetConfig($widgetName);
         $widgetOptions = $this->getWidgetOptions($widgetId);
 
-        $items = isset($widgetConfig['data_items']) ? $widgetConfig['data_items'] : [];
-        $items = $this->filterWidgets($items, $widgetName);
+        $items = $this->visibilityFilter->filterConfigs(
+            isset($widgetConfig['data_items']) ? $widgetConfig['data_items'] : [],
+            $widgetName
+        );
 
         if ($this->eventDispatcher->hasListeners(WidgetItemsLoadDataEvent::EVENT_NAME)) {
             $event = new WidgetItemsLoadDataEvent($items, $widgetConfig, $widgetOptions);
@@ -312,63 +312,6 @@ class WidgetConfigs
         }
 
         return $options;
-    }
-
-    /**
-     * Filter widget configs based on acl enabled, applicable flag and selected items
-     *
-     * @param array $items
-     * @param string|null $widgetName Name of widget in case $items are subwidgets of the widget
-     *
-     * @return array filtered items
-     */
-    protected function filterWidgets(array $items, $widgetName = null)
-    {
-        $filteredItems = [];
-        foreach ($items as $itemName => $item) {
-            $acl        = isset($item['acl']) ? $item['acl'] : null;
-            $applicable = isset($item['applicable']) ? $item['applicable'] : null;
-            $enabled    = $item['enabled'];
-            unset($item['acl'], $item['applicable'], $item['enabled']);
-
-            if (!$this->isItemAllowed($widgetName, $itemName, $enabled, $acl, $applicable)) {
-                continue;
-            }
-
-            $filteredItems[$itemName] = $item;
-        }
-
-        return $filteredItems;
-    }
-
-    /**
-     * @param string|null $widgetName
-     * @param string $itemName
-     * @param bool $enabled
-     * @param string|null $acl
-     * @param string|null $applicable
-     *
-     * @return bool
-     */
-    protected function isItemAllowed($widgetName, $itemName, $enabled, $acl, $applicable)
-    {
-        if (!$enabled || ($acl && !$this->securityFacade->isGranted($acl))) {
-            return false;
-        }
-
-        if ($applicable) {
-            $resolved = $this->resolver->resolve([$applicable]);
-            if (!reset($resolved)) {
-                return false;
-            }
-        }
-
-        $resource = $widgetName ? sprintf('%s.%s', $widgetName, $itemName) : $itemName;
-        if (!$this->featureChecker->isResourceEnabled($resource, 'dashboards')) {
-            return false;
-        }
-
-        return true;
     }
 
     /**
