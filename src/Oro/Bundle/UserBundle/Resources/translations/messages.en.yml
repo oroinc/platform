@@ -114,9 +114,7 @@ oro:
         last_login.label:            Last logged in
         last_name.label:             Last name
         login_count.label:           Login count
-        daily_failed_login_count.label: Daily failed login count
         failed_login_count.label:    Failed login count
-        last_failed_login.label:     Last failed login
         middle_name.label:           Middle name
         name_prefix.label:           Name prefix
         name_suffix.label:           Name suffix
@@ -245,6 +243,4 @@ oro:
             fields:
                 failed_login_limit_enabled.label: Enable failed logins limit
                 failed_login_limit.label: Max login attempts
-                failed_daily_login_limit_enabled.label: Enable daily failed logins limit
-                failed_daily_login_limit.label: Max daily login attempts
 

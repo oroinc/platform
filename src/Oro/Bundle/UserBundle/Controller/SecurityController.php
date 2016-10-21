@@ -29,7 +29,7 @@ class SecurityController extends Controller
         $userManager      = $this->get('oro_user.manager');
 
         $remainingAttempts = null;
-        if ($attemptsProvider->hasLimits()
+        if ($attemptsProvider->hasLimit()
             && $helper->getLastAuthenticationError(false) instanceof BadCredentialsException
             && $helper->getLastUsername()
         ) {

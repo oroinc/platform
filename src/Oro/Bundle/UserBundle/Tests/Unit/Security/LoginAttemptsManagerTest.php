@@ -14,7 +14,7 @@ class LoginAttemptsManagerTest extends \PHPUnit_Framework_TestCase
     {
         $user = $this->getUser();
         $manager = new LoginAttemptsManager(
-            $this->getLoginAttemptsProvider(3, 3),
+            $this->getLoginAttemptsProvider(3),
             $this->getUserManager($user),
             $this->getMailProcessor()
         );
@@ -24,43 +24,27 @@ class LoginAttemptsManagerTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($user->isEnabled());
     }
 
-    public function testIncrementOnlyCumulativeCounterOnFailedLogin()
+    public function testIncrementCounterOnFailedLogin()
     {
-        $user = $this->getUser(5, 5);
+        $user = $this->getUser(5);
         $manager = new LoginAttemptsManager(
-            $this->getLoginAttemptsProvider(0, 10),
+            $this->getLoginAttemptsProvider(10),
             $this->getUserManager($user),
             $this->getMailProcessor()
         );
 
         $manager->trackLoginFailure($user);
 
-        $this->assertSame(5, $user->getDailyFailedLoginCount());
         $this->assertSame(6, $user->getFailedLoginCount());
-    }
-
-    public function testIncrementOnlyDailyCounterOnFailedLogin()
-    {
-        $user = $this->getUser(5, 5);
-        $manager = new LoginAttemptsManager(
-            $this->getLoginAttemptsProvider(10, 0),
-            $this->getUserManager($user),
-            $this->getMailProcessor()
-        );
-
-        $manager->trackLoginFailure($user);
-
-        $this->assertSame(6, $user->getDailyFailedLoginCount());
-        $this->assertSame(5, $user->getFailedLoginCount());
     }
 
     public function testDeactivateUserOnExeededLimit()
     {
-        $user = $this->getUser(3, 17);
+        $user = $this->getUser(4);
         $manager = new LoginAttemptsManager(
-            $this->getLoginAttemptsProvider(5, 10),
+            $this->getLoginAttemptsProvider(5),
             $this->getUserManager($user),
-            $this->getMailProcessor(0, 1)
+            $this->getMailProcessor(1)
         );
 
         $manager->trackLoginFailure($user);
@@ -68,119 +52,54 @@ class LoginAttemptsManagerTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse($user->isEnabled());
     }
 
-    public function testDeactivateUserOnExeededDailyLimit()
+    public function testResetCounterOnSuccessfulLogin()
     {
-        $user = $this->getUser(5, 10);
+        $user = $this->getUser(5);
         $manager = new LoginAttemptsManager(
-            $this->getLoginAttemptsProvider(3, 17),
-            $this->getUserManager($user),
-            $this->getMailProcessor(1, 0)
-        );
-
-        $manager->trackLoginFailure($user);
-
-        $this->assertFalse($user->isEnabled());
-    }
-
-    public function testResetOnlyCumulativeCounterOnSuccessfulLogin()
-    {
-        $user = $this->getUser(8, 5);
-        $manager = new LoginAttemptsManager(
-            $this->getLoginAttemptsProvider(0, 30),
+            $this->getLoginAttemptsProvider(30),
             $this->getUserManager($user),
             $this->getMailProcessor()
         );
 
         $manager->trackLoginSuccess($user);
 
-        $this->assertSame(8, $user->getDailyFailedLoginCount());
         $this->assertSame(0, $user->getFailedLoginCount());
     }
 
-    public function testResetOnlyDailyCounterOnSuccessfulLogin()
-    {
-        $user = $this->getUser(8, 5);
-        $manager = new LoginAttemptsManager(
-            $this->getLoginAttemptsProvider(30, 0),
-            $this->getUserManager($user),
-            $this->getMailProcessor()
-        );
-
-        $manager->trackLoginSuccess($user);
-
-        $this->assertSame(0, $user->getDailyFailedLoginCount());
-        $this->assertSame(5, $user->getFailedLoginCount());
-    }
-
-    public function testResetDailyCounterOnFirstFailedLoginToday()
-    {
-        $lastFail = new \DateTime('now', new \DateTimeZone('UTC'));
-        $lastFail->modify('-1 day');
-
-        $user = $this->getUser(8, 25, $lastFail);
-        $manager = new LoginAttemptsManager(
-            $this->getLoginAttemptsProvider(30, 0),
-            $this->getUserManager($user),
-            $this->getMailProcessor()
-        );
-
-        $manager->trackLoginFailure($user);
-
-        $this->assertSame(1, $user->getDailyFailedLoginCount());
-        $this->assertSame(25, $user->getFailedLoginCount());
-    }
-
     /**
-     * @param int $dailyLoginFails
      * @param int $loginFails
-     * @param \DateTime $lastFailedLogin
      * @return User
      */
-    private function getUser($dailyLoginFails = 0, $loginFails = 0, \DateTime $lastFailedLogin = null)
+    private function getUser($loginFails = 0)
     {
         $user = new User();
         $user->setEnabled(true);
         $user->setUsername('john');
-        $user->setDailyFailedLoginCount($dailyLoginFails);
         $user->setFailedLoginCount($loginFails);
-        $user->setLastFailedLogin($lastFailedLogin);
 
         return $user;
     }
 
     /**
-     * @param int $dailyLimit
      * @param int $limit
      * @return LoginAttemptsProvider
      */
-    private function getLoginAttemptsProvider(
-        $dailyLimit = 0,
-        $limit = 0
-    ) {
+    private function getLoginAttemptsProvider($limit = 0)
+    {
         $provider = $this->getMockBuilder(LoginAttemptsProvider::class)
             ->disableOriginalConstructor()
             ->setMethods([
-                'getMaxDailyLoginAttempts',
-                'hasDailyLimit',
-                'getMaxCumulativeLoginAttempts',
-                'hasCumulativeLimit'
+                'getLimit',
+                'hasLimit'
             ])
             ->getMock();
 
         $provider->expects($this->any())
-            ->method('getMaxDailyLoginAttempts')
-            ->willReturn($dailyLimit);
-
-        $provider->expects($this->any())
-            ->method('hasDailyLimit')
-            ->willReturn(0 !== $dailyLimit);
-
-        $provider->expects($this->any())
-            ->method('getMaxCumulativeLoginAttempts')
+            ->method('getLimit')
             ->willReturn($limit);
 
         $provider->expects($this->any())
-            ->method('hasCumulativeLimit')
+            ->method('hasLimit')
             ->willReturn(0 !== $limit);
 
         return $provider;
@@ -204,21 +123,17 @@ class LoginAttemptsManagerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @param  int $nbDailyEmails
-     * @param  int $nbCumulativeEmails
+     * @param  int $nbEmails
      * @return Processor
      */
-    private function getMailProcessor($nbDailyEmails = 0, $nbCumulativeEmails = 0)
+    private function getMailProcessor($nbEmails = 0)
     {
         $processor = $this->getMockBuilder(Processor::class)
             ->disableOriginalConstructor()
             ->getMock();
 
-        $processor->expects($this->exactly($nbCumulativeEmails))
+        $processor->expects($this->exactly($nbEmails))
             ->method('sendAutoDeactivateEmail');
-
-        $processor->expects($this->exactly($nbDailyEmails))
-            ->method('sendAutoDeactivateDailyEmail');
 
         return $processor;
     }

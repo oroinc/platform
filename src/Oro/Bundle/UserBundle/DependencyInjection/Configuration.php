@@ -72,8 +72,6 @@ class Configuration implements ConfigurationInterface
             [
                 'failed_login_limit_enabled' => ['value' => true, 'type' => 'boolean'],
                 'failed_login_limit' => ['value' => 10, 'type' => 'scalar'],
-                'failed_daily_login_limit_enabled' => ['value' => false, 'type' => 'boolean'],
-                'failed_daily_login_limit' => ['value' => 3, 'type' => 'scalar'],
             ]
         );
 

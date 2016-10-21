@@ -11,59 +11,51 @@ class LoginAttemptsProviderTest extends \PHPUnit_Framework_TestCase
     /**
      * @dataProvider loginAttemptsProvider
      */
-    public function testShouldReturnRemainingLoginAttemptsPerUser(
-        $dailyAttempts,
-        $cumulativeAttempts,
-        $dailyLimit,
-        $cumulativeLimit,
+    public function testShouldReturnRemainingAttempts(
+        $attempts,
+        $limit,
         $expected
     ) {
-        $user = $this->getUser($dailyAttempts, $cumulativeAttempts);
+        $user = $this->getUser($attempts);
         $provider = new LoginAttemptsProvider(
-            $this->getConfigManager($dailyLimit, $cumulativeLimit)
+            $this->getConfigManager($limit)
         );
 
         $this->assertSame($expected, $provider->getRemaining($user));
     }
 
     /**
-     * @return array (dailyAttempts, cumulativeAttempts, dailyLimit, cumulativeLimit, expected)
+     * @return array (attempts, limit, expected)
      */
     public function loginAttemptsProvider()
     {
         return [
-            'available daily logins' => [7, 10, 10, 99, 3],
-            'available cumulative logins' => [3, 10, 99, 100, 90],
-            'exceed daily logins' => [3, 5, 3, 99, 0],
-            'exceed cumulative logins' => [1, 101, 99, 100, 0],
-            'always return 0 on exceed' => [5, 100, 10, 70, 0],
-            'only cumulative limit' => [0, 7, 0, 10, 3],
-            'only daily limit' => [5, 0, 10, 0, 5],
-            'no limits' => [0, 0, 0, 0, 0],
+            'available cumulative logins' => [10, 100, 90],
+            'exceed cumulative logins' => [101, 100, 0],
+            'always return 0 on exceed' => [100, 70, 0],
+            'only cumulative limit' => [7, 10, 3],
+            'no limits' => [0, 0, 0],
         ];
     }
 
     /**
-     * @param  int $dailyAttempts
-     * @param  int $cumulativeAttempts
+     * @param  int $attempts
      * @return User
      */
-    private function getUser($dailyAttempts, $cumulativeAttempts)
+    private function getUser($attempts)
     {
         $user = new User();
         $user->setUsername('john_doe');
-        $user->setDailyFailedLoginCount($dailyAttempts);
-        $user->setFailedLoginCount($cumulativeAttempts);
+        $user->setFailedLoginCount($attempts);
 
         return $user;
     }
 
     /**
-     * @param  int $maxDailyAttempts
-     * @param  int $maxAttempts
+     * @param  int $limit
      * @return ConfigManager
      */
-    private function getConfigManager($maxDailyAttempts, $maxAttempts)
+    private function getConfigManager($limit)
     {
         $manager = $this->getMockBuilder(ConfigManager::class)
             ->disableOriginalConstructor()
@@ -72,10 +64,8 @@ class LoginAttemptsProviderTest extends \PHPUnit_Framework_TestCase
         $manager->expects($this->any())
             ->method('get')
             ->will($this->returnValueMap([
-                [LoginAttemptsProvider::LIMIT_ENABLED, false, false, null, (0 !== $maxAttempts)],
-                [LoginAttemptsProvider::LIMIT, false, false, null, $maxAttempts],
-                [LoginAttemptsProvider::DAILY_LIMIT_ENABLED, false, false, null, (0 !== $maxDailyAttempts)],
-                [LoginAttemptsProvider::DAILY_LIMIT, false, false, null, $maxDailyAttempts],
+                [LoginAttemptsProvider::LIMIT_ENABLED, false, false, null, (0 !== $limit)],
+                [LoginAttemptsProvider::LIMIT, false, false, null, $limit],
             ]));
 
         return $manager;

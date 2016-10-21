@@ -12,7 +12,6 @@ class Processor extends BaseProcessor
     const TEMPLATE_USER_CHANGE_PASSWORD         = 'user_change_password';
     const TEMPLATE_USER_IMPERSONATE             = 'user_impersonate';
     const TEMPLATE_USER_AUTO_DEACTIVATE         = 'auto_deactivate_failed_logins';
-    const TEMPLATE_USER_AUTO_DEACTIVATE_DAILY   = 'auto_deactivate_daily_failed_logins';
 
     /**
      * @param UserInterface $user
@@ -79,27 +78,6 @@ class Processor extends BaseProcessor
     public function sendAutoDeactivateEmail(UserInterface $user, $limit)
     {
         $emailTemplate = $this->findEmailTemplateByName(static::TEMPLATE_USER_AUTO_DEACTIVATE);
-
-        return $this->sendEmail(
-            $user,
-            $this->renderer->compileMessage(
-                $emailTemplate,
-                ['entity' => $user, 'limit' => $limit]
-            ),
-            $this->getEmailTemplateType($emailTemplate),
-            $this->getUserEmails(User::ROLE_ADMINISTRATOR)
-        );
-    }
-
-    /**
-     * @param UserInterface $user
-     * @param int $limit The exceed limit
-     *
-     * @return int
-     */
-    public function sendAutoDeactivateDailyEmail(UserInterface $user, $limit)
-    {
-        $emailTemplate = $this->findEmailTemplateByName(static::TEMPLATE_USER_AUTO_DEACTIVATE_DAILY);
 
         return $this->sendEmail(
             $user,

@@ -123,32 +123,11 @@ abstract class AbstractUser implements
     protected $loginCount;
 
     /**
-     * @var \DateTime
-     *
-     * @ORM\Column(name="last_failed_login", type="datetime", nullable=true)
-     * @ConfigField(
-     *      defaultValues={
-     *          "importexport"={
-     *              "excluded"=true
-     *          }
-     *      }
-     * )
-     */
-    protected $lastFailedLogin;
-
-    /**
      * @var int
      *
      * @ORM\Column(name="failed_login_count", type="integer", options={"default"=0, "unsigned"=true})
      */
     protected $failedLoginCount;
-
-    /**
-     * @var int
-     *
-     * @ORM\Column(name="daily_failed_login_count", type="integer", options={"default"=0, "unsigned"=true})
-     */
-    protected $dailyFailedLoginCount;
 
     /**
      * @var bool
@@ -264,7 +243,6 @@ abstract class AbstractUser implements
         $this->roles = new ArrayCollection();
         $this->organizations = new ArrayCollection();
         $this->failedLoginCount = 0;
-        $this->dailyFailedLoginCount = 0;
     }
 
     /**
@@ -375,26 +353,6 @@ abstract class AbstractUser implements
 
     /**
      * {@inheritdoc}
-     */
-    public function getLastFailedLogin()
-    {
-        return $this->lastFailedLogin;
-    }
-
-    /**
-     * {@inheritdoc}
-     *
-     * @return $this
-     */
-    public function setLastFailedLogin(\DateTime $time = null)
-    {
-        $this->lastFailedLogin = $time;
-
-        return $this;
-    }
-
-    /**
-     * {@inheritdoc}
      *
      * @return AbstractUser
      */
@@ -411,26 +369,6 @@ abstract class AbstractUser implements
     public function getFailedLoginCount()
     {
         return $this->failedLoginCount;
-    }
-
-    /**
-     * {@inheritdoc}
-     *
-     * @return AbstractUser
-     */
-    public function setDailyFailedLoginCount($count)
-    {
-        $this->dailyFailedLoginCount = $count;
-
-        return $this;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function getDailyFailedLoginCount()
-    {
-        return $this->dailyFailedLoginCount;
     }
 
     /**

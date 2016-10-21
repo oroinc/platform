@@ -24,22 +24,6 @@ system_configuration:
                 constraints:
                     - GreaterThan:
                         value: 0
-        oro_user.failed_daily_login_limit_enabled:
-            data_type: boolean
-            type: oro_config_checkbox
-            priority: 60
-            options:
-                required: false
-                label: oro.user.system_configuration.fields.failed_daily_login_limit_enabled.label
-        oro_user.failed_daily_login_limit:
-            data_type: integer
-            type: integer
-            priority: 50
-            options:
-                label: oro.user.system_configuration.fields.failed_daily_login_limit.label
-                constraints:
-                    - GreaterThan:
-                        value: 0
 
     tree:
         system_configuration:
@@ -54,5 +38,3 @@ system_configuration:
                                         children:
                                             - oro_user.failed_login_limit_enabled
                                             - oro_user.failed_login_limit
-                                            - oro_user.failed_daily_login_limit_enabled
-                                            - oro_user.failed_daily_login_limit
