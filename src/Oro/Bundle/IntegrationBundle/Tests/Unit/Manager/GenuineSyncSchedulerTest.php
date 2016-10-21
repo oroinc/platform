@@ -4,71 +4,61 @@ namespace Oro\Bundle\IntegrationBundle\Tests\Unit\Manager;
 
 use Oro\Bundle\IntegrationBundle\Async\Topics;
 use Oro\Bundle\IntegrationBundle\Manager\GenuineSyncScheduler;
-use Oro\Bundle\MessageQueueBundle\Test\Functional\MessageCollector;
+use Oro\Bundle\MessageQueueBundle\Test\Unit\MessageQueueExtension;
+use Oro\Component\MessageQueue\Client\Message;
 use Oro\Component\MessageQueue\Client\MessagePriority;
 use Oro\Component\MessageQueue\Client\MessageProducerInterface;
 
 class GenuineSyncSchedulerTest extends \PHPUnit_Framework_TestCase
 {
+    use MessageQueueExtension;
+
     public function testCouldBeConstructedWithRegistryAsFirstArgument()
     {
-        new GenuineSyncScheduler($this->createTraceableMessageProducer());
+        new GenuineSyncScheduler($this->getMock(MessageProducerInterface::class));
     }
 
     public function testShouldSendSyncIntegrationMessageWithIntegrationIdOnly()
     {
-        $messageProducer = $this->createTraceableMessageProducer();
+        $messageProducer = self::getMessageProducer();
 
         $scheduler = new GenuineSyncScheduler($messageProducer);
 
         $scheduler->schedule('theIntegrationId');
 
-        $traces = $messageProducer->getTopicSentMessages(Topics::SYNC_INTEGRATION);
-
-        $this->assertCount(1, $traces);
-
-        $this->assertEquals(Topics::SYNC_INTEGRATION, $traces[0]['topic']);
-        $this->assertEquals(MessagePriority::VERY_LOW, $traces[0]['message']->getPriority());
-        $this->assertEquals([
-            'integration_id' => 'theIntegrationId',
-            'connector' => null,
-            'connector_parameters' => [],
-            'transport_batch_size' => 100,
-        ], $traces[0]['message']->getBody());
+        self::assertMessageSent(
+            Topics::SYNC_INTEGRATION,
+            new Message(
+                [
+                    'integration_id' => 'theIntegrationId',
+                    'connector' => null,
+                    'connector_parameters' => [],
+                    'transport_batch_size' => 100,
+                ],
+                MessagePriority::VERY_LOW
+            )
+        );
     }
 
     public function testShouldAllowPassConnectorNameAndOptions()
     {
-        $messageProducer = $this->createTraceableMessageProducer();
+        $messageProducer = self::getMessageProducer();
 
         $scheduler = new GenuineSyncScheduler($messageProducer);
 
         $scheduler->schedule('theIntegrationId', 'theConnectorName', ['theOption' => 'theValue']);
 
-        $traces = $messageProducer->getTopicSentMessages(Topics::SYNC_INTEGRATION);
-
-        $this->assertCount(1, $traces);
-
-        $this->assertEquals(Topics::SYNC_INTEGRATION, $traces[0]['topic']);
-        $this->assertEquals(MessagePriority::VERY_LOW, $traces[0]['message']->getPriority());
-        $this->assertEquals([
-            'integration_id' => 'theIntegrationId',
-            'connector' => 'theConnectorName',
-            'connector_parameters' => ['theOption' => 'theValue'],
-            'transport_batch_size' => 100,
-        ], $traces[0]['message']->getBody());
-    }
-
-    /**
-     * @return MessageCollector
-     */
-    protected function createTraceableMessageProducer()
-    {
-        /** @var MessageProducerInterface $internalMessageProducer */
-        $internalMessageProducer = $this->getMock(MessageProducerInterface::class);
-
-        $collector = new MessageCollector($internalMessageProducer);
-
-        return $collector;
+        self::assertMessageSent(
+            Topics::SYNC_INTEGRATION,
+            new Message(
+                [
+                    'integration_id' => 'theIntegrationId',
+                    'connector' => 'theConnectorName',
+                    'connector_parameters' => ['theOption' => 'theValue'],
+                    'transport_batch_size' => 100,
+                ],
+                MessagePriority::VERY_LOW
+            )
+        );
     }
 }

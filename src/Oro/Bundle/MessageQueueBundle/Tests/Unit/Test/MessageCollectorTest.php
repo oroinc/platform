@@ -1,8 +1,8 @@
 <?php
 
-namespace Oro\Bundle\MessageQueueBundle\Tests\Unit;
+namespace Oro\Bundle\MessageQueueBundle\Tests\Unit\Test;
 
-use Oro\Bundle\MessageQueueBundle\Test\Functional\MessageCollector;
+use Oro\Bundle\MessageQueueBundle\Test\MessageCollector;
 use Oro\Component\MessageQueue\Client\MessageProducerInterface;
 
 class MessageCollectorTest extends \PHPUnit_Framework_TestCase
@@ -35,7 +35,7 @@ class MessageCollectorTest extends \PHPUnit_Framework_TestCase
         $this->messageCollector->send($topic, $message);
     }
 
-    public function testShouldCollectMessagesWhenEnabled()
+    public function testShouldCollectMessages()
     {
         $topic = 'test topic';
         $message = 'test message';
@@ -82,5 +82,21 @@ class MessageCollectorTest extends \PHPUnit_Framework_TestCase
         } catch (\Exception $e) {
             self::assertEquals([], $this->messageCollector->getSentMessages());
         }
+    }
+
+    public function testShouldBePossibleToUseWithoutInternalMessageProducer()
+    {
+        $topic = 'test topic';
+        $message = 'test message';
+
+        $messageCollector = new MessageCollector();
+        $messageCollector->send($topic, $message);
+
+        self::assertEquals(
+            [
+                ['topic' => $topic, 'message' => $message]
+            ],
+            $messageCollector->getSentMessages()
+        );
     }
 }

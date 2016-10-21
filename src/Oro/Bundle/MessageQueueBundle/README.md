@@ -1,5 +1,19 @@
 # OroMessageQueue Bundle
 
+## Table of Contents
+
+ - [Overview](#overview)
+ - [Usage](#usage)
+ - [Supervisord](#supervisord)
+ - [Internals](#internals)
+   - [Structure](#structure)
+   - [Flow](#flow)
+   - [Custom transport](#custom-transport)
+   - [Key Classes](#key-classes)
+ - [Unit and Functional tests](#unit-and-functional-tests)
+
+## Overview
+
 The bundle integrates OroMessageQueue component.
 It adds easy to use configuration layer, register services and tie them together, register handy cli commands.
 
@@ -129,11 +143,16 @@ You have to provide an implementation for them
 * [MessageConsumeCommand](../../Component/MessageQueue/Client/ConsumeMessagesCommand.php) - A command you use to consume messages.
 * [QueueConsumer](../../Component/MessageQueue/Consumption/QueueConsumer.php) - A class that works inside the command and watch for a new message and once it is get it pass it to a message processor.
 
-## Functional tests
+## Unit and Functional tests
 
-To functionally test that a message was sent, you can use [MessageQueueExtension](./Test/Functional/MessageQueueExtension.php). Also, in case if you need custom logic for manage sent messages, you can use [MessageQueueAssertTrait](./Test/Functional/MessageQueueAssertTrait.php). 
+To test that a message was sent in unit and functional tests, you can use `MessageQueueExtension` trait. There are two implementation of this trait, one for unit tests, another for functional tests:
 
-But before you start, you need to register `oro_message_queue.test.message_collector` service for `test` environment.
+- [Oro\Bundle\MessageQueueBundle\Test\Unit\MessageQueueExtension](./Test/Unit/MessageQueueExtension.php) for unit tests
+- [Oro\Bundle\MessageQueueBundle\Test\Functional\MessageQueueExtension](./Test/Functional/MessageQueueExtension.php) for functional tests
+
+Also, in case if you need custom logic for manage sent messages, you can use [Oro\Bundle\MessageQueueBundle\Test\Unit\MessageQueueAssertTrait](./Test/Unit/MessageQueueAssertTrait.php) or [Oro\Bundle\MessageQueueBundle\Test\Functional\MessageQueueAssertTrait](./Test/Functional/MessageQueueAssertTrait.php) traits. 
+
+Before you start to use traits in functional tests, you need to register `oro_message_queue.test.message_collector` service for `test` environment.
 
 ```yaml
 # app/config/config_test.yml
@@ -205,6 +224,30 @@ class SomeTest extends WebTestCase
                 ['topic' => 'aFooTopic', 'message' => 'Something else has happened'],
             ]
         );
+    }
+}
+```
+
+In unit tests you are usually need to pass the message producer to a service you test. To get correct instance of the message producer just use `self::getMessageProducer()`, e.g.:
+
+```php
+<?php
+namespace Acme\Bundle\AcmeBundle\Tests\Unit;
+
+use Acme\Bundle\AcmeBundle\SomeClass;
+use Oro\Bundle\MessageQueueBundle\Test\Unit\MessageQueueExtension;
+
+class SomeTest extends \PHPUnit_Framework_TestCase
+{
+    use MessageQueueExtension;
+
+    public function testSingleMessage()
+    {
+        $instance = new SomeClass(self::getMessageProducer());
+        
+        $instance->doSomethind();
+
+        self::assertMessageSent('aFooTopic', 'Something has happened');
     }
 }
 ```

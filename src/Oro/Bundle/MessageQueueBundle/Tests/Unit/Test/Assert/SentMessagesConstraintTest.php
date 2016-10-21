@@ -1,8 +1,8 @@
 <?php
 
-namespace Oro\Bundle\MessageQueueBundle\Tests\Unit;
+namespace Oro\Bundle\MessageQueueBundle\Tests\Unit\Test\Assert;
 
-use Oro\Bundle\MessageQueueBundle\Test\Functional\SentMessagesConstraint;
+use Oro\Bundle\MessageQueueBundle\Test\Assert\SentMessagesConstraint;
 
 class SentMessagesConstraintTest extends \PHPUnit_Framework_TestCase
 {

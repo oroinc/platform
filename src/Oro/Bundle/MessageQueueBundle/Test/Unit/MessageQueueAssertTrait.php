@@ -1,18 +1,33 @@
 <?php
 
-namespace Oro\Bundle\MessageQueueBundle\Test\Functional;
+namespace Oro\Bundle\MessageQueueBundle\Test\Unit;
 
 use Oro\Bundle\MessageQueueBundle\Test\Assert\AbstractMessageQueueAssertTrait;
 use Oro\Bundle\MessageQueueBundle\Test\MessageCollector;
 
 /**
- * Provides useful assertion methods for the message queue related functional tests.
- * It is expected that this trait will be used in classes that have "getContainer" static method.
- * E.g. classes derived from Oro\Bundle\TestFrameworkBundle\Test\WebTestCase.
+ * Provides useful assertion methods for the message queue related unit tests.
  */
 trait MessageQueueAssertTrait
 {
     use AbstractMessageQueueAssertTrait;
+
+    /**
+     * @var MessageCollector|null
+     */
+    private static $messageCollector;
+
+    /**
+     * Unsets the message collector if needed.
+     *
+     * @afterClass
+     */
+    public static function tearDownAfterClassMessageCollector1()
+    {
+        if (isset(self::$messageCollector)) {
+            self::$messageCollector = null;
+        }
+    }
 
     /**
      * Gets an object responsible to collect all sent messages.
@@ -21,7 +36,11 @@ trait MessageQueueAssertTrait
      */
     protected static function getMessageCollector()
     {
-        return self::getContainer()->get('oro_message_queue.test.message_collector');
+        if (!isset(self::$messageCollector)) {
+            self::$messageCollector = new MessageCollector();
+        }
+
+        return self::$messageCollector;
     }
 
     /**

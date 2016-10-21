@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\MessageQueueBundle\Test\Functional;
+namespace Oro\Bundle\MessageQueueBundle\Test\Assert;
 
 /**
  * Constraint that checks if a message was sent.
