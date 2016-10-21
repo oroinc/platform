@@ -63,7 +63,7 @@ class TranslationProcessor implements
             $translationFieldsIterator->writeCurrent($translationKey);
         }
 
-        return $configuration;
+        return $translationFieldsIterator->getConfiguration();
     }
 
     /**
@@ -73,7 +73,7 @@ class TranslationProcessor implements
     public function ensureTranslationKeys(WorkflowChangesEvent $changesEvent)
     {
         $newWorkflowDefinitionFields = new WorkflowDefinitionTranslationFieldsIterator($changesEvent->getDefinition());
-        foreach ($newWorkflowDefinitionFields as $translationKey) {
+        foreach ($newWorkflowDefinitionFields as $translationKey => $value) {
             $this->translationHelper->ensureTranslationKey($translationKey);
         }
     }

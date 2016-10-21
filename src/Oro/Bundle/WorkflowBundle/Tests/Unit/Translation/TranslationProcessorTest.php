@@ -2,8 +2,6 @@
 
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Translation;
 
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-
 use Oro\Bundle\WorkflowBundle\Configuration\Handler\ConfigurationHandlerInterface;
 use Oro\Bundle\WorkflowBundle\Configuration\WorkflowDefinitionBuilderExtensionInterface;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
@@ -11,7 +9,7 @@ use Oro\Bundle\WorkflowBundle\Event\WorkflowChangesEvent;
 use Oro\Bundle\WorkflowBundle\Event\WorkflowEvents;
 use Oro\Bundle\WorkflowBundle\Helper\WorkflowTranslationHelper;
 use Oro\Bundle\WorkflowBundle\Translation\TranslationProcessor;
-use Oro\Bundle\WorkflowBundle\Translation\WorkflowTranslationFieldsIterator;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
@@ -21,21 +19,16 @@ class TranslationProcessorTest extends \PHPUnit_Framework_TestCase
     /** @var TranslationProcessor */
     private $processor;
 
-    /** @var WorkflowTranslationFieldsIterator|\PHPUnit_Framework_MockObject_MockObject */
-    private $fieldsIterator;
-
     /** @var WorkflowTranslationHelper|\PHPUnit_Framework_MockObject_MockObject */
     private $translationHelper;
 
     protected function setUp()
     {
-        $this->fieldsIterator = $this->getMockBuilder(WorkflowTranslationFieldsIterator::class)
-            ->disableOriginalConstructor()->getMock();
 
         $this->translationHelper = $this->getMockBuilder(WorkflowTranslationHelper::class)
             ->disableOriginalConstructor()->getMock();
 
-        $this->processor = new TranslationProcessor($this->fieldsIterator, $this->translationHelper);
+        $this->processor = new TranslationProcessor($this->translationHelper);
     }
 
     protected function tearDown()
@@ -50,27 +43,15 @@ class TranslationProcessorTest extends \PHPUnit_Framework_TestCase
 
     public function testPrepare()
     {
-        $config = ['42' => 24];
-
-        //test iterator modifications
-        $iterationChanges = (object)['key1' => 'val', 'key2' => null];
-
-        $this->fieldsIterator->expects($this->once())->method('iterateConfigTranslationFields')
-            ->with('test_workflow', $config)
-            ->willReturn($iterationChanges);
+        $config = ['label' => 24];
 
         $result = $this->processor->prepare('test_workflow', $config);
 
         $this->assertEquals(
-            (object)[
-                'key1' => 'key1',
-                'key2' => 'key2'
-            ],
-            $iterationChanges,
-            'Iterated keys must be placed to values trough reference.'
+            $result,
+            ['label' => 'oro.workflow.test_workflow.label'],
+            'should return modified with key configuration back'
         );
-
-        $this->assertEquals($result, $config, 'should return configuration back');
     }
 
     public function testImplementsHandler()
@@ -80,25 +61,11 @@ class TranslationProcessorTest extends \PHPUnit_Framework_TestCase
 
     public function testHandle()
     {
-        $configuration = ['name' => 'test_workflow'];
-
-        $iteratedFields = [
-            'key1' => 'value1',
-            'key2' => null,
-            'key3' => 'value3',
-            'key4' => '',
-        ];
-
-        $this->fieldsIterator->expects($this->once())
-            ->method('iterateConfigTranslationFields')
-            ->with('test_workflow', $configuration)->willReturn($iteratedFields);
+        $configuration = ['name' => 'test_workflow', 'label' => 'wflabel'];
 
         $this->translationHelper->expects($this->at(0))
             ->method('saveTranslation')
-            ->with('key1', 'value1');
-        $this->translationHelper->expects($this->at(1))
-            ->method('saveTranslation')
-            ->with('key3', 'value3');
+            ->with('oro.workflow.test_workflow.label', 'wflabel');
 
         $this->processor->handle($configuration);
     }
@@ -133,41 +100,44 @@ class TranslationProcessorTest extends \PHPUnit_Framework_TestCase
 
     public function testEnsureTranslationKeys()
     {
-        $definition = new WorkflowDefinition();
+        $definition = (new WorkflowDefinition())->setName('test_workflow');
         $changes = new WorkflowChangesEvent($definition);
 
-        $this->fieldsIterator->expects($this->once())
-            ->method('iterateWorkflowDefinition')
-            ->with($definition)
-            ->willReturn(['key1', 'key2']);
-
-        $this->translationHelper->expects($this->at(0))->method('ensureTranslationKey')->with('key1');
-        $this->translationHelper->expects($this->at(1))->method('ensureTranslationKey')->with('key2');
+        $this->translationHelper->expects($this->at(0))
+            ->method('ensureTranslationKey')
+            ->with('oro.workflow.test_workflow.label');
 
         $this->processor->ensureTranslationKeys($changes);
     }
 
     public function testClearTranslationKeys()
     {
-        $updatedDefinition = new WorkflowDefinition();
-        $previousDefinition = new WorkflowDefinition();
+        $updatedDefinition = (new WorkflowDefinition())
+            ->setName('test_workflow')
+            ->setLabel('test_workflow_label_translation_key')
+            ->setConfiguration(
+                ['transitions' => ['transition_1' => ['label' => 'test_workflow_transition_1_translation_key']]]
+            );
+        $previousDefinition = (new WorkflowDefinition())
+            ->setName('test_workflow')
+            ->setLabel('test_workflow_label_translation_key')
+            ->setConfiguration(
+                ['transitions' => ['transition_2' => ['label' => 'test_workflow_transition_2_translation_key']]]
+            );
+
         $changes = new WorkflowChangesEvent($updatedDefinition, $previousDefinition);
 
-        $this->fieldsIterator->expects($this->at(0))
-            ->method('iterateWorkflowDefinition')
-            ->with($updatedDefinition)
-            ->willReturn(['key3', 'key4']);
+        $this->translationHelper->expects($this->at(0))
+            ->method('ensureTranslationKey')
+            ->with('test_workflow_label_translation_key');
+        $this->translationHelper->expects($this->at(1))
+            ->method('ensureTranslationKey')
+            ->with('test_workflow_transition_1_translation_key');
 
-        $this->fieldsIterator->expects($this->at(1))
-            ->method('iterateWorkflowDefinition')
-            ->with($previousDefinition)
-            ->willReturn(new \ArrayIterator(['key1', 'key2', 'key3']));
+        $this->translationHelper->expects($this->at(2))
+            ->method('removeTranslationKey')
+            ->with('test_workflow_transition_2_translation_key');
 
-        $this->translationHelper->expects($this->at(0))->method('ensureTranslationKey')->with('key3');
-        $this->translationHelper->expects($this->at(1))->method('ensureTranslationKey')->with('key4');
-
-        $this->translationHelper->expects($this->at(2))->method('removeTranslationKey')->with('key1');
-        $this->translationHelper->expects($this->at(3))->method('removeTranslationKey')->with('key2');
 
         $this->processor->clearTranslationKeys($changes);
     }
@@ -185,17 +155,12 @@ class TranslationProcessorTest extends \PHPUnit_Framework_TestCase
 
     public function testDeleteTranslationKeys()
     {
-        $deletedDefinition = new WorkflowDefinition();
+        $deletedDefinition = (new WorkflowDefinition())->setName('test_workflow')->setLabel('label_translation_key');
 
         $changes = new WorkflowChangesEvent($deletedDefinition);
 
-        $this->fieldsIterator->expects($this->once())
-            ->method('iterateWorkflowDefinition')
-            ->with($deletedDefinition)
-            ->willReturn(['key1_to_delete', 'key2_to_delete']);
-
-        $this->translationHelper->expects($this->at(0))->method('removeTranslationKey')->with('key1_to_delete');
-        $this->translationHelper->expects($this->at(1))->method('removeTranslationKey')->with('key2_to_delete');
+        $this->translationHelper->expects($this->at(0))
+            ->method('removeTranslationKey')->with('label_translation_key');
 
         $this->processor->deleteTranslationKeys($changes);
     }

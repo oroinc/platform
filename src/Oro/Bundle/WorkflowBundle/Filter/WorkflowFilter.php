@@ -25,18 +25,15 @@ class WorkflowFilter extends EntityFilter
     /**
      * @param FormFactoryInterface $factory
      * @param FilterUtility $util
-     * @param TranslationKeyGenerator $generator
      * @param WorkflowTranslationHelper $translationHelper
      */
     public function __construct(
         FormFactoryInterface $factory,
         FilterUtility $util,
-        TranslationKeyGenerator $generator,
         WorkflowTranslationHelper $translationHelper
     ) {
         parent::__construct($factory, $util);
 
-        $this->generator = $generator;
         $this->translationHelper = $translationHelper;
     }
 
@@ -88,10 +85,22 @@ class WorkflowFilter extends EntityFilter
     }
 
     /**
+     * @return TranslationKeyGenerator
+     */
+    protected function getGenerator()
+    {
+        if ($this->generator) {
+            return $this->generator;
+        }
+
+        return $this->generator = new TranslationKeyGenerator();
+    }
+
+    /**
      * {@inheritdoc}
      */
     protected function findRelatedJoin(FilterDatasourceAdapterInterface $ds)
     {
-        // nothing todo, related joins configured manually
+        // nothing to do, related joins configured manually
     }
 }

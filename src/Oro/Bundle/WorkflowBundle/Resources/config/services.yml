@@ -355,7 +355,6 @@ services:
         arguments:
             - '@form.factory'
             - '@oro_filter.filter_utility'
-            - '@oro_translation.generator.translation_key'
             - '@oro_workflow.helper.translation'
         tags:
             - { name: oro_filter.extension.orm_filter.filter, type: workflow, datasource: orm }
