@@ -2,14 +2,12 @@
 
 namespace Oro\Bundle\WorkflowBundle\Helper;
 
-use Oro\Bundle\TranslationBundle\Helper\TranslationsDatagridRouteHelper;
 use Oro\Bundle\TranslationBundle\Translation\KeySource\TranslationKeySource;
 use Oro\Bundle\TranslationBundle\Helper\TranslationHelper;
 use Oro\Bundle\TranslationBundle\Manager\TranslationManager;
 use Oro\Bundle\TranslationBundle\Translation\TranslationKeyGenerator;
 use Oro\Bundle\TranslationBundle\Translation\Translator;
 
-use Oro\Bundle\WorkflowBundle\Configuration\WorkflowConfiguration;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Translation\KeyTemplate\WorkflowTemplate;
 use Oro\Bundle\WorkflowBundle\Translation\WorkflowTranslationFieldsIterator;
@@ -27,9 +25,6 @@ class WorkflowTranslationHelper
     /** @var TranslationHelper */
     private $translationHelper;
 
-    /** @var TranslationsDatagridRouteHelper */
-    private $translationsDatagridRouteHelper;
-
     /** @var WorkflowTranslationFieldsIterator */
     private $translationFieldsIterator;
 
@@ -40,18 +35,15 @@ class WorkflowTranslationHelper
      * @param Translator $translator
      * @param TranslationManager $translationManager
      * @param TranslationHelper $translationHelper
-     * @param TranslationsDatagridRouteHelper $translationsDatagridRouteHelper
      */
     public function __construct(
         Translator $translator,
         TranslationManager $translationManager,
-        TranslationHelper $translationHelper,
-        TranslationsDatagridRouteHelper $translationsDatagridRouteHelper
+        TranslationHelper $translationHelper
     ) {
         $this->translator = $translator;
         $this->translationManager = $translationManager;
         $this->translationHelper = $translationHelper;
-        $this->translationsDatagridRouteHelper = $translationsDatagridRouteHelper;
     }
 
     /**
@@ -134,52 +126,6 @@ class WorkflowTranslationHelper
         unset($item);
 
         $definition->setConfiguration($configuration);
-    }
-
-    /**
-     * @param WorkflowDefinition $definition
-     *
-     * @return array
-     */
-    public function getWorkflowTranslateLinks(WorkflowDefinition $definition)
-    {
-        $configuration = $definition->getConfiguration();
-        $translateLinks['label'] = $this->translationsDatagridRouteHelper->generate(['key' => $definition->getLabel()]);
-
-        $linksData = [
-            WorkflowConfiguration::NODE_STEPS => ['label'],
-            WorkflowConfiguration::NODE_TRANSITIONS => ['label', 'message'],
-            WorkflowConfiguration::NODE_ATTRIBUTES => ['label'],
-        ];
-
-        foreach ($linksData as $node => $attributes) {
-            $translateLinks[$node] = $this->getWorkflowNodeTranslateLinks($configuration, $node, $attributes);
-        }
-
-        return $translateLinks;
-    }
-
-    /**
-     * @param array $configuration
-     * @param string $node
-     * @param array $attributes
-     *
-     * @return array
-     */
-    private function getWorkflowNodeTranslateLinks(array $configuration, $node, array $attributes)
-    {
-        $translateLinks = [];
-        if (!array_key_exists($node, $configuration)) {
-            return $translateLinks;
-        }
-        foreach ($configuration[$node] as $name => $item) {
-            foreach ($attributes as $attribute) {
-                $translateLinks[$name][$attribute] = $this->translationsDatagridRouteHelper
-                    ->generate(['key' => $item[$attribute]]);
-            }
-        }
-
-        return $translateLinks;
     }
 
     /**

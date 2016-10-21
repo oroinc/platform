@@ -10,11 +10,11 @@ use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 
 use Oro\Bundle\SecurityBundle\Annotation\Acl;
 use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
-use Oro\Bundle\WorkflowBundle\Configuration\WorkflowConfiguration;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Form\Type\WorkflowReplacementSelectType;
 use Oro\Bundle\WorkflowBundle\Helper\WorkflowTranslationHelper;
 use Oro\Bundle\WorkflowBundle\Model\Workflow;
+use Oro\Bundle\WorkflowBundle\Translation\TranslationsDatagridLinksProvider;
 
 /**
  * @Route("/workflowdefinition")
@@ -82,7 +82,7 @@ class WorkflowDefinitionController extends Controller
         if ($workflowDefinition->isSystem()) {
             throw new AccessDeniedHttpException('System workflow definitions are not editable');
         }
-        $translateLinks = $this->getTranslateLinks($workflowDefinition);
+        $translateLinks = $this->getTranslationsDatagridLinksProvider()->getWorkflowTranslateLinks($workflowDefinition);
         $this->getTranslationHelper()->extractTranslations($workflowDefinition);
 
         $form = $this->get('oro_workflow.form.workflow_definition');
@@ -110,7 +110,7 @@ class WorkflowDefinitionController extends Controller
      */
     public function viewAction(WorkflowDefinition $workflowDefinition)
     {
-        $translateLinks = $this->getTranslateLinks($workflowDefinition);
+        $translateLinks = $this->getTranslationsDatagridLinksProvider()->getWorkflowTranslateLinks($workflowDefinition);
         $this->getTranslationHelper()->extractTranslations($workflowDefinition);
 
         return array(
@@ -194,17 +194,11 @@ class WorkflowDefinitionController extends Controller
     }
 
     /**
-     * @param WorkflowDefinition $workflowDefinition
-     * @return array
+     * @return TranslationsDatagridLinksProvider
      */
-    protected function getTranslateLinks(WorkflowDefinition $workflowDefinition)
+    protected function getTranslationsDatagridLinksProvider()
     {
-        // show translate links only if any language is available for current user
-        if (0 === count($this->get('oro_translation.provider.language')->getAvailableLanguages())) {
-            return [];
-        }
-
-        return $this->get('oro_workflow.helper.translation')->getWorkflowTranslateLinks($workflowDefinition);
+        return $this->get('oro_workflow.translation.translations_datagrid_links_provider');
     }
 
     /**

@@ -329,7 +329,6 @@ services:
             - '@translator.default'
             - '@oro_translation.manager.translation'
             - '@oro_translation.helper.translation'
-            - '@oro_translation.helper.translation_route'
 
     oro_workflow.translation.processor:
         class: 'Oro\Bundle\WorkflowBundle\Translation\TranslationProcessor'
@@ -341,6 +340,12 @@ services:
             - { name: oro.workflow.configuration.handler, priority: 150 }
             - { name: oro.workflow.definition_builder.extension }
             - { name: oro_workflow.changes.subscriber }
+
+    oro_workflow.translation.translations_datagrid_links_provider:
+        class: 'Oro\Bundle\WorkflowBundle\Translation\TranslationsDatagridLinksProvider'
+        arguments:
+            - '@oro_translation.helper.translation_route'
+            - '@oro_translation.provider.language'
 
     oro_workflow.extension.translation_context_resolver:
         class: 'Oro\Bundle\WorkflowBundle\Extension\TranslationContextResolver'
