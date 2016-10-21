@@ -48,8 +48,8 @@ datagrids:
                 label: oro.dataaudit.datagrid.version
             objectClass:
                 label: oro.dataaudit.datagrid.entity_type
-                frontend_type: select
-                choices: "@oro_dataaudit.dataaudit_grid_service->getObjectClassOptions"
+                type: callback
+                callable: "@oro_dataaudit.datagrid.entity_type_provider->getEntityType"
             objectName:
                 label: oro.dataaudit.datagrid.entity_name
             objectId:
@@ -106,7 +106,7 @@ datagrids:
                     data_name: a.objectClass
                     options:
                           field_options:
-                              choices: "@oro_dataaudit.dataaudit_grid_service->getObjectClassOptions"
+                              choices: "@oro_dataaudit.datagrid.entity_type_provider->getEntityTypes"
                 objectName:
                     type: string
                     data_name: a.objectName

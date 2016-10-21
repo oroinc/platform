@@ -7,7 +7,7 @@ use Doctrine\Common\Persistence\ObjectManager;
 
 use Oro\Bundle\CalendarBundle\Entity\Attendee;
 use Oro\Bundle\CalendarBundle\Entity\CalendarEvent;
-use Oro\Bundle\NotificationBundle\Processor\EmailNotificationProcessor;
+use Oro\Bundle\NotificationBundle\Manager\EmailNotificationManager;
 use Oro\Bundle\SecurityBundle\SecurityFacade;
 
 class EmailSendProcessor
@@ -22,9 +22,9 @@ class EmailSendProcessor
     const REMOVE_CHILD_TEMPLATE_NAME  = 'calendar_invitation_delete_child_event';
 
     /**
-     * @var EmailNotificationProcessor
+     * @var EmailNotificationManager
      */
-    protected $emailNotificationProcessor;
+    protected $emailNotificationManager;
 
     /**
      * @var ObjectManager
@@ -40,16 +40,16 @@ class EmailSendProcessor
     protected $securityFacade;
 
     /**
-     * @param EmailNotificationProcessor $emailNotificationProcessor
+     * @param EmailNotificationManager $emailNotificationManager
      * @param ObjectManager              $objectManager
      * @param SecurityFacade             $securityFacade
      */
     public function __construct(
-        EmailNotificationProcessor $emailNotificationProcessor,
+        EmailNotificationManager $emailNotificationManager,
         ObjectManager $objectManager,
         SecurityFacade $securityFacade
     ) {
-        $this->emailNotificationProcessor = $emailNotificationProcessor;
+        $this->emailNotificationManager = $emailNotificationManager;
         $this->em = $objectManager;
         $this->securityFacade = $securityFacade;
     }
@@ -199,7 +199,7 @@ class EmailSendProcessor
     public function process()
     {
         foreach ($this->emailNotifications as $notification) {
-            $this->emailNotificationProcessor->process($notification->getEntity(), [$notification]);
+            $this->emailNotificationManager->process($notification->getEntity(), [$notification]);
         }
         $this->emailNotifications = [];
         $this->em->flush();
