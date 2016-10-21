@@ -6,6 +6,7 @@ use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Types\Type;
 
+use Oro\Bundle\EntityBundle\ORM\DatabasePlatformInterface;
 use Oro\Bundle\EntityConfigBundle\Config\Id\ConfigIdInterface;
 
 class NamespaceMigration
@@ -164,7 +165,7 @@ class NamespaceMigration
      */
     protected function migrateTableColumn(Connection $connection, $table, $column, $from, $to)
     {
-        $preparedFrom = str_replace('\\', '\\\\', $from);
+        $preparedFrom = $this->prepareFrom($connection, $from);
         $rows = $connection->fetchAll("SELECT id, $column FROM $table WHERE $column LIKE '%$preparedFrom%'");
         foreach ($rows as $row) {
             $id = $row['id'];
@@ -174,6 +175,22 @@ class NamespaceMigration
                 $connection->executeQuery("UPDATE $table SET $column = ? WHERE id = ?", [$alteredValue, $id]);
             }
         }
+    }
+
+    /**
+     * @param Connection $connection
+     * @param string $from
+     * @return string
+     */
+    protected function prepareFrom(Connection $connection, $from)
+    {
+        $from = str_replace('\\', '\\\\', $from);
+
+        if ($connection->getDatabasePlatform()->getName() === DatabasePlatformInterface::DATABASE_MYSQL) {
+            return str_replace('\\', '\\\\', $from);
+        }
+
+        return $from;
     }
 
     /**

@@ -451,6 +451,25 @@ class LocaleSettings
     }
 
     /**
+     * Get locale code according to ISO 15897
+     *
+     * We use this locale to receive
+     * right currency symbols
+     *
+     * @return string
+     */
+    public function getLocaleWithRegion()
+    {
+        $locale = $this->getLocale();
+        if (strlen($locale) > 2) {
+            return $locale;
+        }
+
+        $country = $this->getCountry();
+        return $this->getLocaleByCountry($country);
+    }
+
+    /**
      * @param string $settingName
      *
      * @return mixed
