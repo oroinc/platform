@@ -19,9 +19,11 @@ class ExpressionFactoryTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->contextAccessor = $this->getMock('Oro\Component\ConfigExpression\ContextAccessorInterface');
-        $this->factory = new ExpressionFactory($this->contextAccessor);
+        $this->contextAccessor = $this->getMock(ContextAccessorInterface::class);
+
         $this->extension = $this->getMock(ExtensionInterface::class);
+
+        $this->factory = new ExpressionFactory($this->contextAccessor);
         $this->factory->addExtension($this->extension);
     }
 
@@ -67,12 +69,12 @@ class ExpressionFactoryTest extends \PHPUnit_Framework_TestCase
         $expr    = $this
             ->getMockForAbstractClass(
                 'Oro\Component\ConfigExpression\ExpressionInterface',
-                array(),
+                [],
                 '',
                 true,
                 true,
                 true,
-                array('setContextAccessor', 'initialize')
+                ['setContextAccessor', 'initialize']
             );
 
         $expr->expects($this->never())
@@ -127,12 +129,16 @@ class ExpressionFactoryTest extends \PHPUnit_Framework_TestCase
 
     public function testAddGetExtensions()
     {
-        $extensionsCnt = count($this->factory->getExtensions());
         /** @var ExtensionInterface $newExtension */
         $newExtension = $this->getMock(ExtensionInterface::class);
         $this->factory->addExtension($newExtension);
 
-        $this->assertCount($extensionsCnt + 1, $this->factory->getExtensions());
-        $this->assertContains($newExtension, $this->factory->getExtensions());
+        $this->assertSame(
+            [
+                $this->extension,
+                $newExtension
+            ],
+            $this->factory->getExtensions()
+        );
     }
 }
