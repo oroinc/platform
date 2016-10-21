@@ -12,7 +12,7 @@
 {% if form %}
     {% form_theme form with ['OroConfigBundle:Form:fields.html.twig', 'OroFormBundle:Form:fields.html.twig', 'OroLocaleBundle:Form:fields.html.twig'] %}
 {% endif %}
-{% import 'OroNavigationBundle:Include:contentTags.html.twig' as navigationMacro %}
+{% import 'OroSyncBundle:Include:contentTags.html.twig' as syncMacro %}
 {% import 'OroConfigBundle::macros.html.twig' as configUI %}
 {% import 'OroUIBundle::macros.html.twig' as UI %}
 
@@ -39,5 +39,5 @@
         {{ configUI.renderScrollData(data, form, activeGroup, activeSubGroup, routeName, routeParameters) }}
     </form>
     {{ oro_form_js_validation(form) }}
-    {{ navigationMacro.navigationContentTags({name: 'system_configuration', params: [activeGroup, activeSubGroup]}) }}
+    {{ syncMacro.syncContentTags({name: 'system_configuration', params: [activeGroup, activeSubGroup]}) }}
 {% endblock content %}

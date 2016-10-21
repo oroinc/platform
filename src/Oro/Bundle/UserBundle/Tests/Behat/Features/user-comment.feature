@@ -4,7 +4,10 @@ Feature: User user comment
   I need to have comment user functionality
 
   Scenario: Add comments to user entity
-    Given I login as administrator
+    Given the following users:
+      | firstName | lastName | email              | username |
+      | Charlie   | Sheen    | charlie@sheen.com  | charlie  |
+    And I login as administrator
     And I go to System/Entities/Entity Management
     And filter Name as is equal to "User"
     And click Edit User in grid
@@ -14,13 +17,10 @@ Feature: User user comment
     Then I should see "Schema updated" flash message
 
   Scenario: Add comment
-    Given the following users:
-      | firstName | lastName | email              | username | organization  | organizations   | owner          | businessUnits    |
-      | Charlie   | Sheen    | charlie@sheen.com  | charlie  | @organization | [@organization] | @business_unit | [@business_unit] |
-    And I go to System/User Management/Users
+    Given I go to System/User Management/Users
     And click view Charlie in grid
     And press "Add Comment"
-    When I fill "Comment" form with:
+    When I fill "Comment Form" with:
       | Message    | Amazing cat |
       | Attachment | cat.jpg     |
     And press "Add"

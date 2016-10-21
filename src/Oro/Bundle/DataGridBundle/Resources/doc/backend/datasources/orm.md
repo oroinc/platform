@@ -52,7 +52,7 @@ datagrids:
                 select:
                     - c
                 from:
-                    - { table: %orocrm_contact.entity.class%, alias: c }
+                    - { table: %oro_contact.entity.class%, alias: c }
                 join:
                     left:
                         - { join: c.addresses, alias: address, conditionType: WITH, condition: 'address.primary = true' }

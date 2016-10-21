@@ -9,7 +9,6 @@ use Doctrine\ORM\Mapping as ORM;
 
 use JMS\Serializer\Annotation as JMS;
 
-use Oro\Bundle\DataAuditBundle\Metadata\Annotation as Oro;
 use Oro\Bundle\EmailBundle\Entity\EmailOrigin;
 use Oro\Bundle\EmailBundle\Entity\EmailOwnerInterface;
 use Oro\Bundle\EmailBundle\Model\EmailHolderInterface;
@@ -34,7 +33,6 @@ use Oro\Bundle\UserBundle\Security\AdvancedApiUserInterface;
  *      @ORM\Index("user_first_name_last_name_idx", columns = {"first_name", "last_name"})
  * })
  * @ORM\HasLifecycleCallbacks()
- * @Oro\Loggable
  * @Config(
  *      routeName="oro_user_index",
  *      routeView="oro_user_view",
@@ -106,7 +104,6 @@ class User extends ExtendUser implements
      * @ORM\Column(type="string", length=255, unique=true)
      * @JMS\Type("string")
      * @JMS\Expose
-     * @Oro\Versioned
      * @ConfigField(
      *      defaultValues={
      *          "dataaudit"={
@@ -126,7 +123,6 @@ class User extends ExtendUser implements
      * @ORM\Column(type="string", length=255, unique=true)
      * @JMS\Type("string")
      * @JMS\Expose
-     * @Oro\Versioned
      * @ConfigField(
      *      defaultValues={
      *          "dataaudit"={
@@ -145,7 +141,6 @@ class User extends ExtendUser implements
      * @ORM\Column(name="name_prefix", type="string", length=255, nullable=true)
      * @JMS\Type("string")
      * @JMS\Expose
-     * @Oro\Versioned
      * @ConfigField(
      *      defaultValues={
      *          "dataaudit"={
@@ -164,7 +159,6 @@ class User extends ExtendUser implements
      * @ORM\Column(name="first_name", type="string", length=255, nullable=true)
      * @JMS\Type("string")
      * @JMS\Expose
-     * @Oro\Versioned
      * @ConfigField(
      *      defaultValues={
      *          "dataaudit"={
@@ -183,7 +177,6 @@ class User extends ExtendUser implements
      * @ORM\Column(name="middle_name", type="string", length=255, nullable=true)
      * @JMS\Type("string")
      * @JMS\Expose
-     * @Oro\Versioned
      * @ConfigField(
      *      defaultValues={
      *          "dataaudit"={
@@ -202,7 +195,6 @@ class User extends ExtendUser implements
      * @ORM\Column(name="last_name", type="string", length=255, nullable=true)
      * @JMS\Type("string")
      * @JMS\Expose
-     * @Oro\Versioned
      * @ConfigField(
      *      defaultValues={
      *          "dataaudit"={
@@ -221,7 +213,6 @@ class User extends ExtendUser implements
      * @ORM\Column(name="name_suffix", type="string", length=255, nullable=true)
      * @JMS\Type("string")
      * @JMS\Expose
-     * @Oro\Versioned
      * @ConfigField(
      *      defaultValues={
      *          "dataaudit"={
@@ -240,7 +231,6 @@ class User extends ExtendUser implements
      *      joinColumns={@ORM\JoinColumn(name="user_id", referencedColumnName="id", onDelete="CASCADE")},
      *      inverseJoinColumns={@ORM\JoinColumn(name="group_id", referencedColumnName="id", onDelete="CASCADE")}
      * )
-     * @Oro\Versioned("getName")
      * @ConfigField(
      *      defaultValues={
      *          "dataaudit"={
@@ -257,7 +247,6 @@ class User extends ExtendUser implements
      * @ORM\Column(name="birthday", type="date", nullable=true)
      * @JMS\Type("DateTime")
      * @JMS\Expose
-     * @Oro\Versioned
      * @ConfigField(
      *      defaultValues={
      *          "dataaudit"={
@@ -274,7 +263,6 @@ class User extends ExtendUser implements
      * @ORM\Column(type="boolean")
      * @JMS\Type("boolean")
      * @JMS\Expose
-     * @Oro\Versioned
      * @ConfigField(
      *      defaultValues={
      *          "dataaudit"={
@@ -372,7 +360,6 @@ class User extends ExtendUser implements
      *      joinColumns={@ORM\JoinColumn(name="user_id", referencedColumnName="id", onDelete="CASCADE")},
      *      inverseJoinColumns={@ORM\JoinColumn(name="business_unit_id", referencedColumnName="id", onDelete="CASCADE")}
      * )
-     * @Oro\Versioned("getName")
      * @ConfigField(
      *      defaultValues={
      *          "dataaudit"={
@@ -426,6 +413,13 @@ class User extends ExtendUser implements
     protected $updatedAt;
 
     /**
+     * @var boolean $disableLogin
+     *
+     * @ORM\Column(type="boolean", name="login_disabled", options={"default"=false})
+     */
+    protected $loginDisabled;
+
+    /**
      * @var int
      *
      * @ORM\Column(name="failed_login_count", type="integer", options={"default"=0, "unsigned"=true})
@@ -449,6 +443,7 @@ class User extends ExtendUser implements
         $this->emailOrigins = new ArrayCollection();
         $this->apiKeys = new ArrayCollection();
         $this->groups = new ArrayCollection();
+        $this->loginDisabled = false;
         $this->failedLoginCount = 0;
     }
 
@@ -1193,6 +1188,26 @@ class User extends ExtendUser implements
     public function getFullName()
     {
         return sprintf('%s %s', $this->getFirstName(), $this->getLastName());
+    }
+
+    /**
+     * @return boolean
+     */
+    public function isLoginDisabled()
+    {
+        return $this->loginDisabled;
+    }
+
+    /**
+     * @param boolean $loginDisabled
+     *
+     * @return User
+     */
+    public function setLoginDisabled($loginDisabled)
+    {
+        $this->loginDisabled = $loginDisabled;
+
+        return $this;
     }
 
     /**

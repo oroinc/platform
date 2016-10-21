@@ -1,0 +1,4 @@
+{% set data = record.getValue(base_currency_field) %}
+{% if (data) %}
+    {{ currency }}{{ data|number_format(2) }}
+{% endif %}

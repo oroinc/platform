@@ -18,6 +18,10 @@ config:
 
         'orosync/js/sync': 'bundles/orosync/js/sync.js'
         'orosync/js/sync/wamp': 'bundles/orosync/js/sync/wamp.js'
+        'orosync/js/content/grid-builder': 'bundles/orosync/js/content/grid-builder.js'
+        'orosync/js/app/modules/content-manager-module': 'bundles/orosync/js/app/modules/content-manager-module.js'
+    appmodules:
+        - orosync/js/app/modules/content-manager-module
 
 build:
     paths:

@@ -7,7 +7,7 @@ class ValueTransformer implements DataTransformerInterface
     /**
      * {@inheritdoc}
      */
-    public function transform($class, $property, $value, $config)
+    public function transform($class, $property, $value, array $config, array $context)
     {
         if (is_object($value)) {
             if (method_exists($value, '__toString')) {
