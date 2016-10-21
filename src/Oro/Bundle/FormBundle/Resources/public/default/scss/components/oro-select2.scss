@@ -99,6 +99,8 @@
         .select2-no-results,
         .select2-searching {
             padding: 0 ($offset-x-m / 2) ($offset-y-m / 2);
+
+            background: none;
         }
 
         .select2-highlighted {
