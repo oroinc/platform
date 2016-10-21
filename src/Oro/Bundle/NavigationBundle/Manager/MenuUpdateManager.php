@@ -84,9 +84,9 @@ class MenuUpdateManager
             $entity->setParentKey($options['parentKey']);
         }
         if (isset($options['menu'])) {
-            if (!$this->builderChainProvider->has($options['menu'])) {
-                throw new NotFoundMenuException(sprintf('Menu with "%s" id not found.', $options['menu']));
-            }
+//            if (!$this->builderChainProvider->has($options['menu'])) {
+//                throw new NotFoundMenuException(sprintf('Menu with "%s" id not found.', $options['menu']));
+//            }
             $entity->setMenu($options['menu']);
         }
         if (isset($options['isDivider']) && $options['isDivider']) {
