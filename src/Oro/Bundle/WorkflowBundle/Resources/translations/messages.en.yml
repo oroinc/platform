@@ -94,6 +94,7 @@ oro:
                     label: Perform workflow transitions
                     description: Reveals workflow transition buttons to the user and allows them to manipulate workflows
                 reset_data: Reset workflow "{workflow}"
+                go_to_translations: 'To translations grid'
 
         block:
             title:
@@ -298,4 +299,3 @@ oro:
             name.label: Name
             position.label: Position
             final.label: Final
-

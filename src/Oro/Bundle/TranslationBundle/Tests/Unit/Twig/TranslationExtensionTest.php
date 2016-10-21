@@ -2,12 +2,12 @@
 
 namespace Oro\Bundle\TranslationBundle\Tests\Unit\Twig;
 
-use Oro\Bundle\TranslationBundle\Helper\TranslationRouteHelper;
+use Oro\Bundle\TranslationBundle\Helper\TranslationsDatagridRouteHelper;
 use Oro\Bundle\TranslationBundle\Twig\TranslationExtension;
 
 class TranslationExtensionTest extends \PHPUnit_Framework_TestCase
 {
-    /** @var TranslationRouteHelper|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var TranslationsDatagridRouteHelper|\PHPUnit_Framework_MockObject_MockObject */
     protected $translationRouteHelper;
 
     /**
@@ -15,7 +15,7 @@ class TranslationExtensionTest extends \PHPUnit_Framework_TestCase
      */
     protected function setUp()
     {
-        $this->translationRouteHelper = $this->getMockBuilder(TranslationRouteHelper::class)
+        $this->translationRouteHelper = $this->getMockBuilder(TranslationsDatagridRouteHelper::class)
             ->disableOriginalConstructor()
             ->getMock();
     }

@@ -36,11 +36,21 @@ define(function(require) {
          */
         _createWorkflowModel: function(options) {
             var configuration = options.entity.configuration;
-            configuration.steps = new StepCollection(_.map(configuration.steps, this._mergeName));
-            configuration.transitions = new TransitionCollection(_.map(configuration.transitions, this._mergeName));
+            var translateLinks = options.entity.translateLinks;
+
+            configuration.steps = new StepCollection(this._getNodeConfiguration(configuration, 'steps', translateLinks));
+
+            configuration.transitions = new TransitionCollection(
+                this._getNodeConfiguration(configuration, 'transitions', translateLinks)
+            );
+
+            configuration.attributes = new AttributeCollection(
+                this._getNodeConfiguration(configuration, 'attributes', translateLinks)
+            );
+
             configuration.transition_definitions = new TransitionDefinitionCollection(
-                _.map(configuration.transition_definitions, this._mergeName));
-            configuration.attributes = new AttributeCollection(_.map(configuration.attributes, this._mergeName));
+                this._getNodeConfiguration(configuration, 'transition_definitions', translateLinks)
+            );
 
             configuration.name = options.entity.name;
             configuration.label = options.entity.label;
@@ -53,6 +63,9 @@ define(function(require) {
             workflowModel.setSystemEntities(options.system_entities);
 
             workflowModel.url = options._sourceElement.attr('action');
+            if (translateLinks && 'label' in translateLinks) {
+                workflowModel.translateLinkLabel = translateLinks.label;
+            }
 
             return workflowModel;
         },
@@ -91,16 +104,25 @@ define(function(require) {
         },
 
         /**
-         * Helper function. Callback for _.map;
+         * Get and process configuration node;
          *
          * @param {Object} config
-         * @param {string} name
+         * @param {string} node
+         * @param {Object} translateLinks
          * @returns {Object}
          * @private
          */
-        _mergeName: function(config, name) {
-            config.name = name;
-            return config;
+        _getNodeConfiguration: function(config, node, translateLinks) {
+            var updateConfig = [];
+            _.each(config[node], function (item, name) {
+                item.name = name;
+                if (translateLinks && node in translateLinks && name in translateLinks[node]) {
+                    item.translateLinks = translateLinks[node][name];
+                }
+                updateConfig.push(item);
+            });
+
+            return updateConfig;
         }
     };
 });

@@ -7,33 +7,22 @@ use Oro\Bundle\TranslationBundle\Helper\TranslationHelper;
 use Oro\Bundle\TranslationBundle\Manager\TranslationManager;
 use Oro\Bundle\TranslationBundle\Translation\Translator;
 use Oro\Bundle\TranslationBundle\Translation\KeySource\TranslationKeySource;
-use Oro\Bundle\TranslationBundle\Translation\TranslationKeyGenerator;
 
 use Oro\Bundle\WorkflowBundle\Helper\WorkflowTranslationHelper;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowStep;
 use Oro\Bundle\WorkflowBundle\Translation\KeyTemplate\WorkflowTemplate;
-use Oro\Bundle\WorkflowBundle\Translation\WorkflowTranslationFieldsIterator;
 
 class WorkflowTranslationHelperTest extends \PHPUnit_Framework_TestCase
 {
-    const NODE = 'test_node';
-    const ATTRIBUTE_NAME = 'test_attr_name';
-
     /** @var Translator|\PHPUnit_Framework_MockObject_MockObject */
     private $translator;
 
     /** @var TranslationHelper|\PHPUnit_Framework_MockObject_MockObject */
     private $translationHelper;
 
-    /** @var TranslationKeyGenerator|\PHPUnit_Framework_MockObject_MockObject */
-    private $keyGenerator;
-
     /** @var TranslationManager|\PHPUnit_Framework_MockObject_MockObject */
     private $manager;
-
-    /** @var WorkflowTranslationFieldsIterator|\PHPUnit_Framework_MockObject_MockObject */
-    private $fieldsIterator;
 
     /** @var WorkflowTranslationHelper */
     private $helper;
@@ -50,26 +39,12 @@ class WorkflowTranslationHelperTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->keyGenerator = $this->getMockBuilder(TranslationKeyGenerator::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->fieldsIterator = $this->getMockBuilder(WorkflowTranslationFieldsIterator::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->helper = new WorkflowTranslationHelper(
-            $this->translator,
-            $this->manager,
-            $this->translationHelper,
-            $this->keyGenerator,
-            $this->fieldsIterator
-        );
+        $this->helper = new WorkflowTranslationHelper($this->translator, $this->manager, $this->translationHelper);
     }
 
     protected function tearDown()
     {
-        unset($this->translator, $this->manager, $this->helper, $this->translationHelper, $this->keyGenerator);
+        unset($this->translator, $this->manager, $this->helper, $this->translationHelper);
     }
 
     public function testSaveTranslationNoTranslationForDefaultLocale()
@@ -154,18 +129,13 @@ class WorkflowTranslationHelperTest extends \PHPUnit_Framework_TestCase
 
     public function testPrepareTranslations()
     {
-        $this->keyGenerator->expects($this->once())
-            ->method('generate')
-            ->with($this->getWorkflowSource('workflow1'))
-            ->willReturn('generated-key');
-
         $this->translator->expects($this->once())
             ->method('getLocale')
             ->willReturn('locale1');
 
         $this->translationHelper->expects($this->once())
             ->method('prepareValues')
-            ->with('generated-key', 'locale1', WorkflowTranslationHelper::TRANSLATION_DOMAIN);
+            ->with('oro.workflow.workflow1', 'locale1', WorkflowTranslationHelper::TRANSLATION_DOMAIN);
 
         $this->helper->prepareTranslations('workflow1');
     }
@@ -227,24 +197,33 @@ class WorkflowTranslationHelperTest extends \PHPUnit_Framework_TestCase
             ->setSteps([
                 (new WorkflowStep())->setLabel('step2.label'),
             ])
-            ->setConfiguration($definition->getConfiguration());
+            ->setConfiguration([
+                'steps' => [
+                    'step1' => ['label' => 'step1.label-locale1.workflows'],
+                ],
+                'transitions' => [
+                    'transition1' => [
+                        'label' => 'transition1.label-locale1.workflows',
+                        'message' => 'transition1.message-locale1.workflows',
+                    ]
+                ],
+                'attributes' => [
+                    'attribute1' => ['label' => 'attribute1.label-locale1.workflows'],
+                ],
+                // @todo: update in BAP-12019
+                'label' => '-locale1.workflows',
+            ]);
 
-        $translationKeySource = $this->getWorkflowSource('workflow1');
-        $this->keyGenerator->expects($this->once())->method('generate')->with($translationKeySource);
         $this->translator->expects($this->any())->method('getLocale')->willReturn('locale1');
         $this->translationHelper->expects($this->once())->method('prepareValues');
-        $iteratedKeys = ['key1' => 'val1', 'key2' => 'val2'];
+
         // label + iterated keys
-        $this->translationHelper->expects($this->exactly(count($iteratedKeys) + 1))
+        // @todo: update in BAP-12019
+        $this->translationHelper->expects($this->exactly(6))
             ->method('getValue')
             ->will($this->returnCallback(function ($key, $locale, $domain) {
                 return sprintf('%s-%s.%s', $key, $locale, $domain);
             }));
-
-        $this->fieldsIterator
-            ->expects($this->once())
-            ->method('iterateConfigTranslationFields')
-            ->willReturn($iteratedKeys);
 
         $this->helper->extractTranslations($definition, 'workflow1');
 
@@ -257,12 +236,6 @@ class WorkflowTranslationHelperTest extends \PHPUnit_Framework_TestCase
             ->setName('definition1')
             ->setConfiguration(['steps' => [], 'transitions' => [], 'attributes' => []]);
 
-        $translationKeySource = $this->getWorkflowSource('customName');
-
-        $this->keyGenerator->expects($this->once())->method('generate')->with($translationKeySource);
-
-        $this->fieldsIterator->expects($this->once())->method('iterateConfigTranslationFields')
-            ->willReturn([]);
         $this->helper->extractTranslations($definition, 'customName');
     }
 
