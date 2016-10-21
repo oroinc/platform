@@ -57,7 +57,10 @@ class ControllersResetTest extends WebTestCase
         $this->client->request(
             'POST',
             $this->getUrl('oro_user_reset_send_email'),
-            ['username' => self::USER_NAME],
+            [
+                'username' => self::USER_NAME,
+                'frontend' => 1
+            ],
             [],
             $this->generateNoHashNavigationHeader()
         );
@@ -72,22 +75,23 @@ class ControllersResetTest extends WebTestCase
         $this->assertNotNull($user->getPasswordRequestedAt());
     }
 
-    public function testSendEmailAsAdminAction()
+    public function testSendForcedResetEmailAction()
     {
         /** @var User $user */
         $user = $this->getReference('simple_user');
+        $this->assertNotTrue($user->isLoginDisabled());
 
         $crawler = $this->client->request(
             'GET',
             $this->getUrl(
-                'oro_user_reset_send_email_as_admin',
+                'oro_user_send_forced_password_reset_email',
                 ['id' => $user->getId(), '_widgetContainer' => 'dialog']
             )
         );
         $result = $this->client->getResponse();
         $this->assertHtmlResponseStatusCodeEquals($result, 200);
 
-        $this->assertContains('Are you sure you want to proceed?', $result->getContent());
+        $this->assertContains('/user/send-forced-password-reset-email', $result->getContent());
 
         $form = $crawler->selectButton('Reset')->form();
         $this->client->submit($form);
@@ -95,6 +99,41 @@ class ControllersResetTest extends WebTestCase
         $this->assertContains('oro.user.reset_password.flash.success', $result->getContent());
 
         $user = $this->getContainer()->get('doctrine')->getRepository('OroUserBundle:User')->find($user->getId());
-        $this->assertNotNull($user->getPasswordRequestedAt());
+        $this->assertTrue($user->isLoginDisabled());
+    }
+
+    public function testMassPasswordResetAction()
+    {
+        /** @var User $user */
+        $user = $this->getReference('simple_user');
+        $this->assertNotTrue($user->isLoginDisabled());
+        /** @var User $user */
+        $user2 = $this->getReference('simple_user2');
+        $this->assertNotTrue($user2->isLoginDisabled());
+
+        $ids = [$user->getId(), $user2->getId()];
+        $crawler = $this->client->request(
+            'GET',
+            $this->getUrl(
+                'oro_user_mass_password_reset',
+                [
+                    'id' => $user->getId(),
+                    'gridName' => 'users-grid',
+                    'actionName' => 'reset_password',
+                    'values' => $ids
+                ]
+            )
+        );
+        $result = $this->client->getResponse();
+        $this->assertJsonResponseStatusCodeEquals($result, 200);
+
+        $response = json_decode($result->getContent(), true);
+
+        $this->assertContains(
+            [
+                'successful' => true
+            ],
+            $response
+        );
     }
 }

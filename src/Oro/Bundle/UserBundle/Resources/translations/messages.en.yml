@@ -114,6 +114,7 @@ oro:
         last_login.label:            Last logged in
         last_name.label:             Last name
         login_count.label:           Login count
+        login_disabled.label:        Login disabled
         middle_name.label:           Middle name
         name_prefix.label:           Name prefix
         name_suffix.label:           Name suffix
@@ -201,7 +202,14 @@ oro:
                 ttl_already_requested.message: The password for this user has already been requested within the last 24 hours
                 popup.message: User {{ user }} will receive reset password by email.
                 popup.question: Are you sure you want to proceed?
-
+            force_reset:
+                popup.message: User {{ user }} will receive reset password by email and will be disabled from login.
+                popup.question: Are you sure you want to proceed?
+                success.message: Password reset request has been sent.
+                failure.message: Password reset request has failed.
+                mass_action.success: Password reset completed successfully.
+                mass_action.failure: Mass reset action has failed.
+                popup.label: Reset
         # password tooltip for different rules
         password_complexity:
             unrestricted: ~

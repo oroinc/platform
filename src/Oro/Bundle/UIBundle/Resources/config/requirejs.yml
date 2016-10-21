@@ -183,6 +183,7 @@ config:
         'oroui/js/app/views/layout-subtree-view': 'bundles/oroui/js/app/views/layout-subtree-view.js'
 
         'oroui/js/delete-confirmation': 'bundles/oroui/js/delete-confirmation.js'
+        'oroui/js/standart-confirmation': 'bundles/oroui/js/standart-confirmation.js'
         'oroui/js/error': 'bundles/oroui/js/error.js'
         'oroui/js/init-layout': 'bundles/oroui/js/init-layout.js'
         'oroui/js/layout': 'bundles/oroui/js/layout.js'
