@@ -12,6 +12,7 @@ use Oro\Bundle\NavigationBundle\Entity\MenuUpdateInterface;
 use Oro\Bundle\NavigationBundle\Exception\NotFoundMenuException;
 use Oro\Bundle\NavigationBundle\Exception\NotFoundParentException;
 use Oro\Bundle\NavigationBundle\JsTree\MenuUpdateTreeHandler;
+use Oro\Bundle\NavigationBundle\Menu\Helper\MenuUpdateHelper;
 use Oro\Bundle\NavigationBundle\Provider\BuilderChainProvider;
 use Oro\Bundle\NavigationBundle\Utils\MenuUpdateUtils;
 
@@ -23,17 +24,25 @@ class MenuUpdateManager
     /** @var BuilderChainProvider */
     private $builderChainProvider;
 
+    /** @var MenuUpdateHelper */
+    private $menuUpdateHelper;
+
     /** @var string */
     private $entityClass;
 
     /**
      * @param ManagerRegistry $managerRegistry
      * @param BuilderChainProvider $builderChainProvider
+     * @param MenuUpdateHelper $menuUpdateHelper
      */
-    public function __construct(ManagerRegistry $managerRegistry, BuilderChainProvider $builderChainProvider)
-    {
+    public function __construct(
+        ManagerRegistry $managerRegistry,
+        BuilderChainProvider $builderChainProvider,
+        MenuUpdateHelper $menuUpdateHelper
+    ) {
         $this->managerRegistry = $managerRegistry;
         $this->builderChainProvider = $builderChainProvider;
+        $this->menuUpdateHelper = $menuUpdateHelper;
     }
 
     /**
@@ -173,7 +182,7 @@ class MenuUpdateManager
 
         foreach ($orderedChildren as $priority => $child) {
             $update = $this->createMenuUpdate($ownershipType, $ownerId, ['key' => $child->getName()]);
-            MenuUpdateUtils::updateMenuUpdate($update, $child, $menuName);
+            MenuUpdateUtils::updateMenuUpdate($update, $child, $menuName, $this->menuUpdateHelper);
             $update->setPriority($priority);
             $updates[] = $update;
         }
@@ -324,7 +333,7 @@ class MenuUpdateManager
         $item = $this->findMenuItem($menuName, $key, $ownershipType);
 
         if ($item) {
-            MenuUpdateUtils::updateMenuUpdate($update, $item, $menuName);
+            MenuUpdateUtils::updateMenuUpdate($update, $item, $menuName, $this->menuUpdateHelper);
         } else {
             $update->setCustom(true);
         }

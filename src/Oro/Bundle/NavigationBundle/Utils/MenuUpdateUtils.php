@@ -6,6 +6,7 @@ use Knp\Menu\ItemInterface;
 
 use Oro\Bundle\LocaleBundle\Helper\LocalizationHelper;
 use Oro\Bundle\NavigationBundle\Entity\MenuUpdateInterface;
+use Oro\Bundle\NavigationBundle\Menu\Helper\MenuUpdateHelper;
 
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
@@ -16,20 +17,24 @@ class MenuUpdateUtils
      * Apply changes from menu item to menu update
      *
      * @param MenuUpdateInterface $update
-     * @param ItemInterface $item
-     * @param string $menuName
-     * @param array $extrasMapping
+     * @param ItemInterface       $item
+     * @param string              $menuName
+     * @param MenuUpdateHelper    $menuUpdateHelper
+     * @param array               $extrasMapping
      */
     public static function updateMenuUpdate(
         MenuUpdateInterface $update,
         ItemInterface $item,
         $menuName,
-        array $extrasMapping = ['position' => 'priority', 'description' => 'defaultDescription']
+        MenuUpdateHelper $menuUpdateHelper,
+        array $extrasMapping = ['position' => 'priority']
     ) {
         $accessor = PropertyAccess::createPropertyAccessor();
 
         self::setValue($accessor, $update, 'key', $item->getName());
         self::setValue($accessor, $update, 'uri', $item->getUri());
+
+        $menuUpdateHelper->applyLocalizedFallbackValue($update, $item->getLabel(), 'title', 'string');
 
         if ($update->getTitles()->count() <= 0) {
             self::setValue($accessor, $update, 'defaultTitle', $item->getLabel());
@@ -45,6 +50,11 @@ class MenuUpdateUtils
         $update->setMenu($menuName);
 
         foreach ($item->getExtras() as $key => $value) {
+            if ($key === 'description') {
+                $menuUpdateHelper->applyLocalizedFallbackValue($update, $item->getExtra($key), $key, 'text');
+                continue;
+            }
+
             if (array_key_exists($key, $extrasMapping)) {
                 $key = $extrasMapping[$key];
             }
@@ -77,7 +87,7 @@ class MenuUpdateUtils
             $item = $parentItem->addChild($update->getKey());
         }
 
-        if ($item->getParent()->getName() != $parentItem->getName()) {
+        if ($item->getParent()->getName() !== $parentItem->getName()) {
             $item->getParent()->removeChild($item->getName());
             $item = $parentItem->addChild($item);
         }

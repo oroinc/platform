@@ -41,8 +41,6 @@ class BuilderChainProviderTest extends \PHPUnit_Framework_TestCase
     {
         $this->factory = $this->getMockBuilder('Knp\Menu\MenuFactory')
             ->getMock();
-        $this->eventDispatcher = $this->getMockBuilder('Symfony\Component\EventDispatcher\EventDispatcherInterface')
-            ->getMock();
 
         $this->loader = $this->getMockBuilder('Knp\Menu\Loader\ArrayLoader')
             ->setConstructorArgs([$this->factory])
@@ -52,7 +50,6 @@ class BuilderChainProviderTest extends \PHPUnit_Framework_TestCase
 
         $this->provider = new BuilderChainProvider(
             $this->factory,
-            $this->eventDispatcher,
             $this->loader,
             $this->manipulator
         );

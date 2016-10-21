@@ -7,6 +7,7 @@ use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityRepository;
 
 use Oro\Bundle\NavigationBundle\Manager\MenuUpdateManager;
+use Oro\Bundle\NavigationBundle\Menu\Helper\MenuUpdateHelper;
 use Oro\Bundle\NavigationBundle\Menu\Provider\GlobalOwnershipProvider;
 use Oro\Bundle\NavigationBundle\Provider\BuilderChainProvider;
 use Oro\Bundle\NavigationBundle\Tests\Unit\Entity\Stub\MenuUpdateStub;
@@ -25,6 +26,9 @@ class MenuUpdateManagerTest extends \PHPUnit_Framework_TestCase
 
     /** @var BuilderChainProvider|\PHPUnit_Framework_MockObject_MockObject */
     protected $builderChainProvider;
+
+    /** @var  MenuUpdateHelper|\PHPUnit_Framework_MockObject_MockObject */
+    protected $menuUpdateHelper;
 
     /** @var MenuUpdateManager */
     protected $manager;
@@ -52,8 +56,9 @@ class MenuUpdateManagerTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue($this->entityManager));
 
         $this->builderChainProvider = $this->getMock(BuilderChainProvider::class, [], [], '', false);
+        $this->menuUpdateHelper = $this->getMock(MenuUpdateHelper::class, [], [], '', false);
 
-        $this->manager = new MenuUpdateManager($managerRegistry, $this->builderChainProvider);
+        $this->manager = new MenuUpdateManager($managerRegistry, $this->builderChainProvider, $this->menuUpdateHelper);
     }
 
     public function testCreateMenuUpdate()

@@ -3,6 +3,7 @@
 namespace Oro\Bundle\NavigationBundle\Tests\Unit\Utils;
 
 use Oro\Bundle\LocaleBundle\Helper\LocalizationHelper;
+use Oro\Bundle\NavigationBundle\Menu\Helper\MenuUpdateHelper;
 use Oro\Bundle\NavigationBundle\Tests\Unit\Entity\Stub\MenuUpdateStub;
 use Oro\Bundle\NavigationBundle\Tests\Unit\MenuItemTestTrait;
 use Oro\Bundle\NavigationBundle\Utils\MenuUpdateUtils;
@@ -10,7 +11,18 @@ use Oro\Bundle\NavigationBundle\Utils\MenuUpdateUtils;
 class MenuUpdateUtilsTest extends \PHPUnit_Framework_TestCase
 {
     use MenuItemTestTrait;
-    
+
+    /** @var MenuUpdateHelper|\PHPUnit_Framework_MockObject_MockObject */
+    protected $menuUpdateHelper;
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function setUp()
+    {
+        $this->menuUpdateHelper = $this->getMock(MenuUpdateHelper::class, [], [], '', false);
+    }
+
     public function testUpdateMenuUpdate()
     {
         $menu = $this->getMenu();
@@ -27,7 +39,12 @@ class MenuUpdateUtilsTest extends \PHPUnit_Framework_TestCase
         $expectedUpdate->setMenu('menu');
         $expectedUpdate->setDefaultTitle('item-1-1-1');
 
-        MenuUpdateUtils::updateMenuUpdate($update, $item, 'menu');
+        $this->menuUpdateHelper
+            ->expects($this->once())
+            ->method('applyLocalizedFallbackValue')
+            ->with($update, 'item-1-1-1', 'title', 'string');
+
+        MenuUpdateUtils::updateMenuUpdate($update, $item, 'menu', $this->menuUpdateHelper);
         $this->assertEquals($expectedUpdate, $update);
     }
     

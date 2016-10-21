@@ -18,7 +18,6 @@ use Oro\Bundle\LocaleBundle\Tests\Unit\Form\Type\Stub\LocalizationCollectionType
 use Oro\Bundle\NavigationBundle\Validator\Constraints\MaxNestedLevelValidator;
 use Oro\Bundle\NavigationBundle\Entity\MenuUpdate;
 use Oro\Bundle\NavigationBundle\Form\Type\MenuUpdateType;
-use Oro\Bundle\LocaleBundle\Form\Type\TranslatedLocalizedFallbackValueCollectionType;
 
 class MenuUpdateTypeTest extends FormIntegrationTestCase
 {
@@ -39,7 +38,7 @@ class MenuUpdateTypeTest extends FormIntegrationTestCase
         return [
             new PreloadedExtension(
                 [
-                    TranslatedLocalizedFallbackValueCollectionType::NAME => new TranslatedLocalizedFallbackValueCollectionType(
+                    LocalizedFallbackValueCollectionType::NAME => new LocalizedFallbackValueCollectionType(
                         $translator
                     ),
                     LocalizedFallbackValueCollectionType::NAME => new LocalizedFallbackValueCollectionType($registry),
