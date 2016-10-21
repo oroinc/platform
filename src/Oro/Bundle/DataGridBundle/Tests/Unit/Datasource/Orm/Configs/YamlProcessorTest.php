@@ -166,10 +166,10 @@ class YamlProcessorTest extends \PHPUnit_Framework_TestCase
         $this->setExpectedException(
             'Oro\Bundle\DataGridBundle\Exception\DatasourceException',
             sprintf(
-                'Datagrid configured with service must return an instance of Doctrine\ORM\QueryBuilder, %s given',
+                '%s configured with service must return an instance of Doctrine\ORM\QueryBuilder, %s given',
+                'Oro\Bundle\DataGridBundle\Datasource\Orm\Configs\YamlProcessor',
                 gettype($qb)
             )
-
         );
         $this->processor->processQuery($configs);
     }

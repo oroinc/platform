@@ -37,7 +37,8 @@ class YamlProcessor implements ConfigProcessorInterface
             } else {
                 throw new DatasourceException(
                     sprintf(
-                        'Datagrid configured with service must return an instance of Doctrine\ORM\QueryBuilder, %s given',
+                        '%s configured with service must return an instance of Doctrine\ORM\QueryBuilder, %s given',
+                        get_class($this),
                         is_object($qb) ? get_class($qb) : gettype($qb)
                     )
                 );
