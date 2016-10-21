@@ -139,6 +139,9 @@ class WorkflowTranslationHelper
      */
     public function extractTranslations(WorkflowDefinition $definition)
     {
+        if (!$definition->getName()) {
+            return;
+        }
         $iterator = new WorkflowDefinitionTranslationFieldsIterator($definition);
 
         $this->prepareTranslations($definition->getName());
