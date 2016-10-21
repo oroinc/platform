@@ -19,9 +19,7 @@ class ActionData extends AbstractStorage implements EntityAwareInterface
      */
     public function getRedirectUrl()
     {
-        $result = $this->get('result');
-
-        return is_array($result) && isset($result['redirectUrl']) ? $result['redirectUrl'] : null;
+        return $this->get('redirectUrl');
     }
 
     /**
