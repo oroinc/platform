@@ -9,13 +9,13 @@ use Oro\Bundle\TranslationBundle\Translation\TranslationKeyTemplateInterface;
 abstract class AbstractTranslationFieldsIterator implements TranslationFieldsIteratorInterface
 {
     /** @var TranslationKeyTemplateInterface[] */
-    protected $templateInstances;
+    protected $templateInstances = [];
 
     /** @var TranslationKeyGenerator */
     protected $keyGenerator;
 
     /** @var mixed */
-    private $currentValue;
+    private $currentModificationValue;
 
     /** @var bool */
     private $gotNewValue = false;
@@ -25,11 +25,12 @@ abstract class AbstractTranslationFieldsIterator implements TranslationFieldsIte
      */
     public function writeCurrent($value)
     {
-        $this->currentValue = $value;
+        $this->currentModificationValue = $value;
         $this->gotNewValue = true;
     }
 
     /**
+     * Whether current value was pointing for change by ->writeCurrent($newValue) method
      * @return bool
      */
     protected function hasChanges()
@@ -38,11 +39,12 @@ abstract class AbstractTranslationFieldsIterator implements TranslationFieldsIte
     }
 
     /**
+     * Clearing modification of current value for next iterator step
      * @return void
      */
     protected function clear()
     {
-        $this->currentValue = null;
+        $this->currentModificationValue = null;
         $this->gotNewValue = false;
     }
 
@@ -52,10 +54,19 @@ abstract class AbstractTranslationFieldsIterator implements TranslationFieldsIte
      */
     protected function pickChangedValue()
     {
-        $value = $this->currentValue;
+        $value = $this->currentModificationValue;
         $this->clear();
 
         return $value;
+    }
+
+    /**
+     * Returns current modification value
+     * @return mixed
+     */
+    protected function getChangedValue()
+    {
+        return $this->currentModificationValue;
     }
 
     /**
@@ -71,7 +82,8 @@ abstract class AbstractTranslationFieldsIterator implements TranslationFieldsIte
     }
 
     /**
-     * @param $templateClass
+     * Cached instances factory
+     * @param string $templateClass
      * @return TranslationKeyTemplateInterface
      * @throws \InvalidArgumentException
      */
@@ -102,7 +114,8 @@ abstract class AbstractTranslationFieldsIterator implements TranslationFieldsIte
     }
 
     /**
-     * @param $templateClass
+     * Factory for Oro\Bundle\TranslationBundle\Translation\KeySource\TranslationKeySource
+     * @param string $templateClass
      * @param \ArrayObject $context
      * @return TranslationKeySource
      * @throws \InvalidArgumentException

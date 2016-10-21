@@ -28,13 +28,13 @@ class WorkflowConfigurationTranslationFieldsIterator extends AbstractWorkflowTra
 
         $context['workflow_name'] = $this->workflowName;
 
-        yield $this->makeKey(WorkflowLabelTemplate::class, $context) => $this->configuration['label'];
+        yield $this->makeKey(WorkflowLabelTemplate::class, $context) => $this->getOrNull($this->configuration, 'label');
 
         if ($this->hasChanges()) {
             $this->configuration['label'] = $this->pickChangedValue();
         }
 
-        foreach ($this->attributeFields($configuration, $context) as $key => &$attributeFieldValue) {
+        foreach ($this->attributeFields($this->configuration, $context) as $key => &$attributeFieldValue) {
             yield $key => $attributeFieldValue;
             if ($this->hasChanges()) {
                 $attributeFieldValue = $this->pickChangedValue();
@@ -42,7 +42,7 @@ class WorkflowConfigurationTranslationFieldsIterator extends AbstractWorkflowTra
         }
         unset($attributeFieldValue);
 
-        foreach ($this->transitionFields($configuration, $context) as $key => &$transitionFieldValue) {
+        foreach ($this->transitionFields($this->configuration, $context) as $key => &$transitionFieldValue) {
             yield $key => $transitionFieldValue;
             if ($this->hasChanges()) {
                 $transitionFieldValue = $this->pickChangedValue();
@@ -65,5 +65,15 @@ class WorkflowConfigurationTranslationFieldsIterator extends AbstractWorkflowTra
     public function getConfiguration()
     {
         return $this->configuration;
+    }
+
+    /**
+     * @param array $array
+     * @param string|integer $option
+     * @return mixed|null
+     */
+    private function getOrNull(array $array, $option)
+    {
+        return array_key_exists($option, $array) ? $array[$option] : null;
     }
 }
