@@ -386,6 +386,7 @@ placeholders:
     items: ...
 ```
 - Main menu dropdown active item is now triggering a page refresh, despite the Backbone router limitations
+- Updated jquery.mCustomScrollbar plugin to version 3.1.5 `Resources/public/lib/jquery/jquery.mCustomScrollbar.min.js`
 - Changed `form_row` block to support of form field 'hints' which allows rendering of simple help section for the respective form control
 
 ####FormBundle:
