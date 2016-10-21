@@ -8,13 +8,14 @@ use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
+use Oro\Bundle\EmailBundle\Entity\EmailBody;
 use Oro\Bundle\EmailBundle\Tools\EmailBodyHelper;
 
 /**
  * Converts email body representations.
  * Will be deleted in 2.0
  */
-class ConvertEmailBodyToTextBody extends ContainerAwareCommand
+class ConvertEmailBodyToTextBodyCommand extends ContainerAwareCommand
 {
     const COMMAND_NAME = 'oro:email:convert-body-to-text';
 
@@ -38,11 +39,11 @@ class ConvertEmailBodyToTextBody extends ContainerAwareCommand
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $output->writeln('<info>Conversion of emails body is started.</info>');
+        $container = $this->getContainer();
 
         /** @var Connection $connection */
-        $connection = $this->getContainer()->get('doctrine')->getConnection();
-
-        $tableName = $this->queryHelper->getTableName('Oro\Bundle\EmailBundle\Entity\EmailBody');
+        $connection = $container->get('doctrine')->getConnection();
+        $tableName = $container->get('oro_entity.orm.native_query_executor_helper')->getTableName(EmailBody::class);
         $selectQuery = 'select id, body from ' . $tableName . ' where body is not null and text_body is null '
             . 'order by created desc limit :limit offset :offset';
         $pageNumber = 0;
