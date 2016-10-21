@@ -543,11 +543,11 @@ to the [Fallback documentation](./src/Oro/Bundle/EntityBundle/Resources/doc/enti
 
 ####UserBundle
 - Added `Oro\Bundle\UserBundle\Validator\Constraints\PasswordComplexity` to User model
-- User password requirements are more restrictive by default and require 5 characters, an upper case letter, and a number.
+- User password requirements are more restrictive by default and require 8 characters, an upper case letter, and a number.
 - Any new users or changing of existing passwords need to meet the password requirements specified in System Configuration/General Setup/Security Settings. Existing user passwords are not affected
 
 ####DemoDataBundle
-- All demo users will have passwords ending with '1Q' (e.g. for username 'sale' password is 'sale1Q')
+- All demo users will have passwords ending with '1Q' (e.g. for username 'marketing' password is 'marketing1Q'). For user 'sale' the password is 'salesale1Q'.
 
 ####ImapBundle
  - The command `oro:imap:clear-mailbox` was removed. Produce message to the topic `Oro\Bundle\ImapBundle\Async\Topics::CLEAR_INACTIVE_MAILBOX` instead.

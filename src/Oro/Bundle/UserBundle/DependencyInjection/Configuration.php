@@ -70,7 +70,7 @@ class Configuration implements ConfigurationInterface
         SettingsBuilder::append(
             $rootNode,
             [
-                'password_min_length' => ['value' => 5, 'type' => 'scalar'],
+                'password_min_length' => ['value' => 8, 'type' => 'scalar'],
                 'password_upper_case' => ['value' => true, 'type' => 'boolean'],
                 'password_numbers' => ['value' => true, 'type' => 'boolean'],
                 'password_special_chars' => ['value' => false, 'type' => 'boolean'],
