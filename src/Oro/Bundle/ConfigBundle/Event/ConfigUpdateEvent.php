@@ -15,9 +15,21 @@ class ConfigUpdateEvent extends Event
     protected $changeSet = [];
 
     /**
-     * @param ConfigChangeSet|array $changeSet
+     * @var string|null
      */
-    public function __construct($changeSet)
+    private $scope;
+
+    /**
+     * @var int|null
+     */
+    private $scopeId;
+
+    /**
+     * @param ConfigChangeSet|array $changeSet
+     * @param string|null           $scope
+     * @param int|null              $scopeId
+     */
+    public function __construct($changeSet, $scope = null, $scopeId = null)
     {
         if ($changeSet instanceof ConfigChangeSet) {
             $this->changeSet = $changeSet;
@@ -29,6 +41,9 @@ class ConfigUpdateEvent extends Event
                 'Oro\Bundle\ConfigBundle\Config\ConfigChangeSet or array'
             );
         }
+
+        $this->scope   = $scope;
+        $this->scopeId = $scopeId;
     }
 
     /**
@@ -78,5 +93,21 @@ class ConfigUpdateEvent extends Event
     public function getOldValue($name)
     {
         return $this->changeSet->getOldValue($name);
+    }
+
+    /**
+     * @return null|string
+     */
+    public function getScope()
+    {
+        return $this->scope;
+    }
+
+    /**
+     * @return int|null
+     */
+    public function getScopeId()
+    {
+        return $this->scopeId;
     }
 }
