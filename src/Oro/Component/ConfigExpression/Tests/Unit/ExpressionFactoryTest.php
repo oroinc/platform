@@ -2,20 +2,27 @@
 
 namespace Oro\Component\ConfigExpression\Tests\Unit;
 
+use Oro\Component\ConfigExpression\ContextAccessorInterface;
 use Oro\Component\ConfigExpression\ExpressionFactory;
+use Oro\Component\ConfigExpression\Extension\ExtensionInterface;
 
 class ExpressionFactoryTest extends \PHPUnit_Framework_TestCase
 {
     /** @var ExpressionFactory */
     protected $factory;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var ContextAccessorInterface|\PHPUnit_Framework_MockObject_MockObject */
     protected $contextAccessor;
+
+    /** @var ExtensionInterface|\PHPUnit_Framework_MockObject_MockObject */
+    protected $extension;
 
     protected function setUp()
     {
         $this->contextAccessor = $this->getMock('Oro\Component\ConfigExpression\ContextAccessorInterface');
-        $this->factory         = new ExpressionFactory($this->contextAccessor);
+        $this->factory = new ExpressionFactory($this->contextAccessor);
+        $this->extension = $this->getMock(ExtensionInterface::class);
+        $this->factory->addExtension($this->extension);
     }
 
     /**
@@ -24,14 +31,11 @@ class ExpressionFactoryTest extends \PHPUnit_Framework_TestCase
      */
     public function testCreateNoExpression()
     {
-        $extension = $this->getMock('Oro\Component\ConfigExpression\Extension\ExtensionInterface');
-        $this->factory->addExtension($extension);
-
-        $extension->expects($this->once())
+        $this->extension->expects($this->once())
             ->method('hasExpression')
             ->with('test')
             ->will($this->returnValue(false));
-        $extension->expects($this->never())
+        $this->extension->expects($this->never())
             ->method('getExpression');
 
         $this->factory->create('test');
@@ -45,14 +49,11 @@ class ExpressionFactoryTest extends \PHPUnit_Framework_TestCase
     // @codingStandardsIgnoreEnd
     public function testCreateIncorrectExpressionType()
     {
-        $extension = $this->getMock('Oro\Component\ConfigExpression\Extension\ExtensionInterface');
-        $this->factory->addExtension($extension);
-
-        $extension->expects($this->once())
+        $this->extension->expects($this->once())
             ->method('hasExpression')
             ->with('test')
             ->will($this->returnValue(true));
-        $extension->expects($this->once())
+        $this->extension->expects($this->once())
             ->method('getExpression')
             ->with('test')
             ->will($this->returnValue(new \stdClass()));
@@ -80,14 +81,11 @@ class ExpressionFactoryTest extends \PHPUnit_Framework_TestCase
             ->method('initialize')
             ->with($options);
 
-        $extension = $this->getMock('Oro\Component\ConfigExpression\Extension\ExtensionInterface');
-        $this->factory->addExtension($extension);
-
-        $extension->expects($this->once())
+        $this->extension->expects($this->once())
             ->method('hasExpression')
             ->with('test')
             ->will($this->returnValue(true));
-        $extension->expects($this->once())
+        $this->extension->expects($this->once())
             ->method('getExpression')
             ->with('test')
             ->will($this->returnValue($expr));
@@ -112,14 +110,11 @@ class ExpressionFactoryTest extends \PHPUnit_Framework_TestCase
             ->method('initialize')
             ->with($options);
 
-        $extension = $this->getMock('Oro\Component\ConfigExpression\Extension\ExtensionInterface');
-        $this->factory->addExtension($extension);
-
-        $extension->expects($this->once())
+        $this->extension->expects($this->once())
             ->method('hasExpression')
             ->with('test')
             ->will($this->returnValue(true));
-        $extension->expects($this->once())
+        $this->extension->expects($this->once())
             ->method('getExpression')
             ->with('test')
             ->will($this->returnValue($expr));
@@ -128,5 +123,16 @@ class ExpressionFactoryTest extends \PHPUnit_Framework_TestCase
             $expr,
             $this->factory->create('test', $options)
         );
+    }
+
+    public function testAddGetExtensions()
+    {
+        $extensionsCnt = count($this->factory->getExtensions());
+        /** @var ExtensionInterface $newExtension */
+        $newExtension = $this->getMock(ExtensionInterface::class);
+        $this->factory->addExtension($newExtension);
+
+        $this->assertCount($extensionsCnt + 1, $this->factory->getExtensions());
+        $this->assertContains($newExtension, $this->factory->getExtensions());
     }
 }

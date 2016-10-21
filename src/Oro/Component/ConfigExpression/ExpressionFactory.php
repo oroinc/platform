@@ -58,4 +58,12 @@ class ExpressionFactory implements ExpressionFactoryInterface
     {
         $this->extensions[] = $extension;
     }
+
+    /**
+     * @return ExtensionInterface[]
+     */
+    public function getExtensions()
+    {
+        return $this->extensions;
+    }
 }
