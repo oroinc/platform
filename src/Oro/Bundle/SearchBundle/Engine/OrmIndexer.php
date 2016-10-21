@@ -34,8 +34,6 @@ class OrmIndexer extends AbstractIndexer
      * @param EntityNameResolver $entityNameResolver
      * @param TranslatorInterface $translator
      * @param DbalStorer $dbalStorer
-     *
-     * @internal param EntityTitleResolverInterface $entityTitleResolver
      */
     public function __construct(
         ManagerRegistry $registry,
