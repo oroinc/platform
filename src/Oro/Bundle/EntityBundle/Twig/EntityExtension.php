@@ -48,6 +48,7 @@ class EntityExtension extends \Twig_Extension
     {
         return [
             new \Twig_SimpleFunction('oro_class_name', [$this, 'getClassName']),
+            new \Twig_SimpleFunction('oro_url_class_name', [$this, 'getUrlClassName']),
             new \Twig_SimpleFunction('oro_class_alias', [$this, 'getClassAlias']),
             new \Twig_SimpleFunction('oro_action_params', [$this, 'getActionParams'])
         ];
@@ -83,6 +84,17 @@ class EntityExtension extends \Twig_Extension
         return $escape
             ? $this->entityRoutingHelper->getUrlSafeClassName($className)
             : $className;
+    }
+
+    /**
+     * Get URL safe class name based on passes class name
+     *
+     * @param string $className
+     * @return string
+     */
+    public function getUrlClassName($className)
+    {
+        return $this->entityRoutingHelper->getUrlSafeClassName($className);
     }
 
     /**

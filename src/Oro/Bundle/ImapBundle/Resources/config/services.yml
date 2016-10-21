@@ -195,3 +195,12 @@ services:
             - '@oro_imap.imap_email_google_oauth2_manager'
         tags:
             - { name: kernel.event_listener, event: oro_email.send_email_transport, method: setSmtpTransport }
+
+    oro_imap.async.clear_inactive_mailbox_message_processor:
+        class: 'Oro\Bundle\ImapBundle\Async\ClearInactiveMailboxMessageProcessor'
+        arguments:
+            - '@oro_imap.manager.clear'
+            - '@oro_message_queue.job.runner'
+            - '@logger'
+        tags:
+            - { name: 'oro_message_queue.client.message_processor' }

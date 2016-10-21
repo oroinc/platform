@@ -5,11 +5,14 @@ namespace Oro\Bundle\WorkflowBundle\EventListener\Extension;
 use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\Common\Util\ClassUtils;
 
-use JMS\JobQueueBundle\Entity\Job;
+use Oro\Component\MessageQueue\Client\Message;
+use Oro\Component\MessageQueue\Client\MessageProducerInterface;
 
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
+
+use Oro\Bundle\WorkflowBundle\Async\Topics;
 use Oro\Bundle\WorkflowBundle\Cache\EventTriggerCache;
-use Oro\Bundle\WorkflowBundle\Command\ExecuteProcessJobCommand;
+use Oro\Bundle\WorkflowBundle\Configuration\ProcessPriority;
 use Oro\Bundle\WorkflowBundle\Entity\EventTriggerInterface;
 use Oro\Bundle\WorkflowBundle\Entity\ProcessJob;
 use Oro\Bundle\WorkflowBundle\Entity\ProcessTrigger;
@@ -41,24 +44,32 @@ class ProcessTriggerExtension extends AbstractEventTriggerExtension
     protected $queuedJobs = [];
 
     /**
+     * @var MessageProducerInterface
+     */
+    private $messageProducer;
+
+    /**
      * @param DoctrineHelper $doctrineHelper
      * @param ProcessHandler $handler
      * @param ProcessLogger $logger
      * @param EventTriggerCache $triggerCache
      * @param ProcessSchedulePolicy $schedulePolicy
+     * @param MessageProducerInterface $messageProducer
      */
     public function __construct(
         DoctrineHelper $doctrineHelper,
         ProcessHandler $handler,
         ProcessLogger $logger,
         EventTriggerCache $triggerCache,
-        ProcessSchedulePolicy $schedulePolicy
+        ProcessSchedulePolicy $schedulePolicy,
+        MessageProducerInterface $messageProducer
     ) {
         $this->doctrineHelper = $doctrineHelper;
         $this->handler = $handler;
         $this->logger = $logger;
         $this->triggerCache = $triggerCache;
         $this->schedulePolicy = $schedulePolicy;
+        $this->messageProducer = $messageProducer;
     }
 
     /**
@@ -108,8 +119,8 @@ class ProcessTriggerExtension extends AbstractEventTriggerExtension
         // handle processes
         $hasQueuedOrHandledProcesses = false;
         $handledProcesses = [];
-        foreach ($this->scheduledProcesses as $entityClass => $entityProcesses) {
-            foreach ($entityProcesses as $entityProcess) {
+        foreach ($this->scheduledProcesses as &$entityProcesses) {
+            while ($entityProcess = array_shift($entityProcesses)) {
                 /** @var ProcessTrigger $trigger */
                 $trigger = $entityProcess['trigger'];
                 /** @var ProcessData $data */
@@ -133,8 +144,6 @@ class ProcessTriggerExtension extends AbstractEventTriggerExtension
 
                 $hasQueuedOrHandledProcesses = true;
             }
-
-            unset($this->scheduledProcesses[$entityClass]);
         }
 
         // save both handled entities and queued process jobs
@@ -160,8 +169,7 @@ class ProcessTriggerExtension extends AbstractEventTriggerExtension
             $this->removedEntityHashes = [];
         }
 
-        // create queued JMS jobs
-        $this->createJobs($manager);
+        $this->createJobs();
     }
 
     /**
@@ -226,62 +234,31 @@ class ProcessTriggerExtension extends AbstractEventTriggerExtension
         return $processJob;
     }
 
-    /**
-     * Create JMS jobs for queued process jobs
-     *
-     * @param ObjectManager $manager
-     */
-    protected function createJobs(ObjectManager $manager)
+    protected function createJobs()
     {
-        if (!$this->queuedJobs) {
+        if (empty($this->queuedJobs)) {
             return;
         }
 
-        $jmsJobList = [];
-
         foreach ($this->queuedJobs as $timeShift => $processJobBatch) {
             foreach ($processJobBatch as $priority => $processJobs) {
-                $args = [];
-
                 /** @var ProcessJob $processJob */
                 foreach ($processJobs as $processJob) {
-                    $args[] = '--id=' . $processJob->getId();
+                    $message = new Message();
+                    $message->setBody(['process_job_id' => $processJob->getId()]);
+                    $message->setPriority(ProcessPriority::convertToMessageQueuePriority($priority));
+
+                    if ($timeShift) {
+                        $message->setDelay($timeShift);
+                    }
+
+                    $this->messageProducer->send(Topics::EXECUTE_PROCESS_JOB, $message);
                     $this->logger->debug('Process queued', $processJob->getProcessTrigger(), $processJob->getData());
                 }
-
-                $jmsJob = new Job(ExecuteProcessJobCommand::NAME, $args, false, Job::DEFAULT_QUEUE, $priority);
-
-                if ($timeShift) {
-                    $timeShiftInterval = ProcessTrigger::convertSecondsToDateInterval($timeShift);
-                    $executeAfter = new \DateTime('now', new \DateTimeZone('UTC'));
-                    $executeAfter->add($timeShiftInterval);
-                    $jmsJob->setExecuteAfter($executeAfter);
-                }
-
-                $manager->persist($jmsJob);
-                $jmsJobList[] = $jmsJob;
             }
         }
 
         $this->queuedJobs = [];
-
-        $manager->flush();
-
-        $this->confirmJobs($manager, $jmsJobList);
-    }
-
-    /**
-     * @param ObjectManager $manager
-     * @param Job[] $jmsJobList
-     */
-    protected function confirmJobs(ObjectManager $manager, $jmsJobList)
-    {
-        foreach ($jmsJobList as $jmsJob) {
-            $jmsJob->setState(Job::STATE_PENDING);
-            $manager->persist($jmsJob);
-        }
-
-        $manager->flush();
     }
 
     /**

@@ -93,7 +93,7 @@ class ConfigurationController extends Controller
 
                 // outdate content tags, it's only special case for generation that are not covered by NavigationBundle
                 $taggableData = ['name' => 'user_configuration', 'params' => [$activeGroup, $activeSubGroup]];
-                $sender       = $this->get('oro_navigation.content.topic_sender');
+                $sender       = $this->get('oro_sync.content.topic_sender');
 
                 $sender->send($sender->getGenerator()->generate($taggableData));
             }

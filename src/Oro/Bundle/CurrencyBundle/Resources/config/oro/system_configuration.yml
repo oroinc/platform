@@ -1,0 +1,50 @@
+system_configuration:
+    groups:
+        currency:
+            title: oro.currency.system_configuration.groups.currency.title
+            icon: 'icon-money'
+            page_reload: true
+        currency_settings:
+            title: oro.currency.system_configuration.groups.currency_settings.title
+
+    fields:
+        oro_currency.default_currency:
+            data_type: string
+            type: oro_currency
+            priority: 30
+            options:
+                label: oro.currency.system_configuration.fields.default_currency.lable
+                tooltip: oro.locale.form.tooltip.currency
+                required: true
+                multiple: false
+                restrict: true
+                constraints:
+                    - NotBlank: ~
+
+        oro_currency.currency_display:
+            data_type: string
+            type: choice
+            priority: 10
+            options:
+                label: oro.currency.system_configuration.fields.currency_display.label
+                tooltip: oro.currency.form.tooltip.currency_display
+                required: true
+                constraints:
+                    - NotBlank: ~
+                choices:
+                    iso_code: oro.currency.system_configuration.fields.currency_display.choices.iso_code
+                    symbol: oro.currency.system_configuration.fields.currency_display.choices.symbol
+    tree:
+        system_configuration:
+            platform:
+                children:
+                    general_setup:
+                        children:
+                            currency:
+                                priority: 230
+                                children:
+                                    currency_settings:
+                                        priority: 100
+                                        children:
+                                            - oro_currency.default_currency
+                                            - oro_currency.currency_display

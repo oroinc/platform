@@ -197,8 +197,8 @@ class WorkflowItemRepositoryTest extends WebTestCase
     public function testFindByStepNamesAndEntityClass()
     {
         $items = $this->repository->findByStepNamesAndEntityClass(
-            new ArrayCollection(['starting_point']),
-            WorkflowAwareEntity::class,
+            new ArrayCollection(['second_point']),
+            'Oro\\Bundle\\TestFrameworkBundle\\Entity\\WorkflowAwareEntity',
             'id'
         );
 
@@ -207,10 +207,10 @@ class WorkflowItemRepositoryTest extends WebTestCase
         $expected = [];
         // 21 because "test_multistep_flow" was second loaded workflows in fixtures
         for ($i = 21; $i < 21 + LoadWorkflowAwareEntities::COUNT; $i++) {
-            $expected[] = $this->getReference('test_multistep_flow_item.' . $i);
+            $item = $this->getReference('test_multistep_flow_item.' . $i);
+            
+            $this->assertContains($item, $items);
         }
-
-        $this->assertEquals($expected, $items);
     }
 
     public function testResetWorkflowData()

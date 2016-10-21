@@ -4,6 +4,7 @@ namespace Oro\Bundle\LayoutBundle\Layout\Block\Type;
 
 use Oro\Component\Layout\Block\OptionsResolver\OptionsResolver;
 use Oro\Component\Layout\Block\Type\AbstractType;
+use Oro\Component\Layout\Block\Type\ContainerType;
 use Oro\Component\Layout\Block\Type\Options;
 use Oro\Component\Layout\BlockBuilderInterface;
 
@@ -17,7 +18,10 @@ class FormType extends AbstractType
      */
     public function configureOptions(OptionsResolver $resolver)
     {
-        $resolver->setDefault('form_name', 'form');
+        $resolver->setDefaults([
+            'form_name' => 'form',
+            'instance_name' => '',
+        ]);
         $resolver->setDefined([
             'form',
             'form_action',
@@ -45,6 +49,7 @@ class FormType extends AbstractType
         $this->addBlockType(
             $builder,
             FormStartType::NAME,
+            FormStartType::SHORT_NAME,
             $options,
             [
                 'form',
@@ -54,12 +59,15 @@ class FormType extends AbstractType
                 'form_route_parameters',
                 'form_method',
                 'form_enctype',
+                'additional_block_prefixes',
+                'instance_name',
             ]
         );
 
         $this->addBlockType(
             $builder,
             FormFieldsType::NAME,
+            FormFieldsType::SHORT_NAME,
             $options,
             [
                 'form',
@@ -70,18 +78,23 @@ class FormType extends AbstractType
                 'form_group_prefix',
                 'split_to_fields',
                 'form_data',
-                'preferred_fields'
+                'preferred_fields',
+                'additional_block_prefixes',
+                'instance_name',
             ]
         );
 
         $this->addBlockType(
             $builder,
             FormEndType::NAME,
+            FormEndType::SHORT_NAME,
             $options,
             [
                 'form',
                 'form_name',
                 'render_rest',
+                'additional_block_prefixes',
+                'instance_name',
             ]
         );
     }
@@ -97,16 +110,36 @@ class FormType extends AbstractType
     /**
      * @param BlockBuilderInterface $builder
      * @param string                $name
+     * @param string                $shortName
      * @param Options               $options
      * @param array                 $passedOptions
      */
-    protected function addBlockType(BlockBuilderInterface $builder, $name, Options $options, array $passedOptions)
-    {
+    protected function addBlockType(
+        BlockBuilderInterface $builder,
+        $name,
+        $shortName,
+        Options $options,
+        array $passedOptions
+    ) {
+        $options = $options->toArray();
+        foreach ($options['additional_block_prefixes'] as &$blockPrefix) {
+            $blockPrefix .=  self::FIELD_SEPARATOR . $shortName;
+        }
+        unset($blockPrefix);
+
         $builder->getLayoutManipulator()->add(
-            $builder->getId().self::FIELD_SEPARATOR.$name,
+            $builder->getId() . self::FIELD_SEPARATOR . $shortName,
             $builder->getId(),
             $name,
-            array_intersect_key($options->toArray(), array_flip($passedOptions))
+            array_intersect_key($options, array_flip($passedOptions))
         );
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getParent()
+    {
+        return ContainerType::NAME;
     }
 }

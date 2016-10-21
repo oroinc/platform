@@ -552,7 +552,6 @@ class ConfigurableTableDataConverterTest extends \PHPUnit_Framework_TestCase
 
         $relationFieldValue = $this->converter->getFieldHeaderWithRelation('SingleRelationEntity', 'fullScalar');
         $this->assertEquals($relationFieldValue, 'Full Scalar Entity Name');
-
     }
 
     /**

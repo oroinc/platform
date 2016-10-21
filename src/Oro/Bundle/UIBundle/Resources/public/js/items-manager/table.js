@@ -98,8 +98,15 @@ define(['jquery', 'underscore', 'oroui/js/mediator', 'jquery-ui'], function($, _
             collection.trigger('sort');
         },
 
-        _onModelAdded: function(model) {
-            this.element.append(this._renderModel(model));
+        _onModelAdded: function(model, collection, options) {
+            var newRow = this._renderModel(model);
+            if (_.isUndefined(options.at)) {
+                this.element.append(newRow);
+            } else if (options.at === 0) {
+                this.element.prepend(newRow);
+            } else {
+                this.element.children().eq(options.at).insertBefore(newRow);
+            }
             if (this.options.sorting) {
                 this.element.sortable('refresh');
             }

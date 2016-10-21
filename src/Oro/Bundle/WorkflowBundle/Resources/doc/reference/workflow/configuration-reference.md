@@ -14,6 +14,7 @@ Table of Contents
    - [Example](#example-2)
  - [Transitions Configuration](#transitions-configuration)
    - [Example](#example-3)
+ - [Transition Triggers Configuration](#transition-triggers-configuration)
  - [Transition Definition Configuration](#transition-definition-configuration)
    - [Example](#example-4)
  - [Conditions Configuration](#conditions-configuration)
@@ -66,7 +67,7 @@ imports:
 workflows:
     b2b_flow_lead:
         label: 'Unqualified Sales Lead'
-        entity: OroCRM\Bundle\SalesBundle\Entity\Lead
+        entity: Oro\Bundle\SalesBundle\Entity\Lead
         entity_attribute: lead
         start_step: new
 ```
@@ -146,7 +147,7 @@ workflows:                                                    # Root elements
         label: B2B Sales Flow                                 # This will be shown in UI
         defaults:
             active: true                                      # Active by default (when config is loaded)
-        entity: OroCRM\Bundle\SalesBundle\Entity\Opportunity  # Workflow will be used for this entity
+        entity: Oro\Bundle\SalesBundle\Entity\Opportunity  # Workflow will be used for this entity
         entity_attribute: opportunity                         # Attribute name used to store root entity
         is_system: true                                       # Workflow is system, i.e. not editable and not deletable
         start_step: qualify                                   # Name of start step
@@ -240,7 +241,7 @@ workflows:
             entity_acl:
                 delete: false
             options:
-                class: OroCRM\Bundle\AccountBundle\Entity\Account
+                class: Oro\Bundle\AccountBundle\Entity\Account
         new_company_name:
             label: 'Company name'
             type: string
@@ -371,6 +372,8 @@ Transition configuration has next options:
 * **transition_definition**
     *string*
     Name of associated transition definition.
+* **triggers**
+    Contains configuration for Workflow Transition Triggers
 
 Example
 -------
@@ -403,6 +406,93 @@ workflows:
                 label: 'End conversation'
                 step_to: end_call
                 transition_definition: end_conversation_definition
+                triggers:
+                    -
+                        cron: '* * * * *'
+                        filter: "e.someStatus = 'OPEN'"
+```
+
+Transition Triggers Configuration
+=================================
+
+Transition Triggers are used to perform Transition by Event or by cron-definition.
+
+Please note that transition can be performed by trigger even if Workflow not started for the entity yet. 
+
+There are 2 types of triggers:
+
+Event trigger:
+--------------
+
+Event trigger configuration has next options.
+
+* **entity_class**
+    Class of entity that can trigger transition.
+* **event**
+    Type of the event, can have the following values: `create`, `update`, `delete`.
+* **field**
+    Only for `update` event - field name that should be updated to handle trigger.
+* **queue**
+    [boolean, default = true] Handle trigger in queue (if `true`), or in realtime (if `false`) 
+* **require**
+    String of Symfony Language Expression that should much to handle the trigger. Following aliases are available:
+    * `entity` - Entity object, that dispatched event,
+    * `mainEntity` - Entity object of triggers' workflow,
+    * `wd` - Workflow Definition object,
+    * `wi` - Workflow Item object.
+* **relation**
+    Property path to `mainEntity` relative to `entity` if they are different.
+    
+Example
+-------
+
+```
+workflows:
+    phone_call:
+        # ...
+        transitions:
+            connected:
+                ...
+                triggers:
+                    -
+                        entity_class: Oro\Bundle\SaleBundle\Entity\Quote    # entity class
+                        event: update                                       # event type
+                        field: status                                       # updated field
+                        queued: false                                       # handle trigger not in queue
+                        relation: call                                      # relation to Workflow entity
+                        require: "entity.status = 'pending'"                # expression language condition
+```
+
+Cron trigger:
+--------------
+
+Cron trigger configuration has next options.
+
+* **cron**
+    Cron definition.
+* **queue**
+    [boolean, default = true] Handle trigger in queue (if `true`), or in realtime (if `false`) 
+* **filter**
+    String of Symfony Language Expression that should much to handle the trigger. Following aliases are available:
+    * `e` - Entity,
+    * `wd` - Workflow Definition,
+    * `wi` - Workflow Item,
+    * `ws` - Current Workflow Step.
+    
+Example
+-------
+
+```
+workflows:
+    phone_call:
+        # ...
+        transitions:
+            connected:
+                ...
+                triggers:
+                    -
+                        cron: '* * * * *'                                   # cron definition
+                        filter: "e.someStatus = 'OPEN'"                     # dql-filter
 ```
 
 Transition Definition Configuration

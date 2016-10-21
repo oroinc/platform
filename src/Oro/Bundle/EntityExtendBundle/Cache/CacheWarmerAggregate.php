@@ -41,7 +41,8 @@ class CacheWarmerAggregate implements CacheWarmerInterface
      */
     public function warmUp($cacheDir)
     {
-        if (CommandExecutor::isCurrentCommand('oro:entity-extend:cache:', true)) {
+        if (CommandExecutor::isCurrentCommand('oro:entity-extend:cache:', true)
+            || CommandExecutor::isCurrentCommand('oro:platform:upgrade20', true)) {
             foreach ($this->warmers as $warmer) {
                 $warmer->warmUp($cacheDir);
             }

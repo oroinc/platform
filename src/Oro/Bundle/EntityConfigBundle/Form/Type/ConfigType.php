@@ -2,8 +2,6 @@
 
 namespace Oro\Bundle\EntityConfigBundle\Form\Type;
 
-use Doctrine\Common\Persistence\ManagerRegistry;
-
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
@@ -13,13 +11,13 @@ use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
 use Oro\Bundle\EntityConfigBundle\Form\EventListener\ConfigSubscriber;
 use Oro\Bundle\EntityConfigBundle\Provider\PropertyConfigContainer;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
-use Oro\Bundle\TranslationBundle\Translation\DynamicTranslationMetadataCache;
+use Oro\Bundle\EntityConfigBundle\Translation\ConfigTranslationHelper;
 use Oro\Bundle\TranslationBundle\Translation\Translator;
 
 class ConfigType extends AbstractType
 {
-    /** @var ManagerRegistry */
-    protected $doctrine;
+    /** @var ConfigTranslationHelper */
+    protected $translationHelper;
 
     /** @var ConfigManager */
     protected $configManager;
@@ -27,25 +25,19 @@ class ConfigType extends AbstractType
     /** @var Translator */
     protected $translator;
 
-    /** @var DynamicTranslationMetadataCache */
-    protected $dbTranslationMetadataCache;
-
     /**
-     * @param ManagerRegistry                 $doctrine
-     * @param ConfigManager                   $configManager
-     * @param Translator                      $translator
-     * @param DynamicTranslationMetadataCache $dbTranslationMetadataCache
+     * @param ConfigTranslationHelper $translationHelper
+     * @param ConfigManager $configManager
+     * @param Translator $translator
      */
     public function __construct(
-        ManagerRegistry $doctrine,
+        ConfigTranslationHelper $translationHelper,
         ConfigManager $configManager,
-        Translator $translator,
-        DynamicTranslationMetadataCache $dbTranslationMetadataCache
+        Translator $translator
     ) {
-        $this->doctrine                   = $doctrine;
-        $this->configManager              = $configManager;
-        $this->translator                 = $translator;
-        $this->dbTranslationMetadataCache = $dbTranslationMetadataCache;
+        $this->translationHelper = $translationHelper;
+        $this->configManager = $configManager;
+        $this->translator = $translator;
     }
 
     /**
@@ -117,10 +109,9 @@ class ConfigType extends AbstractType
 
         $builder->addEventSubscriber(
             new ConfigSubscriber(
-                $this->doctrine,
+                $this->translationHelper,
                 $this->configManager,
-                $this->translator,
-                $this->dbTranslationMetadataCache
+                $this->translator
             )
         );
     }

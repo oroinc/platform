@@ -29,6 +29,7 @@ use Oro\Bundle\UserBundle\Migrations\Schema\v1_18\ChangeEmailUserFolderRelation 
 use Oro\Bundle\UserBundle\Migrations\Schema\v1_18\AddEmailUserColumn;
 use Oro\Bundle\UserBundle\Migrations\Schema\v1_18\DropEmailUserColumn;
 use Oro\Bundle\UserBundle\Migrations\Schema\v1_19\AddFirstNameLastNameIndex;
+use Oro\Bundle\UserBundle\Migrations\Schema\v1_22\AddImpersonationTable;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyMethods)
@@ -50,7 +51,7 @@ class OroUserBundleInstaller implements
      */
     public function getMigrationVersion()
     {
-        return 'v1_21';
+        return 'v1_23';
     }
 
     /**
@@ -130,6 +131,7 @@ class OroUserBundleInstaller implements
         AddEmailUserColumn::updateOroEmailUserTable($schema);
         DropEmailUserColumn::updateOroEmailUserTable($schema);
         AddFirstNameLastNameIndex::addFirstNameLastNameIndex($schema);
+        AddImpersonationTable::createOroUserImpersonationTable($schema);
     }
 
     /**
@@ -202,6 +204,7 @@ class OroUserBundleInstaller implements
         $table->addColumn('password_requested', 'datetime', ['notnull' => false, 'precision' => 0]);
         $table->addColumn('last_login', 'datetime', ['notnull' => false, 'precision' => 0]);
         $table->addColumn('login_count', 'integer', ['default' => '0', 'precision' => 0, 'unsigned' => true]);
+        $table->addColumn('login_disabled', 'boolean', ['default' => false]);
         $table->addColumn('createdAt', 'datetime', ['precision' => 0]);
         $table->addColumn('updatedAt', 'datetime', ['precision' => 0]);
         $table->addUniqueIndex(['username'], 'UNIQ_F82840BCF85E0677');
