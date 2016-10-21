@@ -61,4 +61,12 @@ class ActionFactory
 
         return $action;
     }
+
+    /**
+     * @return array
+     */
+    public function getTypes()
+    {
+        return $this->types;
+    }
 }
