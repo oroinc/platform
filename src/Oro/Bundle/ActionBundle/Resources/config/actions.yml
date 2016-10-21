@@ -110,7 +110,7 @@ services:
         arguments:
             - '@oro_action.context_accessor'
             - '@router'
-            - 'redirectUrl'
+            - 'result.redirectUrl'
         tags:
             - { name: oro_action.action, alias: redirect }
 

@@ -5,7 +5,7 @@ namespace Oro\Bundle\ActionBundle\Tests\Unit\Model;
 use Oro\Bundle\ActionBundle\Model\ActionData;
 
 /**
- * @SuppressWarnings(PHPMD.TooManyMethods)
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
 class ActionDataTest extends \PHPUnit_Framework_TestCase
 {
@@ -124,7 +124,7 @@ class ActionDataTest extends \PHPUnit_Framework_TestCase
 
         $url = 'my/test/url';
 
-        $data->offsetSet('redirectUrl', $url);
+        $data->offsetSet('result.redirectUrl', $url);
         $this->assertEquals($url, $data->getRedirectUrl());
     }
 
