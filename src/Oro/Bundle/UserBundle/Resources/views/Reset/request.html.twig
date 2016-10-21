@@ -18,6 +18,7 @@
         {% endif %}
         {{ messagesContent }}
         <input type="text" id="prependedInput" name="username" required="required" placeholder="{{ 'Username or Email'|trans }}" autofocus/>
+        <input type="hidden" name="frontend" value="1" />
         <div class="form-row">
             <a href="{{ path('oro_user_security_login') }}" class="btn btn-link">&laquo; {{ 'Return to Login'|trans }}</a>
             <button type="submit" class="btn extra-submit btn-large btn-primary">{{ 'Request'|trans }}</button>

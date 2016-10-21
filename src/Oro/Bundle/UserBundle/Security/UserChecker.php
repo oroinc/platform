@@ -60,5 +60,12 @@ class UserChecker extends BaseUserChecker
 
             throw $exception;
         }
+
+        if ($user instanceof User && $user->isLoginDisabled()) {
+            $exception = new PasswordChangedException('Invalid password.');
+            $exception->setUser($user);
+
+            throw $exception;
+        }
     }
 }

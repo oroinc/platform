@@ -395,6 +395,7 @@ placeholders:
     items: ...
 ```
 - Main menu dropdown active item is now triggering a page refresh, despite the Backbone router limitations
+- Updated jquery.mCustomScrollbar plugin to version 3.1.5 `Resources/public/lib/jquery/jquery.mCustomScrollbar.min.js`
 
 ####DashboardBundle:
 - Dashboards configurations now loads from `Resources/config/oro/dashboards.yml` instead of `Resources/config/dashboard.yml` file.
@@ -555,3 +556,6 @@ to the [Fallback documentation](./src/Oro/Bundle/EntityBundle/Resources/doc/enti
 
 ####ImapBundle
  - The command `oro:imap:clear-mailbox` was removed. Produce message to the topic `Oro\Bundle\ImapBundle\Async\Topics::CLEAR_INACTIVE_MAILBOX` instead.
+
+####UserBundle
+- Removed service @oro_user.password_reset.widget_provider.actions (replaced by @oro_user.forced_password_reset.widget_provider.actions)
