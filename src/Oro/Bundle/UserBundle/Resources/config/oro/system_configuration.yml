@@ -1,8 +1,8 @@
 system_configuration:
     groups:
-       security_settings:
+       user_settings:
            icon:  icon-key
-           title: oro.user.system_configuration.groups.security_settings.title
+           title: oro.user.system_configuration.groups.user_settings.title
        failed_login_limit:
            icon: icon-signin
            title: oro.user.system_configuration.groups.failed_login_limit.title
@@ -31,7 +31,7 @@ system_configuration:
                 children:
                     general_setup:
                         children:
-                            security_settings:
+                            user_settings:
                                 priority: 90
                                 children:
                                     failed_login_limit:

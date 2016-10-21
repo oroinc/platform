@@ -238,7 +238,7 @@ oro:
 
         system_configuration:
             groups:
-                security_settings.title: Security Settings
+                user_settings.title: User Settings
                 failed_login_limit.title: Login attempts
             fields:
                 failed_login_limit_enabled.label: Enable failed logins limit
