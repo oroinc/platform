@@ -14,6 +14,7 @@ use Oro\Bundle\NavigationBundle\Tests\Unit\MenuItemTestTrait;
 
 class MenuUpdateManagerTest extends \PHPUnit_Framework_TestCase
 {
+    const MENU_ID = 'menu';
     use MenuItemTestTrait;
 
     /** @var EntityRepository|\PHPUnit_Framework_MockObject_MockObject */
@@ -64,10 +65,11 @@ class MenuUpdateManagerTest extends \PHPUnit_Framework_TestCase
         $entity
             ->setOwnershipType($ownershipType)
             ->setOwnerId($ownerId)
+            ->setMenu(self::MENU_ID)
         ;
 
         $this->manager->setEntityClass(MenuUpdateStub::class);
-        $result = $this->manager->createMenuUpdate($ownershipType, $ownerId);
+        $result = $this->manager->createMenuUpdate($ownershipType, $ownerId, ['menu'=> self::MENU_ID]);
         $entity->setKey($result->getKey());
 
         $this->assertEquals($entity, $result);
@@ -154,6 +156,7 @@ class MenuUpdateManagerTest extends \PHPUnit_Framework_TestCase
             ->setOwnerId($ownerId)
             ->setKey($key)
             ->setCustom(true)
+            ->setMenu(self::MENU_ID)
         ;
 
         $menu = $this->getMenu();
@@ -163,7 +166,7 @@ class MenuUpdateManagerTest extends \PHPUnit_Framework_TestCase
         $this->entityRepository
             ->expects($this->once())
             ->method('findOneBy')
-            ->with(['menu' => 'menu', 'key' => $key, 'ownershipType' => $ownershipType, 'ownerId' => $ownerId])
+            ->with(['menu' => self::MENU_ID, 'key' => $key, 'ownershipType' => $ownershipType, 'ownerId' => $ownerId])
             ->will($this->returnValue(null));
 
         $this->builderChainProvider
@@ -263,7 +266,7 @@ class MenuUpdateManagerTest extends \PHPUnit_Framework_TestCase
             ->setOwnershipType($ownershipType)
             ->setOwnerId($ownerId)
             ->setKey('item-1')
-            ->setParentKey($menuName)
+            ->setParentKey(null)
             ->setCustom(false)
             ->setActive(true)
             ->setDefaultTitle('item-1')
@@ -327,7 +330,7 @@ class MenuUpdateManagerTest extends \PHPUnit_Framework_TestCase
             ->setOwnerId($ownerId)
             ->setKey('item-1-1')
             ->setParentKey('item-1')
-            ->setCustom(true)
+            ->setCustom(false)
             ->setActive(false)
             ->setDefaultTitle('item-1-1')
         ;
@@ -339,7 +342,7 @@ class MenuUpdateManagerTest extends \PHPUnit_Framework_TestCase
             ->setOwnerId($ownerId)
             ->setKey('item-1-1-1')
             ->setParentKey('item-1-1')
-            ->setCustom(true)
+            ->setCustom(false)
             ->setActive(false)
             ->setDefaultTitle('item-1-1-1')
         ;

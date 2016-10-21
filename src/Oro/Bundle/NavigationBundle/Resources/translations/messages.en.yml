@@ -61,6 +61,7 @@ oro:
             custom.label: Is Custom
             divider.label: Is Divider
             descriptions.label: Description
+            divider_created: Divider created
         action:
             manage_menus:
                 label: Manage Menus

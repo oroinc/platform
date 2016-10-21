@@ -105,10 +105,7 @@ services:
     oro_navigation.tree.menu_update_tree_handler:
         class: 'Oro\Bundle\NavigationBundle\JsTree\MenuUpdateTreeHandler'
         arguments:
-            - '%oro_navigation.entity.menu_update.class%'
-            - "@doctrine"
-        calls:
-            - [ setTranslator, [ '@translator' ]]
+            - '@translator'
 
     oro_menu.twig.extension:
         class: %oro_menu.twig.extension.class%
@@ -363,7 +360,7 @@ services:
         arguments:
             - '@oro_navigation.repository.menu_update'
         tags:
-            - { name: oro_navigation.ownership_provider, area: default, priority: 200 }
+            - { name: oro_navigation.ownership_provider, area: default, priority: 100 }
 
     oro_navigation.ownership_provider.user:
         class: Oro\Bundle\NavigationBundle\Menu\Provider\UserOwnershipProvider
@@ -371,13 +368,17 @@ services:
             - '@oro_navigation.repository.menu_update'
             - '@security.token_storage'
         tags:
-            - { name: oro_navigation.ownership_provider, area: default, priority: 100 }
+            - { name: oro_navigation.ownership_provider, area: default, priority: 200 }
+
+    oro_navigation.menu_manipulator:
+        class: Knp\Menu\Util\MenuManipulator
+        public: false
 
     oro_navigation.extension.datasource.menu:
         class: Oro\Bundle\NavigationBundle\Datagrid\MenuUpdateDatasource
         arguments:
             - '@oro_menu.builder_chain'
-            - '@oro_menu.menu_manipulator'
+            - '@oro_navigation.menu_manipulator'
             - '%oro_navigation.area%'
         tags:
             - { name: oro_datagrid.datasource, type: menu-update-default-provider }

@@ -1,14 +1,20 @@
 {% extends 'OroNavigationBundle:menuUpdate:update.html.twig' %}
 
-{% set routePrefix = 'oro_navigation_global_menu_' %}
+{% set menuViewPath= path('oro_navigation_global_menu_view', {menuName: entity.menu}) %}
+{% set menuCreatePath= path('oro_navigation_global_menu_create', {menuName: entity.menu, parentKey: entity.key}) %}
+{% set menuCreateDividerPath= path('oro_navigation_global_menu_create', {menuName: entity.menu, parentKey: entity.key}) %}
+{% set menuUpdatePath= path('oro_navigation_global_menu_update', {menuName: entity.menu, key: entity.key}) %}
+{% set onRootSelectRoute = 'oro_navigation_global_menu_view' %}
+{% set onSelectRoute = 'oro_navigation_global_menu_update' %}
+{% set ownerId = null %}
 {% oro_title_set({params : {"%title%": entity.title|trans()}}) %}
 {% set breadcrumbs = {
     'entity': entity,
-    'indexPath': path(routePrefix ~ 'index'),
+    'indexPath': path('oro_navigation_global_menu_index'),
     'indexLabel': 'oro.navigation.menuupdate.roots_plural_label'|trans,
     'additional': [
         {
-            'indexPath': path(routePrefix ~ 'view', {menuName: menuName}),
+            'indexPath': path('oro_navigation_global_menu_view', {menuName: menuName}),
             'indexLabel': menuName
         }
     ]

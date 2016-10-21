@@ -7,7 +7,6 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 
 use Symfony\Component\HttpFoundation\RedirectResponse;
 
-use Oro\Bundle\NavigationBundle\Entity\MenuUpdate;
 use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
 
 /**
@@ -15,14 +14,6 @@ use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
  */
 class UserMenuController extends AbstractMenuController
 {
-    /**
-     * {@inheritdoc}
-     */
-    protected function getOwnershipProvider()
-    {
-        return $this->get('oro_navigation.ownership_provider.user');
-    }
-
     /**
      * @Route("/", name="oro_navigation_user_menu_index")
      * @Template
@@ -32,7 +23,7 @@ class UserMenuController extends AbstractMenuController
      */
     public function indexAction()
     {
-        return parent::indexAction();
+        return parent::index();
     }
 
     /**
@@ -46,7 +37,7 @@ class UserMenuController extends AbstractMenuController
      */
     public function viewAction($menuName)
     {
-        return parent::viewAction($menuName);
+        return parent::view($menuName);
     }
 
     /**
@@ -56,27 +47,12 @@ class UserMenuController extends AbstractMenuController
      *
      * @param string $menuName
      * @param string|null $parentKey
-     * @param bool $isDivider
      *
      * @return array|RedirectResponse
      */
-    public function createAction($menuName, $parentKey = null, $isDivider = false)
+    public function createAction($menuName, $parentKey = null)
     {
-        return parent::createAction($menuName, $parentKey, $isDivider);
-    }
-
-    /**
-     * @Route("/{menuName}/create_divider/{parentKey}", name="oro_navigation_user_menu_create_divider")
-     * @Template("OroNavigationBundle:UserMenu:update.html.twig")
-     *
-     * @param string $menuName
-     * @param string $parentKey
-     *
-     * @return RedirectResponse
-     */
-    public function createDividerAction($menuName, $parentKey = null)
-    {
-        return $this->createAction($menuName, $parentKey, true);
+        return parent::create($menuName, $parentKey, $this->getOwnerId());
     }
 
     /**
@@ -91,6 +67,30 @@ class UserMenuController extends AbstractMenuController
      */
     public function updateAction($menuName, $key)
     {
-        return parent::updateAction($menuName, $key);
+        return parent::update($menuName, $key, $this->getOwnerId());
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function getOwnershipType()
+    {
+        return $this->getOwnershipProvider()->getType();
+    }
+
+    /**
+     * @return int|null
+     */
+    protected function getOwnerId()
+    {
+        return $this->getOwnershipProvider()->getId();
+    }
+
+    /**
+     * @return \Oro\Bundle\NavigationBundle\Menu\Provider\UserOwnershipProvider
+     */
+    protected function getOwnershipProvider()
+    {
+        return $this->get('oro_navigation.ownership_provider.user');
     }
 }

@@ -6,36 +6,31 @@ use Knp\Menu\ItemInterface;
 
 use Symfony\Component\Translation\TranslatorInterface;
 
-use Oro\Component\Tree\Handler\AbstractTreeHandler;
-
-class MenuUpdateTreeHandler extends AbstractTreeHandler
+class MenuUpdateTreeHandler
 {
     const MENU_ITEM_DIVIDER_LABEL = '---------------';
+    const ROOT_PARENT_VALUE = '#';
 
     /**
      * @var TranslatorInterface
      */
     protected $translator;
 
+
     /**
      * @param TranslatorInterface $translator
      */
-    public function setTranslator(TranslatorInterface $translator)
+    public function __construct(TranslatorInterface $translator)
     {
         $this->translator = $translator;
     }
 
     /**
-     * {@inheritdoc}
+     * @param ItemInterface|null $root
+     * @param bool               $includeRoot
+     * @return array
      */
-    protected function moveProcessing($entityId, $parentId, $position)
-    {
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function createTree($root = null, $includeRoot = true)
+    public function createTree(ItemInterface $root = null, $includeRoot = true)
     {
         if ($root === null) {
             return [];
@@ -47,11 +42,11 @@ class MenuUpdateTreeHandler extends AbstractTreeHandler
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @param ItemInterface $root
+     * @param bool          $includeRoot
+     * @return array
      */
-    protected function getNodes($root, $includeRoot)
+    protected function getNodes(ItemInterface $root, $includeRoot)
     {
         $nodes = [];
         if ($includeRoot) {
@@ -68,7 +63,10 @@ class MenuUpdateTreeHandler extends AbstractTreeHandler
     }
 
     /**
-     * {@inheritdoc}
+     * @param array         $entities
+     * @param ItemInterface $root
+     * @param string        $includeRoot
+     * @return array
      */
     protected function formatTree(array $entities, $root, $includeRoot)
     {
@@ -78,7 +76,11 @@ class MenuUpdateTreeHandler extends AbstractTreeHandler
             $node = $this->formatEntity($entity);
 
             if ($entity === $root) {
-                $node['parent'] = self::ROOT_PARENT_VALUE;
+                if ($includeRoot) {
+                    $node['parent'] = self::ROOT_PARENT_VALUE;
+                } else {
+                    continue;
+                }
             }
 
             $formattedTree[] = $node;
@@ -88,13 +90,13 @@ class MenuUpdateTreeHandler extends AbstractTreeHandler
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @param ItemInterface $entity
+     * @return array
      */
     protected function formatEntity($entity)
     {
         $isDivider = $entity->getExtra('divider', false);
+        // todo consider to remove translator from here
         $text = $isDivider ? self::MENU_ITEM_DIVIDER_LABEL : $this->translator->trans($entity->getLabel());
 
         return [

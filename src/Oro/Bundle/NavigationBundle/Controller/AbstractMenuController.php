@@ -2,19 +2,14 @@
 
 namespace Oro\Bundle\NavigationBundle\Controller;
 
-use Knp\Menu\ItemInterface;
-
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\RedirectResponse;
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
-use Oro\Bundle\NavigationBundle\Menu\Provider\OwnershipProviderInterface;
+use Oro\Bundle\NavigationBundle\Utils\MenuUpdateUtils;
 use Oro\Bundle\NavigationBundle\Entity\MenuUpdateInterface;
 use Oro\Bundle\NavigationBundle\Entity\MenuUpdate;
 use Oro\Bundle\NavigationBundle\Form\Type\MenuUpdateType;
-use Oro\Bundle\NavigationBundle\JsTree\MenuUpdateTreeHandler;
 use Oro\Bundle\NavigationBundle\Manager\MenuUpdateManager;
-use Oro\Bundle\NavigationBundle\Utils\MenuUpdateUtils;
 
 abstract class AbstractMenuController extends Controller
 {
@@ -24,157 +19,131 @@ abstract class AbstractMenuController extends Controller
     protected $manager;
 
     /**
-     * @return OwnershipProviderInterface
+     * @return string
      */
-    abstract protected function getOwnershipProvider();
+    abstract protected function getOwnershipType();
 
     /**
      * @return array
      */
-    public function indexAction()
+    protected function index()
     {
         return [
-            'ownershipType' => $this->getOwnershipProvider()->getType(),
+            'ownershipType' => $this->getOwnershipType(),
             'entityClass' => MenuUpdate::class
         ];
     }
 
     /**
      * @param string $menuName
-     *
-     * @return array|RedirectResponse
+     * @return array
      */
-    public function viewAction($menuName)
+    protected function view($menuName)
     {
         $menu = $this->getMenu($menuName);
 
-        return $this->getResponse(['entity' => $menu], $menu);
-    }
-
-    /**
-     * @param string $menuName
-     * @param string|null $parentKey
-     * @param bool $isDivider
-     *
-     * @return array|RedirectResponse
-     */
-    public function createAction($menuName, $parentKey = null, $isDivider = false)
-    {
-        $provider = $this->getOwnershipProvider();
-        /** @var MenuUpdate $menuUpdate */
-        $menuUpdate = $this->getManager()->createMenuUpdate($provider->getType(), $provider->getId(), null, true);
-
-        if ($isDivider) {
-            $menuUpdate->setDivider($isDivider);
-            $menuUpdate->setDefaultTitle(MenuUpdateTreeHandler::MENU_ITEM_DIVIDER_LABEL);
-            $menuUpdate->setUri('#');
-        }
-
-        if ($parentKey) {
-            $parent = $this->getMenuUpdate($menuName, $parentKey, true);
-            $menuUpdate->setParentKey($parent->getKey());
-        }
-
-        $menuUpdate->setMenu($menuName);
-
-        $menu = $this->getMenu($menuName);
-
-        return $this->getResponse($this->update($menuUpdate), $menu);
-    }
-
-    /**
-     * @param string $menuName
-     * @param string $key
-     *
-     * @return array|RedirectResponse
-     */
-    public function updateAction($menuName, $key)
-    {
-        $menuUpdate = $this->getMenuUpdate($menuName, $key, true);
-        $menu = $this->getMenu($menuName);
-        $menuItem = MenuUpdateUtils::findMenuItem($menu, $menuUpdate->getKey());
-
-        return $this->getResponse($this->update($menuUpdate, $menuItem), $menu, $menuItem);
-    }
-
-    /**
-     * @param MenuUpdateInterface $menuUpdate
-     * @param ItemInterface|null $menuItem
-     *
-     * @return array|RedirectResponse
-     */
-    protected function update(MenuUpdateInterface $menuUpdate, ItemInterface $menuItem = null)
-    {
-        $options = [
-            'menu_item' => $menuItem,
+        return [
+            'entity' => $menu,
+            'ownershipType' => $this->getOwnershipType(),
+            'tree' => $this->createMenuTree($menu)
         ];
-        $form = $this->createForm(MenuUpdateType::NAME, $menuUpdate, $options);
-
-        return $this->get('oro_form.model.update_handler')->update(
-            $menuUpdate,
-            $form,
-            $this->get('translator')->trans('oro.navigation.menuupdate.saved_message')
-        );
     }
 
     /**
-     * @param array|RedirectResponse $response
-     * @param ItemInterface $menu
-     * @param ItemInterface|null $menuItem
-     *
+     * @param string  $menuName
+     * @param string  $parentKey
+     * @param integer $ownerId
      * @return array|RedirectResponse
      */
-    private function getResponse($response, ItemInterface $menu, ItemInterface $menuItem = null)
+    protected function create($menuName, $parentKey, $ownerId)
     {
-        if (is_array($response)) {
-            $treeHandler = $this->get('oro_navigation.tree.menu_update_tree_handler');
+        /** @var MenuUpdate $menuUpdate */
+        $menuUpdate = $this->getManager()->createMenuUpdate(
+            $this->getOwnershipType(),
+            $ownerId,
+            [
+                'menu' => $menuName,
+                'parentKey' => $parentKey,
+                'custom' => true
+            ]
+        );
 
-            $response['ownershipType'] = $this->getOwnershipProvider()->getType();
-            $response['menuName'] = $menu->getName();
-            $response['tree'] = $treeHandler->createTree($menu);
-            $response['menuItem'] = $menuItem;
-        }
+        return $this->handleUpdate($menuUpdate);
 
-        return $response;
     }
 
     /**
-     * @param string $menuName
-     * @param string $key
-     * @param bool $isExist
-     *
-     * @return MenuUpdateInterface
+     * @param string  $menuName
+     * @param string  $key
+     * @param integer $ownerId
+     * @return array|RedirectResponse
      */
-    protected function getMenuUpdate($menuName, $key, $isExist = false)
+    protected function update($menuName, $key, $ownerId)
     {
-        $provider = $this->getOwnershipProvider();
-
         $menuUpdate = $this->getManager()->getMenuUpdateByKeyAndScope(
             $menuName,
             $key,
-            $provider->getType(),
-            $provider->getId()
+            $this->getOwnershipType(),
+            $ownerId
         );
 
-        if ($isExist && !$menuUpdate->getId() && $menuUpdate->isCustom()) {
+        if (!$menuUpdate->getKey()) {
             throw $this->createNotFoundException(
                 sprintf("Item \"%s\" in \"%s\" not found.", $key, $menuName)
             );
         }
 
-        return $menuUpdate;
+        return $this->handleUpdate($menuUpdate);
     }
 
     /**
-     * @param string $menuName
-     *
-     * @return ItemInterface
-     * @throws NotFoundHttpException
+     * @param $menuUpdate
+     * @return array|RedirectResponse
+     */
+    protected function handleUpdate(MenuUpdateInterface $menuUpdate)
+    {
+        $form = $this->createForm(MenuUpdateType::NAME, $menuUpdate);
+
+        $response = $this->get('oro_form.model.update_handler')->update(
+            $menuUpdate,
+            $form,
+            $this->get('translator')->trans('oro.navigation.menuupdate.saved_message')
+        );
+
+        if (is_array($response)) {
+            $menu = $this->getMenu($menuUpdate->getMenu());
+
+            $response['ownershipType'] = $this->getOwnershipType();
+            $response['menuName'] = $menu->getName();
+            $response['tree'] = $this->createMenuTree($menu);
+
+            if ($menuUpdate->isCustom()) {
+                $response['menuItem'] = null;
+            } else {
+                $response['menuItem'] = MenuUpdateUtils::findMenuItem($menu, $menuUpdate->getKey());
+            }
+        }
+
+        return $response;
+    }
+
+
+    /**
+     * @return MenuUpdateManager
+     */
+    protected function getManager()
+    {
+        return $this->get('oro_navigation.manager.menu_update_default');
+    }
+
+    /**
+     * @param $menuName
+     * @return \Knp\Menu\ItemInterface
      */
     protected function getMenu($menuName)
     {
         $options = [
-            'ownershipType' => $this->getOwnershipProvider()->getType()
+            'ownershipType' => $this->getOwnershipType()
         ];
         $menu = $this->getManager()->getMenu($menuName, $options);
         if (!count($menu->getChildren())) {
@@ -185,13 +154,12 @@ abstract class AbstractMenuController extends Controller
     }
 
     /**
-     * @return MenuUpdateManager
+     * @param $menu
+     * @return array
      */
-    protected function getManager()
+    protected function createMenuTree($menu)
     {
-        if (!$this->manager) {
-            $this->manager = $this->get('oro_navigation.manager.menu_update_default');
-        }
-        return $this->manager;
+        return $this->get('oro_navigation.tree.menu_update_tree_handler')->createTree($menu);
     }
+
 }

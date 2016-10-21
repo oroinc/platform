@@ -9,7 +9,9 @@ use Doctrine\ORM\EntityRepository;
 use Knp\Menu\ItemInterface;
 
 use Oro\Bundle\NavigationBundle\Entity\MenuUpdateInterface;
-use Oro\Bundle\NavigationBundle\Menu\Provider\OwnershipProviderInterface;
+use Oro\Bundle\NavigationBundle\Exception\NotFoundMenuException;
+use Oro\Bundle\NavigationBundle\Exception\NotFoundParentException;
+use Oro\Bundle\NavigationBundle\JsTree\MenuUpdateTreeHandler;
 use Oro\Bundle\NavigationBundle\Provider\BuilderChainProvider;
 use Oro\Bundle\NavigationBundle\Utils\MenuUpdateUtils;
 
@@ -51,21 +53,47 @@ class MenuUpdateManager
      *
      * @param int $ownershipType
      * @param int $ownerId
-     * @param string $key
-     * @param bool $custom
+     * @param array $options
      *
      * @return MenuUpdateInterface
      */
-    public function createMenuUpdate($ownershipType, $ownerId, $key = null, $custom = false)
+    public function createMenuUpdate($ownershipType, $ownerId, array $options = [])
     {
         /** @var MenuUpdateInterface $entity */
         $entity = new $this->entityClass;
         $entity
             ->setOwnershipType($ownershipType)
-            ->setOwnerId($ownerId)
-            ->setKey($key ? $key : $this->generateKey())
-            ->setCustom($custom)
-        ;
+            ->setOwnerId($ownerId);
+        if (isset($options['key'])) {
+            $entity->setKey($options['key']);
+        } else {
+            $entity->setKey($this->generateKey());
+        }
+        $isCustom = isset($options['custom']) && $options['custom'];
+        $entity->setCustom($isCustom);
+        if (isset($options['parentKey'])) {
+            $parent = $this->getMenuUpdateByKeyAndScope(
+                $options['menu'],
+                $options['parentKey'],
+                $ownershipType,
+                $ownerId
+            );
+            if (!$parent) {
+                throw new NotFoundParentException(sprintf('Parent with "%s" id not found.', $options['parentKey']));
+            }
+            $entity->setParentKey($options['parentKey']);
+        }
+        if (isset($options['menu'])) {
+            if (!$this->builderChainProvider->has($options['menu'])) {
+                throw new NotFoundMenuException(sprintf('Menu with "%s" id not found.', $options['menu']));
+            }
+            $entity->setMenu($options['menu']);
+        }
+        if (isset($options['isDivider']) && $options['isDivider']) {
+            $entity->setDivider(true);
+            $entity->setDefaultTitle(MenuUpdateTreeHandler::MENU_ITEM_DIVIDER_LABEL);
+            $entity->setUri('#');
+        }
 
         return $entity;
     }
@@ -105,9 +133,9 @@ class MenuUpdateManager
             'ownershipType' => $ownershipType,
             'ownerId' => $ownerId,
         ]);
-        
+
         if (!$update) {
-            $update = $this->createMenuUpdate($ownershipType, $ownerId, $key);
+            $update = $this->createMenuUpdate($ownershipType, $ownerId, ['key' => $key, 'menu' => $menuName]);
         }
 
         return $this->getMenuUpdateFromMenu($update, $menuName, $key, $ownershipType);
@@ -129,7 +157,7 @@ class MenuUpdateManager
         foreach ($orderedChildren as $priority => $child) {
             $order[$child->getName()] = $priority;
         }
-        
+
         /** @var MenuUpdateInterface[] $updates */
         $updates = $this->getRepository()->findBy([
             'menu' => $menuName,
@@ -137,19 +165,19 @@ class MenuUpdateManager
             'ownershipType' => $ownershipType,
             'ownerId' => $ownerId,
         ]);
-        
+
         foreach ($updates as $update) {
             $update->setPriority($order[$update->getKey()]);
             unset($orderedChildren[$order[$update->getKey()]]);
         }
 
         foreach ($orderedChildren as $priority => $child) {
-            $update = $this->createMenuUpdate($ownershipType, $ownerId, $child->getName());
+            $update = $this->createMenuUpdate($ownershipType, $ownerId, ['key' => $child->getName()]);
             MenuUpdateUtils::updateMenuUpdate($update, $child, $menuName);
             $update->setPriority($priority);
             $updates[] = $update;
         }
-        
+
         return $updates;
     }
 

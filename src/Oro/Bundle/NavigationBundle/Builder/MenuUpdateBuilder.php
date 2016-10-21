@@ -42,7 +42,7 @@ class MenuUpdateBuilder implements BuilderInterface
      *
      */
     private $providers = [];
-    
+
     /** @var LocalizationHelper */
     private $localizationHelper;
 
@@ -142,24 +142,26 @@ class MenuUpdateBuilder implements BuilderInterface
         if (!isset($this->providers[$area])) {
             return [];
         }
-        $providers = $this->providers[$area];
+        $providersByPriority = $this->providers[$area];
         // convert prioritised list to flat ordered list
-        ksort($providers, SORT_NUMERIC);
-        $filteredProviders = [];
-        foreach ($providers as $list) {
-            $filteredProviders = array_merge($filteredProviders, $list);
+        ksort($providersByPriority, SORT_NUMERIC);
+        $providers = [];
+        foreach ($providersByPriority as $list) {
+            $providers = array_merge($providers, $list);
         }
         // return all tree if ownershipType not defined
         if (null === $ownershipType) {
-            return array_reverse($filteredProviders);
+            return $providers;
         }
-        // remove ownerships higher than selected
-        $key = array_search($ownershipType, array_keys($filteredProviders), true);
-        if ($key !== false) {
-            return array_reverse(array_slice($filteredProviders, $key, null, true));
+        $result = [];
+        foreach ($providers as $key => $provider) {
+            $result[$key] = $provider;
+            if ($key === $ownershipType) {
+                break;
+            }
         }
 
-        return [];
+        return $result;
     }
 
     /**

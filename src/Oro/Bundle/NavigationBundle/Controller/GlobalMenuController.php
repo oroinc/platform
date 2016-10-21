@@ -8,7 +8,6 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
-use Oro\Bundle\NavigationBundle\Entity\MenuUpdate;
 use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
 
 /**
@@ -16,14 +15,6 @@ use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
  */
 class GlobalMenuController extends AbstractMenuController
 {
-    /**
-     * {@inheritdoc}
-     */
-    protected function getOwnershipProvider()
-    {
-        return $this->get('oro_navigation.ownership_provider.global');
-    }
-
     /**
      * @Route("/", name="oro_navigation_global_menu_index")
      * @Template
@@ -35,7 +26,7 @@ class GlobalMenuController extends AbstractMenuController
     {
         $this->checkAcl();
 
-        return parent::indexAction();
+        return $this->index();
     }
 
     /**
@@ -51,7 +42,7 @@ class GlobalMenuController extends AbstractMenuController
     {
         $this->checkAcl();
 
-        return parent::viewAction($menuName);
+        return $this->view($menuName);
     }
 
     /**
@@ -61,29 +52,14 @@ class GlobalMenuController extends AbstractMenuController
      *
      * @param string $menuName
      * @param string|null $parentKey
-     * @param bool $isDivider
      *
      * @return array|RedirectResponse
      */
-    public function createAction($menuName, $parentKey = null, $isDivider = false)
+    public function createAction($menuName, $parentKey = null)
     {
         $this->checkAcl();
 
-        return parent::createAction($menuName, $parentKey, $isDivider);
-    }
-
-    /**
-     * @Route("/{menuName}/create_divider/{parentKey}", name="oro_navigation_global_menu_create_divider")
-     * @Template("OroNavigationBundle:GlobalMenu:update.html.twig")
-     *
-     * @param string $menuName
-     * @param string $parentKey
-     *
-     * @return RedirectResponse
-     */
-    public function createDividerAction($menuName, $parentKey = null)
-    {
-        return $this->createAction($menuName, $parentKey, true);
+        return parent::create($menuName, $parentKey, $this->getOwnerId());
     }
 
     /**
@@ -100,7 +76,31 @@ class GlobalMenuController extends AbstractMenuController
     {
         $this->checkAcl();
 
-        return parent::updateAction($menuName, $key);
+        return parent::update($menuName, $key, $this->getOwnerId());
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function getOwnershipType()
+    {
+        return $this->getOwnershipProvider()->getType();
+    }
+
+    /**
+     * @return int
+     */
+    protected function getOwnerId()
+    {
+        return $this->getOwnershipProvider()->getId();
+    }
+
+    /**
+     * @return \Oro\Bundle\NavigationBundle\Menu\Provider\GlobalOwnershipProvider
+     */
+    protected function getOwnershipProvider()
+    {
+        return $this->get('oro_navigation.ownership_provider.global');
     }
 
     /**
