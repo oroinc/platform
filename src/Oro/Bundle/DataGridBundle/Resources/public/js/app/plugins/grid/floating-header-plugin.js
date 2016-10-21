@@ -123,6 +123,8 @@ define(function(require) {
         },
 
         fixHeaderCellWidth: function() {
+            mediator.trigger('gridHeaderCellWidth:beforeUpdate');
+
             this.isHeaderCellWidthFixed = true;
             this.setupCache();
             var headerCells = this.domCache.headerCells;
@@ -189,6 +191,8 @@ define(function(require) {
             this.domCache.gridContainer.css({
                 width: totalWidth
             });
+
+            mediator.trigger('gridHeaderCellWidth:updated');
 
             this.selectMode();
         },

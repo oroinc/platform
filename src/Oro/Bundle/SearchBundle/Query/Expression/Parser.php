@@ -3,9 +3,11 @@
 namespace Oro\Bundle\SearchBundle\Query\Expression;
 
 use Doctrine\Common\Collections\Expr\CompositeExpression;
+use Doctrine\Common\Collections\Expr\Comparison;
 
 use Oro\Bundle\SearchBundle\Exception\ExpressionSyntaxError;
 use Oro\Bundle\SearchBundle\Query\Criteria\Criteria;
+use Oro\Bundle\SearchBundle\Query\Criteria\ExpressionBuilder;
 use Oro\Bundle\SearchBundle\Query\Query;
 
 /**
@@ -405,55 +407,12 @@ class Parser
             'Not allowed operator'
         );
 
-        switch ($operatorToken->value) {
-            case Query::OPERATOR_CONTAINS:
-                $expr = $expr->contains($fieldName, $this->stream->current->value);
-                break;
-            case Query::OPERATOR_NOT_CONTAINS:
-                $expr = $expr->notContains($fieldName, $this->stream->current->value);
-                break;
-
-            case Query::OPERATOR_EQUALS:
-                $expr = $expr->eq($fieldName, $this->stream->current->value);
-                break;
-            case Query::OPERATOR_NOT_EQUALS:
-                $expr = $expr->neq($fieldName, $this->stream->current->value);
-                break;
-
-            case Query::OPERATOR_GREATER_THAN:
-                $expr = $expr->gt($fieldName, $this->stream->current->value);
-                break;
-            case Query::OPERATOR_GREATER_THAN_EQUALS:
-                $expr = $expr->gte($fieldName, $this->stream->current->value);
-                break;
-
-            case Query::OPERATOR_LESS_THAN:
-                $expr = $expr->lt($fieldName, $this->stream->current->value);
-                break;
-            case Query::OPERATOR_LESS_THAN_EQUALS:
-                $expr = $expr->lte($fieldName, $this->stream->current->value);
-                break;
-
-            case Query::OPERATOR_IN:
-                return [$whereType, $expr->in($fieldName, $this->parseArguments())];
-            case Query::OPERATOR_NOT_IN:
-                return [$whereType, $expr->notIn($fieldName, $this->parseArguments())];
-
-            case Query::OPERATOR_EXISTS:
-                return [$whereType, $expr->exists($fieldName)];
-            case Query::OPERATOR_NOT_EXISTS:
-                return [$whereType, $expr->notExists($fieldName)];
-
-            default:
-                throw new ExpressionSyntaxError(
-                    sprintf('Unsupported operator "%s"', $operatorToken->value),
-                    $operatorToken->cursor
-                );
+        $expression = $this->getComparisonForInAndExistsOperators($operatorToken, $expr, $fieldName);
+        if (!$expression) {
+            $expression = $this->getComparisonForOtherOperators($operatorToken, $expr, $fieldName);
         }
 
-        $this->stream->next();
-
-        return [$whereType, $expr];
+        return [$whereType, $expression];
     }
 
     /**
@@ -603,5 +562,81 @@ class Parser
         }
 
         return $exit;
+    }
+
+    /**
+     * @param Token $operatorToken
+     * @param ExpressionBuilder $expr
+     * @param string $fieldName
+     * @return Comparison
+     */
+    private function getComparisonForOtherOperators(Token $operatorToken, ExpressionBuilder $expr, $fieldName)
+    {
+
+        switch ($operatorToken->value) {
+            case Query::OPERATOR_CONTAINS:
+                $expr = $expr->contains($fieldName, $this->stream->current->value);
+                break;
+            case Query::OPERATOR_NOT_CONTAINS:
+                $expr = $expr->notContains($fieldName, $this->stream->current->value);
+                break;
+
+            case Query::OPERATOR_EQUALS:
+                $expr = $expr->eq($fieldName, $this->stream->current->value);
+                break;
+            case Query::OPERATOR_NOT_EQUALS:
+                $expr = $expr->neq($fieldName, $this->stream->current->value);
+                break;
+
+            case Query::OPERATOR_GREATER_THAN:
+                $expr = $expr->gt($fieldName, $this->stream->current->value);
+                break;
+            case Query::OPERATOR_GREATER_THAN_EQUALS:
+                $expr = $expr->gte($fieldName, $this->stream->current->value);
+                break;
+
+            case Query::OPERATOR_LESS_THAN:
+                $expr = $expr->lt($fieldName, $this->stream->current->value);
+                break;
+            case Query::OPERATOR_LESS_THAN_EQUALS:
+                $expr = $expr->lte($fieldName, $this->stream->current->value);
+                break;
+
+            default:
+                throw new ExpressionSyntaxError(
+                    sprintf('Unsupported operator "%s"', $operatorToken->value),
+                    $operatorToken->cursor
+                );
+        }
+
+        $this->stream->next();
+
+        return $expr;
+    }
+
+    /**
+     * @param Token $operatorToken
+     * @param ExpressionBuilder $expr
+     * @param string $fieldName
+     * @return Comparison
+     */
+    private function getComparisonForInAndExistsOperators(Token $operatorToken, ExpressionBuilder $expr, $fieldName)
+    {
+        switch ($operatorToken->value) {
+            case Query::OPERATOR_IN:
+                return $expr->in($fieldName, $this->parseArguments());
+
+            case Query::OPERATOR_NOT_IN:
+                return $expr->notIn($fieldName, $this->parseArguments());
+
+            case Query::OPERATOR_EXISTS:
+                return $expr->exists($fieldName);
+
+            case Query::OPERATOR_NOT_EXISTS:
+                return $expr->notExists($fieldName);
+
+            default:
+                return null;
+        }
     }
 }
