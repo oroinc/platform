@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Form\Type;
 
+use Oro\Bundle\WorkflowBundle\Helper\WorkflowTranslationHelper;
+use Symfony\Component\Form\FormView;
 use Symfony\Component\Form\PreloadedExtension;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
@@ -103,5 +105,18 @@ class WorkflowTransitionTypeTest extends AbstractWorkflowAttributesTypeTestCase
             ],
             $result
         );
+    }
+
+    public function testFinishView()
+    {
+        $view = new FormView();
+        $view->children = [new FormView()];
+        $form = $this->getMock('Symfony\Component\Form\FormInterface');
+        $this->type->finishView($view, $form, []);
+
+        foreach ($view->children as $childView) {
+            $this->assertNotEmpty($childView->vars);
+            $this->assertEquals($childView->vars['translation_domain'], WorkflowTranslationHelper::TRANSLATION_DOMAIN);
+        }
     }
 }

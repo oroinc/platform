@@ -76,7 +76,7 @@ class WorkflowAttributesType extends AbstractType
      * @param RequiredAttributesListener $requiredAttributesListener
      * @param ContextAccessor $contextAccessor
      * @param EventDispatcherInterface $dispatcher
-     * @param AuthorizationCheckerInterface $authorizationChecker
+     * @param PropertyPathSecurityHelper $propertyPathSecurityHelper
      */
     public function __construct(
         WorkflowRegistry $workflowRegistry,
