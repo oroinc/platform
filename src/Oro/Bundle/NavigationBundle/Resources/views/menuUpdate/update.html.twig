@@ -47,7 +47,7 @@
                             'dataMethod': 'PUT',
                             'dataUrl': path('oro_api_hide_menuupdates', {ownershipType: ownershipType, menuName: menuName, key: app.request.get('key')}),
                             'dataRedirect': app.request.uri,
-                            'successMessage': 'oro.navigation.menuupdate.hide_success_message'|trans()
+                            'successMessage': 'oro.navigation.menuupdate.hide_success_message'
                         }) }}
                     </div>
                 {% else %}
@@ -62,30 +62,29 @@
                             'dataMethod': 'PUT',
                             'dataUrl': path('oro_api_show_menuupdates', {ownershipType: ownershipType, menuName: menuName, key: app.request.get('key')}),
                             'dataRedirect': app.request.uri,
-                            'successMessage': 'oro.navigation.menuupdate.show_success_message'|trans()
+                            'successMessage': 'oro.navigation.menuupdate.show_success_message'
                         }) }}
                     </div>
                 {% endif %}
             {% endif %}
         {% endif %}
         {% if entity.isDivider == false %}
+            {# Create Menu Item button #}
             {% set html = UI.button({
                 'path' : menuCreatePath,
                 'aCss': 'btn-primary',
                 'label': 'oro.ui.create_entity'|trans({'%entityName%': 'oro.navigation.menuupdate.entity_label'|trans}),
                 'title': 'oro.ui.create_entity'|trans({'%entityName%': 'oro.navigation.menuupdate.entity_label'|trans})
             }) %}
-
-            {% set html = html ~ UI.button({
+            {# Create Divider button #}
+            {% set html = html ~ UI.ajaxButton({
                 'aCss': 'btn-primary no-hash menu-divider-create-button',
                 'label': 'oro.ui.create_entity'|trans({'%entityName%': 'oro.navigation.menuupdate.divider'|trans}),
                 'title': 'oro.ui.create_entity'|trans({'%entityName%': 'oro.navigation.menuupdate.divider'|trans}),
-                'data': {
-                    'method': 'POST',
-                    'url': path('oro_api_create_menuupdates', {ownershipType: ownershipType, ownerId: ownerId, menuName: menuName, parentKey: app.request.get('key'), 'isDivider': true}),
-                    'successMessage': 'oro.navigation.menuupdate.divider_created'|trans()
-                },
-                'path': 'javascript:void(0);'
+                'dataMethod': 'POST',
+                'dataUrl': path('oro_api_create_menuupdates', {ownershipType: ownershipType, ownerId: ownerId, menuName: menuName, parentKey: app.request.get('key'), 'isDivider': true}),
+                'dataRedirect': app.request.uri,
+                'successMessage': 'oro.navigation.menuupdate.divider_created'
             }) %}
 
             {% set parameters = {
@@ -169,7 +168,4 @@
     <div class="menuitem-data">
         {{ parent() }}
     </div>
-    <script type="text/javascript">
-        require(['oronavigation/js/init-layout']);
-    </script>
 {% endblock content_data %}

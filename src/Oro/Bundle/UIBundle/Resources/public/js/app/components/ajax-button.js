@@ -24,7 +24,7 @@ define(function(require) {
             url: url,
             type: method,
             success: function(data) {
-                mediator.execute('showFlashMessage', 'success', data.message ? data.message : __(successMessage));
+                mediator.execute('showFlashMessage', 'success', data && data.message ? data.message : __(successMessage));
                 mediator.execute('redirectTo', {url: redirect}, {redirect: true});
                 mediator.execute('hideLoading');
             },
