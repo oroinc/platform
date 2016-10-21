@@ -16,7 +16,7 @@ oro:
         filter.inactive: inactive
         controller:
             emailtemplate.saved.message: "Template saved"
-            job_scheduled.message: "The job has been added to the queue %link%"
+            job_scheduled.message: "The job has been added to the queue"
             job_progress: Check progress
         form:
             choose_template:                     ""

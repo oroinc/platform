@@ -8,5 +8,5 @@ class Topics
     const ADD_ASSOCIATION_TO_EMAILS = 'oro.email.add_association_to_emails';
     const UPDATE_EMAIL_OWNER_ASSOCIATIONS = 'oro.email.update_email_owner_associations';
     const SYNC_EMAIL_SEEN_FLAG = 'oro.email.sync_email_seen_flag';
-    const PURGE_EMAIL_ATTACHMENT = 'oro.email.purge_email_attachment';
+    const PURGE_EMAIL_ATTACHMENTS = 'oro.email.purge_email_attachments';
 }

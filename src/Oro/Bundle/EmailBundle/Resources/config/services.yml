@@ -355,8 +355,8 @@ services:
         tags:
             - { name: 'oro_message_queue.client.message_processor' }
 
-    oro_email.async.processor.purge_email_attachment:
-        class: 'Oro\Bundle\EmailBundle\Async\PurgeEmailAttachmentMessageProcessor'
+    oro_email.async.processor.purge_email_attachments:
+        class: 'Oro\Bundle\EmailBundle\Async\PurgeEmailAttachmentsMessageProcessor'
         arguments:
             - '@doctrine'
             - '@oro_config.global'

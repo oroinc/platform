@@ -53,19 +53,11 @@ class EmailController extends Controller
      */
     public function purgeEmailsAttachmentsAction()
     {
-        $this->getMessageProducer()->send(Topics::PURGE_EMAIL_ATTACHMENT, []);
+
+        $this->getMessageProducer()->send(Topics::PURGE_EMAIL_ATTACHMENTS, []);
 
         return new JsonResponse([
-            'message'    => $this->get('translator')->trans(
-                'oro.email.controller.job_scheduled.message',
-                [
-                    '%link%' => sprintf(
-                        '<a href="%s" class="job-view-link">%s</a>',
-                        $this->get('router')->generate('oro_message_queue_root_jobs'),
-                        $this->get('translator')->trans('oro.email.controller.job_progress')
-                    )
-                ]
-            ),
+            'message'    => $this->get('translator')->trans('oro.email.controller.job_scheduled.message'),
             'successful' => true,
         ]);
     }

@@ -14,7 +14,7 @@ use Oro\Component\MessageQueue\Transport\SessionInterface;
 use Oro\Component\MessageQueue\Util\JSON;
 use Symfony\Bridge\Doctrine\RegistryInterface;
 
-class PurgeEmailAttachmentMessageProcessor implements MessageProcessorInterface, TopicSubscriberInterface
+class PurgeEmailAttachmentsMessageProcessor implements MessageProcessorInterface, TopicSubscriberInterface
 {
     const LIMIT = 100;
 
@@ -64,7 +64,7 @@ class PurgeEmailAttachmentMessageProcessor implements MessageProcessorInterface,
      */
     public static function getSubscribedTopics()
     {
-        return [Topics::PURGE_EMAIL_ATTACHMENT];
+        return [Topics::PURGE_EMAIL_ATTACHMENTS];
     }
 
     /**
