@@ -277,7 +277,7 @@ abstract class AbstractEngine implements EngineInterface
      */
     protected function createIteratorCacheKey($entityName, $offset = null, $limit = null)
     {
-        return sprintf('%d.%d.%d', $entityName, $offset, $limit);
+        return sprintf('%s.%d.%d', $entityName, $offset, $limit);
     }
 
     /**

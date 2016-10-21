@@ -7,7 +7,7 @@ use Doctrine\Common\Persistence\ObjectManager;
 
 use JMS\JobQueueBundle\Entity\Job;
 
-use Oro\Bundle\EmailBundle\Command\ConvertEmailBodyToTextBody;
+use Oro\Bundle\EmailBundle\Command\ConvertEmailBodyToTextBodyCommand;
 
 /**
  * Adds job to collect email body representations.
@@ -20,7 +20,7 @@ class CollectEmailBodyJobFixture extends AbstractFixture
      */
     public function load(ObjectManager $manager)
     {
-        $job = new Job(ConvertEmailBodyToTextBody::COMMAND_NAME, []);
+        $job = new Job(ConvertEmailBodyToTextBodyCommand::COMMAND_NAME, []);
         $manager->persist($job);
         $manager->flush($job);
     }
