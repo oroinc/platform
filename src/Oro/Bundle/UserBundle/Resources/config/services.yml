@@ -467,3 +467,23 @@ services:
         arguments: ['@security.token_storage']
         tags:
             - { name: kernel.event_listener, event: kernel.request , method: onKernelRequest}
+
+    oro_user.security.login_attempts_provider:
+        class: Oro\Bundle\UserBundle\Security\LoginAttemptsProvider
+        arguments:
+            - '@oro_config.user'
+
+    oro_user.security.login_attempts_manager:
+        class: Oro\Bundle\UserBundle\Security\LoginAttemptsManager
+        arguments:
+            - '@oro_user.security.login_attempts_provider'
+            - '@oro_user.manager'
+            - '@oro_user.mailer.processor'
+
+    oro_user.security.login_attempts_subscriber:
+        class: Oro\Bundle\UserBundle\EventListener\LoginAttemptsSubscriber
+        arguments:
+            - '@oro_user.manager'
+            - '@oro_user.security.login_attempts_manager'
+        tags:
+            - { name: kernel.event_subscriber }
