@@ -3,7 +3,6 @@
 namespace Oro\Bundle\MessageQueueBundle\Test\Functional;
 
 use Oro\Bundle\MessageQueueBundle\Test\Assert\AbstractMessageQueueAssertTrait;
-use Oro\Bundle\MessageQueueBundle\Test\MessageCollector;
 
 /**
  * Provides useful assertion methods for the message queue related functional tests.
