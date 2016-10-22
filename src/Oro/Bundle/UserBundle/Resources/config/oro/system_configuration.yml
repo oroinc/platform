@@ -3,7 +3,7 @@ system_configuration:
         user_settings:
             icon:  icon-key
             title: oro.user.system_configuration.groups.user_settings.title
-       failed_login_limit:
+        failed_login_limit:
            icon: icon-signin
            title: oro.user.system_configuration.groups.failed_login_limit.title
         password_complexity_rules:
