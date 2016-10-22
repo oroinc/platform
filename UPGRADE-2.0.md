@@ -14,6 +14,10 @@ UPGRADE FROM 1.10 to 2.0
 - Added class `Oro\Bundle\ActionBundle\Layout\DataProvider\ActionButtonsProvider` - layout data provider.
 - Default value for parameter `applications` in operation configuration renamed from `backend` to `default`.
 
+####ApiBundle
+- The `oro.api.action_processor` DI tag was removed. To add new action processor use `oro_api.actions` section of the ApiBundle configuration.
+- The `oro_api.config_extension` DI tag was removed. To add new configuration extension use `oro_api.config_extensions` section of the ApiBundle configuration.
+
 ####WorkflowBundle
 - Class `Oro\Bundle\WorkflowBundle\Model\WorkflowManager`
     - construction signature was changed now it takes next arguments:
