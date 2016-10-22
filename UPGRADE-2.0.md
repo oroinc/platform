@@ -515,8 +515,15 @@ to the [Fallback documentation](./src/Oro/Bundle/EntityBundle/Resources/doc/enti
 - Added DOC file `doc/content_outdating.md` moved from `NavigationBundle`.
 - Added DOC file `doc/mediator-handlers.md` moved from `NavigationBundle`.
 
-####Component
+####DependencyInjection Component
 - Added trait `Oro\Component\DependencyInjection\Compiler\TaggedServicesCompilerPassTrait`
+
+####EntitySerializer Component
+- Changed signature of `transform` method of `Oro\Component\EntitySerializer\DataTransformerInterface`. Added `array $context` as the last parameter.
+- Changed signature of `post_serialize` callbacks for the EntitySerializer. Added `array $context` as the last parameter.
+- Changed signature of `post_serialize` callbacks for the EntitySerializer. Added `array $context` as the last parameter.
+- Changed signature of `serialize` method of `Oro\Component\EntitySerializer\EntitySerializer`. Added `array $context = []` as the last parameter.
+- Changed signature of `serializeEntities` method of `Oro\Component\EntitySerializer\EntitySerializer`. Added `array $context = []` as the last parameter.
 
 ####NotificationBundle
 - Moved interface `Oro\Bundle\NotificationBundle\Processor\EmailNotificationInterface` to `Oro\Bundle\NotificationBundle\Model` namespace
@@ -550,12 +557,10 @@ to the [Fallback documentation](./src/Oro/Bundle/EntityBundle/Resources/doc/enti
 - Added `Oro\Bundle\UserBundle\Validator\Constraints\PasswordComplexity` to User model
 - User password requirements are more restrictive by default and require 8 characters, an upper case letter, and a number.
 - Any new users or changing of existing passwords need to meet the password requirements specified in System Configuration/General Setup/Security Settings. Existing user passwords are not affected
+- Removed service @oro_user.password_reset.widget_provider.actions (replaced by @oro_user.forced_password_reset.widget_provider.actions)
 
 ####DemoDataBundle
 - All demo users will have passwords ending with '1Q' (e.g. for username 'marketing' password is 'marketing1Q'). For user 'sale' the password is 'salesale1Q'.
 
 ####ImapBundle
  - The command `oro:imap:clear-mailbox` was removed. Produce message to the topic `Oro\Bundle\ImapBundle\Async\Topics::CLEAR_INACTIVE_MAILBOX` instead.
-
-####UserBundle
-- Removed service @oro_user.password_reset.widget_provider.actions (replaced by @oro_user.forced_password_reset.widget_provider.actions)
