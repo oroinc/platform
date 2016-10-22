@@ -115,6 +115,7 @@ oro:
         last_name.label:             Last name
         login_count.label:           Login count
         login_disabled.label:        Login disabled
+        failed_login_count.label:    Failed login count
         middle_name.label:           Middle name
         name_prefix.label:           Name prefix
         name_suffix.label:           Name suffix
@@ -227,6 +228,7 @@ oro:
         security:
             password_changed.message: Your password was updated by administrator. New password was sent to you by email
             password_reseted.message: Your password was successfully reset. You may login now.
+            remaining_login_attempts: '{0} You have no login attempts remaining.|{1} You have one login attempt remaining.|]1,Inf[ You have %count% login attempts remaining.'
         user_bar_settings:
             title: User bar
         image.tooltip: The avatar must be in BMP, JPEG or PNG formats, and file must be less than %file_size% in size
@@ -242,3 +244,12 @@ oro:
             all_owners: All owners
             business_unit: Business Unit
             current_user: Current User
+
+        system_configuration:
+            groups:
+                user_settings.title: User Settings
+                failed_login_limit.title: Login attempts
+            fields:
+                failed_login_limit_enabled.label: Enable failed logins limit
+                failed_login_limit.label: Max login attempts
+
