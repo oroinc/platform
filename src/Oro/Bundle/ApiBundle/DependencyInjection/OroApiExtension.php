@@ -56,6 +56,7 @@ class OroApiExtension extends Extension implements PrependExtensionInterface
         $loader->load('processors.collect_subresources.yml');
         $loader->load('processors.get_config.yml');
         $loader->load('processors.get_metadata.yml');
+        $loader->load('processors.customize_loaded_data.yml');
         $loader->load('processors.get_list.yml');
         $loader->load('processors.get.yml');
         $loader->load('processors.delete.yml');
