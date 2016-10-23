@@ -179,7 +179,7 @@ api:
 Configure nested object
 -----------------------
 
-Sometime it is required to group several fields and expose them as an nested object in Data API. For example lets suppose that an entity has two fields `intervalNumber` and `intervalUnit` but you need to expose them in API as `number` and `unit` properties of `interval` fields. This can be achieved by the following configuration:
+Sometime it is required to group several fields and expose them as an nested object in Data API. For example lets suppose that an entity has two fields `intervalNumber` and `intervalUnit` but you need to expose them in API as `number` and `unit` properties of `interval` field. This can be achieved by the following configuration:
 
 ```yaml
 api:
