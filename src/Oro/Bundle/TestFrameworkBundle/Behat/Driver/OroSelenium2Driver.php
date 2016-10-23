@@ -135,11 +135,10 @@ class OroSelenium2Driver extends Selenium2Driver
      */
     protected function fillTextInput(Element $element, $value)
     {
-        $script = <<<JS
-var node = {{ELEMENT}};
-node.value = '$value';
-JS;
-        $this->executeJsOnElement($element, $script);
+        $existingValueLength = strlen($element->attribute('value'));
+        $value = str_repeat(Key::BACKSPACE . Key::DELETE, $existingValueLength) . $value;
+
+        $element->postValue(array('value' => array($value)));
     }
 
     /**

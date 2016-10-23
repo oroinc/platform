@@ -178,24 +178,4 @@ class Grid extends Element
             return $this->elementFactory->wrapElement('GridRow', $element);
         }, $this->findAll('css', 'tbody tr'));
     }
-
-    /**
-     * Try to guess type of value and return that data in that type
-     * @param string $value
-     * @return \DateTime|int|string
-     */
-    private function normalizeValueByGuessingType($value)
-    {
-        $value = trim($value);
-
-        if (preg_match('/^[0-9]+$/', $value)) {
-            return (int) $value;
-        } elseif (preg_match('/^\p{Sc}(?P<amount>[0-9]+)$/', $value, $matches)) {
-            return (int) $matches['amount'];
-        } elseif ($date = date_create($value)) {
-            return $date;
-        }
-
-        return $value;
-    }
 }

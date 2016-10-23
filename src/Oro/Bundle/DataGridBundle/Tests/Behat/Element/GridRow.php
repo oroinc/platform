@@ -35,7 +35,7 @@ class GridRow extends Element
     public function getCellValue($header)
     {
         /** @var GridHeader $gridHeader */
-        $gridHeader = $this->getElement('GridHeader');
+        $gridHeader = $this->elementFactory->createElement('GridHeader');
         $columnNumber = $gridHeader->getColumnNumber($header);
 
         return $this->normalizeValueByGuessingType(
@@ -64,7 +64,6 @@ class GridRow extends Element
 
         $this->elementFactory->createElement('OroForm')->fillField('value', $value);
         $this->getDriver()->waitForAjax();
-        echo $cell->getOuterHtml();
         $cell->find('css', 'button[title="Save changes"]')->click();
     }
 

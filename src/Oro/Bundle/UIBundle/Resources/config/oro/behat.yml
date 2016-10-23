@@ -2,3 +2,7 @@ elements:
   Entity Edit Button:
     selector: 'a.edit-button'
     class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Element
+
+  Flush Message:
+    selector: '.flash-messages-holder div.alert'
+    class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Element
