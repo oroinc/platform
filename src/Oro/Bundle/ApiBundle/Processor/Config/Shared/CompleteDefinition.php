@@ -37,7 +37,7 @@ use Oro\Bundle\EntityExtendBundle\Extend\RelationType;
  * Updates configuration of fields if other fields a linked to them using "property_path".
  * Sets "exclusion_policy = all" for the entity. It means that the configuration
  * of all fields and associations was completed.
- * Completes configuration of fields that are represented nested objects.
+ * Completes configuration of fields that represent nested objects.
  * By performance reasons all these actions are done in one processor.
  *
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)

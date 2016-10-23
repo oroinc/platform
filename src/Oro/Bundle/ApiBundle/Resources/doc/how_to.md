@@ -11,6 +11,7 @@ Table of Contents
  - [Disable entity action](#disable-entity-action)
  - [Change delete handler for entity](#change-delete-handler-for-entity)
  - [Change the maximum number of entities that can be deleted by one request](#change-the-maximum-number-of-entities-that-can-be-deleted-by-one-request)
+ - [Configure nested object](#configure-nested-object)
 
 
 Turn on API for entity
@@ -173,4 +174,49 @@ api:
             actions:
                 delete_list:
                     max_results: -1
+```
+
+Configure nested object
+-----------------------
+
+Sometime it is required to group several fields and expose them as an nested object in Data API. For example lets suppose that an entity has two fields `intervalNumber` and `intervalUnit` but you need to expose them in API as `number` and `unit` properties of `interval` fields. This can be achieved by the following configuration:
+
+```yaml
+api:
+    entities:
+        Oro\Bundle\ReminderBundle\Entity\Reminder:
+            fields:
+                interval:
+                    data_type: nestedObject
+                    form_options:
+                        data_class: Oro\Bundle\ReminderBundle\Model\ReminderInterval
+                        by_reference: false
+                    fields:
+                        number:
+                            property_path: intervalNumber
+                        unit:
+                            property_path: intervalUnit
+                intervalNumber:
+                    exclude: true
+                intervalUnit:
+                    exclude: true
+```
+
+Please note that an entity, in this example *Oro\Bundle\ReminderBundle\Entity\Reminder*, should have `setInterval` method. This method is called by **create** and **update** actions to set the nested object. 
+
+Here is an example how the nested objects looks in JSON.API:
+
+```json
+{
+  "data": {
+    "type": "reminders",
+    "id": "1",
+    "attributes": {
+      "interval": {
+        "number": 2,
+        "unit": "H"
+      }
+    }
+  }
+}
 ```

@@ -9,7 +9,7 @@ use Oro\Bundle\ApiBundle\Exception\RuntimeException;
 use Oro\Bundle\ApiBundle\Request\DataType;
 
 /**
- * Computes values of fields that represents nested objects.
+ * Computes values of fields that represent nested objects.
  */
 class BuildNestedObjects implements ProcessorInterface
 {

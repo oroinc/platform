@@ -58,3 +58,4 @@ OroApiBundle Documentation
    - [Disable entity action](./how_to.md#disable-entity-action)
    - [Change delete handler for entity](./how_to.md#change-delete-handler-for-entity)
    - [Change the maximum number of entities that can be deleted by one request](./how_to.md#change-the-maximum-number-of-entities-that-can-be-deleted-by-one-request)
+   - [Configure nested object](./how_to.md#configure-nested-object)
