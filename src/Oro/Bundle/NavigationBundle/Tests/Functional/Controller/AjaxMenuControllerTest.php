@@ -2,8 +2,6 @@
 
 namespace Oro\Bundle\NavigationBundle\Tests\Functional\Controller;
 
-use Doctrine\ORM\EntityRepository;
-
 use Oro\Bundle\NavigationBundle\Menu\Provider\GlobalOwnershipProvider;
 use Oro\Bundle\NavigationBundle\Menu\Provider\UserOwnershipProvider;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
