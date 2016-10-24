@@ -120,7 +120,7 @@ class TranslationProcessorTest extends \PHPUnit_Framework_TestCase
                 ],
                 'transition2' => [
                     'label' => 'transition2_stored_label_key',
-                    'message' => 'message2_stored_label_key',
+                    'message' => 'oro.workflow.test_workflow.transition.transition2.warning_message',
                 ]
             ],
             'steps' => [
@@ -187,7 +187,7 @@ class TranslationProcessorTest extends \PHPUnit_Framework_TestCase
                     ['message2_stored_label_key', 'test_workflow', null, 'message2_stored_label_key'],
                     //same means no translation found
                     ['attribute1_stored_label_key', 'test_workflow', null, 'translated_attribute1_stored_label_key'],
-                    [null, null]
+                    [null, null, null]
                 ],
                 $expected
             ]
