@@ -10,29 +10,27 @@ use Symfony\Component\DependencyInjection\Reference;
 class AssertTaggedServicesCompilerPass extends \PHPUnit_Framework_TestCase
 {
     /**
-     * @var string
-     */
-    protected $compilerPassClassName = '';
-
-    /**
-     * @param string $compilerPassClassName
+     * @param CompilerPassInterface $compilerPass
      * @param string $serviceId
      * @param string $tagName
      * @param string $addMethodName
      */
-    public function assertContainerConfigured($compilerPassClassName, $serviceId, $tagName, $addMethodName)
-    {
-        $this->compilerPassClassName = $compilerPassClassName;
-        
-        $this->assetProcessSkipWithoutServiceDefinition($serviceId);
-        $this->assertProcessSkipWithoutTaggedServices($serviceId, $tagName);
-        $this->assertProcess($serviceId, $tagName, $addMethodName);
+    public function assertTaggedServicesRegistered(
+        CompilerPassInterface $compilerPass,
+        $serviceId,
+        $tagName,
+        $addMethodName
+    ) {
+        $this->assetProcessSkipWithoutServiceDefinition($compilerPass, $serviceId);
+        $this->assertProcessSkipWithoutTaggedServices($compilerPass, $serviceId, $tagName);
+        $this->assertProcess($compilerPass, $serviceId, $tagName, $addMethodName);
     }
 
     /**
+     * @param CompilerPassInterface $compilerPass
      * @param string $serviceId
      */
-    private function assetProcessSkipWithoutServiceDefinition($serviceId)
+    private function assetProcessSkipWithoutServiceDefinition(CompilerPassInterface $compilerPass, $serviceId)
     {
         /** @var ContainerBuilder|\PHPUnit_Framework_MockObject_MockObject $containerBuilder */
         $containerBuilder = $this->getMockBuilder('Symfony\Component\DependencyInjection\ContainerBuilder')
@@ -44,16 +42,15 @@ class AssertTaggedServicesCompilerPass extends \PHPUnit_Framework_TestCase
             ->with($serviceId)
             ->willReturn(false);
 
-        /** @var CompilerPassInterface $compilerPass */
-        $compilerPass = new $this->compilerPassClassName;
         $compilerPass->process($containerBuilder);
     }
 
     /**
+     * @param CompilerPassInterface $compilerPass
      * @param string $serviceId
      * @param string $tagName
      */
-    private function assertProcessSkipWithoutTaggedServices($serviceId, $tagName)
+    private function assertProcessSkipWithoutTaggedServices(CompilerPassInterface $compilerPass, $serviceId, $tagName)
     {
         /** @var ContainerBuilder|\PHPUnit_Framework_MockObject_MockObject $containerBuilder */
         $containerBuilder = $this->getMockBuilder('Symfony\Component\DependencyInjection\ContainerBuilder')
@@ -74,17 +71,16 @@ class AssertTaggedServicesCompilerPass extends \PHPUnit_Framework_TestCase
             ->method('getDefinition')
             ->with($serviceId);
 
-        /** @var CompilerPassInterface $compilerPass */
-        $compilerPass = new $this->compilerPassClassName;
         $compilerPass->process($containerBuilder);
     }
 
     /**
+     * @param CompilerPassInterface $compilerPass
      * @param string $serviceId
      * @param string $tagName
      * @param string $addMethodName
      */
-    private function assertProcess($serviceId, $tagName, $addMethodName)
+    private function assertProcess(CompilerPassInterface $compilerPass, $serviceId, $tagName, $addMethodName)
     {
         $service = $this->getMockBuilder(Definition::class)
             ->disableOriginalConstructor()
@@ -133,8 +129,6 @@ class AssertTaggedServicesCompilerPass extends \PHPUnit_Framework_TestCase
             ->with($serviceId)
             ->willReturn($service);
 
-        /** @var CompilerPassInterface $compilerPass */
-        $compilerPass = new $this->compilerPassClassName;
         $compilerPass->process($containerBuilder);
     }
 }
