@@ -64,12 +64,12 @@ class TranslationProcessor implements ConfigurationHandlerInterface, WorkflowDef
     public function translateWorkflowDefinitionFields(WorkflowDefinition $workflowDefinition)
     {
         //important to prefetch all translations as getTranslation retrieves them form local instance-level cache
-        $this->translationHelper->prepareTranslations($workflowDefinition->getName());
+        $workflowName = $workflowDefinition->getName();
 
         $workflowDefinitionFieldsIterator = new WorkflowDefinitionTranslationFieldsIterator($workflowDefinition);
 
         foreach ($workflowDefinitionFieldsIterator as $keyValue) {
-            $fieldTranslation = $this->translationHelper->getTranslation($keyValue);
+            $fieldTranslation = $this->translationHelper->findWorkflowTranslation($keyValue, $workflowName);
             //if no translation comes - sets empty string
             $fieldTranslation = $fieldTranslation !== $keyValue ? $fieldTranslation : '';
             $workflowDefinitionFieldsIterator->writeCurrent((string)$fieldTranslation);

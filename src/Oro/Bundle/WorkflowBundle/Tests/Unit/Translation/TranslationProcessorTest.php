@@ -7,7 +7,6 @@ use Oro\Bundle\WorkflowBundle\Configuration\WorkflowDefinitionBuilderExtensionIn
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowStep;
 use Oro\Bundle\WorkflowBundle\Helper\WorkflowTranslationHelper;
-use Oro\Bundle\WorkflowBundle\Model\Workflow;
 use Oro\Bundle\WorkflowBundle\Translation\TranslationProcessor;
 
 class TranslationProcessorTest extends \PHPUnit_Framework_TestCase
@@ -56,7 +55,7 @@ class TranslationProcessorTest extends \PHPUnit_Framework_TestCase
 
     public function testHandle()
     {
-        $configuration = ['name' => 'test_workflow', 'label' => 'wflabel'];
+        $configuration = ['name' => 'test_workflow', null, 'label' => 'wflabel'];
 
         $this->translationHelper->expects($this->at(0))
             ->method('saveTranslation')
@@ -87,8 +86,7 @@ class TranslationProcessorTest extends \PHPUnit_Framework_TestCase
         array $values,
         WorkflowDefinition $expected
     ) {
-        $this->translationHelper->expects($this->once())->method('prepareTranslations')->with($definition->getName());
-        $this->translationHelper->expects($this->any())->method('getTranslation')->willReturnMap($values);
+        $this->translationHelper->expects($this->any())->method('findWorkflowTranslation')->willReturnMap($values);
 
         $this->processor->translateWorkflowDefinitionFields($definition);
 
@@ -130,15 +128,10 @@ class TranslationProcessorTest extends \PHPUnit_Framework_TestCase
                 'step2' => []
             ],
             'attributes' => [
-                'attribute1' => [
-                    'label' => 'attribute1_stored_label_key'
-                ],
-                'attribute2' => [
-                    //null case
-                ]
+                'attribute1' => ['label' => 'attribute1_stored_label_key'],
+                'attribute2' => [/*null case*/]
             ]
         ]);
-
         $expected = new WorkflowDefinition();
         $expected->setName('test_workflow');
         $expected->setLabel('translated_label_key');
@@ -165,20 +158,12 @@ class TranslationProcessorTest extends \PHPUnit_Framework_TestCase
                 ]
             ],
             'steps' => [ //this node would have same values as entities
-                'step1' => [
-                    'label' => 'translated_step1_stored_label_key'
-                ],
-                'step2' => [
-                    'label' => 'translated_step2_stored_label_key'
-                ]
+                'step1' => ['label' => 'translated_step1_stored_label_key'],
+                'step2' => ['label' => 'translated_step2_stored_label_key']
             ],
             'attributes' => [
-                'attribute1' => [
-                    'label' => 'translated_attribute1_stored_label_key'
-                ],
-                'attribute2' => [
-                    'label' => '' //null value case
-                ]
+                'attribute1' => ['label' => 'translated_attribute1_stored_label_key'],
+                'attribute2' => ['label' => '']
 
             ]
         ]);
@@ -187,15 +172,21 @@ class TranslationProcessorTest extends \PHPUnit_Framework_TestCase
             'full case' => [
                 $definition,
                 [
-                    ['stored_label_key1', 'translated_label_key'],
-                    ['step1_stored_label_key', 'translated_step1_stored_label_key'],
-                    ['step2_stored_label_key', 'translated_step2_stored_label_key'],
-                    ['transition1_stored_label_key', 'translated_transition1_stored_label_key'],
-                    ['message1_stored_label_key', 'translated_message1_stored_label_key'],
-                    ['transition1_attribute1_stored_label_key', 'translated_transition1_attribute1_stored_label_key'],
-                    ['transition2_stored_label_key', 'translated_transition2_stored_label_key'],
-                    ['message2_stored_label_key', 'message2_stored_label_key'], //same means no translation found
-                    ['attribute1_stored_label_key', 'translated_attribute1_stored_label_key'],
+                    ['stored_label_key1', 'test_workflow', null, 'translated_label_key'],
+                    ['step1_stored_label_key', 'test_workflow', null, 'translated_step1_stored_label_key'],
+                    ['step2_stored_label_key', 'test_workflow', null, 'translated_step2_stored_label_key'],
+                    ['transition1_stored_label_key', 'test_workflow', null, 'translated_transition1_stored_label_key'],
+                    ['message1_stored_label_key', 'test_workflow', null, 'translated_message1_stored_label_key'],
+                    [
+                        'transition1_attribute1_stored_label_key',
+                        'test_workflow',
+                        null,
+                        'translated_transition1_attribute1_stored_label_key'
+                    ],
+                    ['transition2_stored_label_key', 'test_workflow', null, 'translated_transition2_stored_label_key'],
+                    ['message2_stored_label_key', 'test_workflow', null, 'message2_stored_label_key'],
+                    //same means no translation found
+                    ['attribute1_stored_label_key', 'test_workflow', null, 'translated_attribute1_stored_label_key'],
                     [null, null]
                 ],
                 $expected

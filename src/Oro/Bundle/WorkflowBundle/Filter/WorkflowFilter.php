@@ -30,12 +30,10 @@ class WorkflowFilter extends EntityFilter
     public function __construct(
         FormFactoryInterface $factory,
         FilterUtility $util,
-        TranslationKeyGenerator $generator,
         WorkflowTranslationHelper $translationHelper
     ) {
         parent::__construct($factory, $util);
 
-        $this->generator = $generator;
         $this->translationHelper = $translationHelper;
     }
 
