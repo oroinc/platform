@@ -15,9 +15,11 @@ class ValidateRequestData extends BaseProcessor
      */
     protected function validatePrimaryDataObject(array $data, $pointer)
     {
-        if ($this->validateRequired($data, JsonApiDoc::TYPE, $pointer)) {
+        if ($this->validateRequired($data, JsonApiDoc::TYPE, $pointer)
+            && $this->validateNotBlankString($data, JsonApiDoc::TYPE, $pointer)
+        ) {
             $this->validatePrimaryDataObjectType($data, $pointer);
         }
-        $this->validateId($data, $pointer);
+        $this->validateNotBlankString($data, JsonApiDoc::ID, $pointer);
     }
 }

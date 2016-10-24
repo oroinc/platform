@@ -44,6 +44,9 @@ class ValidateRequestDataTest extends FormProcessorTestCase
     {
         return [
             [
+                ['data' => ['type' => 'products']]
+            ],
+            [
                 ['data' => ['type' => 'products', 'attributes' => ['test' => null]]]
             ],
             [
@@ -52,13 +55,45 @@ class ValidateRequestDataTest extends FormProcessorTestCase
             [
                 ['data' => ['type' => 'products', 'relationships' => ['test' => ['data' => []]]]]
             ],
+            [
+                [
+                    'data'     => ['type' => 'products'],
+                    'included' => [
+                        ['type' => 'products', 'id' => '10']
+                    ]
+                ]
+            ],
+            [
+                [
+                    'data'     => ['type' => 'products'],
+                    'included' => [
+                        ['type' => 'products', 'id' => '10', 'attributes' => ['test' => null]]
+                    ]
+                ]
+            ],
+            [
+                [
+                    'data'     => ['type' => 'products'],
+                    'included' => [
+                        ['type' => 'products', 'id' => '10', 'relationships' => ['test' => ['data' => null]]]
+                    ]
+                ]
+            ],
+            [
+                [
+                    'data'     => ['type' => 'products'],
+                    'included' => [
+                        ['type' => 'products', 'id' => '10', 'relationships' => ['test' => ['data' => []]]]
+                    ]
+                ]
+            ],
         ];
     }
 
     /**
      * @dataProvider invalidRequestDataProvider
      */
-    public function testProcessWithInvalidRequestData($requestData, $expectedErrorString, $pointer, $expectedCode = 400)
+    public function testProcessWithInvalidRequestData($requestData, $expectedError, $pointer)
     {
         $this->context->setClassName('Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Product');
         $this->context->setRequestData($requestData);
@@ -71,12 +106,15 @@ class ValidateRequestDataTest extends FormProcessorTestCase
         $this->processor->process($this->context);
 
         $errors = $this->context->getErrors();
-        $this->assertCount(1, $errors);
-        $error = $errors[0];
-        $this->assertEquals($expectedCode, $error->getStatusCode());
-        $this->assertEquals('request data constraint', $error->getTitle());
-        $this->assertEquals($expectedErrorString, $error->getDetail());
-        $this->assertEquals($pointer, $error->getSource()->getPointer());
+
+        $expectedError = (array)$expectedError;
+        $pointer = (array)$pointer;
+        $this->assertCount(count($expectedError), $errors);
+        foreach ($errors as $key => $error) {
+            $this->assertEquals('request data constraint', $error->getTitle());
+            $this->assertEquals($expectedError[$key], $error->getDetail());
+            $this->assertEquals($pointer[$key], $error->getSource()->getPointer());
+        }
     }
 
     /**
@@ -202,6 +240,106 @@ class ValidateRequestDataTest extends FormProcessorTestCase
                 ],
                 'The \'id\' property should be a string',
                 '/data/relationships/test/data/0/id',
+            ],
+            [
+                ['data' => ['type' => 'products'], 'included' => null],
+                'The \'included\' property should be an array',
+                '/included'
+            ],
+            [
+                ['data' => ['type' => 'products'], 'included' => []],
+                'The \'included\' property should not be empty',
+                '/included'
+            ],
+            [
+                [
+                    'data'     => ['type' => 'products'],
+                    'included' => [
+                        []
+                    ]
+                ],
+                ['The \'type\' property is required', 'The \'id\' property is required'],
+                ['/included/0/type', '/included/0/id']
+            ],
+            [
+                [
+                    'data'     => ['type' => 'products'],
+                    'included' => [
+                        ['type' => 'products']
+                    ]
+                ],
+                'The \'id\' property is required',
+                '/included/0/id'
+            ],
+            [
+                [
+                    'data'     => ['type' => 'products'],
+                    'included' => [
+                        ['type' => 'products', 'id' => null]
+                    ]
+                ],
+                'The \'id\' property should not be null',
+                '/included/0/id'
+            ],
+            [
+                [
+                    'data'     => ['type' => 'products'],
+                    'included' => [
+                        ['type' => 'products', 'id' => '']
+                    ]
+                ],
+                'The \'id\' property should not be blank',
+                '/included/0/id'
+            ],
+            [
+                [
+                    'data'     => ['type' => 'products'],
+                    'included' => [
+                        ['type' => 'products', 'id' => ' ']
+                    ]
+                ],
+                'The \'id\' property should not be blank',
+                '/included/0/id'
+            ],
+            [
+                [
+                    'data'     => ['type' => 'products'],
+                    'included' => [
+                        ['id' => '10']
+                    ]
+                ],
+                'The \'type\' property is required',
+                '/included/0/type'
+            ],
+            [
+                [
+                    'data'     => ['type' => 'products'],
+                    'included' => [
+                        ['type' => null, 'id' => '10']
+                    ]
+                ],
+                'The \'type\' property should not be null',
+                '/included/0/type'
+            ],
+            [
+                [
+                    'data'     => ['type' => 'products'],
+                    'included' => [
+                        ['type' => '', 'id' => '10']
+                    ]
+                ],
+                'The \'type\' property should not be blank',
+                '/included/0/type'
+            ],
+            [
+                [
+                    'data'     => ['type' => 'products'],
+                    'included' => [
+                        ['type' => ' ', 'id' => '10']
+                    ]
+                ],
+                'The \'type\' property should not be blank',
+                '/included/0/type'
             ],
         ];
     }

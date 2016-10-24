@@ -69,7 +69,7 @@ class ValidateRequestDataTest extends FormProcessorTestCase
     /**
      * @dataProvider invalidRequestDataProvider
      */
-    public function testProcessWithInvalidRequestData($requestData, $expectedErrorString, $pointer, $expectedCode = 400)
+    public function testProcessWithInvalidRequestData($requestData, $expectedError, $pointer)
     {
         $this->context->setClassName('Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Product');
         $this->context->setRequestData($requestData);
@@ -82,12 +82,15 @@ class ValidateRequestDataTest extends FormProcessorTestCase
         $this->processor->process($this->context);
 
         $errors = $this->context->getErrors();
-        $this->assertCount(1, $errors);
-        $error = $errors[0];
-        $this->assertEquals($expectedCode, $error->getStatusCode());
-        $this->assertEquals('request data constraint', $error->getTitle());
-        $this->assertEquals($expectedErrorString, $error->getDetail());
-        $this->assertEquals($pointer, $error->getSource()->getPointer());
+
+        $expectedError = (array)$expectedError;
+        $pointer = (array)$pointer;
+        $this->assertCount(count($expectedError), $errors);
+        foreach ($errors as $key => $error) {
+            $this->assertEquals('request data constraint', $error->getTitle());
+            $this->assertEquals($expectedError[$key], $error->getDetail());
+            $this->assertEquals($pointer[$key], $error->getSource()->getPointer());
+        }
     }
 
     /**

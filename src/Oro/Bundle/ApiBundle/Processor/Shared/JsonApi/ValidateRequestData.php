@@ -41,12 +41,13 @@ abstract class ValidateRequestData implements ProcessorInterface
 
         $this->context = $context;
         try {
-            $pointer = $this->buildPointer('', JsonApiDoc::DATA);
+            $dataPointer = $this->buildPointer('', JsonApiDoc::DATA);
             $requestData = $context->getRequestData();
-            if ($this->validateRequestData($requestData, $pointer)) {
+            if ($this->validateRequestData($requestData, $dataPointer)) {
                 $data = $requestData[JsonApiDoc::DATA];
-                $this->validatePrimaryDataObject($data, $pointer);
-                $this->validateAttributesAndRelationships($data, $pointer);
+                $this->validatePrimaryDataObject($data, $dataPointer);
+                $this->validateAttributesAndRelationships($data, $dataPointer);
+                $this->validateIncludedObjects($requestData, '');
             }
             $this->context = null;
         } catch (\Exception $e) {
@@ -205,22 +206,40 @@ abstract class ValidateRequestData implements ProcessorInterface
     /**
      * @param array  $data
      * @param string $pointer
+     */
+    protected function validateIncludedObjects(array $data, $pointer)
+    {
+        if (array_key_exists(JsonApiDoc::INCLUDED, $data)
+            && $this->validateArray($data, JsonApiDoc::INCLUDED, $pointer, true)
+        ) {
+            $includedPointer = $this->buildPointer($pointer, JsonApiDoc::INCLUDED);
+            foreach ($data[JsonApiDoc::INCLUDED] as $key => $item) {
+                $this->validateResourceObject($item, $this->buildPointer($includedPointer, $key));
+            }
+        }
+    }
+
+    /**
+     * @param array  $data
+     * @param string $pointer
      *
      * @return bool
      */
     protected function validateResourceObject(array $data, $pointer)
     {
-        if (!$this->validateRequired($data, JsonApiDoc::ID, $pointer)) {
-            return false;
-        }
-        if (!$this->validateId($data, $pointer)) {
-            return false;
-        }
+        $isValid = true;
         if (!$this->validateRequired($data, JsonApiDoc::TYPE, $pointer)) {
-            return false;
+            $isValid = false;
+        } elseif (!$this->validateNotBlankString($data, JsonApiDoc::TYPE, $pointer)) {
+            $isValid = false;
+        }
+        if (!$this->validateRequired($data, JsonApiDoc::ID, $pointer)) {
+            $isValid = false;
+        } elseif (!$this->validateNotBlankString($data, JsonApiDoc::ID, $pointer)) {
+            $isValid = false;
         }
 
-        return true;
+        return $isValid;
     }
 
     /**
@@ -246,13 +265,13 @@ abstract class ValidateRequestData implements ProcessorInterface
 
     /**
      * @param array  $data
+     * @param string $property
      * @param string $pointer
      *
      * @return bool
      */
-    protected function validateId(array $data, $pointer)
+    protected function validateNotBlankString(array $data, $property, $pointer)
     {
-        $property = JsonApiDoc::ID;
         if (array_key_exists($property, $data)) {
             $value = $data[$property];
             if (null === $value) {

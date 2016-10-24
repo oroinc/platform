@@ -64,7 +64,7 @@ class ValidateRequestDataTest extends FormProcessorTestCase
     /**
      * @dataProvider invalidRequestDataProvider
      */
-    public function testProcessWithInvalidRequestData($requestData, $expectedErrorString, $pointer)
+    public function testProcessWithInvalidRequestData($requestData, $expectedError, $pointer)
     {
         $this->context->setId('1');
         $this->context->setClassName('Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Product');
@@ -76,11 +76,17 @@ class ValidateRequestDataTest extends FormProcessorTestCase
             ->willReturn('Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Product');
 
         $this->processor->process($this->context);
+
         $errors = $this->context->getErrors();
-        $this->assertCount(1, $errors);
-        $expectedError = $errors[0];
-        $this->assertEquals($expectedErrorString, $expectedError->getDetail());
-        $this->assertEquals($pointer, $expectedError->getSource()->getPointer());
+
+        $expectedError = (array)$expectedError;
+        $pointer = (array)$pointer;
+        $this->assertCount(count($expectedError), $errors);
+        foreach ($errors as $key => $error) {
+            $this->assertEquals('request data constraint', $error->getTitle());
+            $this->assertEquals($expectedError[$key], $error->getDetail());
+            $this->assertEquals($pointer[$key], $error->getSource()->getPointer());
+        }
     }
 
     /**
@@ -89,7 +95,11 @@ class ValidateRequestDataTest extends FormProcessorTestCase
     public function invalidRequestDataProvider()
     {
         return [
-            [['data' => ['attributes' => ['foo' => 'bar']]], 'The \'id\' property is required', '/data/id'],
+            [
+                ['data' => ['attributes' => ['foo' => 'bar']]],
+                ['The \'type\' property is required', 'The \'id\' property is required'],
+                ['/data/type', '/data/id']
+            ],
             [
                 ['data' => ['id' => null, 'type' => 'products', 'attributes' => ['test' => null]]],
                 'The \'id\' property should not be null',
