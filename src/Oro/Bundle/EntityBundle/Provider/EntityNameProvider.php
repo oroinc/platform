@@ -4,7 +4,8 @@ namespace Oro\Bundle\EntityBundle\Provider;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\Common\Util\ClassUtils;
-use Doctrine\Common\Util\Inflector;
+
+use Symfony\Component\PropertyAccess\PropertyAccess;
 
 class EntityNameProvider implements EntityNameProviderInterface
 {
@@ -14,12 +15,16 @@ class EntityNameProvider implements EntityNameProviderInterface
     /** @var ManagerRegistry */
     protected $doctrine;
 
+    /** @var PropertyAccess */
+    protected $accessor;
+
     /**
      * @param ManagerRegistry $doctrine
      */
     public function __construct(ManagerRegistry $doctrine)
     {
         $this->doctrine = $doctrine;
+        $this->accessor = PropertyAccess::createPropertyAccessor();
     }
 
     /**
@@ -28,11 +33,11 @@ class EntityNameProvider implements EntityNameProviderInterface
     public function getName($format, $locale, $entity)
     {
         if ($format === self::SHORT) {
-            return $this->getConstructedName($entity, [$this->getFieldName(ClassUtils::getClass($entity))]);
+            return $this->getConstructedName($entity, [$this->getFieldName(ClassUtils::getClass($entity))], false);
         }
 
         if ($format === self::FULL) {
-            return $this->getConstructedName($entity, $this->getFieldNames(ClassUtils::getClass($entity)));
+            return $this->getConstructedName($entity, $this->getFieldNames(ClassUtils::getClass($entity)), true);
         }
 
         return false;
@@ -107,13 +112,7 @@ class EntityNameProvider implements EntityNameProviderInterface
      */
     protected function getFieldValue($entity, $fieldName)
     {
-        $getterName = 'get' . Inflector::classify($fieldName);
-
-        if (method_exists($entity, $getterName)) {
-            return $entity->$getterName();
-        }
-
-        return null;
+        return $this->accessor->getValue($entity, $fieldName);
     }
 
     /**
@@ -140,10 +139,11 @@ class EntityNameProvider implements EntityNameProviderInterface
      *
      * @param $entity
      * @param $fieldNames
+     * @param bool $full Return name from all fields or just the first non-empty
      *
      * @return string|bool Constructed Name or FALSE if fails
      */
-    protected function getConstructedName($entity, $fieldNames)
+    protected function getConstructedName($entity, $fieldNames, $full = false)
     {
         $fieldValues = [];
         foreach ($fieldNames as $field) {
@@ -156,6 +156,6 @@ class EntityNameProvider implements EntityNameProviderInterface
             return false;
         }
 
-        return implode(' ', $fieldValues);
+        return $full ? $fieldValues[0] : implode(' ', $fieldValues);
     }
 }
