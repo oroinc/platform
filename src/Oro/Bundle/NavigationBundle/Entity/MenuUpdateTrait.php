@@ -60,7 +60,7 @@ trait MenuUpdateTrait
     /**
      * @var string
      *
-     * @ORM\Column(name="uri", type="string", length=255, nullable=true)
+     * @ORM\Column(name="uri", type="string", length=1023, nullable=true)
      */
     protected $uri;
 
@@ -84,6 +84,13 @@ trait MenuUpdateTrait
      * @ORM\Column(name="owner_id", type="integer", nullable=true)
      */
     protected $ownerId;
+
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="icon", type="string", length=150, nullable=true)
+     */
+    protected $icon;
 
     /**
      * @var bool
@@ -333,6 +340,27 @@ trait MenuUpdateTrait
 
         return $this;
     }
+
+    /**
+     * @return string
+     */
+    public function getIcon()
+    {
+        return $this->icon;
+    }
+
+    /**
+     * @param string $icon
+     *
+     * @return MenuUpdateInterface
+     */
+    public function setIcon($icon)
+    {
+        $this->icon = $icon;
+
+        return $this;
+    }
+
 
     /**
      * @return boolean

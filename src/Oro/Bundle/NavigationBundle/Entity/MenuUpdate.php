@@ -95,6 +95,10 @@ class MenuUpdate extends ExtendMenuUpdate implements
             $extras['position'] = $this->getPriority();
         }
 
+        if ($this->getIcon() !== null) {
+            $extras['icon'] = $this->getIcon();
+        }
+
         return $extras;
     }
 }

@@ -3,6 +3,7 @@
 namespace Oro\Bundle\NavigationBundle\Form\Type;
 
 use Knp\Menu\ItemInterface;
+use Oro\Bundle\FormBundle\Form\Type\OroIconType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
@@ -46,7 +47,7 @@ class MenuUpdateType extends AbstractType
                     'text',
                     [
                         'disabled' => false === $menuUpdate->isCustom(),
-                        'required' => true,
+                        'required' => false !== $menuUpdate->isCustom(),
                         'label' => 'oro.navigation.menuupdate.uri.label',
                     ]
                 );
@@ -63,6 +64,14 @@ class MenuUpdateType extends AbstractType
                     );
                 }
             }
+        );
+
+        $builder->add(
+            'icon',
+            'oro_icon_select',
+            [
+                'required' => false,
+            ]
         );
 
         $builder->add(

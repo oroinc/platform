@@ -6,7 +6,6 @@ use Knp\Menu\Loader\ArrayLoader;
 use Knp\Menu\Util\MenuManipulator;
 
 use Oro\Bundle\NavigationBundle\Tests\Unit\Entity\Stub\MenuItemStub;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Oro\Bundle\NavigationBundle\Provider\BuilderChainProvider;
 use Oro\Bundle\NavigationBundle\Menu\BuilderInterface;
 
@@ -16,11 +15,6 @@ class BuilderChainProviderTest extends \PHPUnit_Framework_TestCase
      * @var \PHPUnit_Framework_MockObject_MockObject|FactoryInterface
      */
     protected $factory;
-
-    /**
-     * @var \PHPUnit_Framework_MockObject_MockObject|EventDispatcherInterface
-     */
-    protected $eventDispatcher;
 
     /**
      * @var \PHPUnit_Framework_MockObject_MockObject|ArrayLoader
@@ -41,8 +35,6 @@ class BuilderChainProviderTest extends \PHPUnit_Framework_TestCase
     {
         $this->factory = $this->getMockBuilder('Knp\Menu\MenuFactory')
             ->getMock();
-        $this->eventDispatcher = $this->getMockBuilder('Symfony\Component\EventDispatcher\EventDispatcherInterface')
-            ->getMock();
 
         $this->loader = $this->getMockBuilder('Knp\Menu\Loader\ArrayLoader')
             ->setConstructorArgs([$this->factory])
@@ -52,7 +44,6 @@ class BuilderChainProviderTest extends \PHPUnit_Framework_TestCase
 
         $this->provider = new BuilderChainProvider(
             $this->factory,
-            $this->eventDispatcher,
             $this->loader,
             $this->manipulator
         );
@@ -71,9 +62,19 @@ class BuilderChainProviderTest extends \PHPUnit_Framework_TestCase
 
     public function testHas()
     {
-        $this->provider->addBuilder($this->getMenuBuilderMock(), 'test');
-        $this->assertTrue($this->provider->has('test'));
-        $this->assertFalse($this->provider->has('unknown'));
+        $topMenu = $this->getMockBuilder('Knp\Menu\ItemInterface')
+            ->getMock();
+        $existingMenuName = 'test';
+        $notExistingMenuName = 'unknown';
+
+        $this->factory->expects($this->once())
+            ->method('createItem')
+            ->with($notExistingMenuName)
+            ->will($this->returnValue($topMenu));
+
+        $this->provider->addBuilder($this->getMenuBuilderMock(), $existingMenuName);
+        $this->assertTrue($this->provider->has($existingMenuName));
+        $this->assertFalse($this->provider->has($notExistingMenuName));
     }
 
     /**

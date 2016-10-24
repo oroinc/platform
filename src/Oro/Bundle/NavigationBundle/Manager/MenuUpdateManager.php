@@ -66,28 +66,23 @@ class MenuUpdateManager
             ->setOwnerId($ownerId);
         if (isset($options['key'])) {
             $entity->setKey($options['key']);
-        } else {
-            $entity->setKey($this->generateKey());
         }
         $isCustom = isset($options['custom']) && $options['custom'];
         $entity->setCustom($isCustom);
-        if (isset($options['parentKey'])) {
-            $parent = $this->getMenuUpdateByKeyAndScope(
-                $options['menu'],
-                $options['parentKey'],
-                $ownershipType,
-                $ownerId
-            );
-            if (!$parent) {
-                throw new NotFoundParentException(sprintf('Parent with "%s" id not found.', $options['parentKey']));
-            }
-            $entity->setParentKey($options['parentKey']);
-        }
         if (isset($options['menu'])) {
-            if (!$this->builderChainProvider->has($options['menu'])) {
-                throw new NotFoundMenuException(sprintf('Menu with "%s" id not found.', $options['menu']));
-            }
+            $menu = $this->builderChainProvider->get($options['menu']);
+
             $entity->setMenu($options['menu']);
+
+            if (isset($options['parentKey'])) {
+                $parent = MenuUpdateUtils::findMenuItem($menu, $options['parentKey']);
+                if (!$parent) {
+                    throw new NotFoundParentException(sprintf('Parent with "%s" id not found.', $options['parentKey']));
+                }
+                $entity->setParentKey($options['parentKey']);
+            }
+        } else {
+            throw new \InvalidArgumentException('options["menu"] should be defined.');
         }
         if (isset($options['isDivider']) && $options['isDivider']) {
             $entity->setDivider(true);
@@ -172,7 +167,11 @@ class MenuUpdateManager
         }
 
         foreach ($orderedChildren as $priority => $child) {
-            $update = $this->createMenuUpdate($ownershipType, $ownerId, ['key' => $child->getName()]);
+            $update = $this->createMenuUpdate(
+                $ownershipType,
+                $ownerId,
+                ['key' => $child->getName(), 'menu' => $menuName]
+            );
             MenuUpdateUtils::updateMenuUpdate($update, $child, $menuName);
             $update->setPriority($priority);
             $updates[] = $update;
@@ -346,14 +345,6 @@ class MenuUpdateManager
     private function getEntityManager()
     {
         return $this->managerRegistry->getManagerForClass($this->entityClass);
-    }
-
-    /**
-     * @return string
-     */
-    public function generateKey()
-    {
-        return uniqid('menu_item_');
     }
 
     /**

@@ -93,4 +93,14 @@ class UserMenuController extends AbstractMenuController
     {
         return $this->get('oro_navigation.ownership_provider.user');
     }
+
+    /**
+     * {@inheritDoc}
+     */
+    protected function checkAcl()
+    {
+        if (!$this->get('oro_security.security_facade')->isGranted('oro_user_user_update')) {
+            throw $this->createAccessDeniedException();
+        }
+    }
 }

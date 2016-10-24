@@ -10,6 +10,7 @@ use Knp\Menu\Loader\ArrayLoader;
 use Knp\Menu\Provider\MenuProviderInterface;
 use Knp\Menu\Util\MenuManipulator;
 
+use Oro\Bundle\NavigationBundle\Exception\NotFoundMenuException;
 use Oro\Bundle\NavigationBundle\Menu\BuilderInterface;
 
 class BuilderChainProvider implements MenuProviderInterface
@@ -108,30 +109,7 @@ class BuilderChainProvider implements MenuProviderInterface
                 $menuData = $this->cache->fetch($alias);
                 $this->menus[$alias] = $this->loader->load($menuData);
             } else {
-                $menu = $this->factory->createItem($alias);
-
-                /** @var BuilderInterface $builder */
-                // try to find builder for the specified menu alias
-                if (array_key_exists($alias, $this->builders)) {
-                    foreach ($this->builders[$alias] as $builder) {
-                        $builder->build($menu, $options, $alias);
-                    }
-                }
-
-                // In any case we must run common builder
-                if (array_key_exists(self::COMMON_BUILDER_ALIAS, $this->builders)) {
-                    foreach ($this->builders[self::COMMON_BUILDER_ALIAS] as $builder) {
-                        $builder->build($menu, $options, $alias);
-                    }
-                }
-
-                $this->menus[$alias] = $menu;
-
-                $this->sort($menu);
-
-                if ($this->cache) {
-                    $this->cache->save($alias, $this->manipulator->toArray($menu));
-                }
+                $this->buildMenu($alias, $options);
             }
         }
 
@@ -180,6 +158,12 @@ class BuilderChainProvider implements MenuProviderInterface
     {
         $this->assertAlias($alias);
 
+        if (array_key_exists($alias, $this->builders)) {
+            return true;
+        }
+
+        $this->buildMenu($alias, $options);
+
         return array_key_exists($alias, $this->builders);
     }
 
@@ -193,6 +177,38 @@ class BuilderChainProvider implements MenuProviderInterface
     {
         if (empty($alias)) {
             throw new \InvalidArgumentException('Menu alias was not set.');
+        }
+    }
+
+    /**
+     * @param       $alias
+     * @param array $options
+     */
+    protected function buildMenu($alias, array $options)
+    {
+        $menu = $this->factory->createItem($alias);
+
+        /** @var BuilderInterface $builder */
+        // try to find builder for the specified menu alias
+        if (array_key_exists($alias, $this->builders)) {
+            foreach ($this->builders[$alias] as $builder) {
+                $builder->build($menu, $options, $alias);
+            }
+        }
+
+        // In any case we must run common builder
+        if (array_key_exists(self::COMMON_BUILDER_ALIAS, $this->builders)) {
+            foreach ($this->builders[self::COMMON_BUILDER_ALIAS] as $builder) {
+                $builder->build($menu, $options, $alias);
+            }
+        }
+
+        $this->menus[$alias] = $menu;
+
+        $this->sort($menu);
+
+        if ($this->cache) {
+            $this->cache->save($alias, $this->manipulator->toArray($menu));
         }
     }
 }
