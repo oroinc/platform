@@ -77,6 +77,21 @@ class OroEntityExtensionTest extends \PHPUnit_Framework_TestCase
                                 ]
                             ]
                         ]
+                    ],
+                    'category' => [
+                        'query' => [
+                            'select' => [
+                                'expr'         => 'target.name',
+                                'return_type'  => 'enum',
+                                'filter_by_id' => true,
+                                'label'        => 'test.product.category.label',
+                            ],
+                            'join'   => [
+                                'left' => [
+                                    ['join' => 'entity.category', 'alias' => 'target']
+                                ]
+                            ]
+                        ]
                     ]
                 ],
             ],

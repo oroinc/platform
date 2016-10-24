@@ -11,8 +11,7 @@ interface QueryFactoryInterface
      * Creating the Query wrapper object in the given
      * Datasource context.
      *
-     * @param DatagridInterface $grid
-     * @param array             $config
+     * @param array $config
      * @return SearchQueryInterface
      */
     public function create(array $config = []);

@@ -79,7 +79,6 @@ class ProcessTriggersConfigurator implements LoggerAwareInterface
      * @param array $triggersConfiguration
      * @param array|ProcessDefinition[] $definitions array of definitions for triggers
      *
-     * @return ProcessTrigger[]
      * @throws \LogicException
      */
     public function configureTriggers(array $triggersConfiguration, array $definitions)
@@ -171,7 +170,7 @@ class ProcessTriggersConfigurator implements LoggerAwareInterface
     {
         $existingTrigger->import($newTrigger);
         $this->dirty = true;
-        $this->notify('updated', $existingTrigger);
+        $this->notify($existingTrigger, 'updated');
     }
 
     /**
@@ -181,7 +180,7 @@ class ProcessTriggersConfigurator implements LoggerAwareInterface
     {
         $this->forPersist[] = $newTrigger;
         $this->dirty = true;
-        $this->notify('created', $newTrigger);
+        $this->notify($newTrigger, 'created');
     }
 
     /**
@@ -191,22 +190,26 @@ class ProcessTriggersConfigurator implements LoggerAwareInterface
     {
         $this->forRemove[] = $processTrigger;
         $this->dirty = true;
-        $this->notify('deleted', $processTrigger);
+        $this->notify($processTrigger, 'deleted');
     }
 
     /**
-     * @param string $action
      * @param ProcessTrigger $trigger
+     * @param string $action
      */
-    private function notify($action, ProcessTrigger $trigger)
+    private function notify(ProcessTrigger $trigger, $action)
     {
+        if (!$this->logger) {
+            return;
+        }
+
         $this->logger->info(
-            sprintf(
-                '>> process trigger: %s [%s] - %s',
-                $trigger->getDefinition() ? $trigger->getDefinition()->getName() : '',
-                $trigger->getEvent() ?: 'cron:' . $trigger->getCron(),
-                $action
-            )
+            '>> process trigger: {definition_name} [{type}] - {action}',
+            [
+                'definition_name' => $trigger->getDefinition() ? $trigger->getDefinition()->getName() : '',
+                'type' => $trigger->getEvent() ?: 'cron:' . $trigger->getCron(),
+                'action' => $action
+            ]
         );
     }
 
@@ -255,16 +258,18 @@ class ProcessTriggersConfigurator implements LoggerAwareInterface
                     $objectManager->remove($triggerToDelete);
                 }
             }
-            
+
             $objectManager->flush();
 
-            $this->logger->info('>> process triggers modifications stored in DB');
+            if ($this->logger) {
+                $this->logger->info('>> process triggers modifications stored in DB');
+            }
             $this->dirty = false;
-            
+
             foreach ($this->triggers as $trigger) {
                 $this->ensureSchedule($trigger);
             }
-            
+
             $this->processCronScheduler->flush();
         }
     }

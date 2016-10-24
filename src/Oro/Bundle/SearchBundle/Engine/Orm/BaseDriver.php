@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\SearchBundle\Engine\Orm;
 
+use Doctrine\Common\Collections\Expr\CompositeExpression;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\ORM\Query\Expr\Join;
@@ -19,6 +20,9 @@ use Oro\Bundle\SearchBundle\Query\Query;
  */
 abstract class BaseDriver
 {
+    const EXPRESSION_TYPE_OR  = 'OR';
+    const EXPRESSION_TYPE_AND = 'AND';
+
     /**
      * @var string
      */
@@ -48,8 +52,8 @@ abstract class BaseDriver
         }
 
         $this->associationMappings = $class->associationMappings;
-        $this->entityName = $class->name;
-        $this->em         = $em;
+        $this->entityName          = $class->name;
+        $this->em                  = $em;
     }
 
     /**
@@ -457,10 +461,16 @@ abstract class BaseDriver
         $criteria = $query->getCriteria();
 
         $whereExpression = $criteria->getWhereExpression();
-        if ($whereExpression) {
-            $visitor = new OrmExpressionVisitor($this, $qb, $setOrderBy);
-            $qb->andWhere($visitor->dispatch($whereExpression));
+        if (!$whereExpression) {
+            return;
         }
+        $visitor = new OrmExpressionVisitor($this, $qb, $setOrderBy);
+        $expressionString = $visitor->dispatch($whereExpression);
+
+        $whereExpression instanceof CompositeExpression &&
+        self::EXPRESSION_TYPE_OR === $whereExpression->getType() ?
+            $qb->orWhere($expressionString) :
+            $qb->andWhere($expressionString);
     }
 
     /**
@@ -505,7 +515,7 @@ abstract class BaseDriver
     public function addFilteringField(QueryBuilder $qb, $index, $searchCondition)
     {
         $condition = $searchCondition['condition'];
-        $type = $searchCondition['fieldType'];
+        $type      = $searchCondition['fieldType'];
 
         $qb->setParameter(
             sprintf('field%s', $index),

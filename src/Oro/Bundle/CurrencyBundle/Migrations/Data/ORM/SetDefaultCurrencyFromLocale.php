@@ -1,5 +1,5 @@
 <?php
-namespace OroCRM\Bundle\CurrencyBundle\Migrations\Data\ORM;
+namespace Oro\Bundle\CurrencyBundle\Migrations\Data\ORM;
 
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerAwareTrait;
