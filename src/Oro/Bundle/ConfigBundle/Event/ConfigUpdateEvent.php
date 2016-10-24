@@ -17,12 +17,12 @@ class ConfigUpdateEvent extends Event
     /**
      * @var string|null
      */
-    private $scope;
+    protected $scope;
 
     /**
      * @var int|null
      */
-    private $scopeId;
+    protected $scopeId;
 
     /**
      * @param ConfigChangeSet|array $changeSet
