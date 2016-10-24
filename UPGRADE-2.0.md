@@ -407,7 +407,6 @@ placeholders:
 - Added entity `Oro\Bundle\NavigationBundle\Entity\MenuUpdate` that extends `Oro\Bundle\NavigationBundle\Model\ExtendMenuUpdate` and implements `Oro\Bundle\NavigationBundle\Entity\MenuUpdateInterface`.
 - Added new exceptions:
     * `Oro\Bundle\NavigationBundle\Exception\MaxNestingLevelExceededException`
-    * `Oro\Bundle\NavigationBundle\Exception\NotFoundMenuException`
     * `Oro\Bundle\NavigationBundle\Exception\NotFoundParentException`
 - Added interface `Oro\Bundle\NavigationBundle\Menu\Provider\OwnershipProviderInterface`.
 - Added class `Oro\Bundle\NavigationBundle\Menu\Provider\AbstractOwnershipProvider` that implements `Oro\Bundle\NavigationBundle\Menu\Provider\OwnershipProviderInterface`.
