@@ -15,17 +15,17 @@ use Oro\Bundle\ActionBundle\Configuration\ConfigurationProvider;
 use Oro\Bundle\ActionBundle\Model\ActionGroupRegistry;
 use Oro\Bundle\ActionBundle\Model\OperationRegistry;
 
-class DumpActionConfigurationCommand extends ContainerAwareCommand
+class DebugOperationCommand extends ContainerAwareCommand
 {
     /**
      * {@inheritdoc}
      */
     protected function configure()
     {
-        $this->setName('oro:debug:action:configuration')
-            ->setDescription('Dump action configuration')
+        $this->setName('oro:debug:operation')
+            ->setDescription('Debug operation configuration')
             ->addArgument('name', InputArgument::OPTIONAL, 'Names of the name of node that should be dumped')
-            ->addOption('action-group', null, InputOption::VALUE_NONE, 'Dump action_group')
+            ->addOption('action-group', null, InputOption::VALUE_NONE, 'Debug action_group')
             ->addOption('assemble', null, InputOption::VALUE_NONE, 'Assemble configuration');
     }
 
