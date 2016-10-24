@@ -34,7 +34,7 @@ class WidgetConfigVisibilityFilterTest extends \PHPUnit_Framework_TestCase
             ->method('isResourceEnabled')
             ->will($this->returnCallback(function ($resource, $resourceType) {
                 return $resourceType === 'dashboards' &&
-                    strpos($resource, 'enabled') === 0 || strpos($resource, 'widget.enabled') === 0;;
+                    strpos($resource, 'enabled') === 0 || strpos($resource, 'widget.enabled') === 0;
             }));
 
         $this->widgetConfigVisibilityFilter = new WidgetConfigVisibilityFilter(
