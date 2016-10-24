@@ -115,7 +115,7 @@ class MenuUpdateData extends AbstractFixture implements DependentFixtureInterfac
             'uri' => '#menu_update.3',
             'menu' => 'application_menu',
             'ownership_type' => UserOwnershipProvider::TYPE,
-            'owner_id' => 1,
+            'owner_id' => 'simple_user',
             'active' => true,
             'priority' => 20,
             'divider' => false,
@@ -131,7 +131,7 @@ class MenuUpdateData extends AbstractFixture implements DependentFixtureInterfac
             'uri' => '#menu_update.3_1',
             'menu' => 'application_menu',
             'ownership_type' => UserOwnershipProvider::TYPE,
-            'owner_id' => 1,
+            'owner_id' => 'simple_user',
             'active' => true,
             'priority' => 10,
             'divider' => false,
@@ -147,7 +147,7 @@ class MenuUpdateData extends AbstractFixture implements DependentFixtureInterfac
             'uri' => '#menu_update.4',
             'menu' => 'shortcuts',
             'ownership_type' => GlobalOwnershipProvider::TYPE,
-            'owner_id' => 10,
+            'owner_id' => 0,
             'active' => true,
             'priority' => 10,
             'divider' => false,
@@ -178,7 +178,16 @@ class MenuUpdateData extends AbstractFixture implements DependentFixtureInterfac
             $descriptions = $data['descriptions'];
             unset($data['descriptions']);
 
+            if ($data['owner_id']) {
+                $owner = $this->getReference($data['owner_id']);
+                unset($data['owner_id']);
+                $ownerId = $owner->getId();
+            } else {
+                $ownerId = 0;
+            }
             $entity = $this->getEntity(MenuUpdate::class, $data);
+
+            $entity->setOwnerId($ownerId);
 
             foreach ($titles as $localization => $title) {
                 $fallbackValue = new LocalizedFallbackValue();

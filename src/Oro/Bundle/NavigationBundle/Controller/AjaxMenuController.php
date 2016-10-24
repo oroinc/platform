@@ -105,7 +105,7 @@ class AjaxMenuController extends Controller
             $ownershipType,
             $this->getCurrentOwnerId($ownershipType, $request->get('ownerId'))
         );
-        if ($menuUpdate === null) {
+        if ($menuUpdate === null || $menuUpdate->getId() === null) {
             throw $this->createNotFoundException();
         }
 

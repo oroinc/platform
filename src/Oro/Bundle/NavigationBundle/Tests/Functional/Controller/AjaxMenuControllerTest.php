@@ -51,7 +51,7 @@ class AjaxMenuControllerTest extends WebTestCase
     {
         $parameters = [
             'menuName' => 'application_menu',
-            'parentKey' => 'menu_update.3',
+            'parentKey' => 'menu_list_default',
             'ownershipType' => UserOwnershipProvider::TYPE
         ];
 
