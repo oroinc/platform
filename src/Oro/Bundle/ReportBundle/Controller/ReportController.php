@@ -8,6 +8,7 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 use Oro\Bundle\DashboardBundle\Helper\DateHelper;
 use Oro\Bundle\DataGridBundle\Datagrid\DatagridInterface;
@@ -16,6 +17,7 @@ use Oro\Bundle\ReportBundle\Entity\Report;
 use Oro\Bundle\ReportBundle\Entity\ReportType;
 use Oro\Bundle\SecurityBundle\Annotation\Acl;
 use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
+use Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker;
 
 class ReportController extends Controller
 {
@@ -30,6 +32,8 @@ class ReportController extends Controller
      */
     public function viewAction(Report $entity)
     {
+        $this->checkReportEnabled($entity);
+
         $this->get('oro_segment.entity_name_provider')->setCurrentItem($entity);
 
         $reportGroup = $this->get('oro_entity_config.provider.entity')
@@ -102,6 +106,8 @@ class ReportController extends Controller
      */
     public function updateAction(Report $entity)
     {
+        $this->checkReportEnabled($entity);
+
         return $this->update($entity);
     }
 
@@ -189,5 +195,25 @@ class ReportController extends Controller
         }
 
         return $chartOptions;
+    }
+
+    /**
+     * @param Report $report
+     *
+     * @throws NotFoundHttpException
+     */
+    protected function checkReportEnabled(Report $report)
+    {
+        if (!$this->getFeatureChecker()->isResourceEnabled($report->getInternalId(), 'reports')) {
+            throw $this->createNotFoundException();
+        }
+    }
+
+    /**
+     * @return FeatureChecker
+     */
+    protected function getFeatureChecker()
+    {
+        return $this->get('oro_featuretoggle.checker.feature_checker');
     }
 }

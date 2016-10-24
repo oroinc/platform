@@ -60,3 +60,15 @@ services:
         class: Oro\Bundle\ReportBundle\EventListener\StoreSqlListener
         tags:
             - { name: kernel.event_listener, event: oro_datagrid.orm_datasource.result.after, method: onResultAfter }
+
+    oro_report.config_extension.feature:
+        class: Oro\Bundle\ReportBundle\Configuration\FeatureConfigurationExtension
+        tags:
+            - { name: oro_feature.config_extension }
+
+    oro_report.listener.reports_grid_subscriber:
+        class: Oro\Bundle\ReportBundle\EventListener\ReportsGridSubscriber
+        arguments:
+            - '@oro_featuretoggle.checker.feature_checker'
+        tags:
+            - { name: kernel.event_subscriber }
