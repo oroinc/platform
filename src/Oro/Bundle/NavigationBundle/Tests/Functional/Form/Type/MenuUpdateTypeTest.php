@@ -5,8 +5,6 @@ namespace Oro\Bundle\NavigationBundle\Tests\Functional\Form\Type;
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Genemu\Bundle\FormBundle\Form\JQuery\Type\Select2Type;
 use Knp\Menu\ItemInterface;
-use Oro\Bundle\FormBundle\Form\Type\OroIconType;
-use Oro\Bundle\FormBundle\Tests\Unit\Form\Type\Stub\OroIconTypeStub;
 use Symfony\Component\Form\PreloadedExtension;
 use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Component\Validator\Constraint;
@@ -14,6 +12,7 @@ use Symfony\Component\Validator\ConstraintValidatorFactoryInterface;
 use Symfony\Component\Translation\TranslatorInterface;
 
 use Oro\Component\Testing\Unit\FormIntegrationTestCase;
+use Oro\Bundle\FormBundle\Tests\Unit\Form\Type\Stub\OroIconTypeStub;
 use Oro\Bundle\LocaleBundle\Entity\LocalizedFallbackValue;
 use Oro\Bundle\LocaleBundle\Form\Type\LocalizationCollectionType;
 use Oro\Bundle\LocaleBundle\Form\Type\LocalizedFallbackValueCollectionType;
