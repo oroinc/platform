@@ -75,6 +75,48 @@ abstract class ApiTestCase extends WebTestCase
     /**
      * @return array [entity class => [entity class, [excluded action, ...]], ...]
      */
+    public function getEnabledEntities()
+    {
+        $entities = $this->getEntities();
+        $enabledEntities = [];
+        foreach ($entities as $entityClass => $value) {
+            if (!$this->isEntityEnabled($entityClass)) {
+                continue;
+            }
+
+            $enabledEntities[$entityClass] = $value;
+        }
+        if (!$enabledEntities) {
+            $this->markTestSkipped('There are no enabled entities to test');
+        }
+
+        return $enabledEntities;
+    }
+
+    /**
+     * @return array [entity class => [entity class, [excluded action, ...]], ...]
+     */
+    public function getDisabledEntities()
+    {
+        $entities = $this->getEntities();
+        $disabledEntities = [];
+        foreach ($entities as $entityClass => $value) {
+            if ($this->isEntityEnabled($entityClass)) {
+                continue;
+            }
+
+            $disabledEntities[$entityClass] = $value;
+        }
+        if (!$disabledEntities) {
+            $this->markTestSkipped('There are no disabled entities to test');
+        }
+
+        return $disabledEntities;
+    }
+
+    /**
+     * @return array [entity class => [entity class, [excluded action, ...]], ...]
+     */
     public function getEntities()
     {
         $this->initClient();
