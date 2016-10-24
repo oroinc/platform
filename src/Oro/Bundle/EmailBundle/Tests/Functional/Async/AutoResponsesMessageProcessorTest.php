@@ -13,7 +13,7 @@ class AutoResponsesMessageProcessorTest extends WebTestCase
 
     public function testCouldBeConstructedByContainer()
     {
-        $service = $this->getContainer()->get('oro_email.async.processor.auto_responses');
+        $service = $this->getContainer()->get('oro_email.async.auto_responses');
 
         $this->assertInstanceOf(AutoResponsesMessageProcessor::class, $service);
     }

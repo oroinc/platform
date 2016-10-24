@@ -27,7 +27,7 @@ class SyncEmailSeenFlagMessageProcessorTest extends WebTestCase
 
     public function testCouldBeConstructedByContainer()
     {
-        $service = $this->getContainer()->get('oro_email.async.processor.sync_email_seen_flag');
+        $service = $this->getContainer()->get('oro_email.async.sync_email_seen_flag');
 
         $this->assertInstanceOf(SyncEmailSeenFlagMessageProcessor::class, $service);
     }

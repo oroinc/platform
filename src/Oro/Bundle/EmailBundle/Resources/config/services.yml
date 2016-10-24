@@ -313,7 +313,7 @@ services:
             - { name: doctrine.event_listener, event: onFlush }
             - { name: doctrine.event_listener, event: postFlush }
 
-    oro_email.async.processor.auto_response:
+    oro_email.async.auto_response:
         class: 'Oro\Bundle\EmailBundle\Async\AutoResponseMessageProcessor'
         arguments:
             - '@doctrine'
@@ -322,7 +322,7 @@ services:
         tags:
             - { name: 'oro_message_queue.client.message_processor' }
 
-    oro_email.async.processor.auto_responses:
+    oro_email.async.auto_responses:
         class: 'Oro\Bundle\EmailBundle\Async\AutoResponsesMessageProcessor'
         arguments:
             - '@oro_message_queue.client.message_producer'
@@ -330,7 +330,7 @@ services:
         tags:
             - { name: 'oro_message_queue.client.message_processor' }
 
-    oro_email.async.processor.add_association_to_emails:
+    oro_email.async.add_association_to_emails:
         class: 'Oro\Bundle\EmailBundle\Async\AddAssociationToEmailsMessageProcessor'
         arguments:
             - '@oro_email.command.association_manager'
@@ -338,7 +338,7 @@ services:
         tags:
             - { name: 'oro_message_queue.client.message_processor' }
 
-    oro_email.async.processor.update_email_owner_associations:
+    oro_email.async.update_email_owner_associations:
         class: 'Oro\Bundle\EmailBundle\Async\UpdateEmailOwnerAssociationsMessageProcessor'
         arguments:
             - '@oro_email.command.association_manager'
@@ -346,7 +346,7 @@ services:
         tags:
             - { name: 'oro_message_queue.client.message_processor' }
 
-    oro_email.async.processor.sync_email_seen_flag:
+    oro_email.async.sync_email_seen_flag:
         class: 'Oro\Bundle\EmailBundle\Async\SyncEmailSeenFlagMessageProcessor'
         arguments:
             - '@doctrine'
@@ -355,7 +355,7 @@ services:
         tags:
             - { name: 'oro_message_queue.client.message_processor' }
 
-    oro_email.async.processor.purge_email_attachments:
+    oro_email.async.purge_email_attachments:
         class: 'Oro\Bundle\EmailBundle\Async\PurgeEmailAttachmentsMessageProcessor'
         arguments:
             - '@doctrine'

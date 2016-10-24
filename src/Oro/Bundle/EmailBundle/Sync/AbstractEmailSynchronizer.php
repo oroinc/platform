@@ -68,6 +68,7 @@ abstract class AbstractEmailSynchronizer implements LoggerAwareInterface
     ) {
         $this->doctrine                        = $doctrine;
         $this->knownEmailAddressCheckerFactory = $knownEmailAddressCheckerFactory;
+        $this->logger = new NullLogger();
     }
 
     /**
@@ -117,10 +118,6 @@ abstract class AbstractEmailSynchronizer implements LoggerAwareInterface
      */
     public function sync($maxConcurrentTasks, $minExecIntervalInMin, $maxExecTimeInMin = -1, $maxTasks = 1)
     {
-        if ($this->logger === null) {
-            $this->logger = new NullLogger();
-        }
-
         if (!$this->checkConfiguration()) {
             $this->logger->info('Exit because synchronization was not configured or disabled.');
             return 0;

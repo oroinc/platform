@@ -13,7 +13,7 @@ class PurgeEmailAttachmentsMessageProcessorTest extends WebTestCase
 
     public function testCouldBeConstructedByContainer()
     {
-        $service = $this->getContainer()->get('oro_email.async.processor.purge_email_attachments');
+        $service = $this->getContainer()->get('oro_email.async.purge_email_attachments');
 
         $this->assertInstanceOf(PurgeEmailAttachmentsMessageProcessor::class, $service);
     }

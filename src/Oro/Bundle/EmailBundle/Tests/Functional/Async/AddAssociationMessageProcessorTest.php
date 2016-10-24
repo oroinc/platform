@@ -13,7 +13,7 @@ class AddAssociationToEmailsMessageProcessorTest extends WebTestCase
 
     public function testCouldBeConstructedByContainer()
     {
-        $service = $this->getContainer()->get('oro_email.async.processor.add_association_to_emails');
+        $service = $this->getContainer()->get('oro_email.async.add_association_to_emails');
 
         $this->assertInstanceOf(AddAssociationToEmailsMessageProcessor::class, $service);
     }

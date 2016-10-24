@@ -13,7 +13,7 @@ class UpdateEmailOwnerAssociationsMessageProcessorTest extends WebTestCase
 
     public function testCouldBeConstructedByContainer()
     {
-        $service = $this->getContainer()->get('oro_email.async.processor.update_email_owner_associations');
+        $service = $this->getContainer()->get('oro_email.async.update_email_owner_associations');
 
         $this->assertInstanceOf(UpdateEmailOwnerAssociationsMessageProcessor::class, $service);
     }

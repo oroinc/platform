@@ -433,6 +433,9 @@ placeholders:
 - Constructor of `Oro\Bundle\EmailBundle\Form\DataTransformer\EmailTemplateTransformer` changed. Removed the arguments.
 - Constructor of `Oro\Bundle\EmailBundle\Form\Type\EmailTemplateRichTextType` changed. Removed the arguments.
 - Constructor of `Oro\Bundle\EmailBundle\Form\Type\EmailType` changed. Added `ConfigManager $configManager` as last argument.
+- Constructor of `Oro\Bundle\EmailBundle\EventListener\EntityListener` changed. Added `MessageProducerInterface $producer` as last argument.
+- Constructor of `Oro\Bundle\EmailBundle\EventListener\AutoResponseListener` changed. Added `MessageProducerInterface $producer` as last argument.
+- Constructor of `Oro\Bundle\EmailBundle\Command\Manager\AssociationManager` changed. Added `MessageProducerInterface $producer` as last argument.
 - `Oro/Bundle/EmailBundle/Cache/EntityCacheClearer` deprecated, tag on `oro_email.entity.cache.clearer` removed
 - `oro_email.email_address.entity_manager` inherits `oro_entity.abstract_entity_manager`
 - `Oro/Bundle/EmailBundle/Entity/MailboxProcessSettings` no longer inherits `Oro\Bundle\EmailBundle\Form\Model\ExtendMailboxProcessSettings`
