@@ -348,3 +348,13 @@ services:
             - '@oro_entity.doctrine_helper'
         tags:
             - { name: oro_navigation.menu_update_provider, area: default }
+
+    oro_navigation.data_provider.title:
+        class: Oro\Bundle\NavigationBundle\Provider\NavigationTitleProvider
+        scope: request
+        arguments:
+          - '@oro_navigation.title_service'
+          - '@request'
+        tags:
+            - { name: layout.data_provider, alias: title_provider }
+

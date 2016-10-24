@@ -8,6 +8,9 @@ layout:
                     blockType: head
                 title:
                     blockType: title
+                    options:
+                        value: '=data["title_provider"].getTitle(params)'
+                        params: []
                 meta_charset:
                     blockType: meta
                     options:

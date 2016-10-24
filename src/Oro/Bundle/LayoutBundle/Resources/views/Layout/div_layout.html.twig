@@ -117,6 +117,22 @@
 {% endblock %}
 
 {% block title_widget -%}
+    {% set attr = attr|merge({
+        value: value
+    }) %}
+
+    {% if reverse is defined %}
+        {% set attr = attr|merge({
+            reverse: reverse
+        }) %}
+    {% endif %}
+
+    {% if separator is defined %}
+        {% set attr = attr|merge({
+            separator: separator
+        }) %}
+    {% endif %}
+
     {% if reverse %}
         {% set value = value|reverse %}
     {% endif %}
