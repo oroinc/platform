@@ -60,9 +60,7 @@ abstract class AbstractWorkflowTranslationFieldsIterator extends AbstractTransla
                 $context['transition_name'] = $this->resolveName($transition, $transitionKey);
                 yield $this->makeKey(TransitionLabelTemplate::class, $context) => $transition['label'];
 
-                if (isset($transition['message'])) {
-                    yield $this->makeKey(TransitionWarningMessageTemplate::class, $context) => $transition['message'];
-                }
+                yield $this->makeKey(TransitionWarningMessageTemplate::class, $context) => $transition['message'];
 
                 foreach ($this->transitionAttributeFields($transition, $context) as $key => &$attrValue) {
                     yield $key => $attrValue;
@@ -84,12 +82,10 @@ abstract class AbstractWorkflowTranslationFieldsIterator extends AbstractTransla
             && $this->hasArrayNode('attribute_fields', $transitionConfig['form_options'])
         ) {
             foreach ($transitionConfig['form_options']['attribute_fields'] as $attributeName => &$attributeConfig) {
-                if (isset($attributeConfig['options']['label'])) {
-                    $context['attribute_name'] = $attributeName;
-                    $key = $this->makeKey(TransitionAttributeLabelTemplate::class, $context);
-                    yield $key => $attributeConfig['options']['label'];
-                    unset($context['attribute_name']);
-                }
+                $context['attribute_name'] = $attributeName;
+                $key = $this->makeKey(TransitionAttributeLabelTemplate::class, $context);
+                yield $key => $attributeConfig['options']['label'];
+                unset($context['attribute_name']);
             }
         }
     }

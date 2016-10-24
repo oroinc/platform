@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\WorkflowBundle\Translation;
 
+use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 use Oro\Bundle\WorkflowBundle\Configuration\Handler\ConfigurationHandlerInterface;
@@ -42,12 +43,24 @@ class TranslationProcessor implements
         $translationFieldsIterator = new WorkflowConfigurationTranslationFieldsIterator($workflowName, $configuration);
 
         foreach ($translationFieldsIterator as $translationKey => $value) {
-            if ($translationKey !== $value && (string)$value !== '') {
-                $this->translationHelper->saveTranslation($translationKey, $value);
-            }
+            $this->translationHelper->saveTranslation($translationKey, $value);
         }
 
         return $configuration;
+    }
+
+    public function translateWorkflowDefinitionFields(WorkflowDefinition $workflowDefinition)
+    {
+        $this->translationHelper->prepareTranslations($workflowDefinition->getName());
+
+        $workflowDefinitionFieldsIterator = new WorkflowDefinitionTranslationFieldsIterator($workflowDefinition);
+
+        foreach ($workflowDefinitionFieldsIterator as $key => $value) {
+            $fieldTranslation = $this->translationHelper->getTranslation($key);
+            if ($fieldTranslation === $key) {
+                $workflowDefinitionFieldsIterator->writeCurrent($fieldTranslation);
+            }
+        }
     }
 
     /**
