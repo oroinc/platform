@@ -84,7 +84,6 @@ class MenuUpdateType extends AbstractType
                 'field' => 'text',
             ]
         );
-
     }
 
     /**

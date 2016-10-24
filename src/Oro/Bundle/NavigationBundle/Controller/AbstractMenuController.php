@@ -81,7 +81,6 @@ abstract class AbstractMenuController extends Controller
         );
 
         return $this->handleUpdate($menuUpdate);
-
     }
 
     /**
@@ -175,5 +174,4 @@ abstract class AbstractMenuController extends Controller
     {
         return $this->get('oro_navigation.tree.menu_update_tree_handler')->createTree($menu);
     }
-
 }

@@ -47,7 +47,9 @@ class MenuUpdateStub implements MenuUpdateInterface
 
     public function setImage($value)
     {
-        $this->image = $value; return $this;
+        $this->image = $value;
+
+        return $this;
     }
 
     /**
@@ -63,7 +65,7 @@ class MenuUpdateStub implements MenuUpdateInterface
      * @param Localization|null $localization
      * @return LocalizedFallbackValue|null
      */
-    public function getTitle(\Oro\Bundle\LocaleBundle\Entity\Localization $localization = NULL)
+    public function getTitle(\Oro\Bundle\LocaleBundle\Entity\Localization $localization = null)
     {
         return $this->getFallbackValue($this->titles, $localization);
     }
@@ -72,7 +74,7 @@ class MenuUpdateStub implements MenuUpdateInterface
      * @param Localization|null $localization
      * @return LocalizedFallbackValue|null
      */
-    public function getDescription(\Oro\Bundle\LocaleBundle\Entity\Localization $localization = NULL)
+    public function getDescription(\Oro\Bundle\LocaleBundle\Entity\Localization $localization = null)
     {
         return $this->getFallbackValue($this->descriptions, $localization);
     }
