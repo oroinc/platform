@@ -66,7 +66,7 @@ class WorkflowTranslationKeysSubscriberTest extends \PHPUnit_Framework_TestCase
             ->method('ensureTranslationKey')
             ->with('test_workflow_transition_1_translation_key');
 
-        $this->workflowTranslationHelper->expects($this->at(2))
+        $this->workflowTranslationHelper->expects($this->at(3))
             ->method('removeTranslationKey')
             ->with('test_workflow_transition_2_translation_key');
 

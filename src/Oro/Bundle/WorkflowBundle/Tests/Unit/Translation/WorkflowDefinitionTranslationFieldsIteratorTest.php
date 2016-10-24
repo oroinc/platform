@@ -90,6 +90,7 @@ class WorkflowDefinitionTranslationFieldsIteratorTest extends \PHPUnit_Framework
                     'oro.workflow.test_workflow.step.step_1.label' => null,
                     'oro.workflow.test_workflow.step.step_2.label' => null,
                     'oro.workflow.test_workflow.attribute.attribute_1.label' => null,
+                    'oro.workflow.test_workflow.transition.transition_1.warning_message' => null
                 ]
             ]
         ];
@@ -224,7 +225,15 @@ class WorkflowDefinitionTranslationFieldsIteratorTest extends \PHPUnit_Framework
         $caseLackActual->setConfiguration(
             [
                 'transitions' => [
-                    'transition_1' => []
+                    'transition_1' => [
+                        'form_options' => [
+                            'attribute_fields' => [
+                                'attribute1' => [
+
+                                ]
+                            ]
+                        ]
+                    ]
                 ],
                 'steps' => [
                     'step_1' => []
@@ -247,6 +256,16 @@ class WorkflowDefinitionTranslationFieldsIteratorTest extends \PHPUnit_Framework
                 'transitions' => [
                     'transition_1' => [
                         'label' => '*modified*',
+                        'message' => '*modified*',
+                        'form_options' => [
+                            'attribute_fields' => [
+                                'attribute1' => [
+                                    'options' => [
+                                        'label' => '*modified*'
+                                    ]
+                                ]
+                            ]
+                        ]
                     ]
                 ],
                 'steps' => [

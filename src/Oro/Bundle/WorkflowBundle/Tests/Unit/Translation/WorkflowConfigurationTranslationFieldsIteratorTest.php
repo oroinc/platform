@@ -88,6 +88,8 @@ class WorkflowConfigurationTranslationFieldsIteratorTest extends \PHPUnit_Framew
                     'oro.workflow.test_workflow.transition.transition_four.attribute.attribute_1.label' => 'TAL',
                     'oro.workflow.test_workflow.step.step_1.label' => 'step_1_label',
                     'oro.workflow.test_workflow.step.step_2.label' => null,
+                    'oro.workflow.test_workflow.transition.transition_2.warning_message' => null,
+                    'oro.workflow.test_workflow.transition.transition_four.warning_message' => null
                 ]
             ]
         ];
@@ -170,6 +172,7 @@ class WorkflowConfigurationTranslationFieldsIteratorTest extends \PHPUnit_Framew
                         ],
                         'transition_2' => [
                             'label' => '*modified*transition_2_label',
+                            'message' => '*modified*'
                         ],
                         'transition_3' => [
                             'label' => '*modified*',
@@ -177,6 +180,7 @@ class WorkflowConfigurationTranslationFieldsIteratorTest extends \PHPUnit_Framew
                         ],
                         'transition_four' => [
                             'label' => '*modified*',
+                            'message' => '*modified*',
                             'form_options' => [
                                 'attribute_fields' => [
                                     'attribute_1' => [
