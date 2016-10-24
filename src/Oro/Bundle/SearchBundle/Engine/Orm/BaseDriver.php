@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\SearchBundle\Engine\Orm;
 
+use Doctrine\Common\Collections\Expr\CompositeExpression;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\ORM\Query\Expr\Join;
@@ -19,6 +20,9 @@ use Oro\Bundle\SearchBundle\Query\Query;
  */
 abstract class BaseDriver
 {
+    const EXPRESSION_TYPE_OR  = 'OR';
+    const EXPRESSION_TYPE_AND = 'AND';
+
     /**
      * @var string
      */
@@ -381,10 +385,16 @@ abstract class BaseDriver
         $criteria = $query->getCriteria();
 
         $whereExpression = $criteria->getWhereExpression();
-        if ($whereExpression) {
-            $visitor = new OrmExpressionVisitor($this, $qb, $setOrderBy);
-            $qb->andWhere($visitor->dispatch($whereExpression));
+        if (!$whereExpression) {
+            return;
         }
+        $visitor = new OrmExpressionVisitor($this, $qb, $setOrderBy);
+        $expressionString = $visitor->dispatch($whereExpression);
+
+        $whereExpression instanceof CompositeExpression &&
+        self::EXPRESSION_TYPE_OR === $whereExpression->getType() ?
+            $qb->orWhere($expressionString) :
+            $qb->andWhere($expressionString);
     }
 
     /**
@@ -429,7 +439,7 @@ abstract class BaseDriver
     public function addFilteringField(QueryBuilder $qb, $index, $searchCondition)
     {
         $condition = $searchCondition['condition'];
-        $type = $searchCondition['fieldType'];
+        $type      = $searchCondition['fieldType'];
 
         $qb->setParameter(
             sprintf('field%s', $index),
@@ -449,13 +459,15 @@ abstract class BaseDriver
                 );
         }
 
-        $subIndex = $this->getUniqueId();
-        $subJoinField = sprintf('filter.%sFields', $type);
-        $subJoinAlias = $this->getJoinAlias($type, $subIndex);
+        // @todo to be tested in scope of BB-4508
+        $subIndex      = $this->getUniqueId();
+        $subQueryAlias = sprintf('filter%s', $subIndex);
+        $subJoinField  = sprintf('%s.%sFields', $subQueryAlias, $type);
+        $subJoinAlias  = $this->getJoinAlias($type, $subIndex);
 
         $subQb = $this->em->createQueryBuilder()
-            ->select('filter.id')
-            ->from($this->entityName, 'filter')
+            ->select(sprintf('%s.id', $subQueryAlias))
+            ->from($this->entityName, $subQueryAlias)
             ->join($subJoinField, $subJoinAlias)
             ->andWhere(sprintf(
                 '%s.field = :field%s',

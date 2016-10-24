@@ -100,7 +100,7 @@ datagrids:
                 select:
                     - partial eu.{id, email}
                     - e
-                    - eb.bodyContent AS body_content
+                    - eb.textBody AS body_content
                     - >
                         (SELECT COUNT(_ec.id)
                         FROM OroEmailBundle:Email _ec
@@ -129,6 +129,11 @@ datagrids:
                         -
                             join: e.emailBody
                             alias: eb
+# The next join is performed in EmailGridListener, when any of grid filters are applied: folder, folders, mailbox.
+#                        -
+#                            join: eu.folders
+#                            alias: f
+# Attributes from f are used in ChoiceMessageTypeFilter also.
                 where:
                     and:
                         - >

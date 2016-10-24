@@ -20,6 +20,7 @@ class FormBuilder
         'boolean' => 'checkbox',
         'float' => 'number',
         'decimal' => 'number',
+        'money_value' => 'number'
     ];
 
     /** @var FormFactory */

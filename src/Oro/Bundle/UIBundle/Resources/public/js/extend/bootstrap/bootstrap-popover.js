@@ -28,6 +28,17 @@ define(function(require) {
         return this.$tip;
     };
 
+    Popover.prototype.updateContent = function(content) {
+        this.options.content = content;
+        if (this.isOpen()) {
+            this.show();
+        }
+    };
+
+    Popover.prototype.isOpen = function() {
+        return Boolean(this.$tip && this.$tip.is(':visible'));
+    };
+
     Popover.prototype.hide = _.wrap(Popover.prototype.hide, function(func) {
         clearInterval(this.trackPositionInterval);
         return func.apply(this, _.rest(arguments));

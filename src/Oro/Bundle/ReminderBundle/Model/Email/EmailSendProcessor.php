@@ -6,7 +6,7 @@ use Doctrine\Common\Persistence\ObjectManager;
 
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
-use Oro\Bundle\NotificationBundle\Processor\EmailNotificationProcessor;
+use Oro\Bundle\NotificationBundle\Manager\EmailNotificationManager;
 use Oro\Bundle\ReminderBundle\Entity\Reminder;
 use Oro\Bundle\ReminderBundle\Event\ReminderEvents;
 use Oro\Bundle\ReminderBundle\Event\SendReminderEmailEvent;
@@ -17,9 +17,9 @@ class EmailSendProcessor implements SendProcessorInterface
     const NAME = 'email';
 
     /**
-     * @var EmailNotificationProcessor
+     * @var EmailNotificationManager
      */
-    protected $emailNotificationProcessor;
+    protected $emailNotificationManager;
 
     /**
      * @var ObjectManager
@@ -42,16 +42,16 @@ class EmailSendProcessor implements SendProcessorInterface
     protected $eventDispatcher;
 
     /**
-     * @param EmailNotificationProcessor $emailNotificationProcessor
+     * @param EmailNotificationManager $emailNotificationManager
      * @param EmailNotification          $emailNotification
      * @param EventDispatcherInterface   $eventDispatcher
      */
     public function __construct(
-        EmailNotificationProcessor $emailNotificationProcessor,
+        EmailNotificationManager $emailNotificationManager,
         EmailNotification $emailNotification,
         EventDispatcherInterface $eventDispatcher
     ) {
-        $this->emailNotificationProcessor = $emailNotificationProcessor;
+        $this->emailNotificationManager = $emailNotificationManager;
         $this->emailNotification = $emailNotification;
         $this->eventDispatcher = $eventDispatcher;
     }
@@ -90,7 +90,7 @@ class EmailSendProcessor implements SendProcessorInterface
         $this->emailNotification->setReminder($reminder);
 
         try {
-            $this->emailNotificationProcessor
+            $this->emailNotificationManager
                 ->process(
                     $this->emailNotification->getEntity(),
                     [$this->emailNotification],
