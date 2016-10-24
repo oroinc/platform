@@ -181,8 +181,6 @@ datagrids:
                 params:     [ workflowDefinition ]
         sorters:
             columns:
-                label:
-                    data_name: w.label
                 active:
                     data_name: w.active
                 system:
@@ -230,9 +228,6 @@ datagrids:
         action_configuration: ["@oro_workflow.datagrid.action_permission_provider", "getWorkflowDefinitionPermissions"]
         filters:
             columns:
-                label:
-                    type: string
-                    data_name: w.label
                 relatedEntity:
                     type: choice
                     data_name: w.relatedEntity

@@ -3,15 +3,13 @@
 namespace Oro\Bundle\WorkflowBundle\Helper;
 
 use Oro\Bundle\TranslationBundle\Entity\Translation;
-use Oro\Bundle\TranslationBundle\Translation\KeySource\TranslationKeySource;
 use Oro\Bundle\TranslationBundle\Helper\TranslationHelper;
 use Oro\Bundle\TranslationBundle\Manager\TranslationManager;
+use Oro\Bundle\TranslationBundle\Translation\KeySource\TranslationKeySource;
 use Oro\Bundle\TranslationBundle\Translation\TranslationKeyGenerator;
 use Oro\Bundle\TranslationBundle\Translation\Translator;
 
-use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Translation\KeyTemplate\WorkflowTemplate;
-use Oro\Bundle\WorkflowBundle\Translation\WorkflowDefinitionTranslationFieldsIterator;
 
 class WorkflowTranslationHelper
 {
@@ -26,8 +24,8 @@ class WorkflowTranslationHelper
     /** @var TranslationHelper */
     private $translationHelper;
 
-    /** @var TranslationKeyGenerator */
-    private $translationKeyGenerator;
+    /** @var array */
+    private $values = [];
 
     /**
      * @param Translator $translator
@@ -46,37 +44,61 @@ class WorkflowTranslationHelper
 
     /**
      * @param string $workflowName
+     * @param string $locale
+     * @return array
      */
-    public function prepareTranslations($workflowName)
+    public function findWorkflowTranslations($workflowName, $locale)
     {
-        $translationKeySource = new TranslationKeySource(
-            new WorkflowTemplate(),
-            ['workflow_name' => $workflowName]
+        $generator = new TranslationKeyGenerator();
+
+        $keyPrefix = $generator->generate(
+            new TranslationKeySource(new WorkflowTemplate(), ['workflow_name' => $workflowName])
         );
 
-        $this->translationHelper->prepareValues(
-            $this->getTranslationKeyGenerator()->generate($translationKeySource),
-            $this->translator->getLocale(),
-            self::TRANSLATION_DOMAIN
-        );
+        return $this->translationHelper->findValues($keyPrefix, $locale, self::TRANSLATION_DOMAIN);
     }
 
     /**
      * @param string $key
-     * @return string|null
-     */
-    public function findTranslation($key)
-    {
-        return $this->translationHelper->findValue($key, $this->translator->getLocale(), self::TRANSLATION_DOMAIN);
-    }
-
-    /**
-     * @param string $key
+     * @param string $workflowName
+     * @param string|null $locale
      * @return string
      */
-    public function getTranslation($key)
+    public function findWorkflowTranslation($key, $workflowName = null, $locale = null)
     {
-        return $this->translationHelper->getValue($key, $this->translator->getLocale(), self::TRANSLATION_DOMAIN);
+        $locale = $locale ?: $this->translator->getLocale();
+
+        $cacheKey = sprintf('%s-%s', $locale, $workflowName);
+
+        if (!array_key_exists($cacheKey, $this->values)) {
+            $this->values[$cacheKey] = $this->findWorkflowTranslations($workflowName, $locale);
+        }
+
+        $result = isset($this->values[$cacheKey][$key]) ? $this->values[$cacheKey][$key] : null;
+
+        if (!$result && $locale !== Translation::DEFAULT_LOCALE) {
+            $result = $this->findWorkflowTranslation($key, $workflowName, Translation::DEFAULT_LOCALE);
+        }
+
+        return $result ?: $key;
+    }
+
+    /**
+     * @param string $key
+     * @param string|null $locale
+     * @return string
+     */
+    public function findTranslation($key, $locale = null)
+    {
+        $locale = $locale ?: $this->translator->getLocale();
+
+        $result = $this->translationHelper->findValue($key, $locale, self::TRANSLATION_DOMAIN);
+
+        if (!$result && $locale !== Translation::DEFAULT_LOCALE) {
+            $result = $this->findTranslation($key, Translation::DEFAULT_LOCALE);
+        }
+
+        return $result ?: $key;
     }
 
     /**
@@ -132,34 +154,5 @@ class WorkflowTranslationHelper
     public function removeTranslationKey($key)
     {
         $this->translationManager->removeTranslationKey($key, self::TRANSLATION_DOMAIN);
-    }
-
-    /**
-     * @param WorkflowDefinition $definition
-     */
-    public function extractTranslations(WorkflowDefinition $definition)
-    {
-        if (!$definition->getName()) {
-            return;
-        }
-        $iterator = new WorkflowDefinitionTranslationFieldsIterator($definition);
-
-        $this->prepareTranslations($definition->getName());
-
-        foreach ($iterator as $item) {
-            $iterator->writeCurrent($this->getTranslation($item));
-        }
-    }
-
-    /**
-     * @return TranslationKeyGenerator
-     */
-    private function getTranslationKeyGenerator()
-    {
-        if (null === $this->translationKeyGenerator) {
-            $this->translationKeyGenerator = new TranslationKeyGenerator();
-        }
-
-        return $this->translationKeyGenerator;
     }
 }

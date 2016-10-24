@@ -30,10 +30,12 @@ class WorkflowFilter extends EntityFilter
     public function __construct(
         FormFactoryInterface $factory,
         FilterUtility $util,
+        TranslationKeyGenerator $generator,
         WorkflowTranslationHelper $translationHelper
     ) {
         parent::__construct($factory, $util);
 
+        $this->generator = $generator;
         $this->translationHelper = $translationHelper;
     }
 
@@ -101,6 +103,6 @@ class WorkflowFilter extends EntityFilter
      */
     protected function findRelatedJoin(FilterDatasourceAdapterInterface $ds)
     {
-        // nothing to do, related joins configured manually
+        // related joins configured manually
     }
 }
