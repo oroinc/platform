@@ -777,7 +777,7 @@ class ByConfigObjectNormalizerTest extends \PHPUnit_Framework_TestCase
             'fields'           => [
                 'id'    => null,
                 'name1' => [
-                    'property_path' => '_'
+                    'property_path' => ConfigUtil::IGNORE_PROPERTY_PATH
                 ]
             ]
         ];

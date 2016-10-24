@@ -171,30 +171,22 @@ services:
     oro_api.config_extension.filters:
         class: Oro\Bundle\ApiBundle\Config\FiltersConfigExtension
         public: false
-        tags:
-            - { name: oro_api.config_extension }
 
     oro_api.config_extension.sorters:
         class: Oro\Bundle\ApiBundle\Config\SortersConfigExtension
         public: false
-        tags:
-            - { name: oro_api.config_extension }
 
     oro_api.config_extension.actions:
         class: Oro\Bundle\ApiBundle\Config\ActionsConfigExtension
         public: false
         arguments:
             - '@oro_api.action_processor_bag'
-        tags:
-            - { name: oro_api.config_extension }
 
     oro_api.config_extension.subresources:
         class: Oro\Bundle\ApiBundle\Config\SubresourcesConfigExtension
         public: false
         arguments:
             - '@oro_api.action_processor_bag'
-        tags:
-            - { name: oro_api.config_extension }
 
     oro_api.config_extension.feature:
         class: 'Oro\Bundle\ApiBundle\Config\FeatureConfigurationExtension'
@@ -286,8 +278,7 @@ services:
             - '@oro_api.entity_serializer.config_normalizer'
             - '@oro_api.entity_serializer.data_normalizer'
         calls:
-            # replace to compiler pass injection ?
-            - ["setFieldsFilter", ['@oro_security.serializer.filter_chain']]
+            - [setFieldsFilter, ['@oro_security.serializer.filter_chain']]
 
     oro_api.entity_serializer.doctrine_helper:
         class: Oro\Component\EntitySerializer\DoctrineHelper
