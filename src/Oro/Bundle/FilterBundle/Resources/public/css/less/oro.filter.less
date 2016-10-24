@@ -122,6 +122,32 @@
     }
 }
 
+.filters-state {
+  color: #aaa;
+  font-size: 14px;
+  padding: 0 20px;
+  line-height: 31px;
+  min-width: 160px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  cursor: pointer;
+  .page-title-center & {
+    text-align: center;
+    padding-left: 50px;
+    padding-right: 50px;
+    height: 31px;
+  }
+  .under-left-block & {
+    padding-left: 20px;
+    text-align: left;
+  }
+}
+
+.filters-state-popover {
+  max-width: 100%;
+}
+
 .filter-select .select-filter-widget .ui-icon {
     margin-top: 2px;
 }
