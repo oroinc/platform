@@ -4,6 +4,7 @@ operations:
             - owner-users-select-grid
         exclude_entities:
             - Oro\Bundle\UserBundle\Entity\Role
+            - Oro\Bundle\UserBundle\Entity\User
     clone_role:
         extends: CLONE
         order: 4
@@ -95,3 +96,90 @@ operations:
                     route: oro_user_role_update
                     route_parameters:
                         id: $id
+    reset_password:
+        label: oro.user.password.reset_password.label
+        entities:
+            - Oro\Bundle\UserBundle\Entity\User
+        groups:
+            - datagridRowAction
+        datagrids:
+            - users-grid
+        routes:
+            - oro_user_index
+            - oro_user_view
+        order: 50
+        acl_resource: [password_management]
+        button_options:
+            icon: icon-shield
+        frontend_options:
+            confirmation:
+                title: oro.user.reset_password.popup.title
+                okText: oro.user.reset_password.popup.label
+                message: oro.user.reset_password.popup.question
+                message_parameters:
+                    user: $.data.username
+                component: oroui/js/standart-confirmation
+        datagrid_options:
+            mass_action:
+                type: resetpassword
+                label: oro.user.password.reset_password.label
+                icon: shield
+                route: oro_user_mass_password_reset
+                data_identifier: u.id
+                confirmation: true
+                defaultMessages:
+                    confirm_title: oro.user.reset_password.mass_action.title
+                    confirm_content: oro.user.reset_password.mass_action.question
+                    confirm_ok: oro.user.reset_password.mass_action.label
+                acl_resource: password_management
+                frontend_options:
+                    title: oro.user.reset_password.popup.title
+                    dialogOptions:
+                        modal: true
+                messages:
+                    - success: oro.user.password.force_reset.mass_action.success
+                    - failure: oro.user.password.force_reset.mass_action.failure
+        actions:
+            - '@call_method':
+                object: $.data
+                method: setLoginDisabled
+                method_parameters: [true]
+            - '@call_method':
+                object: $.data
+                method: getConfirmationToken
+                attribute: $.token
+            - '@tree':
+                conditions:
+                    '@and':
+                        - '@empty': $.token
+                actions:
+                    - '@call_method':
+                        object: $.data
+                        method: generateToken
+                        attribute: $.token
+                    - '@call_method':
+                        object: $.data
+                        method: setConfirmationToken
+                        method_parameters: [$.token]
+            - '@flush_entity': $.data
+            - '@call_service_method':
+                service: oro_user.mailer.processor
+                method: sendForcedResetPasswordAsAdminEmail
+                method_parameters: [$.data]
+                attribute: $.sent
+            - '@tree':
+                conditions:
+                    '@and':
+                        - '@eq': [$.sent, true]
+                actions:
+                    - '@flash_message':
+                        message: oro.user.password.force_reset.success.message
+                        type: 'success'
+            - '@tree':
+                conditions:
+                    '@and':
+                        - '@eq': [$.sent, false]
+                actions:
+                    - '@flash_message':
+                        message: oro.user.password.force_reset.failure.message
+                        type: 'error'
