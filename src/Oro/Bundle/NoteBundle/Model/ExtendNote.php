@@ -53,4 +53,15 @@ class ExtendNote
     {
         return $this;
     }
+
+    /**
+     * Gets full target entities list associated with activity
+     * Please use this method carefully because of the performance reasons
+     *
+     * @return object[]
+     */
+    public function getTargetEntities()
+    {
+        return [];
+    }
 }
