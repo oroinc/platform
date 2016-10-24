@@ -476,6 +476,13 @@ define([
          */
         applyValue: function() {
             this.setValue(this._formatRawValue(this._readDOMValue()));
+        },
+
+        getState: function() {
+            return {
+                label: this.label,
+                hint: this._getCriteriaHint()
+            };
         }
     }));
 

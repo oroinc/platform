@@ -684,8 +684,10 @@ abstract class AbstractUser implements
      */
     public function isPasswordRequestNonExpired($ttl)
     {
-        return $this->getPasswordRequestedAt() instanceof \DateTime
-        && $this->getPasswordRequestedAt()->getTimestamp() + $ttl > time();
+        $passwordRequestAt = $this->getPasswordRequestedAt();
+
+        return $passwordRequestAt === null || ($passwordRequestAt instanceof \DateTime
+        && $this->getPasswordRequestedAt()->getTimestamp() + $ttl > time());
     }
 
     /**
