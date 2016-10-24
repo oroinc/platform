@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Handler;
 
-use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityRepository;
@@ -10,13 +9,10 @@ use Doctrine\ORM\EntityRepository;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
-use Oro\Bundle\WorkflowBundle\Entity\WorkflowStep;
 use Oro\Bundle\WorkflowBundle\Event\WorkflowChangesEvent;
 use Oro\Bundle\WorkflowBundle\Event\WorkflowEvents;
 use Oro\Bundle\WorkflowBundle\Handler\WorkflowDefinitionHandler;
-use Oro\Bundle\WorkflowBundle\Model\Step;
 use Oro\Bundle\WorkflowBundle\Model\StepManager;
-use Oro\Bundle\WorkflowBundle\Model\Workflow;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowAssembler;
 
 class WorkflowDefinitionHandlerTest extends \PHPUnit_Framework_TestCase
@@ -33,9 +29,6 @@ class WorkflowDefinitionHandlerTest extends \PHPUnit_Framework_TestCase
     /** @var WorkflowAssembler|\PHPUnit_Framework_MockObject_MockObject */
     protected $workflowAssembler;
 
-    /** @var Workflow|\PHPUnit_Framework_MockObject_MockObject */
-    protected $workflow;
-
     /** @var StepManager|\PHPUnit_Framework_MockObject_MockObject */
     protected $stepManager;
 
@@ -48,10 +41,6 @@ class WorkflowDefinitionHandlerTest extends \PHPUnit_Framework_TestCase
     protected function setUp()
     {
         $this->workflowAssembler = $this->getMockBuilder(WorkflowAssembler::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->workflow = $this->getMockBuilder(Workflow::class)
             ->disableOriginalConstructor()
             ->getMock();
 
@@ -96,7 +85,7 @@ class WorkflowDefinitionHandlerTest extends \PHPUnit_Framework_TestCase
         $this->workflowAssembler->expects($this->once())->method('assemble');
 
         $this->entityManager->expects($this->once())->method('persist')->with($newDefinition);
-        $this->entityManager->expects($this->once())->method('flush')->with();
+        $this->entityManager->expects($this->once())->method('flush');
 
         $changes = new WorkflowChangesEvent($newDefinition);
 
@@ -115,9 +104,6 @@ class WorkflowDefinitionHandlerTest extends \PHPUnit_Framework_TestCase
         $newDefinition = (new WorkflowDefinition())->setName('updated');
 
         $this->workflowAssembler->expects($this->once())->method('assemble');
-//        $this->workflowAssembler->expects($this->once())->method('assemble')->willReturn($this->workflow);
-//        $this->workflow->expects($this->once())->method('getStepManager')->willReturn($this->stepManager);
-//        $this->stepManager->expects($this->once())->method('getSteps')->willReturn($this->getSteps());
 
         $this->entityManager->expects($this->never())->method('persist');
         $this->entityManager->expects($this->once())->method('flush');
@@ -131,8 +117,6 @@ class WorkflowDefinitionHandlerTest extends \PHPUnit_Framework_TestCase
         $this->eventDispatcher->expects($this->at(1))->method('dispatch')->with($afterEvent, $changes);
 
         $this->handler->updateWorkflowDefinition($existingDefinition, $newDefinition);
-
-        //$this->assertEquals($this->getWorkflowSteps($existingDefinition), $existingDefinition->getSteps());
     }
 
     /**
@@ -185,42 +169,5 @@ class WorkflowDefinitionHandlerTest extends \PHPUnit_Framework_TestCase
                 'expected' => false,
             ],
         ];
-    }
-
-    /**
-     * @return Step[]
-     */
-    protected function getSteps()
-    {
-        return [
-            (new Step())
-                ->setName('step1')
-                ->setLabel('Step1 Label')
-                ->setOrder(10)
-                ->setFinal(false)
-        ];
-    }
-
-    /**
-     * @param WorkflowDefinition $definition
-     * @return WorkflowStep[]|ArrayCollection
-     */
-    protected function getWorkflowSteps(WorkflowDefinition $definition)
-    {
-        $steps = new ArrayCollection();
-
-        foreach ($this->getSteps() as $step) {
-            $workflowStep = new WorkflowStep();
-            $workflowStep
-                ->setName($step->getName())
-                ->setLabel($step->getLabel())
-                ->setStepOrder($step->getOrder())
-                ->setFinal($step->isFinal())
-                ->setDefinition($definition);
-
-            $steps->add($workflowStep);
-        }
-
-        return $steps;
     }
 }
