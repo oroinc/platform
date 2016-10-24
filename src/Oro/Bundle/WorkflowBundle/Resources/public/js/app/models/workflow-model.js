@@ -27,7 +27,8 @@ define(function(require) {
             steps: null,
             transitions: null,
             'transition_definitions': null,
-            attributes: null
+            attributes: null,
+            translateLinkLabel: null
         },
 
         MAX_HISTORY_LENGTH: 50,

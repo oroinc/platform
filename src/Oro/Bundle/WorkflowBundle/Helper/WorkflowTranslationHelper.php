@@ -17,39 +17,33 @@ class WorkflowTranslationHelper
     const TRANSLATION_DOMAIN = 'workflows';
 
     /** @var Translator */
-    protected $translator;
+    private $translator;
 
     /** @var TranslationManager */
-    protected $translationManager;
+    private $translationManager;
 
     /** @var TranslationHelper */
-    protected $translationHelper;
-
-    /** @var TranslationKeyGenerator */
-    protected $translationKeyGenerator;
+    private $translationHelper;
 
     /** @var WorkflowTranslationFieldsIterator */
-    protected $translationFieldsIterator;
+    private $translationFieldsIterator;
+
+    /** @var TranslationKeyGenerator */
+    private $translationKeyGenerator;
 
     /**
      * @param Translator $translator
      * @param TranslationManager $translationManager
      * @param TranslationHelper $translationHelper
-     * @param TranslationKeyGenerator $translationKeyGenerator
-     * @param WorkflowTranslationFieldsIterator $translationFieldsIterator
      */
     public function __construct(
         Translator $translator,
         TranslationManager $translationManager,
-        TranslationHelper $translationHelper,
-        TranslationKeyGenerator $translationKeyGenerator,
-        WorkflowTranslationFieldsIterator $translationFieldsIterator
+        TranslationHelper $translationHelper
     ) {
         $this->translator = $translator;
         $this->translationManager = $translationManager;
         $this->translationHelper = $translationHelper;
-        $this->translationKeyGenerator = $translationKeyGenerator;
-        $this->translationFieldsIterator = $translationFieldsIterator;
     }
 
     /**
@@ -63,7 +57,7 @@ class WorkflowTranslationHelper
         );
 
         $this->translationHelper->prepareValues(
-            $this->translationKeyGenerator->generate($translationKeySource),
+            $this->getTranslationKeyGenerator()->generate($translationKeySource),
             $this->translator->getLocale(),
             self::TRANSLATION_DOMAIN
         );
@@ -124,12 +118,39 @@ class WorkflowTranslationHelper
         $definition->setLabel($this->getTranslation($definition->getLabel()));
         $configuration = $definition->getConfiguration();
 
-        $keys = $this->translationFieldsIterator->iterateConfigTranslationFields($workflowName, $configuration);
+        $keys = $this->getWorkflowTranslationFieldsIterator()
+            ->iterateConfigTranslationFields($workflowName, $configuration);
         foreach ($keys as &$item) {
             $item = $this->getTranslation($item);
         }
         unset($item);
 
         $definition->setConfiguration($configuration);
+    }
+
+    /**
+     * @return WorkflowTranslationFieldsIterator
+     */
+    private function getWorkflowTranslationFieldsIterator()
+    {
+        if (null === $this->translationFieldsIterator) {
+            $this->translationFieldsIterator = new WorkflowTranslationFieldsIterator(
+                $this->getTranslationKeyGenerator()
+            );
+        }
+
+        return $this->translationFieldsIterator;
+    }
+
+    /**
+     * @return TranslationKeyGenerator
+     */
+    private function getTranslationKeyGenerator()
+    {
+        if (null === $this->translationKeyGenerator) {
+            $this->translationKeyGenerator = new TranslationKeyGenerator();
+        }
+
+        return $this->translationKeyGenerator;
     }
 }
