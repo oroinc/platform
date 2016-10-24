@@ -1,48 +1,70 @@
 <?php
 
-namespace Oro\Bundle\NavigationBundle\Controller\Api;
+namespace Oro\Bundle\NavigationBundle\Controller;
 
 use Doctrine\ORM\EntityManager;
 
-use FOS\RestBundle\Controller\Annotations\Post;
-use FOS\RestBundle\Controller\Annotations\Put;
-use FOS\RestBundle\Controller\Annotations\Delete;
-use FOS\RestBundle\Controller\Annotations\NamePrefix;
-use FOS\RestBundle\Controller\Annotations\RouteResource;
-
 use Knp\Menu\ItemInterface;
 
-use Nelmio\ApiDocBundle\Annotation\ApiDoc;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 
 use Oro\Bundle\NavigationBundle\Entity\MenuUpdate;
 use Oro\Bundle\NavigationBundle\Menu\ConfigurationBuilder;
 use Oro\Bundle\NavigationBundle\Manager\MenuUpdateManager;
 
-/**
- * @RouteResource("menuupdates")
- * @NamePrefix("oro_api_")
- */
-class MenuController extends Controller
+class AjaxMenuController extends Controller
 {
     /**
-     * @Post("/menu/{menuName}/{parentKey}/{ownershipType}")
+     * @Route("/menu/reset/{ownershipType}/{menuName}", name="oro_navigation_menuupdate_reset")
+     * @Method("DELETE")
      *
-     * @ApiDoc(
-     *  description="Create menu item."
-     * )
-     *
-     * @param string $ownershipType
-     * @param string $menuName
-     * @param string $parentKey
+     * @param Request $request
+     * @param string  $menuName
+     * @param string  $ownershipType
      *
      * @return Response
      */
-    public function createAction(Request $request, $ownershipType, $menuName, $parentKey)
+    public function resetAction(Request $request, $menuName, $ownershipType)
+    {
+        /** @var MenuUpdateManager $manager */
+        $manager = $this->get('oro_navigation.manager.menu_update_default');
+
+        $updates = $manager->getMenuUpdatesByMenuAndScope(
+            $menuName,
+            $ownershipType,
+            $this->getCurrentOwnerId($ownershipType, $request->get('ownerId'))
+        );
+
+        /** @var EntityManager $em */
+        $em = $this->getDoctrine()->getManagerForClass(MenuUpdate::class);
+
+        foreach ($updates as $update) {
+            $em->remove($update);
+        }
+
+        $em->flush($updates);
+
+        return new JsonResponse(null, Response::HTTP_NO_CONTENT);
+    }
+
+    /**
+     * @Route("/menu/{menuName}/{parentKey}/{ownershipType}", name="oro_navigation_menuupdate_create")
+     * @Method("POST")
+     *
+     * @param Request $request
+     * @param string  $menuName
+     * @param string  $parentKey
+     * @param string  $ownershipType
+     *
+     * @return Response
+     */
+    public function createAction(Request $request, $menuName, $parentKey, $ownershipType)
     {
         $menuUpdate = $this->get('oro_navigation.manager.menu_update_default')->createMenuUpdate(
             $ownershipType,
@@ -62,15 +84,13 @@ class MenuController extends Controller
     }
 
     /**
-     * @Delete("/menu/{ownershipType}/{menuName}/{key}")
+     * @Route("/menu/{ownershipType}/{menuName}/{key}", name="oro_navigation_menuupdate_delete")
+     * @Method("DELETE")
      *
-     * @ApiDoc(
-     *  description="Delete or hide menu item."
-     * )
-     *
-     * @param string $ownershipType
-     * @param string $menuName
-     * @param string $key
+     * @param Request $request
+     * @param string  $menuName
+     * @param string  $key
+     * @param string  $ownershipType
      *
      * @return Response
      */
@@ -105,15 +125,13 @@ class MenuController extends Controller
     }
 
     /**
-     * @Put("/menu/show/{ownershipType}/{menuName}/{key}")
+     * @Route("/menu/show/{ownershipType}/{menuName}/{key}", name="oro_navigation_menuupdate_show")
+     * @Method("PUT")
      *
-     * @ApiDoc(
-     *  description="Make menu item visible."
-     * )
-     *
-     * @param string $ownershipType
-     * @param string $menuName
-     * @param string $key
+     * @param Request $request
+     * @param string  $menuName
+     * @param string  $key
+     * @param string  $ownershipType
      *
      * @return Response
      */
@@ -132,15 +150,13 @@ class MenuController extends Controller
     }
 
     /**
-     * @Put("/menu/hide/{ownershipType}/{menuName}/{key}")
+     * @Route("/menu/hide/{ownershipType}/{menuName}/{key}", name="oro_navigation_menuupdate_hide")
+     * @Method("PUT")
      *
-     * @ApiDoc(
-     *  description="Make menu item hidden."
-     * )
-     *
-     * @param string $ownershipType
-     * @param string $menuName
-     * @param string $key
+     * @param Request $request
+     * @param string  $menuName
+     * @param string  $key
+     * @param string  $ownershipType
      *
      * @return Response
      */
@@ -159,42 +175,8 @@ class MenuController extends Controller
     }
 
     /**
-     * @Delete("/menu/reset/{ownershipType}/{menuName}")
-     *
-     * @ApiDoc(description="Reset menu to default state.")
-     *
-     * @param int    $ownershipType
-     * @param string $menuName
-     *
-     * @return Response
-     */
-    public function resetAction(Request $request, $menuName, $ownershipType)
-    {
-        /** @var MenuUpdateManager $manager */
-        $manager = $this->get('oro_navigation.manager.menu_update_default');
-
-        $updates = $manager->getMenuUpdatesByMenuAndScope(
-            $menuName,
-            $ownershipType,
-            $this->getCurrentOwnerId($ownershipType, $request->get('ownerId'))
-        );
-
-        /** @var EntityManager $em */
-        $em = $this->getDoctrine()->getManagerForClass(MenuUpdate::class);
-
-        foreach ($updates as $update) {
-            $em->remove($update);
-        }
-
-        $em->flush($updates);
-
-        return new JsonResponse(null, Response::HTTP_NO_CONTENT);
-    }
-
-    /**
-     * @Put("/menu/move/{ownershipType}/{menuName}")
-     *
-     * @ApiDoc(description="Move menu item.")
+     * @Route("/menu/move/{ownershipType}/{menuName}", name="oro_navigation_menuupdate_move")
+     * @Method("PUT")
      *
      * @param Request $request
      * @param int     $ownershipType
@@ -260,6 +242,8 @@ class MenuController extends Controller
 
     /**
      * @param string $ownershipType
+     * @param null|int $ownerId
+     *
      * @return int
      */
     private function getCurrentOwnerId($ownershipType, $ownerId = null)

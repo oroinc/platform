@@ -11,7 +11,7 @@
                     {% set actionButtons %}
                         <div class="pull-right">
                             {{ resetButton({
-                                'dataUrl': path('oro_api_reset_menuupdates', {menuName: entity.root.name, ownershipType: ownershipType}),
+                                'dataUrl': path('oro_navigation_menuupdate_reset', {menuName: entity.root.name, ownershipType: ownershipType}),
                                 'dataRedirect': menuViewPath,
                                 'menuKey': entity.root.name
                             }) }}
@@ -76,7 +76,7 @@
                                         'updateAllowed' : true,
                                         'onRootSelectRoute' : onRootSelectRoute,
                                         'onSelectRoute' : onSelectRoute,
-                                        'onMoveRoute' : 'oro_api_move_menuupdates'
+                                        'onMoveRoute' : 'oro_navigation_menuupdate_move'
                                     } %}
                                     <div
                                             data-page-component-module="oronavigation/js/app/components/tree-manage-component"

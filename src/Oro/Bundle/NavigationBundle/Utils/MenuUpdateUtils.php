@@ -37,7 +37,6 @@ class MenuUpdateUtils
         $accessor = self::getPropertyAccessor();
 
         self::setValue($accessor, $update, 'key', $item->getName());
-        self::setValue($accessor, $update, 'uri', $item->getUri());
 
         $menuUpdateHelper->applyLocalizedFallbackValue($update, $item->getLabel(), 'title', 'string');
 
@@ -98,11 +97,7 @@ class MenuUpdateUtils
         }
 
         if ($update->getTitles()->count()) {
-            $item->setLabel($update->getTitle($localizationHelper->getCurrentLocalization()));
-        }
-
-        if ($update->getUri()) {
-            $item->setUri($update->getUri());
+            $item->setLabel((string) $update->getTitle($localizationHelper->getCurrentLocalization()));
         }
 
         $item->setDisplay($update->isActive());

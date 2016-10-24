@@ -101,15 +101,24 @@ class ResetMenuUpdatesCommand extends ContainerAwareCommand
      */
     private function resetMenuUpdates($user = null, $menuName = null)
     {
+        $ownerId = null;
         if (null !== $user) {
-            $provider = $this->getContainer()->get('oro_navigation.ownership_provider.user');
+            $ownershipType = $this
+                ->getContainer()
+                ->get('oro_navigation.ownership_provider.user')
+                ->getType();
+
+            $ownerId = $user->getId();
         } else {
-            $provider = $this->getContainer()->get('oro_navigation.ownership_provider.global');
+            $ownershipType = $this
+                ->getContainer()
+                ->get('oro_navigation.ownership_provider.global')
+                ->getType();
         }
 
         $this
             ->getContainer()
             ->get('oro_navigation.manager.menu_update_default')
-            ->resetMenuUpdatesWithOwnershipType($provider, $menuName);
+            ->resetMenuUpdatesWithOwnershipType($ownershipType, $ownerId, $menuName);
     }
 }

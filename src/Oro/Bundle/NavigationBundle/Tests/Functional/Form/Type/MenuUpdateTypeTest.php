@@ -22,8 +22,9 @@ use Oro\Bundle\NavigationBundle\Form\Type\MenuUpdateType;
 class MenuUpdateTypeTest extends FormIntegrationTestCase
 {
     const TEST_TITLE = 'Test Title';
+    const TEST_DESCRIPTION = 'Test Description';
     const TEST_URI = 'http://test_uri';
-    const TEST_ACL_RESCOURCE_ID = 'test_acl_rescource_id';
+    const TEST_ACL_RESOURCE_ID = 'test_acl_rescource_id';
 
     /**
      * {@inheritdoc}
@@ -62,6 +63,11 @@ class MenuUpdateTypeTest extends FormIntegrationTestCase
                     'values' => [
                         'default' => self::TEST_TITLE
                     ]
+                ],
+                'descriptions' => [
+                    'values' => [
+                        'default' => self::TEST_DESCRIPTION
+                    ]
                 ]
             ]
         );
@@ -70,7 +76,8 @@ class MenuUpdateTypeTest extends FormIntegrationTestCase
         $expectedTitle = (new LocalizedFallbackValue)->setString(self::TEST_TITLE);
         $expected->addTitle($expectedTitle);
 
-        $expected->addDescription(new LocalizedFallbackValue);
+        $expectedDescription = (new LocalizedFallbackValue)->setText(self::TEST_DESCRIPTION);
+        $expected->addDescription($expectedDescription);
 
         $this->assertFormOptionEqual(true, 'disabled', $form->get('uri'));
         $this->assertFormNotContainsField('aclResourceId', $form);
@@ -159,7 +166,7 @@ class MenuUpdateTypeTest extends FormIntegrationTestCase
         $menuItem->expects($this->any())
             ->method('getExtra')
             ->with('aclResourceId')
-            ->willReturn(self::TEST_ACL_RESCOURCE_ID);
+            ->willReturn(self::TEST_ACL_RESOURCE_ID);
 
         $form = $this->factory->create(new MenuUpdateType(), $menuUpdate, ['menu_item' => $menuItem]);
 
