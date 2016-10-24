@@ -10,7 +10,15 @@ use Oro\Bundle\NavigationBundle\Model\ExtendMenuUpdate;
 
 /**
  * @ORM\Entity
- * @ORM\Table(name="oro_navigation_menu_upd")
+ * @ORM\Table(
+ *      name="oro_navigation_menu_upd",
+ *      uniqueConstraints={
+ *          @ORM\UniqueConstraint(
+ *              name="unq_menu_key",
+ *              columns={"key", "ownership_type"}
+ *          )
+ *      }
+ * )
  * @ORM\AssociationOverrides({
  *      @ORM\AssociationOverride(
  *          name="titles",
@@ -55,8 +63,6 @@ use Oro\Bundle\NavigationBundle\Model\ExtendMenuUpdate;
  *          )
  *      )
  * })
- * @ORM\HasLifecycleCallbacks
- *
  * @Config(
  *      routeName="oro_navigation_menu_update_index",
  *      defaultValues={
@@ -88,6 +94,7 @@ class MenuUpdate extends ExtendMenuUpdate implements
     public function getExtras()
     {
         $extras = [
+            'uri' => $this->getUri(),
             'divider' => $this->isDivider()
         ];
 

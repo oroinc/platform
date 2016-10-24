@@ -44,27 +44,28 @@ class ResetMenuUpdatesCommand extends WebTestCase
             'should show help' => [
                 '$expectedContent' => "Usage:\n  oro:navigation:menu:reset [options]",
                 '$params'          => ['--help'],
-                '$rowsCount'       => 3
+                '$rowsCount'       => 7
             ],
             'should show failed reset for non existing user' => [
                 '$expectedContent' => "User with email nonexist@user.com not exists.",
                 '$params'          => ['--user=nonexist@user.com'],
-                '$rowsCount'       => 3
+                '$rowsCount'       => 7
             ],
             'should show success reset for user and menu' => [
-                '$expectedContent' => "The menu \"other_menu\" for user \"admin@example.com\" is successfully reset.",
-                '$params'          => ['--user=admin@example.com', '--menu=other_menu'],
-                '$rowsCount'       => 2
+                '$expectedContent' =>
+                    "The menu \"application_menu\" for user \"admin@example.com\" is successfully reset.",
+                '$params'          => ['--user=admin@example.com', '--menu=application_menu'],
+                '$rowsCount'       => 6
             ],
             'should show success reset for user' => [
                 '$expectedContent' => "All menus for user \"admin@example.com\" is successfully reset.",
                 '$params'          => ['--user=admin@example.com'],
-                '$rowsCount'       => 1
+                '$rowsCount'       => 6
             ],
             'should show success reset for global scope and menu' => [
-                '$expectedContent' => "The menu \"other_menu\" for global scope is successfully reset.",
-                '$params'          => ['--menu=other_menu'],
-                '$rowsCount'       => 1
+                '$expectedContent' => "The menu \"shortcuts\" for global scope is successfully reset.",
+                '$params'          => ['--menu=shortcuts'],
+                '$rowsCount'       => 5
             ],
             'should show success reset for global scope' => [
                 '$expectedContent' => "All menus in global scope is successfully reset.",
