@@ -60,6 +60,7 @@ oro:
             divider: Divider
             custom.label: Is Custom
             divider.label: Is Divider
+            icon.label: Icon
             descriptions.label: Description
             divider_created: Divider created
         action:

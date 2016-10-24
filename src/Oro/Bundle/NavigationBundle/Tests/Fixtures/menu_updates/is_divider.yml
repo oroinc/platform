@@ -25,9 +25,10 @@ result_menu:
             extras:
                 uri: '#system'
         divider:
+            uri: '#'
             extras:
-                uri: '#'
                 divider: true
+                translateDisabled: false
     tree:
         menu:
             type: menu

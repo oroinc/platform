@@ -29,9 +29,11 @@ result_menu:
     items:
         system:
             label: 'System'
+            uri: '#system'
             extras:
                 uri: '#system'
                 divider: false
+                translateDisabled: false
             display: false
         custom:
             label: 'Custom'

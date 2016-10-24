@@ -81,7 +81,7 @@ trait MenuUpdateTrait
     /**
      * @var int
      *
-     * @ORM\Column(name="owner_id", type="integer", nullable=true)
+     * @ORM\Column(name="owner_id", type="integer", nullable=false)
      */
     protected $ownerId;
 
