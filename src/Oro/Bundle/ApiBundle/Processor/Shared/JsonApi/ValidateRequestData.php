@@ -207,6 +207,9 @@ abstract class ValidateRequestData implements ProcessorInterface
         if (!$this->validateRequired($data, JsonApiDoc::ID, $pointer)) {
             return false;
         }
+        if (!$this->validateId($data, $pointer)) {
+            return false;
+        }
         if (!$this->validateRequired($data, JsonApiDoc::TYPE, $pointer)) {
             return false;
         }
@@ -230,6 +233,46 @@ abstract class ValidateRequestData implements ProcessorInterface
             );
 
             return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * @param array  $data
+     * @param string $pointer
+     *
+     * @return bool
+     */
+    protected function validateId(array $data, $pointer)
+    {
+        $property = JsonApiDoc::ID;
+        if (array_key_exists($property, $data)) {
+            $value = $data[$property];
+            if (null === $value) {
+                $this->addError(
+                    $this->buildPointer($pointer, $property),
+                    sprintf('The \'%s\' property should not be null', $property)
+                );
+
+                return false;
+            }
+            if (!is_string($value)) {
+                $this->addError(
+                    $this->buildPointer($pointer, $property),
+                    sprintf('The \'%s\' property should be a string', $property)
+                );
+
+                return false;
+            }
+            if ('' === trim($value)) {
+                $this->addError(
+                    $this->buildPointer($pointer, $property),
+                    sprintf('The \'%s\' property should not be blank', $property)
+                );
+
+                return false;
+            }
         }
 
         return true;

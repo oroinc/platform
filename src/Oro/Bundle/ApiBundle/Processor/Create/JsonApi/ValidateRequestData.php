@@ -18,5 +18,6 @@ class ValidateRequestData extends BaseProcessor
         if ($this->validateRequired($data, JsonApiDoc::TYPE, $pointer)) {
             $this->validatePrimaryDataObjectType($data, $pointer);
         }
+        $this->validateId($data, $pointer);
     }
 }

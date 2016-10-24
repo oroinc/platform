@@ -5,6 +5,10 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\Update\JsonApi;
 use Oro\Bundle\ApiBundle\Processor\Update\JsonApi\ValidateRequestData;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\FormProcessorTestCase;
 
+/**
+ * This test case contains only cases for "update" action, for common tests see
+ * @see \Oro\Bundle\ApiBundle\Tests\Unit\Processor\Shared\JsonApi\ValidateRequestDataTest
+ */
 class ValidateRequestDataTest extends FormProcessorTestCase
 {
     /** @var \PHPUnit_Framework_MockObject_MockObject */
@@ -85,10 +89,32 @@ class ValidateRequestDataTest extends FormProcessorTestCase
     public function invalidRequestDataProvider()
     {
         return [
-            [[], 'The primary data object should exist', '/data'],
-            [['data' => null], 'The primary data object should not be empty', '/data'],
-            [['data' => []], 'The primary data object should not be empty', '/data'],
             [['data' => ['attributes' => ['foo' => 'bar']]], 'The \'id\' property is required', '/data/id'],
+            [
+                ['data' => ['id' => null, 'type' => 'products', 'attributes' => ['test' => null]]],
+                'The \'id\' property should not be null',
+                '/data/id'
+            ],
+            [
+                ['data' => ['id' => '', 'type' => 'products', 'attributes' => ['test' => null]]],
+                'The \'id\' property should not be blank',
+                '/data/id'
+            ],
+            [
+                ['data' => ['id' => ' ', 'type' => 'products', 'attributes' => ['test' => null]]],
+                'The \'id\' property should not be blank',
+                '/data/id'
+            ],
+            [
+                ['data' => ['id' => 123, 'type' => 'products', 'attributes' => ['test' => null]]],
+                'The \'id\' property should be a string',
+                '/data/id'
+            ],
+            [
+                ['data' => ['id' => '32', 'type' => 'products', 'attributes' => ['foo' => 'bar']]],
+                'The \'id\' property of the primary data object should match \'id\' parameter of the query sting',
+                '/data/id',
+            ],
             [
                 ['data' => ['id' => '1', 'attributes' => ['foo' => 'bar']]],
                 'The \'type\' property is required',
@@ -99,105 +125,6 @@ class ValidateRequestDataTest extends FormProcessorTestCase
                 'The \'type\' property of the primary data object should match the requested resource',
                 '/data/type',
             ],
-            [
-                ['data' => ['id' => '32', 'type' => 'products', 'attributes' => ['foo' => 'bar']]],
-                'The \'id\' property of the primary data object should match \'id\' parameter of the query sting',
-                '/data/id',
-            ],
-            [
-                ['data' => ['id' => '23', 'type' => 'products']],
-                'The primary data object should contain \'attributes\' or \'relationships\' block',
-                '/data',
-            ],
-            [
-                ['data' => ['id' => '23', 'type' => 'products']],
-                'The primary data object should contain \'attributes\' or \'relationships\' block',
-                '/data',
-            ],
-            [
-                ['data' => ['id' => '23', 'type' => 'products', 'attributes' => null]],
-                'The \'attributes\' property should be an array',
-                '/data/attributes',
-            ],
-            [
-                ['data' => ['id' => '23', 'type' => 'products', 'attributes' => []]],
-                'The \'attributes\' property should not be empty',
-                '/data/attributes',
-            ],
-            [
-                ['data' => ['id' => '23', 'type' => 'products', 'attributes' => [1, 2, 3]]],
-                'The \'attributes\' property should be an associative array',
-                '/data/attributes',
-            ],
-            [
-                ['data' => ['id' => '23', 'type' => 'products', 'relationships' => null]],
-                'The \'relationships\' property should be an array',
-                '/data/relationships',
-            ],
-            [
-                ['data' => ['id' => '23', 'type' => 'products', 'relationships' => []]],
-                'The \'relationships\' property should not be empty',
-                '/data/relationships',
-            ],
-            [
-                ['data' => ['id' => '23', 'type' => 'products', 'relationships' => [1, 2, 3]]],
-                'The \'relationships\' property should be an associative array',
-                '/data/relationships',
-            ],
-            [
-                ['data' => ['id' => '23', 'type' => 'products', 'relationships' => ['test' => null]]],
-                'The relationship should have \'data\' property',
-                '/data/relationships/test',
-            ],
-            [
-                ['data' => ['id' => '23', 'type' => 'products', 'relationships' => ['test' => []]]],
-                'The relationship should have \'data\' property',
-                '/data/relationships/test',
-            ],
-            [
-                [
-                    'data' => [
-                        'id'            => '23',
-                        'type'          => 'products',
-                        'relationships' => ['test' => ['data' => ['id' => '2']]]
-                    ]
-                ],
-                'The \'type\' property is required',
-                '/data/relationships/test/data/type',
-            ],
-            [
-                [
-                    'data' => [
-                        'id'            => '23',
-                        'type'          => 'products',
-                        'relationships' => ['test' => ['data' => ['type' => 'products']]]
-                    ]
-                ],
-                'The \'id\' property is required',
-                '/data/relationships/test/data/id',
-            ],
-            [
-                [
-                    'data' => [
-                        'id'            => '23',
-                        'type'          => 'products',
-                        'relationships' => ['test' => ['data' => [['id' => '2']]]]
-                    ]
-                ],
-                'The \'type\' property is required',
-                '/data/relationships/test/data/0/type',
-            ],
-            [
-                [
-                    'data' => [
-                        'id'            => '23',
-                        'type'          => 'products',
-                        'relationships' => ['test' => ['data' => [['type' => 'products']]]]
-                    ]
-                ],
-                'The \'id\' property is required',
-                '/data/relationships/test/data/0/id',
-            ]
         ];
     }
 }

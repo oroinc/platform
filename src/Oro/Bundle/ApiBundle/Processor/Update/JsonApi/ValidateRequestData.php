@@ -17,7 +17,9 @@ class ValidateRequestData extends BaseProcessor
     protected function validatePrimaryDataObject(array $data, $pointer)
     {
         if ($this->validateResourceObject($data, $pointer)) {
-            $this->validatePrimaryDataObjectId($data, $pointer);
+            if ($this->validateId($data, $pointer)) {
+                $this->validatePrimaryDataObjectId($data, $pointer);
+            }
             $this->validatePrimaryDataObjectType($data, $pointer);
         }
     }
