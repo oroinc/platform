@@ -14,6 +14,7 @@ use Oro\Bundle\DataGridBundle\Datasource\ResultRecordInterface;
 use Oro\Bundle\DataGridBundle\Extension\Action\ActionExtension as DatagridActionExtension;
 use Oro\Bundle\DataGridBundle\Extension\Action\Event\ConfigureActionsBefore;
 use Oro\Bundle\DataGridBundle\Tools\GridConfigurationHelper;
+use Oro\Bundle\SearchBundle\Datagrid\Datasource\SearchDatasource;
 
 class OperationListener
 {
@@ -77,8 +78,13 @@ class OperationListener
     {
         $config = $event->getConfig();
 
-        // datasource type other than ORM is not handled
-        if ($config->getDatasourceType() !== OrmDatasource::TYPE) {
+        echo "d";
+
+        // datasource types other than ORM or search are not handled
+        if (!(
+            $config->getDatasourceType() === OrmDatasource::TYPE ||
+            $config->getDatasourceType() === SearchDatasource::TYPE
+        )) {
             return;
         }
 

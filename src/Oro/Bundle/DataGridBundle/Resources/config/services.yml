@@ -278,6 +278,7 @@ services:
         class: Oro\Bundle\DataGridBundle\Tools\GridConfigurationHelper
         arguments:
             - '@oro_entity.orm.entity_class_resolver'
+            - '@oro_website_search.provider.search_mapping'
 
     oro_datagrid.mixin_configuration.helper:
         class: Oro\Bundle\DataGridBundle\Tools\MixinConfigurationHelper
