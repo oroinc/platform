@@ -4,7 +4,6 @@ namespace Oro\Bundle\ActivityBundle\Migration\Extension;
 
 use Doctrine\DBAL\Schema\Schema;
 
-use Doctrine\DBAL\Schema\Table;
 use Oro\Bundle\ActivityBundle\EntityConfig\ActivityScope;
 use Oro\Bundle\EntityExtendBundle\Migration\Extension\ExtendExtension;
 use Oro\Bundle\EntityExtendBundle\Migration\Extension\ExtendExtensionAwareInterface;
@@ -124,24 +123,6 @@ class ActivityExtension implements ExtendExtensionAwareInterface, NameGeneratorA
             $sourceClassName,
             $associationName,
             $targetClassName
-        );
-    }
-
-    /**
-     * Has many-to-many relation
-     *
-     * @param Schema       $schema
-     * @param Table|string $table       A Table object or table name
-     * @param Table|string $targetTable A Table object or table name
-     *
-     * @return bool
-     */
-    public function hasAssociationTable(Schema $schema, $table, $targetTable)
-    {
-        return $this->extendExtension->hasManyToManyRelation(
-            $schema,
-            $table,
-            $targetTable
         );
     }
 }
