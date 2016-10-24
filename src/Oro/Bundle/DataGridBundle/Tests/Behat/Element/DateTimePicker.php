@@ -16,18 +16,11 @@ class DateTimePicker extends Element
 
         $this->getMonthPicker()->selectOption($dateTime->format('M'));
         $this->getYearPicker()->selectOption($dateTime->format('Y'));
-        $dateValue = (string) $dateTime->format('j');
-
-        /** @var NodeElement $date */
-        foreach ($this->getCalendar()->findAll('css', 'tbody a') as $date) {
-            if ($date->getText() === $dateValue) {
-                $date->click();
-            }
-        }
+        $this->getCalendarDate($dateTime->format('j'))->click();
 
         $timePicker = $this->getTimePicker();
-        $timePicker->setValue($dateTime->format('H:i'));
         $timePicker->click();
+        $timePicker->setValue($dateTime->format('H:i'));
         $this->clickSelectedTime();
     }
 
@@ -75,5 +68,14 @@ class DateTimePicker extends Element
     protected function getDatePicker()
     {
         return $this->find('css', 'input.datepicker-input');
+    }
+
+    /**
+     * @param int|string $dateValue
+     * @return NodeElement|null
+     */
+    protected function getCalendarDate($dateValue)
+    {
+        return $this->getCalendar()->find('css', "tbody a:contains('$dateValue')");
     }
 }

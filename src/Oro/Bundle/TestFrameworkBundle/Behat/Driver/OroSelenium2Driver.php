@@ -6,6 +6,7 @@ use Behat\Mink\Driver\Selenium2Driver;
 use Behat\Mink\Selector\Xpath\Escaper;
 use Behat\Mink\Selector\Xpath\Manipulator;
 use Oro\Bundle\TestFrameworkBundle\Behat\Context\AssertTrait;
+use Oro\Bundle\TestFrameworkBundle\Behat\Element\ElementValueInterface;
 use WebDriver\Element;
 use WebDriver\Key;
 
@@ -42,6 +43,12 @@ class OroSelenium2Driver extends Selenium2Driver
         $element = $this->findElement($xpath);
         $elementName = strtolower($element->name());
 
+        if ($value instanceof ElementValueInterface) {
+            $value->set($xpath, $this);
+
+            return;
+        }
+
         if ('select' === $elementName) {
             if (is_array($value)) {
                 $this->deselectAllOptions($element);
@@ -74,7 +81,7 @@ class OroSelenium2Driver extends Selenium2Driver
 
                 return;
             } elseif ('text' === $element->attribute('type')) {
-                $this->fillTextInput($element, $value);
+                $this->setTextInputElement($element, $value);
 
                 return;
             }
@@ -133,12 +140,13 @@ class OroSelenium2Driver extends Selenium2Driver
      * @param Element $element
      * @param string $value
      */
-    protected function fillTextInput(Element $element, $value)
+    protected function setTextInputElement(Element $element, $value)
     {
-        $existingValueLength = strlen($element->attribute('value'));
-        $value = str_repeat(Key::BACKSPACE . Key::DELETE, $existingValueLength) . $value;
-
-        $element->postValue(array('value' => array($value)));
+        $script = <<<JS
+var node = {{ELEMENT}};
+node.value = '$value';
+JS;
+        $this->executeJsOnElement($element, $script);
     }
 
     /**
@@ -272,7 +280,7 @@ JS;
     /**
      * {@inheritdoc}
      */
-    public function executeJsOnElement(Element $element, $script, $sync = true)
+    protected function executeJsOnElement(Element $element, $script, $sync = true)
     {
         $script  = str_replace('{{ELEMENT}}', 'arguments[0]', $script);
 

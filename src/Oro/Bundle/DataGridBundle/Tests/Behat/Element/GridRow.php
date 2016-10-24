@@ -4,6 +4,8 @@ namespace Oro\Bundle\DataGridBundle\Tests\Behat\Element;
 
 use Behat\Mink\Element\NodeElement;
 use Oro\Bundle\TestFrameworkBundle\Behat\Element\Element;
+use Oro\Bundle\TestFrameworkBundle\Behat\Element\InputMethod;
+use Oro\Bundle\TestFrameworkBundle\Behat\Element\InputValue;
 
 class GridRow extends Element
 {
@@ -55,14 +57,22 @@ class GridRow extends Element
         /** @var GridHeader $gridHeader */
         $gridHeader = $this->elementFactory->createElement('GridHeader');
         $columnNumber = $gridHeader->getColumnNumber($header);
+
+        /** @var NodeElement $cell */
         $cell = $this->getCellByNumber($columnNumber);
-
         $cell->mouseOver();
-        $pencil = $cell->find('css', 'i[data-role="edit"]');
-        self::assertTrue($pencil->isValid());
-        $pencil->click();
 
-        $this->elementFactory->createElement('OroForm')->fillField('value', $value);
+        /** @var NodeElement $pencilIcon */
+        $pencilIcon = $cell->find('css', 'i[data-role="edit"]');
+        self::assertTrue($pencilIcon->isValid());
+        $pencilIcon->click();
+
+
+        $this->elementFactory->createElement('OroForm')->fillField(
+            'value',
+            new InputValue(InputMethod::TYPE, $value)
+        );
+
         $this->getDriver()->waitForAjax();
         $cell->find('css', 'button[title="Save changes"]')->click();
     }
