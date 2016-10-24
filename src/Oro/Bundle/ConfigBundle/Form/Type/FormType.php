@@ -4,6 +4,7 @@ namespace Oro\Bundle\ConfigBundle\Form\Type;
 
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormBuilderInterface;
 
 use Oro\Bundle\ConfigBundle\Config\ConfigChangeSet;
@@ -45,9 +46,9 @@ class FormType extends AbstractType
             $handlers = (array)$blockConfig['handler'];
             $builder->setAttribute(
                 'handler',
-                function (ConfigManager $manager, ConfigChangeSet $changeSet) use ($handlers) {
+                function (ConfigManager $manager, ConfigChangeSet $changeSet, Form $form) use ($handlers) {
                     foreach ($handlers as $handler) {
-                        call_user_func($this->getCallback($handler), $manager, $changeSet);
+                        call_user_func($this->getCallback($handler), $manager, $changeSet, $form);
                     }
                 }
             );

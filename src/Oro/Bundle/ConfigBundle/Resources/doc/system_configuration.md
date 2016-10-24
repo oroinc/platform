@@ -86,7 +86,7 @@ class SettingsFormConfigurator
 
 To customize handling of a group configuration form, it is possible to use `handler` option.
 The handler can be implemented as a static method or a service.
-The signature of the handler must be `function (ConfigManager $manager, ConfigChangeSet $changeSet)`.
+The signature of the handler must be `function (ConfigManager $manager, ConfigChangeSet $changeSet, Form $form)`.
 
 To specify a handler the following syntax should be used
 
