@@ -80,7 +80,9 @@ class ConfigurationPass implements CompilerPassInterface
         $togglesRequiringPageReload = [];
         foreach ($featuresConfigurations as $featuresConfig) {
             foreach ($featuresConfig as $featureConfig) {
-                if (!isset($featureConfig['toggle'], $featureConfig['configuration'])) {
+                if (!isset($featureConfig['toggle']) ||
+                    (!isset($featureConfig['configuration']) && !isset($featureConfig['routes']))
+                ) {
                     continue;
                 }
 

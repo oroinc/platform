@@ -296,7 +296,7 @@ abstract class ApiTestCase extends WebTestCase
     }
 
     /**
-     * @return boolean
+     * @return bool
      */
     protected function isEntityEnabled($entityClass)
     {
