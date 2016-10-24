@@ -3,7 +3,9 @@ define(function(require) {
 
     var TreeManageComponent;
     var __ = require('orotranslation/js/translator');
+    var $ = require('jquery');
     var mediator = require('oroui/js/mediator');
+    var widgetManager = require('oroui/js/widget-manager');
     var messenger = require('oroui/js/messenger');
     var routing = require('routing');
     var BasicTreeManageComponent = require('oroui/js/app/components/basic-tree-manage-component');

@@ -99,7 +99,7 @@ class AjaxMenuControllerTest extends WebTestCase
         $this->client->request(
             'DELETE',
             $this->getUrl('oro_navigation_menuupdate_delete', $parameters),
-            ['ownerId' => 1]
+            ['ownerId' => $this->getReference('simple_user')->getId()]
         );
 
         $result = $this->client->getResponse();
@@ -137,7 +137,7 @@ class AjaxMenuControllerTest extends WebTestCase
         $this->client->request(
             'PUT',
             $this->getUrl('oro_navigation_menuupdate_show', $parameters),
-            ['ownerId' => 1]
+            ['ownerId' => $this->getReference('simple_user')->getId()]
         );
 
         $result = $this->client->getResponse();
@@ -175,7 +175,7 @@ class AjaxMenuControllerTest extends WebTestCase
         $this->client->request(
             'PUT',
             $this->getUrl('oro_navigation_menuupdate_hide', $parameters),
-            ['ownerId' => 1]
+            ['ownerId' => $this->getReference('simple_user')->getId()]
         );
 
         $result = $this->client->getResponse();
@@ -211,7 +211,7 @@ class AjaxMenuControllerTest extends WebTestCase
         $this->client->request(
             'DELETE',
             $this->getUrl('oro_navigation_menuupdate_reset', $parameters),
-            ['ownerId' => 1]
+            ['ownerId' => $this->getReference('simple_user')->getId()]
         );
 
         $result = $this->client->getResponse();
@@ -253,7 +253,7 @@ class AjaxMenuControllerTest extends WebTestCase
             'PUT',
             $this->getUrl('oro_navigation_menuupdate_move', $parameters),
             [
-                'ownerId' => 1,
+                'ownerId' => $this->getReference('simple_user')->getId(),
                 'key' => 'menu_update.3',
                 'parentKey' => 'application_menu',
                 'position' => 11
