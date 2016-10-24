@@ -116,6 +116,33 @@ class WorkflowDefinitionTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($value, $this->workflowDefinition->getConfiguration());
     }
 
+    public function testSetSteps()
+    {
+        $stepOne = new WorkflowStep();
+        $stepOne->setName('step1');
+        $this->workflowDefinition->addStep($stepOne);
+
+        $stepTwo = new WorkflowStep();
+        $stepTwo->setName('step2');
+        $this->workflowDefinition->addStep($stepTwo);
+
+        $stepThree = new WorkflowStep();
+        $stepThree->setName('step3');
+        $this->workflowDefinition->addStep($stepThree);
+
+        $this->assertCount(3, $this->workflowDefinition->getSteps());
+
+        $this->assertTrue($this->workflowDefinition->hasStepByName('step3'));
+        $this->workflowDefinition->removeStep($stepThree);
+        $this->assertFalse($this->workflowDefinition->hasStepByName('step3'));
+
+        $this->assertCount(2, $this->workflowDefinition->getSteps());
+        $this->workflowDefinition->setSteps(new ArrayCollection([$stepOne]));
+        $actualSteps = $this->workflowDefinition->getSteps();
+        $this->assertCount(1, $actualSteps);
+        $this->assertEquals($stepOne, $actualSteps[0]);
+    }
+
     public function testSetGetAclIdentities()
     {
         $firstStep = new WorkflowStep();
@@ -152,33 +179,6 @@ class WorkflowDefinitionTest extends \PHPUnit_Framework_TestCase
         // resetting
         $this->workflowDefinition->setEntityAcls([]);
         $this->assertEmpty($this->workflowDefinition->getEntityAcls()->toArray());
-    }
-
-    public function testSetSteps()
-    {
-        $stepOne = new WorkflowStep();
-        $stepOne->setName('step1');
-        $this->workflowDefinition->addStep($stepOne);
-
-        $stepTwo = new WorkflowStep();
-        $stepTwo->setName('step2');
-        $this->workflowDefinition->addStep($stepTwo);
-
-        $stepThree = new WorkflowStep();
-        $stepThree->setName('step3');
-        $this->workflowDefinition->addStep($stepThree);
-
-        $this->assertCount(3, $this->workflowDefinition->getSteps());
-
-        $this->assertTrue($this->workflowDefinition->hasStepByName('step3'));
-        $this->workflowDefinition->removeStep($stepThree);
-        $this->assertFalse($this->workflowDefinition->hasStepByName('step3'));
-
-        $this->assertCount(2, $this->workflowDefinition->getSteps());
-        $this->workflowDefinition->setSteps(new ArrayCollection([$stepOne]));
-        $actualSteps = $this->workflowDefinition->getSteps();
-        $this->assertCount(1, $actualSteps);
-        $this->assertEquals($stepOne, $actualSteps[0]);
     }
 
     public function testSetGetEntityRestrictions()
