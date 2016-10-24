@@ -9,9 +9,7 @@ use Oro\Bundle\TranslationBundle\Translation\KeySource\TranslationKeySource;
 use Oro\Bundle\TranslationBundle\Translation\TranslationKeyGenerator;
 use Oro\Bundle\TranslationBundle\Translation\Translator;
 
-use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Translation\KeyTemplate\WorkflowTemplate;
-use Oro\Bundle\WorkflowBundle\Translation\WorkflowTranslationFieldsIterator;
 
 class WorkflowTranslationHelper
 {
@@ -25,12 +23,6 @@ class WorkflowTranslationHelper
 
     /** @var TranslationHelper */
     private $translationHelper;
-
-    /** @var WorkflowTranslationFieldsIterator */
-    private $translationFieldsIterator;
-
-    /** @var TranslationKeyGenerator */
-    private $translationKeyGenerator;
 
     /** @var array */
     private $values = [];
@@ -57,7 +49,9 @@ class WorkflowTranslationHelper
      */
     public function findWorkflowTranslations($workflowName, $locale)
     {
-        $keyPrefix = $this->getTranslationKeyGenerator()->generate(
+        $generator = new TranslationKeyGenerator();
+
+        $keyPrefix = $generator->generate(
             new TranslationKeySource(new WorkflowTemplate(), ['workflow_name' => $workflowName])
         );
 
@@ -131,57 +125,5 @@ class WorkflowTranslationHelper
     public function removeTranslationKey($key)
     {
         $this->translationManager->removeTranslationKey($key, self::TRANSLATION_DOMAIN);
-    }
-
-    /**
-     * @param WorkflowDefinition $definition
-     * @param string $workflowName
-     */
-    public function translateWorkflowDefinitionFields(WorkflowDefinition $definition, $workflowName = null)
-    {
-        $workflowName = $workflowName ?: $definition->getName();
-
-        $definition->setLabel($this->findWorkflowTranslation($definition->getLabel(), $workflowName));
-        $configuration = $definition->getConfiguration();
-
-        $keys = $this->getWorkflowTranslationFieldsIterator()
-            ->iterateConfigTranslationFields($workflowName, $configuration);
-        foreach ($keys as &$item) {
-            $item = $this->findWorkflowTranslation($item, $workflowName);
-        }
-        unset($item);
-
-        // TODO: will be removed in scope https://magecore.atlassian.net/browse/BAP-12019
-        foreach ($definition->getSteps() as $step) {
-            $step->setLabel($this->findWorkflowTranslation($step->getLabel(), $workflowName));
-        }
-
-        $definition->setConfiguration($configuration);
-    }
-
-    /**
-     * @return WorkflowTranslationFieldsIterator
-     */
-    private function getWorkflowTranslationFieldsIterator()
-    {
-        if (null === $this->translationFieldsIterator) {
-            $this->translationFieldsIterator = new WorkflowTranslationFieldsIterator(
-                $this->getTranslationKeyGenerator()
-            );
-        }
-
-        return $this->translationFieldsIterator;
-    }
-
-    /**
-     * @return TranslationKeyGenerator
-     */
-    private function getTranslationKeyGenerator()
-    {
-        if (null === $this->translationKeyGenerator) {
-            $this->translationKeyGenerator = new TranslationKeyGenerator();
-        }
-
-        return $this->translationKeyGenerator;
     }
 }
