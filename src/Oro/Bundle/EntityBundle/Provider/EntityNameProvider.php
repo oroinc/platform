@@ -6,6 +6,7 @@ use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\Common\Util\ClassUtils;
 
 use Symfony\Component\PropertyAccess\PropertyAccess;
+use Symfony\Component\PropertyAccess\Exception\InvalidArgumentException;
 
 class EntityNameProvider implements EntityNameProviderInterface
 {
@@ -32,15 +33,11 @@ class EntityNameProvider implements EntityNameProviderInterface
      */
     public function getName($format, $locale, $entity)
     {
-        if ($format === self::SHORT) {
-            return $this->getConstructedName($entity, [$this->getFieldName(ClassUtils::getClass($entity))], false);
+        if ($format !== self::FULL && $format !== self::SHORT) {
+            return false;
         }
 
-        if ($format === self::FULL) {
-            return $this->getConstructedName($entity, $this->getFieldNames(ClassUtils::getClass($entity)), true);
-        }
-
-        return false;
+        return $this->getConstructedName($entity, (array) $this->getFieldNames(ClassUtils::getClass($entity)));
     }
 
     /**
@@ -112,7 +109,11 @@ class EntityNameProvider implements EntityNameProviderInterface
      */
     protected function getFieldValue($entity, $fieldName)
     {
-        return $this->accessor->getValue($entity, $fieldName);
+        try {
+            return $this->accessor->getValue($entity, $fieldName);
+        } catch (InvalidArgumentException $exception) {
+            return null;
+        }
     }
 
     /**
@@ -139,23 +140,17 @@ class EntityNameProvider implements EntityNameProviderInterface
      *
      * @param $entity
      * @param $fieldNames
-     * @param bool $full Return name from all fields or just the first non-empty
      *
      * @return string|bool Constructed Name or FALSE if fails
      */
-    protected function getConstructedName($entity, $fieldNames, $full = false)
+    protected function getConstructedName($entity, $fieldNames)
     {
-        $fieldValues = [];
         foreach ($fieldNames as $field) {
-            $fieldValues[] = $this->getFieldValue($entity, $field);
+            if ($value = $this->getFieldValue($entity, $field)) {
+                return $value;
+            };
         }
 
-        $fieldValues = array_filter($fieldValues);
-
-        if (0 === count($fieldValues)) {
-            return false;
-        }
-
-        return $full ? $fieldValues[0] : implode(' ', $fieldValues);
+        return false;
     }
 }

@@ -50,7 +50,7 @@ class EntityNameProvider implements EntityNameProviderInterface
     public function getNameDQL($format, $locale, $className, $alias)
     {
         if ($format !== self::FULL) {
-            return;
+            return false;
         }
 
         $fields = $this->objectMapper->getEntityMapParameter($className, 'title_fields', []);
