@@ -32,7 +32,7 @@ Feature: Application search
     When I press "Go"
     Then I should see following search entity types:
       | Type            | N | isSelected |
-      | All             | 4 |            |
+      | All             | 3 |            |
       | Business Units  | 1 | yes        |
       | Organizations   | 1 |            |
       | Reports         | 1 |            |
