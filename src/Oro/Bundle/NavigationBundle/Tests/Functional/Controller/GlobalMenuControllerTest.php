@@ -6,8 +6,6 @@ use Oro\Bundle\NavigationBundle\Entity\MenuUpdate;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
 /**
- * @group segfault
- *
  * @dbIsolation
  */
 class GlobalMenuControllerTest extends WebTestCase

@@ -95,9 +95,12 @@ class MenuUpdateTreeHandler
      */
     protected function formatEntity($entity)
     {
-        $isDivider = $entity->getExtra('divider', false);
-        // todo consider to remove translator from here
-        $text = $isDivider ? self::MENU_ITEM_DIVIDER_LABEL : $this->translator->trans($entity->getLabel());
+        $text = $entity->getLabel();
+        if ($entity->getExtra('divider', false)) {
+            $text = self::MENU_ITEM_DIVIDER_LABEL;
+        } elseif (!$entity->getExtra('translateDisabled', false)) {
+            $text = $this->translator->trans($text);
+        }
 
         return [
             'id' => $entity->getName(),

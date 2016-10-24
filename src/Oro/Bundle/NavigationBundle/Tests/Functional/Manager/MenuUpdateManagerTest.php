@@ -54,7 +54,7 @@ class MenuUpdateManagerTest extends WebTestCase
     {
         $updates = $this->manager->getMenuUpdatesByMenuAndScope('application_menu', 'user', 1);
 
-        $this->assertCount(1, $updates);
+        $this->assertCount(2, $updates);
     }
 
     public function testGetMenuUpdateByKeyAndScopeGlobal()

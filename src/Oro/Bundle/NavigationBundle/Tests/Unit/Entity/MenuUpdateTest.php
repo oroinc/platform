@@ -20,7 +20,12 @@ class MenuUpdateTest extends \PHPUnit_Framework_TestCase
         $update->setIcon('test-icon');
 
         $this->assertEquals(
-            ['position' => $priority, 'divider' => true, 'icon' => 'test-icon'],
+            [
+                'position' => $priority,
+                'divider' => true,
+                'icon' => 'test-icon',
+                'translateDisabled' => false
+            ],
             $update->getExtras()
         );
     }

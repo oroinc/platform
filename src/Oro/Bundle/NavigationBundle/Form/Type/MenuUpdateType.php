@@ -12,7 +12,7 @@ use Symfony\Component\Form\FormInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
-use Oro\Bundle\LocaleBundle\Form\Type\TranslatedLocalizedFallbackValueCollectionType;
+use Oro\Bundle\LocaleBundle\Form\Type\LocalizedFallbackValueCollectionType;
 use Oro\Bundle\NavigationBundle\Entity\MenuUpdate;
 
 class MenuUpdateType extends AbstractType
@@ -26,7 +26,7 @@ class MenuUpdateType extends AbstractType
     {
         $builder->add(
             'titles',
-            TranslatedLocalizedFallbackValueCollectionType::class,
+            LocalizedFallbackValueCollectionType::class,
             [
                 'required' => true,
                 'label' => 'oro.navigation.menuupdate.title.label',
@@ -76,7 +76,7 @@ class MenuUpdateType extends AbstractType
 
         $builder->add(
             'descriptions',
-            TranslatedLocalizedFallbackValueCollectionType::class,
+            LocalizedFallbackValueCollectionType::class,
             [
                 'required' => false,
                 'label' => 'oro.navigation.menuupdate.description.label',
