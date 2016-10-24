@@ -196,7 +196,7 @@ class CompoundEntityTypeTest extends TypeTestCase
     public function testBuildFormForAssociationAsField()
     {
         $metadata = new EntityMetadata();
-        $metadata->addAssociation(new AssociationMetadata('owner'))->setDataType('scalar');
+        $metadata->addAssociation(new AssociationMetadata('owner'))->setDataType('object');
 
         $config = new EntityDefinitionConfig();
         $field = $config->addField('owner');
