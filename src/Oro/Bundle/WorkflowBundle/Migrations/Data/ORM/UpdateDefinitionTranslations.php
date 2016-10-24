@@ -21,7 +21,7 @@ class UpdateDefinitionTranslations extends AbstractFixture implements ContainerA
      */
     public function load(ObjectManager $manager)
     {
-        /* @var $processor WorkflowDefinitionHandler */
+        /* @var $handler WorkflowDefinitionHandler */
         $handler = $this->container->get('oro_workflow.handler.workflow_definition');
 
         /* @var $processor TranslationProcessor */

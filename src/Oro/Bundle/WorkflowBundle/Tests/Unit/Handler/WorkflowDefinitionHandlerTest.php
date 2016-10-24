@@ -93,9 +93,7 @@ class WorkflowDefinitionHandlerTest extends \PHPUnit_Framework_TestCase
     {
         $newDefinition = new WorkflowDefinition();
 
-        $this->workflowAssembler->expects($this->once())->method('assemble')->willReturn($this->workflow);
-        $this->workflow->expects($this->once())->method('getStepManager')->willReturn($this->stepManager);
-        $this->stepManager->expects($this->once())->method('getSteps')->willReturn($this->getSteps());
+        $this->workflowAssembler->expects($this->once())->method('assemble');
 
         $this->entityManager->expects($this->once())->method('persist')->with($newDefinition);
         $this->entityManager->expects($this->once())->method('flush')->with();
@@ -109,8 +107,6 @@ class WorkflowDefinitionHandlerTest extends \PHPUnit_Framework_TestCase
         $this->eventDispatcher->expects($this->at(1))->method('dispatch')->with($afterEvent, $changes);
 
         $this->handler->createWorkflowDefinition($newDefinition);
-
-        $this->assertEquals($this->getWorkflowSteps($newDefinition), $newDefinition->getSteps());
     }
 
     public function testUpdateWorkflowDefinition()
@@ -118,9 +114,10 @@ class WorkflowDefinitionHandlerTest extends \PHPUnit_Framework_TestCase
         $existingDefinition = (new WorkflowDefinition())->setName('existing');
         $newDefinition = (new WorkflowDefinition())->setName('updated');
 
-        $this->workflowAssembler->expects($this->once())->method('assemble')->willReturn($this->workflow);
-        $this->workflow->expects($this->once())->method('getStepManager')->willReturn($this->stepManager);
-        $this->stepManager->expects($this->once())->method('getSteps')->willReturn($this->getSteps());
+        $this->workflowAssembler->expects($this->once())->method('assemble');
+//        $this->workflowAssembler->expects($this->once())->method('assemble')->willReturn($this->workflow);
+//        $this->workflow->expects($this->once())->method('getStepManager')->willReturn($this->stepManager);
+//        $this->stepManager->expects($this->once())->method('getSteps')->willReturn($this->getSteps());
 
         $this->entityManager->expects($this->never())->method('persist');
         $this->entityManager->expects($this->once())->method('flush');
@@ -135,7 +132,7 @@ class WorkflowDefinitionHandlerTest extends \PHPUnit_Framework_TestCase
 
         $this->handler->updateWorkflowDefinition($existingDefinition, $newDefinition);
 
-        $this->assertEquals($this->getWorkflowSteps($existingDefinition), $existingDefinition->getSteps());
+        //$this->assertEquals($this->getWorkflowSteps($existingDefinition), $existingDefinition->getSteps());
     }
 
     /**

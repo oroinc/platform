@@ -9,6 +9,7 @@ use Doctrine\Common\Collections\Collection;
 
 use Oro\Bundle\WorkflowBundle\Exception\UnknownStepException;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
+use Oro\Bundle\WorkflowBundle\Entity\WorkflowStep;
 use Oro\Bundle\WorkflowBundle\Configuration\WorkflowConfiguration;
 
 use Oro\Component\Action\Exception\AssemblerException;
@@ -116,11 +117,34 @@ class WorkflowAssembler extends BaseAbstractAssembler
             $workflow->getStepManager()->setStartStepName($startStepName);
         }
 
+        $this->updateDefinitionSteps($definition, $workflow);
+
         if ($needValidation) {
             $this->validateWorkflow($workflow);
         }
 
         return $workflow;
+    }
+
+    /**
+     * @param WorkflowDefinition $definition
+     * @param Workflow $workflow
+     */
+    protected function updateDefinitionSteps(WorkflowDefinition $definition, Workflow $workflow)
+    {
+        $workflowSteps = [];
+        foreach ($workflow->getStepManager()->getSteps() as $step) {
+            $workflowStep = new WorkflowStep();
+            $workflowStep
+                ->setName($step->getName())
+                ->setLabel($step->getLabel())
+                ->setStepOrder($step->getOrder())
+                ->setFinal($step->isFinal());
+
+            $workflowSteps[] = $workflowStep;
+        }
+
+        $definition->setSteps($workflowSteps);
     }
 
     /**

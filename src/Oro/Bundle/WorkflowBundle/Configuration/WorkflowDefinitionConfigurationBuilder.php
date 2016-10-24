@@ -5,7 +5,6 @@ namespace Oro\Bundle\WorkflowBundle\Configuration;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowEntityAcl;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowRestriction;
-use Oro\Bundle\WorkflowBundle\Entity\WorkflowStep;
 use Oro\Bundle\WorkflowBundle\Model\Workflow;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowAssembler;
 
@@ -64,18 +63,16 @@ class WorkflowDefinitionConfigurationBuilder extends AbstractConfigurationBuilde
             'steps_display_ordered',
             false
         );
-        $groups = [
-            WorkflowDefinition::GROUP_TYPE_EXCLUSIVE_ACTIVE => $this->getConfigurationOption(
-                $configuration,
-                WorkflowConfiguration::NODE_EXCLUSIVE_ACTIVE_GROUPS,
-                []
-            ),
-            WorkflowDefinition::GROUP_TYPE_EXCLUSIVE_RECORD => $this->getConfigurationOption(
-                $configuration,
-                WorkflowConfiguration::NODE_EXCLUSIVE_RECORD_GROUPS,
-                []
-            ),
-        ];
+        $activeGroups = $this->getConfigurationOption(
+            $configuration,
+            WorkflowConfiguration::NODE_EXCLUSIVE_ACTIVE_GROUPS,
+            []
+        );
+        $recordGroups = $this->getConfigurationOption(
+            $configuration,
+            WorkflowConfiguration::NODE_EXCLUSIVE_RECORD_GROUPS,
+            []
+        );
 
         $workflowDefinition = new WorkflowDefinition();
         $workflowDefinition
@@ -87,39 +84,18 @@ class WorkflowDefinitionConfigurationBuilder extends AbstractConfigurationBuilde
             ->setActive($configuration['defaults']['active'])
             ->setPriority($configuration['priority'])
             ->setEntityAttributeName($entityAttributeName)
-            ->setGroups($groups)
+            ->setExclusiveActiveGroups($activeGroups)
+            ->setExclusiveRecordGroups($recordGroups)
             ->setConfiguration($this->filterConfiguration($configuration));
 
         $workflow = $this->workflowAssembler->assemble($workflowDefinition, false);
 
-        $this->setSteps($workflowDefinition, $workflow);
         $workflowDefinition->setStartStep($workflowDefinition->getStepByName($startStepName));
 
         $this->setEntityAcls($workflowDefinition, $workflow);
         $this->setEntityRestrictions($workflowDefinition, $workflow);
 
         return $workflowDefinition;
-    }
-
-    /**
-     * @param WorkflowDefinition $workflowDefinition
-     * @param Workflow $workflow
-     */
-    protected function setSteps(WorkflowDefinition $workflowDefinition, Workflow $workflow)
-    {
-        $workflowSteps = array();
-        foreach ($workflow->getStepManager()->getSteps() as $step) {
-            $workflowStep = new WorkflowStep();
-            $workflowStep
-                ->setName($step->getName())
-                ->setLabel($step->getLabel())
-                ->setStepOrder($step->getOrder())
-                ->setFinal($step->isFinal());
-
-            $workflowSteps[] = $workflowStep;
-        }
-
-        $workflowDefinition->setSteps($workflowSteps);
     }
 
     /**

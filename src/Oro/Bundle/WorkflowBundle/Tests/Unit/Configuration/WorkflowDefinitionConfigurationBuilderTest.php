@@ -5,11 +5,12 @@ namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Configuration;
 use Oro\Bundle\ActionBundle\Model\Attribute;
 use Oro\Bundle\ActionBundle\Model\AttributeManager;
 
-use Oro\Bundle\WorkflowBundle\Configuration\WorkflowDefinitionBuilderExtensionInterface;
-use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
-use Oro\Bundle\WorkflowBundle\Configuration\WorkflowDefinitionConfigurationBuilder;
 use Oro\Bundle\WorkflowBundle\Configuration\WorkflowConfiguration;
+use Oro\Bundle\WorkflowBundle\Configuration\WorkflowDefinitionBuilderExtensionInterface;
+use Oro\Bundle\WorkflowBundle\Configuration\WorkflowDefinitionConfigurationBuilder;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowEntityAcl;
+use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
+use Oro\Bundle\WorkflowBundle\Entity\WorkflowStep;
 use Oro\Bundle\WorkflowBundle\Model\Step;
 use Oro\Bundle\WorkflowBundle\Model\StepManager;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowAssembler;
@@ -133,7 +134,24 @@ class WorkflowDefinitionConfigurationBuilderTest extends \PHPUnit_Framework_Test
         $this->workflowAssembler->expects($this->once())
             ->method('assemble')
             ->with($this->isInstanceOf('Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition'), false)
-            ->will($this->returnValue($workflow));
+            ->will($this->returnCallback(function ($definition) use ($workflow, $steps) {
+
+                $workflowSteps = [];
+                foreach ($steps as $step) {
+                    $workflowStep = new WorkflowStep();
+                    $workflowStep
+                        ->setName($step->getName())
+                        ->setLabel($step->getLabel())
+                        ->setStepOrder($step->getOrder())
+                        ->setFinal($step->isFinal());
+
+                    $workflowSteps[] = $workflowStep;
+                }
+
+                $definition->setSteps($workflowSteps);
+
+                return $workflow;
+            }));
 
         $workflowDefinitions = $this->builder->buildFromConfiguration($inputData);
         $this->assertCount(1, $workflowDefinitions);

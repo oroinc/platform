@@ -8,11 +8,9 @@ use Doctrine\ORM\EntityManager;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
-use Oro\Bundle\WorkflowBundle\Entity\WorkflowStep;
 use Oro\Bundle\WorkflowBundle\Event\WorkflowChangesEvent;
 use Oro\Bundle\WorkflowBundle\Event\WorkflowEvents;
 use Oro\Bundle\WorkflowBundle\Handler\Helper\WorkflowDefinitionCloner;
-use Oro\Bundle\WorkflowBundle\Model\Workflow;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowAssembler;
 
 class WorkflowDefinitionHandler
@@ -60,10 +58,9 @@ class WorkflowDefinitionHandler
 
         $previous = WorkflowDefinitionCloner::cloneDefinition($existingDefinition);
 
-        $existingDefinition->import($newDefinition);
+        WorkflowDefinitionCloner::mergeDefinition($existingDefinition, $newDefinition);
 
-        $workflow = $this->workflowAssembler->assemble($existingDefinition);
-        $this->setSteps($existingDefinition, $workflow);
+        $this->workflowAssembler->assemble($existingDefinition);
 
         $this->eventDispatcher->dispatch(
             WorkflowEvents::WORKFLOW_BEFORE_UPDATE,
@@ -93,8 +90,7 @@ class WorkflowDefinitionHandler
     {
         $em = $this->getEntityManager();
 
-        $workflow = $this->workflowAssembler->assemble($workflowDefinition);
-        $this->setSteps($workflowDefinition, $workflow);
+        $this->workflowAssembler->assemble($workflowDefinition);
 
         $this->eventDispatcher->dispatch(
             WorkflowEvents::WORKFLOW_BEFORE_CREATE,
@@ -140,27 +136,6 @@ class WorkflowDefinitionHandler
         );
 
         return true;
-    }
-
-    /**
-     * @param WorkflowDefinition $workflowDefinition
-     * @param Workflow $workflow
-     */
-    protected function setSteps(WorkflowDefinition $workflowDefinition, Workflow $workflow)
-    {
-        $workflowSteps = array();
-        foreach ($workflow->getStepManager()->getSteps() as $step) {
-            $workflowStep = new WorkflowStep();
-            $workflowStep
-                ->setName($step->getName())
-                ->setLabel($step->getLabel())
-                ->setStepOrder($step->getOrder())
-                ->setFinal($step->isFinal());
-
-            $workflowSteps[] = $workflowStep;
-        }
-
-        $workflowDefinition->setSteps($workflowSteps);
     }
 
     /**

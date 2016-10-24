@@ -14,13 +14,29 @@ class WorkflowDefinitionCloner
 {
     /**
      * @param WorkflowDefinition $definition
+     * @param WorkflowDefinition $source
+     * @return WorkflowDefinition
+     */
+    public static function mergeDefinition(WorkflowDefinition $definition, WorkflowDefinition $source)
+    {
+        self::copyMainFields($definition, $source)
+            ->setSteps($source->getSteps())
+            ->setStartStep($source->getStartStep())
+            ->setEntityAcls($source->getEntityAcls())
+            ->setRestrictions($source->getRestrictions());
+
+        return $definition;
+    }
+
+    /**
+     * @param WorkflowDefinition $definition
      * @return WorkflowDefinition
      */
     public static function cloneDefinition(WorkflowDefinition $definition)
     {
         $steps = self::copySteps($definition->getSteps());
 
-        $newDefinition = self::copyDefinition(new WorkflowDefinition(), $definition)->setSteps($steps);
+        $newDefinition = self::copyMainFields(new WorkflowDefinition(), $definition)->setSteps($steps);
 
         $startStep = $definition->getStartStep();
         $startStep = $steps->get($startStep ? $startStep->getName() : null);
@@ -36,7 +52,7 @@ class WorkflowDefinitionCloner
      * @param WorkflowDefinition $source
      * @return WorkflowDefinition
      */
-    private static function copyDefinition(WorkflowDefinition $definition, WorkflowDefinition $source)
+    private static function copyMainFields(WorkflowDefinition $definition, WorkflowDefinition $source)
     {
         $definition
             ->setName($source->getName())
@@ -47,7 +63,8 @@ class WorkflowDefinitionCloner
             ->setStepsDisplayOrdered($source->isStepsDisplayOrdered())
             ->setSystem($source->isSystem())
             ->setPriority($source->getPriority())
-            ->setGroups($source->getGroups());
+            ->setExclusiveActiveGroups($source->getExclusiveActiveGroups())
+            ->setExclusiveRecordGroups($source->getExclusiveRecordGroups());
 
         return $definition;
     }
