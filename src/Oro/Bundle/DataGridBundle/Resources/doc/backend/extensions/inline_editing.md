@@ -12,7 +12,7 @@ datagrids:
             enable: true
         save_api_accessor:
             http_method: PATCH
-            route: orocrm_account_update
+            route: oro_account_update
 ```
 - Open the corresponding page, all the columns for which the frontend type supports inline editing will become editable
 
@@ -49,7 +49,7 @@ save_api_accessor | {class: 'oroui/js/tools/api-accessor'} | Required. Describes
 ### Sample usage of the save_api_accessor with full options provided
 ``` yml
 save_api_accessor:
-    route: orocrm_opportunity_task_update # for example this route uses following mask
+    route: oro_opportunity_task_update # for example this route uses following mask
         # to generate url /api/opportunity/{opportunity_id}/tasks/{id}
     http_method: POST
     headers:

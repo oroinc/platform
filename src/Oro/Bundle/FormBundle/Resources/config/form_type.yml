@@ -197,6 +197,11 @@ services:
         tags:
             - { name: form.type_extension, alias: form, extended_type: 'Symfony\Component\Form\Extension\Core\Type\FormType' }
 
+    oro_help.form.hint_extension:
+        class: Oro\Bundle\FormBundle\Form\Extension\HintFormExtension
+        tags:
+            - { name: form.type_extension, alias: form, extended_type: 'Symfony\Component\Form\Extension\Core\Type\FormType' }
+
     oro_form.extension.constraint_as_option:
         class: %oro_form.extension.constraint_as_option.class%
         arguments:

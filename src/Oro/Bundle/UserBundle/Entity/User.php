@@ -82,7 +82,8 @@ class User extends ExtendUser implements
     EmailHolderInterface,
     FullNameInterface,
     NotificationEmailInterface,
-    AdvancedApiUserInterface
+    AdvancedApiUserInterface,
+    FailedLoginInfoInterface
 {
     const ROLE_DEFAULT = 'ROLE_USER';
     const ROLE_ADMINISTRATOR = 'ROLE_ADMINISTRATOR';
@@ -412,6 +413,20 @@ class User extends ExtendUser implements
     protected $updatedAt;
 
     /**
+     * @var boolean $disableLogin
+     *
+     * @ORM\Column(type="boolean", name="login_disabled", options={"default"=false})
+     */
+    protected $loginDisabled;
+
+    /**
+     * @var int
+     *
+     * @ORM\Column(name="failed_login_count", type="integer", options={"default"=0, "unsigned"=true})
+     */
+    protected $failedLoginCount;
+
+    /**
      * @var OrganizationInterface
      *
      * Organization that user logged in
@@ -428,6 +443,8 @@ class User extends ExtendUser implements
         $this->emailOrigins = new ArrayCollection();
         $this->apiKeys = new ArrayCollection();
         $this->groups = new ArrayCollection();
+        $this->loginDisabled = false;
+        $this->failedLoginCount = 0;
     }
 
     /**
@@ -1171,5 +1188,60 @@ class User extends ExtendUser implements
     public function getFullName()
     {
         return sprintf('%s %s', $this->getFirstName(), $this->getLastName());
+    }
+
+    /**
+     * @return boolean
+     */
+    public function isLoginDisabled()
+    {
+        return $this->loginDisabled;
+    }
+
+    /**
+     * @param boolean $loginDisabled
+     *
+     * @return User
+     */
+    public function setLoginDisabled($loginDisabled)
+    {
+        $this->loginDisabled = $loginDisabled;
+
+        return $this;
+    }
+
+    /**
+     * {@inheritdoc}
+     *
+     * @return $this
+     */
+    public function setFailedLoginCount($count)
+    {
+        $this->failedLoginCount = $count;
+
+        return $this;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getFailedLoginCount()
+    {
+        return $this->failedLoginCount;
+    }
+
+    /**
+     * @param bool $enabled User state
+     *
+     * @return $this
+     */
+    public function setEnabled($enabled)
+    {
+        // reset failed logins counter when user is re-activated
+        if ($enabled && !$this->enabled) {
+            $this->setFailedLoginCount(0);
+        }
+
+        return parent::setEnabled($enabled);
     }
 }
