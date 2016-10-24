@@ -3,6 +3,7 @@ system_configuration:
         email_configuration:
             icon:  icon-envelope
             title: oro.email.system_configuration.email_configuration
+            page_reload: true
 
         email_settings:
             title: oro.email.system_configuration.email_settings

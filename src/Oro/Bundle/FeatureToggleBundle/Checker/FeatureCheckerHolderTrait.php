@@ -44,4 +44,15 @@ trait FeatureCheckerHolderTrait
 
         return true;
     }
+
+    /**
+     * @param string|null $route
+     * @param null|int|object $scopeIdentifier
+     *
+     * @return bool
+     */
+    public function isRouteEnabled($route = null, $scopeIdentifier = null)
+    {
+        return $this->featureChecker->isResourceEnabled($route, 'routes', $scopeIdentifier);
+    }
 }

@@ -176,8 +176,11 @@ services:
             - '@security.context'
             - '@doctrine.orm.entity_manager'
             - '@oro_navigation.item.factory'
+            - '@router'
         tags:
             - { name: oro_menu.builder, alias: pinbar }
+            - { name: oro_featuretogle.feature, feature: email }
+
 
     oro_navigation.favorites_menu.builder:
         class: %oro_navigation.navigation_item_menu.builder.class%
@@ -185,8 +188,10 @@ services:
             - '@security.context'
             - '@doctrine.orm.entity_manager'
             - '@oro_navigation.item.factory'
+            - '@router'
         tags:
             - { name: oro_menu.builder, alias: favorite }
+            - { name: oro_featuretogle.feature, feature: email }
 
     oro_navigation.history_menu.builder:
         class: %oro_navigation.navigation_history_menu.builder.class%
@@ -194,11 +199,13 @@ services:
             - '@security.context'
             - '@doctrine.orm.entity_manager'
             - '@oro_navigation.item.factory'
+            - '@router'
         calls:
             - [ setMatcher, [ '@knp_menu.matcher' ]]
             - [ setOptions, [ '@oro_config.user' ]]
         tags:
             - { name: oro_menu.builder, alias: history }
+            - { name: oro_featuretogle.feature, feature: email }
 
     oro_navigation.mostviewed_menu.builder:
         class: %oro_navigation.navigation_mostviewed_menu.builder.class%
@@ -206,10 +213,12 @@ services:
             - '@security.context'
             - '@doctrine.orm.entity_manager'
             - '@oro_navigation.item.factory'
+            - "@router"
         calls:
             - [ setOptions, [ '@oro_config.user' ]]
         tags:
             - { name: oro_menu.builder, alias: mostviewed }
+            - { name: oro_featuretogle.feature, feature: email }
 
     knp_voter_request:
         class: %oro_navigation.menu.matcher.voter.request%

@@ -6,8 +6,13 @@ use Knp\Menu\ItemInterface;
 use Knp\Menu\Matcher\Matcher;
 use Knp\Menu\Util\MenuManipulator;
 
-class NavigationHistoryBuilder extends NavigationItemBuilder
+use Oro\Bundle\FeatureToggleBundle\Checker\FeatureCheckerHolderTrait;
+use Oro\Bundle\FeatureToggleBundle\Checker\FeatureToggleableInterface;
+
+class NavigationHistoryBuilder extends NavigationItemBuilder implements FeatureToggleableInterface
 {
+    use FeatureCheckerHolderTrait;
+
     /**
      * @var Matcher
      */
@@ -51,7 +56,7 @@ class NavigationHistoryBuilder extends NavigationItemBuilder
      * @param array                   $options
      * @param string|null             $alias
      */
-    public function build(ItemInterface $menu, array $options = array(), $alias = null)
+    public function build(ItemInterface $menu, array $options = [], $alias = null)
     {
         $maxItems = $this->configOptions->get('oro_navigation.maxItems');
 

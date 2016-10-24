@@ -74,6 +74,9 @@ features:
             - 'oro_account_frontend_account_user_confirmation'
             - 'oro_account_frontend_account_user_reset_check_email'
             - 'oro_email_autoresponserule_edittemplate'
+            - 'oro_notification_massnotification_index'
+            - 'oro_notification_massnotification_view'
+            - 'oro_notification_massnotification_info'
         configuration:
             - 'email_autocomplete_configuration'
             - 'signature_configuration'
