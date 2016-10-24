@@ -40,6 +40,6 @@ class UserOwnershipProviderTest extends WebTestCase
     {
         $updates = $this->provider->getMenuUpdates('application_menu');
 
-        $this->assertCount(1, $updates);
+        $this->assertCount(2, $updates);
     }
 }

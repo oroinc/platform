@@ -44,12 +44,12 @@ class ResetMenuUpdatesCommand extends WebTestCase
             'should show help' => [
                 '$expectedContent' => "Usage:\n  oro:navigation:menu:reset [options]",
                 '$params'          => ['--help'],
-                '$rowsCount'       => 7
+                '$rowsCount'       => 8
             ],
             'should show failed reset for non existing user' => [
                 '$expectedContent' => "User with email nonexist@user.com not exists.",
                 '$params'          => ['--user=nonexist@user.com'],
-                '$rowsCount'       => 7
+                '$rowsCount'       => 8
             ],
             'should show success reset for user and menu' => [
                 '$expectedContent' =>
