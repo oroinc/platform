@@ -64,7 +64,7 @@ class WorkflowTranslationHelper
      * @param string|null $locale
      * @return string
      */
-    public function findWorkflowTranslation($key, $workflowName = null, $locale = null)
+    public function findWorkflowTranslation($key, $workflowName, $locale = null)
     {
         if (!$locale) {
             $locale = $this->translator->getLocale();
