@@ -3,13 +3,10 @@
 namespace Oro\Bundle\NavigationBundle\Tests\Functional;
 
 use Knp\Menu\ItemInterface;
-use Knp\Menu\Loader\ArrayLoader;
-use Knp\Menu\MenuFactory;
 use Knp\Menu\Util\MenuManipulator;
 
 use Oro\Bundle\NavigationBundle\Builder\MenuUpdateBuilder;
 use Oro\Bundle\NavigationBundle\Entity\MenuUpdate;
-use Oro\Bundle\NavigationBundle\Provider\BuilderChainProvider;
 use Oro\Bundle\NavigationBundle\Tests\Functional\Stub\OwnershipProviderStub;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
@@ -21,12 +18,6 @@ use Symfony\Component\Yaml\Yaml;
 class MenuUpdateBuilderTest extends WebTestCase
 {
     use EntityTrait;
-
-    /** @var MenuFactory */
-    protected $factory;
-
-    /** @var ArrayLoader */
-    protected $loader;
 
     /** @var MenuManipulator */
     protected $manipulator;
@@ -41,17 +32,7 @@ class MenuUpdateBuilderTest extends WebTestCase
     {
         $this->initClient();
 
-        $this->factory = $this->getContainer()->get('oro_menu.factory');
-        $this->loader = new ArrayLoader($this->factory);
         $this->manipulator = new MenuManipulator();
-
-        $builderChain = $this->getContainer()->get('oro_menu.builder_chain');
-
-        $reflectionClass = new \ReflectionClass(get_class($builderChain));
-        $property = $reflectionClass->getProperty('builders');
-        $property->setAccessible(true);
-
-        $this->builders = $property->getValue($builderChain);
     }
 
     public function testMenuTreeBuilder()
@@ -110,12 +91,7 @@ class MenuUpdateBuilderTest extends WebTestCase
         $configurationBuilder = $this->getContainer()->get('oro_menu.configuration_builder');
         $configurationBuilder->setConfiguration($configuration);
 
-        $builderChain = new BuilderChainProvider($this->factory, $this->loader, $this->manipulator);
-        foreach ($this->builders as $alias => $builders) {
-            foreach ($builders as $builder) {
-                $builderChain->addBuilder($builder, $alias);
-            }
-        }
+        $builderChain = clone $this->getContainer()->get('oro_menu.builder_chain');
 
         $menus = [];
         foreach ($aliases as $alias) {
