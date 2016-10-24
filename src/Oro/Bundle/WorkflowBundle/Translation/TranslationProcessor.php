@@ -35,7 +35,9 @@ class TranslationProcessor implements ConfigurationHandlerInterface, WorkflowDef
         $translationFieldsIterator = new WorkflowConfigurationTranslationFieldsIterator($workflowName, $configuration);
 
         foreach ($translationFieldsIterator as $translationKey => $value) {
-            $this->translationHelper->saveTranslation($translationKey, $value);
+            if ($value !== $translationKey) {
+                $this->translationHelper->saveTranslation($translationKey, $value);
+            }
         }
 
         return $configuration;
@@ -71,7 +73,6 @@ class TranslationProcessor implements ConfigurationHandlerInterface, WorkflowDef
         foreach ($workflowDefinitionFieldsIterator as $keyValue) {
             $fieldTranslation = $this->translationHelper->findWorkflowTranslation($keyValue, $workflowName);
             //if no translation comes - sets empty string
-            $fieldTranslation = $fieldTranslation !== $keyValue ? $fieldTranslation : '';
             $workflowDefinitionFieldsIterator->writeCurrent((string)$fieldTranslation);
         }
     }

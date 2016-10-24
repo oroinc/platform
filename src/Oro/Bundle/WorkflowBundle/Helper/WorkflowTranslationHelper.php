@@ -119,7 +119,7 @@ class WorkflowTranslationHelper
         if ($currentLocale !== Translation::DEFAULT_LOCALE) {
             $existingValue = $this->findValue($key);
 
-            if ($existingValue === $key) {
+            if ($existingValue === null) {
                 $this->saveValue($key, $value);
             }
         }
