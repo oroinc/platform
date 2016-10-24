@@ -151,7 +151,6 @@ class EntityNameProvider implements EntityNameProviderInterface
      */
     protected function getConstructedName($entity, $fieldNames)
     {
-        var_dump($fieldNames);
         foreach ($fieldNames as $field) {
             if ($value = $this->getFieldValue($entity, $field)) {
                 return $value;
