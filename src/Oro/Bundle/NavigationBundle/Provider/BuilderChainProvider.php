@@ -10,7 +10,6 @@ use Knp\Menu\Loader\ArrayLoader;
 use Knp\Menu\Provider\MenuProviderInterface;
 use Knp\Menu\Util\MenuManipulator;
 
-use Oro\Bundle\NavigationBundle\Exception\NotFoundMenuException;
 use Oro\Bundle\NavigationBundle\Menu\BuilderInterface;
 
 class BuilderChainProvider implements MenuProviderInterface

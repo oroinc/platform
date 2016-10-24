@@ -9,7 +9,6 @@ use Doctrine\ORM\EntityRepository;
 use Knp\Menu\ItemInterface;
 
 use Oro\Bundle\NavigationBundle\Entity\MenuUpdateInterface;
-use Oro\Bundle\NavigationBundle\Exception\NotFoundMenuException;
 use Oro\Bundle\NavigationBundle\Exception\NotFoundParentException;
 use Oro\Bundle\NavigationBundle\JsTree\MenuUpdateTreeHandler;
 use Oro\Bundle\NavigationBundle\Provider\BuilderChainProvider;
