@@ -80,7 +80,7 @@ class AjaxMenuController extends Controller
         $em->persist($menuUpdate);
         $em->flush();
 
-        return new JsonResponse(null, Response::HTTP_NO_CONTENT);
+        return new JsonResponse(null, Response::HTTP_CREATED);
     }
 
     /**

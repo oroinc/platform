@@ -44,7 +44,7 @@ class AjaxMenuControllerTest extends WebTestCase
 
         $result = $this->client->getResponse();
 
-        $this->assertResponseStatusCodeEquals($result, Response::HTTP_NO_CONTENT);
+        $this->assertResponseStatusCodeEquals($result, Response::HTTP_CREATED);
     }
 
     public function testCreateUser()
@@ -66,7 +66,7 @@ class AjaxMenuControllerTest extends WebTestCase
 
         $result = $this->client->getResponse();
 
-        $this->assertResponseStatusCodeEquals($result, Response::HTTP_NO_CONTENT);
+        $this->assertResponseStatusCodeEquals($result, Response::HTTP_CREATED);
     }
 
     public function testDeleteGlobal()
