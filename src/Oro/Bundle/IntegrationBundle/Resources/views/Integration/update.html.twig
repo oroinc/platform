@@ -47,8 +47,9 @@
     {% if entity.id %}
         {% set switchEnabled = oro_integration_is_switch_enabled(entity.getEditMode) %}
         {% if switchEnabled %}
+            {% import 'OroUIBundle::macros.html.twig' as UI %}
             {% if entity.enabled %}
-                {{ _self.ajaxButton({
+                {{ UI.ajaxButton({
                 'aCss':  'btn-danger',
                 'iCss':  'icon-remove',
                 'label': 'oro.integration.deactivate'|trans,
@@ -59,7 +60,7 @@
                 'errorMessage': 'oro.integration.deactivate.fail.message'
                 }) }}
             {% else %}
-                {{ _self.ajaxButton({
+                {{ UI.ajaxButton({
                 'aCss':  'btn-success',
                 'iCss':  'icon-ok',
                 'label': 'oro.integration.activate'|trans,
@@ -227,14 +228,3 @@
         });
     </script>
 {% endblock content_data %}
-
-{% macro ajaxButton(parameters) %}
-    {% import 'OroUIBundle::macros.html.twig' as UI %}
-
-    {% set dataAttributes = {
-        'page-component-module': 'orointegration/js/app/components/ajax-button',
-        'page-component-options': {'redirect': parameters.dataRedirect, 'errorMessage': parameters.errorMessage }|json_encode,
-    } %}
-
-    {{ UI.clientButton(parameters|merge({'dataAttributes': dataAttributes})) }}
-{% endmacro %}

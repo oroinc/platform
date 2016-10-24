@@ -30,7 +30,7 @@
                 {#Delete button #}
                 {{ UI.deleteButton({
                     'label': 'oro.navigation.menuupdate.delete'|trans(),
-                    'dataUrl': path('oro_api_delete_menuupdates', {ownershipType: ownershipType, menuName: menuName, key: app.request.get('key')}),
+                    'dataUrl': path('oro_navigation_menuupdate_delete', {ownershipType: ownershipType, menuName: menuName, key: app.request.get('key')}),
                     'dataRedirect': path(menuViewRoute, {menuName: entity.menu, id: ownerId}),
                     'aCss': 'no-hash remove-button',
                     'id': 'btn-remove-attribute',
@@ -40,56 +40,53 @@
                 {% if menuItem.displayed %}
                     {# Hide button #}
                     <div class="pull-right btn-group icons-holder">
-                        {{ UI.link({
-                            'label': 'oro.navigation.menuupdate.hide'|trans(),
-                            'title': 'oro.navigation.menuupdate.hide'|trans(),
-                            'data': {
-                                'method': 'PUT',
-                                'url': path('oro_api_hide_menuupdates', {ownershipType: ownershipType, menuName: menuName, key: app.request.get('key')}),
-                                'successMessage': 'oro.navigation.menuupdate.hide_success_message'|trans()
-                            },
-                            'aCss': 'no-hash btn icons-holder-text menu-visibility-toggle-button',
-                            'iCss': 'icon-eye-close',
-                            'path': 'javascript:void(0);'
+                        {{ UI.ajaxButton({
+                            'aCss':  'no-hash',
+                            'iCss':  'icon-eye-close',
+                            'label': 'oro.navigation.menuupdate.hide'|trans,
+                            'title': 'oro.navigation.menuupdate.hide'|trans,
+                            'dataId': entity.id,
+                            'dataMethod': 'PUT',
+                            'dataUrl': path('oro_navigation_menuupdate_hide', {ownershipType: ownershipType, menuName: menuName, key: app.request.get('key')}),
+                            'dataRedirect': app.request.uri,
+                            'successMessage': 'oro.navigation.menuupdate.hide_success_message'
                         }) }}
                     </div>
                 {% else %}
                     {# Show button #}
                     <div class="pull-right btn-group icons-holder">
-                        {{ UI.link({
-                            'label': 'oro.navigation.menuupdate.show'|trans(),
-                            'title': 'oro.navigation.menuupdate.show'|trans(),
-                            'data': {
-                                'method': 'PUT',
-                                'url': path('oro_api_show_menuupdates', {ownershipType: ownershipType, menuName: menuName, key: app.request.get('key')}),
-                                'successMessage': 'oro.navigation.menuupdate.show_success_message'|trans()
-                            },
-                            'aCss': 'no-hash btn icons-holder-text menu-visibility-toggle-button',
-                            'iCss': 'icon-eye-open',
-                            'path': 'javascript:void(0);'
+                        {{ UI.ajaxButton({
+                            'aCss':  'no-hash',
+                            'iCss':  'icon-eye-open',
+                            'label': 'oro.navigation.menuupdate.show'|trans,
+                            'title': 'oro.navigation.menuupdate.show'|trans,
+                            'dataId': entity.id,
+                            'dataMethod': 'PUT',
+                            'dataUrl': path('oro_navigation_menuupdate_show', {ownershipType: ownershipType, menuName: menuName, key: app.request.get('key')}),
+                            'dataRedirect': app.request.uri,
+                            'successMessage': 'oro.navigation.menuupdate.show_success_message'
                         }) }}
                     </div>
                 {% endif %}
             {% endif %}
         {% endif %}
         {% if entity.isDivider == false %}
+            {# Create Menu Item button #}
             {% set html = UI.button({
                 'path' : path(menuCreateRoute, {menuName: entity.menu, parentKey: entity.key, id: ownerId}),
                 'aCss': 'btn-primary',
                 'label': 'oro.ui.create_entity'|trans({'%entityName%': 'oro.navigation.menuupdate.entity_label'|trans}),
                 'title': 'oro.ui.create_entity'|trans({'%entityName%': 'oro.navigation.menuupdate.entity_label'|trans})
             }) %}
-
-            {% set html = html ~ UI.button({
+            {# Create Divider button #}
+            {% set html = html ~ UI.ajaxButton({
                 'aCss': 'btn-primary no-hash menu-divider-create-button',
                 'label': 'oro.ui.create_entity'|trans({'%entityName%': 'oro.navigation.menuupdate.divider'|trans}),
                 'title': 'oro.ui.create_entity'|trans({'%entityName%': 'oro.navigation.menuupdate.divider'|trans}),
-                'data': {
-                    'method': 'POST',
-                    'url': path('oro_api_create_menuupdates', {ownershipType: ownershipType, ownerId: ownerId, menuName: menuName, parentKey: app.request.get('key'), 'isDivider': true}),
-                    'successMessage': 'oro.navigation.menuupdate.divider_created'|trans()
-                },
-                'path': 'javascript:void(0);'
+                'dataMethod': 'POST',
+                'dataUrl': path('oro_navigation_menuupdate_create', {ownershipType: ownershipType, ownerId: ownerId, menuName: menuName, parentKey: app.request.get('key'), 'isDivider': true}),
+                'dataRedirect': app.request.uri,
+                'successMessage': 'oro.navigation.menuupdate.divider_created'
             }) %}
 
             {% set parameters = {
@@ -163,7 +160,7 @@
                 'updateAllowed' : true,
                 'onRootSelectRoute' : menuViewRoute,
                 'onSelectRoute' : menuUpdateRoute,
-                'onMoveRoute' : 'oro_api_move_menuupdates'
+                'onMoveRoute' : 'oro_navigation_menuupdate_move'
             } %}
             <div
                     data-page-component-module="oronavigation/js/app/components/tree-manage-component"
@@ -174,7 +171,4 @@
     <div class="menuitem-data">
         {{ parent() }}
     </div>
-    <script type="text/javascript">
-        require(['oronavigation/js/init-layout']);
-    </script>
 {% endblock content_data %}

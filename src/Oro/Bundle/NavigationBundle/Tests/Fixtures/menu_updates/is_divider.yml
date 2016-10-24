@@ -1,0 +1,36 @@
+menu:
+    items:
+        system:
+            label: 'System'
+            extras:
+                uri: '#system'
+    tree:
+        menu:
+            type: menu
+            children:
+                system: []
+updates:
+    -
+        key: 'divider'
+        parent_key: ~
+        uri: '#'
+        menu: 'menu'
+        divider: true
+
+
+result_menu:
+    items:
+        system:
+            label: 'System'
+            extras:
+                uri: '#system'
+        divider:
+            extras:
+                uri: '#'
+                divider: true
+    tree:
+        menu:
+            type: menu
+            children:
+                system: []
+                divider: []

@@ -38,6 +38,7 @@ class OroNavigationBundle implements Migration
         $table->addColumn('icon', 'string', ['length' => 150, 'notnull' => false]);
         $table->addColumn('is_divider', 'boolean', []);
         $table->addColumn('is_custom', 'boolean', []);
+        $table->addUniqueIndex(['key', 'ownership_type'], 'unq_menu_key');
     }
 
     /**

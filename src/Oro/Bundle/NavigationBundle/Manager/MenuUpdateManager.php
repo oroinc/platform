@@ -348,6 +348,14 @@ class MenuUpdateManager
     }
 
     /**
+     * @return string
+     */
+    public function generateKey()
+    {
+        return uniqid('menu_item_', false);
+    }
+
+    /**
      * Reset menu updates depending on ownership type and owner id
      *
      * @param int    $ownershipType

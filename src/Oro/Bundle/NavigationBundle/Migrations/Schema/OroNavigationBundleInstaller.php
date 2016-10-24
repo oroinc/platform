@@ -162,7 +162,7 @@ class OroNavigationBundleInstaller implements Installation
         $table->addColumn('is_custom', 'boolean', []);
         $table->addColumn('priority', 'integer', ['notnull' => false]);
         $table->setPrimaryKey(['id']);
-        $table->addUniqueIndex(['key', 'ownership_type'], 'unq_qroup');
+        $table->addUniqueIndex(['key', 'ownership_type'], 'unq_menu_key');
     }
 
     /**
