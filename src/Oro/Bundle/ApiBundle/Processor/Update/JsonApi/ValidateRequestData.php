@@ -4,7 +4,6 @@ namespace Oro\Bundle\ApiBundle\Processor\Update\JsonApi;
 
 use Oro\Bundle\ApiBundle\Processor\Shared\JsonApi\ValidateRequestData as BaseProcessor;
 use Oro\Bundle\ApiBundle\Request\JsonApi\JsonApiDocumentBuilder as JsonApiDoc;
-use Symfony\Component\HttpFoundation\Response;
 
 /**
  * Validates that the request data contains valid JSON.API object.
@@ -17,10 +16,9 @@ class ValidateRequestData extends BaseProcessor
     protected function validatePrimaryDataObject(array $data, $pointer)
     {
         if ($this->validateResourceObject($data, $pointer)) {
-            if ($this->validateId($data, $pointer)) {
-                $this->validatePrimaryDataObjectId($data, $pointer);
-            }
+            $this->validatePrimaryDataObjectId($data, $pointer);
             $this->validatePrimaryDataObjectType($data, $pointer);
+            $this->validateAttributesOrRelationshipsExist($data, $pointer);
         }
     }
 

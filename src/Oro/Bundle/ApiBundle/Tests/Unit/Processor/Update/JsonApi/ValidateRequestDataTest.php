@@ -38,7 +38,7 @@ class ValidateRequestDataTest extends FormProcessorTestCase
             ->with('products')
             ->willReturn('Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Product');
 
-        $this->context->setId('23');
+        $this->context->setId('1');
         $this->context->setClassName('Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Product');
         $this->context->setRequestData($requestData);
 
@@ -50,13 +50,13 @@ class ValidateRequestDataTest extends FormProcessorTestCase
     {
         return [
             [
-                ['data' => ['id' => '23', 'type' => 'products', 'attributes' => ['test' => null]]]
+                ['data' => ['id' => '1', 'type' => 'products', 'attributes' => ['test' => null]]]
             ],
             [
-                ['data' => ['id' => '23', 'type' => 'products', 'relationships' => ['test' => ['data' => null]]]]
+                ['data' => ['id' => '1', 'type' => 'products', 'relationships' => ['test' => ['data' => null]]]]
             ],
             [
-                ['data' => ['id' => '23', 'type' => 'products', 'relationships' => ['test' => ['data' => []]]]],
+                ['data' => ['id' => '1', 'type' => 'products', 'relationships' => ['test' => ['data' => []]]]],
             ],
         ];
     }
@@ -66,7 +66,7 @@ class ValidateRequestDataTest extends FormProcessorTestCase
      */
     public function testProcessWithInvalidRequestData($requestData, $expectedErrorString, $pointer)
     {
-        $this->context->setId('23');
+        $this->context->setId('1');
         $this->context->setClassName('Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Product');
         $this->context->setRequestData($requestData);
 
@@ -106,12 +106,12 @@ class ValidateRequestDataTest extends FormProcessorTestCase
                 '/data/id'
             ],
             [
-                ['data' => ['id' => 123, 'type' => 'products', 'attributes' => ['test' => null]]],
+                ['data' => ['id' => 1, 'type' => 'products', 'attributes' => ['test' => null]]],
                 'The \'id\' property should be a string',
                 '/data/id'
             ],
             [
-                ['data' => ['id' => '32', 'type' => 'products', 'attributes' => ['foo' => 'bar']]],
+                ['data' => ['id' => '10', 'type' => 'products', 'attributes' => ['foo' => 'bar']]],
                 'The \'id\' property of the primary data object should match \'id\' parameter of the query sting',
                 '/data/id',
             ],
@@ -121,9 +121,14 @@ class ValidateRequestDataTest extends FormProcessorTestCase
                 '/data/type',
             ],
             [
-                ['data' => ['id' => '23', 'type' => 'test', 'attributes' => ['foo' => 'bar']]],
+                ['data' => ['id' => '1', 'type' => 'test', 'attributes' => ['foo' => 'bar']]],
                 'The \'type\' property of the primary data object should match the requested resource',
                 '/data/type',
+            ],
+            [
+                ['data' => ['id' => '1', 'type' => 'products']],
+                'The primary data object should contain \'attributes\' or \'relationships\' block',
+                '/data',
             ],
         ];
     }

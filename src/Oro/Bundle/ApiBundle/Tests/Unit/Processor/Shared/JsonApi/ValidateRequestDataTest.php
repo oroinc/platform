@@ -89,16 +89,6 @@ class ValidateRequestDataTest extends FormProcessorTestCase
             [['data' => null], 'The primary data object should not be empty', '/data'],
             [['data' => []], 'The primary data object should not be empty', '/data'],
             [
-                ['data' => ['type' => 'products']],
-                'The primary data object should contain \'attributes\' or \'relationships\' block',
-                '/data',
-            ],
-            [
-                ['data' => ['type' => 'products']],
-                'The primary data object should contain \'attributes\' or \'relationships\' block',
-                '/data',
-            ],
-            [
                 ['data' => ['type' => 'products', 'attributes' => null]],
                 'The \'attributes\' property should be an array',
                 '/data/attributes',
@@ -207,7 +197,7 @@ class ValidateRequestDataTest extends FormProcessorTestCase
                 [
                     'data' => [
                         'type'          => 'products',
-                        'relationships' => ['test' => ['data' => [['type' => 'products', 'id' => 123]]]]
+                        'relationships' => ['test' => ['data' => [['type' => 'products', 'id' => 1]]]]
                     ]
                 ],
                 'The \'id\' property should be a string',

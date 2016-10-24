@@ -52,13 +52,16 @@ class ValidateRequestDataTest extends FormProcessorTestCase
                 ['data' => ['type' => 'products', 'attributes' => ['test' => null]]]
             ],
             [
-                ['data' => ['id' => '23', 'type' => 'products', 'attributes' => ['test' => null]]]
+                ['data' => ['id' => '1', 'type' => 'products', 'attributes' => ['test' => null]]]
             ],
             [
                 ['data' => ['type' => 'products', 'relationships' => ['test' => ['data' => null]]]]
             ],
             [
                 ['data' => ['type' => 'products', 'relationships' => ['test' => ['data' => []]]]]
+            ],
+            [
+                ['data' => ['type' => 'products']]
             ],
         ];
     }
@@ -109,7 +112,7 @@ class ValidateRequestDataTest extends FormProcessorTestCase
                 '/data/id'
             ],
             [
-                ['data' => ['id' => 123, 'type' => 'products', 'attributes' => ['test' => null]]],
+                ['data' => ['id' => 1, 'type' => 'products', 'attributes' => ['test' => null]]],
                 'The \'id\' property should be a string',
                 '/data/id'
             ],

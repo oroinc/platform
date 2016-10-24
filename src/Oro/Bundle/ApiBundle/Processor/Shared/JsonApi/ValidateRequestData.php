@@ -122,24 +122,11 @@ abstract class ValidateRequestData implements ProcessorInterface
      * @param array  $data
      * @param string $pointer
      */
-    protected function validateAttributesAndRelationships(array $data, $pointer)
+    protected function validateAttributesOrRelationshipsExist(array $data, $pointer)
     {
-        $hasAttributes = false;
-        $hasRelationships = false;
-        if (array_key_exists(JsonApiDoc::ATTRIBUTES, $data)) {
-            $hasAttributes = true;
-            $this->validateArray($data, JsonApiDoc::ATTRIBUTES, $pointer, true, true);
-        }
-        if (array_key_exists(JsonApiDoc::RELATIONSHIPS, $data)) {
-            $hasRelationships = true;
-            if ($this->validateArray($data, JsonApiDoc::RELATIONSHIPS, $pointer, true, true)) {
-                $this->validateRelationships(
-                    $data[JsonApiDoc::RELATIONSHIPS],
-                    $this->buildPointer($pointer, JsonApiDoc::RELATIONSHIPS)
-                );
-            }
-        }
-        if (!$hasAttributes && !$hasRelationships) {
+        if (!array_key_exists(JsonApiDoc::ATTRIBUTES, $data)
+            && !array_key_exists(JsonApiDoc::RELATIONSHIPS, $data)
+        ) {
             $this->addError(
                 $pointer,
                 sprintf(
@@ -147,6 +134,25 @@ abstract class ValidateRequestData implements ProcessorInterface
                     JsonApiDoc::ATTRIBUTES,
                     JsonApiDoc::RELATIONSHIPS
                 )
+            );
+        }
+    }
+
+    /**
+     * @param array  $data
+     * @param string $pointer
+     */
+    protected function validateAttributesAndRelationships(array $data, $pointer)
+    {
+        if (array_key_exists(JsonApiDoc::ATTRIBUTES, $data)) {
+            $this->validateArray($data, JsonApiDoc::ATTRIBUTES, $pointer, true, true);
+        }
+        if (array_key_exists(JsonApiDoc::RELATIONSHIPS, $data)
+            && $this->validateArray($data, JsonApiDoc::RELATIONSHIPS, $pointer, true, true)
+        ) {
+            $this->validateRelationships(
+                $data[JsonApiDoc::RELATIONSHIPS],
+                $this->buildPointer($pointer, JsonApiDoc::RELATIONSHIPS)
             );
         }
     }
