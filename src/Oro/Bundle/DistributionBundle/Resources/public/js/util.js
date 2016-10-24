@@ -1,12 +1,15 @@
+/*global $, bootbox, Util*/
+/*jshint -W098*/
 function Util(rootMessagesElements) {
+    'use strict';
 
     rootMessagesElements = rootMessagesElements || $('#alerts');
 
-    var messageTemplate = '<div class="alert fade in alert-{message-type}"> \
-        <i class="icon icon-{message-type}"></i>\
-        <button type="button" class="close" data-dismiss="alert">&times;</button> \
-        {message} \
-        </div>';
+    var messageTemplate = '<div class="alert fade in alert-{message-type}"> ' +
+        '<i class="icon icon-{message-type}"></i>' +
+        '<button type="button" class="close" data-dismiss="alert">&times;</button> ' +
+        '{message} ' +
+        '</div>';
 
     var defaultDialogOptions = {
         title: 'Is this something you really want to do?',
@@ -15,12 +18,12 @@ function Util(rootMessagesElements) {
         buttons: {
             cancel: {
                 label: 'Cancel',
-                callback: function () {
+                callback: function() {
                 }
             },
             continue: {
                 className: 'btn-danger',
-                callback: function () {
+                callback: function() {
                 }
             }
         }
@@ -28,24 +31,24 @@ function Util(rootMessagesElements) {
 
     function displayMessage(type, message) {
         var html = messageTemplate
-            .replace(/{message-type}/g, type)
+            .replace(/\{message-type}/g, type)
             .replace('{message}', message);
         rootMessagesElements.append(html);
     }
 
     return {
-        success: function (message) {
+        success: function(message) {
             displayMessage('success', message);
         },
-        error: function (message) {
+        error: function(message) {
             displayMessage('error', message);
         },
-        confirm: function (title, message, continueCallback, continueLabel, cancelCallback) {
+        confirm: function(title, message, continueCallback, continueLabel, cancelCallback) {
             message = message.replace(/\n/g, '<br />');
-            continueCallback = continueCallback || function () {
+            continueCallback = continueCallback || function() {
             };
             continueLabel = continueLabel || 'Yes, Continue';
-            cancelCallback = cancelCallback || function () {
+            cancelCallback = cancelCallback || function() {
             };
 
             var dialogOptions = $.extend(true, defaultDialogOptions, {
@@ -65,11 +68,11 @@ function Util(rootMessagesElements) {
 
             bootbox.dialog(dialogOptions);
         },
-        redirect: function (url, message) {
+        redirect: function(url, message) {
             $.cookie('message', message, {path: '/'});
             window.location = url;
         },
-        displayCookieMessage: function () {
+        displayCookieMessage: function() {
             var message = $.cookie('message');
             if (message) {
                 this.success(message);
