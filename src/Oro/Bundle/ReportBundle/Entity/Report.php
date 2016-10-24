@@ -55,7 +55,7 @@ class Report extends ExtendReport implements GridQueryDesignerInterface
     protected $id;
 
     /**
-     * Used to identify segments (usually created programatically)
+     * Used to identify reports (usually created programmatically)
      *
      * @var string
      * @ORM\Column(type="string", length=30, nullable=true)
