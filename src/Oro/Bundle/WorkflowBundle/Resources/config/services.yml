@@ -329,6 +329,12 @@ services:
         tags:
             - { name: oro.workflow.configuration.handler, priority: 150 }
             - { name: oro.workflow.definition_builder.extension }
+
+    oro_workflow.translation.keys_subscriber:
+        class: Oro\Bundle\WorkflowBundle\EventListener\WorkflowTranslationKeysSubscriber
+        arguments:
+            - '@oro_workflow.helper.translation'
+        tags:
             - { name: oro_workflow.changes.subscriber }
 
     oro_workflow.translation.translations_datagrid_links_provider:
