@@ -257,55 +257,14 @@ class WorkflowAssemblerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return Step[]
-     */
-    protected function getSteps()
-    {
-        return [
-            (new Step())
-                ->setName('test_start_step')
-                ->setLabel('Start Step')
-                ->setOrder(10)
-                ->setFinal(false)
-        ];
-    }
-
-    /**
-     * @param WorkflowDefinition $definition
-     * @return WorkflowStep[]|ArrayCollection
-     */
-    protected function getWorkflowSteps(WorkflowDefinition $definition)
-    {
-        $steps = new ArrayCollection();
-
-        foreach ($this->getSteps() as $step) {
-            $workflowStep = new WorkflowStep();
-            $workflowStep
-                ->setName($step->getName())
-                ->setLabel($step->getLabel())
-                ->setStepOrder($step->getOrder())
-                ->setFinal($step->isFinal())
-                ->setDefinition($definition);
-
-            $steps->add($workflowStep);
-        }
-
-        return $steps;
-    }
-
-    /**
      * @param array $configuration
      * @param WorkflowStep $startStep
      * @param array $expectedTransitions
      * @param array $expectedDefinitions
      * @dataProvider assembleDataProvider
      */
-    public function testAssemble(
-        array $configuration,
-        $startStep,
-        $expectedTransitions,
-        $expectedDefinitions
-    ) {
+    public function testAssemble(array $configuration, $startStep, $expectedTransitions, $expectedDefinitions)
+    {
         // source data
         $workflow = $this->createWorkflow();
 
@@ -428,15 +387,6 @@ class WorkflowAssemblerTest extends \PHPUnit_Framework_TestCase
             );
         };
 
-//        $steps = new ArrayCollection([
-//            'test_start_step' => (new Step())->setName('test_start_step')->setOrder(0)->setLabel('Test Label'),
-//            'step1' => (new Step())->setName('step1')->setLabel('Updated Label')->setOrder(0),
-//        ]);
-//        $workflowSteps = new ArrayCollection([
-//            $this->getStepEntity('test_start_step')->setLabel('Test Label')->setDefinition($workflowDefinition),
-//            $this->getStepEntity('step1')->setLabel('Updated Label')->setDefinition($workflowDefinition),
-//        ]);
-
         return array(
             'full configuration with start' => array(
                 'configuration' => $fullConfig,
@@ -477,20 +427,6 @@ class WorkflowAssemblerTest extends \PHPUnit_Framework_TestCase
      * @return WorkflowStep
      */
     protected function getStepEntity($name, $label = null)
-    {
-        $step = new WorkflowStep();
-        $step->setName($name);
-        $step->setLabel($label);
-
-        return $step;
-    }
-
-    /**
-     * @param string $name
-     * @param string|null $label
-     * @return WorkflowStep
-     */
-    protected function getWorkflowEntity($name, $label = null)
     {
         $step = new WorkflowStep();
         $step->setName($name);

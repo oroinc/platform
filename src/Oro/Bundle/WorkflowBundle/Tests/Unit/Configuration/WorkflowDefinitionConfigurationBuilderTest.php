@@ -134,8 +134,7 @@ class WorkflowDefinitionConfigurationBuilderTest extends \PHPUnit_Framework_Test
         $this->workflowAssembler->expects($this->once())
             ->method('assemble')
             ->with($this->isInstanceOf('Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition'), false)
-            ->will($this->returnCallback(function ($definition) use ($workflow, $steps) {
-
+            ->will($this->returnCallback(function (WorkflowDefinition $definition) use ($workflow, $steps) {
                 $workflowSteps = [];
                 foreach ($steps as $step) {
                     $workflowStep = new WorkflowStep();

@@ -32,16 +32,14 @@ class WorkflowDefinitionClonerTest extends \PHPUnit_Framework_TestCase
 
         $definition = new WorkflowDefinition();
 
-        $mergedDefinition = WorkflowDefinitionCloner::mergeDefinition($definition, $sourceDefinition);
+        WorkflowDefinitionCloner::mergeDefinition($definition, $sourceDefinition);
 
-        $this->assertSame($mergedDefinition, $definition);
+        $this->assertEquals($definition, $sourceDefinition);
+        $this->assertNotSame($definition, $sourceDefinition);
 
-        $this->assertEquals($mergedDefinition, $sourceDefinition);
-        $this->assertNotSame($mergedDefinition, $sourceDefinition);
+        $this->assertSame($definition->getStartStep(), $sourceDefinition->getStartStep());
 
-        $this->assertSame($mergedDefinition->getStartStep(), $sourceDefinition->getStartStep());
-
-        $this->assertObjectsDefinitions($mergedDefinition, $sourceDefinition);
+        $this->assertObjectsDefinitions($definition, $sourceDefinition);
     }
 
     /**

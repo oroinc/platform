@@ -15,7 +15,6 @@ class WorkflowDefinitionCloner
     /**
      * @param WorkflowDefinition $definition
      * @param WorkflowDefinition $source
-     * @return WorkflowDefinition
      */
     public static function mergeDefinition(WorkflowDefinition $definition, WorkflowDefinition $source)
     {
@@ -24,8 +23,6 @@ class WorkflowDefinitionCloner
             ->setStartStep($source->getStartStep())
             ->setEntityAcls($source->getEntityAcls())
             ->setRestrictions($source->getRestrictions());
-
-        return $definition;
     }
 
     /**
