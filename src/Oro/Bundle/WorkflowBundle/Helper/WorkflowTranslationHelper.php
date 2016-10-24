@@ -64,9 +64,11 @@ class WorkflowTranslationHelper
      * @param string|null $locale
      * @return string
      */
-    public function findWorkflowTranslation($key, $workflowName = null, $locale = null)
+    public function findWorkflowTranslation($key, $workflowName, $locale = null)
     {
-        $locale = $locale ?: $this->translator->getLocale();
+        if (!$locale) {
+            $locale = $this->translator->getLocale();
+        }
 
         $cacheKey = sprintf('%s-%s', $locale, $workflowName);
 
@@ -74,7 +76,10 @@ class WorkflowTranslationHelper
             $this->values[$cacheKey] = $this->findWorkflowTranslations($workflowName, $locale);
         }
 
-        $result = isset($this->values[$cacheKey][$key]) ? $this->values[$cacheKey][$key] : null;
+        $result = null;
+        if (isset($this->values[$cacheKey][$key])) {
+            $result = $this->values[$cacheKey][$key];
+        }
 
         if (!$result && $locale !== Translation::DEFAULT_LOCALE) {
             $result = $this->findWorkflowTranslation($key, $workflowName, Translation::DEFAULT_LOCALE);
