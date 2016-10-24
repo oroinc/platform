@@ -27,7 +27,14 @@ class WidgetUserSelectConverter extends WidgetEntitySelectConverter
         $entityClass,
         TranslatorInterface $translator
     ) {
-        parent::__construct($aclHelper, $entityNameResolver, $doctrineHelper, $entityManager, $entityClass, $translator);
+        parent::__construct(
+            $aclHelper,
+            $entityNameResolver,
+            $doctrineHelper,
+            $entityManager,
+            $entityClass,
+            $translator
+        );
 
         $this->ownerHelper = $ownerHelper;
     }
