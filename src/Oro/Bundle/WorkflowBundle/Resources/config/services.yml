@@ -335,7 +335,6 @@ services:
         arguments:
             - '@oro_workflow.translation.fields_iterator'
             - '@oro_workflow.helper.translation'
-        public: false
         tags:
             - { name: oro.workflow.configuration.handler, priority: 150 }
             - { name: oro.workflow.definition_builder.extension }
