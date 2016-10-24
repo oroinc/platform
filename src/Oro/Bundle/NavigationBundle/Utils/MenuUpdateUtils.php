@@ -29,6 +29,7 @@ class MenuUpdateUtils
         $accessor = PropertyAccess::createPropertyAccessor();
 
         self::setValue($accessor, $update, 'key', $item->getName());
+        self::setValue($accessor, $update, 'uri', $item->getUri());
 
         if ($update->getTitles()->count() <= 0) {
             self::setValue($accessor, $update, 'defaultTitle', $item->getLabel());
@@ -83,6 +84,10 @@ class MenuUpdateUtils
 
         if ($update->getTitles()->count()) {
             $item->setLabel((string) $update->getTitle($localizationHelper->getCurrentLocalization()));
+        }
+
+        if ($update->getUri()) {
+            $item->setUri($update->getUri());
         }
 
         $item->setDisplay($update->isActive());
