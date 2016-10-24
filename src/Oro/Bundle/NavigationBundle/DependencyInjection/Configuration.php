@@ -101,6 +101,7 @@ class Configuration implements ConfigurationInterface
                     ->arrayNode('translateParameters')
                         ->useAttributeAsKey('translateParameters')->prototype('scalar')->end()
                     ->end()
+                    ->booleanNode('translateDisabled')->end()
                     ->arrayNode('attributes')
                         ->children()
                             ->scalarNode('class')->end()

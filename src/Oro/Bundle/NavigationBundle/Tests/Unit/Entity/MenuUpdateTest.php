@@ -19,7 +19,11 @@ class MenuUpdateTest extends \PHPUnit_Framework_TestCase
         $update->setDivider(true);
 
         $this->assertEquals(
-            ['position' => $priority, 'divider' => true],
+            [
+                'position' => $priority,
+                'divider' => true,
+                'translateDisabled' => false
+            ],
             $update->getExtras()
         );
     }
