@@ -4,7 +4,11 @@ define(function(require) {
     require('bowerassets/base64/base64');
 
     return {
-        encode: window.btoa,
-        decode: window.atob
+        encode: function(stringToEncode) {
+            return window.btoa(stringToEncode);
+        },
+        decode: function(encodedData) {
+            return window.atob(encodedData);
+        }
     };
 });
