@@ -54,7 +54,7 @@ class AjaxMenuController extends Controller
     }
 
     /**
-     * @Route("/menu/{menuName}/{parentKey}/{ownershipType}", name="oro_navigation_menuupdate_create")
+     * @Route("/menu/create/{menuName}/{parentKey}/{ownershipType}", name="oro_navigation_menuupdate_create")
      * @Method("POST")
      *
      * @param Request $request
@@ -84,7 +84,7 @@ class AjaxMenuController extends Controller
     }
 
     /**
-     * @Route("/menu/{ownershipType}/{menuName}/{key}", name="oro_navigation_menuupdate_delete")
+     * @Route("/menu/delete/{ownershipType}/{menuName}/{key}", name="oro_navigation_menuupdate_delete")
      * @Method("DELETE")
      *
      * @param Request $request
