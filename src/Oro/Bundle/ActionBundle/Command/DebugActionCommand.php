@@ -2,15 +2,19 @@
 
 namespace Oro\Bundle\ActionBundle\Command;
 
-use Oro\Component\Action\Action\ActionFactory;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException;
+
+use Oro\Component\Action\Action\ActionFactory;
 
 class DebugActionCommand extends ContainerAwareCommand
 {
+    const COMMAND_NAME = 'oro:debug:action';
+
     /**
      * @var ActionFactory
      */
@@ -38,14 +42,13 @@ class DebugActionCommand extends ContainerAwareCommand
      */
     protected function configure()
     {
-        $this->setName('oro:debug:action')
+        $this->setName(self::COMMAND_NAME)
             ->setDescription('Displays current "actions" for an application')
             ->addArgument('action-name', InputArgument::OPTIONAL, 'An "action" name')
             ->setHelp(<<<'EOF'
 The <info>%command.name%</info> displays the configured 'actions':
 
   <info>php %command.full_name%</info>
-
 EOF
             );
     }
@@ -85,7 +88,7 @@ EOF
         } catch (\TypeError $e) {
             $output->writeln(
                 sprintf(
-                    'Unable to load action "%s", due error "%s"',
+                    '<error>Unable to load action "%s", due error "%s"</error>',
                     $actionName,
                     PHP_EOL . $e->getMessage()
                 )
@@ -96,15 +99,12 @@ EOF
 
         $table = new Table($output);
 
-        $reflection = new \ReflectionClass(get_class($action));
-
         $table->addRows(
             [
                 ['Name', $actionName],
                 ['Service Name', $types[$actionName]],
                 ['Class', get_class($action)],
-                ['Full Description', $this->getFullDescription(get_class($action))],
-                ['Arguments', $reflection->getConstructor()],
+                ['Full Description', $this->getFullDescription(get_class($action), $output)],
             ]
         );
         $table->render();
@@ -119,16 +119,19 @@ EOF
      */
     private function outputTableInfo(OutputInterface $output)
     {
+        $container = $this->getContainer();
         $types = $this->actionFactory->getTypes();
         $table = new Table($output);
         $table->setHeaders(['Name', 'Short Description']);
         foreach ($types as $key => $type) {
-            $description = "No Description";
             try {
-                $action = $this->getContainer()->get($type);
-                $description = $this->getShortDescription(get_class($action));
-            } catch (\TypeError $e) {
+                $action = $container->get($type);
+            } catch (ServiceNotFoundException $e) {
+                $output->writeln(sprintf('<error>Can not load Action "%s"</error>', $type));
+
+                throw $e;
             }
+            $description = $this->getShortDescription(get_class($action), $output);
             $table->addRow([$key, $description]);
         }
         $table->render();
@@ -143,9 +146,10 @@ EOF
      *
      * @return string
      */
-    private function getShortDescription($className)
+    private function getShortDescription($className, OutputInterface $output)
     {
-        return $this->getFullDescription($className);
+        // remove lines after the latest empty string
+        return trim(preg_replace('#\n\s*\n.+$#s', '', $this->getFullDescription($className, $output)));
     }
 
     /**
@@ -153,14 +157,39 @@ EOF
      *
      * @return string
      */
-    private function getFullDescription($className)
+    private function getFullDescription($className, OutputInterface $output)
     {
-        $description = sprintf('No Description Found For "%s"', $className);
+        $description = '';
         try {
             $reflection = new \ReflectionClass($className);
-            $doc = $reflection->getDocComment();
-            $description = strlen($doc) ? $doc : $description;
+            $description = $reflection->getDocComment();
+            $description = $this->filterDescription($description);
         } catch (\ReflectionException $e) {
+            $output->writeln(
+                sprintf(
+                    '<error>Can not get Doc Comment for class "%s": %s</error>',
+                    $className,
+                    $e->getMessage()
+                )
+            );
+        }
+
+        return $description;
+    }
+
+    /**
+     * @param string $description
+     *
+     * @return string
+     */
+    private function filterDescription($description)
+    {
+        $regExps = [
+            '#/?\*+.?#',
+            '#^\s*@(package|SuppressWarning).+$#mi',
+        ];
+        foreach ($regExps as $exp) {
+            $description = trim(preg_replace($exp, '', $description));
         }
 
         return $description;
