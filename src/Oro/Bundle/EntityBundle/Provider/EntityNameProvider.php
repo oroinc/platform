@@ -33,11 +33,15 @@ class EntityNameProvider implements EntityNameProviderInterface
      */
     public function getName($format, $locale, $entity)
     {
-        if ($format !== self::FULL && $format !== self::SHORT) {
-            return false;
+        if ($format === self::SHORT) {
+            return $this->getConstructedName($entity, [$this->getFieldName(ClassUtils::getClass($entity))]);
         }
 
-        return $this->getConstructedName($entity, (array) $this->getFieldNames(ClassUtils::getClass($entity)));
+        if ($format === self::FULL) {
+            return $this->getConstructedName($entity, $this->getFieldNames(ClassUtils::getClass($entity)));
+        }
+
+        return false;
     }
 
     /**
@@ -126,13 +130,15 @@ class EntityNameProvider implements EntityNameProviderInterface
         if (null === $manager = $this->doctrine->getManagerForClass($className)) {
             return [];
         }
-
         $metadata = $manager->getClassMetadata($className);
-        $fieldNames = (array)$metadata->getFieldNames();
+        $fieldNames = (array) $metadata->getFieldNames();
 
-        return array_filter($fieldNames, function ($fieldName) use ($metadata) {
-            return 'string' === $metadata->getTypeOfField($fieldName);
-        });
+        return array_filter(
+            $fieldNames,
+            function ($fieldName) use ($metadata) {
+                return 'string' === $metadata->getTypeOfField($fieldName);
+            }
+        );
     }
 
     /**
@@ -145,6 +151,7 @@ class EntityNameProvider implements EntityNameProviderInterface
      */
     protected function getConstructedName($entity, $fieldNames)
     {
+        var_dump($fieldNames);
         foreach ($fieldNames as $field) {
             if ($value = $this->getFieldValue($entity, $field)) {
                 return $value;
