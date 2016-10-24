@@ -17,9 +17,6 @@ class TranslationHelper
     /** @var TranslationManager */
     protected $translationManager;
 
-    /** @var array */
-    protected $values = [];
-
     /**
      * @param ManagerRegistry $registry
      * @param TranslationManager $translationManager
@@ -52,35 +49,10 @@ class TranslationHelper
     }
 
     /**
-     * @param string $keyPrefix
-     * @param string $locale
-     * @param string $domain
-     */
-    public function prepareValues($keyPrefix, $locale, $domain)
-    {
-        $cacheKey = sprintf('%s-%s', $locale, $domain);
-
-        $this->values[$cacheKey] = $this->findValues($keyPrefix, $locale, $domain);
-    }
-
-    /**
      * @param string $key
      * @param string $locale
      * @param string $domain
-     * @return string
-     */
-    public function getValue($key, $locale, $domain)
-    {
-        $cacheKey = sprintf('%s-%s', $locale, $domain);
-
-        return isset($this->values[$cacheKey][$key]) ? $this->values[$cacheKey][$key] : $key;
-    }
-
-    /**
-     * @param string $key
-     * @param string $locale
-     * @param string $domain
-     * @return string
+     * @return string|null
      */
     public function findValue($key, $locale, $domain)
     {
@@ -90,7 +62,7 @@ class TranslationHelper
 
         $result = $queryBuilder->getQuery()->getOneOrNullResult();
 
-        return $result ? $result['value'] : $key;
+        return $result ? $result['value'] : null;
     }
 
     /**

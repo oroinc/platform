@@ -83,7 +83,7 @@ class WorkflowDefinitionController extends Controller
             throw new AccessDeniedHttpException('System workflow definitions are not editable');
         }
         $translateLinks = $this->getTranslationsDatagridLinksProvider()->getWorkflowTranslateLinks($workflowDefinition);
-        $this->getTranslationHelper()->extractTranslations($workflowDefinition);
+        $this->getTranslationHelper()->translateWorkflowDefinitionFields($workflowDefinition);
 
         $form = $this->get('oro_workflow.form.workflow_definition');
         $form->setData($workflowDefinition);
@@ -111,7 +111,7 @@ class WorkflowDefinitionController extends Controller
     public function viewAction(WorkflowDefinition $workflowDefinition)
     {
         $translateLinks = $this->getTranslationsDatagridLinksProvider()->getWorkflowTranslateLinks($workflowDefinition);
-        $this->getTranslationHelper()->extractTranslations($workflowDefinition);
+        $this->getTranslationHelper()->translateWorkflowDefinitionFields($workflowDefinition);
 
         return array(
             'entity' => $workflowDefinition,

@@ -17,7 +17,7 @@ operations:
                 actions:
                     - '@call_service_method':
                         service: oro_workflow.helper.translation
-                        method: extractTranslations
+                        method: translateWorkflowDefinitionFields
                         method_parameters: [$.clone, $.data.name]
                     - '@call_service_method':
                         service: oro_entity.entity_provider

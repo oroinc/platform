@@ -92,6 +92,6 @@ class WorkflowFilter extends EntityFilter
      */
     protected function findRelatedJoin(FilterDatasourceAdapterInterface $ds)
     {
-        // nothing todo, related joins configured manually
+        // related joins configured manually
     }
 }
