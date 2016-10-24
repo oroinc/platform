@@ -3,16 +3,14 @@ Feature: User login
   As an OroCRM admin
   I need to be able to authenticate
 
-# Can't test this scenario on commerce-crm application
-
-#Scenario: Success login
-#  Given I am on "/user/login"
-#  And I fill "Login" form with:
-#    | Username | admin |
-#    | Password | admin |
-#  And I press "Log in"
-#  And I should be on "/"
+Scenario: Success login
+  Given I am on Login page
+  And I fill "Login Form" with:
+    | Username | admin |
+    | Password | admin |
+  And I press "Log in"
+  And I should be on Admin Dashboard page
 
 Scenario: Fail login
-  Given I login as "non_existed_user" user with "non_existed_password" password
+  Given I login as "user" user
   And I should see "Invalid user name or password."

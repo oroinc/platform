@@ -96,13 +96,9 @@ class NormalizeMetadata implements ProcessorInterface
                 $propertyPath = $field->getPropertyPath();
                 if ($propertyPath && $fieldName !== $propertyPath) {
                     $path = ConfigUtil::explodePropertyPath($field->getPropertyPath());
-                    $pathCount = count($path);
-                    if (1 === $pathCount) {
+                    if (1 === count($path)) {
                         $entityMetadata->renameProperty($propertyPath, $fieldName);
-                    } elseif ($processLinkedProperties
-                        && $pathCount > 1
-                        && !$entityMetadata->hasProperty($fieldName)
-                    ) {
+                    } elseif ($processLinkedProperties && !$entityMetadata->hasProperty($fieldName)) {
                         $addedPropertyName = $this->processLinkedProperty(
                             $entityMetadata,
                             $fieldName,
@@ -159,6 +155,7 @@ class NormalizeMetadata implements ProcessorInterface
                     $linkedProperty
                 );
                 $associationMetadata->setName($propertyName);
+                $associationMetadata->setPropertyPath($linkedProperty);
                 $linkedPropertyPath = array_merge($propertyPath, [$linkedProperty]);
                 $associationMetadata->setTargetMetadata(
                     $this->getMetadata(
@@ -181,6 +178,7 @@ class NormalizeMetadata implements ProcessorInterface
                     $linkedProperty
                 );
                 $fieldMetadata->setName($propertyName);
+                $fieldMetadata->setPropertyPath($linkedProperty);
                 $entityMetadata->addField($fieldMetadata);
             }
             $addedPropertyName = $linkedProperty;

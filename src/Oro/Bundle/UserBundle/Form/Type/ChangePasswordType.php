@@ -4,26 +4,30 @@ namespace Oro\Bundle\UserBundle\Form\Type;
 
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Security\Core\Validator\Constraints\UserPassword;
 
 use Oro\Bundle\UserBundle\Form\EventListener\ChangePasswordSubscriber;
+use Oro\Bundle\UserBundle\Form\Provider\PasswordFieldOptionsProvider;
 
 class ChangePasswordType extends AbstractType
 {
     const NAME = 'oro_change_password';
 
-    /**
-     * @var ChangePasswordSubscriber
-     */
+    /** @var ChangePasswordSubscriber */
     protected $subscriber;
+
+    /** @var PasswordFieldOptionsProvider */
+    protected $optionsProvider;
 
     /**
      * @param ChangePasswordSubscriber $subscriber
+     * @param PasswordFieldOptionsProvider $optionsProvider
      */
-    public function __construct(ChangePasswordSubscriber $subscriber)
+    public function __construct(ChangePasswordSubscriber $subscriber, PasswordFieldOptionsProvider $optionsProvider)
     {
         $this->subscriber = $subscriber;
+        $this->optionsProvider = $optionsProvider;
     }
 
     /**
@@ -32,7 +36,6 @@ class ChangePasswordType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder->addEventSubscriber($this->subscriber);
-
         $builder
             ->add(
                 'currentPassword',
@@ -58,8 +61,15 @@ class ChangePasswordType extends AbstractType
                             'class' => 'password-field'
                         ]
                     ],
-                    'first_options' => ['label' => $options['first_options_label']],
-                    'second_options' => ['label' => $options['second_options_label']],
+                    'first_options' => [
+                        'label' => $options['first_options_label'],
+                        'tooltip' => $this->optionsProvider->getTooltip(),
+                        'attr' => [
+                            'data-validation' => $this->optionsProvider->getDataValidationOption(),
+                        ],
+                    ],
+                    'second_options' => ['label' => $options['second_options_label'],
+                    ],
                     'mapped' => false,
                     'cascade_validation' => true,
                 ]
@@ -67,7 +77,7 @@ class ChangePasswordType extends AbstractType
     }
 
     /**
-     *M-BM- {@inheritdoc}
+     * {@inheritdoc}
      */
     public function getName()
     {
@@ -83,9 +93,9 @@ class ChangePasswordType extends AbstractType
     }
 
     /**
-     *M-BM- {@inheritdoc}
+     * {@inheritdoc}
      */
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults(
             [

@@ -4,6 +4,7 @@ namespace Oro\Bundle\CurrencyBundle\Tests\Unit\Twig;
 
 use Twig_SimpleFilter;
 
+use Oro\Bundle\CurrencyBundle\Tests\Unit\Utils\CurrencyNameHelperStub;
 use Oro\Bundle\CurrencyBundle\Twig\CurrencyExtension;
 use Oro\Bundle\CurrencyBundle\Entity\Price;
 
@@ -31,7 +32,7 @@ class CurrencyExtensionTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->extension = new CurrencyExtension($this->formatter, $viewTypeProvider);
+        $this->extension = new CurrencyExtension($this->formatter, $viewTypeProvider, new CurrencyNameHelperStub());
     }
 
     public function testGetFilters()
