@@ -8,7 +8,7 @@ use Oro\Bundle\SearchBundle\Engine\Orm\PdoPgsql;
 use Doctrine\ORM\Configuration;
 
 /**
- * @dbIsolationPerTest
+ * @dbIsolation
  * @dbReindex
  */
 class PdoPgsqlTest extends AbstractDriverTest
