@@ -15,7 +15,6 @@ class WorkflowColumnListener
     public function onBuildBefore(BuildBefore $event)
     {
         $this->processFilters($event->getConfig());
-
     }
 
     /**
