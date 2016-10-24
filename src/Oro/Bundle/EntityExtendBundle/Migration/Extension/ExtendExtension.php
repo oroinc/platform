@@ -840,6 +840,65 @@ class ExtendExtension implements NameGeneratorAwareInterface
     }
 
     /**
+     * Has one-to-many relation
+     *
+     * @param Schema $schema
+     * @param Table|string $table A Table object or table name
+     * @param Table|string $targetTable A Table object or table name
+     *
+     * @return bool
+     *
+     * @throws SchemaException if valid primary key does not exist
+     */
+    public function hasOneToManyRelation(Schema $schema, $table, $targetTable)
+    {
+        $selfTable = $this->getTable($table, $schema);
+        $targetTable = $this->getTable($targetTable, $schema);
+
+        $targetTableName = $this->getTableName($targetTable);
+        $associationName = ExtendHelper::buildAssociationName(
+            $this->getEntityClassByTableName($targetTableName)
+        );
+
+        $primaryKeyColumnName = $this->getPrimaryKeyColumnName($selfTable);
+        $relationColumnName = $this->nameGenerator->generateRelationColumnName(
+            $associationName,
+            '_' . $primaryKeyColumnName
+        );
+
+        return $selfTable->hasColumn($relationColumnName);
+    }
+
+    /**
+     * Has many-to-many relation
+     *
+     * @param Schema       $schema
+     * @param Table|string $table       A Table object or table name
+     * @param Table|string $targetTable A Table object or table name
+     *
+     * @return bool
+     */
+    public function hasManyToManyRelation(Schema $schema, $table, $targetTable)
+    {
+        $selfTableName = $this->getTableName($table);
+        $targetTableName = $this->getTableName($targetTable);
+        $associationName = ExtendHelper::buildAssociationName(
+            $this->getEntityClassByTableName($targetTableName)
+        );
+
+        $selfClassName = $this->getEntityClassByTableName($selfTableName);
+        $targetClassName = $this->getEntityClassByTableName($targetTableName);
+
+        $joinTableName = $this->nameGenerator->generateManyToManyJoinTableName(
+            $selfClassName,
+            $associationName,
+            $targetClassName
+        );
+
+        return $schema->hasTable($joinTableName);
+    }
+
+    /**
      * @param Table|string $table A Table object or table name
      *
      * @return string
