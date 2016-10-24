@@ -14,6 +14,11 @@ use Symfony\Component\PropertyAccess\PropertyAccessor;
 class MenuUpdateUtils
 {
     /**
+     * @var PropertyAccessor
+     */
+    private static $propertyAccessor;
+
+    /**
      * Apply changes from menu item to menu update
      *
      * @param MenuUpdateInterface $update
@@ -29,7 +34,7 @@ class MenuUpdateUtils
         MenuUpdateHelper $menuUpdateHelper,
         array $extrasMapping = ['position' => 'priority']
     ) {
-        $accessor = PropertyAccess::createPropertyAccessor();
+        $accessor = self::getPropertyAccessor();
 
         self::setValue($accessor, $update, 'key', $item->getName());
         self::setValue($accessor, $update, 'uri', $item->getUri());
@@ -170,5 +175,17 @@ class MenuUpdateUtils
                 $accessor->setValue($update, $key, $value);
             }
         }
+    }
+
+    /**
+     * @return PropertyAccessor
+     */
+    private static function getPropertyAccessor()
+    {
+        if (!self::$propertyAccessor) {
+            self::$propertyAccessor = PropertyAccess::createPropertyAccessor();
+        }
+
+        return self::$propertyAccessor;
     }
 }
