@@ -2,15 +2,15 @@
 
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Model;
 
-use Symfony\Component\DependencyInjection\ContainerInterface;
-use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
+
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 use Oro\Bundle\WorkflowBundle\Configuration\WorkflowConfiguration;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowStep;
 use Oro\Bundle\WorkflowBundle\Model\AttributeAssembler;
-use Oro\Bundle\WorkflowBundle\Model\Step;
 use Oro\Bundle\WorkflowBundle\Model\StepAssembler;
 use Oro\Bundle\WorkflowBundle\Model\TransitionAssembler;
 use Oro\Bundle\WorkflowBundle\Model\TransitionManager;
@@ -268,21 +268,12 @@ class WorkflowAssemblerTest extends \PHPUnit_Framework_TestCase
     {
         // source data
         $workflow = $this->createWorkflow();
-
         $workflowDefinition = $this->createWorkflowDefinition($configuration);
-        $workflowDefinition->addStep($this->getStepEntity('test_start_step'));
-        $workflowDefinition->addStep($this->getStepEntity('step1', 'Step1 Label'));
-
+        if ($startStep) {
+            $workflowDefinition->addStep($startStep);
+        }
         $attributes = new ArrayCollection(array('test' => $this->getAttributeMock('test')));
-
-        $steps = new ArrayCollection([
-            'test_start_step' => (new Step())->setName('test_start_step'),
-            'step1' => (new Step())->setName('step1')->setLabel('Updated Label'),
-        ]);
-        $workflowSteps = new ArrayCollection([
-            $this->getStepEntity('test_start_step')->setDefinition($workflowDefinition),
-            $this->getStepEntity('step1')->setLabel('Updated Label')->setDefinition($workflowDefinition),
-        ]);
+        $steps = new ArrayCollection(array('test_start_step' => $this->getStepMock('test_start_step')));
 
         $transitions = array('test_transition' => $this->getTransitionMock(false, 'test_transition'));
         if (!$startStep) {
@@ -421,16 +412,10 @@ class WorkflowAssemblerTest extends \PHPUnit_Framework_TestCase
         );
     }
 
-    /**
-     * @param string $name
-     * @param string|null $label
-     * @return WorkflowStep
-     */
-    protected function getStepEntity($name, $label = null)
+    protected function getStepEntity($name)
     {
         $step = new WorkflowStep();
         $step->setName($name);
-        $step->setLabel($label);
 
         return $step;
     }
