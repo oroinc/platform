@@ -4,7 +4,10 @@ namespace Oro\Bundle\LocaleBundle\ImportExport\Strategy;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
+use Doctrine\ORM\UnitOfWork;
+use Doctrine\Common\Util\ClassUtils;
 
+use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\ImportExportBundle\Strategy\Import\ConfigurableAddOrReplaceStrategy;
 use Oro\Bundle\LocaleBundle\Entity\LocalizedFallbackValue;
 use Oro\Bundle\LocaleBundle\ImportExport\Normalizer\LocalizationCodeFormatter;
@@ -16,6 +19,17 @@ class LocalizedFallbackValueAwareStrategy extends ConfigurableAddOrReplaceStrate
 
     /** @var \ReflectionProperty[] */
     protected $reflectionProperties = [];
+
+    /** @var DoctrineHelper */
+    protected $doctrineHelper;
+
+    /**
+     * @param DoctrineHelper $doctrineHelper
+     */
+    public function setDoctrineHelper(DoctrineHelper $doctrineHelper)
+    {
+        $this->doctrineHelper = $doctrineHelper;
+    }
 
     /**
      * @param string $localizedFallbackValueClass
@@ -52,9 +66,18 @@ class LocalizedFallbackValueAwareStrategy extends ConfigurableAddOrReplaceStrate
      */
     protected function afterProcessEntity($entity)
     {
-        $fields = $this->fieldHelper->getRelations($this->entityName);
-        foreach ($fields as $field) {
+        $metadata = $this->doctrineHelper->getEntityMetadata($this->localizedFallbackValueClass);
+        $localizedValueRelations = [];
+        foreach ($metadata->getAssociationMappings() as $name => $mapping) {
+            if ($metadata->isAssociationInverseSide($name) && $metadata->isCollectionValuedAssociation($name)) {
+                $localizedValueRelations[] = $name;
+            }
+        }
+
+        $entityFields = $this->fieldHelper->getRelations($this->entityName);
+        foreach ($entityFields as $field) {
             if ($this->isLocalizedFallbackValue($field)) {
+                $this->removeNotInitializedEntities($entity, $field, $localizedValueRelations);
                 $this->setLocalizationKeys($entity, $field);
             }
         }
@@ -63,13 +86,62 @@ class LocalizedFallbackValueAwareStrategy extends ConfigurableAddOrReplaceStrate
     }
 
     /**
-     * @param $field
+     * {@inheritdoc}
+     */
+    protected function importExistingEntity($entity, $existingEntity, $itemData = null, array $excludedFields = [])
+    {
+        if (ClassUtils::getClass($entity) === $this->localizedFallbackValueClass) {
+            $metadata = $this->doctrineHelper->getEntityMetadata($this->localizedFallbackValueClass);
+            foreach ($metadata->getAssociationMappings() as $name => $mapping) {
+                if ($metadata->isAssociationInverseSide($name) && $metadata->isCollectionValuedAssociation($name)) {
+                    // exclude all *-to-many relations from import
+                    $excludedFields[] = $name;
+                }
+            }
+        }
+
+        parent::importExistingEntity($entity, $existingEntity, $itemData, $excludedFields);
+    }
+
+    /**
+     * @param string $field
      * @return bool
      */
     protected function isLocalizedFallbackValue($field)
     {
         return $this->fieldHelper->isRelation($field)
             && is_a($field['related_entity_name'], $this->localizedFallbackValueClass, true);
+    }
+
+    /**
+     * Clear not initialized entities that might remain in localized entity because of recursive relations
+     *
+     * @param $entity
+     * @param array $field
+     * @param array $relations
+     */
+    protected function removeNotInitializedEntities($entity, array $field, array $relations)
+    {
+        /** @var Collection|LocalizedFallbackValue[] $localizedFallbackValues */
+        $localizedFallbackValues = $this->fieldHelper->getObjectValue($entity, $field['name']);
+        foreach ($localizedFallbackValues as $value) {
+            // check all inverse relations
+            foreach ($relations as $relation) {
+                /** @var Collection $collection */
+                $collection = $this->fieldHelper->getObjectValue($value, $relation);
+                if ($collection) {
+                    foreach ($collection as $key => $element) {
+                        $uow = $this->doctrineHelper->getEntityManager($element)->getUnitOfWork();
+                        // remove foreign and detached entities
+                        if (spl_object_hash($entity) !== spl_object_hash($element) &&
+                            $uow->getEntityState($element, UnitOfWork::STATE_DETACHED) === UnitOfWork::STATE_DETACHED
+                        ) {
+                            $collection->remove($key);
+                        }
+                    }
+                }
+            }
+        }
     }
 
     /**
