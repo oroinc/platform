@@ -330,3 +330,10 @@ services:
         tags:
             - { name: 'oro_message_queue.client.message_processor' }
             - { name: monolog.logger, channel: oro_workflow }
+
+    oro_workflow.listener.grids_subscriber:
+        class: Oro\Bundle\WorkflowBundle\EventListener\GridsSubscriber
+        arguments:
+            - '@oro_featuretoggle.checker.feature_checker'
+        tags:
+            - { name: kernel.event_subscriber }
