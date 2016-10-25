@@ -9,6 +9,8 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 use Oro\Bundle\ActionBundle\Helper\DocCommentParser;
 
+use Oro\Component\ConfigExpression\FactoryWithTypesInterface;
+
 abstract class AbstractDebugCommand extends ContainerAwareCommand
 {
     /** @var mixed */
@@ -47,7 +49,7 @@ abstract class AbstractDebugCommand extends ContainerAwareCommand
      */
     protected function outputItem($name, OutputInterface $output)
     {
-        $types = $this->getTypes();
+        $types = $this->getFactory()->getTypes();
         if (!isset($types[$name])) {
             $output->writeln(sprintf('<error>Type "%s" is not found</error>', $name));
 
@@ -86,7 +88,7 @@ abstract class AbstractDebugCommand extends ContainerAwareCommand
     {
         $container = $this->getContainer();
 
-        $types = $this->getTypes();
+        $types = $this->getFactory()->getTypes();
 
         $table = new Table($output);
         $table->setHeaders(['Name', 'Short Description']);
@@ -105,7 +107,7 @@ abstract class AbstractDebugCommand extends ContainerAwareCommand
     }
 
     /**
-     * @return mixed
+     * @return FactoryWithTypesInterface
      */
     protected function getFactory()
     {
@@ -132,11 +134,6 @@ abstract class AbstractDebugCommand extends ContainerAwareCommand
      * @return string
      */
     abstract protected function getFactoryServiceId();
-
-    /**
-     * @return array
-     */
-    abstract protected function getTypes();
 
     /**
      * Get name of input argument

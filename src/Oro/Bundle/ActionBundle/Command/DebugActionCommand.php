@@ -42,15 +42,4 @@ EOF
     {
         return self::ARGUMENT_NAME;
     }
-
-    /**
-     * {@inheritdoc}
-     */
-    protected function getTypes()
-    {
-        /** @var ActionFactory $factory */
-        $factory = $this->getFactory();
-
-        return $factory->getTypes();
-    }
 }

@@ -2,9 +2,10 @@
 
 namespace Oro\Component\ConfigExpression;
 
+use Oro\Component\ConfigExpression\Extension\DependencyInjection\DependencyInjectionExtension;
 use Oro\Component\ConfigExpression\Extension\ExtensionInterface;
 
-class ExpressionFactory implements ExpressionFactoryInterface
+class ExpressionFactory implements ExpressionFactoryInterface, FactoryWithTypesInterface
 {
     /** @var ContextAccessorInterface */
     protected $contextAccessor;
@@ -60,10 +61,17 @@ class ExpressionFactory implements ExpressionFactoryInterface
     }
 
     /**
-     * @return ExtensionInterface[]
+     * @return string[]
      */
-    public function getExtensions()
+    public function getTypes()
     {
-        return $this->extensions;
+        $services = [];
+        foreach ($this->extensions as $extension) {
+            if ($extension instanceof DependencyInjectionExtension) {
+                $services[] = $extension->getServiceIds();
+            }
+        }
+
+        return call_user_func_array('array_merge', $services);
     }
 }

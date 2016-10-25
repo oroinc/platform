@@ -5,7 +5,6 @@ namespace Oro\Bundle\ActionBundle\Command;
 use Symfony\Component\Console\Input\InputArgument;
 
 use Oro\Component\ConfigExpression\ExpressionFactory;
-use Oro\Component\ConfigExpression\Extension\DependencyInjection\DependencyInjectionExtension;
 
 class DebugConditionCommand extends AbstractDebugCommand
 {
@@ -40,32 +39,8 @@ EOF
     /**
      * {@inheritdoc}
      */
-    protected function getTypes()
-    {
-        return $this->findExtensionServices();
-    }
-
-    /**
-     * {@inheritdoc}
-     */
     protected function getArgumentName()
     {
         return self::ARGUMENT_NAME;
-    }
-
-    /**
-     * @return array
-     */
-    private function findExtensionServices()
-    {
-        $services = [];
-        /** @var ExpressionFactory $extensionsFactory */
-        $extensionsFactory = $this->getFactory();
-        foreach ($extensionsFactory->getExtensions() as $extension) {
-            if ($extension instanceof DependencyInjectionExtension) {
-                $services = $extension->getServiceIds();
-            }
-        }
-        return $services;
     }
 }
