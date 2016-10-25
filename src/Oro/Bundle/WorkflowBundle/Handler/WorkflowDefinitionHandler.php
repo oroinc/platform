@@ -11,38 +11,23 @@ use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Event\WorkflowChangesEvent;
 use Oro\Bundle\WorkflowBundle\Event\WorkflowEvents;
 use Oro\Bundle\WorkflowBundle\Handler\Helper\WorkflowDefinitionCloner;
-use Oro\Bundle\WorkflowBundle\Model\WorkflowAssembler;
 
 class WorkflowDefinitionHandler
 {
-    /** @var WorkflowAssembler */
-    protected $workflowAssembler;
-
     /** @var ManagerRegistry */
-    protected $managerRegistry;
-
-    /** @var string */
-    protected $entityClass;
+    protected $registry;
 
     /** @var EventDispatcherInterface */
     private $eventDispatcher;
 
     /**
-     * @param WorkflowAssembler $workflowAssembler
      * @param EventDispatcherInterface $eventDispatcher
-     * @param ManagerRegistry $managerRegistry
-     * @param string $entityClass
+     * @param ManagerRegistry $registry
      */
-    public function __construct(
-        WorkflowAssembler $workflowAssembler,
-        EventDispatcherInterface $eventDispatcher,
-        ManagerRegistry $managerRegistry,
-        $entityClass
-    ) {
-        $this->workflowAssembler = $workflowAssembler;
+    public function __construct(EventDispatcherInterface $eventDispatcher, ManagerRegistry $registry)
+    {
         $this->eventDispatcher = $eventDispatcher;
-        $this->managerRegistry = $managerRegistry;
-        $this->entityClass = $entityClass;
+        $this->registry = $registry;
     }
 
     /**
@@ -50,31 +35,18 @@ class WorkflowDefinitionHandler
      * @param WorkflowDefinition|null $newDefinition
      * @throws \Exception
      */
-    public function updateWorkflowDefinition(
-        WorkflowDefinition $existingDefinition,
-        WorkflowDefinition $newDefinition
-    ) {
-        $em = $this->getEntityManager();
-
+    public function updateWorkflowDefinition(WorkflowDefinition $existingDefinition, WorkflowDefinition $newDefinition)
+    {
         $previous = WorkflowDefinitionCloner::cloneDefinition($existingDefinition);
 
         WorkflowDefinitionCloner::mergeDefinition($existingDefinition, $newDefinition);
-
-        $this->workflowAssembler->assemble($existingDefinition);
 
         $this->eventDispatcher->dispatch(
             WorkflowEvents::WORKFLOW_BEFORE_UPDATE,
             new WorkflowChangesEvent($existingDefinition, $previous)
         );
 
-        $em->beginTransaction();
-        try {
-            $em->flush();
-            $em->commit();
-        } catch (\Exception $exception) {
-            $em->rollback();
-            throw $exception;
-        }
+        $this->process($existingDefinition);
 
         $this->eventDispatcher->dispatch(
             WorkflowEvents::WORKFLOW_AFTER_UPDATE,
@@ -88,25 +60,14 @@ class WorkflowDefinitionHandler
      */
     public function createWorkflowDefinition(WorkflowDefinition $workflowDefinition)
     {
-        $em = $this->getEntityManager();
-
-        $this->workflowAssembler->assemble($workflowDefinition);
+        $workflowDefinition = WorkflowDefinitionCloner::cloneDefinition($workflowDefinition);
 
         $this->eventDispatcher->dispatch(
             WorkflowEvents::WORKFLOW_BEFORE_CREATE,
             new WorkflowChangesEvent($workflowDefinition)
         );
 
-        $em->persist($workflowDefinition);
-
-        $em->beginTransaction();
-        try {
-            $em->flush();
-            $em->commit();
-        } catch (\Exception $exception) {
-            $em->rollback();
-            throw $exception;
-        }
+        $this->process($workflowDefinition);
 
         $this->eventDispatcher->dispatch(
             WorkflowEvents::WORKFLOW_AFTER_CREATE,
@@ -139,10 +100,29 @@ class WorkflowDefinitionHandler
     }
 
     /**
+     * @param WorkflowDefinition $workflowDefinition
+     * @throws \Exception
+     */
+    protected function process(WorkflowDefinition $workflowDefinition)
+    {
+        $em = $this->getEntityManager();
+        $em->persist($workflowDefinition);
+        $em->beginTransaction();
+
+        try {
+            $em->flush();
+            $em->commit();
+        } catch (\Exception $exception) {
+            $em->rollback();
+            throw $exception;
+        }
+    }
+
+    /**
      * @return EntityManager
      */
     private function getEntityManager()
     {
-        return $this->managerRegistry->getManagerForClass($this->entityClass);
+        return $this->registry->getManagerForClass(WorkflowDefinition::class);
     }
 }

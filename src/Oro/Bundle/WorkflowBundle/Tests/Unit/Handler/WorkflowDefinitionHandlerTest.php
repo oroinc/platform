@@ -13,7 +13,6 @@ use Oro\Bundle\WorkflowBundle\Event\WorkflowChangesEvent;
 use Oro\Bundle\WorkflowBundle\Event\WorkflowEvents;
 use Oro\Bundle\WorkflowBundle\Handler\WorkflowDefinitionHandler;
 use Oro\Bundle\WorkflowBundle\Model\StepManager;
-use Oro\Bundle\WorkflowBundle\Model\WorkflowAssembler;
 
 class WorkflowDefinitionHandlerTest extends \PHPUnit_Framework_TestCase
 {
@@ -26,9 +25,6 @@ class WorkflowDefinitionHandlerTest extends \PHPUnit_Framework_TestCase
     /** @var \PHPUnit_Framework_MockObject_MockObject|EventDispatcherInterface */
     protected $eventDispatcher;
 
-    /** @var WorkflowAssembler|\PHPUnit_Framework_MockObject_MockObject */
-    protected $workflowAssembler;
-
     /** @var StepManager|\PHPUnit_Framework_MockObject_MockObject */
     protected $stepManager;
 
@@ -40,10 +36,6 @@ class WorkflowDefinitionHandlerTest extends \PHPUnit_Framework_TestCase
      */
     protected function setUp()
     {
-        $this->workflowAssembler = $this->getMockBuilder(WorkflowAssembler::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
         $this->stepManager = $this->getMockBuilder(StepManager::class)
             ->disableOriginalConstructor()
             ->getMock();
@@ -70,19 +62,12 @@ class WorkflowDefinitionHandlerTest extends \PHPUnit_Framework_TestCase
             ->method('getManagerForClass')
             ->willReturn($this->entityManager);
 
-        $this->handler = new WorkflowDefinitionHandler(
-            $this->workflowAssembler,
-            $this->eventDispatcher,
-            $managerRegistry,
-            'OroWorkflowBundle:WorkflowDefinition'
-        );
+        $this->handler = new WorkflowDefinitionHandler($this->eventDispatcher, $managerRegistry);
     }
 
     public function testCreateWorkflowDefinition()
     {
         $newDefinition = new WorkflowDefinition();
-
-        $this->workflowAssembler->expects($this->once())->method('assemble');
 
         $this->entityManager->expects($this->once())->method('persist')->with($newDefinition);
         $this->entityManager->expects($this->once())->method('flush');
@@ -103,9 +88,7 @@ class WorkflowDefinitionHandlerTest extends \PHPUnit_Framework_TestCase
         $existingDefinition = (new WorkflowDefinition())->setName('existing');
         $newDefinition = (new WorkflowDefinition())->setName('updated');
 
-        $this->workflowAssembler->expects($this->once())->method('assemble');
-
-        $this->entityManager->expects($this->never())->method('persist');
+        $this->entityManager->expects($this->once())->method('persist');
         $this->entityManager->expects($this->once())->method('flush');
 
         $changes = new WorkflowChangesEvent($existingDefinition, (new WorkflowDefinition())->setName('existing'));

@@ -19,28 +19,29 @@ use Oro\Bundle\WorkflowBundle\Model\WorkflowAssembler;
 
 class WorkflowAssemblerTest extends \PHPUnit_Framework_TestCase
 {
-    /**
-     * @var array
-     */
-    protected $workflowParameters = array(
+    /** @var array */
+    protected $workflowParameters = [
         'name' => 'test_name',
         'label' => 'Test Label'
-    );
+    ];
 
-    protected $stepConfiguration = array(
+    /** @var array */
+    protected $stepConfiguration = [
         'label' => 'Test',
         'name' => 'test'
-    );
+    ];
 
-    protected $transitionConfiguration = array(
+    /** @var array */
+    protected $transitionConfiguration = [
         'label' => 'Test',
         'step_to' => 'test_step',
         'transition_definition' => 'test_transition_definition'
-    );
+    ];
 
-    protected $transitionDefinition = array(
-        'test_transition_definition' => array()
-    );
+    /** @var array */
+    protected $transitionDefinition = [
+        'test_transition_definition' => []
+    ];
 
     /**
      * @return Workflow
@@ -323,7 +324,6 @@ class WorkflowAssemblerTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($workflow, $actualWorkflow);
         $this->assertEquals($workflowDefinition->getName(), $actualWorkflow->getName());
         $this->assertEquals($workflowDefinition->getLabel(), $actualWorkflow->getLabel());
-        $this->assertEquals($workflowSteps, $workflowDefinition->getSteps());
         $this->assertEquals(
             $attributes,
             $actualWorkflow->getAttributeManager()->getAttributes(),

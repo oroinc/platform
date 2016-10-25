@@ -8,6 +8,7 @@ use Doctrine\Common\Persistence\ObjectManager;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerAwareTrait;
 
+use Oro\Bundle\WorkflowBundle\Configuration\WorkflowConfiguration;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Handler\WorkflowDefinitionHandler;
 use Oro\Bundle\WorkflowBundle\Translation\TranslationProcessor;
@@ -32,7 +33,7 @@ class UpdateDefinitionTranslations extends AbstractFixture implements ContainerA
 
         foreach ($definitions as $definition) {
             $this->processConfiguration($processor, $definition);
-            $handler->createWorkflowDefinition($definition);
+            $handler->updateWorkflowDefinition($definition, $definition);
         }
 
         $manager->flush();
@@ -54,10 +55,29 @@ class UpdateDefinitionTranslations extends AbstractFixture implements ContainerA
 
         $preparedConfiguration = $processor->prepare($definition->getName(), $processor->handle($sourceConfiguration));
 
+        if (isset($preparedConfiguration[WorkflowConfiguration::NODE_STEPS])) {
+            $this->setWorkflowdefinitionSteps($definition, $preparedConfiguration[WorkflowConfiguration::NODE_STEPS]);
+        }
+
         $definition->setLabel($preparedConfiguration['label']);
 
         unset($preparedConfiguration['label'], $preparedConfiguration['name']);
 
         $definition->setConfiguration($preparedConfiguration);
+    }
+
+    /**
+     * @param WorkflowDefinition $definition
+     * @param array $stepsConfiguration
+     */
+    protected function setWorkflowdefinitionSteps(WorkflowDefinition $definition, array $stepsConfiguration)
+    {
+        foreach ($stepsConfiguration as $name => $stepConfiguration) {
+            $workflowStep = $definition->getStepByName($name);
+
+            if ($workflowStep && isset($stepConfiguration['label'])) {
+                $workflowStep->setLabel($stepConfiguration['label']);
+            }
+        }
     }
 }
