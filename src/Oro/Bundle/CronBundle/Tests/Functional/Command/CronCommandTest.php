@@ -33,16 +33,16 @@ class CronCommandTest extends WebTestCase
     {
         $this->mockCronHelper(true);
 
-        $result = $this->runCommand(CronCommand::COMMAND_NAME, ['--skipCheckDaemon' => true]);
+        $result = $this->runCommand(CronCommand::COMMAND_NAME, ['--skipCheckDaemon' => true, '-vvv' => true]);
         $this->assertNotEmpty($result);
 
         $this->checkMessage('allJobNew', $result);
 
-        $result = $this->runCommand(CronCommand::COMMAND_NAME, []);
+        $result = $this->runCommand(CronCommand::COMMAND_NAME, ['-vvv' => true]);
         $this->checkMessage('AllJobAdded', $result);
 
         for ($i = 1; $i < EmailSyncCommand::MAX_JOBS_COUNT; $i++) {
-            $result = $this->runCommand(CronCommand::COMMAND_NAME, []);
+            $result = $this->runCommand(CronCommand::COMMAND_NAME, ['-vvv' => true]);
             $this->assertRegexp('/Processing command "oro:cron:imap-sync": added to job queue/', $result);
         }
 
@@ -58,9 +58,10 @@ class CronCommandTest extends WebTestCase
         $commandTester->execute(array(
             'command'      => $command->getName(),
             '--skipCheckDaemon' => true,
+            '-vvv' => true,
         ));
 
-        $result = $this->runCommand(CronCommand::COMMAND_NAME, []);
+        $result = $this->runCommand(CronCommand::COMMAND_NAME, ['-vvv' => true]);
         $this->assertNotEmpty($result);
 
         $this->checkMessage('AllJobSkip', $result);
