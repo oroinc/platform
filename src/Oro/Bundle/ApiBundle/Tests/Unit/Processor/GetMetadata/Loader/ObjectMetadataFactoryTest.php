@@ -7,16 +7,16 @@ use Oro\Bundle\ApiBundle\Config\EntityDefinitionFieldConfig;
 use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
 use Oro\Bundle\ApiBundle\Model\EntityIdentifier;
 use Oro\Bundle\ApiBundle\Processor\GetMetadata\Loader\MetadataHelper;
-use Oro\Bundle\ApiBundle\Processor\GetMetadata\Loader\ObjectMetadataBuilder;
+use Oro\Bundle\ApiBundle\Processor\GetMetadata\Loader\ObjectMetadataFactory;
 use Oro\Bundle\EntityExtendBundle\Entity\Manager\AssociationManager;
 
-class ObjectMetadataBuilderTest extends LoaderTestCase
+class ObjectMetadataFactoryTest extends LoaderTestCase
 {
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $associationManager;
 
-    /** @var ObjectMetadataBuilder */
-    protected $objectMetadataBuilder;
+    /** @var ObjectMetadataFactory */
+    protected $objectMetadataFactory;
 
     protected function setUp()
     {
@@ -24,7 +24,7 @@ class ObjectMetadataBuilderTest extends LoaderTestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->objectMetadataBuilder = new ObjectMetadataBuilder(
+        $this->objectMetadataFactory = new ObjectMetadataFactory(
             new MetadataHelper(),
             $this->associationManager
         );
@@ -41,11 +41,11 @@ class ObjectMetadataBuilderTest extends LoaderTestCase
 
         self::assertEquals(
             $expected,
-            $this->objectMetadataBuilder->createObjectMetadata('Test\Class', $config)
+            $this->objectMetadataFactory->createObjectMetadata('Test\Class', $config)
         );
     }
 
-    public function testAddMetaPropertyMetadata()
+    public function testCreateAndAddMetaPropertyMetadata()
     {
         $entityMetadata = new EntityMetadata();
         $field = new EntityDefinitionFieldConfig();
@@ -55,7 +55,7 @@ class ObjectMetadataBuilderTest extends LoaderTestCase
         $expected = $this->createMetaPropertyMetadata('testField', 'integer');
         $expected->setPropertyPath('propertyPath');
 
-        $result = $this->objectMetadataBuilder->addMetaPropertyMetadata(
+        $result = $this->objectMetadataFactory->createAndAddMetaPropertyMetadata(
             $entityMetadata,
             'Test\Class',
             'testField',
@@ -66,7 +66,7 @@ class ObjectMetadataBuilderTest extends LoaderTestCase
         self::assertEquals($expected, $result);
     }
 
-    public function testAddFieldMetadata()
+    public function testCreateAndAddFieldMetadata()
     {
         $entityMetadata = new EntityMetadata();
         $entityMetadata->setIdentifierFieldNames(['id']);
@@ -78,7 +78,7 @@ class ObjectMetadataBuilderTest extends LoaderTestCase
         $expected->setPropertyPath('propertyPath');
         $expected->setIsNullable(true);
 
-        $result = $this->objectMetadataBuilder->addFieldMetadata(
+        $result = $this->objectMetadataFactory->createAndAddFieldMetadata(
             $entityMetadata,
             'Test\Class',
             'testField',
@@ -89,7 +89,7 @@ class ObjectMetadataBuilderTest extends LoaderTestCase
         self::assertEquals($expected, $result);
     }
 
-    public function testAddFieldMetadataForIdentifierField()
+    public function testCreateAndAddFieldMetadataForIdentifierField()
     {
         $entityMetadata = new EntityMetadata();
         $entityMetadata->setIdentifierFieldNames(['testField']);
@@ -100,7 +100,7 @@ class ObjectMetadataBuilderTest extends LoaderTestCase
         $expected = $this->createFieldMetadata('testField', 'integer');
         $expected->setPropertyPath('propertyPath');
 
-        $result = $this->objectMetadataBuilder->addFieldMetadata(
+        $result = $this->objectMetadataFactory->createAndAddFieldMetadata(
             $entityMetadata,
             'Test\Class',
             'testField',
@@ -111,7 +111,7 @@ class ObjectMetadataBuilderTest extends LoaderTestCase
         self::assertEquals($expected, $result);
     }
 
-    public function testAddAssociationMetadata()
+    public function testCreateAndAddAssociationMetadata()
     {
         $entityMetadata = new EntityMetadata();
         $field = new EntityDefinitionFieldConfig();
@@ -130,7 +130,7 @@ class ObjectMetadataBuilderTest extends LoaderTestCase
         );
         $expected->setPropertyPath('propertyPath');
 
-        $result = $this->objectMetadataBuilder->addAssociationMetadata(
+        $result = $this->objectMetadataFactory->createAndAddAssociationMetadata(
             $entityMetadata,
             'Test\Class',
             'testField',
@@ -141,7 +141,7 @@ class ObjectMetadataBuilderTest extends LoaderTestCase
         self::assertEquals($expected, $result);
     }
 
-    public function testAddAssociationMetadataForCollapsed()
+    public function testCreateAndAddAssociationMetadataForCollapsed()
     {
         $entityMetadata = new EntityMetadata();
         $field = new EntityDefinitionFieldConfig();
@@ -159,7 +159,7 @@ class ObjectMetadataBuilderTest extends LoaderTestCase
             true
         );
 
-        $result = $this->objectMetadataBuilder->addAssociationMetadata(
+        $result = $this->objectMetadataFactory->createAndAddAssociationMetadata(
             $entityMetadata,
             'Test\Class',
             'testField',
@@ -170,7 +170,7 @@ class ObjectMetadataBuilderTest extends LoaderTestCase
         self::assertEquals($expected, $result);
     }
 
-    public function testAddAssociationMetadataForCollection()
+    public function testCreateAndAddAssociationMetadataForCollection()
     {
         $entityMetadata = new EntityMetadata();
         $field = new EntityDefinitionFieldConfig();
@@ -188,7 +188,7 @@ class ObjectMetadataBuilderTest extends LoaderTestCase
             false
         );
 
-        $result = $this->objectMetadataBuilder->addAssociationMetadata(
+        $result = $this->objectMetadataFactory->createAndAddAssociationMetadata(
             $entityMetadata,
             'Test\Class',
             'testField',
@@ -199,7 +199,7 @@ class ObjectMetadataBuilderTest extends LoaderTestCase
         self::assertEquals($expected, $result);
     }
 
-    public function testAddAssociationMetadataWithCustomTargetClass()
+    public function testCreateAndAddAssociationMetadataWithCustomTargetClass()
     {
         $entityMetadata = new EntityMetadata();
         $field = new EntityDefinitionFieldConfig();
@@ -216,7 +216,7 @@ class ObjectMetadataBuilderTest extends LoaderTestCase
             false
         );
 
-        $result = $this->objectMetadataBuilder->addAssociationMetadata(
+        $result = $this->objectMetadataFactory->createAndAddAssociationMetadata(
             $entityMetadata,
             'Test\Class',
             'testField',
@@ -228,7 +228,7 @@ class ObjectMetadataBuilderTest extends LoaderTestCase
         self::assertEquals($expected, $result);
     }
 
-    public function testAddAssociationMetadataWithoutDataTypeAndWithoutTargetConfig()
+    public function testCreateAndAddAssociationMetadataWithoutDataTypeAndWithoutTargetConfig()
     {
         $entityMetadata = new EntityMetadata();
         $field = new EntityDefinitionFieldConfig();
@@ -244,7 +244,7 @@ class ObjectMetadataBuilderTest extends LoaderTestCase
             false
         );
 
-        $result = $this->objectMetadataBuilder->addAssociationMetadata(
+        $result = $this->objectMetadataFactory->createAndAddAssociationMetadata(
             $entityMetadata,
             'Test\Class',
             'testField',
@@ -255,7 +255,7 @@ class ObjectMetadataBuilderTest extends LoaderTestCase
         self::assertEquals($expected, $result);
     }
 
-    public function testAddAssociationMetadataWithoutDataTypeAndWhenNoIdInTargetConfig()
+    public function testCreateAndAddAssociationMetadataWithoutDataTypeAndWhenNoIdInTargetConfig()
     {
         $entityMetadata = new EntityMetadata();
         $field = new EntityDefinitionFieldConfig();
@@ -272,7 +272,7 @@ class ObjectMetadataBuilderTest extends LoaderTestCase
             false
         );
 
-        $result = $this->objectMetadataBuilder->addAssociationMetadata(
+        $result = $this->objectMetadataFactory->createAndAddAssociationMetadata(
             $entityMetadata,
             'Test\Class',
             'testField',
@@ -283,7 +283,7 @@ class ObjectMetadataBuilderTest extends LoaderTestCase
         self::assertEquals($expected, $result);
     }
 
-    public function testAddAssociationMetadataWithoutDataTypeAndCompositeTargetId()
+    public function testCreateAndAddAssociationMetadataWithoutDataTypeAndCompositeTargetId()
     {
         $entityMetadata = new EntityMetadata();
         $field = new EntityDefinitionFieldConfig();
@@ -301,7 +301,7 @@ class ObjectMetadataBuilderTest extends LoaderTestCase
             false
         );
 
-        $result = $this->objectMetadataBuilder->addAssociationMetadata(
+        $result = $this->objectMetadataFactory->createAndAddAssociationMetadata(
             $entityMetadata,
             'Test\Class',
             'testField',
@@ -312,7 +312,7 @@ class ObjectMetadataBuilderTest extends LoaderTestCase
         self::assertEquals($expected, $result);
     }
 
-    public function testAddAssociationMetadataWithoutDataTypeWithMissingTargetIdField()
+    public function testCreateAndAddAssociationMetadataWithoutDataTypeWithMissingTargetIdField()
     {
         $entityMetadata = new EntityMetadata();
         $field = new EntityDefinitionFieldConfig();
@@ -330,7 +330,7 @@ class ObjectMetadataBuilderTest extends LoaderTestCase
             false
         );
 
-        $result = $this->objectMetadataBuilder->addAssociationMetadata(
+        $result = $this->objectMetadataFactory->createAndAddAssociationMetadata(
             $entityMetadata,
             'Test\Class',
             'testField',
@@ -341,7 +341,7 @@ class ObjectMetadataBuilderTest extends LoaderTestCase
         self::assertEquals($expected, $result);
     }
 
-    public function testAddAssociationMetadataWithoutDataTypeWhenTargetIdFieldHasDataType()
+    public function testCreateAndAddAssociationMetadataWithoutDataTypeWhenTargetIdFieldHasDataType()
     {
         $entityMetadata = new EntityMetadata();
         $field = new EntityDefinitionFieldConfig();
@@ -360,7 +360,7 @@ class ObjectMetadataBuilderTest extends LoaderTestCase
             false
         );
 
-        $result = $this->objectMetadataBuilder->addAssociationMetadata(
+        $result = $this->objectMetadataFactory->createAndAddAssociationMetadata(
             $entityMetadata,
             'Test\Class',
             'testField',
@@ -371,7 +371,7 @@ class ObjectMetadataBuilderTest extends LoaderTestCase
         self::assertEquals($expected, $result);
     }
 
-    public function testAddAssociationMetadataForToOneExtendedAssociation()
+    public function testCreateAndAddAssociationMetadataForToOneExtendedAssociation()
     {
         $entityMetadata = new EntityMetadata();
         $field = new EntityDefinitionFieldConfig();
@@ -396,7 +396,7 @@ class ObjectMetadataBuilderTest extends LoaderTestCase
             false
         );
 
-        $result = $this->objectMetadataBuilder->addAssociationMetadata(
+        $result = $this->objectMetadataFactory->createAndAddAssociationMetadata(
             $entityMetadata,
             'Test\Class',
             'testField',
@@ -407,7 +407,7 @@ class ObjectMetadataBuilderTest extends LoaderTestCase
         self::assertEquals($expected, $result);
     }
 
-    public function testAddAssociationMetadataForToManyExtendedAssociation()
+    public function testCreateAndAddAssociationMetadataForToManyExtendedAssociation()
     {
         $entityMetadata = new EntityMetadata();
         $field = new EntityDefinitionFieldConfig();
@@ -433,7 +433,7 @@ class ObjectMetadataBuilderTest extends LoaderTestCase
             false
         );
 
-        $result = $this->objectMetadataBuilder->addAssociationMetadata(
+        $result = $this->objectMetadataFactory->createAndAddAssociationMetadata(
             $entityMetadata,
             'Test\Class',
             'testField',

@@ -9,36 +9,36 @@ use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
 use Oro\Bundle\ApiBundle\Metadata\FieldMetadata;
 use Oro\Bundle\ApiBundle\Metadata\MetaPropertyMetadata;
 use Oro\Bundle\ApiBundle\Processor\GetMetadata\Loader\NestedObjectMetadataHelper;
-use Oro\Bundle\ApiBundle\Processor\GetMetadata\Loader\ObjectMetadataBuilder;
-use Oro\Bundle\ApiBundle\Processor\GetMetadata\Loader\ObjectNestedObjectMetadataBuilder;
+use Oro\Bundle\ApiBundle\Processor\GetMetadata\Loader\ObjectMetadataFactory;
+use Oro\Bundle\ApiBundle\Processor\GetMetadata\Loader\ObjectNestedObjectMetadataFactory;
 
-class ObjectNestedObjectMetadataBuilderTest extends \PHPUnit_Framework_TestCase
+class ObjectNestedObjectMetadataFactoryTest extends \PHPUnit_Framework_TestCase
 {
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $nestedObjectMetadataHelper;
 
     /** @var \PHPUnit_Framework_MockObject_MockObject */
-    protected $objectMetadataBuilder;
+    protected $objectMetadataFactory;
 
-    /** @var ObjectNestedObjectMetadataBuilder */
-    protected $objectNestedObjectMetadataBuilder;
+    /** @var ObjectNestedObjectMetadataFactory */
+    protected $objectNestedObjectMetadataFactory;
 
     protected function setUp()
     {
         $this->nestedObjectMetadataHelper = $this->getMockBuilder(NestedObjectMetadataHelper::class)
             ->disableOriginalConstructor()
             ->getMock();
-        $this->objectMetadataBuilder = $this->getMockBuilder(ObjectMetadataBuilder::class)
+        $this->objectMetadataFactory = $this->getMockBuilder(ObjectMetadataFactory::class)
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->objectNestedObjectMetadataBuilder = new ObjectNestedObjectMetadataBuilder(
+        $this->objectNestedObjectMetadataFactory = new ObjectNestedObjectMetadataFactory(
             $this->nestedObjectMetadataHelper,
-            $this->objectMetadataBuilder
+            $this->objectMetadataFactory
         );
     }
 
-    public function testAddNestedObjectMetadataForExcludedTargetField()
+    public function testCreateAndAddNestedObjectMetadataForExcludedTargetField()
     {
         $entityMetadata = new EntityMetadata();
         $config = new EntityDefinitionConfig();
@@ -69,12 +69,12 @@ class ObjectNestedObjectMetadataBuilderTest extends \PHPUnit_Framework_TestCase
             ->willReturn($associationMetadata);
         $this->nestedObjectMetadataHelper->expects(self::never())
             ->method('getLinkedField');
-        $this->objectMetadataBuilder->expects(self::never())
-            ->method('addFieldMetadata');
+        $this->objectMetadataFactory->expects(self::never())
+            ->method('createAndAddFieldMetadata');
         $this->nestedObjectMetadataHelper->expects(self::never())
             ->method('setTargetPropertyPath');
 
-        $result = $this->objectNestedObjectMetadataBuilder->addNestedObjectMetadata(
+        $result = $this->objectNestedObjectMetadataFactory->createAndAddNestedObjectMetadata(
             $entityMetadata,
             $config,
             $entityClass,
@@ -86,7 +86,7 @@ class ObjectNestedObjectMetadataBuilderTest extends \PHPUnit_Framework_TestCase
         self::assertSame($associationMetadata, $result);
     }
 
-    public function testAddNestedObjectMetadataForExcludedTargetFieldWhenExcludedPropertiesShouldNotBeIgnored()
+    public function testCreateAndAddNestedObjectMetadataForExcludedTargetFieldWhenExcludedPropertiesShouldNotBeIgnored()
     {
         $entityMetadata = new EntityMetadata();
         $config = new EntityDefinitionConfig();
@@ -128,8 +128,8 @@ class ObjectNestedObjectMetadataBuilderTest extends \PHPUnit_Framework_TestCase
                 self::identicalTo($targetField)
             )
             ->willReturn($linkedField);
-        $this->objectMetadataBuilder->expects(self::once())
-            ->method('addFieldMetadata')
+        $this->objectMetadataFactory->expects(self::once())
+            ->method('createAndAddFieldMetadata')
             ->with(
                 self::identicalTo($associationTargetMetadata),
                 $entityClass,
@@ -147,7 +147,7 @@ class ObjectNestedObjectMetadataBuilderTest extends \PHPUnit_Framework_TestCase
                 $targetAction
             );
 
-        $result = $this->objectNestedObjectMetadataBuilder->addNestedObjectMetadata(
+        $result = $this->objectNestedObjectMetadataFactory->createAndAddNestedObjectMetadata(
             $entityMetadata,
             $config,
             $entityClass,
@@ -159,7 +159,7 @@ class ObjectNestedObjectMetadataBuilderTest extends \PHPUnit_Framework_TestCase
         self::assertSame($associationMetadata, $result);
     }
 
-    public function testAddNestedObjectMetadataForField()
+    public function testCreateAndAddNestedObjectMetadataForField()
     {
         $entityMetadata = new EntityMetadata();
         $config = new EntityDefinitionConfig();
@@ -200,8 +200,8 @@ class ObjectNestedObjectMetadataBuilderTest extends \PHPUnit_Framework_TestCase
                 self::identicalTo($targetField)
             )
             ->willReturn($linkedField);
-        $this->objectMetadataBuilder->expects(self::once())
-            ->method('addFieldMetadata')
+        $this->objectMetadataFactory->expects(self::once())
+            ->method('createAndAddFieldMetadata')
             ->with(
                 self::identicalTo($associationTargetMetadata),
                 $entityClass,
@@ -219,7 +219,7 @@ class ObjectNestedObjectMetadataBuilderTest extends \PHPUnit_Framework_TestCase
                 $targetAction
             );
 
-        $result = $this->objectNestedObjectMetadataBuilder->addNestedObjectMetadata(
+        $result = $this->objectNestedObjectMetadataFactory->createAndAddNestedObjectMetadata(
             $entityMetadata,
             $config,
             $entityClass,
@@ -231,7 +231,7 @@ class ObjectNestedObjectMetadataBuilderTest extends \PHPUnit_Framework_TestCase
         self::assertSame($associationMetadata, $result);
     }
 
-    public function testAddNestedObjectMetadataForMetaProperty()
+    public function testCreateAndAddNestedObjectMetadataForMetaProperty()
     {
         $entityMetadata = new EntityMetadata();
         $config = new EntityDefinitionConfig();
@@ -273,8 +273,8 @@ class ObjectNestedObjectMetadataBuilderTest extends \PHPUnit_Framework_TestCase
                 self::identicalTo($targetField)
             )
             ->willReturn($linkedField);
-        $this->objectMetadataBuilder->expects(self::once())
-            ->method('addMetaPropertyMetadata')
+        $this->objectMetadataFactory->expects(self::once())
+            ->method('createAndAddMetaPropertyMetadata')
             ->with(
                 self::identicalTo($associationTargetMetadata),
                 $entityClass,
@@ -292,7 +292,7 @@ class ObjectNestedObjectMetadataBuilderTest extends \PHPUnit_Framework_TestCase
                 $targetAction
             );
 
-        $result = $this->objectNestedObjectMetadataBuilder->addNestedObjectMetadata(
+        $result = $this->objectNestedObjectMetadataFactory->createAndAddNestedObjectMetadata(
             $entityMetadata,
             $config,
             $entityClass,
