@@ -22,7 +22,7 @@
         "oro/security-bundle": "@dev",
         "oro/config-expression": "dev-master",
         "oro/form-bundle": "@dev",
-        "oro/jsplumb": "~1.7"
+        "bower-asset/jsplumb": "~1.7"
     },
     "autoload": {
         "psr-0": { "Oro\\Bundle\\WorkflowBundle": "" }
