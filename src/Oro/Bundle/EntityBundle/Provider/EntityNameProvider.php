@@ -4,6 +4,7 @@ namespace Oro\Bundle\EntityBundle\Provider;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\Common\Util\ClassUtils;
+use Doctrine\Common\Util\Inflector;
 
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\PropertyAccess\Exception\InvalidArgumentException;
@@ -113,11 +114,17 @@ class EntityNameProvider implements EntityNameProviderInterface
      */
     protected function getFieldValue($entity, $fieldName)
     {
-        try {
-            return $this->accessor->getValue($entity, $fieldName);
-        } catch (InvalidArgumentException $exception) {
-            return null;
+        $getterName = 'get' . Inflector::classify($fieldName);
+
+        if (method_exists($entity, $getterName)) {
+            return $entity->$getterName();
         }
+
+        if (property_exists($entity, $fieldName)) {
+            return $entity->$fieldName;
+        }
+
+        return null;
     }
 
     /**
