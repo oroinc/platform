@@ -13,7 +13,6 @@ use Oro\Bundle\NavigationBundle\Menu\Provider\GlobalOwnershipProvider;
 use Oro\Bundle\NavigationBundle\Menu\Provider\UserOwnershipProvider;
 use Oro\Bundle\UserBundle\DataFixtures\UserUtilityTrait;
 
-
 class LoadMenuUpdateData extends AbstractFixture implements DependentFixtureInterface
 {
     use UserUtilityTrait;

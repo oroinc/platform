@@ -74,6 +74,13 @@ class AjaxMenuController extends Controller
                 'custom' => true
             ]
         );
+        $errors = $this->get('validator')->validate($menuUpdate);
+        if (count($errors)) {
+            $message = $this->get('translator')->trans('oro.navigation.menuupdate.validation_error_message');
+
+            return new JsonResponse(['message' => $message], Response::HTTP_BAD_REQUEST);
+        }
+
         $em = $this->getDoctrine()->getManagerForClass(MenuUpdate::class);
         $em->persist($menuUpdate);
         $em->flush();
@@ -197,7 +204,7 @@ class AjaxMenuController extends Controller
 
         $updates = $manager->moveMenuItem($menuName, $key, $ownershipType, $ownerId, $parentKey, $position);
         foreach ($updates as $update) {
-            $errors = $this->get('validator')->validate($update, 'move');
+            $errors = $this->get('validator')->validate($update);
             if (count($errors)) {
                 $message = $this->get('translator')->trans('oro.navigation.menuupdate.validation_error_message');
 

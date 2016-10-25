@@ -83,9 +83,9 @@ class MenuUpdateManager
             $entity->setMenu($options['menu']);
 
             if (isset($options['parentKey'])) {
-                if($options['parentKey'] === $options['menu']) {
+                if ($options['parentKey'] === $options['menu']) {
                     $parent = $menu;
-                }else {
+                } else {
                     $parent = MenuUpdateUtils::findMenuItem($menu, $options['parentKey']);
                 }
                 if (!$parent) {

@@ -14,8 +14,6 @@ Oro\Bundle\NavigationBundle\Entity\PageState:
 Oro\Bundle\NavigationBundle\Entity\MenuUpdate:
     constraints:
         - Oro\Bundle\NavigationBundle\Validator\Constraints\MaxNestedLevel: ~
-        - Oro\Bundle\NavigationBundle\Validator\Constraints\MaxNestedLevel:
-            groups: move
     properties:
         titles:
             - Valid: ~
