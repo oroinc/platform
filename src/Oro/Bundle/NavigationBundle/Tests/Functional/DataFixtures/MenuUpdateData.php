@@ -137,22 +137,6 @@ class MenuUpdateData extends AbstractFixture implements DependentFixtureInterfac
             'divider' => false,
             'custom' => true,
         ],
-        'menu_update.4' => [
-            'key' => 'menu_update.4',
-            'parent_key' => null,
-            'default_title' => 'menu_update.4.title',
-            'titles' => [],
-            'default_description' => 'menu_update.4.description',
-            'descriptions' => [],
-            'uri' => '#menu_update.4',
-            'menu' => 'shortcuts',
-            'ownership_type' => GlobalOwnershipProvider::TYPE,
-            'owner_id' => 0,
-            'active' => true,
-            'priority' => 10,
-            'divider' => false,
-            'custom' => true,
-        ]
     ];
 
     /**

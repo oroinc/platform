@@ -30,7 +30,7 @@ class UserOwnershipProviderTest extends WebTestCase
 
         $user = $this->getContainer()->get('doctrine')
             ->getRepository('OroUserBundle:User')
-            ->findOneBy(['email' => self::AUTH_USER]);
+            ->findOneBy(['email' => 'simple_user@example.com']);
 
         $token = new UsernamePasswordToken($user, false, 'key');
         $this->client->getContainer()->get('security.token_storage')->setToken($token);
