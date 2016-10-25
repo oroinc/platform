@@ -37,7 +37,7 @@ class WorkflowTranslationKeysSubscriberTest extends \PHPUnit_Framework_TestCase
         $definition = (new WorkflowDefinition())->setName('test_workflow');
         $changes = new WorkflowChangesEvent($definition);
 
-        $this->translationManager->expects($this->at(0))
+        $this->translationManager->expects($this->once())
             ->method('findTranslationKey')
             ->with('oro.workflow.test_workflow.label', WorkflowTranslationHelper::TRANSLATION_DOMAIN);
 
@@ -75,27 +75,26 @@ class WorkflowTranslationKeysSubscriberTest extends \PHPUnit_Framework_TestCase
         $this->translationKeysSubscriber->clearTranslationKeys($changes);
     }
 
+    /**
+     * @expectedException \LogicException
+     * @expectedExceptionMessage Previous WorkflowDefinition expected, got null.
+     */
     public function testClearLogicExceptionOnAbsentPreviousDefinition()
     {
-        $updatedDefinition = new WorkflowDefinition();
-        $previousDefinition = null;
-        $changes = new WorkflowChangesEvent($updatedDefinition, $previousDefinition);
-
-        $this->setExpectedException(\LogicException::class, 'Previous WorkflowDefinition expected. But got null.');
-
-        $this->translationKeysSubscriber->clearTranslationKeys($changes);
+        $this->translationKeysSubscriber->clearTranslationKeys(
+            new WorkflowChangesEvent(new WorkflowDefinition(), null)
+        );
     }
 
     public function testDeleteTranslationKeys()
     {
         $deletedDefinition = (new WorkflowDefinition())->setName('test_workflow')->setLabel('label_translation_key');
 
-        $changes = new WorkflowChangesEvent($deletedDefinition);
+        $this->translationManager->expects($this->once())
+            ->method('removeTranslationKey')
+            ->with('label_translation_key');
 
-        $this->translationManager->expects($this->at(0))
-            ->method('removeTranslationKey')->with('label_translation_key');
-
-        $this->translationKeysSubscriber->deleteTranslationKeys($changes);
+        $this->translationKeysSubscriber->deleteTranslationKeys(new WorkflowChangesEvent($deletedDefinition));
     }
 
     public function testGetSubscribedEvents()

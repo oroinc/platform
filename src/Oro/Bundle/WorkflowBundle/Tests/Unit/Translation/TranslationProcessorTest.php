@@ -30,15 +30,15 @@ class TranslationProcessorTest extends \PHPUnit_Framework_TestCase
         unset($this->translationHelper, $this->processor);
     }
 
-    public function testImplementsBuilderExtension()
+    public function testImplementsInterfaces()
     {
         $this->assertInstanceOf(WorkflowDefinitionBuilderExtensionInterface::class, $this->processor);
+        $this->assertInstanceOf(ConfigurationHandlerInterface::class, $this->processor);
     }
 
     public function testPrepare()
     {
         $config = ['label' => 24];
-
         $result = $this->processor->prepare('test_workflow', $config);
 
         $this->assertEquals(
@@ -48,31 +48,24 @@ class TranslationProcessorTest extends \PHPUnit_Framework_TestCase
         );
     }
 
-    public function testImplementsHandler()
-    {
-        $this->assertInstanceOf(ConfigurationHandlerInterface::class, $this->processor);
-    }
-
     public function testHandle()
     {
         $configuration = ['name' => 'test_workflow', null, 'label' => 'wflabel'];
 
-        $this->translationHelper->expects($this->at(0))
+        $this->translationHelper->expects($this->once())
             ->method('saveTranslation')
             ->with('oro.workflow.test_workflow.label', 'wflabel');
 
-        $this->processor->handle($configuration);
+        $this->assertEquals($configuration, $this->processor->handle($configuration));
     }
 
-    public function tesHandleIncorrectConfigFormatException()
+    /**
+     * @expectedException \InvalidArgumentException
+     * @expectedExceptionMessage Workflow configuration for handler must contain valid `name` node.
+     */
+    public function testHandleIncorrectConfigFormatException()
     {
-        $config = [];
-        $this->setExpectedException(
-            \InvalidArgumentException::class,
-            'Workflow configuration for handler must contain valid `name` node.'
-        );
-
-        $this->processor->handle($config);
+        $this->processor->handle([]);
     }
 
     /**

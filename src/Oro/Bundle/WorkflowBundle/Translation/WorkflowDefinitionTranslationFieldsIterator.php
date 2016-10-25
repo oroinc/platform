@@ -28,12 +28,9 @@ class WorkflowDefinitionTranslationFieldsIterator extends AbstractWorkflowTransl
     public function getIterator()
     {
         $context = new \ArrayObject([]);
-
         $context['workflow_name'] = $this->workflowDefinition->getName();
 
-        $workflowLabelKey = $this->makeKey(WorkflowLabelTemplate::class, $context);
-
-        yield $workflowLabelKey => $this->workflowDefinition->getLabel();
+        yield $this->makeKey(WorkflowLabelTemplate::class, $context) => $this->workflowDefinition->getLabel();
 
         if ($this->hasChanges()) {
             $this->workflowDefinition->setLabel($this->pickChangedValue());
@@ -63,9 +60,8 @@ class WorkflowDefinitionTranslationFieldsIterator extends AbstractWorkflowTransl
 
         foreach ($this->workflowDefinition->getSteps() as $step) {
             $context['step_name'] = $step->getName();
-            $stepTranslationKey = $this->makeKey(StepLabelTemplate::class, $context);
 
-            yield $stepTranslationKey => $step->getLabel();
+            yield $this->makeKey(StepLabelTemplate::class, $context) => $step->getLabel();
             if ($this->hasChanges()) {
                 $configModified = true;
                 $newValue = $this->pickChangedValue();

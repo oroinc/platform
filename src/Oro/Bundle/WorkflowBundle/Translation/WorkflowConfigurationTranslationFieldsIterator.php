@@ -6,11 +6,11 @@ use Oro\Bundle\WorkflowBundle\Translation\KeyTemplate\WorkflowLabelTemplate;
 
 class WorkflowConfigurationTranslationFieldsIterator extends AbstractWorkflowTranslationFieldsIterator
 {
-    /** @var array */
-    private $configuration;
-
     /** @var string */
     private $workflowName;
+
+    /** @var array */
+    private $configuration;
 
     /**
      * @param string $workflowName
@@ -18,8 +18,8 @@ class WorkflowConfigurationTranslationFieldsIterator extends AbstractWorkflowTra
      */
     public function __construct($workflowName, array $configuration)
     {
-        $this->configuration = $configuration;
         $this->workflowName = $workflowName;
+        $this->configuration = $configuration;
     }
 
     /**
@@ -28,7 +28,6 @@ class WorkflowConfigurationTranslationFieldsIterator extends AbstractWorkflowTra
     public function getIterator()
     {
         $context = new \ArrayObject([]);
-
         $context['workflow_name'] = $this->workflowName;
 
         yield $this->makeKey(WorkflowLabelTemplate::class, $context) => $this->getOrNull($this->configuration, 'label');

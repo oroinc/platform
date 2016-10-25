@@ -23,6 +23,18 @@ class WorkflowTranslationKeysSubscriber implements EventSubscriberInterface
     }
 
     /**
+     * {@inheritdoc}
+     */
+    public static function getSubscribedEvents()
+    {
+        return [
+            WorkflowEvents::WORKFLOW_AFTER_CREATE => 'ensureTranslationKeys',
+            WorkflowEvents::WORKFLOW_AFTER_UPDATE => 'clearTranslationKeys',
+            WorkflowEvents::WORKFLOW_AFTER_DELETE => 'deleteTranslationKeys'
+        ];
+    }
+
+    /**
      * @param WorkflowChangesEvent $changesEvent
      * @throws \InvalidArgumentException
      */
@@ -43,11 +55,10 @@ class WorkflowTranslationKeysSubscriber implements EventSubscriberInterface
         $previousDefinition = $changesEvent->getPrevious();
 
         if ($previousDefinition === null) {
-            throw new \LogicException('Previous WorkflowDefinition expected. But got null.');
+            throw new \LogicException('Previous WorkflowDefinition expected, got null.');
         }
 
         $updatedDefinitionKeys = new WorkflowDefinitionTranslationFieldsIterator($changesEvent->getDefinition());
-
         $previousDefinitionKeys = new WorkflowDefinitionTranslationFieldsIterator($previousDefinition);
 
         $newKeys = [];
@@ -75,19 +86,6 @@ class WorkflowTranslationKeysSubscriber implements EventSubscriberInterface
             $this->removeTranslationKey($translationKeyForRemove);
         }
     }
-
-    /**
-     * {@inheritdoc}
-     */
-    public static function getSubscribedEvents()
-    {
-        return [
-            WorkflowEvents::WORKFLOW_AFTER_CREATE => 'ensureTranslationKeys',
-            WorkflowEvents::WORKFLOW_AFTER_UPDATE => 'clearTranslationKeys',
-            WorkflowEvents::WORKFLOW_AFTER_DELETE => 'deleteTranslationKeys'
-        ];
-    }
-
 
     /**
      * @param string $key
