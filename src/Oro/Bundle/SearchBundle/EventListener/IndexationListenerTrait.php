@@ -28,7 +28,7 @@ trait IndexationListenerTrait
 
         foreach ($uow->getScheduledEntityUpdates() as $hash => $entity) {
             $className = ClassUtils::getClass($entity);
-            if (!$this->mappingProvider->isFieldsMappingExists($className)) {
+            if (!$this->mappingProvider->hasFieldsMapping($className)) {
                 continue;
             }
 
