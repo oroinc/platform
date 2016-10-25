@@ -38,7 +38,9 @@ define(function(require) {
             var configuration = options.entity.configuration;
             var translateLinks = options.entity.translateLinks;
 
-            configuration.steps = new StepCollection(this._getNodeConfiguration(configuration, 'steps', translateLinks));
+            configuration.steps = new StepCollection(
+                this._getNodeConfiguration(configuration, 'steps', translateLinks)
+            );
 
             configuration.transitions = new TransitionCollection(
                 this._getNodeConfiguration(configuration, 'transitions', translateLinks)
@@ -114,7 +116,7 @@ define(function(require) {
          */
         _getNodeConfiguration: function(config, node, translateLinks) {
             var updateConfig = [];
-            _.each(config[node], function (item, name) {
+            _.each(config[node], function(item, name) {
                 item.name = name;
                 if (translateLinks && node in translateLinks && name in translateLinks[node]) {
                     item.translateLinks = translateLinks[node][name];
