@@ -128,7 +128,7 @@ abstract class AbstractDebugCommandTestCase extends \PHPUnit_Framework_TestCase
     abstract protected function getArgumentName();
 
     /**
-     * @return Command
+     * @return ContainerAwareCommand
      */
     abstract protected function getCommandInstance();
 }
