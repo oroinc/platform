@@ -25,7 +25,10 @@ class PurgeEmailAttachmentsMessageProcessorTest extends \PHPUnit_Framework_TestC
 
     public function testShouldReturnSubscribedTopics()
     {
-        $this->assertEquals([Topics::PURGE_EMAIL_ATTACHMENTS], PurgeEmailAttachmentsMessageProcessor::getSubscribedTopics());
+        $this->assertEquals(
+            [ Topics::PURGE_EMAIL_ATTACHMENTS ],
+            PurgeEmailAttachmentsMessageProcessor::getSubscribedTopics()
+        );
     }
 
     /**
