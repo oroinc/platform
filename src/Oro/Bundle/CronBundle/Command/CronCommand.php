@@ -56,12 +56,13 @@ class CronCommand extends ContainerAwareCommand
 
         // check if daemon is running
         if (!$skipCheckDaemon && !$daemon->getPid()) {
-            $output->writeln('');
-            $output->write('Daemon process not found, running.. ');
+            $output->writeln('', OutputInterface::VERBOSITY_DEBUG);
 
             if ($pid = $daemon->run()) {
-                $output->writeln(sprintf('<info>OK</info> (pid: %u)', $pid));
+                $output->write('Daemon process not found, running.. ', false, OutputInterface::VERBOSITY_DEBUG);
+                $output->writeln(sprintf('<info>OK</info> (pid: %u)', $pid), OutputInterface::VERBOSITY_DEBUG);
             } else {
+                $output->write('Daemon process not found, running.. ');
                 $output->writeln('<error>failed</error>. Cron jobs can\'t be launched.');
 
                 return;
@@ -78,8 +79,8 @@ class CronCommand extends ContainerAwareCommand
 
         $em->flush();
 
-        $output->writeln('');
-        $output->writeln('All commands finished');
+        $output->writeln('', OutputInterface::VERBOSITY_DEBUG);
+        $output->writeln('All commands finished', OutputInterface::VERBOSITY_DEBUG);
     }
 
     /**
@@ -99,7 +100,11 @@ class CronCommand extends ContainerAwareCommand
         $em = $this->getEntityManager('OroCronBundle:Schedule');
 
         foreach ($commands as $name => $command) {
-            $output->write(sprintf('Processing command "<info>%s</info>": ', $name));
+            $output->write(
+                sprintf('Processing command "<info>%s</info>": ', $name),
+                false,
+                OutputInterface::VERBOSITY_DEBUG
+            );
 
             if ($this->skipCommand($output, $command)) {
                 continue;
@@ -151,7 +156,11 @@ class CronCommand extends ContainerAwareCommand
 
             $arguments = $schedule->getArguments() ? ' ' . implode(' ', $schedule->getArguments()) : '';
 
-            $output->write(sprintf('Processing command "<info>%s%s</info>": ', $schedule->getCommand(), $arguments));
+            $output->write(
+                sprintf('Processing command "<info>%s%s</info>": ', $schedule->getCommand(), $arguments),
+                false,
+                OutputInterface::VERBOSITY_DEBUG
+            );
 
             if ($job = $this->createJob($output, $schedule)) {
                 $jobs[] = $job;
@@ -171,14 +180,21 @@ class CronCommand extends ContainerAwareCommand
     {
         if (!$command instanceof CronCommandInterface) {
             $output->writeln(
-                '<error>Unable to setup, command must be instance of CronCommandInterface</error>'
-            );
+                sprintf(
+                    '<error>Unable to setup, command "<info>%s</info>" must be instance ' .
+                    'of CronCommandInterface</error>',
+                    $command->getName()
+                ));
 
             return true;
         }
 
         if (!$command->getDefaultDefinition()) {
-            $output->writeln('<error>no cron definition found, check command</error>');
+            $output->writeln(
+                sprintf(
+                    '<error>no cron definition found, check command "<info>%s</info>"</error>',
+                    $command->getName()
+                ));
 
             return true;
         }
@@ -216,7 +232,10 @@ class CronCommand extends ContainerAwareCommand
         $name,
         array $arguments = []
     ) {
-        $output->writeln('<comment>new command found, setting up schedule..</comment>');
+        $output->writeln(
+            '<comment>new command found, setting up schedule..</comment>',
+            OutputInterface::VERBOSITY_DEBUG
+        );
 
         $schedule = new Schedule();
         $schedule
@@ -263,14 +282,14 @@ class CronCommand extends ContainerAwareCommand
             ) {
                 $job = new Job($schedule->getCommand(), $arguments);
 
-                $output->writeln('<comment>added to job queue</comment>');
+                $output->writeln('<comment>added to job queue</comment>', OutputInterface::VERBOSITY_DEBUG);
 
                 return $job;
             } else {
-                $output->writeln('<comment>already exists in job queue</comment>');
+                $output->writeln('<comment>already exists in job queue</comment>', OutputInterface::VERBOSITY_DEBUG);
             }
         } else {
-            $output->writeln('<comment>skipped</comment>');
+            $output->writeln('<comment>skipped</comment>', OutputInterface::VERBOSITY_DEBUG);
         }
 
         return null;
