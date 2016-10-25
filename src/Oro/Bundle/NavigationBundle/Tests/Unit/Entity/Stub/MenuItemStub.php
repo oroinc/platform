@@ -5,6 +5,10 @@ namespace Oro\Bundle\NavigationBundle\Tests\Unit\Entity\Stub;
 use Knp\Menu\FactoryInterface;
 use Knp\Menu\ItemInterface;
 
+/**
+ * @SuppressWarnings(PHPMD.ExcessivePublicCount)
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
+ */
 class MenuItemStub implements ItemInterface
 {
     /** @var string */

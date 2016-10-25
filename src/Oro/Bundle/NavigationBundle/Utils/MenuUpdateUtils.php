@@ -80,21 +80,9 @@ class MenuUpdateUtils
         ItemInterface $menu,
         LocalizationHelper $localizationHelper
     ) {
-        $item = self::findMenuItem($menu, $update->getKey());
-        if ($item === null && !$update->isCustom()) {
-            return;
-        }
-
-        $parentItem = self::findMenuItem($menu, $update->getParentKey());
-        $parentItem = $parentItem === null ? $menu : $parentItem;
-
+        $item = self::findOrCreateMenuItem($update, $menu);
         if ($item === null) {
-            $item = $parentItem->addChild($update->getKey());
-        }
-
-        if ($item->getParent()->getName() !== $parentItem->getName()) {
-            $item->getParent()->removeChild($item->getName());
-            $item = $parentItem->addChild($item);
+            return;
         }
 
         if ($update->getTitles()->count()) {
@@ -110,6 +98,32 @@ class MenuUpdateUtils
         foreach ($update->getExtras() as $key => $extra) {
             $item->setExtra($key, $extra);
         }
+    }
+
+    /**
+     * @param MenuUpdateInterface $update
+     * @param ItemInterface $menu
+     * @return ItemInterface|null
+     */
+    protected static function findOrCreateMenuItem(MenuUpdateInterface $update, ItemInterface $menu)
+    {
+        $item = self::findMenuItem($menu, $update->getKey());
+        if ($item === null && !$update->isCustom()) {
+            return null;
+        }
+
+        $parentItem = self::findMenuItem($menu, $update->getParentKey());
+        $parentItem = $parentItem === null ? $menu : $parentItem;
+
+        if ($item === null) {
+            $item = $parentItem->addChild($update->getKey());
+        }
+
+        if ($item->getParent()->getName() !== $parentItem->getName()) {
+            $item->getParent()->removeChild($item->getName());
+            $item = $parentItem->addChild($item);
+        }
+        return $item;
     }
 
     /**
