@@ -5,10 +5,15 @@ namespace Oro\Bundle\ApiBundle\Processor;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormInterface;
 
+use Oro\Bundle\ApiBundle\Collection\KeyObjectCollection;
+
 trait FormContextTrait
 {
     /** @var array */
     protected $requestData;
+
+    /** @var KeyObjectCollection|null */
+    protected $includedObjects;
 
     /** @var FormBuilderInterface|null */
     protected $formBuilder;
@@ -34,6 +39,26 @@ trait FormContextTrait
     public function setRequestData(array $requestData)
     {
         $this->requestData = $requestData;
+    }
+
+    /**
+     * Returns a collection contains additional objects included into the request data.
+     *
+     * @return KeyObjectCollection|null
+     */
+    public function getIncludedObjects()
+    {
+        return $this->includedObjects;
+    }
+
+    /**
+     * Sets a collection contains additional objects included into the request data.
+     *
+     * @param KeyObjectCollection|null $includedObjects
+     */
+    public function setIncludedObjects($includedObjects)
+    {
+        $this->includedObjects = $includedObjects;
     }
 
     /**

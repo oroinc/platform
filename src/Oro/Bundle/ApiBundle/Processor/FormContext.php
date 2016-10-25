@@ -5,6 +5,8 @@ namespace Oro\Bundle\ApiBundle\Processor;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormInterface;
 
+use Oro\Bundle\ApiBundle\Collection\KeyObjectCollection;
+
 interface FormContext extends ContextInterface
 {
     /**
@@ -20,6 +22,20 @@ interface FormContext extends ContextInterface
      * @param array $requestData
      */
     public function setRequestData(array $requestData);
+
+    /**
+     * Returns a collection contains additional objects included into the request data.
+     *
+     * @return KeyObjectCollection|null
+     */
+    public function getIncludedObjects();
+
+    /**
+     * Sets a collection contains additional objects included into the request data.
+     *
+     * @param KeyObjectCollection|null $includedObjects
+     */
+    public function setIncludedObjects($includedObjects);
 
     /**
      * Checks whether the form builder exists.
