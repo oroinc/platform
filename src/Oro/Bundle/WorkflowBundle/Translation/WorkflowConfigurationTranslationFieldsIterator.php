@@ -22,6 +22,9 @@ class WorkflowConfigurationTranslationFieldsIterator extends AbstractWorkflowTra
         $this->workflowName = $workflowName;
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function getIterator()
     {
         $context = new \ArrayObject([]);

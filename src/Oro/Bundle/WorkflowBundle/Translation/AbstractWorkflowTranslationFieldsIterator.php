@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\WorkflowBundle\Translation;
 
+use Oro\Bundle\TranslationBundle\Translation\TranslationFieldsIteratorInterface;
+use Oro\Bundle\TranslationBundle\Translation\TranslationFieldsIteratorTrait;
 use Oro\Bundle\WorkflowBundle\Configuration\WorkflowConfiguration;
 use Oro\Bundle\WorkflowBundle\Translation\KeyTemplate\StepLabelTemplate;
 use Oro\Bundle\WorkflowBundle\Translation\KeyTemplate\TransitionAttributeLabelTemplate;
@@ -9,8 +11,10 @@ use Oro\Bundle\WorkflowBundle\Translation\KeyTemplate\TransitionLabelTemplate;
 use Oro\Bundle\WorkflowBundle\Translation\KeyTemplate\TransitionWarningMessageTemplate;
 use Oro\Bundle\WorkflowBundle\Translation\KeyTemplate\WorkflowAttributeLabelTemplate;
 
-abstract class AbstractWorkflowTranslationFieldsIterator extends AbstractTranslationFieldsIterator
+abstract class AbstractWorkflowTranslationFieldsIterator implements TranslationFieldsIteratorInterface
 {
+    use TranslationFieldsIteratorTrait;
+
     /**
      * @param array $configuration
      * @param \ArrayObject $context

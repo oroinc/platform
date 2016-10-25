@@ -89,11 +89,11 @@ class WorkflowFilter extends EntityFilter
      */
     protected function getGenerator()
     {
-        if ($this->generator) {
-            return $this->generator;
+        if (!$this->generator) {
+            $this->generator = new TranslationKeyGenerator();
         }
 
-        return $this->generator = new TranslationKeyGenerator();
+        return $this->generator;
     }
 
     /**

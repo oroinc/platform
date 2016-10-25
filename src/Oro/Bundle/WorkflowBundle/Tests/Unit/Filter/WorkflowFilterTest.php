@@ -7,12 +7,10 @@ use Symfony\Component\Form\FormFactoryInterface;
 use Oro\Bundle\FilterBundle\Datasource\FilterDatasourceAdapterInterface;
 use Oro\Bundle\FilterBundle\Datasource\ExpressionBuilderInterface;
 use Oro\Bundle\FilterBundle\Filter\FilterUtility;
-use Oro\Bundle\TranslationBundle\Translation\KeySource\TranslationKeySource;
 
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Filter\WorkflowFilter;
 use Oro\Bundle\WorkflowBundle\Helper\WorkflowTranslationHelper;
-use Oro\Bundle\WorkflowBundle\Translation\KeyTemplate\WorkflowTemplate;
 
 class WorkflowFilterTest extends \PHPUnit_Framework_TestCase
 {

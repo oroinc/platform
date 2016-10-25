@@ -1,12 +1,10 @@
 <?php
 
-namespace Oro\Bundle\WorkflowBundle\Translation;
+namespace Oro\Bundle\TranslationBundle\Translation;
 
 use Oro\Bundle\TranslationBundle\Translation\KeySource\TranslationKeySource;
-use Oro\Bundle\TranslationBundle\Translation\TranslationKeyGenerator;
-use Oro\Bundle\TranslationBundle\Translation\TranslationKeyTemplateInterface;
 
-abstract class AbstractTranslationFieldsIterator implements TranslationFieldsIteratorInterface
+trait TranslationFieldsIteratorTrait
 {
     /** @var TranslationKeyTemplateInterface[] */
     protected $templateInstances = [];
@@ -89,17 +87,17 @@ abstract class AbstractTranslationFieldsIterator implements TranslationFieldsIte
      */
     protected function getTemplate($templateClass)
     {
-        if (array_key_exists($templateClass, $this->templateInstances)) {
-            return $this->templateInstances[$templateClass];
+        if (!array_key_exists($templateClass, $this->templateInstances)) {
+            if (!is_a($templateClass, TranslationKeyTemplateInterface::class, true)) {
+                throw new \InvalidArgumentException(
+                    sprintf('Template class must implement %s', TranslationKeyTemplateInterface::class)
+                );
+            }
+
+            $this->templateInstances[$templateClass] = new $templateClass;
         }
 
-        if (!is_a($templateClass, TranslationKeyTemplateInterface::class, true)) {
-            throw new \InvalidArgumentException(
-                sprintf('Template class must implement %s', TranslationKeyTemplateInterface::class)
-            );
-        }
-
-        return $this->templateInstances[$templateClass] = new $templateClass;
+        return $this->templateInstances[$templateClass];
     }
 
     /**

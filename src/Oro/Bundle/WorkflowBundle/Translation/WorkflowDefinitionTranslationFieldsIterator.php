@@ -14,13 +14,16 @@ class WorkflowDefinitionTranslationFieldsIterator extends AbstractWorkflowTransl
      */
     private $workflowDefinition;
 
+    /**
+     * @param WorkflowDefinition $workflowDefinition
+     */
     public function __construct(WorkflowDefinition $workflowDefinition)
     {
         $this->workflowDefinition = $workflowDefinition;
     }
 
     /**
-     * @return \Generator
+     * {@inheritdoc}
      */
     public function getIterator()
     {
