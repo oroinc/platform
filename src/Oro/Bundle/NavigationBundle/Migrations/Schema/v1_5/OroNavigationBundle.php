@@ -34,9 +34,12 @@ class OroNavigationBundle implements Migration
     {
         $table = $schema->getTable('oro_navigation_menu_upd');
         $table->changeColumn('ownership_type', ['type' => StringType::getType('string')]);
+        $table->changeColumn('owner_id', ['notnull' => true]);
+        $table->changeColumn('uri', ['length' => 1023]);
+        $table->addColumn('icon', 'string', ['length' => 150, 'notnull' => false]);
         $table->addColumn('is_divider', 'boolean', []);
         $table->addColumn('is_custom', 'boolean', []);
-        $table->addUniqueIndex(['key', 'ownership_type'], 'unq_menu_key');
+        $table->addUniqueIndex(['key', 'ownership_type'], 'oro_navigation_menu_upd_uidx');
     }
 
     /**

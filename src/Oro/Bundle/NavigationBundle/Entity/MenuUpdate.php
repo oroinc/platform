@@ -14,7 +14,7 @@ use Oro\Bundle\NavigationBundle\Model\ExtendMenuUpdate;
  *      name="oro_navigation_menu_upd",
  *      uniqueConstraints={
  *          @ORM\UniqueConstraint(
- *              name="unq_menu_key",
+ *              name="oro_navigation_menu_upd_uidx",
  *              columns={"key", "ownership_type"}
  *          )
  *      }
@@ -71,6 +71,7 @@ use Oro\Bundle\NavigationBundle\Model\ExtendMenuUpdate;
  *          }
  *      }
  * )
+ * @ORM\HasLifecycleCallbacks()
  */
 class MenuUpdate extends ExtendMenuUpdate implements
     MenuUpdateInterface
@@ -94,12 +95,16 @@ class MenuUpdate extends ExtendMenuUpdate implements
     public function getExtras()
     {
         $extras = [
-            'uri' => $this->getUri(),
-            'divider' => $this->isDivider()
+            'divider' => $this->isDivider(),
+            'translateDisabled' => $this->getId() ? true : false
         ];
 
         if ($this->getPriority() !== null) {
             $extras['position'] = $this->getPriority();
+        }
+
+        if ($this->getIcon() !== null) {
+            $extras['icon'] = $this->getIcon();
         }
 
         return $extras;

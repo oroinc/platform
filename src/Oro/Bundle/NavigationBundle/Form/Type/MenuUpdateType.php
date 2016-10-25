@@ -3,6 +3,7 @@
 namespace Oro\Bundle\NavigationBundle\Form\Type;
 
 use Knp\Menu\ItemInterface;
+use Oro\Bundle\FormBundle\Form\Type\OroIconType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
@@ -11,7 +12,7 @@ use Symfony\Component\Form\FormInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
-use Oro\Bundle\LocaleBundle\Form\Type\TranslatedLocalizedFallbackValueCollectionType;
+use Oro\Bundle\LocaleBundle\Form\Type\LocalizedFallbackValueCollectionType;
 use Oro\Bundle\NavigationBundle\Entity\MenuUpdate;
 
 class MenuUpdateType extends AbstractType
@@ -25,7 +26,7 @@ class MenuUpdateType extends AbstractType
     {
         $builder->add(
             'titles',
-            TranslatedLocalizedFallbackValueCollectionType::class,
+            LocalizedFallbackValueCollectionType::class,
             [
                 'required' => true,
                 'label' => 'oro.navigation.menuupdate.title.label',
@@ -46,7 +47,7 @@ class MenuUpdateType extends AbstractType
                     'text',
                     [
                         'disabled' => false === $menuUpdate->isCustom(),
-                        'required' => true,
+                        'required' => false !== $menuUpdate->isCustom(),
                         'label' => 'oro.navigation.menuupdate.uri.label',
                     ]
                 );
@@ -66,8 +67,16 @@ class MenuUpdateType extends AbstractType
         );
 
         $builder->add(
+            'icon',
+            'oro_icon_select',
+            [
+                'required' => false,
+            ]
+        );
+
+        $builder->add(
             'descriptions',
-            TranslatedLocalizedFallbackValueCollectionType::class,
+            LocalizedFallbackValueCollectionType::class,
             [
                 'required' => false,
                 'label' => 'oro.navigation.menuupdate.description.label',
@@ -75,7 +84,6 @@ class MenuUpdateType extends AbstractType
                 'field' => 'text',
             ]
         );
-
     }
 
     /**

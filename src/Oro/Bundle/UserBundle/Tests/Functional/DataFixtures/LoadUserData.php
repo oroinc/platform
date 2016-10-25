@@ -43,6 +43,17 @@ class LoadUserData extends AbstractFixture implements ContainerAwareInterface
 
         $userManager->updateUser($user);
 
+        $user2 = $userManager->createUser();
+        $user2->setUsername('simple_user2')
+            ->setPlainPassword('simple_password2')
+            ->setFirstName('Elley')
+            ->setLastName('Towards')
+            ->setEmail('simple_user2@example.com')
+            ->setOrganization($organization)
+            ->addOrganization($organization)
+            ->setEnabled(true);
+
         $this->setReference($user->getUsername(), $user);
+        $this->setReference($user2->getUsername(), $user2);
     }
 }

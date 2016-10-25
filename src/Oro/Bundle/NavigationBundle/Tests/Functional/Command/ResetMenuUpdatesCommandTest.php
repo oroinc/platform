@@ -53,14 +53,14 @@ class ResetMenuUpdatesCommand extends WebTestCase
             ],
             'should show success reset for user and menu' => [
                 '$expectedContent' =>
-                    "The menu \"application_menu\" for user \"admin@example.com\" is successfully reset.",
-                '$params'          => ['--user=admin@example.com', '--menu=application_menu'],
-                '$rowsCount'       => 6
+                    "The menu \"application_menu\" for user \"simple_user@example.com\" is successfully reset.",
+                '$params'          => ['--user=simple_user@example.com', '--menu=application_menu'],
+                '$rowsCount'       => 5
             ],
             'should show success reset for user' => [
-                '$expectedContent' => "All menus for user \"admin@example.com\" is successfully reset.",
-                '$params'          => ['--user=admin@example.com'],
-                '$rowsCount'       => 6
+                '$expectedContent' => "All menus for user \"simple_user@example.com\" is successfully reset.",
+                '$params'          => ['--user=simple_user@example.com'],
+                '$rowsCount'       => 5
             ],
             'should show success reset for global scope and menu' => [
                 '$expectedContent' => "The menu \"shortcuts\" for global scope is successfully reset.",

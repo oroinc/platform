@@ -54,7 +54,7 @@ class AjaxMenuController extends Controller
     }
 
     /**
-     * @Route("/menu/{menuName}/{parentKey}/{ownershipType}", name="oro_navigation_menuupdate_create")
+     * @Route("/menu/create/{menuName}/{parentKey}/{ownershipType}", name="oro_navigation_menuupdate_create")
      * @Method("POST")
      *
      * @param Request $request
@@ -80,11 +80,11 @@ class AjaxMenuController extends Controller
         $em->persist($menuUpdate);
         $em->flush();
 
-        return new JsonResponse(null, Response::HTTP_NO_CONTENT);
+        return new JsonResponse(null, Response::HTTP_CREATED);
     }
 
     /**
-     * @Route("/menu/{ownershipType}/{menuName}/{key}", name="oro_navigation_menuupdate_delete")
+     * @Route("/menu/delete/{ownershipType}/{menuName}/{key}", name="oro_navigation_menuupdate_delete")
      * @Method("DELETE")
      *
      * @param Request $request
@@ -105,7 +105,7 @@ class AjaxMenuController extends Controller
             $ownershipType,
             $this->getCurrentOwnerId($ownershipType, $request->get('ownerId'))
         );
-        if ($menuUpdate === null) {
+        if ($menuUpdate === null || $menuUpdate->getId() === null) {
             throw $this->createNotFoundException();
         }
 

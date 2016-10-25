@@ -4,6 +4,7 @@ namespace Oro\Bundle\NavigationBundle\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
 use Oro\Bundle\NavigationBundle\Utils\MenuUpdateUtils;
 use Oro\Bundle\NavigationBundle\Entity\MenuUpdateInterface;
@@ -24,10 +25,17 @@ abstract class AbstractMenuController extends Controller
     abstract protected function getOwnershipType();
 
     /**
+     * @throws AccessDeniedException
+     */
+    abstract protected function checkAcl();
+
+    /**
      * @return array
      */
     protected function index()
     {
+        $this->checkAcl();
+
         return [
             'ownershipType' => $this->getOwnershipType(),
             'entityClass' => MenuUpdate::class
@@ -40,6 +48,8 @@ abstract class AbstractMenuController extends Controller
      */
     protected function view($menuName)
     {
+        $this->checkAcl();
+
         $menu = $this->getMenu($menuName);
 
         return [
@@ -57,6 +67,8 @@ abstract class AbstractMenuController extends Controller
      */
     protected function create($menuName, $parentKey, $ownerId)
     {
+        $this->checkAcl();
+
         /** @var MenuUpdate $menuUpdate */
         $menuUpdate = $this->getManager()->createMenuUpdate(
             $this->getOwnershipType(),
@@ -69,7 +81,6 @@ abstract class AbstractMenuController extends Controller
         );
 
         return $this->handleUpdate($menuUpdate);
-
     }
 
     /**
@@ -80,6 +91,8 @@ abstract class AbstractMenuController extends Controller
      */
     protected function update($menuName, $key, $ownerId)
     {
+        $this->checkAcl();
+
         $menuUpdate = $this->getManager()->getMenuUpdateByKeyAndScope(
             $menuName,
             $key,
@@ -161,5 +174,4 @@ abstract class AbstractMenuController extends Controller
     {
         return $this->get('oro_navigation.tree.menu_update_tree_handler')->createTree($menu);
     }
-
 }

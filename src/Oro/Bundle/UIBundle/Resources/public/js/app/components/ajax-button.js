@@ -8,15 +8,13 @@ define(function(require) {
     var options = {};
 
     function onClick(e) {
-        var method, url, redirect, successMessage, errorMessage;
-
         e.preventDefault();
 
-        method         = $(e.currentTarget).data('method');
-        url            = $(e.currentTarget).data('url');
-        redirect       = $(e.currentTarget).data('redirect');
-        successMessage = $(e.currentTarget).data('success-message');
-        errorMessage   = $(e.currentTarget).data('error-message');
+        var method         = $(e.currentTarget).data('method');
+        var url            = $(e.currentTarget).data('url');
+        var redirect       = $(e.currentTarget).data('redirect');
+        var successMessage = $(e.currentTarget).data('success-message');
+        var errorMessage   = $(e.currentTarget).data('error-message');
 
         mediator.execute('showLoading');
 
@@ -24,7 +22,11 @@ define(function(require) {
             url: url,
             type: method,
             success: function(data) {
-                mediator.execute('showFlashMessage', 'success', data && data.message ? data.message : __(successMessage));
+                mediator.execute(
+                    'showFlashMessage',
+                    'success',
+                    data && data.message ? data.message : __(successMessage)
+                );
                 mediator.execute('redirectTo', {url: redirect}, {redirect: true});
                 mediator.execute('hideLoading');
             },

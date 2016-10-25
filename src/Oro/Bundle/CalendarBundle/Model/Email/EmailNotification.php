@@ -7,7 +7,7 @@ use Doctrine\Common\Persistence\ObjectManager;
 use Oro\Bundle\EmailBundle\Entity\EmailTemplate;
 
 use Oro\Bundle\ReminderBundle\Exception\InvalidArgumentException;
-use Oro\Bundle\NotificationBundle\Processor\EmailNotificationInterface;
+use Oro\Bundle\NotificationBundle\Model\EmailNotificationInterface;
 use Oro\Bundle\CalendarBundle\Entity\CalendarEvent;
 
 class EmailNotification implements EmailNotificationInterface

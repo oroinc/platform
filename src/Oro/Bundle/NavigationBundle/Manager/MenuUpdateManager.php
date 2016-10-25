@@ -9,9 +9,9 @@ use Doctrine\ORM\EntityRepository;
 use Knp\Menu\ItemInterface;
 
 use Oro\Bundle\NavigationBundle\Entity\MenuUpdateInterface;
-use Oro\Bundle\NavigationBundle\Exception\NotFoundMenuException;
 use Oro\Bundle\NavigationBundle\Exception\NotFoundParentException;
 use Oro\Bundle\NavigationBundle\JsTree\MenuUpdateTreeHandler;
+use Oro\Bundle\NavigationBundle\Menu\Helper\MenuUpdateHelper;
 use Oro\Bundle\NavigationBundle\Provider\BuilderChainProvider;
 use Oro\Bundle\NavigationBundle\Utils\MenuUpdateUtils;
 
@@ -23,17 +23,25 @@ class MenuUpdateManager
     /** @var BuilderChainProvider */
     private $builderChainProvider;
 
+    /** @var MenuUpdateHelper */
+    private $menuUpdateHelper;
+
     /** @var string */
     private $entityClass;
 
     /**
      * @param ManagerRegistry $managerRegistry
      * @param BuilderChainProvider $builderChainProvider
+     * @param MenuUpdateHelper $menuUpdateHelper
      */
-    public function __construct(ManagerRegistry $managerRegistry, BuilderChainProvider $builderChainProvider)
-    {
+    public function __construct(
+        ManagerRegistry $managerRegistry,
+        BuilderChainProvider $builderChainProvider,
+        MenuUpdateHelper $menuUpdateHelper
+    ) {
         $this->managerRegistry = $managerRegistry;
         $this->builderChainProvider = $builderChainProvider;
+        $this->menuUpdateHelper = $menuUpdateHelper;
     }
 
     /**
@@ -66,28 +74,23 @@ class MenuUpdateManager
             ->setOwnerId($ownerId);
         if (isset($options['key'])) {
             $entity->setKey($options['key']);
-        } else {
-            $entity->setKey($this->generateKey());
         }
         $isCustom = isset($options['custom']) && $options['custom'];
         $entity->setCustom($isCustom);
-        if (isset($options['parentKey'])) {
-            $parent = $this->getMenuUpdateByKeyAndScope(
-                $options['menu'],
-                $options['parentKey'],
-                $ownershipType,
-                $ownerId
-            );
-            if (!$parent) {
-                throw new NotFoundParentException(sprintf('Parent with "%s" id not found.', $options['parentKey']));
-            }
-            $entity->setParentKey($options['parentKey']);
-        }
         if (isset($options['menu'])) {
-//            if (!$this->builderChainProvider->has($options['menu'])) {
-//                throw new NotFoundMenuException(sprintf('Menu with "%s" id not found.', $options['menu']));
-//            }
+            $menu = $this->builderChainProvider->get($options['menu']);
+
             $entity->setMenu($options['menu']);
+
+            if (isset($options['parentKey'])) {
+                $parent = MenuUpdateUtils::findMenuItem($menu, $options['parentKey']);
+                if (!$parent) {
+                    throw new NotFoundParentException(sprintf('Parent with "%s" id not found.', $options['parentKey']));
+                }
+                $entity->setParentKey($options['parentKey']);
+            }
+        } else {
+            throw new \InvalidArgumentException('options["menu"] should be defined.');
         }
         if (isset($options['isDivider']) && $options['isDivider']) {
             $entity->setDivider(true);
@@ -172,8 +175,12 @@ class MenuUpdateManager
         }
 
         foreach ($orderedChildren as $priority => $child) {
-            $update = $this->createMenuUpdate($ownershipType, $ownerId, ['key' => $child->getName()]);
-            MenuUpdateUtils::updateMenuUpdate($update, $child, $menuName);
+            $update = $this->createMenuUpdate(
+                $ownershipType,
+                $ownerId,
+                ['key' => $child->getName(), 'menu' => $menuName]
+            );
+            MenuUpdateUtils::updateMenuUpdate($update, $child, $menuName, $this->menuUpdateHelper);
             $update->setPriority($priority);
             $updates[] = $update;
         }
@@ -324,7 +331,7 @@ class MenuUpdateManager
         $item = $this->findMenuItem($menuName, $key, $ownershipType);
 
         if ($item) {
-            MenuUpdateUtils::updateMenuUpdate($update, $item, $menuName);
+            MenuUpdateUtils::updateMenuUpdate($update, $item, $menuName, $this->menuUpdateHelper);
         } else {
             $update->setCustom(true);
         }

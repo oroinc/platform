@@ -14,6 +14,10 @@ UPGRADE FROM 1.10 to 2.0
 - Added class `Oro\Bundle\ActionBundle\Layout\DataProvider\ActionButtonsProvider` - layout data provider.
 - Default value for parameter `applications` in operation configuration renamed from `backend` to `default`.
 
+####ApiBundle
+- The `oro.api.action_processor` DI tag was removed. To add new action processor use `oro_api.actions` section of the ApiBundle configuration.
+- The `oro_api.config_extension` DI tag was removed. To add new configuration extension use `oro_api.config_extensions` section of the ApiBundle configuration.
+
 ####WorkflowBundle
 - Class `Oro\Bundle\WorkflowBundle\Model\WorkflowManager`
     - construction signature was changed now it takes next arguments:
@@ -126,8 +130,7 @@ Used with new class `Oro\Bundle\WorkflowBundle\Model\WorkflowExclusiveRecordGrou
 - Service `oro_workflow.transition_schedule.query_factory` (`Oro\Bundle\WorkflowBundle\Model\TransitionSchedule\TransitionQueryFactory`) removed.
 - Service `oro_workflow.cache.process_trigger` (`Oro\Bundle\WorkflowBundle\Cache\ProcessTriggerCache`) removed.
 - Model `Oro\Bundle\WorkflowBundle\Model\TransitionSchedule\ScheduledTransitionProcessName` removed.
-- Class `Oro\Bundle\WorkflowBundle\Model\ProcessTriggerCronScheduler` moved to `Oro\Bundle\WorkflowBundle\Cron\ProcessTriggerCronScheduler`
-and constructor signature changed to `DeferredScheduler $deferredScheduler`.
+- Class `Oro\Bundle\WorkflowBundle\Model\ProcessTriggerCronScheduler` moved to `Oro\Bundle\WorkflowBundle\Cron\ProcessTriggerCronScheduler` and constructor signature changed to `DeferredScheduler $deferredScheduler`.
 - Added new entity `Oro\Bundle\WorkflowBundle\Entity\TransitionCronTrigger`.
 - Added new entity `Oro\Bundle\WorkflowBundle\Entity\TransitionEventTrigger`.
 - Added new interface `Oro\Bundle\WorkflowBundle\Entity\EventTriggerInterface`.
@@ -387,6 +390,11 @@ placeholders:
     items: ...
 ```
 - Main menu dropdown active item is now triggering a page refresh, despite the Backbone router limitations
+- Updated jquery.mCustomScrollbar plugin to version 3.1.5 `Resources/public/lib/jquery/jquery.mCustomScrollbar.min.js`
+- Changed `form_row` block to support of form field 'hints' which allows rendering of simple help section for the respective form control
+
+####FormBundle:
+- Added `Oro\Bundle\FormBundle\Form\Extension\HintFormExtension` to support hints
 
 ####DashboardBundle:
 - Dashboards configurations now loads from `Resources/config/oro/dashboards.yml` instead of `Resources/config/dashboard.yml` file.
@@ -515,5 +523,52 @@ to the [Fallback documentation](./src/Oro/Bundle/EntityBundle/Resources/doc/enti
 - Added DOC file `doc/content_outdating.md` moved from `NavigationBundle`.
 - Added DOC file `doc/mediator-handlers.md` moved from `NavigationBundle`.
 
-####Component
+####DependencyInjection Component
 - Added trait `Oro\Component\DependencyInjection\Compiler\TaggedServicesCompilerPassTrait`
+
+####EntitySerializer Component
+- Changed signature of `transform` method of `Oro\Component\EntitySerializer\DataTransformerInterface`. Added `array $context` as the last parameter.
+- Changed signature of `post_serialize` callbacks for the EntitySerializer. Added `array $context` as the last parameter.
+- Changed signature of `post_serialize` callbacks for the EntitySerializer. Added `array $context` as the last parameter.
+- Changed signature of `serialize` method of `Oro\Component\EntitySerializer\EntitySerializer`. Added `array $context = []` as the last parameter.
+- Changed signature of `serializeEntities` method of `Oro\Component\EntitySerializer\EntitySerializer`. Added `array $context = []` as the last parameter.
+
+####NotificationBundle
+- Moved interface `Oro\Bundle\NotificationBundle\Processor\EmailNotificationInterface` to `Oro\Bundle\NotificationBundle\Model` namespace
+- Moved interface `Oro\Bundle\NotificationBundle\Processor\SenderAwareEmailNotificationInterface` to `Oro\Bundle\NotificationBundle\Model` namespace
+- Removed class `Oro\Bundle\NotificationBundle\Processor\AbstractNotificationProcessor`
+- Removed service @oro_notifications.manager.email_notification and its class `Oro\Bundle\NotificationBundle\Processor\EmailNotificationProcessor` as now the email notifications are processed asynchronously with `Oro\Bundle\NotificationBundle\Async\SendEmailMessageProcessor`
+- Added class `Oro\Bundle\NotificationBundle\Manager\EmailNotificationManager`; some logic from `Oro\Bundle\NotificationBundle\Processor\EmailNotificationProcessor` was moved there
+- Added class `Oro\Bundle\NotificationBundle\Manager\EmailNotificationSender`; some logic from `Oro\Bundle\NotificationBundle\Processor\EmailNotificationProcessor` was moved there
+- Added class `Oro\Bundle\NotificationBundle\Async\Topics`
+- Added class `Oro\Bundle\NotificationBundle\Async\SendEmailMessageProcessor`
+- Constructor of `Oro\Bundle\NotificationBundle\Event\Handler\EmailNotificationHandler` changed: the first argument type is `Oro\Bundle\NotificationBundle\Manager\EmailNotificationManager` instead of `Oro\Bundle\NotificationBundle\Processor\EmailNotificationProcessor`
+- Constructor of `Oro\Bundle\NotificationBundle\Model\MassNotificationSender` changed: the first argument type is `Oro\Bundle\NotificationBundle\Manager\EmailNotificationManager` instead of `Oro\Bundle\NotificationBundle\Processor\EmailNotificationProcessor`
+
+####CalendarBundle
+- Constructor of `Oro\Bundle\CalendarBundle\Model\Email\EmailSendProcessor` changed: the first argument type is `Oro\Bundle\NotificationBundle\Manager\EmailNotificationManager` instead of `Oro\Bundle\NotificationBundle\Processor\EmailNotificationProcessor`
+
+####ReminderBundle
+- Constructor of `Oro\Bundle\ReminderBundle\Model\Email\EmailSendProcessor` changed: the first argument type is `Oro\Bundle\NotificationBundle\Manager\EmailNotificationManager` instead of `Oro\Bundle\NotificationBundle\Processor\EmailNotificationProcessor`
+
+####DataAuditBundle
+- `Oro\Bundle\DataAuditBundle\Loggable\LoggableManager` was removed. Some logic moved to `Oro\Bundle\DataAuditBundle\EventListener\SendChangedEntitiesToMessageQueueListener` class and some backend processors.
+- `Oro\Bundle\DataAuditBundle\EventListener\EntityListener` was removed. Similar logic could be found in `Oro\Bundle\DataAuditBundle\EventListener\SendChangedEntitiesToMessageQueueListener` class.
+- `Oro\Bundle\DataAuditBundle\EventListener\KernelListener` was removed.
+- `Oro\Bundle\DataAuditBundle\Metadata\Driver\AnnotationDriver` was removed.
+- `Oro\Bundle\DataAuditBundle\Metadata\ExtendMetadataFactory` was removed.
+- `Loggable` and `Versioned` annotations were removed. Use entity config auditable option instead.
+- `Oro\Bundle\DataAuditBundle\EventListener\AuditGridListener` was removed. Similar functionality can be found in `Oro\Bundle\DataAuditBundle\Datagrid\EntityTypeProvider`.
+- `Oro\Bundle\DataAuditBundle\Loggable\AuditEntityMapper` was renamed to `Oro\Bundle\DataAuditBundle\Provider\AuditEntityMapper`.
+
+####UserBundle
+- Added `Oro\Bundle\UserBundle\Validator\Constraints\PasswordComplexity` to User model
+- User password requirements are more restrictive by default and require 8 characters, an upper case letter, and a number.
+- Any new users or changing of existing passwords need to meet the password requirements specified in System Configuration/General Setup/Security Settings. Existing user passwords are not affected
+- Removed service @oro_user.password_reset.widget_provider.actions (replaced by @oro_user.forced_password_reset.widget_provider.actions)
+
+####DemoDataBundle
+- All demo users will have passwords ending with '1Q' (e.g. for username 'marketing' password is 'marketing1Q'). For user 'sale' the password is 'salesale1Q'.
+
+####ImapBundle
+ - The command `oro:imap:clear-mailbox` was removed. Produce message to the topic `Oro\Bundle\ImapBundle\Async\Topics::CLEAR_INACTIVE_MAILBOX` instead.

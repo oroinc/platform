@@ -177,6 +177,7 @@ class ConfigurationBuilderTest extends \PHPUnit_Framework_TestCase
                         'route' => 'oro_menu_index',
                         'translateDomain' => 'SomeBundle',
                         'translateParameters' => [],
+                        'translateDisabled' => false,
                         'routeParameters' => [],
                         'extras' => []
                     ],
@@ -184,6 +185,7 @@ class ConfigurationBuilderTest extends \PHPUnit_Framework_TestCase
                         'route' => 'oro_menu_submenu',
                         'translateDomain' => 'SomeBundle',
                         'translateParameters' => [],
+                        'translateDisabled' => true,
                         'routeParameters' => [],
                         'extras' => []
                     ],

@@ -7,8 +7,10 @@ use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityRepository;
 
 use Oro\Bundle\NavigationBundle\Manager\MenuUpdateManager;
+use Oro\Bundle\NavigationBundle\Menu\Helper\MenuUpdateHelper;
 use Oro\Bundle\NavigationBundle\Menu\Provider\GlobalOwnershipProvider;
 use Oro\Bundle\NavigationBundle\Provider\BuilderChainProvider;
+use Oro\Bundle\NavigationBundle\Tests\Unit\Entity\Stub\MenuItemStub;
 use Oro\Bundle\NavigationBundle\Tests\Unit\Entity\Stub\MenuUpdateStub;
 use Oro\Bundle\NavigationBundle\Tests\Unit\MenuItemTestTrait;
 
@@ -25,6 +27,9 @@ class MenuUpdateManagerTest extends \PHPUnit_Framework_TestCase
 
     /** @var BuilderChainProvider|\PHPUnit_Framework_MockObject_MockObject */
     protected $builderChainProvider;
+
+    /** @var  MenuUpdateHelper|\PHPUnit_Framework_MockObject_MockObject */
+    protected $menuUpdateHelper;
 
     /** @var MenuUpdateManager */
     protected $manager;
@@ -52,8 +57,9 @@ class MenuUpdateManagerTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue($this->entityManager));
 
         $this->builderChainProvider = $this->getMock(BuilderChainProvider::class, [], [], '', false);
+        $this->menuUpdateHelper = $this->getMock(MenuUpdateHelper::class, [], [], '', false);
 
-        $this->manager = new MenuUpdateManager($managerRegistry, $this->builderChainProvider);
+        $this->manager = new MenuUpdateManager($managerRegistry, $this->builderChainProvider, $this->menuUpdateHelper);
     }
 
     public function testCreateMenuUpdate()
@@ -75,6 +81,21 @@ class MenuUpdateManagerTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($entity, $result);
         $this->assertEquals($entity->getOwnershipType(), $result->getOwnershipType());
         $this->assertEquals($entity->getOwnerId(), $result->getOwnerId());
+    }
+
+    /**
+     * @expectedException \Oro\Bundle\NavigationBundle\Exception\NotFoundParentException
+     * @expectedExceptionMessage Parent with "parent_key" id not found.
+     */
+    public function testCreateMenuUpdateForNotExistingParent()
+    {
+        $menu = new MenuItemStub();
+        $this->builderChainProvider->expects($this->any())
+            ->method('get')
+            ->with(self::MENU_ID)
+            ->willReturn($menu);
+        $this->manager->setEntityClass(MenuUpdateStub::class);
+        $this->manager->createMenuUpdate('test', 5, ['menu' => self::MENU_ID, 'parentKey' => 'parent_key']);
     }
 
     public function testGetMenuUpdatesByMenuAndScope()
@@ -128,9 +149,9 @@ class MenuUpdateManagerTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue(null));
 
         $this->builderChainProvider
-            ->expects($this->once())
+            ->expects($this->any())
             ->method('get')
-            ->with('menu')
+            ->with(self::MENU_ID)
             ->will($this->returnValue($menu));
 
         $result = $this->manager->getMenuUpdateByKeyAndScope('menu', $key, $ownershipType, $ownerId);
@@ -170,9 +191,9 @@ class MenuUpdateManagerTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue(null));
 
         $this->builderChainProvider
-            ->expects($this->once())
+            ->expects($this->any())
             ->method('get')
-            ->with('menu')
+            ->with(self::MENU_ID)
             ->will($this->returnValue($menu));
 
         $result = $this->manager->getMenuUpdateByKeyAndScope('menu', $key, $ownershipType, $ownerId);
@@ -192,7 +213,7 @@ class MenuUpdateManagerTest extends \PHPUnit_Framework_TestCase
         $this->builderChainProvider
             ->expects($this->any())
             ->method('get')
-            ->with('menu')
+            ->with(self::MENU_ID)
             ->will($this->returnValue($menu));
 
         $update1 = new MenuUpdateStub();
@@ -364,7 +385,7 @@ class MenuUpdateManagerTest extends \PHPUnit_Framework_TestCase
         $this->builderChainProvider
             ->expects($this->once())
             ->method('get')
-            ->with('menu')
+            ->with(self::MENU_ID)
             ->will($this->returnValue($menu));
 
         $this->assertEquals($menu, $this->manager->getMenu('menu'));

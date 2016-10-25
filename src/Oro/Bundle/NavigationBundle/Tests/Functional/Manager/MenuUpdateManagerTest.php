@@ -34,9 +34,11 @@ class MenuUpdateManagerTest extends WebTestCase
     {
         $this->initClient([], $this->generateBasicAuthHeader());
 
-        $this->loadFixtures([
-            'Oro\Bundle\NavigationBundle\Tests\Functional\DataFixtures\MenuUpdateData'
-        ]);
+        $this->loadFixtures(
+            [
+                'Oro\Bundle\NavigationBundle\Tests\Functional\DataFixtures\MenuUpdateData'
+            ]
+        );
 
         $this->manager = $this->getContainer()->get('oro_navigation.manager.menu_update_default');
         $this->em = $this->getContainer()->get('doctrine')->getManagerForClass('OroNavigationBundle:MenuUpdate');
@@ -52,9 +54,13 @@ class MenuUpdateManagerTest extends WebTestCase
 
     public function testGetMenuUpdatesByMenuAndScopeOwnershipUser()
     {
-        $updates = $this->manager->getMenuUpdatesByMenuAndScope('application_menu', 'user', 1);
+        $updates = $this->manager->getMenuUpdatesByMenuAndScope(
+            'application_menu',
+            'user',
+            $this->getReference('simple_user')->getId()
+        );
 
-        $this->assertCount(1, $updates);
+        $this->assertCount(2, $updates);
     }
 
     public function testGetMenuUpdateByKeyAndScopeGlobal()
@@ -62,27 +68,36 @@ class MenuUpdateManagerTest extends WebTestCase
         $update = $this->manager->getMenuUpdateByKeyAndScope('application_menu', 'menu_update.1', 'global', 0);
 
         $result = $this->repository
-            ->findOneBy([
-                'menu' => 'application_menu',
-                'key' => 'menu_update.1',
-                'ownershipType' => 'global',
-                'ownerId' => 0
-            ]);
+            ->findOneBy(
+                [
+                    'menu' => 'application_menu',
+                    'key' => 'menu_update.1',
+                    'ownershipType' => 'global',
+                    'ownerId' => 0
+                ]
+            );
 
         $this->assertEquals($result, $update);
     }
 
     public function testGetMenuUpdateByKeyAndScopeUser()
     {
-        $update = $this->manager->getMenuUpdateByKeyAndScope('application_menu', 'menu_update.3', 'user', 1);
+        $update = $this->manager->getMenuUpdateByKeyAndScope(
+            'application_menu',
+            'menu_update.3',
+            'user',
+            $this->getReference('simple_user')->getId()
+        );
 
         $result = $this->repository
-            ->findOneBy([
-                'menu' => 'application_menu',
-                'key' => 'menu_update.3',
-                'ownershipType' => 'user',
-                'ownerId' => 1
-            ]);
+            ->findOneBy(
+                [
+                    'menu' => 'application_menu',
+                    'key' => 'menu_update.3',
+                    'ownershipType' => 'user',
+                    'ownerId' => $this->getReference('simple_user')->getId()
+                ]
+            );
 
         $this->assertEquals($result, $update);
     }
@@ -93,12 +108,14 @@ class MenuUpdateManagerTest extends WebTestCase
 
         /** @var MenuUpdate[] $result */
         $result = $this->repository
-            ->findBy([
-                'menu' => 'application_menu',
-                'key' => ['menu_update.2', 'menu_update.2_1', 'menu_update.2_1_1'],
-                'ownershipType' => 'global',
-                'ownerId' => 0
-            ]);
+            ->findBy(
+                [
+                    'menu' => 'application_menu',
+                    'key' => ['menu_update.2', 'menu_update.2_1', 'menu_update.2_1_1'],
+                    'ownershipType' => 'global',
+                    'ownerId' => 0
+                ]
+            );
 
         foreach ($result as $entity) {
             $this->assertTrue($entity->isActive());
@@ -111,12 +128,14 @@ class MenuUpdateManagerTest extends WebTestCase
 
         /** @var MenuUpdate[] $result */
         $result = $this->repository
-            ->findBy([
-                'menu' => 'application_menu',
-                'key' => ['menu_update.1', 'menu_update.1_1'],
-                'ownershipType' => 'global',
-                'ownerId' => 0
-            ]);
+            ->findBy(
+                [
+                    'menu' => 'application_menu',
+                    'key' => ['menu_update.1', 'menu_update.1_1'],
+                    'ownershipType' => 'global',
+                    'ownerId' => 0
+                ]
+            );
 
         foreach ($result as $entity) {
             $this->assertFalse($entity->isActive());
@@ -129,11 +148,13 @@ class MenuUpdateManagerTest extends WebTestCase
 
         /** @var MenuUpdate[] $result */
         $result = $this->repository
-            ->findBy([
-                'menu' => 'application_menu',
-                'ownershipType' => 'global',
-                'ownerId' => 0
-            ]);
+            ->findBy(
+                [
+                    'menu' => 'application_menu',
+                    'ownershipType' => 'global',
+                    'ownerId' => 0
+                ]
+            );
 
         $this->assertCount(0, $result);
     }

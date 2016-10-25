@@ -5,8 +5,6 @@ namespace Oro\Bundle\FormBundle\Tests\Unit\Form\Type;
 use Oro\Bundle\FormBundle\Form\Type\OroIconType;
 use Symfony\Component\Form\Test\FormIntegrationTestCase;
 
-use Oro\Bundle\FormBundle\Form\Type\EntityIdentifierType;
-
 class OroIconTypeTest extends FormIntegrationTestCase
 {
     /**
@@ -17,14 +15,6 @@ class OroIconTypeTest extends FormIntegrationTestCase
     protected function setUp()
     {
         $this->type = new OroIconType($this->getMock('Symfony\Component\HttpKernel\KernelInterface'));
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    protected function getTestFormType()
-    {
-        return $this->type;
     }
 
     public function testParameters()

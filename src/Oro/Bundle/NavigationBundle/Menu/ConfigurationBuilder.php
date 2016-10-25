@@ -136,6 +136,7 @@ class ConfigurationBuilder implements BuilderInterface
 
                 $this->moveToExtras($itemOptions, 'translateDomain');
                 $this->moveToExtras($itemOptions, 'translateParameters');
+                $this->moveToExtras($itemOptions, 'translateDisabled');
                 $this->moveToExtras($itemOptions, 'aclResourceId');
 
                 $newMenuItem = $menu->addChild($itemOptions['name'], array_merge($itemOptions, $options));

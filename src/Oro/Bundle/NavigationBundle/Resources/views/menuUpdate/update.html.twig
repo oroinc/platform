@@ -12,11 +12,13 @@
 {% block navButtons %}
     {% if entity.isDivider == false %}
         {% set html = UI.saveAndStayButton({
-            'action': menuUpdatePath
+            'route': menuUpdateRoute,
+            'params': {menuName: entity.menu, key: '$key', id: ownerId}
         }) %}
 
         {% set html = html ~ UI.saveAndNewButton({
-            'action': menuCreatePath
+            'route': menuCreateRoute,
+            'params': {menuName: entity.menu, parentKey: entity.key, id: ownerId}
         }) %}
 
         {{ UI.dropdownSaveButton({'html': html}) }}
@@ -29,7 +31,7 @@
                 {{ UI.deleteButton({
                     'label': 'oro.navigation.menuupdate.delete'|trans(),
                     'dataUrl': path('oro_navigation_menuupdate_delete', {ownershipType: ownershipType, menuName: menuName, key: app.request.get('key')}),
-                    'dataRedirect': menuViewPath,
+                    'dataRedirect': path(menuViewRoute, {menuName: entity.menu, id: ownerId}),
                     'aCss': 'no-hash remove-button',
                     'id': 'btn-remove-attribute',
                     'entity_label': 'oro.navigation.menuupdate.entity_label'|trans,
@@ -71,7 +73,7 @@
         {% if entity.isDivider == false %}
             {# Create Menu Item button #}
             {% set html = UI.button({
-                'path' : menuCreatePath,
+                'path' : path(menuCreateRoute, {menuName: entity.menu, parentKey: entity.key, id: ownerId}),
                 'aCss': 'btn-primary',
                 'label': 'oro.ui.create_entity'|trans({'%entityName%': 'oro.navigation.menuupdate.entity_label'|trans}),
                 'title': 'oro.ui.create_entity'|trans({'%entityName%': 'oro.navigation.menuupdate.entity_label'|trans})
@@ -119,6 +121,7 @@
                         form_row(form.titles),
                         form.uri is defined ? form_row(form.uri) : null,
                         form.aclResourceId is defined ? form_row(form.aclResourceId) : null,
+                        form_row(form.icon),
                         form_row(form.descriptions)
                     ]
                 }
@@ -155,8 +158,8 @@
                 'ownershipType' : ownershipType,
                 'ownerId' : ownerId,
                 'updateAllowed' : true,
-                'onRootSelectRoute' : onRootSelectRoute,
-                'onSelectRoute' : onSelectRoute,
+                'onRootSelectRoute' : menuViewRoute,
+                'onSelectRoute' : menuUpdateRoute,
                 'onMoveRoute' : 'oro_navigation_menuupdate_move'
             } %}
             <div

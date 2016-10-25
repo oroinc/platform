@@ -4,7 +4,7 @@
 {% set menuViewPath= path('oro_navigation_user_menu_view', {menuName: entity.root.name}) %}
 {% set menuCreatePath= path('oro_navigation_user_menu_create', {menuName: entity.root.name}) %}
 {% set menuCreateDividerPath= path('oro_navigation_user_menu_create', {menuName: entity.root.name}) %}
-{% set menuUpdatePath= path('oro_navigation_user_menu_update', {menuName: entity.root.name, key: entity.name}) %}
+{% set saveAndStayButtonAction= path('oro_navigation_user_menu_update', {menuName: entity.root.name, key: entity.name}) %}
 {% set onRootSelectRoute = 'oro_navigation_user_menu_view' %}
 {% set onSelectRoute = 'oro_navigation_user_menu_update' %}
 {% set ownerId = null %}

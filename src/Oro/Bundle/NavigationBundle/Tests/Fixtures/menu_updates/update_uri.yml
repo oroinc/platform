@@ -31,9 +31,11 @@ result_menu:
                 uri: '#system'
         custom:
             label: 'Custom'
+            uri: '#new_custom'
             extras:
-                uri: '#new_custom'
+                uri: '#custom'
                 divider: false
+                translateDisabled: false
     tree:
         menu:
             type: menu

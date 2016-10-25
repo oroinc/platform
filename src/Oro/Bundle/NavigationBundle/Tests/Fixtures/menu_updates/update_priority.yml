@@ -35,16 +35,20 @@ result_menu:
     items:
         system:
             label: 'System'
+            uri: '#system'
             extras:
                 uri: '#system'
                 divider: false
                 position: 20
+                translateDisabled: false
         custom:
             label: 'Custom'
+            uri: '#custom'
             extras:
                 uri: '#custom'
                 divider: false
                 position: 10
+                translateDisabled: false
     tree:
         menu:
             type: menu

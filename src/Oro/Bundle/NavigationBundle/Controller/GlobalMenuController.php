@@ -6,7 +6,6 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 
 use Symfony\Component\HttpFoundation\RedirectResponse;
-use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
 use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
 
@@ -24,8 +23,6 @@ class GlobalMenuController extends AbstractMenuController
      */
     public function indexAction()
     {
-        $this->checkAcl();
-
         return $this->index();
     }
 
@@ -40,8 +37,6 @@ class GlobalMenuController extends AbstractMenuController
      */
     public function viewAction($menuName)
     {
-        $this->checkAcl();
-
         return $this->view($menuName);
     }
 
@@ -57,8 +52,6 @@ class GlobalMenuController extends AbstractMenuController
      */
     public function createAction($menuName, $parentKey = null)
     {
-        $this->checkAcl();
-
         return parent::create($menuName, $parentKey, $this->getOwnerId());
     }
 
@@ -74,8 +67,6 @@ class GlobalMenuController extends AbstractMenuController
      */
     public function updateAction($menuName, $key)
     {
-        $this->checkAcl();
-
         return parent::update($menuName, $key, $this->getOwnerId());
     }
 
@@ -104,12 +95,12 @@ class GlobalMenuController extends AbstractMenuController
     }
 
     /**
-     * @throws AccessDeniedException
+     * {@inheritDoc}
      */
-    private function checkAcl()
+    protected function checkAcl()
     {
         if (!$this->get('oro_security.security_facade')->isGranted('oro_config_system')) {
-            throw new AccessDeniedException('Insufficient permission');
+            throw $this->createAccessDeniedException();
         }
     }
 }

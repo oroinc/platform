@@ -115,28 +115,28 @@ class MenuUpdateData extends AbstractFixture implements DependentFixtureInterfac
             'uri' => '#menu_update.3',
             'menu' => 'application_menu',
             'ownership_type' => UserOwnershipProvider::TYPE,
-            'owner_id' => 1,
+            'owner_id' => 'simple_user',
             'active' => true,
             'priority' => 20,
             'divider' => false,
             'custom' => true,
         ],
-        'menu_update.4' => [
-            'key' => 'menu_update.4',
-            'parent_key' => null,
-            'default_title' => 'menu_update.4.title',
+        'menu_update.3_1' => [
+            'key' => 'menu_update.3_1',
+            'parent_key' => 'menu_update.3',
+            'default_title' => 'menu_update.3_1.title',
             'titles' => [],
-            'default_description' => 'menu_update.4.description',
+            'default_description' => 'menu_update.3_1.description',
             'descriptions' => [],
-            'uri' => '#menu_update.4',
-            'menu' => 'shortcuts',
-            'ownership_type' => GlobalOwnershipProvider::TYPE,
-            'owner_id' => 10,
+            'uri' => '#menu_update.3_1',
+            'menu' => 'application_menu',
+            'ownership_type' => UserOwnershipProvider::TYPE,
+            'owner_id' => 'simple_user',
             'active' => true,
             'priority' => 10,
             'divider' => false,
             'custom' => true,
-        ]
+        ],
     ];
 
     /**
@@ -162,7 +162,16 @@ class MenuUpdateData extends AbstractFixture implements DependentFixtureInterfac
             $descriptions = $data['descriptions'];
             unset($data['descriptions']);
 
+            if ($data['owner_id']) {
+                $owner = $this->getReference($data['owner_id']);
+                unset($data['owner_id']);
+                $ownerId = $owner->getId();
+            } else {
+                $ownerId = 0;
+            }
             $entity = $this->getEntity(MenuUpdate::class, $data);
+
+            $entity->setOwnerId($ownerId);
 
             foreach ($titles as $localization => $title) {
                 $fallbackValue = new LocalizedFallbackValue();

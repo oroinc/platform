@@ -440,6 +440,7 @@ class MenuItemStub implements ItemInterface
      */
     public function hasChildren()
     {
+        return !empty($this->children);
     }
 
     /**
