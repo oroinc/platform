@@ -12,34 +12,38 @@
                         <div class="pull-right">
                             {{ resetButton({
                                 'dataUrl': path('oro_navigation_menuupdate_reset', {menuName: entity.root.name, ownershipType: ownershipType}),
-                                'dataRedirect': menuViewPath,
+                                'dataRedirect': path(menuViewRoute, {menuName: entity.root.name, id: ownerId}),
                                 'menuKey': entity.root.name
                             }) }}
 
                             {{ UI.buttonSeparator() }}
 
                             {% set html = UI.button({
-                                'path' : menuCreatePath,
+                                'path' : path(menuCreateRoute, {menuName: entity.root.name, id: ownerId}),
                                 'aCss': 'btn-primary',
                                 'label': 'oro.ui.create_entity'|trans({'%entityName%': 'oro.navigation.menuupdate.entity_label'|trans}),
                                 'title': 'oro.ui.create_entity'|trans({'%entityName%': 'oro.navigation.menuupdate.entity_label'|trans})
                             }) %}
 
-                            {% set html = html ~ UI.button({
-                                'path' : menuCreateDividerPath,
-                                'aCss': 'btn-primary',
-                                'label': 'oro.ui.create_entity'|trans({'%entityName%': 'oro.navigation.menuupdate.divider'|trans}),
-                                'title': 'oro.ui.create_entity'|trans({'%entityName%': 'oro.navigation.menuupdate.divider'|trans})
+                            {# Create Divider button #}
+                            {% set html = html ~ UI.ajaxButton({
+                            'aCss': 'btn-primary no-hash menu-divider-create-button',
+                            'label': 'oro.ui.create_entity'|trans({'%entityName%': 'oro.navigation.menuupdate.divider'|trans}),
+                            'title': 'oro.ui.create_entity'|trans({'%entityName%': 'oro.navigation.menuupdate.divider'|trans}),
+                            'dataMethod': 'POST',
+                            'dataRedirect': app.request.uri,
+                            'dataUrl': path('oro_navigation_menuupdate_create', {ownershipType: ownershipType, ownerId: ownerId, menuName: entity.name, parentKey: entity.name, 'isDivider': true}),
+                            'successMessage': 'oro.navigation.menuupdate.divider_created'
                             }) %}
 
                             {% set parameters = {
-                                'html': html,
-                                'groupKey': 'createButtons',
-                                'options': {
-                                    'moreButtonAttrs': {
-                                        'class': 'btn-primary'
-                                    }
-                                }
+                            'html': html,
+                            'groupKey': 'createButtons',
+                            'options': {
+                            'moreButtonAttrs': {
+                            'class': 'btn-primary'
+                            }
+                            }
                             } %}
 
                             {{ UI.pinnedDropdownButton(parameters) }}
@@ -74,8 +78,8 @@
                                         'ownershipType' : ownershipType,
                                         'ownerId' : ownerId,
                                         'updateAllowed' : true,
-                                        'onRootSelectRoute' : onRootSelectRoute,
-                                        'onSelectRoute' : onSelectRoute,
+                                        'onRootSelectRoute' : menuViewRoute,
+                                        'onSelectRoute' : menuUpdateRoute,
                                         'onMoveRoute' : 'oro_navigation_menuupdate_move'
                                     } %}
                                     <div
