@@ -7,24 +7,24 @@ use Oro\Bundle\ApiBundle\Config\EntityDefinitionFieldConfig;
 use Oro\Bundle\ApiBundle\Metadata\AssociationMetadata;
 use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
 
-class ObjectNestedObjectMetadataBuilder
+class ObjectNestedObjectMetadataFactory
 {
     /** @var NestedObjectMetadataHelper */
     protected $nestedObjectMetadataHelper;
 
-    /** @var ObjectMetadataBuilder */
-    protected $objectMetadataBuilder;
+    /** @var ObjectMetadataFactory */
+    protected $objectMetadataFactory;
 
     /**
      * @param NestedObjectMetadataHelper $nestedObjectMetadataHelper
-     * @param ObjectMetadataBuilder      $objectMetadataBuilder
+     * @param ObjectMetadataFactory      $objectMetadataFactory
      */
     public function __construct(
         NestedObjectMetadataHelper $nestedObjectMetadataHelper,
-        ObjectMetadataBuilder $objectMetadataBuilder
+        ObjectMetadataFactory $objectMetadataFactory
     ) {
         $this->nestedObjectMetadataHelper = $nestedObjectMetadataHelper;
-        $this->objectMetadataBuilder = $objectMetadataBuilder;
+        $this->objectMetadataFactory = $objectMetadataFactory;
     }
 
     /**
@@ -38,7 +38,7 @@ class ObjectNestedObjectMetadataBuilder
      *
      * @return AssociationMetadata
      */
-    public function addNestedObjectMetadata(
+    public function createAndAddNestedObjectMetadata(
         EntityMetadata $entityMetadata,
         EntityDefinitionConfig $config,
         $entityClass,
@@ -101,14 +101,14 @@ class ObjectNestedObjectMetadataBuilder
             );
 
             $targetPropertyMetadata = $linkedField->isMetaProperty()
-                ? $this->objectMetadataBuilder->addMetaPropertyMetadata(
+                ? $this->objectMetadataFactory->createAndAddMetaPropertyMetadata(
                     $targetEntityMetadata,
                     $parentClassName,
                     $targetFieldName,
                     $targetField,
                     $targetAction
                 )
-                : $this->objectMetadataBuilder->addFieldMetadata(
+                : $this->objectMetadataFactory->createAndAddFieldMetadata(
                     $targetEntityMetadata,
                     $parentClassName,
                     $targetFieldName,

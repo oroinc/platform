@@ -9,24 +9,24 @@ use Oro\Bundle\ApiBundle\Config\EntityDefinitionFieldConfig;
 use Oro\Bundle\ApiBundle\Metadata\AssociationMetadata;
 use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
 
-class EntityNestedObjectMetadataBuilder
+class EntityNestedObjectMetadataFactory
 {
     /** @var NestedObjectMetadataHelper */
     protected $nestedObjectMetadataHelper;
 
-    /** @var EntityMetadataBuilder */
-    protected $entityMetadataBuilder;
+    /** @var EntityMetadataFactory */
+    protected $entityMetadataFactory;
 
     /**
      * @param NestedObjectMetadataHelper $nestedObjectMetadataHelper
-     * @param EntityMetadataBuilder      $entityMetadataBuilder
+     * @param EntityMetadataFactory      $entityMetadataFactory
      */
     public function __construct(
         NestedObjectMetadataHelper $nestedObjectMetadataHelper,
-        EntityMetadataBuilder $entityMetadataBuilder
+        EntityMetadataFactory $entityMetadataFactory
     ) {
         $this->nestedObjectMetadataHelper = $nestedObjectMetadataHelper;
-        $this->entityMetadataBuilder = $entityMetadataBuilder;
+        $this->entityMetadataFactory = $entityMetadataFactory;
     }
 
     /**
@@ -41,7 +41,7 @@ class EntityNestedObjectMetadataBuilder
      *
      * @return AssociationMetadata
      */
-    public function addNestedObjectMetadata(
+    public function createAndAddNestedObjectMetadata(
         EntityMetadata $entityMetadata,
         ClassMetadata $classMetadata,
         EntityDefinitionConfig $config,
@@ -108,14 +108,14 @@ class EntityNestedObjectMetadataBuilder
             );
 
             $targetPropertyMetadata = $linkedField->isMetaProperty()
-                ? $this->entityMetadataBuilder->addEntityMetaPropertyMetadata(
+                ? $this->entityMetadataFactory->createAndAddMetaPropertyMetadata(
                     $targetEntityMetadata,
                     $parentClassMetadata,
                     $targetFieldName,
                     $targetField,
                     $targetAction
                 )
-                : $this->entityMetadataBuilder->addEntityFieldMetadata(
+                : $this->entityMetadataFactory->createAndAddFieldMetadata(
                     $targetEntityMetadata,
                     $parentClassMetadata,
                     $targetFieldName,

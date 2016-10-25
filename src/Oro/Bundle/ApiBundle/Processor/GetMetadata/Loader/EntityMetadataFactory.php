@@ -7,28 +7,28 @@ use Doctrine\ORM\Mapping\ClassMetadata;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionFieldConfig;
 use Oro\Bundle\ApiBundle\Metadata\AssociationMetadata;
 use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
-use Oro\Bundle\ApiBundle\Metadata\EntityMetadataFactory;
+use Oro\Bundle\ApiBundle\Metadata\EntityMetadataFactory as MetadataFactory;
 use Oro\Bundle\ApiBundle\Metadata\FieldMetadata;
 use Oro\Bundle\ApiBundle\Metadata\MetaPropertyMetadata;
 
-class EntityMetadataBuilder
+class EntityMetadataFactory
 {
     /** @var MetadataHelper */
     protected $metadataHelper;
 
-    /** @var EntityMetadataFactory */
-    protected $entityMetadataFactory;
+    /** @var MetadataFactory */
+    protected $metadataFactory;
 
     /**
-     * @param MetadataHelper        $metadataHelper
-     * @param EntityMetadataFactory $entityMetadataFactory
+     * @param MetadataHelper  $metadataHelper
+     * @param MetadataFactory $metadataFactory
      */
     public function __construct(
         MetadataHelper $metadataHelper,
-        EntityMetadataFactory $entityMetadataFactory
+        MetadataFactory $metadataFactory
     ) {
         $this->metadataHelper = $metadataHelper;
-        $this->entityMetadataFactory = $entityMetadataFactory;
+        $this->metadataFactory = $metadataFactory;
     }
 
     /**
@@ -40,7 +40,7 @@ class EntityMetadataBuilder
      *
      * @return MetaPropertyMetadata
      */
-    public function addEntityMetaPropertyMetadata(
+    public function createAndAddMetaPropertyMetadata(
         EntityMetadata $entityMetadata,
         ClassMetadata $classMetadata,
         $fieldName,
@@ -48,7 +48,7 @@ class EntityMetadataBuilder
         $targetAction
     ) {
         $propertyPath = $field->getPropertyPath($fieldName);
-        $metaPropertyMetadata = $this->entityMetadataFactory->createMetaPropertyMetadata(
+        $metaPropertyMetadata = $this->metadataFactory->createMetaPropertyMetadata(
             $classMetadata,
             $propertyPath,
             $field->getDataType()
@@ -71,7 +71,7 @@ class EntityMetadataBuilder
      *
      * @return FieldMetadata
      */
-    public function addEntityFieldMetadata(
+    public function createAndAddFieldMetadata(
         EntityMetadata $entityMetadata,
         ClassMetadata $classMetadata,
         $fieldName,
@@ -79,7 +79,7 @@ class EntityMetadataBuilder
         $targetAction
     ) {
         $propertyPath = $field->getPropertyPath($fieldName);
-        $fieldMetadata = $this->entityMetadataFactory->createFieldMetadata(
+        $fieldMetadata = $this->metadataFactory->createFieldMetadata(
             $classMetadata,
             $propertyPath,
             $field->getDataType()
@@ -102,7 +102,7 @@ class EntityMetadataBuilder
      *
      * @return AssociationMetadata
      */
-    public function addEntityAssociationMetadata(
+    public function createAndAddAssociationMetadata(
         EntityMetadata $entityMetadata,
         ClassMetadata $classMetadata,
         $associationName,
@@ -110,7 +110,7 @@ class EntityMetadataBuilder
         $targetAction
     ) {
         $propertyPath = $field->getPropertyPath($associationName);
-        $associationMetadata = $this->entityMetadataFactory->createAssociationMetadata(
+        $associationMetadata = $this->metadataFactory->createAssociationMetadata(
             $classMetadata,
             $propertyPath,
             $field->getDataType()
