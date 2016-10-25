@@ -5,14 +5,17 @@ namespace Oro\Bundle\ApiBundle\Processor;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormInterface;
 
-/**
- * @method bool has($key)
- * @method mixed get($key)
- * @method void set($key, $value)
- * @method void remove($key)
- */
 trait FormContextTrait
 {
+    /** @var array */
+    protected $requestData;
+
+    /** @var FormBuilderInterface|null */
+    protected $formBuilder;
+
+    /** @var FormInterface|null */
+    protected $form;
+
     /**
      * Returns request data.
      *
@@ -20,7 +23,7 @@ trait FormContextTrait
      */
     public function getRequestData()
     {
-        return $this->get(FormContext::REQUEST_DATA);
+        return $this->requestData;
     }
 
     /**
@@ -30,7 +33,7 @@ trait FormContextTrait
      */
     public function setRequestData(array $requestData)
     {
-        $this->set(FormContext::REQUEST_DATA, $requestData);
+        $this->requestData = $requestData;
     }
 
     /**
@@ -40,7 +43,7 @@ trait FormContextTrait
      */
     public function hasFormBuilder()
     {
-        return $this->has(FormContext::FORM_BUILDER);
+        return null !== $this->formBuilder;
     }
 
     /**
@@ -50,7 +53,7 @@ trait FormContextTrait
      */
     public function getFormBuilder()
     {
-        return $this->get(FormContext::FORM_BUILDER);
+        return $this->formBuilder;
     }
 
     /**
@@ -60,11 +63,7 @@ trait FormContextTrait
      */
     public function setFormBuilder(FormBuilderInterface $formBuilder = null)
     {
-        if ($formBuilder) {
-            $this->set(FormContext::FORM_BUILDER, $formBuilder);
-        } else {
-            $this->remove(FormContext::FORM_BUILDER);
-        }
+        $this->formBuilder = $formBuilder;
     }
 
     /**
@@ -74,7 +73,7 @@ trait FormContextTrait
      */
     public function hasForm()
     {
-        return $this->has(FormContext::FORM);
+        return null !== $this->form;
     }
 
     /**
@@ -84,7 +83,7 @@ trait FormContextTrait
      */
     public function getForm()
     {
-        return $this->get(FormContext::FORM);
+        return $this->form;
     }
 
     /**
@@ -94,10 +93,6 @@ trait FormContextTrait
      */
     public function setForm(FormInterface $form = null)
     {
-        if ($form) {
-            $this->set(FormContext::FORM, $form);
-        } else {
-            $this->remove(FormContext::FORM);
-        }
+        $this->form = $form;
     }
 }

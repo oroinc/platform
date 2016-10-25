@@ -7,15 +7,6 @@ use Symfony\Component\Form\FormInterface;
 
 interface FormContext extends ContextInterface
 {
-    /** Input data */
-    const REQUEST_DATA = 'requestData';
-
-    /** The form builder */
-    const FORM_BUILDER = 'formBuilder';
-
-    /** The form */
-    const FORM = 'form';
-
     /**
      * Returns request data.
      *
