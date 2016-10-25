@@ -7,6 +7,7 @@ use Doctrine\ORM\EntityManager;
 use Knp\Menu\ItemInterface;
 
 use Oro\Bundle\EntityConfigBundle\Config\Config;
+use Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker;
 use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
 use Oro\Bundle\SecurityBundle\SecurityFacade;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
@@ -34,22 +35,28 @@ class NavigationListener
      */
     protected $aclHelper;
 
+    /** @var FeatureChecker */
+    protected $featureChecker;
+
     /**
      * @param EntityManager  $entityManager
      * @param ConfigProvider $entityConfigProvider
      * @param SecurityFacade $securityFacade
      * @param AclHelper      $aclHelper
+     * @param FeatureChecker $featureChecker
      */
     public function __construct(
         EntityManager $entityManager,
         ConfigProvider $entityConfigProvider,
         SecurityFacade $securityFacade,
-        AclHelper $aclHelper
+        AclHelper $aclHelper,
+        FeatureChecker $featureChecker
     ) {
         $this->em                   = $entityManager;
         $this->entityConfigProvider = $entityConfigProvider;
         $this->securityFacade       = $securityFacade;
         $this->aclHelper            = $aclHelper;
+        $this->featureChecker       = $featureChecker;
     }
 
     /**
@@ -63,6 +70,17 @@ class NavigationListener
             $qb = $this->em->getRepository('OroReportBundle:Report')
                 ->createQueryBuilder('report')
                 ->orderBy('report.name', 'ASC');
+
+            $disabledReports = $this->featureChecker->getDisabledResourcesByType('reports');
+            if ($disabledReports) {
+                $qb
+                    ->andWhere($qb->expr()->orX(
+                        $qb->expr()->isNull('report.internalId'),
+                        $qb->expr()->notIn('report.internalId', ':reports')
+                    ))
+                    ->setParameter('reports', $disabledReports);
+            }
+
             $reports = $this->aclHelper->apply($qb)->execute();
 
             if (!empty($reports)) {
