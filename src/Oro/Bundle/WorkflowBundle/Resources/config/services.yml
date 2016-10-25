@@ -332,7 +332,7 @@ services:
     oro_workflow.translation.keys_subscriber:
         class: Oro\Bundle\WorkflowBundle\EventListener\WorkflowTranslationKeysSubscriber
         arguments:
-            - '@oro_workflow.helper.translation'
+            - '@oro_translation.manager.translation'
         tags:
             - { name: oro_workflow.changes.subscriber }
 

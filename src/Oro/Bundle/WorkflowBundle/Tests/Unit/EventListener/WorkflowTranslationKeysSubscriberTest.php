@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\EventListener;
 
+use Oro\Bundle\TranslationBundle\Manager\TranslationManager;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Event\WorkflowChangesEvent;
 use Oro\Bundle\WorkflowBundle\Event\WorkflowEvents;
@@ -11,18 +12,19 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class WorkflowTranslationKeysSubscriberTest extends \PHPUnit_Framework_TestCase
 {
-    /** @var WorkflowTranslationHelper|\PHPUnit_Framework_MockObject_MockObject */
-    private $workflowTranslationHelper;
+    /** @var TranslationManager|\PHPUnit_Framework_MockObject_MockObject */
+    private $translationManager;
 
     /** @var WorkflowTranslationKeysSubscriber */
     private $translationKeysSubscriber;
 
     protected function setUp()
     {
-        $this->workflowTranslationHelper = $this->getMockBuilder(WorkflowTranslationHelper::class)
-            ->disableOriginalConstructor()->getMock();
+        $this->translationManager = $this->getMockBuilder(TranslationManager::class)
+            ->disableOriginalConstructor()
+            ->getMock();
 
-        $this->translationKeysSubscriber = new WorkflowTranslationKeysSubscriber($this->workflowTranslationHelper);
+        $this->translationKeysSubscriber = new WorkflowTranslationKeysSubscriber($this->translationManager);
     }
 
     public function testImplementsSubscriberInterface()
@@ -35,9 +37,9 @@ class WorkflowTranslationKeysSubscriberTest extends \PHPUnit_Framework_TestCase
         $definition = (new WorkflowDefinition())->setName('test_workflow');
         $changes = new WorkflowChangesEvent($definition);
 
-        $this->workflowTranslationHelper->expects($this->at(0))
-            ->method('ensureTranslationKey')
-            ->with('oro.workflow.test_workflow.label');
+        $this->translationManager->expects($this->at(0))
+            ->method('findTranslationKey')
+            ->with('oro.workflow.test_workflow.label', WorkflowTranslationHelper::TRANSLATION_DOMAIN);
 
         $this->translationKeysSubscriber->ensureTranslationKeys($changes);
     }
@@ -59,16 +61,16 @@ class WorkflowTranslationKeysSubscriberTest extends \PHPUnit_Framework_TestCase
 
         $changes = new WorkflowChangesEvent($updatedDefinition, $previousDefinition);
 
-        $this->workflowTranslationHelper->expects($this->at(0))
-            ->method('ensureTranslationKey')
-            ->with('test_workflow_label_translation_key');
-        $this->workflowTranslationHelper->expects($this->at(1))
-            ->method('ensureTranslationKey')
-            ->with('test_workflow_transition_1_translation_key');
+        $this->translationManager->expects($this->at(0))
+            ->method('findTranslationKey')
+            ->with('test_workflow_label_translation_key', WorkflowTranslationHelper::TRANSLATION_DOMAIN);
+        $this->translationManager->expects($this->at(1))
+            ->method('findTranslationKey')
+            ->with('test_workflow_transition_1_translation_key', WorkflowTranslationHelper::TRANSLATION_DOMAIN);
 
-        $this->workflowTranslationHelper->expects($this->at(3))
+        $this->translationManager->expects($this->at(3))
             ->method('removeTranslationKey')
-            ->with('test_workflow_transition_2_translation_key');
+            ->with('test_workflow_transition_2_translation_key', WorkflowTranslationHelper::TRANSLATION_DOMAIN);
 
         $this->translationKeysSubscriber->clearTranslationKeys($changes);
     }
@@ -90,7 +92,7 @@ class WorkflowTranslationKeysSubscriberTest extends \PHPUnit_Framework_TestCase
 
         $changes = new WorkflowChangesEvent($deletedDefinition);
 
-        $this->workflowTranslationHelper->expects($this->at(0))
+        $this->translationManager->expects($this->at(0))
             ->method('removeTranslationKey')->with('label_translation_key');
 
         $this->translationKeysSubscriber->deleteTranslationKeys($changes);

@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\WorkflowBundle\EventListener;
 
+use Oro\Bundle\TranslationBundle\Manager\TranslationManager;
 use Oro\Bundle\WorkflowBundle\Event\WorkflowChangesEvent;
 use Oro\Bundle\WorkflowBundle\Event\WorkflowEvents;
 use Oro\Bundle\WorkflowBundle\Helper\WorkflowTranslationHelper;
@@ -10,15 +11,15 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class WorkflowTranslationKeysSubscriber implements EventSubscriberInterface
 {
-    /** @var WorkflowTranslationHelper */
-    private $workflowTranslationHelper;
+    /** @var TranslationManager */
+    private $translationManager;
 
     /**
-     * @param WorkflowTranslationHelper $workflowTranslationHelper
+     * @param TranslationManager $translationManager
      */
-    public function __construct(WorkflowTranslationHelper $workflowTranslationHelper)
+    public function __construct(TranslationManager $translationManager)
     {
-        $this->workflowTranslationHelper = $workflowTranslationHelper;
+        $this->translationManager = $translationManager;
     }
 
     /**
@@ -29,7 +30,7 @@ class WorkflowTranslationKeysSubscriber implements EventSubscriberInterface
     {
         $newWorkflowDefinitionFields = new WorkflowDefinitionTranslationFieldsIterator($changesEvent->getDefinition());
         foreach ($newWorkflowDefinitionFields as $translationKey => $value) {
-            $this->workflowTranslationHelper->ensureTranslationKey($translationKey);
+            $this->ensureTranslationKey($translationKey);
         }
     }
 
@@ -51,14 +52,14 @@ class WorkflowTranslationKeysSubscriber implements EventSubscriberInterface
 
         $newKeys = [];
         foreach ($updatedDefinitionKeys as $newTranslationKey) {
-            $this->workflowTranslationHelper->ensureTranslationKey($newTranslationKey);
+            $this->ensureTranslationKey($newTranslationKey);
             $newKeys[] = $newTranslationKey;
         }
 
         $oldKeys = array_values(iterator_to_array($previousDefinitionKeys));
 
         foreach (array_diff($oldKeys, $newKeys) as $translationKeyForRemove) {
-            $this->workflowTranslationHelper->removeTranslationKey($translationKeyForRemove);
+            $this->removeTranslationKey($translationKeyForRemove);
         }
     }
 
@@ -71,7 +72,7 @@ class WorkflowTranslationKeysSubscriber implements EventSubscriberInterface
         $deletedDefinition = new WorkflowDefinitionTranslationFieldsIterator($workflowChangesEvent->getDefinition());
 
         foreach ($deletedDefinition as $translationKeyForRemove) {
-            $this->workflowTranslationHelper->removeTranslationKey($translationKeyForRemove);
+            $this->removeTranslationKey($translationKeyForRemove);
         }
     }
 
@@ -85,5 +86,22 @@ class WorkflowTranslationKeysSubscriber implements EventSubscriberInterface
             WorkflowEvents::WORKFLOW_AFTER_UPDATE => 'clearTranslationKeys',
             WorkflowEvents::WORKFLOW_AFTER_DELETE => 'deleteTranslationKeys'
         ];
+    }
+
+
+    /**
+     * @param string $key
+     */
+    private function ensureTranslationKey($key)
+    {
+        $this->translationManager->findTranslationKey($key, WorkflowTranslationHelper::TRANSLATION_DOMAIN);
+    }
+
+    /**
+     * @param string $key
+     */
+    private function removeTranslationKey($key)
+    {
+        $this->translationManager->removeTranslationKey($key, WorkflowTranslationHelper::TRANSLATION_DOMAIN);
     }
 }

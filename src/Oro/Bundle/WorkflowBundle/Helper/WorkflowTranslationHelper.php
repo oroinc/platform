@@ -144,20 +144,4 @@ class WorkflowTranslationHelper
     {
         $this->translationManager->saveValue($key, $value, $locale, self::TRANSLATION_DOMAIN, Translation::SCOPE_UI);
     }
-
-    /**
-     * @param string $key
-     */
-    public function ensureTranslationKey($key)
-    {
-        $this->translationManager->findTranslationKey($key, self::TRANSLATION_DOMAIN);
-    }
-
-    /**
-     * @param string $key
-     */
-    public function removeTranslationKey($key)
-    {
-        $this->translationManager->removeTranslationKey($key, self::TRANSLATION_DOMAIN);
-    }
 }
