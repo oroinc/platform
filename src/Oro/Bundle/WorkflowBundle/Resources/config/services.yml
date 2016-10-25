@@ -196,10 +196,8 @@ services:
     oro_workflow.handler.workflow_definition:
         class: 'Oro\Bundle\WorkflowBundle\Handler\WorkflowDefinitionHandler'
         arguments:
-            - '@oro_workflow.workflow_assembler'
             - '@oro_workflow.changes.event.dispatcher'
             - '@doctrine'
-            - '%oro_workflow.workflow_definition.entity.class%'
 
     oro_workflow.process.cron_scheduler:
         class: 'Oro\Bundle\WorkflowBundle\Cron\ProcessTriggerCronScheduler'

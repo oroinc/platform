@@ -8,7 +8,9 @@ use Doctrine\Common\Persistence\ObjectManager;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerAwareTrait;
 
+use Oro\Bundle\WorkflowBundle\Configuration\WorkflowConfiguration;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
+use Oro\Bundle\WorkflowBundle\Handler\WorkflowDefinitionHandler;
 use Oro\Bundle\WorkflowBundle\Translation\TranslationProcessor;
 
 class UpdateDefinitionTranslations extends AbstractFixture implements ContainerAwareInterface
@@ -20,6 +22,9 @@ class UpdateDefinitionTranslations extends AbstractFixture implements ContainerA
      */
     public function load(ObjectManager $manager)
     {
+        /* @var $handler WorkflowDefinitionHandler */
+        $handler = $this->container->get('oro_workflow.handler.workflow_definition');
+
         /* @var $processor TranslationProcessor */
         $processor = $this->container->get('oro_workflow.translation.processor');
 
@@ -27,13 +32,8 @@ class UpdateDefinitionTranslations extends AbstractFixture implements ContainerA
         $definitions = $manager->getRepository(WorkflowDefinition::class)->findBy(['system' => false]);
 
         foreach ($definitions as $definition) {
-            $configuration = $this->process($processor, $definition);
-
-            $definition->setConfiguration($configuration);
-
-            foreach ($definition->getSteps() as $step) {
-                $step->setLabel($configuration['steps'][$step->getName()]['label']);
-            }
+            $this->processConfiguration($processor, $definition);
+            $handler->updateWorkflowDefinition($definition, $definition);
         }
 
         $manager->flush();
@@ -42,9 +42,8 @@ class UpdateDefinitionTranslations extends AbstractFixture implements ContainerA
     /**
      * @param TranslationProcessor $processor
      * @param WorkflowDefinition $definition
-     * @return array
      */
-    protected function process(TranslationProcessor $processor, WorkflowDefinition $definition)
+    protected function processConfiguration(TranslationProcessor $processor, WorkflowDefinition $definition)
     {
         $sourceConfiguration = array_merge(
             $definition->getConfiguration(),
@@ -56,10 +55,29 @@ class UpdateDefinitionTranslations extends AbstractFixture implements ContainerA
 
         $preparedConfiguration = $processor->prepare($definition->getName(), $processor->handle($sourceConfiguration));
 
+        if (isset($preparedConfiguration[WorkflowConfiguration::NODE_STEPS])) {
+            $this->setWorkflowdefinitionSteps($definition, $preparedConfiguration[WorkflowConfiguration::NODE_STEPS]);
+        }
+
         $definition->setLabel($preparedConfiguration['label']);
 
         unset($preparedConfiguration['label'], $preparedConfiguration['name']);
 
-        return $preparedConfiguration;
+        $definition->setConfiguration($preparedConfiguration);
+    }
+
+    /**
+     * @param WorkflowDefinition $definition
+     * @param array $stepsConfiguration
+     */
+    protected function setWorkflowdefinitionSteps(WorkflowDefinition $definition, array $stepsConfiguration)
+    {
+        foreach ($stepsConfiguration as $name => $stepConfiguration) {
+            $workflowStep = $definition->getStepByName($name);
+
+            if ($workflowStep && isset($stepConfiguration['label'])) {
+                $workflowStep->setLabel($stepConfiguration['label']);
+            }
+        }
     }
 }
