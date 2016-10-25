@@ -16,6 +16,7 @@ oro:
         name.label:          Name
         owner.label:         Owner
         organization.label:  Organization
+        internal_id.label:   Internal Id
 
         entity:
             label:   Entity

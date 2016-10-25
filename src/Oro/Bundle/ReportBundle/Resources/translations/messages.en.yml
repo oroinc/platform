@@ -72,6 +72,7 @@ oro:
         owner.label:         Owner
         type.label:          Report type
         organization.label:  Organization
+        internal_id.label:   Internal Id
 
         reporttype:
             entity_label:        Report Type
