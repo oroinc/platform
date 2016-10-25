@@ -152,7 +152,7 @@ abstract class AbstractConfigProvider implements ConfigProviderInterface
 
         $paths = [
             'require-config'    => $this->webRoot . substr($config->getConfigFilePath(), 0, -3),
-            'require-lib'       => 'ororequirejs/lib/require',
+            'require-lib'       => 'npmassets/requirejs/require',
         ];
 
         $buildConfig = array_merge(

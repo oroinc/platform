@@ -2,7 +2,7 @@ define(function(require) {
     'use strict';
 
     var _ = require('underscore');
-    var Backgrid = require('orodatagrid/lib/backgrid/backgrid');
+    var Backgrid = require('bowerassets/backgrid/lib/backgrid');
 
     /**
      * Cells should be removed durung dispose cycle

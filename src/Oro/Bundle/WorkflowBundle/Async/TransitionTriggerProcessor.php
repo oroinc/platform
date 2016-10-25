@@ -48,26 +48,30 @@ class TransitionTriggerProcessor implements MessageProcessorInterface
      */
     public function process(MessageInterface $message, SessionInterface $session)
     {
+        $result = self::ACK;
+
         try {
             $triggerMessage = $this->createTransitionTriggerMessage($message);
             $trigger = $this->resolveTrigger($triggerMessage->getTriggerId());
 
             if (!$this->handler->process($trigger, $triggerMessage)) {
-                throw new \RuntimeException('Transition not allowed');
-            }
+                $this->logger->warning(
+                    '[TransitionTriggerProcessor] Transition not allowed.',
+                    ['message_body' => $message->getBody(), 'trigger' => $trigger]
+                );
 
-            return self::ACK;
+                $result = self::REJECT;
+            }
         } catch (\Exception $e) {
             $this->logger->error(
-                sprintf(
-                    'Message could not be processed: %s. Original message: "%s"',
-                    $e->getMessage(),
-                    $message->getBody()
-                )
+                '[TransitionTriggerProcessor] Queue message could not be processed.',
+                ['message_body' => $message->getBody(), 'exception' => $e]
             );
 
-            return self::REJECT;
+            $result = self::REJECT;
         }
+
+        return $result;
     }
 
     /**

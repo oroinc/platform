@@ -63,7 +63,7 @@ class ChannelFormSubscriber implements EventSubscriberInterface
 
         $this->muteFields($form, $data);
 
-        $typeChoices = array_keys($form->get('type')->getConfig()->getOption('choices'));
+        $typeChoices = array_values($form->get('type')->getConfig()->getOption('choices'));
         $firstChoice = reset($typeChoices);
 
         $type                  = $data->getType() ? : $firstChoice;
@@ -79,7 +79,7 @@ class ChannelFormSubscriber implements EventSubscriberInterface
         $mappingSettingsModifier = $this->getDynamicModifierClosure($type, 'mapping_settings');
         $mappingSettingsModifier($form);
 
-        $typeChoices = array_keys($form->get('transportType')->getConfig()->getOption('choices'));
+        $typeChoices = array_values($form->get('transportType')->getConfig()->getOption('choices'));
         $firstChoice = reset($typeChoices);
         if ($transport = $data->getTransport()) {
             $transportType = $this->registry->getTransportTypeBySettingEntity($transport, $type, true);
@@ -108,7 +108,7 @@ class ChannelFormSubscriber implements EventSubscriberInterface
             return;
         }
 
-        $typeChoices = array_keys($form->get('transportType')->getConfig()->getOption('choices'));
+        $typeChoices = array_values($form->get('transportType')->getConfig()->getOption('choices'));
         $firstChoice = reset($typeChoices);
         if ($transport = $data->getTransport()) {
             $transportType = $this->registry->getTransportTypeBySettingEntity($transport, $data->getType(), true);
@@ -159,7 +159,7 @@ class ChannelFormSubscriber implements EventSubscriberInterface
             $mappingSettingsModifier($form);
 
             // value that was set on postSet is replaced by null from request
-            $typeChoices           = array_keys($form->get('transportType')->getConfig()->getOption('choices'));
+            $typeChoices           = array_values($form->get('transportType')->getConfig()->getOption('choices'));
             $firstChoice           = reset($typeChoices);
             $data['transportType'] = isset($data['transportType'])
                 ? $data['transportType'] : $firstChoice;
@@ -205,17 +205,8 @@ class ChannelFormSubscriber implements EventSubscriberInterface
                 return;
             }
 
-            $unsetOptions = ['choice_list'];
-            /**
-             * @todo: should be removed in scope of BAP-11222
-             */
-            /* Check if right now we're using Symfony 2.8+ */
-            if (method_exists('Symfony\Component\Form\AbstractType', 'getBlockPrefix')) {
-                array_push($unsetOptions, 'choice_label');
-            }
-
-            $choices = $registry->getAvailableTransportTypesChoiceList($type);
-            FormUtils::replaceField($form, 'transportType', ['choices' => $choices], $unsetOptions);
+            $choices = array_flip($registry->getAvailableTransportTypesChoiceList($type));
+            FormUtils::replaceField($form, 'transportType', ['choices' => $choices], ['choice_list']);
         };
     }
 
@@ -235,17 +226,8 @@ class ChannelFormSubscriber implements EventSubscriberInterface
                 return;
             }
 
-            $unsetOptions = ['choice_list'];
-            /**
-             * @todo: should be removed in scope of BAP-11222
-             */
-            /* Check if right now we're using Symfony 2.8+ */
-            if (method_exists('Symfony\Component\Form\AbstractType', 'getBlockPrefix')) {
-                array_push($unsetOptions, 'choice_label');
-            }
-
-            $choices = $registry->getAvailableConnectorsTypesChoiceList($type);
-            FormUtils::replaceField($form, 'connectors', ['choices' => $choices], $unsetOptions);
+            $choices = array_flip($registry->getAvailableConnectorsTypesChoiceList($type));
+            FormUtils::replaceField($form, 'connectors', ['choices' => $choices], ['choice_list']);
         };
     }
 
