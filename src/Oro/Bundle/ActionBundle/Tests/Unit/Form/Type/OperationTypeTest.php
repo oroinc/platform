@@ -274,8 +274,7 @@ class OperationTypeTest extends FormIntegrationTestCase
         $actionData = new ActionData($data);
 
         if ($modified) {
-            $actionData->modifiedData = null;
-            unset($actionData->modifiedData);
+            $actionData->setModified(true);
         }
 
         return $actionData;
