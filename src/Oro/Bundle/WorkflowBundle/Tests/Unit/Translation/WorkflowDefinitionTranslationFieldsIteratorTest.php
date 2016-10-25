@@ -127,6 +127,9 @@ class WorkflowDefinitionTranslationFieldsIteratorTest extends \PHPUnit_Framework
         ];
     }
 
+    /**
+     * @return array
+     */
     private function createNormalCase()
     {
         $caseNormalActual = new WorkflowDefinition();

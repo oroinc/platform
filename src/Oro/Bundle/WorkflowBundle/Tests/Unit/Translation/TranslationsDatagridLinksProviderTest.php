@@ -83,7 +83,9 @@ class TranslationsDatagridLinksProviderTest extends \PHPUnit_Framework_TestCase
     {
         return [
             'empty' => [
-                'config' => [],
+                'config' => [
+                    WorkflowConfiguration::NODE_STEPS => ['test_node' => []],
+                ],
                 'languagesAvailable' => true,
                 'expected' => [
                     'label' => 'link_to_' . self::WORKFLOW_LABEL,
