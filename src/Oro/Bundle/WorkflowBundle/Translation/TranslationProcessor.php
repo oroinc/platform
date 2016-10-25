@@ -63,6 +63,10 @@ class TranslationProcessor implements ConfigurationHandlerInterface, WorkflowDef
      */
     public function translateWorkflowDefinitionFields(WorkflowDefinition $workflowDefinition)
     {
+        if (!$workflowDefinition->getName()) {
+            return;
+        }
+
         //important to prefetch all translations as getTranslation retrieves them form local instance-level cache
         $workflowName = $workflowDefinition->getName();
 

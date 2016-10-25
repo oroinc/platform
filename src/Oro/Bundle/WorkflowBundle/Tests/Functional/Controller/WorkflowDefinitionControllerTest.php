@@ -78,7 +78,7 @@ class WorkflowDefinitionControllerTest extends WebTestCase
         $this->assertContains($workflow->getLabel(), $crawler->html());
 
         if ($workflow->getStepManager()->getStartStep()) {
-            $this->assertContains($workflow->getStepManager()->getStartStep()->getLabel(), $crawler->html());
+            $this->assertContains($workflow->getStepManager()->getStartStep()->getName(), $crawler->html());
         }
     }
 
