@@ -15,23 +15,6 @@ class DebugConditionCommand extends AbstractDebugCommand
     /**
      * {@inheritdoc}
      */
-    public function isEnabled()
-    {
-        if (!$this->getContainer()->has('oro_action.expression.factory')) {
-            return false;
-        }
-
-        $actionsFactory = $this->getContainer()->get('oro_action.expression.factory');
-        if (!$actionsFactory instanceof ExpressionFactory) {
-            return false;
-        }
-
-        return parent::isEnabled();
-    }
-
-    /**
-     * {@inheritdoc}
-     */
     protected function configure()
     {
         $this->setName(self::COMMAND_NAME)
@@ -47,7 +30,7 @@ EOF
     }
 
     /**
-     * @return string
+     * {@inheritdoc}
      */
     protected function getFactoryServiceId()
     {
@@ -55,7 +38,7 @@ EOF
     }
 
     /**
-     * @return array
+     * {@inheritdoc}
      */
     protected function getTypes()
     {
