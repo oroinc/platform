@@ -139,7 +139,7 @@ abstract class AbstractSearchMappingProvider
      *
      * @return bool
      */
-    public function isFieldsMappingExists($className)
+    public function hasFieldsMapping($className)
     {
         $mappingConfig = $this->getMappingConfig();
 
