@@ -67,3 +67,5 @@ oro:
         choice-tree:
             all: All
             selected: Selected
+        datagrid-toolbar:
+            filters: Filters
