@@ -525,7 +525,7 @@ class JsonApiDocumentBuilderTest extends DocumentBuilderTestCase
         $association = $metadata->addAssociation(
             $this->createAssociationMetadata('category', 'Test\Category')
         );
-        $association->setDataType('scalar');
+        $association->setDataType('object');
         $association->getTargetMetadata()->addField($this->createFieldMetadata('name'));
 
         $this->documentBuilder->setDataObject($object, $metadata);
@@ -727,7 +727,7 @@ class JsonApiDocumentBuilderTest extends DocumentBuilderTestCase
             $this->createAssociationMetadata('category', 'Test\Category')
         );
         $association->setDataType('scalar');
-        $association->setCollapsed('scalar');
+        $association->setCollapsed(true);
         $association->getTargetMetadata()->removeField('id');
         $association->getTargetMetadata()->addField($this->createFieldMetadata('name'));
 
@@ -778,7 +778,7 @@ class JsonApiDocumentBuilderTest extends DocumentBuilderTestCase
             $this->createAssociationMetadata('categories', 'Test\Category', true)
         );
         $association->setDataType('array');
-        $association->setCollapsed('scalar');
+        $association->setCollapsed(true);
         $association->getTargetMetadata()->removeField('id');
         $association->getTargetMetadata()->addField($this->createFieldMetadata('name'));
 

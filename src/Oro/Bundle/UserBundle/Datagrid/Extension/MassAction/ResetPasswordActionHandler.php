@@ -80,7 +80,9 @@ class ResetPasswordActionHandler implements MassActionHandlerInterface
      */
     public function handle(MassActionHandlerArgs $args)
     {
+        // current user will be processed last
         $this->user = $this->getCurrentUser();
+        $user = null;
         $massActionOptions = $args->getMassAction()->getOptions();
 
         /** @var IterableResult $results */
@@ -101,7 +103,7 @@ class ResetPasswordActionHandler implements MassActionHandlerInterface
             }
 
             if ($this->user && $entity->getId() === $this->user->getId()) {
-                $this->user = $entity;
+                $user = $entity;
                 $results->next();
                 continue;
             }
@@ -111,7 +113,7 @@ class ResetPasswordActionHandler implements MassActionHandlerInterface
             $results->next();
         }
 
-        if (null !== $this->user) {
+        if (null !== $user) {
             $this->disableLoginAndNotify($this->user);
         }
 

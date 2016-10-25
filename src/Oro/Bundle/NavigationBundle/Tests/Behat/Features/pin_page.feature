@@ -59,8 +59,8 @@ Feature: Pin page
     And press "Create User"
     When I fill "User Form" with:
       | Username          | userName       |
-      | Password          | 123123q        |
-      | Re-Enter Password | 123123q        |
+      | Password          | 123123123Q        |
+      | Re-Enter Password | 123123123Q        |
       | First Name        | First Name     |
       | Last Name         | Last Name      |
       | Primary Email     | email@test.com |
@@ -84,8 +84,8 @@ Feature: Pin page
 
   Scenario: Save form and view pinned form
     Given I fill "User Form" with:
-      | Password          | 123123q |
-      | Re-Enter Password | 123123q |
+      | Password          | 123123123Q |
+      | Re-Enter Password | 123123123Q |
     And I save and close form
     And I should see "User saved" flash message
     When I follow Create User link in pin holder
@@ -98,8 +98,8 @@ Feature: Pin page
       | Last Name         | Last Name       |
       | Primary Email     | email@test.com  |
     And I fill "User Form" with:
-      | Password          | 123123q |
-      | Re-Enter Password | 123123q |
+      | Password          | 123123123Q |
+      | Re-Enter Password | 123123123Q |
     And I save and close form
     And I should be on User Create page
     And I should see "This value is already used."
