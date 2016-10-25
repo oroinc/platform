@@ -2,10 +2,9 @@
 
 namespace Oro\Bundle\FormBundle\Tests\Unit\Form\Type;
 
-use Oro\Bundle\FormBundle\Form\Type\EntityIdentifierType;
 use Oro\Bundle\FormBundle\Form\Type\EntityTreeSelectType;
+use Oro\Bundle\FormBundle\Tests\Unit\Form\Stub\EntityIdentifierType;
 use Oro\Bundle\FormBundle\Tests\Unit\Form\Stub\TestEntity;
-use Oro\Component\Testing\Unit\Form\Type\Stub\EntityIdentifierType as EntityIdentifierTypeStub;
 use Symfony\Component\Form\PreloadedExtension;
 use Symfony\Component\Form\Test\FormIntegrationTestCase;
 
@@ -28,7 +27,7 @@ class EntityTreeSelectTypeTest extends FormIntegrationTestCase
      */
     protected function getExtensions()
     {
-        $entityIdentifierType = new EntityIdentifierTypeStub(
+        $entityIdentifierType = new EntityIdentifierType(
             [
                 1 => new TestEntity(1)
             ]
@@ -37,7 +36,7 @@ class EntityTreeSelectTypeTest extends FormIntegrationTestCase
         return [
             new PreloadedExtension(
                 [
-                    EntityIdentifierType::NAME => $entityIdentifierType,
+                    $entityIdentifierType->getName() => $entityIdentifierType,
                 ],
                 []
             )
@@ -56,7 +55,7 @@ class EntityTreeSelectTypeTest extends FormIntegrationTestCase
 
     public function testGetParent()
     {
-        $this->assertEquals(EntityIdentifierType::NAME, $this->formType->getParent());
+        $this->assertEquals('oro_entity_identifier', $this->formType->getParent());
     }
 
     /**
@@ -85,6 +84,7 @@ class EntityTreeSelectTypeTest extends FormIntegrationTestCase
         return [
             'data array' => [
                 [
+                    'class' => TestEntity::class,
                     'tree_key' => 'test',
                     'tree_data' => []
                 ],
@@ -101,6 +101,7 @@ class EntityTreeSelectTypeTest extends FormIntegrationTestCase
             ],
             'data callback' => [
                 [
+                    'class' => TestEntity::class,
                     'tree_key' => 'test',
                     'tree_data' => function () {
                         return [];
@@ -119,6 +120,7 @@ class EntityTreeSelectTypeTest extends FormIntegrationTestCase
             ],
             'custom component' => [
                 [
+                    'class' => TestEntity::class,
                     'tree_key' => 'test',
                     'tree_data' => [],
                     'page_component_module' => 'myModule'
