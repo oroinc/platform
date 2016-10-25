@@ -4,6 +4,8 @@ namespace Oro\Bundle\DataGridBundle\Tests\Behat\Element;
 
 use Behat\Mink\Element\NodeElement;
 use Oro\Bundle\TestFrameworkBundle\Behat\Element\Element;
+use Oro\Bundle\TestFrameworkBundle\Behat\Element\InputMethod;
+use Oro\Bundle\TestFrameworkBundle\Behat\Element\InputValue;
 
 class DateTimePicker extends Element
 {
@@ -18,9 +20,12 @@ class DateTimePicker extends Element
         $this->getYearPicker()->selectOption($dateTime->format('Y'));
         $this->getCalendarDate($dateTime->format('j'))->click();
 
+        /** @var NodeElement $timePicker */
         $timePicker = $this->getTimePicker();
         $timePicker->click();
-        $timePicker->setValue($dateTime->format('H:i'));
+        $timePicker->setValue(
+            new InputValue(InputMethod::TYPE, $dateTime->format('H:i'))
+        );
         $this->clickSelectedTime();
     }
 
