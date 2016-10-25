@@ -6,8 +6,9 @@ use Symfony\Component\Console\Input\InputArgument;
 
 class DebugConditionCommand extends AbstractDebugCommand
 {
-    const ARGUMENT_NAME = 'condition-name';
     const COMMAND_NAME = 'oro:debug:condition';
+    const ARGUMENT_NAME = 'condition-name';
+    const FACTORY_SERVICE_ID = 'oro_action.expression.factory';
 
     /**
      * {@inheritdoc}
@@ -30,7 +31,7 @@ EOF
      */
     protected function getFactoryServiceId()
     {
-        return 'oro_action.expression.factory';
+        return self::FACTORY_SERVICE_ID;
     }
 
     /**
