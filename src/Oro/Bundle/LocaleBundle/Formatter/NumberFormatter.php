@@ -81,8 +81,8 @@ class NumberFormatter
 
         $formatter = $this->getFormatter($locale, \NumberFormatter::CURRENCY, $attributes, $textAttributes, $symbols);
 
-        $currencySymbol = $this->getSymbol(\NumberFormatter::CURRENCY_SYMBOL, \NumberFormatter::CURRENCY);
-        $currencyIntlSymbol = $this->getSymbol(\NumberFormatter::INTL_CURRENCY_SYMBOL, \NumberFormatter::CURRENCY);
+        $currencySymbol = $formatter->getSymbol(\NumberFormatter::CURRENCY_SYMBOL);
+        $currencyIntlSymbol = $formatter->getSymbol(\NumberFormatter::INTL_CURRENCY_SYMBOL);
         $localizedCurrencySymbol = $this->localeSettings->getCurrencySymbolByCurrency($currency);
 
         $formattedString = $formatter->formatCurrency($value, $currency);

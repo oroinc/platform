@@ -282,7 +282,7 @@ class OroNavigationExtensionTest extends \PHPUnit_Framework_TestCase
                     )
                 ),
                 'expectedTitles' => array(
-                    'orocrm_call_index' => 'Calls'
+                    'oro_call_index' => 'Calls'
                 )
             )
         );

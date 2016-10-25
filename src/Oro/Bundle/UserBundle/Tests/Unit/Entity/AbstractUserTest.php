@@ -52,10 +52,10 @@ class AbstractUserTest extends \PHPUnit_Framework_TestCase
         $user = $this->getUser();
         $requested = new \DateTime('-10 seconds');
 
-        $user->setPasswordRequestedAt($requested);
         $user->setPasswordRequestedAt(null);
+        $this->assertTrue($user->isPasswordRequestNonExpired(15));
 
-        $this->assertFalse($user->isPasswordRequestNonExpired(15));
+        $user->setPasswordRequestedAt($requested);
         $this->assertFalse($user->isPasswordRequestNonExpired(5));
     }
 

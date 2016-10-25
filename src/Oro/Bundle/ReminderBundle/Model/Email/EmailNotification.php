@@ -6,7 +6,7 @@ use Doctrine\Common\Persistence\ObjectManager;
 
 use Oro\Bundle\EmailBundle\Entity\EmailTemplate;
 use Oro\Bundle\EntityBundle\Provider\EntityNameResolver;
-use Oro\Bundle\NotificationBundle\Processor\SenderAwareEmailNotificationInterface;
+use Oro\Bundle\NotificationBundle\Model\SenderAwareEmailNotificationInterface;
 use Oro\Bundle\ReminderBundle\Entity\Reminder;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\ReminderBundle\Exception\InvalidArgumentException;

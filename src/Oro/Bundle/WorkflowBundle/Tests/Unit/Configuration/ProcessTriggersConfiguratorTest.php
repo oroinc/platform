@@ -5,6 +5,8 @@ namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Configuration;
 use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\Common\Persistence\ManagerRegistry;
 
+use Psr\Log\LoggerInterface;
+
 use Oro\Bundle\WorkflowBundle\Configuration\ProcessConfigurationBuilder;
 use Oro\Bundle\WorkflowBundle\Configuration\ProcessTriggersConfigurator;
 use Oro\Bundle\WorkflowBundle\Cron\ProcessTriggerCronScheduler;
@@ -38,6 +40,9 @@ class ProcessTriggersConfiguratorTest extends \PHPUnit_Framework_TestCase
     /** @var ObjectManager|\PHPUnit_Framework_MockObject_MockObject */
     protected $objectManager;
 
+    /** @var LoggerInterface|\PHPUnit_Framework_MockObject_MockObject */
+    protected $logger;
+
     protected function setUp()
     {
         $this->configurationBuilder = $this->getMock(
@@ -57,12 +62,16 @@ class ProcessTriggersConfiguratorTest extends \PHPUnit_Framework_TestCase
             ->getMock();
 
         $this->triggerEntityClass = 'Oro\Bundle\WorkflowBundle\Entity\ProcessTrigger';
+
+        $this->logger = $this->getMock(LoggerInterface::class);
+
         $this->processTriggersConfigurator = new ProcessTriggersConfigurator(
             $this->configurationBuilder,
             $this->processCronScheduler,
             $this->managerRegistry,
             $this->triggerEntityClass
         );
+        $this->processTriggersConfigurator->setLogger($this->logger);
     }
 
     public function testConfigureTriggers()
@@ -89,9 +98,11 @@ class ProcessTriggersConfiguratorTest extends \PHPUnit_Framework_TestCase
         /** @var ProcessTrigger|\PHPUnit_Framework_MockObject_MockObject $mockExistentTrigger */
         $mockExistentTrigger = $this->getMock($this->triggerEntityClass);
 
-        $nonExistentNewTrigger->setDefinition($definition);
+        $nonExistentNewTrigger->setDefinition($definition)->setCron('42 * * * *');
         $mockExistentTrigger->expects($this->once())->method('import')->with($existentNewTrigger);
         $mockExistentTrigger->expects($this->once())->method('isDefinitiveEqual')->willReturn(true);
+        $mockExistentTrigger->expects($this->any())->method('getDefinition')->willReturn($definition);
+        $mockExistentTrigger->expects($this->any())->method('getCron')->willReturn('43 * * * *');
 
         $mockUnaffectedTrigger = $this->getMock($this->triggerEntityClass);
         $mockUnaffectedTrigger->expects($this->any())->method('isDefinitiveEqual')->willReturn(false);
@@ -102,6 +113,19 @@ class ProcessTriggersConfiguratorTest extends \PHPUnit_Framework_TestCase
         //delete unaffected
         $mockUnaffectedTrigger->expects($this->any())->method('getCron')->willReturn('string'); //in dropSchedule
         $this->processCronScheduler->expects($this->once())->method('removeSchedule')->with($mockUnaffectedTrigger);
+
+        $this->logger->expects($this->at(0))
+            ->method('info')
+            ->with(
+                '>> process trigger: {definition_name} [{type}] - {action}',
+                ['definition_name' => 'definition_name', 'action' => 'updated', 'type' => 'cron:43 * * * *']
+            );
+        $this->logger->expects($this->at(1))
+            ->method('info')
+            ->with(
+                '>> process trigger: {definition_name} [{type}] - {action}',
+                ['definition_name' => 'definition_name', 'action' => 'created', 'type' => 'cron:42 * * * *']
+            );
 
         $this->processTriggersConfigurator->configureTriggers($triggersConfiguration, $definitions);
 
@@ -118,12 +142,19 @@ class ProcessTriggersConfiguratorTest extends \PHPUnit_Framework_TestCase
 
         $definition = (new ProcessDefinition())->setName('definition_name');
 
-        $trigger = (new ProcessTrigger())->setCron('42 * * * *');
+        $trigger = (new ProcessTrigger())->setCron('42 * * * *')->setDefinition($definition);
 
         $this->repository->expects($this->once())->method('findByDefinitionName')->with('definition_name')
             ->willReturn([$trigger]);
 
         $this->processCronScheduler->expects($this->once())->method('removeSchedule')->with($trigger);
+
+        $this->logger->expects($this->once())
+            ->method('info')
+            ->with(
+                '>> process trigger: {definition_name} [{type}] - {action}',
+                ['definition_name' => $definition->getName(), 'action' => 'deleted', 'type' => 'cron:42 * * * *']
+            );
 
         $this->processTriggersConfigurator->removeDefinitionTriggers($definition);
 
@@ -150,7 +181,6 @@ class ProcessTriggersConfiguratorTest extends \PHPUnit_Framework_TestCase
         } else {
             $this->objectManager->expects($this->never())->method('flush');
         }
-
 
         $this->processTriggersConfigurator->flush();
 
@@ -199,6 +229,10 @@ class ProcessTriggersConfiguratorTest extends \PHPUnit_Framework_TestCase
         $this->objectManager->expects($this->once())->method('flush');
         $this->processCronScheduler->expects($this->once())->method('flush');
 
+        $this->logger->expects($this->once())
+            ->method('info')
+            ->with('>> process triggers modifications stored in DB');
+
         $this->processTriggersConfigurator->flush();
     }
 
@@ -214,6 +248,10 @@ class ProcessTriggersConfiguratorTest extends \PHPUnit_Framework_TestCase
         $this->objectManager->expects($this->once())->method('persist')->with($trigger);
         $this->objectManager->expects($this->once())->method('flush');
         $this->processCronScheduler->expects($this->once())->method('flush');
+
+        $this->logger->expects($this->once())
+            ->method('info')
+            ->with('>> process triggers modifications stored in DB');
 
         $this->processTriggersConfigurator->flush();
     }

@@ -120,7 +120,7 @@ For the functional tests we recommend to call `parent::tearDown()` when `tearDow
 | oro_workflow.action.format_name | Oro\Bundle\WorkflowBundle\Model\Action\FormatName |
 | orocrm_account.form.type.account | OroCRM\Bundle\AccountBundle\Form\Type\AccountType |
 | orocrm_account.form.type.account.api | OroCRM\Bundle\AccountBundle\Form\Type\AccountApiType |
-| orocrm_case.view_factory | OroCRM\Bundle\CaseBundle\Model\ViewFactory |
+| orocrm_case.view_factory | Oro\Bundle\CaseBundle\Model\ViewFactory |
 - Added [Query Hint Resolver](./src/Oro/Bundle/EntityBundle/Resources/doc/query_hint_resolver.md)
 - Removed `Oro\Bundle\EntityBundle\ORM\EntityConfigAwareRepositoryInterface` interface
 - Removed `Oro\Bundle\EntityBundle\ORM\Query\FilterCollection` class and `oro_entity.orm.sql_filter` DIC tag

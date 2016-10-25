@@ -8,7 +8,7 @@ define([
      * Init Widget Manager's handlers and listeners
      */
     BaseController.loadBeforeAction([
-        'oroui/js/widget-manager'
+        'oroui/js/widget-manager', 'oroui/js/standart-confirmation'
     ], function(manager) {
         mediator.setHandler('widgets:getByIdAsync', manager.getWidgetInstance, manager);
         mediator.setHandler('widgets:getByAliasAsync', manager.getWidgetInstanceByAlias, manager);

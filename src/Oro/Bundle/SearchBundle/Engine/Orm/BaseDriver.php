@@ -461,16 +461,10 @@ abstract class BaseDriver
         $criteria = $query->getCriteria();
 
         $whereExpression = $criteria->getWhereExpression();
-        if (!$whereExpression) {
-            return;
+        if ($whereExpression) {
+            $visitor = new OrmExpressionVisitor($this, $qb, $setOrderBy);
+            $qb->andWhere($visitor->dispatch($whereExpression));
         }
-        $visitor = new OrmExpressionVisitor($this, $qb, $setOrderBy);
-        $expressionString = $visitor->dispatch($whereExpression);
-
-        $whereExpression instanceof CompositeExpression &&
-        self::EXPRESSION_TYPE_OR === $whereExpression->getType() ?
-            $qb->orWhere($expressionString) :
-            $qb->andWhere($expressionString);
     }
 
     /**
@@ -535,19 +529,21 @@ abstract class BaseDriver
                 );
         }
 
-        $subIndex     = $this->getUniqueId();
-        $subJoinField = sprintf('filter.%sFields', $type);
-        $subJoinAlias = $this->getJoinAlias($type, $subIndex);
+        // @todo to be tested in scope of BB-4508
+        $subIndex      = $this->getUniqueId();
+        $subQueryAlias = sprintf('filter%s', $subIndex);
+        $subJoinField  = sprintf('%s.%sFields', $subQueryAlias, $type);
+        $subJoinAlias  = $this->getJoinAlias($type, $subIndex);
 
         $subQb = $this->em->createQueryBuilder()
-            ->select('filter.id')
-            ->from($this->entityName, 'filter')
+            ->select(sprintf('%s.id', $subQueryAlias))
+            ->from($this->entityName, $subQueryAlias)
             ->join($subJoinField, $subJoinAlias)
             ->andWhere(sprintf(
-                           '%s.field = :field%s',
-                           $subJoinAlias,
-                           $index
-                       ));
+                '%s.field = :field%s',
+                $subJoinAlias,
+                $index
+            ));
 
         $queryString = '(search.id %s (%s))';
 
