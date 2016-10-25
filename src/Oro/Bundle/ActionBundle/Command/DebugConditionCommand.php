@@ -4,8 +4,6 @@ namespace Oro\Bundle\ActionBundle\Command;
 
 use Symfony\Component\Console\Input\InputArgument;
 
-use Oro\Component\ConfigExpression\ExpressionFactory;
-
 class DebugConditionCommand extends AbstractDebugCommand
 {
     const ARGUMENT_NAME = 'condition-name';
@@ -23,7 +21,6 @@ class DebugConditionCommand extends AbstractDebugCommand
 The <info>%command.name%</info> displays list of all conditions with full description:
 
   <info>php %command.full_name%</info>
-
 EOF
             );
     }
