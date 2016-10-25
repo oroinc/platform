@@ -45,4 +45,24 @@ class ValidateRequestData extends BaseProcessor
 
         return true;
     }
+
+    /**
+     * @param array  $data
+     * @param string $pointer
+     */
+    protected function validateAttributesOrRelationshipsExist(array $data, $pointer)
+    {
+        if (!array_key_exists(JsonApiDoc::ATTRIBUTES, $data)
+            && !array_key_exists(JsonApiDoc::RELATIONSHIPS, $data)
+        ) {
+            $this->addError(
+                $pointer,
+                sprintf(
+                    'The primary data object should contain \'%s\' or \'%s\' block',
+                    JsonApiDoc::ATTRIBUTES,
+                    JsonApiDoc::RELATIONSHIPS
+                )
+            );
+        }
+    }
 }
