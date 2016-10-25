@@ -56,10 +56,12 @@ define(function(require) {
         /**
          * @inheritDoc
          */
-        initComponent: function() {
+        render: function() {
+            ActionComponentDropdownLauncher.__super__.render.call(this);
             this.componentOptions._sourceElement = this.$('.dropdown-menu');
             var Component = this.componentConstructor;
             this.component = new Component(this.componentOptions);
+            return this;
         },
 
         /**
@@ -92,8 +94,8 @@ define(function(require) {
          * Handles dropdown menu open and sets max-width for the element
          */
         onOpen: function() {
-            if (!this.component) {
-                this.initComponent();
+            if (_.isFunction(this.component.updateViews)) {
+                this.component.updateViews();
             }
             var $dropdownMenu = this.$('>.dropdown-menu');
             if ($dropdownMenu.length) {
@@ -105,9 +107,6 @@ define(function(require) {
             var $elem = this.$('.dropdown-menu');
             // focus input after Bootstrap opened dropdown menu
             $elem.focusFirstInput();
-            if (_.isFunction(this.component.updateViews)) {
-                this.component.updateViews();
-            }
         },
 
         /**

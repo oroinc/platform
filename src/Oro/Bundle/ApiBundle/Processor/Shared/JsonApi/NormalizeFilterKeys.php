@@ -53,7 +53,7 @@ class NormalizeFilterKeys implements ProcessorInterface
             $filterCollection->remove($filterKey);
             if ($filter instanceof ComparisonFilter && $filter->getField() === $idFieldName) {
                 $filterKey = 'id';
-                $filter->setDescription('The identifier of an entity');
+                $filter->setDescription('Filter records by the identifier field');
             }
             $filterCollection->add(
                 sprintf(self::FILTER_KEY_TEMPLATE, $filterKey),

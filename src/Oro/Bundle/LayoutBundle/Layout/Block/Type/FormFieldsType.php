@@ -97,7 +97,6 @@ class FormFieldsType extends AbstractFormType
     {
         BlockUtils::setViewVarsFromOptions($view, $options, ['form_data', 'split_to_fields']);
         parent::buildView($view, $block, $options);
-
     }
 
     /**

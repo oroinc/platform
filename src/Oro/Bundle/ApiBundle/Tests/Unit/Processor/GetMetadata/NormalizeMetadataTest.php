@@ -341,7 +341,8 @@ class NormalizeMetadataTest extends MetadataProcessorTestCase
         $expectedMetadata->addAssociation(
             $this->createAssociationMetadata('association3', 'Test\Association3Target')
         );
-        $expectedMetadata->addField($this->createFieldMetadata('field5', 'string'));
+        $expectedField5 = $expectedMetadata->addField($this->createFieldMetadata('field5', 'string'));
+        $expectedField5->setPropertyPath('field511');
         $expectedAssociation4 = $this->createAssociationMetadata(
             'association4',
             'Test\Association411Target',
@@ -350,6 +351,7 @@ class NormalizeMetadataTest extends MetadataProcessorTestCase
             'integer',
             ['Test\Association411Target']
         );
+        $expectedAssociation4->setPropertyPath('association411');
         $expectedAssociation4->setIsNullable(true);
         $expectedAssociation4->setTargetMetadata($association411TargetMetadata);
         $expectedMetadata->addAssociation($expectedAssociation4);
@@ -473,6 +475,7 @@ class NormalizeMetadataTest extends MetadataProcessorTestCase
             'integer',
             ['Test\Association11Target']
         );
+        $expectedLinkedAssociation1->setPropertyPath('realAssociation11');
         $expectedLinkedAssociation1->setIsNullable(true);
         $expectedLinkedAssociation1->setTargetMetadata($association11TargetMetadata);
         $expectedMetadata->addAssociation($expectedLinkedAssociation1);
@@ -597,6 +600,7 @@ class NormalizeMetadataTest extends MetadataProcessorTestCase
             ['Test\Association11Target'],
             true
         );
+        $expectedLinkedAssociation1->setPropertyPath('realAssociation11');
         $expectedLinkedAssociation1->setIsNullable(true);
         $expectedLinkedAssociation1->setTargetMetadata($association11TargetMetadata);
         $expectedMetadata->addAssociation($expectedLinkedAssociation1);

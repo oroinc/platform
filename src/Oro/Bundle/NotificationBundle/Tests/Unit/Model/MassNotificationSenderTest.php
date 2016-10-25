@@ -2,11 +2,16 @@
 
 namespace Oro\Bundle\NotificationBundle\Tests\Unit\Model;
 
+use Doctrine\ORM\EntityManager;
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
+use Oro\Bundle\EmailBundle\Entity\Repository\EmailTemplateRepository;
 use Oro\Bundle\EmailBundle\Model\EmailTemplateInterface;
-use Oro\Bundle\NotificationBundle\Processor\EmailNotificationProcessor;
+use Oro\Bundle\LocaleBundle\DQL\DQLNameFormatter;
+use Oro\Bundle\NotificationBundle\Doctrine\EntityPool;
+use Oro\Bundle\NotificationBundle\Manager\EmailNotificationManager;
 use Oro\Bundle\NotificationBundle\Model\MassNotification;
 use Oro\Bundle\NotificationBundle\Model\MassNotificationSender;
+use Oro\Bundle\UserBundle\Entity\Repository\UserRepository;
 
 class MassNotificationSenderTest extends \PHPUnit_Framework_TestCase
 {
@@ -29,8 +34,8 @@ class MassNotificationSenderTest extends \PHPUnit_Framework_TestCase
     /** @var \PHPUnit_Framework_MockObject_MockObject|ConfigManager */
     protected $cm;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|EmailNotificationProcessor */
-    protected $processor;
+    /** @var \PHPUnit_Framework_MockObject_MockObject|EmailNotificationManager */
+    protected $manager;
 
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $dqlNameFormatter;
@@ -43,31 +48,31 @@ class MassNotificationSenderTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->entityManager = $this->getMockBuilder('Doctrine\ORM\EntityManager')
+        $this->entityManager = $this->getMockBuilder(EntityManager::class)
             ->disableOriginalConstructor()->setMethods(['getRepository'])->getMock();
 
-        $this->userRepository = $this->getMockBuilder('Oro\Bundle\UserBundle\Entity\Repository\UserRepository')
+        $this->userRepository = $this->getMockBuilder(UserRepository::class)
                     ->disableOriginalConstructor()->getMock();
 
         $this->templateRepository =
-            $this->getMockBuilder('Oro\Bundle\EmailBundle\Entity\Repository\EmailTemplateRepository')
+            $this->getMockBuilder(EmailTemplateRepository::class)
                     ->disableOriginalConstructor()->getMock();
 
-        $this->entityPool = $this->getMockBuilder('Oro\Bundle\NotificationBundle\Doctrine\EntityPool')
+        $this->entityPool = $this->getMockBuilder(EntityPool::class)
             ->disableOriginalConstructor()->getMock();
 
-        $this->cm = $this->getMockBuilder('Oro\Bundle\ConfigBundle\Config\ConfigManager')
+        $this->cm = $this->getMockBuilder(ConfigManager::class)
             ->disableOriginalConstructor()->getMock();
 
-        $this->dqlNameFormatter = $this->getMockBuilder('Oro\Bundle\LocaleBundle\DQL\DQLNameFormatter')
+        $this->dqlNameFormatter = $this->getMockBuilder(DQLNameFormatter::class)
             ->disableOriginalConstructor()->getMock();
 
-        $this->processor = $this->getMockBuilder('Oro\Bundle\NotificationBundle\Processor\EmailNotificationProcessor')
+        $this->manager = $this->getMockBuilder(EmailNotificationManager::class)
             ->disableOriginalConstructor()
             ->getMock();
 
         $this->sender = new MassNotificationSender(
-            $this->processor,
+            $this->manager,
             $this->cm,
             $this->entityManager,
             $this->entityPool,
@@ -80,7 +85,7 @@ class MassNotificationSenderTest extends \PHPUnit_Framework_TestCase
         unset($this->entityManager);
         unset($this->cm);
         unset($this->entityPool);
-        unset($this->processor);
+        unset($this->manager);
         unset($this->sender);
         unset($this->templateRepository);
         unset($this->userRepository);
@@ -159,16 +164,12 @@ class MassNotificationSenderTest extends \PHPUnit_Framework_TestCase
             'template_content' => 'test content',
             'template_subject' => $subject
         ];
-        $this->processor->expects($this->once())->method('process')->with(
+        $this->manager->expects($this->once())->method('process')->with(
             null,
             $this->callback([$this, 'assertMassNotification']),
             null,
             [MassNotificationSender::MAINTENANCE_VARIABLE => $body]
         );
-
-        $this->processor->expects($this->once())->method('setMessageLimit')->with(0);
-        $this->processor->expects($this->once())->method('addLogType')
-                    ->with(MassNotificationSender::NOTIFICATION_LOG_TYPE);
 
         $this->entityPool->expects($this->once())->method('persistAndFlush')->with($this->entityManager);
 
@@ -205,7 +206,7 @@ class MassNotificationSenderTest extends \PHPUnit_Framework_TestCase
             'template_content' => sprintf("{{ %s }}", MassNotificationSender::MAINTENANCE_VARIABLE),
             'template_subject' => $subject
         ];
-        $this->processor->expects($this->once())->method('process')->with(
+        $this->manager->expects($this->once())->method('process')->with(
             null,
             $this->callback([$this, 'assertMassNotification']),
             null,

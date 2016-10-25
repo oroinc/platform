@@ -1,0 +1,4 @@
+assets:
+    css:
+        'orocurrency':
+            - 'bundles/orocurrency/css/less/main.less'

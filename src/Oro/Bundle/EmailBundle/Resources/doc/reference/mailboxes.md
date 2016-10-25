@@ -170,7 +170,7 @@ class LeadMailboxProcessProvider implements MailboxProcessProviderInterface
      */
     public function getSettingsEntityFQCN()
     {
-        return 'OroCRM\Bundle\SalesBundle\Entity\LeadMailboxProcessSettings';
+        return 'Oro\Bundle\SalesBundle\Entity\LeadMailboxProcessSettings';
     }
 
     /**
@@ -180,7 +180,7 @@ class LeadMailboxProcessProvider implements MailboxProcessProviderInterface
      */
     public function getSettingsFormType()
     {
-        return 'orocrm_sales_lead_mailbox_process_settings';
+        return 'oro_sales_lead_mailbox_process_settings';
     }
 
     /**
@@ -190,7 +190,7 @@ class LeadMailboxProcessProvider implements MailboxProcessProviderInterface
      */
     public function getLabel()
     {
-        return 'orocrm.sales.mailbox.process.lead.label';
+        return 'oro.sales.mailbox.process.lead.label';
     }
 }
 
@@ -199,8 +199,8 @@ class LeadMailboxProcessProvider implements MailboxProcessProviderInterface
 Example provider registration:
 
 ```yaml
-orocrm_sales.provider.mailbox_process.lead:
-    class: %orocrm_sales.provider.mailbox_process.lead.class%
+oro_sales.provider.mailbox_process.lead:
+    class: %oro_sales.provider.mailbox_process.lead.class%
     tags:
         - { name: oro_email.mailbox_process, type: lead }
 ```

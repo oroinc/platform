@@ -1,0 +1,4 @@
+pages:
+  Admin Dashboard:
+    class: Oro\Bundle\DashboardBundle\Tests\Behat\Page\AdminDashboard
+    route: oro_default

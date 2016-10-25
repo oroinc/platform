@@ -2,11 +2,12 @@
 
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Handler;
 
-use Exception;
+use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
 use Oro\Bundle\WorkflowBundle\Exception\ForbiddenTransitionException;
 use Oro\Bundle\WorkflowBundle\Exception\InvalidTransitionException;
 use Oro\Bundle\WorkflowBundle\Exception\WorkflowNotFoundException;
 use Oro\Bundle\WorkflowBundle\Handler\TransitionHandler;
+use Oro\Bundle\WorkflowBundle\Model\Transition;
 
 class TransitionHandlerTest extends \PHPUnit_Framework_TestCase
 {
@@ -55,6 +56,9 @@ class TransitionHandlerTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @dataProvider handleErrorProvider
+     *
+     * @param \Exception $exception
+     * @param int $expectedResponseCode
      */
     public function testHandleError($exception, $expectedResponseCode)
     {
@@ -64,7 +68,18 @@ class TransitionHandlerTest extends \PHPUnit_Framework_TestCase
 
         $this->logger
             ->expects($this->once())
-            ->method('error');
+            ->method('error')
+            ->willReturnCallback(
+                function ($message, array $context) {
+                    $this->assertEquals('[TransitionHandler] Could not perform transition.', $message);
+                    $this->assertArrayHasKey('exception', $context);
+                    $this->assertInstanceOf(\Exception::class, $context['exception']);
+                    $this->assertArrayHasKey('transition', $context);
+                    $this->assertInstanceOf(Transition::class, $context['transition']);
+                    $this->assertArrayHasKey('workflowItem', $context);
+                    $this->assertInstanceOf(WorkflowItem::class, $context['workflowItem']);
+                }
+            );
 
         $this->transitionHelper
             ->expects($this->once())
@@ -83,6 +98,9 @@ class TransitionHandlerTest extends \PHPUnit_Framework_TestCase
         $this->transitionHandler->handle($this->transition, $this->workflowItem);
     }
 
+    /**
+     * @return array
+     */
     public function handleErrorProvider()
     {
         return [
@@ -99,7 +117,7 @@ class TransitionHandlerTest extends \PHPUnit_Framework_TestCase
                 403,
             ],
             '500' => [
-                new Exception,
+                new \Exception,
                 500,
             ],
         ];
@@ -107,6 +125,11 @@ class TransitionHandlerTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @dataProvider transitionMethodsProvider
+     * @param string $dialogTemplate
+     * @param string $pageTemplate
+     * @param \PHPUnit_Framework_MockObject_Matcher_Invocation $managerExpect
+     * @param \PHPUnit_Framework_MockObject_Matcher_Invocation $loggerExpect
+     * @param \PHPUnit_Framework_MockObject_Matcher_Invocation $helperExpect
      */
     public function testHandle($dialogTemplate, $pageTemplate, $managerExpect, $loggerExpect, $helperExpect)
     {
@@ -133,6 +156,9 @@ class TransitionHandlerTest extends \PHPUnit_Framework_TestCase
         $this->transitionHandler->handle($this->transition, $this->workflowItem);
     }
 
+    /**
+     * @return array
+     */
     public function transitionMethodsProvider()
     {
         return [
