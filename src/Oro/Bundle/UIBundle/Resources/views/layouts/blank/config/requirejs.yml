@@ -32,13 +32,13 @@ config:
         'oroui/js/tools':
             'chaplin': 'chaplin'
     paths:
-        'json': 'bundles/oroui/lib/json2.js'
+        'json': 'bundles/bowerassets/json2/json2.js'
         'jquery': 'bundles/components/jquery/jquery.js'
         'jquery-ui': 'bundles/oroui/lib/jquery-ui-1.11.2.js'
         'bootstrap': 'bundles/oroui/lib/bootstrap.min.js'
         'underscore': 'bundles/components/underscore/underscore.js'
         'backbone': 'bundles/components/backbone/backbone.js'
-        'chaplin': 'bundles/oroui/lib/chaplin-1.0.0.js'
+        'chaplin': 'bundles/bowerassets/chaplin/chaplin.js'
 
         'controllers/page-controller': 'bundles/oroui/js/app/controllers/page-controller.js'
 

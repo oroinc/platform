@@ -27,7 +27,12 @@
             </script>
             {% if error %}
                 <div class="alert alert-error">
-                    <div>{{ error.messageKey|trans(error.messageData, 'security') }}</div>
+                    <div>
+                        {{ error.messageKey|trans(error.messageData, 'security') }}
+                        {% if remaining_attempts is not null %}
+                            {{ 'oro.user.security.remaining_login_attempts'|transchoice(remaining_attempts, {'%count%': remaining_attempts}) }}
+                        {% endif %}
+                    </div>
                 </div>
             {% endif %}
             {{ messagesContent }}

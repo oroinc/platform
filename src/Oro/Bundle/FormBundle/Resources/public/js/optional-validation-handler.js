@@ -3,18 +3,47 @@ define(['jquery'], function($) {
 
     /**
      * @export  oroform/js/optional-validation-handler
-     * @class   oroform.optionalValidationHandler
+     * @class   OptionalValidationHandler
      */
     return {
         /**
-         * @param {jQuery} group
+         * @param  {jQuery}  $group Optional validation elements group
+         */
+        initialize: function($group) {
+            var self = this;
+
+            var labels = this.getGroupElements($group, $group.find('label[data-required]'));
+            labels.addClass('required');
+
+            var labelAsterisk = labels.find('em');
+            labelAsterisk.hide().html('*');
+            if (self.hasNotEmptyDescendantGroup($group) ||
+                self.hasNotEmptyInput($group) ||
+                self.hasNotEmptySelect($group)) {
+                labelAsterisk.show();
+
+                $group.data('group-validation-required', true);
+            }
+        },
+
+        /**
+         * @param {jQuery} $group
          * @returns {boolean}
          */
-        hasNotEmptyInput: function(group) {
-            var elementsSelector = 'input[type!="checkbox"][type!="radio"][type!="button"][data-required],' +
+        hasNotEmptyDescendantGroup: function($group) {
+            return $group.find('[data-validation-optional-group][data-group-validation-required]').length > 0;
+        },
+
+        /**
+         * @param {jQuery} $group
+         * @returns {boolean}
+         */
+        hasNotEmptyInput: function($group) {
+            var elementsSelector = 'textarea, input[type!="checkbox"][type!="radio"][type!="button"][data-required],' +
                 ' input[type="radio"][data-required]:checked,' +
                 ' input[type="checkbox"][data-required]:checked';
-            var checkedElements = group.find(elementsSelector);
+
+            var checkedElements = this.getGroupElements($group, $group.find(elementsSelector));
             for (var i = 0; i < checkedElements.length; i++) {
                 if (!this.isValueEmpty($(checkedElements[i]).val())) {
                     return true;
@@ -25,11 +54,11 @@ define(['jquery'], function($) {
         },
 
         /**
-         * @param {jQuery} group
+         * @param {jQuery} $group
          * @returns {boolean}
          */
-        hasNotEmptySelect: function(group) {
-            var elements = group.find('select[data-required]');
+        hasNotEmptySelect: function($group) {
+            var elements = this.getGroupElements($group, $group.find('select'));
             for (var i = 0; i < elements.length; i++) {
                 if (!this.isValueEmpty($(elements[i]).find('option:selected').val())) {
                     return true;
@@ -37,6 +66,61 @@ define(['jquery'], function($) {
             }
 
             return false;
+        },
+
+        /**
+         * @param  {jQuery}  $group   Optional validation elements group
+         * @param  {jQuery}  $element Changed Element
+         *
+         * @return {boolean} Should parent OptionalValidationHandler be called
+         */
+        handle: function($group, $element) {
+            var tagName = $element.prop('tagName').toLowerCase();
+
+            switch (tagName) {
+                case 'select':
+                    this.selectHandler($group, $element);
+                    break;
+                case 'textarea':
+                case 'input':
+                    this.inputHandler($group, $element);
+                    break;
+            }
+
+            return true;
+        },
+
+        /**
+         * @param {jQuery} $group   Optional validation elements group
+         * @param {jQuery} $element Changed Element
+         */
+        inputHandler: function($group, $element) {
+            this.handleGroupRequire($group, $element.val());
+        },
+
+        /**
+         * @param {jQuery} $group   Optional validation elements group
+         * @param {jQuery} $element Changed Element
+         */
+        selectHandler: function($group, $element) {
+            this.handleGroupRequire($group, $element.find('option:selected').val());
+        },
+
+        /**
+         * @param {jQuery}           $group Optional validation elements group
+         * @param {string|undefined} value  Changed Element value
+         */
+        handleGroupRequire: function($group, value) {
+            if (this.isValueEmpty(value)) {
+                $group.find('label[data-required] em').hide();
+                this.clearValidationErrorsAndDisableValidation($group);
+                $group.data('group-validation-required', false);
+            } else {
+                $group.find('label[data-required] em').show();
+                var inputs = this.getGroupElements($group, $group.find('input, select, textarea'));
+                inputs.data('ignore-validation', false);
+                $group.data('group-validation-required', true);
+            }
         },
 
         /**
@@ -49,60 +133,31 @@ define(['jquery'], function($) {
         },
 
         /**
-         * @param {jQuery} element
-         * @param {string|undefined} value
+         * @param {jQuery} $group
          */
-        handleGroupRequire: function(element, value) {
-            var group = element.parents('[data-validation-optional-group]');
-
-            if (this.isValueEmpty(value)) {
-                if (!this.hasNotEmptyInput(group) && !this.hasNotEmptySelect(group)) {
-                    group.find('label[data-required] em').hide();
+        clearValidationErrorsAndDisableValidation: function($group) {
+            var validator = $group.validate();
+            var inputs = this.getGroupElements($group, $group.find('input, select, textarea'));
+            inputs.data('ignore-validation', true);
+            inputs.each(
+                function(key, element) {
+                    validator.hideElementErrors($(element));
                 }
-            } else {
-                group.find('label[data-required] em').show();
-            }
+            );
         },
 
         /**
-         * @param {jQuery} element
+         * @param {jQuery} $group
+         * @param {jQuery} $elements
+         *
+         * @return {jQuery}
          */
-        inputHandler: function(element) {
-            this.handleGroupRequire(element, element.val());
-        },
-
-        /**
-         * @param {jQuery} element
-         */
-        selectHandler: function(element) {
-            this.handleGroupRequire(element, element.find('option:selected').val());
-        },
-
-        /**
-         * @constructor
-         */
-        initialize: function(formElement) {
-            var self = this;
-
-            var groups = formElement.find('[data-validation-optional-group]');
-            var labels = groups.find('label[data-required]');
-
-            labels.find('em').hide().html('*');
-            labels.addClass('required');
-
-            groups.on('change', 'input', function() {
-                self.inputHandler($(this));
-            });
-            groups.on('change', 'select', function() {
-                self.selectHandler($(this));
+        getGroupElements: function($group, $elements) {
+            $elements.filter(function(key, element) {
+                return $(element).closest('[data-validation-optional-group]').get(0) === $group.get(0);
             });
 
-            groups.each(function(index, group) {
-                group = $(group);
-                if (self.hasNotEmptyInput(group) || self.hasNotEmptySelect(group)) {
-                    group.find('label[data-required] em').show();
-                }
-            });
+            return $elements;
         }
     };
 });

@@ -16,6 +16,7 @@ class SuiteController implements Controller
      * @var SuiteRegistry
      */
     private $registry;
+
     /**
      * @var array
      */

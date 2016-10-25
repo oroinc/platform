@@ -130,11 +130,15 @@ class BuildFormBuilderTest extends FormProcessorTestCase
 
         $metadata = new EntityMetadata();
         $metadata->addField($this->createFieldMetadata('field1'));
-        $metadata->addField($this->createFieldMetadata('field2'));
-        $metadata->addField($this->createFieldMetadata('field3'));
+        $metadata->addField($this->createFieldMetadata('field2'))
+            ->setPropertyPath('realField2');
+        $metadata->addField($this->createFieldMetadata('field3'))
+            ->setPropertyPath('realField3');
         $metadata->addAssociation($this->createAssociationMetadata('association1'));
-        $metadata->addAssociation($this->createAssociationMetadata('association2'));
-        $metadata->addAssociation($this->createAssociationMetadata('association3'));
+        $metadata->addAssociation($this->createAssociationMetadata('association2'))
+            ->setPropertyPath('realAssociation2');
+        $metadata->addAssociation($this->createAssociationMetadata('association3'))
+            ->setPropertyPath('realAssociation3');
 
         $this->formFactory->expects($this->once())
             ->method('createNamedBuilder')
@@ -209,7 +213,53 @@ class BuildFormBuilderTest extends FormProcessorTestCase
         $formBuilder = $this->getMock('Symfony\Component\Form\FormBuilderInterface');
 
         $config = new EntityDefinitionConfig();
-        $config->addField('field1')->setPropertyPath(ConfigUtil::IGNORE_PROPERTY_PATH);
+        $config->addField('field1')
+            ->setPropertyPath(ConfigUtil::IGNORE_PROPERTY_PATH);
+
+        $metadata = new EntityMetadata();
+        $metadata->addField($this->createFieldMetadata('field1'))
+            ->setPropertyPath(ConfigUtil::IGNORE_PROPERTY_PATH);
+
+        $this->formFactory->expects($this->once())
+            ->method('createNamedBuilder')
+            ->with(
+                null,
+                'form',
+                $data,
+                [
+                    'data_class'           => $entityClass,
+                    'validation_groups'    => ['Default', 'api'],
+                    'extra_fields_message' => 'This form should not contain extra fields: "{{ extra_fields }}"',
+                    'api_context'          => $this->context
+                ]
+            )
+            ->willReturn($formBuilder);
+
+        $formBuilder->expects($this->once())
+            ->method('add')
+            ->with(
+                'field1',
+                null,
+                ['mapped' => false]
+            );
+
+        $this->context->setClassName($entityClass);
+        $this->context->setConfig($config);
+        $this->context->setMetadata($metadata);
+        $this->context->setResult($data);
+        $this->processor->process($this->context);
+        $this->assertSame($formBuilder, $this->context->getFormBuilder());
+    }
+
+    public function testProcessForFieldIgnoredOnlyForGetActions()
+    {
+        $entityClass = 'Test\Entity';
+        $data = new \stdClass();
+        $formBuilder = $this->getMock('Symfony\Component\Form\FormBuilderInterface');
+
+        $config = new EntityDefinitionConfig();
+        $config->addField('field1')
+            ->setPropertyPath(ConfigUtil::IGNORE_PROPERTY_PATH);
 
         $metadata = new EntityMetadata();
         $metadata->addField($this->createFieldMetadata('field1'));
@@ -234,7 +284,96 @@ class BuildFormBuilderTest extends FormProcessorTestCase
             ->with(
                 'field1',
                 null,
+                []
+            );
+
+        $this->context->setClassName($entityClass);
+        $this->context->setConfig($config);
+        $this->context->setMetadata($metadata);
+        $this->context->setResult($data);
+        $this->processor->process($this->context);
+        $this->assertSame($formBuilder, $this->context->getFormBuilder());
+    }
+
+    public function testProcessForIgnoredAssociation()
+    {
+        $entityClass = 'Test\Entity';
+        $data = new \stdClass();
+        $formBuilder = $this->getMock('Symfony\Component\Form\FormBuilderInterface');
+
+        $config = new EntityDefinitionConfig();
+        $config->addField('association1')
+            ->setPropertyPath(ConfigUtil::IGNORE_PROPERTY_PATH);
+
+        $metadata = new EntityMetadata();
+        $metadata->addAssociation($this->createAssociationMetadata('association1'))
+            ->setPropertyPath(ConfigUtil::IGNORE_PROPERTY_PATH);
+
+        $this->formFactory->expects($this->once())
+            ->method('createNamedBuilder')
+            ->with(
+                null,
+                'form',
+                $data,
+                [
+                    'data_class'           => $entityClass,
+                    'validation_groups'    => ['Default', 'api'],
+                    'extra_fields_message' => 'This form should not contain extra fields: "{{ extra_fields }}"',
+                    'api_context'          => $this->context
+                ]
+            )
+            ->willReturn($formBuilder);
+
+        $formBuilder->expects($this->once())
+            ->method('add')
+            ->with(
+                'association1',
+                null,
                 ['mapped' => false]
+            );
+
+        $this->context->setClassName($entityClass);
+        $this->context->setConfig($config);
+        $this->context->setMetadata($metadata);
+        $this->context->setResult($data);
+        $this->processor->process($this->context);
+        $this->assertSame($formBuilder, $this->context->getFormBuilder());
+    }
+
+    public function testProcessForAssociationIgnoredOnlyForGetActions()
+    {
+        $entityClass = 'Test\Entity';
+        $data = new \stdClass();
+        $formBuilder = $this->getMock('Symfony\Component\Form\FormBuilderInterface');
+
+        $config = new EntityDefinitionConfig();
+        $config->addField('association1')
+            ->setPropertyPath(ConfigUtil::IGNORE_PROPERTY_PATH);
+
+        $metadata = new EntityMetadata();
+        $metadata->addAssociation($this->createAssociationMetadata('association1'));
+
+        $this->formFactory->expects($this->once())
+            ->method('createNamedBuilder')
+            ->with(
+                null,
+                'form',
+                $data,
+                [
+                    'data_class'           => $entityClass,
+                    'validation_groups'    => ['Default', 'api'],
+                    'extra_fields_message' => 'This form should not contain extra fields: "{{ extra_fields }}"',
+                    'api_context'          => $this->context
+                ]
+            )
+            ->willReturn($formBuilder);
+
+        $formBuilder->expects($this->once())
+            ->method('add')
+            ->with(
+                'association1',
+                null,
+                []
             );
 
         $this->context->setClassName($entityClass);

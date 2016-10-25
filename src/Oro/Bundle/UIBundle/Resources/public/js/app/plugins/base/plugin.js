@@ -20,6 +20,10 @@ define(function(require) {
          */
         initialize: function(main, options) {},
 
+        eventNamespace: function() {
+            return this.main.eventNamespace();
+        },
+
         /**
          * Enables plugin
          */

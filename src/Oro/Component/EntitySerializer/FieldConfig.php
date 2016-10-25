@@ -180,7 +180,7 @@ class FieldConfig
      * @return array Each item of the array can be the id of a service in DIC, an instance of
      *               "Oro\Component\EntitySerializer\DataTransformerInterface" or
      *               "Symfony\Component\Form\DataTransformerInterface",
-     *               or function ($class, $property, $value, $config) : mixed.
+     *               or function ($class, $property, $value, $config, $context) : mixed.
      */
     public function getDataTransformers()
     {
@@ -194,7 +194,7 @@ class FieldConfig
      * The data transformer can be the id of a service in DIC or an instance of
      * "Oro\Component\EntitySerializer\DataTransformerInterface" or
      * "Symfony\Component\Form\DataTransformerInterface",
-     * or function ($class, $property, $value, $config) : mixed.
+     * or function ($class, $property, $value, $config, $context) : mixed.
      *
      * @param string|callable|DataTransformerInterface|FormDataTransformerInterface $dataTransformer
      */

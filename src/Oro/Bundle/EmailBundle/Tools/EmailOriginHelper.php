@@ -112,7 +112,7 @@ class EmailOriginHelper
         $originName = InternalEmailOrigin::BAP,
         $enableUseUserEmailOrigin = true
     ) {
-        $originKey = $originName . $email;
+        $originKey = $originName . $email . $enableUseUserEmailOrigin;
         if (!$organization && $this->securityFacade !== null && $this->securityFacade->getOrganization()) {
             $organization = $this->securityFacade->getOrganization();
         }

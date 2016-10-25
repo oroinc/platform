@@ -6,12 +6,13 @@ use Symfony\Component\Form\PreloadedExtension;
 use Symfony\Component\Form\Test\TypeTestCase;
 
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
+use Oro\Bundle\ApiBundle\Form\Type\CompoundEntityType;
 use Oro\Bundle\ApiBundle\Metadata\AssociationMetadata;
 use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
 use Oro\Bundle\ApiBundle\Metadata\FieldMetadata;
-use Oro\Bundle\ApiBundle\Form\Type\CompoundEntityType;
 use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity;
 use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\FormType\NameContainerType;
+use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 
 class CompoundEntityTypeTest extends TypeTestCase
 {
@@ -54,7 +55,8 @@ class CompoundEntityTypeTest extends TypeTestCase
     public function testBuildFormForRenamedField()
     {
         $metadata = new EntityMetadata();
-        $metadata->addField(new FieldMetadata('renamedName'));
+        $metadata->addField(new FieldMetadata('renamedName'))
+            ->setPropertyPath('name');
 
         $config = new EntityDefinitionConfig();
         $config->addField('renamedName')->setPropertyPath('name');
@@ -123,10 +125,11 @@ class CompoundEntityTypeTest extends TypeTestCase
     public function testBuildFormForIgnoredField()
     {
         $metadata = new EntityMetadata();
-        $metadata->addField(new FieldMetadata('name'));
+        $metadata->addField(new FieldMetadata('name'))
+            ->setPropertyPath(ConfigUtil::IGNORE_PROPERTY_PATH);
 
         $config = new EntityDefinitionConfig();
-        $config->addField('name')->setPropertyPath('_');
+        $config->addField('name')->setPropertyPath(ConfigUtil::IGNORE_PROPERTY_PATH);
 
         $data = new Entity\User();
         $form = $this->factory->create(
@@ -141,6 +144,30 @@ class CompoundEntityTypeTest extends TypeTestCase
         $form->submit(['name' => 'testName']);
         $this->assertTrue($form->isSynchronized());
         $this->assertNull($data->getName());
+    }
+
+    public function testBuildFormForFieldIgnoredOnlyForGetActions()
+    {
+        $metadata = new EntityMetadata();
+        $metadata->addField(new FieldMetadata('name'));
+
+        $config = new EntityDefinitionConfig();
+        $fieldConfig = $config->addField('name');
+        $fieldConfig->setPropertyPath(ConfigUtil::IGNORE_PROPERTY_PATH);
+
+        $data = new Entity\User();
+        $form = $this->factory->create(
+            new CompoundEntityType(),
+            $data,
+            [
+                'data_class' => Entity\User::class,
+                'metadata'   => $metadata,
+                'config'     => $config,
+            ]
+        );
+        $form->submit(['name' => 'testName']);
+        $this->assertTrue($form->isSynchronized());
+        $this->assertEquals('testName', $data->getName());
     }
 
     public function testBuildFormForAssociation()
@@ -169,7 +196,7 @@ class CompoundEntityTypeTest extends TypeTestCase
     public function testBuildFormForAssociationAsField()
     {
         $metadata = new EntityMetadata();
-        $metadata->addAssociation(new AssociationMetadata('owner'))->setDataType('scalar');
+        $metadata->addAssociation(new AssociationMetadata('owner'))->setDataType('object');
 
         $config = new EntityDefinitionConfig();
         $field = $config->addField('owner');

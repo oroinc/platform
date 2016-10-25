@@ -86,7 +86,7 @@ class ProcessDefinitionsConfigurator implements LoggerAwareInterface
         $definition = $this->getRepository()->find($name);
         $this->toRemove[] = $definition;
         $this->dirty = true;
-        $this->notify('deleted', $definition);
+        $this->notify($definition, 'deleted');
     }
 
     /**
@@ -97,7 +97,7 @@ class ProcessDefinitionsConfigurator implements LoggerAwareInterface
     {
         $existingDefinition->import($newDefinition);
         $this->dirty = true;
-        $this->notify('updated', $existingDefinition);
+        $this->notify($existingDefinition, 'updated');
     }
 
     /**
@@ -107,7 +107,7 @@ class ProcessDefinitionsConfigurator implements LoggerAwareInterface
     {
         $this->toPersist[] = $newDefinition;
         $this->dirty = true;
-        $this->notify('created', $newDefinition);
+        $this->notify($newDefinition, 'created');
     }
 
     public function flush()
@@ -122,22 +122,36 @@ class ProcessDefinitionsConfigurator implements LoggerAwareInterface
                     $objectManager->remove($definitionToDelete);
                 }
             }
-            
+
             $objectManager->flush();
             $this->dirty = false;
-            $this->logger->info('Process definitions configuration updates are stored into database');
+            $message = 'Process definitions configuration updates are stored into database';
         } else {
-            $this->logger->info('No process definitions configuration updates detected. Nothing flushed into DB');
+            $message = 'No process definitions configuration updates detected. Nothing flushed into DB';
+        }
+
+        if ($this->logger) {
+            $this->logger->info($message);
         }
     }
 
     /**
-     * @param string $action
      * @param ProcessDefinition $definition
+     * @param string $action
      */
-    protected function notify($action, ProcessDefinition $definition)
+    protected function notify(ProcessDefinition $definition, $action)
     {
-        $this->logger->info(sprintf('> process definition: "%s" - %s', $definition->getName(), $action));
+        if (!$this->logger) {
+            return;
+        }
+
+        $this->logger->info(
+            '> process definition: "{definition_name}" - {action}',
+            [
+                'definition_name' => $definition->getName(),
+                'action' => $action
+            ]
+        );
     }
 
     /**
@@ -149,7 +163,7 @@ class ProcessDefinitionsConfigurator implements LoggerAwareInterface
             $this->objectManager = $this->registry->getManagerForClass($this->definitionClass);
         }
 
-        return $this->objectManager ;
+        return $this->objectManager;
     }
 
     /**
