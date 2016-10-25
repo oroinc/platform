@@ -2,16 +2,29 @@
 
 namespace Oro\Bundle\WorkflowBundle\Datagrid;
 
+use Symfony\Component\Translation\TranslatorInterface;
+
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\DataGridBundle\Event\BuildBefore;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowStep;
 use Oro\Bundle\WorkflowBundle\Helper\WorkflowTranslationHelper;
 
+/**
+ * Replaces translation keys (Workflow Step Label) with their translated values
+ */
 class WorkflowDatagridLabelListener
 {
-    public function __construct(WorkflowTranslationHelper $workflowTranslationHelper)
+    /**
+     * @var TranslatorInterface
+     */
+    protected $translator;
+
+    /**
+     * @param TranslatorInterface $translator
+     */
+    public function __construct(TranslatorInterface $translator)
     {
-        $this->workflowTranslationHelper = $workflowTranslationHelper;
+        $this->translator = $translator;
     }
 
     /**
@@ -28,6 +41,18 @@ class WorkflowDatagridLabelListener
                 $this->fixColumnSorter($columnName, $configuration);
             }
         }
+    }
+
+    /**
+     * Used only internally, please use WorkflowTranslationHelper or '@translator.default'
+     *
+     * @param $id
+     *
+     * @return string
+     */
+    public function trans($id)
+    {
+        return $this->translator->trans($id, [], WorkflowTranslationHelper::TRANSLATION_DOMAIN);
     }
 
     /**
@@ -51,17 +76,25 @@ class WorkflowDatagridLabelListener
         return $columns;
     }
 
+    /**
+     * @param $columnName
+     * @param DatagridConfiguration $configuration
+     */
     private function fixColumnDefinition($columnName, DatagridConfiguration $configuration)
     {
         $path = sprintf('[columns][%s]', $columnName);
         $column = $configuration->offsetGetByPath($path);
         $column['frontend_type'] = 'html';
         $column['type'] = 'callback';
-        $column['callable'] = [$this->workflowTranslationHelper, "findTranslation"];
+        $column['callable'] = [$this, "trans"];
         $column['params'] = [$columnName];
         $configuration->offsetSetByPath($path, $column);
     }
 
+    /**
+     * @param $columnName
+     * @param DatagridConfiguration $configuration
+     */
     private function fixColumnFilter($columnName, DatagridConfiguration $configuration)
     {
         $filters = $configuration->offsetGetByPath('[filters][columns]');
@@ -71,6 +104,10 @@ class WorkflowDatagridLabelListener
         $configuration->offsetSetByPath('[filters][columns]', $filters);
     }
 
+    /**
+     * @param $columnName
+     * @param DatagridConfiguration $configuration
+     */
     private function fixColumnSorter($columnName, DatagridConfiguration $configuration)
     {
         $sorters = $configuration->offsetGetByPath('[sorters][columns]');

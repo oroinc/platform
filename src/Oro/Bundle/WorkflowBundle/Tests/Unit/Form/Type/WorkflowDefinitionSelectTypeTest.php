@@ -5,6 +5,7 @@ namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Form\Type;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\PreloadedExtension;
 use Symfony\Component\Form\Test\FormIntegrationTestCase;
+use Symfony\Component\Translation\TranslatorInterface;
 
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Form\Type\WorkflowDefinitionSelectType;
@@ -29,6 +30,9 @@ class WorkflowDefinitionSelectTypeTest extends FormIntegrationTestCase
     /** @var array|WorkflowDefinition[] */
     protected $definitions = [];
 
+    /** @var \PHPUnit_Framework_MockObject_MockObject|TranslatorInterface */
+    protected $translator;
+
     protected function setUp()
     {
         parent::setUp();
@@ -37,7 +41,10 @@ class WorkflowDefinitionSelectTypeTest extends FormIntegrationTestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->type = new WorkflowDefinitionSelectType($this->workflowRegistry);
+        $this->translator = $this->getMock('Symfony\Component\Translation\TranslatorInterface');
+        $this->translator->expects($this->any())->method('trans')->willReturnArgument(0);
+
+        $this->type = new WorkflowDefinitionSelectType($this->workflowRegistry, $this->translator);
     }
 
     public function testSubmitWithWorkflowNameOption()

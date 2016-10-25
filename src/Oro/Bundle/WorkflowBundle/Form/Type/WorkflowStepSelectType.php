@@ -2,16 +2,17 @@
 
 namespace Oro\Bundle\WorkflowBundle\Form\Type;
 
-use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\QueryBuilder;
 
+use Oro\Bundle\WorkflowBundle\Helper\WorkflowTranslationHelper;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\ChoiceList\View\ChoiceView;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Translation\TranslatorInterface;
 
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowStep;
 use Oro\Bundle\WorkflowBundle\Model\Workflow;
@@ -24,12 +25,17 @@ class WorkflowStepSelectType extends AbstractType
     /** @var WorkflowRegistry */
     protected $workflowRegistry;
 
+    /** @var TranslatorInterface */
+    protected $translator;
+
     /**
      * @param WorkflowRegistry $workflowRegistry
+     * @param TranslatorInterface $translator
      */
-    public function __construct(WorkflowRegistry $workflowRegistry)
+    public function __construct(WorkflowRegistry $workflowRegistry, TranslatorInterface $translator)
     {
         $this->workflowRegistry = $workflowRegistry;
+        $this->translator = $translator;
     }
 
     /**
@@ -71,13 +77,28 @@ class WorkflowStepSelectType extends AbstractType
      */
     public function finishView(FormView $view, FormInterface $form, array $options)
     {
-        if (count($this->getWorkflows($options)) > 1) {
-            /** @var ChoiceView $choiceView */
-            foreach ($view->vars['choices'] as $choiceView) {
+        $workflowsCount = count($this->getWorkflows($options));
+
+        /** @var ChoiceView $choiceView */
+        foreach ($view->vars['choices'] as $choiceView) {
+            if ($workflowsCount > 1) {
                 /** @var WorkflowStep $step */
                 $step = $choiceView->data;
-
-                $choiceView->label = sprintf('%s: %s', $step->getDefinition()->getLabel(), $choiceView->label);
+                $choiceView->label = sprintf(
+                    '%s: %s',
+                    $this->translator->trans(
+                        $step->getDefinition()->getLabel(),
+                        [],
+                        WorkflowTranslationHelper::TRANSLATION_DOMAIN
+                    ),
+                    $this->translator->trans($choiceView->label, [], WorkflowTranslationHelper::TRANSLATION_DOMAIN)
+                );
+            } else {
+                $choiceView->label = $this->translator->trans(
+                    $choiceView->label,
+                    [],
+                    WorkflowTranslationHelper::TRANSLATION_DOMAIN
+                );
             }
         }
     }
@@ -110,6 +131,7 @@ class WorkflowStepSelectType extends AbstractType
      * @param EntityManager $em
      * @param string $className
      * @param array $definitions
+     *
      * @return QueryBuilder
      */
     protected function getQueryBuilder(EntityManager $em, $className, array $definitions)
@@ -125,6 +147,7 @@ class WorkflowStepSelectType extends AbstractType
 
     /**
      * @param array|Options $options
+     *
      * @return array
      */
     protected function getWorkflows($options)

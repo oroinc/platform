@@ -56,6 +56,6 @@ services:
     oro_workflow.datagrid.listener.label:
         class: 'Oro\Bundle\WorkflowBundle\Datagrid\WorkflowDatagridLabelListener'
         arguments:
-            - '@oro_workflow.helper.translation'
+            - '@translator.default'
         tags:
             - { name: kernel.event_listener, event: oro_datagrid.datagrid.build.before, method: onBuildBefore,  priority: 255 }
