@@ -2,15 +2,15 @@
 
 namespace Oro\Bundle\NavigationBundle\Tests\Unit\Menu;
 
-use Oro\Bundle\NavigationBundle\Event\ConfigureMenuEvent;
-use Oro\Bundle\NavigationBundle\Menu\AclAwareMenuFactoryExtension;
-use Oro\Bundle\NavigationBundle\Menu\ConfigurationBuilder;
-use Oro\Component\Config\Resolver\SystemAwareResolver;
-
 use Knp\Menu\FactoryInterface;
 use Knp\Menu\MenuItem;
 
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+
+use Oro\Component\Config\Resolver\SystemAwareResolver;
+use Oro\Bundle\NavigationBundle\Event\ConfigureMenuEvent;
+use Oro\Bundle\NavigationBundle\Menu\AclAwareMenuFactoryExtension;
+use Oro\Bundle\NavigationBundle\Menu\ConfigurationBuilder;
 
 class ConfigurationBuilderTest extends \PHPUnit_Framework_TestCase
 {

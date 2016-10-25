@@ -2,10 +2,10 @@
 
 namespace Oro\Bundle\NavigationBundle\Tests\Functional\Menu\Provider;
 
+use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
+
 use Oro\Bundle\NavigationBundle\Menu\Provider\UserOwnershipProvider;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
-
-use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 
 /**
  * @dbIsolation

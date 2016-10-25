@@ -2,14 +2,14 @@
 
 namespace Oro\Bundle\NavigationBundle\Tests\Unit\Menu\Helper;
 
+use Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException;
+use Symfony\Component\Translation\TranslatorInterface;
+
 use Oro\Bundle\LocaleBundle\Entity\Localization;
 use Oro\Bundle\LocaleBundle\Entity\LocalizedFallbackValue;
 use Oro\Bundle\LocaleBundle\Helper\LocalizationHelper;
 use Oro\Bundle\NavigationBundle\Menu\Helper\MenuUpdateHelper;
 use Oro\Bundle\NavigationBundle\Tests\Unit\Entity\Stub\MenuUpdateStub;
-
-use Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException;
-use Symfony\Component\Translation\TranslatorInterface;
 
 class MenuUpdateHelperTest extends \PHPUnit_Framework_TestCase
 {

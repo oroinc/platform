@@ -2,13 +2,13 @@
 
 namespace Oro\Bundle\NavigationBundle\Menu;
 
-use Oro\Bundle\NavigationBundle\Event\ConfigureMenuEvent;
-use Oro\Component\Config\Resolver\ResolverInterface;
-
 use Knp\Menu\FactoryInterface;
 use Knp\Menu\ItemInterface;
 
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+
+use Oro\Bundle\NavigationBundle\Event\ConfigureMenuEvent;
+use Oro\Component\Config\Resolver\ResolverInterface;
 
 class ConfigurationBuilder implements BuilderInterface
 {

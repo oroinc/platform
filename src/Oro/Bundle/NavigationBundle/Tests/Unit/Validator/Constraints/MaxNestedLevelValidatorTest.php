@@ -2,14 +2,14 @@
 
 namespace Oro\Bundle\NavigationBundle\Tests\Unit\Validator\Constraints;
 
+use Symfony\Component\Validator\ExecutionContextInterface;
+
 use Oro\Bundle\LocaleBundle\Helper\LocalizationHelper;
 use Oro\Bundle\NavigationBundle\Tests\Unit\Entity\Stub\MenuUpdateStub;
 use Oro\Bundle\NavigationBundle\Provider\BuilderChainProvider;
 use Oro\Bundle\NavigationBundle\Tests\Unit\MenuItemTestTrait;
 use Oro\Bundle\NavigationBundle\Validator\Constraints\MaxNestedLevel;
 use Oro\Bundle\NavigationBundle\Validator\Constraints\MaxNestedLevelValidator;
-
-use Symfony\Component\Validator\ExecutionContextInterface;
 
 class MaxNestedLevelValidatorTest extends \PHPUnit_Framework_TestCase
 {

@@ -4,14 +4,13 @@ namespace Oro\Bundle\NavigationBundle\Menu\Helper;
 
 use Doctrine\Common\Collections\Collection;
 
+use Symfony\Component\PropertyAccess\PropertyAccess;
+use Symfony\Component\Translation\TranslatorInterface;
+
+use Oro\Component\PropertyAccess\PropertyAccessor;
 use Oro\Bundle\LocaleBundle\Entity\LocalizedFallbackValue;
 use Oro\Bundle\LocaleBundle\Helper\LocalizationHelper;
 use Oro\Bundle\NavigationBundle\Entity\MenuUpdateInterface;
-
-use Oro\Component\PropertyAccess\PropertyAccessor;
-
-use Symfony\Component\PropertyAccess\PropertyAccess;
-use Symfony\Component\Translation\TranslatorInterface;
 
 class MenuUpdateHelper
 {

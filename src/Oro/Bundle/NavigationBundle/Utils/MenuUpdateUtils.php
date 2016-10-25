@@ -4,12 +4,12 @@ namespace Oro\Bundle\NavigationBundle\Utils;
 
 use Knp\Menu\ItemInterface;
 
+use Symfony\Component\PropertyAccess\PropertyAccess;
+use Symfony\Component\PropertyAccess\PropertyAccessor;
+
 use Oro\Bundle\LocaleBundle\Helper\LocalizationHelper;
 use Oro\Bundle\NavigationBundle\Entity\MenuUpdateInterface;
 use Oro\Bundle\NavigationBundle\Menu\Helper\MenuUpdateHelper;
-
-use Symfony\Component\PropertyAccess\PropertyAccess;
-use Symfony\Component\PropertyAccess\PropertyAccessor;
 
 class MenuUpdateUtils
 {

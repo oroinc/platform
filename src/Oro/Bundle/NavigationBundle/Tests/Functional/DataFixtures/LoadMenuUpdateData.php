@@ -6,13 +6,13 @@ use Doctrine\Common\DataFixtures\AbstractFixture;
 use Doctrine\Common\DataFixtures\DependentFixtureInterface;
 use Doctrine\Common\Persistence\ObjectManager;
 
+use Oro\Component\Testing\Unit\EntityTrait;
 use Oro\Bundle\LocaleBundle\Entity\LocalizedFallbackValue;
 use Oro\Bundle\NavigationBundle\Entity\MenuUpdate;
 use Oro\Bundle\NavigationBundle\Menu\Provider\GlobalOwnershipProvider;
 use Oro\Bundle\NavigationBundle\Menu\Provider\UserOwnershipProvider;
 use Oro\Bundle\UserBundle\DataFixtures\UserUtilityTrait;
 
-use Oro\Component\Testing\Unit\EntityTrait;
 
 class LoadMenuUpdateData extends AbstractFixture implements DependentFixtureInterface
 {
