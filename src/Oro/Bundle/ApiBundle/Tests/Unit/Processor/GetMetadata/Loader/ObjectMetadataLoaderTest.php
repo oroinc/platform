@@ -4,33 +4,33 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\GetMetadata\Loader;
 
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
-use Oro\Bundle\ApiBundle\Processor\GetMetadata\Loader\ObjectMetadataBuilder;
+use Oro\Bundle\ApiBundle\Processor\GetMetadata\Loader\ObjectMetadataFactory;
 use Oro\Bundle\ApiBundle\Processor\GetMetadata\Loader\ObjectMetadataLoader;
-use Oro\Bundle\ApiBundle\Processor\GetMetadata\Loader\ObjectNestedObjectMetadataBuilder;
+use Oro\Bundle\ApiBundle\Processor\GetMetadata\Loader\ObjectNestedObjectMetadataFactory;
 
 class ObjectMetadataLoaderTest extends LoaderTestCase
 {
     /** @var \PHPUnit_Framework_MockObject_MockObject */
-    protected $objectMetadataBuilder;
+    protected $objectMetadataFactory;
 
     /** @var \PHPUnit_Framework_MockObject_MockObject */
-    protected $nestedObjectMetadataBuilder;
+    protected $nestedObjectMetadataFactory;
 
     /** @var ObjectMetadataLoader */
     protected $objectMetadataLoader;
 
     protected function setUp()
     {
-        $this->objectMetadataBuilder = $this->getMockBuilder(ObjectMetadataBuilder::class)
+        $this->objectMetadataFactory = $this->getMockBuilder(ObjectMetadataFactory::class)
             ->disableOriginalConstructor()
             ->getMock();
-        $this->nestedObjectMetadataBuilder = $this->getMockBuilder(ObjectNestedObjectMetadataBuilder::class)
+        $this->nestedObjectMetadataFactory = $this->getMockBuilder(ObjectNestedObjectMetadataFactory::class)
             ->disableOriginalConstructor()
             ->getMock();
 
         $this->objectMetadataLoader = new ObjectMetadataLoader(
-            $this->objectMetadataBuilder,
-            $this->nestedObjectMetadataBuilder
+            $this->objectMetadataFactory,
+            $this->nestedObjectMetadataFactory
         );
     }
 
@@ -47,12 +47,12 @@ class ObjectMetadataLoaderTest extends LoaderTestCase
         $field = $config->addField($fieldName);
         $field->setExcluded();
 
-        $this->objectMetadataBuilder->expects(self::once())
+        $this->objectMetadataFactory->expects(self::once())
             ->method('createObjectMetadata')
             ->with($entityClass, self::identicalTo($config))
             ->willReturn($entityMetadata);
-        $this->objectMetadataBuilder->expects(self::never())
-            ->method('addFieldMetadata');
+        $this->objectMetadataFactory->expects(self::never())
+            ->method('createAndAddFieldMetadata');
 
         $result = $this->objectMetadataLoader->loadObjectMetadata(
             $entityClass,
@@ -76,12 +76,12 @@ class ObjectMetadataLoaderTest extends LoaderTestCase
         $field = $config->addField($fieldName);
         $field->setExcluded();
 
-        $this->objectMetadataBuilder->expects(self::once())
+        $this->objectMetadataFactory->expects(self::once())
             ->method('createObjectMetadata')
             ->with($entityClass, self::identicalTo($config))
             ->willReturn($entityMetadata);
-        $this->objectMetadataBuilder->expects(self::once())
-            ->method('addFieldMetadata')
+        $this->objectMetadataFactory->expects(self::once())
+            ->method('createAndAddFieldMetadata')
             ->with(
                 self::identicalTo($entityMetadata),
                 $entityClass,
@@ -111,12 +111,12 @@ class ObjectMetadataLoaderTest extends LoaderTestCase
         $fieldName = 'testField';
         $field = $config->addField($fieldName);
 
-        $this->objectMetadataBuilder->expects(self::once())
+        $this->objectMetadataFactory->expects(self::once())
             ->method('createObjectMetadata')
             ->with($entityClass, self::identicalTo($config))
             ->willReturn($entityMetadata);
-        $this->objectMetadataBuilder->expects(self::once())
-            ->method('addFieldMetadata')
+        $this->objectMetadataFactory->expects(self::once())
+            ->method('createAndAddFieldMetadata')
             ->with(
                 self::identicalTo($entityMetadata),
                 $entityClass,
@@ -147,12 +147,12 @@ class ObjectMetadataLoaderTest extends LoaderTestCase
         $field = $config->addField($fieldName);
         $field->setMetaProperty(true);
 
-        $this->objectMetadataBuilder->expects(self::once())
+        $this->objectMetadataFactory->expects(self::once())
             ->method('createObjectMetadata')
             ->with($entityClass, self::identicalTo($config))
             ->willReturn($entityMetadata);
-        $this->objectMetadataBuilder->expects(self::once())
-            ->method('addMetaPropertyMetadata')
+        $this->objectMetadataFactory->expects(self::once())
+            ->method('createAndAddMetaPropertyMetadata')
             ->with(
                 self::identicalTo($entityMetadata),
                 $entityClass,
@@ -184,12 +184,12 @@ class ObjectMetadataLoaderTest extends LoaderTestCase
         $field = $config->addField($fieldName);
         $field->setMetaProperty(true);
 
-        $this->objectMetadataBuilder->expects(self::once())
+        $this->objectMetadataFactory->expects(self::once())
             ->method('createObjectMetadata')
             ->with($entityClass, self::identicalTo($config))
             ->willReturn($entityMetadata);
-        $this->objectMetadataBuilder->expects(self::once())
-            ->method('addMetaPropertyMetadata')
+        $this->objectMetadataFactory->expects(self::once())
+            ->method('createAndAddMetaPropertyMetadata')
             ->with(
                 self::identicalTo($entityMetadata),
                 $entityClass,
@@ -221,12 +221,12 @@ class ObjectMetadataLoaderTest extends LoaderTestCase
         $field = $config->addField($fieldName);
         $field->setTargetClass('Test\TargetClass');
 
-        $this->objectMetadataBuilder->expects(self::once())
+        $this->objectMetadataFactory->expects(self::once())
             ->method('createObjectMetadata')
             ->with($entityClass, self::identicalTo($config))
             ->willReturn($entityMetadata);
-        $this->objectMetadataBuilder->expects(self::once())
-            ->method('addAssociationMetadata')
+        $this->objectMetadataFactory->expects(self::once())
+            ->method('createAndAddAssociationMetadata')
             ->with(
                 self::identicalTo($entityMetadata),
                 $entityClass,
@@ -257,12 +257,12 @@ class ObjectMetadataLoaderTest extends LoaderTestCase
         $field = $config->addField($fieldName);
         $field->setDataType('nestedObject');
 
-        $this->objectMetadataBuilder->expects(self::once())
+        $this->objectMetadataFactory->expects(self::once())
             ->method('createObjectMetadata')
             ->with($entityClass, self::identicalTo($config))
             ->willReturn($entityMetadata);
-        $this->nestedObjectMetadataBuilder->expects(self::once())
-            ->method('addNestedObjectMetadata')
+        $this->nestedObjectMetadataFactory->expects(self::once())
+            ->method('createAndAddNestedObjectMetadata')
             ->with(
                 self::identicalTo($entityMetadata),
                 self::identicalTo($config),

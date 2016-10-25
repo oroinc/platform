@@ -205,6 +205,7 @@ define(function(require) {
                 newDirection = value[1];
             }
             column = this.columns.findWhere({'name': columnName});
+
             if (column) {
                 if (newDirection) {
                     this.currentDirection = newDirection;
@@ -215,6 +216,8 @@ define(function(require) {
             } else {
                 this.currentColumn = null;
                 this.currentDirection = null;
+
+                this.collection.trigger('backgrid:sort', '', this.currentDirection);
             }
             if (this.hasSortingOrderButton) {
                 this._updateDisplayDirection();
@@ -251,6 +254,7 @@ define(function(require) {
                     }, this));
                 }
             }, this));
+
             return options;
         },
 
