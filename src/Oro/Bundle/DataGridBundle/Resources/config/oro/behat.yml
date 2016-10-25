@@ -34,6 +34,10 @@ elements:
   DateTimePicker:
     class: Oro\Bundle\DataGridBundle\Tests\Behat\Element\DateTimePicker
 
+  TimePicker:
+    selector: 'input.timepicker-input'
+    class: Oro\Bundle\DataGridBundle\Tests\Behat\Element\TimePicker
+
   GridPaginator:
     selector: 'div.toolbar div.pagination'
     class: Oro\Bundle\DataGridBundle\Tests\Behat\Element\GridPaginator

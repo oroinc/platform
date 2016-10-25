@@ -20,19 +20,7 @@ class DateTimePicker extends Element
         $this->getYearPicker()->selectOption($dateTime->format('Y'));
         $this->getCalendarDate($dateTime->format('j'))->click();
 
-        /** @var NodeElement $timePicker */
-        $timePicker = $this->getTimePicker();
-        $timePicker->click();
-        $timePicker->setValue(
-            new InputValue(InputMethod::TYPE, $dateTime->format('H:i'))
-        );
-        $this->clickSelectedTime();
-    }
-
-    protected function clickSelectedTime()
-    {
-        $timeSelect = $this->findVisible('css', '.ui-timepicker-wrapper');
-        $timeSelect->find('css', 'li.ui-timepicker-selected')->click();
+        $this->getTimePicker()->setValue($dateTime);
     }
 
     /**
@@ -60,11 +48,11 @@ class DateTimePicker extends Element
     }
 
     /**
-     * @return NodeElement|null
+     * @return TimePicker
      */
     protected function getTimePicker()
     {
-        return $this->find('css', 'input.timepicker-input');
+        return $this->getElement('TimePicker');
     }
 
     /**
