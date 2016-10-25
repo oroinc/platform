@@ -46,7 +46,7 @@ class CronCommandTest extends WebTestCase
             $this->assertRegexp('/Processing command "oro:cron:imap-sync": added to job queue/', $result);
         }
 
-        $result = $this->runCommand(CronCommand::COMMAND_NAME, []);
+        $result = $this->runCommand(CronCommand::COMMAND_NAME, ['-vvv' => true]);
         $this->checkMessage('AllJobAlreadyExist', $result);
     }
 
@@ -58,7 +58,6 @@ class CronCommandTest extends WebTestCase
         $commandTester->execute(array(
             'command'      => $command->getName(),
             '--skipCheckDaemon' => true,
-            '-vvv' => true,
         ));
 
         $result = $this->runCommand(CronCommand::COMMAND_NAME, ['-vvv' => true]);
