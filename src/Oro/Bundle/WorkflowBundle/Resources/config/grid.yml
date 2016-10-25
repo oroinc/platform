@@ -52,3 +52,10 @@ services:
             - '@oro_workflow.restriction.manager'
         tags:
             - { name: oro_datagrid.extension }
+
+    oro_workflow.datagrid.listener.label:
+        class: 'Oro\Bundle\WorkflowBundle\Datagrid\WorkflowDatagridLabelListener'
+        arguments:
+            - '@oro_workflow.helper.translation'
+        tags:
+            - { name: kernel.event_listener, event: oro_datagrid.datagrid.build.before, method: onBuildBefore,  priority: 255 }
