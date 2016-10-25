@@ -46,8 +46,6 @@ services:
                 -
                     -
                         value: {required: true}
-                        reverse: {default: false}
-                        separator: ~
                         params: ~
             - [setName, ['title']]
         tags:

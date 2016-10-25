@@ -1,8 +1,8 @@
 <?php
 
-namespace Oro\Bundle\NavigationBundle\Provider;
+namespace Oro\Bundle\NavigationBundle\Layout\DataProvider;
 
-use Symfony\Component\HttpFoundation\Request;
+use Oro\Bundle\NavigationBundle\Provider\TitleService;
 
 class NavigationTitleProvider
 {
@@ -12,38 +12,31 @@ class NavigationTitleProvider
     private $titleService;
 
     /**
-     * @var Request
-     */
-    private $request;
-
-    /**
      * @param TitleService  $titleService
-     * @param Request       $request
      */
     public function __construct(
-        TitleService $titleService,
-        Request $request
+        TitleService $titleService
     ) {
         $this->titleService = $titleService;
-        $this->request = $request;
     }
 
 
     /**
      * Load title template from config values
      *
+     * @param string $routeName
      * @param array  $params
      *
      * @return string
      */
-    public function getTitle($params = [])
+    public function getTitle($routeName, $params = [])
     {
-        $this->titleService->loadByRoute($this->request->get('_route'));
+        $this->titleService->loadByRoute($routeName);
         $this->titleService->setParams($params);
 
         $title = $this->titleService
             ->render(array(), null, null, null, true);
 
-        return [$title];
+        return $title;
     }
 }

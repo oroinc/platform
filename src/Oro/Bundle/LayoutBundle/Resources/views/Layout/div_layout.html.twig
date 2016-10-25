@@ -121,29 +121,9 @@
         value: value
     }) %}
 
-    {% if reverse is defined %}
-        {% set attr = attr|merge({
-            reverse: reverse
-        }) %}
-    {% endif %}
-
-    {% if separator is defined %}
-        {% set attr = attr|merge({
-            separator: separator
-        }) %}
-    {% endif %}
-
-    {% if reverse %}
-        {% set value = value|reverse %}
-    {% endif %}
     {% spaceless %}
         <title>
-            {%- for element in value -%}
-                {{ element|block_text(translation_domain) }}
-                {%- if not loop.last -%}
-                    {{ separator }}
-                {%- endif -%}
-            {%- endfor -%}
+            {{ value|block_text(translation_domain) }}
         </title>
     {% endspaceless %}
 {%- endblock %}

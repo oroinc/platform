@@ -9,7 +9,7 @@ layout:
                 title:
                     blockType: title
                     options:
-                        value: '=data["title_provider"].getTitle(params)'
+                        value: '=data["title_provider"].getTitle(context["route_name"], params)'
                         params: []
                 meta_charset:
                     blockType: meta
