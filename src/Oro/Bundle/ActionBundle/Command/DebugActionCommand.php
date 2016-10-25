@@ -10,6 +10,7 @@ class DebugActionCommand extends AbstractDebugCommand
 {
     const COMMAND_NAME = 'oro:debug:action';
     const ARGUMENT_NAME = 'action-name';
+    const FACTORY_SERVICE_ID = 'oro_action.action_factory';
 
     /**
      * {@inheritdoc}
@@ -32,7 +33,7 @@ EOF
      */
     protected function getFactoryServiceId()
     {
-        return 'oro_action.action_factory';
+        return self::FACTORY_SERVICE_ID;
     }
 
     /**

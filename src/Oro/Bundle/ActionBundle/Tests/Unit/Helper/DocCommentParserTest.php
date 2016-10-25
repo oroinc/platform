@@ -27,7 +27,6 @@ class DocCommentParserTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($expected, $this->parser->getFullComment($className));
     }
 
-
     /**
      * @return array
      */

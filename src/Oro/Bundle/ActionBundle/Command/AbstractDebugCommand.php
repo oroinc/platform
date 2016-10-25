@@ -13,12 +13,6 @@ use Oro\Component\ConfigExpression\FactoryWithTypesInterface;
 
 abstract class AbstractDebugCommand extends ContainerAwareCommand
 {
-    /** @var mixed */
-    protected $factory;
-
-    /** @var DocCommentParser */
-    protected $docCommentParser;
-
     /**
      * {@inheritdoc}
      */
@@ -64,14 +58,15 @@ abstract class AbstractDebugCommand extends ContainerAwareCommand
             return 1;
         }
 
-        $table = new Table($output);
+        $docCommentParser = new DocCommentParser();
 
+        $table = new Table($output);
         $table->addRows(
             [
                 ['Name', $name],
                 ['Service Name', $types[$name]],
                 ['Class', get_class($service)],
-                ['Full Description', $this->getDocCommentParser()->getFullComment(get_class($service))],
+                ['Full Description', $docCommentParser->getFullComment(get_class($service))],
             ]
         );
         $table->render();
@@ -86,16 +81,17 @@ abstract class AbstractDebugCommand extends ContainerAwareCommand
      */
     protected function outputAllItems(OutputInterface $output)
     {
-        $container = $this->getContainer();
-
         $types = $this->getFactory()->getTypes();
 
         $table = new Table($output);
         $table->setHeaders(['Name', 'Short Description']);
+
+        $docCommentParser = new DocCommentParser();
+
         foreach ($types as $key => $type) {
             try {
-                $service = $container->get($type);
-                $description = $this->getDocCommentParser()->getShortComment(get_class($service));
+                $service = $this->getContainer()->get($type);
+                $description = $docCommentParser->getShortComment(get_class($service));
                 $table->addRow([$key, $description]);
             } catch (\TypeError $e) {
                 $output->writeln(sprintf('<error>Can not load Service "%s": %s</error>', $type, $e->getMessage()));
@@ -111,23 +107,7 @@ abstract class AbstractDebugCommand extends ContainerAwareCommand
      */
     protected function getFactory()
     {
-        if (null === $this->factory) {
-            $this->factory =  $this->getContainer()->get($this->getFactoryServiceId());
-        }
-
-        return $this->factory;
-    }
-
-    /**
-     * @return DocCommentParser
-     */
-    protected function getDocCommentParser()
-    {
-        if (null === $this->docCommentParser) {
-            $this->docCommentParser = new DocCommentParser();
-        }
-
-        return $this->docCommentParser;
+        return $this->getContainer()->get($this->getFactoryServiceId());
     }
 
     /**

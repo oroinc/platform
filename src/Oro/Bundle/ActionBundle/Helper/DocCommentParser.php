@@ -12,9 +12,8 @@ class DocCommentParser
     public function getFullComment($className)
     {
         $reflection = new \ReflectionClass($className);
-        $comment = $reflection->getDocComment();
 
-        return $this->filterComment($comment);
+        return $this->filterComment($reflection->getDocComment());
     }
 
     /**
