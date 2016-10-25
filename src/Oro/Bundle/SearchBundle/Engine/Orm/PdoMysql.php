@@ -286,6 +286,7 @@ class PdoMysql extends BaseDriver
             $result->add("$joinAlias.value LIKE :$valueParameter");
             $qb->setParameter($valueParameter, $value . '%');
         }
+
         return $result;
     }
 
