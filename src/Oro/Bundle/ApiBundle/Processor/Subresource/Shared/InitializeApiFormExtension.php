@@ -41,6 +41,22 @@ class InitializeApiFormExtension implements ProcessorInterface
         /** @var SubresourceContext $context */
 
         $this->formExtensionSwitcher->switchToApiFormExtension();
+
+        /**
+         * remember current metadata and config accessors as an action can be nested
+         * and accessors should be restored after the current action
+         * @see \Oro\Bundle\ApiBundle\Processor\Shared\RestoreDefaultFormExtension
+         */
+        $currentMetadataAccessor = $this->metadataTypeGuesser->getMetadataAccessor();
+        if (null !== $currentMetadataAccessor) {
+            $context->set('previousMetadataAccessor', $currentMetadataAccessor);
+        }
+        $currentConfigAccessor = $this->metadataTypeGuesser->getConfigAccessor();
+        if (null !== $currentConfigAccessor) {
+            $context->set('previousConfigAccessor', $currentConfigAccessor);
+        }
+
+        // set metadata and config accessors
         $this->metadataTypeGuesser->setMetadataAccessor(new ContextParentMetadataAccessor($context));
         $this->metadataTypeGuesser->setConfigAccessor(new ContextParentConfigAccessor($context));
     }

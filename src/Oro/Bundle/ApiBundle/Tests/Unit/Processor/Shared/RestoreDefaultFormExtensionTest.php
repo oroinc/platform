@@ -45,4 +45,23 @@ class RestoreDefaultFormExtensionTest extends FormProcessorTestCase
 
         $this->processor->process($this->context);
     }
+
+    public function testProcessForPreviouslyRememberedMetadataAndConfigAccessors()
+    {
+        $metadataAccessor = $this->getMock('Oro\Bundle\ApiBundle\Metadata\MetadataAccessorInterface');
+        $configAccessor = $this->getMock('Oro\Bundle\ApiBundle\Config\ConfigAccessorInterface');
+
+        $this->formExtensionSwitcher->expects($this->once())
+            ->method('switchToDefaultFormExtension');
+        $this->metadataTypeGuesser->expects($this->once())
+            ->method('setMetadataAccessor')
+            ->with(self::identicalTo($metadataAccessor));
+        $this->metadataTypeGuesser->expects($this->once())
+            ->method('setConfigAccessor')
+            ->with(self::identicalTo($configAccessor));
+
+        $this->context->set('previousMetadataAccessor', $metadataAccessor);
+        $this->context->set('previousConfigAccessor', $configAccessor);
+        $this->processor->process($this->context);
+    }
 }

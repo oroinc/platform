@@ -117,6 +117,20 @@ class MetadataTypeGuesserTest extends \PHPUnit_Framework_TestCase
         return $associationMetadata;
     }
 
+    public function testShouldGetPreviouslySetMetadataAccessor()
+    {
+        $metadataAccessor = $this->getMock('Oro\Bundle\ApiBundle\Metadata\MetadataAccessorInterface');
+        $this->typeGuesser->setMetadataAccessor($metadataAccessor);
+        self::assertSame($metadataAccessor, $this->typeGuesser->getMetadataAccessor());
+    }
+
+    public function testShouldGetPreviouslySetConfigAccessor()
+    {
+        $configAccessor = $this->getMock('Oro\Bundle\ApiBundle\Config\ConfigAccessorInterface');
+        $this->typeGuesser->setConfigAccessor($configAccessor);
+        self::assertSame($configAccessor, $this->typeGuesser->getConfigAccessor());
+    }
+
     public function testGuessRequired()
     {
         $this->assertNull($this->typeGuesser->guessRequired(self::TEST_CLASS, self::TEST_PROPERTY));

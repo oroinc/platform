@@ -37,6 +37,12 @@ class InitializeApiFormExtensionTest extends FormProcessorTestCase
         $this->formExtensionSwitcher->expects($this->once())
             ->method('switchToApiFormExtension');
         $this->metadataTypeGuesser->expects($this->once())
+            ->method('getMetadataAccessor')
+            ->willReturn(null);
+        $this->metadataTypeGuesser->expects($this->once())
+            ->method('getConfigAccessor')
+            ->willReturn(null);
+        $this->metadataTypeGuesser->expects($this->once())
             ->method('setMetadataAccessor')
             ->with($this->isInstanceOf('Oro\Bundle\ApiBundle\Processor\ContextMetadataAccessor'));
         $this->metadataTypeGuesser->expects($this->once())
@@ -44,5 +50,34 @@ class InitializeApiFormExtensionTest extends FormProcessorTestCase
             ->with($this->isInstanceOf('Oro\Bundle\ApiBundle\Processor\ContextConfigAccessor'));
 
         $this->processor->process($this->context);
+
+        self::assertFalse($this->context->has('previousMetadataAccessor'));
+        self::assertFalse($this->context->has('previousConfigAccessor'));
+    }
+
+    public function testProcessWhenMetadataTypeGuesserHasMetadataAndConfigAccessors()
+    {
+        $metadataAccessor = $this->getMock('Oro\Bundle\ApiBundle\Metadata\MetadataAccessorInterface');
+        $configAccessor = $this->getMock('Oro\Bundle\ApiBundle\Config\ConfigAccessorInterface');
+
+        $this->formExtensionSwitcher->expects($this->once())
+            ->method('switchToApiFormExtension');
+        $this->metadataTypeGuesser->expects($this->once())
+            ->method('getMetadataAccessor')
+            ->willReturn($metadataAccessor);
+        $this->metadataTypeGuesser->expects($this->once())
+            ->method('getConfigAccessor')
+            ->willReturn($configAccessor);
+        $this->metadataTypeGuesser->expects($this->once())
+            ->method('setMetadataAccessor')
+            ->with($this->isInstanceOf('Oro\Bundle\ApiBundle\Processor\ContextMetadataAccessor'));
+        $this->metadataTypeGuesser->expects($this->once())
+            ->method('setConfigAccessor')
+            ->with($this->isInstanceOf('Oro\Bundle\ApiBundle\Processor\ContextConfigAccessor'));
+
+        $this->processor->process($this->context);
+
+        self::assertSame($metadataAccessor, $this->context->get('previousMetadataAccessor'));
+        self::assertSame($configAccessor, $this->context->get('previousConfigAccessor'));
     }
 }

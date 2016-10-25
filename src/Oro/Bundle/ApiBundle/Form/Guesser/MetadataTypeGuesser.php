@@ -39,11 +39,27 @@ class MetadataTypeGuesser implements FormTypeGuesserInterface
     }
 
     /**
+     * @return MetadataAccessorInterface|null
+     */
+    public function getMetadataAccessor()
+    {
+        return $this->metadataAccessor;
+    }
+
+    /**
      * @param MetadataAccessorInterface|null $metadataAccessor
      */
     public function setMetadataAccessor(MetadataAccessorInterface $metadataAccessor = null)
     {
         $this->metadataAccessor = $metadataAccessor;
+    }
+
+    /**
+     * @return ConfigAccessorInterface|null
+     */
+    public function getConfigAccessor()
+    {
+        return $this->configAccessor;
     }
 
     /**
