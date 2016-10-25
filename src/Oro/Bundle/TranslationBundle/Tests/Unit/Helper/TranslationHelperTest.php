@@ -3,9 +3,12 @@
 namespace Oro\Bundle\TranslationBundle\Tests\Unit\Helper;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
+use Doctrine\Common\Persistence\ObjectManager;
 
+use Oro\Bundle\TranslationBundle\Entity\Repository\TranslationRepository;
+use Oro\Bundle\TranslationBundle\Entity\Translation;
 use Oro\Bundle\TranslationBundle\Helper\TranslationHelper;
-use Oro\Bundle\TranslationBundle\Manager\TranslationManager;
+
 use Oro\Component\Testing\Unit\EntityTrait;
 
 class TranslationHelperTest extends \PHPUnit_Framework_TestCase
@@ -15,33 +18,74 @@ class TranslationHelperTest extends \PHPUnit_Framework_TestCase
     /** @var ManagerRegistry|\PHPUnit_Framework_MockObject_MockObject */
     protected $registry;
 
-    /** @var TranslationManager|\PHPUnit_Framework_MockObject_MockObject */
-    protected $translationManager;
+    /** @var TranslationRepository|\PHPUnit_Framework_MockObject_MockObject */
+    protected $repository;
 
     /** @var TranslationHelper */
     protected $helper;
 
     protected function setUp()
     {
-        $this->registry = $this->getMockBuilder(ManagerRegistry::class)->getMock();
-
-        $this->translationManager = $this->getMockBuilder(TranslationManager::class)
+        $this->repository = $this->getMockBuilder(TranslationRepository::class)
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->helper = new TranslationHelper($this->registry, $this->translationManager);
+        $manager = $this->getMock(ObjectManager::class);
+        $manager->expects($this->any())
+            ->method('getRepository')
+            ->with(Translation::class)
+            ->willReturn($this->repository);
+
+        $this->registry = $this->getMock(ManagerRegistry::class);
+        $this->registry->expects($this->any())
+            ->method('getManagerForClass')
+            ->with(Translation::class)
+            ->willReturn($manager);
+
+        $this->helper = new TranslationHelper($this->registry);
     }
 
-    public function testGetValue()
+    public function testFindValues()
     {
-        $this->setValue($this->helper, 'values', ['locale1-domain1' => ['key1' => 'val1', 'key2' => 'val2']]);
-        $this->assertEquals('val1', $this->helper->getValue('key1', 'locale1', 'domain1'));
+        $keysPrefix = 'oro.trans';
+        $locale = 'en';
+        $domain = 'messages';
+        $data = ['data'];
+
+        $this->repository->expects($this->once())
+            ->method('findValues')
+            ->with($keysPrefix, $locale, $domain)
+            ->willReturn($data);
+
+        $this->assertEquals($data, $this->helper->findValues($keysPrefix, $locale, $domain));
     }
 
-
-    public function testGetValueEmptyValues()
+    public function testFindValue()
     {
-        $this->setValue($this->helper, 'values', []);
-        $this->assertEquals('key1', $this->helper->getValue('key1', 'locale1', 'domain1'));
+        $key = 'oro.trans.test.key';
+        $locale = 'en';
+        $domain = 'messages';
+        $data = (new Translation())->setValue('test_value');
+
+        $this->repository->expects($this->once())
+            ->method('findValue')
+            ->with($key, $locale, $domain)
+            ->willReturn($data);
+
+        $this->assertEquals($data->getValue(), $this->helper->findValue($key, $locale, $domain));
+    }
+
+    public function testFindValueWithoutTranslation()
+    {
+        $key = 'oro.trans.test.key';
+        $locale = 'en';
+        $domain = 'messages';
+
+        $this->repository->expects($this->once())
+            ->method('findValue')
+            ->with($key, $locale, $domain)
+            ->willReturn(null);
+
+        $this->assertNull($this->helper->findValue($key, $locale, $domain));
     }
 }

@@ -6,6 +6,7 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 use Oro\Bundle\WorkflowBundle\Configuration\Handler\ConfigurationHandlerInterface;
 use Oro\Bundle\WorkflowBundle\Configuration\WorkflowDefinitionBuilderExtensionInterface;
+use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Event\WorkflowChangesEvent;
 use Oro\Bundle\WorkflowBundle\Event\WorkflowEvents;
 use Oro\Bundle\WorkflowBundle\Helper\WorkflowTranslationHelper;
@@ -136,6 +137,14 @@ class TranslationProcessor implements
         foreach ($keysForRemoval as $translationKey) {
             $this->translationHelper->removeTranslationKey($translationKey);
         }
+    }
+
+    /**
+     * @param WorkflowDefinition $definition
+     */
+    public function translateWorkflowDefinitionFields(WorkflowDefinition $definition)
+    {
+        //TODO: implement in BAP-12019
     }
 
     /**

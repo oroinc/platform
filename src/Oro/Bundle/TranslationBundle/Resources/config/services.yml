@@ -240,7 +240,6 @@ services:
         class: 'Oro\Bundle\TranslationBundle\Helper\TranslationHelper'
         arguments:
             - '@doctrine'
-            - '@oro_translation.manager.translation'
 
     oro_translation.filter.language:
         class: 'Oro\Bundle\TranslationBundle\Filter\LanguageFilter'
