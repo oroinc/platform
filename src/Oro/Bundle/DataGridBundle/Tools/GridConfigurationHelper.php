@@ -28,10 +28,6 @@ class GridConfigurationHelper
      */
     public function getEntity(DatagridConfiguration $config)
     {
-        if ($config->getDatasourceType() !== OrmDatasource::TYPE) {
-            return;
-        }
-
         $entityClassName = $config->offsetGetOr('extended_entity_name');
         if ($entityClassName) {
             return $entityClassName;

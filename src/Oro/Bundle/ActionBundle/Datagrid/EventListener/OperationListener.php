@@ -78,13 +78,8 @@ class OperationListener
     {
         $config = $event->getConfig();
 
-        echo "d";
-
-        // datasource types other than ORM or search are not handled
-        if (!(
-            $config->getDatasourceType() === OrmDatasource::TYPE ||
-            $config->getDatasourceType() === SearchDatasource::TYPE
-        )) {
+        // datasource types other than ORM are not handled
+        if ($config->getDatasourceType() !== OrmDatasource::TYPE) {
             return;
         }
 

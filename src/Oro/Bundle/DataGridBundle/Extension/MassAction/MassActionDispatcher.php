@@ -140,35 +140,19 @@ class MassActionDispatcher
         $values = []
     ) {
         $datasource = $datagrid->getDatasource();
-        if (!(($datasource instanceof OrmDatasource) || ($datasource instanceof SearchDatasource))) {
-            throw new LogicException("Mass actions applicable only for datagrids with ORM and search datasource.");
-        }
-
-        if ($datasource instanceof OrmDatasource) {
-            /** @var QueryBuilder $qb */
-            $qb = $datagrid->getAcceptedDatasource()->getQueryBuilder();
-
-            if ($values) {
-                $valueWhereCondition =
-                    $inset
-                        ? $qb->expr()->in($identifierField, $values)
-                        : $qb->expr()->notIn($identifierField, $values);
-                $qb->andWhere($valueWhereCondition);
-            }
-        }
-
         if ($datasource instanceof SearchDatasource) {
-            /** @var \Oro\Bundle\SearchBundle\Query\Query $qb */
-            $qb = $datasource->getSearchQuery()->getQuery();
+            throw new LogicException("Mass actions applicable only for datagrids with ORM datasource.");
+        }
 
-            if ($values) {
-                $valueWhereCondition =
-                    $inset
-                        ? $qb->getCriteria()->expr()->in($identifierField, $values)
-                        : $qb->getCriteria()->expr()->notIn($identifierField, $values);
+        /** @var QueryBuilder $qb */
+        $qb = $datagrid->getAcceptedDatasource()->getQueryBuilder();
 
-                $qb->getCriteria()->andWhere($valueWhereCondition);
-            }
+        if ($values) {
+            $valueWhereCondition =
+                $inset
+                    ? $qb->expr()->in($identifierField, $values)
+                    : $qb->expr()->notIn($identifierField, $values);
+            $qb->andWhere($valueWhereCondition);
         }
 
         return $qb;
