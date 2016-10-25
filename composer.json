@@ -78,7 +78,8 @@
         "oro/moment-timezone": "0.3.*",
         "vakata/jstree": "^3.2",
         "symfony/polyfill-php70":"1.*",
-        "liuggio/excelbundle": "~2.1"
+        "liuggio/excelbundle": "~2.1",
+        "doctrine/annotations": "~1.2.7"
     },
     "require-dev": {
         "sensio/generator-bundle": "2.5.3",
