@@ -3,6 +3,8 @@ UPGRADE FROM 1.10 to 2.0
 
 ####General
 - LiipImagineBundle updated to 1.5.* version.
+- Added dependency on [fxpio/composer-asset-plugin](https://github.com/fxpio/composer-asset-plugin) composer plugin.
+- All original third-party asset libraries were moved out from platform and added to composer.json as bower-asset/npm-asset dependency.
 
 ####Action Component
 - Deprecated constant `Oro\Component\Action\Event\ExecuteActionEvents::DEPRECATED_HANDLE_BEFORE` removed. Use `Oro\Component\Action\Event\ExecuteActionEvents::HANDLE_BEFORE` instead.
