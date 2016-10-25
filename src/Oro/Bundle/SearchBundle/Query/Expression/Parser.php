@@ -31,7 +31,7 @@ class Parser
     protected $types;
 
     /** @var array */
-    protected $typOperators;
+    protected $typeOperators;
 
     /** @var array */
     protected $orderDirections;
@@ -74,6 +74,7 @@ class Parser
             Query::OPERATOR_NOT_IN,
             Query::OPERATOR_CONTAINS,
             Query::OPERATOR_NOT_CONTAINS,
+            Query::OPERATOR_STARTS_WITH,
         ];
 
         $this->types = [
@@ -89,10 +90,11 @@ class Parser
                 Query::OPERATOR_NOT_CONTAINS,
                 Query::OPERATOR_EQUALS,
                 Query::OPERATOR_NOT_EQUALS,
+                Query::OPERATOR_STARTS_WITH,
                 Query::OPERATOR_EXISTS,
                 Query::OPERATOR_NOT_EXISTS,
             ],
-            QUERY::TYPE_INTEGER  => [
+            Query::TYPE_INTEGER  => [
                 Query::OPERATOR_GREATER_THAN,
                 Query::OPERATOR_GREATER_THAN_EQUALS,
                 Query::OPERATOR_LESS_THAN,
@@ -104,7 +106,7 @@ class Parser
                 Query::OPERATOR_EXISTS,
                 Query::OPERATOR_NOT_EXISTS,
             ],
-            QUERY::TYPE_DECIMAL  => [
+            Query::TYPE_DECIMAL  => [
                 Query::OPERATOR_GREATER_THAN,
                 Query::OPERATOR_GREATER_THAN_EQUALS,
                 Query::OPERATOR_LESS_THAN,
@@ -116,7 +118,7 @@ class Parser
                 Query::OPERATOR_EXISTS,
                 Query::OPERATOR_NOT_EXISTS,
             ],
-            QUERY::TYPE_DATETIME => [
+            Query::TYPE_DATETIME => [
                 Query::OPERATOR_GREATER_THAN,
                 Query::OPERATOR_GREATER_THAN_EQUALS,
                 Query::OPERATOR_LESS_THAN,
@@ -600,6 +602,10 @@ class Parser
                 break;
             case Query::OPERATOR_LESS_THAN_EQUALS:
                 $expr = $expr->lte($fieldName, $this->stream->current->value);
+                break;
+
+            case Query::OPERATOR_STARTS_WITH:
+                $expr = $expr->startsWith($fieldName, $this->stream->current->value);
                 break;
 
             default:

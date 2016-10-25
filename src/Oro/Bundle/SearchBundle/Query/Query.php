@@ -37,6 +37,7 @@ class Query
     const OPERATOR_NOT_CONTAINS        = '!~';
     const OPERATOR_IN                  = 'in';
     const OPERATOR_NOT_IN              = '!in';
+    const OPERATOR_STARTS_WITH         = 'starts_with';
     const OPERATOR_EXISTS              = 'exists';
     const OPERATOR_NOT_EXISTS          = 'notexists';
 
@@ -296,6 +297,9 @@ class Query
                 break;
             case self::OPERATOR_NOT_IN:
                 $expr = $expr->notIn($fieldName, $fieldValue);
+                break;
+            case self::OPERATOR_STARTS_WITH:
+                $expr = $expr->startsWith($fieldName, $fieldValue);
                 break;
             default:
                 throw new ExpressionSyntaxError(

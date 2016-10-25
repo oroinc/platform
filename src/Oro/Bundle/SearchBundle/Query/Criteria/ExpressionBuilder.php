@@ -20,6 +20,17 @@ class ExpressionBuilder extends BaseExpressionBuilder
 
     /**
      * @param string $field
+     * @param string $value
+     *
+     * @return Comparison
+     */
+    public function startsWith($field, $value)
+    {
+        return new Comparison($field, Comparison::STARTS_WITH, new Value($value));
+    }
+
+    /**
+     * @param string $field
      * @return Comparison
      */
     public function exists($field)

@@ -79,6 +79,8 @@ class PdoMysql extends BaseDriver
                     $this->createLikeWordsExpr($qb, $shortWords, $index, $searchCondition)
                 );
             }
+        } elseif ($searchCondition['condition'] === Query::OPERATOR_STARTS_WITH) {
+            $whereExpr = $this->createStartWithWordsExpr($qb, $words, $index, $searchCondition);
         } else {
             $whereExpr = $this->createNotLikeWordsExpr($qb, $words, $index, $searchCondition);
         }
@@ -261,6 +263,31 @@ class PdoMysql extends BaseDriver
         }
 
         return $whereExpr;
+    }
+
+    /**
+     * @param QueryBuilder $qb
+     * @param array $words
+     * @param int $index
+     * @param array $searchCondition
+     * @return string
+     */
+    public function createStartWithWordsExpr(
+        QueryBuilder $qb,
+        array $words,
+        $index,
+        array $searchCondition
+    ) {
+        $joinAlias = $this->getJoinAlias($searchCondition['fieldType'], $index);
+
+        $result = $qb->expr()->orX();
+        foreach (array_values($words) as $key => $value) {
+            $valueParameter = 'value' . $index . '_w' . $key;
+            $result->add("$joinAlias.value LIKE :$valueParameter");
+            $qb->setParameter($valueParameter, $value . '%');
+        }
+
+        return $result;
     }
 
     /**
