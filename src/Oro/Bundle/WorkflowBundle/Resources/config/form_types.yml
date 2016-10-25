@@ -41,7 +41,7 @@ services:
         class: 'Oro\Bundle\WorkflowBundle\Form\Type\WorkflowStepSelectType'
         arguments:
             - '@oro_workflow.registry'
-            - '@translator.default'
+            - '@translator'
         tags:
             - { name: form.type, alias: oro_workflow_step_select }
 
@@ -49,7 +49,7 @@ services:
         class: 'Oro\Bundle\WorkflowBundle\Form\Type\WorkflowDefinitionSelectType'
         arguments:
             - '@oro_workflow.registry'
-            - '@translator.default'
+            - '@translator'
         tags:
             - { name: form.type, alias: oro_workflow_definition_select }
 
@@ -57,6 +57,7 @@ services:
         class: 'Oro\Bundle\WorkflowBundle\Form\Type\WorkflowSelectType'
         arguments:
             - '@doctrine'
+            - '@translator'
         tags:
             - { name: form.type, alias: oro_workflow_select }
 
