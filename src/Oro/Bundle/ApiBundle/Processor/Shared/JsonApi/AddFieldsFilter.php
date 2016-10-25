@@ -74,7 +74,11 @@ class AddFieldsFilter implements ProcessorInterface
         }
 
         $associations = $context->getMetadata()->getAssociations();
-        foreach ($associations as $association) {
+        foreach ($associations as $associationName => $association) {
+            $fieldConfig = $config->getField($associationName);
+            if (null !== $fieldConfig && DataType::isAssociationAsField($fieldConfig->getDataType())) {
+                continue;
+            }
             $targetClasses = $association->getAcceptableTargetClassNames();
             foreach ($targetClasses as $targetClass) {
                 $this->addFilter($filters, $targetClass, $context->getRequestType());
