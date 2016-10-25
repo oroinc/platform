@@ -12,7 +12,7 @@ use Oro\Bundle\ApiBundle\Request\DataType;
 use Oro\Bundle\EntityExtendBundle\Entity\Manager\AssociationManager;
 use Oro\Bundle\EntityExtendBundle\Extend\RelationType;
 
-class ObjectMetadataBuilder
+class ObjectMetadataFactory
 {
     /** @var MetadataHelper */
     protected $metadataHelper;
@@ -56,7 +56,7 @@ class ObjectMetadataBuilder
      *
      * @return MetaPropertyMetadata
      */
-    public function addMetaPropertyMetadata(
+    public function createAndAddMetaPropertyMetadata(
         EntityMetadata $entityMetadata,
         $entityClass,
         $fieldName,
@@ -81,7 +81,7 @@ class ObjectMetadataBuilder
      *
      * @return FieldMetadata
      */
-    public function addFieldMetadata(
+    public function createAndAddFieldMetadata(
         EntityMetadata $entityMetadata,
         $entityClass,
         $fieldName,
@@ -110,7 +110,7 @@ class ObjectMetadataBuilder
      *
      * @return AssociationMetadata
      */
-    public function addAssociationMetadata(
+    public function createAndAddAssociationMetadata(
         EntityMetadata $entityMetadata,
         $entityClass,
         $fieldName,

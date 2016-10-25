@@ -5,33 +5,33 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\GetMetadata\Loader;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionFieldConfig;
 use Oro\Bundle\ApiBundle\Metadata\AssociationMetadata;
 use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
-use Oro\Bundle\ApiBundle\Metadata\EntityMetadataFactory;
+use Oro\Bundle\ApiBundle\Metadata\EntityMetadataFactory as MetadataFactory;
 use Oro\Bundle\ApiBundle\Metadata\FieldMetadata;
 use Oro\Bundle\ApiBundle\Metadata\MetaPropertyMetadata;
-use Oro\Bundle\ApiBundle\Processor\GetMetadata\Loader\EntityMetadataBuilder;
+use Oro\Bundle\ApiBundle\Processor\GetMetadata\Loader\EntityMetadataFactory;
 use Oro\Bundle\ApiBundle\Processor\GetMetadata\Loader\MetadataHelper;
 
-class EntityMetadataBuilderTest extends LoaderTestCase
+class EntityMetadataFactoryTest extends LoaderTestCase
 {
     /** @var \PHPUnit_Framework_MockObject_MockObject */
-    protected $entityMetadataFactory;
+    protected $metadataFactory;
 
-    /** @var EntityMetadataBuilder */
-    protected $entityMetadataBuilder;
+    /** @var EntityMetadataFactory */
+    protected $entityMetadataFactory;
 
     protected function setUp()
     {
-        $this->entityMetadataFactory = $this->getMockBuilder(EntityMetadataFactory::class)
+        $this->metadataFactory = $this->getMockBuilder(MetadataFactory::class)
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->entityMetadataBuilder = new EntityMetadataBuilder(
+        $this->entityMetadataFactory = new EntityMetadataFactory(
             new MetadataHelper(),
-            $this->entityMetadataFactory
+            $this->metadataFactory
         );
     }
 
-    public function testAddEntityMetaPropertyMetadata()
+    public function testCreateAndAddMetaPropertyMetadata()
     {
         $entityMetadata = new EntityMetadata();
         $field = new EntityDefinitionFieldConfig();
@@ -43,7 +43,7 @@ class EntityMetadataBuilderTest extends LoaderTestCase
         $metadata = new MetaPropertyMetadata('propertyPath');
         $metadata->setDataType('integer');
 
-        $this->entityMetadataFactory->expects(self::once())
+        $this->metadataFactory->expects(self::once())
             ->method('createMetaPropertyMetadata')
             ->with(self::identicalTo($classMetadata), 'propertyPath', 'integer')
             ->willReturn($metadata);
@@ -51,7 +51,7 @@ class EntityMetadataBuilderTest extends LoaderTestCase
         $expected = $this->createMetaPropertyMetadata('testField', 'integer');
         $expected->setPropertyPath('propertyPath');
 
-        $result = $this->entityMetadataBuilder->addEntityMetaPropertyMetadata(
+        $result = $this->entityMetadataFactory->createAndAddMetaPropertyMetadata(
             $entityMetadata,
             $classMetadata,
             'testField',
@@ -62,7 +62,7 @@ class EntityMetadataBuilderTest extends LoaderTestCase
         self::assertEquals($expected, $result);
     }
 
-    public function testAddEntityFieldMetadata()
+    public function testCreateAndAddFieldMetadata()
     {
         $entityMetadata = new EntityMetadata();
         $entityMetadata->setIdentifierFieldNames(['id']);
@@ -75,7 +75,7 @@ class EntityMetadataBuilderTest extends LoaderTestCase
         $metadata = new FieldMetadata('propertyPath');
         $metadata->setDataType('integer');
 
-        $this->entityMetadataFactory->expects(self::once())
+        $this->metadataFactory->expects(self::once())
             ->method('createFieldMetadata')
             ->with(self::identicalTo($classMetadata), 'propertyPath', 'integer')
             ->willReturn($metadata);
@@ -83,7 +83,7 @@ class EntityMetadataBuilderTest extends LoaderTestCase
         $expected = $this->createFieldMetadata('testField', 'integer');
         $expected->setPropertyPath('propertyPath');
 
-        $result = $this->entityMetadataBuilder->addEntityFieldMetadata(
+        $result = $this->entityMetadataFactory->createAndAddFieldMetadata(
             $entityMetadata,
             $classMetadata,
             'testField',
@@ -94,7 +94,7 @@ class EntityMetadataBuilderTest extends LoaderTestCase
         self::assertEquals($expected, $result);
     }
 
-    public function testAddEntityAssociationMetadata()
+    public function testCreateAndAddAssociationMetadata()
     {
         $entityMetadata = new EntityMetadata();
         $field = new EntityDefinitionFieldConfig();
@@ -112,7 +112,7 @@ class EntityMetadataBuilderTest extends LoaderTestCase
         $metadata->setIsCollection(false);
         $metadata->setIsNullable(true);
 
-        $this->entityMetadataFactory->expects(self::once())
+        $this->metadataFactory->expects(self::once())
             ->method('createAssociationMetadata')
             ->with(self::identicalTo($classMetadata), 'propertyPath', 'integer')
             ->willReturn($metadata);
@@ -128,7 +128,7 @@ class EntityMetadataBuilderTest extends LoaderTestCase
         );
         $expected->setPropertyPath('propertyPath');
 
-        $result = $this->entityMetadataBuilder->addEntityAssociationMetadata(
+        $result = $this->entityMetadataFactory->createAndAddAssociationMetadata(
             $entityMetadata,
             $classMetadata,
             'testField',

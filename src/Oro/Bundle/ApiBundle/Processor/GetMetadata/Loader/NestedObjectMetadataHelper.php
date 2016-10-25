@@ -14,19 +14,19 @@ class NestedObjectMetadataHelper
     /** @var MetadataHelper */
     protected $metadataHelper;
 
-    /** @var ObjectMetadataBuilder */
-    protected $objectMetadataBuilder;
+    /** @var ObjectMetadataFactory */
+    protected $objectMetadataFactory;
 
     /**
      * @param MetadataHelper        $metadataHelper
-     * @param ObjectMetadataBuilder $objectMetadataBuilder
+     * @param ObjectMetadataFactory $objectMetadataFactory
      */
     public function __construct(
         MetadataHelper $metadataHelper,
-        ObjectMetadataBuilder $objectMetadataBuilder
+        ObjectMetadataFactory $objectMetadataFactory
     ) {
         $this->metadataHelper = $metadataHelper;
-        $this->objectMetadataBuilder = $objectMetadataBuilder;
+        $this->objectMetadataFactory = $objectMetadataFactory;
     }
 
     /**
@@ -48,7 +48,7 @@ class NestedObjectMetadataHelper
         $formOptions = $field->getFormOptions();
         $targetClass = $formOptions['data_class'];
 
-        $associationMetadata = $this->objectMetadataBuilder->addAssociationMetadata(
+        $associationMetadata = $this->objectMetadataFactory->createAndAddAssociationMetadata(
             $entityMetadata,
             $entityClass,
             $fieldName,
@@ -58,7 +58,7 @@ class NestedObjectMetadataHelper
         );
 
         $targetConfig = $field->getTargetEntity();
-        $targetEntityMetadata = $this->objectMetadataBuilder->createObjectMetadata($targetClass, $targetConfig);
+        $targetEntityMetadata = $this->objectMetadataFactory->createObjectMetadata($targetClass, $targetConfig);
         $associationMetadata->setTargetMetadata($targetEntityMetadata);
 
         return $associationMetadata;
