@@ -18,7 +18,7 @@ class DebugConditionCommand extends AbstractDebugCommand
     protected function configure()
     {
         $this->setName(self::COMMAND_NAME)
-            ->setDescription('Displays current "condition" for an application')
+            ->setDescription('Displays current "conditions" for an application')
             ->addArgument(self::ARGUMENT_NAME, InputArgument::OPTIONAL, 'A condition name')
             ->setHelp(<<<EOF
 The <info>%command.name%</info> displays list of all conditions with full description:
