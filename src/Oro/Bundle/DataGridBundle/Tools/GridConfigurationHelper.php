@@ -13,17 +13,12 @@ class GridConfigurationHelper
     /** @var EntityClassResolver */
     protected $entityClassResolver;
 
-    /** @var AbstractSearchMappingProvider */
-    protected $mappingProvider;
-
     /**
      * @param EntityClassResolver $entityClassResolver
      */
-    public function __construct(
-        EntityClassResolver $entityClassResolver, AbstractSearchMappingProvider $mappingProvider
-    ) {
+    public function __construct(EntityClassResolver $entityClassResolver)
+    {
         $this->entityClassResolver = $entityClassResolver;
-        $this->mappingProvider = $mappingProvider;
     }
 
     /**
@@ -33,30 +28,21 @@ class GridConfigurationHelper
      */
     public function getEntity(DatagridConfiguration $config)
     {
-        if ($config->getDatasourceType() === SearchDatasource::TYPE) {
-            $from = $config->offsetGetByPath('[source][query][from]');
-            if (!$from) {
-                return null;
-            }
+        if ($config->getDatasourceType() !== OrmDatasource::TYPE) {
+            return;
+        }
 
-            $entityClassName = $this->mappingProvider->getEntityClass($from[0]);
-
+        $entityClassName = $config->offsetGetOr('extended_entity_name');
+        if ($entityClassName) {
             return $entityClassName;
         }
 
-        if ($config->getDatasourceType() === OrmDatasource::TYPE) {
-            $entityClassName = $config->offsetGetOr('extended_entity_name');
-            if ($entityClassName) {
-                return $entityClassName;
-            }
-
-            $from = $config->offsetGetByPath('[source][query][from]');
-            if (!$from) {
-                return null;
-            }
-
-            return $this->entityClassResolver->getEntityClass($from[0]['table']);
+        $from = $config->offsetGetByPath('[source][query][from]');
+        if (!$from) {
+            return null;
         }
+
+        return $this->entityClassResolver->getEntityClass($from[0]['table']);
     }
 
     /**
