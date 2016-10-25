@@ -441,7 +441,6 @@ placeholders:
 - Class `Oro\Bundle\NavigationBundle\Provider\BuilderChainProvider`
     - construction signature was changed now it takes next arguments:
         - `FactoryInterface` $factory,
-        - `EventDispatcherInterface` $eventDispatcher,
         - `ArrayLoader` $loader,
         - `MenuManipulator` $manipulator
 - Added new command `oro:navigation:menu:reset` that removes changes in menus for different scopes.
