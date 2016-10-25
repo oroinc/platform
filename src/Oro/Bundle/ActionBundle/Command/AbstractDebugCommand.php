@@ -22,11 +22,7 @@ abstract class AbstractDebugCommand extends ContainerAwareCommand
      */
     public function isEnabled()
     {
-        if (!$this->getContainer()->has($this->getFactoryServiceId())) {
-            return false;
-        }
-
-        return parent::isEnabled();
+        return $this->getContainer()->has($this->getFactoryServiceId()) && parent::isEnabled();
     }
 
     /**
@@ -37,9 +33,9 @@ abstract class AbstractDebugCommand extends ContainerAwareCommand
         $name = $input->getArgument($this->getArgumentName());
 
         if ($name) {
-            return $this->outputDetailedInfo($name, $output);
+            return $this->outputItem($name, $output);
         } else {
-            return $this->outputTableInfo($output);
+            return $this->outputAllItems($output);
         }
     }
 
@@ -49,11 +45,11 @@ abstract class AbstractDebugCommand extends ContainerAwareCommand
      *
      * @return int
      */
-    protected function outputDetailedInfo($name, OutputInterface $output)
+    protected function outputItem($name, OutputInterface $output)
     {
         $types = $this->getTypes();
         if (!isset($types[$name])) {
-            $output->writeln(sprintf('Type "%s" not found', $name));
+            $output->writeln(sprintf('<error>Type "%s" is not found</error>', $name));
 
             return 1;
         }
@@ -61,13 +57,7 @@ abstract class AbstractDebugCommand extends ContainerAwareCommand
         try {
             $service = $this->getContainer()->get($types[$name]);
         } catch (\TypeError $e) {
-            $output->writeln(
-                sprintf(
-                    '<error>Unable to load service "%s", due error "%s"</error>',
-                    $name,
-                    $e->getMessage()
-                )
-            );
+            $output->writeln(sprintf('<error>Can not load Service "%s": %s</error>', $types[$name], $e->getMessage()));
 
             return 1;
         }
@@ -92,7 +82,7 @@ abstract class AbstractDebugCommand extends ContainerAwareCommand
      *
      * @return int
      */
-    protected function outputTableInfo(OutputInterface $output)
+    protected function outputAllItems(OutputInterface $output)
     {
         $container = $this->getContainer();
 
