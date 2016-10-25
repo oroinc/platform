@@ -8,6 +8,7 @@ namespace Oro\Bundle\ActionBundle\Tests\Unit\Stub;
  *
  * Class TestEntity1
  * @package Oro\Bundle\ActionBundle\Tests\Unit\Stub
+ * @SuppressWarnings(PHPMD)
  */
 class TestEntity1
 {
