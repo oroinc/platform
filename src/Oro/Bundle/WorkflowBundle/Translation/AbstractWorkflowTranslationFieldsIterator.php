@@ -63,10 +63,10 @@ abstract class AbstractWorkflowTranslationFieldsIterator implements TranslationF
             foreach ($configuration[WorkflowConfiguration::NODE_TRANSITIONS] as $transitionKey => &$transition) {
                 $context['transition_name'] = $this->resolveName($transition, $transitionKey);
                 yield $this->makeKey(TransitionLabelTemplate::class, $context) => $transition['label'];
-
                 yield $this->makeKey(TransitionWarningMessageTemplate::class, $context) => $transition['message'];
 
-                foreach ($this->transitionAttributeFields($transition, $context) as $key => &$attrValue) {
+                $attributeFields = $this->transitionAttributeFields($transition, $context);
+                foreach ($attributeFields as $key => &$attrValue) {
                     yield $key => $attrValue;
                 }
                 unset($attrValue, $context['transition_name']);
@@ -91,6 +91,7 @@ abstract class AbstractWorkflowTranslationFieldsIterator implements TranslationF
                 yield $key => $attributeConfig['options']['label'];
                 unset($context['attribute_name']);
             }
+            unset($attributeConfig);
         }
     }
 

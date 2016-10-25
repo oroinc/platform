@@ -30,9 +30,7 @@ class TranslationProcessor implements ConfigurationHandlerInterface, WorkflowDef
             throw new \InvalidArgumentException('Workflow configuration for handler must contain valid `name` node.');
         }
 
-        $workflowName = $configuration['name'];
-
-        $translationFieldsIterator = new WorkflowConfigurationTranslationFieldsIterator($workflowName, $configuration);
+        $translationFieldsIterator = $this->getConfigurationIterator($configuration['name'], $configuration);
 
         foreach ($translationFieldsIterator as $translationKey => $value) {
             if ($value !== $translationKey) {
@@ -49,7 +47,7 @@ class TranslationProcessor implements ConfigurationHandlerInterface, WorkflowDef
      */
     public function prepare($workflowName, array $configuration)
     {
-        $translationFieldsIterator = new WorkflowConfigurationTranslationFieldsIterator($workflowName, $configuration);
+        $translationFieldsIterator = $this->getConfigurationIterator($workflowName, $configuration);
 
         //fill translatable fields with it's translation keys
         foreach ($translationFieldsIterator as $translationKey => $value) {
@@ -74,5 +72,15 @@ class TranslationProcessor implements ConfigurationHandlerInterface, WorkflowDef
             $fieldTranslation = $this->translationHelper->findWorkflowTranslation($keyValue, $workflowName);
             $workflowDefinitionFieldsIterator->writeCurrent($fieldTranslation !== $key ? $fieldTranslation : '');
         }
+    }
+
+    /**
+     * @param string $workflowName
+     * @param array $configuration
+     * @return WorkflowConfigurationTranslationFieldsIterator
+     */
+    protected function getConfigurationIterator($workflowName, array $configuration)
+    {
+        return new WorkflowConfigurationTranslationFieldsIterator($workflowName, $configuration);
     }
 }

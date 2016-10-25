@@ -122,6 +122,25 @@ class WorkflowTranslationHelperTest extends \PHPUnit_Framework_TestCase
         $this->helper->saveTranslation('test_key', 'test_value');
     }
 
+    public function testSaveTranslationWithNotDefaultLocale()
+    {
+        $this->translator->expects($this->once())->method('getLocale')->willReturn('pl');
+
+        $this->manager->expects($this->at(0))
+            ->method('saveValue')
+            ->with('test_key', 'test_value', 'pl', WorkflowTranslationHelper::TRANSLATION_DOMAIN);
+        $this->manager->expects($this->at(1))
+            ->method('saveValue')
+            ->with(
+                'test_key',
+                'test_value',
+                Translation::DEFAULT_LOCALE,
+                WorkflowTranslationHelper::TRANSLATION_DOMAIN
+            );
+
+        $this->helper->saveTranslation('test_key', 'test_value');
+    }
+
     /**
      * @dataProvider findTranslationProvider
      *
