@@ -10,13 +10,10 @@ use Knp\Menu\ItemInterface;
 
 use Oro\Bundle\NavigationBundle\Entity\MenuUpdateInterface;
 use Oro\Bundle\NavigationBundle\Exception\NotFoundParentException;
-use Oro\Bundle\NavigationBundle\Exception\ValidationFailedException;
 use Oro\Bundle\NavigationBundle\JsTree\MenuUpdateTreeHandler;
 use Oro\Bundle\NavigationBundle\Menu\Helper\MenuUpdateHelper;
 use Oro\Bundle\NavigationBundle\Provider\BuilderChainProvider;
 use Oro\Bundle\NavigationBundle\Utils\MenuUpdateUtils;
-
-use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 class MenuUpdateManager
 {
@@ -29,9 +26,6 @@ class MenuUpdateManager
     /** @var MenuUpdateHelper */
     private $menuUpdateHelper;
 
-    /** @var ValidatorInterface */
-    private $validator;
-
     /** @var string */
     private $entityClass;
 
@@ -39,18 +33,15 @@ class MenuUpdateManager
      * @param ManagerRegistry $managerRegistry
      * @param BuilderChainProvider $builderChainProvider
      * @param MenuUpdateHelper $menuUpdateHelper
-     * @param ValidatorInterface $validator
      */
     public function __construct(
         ManagerRegistry $managerRegistry,
         BuilderChainProvider $builderChainProvider,
-        MenuUpdateHelper $menuUpdateHelper,
-        ValidatorInterface $validator
+        MenuUpdateHelper $menuUpdateHelper
     ) {
         $this->managerRegistry = $managerRegistry;
         $this->builderChainProvider = $builderChainProvider;
         $this->menuUpdateHelper = $menuUpdateHelper;
-        $this->validator = $validator;
     }
 
     /**
@@ -302,7 +293,7 @@ class MenuUpdateManager
      * @param string $parentKey
      * @param int $position
      *
-     * @throws ValidationFailedException
+     * @return MenuUpdateInterface[]
      */
     public function moveMenuItem($menuName, $key, $ownershipType, $ownerId, $parentKey, $position)
     {
@@ -331,16 +322,7 @@ class MenuUpdateManager
             $this->getReorderedMenuUpdates($menuName, $order, $ownershipType, $ownerId)
         );
 
-        foreach ($updates as $update) {
-            $errors = $this->validator->validate($update, 'move');
-            if (count($errors)) {
-                throw new ValidationFailedException();
-            }
-
-            $this->getEntityManager()->persist($update);
-        }
-
-        $this->getEntityManager()->flush();
+        return $updates;
     }
 
     /**

@@ -173,7 +173,7 @@ class MenuUpdateManagerTest extends WebTestCase
 
     public function testMoveMenuItem()
     {
-        $this->manager->moveMenuItem(
+        $updates = $this->manager->moveMenuItem(
             self::MENU_NAME,
             LoadMenuUpdateData::MENU_UPDATE_3_1,
             'global',
@@ -182,20 +182,13 @@ class MenuUpdateManagerTest extends WebTestCase
             0
         );
 
-        /** @var MenuUpdate[] $result */
-        $result = $this->repository
-            ->findBy(
-                [
-                    'menu' => self::MENU_NAME,
-                    'key' => [LoadMenuUpdateData::MENU_UPDATE_2_1, LoadMenuUpdateData::MENU_UPDATE_3_1],
-                    'ownershipType' => 'global',
-                    'ownerId' => 0
-                ]
-            );
+        $this->assertCount(2, $updates);
 
-        $this->assertCount(2, $result);
-        $this->assertEquals(1, $result[0]->getPriority());
-        $this->assertEquals(2, $result[1]->getPriority());
-        $this->assertEquals(LoadMenuUpdateData::MENU_UPDATE_2, $result[1]->getParentKey());
+        $this->assertEquals(1, $updates[0]->getPriority());
+        $this->assertEquals(LoadMenuUpdateData::MENU_UPDATE_3_1, $updates[0]->getKey());
+        $this->assertEquals(LoadMenuUpdateData::MENU_UPDATE_2, $updates[0]->getParentKey());
+
+        $this->assertEquals(LoadMenuUpdateData::MENU_UPDATE_2_1, $updates[1]->getKey());
+        $this->assertEquals(2, $updates[1]->getPriority());
     }
 }

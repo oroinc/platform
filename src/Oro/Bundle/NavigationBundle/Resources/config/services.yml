@@ -389,7 +389,6 @@ services:
             - "@doctrine"
             - "@oro_menu.builder_chain"
             - "@oro_navigation.menu_helper.menu_update"
-            - "@validator"
 
     oro_navigation.manager.menu_update_default:
         parent: oro_navigation.manager.menu_update_abstract

@@ -13,7 +13,6 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 
 use Oro\Bundle\NavigationBundle\Entity\MenuUpdate;
-use Oro\Bundle\NavigationBundle\Exception\ValidationFailedException;
 use Oro\Bundle\NavigationBundle\Menu\ConfigurationBuilder;
 use Oro\Bundle\NavigationBundle\Manager\MenuUpdateManager;
 
@@ -193,13 +192,22 @@ class AjaxMenuController extends Controller
         $parentKey = $request->get('parentKey');
         $position = $request->get('position');
 
-        try {
-            $manager->moveMenuItem($menuName, $key, $ownershipType, $ownerId, $parentKey, $position);
-        } catch (ValidationFailedException $e) {
-            $message = $this->get('translator')->trans('oro.navigation.menuupdate.validation_error_message');
+        /** @var EntityManager $entityManager */
+        $entityManager = $this->getDoctrine()->getManagerForClass(MenuUpdate::class);
 
-            return new JsonResponse(['message' => $message], Response::HTTP_BAD_REQUEST);
+        $updates = $manager->moveMenuItem($menuName, $key, $ownershipType, $ownerId, $parentKey, $position);
+        foreach ($updates as $update) {
+            $errors = $this->get('validator')->validate($update, 'move');
+            if (count($errors)) {
+                $message = $this->get('translator')->trans('oro.navigation.menuupdate.validation_error_message');
+
+                return new JsonResponse(['message' => $message], Response::HTTP_BAD_REQUEST);
+            }
+
+            $entityManager->persist($update);
         }
+
+        $entityManager->flush();
 
         return new JsonResponse(['status' => true], Response::HTTP_OK);
     }
