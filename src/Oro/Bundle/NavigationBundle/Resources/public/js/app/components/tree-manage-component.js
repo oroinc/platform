@@ -93,20 +93,20 @@ define(function(require) {
                     parentKey: data.parent,
                     position: data.position
                 },
-                success: function(result) {
-                    if (!result.status) {
-                        self.rollback(data);
-
-                        var message = __('oro.ui.jstree.move_node_error', {nodeText: data.node.text});
-                        if (result.message) {
-                            message = result.message;
-                        }
-                        messenger.notificationFlashMessage('error', message);
-                    } else if (self.reloadWidget) {
+                success: function() {
+                    if (self.reloadWidget) {
                         widgetManager.getWidgetInstanceByAlias(self.reloadWidget, function(widget) {
                             widget.render();
                         });
                     }
+                },
+                error: function(xhr) {
+                    self.rollback(data);
+                    var message = __('oro.ui.jstree.move_node_error', {nodeText: data.node.text});
+                    if (xhr.responseJSON.message) {
+                        message = xhr.responseJSON.message;
+                    }
+                    messenger.notificationFlashMessage('error', message);
                 }
             });
         }

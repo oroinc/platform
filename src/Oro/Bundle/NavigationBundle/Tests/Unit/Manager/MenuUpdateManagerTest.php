@@ -14,6 +14,8 @@ use Oro\Bundle\NavigationBundle\Tests\Unit\Entity\Stub\MenuItemStub;
 use Oro\Bundle\NavigationBundle\Tests\Unit\Entity\Stub\MenuUpdateStub;
 use Oro\Bundle\NavigationBundle\Tests\Unit\MenuItemTestTrait;
 
+use Symfony\Component\Validator\Validator\ValidatorInterface;
+
 class MenuUpdateManagerTest extends \PHPUnit_Framework_TestCase
 {
     const MENU_ID = 'menu';
@@ -30,6 +32,9 @@ class MenuUpdateManagerTest extends \PHPUnit_Framework_TestCase
 
     /** @var  MenuUpdateHelper|\PHPUnit_Framework_MockObject_MockObject */
     protected $menuUpdateHelper;
+
+    /** @var  ValidatorInterface */
+    protected $validator;
 
     /** @var MenuUpdateManager */
     protected $manager;
@@ -58,8 +63,14 @@ class MenuUpdateManagerTest extends \PHPUnit_Framework_TestCase
 
         $this->builderChainProvider = $this->getMock(BuilderChainProvider::class, [], [], '', false);
         $this->menuUpdateHelper = $this->getMock(MenuUpdateHelper::class, [], [], '', false);
+        $this->validator = $this->getMock(ValidatorInterface::class, [], [], '', false);
 
-        $this->manager = new MenuUpdateManager($managerRegistry, $this->builderChainProvider, $this->menuUpdateHelper);
+        $this->manager = new MenuUpdateManager(
+            $managerRegistry,
+            $this->builderChainProvider,
+            $this->menuUpdateHelper,
+            $this->validator
+        );
     }
 
     public function testCreateMenuUpdate()

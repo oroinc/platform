@@ -16,7 +16,7 @@ class ResetMenuUpdatesCommand extends WebTestCase
     {
         $this->initClient();
         $this->loadFixtures([
-            'Oro\Bundle\NavigationBundle\Tests\Functional\DataFixtures\MenuUpdateData'
+            'Oro\Bundle\NavigationBundle\Tests\Functional\DataFixtures\LoadMenuUpdateData'
         ]);
     }
 

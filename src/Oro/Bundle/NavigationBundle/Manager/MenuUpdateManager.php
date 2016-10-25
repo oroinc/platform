@@ -10,10 +10,13 @@ use Knp\Menu\ItemInterface;
 
 use Oro\Bundle\NavigationBundle\Entity\MenuUpdateInterface;
 use Oro\Bundle\NavigationBundle\Exception\NotFoundParentException;
+use Oro\Bundle\NavigationBundle\Exception\ValidationFailedException;
 use Oro\Bundle\NavigationBundle\JsTree\MenuUpdateTreeHandler;
 use Oro\Bundle\NavigationBundle\Menu\Helper\MenuUpdateHelper;
 use Oro\Bundle\NavigationBundle\Provider\BuilderChainProvider;
 use Oro\Bundle\NavigationBundle\Utils\MenuUpdateUtils;
+
+use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 class MenuUpdateManager
 {
@@ -26,6 +29,9 @@ class MenuUpdateManager
     /** @var MenuUpdateHelper */
     private $menuUpdateHelper;
 
+    /** @var ValidatorInterface */
+    private $validator;
+
     /** @var string */
     private $entityClass;
 
@@ -33,15 +39,18 @@ class MenuUpdateManager
      * @param ManagerRegistry $managerRegistry
      * @param BuilderChainProvider $builderChainProvider
      * @param MenuUpdateHelper $menuUpdateHelper
+     * @param ValidatorInterface $validator
      */
     public function __construct(
         ManagerRegistry $managerRegistry,
         BuilderChainProvider $builderChainProvider,
-        MenuUpdateHelper $menuUpdateHelper
+        MenuUpdateHelper $menuUpdateHelper,
+        ValidatorInterface $validator
     ) {
         $this->managerRegistry = $managerRegistry;
         $this->builderChainProvider = $builderChainProvider;
         $this->menuUpdateHelper = $menuUpdateHelper;
+        $this->validator = $validator;
     }
 
     /**
@@ -281,6 +290,57 @@ class MenuUpdateManager
 
             $this->hideMenuItemChildren($menuName, $child, $ownershipType, $ownerId);
         }
+    }
+
+    /**
+     * @SuppressWarnings(PHPMD.NPathComplexity)
+     *
+     * @param string $menuName
+     * @param string $key
+     * @param string $ownershipType
+     * @param int $ownerId
+     * @param string $parentKey
+     * @param int $position
+     *
+     * @throws ValidationFailedException
+     */
+    public function moveMenuItem($menuName, $key, $ownershipType, $ownerId, $parentKey, $position)
+    {
+        $currentUpdate = $this->getMenuUpdateByKeyAndScope($menuName, $key, $ownershipType, $ownerId);
+
+        $parent = $this->findMenuItem($menuName, $parentKey, $ownershipType);
+        $currentUpdate->setParentKey($parent ? $parent->getName() : null);
+
+        $i = 0;
+        $order = [];
+        $parent = !$parent ? $this->getMenu($menuName) : $parent;
+
+        /** @var ItemInterface $child */
+        foreach ($parent->getChildren() as $child) {
+            if ($position == $i++) {
+                $currentUpdate->setPriority($i++);
+            }
+
+            if ($child->getName() != $key) {
+                $order[$i] = $child;
+            }
+        }
+
+        $updates = array_merge(
+            [$currentUpdate],
+            $this->getReorderedMenuUpdates($menuName, $order, $ownershipType, $ownerId)
+        );
+
+        foreach ($updates as $update) {
+            $errors = $this->validator->validate($update, 'move');
+            if (count($errors)) {
+                throw new ValidationFailedException();
+            }
+
+            $this->getEntityManager()->persist($update);
+        }
+
+        $this->getEntityManager()->flush();
     }
 
     /**

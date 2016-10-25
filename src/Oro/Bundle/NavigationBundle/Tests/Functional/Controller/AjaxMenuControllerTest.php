@@ -4,6 +4,7 @@ namespace Oro\Bundle\NavigationBundle\Tests\Functional\Controller;
 
 use Oro\Bundle\NavigationBundle\Menu\Provider\GlobalOwnershipProvider;
 use Oro\Bundle\NavigationBundle\Menu\Provider\UserOwnershipProvider;
+use Oro\Bundle\NavigationBundle\Tests\Functional\DataFixtures\LoadMenuUpdateData;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
 use Symfony\Component\HttpFoundation\Response;
@@ -13,6 +14,8 @@ use Symfony\Component\HttpFoundation\Response;
  */
 class AjaxMenuControllerTest extends WebTestCase
 {
+    const MENU_NAME = 'application_menu';
+
     /**
      * {@inheritdoc}
      */
@@ -21,15 +24,15 @@ class AjaxMenuControllerTest extends WebTestCase
         $this->initClient([], $this->generateWsseAuthHeader());
 
         $this->loadFixtures([
-            'Oro\Bundle\NavigationBundle\Tests\Functional\DataFixtures\MenuUpdateData'
+            'Oro\Bundle\NavigationBundle\Tests\Functional\DataFixtures\LoadMenuUpdateData'
         ]);
     }
 
     public function testCreateGlobal()
     {
         $parameters = [
-            'menuName' => 'application_menu',
-            'parentKey' => 'menu_update.1',
+            'menuName' => self::MENU_NAME,
+            'parentKey' => LoadMenuUpdateData::MENU_UPDATE_1,
             'ownershipType' => GlobalOwnershipProvider::TYPE
         ];
 
@@ -50,7 +53,7 @@ class AjaxMenuControllerTest extends WebTestCase
     public function testCreateUser()
     {
         $parameters = [
-            'menuName' => 'application_menu',
+            'menuName' => self::MENU_NAME,
             'parentKey' => 'menu_list_default',
             'ownershipType' => UserOwnershipProvider::TYPE
         ];
@@ -72,8 +75,8 @@ class AjaxMenuControllerTest extends WebTestCase
     public function testDeleteGlobal()
     {
         $parameters = [
-            'menuName' => 'application_menu',
-            'key' => 'menu_update.1_1',
+            'menuName' => self::MENU_NAME,
+            'key' => LoadMenuUpdateData::MENU_UPDATE_1_1,
             'ownershipType' => GlobalOwnershipProvider::TYPE
         ];
 
@@ -91,8 +94,8 @@ class AjaxMenuControllerTest extends WebTestCase
     public function testDeleteUser()
     {
         $parameters = [
-            'menuName' => 'application_menu',
-            'key' => 'menu_update.3_1',
+            'menuName' => self::MENU_NAME,
+            'key' => LoadMenuUpdateData::MENU_UPDATE_3_1,
             'ownershipType' => UserOwnershipProvider::TYPE
         ];
 
@@ -110,8 +113,8 @@ class AjaxMenuControllerTest extends WebTestCase
     public function testShowGlobal()
     {
         $parameters = [
-            'menuName' => 'application_menu',
-            'key' => 'menu_update.2_1',
+            'menuName' => self::MENU_NAME,
+            'key' => LoadMenuUpdateData::MENU_UPDATE_2_1,
             'ownershipType' => GlobalOwnershipProvider::TYPE
         ];
 
@@ -129,8 +132,8 @@ class AjaxMenuControllerTest extends WebTestCase
     public function testShowUser()
     {
         $parameters = [
-            'menuName' => 'application_menu',
-            'key' => 'menu_update.3',
+            'menuName' => self::MENU_NAME,
+            'key' => LoadMenuUpdateData::MENU_UPDATE_3,
             'ownershipType' => UserOwnershipProvider::TYPE
         ];
 
@@ -148,8 +151,8 @@ class AjaxMenuControllerTest extends WebTestCase
     public function testHideGlobal()
     {
         $parameters = [
-            'menuName' => 'application_menu',
-            'key' => 'menu_update.2',
+            'menuName' => self::MENU_NAME,
+            'key' => LoadMenuUpdateData::MENU_UPDATE_2,
             'ownershipType' => GlobalOwnershipProvider::TYPE
         ];
 
@@ -167,8 +170,8 @@ class AjaxMenuControllerTest extends WebTestCase
     public function testHideUser()
     {
         $parameters = [
-            'menuName' => 'application_menu',
-            'key' => 'menu_update.3',
+            'menuName' => self::MENU_NAME,
+            'key' => LoadMenuUpdateData::MENU_UPDATE_3,
             'ownershipType' => UserOwnershipProvider::TYPE
         ];
 
@@ -186,7 +189,7 @@ class AjaxMenuControllerTest extends WebTestCase
     public function testResetGlobal()
     {
         $parameters = [
-            'menuName' => 'application_menu',
+            'menuName' => self::MENU_NAME,
             'ownershipType' => GlobalOwnershipProvider::TYPE
         ];
 
@@ -204,7 +207,7 @@ class AjaxMenuControllerTest extends WebTestCase
     public function testResetUser()
     {
         $parameters = [
-            'menuName' => 'application_menu',
+            'menuName' => self::MENU_NAME,
             'ownershipType' => UserOwnershipProvider::TYPE
         ];
 
@@ -222,7 +225,7 @@ class AjaxMenuControllerTest extends WebTestCase
     public function testMoveGlobal()
     {
         $parameters = [
-            'menuName' => 'application_menu',
+            'menuName' => self::MENU_NAME,
             'ownershipType' => GlobalOwnershipProvider::TYPE
         ];
 
@@ -231,8 +234,8 @@ class AjaxMenuControllerTest extends WebTestCase
             $this->getUrl('oro_navigation_menuupdate_move', $parameters),
             [
                 'ownerId' => 0,
-                'key' => 'menu_update.1',
-                'parentKey' => 'application_menu',
+                'key' => LoadMenuUpdateData::MENU_UPDATE_1,
+                'parentKey' => self::MENU_NAME,
                 'position' => 33
             ]
         );
@@ -245,7 +248,7 @@ class AjaxMenuControllerTest extends WebTestCase
     public function testMoveUser()
     {
         $parameters = [
-            'menuName' => 'application_menu',
+            'menuName' => self::MENU_NAME,
             'ownershipType' => UserOwnershipProvider::TYPE
         ];
 
@@ -254,8 +257,8 @@ class AjaxMenuControllerTest extends WebTestCase
             $this->getUrl('oro_navigation_menuupdate_move', $parameters),
             [
                 'ownerId' => $this->getReference('simple_user')->getId(),
-                'key' => 'menu_update.3',
-                'parentKey' => 'application_menu',
+                'key' => LoadMenuUpdateData::MENU_UPDATE_3,
+                'parentKey' => self::MENU_NAME,
                 'position' => 11
             ]
         );

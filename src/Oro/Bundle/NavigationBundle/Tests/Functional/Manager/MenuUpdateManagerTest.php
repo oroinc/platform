@@ -7,6 +7,7 @@ use Doctrine\ORM\EntityRepository;
 
 use Oro\Bundle\NavigationBundle\Entity\MenuUpdate;
 use Oro\Bundle\NavigationBundle\Manager\MenuUpdateManager;
+use Oro\Bundle\NavigationBundle\Tests\Functional\DataFixtures\LoadMenuUpdateData;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
 use Oro\Component\Testing\Unit\EntityTrait;
@@ -17,6 +18,8 @@ use Oro\Component\Testing\Unit\EntityTrait;
 class MenuUpdateManagerTest extends WebTestCase
 {
     use EntityTrait;
+
+    const MENU_NAME = 'application_menu';
 
     /** @var EntityManager */
     protected $em;
@@ -36,7 +39,7 @@ class MenuUpdateManagerTest extends WebTestCase
 
         $this->loadFixtures(
             [
-                'Oro\Bundle\NavigationBundle\Tests\Functional\DataFixtures\MenuUpdateData'
+                'Oro\Bundle\NavigationBundle\Tests\Functional\DataFixtures\LoadMenuUpdateData'
             ]
         );
 
@@ -47,7 +50,7 @@ class MenuUpdateManagerTest extends WebTestCase
 
     public function testGetMenuUpdatesByMenuAndScopeOwnershipGlobal()
     {
-        $updates = $this->manager->getMenuUpdatesByMenuAndScope('application_menu', 'global', 0);
+        $updates = $this->manager->getMenuUpdatesByMenuAndScope(self::MENU_NAME, 'global', 0);
 
         $this->assertCount(5, $updates);
     }
@@ -55,7 +58,7 @@ class MenuUpdateManagerTest extends WebTestCase
     public function testGetMenuUpdatesByMenuAndScopeOwnershipUser()
     {
         $updates = $this->manager->getMenuUpdatesByMenuAndScope(
-            'application_menu',
+            self::MENU_NAME,
             'user',
             $this->getReference('simple_user')->getId()
         );
@@ -65,13 +68,18 @@ class MenuUpdateManagerTest extends WebTestCase
 
     public function testGetMenuUpdateByKeyAndScopeGlobal()
     {
-        $update = $this->manager->getMenuUpdateByKeyAndScope('application_menu', 'menu_update.1', 'global', 0);
+        $update = $this->manager->getMenuUpdateByKeyAndScope(
+            self::MENU_NAME,
+            LoadMenuUpdateData::MENU_UPDATE_1,
+            'global',
+            0
+        );
 
         $result = $this->repository
             ->findOneBy(
                 [
-                    'menu' => 'application_menu',
-                    'key' => 'menu_update.1',
+                    'menu' => self::MENU_NAME,
+                    'key' => LoadMenuUpdateData::MENU_UPDATE_1,
                     'ownershipType' => 'global',
                     'ownerId' => 0
                 ]
@@ -83,8 +91,8 @@ class MenuUpdateManagerTest extends WebTestCase
     public function testGetMenuUpdateByKeyAndScopeUser()
     {
         $update = $this->manager->getMenuUpdateByKeyAndScope(
-            'application_menu',
-            'menu_update.3',
+            self::MENU_NAME,
+            LoadMenuUpdateData::MENU_UPDATE_3,
             'user',
             $this->getReference('simple_user')->getId()
         );
@@ -92,8 +100,8 @@ class MenuUpdateManagerTest extends WebTestCase
         $result = $this->repository
             ->findOneBy(
                 [
-                    'menu' => 'application_menu',
-                    'key' => 'menu_update.3',
+                    'menu' => self::MENU_NAME,
+                    'key' => LoadMenuUpdateData::MENU_UPDATE_3,
                     'ownershipType' => 'user',
                     'ownerId' => $this->getReference('simple_user')->getId()
                 ]
@@ -104,14 +112,18 @@ class MenuUpdateManagerTest extends WebTestCase
 
     public function testShowMenuItem()
     {
-        $this->manager->showMenuItem('application_menu', 'menu_update.2_1', 'global', 0);
+        $this->manager->showMenuItem(self::MENU_NAME, LoadMenuUpdateData::MENU_UPDATE_2_1, 'global', 0);
 
         /** @var MenuUpdate[] $result */
         $result = $this->repository
             ->findBy(
                 [
-                    'menu' => 'application_menu',
-                    'key' => ['menu_update.2', 'menu_update.2_1', 'menu_update.2_1_1'],
+                    'menu' => self::MENU_NAME,
+                    'key' => [
+                        LoadMenuUpdateData::MENU_UPDATE_2,
+                        LoadMenuUpdateData::MENU_UPDATE_2_1,
+                        LoadMenuUpdateData::MENU_UPDATE_2_1_1
+                    ],
                     'ownershipType' => 'global',
                     'ownerId' => 0
                 ]
@@ -124,14 +136,14 @@ class MenuUpdateManagerTest extends WebTestCase
 
     public function testHideMenuItem()
     {
-        $this->manager->hideMenuItem('application_menu', 'menu_update.1', 'global', 0);
+        $this->manager->hideMenuItem(self::MENU_NAME, LoadMenuUpdateData::MENU_UPDATE_1, 'global', 0);
 
         /** @var MenuUpdate[] $result */
         $result = $this->repository
             ->findBy(
                 [
-                    'menu' => 'application_menu',
-                    'key' => ['menu_update.1', 'menu_update.1_1'],
+                    'menu' => self::MENU_NAME,
+                    'key' => [LoadMenuUpdateData::MENU_UPDATE_1, LoadMenuUpdateData::MENU_UPDATE_1_1],
                     'ownershipType' => 'global',
                     'ownerId' => 0
                 ]
@@ -144,18 +156,46 @@ class MenuUpdateManagerTest extends WebTestCase
 
     public function testResetMenuUpdatesWithOwnershipType()
     {
-        $this->manager->resetMenuUpdatesWithOwnershipType('global', 0, 'application_menu');
+        $this->manager->resetMenuUpdatesWithOwnershipType('global', 0, self::MENU_NAME);
 
         /** @var MenuUpdate[] $result */
         $result = $this->repository
             ->findBy(
                 [
-                    'menu' => 'application_menu',
+                    'menu' => self::MENU_NAME,
                     'ownershipType' => 'global',
                     'ownerId' => 0
                 ]
             );
 
         $this->assertCount(0, $result);
+    }
+
+    public function testMoveMenuItem()
+    {
+        $this->manager->moveMenuItem(
+            self::MENU_NAME,
+            LoadMenuUpdateData::MENU_UPDATE_3_1,
+            'global',
+            0,
+            LoadMenuUpdateData::MENU_UPDATE_2,
+            0
+        );
+
+        /** @var MenuUpdate[] $result */
+        $result = $this->repository
+            ->findBy(
+                [
+                    'menu' => self::MENU_NAME,
+                    'key' => [LoadMenuUpdateData::MENU_UPDATE_2_1, LoadMenuUpdateData::MENU_UPDATE_3_1],
+                    'ownershipType' => 'global',
+                    'ownerId' => 0
+                ]
+            );
+
+        $this->assertCount(2, $result);
+        $this->assertEquals(1, $result[0]->getPriority());
+        $this->assertEquals(2, $result[1]->getPriority());
+        $this->assertEquals(LoadMenuUpdateData::MENU_UPDATE_2, $result[1]->getParentKey());
     }
 }

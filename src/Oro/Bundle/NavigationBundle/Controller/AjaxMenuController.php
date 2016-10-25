@@ -4,8 +4,6 @@ namespace Oro\Bundle\NavigationBundle\Controller;
 
 use Doctrine\ORM\EntityManager;
 
-use Knp\Menu\ItemInterface;
-
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 
@@ -15,6 +13,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 
 use Oro\Bundle\NavigationBundle\Entity\MenuUpdate;
+use Oro\Bundle\NavigationBundle\Exception\ValidationFailedException;
 use Oro\Bundle\NavigationBundle\Menu\ConfigurationBuilder;
 use Oro\Bundle\NavigationBundle\Manager\MenuUpdateManager;
 
@@ -189,55 +188,20 @@ class AjaxMenuController extends Controller
         /** @var MenuUpdateManager $manager */
         $manager = $this->get('oro_navigation.manager.menu_update_default');
 
-        $ownerId = $this->getCurrentOwnerId($ownershipType, $request->get('ownerId'));
-
         $key = $request->get('key');
-        $currentUpdate = $manager->getMenuUpdateByKeyAndScope($menuName, $key, $ownershipType, $ownerId);
-
+        $ownerId = $this->getCurrentOwnerId($ownershipType, $request->get('ownerId'));
         $parentKey = $request->get('parentKey');
-        $parent = $manager->findMenuItem($menuName, $parentKey, $ownershipType);
-        $currentUpdate->setParentKey($parent ? $parent->getName() : null);
-
-        $i = 0;
-        $order = [];
-        $parent = !$parent ? $manager->getMenu($menuName) : $parent;
-
         $position = $request->get('position');
-        /** @var ItemInterface $child */
-        foreach ($parent->getChildren() as $child) {
-            if ($position == $i++) {
-                $currentUpdate->setPriority($i++);
-            }
 
-            if ($child->getName() != $key) {
-                $order[$i] = $child;
-            }
+        try {
+            $manager->moveMenuItem($menuName, $key, $ownershipType, $ownerId, $parentKey, $position);
+        } catch (ValidationFailedException $e) {
+            $message = $this->get('translator')->trans('oro.navigation.menuupdate.validation_error_message');
+
+            return new JsonResponse(['message' => $message], Response::HTTP_BAD_REQUEST);
         }
 
-        /** @var EntityManager $em */
-        $em = $this->getDoctrine()->getManagerForClass(MenuUpdate::class);
-
-        $updates = array_merge(
-            [$currentUpdate],
-            $manager->getReorderedMenuUpdates($menuName, $order, $ownershipType, $ownerId)
-        );
-
-        $errors = [];
-        foreach ($updates as $update) {
-            $errors = $this->get('validator')->validate($update, 'move');
-            if (count($errors)) {
-                break;
-            }
-
-            $em->persist($update);
-        }
-
-        if (!count($errors)) {
-            $em->flush($updates);
-            return new JsonResponse(['status' => true], Response::HTTP_OK);
-        }
-
-        return new JsonResponse(['status' => false, 'message' => (string) $errors], Response::HTTP_OK);
+        return new JsonResponse(['status' => true], Response::HTTP_OK);
     }
 
     /**

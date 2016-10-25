@@ -14,15 +14,23 @@ use Oro\Bundle\UserBundle\DataFixtures\UserUtilityTrait;
 
 use Oro\Component\Testing\Unit\EntityTrait;
 
-class MenuUpdateData extends AbstractFixture implements DependentFixtureInterface
+class LoadMenuUpdateData extends AbstractFixture implements DependentFixtureInterface
 {
     use UserUtilityTrait;
     use EntityTrait;
 
+    const MENU_UPDATE_1 = 'menu_update.1';
+    const MENU_UPDATE_1_1 = 'menu_update.1_1';
+    const MENU_UPDATE_2 = 'menu_update.2';
+    const MENU_UPDATE_2_1 = 'menu_update.2_1';
+    const MENU_UPDATE_2_1_1 = 'menu_update.2_1_1';
+    const MENU_UPDATE_3 = 'menu_update.3';
+    const MENU_UPDATE_3_1 = 'menu_update.3_1';
+
     /** @var array */
     protected static $menuUpdates = [
-        'menu_update.1' => [
-            'key' => 'menu_update.1',
+        self::MENU_UPDATE_1 => [
+            'key' => self::MENU_UPDATE_1,
             'parent_key' => null,
             'default_title' => 'menu_update.1.title',
             'titles' => [
@@ -43,9 +51,9 @@ class MenuUpdateData extends AbstractFixture implements DependentFixtureInterfac
             'divider' => false,
             'custom' => true,
         ],
-        'menu_update.1_1' => [
-            'key' => 'menu_update.1_1',
-            'parent_key' => 'menu_update.1',
+        self::MENU_UPDATE_1_1 => [
+            'key' => self::MENU_UPDATE_1_1,
+            'parent_key' => self::MENU_UPDATE_1,
             'default_title' => 'menu_update.1_1.title',
             'titles' => [],
             'default_description' => 'menu_update.1_1.description',
@@ -59,8 +67,8 @@ class MenuUpdateData extends AbstractFixture implements DependentFixtureInterfac
             'divider' => false,
             'custom' => true,
         ],
-        'menu_update.2' => [
-            'key' => 'menu_update.2',
+        self::MENU_UPDATE_2 => [
+            'key' => self::MENU_UPDATE_2,
             'parent_key' => null,
             'default_title' => 'menu_update.2.title',
             'titles' => [],
@@ -75,9 +83,9 @@ class MenuUpdateData extends AbstractFixture implements DependentFixtureInterfac
             'divider' => false,
             'custom' => true,
         ],
-        'menu_update.2_1' => [
-            'key' => 'menu_update.2_1',
-            'parent_key' => 'menu_update.2',
+        self::MENU_UPDATE_2_1 => [
+            'key' => self::MENU_UPDATE_2_1,
+            'parent_key' => self::MENU_UPDATE_2,
             'default_title' => 'menu_update.2_1.title',
             'titles' => [],
             'default_description' => 'menu_update.2_1.description',
@@ -91,9 +99,9 @@ class MenuUpdateData extends AbstractFixture implements DependentFixtureInterfac
             'divider' => false,
             'custom' => true,
         ],
-        'menu_update.2_1_1' => [
-            'key' => 'menu_update.2_1_1',
-            'parent_key' => 'menu_update.2_1',
+        self::MENU_UPDATE_2_1_1 => [
+            'key' => self::MENU_UPDATE_2_1_1,
+            'parent_key' => self::MENU_UPDATE_2_1,
             'titles' => [],
             'descriptions' => [],
             'uri' => '#',
@@ -105,8 +113,8 @@ class MenuUpdateData extends AbstractFixture implements DependentFixtureInterfac
             'divider' => true,
             'custom' => true,
         ],
-        'menu_update.3' => [
-            'key' => 'menu_update.3',
+        self::MENU_UPDATE_3 => [
+            'key' => self::MENU_UPDATE_3,
             'parent_key' => null,
             'default_title' => 'menu_update.3.title',
             'titles' => [],
@@ -121,9 +129,9 @@ class MenuUpdateData extends AbstractFixture implements DependentFixtureInterfac
             'divider' => false,
             'custom' => true,
         ],
-        'menu_update.3_1' => [
-            'key' => 'menu_update.3_1',
-            'parent_key' => 'menu_update.3',
+        self::MENU_UPDATE_3_1 => [
+            'key' => self::MENU_UPDATE_3_1,
+            'parent_key' => self::MENU_UPDATE_3,
             'default_title' => 'menu_update.3_1.title',
             'titles' => [],
             'default_description' => 'menu_update.3_1.description',

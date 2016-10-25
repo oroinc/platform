@@ -23,7 +23,7 @@ class UserOwnershipProviderTest extends WebTestCase
         $this->initClient([], $this->generateBasicAuthHeader());
 
         $this->loadFixtures([
-            'Oro\Bundle\NavigationBundle\Tests\Functional\DataFixtures\MenuUpdateData'
+            'Oro\Bundle\NavigationBundle\Tests\Functional\DataFixtures\LoadMenuUpdateData'
         ]);
 
         $this->provider = $this->getContainer()->get('oro_navigation.ownership_provider.user');

@@ -3,6 +3,7 @@
 namespace Oro\Bundle\NavigationBundle\Tests\Functional\Controller;
 
 use Oro\Bundle\NavigationBundle\Entity\MenuUpdate;
+use Oro\Bundle\NavigationBundle\Tests\Functional\DataFixtures\LoadMenuUpdateData;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
 /**
@@ -10,6 +11,8 @@ use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
  */
 class GlobalMenuControllerTest extends WebTestCase
 {
+    const MENU_NAME = 'application_menu';
+
     /**
      * {@inheritdoc}
      */
@@ -18,7 +21,7 @@ class GlobalMenuControllerTest extends WebTestCase
         $this->initClient([], $this->generateBasicAuthHeader());
 
         $this->loadFixtures([
-            'Oro\Bundle\NavigationBundle\Tests\Functional\DataFixtures\MenuUpdateData'
+            'Oro\Bundle\NavigationBundle\Tests\Functional\DataFixtures\LoadMenuUpdateData'
         ]);
     }
 
@@ -31,7 +34,7 @@ class GlobalMenuControllerTest extends WebTestCase
 
     public function testView()
     {
-        $url = $this->getUrl('oro_navigation_global_menu_view', ['menuName' => 'application_menu']);
+        $url = $this->getUrl('oro_navigation_global_menu_view', ['menuName' => self::MENU_NAME]);
         $crawler = $this->client->request('GET', $url);
         $result = $this->client->getResponse();
 
@@ -45,7 +48,7 @@ class GlobalMenuControllerTest extends WebTestCase
 
     public function testCreate()
     {
-        $url = $this->getUrl('oro_navigation_global_menu_create', ['menuName' => 'application_menu']);
+        $url = $this->getUrl('oro_navigation_global_menu_create', ['menuName' => self::MENU_NAME]);
         $crawler = $this->client->request('GET', $url);
         $result = $this->client->getResponse();
 
@@ -69,8 +72,8 @@ class GlobalMenuControllerTest extends WebTestCase
     public function testCreateChild()
     {
         $url = $this->getUrl('oro_navigation_global_menu_create', [
-            'menuName' => 'application_menu',
-            'parentKey' => 'menu_update.1'
+            'menuName' => self::MENU_NAME,
+            'parentKey' => LoadMenuUpdateData::MENU_UPDATE_1
         ]);
         $crawler = $this->client->request('GET', $url);
         $result = $this->client->getResponse();
@@ -95,10 +98,10 @@ class GlobalMenuControllerTest extends WebTestCase
     public function testUpdateCustom()
     {
         /** @var MenuUpdate $reference */
-        $reference = $this->getReference('menu_update.1');
+        $reference = $this->getReference(LoadMenuUpdateData::MENU_UPDATE_1);
 
         $url = $this->getUrl('oro_navigation_global_menu_update', [
-            'menuName' => 'application_menu',
+            'menuName' => self::MENU_NAME,
             'key' => $reference->getKey()
         ]);
         $crawler = $this->client->request('GET', $url);
@@ -126,7 +129,7 @@ class GlobalMenuControllerTest extends WebTestCase
     public function testUpdateNotCustom()
     {
         $url = $this->getUrl('oro_navigation_global_menu_update', [
-            'menuName' => 'application_menu',
+            'menuName' => self::MENU_NAME,
             'key' => 'menu_list_default'
         ]);
         $crawler = $this->client->request('GET', $url);
