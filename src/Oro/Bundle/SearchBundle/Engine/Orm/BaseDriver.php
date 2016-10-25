@@ -385,16 +385,10 @@ abstract class BaseDriver
         $criteria = $query->getCriteria();
 
         $whereExpression = $criteria->getWhereExpression();
-        if (!$whereExpression) {
-            return;
+        if ($whereExpression) {
+            $visitor = new OrmExpressionVisitor($this, $qb, $setOrderBy);
+            $qb->andWhere($visitor->dispatch($whereExpression));
         }
-        $visitor = new OrmExpressionVisitor($this, $qb, $setOrderBy);
-        $expressionString = $visitor->dispatch($whereExpression);
-
-        $whereExpression instanceof CompositeExpression &&
-        self::EXPRESSION_TYPE_OR === $whereExpression->getType() ?
-            $qb->orWhere($expressionString) :
-            $qb->andWhere($expressionString);
     }
 
     /**

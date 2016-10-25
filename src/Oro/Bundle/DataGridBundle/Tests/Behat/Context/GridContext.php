@@ -433,6 +433,10 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
      */
     private function getGridFilters()
     {
-        return $this->elementFactory->createElement('GridFilters');
+        $filters = $this->elementFactory->createElement('GridFilters');
+        if (!$filters->isVisible()) {
+            $this->elementFactory->createElement('GridToolbarActions')->getActionByTitle('Filters')->click();
+        }
+        return $filters;
     }
 }

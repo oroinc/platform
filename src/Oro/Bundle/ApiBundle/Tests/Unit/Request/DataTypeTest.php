@@ -7,6 +7,25 @@ use Oro\Bundle\ApiBundle\Request\DataType;
 class DataTypeTest extends \PHPUnit_Framework_TestCase
 {
     /**
+     * @dataProvider nestedObjectProvider
+     */
+    public function testIsNestedObject($dataType, $expected)
+    {
+        self::assertSame($expected, DataType::isNestedObject($dataType));
+    }
+
+    public function nestedObjectProvider()
+    {
+        return [
+            ['nestedObject', true],
+            ['object', false],
+            ['string', false],
+            [null, false],
+            ['', false],
+        ];
+    }
+
+    /**
      * @dataProvider associationAsFieldProvider
      */
     public function testIsAssociationAsField($dataType, $expected)
@@ -18,7 +37,9 @@ class DataTypeTest extends \PHPUnit_Framework_TestCase
     {
         return [
             ['array', true],
+            ['object', true],
             ['scalar', true],
+            ['nestedObject', true],
             ['string', false],
             [null, false],
             ['', false],
