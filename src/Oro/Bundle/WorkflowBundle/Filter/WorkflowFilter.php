@@ -25,18 +25,15 @@ class WorkflowFilter extends EntityFilter
     /**
      * @param FormFactoryInterface $factory
      * @param FilterUtility $util
-     * @param TranslationKeyGenerator $generator
      * @param WorkflowTranslationHelper $translationHelper
      */
     public function __construct(
         FormFactoryInterface $factory,
         FilterUtility $util,
-        TranslationKeyGenerator $generator,
         WorkflowTranslationHelper $translationHelper
     ) {
         parent::__construct($factory, $util);
 
-        $this->generator = $generator;
         $this->translationHelper = $translationHelper;
     }
 
@@ -77,7 +74,7 @@ class WorkflowFilter extends EntityFilter
             $ds->expr()->like(sprintf('%s.key', $fieldName), $keyParameter, true)
         );
 
-        $key = $this->generator->generate(
+        $key = $this->getGenerator()->generate(
             new TranslationKeySource(new WorkflowTemplate(), ['workflow_name' => $definition->getName()])
         );
 
@@ -85,6 +82,18 @@ class WorkflowFilter extends EntityFilter
         $ds->setParameter($domainParameter, 'workflows');
 
         return $expr;
+    }
+
+    /**
+     * @return TranslationKeyGenerator
+     */
+    protected function getGenerator()
+    {
+        if (!$this->generator) {
+            $this->generator = new TranslationKeyGenerator();
+        }
+
+        return $this->generator;
     }
 
     /**

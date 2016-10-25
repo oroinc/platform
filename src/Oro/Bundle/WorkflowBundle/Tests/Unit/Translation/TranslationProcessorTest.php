@@ -2,45 +2,32 @@
 
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Translation;
 
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-
 use Oro\Bundle\WorkflowBundle\Configuration\Handler\ConfigurationHandlerInterface;
 use Oro\Bundle\WorkflowBundle\Configuration\WorkflowDefinitionBuilderExtensionInterface;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
-use Oro\Bundle\WorkflowBundle\Event\WorkflowChangesEvent;
-use Oro\Bundle\WorkflowBundle\Event\WorkflowEvents;
+use Oro\Bundle\WorkflowBundle\Entity\WorkflowStep;
 use Oro\Bundle\WorkflowBundle\Helper\WorkflowTranslationHelper;
 use Oro\Bundle\WorkflowBundle\Translation\TranslationProcessor;
-use Oro\Bundle\WorkflowBundle\Translation\WorkflowTranslationFieldsIterator;
 
-/**
- * @SuppressWarnings(PHPMD.TooManyPublicMethods)
- */
 class TranslationProcessorTest extends \PHPUnit_Framework_TestCase
 {
     /** @var TranslationProcessor */
     private $processor;
-
-    /** @var WorkflowTranslationFieldsIterator|\PHPUnit_Framework_MockObject_MockObject */
-    private $fieldsIterator;
 
     /** @var WorkflowTranslationHelper|\PHPUnit_Framework_MockObject_MockObject */
     private $translationHelper;
 
     protected function setUp()
     {
-        $this->fieldsIterator = $this->getMockBuilder(WorkflowTranslationFieldsIterator::class)
-            ->disableOriginalConstructor()->getMock();
-
         $this->translationHelper = $this->getMockBuilder(WorkflowTranslationHelper::class)
             ->disableOriginalConstructor()->getMock();
 
-        $this->processor = new TranslationProcessor($this->fieldsIterator, $this->translationHelper);
+        $this->processor = new TranslationProcessor($this->translationHelper);
     }
 
     protected function tearDown()
     {
-        unset($this->fieldsIterator, $this->translationHelper, $this->processor);
+        unset($this->translationHelper, $this->processor);
     }
 
     public function testImplementsBuilderExtension()
@@ -50,27 +37,15 @@ class TranslationProcessorTest extends \PHPUnit_Framework_TestCase
 
     public function testPrepare()
     {
-        $config = ['42' => 24];
-
-        //test iterator modifications
-        $iterationChanges = (object)['key1' => 'val', 'key2' => null];
-
-        $this->fieldsIterator->expects($this->once())->method('iterateConfigTranslationFields')
-            ->with('test_workflow', $config)
-            ->willReturn($iterationChanges);
+        $config = ['label' => 24];
 
         $result = $this->processor->prepare('test_workflow', $config);
 
         $this->assertEquals(
-            (object)[
-                'key1' => 'key1',
-                'key2' => 'key2'
-            ],
-            $iterationChanges,
-            'Iterated keys must be placed to values trough reference.'
+            $result,
+            ['label' => 'oro.workflow.test_workflow.label'],
+            'should return modified with key configuration back'
         );
-
-        $this->assertEquals($result, $config, 'should return configuration back');
     }
 
     public function testImplementsHandler()
@@ -80,25 +55,11 @@ class TranslationProcessorTest extends \PHPUnit_Framework_TestCase
 
     public function testHandle()
     {
-        $configuration = ['name' => 'test_workflow'];
-
-        $iteratedFields = [
-            'key1' => 'value1',
-            'key2' => null,
-            'key3' => 'value3',
-            'key4' => '',
-        ];
-
-        $this->fieldsIterator->expects($this->once())
-            ->method('iterateConfigTranslationFields')
-            ->with('test_workflow', $configuration)->willReturn($iteratedFields);
+        $configuration = ['name' => 'test_workflow', null, 'label' => 'wflabel'];
 
         $this->translationHelper->expects($this->at(0))
             ->method('saveTranslation')
-            ->with('key1', 'value1');
-        $this->translationHelper->expects($this->at(1))
-            ->method('saveTranslation')
-            ->with('key3', 'value3');
+            ->with('oro.workflow.test_workflow.label', 'wflabel');
 
         $this->processor->handle($configuration);
     }
@@ -114,89 +75,122 @@ class TranslationProcessorTest extends \PHPUnit_Framework_TestCase
         $this->processor->handle($config);
     }
 
-    public function testImplementsSubscriberInterface()
-    {
-        $this->assertInstanceOf(EventSubscriberInterface::class, $this->processor);
+    /**
+     * @dataProvider translateWorkflowDefinitionFieldsProvider
+     * @param WorkflowDefinition $definition
+     * @param array $values
+     * @param WorkflowDefinition $expected
+     */
+    public function testTranslateWorkflowDefinitionFields(
+        WorkflowDefinition $definition,
+        array $values,
+        WorkflowDefinition $expected
+    ) {
+        $this->translationHelper->expects($this->any())->method('findWorkflowTranslation')->willReturnMap($values);
+
+        $this->processor->translateWorkflowDefinitionFields($definition);
+
+        $this->assertEquals($expected, $definition);
     }
 
-    public function testGetSubscribedEvents()
-    {
-        $this->assertEquals(
-            [
-                WorkflowEvents::WORKFLOW_AFTER_CREATE => 'ensureTranslationKeys',
-                WorkflowEvents::WORKFLOW_AFTER_UPDATE => 'clearTranslationKeys',
-                WorkflowEvents::WORKFLOW_AFTER_DELETE => 'deleteTranslationKeys'
-            ],
-            TranslationProcessor::getSubscribedEvents()
-        );
-    }
-
-    public function testEnsureTranslationKeys()
+    /**
+     * @return array
+     */
+    public function translateWorkflowDefinitionFieldsProvider()
     {
         $definition = new WorkflowDefinition();
-        $changes = new WorkflowChangesEvent($definition);
+        $definition->setName('test_workflow');
+        $definition->setLabel('stored_label_key1');
+        $definition->addStep((new WorkflowStep())->setName('step1')->setLabel('step1_stored_label_key'));
+        $definition->addStep((new WorkflowStep())->setName('step2')->setLabel('step2_stored_label_key'));
+        $definition->setConfiguration([
+            'transitions' => [
+                'transition1' => [
+                    'label' => 'transition1_stored_label_key',
+                    'message' => 'message1_stored_label_key',
+                    'form_options' => [
+                        'attribute_fields' => [
+                            'attribute1' => [
+                                'options' => [
+                                    'label' => 'transition1_attribute1_stored_label_key'
+                                ]
+                            ]
+                        ]
+                    ]
+                ],
+                'transition2' => [
+                    'label' => 'transition2_stored_label_key',
+                    'message' => 'oro.workflow.test_workflow.transition.transition2.warning_message',
+                ]
+            ],
+            'steps' => [
+                'step1' => [],
+                'step2' => []
+            ],
+            'attributes' => [
+                'attribute1' => ['label' => 'attribute1_stored_label_key'],
+                'attribute2' => [/*null case*/]
+            ]
+        ]);
+        $expected = new WorkflowDefinition();
+        $expected->setName('test_workflow');
+        $expected->setLabel('translated_label_key');
+        $expected->addStep((new WorkflowStep())->setName('step1')->setLabel('translated_step1_stored_label_key'));
+        $expected->addStep((new WorkflowStep())->setName('step2')->setLabel('translated_step2_stored_label_key'));
+        $expected->setConfiguration([
+            'transitions' => [
+                'transition1' => [
+                    'label' => 'translated_transition1_stored_label_key',
+                    'message' => 'translated_message1_stored_label_key',
+                    'form_options' => [
+                        'attribute_fields' => [
+                            'attribute1' => [
+                                'options' => [
+                                    'label' => 'translated_transition1_attribute1_stored_label_key'
+                                ]
+                            ]
+                        ]
+                    ]
+                ],
+                'transition2' => [
+                    'label' => 'translated_transition2_stored_label_key',
+                    'message' => '',
+                ]
+            ],
+            'steps' => [ //this node would have same values as entities
+                'step1' => ['label' => 'translated_step1_stored_label_key'],
+                'step2' => ['label' => 'translated_step2_stored_label_key']
+            ],
+            'attributes' => [
+                'attribute1' => ['label' => 'translated_attribute1_stored_label_key'],
+                'attribute2' => ['label' => '']
 
-        $this->fieldsIterator->expects($this->once())
-            ->method('iterateWorkflowDefinition')
-            ->with($definition)
-            ->willReturn(['key1', 'key2']);
+            ]
+        ]);
 
-        $this->translationHelper->expects($this->at(0))->method('ensureTranslationKey')->with('key1');
-        $this->translationHelper->expects($this->at(1))->method('ensureTranslationKey')->with('key2');
-
-        $this->processor->ensureTranslationKeys($changes);
-    }
-
-    public function testClearTranslationKeys()
-    {
-        $updatedDefinition = new WorkflowDefinition();
-        $previousDefinition = new WorkflowDefinition();
-        $changes = new WorkflowChangesEvent($updatedDefinition, $previousDefinition);
-
-        $this->fieldsIterator->expects($this->at(0))
-            ->method('iterateWorkflowDefinition')
-            ->with($updatedDefinition)
-            ->willReturn(['key3', 'key4']);
-
-        $this->fieldsIterator->expects($this->at(1))
-            ->method('iterateWorkflowDefinition')
-            ->with($previousDefinition)
-            ->willReturn(new \ArrayIterator(['key1', 'key2', 'key3']));
-
-        $this->translationHelper->expects($this->at(0))->method('ensureTranslationKey')->with('key3');
-        $this->translationHelper->expects($this->at(1))->method('ensureTranslationKey')->with('key4');
-
-        $this->translationHelper->expects($this->at(2))->method('removeTranslationKey')->with('key1');
-        $this->translationHelper->expects($this->at(3))->method('removeTranslationKey')->with('key2');
-
-        $this->processor->clearTranslationKeys($changes);
-    }
-
-    public function testClearLogicExceptionOnAbsentPreviousDefinition()
-    {
-        $updatedDefinition = new WorkflowDefinition();
-        $previousDefinition = null;
-        $changes = new WorkflowChangesEvent($updatedDefinition, $previousDefinition);
-
-        $this->setExpectedException(\LogicException::class, 'Previous WorkflowDefinition expected. But got null.');
-
-        $this->processor->clearTranslationKeys($changes);
-    }
-
-    public function testDeleteTranslationKeys()
-    {
-        $deletedDefinition = new WorkflowDefinition();
-
-        $changes = new WorkflowChangesEvent($deletedDefinition);
-
-        $this->fieldsIterator->expects($this->once())
-            ->method('iterateWorkflowDefinition')
-            ->with($deletedDefinition)
-            ->willReturn(['key1_to_delete', 'key2_to_delete']);
-
-        $this->translationHelper->expects($this->at(0))->method('removeTranslationKey')->with('key1_to_delete');
-        $this->translationHelper->expects($this->at(1))->method('removeTranslationKey')->with('key2_to_delete');
-
-        $this->processor->deleteTranslationKeys($changes);
+        return [
+            'full case' => [
+                $definition,
+                [
+                    ['stored_label_key1', 'test_workflow', null, 'translated_label_key'],
+                    ['step1_stored_label_key', 'test_workflow', null, 'translated_step1_stored_label_key'],
+                    ['step2_stored_label_key', 'test_workflow', null, 'translated_step2_stored_label_key'],
+                    ['transition1_stored_label_key', 'test_workflow', null, 'translated_transition1_stored_label_key'],
+                    ['message1_stored_label_key', 'test_workflow', null, 'translated_message1_stored_label_key'],
+                    [
+                        'transition1_attribute1_stored_label_key',
+                        'test_workflow',
+                        null,
+                        'translated_transition1_attribute1_stored_label_key'
+                    ],
+                    ['transition2_stored_label_key', 'test_workflow', null, 'translated_transition2_stored_label_key'],
+                    ['message2_stored_label_key', 'test_workflow', null, 'message2_stored_label_key'],
+                    //same means no translation found
+                    ['attribute1_stored_label_key', 'test_workflow', null, 'translated_attribute1_stored_label_key'],
+                    [null, null, null]
+                ],
+                $expected
+            ]
+        ];
     }
 }

@@ -7,21 +7,15 @@ use Symfony\Component\Form\FormFactoryInterface;
 use Oro\Bundle\FilterBundle\Datasource\FilterDatasourceAdapterInterface;
 use Oro\Bundle\FilterBundle\Datasource\ExpressionBuilderInterface;
 use Oro\Bundle\FilterBundle\Filter\FilterUtility;
-use Oro\Bundle\TranslationBundle\Translation\KeySource\TranslationKeySource;
-use Oro\Bundle\TranslationBundle\Translation\TranslationKeyGenerator;
 
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Filter\WorkflowFilter;
 use Oro\Bundle\WorkflowBundle\Helper\WorkflowTranslationHelper;
-use Oro\Bundle\WorkflowBundle\Translation\KeyTemplate\WorkflowTemplate;
 
 class WorkflowFilterTest extends \PHPUnit_Framework_TestCase
 {
     /** @var FormFactoryInterface|\PHPUnit_Framework_MockObject_MockObject */
     protected $formFactory;
-
-    /** @var TranslationKeyGenerator|\PHPUnit_Framework_MockObject_MockObject */
-    protected $generator;
 
     /** @var WorkflowTranslationHelper|\PHPUnit_Framework_MockObject_MockObject */
     protected $translationHelper;
@@ -41,7 +35,6 @@ class WorkflowFilterTest extends \PHPUnit_Framework_TestCase
     protected function setUp()
     {
         $this->formFactory = $this->getMock(FormFactoryInterface::class);
-        $this->generator = $this->getMock(TranslationKeyGenerator::class);
         $this->translationHelper = $this->getMockBuilder(WorkflowTranslationHelper::class)
             ->disableOriginalConstructor()
             ->getMock();
@@ -51,7 +44,6 @@ class WorkflowFilterTest extends \PHPUnit_Framework_TestCase
         $this->filter = new WorkflowFilter(
             $this->formFactory,
             new FilterUtility(),
-            $this->generator,
             $this->translationHelper
         );
     }
@@ -121,14 +113,9 @@ class WorkflowFilterTest extends \PHPUnit_Framework_TestCase
             ->with('expr1', 'expr2')
             ->willReturn('expr3');
 
-        $this->generator->expects($this->once())
-            ->method('generate')
-            ->with(new TranslationKeySource(new WorkflowTemplate(), ['workflow_name' => 'definition1']))
-            ->willReturn('generatedKey');
-
         $this->datasourceAdapter->expects($this->at(5))
             ->method('setParameter')
-            ->with('keyParameter', 'generatedKey%');
+            ->with('keyParameter', 'oro.workflow.definition1%');
 
         $this->datasourceAdapter->expects($this->at(6))
             ->method('setParameter')

@@ -33,7 +33,7 @@ class TranslationsDatagridLinksProvider
     public function getWorkflowTranslateLinks(WorkflowDefinition $definition)
     {
         // translate links are available only if any language is available for current user
-        if (0 === count($this->languageProvider->getAvailableLanguages())) {
+        if (!$definition->getName() || 0 === count($this->languageProvider->getAvailableLanguages())) {
             return [];
         }
 
@@ -68,6 +68,9 @@ class TranslationsDatagridLinksProvider
         }
         foreach ($configuration[$node] as $name => $item) {
             foreach ($attributes as $attribute) {
+                if (!array_key_exists($attribute, $item)) {
+                    continue;
+                }
                 $translateLinks[$name][$attribute] = $this->routeHelper->generate(['key' => $item[$attribute]]);
             }
         }

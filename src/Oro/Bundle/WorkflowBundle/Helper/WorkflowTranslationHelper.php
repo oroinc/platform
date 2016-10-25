@@ -113,22 +113,35 @@ class WorkflowTranslationHelper
      */
     public function saveTranslation($key, $value)
     {
-        $this->translationManager->saveValue($key, $value, $this->translator->getLocale(), self::TRANSLATION_DOMAIN);
+        $currentLocale = $this->translator->getLocale();
+        $this->saveValue($key, $value, $currentLocale);
+
+        if ($currentLocale !== Translation::DEFAULT_LOCALE) {
+            $existingValue = $this->findValue($key);
+
+            if ($existingValue === null) {
+                $this->saveValue($key, $value);
+            }
+        }
     }
 
     /**
      * @param string $key
+     * @param string $locale
+     * @return string
      */
-    public function ensureTranslationKey($key)
+    private function findValue($key, $locale = Translation::DEFAULT_LOCALE)
     {
-        $this->translationManager->findTranslationKey($key, self::TRANSLATION_DOMAIN);
+        return $this->translationHelper->findValue($key, $locale, self::TRANSLATION_DOMAIN);
     }
 
     /**
      * @param string $key
+     * @param string $value
+     * @param string $locale
      */
-    public function removeTranslationKey($key)
+    private function saveValue($key, $value, $locale = Translation::DEFAULT_LOCALE)
     {
-        $this->translationManager->removeTranslationKey($key, self::TRANSLATION_DOMAIN);
+        $this->translationManager->saveValue($key, $value, $locale, self::TRANSLATION_DOMAIN, Translation::SCOPE_UI);
     }
 }

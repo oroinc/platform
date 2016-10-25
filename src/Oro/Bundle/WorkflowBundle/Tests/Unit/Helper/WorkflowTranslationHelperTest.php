@@ -122,20 +122,6 @@ class WorkflowTranslationHelperTest extends \PHPUnit_Framework_TestCase
         $this->helper->saveTranslation('test_key', 'test_value');
     }
 
-    public function testEnsureTranslationKey()
-    {
-        $key = 'key_to_be_sure_that_exists';
-        $this->manager->expects($this->once())->method('findTranslationKey')->with($key, 'workflows');
-        $this->helper->ensureTranslationKey($key);
-    }
-
-    public function testRemoveTranslationKey()
-    {
-        $key = 'key_to_remove';
-        $this->manager->expects($this->once())->method('removeTranslationKey')->with($key, 'workflows');
-        $this->helper->removeTranslationKey($key);
-    }
-
     /**
      * @dataProvider findTranslationProvider
      *
