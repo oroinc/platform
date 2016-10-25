@@ -39,7 +39,7 @@ class WorkflowTemplate implements TranslationKeyTemplateInterface
     public function getKeyTemplates()
     {
         $result = [];
-        foreach($this->getRequiredKeys() as $key) {
+        foreach ($this->getRequiredKeys() as $key) {
             $result[$key] = $this->getKeyTemplate($key);
         }
 
