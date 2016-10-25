@@ -184,7 +184,8 @@ class CronCommand extends ContainerAwareCommand
                     '<error>Unable to setup, command "<info>%s</info>" must be instance ' .
                     'of CronCommandInterface</error>',
                     $command->getName()
-                ));
+                )
+            );
 
             return true;
         }
@@ -194,7 +195,8 @@ class CronCommand extends ContainerAwareCommand
                 sprintf(
                     '<error>no cron definition found, check command "<info>%s</info>"</error>',
                     $command->getName()
-                ));
+                )
+            );
 
             return true;
         }
