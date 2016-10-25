@@ -558,6 +558,8 @@ services:
         class: %oro_email.listener.datagrid.email.class%
         arguments:
             - '@oro_email.datagrid_query_factory'
+            - '@oro_security.security_facade'
+            - '@oro_datagrid.grid_view.manager'
         tags:
             - { name: kernel.event_listener, event: oro_datagrid.datagrid.build.after.base-email-grid, method: onBuildAfter }
             - { name: kernel.event_listener, event: oro_datagrid.orm_datasource.result.before_query.base-email-grid, method: onResultBeforeQuery, priority: -255 }
@@ -653,7 +655,6 @@ services:
             - '@oro_email.mailbox.process_storage'
             - '@oro_security.security_facade'
             - '@oro_email.related_emails.provider'
-            - '@oro_email.tools.email_body_helper'
         tags:
             - { name: twig.extension }
 
@@ -685,7 +686,6 @@ services:
            - '@oro_email.mailbox.process_storage.link'
            - '@oro_activity.association_helper'
            - '@oro_comment.association_helper'
-           - '@oro_email.tools.email_body_helper'
         calls:
            - [ setSecurityContextLink, ['@security.context.link'] ]
         tags:
@@ -871,7 +871,6 @@ services:
             - '@oro_ui.html_tag_helper'
             - '@router'
             - '@oro_entity_config.config_manager'
-            - '@oro_email.tools.email_body_helper'
 
     oro_email.datagrid.origin_folder.provider:
         class: %oro_email.datagrid.origin_folder.provider.class%
@@ -1073,7 +1072,11 @@ services:
             - '@oro_email.provider.emailowners.provider'
             - '@oro_email.email.manager'
 
-    oro_email.tools.email_body_helper:
-        class: Oro\Bundle\EmailBundle\Tools\EmailBodyHelper
+    oro_email.async.upgrade_email_body_processor:
+        class: Oro\Bundle\EmailBundle\Migrations\Schema\v1_29\UpgradeEmailBodyMessageProcessor
         arguments:
-            - '@oro_ui.html_tag_helper'
+            - '@oro_message_queue.message_producer'
+            - '@oro_entity.orm.native_query_executor_helper'
+            - '@logger'
+        tags:
+            - { name: 'oro_message_queue.client.message_processor', topicName: 'oro_email.migrate_email_body' }

@@ -301,7 +301,7 @@ class Email extends ExtendEmail
      */
     public function setSubject($subject)
     {
-        $this->subject = $subject;
+        $this->subject = mb_substr($subject, 0, 998, mb_detect_encoding($subject));
 
         return $this;
     }

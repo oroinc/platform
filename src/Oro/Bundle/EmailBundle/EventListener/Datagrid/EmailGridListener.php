@@ -8,12 +8,14 @@ use Doctrine\ORM\QueryBuilder;
 
 use Oro\Bundle\DataGridBundle\Datagrid\ParameterBag;
 use Oro\Bundle\DataGridBundle\Datasource\Orm\OrmDatasource;
+use Oro\Bundle\DataGridBundle\Entity\GridView;
+use Oro\Bundle\DataGridBundle\Entity\Manager\GridViewManager;
 use Oro\Bundle\DataGridBundle\Event\BuildAfter;
 use Oro\Bundle\DataGridBundle\Event\OrmResultBeforeQuery;
-
 use Oro\Bundle\EmailBundle\Datagrid\EmailQueryFactory;
 use Oro\Bundle\FeatureToggleBundle\Checker\FeatureCheckerHolderTrait;
 use Oro\Bundle\FeatureToggleBundle\Checker\FeatureToggleableInterface;
+use Oro\Bundle\SecurityBundle\SecurityFacade;
 
 class EmailGridListener implements FeatureToggleableInterface
 {
@@ -25,6 +27,16 @@ class EmailGridListener implements FeatureToggleableInterface
     protected $factory;
 
     /**
+     * @var SecurityFacade
+     */
+    protected $securityFacade;
+
+    /**
+     * @var GridViewManager
+     */
+    protected $gridViewManager;
+
+    /**
      * Stores join's root and alias if joins for filters are added - ['eu' => ['alias1']]
      *
      * @var []
@@ -33,10 +45,17 @@ class EmailGridListener implements FeatureToggleableInterface
 
     /**
      * @param EmailQueryFactory $factory
+     * @param SecurityFacade $securityFacade
+     * @param GridViewManager $gridViewManager
      */
-    public function __construct(EmailQueryFactory $factory)
-    {
+    public function __construct(
+        EmailQueryFactory $factory,
+        SecurityFacade $securityFacade,
+        GridViewManager $gridViewManager
+    ) {
         $this->factory = $factory;
+        $this->securityFacade = $securityFacade;
+        $this->gridViewManager = $gridViewManager;
     }
 
     /**
@@ -99,6 +118,9 @@ class EmailGridListener implements FeatureToggleableInterface
     {
         $filters = $parameters->get('_filter');
         if (!$filters || !is_array($filters)) {
+            $filters = $this->getGridViewFiltersData();
+        }
+        if (!$filters) {
             return;
         }
         $this->filterJoins = [];
@@ -137,6 +159,24 @@ class EmailGridListener implements FeatureToggleableInterface
         }
     }
 
+    /**
+     * @return array
+     */
+    protected function getGridViewFiltersData()
+    {
+        $filters = [];
+        $user = $this->securityFacade->getLoggedUser();
+        if (!$user) {
+            return $filters;
+        }
+        /** @var GridView|null $gridView */
+        $gridView = $this->gridViewManager->getDefaultView($user, 'user-email-grid');
+        if (!$gridView) {
+            return $filters;
+        }
+
+        return $gridView->getFiltersData();
+    }
 
     /**
      *

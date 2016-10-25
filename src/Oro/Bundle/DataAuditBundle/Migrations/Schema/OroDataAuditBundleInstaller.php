@@ -14,7 +14,7 @@ class OroDataAuditBundleInstaller implements Installation
      */
     public function getMigrationVersion()
     {
-        return 'v1_7';
+        return 'v1_8';
     }
 
     /**
@@ -34,19 +34,21 @@ class OroDataAuditBundleInstaller implements Installation
         $auditTable = $schema->createTable('oro_audit');
         $auditTable->addColumn('id', 'integer', ['autoincrement' => true]);
         $auditTable->addColumn('user_id', 'integer', ['notnull' => false]);
-        $auditTable->addColumn('action', 'string', ['length' => 8]);
-        $auditTable->addColumn('logged_at', 'datetime', []);
+        $auditTable->addColumn('action', 'string', ['length' => 8, 'notnull' => false]);
+        $auditTable->addColumn('logged_at', 'datetime', ['notnull' => false]);
         $auditTable->addColumn('object_id', 'integer', ['notnull' => false]);
         $auditTable->addColumn('object_class', 'string', ['length' => 255]);
-        $auditTable->addColumn('object_name', 'string', ['length' => 255]);
-        $auditTable->addColumn('version', 'integer', []);
+        $auditTable->addColumn('object_name', 'string', ['length' => 255, 'notnull' => false]);
+        $auditTable->addColumn('version', 'integer', ['notnull' => false]);
         $auditTable->addColumn('organization_id', 'integer', ['notnull' => false]);
         $auditTable->addColumn('type', 'string', ['length' => 255]);
+        $auditTable->addColumn('transaction_id', 'string', ['length' => 255]);
 
         $auditTable->setPrimaryKey(['id']);
 
         $auditTable->addIndex(['user_id'], 'IDX_5FBA427CA76ED395', []);
         $auditTable->addIndex(['type'], 'idx_oro_audit_type');
+        $auditTable->addUniqueIndex(['object_id', 'object_class', 'version'], 'idx_oro_audit_version');
 
         $auditTable->addForeignKeyConstraint(
             $schema->getTable('oro_user'),
@@ -111,6 +113,10 @@ class OroDataAuditBundleInstaller implements Installation
             'comment' => '(DC2Type:json_array)',
         ]);
         $auditFieldTable->addColumn('new_jsonarray', 'json_array', [
+            'notnull' => false,
+            'comment' => '(DC2Type:json_array)',
+        ]);
+        $auditFieldTable->addColumn('collection_diffs', 'json_array', [
             'notnull' => false,
             'comment' => '(DC2Type:json_array)',
         ]);

@@ -29,3 +29,8 @@ services:
         class: %oro_installer.script_manager.class%
         arguments:
             - '@kernel'
+
+    oro_installer.namespace_migration:
+        class: 'Oro\Bundle\InstallerBundle\CacheWarmer\NamespaceMigration'
+        arguments:
+            - '@doctrine'

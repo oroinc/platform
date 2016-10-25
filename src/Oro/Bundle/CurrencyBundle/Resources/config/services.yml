@@ -8,6 +8,12 @@ services:
         arguments:
             - '@oro_locale.formatter.number'
             - '@oro_currency.provider.view_type'
+            - '@oro_currency.helper.currency_name'
+        tags:
+            - { name: twig.extension }
+
+    oro_currency.twig.rate:
+        class: Oro\Bundle\CurrencyBundle\Twig\RateConverterExtension
         tags:
             - { name: twig.extension }
 
@@ -41,6 +47,7 @@ services:
         class: Oro\Bundle\CurrencyBundle\Utils\CurrencyNameHelper
         arguments:
             - '@oro_locale.settings'
+            - '@oro_locale.formatter.number'
             - '@oro_currency.provider.view_type'
             - '@oro_currency.config.currency'
 
@@ -52,8 +59,53 @@ services:
             - { name: oro_datagrid.inline_edit_column_options_guesser, priority: 91 }
 
     oro_currency.datagrid.column_options_guesser:
-            class: Oro\Bundle\CurrencyBundle\Grid\CurrencyColumnOptionsGuesser
-            arguments:
-                - '@oro_currency.helper.currency_name'
-            tags:
-                - { name: oro_datagrid.column_options_guesser }
+        class: Oro\Bundle\CurrencyBundle\Grid\CurrencyColumnOptionsGuesser
+        arguments:
+            - '@oro_currency.helper.currency_name'
+        tags:
+            - { name: oro_datagrid.column_options_guesser }
+
+    oro_currency.datagrid.column_options_guesser.money_value_guesser:
+        class: Oro\Bundle\CurrencyBundle\Grid\MoneyValueColumnOptionsGuesser
+        tags:
+            - { name: oro_datagrid.column_options_guesser }
+
+    oro_currency.query.currency_transformer:
+        class: Oro\Bundle\CurrencyBundle\Query\CurrencyQueryBuilderTransformer
+
+    oro_currency.locale_settings:
+        class: Oro\Bundle\CurrencyBundle\Model\LocaleSettings
+        decorates: oro_locale.settings
+        arguments:
+            - '@oro_config.user'
+            - '@oro_locale.calendar_factory'
+            - '@oro_currency.config.currency'
+        calls:
+            - [addNameFormats, [%oro_locale.format.name%]]
+            - [addAddressFormats, [%oro_locale.format.address%]]
+            - [addLocaleData, [%oro_locale.locale_data%]]
+            - [addCurrencyData, [%oro_locale.currency_data%]]
+
+    oro_currency.converter.currency_to_string:
+        class: Oro\Bundle\CurrencyBundle\Converter\CurrencyToString
+
+    oro_currency.importexport.formatter.multi_currency_type:
+        class: Oro\Bundle\CurrencyBundle\Formatter\MultiCurrencyTypeFormatter
+        arguments:
+            - '@oro_locale.formatter.number'
+        tags:
+            - { name: oro_importexport.formatter.formatter, data_type: multi-currency, format_type: excel }
+
+    oro_currency.formatter.money_value_type:
+        class: Oro\Bundle\CurrencyBundle\Formatter\MoneyValueTypeFormatter
+        arguments:
+             - '@oro_locale.formatter.number'
+             - '@oro_currency.rounding.price_rounding_service'
+
+    oro_currency.formatter.number:
+        class: Oro\Bundle\CurrencyBundle\Formatter\NumberFormatter
+        decorates: oro_locale.formatter.number
+        arguments:
+            - '@oro_locale.settings'
+            - '@oro_currency.config.currency'
+

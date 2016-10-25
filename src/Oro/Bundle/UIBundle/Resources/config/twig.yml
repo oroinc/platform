@@ -69,10 +69,8 @@ services:
         class: %oro_ui.twig.widget.class%
         calls:
             - [setRequest, ["@?request="]]
-            - [setRouter, ["@router"]]
         tags:
             - { name: twig.extension }
-            - { name: oro_featuretogle.feature,  feature: email }
 
     oro_ui.twig.date_extension:
         class: %oro_ui.twig.date.class%

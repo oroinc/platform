@@ -3,17 +3,18 @@
 namespace Oro\Bundle\ApiBundle\Metadata;
 
 use Oro\Component\ChainProcessor\ParameterBag;
+use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 
 abstract class PropertyMetadata extends ParameterBag
 {
-    /** the name of a property */
-    const NAME = 'name';
+    /** @var string */
+    private $name;
 
-    /** the data-type of a property */
-    const DATA_TYPE = 'dataType';
+    /** @var string */
+    private $propertyPath;
 
-    /** a flag indicates whether a property can be NULL */
-    const NULLABLE = 'nullable';
+    /** @var string */
+    private $dataType;
 
     /**
      * PropertyMetadata constructor.
@@ -22,22 +23,25 @@ abstract class PropertyMetadata extends ParameterBag
      */
     public function __construct($name = null)
     {
-        if (null !== $name) {
-            $this->setName($name);
-        }
+        $this->name = $name;
     }
 
     /**
-     * Make a deep copy of object.
+     * Gets a native PHP array representation of the object.
+     *
+     * @return array [key => value, ...]
      */
-    public function __clone()
+    public function toArray()
     {
-        $this->items = array_map(
-            function ($value) {
-                return is_object($value) ? clone $value : $value;
-            },
-            $this->items
-        );
+        $result = ['name' => $this->name];
+        if ($this->propertyPath) {
+            $result['property_path'] = $this->propertyPath;
+        }
+        if ($this->dataType) {
+            $result['data_type'] = $this->dataType;
+        }
+
+        return $result;
     }
 
     /**
@@ -47,21 +51,45 @@ abstract class PropertyMetadata extends ParameterBag
      */
     public function getName()
     {
-        return $this->get(self::NAME);
+        return $this->name;
     }
 
     /**
      * Sets the name of a property.
      *
      * @param string $name
-     *
-     * @return self
      */
     public function setName($name)
     {
-        $this->set(self::NAME, $name);
+        $this->name = $name;
+    }
 
-        return $this;
+    /**
+     * Gets the property path of a property.
+     *
+     * @return string The property path or NULL if the property is not mapped.
+     */
+    public function getPropertyPath()
+    {
+        if (null === $this->propertyPath) {
+            return $this->name;
+        }
+
+        return ConfigUtil::IGNORE_PROPERTY_PATH !== $this->propertyPath
+            ? $this->propertyPath
+            : null;
+    }
+
+    /**
+     * Sets the property path of a property.
+     *
+     * @param string|null $propertyPath The property path,
+     *                                  NULL if the property path equals to name
+     *                                  or "_" (ConfigUtil::IGNORE_PROPERTY_PATH) if the property is not mapped.
+     */
+    public function setPropertyPath($propertyPath)
+    {
+        $this->propertyPath = $propertyPath;
     }
 
     /**
@@ -71,44 +99,16 @@ abstract class PropertyMetadata extends ParameterBag
      */
     public function getDataType()
     {
-        return $this->get(self::DATA_TYPE);
+        return $this->dataType;
     }
 
     /**
      * Sets the data-type of a property.
      *
      * @param string $dataType
-     *
-     * @return self
      */
     public function setDataType($dataType)
     {
-        $this->set(self::DATA_TYPE, $dataType);
-
-        return $this;
-    }
-
-    /**
-     * Whether a property can be NULL.
-     *
-     * @return bool
-     */
-    public function isNullable()
-    {
-        return (bool)$this->get(self::NULLABLE);
-    }
-
-    /**
-     * Sets a flag indicates whether a property can be NULL.
-     *
-     * @param bool $value
-     *
-     * @return self
-     */
-    public function setIsNullable($value)
-    {
-        $this->set(self::NULLABLE, $value);
-
-        return $this;
+        $this->dataType = $dataType;
     }
 }

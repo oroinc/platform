@@ -40,12 +40,36 @@ class MultiCurrencyGuesserTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($expected, $guessed);
     }
 
+    public function testWrongConfig()
+    {
+        try {
+            $this->currencyHelper->expects($this->once())->method('getCurrencyChoices')
+                ->willReturn(['USD' => 'USD']);
+            $this->guesser->guessColumnOptions('test', 'test', ['frontend_type' => 'multi-currency']);
+            $this->fail('Expected exception not thrown');
+        } catch (\LogicException $e) {
+             $this->assertEquals(0, $e->getCode());
+            $this->assertEquals(
+                sprintf(
+                    'You need to specify %s for multicurrency column',
+                    MultiCurrencyGuesser::MULTI_CURRENCY_CONFIG
+                ),
+                $e->getMessage()
+            );
+        }
+    }
+
     public function setParametersDataProvider()
     {
         return [
             'empty' => [
                 [
                     'frontend_type' => 'multi-currency',
+                    'multicurrency_config' => [
+                        'original_field' => 'test',
+                        'value_field'    => 'testValue',
+                        'currency_field' => 'testCurrency'
+                    ]
                 ],
                 [
                     'inline_editing' => [
@@ -54,7 +78,9 @@ class MultiCurrencyGuesserTest extends \PHPUnit_Framework_TestCase
                         ],
                         'save_api_accessor' => [
                             'class' => 'orocurrency/js/datagrid/inline-editing/currency-save-api-accessor',
-                            'cell_field' => 'test'
+                            'cell_field' => 'test',
+                            'value_field'    => 'testValue',
+                            'currency_field' => 'testCurrency'
                         ]
                     ],
                     'frontend_type' => 'multi-currency',
@@ -62,6 +88,10 @@ class MultiCurrencyGuesserTest extends \PHPUnit_Framework_TestCase
                     'choices' => [
                         'USD' => 'USD',
                         'UAH' => 'UAH'
+                    ],
+                    'params' => [
+                        'value' => 'test',
+                        'currency' => 'testCurrency'
                     ]
                 ],
                 true
@@ -70,6 +100,11 @@ class MultiCurrencyGuesserTest extends \PHPUnit_Framework_TestCase
                 [
                     'frontend_type' => 'multi-currency',
                     'type' => 'field',
+                    'multicurrency_config' => [
+                        'original_field' => 'test',
+                        'value_field'    => 'testValue',
+                        'currency_field' => 'testCurrency'
+                    ]
                 ],
                 [
                     'inline_editing' => [
@@ -78,7 +113,9 @@ class MultiCurrencyGuesserTest extends \PHPUnit_Framework_TestCase
                         ],
                         'save_api_accessor' => [
                             'class' => 'orocurrency/js/datagrid/inline-editing/currency-save-api-accessor',
-                            'cell_field' => 'test'
+                            'cell_field' => 'test',
+                            'value_field'    => 'testValue',
+                            'currency_field' => 'testCurrency'
                         ]
                     ],
                     'frontend_type' => 'multi-currency',
@@ -86,6 +123,10 @@ class MultiCurrencyGuesserTest extends \PHPUnit_Framework_TestCase
                     'choices' => [
                         'USD' => 'USD',
                         'UAH' => 'UAH'
+                    ],
+                    'params' => [
+                        'value' => 'test',
+                        'currency' => 'testCurrency'
                     ]
                 ],
                 true

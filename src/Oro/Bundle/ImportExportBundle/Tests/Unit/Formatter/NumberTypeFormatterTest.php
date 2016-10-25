@@ -16,12 +16,12 @@ class NumberTypeFormatterTest extends \PHPUnit_Framework_TestCase
 
     public function setUp()
     {
-        /** @var LocaleSettings|\PHPUnit_Framework_MockObject_MockObject $localeSettings */
-        $localeSettings = $this->getMockBuilder('Oro\Bundle\LocaleBundle\Model\LocaleSettings')
+        /** @var LocaleSettings|\PHPUnit_Framework_MockObject_MockObject $numberFormatter */
+        $numberFormatter = $this->getMockBuilder('Oro\Bundle\LocaleBundle\Formatter\NumberFormatter')
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->formatter = new NumberTypeFormatter($localeSettings);
+        $this->formatter = new NumberTypeFormatter($numberFormatter);
     }
 
     /**

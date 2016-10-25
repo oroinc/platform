@@ -12,28 +12,28 @@ use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 class EntityMetadata implements ToArrayInterface
 {
     /** @var string */
-    protected $className;
+    private $className;
 
     /** @var bool */
-    protected $inherited = false;
+    private $inherited = false;
 
     /** @var bool */
-    protected $hasIdGenerator = false;
+    private $hasIdGenerator = false;
 
     /** @var string[] */
-    protected $identifiers = [];
+    private $identifiers = [];
 
     /** @var MetaPropertyMetadata[] */
-    protected $metaProperties = [];
+    private $metaProperties = [];
 
     /** @var FieldMetadata[] */
-    protected $fields = [];
+    private $fields = [];
 
     /** @var AssociationMetadata[] */
-    protected $associations = [];
+    private $associations = [];
 
     /** @var ParameterBag|null */
-    protected $attributes;
+    private $attributes;
 
     /**
      * Makes a deep copy of the object.
@@ -102,7 +102,7 @@ class EntityMetadata implements ToArrayInterface
      *
      * @return array
      */
-    protected function convertPropertiesToArray(array $properties)
+    private function convertPropertiesToArray(array $properties)
     {
         $result = [];
         foreach ($properties as $name => $property) {
@@ -242,6 +242,43 @@ class EntityMetadata implements ToArrayInterface
         } elseif ($this->hasMetaProperty($oldName)) {
             $this->renameMetaProperty($oldName, $newName);
         }
+    }
+
+    /**
+     * Finds a property metadata by the given property path.
+     *
+     * @param string $propertyPath
+     *
+     * @return PropertyMetadata|null
+     */
+    public function getPropertyByPropertyPath($propertyPath)
+    {
+        $property = $this->getByPropertyPath($this->fields, $propertyPath);
+        if (null === $property) {
+            $property = $this->getByPropertyPath($this->associations, $propertyPath);
+        }
+        if (null === $property) {
+            $property = $this->getByPropertyPath($this->metaProperties, $propertyPath);
+        }
+
+        return $property;
+    }
+
+    /**
+     * @param PropertyMetadata[] $properties
+     * @param string             $propertyPath
+     *
+     * @return PropertyMetadata|null
+     */
+    private function getByPropertyPath(array $properties, $propertyPath)
+    {
+        foreach ($properties as $property) {
+            if ($property->getPropertyPath() === $propertyPath) {
+                return $property;
+            }
+        }
+
+        return null;
     }
 
     /**

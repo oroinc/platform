@@ -1,9 +1,9 @@
 {% import 'OroUIBundle::macros.html.twig' as UI %}
 {% if feature_enabled('email') %}
 <script type="text/template" id="email-notification-item-template">
-    <div class="info" data-id="<%= id %>">
+    <div class="info" data-id="<%- id %>">
         <div class="body">
-            <div class="title nowrap-ellipsis"><%= subject %></div>
+            <div class="title nowrap-ellipsis"><%- subject %></div>
             <div class="description nowrap-ellipsis"><%= bodyContent %></div>
         </div>
         <% if (seen) {  %>
@@ -15,9 +15,9 @@
     <div class="footer row-fluid">
         <span class="pull-left fromName">
             <% if (linkFromName) { %>
-                <a href="<%= linkFromName %>"><%= fromName %></a>
+                <a href="<%- linkFromName %>"><%- fromName %></a>
             <% } else { %>
-                <%= fromName %>
+                <%- fromName %>
             <% } %>
         </span>
         <span class="pull-right reply-all-action">
