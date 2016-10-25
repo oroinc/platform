@@ -14,7 +14,7 @@ use Oro\Bundle\NavigationBundle\Model\ExtendMenuUpdate;
  *      name="oro_navigation_menu_upd",
  *      uniqueConstraints={
  *          @ORM\UniqueConstraint(
- *              name="unq_menu_key",
+ *              name="oro_navigation_menu_upd_uidx",
  *              columns={"key", "ownership_type"}
  *          )
  *      }
