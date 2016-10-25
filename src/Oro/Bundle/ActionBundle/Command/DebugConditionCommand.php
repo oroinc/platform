@@ -2,21 +2,15 @@
 
 namespace Oro\Bundle\ActionBundle\Command;
 
-use Oro\Component\ConfigExpression\ExpressionFactory;
-
-use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
-use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Input\InputArgument;
-use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Output\OutputInterface;
-use Zend\ServiceManager\Exception\ServiceNotFoundException;
 
-class DebugConditionCommand extends ContainerAwareCommand
+use Oro\Component\ConfigExpression\ExpressionFactory;
+use Oro\Component\ConfigExpression\Extension\DependencyInjection\DependencyInjectionExtension;
+
+class DebugConditionCommand extends AbstractDebugCommand
 {
-    /**
-     * @var ExpressionFactory
-     */
-    protected $expressionFactory;
+    const ARGUMENT_NAME = 'condition-name';
+    const COMMAND_NAME = 'oro:debug:condition';
 
     /**
      * {@inheritdoc}
@@ -40,9 +34,9 @@ class DebugConditionCommand extends ContainerAwareCommand
      */
     protected function configure()
     {
-        $this->setName('oro:debug:condition')
-            ->setDescription('Displays enable condition')
-            ->addArgument('condition-name', InputArgument::OPTIONAL, 'A condition name')
+        $this->setName(self::COMMAND_NAME)
+            ->setDescription('Displays current "condition" for an application')
+            ->addArgument(self::ARGUMENT_NAME, InputArgument::OPTIONAL, 'A condition name')
             ->setHelp(<<<EOF
 The <info>%command.name%</info> displays list of all conditions with full description:
 
@@ -53,129 +47,42 @@ EOF
     }
 
     /**
+     * @return string
+     */
+    protected function getFactoryServiceId()
+    {
+        return 'oro_action.expression.factory';
+    }
+
+    /**
+     * @return array
+     */
+    protected function getTypes()
+    {
+        return $this->findExtensionServices();
+    }
+
+    /**
      * {@inheritdoc}
      */
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function getArgumentName()
     {
-        $conditionName = $input->getArgument('condition-name');
-        $this->expressionFactory = $this->getContainer()->get('oro_action.expression.factory');
-
-        if ($conditionName) {
-            return $this->outputDetailedInfo($conditionName, $output);
-        } else {
-            return $this->outputShortInfo($output);
-        }
+        return self::ARGUMENT_NAME;
     }
 
     /**
-     * @param string $conditionName
-     * @param OutputInterface $output
-     *
-     * @return int
+     * @return array
      */
-    private function outputDetailedInfo($conditionName, OutputInterface $output)
+    private function findExtensionServices()
     {
-        $extensions = $this->expressionFactory->getExtensions();
-        if (!array_key_exists($conditionName, $extensions)) {
-            $output->writeln(sprintf('Condition "%s" not found', $conditionName));
-
-            return 1;
-        }
-
-        try {
-            $extension = $this->getContainer()->get($extensions[$conditionName]);
-        } catch (ServiceNotFoundException $e) {
-            $output->writeln(
-                sprintf('Unable to find condition "%s", due error "%s"',
-                    $conditionName,
-                    PHP_EOL . $e->getMessage()
-                )
-            );
-
-            return 1;
-        }
-
-        $table = new Table($output);
-
-        $reflection = new \ReflectionClass(get_class($extension));
-
-        $table->addRows(
-            [
-                ['Name', $conditionName],
-                ['Service Name', $extensions[$conditionName]],
-                ['Class', get_class($extension)],
-                ['Full Description', $this->getFullDescription(get_class($extension))],
-                ['Arguments', $reflection->getConstructor()],
-            ]
-        );
-        $table->render();
-
-        return 0;
-    }
-
-    /**
-     * @param OutputInterface $output
-     *
-     * @return int
-     */
-    private function outputShortInfo(OutputInterface $output)
-    {
-        $extensions = $this->expressionFactory->getExtensions();
-        $table = new Table($output);
-        $table->setHeaders(['Name', 'Short Description']);
-        foreach ($extensions as $key => $condition) {
-            try {
-                $condition = $this->getContainer()->get($condition);
-                $description = $this->getShortDescription(get_class($condition));
-            } catch (ServiceNotFoundException $e) {
-                $description = "No Description";
+        $services = [];
+        /** @var ExpressionFactory $extensionsFactory */
+        $extensionsFactory = $this->getFactory();
+        foreach ($extensionsFactory->getExtensions() as $extension) {
+            if ($extension instanceof DependencyInjectionExtension) {
+                $services = $extension->getServiceIds();
             }
-            $table->addRow([$key, $description]);
         }
-        $table->render();
-
-        return 0;
-    }
-
-    /**
-     * Returns only first line from full description
-     *
-     * @param string $className
-     *
-     * @return string
-     */
-    private function getShortDescription($className)
-    {
-        $fullDescription = $this->getFullDescription($className);
-        list($shortDescription) = explode("\n", $fullDescription);
-        return $shortDescription;
-    }
-
-    /**
-     * @param string $className
-     *
-     * @return string
-     */
-    private function getFullDescription($className)
-    {
-        $description = sprintf('No Description Found For "%s"', $className);
-        try {
-            $reflection = new \ReflectionClass($className);
-            $doc = $reflection->getDocComment();
-            $description = strlen($doc) ? $this->parserDocComment($doc) : $description;
-        } catch (\ReflectionException $e) {
-        }
-        return $description;
-    }
-
-    /**
-     * @param string $docComment
-     *
-     * @return string
-     */
-    private function parserDocComment($docComment)
-    {
-        $docComment = substr($docComment, 3, -2);
-        return preg_replace('/\s\*\s/', '', $docComment);
+        return $services;
     }
 }
