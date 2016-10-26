@@ -60,8 +60,6 @@ class WorkflowDefinitionHandler
      */
     public function createWorkflowDefinition(WorkflowDefinition $workflowDefinition)
     {
-        $workflowDefinition = WorkflowDefinitionCloner::cloneDefinition($workflowDefinition);
-
         $this->eventDispatcher->dispatch(
             WorkflowEvents::WORKFLOW_BEFORE_CREATE,
             new WorkflowChangesEvent($workflowDefinition)
