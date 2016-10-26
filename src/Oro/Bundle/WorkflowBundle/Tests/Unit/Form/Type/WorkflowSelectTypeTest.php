@@ -2,11 +2,15 @@
 
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Form\Type;
 
-use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
-use Symfony\Component\Form\Test\FormIntegrationTestCase;
+use Doctrine\Common\Persistence\ManagerRegistry;
 
-use Oro\Bundle\WorkflowBundle\Form\Type\WorkflowSelectType;
+use Symfony\Component\Form\Test\FormIntegrationTestCase;
+use Symfony\Component\Translation\TranslatorInterface;
+
 use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
+
+use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
+use Oro\Bundle\WorkflowBundle\Form\Type\WorkflowSelectType;
 
 class WorkflowSelectTypeTest extends FormIntegrationTestCase
 {
@@ -15,7 +19,7 @@ class WorkflowSelectTypeTest extends FormIntegrationTestCase
     const TEST_WORKFLOW_LABEL = 'Test Workflow Label';
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var \PHPUnit_Framework_MockObject_MockObject|ManagerRegistry
      */
     protected $registry;
 
@@ -23,6 +27,9 @@ class WorkflowSelectTypeTest extends FormIntegrationTestCase
      * @var WorkflowSelectType
      */
     protected $type;
+
+    /** @var \PHPUnit_Framework_MockObject_MockObject|TranslatorInterface */
+    protected $translator;
 
     protected function setUp()
     {
@@ -32,7 +39,10 @@ class WorkflowSelectTypeTest extends FormIntegrationTestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->type = new WorkflowSelectType($this->registry);
+        $this->translator = $this->getMock('Symfony\Component\Translation\TranslatorInterface');
+        $this->translator->expects($this->any())->method('trans')->willReturnArgument(0);
+
+        $this->type = new WorkflowSelectType($this->registry, $this->translator);
     }
 
     protected function tearDown()

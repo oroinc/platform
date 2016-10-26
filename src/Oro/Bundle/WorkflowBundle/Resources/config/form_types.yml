@@ -4,8 +4,6 @@ parameters:
 
     oro_workflow.form.type.attributes.class: Oro\Bundle\WorkflowBundle\Form\Type\WorkflowAttributesType
     oro_workflow.form.type.transition.class: Oro\Bundle\WorkflowBundle\Form\Type\WorkflowTransitionType
-    oro_workflow.form.type.workflow_step_select.class: Oro\Bundle\WorkflowBundle\Form\Type\WorkflowStepSelectType
-    oro_workflow.form.type.workflow_select.class: Oro\Bundle\WorkflowBundle\Form\Type\WorkflowSelectType
 
     oro_workflow.form.type.workflow_definition.class: Oro\Bundle\WorkflowBundle\Form\Type\WorkflowDefinitionType
 
@@ -40,23 +38,26 @@ services:
             - { name: form.type, alias: oro_workflow_transition }
 
     oro_workflow.form.type.workflow_step_select:
-        class: %oro_workflow.form.type.workflow_step_select.class%
+        class: 'Oro\Bundle\WorkflowBundle\Form\Type\WorkflowStepSelectType'
         arguments:
             - '@oro_workflow.registry'
+            - '@translator'
         tags:
             - { name: form.type, alias: oro_workflow_step_select }
 
     oro_workflow.form.type.workflow_definition_select:
-        class: Oro\Bundle\WorkflowBundle\Form\Type\WorkflowDefinitionSelectType
+        class: 'Oro\Bundle\WorkflowBundle\Form\Type\WorkflowDefinitionSelectType'
         arguments:
             - '@oro_workflow.registry'
+            - '@translator'
         tags:
             - { name: form.type, alias: oro_workflow_definition_select }
 
     oro_workflow.form.type.workflow_select:
-        class: %oro_workflow.form.type.workflow_select.class%
+        class: 'Oro\Bundle\WorkflowBundle\Form\Type\WorkflowSelectType'
         arguments:
             - '@doctrine'
+            - '@translator'
         tags:
             - { name: form.type, alias: oro_workflow_select }
 
