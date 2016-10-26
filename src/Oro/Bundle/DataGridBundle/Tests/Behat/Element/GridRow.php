@@ -64,9 +64,9 @@ class GridRow extends Element
 
         /** @var NodeElement $pencilIcon */
         $pencilIcon = $cell->find('css', 'i[data-role="edit"]');
-        self::assertTrue($pencilIcon->isValid());
+        self::assertTrue($pencilIcon->isValid(), "Cell with '$header' is not inline editable");
+        self::assertTrue($pencilIcon->isVisible(), "Cell with '$header' is not inline editable");
         $pencilIcon->click();
-
 
         $this->elementFactory->createElement('OroForm')->fillField(
             'value',
