@@ -68,7 +68,7 @@ class TranslationHelperTest extends \PHPUnit_Framework_TestCase
         $data = (new Translation())->setValue('test_value');
 
         $this->repository->expects($this->once())
-            ->method('findValue')
+            ->method('findTranslation')
             ->with($key, $locale, $domain)
             ->willReturn($data);
 
@@ -82,7 +82,7 @@ class TranslationHelperTest extends \PHPUnit_Framework_TestCase
         $domain = 'messages';
 
         $this->repository->expects($this->once())
-            ->method('findValue')
+            ->method('findTranslation')
             ->with($key, $locale, $domain)
             ->willReturn(null);
 
