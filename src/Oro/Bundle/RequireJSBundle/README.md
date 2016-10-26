@@ -1,9 +1,9 @@
 OroRequireJSBundle
 ====================
-This bundle provides easy way to:
+This bundle provides an easy way to:
 
- -  generates require.js config file for a project;
- -  optimizes, minify and merge all JS-file into one resources.
+ -  generate require.js config file for a project;
+ -  optimize, minify and merge all JS-file into one resources.
 
 For details of configuration options see [RequireJS API].<br />
 For details of build options see [example.build.js].
@@ -27,7 +27,7 @@ Common options for require.js config are placed in ```app/config.yml```:
 
 Bundle specific options are defined inside ```requirejs.yml``` file, which is placed in ```%BundleName%\Resources\config\requirejs.yml```.
 It can have three sections ```shim```, ```map``` and ```paths``` (see [RequireJS API]).
-Each bundle's javascript module have to be defined in ```paths``` section, where key is a module name and value is its relative path from document root.
+Each bundle's javascript module have to be defined in ```paths``` section, where key is a module name and value is its relative path from the document root.
 
     config:
         shim:
@@ -45,7 +45,7 @@ Each bundle's javascript module have to be defined in ```paths``` section, where
             'oroui/js/jquery-extend': 'bundles/oroui/js/jquery-extend.js'
 
 ### Generation
-Main require.js config is generated automatically and embedded in HTML-page. The config is stored in application cache. So if you want, for some reason, renew a require.js configuration, then just clean a cache.
+Main require.js config is generated automatically and embedded in HTML-page. The config is stored in application cache. In case you wish to renew require.js configuration, just clean cache.
 
 ### Usage
 To get `require.js` script with its configuration on your page, just include `scripts.html.twig` template from `OroRequireJSBundle` to `<head/>` tag of your `index.html.twig` template.
@@ -76,11 +76,10 @@ The template `scripts.html.twig` accepts two optional parameters `compressed` an
 
 ## Runtime require.js main config extension
 
-Sometimes it is necessary to modify require.js configuration on a fly (e.g. to set dynamic path in depends of request parameters etc.).
-It is possible to do over `config_extend` parameter for `OroRequireJSBundle::scripts.html.twig` template.
-That variable can contain piece of custom configuration which will be applied after general configuration is loaded and before any module get utilized.
+Sometimes it is not enough to specify require.js configuration settings statically, it is required to modify certain parameters dynamically at each launch. It is possible to do this over `config_extend` parameter for `OroRequireJSBundle::scripts.html.twig` template.
+That variable can contain a piece of custom configuration which will be applied after general configuration is loaded and before any module is utilized.
 
-E.g. to dynamically define path to translation dictionary (depending on what locale is currently used):
+E.g. to dynamically define the path to translation dictionary (depending on what locale is currently used):
 
     {% set requirejs_config_extend %}
         require({
@@ -92,7 +91,7 @@ E.g. to dynamically define path to translation dictionary (depending on what loc
     {% endset %}
 
 
-In terms of sequence of code execution it looks:
+In terms of sequence of code execution, it looks the following way:
 
  1. Prod mode (and built resource exists)
     - execute all custom configurations<br />
