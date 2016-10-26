@@ -26,9 +26,8 @@ config:
 
     paths:
         'moment': 'bundles/orolocale/lib/moment/moment.js'
-        'moment-timezone': 'bundles/components/moment-timezone/builds/moment-timezone-with-data.min.js'
-#        'moment-timezone': 'bundles/components/moment-timezone/builds/moment-timezone-with-data.js'
-        'numeral': 'bundles/orolocale/lib/numeral.js'
+        'moment-timezone': 'bundles/bowerassets/moment-timezone/builds/moment-timezone-with-data.js'
+        'numeral': 'bundles/bowerassets/numeral/numeral.js'
         'orolocale/js/locale-settings': 'bundles/orolocale/js/locale-settings.js'
         'orolocale/js/locale-settings/data': '../js/oro.locale_data.js'
         'orolocale/js/formatter/name': 'bundles/orolocale/js/formatter/name.js'

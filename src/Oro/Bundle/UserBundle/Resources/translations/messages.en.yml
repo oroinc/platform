@@ -115,6 +115,7 @@ oro:
         last_name.label:             Last name
         login_count.label:           Login count
         login_disabled.label:        Login disabled
+        failed_login_count.label:    Failed login count
         middle_name.label:           Middle name
         name_prefix.label:           Name prefix
         name_suffix.label:           Name suffix
@@ -210,6 +211,25 @@ oro:
                 mass_action.success: Password reset completed successfully.
                 mass_action.failure: Mass reset action has failed.
                 popup.label: Reset
+        # password tooltip for different rules
+        password_complexity:
+            unrestricted: ~
+            min_length: The password must be at least {{ length }} characters long
+            upper_case: The password must include an uppercase letter
+            numbers:    The password must include a number
+            special_chars:  The password must include a special character (!"#$%&'()*+,-./:;<=>?@[\]^_`{|}~ and space)
+            min_length_upper_case: The password must be at least {{ length }} characters long and include an uppercase letter
+            min_length_numbers: The password must be at least {{ length }} characters long and include a number
+            min_length_special_chars: The password must be at least {{ length }} characters long and include a special character (!"#$%&'()*+,-./:;<=>?@[\]^_`{|}~ and space)
+            min_length_upper_case_numbers: The password must be at least {{ length }} characters long and include an uppercase letter and a number
+            min_length_upper_case_special_chars: The password must be at least {{ length }} characters long and include an uppercase letter and a special character (!"#$%&'()*+,-./:;<=>?@[\]^_`{|}~ and space)
+            min_length_numbers_special_chars: The password must be at least {{ length }} characters long and include a number and a special character (!"#$%&'()*+,-./:;<=>?@[\]^_`{|}~ and space)
+            min_length_upper_case_numbers_special_chars: The password must be at least {{ length }} characters long and include an uppercase letter, a number, and a special character (!"#$%&'()*+,-./:;<=>?@[\]^_`{|}~ and space)
+            upper_case_numbers: The password must include an uppercase letter and a number
+            upper_case_special_chars: The password must include an uppercase letter and a special character (!"#$%&'()*+,-./:;<=>?@[\]^_`{|}~ and space)
+            numbers_special_chars: The password must include a number and a special character (!"#$%&'()*+,-./:;<=>?@[\]^_`{|}~ and space)
+            upper_case_numbers_special_chars: The password must include an uppercase letter, a number and a special character (!"#$%&'()*+,-./:;<=>?@[\]^_`{|}~ and space)
+
         action:
             password_management:
                 label: Manage passwords
@@ -227,6 +247,7 @@ oro:
         security:
             password_changed.message: Your password was updated by administrator. New password was sent to you by email
             password_reseted.message: Your password was successfully reset. You may login now.
+            remaining_login_attempts: '{0} You have no login attempts remaining.|{1} You have one login attempt remaining.|]1,Inf[ You have %count% login attempts remaining.'
         user_bar_settings:
             title: User bar
         image.tooltip: The avatar must be in BMP, JPEG or PNG formats, and file must be less than %file_size% in size
@@ -242,3 +263,19 @@ oro:
             all_owners: All owners
             business_unit: Business Unit
             current_user: Current User
+
+        system_configuration:
+            groups:
+                user_settings.title: User Settings
+                failed_login_limit.title: Login attempts
+                password_complexity_rules.title: Password restrictions
+            fields:
+                failed_login_limit_enabled.label: Enable failed logins limit
+                failed_login_limit.label: Max login attempts
+                password_min_length.label: Minimal password length
+                password_numbers.label: Require a number
+                password_upper_case.label: Require an uppercase letter
+                password_special_chars:
+                    label: Require a special character
+                    tooltip: >
+                        Special chars: !"#$%&'()*+,-./:;<=>?@[\]^_`{|}~ and space

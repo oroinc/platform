@@ -1,11 +1,14 @@
-/*global base64_encode, base64_decode*/
-define(['base64'], function() {
+define(function(require) {
     'use strict';
 
+    require('bowerassets/base64/base64');
+
     return {
-        // jscs:disable
-        encode: base64_encode,
-        decode: base64_decode
-        // jscs:enable
+        encode: function(stringToEncode) {
+            return window.btoa(stringToEncode);
+        },
+        decode: function(encodedData) {
+            return window.atob(encodedData);
+        }
     };
 });
