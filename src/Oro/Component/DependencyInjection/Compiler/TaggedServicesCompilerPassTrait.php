@@ -19,16 +19,28 @@ trait TaggedServicesCompilerPassTrait
         $tagName,
         $addMethodName
     ) {
-        if (!$container->hasDefinition($serviceId) ||
-                null == ($taggedServiceIds = $container->findTaggedServiceIds($tagName))) {
+        if (!$container->hasDefinition($serviceId)) {
+            return;
+        }
+
+        $taggedServiceIds = $container->findTaggedServiceIds($tagName);
+        if (!$taggedServiceIds) {
             return;
         }
 
         $taggedServices = [];
         foreach ($taggedServiceIds as $id => $attributes) {
-            $priority = isset($attributes[0]['priority']) ? $attributes[0]['priority'] : 0;
-            $alias = isset($attributes[0]['alias']) ? $attributes[0]['alias'] : $id;
-            $taggedServices[$priority] = [new Reference($id), $alias];
+            $priority = 0;
+            if (isset($attributes[0]['priority'])) {
+                $priority = $attributes[0]['priority'];
+            }
+
+            $alias = $id;
+            if (isset($attributes[0]['alias'])) {
+                $alias = $attributes[0]['alias'];
+            }
+
+            $taggedServices[$priority][] = [new Reference($id), $alias];
         }
 
         // sort by priority ascending
@@ -36,8 +48,10 @@ trait TaggedServicesCompilerPassTrait
 
         // register
         $service = $container->getDefinition($serviceId);
-        foreach ($taggedServices as $taggedService) {
-            $service->addMethodCall($addMethodName, $taggedService);
+        foreach ($taggedServices as $prioritedTaggedServices) {
+            foreach ($prioritedTaggedServices as $taggedService) {
+                $service->addMethodCall($addMethodName, $taggedService);
+            }
         }
     }
 }
