@@ -26,6 +26,7 @@ class LoadWorkflowTranslations extends AbstractFixture implements DependentFixtu
     const WORKFLOW1 = 'workflow1';
     const WORKFLOW2 = 'workflow2';
     const WORKFLOW3 = 'workflow3';
+    const WORKFLOW4 = 'workflow4';
 
     const TRANSLATION1 = 'translation1.key';
     const TRANSLATION2 = 'translation2.key';
@@ -35,6 +36,9 @@ class LoadWorkflowTranslations extends AbstractFixture implements DependentFixtu
         Translation::DEFAULT_LOCALE => [
             self::WORKFLOW1 => [
                 self::TRANSLATION1 => 'translation1-1.default',
+            ],
+            self::WORKFLOW4 => [
+                'step.step2.label' => 'workflow4.step2.label.default',
             ],
         ],
         LoadLanguages::LANGUAGE2 => [
@@ -46,6 +50,16 @@ class LoadWorkflowTranslations extends AbstractFixture implements DependentFixtu
                 self::TRANSLATION1 => 'translation2-1.value',
             ],
             self::WORKFLOW3 => [],
+            self::WORKFLOW4 => [
+                'label' => 'workflow4.label.value',
+                'step.step1.label' => 'workflow4.step1.label.value',
+                'attribute.attribute1.label' => 'workflow4.attribute1.label.value',
+                'attribute.attribute2.label' => 'workflow4.attribute2.label.value',
+                'transition.transition1.label' => 'workflow4.transition1.label.value',
+                'transition.transition1.warning_message' => 'workflow4.transition1.message.value',
+                'transition.transition2.label' => 'workflow4.transition2.label.value',
+                'transition.transition2.warning_message' => 'workflow4.transition2.message.value',
+            ],
         ],
     ];
 
@@ -75,6 +89,8 @@ class LoadWorkflowTranslations extends AbstractFixture implements DependentFixtu
      */
     public function load(ObjectManager $manager)
     {
+        // TODO: refactor that method
+
         $generator = new TranslationKeyGenerator();
 
         foreach ($this->workflowTranslations as $locale => $workflows) {
@@ -96,13 +112,26 @@ class LoadWorkflowTranslations extends AbstractFixture implements DependentFixtu
         }
 
         $this->getTranslationManager()->flush();
+        $this->container->get('translator.default')->rebuildCache();
     }
 
+    /**
+     * @param string $key
+     * @param string $value
+     * @param string $locale
+     * @return Translation
+     */
     protected function createTranslation($key, $value, $locale)
     {
         $translationManager = $this->getTranslationManager();
 
-        return $translationManager->saveValue($key, $value, $locale, WorkflowTranslationHelper::TRANSLATION_DOMAIN);
+        return $translationManager->saveValue(
+            $key,
+            $value,
+            $locale,
+            WorkflowTranslationHelper::TRANSLATION_DOMAIN,
+            Translation::SCOPE_UI
+        );
     }
 
     /**

@@ -18,6 +18,7 @@ use Oro\Bundle\WorkflowBundle\Model\WorkflowManager;
 
 class DumpWorkflowTranslationsCommand extends ContainerAwareCommand
 {
+    const NAME = 'oro:workflow:translations:dump';
     const INLINE_LEVEL = 10;
     const TRANSLATION_DOMAIN = 'workflows';
 
@@ -26,7 +27,7 @@ class DumpWorkflowTranslationsCommand extends ContainerAwareCommand
      */
     protected function configure()
     {
-        $this->setName('oro:workflow:translations:dump')
+        $this->setName(self::NAME)
             ->setDescription('Dump translations')
             ->addArgument(
                 'workflow',
