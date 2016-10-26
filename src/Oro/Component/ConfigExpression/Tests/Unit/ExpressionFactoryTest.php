@@ -4,6 +4,7 @@ namespace Oro\Component\ConfigExpression\Tests\Unit;
 
 use Oro\Component\ConfigExpression\ContextAccessorInterface;
 use Oro\Component\ConfigExpression\ExpressionFactory;
+use Oro\Component\ConfigExpression\Extension\DependencyInjection\DependencyInjectionExtension;
 use Oro\Component\ConfigExpression\Extension\ExtensionInterface;
 
 class ExpressionFactoryTest extends \PHPUnit_Framework_TestCase
@@ -127,18 +128,16 @@ class ExpressionFactoryTest extends \PHPUnit_Framework_TestCase
         );
     }
 
-    public function testAddGetExtensions()
+    public function testGetTypes()
     {
-        /** @var ExtensionInterface $newExtension */
-        $newExtension = $this->getMock(ExtensionInterface::class);
+        $types = ['test_name' => 'test_service_id'];
+        /** @var DependencyInjectionExtension|\PHPUnit_Framework_MockObject_MockObject $newExtension */
+        $newExtension = $this->getMockBuilder(DependencyInjectionExtension::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+        $newExtension->expects($this->once())->method('getServiceIds')->willReturn($types);
         $this->factory->addExtension($newExtension);
 
-        $this->assertSame(
-            [
-                $this->extension,
-                $newExtension
-            ],
-            $this->factory->getExtensions()
-        );
+        $this->assertSame($types, $this->factory->getTypes());
     }
 }
