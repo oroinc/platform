@@ -13,6 +13,9 @@ use Oro\Bundle\DataGridBundle\Datagrid\Builder;
  */
 class DatagridConfiguration extends ConfigObject
 {
+    public function getParams(){
+        return $this->params;
+    }
     const COLUMN_PATH = '[columns][%s]';
     const SORTER_PATH = '[sorters][columns][%s]';
     const FILTER_PATH = '[filters][columns][%s]';
