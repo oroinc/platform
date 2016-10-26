@@ -62,6 +62,8 @@ class TranslationManager
         $domain = self::DEFAULT_DOMAIN,
         $persist = false
     ) {
+        // TODO: rename to createTranslation
+
         $cacheKey = sprintf('%s-%s-%s', $locale, $domain, $key);
         if (!array_key_exists($cacheKey, $this->createdTranslationValues)) {
             $translationValue = new Translation();
@@ -93,10 +95,12 @@ class TranslationManager
      */
     public function saveValue($key, $value, $locale, $domain = self::DEFAULT_DOMAIN, $scope = Translation::SCOPE_SYSTEM)
     {
+        // TODO: rename to saveTranslation
+
         /** @var TranslationRepository $repo */
         $repo = $this->getEntityRepository(Translation::class);
 
-        $translationValue = $repo->findValue($key, $locale, $domain);
+        $translationValue = $repo->findTranslation($key, $locale, $domain);
         if (!$this->canUpdateTranslation($scope, $translationValue)) {
             return null;
         }
