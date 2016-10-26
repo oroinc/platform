@@ -34,6 +34,12 @@ class Context extends ApiContext implements ContextInterface
     /** FQCN of an entity */
     const CLASS_NAME = 'class';
 
+    /**
+     * a value indicates whether errors should just stop processing
+     * or an exception should be thrown is any error occurred
+     */
+    const SOFT_ERRORS_HANDLING = 'softErrorsHandling';
+
     /** a prefix for all configuration sections */
     const CONFIG_PREFIX = 'config_';
 
@@ -286,6 +292,32 @@ class Context extends ApiContext implements ContextInterface
     public function resetErrors()
     {
         $this->errors = null;
+    }
+
+    /**
+     * Gets a value indicates whether errors should just stop processing
+     * or an exception should be thrown is any error occurred.
+     *
+     * @return bool
+     */
+    public function isSoftErrorsHandling()
+    {
+        return (bool)$this->get(self::SOFT_ERRORS_HANDLING);
+    }
+
+    /**
+     * Sets a value indicates whether errors should just stop processing
+     * or an exception should be thrown is any error occurred.
+     *
+     * @param bool $softErrorsHandling
+     */
+    public function setSoftErrorsHandling($softErrorsHandling)
+    {
+        if ($softErrorsHandling) {
+            $this->set(self::SOFT_ERRORS_HANDLING, true);
+        } else {
+            $this->remove(self::SOFT_ERRORS_HANDLING);
+        }
     }
 
     /**

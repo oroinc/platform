@@ -1029,6 +1029,21 @@ class ContextTest extends \PHPUnit_Framework_TestCase
         $this->assertSame([], $this->context->getErrors());
     }
 
+    public function testSoftErrorsHandling()
+    {
+        $this->assertFalse($this->context->isSoftErrorsHandling());
+        $this->assertFalse($this->context->has(Context::SOFT_ERRORS_HANDLING));
+
+        $this->context->setSoftErrorsHandling(true);
+        $this->assertTrue($this->context->isSoftErrorsHandling());
+        $this->assertTrue($this->context->has(Context::SOFT_ERRORS_HANDLING));
+        $this->assertTrue($this->context->get(Context::SOFT_ERRORS_HANDLING));
+
+        $this->context->setSoftErrorsHandling(false);
+        $this->assertFalse($this->context->isSoftErrorsHandling());
+        $this->assertFalse($this->context->has(Context::SOFT_ERRORS_HANDLING));
+    }
+
     /**
      * @param array $data
      *

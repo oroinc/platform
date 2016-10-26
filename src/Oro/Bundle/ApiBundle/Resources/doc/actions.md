@@ -611,6 +611,8 @@ General methods:
 - **getErrors()** - Gets all [errors](../../Model/Error.php) happened during the processing of an action.
 - **addError(error)** - Registers an [error](../../Model/Error.php).
 - **resetErrors()** - Removes all errors.
+- **isSoftErrorsHandling()** - Gets a value indicates whether errors should just stop processing or an exception should be thrown is any error occurred.
+- **setSoftErrorsHandling(softErrorsHandling)** - Sets a value indicates whether errors should just stop processing or an exception should be thrown is any error occurred.
 
 Entity configuration related methods:
 
