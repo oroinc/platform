@@ -40,7 +40,7 @@ class WorkflowDefinitionHandleBuilder extends AbstractConfigurationBuilder
      */
     public function buildFromRawConfiguration(array $configuration)
     {
-        foreach ($this->handlers as $handler){
+        foreach ($this->handlers as $handler) {
             $configuration = $handler->handle($configuration);
         }
 

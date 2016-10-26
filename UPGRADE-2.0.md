@@ -138,6 +138,23 @@ and constructor signature changed to `DeferredScheduler $deferredScheduler`.
 - Removed parameter `oro_workflow.listener.process_collector.class`.
 - Removed listener `oro_workflow.event_listener.scheduled_transitions_listener` (`Oro\Bundle\WorkflowBundle\EventListener\WorkflowScheduledTransitionsListener`).
 - Removed action group `oro_workflow_transition_process_schedule`.
+- Added possibility of translation for workflow configuration fields in file `Resources/translations/workflows.en.yml`:
+Now all following fields MUST be moved from workflow.yml configuration file in appropriate translation file under its key node. See keys and fields below:
+ `oro.workflow.{workflow_name}.label` - workflow `label` field.
+ `oro.workflow.{workflow_name}.step.{step_name}.label` - step `label` field.
+ `oro.workflow.{workflow_name}.attribute.{attribute_name}.label` - workflow attribute `label` field.
+ `oro.workflow.{workflow_name}.transition.{transition_name}.label` - transition `label` field.
+ `oro.workflow.{workflow_name}.transition.{transition_name}.warning_message` - transition `message` field.
+ `oro.workflow.{workflow_name}.transition.{transition_name}.attribute.{attribute_name}.label` - form options attribute `label` field.
+To migrate all labels from configuration translatable fields automatically you can use following [script_gist](https://gist.githubusercontent.com/ephrin/39e189653db09ca66f4f6ddc190c40ad/raw/19d8fa59b487932ba433537170e78409399449d4/wf_labels_code_migration.php)
+- Added command `oro:workflow:translations:dump` as a helper to see custom workflow translations (lack of them as well) and their keys.
+- Added `Oro\Bundle\WorkflowBundle\Configuration\WorkflowDefinitionBuilderExtensionInterface` and `oro.workflow.definition_builder.extension` service tag for usage in cases to pre-process (prepare) workflow builder configuration.
+- Added service tag `oro.workflow.configuration.handler` for request configuration procession by `Oro\Bundle\WorkflowBundle\Configuration\Handler\ConfigurationHandlerInterface`.
+- Removed `import` method from `Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition`. Use `Oro\Bundle\WorkflowBundle\Handler\Helper\WorkflowDefinitionCloner::cloneDefinition` instead.
+- Added `previous` property for `Oro\Bundle\WorkflowBundle\Event\WorkflowChangesEvent` in case of definition update.
+
+ 
+    
 
 ####LocaleBundle:
 - Added helper `Oro\Bundle\LocaleBundle\Helper\LocalizationQueryTrait` for adding needed joins to QueryBuilder
@@ -297,7 +314,14 @@ and constructor signature changed to `DeferredScheduler $deferredScheduler`.
 - Added new ACL permission `TRANSLATE`, should be used to determine if user has access to modify translations per language.
 - Removed `Oro\Bundle\TranslationBundle\Translation\TranslationStatusInterface`
 - Added `Oro\Bundle\TranslationBundle\DependencyInjection\Compiler\TranslationContextResolverPass`.
+- Added `Oro\Bundle\TranslationBundle\Helper\TranslationHelper` class with `oro_translation.helper.translation` as accessor for translation values in database.  
+- Added Twig extension `\Oro\Bundle\TranslationBundle\Twig\TranslationExtension` with methods `oro_translation_debug_translator` and `translation_grid_link`
+- Added `Oro\Bundle\TranslationBundle\Translation\TranslationKeyGenerator`
+- Added `Oro\Bundle\TranslationBundle\Translation\TranslationKeySourceInterface` with 2 types of implementations `Oro\Bundle\TranslationBundle\Translation\KeySource\DynamicTranslationKeySource` and immutable one - `Oro\Bundle\TranslationBundle\Translation\KeySource\TranslationKeySource`
+- Added `Oro\Bundle\TranslationBundle\Translation\TranslationFieldsIteratorInterface` as useful way to define single point of custom structure translatable fields awareness and manipulation.
+- Added `Oro\Bundle\TranslationBundle\Translation\TranslationFieldsIteratorTrait`.
 
+ 
 ####EntityExtendBundle
 - `Oro\Bundle\EntityExtendBundle\Migration\EntityMetadataHelper`
     - `getEntityClassByTableName` deprecated, use `getEntityClassesByTableName` instead
