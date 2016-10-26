@@ -5,6 +5,7 @@ use Behat\Behat\EventDispatcher\Event\AfterFeatureTested;
 use Behat\Behat\EventDispatcher\Event\BeforeFeatureTested;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpKernel\KernelInterface;
+use Symfony\Component\Process\Exception\RuntimeException;
 use Symfony\Component\Process\Process;
 
 class MessageQueueConsumerProcessSubscriber implements EventSubscriberInterface
@@ -31,10 +32,18 @@ class MessageQueueConsumerProcessSubscriber implements EventSubscriberInterface
     public function stopMessageConsumer()
     {
         $this->process->stop();
+
+        //Process::stop() don't stop subprocesses see https://github.com/symfony/symfony/issues/5030
+        try {
+            $process = new Process('kill -9 `pgrep -f oro:message-queue:consume`');
+            $process->run();
+        } catch (RuntimeException $e) {
+        }
     }
 
     public function startMessageConsumer()
     {
+        /** Cunsumer is a demon so we need to run it asynchronously */
         $this->process->start();
     }
 
