@@ -9,8 +9,6 @@ use Oro\Bundle\TranslationBundle\Translation\Translator;
 use Oro\Bundle\TranslationBundle\Translation\KeySource\TranslationKeySource;
 
 use Oro\Bundle\WorkflowBundle\Helper\WorkflowTranslationHelper;
-use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
-use Oro\Bundle\WorkflowBundle\Entity\WorkflowStep;
 use Oro\Bundle\WorkflowBundle\Translation\KeyTemplate\WorkflowTemplate;
 
 class WorkflowTranslationHelperTest extends \PHPUnit_Framework_TestCase
@@ -42,6 +40,9 @@ class WorkflowTranslationHelperTest extends \PHPUnit_Framework_TestCase
         $this->helper = new WorkflowTranslationHelper($this->translator, $this->manager, $this->translationHelper);
     }
 
+    /**
+     * {@inheritdoc}
+     */
     protected function tearDown()
     {
         unset($this->translator, $this->manager, $this->helper, $this->translationHelper);
@@ -202,6 +203,13 @@ class WorkflowTranslationHelperTest extends \PHPUnit_Framework_TestCase
                 'value' => null
             ]
         ];
+    }
+
+    public function testFlushTranslations()
+    {
+        $this->translationHelper->expects($this->once())->method('flush');
+
+        $this->helper->flushTranslations();
     }
 
     /**

@@ -2,8 +2,11 @@
 
 namespace Oro\Bundle\TranslationBundle\Tests\Functional\Manager;
 
+use Doctrine\ORM\EntityRepository;
+
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Bundle\TranslationBundle\Entity\Language;
+use Oro\Bundle\TranslationBundle\Entity\Repository\TranslationKeyRepository;
 use Oro\Bundle\TranslationBundle\Entity\Repository\TranslationRepository;
 use Oro\Bundle\TranslationBundle\Entity\Translation;
 use Oro\Bundle\TranslationBundle\Entity\TranslationKey;
@@ -32,11 +35,7 @@ class TranslationManagerTest extends WebTestCase
         $this->loadFixtures([LoadTranslations::class]);
 
         $this->manager = $this->getContainer()->get('oro_translation.manager.translation');
-
-        $this->repository = $this->getContainer()
-            ->get('doctrine')
-            ->getManagerForClass(Translation::class)
-            ->getRepository(Translation::class);
+        $this->repository = $this->getRepository(Translation::class);
     }
 
     public function testCreateValue()
@@ -55,6 +54,11 @@ class TranslationManagerTest extends WebTestCase
         $translation = $this->repository->findTranslation($key, $locale, $domain);
 
         $this->ensureTranslationIsCorrect($translation, $key, $value, $domain, $locale);
+    }
+
+    public function testCreateWithEmptyValue()
+    {
+        // TODO: implement it
     }
 
     public function testUpdateScopeSystemValue()
@@ -138,6 +142,63 @@ class TranslationManagerTest extends WebTestCase
         $this->assertNull($translation);
     }
 
+    public function testRemoveTranslationKey()
+    {
+        /* @var $repository TranslationKeyRepository */
+        $repository = $this->getRepository(TranslationKey::class);
+
+        $this->assertNotNull(
+            $repository->findOneBy([
+                'key' => LoadTranslations::TRANSLATION_KEY_3,
+                'domain' => LoadTranslations::TRANSLATION_KEY_DOMAIN
+            ])
+        );
+
+        $this->manager->removeTranslationKey(
+            LoadTranslations::TRANSLATION_KEY_3,
+            LoadTranslations::TRANSLATION_KEY_DOMAIN
+        );
+        $this->manager->flush();
+
+        $this->assertNull(
+            $repository->findOneBy([
+                'key' => LoadTranslations::TRANSLATION_KEY_3,
+                'domain' => LoadTranslations::TRANSLATION_KEY_DOMAIN
+            ])
+        );
+    }
+
+    public function testRemoveMissingTranslationKey()
+    {
+        /* @var $repository TranslationKeyRepository */
+        $repository = $this->getRepository(TranslationKey::class);
+
+        $this->assertNull(
+            $repository->findOneBy([
+                'key' => 'test.key1',
+                'domain' => 'test.domain'
+            ])
+        );
+
+        $this->manager->removeTranslationKey('test.key1', 'test.domain');
+        $this->manager->flush();
+    }
+
+    public function testFindAvailableDomainsForLocales()
+    {
+        // TODO: implement it
+    }
+
+    public function testGetAvailableDomains()
+    {
+        // TODO: implement it
+    }
+
+    public function testFindTranslationKey()
+    {
+        // TODO: implement it
+    }
+
     /**
      * @param string $key
      * @param string $value
@@ -149,6 +210,18 @@ class TranslationManagerTest extends WebTestCase
     {
         $this->manager->saveValue($key, $value, $locale, $domain, $scope);
         $this->manager->flush();
+    }
+
+    /**
+     * @param string $class
+     * @return EntityRepository
+     */
+    protected function getRepository($class)
+    {
+        return $this->getContainer()
+            ->get('doctrine')
+            ->getManagerForClass($class)
+            ->getRepository($class);
     }
 
     /**

@@ -95,7 +95,9 @@ class WorkflowTranslationHelper
      */
     public function findTranslation($key, $locale = null)
     {
-        $locale = $locale ?: $this->translator->getLocale();
+        if (!$locale) {
+            $locale = $this->translator->getLocale();
+        }
 
         $result = $this->translationHelper->findValue($key, $locale, self::TRANSLATION_DOMAIN);
 
@@ -115,11 +117,14 @@ class WorkflowTranslationHelper
         $currentLocale = $this->translator->getLocale();
         $this->saveValue($key, $value, $currentLocale);
 
-        if ($currentLocale !== Translation::DEFAULT_LOCALE) {
-            if (null === ($existingValue = $this->findValue($key))) {
-                $this->saveValue($key, $value);
-            }
+        if ($currentLocale !== Translation::DEFAULT_LOCALE && null === $this->findValue($key)) {
+            $this->saveValue($key, $value);
         }
+    }
+
+    public function flushTranslations()
+    {
+        $this->translationManager->flush();
     }
 
     /**

@@ -53,4 +53,9 @@ class LanguageRepositoryTest extends WebTestCase
             $this->repository->getAvailableLanguageCodes(true)
         ));
     }
+
+    public function testGetAvailableLanguagesByCurrentUser()
+    {
+        // TODO: implement it
+    }
 }

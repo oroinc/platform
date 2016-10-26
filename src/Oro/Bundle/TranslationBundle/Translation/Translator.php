@@ -18,6 +18,8 @@ use Oro\Bundle\TranslationBundle\Strategy\TranslationStrategyProvider;
  */
 class Translator extends BaseTranslator
 {
+    const DEFAULT_LOCALE = 'en';
+
     /** @var DynamicTranslationMetadataCache|null */
     protected $databaseTranslationMetadataCache;
 

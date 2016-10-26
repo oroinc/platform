@@ -3,8 +3,8 @@
 namespace Oro\Bundle\WorkflowBundle\Tests\Functional\Helper;
 
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
-
 use Oro\Bundle\TranslationBundle\Tests\Functional\DataFixtures\LoadLanguages;
+use Oro\Bundle\TranslationBundle\Translation\Translator;
 use Oro\Bundle\WorkflowBundle\Helper\WorkflowTranslationHelper;
 use Oro\Bundle\WorkflowBundle\Tests\Functional\DataFixtures\LoadWorkflowTranslations;
 
@@ -150,28 +150,45 @@ class WorkflowTranslationHelperTest extends WebTestCase
         ];
     }
 
-//    /**
-//     * @param string $key
-//     * @param string $value
-//     * @param string $locale
-//     *
-//     * @dataProvider saveTranslationProvider
-//     */
-//    public function testSaveTranslation($key, $value, $locale)
-//    {
-//        $this->helper->saveTranslation($key, $value, true);
-//
-//        $this->assertEquals($value, $this->helper->findTranslation($key, $locale));
-//    }
-//
-//    public function saveTranslationProvider()
-//    {
-//        return [
-//            'save' => [
-//                'key' => 'test.key1',
-//                'value' => 'test.value1',
-//                'locale' => null
-//            ],
-//        ];
-//    }
+    public function testSaveTranslation()
+    {
+        $this->getTranslator()->setLocale(LoadLanguages::LANGUAGE2);
+
+        $this->helper->saveTranslation('test.key', 'test.value');
+        $this->helper->flushTranslations();
+
+        $this->assertEquals('test.value', $this->helper->findTranslation('test.key', LoadLanguages::LANGUAGE2));
+        $this->assertEquals('test.value', $this->helper->findTranslation('test.key', Translator::DEFAULT_LOCALE));
+    }
+
+    public function testSaveTranslationWithDefaultLocale()
+    {
+        $this->getTranslator()->setLocale(Translator::DEFAULT_LOCALE);
+
+        $this->helper->saveTranslation('test.key', 'test.value');
+        $this->helper->flushTranslations();
+
+        $this->assertEquals('test.value', $this->helper->findTranslation('test.key', Translator::DEFAULT_LOCALE));
+    }
+
+    public function testSaveTranslationWithExistingDefaultTranslation()
+    {
+        $key = LoadWorkflowTranslations::TRANSLATION1;
+
+        $this->getTranslator()->setLocale(LoadLanguages::LANGUAGE2);
+
+        $this->helper->saveTranslation($key, 'changed value');
+        $this->helper->flushTranslations();
+
+        $this->assertEquals('translation1.default', $this->helper->findTranslation($key, Translator::DEFAULT_LOCALE));
+        $this->assertEquals('changed value', $this->helper->findTranslation($key, LoadLanguages::LANGUAGE2));
+    }
+
+    /**
+     * @return Translator
+     */
+    protected function getTranslator()
+    {
+        return $this->getContainer()->get('translator');
+    }
 }
