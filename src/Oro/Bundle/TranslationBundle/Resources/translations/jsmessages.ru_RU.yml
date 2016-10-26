@@ -1,5 +1,0 @@
-oro.datagrid.pagination:
-    label: 'Страница Sys'
-    totalPages: 'из {{ totalPages }} Sys'
-    totalRecords: 'Всего записей из {{ totalRecords }}'
-    visibleItems: 'Показано {{ count }} из {{ total }} записей Sys'
