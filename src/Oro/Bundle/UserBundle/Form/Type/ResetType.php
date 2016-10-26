@@ -6,19 +6,24 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
+use Oro\Bundle\UserBundle\Form\Provider\PasswordFieldOptionsProvider;
+
 class ResetType extends AbstractType
 {
-    /**
-     * @var string
-     */
+    /** @var string */
     protected $class;
+
+    /** @var PasswordFieldOptionsProvider */
+    protected $optionsProvider;
 
     /**
      * @param string $class User entity class
+     * @param PasswordFieldOptionsProvider $optionsProvider
      */
-    public function __construct($class)
+    public function __construct($class, PasswordFieldOptionsProvider $optionsProvider)
     {
         $this->class = $class;
+        $this->optionsProvider = $optionsProvider;
     }
 
     /**
@@ -29,8 +34,18 @@ class ResetType extends AbstractType
         $builder->add('plainPassword', 'repeated', [
             'type'            => 'password',
             'required'        => true,
-            'first_options'   => ['label' => 'oro.user.password.enter_new_password.label'],
-            'second_options'  => ['label' => 'oro.user.password.enter_new_password_again.label'],
+            'first_options' => [
+                'label' => 'oro.user.password.enter_new_password.label',
+                'attr' => [
+                    'data-validation' => $this->optionsProvider->getDataValidationOption(),
+                ],
+                'hint' => $this->optionsProvider->getTooltip(),
+                'hint_position' => 'above',
+                'hint_attr' => ['class' => 'oro-hint oro-hint-above'],
+            ],
+            'second_options'  => [
+                'label' => 'oro.user.password.enter_new_password_again.label',
+            ],
         ]);
     }
 

@@ -8,6 +8,7 @@ use Behat\Symfony2Extension\ServiceContainer\Symfony2Extension;
 use Behat\Symfony2Extension\Suite\SymfonyBundleSuite;
 use Behat\Symfony2Extension\Suite\SymfonySuiteGenerator;
 use Behat\Testwork\Cli\ServiceContainer\CliExtension;
+use Behat\Testwork\EventDispatcher\ServiceContainer\EventDispatcherExtension;
 use Behat\Testwork\ServiceContainer\Extension as TestworkExtension;
 use Behat\Testwork\ServiceContainer\ExtensionManager;
 use Behat\Testwork\Suite\ServiceContainer\SuiteExtension;
@@ -29,6 +30,8 @@ class OroTestFrameworkExtension implements TestworkExtension
     const DUMPER_TAG = 'oro_test.dumper';
 
     const ELEMENTS_CONFIG_ROOT = 'elements';
+
+    const PAGES_CONFIG_ROOT = 'pages';
 
     /**
      * {@inheritdoc}
@@ -99,8 +102,9 @@ class OroTestFrameworkExtension implements TestworkExtension
         $container->setParameter('oro_test.shared_contexts', $config['shared_contexts']);
         $container->setParameter('oro_test.application_suites', $config['application_suites']);
         $container->setParameter('oro_test.reference_initializer_class', $config['reference_initializer_class']);
+        // Remove reboot kernel after scenario because we have isolation in feature layer instead of scenario
         $container->getDefinition('symfony2_extension.context_initializer.kernel_aware')
-            ->clearTag(\Behat\Testwork\EventDispatcher\ServiceContainer\EventDispatcherExtension::SUBSCRIBER_TAG);
+            ->clearTag(EventDispatcherExtension::SUBSCRIBER_TAG);
     }
 
     /**
@@ -232,6 +236,7 @@ class OroTestFrameworkExtension implements TestworkExtension
     private function processElements(ContainerBuilder $container)
     {
         $elementConfiguration = [];
+        $pagesConfiguration = [];
         $kernel = $container->get(Symfony2Extension::KERNEL_ID);
 
         /** @var BundleInterface $bundle */
@@ -248,10 +253,17 @@ class OroTestFrameworkExtension implements TestworkExtension
 
             $config = Yaml::parse(file_get_contents($mappingPath));
 
-            $elementConfiguration = array_merge($elementConfiguration, $config[self::ELEMENTS_CONFIG_ROOT]);
+            if (isset($config[self::ELEMENTS_CONFIG_ROOT])) {
+                $elementConfiguration = array_merge($elementConfiguration, $config[self::ELEMENTS_CONFIG_ROOT]);
+            }
+
+            if (isset($config[self::PAGES_CONFIG_ROOT])) {
+                $pagesConfiguration = array_merge($pagesConfiguration, $config[self::PAGES_CONFIG_ROOT]);
+            }
         }
 
         $container->getDefinition('oro_element_factory')->replaceArgument(2, $elementConfiguration);
+        $container->getDefinition('oro_page_factory')->replaceArgument(1, $pagesConfiguration);
     }
 
     /**

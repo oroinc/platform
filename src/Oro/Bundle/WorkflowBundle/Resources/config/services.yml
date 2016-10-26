@@ -87,6 +87,9 @@ services:
             - '@oro_workflow.entity_connector'
         calls:
             - [addApplicabilityFilter, ['@oro_workflow.applicability_filter.exclusive_record_group']]
+            - [setLogger, ['@logger']]
+        tags:
+            - { name: monolog.logger, channel: oro_workflow }
 
     oro_workflow.applicability_filter.exclusive_record_group:
         class: 'Oro\Bundle\WorkflowBundle\Model\WorkflowExclusiveRecordGroupFilter'
@@ -126,6 +129,8 @@ services:
         arguments:
             - '@oro_entity.doctrine_helper'
             - "@?logger"
+        tags:
+            - { name: monolog.logger, channel: oro_workflow }
 
     oro_workflow.registry:
         class: '%oro_workflow.registry.class%'
@@ -167,6 +172,8 @@ services:
             - '@oro_workflow.manager'
             - '@oro_workflow.handler.transition_helper'
             - '@logger'
+        tags:
+            - { name: monolog.logger, channel: oro_workflow }
 
     oro_workflow.handler.start_transition_handler:
         class: '%oro_workflow.handler.start_transition_handler.class%'
@@ -370,3 +377,4 @@ services:
             - '@logger'
         tags:
             - { name: 'oro_message_queue.client.message_processor' }
+            - { name: monolog.logger, channel: oro_workflow }
