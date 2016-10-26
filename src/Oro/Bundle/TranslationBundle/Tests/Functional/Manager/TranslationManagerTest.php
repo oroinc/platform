@@ -18,7 +18,7 @@ class TranslationManagerTest extends WebTestCase
 {
     /** @var TranslationManager */
     protected $manager;
-    
+
     /** @var TranslationRepository */
     protected $repository;
 
@@ -32,7 +32,7 @@ class TranslationManagerTest extends WebTestCase
         $this->loadFixtures([LoadTranslations::class]);
 
         $this->manager = $this->getContainer()->get('oro_translation.manager.translation');
-        
+
         $this->repository = $this->getContainer()
             ->get('doctrine')
             ->getManagerForClass(Translation::class)
@@ -46,13 +46,13 @@ class TranslationManagerTest extends WebTestCase
         $locale = LoadLanguages::LANGUAGE1;
         $domain = LoadTranslations::TRANSLATION_KEY_DOMAIN;
 
-        $translation = $this->repository->findValue($key, $locale, $domain);
+        $translation = $this->repository->findTranslation($key, $locale, $domain);
         $this->assertNull($translation);
 
         $this->manager->saveValue($key, $value, $locale, $domain, Translation::SCOPE_UI);
         $this->manager->flush();
 
-        $translation = $this->repository->findValue($key, $locale, $domain);
+        $translation = $this->repository->findTranslation($key, $locale, $domain);
 
         $this->ensureTranslationIsCorrect($translation, $key, $value, $domain, $locale);
     }
@@ -69,7 +69,7 @@ class TranslationManagerTest extends WebTestCase
         $this->assertNotNull($this->manager->saveValue($key, $value, $locale, $domain, Translation::SCOPE_SYSTEM));
         $this->manager->flush();
 
-        $translation = $this->repository->findValue($key, $locale, $domain);
+        $translation = $this->repository->findTranslation($key, $locale, $domain);
         $this->ensureTranslationIsCorrect($translation, $key, $value, $domain, $locale);
     }
 
@@ -86,7 +86,7 @@ class TranslationManagerTest extends WebTestCase
         $this->assertNotNull($this->manager->saveValue($key, $value, $locale, $domain, Translation::SCOPE_INSTALLED));
         $this->manager->flush();
 
-        $translation = $this->repository->findValue($key, $locale, $domain);
+        $translation = $this->repository->findTranslation($key, $locale, $domain);
         $this->ensureTranslationIsCorrect($translation, $key, $value, $domain, $locale);
 
         // Ensure That We cannot Overwrite SCOPE_INSTALLED
@@ -94,7 +94,7 @@ class TranslationManagerTest extends WebTestCase
             $this->manager->saveValue($key, uniqid('', true), $locale, $domain, Translation::SCOPE_SYSTEM)
         );
 
-        $translation = $this->repository->findValue($key, $locale, $domain);
+        $translation = $this->repository->findTranslation($key, $locale, $domain);
         $this->ensureTranslationIsCorrect($translation, $key, $value, $domain, $locale);
     }
 
@@ -111,14 +111,14 @@ class TranslationManagerTest extends WebTestCase
         $this->assertNotNull($this->manager->saveValue($key, $value, $locale, $domain, Translation::SCOPE_UI));
         $this->manager->flush();
 
-        $translation = $this->repository->findValue($key, $locale, $domain);
+        $translation = $this->repository->findTranslation($key, $locale, $domain);
         $this->ensureTranslationIsCorrect($translation, $key, $value, $domain, $locale);
 
         //Ensure That We cannot Overwrite SCOPE_UI
         $this->assertNull(
             $this->manager->saveValue($key, uniqid('', true), $locale, $domain, Translation::SCOPE_INSTALLED)
         );
-        $translation = $this->repository->findValue($key, $locale, $domain);
+        $translation = $this->repository->findTranslation($key, $locale, $domain);
         $this->ensureTranslationIsCorrect($translation, $key, $value, $domain, $locale);
     }
 
@@ -134,7 +134,7 @@ class TranslationManagerTest extends WebTestCase
         $this->assertNull($this->manager->saveValue($key, $value, $locale, $domain, Translation::SCOPE_UI));
         $this->manager->flush();
 
-        $translation = $this->repository->findValue($key, $locale, $domain);
+        $translation = $this->repository->findTranslation($key, $locale, $domain);
         $this->assertNull($translation);
     }
 

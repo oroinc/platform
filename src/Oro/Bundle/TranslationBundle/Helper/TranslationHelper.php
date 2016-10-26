@@ -39,7 +39,7 @@ class TranslationHelper
      */
     public function findValue($key, $locale, $domain)
     {
-        $translation = $this->getTranslationRepository()->findValue($key, $locale, $domain);
+        $translation = $this->getTranslationRepository()->findTranslation($key, $locale, $domain);
 
         return $translation ? $translation->getValue() : null;
     }

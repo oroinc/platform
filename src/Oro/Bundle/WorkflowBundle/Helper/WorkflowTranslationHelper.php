@@ -109,7 +109,6 @@ class WorkflowTranslationHelper
     /**
      * @param string $key
      * @param string $value
-     *
      */
     public function saveTranslation($key, $value)
     {
@@ -117,9 +116,7 @@ class WorkflowTranslationHelper
         $this->saveValue($key, $value, $currentLocale);
 
         if ($currentLocale !== Translation::DEFAULT_LOCALE) {
-            $existingValue = $this->findValue($key);
-
-            if ($existingValue === null) {
+            if (null === ($existingValue = $this->findValue($key))) {
                 $this->saveValue($key, $value);
             }
         }
