@@ -2,28 +2,43 @@
 
 namespace Oro\Bundle\NavigationBundle\Menu;
 
-use Oro\Component\Config\Resolver\ResolverInterface;
-
+use Knp\Menu\FactoryInterface;
 use Knp\Menu\ItemInterface;
+
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+
+use Oro\Bundle\NavigationBundle\Event\ConfigureMenuEvent;
+use Oro\Component\Config\Resolver\ResolverInterface;
 
 class ConfigurationBuilder implements BuilderInterface
 {
     const DEFAULT_AREA = 'default';
 
-    /**
-     * @var array $container
-     */
+    /** @var array */
     protected $configuration;
 
     /** @var ResolverInterface */
     protected $resolver;
 
+    /** @var EventDispatcherInterface */
+    private $factory;
+
+    /** @var EventDispatcherInterface */
+    private $eventDispatcher;
+
     /**
-     * @param ResolverInterface $resolver
+     * @param ResolverInterface        $resolver
+     * @param FactoryInterface         $factory
+     * @param EventDispatcherInterface $eventDispatcher
      */
-    public function __construct(ResolverInterface $resolver)
-    {
+    public function __construct(
+        ResolverInterface $resolver,
+        FactoryInterface $factory,
+        EventDispatcherInterface $eventDispatcher
+    ) {
         $this->resolver = $resolver;
+        $this->factory = $factory;
+        $this->eventDispatcher = $eventDispatcher;
     }
 
     /**
@@ -37,11 +52,11 @@ class ConfigurationBuilder implements BuilderInterface
     /**
      * Modify menu by adding, removing or editing items.
      *
-     * @param \Knp\Menu\ItemInterface $menu
-     * @param array                   $options
-     * @param string|null             $alias
+     * @param ItemInterface $menu
+     * @param array         $options
+     * @param string|null   $alias
      */
-    public function build(ItemInterface $menu, array $options = array(), $alias = null)
+    public function build(ItemInterface $menu, array $options = [], $alias = null)
     {
         $menuConfig = $this->configuration;
 
@@ -52,33 +67,34 @@ class ConfigurationBuilder implements BuilderInterface
                         $menu->setExtras($menuTreeElement['extras']);
                     }
 
-                    if (!empty($menuTreeElement['type'])) {
-                        $menu->setExtra('type', $menuTreeElement['type']);
-                    }
-
-                    $menu->setExtra('area', $this->getMenuArea($alias, $menuConfig['areas']));
+                    $defaultArea = ConfigurationBuilder::DEFAULT_AREA;
+                    $this->setExtraFromConfig($menu, $menuTreeElement, 'type');
+                    $this->setExtraFromConfig($menu, $menuTreeElement, 'area', $defaultArea);
+                    $this->setExtraFromConfig($menu, $menuTreeElement, 'read_only', false);
+                    $this->setExtraFromConfig($menu, $menuTreeElement, 'max_nesting_level', 0);
 
                     $this->createFromArray($menu, $menuTreeElement['children'], $menuConfig['items'], $options);
                 }
             }
         }
+
+        $event = new ConfigureMenuEvent($this->factory, $menu);
+        $this->eventDispatcher->dispatch(ConfigureMenuEvent::getEventName($alias), $event);
     }
 
     /**
-     * @param string $alias
-     * @param array $areasConfig
-     * @return string
-     * @throws \Exception
+     * @param ItemInterface $menu
+     * @param array         $config
+     * @param string        $optionName
+     * @param mixed         $default
      */
-    private function getMenuArea($alias, $areasConfig)
+    private function setExtraFromConfig($menu, $config, $optionName, $default = null)
     {
-        foreach ($areasConfig as $area => $menuAliases) {
-            if (in_array($alias, $menuAliases)) {
-                return $area;
-            }
+        if (!empty($config[$optionName])) {
+            $menu->setExtra($optionName, $config[$optionName]);
+        } elseif ($default !== null) {
+            $menu->setExtra($optionName, $default);
         }
-
-        return self::DEFAULT_AREA;
     }
 
     /**
@@ -87,8 +103,6 @@ class ConfigurationBuilder implements BuilderInterface
      * @param array         $itemList
      * @param array         $options
      * @param array         $itemCodes
-     *
-     * @return \Knp\Menu\ItemInterface
      */
     private function createFromArray(
         ItemInterface $menu,
@@ -119,8 +133,11 @@ class ConfigurationBuilder implements BuilderInterface
                 if (!empty($itemData['position'])) {
                     $itemOptions['extras']['position'] = $itemData['position'];
                 }
+
                 $this->moveToExtras($itemOptions, 'translateDomain');
                 $this->moveToExtras($itemOptions, 'translateParameters');
+                $this->moveToExtras($itemOptions, 'translateDisabled');
+                $this->moveToExtras($itemOptions, 'aclResourceId');
 
                 $newMenuItem = $menu->addChild($itemOptions['name'], array_merge($itemOptions, $options));
 
