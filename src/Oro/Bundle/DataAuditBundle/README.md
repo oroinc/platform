@@ -3,8 +3,6 @@ OroDataAuditBundle
 
 The OroDataAuditBundle provides changelogs for your entities that are configurable on an entity and in the GUI. 
 
-**Please note**, *`Loggable` and `Versioned` annotations are not currently supported*.
-
 ###Entity Configuration
 
 DataAudit can only be enabled for Configurable entities. To add a property of an entity to the changelog,

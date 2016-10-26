@@ -5,4 +5,20 @@ oro:
     user:
         message:
             invalid_username: The Email with same value id used by another customer. Please choose another Username.
+            invalid_password:
+                min_length: The password must be at least {{ length }} characters long
+                upper_case: The password must include an uppercase letter
+                numbers:    The password must include a number
+                special_chars:  The password must include a special character
+                min_length_upper_case: The password must be at least {{ length }} characters long and include an uppercase letter
+                min_length_numbers: The password must be at least {{ length }} characters long and include a number
+                min_length_special_chars: The password must be at least {{ length }} characters long and include a special character
+                min_length_upper_case_numbers: The password must be at least {{ length }} characters long and include an uppercase letter and a number
+                min_length_upper_case_special_chars: The password must be at least {{ length }} characters long and include an uppercase letter and a special character
+                min_length_numbers_special_chars: The password must be at least {{ length }} characters long and include a number and a special character
+                min_length_upper_case_numbers_special_chars: The password must be at least {{ length }} characters long and include an uppercase letter, a number, and a special character
+                upper_case_numbers: The password must include an uppercase letter and a number
+                upper_case_special_chars: The password must include an uppercase letter and a special character
+                numbers_special_chars: The password must include a number and a special character
+                upper_case_numbers_special_chars: The password must include an uppercase letter, a number and a special character
             password_already_used: You have recently used this password. Please, choose another.

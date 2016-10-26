@@ -6,7 +6,7 @@ define([
     'cryptojs/sha256',
     'oroui/js/mediator',
     'bootstrap'
-], function($, _, tools, MultiUseResourceManager, CryptoJS, mediator) {
+], function($, _, tools, MultiUseResourceManager, SHA256, mediator) {
     'use strict';
 
     var defaults = {
@@ -110,7 +110,7 @@ define([
                 var namespace = (options || {}).namespace;
 
                 if (!namespace) {
-                    namespace = CryptoJS.SHA256(message + this.type).toString();
+                    namespace = SHA256(message + this.type).toString();
 
                     if (!options) {
                         options = {

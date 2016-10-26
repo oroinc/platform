@@ -72,7 +72,7 @@ class ConfigProviderTest extends \PHPUnit_Framework_TestCase
     {
         $requireConfig = [
             'require-config'    => './web/root/js/require-config',
-            'require-lib'       => 'ororequirejs/lib/require'
+            'require-lib'       => 'npmassets/requirejs/require'
         ];
 
         $config = new Config();

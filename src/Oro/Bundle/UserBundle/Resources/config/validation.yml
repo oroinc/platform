@@ -18,8 +18,7 @@ Oro\Bundle\UserBundle\Entity\User:
         plainPassword:
             - NotBlank:
                 groups:     [Registration]
-            - Length:
-                min:        20
+            - Oro\Bundle\UserBundle\Validator\Constraints\PasswordComplexity: ~
             - Oro\Bundle\UserBundle\Validator\Constraints\PasswordAlreadyUsed: ~
         enabled:
             - NotNull:      ~

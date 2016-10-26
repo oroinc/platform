@@ -36,3 +36,8 @@ Launching Ratchet WS Server on: 0.0.0.0:8080
 ```
 
 This means the websocket server is now up and running!
+
+## Content Outdating ##
+
+* [Content Outdating Notifications](./Resources/doc/content_outdating.md)
+* [Mediator Handlers](./Resources/doc/mediator-handlers.md)

@@ -16,7 +16,7 @@ use Oro\Bundle\RequireJSBundle\Manager\ConfigProviderManager;
 class OroBuildCommand extends ContainerAwareCommand
 {
     const BUILD_CONFIG_FILE_NAME    = 'build.js';
-    const OPTIMIZER_FILE_PATH       = 'bundles/ororequirejs/lib/r.js';
+    const OPTIMIZER_FILE_PATH       = 'bundles/npmassets/requirejs/bin/r.js';
 
     /**
      * @var Filesystem

@@ -8,6 +8,7 @@ use Oro\Bundle\EntityBundle\ORM\Registry;
 use Oro\Bundle\UserBundle\Entity\Repository\RoleRepository;
 use Oro\Bundle\UserBundle\Entity\Role;
 use Oro\Bundle\UserBundle\Entity\User;
+use OroEntityProxy\OroEmailBundle\EmailAddressProxy;
 
 class ReferenceRepositoryInitializer
 {
@@ -45,6 +46,10 @@ class ReferenceRepositoryInitializer
         $this->referenceRepository->set('adminRole', $this->getRole(User::ROLE_ADMINISTRATOR));
         $this->referenceRepository->set('organization', $user->getOrganization());
         $this->referenceRepository->set('business_unit', $user->getOwner());
+        $this->referenceRepository->set(
+            'adminEmailAddress',
+            $this->em->getRepository(EmailAddressProxy::class)->findOneBy([])
+        );
     }
 
     /**

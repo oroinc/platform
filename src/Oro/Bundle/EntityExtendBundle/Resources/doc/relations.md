@@ -18,7 +18,7 @@ use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\MigrationBundle\Migration\Migration;
 use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 
-class OroCRMSalesBundle implements Migration, ExtendExtensionAwareInterface
+class OroSalesBundle implements Migration, ExtendExtensionAwareInterface
 {
     protected $extendExtension;
 
@@ -56,7 +56,7 @@ use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\MigrationBundle\Migration\Migration;
 use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 
-class OroCRMSalesBundle implements Migration, ExtendExtensionAwareInterface
+class OroSalesBundle implements Migration, ExtendExtensionAwareInterface
 {
     protected $extendExtension;
 
@@ -105,7 +105,7 @@ use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\MigrationBundle\Migration\Migration;
 use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 
-class OroCRMSalesBundle implements Migration, ExtendExtensionAwareInterface
+class OroSalesBundle implements Migration, ExtendExtensionAwareInterface
 {
     protected $extendExtension;
 
@@ -145,7 +145,7 @@ use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\MigrationBundle\Migration\Migration;
 use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 
-class OroCRMSalesBundle implements Migration, ExtendExtensionAwareInterface
+class OroSalesBundle implements Migration, ExtendExtensionAwareInterface
 {
     protected $extendExtension;
 
@@ -185,7 +185,7 @@ use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\MigrationBundle\Migration\Migration;
 use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 
-class OroCRMSalesBundle implements Migration, ExtendExtensionAwareInterface
+class OroSalesBundle implements Migration, ExtendExtensionAwareInterface
 {
     protected $extendExtension;
 
@@ -236,7 +236,7 @@ use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\MigrationBundle\Migration\Migration;
 use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 
-class OroCRMSalesBundle implements Migration, ExtendExtensionAwareInterface
+class OroSalesBundle implements Migration, ExtendExtensionAwareInterface
 {
     protected $extendExtension;
 
@@ -287,7 +287,7 @@ use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\MigrationBundle\Migration\Migration;
 use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 
-class OroCRMSalesBundle implements Migration, ExtendExtensionAwareInterface
+class OroSalesBundle implements Migration, ExtendExtensionAwareInterface
 {
     protected $extendExtension;
 
@@ -327,7 +327,7 @@ use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\MigrationBundle\Migration\Migration;
 use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 
-class OroCRMSalesBundle implements Migration, ExtendExtensionAwareInterface
+class OroSalesBundle implements Migration, ExtendExtensionAwareInterface
 {
     protected $extendExtension;
 
@@ -367,7 +367,7 @@ use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\MigrationBundle\Migration\Migration;
 use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 
-class OroCRMSalesBundle implements Migration, ExtendExtensionAwareInterface
+class OroSalesBundle implements Migration, ExtendExtensionAwareInterface
 {
     protected $extendExtension;
 
@@ -416,7 +416,7 @@ use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\MigrationBundle\Migration\Migration;
 use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 
-class OroCRMSalesBundle implements Migration, ExtendExtensionAwareInterface
+class OroSalesBundle implements Migration, ExtendExtensionAwareInterface
 {
     protected $extendExtension;
 

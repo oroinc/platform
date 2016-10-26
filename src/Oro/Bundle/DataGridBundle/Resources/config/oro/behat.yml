@@ -38,6 +38,10 @@ elements:
     selector: 'div.toolbar div.pagination'
     class: Oro\Bundle\DataGridBundle\Tests\Behat\Element\GridPaginator
 
+  GridToolbarActions:
+      selector: 'div.toolbar div.actions-panel'
+      class: Oro\Bundle\DataGridBundle\Tests\Behat\Element\GridToolbarActions
+
   GridFloatingMenu:
     selector: '.dropdown-menu__floating'
     class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Element

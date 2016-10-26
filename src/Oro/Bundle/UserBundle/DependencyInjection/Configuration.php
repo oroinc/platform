@@ -70,10 +70,16 @@ class Configuration implements ConfigurationInterface
         SettingsBuilder::append(
             $rootNode,
             [
+                'failed_login_limit_enabled' => ['value' => true, 'type' => 'boolean'],
+                'failed_login_limit' => ['value' => 10, 'type' => 'scalar'],
+                'password_min_length' => ['value' => 8, 'type' => 'scalar'],
+                'password_upper_case' => ['value' => true, 'type' => 'boolean'],
+                'password_numbers' => ['value' => true, 'type' => 'boolean'],
+                'password_special_chars' => ['value' => false, 'type' => 'boolean'],
                 'days_before_change_enabled' => ['value' => false, 'type' => 'boolean'],
                 'days_before_change' => ['value' => 30, 'type' => 'scalar'],
                 'match_old_passwords_enabled' => ['value' => false, 'type' => 'boolean'],
-                'match_old_passwords_number' => ['value' => 12, 'type' => 'scalar']
+                'match_old_passwords_number' => ['value' => 12, 'type' => 'scalar'],
             ]
         );
 

@@ -6,7 +6,7 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Security\Core\SecurityContextInterface;
 use Symfony\Component\HttpFoundation\Request;
 
@@ -14,6 +14,7 @@ use Doctrine\ORM\EntityRepository;
 
 use Oro\Bundle\SecurityBundle\SecurityFacade;
 use Oro\Bundle\UserBundle\Form\EventListener\UserSubscriber;
+use Oro\Bundle\UserBundle\Form\Provider\PasswordFieldOptionsProvider;
 use Oro\Bundle\UserBundle\Entity\User;
 
 class UserType extends AbstractType
@@ -27,23 +28,29 @@ class UserType extends AbstractType
     /** @var bool */
     protected $isMyProfilePage;
 
+    /** @var PasswordFieldOptionsProvider */
+    protected $optionsProvider;
+
     /** @var int */
     protected $userId;
 
     /**
      * @param SecurityContextInterface $security Security context
-     * @param SecurityFacade           $securityFacade
-     * @param Request                  $request Request
+     * @param SecurityFacade $securityFacade
+     * @param Request $request                   Request
+     * @param PasswordFieldOptionsProvider $optionsProvider
      */
     public function __construct(
         SecurityContextInterface $security,
         SecurityFacade           $securityFacade,
-        Request                  $request
+        Request $request,
+        PasswordFieldOptionsProvider $optionsProvider
     ) {
         $this->security          = $security;
         $this->securityFacade    = $securityFacade;
 
         $this->isMyProfilePage = $request->attributes->get('_route') === 'oro_user_profile_update';
+        $this->optionsProvider = $optionsProvider;
 
         if ($this->isMyProfilePage) {
             $user = $securityFacade->getLoggedUser();
@@ -120,8 +127,16 @@ class UserType extends AbstractType
                     'label'          => 'oro.user.password.label',
                     'type'           => 'password',
                     'required'       => true,
-                    'first_options'  => ['label' => 'oro.user.password.label'],
-                    'second_options' => ['label' => 'oro.user.password_re.label'],
+                    'first_options' => [
+                        'label' => 'oro.user.password.label',
+                        'tooltip' => $this->optionsProvider->getTooltip(),
+                        'attr' => [
+                            'data-validation' => $this->optionsProvider->getDataValidationOption()
+                        ]
+                    ],
+                    'second_options' => [
+                        'label' => 'oro.user.password_re.label',
+                    ],
                 ]
             )
             ->add(
@@ -136,8 +151,8 @@ class UserType extends AbstractType
                     'prototype'      => true,
                     'prototype_name' => 'tag__name__'
                 ]
-            );
-        $builder->add('change_password', ChangePasswordType::NAME, ['userId' => $this->userId])
+            )
+            ->add('change_password', ChangePasswordType::NAME, ['userId' => $this->userId])
             ->add('avatar', 'oro_image', ['label' => 'oro.user.avatar.label', 'required' => false]);
 
         $this->addInviteUserField($builder);
@@ -146,7 +161,7 @@ class UserType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults(
             [
