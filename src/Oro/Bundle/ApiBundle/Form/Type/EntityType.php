@@ -9,6 +9,7 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+use Oro\Bundle\ApiBundle\Collection\KeyObjectCollection;
 use Oro\Bundle\ApiBundle\Form\DataTransformer\CollectionToArrayTransformer;
 use Oro\Bundle\ApiBundle\Form\DataTransformer\EntityToIdTransformer;
 use Oro\Bundle\ApiBundle\Metadata\AssociationMetadata;
@@ -33,15 +34,21 @@ class EntityType extends AbstractType
     {
         /** @var AssociationMetadata $metadata */
         $metadata = $options['metadata'];
+        /** @var KeyObjectCollection|null $includedObjects */
+        $includedObjects = $options['included_objects'];
         if ($metadata->isCollection()) {
             $builder
                 ->addEventSubscriber(new MergeDoctrineCollectionListener())
                 ->addViewTransformer(
-                    new CollectionToArrayTransformer(new EntityToIdTransformer($this->doctrine, $metadata)),
+                    new CollectionToArrayTransformer(
+                        new EntityToIdTransformer($this->doctrine, $metadata, $includedObjects)
+                    ),
                     true
                 );
         } else {
-            $builder->addViewTransformer(new EntityToIdTransformer($this->doctrine, $metadata));
+            $builder->addViewTransformer(
+                new EntityToIdTransformer($this->doctrine, $metadata, $includedObjects)
+            );
         }
     }
 
@@ -51,9 +58,10 @@ class EntityType extends AbstractType
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver
-            ->setDefaults(['compound' => false])
+            ->setDefaults(['compound' => false, 'included_objects' => null])
             ->setRequired(['metadata'])
-            ->setAllowedTypes('metadata', ['Oro\Bundle\ApiBundle\Metadata\AssociationMetadata']);
+            ->setAllowedTypes('metadata', [AssociationMetadata::class])
+            ->setAllowedTypes('included_objects', ['null', KeyObjectCollection::class]);
     }
 
     /**

@@ -24,14 +24,28 @@ interface FormContext extends ContextInterface
     public function setRequestData(array $requestData);
 
     /**
-     * Returns a collection contains additional objects included into the request data.
+     * Returns additional data included into the request.
+     *
+     * @return array
+     */
+    public function getIncludedData();
+
+    /**
+     * Sets additional data included into the request.
+     *
+     * @param array $includedData
+     */
+    public function setIncludedData(array $includedData);
+
+    /**
+     * Returns a collection contains additional objects included into the request.
      *
      * @return KeyObjectCollection|null
      */
     public function getIncludedObjects();
 
     /**
-     * Sets a collection contains additional objects included into the request data.
+     * Sets a collection contains additional objects included into the request.
      *
      * @param KeyObjectCollection|null $includedObjects
      */

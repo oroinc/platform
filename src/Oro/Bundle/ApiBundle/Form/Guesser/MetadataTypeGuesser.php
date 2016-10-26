@@ -5,6 +5,7 @@ namespace Oro\Bundle\ApiBundle\Form\Guesser;
 use Symfony\Component\Form\FormTypeGuesserInterface;
 use Symfony\Component\Form\Guess\TypeGuess;
 
+use Oro\Bundle\ApiBundle\Collection\KeyObjectCollection;
 use Oro\Bundle\ApiBundle\Config\ConfigAccessorInterface;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionFieldConfig;
@@ -27,6 +28,9 @@ class MetadataTypeGuesser implements FormTypeGuesserInterface
 
     /** @var ConfigAccessorInterface|null */
     protected $configAccessor;
+
+    /** @var KeyObjectCollection|null */
+    protected $includedObjects;
 
     /**
      * @param array          $dataTypeMappings [data type => [form type, options], ...]
@@ -68,6 +72,22 @@ class MetadataTypeGuesser implements FormTypeGuesserInterface
     public function setConfigAccessor(ConfigAccessorInterface $configAccessor = null)
     {
         $this->configAccessor = $configAccessor;
+    }
+
+    /**
+     * @return KeyObjectCollection|null
+     */
+    public function getIncludedObjects()
+    {
+        return $this->includedObjects;
+    }
+
+    /**
+     * @param KeyObjectCollection|null $includedObjects
+     */
+    public function setIncludedObjects(KeyObjectCollection $includedObjects = null)
+    {
+        $this->includedObjects = $includedObjects;
     }
 
     /**
@@ -211,7 +231,7 @@ class MetadataTypeGuesser implements FormTypeGuesserInterface
     {
         return $this->createTypeGuess(
             'oro_api_entity',
-            ['metadata' => $metadata],
+            ['metadata' => $metadata, 'included_objects' => $this->includedObjects],
             TypeGuess::HIGH_CONFIDENCE
         );
     }

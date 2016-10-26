@@ -4,6 +4,7 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Form\Type;
 
 use Doctrine\Common\Collections\ArrayCollection;
 
+use Oro\Bundle\ApiBundle\Collection\KeyObjectCollection;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\Forms;
 
@@ -31,9 +32,7 @@ class EntityTypeTest extends OrmRelatedTestCase
     {
         $associationMetadata = new AssociationMetadata();
         $associationMetadata->setIsCollection(false);
-        $associationMetadata->setAcceptableTargetClassNames(
-            ['Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Group']
-        );
+        $associationMetadata->setAcceptableTargetClassNames([Group::class]);
 
         $form = $this->factory->create(
             new EntityType($this->doctrine),
@@ -61,9 +60,7 @@ class EntityTypeTest extends OrmRelatedTestCase
     {
         $associationMetadata = new AssociationMetadata();
         $associationMetadata->setIsCollection(true);
-        $associationMetadata->setAcceptableTargetClassNames(
-            ['Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Group']
-        );
+        $associationMetadata->setAcceptableTargetClassNames([Group::class]);
 
         $form = $this->factory->create(
             new EntityType($this->doctrine),
@@ -86,7 +83,7 @@ class EntityTypeTest extends OrmRelatedTestCase
 
     public function testSingleWithValidValue()
     {
-        $value = ['class' => 'Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Group', 'id' => 123];
+        $value = ['class' => Group::class, 'id' => 123];
         $entity = new Group();
         $entity->setId($value['id']);
         $entity->setName('test');
@@ -108,9 +105,7 @@ class EntityTypeTest extends OrmRelatedTestCase
 
         $associationMetadata = new AssociationMetadata();
         $associationMetadata->setIsCollection(false);
-        $associationMetadata->setAcceptableTargetClassNames(
-            ['Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Group']
-        );
+        $associationMetadata->setAcceptableTargetClassNames([Group::class]);
 
         $form = $this->factory->create(
             new EntityType($this->doctrine),
@@ -123,7 +118,7 @@ class EntityTypeTest extends OrmRelatedTestCase
 
     public function testMultipleWithValidValue()
     {
-        $value = ['class' => 'Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Group', 'id' => 123];
+        $value = ['class' => Group::class, 'id' => 123];
         $entity = new Group();
         $entity->setId($value['id']);
         $entity->setName('test');
@@ -145,9 +140,7 @@ class EntityTypeTest extends OrmRelatedTestCase
 
         $associationMetadata = new AssociationMetadata();
         $associationMetadata->setIsCollection(true);
-        $associationMetadata->setAcceptableTargetClassNames(
-            ['Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Group']
-        );
+        $associationMetadata->setAcceptableTargetClassNames([Group::class]);
 
         $form = $this->factory->create(
             new EntityType($this->doctrine),
@@ -162,9 +155,7 @@ class EntityTypeTest extends OrmRelatedTestCase
     {
         $associationMetadata = new AssociationMetadata();
         $associationMetadata->setIsCollection(false);
-        $associationMetadata->setAcceptableTargetClassNames(
-            ['Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Group']
-        );
+        $associationMetadata->setAcceptableTargetClassNames([Group::class]);
 
         $form = $this->factory->create(
             new EntityType($this->doctrine),
@@ -179,9 +170,7 @@ class EntityTypeTest extends OrmRelatedTestCase
     {
         $associationMetadata = new AssociationMetadata();
         $associationMetadata->setIsCollection(true);
-        $associationMetadata->setAcceptableTargetClassNames(
-            ['Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Group']
-        );
+        $associationMetadata->setAcceptableTargetClassNames([Group::class]);
 
         $form = $this->factory->create(
             new EntityType($this->doctrine),
@@ -198,9 +187,7 @@ class EntityTypeTest extends OrmRelatedTestCase
 
         $associationMetadata = new AssociationMetadata();
         $associationMetadata->setIsCollection(false);
-        $associationMetadata->setAcceptableTargetClassNames(
-            ['Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Group']
-        );
+        $associationMetadata->setAcceptableTargetClassNames([Group::class]);
 
         $form = $this->factory->create(
             new EntityType($this->doctrine),
@@ -217,9 +204,7 @@ class EntityTypeTest extends OrmRelatedTestCase
 
         $associationMetadata = new AssociationMetadata();
         $associationMetadata->setIsCollection(true);
-        $associationMetadata->setAcceptableTargetClassNames(
-            ['Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Group']
-        );
+        $associationMetadata->setAcceptableTargetClassNames([Group::class]);
 
         $form = $this->factory->create(
             new EntityType($this->doctrine),
@@ -228,6 +213,52 @@ class EntityTypeTest extends OrmRelatedTestCase
         );
         $form->submit([$value]);
         $this->assertFalse($form->isSynchronized());
+    }
+
+    public function testSingleWithValidValueFromIncludedObjects()
+    {
+        $value = ['class' => Group::class, 'id' => 123];
+        $entity = new Group();
+        $entity->setId($value['id']);
+        $entity->setName('test');
+
+        $associationMetadata = new AssociationMetadata();
+        $associationMetadata->setIsCollection(false);
+        $associationMetadata->setAcceptableTargetClassNames([Group::class]);
+
+        $includedObjects = new KeyObjectCollection();
+        $includedObjects->add($value['id'], $entity);
+
+        $form = $this->factory->create(
+            new EntityType($this->doctrine),
+            null,
+            ['metadata' => $associationMetadata, 'included_objects' => $includedObjects]
+        );
+        $form->submit($value);
+        $this->assertTrue($form->isSynchronized());
+    }
+
+    public function testMultipleWithValidValueFromIncludedObjects()
+    {
+        $value = ['class' => Group::class, 'id' => 123];
+        $entity = new Group();
+        $entity->setId($value['id']);
+        $entity->setName('test');
+
+        $associationMetadata = new AssociationMetadata();
+        $associationMetadata->setIsCollection(true);
+        $associationMetadata->setAcceptableTargetClassNames([Group::class]);
+
+        $includedObjects = new KeyObjectCollection();
+        $includedObjects->add($value['id'], $entity);
+
+        $form = $this->factory->create(
+            new EntityType($this->doctrine),
+            null,
+            ['metadata' => $associationMetadata, 'included_objects' => $includedObjects]
+        );
+        $form->submit([$value]);
+        $this->assertTrue($form->isSynchronized());
     }
 
     public function testGetName()

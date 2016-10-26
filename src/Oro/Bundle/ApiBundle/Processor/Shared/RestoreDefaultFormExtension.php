@@ -4,9 +4,7 @@ namespace Oro\Bundle\ApiBundle\Processor\Shared;
 
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
-use Oro\Bundle\ApiBundle\Form\FormExtensionSwitcherInterface;
-use Oro\Bundle\ApiBundle\Form\Guesser\MetadataTypeGuesser;
-use Oro\Bundle\ApiBundle\Processor\Context;
+use Oro\Bundle\ApiBundle\Processor\FormContext;
 
 /**
  * Switches to default form extension.
@@ -14,35 +12,21 @@ use Oro\Bundle\ApiBundle\Processor\Context;
  * and an action called this processor can work in different contexts, we should returns the forms
  * to the original state to prevent possible collisions.
  */
-class RestoreDefaultFormExtension implements ProcessorInterface
+class RestoreDefaultFormExtension extends SwitchFormExtension implements ProcessorInterface
 {
-    /** @var FormExtensionSwitcherInterface */
-    protected $formExtensionSwitcher;
-
-    /** @var MetadataTypeGuesser */
-    protected $metadataTypeGuesser;
-
-    /**
-     * @param FormExtensionSwitcherInterface $formExtensionSwitcher
-     * @param MetadataTypeGuesser            $metadataTypeGuesser
-     */
-    public function __construct(
-        FormExtensionSwitcherInterface $formExtensionSwitcher,
-        MetadataTypeGuesser $metadataTypeGuesser
-    ) {
-        $this->formExtensionSwitcher = $formExtensionSwitcher;
-        $this->metadataTypeGuesser = $metadataTypeGuesser;
-    }
-
     /**
      * {@inheritdoc}
      */
     public function process(ContextInterface $context)
     {
-        /** @var Context $context */
+        /** @var FormContext $context */
 
-        $this->formExtensionSwitcher->switchToDefaultFormExtension();
-        $this->metadataTypeGuesser->setMetadataAccessor($context->get('previousMetadataAccessor'));
-        $this->metadataTypeGuesser->setConfigAccessor($context->get('previousConfigAccessor'));
+        if (!$this->isApiFormExtensionActivated($context)) {
+            // the default form extension is already restored
+            return;
+        }
+
+        $this->switchToDefaultFormExtension($context);
+        $this->restoreContext($context);
     }
 }

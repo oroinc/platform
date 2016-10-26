@@ -12,6 +12,9 @@ trait FormContextTrait
     /** @var array */
     protected $requestData;
 
+    /** @var array */
+    protected $includedData;
+
     /** @var KeyObjectCollection|null */
     protected $includedObjects;
 
@@ -39,6 +42,26 @@ trait FormContextTrait
     public function setRequestData(array $requestData)
     {
         $this->requestData = $requestData;
+    }
+
+    /**
+     * Returns additional data included into the request.
+     *
+     * @return array
+     */
+    public function getIncludedData()
+    {
+        return $this->includedData;
+    }
+
+    /**
+     * Sets additional data included into the request.
+     *
+     * @param array $includedData
+     */
+    public function setIncludedData(array $includedData)
+    {
+        $this->includedData = $includedData;
     }
 
     /**
