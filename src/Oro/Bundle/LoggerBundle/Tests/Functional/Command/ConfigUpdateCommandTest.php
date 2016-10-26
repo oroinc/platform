@@ -26,7 +26,6 @@ class ConfigUpdateCommandTest extends WebTestCase
         $this->initClient();
         $this->configGlobal = $this->getContainer()->get('oro_config.global');
         $this->configUser = $this->getContainer()->get('oro_config.user');
-
     }
 
     /**

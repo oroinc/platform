@@ -126,7 +126,7 @@ class ConfigUpdateCommand extends ContainerAwareCommand
                 $disableAfter = new \DateTime('now', new \DateTimeZone('UTC'));
                 $disableAfter->add(\DateInterval::createFromDateString($value));
 
-                if ($disableAfter == $now) {
+                if ($disableAfter <= $now) {
                     throw new \InvalidArgumentException(
                         sprintf(
                             "Value '%s' for '%s' argument should be valid date interval",
