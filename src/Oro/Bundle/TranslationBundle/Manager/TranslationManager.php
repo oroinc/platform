@@ -137,21 +137,6 @@ class TranslationManager
     }
 
     /**
-     * @param string $keysPrefix
-     * @param string $domain
-     */
-    public function removeTranslationKeysByPrefix($keysPrefix, $domain)
-    {
-        $queryBuilder = $this->getEntityRepository(TranslationKey::class)->createQueryBuilder('tk');
-        $queryBuilder->delete()
-            ->where('tk.domain = :domain')
-            ->andWhere($queryBuilder->expr()->like('tk.key', ':keysPrefix'))
-            ->setParameters(['domain' => $domain,  'keysPrefix' => $keysPrefix . '%'])
-            ->getQuery()
-            ->execute();
-    }
-
-    /**
      * @param int $scope
      * @param Translation $translation
      * @return bool
