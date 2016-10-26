@@ -21,7 +21,7 @@ class MessageQueueConsumerProcessSubscriber implements EventSubscriberInterface
     public function __construct(KernelInterface $kernel)
     {
         $command = sprintf(
-            './console oro:message-queue:consume --env=%s %s',
+            'exec ./console oro:message-queue:consume --env=%s %s',
             $kernel->getEnvironment(),
             $kernel->isDebug() ? '' : '--no-debug'
         );
@@ -32,13 +32,6 @@ class MessageQueueConsumerProcessSubscriber implements EventSubscriberInterface
     public function stopMessageConsumer()
     {
         $this->process->stop();
-
-        //Process::stop() don't stop subprocesses see https://github.com/symfony/symfony/issues/5030
-        try {
-            $process = new Process('kill -9 `pgrep -f oro:message-queue:consume`');
-            $process->run();
-        } catch (RuntimeException $e) {
-        }
     }
 
     public function startMessageConsumer()
