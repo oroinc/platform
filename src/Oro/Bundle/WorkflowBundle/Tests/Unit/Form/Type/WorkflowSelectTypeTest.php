@@ -4,12 +4,15 @@ namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Form\Type;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
 
+use Symfony\Component\Form\ChoiceList\View\ChoiceView;
+use Symfony\Component\Form\FormView;
 use Symfony\Component\Form\Test\FormIntegrationTestCase;
 use Symfony\Component\Translation\TranslatorInterface;
 
 use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
+use Oro\Bundle\WorkflowBundle\Helper\WorkflowTranslationHelper;
 use Oro\Bundle\WorkflowBundle\Form\Type\WorkflowSelectType;
 
 class WorkflowSelectTypeTest extends FormIntegrationTestCase
@@ -125,5 +128,18 @@ class WorkflowSelectTypeTest extends FormIntegrationTestCase
                 )
             ),
         );
+    }
+
+    public function testFinishView()
+    {
+        $view = new FormView();
+        $child = new ChoiceView([], 'test', 'test');
+        $view->vars['choices'] = [$child];
+        $form = $this->getMock('Symfony\Component\Form\FormInterface');
+        $this->translator->expects($this->atLeastOnce())
+            ->method('trans')
+            ->with('test', [], WorkflowTranslationHelper::TRANSLATION_DOMAIN)
+            ->willReturnArgument(0);
+        $this->type->finishView($view, $form, ['workflow_name' => 'test_wf']);
     }
 }

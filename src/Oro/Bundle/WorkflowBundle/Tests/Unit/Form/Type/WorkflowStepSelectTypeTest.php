@@ -13,6 +13,7 @@ use Symfony\Component\Form\Test\FormIntegrationTestCase;
 use Symfony\Component\Translation\TranslatorInterface;
 
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowStep;
+use Oro\Bundle\WorkflowBundle\Helper\WorkflowTranslationHelper;
 use Oro\Bundle\WorkflowBundle\Form\Type\WorkflowStepSelectType;
 use Oro\Bundle\WorkflowBundle\Model\Workflow;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowRegistry;
@@ -205,6 +206,7 @@ class WorkflowStepSelectTypeTest extends FormIntegrationTestCase
     /**
      * @param string $class
      * @param string $definitionLabel
+     *
      * @return \PHPUnit_Framework_MockObject_MockObject|Workflow|WorkflowStep
      */
     protected function getWorkflowDefinitionAwareClassMock($class, $definitionLabel = null)
@@ -270,5 +272,18 @@ class WorkflowStepSelectTypeTest extends FormIntegrationTestCase
                 ]
             ]
         ];
+    }
+
+    public function testFinishView()
+    {
+        $view = new FormView();
+        $child = new ChoiceView([], 'test', 'test');
+        $view->vars['choices'] = [$child];
+        $form = $this->getMock('Symfony\Component\Form\FormInterface');
+        $this->translator->expects($this->atLeastOnce())
+            ->method('trans')
+            ->with('test', [], WorkflowTranslationHelper::TRANSLATION_DOMAIN)
+            ->willReturnArgument(0);
+        $this->type->finishView($view, $form, ['workflow_name' => 'test_wf']);
     }
 }
