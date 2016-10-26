@@ -328,15 +328,6 @@ services:
             - { name: oro_ui.view_action_provider, group: activity, priority: 100 }
             - { name: oro_ui.update_action_provider, group: activity, priority: 100 }
 
-    oro_user.password_reset.widget_provider.actions:
-        parent: oro_ui.widget_provider.action_button.abstract
-        arguments:
-            - oro_user_password_reset_button
-            - oro_user_password_reset_link
-        tags:
-            - { name: oro_ui.view_action_provider, group: activity, priority: 110 }
-            - { name: oro_ui.update_action_provider, group: activity, priority: 110 }
-
     security.user_checker:
         class: %oro_user.security.user_checker.class%
         arguments:
@@ -408,6 +399,18 @@ services:
         tags:
             - { name: validator.constraint_validator, alias: oro_user.validator.user_authentication_fields }
 
+    oro_user.validator.password_complexity_validator:
+        class: Oro\Bundle\UserBundle\Validator\PasswordComplexityValidator
+        arguments:
+            - '@oro_user.provider.password_complexity_config_provider'
+        tags:
+            - { name: validator.constraint_validator, alias: oro_user.validator.password_complexity }
+
+    oro_user.provider.password_complexity_config_provider:
+        class: Oro\Bundle\UserBundle\Provider\PasswordComplexityConfigProvider
+        arguments:
+            - '@oro_config.user'
+
     # Dashboard
     oro_user.dashboard.owner_helper:
         class: Oro\Bundle\UserBundle\Dashboard\OwnerHelper
@@ -441,3 +444,46 @@ services:
             - '@doctrine.orm.entity_manager'
             - '@request_stack'
             - '@security.context'
+
+    oro_user.forced_password_reset.widget_provider.actions:
+        parent: oro_ui.widget_provider.action_button.abstract
+        arguments:
+            - oro_user_force_password_reset_button
+            - oro_user_force_password_reset_link
+        tags:
+            - { name: oro_ui.view_action_provider, group: activity, priority: 120 }
+
+    oro_user.datagrid.extention.reset_password:
+        class: Oro\Bundle\UserBundle\Datagrid\Extension\MassAction\ResetPasswordExtention
+        calls:
+            - [setRequestStack, ["@request_stack"]]
+        public: false
+        shared: false
+        tags:
+            - { name: oro_datagrid.extension }
+
+    oro_user.security.disabled_login_subscriber:
+        class: Oro\Bundle\UserBundle\Security\DisabledLoginSubscriber
+        arguments: ['@security.token_storage']
+        tags:
+            - { name: kernel.event_listener, event: kernel.request , method: onKernelRequest}
+
+    oro_user.security.login_attempts_provider:
+        class: Oro\Bundle\UserBundle\Security\LoginAttemptsProvider
+        arguments:
+            - '@oro_config.user'
+
+    oro_user.security.login_attempts_manager:
+        class: Oro\Bundle\UserBundle\Security\LoginAttemptsManager
+        arguments:
+            - '@oro_user.security.login_attempts_provider'
+            - '@oro_user.manager'
+            - '@oro_user.mailer.processor'
+
+    oro_user.security.login_attempts_subscriber:
+        class: Oro\Bundle\UserBundle\EventListener\LoginAttemptsSubscriber
+        arguments:
+            - '@oro_user.manager'
+            - '@oro_user.security.login_attempts_manager'
+        tags:
+            - { name: kernel.event_subscriber }

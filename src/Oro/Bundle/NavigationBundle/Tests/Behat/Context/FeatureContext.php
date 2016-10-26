@@ -2,14 +2,23 @@
 
 namespace Oro\Bundle\NavigationBundle\Tests\Behat\Context;
 
+use Behat\Gherkin\Node\TableNode;
+use Behat\Mink\Element\NodeElement;
+use Behat\Symfony2Extension\Context\KernelAwareContext;
+use Behat\Symfony2Extension\Context\KernelDictionary;
+use Doctrine\ORM\EntityManager;
 use Oro\Bundle\ConfigBundle\Tests\Behat\Element\SystemConfigForm;
+use Oro\Bundle\NavigationBundle\Entity\NavigationHistoryItem;
+use Oro\Bundle\NavigationBundle\Entity\Repository\HistoryItemRepository;
+use Oro\Bundle\NavigationBundle\Tests\Behat\Element\MainMenu;
 use Oro\Bundle\TestFrameworkBundle\Behat\Context\OroFeatureContext;
-use Oro\Bundle\TestFrameworkBundle\Behat\Element\OroElementFactoryAware;
-use Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context\ElementFactoryDictionary;
+use Oro\Bundle\TestFrameworkBundle\Behat\Element\OroPageObjectAware;
+use Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context\PageObjectDictionary;
+use Symfony\Component\DomCrawler\Crawler;
 
-class FeatureContext extends OroFeatureContext implements OroElementFactoryAware
+class FeatureContext extends OroFeatureContext implements OroPageObjectAware, KernelAwareContext
 {
-    use ElementFactoryDictionary;
+    use PageObjectDictionary, KernelDictionary;
 
     /**
      * @Given uncheck Use Default for :label field
@@ -26,7 +35,7 @@ class FeatureContext extends OroFeatureContext implements OroElementFactoryAware
      */
     public function iSaveSetting()
     {
-        $this->getSession()->getPage()->pressButton('Save settings');
+        $this->getPage()->pressButton('Save settings');
     }
 
     /**
@@ -45,5 +54,289 @@ class FeatureContext extends OroFeatureContext implements OroElementFactoryAware
     public function menuMustBeOnRightSide()
     {
         self::assertTrue($this->createElement('MainMenu')->hasClass('main-menu-top'));
+    }
+
+    /**
+     * @When /^(?:|I )click "(?P<link>[^"]+)" in shortcuts search results$/
+     */
+    public function clickInShortcutsSearchResults($link)
+    {
+        $result = $this->spin(function (FeatureContext $context) use ($link) {
+            $result = $context->getPage()->find('css', sprintf('li[data-value="%s"] a', $link));
+
+            if ($result && $result->isVisible()) {
+                return $result;
+            }
+
+            return false;
+        });
+
+        self::assertNotFalse($result, sprintf('Link "%s" not found', $link));
+
+        $result->click();
+    }
+
+    /**
+     * @When /^(?:|I )(?P<action>(pin|unpin)) page$/
+     */
+    public function iPinPage($action)
+    {
+        $button = $this->getPage()->findButton('Pin/unpin the page');
+        self::assertNotNull($button, 'Pin/Unpin button not found on page');
+
+        $activeClass = 'gold-icon';
+
+        if ('pin' === $action) {
+            if ($button->hasClass($activeClass)) {
+                self::fail('Can\'t pin tab that already pinned');
+            }
+
+            $button->press();
+        } elseif ('unpin' === $action) {
+            if (!$button->hasClass($activeClass)) {
+                self::fail('Can\'t unpin tab that not pinned before');
+            }
+
+            $button->press();
+        }
+    }
+
+    /**
+     * @Given /^(?P<link>[\w\s]+) link must not be in pin holder$/
+     */
+    public function usersLinkMustNotBeInPinHolder($link)
+    {
+        $linkElement = $this->getPage()->findElementContains('PinBarLink', $link);
+        self::assertFalse($linkElement->isValid(), "Link with '$link' anchor found, but it's not expected");
+    }
+
+    /**
+     * @Then /^(?P<link>[\w\s]+) link must be in pin holder$/
+     */
+    public function linkMustBeInPinHolder($link)
+    {
+        $linkElement = $this->getPage()->findElementContains('PinBarLink', $link);
+        self::assertTrue($linkElement->isValid(), "Link with '$link' anchor not found");
+    }
+
+    /**
+     * @When /^(?:|I )follow (?P<link>[\w\s]+) link in pin holder$/
+     */
+    public function followUsersLinkInPinHolder($link)
+    {
+        $linkElement = $this->getPage()->findElementContains('PinBarLink', $link);
+        self::assertTrue($linkElement->isValid(), "Link with '$link' anchor not found");
+
+        $linkElement->click();
+    }
+
+    /**
+     * @When press Create User button
+     */
+    public function pressCreateUserButton()
+    {
+        $this->getPage()->find('css', 'div.title-buttons-container a.btn-primary')->click();
+    }
+
+    /**
+     * @When /^(?:|I )click icon bars$/
+     */
+    public function clickBarsIcon()
+    {
+        $this->getPage()->find('css', 'i.icon-bars')->click();
+    }
+
+    /**
+     * @When /^(?:|I )go to next pages:$/
+     */
+    public function goToPages(TableNode $table)
+    {
+        /** @var MainMenu $menu */
+        $menu = $this->createElement('MainMenu');
+        /** @var EntityManager $em */
+        $em = $this->getContainer()->get('doctrine')->getManager();
+        $pages = $table->getColumn(0);
+
+        $firstPage = array_shift($pages);
+        $menu->openAndClick($firstPage);
+        $this->waitForAjax();
+        $actualCount = $this->getPageTransitionCount($em);
+
+        foreach ($pages as $page) {
+            $crawler = new Crawler($this->getSession()->getPage()->getHtml());
+            $actualTitle = $crawler->filter('head title')->first()->text();
+
+            $menu->openAndClick($page);
+            $this->waitForAjax();
+            $actualCount++;
+
+            $result = $this->spin(function (FeatureContext $context) use ($actualCount, $em) {
+                return $actualCount === $context->getPageTransitionCount($em);
+            });
+
+            self::assertNotFalse($result, 'New page was not persisted in the database');
+
+            $result = $this->spin(function (FeatureContext $context) use ($actualTitle) {
+                $lastHistoryLink = $context->getLastHistoryLink();
+                $this->clickBarsIcon();
+
+                if (false === strpos($actualTitle, $lastHistoryLink)) {
+                    $context->getSession()->reload();
+
+                    return false;
+                }
+
+                return true;
+            });
+
+            self::assertNotFalse($result, sprintf(
+                'Page "%s" expected in last history link but got "%s"',
+                $actualTitle,
+                $this->getLastHistoryLink()
+            ));
+        }
+    }
+
+    /**
+     * @param EntityManager $em
+     * @return int
+     */
+    protected function getPageTransitionCount(EntityManager $em)
+    {
+        /** @var HistoryItemRepository $repository */
+        $repository = $em->getRepository('OroNavigationBundle:NavigationHistoryItem');
+
+        return array_sum(array_map(function (NavigationHistoryItem $item) use ($em) {
+            $em->detach($item);
+
+            return $item->getVisitCount();
+        }, $repository->findAll()));
+    }
+
+    /**
+     * @return string
+     */
+    private function getLastHistoryLink()
+    {
+        $this->chooseQuickMenuTab('History');
+        $content = $this->createElement('History Content');
+
+        return $content->find('css', 'ul li a')->getText();
+    }
+
+    /**
+     * @Then /^(?P<tab>(History|Most Viewed|Favorites)) must looks like:$/
+     */
+    public function historyMustLooksLike($tab, TableNode $table)
+    {
+        $content = $this->createElement($tab.' Content');
+
+        if (!$content->isVisible()) {
+            $this->chooseQuickMenuTab($tab);
+        }
+
+        self::assertTrue($content->isVisible());
+
+        /** @var NodeElement $item */
+        foreach ($content->findAll('css', 'ul li a') as $key => $item) {
+            self::assertEquals(
+                $table->getRow($key)[0],
+                trim($item->getText())
+            );
+        }
+    }
+
+    /**
+     * @Then /^(?P<tab>(History|Most Viewed|Favorites)) is empty$/
+     */
+    public function tabContentIsEmpty($tab)
+    {
+        $content = $this->createElement($tab.' Content');
+
+        if (!$content->isVisible()) {
+            $this->chooseQuickMenuTab($tab);
+        }
+
+        self::assertTrue($content->isVisible());
+        self::assertCount(0, $content->findAll('css', 'ul li a'));
+    }
+
+    /**
+     * @When /^(?:|I )choose (?P<link>(History|Most Viewed|Favorites)) tab$/
+     */
+    public function chooseQuickMenuTab($link)
+    {
+        $linkElement = $this->getPage()->findLink($link);
+        self::assertNotNull($linkElement);
+
+        if (!$linkElement->isVisible()) {
+            $this->clickBarsIcon();
+        }
+
+        $linkElement->click();
+    }
+
+    /**
+     * @When /^(?:|I )(?P<action>(add|remove)) page (to|from) favorites$/
+     */
+    public function iAddOrRemovePageToFavorites($action)
+    {
+        $button = $this->createElement('AddToFavoritesButton');
+        self::assertTrue($button->isVisible());
+
+        $activeClass = 'gold-icon';
+
+        if ('add' === $action) {
+            if ($button->hasClass($activeClass)) {
+                self::fail('Can\'t add page to favorites, it is already in favorites');
+            }
+
+            $button->press();
+        } elseif ('remove' === $action) {
+            if (!$button->hasClass($activeClass)) {
+                self::fail('Can\'t remove page from favorites, it is not in favorites currently');
+            }
+
+            $button->press();
+        }
+    }
+
+    /**
+     * @When /^(?:|I )remove "(?P<record>[^"]+)" from favorites$/
+     */
+    public function removeFromFavorites($record)
+    {
+        $content = $this->createElement('Favorites Content');
+        self::assertTrue($content->isVisible());
+
+        $item = $content->findElementContains('QuickMenuContentItem', $record);
+        self::assertTrue($item->isVisible());
+
+        $item->find('css', 'button.close')->press();
+    }
+
+    /**
+     * @Then there are no pages in favorites
+     */
+    public function thereAreNoPagesInFavorites()
+    {
+        $content = $this->createElement('Favorites Content');
+        self::assertTrue($content->isVisible());
+
+        self::assertCount(0, $content->findAll('css', 'ul li'));
+    }
+
+    /**
+     * @Then /^(?:|I )click on "(?P<record>[^"]+)" in Favorites$/
+     */
+    public function iClickOnInFavorites($record)
+    {
+        $content = $this->createElement('Favorites Content');
+        self::assertTrue($content->isVisible());
+
+        $item = $content->findElementContains('QuickMenuContentItem', $record);
+        self::assertTrue($item->isVisible());
+
+        $item->find('css', 'a')->click();
     }
 }

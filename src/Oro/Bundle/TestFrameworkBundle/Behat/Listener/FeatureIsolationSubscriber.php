@@ -5,6 +5,7 @@ namespace Oro\Bundle\TestFrameworkBundle\Behat\Listener;
 use Behat\Behat\EventDispatcher\Event\AfterFeatureTested;
 use Behat\Behat\EventDispatcher\Event\BeforeFeatureTested;
 use Behat\Testwork\EventDispatcher\Event\BeforeSuiteTested;
+use Doctrine\Bundle\DoctrineBundle\Registry;
 use Oro\Bundle\TestFrameworkBundle\Behat\Element\OroElementFactory;
 use Oro\Bundle\TestFrameworkBundle\Behat\Fixtures\FixtureLoader;
 use Oro\Bundle\TestFrameworkBundle\Behat\Dumper\DumperInterface;
@@ -29,25 +30,31 @@ class FeatureIsolationSubscriber implements EventSubscriberInterface
     /** @var ReferenceRepositoryInitializer  */
     protected $referenceRepositoryInitializer;
 
+    /** @var Registry  */
+    protected $registry;
+
     /**
      * @param DumperInterface[] $dumpers
      * @param FixtureLoader $fixtureLoader
      * @param OroElementFactory $elementFactory
      * @param KernelServiceFactory $kernelServiceFactory
      * @param ReferenceRepositoryInitializer $referenceRepositoryInitializer
+     * @param Registry $registry
      */
     public function __construct(
         array $dumpers,
         FixtureLoader $fixtureLoader,
         OroElementFactory $elementFactory,
         KernelServiceFactory $kernelServiceFactory,
-        ReferenceRepositoryInitializer $referenceRepositoryInitializer
+        ReferenceRepositoryInitializer $referenceRepositoryInitializer,
+        Registry $registry
     ) {
         $this->dumpers = $dumpers;
         $this->fixtureLoader = $fixtureLoader;
         $this->elementFactory = $elementFactory;
         $this->kernelServiceFactory = $kernelServiceFactory;
         $this->referenceRepositoryInitializer = $referenceRepositoryInitializer;
+        $this->registry = $registry;
     }
 
     /**
@@ -87,8 +94,8 @@ class FeatureIsolationSubscriber implements EventSubscriberInterface
     public function afterFeature(AfterFeatureTested $event)
     {
         $this->clearDependencies();
-        $this->restore();
         $this->shutdownKernel();
+        $this->restore();
     }
 
     public function bootKernel()
@@ -134,6 +141,7 @@ class FeatureIsolationSubscriber implements EventSubscriberInterface
 
     public function shutdownKernel()
     {
+        $this->registry->getManager()->clear();
         $this->kernelServiceFactory->shutdown();
     }
 }

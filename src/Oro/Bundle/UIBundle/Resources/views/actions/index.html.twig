@@ -27,6 +27,11 @@
                     {% block navButtons %}{% endblock navButtons %}
                     {% placeholder index_navButtons_after with buttonsPlaceholderData %}
                 </div>
+                <div class="page-title-center"
+                     data-page-component-module="oroui/js/app/components/view-component"
+                     data-page-component-options="{{ {'view': 'oroui/js/app/views/page-center-title-view'}|json_encode }}">
+                    <div class="filters-state-view-container"></div>
+                </div>
             </div>
         </div>
     </div>
@@ -39,13 +44,14 @@
                 'enableFullScreenLayout': true,
                 'enableViews': true,
                 'showViewsInNavbar': true,
+                'filtersStateElement': '.filters-state-view-container'
             }
             |merge(renderParams|default({})) %}
             {{ dataGrid.renderGrid(gridName, params|default({}), renderParams) }}
 
             {# Only grids on index pages will be tagged #}
             <script type="text/javascript">
-                require(['oronavigation/js/content/grid-builder'], function (GridTagBuilder) {
+                require(['orosync/js/content/grid-builder'], function (GridTagBuilder) {
                     GridTagBuilder.allowTracking({{ gridName|json_encode|raw }});
                 });
             </script>

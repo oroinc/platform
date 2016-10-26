@@ -705,4 +705,18 @@ class WorkflowItem extends ExtendWorkflowItem implements EntityAwareInterface
     {
         $this->updated = new \DateTime('now', new \DateTimeZone('UTC'));
     }
+
+    /**
+     * @return string
+     */
+    public function __toString()
+    {
+        return sprintf(
+            '[%s] %s:%s %s',
+            $this->workflowName,
+            $this->entityClass,
+            $this->entityId,
+            $this->currentStep ? $this->currentStep->getName() : null
+        );
+    }
 }

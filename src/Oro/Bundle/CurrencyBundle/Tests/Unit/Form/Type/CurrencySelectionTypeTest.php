@@ -70,7 +70,6 @@ class CurrencySelectionTypeTest extends FormIntegrationTestCase
      * @dataProvider submitDataProvider
      *
      * @param array $allowedCurrencies
-     * @param string $localeCurrency
      * @param array $inputOptions
      * @param array $expectedOptions
      * @param string $submittedData
@@ -122,7 +121,6 @@ class CurrencySelectionTypeTest extends FormIntegrationTestCase
     {
         $currencyBundle = Intl::getCurrencyBundle();
         $usdName = $currencyBundle->getCurrencyName('USD');
-        $eurName = $currencyBundle->getCurrencyName('EUR');
         $gbpName = $currencyBundle->getCurrencyName('GBP');
         $rubName = $currencyBundle->getCurrencyName('RUB');
         $uahName = $currencyBundle->getCurrencyName('UAH');

@@ -21,7 +21,7 @@ Scenario: Add note
   And click view Charlie in grid
   And follow "More actions"
   And press "Add note"
-  And fill "Note" form with:
+  And fill "Note Form" with:
     | Message    | Charlie works hard  |
     | Attachment | note-attachment.jpg |
   When press "Add"
@@ -38,7 +38,7 @@ Scenario: View note
 
 Scenario: Edit note in view page
   And I click "Update note" on "Charlie works hard" in activity list
-  And fill "Note" form with:
+  And fill "Note Form" with:
     | Message    | Very good actor      |
     | Attachment | note-attachment2.jpg |
   When I press "Save"

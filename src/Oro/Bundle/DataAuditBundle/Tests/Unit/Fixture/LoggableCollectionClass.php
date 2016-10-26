@@ -4,12 +4,9 @@ namespace Oro\Bundle\DataAuditBundle\Tests\Unit\Fixture;
 
 use Doctrine\ORM\Mapping as ORM;
 
-use Oro\Bundle\DataAuditBundle\Metadata\Annotation as Oro;
-
 /**
  * @ORM\Entity
  * @ORM\Table
- * @Oro\Loggable
  */
 class LoggableCollectionClass
 {
