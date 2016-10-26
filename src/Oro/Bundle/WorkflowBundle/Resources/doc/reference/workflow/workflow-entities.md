@@ -150,7 +150,7 @@ Attribute
 Oro\Bundle\ActionBundle\Model\Attribute
 
 **Description:**
-Encapsulates attribute parameters, has label, type and options. Also has possibility manage ACL permission
+Encapsulates attribute parameters, has type and options. Also has possibility manage ACL permission
 for the entity actions.
 
 **Methods:**
@@ -320,7 +320,7 @@ Workflow Step
 Oro\Bundle\WorkflowBundle\Entity\WorkflowStep
 
 **Description:**
-This class is the representation of Step entity, it stores only data that be used in DB requests: name, label,
+This class is the representation of Step entity, it stores only data that be used in DB requests: name,
 step order and final flag. Also Workflow Step knows about Workflow Definition that it attached to.
 
 **Methods:**
