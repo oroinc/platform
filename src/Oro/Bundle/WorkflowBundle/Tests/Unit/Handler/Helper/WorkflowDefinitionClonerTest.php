@@ -52,25 +52,29 @@ class WorkflowDefinitionClonerTest extends \PHPUnit_Framework_TestCase
         WorkflowDefinition $definition2,
         $isCopy = false
     ) {
+        if (!$isCopy) {
+            $definition2 = $definition1;
+        }
+
         foreach ($definition1->getSteps() as $item) {
             $this->assertSame($definition1, $item->getDefinition());
         }
         foreach ($definition2->getSteps() as $item) {
-            $this->assertSame($isCopy ? $definition2 : $definition1, $item->getDefinition());
+            $this->assertSame($definition2, $item->getDefinition());
         }
 
         foreach ($definition1->getEntityAcls() as $item) {
             $this->assertSame($definition1, $item->getDefinition());
         }
         foreach ($definition2->getEntityAcls() as $item) {
-            $this->assertSame($isCopy ? $definition2 : $definition1, $item->getDefinition());
+            $this->assertSame($definition2, $item->getDefinition());
         }
 
         foreach ($definition1->getRestrictions() as $item) {
             $this->assertSame($definition1, $item->getDefinition());
         }
         foreach ($definition2->getRestrictions() as $item) {
-            $this->assertSame($isCopy ? $definition2 : $definition1, $item->getDefinition());
+            $this->assertSame($definition2, $item->getDefinition());
         }
     }
 
