@@ -9,5 +9,5 @@ config:
 
     paths:
         'moment': 'bundles/orolocale/lib/moment/moment.js'
-        'numeral': 'bundles/orolocale/lib/numeral.js'
+        'numeral': 'bundles/bowerassets/numeral/numeral.js'
         'orolocale/js/locale-settings/data': '../js/oro.locale_data.js'

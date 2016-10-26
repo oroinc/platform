@@ -2,11 +2,9 @@
 <div class="sorting-label"><%=_.__('oro.datagrid.toolbar_sorting.label') %>:</div>
 <% } %>
 <select class="oro-select2 input-widget">
-    <% if (currentDirection === null) { %>
-    <option value="not-selected" selected="selected">
+    <option value="not-selected" <% if (currentDirection === null) { %>selected="selected"<% } %>>
         <%= _.__('oro.datagrid.sorters.not_selected') %>
     </option>
-    <% } %>
     <% for(var i = 0; i < columns.length; i++) { %>
     <option value="<%= columns[i].value %>"<% if (selectedValue === columns[i].value) { %> selected="selected"<% } %>>
         <%- columns[i].label %>
