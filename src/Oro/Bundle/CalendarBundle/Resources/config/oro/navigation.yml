@@ -26,9 +26,8 @@ navigation:
             oro_calendar_menu_divider:
                 label: ''
                 extras:
+                    divider: true
                     position: 95
-                attributes:
-                    class: 'divider'
             oro_calendar_color_action:
                 uri: '#'
                 extras:

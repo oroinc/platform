@@ -2,44 +2,46 @@
 
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Model;
 
-use Symfony\Component\DependencyInjection\ContainerInterface;
-use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 
-use Oro\Bundle\WorkflowBundle\Entity\WorkflowStep;
-use Oro\Bundle\WorkflowBundle\Model\TransitionManager;
-use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
-use Oro\Bundle\WorkflowBundle\Model\Workflow;
-use Oro\Bundle\WorkflowBundle\Model\WorkflowAssembler;
+use Symfony\Component\DependencyInjection\ContainerInterface;
+
 use Oro\Bundle\WorkflowBundle\Configuration\WorkflowConfiguration;
+use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
+use Oro\Bundle\WorkflowBundle\Entity\WorkflowStep;
 use Oro\Bundle\WorkflowBundle\Model\AttributeAssembler;
 use Oro\Bundle\WorkflowBundle\Model\StepAssembler;
 use Oro\Bundle\WorkflowBundle\Model\TransitionAssembler;
+use Oro\Bundle\WorkflowBundle\Model\TransitionManager;
+use Oro\Bundle\WorkflowBundle\Model\Workflow;
+use Oro\Bundle\WorkflowBundle\Model\WorkflowAssembler;
 
 class WorkflowAssemblerTest extends \PHPUnit_Framework_TestCase
 {
-    /**
-     * @var array
-     */
-    protected $workflowParameters = array(
+    /** @var array */
+    protected $workflowParameters = [
         'name' => 'test_name',
         'label' => 'Test Label'
-    );
+    ];
 
-    protected $stepConfiguration = array(
+    /** @var array */
+    protected $stepConfiguration = [
         'label' => 'Test',
         'name' => 'test'
-    );
+    ];
 
-    protected $transitionConfiguration = array(
+    /** @var array */
+    protected $transitionConfiguration = [
         'label' => 'Test',
         'step_to' => 'test_step',
         'transition_definition' => 'test_transition_definition'
-    );
+    ];
 
-    protected $transitionDefinition = array(
-        'test_transition_definition' => array()
-    );
+    /** @var array */
+    protected $transitionDefinition = [
+        'test_transition_definition' => []
+    ];
 
     /**
      * @return Workflow

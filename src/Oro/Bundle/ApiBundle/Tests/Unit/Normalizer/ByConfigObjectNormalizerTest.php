@@ -13,7 +13,7 @@ use Oro\Bundle\ApiBundle\Normalizer\ConfigNormalizer;
 use Oro\Bundle\ApiBundle\Normalizer\DateTimeNormalizer;
 use Oro\Bundle\ApiBundle\Normalizer\ObjectNormalizer;
 use Oro\Bundle\ApiBundle\Normalizer\ObjectNormalizerRegistry;
-use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity as Object;
+use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity;
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 
@@ -47,7 +47,7 @@ class ByConfigObjectNormalizerTest extends \PHPUnit_Framework_TestCase
 
     public function testNormalizeSimpleObject()
     {
-        $object = new Object\Group();
+        $object = new Entity\Group();
         $object->setId(123);
         $object->setName('test_name');
 
@@ -75,7 +75,7 @@ class ByConfigObjectNormalizerTest extends \PHPUnit_Framework_TestCase
 
     public function testNormalizeSimpleObjectWithRenaming()
     {
-        $object = new Object\Group();
+        $object = new Entity\Group();
         $object->setId(123);
         $object->setName('test_name');
 
@@ -105,7 +105,7 @@ class ByConfigObjectNormalizerTest extends \PHPUnit_Framework_TestCase
 
     public function testNormalizeSimpleObjectWithDataTransformers()
     {
-        $object = new Object\Group();
+        $object = new Entity\Group();
         $object->setId(123);
         $object->setName('test_name');
 
@@ -115,8 +115,8 @@ class ByConfigObjectNormalizerTest extends \PHPUnit_Framework_TestCase
                 'id'   => null,
                 'name' => [
                     'data_transformer' => [
-                        function ($class, $property, $value, $config) {
-                            return $value . sprintf(' (%s::%s)', $class, $property);
+                        function ($class, $property, $value, $config, $context) {
+                            return $value . sprintf(' (%s::%s)[%s]', $class, $property, $context['key']);
                         }
                     ]
                 ]
@@ -125,13 +125,14 @@ class ByConfigObjectNormalizerTest extends \PHPUnit_Framework_TestCase
 
         $result = $this->objectNormalizer->normalizeObject(
             $object,
-            $this->createConfigObject($config)
+            $this->createConfigObject($config),
+            ['key' => 'context value']
         );
 
         $this->assertEquals(
             [
                 'id'   => 123,
-                'name' => 'test_name (Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Group::name)'
+                'name' => 'test_name (Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Group::name)[context value]'
             ],
             $result
         );
@@ -139,7 +140,7 @@ class ByConfigObjectNormalizerTest extends \PHPUnit_Framework_TestCase
 
     public function testNormalizeSimpleObjectWithPostSerialize()
     {
-        $object = new Object\Group();
+        $object = new Entity\Group();
         $object->setId(123);
         $object->setName('test_name');
 
@@ -149,8 +150,8 @@ class ByConfigObjectNormalizerTest extends \PHPUnit_Framework_TestCase
                 'id'   => null,
                 'name' => null
             ],
-            'post_serialize'   => function (array $item) {
-                $item['name'] .= '_additional';
+            'post_serialize'   => function (array $item, array $context) {
+                $item['name'] .= sprintf('_additional[%s]', $context['key']);
 
                 return $item;
             }
@@ -158,13 +159,14 @@ class ByConfigObjectNormalizerTest extends \PHPUnit_Framework_TestCase
 
         $result = $this->objectNormalizer->normalizeObject(
             $object,
-            $this->createConfigObject($config)
+            $this->createConfigObject($config),
+            ['key' => 'context value']
         );
 
         $this->assertEquals(
             [
                 'id'   => 123,
-                'name' => 'test_name_additional'
+                'name' => 'test_name_additional[context value]'
             ],
             $result
         );
@@ -221,7 +223,7 @@ class ByConfigObjectNormalizerTest extends \PHPUnit_Framework_TestCase
 
     public function testNormalizeObjectWithNullToOneRelations()
     {
-        $product = new Object\Product();
+        $product = new Entity\Product();
         $product->setId(123);
         $product->setName('product_name');
 
@@ -346,10 +348,10 @@ class ByConfigObjectNormalizerTest extends \PHPUnit_Framework_TestCase
 
     public function testNormalizeObjectWithNullToManyRelation()
     {
-        $product = new Object\Product();
+        $product = new Entity\Product();
         $product->setId(123);
         $product->setName('product_name');
-        $owner = new Object\User();
+        $owner = new Entity\User();
         $owner->setId(456);
         $owner->setName('user_name');
         $owner->addProduct($product);
@@ -450,8 +452,8 @@ class ByConfigObjectNormalizerTest extends \PHPUnit_Framework_TestCase
                     'fields'           => [
                         'name'    => [
                             'data_transformer' => [
-                                function ($class, $property, $value, $config) {
-                                    return $value . sprintf(' (%s::%s)', $class, $property);
+                                function ($class, $property, $value, $config, $context) {
+                                    return $value . sprintf(' (%s::%s)[%s]', $class, $property, $context['key']);
                                 }
                             ]
                         ],
@@ -461,8 +463,8 @@ class ByConfigObjectNormalizerTest extends \PHPUnit_Framework_TestCase
                             'fields'           => 'id'
                         ]
                     ],
-                    'post_serialize'   => function (array $item) {
-                        $item['name'] .= '_additional';
+                    'post_serialize'   => function (array $item, array $context) {
+                        $item['name'] .= sprintf('_additional[%s]', $context['key']);
 
                         return $item;
                     }
@@ -472,7 +474,8 @@ class ByConfigObjectNormalizerTest extends \PHPUnit_Framework_TestCase
 
         $result = $this->objectNormalizer->normalizeObject(
             $this->createProductObject(),
-            $this->createConfigObject($config)
+            $this->createConfigObject($config),
+            ['key' => 'context value']
         );
 
         $this->assertEquals(
@@ -480,7 +483,8 @@ class ByConfigObjectNormalizerTest extends \PHPUnit_Framework_TestCase
                 'id'        => 123,
                 'category1' => 'category_label',
                 'owner'     => [
-                    'name'    => 'user_name (Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\User::name)_additional',
+                    'name'    => 'user_name (Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\User::name)'
+                        . '[context value]_additional[context value]',
                     'groups1' => [11, 22]
                 ]
             ],
@@ -490,10 +494,10 @@ class ByConfigObjectNormalizerTest extends \PHPUnit_Framework_TestCase
 
     public function testNormalizeObjectWithCollapsedNullTableInheritanceRelations()
     {
-        $product = new Object\Product();
+        $product = new Entity\Product();
         $product->setId(123);
         $product->setName('product_name');
-        $owner = new Object\User();
+        $owner = new Entity\User();
         $owner->setId(456);
         $owner->setName('user_name');
         $owner->addProduct($product);
@@ -548,15 +552,15 @@ class ByConfigObjectNormalizerTest extends \PHPUnit_Framework_TestCase
 
     public function testNormalizeObjectWithCollapsedTableInheritanceRelations()
     {
-        $product = new Object\Product();
+        $product = new Entity\Product();
         $product->setId(123);
         $product->setName('product_name');
-        $product->setCategory(new Object\Category('category_name'));
-        $owner = new Object\User();
+        $product->setCategory(new Entity\Category('category_name'));
+        $owner = new Entity\User();
         $owner->setId(456);
         $owner->setName('user_name');
         $owner->addProduct($product);
-        $group = new Object\Group();
+        $group = new Entity\Group();
         $group->setId(789);
         $owner->addGroup($group);
 
@@ -618,10 +622,10 @@ class ByConfigObjectNormalizerTest extends \PHPUnit_Framework_TestCase
 
     public function testNormalizeObjectWithNullTableInheritanceRelations()
     {
-        $product = new Object\Product();
+        $product = new Entity\Product();
         $product->setId(123);
         $product->setName('product_name');
-        $owner = new Object\User();
+        $owner = new Entity\User();
         $owner->setId(456);
         $owner->setName('user_name');
         $owner->addProduct($product);
@@ -674,15 +678,15 @@ class ByConfigObjectNormalizerTest extends \PHPUnit_Framework_TestCase
 
     public function testNormalizeObjectWithTableInheritanceRelations()
     {
-        $product = new Object\Product();
+        $product = new Entity\Product();
         $product->setId(123);
         $product->setName('product_name');
-        $product->setCategory(new Object\Category('category_name'));
-        $owner = new Object\User();
+        $product->setCategory(new Entity\Category('category_name'));
+        $owner = new Entity\User();
         $owner->setId(456);
         $owner->setName('user_name');
         $owner->addProduct($product);
-        $group = new Object\Group();
+        $group = new Entity\Group();
         $group->setId(789);
         $owner->addGroup($group);
 
@@ -742,7 +746,7 @@ class ByConfigObjectNormalizerTest extends \PHPUnit_Framework_TestCase
 
     public function testNormalizeShouldNotChangeOriginalConfig()
     {
-        $object = new Object\Group();
+        $object = new Entity\Group();
         $object->setId(123);
         $object->setName('test_name');
 
@@ -764,7 +768,7 @@ class ByConfigObjectNormalizerTest extends \PHPUnit_Framework_TestCase
 
     public function testNormalizeWithIgnoredField()
     {
-        $object = new Object\Group();
+        $object = new Entity\Group();
         $object->setId(123);
         $object->setName('test_name');
 
@@ -773,7 +777,7 @@ class ByConfigObjectNormalizerTest extends \PHPUnit_Framework_TestCase
             'fields'           => [
                 'id'    => null,
                 'name1' => [
-                    'property_path' => '_'
+                    'property_path' => ConfigUtil::IGNORE_PROPERTY_PATH
                 ]
             ]
         ];
@@ -793,7 +797,7 @@ class ByConfigObjectNormalizerTest extends \PHPUnit_Framework_TestCase
 
     public function testNormalizeWithDependsOnNotConfiguredField()
     {
-        $object = new Object\Group();
+        $object = new Entity\Group();
         $object->setId(123);
         $object->setName('test_name');
 
@@ -822,7 +826,7 @@ class ByConfigObjectNormalizerTest extends \PHPUnit_Framework_TestCase
 
     public function testNormalizeWithDependsOnExcludedField()
     {
-        $object = new Object\Group();
+        $object = new Entity\Group();
         $object->setId(123);
         $object->setName('test_name');
 
@@ -853,30 +857,30 @@ class ByConfigObjectNormalizerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return Object\Product
+     * @return Entity\Product
      */
     protected function createProductObject()
     {
-        $product = new Object\Product();
+        $product = new Entity\Product();
         $product->setId(123);
         $product->setName('product_name');
         $product->setUpdatedAt(new \DateTime('2015-12-01 10:20:30', new \DateTimeZone('UTC')));
 
-        $category = new Object\Category('category_name');
+        $category = new Entity\Category('category_name');
         $category->setLabel('category_label');
         $product->setCategory($category);
 
-        $owner = new Object\User();
+        $owner = new Entity\User();
         $owner->setId(456);
         $owner->setName('user_name');
-        $ownerCategory = new Object\Category('owner_category_name');
+        $ownerCategory = new Entity\Category('owner_category_name');
         $ownerCategory->setLabel('owner_category_label');
         $owner->setCategory($ownerCategory);
-        $ownerGroup1 = new Object\Group();
+        $ownerGroup1 = new Entity\Group();
         $ownerGroup1->setId(11);
         $ownerGroup1->setName('owner_group1');
         $owner->addGroup($ownerGroup1);
-        $ownerGroup2 = new Object\Group();
+        $ownerGroup2 = new Entity\Group();
         $ownerGroup2->setId(22);
         $ownerGroup2->setName('owner_group2');
         $owner->addGroup($ownerGroup2);

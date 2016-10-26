@@ -29,6 +29,12 @@ oro_api:
     api_doc_views: ['default', 'rest_json_api', 'rest_plain']
     documentation_path: https://www.orocrm.com/documentation/index/current/book/data-api
 
+    config_extensions:
+        - oro_api.config_extension.filters
+        - oro_api.config_extension.sorters
+        - oro_api.config_extension.actions
+        - oro_api.config_extension.subresources
+
     filters:
         string: ~
         boolean: ~
@@ -134,6 +140,7 @@ oro_api:
 
     actions:
         get_list:
+            processor_service_id: oro_api.get_list.processor
             processing_groups:
                 initialize:
                     priority: -10
@@ -152,6 +159,7 @@ oro_api:
                 normalize_result:
                     priority: -80
         get:
+            processor_service_id: oro_api.get.processor
             processing_groups:
                 initialize:
                     priority: -10
@@ -170,6 +178,7 @@ oro_api:
                 normalize_result:
                     priority: -80
         delete:
+            processor_service_id: oro_api.delete.processor
             processing_groups:
                 initialize:
                     priority: -10
@@ -188,6 +197,7 @@ oro_api:
                 normalize_result:
                     priority: -80
         delete_list:
+            processor_service_id: oro_api.delete_list.processor
             processing_groups:
                 initialize:
                     priority: -10
@@ -206,6 +216,7 @@ oro_api:
                 normalize_result:
                     priority: -80
         create:
+            processor_service_id: oro_api.create.processor
             processing_groups:
                 initialize:
                     priority: -10
@@ -226,6 +237,7 @@ oro_api:
                 normalize_result:
                     priority: -90
         update:
+            processor_service_id: oro_api.update.processor
             processing_groups:
                 initialize:
                     priority: -10
@@ -248,6 +260,7 @@ oro_api:
                 normalize_result:
                     priority: -100
         get_subresource:
+            processor_service_id: oro_api.get_subresource.processor
             processing_groups:
                 initialize:
                     priority: -10
@@ -266,6 +279,7 @@ oro_api:
                 normalize_result:
                     priority: -80
         get_relationship:
+            processor_service_id: oro_api.get_relationship.processor
             processing_groups:
                 initialize:
                     priority: -10
@@ -284,6 +298,7 @@ oro_api:
                 normalize_result:
                     priority: -80
         delete_relationship:
+            processor_service_id: oro_api.delete_relationship.processor
             processing_groups:
                 initialize:
                     priority: -10
@@ -302,6 +317,7 @@ oro_api:
                 normalize_result:
                     priority: -80
         add_relationship:
+            processor_service_id: oro_api.add_relationship.processor
             processing_groups:
                 initialize:
                     priority: -10
@@ -320,6 +336,7 @@ oro_api:
                 normalize_result:
                     priority: -80
         update_relationship:
+            processor_service_id: oro_api.update_relationship.processor
             processing_groups:
                 initialize:
                     priority: -10

@@ -13,6 +13,72 @@ class WorkflowDefinitionClonerTest extends \PHPUnit_Framework_TestCase
 {
     public function testCloneDefinition()
     {
+        $definition = $this->createDefinition();
+
+        $clonedDefinition = WorkflowDefinitionCloner::cloneDefinition($definition);
+
+        $this->assertEquals($definition, $clonedDefinition);
+        $this->assertNotSame($definition, $clonedDefinition);
+
+        $this->assertEquals($definition->getStartStep(), $clonedDefinition->getStartStep());
+        $this->assertNotSame($definition->getStartStep(), $clonedDefinition->getStartStep());
+
+        $this->assertObjectsDefinitions($definition, $clonedDefinition, true);
+    }
+
+    public function testMergeDefinition()
+    {
+        $sourceDefinition = $this->createDefinition();
+
+        $definition = new WorkflowDefinition();
+
+        WorkflowDefinitionCloner::mergeDefinition($definition, $sourceDefinition);
+
+        $this->assertEquals($definition, $sourceDefinition);
+        $this->assertNotSame($definition, $sourceDefinition);
+
+        $this->assertSame($definition->getStartStep(), $sourceDefinition->getStartStep());
+
+        $this->assertObjectsDefinitions($definition, $sourceDefinition);
+    }
+
+    /**
+     * @param WorkflowDefinition $definition1
+     * @param WorkflowDefinition $definition2
+     * @param bool|false $isCopy
+     */
+    protected function assertObjectsDefinitions(
+        WorkflowDefinition $definition1,
+        WorkflowDefinition $definition2,
+        $isCopy = false
+    ) {
+        foreach ($definition1->getSteps() as $item) {
+            $this->assertSame($definition1, $item->getDefinition());
+        }
+        foreach ($definition2->getSteps() as $item) {
+            $this->assertSame($isCopy ? $definition2 : $definition1, $item->getDefinition());
+        }
+
+        foreach ($definition1->getEntityAcls() as $item) {
+            $this->assertSame($definition1, $item->getDefinition());
+        }
+        foreach ($definition2->getEntityAcls() as $item) {
+            $this->assertSame($isCopy ? $definition2 : $definition1, $item->getDefinition());
+        }
+
+        foreach ($definition1->getRestrictions() as $item) {
+            $this->assertSame($definition1, $item->getDefinition());
+        }
+        foreach ($definition2->getRestrictions() as $item) {
+            $this->assertSame($isCopy ? $definition2 : $definition1, $item->getDefinition());
+        }
+    }
+
+    /**
+     * @return WorkflowDefinition
+     */
+    protected function createDefinition()
+    {
         $step1 = new WorkflowStep();
         $step1->setName('step1');
 
@@ -40,9 +106,6 @@ class WorkflowDefinitionClonerTest extends \PHPUnit_Framework_TestCase
         $definition = new WorkflowDefinition();
         $definition->setSteps($steps)->setStartStep($step2)->setEntityAcls($entityAcls)->setRestrictions($restrictions);
 
-        $newDefinition = WorkflowDefinitionCloner::cloneDefinition($definition);
-
-        $this->assertEquals($definition, $newDefinition);
-        $this->assertNotSame($definition, $newDefinition);
+        return $definition;
     }
 }

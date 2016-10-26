@@ -31,7 +31,7 @@ class WorkflowDefinitionConfigurationBuilder extends AbstractConfigurationBuilde
      */
     public function buildFromConfiguration(array $configurationData)
     {
-        $workflowDefinitions = array();
+        $workflowDefinitions = [];
         foreach ($configurationData as $workflowName => $workflowConfiguration) {
             $workflowDefinitions[] = $this->buildOneFromConfiguration($workflowName, $workflowConfiguration);
         }
@@ -64,18 +64,16 @@ class WorkflowDefinitionConfigurationBuilder extends AbstractConfigurationBuilde
             'steps_display_ordered',
             false
         );
-        $groups = [
-            WorkflowDefinition::GROUP_TYPE_EXCLUSIVE_ACTIVE => $this->getConfigurationOption(
-                $configuration,
-                WorkflowConfiguration::NODE_EXCLUSIVE_ACTIVE_GROUPS,
-                []
-            ),
-            WorkflowDefinition::GROUP_TYPE_EXCLUSIVE_RECORD => $this->getConfigurationOption(
-                $configuration,
-                WorkflowConfiguration::NODE_EXCLUSIVE_RECORD_GROUPS,
-                []
-            ),
-        ];
+        $activeGroups = $this->getConfigurationOption(
+            $configuration,
+            WorkflowConfiguration::NODE_EXCLUSIVE_ACTIVE_GROUPS,
+            []
+        );
+        $recordGroups = $this->getConfigurationOption(
+            $configuration,
+            WorkflowConfiguration::NODE_EXCLUSIVE_RECORD_GROUPS,
+            []
+        );
 
         $workflowDefinition = new WorkflowDefinition();
         $workflowDefinition
@@ -87,7 +85,8 @@ class WorkflowDefinitionConfigurationBuilder extends AbstractConfigurationBuilde
             ->setActive($configuration['defaults']['active'])
             ->setPriority($configuration['priority'])
             ->setEntityAttributeName($entityAttributeName)
-            ->setGroups($groups)
+            ->setExclusiveActiveGroups($activeGroups)
+            ->setExclusiveRecordGroups($recordGroups)
             ->setConfiguration($this->filterConfiguration($configuration));
 
         $workflow = $this->workflowAssembler->assemble($workflowDefinition, false);
@@ -107,7 +106,7 @@ class WorkflowDefinitionConfigurationBuilder extends AbstractConfigurationBuilde
      */
     protected function setSteps(WorkflowDefinition $workflowDefinition, Workflow $workflow)
     {
-        $workflowSteps = array();
+        $workflowSteps = [];
         foreach ($workflow->getStepManager()->getSteps() as $step) {
             $workflowStep = new WorkflowStep();
             $workflowStep
@@ -128,7 +127,7 @@ class WorkflowDefinitionConfigurationBuilder extends AbstractConfigurationBuilde
      */
     protected function setEntityAcls(WorkflowDefinition $workflowDefinition, Workflow $workflow)
     {
-        $entityAcls = array();
+        $entityAcls = [];
         foreach ($workflow->getAttributeManager()->getEntityAttributes() as $attribute) {
             foreach ($workflow->getStepManager()->getSteps() as $step) {
                 $updatable = $attribute->isEntityUpdateAllowed()
@@ -181,13 +180,13 @@ class WorkflowDefinitionConfigurationBuilder extends AbstractConfigurationBuilde
      */
     protected function filterConfiguration(array $configuration)
     {
-        $configurationKeys = array(
+        $configurationKeys = [
             WorkflowConfiguration::NODE_STEPS,
             WorkflowConfiguration::NODE_ATTRIBUTES,
             WorkflowConfiguration::NODE_TRANSITIONS,
             WorkflowConfiguration::NODE_TRANSITION_DEFINITIONS,
             WorkflowConfiguration::NODE_ENTITY_RESTRICTIONS
-        );
+        ];
 
         return array_intersect_key($configuration, array_flip($configurationKeys));
     }

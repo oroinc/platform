@@ -1,0 +1,8 @@
+{% macro syncContentTags(data, includeCollectionTag = false) %}
+    <script type="text/javascript">
+        require([ 'orosync/js/content-manager'],
+        function (contentManager) {
+            contentManager.tagContent({{ oro_sync_get_content_tags(data, includeCollectionTag)|json_encode|raw }});
+        });
+    </script>
+{% endmacro %}
