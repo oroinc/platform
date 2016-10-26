@@ -5,7 +5,7 @@ namespace Oro\Bundle\WorkflowBundle\Form\Type;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\OptionsResolver\Options;
 
 use Oro\Bundle\WorkflowBundle\Helper\WorkflowTranslationHelper;
@@ -44,9 +44,9 @@ class WorkflowTransitionType extends AbstractType
      * - "workflow_item" - required, instance of WorkflowItem entity
      * - "transition_name" - required, name of transition
      *
-     * @param OptionsResolverInterface $resolver
+     * @param OptionsResolver $resolver
      */
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setRequired(array('workflow_item', 'transition_name'));
 
@@ -56,21 +56,20 @@ class WorkflowTransitionType extends AbstractType
             )
         );
 
-        $resolver->setNormalizers(
-            array(
-                'constraints' => function (Options $options, $constraints) {
-                    if (!$constraints) {
-                        $constraints = array();
-                    }
-
-                    $constraints[] = new TransitionIsAllowed(
-                        $options['workflow_item'],
-                        $options['transition_name']
-                    );
-
-                    return $constraints;
+        $resolver->setNormalizer(
+            'constraints',
+            function (Options $options, $constraints) {
+                if (!$constraints) {
+                    $constraints = array();
                 }
-            )
+
+                $constraints[] = new TransitionIsAllowed(
+                    $options['workflow_item'],
+                    $options['transition_name']
+                );
+
+                return $constraints;
+            }
         );
     }
 
@@ -80,7 +79,9 @@ class WorkflowTransitionType extends AbstractType
     public function finishView(FormView $view, FormInterface $form, array $options)
     {
         foreach ($view->children as $k => $childView) {
-            $childView->vars['translation_domain'] = WorkflowTranslationHelper::TRANSLATION_DOMAIN;
+            if (isset($childView->vars['label'])&&(!empty($childView->vars['label']))) {
+                $childView->vars['translation_domain'] = WorkflowTranslationHelper::TRANSLATION_DOMAIN;
+            }
         }
     }
 }

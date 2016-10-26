@@ -110,7 +110,9 @@ class WorkflowTransitionTypeTest extends AbstractWorkflowAttributesTypeTestCase
     public function testFinishView()
     {
         $view = new FormView();
-        $view->children = [new FormView()];
+        $child = new FormView();
+        $child->vars['label'] = 'test';
+        $view->children = [$child];
         $form = $this->getMock('Symfony\Component\Form\FormInterface');
         $this->type->finishView($view, $form, []);
 
