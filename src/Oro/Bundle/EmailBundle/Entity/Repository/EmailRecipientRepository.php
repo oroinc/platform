@@ -60,16 +60,6 @@ class EmailRecipientRepository extends EntityRepository
             ->join('e.recipients', 'r')
             ->join('r.emailAddress', 'a')
             ->andWhere('e.sentAt > :from');
-//
-//        $emailQb = $this->_em->getRepository('Oro\Bundle\EmailBundle\Entity\EmailRecipient')->createQueryBuilder('r');
-//        $emailQb
-//            ->select('r.id')
-//            ->join('r.email', 'e')
-//            ->join('e.fromEmailAddress', 'fe')
-//            ->join('e.recipients', 'r')
-//            ->join('r.emailAddress', 'a')
-//            ->andWhere('e.sentAt > :from');
-//            ->groupBy('a.email');
 
         if ($senderEmails) {
             $emailQb->andWhere($emailQb->expr()->in('fe.email', ':senders'));
@@ -83,12 +73,12 @@ class EmailRecipientRepository extends EntityRepository
 
         $recepientsQb = $this->createQueryBuilder('re');
         $recepientsQb
-            ->select('MAX(re.name), ea.email')
+            ->distinct()
+            ->select('re.name, ea.email')
             ->orderBy('re.name')
             ->join('re.emailAddress', 'ea')
             ->where($recepientsQb->expr()->in('re.id', $emailQb->getDQL()))
-            ->setParameter('from', new \DateTime('-30 days'))
-            ->groupBy('re.name, ea.email');
+            ->setParameter('from', new \DateTime('-30 days'));
 
         if ($senderEmails) {
             $recepientsQb->setParameter('senders', $senderEmails);
