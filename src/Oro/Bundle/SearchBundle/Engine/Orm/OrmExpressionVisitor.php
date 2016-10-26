@@ -42,6 +42,7 @@ class OrmExpressionVisitor extends ExpressionVisitor
     {
         $value = $comparison->getValue()->getValue();
         list($type, $field) = $this->explodeCombinedFieldString($comparison->getField());
+        $condition = Criteria::getSearchOperatorByComparisonOperator($comparison->getOperator());
 
         $index     = $this->driver->getUniqueId();
         $joinField = $this->driver->getJoinField($type);
@@ -51,7 +52,7 @@ class OrmExpressionVisitor extends ExpressionVisitor
 
         $searchCondition = [
             'fieldName'  => $field,
-            'condition'  => Criteria::getSearchOperatorByComparisonOperator($comparison->getOperator()),
+            'condition'  => $condition,
             'fieldValue' => $value,
             'fieldType'  => $type
         ];
@@ -60,7 +61,7 @@ class OrmExpressionVisitor extends ExpressionVisitor
             return $this->driver->addFilteringField($this->qb, $index, $searchCondition);
         }
 
-        if ($type === Query::TYPE_TEXT) {
+        if ($type === Query::TYPE_TEXT && !in_array($condition, [Query::OPERATOR_IN, Query::OPERATOR_NOT_IN], true)) {
             if ($searchCondition['fieldValue'] === '') {
                 $this->qb->setParameter('field' . $index, $searchCondition['fieldName']);
 
