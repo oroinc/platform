@@ -9,22 +9,22 @@ use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 
 class ObjectMetadataLoader
 {
-    /** @var ObjectMetadataBuilder */
-    protected $objectMetadataBuilder;
+    /** @var ObjectMetadataFactory */
+    protected $objectMetadataFactory;
 
-    /** @var ObjectNestedObjectMetadataBuilder */
-    protected $nestedObjectMetadataBuilder;
+    /** @var ObjectNestedObjectMetadataFactory */
+    protected $nestedObjectMetadataFactory;
 
     /**
-     * @param ObjectMetadataBuilder             $objectMetadataBuilder
-     * @param ObjectNestedObjectMetadataBuilder $nestedObjectMetadataBuilder
+     * @param ObjectMetadataFactory             $objectMetadataFactory
+     * @param ObjectNestedObjectMetadataFactory $nestedObjectMetadataFactory
      */
     public function __construct(
-        ObjectMetadataBuilder $objectMetadataBuilder,
-        ObjectNestedObjectMetadataBuilder $nestedObjectMetadataBuilder
+        ObjectMetadataFactory $objectMetadataFactory,
+        ObjectNestedObjectMetadataFactory $nestedObjectMetadataFactory
     ) {
-        $this->objectMetadataBuilder = $objectMetadataBuilder;
-        $this->nestedObjectMetadataBuilder = $nestedObjectMetadataBuilder;
+        $this->objectMetadataFactory = $objectMetadataFactory;
+        $this->nestedObjectMetadataFactory = $nestedObjectMetadataFactory;
     }
 
     /**
@@ -41,7 +41,7 @@ class ObjectMetadataLoader
         $withExcludedProperties,
         $targetAction
     ) {
-        $entityMetadata = $this->objectMetadataBuilder->createObjectMetadata($entityClass, $config);
+        $entityMetadata = $this->objectMetadataFactory->createObjectMetadata($entityClass, $config);
         $fields = $config->getFields();
         foreach ($fields as $fieldName => $field) {
             if (!$withExcludedProperties && $field->isExcluded()) {
@@ -49,7 +49,7 @@ class ObjectMetadataLoader
             }
             $targetClass = $field->getTargetClass();
             if ($targetClass) {
-                $this->objectMetadataBuilder->addAssociationMetadata(
+                $this->objectMetadataFactory->createAndAddAssociationMetadata(
                     $entityMetadata,
                     $entityClass,
                     $fieldName,
@@ -57,7 +57,7 @@ class ObjectMetadataLoader
                     $targetAction
                 );
             } elseif ($field->isMetaProperty()) {
-                $this->objectMetadataBuilder->addMetaPropertyMetadata(
+                $this->objectMetadataFactory->createAndAddMetaPropertyMetadata(
                     $entityMetadata,
                     $entityClass,
                     $fieldName,
@@ -68,7 +68,7 @@ class ObjectMetadataLoader
                     $entityMetadata->setInheritedType(true);
                 }
             } elseif (DataType::isNestedObject($field->getDataType())) {
-                $this->nestedObjectMetadataBuilder->addNestedObjectMetadata(
+                $this->nestedObjectMetadataFactory->createAndAddNestedObjectMetadata(
                     $entityMetadata,
                     $config,
                     $entityClass,
@@ -78,7 +78,7 @@ class ObjectMetadataLoader
                     $targetAction
                 );
             } else {
-                $this->objectMetadataBuilder->addFieldMetadata(
+                $this->objectMetadataFactory->createAndAddFieldMetadata(
                     $entityMetadata,
                     $entityClass,
                     $fieldName,

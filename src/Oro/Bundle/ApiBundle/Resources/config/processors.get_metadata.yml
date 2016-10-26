@@ -12,16 +12,16 @@ services:
         arguments:
             - '@oro_api.doctrine_helper'
             - '@oro_api.entity_metadata_factory'
-            - '@oro_api.load_metadata.builder.object'
-            - '@oro_api.load_metadata.builder.entity'
-            - '@oro_api.load_metadata.nested_object.builder.entity'
+            - '@oro_api.load_metadata.factory.object'
+            - '@oro_api.load_metadata.factory.entity'
+            - '@oro_api.load_metadata.nested_object.factory.entity'
 
     oro_api.load_metadata.loader.object:
         class: Oro\Bundle\ApiBundle\Processor\GetMetadata\Loader\ObjectMetadataLoader
         public: false
         arguments:
-            - '@oro_api.load_metadata.builder.object'
-            - '@oro_api.load_metadata.nested_object.builder.object'
+            - '@oro_api.load_metadata.factory.object'
+            - '@oro_api.load_metadata.nested_object.factory.object'
 
     oro_api.load_metadata.loader.association:
         class: Oro\Bundle\ApiBundle\Processor\GetMetadata\Loader\AssociationMetadataLoader
@@ -29,36 +29,36 @@ services:
         arguments:
             - '@oro_api.metadata_provider'
 
-    oro_api.load_metadata.nested_object.builder.entity:
-        class: Oro\Bundle\ApiBundle\Processor\GetMetadata\Loader\EntityNestedObjectMetadataBuilder
+    oro_api.load_metadata.nested_object.factory.entity:
+        class: Oro\Bundle\ApiBundle\Processor\GetMetadata\Loader\EntityNestedObjectMetadataFactory
         public: false
         arguments:
             - '@oro_api.load_metadata.nested_object.helper'
-            - '@oro_api.load_metadata.builder.entity'
+            - '@oro_api.load_metadata.factory.entity'
 
-    oro_api.load_metadata.nested_object.builder.object:
-        class: Oro\Bundle\ApiBundle\Processor\GetMetadata\Loader\ObjectNestedObjectMetadataBuilder
+    oro_api.load_metadata.nested_object.factory.object:
+        class: Oro\Bundle\ApiBundle\Processor\GetMetadata\Loader\ObjectNestedObjectMetadataFactory
         public: false
         arguments:
             - '@oro_api.load_metadata.nested_object.helper'
-            - '@oro_api.load_metadata.builder.object'
+            - '@oro_api.load_metadata.factory.object'
 
     oro_api.load_metadata.nested_object.helper:
         class: Oro\Bundle\ApiBundle\Processor\GetMetadata\Loader\NestedObjectMetadataHelper
         public: false
         arguments:
             - '@oro_api.load_metadata.helper'
-            - '@oro_api.load_metadata.builder.object'
+            - '@oro_api.load_metadata.factory.object'
 
-    oro_api.load_metadata.builder.entity:
-        class: Oro\Bundle\ApiBundle\Processor\GetMetadata\Loader\EntityMetadataBuilder
+    oro_api.load_metadata.factory.entity:
+        class: Oro\Bundle\ApiBundle\Processor\GetMetadata\Loader\EntityMetadataFactory
         public: false
         arguments:
             - '@oro_api.load_metadata.helper'
             - '@oro_api.entity_metadata_factory'
 
-    oro_api.load_metadata.builder.object:
-        class: Oro\Bundle\ApiBundle\Processor\GetMetadata\Loader\ObjectMetadataBuilder
+    oro_api.load_metadata.factory.object:
+        class: Oro\Bundle\ApiBundle\Processor\GetMetadata\Loader\ObjectMetadataFactory
         public: false
         arguments:
             - '@oro_api.load_metadata.helper'
