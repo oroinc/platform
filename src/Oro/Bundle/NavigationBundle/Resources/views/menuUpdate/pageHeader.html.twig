@@ -1,0 +1,34 @@
+<div class="customer-info well-small customer-simple">
+    <div class="customer-content">
+        <div class="top-row">
+            {% block breadcrumbs %}
+                <div class="pull-left">
+                    {% if breadcrumbs.indexLabel is defined %}
+                        <div class="sub-title">
+                            {%- if breadcrumbs.indexPath is defined -%}
+                                <a href="{{ oro_url_add_query(breadcrumbs.indexPath) }}">{{ breadcrumbs.indexLabel }}</a>
+                            {%- else -%}
+                                {{ breadcrumbs.indexLabel }}
+                            {%- endif -%}
+                        </div>
+                        <span class="separator">/</span>
+                    {% endif %}
+                    {% if breadcrumbs.additional is defined %}
+                        {% for breadcrumb in breadcrumbs.additional %}
+                            <div class="sub-title">
+                                {%- if breadcrumb.indexPath is defined -%}
+                                    <a href="{{ breadcrumb.indexPath }}">{{ breadcrumb.indexLabel }}</a>
+                                {%- else -%}
+                                    {{ breadcrumb.indexLabel }}
+                                {%- endif -%}
+                            </div>
+                            <span class="separator">/</span>
+                        {% endfor %}
+                    {% endif %}
+                    <h1 class="user-name">{{ breadcrumbs.entityTitle|raw }}</h1>
+                </div>
+                {% block breadcrumbMessage %}{% endblock breadcrumbMessage %}
+            {% endblock breadcrumbs %}
+        </div>
+    </div>
+</div>
