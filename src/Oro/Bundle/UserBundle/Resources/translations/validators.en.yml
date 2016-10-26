@@ -5,3 +5,4 @@ oro:
     user:
         message:
             invalid_username: The Email with same value id used by another customer. Please choose another Username.
+            password_already_used: You have recently used this password. Please, choose another.

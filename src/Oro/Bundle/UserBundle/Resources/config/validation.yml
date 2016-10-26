@@ -19,7 +19,8 @@ Oro\Bundle\UserBundle\Entity\User:
             - NotBlank:
                 groups:     [Registration]
             - Length:
-                min:        2
+                min:        20
+            - Oro\Bundle\UserBundle\Validator\Constraints\PasswordAlreadyUsed: ~
         enabled:
             - NotNull:      ~
         roles:

@@ -446,3 +446,12 @@ services:
         class: Oro\Bundle\UserBundle\EventListener\UserPasswordListener
         tags:
             - { name: doctrine.event_listener, event: onFlush }
+
+    oro_user.validator.password_already_used:
+        class: Oro\Bundle\UserBundle\Validator\PasswordAlreadyUsedValidator
+        arguments:
+            - '@doctrine'
+            - '@oro_config.manager'
+            - '@security.user_password_encoder.generic'
+        tags:
+            - { name: validator.constraint_validator, alias: oro_used_password }

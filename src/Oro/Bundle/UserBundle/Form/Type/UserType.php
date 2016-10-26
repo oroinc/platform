@@ -4,9 +4,6 @@ namespace Oro\Bundle\UserBundle\Form\Type;
 
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\Form\Form;
-use Symfony\Component\Form\FormEvent;
-use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
@@ -15,7 +12,6 @@ use Symfony\Component\HttpFoundation\Request;
 
 use Doctrine\ORM\EntityRepository;
 
-use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\SecurityBundle\SecurityFacade;
 use Oro\Bundle\UserBundle\Form\EventListener\UserSubscriber;
 use Oro\Bundle\UserBundle\Entity\User;
@@ -31,6 +27,9 @@ class UserType extends AbstractType
     /** @var bool */
     protected $isMyProfilePage;
 
+    /** @var int */
+    protected $userId;
+
     /**
      * @param SecurityContextInterface $security Security context
      * @param SecurityFacade           $securityFacade
@@ -45,6 +44,14 @@ class UserType extends AbstractType
         $this->securityFacade    = $securityFacade;
 
         $this->isMyProfilePage = $request->attributes->get('_route') === 'oro_user_profile_update';
+
+        if ($this->isMyProfilePage) {
+            $user = $securityFacade->getLoggedUser();
+        } else {
+            $user = $request->attributes->get('entity', null);
+        }
+
+        $this->userId = $user ? $user->getId() : null;
     }
 
     /**
@@ -130,7 +137,7 @@ class UserType extends AbstractType
                     'prototype_name' => 'tag__name__'
                 ]
             );
-        $builder->add('change_password', ChangePasswordType::NAME)
+        $builder->add('change_password', ChangePasswordType::NAME, ['userId' => $this->userId])
             ->add('avatar', 'oro_image', ['label' => 'oro.user.avatar.label', 'required' => false]);
 
         $this->addInviteUserField($builder);
