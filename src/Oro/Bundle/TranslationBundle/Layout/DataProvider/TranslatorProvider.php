@@ -7,7 +7,7 @@ use Symfony\Component\Translation\TranslatorInterface;
 /**
  * Provides layer for layouts to use translator as DataProvider
  */
-class TranslatorProvider implements TranslatorInterface
+class TranslatorProvider
 {
     /** @var TranslatorInterface */
     private $translator;
@@ -23,7 +23,7 @@ class TranslatorProvider implements TranslatorInterface
     /**
      * {@inheritdoc}
      */
-    public function trans($id, array $parameters = array(), $domain = null, $locale = null)
+    public function getTrans($id, array $parameters = array(), $domain = null, $locale = null)
     {
         return $this->translator->trans($id, $parameters, $domain, $locale);
     }
@@ -31,17 +31,9 @@ class TranslatorProvider implements TranslatorInterface
     /**
      * {@inheritdoc}
      */
-    public function transChoice($id, $number, array $parameters = array(), $domain = null, $locale = null)
+    public function getTransChoice($id, $number, array $parameters = array(), $domain = null, $locale = null)
     {
         return $this->translator->transChoice($id, $number, $parameters, $domain, $locale);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function setLocale($locale)
-    {
-        $this->translator->setLocale($locale);
     }
 
     /**
