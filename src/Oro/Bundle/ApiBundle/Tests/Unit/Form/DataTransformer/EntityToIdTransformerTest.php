@@ -118,7 +118,7 @@ class EntityToIdTransformerTest extends OrmRelatedTestCase
         $entity->setId($value['id']);
         $entity->setName('test');
 
-        $includedObjects->add($value['id'], $entity);
+        $includedObjects->add($entity, $value['id']);
 
         $this->assertEquals($entity, $transformer->reverseTransform($value));
     }

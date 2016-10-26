@@ -3,7 +3,7 @@
 namespace Oro\Bundle\ApiBundle\Collection;
 
 /**
- * The collection that allows associate objects with its string keys.
+ * The collection that allows associate objects with its scalar keys.
  */
 class KeyObjectCollection implements \Countable, \IteratorAggregate
 {
@@ -13,18 +13,22 @@ class KeyObjectCollection implements \Countable, \IteratorAggregate
     /** @var array [object hash => key, ...] */
     private $keys = [];
 
+    /** @var array [key => data, ...] */
+    private $data = [];
+
     /**
      * Adds an object to the collection.
      *
-     * @param string $key
-     * @param object $object
+     * @param object $object The object to add
+     * @param mixed  $key    The scalar key to be associated with the object
+     * @param mixed  $data   The data to be associated with the object
      *
      * @throws \InvalidArgumentException if arguments are not valid or the given object already exists
      */
-    public function add($key, $object)
+    public function add($object, $key, $data = null)
     {
-        $this->assertKey($key);
         $this->assertObject($object);
+        $this->assertKey($key);
 
         $hash = spl_object_hash($object);
         if (isset($this->objects[$key])) {
@@ -40,16 +44,17 @@ class KeyObjectCollection implements \Countable, \IteratorAggregate
 
         $this->objects[$key] = $object;
         $this->keys[$hash] = $key;
+        $this->data[$key] = $data;
     }
 
     /**
      * Removes an object by its key from the collection.
      *
-     * @param string $key
+     * @param mixed $key
      *
      * @throws \InvalidArgumentException if the given key is not valid
      */
-    public function remove($key)
+    public function removeKey($key)
     {
         $this->assertKey($key);
 
@@ -57,6 +62,7 @@ class KeyObjectCollection implements \Countable, \IteratorAggregate
             $hash = spl_object_hash($this->objects[$key]);
             unset($this->objects[$key]);
             unset($this->keys[$hash]);
+            unset($this->data[$key]);
         }
     }
 
@@ -67,14 +73,16 @@ class KeyObjectCollection implements \Countable, \IteratorAggregate
      *
      * @throws \InvalidArgumentException if the given object is not valid
      */
-    public function removeObject($object)
+    public function remove($object)
     {
         $this->assertObject($object);
 
         $hash = spl_object_hash($object);
         if (isset($this->keys[$hash])) {
-            unset($this->objects[$this->keys[$hash]]);
+            $key = $this->keys[$hash];
+            unset($this->objects[$key]);
             unset($this->keys[$hash]);
+            unset($this->data[$key]);
         }
     }
 
@@ -85,6 +93,7 @@ class KeyObjectCollection implements \Countable, \IteratorAggregate
     {
         $this->objects = [];
         $this->keys = [];
+        $this->data = [];
     }
 
     /**
@@ -126,7 +135,7 @@ class KeyObjectCollection implements \Countable, \IteratorAggregate
     /**
      * Checks whether the collection contains an object with the given key.
      *
-     * @param string $key
+     * @param mixed $key
      *
      * @return bool
      *
@@ -142,7 +151,7 @@ class KeyObjectCollection implements \Countable, \IteratorAggregate
     /**
      * Gets an object by its key.
      *
-     * @param string $key
+     * @param mixed $key
      *
      * @return object|null
      *
@@ -173,7 +182,25 @@ class KeyObjectCollection implements \Countable, \IteratorAggregate
         $hash = spl_object_hash($object);
 
         return isset($this->keys[$hash])
-            ? $this->objects[$this->keys[$hash]]
+            ? $this->keys[$hash]
+            : null;
+    }
+
+    /**
+     * Gets data are associated with an object with the given key.
+     *
+     * @param mixed $key
+     *
+     * @return mixed
+     *
+     * @throws \InvalidArgumentException if the given key is not valid
+     */
+    public function getData($key)
+    {
+        $this->assertKey($key);
+
+        return isset($this->data[$key])
+            ? $this->data[$key]
             : null;
     }
 
@@ -198,17 +225,17 @@ class KeyObjectCollection implements \Countable, \IteratorAggregate
     }
 
     /**
-     * @param string $key
+     * @param mixed $key
      */
     private function assertKey($key)
     {
-        if (!is_string($key)) {
+        if (!is_scalar($key)) {
             throw new \InvalidArgumentException(
-                sprintf('Expected $key argument of type "object", "%s" given', $this->getValueType($key))
+                sprintf('Expected $key argument of type "scalar", "%s" given.', $this->getValueType($key))
             );
         }
-        if ('' === trim($key)) {
-            throw new \InvalidArgumentException('The $key argument should be not blank');
+        if (is_string($key) && '' === trim($key)) {
+            throw new \InvalidArgumentException('The $key argument should not be a blank string.');
         }
     }
 
@@ -219,7 +246,7 @@ class KeyObjectCollection implements \Countable, \IteratorAggregate
     {
         if (!is_object($object)) {
             throw new \InvalidArgumentException(
-                sprintf('Expected $object argument of type "object", "%s" given', $this->getValueType($object))
+                sprintf('Expected $object argument of type "object", "%s" given.', $this->getValueType($object))
             );
         }
     }

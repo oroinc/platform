@@ -227,7 +227,7 @@ class EntityTypeTest extends OrmRelatedTestCase
         $associationMetadata->setAcceptableTargetClassNames([Group::class]);
 
         $includedObjects = new KeyObjectCollection();
-        $includedObjects->add($value['id'], $entity);
+        $includedObjects->add($entity, $value['id']);
 
         $form = $this->factory->create(
             new EntityType($this->doctrine),
@@ -250,7 +250,7 @@ class EntityTypeTest extends OrmRelatedTestCase
         $associationMetadata->setAcceptableTargetClassNames([Group::class]);
 
         $includedObjects = new KeyObjectCollection();
-        $includedObjects->add($value['id'], $entity);
+        $includedObjects->add($entity, $value['id']);
 
         $form = $this->factory->create(
             new EntityType($this->doctrine),

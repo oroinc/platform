@@ -79,7 +79,7 @@ trait FormContextTrait
      *
      * @param KeyObjectCollection|null $includedObjects
      */
-    public function setIncludedObjects($includedObjects)
+    public function setIncludedObjects(KeyObjectCollection $includedObjects = null)
     {
         $this->includedObjects = $includedObjects;
     }
