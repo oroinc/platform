@@ -9,17 +9,17 @@ interface ContextAccessorInterface
     /**
      * Sets the value to the context.
      *
-     * @param mixed                 $context
-     * @param PropertyPathInterface $property
-     * @param mixed                 $value
+     * @param mixed $context
+     * @param string|PropertyPathInterface $property
+     * @param mixed $value
      */
     public function setValue($context, $property, $value);
 
     /**
      * Gets the value from the context.
      *
-     * @param mixed                 $context
-     * @param PropertyPathInterface $property
+     * @param mixed $context
+     * @param string|PropertyPathInterface $property
      *
      * @return mixed
      */
@@ -28,8 +28,8 @@ interface ContextAccessorInterface
     /**
      * Checks whether the context has the value.
      *
-     * @param mixed                 $context
-     * @param PropertyPathInterface $property
+     * @param mixed $context
+     * @param string|PropertyPathInterface $property
      *
      * @return bool
      */

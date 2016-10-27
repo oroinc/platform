@@ -32,7 +32,7 @@ class ContextAccessor implements ContextAccessorInterface
     /**
      * {@inheritdoc}
      *
-     * @param mixed $context
+     * @param object|array $context
      * @param mixed $value
      * @return mixed
      */
@@ -52,7 +52,7 @@ class ContextAccessor implements ContextAccessorInterface
     /**
      * {@inheritdoc}
      *
-     * @param mixed $context
+     * @param object|array $context
      * @param mixed $value
      * @return bool
      */
