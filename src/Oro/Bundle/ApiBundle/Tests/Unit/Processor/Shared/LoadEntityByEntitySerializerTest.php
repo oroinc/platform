@@ -72,15 +72,24 @@ class LoadEntityByEntitySerializerTest extends GetProcessorOrmRelatedTestCase
 
         $query = $this->doctrineHelper->getEntityRepositoryForClass($entityClass)->createQueryBuilder('e');
 
+        $entityDefinitionConfig = new EntityDefinitionConfig();
         $config = new Config();
-        $config->setDefinition(new EntityDefinitionConfig());
+        $config->setDefinition($entityDefinitionConfig);
         $this->configProvider->expects($this->once())
             ->method('getConfig')
             ->willReturn($config);
 
         $this->serializer->expects($this->once())
             ->method('serialize')
-            ->with($query)
+            ->with(
+                self::identicalTo($query),
+                self::identicalTo($entityDefinitionConfig),
+                [
+                    'action'      => $this->context->getAction(),
+                    'version'     => $this->context->getVersion(),
+                    'requestType' => $this->context->getRequestType()
+                ]
+            )
             ->willReturn($dataFromSerializer);
 
         if ($isThrowable) {

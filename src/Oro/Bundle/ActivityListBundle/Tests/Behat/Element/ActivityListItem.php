@@ -64,7 +64,7 @@ class ActivityListItem extends Element
         $this->getDriver()->waitForAjax();
 
         /** @var Form $form */
-        $form = $this->elementFactory->createElement('Comment');
+        $form = $this->elementFactory->createElement('Comment Form');
         $form->fill($table);
         $this->getPage()->find('css', '.ui-dialog-buttonpane .btn-primary')->press();
     }
@@ -83,7 +83,7 @@ class ActivityListItem extends Element
         $commentItem->clickActionLink('Update Comment');
 
         /** @var Form $form */
-        $form = $this->elementFactory->createElement('Comment');
+        $form = $this->elementFactory->createElement('Comment Form');
         $form->fill($table);
         $this->getPage()->find('css', '.ui-dialog-buttonpane .btn-primary')->press();
     }

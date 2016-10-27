@@ -9,16 +9,25 @@ operations:
         datagrids:
             - workflow-definitions-grid
         acl_resource: [CREATE, entity:Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition]
+        replace: [preactions]
         preactions:
+            - '@call_service_method':
+                service: oro_action.helper.default_operation_request
+                method: getRequestRoute
+                attribute: $.requestRoute
             - '@tree':
                 conditions:
                     '@and':
-                        - '@eq': [$.requestRoute, 'oro_action_widget_form']
+                        - '@not_blank': $.data
+                        - '@eq': [$.requestRoute, 'oro_action_widget_form'] # display a form template
                 actions:
                     - '@call_service_method':
-                        service: oro_workflow.helper.translation
-                        method: extractTranslations
-                        method_parameters: [$.clone, $.data.name]
+                        service: oro_workflow.translation.processor
+                        method: translateWorkflowDefinitionFields
+                        method_parameters: [$.data]
+                    - '@clone_object':
+                        target: $.data
+                        attribute: $.clone
                     - '@call_service_method':
                         service: oro_entity.entity_provider
                         method: getEntities

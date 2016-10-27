@@ -240,17 +240,12 @@ services:
         class: 'Oro\Bundle\TranslationBundle\Helper\TranslationHelper'
         arguments:
             - '@doctrine'
-            - '@oro_translation.manager.translation'
 
     oro_translation.filter.language:
         class: 'Oro\Bundle\TranslationBundle\Filter\LanguageFilter'
         parent: oro_filter.entity_filter
         tags:
             - { name: oro_filter.extension.orm_filter.filter, type: language, datasource: orm }
-
-    oro_translation.generator.translation_key:
-        class: 'Oro\Bundle\TranslationBundle\Translation\TranslationKeyGenerator'
-        public: false
 
     oro_translation.helper.translation_route:
         class: 'Oro\Bundle\TranslationBundle\Helper\TranslationsDatagridRouteHelper'

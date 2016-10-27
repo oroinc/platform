@@ -4,7 +4,6 @@ namespace Oro\Bundle\TranslationBundle\Entity\Repository;
 
 use Doctrine\DBAL\Types\Type;
 use Doctrine\ORM\EntityRepository;
-use Doctrine\ORM\QueryBuilder;
 
 use Oro\Bundle\TranslationBundle\Entity\Language;
 use Oro\Bundle\TranslationBundle\Entity\Translation;
@@ -12,22 +11,31 @@ use Oro\Bundle\TranslationBundle\Entity\Translation;
 class TranslationRepository extends EntityRepository
 {
     /**
-     * @param string $key
+     * @param string $keysPrefix
      * @param string $locale
      * @param string $domain
-     *
-     * @return QueryBuilder
+     * @return array
      */
-    public function getFindValueQueryBuilder($key, $locale, $domain)
+    public function findValues($keysPrefix, $locale, $domain)
     {
-        return $this->createQueryBuilder('t')
+        $queryBuilder = $this->createQueryBuilder('t');
+        $result = $queryBuilder->select('tk.key, t.value')
             ->join('t.language', 'l')
-            ->join('t.translationKey', 'k')
-            ->where('l.code = :code AND k.key = :key AND k.domain = :domain')
-            ->setParameter('code', $locale, Type::STRING)
-            ->setParameter('key', $key, Type::STRING)
-            ->setParameter('domain', $domain, Type::STRING);
+            ->join('t.translationKey', 'tk')
+            ->where(
+                $queryBuilder->expr()->andX(
+                    $queryBuilder->expr()->eq('tk.domain', ':domain'),
+                    $queryBuilder->expr()->eq('l.code', ':locale'),
+                    $queryBuilder->expr()->like('tk.key', ':keysPrefix')
+                )
+            )
+            ->setParameters(['locale' => $locale, 'domain' => $domain, 'keysPrefix' => $keysPrefix . '%'])
+            ->getQuery()
+            ->getArrayResult();
+
+        return array_column($result, 'value', 'key');
     }
+
     /**
      * @param string $key
      * @param string $locale
@@ -36,7 +44,22 @@ class TranslationRepository extends EntityRepository
      */
     public function findValue($key, $locale, $domain)
     {
-        return $this->getFindValueQueryBuilder($key, $locale, $domain)->getQuery()->getOneOrNullResult();
+        $queryBuilder = $this->createQueryBuilder('t');
+
+        return $queryBuilder->join('t.language', 'l')
+            ->join('t.translationKey', 'k')
+            ->where(
+                $queryBuilder->expr()->andX(
+                    $queryBuilder->expr()->eq('l.code', ':code'),
+                    $queryBuilder->expr()->eq('k.key', ':key'),
+                    $queryBuilder->expr()->eq('k.domain', ':domain')
+                )
+            )
+            ->setParameter('code', $locale, Type::STRING)
+            ->setParameter('key', $key, Type::STRING)
+            ->setParameter('domain', $domain, Type::STRING)
+            ->getQuery()
+            ->getOneOrNullResult();
     }
 
     /**
@@ -75,13 +98,18 @@ class TranslationRepository extends EntityRepository
      */
     public function findAllByLanguageAndDomain($languageCode, $domain)
     {
-        $qb = $this->createQueryBuilder('t')
-            ->distinct(true)
+        $qb = $this->createQueryBuilder('t');
+        $qb->distinct(true)
             ->select('t.id, t.value, k.key, k.domain, l.code')
             ->join('t.language', 'l')
             ->join('t.translationKey', 'k')
-            ->where('l.code = :code AND t.scope > :scope')
-            ->andWhere('k.domain = :domain')
+            ->where(
+                $qb->expr()->andX(
+                    $qb->expr()->eq('l.code', ':code'),
+                    $qb->expr()->gt('t.scope', ':scope'),
+                    $qb->expr()->eq('k.domain', ':domain')
+                )
+            )
             ->setParameter('code', $languageCode)
             ->setParameter('domain', $domain, Type::STRING)
             ->setParameter('scope', Translation::SCOPE_SYSTEM);

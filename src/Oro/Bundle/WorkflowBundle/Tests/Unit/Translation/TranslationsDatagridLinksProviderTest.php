@@ -60,7 +60,7 @@ class TranslationsDatagridLinksProviderTest extends \PHPUnit_Framework_TestCase
     public function testGetWorkflowTranslateLinks(array $config, $languagesAvailable, array $expected)
     {
         $definition = new WorkflowDefinition();
-        $definition->setLabel(self::WORKFLOW_LABEL)->setConfiguration($config);
+        $definition->setName('test_workflow')->setLabel(self::WORKFLOW_LABEL)->setConfiguration($config);
 
         $this->languageProvider->expects($this->once())->method('getAvailableLanguages')->willReturn(
             $languagesAvailable ? ['en'] : []
@@ -83,7 +83,9 @@ class TranslationsDatagridLinksProviderTest extends \PHPUnit_Framework_TestCase
     {
         return [
             'empty' => [
-                'config' => [],
+                'config' => [
+                    WorkflowConfiguration::NODE_STEPS => ['test_node' => []],
+                ],
                 'languagesAvailable' => true,
                 'expected' => [
                     'label' => 'link_to_' . self::WORKFLOW_LABEL,

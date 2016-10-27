@@ -87,6 +87,9 @@ services:
             - '@oro_workflow.entity_connector'
         calls:
             - [addApplicabilityFilter, ['@oro_workflow.applicability_filter.exclusive_record_group']]
+            - [setLogger, ['@logger']]
+        tags:
+            - { name: monolog.logger, channel: oro_workflow }
 
     oro_workflow.applicability_filter.exclusive_record_group:
         class: 'Oro\Bundle\WorkflowBundle\Model\WorkflowExclusiveRecordGroupFilter'
@@ -126,6 +129,8 @@ services:
         arguments:
             - '@oro_entity.doctrine_helper'
             - "@?logger"
+        tags:
+            - { name: monolog.logger, channel: oro_workflow }
 
     oro_workflow.registry:
         class: '%oro_workflow.registry.class%'
@@ -167,6 +172,8 @@ services:
             - '@oro_workflow.manager'
             - '@oro_workflow.handler.transition_helper'
             - '@logger'
+        tags:
+            - { name: monolog.logger, channel: oro_workflow }
 
     oro_workflow.handler.start_transition_handler:
         class: '%oro_workflow.handler.start_transition_handler.class%'
@@ -196,10 +203,8 @@ services:
     oro_workflow.handler.workflow_definition:
         class: 'Oro\Bundle\WorkflowBundle\Handler\WorkflowDefinitionHandler'
         arguments:
-            - '@oro_workflow.workflow_assembler'
             - '@oro_workflow.changes.event.dispatcher'
             - '@doctrine'
-            - '%oro_workflow.workflow_definition.entity.class%'
 
     oro_workflow.process.cron_scheduler:
         class: 'Oro\Bundle\WorkflowBundle\Cron\ProcessTriggerCronScheduler'
@@ -314,15 +319,6 @@ services:
             - [addVerifier, ['@oro_workflow.transition_trigger.verifier.event_trigger_relation']]
             - [addVerifier, ['@oro_workflow.transition_trigger.verifier.event_trigger_expression']]
 
-    oro_workflow.generator.translation_key:
-        class: 'Oro\Bundle\TranslationBundle\Translation\TranslationKeyGenerator'
-        public: false
-
-    oro_workflow.translation.fields_iterator:
-        class: 'Oro\Bundle\WorkflowBundle\Translation\WorkflowTranslationFieldsIterator'
-        arguments:
-            - '@oro_workflow.generator.translation_key'
-
     oro_workflow.helper.translation:
         class: 'Oro\Bundle\WorkflowBundle\Helper\WorkflowTranslationHelper'
         arguments:
@@ -333,12 +329,16 @@ services:
     oro_workflow.translation.processor:
         class: 'Oro\Bundle\WorkflowBundle\Translation\TranslationProcessor'
         arguments:
-            - '@oro_workflow.translation.fields_iterator'
             - '@oro_workflow.helper.translation'
-        public: false
         tags:
             - { name: oro.workflow.configuration.handler, priority: 150 }
             - { name: oro.workflow.definition_builder.extension }
+
+    oro_workflow.translation.keys_subscriber:
+        class: Oro\Bundle\WorkflowBundle\EventListener\WorkflowTranslationKeysSubscriber
+        arguments:
+            - '@oro_translation.manager.translation'
+        tags:
             - { name: oro_workflow.changes.subscriber }
 
     oro_workflow.translation.translations_datagrid_links_provider:
@@ -365,7 +365,6 @@ services:
         arguments:
             - '@form.factory'
             - '@oro_filter.filter_utility'
-            - '@oro_translation.generator.translation_key'
             - '@oro_workflow.helper.translation'
         tags:
             - { name: oro_filter.extension.orm_filter.filter, type: workflow, datasource: orm }
@@ -378,3 +377,4 @@ services:
             - '@logger'
         tags:
             - { name: 'oro_message_queue.client.message_processor' }
+            - { name: monolog.logger, channel: oro_workflow }

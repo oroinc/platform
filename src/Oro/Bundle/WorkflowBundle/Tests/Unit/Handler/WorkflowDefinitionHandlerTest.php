@@ -12,7 +12,7 @@ use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Event\WorkflowChangesEvent;
 use Oro\Bundle\WorkflowBundle\Event\WorkflowEvents;
 use Oro\Bundle\WorkflowBundle\Handler\WorkflowDefinitionHandler;
-use Oro\Bundle\WorkflowBundle\Model\WorkflowAssembler;
+use Oro\Bundle\WorkflowBundle\Model\StepManager;
 
 class WorkflowDefinitionHandlerTest extends \PHPUnit_Framework_TestCase
 {
@@ -22,27 +22,29 @@ class WorkflowDefinitionHandlerTest extends \PHPUnit_Framework_TestCase
     /** @var \PHPUnit_Framework_MockObject_MockObject|EntityManager */
     protected $entityManager;
 
-    /** @var WorkflowDefinitionHandler */
-    protected $handler;
-
     /** @var \PHPUnit_Framework_MockObject_MockObject|EventDispatcherInterface */
     protected $eventDispatcher;
+
+    /** @var StepManager|\PHPUnit_Framework_MockObject_MockObject */
+    protected $stepManager;
+
+    /** @var WorkflowDefinitionHandler */
+    protected $handler;
 
     /**
      * {@inheritdoc}
      */
     protected function setUp()
     {
-        /** @var WorkflowAssembler $assembler */
-        $assembler = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Model\WorkflowAssembler')
+        $this->stepManager = $this->getMockBuilder(StepManager::class)
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->entityManager = $this->getMockBuilder('Doctrine\ORM\EntityManager')
+        $this->entityManager = $this->getMockBuilder(EntityManager::class)
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->entityRepository = $this->getMockBuilder('Doctrine\ORM\EntityRepository')
+        $this->entityRepository = $this->getMockBuilder(EntityRepository::class)
             ->disableOriginalConstructor()
             ->getMock();
 
@@ -51,21 +53,16 @@ class WorkflowDefinitionHandlerTest extends \PHPUnit_Framework_TestCase
             ->willReturn($this->entityRepository);
 
         /** @var \PHPUnit_Framework_MockObject_MockObject|ManagerRegistry $managerRegistry */
-        $managerRegistry = $this->getMock('Doctrine\Common\Persistence\ManagerRegistry');
+        $managerRegistry = $this->getMock(ManagerRegistry::class);
 
         /** @var \PHPUnit_Framework_MockObject_MockObject|EventDispatcherInterface */
-        $this->eventDispatcher = $this->getMock('Symfony\Component\EventDispatcher\EventDispatcherInterface');
+        $this->eventDispatcher = $this->getMock(EventDispatcherInterface::class);
 
         $managerRegistry->expects($this->any())
             ->method('getManagerForClass')
             ->willReturn($this->entityManager);
 
-        $this->handler = new WorkflowDefinitionHandler(
-            $assembler,
-            $this->eventDispatcher,
-            $managerRegistry,
-            'OroWorkflowBundle:WorkflowDefinition'
-        );
+        $this->handler = new WorkflowDefinitionHandler($this->eventDispatcher, $managerRegistry);
     }
 
     public function testCreateWorkflowDefinition()
@@ -73,6 +70,7 @@ class WorkflowDefinitionHandlerTest extends \PHPUnit_Framework_TestCase
         $newDefinition = new WorkflowDefinition();
 
         $this->entityManager->expects($this->once())->method('persist')->with($newDefinition);
+        $this->entityManager->expects($this->once())->method('flush');
 
         $changes = new WorkflowChangesEvent($newDefinition);
 
@@ -90,6 +88,8 @@ class WorkflowDefinitionHandlerTest extends \PHPUnit_Framework_TestCase
         $existingDefinition = (new WorkflowDefinition())->setName('existing');
         $newDefinition = (new WorkflowDefinition())->setName('updated');
 
+        $this->entityManager->expects($this->once())->method('persist');
+        $this->entityManager->expects($this->once())->method('flush');
 
         $changes = new WorkflowChangesEvent($existingDefinition, (new WorkflowDefinition())->setName('existing'));
 
@@ -100,10 +100,6 @@ class WorkflowDefinitionHandlerTest extends \PHPUnit_Framework_TestCase
         $this->eventDispatcher->expects($this->at(1))->method('dispatch')->with($afterEvent, $changes);
 
         $this->handler->updateWorkflowDefinition($existingDefinition, $newDefinition);
-
-        if ($newDefinition) {
-            $this->assertEquals($existingDefinition, $newDefinition);
-        }
     }
 
     /**

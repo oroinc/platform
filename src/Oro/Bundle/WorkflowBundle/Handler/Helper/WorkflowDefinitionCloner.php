@@ -14,14 +14,26 @@ class WorkflowDefinitionCloner
 {
     /**
      * @param WorkflowDefinition $definition
+     * @param WorkflowDefinition $source
+     */
+    public static function mergeDefinition(WorkflowDefinition $definition, WorkflowDefinition $source)
+    {
+        self::copyMainFields($definition, $source)
+            ->setSteps($source->getSteps())
+            ->setStartStep($source->getStartStep())
+            ->setEntityAcls($source->getEntityAcls())
+            ->setRestrictions($source->getRestrictions());
+    }
+
+    /**
+     * @param WorkflowDefinition $definition
      * @return WorkflowDefinition
      */
     public static function cloneDefinition(WorkflowDefinition $definition)
     {
         $steps = self::copySteps($definition->getSteps());
 
-        $newDefinition = new WorkflowDefinition();
-        $newDefinition->import($definition)->setSteps($steps);
+        $newDefinition = self::copyMainFields(new WorkflowDefinition(), $definition)->setSteps($steps);
 
         $startStep = $definition->getStartStep();
         $startStep = $steps->get($startStep ? $startStep->getName() : null);
@@ -30,6 +42,28 @@ class WorkflowDefinitionCloner
         $restrictions = self::copyRestrictions($definition);
 
         return $newDefinition->setStartStep($startStep)->setEntityAcls($entityAcls)->setRestrictions($restrictions);
+    }
+
+    /**
+     * @param WorkflowDefinition $definition
+     * @param WorkflowDefinition $source
+     * @return WorkflowDefinition
+     */
+    private static function copyMainFields(WorkflowDefinition $definition, WorkflowDefinition $source)
+    {
+        $definition
+            ->setName($source->getName())
+            ->setLabel($source->getLabel())
+            ->setRelatedEntity($source->getRelatedEntity())
+            ->setEntityAttributeName($source->getEntityAttributeName())
+            ->setConfiguration($source->getConfiguration())
+            ->setStepsDisplayOrdered($source->isStepsDisplayOrdered())
+            ->setSystem($source->isSystem())
+            ->setPriority($source->getPriority())
+            ->setExclusiveActiveGroups($source->getExclusiveActiveGroups())
+            ->setExclusiveRecordGroups($source->getExclusiveRecordGroups());
+
+        return $definition;
     }
 
     /**
