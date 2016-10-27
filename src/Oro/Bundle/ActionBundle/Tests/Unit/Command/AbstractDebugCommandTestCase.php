@@ -3,7 +3,6 @@
 namespace Oro\Bundle\ActionBundle\Tests\Unit\Command;
 
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
-use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
@@ -26,17 +25,22 @@ abstract class AbstractDebugCommandTestCase extends \PHPUnit_Framework_TestCase
     /** @var ContainerAwareCommand */
     protected $command;
 
-    /**
-     * @var OutputStub
-     */
+    /** @var OutputStub */
     protected $output;
 
     protected function setUp()
     {
-        $this->factory = $this->getMockBuilder(FactoryWithTypesInterface::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->factory = $this->getMock(FactoryWithTypesInterface::class);
+
         $this->container = $this->getMock(ContainerInterface::class);
+        $this->container->expects($this->any())
+            ->method('get')
+            ->willReturnCallback(
+                function ($serviceId) {
+                    return $serviceId === $this->getFactoryServiceId() ? $this->factory : new TestEntity1();
+                }
+            );
+
         $this->input = $this->getMock(InputInterface::class);
         $this->output = new OutputStub();
         $this->command = $this->getCommandInstance();
@@ -52,13 +56,8 @@ abstract class AbstractDebugCommandTestCase extends \PHPUnit_Framework_TestCase
      */
     public function testExecute(array $types, array $expected, $argument = null)
     {
-        $testService = new TestEntity1();
         $this->factory->expects($this->once())->method('getTypes')->willReturn($types);
-        $this->container->expects($this->any())
-            ->method('get')
-            ->willReturnCallback(function ($serviceId) use ($testService) {
-                return $serviceId === $this->getFactoryServiceId() ? $this->factory : $testService;
-            });
+
         $this->input->expects($this->once())->method('getArgument')->willReturn($argument);
 
         $this->command->run($this->input, $this->output);
