@@ -1,7 +1,0 @@
-config:
-    shim:
-        'jquery.form':
-            deps:
-                - 'jquery'
-    paths:
-        'jquery.form': 'bundles/oronavigation/lib/jquery.form.js'

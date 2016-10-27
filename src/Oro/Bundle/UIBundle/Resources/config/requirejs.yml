@@ -31,6 +31,9 @@ config:
         'jquery.multiselect.filter':
             deps:
                 - 'jquery.multiselect'
+        'jquery.form':
+            deps:
+                - 'jquery'
         'lightgallery':
             deps:
                 - 'jquery'
@@ -104,6 +107,7 @@ config:
         'jquery.cookie': 'bundles/bowerassets/jquery-cookie/jquery.cookie.js'
         'jquery.mCustomScrollbar': 'bundles/bowerassets/malihu-custom-scrollbar-plugin/jquery.mCustomScrollbar.js'
         'jquery.jstree': 'bundles/components/jstree/dist/jstree.js'
+        'jquery.form': 'bundles/bowerassets/jquery-form/jquery.form.js'
         'bootstrap-affix': 'bowerassets/bootstrap/docs/assets/js/bootstrap-affix.js'
         'bootstrap-alert': 'bowerassets/bootstrap/docs/assets/js/bootstrap-alert.js'
         'bootstrap-button': 'bowerassets/bootstrap/docs/assets/js/bootstrap-button.js'
