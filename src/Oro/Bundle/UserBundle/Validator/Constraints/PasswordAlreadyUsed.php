@@ -12,19 +12,6 @@ class PasswordAlreadyUsed extends Constraint
     /** @var int */
     public $userId;
 
-    public function __construct($options = null)
-    {
-        parent::__construct($options);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getTargets()
-    {
-        return self::PROPERTY_CONSTRAINT;
-    }
-
     /**
      * {@inheritdoc}
      */

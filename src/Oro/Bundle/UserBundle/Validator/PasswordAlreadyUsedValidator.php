@@ -53,12 +53,12 @@ class PasswordAlreadyUsedValidator extends ConstraintValidator
             ->getRepository('OroUserBundle:PasswordHash')
             ->findBy(['user' => $constraint->userId], null, $passwordHistoryLimit);
 
-        $encoder = null;
-        foreach ($oldPasswords as $passwordHash) {
-            if (!$encoder) {
-                $encoder = $this->encoderFactory->getEncoder($passwordHash->getUser());
-            }
+        $user = $this->registry
+            ->getManagerForClass('OroUserBundle:User')
+            ->find('OroUserBundle:User', $constraint->userId);
+        $encoder = $this->encoderFactory->getEncoder($user);
 
+        foreach ($oldPasswords as $passwordHash) {
             if ($encoder->isPasswordValid($passwordHash->getHash(), $value, $passwordHash->getSalt())) {
                 $this->context->addViolation($constraint->message);
 
