@@ -5,6 +5,8 @@ namespace Oro\Bundle\WorkflowBundle\Migrations\Data\ORM;
 use Doctrine\Common\DataFixtures\AbstractFixture;
 use Doctrine\Common\Persistence\ObjectManager;
 
+use Oro\Bundle\WorkflowBundle\Configuration\WorkflowConfigurationProvider;
+use Oro\Bundle\WorkflowBundle\Configuration\WorkflowDefinitionConfigurationBuilder;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerAwareTrait;
 
@@ -29,7 +31,25 @@ class UpdateDefinitionTranslations extends AbstractFixture implements ContainerA
         $processor = $this->container->get('oro_workflow.translation.processor');
 
         /* @var $definitions WorkflowDefinition[] */
-        $definitions = $manager->getRepository(WorkflowDefinition::class)->findBy(['system' => false]);
+        $definitions = $manager->getRepository(WorkflowDefinition::class)->findAll();
+
+        foreach ($definitions as $key => $definition) {
+            $definitions[$definition->getName()] = $definition;
+            unset($definitions[$key]);
+        }
+
+        /** @var WorkflowConfigurationProvider $configurationProvider */
+        $configurationProvider = $this->container->get('oro_workflow.configuration.provider.workflow_config');
+        $workflowConfiguration = $configurationProvider->getWorkflowDefinitionConfiguration();
+
+        if (count($workflowConfiguration)) {
+            $definitions = array_filter(
+                $definitions,
+                function (WorkflowDefinition $item) use ($workflowConfiguration) {
+                    return !isset($workflowConfiguration[$item->getName()]);
+                }
+            );
+        }
 
         foreach ($definitions as $definition) {
             $this->processConfiguration($processor, $definition);
