@@ -20,6 +20,7 @@ services:
             - '@oro_action.context_accessor'
             - '@event_dispatcher'
             - '@oro_security.helper.property_path_helper'
+            - '@translator'
         tags:
             - { name: form.type, alias: oro_workflow_attributes }
 
