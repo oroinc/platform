@@ -11,9 +11,13 @@ use Oro\Bundle\EmailBundle\Entity\EmailBody;
 use Oro\Bundle\EmailBundle\Entity\EmailUser;
 use Oro\Bundle\EmailBundle\Manager\AutoResponseManager;
 use Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink;
+use Oro\Bundle\FeatureToggleBundle\Checker\FeatureCheckerHolderTrait;
+use Oro\Bundle\FeatureToggleBundle\Checker\FeatureToggleableInterface;
 
-class AutoResponseListener extends MailboxEmailListener
+class AutoResponseListener extends MailboxEmailListener implements FeatureToggleableInterface
 {
+    use FeatureCheckerHolderTrait;
+
     /** @var ServiceLink */
     private $autoResponseManagerLink;
 
@@ -33,6 +37,10 @@ class AutoResponseListener extends MailboxEmailListener
      */
     public function postFlush(PostFlushEventArgs $args)
     {
+        if (!$this->isFeaturesEnabled()) {
+            return;
+        }
+
         $emailIds = $this->popEmailIds();
         if (!$emailIds) {
             return;

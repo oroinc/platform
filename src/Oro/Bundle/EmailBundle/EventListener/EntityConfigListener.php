@@ -5,9 +5,13 @@ namespace Oro\Bundle\EmailBundle\EventListener;
 use Doctrine\Common\Cache\Cache;
 
 use Oro\Bundle\EntityConfigBundle\Event\PreFlushConfigEvent;
+use Oro\Bundle\FeatureToggleBundle\Checker\FeatureCheckerHolderTrait;
+use Oro\Bundle\FeatureToggleBundle\Checker\FeatureToggleableInterface;
 
-class EntityConfigListener
+class EntityConfigListener implements FeatureToggleableInterface
 {
+    use FeatureCheckerHolderTrait;
+
     /** @var Cache */
     protected $cache;
 
@@ -29,6 +33,10 @@ class EntityConfigListener
      */
     public function preFlush(PreFlushConfigEvent $event)
     {
+        if (!$this->isFeaturesEnabled()) {
+            return;
+        }
+
         $config = $event->getConfig('email');
         if (null === $config || $event->isEntityConfig()) {
             return;

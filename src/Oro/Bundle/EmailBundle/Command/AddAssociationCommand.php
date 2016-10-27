@@ -46,6 +46,13 @@ class AddAssociationCommand extends ContainerAwareCommand
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
+        $featureChecker = $this->getContainer()->get('oro_featuretoggle.checker.feature_checker');
+        if (!$featureChecker->isFeatureEnabled('email')) {
+            $output->writeln('The email feature is disabled. The command will not run.');
+
+            return 0;
+        }
+
         $countNewAssociations = $this->getCommandAssociationManager()->processAddAssociation(
             $input->getOption('id'),
             $input->getOption('targetClass'),

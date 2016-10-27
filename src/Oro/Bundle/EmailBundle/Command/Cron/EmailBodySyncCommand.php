@@ -2,15 +2,15 @@
 
 namespace Oro\Bundle\EmailBundle\Command\Cron;
 
-use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
-use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Input\InputOption;
-use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Filesystem\LockHandler;
-
 use Oro\Bundle\CronBundle\Command\CronCommandInterface;
 use Oro\Bundle\EmailBundle\Sync\EmailBodySynchronizer;
 use Oro\Component\Log\OutputLogger;
+use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
+use Symfony\Component\Console\Input\InputInterface;
+
+use Symfony\Component\Console\Input\InputOption;
+use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Filesystem\LockHandler;
 
 class EmailBodySyncCommand extends ContainerAwareCommand implements CronCommandInterface
 {
@@ -61,6 +61,13 @@ class EmailBodySyncCommand extends ContainerAwareCommand implements CronCommandI
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
+        $featureChecker = $this->getContainer()->get('oro_featuretoggle.checker.feature_checker');
+        if (!$featureChecker->isFeatureEnabled('email')) {
+            $output->writeln('The email feature is disabled. The command will not run.');
+
+            return 0;
+        }
+
         $lock = new LockHandler('oro:cron:email-body-sync');
         if (!$lock->lock()) {
             $output->writeln('The command is already running in another process.');
