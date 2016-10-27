@@ -5,12 +5,11 @@ namespace Oro\Bundle\WorkflowBundle\Migrations\Data\ORM;
 use Doctrine\Common\DataFixtures\AbstractFixture;
 use Doctrine\Common\Persistence\ObjectManager;
 
-use Oro\Bundle\WorkflowBundle\Configuration\WorkflowConfigurationProvider;
-use Oro\Bundle\WorkflowBundle\Configuration\WorkflowDefinitionConfigurationBuilder;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerAwareTrait;
 
 use Oro\Bundle\WorkflowBundle\Configuration\WorkflowConfiguration;
+use Oro\Bundle\WorkflowBundle\Configuration\WorkflowConfigurationProvider;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Handler\WorkflowDefinitionHandler;
 use Oro\Bundle\WorkflowBundle\Translation\TranslationProcessor;
