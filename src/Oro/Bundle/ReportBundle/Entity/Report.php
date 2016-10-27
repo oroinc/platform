@@ -55,14 +55,6 @@ class Report extends ExtendReport implements GridQueryDesignerInterface
     protected $id;
 
     /**
-     * Used to identify reports (usually created programmatically)
-     *
-     * @var string
-     * @ORM\Column(type="string", length=30, nullable=true)
-     */
-    protected $internalId;
-
-    /**
      * @var string
      *
      * @ORM\Column(name="name", type="string", length=255)
@@ -164,26 +156,6 @@ class Report extends ExtendReport implements GridQueryDesignerInterface
     public function getId()
     {
         return $this->id;
-    }
-
-    /**
-     * @return string|null
-     */
-    public function getInternalId()
-    {
-        return $this->internalId;
-    }
-
-    /**
-     * @param string|null $internalId
-     *
-     * @return Report
-     */
-    public function setInternalId($internalId)
-    {
-        $this->internalId = $internalId;
-
-        return $this;
     }
 
     /**

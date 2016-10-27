@@ -56,14 +56,6 @@ class Segment extends ExtendSegment implements GridQueryDesignerInterface
     protected $id;
 
     /**
-     * Used to identify segments (usually created programatically)
-     *
-     * @var string
-     * @ORM\Column(type="string", length=30, nullable=true)
-     */
-    protected $internalId;
-
-    /**
      * @ORM\Column(type="string", unique=true, length=255, nullable=false)
      */
     protected $name;
@@ -161,26 +153,6 @@ class Segment extends ExtendSegment implements GridQueryDesignerInterface
     public function getId()
     {
         return $this->id;
-    }
-
-    /**
-     * @return string|null
-     */
-    public function getInternalId()
-    {
-        return $this->internalId;
-    }
-
-    /**
-     * @param string|null $internalId
-     *
-     * @return Segment
-     */
-    public function setInternalId($internalId)
-    {
-        $this->internalId = $internalId;
-
-        return $this;
     }
 
     /**

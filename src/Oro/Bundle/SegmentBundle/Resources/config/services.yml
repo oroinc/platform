@@ -93,15 +93,3 @@ services:
     oro_segment.grid.datagrid_configuration_builder:
         class: %oro_segment.grid.datagrid_configuration_builder.class%
         parent: oro_report.grid.base_configuration_builder
-
-    oro_segment.config_extension.feature:
-        class: Oro\Bundle\SegmentBundle\Configuration\FeatureConfigurationExtension
-        tags:
-            - { name: oro_feature.config_extension }
-
-    oro_segment.listener.segments_grid_subscriber:
-        class: Oro\Bundle\SegmentBundle\EventListener\SegmentsGridSubscriber
-        arguments:
-            - '@oro_featuretoggle.checker.feature_checker'
-        tags:
-            - { name: kernel.event_subscriber }

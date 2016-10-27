@@ -6,12 +6,10 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 use Oro\Bundle\SecurityBundle\Annotation\Acl;
 use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
 
-use Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker;
 use Oro\Bundle\UIBundle\Route\Router;
 use Oro\Bundle\SegmentBundle\Entity\Segment;
 use Oro\Bundle\SegmentBundle\Entity\SegmentType;
@@ -47,8 +45,6 @@ class SegmentController extends Controller
      */
     public function viewAction(Segment $entity)
     {
-        $this->checkSegmentEnabled($entity);
-
         $this->get('oro_segment.entity_name_provider')->setCurrentItem($entity);
 
         $segmentGroup = $this->get('oro_entity_config.provider.entity')
@@ -96,8 +92,6 @@ class SegmentController extends Controller
      */
     public function updateAction(Segment $entity)
     {
-        $this->checkSegmentEnabled($entity);
-
         return $this->update($entity);
     }
 
@@ -110,7 +104,6 @@ class SegmentController extends Controller
      */
     public function refreshAction(Segment $entity)
     {
-        $this->checkSegmentEnabled($entity);
         if ($entity->isStaticType()) {
             $this->get('oro_segment.static_segment_manager')->run($entity);
 
@@ -145,25 +138,5 @@ class SegmentController extends Controller
             'entities' => $this->get('oro_segment.entity_provider')->getEntities(),
             'metadata' => $this->get('oro_query_designer.query_designer.manager')->getMetadata('segment')
         ];
-    }
-
-    /**
-     * @param Segment $segment
-     *
-     * @throws NotFoundHttpException
-     */
-    protected function checkSegmentEnabled(Segment $segment)
-    {
-        if (!$this->getFeatureChecker()->isResourceEnabled($segment->getInternalId(), 'segments')) {
-            throw $this->createNotFoundException();
-        }
-    }
-
-    /**
-     * @return FeatureChecker
-     */
-    protected function getFeatureChecker()
-    {
-        return $this->get('oro_featuretoggle.checker.feature_checker');
     }
 }
