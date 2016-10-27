@@ -263,6 +263,11 @@ services:
         tags:
             - { name: oro.api.processor, action: add_relationship, group: normalize_result, priority: -100 }
 
+    oro_api.add_relationship.set_result_document:
+        class: Oro\Bundle\ApiBundle\Processor\Shared\SetResultDocument
+        tags:
+            - { name: oro.api.processor, action: add_relationship, group: normalize_result, priority: -190 }
+
     oro_api.add_relationship.json_api.validate_normalized_result_schema:
         class: Oro\Bundle\ApiBundle\Processor\Shared\JsonApi\ValidateNormalizedResultSchema
         tags:

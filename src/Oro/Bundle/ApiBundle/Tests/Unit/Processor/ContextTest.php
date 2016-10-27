@@ -13,6 +13,7 @@ use Oro\Bundle\ApiBundle\Metadata\ActionMetadataExtra;
 use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
 use Oro\Bundle\ApiBundle\Model\Error;
 use Oro\Bundle\ApiBundle\Processor\Context;
+use Oro\Bundle\ApiBundle\Request\DocumentBuilderInterface;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 
@@ -214,6 +215,18 @@ class ContextTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse($this->context->isSuccessResponse());
         $this->context->setResponseStatusCode(300);
         $this->assertFalse($this->context->isSuccessResponse());
+    }
+
+    public function testResponseDocumentBuilder()
+    {
+        $this->assertNull($this->context->getResponseDocumentBuilder());
+
+        $documentBuilder = $this->getMock(DocumentBuilderInterface::class);
+        $this->context->setResponseDocumentBuilder($documentBuilder);
+        $this->assertSame($documentBuilder, $this->context->getResponseDocumentBuilder());
+
+        $this->context->setResponseDocumentBuilder(null);
+        $this->assertNull($this->context->getResponseDocumentBuilder());
     }
 
     public function testClassName()

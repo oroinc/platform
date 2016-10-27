@@ -599,6 +599,8 @@ General methods:
 - **getResponseStatusCode()** - Gets the response status code.
 - **setResponseStatusCode(statusCode)** - Sets the response status code.
 - **isSuccessResponse()** - Indicates whether a result document represents a success response.
+- **getResponseDocumentBuilder()** - Gets the response document builder.
+- **setResponseDocumentBuilder(documentBuilder)** - Sets the response document builder.
 - **getFilters()** - Gets a [list of filters](../../Filter/FilterCollection.php) is used to add additional restrictions to a query is used to get entity data.
 - **getFilterValues()** - Gets a collection of the [FilterValue](../../Filter/FilterValue.php) objects that contains all incoming filters.
 - **setFilterValues(accessor)** - Sets an [object](../../Filter/FilterValueAccessorInterface.php) that will be used to accessing incoming filters.

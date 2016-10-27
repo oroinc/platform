@@ -243,6 +243,11 @@ services:
         tags:
             - { name: oro.api.processor, action: delete_list, group: normalize_result, priority: -100 }
 
+    oro_api.delete_list.set_result_document:
+        class: Oro\Bundle\ApiBundle\Processor\Shared\SetResultDocument
+        tags:
+            - { name: oro.api.processor, action: delete_list, group: normalize_result, priority: -190 }
+
     oro_api.delete_list.json_api.set_response_content_type:
         class: Oro\Bundle\ApiBundle\Processor\Shared\JsonApi\SetResponseContentType
         tags:

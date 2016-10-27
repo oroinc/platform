@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\ApiBundle\Processor;
 
+use Oro\Bundle\ApiBundle\Request\DocumentBuilderInterface;
 use Oro\Component\ChainProcessor\ParameterBag;
 use Oro\Component\ChainProcessor\ParameterBagInterface;
 use Oro\Bundle\ApiBundle\Collection\CaseInsensitiveParameterBag;
@@ -87,6 +88,9 @@ class Context extends ApiContext implements ContextInterface
 
     /** @var ParameterBagInterface */
     private $responseHeaders;
+
+    /** @var DocumentBuilderInterface|null */
+    private $responseDocumentBuilder;
 
     /**
      * @param ConfigProvider   $configProvider
@@ -179,6 +183,22 @@ class Context extends ApiContext implements ContextInterface
         $statusCode = $this->getResponseStatusCode();
 
         return $statusCode>= 200 && $statusCode < 300;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getResponseDocumentBuilder()
+    {
+        return $this->responseDocumentBuilder;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setResponseDocumentBuilder(DocumentBuilderInterface $documentBuilder = null)
+    {
+        $this->responseDocumentBuilder = $documentBuilder;
     }
 
     /**

@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\ApiBundle\Processor;
 
+use Oro\Bundle\ApiBundle\Request\DocumentBuilderInterface;
 use Oro\Component\ChainProcessor\ContextInterface as ComponentContextInterface;
 use Oro\Component\ChainProcessor\ParameterBagInterface;
 use Oro\Bundle\ApiBundle\Collection\Criteria;
@@ -92,16 +93,30 @@ interface ContextInterface extends ComponentContextInterface
     /**
      * Sets the response status code.
      *
-     * @param $statusCode
+     * @param int $statusCode
      */
     public function setResponseStatusCode($statusCode);
 
     /**
      * Indicates whether a result document represents a success response.
      *
-     * @return int|null
+     * @return bool
      */
     public function isSuccessResponse();
+
+    /**
+     * Gets the response document builder.
+     *
+     * @return DocumentBuilderInterface|null
+     */
+    public function getResponseDocumentBuilder();
+
+    /**
+     * Sets the response document builder.
+     *
+     * @param DocumentBuilderInterface|null $documentBuilder
+     */
+    public function setResponseDocumentBuilder(DocumentBuilderInterface $documentBuilder = null);
 
     /**
      * Gets a list of filters is used to add additional restrictions to a query is used to get result data.

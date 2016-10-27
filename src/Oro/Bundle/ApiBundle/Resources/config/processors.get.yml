@@ -220,6 +220,11 @@ services:
         tags:
             - { name: oro.api.processor, action: get, group: normalize_result, priority: -100 }
 
+    oro_api.get.set_result_document:
+        class: Oro\Bundle\ApiBundle\Processor\Shared\SetResultDocument
+        tags:
+            - { name: oro.api.processor, action: get, group: normalize_result, priority: -190 }
+
     oro_api.get.validate_normalized_result_exists:
         class: Oro\Bundle\ApiBundle\Processor\Shared\ValidateNormalizedResultExists
         tags:
