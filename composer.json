@@ -113,7 +113,7 @@
         "bower-asset/backbone-pageable": "1.2.3",
         "bower-asset/numeral": "1.5.2",
         "bower-asset/jquery-form": "3.37.0",
-        "npm-asset/requirejs": "2.1.15"
+        "npm-asset/requirejs": "2.3.*"
     },
     "require-dev": {
         "sensio/generator-bundle": "2.5.3",
