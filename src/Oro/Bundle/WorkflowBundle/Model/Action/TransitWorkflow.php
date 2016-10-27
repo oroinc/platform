@@ -91,7 +91,7 @@ class TransitWorkflow extends ComponentAbstractAction
         } else {
             throw new InvalidParameterException('Option "entity" is required.');
         }
-
+        
         if (isset($options['transition'])) {
             $this->transition = $options['transition'];
         } elseif (isset($options[self::OPTION_INDEX_TRANSITION])) {

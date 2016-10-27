@@ -7,7 +7,7 @@ use Oro\Bundle\ActionBundle\Command\DebugConditionCommand;
 class DebugConditionCommandTest extends AbstractDebugCommandTestCase
 {
     /**
-     * @return string
+     * {@inheritdoc}
      */
     protected function getFactoryServiceId()
     {
@@ -15,7 +15,7 @@ class DebugConditionCommandTest extends AbstractDebugCommandTestCase
     }
 
     /**
-     * @return string
+     * {@inheritdoc}
      */
     protected function getCommandName()
     {

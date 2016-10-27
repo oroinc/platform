@@ -14,7 +14,7 @@ class ContextAccessor implements ContextAccessorInterface
     protected $propertyAccessor;
 
     /**
-     * Set value to context.
+     * {@inheritdoc}
      *
      * @param object|array $context
      * @param string|PropertyPathInterface $property
@@ -30,7 +30,7 @@ class ContextAccessor implements ContextAccessorInterface
     }
 
     /**
-     * Get value from context
+     * {@inheritdoc}
      *
      * @param mixed $context
      * @param mixed $value
@@ -50,7 +50,7 @@ class ContextAccessor implements ContextAccessorInterface
     }
 
     /**
-     * Checks whether context has value
+     * {@inheritdoc}
      *
      * @param mixed $context
      * @param mixed $value
