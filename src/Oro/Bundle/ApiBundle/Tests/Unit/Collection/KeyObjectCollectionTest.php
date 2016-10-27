@@ -133,7 +133,7 @@ class KeyObjectCollectionTest extends \PHPUnit_Framework_TestCase
 
     public function testShouldGetDataReturnNullForUnknownObject()
     {
-        self::assertNull($this->collection->getData('key'));
+        self::assertNull($this->collection->getData(new \stdClass()));
     }
 
     public function testShouldGetDataForAddedObject()
@@ -142,7 +142,7 @@ class KeyObjectCollectionTest extends \PHPUnit_Framework_TestCase
         $key = 'key';
         $data = new \stdClass();
         $this->collection->add($object, $key, $data);
-        self::assertSame($data, $this->collection->getData($key));
+        self::assertSame($data, $this->collection->getData($object));
     }
 
     public function testShouldContainsKeyReturnFalseForUnknownObject()

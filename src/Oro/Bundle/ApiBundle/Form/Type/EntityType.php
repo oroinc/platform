@@ -9,7 +9,7 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-use Oro\Bundle\ApiBundle\Collection\KeyObjectCollection;
+use Oro\Bundle\ApiBundle\Collection\IncludedObjectCollection;
 use Oro\Bundle\ApiBundle\Form\DataTransformer\CollectionToArrayTransformer;
 use Oro\Bundle\ApiBundle\Form\DataTransformer\EntityToIdTransformer;
 use Oro\Bundle\ApiBundle\Metadata\AssociationMetadata;
@@ -34,7 +34,7 @@ class EntityType extends AbstractType
     {
         /** @var AssociationMetadata $metadata */
         $metadata = $options['metadata'];
-        /** @var KeyObjectCollection|null $includedObjects */
+        /** @var IncludedObjectCollection|null $includedObjects */
         $includedObjects = $options['included_objects'];
         if ($metadata->isCollection()) {
             $builder
@@ -61,7 +61,7 @@ class EntityType extends AbstractType
             ->setDefaults(['compound' => false, 'included_objects' => null])
             ->setRequired(['metadata'])
             ->setAllowedTypes('metadata', [AssociationMetadata::class])
-            ->setAllowedTypes('included_objects', ['null', KeyObjectCollection::class]);
+            ->setAllowedTypes('included_objects', ['null', IncludedObjectCollection::class]);
     }
 
     /**

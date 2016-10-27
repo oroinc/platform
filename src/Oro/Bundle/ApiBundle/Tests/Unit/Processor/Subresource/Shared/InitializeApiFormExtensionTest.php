@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\Subresource\Shared;
 
-use Oro\Bundle\ApiBundle\Collection\KeyObjectCollection;
+use Oro\Bundle\ApiBundle\Collection\IncludedObjectCollection;
 use Oro\Bundle\ApiBundle\Config\ConfigAccessorInterface;
 use Oro\Bundle\ApiBundle\Form\FormExtensionSwitcherInterface;
 use Oro\Bundle\ApiBundle\Form\Guesser\MetadataTypeGuesser;
@@ -91,9 +91,9 @@ class InitializeApiFormExtensionTest extends ChangeRelationshipTestCase
 
     public function testProcessWhenMetadataTypeGuesserHasContext()
     {
-        $currentIncludedObjects = $this->getMock(KeyObjectCollection::class);
+        $currentIncludedObjects = $this->getMock(IncludedObjectCollection::class);
 
-        $includedObjects = $this->getMock(KeyObjectCollection::class);
+        $includedObjects = $this->getMock(IncludedObjectCollection::class);
         $metadataAccessor = $this->getMock(MetadataAccessorInterface::class);
         $configAccessor = $this->getMock(ConfigAccessorInterface::class);
 

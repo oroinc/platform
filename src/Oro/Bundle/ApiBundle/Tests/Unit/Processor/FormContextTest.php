@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor;
 
-use Oro\Bundle\ApiBundle\Collection\KeyObjectCollection;
+use Oro\Bundle\ApiBundle\Collection\IncludedObjectCollection;
 use Oro\Bundle\ApiBundle\Processor\FormContext;
 
 class FormContextTest extends \PHPUnit_Framework_TestCase
@@ -40,7 +40,7 @@ class FormContextTest extends \PHPUnit_Framework_TestCase
     {
         $this->assertNull($this->context->getIncludedObjects());
 
-        $includedObjects = $this->getMock(KeyObjectCollection::class);
+        $includedObjects = $this->getMock(IncludedObjectCollection::class);
         $this->context->setIncludedObjects($includedObjects);
         $this->assertSame($includedObjects, $this->context->getIncludedObjects());
 

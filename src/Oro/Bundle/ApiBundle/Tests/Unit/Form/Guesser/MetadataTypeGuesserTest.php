@@ -6,7 +6,7 @@ use Symfony\Component\Form\Guess\TypeGuess;
 
 use Oro\Bundle\ApiBundle\Config\ConfigAccessorInterface;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
-use Oro\Bundle\ApiBundle\Collection\KeyObjectCollection;
+use Oro\Bundle\ApiBundle\Collection\IncludedObjectCollection;
 use Oro\Bundle\ApiBundle\Form\Guesser\MetadataTypeGuesser;
 use Oro\Bundle\ApiBundle\Metadata\AssociationMetadata;
 use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
@@ -240,7 +240,7 @@ class MetadataTypeGuesserTest extends \PHPUnit_Framework_TestCase
             'integer'
         );
         $metadata->addAssociation($associationMetadata);
-        $includedObjects = $this->getMock(KeyObjectCollection::class);
+        $includedObjects = $this->getMock(IncludedObjectCollection::class);
 
         $this->typeGuesser->setMetadataAccessor($this->getMetadataAccessor($metadata));
         $this->typeGuesser->setIncludedObjects($includedObjects);
@@ -288,7 +288,7 @@ class MetadataTypeGuesserTest extends \PHPUnit_Framework_TestCase
             'integer'
         );
         $metadata->addAssociation($associationMetadata);
-        $includedObjects = $this->getMock(KeyObjectCollection::class);
+        $includedObjects = $this->getMock(IncludedObjectCollection::class);
 
         $this->typeGuesser->setMetadataAccessor($this->getMetadataAccessor($metadata));
         $this->typeGuesser->setIncludedObjects($includedObjects);

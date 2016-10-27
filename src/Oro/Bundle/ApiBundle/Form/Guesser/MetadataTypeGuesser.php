@@ -5,7 +5,7 @@ namespace Oro\Bundle\ApiBundle\Form\Guesser;
 use Symfony\Component\Form\FormTypeGuesserInterface;
 use Symfony\Component\Form\Guess\TypeGuess;
 
-use Oro\Bundle\ApiBundle\Collection\KeyObjectCollection;
+use Oro\Bundle\ApiBundle\Collection\IncludedObjectCollection;
 use Oro\Bundle\ApiBundle\Config\ConfigAccessorInterface;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionFieldConfig;
@@ -29,7 +29,7 @@ class MetadataTypeGuesser implements FormTypeGuesserInterface
     /** @var ConfigAccessorInterface|null */
     protected $configAccessor;
 
-    /** @var KeyObjectCollection|null */
+    /** @var IncludedObjectCollection|null */
     protected $includedObjects;
 
     /**
@@ -75,7 +75,7 @@ class MetadataTypeGuesser implements FormTypeGuesserInterface
     }
 
     /**
-     * @return KeyObjectCollection|null
+     * @return IncludedObjectCollection|null
      */
     public function getIncludedObjects()
     {
@@ -83,9 +83,9 @@ class MetadataTypeGuesser implements FormTypeGuesserInterface
     }
 
     /**
-     * @param KeyObjectCollection|null $includedObjects
+     * @param IncludedObjectCollection|null $includedObjects
      */
-    public function setIncludedObjects(KeyObjectCollection $includedObjects = null)
+    public function setIncludedObjects(IncludedObjectCollection $includedObjects = null)
     {
         $this->includedObjects = $includedObjects;
     }

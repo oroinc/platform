@@ -7,7 +7,7 @@ use Doctrine\Common\Persistence\ManagerRegistry;
 use Symfony\Component\Form\DataTransformerInterface;
 use Symfony\Component\Form\Exception\TransformationFailedException;
 
-use Oro\Bundle\ApiBundle\Collection\KeyObjectCollection;
+use Oro\Bundle\ApiBundle\Collection\IncludedObjectCollection;
 use Oro\Bundle\ApiBundle\Metadata\AssociationMetadata;
 
 class EntityToIdTransformer implements DataTransformerInterface
@@ -18,18 +18,18 @@ class EntityToIdTransformer implements DataTransformerInterface
     /** @var AssociationMetadata */
     protected $metadata;
 
-    /** @var KeyObjectCollection|null */
+    /** @var IncludedObjectCollection|null */
     protected $includedObjects;
 
     /**
-     * @param ManagerRegistry          $doctrine
-     * @param AssociationMetadata      $metadata
-     * @param KeyObjectCollection|null $includedObjects
+     * @param ManagerRegistry               $doctrine
+     * @param AssociationMetadata           $metadata
+     * @param IncludedObjectCollection|null $includedObjects
      */
     public function __construct(
         ManagerRegistry $doctrine,
         AssociationMetadata $metadata,
-        KeyObjectCollection $includedObjects = null
+        IncludedObjectCollection $includedObjects = null
     ) {
         $this->doctrine = $doctrine;
         $this->metadata = $metadata;
@@ -128,12 +128,7 @@ class EntityToIdTransformer implements DataTransformerInterface
             return null;
         }
 
-        $entity = $this->includedObjects->get($entityId);
-        if (null === $entity || !is_a($entity, $entityClass)) {
-            return null;
-        }
-
-        return $entity;
+        return $this->includedObjects->get($entityClass, $entityId);
     }
 
     /**

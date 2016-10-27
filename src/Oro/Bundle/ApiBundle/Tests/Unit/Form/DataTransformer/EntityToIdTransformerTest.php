@@ -2,7 +2,8 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Form\DateTransformer;
 
-use Oro\Bundle\ApiBundle\Collection\KeyObjectCollection;
+use Oro\Bundle\ApiBundle\Collection\IncludedObjectCollection;
+use Oro\Bundle\ApiBundle\Collection\IncludedObjectData;
 use Oro\Bundle\ApiBundle\Form\DataTransformer\EntityToIdTransformer;
 use Oro\Bundle\ApiBundle\Metadata\AssociationMetadata;
 use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\CompositeKeyEntity;
@@ -81,7 +82,7 @@ class EntityToIdTransformerTest extends OrmRelatedTestCase
     public function testReverseTransformWhenEntityDoesNotFoundInIncludedObject()
     {
         $metadata = $this->getAssociationMetadata([Group::class]);
-        $includedObjects = new KeyObjectCollection();
+        $includedObjects = new IncludedObjectCollection();
         $transformer = new EntityToIdTransformer($this->doctrine, $metadata, $includedObjects);
 
         $value = ['class' => Group::class, 'id' => 123];
@@ -110,7 +111,7 @@ class EntityToIdTransformerTest extends OrmRelatedTestCase
     public function testReverseTransformWhenEntityFoundInIncludedObject()
     {
         $metadata = $this->getAssociationMetadata([Group::class]);
-        $includedObjects = new KeyObjectCollection();
+        $includedObjects = new IncludedObjectCollection();
         $transformer = new EntityToIdTransformer($this->doctrine, $metadata, $includedObjects);
 
         $value = ['class' => Group::class, 'id' => 123];
@@ -118,7 +119,7 @@ class EntityToIdTransformerTest extends OrmRelatedTestCase
         $entity->setId($value['id']);
         $entity->setName('test');
 
-        $includedObjects->add($entity, $value['id']);
+        $includedObjects->add($entity, $value['class'], $value['id'], new IncludedObjectData('/included/0', 0));
 
         $this->assertEquals($entity, $transformer->reverseTransform($value));
     }

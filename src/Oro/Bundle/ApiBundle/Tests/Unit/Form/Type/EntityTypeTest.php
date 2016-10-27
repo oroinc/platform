@@ -4,10 +4,11 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Form\Type;
 
 use Doctrine\Common\Collections\ArrayCollection;
 
-use Oro\Bundle\ApiBundle\Collection\KeyObjectCollection;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\Forms;
 
+use Oro\Bundle\ApiBundle\Collection\IncludedObjectCollection;
+use Oro\Bundle\ApiBundle\Collection\IncludedObjectData;
 use Oro\Bundle\ApiBundle\Form\Type\EntityType;
 use Oro\Bundle\ApiBundle\Metadata\AssociationMetadata;
 use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Group;
@@ -226,8 +227,8 @@ class EntityTypeTest extends OrmRelatedTestCase
         $associationMetadata->setIsCollection(false);
         $associationMetadata->setAcceptableTargetClassNames([Group::class]);
 
-        $includedObjects = new KeyObjectCollection();
-        $includedObjects->add($entity, $value['id']);
+        $includedObjects = new IncludedObjectCollection();
+        $includedObjects->add($entity, $value['class'], $value['id'], new IncludedObjectData('/included/0', 0));
 
         $form = $this->factory->create(
             new EntityType($this->doctrine),
@@ -249,8 +250,8 @@ class EntityTypeTest extends OrmRelatedTestCase
         $associationMetadata->setIsCollection(true);
         $associationMetadata->setAcceptableTargetClassNames([Group::class]);
 
-        $includedObjects = new KeyObjectCollection();
-        $includedObjects->add($entity, $value['id']);
+        $includedObjects = new IncludedObjectCollection();
+        $includedObjects->add($entity, $value['class'], $value['id'], new IncludedObjectData('/included/0', 0));
 
         $form = $this->factory->create(
             new EntityType($this->doctrine),

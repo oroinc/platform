@@ -13,7 +13,7 @@ class KeyObjectCollection implements \Countable, \IteratorAggregate
     /** @var array [object hash => key, ...] */
     private $keys = [];
 
-    /** @var array [key => data, ...] */
+    /** @var array [object hash => data, ...] */
     private $data = [];
 
     /**
@@ -44,7 +44,7 @@ class KeyObjectCollection implements \Countable, \IteratorAggregate
 
         $this->objects[$key] = $object;
         $this->keys[$hash] = $key;
-        $this->data[$key] = $data;
+        $this->data[$hash] = $data;
     }
 
     /**
@@ -62,7 +62,7 @@ class KeyObjectCollection implements \Countable, \IteratorAggregate
             $hash = spl_object_hash($this->objects[$key]);
             unset($this->objects[$key]);
             unset($this->keys[$hash]);
-            unset($this->data[$key]);
+            unset($this->data[$hash]);
         }
     }
 
@@ -82,7 +82,7 @@ class KeyObjectCollection implements \Countable, \IteratorAggregate
             $key = $this->keys[$hash];
             unset($this->objects[$key]);
             unset($this->keys[$hash]);
-            unset($this->data[$key]);
+            unset($this->data[$hash]);
         }
     }
 
@@ -187,20 +187,22 @@ class KeyObjectCollection implements \Countable, \IteratorAggregate
     }
 
     /**
-     * Gets data are associated with an object with the given key.
+     * Gets data are associated with an object.
      *
-     * @param mixed $key
+     * @param object $object
      *
      * @return mixed
      *
-     * @throws \InvalidArgumentException if the given key is not valid
+     * @throws \InvalidArgumentException if the given object is not valid
      */
-    public function getData($key)
+    public function getData($object)
     {
-        $this->assertKey($key);
+        $this->assertObject($object);
 
-        return isset($this->data[$key])
-            ? $this->data[$key]
+        $hash = spl_object_hash($object);
+
+        return isset($this->data[$hash])
+            ? $this->data[$hash]
             : null;
     }
 
