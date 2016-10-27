@@ -4,7 +4,6 @@ namespace Oro\Bundle\FeatureToggleBundle\Tests\Unit\Cache;
 
 use Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker;
 use Oro\Bundle\FeatureToggleBundle\Checker\Voter\VoterInterface;
-use Oro\Bundle\FeatureToggleBundle\Tests\Unit\Fixtures\Voter;
 use Oro\Bundle\FeatureToggleBundle\Configuration\ConfigurationManager;
 
 class FeatureCheckerTest extends \PHPUnit_Framework_TestCase
@@ -295,87 +294,6 @@ class FeatureCheckerTest extends \PHPUnit_Framework_TestCase
             'both enabled' => [['feature1' => true, 'feature2' => true], true],
             'feature disabled' => [['feature1' => false, 'feature2' => true], false],
             'dependency disabled' => [['feature1' => true, 'feature2' => false], false],
-        ];
-    }
-
-    /**
-     * @dataProvider getDisabledResourcesByTypeProvider
-     */
-    public function testGetDisabledResourcesByType($resourceType, array $resources, Voter $voter, $expectedResources)
-    {
-        /** @var ConfigurationManager|\PHPUnit_Framework_MockObject_MockObject $configManager */
-        $configManager = $this->getMockBuilder(ConfigurationManager::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $configManager->expects($this->any())
-            ->method('getResourcesByType')
-            ->with($resourceType)
-            ->will($this->returnValue($resources));
-        $configManager->expects($this->any())
-            ->method('getFeatureDependencies')
-            ->will($this->returnValue([]));
-
-        $featureChecker = new FeatureChecker($configManager, [$voter]);
-        $this->assertEquals($expectedResources, $featureChecker->getDisabledResourcesByType($resourceType));
-    }
-
-    public function getDisabledResourcesByTypeProvider()
-    {
-        return [
-            [
-                'type',
-                [
-                    'resource' => [
-                        'feature1',
-                    ],
-                    'resource2' => [
-                        'feature2',
-                    ],
-                ],
-                new Voter([
-                    'feature1' => Voter::FEATURE_ENABLED,
-                    'feature2' => Voter::FEATURE_ENABLED,
-                ]),
-                [],
-            ],
-            [
-                'type',
-                [
-                    'resource' => [
-                        'feature1',
-                    ],
-                    'resource2' => [
-                        'feature2',
-                    ],
-                ],
-                new Voter([
-                    'feature1' => Voter::FEATURE_ENABLED,
-                    'feature2' => Voter::FEATURE_DISABLED,
-                ]),
-                [
-                    'resource2',
-                ],
-            ],
-            [
-                'type',
-                [
-                    'resource' => [
-                        'feature1',
-                    ],
-                    'resource2' => [
-                        'feature2',
-                    ],
-                ],
-                new Voter([
-                    'feature1' => Voter::FEATURE_DISABLED,
-                    'feature2' => Voter::FEATURE_DISABLED,
-                ]),
-                [
-                    'resource',
-                    'resource2',
-                ],
-            ],
         ];
     }
 }
