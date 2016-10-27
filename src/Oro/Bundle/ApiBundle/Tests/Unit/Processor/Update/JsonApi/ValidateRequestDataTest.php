@@ -142,4 +142,22 @@ class ValidateRequestDataTest extends FormProcessorTestCase
             ],
         ];
     }
+
+    public function testProcessWithNormalizedId()
+    {
+        $requestData = ['data' => ['id' => '1', 'type' => 'products', 'attributes' => ['test' => null]]];
+        $normalizedId = 1;
+
+        $this->valueNormalizer->expects($this->once())
+            ->method('normalizeValue')
+            ->with('products')
+            ->willReturn('Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Product');
+
+        $this->context->setId($normalizedId);
+        $this->context->setClassName('Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Product');
+        $this->context->setRequestData($requestData);
+
+        $this->processor->process($this->context);
+        $this->assertFalse($this->context->hasErrors());
+    }
 }

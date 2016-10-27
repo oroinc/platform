@@ -55,6 +55,7 @@ class LoadNormalizedEntity implements ProcessorInterface
         $getContext->setId($entityId);
         $getContext->skipGroup('security_check');
         $getContext->skipGroup(RequestActionProcessor::NORMALIZE_RESULT_GROUP);
+        $getContext->setSoftErrorsHandling(true);
         $this->prepareGetContext($getContext, $context);
 
         $getProcessor->process($getContext);

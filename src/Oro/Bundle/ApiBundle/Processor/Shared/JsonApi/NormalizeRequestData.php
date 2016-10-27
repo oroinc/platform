@@ -56,10 +56,8 @@ class NormalizeRequestData implements ProcessorInterface
         $this->context = $context;
         try {
             $context->setRequestData($this->normalizeData($requestData[JsonApiDoc::DATA], $context->getMetadata()));
+        } finally {
             $this->context = null;
-        } catch (\Exception $e) {
-            $this->context = null;
-            throw $e;
         }
     }
 
@@ -199,6 +197,12 @@ class NormalizeRequestData implements ProcessorInterface
      */
     protected function normalizeEntityId($pointer, $entityClass, $entityId)
     {
+        $includedObjects = $this->context->getIncludedObjects();
+        if (null !== $includedObjects && null !== $includedObjects->get($entityClass, $entityId)) {
+            // keep the id of an included object as is
+            return $entityId;
+        }
+
         try {
             return $this->entityIdTransformer->reverseTransform($entityClass, $entityId);
         } catch (\Exception $e) {

@@ -56,6 +56,16 @@ services:
         tags:
             - { name: oro.api.processor, action: update, group: normalize_input, requestType: json_api, priority: 90 }
 
+    oro_api.update.json_api.normalize_included_data:
+        class: Oro\Bundle\ApiBundle\Processor\Shared\JsonApi\NormalizeIncludedData
+        arguments:
+            - '@oro_api.doctrine_helper'
+            - '@oro_api.entity_instantiator'
+            - '@oro_api.value_normalizer'
+            - '@oro_api.rest.entity_id_transformer'
+        tags:
+            - { name: oro.api.processor, action: update, group: normalize_input, requestType: json_api, priority: -30 }
+
     oro_api.update.rest.normalize_request_data:
         class: Oro\Bundle\ApiBundle\Processor\Shared\Rest\NormalizeRequestData
         arguments:
@@ -77,7 +87,7 @@ services:
             - { name: oro.api.processor, action: update, group: normalize_input, priority: -100 }
 
     oro_api.update.rest.normalize_entity_id:
-        class: Oro\Bundle\ApiBundle\Processor\Shared\NormalizeEntityId
+        class: Oro\Bundle\ApiBundle\Processor\Shared\Form\NormalizeEntityId
         arguments:
             - '@oro_api.rest.entity_id_transformer'
         tags:
@@ -155,14 +165,6 @@ services:
         tags:
             - { name: oro.api.processor, action: update, group: load_data, priority: -10 }
 
-    oro_api.update.json_api.set_included_objects:
-        class: Oro\Bundle\ApiBundle\Processor\Shared\JsonApi\SetIncludedObjects
-        arguments:
-            - '@oro_api.entity_instantiator'
-            - '@oro_api.value_normalizer'
-        tags:
-            - { name: oro.api.processor, action: update, group: load_data, requestType: json_api, priority: -50 }
-
     #
     # transform_data
     #
@@ -174,6 +176,14 @@ services:
             - '@oro_api.form.guesser.metadata'
         tags:
             - { name: oro.api.processor, action: update, group: transform_data, priority: 250 }
+
+    oro_api.update.json_api.process_included_objects:
+        class: Oro\Bundle\ApiBundle\Processor\Shared\JsonApi\ProcessIncludedObjects
+        arguments:
+            - '@oro_api.action_processor_bag'
+            - '@oro_api.json_api.error_completer'
+        tags:
+            - { name: oro.api.processor, action: update, group: transform_data, requestType: json_api, priority: 200 }
 
     oro_api.update.build_form_builder:
         class: Oro\Bundle\ApiBundle\Processor\Shared\BuildFormBuilder
@@ -199,9 +209,27 @@ services:
         tags:
             - { name: oro.api.processor, action: update, group: transform_data, priority: -100 }
 
+    oro_api.update.restore_default_form_extension:
+        class: Oro\Bundle\ApiBundle\Processor\Shared\RestoreDefaultFormExtension
+        arguments:
+            - '@form.registry'
+            - '@oro_api.form.guesser.metadata'
+        tags:
+            - { name: oro.api.processor, action: update, group: transform_data, priority: -250 }
+            # add this processor to the begin of "normalize_result" group to make sure that
+            # the default form extension is restored even if an error occurred
+            - { name: oro.api.processor, action: update, group: normalize_result, priority: 250 }
+
     #
     # save_data
     #
+
+    oro_api.update.persist_included_entities:
+        class: Oro\Bundle\ApiBundle\Processor\Shared\PersistIncludedEntities
+        arguments:
+            - '@oro_api.doctrine_helper'
+        tags:
+            - { name: oro.api.processor, action: update, group: save_data, priority: -5 }
 
     oro_api.update.save_entity:
         class: Oro\Bundle\ApiBundle\Processor\Update\SaveEntity
@@ -224,14 +252,6 @@ services:
     #
     # normalize_result
     #
-
-    oro_api.update.restore_default_form_extension:
-        class: Oro\Bundle\ApiBundle\Processor\Shared\RestoreDefaultFormExtension
-        arguments:
-            - '@form.registry'
-            - '@oro_api.form.guesser.metadata'
-        tags:
-            - { name: oro.api.processor, action: update, group: normalize_result, priority: 250 }
 
     oro_api.update.rest.complete_errors:
         class: Oro\Bundle\ApiBundle\Processor\Shared\CompleteErrors

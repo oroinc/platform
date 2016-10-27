@@ -184,6 +184,17 @@ services:
         tags:
             - { name: oro.api.processor, action: delete_relationship, group: transform_data, priority: -100 }
 
+    oro_api.delete_relationship.restore_default_form_extension:
+        class: Oro\Bundle\ApiBundle\Processor\Shared\RestoreDefaultFormExtension
+        arguments:
+            - '@form.registry'
+            - '@oro_api.form.guesser.metadata'
+        tags:
+            - { name: oro.api.processor, action: delete_relationship, group: transform_data, priority: -250 }
+            # add this processor to the begin of "normalize_result" group to make sure that
+            # the default form extension is restored even if an error occurred
+            - { name: oro.api.processor, action: delete_relationship, group: normalize_result, priority: 250 }
+
     #
     # save_data
     #
@@ -198,14 +209,6 @@ services:
     #
     # normalize_result
     #
-
-    oro_api.delete_relationship.restore_default_form_extension:
-        class: Oro\Bundle\ApiBundle\Processor\Shared\RestoreDefaultFormExtension
-        arguments:
-            - '@form.registry'
-            - '@oro_api.form.guesser.metadata'
-        tags:
-            - { name: oro.api.processor, action: delete_relationship, group: normalize_result, priority: 250 }
 
     oro_api.delete_relationship.rest.complete_errors:
         class: Oro\Bundle\ApiBundle\Processor\Shared\CompleteErrors
