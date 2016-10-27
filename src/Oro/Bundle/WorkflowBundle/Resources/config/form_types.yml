@@ -68,7 +68,7 @@ services:
     oro_wofkflow.form.autocomplete.wofkflow_replacement.search_handler:
         class: 'Oro\Bundle\WorkflowBundle\Autocomplete\WorkflowReplacementSearchHandler'
         arguments:
-            - '%oro_workflow.workflow_definition.entity.class%'
+            - '%oro_workflow.entity.workflow_definition.class%'
             - ['label']
         calls:
             - [initDoctrinePropertiesByManagerRegistry, ['@doctrine']]

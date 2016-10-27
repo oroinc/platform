@@ -5,6 +5,8 @@ namespace Oro\Bundle\WorkflowBundle\Handler;
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\EntityManager;
 
+use Doctrine\ORM\OptimisticLockException;
+use Doctrine\ORM\ORMInvalidArgumentException;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
@@ -37,20 +39,20 @@ class WorkflowDefinitionHandler
      */
     public function updateWorkflowDefinition(WorkflowDefinition $existingDefinition, WorkflowDefinition $newDefinition)
     {
-        $previous = WorkflowDefinitionCloner::cloneDefinition($existingDefinition);
+        $originalDefinition = WorkflowDefinitionCloner::cloneDefinition($existingDefinition);
 
         WorkflowDefinitionCloner::mergeDefinition($existingDefinition, $newDefinition);
 
         $this->eventDispatcher->dispatch(
             WorkflowEvents::WORKFLOW_BEFORE_UPDATE,
-            new WorkflowChangesEvent($existingDefinition, $previous)
+            new WorkflowChangesEvent($existingDefinition, $originalDefinition)
         );
 
         $this->process($existingDefinition);
 
         $this->eventDispatcher->dispatch(
             WorkflowEvents::WORKFLOW_AFTER_UPDATE,
-            new WorkflowChangesEvent($existingDefinition, $previous)
+            new WorkflowChangesEvent($existingDefinition, $originalDefinition)
         );
     }
 
@@ -78,8 +80,8 @@ class WorkflowDefinitionHandler
     /**
      * @param WorkflowDefinition $workflowDefinition
      * @return bool
-     * @throws \Doctrine\ORM\OptimisticLockException
-     * @throws \Doctrine\ORM\ORMInvalidArgumentException
+     * @throws OptimisticLockException
+     * @throws ORMInvalidArgumentException
      */
     public function deleteWorkflowDefinition(WorkflowDefinition $workflowDefinition)
     {

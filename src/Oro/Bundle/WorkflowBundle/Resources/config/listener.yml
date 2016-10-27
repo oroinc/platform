@@ -71,8 +71,8 @@ services:
         arguments:
             - '@oro_workflow.registry'
         tags:
-            - { name: doctrine.orm.entity_listener, entity: '%oro_workflow.workflow_definition.entity.class%', event: prePersist }
-            - { name: doctrine.orm.entity_listener, entity: '%oro_workflow.workflow_definition.entity.class%', event: preUpdate }
+            - { name: doctrine.orm.entity_listener, entity: '%oro_workflow.entity.workflow_definition.class%', event: prePersist }
+            - { name: doctrine.orm.entity_listener, entity: '%oro_workflow.entity.workflow_definition.class%', event: preUpdate }
 
     oro_workflow.event_listener.transition_triggers:
         class: 'Oro\Bundle\WorkflowBundle\EventListener\WorkflowTransitionTriggersListener'

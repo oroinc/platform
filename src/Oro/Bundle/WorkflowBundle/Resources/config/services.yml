@@ -1,27 +1,14 @@
 parameters:
-    oro_workflow.attribute_guesser.class: Oro\Bundle\ActionBundle\Model\AttributeGuesser
-    oro_workflow.context_accessor.class: Oro\Bundle\WorkflowBundle\Model\ContextAccessor
-    oro_workflow.manager.class: Oro\Bundle\WorkflowBundle\Model\WorkflowManager
-    oro_workflow.process_definition.entity.class: Oro\Bundle\WorkflowBundle\Entity\ProcessDefinition
-    oro_workflow.process_trigger.entity.class: Oro\Bundle\WorkflowBundle\Entity\ProcessTrigger
-    oro_workflow.process.process_factory.class: Oro\Bundle\WorkflowBundle\Model\ProcessFactory
-    oro_workflow.process.process_handler.class: Oro\Bundle\WorkflowBundle\Model\ProcessHandler
-    oro_workflow.process.schedule_policy.exclude_definitions.class: Oro\Bundle\WorkflowBundle\Model\ExcludeDefinitionsProcessSchedulePolicy
-    oro_workflow.process.logger.class: Oro\Bundle\WorkflowBundle\Model\ProcessLogger
-    oro_workflow.registry.class: Oro\Bundle\WorkflowBundle\Model\WorkflowRegistry
-    oro_workflow.workflow_definition.entity.class: Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition
-    oro_workflow.workflow_item.entity.class: Oro\Bundle\WorkflowBundle\Entity\WorkflowItem
-    oro_workflow.workflow_result.class: Oro\Bundle\WorkflowBundle\Model\WorkflowResult
-    oro_workflow.handler.transition_helper.class: Oro\Bundle\WorkflowBundle\Handler\Helper\TransitionHelper
-    oro_workflow.handler.transition_handler.class: Oro\Bundle\WorkflowBundle\Handler\TransitionHandler
-    oro_workflow.handler.start_transition_handler.class: Oro\Bundle\WorkflowBundle\Handler\StartTransitionHandler
-
+    oro_workflow.entity.process_definition.class: Oro\Bundle\WorkflowBundle\Entity\ProcessDefinition
+    oro_workflow.entity.process_trigger.class: Oro\Bundle\WorkflowBundle\Entity\ProcessTrigger
+    oro_workflow.entity.workflow_definition.class: Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition
+    oro_workflow.entity.workflow_item.class: Oro\Bundle\WorkflowBundle\Entity\WorkflowItem
     oro_workflow.entity.transition_trigger_cron.class: Oro\Bundle\WorkflowBundle\Entity\TransitionCronTrigger
     oro_workflow.entity.transition_trigger_event.class: Oro\Bundle\WorkflowBundle\Entity\TransitionEventTrigger
 
 services:
     oro_workflow.attribute_guesser:
-        class: '%oro_workflow.attribute_guesser.class%'
+        class: 'Oro\Bundle\ActionBundle\Model\AttributeGuesser'
         arguments:
             - '@form.registry'
             - '@doctrine'
@@ -58,7 +45,7 @@ services:
         deprecated: The "%service_id%" service is deprecated since since 1.10. Use "oro_action.attribute_guesser" instead
 
     oro_workflow.context_accessor:
-        class: '%oro_workflow.context_accessor.class%'
+        class: 'Oro\Bundle\WorkflowBundle\Model\ContextAccessor'
         deprecated: The "%service_id%" service is deprecated since since 1.10. Use "oro_action.context_accessor" instead
 
     oro_workflow.datagrid.action.workflow_activate:
@@ -103,20 +90,20 @@ services:
             - '@oro_workflow.manager'
 
     oro_workflow.process.process_factory:
-        class: '%oro_workflow.process.process_factory.class%'
+        class: 'Oro\Bundle\WorkflowBundle\Model\ProcessFactory'
         arguments:
             - '@oro_workflow.action_assembler'
             - '@oro_workflow.expression.factory'
 
     oro_workflow.process.process_handler:
-        class: '%oro_workflow.process.process_handler.class%'
+        class: 'Oro\Bundle\WorkflowBundle\Model\ProcessHandler'
         arguments:
             - '@oro_workflow.process.process_factory'
             - '@oro_workflow.process.logger'
             - '@event_dispatcher'
 
     oro_workflow.process.schedule_policy.exclude_definitions:
-        class: '%oro_workflow.process.schedule_policy.exclude_definitions.class%'
+        class: 'Oro\Bundle\WorkflowBundle\Model\ExcludeDefinitionsProcessSchedulePolicy'
         tags:
             - { name: kernel.event_listener, event: oro_workflow.process.handle_before, method: onProcessHandleBefore }
             - { name: kernel.event_listener, event: oro_workflow.process.handle_after_flush, method: onProcessHandleAfterFlush }
@@ -125,7 +112,7 @@ services:
         alias: oro_workflow.process.schedule_policy.exclude_definitions
 
     oro_workflow.process.logger:
-        class: '%oro_workflow.process.logger.class%'
+        class: 'Oro\Bundle\WorkflowBundle\Model\ProcessLogger'
         arguments:
             - '@oro_entity.doctrine_helper'
             - "@?logger"
@@ -133,7 +120,7 @@ services:
             - { name: monolog.logger, channel: oro_workflow }
 
     oro_workflow.registry:
-        class: '%oro_workflow.registry.class%'
+        class: 'Oro\Bundle\WorkflowBundle\Model\WorkflowRegistry'
         arguments:
             - '@doctrine'
             - '@oro_workflow.workflow_assembler'
@@ -161,13 +148,13 @@ services:
             - { name: oro_entity.virtual_relation_provider, priority: 150 }
 
     oro_workflow.handler.transition_helper:
-        class: '%oro_workflow.handler.transition_helper.class%'
+        class: 'Oro\Bundle\WorkflowBundle\Handler\Helper\TransitionHelper'
         arguments:
             - '@fos_rest.view_handler'
             - '@twig'
 
     oro_workflow.handler.transition_handler:
-        class: '%oro_workflow.handler.transition_handler.class%'
+        class: 'Oro\Bundle\WorkflowBundle\Handler\TransitionHandler'
         arguments:
             - '@oro_workflow.manager'
             - '@oro_workflow.handler.transition_helper'
@@ -176,7 +163,7 @@ services:
             - { name: monolog.logger, channel: oro_workflow }
 
     oro_workflow.handler.start_transition_handler:
-        class: '%oro_workflow.handler.start_transition_handler.class%'
+        class: 'Oro\Bundle\WorkflowBundle\Handler\StartTransitionHandler'
         arguments:
             - '@oro_workflow.manager'
             - '@oro_workflow.serializer.data.serializer'
@@ -216,7 +203,7 @@ services:
         arguments:
             - '@oro_workflow.configuration.builder.process_configuration'
             - '@doctrine'
-            - '%oro_workflow.process_definition.entity.class%'
+            - '%oro_workflow.entity.process_definition.class%'
 
     oro_workflow.process.triggers_configurator:
         class: 'Oro\Bundle\WorkflowBundle\Configuration\ProcessTriggersConfigurator'
@@ -224,7 +211,7 @@ services:
             - '@oro_workflow.configuration.builder.process_configuration'
             - '@oro_workflow.process.cron_scheduler'
             - '@doctrine'
-            - '%oro_workflow.process_trigger.entity.class%'
+            - '%oro_workflow.entity.process_trigger.class%'
 
     oro_workflow.process.configurator:
         class: 'Oro\Bundle\WorkflowBundle\Configuration\ProcessConfigurator'
@@ -233,19 +220,19 @@ services:
             - '@doctrine'
             - '@oro_workflow.process.definitions_configurator'
             - '@oro_workflow.process.triggers_configurator'
-            - '%oro_workflow.process_definition.entity.class%'
+            - '%oro_workflow.entity.process_definition.class%'
 
     oro_workflow.repository.workflow_item:
         class: 'Oro\Bundle\WorkflowBundle\Entity\Repository\WorkflowItemRepository'
         parent: oro_entity.abstract_repository
         arguments:
-            - '%oro_workflow.workflow_item.entity.class%'
+            - '%oro_workflow.entity.workflow_item.class%'
 
     oro_workflow.repository.process_trigger:
         class: 'Oro\Bundle\WorkflowBundle\Entity\Repository\ProcessTriggerRepository'
         parent: oro_entity.abstract_repository
         arguments:
-            - '%oro_workflow.process_trigger.entity.class%'
+            - '%oro_workflow.entity.process_trigger.class%'
 
     oro_workflow.repository.transition_event_trigger:
         class: 'Oro\Bundle\WorkflowBundle\Entity\Repository\TransitionEventTriggerRepository'

@@ -16,7 +16,7 @@ datagrids:
                     - process.createdAt
                     - process.name as processDefinition
                 from:
-                    - { table: %oro_workflow.process_definition.entity.class%, alias: process }
+                    - { table: %oro_workflow.entity.process_definition.class%, alias: process }
         columns:
             label:
                 label: oro.workflow.processdefinition.label.label
@@ -117,7 +117,7 @@ datagrids:
                     - w.groups
                     - w.createdAt
                 from:
-                    - { table: %oro_workflow.workflow_definition.entity.class%, alias: w }
+                    - { table: %oro_workflow.entity.workflow_definition.class%, alias: w }
         columns:
             label:
                 label:         oro.workflow.workflowdefinition.label.label

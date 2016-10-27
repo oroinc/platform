@@ -155,7 +155,12 @@ To migrate all labels from configuration translatable fields automatically you c
 - Added service tag `oro.workflow.configuration.handler` for request configuration procession by `Oro\Bundle\WorkflowBundle\Configuration\Handler\ConfigurationHandlerInterface`.
 - Removed `import` method from `Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition`. Use `Oro\Bundle\WorkflowBundle\Handler\Helper\WorkflowDefinitionCloner::cloneDefinition` instead.
 - Added `originalDefinition` property and second constructor argument for `Oro\Bundle\WorkflowBundle\Event\WorkflowChangesEvent` in case of definition update.
-- 
+- Container parameter `oro_workflow.workflow_item.entity.class` renamed to `oro_workflow.entity.workflow_item.class`
+- Container parameter `oro_workflow.workflow_definition.entity.class` renamed to `oro_workflow.entity.workflow_definition.class`
+- Container parameter `oro_workflow.process_trigger.entity.class` renamed to `oro_workflow.entity.process_trigger.class`
+- Container parameter `oro_workflow.process_definition.entity.class` renamed to `oro_workflow.entity.process_definition.class`
+- Added container parameter `oro_workflow.entity.transition_trigger_cron.class`
+- Added container parameter `oro_workflow.entity.transition_trigger_event.class`
 
  
     

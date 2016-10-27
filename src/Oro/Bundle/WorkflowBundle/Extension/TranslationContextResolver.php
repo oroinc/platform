@@ -8,13 +8,7 @@ use Oro\Bundle\TranslationBundle\Extension\TranslationContextResolverInterface;
 use Oro\Bundle\TranslationBundle\Translation\TranslationKeyTemplateInterface;
 
 use Oro\Bundle\WorkflowBundle\Translation\KeyTemplateParametersResolver;
-use Oro\Bundle\WorkflowBundle\Translation\KeyTemplate\StepLabelTemplate;
-use Oro\Bundle\WorkflowBundle\Translation\KeyTemplate\TransitionAttributeLabelTemplate;
-use Oro\Bundle\WorkflowBundle\Translation\KeyTemplate\TransitionLabelTemplate;
-use Oro\Bundle\WorkflowBundle\Translation\KeyTemplate\TransitionWarningMessageTemplate;
-use Oro\Bundle\WorkflowBundle\Translation\KeyTemplate\WorkflowAttributeLabelTemplate;
-use Oro\Bundle\WorkflowBundle\Translation\KeyTemplate\WorkflowLabelTemplate;
-use Oro\Bundle\WorkflowBundle\Translation\KeyTemplate\WorkflowTemplate;
+use Oro\Bundle\WorkflowBundle\Translation\KeyTemplate;
 
 class TranslationContextResolver implements TranslationContextResolverInterface
 {
@@ -39,12 +33,12 @@ class TranslationContextResolver implements TranslationContextResolverInterface
         $this->resolver = $resolver;
 
         $this->templates = [
-            new WorkflowLabelTemplate(),
-            new TransitionLabelTemplate(),
-            new TransitionWarningMessageTemplate(),
-            new StepLabelTemplate(),
-            new TransitionAttributeLabelTemplate(),
-            new WorkflowAttributeLabelTemplate(),
+            new KeyTemplate\WorkflowLabelTemplate(),
+            new KeyTemplate\TransitionLabelTemplate(),
+            new KeyTemplate\TransitionWarningMessageTemplate(),
+            new KeyTemplate\StepLabelTemplate(),
+            new KeyTemplate\TransitionAttributeLabelTemplate(),
+            new KeyTemplate\WorkflowAttributeLabelTemplate(),
         ];
     }
 
@@ -53,7 +47,7 @@ class TranslationContextResolver implements TranslationContextResolverInterface
      */
     public function resolve($id)
     {
-        if (0 !== strpos($id, WorkflowTemplate::KEY_PREFIX)) {
+        if (0 !== strpos($id, KeyTemplate\WorkflowTemplate::KEY_PREFIX)) {
             return null;
         }
 

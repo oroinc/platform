@@ -52,14 +52,14 @@ class WorkflowTranslationKeysSubscriber implements EventSubscriberInterface
      */
     public function clearTranslationKeys(WorkflowChangesEvent $changesEvent)
     {
-        $previousDefinition = $changesEvent->getPrevious();
+        $originalDefinition = $changesEvent->getOriginalDefinition();
 
-        if ($previousDefinition === null) {
+        if ($originalDefinition === null) {
             throw new \LogicException('Previous WorkflowDefinition expected, got null.');
         }
 
         $updatedDefinitionKeys = new WorkflowDefinitionTranslationFieldsIterator($changesEvent->getDefinition());
-        $previousDefinitionKeys = new WorkflowDefinitionTranslationFieldsIterator($previousDefinition);
+        $previousDefinitionKeys = new WorkflowDefinitionTranslationFieldsIterator($originalDefinition);
 
         $newKeys = [];
         foreach ($updatedDefinitionKeys as $newTranslationKey) {
