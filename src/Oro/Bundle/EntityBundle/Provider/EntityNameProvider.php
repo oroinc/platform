@@ -6,9 +6,6 @@ use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\Common\Util\ClassUtils;
 use Doctrine\Common\Util\Inflector;
 
-use Symfony\Component\PropertyAccess\PropertyAccess;
-use Symfony\Component\PropertyAccess\Exception\InvalidArgumentException;
-
 class EntityNameProvider implements EntityNameProviderInterface
 {
     /** @var string[] */
@@ -17,16 +14,12 @@ class EntityNameProvider implements EntityNameProviderInterface
     /** @var ManagerRegistry */
     protected $doctrine;
 
-    /** @var PropertyAccess */
-    protected $accessor;
-
     /**
      * @param ManagerRegistry $doctrine
      */
     public function __construct(ManagerRegistry $doctrine)
     {
         $this->doctrine = $doctrine;
-        $this->accessor = PropertyAccess::createPropertyAccessor();
     }
 
     /**
@@ -158,12 +151,13 @@ class EntityNameProvider implements EntityNameProviderInterface
      */
     protected function getConstructedName($entity, $fieldNames)
     {
+        $values = [];
         foreach ($fieldNames as $field) {
-            if ($value = $this->getFieldValue($entity, $field)) {
-                return $value;
-            };
+            $values[] = $this->getFieldValue($entity, $field);
         }
 
-        return false;
+        $values = array_filter($values);
+
+        return empty($values) ? false : implode(' ' , $values);
     }
 }

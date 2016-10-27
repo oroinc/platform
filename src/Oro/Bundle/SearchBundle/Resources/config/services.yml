@@ -265,10 +265,3 @@ services:
         arguments: ["@translator"]
         tags:
             - { name: form.type, alias: oro_search_type_string_filter }
-
-    oro_search.entity_name_provider:
-        class: Oro\Bundle\SearchBundle\Provider\EntityNameProvider
-        arguments:
-            - '@oro_search.mapper'
-        tags:
-            - { name: oro_entity.name_provider, priority: -90 }
