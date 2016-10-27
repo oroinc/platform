@@ -101,3 +101,11 @@ services:
             - '@oro_featuretoggle.checker.feature_checker'
         tags:
             - { name: oro_navigation.menu_extension, priority: 90 }
+
+    oro_featuretoggle.event_listener.navigation:
+        class: Oro\Bundle\FeatureToggleBundle\EventListener\NavigationListener
+        arguments:
+            - '@oro_featuretoggle.checker.feature_checker'
+        tags:
+            - { name: kernel.event_listener, event: oro_menu.configure.application_menu, method: onNavigationConfigure }
+            - { name: kernel.event_listener, event: oro_menu.configure.shortcuts, method: onNavigationConfigure }
