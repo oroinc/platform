@@ -95,11 +95,13 @@ class Configuration implements ConfigurationInterface
                     ->scalarNode('label')->end()
                     ->scalarNode('uri')->end()
                     ->scalarNode('route')->end()
+                    ->scalarNode('read_only')->end()
                     ->scalarNode('aclResourceId')->end()
                     ->scalarNode('translateDomain')->end()
                     ->arrayNode('translateParameters')
                         ->useAttributeAsKey('translateParameters')->prototype('scalar')->end()
                     ->end()
+                    ->booleanNode('translateDisabled')->end()
                     ->arrayNode('attributes')
                         ->children()
                             ->scalarNode('class')->end()
@@ -148,6 +150,9 @@ class Configuration implements ConfigurationInterface
                 ->prototype('array')
                     ->children()
                         ->scalarNode('type')->end()
+                        ->scalarNode('area')->end()
+                        ->scalarNode('read_only')->end()
+                        ->scalarNode('max_nesting_level')->end()
                         ->arrayNode('extras')
                             ->useAttributeAsKey('extras')->prototype('scalar')->end()
                         ->end()
@@ -156,16 +161,6 @@ class Configuration implements ConfigurationInterface
                 ->end()
             ->end()
         ->end();
-
-        $node
-            ->arrayNode('areas')
-                ->useAttributeAsKey('id')
-                    ->prototype('array')
-                        ->requiresAtLeastOneElement()
-                        ->prototype('scalar')->end()
-                    ->end()
-                ->end()
-            ->end();
 
         return $this;
     }

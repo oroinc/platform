@@ -2,8 +2,9 @@
 
 namespace Oro\Bundle\CalendarBundle\EventListener;
 
-use Oro\Bundle\NavigationBundle\Event\ConfigureMenuEvent;
 use Oro\Bundle\CalendarBundle\Provider\SystemCalendarConfig;
+use Oro\Bundle\NavigationBundle\Event\ConfigureMenuEvent;
+use Oro\Bundle\NavigationBundle\Utils\MenuUpdateUtils;
 
 class NavigationListener
 {
@@ -24,10 +25,10 @@ class NavigationListener
     public function onNavigationConfigure(ConfigureMenuEvent $event)
     {
         if (!$this->calendarConfig->isPublicCalendarEnabled() && !$this->calendarConfig->isSystemCalendarEnabled()) {
-            $event->getMenu()
-                ->getChild('system_tab')
-                ->getChild('oro_system_calendar_list')
-                ->setDisplay(false);
+            $calendarListItem = MenuUpdateUtils::findMenuItem($event->getMenu(), 'oro_system_calendar_list');
+            if ($calendarListItem !== null) {
+                $calendarListItem->setDisplay(false);
+            }
         }
     }
 }
