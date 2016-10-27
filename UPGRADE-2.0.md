@@ -8,6 +8,7 @@ UPGRADE FROM 1.10 to 2.0
 - Deprecated constant `Oro\Component\Action\Event\ExecuteActionEvents::DEPRECATED_HANDLE_BEFORE` removed. Use `Oro\Component\Action\Event\ExecuteActionEvents::HANDLE_BEFORE` instead.
 - Deprecated constant `Oro\Component\Action\Event\ExecuteActionEvents::DEPRECATED_HANDLE_AFTER` removed. Use `Oro\Component\Action\Event\ExecuteActionEvents::HANDLE_AFTER` instead.
 - Deprecated events `oro_workflow.action.handle_before` and `oro_workflow.action.handle_action` removed.
+- Removed service `@oro_action.context_accessor` and its class `Oro\Component\Action\Model\ContextAccessor`. Use `@oro_action.expression.context_accessor` and `Oro\Component\ConfigExpression\ContextAccessor`.
 - Class `Oro\Component\Action\Action\ActionFactory` 
     - implement new interface `Oro\Component\ConfigExpression\FactoryWithTypesInterface`
     
