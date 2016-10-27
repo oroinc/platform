@@ -4,7 +4,8 @@ namespace Oro\Bundle\SearchBundle\EventListener;
 
 use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ORM\UnitOfWork;
-use Oro\Bundle\SearchBundle\Provider\SearchMappingProvider;
+
+use Oro\Bundle\SearchBundle\Provider\AbstractSearchMappingProvider;
 
 /**
  * This trait contains common code that repeats in
@@ -13,7 +14,7 @@ use Oro\Bundle\SearchBundle\Provider\SearchMappingProvider;
 trait IndexationListenerTrait
 {
     /**
-     * @var SearchMappingProvider
+     * @var AbstractSearchMappingProvider
      */
     protected $mappingProvider;
 
