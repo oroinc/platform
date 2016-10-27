@@ -3,6 +3,7 @@
 namespace Oro\Bundle\TranslationBundle\Tests\Functional\Controller;
 
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
+use Oro\Bundle\TranslationBundle\Migrations\Data\Demo\ORM\LoadTranslationUsers;
 use Oro\Bundle\TranslationBundle\Tests\Functional\DataFixtures\LoadLanguages;
 
 /**
@@ -15,7 +16,10 @@ class LanguageControllerTest extends WebTestCase
      */
     protected function setUp()
     {
-        $this->initClient([], $this->generateBasicAuthHeader());
+        $this->initClient([], $this->generateBasicAuthHeader(
+            LoadTranslationUsers::TRANSLATOR_USERNAME,
+            LoadTranslationUsers::TRANSLATOR_USERNAME
+        ));
         $this->loadFixtures([LoadLanguages::class]);
     }
 
@@ -29,11 +33,9 @@ class LanguageControllerTest extends WebTestCase
         $languages = $this->getContainer()->get('oro_translation.provider.language')->getAvailableLanguages();
 
         $result = $this->getJsonResponseContent($this->client->requestGrid('oro-translation-language-grid'), 200);
-        $this->assertEquals(count($languages), count($result['data']));
+        $this->assertCount(1, $result['data']);
 
-        foreach ($result['data'] as $data) {
-            $this->assertArrayHasKey('language', $data);
-            $this->assertContains($data['language'], $languages);
-        }
+        $this->assertArrayHaskey('language', $result['data'][0]);
+        $this->assertEquals($languages[LoadLanguages::LANGUAGE3], $result['data'][0]['language']);
     }
 }
