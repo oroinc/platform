@@ -33,7 +33,6 @@ class ReverseSyncProcessor extends AbstractSyncProcessor
             if (!($realConnector instanceof TwoWaySyncConnectorInterface)) {
                 throw new LogicException('This connector does not support reverse sync.');
             }
-
         } catch (\Exception $exception) {
             $this->logger->error($exception->getMessage(), ['exception' => $exception]);
 

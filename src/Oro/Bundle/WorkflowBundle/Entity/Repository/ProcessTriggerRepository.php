@@ -6,7 +6,7 @@ use Doctrine\ORM\EntityRepository;
 
 use Oro\Bundle\WorkflowBundle\Entity\ProcessTrigger;
 
-class ProcessTriggerRepository extends EntityRepository
+class ProcessTriggerRepository extends EntityRepository implements EventTriggerRepositoryInterface
 {
     /**
      * @param ProcessTrigger $trigger
@@ -78,6 +78,14 @@ class ProcessTriggerRepository extends EntityRepository
         }
 
         return $queryBuilder->getQuery()->execute();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getAvailableEventTriggers()
+    {
+        return $this->findAllWithDefinitions(null, false);
     }
 
     /**

@@ -5,13 +5,10 @@ namespace Oro\Bundle\UserBundle\Entity;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
-
-use Symfony\Component\Security\Core\Role\RoleInterface;
-
-use Oro\Bundle\DataAuditBundle\Metadata\Annotation as Oro;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\OrganizationBundle\Entity\OrganizationInterface;
+use Symfony\Component\Security\Core\Role\RoleInterface;
 
 /**
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
@@ -41,7 +38,6 @@ abstract class AbstractUser implements
      * @var string
      *
      * @ORM\Column(type="string", length=255, unique=true)
-     * @Oro\Versioned
      * @ConfigField(
      *      defaultValues={
      *          "dataaudit"={
@@ -125,7 +121,6 @@ abstract class AbstractUser implements
      * @var bool
      *
      * @ORM\Column(type="boolean")
-     * @Oro\Versioned
      * @ConfigField(
      *      defaultValues={
      *          "dataaudit"={
@@ -144,7 +139,6 @@ abstract class AbstractUser implements
      *      joinColumns={@ORM\JoinColumn(name="user_id", referencedColumnName="id", onDelete="CASCADE")},
      *      inverseJoinColumns={@ORM\JoinColumn(name="role_id", referencedColumnName="id", onDelete="CASCADE")}
      * )
-     * @Oro\Versioned("getLabel")
      * @ConfigField(
      *      defaultValues={
      *          "dataaudit"={"auditable"=true},
@@ -690,8 +684,10 @@ abstract class AbstractUser implements
      */
     public function isPasswordRequestNonExpired($ttl)
     {
-        return $this->getPasswordRequestedAt() instanceof \DateTime
-        && $this->getPasswordRequestedAt()->getTimestamp() + $ttl > time();
+        $passwordRequestAt = $this->getPasswordRequestedAt();
+
+        return $passwordRequestAt === null || ($passwordRequestAt instanceof \DateTime
+        && $this->getPasswordRequestedAt()->getTimestamp() + $ttl > time());
     }
 
     /**

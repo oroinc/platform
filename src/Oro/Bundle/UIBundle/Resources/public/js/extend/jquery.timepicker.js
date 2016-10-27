@@ -4,7 +4,7 @@ define(function(require) {
     var $ = require('jquery');
     var mask = require('oroui/js/dropdown-mask');
     require('oroui/js/jquery-timepicker-l10n');
-    require('oroui/lib/jquery.timepicker-1.4.13/jquery.timepicker');
+    require('jquery.timepicker');
 
     $(document)
         .on('showTimepicker', function(e) {

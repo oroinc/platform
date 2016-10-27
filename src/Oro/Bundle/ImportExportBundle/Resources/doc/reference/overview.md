@@ -65,7 +65,7 @@ fixtures. TemplateManager is a storage for import template fixtures.
 OroBatchBundle Configuration
 ----------------------------
 
-This configuration is used by OroBatchBundle and encapsulates three jobs for importing entity to CSV file,
+This configuration is used by OroBatchBundle and encapsulates three jobs for importing entity from CSV file,
 validating import data and exporting entity to CSV file.
 
 ```

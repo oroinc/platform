@@ -81,7 +81,6 @@ class WidgetController extends Controller
                     return $this->redirect($params['response']['redirectUrl']);
                 }
             }
-
         } catch (\Exception $e) {
             $params = array_merge($params, $this->getErrorResponse(
                 $params,

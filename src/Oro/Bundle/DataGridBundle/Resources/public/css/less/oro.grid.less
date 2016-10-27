@@ -45,9 +45,12 @@
 
 .grid-views {
   margin: 0 0 0 15px;
-
+  .inner-grid & {
+    margin-left: 20px;
+  }
   .page-title & {
     float: left;
+    margin-left: 0;
   }
 
   .btn,
@@ -255,7 +258,7 @@ table .thead-sizing {
     z-index: 898;
   }
   .grid-container thead {
-    z-index: 899;
+    z-index: 3;
     &.thead-sizing th {
       border-top: none;
     }
@@ -382,4 +385,7 @@ td > .nowrap-ellipsis {
   .grid-header.thead-sizing  .grid-header-cell:not(.abbreviated) .grid-header-cell__label {
     width: 40px !important;
   }
+}
+.grid-toolbar-mass-actions {
+  font-size: 0;
 }

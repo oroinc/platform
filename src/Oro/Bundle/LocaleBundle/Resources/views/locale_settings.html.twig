@@ -39,11 +39,12 @@ function($, localeSettings) {
     {% endfor %}
 
     {% set localeConfigurationClass = '\\Oro\\Bundle\\LocaleBundle\\DependencyInjection\\Configuration::' %}
+    {% set currencyConfigurationClass = '\\Oro\\Bundle\\CurrencyBundle\\DependencyInjection\\Configuration::' %}
     {% set defaults = {
         'locale':   constant(localeConfigurationClass ~ 'DEFAULT_LOCALE'),
         'language': constant(localeConfigurationClass ~ 'DEFAULT_LANGUAGE'),
         'country':  constant(localeConfigurationClass ~ 'DEFAULT_COUNTRY'),
-        'currency': constant(localeConfigurationClass ~ 'DEFAULT_CURRENCY')
+        'currency': constant(currencyConfigurationClass ~ 'DEFAULT_CURRENCY')
     } %}
 
     {% set settings = {

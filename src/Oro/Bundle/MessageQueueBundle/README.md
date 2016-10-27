@@ -56,7 +56,7 @@ class FooMessageProcessor implements MessageProcessor, TopicSubscriberInterface
 Register it as a container service and subscribe to the topic:
 
 ```yaml
-orocrm_channel.async.change_integration_status_processor:
+oro_channel.async.change_integration_status_processor:
     class: 'FooMessageProcessor'
     tags:
         - { name: 'oro_message_queue.client.message_processor' }
@@ -131,7 +131,7 @@ You have to provide an implementation for them
 
 ## Functional tests
 
-To functionally test that a message was sent, you can use [MessageQueueExtension](./Test/Functional/MessageQueueExtension.php).
+To functionally test that a message was sent, you can use [MessageQueueExtension](./Test/Functional/MessageQueueExtension.php). Also, in case if you need custom logic for manage sent messages, you can use [MessageQueueAssertTrait](./Test/Functional/MessageQueueAssertTrait.php). 
 
 But before you start, you need to register `oro_message_queue.test.message_collector` service for `test` environment.
 
@@ -161,16 +161,45 @@ class SomeTest extends WebTestCase
 
     public function testSingleMessage()
     {
-        // do something that sends a message
-
+        // assert that a message was sent to a topic
         self::assertMessageSent('aFooTopic', 'Something has happened');
+
+        // assert that at least one message was sent to a topic
+        // can be used if a message is not matter
+        self::assertMessageSent('aFooTopic');
     }
 
     public function testSeveralMessages()
     {
-        // do something that sends several messages
-
+        // assert that exactly given messages were sent to a topic
         self::assertMessagesSent(
+            'aFooTopic',
+            [
+                'Something has happened',
+                'Something else has happened',
+            ]
+        );
+        // assert that the exactly given number of messages were sent to a topic
+        // can be used if messages are not matter
+        self::assertMessagesCount('aFooTopic', 2);
+        // also assertCountMessages alias can be used to do the same assertion
+        self::assertCountMessages('aFooTopic');
+    }
+
+    public function testNoMessages()
+    {
+        // assert that no any message was sent to a topic
+        self::assertMessagesEmpty('aFooTopic');
+        // also assertEmptyMessages alias can be used to do the same assertion
+        self::assertEmptyMessages('aFooTopic');
+    }
+
+    public function testAllMessages()
+    {
+        // assert that exactly given messages were sent
+        // NOTE: use this assertion with caution because it is possible
+        // that messages not related to a testing functionality were sent as well
+        self::assertAllMessagesSent(
             [
                 ['topic' => 'aFooTopic', 'message' => 'Something has happened'],
                 ['topic' => 'aFooTopic', 'message' => 'Something else has happened'],

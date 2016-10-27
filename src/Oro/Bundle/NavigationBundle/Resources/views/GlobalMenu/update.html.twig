@@ -1,0 +1,20 @@
+{% extends 'OroNavigationBundle:menuUpdate:update.html.twig' %}
+
+{% set menuIndexRoute  = 'oro_navigation_global_menu_index' %}
+{% set menuViewRoute   = 'oro_navigation_global_menu_view' %}
+{% set menuCreateRoute = 'oro_navigation_global_menu_create' %}
+{% set menuUpdateRoute = 'oro_navigation_global_menu_update' %}
+
+{% set ownerId = null %}
+{% oro_title_set({params : {"%title%": entity.title|trans()}}) %}
+{% set breadcrumbs = {
+    'entity': entity,
+    'indexPath': path(menuIndexRoute),
+    'indexLabel': 'oro.navigation.menuupdate.roots_plural_label'|trans,
+    'additional': [
+        {
+            'indexPath': path(menuViewRoute, {menuName: menuName}),
+            'indexLabel': menuName
+        }
+    ]
+} %}

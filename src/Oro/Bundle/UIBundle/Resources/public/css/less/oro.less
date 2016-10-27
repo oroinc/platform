@@ -49,6 +49,9 @@ a {
   &.disabled {
     color: #bfbfbf;
     pointer-events: none;
+    [class^='icon-'].hide-text:before {
+      color: #bfbfbf;
+    }
   }
 }
 form {
@@ -1618,11 +1621,17 @@ footer {
   }
   .ui-dialog-title {
     color: #fff;
-    font-size: @baseFontSize;
+    font: bold 16px/18px Helvetica, Arial, sans-serif !important;
     display: block;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+  }
+  .ui-dialog-body {
+    font-size: 14px;
+    overflow-y: auto;
+    max-height: 400px;
+    padding: 15px;
   }
   .ui-dialog-titlebar-buttonpane {
     right: 7px !important;
@@ -1688,10 +1697,6 @@ footer {
         margin-left: 142px;
         .control-label {
           width: auto;
-        }
-        select{
-          width: 100%;
-          max-width: 282px;
         }
       }
     }
@@ -2257,6 +2262,10 @@ div.selector {
   #gradient > .vertical(#ffffff, #f3f3f3);
   -webkit-border-radius: 3px;
   border-radius: 3px;
+
+  option {
+    padding-left: 6px;
+  }
 }
 
 div.selector span {
@@ -2286,6 +2295,8 @@ div.selector select {
   width: auto;
   box-sizing: border-box;
 }
+
+div.selector.input-widget-select select {width: 100%;}
 
 /* start uniformjs customization (see documentation http://uniformjs.com/ selectAutoWidth property for explain this styles) */
 .controls select {width: 279px;}

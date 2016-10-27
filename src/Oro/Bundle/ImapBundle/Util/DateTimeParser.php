@@ -47,6 +47,9 @@ class DateTimeParser
         $date = self::parseDateTime($value);
         if (!$date) {
             $err  = self::getDateTimeLastError($value);
+
+            // replace leading whitespace with zero in minutes and seconds
+            $value = preg_replace('#: (\d)#', ':0$1', $value);
             $date = self::parseDateTime($value, 'D, d m Y H:i:s O');
 
             if (!$date && false !== strpos($value, ',')) {

@@ -1,0 +1,5 @@
+services:
+    oro_api.customize_loaded_data.build_nested_objects:
+        class: Oro\Bundle\ApiBundle\Processor\CustomizeLoadedData\BuildNestedObjects
+        tags:
+            - { name: oro.api.processor, action: customize_loaded_data }

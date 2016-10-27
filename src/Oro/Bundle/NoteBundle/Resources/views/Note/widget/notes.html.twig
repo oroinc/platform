@@ -58,8 +58,8 @@
                 data-page-component-module="oronote/js/app/components/notes-component"
                 data-page-component-options="{{ options|json_encode }}"></div>
 
-            {% include 'OroNoteBundle:Note:js/list.js.twig' with {'id': 'template-note-list'} %}
-            {% include 'OroNoteBundle:Note:js/view.js.twig' with {'id': 'template-note-item'} %}
+            {% include 'OroNoteBundle:Note:js/list.html.twig' with {'id': 'template-note-list'} %}
+            {% include 'OroNoteBundle:Note:js/view.html.twig' with {'id': 'template-note-item'} %}
         {% endblock %}
     {% endblock %}
 </div>

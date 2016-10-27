@@ -21,7 +21,7 @@ class NullDriver implements DriverInterface
 
     /**
      * @param NullSession $session
-     * @param Config               $config
+     * @param Config      $config
      */
     public function __construct(NullSession $session, Config $config)
     {

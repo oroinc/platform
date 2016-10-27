@@ -119,7 +119,7 @@ class FeatureChecker
         $features = $this->configManager->getFeaturesByResource($resourceType, $resource);
 
         foreach ($features as $feature) {
-            if (!$this->checkFeatureState($feature, $scopeIdentifier)) {
+            if (!$this->isFeatureEnabled($feature, $scopeIdentifier)) {
                 return false;
             }
         }

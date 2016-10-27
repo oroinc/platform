@@ -2,39 +2,27 @@
 
 namespace Oro\Bundle\EntityConfigBundle\Translation;
 
-use Doctrine\Common\Persistence\ManagerRegistry;
-use Doctrine\ORM\EntityManager;
-
 use Symfony\Component\Translation\TranslatorInterface;
 
-use Oro\Bundle\TranslationBundle\Entity\Repository\TranslationRepository;
 use Oro\Bundle\TranslationBundle\Entity\Translation;
-use Oro\Bundle\TranslationBundle\Translation\DynamicTranslationMetadataCache;
+use Oro\Bundle\TranslationBundle\Manager\TranslationManager;
 
 class ConfigTranslationHelper
 {
-    /** @var ManagerRegistry */
-    protected $registry;
+    /** @var TranslationManager */
+    protected $translationManager;
 
     /** @var TranslatorInterface */
     protected $translator;
 
-    /** @var DynamicTranslationMetadataCache */
-    protected $translationCache;
-
     /**
-     * @param ManagerRegistry $registry
+     * @param TranslationManager $translationManager
      * @param TranslatorInterface $translator
-     * @param DynamicTranslationMetadataCache $translationCache
      */
-    public function __construct(
-        ManagerRegistry $registry,
-        TranslatorInterface $translator,
-        DynamicTranslationMetadataCache $translationCache
-    ) {
-        $this->registry = $registry;
+    public function __construct(TranslationManager $translationManager, TranslatorInterface $translator)
+    {
+        $this->translationManager = $translationManager;
         $this->translator = $translator;
-        $this->translationCache = $translationCache;
     }
 
     /**
@@ -56,6 +44,14 @@ class ConfigTranslationHelper
     }
 
     /**
+     * @param string|null $locale
+     */
+    public function invalidateCache($locale = null)
+    {
+        $this->translationManager->invalidateCache($locale);
+    }
+
+    /**
      * @param array $translations
      */
     public function saveTranslations(array $translations)
@@ -65,48 +61,20 @@ class ConfigTranslationHelper
         }
 
         $locale = $this->translator->getLocale();
-        $entities = [];
 
         foreach ($translations as $key => $value) {
-            $entities[] = $this->createTranslationEntity($key, $value, $locale);
+            $this->translationManager->saveValue(
+                $key,
+                $value,
+                $locale,
+                TranslationManager::DEFAULT_DOMAIN,
+                Translation::SCOPE_UI
+            );
         }
 
         // mark translation cache dirty
-        $this->translationCache->updateTimestamp($locale);
+        $this->translationManager->invalidateCache($locale);
 
-        $this->getTranslationManager()->flush($entities);
-    }
-
-    /**
-     * @param string $key
-     * @param string $value
-     * @param string $locale
-     * @return Translation
-     */
-    protected function createTranslationEntity($key, $value, $locale)
-    {
-        return $this->getTranslationRepository()->saveValue(
-            $key,
-            $value,
-            $locale,
-            TranslationRepository::DEFAULT_DOMAIN,
-            Translation::SCOPE_UI
-        );
-    }
-
-    /**
-     * @return EntityManager
-     */
-    protected function getTranslationManager()
-    {
-        return $this->registry->getManagerForClass(Translation::ENTITY_NAME);
-    }
-
-    /**
-     * @return TranslationRepository
-     */
-    protected function getTranslationRepository()
-    {
-        return $this->getTranslationManager()->getRepository(Translation::ENTITY_NAME);
+        $this->translationManager->flush();
     }
 }
