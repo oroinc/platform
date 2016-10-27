@@ -107,7 +107,7 @@ class SaveFieldsChangesActionTest extends \PHPUnit_Framework_TestCase
         return [
             [
                 [
-                    'entity'    => new PropertyPath('entity'),
+                    'entity'    => new PropertyPath('data'),
                     'changeSet' => new PropertyPath('changeSet'),
                 ],
                 [
