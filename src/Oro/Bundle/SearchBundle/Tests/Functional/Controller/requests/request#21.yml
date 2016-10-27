@@ -17,7 +17,7 @@ response:
                 record_url: http://localhost%oro_default_prefix%search/
             -
                 entity_name: Oro\Bundle\TestFrameworkBundle\Entity\Item
-                record_string: item1@mail.com 123-456-100
+                record_string: item5@mail.com 123-456-500
                 record_url: http://localhost%oro_default_prefix%search/
             -
                 entity_name: Oro\Bundle\TestFrameworkBundle\Entity\Item
@@ -41,7 +41,7 @@ response:
                 selectedData: []
             -
                 entityName: Oro\Bundle\TestFrameworkBundle\Entity\Item
-                recordTitle: item1@mail.com 123-456-100
+                recordTitle: item5@mail.com 123-456-500
                 recordUrl: http://localhost%oro_default_prefix%search/
                 selectedData: []
             -

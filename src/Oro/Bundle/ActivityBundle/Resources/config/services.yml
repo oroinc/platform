@@ -147,7 +147,7 @@ services:
             - '@oro_entity_config.config_manager'
             - '@oro_entity.entity_class_name_helper'
             - '@doctrine.orm.entity_manager'
-            - '@oro_search.mapper'
+            - '@oro_entity.entity_name_resolver'
             - '@event_dispatcher'
 
     oro_activity.form.handler.activity_entity.api:

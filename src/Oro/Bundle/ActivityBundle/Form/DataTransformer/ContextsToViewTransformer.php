@@ -62,7 +62,7 @@ class ContextsToViewTransformer implements DataTransformerInterface
         $this->translator           = $translator;
         $this->securityTokenStorage = $securityTokenStorage;
         $this->dispatcher           = $dispatcher;
-        $this->entityNameResolver  = $entityNameResolver;
+        $this->entityNameResolver   = $entityNameResolver;
         $this->collectionModel      = $collectionModel;
     }
 

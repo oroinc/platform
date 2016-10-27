@@ -15,6 +15,7 @@ use Doctrine\ORM\QueryBuilder;
 use Oro\Component\DoctrineUtils\ORM\QueryUtils;
 use Oro\Component\DoctrineUtils\ORM\SqlQueryBuilder;
 
+use Oro\Bundle\EntityBundle\Provider\EntityNameResolver;
 use Oro\Bundle\EntityBundle\Tools\EntityClassNameHelper;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\ActivityBundle\Manager\ActivityManager;
@@ -22,7 +23,6 @@ use Oro\Bundle\ActivityBundle\Event\SearchAliasesEvent;
 use Oro\Bundle\FormBundle\Autocomplete\ConverterInterface;
 use Oro\Bundle\SearchBundle\Engine\Indexer;
 use Oro\Bundle\SearchBundle\Query\Result\Item;
-use Oro\Bundle\SearchBundle\Engine\ObjectMapper;
 use Oro\Bundle\SearchBundle\Event\PrepareResultItemEvent;
 
 /**
@@ -31,7 +31,7 @@ use Oro\Bundle\SearchBundle\Event\PrepareResultItemEvent;
  * Can not use default Oro\Bundle\FormBundle\Autocomplete\SearchHandlerInterface cause in this handler we manipulate
  * with different types of entities.
  *
- * Also @see Oro\Bundle\ActivityBundle\Form\DataTransformer\ContextsToViewTransformer
+ * Also @see \Oro\Bundle\ActivityBundle\Form\DataTransformer\ContextsToViewTransformer
  */
 class ContextSearchHandler implements ConverterInterface
 {
@@ -56,8 +56,8 @@ class ContextSearchHandler implements ConverterInterface
     /** @var ObjectManager */
     protected $objectManager;
 
-    /** @var ObjectMapper */
-    protected $mapper;
+    /** @var EntityNameResolver */
+    protected $nameResolver;
 
     /** @var EventDispatcherInterface */
     protected $dispatcher;
@@ -73,7 +73,7 @@ class ContextSearchHandler implements ConverterInterface
      * @param ConfigManager            $configManager
      * @param EntityClassNameHelper    $entityClassNameHelper
      * @param ObjectManager            $objectManager
-     * @param ObjectMapper             $mapper
+     * @param EntityNameResolver       $nameResolver
      * @param EventDispatcherInterface $dispatcher
      * @param string|null              $class
      *
@@ -87,7 +87,7 @@ class ContextSearchHandler implements ConverterInterface
         ConfigManager $configManager,
         EntityClassNameHelper $entityClassNameHelper,
         ObjectManager $objectManager,
-        ObjectMapper $mapper,
+        EntityNameResolver $nameResolver,
         EventDispatcherInterface $dispatcher,
         $class = null
     ) {
@@ -98,7 +98,7 @@ class ContextSearchHandler implements ConverterInterface
         $this->configManager         = $configManager;
         $this->entityClassNameHelper = $entityClassNameHelper;
         $this->objectManager         = $objectManager;
-        $this->mapper                = $mapper;
+        $this->nameResolver          = $nameResolver;
         $this->dispatcher            = $dispatcher;
         $this->class                 = $class;
     }
@@ -286,30 +286,6 @@ class ContextSearchHandler implements ConverterInterface
     }
 
     /**
-     * Returns a DQL expression that can be used to get a text representation of the given type of entities.
-     *
-     * @param string $className The FQCN of the entity
-     * @param string $alias     The alias in SELECT or JOIN statement
-     *
-     * @return string|false
-     */
-    protected function getNameDQL($className, $alias)
-    {
-        $fields = $this->mapper->getEntityMapParameter($className, 'title_fields');
-        if ($fields) {
-            $titleParts = [];
-            foreach ($fields as $field) {
-                $titleParts[] = $alias . '.' . $field;
-                $titleParts[] = '\' \'';
-            }
-
-            return QueryUtils::buildConcatExpr($titleParts);
-        }
-
-        return false;
-    }
-
-    /**
      * Query builder to get target entities in a single query
      *
      * @param array $groupedTargets
@@ -325,7 +301,7 @@ class ContextSearchHandler implements ConverterInterface
         $selectStmt = null;
         $subQueries = [];
         foreach ($groupedTargets as $entityClass => $ids) {
-            $nameExpr = $this->getNameDQL($entityClass, 'e');
+            $nameExpr = $this->nameResolver->getNameDQL($entityClass, 'e');
             /** @var QueryBuilder $subQb */
             $subQb    = $objectManager->getRepository($entityClass)->createQueryBuilder('e')
                 ->select(

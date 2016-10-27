@@ -122,7 +122,10 @@ class EntityNameProvider implements EntityNameProviderInterface
 
     /**
      * Return string field names of className
+     * Return first string field match from fieldGuesses or all string fields
+     *
      * @param  string $className
+     *
      * @return array
      */
     protected function getFieldNames($className)

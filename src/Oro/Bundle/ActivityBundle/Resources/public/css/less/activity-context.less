@@ -21,12 +21,19 @@
 .context-item {
   list-style: none;
   cursor: pointer;
-  display: inline-block;
   white-space: nowrap;
+  &.active {
+    background-color: #ebebeb;
+  }
+  .dropdown-menu &:hover {
+    background: #f3f3f3;
+    color: #444444;
+  }
 }
 
-.context-item.active {
-  background-color: #ebebeb;
+.cell-context-item{
+  display: inline-block;
+  white-space: nowrap;
 }
 
 .customer-content .context-item .icon-remove {
