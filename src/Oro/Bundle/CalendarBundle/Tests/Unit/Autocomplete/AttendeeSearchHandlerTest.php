@@ -65,7 +65,7 @@ class AttendeeSearchHandlerTest extends \PHPUnit_Framework_TestCase
 
         $this->om = $this->getMock('Doctrine\Common\Persistence\ObjectManager');
 
-        $mapper = $this->getMockBuilder('Oro\Bundle\SearchBundle\Engine\ObjectMapper')
+        $nameResolver = $this->getMockBuilder('Oro\Bundle\EntityBundle\Provider\EntityNameResolver')
             ->disableOriginalConstructor()
             ->getMock();
 
@@ -94,7 +94,7 @@ class AttendeeSearchHandlerTest extends \PHPUnit_Framework_TestCase
             $configManager,
             $entityClassNameHelper,
             $this->om,
-            $mapper,
+            $nameResolver,
             $dispatcher
         );
 
