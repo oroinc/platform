@@ -80,7 +80,7 @@ class ProcessDefinition implements DomainObjectInterface
      *
      * @ORM\Column(name="exclude_definitions", type="simple_array", nullable=true)
      */
-    protected $excludeDefinitions;
+    protected $excludeDefinitions = [];
 
     /**
      * @var array

@@ -81,6 +81,7 @@ class ControllersTest extends WebTestCase
         $result = $this->getJsonResponseContent($response, 200);
         $data = $result['data'];
         $options = $result['options'];
+        $this->addOroDefaultPrefixToUrlInParameterArray($reportResult, 'view_link');
         $this->verifyReport($reportResult, $data, $options['totalRecords']);
     }
 
@@ -128,6 +129,7 @@ class ControllersTest extends WebTestCase
         $result = $this->getJsonResponseContent($response, 200);
         $data = $result['data'];
         $options = $result['options'];
+        $this->addOroDefaultPrefixToUrlInParameterArray($reportResult, 'view_link');
         $this->verifyReport($reportResult, $data, (int)$options['totalRecords']);
     }
 

@@ -9,7 +9,7 @@
     <form id="login-form" action="{{ path('oro_user_security_check') }}" method="post" class="form-signin">
         <div class="title-box">
             {% if oro_theme_logo() %}
-            <h1 class="oro-title logo-{{ oro_theme_logo() ? 'image' : 'text' }}">
+            <h1 class="title logo-{{ oro_theme_logo() ? 'image' : 'text' }}">
                 <img src="{{ asset(oro_theme_logo()) }}">
             </h1>
             <span class="divider-vertical"></span>
@@ -27,7 +27,12 @@
             </script>
             {% if error %}
                 <div class="alert alert-error">
-                    <div>{{ error.messageKey|trans(error.messageData, 'security') }}</div>
+                    <div>
+                        {{ error.messageKey|trans(error.messageData, 'security') }}
+                        {% if remaining_attempts is not null %}
+                            {{ 'oro.user.security.remaining_login_attempts'|transchoice(remaining_attempts, {'%count%': remaining_attempts}) }}
+                        {% endif %}
+                    </div>
                 </div>
             {% endif %}
             {{ messagesContent }}
@@ -56,7 +61,7 @@
             </div>
             {% placeholder oro_user_login_form %}
         </fieldset>
-        <input type="hidden" name="_target_path" value="" />
+        <input type="hidden" name="_target_path" value="{{ url('oro_default') }}" />
         <input type="hidden" name="_csrf_token" value="{{ csrf_token }}" />
     </form>
 </div>

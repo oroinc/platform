@@ -10,7 +10,9 @@
         "oro/ui-bundle": "dev-master",
         "oro/locale-bundle": "dev-master",
         "oro/requirejs-bundle": "dev-master",
-        "oro/datagrid-bundle": "dev-master"
+        "oro/datagrid-bundle": "dev-master",
+        "bower-asset/flotr2": "*",
+        "bower-asset/bean": "1.0.6"
     },
     "autoload": {
         "psr-0": { "Oro\\Bundle\\ChartBundle": "" }

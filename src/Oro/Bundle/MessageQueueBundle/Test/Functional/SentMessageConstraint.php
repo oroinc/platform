@@ -13,7 +13,7 @@ class SentMessageConstraint extends \PHPUnit_Framework_Constraint
     protected $message;
 
     /**
-     * @param array $message ['topic' => topic name, 'message' => message]
+     * @param array $message ['topic' => topic name, 'message' => message] or ['topic' => topic name]
      */
     public function __construct(array $message)
     {
@@ -30,10 +30,21 @@ class SentMessageConstraint extends \PHPUnit_Framework_Constraint
             return false;
         }
 
-        $constraint = new \PHPUnit_Framework_Constraint_IsEqual($this->message);
-        foreach ($other as $message) {
-            if ($constraint->evaluate($message, '', true)) {
-                return true;
+        if (array_key_exists('message', $this->message)) {
+            $constraint = new \PHPUnit_Framework_Constraint_IsEqual($this->message);
+            foreach ($other as $message) {
+                if ($constraint->evaluate($message, '', true)) {
+                    return true;
+                }
+            }
+        } else {
+            foreach ($other as $message) {
+                if (is_array($message)
+                    && array_key_exists('topic', $message)
+                    && $message['topic'] === $this->message['topic']
+                ) {
+                    return true;
+                }
             }
         }
 

@@ -37,6 +37,7 @@ use Oro\Bundle\EntityExtendBundle\Extend\RelationType;
  * Updates configuration of fields if other fields a linked to them using "property_path".
  * Sets "exclusion_policy = all" for the entity. It means that the configuration
  * of all fields and associations was completed.
+ * Completes configuration of fields that represent nested objects.
  * By performance reasons all these actions are done in one processor.
  *
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
@@ -209,26 +210,41 @@ class CompleteDefinition implements ProcessorInterface
             $fields = $definition->getFields();
             foreach ($fields as $fieldName => $field) {
                 $dataType = $field->getDataType();
-                if ($dataType && 0 === strpos($dataType, 'association:')) {
-                    list(, $associationType, $associationKind) = array_pad(explode(':', $dataType, 3), 3, null);
+                if (DataType::isNestedObject($dataType)) {
+                    $this->completeNestedObject($fieldName, $field);
+                } elseif (DataType::isExtendedAssociation($dataType)) {
+                    if ($field->getTargetType()) {
+                        throw new \RuntimeException(
+                            sprintf(
+                                'The "target_type" option cannot be configured for "%s::%s".',
+                                $entityClass,
+                                $fieldName
+                            )
+                        );
+                    }
+                    if ($field->getDependsOn()) {
+                        throw new \RuntimeException(
+                            sprintf(
+                                'The "depends_on" option cannot be configured for "%s::%s".',
+                                $entityClass,
+                                $fieldName
+                            )
+                        );
+                    }
+
+                    list($associationType, $associationKind) = DataType::parseExtendedAssociation($dataType);
                     $targetClass = $field->getTargetClass();
                     if (!$targetClass) {
                         $targetClass = EntityIdentifier::class;
                         $field->setTargetClass($targetClass);
                     }
-                    if (!$field->getTargetType()) {
-                        $field->setTargetType($this->getExtendedAssociationTargetType($associationType));
-                    }
-                    if (!$field->getDependsOn()) {
-                        $field->setDependsOn(
-                            $this->getExtendedAssociationTargetFields(
-                                $entityClass,
-                                $associationType,
-                                $associationKind
-                            )
-                        );
-                    }
+                    $field->setTargetType($this->getExtendedAssociationTargetType($associationType));
+
                     $this->completeAssociation($field, $targetClass, $version, $requestType);
+
+                    $targets = $this->getExtendedAssociationTargets($entityClass, $associationType, $associationKind);
+                    $field->setDependsOn(array_values($targets));
+                    $this->fixExtendedAssociationIdentifierDataType($field, array_keys($targets));
                 }
             }
         }
@@ -253,18 +269,58 @@ class CompleteDefinition implements ProcessorInterface
      * @param string $associationType
      * @param string $associationKind
      *
-     * @return string[]
+     * @return array [target_entity_class => field_name]
      */
-    protected function getExtendedAssociationTargetFields($entityClass, $associationType, $associationKind)
+    protected function getExtendedAssociationTargets($entityClass, $associationType, $associationKind)
     {
-        $targets = $this->associationManager->getAssociationTargets(
+        return $this->associationManager->getAssociationTargets(
             $entityClass,
             null,
             $associationType,
             $associationKind
         );
+    }
 
-        return array_values($targets);
+    /**
+     * @param EntityDefinitionFieldConfig $field
+     * @param string[]                    $targets
+     */
+    protected function fixExtendedAssociationIdentifierDataType(EntityDefinitionFieldConfig $field, array $targets)
+    {
+        $targetEntity = $field->getTargetEntity();
+        if (null === $targetEntity) {
+            return;
+        }
+        $idFieldNames = $targetEntity->getIdentifierFieldNames();
+        if (1 !== count($idFieldNames)) {
+            return;
+        }
+        $idField = $targetEntity->getField(reset($idFieldNames));
+        if (null === $idField) {
+            return;
+        }
+
+        if (DataType::STRING === $idField->getDataType()) {
+            $idDataType = null;
+            foreach ($targets as $target) {
+                $targetMetadata = $this->doctrineHelper->getEntityMetadataForClass($target);
+                $targetIdFieldNames = $targetMetadata->getIdentifierFieldNames();
+                if (1 !== count($targetIdFieldNames)) {
+                    $idDataType = null;
+                    break;
+                }
+                $dataType = $targetMetadata->getTypeOfField(reset($targetIdFieldNames));
+                if (null === $idDataType) {
+                    $idDataType = $dataType;
+                } elseif ($idDataType !== $dataType) {
+                    $idDataType = null;
+                    break;
+                }
+            }
+            if ($idDataType) {
+                $idField->setDataType($idDataType);
+            }
+        }
     }
 
     /**
@@ -439,11 +495,46 @@ class CompleteDefinition implements ProcessorInterface
     ) {
         $fields = $definition->getFields();
         foreach ($fields as $fieldName => $field) {
-            $targetClass = $field->getTargetClass();
-            if (!$targetClass) {
-                continue;
+            if (DataType::isNestedObject($field->getDataType())) {
+                $this->completeNestedObject($fieldName, $field);
+            } else {
+                $targetClass = $field->getTargetClass();
+                if (!$targetClass) {
+                    continue;
+                }
+                $this->completeAssociation($field, $targetClass, $version, $requestType);
             }
-            $this->completeAssociation($field, $targetClass, $version, $requestType);
+        }
+    }
+
+    /**
+     * @param string                      $fieldName
+     * @param EntityDefinitionFieldConfig $field
+     */
+    protected function completeNestedObject($fieldName, EntityDefinitionFieldConfig $field)
+    {
+        $field->setPropertyPath(ConfigUtil::IGNORE_PROPERTY_PATH);
+
+        $target = $field->getOrCreateTargetEntity();
+        $target->setExcludeAll();
+
+        $dependsOn = $field->getDependsOn();
+        if (null === $dependsOn) {
+            $dependsOn = [];
+        }
+        $targetFields = $target->getFields();
+        foreach ($targetFields as $targetFieldName => $targetField) {
+            $targetPropertyPath = $targetField->getPropertyPath($targetFieldName);
+            if (!in_array($targetPropertyPath, $dependsOn, true)) {
+                $dependsOn[] = $targetPropertyPath;
+            }
+        }
+        $field->setDependsOn($dependsOn);
+
+        $formOptions = $field->getFormOptions();
+        if (null === $formOptions || !array_key_exists('property_path', $formOptions)) {
+            $formOptions['property_path'] = $fieldName;
+            $field->setFormOptions($formOptions);
         }
     }
 }

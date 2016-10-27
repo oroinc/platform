@@ -5,6 +5,7 @@ namespace Oro\Bundle\ApiBundle\Processor\GetList;
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
 use Oro\Bundle\ApiBundle\Normalizer\ObjectNormalizer;
+use Oro\Bundle\ApiBundle\Processor\Context;
 
 class NormalizeData implements ProcessorInterface
 {
@@ -40,8 +41,17 @@ class NormalizeData implements ProcessorInterface
         $config = $context->getConfig();
 
         $normalizedData = [];
+        $normalizationContext = [
+            Context::ACTION       => $context->getAction(),
+            Context::VERSION      => $context->getVersion(),
+            Context::REQUEST_TYPE => $context->getRequestType()
+        ];
         foreach ($data as $key => $value) {
-            $normalizedData[$key] = $this->objectNormalizer->normalizeObject($value, $config);
+            $normalizedData[$key] = $this->objectNormalizer->normalizeObject(
+                $value,
+                $config,
+                $normalizationContext
+            );
         }
         $context->setResult($normalizedData);
     }

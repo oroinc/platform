@@ -4,42 +4,28 @@ namespace Oro\Bundle\ApiBundle\Metadata;
 
 use Oro\Component\ChainProcessor\ToArrayInterface;
 
-class AssociationMetadata implements ToArrayInterface
+class AssociationMetadata extends PropertyMetadata implements ToArrayInterface
 {
     /** @var string */
-    protected $name;
-
-    /** @var string */
-    protected $dataType;
-
-    /** @var string */
-    protected $targetClass;
+    private $targetClass;
 
     /** @var string[] */
-    protected $acceptableTargetClasses = [];
+    private $acceptableTargetClasses = [];
 
     /** @var string */
-    protected $associationType;
+    private $associationType;
 
     /** @var bool */
-    protected $collection = false;
+    private $collection = false;
 
     /** @var bool */
-    protected $nullable = false;
+    private $nullable = false;
 
     /** @var bool */
-    protected $collapsed = false;
+    private $collapsed = false;
 
     /** @var EntityMetadata|null */
     private $targetMetadata;
-
-    /**
-     * @param string|null $name
-     */
-    public function __construct($name = null)
-    {
-        $this->name = $name;
-    }
 
     /**
      * Makes a deep copy of the object.
@@ -58,14 +44,15 @@ class AssociationMetadata implements ToArrayInterface
      */
     public function toArray()
     {
-        $result = [
-            'name' => $this->name,
-            'data_type'        => $this->dataType,
-            'nullable'         => $this->nullable,
-            'collapsed'        => $this->collapsed,
-            'association_type' => $this->associationType,
-            'collection'       => $this->collection
-        ];
+        $result = array_merge(
+            parent::toArray(),
+            [
+                'nullable'         => $this->nullable,
+                'collapsed'        => $this->collapsed,
+                'association_type' => $this->associationType,
+                'collection'       => $this->collection
+            ]
+        );
         if ($this->targetClass) {
             $result['target_class'] = $this->targetClass;
         }
@@ -77,46 +64,6 @@ class AssociationMetadata implements ToArrayInterface
         }
 
         return $result;
-    }
-
-    /**
-     * Gets the name of the association.
-     *
-     * @return string
-     */
-    public function getName()
-    {
-        return $this->name;
-    }
-
-    /**
-     * Sets the name of the association.
-     *
-     * @param string $name
-     */
-    public function setName($name)
-    {
-        $this->name = $name;
-    }
-
-    /**
-     * Gets the data-type of the association identifier field.
-     *
-     * @return string
-     */
-    public function getDataType()
-    {
-        return $this->dataType;
-    }
-
-    /**
-     * Sets the data-type of the association identifier field.
-     *
-     * @param string $dataType
-     */
-    public function setDataType($dataType)
-    {
-        $this->dataType = $dataType;
     }
 
     /**

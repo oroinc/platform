@@ -16,7 +16,8 @@
         "nelmio/api-doc-bundle": "dev-master",
         "symfony/assetic-bundle": "2.1.*",
         "kriswallsmith/assetic": "1.1.*@dev",
-        "oro/requirejs-bundle": "dev-master"
+        "oro/requirejs-bundle": "dev-master",
+        "bower-asset/jquery-form": "3.37.0"
     },
     "require-dev": {
         "doctrine/data-fixtures": "@dev",

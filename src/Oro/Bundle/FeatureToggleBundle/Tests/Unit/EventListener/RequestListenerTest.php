@@ -26,7 +26,7 @@ class RequestListenerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException Symfony\Component\HttpKernel\Exception\NotFoundHttpException
+     * @expectedException \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
     public function testWhenRouteFeatureDisabled()
     {
@@ -41,6 +41,7 @@ class RequestListenerTest extends \PHPUnit_Framework_TestCase
         /** @var GetResponseEvent|\PHPUnit_Framework_MockObject_MockObject $event */
         $event = $this->getMockBuilder(GetResponseEvent::class)->disableOriginalConstructor()->getMock();
         $event->method('getRequest')->willReturn($request);
+        $event->method('isMasterRequest')->willReturn(true);
         
         $this->listener->onRequest($event);
     }
@@ -58,7 +59,22 @@ class RequestListenerTest extends \PHPUnit_Framework_TestCase
         /** @var GetResponseEvent|\PHPUnit_Framework_MockObject_MockObject $event */
         $event = $this->getMockBuilder(GetResponseEvent::class)->disableOriginalConstructor()->getMock();
         $event->method('getRequest')->willReturn($request);
+        $event->method('isMasterRequest')->willReturn(true);
         
+        $this->listener->onRequest($event);
+    }
+
+    public function testForNonMasterRequest()
+    {
+        $this->featureChecker->expects($this->never())
+            ->method('isResourceEnabled');
+
+        /** @var GetResponseEvent|\PHPUnit_Framework_MockObject_MockObject $event */
+        $event = $this->getMockBuilder(GetResponseEvent::class)->disableOriginalConstructor()->getMock();
+        $event->expects($this->once())
+            ->method('isMasterRequest')
+            ->willReturn(false);
+
         $this->listener->onRequest($event);
     }
 }

@@ -3,4 +3,4 @@ assets:
         'orocalendar':
             - 'bundles/orocalendar/css/calendar.css'
             - 'bundles/orocalendar/css/less/print.less'
-            - 'bundles/orocalendar/lib/fullcalendar/fullcalendar.css'
+            - 'bundles/bowerassets/fullcalendar/dist/fullcalendar.css'

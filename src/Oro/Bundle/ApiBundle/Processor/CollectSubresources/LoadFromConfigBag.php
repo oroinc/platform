@@ -3,7 +3,6 @@
 namespace Oro\Bundle\ApiBundle\Processor\CollectSubresources;
 
 use Oro\Component\ChainProcessor\ContextInterface;
-use Oro\Bundle\ApiBundle\Config\EntityDefinitionFieldConfig;
 use Oro\Bundle\ApiBundle\Metadata\AssociationMetadata;
 use Oro\Bundle\ApiBundle\Provider\ConfigProvider;
 use Oro\Bundle\ApiBundle\Provider\MetadataProvider;

@@ -12,6 +12,5 @@ class Query
      */
     public function getDQL()
     {
-        
     }
 }

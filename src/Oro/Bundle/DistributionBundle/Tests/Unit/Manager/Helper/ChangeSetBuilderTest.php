@@ -60,6 +60,5 @@ class ChangeSetBuilderTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue($sourceReference));
 
         return $package;
-
     }
 }

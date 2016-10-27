@@ -22,6 +22,15 @@ system_configuration:
         fourth_group:
           title: 'Fourth group'
 
+        group_with_scalar_configurator_and_handler:
+          title: 'Scalar configurator and handler'
+          configurator: 'Test\Class::method'
+          handler: 'Test\Class::method'
+
+        group_with_array_configurator_and_handler:
+          title: 'Array configurator and handler'
+          configurator: ['Test\Class::method']
+          handler: ['Test\Class::method']
 
     tree:
         system_configuration:

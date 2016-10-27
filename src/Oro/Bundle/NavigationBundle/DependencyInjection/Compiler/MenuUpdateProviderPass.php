@@ -9,27 +9,38 @@ use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 class MenuUpdateProviderPass implements CompilerPassInterface
 {
     const BUILDER_SERVICE_ID = 'oro_navigation.menu_update.builder';
-    const TAG = 'oro_navigation.menu_update_provider';
+    const OWNERSHIP_PROVIDER_TAG = 'oro_navigation.ownership_provider';
 
     /**
      * {@inheritdoc}
      */
     public function process(ContainerBuilder $container)
     {
+        $this->processUpdateProviders($container);
+    }
+
+    /**
+     * @param ContainerBuilder $container
+     */
+    protected function processUpdateProviders(ContainerBuilder $container)
+    {
         if (!$container->hasDefinition(self::BUILDER_SERVICE_ID)) {
             return;
         }
 
-        $providers = $container->findTaggedServiceIds(self::TAG);
+        $providers = $container->findTaggedServiceIds(self::OWNERSHIP_PROVIDER_TAG);
         if (!$providers) {
             return;
         }
 
-        $service = $container->getDefinition(self::BUILDER_SERVICE_ID);
+        $builderService = $container->getDefinition(self::BUILDER_SERVICE_ID);
 
         foreach ($providers as $id => $tags) {
             foreach ($tags as $attributes) {
-                $service->addMethodCall('addProvider', [$attributes['area'], new Reference($id)]);
+                $builderService->addMethodCall(
+                    'addProvider',
+                    [new Reference($id), $attributes['area'], $attributes['priority']]
+                );
             }
         }
     }

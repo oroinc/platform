@@ -363,7 +363,7 @@ Oro\Bundle\ImportExportBundle\Converter\AbstractTableDataConverter
 Abstract class that is responsible for headers and conversion rules.
 Can be extended and used in more complex use cases when you need to provide human readable
 names of headers in import/export files. Configured with the rules that will be used to convert data to import/export
-formats. See OroCRM\Bundle\ContactBundle\ImportExport\Converter\ContactDataConverter as an example of usage of this
+formats. See Oro\Bundle\ContactBundle\ImportExport\Converter\ContactDataConverter as an example of usage of this
 class.
 
 **Methods:**

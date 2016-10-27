@@ -384,7 +384,6 @@ class AclHelperTest extends OrmTestCase
         $this->assertEmpty($hints[AclWalker::ORO_ACL_CONDITION]->getWhereConditions());
         $joinCondition = $hints[AclWalker::ORO_ACL_CONDITION]->getJoinConditions()[0];
         $this->assertEquals([1], $joinCondition->getValue());
-
     }
 
     protected function resultWalker2(SelectStatement $resultAst)
