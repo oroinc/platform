@@ -39,7 +39,11 @@ class WorkflowStepSelectTypeTest extends FormIntegrationTestCase
             ->getMock();
 
         $this->translator = $this->getMock('Symfony\Component\Translation\TranslatorInterface');
-        $this->translator->expects($this->any())->method('trans')->willReturnArgument(0);
+        $this->translator->expects($this->any())->method('trans')->willReturnCallback(
+            function ($label) {
+                return 'transtaled_' . $label;
+            }
+        );
 
         $this->repository = $this->getMockBuilder('Doctrine\ORM\EntityRepository')
             ->disableOriginalConstructor()
@@ -160,8 +164,8 @@ class WorkflowStepSelectTypeTest extends FormIntegrationTestCase
             ['workflow_name' => 'test']
         );
 
-        $this->assertEquals('step1label', $view->vars['choices'][0]->label);
-        $this->assertEquals('step2label', $view->vars['choices'][1]->label);
+        $this->assertEquals('transtaled_step1label', $view->vars['choices'][0]->label);
+        $this->assertEquals('transtaled_step2label', $view->vars['choices'][1]->label);
     }
 
     public function testFinishViewWithMoreThanOneWorkflow()
@@ -186,8 +190,8 @@ class WorkflowStepSelectTypeTest extends FormIntegrationTestCase
             ['workflow_entity_class' => '\stdClass']
         );
 
-        $this->assertEquals('wf_l1: step1label', $view->vars['choices'][0]->label);
-        $this->assertEquals('wf_l2: step2label', $view->vars['choices'][1]->label);
+        $this->assertEquals('transtaled_wf_l1: transtaled_step1label', $view->vars['choices'][0]->label);
+        $this->assertEquals('transtaled_wf_l2: transtaled_step2label', $view->vars['choices'][1]->label);
     }
 
     /**
@@ -272,18 +276,5 @@ class WorkflowStepSelectTypeTest extends FormIntegrationTestCase
                 ]
             ]
         ];
-    }
-
-    public function testFinishView()
-    {
-        $view = new FormView();
-        $child = new ChoiceView([], 'test', 'test');
-        $view->vars['choices'] = [$child];
-        $form = $this->getMock('Symfony\Component\Form\FormInterface');
-        $this->translator->expects($this->atLeastOnce())
-            ->method('trans')
-            ->with('test', [], WorkflowTranslationHelper::TRANSLATION_DOMAIN)
-            ->willReturnArgument(0);
-        $this->type->finishView($view, $form, ['workflow_name' => 'test_wf']);
     }
 }

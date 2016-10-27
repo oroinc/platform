@@ -66,10 +66,10 @@ class WorkflowSelectType extends AbstractType
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults(
-            array(
+            [
                 'entity_class' => null,
                 'config_id' => null, // can be extracted from parent form
-            )
+            ]
         );
 
         $resolver->setNormalizer(
@@ -87,11 +87,11 @@ class WorkflowSelectType extends AbstractType
                     }
                 }
 
-                $choices = array();
+                $choices = [];
                 if ($entityClass) {
                     /** @var WorkflowDefinition[] $definitions */
                     $definitions = $this->registry->getRepository('OroWorkflowBundle:WorkflowDefinition')
-                        ->findBy(array('relatedEntity' => $entityClass));
+                        ->findBy(['relatedEntity' => $entityClass]);
 
                     foreach ($definitions as $definition) {
                         $name = $definition->getName();

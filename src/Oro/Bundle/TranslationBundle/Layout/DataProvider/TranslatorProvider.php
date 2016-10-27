@@ -23,7 +23,7 @@ class TranslatorProvider
     /**
      * {@inheritdoc}
      */
-    public function getTrans($id, array $parameters = array(), $domain = null, $locale = null)
+    public function getTrans($id, array $parameters = [], $domain = null, $locale = null)
     {
         return $this->translator->trans($id, $parameters, $domain, $locale);
     }
@@ -31,7 +31,7 @@ class TranslatorProvider
     /**
      * {@inheritdoc}
      */
-    public function getTransChoice($id, $number, array $parameters = array(), $domain = null, $locale = null)
+    public function getTransChoice($id, $number, array $parameters = [], $domain = null, $locale = null)
     {
         return $this->translator->transChoice($id, $number, $parameters, $domain, $locale);
     }

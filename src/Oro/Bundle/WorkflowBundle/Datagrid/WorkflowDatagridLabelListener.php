@@ -69,7 +69,7 @@ class WorkflowDatagridLabelListener
         $columns = [];
         if (count($columnAliases)) {
             foreach ($columnAliases as $key => $alias) {
-                if (strstr($key, WorkflowStep::class . '::label') !== false) {
+                if (false !== strpos($key, WorkflowStep::class . '::label')) {
                     $columns[] = $alias;
                     continue;
                 }

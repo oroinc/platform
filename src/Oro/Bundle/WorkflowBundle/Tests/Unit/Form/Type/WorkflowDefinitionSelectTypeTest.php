@@ -40,12 +40,11 @@ class WorkflowDefinitionSelectTypeTest extends FormIntegrationTestCase
     {
         parent::setUp();
 
-        $this->workflowRegistry = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Model\WorkflowRegistry')
+        $this->workflowRegistry = $this->getMockBuilder(WorkflowRegistry::class)
             ->disableOriginalConstructor()
             ->getMock();
 
         $this->translator = $this->getMock('Symfony\Component\Translation\TranslatorInterface');
-        $this->translator->expects($this->any())->method('trans')->willReturnArgument(0);
 
         $this->type = new WorkflowDefinitionSelectType($this->workflowRegistry, $this->translator);
     }
@@ -212,14 +211,19 @@ class WorkflowDefinitionSelectTypeTest extends FormIntegrationTestCase
 
     public function testFinishView()
     {
+        $label = 'test_label';
+        $translatedLabel = 'translated_test_label';
+
         $view = new FormView();
-        $child = new ChoiceView([], 'test', 'test');
-        $view->vars['choices'] = [$child];
-        $form = $this->getMock('Symfony\Component\Form\FormInterface');
-        $this->translator->expects($this->atLeastOnce())
+        $view->vars['choices'] = [new ChoiceView([], 'test', $label)];
+
+        $this->translator->expects($this->once())
             ->method('trans')
-            ->with('test', [], WorkflowTranslationHelper::TRANSLATION_DOMAIN)
-            ->willReturnArgument(0);
-        $this->type->finishView($view, $form, ['workflow_name' => 'test_wf']);
+            ->with($label, [], WorkflowTranslationHelper::TRANSLATION_DOMAIN)
+            ->willReturn($translatedLabel);
+
+        $this->type->finishView($view, $this->getMock(FormInterface::class), []);
+
+        $this->assertEquals([new ChoiceView([], 'test', $translatedLabel)], $view->vars['choices']);
     }
 }

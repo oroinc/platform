@@ -79,7 +79,7 @@ class WorkflowTransitionType extends AbstractType
     public function finishView(FormView $view, FormInterface $form, array $options)
     {
         foreach ($view->children as $k => $childView) {
-            if (isset($childView->vars['label'])&&(!empty($childView->vars['label']))) {
+            if (isset($childView->vars['label']) && (!empty($childView->vars['label']))) {
                 $childView->vars['translation_domain'] = WorkflowTranslationHelper::TRANSLATION_DOMAIN;
             }
         }
