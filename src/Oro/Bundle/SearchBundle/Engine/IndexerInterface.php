@@ -50,6 +50,7 @@ interface IndexerInterface
      * @param array           $context
      *
      * @return int Number of reindexed entities
+     * @throws \LogicException
      */
     public function reindex($class = null, array $context = []);
 }
