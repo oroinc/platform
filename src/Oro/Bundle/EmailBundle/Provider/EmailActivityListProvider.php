@@ -5,6 +5,8 @@ namespace Oro\Bundle\EmailBundle\Provider;
 use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ORM\QueryBuilder;
 
+use Oro\Bundle\FeatureToggleBundle\Checker\FeatureCheckerHolderTrait;
+use Oro\Bundle\FeatureToggleBundle\Checker\FeatureToggleableInterface;
 use Symfony\Bundle\FrameworkBundle\Routing\Router;
 use Symfony\Component\Routing\Exception\RouteNotFoundException;
 use Symfony\Component\PropertyAccess\PropertyAccess;
@@ -42,8 +44,11 @@ class EmailActivityListProvider implements
     ActivityListProviderInterface,
     ActivityListDateProviderInterface,
     ActivityListGroupProviderInterface,
-    CommentProviderInterface
+    CommentProviderInterface,
+    FeatureToggleableInterface
 {
+    use FeatureCheckerHolderTrait;
+
     const ACTIVITY_CLASS = 'Oro\Bundle\EmailBundle\Entity\Email';
     const ACL_CLASS = 'Oro\Bundle\EmailBundle\Entity\EmailUser';
 
@@ -350,6 +355,11 @@ class EmailActivityListProvider implements
     public function isCommentsEnabled($entityClass)
     {
         return $this->commentAssociationHelper->isCommentAssociationEnabled($entityClass);
+    }
+
+    public function isEnabled()
+    {
+        return $this->isFeaturesEnabled();
     }
 
     /**
