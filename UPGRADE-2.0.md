@@ -10,13 +10,15 @@ UPGRADE FROM 1.10 to 2.0
 - Deprecated events `oro_workflow.action.handle_before` and `oro_workflow.action.handle_action` removed.
 - Removed service `@oro_action.context_accessor` and its class `Oro\Component\Action\Model\ContextAccessor`. Use `@oro_action.expression.context_accessor` and `Oro\Component\ConfigExpression\ContextAccessor`.
 - Class `Oro\Component\Action\Action\ActionFactory` 
-    - implement new interface `Oro\Component\ConfigExpression\FactoryWithTypesInterface`
+    - implements new interface `Oro\Component\ConfigExpression\FactoryWithTypesInterface`
+- Class `Oro\Component\Action\Action\FlashMessage`
+    - method `setRequest` now accepts null value.
     
 
 ####Config Expression Component
 - Added interface  `Oro\Component\ConfigExpression\FactoryWithTypesInterface` with method `FactoryWithTypesInterface::getTypes()`
 - Class `Oro\Component\ConfigExpression\ExpressionFactory` 
-    - implement new interface `Oro\Component\ConfigExpression\FactoryWithTypesInterface`
+    - implements new interface `Oro\Component\ConfigExpression\FactoryWithTypesInterface`
 
 ####ActionBundle
 - Class `Oro\Bundle\ActionBundle\Layout\Block\Type\ActionLineButtonsType` was removed -> block type `action_buttons` replaced with DI configuration.
