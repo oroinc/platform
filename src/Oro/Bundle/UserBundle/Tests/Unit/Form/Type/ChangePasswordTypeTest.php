@@ -52,7 +52,8 @@ class ChangePasswordTypeTest extends FormIntegrationTestCase
             'plain_password_invalid_message' => 'label',
             'first_options_label' => 'label',
             'first_options_tooltip' => 'label',
-            'second_options_label' => 'label'
+            'second_options_label' => 'label',
+            'userId' => null
         ];
 
         $builder->expects($this->once())

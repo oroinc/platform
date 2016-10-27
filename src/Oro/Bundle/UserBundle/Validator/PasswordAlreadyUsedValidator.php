@@ -61,6 +61,8 @@ class PasswordAlreadyUsedValidator extends ConstraintValidator
 
             if ($encoder->isPasswordValid($passwordHash->getHash(), $value, $passwordHash->getSalt())) {
                 $this->context->addViolation($constraint->message);
+
+                break;
             }
         }
     }
