@@ -16,7 +16,7 @@ class OroCronBundleInstaller implements Installation
      */
     public function getMigrationVersion()
     {
-        return 'v1_3';
+        return 'v1_4';
     }
 
     /**
@@ -29,6 +29,8 @@ class OroCronBundleInstaller implements Installation
         $this->createJmsJobRelatedEntitiesTable($schema);
         $this->createJmsJobStatisticsTable($schema);
         $this->createJmsJobsTable($schema);
+        $this->createJmsCronJobsTable($schema);
+
         $this->createOroCronScheduleTable($schema);
 
         /** Foreign keys generation **/
@@ -111,10 +113,26 @@ class OroCronBundleInstaller implements Installation
         $table->addColumn('originalJob_id', 'bigint', ['notnull' => false, 'unsigned' => true]);
         $table->addColumn('queue', 'string', ['length' => Job::MAX_QUEUE_LENGTH]);
         $table->addColumn('priority', 'smallint', ['notnull' => true]);
+        $table->addColumn('workerName', 'string', ['length' => 50, 'notnull' => false]);
         $table->setPrimaryKey(['id']);
         $table->addIndex(['originalJob_id'], 'IDX_704ADB9349C447F1', []);
         $table->addIndex(['command'], 'cmd_search_index', []);
         $table->addIndex(['state', 'priority', 'id'], 'sorting_index', []);
+    }
+
+    /**
+     * Create oro_cron_schedule table
+     *
+     * @param Schema $schema
+     */
+    public function createJmsCronJobsTable(Schema $schema)
+    {
+        $table = $schema->createTable('jms_cron_jobs');
+        $table->addColumn('id', 'integer', ['unsigned' => true, 'autoincrement' => true]);
+        $table->addColumn('command', 'string', ['length' => 200 ]);
+        $table->addColumn('lastRunAt', 'datetime', ['notnull' => true]);
+        $table->setPrimaryKey(['id']);
+        $table->addUniqueIndex(['command'], 'UNIQ_55F5ED428ECAEAD4', []);
     }
 
     /**
