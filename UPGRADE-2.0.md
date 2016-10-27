@@ -382,7 +382,7 @@ tag if it works with extend classes
 - `oro_search.search.engine.indexer` service was replaced with async implementation `oro_search.async.indexer`. Use sync indexer only for test environment.
 - New helper trait Oro/Component/Testing/SearchExtensionTrait - easy access to sync indexer for test environment
 
-####UiBundle:
+####UIBundle:
 - Placeholders configuration now loads from `Resources/config/oro/placeholders.yml` file instead of `Resources/config/placeholders.yml`.
 - Additional common root node `placeholders` were added for placeholders configurations in `Resources/config/oro/placeholders.yml` file.
    *Please node* that your configuration now should have two `placeholders` nodes (one nested in other) instead of single one.
@@ -392,8 +392,11 @@ placeholders:
     items: ...
 ```
 - Main menu dropdown active item is now triggering a page refresh, despite the Backbone router limitations.
-- Updated jquery.mCustomScrollbar plugin to version 3.1.5 `Resources/public/lib/jquery/jquery.mCustomScrollbar.min.js`.
+- Updated jquery.mCustomScrollbar plugin to version 3.1.5.
 - Changed `form_row` block to support of form field 'hints' which allows rendering of simple help section for the respective form control.
+
+####RequireJS:
+- Updated RequireJS library to version 2.3.*
 
 ####FormBundle:
 - Added `Oro\Bundle\FormBundle\Form\Extension\HintFormExtension` to support hints.
