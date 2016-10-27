@@ -2,12 +2,14 @@
 
 namespace Oro\Bundle\WorkflowBundle\Datagrid;
 
+use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Symfony\Component\Translation\TranslatorInterface;
 
 use Oro\Bundle\DataGridBundle\Exception\InvalidArgumentException;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\DataGridBundle\Event\BuildBefore;
 
+use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowStep;
 use Oro\Bundle\WorkflowBundle\Form\Type\WorkflowStepSelectType;
 use Oro\Bundle\WorkflowBundle\Helper\WorkflowTranslationHelper;
@@ -69,7 +71,9 @@ class WorkflowDatagridLabelListener
         $columns = [];
         if (count($columnAliases)) {
             foreach ($columnAliases as $key => $alias) {
-                if (false !== strpos($key, WorkflowStep::class . '::label')) {
+                if (false !== strpos($key, WorkflowStep::class . '::label') ||
+                    false !== strpos($key, WorkflowDefinition::class . '::label')
+                ) {
                     $columns[] = $alias;
                     continue;
                 }

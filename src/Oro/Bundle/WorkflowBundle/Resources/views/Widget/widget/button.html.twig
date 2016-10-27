@@ -3,11 +3,16 @@
     <div class="btn-group" id="{{ blockId }}">
         {% for data in workflow.transitionsData %}
             {# Show button for start or transit workflow #}
-            {# Transaltions temporary disabled due to BAP-5355 #}
+            {% set transitionMessage = data.transition.message|trans({},'workflows') %}
+            {% if transitionMessage == data.transition.message %}
+                {# if no translation for message then do not show message #}
+                {% set transitionMessage = '' %}
+            {% endif %}
+
             {% set transitionData = {
                 'enabled': data.isAllowed,
                 'transition-label': data.transition.label|trans({},'workflows'),
-                'message': data.transition.message|trans({},'workflows')|nl2br,
+                'message': transitionMessage|nl2br,
                 'transition-condition-messages': data.errors
             } %}
 
