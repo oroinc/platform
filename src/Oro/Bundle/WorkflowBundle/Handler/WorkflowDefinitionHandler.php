@@ -55,8 +55,8 @@ class WorkflowDefinitionHandler
     ) {
         $em = $this->getEntityManager();
 
-        $previous = new WorkflowDefinition();
-        $previous->import($existingDefinition);
+        $originalDefinition = new WorkflowDefinition();
+        $originalDefinition->import($existingDefinition);
 
         $existingDefinition->import($newDefinition);
 
@@ -64,7 +64,7 @@ class WorkflowDefinitionHandler
 
         $this->eventDispatcher->dispatch(
             WorkflowEvents::WORKFLOW_BEFORE_UPDATE,
-            new WorkflowChangesEvent($existingDefinition, $previous)
+            new WorkflowChangesEvent($existingDefinition, $originalDefinition)
         );
 
         $em->persist($existingDefinition);
@@ -80,7 +80,7 @@ class WorkflowDefinitionHandler
 
         $this->eventDispatcher->dispatch(
             WorkflowEvents::WORKFLOW_AFTER_UPDATE,
-            new WorkflowChangesEvent($existingDefinition, $previous)
+            new WorkflowChangesEvent($existingDefinition, $originalDefinition)
         );
     }
 

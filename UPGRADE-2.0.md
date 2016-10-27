@@ -151,7 +151,8 @@ To migrate all labels from configuration translatable fields automatically you c
 - Added `Oro\Bundle\WorkflowBundle\Configuration\WorkflowDefinitionBuilderExtensionInterface` and `oro.workflow.definition_builder.extension` service tag for usage in cases to pre-process (prepare) workflow builder configuration.
 - Added service tag `oro.workflow.configuration.handler` for request configuration procession by `Oro\Bundle\WorkflowBundle\Configuration\Handler\ConfigurationHandlerInterface`.
 - Removed `import` method from `Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition`. Use `Oro\Bundle\WorkflowBundle\Handler\Helper\WorkflowDefinitionCloner::cloneDefinition` instead.
-- Added `previous` property for `Oro\Bundle\WorkflowBundle\Event\WorkflowChangesEvent` in case of definition update.
+- Added `originalDefinition` property and second constructor argument for `Oro\Bundle\WorkflowBundle\Event\WorkflowChangesEvent` in case of definition update.
+- 
 
  
     
