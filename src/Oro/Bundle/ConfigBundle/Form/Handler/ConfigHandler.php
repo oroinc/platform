@@ -53,7 +53,7 @@ class ConfigHandler
                 $changeSet = $this->manager->save($form->getData());
                 $handler = $form->getConfig()->getAttribute('handler');
                 if (null !== $handler && is_callable($handler)) {
-                    call_user_func($handler, $this->manager, $changeSet);
+                    call_user_func($handler, $this->manager, $changeSet, $form);
                 }
 
                 return true;
