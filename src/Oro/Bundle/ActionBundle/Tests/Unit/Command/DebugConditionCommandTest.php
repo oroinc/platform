@@ -16,7 +16,7 @@ class DebugConditionCommandTest extends AbstractDebugCommandTestCase
     /**
      * {@inheritdoc}
      */
-    public function getFactoryServiceId()
+    protected function getFactoryServiceId()
     {
         return DebugConditionCommand::FACTORY_SERVICE_ID;
     }
@@ -24,7 +24,7 @@ class DebugConditionCommandTest extends AbstractDebugCommandTestCase
     /**
      * {@inheritdoc}
      */
-    public function getArgumentName()
+    protected function getArgumentName()
     {
         return DebugConditionCommand::ARGUMENT_NAME;
     }
@@ -32,7 +32,7 @@ class DebugConditionCommandTest extends AbstractDebugCommandTestCase
     /**
      * {@inheritdoc}
      */
-    public function getCommandInstance()
+    protected function getCommandInstance()
     {
         return new DebugConditionCommand();
     }
