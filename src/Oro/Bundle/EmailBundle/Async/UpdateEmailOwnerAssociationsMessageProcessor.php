@@ -1,7 +1,7 @@
 <?php
 namespace Oro\Bundle\EmailBundle\Async;
 
-use Oro\Bundle\EmailBundle\Command\Manager\AssociationManager;
+use Oro\Bundle\EmailBundle\Async\Manager\AssociationManager;
 use Oro\Component\MessageQueue\Client\TopicSubscriberInterface;
 use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
 use Oro\Component\MessageQueue\Transport\MessageInterface;
@@ -47,7 +47,12 @@ class UpdateEmailOwnerAssociationsMessageProcessor implements MessageProcessorIn
             return self::REJECT;
         }
 
-        $this->associationManager->processUpdateEmailOwner($data['ownerClass'], $data['ownerIds']);
+        $messagesCount = $this->associationManager->processUpdateEmailOwner($data['ownerClass'], $data['ownerIds']);
+
+        $this->logger->info(sprintf(
+            '[UpdateEmailOwnerAssociationsMessageProcessor] Sent "%s" messages',
+            $messagesCount
+        ));
 
         return self::ACK;
     }

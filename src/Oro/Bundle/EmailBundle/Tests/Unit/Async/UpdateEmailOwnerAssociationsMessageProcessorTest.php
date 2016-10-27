@@ -3,7 +3,7 @@ namespace Oro\Bundle\EmailBundle\Tests\Unit\Async;
 
 use Oro\Bundle\EmailBundle\Async\Topics;
 use Oro\Bundle\EmailBundle\Async\UpdateEmailOwnerAssociationsMessageProcessor;
-use Oro\Bundle\EmailBundle\Command\Manager\AssociationManager;
+use Oro\Bundle\EmailBundle\Async\Manager\AssociationManager;
 use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
 use Oro\Component\MessageQueue\Transport\Null\NullMessage;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
@@ -74,12 +74,18 @@ class UpdateEmailOwnerAssociationsMessageProcessorTest extends \PHPUnit_Framewor
             ->expects($this->never())
             ->method('critical')
         ;
+        $logger
+            ->expects($this->once())
+            ->method('info')
+            ->with($this->equalTo('[UpdateEmailOwnerAssociationsMessageProcessor] Sent "1" messages'))
+        ;
 
         $manager = $this->createAssociationManagerMock();
         $manager
             ->expects($this->once())
             ->method('processUpdateEmailOwner')
             ->with('class', [123])
+            ->willReturn(1)
         ;
 
         $message = new NullMessage();

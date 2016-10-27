@@ -1,5 +1,5 @@
 <?php
-namespace Oro\Bundle\EmailBundle\Command\Manager;
+namespace Oro\Bundle\EmailBundle\Async\Manager;
 
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\QueryBuilder;
@@ -74,16 +74,16 @@ class AssociationManager
     }
 
     /**
-     * Process of command oro:email:update-email-owner-associations
+     * Update email owner association.
      *
      * @param string $ownerClassName
-     * @param array $ownerId
+     * @param array $ownerIds
      *
      * @return int
      */
-    public function processUpdateEmailOwner($ownerClassName, array $ownerId)
+    public function processUpdateEmailOwner($ownerClassName, array $ownerIds)
     {
-        $ownerQb = $this->createOwnerQb($ownerClassName, $ownerId);
+        $ownerQb = $this->createOwnerQb($ownerClassName, $ownerIds);
         $owners = $this->getOwnerIterator($ownerQb);
         $countNewMessages = 0;
         foreach ($owners as $owner) {
@@ -160,9 +160,9 @@ class AssociationManager
     /**
      * @param QueryBuilder $ownerQb
      *
-     * @return $this
+     * @return BufferedQueryResultIterator
      */
-    protected function getOwnerIterator($ownerQb)
+    protected function getOwnerIterator(QueryBuilder $ownerQb)
     {
         return (new BufferedQueryResultIterator($ownerQb))
             ->setBufferSize(1)

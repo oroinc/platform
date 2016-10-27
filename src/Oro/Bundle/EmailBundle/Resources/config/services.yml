@@ -1099,7 +1099,7 @@ services:
             - '@oro_email.provider.emailowners.provider'
 
     oro_email.command.association_manager:
-        class: Oro\Bundle\EmailBundle\Command\Manager\AssociationManager
+        class: Oro\Bundle\EmailBundle\Async\Manager\AssociationManager
         arguments:
             - '@oro_entity.doctrine_helper'
             - '@oro_email.email.activity.manager'
