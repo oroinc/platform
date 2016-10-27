@@ -2,6 +2,7 @@
 
 namespace Oro\Component\ConfigExpression\Tests\Unit;
 
+use Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException;
 use Symfony\Component\PropertyAccess\PropertyPath;
 
 use Oro\Component\ConfigExpression\ContextAccessor;
@@ -9,7 +10,9 @@ use Oro\Component\ConfigExpression\Tests\Unit\Fixtures\ItemStub;
 
 class ContextAccessorTest extends \PHPUnit_Framework_TestCase
 {
-    /** @var ContextAccessor */
+    /**
+     * @var ContextAccessor
+     */
     protected $contextAccessor;
 
     protected function setUp()
@@ -20,34 +23,42 @@ class ContextAccessorTest extends \PHPUnit_Framework_TestCase
     /**
      * @dataProvider getValueDataProvider
      */
-    public function testGetValue($context, $property, $expectedValue)
+    public function testGetValue($context, $value, $expectedValue)
     {
-        $this->assertEquals($expectedValue, $this->contextAccessor->getValue($context, $property));
+        $this->assertEquals($expectedValue, $this->contextAccessor->getValue($context, $value));
     }
 
+    /**
+     * @return array
+     */
     public function getValueDataProvider()
     {
         return [
-            'first_level'                => [
-                'context'       => $this->createObject(['foo' => 'bar']),
-                'property'      => new PropertyPath('foo'),
+            'get_simple_value' => [
+                'context' => ['foo' => 'bar'],
+                'value' => 'test',
+                'expectedValue' => 'test'
+            ],
+            'get_property_from_array' => [
+                'context' => ['foo' => 'bar'],
+                'value' => new PropertyPath('[foo]'),
                 'expectedValue' => 'bar'
             ],
-            'nested'                     => [
-                'context'       => $this->createObject(['foo' => $this->createObject(['bar' => 'baz'])]),
-                'property'      => new PropertyPath('foo.bar'),
+            'get_property_from_object' => [
+                'context' => $this->createObject(['foo' => 'bar']),
+                'value' => new PropertyPath('foo'),
+                'expectedValue' => 'bar'
+            ],
+            'get_nested_property_from_object' => [
+                'context' => $this->createObject(['foo' => $this->createObject(['bar' => 'baz'])]),
+                'value' => new PropertyPath('foo.bar'),
                 'expectedValue' => 'baz'
             ],
-            'nested_by_first_level_data' => [
-                'context'       => $this->createObject(['foo' => $this->createObject(['bar' => 'baz'])]),
-                'property'      => new PropertyPath('data.foo.bar'),
-                'expectedValue' => 'baz'
+            'get_unknown_property' => [
+                'context' => $this->createObject(['foo' => 'bar']),
+                'value' => new PropertyPath('baz'),
+                'expectedValue' => null
             ],
-            'nested_by_data'             => [
-                'context'       => $this->createObject(['foo' => $this->createObject(['bar' => 'baz'])]),
-                'property'      => new PropertyPath('data.foo.data.bar'),
-                'expectedValue' => 'baz'
-            ]
         ];
     }
 
@@ -62,104 +73,134 @@ class ContextAccessorTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($expectedValue, $actualValue);
     }
 
+    /**
+     * @return array
+     */
     public function setValueDataProvider()
     {
         return [
-            'first_level'                => [
-                'context'       => $this->createObject(['foo' => 'bar']),
-                'property'      => new PropertyPath('foo'),
-                'value'         => 'test',
+            'set_simple_new_property' => [
+                'context' => $this->createObject([]),
+                'property' => new PropertyPath('test'),
+                'value' => 'value',
+                'expectedValue' => 'value'
+            ],
+            'set_simple_existing_property_text_path' => [
+                'context' => $this->createObject(['foo' => 'bar']),
+                'property' => new PropertyPath('foo'),
+                'value' => 'test',
                 'expectedValue' => 'test'
             ],
-            'nested'                     => [
-                'context'       => $this->createObject(['foo' => $this->createObject(['bar' => 'baz'])]),
-                'property'      => new PropertyPath('foo.bar'),
-                'value'         => 'test',
-                'expectedValue' => 'test'
+            'set_existing_property_to_new' => [
+                'context' => $this->createObject(['foo' => 'bar']),
+                'property' => new PropertyPath('test'),
+                'value' => new PropertyPath('foo'),
+                'expectedValue' => 'bar'
             ],
-            'nested_by_first_level_data' => [
-                'context'       => $this->createObject(['foo' => $this->createObject(['bar' => 'baz'])]),
-                'property'      => new PropertyPath('data.foo.bar'),
-                'value'         => 'test',
-                'expectedValue' => 'test'
+            'set_existing_property_to_existing' => [
+                'context' => $this->createObject(['foo' => 'bar', 'test' => 'old']),
+                'property' => new PropertyPath('test'),
+                'value' => new PropertyPath('foo'),
+                'expectedValue' => 'bar'
             ],
-            'nested_by_data'             => [
-                'context'       => $this->createObject(['foo' => $this->createObject(['bar' => 'baz'])]),
-                'property'      => new PropertyPath('data.foo.data.bar'),
-                'value'         => 'test',
-                'expectedValue' => 'test'
-            ]
+            'nested_property_from_object_to_new' => [
+                'context' => $this->createObject(['foo' => $this->createObject(['bar' => 'baz'])]),
+                'property' => new PropertyPath('test'),
+                'value' => new PropertyPath('foo.bar'),
+                'expectedValue' => 'baz'
+            ],
+            'nested_property_from_object_to_existing' => [
+                'context' => $this->createObject(
+                    ['test' => 'old', 'foo' => $this->createObject(['bar' => 'baz'])]
+                ),
+                'property' => new PropertyPath('test'),
+                'value' => new PropertyPath('foo.bar'),
+                'expectedValue' => 'baz'
+            ],
+            'unknown_property' => [
+                'context' => $this->createObject(['foo' => 'bar']),
+                'property' => new PropertyPath('test'),
+                'value' => new PropertyPath('baz'),
+                'expectedValue' => null
+            ],
         ];
     }
 
     /**
      * @dataProvider hasValueDataProvider
-     * @depends      testGetValue
+     *
+     * @param mixed $context
+     * @param mixed $value
+     * @param mixed $expectedValue
      */
-    public function testHasValue($context, $property, $expectedValue)
+    public function testHasValue($context, $value, $expectedValue)
     {
-        $actualValue = $this->contextAccessor->hasValue($context, $property);
+        $this->contextAccessor->hasValue($context, $value);
+        $actualValue = $this->contextAccessor->hasValue($context, $value);
         $this->assertEquals($expectedValue, $actualValue);
     }
 
+    /**
+     * @return array
+     */
     public function hasValueDataProvider()
     {
         return [
-            'has'                                => [
-                'context'       => $this->createObject(['foo' => null]),
-                'property'      => new PropertyPath('foo'),
-                'expectedValue' => true
-            ],
-            'not_has'                            => [
-                'context'       => $this->createObject([]),
-                'property'      => new PropertyPath('foo'),
+            'not_has' => [
+                'context' => $this->createObject([]),
+                'value' => new PropertyPath('test'),
                 'expectedValue' => false
             ],
-            'has_nested'                         => [
-                'context'       => $this->createObject(['foo' => $this->createObject(['bar' => 'baz'])]),
-                'property'      => new PropertyPath('foo.bar'),
-                'expectedValue' => true
-            ],
-            'not_has_nested'                     => [
-                'context'       => $this->createObject(['foo' => $this->createObject(['bar' => 'baz'])]),
-                'property'      => new PropertyPath('foo.baz'),
+            'not_has_nested' => [
+                'context' => $this->createObject(['foo' => $this->createObject(['bar' => 'baz'])]),
+                'value' => new PropertyPath('data[foo].baz'),
                 'expectedValue' => false
             ],
-            'has_nested_by_first_level_data'     => [
-                'context'       => $this->createObject(['foo' => $this->createObject(['bar' => 'baz'])]),
-                'property'      => new PropertyPath('data.foo.bar'),
+            'has_as_array_syntax' => [
+                'context' => $this->createObject(['foo' => 'bar']),
+                'value' => new PropertyPath('data[foo]'),
                 'expectedValue' => true
             ],
-            'not_has_nested_by_first_level_data' => [
-                'context'       => $this->createObject(['foo' => $this->createObject(['bar' => 'baz'])]),
-                'property'      => new PropertyPath('data.foo.baz'),
-                'expectedValue' => false
-            ],
-            'has_nested_by_data'                 => [
-                'context'       => $this->createObject(['foo' => $this->createObject(['bar' => 'baz'])]),
-                'property'      => new PropertyPath('data.foo.data.bar'),
+            'has_as_object_syntax' => [
+                'context' => $this->createObject(['foo' => 'bar']),
+                'value' => new PropertyPath('data[foo]'),
                 'expectedValue' => true
             ],
-            'not_has_nested_by_data'             => [
-                'context'       => $this->createObject(['foo' => $this->createObject(['bar' => 'baz'])]),
-                'property'      => new PropertyPath('data.foo.data.baz'),
-                'expectedValue' => false
-            ]
+            'has_nested' => [
+                'context' => $this->createObject(['foo' => $this->createObject(['bar' => 'baz'])]),
+                'value' => new PropertyPath('data[foo].data'),
+                'expectedValue' => true
+            ],
+            'has_nested_nested' => [
+                'context' => $this->createObject(['foo' => $this->createObject(['bar' => 'baz'])]),
+                'value' => new PropertyPath('data[foo].data.bar'),
+                'expectedValue' => true
+            ],
         ];
     }
 
-    // @codingStandardsIgnoreStart
-    /**
-     * @expectedException \Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException
-     * @expectedExceptionMessage The property "test" cannot be got by "__get" method because "__isset" method returns false. Class "Oro\Component\ConfigExpression\Tests\Unit\Fixtures\ItemStub".
-     */
-    // @codingStandardsIgnoreEnd
-    public function testGetValueForUnknownProperty()
+    public function testGetValueNoSuchProperty()
     {
-        $this->contextAccessor->getValue(
-            $this->createObject([]),
-            new PropertyPath('test')
+        $context = $this->createObject([]);
+        $value = new PropertyPath('test');
+
+        $propertyAccessor = $this->getMockBuilder('Symfony\Component\PropertyAccess\PropertyAccessor')
+            ->disableOriginalConstructor()
+            ->setMethods(['getValue'])
+            ->getMock();
+        $propertyAccessor->expects($this->once())
+            ->method('getValue')
+            ->with($context, $value)
+            ->will($this->throwException(new NoSuchPropertyException('No such property')));
+
+        $propertyAccessorReflection = new \ReflectionProperty(
+            'Oro\Component\ConfigExpression\ContextAccessor',
+            'propertyAccessor'
         );
+        $propertyAccessorReflection->setAccessible(true);
+        $propertyAccessorReflection->setValue($this->contextAccessor, $propertyAccessor);
+
+        $this->assertNull($this->contextAccessor->getValue($context, $value));
     }
 
     /**

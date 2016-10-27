@@ -6,7 +6,7 @@ use Oro\Bundle\CalendarBundle\Entity\Calendar;
 use Oro\Bundle\EntityBundle\Tests\Unit\ORM\Stub\ItemStub;
 use Oro\Bundle\CalendarBundle\Workflow\Action\CreateCalendarEventAction;
 
-use Oro\Component\Action\Model\ContextAccessor;
+use Oro\Component\ConfigExpression\ContextAccessor;
 
 class CreateCalendarEventActionTest extends \PHPUnit_Framework_TestCase
 {

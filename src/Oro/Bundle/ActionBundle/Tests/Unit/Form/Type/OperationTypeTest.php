@@ -12,7 +12,7 @@ use Oro\Bundle\ActionBundle\Model\Operation;
 use Oro\Bundle\ActionBundle\Model\OperationManager;
 use Oro\Bundle\ActionBundle\Form\Type\OperationType;
 
-use Oro\Component\Action\Model\ContextAccessor;
+use Oro\Component\ConfigExpression\ContextAccessor;
 use Oro\Component\Testing\Unit\FormIntegrationTestCase;
 
 class OperationTypeTest extends FormIntegrationTestCase

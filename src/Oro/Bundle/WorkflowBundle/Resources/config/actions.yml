@@ -2,7 +2,7 @@ services:
     oro_workflow.action.create_related_entity:
         class: 'Oro\Bundle\WorkflowBundle\Model\Action\CreateRelatedEntity'
         arguments:
-            - '@oro_action.context_accessor'
+            - '@oro_action.expression.context_accessor'
             - '@doctrine'
         tags:
             - { name: oro_action.action, alias: create_related_entity }
@@ -10,7 +10,7 @@ services:
     oro_workflow.action.start_workflow:
         class: 'Oro\Bundle\WorkflowBundle\Model\Action\StartWorkflow'
         arguments:
-            - '@oro_action.context_accessor'
+            - '@oro_action.expression.context_accessor'
             - '@oro_workflow.manager'
         tags:
             - { name: oro_action.action, alias: start_workflow }
@@ -18,7 +18,7 @@ services:
     oro_workflow.action.transit_workflow:
         class: 'Oro\Bundle\WorkflowBundle\Model\Action\TransitWorkflow'
         arguments:
-            - '@oro_action.context_accessor'
+            - '@oro_action.expression.context_accessor'
             - '@oro_workflow.manager'
         tags:
             - { name: oro_action.action, alias: transit_workflow }

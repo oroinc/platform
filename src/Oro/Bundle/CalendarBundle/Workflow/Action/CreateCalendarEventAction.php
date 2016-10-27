@@ -15,7 +15,7 @@ use Oro\Bundle\UserBundle\Entity\User;
 
 use Oro\Component\Action\Action\AbstractAction;
 use Oro\Component\Action\Exception\InvalidParameterException;
-use Oro\Component\Action\Model\ContextAccessor;
+use Oro\Component\ConfigExpression\ContextAccessor;
 
 /**
  * - @create_calendar_event:

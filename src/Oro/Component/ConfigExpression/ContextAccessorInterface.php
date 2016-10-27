@@ -13,7 +13,7 @@ interface ContextAccessorInterface
      * @param PropertyPathInterface $property
      * @param mixed                 $value
      */
-    public function setValue($context, PropertyPathInterface $property, $value);
+    public function setValue($context, $property, $value);
 
     /**
      * Gets the value from the context.
@@ -23,7 +23,7 @@ interface ContextAccessorInterface
      *
      * @return mixed
      */
-    public function getValue($context, PropertyPathInterface $property);
+    public function getValue($context, $property);
 
     /**
      * Checks whether the context has the value.
@@ -33,5 +33,5 @@ interface ContextAccessorInterface
      *
      * @return bool
      */
-    public function hasValue($context, PropertyPathInterface $property);
+    public function hasValue($context, $property);
 }

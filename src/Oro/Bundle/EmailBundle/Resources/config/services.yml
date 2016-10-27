@@ -519,7 +519,7 @@ services:
     oro_email.workflow.action.send_email:
         class: %oro_email.workflow.action.send_email.class%
         arguments:
-            - '@oro_action.context_accessor'
+            - '@oro_action.expression.context_accessor'
             - '@oro_email.mailer.processor'
             - '@oro_email.email.address.helper'
             - '@oro_entity.entity_name_resolver'
@@ -531,7 +531,7 @@ services:
     oro_email.workflow.action.send_email_template:
         class: %oro_email.workflow.action.send_email_template.class%
         arguments:
-            - '@oro_action.context_accessor'
+            - '@oro_action.expression.context_accessor'
             - '@oro_email.mailer.processor'
             - '@oro_email.email.address.helper'
             - '@oro_entity.entity_name_resolver'
@@ -953,7 +953,7 @@ services:
     oro_email.workflow.action.parse_first_name:
         class: %oro_email.workflow.action.parse_first_name.class%
         arguments:
-            - '@oro_action.context_accessor'
+            - '@oro_action.expression.context_accessor'
             - '@oro_email.email.address.helper'
         tags:
             - { name: oro_action.action, alias: parse_first_name_from_email_address }
@@ -961,7 +961,7 @@ services:
     oro_email.workflow.action.parse_last_name:
         class: %oro_email.workflow.action.parse_last_name.class%
         arguments:
-            - '@oro_action.context_accessor'
+            - '@oro_action.expression.context_accessor'
             - '@oro_email.email.address.helper'
         tags:
             - { name: oro_action.action, alias: parse_last_name_from_email_address }
@@ -969,7 +969,7 @@ services:
     oro_email.workflow.action.request_mailboxes:
         class: %oro_email.workflow.action.request_mailboxes.class%
         arguments:
-            - '@oro_action.context_accessor'
+            - '@oro_action.expression.context_accessor'
             - '@doctrine'
             - '@oro_email.mailbox.process_storage'
         tags:
@@ -978,7 +978,7 @@ services:
     oro_email.workflow.action.strip_html_tags:
         class: %oro_email.workflow.action.strip_html_tags.class%
         arguments:
-            - '@oro_action.context_accessor'
+            - '@oro_action.expression.context_accessor'
             - '@oro_ui.html_tag_helper'
         tags:
             - { name: oro_action.action, alias: strip_html_tags }
@@ -986,7 +986,7 @@ services:
     oro_email.workflow.action.add_activity_target:
         class: %oro_email.workflow.action.add_activity_target.class%
         arguments:
-            - '@oro_action.context_accessor'
+            - '@oro_action.expression.context_accessor'
             - '@oro_email.email.activity.manager'
             - '@oro_activity_list.provider.chain'
             - '@doctrine.orm.entity_manager'
