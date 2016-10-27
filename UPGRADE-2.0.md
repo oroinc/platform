@@ -8,11 +8,21 @@ UPGRADE FROM 1.10 to 2.0
 - Deprecated constant `Oro\Component\Action\Event\ExecuteActionEvents::DEPRECATED_HANDLE_BEFORE` removed. Use `Oro\Component\Action\Event\ExecuteActionEvents::HANDLE_BEFORE` instead.
 - Deprecated constant `Oro\Component\Action\Event\ExecuteActionEvents::DEPRECATED_HANDLE_AFTER` removed. Use `Oro\Component\Action\Event\ExecuteActionEvents::HANDLE_AFTER` instead.
 - Deprecated events `oro_workflow.action.handle_before` and `oro_workflow.action.handle_action` removed.
+- Class `Oro\Component\Action\Action\ActionFactory` 
+    - implement new interface `Oro\Component\ConfigExpression\FactoryWithTypesInterface`
+    
+
+####Config Expression Component
+- Added interface  `Oro\Component\ConfigExpression\FactoryWithTypesInterface` with method `FactoryWithTypesInterface::getTypes()`
+- Class `Oro\Component\ConfigExpression\ExpressionFactory` 
+    - implement new interface `Oro\Component\ConfigExpression\FactoryWithTypesInterface`
 
 ####ActionBundle
 - Class `Oro\Bundle\ActionBundle\Layout\Block\Type\ActionLineButtonsType` was removed -> block type `action_buttons` replaced with DI configuration.
 - Added class `Oro\Bundle\ActionBundle\Layout\DataProvider\ActionButtonsProvider` - layout data provider.
 - Default value for parameter `applications` in operation configuration renamed from `backend` to `default`.
+- Added new command `Oro\Bundle\ActionBundle\Command (oro:debug:action)` for displays list of all actions with full description.
+- Added new command `Oro\Bundle\ActionBundle\Command (oro:debug:condition)` that displays list of all conditions with full description
 
 ####WorkflowBundle
 - Class `Oro\Bundle\WorkflowBundle\Model\WorkflowManager`
