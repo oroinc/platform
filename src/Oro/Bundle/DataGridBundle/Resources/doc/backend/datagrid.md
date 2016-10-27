@@ -53,8 +53,8 @@ datagrids:
                     - u
                 from:
                     { table: AcmeDemoBundle:User, alias:u }
-            where:
-                and:
+                where:
+                   and:
                     - u.group = :group_id
             bind_parameters:
                 group_id: groupId
