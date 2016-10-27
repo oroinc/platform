@@ -302,3 +302,10 @@ services:
             - '@event_dispatcher'
         tags:
             - { name: twig.extension }
+
+    oro_integration.integration_avatar_provider:
+        class: Oro\Bundle\IntegrationBundle\Provider\EntityAvatarProvider
+        arguments:
+            - '@oro_integration.manager.types_registry'
+        tags:
+            - { name: oro_entity.avatar_provider, priority: -10 }
