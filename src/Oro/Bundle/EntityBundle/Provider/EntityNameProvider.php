@@ -131,14 +131,21 @@ class EntityNameProvider implements EntityNameProviderInterface
             return [];
         }
         $metadata = $manager->getClassMetadata($className);
-        $fieldNames = (array) $metadata->getFieldNames();
 
-        return array_filter(
-            $fieldNames,
+        $fieldNames = array_filter(
+            (array) $metadata->getFieldNames(),
             function ($fieldName) use ($metadata) {
                 return 'string' === $metadata->getTypeOfField($fieldName);
             }
         );
+
+        $guessFiledNames = array_intersect($fieldNames, $this->fieldGuesses);
+
+        if (!empty($guessFiledNames)) {
+            return (array) reset($guessFiledNames);
+        }
+
+        return $fieldNames;
     }
 
     /**
@@ -158,6 +165,6 @@ class EntityNameProvider implements EntityNameProviderInterface
 
         $values = array_filter($values);
 
-        return empty($values) ? false : implode(' ' , $values);
+        return empty($values) ? false : implode(' ', $values);
     }
 }
