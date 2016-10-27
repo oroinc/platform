@@ -6,15 +6,15 @@ use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\QueryBuilder;
 
-use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
-use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Input\InputOption;
-use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Console\Helper\ProgressBar;
-
 use Oro\Bundle\BatchBundle\ORM\Query\BufferedQueryResultIterator;
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EmailBundle\Entity\EmailAttachment;
+use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
+use Symfony\Component\Console\Helper\ProgressBar;
+
+use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
+use Symfony\Component\Console\Output\OutputInterface;
 
 class PurgeEmailAttachmentCommand extends ContainerAwareCommand
 {
@@ -52,6 +52,13 @@ class PurgeEmailAttachmentCommand extends ContainerAwareCommand
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
+        $featureChecker = $this->getContainer()->get('oro_featuretoggle.checker.feature_checker');
+        if (!$featureChecker->isFeatureEnabled('email')) {
+            $output->writeln('The email feature is disabled. The command will not run.');
+
+            return 0;
+        }
+
         $size = $this->getSize($input);
 
         $emailAttachments = $this->getEmailAttachments($size);

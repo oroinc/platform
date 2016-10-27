@@ -7,20 +7,24 @@ use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\Event\OnFlushEventArgs;
 use Doctrine\ORM\Event\PostFlushEventArgs;
 
-use Psr\Log\LoggerAwareInterface;
-use Psr\Log\LoggerAwareTrait;
-
 use Oro\Bundle\EmailBundle\Entity\EmailBody;
 use Oro\Bundle\EmailBundle\Mailbox\MailboxProcessStorage;
 use Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink;
+use Oro\Bundle\FeatureToggleBundle\Checker\FeatureCheckerHolderTrait;
+
+use Oro\Bundle\FeatureToggleBundle\Checker\FeatureToggleableInterface;
 use Oro\Bundle\WorkflowBundle\Entity\ProcessDefinition;
 use Oro\Bundle\WorkflowBundle\Entity\ProcessTrigger;
 use Oro\Bundle\WorkflowBundle\Model\ProcessData;
 use Oro\Bundle\WorkflowBundle\Model\ProcessHandler;
+use Psr\Log\LoggerAwareInterface;
+use Psr\Log\LoggerAwareTrait;
 
-class MailboxProcessTriggerListener extends MailboxEmailListener implements LoggerAwareInterface
+class MailboxProcessTriggerListener extends MailboxEmailListener implements
+    LoggerAwareInterface,
+    FeatureToggleableInterface
 {
-    use LoggerAwareTrait;
+    use LoggerAwareTrait, FeatureCheckerHolderTrait;
 
     /** @var ProcessHandler */
     protected $handler;
@@ -51,6 +55,10 @@ class MailboxProcessTriggerListener extends MailboxEmailListener implements Logg
      */
     public function onFlush(OnFlushEventArgs $args)
     {
+        if (!$this->isFeaturesEnabled()) {
+            return;
+        }
+
         parent::onFlush($args);
         $this->emailBodies = array_filter(
             $this->emailBodies,
@@ -69,6 +77,10 @@ class MailboxProcessTriggerListener extends MailboxEmailListener implements Logg
      */
     public function postFlush(PostFlushEventArgs $args)
     {
+        if (!$this->isFeaturesEnabled()) {
+            return;
+        }
+
         if (empty($this->emailBodies)) {
             return;
         }

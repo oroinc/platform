@@ -45,6 +45,7 @@ class Configuration implements ConfigurationInterface
         SettingsBuilder::append(
             $rootNode,
             [
+                'feature_enabled' => ['value' => true],
                 'signature' => ['value' => ''],
                 'append_signature' => ['value' => true],
                 'default_button_reply' => ['value' => true],
