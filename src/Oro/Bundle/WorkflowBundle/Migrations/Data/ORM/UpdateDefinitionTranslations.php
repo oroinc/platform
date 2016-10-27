@@ -32,22 +32,18 @@ class UpdateDefinitionTranslations extends AbstractFixture implements ContainerA
         /* @var $definitions WorkflowDefinition[] */
         $definitions = $manager->getRepository(WorkflowDefinition::class)->findAll();
 
-        foreach ($definitions as $key => $definition) {
-            $definitions[$definition->getName()] = $definition;
-            unset($definitions[$key]);
-        }
-
         /** @var WorkflowConfigurationProvider $configurationProvider */
         $configurationProvider = $this->container->get('oro_workflow.configuration.provider.workflow_config');
         $workflowConfiguration = $configurationProvider->getWorkflowDefinitionConfiguration();
 
         if (count($workflowConfiguration)) {
-            $definitions = array_filter(
-                $definitions,
-                function (WorkflowDefinition $item) use ($workflowConfiguration) {
-                    return !isset($workflowConfiguration[$item->getName()]);
-                }
-            );
+            $workflowNames = array_map(function ($config) {
+                return $config['name'];
+            }, $workflowConfiguration);
+
+            $definitions = array_filter($definitions, function (WorkflowDefinition $definition) use ($workflowNames) {
+                return !in_array($definition->getName(), $workflowNames);
+            });
         }
 
         foreach ($definitions as $definition) {
