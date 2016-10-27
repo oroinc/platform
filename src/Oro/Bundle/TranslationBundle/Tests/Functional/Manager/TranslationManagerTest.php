@@ -151,7 +151,35 @@ class TranslationManagerTest extends WebTestCase
 
     public function testFindTranslationKey()
     {
-        // TODO: implement it
+        $key = LoadTranslations::TRANSLATION_KEY_1;
+        $domain = LoadTranslations::TRANSLATION_KEY_DOMAIN;
+
+        /* @var $repository TranslationKeyRepository */
+        $repository = $this->getRepository(TranslationKey::class);
+
+        $existingKey = $repository->findOneBy(['key' => $key, 'domain' => $domain]);
+
+        $this->assertNotNull($existingKey);
+
+        $this->assertSame($existingKey, $this->manager->findTranslationKey($key, $domain));
+    }
+
+    public function testCreateTranslationKey()
+    {
+        $key = 'translation.key1';
+        $domain = LoadTranslations::TRANSLATION_KEY_DOMAIN;
+
+        /* @var $repository TranslationKeyRepository */
+        $repository = $this->getRepository(TranslationKey::class);
+
+        $this->assertNull($repository->findOneBy(['key' => $key, 'domain' => $domain]));
+
+        $translationKey = $this->manager->findTranslationKey($key, $domain);
+
+        $this->manager->flush();
+
+        $this->assertSame($translationKey, $repository->findOneBy(['key' => $key, 'domain' => $domain]));
+        $this->assertEquals($key, $translationKey->getKey());
     }
 
     public function testRemoveTranslationKey()
@@ -208,10 +236,7 @@ class TranslationManagerTest extends WebTestCase
                 ['code' => LoadLanguages::LANGUAGE2, 'domain' => 'maintenance'],
                 ['code' => LoadLanguages::LANGUAGE2, 'domain' => 'messages'],
                 ['code' => LoadLanguages::LANGUAGE2, 'domain' => 'security'],
-                [
-                    'code' => LoadLanguages::LANGUAGE2,
-                    'domain' => LoadTranslations::TRANSLATION_KEY_DOMAIN,
-                ],
+                ['code' => LoadLanguages::LANGUAGE2, 'domain' => LoadTranslations::TRANSLATION_KEY_DOMAIN],
                 ['code' => LoadLanguages::LANGUAGE2, 'domain' => 'tooltips'],
                 ['code' => LoadLanguages::LANGUAGE2, 'domain' => 'validators'],
                 ['code' => LoadLanguages::LANGUAGE2, 'domain' => 'workflows'],
