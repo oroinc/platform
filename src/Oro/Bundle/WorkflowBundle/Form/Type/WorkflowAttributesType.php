@@ -268,9 +268,11 @@ class WorkflowAttributesType extends AbstractType
         }
 
         // update form label
-        $attributeOptions['options']['label'] = isset($attributeOptions['label'])
-            ? $attributeOptions['label']
-            : $attribute->getLabel();
+        if (!isset($attributeOptions['options']['label'])) {
+            $attributeOptions['options']['label'] = isset($attributeOptions['label'])
+                ? $attributeOptions['label']
+                : $attribute->getLabel();
+        }
 
         // update required option
         if (!array_key_exists('required', $attributeOptions['options'])) {
