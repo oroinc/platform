@@ -6,6 +6,7 @@ use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
 use Oro\Bundle\ApiBundle\Collection\IncludedObjectCollection;
 use Oro\Bundle\ApiBundle\Collection\IncludedObjectData;
+use Oro\Bundle\ApiBundle\Exception\RuntimeException;
 use Oro\Bundle\ApiBundle\Model\Error;
 use Oro\Bundle\ApiBundle\Model\ErrorSource;
 use Oro\Bundle\ApiBundle\Processor\FormContext;
@@ -63,13 +64,10 @@ class NormalizeIncludedData implements ProcessorInterface
         /** @var FormContext $context */
 
         $includedData = $context->getIncludedData();
-        if (null !== $includedData) {
-            // the included data are already normalized
-            return;
+        if (null === $includedData) {
+            $includedData = $this->normalizeIncludedData($context->getRequestData());
+            $context->setIncludedData($includedData);
         }
-
-        $includedData = $this->normalizeIncludedData($context->getRequestData());
-        $context->setIncludedData($includedData);
 
         if (empty($includedData) || null !== $context->getIncludedObjects()) {
             // no included data or they are already converted to included objects collection
@@ -117,8 +115,8 @@ class NormalizeIncludedData implements ProcessorInterface
 
         $includedPointer = $this->buildPointer('', JsonApiDoc::INCLUDED);
         foreach ($includedData as $index => $data) {
-            $data = $data[JsonApiDoc::DATA];
             $pointer = $this->buildPointer($includedPointer, $index);
+            $data = $this->getDataProperty($data, $pointer);
             $entityClass = $this->getEntityClass(
                 $this->buildPointer($pointer, JsonApiDoc::TYPE),
                 $data[JsonApiDoc::TYPE]
@@ -151,6 +149,34 @@ class NormalizeIncludedData implements ProcessorInterface
     }
 
     /**
+     * @param mixed  $data
+     * @param string $pointer
+     *
+     * @return array
+     */
+    protected function getDataProperty($data, $pointer)
+    {
+        if (!is_array($data)) {
+            throw new RuntimeException(
+                sprintf('The "%s" element should be an array.', $pointer)
+            );
+        }
+        if (!array_key_exists(JsonApiDoc::DATA, $data)) {
+            throw new RuntimeException(
+                sprintf('The "%s" element should have "%s" property.', $pointer, JsonApiDoc::DATA)
+            );
+        }
+        $data = $data[JsonApiDoc::DATA];
+        if (!is_array($data)) {
+            throw new RuntimeException(
+                sprintf('The "%s" property of "%s" element should be an array.', JsonApiDoc::DATA, $pointer)
+            );
+        }
+
+        return $data;
+    }
+
+    /**
      * @param string $pointer
      * @param array  $data
      * @param string $entityClass
@@ -166,7 +192,7 @@ class NormalizeIncludedData implements ProcessorInterface
         if (true === $flag || false === $flag) {
             if (!$this->doctrineHelper->isManageableEntityClass($entityClass)) {
                 $this->addValidationError(
-                    Constraint::INVALID_VALUE,
+                    Constraint::VALUE,
                     $this->buildPointer($this->buildPointer($pointer, JsonApiDoc::META), '_update'),
                     'Only manageable entity can be updated.'
                 );
@@ -178,7 +204,7 @@ class NormalizeIncludedData implements ProcessorInterface
         }
 
         $this->addValidationError(
-            Constraint::INVALID_VALUE,
+            Constraint::VALUE,
             $this->buildPointer($this->buildPointer($pointer, JsonApiDoc::META), '_update'),
             'This value should be boolean.'
         );

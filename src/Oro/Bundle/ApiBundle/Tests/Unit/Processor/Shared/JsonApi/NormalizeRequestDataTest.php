@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\Shared\JsonApi;
 
+use Oro\Bundle\ApiBundle\Collection\IncludedObjectCollection;
+use Oro\Bundle\ApiBundle\Collection\IncludedObjectData;
 use Oro\Bundle\ApiBundle\Metadata\AssociationMetadata;
 use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
 use Oro\Bundle\ApiBundle\Model\Error;
@@ -491,5 +493,55 @@ class NormalizeRequestDataTest extends FormProcessorTestCase
             ],
             $this->context->getErrors()
         );
+    }
+
+    public function testProcessShouldNotNormalizeIdOfIncludedObject()
+    {
+        $inputData = [
+            'data' => [
+                'relationships' => [
+                    'association' => [
+                        'data' => [
+                            'type' => 'users',
+                            'id'   => 'INCLUDED1'
+                        ]
+                    ]
+                ]
+            ]
+        ];
+        $includedObjects = new IncludedObjectCollection();
+        $includedObjects->add(new \stdClass(), 'Test\User', 'INCLUDED1', new IncludedObjectData('/included/0', 0));
+
+        $metadata = new EntityMetadata();
+        $associationMetadata = new AssociationMetadata();
+        $associationMetadata->setName('association');
+        $associationMetadata->setAcceptableTargetClassNames(['Test\User']);
+        $metadata->addAssociation($associationMetadata);
+
+        $requestType = $this->context->getRequestType();
+        $this->valueNormalizer->expects($this->any())
+            ->method('normalizeValue')
+            ->willReturnMap(
+                [
+                    ['users', 'entityClass', $requestType, false, 'Test\User'],
+                    ['groups', 'entityClass', $requestType, false, 'Test\Group']
+                ]
+            );
+        $this->entityIdTransformer->expects($this->never())
+            ->method('reverseTransform');
+
+        $this->context->setRequestData($inputData);
+        $this->context->setMetadata($metadata);
+        $this->context->setIncludedObjects($includedObjects);
+        $this->processor->process($this->context);
+
+        $expectedData = [
+            'association' => [
+                'id'    => 'INCLUDED1',
+                'class' => 'Test\User'
+            ],
+        ];
+
+        $this->assertEquals($expectedData, $this->context->getRequestData());
     }
 }

@@ -27,7 +27,11 @@ class ProcessIncludedObjects extends BaseProcessIncludedObjects
             } else {
                 $propertyPath = $errorSource->getPropertyPath();
                 if ($propertyPath) {
-                    $errorSource->setPropertyPath(str_replace('/', '.', $objectPath) . '.' . $propertyPath);
+                    $propertyPath = str_replace('/', '.', $objectPath) . '.' . $propertyPath;
+                    if (0 === strpos($propertyPath, '.')) {
+                        $propertyPath = substr($propertyPath, 1);
+                    }
+                    $errorSource->setPropertyPath($propertyPath);
                 }
             }
         }

@@ -7,6 +7,9 @@ use Oro\Component\ChainProcessor\ProcessorInterface;
 use Oro\Bundle\ApiBundle\Processor\FormContext;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 
+/**
+ * Makes all new included entities persistent.
+ */
 class PersistIncludedEntities implements ProcessorInterface
 {
     /** @var DoctrineHelper */
@@ -42,7 +45,7 @@ class PersistIncludedEntities implements ProcessorInterface
         foreach ($includedObjects as $object) {
             if (!$includedObjects->getData($object)->isExisting()) {
                 $em = $this->doctrineHelper->getEntityManager($object, false);
-                if ($em) {
+                if (null !== $em) {
                     $em->persist($object);
                 }
             }
