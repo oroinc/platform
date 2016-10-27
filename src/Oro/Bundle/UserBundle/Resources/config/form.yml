@@ -1,6 +1,4 @@
 parameters:
-    oro_user.form.type.user.class:              Oro\Bundle\UserBundle\Form\Type\UserType
-    oro_user.form.type.user.api.class:          Oro\Bundle\UserBundle\Form\Type\UserApiType
     oro_user.form.type.reset.class:             Oro\Bundle\UserBundle\Form\Type\ResetType
     oro_user.form.type.role.api.class:          Oro\Bundle\UserBundle\Form\Type\RoleApiType
     oro_user.form.type.group.class:             Oro\Bundle\UserBundle\Form\Type\GroupType
@@ -11,8 +9,6 @@ parameters:
     oro_user.form.type.role_multiselect.class:  Oro\Bundle\UserBundle\Form\Type\RoleMultiSelectType
     oro_user.form.type.gender.class:            Oro\Bundle\UserBundle\Form\Type\GenderType
     oro_user.form.type.email.class:             Oro\Bundle\UserBundle\Form\Type\EmailType
-    oro_user.form.type.change_password.class:   Oro\Bundle\UserBundle\Form\Type\ChangePasswordType
-    oro_user.form.type.set_password.class:      Oro\Bundle\UserBundle\Form\Type\SetPasswordType
     oro_user.form.handler.user.class:           Oro\Bundle\UserBundle\Form\Handler\UserHandler
     oro_user.form.handler.reset.class:          Oro\Bundle\UserBundle\Form\Handler\ResetHandler
     oro_user.form.handler.role.class:           Oro\Bundle\UserBundle\Form\Handler\RoleHandler
@@ -82,34 +78,40 @@ services:
 
     oro_user.form.type.user:
         scope: request
-        class:                        %oro_user.form.type.user.class%
+        class: Oro\Bundle\UserBundle\Form\Type\UserType
         arguments:
             - '@security.context'
             - '@oro_security.security_facade'
             - '@request'
+            - '@oro_user.form.provider.password_field_options_provider'
         tags:
             - { name: form.type, alias: oro_user_user }
 
     oro_user.form.type.user.api:
         scope: request
-        class:                        %oro_user.form.type.user.api.class%
+        class: Oro\Bundle\UserBundle\Form\Type\UserApiType
         arguments:
             - '@security.context'
             - '@oro_security.security_facade'
             - '@request'
+            - '@oro_user.form.provider.password_field_options_provider'
         calls:
             - [setUserConfigManager, ["@oro_config.user"]]
         tags:
             - { name: form.type, alias: user }
 
     oro_user.form.type.change_password:
-        class: %oro_user.form.type.change_password.class%
-        arguments:                    ["@oro_user.change_password.subscriber"]
+        class: Oro\Bundle\UserBundle\Form\Type\ChangePasswordType
+        arguments:
+             - '@oro_user.change_password.subscriber'
+             - '@oro_user.form.provider.password_field_options_provider'
         tags:
             - { name: form.type, alias: oro_change_password }
 
     oro_user.form.type.set_password.form.type:
-        class: %oro_user.form.type.set_password.class%
+        class: Oro\Bundle\UserBundle\Form\Type\SetPasswordType
+        arguments:
+             - '@oro_user.form.provider.password_field_options_provider'
         tags:
             - { name: form.type, alias: oro_set_password }
 
@@ -143,7 +145,9 @@ services:
 
     oro_user.form.type.reset:
         class:                        %oro_user.form.type.reset.class%
-        arguments:                    [%oro_user.entity.class%]
+        arguments:
+            - %oro_user.entity.class%
+            - '@oro_user.form.provider.password_field_options_provider'
         tags:
             - { name: form.type, alias: oro_user_reset }
 
@@ -278,6 +282,26 @@ services:
             - '@oro_user.form.type.set_password.form'
             - '@oro_user.mailer.processor'
             - '@oro_user.manager'
+
+    oro_user.form.provider.password_tooltip:
+        class: Oro\Bundle\UserBundle\Form\Provider\PasswordTooltipProvider
+        arguments:
+            - '@oro_user.provider.password_complexity_config_provider'
+            - '@translator'
+
+    oro_user.form.provider.password_field_options_provider:
+        class: Oro\Bundle\UserBundle\Form\Provider\PasswordFieldOptionsProvider
+        arguments:
+            - '@oro_user.provider.password_complexity_config_provider'
+            - '@oro_user.form.provider.password_tooltip'
+
+    oro_user.form.extension.js_validation.password_complexity_extension:
+        class: Oro\Bundle\UserBundle\Form\Extension\JsValidation\PasswordComplexityExtension
+        arguments:
+            - '@oro_form.extension.js_validation.constraints_provider'
+            - '@oro_user.provider.password_complexity_config_provider'
+        tags:
+            - { name: form.type_extension, alias: form, extended_type: 'repeated' }
 
     # Dashboard
     oro_user.form.type.widget_owners:

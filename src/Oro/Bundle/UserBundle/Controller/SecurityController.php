@@ -2,11 +2,12 @@
 
 namespace Oro\Bundle\UserBundle\Controller;
 
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
-use Symfony\Component\HttpFoundation\Response;
-
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
+
+use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Security\Core\Exception\BadCredentialsException;
 
 class SecurityController extends Controller
 {
@@ -24,6 +25,18 @@ class SecurityController extends Controller
 
         $helper           = $this->get('security.authentication_utils');
         $csrfTokenManager = $this->get('security.csrf.token_manager');
+        $attemptsProvider = $this->get('oro_user.security.login_attempts_provider');
+        $userManager      = $this->get('oro_user.manager');
+
+        $remainingAttempts = null;
+        if ($attemptsProvider->hasLimit()
+            && $helper->getLastAuthenticationError(false) instanceof BadCredentialsException
+            && $helper->getLastUsername()
+        ) {
+            if ($user = $userManager->findUserByUsernameOrEmail($helper->getLastUsername())) {
+                $remainingAttempts = $attemptsProvider->getRemaining($user);
+            }
+        }
 
         return [
             // last username entered by the user (if any)
@@ -31,7 +44,9 @@ class SecurityController extends Controller
             // last authentication error (if any)
             'error'         => $helper->getLastAuthenticationError(),
             // CSRF token for the login form
-            'csrf_token'    => $csrfTokenManager->getToken('authenticate')->getValue()
+            'csrf_token'    => $csrfTokenManager->getToken('authenticate')->getValue(),
+            // Remaining login attempts
+            'remaining_attempts' => $remainingAttempts,
         ];
     }
 

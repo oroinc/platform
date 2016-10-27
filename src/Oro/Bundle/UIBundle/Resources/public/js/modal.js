@@ -40,6 +40,21 @@ define([
             if (options.handleClose) {
                 this.events = _.extend({}, this.events, {'click .close': _.bind(this.onClose, this)});
             }
+
+            // Backbone.BootstrapModal is XSS vulnerable due to wrong template interpolation
+            // Escape all variables except "content"
+            if (options.hasOwnProperty('title')) {
+                options.title = _.escape(options.title);
+            }
+
+            if (options.hasOwnProperty('cancelText')) {
+                options.cancelText = _.escape(options.cancelText);
+            }
+
+            if (options.hasOwnProperty('okText')) {
+                options.okText = _.escape(options.okText);
+            }
+
             Modal.__super__.initialize.call(this, options);
         },
 
