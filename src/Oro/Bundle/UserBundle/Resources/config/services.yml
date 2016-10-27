@@ -498,6 +498,6 @@ services:
         arguments:
             - '@doctrine'
             - '@oro_config.manager'
-            - '@security.user_password_encoder.generic'
+            - '@security.encoder_factory'
         tags:
             - { name: validator.constraint_validator, alias: oro_used_password }

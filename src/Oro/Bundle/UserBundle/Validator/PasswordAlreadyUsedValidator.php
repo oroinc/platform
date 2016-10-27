@@ -6,8 +6,8 @@ use Doctrine\Bundle\DoctrineBundle\Registry;
 
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
-use Symfony\Component\Security\Core\Encoder\UserPasswordEncoder;
 use Symfony\Component\Validator\Exception\UnexpectedTypeException;
+use Symfony\Component\Security\Core\Encoder\EncoderFactoryInterface;
 
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\UserBundle\Validator\Constraints\PasswordAlreadyUsed;
@@ -20,14 +20,17 @@ class PasswordAlreadyUsedValidator extends ConstraintValidator
     /** @var ConfigManager */
     protected $configManager;
 
-    /** @var UserPasswordEncoder */
-    protected $passwordEncoder;
+    /** @var EncoderFactoryInterface */
+    protected $encoderFactory;
 
-    public function __construct(Registry $registry, ConfigManager $configManager, UserPasswordEncoder $passwordEncoder)
-    {
+    public function __construct(
+        Registry $registry,
+        ConfigManager $configManager,
+        EncoderFactoryInterface $encoderFactory
+    ) {
         $this->registry = $registry;
         $this->configManager = $configManager;
-        $this->passwordEncoder = $passwordEncoder;
+        $this->encoderFactory = $encoderFactory;
     }
 
     /**
@@ -50,10 +53,15 @@ class PasswordAlreadyUsedValidator extends ConstraintValidator
             ->getRepository('OroUserBundle:PasswordHash')
             ->findBy(['user' => $constraint->userId], null, $passwordHistoryLimit);
 
+        $encoder = null;
         foreach ($oldPasswords as $passwordHash) {
-            $this->passwordEncoder->isPasswordValid($passwordHash->getUser(), $passwordHash->getHash());
-        }
+            if (!$encoder) {
+                $encoder = $this->encoderFactory->getEncoder($passwordHash->getUser());
+            }
 
-        $this->context->addViolation($constraint->message);
+            if ($encoder->isPasswordValid($passwordHash->getHash(), $value, $passwordHash->getSalt())) {
+                $this->context->addViolation($constraint->message);
+            }
+        }
     }
 }

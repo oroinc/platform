@@ -8,10 +8,12 @@ use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\UserBundle\Entity\UserManager;
 use Oro\Bundle\UserBundle\Mailer\Processor;
+use Oro\Bundle\UserBundle\Validator\Constraints\PasswordAlreadyUsed;
 
 /**
  * Class SetPasswordHandler
@@ -40,13 +42,17 @@ class SetPasswordHandler
     /** @var UserManager */
     protected $userManager;
 
+    /** @var ValidatorInterface */
+    protected $validator;
+
     /**
-     * @param LoggerInterface     $logger
-     * @param Request             $request
+     * @param LoggerInterface $logger
+     * @param Request $request
      * @param TranslatorInterface $translator
-     * @param FormInterface       $form
-     * @param Processor           $mailerProcessor
-     * @param UserManager         $userManager
+     * @param FormInterface $form
+     * @param Processor $mailerProcessor
+     * @param UserManager $userManager
+     * @param ValidatorInterface $validator
      */
     public function __construct(
         LoggerInterface $logger,
@@ -54,7 +60,8 @@ class SetPasswordHandler
         TranslatorInterface $translator,
         FormInterface   $form,
         Processor       $mailerProcessor,
-        UserManager     $userManager
+        UserManager     $userManager,
+        ValidatorInterface $validator
     ) {
         $this->logger          = $logger;
         $this->request         = $request;
@@ -62,6 +69,7 @@ class SetPasswordHandler
         $this->form            = $form;
         $this->mailerProcessor = $mailerProcessor;
         $this->userManager     = $userManager;
+        $this->validator       = $validator;
     }
 
     /**
@@ -76,6 +84,19 @@ class SetPasswordHandler
         if (in_array($this->request->getMethod(), ['POST', 'PUT'])) {
             $this->form->submit($this->request);
             if ($this->form->isValid()) {
+                // check if this password has been recently used
+                $password = $this->form->get('password')->getData();
+                $constraint = new PasswordAlreadyUsed(['userId' => $entity->getId()]);
+                $errors = $this->validator->validate($password, $constraint);
+
+                if (count($errors) > 0) {
+                    $this->form->addError(
+                        new FormError($this->translator->trans('oro.user.password.already_used.message'))
+                    );
+
+                    return false;
+                }
+
                 $entity->setPlainPassword($this->form->get('password')->getData());
                 $entity->setPasswordChangedAt(new \DateTime());
                 try {

@@ -199,6 +199,7 @@ oro:
             enter_new_password.label: Enter new password
             enter_new_password_again.label: Enter new password again
             reset.label: Reset
+            already_used.message: The user has recently used this password. Please, choose another.
             reset:
                 ttl_already_requested.message: The password for this user has already been requested within the last 24 hours
                 popup.message: User {{ user }} will receive reset password by email.
