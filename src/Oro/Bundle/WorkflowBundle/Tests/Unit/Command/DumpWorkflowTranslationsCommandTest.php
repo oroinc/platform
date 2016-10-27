@@ -86,6 +86,11 @@ class DumpWorkflowTranslationsCommandTest extends \PHPUnit_Framework_TestCase
         );
     }
 
+    public function testGetName()
+    {
+        $this->assertEquals(DumpWorkflowTranslationsCommand::NAME, $this->command->getName());
+    }
+
     public function testConfigure()
     {
         $this->assertNotEmpty($this->command->getDescription());

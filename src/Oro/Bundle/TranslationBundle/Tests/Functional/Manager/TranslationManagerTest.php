@@ -58,7 +58,14 @@ class TranslationManagerTest extends WebTestCase
 
     public function testCreateWithEmptyValue()
     {
-        // TODO: implement it
+        $key = uniqid('TEST_KEY_', true);
+        $locale = LoadLanguages::LANGUAGE1;
+        $domain = LoadTranslations::TRANSLATION_KEY_DOMAIN;
+
+        $this->assertNull($this->manager->saveValue($key, '', $locale, $domain, Translation::SCOPE_UI));
+        $this->manager->flush();
+
+        $this->assertNull($this->repository->findTranslation($key, $locale, $domain));
     }
 
     public function testUpdateScopeSystemValue()
@@ -142,6 +149,11 @@ class TranslationManagerTest extends WebTestCase
         $this->assertNull($translation);
     }
 
+    public function testFindTranslationKey()
+    {
+        // TODO: implement it
+    }
+
     public function testRemoveTranslationKey()
     {
         /* @var $repository TranslationKeyRepository */
@@ -186,17 +198,47 @@ class TranslationManagerTest extends WebTestCase
 
     public function testFindAvailableDomainsForLocales()
     {
-        // TODO: implement it
+        // TODO: skip load translations and remove unused domains
+        $this->assertEquals(
+            [
+                ['code' => LoadLanguages::LANGUAGE2, 'domain' => 'HWIOAuthBundle'],
+                ['code' => LoadLanguages::LANGUAGE2, 'domain' => 'entities'],
+                ['code' => LoadLanguages::LANGUAGE2, 'domain' => 'install'],
+                ['code' => LoadLanguages::LANGUAGE2, 'domain' => 'jsmessages'],
+                ['code' => LoadLanguages::LANGUAGE2, 'domain' => 'maintenance'],
+                ['code' => LoadLanguages::LANGUAGE2, 'domain' => 'messages'],
+                ['code' => LoadLanguages::LANGUAGE2, 'domain' => 'security'],
+                [
+                    'code' => LoadLanguages::LANGUAGE2,
+                    'domain' => LoadTranslations::TRANSLATION_KEY_DOMAIN,
+                ],
+                ['code' => LoadLanguages::LANGUAGE2, 'domain' => 'tooltips'],
+                ['code' => LoadLanguages::LANGUAGE2, 'domain' => 'validators'],
+                ['code' => LoadLanguages::LANGUAGE2, 'domain' => 'workflows'],
+            ],
+            $this->manager->findAvailableDomainsForLocales([LoadLanguages::LANGUAGE2])
+        );
     }
 
     public function testGetAvailableDomains()
     {
-        // TODO: implement it
-    }
-
-    public function testFindTranslationKey()
-    {
-        // TODO: implement it
+        // TODO: skip load translations and remove unused domains
+        $this->assertEquals(
+            [
+                LoadTranslations::TRANSLATION_KEY_DOMAIN => LoadTranslations::TRANSLATION_KEY_DOMAIN,
+                'messages' => 'messages',
+                'jsmessages' => 'jsmessages',
+                'validators' => 'validators',
+                'security' => 'security',
+                'entities' => 'entities',
+                'HWIOAuthBundle' => 'HWIOAuthBundle',
+                'maintenance' => 'maintenance',
+                'tooltips' => 'tooltips',
+                'workflows' => 'workflows',
+                'install' => 'install',
+            ],
+            $this->manager->getAvailableDomains()
+        );
     }
 
     /**
