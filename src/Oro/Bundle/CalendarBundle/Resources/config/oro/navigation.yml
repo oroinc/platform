@@ -3,7 +3,7 @@ navigation:
         templates:
             calendar_menu:
                 template: 'OroCalendarBundle:Calendar:Menu/contextMenu.html.twig'
-                rootClass: 'dropdown-menu context-menu'
+                root_class: 'dropdown-menu context-menu'
         items:
             oro_calendar_view_default:
                 label: 'oro.calendar.menu.view_default'
