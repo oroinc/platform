@@ -204,12 +204,18 @@ class TranslationManager
 
     /**
      * Flushes all changes
+     *
+     * @param bool|false $force
      */
-    public function flush()
+    public function flush($force = false)
     {
-        $updatedItems = array_values($this->translations) + array_values($this->translationKeys);
-        if ($updatedItems) {
-            $this->getEntityManager(Translation::class)->flush($updatedItems);
+        if ($force) {
+            $this->getEntityManager(Translation::class)->flush();
+        } else {
+            $updatedItems = array_values($this->translations) + array_values($this->translationKeys);
+            if ($updatedItems) {
+                $this->getEntityManager(Translation::class)->flush($updatedItems);
+            }
         }
 
         // clear local cache

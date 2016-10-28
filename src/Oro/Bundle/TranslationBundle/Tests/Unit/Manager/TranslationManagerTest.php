@@ -180,8 +180,14 @@ class TranslationManagerTest extends \PHPUnit_Framework_TestCase
 
     public function testFlushWithoutChanges()
     {
-        $this->objectManager->expects($this->never());
+        $this->objectManager->expects($this->never())->method('flush');
         $this->manager->flush();
+    }
+
+    public function testForceFlush()
+    {
+        $this->objectManager->expects($this->once())->method('flush');
+        $this->manager->flush(true);
     }
 
     public function testClear()
