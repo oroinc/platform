@@ -8,24 +8,27 @@ UPGRADE FROM 1.10 to 2.0
 - Deprecated constant `Oro\Component\Action\Event\ExecuteActionEvents::DEPRECATED_HANDLE_BEFORE` removed. Use `Oro\Component\Action\Event\ExecuteActionEvents::HANDLE_BEFORE` instead.
 - Deprecated constant `Oro\Component\Action\Event\ExecuteActionEvents::DEPRECATED_HANDLE_AFTER` removed. Use `Oro\Component\Action\Event\ExecuteActionEvents::HANDLE_AFTER` instead.
 - Deprecated events `oro_workflow.action.handle_before` and `oro_workflow.action.handle_action` removed.
-- Removed service `@oro_action.context_accessor` and its class `Oro\Component\Action\Model\ContextAccessor`. Use `@oro_action.expression.context_accessor` and `Oro\Component\ConfigExpression\ContextAccessor`.
+- Removed service `@oro_action.context_accessor` and its class `Oro\Component\Action\Model\ContextAccessor`. Use `Oro\Component\ConfigExpression\ContextAccessor` (`@oro_action.expression.context_accessor`) instead.
 - Class `Oro\Component\Action\Action\ActionFactory` 
     - implements new interface `Oro\Component\ConfigExpression\FactoryWithTypesInterface`
 - Class `Oro\Component\Action\Action\FlashMessage`
     - method `setRequest` now accepts null value.
-    
 
 ####Config Expression Component
-- Added interface  `Oro\Component\ConfigExpression\FactoryWithTypesInterface` with method `FactoryWithTypesInterface::getTypes()`
-- Class `Oro\Component\ConfigExpression\ExpressionFactory` 
-    - implements new interface `Oro\Component\ConfigExpression\FactoryWithTypesInterface`
+- Added interface `Oro\Component\ConfigExpression\FactoryWithTypesInterface` with method `FactoryWithTypesInterface::getTypes()`
+- Class `Oro\Component\ConfigExpression\ExpressionFactory` now implements interface `Oro\Component\ConfigExpression\FactoryWithTypesInterface`
 
 ####ActionBundle
 - Class `Oro\Bundle\ActionBundle\Layout\Block\Type\ActionLineButtonsType` was removed -> block type `action_buttons` replaced with DI configuration.
 - Added class `Oro\Bundle\ActionBundle\Layout\DataProvider\ActionButtonsProvider` - layout data provider.
 - Default value for parameter `applications` in operation configuration renamed from `backend` to `default`.
-- Added new command `Oro\Bundle\ActionBundle\Command (oro:debug:action)` for displays list of all actions with full description.
-- Added new command `Oro\Bundle\ActionBundle\Command (oro:debug:condition)` that displays list of all conditions with full description
+- Added new command `Oro\Bundle\ActionBundle\Command\DebugActionCommand (oro:debug:action)` that displays list of all actions with description.
+- Added new command `Oro\Bundle\ActionBundle\Command\DebugConditionCommand (oro:debug:condition)` that displays list of all conditions full description
+- Command `Oro\Bundle\ActionBundle\Command\DumpActionConfigurationCommand` (`oro:action:configuration:dump`) renamed to `Oro\Bundle\ActionBundle\Command\DebugOperationCommand` (`oro:debug:operation`) 
+- Tag `oro_workflow.action` removed, now for actions always using `oro_action.action`
+- Tag `oro_workflow.condition` removed, now for conditions always using `oro_action.condition`
+- Deprecated service `oro_workflow.context_accessor` removed
+- Service (`Oro\Bundle\ActionBundle\Model\ConfigurationPass\ReplacePropertyPath`) removed, use `Oro\Component\ConfigExpression\ConfigurationPass\ReplacePropertyPath` instead
 
 ####WorkflowBundle
 - Class `Oro\Bundle\WorkflowBundle\Model\WorkflowManager`
@@ -150,6 +153,9 @@ Used with new class `Oro\Bundle\WorkflowBundle\Model\WorkflowExclusiveRecordGrou
 - Removed parameter `oro_workflow.listener.process_collector.class`.
 - Removed listener `oro_workflow.event_listener.scheduled_transitions_listener` (`Oro\Bundle\WorkflowBundle\EventListener\WorkflowScheduledTransitionsListener`).
 - Removed action group `oro_workflow_transition_process_schedule`.
+- Deprecated class `Oro\Bundle\WorkflowBundle\Model\AbstractStorage` removed
+- Deprecated class `Oro\Bundle\WorkflowBundle\Model\ConfigurationPass\ReplacePropertyPath` (`oro_workflow.configuration_pass.replace_property_path`) removed
+- Deprecated class `Oro\Bundle\WorkflowBundle\Model\ReplacePropertyPath\ContextAccessor` removed
 
 ####LocaleBundle:
 - Added helper `Oro\Bundle\LocaleBundle\Helper\LocalizationQueryTrait` for adding needed joins to QueryBuilder

@@ -63,32 +63,31 @@ Console commands
 
 This command displays current actions for an application.
 
-- Displays list of current actions `php app/console oro:debug:action`
-- Show full description `php app/console oro:debug:action [<name>]`
-
-##### Usage
-
 ```
   oro:debug:action [<name>]
   oro:debug:action
 
 Arguments:
-  name    An action name
+  name (optional): An action name
 ```
+
+##### Usage
+
+- Displays list of current actions `php app/console oro:debug:action`
+- Show full description `php app/console oro:debug:action [<name>]`
 
 #### oro:debug:condition
 
 This command displays current conditions for an application.
 
-- Displays list of all conditions `php app/console oro:debug:condition`
-- Show full description `php app/console oro:debug:condition [<name>]`
+```
+  oro:debug:condition [<name>]
+
+Arguments:
+  name (optional): A condition name
+```
 
 ##### Usage
 
-```
-  oro:debug:condition [<name>]
-  oro:debug:condition
-
-Arguments:
-  name    A condition name
-```
+- Displays list of all conditions `php app/console oro:debug:condition`
+- Show full description `php app/console oro:debug:condition [<name>]`
