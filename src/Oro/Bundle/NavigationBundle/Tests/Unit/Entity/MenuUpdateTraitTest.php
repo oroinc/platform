@@ -4,7 +4,7 @@ namespace Oro\Bundle\NavigationBundle\Tests\Unit\Entity;
 
 use Oro\Bundle\LocaleBundle\Entity\Localization;
 use Oro\Bundle\LocaleBundle\Entity\LocalizedFallbackValue;
-use Oro\Bundle\NavigationBundle\Entity\MenuUpdateInterface;
+use Oro\Bundle\NavigationBundle\Menu\Provider\GlobalOwnershipProvider;
 use Oro\Bundle\NavigationBundle\Tests\Unit\Entity\Stub\MenuUpdateStub;
 
 use Oro\Component\Testing\Unit\EntityTestCaseTrait;
@@ -21,9 +21,10 @@ class MenuUpdateTraitTest extends \PHPUnit_Framework_TestCase
             ['parentKey', 'page_container'],
             ['uri', 'uri'],
             ['menu', 'main_menu'],
-            ['ownershipType', MenuUpdateInterface::OWNERSHIP_GLOBAL],
+            ['ownershipType', GlobalOwnershipProvider::TYPE],
             ['ownerId', 3],
             ['active', true],
+            ['divider', true],
             ['priority', 1],
         ];
 
@@ -53,6 +54,36 @@ class MenuUpdateTraitTest extends \PHPUnit_Framework_TestCase
             ->removeTitle($firstTitle);
 
         $this->assertEquals([$secondTitle], array_values($update->getTitles()->toArray()));
+    }
+
+    public function testDescriptionAccessors()
+    {
+        $update = new MenuUpdateStub();
+        $this->assertEmpty($update->getDescriptions()->toArray());
+
+        $firstDescription = $this->createLocalizedValue();
+
+        $secondDescription = $this->createLocalizedValue();
+
+        $update->addDescription($firstDescription)
+            ->addDescription($secondDescription)
+            ->addDescription($secondDescription);
+
+        $this->assertCount(2, $update->getDescriptions()->toArray());
+
+        $this->assertEquals(
+            [$firstDescription, $secondDescription],
+            array_values($update->getDescriptions()->toArray())
+        );
+
+        $update->removeDescription($firstDescription)
+            ->removeDescription($firstDescription);
+
+        $this->assertEquals([$secondDescription], array_values($update->getDescriptions()->toArray()));
+
+        $defaultDescriptionString = 'default description string';
+        $update->setDefaultDescription($defaultDescriptionString);
+        $this->assertEquals($defaultDescriptionString, $update->getDefaultDescription()->getText());
     }
 
     /**

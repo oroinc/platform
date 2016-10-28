@@ -81,7 +81,7 @@ var ORO = (function(ORO) {
 
             var button = this.container.querySelector('button');
             if (button) {
-                button.disable();
+                button.disabled = true;
             }
 
             this.ajax(this.options.url, {
