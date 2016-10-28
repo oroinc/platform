@@ -8,6 +8,9 @@ config:
         'jquery.form':
             deps:
                 - 'jquery'
+        'bootstrap-popover':
+            deps:
+                - 'bootstrap-tooltip'
     map:
         '*':
             'jquery': 'oroui/js/extend/jquery'
