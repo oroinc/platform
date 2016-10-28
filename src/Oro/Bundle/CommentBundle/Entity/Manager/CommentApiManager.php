@@ -51,14 +51,14 @@ class CommentApiManager extends ApiEntityManager
     protected $configManager;
 
     /**
-     * @param Registry $doctrine
-     * @param SecurityFacade $securityFacade
-     * @param EntityNameResolver $entityNameResolver
-     * @param Pager $pager
+     * @param Registry                 $doctrine
+     * @param SecurityFacade           $securityFacade
+     * @param EntityNameResolver       $entityNameResolver
+     * @param Pager                    $pager
      * @param EventDispatcherInterface $eventDispatcher
-     * @param AttachmentProvider $attachmentProvider
-     * @param AclHelper $aclHelper
-     * @param ConfigManager $configManager
+     * @param AttachmentProvider       $attachmentProvider
+     * @param AclHelper                $aclHelper
+     * @param ConfigManager            $configManager
      */
     public function __construct(
         Registry $doctrine,
@@ -179,16 +179,16 @@ class CommentApiManager extends ApiEntityManager
         $ownerId   = '';
 
         if ($entity->getOwner()) {
-            $ownerId   = $entity->getOwner()->getId();
             $ownerName = $this->entityNameResolver->getName($entity->getOwner());
+            $ownerId   = $entity->getOwner()->getId();
         }
 
         $editorName = '';
         $editorId   = '';
 
         if ($entity->getUpdatedBy()) {
-            $editorId   = $entity->getUpdatedBy()->getId();
             $editorName = $this->entityNameResolver->getName($entity->getUpdatedBy());
+            $editorId   = $entity->getUpdatedBy()->getId();
         }
 
         $result = [
