@@ -11,7 +11,6 @@ use Doctrine\ORM\QueryBuilder;
 
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\PropertyAccess\PropertyAccess;
-use Symfony\Component\Translation\TranslatorInterface;
 
 use Oro\Bundle\AttachmentBundle\Provider\AttachmentProvider;
 use Oro\Bundle\CommentBundle\Entity\Comment;
@@ -51,9 +50,6 @@ class CommentApiManager extends ApiEntityManager
     /** @var aclHelper */
     protected $configManager;
 
-    /** @var TranslatorInterface */
-    protected $translator;
-
     /**
      * @param Registry $doctrine
      * @param SecurityFacade $securityFacade
@@ -63,7 +59,6 @@ class CommentApiManager extends ApiEntityManager
      * @param AttachmentProvider $attachmentProvider
      * @param AclHelper $aclHelper
      * @param ConfigManager $configManager
-     * @param TranslatorInterface $translator
      */
     public function __construct(
         Registry $doctrine,
@@ -73,8 +68,7 @@ class CommentApiManager extends ApiEntityManager
         EventDispatcherInterface $eventDispatcher,
         AttachmentProvider $attachmentProvider,
         AclHelper $aclHelper,
-        ConfigManager $configManager,
-        TranslatorInterface $translator
+        ConfigManager $configManager
     ) {
         $this->em                 = $doctrine->getManager();
         $this->securityFacade     = $securityFacade;
@@ -83,7 +77,6 @@ class CommentApiManager extends ApiEntityManager
         $this->attachmentProvider = $attachmentProvider;
         $this->aclHelper          = $aclHelper;
         $this->configManager      = $configManager;
-        $this->translator = $translator;
 
         parent::__construct(Comment::ENTITY_NAME, $this->em);
 
@@ -187,8 +180,7 @@ class CommentApiManager extends ApiEntityManager
 
         if ($entity->getOwner()) {
             $ownerId   = $entity->getOwner()->getId();
-            $ownerName = $this->entityNameResolver->getName($entity->getOwner())
-                ?: $this->translator->trans('oro.entity.item', ['%id%' => $ownerId]);
+            $ownerName = $this->entityNameResolver->getName($entity->getOwner());
         }
 
         $editorName = '';
@@ -196,8 +188,7 @@ class CommentApiManager extends ApiEntityManager
 
         if ($entity->getUpdatedBy()) {
             $editorId   = $entity->getUpdatedBy()->getId();
-            $editorName = $this->entityNameResolver->getName($entity->getUpdatedBy())
-                ?: $this->translator->trans('oro.entity.item', ['%id%' => $editorId]);
+            $editorName = $this->entityNameResolver->getName($entity->getUpdatedBy());
         }
 
         $result = [

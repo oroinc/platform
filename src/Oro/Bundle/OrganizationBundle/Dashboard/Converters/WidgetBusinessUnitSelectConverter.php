@@ -4,8 +4,6 @@ namespace Oro\Bundle\OrganizationBundle\Dashboard\Converters;
 
 use Doctrine\ORM\EntityManager;
 
-use Symfony\Component\Translation\TranslatorInterface;
-
 use Oro\Bundle\DashboardBundle\Provider\Converters\WidgetEntitySelectConverter;
 use Oro\Bundle\EntityBundle\Provider\EntityNameResolver;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
@@ -23,16 +21,14 @@ class WidgetBusinessUnitSelectConverter extends WidgetEntitySelectConverter
         EntityNameResolver $entityNameResolver,
         DoctrineHelper $doctrineHelper,
         EntityManager $entityManager,
-        $entityClass,
-        TranslatorInterface $translator
+        $entityClass
     ) {
         parent::__construct(
             $aclHelper,
             $entityNameResolver,
             $doctrineHelper,
             $entityManager,
-            $entityClass,
-            $translator
+            $entityClass
         );
 
         $this->ownerHelper = $ownerHelper;

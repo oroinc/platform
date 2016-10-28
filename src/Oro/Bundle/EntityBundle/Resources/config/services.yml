@@ -335,10 +335,19 @@ services:
             - %oro_entity.entity_name_formats%
 
     oro_entity.entity_name_provider.default:
-        class: %oro_entity.entity_name_provider.default.class%
+        class: Oro\Bundle\EntityBundle\Provider\EntityNameProvider
         public: false
         arguments:
             - '@doctrine'
+        tags:
+            - { name: oro_entity.name_provider, priority: -90 }
+
+    oro_entity.entity_name_provider.fallback:
+        class: Oro\Bundle\EntityBundle\Provider\FallbackEntityNameProvider
+        public: false
+        arguments:
+            - '@doctrine'
+            - '@translator'
         tags:
             - { name: oro_entity.name_provider, priority: -100 }
 

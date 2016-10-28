@@ -6,8 +6,6 @@ use Oro\Bundle\DashboardBundle\Provider\Converters\WidgetEntitySelectConverter;
 
 use Doctrine\ORM\EntityManager;
 
-use Symfony\Component\Translation\TranslatorInterface;
-
 use Oro\Bundle\EntityBundle\Provider\EntityNameResolver;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
@@ -24,16 +22,14 @@ class WidgetUserSelectConverter extends WidgetEntitySelectConverter
         EntityNameResolver $entityNameResolver,
         DoctrineHelper $doctrineHelper,
         EntityManager $entityManager,
-        $entityClass,
-        TranslatorInterface $translator
+        $entityClass
     ) {
         parent::__construct(
             $aclHelper,
             $entityNameResolver,
             $doctrineHelper,
             $entityManager,
-            $entityClass,
-            $translator
+            $entityClass
         );
 
         $this->ownerHelper = $ownerHelper;

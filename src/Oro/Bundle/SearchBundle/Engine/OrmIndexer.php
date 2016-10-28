@@ -4,8 +4,6 @@ namespace Oro\Bundle\SearchBundle\Engine;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
 
-use Symfony\Component\Translation\TranslatorInterface;
-
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityBundle\ORM\OroEntityManager;
 use Oro\Bundle\EntityBundle\Provider\EntityNameResolver;
@@ -32,7 +30,6 @@ class OrmIndexer extends AbstractIndexer
      * @param DoctrineHelper $doctrineHelper
      * @param ObjectMapper $mapper
      * @param EntityNameResolver $entityNameResolver
-     * @param TranslatorInterface $translator
      * @param DbalStorer $dbalStorer
      */
     public function __construct(
@@ -40,10 +37,10 @@ class OrmIndexer extends AbstractIndexer
         DoctrineHelper $doctrineHelper,
         ObjectMapper $mapper,
         EntityNameResolver $entityNameResolver,
-        TranslatorInterface $translator,
         DbalStorer $dbalStorer
     ) {
-        parent::__construct($registry, $doctrineHelper, $mapper, $entityNameResolver, $translator);
+        parent::__construct($registry, $doctrineHelper, $mapper, $entityNameResolver);
+
         $this->dbalStorer = $dbalStorer;
     }
 

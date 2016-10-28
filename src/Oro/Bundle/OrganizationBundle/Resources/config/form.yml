@@ -202,6 +202,5 @@ services:
             - '@oro_entity.doctrine_helper'
             - '@doctrine.orm.entity_manager'
             - 'Oro\Bundle\OrganizationBundle\Entity\BusinessUnit'
-            - '@translator'
         tags:
             - { name: oro_dashboard.value.converter, alias: 'oro_type_widget_business_unit_select' }

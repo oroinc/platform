@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\EntityBundle\Provider;
 
+use Doctrine\Common\Persistence\Mapping\ClassMetadata;
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\Common\Util\ClassUtils;
 use Doctrine\Common\Util\Inflector;
@@ -27,12 +28,19 @@ class EntityNameProvider implements EntityNameProviderInterface
      */
     public function getName($format, $locale, $entity)
     {
+        $className = ClassUtils::getClass($entity);
         if ($format === self::SHORT) {
-            return $this->getConstructedName($entity, [$this->getFieldName(ClassUtils::getClass($entity))]);
+            return $this->getConstructedName($entity, [$this->getFieldName($className)]);
         }
 
         if ($format === self::FULL) {
-            return $this->getConstructedName($entity, $this->getFieldNames(ClassUtils::getClass($entity)));
+            if ($name = $this->getConstructedName($entity, $this->getFieldNames($className))) {
+                return $name;
+            }
+
+            if ($idFiledName = $this->getIdFieldName($className)) {
+                return $idFiledName;
+            }
         }
 
         return false;
@@ -61,15 +69,62 @@ class EntityNameProvider implements EntityNameProviderInterface
                 return $alias . '.' . $fieldName;
             }, $fieldNames);
 
-            if (1 === count($fieldNames)) {
-                return reset($fieldNames);
+            $idColumnName = sprintf('%s.%s', $alias, $this->getIdFieldName($className));
+
+            if (count($fieldNames) === 0) {
+                return $idColumnName;
             }
 
-            // more than one field name
-            return sprintf("CONCAT_WS(' ', %s)", implode(', ', $fieldNames));
+            $nameDQL = reset($fieldNames);
+
+            if (count($fieldNames) > 1) {
+                $nameDQL = sprintf("CONCAT_WS(' ', %s)", implode(', ', $fieldNames));
+            }
+
+            return sprintf('COALESCE(%s, %s)', $nameDQL, $idColumnName);
         }
 
         return false;
+    }
+
+    /**
+     * Return single class Identifier Field Name or null if there a multiple or none
+     *
+     * @param $className
+     *
+     * @return string|null
+     */
+    protected function getIdFieldName($className)
+    {
+        $metadata = $this->getClassMetadata($className);
+        if (!$metadata) {
+            return null;
+        }
+
+        $identifierFieldNames = $metadata->getIdentifierFieldNames();
+
+        if (count($identifierFieldNames) !== 1) {
+            return null;
+        }
+
+        return reset($identifierFieldNames);
+    }
+
+    /**
+     * Return metadata of className
+     *
+     * @param string $className
+     *
+     * @return ClassMetadata|null
+     */
+    protected function getClassMetadata($className)
+    {
+        $manager = $this->doctrine->getManagerForClass($className);
+        if (null === $manager) {
+            return null;
+        }
+
+        return $manager->getClassMetadata($className);
     }
 
     /**
@@ -79,12 +134,12 @@ class EntityNameProvider implements EntityNameProviderInterface
      */
     protected function getFieldName($className)
     {
-        $manager = $this->doctrine->getManagerForClass($className);
-        if (null === $manager) {
+        $metadata = $this->getClassMetadata($className);
+
+        if (!$metadata) {
             return null;
         }
 
-        $metadata = $manager->getClassMetadata($className);
         foreach ($this->fieldGuesses as $fieldName) {
             if ($metadata->hasField($fieldName) && $metadata->getTypeOfField($fieldName) === 'string') {
                 return $fieldName;
@@ -130,10 +185,11 @@ class EntityNameProvider implements EntityNameProviderInterface
      */
     protected function getFieldNames($className)
     {
-        if (null === $manager = $this->doctrine->getManagerForClass($className)) {
+        $metadata = $this->getClassMetadata($className);
+
+        if (!$metadata) {
             return [];
         }
-        $metadata = $manager->getClassMetadata($className);
 
         $fieldNames = array_filter(
             (array) $metadata->getFieldNames(),

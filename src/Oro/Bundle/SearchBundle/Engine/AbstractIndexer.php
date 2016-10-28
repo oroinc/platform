@@ -6,8 +6,6 @@ use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Query\Expr\OrderBy;
 
-use Symfony\Component\Translation\TranslatorInterface;
-
 use Oro\Bundle\BatchBundle\ORM\Query\BufferedQueryResultIterator;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityBundle\Provider\EntityNameResolver;
@@ -29,28 +27,22 @@ abstract class AbstractIndexer implements IndexerInterface
     /** @var EntityNameResolver */
     protected $entityNameResolver;
 
-    /** @var TranslatorInterface */
-    protected $translator;
-
     /**
      * @param ManagerRegistry              $registry
      * @param DoctrineHelper               $doctrineHelper
      * @param ObjectMapper                 $mapper
      * @param EntityNameResolver           $entityNameResolver
-     * @param TranslatorInterface          $translator
      */
     public function __construct(
         ManagerRegistry $registry,
         DoctrineHelper $doctrineHelper,
         ObjectMapper $mapper,
-        EntityNameResolver $entityNameResolver,
-        TranslatorInterface $translator
+        EntityNameResolver $entityNameResolver
     ) {
         $this->registry = $registry;
         $this->doctrineHelper = $doctrineHelper;
         $this->mapper = $mapper;
         $this->entityNameResolver = $entityNameResolver;
-        $this->translator = $translator;
     }
 
     /**
@@ -160,8 +152,7 @@ abstract class AbstractIndexer implements IndexerInterface
      */
     protected function getEntityTitle($entity)
     {
-        return $this->entityNameResolver->getName($entity)
-            ?: $this->translator->trans('oro.entity.item', ['%id%' => $entity->getId()]);
+        return $this->entityNameResolver->getName($entity);
     }
 
     /**

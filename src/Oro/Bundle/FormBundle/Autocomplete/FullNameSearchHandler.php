@@ -2,8 +2,6 @@
 
 namespace Oro\Bundle\FormBundle\Autocomplete;
 
-use Symfony\Component\Translation\TranslatorInterface;
-
 use Oro\Bundle\EntityBundle\Provider\EntityNameResolver;
 
 class FullNameSearchHandler extends SearchHandler
@@ -14,24 +12,11 @@ class FullNameSearchHandler extends SearchHandler
     protected $entityNameResolver;
 
     /**
-     * @var TranslatorInterface
-     */
-    protected $translator;
-
-    /**
      * @param EntityNameResolver $entityNameResolver
      */
     public function setEntityNameResolver(EntityNameResolver $entityNameResolver)
     {
         $this->entityNameResolver = $entityNameResolver;
-    }
-
-    /**
-     * @param TranslatorInterface $translator
-     */
-    public function setTranslator(TranslatorInterface $translator)
-    {
-        $this->translator = $translator;
     }
 
     /**
@@ -57,8 +42,8 @@ class FullNameSearchHandler extends SearchHandler
         if (!$this->entityNameResolver) {
             throw new \RuntimeException('Name resolver must be configured');
         }
-        return $this->entityNameResolver->getName($entity)
-            ?: $this->translator->trans('oro.entity.item', ['%id%' => $entity->getId()]);
+
+        return $this->entityNameResolver->getName($entity);
     }
 
     /**
