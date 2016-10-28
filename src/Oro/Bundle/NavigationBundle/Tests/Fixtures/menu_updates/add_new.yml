@@ -1,0 +1,38 @@
+menu:
+    items:
+        system:
+            label: 'System'
+            extras:
+                uri: '#system'
+    tree:
+        menu:
+            type: menu
+            children:
+                system: []
+updates:
+    -
+        key: 'custom'
+        parent_key: 'system'
+        default_title: 'Custom'
+        uri: '#custom'
+        menu: 'menu'
+
+result_menu:
+    items:
+        system:
+            label: 'System'
+            extras:
+                uri: '#system'
+        custom:
+            label: 'Custom'
+            uri: '#custom'
+            extras:
+                divider: false
+                translate_disabled: false
+    tree:
+        menu:
+            type: menu
+            children:
+                system:
+                    children:
+                        custom: []

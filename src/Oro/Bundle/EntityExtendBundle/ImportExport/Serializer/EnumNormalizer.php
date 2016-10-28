@@ -4,10 +4,10 @@ namespace Oro\Bundle\EntityExtendBundle\ImportExport\Serializer;
 
 use Doctrine\Common\Util\ClassUtils;
 
+use Oro\Bundle\EntityBundle\Helper\FieldHelper;
 use Oro\Bundle\EntityExtendBundle\Entity\AbstractEnumValue;
 use Oro\Bundle\ImportExportBundle\Serializer\Normalizer\DenormalizerInterface;
 use Oro\Bundle\ImportExportBundle\Serializer\Normalizer\NormalizerInterface;
-use Oro\Bundle\ImportExportBundle\Field\FieldHelper;
 
 class EnumNormalizer implements NormalizerInterface, DenormalizerInterface
 {
