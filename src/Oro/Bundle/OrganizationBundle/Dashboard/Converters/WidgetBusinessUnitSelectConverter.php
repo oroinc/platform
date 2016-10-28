@@ -2,12 +2,15 @@
 
 namespace Oro\Bundle\OrganizationBundle\Dashboard\Converters;
 
+use Oro\Bundle\DashboardBundle\Provider\Converters\WidgetEntitySelectConverter;
+
 use Doctrine\ORM\EntityManager;
 
-use Oro\Bundle\DashboardBundle\Provider\Converters\WidgetEntitySelectConverter;
 use Oro\Bundle\EntityBundle\Provider\EntityNameResolver;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
+
 use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
+
 use Oro\Bundle\UserBundle\Dashboard\OwnerHelper;
 
 class WidgetBusinessUnitSelectConverter extends WidgetEntitySelectConverter
@@ -23,13 +26,7 @@ class WidgetBusinessUnitSelectConverter extends WidgetEntitySelectConverter
         EntityManager $entityManager,
         $entityClass
     ) {
-        parent::__construct(
-            $aclHelper,
-            $entityNameResolver,
-            $doctrineHelper,
-            $entityManager,
-            $entityClass
-        );
+        parent::__construct($aclHelper, $entityNameResolver, $doctrineHelper, $entityManager, $entityClass);
 
         $this->ownerHelper = $ownerHelper;
     }

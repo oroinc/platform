@@ -5,8 +5,10 @@ namespace Oro\Bundle\DashboardBundle\Provider\Converters;
 use Doctrine\ORM\EntityManager;
 
 use Oro\Bundle\DashboardBundle\Provider\ConfigValueConverterAbstract;
+
 use Oro\Bundle\EntityBundle\Provider\EntityNameResolver;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
+
 use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
 
 class WidgetEntitySelectConverter extends ConfigValueConverterAbstract
@@ -27,11 +29,11 @@ class WidgetEntitySelectConverter extends ConfigValueConverterAbstract
     protected $entityClass;
 
     /**
-     * @param AclHelper $aclHelper
+     * @param AclHelper          $aclHelper
      * @param EntityNameResolver $entityNameResolver
-     * @param DoctrineHelper $doctrineHelper
-     * @param EntityManager $entityManager
-     * @param string $entityClass
+     * @param DoctrineHelper     $doctrineHelper
+     * @param EntityManager      $entityManager
+     * @param string             $entityClass
      */
     public function __construct(
         AclHelper $aclHelper,

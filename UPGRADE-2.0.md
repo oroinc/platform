@@ -379,11 +379,24 @@ tag if it works with extend classes
 - Oro/Bundle/SearchBundle/Entity/UpdateEntity and Oro/Bundle/SearchBundle/EventListener/UpdateSchemaDoctrineListener were removed
 - `oro_search.search.engine.indexer` service was replaced with async implementation `oro_search.async.indexer`. Use sync indexer only for test environment.
 - New helper trait Oro/Component/Testing/SearchExtensionTrait - easy access to sync indexer for test environment
-- Removed `Oro\Bundle\SearchBundle\Resolver\EntityTitleResolverInterface` and classes that implement it. Dependencies are replaced with `Oro\Bundle\EntityBundle\Provider\EntityNameResolver` and `@translator`
-- Deprecated usage of `title_fields` as they are not available on all search engines (e.g. elastic search)
+- Removed `Oro\Bundle\SearchBundle\Resolver\EntityTitleResolverInterface` and classes that implement it:
+- Changed constructor and replaced `Oro\Bundle\SearchBundle\Resolver\EntityTitleResolverInterface` with `Oro\Bundle\EntityBundle\Provider\EntityNameResolver` in classes:
+  - `Oro\Bundle\SearchBundle\Engine\AbstractIndexer`
+  - `Oro\Bundle\SearchBundle\Engine\OrmIndexer`
+  - `Oro\Bundle\SearchBundle\EventListener\PrepareResultItemListener`
+  - `Oro\Bundle\ElasticSearchBundle\Engine\ElasticSearchIndexer`
+  - `Oro\Bundle\ActivityBundle\Entity\Manager\ActivityContextApiEntityManager`
+  - `Oro\Bundle\ActivityBundle\Form\DataTransformer\ContextsToViewTransformer`
+  - `Oro\Bundle\ActivityBundle\Form\Type\ContextsSelectType`
+  - `Oro\Bundle\CalendarBundle\Form\DataTransformer\AttendeesToViewTransformer`
+- Removed (deprecated) usage of `title_fields` as they are not available on all search engines (e.g. elastic search). Entity titles will resolve using EntityNameResolver. This may affect search results (e.g. `recordTitle` and `record_string` in functional tests are changed).
+
+####ElasticSearchBundle
+- Changed constructor of `Oro\Bundle\ElasticSearchBundle\Engine\ElasticSearchIndexer`. Replaced `EntityTitleResolverInterface` with `EntityNameResolver`.
 
 ####ActivityBundle:
-- Constructor of `Oro\Bundle\ActivityBundle\Autocomplete\ContextSearchHandler` is changed. Removed ObjectMapper dependency and added EntityNameResolver instead. Class now use EntityNameResolver instead of `title_fields`.
+- Changed constructor of `Oro\Bundle\ActivityBundle\Autocomplete\ContextSearchHandler`. Replaced `ObjectMapper` with `EntityNameResolver`. Class now use EntityNameResolver instead of `title_fields`.
+
 
 ####UiBundle:
 - Placeholders configuration now loads from `Resources/config/oro/placeholders.yml` file instead of `Resources/config/placeholders.yml`.
@@ -494,7 +507,8 @@ oro_email.email_address.entity_manager:
 - Added EntityFallbackExtension service which reads fallback values of entities in twig
 - Added AbstractEntityFallbackProvider abstract service to ease adding new fallback types, please refer
 to the [Fallback documentation](./src/Oro/Bundle/EntityBundle/Resources/doc/entity_fallback.md) for details
-- `Oro\Bundle\EntityBundle\Provider\EntityNameProvider` now is the base Entity Name Provider which returns names based on the first of the string entity fields from 'firstName', 'name', 'title', 'subject' or space-delimited concatenation of all string fields (new). Same applies for both getName and getNameDQL methods.
+- `Oro\Bundle\EntityBundle\Provider\EntityNameProvider` now is the base Entity Name Provider which returns entity titles based on the first of the string entity fields from 'firstName', 'name', 'title', 'subject' or a space-delimited concatenation of all string fields (new). If resulting title is empty it will return the entity id. Same applies for both getName and getNameDQL methods.
+- Added `Oro\Bundle\EntityBundle\Provider\FallbackEntityNameProvider` which will resolve entity title as Item #1 (uses translator) in case no suitable fields are found to construct the title. Should be kept as last provider.
 
 ####ContactBundle
 

@@ -4,8 +4,6 @@ namespace Oro\Bundle\SearchBundle\Tests\Unit\EventListener;
 
 use Oro\Bundle\EntityBundle\Provider\EntityNameResolver;
 use Oro\Bundle\SearchBundle\EventListener\PrepareResultItemListener;
-use Oro\Bundle\SearchBundle\Resolver\EntityTitleResolverInterface;
-use Symfony\Component\Translation\TranslatorInterface;
 
 class PrepareResultItemListenerTest extends \PHPUnit_Framework_TestCase
 {
@@ -82,14 +80,11 @@ class PrepareResultItemListenerTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->translator = $this->getMock(TranslatorInterface::class);
-
         $this->listener = new PrepareResultItemListener(
             $this->router,
             $this->mapper,
             $this->em,
-            $this->entityNameResolver,
-            $this->translator
+            $this->entityNameResolver
         );
     }
 

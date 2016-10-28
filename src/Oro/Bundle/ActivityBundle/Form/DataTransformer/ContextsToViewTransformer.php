@@ -87,8 +87,7 @@ class ContextsToViewTransformer implements DataTransformerInterface
                     continue;
                 }
 
-                $title = $this->entityNameResolver->getName($target)
-                    ?: $this->translator->trans('oro.entity.item', ['%id%' => $target->getId()]);
+                $title = $this->entityNameResolver->getName($target);
                 if ($label = $this->getClassLabel($targetClass)) {
                     $title .= ' (' . $label . ')';
                 }

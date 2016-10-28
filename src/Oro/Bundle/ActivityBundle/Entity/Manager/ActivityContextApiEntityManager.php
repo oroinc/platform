@@ -5,10 +5,8 @@ namespace Oro\Bundle\ActivityBundle\Entity\Manager;
 use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\Common\Util\ClassUtils;
 
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
-use Symfony\Component\Translation\TranslatorInterface;
 
 use Oro\Bundle\ActivityBundle\Event\PrepareContextTitleEvent;
 use Oro\Bundle\ActivityBundle\Manager\ActivityManager;
@@ -18,7 +16,6 @@ use Oro\Bundle\EntityBundle\ORM\EntityAliasResolver;
 use Oro\Bundle\EntityBundle\Provider\EntityNameResolver;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
-use Oro\Bundle\SearchBundle\Engine\ObjectMapper;
 use Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager;
 
 class ActivityContextApiEntityManager extends ApiEntityManager
@@ -44,9 +41,6 @@ class ActivityContextApiEntityManager extends ApiEntityManager
     /** @var DoctrineHelper */
     protected $doctrineHelper;
 
-    /** @var TranslatorInterface */
-    protected $translator;
-
     /**
      * @param ObjectManager                 $om
      * @param ActivityManager               $activityManager
@@ -56,7 +50,6 @@ class ActivityContextApiEntityManager extends ApiEntityManager
      * @param EntityAliasResolver           $entityAliasResolver
      * @param EntityNameResolver            $entityNameResolver
      * @param DoctrineHelper                $doctrineHelper
-     * @param TranslatorInterface           $translator
      */
     public function __construct(
         ObjectManager $om,
@@ -66,8 +59,7 @@ class ActivityContextApiEntityManager extends ApiEntityManager
         RouterInterface $router,
         EntityAliasResolver $entityAliasResolver,
         EntityNameResolver $entityNameResolver,
-        DoctrineHelper $doctrineHelper,
-        TranslatorInterface $translator
+        DoctrineHelper $doctrineHelper
     ) {
         parent::__construct(null, $om);
 
@@ -78,7 +70,6 @@ class ActivityContextApiEntityManager extends ApiEntityManager
         $this->entityAliasResolver  = $entityAliasResolver;
         $this->entityNameResolver   = $entityNameResolver;
         $this->doctrineHelper       = $doctrineHelper;
-        $this->translator           = $translator;
     }
 
     /**

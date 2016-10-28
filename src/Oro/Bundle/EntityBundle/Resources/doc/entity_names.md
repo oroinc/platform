@@ -94,7 +94,7 @@ Entity name providers are registered in the DI container by `oro_entity.name_pro
 
 ```yml
     oro_entity.entity_name_provider.default:
-        class: %oro_entity.entity_name_provider.default.class%
+        class: Oro\Bundle\EntityBundle\Provider\EntityNameProvider
         public: false
         arguments:
             - @doctrine
@@ -103,3 +103,9 @@ Entity name providers are registered in the DI container by `oro_entity.name_pro
 ```
 
 The priority can be specified to move the provider up or down the providers chain. The bigger the priority number is, the earlier the provider will be executed. The priority value is optional and defaults to 0.
+
+**Default behaviour**
+
+The bundled provider `Oro\Bundle\EntityBundle\Provider\EntityNameProvider` will resolve entity titles by trying to find suitable fields in the entity. First it tries to use one string field from the list 'firstName', 'name', 'title', 'subject' or if none of these is present, it will use a space-delimited concatenation of all non-serialized string fields. If some of the fields is found but the resulting title is empty (i.e. value of the fields is null) it will return the entity id.
+
+If no suitable fields are available (e.g. entity does not have any string fields) then another provider `Oro\Bundle\EntityBundle\Provider\FallbackEntityNameProvider` will try to construct a title in the form of 'Item #1' from the entity identifier.
