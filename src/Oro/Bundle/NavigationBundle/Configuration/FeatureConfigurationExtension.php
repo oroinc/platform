@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\DashboardBundle\Configuration;
+namespace Oro\Bundle\NavigationBundle\Configuration;
 
 use Symfony\Component\Config\Definition\Builder\NodeBuilder;
 
@@ -14,7 +14,7 @@ class FeatureConfigurationExtension implements ConfigurationExtensionInterface
     public function extendConfigurationTree(NodeBuilder $node)
     {
         $node
-            ->arrayNode('dashboard_widgets')
+            ->arrayNode('navigation_items')
                 ->prototype('variable')
                 ->end()
             ->end();

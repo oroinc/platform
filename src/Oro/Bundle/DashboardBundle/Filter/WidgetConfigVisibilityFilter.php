@@ -82,7 +82,7 @@ class WidgetConfigVisibilityFilter
         }
 
         $resource = $widgetName ? sprintf('%s.%s', $widgetName, $itemName) : $itemName;
-        if (!$this->featureChecker->isResourceEnabled($resource, 'dashboards')) {
+        if (!$this->featureChecker->isResourceEnabled($resource, 'dashboard_widgets')) {
             return false;
         }
 
