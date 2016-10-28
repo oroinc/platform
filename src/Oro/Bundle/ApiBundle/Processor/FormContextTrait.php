@@ -5,7 +5,7 @@ namespace Oro\Bundle\ApiBundle\Processor;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormInterface;
 
-use Oro\Bundle\ApiBundle\Collection\IncludedObjectCollection;
+use Oro\Bundle\ApiBundle\Collection\IncludedEntityCollection;
 
 trait FormContextTrait
 {
@@ -15,8 +15,8 @@ trait FormContextTrait
     /** @var array */
     protected $includedData;
 
-    /** @var IncludedObjectCollection|null */
-    protected $includedObjects;
+    /** @var IncludedEntityCollection|null */
+    protected $includedEntities;
 
     /** @var FormBuilderInterface|null */
     protected $formBuilder;
@@ -65,23 +65,23 @@ trait FormContextTrait
     }
 
     /**
-     * Returns a collection contains additional objects included into the request data.
+     * Returns a collection contains additional entities included into the request data.
      *
-     * @return IncludedObjectCollection|null
+     * @return IncludedEntityCollection|null
      */
-    public function getIncludedObjects()
+    public function getIncludedEntities()
     {
-        return $this->includedObjects;
+        return $this->includedEntities;
     }
 
     /**
-     * Sets a collection contains additional objects included into the request data.
+     * Sets a collection contains additional entities included into the request data.
      *
-     * @param IncludedObjectCollection|null $includedObjects
+     * @param IncludedEntityCollection|null $includedEntities
      */
-    public function setIncludedObjects(IncludedObjectCollection $includedObjects = null)
+    public function setIncludedEntities(IncludedEntityCollection $includedEntities = null)
     {
-        $this->includedObjects = $includedObjects;
+        $this->includedEntities = $includedEntities;
     }
 
     /**

@@ -45,7 +45,7 @@ abstract class ValidateRequestData implements ProcessorInterface
                 $data = $requestData[JsonApiDoc::DATA];
                 $this->validatePrimaryDataObject($data, $dataPointer);
                 $this->validateAttributesAndRelationships($data, $dataPointer);
-                $this->validateIncludedObjects($requestData, '');
+                $this->validateIncludedEntities($requestData, '');
             }
         } finally {
             $this->context = null;
@@ -179,7 +179,7 @@ abstract class ValidateRequestData implements ProcessorInterface
      * @param array  $data
      * @param string $pointer
      */
-    protected function validateIncludedObjects(array $data, $pointer)
+    protected function validateIncludedEntities(array $data, $pointer)
     {
         if (array_key_exists(JsonApiDoc::INCLUDED, $data)
             && $this->validateArray($data, JsonApiDoc::INCLUDED, $pointer, true)

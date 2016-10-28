@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\Shared;
 
-use Oro\Bundle\ApiBundle\Collection\IncludedObjectCollection;
+use Oro\Bundle\ApiBundle\Collection\IncludedEntityCollection;
 use Oro\Bundle\ApiBundle\Config\ConfigAccessorInterface;
 use Oro\Bundle\ApiBundle\Form\FormExtensionSwitcherInterface;
 use Oro\Bundle\ApiBundle\Form\Guesser\MetadataTypeGuesser;
@@ -41,7 +41,7 @@ class RestoreDefaultFormExtensionTest extends FormProcessorTestCase
         $this->formExtensionSwitcher->expects($this->never())
             ->method('switchToDefaultFormExtension');
         $this->metadataTypeGuesser->expects($this->never())
-            ->method('setIncludedObjects')
+            ->method('setIncludedEntities')
             ->with(null);
         $this->metadataTypeGuesser->expects($this->never())
             ->method('setMetadataAccessor')
@@ -58,7 +58,7 @@ class RestoreDefaultFormExtensionTest extends FormProcessorTestCase
         $this->formExtensionSwitcher->expects($this->once())
             ->method('switchToDefaultFormExtension');
         $this->metadataTypeGuesser->expects($this->once())
-            ->method('setIncludedObjects')
+            ->method('setIncludedEntities')
             ->with(null);
         $this->metadataTypeGuesser->expects($this->once())
             ->method('setMetadataAccessor')
@@ -73,15 +73,15 @@ class RestoreDefaultFormExtensionTest extends FormProcessorTestCase
 
     public function testProcessForPreviouslyRememberedContext()
     {
-        $includedObjects = $this->getMock(IncludedObjectCollection::class);
+        $includedEntities = $this->getMock(IncludedEntityCollection::class);
         $metadataAccessor = $this->getMock(MetadataAccessorInterface::class);
         $configAccessor = $this->getMock(ConfigAccessorInterface::class);
 
         $this->formExtensionSwitcher->expects($this->once())
             ->method('switchToDefaultFormExtension');
         $this->metadataTypeGuesser->expects($this->once())
-            ->method('setIncludedObjects')
-            ->with($includedObjects);
+            ->method('setIncludedEntities')
+            ->with($includedEntities);
         $this->metadataTypeGuesser->expects($this->once())
             ->method('setMetadataAccessor')
             ->with(self::identicalTo($metadataAccessor));
@@ -90,12 +90,12 @@ class RestoreDefaultFormExtensionTest extends FormProcessorTestCase
             ->with(self::identicalTo($configAccessor));
 
         $this->context->set(RestoreDefaultFormExtension::API_FORM_EXTENSION_ACTIVATED, true);
-        $this->context->set(RestoreDefaultFormExtension::PREVIOUS_INCLUDED_OBJECTS, $includedObjects);
+        $this->context->set(RestoreDefaultFormExtension::PREVIOUS_INCLUDED_ENTITIES, $includedEntities);
         $this->context->set(RestoreDefaultFormExtension::PREVIOUS_METADATA_ACCESSOR, $metadataAccessor);
         $this->context->set(RestoreDefaultFormExtension::PREVIOUS_CONFIG_ACCESSOR, $configAccessor);
         $this->processor->process($this->context);
 
-        self::assertFalse($this->context->has(RestoreDefaultFormExtension::PREVIOUS_INCLUDED_OBJECTS));
+        self::assertFalse($this->context->has(RestoreDefaultFormExtension::PREVIOUS_INCLUDED_ENTITIES));
         self::assertFalse($this->context->has(RestoreDefaultFormExtension::PREVIOUS_METADATA_ACCESSOR));
         self::assertFalse($this->context->has(RestoreDefaultFormExtension::PREVIOUS_CONFIG_ACCESSOR));
     }

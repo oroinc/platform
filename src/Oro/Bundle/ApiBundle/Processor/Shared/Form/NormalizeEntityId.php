@@ -40,9 +40,9 @@ class NormalizeEntityId implements ProcessorInterface
             return;
         }
 
-        $includedObjects = $context->getIncludedObjects();
-        if (null !== $includedObjects && null !== $includedObjects->get($context->getClassName(), $entityId)) {
-            // keep the id of an included object as is
+        $includedEntities = $context->getIncludedEntities();
+        if (null !== $includedEntities && null !== $includedEntities->get($context->getClassName(), $entityId)) {
+            // keep the id of an included entity as is
             return;
         }
 

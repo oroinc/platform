@@ -197,9 +197,9 @@ class NormalizeRequestData implements ProcessorInterface
      */
     protected function normalizeEntityId($pointer, $entityClass, $entityId)
     {
-        $includedObjects = $this->context->getIncludedObjects();
-        if (null !== $includedObjects && null !== $includedObjects->get($entityClass, $entityId)) {
-            // keep the id of an included object as is
+        $includedEntities = $this->context->getIncludedEntities();
+        if (null !== $includedEntities && null !== $includedEntities->get($entityClass, $entityId)) {
+            // keep the id of an included entity as is
             return $entityId;
         }
 

@@ -5,7 +5,7 @@ namespace Oro\Bundle\ApiBundle\Form\Guesser;
 use Symfony\Component\Form\FormTypeGuesserInterface;
 use Symfony\Component\Form\Guess\TypeGuess;
 
-use Oro\Bundle\ApiBundle\Collection\IncludedObjectCollection;
+use Oro\Bundle\ApiBundle\Collection\IncludedEntityCollection;
 use Oro\Bundle\ApiBundle\Config\ConfigAccessorInterface;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionFieldConfig;
@@ -29,8 +29,8 @@ class MetadataTypeGuesser implements FormTypeGuesserInterface
     /** @var ConfigAccessorInterface|null */
     protected $configAccessor;
 
-    /** @var IncludedObjectCollection|null */
-    protected $includedObjects;
+    /** @var IncludedEntityCollection|null */
+    protected $includedEntities;
 
     /**
      * @param array          $dataTypeMappings [data type => [form type, options], ...]
@@ -75,19 +75,19 @@ class MetadataTypeGuesser implements FormTypeGuesserInterface
     }
 
     /**
-     * @return IncludedObjectCollection|null
+     * @return IncludedEntityCollection|null
      */
-    public function getIncludedObjects()
+    public function getIncludedEntities()
     {
-        return $this->includedObjects;
+        return $this->includedEntities;
     }
 
     /**
-     * @param IncludedObjectCollection|null $includedObjects
+     * @param IncludedEntityCollection|null $includedEntities
      */
-    public function setIncludedObjects(IncludedObjectCollection $includedObjects = null)
+    public function setIncludedEntities(IncludedEntityCollection $includedEntities = null)
     {
-        $this->includedObjects = $includedObjects;
+        $this->includedEntities = $includedEntities;
     }
 
     /**
@@ -231,7 +231,7 @@ class MetadataTypeGuesser implements FormTypeGuesserInterface
     {
         return $this->createTypeGuess(
             'oro_api_entity',
-            ['metadata' => $metadata, 'included_objects' => $this->includedObjects],
+            ['metadata' => $metadata, 'included_entities' => $this->includedEntities],
             TypeGuess::HIGH_CONFIDENCE
         );
     }

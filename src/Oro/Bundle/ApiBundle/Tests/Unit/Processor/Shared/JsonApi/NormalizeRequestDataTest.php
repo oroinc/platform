@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\Shared\JsonApi;
 
-use Oro\Bundle\ApiBundle\Collection\IncludedObjectCollection;
-use Oro\Bundle\ApiBundle\Collection\IncludedObjectData;
+use Oro\Bundle\ApiBundle\Collection\IncludedEntityCollection;
+use Oro\Bundle\ApiBundle\Collection\IncludedEntityData;
 use Oro\Bundle\ApiBundle\Metadata\AssociationMetadata;
 use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
 use Oro\Bundle\ApiBundle\Model\Error;
@@ -495,7 +495,7 @@ class NormalizeRequestDataTest extends FormProcessorTestCase
         );
     }
 
-    public function testProcessShouldNotNormalizeIdOfIncludedObject()
+    public function testProcessShouldNotNormalizeIdOfIncludedEntity()
     {
         $inputData = [
             'data' => [
@@ -509,8 +509,8 @@ class NormalizeRequestDataTest extends FormProcessorTestCase
                 ]
             ]
         ];
-        $includedObjects = new IncludedObjectCollection();
-        $includedObjects->add(new \stdClass(), 'Test\User', 'INCLUDED1', new IncludedObjectData('/included/0', 0));
+        $includedEntities = new IncludedEntityCollection();
+        $includedEntities->add(new \stdClass(), 'Test\User', 'INCLUDED1', new IncludedEntityData('/included/0', 0));
 
         $metadata = new EntityMetadata();
         $associationMetadata = new AssociationMetadata();
@@ -532,7 +532,7 @@ class NormalizeRequestDataTest extends FormProcessorTestCase
 
         $this->context->setRequestData($inputData);
         $this->context->setMetadata($metadata);
-        $this->context->setIncludedObjects($includedObjects);
+        $this->context->setIncludedEntities($includedEntities);
         $this->processor->process($this->context);
 
         $expectedData = [

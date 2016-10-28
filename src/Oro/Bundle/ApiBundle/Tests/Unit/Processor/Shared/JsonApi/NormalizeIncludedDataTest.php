@@ -4,7 +4,7 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\Shared\JsonApi;
 
 use Doctrine\ORM\EntityManager;
 
-use Oro\Bundle\ApiBundle\Collection\IncludedObjectCollection;
+use Oro\Bundle\ApiBundle\Collection\IncludedEntityCollection;
 use Oro\Bundle\ApiBundle\Model\Error;
 use Oro\Bundle\ApiBundle\Model\ErrorSource;
 use Oro\Bundle\ApiBundle\Processor\Shared\JsonApi\NormalizeIncludedData;
@@ -106,7 +106,7 @@ class NormalizeIncludedDataTest extends FormProcessorTestCase
             ['data' => ['type' => 'testType', 'id' => 'testId']]
         ];
         $normalizedType = 'Test\Class';
-        $includedObject = new \stdClass();
+        $includedEntity = new \stdClass();
 
         $this->valueNormalizer->expects(self::once())
             ->method('normalizeValue')
@@ -117,19 +117,19 @@ class NormalizeIncludedDataTest extends FormProcessorTestCase
         $this->entityInstantiator->expects(self::once())
             ->method('instantiate')
             ->with($normalizedType)
-            ->willReturn($includedObject);
+            ->willReturn($includedEntity);
 
         $this->context->setIncludedData($includedData);
         $this->processor->process($this->context);
         $this->assertSame($includedData, $this->context->getIncludedData());
-        $this->assertNotNull($this->context->getIncludedObjects());
+        $this->assertNotNull($this->context->getIncludedEntities());
         $this->assertSame(
-            $includedObject,
-            $this->context->getIncludedObjects()->get($normalizedType, 'testId')
+            $includedEntity,
+            $this->context->getIncludedEntities()->get($normalizedType, 'testId')
         );
     }
 
-    public function testProcessWhenIncludedObjectsAlreadyLoaded()
+    public function testProcessWhenIncludedEntitiesAlreadyLoaded()
     {
         $requestData = [
             'included' => [
@@ -138,7 +138,7 @@ class NormalizeIncludedDataTest extends FormProcessorTestCase
         ];
 
         $this->context->setRequestData($requestData);
-        $this->context->setIncludedObjects(new IncludedObjectCollection());
+        $this->context->setIncludedEntities(new IncludedEntityCollection());
         $this->processor->process($this->context);
         $this->assertEquals(
             [
@@ -146,7 +146,7 @@ class NormalizeIncludedDataTest extends FormProcessorTestCase
             ],
             $this->context->getIncludedData()
         );
-        $this->assertCount(0, $this->context->getIncludedObjects());
+        $this->assertCount(0, $this->context->getIncludedEntities());
     }
 
     public function testProcessIncludedSectionDoesNotExistInRequestData()
@@ -156,7 +156,7 @@ class NormalizeIncludedDataTest extends FormProcessorTestCase
         $this->context->setRequestData($requestData);
         $this->processor->process($this->context);
         $this->assertEquals([], $this->context->getIncludedData());
-        $this->assertNull($this->context->getIncludedObjects());
+        $this->assertNull($this->context->getIncludedEntities());
     }
 
     public function testProcessIncludedSectionExistInRequestData()
@@ -167,7 +167,7 @@ class NormalizeIncludedDataTest extends FormProcessorTestCase
             ]
         ];
         $normalizedType = 'Test\Class';
-        $includedObject = new \stdClass();
+        $includedEntity = new \stdClass();
 
         $this->valueNormalizer->expects(self::once())
             ->method('normalizeValue')
@@ -178,7 +178,7 @@ class NormalizeIncludedDataTest extends FormProcessorTestCase
         $this->entityInstantiator->expects(self::once())
             ->method('instantiate')
             ->with($normalizedType)
-            ->willReturn($includedObject);
+            ->willReturn($includedEntity);
 
         $this->context->setRequestData($requestData);
         $this->processor->process($this->context);
@@ -188,14 +188,14 @@ class NormalizeIncludedDataTest extends FormProcessorTestCase
             ],
             $this->context->getIncludedData()
         );
-        $this->assertNotNull($this->context->getIncludedObjects());
+        $this->assertNotNull($this->context->getIncludedEntities());
         $this->assertSame(
-            $includedObject,
-            $this->context->getIncludedObjects()->get($normalizedType, 'testId')
+            $includedEntity,
+            $this->context->getIncludedEntities()->get($normalizedType, 'testId')
         );
     }
 
-    public function testProcessForNewIncludedObjectOrEntity()
+    public function testProcessForNewIncludedEntityOrObject()
     {
         $requestData = [
             'included' => [
@@ -203,7 +203,7 @@ class NormalizeIncludedDataTest extends FormProcessorTestCase
             ]
         ];
         $normalizedType = 'Test\Class';
-        $includedObject = new \stdClass();
+        $includedEntity = new \stdClass();
 
         $this->doctrineHelper->expects(self::never())
             ->method('isManageableEntityClass');
@@ -217,15 +217,15 @@ class NormalizeIncludedDataTest extends FormProcessorTestCase
         $this->entityInstantiator->expects(self::once())
             ->method('instantiate')
             ->with($normalizedType)
-            ->willReturn($includedObject);
+            ->willReturn($includedEntity);
 
         $this->context->setRequestData($requestData);
         $this->processor->process($this->context);
         $this->assertFalse($this->context->hasErrors());
-        $this->assertNotNull($this->context->getIncludedObjects());
+        $this->assertNotNull($this->context->getIncludedEntities());
         $this->assertSame(
-            $includedObject,
-            $this->context->getIncludedObjects()->get($normalizedType, 'testId')
+            $includedEntity,
+            $this->context->getIncludedEntities()->get($normalizedType, 'testId')
         );
     }
 
@@ -256,7 +256,7 @@ class NormalizeIncludedDataTest extends FormProcessorTestCase
 
         $this->context->setRequestData($requestData);
         $this->processor->process($this->context);
-        $this->assertNull($this->context->getIncludedObjects());
+        $this->assertNull($this->context->getIncludedEntities());
         $this->assertEquals([$error], $this->context->getErrors());
     }
 
@@ -299,10 +299,10 @@ class NormalizeIncludedDataTest extends FormProcessorTestCase
         $this->context->setRequestData($requestData);
         $this->processor->process($this->context);
         $this->assertFalse($this->context->hasErrors());
-        $this->assertNotNull($this->context->getIncludedObjects());
+        $this->assertNotNull($this->context->getIncludedEntities());
         $this->assertSame(
             $includedEntity,
-            $this->context->getIncludedObjects()->get($normalizedType, $normalizedId)
+            $this->context->getIncludedEntities()->get($normalizedType, $normalizedId)
         );
     }
 
@@ -347,11 +347,11 @@ class NormalizeIncludedDataTest extends FormProcessorTestCase
 
         $this->context->setRequestData($requestData);
         $this->processor->process($this->context);
-        $this->assertNull($this->context->getIncludedObjects());
+        $this->assertNull($this->context->getIncludedEntities());
         $this->assertEquals([$error], $this->context->getErrors());
     }
 
-    public function testProcessWhenIncludedObjectTypeIsUnknown()
+    public function testProcessWhenIncludedEntityTypeIsUnknown()
     {
         $requestData = [
             'included' => [
@@ -370,7 +370,7 @@ class NormalizeIncludedDataTest extends FormProcessorTestCase
 
         $this->context->setRequestData($requestData);
         $this->processor->process($this->context);
-        $this->assertNull($this->context->getIncludedObjects());
+        $this->assertNull($this->context->getIncludedEntities());
         $this->assertEquals([$error], $this->context->getErrors());
     }
 
@@ -399,7 +399,7 @@ class NormalizeIncludedDataTest extends FormProcessorTestCase
 
         $this->context->setRequestData($requestData);
         $this->processor->process($this->context);
-        $this->assertNull($this->context->getIncludedObjects());
+        $this->assertNull($this->context->getIncludedEntities());
         $this->assertEquals([$error], $this->context->getErrors());
     }
 
@@ -432,7 +432,7 @@ class NormalizeIncludedDataTest extends FormProcessorTestCase
 
         $this->context->setRequestData($requestData);
         $this->processor->process($this->context);
-        $this->assertNull($this->context->getIncludedObjects());
+        $this->assertNull($this->context->getIncludedEntities());
         $this->assertEquals([$error], $this->context->getErrors());
     }
 }

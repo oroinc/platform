@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Form\DateTransformer;
 
-use Oro\Bundle\ApiBundle\Collection\IncludedObjectCollection;
-use Oro\Bundle\ApiBundle\Collection\IncludedObjectData;
+use Oro\Bundle\ApiBundle\Collection\IncludedEntityCollection;
+use Oro\Bundle\ApiBundle\Collection\IncludedEntityData;
 use Oro\Bundle\ApiBundle\Form\DataTransformer\EntityToIdTransformer;
 use Oro\Bundle\ApiBundle\Metadata\AssociationMetadata;
 use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\CompositeKeyEntity;
@@ -79,11 +79,11 @@ class EntityToIdTransformerTest extends OrmRelatedTestCase
         $this->assertEquals($entity, $transformer->reverseTransform($value));
     }
 
-    public function testReverseTransformWhenEntityDoesNotFoundInIncludedObject()
+    public function testReverseTransformWhenEntityDoesNotFoundInIncludedEntity()
     {
         $metadata = $this->getAssociationMetadata([Group::class]);
-        $includedObjects = new IncludedObjectCollection();
-        $transformer = new EntityToIdTransformer($this->doctrine, $metadata, $includedObjects);
+        $includedEntities = new IncludedEntityCollection();
+        $transformer = new EntityToIdTransformer($this->doctrine, $metadata, $includedEntities);
 
         $value = ['class' => Group::class, 'id' => 123];
         $entity = new Group();
@@ -108,18 +108,18 @@ class EntityToIdTransformerTest extends OrmRelatedTestCase
         $this->assertEquals($entity, $transformer->reverseTransform($value));
     }
 
-    public function testReverseTransformWhenEntityFoundInIncludedObject()
+    public function testReverseTransformWhenEntityFoundInIncludedEntity()
     {
         $metadata = $this->getAssociationMetadata([Group::class]);
-        $includedObjects = new IncludedObjectCollection();
-        $transformer = new EntityToIdTransformer($this->doctrine, $metadata, $includedObjects);
+        $includedEntities = new IncludedEntityCollection();
+        $transformer = new EntityToIdTransformer($this->doctrine, $metadata, $includedEntities);
 
         $value = ['class' => Group::class, 'id' => 123];
         $entity = new Group();
         $entity->setId($value['id']);
         $entity->setName('test');
 
-        $includedObjects->add($entity, $value['class'], $value['id'], new IncludedObjectData('/included/0', 0));
+        $includedEntities->add($entity, $value['class'], $value['id'], new IncludedEntityData('/included/0', 0));
 
         $this->assertEquals($entity, $transformer->reverseTransform($value));
     }

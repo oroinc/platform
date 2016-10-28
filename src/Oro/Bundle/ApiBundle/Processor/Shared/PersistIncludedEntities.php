@@ -36,17 +36,17 @@ class PersistIncludedEntities implements ProcessorInterface
             return;
         }
 
-        $includedObjects = $context->getIncludedObjects();
-        if (null === $includedObjects) {
-            // the Context does not have included objects
+        $includedEntities = $context->getIncludedEntities();
+        if (null === $includedEntities) {
+            // the Context does not have included entities
             return;
         }
 
-        foreach ($includedObjects as $object) {
-            if (!$includedObjects->getData($object)->isExisting()) {
-                $em = $this->doctrineHelper->getEntityManager($object, false);
+        foreach ($includedEntities as $entity) {
+            if (!$includedEntities->getData($entity)->isExisting()) {
+                $em = $this->doctrineHelper->getEntityManager($entity, false);
                 if (null !== $em) {
-                    $em->persist($object);
+                    $em->persist($entity);
                 }
             }
         }

@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor;
 
-use Oro\Bundle\ApiBundle\Collection\IncludedObjectCollection;
+use Oro\Bundle\ApiBundle\Collection\IncludedEntityCollection;
 use Oro\Bundle\ApiBundle\Processor\FormContext;
 
 class FormContextTest extends \PHPUnit_Framework_TestCase
@@ -36,16 +36,16 @@ class FormContextTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($includedData, $this->context->getIncludedData());
     }
 
-    public function testIncludedObjects()
+    public function testIncludedEntities()
     {
-        $this->assertNull($this->context->getIncludedObjects());
+        $this->assertNull($this->context->getIncludedEntities());
 
-        $includedObjects = $this->getMock(IncludedObjectCollection::class);
-        $this->context->setIncludedObjects($includedObjects);
-        $this->assertSame($includedObjects, $this->context->getIncludedObjects());
+        $includedEntities = $this->getMock(IncludedEntityCollection::class);
+        $this->context->setIncludedEntities($includedEntities);
+        $this->assertSame($includedEntities, $this->context->getIncludedEntities());
 
-        $this->context->setIncludedObjects();
-        $this->assertNull($this->context->getIncludedObjects());
+        $this->context->setIncludedEntities();
+        $this->assertNull($this->context->getIncludedEntities());
     }
 
     public function testFormBuilder()

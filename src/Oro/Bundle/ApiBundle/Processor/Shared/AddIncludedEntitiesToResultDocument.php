@@ -9,7 +9,7 @@ use Oro\Bundle\ApiBundle\Processor\FormContext;
 /**
  * Adds the included entities to the response using the response document builder.
  */
-class AddIncludedObjectsToResultDocument implements ProcessorInterface
+class AddIncludedEntitiesToResultDocument implements ProcessorInterface
 {
     /**
      * {@inheritdoc}
@@ -24,23 +24,23 @@ class AddIncludedObjectsToResultDocument implements ProcessorInterface
             return;
         }
 
-        $includedObjects = $context->getIncludedObjects();
-        if (null === $includedObjects) {
-            // no included objects
+        $includedEntities = $context->getIncludedEntities();
+        if (null === $includedEntities) {
+            // no included entities
             return;
         }
 
         $documentBuilder = $context->getResponseDocumentBuilder();
         if (null === $documentBuilder) {
-            // the response document builder is required to add included objects to the response body
+            // the response document builder is required to add included entities to the response body
             return;
         }
 
-        foreach ($includedObjects as $object) {
-            $objectData = $includedObjects->getData($object);
+        foreach ($includedEntities as $entity) {
+            $entityData = $includedEntities->getData($entity);
             $documentBuilder->addIncludedObject(
-                $objectData->getNormalizedData(),
-                $objectData->getMetadata()
+                $entityData->getNormalizedData(),
+                $entityData->getMetadata()
             );
         }
     }

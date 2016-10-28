@@ -9,7 +9,7 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-use Oro\Bundle\ApiBundle\Collection\IncludedObjectCollection;
+use Oro\Bundle\ApiBundle\Collection\IncludedEntityCollection;
 use Oro\Bundle\ApiBundle\Form\DataTransformer\CollectionToArrayTransformer;
 use Oro\Bundle\ApiBundle\Form\DataTransformer\EntityToIdTransformer;
 use Oro\Bundle\ApiBundle\Metadata\AssociationMetadata;
@@ -34,20 +34,20 @@ class EntityType extends AbstractType
     {
         /** @var AssociationMetadata $metadata */
         $metadata = $options['metadata'];
-        /** @var IncludedObjectCollection|null $includedObjects */
-        $includedObjects = $options['included_objects'];
+        /** @var IncludedEntityCollection|null $includedEntities */
+        $includedEntities = $options['included_entities'];
         if ($metadata->isCollection()) {
             $builder
                 ->addEventSubscriber(new MergeDoctrineCollectionListener())
                 ->addViewTransformer(
                     new CollectionToArrayTransformer(
-                        new EntityToIdTransformer($this->doctrine, $metadata, $includedObjects)
+                        new EntityToIdTransformer($this->doctrine, $metadata, $includedEntities)
                     ),
                     true
                 );
         } else {
             $builder->addViewTransformer(
-                new EntityToIdTransformer($this->doctrine, $metadata, $includedObjects)
+                new EntityToIdTransformer($this->doctrine, $metadata, $includedEntities)
             );
         }
     }
@@ -58,10 +58,10 @@ class EntityType extends AbstractType
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver
-            ->setDefaults(['compound' => false, 'included_objects' => null])
+            ->setDefaults(['compound' => false, 'included_entities' => null])
             ->setRequired(['metadata'])
             ->setAllowedTypes('metadata', [AssociationMetadata::class])
-            ->setAllowedTypes('included_objects', ['null', IncludedObjectCollection::class]);
+            ->setAllowedTypes('included_entities', ['null', IncludedEntityCollection::class]);
     }
 
     /**

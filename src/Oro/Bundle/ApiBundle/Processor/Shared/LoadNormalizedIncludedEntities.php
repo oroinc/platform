@@ -4,7 +4,7 @@ namespace Oro\Bundle\ApiBundle\Processor\Shared;
 
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
-use Oro\Bundle\ApiBundle\Collection\IncludedObjectData;
+use Oro\Bundle\ApiBundle\Collection\IncludedEntityData;
 use Oro\Bundle\ApiBundle\Processor\Get\GetContext;
 use Oro\Bundle\ApiBundle\Processor\RequestActionProcessor;
 use Oro\Bundle\ApiBundle\Processor\ActionProcessorBagInterface;
@@ -16,7 +16,7 @@ use Oro\Bundle\ApiBundle\Request\ApiActions;
  * We have to do it because the entities returned by "create" or "update" actions
  * must be the same as the entities returned by "get" action.
  */
-class LoadNormalizedIncludedObjects implements ProcessorInterface
+class LoadNormalizedIncludedEntities implements ProcessorInterface
 {
     /** @var ActionProcessorBagInterface */
     protected $processorBag;
@@ -42,36 +42,36 @@ class LoadNormalizedIncludedObjects implements ProcessorInterface
             return;
         }
 
-        $includedObjects = $context->getIncludedObjects();
-        if (null === $includedObjects) {
-            // no included objects
+        $includedEntities = $context->getIncludedEntities();
+        if (null === $includedEntities) {
+            // no included entities
             return;
         }
 
-        foreach ($includedObjects as $object) {
-            $this->processIncludedObject(
+        foreach ($includedEntities as $entity) {
+            $this->processIncludedEntity(
                 $context,
-                $includedObjects->getClass($object),
-                $includedObjects->getId($object),
-                $object,
-                $includedObjects->getData($object)
+                $includedEntities->getClass($entity),
+                $includedEntities->getId($entity),
+                $entity,
+                $includedEntities->getData($entity)
             );
         }
     }
 
     /**
      * @param FormContext        $context
-     * @param string             $objectClass
-     * @param mixed              $objectId
-     * @param object             $object
-     * @param IncludedObjectData $objectData
+     * @param string             $entityClass
+     * @param mixed              $entityId
+     * @param object             $entity
+     * @param IncludedEntityData $entityData
      */
-    protected function processIncludedObject(
+    protected function processIncludedEntity(
         FormContext $context,
-        $objectClass,
-        $objectId,
-        $object,
-        IncludedObjectData $objectData
+        $entityClass,
+        $entityId,
+        $entity,
+        IncludedEntityData $entityData
     ) {
         $getProcessor = $this->processorBag->getProcessor(ApiActions::GET);
 
@@ -80,10 +80,10 @@ class LoadNormalizedIncludedObjects implements ProcessorInterface
         $getContext->setVersion($context->getVersion());
         $getContext->getRequestType()->set($context->getRequestType());
         $getContext->setRequestHeaders($context->getRequestHeaders());
-        $getContext->setClassName($objectClass);
-        $getContext->setId($objectId);
-        if (!$objectData->isExisting()) {
-            $getContext->setResult($object);
+        $getContext->setClassName($entityClass);
+        $getContext->setId($entityId);
+        if (!$entityData->isExisting()) {
+            $getContext->setResult($entity);
         }
         $getContext->skipGroup('security_check');
         $getContext->skipGroup(RequestActionProcessor::NORMALIZE_RESULT_GROUP);
@@ -97,8 +97,8 @@ class LoadNormalizedIncludedObjects implements ProcessorInterface
                 $context->addError($error);
             }
         } else {
-            $objectData->setNormalizedData($getContext->getResult());
-            $objectData->setMetadata($getContext->getMetadata());
+            $entityData->setNormalizedData($getContext->getResult());
+            $entityData->setMetadata($getContext->getMetadata());
         }
     }
 }

@@ -4,18 +4,18 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\Shared\JsonApi;
 
 use Oro\Bundle\ApiBundle\Model\ErrorSource;
 use Oro\Component\ChainProcessor\ActionProcessorInterface;
-use Oro\Bundle\ApiBundle\Collection\IncludedObjectCollection;
-use Oro\Bundle\ApiBundle\Collection\IncludedObjectData;
+use Oro\Bundle\ApiBundle\Collection\IncludedEntityCollection;
+use Oro\Bundle\ApiBundle\Collection\IncludedEntityData;
 use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
 use Oro\Bundle\ApiBundle\Model\Error;
 use Oro\Bundle\ApiBundle\Processor\ActionProcessorBagInterface;
 use Oro\Bundle\ApiBundle\Processor\Create\CreateContext;
-use Oro\Bundle\ApiBundle\Processor\Shared\JsonApi\ProcessIncludedObjects;
+use Oro\Bundle\ApiBundle\Processor\Shared\JsonApi\ProcessIncludedEntities;
 use Oro\Bundle\ApiBundle\Request\ApiActions;
 use Oro\Bundle\ApiBundle\Request\ErrorCompleterInterface;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\FormProcessorTestCase;
 
-class ProcessIncludedObjectsTest extends FormProcessorTestCase
+class ProcessIncludedEntitiesTest extends FormProcessorTestCase
 {
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $processorBag;
@@ -23,7 +23,7 @@ class ProcessIncludedObjectsTest extends FormProcessorTestCase
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $errorCompleter;
 
-    /** @var ProcessIncludedObjects */
+    /** @var ProcessIncludedEntities */
     protected $processor;
 
     protected function setUp()
@@ -33,7 +33,7 @@ class ProcessIncludedObjectsTest extends FormProcessorTestCase
         $this->processorBag = $this->getMock(ActionProcessorBagInterface::class);
         $this->errorCompleter = $this->getMock(ErrorCompleterInterface::class);
 
-        $this->processor = new ProcessIncludedObjects(
+        $this->processor = new ProcessIncludedEntities(
             $this->processorBag,
             $this->errorCompleter
         );
@@ -44,14 +44,14 @@ class ProcessIncludedObjectsTest extends FormProcessorTestCase
         $includedData = [
             ['data' => ['type' => 'testType', 'id' => 'testId']]
         ];
-        $includedObject = new \stdClass();
+        $includedEntity = new \stdClass();
 
-        $includedObjects = new IncludedObjectCollection();
-        $includedObjects->add(
-            $includedObject,
+        $includedEntities = new IncludedEntityCollection();
+        $includedEntities->add(
+            $includedEntity,
             'Test\Class',
             'id',
-            new IncludedObjectData('/included/0', 0)
+            new IncludedEntityData('/included/0', 0)
         );
 
         $expectedError = Error::createValidationError('some error')
@@ -77,7 +77,7 @@ class ProcessIncludedObjectsTest extends FormProcessorTestCase
             );
 
         $this->context->setIncludedData($includedData);
-        $this->context->setIncludedObjects($includedObjects);
+        $this->context->setIncludedEntities($includedEntities);
         $this->processor->process($this->context);
         $this->assertEquals([$expectedError], $actionContext->getErrors());
     }
@@ -87,14 +87,14 @@ class ProcessIncludedObjectsTest extends FormProcessorTestCase
         $includedData = [
             ['data' => ['type' => 'testType', 'id' => 'testId']]
         ];
-        $includedObject = new \stdClass();
+        $includedEntity = new \stdClass();
 
-        $includedObjects = new IncludedObjectCollection();
-        $includedObjects->add(
-            $includedObject,
+        $includedEntities = new IncludedEntityCollection();
+        $includedEntities->add(
+            $includedEntity,
             'Test\Class',
             'id',
-            new IncludedObjectData('/included/0', 0)
+            new IncludedEntityData('/included/0', 0)
         );
 
         $expectedError = Error::createValidationError('some error')
@@ -121,7 +121,7 @@ class ProcessIncludedObjectsTest extends FormProcessorTestCase
             );
 
         $this->context->setIncludedData($includedData);
-        $this->context->setIncludedObjects($includedObjects);
+        $this->context->setIncludedEntities($includedEntities);
         $this->processor->process($this->context);
         $this->assertEquals([$expectedError], $actionContext->getErrors());
     }
@@ -131,14 +131,14 @@ class ProcessIncludedObjectsTest extends FormProcessorTestCase
         $includedData = [
             ['data' => ['type' => 'testType', 'id' => 'testId']]
         ];
-        $includedObject = new \stdClass();
+        $includedEntity = new \stdClass();
 
-        $includedObjects = new IncludedObjectCollection();
-        $includedObjects->add(
-            $includedObject,
+        $includedEntities = new IncludedEntityCollection();
+        $includedEntities->add(
+            $includedEntity,
             'Test\Class',
             'id',
-            new IncludedObjectData('/included/0', 0)
+            new IncludedEntityData('/included/0', 0)
         );
 
         $expectedError = Error::createValidationError('some error')
@@ -165,7 +165,7 @@ class ProcessIncludedObjectsTest extends FormProcessorTestCase
             );
 
         $this->context->setIncludedData($includedData);
-        $this->context->setIncludedObjects($includedObjects);
+        $this->context->setIncludedEntities($includedEntities);
         $this->processor->process($this->context);
         $this->assertEquals([$expectedError], $actionContext->getErrors());
     }

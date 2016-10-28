@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\Subresource\Shared;
 
-use Oro\Bundle\ApiBundle\Collection\IncludedObjectCollection;
+use Oro\Bundle\ApiBundle\Collection\IncludedEntityCollection;
 use Oro\Bundle\ApiBundle\Config\ConfigAccessorInterface;
 use Oro\Bundle\ApiBundle\Form\FormExtensionSwitcherInterface;
 use Oro\Bundle\ApiBundle\Form\Guesser\MetadataTypeGuesser;
@@ -43,7 +43,7 @@ class InitializeApiFormExtensionTest extends ChangeRelationshipTestCase
         $this->formExtensionSwitcher->expects($this->once())
             ->method('switchToApiFormExtension');
         $this->metadataTypeGuesser->expects($this->once())
-            ->method('getIncludedObjects')
+            ->method('getIncludedEntities')
             ->willReturn(null);
         $this->metadataTypeGuesser->expects($this->once())
             ->method('getMetadataAccessor')
@@ -52,7 +52,7 @@ class InitializeApiFormExtensionTest extends ChangeRelationshipTestCase
             ->method('getConfigAccessor')
             ->willReturn(null);
         $this->metadataTypeGuesser->expects($this->once())
-            ->method('setIncludedObjects')
+            ->method('setIncludedEntities')
             ->with(null);
         $this->metadataTypeGuesser->expects($this->once())
             ->method('setMetadataAccessor')
@@ -63,7 +63,7 @@ class InitializeApiFormExtensionTest extends ChangeRelationshipTestCase
 
         $this->processor->process($this->context);
 
-        self::assertFalse($this->context->has(InitializeApiFormExtension::PREVIOUS_INCLUDED_OBJECTS));
+        self::assertFalse($this->context->has(InitializeApiFormExtension::PREVIOUS_INCLUDED_ENTITIES));
         self::assertFalse($this->context->has(InitializeApiFormExtension::PREVIOUS_METADATA_ACCESSOR));
         self::assertFalse($this->context->has(InitializeApiFormExtension::PREVIOUS_CONFIG_ACCESSOR));
     }
@@ -73,13 +73,13 @@ class InitializeApiFormExtensionTest extends ChangeRelationshipTestCase
         $this->formExtensionSwitcher->expects($this->never())
             ->method('switchToApiFormExtension');
         $this->metadataTypeGuesser->expects($this->never())
-            ->method('getIncludedObjects');
+            ->method('getIncludedEntities');
         $this->metadataTypeGuesser->expects($this->never())
             ->method('getMetadataAccessor');
         $this->metadataTypeGuesser->expects($this->never())
             ->method('getConfigAccessor');
         $this->metadataTypeGuesser->expects($this->never())
-            ->method('setIncludedObjects');
+            ->method('setIncludedEntities');
         $this->metadataTypeGuesser->expects($this->never())
             ->method('setMetadataAccessor');
         $this->metadataTypeGuesser->expects($this->never())
@@ -91,17 +91,17 @@ class InitializeApiFormExtensionTest extends ChangeRelationshipTestCase
 
     public function testProcessWhenMetadataTypeGuesserHasContext()
     {
-        $currentIncludedObjects = $this->getMock(IncludedObjectCollection::class);
+        $currentIncludedEntities = $this->getMock(IncludedEntityCollection::class);
 
-        $includedObjects = $this->getMock(IncludedObjectCollection::class);
+        $includedEntities = $this->getMock(IncludedEntityCollection::class);
         $metadataAccessor = $this->getMock(MetadataAccessorInterface::class);
         $configAccessor = $this->getMock(ConfigAccessorInterface::class);
 
         $this->formExtensionSwitcher->expects($this->once())
             ->method('switchToApiFormExtension');
         $this->metadataTypeGuesser->expects($this->once())
-            ->method('getIncludedObjects')
-            ->willReturn($includedObjects);
+            ->method('getIncludedEntities')
+            ->willReturn($includedEntities);
         $this->metadataTypeGuesser->expects($this->once())
             ->method('getMetadataAccessor')
             ->willReturn($metadataAccessor);
@@ -109,8 +109,8 @@ class InitializeApiFormExtensionTest extends ChangeRelationshipTestCase
             ->method('getConfigAccessor')
             ->willReturn($configAccessor);
         $this->metadataTypeGuesser->expects($this->once())
-            ->method('setIncludedObjects')
-            ->with($this->identicalTo($currentIncludedObjects));
+            ->method('setIncludedEntities')
+            ->with($this->identicalTo($currentIncludedEntities));
         $this->metadataTypeGuesser->expects($this->once())
             ->method('setMetadataAccessor')
             ->with($this->isInstanceOf(ContextParentMetadataAccessor::class));
@@ -118,12 +118,12 @@ class InitializeApiFormExtensionTest extends ChangeRelationshipTestCase
             ->method('setConfigAccessor')
             ->with($this->isInstanceOf(ContextParentConfigAccessor::class));
 
-        $this->context->setIncludedObjects($currentIncludedObjects);
+        $this->context->setIncludedEntities($currentIncludedEntities);
         $this->processor->process($this->context);
 
         self::assertSame(
-            $includedObjects,
-            $this->context->get(InitializeApiFormExtension::PREVIOUS_INCLUDED_OBJECTS)
+            $includedEntities,
+            $this->context->get(InitializeApiFormExtension::PREVIOUS_INCLUDED_ENTITIES)
         );
         self::assertSame(
             $metadataAccessor,

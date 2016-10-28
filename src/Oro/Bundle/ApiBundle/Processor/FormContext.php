@@ -5,7 +5,7 @@ namespace Oro\Bundle\ApiBundle\Processor;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormInterface;
 
-use Oro\Bundle\ApiBundle\Collection\IncludedObjectCollection;
+use Oro\Bundle\ApiBundle\Collection\IncludedEntityCollection;
 
 interface FormContext extends ContextInterface
 {
@@ -38,18 +38,18 @@ interface FormContext extends ContextInterface
     public function setIncludedData(array $includedData);
 
     /**
-     * Returns a collection contains additional objects included into the request.
+     * Returns a collection contains additional entities included into the request.
      *
-     * @return IncludedObjectCollection|null
+     * @return IncludedEntityCollection|null
      */
-    public function getIncludedObjects();
+    public function getIncludedEntities();
 
     /**
-     * Sets a collection contains additional objects included into the request.
+     * Sets a collection contains additional entities included into the request.
      *
-     * @param IncludedObjectCollection|null $includedObjects
+     * @param IncludedEntityCollection|null $includedEntities
      */
-    public function setIncludedObjects(IncludedObjectCollection $includedObjects = null);
+    public function setIncludedEntities(IncludedEntityCollection $includedEntities = null);
 
     /**
      * Checks whether the form builder exists.

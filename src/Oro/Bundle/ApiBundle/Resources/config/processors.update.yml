@@ -177,8 +177,8 @@ services:
         tags:
             - { name: oro.api.processor, action: update, group: transform_data, priority: 250 }
 
-    oro_api.update.json_api.process_included_objects:
-        class: Oro\Bundle\ApiBundle\Processor\Shared\JsonApi\ProcessIncludedObjects
+    oro_api.update.json_api.process_included_entities:
+        class: Oro\Bundle\ApiBundle\Processor\Shared\JsonApi\ProcessIncludedEntities
         arguments:
             - '@oro_api.action_processor_bag'
             - '@oro_api.json_api.error_completer'
@@ -249,8 +249,8 @@ services:
         tags:
             - { name: oro.api.processor, action: update, group: normalize_data, priority: -10 }
 
-    oro_api.update.load_normalized_included_objects:
-        class: Oro\Bundle\ApiBundle\Processor\Shared\LoadNormalizedIncludedObjects
+    oro_api.update.load_normalized_included_entities:
+        class: Oro\Bundle\ApiBundle\Processor\Shared\LoadNormalizedIncludedEntities
         arguments:
             - '@oro_api.action_processor_bag'
         tags:
@@ -306,8 +306,8 @@ services:
             - { name: oro.api.processor, action: update, group: normalize_result, requestType: json_api, priority: -55 }
             - { name: monolog.logger, channel: api }
 
-    oro_api.update.add_included_objects_to_result_document:
-        class: Oro\Bundle\ApiBundle\Processor\Shared\AddIncludedObjectsToResultDocument
+    oro_api.update.add_included_entities_to_result_document:
+        class: Oro\Bundle\ApiBundle\Processor\Shared\AddIncludedEntitiesToResultDocument
         tags:
             - { name: oro.api.processor, action: update, group: normalize_result, priority: -100 }
 

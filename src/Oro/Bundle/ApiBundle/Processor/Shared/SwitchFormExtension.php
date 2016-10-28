@@ -10,9 +10,9 @@ abstract class SwitchFormExtension
 {
     const API_FORM_EXTENSION_ACTIVATED = 'apiFormExtensionActivated';
 
-    const PREVIOUS_METADATA_ACCESSOR = 'previousMetadataAccessor';
-    const PREVIOUS_CONFIG_ACCESSOR   = 'previousConfigAccessor';
-    const PREVIOUS_INCLUDED_OBJECTS  = 'previousIncludedObjects';
+    const PREVIOUS_METADATA_ACCESSOR  = 'previousMetadataAccessor';
+    const PREVIOUS_CONFIG_ACCESSOR    = 'previousConfigAccessor';
+    const PREVIOUS_INCLUDED_ENTITIES  = 'previousIncludedEntities';
 
     /** @var FormExtensionSwitcherInterface */
     protected $formExtensionSwitcher;
@@ -69,8 +69,8 @@ abstract class SwitchFormExtension
         // and this context should be restored when the current action is finished
         $this->rememberValue(
             $context,
-            self::PREVIOUS_INCLUDED_OBJECTS,
-            $this->metadataTypeGuesser->getIncludedObjects()
+            self::PREVIOUS_INCLUDED_ENTITIES,
+            $this->metadataTypeGuesser->getIncludedEntities()
         );
         $this->rememberValue(
             $context,
@@ -89,11 +89,11 @@ abstract class SwitchFormExtension
      */
     protected function restoreContext(FormContext $context)
     {
-        $this->metadataTypeGuesser->setIncludedObjects($context->get(self::PREVIOUS_INCLUDED_OBJECTS));
+        $this->metadataTypeGuesser->setIncludedEntities($context->get(self::PREVIOUS_INCLUDED_ENTITIES));
         $this->metadataTypeGuesser->setMetadataAccessor($context->get(self::PREVIOUS_METADATA_ACCESSOR));
         $this->metadataTypeGuesser->setConfigAccessor($context->get(self::PREVIOUS_CONFIG_ACCESSOR));
 
-        $context->remove(self::PREVIOUS_INCLUDED_OBJECTS);
+        $context->remove(self::PREVIOUS_INCLUDED_ENTITIES);
         $context->remove(self::PREVIOUS_METADATA_ACCESSOR);
         $context->remove(self::PREVIOUS_CONFIG_ACCESSOR);
     }

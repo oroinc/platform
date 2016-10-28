@@ -2,12 +2,12 @@
 
 namespace Oro\Bundle\ApiBundle\Collection;
 
-class IncludedObjectCollection implements \Countable, \IteratorAggregate
+class IncludedEntityCollection implements \Countable, \IteratorAggregate
 {
     /** @var KeyObjectCollection */
     private $collection;
 
-    /** @var array [key => [object class, object id], ...] */
+    /** @var array [key => [entity class, entity id], ...] */
     private $keys = [];
 
     public function __construct()
@@ -16,35 +16,35 @@ class IncludedObjectCollection implements \Countable, \IteratorAggregate
     }
 
     /**
-     * Adds an object to the collection.
+     * Adds an entity to the collection.
      *
-     * @param object             $object
-     * @param string             $objectClass
-     * @param mixed              $objectId
-     * @param IncludedObjectData $data
+     * @param object             $entity
+     * @param string             $entityClass
+     * @param mixed              $entityId
+     * @param IncludedEntityData $data
      */
-    public function add($object, $objectClass, $objectId, IncludedObjectData $data)
+    public function add($entity, $entityClass, $entityId, IncludedEntityData $data)
     {
-        $key = $this->buildKey($objectClass, $objectId);
-        $this->collection->add($object, $key, $data);
-        $this->keys[$key] = [$objectClass, $objectId];
+        $key = $this->buildKey($entityClass, $entityId);
+        $this->collection->add($entity, $key, $data);
+        $this->keys[$key] = [$entityClass, $entityId];
     }
 
     /**
-     * Removes an object from the collection.
+     * Removes an entity from the collection.
      *
-     * @param string $objectClass
-     * @param mixed  $objectId
+     * @param string $entityClass
+     * @param mixed  $entityId
      */
-    public function remove($objectClass, $objectId)
+    public function remove($entityClass, $entityId)
     {
-        $key = $this->buildKey($objectClass, $objectId);
+        $key = $this->buildKey($entityClass, $entityId);
         $this->collection->removeKey($key);
         unset($this->keys[$key]);
     }
 
     /**
-     * Removes all objects from the collection.
+     * Removes all entities from the collection.
      */
     public function clear()
     {
@@ -53,7 +53,7 @@ class IncludedObjectCollection implements \Countable, \IteratorAggregate
     }
 
     /**
-     * Checks whether the collection does contain any object.
+     * Checks whether the collection does contain any entity.
      *
      * @return bool
      */
@@ -63,7 +63,7 @@ class IncludedObjectCollection implements \Countable, \IteratorAggregate
     }
 
     /**
-     * Gets the number of objects in the collection
+     * Gets the number of entities in the collection
      *
      * @return int
      */
@@ -73,29 +73,29 @@ class IncludedObjectCollection implements \Countable, \IteratorAggregate
     }
 
     /**
-     * Checks whether an object exists in the collection.
+     * Checks whether an entity exists in the collection.
      *
-     * @param string $objectClass
-     * @param mixed  $objectId
+     * @param string $entityClass
+     * @param mixed  $entityId
      *
      * @return bool
      */
-    public function contains($objectClass, $objectId)
+    public function contains($entityClass, $entityId)
     {
-        return $this->collection->containsKey($this->buildKey($objectClass, $objectId));
+        return $this->collection->containsKey($this->buildKey($entityClass, $entityId));
     }
 
     /**
-     * Gets an object by its key.
+     * Gets an entity.
      *
-     * @param string $objectClass
-     * @param mixed  $objectId
+     * @param string $entityClass
+     * @param mixed  $entityId
      *
      * @return object|null
      */
-    public function get($objectClass, $objectId)
+    public function get($entityClass, $entityId)
     {
-        return $this->collection->get($this->buildKey($objectClass, $objectId));
+        return $this->collection->get($this->buildKey($entityClass, $entityId));
     }
 
     /**
@@ -103,7 +103,7 @@ class IncludedObjectCollection implements \Countable, \IteratorAggregate
      *
      * @param object $object
      *
-     * @return IncludedObjectData
+     * @return IncludedEntityData
      */
     public function getData($object)
     {
@@ -153,13 +153,13 @@ class IncludedObjectCollection implements \Countable, \IteratorAggregate
     }
 
     /**
-     * @param string $objectClass
-     * @param mixed  $objectId
+     * @param string $entityClass
+     * @param mixed  $entityId
      *
      * @return string
      */
-    private function buildKey($objectClass, $objectId)
+    private function buildKey($entityClass, $entityId)
     {
-        return $objectClass . ':' . (string)$objectId;
+        return $entityClass . ':' . (string)$entityId;
     }
 }

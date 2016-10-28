@@ -4,8 +4,8 @@ namespace Oro\Bundle\ApiBundle\Processor\Shared\JsonApi;
 
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
-use Oro\Bundle\ApiBundle\Collection\IncludedObjectCollection;
-use Oro\Bundle\ApiBundle\Collection\IncludedObjectData;
+use Oro\Bundle\ApiBundle\Collection\IncludedEntityCollection;
+use Oro\Bundle\ApiBundle\Collection\IncludedEntityData;
 use Oro\Bundle\ApiBundle\Exception\RuntimeException;
 use Oro\Bundle\ApiBundle\Model\Error;
 use Oro\Bundle\ApiBundle\Model\ErrorSource;
@@ -69,16 +69,16 @@ class NormalizeIncludedData implements ProcessorInterface
             $context->setIncludedData($includedData);
         }
 
-        if (empty($includedData) || null !== $context->getIncludedObjects()) {
-            // no included data or they are already converted to included objects collection
+        if (empty($includedData) || null !== $context->getIncludedEntities()) {
+            // no included data or they are already converted to included entities collection
             return;
         }
 
         $this->context = $context;
         try {
-            $includedObjects = $this->loadIncludedObjects($includedData);
-            if (null !== $includedObjects) {
-                $context->setIncludedObjects($includedObjects);
+            $includedEntities = $this->loadIncludedEntities($includedData);
+            if (null !== $includedEntities) {
+                $context->setIncludedEntities($includedEntities);
             }
         } finally {
             $this->context = null;
@@ -107,11 +107,11 @@ class NormalizeIncludedData implements ProcessorInterface
     /**
      * @param array $includedData
      *
-     * @return IncludedObjectCollection|null
+     * @return IncludedEntityCollection|null
      */
-    protected function loadIncludedObjects(array $includedData)
+    protected function loadIncludedEntities(array $includedData)
     {
-        $includedObjects = new IncludedObjectCollection();
+        $includedEntities = new IncludedEntityCollection();
 
         $includedPointer = $this->buildPointer('', JsonApiDoc::INCLUDED);
         foreach ($includedData as $index => $data) {
@@ -133,11 +133,11 @@ class NormalizeIncludedData implements ProcessorInterface
                     if (null !== $entityId) {
                         $entity = $this->getEntity($pointer, $entityClass, $entityId, $updateFlag);
                         if (null !== $entity) {
-                            $includedObjects->add(
+                            $includedEntities->add(
                                 $entity,
                                 $entityClass,
                                 $entityId,
-                                new IncludedObjectData($pointer, $index, $updateFlag)
+                                new IncludedEntityData($pointer, $index, $updateFlag)
                             );
                         }
                     }
@@ -145,7 +145,7 @@ class NormalizeIncludedData implements ProcessorInterface
             }
         }
 
-        return !$this->context->hasErrors() ? $includedObjects : null;
+        return !$this->context->hasErrors() ? $includedEntities : null;
     }
 
     /**

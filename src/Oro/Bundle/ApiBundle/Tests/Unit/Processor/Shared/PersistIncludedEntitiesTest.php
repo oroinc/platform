@@ -3,8 +3,8 @@
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\Shared;
 
 use Doctrine\ORM\EntityManager;
-use Oro\Bundle\ApiBundle\Collection\IncludedObjectCollection;
-use Oro\Bundle\ApiBundle\Collection\IncludedObjectData;
+use Oro\Bundle\ApiBundle\Collection\IncludedEntityCollection;
+use Oro\Bundle\ApiBundle\Collection\IncludedEntityData;
 use Oro\Bundle\ApiBundle\Processor\Shared\PersistIncludedEntities;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\FormProcessorTestCase;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
@@ -39,31 +39,31 @@ class PersistIncludedEntitiesTest extends FormProcessorTestCase
         $this->processor->process($this->context);
     }
 
-    public function testProcessWhenIncludedObjectsCollectionDoesNotExist()
+    public function testProcessWhenIncludedEntitiesCollectionDoesNotExist()
     {
         $this->context->setIncludedData([['key' => 'val']]);
         $this->processor->process($this->context);
     }
 
-    public function testProcessWhenIncludedObjectsCollectionIsEmpty()
+    public function testProcessWhenIncludedEntitiesCollectionIsEmpty()
     {
         $this->context->setIncludedData([['key' => 'val']]);
-        $this->context->setIncludedObjects(new IncludedObjectCollection());
+        $this->context->setIncludedEntities(new IncludedEntityCollection());
         $this->processor->process($this->context);
     }
 
     public function testProcessForNewIncludedObject()
     {
         $object = new \stdClass();
-        $objectClass = 'TestClass';
+        $objectClass = 'Test\Class';
         $isExistingObject = false;
 
-        $includedObjects = new IncludedObjectCollection();
-        $includedObjects->add(
+        $includedEntities = new IncludedEntityCollection();
+        $includedEntities->add(
             $object,
             $objectClass,
             'id',
-            new IncludedObjectData('/included/0', 0, $isExistingObject)
+            new IncludedEntityData('/included/0', 0, $isExistingObject)
         );
 
         $this->doctrineHelper->expects(self::once())
@@ -72,44 +72,44 @@ class PersistIncludedEntitiesTest extends FormProcessorTestCase
             ->willReturn(null);
 
         $this->context->setIncludedData([['key' => 'val']]);
-        $this->context->setIncludedObjects($includedObjects);
+        $this->context->setIncludedEntities($includedEntities);
         $this->processor->process($this->context);
     }
 
     public function testProcessForExistingIncludedObject()
     {
         $object = new \stdClass();
-        $objectClass = 'TestClass';
+        $objectClass = 'Test\Class';
         $isExistingObject = true;
 
-        $includedObjects = new IncludedObjectCollection();
-        $includedObjects->add(
+        $includedEntities = new IncludedEntityCollection();
+        $includedEntities->add(
             $object,
             $objectClass,
             'id',
-            new IncludedObjectData('/included/0', 0, $isExistingObject)
+            new IncludedEntityData('/included/0', 0, $isExistingObject)
         );
 
         $this->doctrineHelper->expects(self::never())
             ->method('getEntityManager');
 
         $this->context->setIncludedData([['key' => 'val']]);
-        $this->context->setIncludedObjects($includedObjects);
+        $this->context->setIncludedEntities($includedEntities);
         $this->processor->process($this->context);
     }
 
     public function testProcessForNewIncludedEntity()
     {
-        $object = new \stdClass();
-        $objectClass = 'TestClass';
-        $isExistingObject = false;
+        $entity = new \stdClass();
+        $entityClass = 'Test\Class';
+        $isExistingEntity = false;
 
-        $includedObjects = new IncludedObjectCollection();
-        $includedObjects->add(
-            $object,
-            $objectClass,
+        $includedEntities = new IncludedEntityCollection();
+        $includedEntities->add(
+            $entity,
+            $entityClass,
             'id',
-            new IncludedObjectData('/included/0', 0, $isExistingObject)
+            new IncludedEntityData('/included/0', 0, $isExistingEntity)
         );
 
         $em = $this->getMockBuilder(EntityManager::class)
@@ -117,36 +117,36 @@ class PersistIncludedEntitiesTest extends FormProcessorTestCase
             ->getMock();
         $this->doctrineHelper->expects(self::once())
             ->method('getEntityManager')
-            ->with(self::identicalTo($object), false)
+            ->with(self::identicalTo($entity), false)
             ->willReturn($em);
         $em->expects(self::once())
             ->method('persist')
-            ->with(self::identicalTo($object));
+            ->with(self::identicalTo($entity));
 
         $this->context->setIncludedData([['key' => 'val']]);
-        $this->context->setIncludedObjects($includedObjects);
+        $this->context->setIncludedEntities($includedEntities);
         $this->processor->process($this->context);
     }
 
     public function testProcessForExistingIncludedEntity()
     {
-        $object = new \stdClass();
-        $objectClass = 'TestClass';
-        $isExistingObject = true;
+        $entity = new \stdClass();
+        $entityClass = 'Test\Class';
+        $isExistingEntity = true;
 
-        $includedObjects = new IncludedObjectCollection();
-        $includedObjects->add(
-            $object,
-            $objectClass,
+        $includedEntities = new IncludedEntityCollection();
+        $includedEntities->add(
+            $entity,
+            $entityClass,
             'id',
-            new IncludedObjectData('/included/0', 0, $isExistingObject)
+            new IncludedEntityData('/included/0', 0, $isExistingEntity)
         );
 
         $this->doctrineHelper->expects(self::never())
             ->method('getEntityManager');
 
         $this->context->setIncludedData([['key' => 'val']]);
-        $this->context->setIncludedObjects($includedObjects);
+        $this->context->setIncludedEntities($includedEntities);
         $this->processor->process($this->context);
     }
 }

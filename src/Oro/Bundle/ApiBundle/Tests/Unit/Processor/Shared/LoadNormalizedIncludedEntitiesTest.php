@@ -3,23 +3,23 @@
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\Shared;
 
 use Oro\Component\ChainProcessor\ActionProcessorInterface;
-use Oro\Bundle\ApiBundle\Collection\IncludedObjectCollection;
-use Oro\Bundle\ApiBundle\Collection\IncludedObjectData;
+use Oro\Bundle\ApiBundle\Collection\IncludedEntityCollection;
+use Oro\Bundle\ApiBundle\Collection\IncludedEntityData;
 use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
 use Oro\Bundle\ApiBundle\Model\Error;
 use Oro\Bundle\ApiBundle\Processor\ActionProcessorBagInterface;
 use Oro\Bundle\ApiBundle\Processor\Get\GetContext;
 use Oro\Bundle\ApiBundle\Processor\RequestActionProcessor;
-use Oro\Bundle\ApiBundle\Processor\Shared\LoadNormalizedIncludedObjects;
+use Oro\Bundle\ApiBundle\Processor\Shared\LoadNormalizedIncludedEntities;
 use Oro\Bundle\ApiBundle\Request\ApiActions;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\FormProcessorTestCase;
 
-class LoadNormalizedIncludedObjectsTest extends FormProcessorTestCase
+class LoadNormalizedIncludedEntitiesTest extends FormProcessorTestCase
 {
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $processorBag;
 
-    /** @var LoadNormalizedIncludedObjects */
+    /** @var LoadNormalizedIncludedEntities */
     protected $processor;
 
     public function setUp()
@@ -28,7 +28,7 @@ class LoadNormalizedIncludedObjectsTest extends FormProcessorTestCase
 
         $this->processorBag = $this->getMock(ActionProcessorBagInterface::class);
 
-        $this->processor = new LoadNormalizedIncludedObjects($this->processorBag);
+        $this->processor = new LoadNormalizedIncludedEntities($this->processorBag);
     }
 
     public function testProcessWithoutIncludedData()
@@ -36,20 +36,20 @@ class LoadNormalizedIncludedObjectsTest extends FormProcessorTestCase
         $this->processor->process($this->context);
     }
 
-    public function testProcessWithoutIncludedObjects()
+    public function testProcessWithoutIncludedEntities()
     {
         $this->context->setIncludedData(['key' => 'value']);
         $this->processor->process($this->context);
     }
 
-    public function testProcessForNewIncludedObjectWhenGetActionSuccess()
+    public function testProcessForNewIncludedEntityWhenGetActionSuccess()
     {
-        $includedObjects = new IncludedObjectCollection();
-        $includedObject = new \stdClass();
-        $includedObjectClass = 'Test\Class';
-        $includedObjectId = 'testId';
-        $includedObjectData = new IncludedObjectData('/included/0', 0);
-        $includedObjects->add($includedObject, $includedObjectClass, $includedObjectId, $includedObjectData);
+        $includedEntities = new IncludedEntityCollection();
+        $includedEntity = new \stdClass();
+        $includedEntityClass = 'Test\Class';
+        $includedEntityId = 'testId';
+        $includedEntityData = new IncludedEntityData('/included/0', 0);
+        $includedEntities->add($includedEntity, $includedEntityClass, $includedEntityId, $includedEntityData);
 
         $getResult = ['normalizedKey' => 'normalizedValue'];
         $getMetadata = new EntityMetadata();
@@ -71,9 +71,9 @@ class LoadNormalizedIncludedObjectsTest extends FormProcessorTestCase
         $expectedGetContext->setVersion($this->context->getVersion());
         $expectedGetContext->getRequestType()->set($this->context->getRequestType());
         $expectedGetContext->setRequestHeaders($this->context->getRequestHeaders());
-        $expectedGetContext->setClassName($includedObjectClass);
-        $expectedGetContext->setId($includedObjectId);
-        $expectedGetContext->setResult($includedObject);
+        $expectedGetContext->setClassName($includedEntityClass);
+        $expectedGetContext->setId($includedEntityId);
+        $expectedGetContext->setResult($includedEntity);
         $expectedGetContext->skipGroup('security_check');
         $expectedGetContext->skipGroup(RequestActionProcessor::NORMALIZE_RESULT_GROUP);
         $expectedGetContext->setSoftErrorsHandling(true);
@@ -91,24 +91,24 @@ class LoadNormalizedIncludedObjectsTest extends FormProcessorTestCase
             );
 
         $this->context->setIncludedData(['key' => 'value']);
-        $this->context->setIncludedObjects($includedObjects);
+        $this->context->setIncludedEntities($includedEntities);
         $this->context->setClassName('Test\Entity');
         $this->context->setId(123);
         $this->context->getRequestHeaders()->set('test-header', 'some value');
         $this->processor->process($this->context);
 
-        self::assertSame($getResult, $includedObjectData->getNormalizedData());
-        self::assertSame($getMetadata, $includedObjectData->getMetadata());
+        self::assertSame($getResult, $includedEntityData->getNormalizedData());
+        self::assertSame($getMetadata, $includedEntityData->getMetadata());
     }
 
-    public function testProcessForExistingIncludedObjectWhenGetActionSuccess()
+    public function testProcessForExistingIncludedEntityWhenGetActionSuccess()
     {
-        $includedObjects = new IncludedObjectCollection();
-        $includedObject = new \stdClass();
-        $includedObjectClass = 'Test\Class';
-        $includedObjectId = 'testId';
-        $includedObjectData = new IncludedObjectData('/included/0', 0, true);
-        $includedObjects->add($includedObject, $includedObjectClass, $includedObjectId, $includedObjectData);
+        $includedEntities = new IncludedEntityCollection();
+        $includedEntity = new \stdClass();
+        $includedEntityClass = 'Test\Class';
+        $includedEntityId = 'testId';
+        $includedEntityData = new IncludedEntityData('/included/0', 0, true);
+        $includedEntities->add($includedEntity, $includedEntityClass, $includedEntityId, $includedEntityData);
 
         $getResult = ['normalizedKey' => 'normalizedValue'];
         $getMetadata = new EntityMetadata();
@@ -130,8 +130,8 @@ class LoadNormalizedIncludedObjectsTest extends FormProcessorTestCase
         $expectedGetContext->setVersion($this->context->getVersion());
         $expectedGetContext->getRequestType()->set($this->context->getRequestType());
         $expectedGetContext->setRequestHeaders($this->context->getRequestHeaders());
-        $expectedGetContext->setClassName($includedObjectClass);
-        $expectedGetContext->setId($includedObjectId);
+        $expectedGetContext->setClassName($includedEntityClass);
+        $expectedGetContext->setId($includedEntityId);
         $expectedGetContext->skipGroup('security_check');
         $expectedGetContext->skipGroup(RequestActionProcessor::NORMALIZE_RESULT_GROUP);
         $expectedGetContext->setSoftErrorsHandling(true);
@@ -149,26 +149,26 @@ class LoadNormalizedIncludedObjectsTest extends FormProcessorTestCase
             );
 
         $this->context->setIncludedData(['key' => 'value']);
-        $this->context->setIncludedObjects($includedObjects);
+        $this->context->setIncludedEntities($includedEntities);
         $this->context->setClassName('Test\Entity');
         $this->context->setId(123);
         $this->context->getRequestHeaders()->set('test-header', 'some value');
         $this->processor->process($this->context);
 
-        self::assertSame($getResult, $includedObjectData->getNormalizedData());
-        self::assertSame($getMetadata, $includedObjectData->getMetadata());
+        self::assertSame($getResult, $includedEntityData->getNormalizedData());
+        self::assertSame($getMetadata, $includedEntityData->getMetadata());
     }
 
     public function testProcessWhenGetActionHasErrors()
     {
         $getError = Error::create('test error');
 
-        $includedObjects = new IncludedObjectCollection();
-        $includedObject = new \stdClass();
-        $includedObjectClass = 'Test\Class';
-        $includedObjectId = 'testId';
-        $includedObjectData = new IncludedObjectData('/included/0', 0, true);
-        $includedObjects->add($includedObject, $includedObjectClass, $includedObjectId, $includedObjectData);
+        $includedEntities = new IncludedEntityCollection();
+        $includedEntity = new \stdClass();
+        $includedEntityClass = 'Test\Class';
+        $includedEntityId = 'testId';
+        $includedEntityData = new IncludedEntityData('/included/0', 0, true);
+        $includedEntities->add($includedEntity, $includedEntityClass, $includedEntityId, $includedEntityData);
 
         $getContext = new GetContext($this->configProvider, $this->metadataProvider);
         $getProcessor = $this->getMock(ActionProcessorInterface::class);
@@ -191,14 +191,14 @@ class LoadNormalizedIncludedObjectsTest extends FormProcessorTestCase
             );
 
         $this->context->setIncludedData(['key' => 'value']);
-        $this->context->setIncludedObjects($includedObjects);
+        $this->context->setIncludedEntities($includedEntities);
         $this->context->setClassName('Test\Entity');
         $this->context->setId(123);
         $this->context->getRequestHeaders()->set('test-header', 'some value');
         $this->processor->process($this->context);
 
         self::assertEquals([$getError], $this->context->getErrors());
-        self::assertNull($includedObjectData->getNormalizedData());
-        self::assertNull($includedObjectData->getMetadata());
+        self::assertNull($includedEntityData->getNormalizedData());
+        self::assertNull($includedEntityData->getMetadata());
     }
 }

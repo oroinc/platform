@@ -7,7 +7,7 @@ use Doctrine\Common\Persistence\ManagerRegistry;
 use Symfony\Component\Form\DataTransformerInterface;
 use Symfony\Component\Form\Exception\TransformationFailedException;
 
-use Oro\Bundle\ApiBundle\Collection\IncludedObjectCollection;
+use Oro\Bundle\ApiBundle\Collection\IncludedEntityCollection;
 use Oro\Bundle\ApiBundle\Metadata\AssociationMetadata;
 
 class EntityToIdTransformer implements DataTransformerInterface
@@ -18,22 +18,22 @@ class EntityToIdTransformer implements DataTransformerInterface
     /** @var AssociationMetadata */
     protected $metadata;
 
-    /** @var IncludedObjectCollection|null */
-    protected $includedObjects;
+    /** @var IncludedEntityCollection|null */
+    protected $includedEntities;
 
     /**
      * @param ManagerRegistry               $doctrine
      * @param AssociationMetadata           $metadata
-     * @param IncludedObjectCollection|null $includedObjects
+     * @param IncludedEntityCollection|null $includedEntities
      */
     public function __construct(
         ManagerRegistry $doctrine,
         AssociationMetadata $metadata,
-        IncludedObjectCollection $includedObjects = null
+        IncludedEntityCollection $includedEntities = null
     ) {
         $this->doctrine = $doctrine;
         $this->metadata = $metadata;
-        $this->includedObjects = $includedObjects;
+        $this->includedEntities = $includedEntities;
     }
 
     /**
@@ -124,11 +124,11 @@ class EntityToIdTransformer implements DataTransformerInterface
      */
     protected function getIncludedEntity($entityClass, $entityId)
     {
-        if (null === $this->includedObjects) {
+        if (null === $this->includedEntities) {
             return null;
         }
 
-        return $this->includedObjects->get($entityClass, $entityId);
+        return $this->includedEntities->get($entityClass, $entityId);
     }
 
     /**

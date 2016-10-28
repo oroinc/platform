@@ -7,8 +7,8 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\Forms;
 
-use Oro\Bundle\ApiBundle\Collection\IncludedObjectCollection;
-use Oro\Bundle\ApiBundle\Collection\IncludedObjectData;
+use Oro\Bundle\ApiBundle\Collection\IncludedEntityCollection;
+use Oro\Bundle\ApiBundle\Collection\IncludedEntityData;
 use Oro\Bundle\ApiBundle\Form\Type\EntityType;
 use Oro\Bundle\ApiBundle\Metadata\AssociationMetadata;
 use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Group;
@@ -216,7 +216,7 @@ class EntityTypeTest extends OrmRelatedTestCase
         $this->assertFalse($form->isSynchronized());
     }
 
-    public function testSingleWithValidValueFromIncludedObjects()
+    public function testSingleWithValidValueFromIncludedEntities()
     {
         $value = ['class' => Group::class, 'id' => 123];
         $entity = new Group();
@@ -227,19 +227,19 @@ class EntityTypeTest extends OrmRelatedTestCase
         $associationMetadata->setIsCollection(false);
         $associationMetadata->setAcceptableTargetClassNames([Group::class]);
 
-        $includedObjects = new IncludedObjectCollection();
-        $includedObjects->add($entity, $value['class'], $value['id'], new IncludedObjectData('/included/0', 0));
+        $includedEntities = new IncludedEntityCollection();
+        $includedEntities->add($entity, $value['class'], $value['id'], new IncludedEntityData('/included/0', 0));
 
         $form = $this->factory->create(
             new EntityType($this->doctrine),
             null,
-            ['metadata' => $associationMetadata, 'included_objects' => $includedObjects]
+            ['metadata' => $associationMetadata, 'included_entities' => $includedEntities]
         );
         $form->submit($value);
         $this->assertTrue($form->isSynchronized());
     }
 
-    public function testMultipleWithValidValueFromIncludedObjects()
+    public function testMultipleWithValidValueFromIncludedEntities()
     {
         $value = ['class' => Group::class, 'id' => 123];
         $entity = new Group();
@@ -250,13 +250,13 @@ class EntityTypeTest extends OrmRelatedTestCase
         $associationMetadata->setIsCollection(true);
         $associationMetadata->setAcceptableTargetClassNames([Group::class]);
 
-        $includedObjects = new IncludedObjectCollection();
-        $includedObjects->add($entity, $value['class'], $value['id'], new IncludedObjectData('/included/0', 0));
+        $includedEntities = new IncludedEntityCollection();
+        $includedEntities->add($entity, $value['class'], $value['id'], new IncludedEntityData('/included/0', 0));
 
         $form = $this->factory->create(
             new EntityType($this->doctrine),
             null,
-            ['metadata' => $associationMetadata, 'included_objects' => $includedObjects]
+            ['metadata' => $associationMetadata, 'included_entities' => $includedEntities]
         );
         $form->submit([$value]);
         $this->assertTrue($form->isSynchronized());

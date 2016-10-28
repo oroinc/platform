@@ -4,7 +4,7 @@ namespace Oro\Bundle\ApiBundle\Collection;
 
 use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
 
-class IncludedObjectData
+class IncludedEntityData
 {
     /** @var string */
     private $path;
@@ -22,10 +22,10 @@ class IncludedObjectData
     private $metadata;
 
     /**
-     * @param string $path     A path to the object in the request data
-     * @param int    $index    An index of the object in the included data
-     * @param bool   $existing TRUE if an existing object should be updated;
-     *                         FALSE if a new object should be created
+     * @param string $path     A path to the entity in the request data
+     * @param int    $index    An index of the entity in the included data
+     * @param bool   $existing TRUE if an existing entity should be updated;
+     *                         FALSE if a new entity should be created
      */
     public function __construct($path, $index, $existing = false)
     {
@@ -35,7 +35,7 @@ class IncludedObjectData
     }
 
     /**
-     * Gets a path to the object in the request data.
+     * Gets a path to the entity in the request data.
      *
      * @return string
      */
@@ -45,7 +45,7 @@ class IncludedObjectData
     }
 
     /**
-     * Gets an index of the object in the included data.
+     * Gets an index of the entity in the included data.
      *
      * @return int
      */
@@ -55,7 +55,7 @@ class IncludedObjectData
     }
 
     /**
-     * Gets a value indicates whether an existing object should be updated or new one should be created.
+     * Gets a value indicates whether an existing entity should be updated or new one should be created.
      *
      * @return bool
      */
@@ -65,7 +65,7 @@ class IncludedObjectData
     }
 
     /**
-     * Gets a normalized representation of the object.
+     * Gets a normalized representation of the entity.
      *
      * @return array|null
      */
@@ -75,7 +75,7 @@ class IncludedObjectData
     }
 
     /**
-     * Sets a normalized representation of the object.
+     * Sets a normalized representation of the entity.
      *
      * @param array|null $normalizedData
      */
@@ -85,7 +85,7 @@ class IncludedObjectData
     }
 
     /**
-     * Gets metadata of the object.
+     * Gets metadata of the entity.
      *
      * @return EntityMetadata|null
      */
@@ -95,7 +95,7 @@ class IncludedObjectData
     }
 
     /**
-     * Sets metadata of the object.
+     * Sets metadata of the entity.
      *
      * @param EntityMetadata|null $metadata
      */

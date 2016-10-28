@@ -4,30 +4,30 @@ namespace Oro\Bundle\ApiBundle\Processor\Shared\JsonApi;
 
 use Oro\Bundle\ApiBundle\Model\Error;
 use Oro\Bundle\ApiBundle\Model\ErrorSource;
-use Oro\Bundle\ApiBundle\Processor\Shared\ProcessIncludedObjects as BaseProcessIncludedObjects;
+use Oro\Bundle\ApiBundle\Processor\Shared\ProcessIncludedEntities as BaseProcessIncludedEntities;
 use Oro\Bundle\ApiBundle\Request\JsonApi\JsonApiDocumentBuilder as JsonApiDoc;
 
 /**
- * Validates and fill included objects.
+ * Validates and fill included entities.
  */
-class ProcessIncludedObjects extends BaseProcessIncludedObjects
+class ProcessIncludedEntities extends BaseProcessIncludedEntities
 {
     /**
      * {@inheritdoc}
      */
-    protected function fixErrorPath(Error $error, $objectPath)
+    protected function fixErrorPath(Error $error, $entityPath)
     {
         $errorSource = $error->getSource();
         if (null === $errorSource) {
-            $error->setSource(ErrorSource::createByPropertyPath($objectPath));
+            $error->setSource(ErrorSource::createByPropertyPath($entityPath));
         } else {
             $pointer = $errorSource->getPointer();
             if ($pointer && 0 === strpos($pointer, '/' . JsonApiDoc::DATA)) {
-                $errorSource->setPointer($objectPath . substr($pointer, strlen(JsonApiDoc::DATA) + 1));
+                $errorSource->setPointer($entityPath . substr($pointer, strlen(JsonApiDoc::DATA) + 1));
             } else {
                 $propertyPath = $errorSource->getPropertyPath();
                 if ($propertyPath) {
-                    $propertyPath = str_replace('/', '.', $objectPath) . '.' . $propertyPath;
+                    $propertyPath = str_replace('/', '.', $entityPath) . '.' . $propertyPath;
                     if (0 === strpos($propertyPath, '.')) {
                         $propertyPath = substr($propertyPath, 1);
                     }

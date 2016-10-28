@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\Shared\Form;
 
-use Oro\Bundle\ApiBundle\Collection\IncludedObjectCollection;
-use Oro\Bundle\ApiBundle\Collection\IncludedObjectData;
+use Oro\Bundle\ApiBundle\Collection\IncludedEntityCollection;
+use Oro\Bundle\ApiBundle\Collection\IncludedEntityData;
 use Oro\Bundle\ApiBundle\Model\Error;
 use Oro\Bundle\ApiBundle\Processor\Shared\Form\NormalizeEntityId;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\FormProcessorTestCase;
@@ -36,12 +36,12 @@ class NormalizeEntityIdTest extends FormProcessorTestCase
         $this->processor->process($this->context);
     }
 
-    public function testProcessWhenIdBelongsToIncludedObject()
+    public function testProcessWhenIdBelongsToIncludedEntity()
     {
-        $includedObjects = new IncludedObjectCollection();
-        $includedObjects->add(new \stdClass(), 'Test\Class', '123', new IncludedObjectData('/included/0', 0));
+        $includedEntities = new IncludedEntityCollection();
+        $includedEntities->add(new \stdClass(), 'Test\Class', '123', new IncludedEntityData('/included/0', 0));
 
-        $this->context->setIncludedObjects($includedObjects);
+        $this->context->setIncludedEntities($includedEntities);
         $this->context->setClassName('Test\Class');
         $this->context->setId('123');
 
