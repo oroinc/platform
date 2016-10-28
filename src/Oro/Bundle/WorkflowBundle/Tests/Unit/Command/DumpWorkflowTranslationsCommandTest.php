@@ -7,7 +7,6 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Yaml\Yaml;
 
-use Oro\Bundle\TranslationBundle\Entity\Translation;
 use Oro\Bundle\TranslationBundle\Translation\Translator;
 
 use Oro\Bundle\WorkflowBundle\Command\DumpWorkflowTranslationsCommand;
@@ -148,7 +147,7 @@ class DumpWorkflowTranslationsCommandTest extends \PHPUnit_Framework_TestCase
         $this->workflow->expects($this->once())->method('getDefinition')->willReturn($definition);
 
         $domain = DumpWorkflowTranslationsCommand::TRANSLATION_DOMAIN;
-        $defaultLocale = Translation::DEFAULT_LOCALE;
+        $defaultLocale = Translator::DEFAULT_LOCALE;
 
         $this->translator->expects($this->any())
             ->method('hasTrans')

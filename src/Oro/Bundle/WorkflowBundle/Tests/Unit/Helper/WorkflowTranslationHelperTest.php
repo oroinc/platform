@@ -99,7 +99,7 @@ class WorkflowTranslationHelperTest extends \PHPUnit_Framework_TestCase
                     ],
                     [
                         WorkflowTemplate::KEY_PREFIX . '.' . $workflowName,
-                        Translation::DEFAULT_LOCALE,
+                        Translator::DEFAULT_LOCALE,
                         WorkflowTranslationHelper::TRANSLATION_DOMAIN,
                         ['key1' => 'value1', 'key2' => 'value2', $key => $fallbackValue]
                     ],
@@ -135,7 +135,7 @@ class WorkflowTranslationHelperTest extends \PHPUnit_Framework_TestCase
             ->with(
                 'test_key',
                 'test_value',
-                Translation::DEFAULT_LOCALE,
+                Translator::DEFAULT_LOCALE,
                 WorkflowTranslationHelper::TRANSLATION_DOMAIN
             );
 
@@ -174,7 +174,7 @@ class WorkflowTranslationHelperTest extends \PHPUnit_Framework_TestCase
                     ],
                     [
                         $key,
-                        Translation::DEFAULT_LOCALE,
+                        Translator::DEFAULT_LOCALE,
                         WorkflowTranslationHelper::TRANSLATION_DOMAIN,
                         $fallbackValue
                     ],
