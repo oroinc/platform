@@ -14,6 +14,7 @@ use Oro\Component\MessageQueue\Job\JobRunner;
 use Oro\Component\MessageQueue\Transport\MessageInterface;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
 use Oro\Component\MessageQueue\Util\JSON;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerAwareTrait;
 
@@ -45,21 +46,29 @@ class ReversSyncIntegrationProcessor implements
     private $jobRunner;
 
     /**
+     * @var LoggerInterface
+     */
+    private $logger;
+
+    /**
      * @param DoctrineHelper $doctrineHelper
      * @param ReverseSyncProcessor $reverseSyncProcessor
      * @param TypesRegistry $typesRegistry
-     * @param JobRunner $jobRunner
+     * @param JobRunner $jobRunner,
+     * @param LoggerInterface $logger
      */
     public function __construct(
         DoctrineHelper $doctrineHelper,
         ReverseSyncProcessor $reverseSyncProcessor,
         TypesRegistry $typesRegistry,
-        JobRunner $jobRunner
+        JobRunner $jobRunner,
+        LoggerInterface $logger
     ) {
         $this->doctrineHelper = $doctrineHelper;
         $this->reverseSyncProcessor = $reverseSyncProcessor;
         $this->typesRegistry = $typesRegistry;
         $this->jobRunner = $jobRunner;
+        $this->logger = $logger;
     }
 
     /**
@@ -76,43 +85,77 @@ class ReversSyncIntegrationProcessor implements
     public function process(MessageInterface $message, SessionInterface $session)
     {
         $body = JSON::decode($message->getBody());
-        $body = array_replace_recursive([
-            'integration_id' => null,
-            'connector' => null,
-            'connector_parameters' => [],
-        ], $body);
+        $body = array_replace_recursive(
+            [
+                'integration_id' => null,
+                'connector' => null,
+                'connector_parameters' => [],
+            ],
+            $body
+        );
 
-        if (false == $body['integration_id']) {
-            throw new \LogicException('The message invalid. It must have integration_id set');
+        if (! $body['integration_id']) {
+            $this->logger->critical('Invalid message: integration_id is empty', ['message' => $message]);
+
+            return self::REJECT;
+        }
+
+        if (! $body['connector']) {
+            $this->logger->critical('Invalid message: connector is empty', ['message' => $message]);
+
+            return self::REJECT;
         }
 
         $jobName = 'oro_integration:revers_sync_integration:'.$body['integration_id'];
         $ownerId = $message->getMessageId();
 
-        $result = $this->jobRunner->runUnique($ownerId, $jobName, function () use ($body) {
-            /** @var EntityManagerInterface $em */
-            $em = $this->doctrineHelper->getEntityManagerForClass(Integration::class);
+        /** @var EntityManagerInterface $em */
+        $em = $this->doctrineHelper->getEntityManagerForClass(Integration::class);
 
-            /** @var Integration $integration */
-            $integration = $em->find(Integration::class, $body['integration_id']);
-            if (false == $integration) {
-                return false;
-            }
-            if (false == $integration->isEnabled()) {
-                return false;
-            }
+        /** @var Integration $integration */
+        $integration = $em->find(Integration::class, $body['integration_id']);
+        if (! $integration) {
+            $this->logger->critical(
+                sprintf('Integration not found: %s', $body['integration_id']),
+                ['message' => $message]
+            );
 
-            $em->getConnection()->getConfiguration()->setSQLLogger(null);
+            return self::REJECT;
+        }
+        if (! $integration->isEnabled()) {
+            $this->logger->critical(
+                sprintf('Integration is not enabled: %s', $body['integration_id']),
+                ['message' => $message]
+            );
 
+            return self::REJECT;
+        }
+
+        $em->getConnection()->getConfiguration()->setSQLLogger(null);
+
+        try {
             $connector = $this->typesRegistry->getConnectorType($integration->getType(), $body['connector']);
-            if (!$connector instanceof TwoWaySyncConnectorInterface) {
-                throw new LogicException(sprintf(
-                    'Unable to perform revers sync for integration "%s" and connector type "%s"',
+        } catch (LogicException $e) { //can't find the connector
+            $this->logger->critical(
+                sprintf('Connector not found: %s', $body['connector']),
+                ['message' => $message]
+            );
+            return self::REJECT;
+        }
+        if (!$connector instanceof TwoWaySyncConnectorInterface) {
+            $this->logger->critical(
+                sprintf(
+                    'Unable to perform reverse sync for integration "%s" and connector type "%s"',
                     $integration->getId(),
                     $body['connector']
-                ));
-            }
+                ),
+                ['message' => $message]
+            );
 
+            return self::REJECT;
+        }
+
+        $result = $this->jobRunner->runUnique($ownerId, $jobName, function () use ($integration, $body) {
             $this->reverseSyncProcessor->process(
                 $integration,
                 $body['connector'],

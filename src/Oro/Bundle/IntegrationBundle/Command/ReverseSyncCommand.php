@@ -46,6 +46,9 @@ class ReverseSyncCommand extends Command implements ContainerAwareInterface
 
         $integrationId   = $input->getOption('integration');
         $connector   = $input->getOption('connector');
+        if (! $connector) {
+            throw new \InvalidArgumentException('Connector must be set');
+        }
         $connectorParameters = $this->getConnectorParameters($input);
         /** @var ChannelRepository $integrationRepository */
         $integrationRepository = $this->getEntityManager()->getRepository(Integration::class);

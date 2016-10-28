@@ -19,6 +19,7 @@ use Oro\Component\MessageQueue\Transport\Null\NullMessage;
 use Oro\Component\MessageQueue\Transport\Null\NullSession;
 use Oro\Component\MessageQueue\Util\JSON;
 use Oro\Component\Testing\ClassExtensionTrait;
+use Psr\Log\LoggerInterface;
 use Symfony\Bridge\Doctrine\RegistryInterface;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\HttpFoundation\ParameterBag;
@@ -54,27 +55,33 @@ class SyncIntegrationProcessorTest extends \PHPUnit_Framework_TestCase
             $this->createRegistryStub(),
             $this->createTokenStorageMock(),
             $this->createSyncProcessorRegistryStub(null),
-            new JobRunner()
+            new JobRunner(),
+            $this->createLoggerMock()
         );
     }
 
-    /**
-     * @expectedException \LogicException
-     * @expectedExceptionMessage The message invalid. It must have integration_id set
-     */
-    public function testThrowIfMessageBodyMissIntegrationId()
+    public function testRejectAndLogMessageBodyMissIntegrationId()
     {
+        $logger = $this->createLoggerMock();
+        $logger
+            ->expects($this->once())
+            ->method('critical')
+            ->with('Invalid message: integration_id is empty')
+        ;
         $processor = new SyncIntegrationProcessor(
             $this->createRegistryStub(),
             $this->createTokenStorageMock(),
             $this->createSyncProcessorRegistryStub(null),
-            new JobRunner()
+            new JobRunner(),
+            $logger
         );
 
         $message = new NullMessage();
         $message->setBody('[]');
 
-        $processor->process($message, new NullSession());
+        $status = $processor->process($message, new NullSession());
+
+        $this->assertEquals(MessageProcessorInterface::REJECT, $status);
     }
 
     /**
@@ -87,7 +94,8 @@ class SyncIntegrationProcessorTest extends \PHPUnit_Framework_TestCase
             $this->createRegistryStub(),
             $this->createTokenStorageMock(),
             $this->createSyncProcessorRegistryStub(null),
-            new JobRunner()
+            new JobRunner(),
+            $this->createLoggerMock()
         );
 
         $message = new NullMessage();
@@ -112,7 +120,8 @@ class SyncIntegrationProcessorTest extends \PHPUnit_Framework_TestCase
             $registryStub,
             $this->createTokenStorageMock(),
             $this->createSyncProcessorRegistryStub(null),
-            new JobRunner()
+            new JobRunner(),
+            $this->createLoggerMock()
         );
 
         $message = new NullMessage();
@@ -142,7 +151,8 @@ class SyncIntegrationProcessorTest extends \PHPUnit_Framework_TestCase
             $registryStub,
             $this->createTokenStorageMock(),
             $this->createSyncProcessorRegistryStub(null),
-            new JobRunner()
+            new JobRunner(),
+            $this->createLoggerMock()
         );
 
         $message = new NullMessage();
@@ -174,7 +184,8 @@ class SyncIntegrationProcessorTest extends \PHPUnit_Framework_TestCase
             $this->createRegistryStub($entityManagerMock),
             $this->createTokenStorageMock(),
             $this->createSyncProcessorRegistryStub($this->createSyncProcessorMock()),
-            $jobRunner
+            $jobRunner,
+            $this->createLoggerMock()
         );
 
         $message = new NullMessage();
@@ -219,11 +230,13 @@ class SyncIntegrationProcessorTest extends \PHPUnit_Framework_TestCase
             $registryStub,
             $tokenStorageStub,
             $syncProcessorRegistryStub,
-            new JobRunner()
+            new JobRunner(),
+            $this->createLoggerMock()
         );
 
         $message = new NullMessage();
         $message->setBody(JSON::encode(['integration_id' => 'theIntegrationId']));
+        $message->setMessageId('someId');
 
         $processor->process($message, new NullSession());
     }
@@ -262,11 +275,13 @@ class SyncIntegrationProcessorTest extends \PHPUnit_Framework_TestCase
             $registryStub,
             $tokenStorageStub,
             $syncProcessorRegistryStub,
-            new JobRunner()
+            new JobRunner(),
+            $this->createLoggerMock()
         );
 
         $message = new NullMessage();
         $message->setBody(JSON::encode(['integration_id' => 'theIntegrationId']));
+        $message->setMessageId('someId');
 
         $processor->process($message, new NullSession());
     }
@@ -301,11 +316,13 @@ class SyncIntegrationProcessorTest extends \PHPUnit_Framework_TestCase
             $registryStub,
             $this->createTokenStorageMock(),
             $syncProcessorRegistryStub,
-            new JobRunner()
+            new JobRunner(),
+            $this->createLoggerMock()
         );
 
         $message = new NullMessage();
         $message->setBody(JSON::encode(['integration_id' => 'theIntegrationId']));
+        $message->setMessageId('someId');
 
         $status = $processor->process($message, new NullSession());
 
@@ -342,11 +359,13 @@ class SyncIntegrationProcessorTest extends \PHPUnit_Framework_TestCase
             $registryStub,
             $this->createTokenStorageMock(),
             $syncProcessorRegistryStub,
-            new JobRunner()
+            new JobRunner(),
+            $this->createLoggerMock()
         );
 
         $message = new NullMessage();
         $message->setBody(JSON::encode(['integration_id' => 'theIntegrationId']));
+        $message->setMessageId('someId');
 
         $status = $processor->process($message, new NullSession());
 
@@ -384,11 +403,13 @@ class SyncIntegrationProcessorTest extends \PHPUnit_Framework_TestCase
             $registryStub,
             $this->createTokenStorageMock(),
             $syncProcessorRegistryStub,
-            new JobRunner()
+            new JobRunner(),
+            $this->createLoggerMock()
         );
 
         $message = new NullMessage();
         $message->setBody(JSON::encode(['integration_id' => 'theIntegrationId']));
+        $message->setMessageId('someId');
 
         $status = $processor->process($message, new NullSession());
 
@@ -433,7 +454,8 @@ class SyncIntegrationProcessorTest extends \PHPUnit_Framework_TestCase
             $registryStub,
             $this->createTokenStorageMock(),
             $syncProcessorRegistryStub,
-            new JobRunner()
+            new JobRunner(),
+            $this->createLoggerMock()
         );
 
         $message = new NullMessage();
@@ -445,6 +467,7 @@ class SyncIntegrationProcessorTest extends \PHPUnit_Framework_TestCase
                 'force' => true,
             ]
         ]));
+        $message->setMessageId('someId');
 
         $status = $processor->process($message, new NullSession());
 
@@ -534,5 +557,14 @@ class SyncIntegrationProcessorTest extends \PHPUnit_Framework_TestCase
         ;
 
         return $transportMock;
+    }
+
+
+    /**
+     * @return \PHPUnit_Framework_MockObject_MockObject | LoggerInterface
+     */
+    private function createLoggerMock()
+    {
+        return $this->getMock(LoggerInterface::class);
     }
 }

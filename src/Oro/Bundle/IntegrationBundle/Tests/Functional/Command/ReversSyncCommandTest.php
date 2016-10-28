@@ -29,12 +29,31 @@ class ReversSyncCommandTest extends WebTestCase
         $this->assertContains("Usage:\n  oro:integration:reverse:sync [options]", $result);
     }
 
-    public function testShouldSendSyncIntegrationWithoutAnyAdditionalOptions()
+    public function shouldNotSendReverseSyncIntegrationWithoutConnector()
     {
         /** @var Channel $integration */
         $integration = $this->getReference('oro_integration:foo_integration');
 
-        $result = $this->runCommand('oro:integration:reverse:sync', ['--integration='.$integration->getId()]);
+        $result = $this->runCommand('oro:integration:reverse:sync', [
+            '--integration='.$integration->getId()
+        ]);
+
+        $this->assertNotContains('Run revers sync for "Foo Integration" integration', $result);
+        $this->assertNotContains('Completed', $result);
+        $this->assertContains('Connector must be set', $result);
+
+        self::assertEmptyMessages(Topics::REVERS_SYNC_INTEGRATION);
+    }
+
+    public function testShouldSendReverseSyncIntegrationWithoutAnyAdditionalOptions()
+    {
+        /** @var Channel $integration */
+        $integration = $this->getReference('oro_integration:foo_integration');
+
+        $result = $this->runCommand('oro:integration:reverse:sync', [
+            '--integration='.$integration->getId(),
+            '--connector=TestChannel'
+        ]);
 
         $this->assertContains('Run revers sync for "Foo Integration" integration', $result);
         $this->assertContains('Completed', $result);

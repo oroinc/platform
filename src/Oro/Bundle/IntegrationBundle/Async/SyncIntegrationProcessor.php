@@ -11,6 +11,7 @@ use Oro\Component\MessageQueue\Job\JobRunner;
 use Oro\Component\MessageQueue\Transport\MessageInterface;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
 use Oro\Component\MessageQueue\Util\JSON;
+use Psr\Log\LoggerInterface;
 use Symfony\Bridge\Doctrine\RegistryInterface;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerAwareTrait;
@@ -41,21 +42,29 @@ class SyncIntegrationProcessor implements MessageProcessorInterface, ContainerAw
     private $jobRunner;
 
     /**
+     * @var LoggerInterface
+     */
+    private $logger;
+
+    /**
      * @param RegistryInterface $doctrine
      * @param TokenStorageInterface $tokenStorage
      * @param SyncProcessorRegistry $syncProcessorRegistry
      * @param JobRunner $jobRunner
+     * @param LoggerInterface $logger;
      */
     public function __construct(
         RegistryInterface $doctrine,
         TokenStorageInterface $tokenStorage,
         SyncProcessorRegistry $syncProcessorRegistry,
-        JobRunner $jobRunner
+        JobRunner $jobRunner,
+        LoggerInterface $logger
     ) {
         $this->doctrine = $doctrine;
         $this->tokenStorage = $tokenStorage;
         $this->syncProcessorRegistry = $syncProcessorRegistry;
         $this->jobRunner = $jobRunner;
+        $this->logger = $logger;
     }
 
     /**
@@ -79,30 +88,49 @@ class SyncIntegrationProcessor implements MessageProcessorInterface, ContainerAw
             'transport_batch_size' => 100,
         ], $body);
 
-        if (false == $body['integration_id']) {
-            throw new \LogicException('The message invalid. It must have integration_id set');
+        if (! $body['integration_id']) {
+            $this->logger->critical('Invalid message: integration_id is empty', ['message' => $message]);
+            return self::REJECT;
+        }
+
+        /** @var EntityManagerInterface $em */
+        $em = $this->doctrine->getManager();
+
+        /** @var Integration $integration */
+        $integration = $em->find(Integration::class, $body['integration_id']);
+        if (! $integration) {
+            $this->logger->critical(
+                sprintf('Integration not found: %s', $body['integration_id']),
+                ['message' => $message]
+            );
+            return self::REJECT;
+        }
+
+        if (! $integration->isEnabled()) {
+            $this->logger->critical(
+                sprintf('Integration id not enabled: %s', $body['integration_id']),
+                ['message' => $message]
+            );
+            return self::REJECT;
         }
 
         $jobName = 'oro_integration:sync_integration:'.$body['integration_id'];
         $ownerId = $message->getMessageId();
 
-        $result = $this->jobRunner->runUnique($ownerId, $jobName, function () use ($body) {
-            /** @var EntityManagerInterface $em */
-            $em = $this->doctrine->getManager();
+        if (! $ownerId) {
+            $this->logger->critical(
+                'Internal error: ownerid is empty',
+                ['message' => $message]
+            );
+            return self::REJECT;
+        }
 
-            /** @var Integration $integration */
-            $integration = $em->find(Integration::class, $body['integration_id']);
-            if (false == $integration) {
-                return false;
-            }
-            if (false == $integration->isEnabled()) {
-                return false;
-            }
+        $em->getConnection()->getConfiguration()->setSQLLogger(null);
 
-            $em->getConnection()->getConfiguration()->setSQLLogger(null);
+        $this->updateToken($integration);
+        $integration->getTransport()->getSettingsBag()->set('page_size', $body['transport_batch_size']);
 
-            $this->updateToken($integration);
-            $integration->getTransport()->getSettingsBag()->set('page_size', $body['transport_batch_size']);
+        $result = $this->jobRunner->runUnique($ownerId, $jobName, function () use ($integration, $body) {
 
             $processor = $this->syncProcessorRegistry->getProcessorForIntegration($integration);
 
