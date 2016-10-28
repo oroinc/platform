@@ -54,7 +54,7 @@ class FillPasswordExpiresAtField extends ParametrizedMigrationQuery
             ->createQueryBuilder()
             ->update($this->tableName)
             ->set('password_expires_at', ':expiryDate')
-            ->setParameter('expiryDate', new \DateTime('now', new \DateTimeZone('UTC')), Type::DATETIME);
+            ->setParameter('expiryDate', new \DateTime('+30 day', new \DateTimeZone('UTC')), Type::DATETIME);
         ;
 
         $this->logQuery($logger, $qb->getSql());
