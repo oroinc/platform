@@ -434,6 +434,7 @@ placeholders:
     * `oro_titles` to `titles`
     * `oro_menu_config` to `menu_config`
     * `oro_navigation_elements` to `navigation_elements`
+- All configuration nodes in `Resources/config/oro/navigation.yml` were renamed to snake case
 - Added class `Oro\Bundle\NavigationBundle\Builder\MenuUpdateBuilder` that implements `Oro\Bundle\NavigationBundle\Menu\BuilderInterface`.
 - Added class `Oro\Bundle\NavigationBundle\DependencyInjection\Compiler\MenuUpdateProviderPass`.
 - Added `tree.$.areas`, `tree.$.max_nesting_level`, `tree.$.read_only` and `items.$.read_only` nodes to `Oro\Bundle\NavigationBundle\DependencyInjection\Configuration`.
