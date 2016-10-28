@@ -207,7 +207,7 @@ class WorkflowTranslationHelperTest extends \PHPUnit_Framework_TestCase
 
     public function testFlushTranslations()
     {
-        $this->translationHelper->expects($this->once())->method('flush');
+        $this->manager->expects($this->once())->method('flush');
 
         $this->helper->flushTranslations();
     }

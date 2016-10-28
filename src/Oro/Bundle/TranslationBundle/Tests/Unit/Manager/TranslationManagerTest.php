@@ -4,9 +4,10 @@ namespace Oro\Bundle\TranslationBundle\Tests\Unit\Manager;
 
 use Doctrine\Bundle\DoctrineBundle\Registry;
 use Doctrine\Common\Persistence\ObjectManager;
-use Doctrine\Common\Persistence\ObjectRepository;
 
 use Oro\Bundle\TranslationBundle\Entity\Language;
+use Oro\Bundle\TranslationBundle\Entity\Repository\TranslationKeyRepository;
+use Oro\Bundle\TranslationBundle\Entity\Repository\LanguageRepository;
 use Oro\Bundle\TranslationBundle\Entity\Translation;
 use Oro\Bundle\TranslationBundle\Entity\TranslationKey;
 use Oro\Bundle\TranslationBundle\Manager\TranslationManager;
@@ -34,8 +35,11 @@ class TranslationManagerTest extends \PHPUnit_Framework_TestCase
     /** @var \PHPUnit_Framework_MockObject_MockObject|ObjectManager */
     protected $objectManager;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|ObjectRepository */
-    protected $objectRepository;
+    /** @var \PHPUnit_Framework_MockObject_MockObject|TranslationKeyRepository */
+    protected $translationKeyRepository;
+
+    /** @var \PHPUnit_Framework_MockObject_MockObject|LanguageRepository */
+    protected $languageRepository;
 
     protected function setUp()
     {
@@ -59,13 +63,20 @@ class TranslationManagerTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->objectRepository = $this->getMockBuilder(ObjectRepository::class)
+        $this->translationKeyRepository = $this->getMockBuilder(TranslationKeyRepository::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $this->languageRepository = $this->getMockBuilder(LanguageRepository::class)
             ->disableOriginalConstructor()
             ->getMock();
 
         $this->objectManager->expects($this->any())
             ->method('getRepository')
-            ->willReturn($this->objectRepository);
+            ->will($this->returnValueMap([
+                [TranslationKey::class, $this->translationKeyRepository],
+                [Language::class, $this->languageRepository],
+            ]));
 
         $this->registry->expects($this->any())
             ->method('getManagerForClass')
@@ -87,7 +98,8 @@ class TranslationManagerTest extends \PHPUnit_Framework_TestCase
             $this->translator,
             $this->jsTranslationDumper,
             $this->objectManager,
-            $this->objectRepository
+            $this->translationKeyRepository,
+            $this->languageRepository
         );
     }
 
@@ -99,7 +111,7 @@ class TranslationManagerTest extends \PHPUnit_Framework_TestCase
         $this->objectManager->expects($this->once())->method('persist');
         $this->objectManager->expects($this->never())->method('flush');
 
-        $this->objectRepository->expects($this->once())
+        $this->translationKeyRepository->expects($this->once())
             ->method('findOneBy')
             ->with(['key' => $key, 'domain' => $domain]);
 
@@ -122,12 +134,12 @@ class TranslationManagerTest extends \PHPUnit_Framework_TestCase
         $domain = TranslationManager::DEFAULT_DOMAIN;
         $locale = 'locale';
 
-        $this->objectRepository->expects($this->at(0))
+        $this->translationKeyRepository->expects($this->once())
             ->method('findOneBy')
             ->with(['key' => $key, 'domain' => $domain])
             ->willReturn((new TranslationKey())->setKey($key)->setDomain($domain));
 
-        $this->objectRepository->expects($this->at(1))
+        $this->languageRepository->expects($this->once())
             ->method('findOneBy')
             ->with(['code' => $locale])
             ->willReturn((new Language())->setCode($locale));
@@ -154,7 +166,21 @@ class TranslationManagerTest extends \PHPUnit_Framework_TestCase
 
     public function testFlush()
     {
-        $this->objectManager->expects($this->once())->method('flush');
+        $this->translationKeyRepository->expects($this->any())
+            ->method('findOneBy')->willReturn((new TranslationKey())->setKey('key')->setDomain('domain'));
+
+        $this->languageRepository->expects($this->any())
+            ->method('findOneBy')->willReturn((new Language())->setCode('locale'));
+
+        $translation = $this->manager->createValue('key', 'value', 'locale', 'domain');
+
+        $this->objectManager->expects($this->once())->method('flush')->with([$translation]);
+        $this->manager->flush();
+    }
+
+    public function testFlushWithoutChanges()
+    {
+        $this->objectManager->expects($this->never());
         $this->manager->flush();
     }
 
