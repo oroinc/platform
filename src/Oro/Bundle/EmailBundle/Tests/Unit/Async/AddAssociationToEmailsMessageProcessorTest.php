@@ -1,22 +1,23 @@
 <?php
 namespace Oro\Bundle\EmailBundle\Tests\Unit\Async;
 
+use Psr\Log\LoggerInterface;
+
 use Oro\Bundle\EmailBundle\Async\AddAssociationToEmailsMessageProcessor;
 use Oro\Bundle\EmailBundle\Async\Topics;
-use Oro\Bundle\EmailBundle\Async\Manager\AssociationManager;
+use Oro\Component\MessageQueue\Client\MessageProducerInterface;
 use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
 use Oro\Component\MessageQueue\Transport\Null\NullMessage;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
-use Psr\Log\LoggerInterface;
 
 class AddAssociationToEmailsMessageProcessorTest extends \PHPUnit_Framework_TestCase
 {
     public function testCouldBeConstructedWithRequiredArguments()
     {
-        new AddAssociationToEmailsMessageProcessor($this->createAssociationManagerMock(), $this->createLoggerMock());
+        new AddAssociationToEmailsMessageProcessor($this->createMessageProducerMock(), $this->createLoggerMock());
     }
 
-    public function testShouldRejectMessageIfEmailIdIsMissing()
+    public function testShouldRejectMessageIfEmailIdsIsMissing()
     {
         $logger = $this->createLoggerMock();
         $logger
@@ -33,7 +34,7 @@ class AddAssociationToEmailsMessageProcessorTest extends \PHPUnit_Framework_Test
         ]));
 
         $processor = new AddAssociationToEmailsMessageProcessor(
-            $this->createAssociationManagerMock(),
+            $this->createMessageProducerMock(),
             $logger
         );
 
@@ -58,7 +59,7 @@ class AddAssociationToEmailsMessageProcessorTest extends \PHPUnit_Framework_Test
         ]));
 
         $processor = new AddAssociationToEmailsMessageProcessor(
-            $this->createAssociationManagerMock(),
+            $this->createMessageProducerMock(),
             $logger
         );
 
@@ -84,7 +85,7 @@ class AddAssociationToEmailsMessageProcessorTest extends \PHPUnit_Framework_Test
         ]));
 
         $processor = new AddAssociationToEmailsMessageProcessor(
-            $this->createAssociationManagerMock(),
+            $this->createMessageProducerMock(),
             $logger
         );
 
@@ -101,22 +102,27 @@ class AddAssociationToEmailsMessageProcessorTest extends \PHPUnit_Framework_Test
             ->method('critical')
         ;
 
-        $manager = $this->createAssociationManagerMock();
-        $manager
-            ->expects($this->once())
-            ->method('processAddAssociation')
-            ->with([456], 'class', 123)
+        $producer = $this->createMessageProducerMock();
+        $producer
+            ->expects($this->at(0))
+            ->method('send')
+            ->with(Topics::ADD_ASSOCIATION_TO_EMAIL, [1, 'class', 123])
+        ;
+        $producer
+            ->expects($this->at(1))
+            ->method('send')
+            ->with(Topics::ADD_ASSOCIATION_TO_EMAIL, [2, 'class', 123])
         ;
 
         $message = new NullMessage();
         $message->setBody(json_encode([
-            'emailIds' => [456],
+            'emailIds' => [1,2],
             'targetClass' => 'class',
             'targetId' => 123,
         ]));
 
         $processor = new AddAssociationToEmailsMessageProcessor(
-            $manager,
+            $producer,
             $logger
         );
 
@@ -142,18 +148,18 @@ class AddAssociationToEmailsMessageProcessorTest extends \PHPUnit_Framework_Test
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|AssociationManager
-     */
-    private function createAssociationManagerMock()
-    {
-        return $this->getMock(AssociationManager::class, [], [], '', false);
-    }
-
-    /**
      * @return \PHPUnit_Framework_MockObject_MockObject|LoggerInterface
      */
     private function createLoggerMock()
     {
         return $this->getMock(LoggerInterface::class);
+    }
+
+    /**
+     * @return \PHPUnit_Framework_MockObject_MockObject|MessageProducerInterface
+     */
+    private function createMessageProducerMock()
+    {
+        return $this->getMock(MessageProducerInterface::class);
     }
 }

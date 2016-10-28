@@ -443,7 +443,7 @@ placeholders:
 - `Oro\Bundle\EmailBundle\Form\Model\ExtendMailboxProcessSettings` removed
 - Class `Oro\Bundle\EmailBundle\Form\Model\Email`
     - method `getContexts` now returns `Doctrine\Common\Collections\Collection` instead of array
-- The command `oro:email:add-associations` (class `Oro\Bundle\EmailBundle\Command\AddAssociationCommand`) was removed. Produce message to the topic `oro.email.add_association_to_emails` instead.
+- The command `oro:email:add-associations` (class `Oro\Bundle\EmailBundle\Command\AddAssociationCommand`) was removed. Produce message to the topic `oro.email.add_association_to_email` or `oro.email.add_association_to_emails` instead.
 - The command `oro:email:autoresponse` (class `Oro\Bundle\EmailBundle\Command\AutoResponseCommand`) was removed. Produce message to the topic `oro.email.send_auto_response` or `oro.email.send_auto_responses` instead.
 - The command `oro:email:flag-sync` (class `Oro\Bundle\EmailBundle\Command\EmailFlagSyncCommand`) was removed. Produce message to the topic `oro.email.sync_email_seen_flag` instead.
 - The command `oro:email-attachment:purge` (class `Oro\Bundle\EmailBundle\Command\PurgeEmailAttachmentCommand`) was removed. Produce message to the topic `oro.email.purge_email_attachments` instead.

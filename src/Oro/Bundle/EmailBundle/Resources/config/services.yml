@@ -333,6 +333,14 @@ services:
     oro_email.async.add_association_to_emails:
         class: 'Oro\Bundle\EmailBundle\Async\AddAssociationToEmailsMessageProcessor'
         arguments:
+            - '@oro_message_queue.client.message_producer'
+            - '@logger'
+        tags:
+            - { name: 'oro_message_queue.client.message_processor' }
+
+    oro_email.async.add_association_to_email:
+        class: 'Oro\Bundle\EmailBundle\Async\AddAssociationToEmailMessageProcessor'
+        arguments:
             - '@oro_email.command.association_manager'
             - '@logger'
         tags:
