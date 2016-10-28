@@ -11,9 +11,11 @@ use Oro\Bundle\WorkflowBundle\Command\Upgrade20\Workflow\WorkflowsUtil;
 use Oro\Bundle\WorkflowBundle\Command\Upgrade20\Workflow\WorkflowTranslationTools;
 use Oro\Bundle\WorkflowBundle\Command\Upgrade20\YamlContentUtils;
 use Oro\Bundle\WorkflowBundle\Configuration\WorkflowConfiguration;
+use Psr\Log\LogLevel;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
+use Symfony\Component\Console\Logger\ConsoleLogger;
 use Symfony\Component\Console\Output\OutputInterface;
 
 class DefinitionUpgrade20Command extends ContainerAwareCommand
@@ -29,7 +31,12 @@ class DefinitionUpgrade20Command extends ContainerAwareCommand
     {
         $this->setName(self::NAME);
 
-        $this->addOption('expand', 'x', InputOption::VALUE_OPTIONAL);
+        $this->addOption(
+            'inline-keys',
+            'i',
+            InputOption::VALUE_OPTIONAL,
+            'Dump translation keys as inline. Otherwise they will be expanded to trees by theirs dots.'
+        );
     }
 
     /**
@@ -47,7 +54,7 @@ class DefinitionUpgrade20Command extends ContainerAwareCommand
         $options->setConfigFilePath('Resources/config/oro/workflows.yml');
         $options->setTranslationFilePath('Resources/translations/workflows.en.yml');
 
-        $extractor = new TranslationsExtractor($options);
+        $extractor = new TranslationsExtractor($options, $this->createConsoleLogger($output));
 
         $this->workflowTools = new WorkflowTranslationTools();
 
@@ -58,7 +65,7 @@ class DefinitionUpgrade20Command extends ContainerAwareCommand
 
         $extractor->setResourceUpdater(YamlContentUtils::getCallableResourceUpdater());
 
-        $extractor->execute(!$input->getOption('expand'));
+        $extractor->execute($input->getOption('inline-keys'));
     }
 
     /**
@@ -201,5 +208,24 @@ class DefinitionUpgrade20Command extends ContainerAwareCommand
                 }
             }
         );
+    }
+
+    /**
+     * @param OutputInterface $output
+     *
+     * @return ConsoleLogger
+     */
+    protected function createConsoleLogger(OutputInterface $output)
+    {
+        return new ConsoleLogger($output, [
+            LogLevel::EMERGENCY => OutputInterface::VERBOSITY_QUIET,
+            LogLevel::ALERT => OutputInterface::VERBOSITY_NORMAL,
+            LogLevel::CRITICAL => OutputInterface::VERBOSITY_NORMAL,
+            LogLevel::ERROR => OutputInterface::VERBOSITY_NORMAL,
+            LogLevel::WARNING => OutputInterface::VERBOSITY_QUIET,
+            LogLevel::NOTICE => OutputInterface::VERBOSITY_NORMAL,
+            LogLevel::INFO => OutputInterface::VERBOSITY_NORMAL,
+            LogLevel::DEBUG => OutputInterface::VERBOSITY_VERY_VERBOSE,
+        ]);
     }
 }

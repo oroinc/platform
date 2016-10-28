@@ -66,7 +66,7 @@ class TranslationsExtractor
     /**
      * @param bool $dumpFlatKeys
      */
-    public function execute($dumpFlatKeys = true)
+    public function execute($dumpFlatKeys = false)
     {
         foreach ($this->configFiles() as $configFile) {
             $transFile = $this->getTranslationFile($configFile);
@@ -77,10 +77,10 @@ class TranslationsExtractor
                     ['resource', $configResource->getFile()->getRealPath()]
                 );
                 $this->processConfigResource($configResource, $transFile);
-                $configResource->dump();
+                $configResource->dump($this->logger);
             }
 
-            $transFile->dump($dumpFlatKeys);
+            $transFile->dump($dumpFlatKeys, $this->logger);
         }
     }
 
@@ -114,11 +114,15 @@ class TranslationsExtractor
         if (array_key_exists('imports', $configData) && is_array($configData['imports'])) {
             $imports = $configData['imports'];
             unset($configData['imports']);
-
+            $this->logger->debug('Processing imports of config resource {file}', ['file' => $file->getRealPath()]);
             foreach ($imports as $importData) {
                 if (array_key_exists('resource', $importData)) {
                     $resourceFile = new \SplFileInfo($file->getPath() . DIRECTORY_SEPARATOR . $importData['resource']);
                     if ($resourceFile->isReadable()) {
+                        $this->logger->debug(
+                            'Got import resource {file}. Importing.',
+                            ['file' => $resourceFile->getRealPath()]
+                        );
                         foreach ($this->loadConfigFile($resourceFile) as $configResource) {
                             yield $configResource;
                         }
