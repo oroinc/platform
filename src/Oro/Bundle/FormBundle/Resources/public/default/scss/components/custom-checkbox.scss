@@ -2,7 +2,8 @@
     &__input {
         &:focus {
             ~ .custom-checkbox__icon {
-                color: transparentize(get-color('ui', 'normal'), .45);
+                outline: $checkbox-outline-checked-focus-state;
+                outline-offset: $checkbox-outline-offset-checked-focus-state;
             }
         }
 
@@ -12,13 +13,6 @@
 
                 &:before {
                     content: '\e834';
-                }
-            }
-
-            &:focus {
-                ~ .custom-checkbox__icon {
-                    outline: $checkbox-outline-checked-focus-state;
-                    outline-offset: $checkbox-outline-offset-checked-focus-state;
                 }
             }
         }

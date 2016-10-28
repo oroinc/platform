@@ -8,4 +8,8 @@
     &__content {
         margin-bottom: $form-row__content-offset-x;
     }
+
+    &--offset-none {
+        margin-bottom: 0;
+    }
 }
