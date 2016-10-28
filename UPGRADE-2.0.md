@@ -161,7 +161,9 @@ To migrate all labels from configuration translatable fields automatically you c
 - Container parameter `oro_workflow.process_definition.entity.class` renamed to `oro_workflow.entity.process_definition.class`
 - Added container parameter `oro_workflow.entity.transition_trigger_cron.class`
 - Added container parameter `oro_workflow.entity.transition_trigger_event.class`
-
+- Changed signature of constructor of `\Oro\Bundle\WorkflowBundle\Form\Type\WorkflowDefinitionSelectType`, now it takes as second argument instance of `Symfony\Component\Translation\TranslatorInterface`
+- Changed signature of constructor of `\Oro\Bundle\WorkflowBundle\Form\Type\WorkflowSelectType`, now it takes as second argument instance of `\Symfony\Component\Translation\TranslatorInterface`
+- Changed signature of constructor of `\Oro\Bundle\WorkflowBundle\Form\Type\WorkflowStepSelectType`, now it takes as second argument instance of `\Symfony\Component\Translation\TranslatorInterface`
  
     
 
@@ -265,6 +267,7 @@ To migrate all labels from configuration translatable fields automatically you c
 - Class `Oro/Bundle/DataGridBundle/Extension/MassAction/DeleteMassActionHandler.php`
     - construction signature was changed now it takes new argument:
         `MessageProducerInterface` $producer
+- Added helper `Oro\Bundle\DataGridBundle\Tools\DatagridRouteHelper`
 
 ####SecurityBundle
 - Removed layout context configurator `Oro\Bundle\SecurityBundle\Layout\Extension\SecurityFacadeContextConfigurator`.
@@ -324,11 +327,15 @@ To migrate all labels from configuration translatable fields automatically you c
 - Removed `Oro\Bundle\TranslationBundle\Translation\TranslationStatusInterface`
 - Added `Oro\Bundle\TranslationBundle\DependencyInjection\Compiler\TranslationContextResolverPass`.
 - Added `Oro\Bundle\TranslationBundle\Helper\TranslationHelper` class with `oro_translation.helper.translation` as accessor for translation values in database.  
-- Added Twig extension `\Oro\Bundle\TranslationBundle\Twig\TranslationExtension` with methods `oro_translation_debug_translator` and `translation_grid_link`
+- Added Twig extension `\Oro\Bundle\TranslationBundle\Twig\TranslationExtension` wich declare following TWIG functions:
+    - `oro_translation_debug_translator` 
+    - `translation_grid_link`
 - Added `Oro\Bundle\TranslationBundle\Translation\TranslationKeyGenerator`
 - Added `Oro\Bundle\TranslationBundle\Translation\TranslationKeySourceInterface` with 2 types of implementations `Oro\Bundle\TranslationBundle\Translation\KeySource\DynamicTranslationKeySource` and immutable one - `Oro\Bundle\TranslationBundle\Translation\KeySource\TranslationKeySource`
 - Added `Oro\Bundle\TranslationBundle\Translation\TranslationFieldsIteratorInterface` as useful way to define single point of custom structure translatable fields awareness and manipulation.
 - Added `Oro\Bundle\TranslationBundle\Translation\TranslationFieldsIteratorTrait`.
+- Added Data Provider `Oro\Bundle\TranslationBundle\Layout\DataProvider\TranslatorProvider` that provides the translator to Layouts. 
+- Added helper `Oro\Bundle\TranslationBundle\Helper\TranslationsDatagridRouteHelper`.
 
  
 ####EntityExtendBundle
