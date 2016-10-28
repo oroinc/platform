@@ -251,3 +251,10 @@ services:
         class: 'Oro\Bundle\TranslationBundle\Helper\TranslationsDatagridRouteHelper'
         arguments:
             - '@oro_datagrid.helper.route'
+
+    oro_translation.layout.data_provider.translator:
+        class: 'Oro\Bundle\TranslationBundle\Layout\DataProvider\TranslatorProvider'
+        arguments:
+            - '@translator'
+        tags:
+            - { name: layout.data_provider, alias: translator }
