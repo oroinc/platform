@@ -3,13 +3,13 @@
 namespace Oro\Bundle\WorkflowBundle\Datagrid;
 
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
+use Oro\Bundle\WorkflowBundle\Form\Type\WorkflowDefinitionSelectType;
 use Symfony\Component\Translation\TranslatorInterface;
 
 use Oro\Bundle\DataGridBundle\Exception\InvalidArgumentException;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\DataGridBundle\Event\BuildBefore;
 
-use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowStep;
 use Oro\Bundle\WorkflowBundle\Form\Type\WorkflowStepSelectType;
 use Oro\Bundle\WorkflowBundle\Helper\WorkflowTranslationHelper;
@@ -39,10 +39,17 @@ class WorkflowDatagridLabelListener
     {
         $configuration = $event->getConfig();
         $columns = $this->getWorkflowLabelColumns($configuration);
-        if (count($columns)) {
-            foreach ($columns as $columnName) {
+        if (count($columns[WorkflowStep::class])) {
+            foreach ($columns[WorkflowStep::class] as $columnName) {
                 $this->fixColumnDefinition($columnName, $configuration);
-                $this->fixColumnFilter($columnName, $configuration);
+                $this->fixStepNameFilter($columnName, $configuration);
+                $this->fixColumnSorter($columnName, $configuration);
+            }
+        }
+        if (count($columns[WorkflowDefinition::class])) {
+            foreach ($columns[WorkflowDefinition::class] as $columnName) {
+                $this->fixColumnDefinition($columnName, $configuration);
+                $this->fixDefinitionNameFilter($columnName, $configuration);
                 $this->fixColumnSorter($columnName, $configuration);
             }
         }
@@ -68,13 +75,18 @@ class WorkflowDatagridLabelListener
     private function getWorkflowLabelColumns(DatagridConfiguration $configuration)
     {
         $columnAliases = $configuration->offsetGetByPath('[source][query_config][column_aliases]');
-        $columns = [];
+        $columns = [
+            WorkflowStep::class => [],
+            WorkflowDefinition::class => [],
+        ];
         if (count($columnAliases)) {
             foreach ($columnAliases as $key => $alias) {
-                if (false !== strpos($key, WorkflowStep::class . '::label') ||
-                    false !== strpos($key, WorkflowDefinition::class . '::label')
-                ) {
-                    $columns[] = $alias;
+                if (false !== strpos($key, WorkflowStep::class . '::label')) {
+                    $columns[WorkflowStep::class][] = $alias;
+                    continue;
+                }
+                if (false !== strpos($key, WorkflowDefinition::class . '::label')) {
+                    $columns[WorkflowDefinition::class][] = $alias;
                     continue;
                 }
             }
@@ -102,7 +114,7 @@ class WorkflowDatagridLabelListener
      * @param $columnName
      * @param DatagridConfiguration $configuration
      */
-    private function fixColumnFilter($columnName, DatagridConfiguration $configuration)
+    private function fixStepNameFilter($columnName, DatagridConfiguration $configuration)
     {
         $filters = $configuration->offsetGetByPath('[filters][columns]');
         $label = $configuration->offsetGetByPath(sprintf('[columns][%s][label]', $columnName));
@@ -115,6 +127,33 @@ class WorkflowDatagridLabelListener
                 'data_name' => $tableAlias . '.id',
                 'options' => [
                     'field_type' => WorkflowStepSelectType::NAME,
+                    'field_options' => [
+                        'workflow_entity_class' => $this->getRootEntityClass($configuration),
+                        'multiple' => true
+                    ]
+                ]
+            ];
+        }
+        $configuration->offsetSetByPath('[filters][columns]', $filters);
+    }
+
+    /**
+     * @param $columnName
+     * @param DatagridConfiguration $configuration
+     */
+    private function fixDefinitionNameFilter($columnName, DatagridConfiguration $configuration)
+    {
+        $filters = $configuration->offsetGetByPath('[filters][columns]');
+        $label = $configuration->offsetGetByPath(sprintf('[columns][%s][label]', $columnName));
+        $label = $label ?: 'oro.workflow.workflowdefinition.grid.column.label';
+        if (isset($filters[$columnName])) {
+            $tableAlias = $this->getTableAliasForColumnName($columnName, $configuration);
+            $filters[$columnName] = [
+                'label' => $label,
+                'type' => 'entity',
+                'data_name' => $tableAlias . '.name',
+                'options' => [
+                    'field_type' => WorkflowDefinitionSelectType::NAME,
                     'field_options' => [
                         'workflow_entity_class' => $this->getRootEntityClass($configuration),
                         'multiple' => true
