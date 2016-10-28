@@ -76,14 +76,6 @@ class TransitionIsAllowedValidator extends ConstraintValidator
                         ]
                     );
                     break;
-                case InvalidTransitionException::WORKFLOW_CANCELED_BY_TRANSITION:
-                    $errors->add(
-                        [
-                            'message' => $constraint::$workflowCanceledByTransitionMessage,
-                            'parameters' => [],
-                        ]
-                    );
-                    break;
             }
         }
 
