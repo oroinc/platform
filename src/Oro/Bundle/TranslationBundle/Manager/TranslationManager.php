@@ -62,8 +62,6 @@ class TranslationManager
         $domain = self::DEFAULT_DOMAIN,
         $persist = false
     ) {
-        // TODO: rename to createTranslation
-
         $cacheKey = sprintf('%s-%s-%s', $locale, $domain, $key);
         if (!array_key_exists($cacheKey, $this->translations)) {
             $translationValue = new Translation();
