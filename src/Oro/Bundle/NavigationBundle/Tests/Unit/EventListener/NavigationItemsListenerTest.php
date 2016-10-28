@@ -1,15 +1,15 @@
 <?php
 
-namespace Oro\Bundle\FeatureToggleBundle\Tests\Unit\EventListener;
+namespace Oro\Bundle\NavigationBundle\Tests\Unit\EventListener;
 
 use Knp\Menu\MenuItem;
 
-use Oro\Bundle\FeatureToggleBundle\EventListener\NavigationListener;
 use Oro\Bundle\NavigationBundle\Event\ConfigureMenuEvent;
+use Oro\Bundle\NavigationBundle\EventListener\NavigationItemsListener;
 
-class NavigationListenerTest extends \PHPUnit_Framework_TestCase
+class NavigationItemsListenerTest extends \PHPUnit_Framework_TestCase
 {
-    /** @var NavigationListener */
+    /** @var NavigationItemsListener */
     protected $navigationListener;
 
     public function setUp()
@@ -33,7 +33,7 @@ class NavigationListenerTest extends \PHPUnit_Framework_TestCase
                 ],
             ]));
 
-        $this->navigationListener = new NavigationListener($featureChecker);
+        $this->navigationListener = new NavigationItemsListener($featureChecker);
     }
 
     /**

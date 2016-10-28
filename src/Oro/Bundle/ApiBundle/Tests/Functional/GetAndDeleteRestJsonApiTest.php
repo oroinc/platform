@@ -11,16 +11,13 @@ class GetAndDeleteRestJsonApiTest extends RestJsonApiTestCase
      * @param string   $entityClass
      * @param string[] $excludedActions
      *
-     * @dataProvider getEnabledEntities
+     * @dataProvider getEntities
      */
-    public function testEnabledRestRequests($entityClass, $excludedActions)
+    public function testRestRequests($entityClass, $excludedActions)
     {
         if (in_array('get_list', $excludedActions, true)) {
             return;
         }
-
-        // guard
-        $this->assertTrue($this->isEntityEnabled($entityClass));
 
         $entityType = $this->getEntityType($entityClass);
 
@@ -42,31 +39,6 @@ class GetAndDeleteRestJsonApiTest extends RestJsonApiTestCase
                 $this->checkDeleteRequest($entityType, $id, $excludedActions);
             }
         }
-    }
-
-    /**
-     * @param string   $entityClass
-     * @param string[] $excludedActions
-     *
-     * @dataProvider getDisabledEntities
-     */
-    public function testDisabledRestRequests($entityClass, $excludedActions)
-    {
-        if (in_array('get_list', $excludedActions, true)) {
-            return;
-        }
-
-        // guard
-        $this->assertFalse($this->isEntityEnabled($entityClass));
-
-        $entityType = $this->getEntityType($entityClass);
-
-        // test "get list" request
-        $response = $this->request(
-            'GET',
-            $this->getUrl('oro_rest_api_cget', ['entity' => $entityType, 'page[size]' => 1])
-        );
-        $this->assertApiResponseStatusCodeEquals($response, 403, $entityType, 'get list');
     }
 
     /**

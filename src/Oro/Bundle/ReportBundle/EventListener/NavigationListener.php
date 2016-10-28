@@ -12,7 +12,6 @@ use Oro\Bundle\NavigationBundle\Event\ConfigureMenuEvent;
 use Oro\Bundle\NavigationBundle\Utils\MenuUpdateUtils;
 use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
 use Oro\Bundle\SecurityBundle\SecurityFacade;
-use Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker;
 
 class NavigationListener
 {
@@ -28,28 +27,22 @@ class NavigationListener
     /** @var AclHelper */
     protected $aclHelper;
 
-    /** @var FeatureChecker */
-    protected $featureChecker;
-
     /**
-     * @param EntityManager  $entityManager
-     * @param ConfigProvider $entityConfigProvider
-     * @param SecurityFacade $securityFacade
-     * @param AclHelper      $aclHelper
-     * @param FeatureChecker $featureChecker
+     * @param EntityManager    $entityManager
+     * @param ConfigProvider   $entityConfigProvider
+     * @param SecurityFacade   $securityFacade
+     * @param AclHelper        $aclHelper
      */
     public function __construct(
         EntityManager $entityManager,
         ConfigProvider $entityConfigProvider,
         SecurityFacade $securityFacade,
-        AclHelper $aclHelper,
-        FeatureChecker $featureChecker
+        AclHelper $aclHelper
     ) {
         $this->em                   = $entityManager;
         $this->entityConfigProvider = $entityConfigProvider;
         $this->securityFacade       = $securityFacade;
         $this->aclHelper            = $aclHelper;
-        $this->featureChecker       = $featureChecker;
     }
 
     /**
@@ -62,17 +55,6 @@ class NavigationListener
             $qb = $this->em->getRepository('OroReportBundle:Report')
                 ->createQueryBuilder('report')
                 ->orderBy('report.name', 'ASC');
-
-            $disabledReports = $this->featureChecker->getDisabledResourcesByType('reports');
-            if ($disabledReports) {
-                $qb
-                    ->andWhere($qb->expr()->orX(
-                        $qb->expr()->isNull('report.internalId'),
-                        $qb->expr()->notIn('report.internalId', ':reports')
-                    ))
-                    ->setParameter('reports', $disabledReports);
-            }
-
             $reports = $this->aclHelper->apply($qb)->execute();
 
             if (!empty($reports)) {

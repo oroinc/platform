@@ -4,7 +4,6 @@ namespace Oro\Bundle\DashboardBundle\Model;
 
 use Oro\Bundle\DashboardBundle\Entity\Dashboard;
 use Oro\Bundle\DashboardBundle\Entity\Widget;
-use Oro\Bundle\DashboardBundle\Model\WidgetConfigs;
 
 class Factory
 {

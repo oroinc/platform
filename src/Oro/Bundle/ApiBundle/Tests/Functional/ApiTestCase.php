@@ -8,7 +8,6 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Yaml\Parser;
 
-use Oro\Bundle\ApiBundle\Processor\Shared\EntityTypeFeatureCheck;
 use Oro\Bundle\ApiBundle\Request\DataType;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Request\ValueNormalizer;
@@ -70,48 +69,6 @@ abstract class ApiTestCase extends WebTestCase
             DataType::ENTITY_TYPE,
             $this->getRequestType()
         );
-    }
-
-    /**
-     * @return array [entity class => [entity class, [excluded action, ...]], ...]
-     */
-    public function getEnabledEntities()
-    {
-        $entities = $this->getEntities();
-        $enabledEntities = [];
-        foreach ($entities as $entityClass => $value) {
-            if (!$this->isEntityEnabled($entityClass)) {
-                continue;
-            }
-
-            $enabledEntities[$entityClass] = $value;
-        }
-        if (!$enabledEntities) {
-            $this->markTestSkipped('There are no enabled entities to test');
-        }
-
-        return $enabledEntities;
-    }
-
-    /**
-     * @return array [entity class => [entity class, [excluded action, ...]], ...]
-     */
-    public function getDisabledEntities()
-    {
-        $entities = $this->getEntities();
-        $disabledEntities = [];
-        foreach ($entities as $entityClass => $value) {
-            if ($this->isEntityEnabled($entityClass)) {
-                continue;
-            }
-
-            $disabledEntities[$entityClass] = $value;
-        }
-        if (!$disabledEntities) {
-            $this->markTestSkipped('There are no disabled entities to test');
-        }
-
-        return $disabledEntities;
     }
 
     /**
@@ -335,14 +292,5 @@ abstract class ApiTestCase extends WebTestCase
             }
             throw $e;
         }
-    }
-
-    /**
-     * @return bool
-     */
-    protected function isEntityEnabled($entityClass)
-    {
-        return $this->getContainer()->get('oro_featuretoggle.checker.feature_checker')
-            ->isResourceEnabled($entityClass, EntityTypeFeatureCheck::API_RESOURCE_KEY);
     }
 }

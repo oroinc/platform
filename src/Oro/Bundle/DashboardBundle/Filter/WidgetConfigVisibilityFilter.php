@@ -36,7 +36,9 @@ class WidgetConfigVisibilityFilter
      * Filter visible widget items
      *
      * @param array       $configs
-     * @param string|null $widgetName  Name of widget in case $items are subwidgets of the widget
+     * @param string|null $widgetName Name of widget in case $items are sub widgets of the widget
+     *
+     * @return array
      */
     public function filterConfigs(array $configs, $widgetName = null)
     {

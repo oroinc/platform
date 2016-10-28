@@ -40,7 +40,7 @@ define([
             if (!this.options.pageReload) {
                 this.$el.on(
                     'change',
-                    'input[type=checkbox][data-needs-page-reload]',
+                    'input[data-needs-page-reload]',
                     _.bind(this._onNeedsReloadChange, this)
                 );
             }
@@ -52,7 +52,7 @@ define([
                 return;
             }
 
-            this.$el.off('change', 'input[type=checkbox][data-needs-page-reload]');
+            this.$el.off('change', 'input[data-needs-page-reload]');
 
             ConfigForm.__super__.dispose.apply(this, arguments);
         },

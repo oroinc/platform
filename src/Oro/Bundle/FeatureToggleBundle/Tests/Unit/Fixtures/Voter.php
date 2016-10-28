@@ -13,8 +13,8 @@ class Voter implements VoterInterface
     protected $defaultStrategy;
 
     /**
-     * @param array  $strategyByFeature
-     * @param string $defaultStrategy
+     * @param array $strategyByFeature
+     * @param int   $defaultStrategy
      */
     public function __construct(array $strategyByFeature, $defaultStrategy = VoterInterface::FEATURE_ABSTAIN)
     {

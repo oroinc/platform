@@ -1,13 +1,13 @@
 <?php
 
-namespace Oro\Bundle\FeatureToggleBundle\EventListener;
+namespace Oro\Bundle\NavigationBundle\EventListener;
 
 use Knp\Menu\ItemInterface;
 
 use Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker;
 use Oro\Bundle\NavigationBundle\Event\ConfigureMenuEvent;
 
-class NavigationListener
+class NavigationItemsListener
 {
     /** @var FeatureChecker */
     protected $featureChecker;

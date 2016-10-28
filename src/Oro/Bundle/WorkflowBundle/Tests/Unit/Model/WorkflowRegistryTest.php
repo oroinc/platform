@@ -131,7 +131,7 @@ class WorkflowRegistryTest extends \PHPUnit_Framework_TestCase
      * @expectedException \Oro\Bundle\WorkflowBundle\Exception\WorkflowNotFoundException
      * @expectedExceptionMessage Workflow "test_workflow" not found
      */
-    public function testGetWorkflowDisabledFeature()
+    public function testGetWorkflowForDisabledFeatureShouldThrowException()
     {
         $workflowName = 'test_workflow';
 
@@ -145,6 +145,22 @@ class WorkflowRegistryTest extends \PHPUnit_Framework_TestCase
             ->willReturn(false);
 
         $this->registry->getWorkflow($workflowName);
+    }
+
+    public function testGetWorkflowForDisabledFeatureShouldReturnNull()
+    {
+        $workflowName = 'test_workflow';
+
+        $this->entityRepository->expects($this->never())
+            ->method('find')
+            ->with($workflowName);
+
+        $this->featureChecker->expects($this->once())
+            ->method('isResourceEnabled')
+            ->with($workflowName, WorkflowRegistry::FEATURE_CONFIG_WORKFLOW_KEY)
+            ->willReturn(false);
+
+        $this->assertNull($this->registry->getWorkflow($workflowName, false));
     }
 
     public function testGetWorkflowWithDbEntitiesUpdate()
