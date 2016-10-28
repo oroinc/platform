@@ -17,6 +17,8 @@ services:
         arguments:
             - '@doctrine'
             - '@logger'
+        tags:
+            - { name: monolog.logger, channel: oro_workflow }
 
     oro_workflow.async.transition_trigger_event_processor:
         parent: oro_workflow.async.transition_trigger_processor.abstract

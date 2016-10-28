@@ -1,0 +1,11 @@
+parameters:
+    oro_currency.datagrid_extension.formatter.property.money_value.class: Oro\Bundle\CurrencyBundle\Formatter\Property\MoneyValueProperty
+
+services:
+    oro_currency.datagrid_extension.formatter.property.money_value:
+        class: %oro_currency.datagrid_extension.formatter.property.money_value.class%
+        arguments:
+            - '@oro_currency.formatter.money_value_type'
+            - '@logger'
+        tags:
+            - { name:  oro_datagrid.extension.formatter.property, type: money_value }

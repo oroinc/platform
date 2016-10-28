@@ -1,7 +1,7 @@
 {
-    "OroCRM\\Bundle\\AccountBundle\\Entity\\Account": {
+    "Oro\\Bundle\\AccountBundle\\Entity\\Account": {
         "label": "Account",
-        "name": "OroCRM\\Bundle\\AccountBundle\\Entity\\Account",
+        "name": "Oro\\Bundle\\AccountBundle\\Entity\\Account",
         "fields": [
             {
                 "name": "name",
