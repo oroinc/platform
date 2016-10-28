@@ -5,15 +5,12 @@ config:
         'jquery.form':
             deps:
                 - 'jquery'
-        'url':
-            exports: 'Url'
     paths:
         'routing': 'bundles/fosjsrouting/js/router.js'
-        'jquery.form': 'bundles/oronavigation/lib/jquery.form.js'
-        'url': 'bundles/oronavigation/lib/url.min.js'
         'oronavigation/js/app/views/shortcuts-view': 'bundles/oronavigation/js/app/views/shortcuts-view.js'
         'oronavigation/js/app/components/favorite-component': 'bundles/oronavigation/js/app/components/favorite-component.js'
         'oronavigation/js/app/components/pin-component': 'bundles/oronavigation/js/app/components/pin-component.js'
+        'oronavigation/js/app/components/tree-manage-component': 'bundles/oronavigation/js/app/components/tree-manage-component.js'
         'oronavigation/js/app/modules/views-module': 'bundles/oronavigation/js/app/modules/views-module.js'
         'oronavigation/js/app/models/base/collection': 'bundles/oronavigation/js/app/models/base/collection.js'
         'oronavigation/js/app/models/base/model': 'bundles/oronavigation/js/app/models/base/model.js'

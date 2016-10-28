@@ -2,10 +2,10 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\ImportExport\Serializer;
 
+use Oro\Bundle\EntityBundle\Helper\FieldHelper;
 use Oro\Bundle\EntityExtendBundle\Entity\AbstractEnumValue;
 use Oro\Bundle\EntityExtendBundle\ImportExport\Serializer\EnumNormalizer;
 use Oro\Bundle\EntityExtendBundle\Tests\Unit\Fixtures\TestEnumValue;
-use Oro\Bundle\ImportExportBundle\Field\FieldHelper;
 
 class EnumNormalizerTest extends \PHPUnit_Framework_TestCase
 {
@@ -21,7 +21,7 @@ class EnumNormalizerTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->fieldHelper = $this->getMockBuilder('Oro\Bundle\ImportExportBundle\Field\FieldHelper')
+        $this->fieldHelper = $this->getMockBuilder('Oro\Bundle\EntityBundle\Helper\FieldHelper')
             ->disableOriginalConstructor()
             ->getMock();
 

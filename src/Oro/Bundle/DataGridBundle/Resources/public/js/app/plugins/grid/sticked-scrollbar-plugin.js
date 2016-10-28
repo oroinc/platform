@@ -7,6 +7,7 @@ define(function(require) {
     var $ = require('jquery');
     var _ = require('underscore');
     require('jquery.mCustomScrollbar');
+    require('jquery.mousewheel');
 
     StickedScrollbarPlugin = BasePlugin.extend({
         /**
