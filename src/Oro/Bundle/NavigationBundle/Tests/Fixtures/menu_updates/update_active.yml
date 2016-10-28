@@ -33,7 +33,7 @@ result_menu:
             extras:
                 uri: '#system'
                 divider: false
-                translateDisabled: false
+                translate_disabled: false
             display: false
         custom:
             label: 'Custom'
