@@ -49,7 +49,6 @@ class LoadTranslationRoles extends AbstractFixture implements ContainerAwareInte
             sprintf('action:oro_importexport_export') => ['EXECUTE'],
         ];
 
-        // TODO: move to separate trait/helper
         $this->setPermissions($aclManager, $aclManager->getSid($role), $permissions);
     }
 
