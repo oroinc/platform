@@ -50,11 +50,16 @@ class AddAssociationToEmailsMessageProcessor implements MessageProcessorInterfac
 
         foreach ($data['emailIds'] as $id) {
             $this->producer->send(Topics::ADD_ASSOCIATION_TO_EMAIL, [
-                $id,
-                $data['targetClass'],
-                $data['targetId']
+                'emailId' => $id,
+                'targetClass' => $data['targetClass'],
+                'targetId' => $data['targetId'],
             ]);
         }
+
+        $this->logger->info(sprintf(
+            '[AddAssociationToEmailsMessageProcessor] Sent "%s" messages',
+            count($data['emailIds'])
+        ));
 
         return self::ACK;
     }

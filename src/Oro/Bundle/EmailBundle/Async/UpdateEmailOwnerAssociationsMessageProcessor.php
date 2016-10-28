@@ -1,20 +1,21 @@
 <?php
 namespace Oro\Bundle\EmailBundle\Async;
 
-use Oro\Bundle\EmailBundle\Async\Manager\AssociationManager;
+use Psr\Log\LoggerInterface;
+
+use Oro\Component\MessageQueue\Client\MessageProducerInterface;
 use Oro\Component\MessageQueue\Client\TopicSubscriberInterface;
 use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
 use Oro\Component\MessageQueue\Transport\MessageInterface;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
 use Oro\Component\MessageQueue\Util\JSON;
-use Psr\Log\LoggerInterface;
 
 class UpdateEmailOwnerAssociationsMessageProcessor implements MessageProcessorInterface, TopicSubscriberInterface
 {
     /**
-     * @var AssociationManager
+     * @var MessageProducerInterface
      */
-    private $associationManager;
+    private $producer;
 
     /**
      * @var LoggerInterface
@@ -22,12 +23,12 @@ class UpdateEmailOwnerAssociationsMessageProcessor implements MessageProcessorIn
     private $logger;
 
     /**
-     * @param AssociationManager $associationManager
-     * @param LoggerInterface    $logger
+     * @param MessageProducerInterface $producer
+     * @param LoggerInterface $logger
      */
-    public function __construct(AssociationManager $associationManager, LoggerInterface $logger)
+    public function __construct(MessageProducerInterface $producer, LoggerInterface $logger)
     {
-        $this->associationManager = $associationManager;
+        $this->producer = $producer;
         $this->logger = $logger;
     }
 
@@ -47,11 +48,16 @@ class UpdateEmailOwnerAssociationsMessageProcessor implements MessageProcessorIn
             return self::REJECT;
         }
 
-        $messagesCount = $this->associationManager->processUpdateEmailOwner($data['ownerClass'], $data['ownerIds']);
+        foreach ($data['ownerIds'] as $id) {
+            $this->producer->send(Topics::UPDATE_EMAIL_OWNER_ASSOCIATION, [
+                'ownerId' => $id,
+                'ownerClass' => $data['ownerClass'],
+            ]);
+        }
 
         $this->logger->info(sprintf(
             '[UpdateEmailOwnerAssociationsMessageProcessor] Sent "%s" messages',
-            $messagesCount
+            count($data['ownerIds'])
         ));
 
         return self::ACK;

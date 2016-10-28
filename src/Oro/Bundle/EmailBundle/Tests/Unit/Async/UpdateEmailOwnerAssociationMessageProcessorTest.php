@@ -3,19 +3,19 @@ namespace Oro\Bundle\EmailBundle\Tests\Unit\Async;
 
 use Psr\Log\LoggerInterface;
 
+use Oro\Bundle\EmailBundle\Async\Manager\AssociationManager;
 use Oro\Bundle\EmailBundle\Async\Topics;
-use Oro\Bundle\EmailBundle\Async\UpdateEmailOwnerAssociationsMessageProcessor;
-use Oro\Component\MessageQueue\Client\MessageProducerInterface;
+use Oro\Bundle\EmailBundle\Async\UpdateEmailOwnerAssociationMessageProcessor;
 use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
 use Oro\Component\MessageQueue\Transport\Null\NullMessage;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
 
-class UpdateEmailOwnerAssociationsMessageProcessorTest extends \PHPUnit_Framework_TestCase
+class UpdateEmailOwnerAssociationMessageProcessorTest extends \PHPUnit_Framework_TestCase
 {
     public function testCouldBeConstructedWithRequiredArguments()
     {
-        new UpdateEmailOwnerAssociationsMessageProcessor(
-            $this->createMessageProducerMock(),
+        new UpdateEmailOwnerAssociationMessageProcessor(
+            $this->createAssociationManagerMock(),
             $this->createLoggerMock()
         );
     }
@@ -26,16 +26,16 @@ class UpdateEmailOwnerAssociationsMessageProcessorTest extends \PHPUnit_Framewor
         $logger
             ->expects($this->once())
             ->method('critical')
-            ->with('[UpdateEmailOwnerAssociationsMessageProcessor] Got invalid message: "{"ownerIds":[1]}"')
+            ->with('[UpdateEmailOwnerAssociationMessageProcessor] Got invalid message: "{"ownerId":[1]}"')
         ;
 
         $message = new NullMessage();
         $message->setBody(json_encode([
-            'ownerIds' => [1],
+            'ownerId' => [1],
         ]));
 
-        $processor = new UpdateEmailOwnerAssociationsMessageProcessor(
-            $this->createMessageProducerMock(),
+        $processor = new UpdateEmailOwnerAssociationMessageProcessor(
+            $this->createAssociationManagerMock(),
             $logger
         );
 
@@ -44,13 +44,13 @@ class UpdateEmailOwnerAssociationsMessageProcessorTest extends \PHPUnit_Framewor
         $this->assertEquals(MessageProcessorInterface::REJECT, $result);
     }
 
-    public function testShouldRejectMessageIfOwnerIdsIsMissing()
+    public function testShouldRejectMessageIfOwnerIdIsMissing()
     {
         $logger = $this->createLoggerMock();
         $logger
             ->expects($this->once())
             ->method('critical')
-            ->with('[UpdateEmailOwnerAssociationsMessageProcessor] Got invalid message: "{"ownerClass":"class"}"')
+            ->with('[UpdateEmailOwnerAssociationMessageProcessor] Got invalid message: "{"ownerClass":"class"}"')
         ;
 
         $message = new NullMessage();
@@ -58,8 +58,8 @@ class UpdateEmailOwnerAssociationsMessageProcessorTest extends \PHPUnit_Framewor
             'ownerClass' => 'class',
         ]));
 
-        $processor = new UpdateEmailOwnerAssociationsMessageProcessor(
-            $this->createMessageProducerMock(),
+        $processor = new UpdateEmailOwnerAssociationMessageProcessor(
+            $this->createAssociationManagerMock(),
             $logger
         );
 
@@ -75,32 +75,22 @@ class UpdateEmailOwnerAssociationsMessageProcessorTest extends \PHPUnit_Framewor
             ->expects($this->never())
             ->method('critical')
         ;
-        $logger
-            ->expects($this->once())
-            ->method('info')
-            ->with($this->equalTo('[UpdateEmailOwnerAssociationsMessageProcessor] Sent "2" messages'))
-        ;
 
-        $producer = $this->createMessageProducerMock();
-        $producer
-            ->expects($this->at(0))
-            ->method('send')
-            ->with(Topics::UPDATE_EMAIL_OWNER_ASSOCIATION, ['ownerId' => 1,'ownerClass' => 'class'])
-        ;
-        $producer
-            ->expects($this->at(1))
-            ->method('send')
-            ->with(Topics::UPDATE_EMAIL_OWNER_ASSOCIATION, ['ownerId' => 2,'ownerClass' => 'class'])
+        $manager = $this->createAssociationManagerMock();
+        $manager
+            ->expects($this->once())
+            ->method('processUpdateEmailOwner')
+            ->with('class', [1])
         ;
 
         $message = new NullMessage();
         $message->setBody(json_encode([
             'ownerClass' => 'class',
-            'ownerIds' => [1,2],
+            'ownerId' => 1,
         ]));
 
-        $processor = new UpdateEmailOwnerAssociationsMessageProcessor(
-            $producer,
+        $processor = new UpdateEmailOwnerAssociationMessageProcessor(
+            $manager,
             $logger
         );
 
@@ -112,8 +102,8 @@ class UpdateEmailOwnerAssociationsMessageProcessorTest extends \PHPUnit_Framewor
     public function testShouldReturnSubscribedTopics()
     {
         $this->assertEquals(
-            [Topics::UPDATE_EMAIL_OWNER_ASSOCIATIONS],
-            UpdateEmailOwnerAssociationsMessageProcessor::getSubscribedTopics()
+            [Topics::UPDATE_EMAIL_OWNER_ASSOCIATION],
+            UpdateEmailOwnerAssociationMessageProcessor::getSubscribedTopics()
         );
     }
 
@@ -126,18 +116,18 @@ class UpdateEmailOwnerAssociationsMessageProcessorTest extends \PHPUnit_Framewor
     }
 
     /**
+     * @return \PHPUnit_Framework_MockObject_MockObject|AssociationManager
+     */
+    private function createAssociationManagerMock()
+    {
+        return $this->getMock(AssociationManager::class, [], [], '', false);
+    }
+
+    /**
      * @return \PHPUnit_Framework_MockObject_MockObject|LoggerInterface
      */
     private function createLoggerMock()
     {
         return $this->getMock(LoggerInterface::class);
-    }
-
-    /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|MessageProducerInterface
-     */
-    private function createMessageProducerMock()
-    {
-        return $this->getMock(MessageProducerInterface::class);
     }
 }

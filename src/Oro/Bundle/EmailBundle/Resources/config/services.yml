@@ -346,10 +346,18 @@ services:
         tags:
             - { name: 'oro_message_queue.client.message_processor' }
 
+    oro_email.async.update_email_owner_association:
+        class: 'Oro\Bundle\EmailBundle\Async\UpdateEmailOwnerAssociationMessageProcessor'
+        arguments:
+            - '@oro_email.command.association_manager'
+            - '@logger'
+        tags:
+            - { name: 'oro_message_queue.client.message_processor' }
+
     oro_email.async.update_email_owner_associations:
         class: 'Oro\Bundle\EmailBundle\Async\UpdateEmailOwnerAssociationsMessageProcessor'
         arguments:
-            - '@oro_email.command.association_manager'
+            - '@oro_message_queue.client.message_producer'
             - '@logger'
         tags:
             - { name: 'oro_message_queue.client.message_processor' }

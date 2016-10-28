@@ -101,17 +101,22 @@ class AddAssociationToEmailsMessageProcessorTest extends \PHPUnit_Framework_Test
             ->expects($this->never())
             ->method('critical')
         ;
+        $logger
+            ->expects($this->once())
+            ->method('info')
+            ->with($this->equalTo('[AddAssociationToEmailsMessageProcessor] Sent "2" messages'))
+        ;
 
         $producer = $this->createMessageProducerMock();
         $producer
             ->expects($this->at(0))
             ->method('send')
-            ->with(Topics::ADD_ASSOCIATION_TO_EMAIL, [1, 'class', 123])
+            ->with(Topics::ADD_ASSOCIATION_TO_EMAIL, ['emailId' => 1,'targetClass' => 'class','targetId' => 123])
         ;
         $producer
             ->expects($this->at(1))
             ->method('send')
-            ->with(Topics::ADD_ASSOCIATION_TO_EMAIL, [2, 'class', 123])
+            ->with(Topics::ADD_ASSOCIATION_TO_EMAIL, ['emailId' => 2,'targetClass' => 'class','targetId' => 123])
         ;
 
         $message = new NullMessage();

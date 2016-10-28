@@ -67,7 +67,8 @@ class OroEmailBundle extends Bundle
             ->add(Topics::SEND_AUTO_RESPONSES, 'Send auto response for multiple emails')
             ->add(Topics::ADD_ASSOCIATION_TO_EMAIL, 'Add association to single email')
             ->add(Topics::ADD_ASSOCIATION_TO_EMAILS, 'Add association to multiple emails')
-            ->add(Topics::UPDATE_EMAIL_OWNER_ASSOCIATIONS, 'Updates emails for email owner')
+            ->add(Topics::UPDATE_EMAIL_OWNER_ASSOCIATION, 'Updates single email for email owner')
+            ->add(Topics::UPDATE_EMAIL_OWNER_ASSOCIATIONS, 'Updates multiple emails for email owner')
             ->add(Topics::SYNC_EMAIL_SEEN_FLAG, 'Synchronization email flags')
             ->add(Topics::PURGE_EMAIL_ATTACHMENTS, 'Purge email attachments')
         ;
