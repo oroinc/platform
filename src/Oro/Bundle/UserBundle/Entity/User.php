@@ -1258,4 +1258,20 @@ class User extends ExtendUser implements
 
         return parent::setEnabled($enabled);
     }
+
+    /**
+     * @return \DateTime
+     */
+    public function getPasswordExpiresAt()
+    {
+        return $this->passwordExpiresAt;
+    }
+
+    /**
+     * @param \DateTime $passwordExpiresAt
+     */
+    public function setPasswordExpiresAt($passwordExpiresAt)
+    {
+        $this->passwordExpiresAt = $passwordExpiresAt;
+    }
 }
