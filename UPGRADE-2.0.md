@@ -415,17 +415,17 @@ placeholders:
 - Root node for dashboards configuration in `Resources/config/oro/dashboards.yml` file were changed from `oro_dashboard_config` to `dashboards`.
 - Class `Oro\Bundle\DashboardBundle\Model\WidgetConfigs`
     - construction signature was changed now it takes next arguments:
-        - `ConfigProvider` $configProvider
-        - `SecurityFacade` $securityFacade
-        - `ResolverInterface` $resolver
-        - `EntityManagerInterface` $entityManager
-        - `ConfigValueProvider` $valueProvider
-        - `TranslatorInterface` $translator
-        - `EventDispatcherInterface` $eventDispatcher
-        - `FeatureChecker` $featureChecker
+        - `ConfigProvider` $configProvider,
+        - `ResolverInterface` $resolver,
+        - `EntityManagerInterface` $entityManager,
+        - `ConfigValueProvider` $valueProvider,
+        - `TranslatorInterface` $translator,
+        - `EventDispatcherInterface` $eventDispatcher,
+        - `WidgetConfigVisibilityFilter` $visibilityFilter
     - method `filterWidgets` signature was changed now it takes next arguments:
         - `array` $items
         - $widgetName = null
+- Constructor of `Oro\Bundle\DashboardBundle\Model\Factory` was changed. Added `WidgetConfigs $widgetConfigs` as last argument.
 
 ####NavigationBundle:
 - Navigation configuration now loads form `Resources/config/oro/navigation.yml` instead of `Resources/config/navigation.yml` file.
@@ -483,6 +483,7 @@ placeholders:
 - `Oro\Bundle\EmailBundle\Form\Model\ExtendMailboxProcessSettings` was removed
 - Class `Oro\Bundle\EmailBundle\Form\Model\Email`
     - method `getContexts` now returns `Doctrine\Common\Collections\Collection` instead of array
+- Constructor of `Oro\Bundle\EmailBundle\Mailbox\MailboxProcessStorage` was changed. Added `FeatureChecker $featureChecker` argument.
 
 ####EntityBundle
 - `oro_entity.abstract_repository` introduced. Please inherit all your doctrine repository factory services
