@@ -161,16 +161,32 @@ class LayoutDataCollector extends DataCollector
                 continue;
             }
 
-            if (is_object($value) && !method_exists($value, '__toString')) {
-                $result[$key] = get_class($value);
-            } elseif (is_array($value)) {
-                $result[$key] = json_encode($value);
-            } else {
-                $result[$key] = (string) $value;
-            }
+            $result[$key] = $this->prepareOptionValue($value);
         }
 
         return $result;
+    }
+
+    /**
+     * @param $optionValue
+     *
+     * @return string
+     */
+    private function prepareOptionValue($optionValue)
+    {
+        if (is_array($optionValue)) {
+            foreach ($optionValue as $key => $value) {
+                $optionValue[$key] = $this->prepareOptionValue($value);
+            }
+
+            return json_encode($optionValue);
+        }
+
+        if (is_object($optionValue) && !method_exists($optionValue, '__toString')) {
+            return get_class($optionValue);
+        }
+
+        return (string) $optionValue;
     }
 
     /**
