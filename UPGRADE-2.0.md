@@ -162,6 +162,7 @@ Used with new class `Oro\Bundle\WorkflowBundle\Model\WorkflowExclusiveRecordGrou
     - `ConfigManager $cm`,
     - `LanguageProvider $languageProvider`.
 - `oro_locale.repository.localization` inherits `oro_entity.abstract_repository`
+- Updated moment-timezone.js library to version 0.5.*
 
 ####Layout Component:
 - Interface `Oro\Component\Layout\DataProviderInterface` was removed.
