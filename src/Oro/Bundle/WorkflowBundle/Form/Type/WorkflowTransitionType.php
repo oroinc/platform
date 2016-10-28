@@ -3,12 +3,9 @@
 namespace Oro\Bundle\WorkflowBundle\Form\Type;
 
 use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\FormInterface;
-use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\OptionsResolver\Options;
 
-use Oro\Bundle\WorkflowBundle\Helper\WorkflowTranslationHelper;
 use Oro\Bundle\WorkflowBundle\Validator\Constraints\TransitionIsAllowed;
 
 class WorkflowTransitionType extends AbstractType
@@ -71,17 +68,5 @@ class WorkflowTransitionType extends AbstractType
                 return $constraints;
             }
         );
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function finishView(FormView $view, FormInterface $form, array $options)
-    {
-        foreach ($view->children as $k => $childView) {
-            if (isset($childView->vars['label']) && (!empty($childView->vars['label']))) {
-                $childView->vars['translation_domain'] = WorkflowTranslationHelper::TRANSLATION_DOMAIN;
-            }
-        }
     }
 }

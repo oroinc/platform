@@ -110,20 +110,4 @@ class WorkflowTransitionTypeTest extends AbstractWorkflowAttributesTypeTestCase
             $result
         );
     }
-
-    public function testFinishView()
-    {
-        $child = new FormView();
-        $child->vars['label'] = 'test';
-
-        $view = new FormView();
-        $view->children = [$child];
-
-        $this->type->finishView($view, $this->getMock(FormInterface::class), []);
-
-        foreach ($view->children as $childView) {
-            $this->assertNotEmpty($childView->vars);
-            $this->assertEquals($childView->vars['translation_domain'], WorkflowTranslationHelper::TRANSLATION_DOMAIN);
-        }
-    }
 }

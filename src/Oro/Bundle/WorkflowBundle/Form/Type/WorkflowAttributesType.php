@@ -279,24 +279,20 @@ class WorkflowAttributesType extends AbstractType
         // update form label
         if (isset($attributeOptions['label'])) {
             $attributeOptions['options']['label'] = $attributeOptions['label'];
-        } else {
-            if (isset($attributeOptions['options']['label'])) {
-                if (is_array($attributeOptions['options']['label'])) {
-                    $attributeOptions['options']['label'] = array_shift($attributeOptions['options']['label']);
-                }
-
-                $label = $this->translator->trans(
-                    $attributeOptions['options']['label'],
-                    [],
-                    WorkflowTranslationHelper::TRANSLATION_DOMAIN
-                );
-
-                if ($label === $attributeOptions['options']['label']) {
-                    $attributeOptions['options']['label'] = $attribute->getLabel();
-                }
-            } else {
-                $attributeOptions['options']['label'] = $attribute->getLabel();
+        } elseif (isset($attributeOptions['options']['label'])) {
+            if (is_array($attributeOptions['options']['label'])) {
+                $attributeOptions['options']['label'] = array_shift($attributeOptions['options']['label']);
             }
+
+            $domain = WorkflowTranslationHelper::TRANSLATION_DOMAIN;
+            $label = $attributeOptions['options']['label'];
+            if ($this->translator->trans($label, [], $domain) === $label) {
+                $attributeOptions['options']['label'] = $attribute->getLabel();
+            } else {
+                $attributeOptions['options']['translation_domain'] = $domain;
+            }
+        } else {
+            $attributeOptions['options']['label'] = $attribute->getLabel();
         }
 
         // update required option
