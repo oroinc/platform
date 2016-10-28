@@ -76,8 +76,9 @@ class Configuration implements ConfigurationInterface
                 'password_upper_case' => ['value' => true, 'type' => 'boolean'],
                 'password_numbers' => ['value' => true, 'type' => 'boolean'],
                 'password_special_chars' => ['value' => false, 'type' => 'boolean'],
-                'days_before_change_enabled' => ['value' => false, 'type' => 'boolean'],
-                'days_before_change' => ['value' => 30, 'type' => 'scalar'],
+                'password_change_period_enabled' => ['value' => false, 'type' => 'boolean'],
+                'password_change_period' => ['value' => 30, 'type' => 'scalar'],
+                'password_change_period_unit' => ['value' => 'days'],
                 'match_old_passwords_enabled' => ['value' => false, 'type' => 'boolean'],
                 'match_old_passwords_number' => ['value' => 12, 'type' => 'scalar'],
             ]

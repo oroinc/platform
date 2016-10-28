@@ -281,7 +281,13 @@ oro:
                     label: Require a special character
                     tooltip: >
                         Special chars: !"#$%&'()*+,-./:;<=>?@[\]^_`{|}~ and space
-                days_before_change_enabled.label: Enable days before change limit
-                days_before_change.label: Days before change
+                password_change_period_enabled.label: Enable password change period
+                password_change_period.label: Password change period
                 match_old_passwords_enabled.label: Enable match old passwords
                 match_old_passwords_number.label: Number of old passwords to match
+                password_change_period_unit:
+                    label: Unit of password change period
+                    choices:
+                        days: Days
+                        weeks: Weeks
+                        months: Months

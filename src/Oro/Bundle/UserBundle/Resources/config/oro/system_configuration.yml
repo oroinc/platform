@@ -65,22 +65,35 @@ system_configuration:
                 tooltip: oro.user.system_configuration.fields.password_special_chars.tooltip
                 required: false
 
-        oro_user.days_before_change_enabled:
+        oro_user.password_change_period_enabled:
             data_type: boolean
             type: oro_config_checkbox
             priority: 99
             options:
                 required: false
-                label: oro.user.system_configuration.fields.days_before_change_enabled.label
-        oro_user.days_before_change:
+                label: oro.user.system_configuration.fields.password_change_period_enabled.label
+        oro_user.password_change_period:
             data_type: integer
             type: integer
             priority: 89
             options:
-                label: oro.user.system_configuration.fields.days_before_change.label
+                label: oro.user.system_configuration.fields.password_change_period.label
                 constraints:
                     - GreaterThan:
                         value: 0
+        oro_user.password_change_period_unit:
+            data_type: string
+            type: choice
+            priority: 88
+            options:
+                label: oro.user.system_configuration.fields.password_change_period_unit.label
+                required: true
+                constraints:
+                    - NotBlank: ~
+                choices:
+                    days: oro.user.system_configuration.fields.password_change_period_unit.choices.days
+                    weeks: oro.user.system_configuration.fields.password_change_period_unit.choices.weeks
+                    months: oro.user.system_configuration.fields.password_change_period_unit.choices.months
         oro_user.match_old_passwords_enabled:
             data_type: boolean
             type: oro_config_checkbox
@@ -119,7 +132,8 @@ system_configuration:
                                             - oro_user.password_special_chars
                                     mandatory_password_change:
                                         children:
-                                            - oro_user.days_before_change_enabled
-                                            - oro_user.days_before_change
+                                            - oro_user.password_change_period_enabled
+                                            - oro_user.password_change_period
+                                            - oro_user.password_change_period_unit
                                             - oro_user.match_old_passwords_enabled
                                             - oro_user.match_old_passwords_number
