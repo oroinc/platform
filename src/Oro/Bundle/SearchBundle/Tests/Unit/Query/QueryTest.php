@@ -246,7 +246,7 @@ class QueryTest extends \PHPUnit_Framework_TestCase
     {
         $query = new Query();
         $query->addSelect('text.foo as bar');
-        $query->addSelect('text.faa as bor');
+        $query->addSelect('faa as bor');
         $query->addSelect('text.bar');
 
         $aliases = $query->getSelectAliases();

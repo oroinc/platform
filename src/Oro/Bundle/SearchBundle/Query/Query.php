@@ -191,10 +191,12 @@ class Query
      */
     public function addSelect($fieldNames, $enforcedFieldType = null)
     {
-        foreach ((array)$fieldNames as $fieldName) {
-            $fieldName = $this->parseFieldAliasing($fieldName);
+        if ($fieldNames) {
+            foreach ((array)$fieldNames as $fieldName) {
+                $fieldName = $this->parseFieldAliasing($fieldName, $enforcedFieldType);
 
-            $this->addToSelect($fieldName, $enforcedFieldType);
+                $this->addToSelect($fieldName, $enforcedFieldType);
+            }
         }
 
         return $this;
@@ -716,18 +718,30 @@ class Query
     /**
      * Parse field name and check if there is an alias declared in it.
      *
-     * @param $field
+     * @param string $field
+     * @param string|null
      * @return string
      */
-    private function parseFieldAliasing($field)
+    private function parseFieldAliasing($field, $enforcedFieldType = null)
     {
         $part = strrev(trim($field));
         $part = preg_split('/ sa /im', $part, 2);
+
         if (count($part) > 1) {
             // splitting with ' ' and taking first word as a field name - does not allow spaces in field name
             $rev   = strrev($part[1]);
             $rev   = explode(' ', $rev);
             $field = array_shift($rev);
+
+            list($explodedType, $explodedName) = Criteria::explodeFieldTypeName($field);
+            if (!$explodedType) {
+                if ($enforcedFieldType) {
+                    $explodedType = $enforcedFieldType;
+                } else {
+                    $explodedType = self::TYPE_TEXT;
+                }
+            }
+            $field = Criteria::implodeFieldTypeName($explodedType, $explodedName);
 
             $alias = strrev($part[0]);
 
