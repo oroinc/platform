@@ -226,44 +226,26 @@ class TranslationManagerTest extends WebTestCase
 
     public function testFindAvailableDomainsForLocales()
     {
-        // TODO: skip load translations and remove unused domains
-        $this->assertEquals(
-            [
-                ['code' => LoadLanguages::LANGUAGE2, 'domain' => 'HWIOAuthBundle'],
-                ['code' => LoadLanguages::LANGUAGE2, 'domain' => 'entities'],
-                ['code' => LoadLanguages::LANGUAGE2, 'domain' => 'install'],
-                ['code' => LoadLanguages::LANGUAGE2, 'domain' => 'jsmessages'],
-                ['code' => LoadLanguages::LANGUAGE2, 'domain' => 'maintenance'],
-                ['code' => LoadLanguages::LANGUAGE2, 'domain' => 'messages'],
-                ['code' => LoadLanguages::LANGUAGE2, 'domain' => 'security'],
-                ['code' => LoadLanguages::LANGUAGE2, 'domain' => LoadTranslations::TRANSLATION_KEY_DOMAIN],
-                ['code' => LoadLanguages::LANGUAGE2, 'domain' => 'tooltips'],
-                ['code' => LoadLanguages::LANGUAGE2, 'domain' => 'validators'],
-                ['code' => LoadLanguages::LANGUAGE2, 'domain' => 'workflows'],
-            ],
-            $this->manager->findAvailableDomainsForLocales([LoadLanguages::LANGUAGE2])
-        );
+        $domains = [];
+
+        /* @var $repository TranslationKeyRepository */
+        $repository = $this->getRepository(TranslationKey::class);
+        foreach ($repository->findAvailableDomains() as $domain) {
+            $domains[] = [
+                'code' => LoadLanguages::LANGUAGE2,
+                'domain' => $domain
+            ];
+        }
+
+        $this->assertEquals($domains, $this->manager->findAvailableDomainsForLocales([LoadLanguages::LANGUAGE2]));
     }
 
     public function testGetAvailableDomains()
     {
-        // TODO: skip load translations and remove unused domains
-        $this->assertEquals(
-            [
-                LoadTranslations::TRANSLATION_KEY_DOMAIN => LoadTranslations::TRANSLATION_KEY_DOMAIN,
-                'messages' => 'messages',
-                'jsmessages' => 'jsmessages',
-                'validators' => 'validators',
-                'security' => 'security',
-                'entities' => 'entities',
-                'HWIOAuthBundle' => 'HWIOAuthBundle',
-                'maintenance' => 'maintenance',
-                'tooltips' => 'tooltips',
-                'workflows' => 'workflows',
-                'install' => 'install',
-            ],
-            $this->manager->getAvailableDomains()
-        );
+        $domains = $this->manager->getAvailableDomains();
+
+        $this->assertContains('test_domain', $domains);
+        $this->assertGreaterThanOrEqual(1, count($domains));
     }
 
     /**

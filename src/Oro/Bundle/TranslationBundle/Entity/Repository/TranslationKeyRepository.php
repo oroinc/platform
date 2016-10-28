@@ -26,8 +26,7 @@ class TranslationKeyRepository extends EntityRepository
     {
         $qb = $this->createQueryBuilder('k')
             ->distinct(true)
-            ->select('k.domain')
-            ->orderBy('k.domain', 'asc');
+            ->select('k.domain');
 
         $data = array_values(array_column($qb->getQuery()->getArrayResult(), 'domain'));
 
