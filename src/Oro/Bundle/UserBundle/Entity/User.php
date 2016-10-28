@@ -429,7 +429,7 @@ class User extends ExtendUser implements
     /**
      * @var \DateTime $createdAt
      *
-     * @ORM\Column(type="datetime")
+     * @ORM\Column(name="password_expires_at", type="datetime")
      * @ConfigField(
      *      defaultValues={
      *          "entity"={
