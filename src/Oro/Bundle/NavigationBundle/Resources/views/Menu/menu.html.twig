@@ -137,7 +137,7 @@
     {% endif -%}
     {% if options.allow_safe_labels and item.getExtra('safe_label', false) %}
         {{- item.label|trans|raw -}}
-    {% elseif item.getExtra('translateDisabled', false) == false %}
+    {% elseif item.getExtra('translate_disabled', false) == false %}
         {{- item.label|trans(item.getExtra('translateParams', {}), item.getExtra('translateDomain', 'messages'))|title -}}
     {% else %}
         {{- item.label|title -}}
