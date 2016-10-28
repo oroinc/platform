@@ -111,7 +111,7 @@ class IntegrationTypeSelectType extends AbstractType
     {
         $choices = [];
         foreach ($this->getAvailableIntegrationTypes() as $typeName => $data) {
-            $choices[$typeName] = $data['label'];
+            $choices[$data['label']] = $typeName;
         }
 
         return $choices;
@@ -127,7 +127,7 @@ class IntegrationTypeSelectType extends AbstractType
     protected function getChoiceAttributes($typeName)
     {
         $attributes = [];
-        $data       = $this->itemsCache[$typeName];
+        $data       = !empty($this->itemsCache[$typeName]) ? $this->itemsCache[$typeName] : [];
         if (!empty($data['icon'])) {
             $attributes['data-icon'] = $this->assetHelper->getUrl($data['icon']);
         }

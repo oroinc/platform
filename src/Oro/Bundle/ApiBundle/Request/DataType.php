@@ -22,10 +22,27 @@ final class DataType
     const ORDER_BY         = 'orderBy';
 
     /**
-     * Checks whether the association should be represented as a field.
+     * Checks whether the field represents a nested object.
+     *
+     * @param string $dataType
+     *
+     * @return bool
+     */
+    public static function isNestedObject($dataType)
+    {
+        return 'nestedObject' === $dataType;
+    }
+
+    /**
+     * Checks whether an association should be represented as a field.
      * For JSON.API it means that it should be in "attributes" section instead of "relationships" section.
-     * Usually, to increase readability, "array" data type is used for "to-many" associations
-     * and "scalar" data type is used for "to-one" associations.
+     * Usually, to increase readability, "array" data-type is used for "to-many" associations
+     * and "object" or "scalar" data-type is used for "to-one" associations.
+     * The "object" is usually used if a value of such field contains several properties.
+     * The "scalar" is usually used if a value of such field contains a scalar value.
+     * Also "nested" data-type, that is used to group several fields in one object, is classified
+     * as an association that should be represented as a field because the behaviour
+     * of the nested object is the same.
      *
      * @param string $dataType
      *
@@ -33,7 +50,11 @@ final class DataType
      */
     public static function isAssociationAsField($dataType)
     {
-        return in_array($dataType, ['array', 'scalar'], true);
+        return in_array(
+            $dataType,
+            ['array', 'object', 'scalar', 'nestedObject'],
+            true
+        );
     }
 
     /**

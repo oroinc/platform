@@ -9,8 +9,16 @@ use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
 use Oro\Bundle\NavigationBundle\Model\ExtendMenuUpdate;
 
 /**
- * @ORM\Entity(repositoryClass="Oro\Bundle\NavigationBundle\Entity\Repository\MenuUpdateRepository")
- * @ORM\Table(name="oro_navigation_menu_upd")
+ * @ORM\Entity
+ * @ORM\Table(
+ *      name="oro_navigation_menu_upd",
+ *      uniqueConstraints={
+ *          @ORM\UniqueConstraint(
+ *              name="oro_navigation_menu_upd_uidx",
+ *              columns={"key", "ownership_type", "owner_id"}
+ *          )
+ *      }
+ * )
  * @ORM\AssociationOverrides({
  *      @ORM\AssociationOverride(
  *          name="titles",
@@ -32,22 +40,43 @@ use Oro\Bundle\NavigationBundle\Model\ExtendMenuUpdate;
  *                  )
  *              }
  *          )
+ *      ),
+ *      @ORM\AssociationOverride(
+ *          name="descriptions",
+ *          joinTable=@ORM\JoinTable(
+ *              name="oro_navigation_menu_upd_descr",
+ *              joinColumns={
+ *                  @ORM\JoinColumn(
+ *                      name="menu_update_id",
+ *                      referencedColumnName="id",
+ *                      onDelete="CASCADE"
+ *                  )
+ *              },
+ *              inverseJoinColumns={
+ *                  @ORM\JoinColumn(
+ *                      name="localized_value_id",
+ *                      referencedColumnName="id",
+ *                      onDelete="CASCADE",
+ *                      unique=true
+ *                  )
+ *              }
+ *          )
  *      )
  * })
  * @Config(
+ *      routeName="oro_navigation_menu_update_index",
  *      defaultValues={
  *          "entity"={
  *              "icon"="icon-th"
  *          }
  *      }
  * )
+ * @ORM\HasLifecycleCallbacks()
  */
 class MenuUpdate extends ExtendMenuUpdate implements
     MenuUpdateInterface
 {
     use MenuUpdateTrait;
-    
-    const OWNERSHIP_USER            = 3;
 
     /**
      * {@inheritdoc}
@@ -57,6 +86,7 @@ class MenuUpdate extends ExtendMenuUpdate implements
         parent::__construct();
 
         $this->titles = new ArrayCollection();
+        $this->descriptions = new ArrayCollection();
     }
 
     /**
@@ -64,10 +94,17 @@ class MenuUpdate extends ExtendMenuUpdate implements
      */
     public function getExtras()
     {
-        $extras = [];
+        $extras = [
+            'divider' => $this->isDivider(),
+            'translateDisabled' => $this->getId() ? true : false
+        ];
 
         if ($this->getPriority() !== null) {
             $extras['position'] = $this->getPriority();
+        }
+
+        if ($this->getIcon() !== null) {
+            $extras['icon'] = $this->getIcon();
         }
 
         return $extras;
