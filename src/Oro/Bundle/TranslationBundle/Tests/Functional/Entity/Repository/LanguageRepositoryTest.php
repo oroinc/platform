@@ -4,10 +4,17 @@ namespace Oro\Bundle\TranslationBundle\Tests\Functional\Entity\Repository;
 
 use Doctrine\ORM\EntityManager;
 
+use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
+
+use Oro\Bundle\SecurityBundle\Authentication\Token\UsernamePasswordOrganizationToken;
+
+use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Bundle\TranslationBundle\Entity\Language;
 use Oro\Bundle\TranslationBundle\Entity\Repository\LanguageRepository;
+use Oro\Bundle\TranslationBundle\Migrations\Data\Demo\ORM\LoadTranslationUsers;
 use Oro\Bundle\TranslationBundle\Tests\Functional\DataFixtures\LoadLanguages;
+use Oro\Bundle\UserBundle\Entity\User;
 
 /**
  * @dbIsolation
@@ -31,6 +38,14 @@ class LanguageRepositoryTest extends WebTestCase
 
         $this->em = $this->getContainer()->get('doctrine')->getManagerForClass(Language::class);
         $this->repository = $this->em->getRepository(Language::class);
+
+        $userRepository = $this->getContainer()->get('doctrine')->getManagerForClass(User::class)
+            ->getRepository(User::class);
+
+        $user = $repo->findOneBy(['username' => LoadTranslationUsers::TRANSLATOR_USERNAME]);
+
+        $token = new UsernamePasswordOrganizationToken($user, false, 'k', $user->getOrganization(), $user->getRoles());
+        $this->client->getContainer()->get('security.token_storage')->setToken($token);
     }
 
     public function testGetAvailableLanguageCodes()
@@ -56,6 +71,14 @@ class LanguageRepositoryTest extends WebTestCase
 
     public function testGetAvailableLanguagesByCurrentUser()
     {
-        // TODO: implement it
+        /* @var $aclHelper AclHelper */
+        $aclHelper = $this->getContainer()->get('oro_security.acl_helper');
+
+        $this->assertEquals(
+            [
+                $this->getReference(LoadLanguages::LANGUAGE3)
+            ],
+            $this->repository->getAvailableLanguagesByCurrentUser($aclHelper)
+        );
     }
 }
