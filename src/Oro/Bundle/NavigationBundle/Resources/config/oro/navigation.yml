@@ -34,13 +34,13 @@ navigation:
                 label: 'oro.navigation.menu.pinbar.label'
                 extras:
                     icon: 'icon-folder-close'
-                    maxItems: 10
+                    max_items: 10
                 uri: '#'
             history:
                 label: 'oro.navigation.menu.history.label'
                 extras:
                     icon: 'icon-time'
-                    activeIfFirstIsEmpty: true
+                    active_if_first_is_empty: true
                 uri: '#'
             favorite:
                 label: 'oro.navigation.menu.favorite.label'

@@ -30,7 +30,7 @@ class Configuration implements ConfigurationInterface
         SettingsBuilder::append(
             $rootNode,
             [
-                'maxItems'        => ['value' => 20],
+                'max_items'       => ['value' => 20],
                 'title_suffix'    => ['value' => ''],
                 'title_delimiter' => ['value' => '-'],
                 'breadcrumb_menu' => ['value' => 'application_menu'],
