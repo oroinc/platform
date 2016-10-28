@@ -180,6 +180,14 @@ class RestDocumentBuilder extends AbstractDocumentBuilder
     }
 
     /**
+     * @param array $object
+     */
+    protected function addRelatedObject(array $object)
+    {
+        throw new \LogicException('The included objects are not supported by this document.');
+    }
+
+    /**
      * {@inheritdoc}
      */
     protected function hasIdentifierFieldsOnly(EntityMetadata $metadata)

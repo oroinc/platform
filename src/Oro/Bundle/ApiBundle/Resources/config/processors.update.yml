@@ -249,6 +249,13 @@ services:
         tags:
             - { name: oro.api.processor, action: update, group: normalize_data, priority: -10 }
 
+    oro_api.update.load_normalized_included_objects:
+        class: Oro\Bundle\ApiBundle\Processor\Shared\LoadNormalizedIncludedObjects
+        arguments:
+            - '@oro_api.action_processor_bag'
+        tags:
+            - { name: oro.api.processor, action: update, group: normalize_data, priority: -50 }
+
     #
     # normalize_result
     #
@@ -299,13 +306,18 @@ services:
             - { name: oro.api.processor, action: update, group: normalize_result, requestType: json_api, priority: -55 }
             - { name: monolog.logger, channel: api }
 
-    oro_api.update.process_errors:
-        class: Oro\Bundle\ApiBundle\Processor\Shared\ProcessErrors
+    oro_api.update.add_included_objects_to_result_document:
+        class: Oro\Bundle\ApiBundle\Processor\Shared\AddIncludedObjectsToResultDocument
         tags:
             - { name: oro.api.processor, action: update, group: normalize_result, priority: -100 }
 
     oro_api.update.set_result_document:
         class: Oro\Bundle\ApiBundle\Processor\Shared\SetResultDocument
+        tags:
+            - { name: oro.api.processor, action: update, group: normalize_result, priority: -150 }
+
+    oro_api.update.process_errors:
+        class: Oro\Bundle\ApiBundle\Processor\Shared\ProcessErrors
         tags:
             - { name: oro.api.processor, action: update, group: normalize_result, priority: -190 }
 

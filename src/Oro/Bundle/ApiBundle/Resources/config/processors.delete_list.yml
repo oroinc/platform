@@ -238,13 +238,13 @@ services:
             - { name: oro.api.processor, action: delete_list, group: normalize_result, requestType: json_api, priority: -55 }
             - { name: monolog.logger, channel: api }
 
-    oro_api.delete_list.process_errors:
-        class: Oro\Bundle\ApiBundle\Processor\Shared\ProcessErrors
-        tags:
-            - { name: oro.api.processor, action: delete_list, group: normalize_result, priority: -100 }
-
     oro_api.delete_list.set_result_document:
         class: Oro\Bundle\ApiBundle\Processor\Shared\SetResultDocument
+        tags:
+            - { name: oro.api.processor, action: delete_list, group: normalize_result, priority: -150 }
+
+    oro_api.delete_list.process_errors:
+        class: Oro\Bundle\ApiBundle\Processor\Shared\ProcessErrors
         tags:
             - { name: oro.api.processor, action: delete_list, group: normalize_result, priority: -190 }
 

@@ -272,13 +272,13 @@ services:
             - { name: oro.api.processor, action: update_relationship, group: normalize_result, collection: false, requestType: json_api, priority: -55 }
             - { name: monolog.logger, channel: api }
 
-    oro_api.update_relationship.process_errors:
-        class: Oro\Bundle\ApiBundle\Processor\Shared\ProcessErrors
-        tags:
-            - { name: oro.api.processor, action: update_relationship, group: normalize_result, priority: -100 }
-
     oro_api.update_relationship.set_result_document:
         class: Oro\Bundle\ApiBundle\Processor\Shared\SetResultDocument
+        tags:
+            - { name: oro.api.processor, action: update_relationship, group: normalize_result, priority: -150 }
+
+    oro_api.update_relationship.process_errors:
+        class: Oro\Bundle\ApiBundle\Processor\Shared\ProcessErrors
         tags:
             - { name: oro.api.processor, action: update_relationship, group: normalize_result, priority: -190 }
 
