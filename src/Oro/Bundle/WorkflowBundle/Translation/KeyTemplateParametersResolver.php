@@ -6,6 +6,7 @@ use Symfony\Component\Translation\TranslatorInterface;
 
 use Oro\Bundle\TranslationBundle\Translation\TranslationKeyTemplateInterface;
 
+use Oro\Bundle\WorkflowBundle\Helper\WorkflowTranslationHelper;
 use Oro\Bundle\WorkflowBundle\Translation\KeyTemplate\StepLabelTemplate;
 use Oro\Bundle\WorkflowBundle\Translation\KeyTemplate\TransitionAttributeLabelTemplate;
 use Oro\Bundle\WorkflowBundle\Translation\KeyTemplate\TransitionLabelTemplate;
@@ -14,8 +15,6 @@ use Oro\Bundle\WorkflowBundle\Translation\KeyTemplate\WorkflowLabelTemplate;
 
 class KeyTemplateParametersResolver
 {
-    const TRANSLATION_DOMAIN = 'workflows';
-
     /** @var TranslatorInterface */
     protected $translator;
 
@@ -73,7 +72,7 @@ class KeyTemplateParametersResolver
         $resolved[$template->getKeyTemplate($template->getName())] = $this->translator->trans(
             $templateKey,
             [],
-            self::TRANSLATION_DOMAIN
+            WorkflowTranslationHelper::TRANSLATION_DOMAIN
         );
     }
 }

@@ -2,14 +2,14 @@
 
 namespace Oro\Bundle\WorkflowBundle\Form\Type;
 
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Exception\InvalidConfigurationException;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 use Symfony\Component\OptionsResolver\Options;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\PropertyAccess\PropertyPath;
-use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
+use Symfony\Component\Translation\TranslatorInterface;
 
 use Oro\Bundle\ActionBundle\Model\Attribute;
 use Oro\Bundle\ActionBundle\Model\AttributeGuesser;
@@ -17,6 +17,7 @@ use Oro\Bundle\SecurityBundle\Util\PropertyPathSecurityHelper;
 use Oro\Bundle\WorkflowBundle\Form\EventListener\DefaultValuesListener;
 use Oro\Bundle\WorkflowBundle\Form\EventListener\FormInitListener;
 use Oro\Bundle\WorkflowBundle\Form\EventListener\RequiredAttributesListener;
+use Oro\Bundle\WorkflowBundle\Helper\WorkflowTranslationHelper;
 use Oro\Bundle\WorkflowBundle\Model\Workflow;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowData;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowRegistry;
@@ -69,6 +70,11 @@ class WorkflowAttributesType extends AbstractType
     protected $propertyPathSecurityHelper;
 
     /**
+     * @var TranslatorInterface
+     */
+    protected $translator;
+
+    /**
      * @param WorkflowRegistry $workflowRegistry
      * @param AttributeGuesser $attributeGuesser ,
      * @param DefaultValuesListener $defaultValuesListener
@@ -76,7 +82,8 @@ class WorkflowAttributesType extends AbstractType
      * @param RequiredAttributesListener $requiredAttributesListener
      * @param ContextAccessor $contextAccessor
      * @param EventDispatcherInterface $dispatcher
-     * @param AuthorizationCheckerInterface $authorizationChecker
+     * @param PropertyPathSecurityHelper $propertyPathSecurityHelper
+     * @param TranslatorInterface $translator
      */
     public function __construct(
         WorkflowRegistry $workflowRegistry,
@@ -86,7 +93,8 @@ class WorkflowAttributesType extends AbstractType
         RequiredAttributesListener $requiredAttributesListener,
         ContextAccessor $contextAccessor,
         EventDispatcherInterface $dispatcher,
-        PropertyPathSecurityHelper $propertyPathSecurityHelper
+        PropertyPathSecurityHelper $propertyPathSecurityHelper,
+        TranslatorInterface $translator
     ) {
         $this->workflowRegistry = $workflowRegistry;
         $this->attributeGuesser = $attributeGuesser;
@@ -96,6 +104,7 @@ class WorkflowAttributesType extends AbstractType
         $this->contextAccessor = $contextAccessor;
         $this->dispatcher = $dispatcher;
         $this->propertyPathSecurityHelper = $propertyPathSecurityHelper;
+        $this->translator = $translator;
     }
 
     /**
@@ -268,9 +277,23 @@ class WorkflowAttributesType extends AbstractType
         }
 
         // update form label
-        $attributeOptions['options']['label'] = isset($attributeOptions['label'])
-            ? $attributeOptions['label']
-            : $attribute->getLabel();
+        if (isset($attributeOptions['label'])) {
+            $attributeOptions['options']['label'] = $attributeOptions['label'];
+        } elseif (isset($attributeOptions['options']['label'])) {
+            if (is_array($attributeOptions['options']['label'])) {
+                $attributeOptions['options']['label'] = array_shift($attributeOptions['options']['label']);
+            }
+
+            $domain = WorkflowTranslationHelper::TRANSLATION_DOMAIN;
+            $label = $attributeOptions['options']['label'];
+            if ($this->translator->trans($label, [], $domain) === $label) {
+                $attributeOptions['options']['label'] = $attribute->getLabel();
+            } else {
+                $attributeOptions['options']['translation_domain'] = $domain;
+            }
+        } else {
+            $attributeOptions['options']['label'] = $attribute->getLabel();
+        }
 
         // update required option
         if (!array_key_exists('required', $attributeOptions['options'])) {

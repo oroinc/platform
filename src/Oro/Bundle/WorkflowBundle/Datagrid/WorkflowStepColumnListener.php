@@ -28,8 +28,8 @@ class WorkflowStepColumnListener extends AbstractDatagridListener
 
     const WORKFLOW_STEP_COLUMN = 'workflowStepLabel';
 
-    const WORKFLOW_FILTER = 'workflowStepLableByWorkflow';
-    const WORKFLOW_STEP_FILTER = 'workflowStepLableByWorkflowStep';
+    const WORKFLOW_FILTER = 'workflowStepLabelByWorkflow';
+    const WORKFLOW_STEP_FILTER = 'workflowStepLabelByWorkflowStep';
 
     /**
      * @var ConfigProvider

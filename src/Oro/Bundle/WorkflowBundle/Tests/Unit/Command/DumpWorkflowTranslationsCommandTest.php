@@ -12,6 +12,7 @@ use Oro\Bundle\TranslationBundle\Translation\Translator;
 
 use Oro\Bundle\WorkflowBundle\Command\DumpWorkflowTranslationsCommand;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
+use Oro\Bundle\WorkflowBundle\Helper\WorkflowTranslationHelper;
 use Oro\Bundle\WorkflowBundle\Model\Workflow;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowManager;
 
@@ -142,7 +143,7 @@ class DumpWorkflowTranslationsCommandTest extends \PHPUnit_Framework_TestCase
 
         $this->workflow->expects($this->once())->method('getDefinition')->willReturn($definition);
 
-        $domain = DumpWorkflowTranslationsCommand::TRANSLATION_DOMAIN;
+        $domain = WorkflowTranslationHelper::TRANSLATION_DOMAIN;
         $defaultLocale = Translation::DEFAULT_LOCALE;
 
         $this->translator->expects($this->any())
