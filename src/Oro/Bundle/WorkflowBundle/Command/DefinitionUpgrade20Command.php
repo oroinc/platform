@@ -18,6 +18,9 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Logger\ConsoleLogger;
 use Symfony\Component\Console\Output\OutputInterface;
 
+/**
+ * @SuppressWarnings(CouplingBetweenObjects)
+ */
 class DefinitionUpgrade20Command extends ContainerAwareCommand
 {
     const NAME = 'oro:workflow:definitions:upgrade20';
