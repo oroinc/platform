@@ -3,13 +3,6 @@ Oro\Bundle\OrganizationBundle\Entity\BusinessUnit:
     name: Common Business Unit
     organization: '@organization'
 
-Oro\Bundle\CalendarBundle\Entity\CalendarEvent:
-  calendarEvent:
-    title: Common Event
-    start: <dateTimeThisYear('now')>
-    end: <dateTimeThisYear('now')>
-    allDay: false
-
 Oro\Bundle\ReportBundle\Entity\ReportType:
   reportType:
     __construct: ['Common report type']

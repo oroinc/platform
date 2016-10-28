@@ -23,6 +23,7 @@
         "components/jqueryui": "1.11.2",
         "bower-asset/select2": "3.4.1",
         "bower-asset/chaplin": "1.0.0",
+        "bower-asset/jquery-form": "3.37.0",
         "bower-asset/jquery-cookie": "1.4.1",
         "bower-asset/crypto-js": "3.1.7",
         "bower-asset/jquery-mousewheel": "3.1.13",
