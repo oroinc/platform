@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\WorkflowBundle\Model;
 
+use Oro\Bundle\ActionBundle\Model\Attribute;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Translation\TranslatorInterface;
 
