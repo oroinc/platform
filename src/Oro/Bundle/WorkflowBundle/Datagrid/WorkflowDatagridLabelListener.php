@@ -19,14 +19,24 @@ use Oro\Bundle\WorkflowBundle\Helper\WorkflowTranslationHelper;
  */
 class WorkflowDatagridLabelListener
 {
-    /**
-     * @var TranslatorInterface
-     */
+    /** @var array */
+    protected static $columns = [
+        WorkflowStep::class => [
+            'pk' => 'id',
+            'defaultLabel' => 'oro.workflow.workflowstep.grid.label',
+            'form' => WorkflowStepSelectType::NAME
+        ],
+        WorkflowDefinition::class => [
+            'pk' => 'name',
+            'defaultLabel' => 'oro.workflow.workflowdefinition.grid.column.label',
+            'form' => WorkflowDefinitionSelectType::NAME
+        ]
+    ];
+
+    /** @var TranslatorInterface */
     protected $translator;
 
-    /**
-     * @param TranslatorInterface $translator
-     */
+    /** @param TranslatorInterface $translator */
     public function __construct(TranslatorInterface $translator)
     {
         $this->translator = $translator;
@@ -39,18 +49,20 @@ class WorkflowDatagridLabelListener
     {
         $configuration = $event->getConfig();
         $columns = $this->getWorkflowLabelColumns($configuration);
-        if (count($columns[WorkflowStep::class])) {
-            foreach ($columns[WorkflowStep::class] as $columnName) {
-                $this->fixColumnDefinition($columnName, $configuration);
-                $this->fixStepNameFilter($columnName, $configuration);
-                $this->fixColumnSorter($columnName, $configuration);
-            }
-        }
-        if (count($columns[WorkflowDefinition::class])) {
-            foreach ($columns[WorkflowDefinition::class] as $columnName) {
-                $this->fixColumnDefinition($columnName, $configuration);
-                $this->fixDefinitionNameFilter($columnName, $configuration);
-                $this->fixColumnSorter($columnName, $configuration);
+
+        foreach (self::$columns as $class => $config) {
+            if (count($columns[$class])) {
+                foreach ($columns[$class] as $columnName) {
+                    $this->updateColumnDefinition($configuration, $columnName);
+                    $this->updateColumnFilter(
+                        $configuration,
+                        $columnName,
+                        $config['pk'],
+                        $config['defaultLabel'],
+                        $config['form']
+                    );
+                    $this->updateColumnSorter($configuration, $columnName);
+                }
             }
         }
     }
@@ -96,10 +108,10 @@ class WorkflowDatagridLabelListener
     }
 
     /**
-     * @param $columnName
      * @param DatagridConfiguration $configuration
+     * @param string $columnName
      */
-    private function fixColumnDefinition($columnName, DatagridConfiguration $configuration)
+    private function updateColumnDefinition(DatagridConfiguration $configuration, $columnName)
     {
         $path = sprintf('[columns][%s]', $columnName);
         $column = $configuration->offsetGetByPath($path);
@@ -111,22 +123,25 @@ class WorkflowDatagridLabelListener
     }
 
     /**
-     * @param $columnName
      * @param DatagridConfiguration $configuration
+     * @param string $columnName
+     * @param string $pk
+     * @param string $defaultLabel
+     * @param string $form
      */
-    private function fixStepNameFilter($columnName, DatagridConfiguration $configuration)
+    private function updateColumnFilter(DatagridConfiguration $configuration, $columnName, $pk, $defaultLabel, $form)
     {
         $filters = $configuration->offsetGetByPath('[filters][columns]');
         $label = $configuration->offsetGetByPath(sprintf('[columns][%s][label]', $columnName));
-        $label = $label ?: 'oro.workflow.workflowstep.grid.label';
+        $label = $label ?: $defaultLabel;
         if (isset($filters[$columnName])) {
             $tableAlias = $this->getTableAliasForColumnName($columnName, $configuration);
             $filters[$columnName] = [
                 'label' => $label,
                 'type' => 'entity',
-                'data_name' => $tableAlias . '.id',
+                'data_name' => $tableAlias . '.' . $pk,
                 'options' => [
-                    'field_type' => WorkflowStepSelectType::NAME,
+                    'field_type' => $form,
                     'field_options' => [
                         'workflow_entity_class' => $this->getRootEntityClass($configuration),
                         'multiple' => true
@@ -138,37 +153,10 @@ class WorkflowDatagridLabelListener
     }
 
     /**
-     * @param $columnName
      * @param DatagridConfiguration $configuration
+     * @param string $columnName
      */
-    private function fixDefinitionNameFilter($columnName, DatagridConfiguration $configuration)
-    {
-        $filters = $configuration->offsetGetByPath('[filters][columns]');
-        $label = $configuration->offsetGetByPath(sprintf('[columns][%s][label]', $columnName));
-        $label = $label ?: 'oro.workflow.workflowdefinition.grid.column.label';
-        if (isset($filters[$columnName])) {
-            $tableAlias = $this->getTableAliasForColumnName($columnName, $configuration);
-            $filters[$columnName] = [
-                'label' => $label,
-                'type' => 'entity',
-                'data_name' => $tableAlias . '.name',
-                'options' => [
-                    'field_type' => WorkflowDefinitionSelectType::NAME,
-                    'field_options' => [
-                        'workflow_entity_class' => $this->getRootEntityClass($configuration),
-                        'multiple' => true
-                    ]
-                ]
-            ];
-        }
-        $configuration->offsetSetByPath('[filters][columns]', $filters);
-    }
-
-    /**
-     * @param $columnName
-     * @param DatagridConfiguration $configuration
-     */
-    private function fixColumnSorter($columnName, DatagridConfiguration $configuration)
+    private function updateColumnSorter(DatagridConfiguration $configuration, $columnName)
     {
         $sorters = $configuration->offsetGetByPath('[sorters][columns]');
         if (isset($sorters[$columnName])) {
