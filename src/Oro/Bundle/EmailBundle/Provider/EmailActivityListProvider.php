@@ -357,11 +357,6 @@ class EmailActivityListProvider implements
         return $this->commentAssociationHelper->isCommentAssociationEnabled($entityClass);
     }
 
-    public function isEnabled()
-    {
-        return $this->isFeaturesEnabled();
-    }
-
     /**
      * {@inheritdoc}
      */
