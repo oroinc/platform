@@ -186,6 +186,14 @@ class LayoutDataCollector extends DataCollector
             return get_class($optionValue);
         }
 
+        if (is_scalar($optionValue)) {
+            return $optionValue;
+        }
+
+        if ($optionValue === null) {
+            return 'null';
+        }
+
         return (string) $optionValue;
     }
 
