@@ -72,6 +72,30 @@ class DatagridDataConverter implements DataConverterInterface, ContextAwareInter
      */
     public function convertToExportFormat(array $exportedRecord, $skipNullValues = true)
     {
+        $columns = $this->getGridColumns();
+
+        $result = [];
+        foreach ($columns as $columnName => $column) {
+            if (isset($column['renderable']) && false === $column['renderable']) {
+                continue;
+            }
+
+            $val  = isset($exportedRecord[$columnName]) ? $exportedRecord[$columnName] : null;
+            $val  = $this->applyFrontendFormatting($val, $column);
+            $label = isset($result[$column['label']]) ?
+                sprintf('%s_%s', $column['label'], $columnName) :
+                $column['label'];
+            $result[$this->translator->trans($label)] = $val;
+        }
+
+        return $result;
+    }
+
+    /**
+     * @return array|mixed
+     */
+    protected function getGridColumns()
+    {
         if ($this->context->getValue('columns')) {
             $columns = $this->context->getValue('columns');
         } elseif ($this->context->hasOption('gridName')) {
@@ -92,21 +116,7 @@ class DatagridDataConverter implements DataConverterInterface, ContextAwareInter
             }
         }
 
-        $result = [];
-        foreach ($columns as $columnName => $column) {
-            if (isset($column['renderable']) && false === $column['renderable']) {
-                continue;
-            }
-
-            $val  = isset($exportedRecord[$columnName]) ? $exportedRecord[$columnName] : null;
-            $val  = $this->applyFrontendFormatting($val, $column);
-            $label = isset($result[$column['label']]) ?
-                sprintf('%s_%s', $column['label'], $columnName) :
-                $column['label'];
-            $result[$this->translator->trans($label)] = $val;
-        }
-
-        return $result;
+        return $columns;
     }
 
     /**
