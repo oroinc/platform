@@ -55,7 +55,7 @@ class TranslationManager
      *
      * @return Translation
      */
-    public function createValue(
+    public function createTranslation(
         $key,
         $value,
         $locale,
@@ -93,10 +93,8 @@ class TranslationManager
      *
      * @return Translation|null
      */
-    public function saveValue($key, $value, $locale, $domain = self::DEFAULT_DOMAIN, $scope = Translation::SCOPE_SYSTEM)
+    public function saveTranslation($key, $value, $locale, $domain = self::DEFAULT_DOMAIN, $scope = Translation::SCOPE_SYSTEM)
     {
-        // TODO: rename to saveTranslation
-
         /** @var TranslationRepository $repo */
         $repo = $this->getEntityRepository(Translation::class);
 
@@ -115,7 +113,7 @@ class TranslationManager
         }
 
         if ($value && null === $translation) {
-            $translation = $this->createValue($key, $value, $locale, $domain, true);
+            $translation = $this->createTranslation($key, $value, $locale, $domain, true);
         }
 
         if (null !== $translation) {

@@ -126,7 +126,7 @@ class LoadWorkflowTranslations extends AbstractFixture implements DependentFixtu
     {
         $translationManager = $this->getTranslationManager();
 
-        return $translationManager->saveValue(
+        return $translationManager->saveTranslation(
             $key,
             $value,
             $locale,

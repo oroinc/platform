@@ -144,6 +144,12 @@ class WorkflowTranslationHelper
      */
     private function saveValue($key, $value, $locale = Translator::DEFAULT_LOCALE)
     {
-        $this->translationManager->saveValue($key, $value, $locale, self::TRANSLATION_DOMAIN, Translation::SCOPE_UI);
+        $this->translationManager->saveTranslation(
+            $key,
+            $value,
+            $locale,
+            self::TRANSLATION_DOMAIN,
+            Translation::SCOPE_UI
+        );
     }
 }

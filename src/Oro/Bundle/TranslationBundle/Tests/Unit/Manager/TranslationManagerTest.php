@@ -123,11 +123,11 @@ class TranslationManagerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @dataProvider createValueDataProvider
+     * @dataProvider createTranslationDataProvider
      *
      * @param bool $persist
      */
-    public function testCreateValue($persist = false)
+    public function testCreateTranslation($persist = false)
     {
         $key = 'key';
         $value = 'value';
@@ -146,8 +146,8 @@ class TranslationManagerTest extends \PHPUnit_Framework_TestCase
 
         $this->objectManager->expects($persist ? $this->atLeastOnce() : $this->never())->method('persist');
 
-        $translation1 = $this->manager->createValue($key, $value, $locale, $domain, $persist);
-        $translation2 = $this->manager->createValue($key, $value, $locale, $domain, $persist);
+        $translation1 = $this->manager->createTranslation($key, $value, $locale, $domain, $persist);
+        $translation2 = $this->manager->createTranslation($key, $value, $locale, $domain, $persist);
 
         $this->assertInstanceOf(Translation::class, $translation1);
         $this->assertSame($translation1, $translation2);
@@ -156,7 +156,7 @@ class TranslationManagerTest extends \PHPUnit_Framework_TestCase
     /**
      * @return array
      */
-    public function createValueDataProvider()
+    public function createTranslationDataProvider()
     {
         return [
             ['persist' => true],
@@ -172,7 +172,7 @@ class TranslationManagerTest extends \PHPUnit_Framework_TestCase
         $this->languageRepository->expects($this->any())
             ->method('findOneBy')->willReturn((new Language())->setCode('locale'));
 
-        $translation = $this->manager->createValue('key', 'value', 'locale', 'domain');
+        $translation = $this->manager->createTranslation('key', 'value', 'locale', 'domain');
 
         $this->objectManager->expects($this->once())->method('flush')->with([$translation]);
         $this->manager->flush();

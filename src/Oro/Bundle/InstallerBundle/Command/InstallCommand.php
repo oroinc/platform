@@ -59,8 +59,7 @@ class InstallCommand extends AbstractCommand implements InstallCommandInterface
                 null,
                 InputOption::VALUE_NONE,
                 'Database will be dropped and all data will be deleted.'
-            )
-            ->addOption('skip-load-translations', null, InputOption::VALUE_NONE, 'Skip load translations into DB.');
+            );
 
         parent::configure();
     }
@@ -530,11 +529,8 @@ class InstallCommand extends AbstractCommand implements InstallCommandInterface
             $assetsOptions['--symlink'] = true;
         }
 
-        if (!$input->hasOption('skip-load-translations') || !$input->getOption('skip-load-translations')) {
-            $commandExecutor->runCommand('oro:translation:load', ['--process-isolation' => true]);
-        }
-
         $commandExecutor
+            ->runCommand('oro:translation:load', ['--process-isolation' => true])
             ->runCommand(
                 'oro:navigation:init',
                 array(
