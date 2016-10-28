@@ -530,7 +530,7 @@ class InstallCommand extends AbstractCommand implements InstallCommandInterface
             $assetsOptions['--symlink'] = true;
         }
 
-        if (!$input->hasOption('skip-load-translations') || !$input->hasOption('skip-load-translations')) {
+        if (!$input->hasOption('skip-load-translations') || !$input->getOption('skip-load-translations')) {
             $commandExecutor->runCommand('oro:translation:load', ['--process-isolation' => true]);
         }
 
