@@ -142,7 +142,7 @@
             }
 
             @include element-state('warning') {
-                border: .1rem solid $color-warring;
+                border: .1rem solid $color-warning;
                 box-shadow: 0 .1rem .7rem 0 rgba(126,166,164,.35);
             }
 
