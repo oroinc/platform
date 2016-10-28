@@ -2,6 +2,9 @@
 
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Datagrid;
 
+use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
+use Oro\Bundle\WorkflowBundle\Entity\WorkflowStep;
+use Oro\Bundle\WorkflowBundle\Form\Type\WorkflowDefinitionSelectType;
 use Symfony\Component\Translation\TranslatorInterface;
 
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
@@ -56,23 +59,23 @@ class WorkflowDatagridLabelListenerTest extends \PHPUnit_Framework_TestCase
         $mockEvent->expects($this->atLeastOnce())->method('getConfig')->willReturn($datagridConfiguration);
         $this->listener->onBuildBefore($mockEvent);
 
-        //Verify Column
+        //Verify Step Name Column
         $this->assertEquals(
             [
                 'frontend_type' => 'html',
                 'type' => 'callback',
                 'callable' => [$this->listener, "trans"],
                 'params' => ['c2'],
-                'label' => 'Name',
+                'label' => 'Step Name',
                 'translatable' => false,
             ],
             $datagridConfiguration->offsetGetByPath('[columns][c2]')
         );
 
-        //Verify Filter
+        //Verify Step Name Filter
         $this->assertEquals(
             [
-                'label' => 'Name',
+                'label' => 'Step Name',
                 'type' => 'entity',
                 'data_name' => 't4.id',
                 'options' => [
@@ -86,8 +89,39 @@ class WorkflowDatagridLabelListenerTest extends \PHPUnit_Framework_TestCase
             $datagridConfiguration->offsetGetByPath('[filters][columns][c2]')
         );
 
-        //Verify Sorter
+        //Verify Definition Name Column
+        $this->assertEquals(
+            [
+                'frontend_type' => 'html',
+                'type' => 'callback',
+                'callable' => [$this->listener, "trans"],
+                'params' => ['c3'],
+                'label' => 'Workflow Name',
+                'translatable' => false,
+            ],
+            $datagridConfiguration->offsetGetByPath('[columns][c3]')
+        );
+
+        //Verify Definition Name Filter
+        $this->assertEquals(
+            [
+                'label' => 'Workflow Name',
+                'type' => 'entity',
+                'data_name' => 't5.name',
+                'options' => [
+                    'field_type' => WorkflowDefinitionSelectType::NAME,
+                    'field_options' => [
+                        'workflow_entity_class' => 'SomeEntity',
+                        'multiple' => true
+                    ]
+                ],
+            ],
+            $datagridConfiguration->offsetGetByPath('[filters][columns][c3]')
+        );
+
+        //Verify Sorters
         $this->assertNull($datagridConfiguration->offsetGetByPath('[sorters][columns][c2]'));
+        $this->assertNull($datagridConfiguration->offsetGetByPath('[sorters][columns][c3]'));
     }
 
     /**
@@ -102,7 +136,12 @@ class WorkflowDatagridLabelListenerTest extends \PHPUnit_Framework_TestCase
                 'columns' => [
                     'c2' => [
                         'frontend_type' => 'string',
-                        'label' => 'Name',
+                        'label' => 'Step Name',
+                        'translatable' => false,
+                    ],
+                    'c3' => [
+                        'frontend_type' => 'string',
+                        'label' => 'Workflow Name',
                         'translatable' => false,
                     ],
                 ],
@@ -110,6 +149,9 @@ class WorkflowDatagridLabelListenerTest extends \PHPUnit_Framework_TestCase
                     'columns' => [
                         'c2' => [
                             'data_name' => 'c2',
+                        ],
+                        'c3' => [
+                            'data_name' => 'c3',
                         ],
                     ],
                 ],
@@ -120,12 +162,18 @@ class WorkflowDatagridLabelListenerTest extends \PHPUnit_Framework_TestCase
                             'data_name' => 'c2',
                             'translatable' => false,
                         ],
+                        'c3' => [
+                            'type' => 'string',
+                            'data_name' => 'c3',
+                            'translatable' => false,
+                        ],
                     ],
                 ],
                 'source' => [
                     'query' => [
                         'select' => [
                             't4.label as c2',
+                            't5.label as c3',
                         ],
                         'from' => [
                             [
@@ -136,8 +184,8 @@ class WorkflowDatagridLabelListenerTest extends \PHPUnit_Framework_TestCase
                     ],
                     'query_config' => [
                         'column_aliases' => [
-                            'workflowItems_virtual+Oro\\Bundle\\WorkflowBundle\\Entity\\WorkflowItem::curr' .
-                            'entStep+Oro\\Bundle\\WorkflowBundle\\Entity\\WorkflowStep::label' => 'c2',
+                            WorkflowStep::class . '::label' => 'c2',
+                            WorkflowDefinition::class . '::label' => 'c3',
                         ],
                     ],
                 ],

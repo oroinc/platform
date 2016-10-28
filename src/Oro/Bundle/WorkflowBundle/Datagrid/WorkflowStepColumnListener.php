@@ -84,11 +84,6 @@ class WorkflowStepColumnListener extends AbstractDatagridListener
     {
         $config = $event->getConfig();
 
-        // Skip Reports
-        if (!$this->isApplicableGrid($config)) {
-            return;
-        }
-
         // datasource type other than ORM is not supported yet
         if ($config->getDatasourceType() !== OrmDatasource::TYPE) {
             return;
@@ -130,11 +125,6 @@ class WorkflowStepColumnListener extends AbstractDatagridListener
         $config = $datagrid->getConfig();
         $datasource = $datagrid->getDatasource();
 
-        // Skip Reports
-        if (!$this->isApplicableGrid($config)) {
-            return;
-        }
-
         if (!($datasource instanceof OrmDatasource) || !$this->isApplicable($config)) {
             return;
         }
@@ -149,11 +139,6 @@ class WorkflowStepColumnListener extends AbstractDatagridListener
     public function onResultAfter(OrmResultAfter $event)
     {
         $config = $event->getDatagrid()->getConfig();
-
-        // Skip Reports
-        if (!$this->isApplicableGrid($config)) {
-            return;
-        }
 
         if (!$this->isApplicable($config)) {
             return;
@@ -375,15 +360,5 @@ class WorkflowStepColumnListener extends AbstractDatagridListener
     protected function isEntityHaveMoreThanOneWorkflow($className)
     {
         return $this->getWorkflows($className)->count() > 1;
-    }
-
-    /**
-     * @param DatagridConfiguration $configuration
-     *
-     * @return bool
-     */
-    protected function isApplicableGrid(DatagridConfiguration $configuration)
-    {
-        return (strpos($configuration->offsetGetByPath('name'), Report::GRID_PREFIX) === false);
     }
 }
