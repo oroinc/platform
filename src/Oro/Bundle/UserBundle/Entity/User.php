@@ -427,6 +427,20 @@ class User extends ExtendUser implements
     protected $failedLoginCount;
 
     /**
+     * @var \DateTime $createdAt
+     *
+     * @ORM\Column(type="datetime")
+     * @ConfigField(
+     *      defaultValues={
+     *          "entity"={
+     *              "label"="oro.ui.password_expires_at"
+     *          }
+     *      }
+     * )
+     */
+    protected $passwordExpiresAt;
+
+    /**
      * @var OrganizationInterface
      *
      * Organization that user logged in

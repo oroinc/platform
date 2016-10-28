@@ -32,6 +32,7 @@ use Oro\Bundle\UserBundle\Migrations\Schema\v1_19\AddFirstNameLastNameIndex;
 use Oro\Bundle\UserBundle\Migrations\Schema\v1_22\AddImpersonationTable;
 use Oro\Bundle\UserBundle\Migrations\Schema\v1_23\AddFailedLoginColumns;
 use Oro\Bundle\UserBundle\Migrations\Schema\v1_24\AddPasswordHashTable;
+use Oro\Bundle\UserBundle\Migrations\Schema\v1_24\AddPasswordExpiresAtColumn;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyMethods)
@@ -136,6 +137,7 @@ class OroUserBundleInstaller implements
         AddImpersonationTable::createOroUserImpersonationTable($schema);
         AddFailedLoginColumns::updateOroUserTable($schema);
         AddPasswordHashTable::createOroUserPasswordHashTable($schema);
+        AddPasswordExpiresAtColumn::updateOroUserTable($schema);
     }
 
     /**
