@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\WorkflowBundle\Command\Upgrade20;
 
+use Psr\Log\LoggerInterface;
+use Psr\Log\NullLogger;
 use Symfony\Component\Yaml\Yaml;
 
 class TranslationsExtractor
@@ -18,12 +20,16 @@ class TranslationsExtractor
     /** @var MovementOptions */
     private $options;
 
+    /** @var LoggerInterface */
+    private $logger;
+
     /**
      * @param MovementOptions $movementOptions
      */
-    public function __construct(MovementOptions $movementOptions)
+    public function __construct(MovementOptions $movementOptions, LoggerInterface $logger = null)
     {
         $this->options = $movementOptions;
+        $this->logger = $logger ?: new NullLogger();
     }
 
     /**
@@ -33,8 +39,8 @@ class TranslationsExtractor
     {
         foreach ($this->options->getBundles() as $bundle) {
             $configFile = $bundle->getPath() . DIRECTORY_SEPARATOR . ltrim($this->options->getConfigFilePath());
-
             if (\file_exists($configFile)) {
+                $this->logger->info('Found configuration file {file}.', ['file' => $configFile]);
                 yield new ConfigFile($configFile, $bundle);
             }
         }
@@ -64,8 +70,12 @@ class TranslationsExtractor
     {
         foreach ($this->configFiles() as $configFile) {
             $transFile = $this->getTranslationFile($configFile);
-
+            $this->logger->debug('Loading configuration file {file}', ['file' => $configFile->getRealPath()]);
             foreach ($this->loadConfigFile($configFile->getFileInfo()) as $configResource) {
+                $this->logger->debug(
+                    'Loaded resource {resource}. Processing.',
+                    ['resource', $configResource->getFile()->getRealPath()]
+                );
                 $this->processConfigResource($configResource, $transFile);
                 $configResource->dump();
             }
@@ -78,8 +88,15 @@ class TranslationsExtractor
     {
         foreach ($this->translationGenerators as $processor) {
             foreach ($processor->generate($configResource) as $data) {
-                //echo "{$data->getKey()} => {$data->getValue()}" . PHP_EOL;
+                $this->logger->debug(
+                    'Generated key {key} with value {value}. Keep as translation.',
+                    ['key' => $data->getKey(), 'value' => $data->getValue(), 'path' => $data->getPath()]
+                );
                 $translationFile->addTranslation($data->getKey(), $data->getValue());
+                $this->logger->debug(
+                    'Updating config resource {resource} by data {data}',
+                    ['resource' => $configResource->getFile()->getRealPath(), 'data' => $data]
+                );
                 call_user_func($this->resourceUpdater, $configResource, $data);
             }
         }

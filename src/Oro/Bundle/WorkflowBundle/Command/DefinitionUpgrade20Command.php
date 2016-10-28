@@ -29,7 +29,7 @@ class DefinitionUpgrade20Command extends ContainerAwareCommand
     {
         $this->setName(self::NAME);
 
-        $this->addOption('expand', 'e', InputOption::VALUE_OPTIONAL);
+        $this->addOption('expand', 'x', InputOption::VALUE_OPTIONAL);
     }
 
     /**
@@ -93,6 +93,9 @@ class DefinitionUpgrade20Command extends ContainerAwareCommand
                 $data = $configResource->getData();
                 foreach (WorkflowsUtil::workflows($data) as $workflowName => $workflowConfig) {
                     foreach (WorkflowsUtil::steps($workflowConfig) as $stepName => $stepConfig) {
+                        if (!is_array($stepConfig)) {
+                            continue;
+                        }
                         if (array_key_exists('label', $stepConfig)) {
                             $key = $this->workflowTools->stepLabelKey([
                                 'workflow_name' => $workflowName,
