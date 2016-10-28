@@ -161,12 +161,12 @@ class LayoutDataCollector extends DataCollector
                 continue;
             }
 
-            if (is_object($value)) {
+            if (is_object($value) && !method_exists($value, '__toString')) {
                 $result[$key] = get_class($value);
             } elseif (is_array($value)) {
                 $result[$key] = json_encode($value);
             } else {
-                $result[$key] = $value;
+                $result[$key] = (string) $value;
             }
         }
 
