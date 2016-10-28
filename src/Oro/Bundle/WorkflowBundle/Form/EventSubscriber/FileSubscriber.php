@@ -11,7 +11,8 @@ use Oro\Bundle\AttachmentBundle\Entity\File;
 use Oro\Bundle\AttachmentBundle\Entity\Attachment;
 
 use Oro\Bundle\AttachmentBundle\Form\EventSubscriber\FileSubscriber as BaseFileSubscriber;
-use Oro\Bundle\WorkflowBundle\Model\Workflow;
+
+use Oro\Bundle\WorkflowBundle\Utils\WorkflowHelper;
 
 class FileSubscriber extends BaseFileSubscriber
 {
@@ -40,7 +41,7 @@ class FileSubscriber extends BaseFileSubscriber
         }
 
         if ($dataClass == 'Oro\Bundle\WorkflowBundle\Model\WorkflowData') {
-            $data = $this->getRealWorkflowData($form);
+            $data = WorkflowHelper::getRealWorkflowData($form);
             $dataClass = $data['dataClass'];
             $fieldName = $data['fieldName'];
         }
@@ -59,50 +60,5 @@ class FileSubscriber extends BaseFileSubscriber
                 $fileField->addError($error);
             }
         }
-    }
-
-    /**
-     * @param FormInterface $form
-     * @return array
-     * @throws \Exception
-     */
-    protected function getRealWorkflowData(FormInterface $form)
-    {
-        $options = $options = $form->getRoot()->getConfig()->getOptions();
-
-        if (empty($options['workflow'])) {
-            throw new \Exception('The object not found');
-        }
-
-        /** @var Workflow $workflow */
-        $workflow = $options['workflow'];
-
-        $attributeManager = $workflow->getAttributeManager();
-
-        $fieldAttribute = $attributeManager->getAttribute($form->getName());
-
-        if (!$fieldAttribute) {
-            throw new \Ecxeption('Field attribute not found');
-        }
-
-        $propertyPath = $fieldAttribute->getPropertyPath();
-
-        $propertyPathData = explode('.', $propertyPath);
-
-        $fieldName = array_pop($propertyPathData);
-        $dataClassAlias = array_pop($propertyPathData);
-
-        $dataClassAttribute = $attributeManager->getAttribute($dataClassAlias);
-
-        $dataClass = $dataClassAttribute->getOption('class');
-
-        if (!$dataClass) {
-           throw new \Exception('Data class not found');
-        }
-
-        return [
-            'fieldName' => $fieldName,
-            'dataClass'  => $dataClass
-        ];
     }
 }

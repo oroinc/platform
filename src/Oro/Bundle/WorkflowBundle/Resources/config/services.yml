@@ -246,3 +246,13 @@ services:
         arguments:
             - '@oro_workflow.generator.trigger_schedule_options_verifier'
             - '%oro_workflow.workflow_item.entity.class%'
+
+    oro_workflow.manager.attachment_manager:
+        class: Oro\Bundle\WorkflowBundle\Manager\AttachmentManager
+        decorates: oro_attachment.manager
+        arguments:
+            - '@router'
+            - %oro_attachment.files%
+            - '@oro_entity_extend.association_manager'
+        calls:
+            - [setFileManager, ['@oro_attachment.file_manager']]
