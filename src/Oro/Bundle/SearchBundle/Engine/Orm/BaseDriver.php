@@ -182,11 +182,13 @@ abstract class BaseDriver
     /**
      * Returns an unique ID hash, used for SQL aliases
      *
+     * @param string $prefix
      * @return string
      */
-    public function getUniqueId()
+    public function getUniqueId($prefix = '')
     {
-        return str_replace('.', '_', uniqid('', true));
+        return uniqid($prefix);
+        return str_replace('.', '_', uniqid($prefix, true));
     }
 
     /**
@@ -415,14 +417,15 @@ abstract class BaseDriver
         foreach ($selects as $select) {
             list($type, $name) = Criteria::explodeFieldTypeName($select);
 
-            $uniqIndex = $this->getUniqueId();
+            $uniqIndex = $this->getUniqueId($name);
             $joinField = $this->getJoinField($type);
             $joinAlias = $this->getJoinAlias($type, $uniqIndex);
 
-            $withClause = sprintf('%s.field = :param%s', $joinAlias, $uniqIndex);
+            $param = sprintf('param%s', $uniqIndex);
+            $withClause = sprintf('%s.field = :%s', $joinAlias, $param);
 
             $qb->leftJoin($joinField, $joinAlias, Join::WITH, $withClause)
-                ->setParameter('param' . $uniqIndex, $name);
+                ->setParameter($param, $name);
 
             $qb->addSelect($joinAlias . '.value as ' . $name);
         }
@@ -516,10 +519,11 @@ abstract class BaseDriver
     {
         $condition = $searchCondition['condition'];
         $type      = $searchCondition['fieldType'];
+        $fieldName = $searchCondition['fieldName'];
 
         $qb->setParameter(
             sprintf('field%s', $index),
-            $searchCondition['fieldName']
+            $fieldName
         );
 
         switch ($condition) {
@@ -535,14 +539,13 @@ abstract class BaseDriver
                 );
         }
 
-        $subIndex = $this->getUniqueId();
-        $subQueryAlias = sprintf('filter%s', $subIndex);
-        $subJoinField = sprintf('%s.%sFields', $subQueryAlias, $type);
+        $subIndex = $this->getUniqueId($fieldName);
+        $subJoinField = sprintf('%s.%sFields', $subIndex, $type);
         $subJoinAlias = $this->getJoinAlias($type, $subIndex);
 
         $subQb = $this->em->createQueryBuilder()
-            ->select(sprintf('%s.id', $subQueryAlias))
-            ->from($this->entityName, $subQueryAlias)
+            ->select(sprintf('%s.id', $subIndex))
+            ->from($this->entityName, $subIndex)
             ->join($subJoinField, $subJoinAlias)
             ->andWhere(sprintf(
                 '%s.field = :field%s',

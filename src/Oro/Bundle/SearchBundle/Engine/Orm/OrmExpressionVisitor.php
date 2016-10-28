@@ -43,7 +43,7 @@ class OrmExpressionVisitor extends ExpressionVisitor
         $value = $comparison->getValue()->getValue();
         list($type, $field) = $this->explodeCombinedFieldString($comparison->getField());
 
-        $index     = $this->driver->getUniqueId();
+        $index     = $this->driver->getUniqueId($field);
         $joinField = $this->driver->getJoinField($type);
         $joinAlias = $this->driver->getJoinAlias($type, $index);
 
