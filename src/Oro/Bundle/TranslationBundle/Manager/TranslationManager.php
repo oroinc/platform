@@ -137,6 +137,7 @@ class TranslationManager
         $this->languages = [];
         $this->translationKeys = [];
         $this->createdTranslationValues = [];
+        $this->availableDomains = null;
     }
 
     public function clear()

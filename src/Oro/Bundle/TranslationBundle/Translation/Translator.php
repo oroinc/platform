@@ -204,7 +204,7 @@ class Translator extends BaseTranslator
             return;
         }
 
-        $tmpDir = uniqid($cacheDir, true);
+        $tmpDir = $cacheDir . DIRECTORY_SEPARATOR . uniqid('CACHE_', true);
 
         $options = array_merge($this->originalOptions, ['cache_dir' => $tmpDir]);
 
