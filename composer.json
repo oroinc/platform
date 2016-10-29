@@ -113,7 +113,8 @@
         "bower-asset/backbone-pageable": "1.2.3",
         "bower-asset/numeral": "1.5.2",
         "bower-asset/jquery-form": "3.37.0",
-        "npm-asset/requirejs": "2.3.*"
+        "npm-asset/requirejs": "2.3.*",
+        "doctrine/annotations": "~1.2.7"
     },
     "require-dev": {
         "sensio/generator-bundle": "2.5.3",
@@ -122,9 +123,7 @@
         "behat/mink-selenium2-driver":"1.*",
         "bossa/phpspec2-expect": "~1.0",
         "behat/symfony2-extension": "2.1.1",
-        "nelmio/alice": "^2.1",
-        "squizlabs/php_codesniffer": "2.3.*",
-        "phpunit/phpunit": "4.8.*"
+        "nelmio/alice": "2.1.4"
     },
     "minimum-stability": "dev",
     "prefer-stable": true,
