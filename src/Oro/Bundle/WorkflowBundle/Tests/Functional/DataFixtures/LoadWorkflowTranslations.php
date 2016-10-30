@@ -90,8 +90,6 @@ class LoadWorkflowTranslations extends AbstractFixture implements DependentFixtu
      */
     public function load(ObjectManager $manager)
     {
-        // TODO: refactor that method
-
         $generator = new TranslationKeyGenerator();
 
         foreach ($this->workflowTranslations as $locale => $workflows) {
