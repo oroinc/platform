@@ -74,8 +74,8 @@
         "components/backbone": "1.1.*",
         "components/font-awesome": "~4.3.0",
         "piwik/device-detector": "~3.0",
-        "oro/jsplumb": "~1.7",
-        "oro/moment-timezone": "0.3.*",
+        "bower-asset/jsplumb": "~1.7",
+        "bower-asset/moment-timezone": "0.3.*",
         "vakata/jstree": "^3.2",
         "symfony/polyfill-php70":"1.*",
         "liuggio/excelbundle": "~2.1",
@@ -113,7 +113,8 @@
         "bower-asset/backbone-pageable": "1.2.3",
         "bower-asset/numeral": "1.5.2",
         "bower-asset/jquery-form": "3.37.0",
-        "npm-asset/requirejs": "2.1.15"
+        "npm-asset/requirejs": "2.3.*",
+        "doctrine/annotations": "~1.2.7"
     },
     "require-dev": {
         "sensio/generator-bundle": "2.5.3",
@@ -122,7 +123,7 @@
         "behat/mink-selenium2-driver":"1.*",
         "bossa/phpspec2-expect": "~1.0",
         "behat/symfony2-extension": "2.1.1",
-        "nelmio/alice": "^2.1"
+        "nelmio/alice": "2.1.4"
     },
     "minimum-stability": "dev",
     "prefer-stable": true,
