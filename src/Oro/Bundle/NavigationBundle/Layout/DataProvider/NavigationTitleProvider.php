@@ -37,6 +37,11 @@ class NavigationTitleProvider
         $title = $this->titleService
             ->render(array(), null, null, null, true);
 
-        return $title;
+        return $this->cleanUpTitle($title);
+    }
+
+    private function cleanUpTitle($title)
+    {
+        return trim($title, ' - ');
     }
 }
