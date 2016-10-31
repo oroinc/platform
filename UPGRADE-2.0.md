@@ -523,11 +523,11 @@ oro_email.email_address.entity_manager:
 - Added EntityFallbackExtension service which reads fallback values of entities in twig
 - Added AbstractEntityFallbackProvider abstract service to ease adding new fallback types, please refer
 to the [Fallback documentation](./src/Oro/Bundle/EntityBundle/Resources/doc/entity_fallback.md) for details
-- `Oro\Bundle\EntityBundle\Provider\EntityNameProvider` now is the base Entity Name Provider which returns:
-   - Short format: entity titles based on the first of the string entity fields from 'firstName', 'name', 'title', 'subject'
-   - Full format: a space-delimited concatenation of all string fields.
- If resulting title is empty it will return the entity id. Same applies for both getName and getNameDQL methods.
-- Added `Oro\Bundle\EntityBundle\Provider\FallbackEntityNameProvider` which will resolve entity title as Item #1 (uses translator) in case no suitable fields are found to construct the title. Should be kept as last provider.
+- `Oro\Bundle\EntityBundle\Provider\EntityNameProvider` now is the generic Entity Name Provider which resolves:
+   - 'Short' format: title based on entity fields from 'firstName', 'name', 'title', 'subject' (uses only the first that is found)
+   - 'Full' format: a space-delimited concatenation of all string fields of the entity.
+   - For both formats: will return the entity ID when fields are found but their value is empty. Same applies for both `getName` and `getNameDQL` methods. Will return `false` if no suitable fields are available.
+- Added `Oro\Bundle\EntityBundle\Provider\FallbackEntityNameProvider` which will resolve entity title in form of 'Item #1' (translates `oro.entity.item`). Can use only single-column identifiers, else returns `false`. Should be kept as last provider.
 
 ####ContactBundle
 

@@ -106,6 +106,6 @@ The priority can be specified to move the provider up or down the providers chai
 
 **Default behaviour**
 
-The bundled provider `Oro\Bundle\EntityBundle\Provider\EntityNameProvider` will resolve entity titles by trying to find suitable fields in the entity. First it tries to use one string field from the list 'firstName', 'name', 'title', 'subject' or if none of these is present, it will use a space-delimited concatenation of all non-serialized string fields. If some of the fields is found but the resulting title is empty (i.e. value of the fields is null) it will return the entity id.
+The bundled provider `Oro\Bundle\EntityBundle\Provider\EntityNameProvider` will resolve entity titles by trying to find suitable fields in the entity. For 'short' format it tries to use one string field from the list 'firstName', 'name', 'title', 'subject' (in that order). For 'full' it will use a space-delimited concatenation of all non-serialized string fields. If some of the fields is found but the resulting title is empty (i.e. value of the fields is null) it will return the entity id.
 
-If no suitable fields are available (e.g. entity does not have any string fields) then another provider `Oro\Bundle\EntityBundle\Provider\FallbackEntityNameProvider` will try to construct a title in the form of 'Item #1' from the entity identifier.
+If no suitable fields are available (e.g. entity does not have any string fields) then another provider `Oro\Bundle\EntityBundle\Provider\FallbackEntityNameProvider` will try to construct a title in the form of 'Item #1' from the entity identifier and `oro.entity.item` translation key.
