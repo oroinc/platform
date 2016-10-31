@@ -31,6 +31,9 @@ class PasswordExpiryPeriodChangeListener
         $this->provider = $provider;
     }
 
+    /**
+     * @param ConfigUpdateEvent $event
+     */
     public function onConfigUpdate(ConfigUpdateEvent $event)
     {
         $settingsUnitKey    = $this->getSettingsUnitKey();
@@ -48,6 +51,9 @@ class PasswordExpiryPeriodChangeListener
         }
     }
 
+    /**
+     * Sets a new password expiry date to all users.
+     */
     protected function resetPasswordExpiryDates()
     {
         $newExpiryDate = $this->provider->getPasswordExpiryDateFromNow();
