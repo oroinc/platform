@@ -217,4 +217,17 @@ class TranslationManagerTest extends \PHPUnit_Framework_TestCase
             ['en'],
         ];
     }
+
+    public function testRemoveMissingTranslationKey()
+    {
+        $nonExistingKey = uniqid('KEY_');
+        $nonExistingDomain = uniqid('KEY_');
+        $this->translationKeyRepository
+            ->expects($this->once())
+            ->method('findOneBy')
+            ->willReturn(null)
+            ->with(['key' => $nonExistingKey, 'domain' => $nonExistingDomain]);
+        $this->objectManager->expects($this->never())->method('remove');
+        $this->manager->removeTranslationKey($nonExistingKey, $nonExistingDomain);
+    }
 }

@@ -214,22 +214,6 @@ class TranslationManagerTest extends WebTestCase
         );
     }
 
-    public function testRemoveMissingTranslationKey()
-    {
-        /* @var $repository TranslationKeyRepository */
-        $repository = $this->getRepository(TranslationKey::class);
-
-        $this->assertNull(
-            $repository->findOneBy([
-                'key' => 'test.key1',
-                'domain' => 'test.domain'
-            ])
-        );
-
-        $this->manager->removeTranslationKey('test.key1', 'test.domain');
-        $this->manager->flush();
-    }
-
     public function testFindAvailableDomainsForLocales()
     {
         $domains = [];
