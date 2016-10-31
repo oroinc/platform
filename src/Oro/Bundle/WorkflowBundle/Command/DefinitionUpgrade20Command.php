@@ -30,6 +30,9 @@ class DefinitionUpgrade20Command extends ContainerAwareCommand
      */
     private $workflowTools;
 
+    /**
+     * {@inheritdoc}
+     */
     protected function configure()
     {
         $this->setName(self::NAME);

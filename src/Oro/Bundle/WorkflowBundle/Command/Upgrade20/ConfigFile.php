@@ -6,16 +6,15 @@ use Symfony\Component\HttpKernel\Bundle\BundleInterface;
 
 class ConfigFile
 {
-    /**@var string */
+    /** @var string */
     private $realPath;
 
-    /**
-     * @var BundleInterface
-     */
+    /** @var BundleInterface */
     private $bundle;
 
     /**
      * @param string $realPath
+     * @param BundleInterface $bundle
      */
     public function __construct($realPath, BundleInterface $bundle)
     {

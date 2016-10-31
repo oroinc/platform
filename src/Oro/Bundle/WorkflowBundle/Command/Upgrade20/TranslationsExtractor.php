@@ -25,6 +25,7 @@ class TranslationsExtractor
 
     /**
      * @param MovementOptions $movementOptions
+     * @param LoggerInterface $logger
      */
     public function __construct(MovementOptions $movementOptions, LoggerInterface $logger = null)
     {
@@ -84,6 +85,10 @@ class TranslationsExtractor
         }
     }
 
+    /**
+     * @param ConfigResource $configResource
+     * @param TranslationFile $translationFile
+     */
     private function processConfigResource(ConfigResource $configResource, TranslationFile $translationFile)
     {
         foreach ($this->translationGenerators as $processor) {
@@ -142,6 +147,9 @@ class TranslationsExtractor
         $this->translationGenerators[] = $generator;
     }
 
+    /**
+     * @param callable $updater
+     */
     public function setResourceUpdater(callable $updater)
     {
         $this->resourceUpdater = $updater;

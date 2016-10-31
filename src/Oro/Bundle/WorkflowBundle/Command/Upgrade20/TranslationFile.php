@@ -18,17 +18,28 @@ class TranslationFile
     /** @var bool */
     private $dry;
 
+    /**
+     * @param string $realPath
+     * @param bool $dry
+     */
     public function __construct($realPath, $dry = false)
     {
         $this->realPath = $realPath;
         $this->dry = $dry;
     }
 
+    /**
+     * @param string $key
+     * @param string $value
+     */
     public function addTranslation($key, $value)
     {
         $this->translations[$key] = $value;
     }
 
+    /**
+     * @return array
+     */
     private function getExistingTranslations()
     {
         if (file_exists($this->realPath)) {
@@ -41,6 +52,10 @@ class TranslationFile
         }
     }
 
+    /**
+     * @param bool $flatten
+     * @param LoggerInterface|null $logger
+     */
     public function dump($flatten = true, LoggerInterface $logger = null)
     {
         $logger = $logger ?: new NullLogger();

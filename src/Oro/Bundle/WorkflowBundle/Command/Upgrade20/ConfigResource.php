@@ -23,6 +23,11 @@ class ConfigResource
     /** @var bool */
     private $dry;
 
+    /**
+     * @param \SplFileInfo $file
+     * @param array $data
+     * @param bool $dry
+     */
     public function __construct(\SplFileInfo $file, array $data, $dry = false)
     {
         $this->file = $file;
@@ -58,6 +63,9 @@ class ConfigResource
         return $this->originalContent = file_get_contents($this->file->getRealPath());
     }
 
+    /**
+     * @return string
+     */
     public function getContent()
     {
         if (null === $this->content) {
@@ -75,6 +83,9 @@ class ConfigResource
         $this->content = $content;
     }
 
+    /**
+     * @param LoggerInterface|null $logger
+     */
     public function dump(LoggerInterface $logger = null)
     {
         $logger = $logger ?: new NullLogger();

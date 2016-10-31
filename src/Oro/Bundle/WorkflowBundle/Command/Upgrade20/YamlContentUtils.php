@@ -22,6 +22,9 @@ class YamlContentUtils
         }
     }
 
+    /**
+     * @return \Closure
+     */
     public static function getCallableResourceUpdater()
     {
         return function (

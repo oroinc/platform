@@ -9,6 +9,9 @@ class CallBackTranslationGenerator implements ResourceTranslationGenerator
      */
     private $callable;
 
+    /**
+     * @param callable $callable
+     */
     public function __construct(callable $callable)
     {
         $this->callable = $callable;

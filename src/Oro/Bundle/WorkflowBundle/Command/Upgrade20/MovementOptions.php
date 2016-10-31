@@ -6,13 +6,13 @@ use Symfony\Component\HttpKernel\Bundle\BundleInterface;
 
 class MovementOptions
 {
-    /**
-     * @var array|BundleInterface[]
-     */
+    /** @var array|BundleInterface[] */
     private $bundles = [];
 
+    /** @var string */
     private $configFilePath;
 
+    /** @var string */
     private $translationFilePath;
 
     /**
@@ -35,7 +35,7 @@ class MovementOptions
     }
 
     /**
-     * @return mixed
+     * @return string
      */
     public function getConfigFilePath()
     {
@@ -43,7 +43,7 @@ class MovementOptions
     }
 
     /**
-     * @param mixed $configFilePath
+     * @param string $configFilePath
      * @return $this
      */
     public function setConfigFilePath($configFilePath)
@@ -54,7 +54,7 @@ class MovementOptions
     }
 
     /**
-     * @return mixed
+     * @return string
      */
     public function getTranslationFilePath()
     {
@@ -62,7 +62,7 @@ class MovementOptions
     }
 
     /**
-     * @param mixed $translationFilePath
+     * @param string $translationFilePath
      */
     public function setTranslationFilePath($translationFilePath)
     {

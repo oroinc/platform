@@ -6,6 +6,10 @@ use Symfony\Component\Translation\Util\ArrayConverter;
 
 class KeysUtil
 {
+    /**
+     * @param array $array
+     * @return array
+     */
     public static function expandToTree(array $array)
     {
         return ArrayConverter::expandToTree($array);
