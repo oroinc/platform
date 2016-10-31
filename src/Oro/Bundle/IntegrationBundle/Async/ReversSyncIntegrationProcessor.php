@@ -94,14 +94,14 @@ class ReversSyncIntegrationProcessor implements
             $body
         );
 
-        if (! $body['integration_id']) {
-            $this->logger->critical('Invalid message: integration_id is empty', ['message' => $message]);
-
-            return self::REJECT;
-        }
-
-        if (! $body['connector']) {
-            $this->logger->critical('Invalid message: connector is empty', ['message' => $message]);
+        if (! $body['integration_id'] || ! $body['connector']) {
+            $this->logger->critical(
+                sprintf(
+                    'Invalid message: integration_id and connector should not be empty: %s',
+                    $message->getBody()
+                ),
+                ['message' => $message]
+            );
 
             return self::REJECT;
         }
@@ -114,17 +114,9 @@ class ReversSyncIntegrationProcessor implements
 
         /** @var Integration $integration */
         $integration = $em->find(Integration::class, $body['integration_id']);
-        if (! $integration) {
+        if (! $integration || ! $integration->isEnabled()) {
             $this->logger->critical(
-                sprintf('Integration not found: %s', $body['integration_id']),
-                ['message' => $message]
-            );
-
-            return self::REJECT;
-        }
-        if (! $integration->isEnabled()) {
-            $this->logger->critical(
-                sprintf('Integration is not enabled: %s', $body['integration_id']),
+                sprintf('Integration should exist and be enabled: %s', $body['integration_id']),
                 ['message' => $message]
             );
 
