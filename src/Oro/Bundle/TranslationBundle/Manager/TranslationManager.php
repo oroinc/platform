@@ -91,8 +91,13 @@ class TranslationManager
      *
      * @return Translation|null
      */
-    public function saveTranslation($key, $value, $locale, $domain = self::DEFAULT_DOMAIN, $scope = Translation::SCOPE_SYSTEM)
-    {
+    public function saveTranslation(
+        $key,
+        $value,
+        $locale,
+        $domain = self::DEFAULT_DOMAIN,
+        $scope = Translation::SCOPE_SYSTEM
+    ) {
         /** @var TranslationRepository $repo */
         $repo = $this->getEntityRepository(Translation::class);
 
@@ -218,6 +223,7 @@ class TranslationManager
         $this->languages = [];
         $this->translationKeys = [];
         $this->translations = [];
+        $this->availableDomains = null;
     }
 
     public function clear()
