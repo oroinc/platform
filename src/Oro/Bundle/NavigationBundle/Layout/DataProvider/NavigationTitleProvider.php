@@ -2,22 +2,27 @@
 
 namespace Oro\Bundle\NavigationBundle\Layout\DataProvider;
 
+use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\NavigationBundle\Provider\TitleService;
 
 class NavigationTitleProvider
 {
-    /**
-     * @var TitleService
-     */
+    /** @var TitleService */
     private $titleService;
+
+    /** @var ConfigManager */
+    private $userConfigManager;
 
     /**
      * @param TitleService  $titleService
+     * @param ConfigManager $userConfigManager
      */
     public function __construct(
-        TitleService $titleService
+        TitleService $titleService,
+        ConfigManager $userConfigManager
     ) {
         $this->titleService = $titleService;
+        $this->userConfigManager = $userConfigManager;
     }
 
 
@@ -34,14 +39,10 @@ class NavigationTitleProvider
         $this->titleService->loadByRoute($routeName);
         $this->titleService->setParams($params);
 
-        $title = $this->titleService
-            ->render([], null, null, null, true);
+        $title = $this->titleService->render([], null, null, null, true);
 
-        return $this->cleanUpTitle($title);
-    }
+        $delimiter  = ' ' . $this->userConfigManager->get('oro_navigation.title_delimiter') . ' ';
 
-    private function cleanUpTitle($title)
-    {
-        return trim($title, ' - ');
+        return trim($title, $delimiter);
     }
 }

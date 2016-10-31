@@ -354,6 +354,7 @@ services:
         scope: request
         arguments:
           - '@oro_navigation.title_service'
+          - '@oro_config.user'
         tags:
             - { name: layout.data_provider, alias: title_provider }
 
