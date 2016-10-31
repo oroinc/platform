@@ -4,6 +4,11 @@ namespace Oro\Bundle\IntegrationBundle\Tests\Unit\Async;
 use Doctrine\DBAL\Connection;
 use Doctrine\ORM\Configuration;
 use Doctrine\ORM\EntityManagerInterface;
+
+use Psr\Log\LoggerInterface;
+
+use Symfony\Component\DependencyInjection\ContainerAwareInterface;
+
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\IntegrationBundle\Async\ReversSyncIntegrationProcessor;
 use Oro\Bundle\IntegrationBundle\Async\Topics;
@@ -19,8 +24,6 @@ use Oro\Component\MessageQueue\Transport\Null\NullMessage;
 use Oro\Component\MessageQueue\Transport\Null\NullSession;
 use Oro\Component\MessageQueue\Util\JSON;
 use Oro\Component\Testing\ClassExtensionTrait;
-use Psr\Log\LoggerInterface;
-use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 
 class ReversSyncIntegrationProcessorTest extends \PHPUnit_Framework_TestCase
 {
