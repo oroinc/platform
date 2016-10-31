@@ -170,8 +170,7 @@ class WidgetConfigs
     }
 
     /**
-     * Returns widget configuration or null
-     * based on applicable flags and acl
+     * Returns widget configuration or null based on applicable flags and acl
      *
      * @param string $widgetName
      *
