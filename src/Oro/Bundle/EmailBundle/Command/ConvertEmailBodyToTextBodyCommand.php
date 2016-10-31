@@ -45,15 +45,15 @@ class ConvertEmailBodyToTextBodyCommand extends ContainerAwareCommand
         $connection = $container->get('doctrine')->getConnection();
         $tableName = $container->get('oro_entity.orm.native_query_executor_helper')->getTableName(EmailBody::class);
         $selectQuery = 'select id, body from ' . $tableName . ' where body is not null and text_body is null '
-            . 'order by created desc limit :limit offset :offset';
+            . 'order by created desc limit :limit';
         $pageNumber = 0;
         $emailBodyHelper = new EmailBodyHelper();
         while (true) {
             $output->writeln(sprintf('<info>Process page %s.</info>', $pageNumber + 1));
             $data = $connection->fetchAll(
                 $selectQuery,
-                ['limit' => self::BATCH_SIZE, 'offset' => self::BATCH_SIZE * $pageNumber],
-                ['limit' => 'integer', 'offset' => 'integer']
+                ['limit' => self::BATCH_SIZE],
+                ['limit' => 'integer']
             );
 
             // exit if we have no data anymore
