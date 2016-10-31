@@ -44,20 +44,14 @@ class TaggedServicesCompilerPassTraitTest extends \PHPUnit_Framework_TestCase
         $this->registerTaggedServices($this->builder, 'service1', 'tag1', 'addExtension');
     }
 
-    public function testRegisterTaggedServices()
+    /**
+     * @dataProvider taggedServicesDataProvider
+     */
+    public function testRegisterTaggedServices($taggedServices)
     {
         $this->builder->expects($this->once())->method('hasDefinition')->willReturn(true);
         $this->builder->expects($this->once())->method('findTaggedServiceIds')
-            ->willReturn([
-                'taggedService1' => [
-                    ['priority' => 20, 'alias' => 'taggedService1Alias'],
-                ],
-                'taggedService2' => [
-                ],
-                'taggedService3' => [
-                    ['priority' => 10, 'alias' => 'taggedService3Alias'],
-                ],
-            ]);
+            ->willReturn($taggedServices);
         $this->builder->expects($this->once())->method('getDefinition')->with('service1')->willReturn($this->service);
 
         $this->service->expects($this->exactly(3))->method('addMethodCall');
@@ -72,5 +66,41 @@ class TaggedServicesCompilerPassTraitTest extends \PHPUnit_Framework_TestCase
             ->with('addExtension', [new Reference('taggedService1'), 'taggedService1Alias']);
 
         $this->registerTaggedServices($this->builder, 'service1', 'tag1', 'addExtension');
+    }
+
+
+    /**
+     * @return array
+     */
+    public function taggedServicesDataProvider()
+    {
+        return [
+            'one without priority and without alias' => [
+                [
+                    'taggedService1' => [
+                        ['priority' => 20, 'alias' => 'taggedService1Alias'],
+                    ],
+                    'taggedService2' => [
+                    ],
+                    'taggedService3' => [
+                        ['priority' => 10, 'alias' => 'taggedService3Alias'],
+                    ],
+                ],
+            ],
+            'all without priorities' => [
+                [
+                    'taggedService2' => [],
+                    'taggedService3' => [['alias' => 'taggedService3Alias']],
+                    'taggedService1' => [['alias' => 'taggedService1Alias']],
+                ],
+            ],
+            'with duplicated priorities' => [
+                [
+                    'taggedService2' => [['priority' => 10]],
+                    'taggedService3' => [['priority' => 10, 'alias' => 'taggedService3Alias']],
+                    'taggedService1' => [['priority' => 10, 'alias' => 'taggedService1Alias']],
+                ],
+            ],
+        ];
     }
 }
