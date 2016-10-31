@@ -125,16 +125,16 @@ class EmailTemplateControllerTest extends WebTestCase
             ->getRepository('Oro\Bundle\EmailBundle\Entity\EmailTemplate')
             ->findOneBy(['name' => 'test_template']);
 
-        $calendarEvent = $em
-            ->getRepository('Oro\Bundle\CalendarBundle\Entity\CalendarEvent')
-            ->findOneBy(['title' => 'test_title']);
-        $this->assertNotNull($calendarEvent);
+        $user = $em
+            ->getRepository('Oro\Bundle\UserBundle\Entity\User')
+            ->findOneBy(['username' => 'simple_user']);
+        $this->assertNotNull($user);
 
         $this->client->request(
             'GET',
             $this->getUrl(
                 'oro_api_get_emailtemplate_compiled',
-                ['id' => $emailTemplate->getId(), 'entityId' => $calendarEvent->getId()]
+                ['id' => $emailTemplate->getId(), 'entityId' => $user->getId()]
             )
         );
 
@@ -154,10 +154,10 @@ class EmailTemplateControllerTest extends WebTestCase
     {
         $em = $this->getContainer()->get('doctrine.orm.entity_manager');
         $emailTemplate = $this->getReference('emailTemplate1');
-        $calendarEvent = $em
-            ->getRepository('Oro\Bundle\CalendarBundle\Entity\CalendarEvent')
-            ->findOneBy(['title' => 'test_title']);
-        $this->assertNotNull($calendarEvent);
+        $user = $em
+            ->getRepository('Oro\Bundle\UserBundle\Entity\User')
+            ->findOneBy(['username' => 'simple_user']);
+        $this->assertNotNull($user);
 
         $this->client->request(
             'GET',
