@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Model;
 
+use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 use Doctrine\Common\Collections\ArrayCollection;
@@ -47,8 +48,11 @@ class WorkflowManagerTest extends \PHPUnit_Framework_TestCase
     /** @var EventDispatcherInterface|\PHPUnit_Framework_MockObject_MockObject */
     protected $eventDispatcher;
 
-    /** @var WorkflowEntityConnector| \PHPUnit_Framework_MockObject_MockObject */
+    /** @var WorkflowEntityConnector|\PHPUnit_Framework_MockObject_MockObject */
     protected $entityConnector;
+
+    /** @var LoggerInterface|\PHPUnit_Framework_MockObject_MockObject */
+    protected $logger;
 
     protected function setUp()
     {
@@ -67,12 +71,15 @@ class WorkflowManagerTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
+        $this->logger = $this->getMock(LoggerInterface::class);
+
         $this->workflowManager = new WorkflowManager(
             $this->workflowRegistry,
             $this->doctrineHelper,
             $this->eventDispatcher,
             $this->entityConnector
         );
+        $this->workflowManager->setLogger($this->logger);
     }
 
     protected function tearDown()
@@ -82,7 +89,8 @@ class WorkflowManagerTest extends \PHPUnit_Framework_TestCase
             $this->workflowRegistry,
             $this->doctrineHelper,
             $this->eventDispatcher,
-            $this->entityConnector
+            $this->entityConnector,
+            $this->logger
         );
     }
 
@@ -593,6 +601,20 @@ class WorkflowManagerTest extends \PHPUnit_Framework_TestCase
             ->method('getWorkflow')
             ->with($workflowName)
             ->will($this->returnValue($workflow));
+
+        $this->logger->expects($this->once())
+            ->method('info')
+            ->willReturnCallback(
+                function ($message, array $context) use ($workflow, $workflowItem, $transition) {
+                    $this->assertEquals('Workflow transition is complete', $message);
+                    $this->assertArrayHasKey('workflow', $context);
+                    $this->assertEquals($workflow, $context['workflow']);
+                    $this->assertArrayHasKey('workflowItem', $context);
+                    $this->assertEquals($workflowItem, $context['workflowItem']);
+                    $this->assertArrayHasKey('transition', $context);
+                    $this->assertEquals($transition, $context['transition']);
+                }
+            );
 
         $entityManager = $this->getTransactionScopedEntityManager(WorkflowItem::class);
 

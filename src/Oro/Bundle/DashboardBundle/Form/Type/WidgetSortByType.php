@@ -83,6 +83,7 @@ class WidgetSortByType extends AbstractType
     {
         $choices = [];
 
+        //@TODO change logic of grabbing choices. They should grab from datagrid config
         $fields = $this->fieldProvider->getFields($className);
         foreach ($fields as $field) {
             $choices[$field['name']] = $field['label'];

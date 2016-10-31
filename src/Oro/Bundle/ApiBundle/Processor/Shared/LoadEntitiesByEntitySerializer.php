@@ -7,6 +7,7 @@ use Doctrine\ORM\QueryBuilder;
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
 use Oro\Component\EntitySerializer\EntitySerializer;
+use Oro\Bundle\ApiBundle\Processor\Context;
 use Oro\Bundle\ApiBundle\Processor\ListContext;
 
 /**
@@ -51,7 +52,15 @@ class LoadEntitiesByEntitySerializer implements ProcessorInterface
         }
 
         $context->setResult(
-            $this->entitySerializer->serialize($query, $config)
+            $this->entitySerializer->serialize(
+                $query,
+                $config,
+                [
+                    Context::ACTION       => $context->getAction(),
+                    Context::VERSION      => $context->getVersion(),
+                    Context::REQUEST_TYPE => $context->getRequestType()
+                ]
+            )
         );
 
         // data returned by the EntitySerializer are already normalized

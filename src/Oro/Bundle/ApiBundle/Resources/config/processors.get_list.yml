@@ -7,8 +7,6 @@ services:
             - get_list
             - '@oro_api.config_provider'
             - '@oro_api.metadata_provider'
-        tags:
-            - { name: oro.api.action_processor }
 
     #
     # initialize

@@ -1,15 +1,17 @@
-define([
-    'jquery',
-    'underscore',
-    'orotranslation/js/translator',
-    'routing',
-    'oroui/js/tools',
-    'oroui/js/mediator',
-    './map-filter-module-name',
-    './collection-filters-manager'
-], function($, _, __, routing, tools, mediator, mapFilterModuleName, FiltersManager) {
+define(function(require) {
     'use strict';
 
+    var $ = require('jquery');
+    var _ = require('underscore');
+    var __ = require('orotranslation/js/translator');
+    var mediator = require('oroui/js/mediator');
+    var routing = require('routing');
+    var tools = require('oroui/js/tools');
+    var mapFilterModuleName = require('orofilter/js/map-filter-module-name');
+    var FiltersManager = require('orofilter/js/collection-filters-manager');
+    var FiltersTogglePlugin = require('orofilter/js/plugins/filters-toggle-plugin');
+    var module = require('module');
+    var moduleConfigs = module.config();
     var cachedFilters = {};
 
     var methods = {
@@ -47,6 +49,9 @@ define([
             var options = methods.combineOptions.call(this);
             options.collection = this.collection;
             options.el = $('<div/>').prependTo(this.$el);
+            if (this.enableToggleFilters) {
+                options.filtersStateElement = this.filtersStateElement || $('<div/>').prependTo(this.$el);
+            }
             filtersList = new FiltersManager(options);
             filtersList.render();
             mediator.trigger('datagrid_filters:rendered', this.collection, this.$el);
@@ -161,6 +166,8 @@ define([
                 modules: null
             };
 
+            _.extend(self, _.pick(options, 'filtersStateElement', 'enableToggleFilters'));
+
             methods.initBuilder.call(self);
 
             options.gridPromise.done(function(grid) {
@@ -170,6 +177,19 @@ define([
             }).fail(function() {
                 deferred.reject();
             });
+        },
+
+        processDatagridOptions: function(deferred, options) {
+            if (!_.isArray(options.metadata.plugins)) {
+                options.metadata.plugins = [];
+            }
+            if (_.result(moduleConfigs, 'enableToggleFilters') === false) {
+                options.enableToggleFilters = false;
+            }
+            if (options.enableToggleFilters) {
+                options.metadata.plugins.push(FiltersTogglePlugin);
+            }
+            deferred.resolve();
         }
     };
 });

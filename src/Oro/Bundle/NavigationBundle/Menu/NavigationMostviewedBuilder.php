@@ -30,10 +30,10 @@ class NavigationMostviewedBuilder extends NavigationItemBuilder
      */
     public function build(ItemInterface $menu, array $options = array(), $alias = null)
     {
-        $options['orderBy'] = array(array('field' => NavigationHistoryItem::NAVIGATION_HISTORY_COLUMN_VISIT_COUNT));
-        $maxItems = $this->configOptions->get('oro_navigation.maxItems');
+        $options['order_by'] = array(array('field' => NavigationHistoryItem::NAVIGATION_HISTORY_COLUMN_VISIT_COUNT));
+        $maxItems = $this->configOptions->get('oro_navigation.max_items');
         if (!is_null($maxItems)) {
-            $options['maxItems'] = $maxItems;
+            $options['max_items'] = $maxItems;
         }
         parent::build($menu, $options, $alias);
     }

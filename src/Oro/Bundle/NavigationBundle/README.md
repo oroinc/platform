@@ -9,25 +9,35 @@ ACL implementation from Oro UserBundle.
 
 * [Your first menu](#first-menu)
 * [Rendering Menus](#rendering-menus)
-* [Content Outdating Notifications](./Resources/doc/content_outdating.md)
-* [Mediator Handlers](./Resources/doc/mediator-handlers.md)
 
 <a name="first-menu"></a>
 
-### Step 3) Initialize Page Titles
+### Initialize Page Titles
+
+To load page titles from configs and controller annotations execute following command:
+
 ```
 php app/console oro:navigation:init
 ```
+
+### Menu data sources
+
+Menu data can come from different sources:
+
+* configs (`SomeBundle/Resources/config/oro/navigation.yml`)
+* builders tagged as `oro_menu.builder`
+* event listeners for `oro_menu.configure.<menu_alias>` event
+* changes made by user in menu management UI
 
 ## Your first menu
 
 ### Defining menu with PHP Builder
 
-To create menu with Builder it have to be registered as oro_menu.builder tag in services.yml
+To create menu with Builder it have to be registered as `oro_menu.builder` tag in `services.yml`
 alias attribute should be added as well and will be used as menu identifier.
 
 ```yaml
-services.yml
+# services.yml
 parameters:
   acme.main_menu.builder.class: Acme\Bundle\DemoBundle\Menu\MainMenuBuilder
 
@@ -37,11 +47,12 @@ services:
     tags:
        - { name: oro_menu.builder, alias: main }
 ```
-All menu Builders must implement Oro\Menu\BuilderInterface with build() method. In build() method Bundles manipulate
-menu items. All builders are collected in ChainBuilderProvider which is registered in system as Knp\Menu Provider.
+
+All menu Builders must implement `Oro\Menu\BuilderInterface` with `build()` method. In `build()` method Bundles manipulate
+menu items. All builders are collected in `BuilderChainProvider` which is registered in system as Knp\Menu Provider.
 Configurations are collected in Extension and passed into Configuration class. In future more
 addition Configurations may be created, for example for getting menu configurations from annotations or some persistent
-storage like database. After menu structure created oro_menu.configure.<menu_alias> event dispatched, with MenuItem
+storage like database. After menu structure created `oro_menu.configure.<menu_alias>` event dispatched, with MenuItem
 and MenuFactory available.
 
 ``` php
@@ -63,9 +74,11 @@ class MainMenuBuilder implements BuilderInterface
     }
 }
 ```
+
 ### Menu declaration in YAML
-YAML file with default menu declaration is located in /Oro/NavigationBundle/Resources/config/oro/navigation.yml.
-In addition to it, each bundle may have their own menu which must be located in /SomeBundleName/Resource/config/oro/navigation.yml.
+
+YAML file with default menu declaration is located in `Oro/NavigationBundle/Resources/config/oro/navigation.yml`.
+In addition to it, each bundle may have their own menu which must be located in `SomeBundleName/Resource/config/oro/navigation.yml`.
 Both types of declaration files have the same format:
 
 ```yaml
@@ -75,43 +88,41 @@ menu_config:
             template: <template>              # path to custom template for renderer
             clear_matcher: <option_value>
             depth: <option_value>
-            currentAsLink: <option_value>
-            currentClass: <option_value>
-            ancestorClass: <option_value>
-            firstClass: <option_value>
-            lastClass: <option_value>
+            current_as_link: <option_value>
+            current_class: <option_value>
+            ancestor_class: <option_value>
+            first_class: <option_value>
+            last_class: <option_value>
             compressed: <option_value>
             block: <option_value>
-            rootClass: <option_value>
-            isDropdown: <option_value>
+            root_class: <option_value>
+            is_dropdown: <option_value>
 
     items: #menu items
         <key>: # menu item identifier. used as default value for name, route and label, if it not set in options
-            aclResourceId                     # ACL resource Id
-            translateDomain: <domain_name>    # translation domain
-                translateParameters:          # translation parameters
-            label: <label>                    # label text or translation string template
-            name:  <name>                     # name of menu item, used as default for route
-            uri: <uri_string>                 # uri string, if no route parameter set
-            route: <route_name>               # route name for uri generation, if not set and uri not set - loads from key
-                routeParameters:              # router parameters
-            attributes: <attr_list>           # <li> item attributes
-            linkAttributes: <attr_list>       # <a> anchor attributes
-            labelAttributes: <attr_list>      # <span> attributes for text items without link
-            childrenAttributes: <attr_list>   # <ul> item attributes for nested lists
-            showNonAuthorized: <boolean>      # show for non-authorized users
-            display: <boolean>                # disable showing of menu item
-            displayChildren: <boolean>        # disable showing of menu item children
-
-    areas:                                    # menu area identifier
-        default:                              # identifier area for menu in admin panel
-            - application_menu                # application menu in admin panel
-        custom:                               # identifier area for menu in custom place
-            - custom_menu                     # custom menu in admin panel
+            acl_resource_id: <string>           # ACL resource Id
+            translate_domain: <domain_name>     # translation domain
+            translate_parameters:               # translation parameters
+            label: <label>                      # label text or translation string template
+            name:  <name>                       # name of menu item, used as default for route
+            uri: <uri_string>                   # uri string, if no route parameter set
+            read_only: <boolean>                # disable ability to edit menu item in UI
+            route: <route_name>                 # route name for uri generation, if not set and uri not set - loads from key
+            route_parameters:                   # router parameters
+            attributes: <attr_list>             # <li> item attributes
+            link_attributes: <attr_list>        # <a> anchor attributes
+            label_attributes: <attr_list>       # <span> attributes for text items without link
+            children_attributes: <attr_list>    # <ul> item attributes for nested lists
+            show_non_authorized: <boolean>      # show for non-authorized users
+            display: <boolean>                  # disable showing of menu item
+            display_children: <boolean>         # disable showing of menu item children
 
     tree:
         <menu_alias>                            # menu alias
             type: <menu_type>                   # menu type code. Link to menu template section.
+            area: <string>                      # menu area identifier
+            read_only: <boolean>                # disable ability to edit menu in UI
+            max_nesting_level: <integer>        # menu max nesting level
             merge_strategy: <strategy>          # node merge strategy. possible strategies are append|replace|move
             extras:                             # extra parameters for container renderer
                 brand: <string>
@@ -137,6 +148,7 @@ For example: `acme_my_menu_item` instead of `my_menu_item`.
 
 Navigation bundle helps to manage page titles for all routes and supports titles translation.
 Rout titles can be defined in navigation.yml file:
+
 ```yaml
 titles:
     route_name_1: "%%parameter%% - Title"
@@ -145,11 +157,13 @@ titles:
 ```
 
 Title can be defined with annotation together with route annotation:
+
 ```
 @TitleTemplate("Route title with %%parameter%%")
 ```
 
 After titles update following command should be executed:
+
 ```
 php app/console oro:navigation:init
 ```

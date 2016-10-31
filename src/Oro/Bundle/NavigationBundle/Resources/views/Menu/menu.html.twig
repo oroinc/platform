@@ -66,7 +66,7 @@
 {% endblock %}
 
 {% block item_renderer %}
-    {% set showNonAuthorized = item.extras.showNonAuthorized is defined and item.extras.showNonAuthorized %}
+    {% set showNonAuthorized = item.extras.show_non_authorized is defined and item.extras.show_non_authorized %}
     {% set displayable = item.extras.isAllowed or showNonAuthorized %}
     {% if item.displayed and displayable %}
         {# building the class of the item #}
@@ -137,7 +137,9 @@
     {% endif -%}
     {% if options.allow_safe_labels and item.getExtra('safe_label', false) %}
         {{- item.label|trans|raw -}}
+    {% elseif item.getExtra('translate_disabled', false) == false %}
+        {{- item.label|trans(item.getExtra('translateParams', {}), item.getExtra('translateDomain', 'messages'))|title -}}
     {% else %}
-        {{- item.label|trans(item.getExtra('translateParams', {}), item.getExtra('translateDomain', 'messages')) -}}
+        {{- item.label|title -}}
     {% endif %}
 {% endblock %}

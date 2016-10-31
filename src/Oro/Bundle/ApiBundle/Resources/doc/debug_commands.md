@@ -1,7 +1,8 @@
-Debug commands
---------------
+Debug Commands
+==============
 
-### oro:api:cache:clear
+oro:api:cache:clear
+-------------------
 
 This command command clears Data API cache.
 
@@ -11,7 +12,8 @@ Usually you need to run this command when you add a new entity to `Resources/con
 php app/console oro:api:cache:clear
 ```
 
-### oro:api:doc:cache:clear
+oro:api:doc:cache:clear
+-----------------------
 
 This command allows to clear or warm-up API documentation cache.
 
@@ -33,7 +35,8 @@ To work only with the specified [API documentation views](https://github.com/nel
 php app/console oro:api:doc:cache:clear --view=rest_json_api
 ```
 
-### oro:api:dump
+oro:api:dump
+------------
 
 This command shows all resources accessible through Data API.
 
@@ -73,7 +76,8 @@ In additional you can use this command to get all entities that are not accessib
 php app/console oro:api:dump --not-accessible
 ```
 
-### oro:api:debug
+oro:api:debug
+-------------
 
 This command shows details about registered Data API actions and processors.
 
@@ -95,7 +99,8 @@ The `request-type` option can be used to see the processors which will be execut
 php app/console oro:api:debug get_list --request-type=rest --request-type=json_api
 ```
 
-### oro:api:config:dump
+oro:api:config:dump
+-------------------
 
 This command shows configuration for a particular entity.
 
@@ -154,7 +159,8 @@ or it's also possible to pass multiple options
 php app/console oro:api:config:dump users --extra=sorters --extra=descriptions --extra=filters --extra="Acme\Bundle\AcmeBundle\Config\AcmeConfigExtra"
 ```
 
-### oro:api:metadata:dump
+oro:api:metadata:dump
+---------------------
 
 This command shows metadata for a particular entity.
 
@@ -182,7 +188,8 @@ If you want to see entity metadata that is used for a particular request type yo
 php app/console oro:api:metadata:dump users --request-type=rest --request-type=json_api
 ```
 
-### oro:api:config:dump-reference
+oro:api:config:dump-reference
+-----------------------------
 
 This command shows the structure of `Resources/config/oro/api.yml`.
 

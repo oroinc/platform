@@ -6,11 +6,13 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\HttpKernel\KernelInterface;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Yaml\Yaml;
 
 class OroIconType extends AbstractType
 {
+    const NAME = 'oro_icon_select';
+
     /**
      * @var KernelInterface
      */
@@ -44,7 +46,7 @@ class OroIconType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    public function configureOptions(OptionsResolver $resolver)
     {
         $configFile = $this->kernel->locateResource('@OroFormBundle/Resources/config/config_icon.yml');
         $config      = Yaml::parse(file_get_contents($configFile));
@@ -90,6 +92,6 @@ class OroIconType extends AbstractType
      */
     public function getBlockPrefix()
     {
-        return 'oro_icon_select';
+        return self::NAME;
     }
 }

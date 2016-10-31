@@ -1,0 +1,21 @@
+Oro\Bundle\OrganizationBundle\Entity\BusinessUnit:
+  businessUnit:
+    name: Common Business Unit
+    organization: '@organization'
+
+Oro\Bundle\ReportBundle\Entity\ReportType:
+  reportType:
+    __construct: ['Common report type']
+    label: Common Report Type
+
+Oro\Bundle\ReportBundle\Entity\Report:
+  report:
+    name: Common Report
+    type: '@reportType'
+    entity: Oro\Bundle\OrganizationBundle\Entity\Organization
+    definition: abcd
+
+Oro\Bundle\OrganizationBundle\Entity\Organization:
+  commonOrganization:
+    name: Common Organization
+    enabled: true

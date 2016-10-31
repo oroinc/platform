@@ -177,6 +177,7 @@ api:
 
 The `entities` section describes a configuration of entities.
 
+* **documentation_resource** *string* May contain the link to [markdown](https://en.wikipedia.org/wiki/Markdown) file that contains a detailed documentation for a single or multiple API resources. For more details see [Documenting API Resources](./documentation.md).
 * **exclude** *boolean* Indicates whether the entity should be excluded from Data API. By default `false`.
 * **inherit** *boolean* By default `true`. The flag indicates that the configuration for certain entity should be merged with the configuration of a parent entity. If a derived entity should have completely different configuration and merging with parent configuration is not needed the flag should be set to `false`.
 * **exclusion_policy** *string* - Can be `all` or `none`. By default `none`. Indicates the exclusion strategy that should be used for the entity. `all` means that all fields are not configured explicitly will be excluded. `none` means that only fields marked with `exclude` flag will be excluded.
@@ -204,6 +205,7 @@ Example:
 api:
     entities:
         Acme\Bundle\AcmeBundle\Entity\AcmeEntity:
+            documentation_resource: '@AcmeAcmeBundle/Resources/doc/api/acme_entity.md'
             inherit:              false
             exclusion_policy:     all
             max_results:          25
@@ -213,7 +215,7 @@ api:
             hints:
                 - HINT_TRANSLATABLE
                 - { name: HINT_FILTER_BY_CURRENT_USER }
-                - { name: HINT_CUSTOM_OUTPUT_WALKER, value: "Acme\Bundle\AcmeBundle\AST_Walker_Class"}
+                - { name: HINT_CUSTOM_OUTPUT_WALKER, value: 'Acme\Bundle\AcmeBundle\AST_Walker_Class'}
             delete_handler:       acme.demo.test_entity.delete_handler
             excluded:             false
             form_type: acme_entity.api_form
@@ -227,9 +229,9 @@ api:
 This section describes entity fields' configuration.
 
 * **exclude** *boolean* Indicates whether the field should be excluded. This property is described above in ["exclude" option](#exclude-option).
-* **description** *string* A human-readable description of the field. Used in auto generated documentation only.
+* **description** *string* A human-readable description of the field or a link to the [documentation resource](./documentation.md). Used in auto generated documentation only.
 * **property_path** *string* The property path to reach the fields' value. Can be used to rename a field or to access to a field of related entity.
-* **data_transformer** - The data transformer(s) to be applies to the field value. Can be specified as service name, array of service names or as FQCN and method name.
+* **data_transformer** - The data transformer(s) to be applies to the field value. Can be specified as service name, array of service names or as FQCN and method name. If a data transformer is a static method of a class, the method should have the following signature: `function ($class, $property, $value, array $config, array $context) : mixed` and should return transformed value. If a data transformer is a service, it should implement either `Oro\Component\EntitySerializer\DataTransformerInterface` or `Symfony\Component\Form\DataTransformerInterface` interface.
 * **collapse** *boolean* Indicates whether the entity should be collapsed. It is applicable for associations only. It means that target entity should be returned as a value, instead of an array with values of entity fields. Usually this property is set by [get_relation_config](./actions.md#get_relation_config-action) processors to get identifier of the related entity.
 * **form_type** *string* The form type that should be used for the field in [create](./actions.md#create-action) and [update](./actions.md#update-action) actions.
 * **form_options** *array* The form options that should be used for the field in [create](./actions.md#create-action) and [update](./actions.md#update-action) actions.
@@ -262,12 +264,12 @@ api:
                 # full syntax for data transformer
                 field2:
                     data_transformer:
-                        - "my.data.transformer.service.id"
-                        - ["Acme\Bundle\AcmeBundle\DataTransformer\MyDataTransformer", "transform"]
+                        - 'my.data.transformer.service.id'
+                        - ['Acme\Bundle\AcmeBundle\DataTransformer\MyDataTransformer', 'transform']
 
                 # short syntax for data transformer
                 field3:
-                    data_transformer: "my.data.transformer.service.id"
+                    data_transformer: 'my.data.transformer.service.id'
 
                 # full syntax for "collapse" property
                 field4:
@@ -311,7 +313,7 @@ This section describes fields by which the result data can be filtered. It conta
 * **exclusion_policy** *string* Can be `all` or `none`. By default `none`. Indicates the exclusion strategy that should be used. `all` means that all fields are not configured explicitly will be excluded. `none` means that only fields marked with `exclude` flag will be excluded.
 * **fields** This section describes a configuration of each field that can be used to filter the result data. Each filter can have the following properties:
     * **exclude** *boolean* Indicates whether filtering by this field should be disabled. By default `false`.
-    * **description** *string* A human-readable description of the filter. Used in auto generated documentation only.
+    * **description** *string* A human-readable description of the filter or a link to the [documentation resource](./documentation.md). Used in auto generated documentation only.
     * **property_path** *string* The property path to reach the fields' value. The same way as above in `fields` configuration section.
     * **data_type** *string* The data type of the filter value. Can be `boolean`, `integer`, `string`, etc.
     * **allow_array** *boolean* A flag indicates whether the filter can contains several values. By default `false`.
@@ -334,7 +336,7 @@ api:
                     field2:
                         data_type: string
                         property_path: firstName
-                        description: "My filter description"
+                        description: 'My filter description'
                     field3:
                         data_type: boolean
                         allow_array: false
@@ -378,7 +380,7 @@ The `actions` configuration section allows to specify action-specific options. T
 
 * **exclude** *boolean* Indicates whether the action is disabled for entity. By default `false`.
 * **description** *string* A short, human-readable description of API resource. Used in auto generated documentation only.
-* **documentation** *string* A detailed documentation of API resource. Used in auto generated documentation only.
+* **documentation** *string* A detailed documentation of API resource or a link to the [documentation resource](./documentation.md). Used in auto generated documentation only.
 * **acl_resource** *string* The name of ACL resource that should be used to protect an entity in a scope of this action. The `null` can be used to disable access checks.
 * **max_results** *integer* The maximum number of entities in the result. Set `-1` (it means unlimited), zero or positive number to set the limit. Can be used to set the limit for both root and related entities.
 * **order_by** *array* The property can be used to configure default ordering of the result. The item key is the name of a field. The value can be `ASC` or `DESC`. By default the result is ordered by identifier field.

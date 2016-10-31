@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\MessageQueueBundle\Test\Functional;
 
+use Symfony\Component\DependencyInjection\ContainerInterface;
+
 /**
  * It is expected that this trait will be used in classes that have "getContainer" method.
  * E.g. classes derived from Oro\Bundle\TestFrameworkBundle\Test\WebTestCase.
@@ -11,28 +13,29 @@ trait MessageQueueExtension
     use MessageQueueAssertTrait;
 
     /**
-     * Enables the collecting of messages before each test.
+     * Removes all sent messages.
      *
      * @before
      */
     public function setUpMessageCollector()
     {
         self::getMessageCollector()
-            ->enable();
+            ->clear();
     }
 
     /**
-     * Removes all sent messages and disables the collecting of new messages after each test.
-     * The disabling of the collector is needed because it is possible that exist
-     * functional test that produce messages, but they do not need to test it,
-     * and, as result, this extension might not be added to such tests.
+     * Removes all sent messages.
      *
      * @after
      */
     public function tearDownMessageCollector()
     {
         self::getMessageCollector()
-            ->clear()
-            ->disable();
+            ->clear();
     }
+
+    /**
+     * @return ContainerInterface
+     */
+    abstract public function getContainer();
 }

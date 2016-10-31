@@ -3,6 +3,7 @@
 namespace Oro\Bundle\TranslationBundle\Tests\Functional\ImportExport\Strategy;
 
 use Oro\Bundle\TranslationBundle\Entity\Translation;
+use Oro\Bundle\TranslationBundle\Entity\TranslationKey;
 use Oro\Bundle\TranslationBundle\ImportExport\Strategy\TranslationResetStrategy;
 use Oro\Bundle\TranslationBundle\Tests\Functional\DataFixtures\LoadLanguages;
 use Oro\Bundle\TranslationBundle\Tests\Functional\DataFixtures\LoadTranslations;
@@ -10,7 +11,7 @@ use Oro\Bundle\TranslationBundle\Tests\Functional\DataFixtures\LoadTranslations;
 /**
  * @dbIsolation
  */
-class TranslatioResetStrategyTest extends AbstractTranslationImportStrategyTest
+class TranslationResetStrategyTest extends AbstractTranslationImportStrategyTest
 {
     public function testProcess()
     {
@@ -20,9 +21,8 @@ class TranslatioResetStrategyTest extends AbstractTranslationImportStrategyTest
         $existingTranslation = $this->getReference(LoadTranslations::TRANSLATION1);
         $translation = new Translation();
         $translation
-            ->setLocale($existingTranslation->getLocale())
-            ->setDomain($existingTranslation->getDomain())
-            ->setKey($existingTranslation->getKey())
+            ->setLanguage($existingTranslation->getLanguage())
+            ->setTranslationKey($existingTranslation->getTranslationKey())
             ->setValue($existingTranslation->getValue());
 
         $this->processTranslation($translation);
@@ -30,10 +30,12 @@ class TranslatioResetStrategyTest extends AbstractTranslationImportStrategyTest
         $this->assertEquals(1, $this->getTranslationsByLocaleCount(LoadLanguages::LANGUAGE1));
 
         $translation = new Translation();
+        $translationKey = new TranslationKey();
+        $translationKey = $this->processTranslationKey($translationKey->setDomain('new_domain')->setKey('new_key'));
+
         $translation
-            ->setLocale(LoadLanguages::LANGUAGE1)
-            ->setDomain('new_domain')
-            ->setKey('new_key')
+            ->setLanguage($this->getReference(LoadLanguages::LANGUAGE1))
+            ->setTranslationKey($translationKey)
             ->setValue('new_value');
 
         $this->processTranslation($translation);
@@ -51,7 +53,7 @@ class TranslatioResetStrategyTest extends AbstractTranslationImportStrategyTest
         return new TranslationResetStrategy(
             $container->get('event_dispatcher'),
             $container->get('oro_importexport.strategy.import.helper'),
-            $container->get('oro_importexport.field.field_helper'),
+            $container->get('oro_entity.helper.field_helper'),
             $container->get('oro_importexport.field.database_helper'),
             $container->get('oro_entity.entity_class_name_provider'),
             $container->get('translator'),

@@ -13,11 +13,9 @@ use Oro\Bundle\FormBundle\Form\Extension\Traits\FormExtendedTypeTrait;
 class JsValidationExtension extends AbstractTypeExtension
 {
     use FormExtendedTypeTrait;
-    
-    /**
-     * @var ConstraintsProvider
-     */
-    protected $eventDispatcher;
+
+    /** @var ConstraintsProvider */
+    protected $constraintsProvider;
 
     /**
      * @param ConstraintsProvider $constraintsProvider
@@ -32,19 +30,19 @@ class JsValidationExtension extends AbstractTypeExtension
      */
     public function finishView(FormView $view, FormInterface $form, array $options)
     {
-        $this->addDataValidationOptionalGroupAttribute($view, $options);
+        $this->addDataValidationOptionalGroupAttributes($view, $options);
         $this->addDataValidationAttribute($view, $form);
     }
 
     /**
-     * Adds "data-validation-optional-group" attribute to embedded form.
+     * Adds "data-validation-optional-group" attributes to embedded form.
      *
      * Validation will run only if one of the children is filled in.
      *
      * @param FormView $view
      * @param array $options
      */
-    protected function addDataValidationOptionalGroupAttribute(FormView $view, array $options)
+    protected function addDataValidationOptionalGroupAttributes(FormView $view, array $options)
     {
         if ($this->isOptionalEmbeddedFormView($view, $options)) {
             $view->vars['attr']['data-validation-optional-group'] = null;
