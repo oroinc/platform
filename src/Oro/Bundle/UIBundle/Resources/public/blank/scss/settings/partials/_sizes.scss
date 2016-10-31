@@ -1,7 +1,9 @@
 // Media breakpoints
-$breakpoint-desktop: 1333px !default;
-$breakpoint-tablet: $breakpoint-desktop - 1px !default;
-$breakpoint-mobile: 640px !default;
+$breakpoint-desktop: 1100px;
+$breakpoint-tablet: $breakpoint-desktop - 1px;
+$breakpoint-tablet-small: 992px;
+$breakpoint-mobile-portrait: 640px;
+$breakpoint-mobile: 414px;
 
 // Offsets
 $offset-y: 15px !default;
