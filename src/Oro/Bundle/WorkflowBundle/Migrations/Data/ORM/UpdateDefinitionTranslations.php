@@ -4,6 +4,7 @@ namespace Oro\Bundle\WorkflowBundle\Migrations\Data\ORM;
 
 use Doctrine\Common\DataFixtures\AbstractFixture;
 use Doctrine\Common\Persistence\ObjectManager;
+use Doctrine\DBAL\Types\Type;
 
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerAwareTrait;
@@ -23,28 +24,19 @@ class UpdateDefinitionTranslations extends AbstractFixture implements ContainerA
      */
     public function load(ObjectManager $manager)
     {
-        /* @var $handler WorkflowDefinitionHandler */
-        $handler = $this->container->get('oro_workflow.handler.workflow_definition');
+        $qb = $manager->getRepository(WorkflowDefinition::class)->createQueryBuilder('wd');
 
-        /* @var $processor TranslationProcessor */
+        /** @var $definitions WorkflowDefinition[] */
+        $definitions = $qb->where($qb->expr()->notIn('wd.name', ':names'))
+            ->setParameter('name', $this->getWorkflowNamesFromCurrentConfiguration(), Type::TARRAY)
+            ->getQuery()
+            ->getResult();
+
+        /** @var $processor TranslationProcessor */
         $processor = $this->container->get('oro_workflow.translation.processor');
 
-        /* @var $definitions WorkflowDefinition[] */
-        $definitions = $manager->getRepository(WorkflowDefinition::class)->findAll();
-
-        /** @var WorkflowConfigurationProvider $configurationProvider */
-        $configurationProvider = $this->container->get('oro_workflow.configuration.provider.workflow_config');
-        $workflowConfiguration = $configurationProvider->getWorkflowDefinitionConfiguration();
-
-        if (count($workflowConfiguration)) {
-            $workflowNames = array_map(function ($config) {
-                return $config['name'];
-            }, $workflowConfiguration);
-
-            $definitions = array_filter($definitions, function (WorkflowDefinition $definition) use ($workflowNames) {
-                return !in_array($definition->getName(), $workflowNames);
-            });
-        }
+        /** @var $handler WorkflowDefinitionHandler */
+        $handler = $this->container->get('oro_workflow.handler.workflow_definition');
 
         foreach ($definitions as $definition) {
             $this->processConfiguration($processor, $definition);
@@ -52,6 +44,23 @@ class UpdateDefinitionTranslations extends AbstractFixture implements ContainerA
         }
 
         $manager->flush();
+    }
+
+    /**
+     * @return array
+     */
+    protected function getWorkflowNamesFromCurrentConfiguration()
+    {
+        /** @var WorkflowConfigurationProvider $configurationProvider */
+        $configurationProvider = $this->container->get('oro_workflow.configuration.provider.workflow_config');
+        $workflowConfiguration = $configurationProvider->getWorkflowDefinitionConfiguration();
+
+        return array_map(
+            function ($config) {
+                return $config['name'];
+            },
+            $workflowConfiguration
+        );
     }
 
     /**
