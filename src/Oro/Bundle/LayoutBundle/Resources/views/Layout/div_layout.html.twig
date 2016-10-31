@@ -117,14 +117,8 @@
 {% endblock %}
 
 {% block title_widget -%}
-    {% set attr = attr|merge({
-        value: value
-    }) %}
-
     {% spaceless %}
-        <title>
-            {{ value|block_text(translation_domain) }}
-        </title>
+        <title>{{ value|block_text(translation_domain) }}</title>
     {% endspaceless %}
 {%- endblock %}
 
