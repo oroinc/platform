@@ -185,7 +185,7 @@ FROM
     %s AS a
     INNER JOIN
         (
-            SELECT  connector, MAX(`date`) AS minDate
+            SELECT  connector, MAX(date) AS minDate
             FROM %s AS b
             WHERE b.code = %s
             GROUP BY connector
