@@ -48,7 +48,7 @@ class EntityNameProviderTest extends \PHPUnit_Framework_TestCase
 
     public function testGetNameForUnsupportedFormat()
     {
-        $result = $this->entityNameProvider->getName('full', null, new TestEntity());
+        $result = $this->entityNameProvider->getName('test', null, new TestEntity());
         $this->assertFalse($result);
     }
 
@@ -89,7 +89,7 @@ class EntityNameProviderTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse($result);
     }
 
-    public function testGetNameNoAppropriateFieldButHasIdentifier()
+    public function testGetNameShortEmptyNameButHasIdentifier()
     {
         $entity = new TestEntity(123);
 
@@ -97,17 +97,84 @@ class EntityNameProviderTest extends \PHPUnit_Framework_TestCase
             ->method('getIdentifierFieldNames')
             ->willReturn(['id']);
 
+        $this->metadata->expects($this->any())
+            ->method('hasField')
+            ->willReturnMap(
+                [
+                    ['name', true],
+                ]
+            );
+
+        $this->metadata->expects($this->once())
+            ->method('getTypeOfField')
+            ->with('name')
+            ->willReturn('string');
+
         $result = $this->entityNameProvider->getName('short', null, $entity);
         $this->assertEquals(123, $result);
     }
 
-    public function testGetNameDQLForUnsupportedFormat()
+    public function testGetNameFullEmptyNameButHasIdentifier()
     {
-        $result = $this->entityNameProvider->getNameDQL('full', null, self::ENTITY_CLASS, 'alias');
+        $entity = new TestEntity(123);
+
+        $this->metadata->expects($this->once())
+            ->method('getIdentifierFieldNames')
+            ->willReturn(['id']);
+
+        $this->metadata->expects($this->any())
+            ->method('hasField')
+            ->willReturnMap(
+                [
+                    ['name', true],
+                ]
+            );
+
+        $this->metadata->expects($this->once())
+            ->method('getTypeOfField')
+            ->with('name')
+            ->willReturn('string');
+
+        $this->metadata->expects($this->once())
+            ->method('getFieldNames')
+            ->willReturn(['name']);
+
+        $result = $this->entityNameProvider->getName('full', null, $entity);
+        $this->assertEquals(123, $result);
+    }
+
+    public function testGetNameFullEmptyNameButNoIdentifier()
+    {
+        $entity = new TestEntity(123);
+
+        $this->metadata->expects($this->any())
+            ->method('hasField')
+            ->willReturnMap(
+                [
+                    ['name', true],
+                ]
+            );
+
+        $this->metadata->expects($this->once())
+            ->method('getTypeOfField')
+            ->with('name')
+            ->willReturn('string');
+
+        $this->metadata->expects($this->once())
+            ->method('getFieldNames')
+            ->willReturn(['name']);
+
+        $result = $this->entityNameProvider->getName('full', null, $entity);
         $this->assertFalse($result);
     }
 
-    public function testGetNameDQL()
+    public function testGetNameDQLForUnsupportedFormat()
+    {
+        $result = $this->entityNameProvider->getNameDQL('test', null, self::ENTITY_CLASS, 'alias');
+        $this->assertFalse($result);
+    }
+
+    public function testGetNameDQLShortNoIdentifier()
     {
         $this->metadata->expects($this->any())
             ->method('hasField')
@@ -125,6 +192,28 @@ class EntityNameProviderTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('alias.name', $result);
     }
 
+    public function testGetNameDQLShortWithIdentifier()
+    {
+        $this->metadata->expects($this->once())
+            ->method('getIdentifierFieldNames')
+            ->willReturn(['id']);
+
+        $this->metadata->expects($this->any())
+            ->method('hasField')
+            ->willReturnMap(
+                [
+                    ['name', true],
+                ]
+            );
+        $this->metadata->expects($this->once())
+            ->method('getTypeOfField')
+            ->with('name')
+            ->willReturn('string');
+
+        $result = $this->entityNameProvider->getNameDQL('short', null, self::ENTITY_CLASS, 'alias');
+        $this->assertEquals('COALESCE(alias.name, alias.id)', $result);
+    }
+
     public function testGetNameDQLForNotManageableEntity()
     {
         $result = $this->entityNameProvider->getNameDQL('short', null, 'Test\Class', 'alias');
@@ -137,13 +226,66 @@ class EntityNameProviderTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse($result);
     }
 
-    public function testGetNameDQLNoAppropriateFieldButHasIdentifier()
+    public function testGetNameDQLShortNoAppropriateField()
+    {
+        $result = $this->entityNameProvider->getNameDQL('short', null, self::ENTITY_CLASS, 'alias');
+
+        $this->assertFalse($result);
+    }
+
+    public function testGetNameDQLFullNoAppropriateFields()
+    {
+        $result = $this->entityNameProvider->getNameDQL('full', null, self::ENTITY_CLASS, 'alias');
+        $this->assertFalse($result);
+    }
+
+    public function testGetNameDQLFull()
     {
         $this->metadata->expects($this->once())
             ->method('getIdentifierFieldNames')
             ->willReturn(['id']);
 
-        $result = $this->entityNameProvider->getNameDQL('short', null, self::ENTITY_CLASS, 'alias');
-        $this->assertEquals('alias.id', $result);
+        $this->metadata->expects($this->any())
+            ->method('hasField')
+            ->willReturnMap(
+                [
+                    ['name', true],
+                    ['description', true],
+                ]
+            );
+
+        $this->metadata->expects($this->once())
+            ->method('getFieldNames')
+            ->willReturn(['name', 'description']);
+
+        $this->metadata->expects($this->exactly(2))
+            ->method('getTypeOfField')
+            ->willReturn('string');
+
+        $result = $this->entityNameProvider->getNameDQL('full', null, self::ENTITY_CLASS, 'alias');
+        $this->assertEquals('COALESCE(CONCAT_WS(\' \', alias.name, alias.description), alias.id)', $result);
+    }
+
+    public function testGetNameDQLFullNoIdentifier()
+    {
+        $this->metadata->expects($this->any())
+            ->method('hasField')
+            ->willReturnMap(
+                [
+                    ['name', true],
+                    ['description', true],
+                ]
+            );
+
+        $this->metadata->expects($this->once())
+            ->method('getFieldNames')
+            ->willReturn(['name', 'description']);
+
+        $this->metadata->expects($this->exactly(2))
+            ->method('getTypeOfField')
+            ->willReturn('string');
+
+        $result = $this->entityNameProvider->getNameDQL('full', null, self::ENTITY_CLASS, 'alias');
+        $this->assertEquals('CONCAT_WS(\' \', alias.name, alias.description)', $result);
     }
 }

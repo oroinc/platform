@@ -523,7 +523,10 @@ oro_email.email_address.entity_manager:
 - Added EntityFallbackExtension service which reads fallback values of entities in twig
 - Added AbstractEntityFallbackProvider abstract service to ease adding new fallback types, please refer
 to the [Fallback documentation](./src/Oro/Bundle/EntityBundle/Resources/doc/entity_fallback.md) for details
-- `Oro\Bundle\EntityBundle\Provider\EntityNameProvider` now is the base Entity Name Provider which returns entity titles based on the first of the string entity fields from 'firstName', 'name', 'title', 'subject' or a space-delimited concatenation of all string fields (new). If resulting title is empty it will return the entity id. Same applies for both getName and getNameDQL methods.
+- `Oro\Bundle\EntityBundle\Provider\EntityNameProvider` now is the base Entity Name Provider which returns:
+   - Short format: entity titles based on the first of the string entity fields from 'firstName', 'name', 'title', 'subject'
+   - Full format: a space-delimited concatenation of all string fields.
+ If resulting title is empty it will return the entity id. Same applies for both getName and getNameDQL methods.
 - Added `Oro\Bundle\EntityBundle\Provider\FallbackEntityNameProvider` which will resolve entity title as Item #1 (uses translator) in case no suitable fields are found to construct the title. Should be kept as last provider.
 
 ####ContactBundle

@@ -7,6 +7,13 @@ use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\Common\Util\ClassUtils;
 use Doctrine\Common\Util\Inflector;
 
+/**
+ * Generic resolver for entity names(titles):
+ * - Short format returns name based on guesses using first existing field from the list $fieldGuesses or false
+ * if no appropriate field is found
+ * - Full format returns concatenation of all string fields or false if no string fields are found.
+ * When existing fields have empty values, identifier (if exists and is single) will be used as title.
+ */
 class EntityNameProvider implements EntityNameProviderInterface
 {
     /** @var string[] */
@@ -28,21 +35,32 @@ class EntityNameProvider implements EntityNameProviderInterface
      */
     public function getName($format, $locale, $entity)
     {
+        if (!in_array($format, [self::SHORT, self::FULL])) {
+            // unsupported format
+            return false;
+        }
+
         $className = ClassUtils::getClass($entity);
-        if ($format === self::SHORT) {
-            return $this->getConstructedName($entity, [$this->getFieldName($className)]);
+
+        $fieldNames = self::FULL === $format
+            ? $this->getFieldNames($className)
+            : (array) $this->guessFieldName($className);
+
+        if (empty($fieldNames)) {
+            // no suitable fields
+            return false;
         }
 
-        if ($format === self::FULL) {
-            if ($name = $this->getConstructedName($entity, $this->getFieldNames($className))) {
-                return $name;
-            }
-
-            if ($idFiledName = $this->getIdFieldName($className)) {
-                return $idFiledName;
-            }
+        if ($name = $this->getConstructedName($entity, $fieldNames)) {
+            return $name;
         }
 
+        // field value is empty, try with id
+        if ($idFiledName = $this->getIdFieldName($className)) {
+            return $this->getFieldValue($entity, $idFiledName);
+        }
+
+        // no identifier column
         return false;
     }
 
@@ -51,40 +69,54 @@ class EntityNameProvider implements EntityNameProviderInterface
      */
     public function getNameDQL($format, $locale, $className, $alias)
     {
-        if ($format === self::SHORT) {
-            $fieldName = $this->getFieldName($className);
-            if ($fieldName) {
-                return $alias . '.' . $fieldName;
-            }
+        if (!in_array($format, [self::SHORT, self::FULL])) {
+            // unsupported format
+            return false;
         }
+        $idFieldName = $this->getIdFieldName($className);
+        $idColumnName = $idFieldName ? sprintf('%s.%s', $alias, $idFieldName) : false;
 
-        if ($format === self::FULL) {
-            $fieldNames = $this->getFieldNames($className);
-            if (0 === count($fieldNames)) {
+        if ($format === self::SHORT) {
+            $guessFieldName = $this->guessFieldName($className);
+            if (!$guessFieldName) {
                 return false;
             }
 
-            // prepend table alias
-            $fieldNames = array_map(function ($fieldName) use ($alias) {
+            $nameDQL = $alias . '.' . $guessFieldName;
+
+            if ($idColumnName) {
+                return sprintf('COALESCE(%s, %s)', $nameDQL, $idColumnName);
+            }
+
+            return $nameDQL;
+        }
+
+        $fieldNames = $this->getFieldNames($className);
+        if (0 === count($fieldNames)) {
+            return false;
+        }
+
+        // prepend table alias
+        $fieldNames = array_map(
+            function ($fieldName) use ($alias) {
                 return $alias . '.' . $fieldName;
-            }, $fieldNames);
+            },
+            $fieldNames
+        );
 
-            $idColumnName = sprintf('%s.%s', $alias, $this->getIdFieldName($className));
 
-            if (count($fieldNames) === 0) {
-                return $idColumnName;
-            }
+        $nameDQL = reset($fieldNames);
 
-            $nameDQL = reset($fieldNames);
+        if (count($fieldNames) > 1) {
+            $nameDQL = sprintf("CONCAT_WS(' ', %s)", implode(', ', $fieldNames));
+        }
 
-            if (count($fieldNames) > 1) {
-                $nameDQL = sprintf("CONCAT_WS(' ', %s)", implode(', ', $fieldNames));
-            }
-
+        if ($idColumnName) {
+            // if has id column, add it as fallback when name is empty
             return sprintf('COALESCE(%s, %s)', $nameDQL, $idColumnName);
         }
 
-        return false;
+        return $nameDQL;
     }
 
     /**
@@ -128,11 +160,13 @@ class EntityNameProvider implements EntityNameProviderInterface
     }
 
     /**
+     * Return first string field from the fieldGuesses or null
+     *
      * @param string $className
      *
      * @return string|null
      */
-    protected function getFieldName($className)
+    protected function guessFieldName($className)
     {
         $metadata = $this->getClassMetadata($className);
 
@@ -144,11 +178,6 @@ class EntityNameProvider implements EntityNameProviderInterface
             if ($metadata->hasField($fieldName) && $metadata->getTypeOfField($fieldName) === 'string') {
                 return $fieldName;
             }
-        }
-
-        $identifierFieldNames = $metadata->getIdentifierFieldNames();
-        if (count($identifierFieldNames) === 1) {
-            return reset($identifierFieldNames);
         }
 
         return null;
@@ -197,12 +226,6 @@ class EntityNameProvider implements EntityNameProviderInterface
                 return 'string' === $metadata->getTypeOfField($fieldName);
             }
         );
-
-        $guessFiledNames = array_intersect($fieldNames, $this->fieldGuesses);
-
-        if (!empty($guessFiledNames)) {
-            return (array) reset($guessFiledNames);
-        }
 
         return $fieldNames;
     }
