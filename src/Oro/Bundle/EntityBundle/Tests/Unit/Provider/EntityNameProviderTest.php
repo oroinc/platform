@@ -211,7 +211,7 @@ class EntityNameProviderTest extends \PHPUnit_Framework_TestCase
             ->willReturn('string');
 
         $result = $this->entityNameProvider->getNameDQL('short', null, self::ENTITY_CLASS, 'alias');
-        $this->assertEquals('COALESCE(alias.name, alias.id AS string)', $result);
+        $this->assertEquals('COALESCE(alias.name, CAST(alias.id AS string))', $result);
     }
 
     public function testGetNameDQLForNotManageableEntity()
@@ -263,7 +263,7 @@ class EntityNameProviderTest extends \PHPUnit_Framework_TestCase
             ->willReturn('string');
 
         $result = $this->entityNameProvider->getNameDQL('full', null, self::ENTITY_CLASS, 'alias');
-        $this->assertEquals('COALESCE(CONCAT_WS(\' \', alias.name, alias.description), alias.id AS string)', $result);
+        $this->assertEquals('COALESCE(CONCAT_WS(\' \', alias.name, alias.description), CAST(alias.id AS string))', $result);
     }
 
     public function testGetNameDQLFullNoIdentifier()

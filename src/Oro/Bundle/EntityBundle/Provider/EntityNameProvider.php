@@ -148,7 +148,7 @@ class EntityNameProvider implements EntityNameProviderInterface
             return $nameDQL;
         }
 
-        return sprintf('COALESCE(%s, %s AS string)', $nameDQL, $alias . '.' . $idFieldName);
+        return sprintf('COALESCE(%s, CAST(%s AS string))', $nameDQL, $alias . '.' . $idFieldName);
     }
 
     /**
