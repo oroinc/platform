@@ -2,8 +2,11 @@
 
 namespace Oro\Bundle\NavigationBundle\Tests\Unit\Menu;
 
+use Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker;
+use Oro\Bundle\FeatureToggleBundle\Checker\FeatureCheckerHolderTrait;
 use Oro\Bundle\NavigationBundle\Menu\NavigationHistoryBuilder;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
+use Symfony\Bundle\FrameworkBundle\Routing\Router;
 
 class NavigationHistoryBuilderTest extends \PHPUnit_Framework_TestCase
 {
@@ -27,6 +30,12 @@ class NavigationHistoryBuilderTest extends \PHPUnit_Framework_TestCase
      */
     protected $manipulator;
 
+    /** @var  Router */
+    protected $router;
+
+    /** @var  FeatureChecker */
+    protected $featureChecker;
+
     /**
      * @var \Oro\Bundle\NavigationBundle\Entity\Builder\ItemFactory
      */
@@ -39,15 +48,24 @@ class NavigationHistoryBuilderTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
         $this->factory = $this->getMock('Oro\Bundle\NavigationBundle\Entity\Builder\ItemFactory');
+        $this->router = $this->getMockBuilder('Symfony\Bundle\FrameworkBundle\Routing\Router')
+            ->disableOriginalConstructor()
+            ->getMock();
 
         $this->builder = $this->getMockBuilder('Oro\Bundle\NavigationBundle\Menu\NavigationHistoryBuilder')
-            ->setConstructorArgs(array($this->securityContext, $this->em, $this->factory))
-            ->setMethods(array('getMenuManipulator'))
+            ->setConstructorArgs(array($this->securityContext, $this->em, $this->factory, $this->router))
+            ->setMethods(array('getMenuManipulator', 'set', 'isRouteEnabled'))
+            ->getMock();
+
+        $this->featureChecker = $this->getMockBuilder(FeatureChecker::class)
+            ->disableOriginalConstructor()
             ->getMock();
 
         $this->manipulator = $this->getMock('Knp\Menu\Util\MenuManipulator');
         $this->builder->expects($this->any())->method('getMenuManipulator')
             ->will($this->returnValue($this->manipulator));
+        $this->builder->setFeatureChecker($this->featureChecker);
+        $this->builder->addFeature('email');
     }
 
     public function testBuild()
@@ -117,6 +135,15 @@ class NavigationHistoryBuilderTest extends \PHPUnit_Framework_TestCase
 
         $this->builder->setMatcher($matcher);
 
+        $this->router->expects($this->exactly(2))
+            ->method('match')
+            ->with($this->isType('string'))
+            ->willReturn(['_route' => 'route']);
+
+        $this->builder->expects($this->exactly(2))
+            ->method('isRouteEnabled')
+            ->with($this->anything())
+            ->willReturn(true);
         $menu->expects($this->exactly(2))
             ->method('addChild');
         $menu->expects($this->once())

@@ -2,8 +2,10 @@
 
 namespace Oro\Bundle\NavigationBundle\Tests\Unit\Menu;
 
+use Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker;
 use Oro\Bundle\NavigationBundle\Menu\NavigationItemBuilder;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
+use Symfony\Bundle\FrameworkBundle\Routing\Router;
 
 class NavigationItemBuilderBuilderTest extends \PHPUnit_Framework_TestCase
 {
@@ -23,6 +25,16 @@ class NavigationItemBuilderBuilderTest extends \PHPUnit_Framework_TestCase
     protected $builder;
 
     /**
+     * @var Router
+     */
+    protected $router;
+
+    /**
+     * @var FeatureChecker
+     */
+    protected $featureChecker;
+
+    /**
      * @var \Oro\Bundle\NavigationBundle\Entity\Builder\ItemFactory
      */
     protected $factory;
@@ -34,7 +46,17 @@ class NavigationItemBuilderBuilderTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
         $this->factory = $this->getMock('Oro\Bundle\NavigationBundle\Entity\Builder\ItemFactory');
-        $this->builder = new NavigationItemBuilder($this->securityContext, $this->em, $this->factory);
+        $this->router = $this->getMockBuilder('Symfony\Bundle\FrameworkBundle\Routing\Router')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $this->featureChecker = $this->getMockBuilder(FeatureChecker::class)
+            ->setMethods(['isResourceEnabled'])
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $this->builder = new NavigationItemBuilder($this->securityContext, $this->em, $this->factory, $this->router);
+        $this->builder->setFeatureChecker($this->featureChecker);
+        $this->builder->addFeature('email');
     }
 
     public function testBuildAnonUser()
@@ -117,6 +139,16 @@ class NavigationItemBuilderBuilderTest extends \PHPUnit_Framework_TestCase
             ->method('getNavigationItems')
             ->with($userId, $organization, $type)
             ->will($this->returnValue($items));
+
+        $this->router->expects($this->exactly(2))
+            ->method('match')
+            ->with($this->isType('string'))
+            ->willReturn(['_route' => 'route']);
+
+        $this->featureChecker->expects($this->exactly(2))
+            ->method('isResourceEnabled')
+            ->with($this->anything())
+            ->willReturn(true);
 
         $this->em->expects($this->once())
             ->method('getRepository')
