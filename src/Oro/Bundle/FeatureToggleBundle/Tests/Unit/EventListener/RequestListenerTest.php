@@ -66,11 +66,17 @@ class RequestListenerTest extends \PHPUnit_Framework_TestCase
 
     public function testForNonMasterRequest()
     {
-        $this->featureChecker->expects($this->never())
-            ->method('isResourceEnabled');
+        $this->featureChecker
+            ->expects($this->once())
+            ->method('isResourceEnabled')
+            ->with('oro_login', 'routes')
+            ->willReturn(false);
 
+        $request = $this->getMock(Request::class);
+        $request->method('get')->with('_route')->willReturn('oro_login');
         /** @var GetResponseEvent|\PHPUnit_Framework_MockObject_MockObject $event */
         $event = $this->getMockBuilder(GetResponseEvent::class)->disableOriginalConstructor()->getMock();
+        $event->method('getRequest')->willReturn($request);
         $event->expects($this->once())
             ->method('isMasterRequest')
             ->willReturn(false);
