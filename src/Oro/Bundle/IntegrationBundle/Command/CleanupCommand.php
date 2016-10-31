@@ -187,13 +187,21 @@ FROM
         (
             SELECT  connector, MAX(`date`) AS minDate
             FROM %s AS b
+            WHERE b.code = %s
             GROUP BY connector
         ) b ON a.connector = b.connector AND
                 a.date = b.minDate
+WHERE a.code = %s
 GROUP BY 
     a.connector
 SQL;
-        $selectQuery = sprintf($selectQuery, $tableName, $tableName);
+        $selectQuery = sprintf(
+            $selectQuery,
+            $tableName,
+            $tableName,
+            Status::STATUS_COMPLETED,
+            Status::STATUS_COMPLETED
+        );
         $data = $connection->fetchAll($selectQuery);
         $excludes = array_map(
             function ($item) {
