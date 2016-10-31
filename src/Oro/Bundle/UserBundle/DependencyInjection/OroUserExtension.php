@@ -18,6 +18,8 @@ use Oro\Bundle\SecurityBundle\DependencyInjection\Extension\SecurityExtensionHel
  */
 class OroUserExtension extends Extension implements PrependExtensionInterface
 {
+    const ALIAS = 'oro_user';
+
     /**
      * {@inheritDoc}
      */

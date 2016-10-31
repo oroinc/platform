@@ -488,8 +488,15 @@ services:
         tags:
             - { name: kernel.event_subscriber }
 
+    oro_user.provider.password_change_period_config_provider:
+        class: Oro\Bundle\UserBundle\Provider\PasswordChangePeriodConfigProvider
+        arguments:
+            - '@oro_config.manager'
+
     oro_user.listener.password_listener:
         class: Oro\Bundle\UserBundle\EventListener\UserPasswordListener
+        arguments:
+            - '@oro_user.provider.password_change_period_config_provider'
         tags:
             - { name: doctrine.event_listener, event: onFlush }
 
@@ -501,3 +508,11 @@ services:
             - '@security.encoder_factory'
         tags:
             - { name: validator.constraint_validator, alias: oro_used_password }
+
+    oro_user.config.listener:
+        class: Oro\Bundle\UserBundle\EventListener\PasswordExpiryPeriodChangeListener
+        arguments:
+            - '@doctrine'
+            - '@oro_user.provider.password_change_period_config_provider'
+        tags:
+            - { name: kernel.event_listener, event: oro_config.update_after, method: onConfigUpdate }
