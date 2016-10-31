@@ -35,6 +35,7 @@ services:
         class: %oro_workflow.attribute_assembler.class%
         arguments:
             - '@oro_workflow.attribute_guesser'
+            - '@translator'
 
     oro_workflow.step_assembler:
         class: %oro_workflow.step_assembler.class%

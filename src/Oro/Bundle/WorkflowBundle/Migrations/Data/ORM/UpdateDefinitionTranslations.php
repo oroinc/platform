@@ -9,6 +9,7 @@ use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerAwareTrait;
 
 use Oro\Bundle\WorkflowBundle\Configuration\WorkflowConfiguration;
+use Oro\Bundle\WorkflowBundle\Configuration\WorkflowConfigurationProvider;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Handler\WorkflowDefinitionHandler;
 use Oro\Bundle\WorkflowBundle\Translation\TranslationProcessor;
@@ -29,7 +30,21 @@ class UpdateDefinitionTranslations extends AbstractFixture implements ContainerA
         $processor = $this->container->get('oro_workflow.translation.processor');
 
         /* @var $definitions WorkflowDefinition[] */
-        $definitions = $manager->getRepository(WorkflowDefinition::class)->findBy(['system' => false]);
+        $definitions = $manager->getRepository(WorkflowDefinition::class)->findAll();
+
+        /** @var WorkflowConfigurationProvider $configurationProvider */
+        $configurationProvider = $this->container->get('oro_workflow.configuration.provider.workflow_config');
+        $workflowConfiguration = $configurationProvider->getWorkflowDefinitionConfiguration();
+
+        if (count($workflowConfiguration)) {
+            $workflowNames = array_map(function ($config) {
+                return $config['name'];
+            }, $workflowConfiguration);
+
+            $definitions = array_filter($definitions, function (WorkflowDefinition $definition) use ($workflowNames) {
+                return !in_array($definition->getName(), $workflowNames);
+            });
+        }
 
         foreach ($definitions as $definition) {
             $this->processConfiguration($processor, $definition);
