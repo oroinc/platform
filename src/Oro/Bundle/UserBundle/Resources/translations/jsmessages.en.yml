@@ -1,3 +1,5 @@
+"Could not perform action": "Could not perform action"
+
 oro:
     user:
         update_status.label: Update status
@@ -6,6 +8,14 @@ oro:
         reset_password:
             flash:
                 success: Reset password email has been sent to user
+            popup:
+                question: User <b>{{ user }}</b> will receive reset password by email and will be disabled from login.
+                title: Reset password
+                label: Reset
+            mass_action:
+                question: The selected users will receive reset password by email and will be disabled from login.
+                title: Reset password
+                label: Reset
         change_password:
             flash:
                 success: The password has been changed

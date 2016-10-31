@@ -77,7 +77,8 @@ class ContextsSelectType extends AbstractType
                 $this->translator,
                 $this->securityTokenStorage,
                 $this->dispatcher,
-                $this->entityTitleResolver
+                $this->entityTitleResolver,
+                $options['collectionModel']
             )
         );
     }
@@ -108,7 +109,8 @@ class ContextsSelectType extends AbstractType
 
         $resolver->setDefaults([
             'tooltip' => false,
-            'configs' => $defaultConfigs
+            'configs' => $defaultConfigs,
+            'collectionModel' => false,
         ]);
 
         $resolver->setNormalizer(

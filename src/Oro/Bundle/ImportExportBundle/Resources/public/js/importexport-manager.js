@@ -34,7 +34,7 @@ define(function(require) {
             exportConfigRoute: 'oro_importexport_export_config',
             isExportPopupRequired: false,
 
-            exortTemplateTitle: 'Template',
+            exportTemplateTitle: 'Template',
             exportTemplateProcessor: null,
             exportTemplateJob: null,
             exportTemplateRoute: 'oro_importexport_export_template',
@@ -82,7 +82,9 @@ define(function(require) {
         handleImport: function() {
             var widget = this._renderDialogWidget({
                 url: routing.generate(this.options.importRoute, $.extend({}, this.routeOptions)),
-                title: this.options.importTitle
+                dialogOptions: {
+                    title: this.options.importTitle
+                }
             });
 
             if (!_.isEmpty(this.options.datagridName) || this.options.refreshPageOnSuccess) {
@@ -124,7 +126,9 @@ define(function(require) {
 
                 this._renderDialogWidget({
                     url: exportUrl,
-                    title: this.options.exportTitle
+                    dialogOptions: {
+                        title: this.options.exportTitle
+                    }
                 });
             } else {
                 exportUrl = routing.generate(this.options.exportRoute, $.extend({}, this.routeOptions, {
@@ -160,7 +164,9 @@ define(function(require) {
 
                 this._renderDialogWidget({
                     url: exportTemplateUrl,
-                    title: this.options.exportTemplateTitle
+                    dialogOptions: {
+                        title: this.options.exportTemplateTitle
+                    }
                 });
             } else {
                 exportTemplateUrl = routing.generate(
@@ -179,7 +185,7 @@ define(function(require) {
          * @returns {DialogWidget}
          */
         _renderDialogWidget: function(options) {
-            var opts = $.extend({}, this.options.dialogOptions, options);
+            var opts = $.extend(true, {}, this.options.dialogOptions, options);
 
             var widget = new DialogWidget(opts);
 

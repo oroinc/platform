@@ -2,3 +2,4 @@ config:
     paths:
         'oroconfig/js/form/default': 'bundles/oroconfig/js/form/default.js'
         'oroconfig/js/form/config-form': 'bundles/oroconfig/js/form/config-form.js'
+        'oroconfig/js/configuration': 'bundles/oroconfig/js/configuration.js'

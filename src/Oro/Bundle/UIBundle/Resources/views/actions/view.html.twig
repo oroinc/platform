@@ -1,5 +1,5 @@
 {% extends bap.layout %}
-{% import 'OroNavigationBundle:Include:contentTags.html.twig' as navigationMacro %}
+{% import 'OroSyncBundle:Include:contentTags.html.twig' as syncMacro %}
 {% import 'OroUIBundle::macros.html.twig' as UI %}
 
 {% block before_content_addition %}
@@ -214,9 +214,9 @@
         {% endblock content_data %}
     </div>
 
-    {% block navigation_content_tags %}
+    {% block sync_content_tags %}
         {# block added just for possibility to disable it in child templates if needed #}
-        {{ navigationMacro.navigationContentTags(entity) }}
+        {{ syncMacro.syncContentTags(entity) }}
     {% endblock %}
 </div>
 {% endblock content %}

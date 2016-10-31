@@ -10,6 +10,7 @@ use Symfony\Bundle\FrameworkBundle\Routing\Router;
 use Symfony\Component\Filesystem\Exception\IOException;
 
 use Oro\Bundle\TranslationBundle\Controller\Controller;
+use Oro\Bundle\TranslationBundle\Provider\LanguageProvider;
 
 class JsTranslationDumper implements LoggerAwareInterface
 {
@@ -24,8 +25,8 @@ class JsTranslationDumper implements LoggerAwareInterface
     /** @var string */
     protected $kernelRootDir;
 
-    /** @var string */
-    protected $defaultLocale;
+    /** @var LanguageProvider */
+    protected $languageProvider;
 
     /**
      * @var Router
@@ -41,7 +42,7 @@ class JsTranslationDumper implements LoggerAwareInterface
      * @param Router     $router
      * @param array      $translationDomains
      * @param string     $kernelRootDir
-     * @param string     $defaultLocale
+     * @param LanguageProvider $languageProvider
      * @param string     $jsTranslationRoute
      */
     public function __construct(
@@ -49,14 +50,14 @@ class JsTranslationDumper implements LoggerAwareInterface
         Router $router,
         $translationDomains,
         $kernelRootDir,
-        $defaultLocale,
+        LanguageProvider $languageProvider,
         $jsTranslationRoute = 'oro_translation_jstranslation'
     ) {
         $this->translationController = $translationController;
         $this->router                = $router;
         $this->translationDomains    = $translationDomains;
         $this->kernelRootDir         = $kernelRootDir;
-        $this->defaultLocale         = $defaultLocale;
+        $this->languageProvider      = $languageProvider;
         $this->jsTranslationRoute    = $jsTranslationRoute;
 
         $this->setLogger(new NullLogger());
@@ -72,7 +73,7 @@ class JsTranslationDumper implements LoggerAwareInterface
     public function dumpTranslations($locales = [])
     {
         if (empty($locales)) {
-            $locales[] = $this->defaultLocale;
+            $locales = array_keys($this->languageProvider->getAvailableLanguages());
         }
 
         $targetPattern = realpath($this->kernelRootDir . '/../web')

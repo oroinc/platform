@@ -18,6 +18,7 @@ class Configuration implements ConfigurationInterface
 
         $node = $rootNode->children();
         $this->appendConfigOptions($node);
+        $this->appendConfigExtensionsNode($node);
         $this->appendActionsNode($node);
         $this->appendFiltersNode($node);
         $this->appendFormTypesNode($node);
@@ -46,6 +47,24 @@ class Configuration implements ConfigurationInterface
                 ->info('All supported ApiDoc views')
                 ->prototype('scalar')->end()
                 ->defaultValue(['default'])
+            ->end()
+            ->scalarNode('documentation_path')
+                ->info('The URL to the API documentation')
+                ->defaultNull()
+            ->end();
+    }
+
+    /**
+     * @param NodeBuilder $node
+     */
+    protected function appendConfigExtensionsNode(NodeBuilder $node)
+    {
+        $node
+            ->arrayNode('config_extensions')
+                ->info('The configuration extensions for "Resources/config/oro/api.yml".')
+                ->example(['oro_api.config_extension.filters', 'oro_api.config_extension.sorters'])
+                ->prototype('scalar')
+                ->end()
             ->end();
     }
 
@@ -60,6 +79,7 @@ class Configuration implements ConfigurationInterface
                 ->example(
                     [
                         'get' => [
+                            'processor_service_id' => 'oro_api.get.processor',
                             'processing_groups' => [
                                 'load_data' => [
                                     'priority' => -10
@@ -74,6 +94,10 @@ class Configuration implements ConfigurationInterface
                 ->useAttributeAsKey('name')
                 ->prototype('array')
                     ->children()
+                        ->scalarNode('processor_service_id')
+                            ->info('The service id of the action processor. Set for public actions only.')
+                            ->cannotBeEmpty()
+                        ->end()
                         ->arrayNode('processing_groups')
                             ->info('A list of groups by which child processors can be split')
                             ->useAttributeAsKey('name')

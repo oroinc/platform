@@ -18,7 +18,7 @@ class DataTransformerRegistry
      * @param mixed  $transformer Can be the id of a service in DIC,
      *                            an instance of "Oro\Component\EntitySerializer\DataTransformerInterface"
      *                            or "Symfony\Component\Form\DataTransformerInterface",
-     *                            or function ($class, $property, $value, $config) : mixed.
+     *                            or function ($class, $property, $value, $config, $context) : mixed.
      */
     public function addDataTransformer($dataType, $transformer)
     {
@@ -34,7 +34,7 @@ class DataTransformerRegistry
      *                    the id of a service in DIC,
      *                    an instance of "Oro\Component\EntitySerializer\DataTransformerInterface"
      *                    or "Symfony\Component\Form\DataTransformerInterface",
-     *                    or function ($class, $property, $value, $config) : mixed.
+     *                    or function ($class, $property, $value, $config, $context) : mixed.
      */
     public function getDataTransformer($dataType)
     {

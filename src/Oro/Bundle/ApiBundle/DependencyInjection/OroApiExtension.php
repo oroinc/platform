@@ -20,11 +20,10 @@ use Oro\Bundle\ApiBundle\Util\DependencyInjectionUtil;
 class OroApiExtension extends Extension implements PrependExtensionInterface
 {
     const API_DOC_VIEWS_PARAMETER_NAME = 'oro_api.api_doc.views';
+    const API_DOC_PATH_PARAMETER_NAME  = 'oro_api.api_doc.path';
 
     const ACTION_PROCESSOR_BAG_SERVICE_ID             = 'oro_api.action_processor_bag';
-    const ACTION_PROCESSOR_TAG                        = 'oro.api.action_processor';
     const CONFIG_EXTENSION_REGISTRY_SERVICE_ID        = 'oro_api.config_extension_registry';
-    const CONFIG_EXTENSION_TAG                        = 'oro_api.config_extension';
     const PROCESSOR_BAG_SERVICE_ID                    = 'oro_api.processor_bag';
     const PROCESSOR_FACTORY_SERVICE_ID                = 'oro_api.processor_factory';
     const APPLICABLE_CHECKER_FACTORY_SERVICE_ID       = 'oro_api.processor_applicable_checker_factory';
@@ -57,6 +56,7 @@ class OroApiExtension extends Extension implements PrependExtensionInterface
         $loader->load('processors.collect_subresources.yml');
         $loader->load('processors.get_config.yml');
         $loader->load('processors.get_metadata.yml');
+        $loader->load('processors.customize_loaded_data.yml');
         $loader->load('processors.get_list.yml');
         $loader->load('processors.get.yml');
         $loader->load('processors.delete.yml');
@@ -79,8 +79,8 @@ class OroApiExtension extends Extension implements PrependExtensionInterface
          * that's why the action processors bag and all configuration extensions should be registered before.
          */
         $this->registerConfigParameters($container, $config);
-        $this->registerActionProcessors($container);
-        $this->registerConfigExtensions($container);
+        $this->registerActionProcessors($container, $config);
+        $this->registerConfigExtensions($container, $config);
 
         try {
             $this->loadApiConfiguration($container);
@@ -229,12 +229,14 @@ class OroApiExtension extends Extension implements PrependExtensionInterface
             ->getDefinition(self::CONFIG_EXTENSION_REGISTRY_SERVICE_ID)
             ->replaceArgument(0, $config['config_max_nesting_level']);
         $container->setParameter(self::API_DOC_VIEWS_PARAMETER_NAME, $config['api_doc_views']);
+        $container->setParameter(self::API_DOC_PATH_PARAMETER_NAME, $config['documentation_path']);
     }
 
     /**
      * @param ContainerBuilder $container
+     * @param array            $config
      */
-    protected function registerActionProcessors(ContainerBuilder $container)
+    protected function registerActionProcessors(ContainerBuilder $container, array $config)
     {
         $actionProcessorBagServiceDef = DependencyInjectionUtil::findDefinition(
             $container,
@@ -242,18 +244,21 @@ class OroApiExtension extends Extension implements PrependExtensionInterface
         );
         if (null !== $actionProcessorBagServiceDef) {
             $logger = new Reference('logger', ContainerInterface::IGNORE_ON_INVALID_REFERENCE);
-            $taggedServices = $container->findTaggedServiceIds(self::ACTION_PROCESSOR_TAG);
-            foreach ($taggedServices as $id => $attributes) {
+            foreach ($config['actions'] as $action => $actionConfig) {
+                if (empty($actionConfig['processor_service_id'])) {
+                    continue;
+                }
+                $actionProcessorServiceId = $actionConfig['processor_service_id'];
                 // inject the logger for "api" channel into an action processor
                 // we have to do it in this way rather than in service.yml to avoid
                 // "The service definition "logger" does not exist." exception
-                $container->getDefinition($id)
+                $container->getDefinition($actionProcessorServiceId)
                     ->addTag('monolog.logger', ['channel' => 'api'])
                     ->addMethodCall('setLogger', [$logger]);
                 // register an action processor in the bag
                 $actionProcessorBagServiceDef->addMethodCall(
                     'addProcessor',
-                    [new Reference($id)]
+                    [new Reference($actionProcessorServiceId)]
                 );
             }
         }
@@ -261,14 +266,21 @@ class OroApiExtension extends Extension implements PrependExtensionInterface
 
     /**
      * @param ContainerBuilder $container
+     * @param array            $config
      */
-    protected function registerConfigExtensions(ContainerBuilder $container)
+    protected function registerConfigExtensions(ContainerBuilder $container, array $config)
     {
-        DependencyInjectionUtil::registerTaggedServices(
+        $configExtensionRegistryDef = DependencyInjectionUtil::findDefinition(
             $container,
-            self::CONFIG_EXTENSION_REGISTRY_SERVICE_ID,
-            self::CONFIG_EXTENSION_TAG,
-            'addExtension'
+            self::CONFIG_EXTENSION_REGISTRY_SERVICE_ID
         );
+        if (null !== $configExtensionRegistryDef) {
+            foreach ($config['config_extensions'] as $serviceId) {
+                $configExtensionRegistryDef->addMethodCall(
+                    'addExtension',
+                    [new Reference($serviceId)]
+                );
+            }
+        }
     }
 }

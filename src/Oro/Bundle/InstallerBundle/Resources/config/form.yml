@@ -14,6 +14,8 @@ services:
 
     oro_installer.form.type.configuration.database:
         class:                                            %oro_installer.form.type.configuration.database.class%
+        arguments:
+            - '@translator'
         tags:
             - { name: form.type, alias: oro_installer_configuration_database }
 

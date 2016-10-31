@@ -39,7 +39,7 @@ class ConfigNormalizerTest extends \PHPUnit_Framework_TestCase
                     'exclusion_policy' => 'all',
                     'fields'           => [
                         'field1'       => [
-                            'property_path' => '_'
+                            'property_path' => ConfigUtil::IGNORE_PROPERTY_PATH
                         ],
                         'field2'       => [
                             'property_path' => 'realField2'
@@ -49,7 +49,7 @@ class ConfigNormalizerTest extends \PHPUnit_Framework_TestCase
                                 'association11' => [
                                     'fields' => [
                                         'field111' => [
-                                            'property_path' => '_'
+                                            'property_path' => ConfigUtil::IGNORE_PROPERTY_PATH
                                         ],
                                         'field112' => null
                                     ]

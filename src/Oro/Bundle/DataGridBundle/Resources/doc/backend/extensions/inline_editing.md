@@ -12,7 +12,7 @@ datagrids:
             enable: true
         save_api_accessor:
             http_method: PATCH
-            route: orocrm_account_update
+            route: oro_account_update
 ```
 - Open the corresponding page, all the columns for which the frontend type supports inline editing will become editable
 
@@ -22,6 +22,7 @@ datagrids:
     {grid-uid}:
         inline_editing:
             enable: true
+            acl_resource: custom_acl_resource
             entity_name: Oro\Bundle\UserBundle\Entity\User
             behaviour: enable_all
             plugin: orodatagrid/js/app/plugins/grid/inline-editing-plugin
@@ -37,6 +38,7 @@ datagrids:
 Option name              | Default value | Description
 :------------------------|:--------------|:-----------
 enable    | false        | Enables inline editing on the grid. By default is enabled for all cells that have frontend type that supports inline editing
+acl_resource | | Enables inline editing if access granted to specified resource. By default is checked EDIT permission to specified entity
 entity_name | | Entity class name for saving data. By default it tries to get value from `extended_entity_name`
 behaviour | enable_all   | Specifies the way to enable the inline editing. Possible values: `enable_all` - (default). this will enable inline editing where possible. `enable_selected` - disable by default, enable only on configured cells
 plugin    | orodatagrid/js/app/plugins/grid/inline-editing-plugin | Specifies the plugin realization
@@ -47,7 +49,7 @@ save_api_accessor | {class: 'oroui/js/tools/api-accessor'} | Required. Describes
 ### Sample usage of the save_api_accessor with full options provided
 ``` yml
 save_api_accessor:
-    route: orocrm_opportunity_task_update # for example this route uses following mask
+    route: oro_opportunity_task_update # for example this route uses following mask
         # to generate url /api/opportunity/{opportunity_id}/tasks/{id}
     http_method: POST
     headers:

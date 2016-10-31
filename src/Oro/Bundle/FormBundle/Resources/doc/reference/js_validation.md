@@ -85,6 +85,50 @@ In case you have one form which saves several different entities at once (e.g. c
 ```
 After that, validation for sub-entinty works only if some of fields is not blank. Otherwise it ignores all validation rules for fields elements of sub-entity.
 
+###Override of optional validation logic
+In case if you want to customize "optional validation group" behaviour you can override a handler which is responsible for
+handle field changes in specific optional validation group. In this case you need:
+1) add custom handler to requirejs.yml
+```
+config:
+    paths:
+        example/js/custom-handler: 'bundles/example/js/custom-handler.js'
+```
+
+Custom optional validation handler should have two methods: initialize and handle.
+Method "Initialise" is responsible for update validation state for "optional validation group" after it will be loaded to the page.
+Method "Handle" is responsible for update "optional validation group" validation state after the descendant field will be changed.
+
+You can have any level of "optional validation group" inheritance in your page. In case if your field has more than one "optional validation group" ancestor,
+all "optional validation group" handlers will be called from closest ancestor to root by default.
+This behaviour is configurable, you can simply return `true` or `false` in your custom "Handle" method.
+
+2) add data attribute to validation group
+```
+   +--<fieldset data-validation-optional-group data-validation-optional-group-handler="example/js/custom-handler">
+      +--<input>
+      +--<input>
+      +--<input>
+```
+3) all custom handlers should be preloaded to avoid situation when form was loaded but handler was not. To avoid such 
+situations you should add custom application module
+```
+requirejs.yml:
+    paths:
+        example/js/custom-handler: 'bundles/example/js/custom-handler.js'
+        example/js/custom-module: 'bundles/example/js/custom-module.js'
+    config:
+        appmodules:
+            - example/js/custom-module
+
+custom-handler.js:
+    define([
+        'oroui/js/app/controllers/base/controller'
+    ], function(BaseController) {
+        BaseController.loadBeforeAction(['example/js/custom-handler'], function() {});
+    });
+```
+
 ## Ignore validation section
 There are cases when developer need to suppress validation for some field or group of fields. It can be done over `data-validation-ignore` attribute of container element. It works the same way as with `data-validation-optional-group` attribute, except validator omit these fields even if they have some value.
 ```

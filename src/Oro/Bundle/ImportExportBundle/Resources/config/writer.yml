@@ -36,7 +36,7 @@ services:
         class: %oro_importexport.writer.entity_detach_fixer.class%
         arguments:
             - '@oro_entity.doctrine_helper'
-            - '@oro_importexport.field.field_helper'
+            - '@oro_entity.helper.field_helper'
             - '@property_accessor'
 
     oro_importexport.writer.dummy:

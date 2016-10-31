@@ -241,7 +241,7 @@ class DatabaseHelper
     /**
      * @param string $entityName
      * @param string $fieldName
-     * @return bool
+     * @return string|null
      */
     public function getInversedRelationFieldName($entityName, $fieldName)
     {

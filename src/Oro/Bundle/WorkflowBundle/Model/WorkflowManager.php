@@ -5,6 +5,9 @@ namespace Oro\Bundle\WorkflowBundle\Model;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\EntityManager;
 
+use Psr\Log\LoggerAwareInterface;
+use Psr\Log\LoggerAwareTrait;
+
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
@@ -20,8 +23,10 @@ use Oro\Bundle\WorkflowBundle\Exception\WorkflowException;
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
-class WorkflowManager
+class WorkflowManager implements LoggerAwareInterface
 {
+    use LoggerAwareTrait;
+
     /** @var DoctrineHelper */
     protected $doctrineHelper;
 
@@ -239,7 +244,7 @@ class WorkflowManager
     /**
      * @param Workflow $workflow
      * @param WorkflowItem $workflowItem
-     * @param $transition
+     * @param string $transition
      */
     private function transitWorkflow(Workflow $workflow, WorkflowItem $workflowItem, $transition)
     {
@@ -248,6 +253,17 @@ class WorkflowManager
                 $workflow->transit($workflowItem, $transition);
                 $workflowItem->setUpdated(); // transition might not change workflow item
                 $em->flush();
+
+                if ($this->logger) {
+                    $this->logger->info(
+                        'Workflow transition is complete',
+                        [
+                            'workflow' => $workflow,
+                            'workflowItem' => $workflowItem,
+                            'transition' => $transition
+                        ]
+                    );
+                }
             },
             WorkflowItem::class
         );
