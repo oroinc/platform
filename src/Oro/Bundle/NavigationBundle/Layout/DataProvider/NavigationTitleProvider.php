@@ -35,7 +35,7 @@ class NavigationTitleProvider
         $this->titleService->setParams($params);
 
         $title = $this->titleService
-            ->render(array(), null, null, null, true);
+            ->render([], null, null, null, true);
 
         return $this->cleanUpTitle($title);
     }
