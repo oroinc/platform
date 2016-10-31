@@ -16,6 +16,8 @@ use Oro\Bundle\TranslationBundle\Tests\Functional\DataFixtures\LoadTranslations;
 
 /**
  * @dbIsolation
+ *
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
 class TranslationManagerTest extends WebTestCase
 {
@@ -77,7 +79,9 @@ class TranslationManagerTest extends WebTestCase
 
         $this->createTranslation($key, 'initial value', $locale, $domain, Translation::SCOPE_SYSTEM);
 
-        $this->assertNotNull($this->manager->saveTranslation($key, $value, $locale, $domain, Translation::SCOPE_SYSTEM));
+        $this->assertNotNull(
+            $this->manager->saveTranslation($key, $value, $locale, $domain, Translation::SCOPE_SYSTEM)
+        );
         $this->manager->flush();
 
         $translation = $this->repository->findTranslation($key, $locale, $domain);
@@ -94,7 +98,9 @@ class TranslationManagerTest extends WebTestCase
         $this->createTranslation($key, 'initial value', $locale, $domain, Translation::SCOPE_SYSTEM);
 
         // Ensure That We Overwrite SCOPE_SYSTEM
-        $this->assertNotNull($this->manager->saveTranslation($key, $value, $locale, $domain, Translation::SCOPE_INSTALLED));
+        $this->assertNotNull(
+            $this->manager->saveTranslation($key, $value, $locale, $domain, Translation::SCOPE_INSTALLED)
+        );
         $this->manager->flush();
 
         $translation = $this->repository->findTranslation($key, $locale, $domain);
@@ -246,6 +252,19 @@ class TranslationManagerTest extends WebTestCase
 
         $this->assertContains('test_domain', $domains);
         $this->assertGreaterThanOrEqual(1, count($domains));
+
+        $uniqueDomain = uniqid('DOMAIN_', true);
+        $uniqueKey = uniqid('KEY_', true);
+
+        $this->assertNotContains($uniqueDomain, $domains);
+
+        $this->manager->findTranslationKey($uniqueKey, $uniqueDomain);
+        $this->manager->flush();
+
+        $domains = $this->manager->getAvailableDomains();
+
+        $this->assertContains($uniqueDomain, $domains);
+        $this->assertGreaterThanOrEqual(2, count($domains));
     }
 
     /**
