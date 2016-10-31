@@ -50,7 +50,7 @@ class MenuUpdateType extends AbstractType
                         'label' => 'oro.navigation.menuupdate.uri.label',
                     ]
                 );
-                if (null !== $options['menu_item'] && !empty($menuItem->getExtra('aclResourceId'))) {
+                if (null !== $options['menu_item'] && !empty($menuItem->getExtra('acl_resource_id'))) {
                     $form->add(
                         'aclResourceId',
                         'text',
@@ -58,7 +58,7 @@ class MenuUpdateType extends AbstractType
                             'label' => 'oro.navigation.menuupdate.acl_resource_id.label',
                             'mapped' => false,
                             'disabled' => true,
-                            'data' => $menuItem->getExtra('aclResourceId'),
+                            'data' => $menuItem->getExtra('acl_resource_id'),
                         ]
                     );
                 }
