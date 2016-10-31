@@ -13,7 +13,7 @@ use Oro\Bundle\EmailBundle\Command\ConvertEmailBodyToTextBodyCommand;
  * Adds job to collect email body representations.
  * Will be deleted in 2.0
  */
-class CollectEmailBodyJobFixture extends AbstractFixture
+class CollectEmailBodyAddJobFixture extends AbstractFixture
 {
     /**
      * {@inheritdoc}
