@@ -198,7 +198,26 @@ define([
      */
     $.validator.prototype.init = _.wrap($.validator.prototype.init, function(init) {
         validationHandler.initialize($(this.currentForm));
-        init.apply(this, arguments);
+        init.apply(this, _.rest(arguments));
+        this.prestineValues = {};
+        // defer used there since `elements` method expects form has validator object that is created here
+        _.defer(_.bind(function(){
+            this.elements().each(_.bind(function(index, element) {
+                if (!this.checkable(element)) {
+                    this.prestineValues[element.name] = element.value;
+                }
+            }, this));
+        }, this));
+    });
+
+    $.validator.prototype.resetForm = _.wrap($.validator.prototype.resetForm, function(resetForm) {
+        this.prestineValues = {};
+        this.elements().each(_.bind(function(index, element) {
+            if (!this.checkable(element)) {
+                this.prestineValues[element.name] = element.value;
+            }
+        }, this));
+        resetForm.apply(this, _.rest(arguments));
     });
 
     /**
@@ -310,7 +329,7 @@ define([
         // ignore all invisible elements except input type=hidden
         ignore: ':hidden:not([type=hidden])',
         onfocusout: function(element, event) {
-            if (!this.checkable(element)) {
+            if (!this.checkable(element) && this.prestineValues[element.name] !== element.value) {
                 this.element(element);
             }
         },
