@@ -56,7 +56,7 @@ class EntityNameProvider implements EntityNameProviderInterface
         }
 
         // field value is empty, try with id
-        if ($idFiledName = $this->getIdFieldName($className)) {
+        if ($idFiledName = $this->getSingleIdFieldName($className)) {
             return $this->getFieldValue($entity, $idFiledName);
         }
 
@@ -73,8 +73,6 @@ class EntityNameProvider implements EntityNameProviderInterface
             // unsupported format
             return false;
         }
-        $idFieldName = $this->getIdFieldName($className);
-        $idColumnName = $idFieldName ? sprintf('%s.%s', $alias, $idFieldName) : false;
 
         if ($format === self::SHORT) {
             $guessFieldName = $this->guessFieldName($className);
@@ -84,11 +82,7 @@ class EntityNameProvider implements EntityNameProviderInterface
 
             $nameDQL = $alias . '.' . $guessFieldName;
 
-            if ($idColumnName) {
-                return sprintf('COALESCE(%s, %s)', $nameDQL, $idColumnName);
-            }
-
-            return $nameDQL;
+            return $this->addIdFallback($nameDQL, $alias, $className);
         }
 
         $fieldNames = $this->getFieldNames($className);
@@ -111,12 +105,7 @@ class EntityNameProvider implements EntityNameProviderInterface
             $nameDQL = sprintf("CONCAT_WS(' ', %s)", implode(', ', $fieldNames));
         }
 
-        if ($idColumnName) {
-            // if has id column, add it as fallback when name is empty
-            return sprintf('COALESCE(%s, %s)', $nameDQL, $idColumnName);
-        }
-
-        return $nameDQL;
+        return $this->addIdFallback($nameDQL, $alias, $className);
     }
 
     /**
@@ -126,7 +115,7 @@ class EntityNameProvider implements EntityNameProviderInterface
      *
      * @return string|null
      */
-    protected function getIdFieldName($className)
+    protected function getSingleIdFieldName($className)
     {
         $metadata = $this->getClassMetadata($className);
         if (!$metadata) {
@@ -140,6 +129,26 @@ class EntityNameProvider implements EntityNameProviderInterface
         }
 
         return reset($identifierFieldNames);
+    }
+
+    /**
+     * Adds the identifier column to the DQL as name fallback (if identifier exists and is only one)
+     *
+     * @param $nameDQL
+     * @param $alias
+     * @param $className
+     *
+     * @return string
+     */
+    protected function addIdFallback($nameDQL, $alias, $className)
+    {
+        $idFieldName = $this->getSingleIdFieldName($className);
+
+        if (null === $idFieldName) {
+            return $nameDQL;
+        }
+
+        return sprintf('COALESCE(%s, %s AS string)', $nameDQL, $alias . '.' . $idFieldName);
     }
 
     /**
