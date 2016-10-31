@@ -64,7 +64,7 @@ class ReversSyncCommandTest extends WebTestCase
                 [
                     'integration_id' => $integration->getId(),
                     'connector_parameters' => [],
-                    'connector' => null,
+                    'connector' => 'TestChannel',
                     'transport_batch_size' => 100,
                 ],
                 MessagePriority::VERY_LOW
