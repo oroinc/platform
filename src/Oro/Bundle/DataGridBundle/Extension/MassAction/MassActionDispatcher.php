@@ -110,7 +110,9 @@ class MassActionDispatcher
         //prepare query builder
         $qb->setMaxResults(null);
 
-        if ($datagrid->getDatasource() instanceof OrmDatasource && !$datagrid->getConfig()->isDatasourceSkipAclApply()) {
+        if ($datagrid->getDatasource() instanceof OrmDatasource
+            && !$datagrid->getConfig()->isDatasourceSkipAclApply()
+        ) {
             $qb = $this->aclHelper->apply($qb);
         }
 
