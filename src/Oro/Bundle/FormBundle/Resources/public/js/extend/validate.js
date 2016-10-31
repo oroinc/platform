@@ -198,6 +198,9 @@ define([
      */
     $.validator.prototype.init = _.wrap($.validator.prototype.init, function(init) {
         validationHandler.initialize($(this.currentForm));
+        $(this.currentForm).on('content:changed', function (event) {
+            validationHandler.initialize($(event.target));
+        });
         init.apply(this, arguments);
     });
 
