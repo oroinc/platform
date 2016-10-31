@@ -29,7 +29,7 @@ class ReversSyncCommandTest extends WebTestCase
         $this->assertContains("Usage:\n  oro:integration:reverse:sync [options]", $result);
     }
 
-    public function shouldNotSendReverseSyncIntegrationWithoutConnector()
+    public function testShouldNotSendReverseSyncIntegrationWithoutConnector()
     {
         /** @var Channel $integration */
         $integration = $this->getReference('oro_integration:foo_integration');

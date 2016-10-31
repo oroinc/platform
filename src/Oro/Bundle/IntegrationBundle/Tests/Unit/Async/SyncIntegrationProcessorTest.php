@@ -63,7 +63,7 @@ class SyncIntegrationProcessorTest extends \PHPUnit_Framework_TestCase
         );
     }
 
-    public function testRejectAndLogMessageBodyMissIntegrationId()
+    public function testShouldRejectAndLogMessageBodyMissIntegrationId()
     {
         $logger = $this->createLoggerMock();
         $logger
@@ -91,7 +91,7 @@ class SyncIntegrationProcessorTest extends \PHPUnit_Framework_TestCase
      * @expectedException \LogicException
      * @expectedExceptionMessage The malformed json given.
      */
-    public function testThrowIfMessageBodyInvalidJson()
+    public function testShouldThrowIfMessageBodyInvalidJson()
     {
         $processor = new SyncIntegrationProcessor(
             $this->createRegistryStub(),
