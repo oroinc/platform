@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\IntegrationBundle\Provider;
 
+use Liip\ImagineBundle\Imagine\Cache\CacheManager;
+
 use Oro\Bundle\EntityBundle\Provider\EntityAvatarProviderInterface;
 use Oro\Bundle\IntegrationBundle\Manager\TypesRegistry;
 use Oro\Bundle\MagentoBundle\Entity\IntegrationAwareInterface;
@@ -12,12 +14,17 @@ class EntityAvatarProvider implements EntityAvatarProviderInterface
     /** @var TypesRegistry */
     protected $typesRegistry;
 
+    /** @var CacheManager */
+    protected $cacheManager;
+
     /**
      * @param TypesRegistry $typesRegistry
+     * @param CacheManager  $cacheManager
      */
-    public function __construct(TypesRegistry $typesRegistry)
+    public function __construct(TypesRegistry $typesRegistry, CacheManager $cacheManager)
     {
         $this->typesRegistry = $typesRegistry;
+        $this->cacheManager = $cacheManager;
     }
 
     /**
@@ -41,6 +48,9 @@ class EntityAvatarProvider implements EntityAvatarProviderInterface
             return null;
         }
 
-        return new Image(Image::TYPE_FILE_PATH, ['path' => $entityChannel->getIcon()]);
+        return new Image(
+            Image::TYPE_FILE_PATH,
+            ['path' => $this->cacheManager->getBrowserPath($entityChannel->getIcon(), $filterName)]
+        );
     }
 }

@@ -22,7 +22,15 @@ class EntityAvatarProviderTest extends \PHPUnit_Framework_TestCase
             ->addChannelType('without-icon', new IntegrationTypeWithoutIcon())
             ->addChannelType('with-icon', new IntegrationTypeWithIcon());
 
-        $this->entityAvatarProvider = new EntityAvatarProvider($typesRegistry);
+        $cacheManager = $this->getMockBuilder('Liip\ImagineBundle\Imagine\Cache\CacheManager')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $cacheManager
+            ->expects($this->any())
+            ->method('getBrowserPath')
+            ->will($this->returnArgument(0));
+
+        $this->entityAvatarProvider = new EntityAvatarProvider($typesRegistry, $cacheManager);
     }
 
     /**

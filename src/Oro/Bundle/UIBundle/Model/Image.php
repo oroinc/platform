@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\UIBundle\Model;
 
-class Image
+class Image implements \JsonSerializable
 {
     const TYPE_ICON = 'icon';
     const TYPE_FILE = 'file';
@@ -38,5 +38,16 @@ class Image
     public function getData()
     {
         return $this->data;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function jsonSerialize()
+    {
+        return [
+            'type' => $this->type,
+            'data' => $this->data,
+        ];
     }
 }

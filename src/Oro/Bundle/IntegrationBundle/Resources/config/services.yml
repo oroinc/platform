@@ -307,5 +307,6 @@ services:
         class: Oro\Bundle\IntegrationBundle\Provider\EntityAvatarProvider
         arguments:
             - '@oro_integration.manager.types_registry'
+            - '@liip_imagine.cache.manager'
         tags:
-            - { name: oro_entity.avatar_provider, priority: -10 }
+            - { name: oro_entity.avatar_provider, priority: 10 }

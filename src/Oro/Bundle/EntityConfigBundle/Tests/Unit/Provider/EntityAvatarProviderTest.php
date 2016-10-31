@@ -68,7 +68,7 @@ class EntityAvatarProviderTest extends \PHPUnit_Framework_TestCase
             ],
             'entity without config' => [
                 'filter',
-                new Image(),
+                new Image(null, null),
                 null,
             ],
         ];
