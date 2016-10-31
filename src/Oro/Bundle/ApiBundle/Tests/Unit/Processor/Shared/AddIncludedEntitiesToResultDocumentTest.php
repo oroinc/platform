@@ -22,12 +22,14 @@ class AddIncludedEntitiesToResultDocumentTest extends FormProcessorTestCase
 
     public function testProcessWithoutIncludedData()
     {
+        $this->context->setResponseStatusCode(200);
         $this->processor->process($this->context);
     }
 
     public function testProcessWithoutIncludedEntities()
     {
         $this->context->setIncludedData(['key' => 'value']);
+        $this->context->setResponseStatusCode(200);
         $this->processor->process($this->context);
     }
 
@@ -35,10 +37,11 @@ class AddIncludedEntitiesToResultDocumentTest extends FormProcessorTestCase
     {
         $this->context->setIncludedData(['key' => 'value']);
         $this->context->setIncludedEntities(new IncludedEntityCollection());
+        $this->context->setResponseStatusCode(200);
         $this->processor->process($this->context);
     }
 
-    public function testProcess()
+    public function testProcessForSuccessResponse()
     {
         $documentBuilder = $this->getMock(DocumentBuilderInterface::class);
         $includedEntities = new IncludedEntityCollection();
@@ -57,6 +60,29 @@ class AddIncludedEntitiesToResultDocumentTest extends FormProcessorTestCase
         $this->context->setIncludedData(['key' => 'value']);
         $this->context->setIncludedEntities($includedEntities);
         $this->context->setResponseDocumentBuilder($documentBuilder);
+        $this->context->setResponseStatusCode(200);
+        $this->processor->process($this->context);
+    }
+
+    public function testProcessForFailureResponse()
+    {
+        $documentBuilder = $this->getMock(DocumentBuilderInterface::class);
+        $includedEntities = new IncludedEntityCollection();
+
+        $normalizedData = ['normalizedKey' => 'normalizedValue'];
+        $metadata = new EntityMetadata();
+        $entityData = new IncludedEntityData('/included/0', 0);
+        $entityData->setNormalizedData($normalizedData);
+        $entityData->setMetadata($metadata);
+        $includedEntities->add(new \stdClass(), 'Test\Class', 'testId', $entityData);
+
+        $documentBuilder->expects(self::never())
+            ->method('addIncludedObject');
+
+        $this->context->setIncludedData(['key' => 'value']);
+        $this->context->setIncludedEntities($includedEntities);
+        $this->context->setResponseDocumentBuilder($documentBuilder);
+        $this->context->setResponseStatusCode(400);
         $this->processor->process($this->context);
     }
 }

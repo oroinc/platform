@@ -36,6 +36,11 @@ class AddIncludedEntitiesToResultDocument implements ProcessorInterface
             return;
         }
 
+        if (!$context->isSuccessResponse()) {
+            // add included entities to the response body only if there was not any errors
+            return;
+        }
+
         foreach ($includedEntities as $entity) {
             $entityData = $includedEntities->getData($entity);
             $documentBuilder->addIncludedObject(
