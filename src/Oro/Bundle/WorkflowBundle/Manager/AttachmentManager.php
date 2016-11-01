@@ -9,7 +9,6 @@ use Oro\Bundle\AttachmentBundle\Manager\AttachmentManager as BaseManager;
 use Oro\Bundle\WorkflowBundle\Utils\WorkflowHelper;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowData;
 
-
 class AttachmentManager extends BaseManager
 {
     /**
