@@ -93,6 +93,7 @@ config:
         'base64': 'oroui/js/extend/base64.js'
         'jquery': 'bundles/components/jquery/jquery.js'
         'jquery-ui': 'bundles/oroui/lib/jquery-ui.js'
+        'jquery.form': 'bundles/bowerassets/jquery-form/jquery.form.js'
         'jquery.mousewheel': 'bundles/bowerassets/jquery-mousewheel/jquery.mousewheel.js'
         'jquery.numeric': 'bundles/bowerassets/jquery.numeric/jquery.numeric.js'
         'jquery.uniform': 'bundles/bowerassets/uniform/jquery.uniform.js'
