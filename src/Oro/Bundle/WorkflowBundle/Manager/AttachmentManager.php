@@ -13,6 +13,19 @@ use Oro\Bundle\WorkflowBundle\Model\WorkflowData;
 class AttachmentManager extends BaseManager
 {
     /**
+     * @var WorkflowHelper
+     */
+    protected $helper;
+
+    /**
+     * @param WorkflowHelper $workflowHelper
+     */
+    public function setWorkflowHelper(WorkflowHelper $workflowHelper)
+    {
+        $this->helper = $workflowHelper;
+    }
+
+    /**
      * Get attachment url
      *
      * @param object $parentEntity
@@ -24,9 +37,9 @@ class AttachmentManager extends BaseManager
      */
     public function getFileUrl($parentEntity, $fieldName, File $entity, $type = 'get', $absolute = false)
     {
-
+        /** CRM-6430 disable for workflow */
         if ($parentEntity instanceof WorkflowData) {
-
+            return;
         }
 
         return $this->getAttachment(
@@ -35,51 +48,6 @@ class AttachmentManager extends BaseManager
             $fieldName,
             $entity,
             $type,
-            $absolute
-        );
-    }
-
-    /**
-     * Get attachment url
-     *
-     * @param string $parentClass
-     * @param int    $parentId
-     * @param string $fieldName
-     * @param File   $entity
-     * @param string $type
-     * @param bool   $absolute
-     * @return string
-     */
-    public function getAttachment(
-        $parentClass,
-        $parentId,
-        $fieldName,
-        File $entity,
-        $type = 'get',
-        $absolute = false
-    ) {
-        $urlString = str_replace(
-            '/',
-            '_',
-            base64_encode(
-                implode(
-                    '|',
-                    [
-                        $parentClass,
-                        $fieldName,
-                        $parentId,
-                        $type,
-                        $entity->getOriginalFilename()
-                    ]
-                )
-            )
-        );
-        return $this->router->generate(
-            'oro_attachment_file',
-            [
-                'codedString' => $urlString,
-                'extension'   => $entity->getExtension()
-            ],
             $absolute
         );
     }
