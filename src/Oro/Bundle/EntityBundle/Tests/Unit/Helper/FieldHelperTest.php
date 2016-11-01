@@ -1,10 +1,10 @@
 <?php
 
-namespace Oro\Bundle\ImportExportBundle\Tests\Unit\File;
+namespace Oro\Bundle\EntityBundle\Tests\Unit\Helper;
 
+use Oro\Bundle\EntityBundle\Helper\FieldHelper;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityExtendBundle\Extend\FieldTypeHelper;
-use Oro\Bundle\ImportExportBundle\Field\FieldHelper;
 use Oro\Bundle\ImportExportBundle\Tests\Unit\Strategy\Stub\ImportEntity;
 use Oro\Bundle\WorkflowBundle\Field\FieldProvider;
 
