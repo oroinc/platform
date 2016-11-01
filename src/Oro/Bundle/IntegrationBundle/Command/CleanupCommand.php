@@ -187,7 +187,7 @@ FROM
         (
             SELECT  connector, MAX(date) AS minDate
             FROM %s AS b
-            WHERE b.code = %s
+            WHERE b.code = '%s'
             GROUP BY connector
         ) b ON a.connector = b.connector AND
                 a.date = b.minDate
