@@ -61,6 +61,7 @@ services:
             - '@oro_dashboard.widget_config_value.provider'
             - '@translator'
             - '@event_dispatcher'
+            - '@oro_featuretoggle.checker.feature_checker'
         calls:
             - [setRequest, ["@?request="]]
 

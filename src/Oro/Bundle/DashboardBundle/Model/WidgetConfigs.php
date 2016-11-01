@@ -13,6 +13,7 @@ use Oro\Bundle\DashboardBundle\Event\WidgetItemsLoadDataEvent;
 use Oro\Bundle\DashboardBundle\Entity\Widget;
 use Oro\Bundle\DashboardBundle\Provider\ConfigValueProvider;
 use Oro\Bundle\SecurityBundle\SecurityFacade;
+use Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker;
 
 use Oro\Component\Config\Resolver\ResolverInterface;
 
@@ -42,6 +43,9 @@ class WidgetConfigs
     /** @var EventDispatcherInterface */
     protected $eventDispatcher;
 
+    /** @var FeatureChecker */
+    protected $featureChecker;
+
     /** @var array */
     protected $widgetOptionsById = [];
 
@@ -61,7 +65,8 @@ class WidgetConfigs
         EntityManagerInterface $entityManager,
         ConfigValueProvider $valueProvider,
         TranslatorInterface $translator,
-        EventDispatcherInterface $eventDispatcher
+        EventDispatcherInterface $eventDispatcher,
+        FeatureChecker $featureChecker
     ) {
         $this->configProvider = $configProvider;
         $this->securityFacade = $securityFacade;
@@ -70,6 +75,7 @@ class WidgetConfigs
         $this->valueProvider = $valueProvider;
         $this->translator = $translator;
         $this->eventDispatcher = $eventDispatcher;
+        $this->featureChecker = $featureChecker;
     }
 
     /**
@@ -299,15 +305,17 @@ class WidgetConfigs
     {
         $securityFacade = $this->securityFacade;
         $resolver       = $this->resolver;
+        $featureChecker = $this->featureChecker;
 
         return array_filter(
             $items,
-            function (&$item) use ($securityFacade, $resolver, &$items) {
+            function (&$item) use ($securityFacade, $resolver, $featureChecker, &$items) {
                 $visible = true;
                 next($items);
                 $accessGranted = !isset($item['acl']) || $securityFacade->isGranted($item['acl']);
                 $applicable    = true;
                 $enabled       = $item['enabled'];
+                $routeEnabled = $featureChecker->isResourceEnabled($item['route'], 'routes');
                 if (isset($item['applicable'])) {
                     $resolved   = $resolver->resolve([$item['applicable']]);
                     $applicable = reset($resolved);
@@ -315,7 +323,7 @@ class WidgetConfigs
 
                 unset($item['acl'], $item['applicable'], $item['enabled']);
 
-                return $visible && $enabled && $accessGranted && $applicable;
+                return $visible && $enabled && $accessGranted && $applicable && $routeEnabled;
             }
         );
     }
