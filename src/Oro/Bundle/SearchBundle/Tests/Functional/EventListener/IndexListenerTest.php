@@ -7,6 +7,9 @@ use Oro\Bundle\TestFrameworkBundle\Entity\Item;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Symfony\Bridge\Doctrine\RegistryInterface;
 
+/**
+ * @group search
+ */
 class IndexListenerTest extends WebTestCase
 {
     use MessageQueueAssertTrait;

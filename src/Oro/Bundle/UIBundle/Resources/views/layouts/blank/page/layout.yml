@@ -32,6 +32,11 @@ layout:
                         src: '=data["asset"].getUrl(data["theme"].getStylesOutput(context["theme"]))'
                 body:
                     blockType: body
+                wrapper:
+                    blockType: container
+                    options:
+                        attr:
+                            id: 'container'
                 require_js:
                     blockType: container
                 requirejs_scripts:
@@ -56,4 +61,5 @@ layout:
                             requirejs_scripts: ~
                         require_modules:
                             app_script: ~
-                    body: ~
+                    body:
+                        wrapper: ~

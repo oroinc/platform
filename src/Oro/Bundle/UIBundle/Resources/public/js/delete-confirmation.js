@@ -26,6 +26,15 @@ define(function(require) {
         /** @property {Boolean} */
         allowOk: true,
 
+        /** @property {String} */
+        okText: __('Yes, Delete'),
+
+        /** @property {String} */
+        title: __('Delete Confirmation'),
+
+        /** @property {String} */
+        cancelText: __('Cancel'),
+
         /**
          * @param {Object} options
          */
@@ -37,9 +46,9 @@ define(function(require) {
             };
 
             options = _.extend({
-                title: __('Delete Confirmation'),
-                okText: __('Yes, Delete'),
-                cancelText: __('Cancel'),
+                title: this.title,
+                okText: this.okText,
+                cancelText: this.cancelText,
                 template: _.template(this.template, interpolate),
                 allowOk: this.allowOk
             }, options);

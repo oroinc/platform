@@ -212,7 +212,7 @@ define(function(require) {
                 'toggle': this.updateToggleAllAction,
                 'commentCountChanged': this.onCommentCountChange
             });
-            return emailItemView.deferredRender.promise();
+            return emailItemView.getDeferredRenderPromise();
         },
 
         /**
