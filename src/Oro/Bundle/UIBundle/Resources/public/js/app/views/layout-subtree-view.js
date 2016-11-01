@@ -21,6 +21,7 @@ define(function(require) {
         initialize: function(options) {
             this.options = $.extend(true, {}, this.options, options);
             LayoutSubtreeView.__super__.initialize.apply(this, arguments);
+            this.initLayout();
         },
 
         delegateEvents: function() {
@@ -65,9 +66,7 @@ define(function(require) {
             this.$el.html($(content).children());
 
             this.disposePageComponents();
-            this.initLayout().done(function() {
-
-            });
+            this.initLayout();
         },
 
         _showLoading: function() {
