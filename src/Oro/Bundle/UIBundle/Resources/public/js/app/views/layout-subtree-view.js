@@ -4,10 +4,9 @@ define(function(require) {
     var LayoutSubtreeView;
     var BaseView = require('oroui/js/app/views/base/view');
     var mediator = require('oroui/js/mediator');
-    var Error = require('oroui/js/error');
     var LoadingMaskView = require('oroui/js/app/views/loading-mask-view');
+    var LayoutSubtreeManager = require('oroui/js/layout-subtree-manager');
     var $ = require('jquery');
-    var _ = require('underscore');
 
     LayoutSubtreeView = BaseView.extend({
         options: {
@@ -23,51 +22,37 @@ define(function(require) {
             LayoutSubtreeView.__super__.initialize.apply(this, arguments);
         },
 
+        getOptions: function() {
+            return this.options;
+        },
+
         delegateEvents: function() {
             var result = LayoutSubtreeView.__super__.delegateEvents.apply(this, arguments);
-            _.each(this.options.reloadEvents || [], function(event) {
-                mediator.on(event, this.reloadLayout, this);
-            }, this);
+            LayoutSubtreeManager.addLayoutSubtreeInstance(this.options);
+            mediator.on('layout_subtree_reload_start', this._showLoading, this);
+            mediator.on('layout_subtree_reload_done', this._onContentLoad, this);
+            mediator.on('layout_subtree_reload_fail', this._hideLoading, this);
             return result;
         },
 
         undelegateEvents: function() {
-            _.each(this.options.reloadEvents || [], function(event) {
-                mediator.off(event, this.reloadLayout, this);
-            }, this);
+            LayoutSubtreeManager.removeLayoutSubtreeInstance(this.options);
+            mediator.off('layout_subtree_reload_start', this._showLoading, this);
+            mediator.off('layout_subtree_reload_done', this._onContentLoad, this);
+            mediator.off('layout_subtree_reload_fail', this._hideLoading, this);
             return LayoutSubtreeView.__super__.undelegateEvents.apply(this, arguments);
-        },
-
-        reloadLayout: function() {
-            this._showLoading();
-            $.ajax(this.getLoadingOptions())
-                .done(_.bind(this._onContentLoad, this))
-                .fail(_.bind(this._onContentLoadFail, this));
-        },
-
-        getLoadingOptions: function() {
-            return {
-                url: this.options.url,
-                data: {
-                    layout_root_id: this.options.rootId
-                },
-                type: this.options.method
-            };
-        },
-
-        _onContentLoadFail: function(jqxhr) {
-            this._hideLoading();
-            Error.handle({}, jqxhr, {enforce: true});
         },
 
         _onContentLoad: function(content) {
             this._hideLoading();
-            this.$el.html($(content).children());
+            if (content.hasOwnProperty(this.options.rootId)) {
+                content = content[this.options.rootId];
+                this.$el.html($(content).children());
 
-            this.disposePageComponents();
-            this.initLayout().done(function() {
-
-            });
+                this.disposePageComponents();
+                this.initLayout().done(function() {
+                });
+            }
         },
 
         _showLoading: function() {
