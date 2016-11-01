@@ -27,7 +27,7 @@ class TemplateFixtureRelationCalculatorTest extends \PHPUnit_Framework_TestCase
             ->getMockBuilder('Oro\Bundle\ImportExportBundle\TemplateFixture\TemplateManager')
             ->disableOriginalConstructor()
             ->getMock();
-        $this->fieldHelper = $this->getMockBuilder('Oro\Bundle\ImportExportBundle\Field\FieldHelper')
+        $this->fieldHelper = $this->getMockBuilder('Oro\Bundle\EntityBundle\Helper\FieldHelper')
             ->disableOriginalConstructor()
             ->getMock();
         $this->calculator = new TemplateFixtureRelationCalculator($this->templateManager, $this->fieldHelper);

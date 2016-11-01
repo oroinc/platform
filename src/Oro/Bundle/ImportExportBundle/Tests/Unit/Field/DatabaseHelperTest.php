@@ -92,7 +92,7 @@ class DatabaseHelperTest extends \PHPUnit_Framework_TestCase
         $fieldHelper = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink')
             ->disableOriginalConstructor()
             ->getMock();
-        $this->fieldHelperService = $this->getMockBuilder('Oro\Bundle\ImportExportBundle\Field\FieldHelper')
+        $this->fieldHelperService = $this->getMockBuilder('Oro\Bundle\EntityBundle\Helper\FieldHelper')
             ->disableOriginalConstructor()
             ->getMock('getService');
         $fieldHelper->expects($this->any())

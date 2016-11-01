@@ -4,13 +4,11 @@ namespace Oro\Bundle\NavigationBundle\Entity;
 
 use Doctrine\Common\Collections\Collection;
 
+use Oro\Bundle\LocaleBundle\Entity\Localization;
 use Oro\Bundle\LocaleBundle\Entity\LocalizedFallbackValue;
 
 interface MenuUpdateInterface
 {
-    const OWNERSHIP_GLOBAL        = 1;
-    const OWNERSHIP_ORGANIZATION  = 2;
-
     /**
      * @return int
      */
@@ -60,6 +58,63 @@ interface MenuUpdateInterface
     public function removeTitle(LocalizedFallbackValue $title);
 
     /**
+     * @param Localization $localization
+     *
+     * @return LocalizedFallbackValue
+     */
+    public function getTitle(Localization $localization = null);
+
+    /**
+     * @return LocalizedFallbackValue
+     */
+    public function getDefaultTitle();
+
+    /**
+     * @param string $value
+     *
+     * @return LocalizedFallbackValue
+     */
+    public function setDefaultTitle($value);
+
+    /**
+     * @return Collection|LocalizedFallbackValue[]
+     */
+    public function getDescriptions();
+
+    /**
+     * @param LocalizedFallbackValue $description
+     *
+     * @return MenuUpdateInterface
+     */
+    public function addDescription(LocalizedFallbackValue $description);
+
+    /**
+     * @param LocalizedFallbackValue $description
+     *
+     * @return MenuUpdateInterface
+     */
+    public function removeDescription(LocalizedFallbackValue $description);
+
+    /**
+     * @param Localization $localization
+     *
+     * @return LocalizedFallbackValue
+     */
+    public function getDescription(Localization $localization = null);
+
+    /**
+     * @return LocalizedFallbackValue
+     */
+    public function getDefaultDescription();
+
+    /**
+     * @param string $value
+     *
+     * @return LocalizedFallbackValue
+     */
+    public function setDefaultDescription($value);
+
+    /**
      * @return string
      */
     public function getUri();
@@ -84,7 +139,7 @@ interface MenuUpdateInterface
     public function setMenu($menu);
 
     /**
-     * @return int
+     * @return string
      */
     public function getOwnershipType();
 
@@ -130,6 +185,32 @@ interface MenuUpdateInterface
      * @return MenuUpdateInterface
      */
     public function setPriority($priority);
+
+    /**
+     * @return boolean
+     */
+    public function isDivider();
+
+    /**
+     * @param boolean $divider
+     *
+     * @return MenuUpdateInterface
+     */
+    public function setDivider($divider);
+
+    /**
+     * @return boolean
+     */
+    public function isCustom();
+
+    /**
+     * Check is new created item or it's update on existed item
+     *
+     * @param boolean $custom
+     *
+     * @return MenuUpdateInterface
+     */
+    public function setCustom($custom);
 
     /**
      * Get array of extra data that is not declared in MenuUpdateInterface model
