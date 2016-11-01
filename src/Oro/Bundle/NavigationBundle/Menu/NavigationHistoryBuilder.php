@@ -6,13 +6,10 @@ use Knp\Menu\ItemInterface;
 use Knp\Menu\Matcher\Matcher;
 use Knp\Menu\Util\MenuManipulator;
 
-use Oro\Bundle\FeatureToggleBundle\Checker\FeatureCheckerHolderTrait;
 use Oro\Bundle\FeatureToggleBundle\Checker\FeatureToggleableInterface;
 
 class NavigationHistoryBuilder extends NavigationItemBuilder implements FeatureToggleableInterface
 {
-    use FeatureCheckerHolderTrait;
-
     /**
      * @var Matcher
      */
