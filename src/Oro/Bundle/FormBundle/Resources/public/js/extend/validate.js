@@ -201,23 +201,12 @@ define([
         init.apply(this, _.rest(arguments));
         this.prestineValues = {};
         // defer used there since `elements` method expects form has validator object that is created here
-        _.defer(_.bind(function(){
-            this.elements().each(_.bind(function(index, element) {
-                if (!this.checkable(element)) {
-                    this.prestineValues[element.name] = element.value;
-                }
-            }, this));
-        }, this));
+        _.defer(_.bind(this.collectPristineValues, this));
     });
 
     $.validator.prototype.resetForm = _.wrap($.validator.prototype.resetForm, function(resetForm) {
-        this.prestineValues = {};
-        this.elements().each(_.bind(function(index, element) {
-            if (!this.checkable(element)) {
-                this.prestineValues[element.name] = element.value;
-            }
-        }, this));
         resetForm.apply(this, _.rest(arguments));
+        this.collectPristineValues();
     });
 
     /**
@@ -271,6 +260,19 @@ define([
         })(errors);
 
         this.showErrors(result);
+    };
+
+    $.validator.prototype.collectPristineValues = function() {
+        this.prestineValues = {};
+        this.elements().each(_.bind(function(index, element) {
+            if (!this.checkable(element)) {
+                this.prestineValues[element.name] = element.value;
+            }
+        }, this));
+    };
+
+    $.validator.prototype.isPristine = function(element) {
+        return this.prestineValues[element.name] === element.value;
     };
 
     /**
@@ -329,7 +331,7 @@ define([
         // ignore all invisible elements except input type=hidden
         ignore: ':hidden:not([type=hidden])',
         onfocusout: function(element, event) {
-            if (!this.checkable(element) && this.prestineValues[element.name] !== element.value) {
+            if (!this.checkable(element) && !this.isPristine(element)) {
                 this.element(element);
             }
         },
