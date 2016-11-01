@@ -8,9 +8,10 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
-use Oro\Bundle\UserBundle\Form\Provider\PasswordFieldOptionsProvider;
+use Oro\Bundle\FormBundle\Utils\FormUtils;
 use Oro\Bundle\UserBundle\Entity\UserInterface;
-use Oro\Bundle\UserBundle\Validator\Constraints\PasswordAlreadyUsed;
+use Oro\Bundle\UserBundle\Validator\Constraints\UsedPassword;
+use Oro\Bundle\UserBundle\Form\Provider\PasswordFieldOptionsProvider;
 
 class ResetType extends AbstractType
 {
@@ -94,10 +95,8 @@ class ResetType extends AbstractType
             $form = $event->getForm();
             // attach a constraint to first_options
             $options = $form->get('plainPassword')->getConfig()->getOptions();
-            $options['first_options']['constraints'] = [new PasswordAlreadyUsed(['userId' => $entity->getId()])];
-
-            $form->remove('plainPassword');
-            $form->add('plainPassword', 'repeated', $options);
+            $options['first_options']['constraints'] = [new UsedPassword(['userId' => $entity->getId()])];
+            FormUtils::replaceField($form, 'plainPassword', $options);
         }
     }
 }

@@ -19,7 +19,7 @@ Oro\Bundle\UserBundle\Entity\User:
             - NotBlank:
                 groups:     [Registration]
             - Oro\Bundle\UserBundle\Validator\Constraints\PasswordComplexity: ~
-            - Oro\Bundle\UserBundle\Validator\Constraints\PasswordAlreadyUsed: ~
+            - Oro\Bundle\UserBundle\Validator\Constraints\UsedPassword: ~
         enabled:
             - NotNull:      ~
         roles:

@@ -8,7 +8,7 @@ use Doctrine\ORM\Event\OnFlushEventArgs;
 use Symfony\Component\Security\Core\User\UserInterface;
 
 use Oro\Bundle\UserBundle\Entity\User;
-use Oro\Bundle\UserBundle\Entity\PasswordHash;
+use Oro\Bundle\UserBundle\Entity\PasswordHistory;
 use Oro\Bundle\UserBundle\Provider\PasswordChangePeriodConfigProvider;
 
 class UserPasswordListener
@@ -30,14 +30,14 @@ class UserPasswordListener
 
         foreach ($uow->getScheduledEntityInsertions() as $entity) {
             if ($entity instanceof User) {
-                $this->createAndPersistPasswordHash($entity, $em);
+                $this->createAndPersistPasswordHistory($entity, $em);
                 $this->resetUserPasswordExpiryDate($entity, $em);
             }
         }
 
         foreach ($uow->getScheduledEntityUpdates() as $entity) {
             if ($entity instanceof User && array_key_exists('password', $uow->getEntityChangeSet($entity))) {
-                $this->createAndPersistPasswordHash($entity, $em);
+                $this->createAndPersistPasswordHistory($entity, $em);
                 $this->resetUserPasswordExpiryDate($entity, $em);
             }
         }
@@ -47,26 +47,22 @@ class UserPasswordListener
      * @param UserInterface $user
      * @param EntityManager $em
      */
-    public function createAndPersistPasswordHash(UserInterface $user, EntityManager $em)
+    protected function createAndPersistPasswordHistory(UserInterface $user, EntityManager $em)
     {
-        $salt = $user->getSalt();
-        $hash = $user->getPassword();
+        $PasswordHistory = new PasswordHistory();
+        $PasswordHistory->setUser($user);
+        $PasswordHistory->setSalt($user->getSalt());
+        $PasswordHistory->setPasswordHash($user->getPassword());
 
-        /** @var PasswordHash $passwordHash */
-        $passwordHash = new PasswordHash();
-        $passwordHash->setUser($user);
-        $passwordHash->setSalt($salt);
-        $passwordHash->setHash($hash);
-
-        $em->persist($passwordHash);
-        $em->getUnitOfWork()->computeChangeSet($em->getClassMetadata(PasswordHash::class), $passwordHash);
+        $em->persist($PasswordHistory);
+        $em->getUnitOfWork()->computeChangeSet($em->getClassMetadata(PasswordHistory::class), $PasswordHistory);
     }
 
     /**
      * @param User $user
      * @param EntityManager $em
      */
-    public function resetUserPasswordExpiryDate(User $user, EntityManager $em)
+    protected function resetUserPasswordExpiryDate(User $user, EntityManager $em)
     {
         $expiryDate = $this->provider->getPasswordExpiryDateFromNow();
         $user->setPasswordExpiresAt($expiryDate);

@@ -4,7 +4,7 @@ namespace Oro\Bundle\UserBundle\Validator\Constraints;
 
 use Symfony\Component\Validator\Constraint;
 
-class PasswordAlreadyUsed extends Constraint
+class UsedPassword extends Constraint
 {
     /** @var string */
     public $message = 'oro.user.message.password_already_used';

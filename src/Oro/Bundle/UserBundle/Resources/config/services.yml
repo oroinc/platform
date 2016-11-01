@@ -501,7 +501,7 @@ services:
             - { name: doctrine.event_listener, event: onFlush }
 
     oro_user.validator.password_already_used:
-        class: Oro\Bundle\UserBundle\Validator\PasswordAlreadyUsedValidator
+        class: Oro\Bundle\UserBundle\Validator\UsedPasswordValidator
         arguments:
             - '@doctrine'
             - '@oro_config.manager'

@@ -67,7 +67,7 @@ class RegionRepositoryTest extends \PHPUnit_Framework_TestCase
             ->setMethods(array('select', 'from', 'where', 'orderBy', 'setParameter', 'getQuery'))
             ->getMock();
         $queryBuilder->expects($this->once())->method('select')->with($entityAlias)
-            ->will($this->returnSelf());
+        ->will($this->returnSelf());
         $queryBuilder->expects($this->once())->method('from')->with(self::ENTITY_NAME, $entityAlias)
             ->will($this->returnSelf());
         $queryBuilder->expects($this->once())->method('where')->with('r.country = :country')

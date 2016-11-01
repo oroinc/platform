@@ -10,9 +10,9 @@ use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 use Symfony\Component\Security\Core\Encoder\EncoderFactoryInterface;
 
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
-use Oro\Bundle\UserBundle\Validator\Constraints\PasswordAlreadyUsed;
+use Oro\Bundle\UserBundle\Validator\Constraints\UsedPassword;
 
-class PasswordAlreadyUsedValidator extends ConstraintValidator
+class UsedPasswordValidator extends ConstraintValidator
 {
     /** @var Registry */
     protected $registry;
@@ -38,19 +38,19 @@ class PasswordAlreadyUsedValidator extends ConstraintValidator
      */
     public function validate($value, Constraint $constraint)
     {
-        if (!$constraint instanceof PasswordAlreadyUsed) {
+        if (!$constraint instanceof UsedPassword) {
             throw new UnexpectedTypeException($constraint, __NAMESPACE__.'Constraint\NotBlank');
         }
 
-        if (null === $constraint->userId || !$this->configManager->get('oro_user.match_old_passwords_enabled')) {
+        if (null === $constraint->userId || !$this->configManager->get('oro_user.old_password_check_enabled')) {
             return;
         }
 
-        $passwordHistoryLimit = $this->configManager->get('oro_user.match_old_passwords_number');
+        $passwordHistoryLimit = $this->configManager->get('oro_user.old_password_check_number');
 
         $oldPasswords = $this->registry
-            ->getManagerForClass('OroUserBundle:PasswordHash')
-            ->getRepository('OroUserBundle:PasswordHash')
+            ->getManagerForClass('OroUserBundle:PasswordHistory')
+            ->getRepository('OroUserBundle:PasswordHistory')
             ->findBy(['user' => $constraint->userId], null, $passwordHistoryLimit);
 
         $user = $this->registry
@@ -58,8 +58,8 @@ class PasswordAlreadyUsedValidator extends ConstraintValidator
             ->find('OroUserBundle:User', $constraint->userId);
         $encoder = $this->encoderFactory->getEncoder($user);
 
-        foreach ($oldPasswords as $passwordHash) {
-            if ($encoder->isPasswordValid($passwordHash->getHash(), $value, $passwordHash->getSalt())) {
+        foreach ($oldPasswords as $passwordHistory) {
+            if ($encoder->isPasswordValid($passwordHistory->getPasswordHash(), $value, $passwordHistory->getSalt())) {
                 $this->context->addViolation($constraint->message);
 
                 break;

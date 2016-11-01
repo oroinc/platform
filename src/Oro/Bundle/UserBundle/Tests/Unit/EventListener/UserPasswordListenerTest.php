@@ -9,8 +9,10 @@ class UserPasswordListenerTest extends \PHPUnit_Framework_TestCase
 {
     /** @var  UserPasswordListener */
     protected $listener;
+
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $uow;
+
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $eventArgs;
 
@@ -35,7 +37,7 @@ class UserPasswordListenerTest extends \PHPUnit_Framework_TestCase
             ->willReturn($this->uow);
         $em->expects($this->once())
             ->method('persist')
-            ->with($this->isInstanceOf('Oro\Bundle\UserBundle\Entity\PasswordHash'));
+            ->with($this->isInstanceOf('Oro\Bundle\UserBundle\Entity\PasswordHistory'));
         $em->expects($this->atLeastOnce())
             ->method('getClassMetadata')
             ->willReturn($meta);
@@ -56,7 +58,7 @@ class UserPasswordListenerTest extends \PHPUnit_Framework_TestCase
      *
      * @dataProvider dataProvider
      */
-    public function testPersistedUser($inserts, $updates)
+    public function testCreatePasswordHistoryOnPersistingUser($inserts, $updates)
     {
         $this->uow
             ->expects($this->once())
@@ -80,7 +82,7 @@ class UserPasswordListenerTest extends \PHPUnit_Framework_TestCase
      *
      * @dataProvider dataProvider
      */
-    public function testUpdatedUser($inserts, $updates)
+    public function testCreatePasswordHistoryOnUpdatingUser($inserts, $updates)
     {
         $this->uow
             ->expects($this->once())

@@ -48,4 +48,12 @@ class OroUserExtension extends Extension implements PrependExtensionInterface
         /** @var ExtendedContainerBuilder $container */
         SecurityExtensionHelper::makeFirewallLatest($container, 'main');
     }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getAlias()
+    {
+        return self::ALIAS;
+    }
 }

@@ -3,12 +3,12 @@
 namespace Oro\Bundle\UserBundle\Tests\Unit\Validator;
 
 use Oro\Bundle\UserBundle\Entity\User;
-use Oro\Bundle\UserBundle\Entity\PasswordHash;
-use Oro\Bundle\UserBundle\Validator\Constraints\PasswordAlreadyUsed;
-use Oro\Bundle\UserBundle\Validator\PasswordAlreadyUsedValidator;
+use Oro\Bundle\UserBundle\Entity\PasswordHistory;
+use Oro\Bundle\UserBundle\Validator\Constraints\UsedPassword;
+use Oro\Bundle\UserBundle\Validator\UsedPasswordValidator;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 
-class PasswordAlreadyUsedValidatorTest extends \PHPUnit_Framework_TestCase
+class UsedPasswordValidatorTest extends \PHPUnit_Framework_TestCase
 {
     protected $constraint;
 
@@ -16,8 +16,8 @@ class PasswordAlreadyUsedValidatorTest extends \PHPUnit_Framework_TestCase
     {
 
         $user = new User();
-        $passHash1 = $this->createPasswordHash($user);
-        $passHash2 = $this->createPasswordHash($user);
+        $passHash1 = $this->createPasswordHistory($user);
+        $passHash2 = $this->createPasswordHistory($user);
 
         $repo = $this->getMockBuilder('Doctrine\Common\Persistence\ObjectRepository')
             ->disableOriginalConstructor()
@@ -61,7 +61,7 @@ class PasswordAlreadyUsedValidatorTest extends \PHPUnit_Framework_TestCase
             ->method('getEncoder')
             ->willReturn($encoder);
 
-        $this->validator = new PasswordAlreadyUsedValidator($registry, $configManager, $encoderFactory);
+        $this->validator = new UsedPasswordValidator($registry, $configManager, $encoderFactory);
     }
 
     public function testValidateAlreadyUsedPassword()
@@ -70,16 +70,16 @@ class PasswordAlreadyUsedValidatorTest extends \PHPUnit_Framework_TestCase
         $context->expects($this->once())
             ->method('addViolation');
         $this->validator->initialize($context);
-        $this->validator->validate('testPass123', new PasswordAlreadyUsed(['userId' => 123]));
+        $this->validator->validate('testPass123', new UsedPassword(['userId' => 123]));
     }
 
-    private function createPasswordHash(User $user)
+    private function createPasswordHistory(User $user)
     {
-        $passwordHash = new PasswordHash();
-        $passwordHash->setUser($user);
-        $passwordHash->setSalt($user->getSalt());
-        $passwordHash->setHash($user->getPassword());
+        $passwordHistory = new PasswordHistory();
+        $passwordHistory->setUser($user);
+        $passwordHistory->setSalt($user->getSalt());
+        $passwordHistory->setPasswordHash($user->getPassword());
 
-        return $passwordHash;
+        return $passwordHistory;
     }
 }

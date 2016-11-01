@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\UserBundle\EventListener;
 
-use Doctrine\DBAL\Types\Type;
 use Doctrine\Bundle\DoctrineBundle\Registry;
 
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
@@ -24,6 +23,7 @@ class PasswordExpiryPeriodChangeListener
 
     /**
      * @param Registry $registry
+     * @param PasswordChangePeriodConfigProvider $provider
      */
     public function __construct(Registry $registry, PasswordChangePeriodConfigProvider $provider)
     {
@@ -40,31 +40,25 @@ class PasswordExpiryPeriodChangeListener
         $settingsValueKey   = $this->getSettingsValueKey();
         $settingsEnabledKey = $this->getSettingsEnabledKey();
 
-        if ($event->isChanged($settingsEnabledKey)) {
-            $this->resetPasswordExpiryDates();
-        } else if (!$this->provider->isPasswordChangePeriodEnabled()) {
+        if (!$event->isChanged($settingsEnabledKey) && !$this->provider->isPasswordChangePeriodEnabled()) {
             return;
         }
 
-        if ($event->isChanged($settingsUnitKey) || $event->isChanged($settingsValueKey)) {
+        if ($event->isChanged($settingsEnabledKey)
+            || $event->isChanged($settingsUnitKey)
+            || $event->isChanged($settingsValueKey)
+        ) {
             $this->resetPasswordExpiryDates();
         }
     }
 
     /**
-     * Sets a new password expiry date to all users.
+     * Sets a new password expiry date for all users.
      */
     protected function resetPasswordExpiryDates()
     {
         $newExpiryDate = $this->provider->getPasswordExpiryDateFromNow();
-
-        $qb = $this->registry->getEntityManager()->createQueryBuilder();
-        $qb
-            ->update('OroUserBundle:User', 'u')
-            ->set('u.passwordExpiresAt', ':expiryDate')
-            ->setParameter('expiryDate', $newExpiryDate, Type::DATETIME);
-
-        $qb->getQuery()->execute();
+        $this->registry->getRepository('OroUserBundle:User')->setPasswordExpiresAt($newExpiryDate);
     }
 
     /**

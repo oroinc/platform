@@ -31,7 +31,7 @@ use Oro\Bundle\UserBundle\Migrations\Schema\v1_18\DropEmailUserColumn;
 use Oro\Bundle\UserBundle\Migrations\Schema\v1_19\AddFirstNameLastNameIndex;
 use Oro\Bundle\UserBundle\Migrations\Schema\v1_22\AddImpersonationTable;
 use Oro\Bundle\UserBundle\Migrations\Schema\v1_23\AddFailedLoginColumns;
-use Oro\Bundle\UserBundle\Migrations\Schema\v1_24\AddPasswordHashTable;
+use Oro\Bundle\UserBundle\Migrations\Schema\v1_24\AddPasswordHistoryTable;
 use Oro\Bundle\UserBundle\Migrations\Schema\v1_24\AddPasswordExpiresAtColumn;
 
 /**
@@ -136,7 +136,7 @@ class OroUserBundleInstaller implements
         AddFirstNameLastNameIndex::addFirstNameLastNameIndex($schema);
         AddImpersonationTable::createOroUserImpersonationTable($schema);
         AddFailedLoginColumns::updateOroUserTable($schema);
-        AddPasswordHashTable::createOroUserPasswordHashTable($schema);
+        AddPasswordHistoryTable::createOroUserPasswordHistoryTable($schema);
         AddPasswordExpiresAtColumn::updateOroUserTable($schema);
     }
 

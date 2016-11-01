@@ -13,7 +13,7 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\UserBundle\Entity\UserManager;
 use Oro\Bundle\UserBundle\Mailer\Processor;
-use Oro\Bundle\UserBundle\Validator\Constraints\PasswordAlreadyUsed;
+use Oro\Bundle\UserBundle\Validator\Constraints\UsedPassword;
 
 /**
  * Class SetPasswordHandler
@@ -86,7 +86,7 @@ class SetPasswordHandler
             if ($this->form->isValid()) {
                 // check if this password has been recently used
                 $password = $this->form->get('password')->getData();
-                $constraint = new PasswordAlreadyUsed(['userId' => $entity->getId()]);
+                $constraint = new UsedPassword(['userId' => $entity->getId()]);
                 $errors = $this->validator->validate($password, $constraint);
 
                 if (count($errors) > 0) {

@@ -6,15 +6,20 @@ use Doctrine\ORM\Mapping as ORM;
 
 use Symfony\Component\Security\Core\User\UserInterface as BaseUser;
 
+use Oro\Bundle\EntityBundle\EntityProperty\CreatedAtAwareInterface;
+use Oro\Bundle\EntityBundle\EntityProperty\CreatedAtAwareTrait;
+
 /**
- * Marketing list removed items.
+ * User password history.
  *
- * @ORM\Table(name="oro_user_password_hash")
+ * @ORM\Table(name="oro_user_password_history")
  * @ORM\Entity
  * @ORM\HasLifecycleCallbacks
  */
-class PasswordHash
+class PasswordHistory implements CreatedAtAwareInterface
 {
+    use CreatedAtAwareTrait;
+
     /**
      * @ORM\Id
      * @ORM\Column(type="integer")
@@ -25,13 +30,13 @@ class PasswordHash
     /**
      * @var BaseUser
      *
-     * @ORM\ManyToOne(targetEntity="User", inversedBy="statuses")
+     * @ORM\ManyToOne(targetEntity="User")
      * @ORM\JoinColumn(name="user_id", referencedColumnName="id")
      */
     protected $user;
 
     /**
-     * The used for hashing
+     * The salt used for hashing
      *
      * @var string
      *
@@ -44,19 +49,12 @@ class PasswordHash
      *
      * @var string
      *
-     * @ORM\Column(type="string")
+     * @ORM\Column(name="password_hash", type="string")
      */
-    protected $hash;
+    protected $passwordHash;
 
     /**
-     * @var \DateTime
-     *
-     * @ORM\Column(name="created_at", type="datetime")
-     */
-    protected $createdAt;
-
-    /**
-     * @return mixed
+     * @return int
      */
     public function getId()
     {
@@ -98,25 +96,17 @@ class PasswordHash
     /**
      * @return string
      */
-    public function getHash()
+    public function getPasswordHash()
     {
-        return $this->hash;
+        return $this->passwordHash;
     }
 
     /**
-     * @param string $hash
+     * @param string $passwordHash
      */
-    public function setHash($hash)
+    public function setPasswordHash($passwordHash)
     {
-        $this->hash = $hash;
-    }
-
-    /**
-     * @return \DateTime
-     */
-    public function getCreatedAt()
-    {
-        return $this->createdAt;
+        $this->passwordHash = $passwordHash;
     }
 
     /**

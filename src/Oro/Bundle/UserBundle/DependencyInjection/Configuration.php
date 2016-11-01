@@ -79,8 +79,8 @@ class Configuration implements ConfigurationInterface
                 'password_change_period_enabled' => ['value' => false, 'type' => 'boolean'],
                 'password_change_period' => ['value' => 30, 'type' => 'scalar'],
                 'password_change_period_unit' => ['value' => 'days'],
-                'match_old_passwords_enabled' => ['value' => false, 'type' => 'boolean'],
-                'match_old_passwords_number' => ['value' => 12, 'type' => 'scalar'],
+                'old_password_check_enabled' => ['value' => false, 'type' => 'boolean'],
+                'old_password_check_number' => ['value' => 12, 'type' => 'scalar'],
             ]
         );
 

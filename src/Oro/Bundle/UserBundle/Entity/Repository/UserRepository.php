@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\UserBundle\Entity\Repository;
 
+use Doctrine\DBAL\Types\Type;
 use Doctrine\ORM\EntityRepository;
 
 use Oro\Bundle\EmailBundle\Entity\EmailOrigin;
@@ -169,5 +170,16 @@ class UserRepository extends EntityRepository implements EmailAwareRepository
             ))
             ->getQuery()
             ->getResult();
+    }
+
+    public function setPasswordExpiresAt(\DateTime $value = null)
+    {
+        $qb = $this->createQueryBuilder('u');
+        $qb
+            ->update()
+            ->set('u.passwordExpiresAt', ':expiryDate')
+            ->setParameter('expiryDate', $value, Type::DATETIME);
+
+        $qb->getQuery()->execute();
     }
 }

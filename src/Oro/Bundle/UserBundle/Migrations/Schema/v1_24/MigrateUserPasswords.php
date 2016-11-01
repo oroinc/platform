@@ -44,19 +44,19 @@ class MigrateUserPasswords extends ParametrizedSqlMigrationQuery
      */
     protected function insertUserPasswords(LoggerInterface $logger, $dryRun)
     {
-        $slq =
-            'INSERT INTO oro_user_password_hash'
-            . ' (user_id, salt, hash, created_at)'
+        $sql =
+            'INSERT INTO oro_user_password_history'
+            . ' (user_id, salt, password_hash, created_at)'
             . ' SELECT id, salt, password, :now'
             . ' FROM oro_user';
 
         $params = ['now' => new \DateTime()];
         $types = ['now' => Type::DATETIME];
 
-        $this->logQuery($logger, $slq, $params, $types);
+        $this->logQuery($logger, $sql, $params, $types);
 
         if (!$dryRun) {
-            $this->connection->executeUpdate($slq, $params, $types);
+            $this->connection->executeUpdate($sql, $params, $types);
         }
     }
 }

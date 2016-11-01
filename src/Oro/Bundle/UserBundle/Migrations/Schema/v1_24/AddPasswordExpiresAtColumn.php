@@ -15,7 +15,6 @@ class AddPasswordExpiresAtColumn implements Migration
     public function up(Schema $schema, QueryBag $queries)
     {
         self::updateOroUserTable($schema);
-        $queries->addPostQuery(new FillPasswordExpiresAtField('oro_user'));
     }
 
     /**

@@ -427,7 +427,7 @@ class User extends ExtendUser implements
     protected $failedLoginCount;
 
     /**
-     * @var \DateTime $createdAt
+     * @var \DateTime $passwordExpiresAt
      *
      * @ORM\Column(name="password_expires_at", type="datetime")
      * @ConfigField(
@@ -1270,7 +1270,7 @@ class User extends ExtendUser implements
     /**
      * @param \DateTime $passwordExpiresAt
      */
-    public function setPasswordExpiresAt($passwordExpiresAt)
+    public function setPasswordExpiresAt(\DateTime $passwordExpiresAt = null)
     {
         $this->passwordExpiresAt = $passwordExpiresAt;
     }

@@ -7,30 +7,30 @@ use Doctrine\DBAL\Schema\Schema;
 use Oro\Bundle\MigrationBundle\Migration\Migration;
 use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 
-class AddPasswordHashTable implements Migration
+class AddPasswordHistoryTable implements Migration
 {
     /**
      * {@inheritdoc}
      */
     public function up(Schema $schema, QueryBag $queries)
     {
-        static::createOroUserPasswordHashTable($schema);
+        static::createOroUserPasswordHistoryTable($schema);
         $queries->addPostQuery(new MigrateUserPasswords());
     }
 
     /**
-     * Create oro_user_password_hash table
+     * Create oro_user_password_history table
      *
      * @param Schema $schema
      */
-    public static function createOroUserPasswordHashTable(Schema $schema)
+    public static function createOroUserPasswordHistoryTable(Schema $schema)
     {
-        $table = $schema->createTable('oro_user_password_hash');
+        $table = $schema->createTable('oro_user_password_history');
         $table->addColumn('id', 'integer', ['autoincrement' => true]);
         $table->addColumn('user_id', 'integer', ['notnull' => true]);
-        $table->addColumn('salt', 'string', ['length' => 255, 'precision' => 0]);
-        $table->addColumn('hash', 'string', ['length' => 255, 'precision' => 0]);
-        $table->addColumn('created_at', 'datetime', ['notnull' => false]);
+        $table->addColumn('salt', 'string', ['length' => 255]);
+        $table->addColumn('password_hash', 'string', ['length' => 255]);
+        $table->addColumn('created_at', 'datetime', ['notnull' => true]);
         $table->setPrimaryKey(['id']);
         $table->addForeignKeyConstraint(
             $schema->getTable('oro_user'),
