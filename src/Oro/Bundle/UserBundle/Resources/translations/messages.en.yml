@@ -115,6 +115,7 @@ oro:
         last_name.label:             Last name
         login_count.label:           Login count
         login_disabled.label:        Login disabled
+        password_expires_at.label:   Password expires at
         failed_login_count.label:    Failed login count
         middle_name.label:           Middle name
         name_prefix.label:           Name prefix

@@ -429,14 +429,7 @@ class User extends ExtendUser implements
     /**
      * @var \DateTime $passwordExpiresAt
      *
-     * @ORM\Column(name="password_expires_at", type="datetime")
-     * @ConfigField(
-     *      defaultValues={
-     *          "entity"={
-     *              "label"="oro.ui.password_expires_at"
-     *          }
-     *      }
-     * )
+     * @ORM\Column(name="password_expires_at", type="datetime", nullable=true)
      */
     protected $passwordExpiresAt;
 

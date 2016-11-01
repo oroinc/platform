@@ -30,7 +30,7 @@ class AddPasswordHistoryTable implements Migration
         $table->addColumn('user_id', 'integer', ['notnull' => true]);
         $table->addColumn('salt', 'string', ['length' => 255]);
         $table->addColumn('password_hash', 'string', ['length' => 255]);
-        $table->addColumn('created_at', 'datetime', ['notnull' => true]);
+        $table->addColumn('created_at', 'datetime', []);
         $table->setPrimaryKey(['id']);
         $table->addForeignKeyConstraint(
             $schema->getTable('oro_user'),
