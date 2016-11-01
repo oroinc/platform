@@ -28,7 +28,7 @@ result_menu:
             uri: '#'
             extras:
                 divider: true
-                translateDisabled: false
+                translate_disabled: false
     tree:
         menu:
             type: menu
