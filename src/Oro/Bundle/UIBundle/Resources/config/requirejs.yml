@@ -169,6 +169,7 @@ config:
         'oroui/js/error': 'bundles/oroui/js/error.js'
         'oroui/js/init-layout': 'bundles/oroui/js/init-layout.js'
         'oroui/js/layout': 'bundles/oroui/js/layout.js'
+        'oroui/js/layout-subtree-manager': 'bundles/oroui/js/layout-subtree-manager.js'
         'oroui/js/loading-mask': 'bundles/oroui/js/loading-mask.js'
         'oroui/js/mediator': 'bundles/oroui/js/mediator.js'
         'oroui/js/messenger': 'bundles/oroui/js/messenger.js'
