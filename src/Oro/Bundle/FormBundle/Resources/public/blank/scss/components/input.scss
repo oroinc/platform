@@ -10,9 +10,9 @@
                              $input-color
                             );
 
-    @include element-state('hover') {
-        text-decoration: none;
+    box-sizing: border-box;
 
+    @include element-state('hover') {
         border-color: $input-border-color-hover-state;
     }
 
