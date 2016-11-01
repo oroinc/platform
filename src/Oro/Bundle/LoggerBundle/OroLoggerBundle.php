@@ -2,9 +2,17 @@
 
 namespace Oro\Bundle\LoggerBundle;
 
+use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
+
+use Oro\Bundle\LoggerBundle\DependencyInjection\Compiler\DetailedLogsHandlerPass;
 
 class OroLoggerBundle extends Bundle
 {
+    public function build(ContainerBuilder $container)
+    {
+        parent::build($container);
 
+        $container->addCompilerPass(new DetailedLogsHandlerPass());
+    }
 }

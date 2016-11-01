@@ -6,3 +6,8 @@ services:
         tags:
             - { name: kernel.event_subscriber }
             - { name: monolog.logger, channel: console }
+
+    oro_logger.monolog.detailed_logs.handler:
+        class: Oro\Bundle\LoggerBundle\Monolog\DetailedLogsHandler
+        calls:
+            - ['setContainer', ['@service_container']]
