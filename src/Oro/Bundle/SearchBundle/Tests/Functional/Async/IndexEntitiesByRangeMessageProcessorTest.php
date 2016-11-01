@@ -10,6 +10,7 @@ use Oro\Component\MessageQueue\Transport\SessionInterface;
 
 /**
  * @dbIsolationPerTest
+ * @group search
  */
 class IndexEntitiesByRangeMessageProcessorTest extends WebTestCase
 {
@@ -29,6 +30,11 @@ class IndexEntitiesByRangeMessageProcessorTest extends WebTestCase
 
     public function testShouldCreateIndexForEntity()
     {
+        // TODO: BAP-12226 Test should work with different engines not only ORM
+        if ($this->getContainer()->getParameter('oro_search.engine') !== 'orm') {
+            $this->markTestIncomplete('BAP-12226: This test doesn\'t work with current search engine');
+        }
+
         $itemManager = $this->getDoctrine()->getManagerForClass(Item::class);
 
         $indexManager = $this->getDoctrine()->getManagerForClass(IndexItem::class);
