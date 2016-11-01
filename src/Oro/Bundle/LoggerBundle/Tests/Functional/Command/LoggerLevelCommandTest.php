@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\LoggerBundle\Tests\Functional\Command;
 
-use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\LoggerBundle\DependencyInjection\Configuration;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
