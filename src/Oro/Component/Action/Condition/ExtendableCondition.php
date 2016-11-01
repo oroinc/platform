@@ -65,12 +65,11 @@ class ExtendableCondition extends AbstractCondition implements ContextAccessorAw
      */
     public function initialize(array $options)
     {
-        if (empty($options)) {
+        if (!array_key_exists('events', $options)) {
             throw new ExtendableEventNameMissingException(
-                sprintf('You need to specify a list of event names for the "@%s" condition type', self::NAME)
+                sprintf('You need to specify a list of event names for the "@%s" condition type with "events" config key', self::NAME)
             );
         }
-
-        $this->subscribedEvents = $options;
+        $this->subscribedEvents = $options['events'];
     }
 }
