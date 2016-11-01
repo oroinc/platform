@@ -10,6 +10,7 @@ use Oro\Component\Layout\Layout;
 use Oro\Component\Layout\LayoutContext;
 use Oro\Component\Layout\LayoutManager;
 
+// TODO: Change doc in ticket BB-5243 to use FormView instead of FormAccessor
 use Oro\Bundle\LayoutBundle\Layout\Form\FormAccessor;
 use Oro\Bundle\LayoutBundle\Layout\Form\FormAction;
 use Oro\Bundle\LayoutBundle\Tests\Fixtures\UserNameType;

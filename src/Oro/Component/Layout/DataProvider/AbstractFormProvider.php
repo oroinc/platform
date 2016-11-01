@@ -5,9 +5,10 @@ namespace Oro\Component\Layout\DataProvider;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormInterface;
 
-use Oro\Bundle\LayoutBundle\Layout\Form\FormAccessor;
-use Oro\Bundle\LayoutBundle\Layout\Form\FormAction;
+use Oro\Bundle\EmbeddedFormBundle\Layout\Form\FormAccessor;
+use Oro\Bundle\EmbeddedFormBundle\Layout\Form\FormAction;
 
+// TODO: Refactor this class in ticket BB-5243
 abstract class AbstractFormProvider
 {
     /** @var array */

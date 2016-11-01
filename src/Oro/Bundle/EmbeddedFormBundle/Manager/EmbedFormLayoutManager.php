@@ -8,7 +8,7 @@ use Oro\Component\Layout\Layout;
 use Oro\Component\Layout\LayoutContext;
 use Oro\Component\Layout\LayoutManager;
 
-use Oro\Bundle\LayoutBundle\Layout\Form\FormAccessor;
+use Oro\Bundle\EmbeddedFormBundle\Layout\Form\FormAccessor;
 use Oro\Bundle\EmbeddedFormBundle\Entity\EmbeddedForm;
 
 class EmbedFormLayoutManager
@@ -55,6 +55,9 @@ class EmbedFormLayoutManager
         $customLayout = $this->formManager->getCustomFormLayoutByFormType($formTypeName);
 
         $layoutContext = new LayoutContext();
+
+        $layoutContext->set('expressions_evaluate', true);
+//        $layoutContext->set('expressions_evaluate_deferred', false);
 
         $layoutContext->getResolver()
             ->setRequired([

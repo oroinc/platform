@@ -1062,6 +1062,7 @@ Working with forms
 -----------------------------------
 
 ### Non page specific form ###
+// TODO: Change doc in ticket BB-5243 to use FormView instead of FormAccessor
 
 Let's implement a simple search form by means of the layout engine.
 To use the form in layouts we need to configure the layout context first. Since the search form persists on many pages we will add it to the layout context using another context configurator:
