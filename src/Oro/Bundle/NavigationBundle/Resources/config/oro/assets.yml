@@ -2,3 +2,4 @@ assets:
     css:
         'oronavigation':
           - 'bundles/oronavigation/css/less/main.less'
+          - 'bundles/oronavigation/css/menuitems.css'
