@@ -104,7 +104,6 @@ class NavigationItemBuilderBuilderTest extends \PHPUnit_Framework_TestCase
         $user->expects($this->once($userId))
             ->method('getId')
             ->will($this->returnValue(1));
-
         $token = $this->getMockBuilder(
             'Oro\Bundle\SecurityBundle\Authentication\Token\UsernamePasswordOrganizationToken'
         )
@@ -113,11 +112,9 @@ class NavigationItemBuilderBuilderTest extends \PHPUnit_Framework_TestCase
         $token->expects($this->once())
             ->method('getUser')
             ->will($this->returnValue($user));
-
         $token->expects($this->once())
             ->method('getOrganizationContext')
             ->will($this->returnValue($organization));
-
         $this->securityContext->expects($this->atLeastOnce())
             ->method('getToken')
             ->will($this->returnValue($token));
@@ -139,17 +136,14 @@ class NavigationItemBuilderBuilderTest extends \PHPUnit_Framework_TestCase
             ->method('getNavigationItems')
             ->with($userId, $organization, $type)
             ->will($this->returnValue($items));
-
         $this->router->expects($this->exactly(2))
             ->method('match')
             ->with($this->isType('string'))
             ->willReturn(['_route' => 'route']);
-
         $this->featureChecker->expects($this->exactly(2))
             ->method('isResourceEnabled')
             ->with($this->anything())
             ->willReturn(true);
-
         $this->em->expects($this->once())
             ->method('getRepository')
             ->with(get_class($item))
