@@ -199,7 +199,6 @@ define([
     $.validator.prototype.init = _.wrap($.validator.prototype.init, function(init) {
         validationHandler.initialize($(this.currentForm));
         init.apply(this, _.rest(arguments));
-        this.prestineValues = {};
         // defer used there since `elements` method expects form has validator object that is created here
         _.defer(_.bind(this.collectPristineValues, this));
     });
@@ -263,16 +262,16 @@ define([
     };
 
     $.validator.prototype.collectPristineValues = function() {
-        this.prestineValues = {};
+        this.pristineValues = {};
         this.elements().each(_.bind(function(index, element) {
             if (!this.checkable(element)) {
-                this.prestineValues[element.name] = element.value;
+                this.pristineValues[element.name] = element.value;
             }
         }, this));
     };
 
     $.validator.prototype.isPristine = function(element) {
-        return this.prestineValues[element.name] === element.value;
+        return this.pristineValues[element.name] === element.value;
     };
 
     /**
