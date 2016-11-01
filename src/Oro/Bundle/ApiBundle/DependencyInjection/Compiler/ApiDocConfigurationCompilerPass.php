@@ -10,6 +10,7 @@ use Oro\Bundle\ApiBundle\Util\DependencyInjectionUtil;
 
 class ApiDocConfigurationCompilerPass implements CompilerPassInterface
 {
+    const API_DOC_PATH_PARAMETER_NAME               = 'oro_api.api_doc.path';
     const API_DOC_EXTRACTOR_SERVICE                 = 'nelmio_api_doc.extractor.api_doc_extractor';
     const EXPECTED_API_DOC_EXTRACTOR_CLASS          = 'Nelmio\ApiDocBundle\Extractor\ApiDocExtractor';
     const EXPECTED_CACHING_API_DOC_EXTRACTOR_CLASS  = 'Nelmio\ApiDocBundle\Extractor\CachingApiDocExtractor';
@@ -57,7 +58,7 @@ class ApiDocConfigurationCompilerPass implements CompilerPassInterface
                 );
                 $apiDocHtmlFormatterDef->addMethodCall(
                     'setDocumentationPath',
-                    [$container->getParameter('oro_api.api_doc.path')]
+                    [$container->getParameter(self::API_DOC_PATH_PARAMETER_NAME)]
                 );
             }
         }
