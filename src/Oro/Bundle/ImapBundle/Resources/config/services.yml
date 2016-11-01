@@ -205,11 +205,20 @@ services:
         tags:
             - { name: 'oro_message_queue.client.message_processor' }
 
-    oro_imap.async.processor.sync_email:
+    oro_imap.async.sync_email:
         scope: prototype
         class: 'Oro\Bundle\ImapBundle\Async\SyncEmailMessageProcessor'
         arguments:
             - '@oro_imap.email_synchronizer'
+            - '@logger'
+        tags:
+            - { name: 'oro_message_queue.client.message_processor' }
+
+    oro_imap.async.sync_emails:
+        scope: prototype
+        class: 'Oro\Bundle\ImapBundle\Async\SyncEmailsMessageProcessor'
+        arguments:
+            - '@oro_message_queue.client.message_producer'
             - '@logger'
         tags:
             - { name: 'oro_message_queue.client.message_processor' }

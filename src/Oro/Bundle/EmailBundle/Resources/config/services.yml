@@ -330,16 +330,16 @@ services:
         tags:
             - { name: 'oro_message_queue.client.message_processor' }
 
-    oro_email.async.add_association_to_emails:
-        class: 'Oro\Bundle\EmailBundle\Async\AddAssociationToEmailsMessageProcessor'
+    oro_email.async.add_email_associations:
+        class: 'Oro\Bundle\EmailBundle\Async\AddEmailAssociationsMessageProcessor'
         arguments:
             - '@oro_message_queue.client.message_producer'
             - '@logger'
         tags:
             - { name: 'oro_message_queue.client.message_processor' }
 
-    oro_email.async.add_association_to_email:
-        class: 'Oro\Bundle\EmailBundle\Async\AddAssociationToEmailMessageProcessor'
+    oro_email.async.add_email_association:
+        class: 'Oro\Bundle\EmailBundle\Async\AddEmailAssociationMessageProcessor'
         arguments:
             - '@oro_email.command.association_manager'
             - '@logger'
@@ -375,7 +375,16 @@ services:
         class: 'Oro\Bundle\EmailBundle\Async\PurgeEmailAttachmentsMessageProcessor'
         arguments:
             - '@doctrine'
+            - '@oro_message_queue.client.message_producer'
             - '@oro_config.global'
+        tags:
+            - { name: 'oro_message_queue.client.message_processor' }
+
+    oro_email.async.purge_email_attachments_by_ids:
+        class: 'Oro\Bundle\EmailBundle\Async\PurgeEmailAttachmentsByIdsMessageProcessor'
+        arguments:
+            - '@doctrine'
+            - '@logger'
         tags:
             - { name: 'oro_message_queue.client.message_processor' }
 

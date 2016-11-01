@@ -1,15 +1,16 @@
 <?php
 namespace Oro\Bundle\EmailBundle\Async;
 
+use Psr\Log\LoggerInterface;
+
 use Oro\Bundle\EmailBundle\Async\Manager\AssociationManager;
 use Oro\Component\MessageQueue\Client\TopicSubscriberInterface;
 use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
 use Oro\Component\MessageQueue\Transport\MessageInterface;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
 use Oro\Component\MessageQueue\Util\JSON;
-use Psr\Log\LoggerInterface;
 
-class AddAssociationToEmailMessageProcessor implements MessageProcessorInterface, TopicSubscriberInterface
+class AddEmailAssociationMessageProcessor implements MessageProcessorInterface, TopicSubscriberInterface
 {
     /**
      * @var AssociationManager
@@ -40,7 +41,7 @@ class AddAssociationToEmailMessageProcessor implements MessageProcessorInterface
 
         if (! isset($data['emailId'], $data['targetClass'], $data['targetId'])) {
             $this->logger->critical(sprintf(
-                '[AddAssociationToEmailMessageProcessor] Got invalid message: "%s"',
+                '[AddEmailAssociationMessageProcessor] Got invalid message: "%s"',
                 $message->getBody()
             ));
 

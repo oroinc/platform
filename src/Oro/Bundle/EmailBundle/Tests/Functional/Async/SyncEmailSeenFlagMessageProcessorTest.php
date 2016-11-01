@@ -8,7 +8,6 @@ use Oro\Bundle\EmailBundle\Entity\EmailUser;
 use Oro\Bundle\EmailBundle\Entity\InternalEmailOrigin;
 use Oro\Bundle\MessageQueueBundle\Test\Functional\MessageQueueExtension;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
-use Oro\Component\MessageQueue\Client\TraceableMessageProducer;
 use OroEntityProxy\OroEmailBundle\EmailAddressProxy;
 
 /**
@@ -40,13 +39,13 @@ class SyncEmailSeenFlagMessageProcessorTest extends WebTestCase
         $emailUser->setSeen(true);
         $this->getEntityManager()->flush();
 
-        $this->assertMessageSent(Topics::SYNC_EMAIL_SEEN_FLAG, ['ids' => [$emailUser->getId()], 'seen' => true]);
+        $this->assertMessageSent(Topics::SYNC_EMAIL_SEEN_FLAG, ['id' => [$emailUser->getId()], 'seen' => true]);
 
         // setUnseen
         $emailUser->setSeen(false);
         $this->getEntityManager()->flush();
 
-        $this->assertMessageSent(Topics::SYNC_EMAIL_SEEN_FLAG, ['ids' => [$emailUser->getId()], 'seen' => false]);
+        $this->assertMessageSent(Topics::SYNC_EMAIL_SEEN_FLAG, ['id' => [$emailUser->getId()], 'seen' => false]);
     }
 
     private function createEmailUser()
@@ -79,14 +78,6 @@ class SyncEmailSeenFlagMessageProcessorTest extends WebTestCase
         $this->getEntityManager()->flush();
 
         return $emailUser;
-    }
-
-    /**
-     * @return \Oro\Component\MessageQueue\Client\MessageProducer|TraceableMessageProducer
-     */
-    private function getMessageProducer()
-    {
-        return $this->getContainer()->get('oro_message_queue.client.message_producer');
     }
 
     /**

@@ -1,11 +1,11 @@
 <?php
 namespace Oro\Bundle\ImapBundle\Tests\Unit\Async;
 
+use Oro\Component\MessageQueue\Client\MessageProducerInterface;
 use Psr\Log\LoggerInterface;
 
-use Oro\Bundle\ImapBundle\Async\SyncEmailMessageProcessor;
+use Oro\Bundle\ImapBundle\Async\SyncEmailsMessageProcessor;
 use Oro\Bundle\ImapBundle\Async\Topics;
-use Oro\Bundle\ImapBundle\Sync\ImapEmailSynchronizer;
 use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
 use Oro\Component\MessageQueue\Transport\Null\NullMessage;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
@@ -14,8 +14,8 @@ class SyncEmailMessageProcessorTest extends \PHPUnit_Framework_TestCase
 {
     public function testCouldBeConstructedWithRequiredArguments()
     {
-        new SyncEmailMessageProcessor(
-            $this->createImapEmailSynchronizerMock(),
+        new SyncEmailsMessageProcessor(
+            $this->createMessageProducerMock(),
             $this->createLoggerMock()
         );
     }
@@ -29,19 +29,17 @@ class SyncEmailMessageProcessorTest extends \PHPUnit_Framework_TestCase
             ->with('Got invalid message. "{"key":"value"}"')
         ;
 
-        $synchronizer = $this->createImapEmailSynchronizerMock();
-
         $message = new NullMessage();
         $message->setBody(json_encode(['key' => 'value']));
 
-        $processor = new SyncEmailMessageProcessor($synchronizer, $logger);
+        $processor = new SyncEmailsMessageProcessor($this->createMessageProducerMock(), $logger);
 
         $result = $processor->process($message, $this->createSessionMock());
 
         $this->assertEquals(MessageProcessorInterface::REJECT, $result);
     }
 
-    public function testShouldExecuteSyncOriginsWithIds()
+    public function testShouldSendMessagesToSyncEmailTopic()
     {
         $logger = $this->createLoggerMock();
         $logger
@@ -49,17 +47,22 @@ class SyncEmailMessageProcessorTest extends \PHPUnit_Framework_TestCase
             ->method('critical')
         ;
 
-        $synchronizer = $this->createImapEmailSynchronizerMock();
-        $synchronizer
-            ->expects($this->once())
-            ->method('syncOrigins')
-            ->with($this->identicalTo([1]))
+        $producer = $this->createMessageProducerMock();
+        $producer
+            ->expects($this->at(0))
+            ->method('send')
+            ->with($this->equalTo(Topics::SYNC_EMAIL), $this->identicalTo(['id' => 1]))
+        ;
+        $producer
+            ->expects($this->at(1))
+            ->method('send')
+            ->with($this->equalTo(Topics::SYNC_EMAIL), $this->identicalTo(['id' => 2]))
         ;
 
         $message = new NullMessage();
-        $message->setBody(json_encode(['id' => 1]));
+        $message->setBody(json_encode(['ids' => [1,2]]));
 
-        $processor = new SyncEmailMessageProcessor($synchronizer, $logger);
+        $processor = new SyncEmailsMessageProcessor($producer, $logger);
 
         $result = $processor->process($message, $this->createSessionMock());
 
@@ -69,8 +72,8 @@ class SyncEmailMessageProcessorTest extends \PHPUnit_Framework_TestCase
     public function testShouldReturnSubscribedTopics()
     {
         $this->assertEquals(
-            [Topics::SYNC_EMAIL],
-            SyncEmailMessageProcessor::getSubscribedTopics()
+            [Topics::SYNC_EMAILS],
+            SyncEmailsMessageProcessor::getSubscribedTopics()
         );
     }
 
@@ -83,18 +86,18 @@ class SyncEmailMessageProcessorTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|ImapEmailSynchronizer
-     */
-    private function createImapEmailSynchronizerMock()
-    {
-        return $this->getMock(ImapEmailSynchronizer::class, [], [], '', false);
-    }
-
-    /**
      * @return \PHPUnit_Framework_MockObject_MockObject|LoggerInterface
      */
     private function createLoggerMock()
     {
         return $this->getMock(LoggerInterface::class);
+    }
+
+    /**
+     * @return \PHPUnit_Framework_MockObject_MockObject|MessageProducerInterface
+     */
+    private function createMessageProducerMock()
+    {
+        return $this->getMock(MessageProducerInterface::class);
     }
 }

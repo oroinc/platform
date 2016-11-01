@@ -23,7 +23,7 @@ processes:
                             method: 'send'
                             method_parameters:
                                 - '$.topic'
-                                - { ids: ['$id'], seen: $seen }
+                                - { id: $id, seen: $seen }
 
     triggers:
         sync_email_flag_after_changed:

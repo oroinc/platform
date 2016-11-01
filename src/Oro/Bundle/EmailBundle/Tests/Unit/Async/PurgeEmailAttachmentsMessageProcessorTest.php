@@ -1,8 +1,6 @@
 <?php
 namespace Oro\Bundle\EmailBundle\Tests\Unit\Async;
 
-use Doctrine\ORM\EntityManager;
-
 use Psr\Log\LoggerInterface;
 
 use Symfony\Bridge\Doctrine\RegistryInterface;
@@ -10,8 +8,8 @@ use Symfony\Bridge\Doctrine\RegistryInterface;
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EmailBundle\Async\PurgeEmailAttachmentsMessageProcessor;
 use Oro\Bundle\EmailBundle\Async\Topics;
-use Oro\Bundle\EmailBundle\Entity\EmailAttachment;
 use Oro\Bundle\EmailBundle\Tests\Unit\ReflectionUtil;
+use Oro\Component\MessageQueue\Client\MessageProducerInterface;
 
 class PurgeEmailAttachmentsMessageProcessorTest extends \PHPUnit_Framework_TestCase
 {
@@ -19,6 +17,7 @@ class PurgeEmailAttachmentsMessageProcessorTest extends \PHPUnit_Framework_TestC
     {
         new PurgeEmailAttachmentsMessageProcessor(
             $this->createRegistryInterfaceMock(),
+            $this->createMessageProducerMock(),
             $this->createConfigManagerMock()
         );
     }
@@ -45,6 +44,7 @@ class PurgeEmailAttachmentsMessageProcessorTest extends \PHPUnit_Framework_TestC
 
         $processor = new PurgeEmailAttachmentsMessageProcessor(
             $this->createRegistryInterfaceMock(),
+            $this->createMessageProducerMock(),
             $configManager
         );
 
@@ -75,63 +75,6 @@ class PurgeEmailAttachmentsMessageProcessorTest extends \PHPUnit_Framework_TestC
     }
 
     /**
-     * @dataProvider removeAttachmentDataProvider
-     */
-    public function testShouldRemoveCorrectAttachments($attachmentExpects, $attachmentReturns, $managerExpects, $size)
-    {
-        $attachment = $this->createEmailAttachmentMock();
-        $attachment->expects($attachmentExpects)
-            ->method('getSize')
-            ->willReturn($attachmentReturns)
-        ;
-
-        $manager = $this->createEntityManagerMock();
-        $manager->expects($managerExpects)
-            ->method('remove')
-            ->with($attachment)
-        ;
-
-        $processor = new PurgeEmailAttachmentsMessageProcessor(
-            $this->createRegistryInterfaceMock(),
-            $this->createConfigManagerMock()
-        );
-
-        ReflectionUtil::callProtectedMethod($processor, 'removeAttachment', [$manager, $attachment, $size]);
-    }
-
-    public function removeAttachmentDataProvider()
-    {
-        return [
-            [
-                'attachmentExpects' => $this->never(),
-                'attachmentReturns' => 1,
-                'managerExpects' => $this->once(),
-                'size' => 0,
-            ],
-            [
-                'attachmentExpects' => $this->once(),
-                'attachmentReturns' => 1,
-                'managerExpects' => $this->never(),
-                'size' => 2,
-            ],
-            [
-                'attachmentExpects' => $this->once(),
-                'attachmentReturns' => 2,
-                'managerExpects' => $this->once(),
-                'size' => 2,
-            ],
-        ];
-    }
-
-    /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|EntityManager
-     */
-    private function createEntityManagerMock()
-    {
-        return $this->getMock(EntityManager::class, [], [], '', false);
-    }
-
-    /**
      * @return \PHPUnit_Framework_MockObject_MockObject|ConfigManager
      */
     private function createConfigManagerMock()
@@ -148,10 +91,10 @@ class PurgeEmailAttachmentsMessageProcessorTest extends \PHPUnit_Framework_TestC
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|EmailAttachment
+     * @return \PHPUnit_Framework_MockObject_MockObject|MessageProducerInterface
      */
-    private function createEmailAttachmentMock()
+    private function createMessageProducerMock()
     {
-        return $this->getMock(EmailAttachment::class, [], [], '', false);
+        return $this->getMock(MessageProducerInterface::class);
     }
 }

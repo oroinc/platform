@@ -1,13 +1,14 @@
 <?php
 namespace Oro\Bundle\EmailBundle\Async;
 
+use Psr\Log\LoggerInterface;
+
 use Oro\Bundle\EmailBundle\Async\Manager\AssociationManager;
 use Oro\Component\MessageQueue\Client\TopicSubscriberInterface;
 use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
 use Oro\Component\MessageQueue\Transport\MessageInterface;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
 use Oro\Component\MessageQueue\Util\JSON;
-use Psr\Log\LoggerInterface;
 
 class UpdateEmailOwnerAssociationMessageProcessor implements MessageProcessorInterface, TopicSubscriberInterface
 {

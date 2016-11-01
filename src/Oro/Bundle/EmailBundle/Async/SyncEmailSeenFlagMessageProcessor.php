@@ -51,34 +51,32 @@ class SyncEmailSeenFlagMessageProcessor implements MessageProcessorInterface, To
     {
         $data = JSON::decode($message->getBody());
 
-        if (! isset($data['ids'], $data['seen']) || ! is_array($data['ids'])) {
-            $this->logger->critical(sprintf(
-                '[SyncEmailSeenFlagMessageProcessor] Got invalid message: "%s"',
-                $message->getBody()
-            ));
+        if (! isset($data['id'], $data['seen'])) {
+            $this->logger->critical(
+                sprintf('[SyncEmailSeenFlagMessageProcessor] Got invalid message: "%s"', $message->getBody()),
+                ['message' => $message]
+            );
 
             return self::REJECT;
         }
 
-        foreach ($data['ids'] as $id) {
-            /** @var EmailUser $emailUser */
-            $emailUser = $this->getUserEmailRepository()->find($id);
-            if (! $emailUser) {
-                $this->logger->error(sprintf(
-                    '[SyncEmailSeenFlagMessageProcessor] UserEmail was not found. id: "%s"',
-                    $id
-                ));
+        /** @var EmailUser $emailUser */
+        $emailUser = $this->getUserEmailRepository()->find($data['id']);
+        if (! $emailUser) {
+            $this->logger->error(
+                sprintf('[SyncEmailSeenFlagMessageProcessor] UserEmail was not found. id: "%s"', $data['id']),
+                ['message' => $message]
+            );
 
-                continue;
-            }
-
-            $data['seen']
-                ? $this->emailFlagManager->setSeen($emailUser)
-                : $this->emailFlagManager->setUnseen($emailUser)
-            ;
-
-            $emailUser->decrementUnsyncedFlagCount();
+            return self::REJECT;
         }
+
+        $data['seen']
+            ? $this->emailFlagManager->setSeen($emailUser)
+            : $this->emailFlagManager->setUnseen($emailUser)
+        ;
+
+        $emailUser->decrementUnsyncedFlagCount();
 
         $this->getUserEmailManager()->flush();
 

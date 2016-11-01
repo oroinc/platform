@@ -1,8 +1,9 @@
 <?php
-namespace Oro\Bundle\EmailBundle\Async;
+namespace Oro\Bundle\ImapBundle\Async;
 
 use Psr\Log\LoggerInterface;
 
+use Oro\Bundle\ImapBundle\Sync\ImapEmailSynchronizer;
 use Oro\Component\MessageQueue\Client\MessageProducerInterface;
 use Oro\Component\MessageQueue\Client\TopicSubscriberInterface;
 use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
@@ -10,10 +11,10 @@ use Oro\Component\MessageQueue\Transport\MessageInterface;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
 use Oro\Component\MessageQueue\Util\JSON;
 
-class AddAssociationToEmailsMessageProcessor implements MessageProcessorInterface, TopicSubscriberInterface
+class SyncEmailsMessageProcessor implements MessageProcessorInterface, TopicSubscriberInterface
 {
     /**
-     * @var MessageProducerInterface
+     * @var ImapEmailSynchronizer
      */
     private $producer;
 
@@ -37,29 +38,21 @@ class AddAssociationToEmailsMessageProcessor implements MessageProcessorInterfac
      */
     public function process(MessageInterface $message, SessionInterface $session)
     {
-        $data = JSON::decode($message->getBody());
+        $body = JSON::decode($message->getBody());
 
-        if (! isset($data['emailIds'], $data['targetClass'], $data['targetId']) || ! is_array($data['emailIds'])) {
-            $this->logger->critical(sprintf(
-                '[AddAssociationToEmailsMessageProcessor] Got invalid message: "%s"',
-                $message->getBody()
-            ));
+        if (! isset($body['ids']) || ! is_array($body['ids'])) {
+            $this->logger->critical(
+                sprintf('Got invalid message. "%s"', $message->getBody()),
+                ['message' => $message]
+            );
 
             return self::REJECT;
         }
 
-        foreach ($data['emailIds'] as $id) {
-            $this->producer->send(Topics::ADD_ASSOCIATION_TO_EMAIL, [
-                'emailId' => $id,
-                'targetClass' => $data['targetClass'],
-                'targetId' => $data['targetId'],
-            ]);
+        foreach ($body['ids'] as $id) {
+            $this->producer->send(Topics::SYNC_EMAIL, ['id' => $id]);
         }
 
-        $this->logger->info(sprintf(
-            '[AddAssociationToEmailsMessageProcessor] Sent "%s" messages',
-            count($data['emailIds'])
-        ));
 
         return self::ACK;
     }
@@ -69,6 +62,6 @@ class AddAssociationToEmailsMessageProcessor implements MessageProcessorInterfac
      */
     public static function getSubscribedTopics()
     {
-        return [Topics::ADD_ASSOCIATION_TO_EMAILS];
+        return [Topics::SYNC_EMAILS];
     }
 }

@@ -17,7 +17,7 @@ use Oro\Bundle\SecurityBundle\Encoder\Mcrypt;
 
 class ImapEmailSynchronizer extends AbstractEmailSynchronizer
 {
-    static protected $messageQueueTopic = Topics::SYNC_EMAIL;
+    static protected $messageQueueTopic = Topics::SYNC_EMAILS;
 
     /** @var ImapEmailSynchronizationProcessorFactory */
     protected $syncProcessorFactory;

@@ -3,6 +3,9 @@ namespace Oro\Bundle\EmailBundle\Tests\Unit\Async;
 
 use Doctrine\Bundle\DoctrineBundle\Registry;
 use Doctrine\ORM\EntityManager;
+
+use Psr\Log\LoggerInterface;
+
 use Oro\Bundle\EmailBundle\Async\SyncEmailSeenFlagMessageProcessor;
 use Oro\Bundle\EmailBundle\Async\Topics;
 use Oro\Bundle\EmailBundle\Entity\EmailUser;
@@ -11,7 +14,6 @@ use Oro\Bundle\EmailBundle\Manager\EmailFlagManager;
 use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
 use Oro\Component\MessageQueue\Transport\Null\NullMessage;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
-use Psr\Log\LoggerInterface;
 
 class SyncEmailSeenFlagMessageProcessorTest extends \PHPUnit_Framework_TestCase
 {
@@ -24,7 +26,7 @@ class SyncEmailSeenFlagMessageProcessorTest extends \PHPUnit_Framework_TestCase
         );
     }
 
-    public function testShouldRejectMessageIfMessageIdsPropertyIsNotSet()
+    public function testShouldRejectMessageIfMessageIdPropertyIsNotSet()
     {
         $logger = $this->createLoggerMock();
         $logger
@@ -55,7 +57,7 @@ class SyncEmailSeenFlagMessageProcessorTest extends \PHPUnit_Framework_TestCase
         $logger
             ->expects($this->once())
             ->method('critical')
-            ->with('[SyncEmailSeenFlagMessageProcessor] Got invalid message: "{"ids":[123]}"')
+            ->with('[SyncEmailSeenFlagMessageProcessor] Got invalid message: "{"id":123}"')
         ;
 
         $processor = new SyncEmailSeenFlagMessageProcessor(
@@ -66,7 +68,7 @@ class SyncEmailSeenFlagMessageProcessorTest extends \PHPUnit_Framework_TestCase
 
         $message = new NullMessage();
         $message->setBody(json_encode([
-            'ids' => [123],
+            'id' => 123,
         ]));
 
         $result = $processor->process($message, $this->createSessionMock());
@@ -74,7 +76,7 @@ class SyncEmailSeenFlagMessageProcessorTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(MessageProcessorInterface::REJECT, $result);
     }
 
-    public function testShouldSkipIdIfUserEmailEntityWasNotFound()
+    public function testShouldRejectMessageIfUserEmailEntityWasNotFound()
     {
         $logger = $this->createLoggerMock();
         $logger
@@ -91,8 +93,6 @@ class SyncEmailSeenFlagMessageProcessorTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue(null))
         ;
 
-        $em = $this->createEntityManagerMock();
-
         $doctrine = $this->createDoctrineMock();
         $doctrine
             ->expects($this->once())
@@ -100,28 +100,32 @@ class SyncEmailSeenFlagMessageProcessorTest extends \PHPUnit_Framework_TestCase
             ->with(EmailUser::class)
             ->will($this->returnValue($repository))
         ;
-        $doctrine
-            ->expects($this->once())
-            ->method('getEntityManagerForClass')
-            ->with(EmailUser::class)
-            ->will($this->returnValue($em))
+
+        $flagManager = $this->createEmailFlagManagerMock();
+        $flagManager
+            ->expects($this->never())
+            ->method('setSeen')
+        ;
+        $flagManager
+            ->expects($this->never())
+            ->method('setUnseen')
         ;
 
         $processor = new SyncEmailSeenFlagMessageProcessor(
             $doctrine,
-            $this->createEmailFlagManagerMock(),
+            $flagManager,
             $logger
         );
 
         $message = new NullMessage();
         $message->setBody(json_encode([
-            'ids' => [123],
+            'id' => 123,
             'seen' => true,
         ]));
 
         $result = $processor->process($message, $this->createSessionMock());
 
-        $this->assertEquals(MessageProcessorInterface::ACK, $result);
+        $this->assertEquals(MessageProcessorInterface::REJECT, $result);
     }
 
     public function testShouldSetSeenIfSeenIsTrue()
@@ -150,6 +154,10 @@ class SyncEmailSeenFlagMessageProcessorTest extends \PHPUnit_Framework_TestCase
         ;
 
         $em = $this->createEntityManagerMock();
+        $em
+            ->expects($this->once())
+            ->method('flush')
+        ;
 
         $doctrine = $this->createDoctrineMock();
         $doctrine
@@ -169,7 +177,7 @@ class SyncEmailSeenFlagMessageProcessorTest extends \PHPUnit_Framework_TestCase
 
         $message = new NullMessage();
         $message->setBody(json_encode([
-            'ids' => [123],
+            'id' => 123,
             'seen' => true,
         ]));
 
@@ -204,6 +212,10 @@ class SyncEmailSeenFlagMessageProcessorTest extends \PHPUnit_Framework_TestCase
         ;
 
         $em = $this->createEntityManagerMock();
+        $em
+            ->expects($this->once())
+            ->method('flush')
+        ;
 
         $doctrine = $this->createDoctrineMock();
         $doctrine
@@ -223,7 +235,7 @@ class SyncEmailSeenFlagMessageProcessorTest extends \PHPUnit_Framework_TestCase
 
         $message = new NullMessage();
         $message->setBody(json_encode([
-            'ids' => [123],
+            'id' => 123,
             'seen' => false,
         ]));
 

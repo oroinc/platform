@@ -10,6 +10,7 @@ use Symfony\Bridge\Doctrine\RegistryInterface;
 use Oro\Bundle\BatchBundle\ORM\Query\BufferedQueryResultIterator;
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EmailBundle\Entity\EmailAttachment;
+use Oro\Component\MessageQueue\Client\MessageProducerInterface;
 use Oro\Component\MessageQueue\Client\TopicSubscriberInterface;
 use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
 use Oro\Component\MessageQueue\Transport\MessageInterface;
@@ -26,17 +27,24 @@ class PurgeEmailAttachmentsMessageProcessor implements MessageProcessorInterface
     private $doctrine;
 
     /**
+     * @var MessageProducerInterface
+     */
+    private $producer;
+
+    /**
      * @var ConfigManager
      */
     private $configManager;
 
     /**
      * @param RegistryInterface $doctrine
+     * @param MessageProducerInterface $producer
      * @param ConfigManager $configManager
      */
-    public function __construct(RegistryInterface $doctrine, ConfigManager $configManager)
+    public function __construct(RegistryInterface $doctrine, MessageProducerInterface $producer, ConfigManager $configManager)
     {
         $this->doctrine = $doctrine;
+        $this->producer = $producer;
         $this->configManager = $configManager;
     }
 
@@ -52,10 +60,18 @@ class PurgeEmailAttachmentsMessageProcessor implements MessageProcessorInterface
         ], $payload);
 
         $size = $this->getSize($payload);
-
         $emailAttachments = $this->getEmailAttachments($size);
-        foreach ($emailAttachments as $attachment) {
-            $this->removeAttachment($this->getEntityManager(), $attachment, $size);
+
+        $ids = [];
+        $lastIndex = count($emailAttachments) - 1;
+        foreach ($emailAttachments as $index => $attachment) {
+            $ids[] = $attachment['id'];
+
+            if (count($ids) == self::LIMIT || $lastIndex == $index) {
+                $this->producer->send(Topics::PURGE_EMAIL_ATTACHMENTS_BY_IDS, ['ids' => $ids]);
+
+                $ids = [];
+            }
         }
 
         return self::ACK;
@@ -93,23 +109,6 @@ class PurgeEmailAttachmentsMessageProcessor implements MessageProcessorInterface
     }
 
     /**
-     * @param EntityManager   $em
-     * @param EmailAttachment $attachment
-     * @param int             $size
-     */
-    private function removeAttachment(EntityManager $em, EmailAttachment $attachment, $size)
-    {
-        // Double check of attachment size
-        if ($size) {
-            if ($attachment->getSize() < $size) {
-                return;
-            }
-        }
-
-        $em->remove($attachment);
-    }
-
-    /**
      * @param int $size
      *
      * @return BufferedQueryResultIterator
@@ -120,7 +119,6 @@ class PurgeEmailAttachmentsMessageProcessor implements MessageProcessorInterface
         $em = $this->getEntityManager();
 
         $emailAttachments = (new BufferedQueryResultIterator($qb))
-            ->setBufferSize(static::LIMIT)
             ->setPageCallback(
                 function () use ($em) {
                     $em->flush();
@@ -140,6 +138,7 @@ class PurgeEmailAttachmentsMessageProcessor implements MessageProcessorInterface
     {
         $qb = $this->getEmailAttachmentRepository()
             ->createQueryBuilder('a')
+            ->select('a.id')
             ->join('a.attachmentContent', 'attachment_content');
 
         if ($size > 0) {
