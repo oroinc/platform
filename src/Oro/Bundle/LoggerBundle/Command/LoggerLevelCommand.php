@@ -94,7 +94,7 @@ class LoggerLevelCommand extends ContainerAwareCommand
             );
         } else {
             $message = sprintf(
-                "Log level for global scope is set to '%s' till.",
+                "Log level for global scope is set to '%s' till %s.",
                 $level,
                 $disableAfter->format(\DateTime::RFC850)
             );
