@@ -2,72 +2,74 @@
 
 namespace Oro\Component\DependencyInjection\Tests\Unit;
 
+use Oro\Component\DependencyInjection\Compiler\TaggedServicesCompilerPassTrait;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
 
-use Oro\Component\DependencyInjection\Compiler\TaggedServicesCompilerPassTrait;
-
 class TaggedServicesCompilerPassTraitTest extends \PHPUnit_Framework_TestCase
 {
-    use TaggedServicesCompilerPassTrait;
-
-    /** @var Definition|\PHPUnit_Framework_MockObject_MockObject */
-    protected $service;
-
-    /** @var ContainerBuilder|\PHPUnit_Framework_MockObject_MockObject */
-    protected $builder;
+    /**
+     * @var TaggedServicesCompilerPassTrait|\PHPUnit_Framework_MockObject_MockObject
+     */
+    protected $trait;
 
     /**
      * {@inheritdoc}
      */
     public function setUp()
     {
-        $this->builder = $this->getMockBuilder(ContainerBuilder::class)->getMock();
-        $this->service = $this->getMockBuilder(Definition::class)->getMock();
+        $this->trait = $this->getMockBuilder(TaggedServicesCompilerPassTrait::class)
+            ->getMockForTrait();
     }
 
     public function testRegisterTaggedServicesAndNoServiceDefinition()
     {
-        $this->builder->expects($this->once())->method('hasDefinition')->with('service1')->willReturn(false);
-        $this->builder->expects($this->never())->method('findTaggedServiceIds');
+        $container = $this->getMockBuilder(ContainerBuilder::class)->getMock();
+        $container->expects($this->once())->method('hasDefinition')->with('service1')->willReturn(false);
+        $container->expects($this->never())->method('findTaggedServiceIds');
 
-        $this->registerTaggedServices($this->builder, 'service1', 'tag1', 'addExtension');
+        $this->trait->registerTaggedServices($container, 'service1', 'tag1', 'addExtension');
     }
 
     public function testRegisterTaggedServicesAndNoTaggedServices()
     {
-        $this->builder->expects($this->once())->method('hasDefinition')->willReturn(true);
-        $this->builder->expects($this->once())->method('findTaggedServiceIds')->with('tag1')->willReturn(null);
-        $this->builder->expects($this->never())->method('getDefinition');
+        $container = $this->getMockBuilder(ContainerBuilder::class)->getMock();
+        $container->expects($this->once())->method('hasDefinition')->willReturn(true);
+        $container->expects($this->once())->method('findTaggedServiceIds')->with('tag1')->willReturn(null);
+        $container->expects($this->never())->method('getDefinition');
 
-        $this->registerTaggedServices($this->builder, 'service1', 'tag1', 'addExtension');
+        $this->trait->registerTaggedServices($container, 'service1', 'tag1', 'addExtension');
     }
 
     /**
      * @dataProvider taggedServicesDataProvider
+     * @param array $taggedServices
      */
-    public function testRegisterTaggedServices($taggedServices)
+    public function testRegisterTaggedServices(array $taggedServices)
     {
-        $this->builder->expects($this->once())->method('hasDefinition')->willReturn(true);
-        $this->builder->expects($this->once())->method('findTaggedServiceIds')
+        $service = $this->getMockBuilder(Definition::class)
+            ->getMock();
+
+        $container = $this->getMockBuilder(ContainerBuilder::class)->getMock();
+        $container->expects($this->once())->method('hasDefinition')->willReturn(true);
+        $container->expects($this->once())->method('findTaggedServiceIds')
             ->willReturn($taggedServices);
-        $this->builder->expects($this->once())->method('getDefinition')->with('service1')->willReturn($this->service);
+        $container->expects($this->once())->method('getDefinition')->with('service1')->willReturn($service);
 
-        $this->service->expects($this->exactly(3))->method('addMethodCall');
+        $service->expects($this->exactly(3))->method('addMethodCall');
 
-        $this->service->expects($this->at(0))->method('addMethodCall')
+        $service->expects($this->at(0))->method('addMethodCall')
             ->with('addExtension', [new Reference('taggedService2'), 'taggedService2']);
 
-        $this->service->expects($this->at(1))->method('addMethodCall')
+        $service->expects($this->at(1))->method('addMethodCall')
             ->with('addExtension', [new Reference('taggedService3'), 'taggedService3Alias']);
 
-        $this->service->expects($this->at(2))->method('addMethodCall')
+        $service->expects($this->at(2))->method('addMethodCall')
             ->with('addExtension', [new Reference('taggedService1'), 'taggedService1Alias']);
 
-        $this->registerTaggedServices($this->builder, 'service1', 'tag1', 'addExtension');
+        $this->trait->registerTaggedServices($container, 'service1', 'tag1', 'addExtension');
     }
-
 
     /**
      * @return array

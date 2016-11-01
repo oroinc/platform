@@ -19,8 +19,11 @@ trait TaggedServicesCompilerPassTrait
         $tagName,
         $addMethodName
     ) {
-        if (!$container->hasDefinition($serviceId) ||
-            null == ($taggedServiceIds = $container->findTaggedServiceIds($tagName))) {
+        if (!$container->hasDefinition($serviceId)) {
+            return;
+        }
+        $taggedServiceIds = $container->findTaggedServiceIds($tagName);
+        if (count($taggedServiceIds) === 0) {
             return;
         }
 
