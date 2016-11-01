@@ -49,13 +49,13 @@ class UserPasswordListener
      */
     protected function createAndPersistPasswordHistory(UserInterface $user, EntityManager $em)
     {
-        $PasswordHistory = new PasswordHistory();
-        $PasswordHistory->setUser($user);
-        $PasswordHistory->setSalt($user->getSalt());
-        $PasswordHistory->setPasswordHash($user->getPassword());
+        $passwordHistory = new PasswordHistory();
+        $passwordHistory->setUser($user);
+        $passwordHistory->setSalt($user->getSalt());
+        $passwordHistory->setPasswordHash($user->getPassword());
 
-        $em->persist($PasswordHistory);
-        $em->getUnitOfWork()->computeChangeSet($em->getClassMetadata(PasswordHistory::class), $PasswordHistory);
+        $em->persist($passwordHistory);
+        $em->getUnitOfWork()->computeChangeSet($em->getClassMetadata(PasswordHistory::class), $passwordHistory);
     }
 
     /**

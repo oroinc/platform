@@ -42,11 +42,11 @@ class UsedPasswordValidator extends ConstraintValidator
             throw new UnexpectedTypeException($constraint, __NAMESPACE__.'Constraint\NotBlank');
         }
 
-        if (null === $constraint->userId || !$this->configManager->get('oro_user.old_password_check_enabled')) {
+        if (null === $constraint->userId || !$this->configManager->get('oro_user.used_password_check_enabled')) {
             return;
         }
 
-        $passwordHistoryLimit = $this->configManager->get('oro_user.old_password_check_number');
+        $passwordHistoryLimit = $this->configManager->get('oro_user.used_password_check_number');
 
         $oldPasswords = $this->registry
             ->getManagerForClass('OroUserBundle:PasswordHistory')

@@ -49,7 +49,11 @@ class UserPasswordListenerTest extends \PHPUnit_Framework_TestCase
             ->method('getEntityManager')
             ->willReturn($em);
 
-        $this->listener = new UserPasswordListener();
+        $provider = $this->getMockBuilder('Oro\Bundle\UserBundle\Provider\PasswordChangePeriodConfigProvider')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $this->listener = new UserPasswordListener($provider);
     }
 
     /**

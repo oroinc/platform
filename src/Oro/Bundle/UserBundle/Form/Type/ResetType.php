@@ -95,7 +95,7 @@ class ResetType extends AbstractType
             $form = $event->getForm();
             // attach a constraint to first_options
             $options = $form->get('plainPassword')->getConfig()->getOptions();
-            $options['first_options']['constraints'] = [new UsedPassword(['userId' => $entity->getId()])];
+            $options['first_options']['constraints'][] = new UsedPassword(['userId' => $entity->getId()]);
             FormUtils::replaceField($form, 'plainPassword', $options);
         }
     }

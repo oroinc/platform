@@ -283,8 +283,8 @@ oro:
                         Special chars: !"#$%&'()*+,-./:;<=>?@[\]^_`{|}~ and space
                 password_change_period_enabled.label: Enable password change period
                 password_change_period.label: Password change period
-                old_password_check_enabled.label: Enable old passwords check
-                old_password_check_number.label: Number of old passwords to match
+                used_password_check_enabled.label: Enable old passwords check
+                used_password_check_number.label: Number of old passwords to match
                 password_change_period_unit:
                     label: Unit of password change period
                     choices:

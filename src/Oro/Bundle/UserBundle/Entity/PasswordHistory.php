@@ -108,14 +108,4 @@ class PasswordHistory implements CreatedAtAwareInterface
     {
         $this->passwordHash = $passwordHash;
     }
-
-    /**
-     * Pre persist event listener
-     *
-     * @ORM\PrePersist
-     */
-    public function beforeSave()
-    {
-        $this->createdAt = new \DateTime('now', new \DateTimeZone('UTC'));
-    }
 }

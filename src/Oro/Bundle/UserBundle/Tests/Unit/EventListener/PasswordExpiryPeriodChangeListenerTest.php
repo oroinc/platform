@@ -15,6 +15,7 @@ class PasswordExpiryPeriodChangeListenerTest extends \PHPUnit_Framework_TestCase
     /** @var  PasswordChangePeriodConfigProvider */
     protected $provider;
 
+    /** @var \DateTime */
     protected $expiryDate;
 
     /**
