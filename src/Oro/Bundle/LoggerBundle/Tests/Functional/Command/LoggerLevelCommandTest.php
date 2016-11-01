@@ -17,7 +17,6 @@ class LoggerLevelCommandTest extends WebTestCase
     protected function setUp()
     {
         $this->initClient();
-        
     }
 
     public function testRunCommandToUpdateUserScope()
