@@ -55,13 +55,7 @@ class DetailedLogsHandlerTest extends \PHPUnit_Framework_TestCase
         $this->handler->close();
     }
 
-    /**
-     * @dataProvider closeProvider
-     *
-     * @param array $expectedRecords
-     * @param null|string $detailedLogsLevelValue
-     */
-    public function testClose(array $expectedRecords, $detailedLogsLevelValue)
+    public function testClose()
     {
         $this->config->expects($this->at(0))
             ->method('get')
@@ -71,11 +65,15 @@ class DetailedLogsHandlerTest extends \PHPUnit_Framework_TestCase
         $this->config->expects($this->at(1))
             ->method('get')
             ->with('oro_logger.detailed_logs_level')
-            ->willReturn($detailedLogsLevelValue);
+            ->willReturn('warning');
 
         $this->nestedHandler->expects($this->once())
             ->method('handleBatch')
-            ->with($expectedRecords);
+            ->with([
+                2 => ['level' => Logger::WARNING],
+                3 => ['level' => Logger::ERROR],
+                4 => ['level' => Logger::CRITICAL],
+            ]);
 
         $this->handler->handle(['level' => Logger::DEBUG]);
         $this->handler->handle(['level' => Logger::INFO]);
@@ -84,28 +82,5 @@ class DetailedLogsHandlerTest extends \PHPUnit_Framework_TestCase
         $this->handler->handle(['level' => Logger::CRITICAL]);
 
         $this->handler->close();
-    }
-
-    public function closeProvider()
-    {
-        return [
-            'based on value from config' => [
-                'expectedRecords' => [
-                    2 => ['level' => Logger::WARNING],
-                    3 => ['level' => Logger::ERROR],
-                    4 => ['level' => Logger::CRITICAL],
-                ],
-                'detailedLogsLevelValue' => 'warning',
-            ],
-            'based on default value' => [
-                'expectedRecords' => [
-                    1 => ['level' => Logger::INFO],
-                    2 => ['level' => Logger::WARNING],
-                    3 => ['level' => Logger::ERROR],
-                    4 => ['level' => Logger::CRITICAL],
-                ],
-                'detailedLogsLevelValue' => null,
-            ]
-        ];
     }
 }
