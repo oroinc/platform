@@ -108,7 +108,7 @@ class ObjectMapper extends AbstractMapper
     {
         $objectData  = [];
         $objectClass = ClassUtils::getRealClass($object);
-        if (is_object($object) && $this->mappingProvider->isFieldsMappingExists($objectClass)) {
+        if (is_object($object) && $this->mappingProvider->hasFieldsMapping($objectClass)) {
             $alias = $this->getEntityMapParameter($objectClass, 'alias', $objectClass);
             foreach ($this->getEntityMapParameter($objectClass, 'fields', []) as $field) {
                 $objectData = $this->processField($alias, $objectData, $field, $object);

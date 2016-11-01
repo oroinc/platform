@@ -10,3 +10,13 @@ Oro\Bundle\NavigationBundle\Entity\PageState:
             - NotBlank:     ~
         data:
             - NotBlank:     ~
+
+Oro\Bundle\NavigationBundle\Entity\MenuUpdate:
+    constraints:
+        - Oro\Bundle\NavigationBundle\Validator\Constraints\MaxNestedLevel: ~
+    properties:
+        titles:
+            - Valid: ~
+        uri:
+            - NotBlank:
+                groups: [UserDefined]

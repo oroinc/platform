@@ -156,6 +156,40 @@ class SearchHandler implements SearchHandlerInterface
     }
 
     /**
+     * {@inheritdoc}
+     */
+    public function convertItem($item)
+    {
+        $result = [];
+
+        if ($this->idFieldName) {
+            $result[$this->idFieldName] = $this->getPropertyValue($this->idFieldName, $item);
+        }
+
+        foreach ($this->getProperties() as $property) {
+            $result[$property] = $this->getPropertyValue($property, $item);
+        }
+
+        return $result;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getEntityName()
+    {
+        return $this->entityName;
+    }
+
+    /**
+     * @param AclHelper $aclHelper
+     */
+    public function setAclHelper(AclHelper $aclHelper)
+    {
+        $this->aclHelper = $aclHelper;
+    }
+
+    /**
      * @throws \RuntimeException
      */
     protected function checkAllDependenciesInjected()
@@ -260,24 +294,6 @@ class SearchHandler implements SearchHandlerInterface
     }
 
     /**
-     * {@inheritdoc}
-     */
-    public function convertItem($item)
-    {
-        $result = [];
-
-        if ($this->idFieldName) {
-            $result[$this->idFieldName] = $this->getPropertyValue($this->idFieldName, $item);
-        }
-
-        foreach ($this->properties as $property) {
-            $result[$property] = $this->getPropertyValue($property, $item);
-        }
-
-        return $result;
-    }
-
-    /**
      * @param string $propertyPath
      * @param object|array $item
      * @return mixed
@@ -303,21 +319,5 @@ class SearchHandler implements SearchHandlerInterface
         } catch (NoSuchPropertyException $e) {
             return null;
         }
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getEntityName()
-    {
-        return $this->entityName;
-    }
-
-    /**
-     * @param AclHelper $aclHelper
-     */
-    public function setAclHelper(AclHelper $aclHelper)
-    {
-        $this->aclHelper = $aclHelper;
     }
 }

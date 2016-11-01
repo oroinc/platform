@@ -3,10 +3,10 @@ navigation:
         templates:
             application_menu:
                 template: 'OroNavigationBundle:Menu:application_menu.html.twig'
-                currentClass: 'active'
-                ancestorClass: 'active'
+                current_class: 'active'
+                ancestor_class: 'active'
                 allow_safe_labels: true
-                rootClass: 'nav nav-multilevel main-menu'
+                root_class: 'nav nav-multilevel main-menu'
             dots_menu:
                 template: 'OroNavigationBundle:Menu:dots_menu.html.twig'
             shortcuts:
@@ -23,24 +23,24 @@ navigation:
                 template: 'OroNavigationBundle:Menu:favorites.html.twig'
             mostviewed:
                 template: 'OroNavigationBundle:Menu:mostviewed.html.twig'
-                rootClass: 'extra-list'
+                root_class: 'extra-list'
             history:
                 template: 'OroNavigationBundle:Menu:history.html.twig'
-                rootClass: 'extra-list'
-                currentAsLink: false
+                root_class: 'extra-list'
+                current_as_link: false
 
         items:
             pinbar:
                 label: 'oro.navigation.menu.pinbar.label'
                 extras:
                     icon: 'icon-folder-close'
-                    maxItems: 10
+                    max_items: 10
                 uri: '#'
             history:
                 label: 'oro.navigation.menu.history.label'
                 extras:
                     icon: 'icon-time'
-                    activeIfFirstIsEmpty: true
+                    active_if_first_is_empty: true
                 uri: '#'
             favorite:
                 label: 'oro.navigation.menu.favorite.label'
@@ -52,13 +52,26 @@ navigation:
                 extras:
                     icon: 'icon-flag'
                 uri: '#'
+            menu_list_default:
+                label: 'oro.navigation.menu.menu_list_default.label'
+                route: 'oro_navigation_global_menu_index'
+                extras:
+                    position: 90
+                    routes: ['/^oro_navigation_global_menu_[\w_]+$/']
+                    description: 'Manage menus in default area'
 
         tree:
             application_menu:
                 type: application_menu
+                max_nesting_level: 4
+                children:
+                    system_tab:
+                        children:
+                            menu_list_default: ~
 
             dots_menu:
                 type: dots_menu
+                read_only: true
                 children:
                     history: ~
                     favorite: ~
@@ -70,6 +83,15 @@ navigation:
     titles:
         oro_shortcut_actionslist: 'Shortcut Actions List'
         oro_pinbar_help: 'How To Use Pinbar'
+
+        oro_navigation_user_menu_index: '%%username%% - Menus'
+        oro_navigation_user_menu_view: '%%title%% - Menus - %%username%%'
+        oro_navigation_user_menu_create: 'Create Menu Item - Menus - %%username%%'
+        oro_navigation_user_menu_update: '%%title%% - Edit - Menus - %%username%%'
+        oro_navigation_global_menu_index: 'Menus'
+        oro_navigation_global_menu_view: '%%title%% - Menus'
+        oro_navigation_global_menu_create: 'Create Menu Item - Menus'
+        oro_navigation_global_menu_update: '%%title%% - Edit - Menus'
 
     navigation_elements:
         pinButton:

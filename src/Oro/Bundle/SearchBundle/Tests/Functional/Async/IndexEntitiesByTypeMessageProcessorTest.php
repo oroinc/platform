@@ -4,17 +4,18 @@ namespace Oro\Bundle\SearchBundle\Tests\Functional\Async;
 use Oro\Bundle\MessageQueueBundle\Test\Functional\MessageQueueAssertTrait;
 use Oro\Bundle\SearchBundle\Async\IndexEntitiesByTypeMessageProcessor;
 use Oro\Bundle\SearchBundle\Async\Topics;
+use Oro\Bundle\SearchBundle\Tests\Functional\SearchExtensionTrait;
+use Oro\Bundle\SearchBundle\Entity\Item as IndexItem;
 use Oro\Bundle\TestFrameworkBundle\Entity\Item;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Component\MessageQueue\Job\Topics as JobTopics;
 use Oro\Component\MessageQueue\Transport\Null\NullMessage;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
 use Oro\Component\MessageQueue\Util\JSON;
-use Oro\Component\Testing\SearchExtensionTrait;
-use Oro\Bundle\SearchBundle\Entity\Item as IndexItem;
 
 /**
  * @dbIsolationPerTest
+ * @group search
  */
 class IndexEntitiesByTypeMessageProcessorTest extends WebTestCase
 {

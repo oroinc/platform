@@ -3,9 +3,12 @@
 namespace Oro\Bundle\UserBundle\Tests\Unit\Form\Type;
 
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Security\Core\SecurityContextInterface;
 
+use Oro\Bundle\SecurityBundle\SecurityFacade;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\UserBundle\Form\EventListener\UserSubscriber;
+use Oro\Bundle\UserBundle\Form\Provider\PasswordFieldOptionsProvider;
 use Oro\Bundle\UserBundle\Form\Type\UserType;
 
 class UserTypeTest extends \PHPUnit_Framework_TestCase
@@ -17,18 +20,24 @@ class UserTypeTest extends \PHPUnit_Framework_TestCase
     const RULE_GROUP          = 'oro_user_group_view';
     const RULE_ROLE           = 'oro_user_role_view';
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var SecurityContextInterface|\PHPUnit_Framework_MockObject_MockObject */
     private $securityInterface;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var SecurityFacade|\PHPUnit_Framework_MockObject_MockObject */
     private $securityFacade;
+
+    /** @var PasswordFieldOptionsProvider|\PHPUnit_Framework_MockObject_MockObject */
+    protected $optionsProvider;
 
     protected function setUp()
     {
-        $this->securityInterface   = $this->getMockBuilder('Symfony\Component\Security\Core\SecurityContextInterface')
+        $this->securityInterface = $this->getMockBuilder(SecurityContextInterface::class)
             ->disableOriginalConstructor()
             ->getMock();
-        $this->securityFacade      = $this->getMockBuilder('Oro\Bundle\SecurityBundle\SecurityFacade')
+        $this->securityFacade = $this->getMockBuilder(SecurityFacade::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+        $this->optionsProvider = $this->getMockBuilder(PasswordFieldOptionsProvider::class)
             ->disableOriginalConstructor()
             ->getMock();
     }
@@ -126,7 +135,7 @@ class UserTypeTest extends \PHPUnit_Framework_TestCase
             ->with('inviteUser', 'checkbox')
             ->will($this->returnValue($builder));
 
-        $type = new UserType($this->securityInterface, $this->securityFacade, $request);
+        $type = new UserType($this->securityInterface, $this->securityFacade, $request, $this->optionsProvider);
         $type->buildForm($builder, []);
     }
 
@@ -221,14 +230,17 @@ class UserTypeTest extends \PHPUnit_Framework_TestCase
 
     public function testSetDefaultOptions()
     {
-        $resolver = $this->getMockForAbstractClass('Symfony\Component\OptionsResolver\OptionsResolverInterface');
+        $resolver = $this->getMockBuilder('Symfony\Component\OptionsResolver\OptionsResolver')
+            ->disableOriginalConstructor()
+            ->getMock();
         $resolver->expects($this->once())
             ->method('setDefaults');
         $type = new UserType(
             $this->securityInterface,
             $this->securityFacade,
-            new Request()
+            new Request(),
+            $this->optionsProvider
         );
-        $type->setDefaultOptions($resolver);
+        $type->configureOptions($resolver);
     }
 }

@@ -11,9 +11,8 @@ navigation:
             segments_divider:
                 label: ''
                 extras:
+                    divider: true
                     position: 100
-                attributes:
-                    class: 'divider'
 
             manage_segments:
                 label: 'oro.segment.menu.manage_segments.label'

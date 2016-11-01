@@ -89,7 +89,7 @@ class Lexer
                 $cursor += strlen($match[0]);
             } elseif (preg_match(
                 '/and(?=[\s(])|\>\=|or(?=[\s(])|\<\=|in(?=[\s(])|\=|\!\=|\*|~|\!~|\>|\<|' .
-                'exists(?=[\s(])|notexists(?=[\s(])/A',
+                'exists(?=[\s(])|notexists(?=[\s(])|starts_with(?=[\s(])/A',
                 $expression,
                 $match,
                 null,

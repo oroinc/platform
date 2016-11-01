@@ -16,7 +16,7 @@ interface NavigationRepositoryInterface
      * @param User | integer $user
      * @param Organization   $organization
      * @param string         $type
-     * @param array          $options If passed $options['orderBy'], must be an array with following structure:
+     * @param array          $options If passed $options['order_by'], must be an array with following structure:
      *                                array(
      *                                array(
      *                                'field'   => $field_name,

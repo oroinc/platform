@@ -98,10 +98,10 @@ abstract class AbstractSearchMappingProviderTest extends \PHPUnit_Framework_Test
         $this->assertFalse($this->provider->isClassSupported('Oro\TestBundle\Entity\BadEntity'));
     }
 
-    public function testIsFieldsMappingExists()
+    public function testHasFieldsMapping()
     {
-        $this->assertTrue($this->provider->isFieldsMappingExists('Oro\TestBundle\Entity\TestEntity'));
-        $this->assertFalse($this->provider->isFieldsMappingExists('Oro\TestBundle\Entity\BadEntity'));
+        $this->assertTrue($this->provider->hasFieldsMapping('Oro\TestBundle\Entity\TestEntity'));
+        $this->assertFalse($this->provider->hasFieldsMapping('Oro\TestBundle\Entity\BadEntity'));
     }
 
     public function testGetEntityMapParameter()
