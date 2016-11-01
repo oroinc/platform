@@ -39,13 +39,13 @@ class SyncEmailSeenFlagMessageProcessorTest extends WebTestCase
         $emailUser->setSeen(true);
         $this->getEntityManager()->flush();
 
-        $this->assertMessageSent(Topics::SYNC_EMAIL_SEEN_FLAG, ['id' => [$emailUser->getId()], 'seen' => true]);
+        $this->assertMessageSent(Topics::SYNC_EMAIL_SEEN_FLAG, ['id' => $emailUser->getId(), 'seen' => true]);
 
         // setUnseen
         $emailUser->setSeen(false);
         $this->getEntityManager()->flush();
 
-        $this->assertMessageSent(Topics::SYNC_EMAIL_SEEN_FLAG, ['id' => [$emailUser->getId()], 'seen' => false]);
+        $this->assertMessageSent(Topics::SYNC_EMAIL_SEEN_FLAG, ['id' => $emailUser->getId(), 'seen' => false]);
     }
 
     private function createEmailUser()

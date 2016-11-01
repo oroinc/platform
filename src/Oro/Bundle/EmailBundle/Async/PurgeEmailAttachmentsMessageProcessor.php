@@ -19,7 +19,7 @@ use Oro\Component\MessageQueue\Util\JSON;
 
 class PurgeEmailAttachmentsMessageProcessor implements MessageProcessorInterface, TopicSubscriberInterface
 {
-    const LIMIT = 100;
+    const LIMIT = 1000;
 
     /**
      * @var RegistryInterface
@@ -41,8 +41,11 @@ class PurgeEmailAttachmentsMessageProcessor implements MessageProcessorInterface
      * @param MessageProducerInterface $producer
      * @param ConfigManager $configManager
      */
-    public function __construct(RegistryInterface $doctrine, MessageProducerInterface $producer, ConfigManager $configManager)
-    {
+    public function __construct(
+        RegistryInterface $doctrine,
+        MessageProducerInterface $producer,
+        ConfigManager $configManager
+    ) {
         $this->doctrine = $doctrine;
         $this->producer = $producer;
         $this->configManager = $configManager;
