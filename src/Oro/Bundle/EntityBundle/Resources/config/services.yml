@@ -451,3 +451,8 @@ services:
 
     oro_entity.avatar_provider:
         class: Oro\Bundle\EntityBundle\Provider\ChainEntityAvatarProvider
+
+    oro_entity.entity_to_string_transformer:
+        class: Oro\Bundle\EntityBundle\Form\DataTransformer\EntityToStringTransformer
+        arguments:
+            - '@oro_entity.doctrine_helper'
