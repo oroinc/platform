@@ -2,6 +2,11 @@
 
 namespace Oro\Component\Layout;
 
+use Oro\Component\ExpressionLanguage\ExpressionLanguage;
+use Oro\Component\Layout\ExpressionLanguage\Encoder\ExpressionEncoderRegistry;
+use Oro\Component\Layout\ExpressionLanguage\Encoder\JsonExpressionEncoder;
+use Oro\Component\Layout\ExpressionLanguage\ExpressionManipulator;
+use Oro\Component\Layout\ExpressionLanguage\ExpressionProcessor;
 use Oro\Component\Layout\Extension\Core\CoreExtension;
 
 /**
@@ -104,7 +109,17 @@ final class Layouts
      */
     public static function createLayoutFactoryBuilder()
     {
-        $builder = new LayoutFactoryBuilder();
+        $builder = new LayoutFactoryBuilder(
+            new ExpressionProcessor(
+                new ExpressionLanguage(),
+                new ExpressionEncoderRegistry(
+                    [
+                        'json' => new JsonExpressionEncoder(new ExpressionManipulator())
+                    ]
+                )
+            )
+        );
+
         $builder->addExtension(new CoreExtension());
 
         return $builder;

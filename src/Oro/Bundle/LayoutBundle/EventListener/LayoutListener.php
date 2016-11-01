@@ -139,6 +139,7 @@ class LayoutListener
                 $context->set('action', $action);
             }
         }
+
         $theme = $layoutAnnotation->getTheme();
         if (!empty($theme)) {
             $currentTheme = $context->getOr('theme');
@@ -151,5 +152,7 @@ class LayoutListener
         if (!empty($vars)) {
             $context->getResolver()->setRequired($vars);
         }
+
+        $context->set('expressions_evaluate_deferred', true);
     }
 }

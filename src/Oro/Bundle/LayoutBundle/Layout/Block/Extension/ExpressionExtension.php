@@ -9,23 +9,23 @@ use Oro\Component\Layout\BlockInterface;
 use Oro\Component\Layout\BlockView;
 use Oro\Component\Layout\ContextInterface;
 use Oro\Component\Layout\DataAccessorInterface;
-
-use Oro\Bundle\LayoutBundle\Layout\Processor\ExpressionProcessor;
+use Oro\Component\Layout\ExpressionLanguage\ExpressionProcessor;
 
 /**
  * Allows to use expressions (see ConfigExpression component) in block type options and attributes.
  */
 class ExpressionExtension extends AbstractBlockTypeExtension
 {
-    /** @var ExpressionProcessor */
+    /**
+     * @var ExpressionProcessor
+     */
     protected $processor;
 
     /**
      * @param ExpressionProcessor $processor
      */
-    public function __construct(
-        ExpressionProcessor $processor
-    ) {
+    public function __construct(ExpressionProcessor $processor)
+    {
         $this->processor = $processor;
     }
 

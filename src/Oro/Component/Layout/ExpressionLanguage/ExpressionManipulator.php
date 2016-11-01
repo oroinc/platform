@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\LayoutBundle\ExpressionLanguage;
+namespace Oro\Component\Layout\ExpressionLanguage;
 
 use Symfony\Component\ExpressionLanguage\Node\Node;
 use Symfony\Component\ExpressionLanguage\ParsedExpression;

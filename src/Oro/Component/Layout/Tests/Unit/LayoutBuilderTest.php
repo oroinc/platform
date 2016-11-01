@@ -22,16 +22,23 @@ class LayoutBuilderTest extends \PHPUnit_Framework_TestCase
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $renderer;
 
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    protected $expressionProcessor;
+
     /** @var LayoutBuilder|\PHPUnit_Framework_MockObject_MockObject */
     protected $layoutBuilder;
 
     protected function setUp()
     {
-        $this->registry          = $this->getMock('Oro\Component\Layout\LayoutRegistryInterface');
-        $this->rawLayoutBuilder  = $this->getMock('Oro\Component\Layout\RawLayoutBuilderInterface');
-        $this->layoutManipulator = $this->getMock('Oro\Component\Layout\DeferredLayoutManipulatorInterface');
-        $this->blockFactory      = $this->getMock('Oro\Component\Layout\BlockFactoryInterface');
-        $this->renderer          = $this->getMock('Oro\Component\Layout\LayoutRendererInterface');
+        $this->registry            = $this->getMock('Oro\Component\Layout\LayoutRegistryInterface');
+        $this->rawLayoutBuilder    = $this->getMock('Oro\Component\Layout\RawLayoutBuilderInterface');
+        $this->layoutManipulator   = $this->getMock('Oro\Component\Layout\DeferredLayoutManipulatorInterface');
+        $this->blockFactory        = $this->getMock('Oro\Component\Layout\BlockFactoryInterface');
+        $this->renderer            = $this->getMock('Oro\Component\Layout\LayoutRendererInterface');
+        $this->expressionProcessor = $this
+            ->getMockBuilder('Oro\Component\Layout\ExpressionLanguage\ExpressionProcessor')
+            ->disableOriginalConstructor()
+            ->getMock();
 
         $rendererRegistry = new LayoutRendererRegistry();
         $rendererRegistry->addRenderer('test', $this->renderer);
@@ -44,7 +51,8 @@ class LayoutBuilderTest extends \PHPUnit_Framework_TestCase
                     $this->rawLayoutBuilder,
                     $this->layoutManipulator,
                     $this->blockFactory,
-                    $rendererRegistry
+                    $rendererRegistry,
+                    $this->expressionProcessor
                 ]
             )
             ->setMethods(['createLayout'])

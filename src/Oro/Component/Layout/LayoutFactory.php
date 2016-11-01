@@ -2,6 +2,8 @@
 
 namespace Oro\Component\Layout;
 
+use Oro\Component\Layout\ExpressionLanguage\ExpressionProcessor;
+
 class LayoutFactory implements LayoutFactoryInterface
 {
     /** @var LayoutRegistryInterface */
@@ -10,16 +12,22 @@ class LayoutFactory implements LayoutFactoryInterface
     /** @var LayoutRendererRegistryInterface */
     protected $rendererRegistry;
 
+    /** @var ExpressionProcessor */
+    protected $expressionProcessor;
+
     /**
      * @param LayoutRegistryInterface         $registry
      * @param LayoutRendererRegistryInterface $rendererRegistry
+     * @param ExpressionProcessor             $expressionProcessor
      */
     public function __construct(
         LayoutRegistryInterface $registry,
-        LayoutRendererRegistryInterface $rendererRegistry
+        LayoutRendererRegistryInterface $rendererRegistry,
+        ExpressionProcessor $expressionProcessor
     ) {
-        $this->registry         = $registry;
-        $this->rendererRegistry = $rendererRegistry;
+        $this->registry            = $registry;
+        $this->rendererRegistry    = $rendererRegistry;
+        $this->expressionProcessor = $expressionProcessor;
     }
 
     /**
@@ -84,7 +92,8 @@ class LayoutFactory implements LayoutFactoryInterface
             $rawLayoutBuilder,
             $layoutManipulator,
             $blockFactory,
-            $this->rendererRegistry
+            $this->rendererRegistry,
+            $this->expressionProcessor
         );
     }
 }

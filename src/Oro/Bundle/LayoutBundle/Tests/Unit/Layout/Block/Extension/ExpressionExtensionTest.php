@@ -6,9 +6,9 @@ use Oro\Component\Layout\Block\Type\BaseType;
 use Oro\Component\Layout\Block\Type\Options;
 use Oro\Component\Layout\DataAccessorInterface;
 use Oro\Component\Layout\BlockView;
+use Oro\Component\Layout\ExpressionLanguage\ExpressionProcessor;
 use Oro\Component\Layout\LayoutContext;
 
-use Oro\Bundle\LayoutBundle\Layout\Processor\ExpressionProcessor;
 use Oro\Bundle\LayoutBundle\Layout\Block\Extension\ExpressionExtension;
 
 class ExpressionExtensionTest extends \PHPUnit_Framework_TestCase
@@ -21,7 +21,8 @@ class ExpressionExtensionTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->processor = $this->getMockBuilder('Oro\Bundle\LayoutBundle\Layout\Processor\ExpressionProcessor')
+        $this->processor = $this
+            ->getMockBuilder('Oro\Component\Layout\ExpressionLanguage\ExpressionProcessor')
             ->disableOriginalConstructor()
             ->getMock();
 

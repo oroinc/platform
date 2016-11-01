@@ -2,6 +2,7 @@
 
 namespace Oro\Component\Layout;
 
+use Oro\Component\Layout\ExpressionLanguage\ExpressionProcessor;
 use Oro\Component\Layout\Extension\ExtensionInterface;
 use Oro\Component\Layout\Extension\PreloadedExtension;
 
@@ -60,6 +61,16 @@ class LayoutFactoryBuilder implements LayoutFactoryBuilderInterface
      * @var string
      */
     private $defaultRenderer;
+
+    /**
+     * @var ExpressionProcessor
+     */
+    private $expressionProcessor;
+
+    public function __construct(ExpressionProcessor $expressionProcessor)
+    {
+        $this->expressionProcessor = $expressionProcessor;
+    }
 
     /**
      * {@inheritdoc}
@@ -154,6 +165,6 @@ class LayoutFactoryBuilder implements LayoutFactoryBuilderInterface
             $rendererRegistry->setDefaultRenderer($defaultRenderer);
         }
 
-        return new LayoutFactory($registry, $rendererRegistry);
+        return new LayoutFactory($registry, $rendererRegistry, $this->expressionProcessor);
     }
 }
