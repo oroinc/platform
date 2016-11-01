@@ -191,7 +191,7 @@ FROM
             GROUP BY connector
         ) b ON a.connector = b.connector AND
                 a.date = b.minDate
-WHERE a.code = %s
+WHERE a.code = '%s'
 GROUP BY 
     a.connector
 SQL;
