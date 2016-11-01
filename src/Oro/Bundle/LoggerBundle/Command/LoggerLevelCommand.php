@@ -2,18 +2,17 @@
 
 namespace Oro\Bundle\LoggerBundle\Command;
 
-use Oro\Bundle\UserBundle\Entity\User;
-
 use Psr\Log\LogLevel;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
+use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\LoggerBundle\DependencyInjection\Configuration;
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 
-class ConfigUpdateCommand extends ContainerAwareCommand
+class LoggerLevelCommand extends ContainerAwareCommand
 {
     const LEVEL_PARAM         = 'level';
     const DISABLE_AFTER_PARAM = 'disable-after';
@@ -21,10 +20,14 @@ class ConfigUpdateCommand extends ContainerAwareCommand
 
     /** @var array */
     protected static $loggingLevels = [
+        LogLevel::EMERGENCY,
+        LogLevel::ALERT,
+        LogLevel::CRITICAL,
+        LogLevel::ERROR,
         LogLevel::WARNING,
         LogLevel::NOTICE,
         LogLevel::INFO,
-        LogLevel::DEBUG
+        LogLevel::DEBUG,
     ];
 
     /**
@@ -42,7 +45,7 @@ class ConfigUpdateCommand extends ContainerAwareCommand
             ->addArgument(
                 self::DISABLE_AFTER_PARAM,
                 InputArgument::REQUIRED,
-                'Disable logging after interval. For example: "1 day", "3 months", etc. ' .
+                'Disable logging after interval. For example: "630 seconds", "1 hour + 30 minutes", etc. ' .
                 'See: <info>http://php.net/manual/en/datetime.formats.relative.php<info>'
             )
             ->addOption(
@@ -63,10 +66,10 @@ class ConfigUpdateCommand extends ContainerAwareCommand
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $user = null;
+        $level = $this->getLogLevel($input->getArgument(self::LEVEL_PARAM));
+        $disableAfter = $this->getDisableAfterDateTime($input->getArgument(self::DISABLE_AFTER_PARAM));
 
-        $level = $this->getValidatedLevelParam($input->getArgument(self::LEVEL_PARAM));
-        $disableAfter = $this->getValidatedDisableParam($input->getArgument(self::DISABLE_AFTER_PARAM));
-        $user = $this->getValidatedUserParam($input->getOption(self::USER_PARAM));
+        $user = $this->getUser($input->getOption(self::USER_PARAM));
 
         if ($user) {
             /* @var ConfigManager $configManager */
@@ -84,14 +87,16 @@ class ConfigUpdateCommand extends ContainerAwareCommand
 
         if ($user) {
             $message = sprintf(
-                "Log level for user '%s' is successfully set to '%s'.",
+                "Log level for user '%s' is successfully set to '%s' till %s.",
                 $user->getEmail(),
-                $level
+                $level,
+                $disableAfter->format(\DateTime::RFC850)
             );
         } else {
             $message = sprintf(
-                "Log level for global scope is set to '%s'.",
-                $level
+                "Log level for global scope is set to '%s' till.",
+                $level,
+                $disableAfter->format(\DateTime::RFC850)
             );
         }
 
@@ -105,7 +110,7 @@ class ConfigUpdateCommand extends ContainerAwareCommand
      *
      * @return string
      */
-    public function getValidatedLevelParam($value)
+    public function getLogLevel($value)
     {
         if (!in_array($value, self::$loggingLevels)) {
             throw new \InvalidArgumentException(
@@ -125,9 +130,9 @@ class ConfigUpdateCommand extends ContainerAwareCommand
      *
      * @throws \InvalidArgumentException
      *
-     * @return string
+     * @return \DateTime
      */
-    public function getValidatedDisableParam($value)
+    public function getDisableAfterDateTime($value)
     {
         $now = new \DateTime('now', new \DateTimeZone('UTC'));
         $disableAfter = clone $now;
@@ -147,28 +152,28 @@ class ConfigUpdateCommand extends ContainerAwareCommand
     }
 
     /**
-     * @param string $value
+     * @param string $email
      *
      * @throws \InvalidArgumentException
      *
-     * @return User | null
+     * @return User|null
      */
-    public function getValidatedUserParam($value)
+    public function getUser($email)
     {
         $user = null;
 
-        if ($value) {
+        if ($email) {
             /** @var User $user */
             $user = $this
                 ->getContainer()
                 ->get('oro_user.manager')
-                ->findUserByEmail($value);
+                ->findUserByEmail($email);
 
             if (is_null($user)) {
                 throw new \InvalidArgumentException(
                     sprintf(
                         "User with email '%s' not exists.",
-                        $value
+                        $email
                     )
                 );
             }
