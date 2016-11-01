@@ -9,15 +9,12 @@ class UsedPassword extends Constraint
     /** @var string */
     public $message = 'oro.user.message.password_already_used';
 
-    /** @var int */
-    public $userId;
-
     /**
      * {@inheritdoc}
      */
-    public function getDefaultOption()
+    public function getTargets()
     {
-        return 'userId';
+        return self::CLASS_CONSTRAINT;
     }
 
     /**

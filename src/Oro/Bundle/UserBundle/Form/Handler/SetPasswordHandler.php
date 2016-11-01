@@ -84,11 +84,10 @@ class SetPasswordHandler
         if (in_array($this->request->getMethod(), ['POST', 'PUT'])) {
             $this->form->submit($this->request);
             if ($this->form->isValid()) {
-                // check if this password has been recently used
-                $password = $this->form->get('password')->getData();
-                $constraint = new UsedPassword(['userId' => $entity->getId()]);
-                $errors = $this->validator->validate($password, $constraint);
+                $entity->setPlainPassword($this->form->get('password')->getData());
+                $entity->setPasswordChangedAt(new \DateTime());
 
+                $errors = $this->validator->validate($entity);
                 if (count($errors) > 0) {
                     $this->form->addError(
                         new FormError($this->translator->trans('oro.user.password.already_used.message'))
@@ -97,8 +96,6 @@ class SetPasswordHandler
                     return false;
                 }
 
-                $entity->setPlainPassword($this->form->get('password')->getData());
-                $entity->setPasswordChangedAt(new \DateTime());
                 try {
                     $this->mailerProcessor->sendChangePasswordEmail($entity);
                 } catch (\Exception $e) {

@@ -14,7 +14,6 @@ use Oro\Bundle\EntityBundle\EntityProperty\CreatedAtAwareTrait;
  *
  * @ORM\Table(name="oro_user_password_history")
  * @ORM\Entity
- * @ORM\HasLifecycleCallbacks
  */
 class PasswordHistory implements CreatedAtAwareInterface
 {

@@ -50,7 +50,7 @@ class MigrateUserPasswords extends ParametrizedSqlMigrationQuery
             . ' SELECT id, salt, password, :now'
             . ' FROM oro_user';
 
-        $params = ['now' => new \DateTime()];
+        $params = ['now' => new \DateTime('now', new \DateTimeZone('UTC'))];
         $types = ['now' => Type::DATETIME];
 
         $this->logQuery($logger, $sql, $params, $types);

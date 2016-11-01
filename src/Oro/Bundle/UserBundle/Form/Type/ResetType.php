@@ -52,8 +52,6 @@ class ResetType extends AbstractType
                 'label' => 'oro.user.password.enter_new_password_again.label',
             ],
         ]);
-
-        $builder->addEventListener(FormEvents::PRE_SET_DATA, array($this, 'onPreSetData'));
     }
 
     /**
@@ -82,21 +80,5 @@ class ResetType extends AbstractType
     public function getBlockPrefix()
     {
         return 'oro_user_reset';
-    }
-
-    /**
-     * @param FormEvent $event
-     */
-    public function onPreSetData(FormEvent $event)
-    {
-        $entity = $event->getData();
-
-        if ($entity instanceof UserInterface) {
-            $form = $event->getForm();
-            // attach a constraint to first_options
-            $options = $form->get('plainPassword')->getConfig()->getOptions();
-            $options['first_options']['constraints'][] = new UsedPassword(['userId' => $entity->getId()]);
-            FormUtils::replaceField($form, 'plainPassword', $options);
-        }
     }
 }

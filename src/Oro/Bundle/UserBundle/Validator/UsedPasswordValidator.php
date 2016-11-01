@@ -36,13 +36,13 @@ class UsedPasswordValidator extends ConstraintValidator
     /**
      * {@inheritdoc}
      */
-    public function validate($value, Constraint $constraint)
+    public function validate($user, Constraint $constraint)
     {
         if (!$constraint instanceof UsedPassword) {
             throw new UnexpectedTypeException($constraint, __NAMESPACE__.'Constraint\NotBlank');
         }
 
-        if (null === $constraint->userId || !$this->configManager->get('oro_user.used_password_check_enabled')) {
+        if (!$this->configManager->get('oro_user.used_password_check_enabled')) {
             return;
         }
 
@@ -51,15 +51,13 @@ class UsedPasswordValidator extends ConstraintValidator
         $oldPasswords = $this->registry
             ->getManagerForClass('OroUserBundle:PasswordHistory')
             ->getRepository('OroUserBundle:PasswordHistory')
-            ->findBy(['user' => $constraint->userId], null, $passwordHistoryLimit);
+            ->findBy(['user' => $user], null, $passwordHistoryLimit);
 
-        $user = $this->registry
-            ->getManagerForClass('OroUserBundle:User')
-            ->find('OroUserBundle:User', $constraint->userId);
         $encoder = $this->encoderFactory->getEncoder($user);
+        $newPassword = $user->getPlainPassword();
 
         foreach ($oldPasswords as $passwordHistory) {
-            if ($encoder->isPasswordValid($passwordHistory->getPasswordHash(), $value, $passwordHistory->getSalt())) {
+            if ($encoder->isPasswordValid($passwordHistory->getPasswordHash(), $newPassword, $passwordHistory->getSalt())) {
                 $this->context->addViolation($constraint->message);
 
                 break;

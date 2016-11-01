@@ -16,6 +16,13 @@
             <h2 class="title">{{ 'Password Reset'|trans }}</h2>
         </div>
         <fieldset>
+            {% if not form.vars.valid and form.vars.errors|length %}
+                <div class="alert alert-error">
+                    <div class="message">
+                        {{ form_errors(form) }}
+                    </div>
+                </div>
+            {% endif %}
             <div>
                 {{ form_errors(form.plainPassword.first) }}
             </div>

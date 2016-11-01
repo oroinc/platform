@@ -13,14 +13,20 @@ class PasswordChangePeriodConfigProvider
     const WEEKS  = 'weeks';
     const MONTHS = 'months';
 
+    /**
+     * @param ConfigManager $configManager
+     */
     public function __construct(ConfigManager $configManager)
     {
         $this->configManager = $configManager;
     }
 
+    /**
+     * @return bool
+     */
     public function isPasswordChangePeriodEnabled()
     {
-        return $this->configManager->get('oro_user.password_change_period_enabled');
+        return (bool) $this->configManager->get('oro_user.password_change_period_enabled');
     }
 
     /**

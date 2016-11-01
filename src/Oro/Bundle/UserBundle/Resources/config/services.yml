@@ -498,7 +498,7 @@ services:
         arguments:
             - '@oro_user.provider.password_change_period_config_provider'
         tags:
-            - { name: doctrine.event_listener, event: onFlush }
+            - { name: doctrine.event_listener, event: onFlush, priority: 200 }
 
     oro_user.validator.password_already_used:
         class: Oro\Bundle\UserBundle\Validator\UsedPasswordValidator
