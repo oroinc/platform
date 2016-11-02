@@ -63,7 +63,7 @@ class DetailedLogsHandlerPassTest extends \PHPUnit_Framework_TestCase
         ];
     }
 
-    public function testRemoveNestedHandlerFromHandlersToChannelsParam()
+    public function testRemoveNestedHandlersFromHandlersToChannelsParam()
     {
         $handlersToChannels = [
             'monolog.handler.detailed_logs_nested' => null,
@@ -87,7 +87,7 @@ class DetailedLogsHandlerPassTest extends \PHPUnit_Framework_TestCase
 
         $this->containerBuilder->expects($this->once())->method('findTaggedServiceIds')->willReturn([]);
 
-        $this->containerBuilder->expects($this->exactly(3))
+        $this->containerBuilder->expects($this->exactly(5))
             ->method('findDefinition')
             ->will($this->returnCallback(function ($handlerId) {
                 switch ($handlerId) {
@@ -121,7 +121,7 @@ class DetailedLogsHandlerPassTest extends \PHPUnit_Framework_TestCase
     /**
      * @expectedException \Oro\Bundle\LoggerBundle\Exception\InvalidConfigurationException
      */
-    public function testRemoveNestedHandlerFromHandlersToChannelsParamFails()
+    public function testRemoveNestedHandlersFromHandlersToChannelsParamFails()
     {
         $handlersToChannels = [
             'monolog.handler.detailed_logs' => null,
@@ -146,7 +146,7 @@ class DetailedLogsHandlerPassTest extends \PHPUnit_Framework_TestCase
         $this->compilerPass->process($this->containerBuilder);
     }
 
-    public function testRemoveNestedHandlerFromAllChannelsAndInjectNestedHandler()
+    public function testRemoveNestedHandlersFromAllChannels()
     {
         $this->containerBuilder->expects($this->exactly(2))->method('has')->willReturn(true);
 
@@ -161,7 +161,7 @@ class DetailedLogsHandlerPassTest extends \PHPUnit_Framework_TestCase
                 [['channel' => 'doctrine']]
             ]);
 
-        $this->containerBuilder->expects($this->exactly(7))
+        $this->containerBuilder->expects($this->exactly(6))
             ->method('findDefinition')
             ->will($this->returnCallback(function ($handlerId) {
                 switch ($handlerId) {
@@ -202,10 +202,14 @@ class DetailedLogsHandlerPassTest extends \PHPUnit_Framework_TestCase
                             ->with('pushHandler')
                             ->willReturn($logger);
 
+                        $newDetailedLogsHandlerReference = new Reference(
+                            DetailedLogsHandlerPass::DETAILED_LOGS_HANDLER_SERVICE_PREFIX . 'detailed_logs'
+                        );
+
                         $logger->expects($this->once())
                             ->method('setMethodCalls')
                             ->with([
-                                1 => ['pushHandler', [$detailedLogsHandlerReference]],
+                                1 => ['pushHandler', [$newDetailedLogsHandlerReference]],
                                 2 => ['pushHandler', [$nestedHandlerReference]],
                                 3 => ['pushHandler', [$mainHandlerReference]]
                             ]);
@@ -241,7 +245,7 @@ class DetailedLogsHandlerPassTest extends \PHPUnit_Framework_TestCase
     /**
      * @expectedException \Oro\Bundle\LoggerBundle\Exception\InvalidConfigurationException
      */
-    public function testRemoveNestedHandlerFromAllChannelsFails()
+    public function testRemoveNestedHandlersFromAllChannelsFails()
     {
         $this->containerBuilder->expects($this->exactly(2))->method('has')->willReturn(true);
 

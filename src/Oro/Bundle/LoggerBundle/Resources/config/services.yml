@@ -7,7 +7,11 @@ services:
             - { name: kernel.event_subscriber }
             - { name: monolog.logger, channel: console }
 
-    oro_logger.monolog.detailed_logs.handler:
+    oro_logger.monolog.detailed_logs.handler.prototype:
+        abstract: true
         class: Oro\Bundle\LoggerBundle\Monolog\DetailedLogsHandler
         calls:
             - ['setContainer', ['@service_container']]
+
+    oro_logger.monolog.detailed_logs.handler:
+        parent: oro_logger.monolog.detailed_logs.handler.prototype

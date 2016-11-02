@@ -4,6 +4,7 @@ namespace Oro\Bundle\LoggerBundle\DependencyInjection\Compiler;
 
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\DefinitionDecorator;
 use Symfony\Component\DependencyInjection\Reference;
 
 use Oro\Bundle\LoggerBundle\Exception\InvalidConfigurationException;
@@ -15,7 +16,8 @@ use Oro\Bundle\LoggerBundle\Monolog\DetailedLogsHandler;
  */
 class DetailedLogsHandlerPass implements CompilerPassInterface
 {
-    const DETAILED_LOGS_HANDLER_SERVICE_ID = 'oro_logger.monolog.detailed_logs.handler';
+    const DETAILED_LOGS_HANDLER_SERVICE_PREFIX = 'oro_logger.monolog.detailed_logs.handler.';
+    const DETAILED_LOGS_HANDLER_PROTOTYPE_ID = 'oro_logger.monolog.detailed_logs.handler.prototype';
     const MONOLOG_LOGGER_SERVICE_ID = 'monolog.logger';
     const MONOLOG_HANDLERS_TO_CHANNELS_PARAM = 'monolog.handlers_to_channels';
 
@@ -25,24 +27,20 @@ class DetailedLogsHandlerPass implements CompilerPassInterface
     public function process(ContainerBuilder $container)
     {
         if (!$container->has(self::MONOLOG_LOGGER_SERVICE_ID) ||
-            !$container->has(self::DETAILED_LOGS_HANDLER_SERVICE_ID)
+            !$container->has(self::DETAILED_LOGS_HANDLER_PROTOTYPE_ID)
         ) {
             return;
         }
 
-        $this->removeNestedHandlerFromHandersToChannelsParam($container);
-
-        $nestedHandlerId = $this->removeNestedHandlerFromAllChannels($container);
-        if ($nestedHandlerId !== null) {
-            $this->injectNestedHandler($container, $nestedHandlerId);
-        }
+        $this->removeNestedHandlersFromHandlersToChannelsParam($container);
+        $this->removeNestedHandlersFromAllChannels($container);
     }
 
     /**
      * @param ContainerBuilder $container
      * @throws InvalidConfigurationException
      */
-    protected function removeNestedHandlerFromHandersToChannelsParam(ContainerBuilder $container)
+    protected function removeNestedHandlersFromHandlersToChannelsParam(ContainerBuilder $container)
     {
         $handlersToChannels = $container->getParameter(self::MONOLOG_HANDLERS_TO_CHANNELS_PARAM);
         $handlerIds = array_keys($handlersToChannels);
@@ -58,8 +56,6 @@ class DetailedLogsHandlerPass implements CompilerPassInterface
 
                 $nestedHandlerId = $handlerIds[$i - 1];
                 unset($handlersToChannels[$nestedHandlerId]);
-
-                break;
             }
         }
 
@@ -68,10 +64,9 @@ class DetailedLogsHandlerPass implements CompilerPassInterface
 
     /**
      * @param ContainerBuilder $container
-     * @return null|string
      * @throws InvalidConfigurationException
      */
-    protected function removeNestedHandlerFromAllChannels(ContainerBuilder $container)
+    protected function removeNestedHandlersFromAllChannels(ContainerBuilder $container)
     {
         $loggers = [self::MONOLOG_LOGGER_SERVICE_ID => $container->findDefinition(self::MONOLOG_LOGGER_SERVICE_ID)];
 
@@ -81,8 +76,6 @@ class DetailedLogsHandlerPass implements CompilerPassInterface
                 $loggers[$loggerId] = $container->findDefinition($loggerId);
             }
         }
-
-        $nestedHandlerId = null;
 
         foreach ($loggers as $logger) {
             $calls = array_filter($logger->getMethodCalls(), function ($call) {
@@ -103,7 +96,15 @@ class DetailedLogsHandlerPass implements CompilerPassInterface
                     );
                 }
 
-                $nestedHandlerId = $calls[$i - 1][1][0];
+                $nestedHandlerId = (string)$calls[$i - 1][1][0];
+                $handlerName = substr($handlerId, strrpos($handlerId, '.') + 1);
+                $newHandlerId = self::DETAILED_LOGS_HANDLER_SERVICE_PREFIX . $handlerName;
+
+                $newHandler = new DefinitionDecorator(self::DETAILED_LOGS_HANDLER_PROTOTYPE_ID);
+                $newHandler->addMethodCall('setHandler', [new Reference($nestedHandlerId)]);
+                $container->setDefinition($newHandlerId, $newHandler);
+
+                $calls[$i][1][0] = new Reference($newHandlerId);
 
                 unset($calls[$i - 1]);
                 $logger->removeMethodCall('pushHandler')->setMethodCalls($calls);
@@ -111,17 +112,5 @@ class DetailedLogsHandlerPass implements CompilerPassInterface
                 break;
             }
         }
-
-        return $nestedHandlerId;
-    }
-
-    /**
-     * @param ContainerBuilder $container
-     * @param string $nestedHandlerId
-     */
-    protected function injectNestedHandler(ContainerBuilder $container, $nestedHandlerId)
-    {
-        $detailedLogsHandler = $container->findDefinition(self::DETAILED_LOGS_HANDLER_SERVICE_ID);
-        $detailedLogsHandler->addMethodCall('setHandler', [new Reference($nestedHandlerId)]);
     }
 }
