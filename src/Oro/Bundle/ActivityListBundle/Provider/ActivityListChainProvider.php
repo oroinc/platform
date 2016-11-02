@@ -4,6 +4,7 @@ namespace Oro\Bundle\ActivityListBundle\Provider;
 
 use Doctrine\ORM\EntityManager;
 
+use Oro\Bundle\FeatureToggleBundle\Checker\FeatureToggleableInterface;
 use Symfony\Component\Translation\TranslatorInterface;
 
 use Oro\Bundle\ActivityListBundle\Model\ActivityListUpdatedByProviderInterface;
@@ -290,6 +291,10 @@ class ActivityListChainProvider
 
         foreach ($this->providers as $provider) {
             $hasComment = false;
+
+            if ($provider instanceof FeatureToggleableInterface && !$provider->isFeaturesEnabled()) {
+                continue;
+            }
 
             if ($provider instanceof CommentProviderInterface) {
                 $hasComment = $provider->isCommentsEnabled($provider->getActivityClass());

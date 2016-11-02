@@ -3,6 +3,7 @@
 namespace Oro\Bundle\DashboardBundle\Tests\Unit\Model;
 
 use Oro\Bundle\DashboardBundle\Model\WidgetConfigs;
+use Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker;
 
 class WidgetAttributesTest extends \PHPUnit_Framework_TestCase
 {
@@ -26,6 +27,9 @@ class WidgetAttributesTest extends \PHPUnit_Framework_TestCase
 
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $eventDispatcher;
+
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    protected $featureChecker;
 
     protected function setUp()
     {
@@ -51,6 +55,10 @@ class WidgetAttributesTest extends \PHPUnit_Framework_TestCase
 
         $this->eventDispatcher = $this->getMock('Symfony\Component\EventDispatcher\EventDispatcherInterface');
 
+        $this->featureChecker = $this->getMockBuilder(FeatureChecker::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
         $this->target = new WidgetConfigs(
             $this->configProvider,
             $this->securityFacade,
@@ -58,7 +66,8 @@ class WidgetAttributesTest extends \PHPUnit_Framework_TestCase
             $em,
             $this->valueProvider,
             $this->translator,
-            $this->eventDispatcher
+            $this->eventDispatcher,
+            $this->featureChecker
         );
     }
 

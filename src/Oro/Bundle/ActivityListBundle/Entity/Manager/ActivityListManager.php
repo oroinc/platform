@@ -4,6 +4,7 @@ namespace Oro\Bundle\ActivityListBundle\Entity\Manager;
 
 use Doctrine\ORM\QueryBuilder;
 
+use Oro\Bundle\FeatureToggleBundle\Checker\FeatureToggleableInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Security\Core\Util\ClassUtils;
 
@@ -28,6 +29,9 @@ use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 
 use Oro\Bundle\SecurityBundle\SecurityFacade;
 
+/**
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
+ */
 class ActivityListManager
 {
     /**
@@ -271,7 +275,7 @@ class ActivityListManager
     /**
      * @param integer $activityListItemId
      *
-     * @return array
+     * @return array|null
      */
     public function getItem($activityListItemId)
     {
@@ -293,7 +297,9 @@ class ActivityListManager
     {
         $result = [];
         foreach ($entities as $entity) {
-            $result[] = $this->getEntityViewModel($entity, $targetEntityData);
+            if ($viewModel = $this->getEntityViewModel($entity, $targetEntityData)) {
+                $result[] = $viewModel;
+            }
         }
 
         return $result;
@@ -303,11 +309,16 @@ class ActivityListManager
      * @param ActivityList $entity
      * @param []           $targetEntityData
      *
-     * @return array
+     * @return array|null
      */
     public function getEntityViewModel(ActivityList $entity, $targetEntityData = [])
     {
         $entityProvider = $this->chainProvider->getProviderForEntity($entity->getRelatedActivityClass());
+
+        if ($entityProvider instanceof FeatureToggleableInterface && !$entityProvider->isFeaturesEnabled()) {
+            return null;
+        }
+
         $activity       = $this->doctrineHelper->getEntity(
             $entity->getRelatedActivityClass(),
             $entity->getRelatedActivityId()
