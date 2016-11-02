@@ -144,7 +144,7 @@ class RendererTest extends LayoutTestCase
                 'title',
                 'head',
                 'title',
-                ['value' => ['First', 'Second'], 'separator' => ' - ', 'reverse' => true]
+                ['value' => 'Page Title']
             )
             ->add('meta', 'head', 'meta', ['charset' => 'UTF-8'])
             ->add('style', 'head', 'style', ['content' => 'body { color: red; }', 'scoped' => true])
@@ -358,7 +358,7 @@ class RendererTest extends LayoutTestCase
 <!DOCTYPE html>
 <html>
     <head>
-        <title>Second - First</title>
+        <title>Page Title</title>
         <meta charset="UTF-8"/>
         <style type="text/css" scoped="scoped">
             body { color: red; }
