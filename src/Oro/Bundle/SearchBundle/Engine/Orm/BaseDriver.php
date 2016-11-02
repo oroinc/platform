@@ -165,7 +165,6 @@ abstract class BaseDriver
     public function getUniqueId($prefix = '')
     {
         return uniqid($prefix);
-        return str_replace('.', '_', uniqid($prefix, true));
     }
 
     /**
