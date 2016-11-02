@@ -29,6 +29,9 @@ use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 
 use Oro\Bundle\SecurityBundle\SecurityFacade;
 
+/**
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
+ */
 class ActivityListManager
 {
     /**
