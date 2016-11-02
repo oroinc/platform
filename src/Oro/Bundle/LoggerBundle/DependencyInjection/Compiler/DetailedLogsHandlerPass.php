@@ -82,8 +82,8 @@ class DetailedLogsHandlerPass implements CompilerPassInterface
                 return $call[0] == 'pushHandler';
             });
 
-            for ($i = 0; $i < count($calls); $i++) {
-                $handlerId = (string)$calls[$i][1][0];
+            foreach ($calls as $i => &$call) {
+                $handlerId = (string)$call[1][0];
                 $handler = $container->findDefinition($handlerId);
 
                 if ($handler->getClass() != DetailedLogsHandler::class) {
@@ -104,7 +104,7 @@ class DetailedLogsHandlerPass implements CompilerPassInterface
                 $newHandler->addMethodCall('setHandler', [new Reference($nestedHandlerId)]);
                 $container->setDefinition($newHandlerId, $newHandler);
 
-                $calls[$i][1][0] = new Reference($newHandlerId);
+                $call[1][0] = new Reference($newHandlerId);
 
                 unset($calls[$i - 1]);
                 $logger->removeMethodCall('pushHandler')->setMethodCalls($calls);
