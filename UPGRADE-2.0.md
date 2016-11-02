@@ -5,6 +5,10 @@ UPGRADE FROM 1.10 to 2.0
 - LiipImagineBundle was updated to 1.5.* version.
 - Added dependency to [fxpio/composer-asset-plugin](https://github.com/fxpio/composer-asset-plugin) composer plugin.
 - All original third-party asset libraries were moved out from platform and added to composer.json as bower-asset/npm-asset dependency.
+- Upgrade to 2.0 is available only from 1.10 version. For this update
+  was added the command "oro:platform:upgrade20". Before run this command the cache has to be deleted. 
+  Command have to be run only one time. In next releases 2.x to apply release changes it will be enough run the command "oro:platform:update".
+  Upgrade from version less then 1.10 is not supported.
 
 ####Action Component
 - Deprecated constant `Oro\Component\Action\Event\ExecuteActionEvents::DEPRECATED_HANDLE_BEFORE` removed. Use `Oro\Component\Action\Event\ExecuteActionEvents::HANDLE_BEFORE` instead.
@@ -19,6 +23,9 @@ UPGRADE FROM 1.10 to 2.0
 ####ApiBundle
 - The `oro.api.action_processor` DI tag was removed. To add a new action processor, use `oro_api.actions` section of the ApiBundle configuration.
 - The `oro_api.config_extension` DI tag was removed. To add a new configuration extension, use `oro_api.config_extensions` section of the ApiBundle configuration.
+
+#### ImportExportBundle
+- ImportExportBundle/Field/FieldHelper.php was moved to EntityBundle/Helper/
 
 ####WorkflowBundle
 - Class `Oro\Bundle\WorkflowBundle\Model\WorkflowManager`
@@ -394,6 +401,7 @@ placeholders:
 - Main menu dropdown active item is now triggering a page refresh, despite the Backbone router limitations.
 - Updated jquery.mCustomScrollbar plugin to version 3.1.5.
 - Changed `form_row` block to support of form field 'hints' which allows rendering of simple help section for the respective form control.
+- Updated jQuery and jQuery-UI libraries to version 3.1.* and 1.12.* accordingly
 
 ####RequireJS:
 - Updated RequireJS library to version 2.3.*
@@ -412,6 +420,7 @@ placeholders:
     * `oro_titles` to `titles`
     * `oro_menu_config` to `menu_config`
     * `oro_navigation_elements` to `navigation_elements`
+- All configuration nodes in `Resources/config/oro/navigation.yml` were renamed to snake case
 - Added class `Oro\Bundle\NavigationBundle\Builder\MenuUpdateBuilder` that implements `Oro\Bundle\NavigationBundle\Menu\BuilderInterface`.
 - Added class `Oro\Bundle\NavigationBundle\DependencyInjection\Compiler\MenuUpdateProviderPass`.
 - Added `tree.$.areas`, `tree.$.max_nesting_level`, `tree.$.read_only` and `items.$.read_only` nodes to `Oro\Bundle\NavigationBundle\DependencyInjection\Configuration`.
@@ -577,3 +586,9 @@ to the [Fallback documentation](./src/Oro/Bundle/EntityBundle/Resources/doc/enti
 
 ####ImapBundle
  - The command `oro:imap:clear-mailbox` was removed. Produce message to the topic `Oro\Bundle\ImapBundle\Async\Topics::CLEAR_INACTIVE_MAILBOX` instead.
+
+####OroCalendarBundle
+- OroCalendarBundle moved to a separate package
+
+####OroInstallerBundle
+- Added interface `Oro\Bundle\InstallerBundle\CacheWarmer\NamespaceMigrationProviderInterface`. it makes available add the rules for command "oro:platform:upgrade20"
