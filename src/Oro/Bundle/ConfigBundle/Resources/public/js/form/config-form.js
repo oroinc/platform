@@ -18,7 +18,8 @@ define([
     return Backbone.View.extend({
 
         defaults: {
-            pageReload: false
+            pageReload: false,
+            isFormValid: true
         },
 
         events: {
@@ -31,6 +32,7 @@ define([
          */
         initialize: function(options) {
             this.options = _.defaults(options || {}, this.defaults, this.options);
+            mediator.trigger('config-form:init', this.options);
             formDefault();
         },
 
@@ -74,19 +76,24 @@ define([
         },
 
         /**
-         * Reloads page on form submit if reloadPage is set to true.
+         * Reloads page on form submit if reloadPage is set to true and response contains valid form
+         *
+         * We use mediator with event 'config-form:init', because we need to get option from new form that we'll
+         * receive within response. Only new form contains validation result information.
          */
         submitHandler: function() {
             if (this.options.pageReload) {
-                mediator.once('page:update', function() {
-                    messenger.notificationMessage('info', __('Please wait until page will be reloaded...'));
-                    // force reload without hash navigation
-                    window.location.reload();
-                });
+                mediator.once('config-form:init', function(options) {
+                    if (options.isFormValid) {
+                        messenger.notificationMessage('info', __('Please wait until page will be reloaded...'));
+                        // force reload without hash navigation
+                        window.location.reload();
 
-                mediator.once('page:afterChange', function() {
-                    // Show loading until page is fully reloaded
-                    mediator.execute('showLoading');
+                        this.once('page:afterChange', function () {
+                            // Show loading until page is fully reloaded
+                            this.execute('showLoading');
+                        });
+                    }
                 });
             }
         }
