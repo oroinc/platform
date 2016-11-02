@@ -4,6 +4,9 @@ namespace Oro\Bundle\EmailBundle\Tests\Unit\Provider;
 
 use Oro\Bundle\EmailBundle\Provider\EmailActivityListProvider;
 use Oro\Bundle\EmailBundle\Tools\EmailBodyHelper;
+use Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker;
+use Oro\Bundle\FeatureToggleBundle\Checker\FeatureCheckerHolderTrait;
+use Oro\Bundle\FeatureToggleBundle\Checker\FeatureToggleableInterface;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\EmailBundle\Entity\EmailUser;
@@ -35,6 +38,9 @@ class EmailActivityListProviderTest extends \PHPUnit_Framework_TestCase
 
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $commentAssociationHelper;
+
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    protected $featureChecker;
 
     protected function setUp()
     {
@@ -80,6 +86,10 @@ class EmailActivityListProviderTest extends \PHPUnit_Framework_TestCase
             ->getMock();
         $this->commentAssociationHelper = $this
             ->getMockBuilder('Oro\Bundle\CommentBundle\Tools\CommentAssociationHelper')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $this->featureChecker = $this->getMockBuilder(FeatureChecker::class)
+            ->setMethods(['isFeatureEnabled'])
             ->disableOriginalConstructor()
             ->getMock();
 
@@ -161,5 +171,21 @@ class EmailActivityListProviderTest extends \PHPUnit_Framework_TestCase
         $owner = $activityOwnerArray[0];
         $this->assertEquals($organization->getName(), $owner->getOrganization()->getName());
         $this->assertEquals($user->getUsername(), $owner->getUser()->getUsername());
+    }
+
+    public function testFeatureToggleable()
+    {
+        $this->assertInstanceOf(FeatureToggleableInterface::class, $this->emailActivityListProvider);
+
+        $this->emailActivityListProvider->setFeatureChecker($this->featureChecker);
+        $this->emailActivityListProvider->addFeature('email');
+
+        $mock = $this->getMockForTrait(FeatureCheckerHolderTrait::class);
+
+        $mock->expects($this->any())
+            ->method('isFeaturesEnabled')
+            ->will($this->returnValue(true));
+
+        $this->assertTrue($mock->isFeaturesEnabled());
     }
 }
