@@ -80,7 +80,7 @@ class ExpireUserPasswordsProcessor implements MessageProcessorInterface, TopicSu
         $count = 0;
         $batch = [];
         while ($user = $users->next()) {
-            $batch[] = $user;
+            $batch[] = $user[0];
             if (++$count % self::BATCH_SIZE === 0) {
                 $this->processBatch($batch);
                 $batch = [];
