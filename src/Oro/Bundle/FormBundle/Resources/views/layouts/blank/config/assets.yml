@@ -7,5 +7,6 @@ styles:
         - 'bundles/oroform/blank/scss/variables/select-config.scss'
         - 'bundles/oroform/blank/scss/variables/textarea-config.scss'
         - 'bundles/oroform/blank/scss/variables/label-config.scss'
+        - 'bundles/oroform/blank/scss/variables/form-row-config.scss'
         - 'bundles/oroform/blank/scss/styles.scss'
     filters: ['cssrewrite', 'cssmin']

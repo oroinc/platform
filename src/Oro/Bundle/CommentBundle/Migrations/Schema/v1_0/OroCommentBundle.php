@@ -43,7 +43,6 @@ class OroCommentBundle implements Migration, CommentExtensionAwareInterface, Att
     {
         self::createCommentTable($schema);
         self::addCommentToEmail($schema, $this->comment);
-        self::addCommentToCalendarEvent($schema, $this->comment);
         self::addCommentToNote($schema, $this->comment);
         self::addAttachment($schema, $this->attachmentExtension);
     }
@@ -96,15 +95,6 @@ class OroCommentBundle implements Migration, CommentExtensionAwareInterface, Att
     public static function addCommentToEmail(Schema $schema, CommentExtension $commentExtension)
     {
         $commentExtension->addCommentAssociation($schema, 'oro_email');
-    }
-
-    /**
-     * @param Schema           $schema
-     * @param CommentExtension $commentExtension
-     */
-    public static function addCommentToCalendarEvent(Schema $schema, CommentExtension $commentExtension)
-    {
-        $commentExtension->addCommentAssociation($schema, 'oro_calendar_event');
     }
 
     /**
