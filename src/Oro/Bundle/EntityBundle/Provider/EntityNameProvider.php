@@ -148,7 +148,8 @@ class EntityNameProvider implements EntityNameProviderInterface
             return $nameDQL;
         }
 
-        return sprintf('COALESCE(%s, CAST(%s AS string))', $nameDQL, $alias . '.' . $idFieldName);
+        // use cast to avoid mixed collation errors
+        return sprintf('COALESCE(CAST(%s AS string), CAST(%s AS string))', $nameDQL, $alias . '.' . $idFieldName);
     }
 
     /**
