@@ -10,7 +10,6 @@ use Oro\Bundle\TranslationBundle\Provider\OroTranslationAdapter;
 use Oro\Bundle\TranslationBundle\Provider\PackagesProvider;
 use Oro\Bundle\TranslationBundle\Provider\TranslationStatisticProvider;
 
-
 class TranslationStatisticProviderTest extends \PHPUnit_Framework_TestCase
 {
     /** @var Cache|\PHPUnit_Framework_MockObject_MockObject */
