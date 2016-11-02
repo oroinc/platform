@@ -6,6 +6,7 @@ use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
 /**
  * @dbIsolationPerTest
+ * @group search
  */
 class IndexEntitiesByIdMessageProcessorTest extends WebTestCase
 {

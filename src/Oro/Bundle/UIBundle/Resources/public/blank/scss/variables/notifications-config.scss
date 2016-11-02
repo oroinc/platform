@@ -6,5 +6,6 @@ $notifications-success-color: get-color('ui', 'success') !default;
 $notifications-success-text-color: get-color('ui', 'success-dark') !default;
 $notifications-warring-color: get-color('ui', 'warring') !default;
 $notifications-warring-text-color: get-color('ui', 'warring-dark') !default;
-$notifications-offset: 5px 0 0 0 !default;
+
+$notifications-offset: 5px 0 10px 0 !default;
 $notifications-inner-offset: 6px 9px !default;

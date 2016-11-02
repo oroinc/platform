@@ -433,3 +433,13 @@ services:
         arguments:
             - '@translator'
             - '@oro_locale.helper.localization'
+
+    oro_navigation.data_provider.title:
+        class: Oro\Bundle\NavigationBundle\Layout\DataProvider\NavigationTitleProvider
+        scope: request
+        arguments:
+          - '@oro_navigation.title_service'
+          - '@oro_config.user'
+        tags:
+            - { name: layout.data_provider, alias: title_provider }
+
