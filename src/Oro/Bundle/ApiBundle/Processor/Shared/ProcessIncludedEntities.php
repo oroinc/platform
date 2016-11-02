@@ -2,9 +2,9 @@
 
 namespace Oro\Bundle\ApiBundle\Processor\Shared;
 
-use Oro\Component\ChainProcessor\ActionProcessorInterface;
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
+use Oro\Bundle\ApiBundle\Collection\IncludedEntityData;
 use Oro\Bundle\ApiBundle\Model\Error;
 use Oro\Bundle\ApiBundle\Processor\ActionProcessorBagInterface;
 use Oro\Bundle\ApiBundle\Processor\FormContext;
@@ -56,37 +56,37 @@ abstract class ProcessIncludedEntities implements ProcessorInterface
 
         foreach ($includedEntities as $entity) {
             $entityData = $includedEntities->getData($entity);
-            $action = $entityData->isExisting() ? ApiActions::UPDATE : ApiActions::CREATE;
             $this->processIncludedEntity(
-                $this->processorBag->getProcessor($action),
                 $context,
                 $includedEntities->getClass($entity),
                 $includedEntities->getId($entity),
                 $includedData[$entityData->getIndex()],
                 $entity,
-                $entityData->getPath()
+                $entityData
             );
         }
     }
 
     /**
-     * @param ActionProcessorInterface $actionProcessor
      * @param FormContext              $context
      * @param string                   $entityClass
      * @param mixed                    $entityId
-     * @param array                    $entityData
+     * @param array                    $entityRequestData
      * @param object                   $entity
-     * @param string                   $entityPath
+     * @param IncludedEntityData       $entityData
      */
     protected function processIncludedEntity(
-        ActionProcessorInterface $actionProcessor,
         FormContext $context,
         $entityClass,
         $entityId,
-        array $entityData,
+        array $entityRequestData,
         $entity,
-        $entityPath
+        IncludedEntityData $entityData
     ) {
+        $actionProcessor = $this->processorBag->getProcessor(
+            $entityData->isExisting() ? ApiActions::UPDATE : ApiActions::CREATE
+        );
+
         /** @var SingleItemContext|FormContext $actionContext */
         $actionContext = $actionProcessor->createContext();
         $actionContext->setVersion($context->getVersion());
@@ -96,7 +96,7 @@ abstract class ProcessIncludedEntities implements ProcessorInterface
 
         $actionContext->setClassName($entityClass);
         $actionContext->setId($entityId);
-        $actionContext->setRequestData($entityData);
+        $actionContext->setRequestData($entityRequestData);
         $actionContext->setResult($entity);
 
         $actionContext->setLastGroup('transform_data');
@@ -109,9 +109,11 @@ abstract class ProcessIncludedEntities implements ProcessorInterface
             $errors = $actionContext->getErrors();
             foreach ($errors as $error) {
                 $this->errorCompleter->complete($error, $actionMetadata);
-                $this->fixErrorPath($error, $entityPath);
+                $this->fixErrorPath($error, $entityData->getPath());
                 $context->addError($error);
             }
+        } else {
+            $entityData->setMetadata($actionContext->getMetadata());
         }
     }
 

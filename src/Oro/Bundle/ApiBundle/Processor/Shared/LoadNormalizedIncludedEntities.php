@@ -52,7 +52,6 @@ class LoadNormalizedIncludedEntities implements ProcessorInterface
             $this->processIncludedEntity(
                 $context,
                 $includedEntities->getClass($entity),
-                $includedEntities->getId($entity),
                 $entity,
                 $includedEntities->getData($entity)
             );
@@ -62,14 +61,12 @@ class LoadNormalizedIncludedEntities implements ProcessorInterface
     /**
      * @param FormContext        $context
      * @param string             $entityClass
-     * @param mixed              $entityId
      * @param object             $entity
      * @param IncludedEntityData $entityData
      */
     protected function processIncludedEntity(
         FormContext $context,
         $entityClass,
-        $entityId,
         $entity,
         IncludedEntityData $entityData
     ) {
@@ -81,7 +78,7 @@ class LoadNormalizedIncludedEntities implements ProcessorInterface
         $getContext->getRequestType()->set($context->getRequestType());
         $getContext->setRequestHeaders($context->getRequestHeaders());
         $getContext->setClassName($entityClass);
-        $getContext->setId($entityId);
+        $getContext->setId($entityData->getMetadata()->getIdentifierValue($entity));
         if (!$entityData->isExisting()) {
             $getContext->setResult($entity);
         }

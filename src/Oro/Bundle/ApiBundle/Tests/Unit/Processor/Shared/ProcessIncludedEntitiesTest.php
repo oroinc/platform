@@ -56,7 +56,7 @@ class ProcessIncludedEntitiesTest extends FormProcessorTestCase
         $this->processor->process($this->context);
     }
 
-    public function testProcessForNewIncludedEntity()
+    public function testProcessForNewIncludedEntityWhenCreateActionSuccess()
     {
         $includedData = [
             ['data' => ['type' => 'testType', 'id' => 'testId']]
@@ -64,20 +64,12 @@ class ProcessIncludedEntitiesTest extends FormProcessorTestCase
         $includedEntity = new \stdClass();
 
         $includedEntities = new IncludedEntityCollection();
-        $includedEntities->add(
-            $includedEntity,
-            'Test\Class',
-            'id',
-            new IncludedEntityData('/included/0', 0)
-        );
-
-        $metadata = new EntityMetadata();
-        $error = Error::createValidationError('some error');
+        $includedEntityData = new IncludedEntityData('/included/0', 0);
+        $includedEntities->add($includedEntity, 'Test\Class', 'id', $includedEntityData);
 
         $expectedContext = new CreateContext($this->configProvider, $this->metadataProvider);
         $expectedContext->setVersion($this->context->getVersion());
         $expectedContext->getRequestType()->set($this->context->getRequestType());
-        $expectedContext->setMetadata($metadata);
         $expectedContext->setRequestHeaders($this->context->getRequestHeaders());
         $expectedContext->setIncludedEntities($includedEntities);
         $expectedContext->setClassName('Test\Class');
@@ -87,8 +79,9 @@ class ProcessIncludedEntitiesTest extends FormProcessorTestCase
         $expectedContext->setLastGroup('transform_data');
         $expectedContext->setSoftErrorsHandling(true);
 
+        $actionMetadata = new EntityMetadata();
+
         $actionContext = new CreateContext($this->configProvider, $this->metadataProvider);
-        $actionContext->setMetadata($metadata);
         $actionProcessor = $this->getMock(ActionProcessorInterface::class);
         $this->processorBag->expects(self::once())
             ->method('getProcessor')
@@ -100,24 +93,24 @@ class ProcessIncludedEntitiesTest extends FormProcessorTestCase
         $actionProcessor->expects(self::once())
             ->method('process')
             ->willReturnCallback(
-                function (CreateContext $context) use ($expectedContext, $error) {
+                function (CreateContext $context) use ($expectedContext, $actionMetadata) {
                     $this->assertEquals($expectedContext, $context);
 
-                    $context->addError($error);
+                    $context->setMetadata($actionMetadata);
                 }
             );
-        $this->errorCompleter->expects(self::once())
-            ->method('complete')
-            ->with(self::identicalTo($error), self::identicalTo($metadata));
+        $this->errorCompleter->expects(self::never())
+            ->method('complete');
 
         $this->context->setIncludedData($includedData);
         $this->context->setIncludedEntities($includedEntities);
         $this->context->getRequestHeaders()->set('header1', 'value1');
         $this->processor->process($this->context);
-        $this->assertEquals([$error], $actionContext->getErrors());
+        $this->assertFalse($actionContext->hasErrors());
+        $this->assertSame($actionMetadata, $includedEntityData->getMetadata());
     }
 
-    public function testProcessForExistingIncludedEntity()
+    public function testProcessForNewIncludedEntityWhenCreateActionFailed()
     {
         $includedData = [
             ['data' => ['type' => 'testType', 'id' => 'testId']]
@@ -125,20 +118,14 @@ class ProcessIncludedEntitiesTest extends FormProcessorTestCase
         $includedEntity = new \stdClass();
 
         $includedEntities = new IncludedEntityCollection();
-        $includedEntities->add(
-            $includedEntity,
-            'Test\Class',
-            'id',
-            new IncludedEntityData('/included/0', 0, true)
-        );
+        $includedEntityData = new IncludedEntityData('/included/0', 0);
+        $includedEntities->add($includedEntity, 'Test\Class', 'id', $includedEntityData);
 
-        $metadata = new EntityMetadata();
         $error = Error::createValidationError('some error');
 
-        $expectedContext = new UpdateContext($this->configProvider, $this->metadataProvider);
+        $expectedContext = new CreateContext($this->configProvider, $this->metadataProvider);
         $expectedContext->setVersion($this->context->getVersion());
         $expectedContext->getRequestType()->set($this->context->getRequestType());
-        $expectedContext->setMetadata($metadata);
         $expectedContext->setRequestHeaders($this->context->getRequestHeaders());
         $expectedContext->setIncludedEntities($includedEntities);
         $expectedContext->setClassName('Test\Class');
@@ -148,8 +135,65 @@ class ProcessIncludedEntitiesTest extends FormProcessorTestCase
         $expectedContext->setLastGroup('transform_data');
         $expectedContext->setSoftErrorsHandling(true);
 
+        $actionMetadata = new EntityMetadata();
+
+        $actionContext = new CreateContext($this->configProvider, $this->metadataProvider);
+        $actionProcessor = $this->getMock(ActionProcessorInterface::class);
+        $this->processorBag->expects(self::once())
+            ->method('getProcessor')
+            ->with(ApiActions::CREATE)
+            ->willReturn($actionProcessor);
+        $actionProcessor->expects(self::once())
+            ->method('createContext')
+            ->willReturn($actionContext);
+        $actionProcessor->expects(self::once())
+            ->method('process')
+            ->willReturnCallback(
+                function (CreateContext $context) use ($expectedContext, $error, $actionMetadata) {
+                    $this->assertEquals($expectedContext, $context);
+
+                    $context->setMetadata($actionMetadata);
+                    $context->addError($error);
+                }
+            );
+        $this->errorCompleter->expects(self::once())
+            ->method('complete')
+            ->with(self::identicalTo($error), self::identicalTo($actionMetadata));
+
+        $this->context->setIncludedData($includedData);
+        $this->context->setIncludedEntities($includedEntities);
+        $this->context->getRequestHeaders()->set('header1', 'value1');
+        $this->processor->process($this->context);
+        $this->assertEquals([$error], $actionContext->getErrors());
+        $this->assertNull($includedEntityData->getMetadata());
+    }
+
+    public function testProcessForExistingIncludedEntityWhenUpdateActionSuccess()
+    {
+        $includedData = [
+            ['data' => ['type' => 'testType', 'id' => 'testId']]
+        ];
+        $includedEntity = new \stdClass();
+
+        $includedEntities = new IncludedEntityCollection();
+        $includedEntityData = new IncludedEntityData('/included/0', 0, true);
+        $includedEntities->add($includedEntity, 'Test\Class', 'id', $includedEntityData);
+
+        $expectedContext = new UpdateContext($this->configProvider, $this->metadataProvider);
+        $expectedContext->setVersion($this->context->getVersion());
+        $expectedContext->getRequestType()->set($this->context->getRequestType());
+        $expectedContext->setRequestHeaders($this->context->getRequestHeaders());
+        $expectedContext->setIncludedEntities($includedEntities);
+        $expectedContext->setClassName('Test\Class');
+        $expectedContext->setId('id');
+        $expectedContext->setRequestData(['data' => ['type' => 'testType', 'id' => 'testId']]);
+        $expectedContext->setResult($includedEntity);
+        $expectedContext->setLastGroup('transform_data');
+        $expectedContext->setSoftErrorsHandling(true);
+
+        $actionMetadata = new EntityMetadata();
+
         $actionContext = new UpdateContext($this->configProvider, $this->metadataProvider);
-        $actionContext->setMetadata($metadata);
         $actionProcessor = $this->getMock(ActionProcessorInterface::class);
         $this->processorBag->expects(self::once())
             ->method('getProcessor')
@@ -161,20 +205,78 @@ class ProcessIncludedEntitiesTest extends FormProcessorTestCase
         $actionProcessor->expects(self::once())
             ->method('process')
             ->willReturnCallback(
-                function (UpdateContext $context) use ($expectedContext, $error) {
+                function (UpdateContext $context) use ($expectedContext, $actionMetadata) {
                     $this->assertEquals($expectedContext, $context);
 
+                    $context->setMetadata($actionMetadata);
+                }
+            );
+        $this->errorCompleter->expects(self::never())
+            ->method('complete');
+
+        $this->context->setIncludedData($includedData);
+        $this->context->setIncludedEntities($includedEntities);
+        $this->context->getRequestHeaders()->set('header1', 'value1');
+        $this->processor->process($this->context);
+        $this->assertFalse($actionContext->hasErrors());
+        $this->assertSame($actionMetadata, $includedEntityData->getMetadata());
+    }
+
+    public function testProcessForExistingIncludedEntityWhenUpdateActionFailed()
+    {
+        $includedData = [
+            ['data' => ['type' => 'testType', 'id' => 'testId']]
+        ];
+        $includedEntity = new \stdClass();
+
+        $includedEntities = new IncludedEntityCollection();
+        $includedEntityData = new IncludedEntityData('/included/0', 0, true);
+        $includedEntities->add($includedEntity, 'Test\Class', 'id', $includedEntityData);
+
+        $error = Error::createValidationError('some error');
+
+        $expectedContext = new UpdateContext($this->configProvider, $this->metadataProvider);
+        $expectedContext->setVersion($this->context->getVersion());
+        $expectedContext->getRequestType()->set($this->context->getRequestType());
+        $expectedContext->setRequestHeaders($this->context->getRequestHeaders());
+        $expectedContext->setIncludedEntities($includedEntities);
+        $expectedContext->setClassName('Test\Class');
+        $expectedContext->setId('id');
+        $expectedContext->setRequestData(['data' => ['type' => 'testType', 'id' => 'testId']]);
+        $expectedContext->setResult($includedEntity);
+        $expectedContext->setLastGroup('transform_data');
+        $expectedContext->setSoftErrorsHandling(true);
+
+        $actionMetadata = new EntityMetadata();
+
+        $actionContext = new UpdateContext($this->configProvider, $this->metadataProvider);
+        $actionProcessor = $this->getMock(ActionProcessorInterface::class);
+        $this->processorBag->expects(self::once())
+            ->method('getProcessor')
+            ->with(ApiActions::UPDATE)
+            ->willReturn($actionProcessor);
+        $actionProcessor->expects(self::once())
+            ->method('createContext')
+            ->willReturn($actionContext);
+        $actionProcessor->expects(self::once())
+            ->method('process')
+            ->willReturnCallback(
+                function (UpdateContext $context) use ($expectedContext, $error, $actionMetadata) {
+                    $this->assertEquals($expectedContext, $context);
+
+                    $context->setMetadata($actionMetadata);
                     $context->addError($error);
                 }
             );
         $this->errorCompleter->expects(self::once())
             ->method('complete')
-            ->with(self::identicalTo($error), self::identicalTo($metadata));
+            ->with(self::identicalTo($error), self::identicalTo($actionMetadata));
 
         $this->context->setIncludedData($includedData);
         $this->context->setIncludedEntities($includedEntities);
         $this->context->getRequestHeaders()->set('header1', 'value1');
         $this->processor->process($this->context);
         $this->assertEquals([$error], $actionContext->getErrors());
+        $this->assertNull($includedEntityData->getMetadata());
     }
 }
