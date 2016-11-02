@@ -2,6 +2,8 @@
     padding: $notifications-inner-offset;
     margin: $notifications-offset;
 
+    list-style: none;
+
     background-color: $notifications-color;
     color: $notifications-text-color;
 
@@ -18,6 +20,5 @@
     &--warring {
         background-color: $notifications-warring-color;
         color: $notifications-warring-text-color;
-
     }
 }

@@ -45,7 +45,7 @@ require(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/tools
 
     $(function() {
         var $pageTitle = $('#page-title');
-        if ($pageTitle.size()) {
+        if ($pageTitle.length) {
             document.title = $('<div.>').html($('#page-title').text()).text();
         }
         layout.hideProgressBar();
