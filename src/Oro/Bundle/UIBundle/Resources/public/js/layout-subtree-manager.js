@@ -42,14 +42,14 @@ define([
          */
         removeLayoutSubtreeInstance: function(layoutSubtreeRootId) {
             delete this.layoutSubtreeCollection[layoutSubtreeRootId];
-            Object.keys(this.reloadEvents).map((function(eventItem) {
+            Object.keys(this.reloadEvents).map((function(eventItem, eventName) {
                 var index = eventItem.indexOf(layoutSubtreeRootId);
                 if (index > -1) {
                     eventItem.splice(index, 1);
                 }
                 if (!eventItem.length) {
-                    delete this.reloadEvents[eventItem];
-                    mediator.off(event, this._reloadLayouts, this);
+                    delete this.reloadEvents[eventName];
+                    mediator.off(eventName, this._reloadLayouts, this);
                 }
             }).bind(this));
         },
