@@ -82,10 +82,11 @@ class DatagridDataConverter implements DataConverterInterface, ContextAwareInter
 
             $val  = isset($exportedRecord[$columnName]) ? $exportedRecord[$columnName] : null;
             $val  = $this->applyFrontendFormatting($val, $column);
-            $label = isset($result[$this->translator->trans($column['label'])]) ?
-                sprintf('%s_%s', $column['label'], $columnName) :
-                $column['label'];
-            $result[$this->translator->trans($label)] = $val;
+            $columnLabel = $this->translator->trans($column['label']);
+            $label = isset($result[$columnLabel]) ?
+                sprintf('%s_%s', $columnLabel, $columnName) :
+                $columnLabel;
+            $result[$label] = $val;
         }
 
         return $result;
