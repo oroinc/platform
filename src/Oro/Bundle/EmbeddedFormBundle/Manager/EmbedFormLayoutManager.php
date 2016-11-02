@@ -57,7 +57,6 @@ class EmbedFormLayoutManager
         $layoutContext = new LayoutContext();
 
         $layoutContext->set('expressions_evaluate', true);
-//        $layoutContext->set('expressions_evaluate_deferred', false);
 
         $layoutContext->getResolver()
             ->setRequired([
