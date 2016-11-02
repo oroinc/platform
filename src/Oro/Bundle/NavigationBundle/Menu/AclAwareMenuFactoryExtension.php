@@ -17,7 +17,7 @@ class AclAwareMenuFactoryExtension implements Factory\ExtensionInterface
     /**#@+
      * ACL Aware MenuFactory constants
      */
-    const ACL_RESOURCE_ID_KEY = 'aclResourceId';
+    const ACL_RESOURCE_ID_KEY = 'acl_resource_id';
     const ROUTE_CONTROLLER_KEY = '_controller';
     const CONTROLLER_ACTION_DELIMITER = '::';
     const DEFAULT_ACL_POLICY = true;
@@ -124,7 +124,7 @@ class AclAwareMenuFactoryExtension implements Factory\ExtensionInterface
         }
 
         if ($this->hideAllForNotLoggedInUsers && !$securityFacade->hasLoggedUser()) {
-            if (!empty($options['extras']['showNonAuthorized'])) {
+            if (!empty($options['extras']['show_non_authorized'])) {
                 return;
             }
 

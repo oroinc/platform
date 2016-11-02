@@ -23,7 +23,7 @@
 {% block taggable_datagrid_widget %}
     {{ block_widget(block) }}
     <script type="text/javascript">
-        require(['oronavigation/js/content/grid-builder'], function (GridTagBuilder) {
+        require(['orosync/js/content/grid-builder'], function (GridTagBuilder) {
             GridTagBuilder.allowTracking({{ grid_full_name|json_encode|raw }});
         });
     </script>

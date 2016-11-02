@@ -1,18 +1,35 @@
 config:
+    shim:
+        'bootstrap':
+            deps:
+                - 'jquery'
+        'underscore':
+            exports: '_'
+        'jquery.form':
+            deps:
+                - 'jquery'
+        'bootstrap-popover':
+            deps:
+                - 'bootstrap-tooltip'
     map:
         '*':
             'jquery': 'oroui/js/extend/jquery'
             'chaplin': 'oroui/js/extend/chaplin'
             'underscore': 'oroui/js/extend/underscore'
             'backbone': 'oroui/js/extend/backbone'
+            'bootstrap': 'oroui/js/extend/bootstrap'
         'oroui/js/extend/jquery':
             'jquery': 'jquery'
+        'oroui/js/extend/jquery-ui':
+            'jquery-ui': 'jquery-ui'
         'oroui/js/extend/chaplin':
             'chaplin': 'chaplin'
         'oroui/js/extend/underscore':
             'underscore': 'underscore'
         'oroui/js/extend/backbone':
             'backbone': 'backbone'
+        'oroui/js/extend/bootstrap':
+            'bootstrap': 'bootstrap'
         'chaplin':
             'backbone': 'backbone'
         'oroui/js/app/components/base/component':
@@ -21,14 +38,36 @@ config:
         'oroui/js/tools':
             'chaplin': 'chaplin'
     paths:
-        'json': 'bundles/oroui/lib/json2.js'
+        'json': 'bundles/bowerassets/json2/json2.js'
         'jquery': 'bundles/components/jquery/jquery.js'
+        'jquery-ui': 'bundles/oroui/lib/jquery-ui.js'
+        'jquery.form': 'bundles/bowerassets/jquery-form/jquery.form.js'
+        'bootstrap-affix': 'bowerassets/bootstrap/docs/assets/js/bootstrap-affix.js'
+        'bootstrap-alert': 'bowerassets/bootstrap/docs/assets/js/bootstrap-alert.js'
+        'bootstrap-button': 'bowerassets/bootstrap/docs/assets/js/bootstrap-button.js'
+        'bootstrap-carousel': 'bowerassets/bootstrap/docs/assets/js/bootstrap-carousel.js'
+        'bootstrap-collapse': 'bowerassets/bootstrap/docs/assets/js/bootstrap-collapse.js'
+        'bootstrap-dropdown': 'bowerassets/bootstrap/docs/assets/js/bootstrap-dropdown.js'
+        'bootstrap-modal': 'bowerassets/bootstrap/docs/assets/js/bootstrap-modal.js'
+        'bootstrap-popover': 'bowerassets/bootstrap/docs/assets/js/bootstrap-popover.js'
+        'bootstrap-scrollspy': 'bowerassets/bootstrap/docs/assets/js/bootstrap-scrollspy.js'
+        'bootstrap-tab': 'bowerassets/bootstrap/docs/assets/js/bootstrap-tab.js'
+        'bootstrap-tooltip': 'bowerassets/bootstrap/docs/assets/js/bootstrap-tooltip.js'
+        'bootstrap-transition': 'bowerassets/bootstrap/docs/assets/js/bootstrap-transition.js'
+        'bootstrap-typeahead': 'bowerassets/bootstrap/docs/assets/js/bootstrap-typeahead.js'
+        'bootstrap': 'bundles/oroui/lib/bootstrap.js'
         'underscore': 'bundles/components/underscore/underscore.js'
         'backbone': 'bundles/components/backbone/backbone.js'
-        'chaplin': 'bundles/oroui/lib/chaplin-1.0.0.js'
+        'chaplin': 'bundles/bowerassets/chaplin/chaplin.js'
 
         'controllers/page-controller': 'bundles/oroui/js/app/controllers/page-controller.js'
 
         'oroui/js/input-widget-manager': 'bundles/oroui/js/input-widget-manager.js'
+
+        'oroui/js/app/modules/layout-module': 'bundles/oroui/js/app/modules/layout-module.js'
+        'oroui/js/app/models/base/collection': 'bundles/oroui/js/app/models/base/collection.js'
+        'oroui/blank/js/app/modules/views-module': 'oroui/blank/js/app/modules/views-module.js'
     appmodules:
+        - oroui/js/app/modules/layout-module
+        - oroui/blank/js/app/modules/views-module
         - oroui/js/input-widget-manager

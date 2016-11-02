@@ -19,16 +19,7 @@ class InstallationStep extends AbstractStep
         $action = $this->getRequest()->query->get('action');
         switch ($action) {
             case 'fixtures':
-                return $this->handleAjaxAction(
-                    'oro:migration:data:load',
-                    array(
-                        '--fixtures-type' => 'demo',
-                        '--disabled-listeners' => array(
-                            'oro_dataaudit.listener.entity_listener',
-                            'oro_dataaudit.listener.deprecated_audit_data_listener'
-                        )
-                    )
-                );
+                return $this->handleAjaxAction('oro:migration:data:load', array('--fixtures-type' => 'demo'));
             case 'navigation':
                 return $this->handleAjaxAction('oro:navigation:init');
             case 'js-routing':

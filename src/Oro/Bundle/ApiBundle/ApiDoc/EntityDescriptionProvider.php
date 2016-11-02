@@ -14,6 +14,7 @@ class EntityDescriptionProvider
 {
     const DESCRIPTION        = 'description';
     const PLURAL_DESCRIPTION = 'plural_description';
+    const DOCUMENTATION      = 'documentation';
     const MANAGEABLE         = 'manageable';
     const CONFIGURABLE       = 'configurable';
     const FIELDS             = 'fields';
@@ -82,9 +83,6 @@ class EntityDescriptionProvider
         }
 
         $result = $this->entityClassNameProvider->getEntityClassName($entityClass);
-        if ($result) {
-            $result = $this->normalizeEntityDescription($result);
-        }
         $this->cache[$entityClass][self::DESCRIPTION] = $result;
 
         return $result;
@@ -107,10 +105,29 @@ class EntityDescriptionProvider
         }
 
         $result = $this->entityClassNameProvider->getEntityClassPluralName($entityClass);
-        if ($result) {
-            $result = $this->normalizeEntityDescription($result);
-        }
         $this->cache[$entityClass][self::PLURAL_DESCRIPTION] = $result;
+
+        return $result;
+    }
+
+    /**
+     * Returns the detailed documentation in English of the given entity type.
+     *
+     * @param string $entityClass
+     *
+     * @return string|null
+     */
+    public function getEntityDocumentation($entityClass)
+    {
+        if (!isset($this->cache[$entityClass])) {
+            $this->cache[$entityClass] = [];
+        }
+        if (array_key_exists(self::DOCUMENTATION, $this->cache[$entityClass])) {
+            return $this->cache[$entityClass][self::DOCUMENTATION];
+        }
+
+        $result = $this->findEntityDocumentation($entityClass);
+        $this->cache[$entityClass][self::DOCUMENTATION] = $result;
 
         return $result;
     }
@@ -125,30 +142,52 @@ class EntityDescriptionProvider
      */
     public function getFieldDescription($entityClass, $propertyPath)
     {
-        if (!isset($this->cache[$entityClass][self::FIELDS])) {
-            $this->cache[$entityClass][self::FIELDS] = [];
+        if (!isset($this->cache[$entityClass][self::FIELDS][$propertyPath])) {
+            $this->cache[$entityClass][self::FIELDS][$propertyPath] = [];
         }
-        if (array_key_exists($propertyPath, $this->cache[$entityClass][self::FIELDS])) {
-            return $this->cache[$entityClass][self::FIELDS][$propertyPath];
+        if (array_key_exists(self::DESCRIPTION, $this->cache[$entityClass][self::FIELDS][$propertyPath])) {
+            return $this->cache[$entityClass][self::FIELDS][$propertyPath][self::DESCRIPTION];
         }
 
         $result = null;
-        if (!array_key_exists(self::MANAGEABLE, $this->cache[$entityClass])) {
-            $this->cache[$entityClass][self::MANAGEABLE] = $this->doctrineHelper->isManageableEntity($entityClass);
+        if ($this->isManageableEntity($entityClass) && $this->isConfigurableEntity($entityClass)) {
+            $result = $this->findFieldDescription($entityClass, $propertyPath);
         }
-        if ($this->cache[$entityClass][self::MANAGEABLE]) {
-            if (!array_key_exists(self::CONFIGURABLE, $this->cache[$entityClass])) {
-                $this->cache[$entityClass][self::CONFIGURABLE] = $this->entityConfigProvider->hasConfig($entityClass);
-            }
-            if ($this->cache[$entityClass][self::CONFIGURABLE]) {
-                $result = $this->findFieldDescription($entityClass, $propertyPath);
-            }
+        if (!$result && false === strpos($propertyPath, '.')) {
+            $result = $this->humanizePropertyName($propertyPath);
         }
-        if (!$result) {
-            $result = $this->humanizePropertyPath($propertyPath);
+        if ($result) {
+            $result = strtolower($result);
         }
-        $result = $this->normalizeFieldDescription($result);
-        $this->cache[$entityClass][self::FIELDS][$propertyPath] = $result;
+
+        $this->cache[$entityClass][self::FIELDS][$propertyPath][self::DESCRIPTION] = $result;
+
+        return $result;
+    }
+
+    /**
+     * Returns the detailed documentation in English of the given entity field.
+     *
+     * @param string $entityClass
+     * @param string $propertyPath
+     *
+     * @return string|null
+     */
+    public function getFieldDocumentation($entityClass, $propertyPath)
+    {
+        if (!isset($this->cache[$entityClass][self::FIELDS][$propertyPath])) {
+            $this->cache[$entityClass][self::FIELDS][$propertyPath] = [];
+        }
+        if (array_key_exists(self::DOCUMENTATION, $this->cache[$entityClass][self::FIELDS][$propertyPath])) {
+            return $this->cache[$entityClass][self::FIELDS][$propertyPath][self::DOCUMENTATION];
+        }
+
+        $result = null;
+        if ($this->isManageableEntity($entityClass) && $this->isConfigurableEntity($entityClass)) {
+            $result = $this->findFieldDocumentation($entityClass, $propertyPath);
+        }
+
+        $this->cache[$entityClass][self::FIELDS][$propertyPath][self::DOCUMENTATION] = $result;
 
         return $result;
     }
@@ -162,9 +201,26 @@ class EntityDescriptionProvider
      */
     public function humanizeAssociationName($associationName)
     {
-        return $this->normalizeAssociationDescription(
-            $this->humanizePropertyPath($associationName)
-        );
+        return $this->humanizePropertyName($associationName);
+    }
+
+    /**
+     * @param string $entityClass
+     *
+     * @return string|null
+     */
+    protected function findEntityDocumentation($entityClass)
+    {
+        $result = null;
+        $config = $this->getEntityConfig($entityClass);
+        if (null !== $config) {
+            $label = $config->get('description');
+            if ($label) {
+                $result = $this->trans($label);
+            }
+        }
+
+        return $result;
     }
 
     /**
@@ -180,8 +236,27 @@ class EntityDescriptionProvider
         if (null !== $config) {
             $label = $config->get('label');
             if ($label) {
-                $translated = $this->translator->trans($label);
-                $result = $translated ?: $label;
+                $result = $this->trans($label);
+            }
+        }
+
+        return $result;
+    }
+
+    /**
+     * @param string $entityClass
+     * @param string $propertyPath
+     *
+     * @return string|null
+     */
+    protected function findFieldDocumentation($entityClass, $propertyPath)
+    {
+        $result = null;
+        $config = $this->findFieldConfig($entityClass, $propertyPath);
+        if (null !== $config) {
+            $label = $config->get('description');
+            if ($label) {
+                $result = $this->trans($label);
             }
         }
 
@@ -211,6 +286,18 @@ class EntityDescriptionProvider
 
     /**
      * @param string $entityClass
+     *
+     * @return ConfigInterface|null
+     */
+    protected function getEntityConfig($entityClass)
+    {
+        return $this->entityConfigProvider->hasConfig($entityClass)
+            ? $this->entityConfigProvider->getConfig($entityClass)
+            : null;
+    }
+
+    /**
+     * @param string $entityClass
      * @param string $fieldName
      *
      * @return ConfigInterface|null
@@ -227,7 +314,7 @@ class EntityDescriptionProvider
      *
      * @return string
      */
-    protected function humanizePropertyPath($propertyPath)
+    protected function humanizePropertyName($propertyPath)
     {
         return preg_replace(
             '/(?<=[^A-Z])([A-Z])/',
@@ -237,32 +324,44 @@ class EntityDescriptionProvider
     }
 
     /**
-     * @param string $description
+     * @param string $label
      *
-     * @return string
+     * @return string|null
      */
-    protected function normalizeEntityDescription($description)
+    protected function trans($label)
     {
-        return ucwords($description);
+        $translated = $this->translator->trans($label);
+
+        return !empty($translated) && $translated !== $label
+            ? $translated
+            : null;
     }
 
     /**
-     * @param string $description
+     * @param string $entityClass
      *
-     * @return string
+     * @return bool
      */
-    protected function normalizeFieldDescription($description)
+    protected function isManageableEntity($entityClass)
     {
-        return ucwords($description);
+        if (!array_key_exists(self::MANAGEABLE, $this->cache[$entityClass])) {
+            $this->cache[$entityClass][self::MANAGEABLE] = $this->doctrineHelper->isManageableEntity($entityClass);
+        }
+
+        return $this->cache[$entityClass][self::MANAGEABLE];
     }
 
     /**
-     * @param string $description
+     * @param string $entityClass
      *
-     * @return string
+     * @return bool
      */
-    protected function normalizeAssociationDescription($description)
+    protected function isConfigurableEntity($entityClass)
     {
-        return ucwords($description);
+        if (!array_key_exists(self::CONFIGURABLE, $this->cache[$entityClass])) {
+            $this->cache[$entityClass][self::CONFIGURABLE] = $this->entityConfigProvider->hasConfig($entityClass);
+        }
+
+        return $this->cache[$entityClass][self::CONFIGURABLE];
     }
 }

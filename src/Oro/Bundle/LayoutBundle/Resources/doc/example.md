@@ -860,10 +860,18 @@ class ContainerExtension extends AbstractBlockTypeExtension
     /**
      * {@inheritdoc}
      */
-    public function finishView(BlockView $view, BlockInterface $block, Options $options)
+    public function buildView(BlockView $view, BlockInterface $block, Options $options)
     {
-        if (!empty($options['type'])) {
-            BlockUtils::registerPlugin($view, $options['type'] . '_' . $block->getTypeName());
+        BlockUtils::setViewVarsFromOptions($view, $options, ['type']);
+    }
+    
+    /**
+     * {@inheritdoc}
+     */
+    public function finishView(BlockView $view, BlockInterface $block)
+    {
+        if (!$view->vars['type']) {
+            BlockUtils::registerPlugin($view, $view->vars['type'] . '_' . $block->getTypeName());
         }
     }
 
@@ -2000,7 +2008,7 @@ For simplify block attribute configuration use twig function `layout_attr_defaul
 {% set attr = layout_attr_defaults(attr, {
     required: 'required',
     autofocus: true,
-    '~class': " input input_block input_md {{ class_prefix }}__form__input"
+    '~class': " input input--full input--size-m {{ class_prefix }}--another-modifier"
 }) %}
 ```
 If you use prefix `~` value `attr` concatenate `default_attr` value with this prefix.

@@ -7,12 +7,12 @@ use Behat\Gherkin\Node\TableNode;
 use Behat\Mink\Element\NodeElement;
 use Oro\Bundle\ActivityListBundle\Tests\Behat\Element\ActivityList;
 use Oro\Bundle\TestFrameworkBundle\Behat\Context\OroFeatureContext;
-use Oro\Bundle\TestFrameworkBundle\Behat\Element\OroElementFactoryAware;
-use Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context\ElementFactoryDictionary;
+use Oro\Bundle\TestFrameworkBundle\Behat\Element\OroPageObjectAware;
+use Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context\PageObjectDictionary;
 
-class ActivityContext extends OroFeatureContext implements OroElementFactoryAware, SnippetAcceptingContext
+class ActivityContext extends OroFeatureContext implements OroPageObjectAware, SnippetAcceptingContext
 {
-    use ElementFactoryDictionary;
+    use PageObjectDictionary;
 
     /**
      * Assert that activity item with given text is present in activity list

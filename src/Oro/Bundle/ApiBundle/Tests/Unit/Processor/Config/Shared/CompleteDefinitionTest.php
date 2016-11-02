@@ -2475,4 +2475,310 @@ class CompleteDefinitionTest extends ConfigProcessorTestCase
             $this->context->getResult()
         );
     }
+
+    public function testProcessNestedObjectForNotManageableEntity()
+    {
+        $config = [
+            'fields' => [
+                'field1' => [
+                    'data_type'    => 'nestedObject',
+                    'form_options' => [
+                        'data_class' => 'Test\Target'
+                    ],
+                    'fields'       => [
+                        'field11' => [
+                            'property_path' => 'field2'
+                        ]
+                    ]
+                ],
+                'field2' => [
+                    'exclude' => true
+                ]
+            ]
+        ];
+
+        $this->doctrineHelper->expects($this->once())
+            ->method('isManageableEntityClass')
+            ->with(self::TEST_CLASS_NAME)
+            ->willReturn(false);
+        $this->doctrineHelper->expects($this->never())
+            ->method('getEntityMetadataForClass');
+
+        $this->context->setResult($this->createConfigObject($config));
+        $this->processor->process($this->context);
+
+        $this->assertConfig(
+            [
+                'exclusion_policy' => 'all',
+                'fields'           => [
+                    'field1' => [
+                        'data_type'        => 'nestedObject',
+                        'form_options'     => [
+                            'data_class'    => 'Test\Target',
+                            'property_path' => 'field1'
+                        ],
+                        'fields'           => [
+                            'field11' => [
+                                'property_path' => 'field2'
+                            ]
+                        ],
+                        'property_path'    => ConfigUtil::IGNORE_PROPERTY_PATH,
+                        'exclusion_policy' => 'all',
+                        'depends_on'       => ['field2']
+                    ],
+                    'field2' => [
+                        'exclude' => true
+                    ]
+                ]
+            ],
+            $this->context->getResult()
+        );
+    }
+
+    public function testProcessNestedObjectForManageableEntity()
+    {
+        $config = [
+            'fields' => [
+                'id'     => null,
+                'field1' => [
+                    'data_type'    => 'nestedObject',
+                    'form_options' => [
+                        'data_class' => 'Test\Target'
+                    ],
+                    'fields'       => [
+                        'field11' => [
+                            'property_path' => 'field2'
+                        ]
+                    ]
+                ],
+                'field2' => [
+                    'exclude' => true
+                ]
+            ]
+        ];
+
+        $rootEntityMetadata = $this->getClassMetadataMock(self::TEST_CLASS_NAME);
+
+        $rootEntityMetadata->expects($this->any())
+            ->method('getIdentifierFieldNames')
+            ->willReturn(['id']);
+        $rootEntityMetadata->expects($this->once())
+            ->method('getFieldNames')
+            ->willReturn(['id', 'field1', 'field2']);
+        $rootEntityMetadata->expects($this->once())
+            ->method('getAssociationMappings')
+            ->willReturn([]);
+
+        $this->doctrineHelper->expects($this->once())
+            ->method('isManageableEntityClass')
+            ->with(self::TEST_CLASS_NAME)
+            ->willReturn(true);
+        $this->doctrineHelper->expects($this->once())
+            ->method('getEntityMetadataForClass')
+            ->with(self::TEST_CLASS_NAME)
+            ->willReturn($rootEntityMetadata);
+
+        $this->context->setResult($this->createConfigObject($config));
+        $this->processor->process($this->context);
+
+        $this->assertConfig(
+            [
+                'exclusion_policy'       => 'all',
+                'identifier_field_names' => ['id'],
+                'fields'                 => [
+                    'id'     => null,
+                    'field1' => [
+                        'data_type'        => 'nestedObject',
+                        'form_options'     => [
+                            'data_class'    => 'Test\Target',
+                            'property_path' => 'field1'
+                        ],
+                        'fields'           => [
+                            'field11' => [
+                                'property_path' => 'field2'
+                            ]
+                        ],
+                        'property_path'    => ConfigUtil::IGNORE_PROPERTY_PATH,
+                        'exclusion_policy' => 'all',
+                        'depends_on'       => ['field2']
+                    ],
+                    'field2' => [
+                        'exclude' => true
+                    ]
+                ]
+            ],
+            $this->context->getResult()
+        );
+    }
+
+    public function testProcessNestedObjectForRenamedField()
+    {
+        $config = [
+            'fields' => [
+                'field1' => [
+                    'data_type'    => 'nestedObject',
+                    'form_options' => [
+                        'data_class'    => 'Test\Target',
+                        'property_path' => 'otherField'
+                    ],
+                    'fields'       => [
+                        'field11' => [
+                            'property_path' => 'field2'
+                        ]
+                    ]
+                ],
+                'field2' => [
+                    'exclude' => true
+                ]
+            ]
+        ];
+
+        $this->doctrineHelper->expects($this->once())
+            ->method('isManageableEntityClass')
+            ->with(self::TEST_CLASS_NAME)
+            ->willReturn(false);
+        $this->doctrineHelper->expects($this->never())
+            ->method('getEntityMetadataForClass');
+
+        $this->context->setResult($this->createConfigObject($config));
+        $this->processor->process($this->context);
+
+        $this->assertConfig(
+            [
+                'exclusion_policy' => 'all',
+                'fields'           => [
+                    'field1' => [
+                        'data_type'        => 'nestedObject',
+                        'form_options'     => [
+                            'data_class'    => 'Test\Target',
+                            'property_path' => 'otherField'
+                        ],
+                        'fields'           => [
+                            'field11' => [
+                                'property_path' => 'field2'
+                            ]
+                        ],
+                        'property_path'    => ConfigUtil::IGNORE_PROPERTY_PATH,
+                        'exclusion_policy' => 'all',
+                        'depends_on'       => ['field2']
+                    ],
+                    'field2' => [
+                        'exclude' => true
+                    ]
+                ]
+            ],
+            $this->context->getResult()
+        );
+    }
+
+    public function testProcessNestedObjectWithoutFormOptions()
+    {
+        $config = [
+            'fields' => [
+                'field1' => [
+                    'data_type' => 'nestedObject',
+                    'fields'    => [
+                        'field11' => [
+                            'property_path' => 'field2'
+                        ]
+                    ]
+                ],
+                'field2' => [
+                    'exclude' => true
+                ]
+            ]
+        ];
+
+        $this->doctrineHelper->expects($this->once())
+            ->method('isManageableEntityClass')
+            ->with(self::TEST_CLASS_NAME)
+            ->willReturn(false);
+        $this->doctrineHelper->expects($this->never())
+            ->method('getEntityMetadataForClass');
+
+        $this->context->setResult($this->createConfigObject($config));
+        $this->processor->process($this->context);
+
+        $this->assertConfig(
+            [
+                'exclusion_policy' => 'all',
+                'fields'           => [
+                    'field1' => [
+                        'data_type'        => 'nestedObject',
+                        'form_options'     => [
+                            'property_path' => 'field1'
+                        ],
+                        'fields'           => [
+                            'field11' => [
+                                'property_path' => 'field2'
+                            ]
+                        ],
+                        'property_path'    => ConfigUtil::IGNORE_PROPERTY_PATH,
+                        'exclusion_policy' => 'all',
+                        'depends_on'       => ['field2']
+                    ],
+                    'field2' => [
+                        'exclude' => true
+                    ]
+                ]
+            ],
+            $this->context->getResult()
+        );
+    }
+
+    public function testProcessNestedObjectWhenDependsOnIsPartiallySet()
+    {
+        $config = [
+            'fields' => [
+                'field1' => [
+                    'data_type'  => 'nestedObject',
+                    'depends_on' => ['field3'],
+                    'fields'     => [
+                        'field11' => [
+                            'property_path' => 'field2'
+                        ],
+                        'field12' => [
+                            'property_path' => 'field3'
+                        ]
+                    ]
+                ]
+            ]
+        ];
+
+        $this->doctrineHelper->expects($this->once())
+            ->method('isManageableEntityClass')
+            ->with(self::TEST_CLASS_NAME)
+            ->willReturn(false);
+        $this->doctrineHelper->expects($this->never())
+            ->method('getEntityMetadataForClass');
+
+        $this->context->setResult($this->createConfigObject($config));
+        $this->processor->process($this->context);
+
+        $this->assertConfig(
+            [
+                'exclusion_policy' => 'all',
+                'fields'           => [
+                    'field1' => [
+                        'data_type'        => 'nestedObject',
+                        'form_options'     => [
+                            'property_path' => 'field1'
+                        ],
+                        'fields'           => [
+                            'field11' => [
+                                'property_path' => 'field2'
+                            ],
+                            'field12' => [
+                                'property_path' => 'field3'
+                            ]
+                        ],
+                        'property_path'    => ConfigUtil::IGNORE_PROPERTY_PATH,
+                        'exclusion_policy' => 'all',
+                        'depends_on'       => ['field3', 'field2']
+                    ]
+                ]
+            ],
+            $this->context->getResult()
+        );
+    }
 }

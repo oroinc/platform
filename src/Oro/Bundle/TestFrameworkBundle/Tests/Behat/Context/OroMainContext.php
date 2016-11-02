@@ -3,7 +3,6 @@
 namespace Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context;
 
 use Behat\Behat\Context\SnippetAcceptingContext;
-use Behat\Behat\Hook\Scope\BeforeScenarioScope;
 use Behat\Gherkin\Node\TableNode;
 use Behat\Mink\Element\NodeElement;
 use Behat\MinkExtension\Context\MinkContext;
@@ -11,29 +10,29 @@ use Behat\Mink\Exception\ElementNotFoundException;
 use Behat\Symfony2Extension\Context\KernelAwareContext;
 use Behat\Symfony2Extension\Context\KernelDictionary;
 use Doctrine\Common\Inflector\Inflector;
+use Oro\Bundle\AttachmentBundle\Tests\Behat\Element\AttachmentItem;
 use Oro\Bundle\FormBundle\Tests\Behat\Element\OroForm;
 use Oro\Bundle\NavigationBundle\Tests\Behat\Element\MainMenu;
 use Oro\Bundle\TestFrameworkBundle\Behat\Driver\OroSelenium2Driver;
 use Oro\Bundle\TestFrameworkBundle\Behat\Context\AssertTrait;
 use Oro\Bundle\TestFrameworkBundle\Behat\Element\CollectionField;
 use Oro\Bundle\TestFrameworkBundle\Behat\Element\Form;
-use Oro\Bundle\TestFrameworkBundle\Behat\Element\OroElementFactoryAware;
+use Oro\Bundle\TestFrameworkBundle\Behat\Element\OroPageObjectAware;
 
 /**
- * Defines application features from the specific context.
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
 class OroMainContext extends MinkContext implements
     SnippetAcceptingContext,
-    OroElementFactoryAware,
+    OroPageObjectAware,
     KernelAwareContext
 {
-    use AssertTrait;
-    use KernelDictionary, ElementFactoryDictionary;
+    use AssertTrait, KernelDictionary, PageObjectDictionary;
 
     /**
      * @BeforeScenario
      */
-    public function beforeScenario(BeforeScenarioScope $scope)
+    public function beforeScenario()
     {
         $this->getSession()->resizeWindow(1920, 1080, 'current');
     }
@@ -124,18 +123,11 @@ class OroMainContext extends MinkContext implements
     }
 
     /**
-     * @Then /^(?:|I )click update schema$/
+     * @Then page has :header header
      */
-    public function iClickUpdateSchema()
+    public function pageHasHeader($header)
     {
-        /** @var OroSelenium2Driver $driver */
-        $driver = $this->getSession()->getDriver();
-        $page = $this->getPage();
-
-        $page->clickLink('Update schema');
-        $driver->waitForAjax();
-        $page->clickLink('Yes, Proceed');
-        $driver->waitForAjax(120000);
+        $this->assertSession()->elementTextContains('css', 'div#container h1', $header);
     }
 
     /**
@@ -146,6 +138,14 @@ class OroMainContext extends MinkContext implements
     public function closeErrorMessage()
     {
         $this->createOroForm()->find('css', '.alert-error button.close')->press();
+    }
+
+    /**
+     * @Then /^(?:|I )close ui dialog$/
+     */
+    public function closeUiDialog()
+    {
+        $this->getSession()->getPage()->find('css', 'button.ui-dialog-titlebar-close')->press();
     }
 
     /**
@@ -170,7 +170,7 @@ class OroMainContext extends MinkContext implements
      *            | Users       | [Charlie, Pitt] |
      *            | Date        | 2017-08-24      |
      *
-     * @When /^(?:|I )fill "(?P<formName>(?:[^"]|\\")*)" form with:$/
+     * @When /^(?:|I )fill "(?P<formName>(?:[^"]|\\")*)" with:$/
      * @When /^(?:|I )fill form with:$/
      */
     public function iFillFormWith(TableNode $table, $formName = "OroForm")
@@ -178,6 +178,23 @@ class OroMainContext extends MinkContext implements
         /** @var Form $form */
         $form = $this->createElement($formName);
         $form->fill($table);
+    }
+
+    /**
+     * Assert form fields values
+     * Example: And "User" form must contains values:
+     *            | Username          | charlie           |
+     *            | First Name        | Charlie           |
+     *            | Last Name         | Sheen             |
+     *            | Primary Email     | charlie@sheen.com |
+     *
+     * @Then /^"(?P<formName>(?:[^"]|\\")*)" must contains values:$/
+     */
+    public function formMustContainsValues($formName, TableNode $table)
+    {
+        /** @var Form $form */
+        $form = $this->createElement($formName);
+        $form->assertFields($table);
     }
 
     /**
@@ -272,6 +289,14 @@ class OroMainContext extends MinkContext implements
     }
 
     /**
+     * @When /^(?:|I )click on "(?P<element>[\w\s]+)"$/
+     */
+    public function iClickOn($element)
+    {
+        $this->createElement($element)->click();
+    }
+
+    /**
      * @Then /^(?:|I )should see large image$/
      */
     public function iShouldSeeLargeImage()
@@ -288,6 +313,35 @@ class OroMainContext extends MinkContext implements
         $page = $this->getSession()->getPage();
         $page->find('css', '.lg-image')->mouseOver();
         $page->find('css', 'span.lg-close')->click();
+    }
+
+    /**
+     * @Then /^(?:|I )click on "(?P<text>[^"]+)" attachment thumbnail$/
+     */
+    public function commentAttachmentShouldProperlyWork($text)
+    {
+        /** @var AttachmentItem $attachmentItem */
+        $attachmentItem = $this->elementFactory->findElementContains('AttachmentItem', $text);
+        self::assertTrue($attachmentItem->isValid(), sprintf('Attachment with "%s" text not found', $text));
+
+        $attachmentItem->clickOnAttachmentThumbnail();
+
+        $thumbnail = $this->getPage()->find('css', "div.thumbnail a[title='$text']");
+        self::assertTrue($thumbnail->isValid(), sprintf('Thumbnail "%s" not found', $text));
+
+        $thumbnail->click();
+    }
+
+    /**
+     * @Then /^download link for "(?P<text>[^"]+)" attachment should work$/
+     */
+    public function downloadLinkForAttachmentShouldWork($text)
+    {
+        /** @var AttachmentItem $attachmentItem */
+        $attachmentItem = $this->elementFactory->findElementContains('AttachmentItem', $text);
+        self::assertTrue($attachmentItem->isValid(), sprintf('Attachment with "%s" text not found', $text));
+
+        $attachmentItem->checkDownloadLink();
     }
 
      /**
@@ -312,13 +366,24 @@ class OroMainContext extends MinkContext implements
      * Example: Given I go to System/ Channels
      * Example: And go to System/ User Management/ Users
      *
-     * @Given /^(?:|I )go to (?P<path>(?:(?!([nN]ewer|[oO]lder) activities)([^"]*)))$/
+     * @Given /^(?:|I )go to (?P<path>(?:(?!([nN]ewer|[oO]lder) activities)(?!.*page)([^"]*)))$/
      */
     public function iOpenTheMenuAndClick($path)
     {
         /** @var MainMenu $mainMenu */
         $mainMenu = $this->createElement('MainMenu');
         $mainMenu->openAndClick($path);
+    }
+
+    /**
+     * @Given /^(?:|I )should be on (?P<page>[\w\s\/]+) page$/
+     */
+    public function assertPage($page)
+    {
+        $urlPath = parse_url($this->getSession()->getCurrentUrl(), PHP_URL_PATH);
+        $route = $this->getContainer()->get('router')->match($urlPath);
+
+        self::assertEquals($route['_route'], $this->getPage($page)->getRoute());
     }
 
     /**
@@ -343,14 +408,6 @@ class OroMainContext extends MinkContext implements
     public function iSaveForm()
     {
         $this->createOroForm()->save();
-    }
-
-    /**
-     * @Given /^(?:|I |I'm )edit entity$/
-     */
-    public function iMEditEntity()
-    {
-        $this->createElement('Entity Edit Button')->click();
     }
 
     /**
@@ -413,11 +470,11 @@ class OroMainContext extends MinkContext implements
     }
 
     /**
-     * Assert text by label in page. Accept regexp as parameter to label
+     * Assert text by label in page.
      * Example: Then I should see call with:
      *            | Subject             | Proposed Charlie to star in new film |
      *            | Additional comments | Charlie was in a good mood           |
-     *            | Call date & time    | Aug 24, 2017,? 11:00 AM              |
+     *            | Call date & time    | Aug 24, 2017, 11:00 AM               |
      *            | Phone number        | (310) 475-0859                       |
      *            | Direction           | Outgoing                             |
      *            | Duration            | 5:30                                 |
@@ -437,7 +494,7 @@ class OroMainContext extends MinkContext implements
             foreach ($labels as $label) {
                 $text = $label->getParent()->find('css', 'div.controls div.control-label')->getText();
 
-                if (false !== preg_match(sprintf('/%s/i', $row[1]), $text)) {
+                if (1 === preg_match(sprintf('/%s/i', preg_quote($row[1])), $text)) {
                     continue 2;
                 }
             }
@@ -459,12 +516,53 @@ class OroMainContext extends MinkContext implements
     }
 
     /**
+     * {@inheritdoc}
+     */
+    public function fillField($field, $value)
+    {
+        $field = $this->fixStepArgument($field);
+        $value = $this->fixStepArgument($value);
+        $this->createOroForm()->fillField($field, $value);
+    }
+
+    /**
      * @Then /^(?P<label>[\w\s]+) is a required field$/
      */
     public function fieldIsRequired($label)
     {
         $labelElement = $this->getPage()->findElementContains('Label', $label);
         self::assertTrue($labelElement->hasClass('required'));
+    }
+
+        /**
+     * @When /^(?:|I )type "(?P<value>(?:[^"]|\\")*)" in "(?P<field>(?:[^"]|\\")*)"$/
+     */
+    public function iTypeInFieldWith($locator, $value)
+    {
+        $locator = $this->fixStepArgument($locator);
+        $value = $this->fixStepArgument($value);
+        $field = $this->getPage()->find('named', array('field', $locator));
+        /** @var OroSelenium2Driver $driver */
+        $driver = $this->getSession()->getDriver();
+
+        if (null === $field) {
+            throw new ElementNotFoundException($driver, 'form field', 'id|name|label|value|placeholder', $locator);
+        }
+
+        self::assertTrue($field->isVisible(), "Field with '$locator' was found, but it not visible");
+
+        $driver->typeIntoInput($field->getXpath(), $value);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function assertElementOnPage($element)
+    {
+        self::assertTrue(
+            $this->createElement($element)->isVisible(),
+            sprintf('Element "%s" is not visible, or not present on the page', $element)
+        );
     }
 
     /**.

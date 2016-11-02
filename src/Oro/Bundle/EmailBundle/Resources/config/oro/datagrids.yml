@@ -100,7 +100,7 @@ datagrids:
                 select:
                     - partial eu.{id, email}
                     - e
-                    - eb.bodyContent AS body_content
+                    - eb.textBody AS body_content
                     - >
                         (SELECT COUNT(_ec.id)
                         FROM OroEmailBundle:Email _ec
@@ -129,6 +129,11 @@ datagrids:
                         -
                             join: e.emailBody
                             alias: eb
+# The next join is performed in EmailGridListener, when any of grid filters are applied: folder, folders, mailbox.
+#                        -
+#                            join: eu.folders
+#                            alias: f
+# Attributes from f are used in ChoiceMessageTypeFilter also.
                 where:
                     and:
                         - >
@@ -313,7 +318,7 @@ datagrids:
                 select:
                     - partial e.{ id, subject, sentAt }
                     - partial eu.{ id, receivedAt, email }
-                    - eb.bodyContent AS body_content
+                    - eb.textBody AS body_content
                     - a
                     - CASE WHEN eu.seen = true THEN 0 ELSE 1 END as is_new
                 from:
@@ -336,6 +341,15 @@ datagrids:
                 type: callback
                 className: 'email-row-is-readed'
                 callable: "@oro_email.helper.datagrid.emails->getReadedRowClosure"
+            email.id: ~
+            view_thread_link:
+                type: url
+                route: oro_email_thread_widget
+                params: { id: email.id }
+            reply_email_link:
+                type: url
+                route: oro_email_email_reply
+                params: { id: email.id }
         options:
             entityHint: email
             toolbarOptions:
@@ -345,6 +359,38 @@ datagrids:
                 pageSize:
                     items: [10]
                     default_per_page: 10
+        actions:
+            reply:
+                type: dialog
+                label: oro.email.datagrid.emails.action.reply
+                link:  reply_email_link
+                icon: reply
+                widgetOptions:
+                    options:
+                        dialogOptions:
+                            title:         "@translator->trans(oro.dashboard.recent_emails.reply)"
+                            allowMaximize: false
+                            allowMinimize: false
+                            modal:         true
+                            dblclick:      maximize
+                            maximizedHeightDecreaseBy: minimize-bar
+                            width: 700
+            view_thread:
+                type: dialog
+                label: oro.email.datagrid.emails.action.view
+                link: view_thread_link
+                icon: eye-open
+                rowAction: true
+                widgetOptions:
+                    options:
+                        dialogOptions:
+                            title:         "@translator->trans(oro.dashboard.recent_emails.view_email)"
+                            allowMaximize: false
+                            allowMinimize: false
+                            modal:         true
+                            dblclick:      maximize
+                            maximizedHeightDecreaseBy: minimize-bar
+                            width: 700
 
     dashboard-recent-emails-inbox-grid:
         extends: dashboard-recent-emails-grid

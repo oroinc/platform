@@ -16,8 +16,8 @@
 
         padding: 0 $offset-y-m;
 
-        line-height: ($font-size - 0.1) * 2;
-        font-family: $roboto-font;
+        line-height: ($base-font-size - 0.1) * 2;
+        font-family: $bae-font-minor;
         text-align: center;
 
         cursor: pointer;
@@ -38,7 +38,9 @@
 
         padding: 10px 15px;
 
-        background: $base-background-color;
+        font-size: $base-font-size;
+
+        background: get-color('additional', 'ultra');
         border-radius: 2px;
         box-shadow: 0 4px 5px 0 rgba(0,0,0,.4);
     }
@@ -65,10 +67,10 @@
 
         line-height: 2;
 
-        color: $base-font-color;
+        color: get-color('additional', 'dark');
 
         &:hover {
-            color: $base-font-color;
+            color: get-color('additional', 'dark');
         }
     }
 
@@ -83,7 +85,8 @@
     }
 
     // toolbar open
-    &.active {
+    &.active,
+    &.open {
         .oro-toolbar__content {
             box-shadow: inset 1px 1px 3px 0 rgba(0,0,0,.3);
         }
