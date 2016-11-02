@@ -14,6 +14,7 @@ define([
     layoutSubtreeManager = {
         url: window.location.href,
         method: 'get',
+        layoutSubtreeCollection: [],
         reloadEvents: {},
 
         /**
@@ -21,14 +22,15 @@ define([
          *
          * @param {object} layoutSubtreeOptions
          */
-        addLayoutSubtreeInstance: function(layoutSubtreeOptions) {
-            if (layoutSubtreeOptions.reloadEvents instanceof Array) {
-                layoutSubtreeOptions.reloadEvents.map((function(item, index) {
-                    if (!this.reloadEvents[item]) {
-                        this.reloadEvents[item] = [];
-                        mediator.on(item, this._reloadLayouts.bind(this, item));
+        addLayoutSubtreeInstance: function(layoutSubtreeView) {
+            this.layoutSubtreeCollection[layoutSubtreeView.options.rootId] = layoutSubtreeView;
+            if (layoutSubtreeView.options.reloadEvents instanceof Array) {
+                layoutSubtreeView.options.reloadEvents.map((function(eventItem, index) {
+                    if (!this.reloadEvents[eventItem]) {
+                        this.reloadEvents[eventItem] = [];
+                        mediator.on(eventItem, this._reloadLayouts.bind(this, eventItem));
                     }
-                    this.reloadEvents[item].push(layoutSubtreeOptions.rootId);
+                    this.reloadEvents[eventItem].push(layoutSubtreeView.options.rootId);
                 }).bind(this));
             }
         },
@@ -38,17 +40,75 @@ define([
          *
          * @param {string} rootId unique layoutSubtree identifier
          */
-        removeLayoutSubtreeInstance: function(layoutSubtreeOptions) {
-            Object.keys(this.reloadEvents).map((function(item) {
-                var index = item.indexOf(layoutSubtreeOptions.rootId);
+        removeLayoutSubtreeInstance: function(layoutSubtreeRootId) {
+            delete this.layoutSubtreeCollection[layoutSubtreeRootId];
+            Object.keys(this.reloadEvents).map((function(eventItem) {
+                var index = eventItem.indexOf(layoutSubtreeRootId);
                 if (index > -1) {
-                    item.splice(index, 1);
+                    eventItem.splice(index, 1);
                 }
-                if (!item.length) {
-                    delete this.reloadEvents[item];
+                if (!eventItem.length) {
+                    delete this.reloadEvents[eventItem];
                     mediator.off(event, this._reloadLayouts, this);
                 }
             }).bind(this));
+        },
+
+        /**
+         * Call layoutSubtreeView methods from collection.
+         *
+         * @param {string} event name of fired event
+         */
+        _callLayoutSubtreeViewMethod: function(idsIterator, methodName, methodParams) {
+            idsIterator.map((function(rootId) {
+                if (typeof this.layoutSubtreeCollection[rootId] !== 'undefined') {
+                    var methodArguments = typeof methodParams === 'function' ? methodParams(rootId) : [];
+                    this.layoutSubtreeCollection[rootId][methodName].apply(this.layoutSubtreeCollection[rootId], methodArguments);
+                }
+            }).bind(this));
+        },
+
+        // TODO Remove after finish backend part
+        _executeMockAjaxQuery: function(queryData, eventListeners) {
+            var dfd = $.Deferred();
+            var ajaxes = eventListeners.map(function(rootId){
+                var customAjaxDeff = $.Deferred();
+                $.ajax({
+                    url: queryData.url,
+                    method: queryData.method,
+                    data: {
+                        layout_root_id: rootId
+                    }
+                }).done(function(content){
+                    customAjaxDeff.resolve({
+                        rootId: rootId,
+                        content: content
+                    })
+                }).fail(function(jqxhr){
+                    customAjaxDeff.fail({
+                        rootId: rootId,
+                        jqxhr: jqxhr
+                    })
+                });
+                return customAjaxDeff;
+            });
+            $.when.apply($, ajaxes).then(
+                function() {
+                    var result = [];
+                    Array.prototype.slice.call(arguments).map(function(item){
+                        result[item.rootId] = item.content;
+                    });
+                    dfd.resolve(result);
+                },
+                function() {
+                    var result = [];
+                    Array.prototype.slice.call(arguments).map(function(item){
+                        result[item.rootId] = item.jqxhr;
+                    });
+                    dfd.fail(result);
+                }
+            )
+            return dfd;
         },
 
         /**
@@ -57,23 +117,30 @@ define([
          * @param {string} event name of fired event
          */
         _reloadLayouts: function(event) {
-            if (!this.reloadEvents[event] || !(this.reloadEvents[event] instanceof Array) || !this.reloadEvents[event].length) {
+            var self = this;
+            var eventListeners = this.reloadEvents[event] || [];
+            if (!(eventListeners instanceof Array) || !eventListeners.length) {
                 return;
             }
             var queryData = {
                 url: this.url,
                 data: {
-                    layout_root_id: this.reloadEvents[event]
+                    layout_root_id: eventListeners.join(',')
                 },
                 type: this.method
             };
-            mediator.trigger('layout_subtree_reload_start');
-            $.ajax(queryData)
+            this._callLayoutSubtreeViewMethod(eventListeners, '_showLoading');
+            // TODO Uncomment after finish backend part
+            //$.ajax(queryData)
+            // TODO Remove after finish backend part
+            this._executeMockAjaxQuery(queryData, eventListeners)
                 .done(function(content) {
-                    mediator.trigger('layout_subtree_reload_done', content);
+                    self._callLayoutSubtreeViewMethod(Object.keys(content), '_onContentLoad', function(rootId) {
+                        return [content[rootId]];
+                    });
                 })
                 .fail(function(jqxhr) {
-                    mediator.trigger('layout_subtree_reload_fail');
+                    self._callLayoutSubtreeViewMethod(eventListeners, '_hideLoading');
                     Error.handle({}, jqxhr, {enforce: true});
                 });
         }
