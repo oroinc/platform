@@ -2,6 +2,12 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Form;
 
+use Symfony\Component\Form\FormExtensionInterface;
+use Symfony\Component\Form\FormRegistry;
+use Symfony\Component\Form\ResolvedFormTypeFactoryInterface;
+
+use Oro\Bundle\ApiBundle\Form\Extension\SwitchableDependencyInjectionExtension;
+use Oro\Bundle\ApiBundle\Form\FormExtensionState;
 use Oro\Bundle\ApiBundle\Form\SwitchableFormRegistry;
 
 class SwitchableFormRegistryTest extends \PHPUnit_Framework_TestCase
@@ -13,13 +19,14 @@ class SwitchableFormRegistryTest extends \PHPUnit_Framework_TestCase
     public function testConstructorWithSeveralFormExtensions()
     {
         $extensions = [
-            $this->getMock('Symfony\Component\Form\FormExtensionInterface'),
-            $this->getMock('Symfony\Component\Form\FormExtensionInterface'),
+            $this->getMock(FormExtensionInterface::class),
+            $this->getMock(FormExtensionInterface::class),
         ];
 
         new SwitchableFormRegistry(
             $extensions,
-            $this->getMock('Symfony\Component\Form\ResolvedFormTypeFactoryInterface')
+            $this->getMock(ResolvedFormTypeFactoryInterface::class),
+            $this->getMock(FormExtensionState::class)
         );
     }
 
@@ -32,25 +39,26 @@ class SwitchableFormRegistryTest extends \PHPUnit_Framework_TestCase
     public function testConstructorWithUnexpectedFormExtensions()
     {
         $extensions = [
-            $this->getMock('Symfony\Component\Form\FormExtensionInterface'),
+            $this->getMock(FormExtensionInterface::class),
         ];
 
         new SwitchableFormRegistry(
             $extensions,
-            $this->getMock('Symfony\Component\Form\ResolvedFormTypeFactoryInterface')
+            $this->getMock(ResolvedFormTypeFactoryInterface::class),
+            $this->getMock(FormExtensionState::class)
         );
     }
 
     public function testShouldBePossibleToSetTypesAndGuesser()
     {
-        $extension = $this
-            ->getMockBuilder('Oro\Bundle\ApiBundle\Form\Extension\SwitchableDependencyInjectionExtension')
+        $extension = $this->getMockBuilder(SwitchableDependencyInjectionExtension::class)
             ->disableOriginalConstructor()
             ->getMock();
 
         $formRegistry = new SwitchableFormRegistry(
             [$extension],
-            $this->getMock('Symfony\Component\Form\ResolvedFormTypeFactoryInterface')
+            $this->getMock(ResolvedFormTypeFactoryInterface::class),
+            $this->getMock(FormExtensionState::class)
         );
 
         $this->setPrivatePropertyValue($formRegistry, 'types', null);
@@ -65,15 +73,19 @@ class SwitchableFormRegistryTest extends \PHPUnit_Framework_TestCase
             ->getMockBuilder('Oro\Bundle\ApiBundle\Form\Extension\SwitchableDependencyInjectionExtension')
             ->disableOriginalConstructor()
             ->getMock();
+        $formExtensionState = $this->getMock(FormExtensionState::class);
 
         $formRegistry = new SwitchableFormRegistry(
             [$extension],
-            $this->getMock('Symfony\Component\Form\ResolvedFormTypeFactoryInterface')
+            $this->getMock(ResolvedFormTypeFactoryInterface::class),
+            $formExtensionState
         );
 
-        $extension->expects($this->never())
+        $extension->expects(self::never())
             ->method('switchFormExtension')
             ->with(SwitchableFormRegistry::DEFAULT_EXTENSION);
+        $formExtensionState->expects(self::never())
+            ->method('switchToDefaultFormExtension');
 
         // this switch should do nothing
         $formRegistry->switchToDefaultFormExtension();
@@ -87,18 +99,24 @@ class SwitchableFormRegistryTest extends \PHPUnit_Framework_TestCase
             ->getMockBuilder('Oro\Bundle\ApiBundle\Form\Extension\SwitchableDependencyInjectionExtension')
             ->disableOriginalConstructor()
             ->getMock();
+        $formExtensionState = $this->getMock(FormExtensionState::class);
 
         $formRegistry = new SwitchableFormRegistry(
             [$extension],
-            $this->getMock('Symfony\Component\Form\ResolvedFormTypeFactoryInterface')
+            $this->getMock(ResolvedFormTypeFactoryInterface::class),
+            $formExtensionState
         );
 
-        $extension->expects($this->at(0))
+        $extension->expects(self::at(0))
             ->method('switchFormExtension')
             ->with(SwitchableFormRegistry::API_EXTENSION);
-        $extension->expects($this->at(1))
+        $formExtensionState->expects(self::at(0))
+            ->method('switchToApiFormExtension');
+        $extension->expects(self::at(1))
             ->method('switchFormExtension')
             ->with(SwitchableFormRegistry::DEFAULT_EXTENSION);
+        $formExtensionState->expects(self::at(1))
+            ->method('switchToDefaultFormExtension');
 
         // should switch to api form extension
         $this->setPrivatePropertyValue($formRegistry, 'types', null);
@@ -111,28 +129,33 @@ class SwitchableFormRegistryTest extends \PHPUnit_Framework_TestCase
         $this->setPrivatePropertyValue($formRegistry, 'types', null);
         $this->setPrivatePropertyValue($formRegistry, 'guesser', null);
         $formRegistry->switchToDefaultFormExtension();
-        $this->assertAttributeEquals([], 'types', $formRegistry);
-        $this->assertAttributeEquals(false, 'guesser', $formRegistry);
+        self::assertAttributeEquals([], 'types', $formRegistry);
+        self::assertAttributeEquals(false, 'guesser', $formRegistry);
     }
 
     public function testSeveralSwitchToApiAndThenToDefaultFormExtension()
     {
-        $extension = $this
-            ->getMockBuilder('Oro\Bundle\ApiBundle\Form\Extension\SwitchableDependencyInjectionExtension')
+        $extension = $this->getMockBuilder(SwitchableDependencyInjectionExtension::class)
             ->disableOriginalConstructor()
             ->getMock();
+        $formExtensionState = $this->getMock(FormExtensionState::class);
 
         $formRegistry = new SwitchableFormRegistry(
             [$extension],
-            $this->getMock('Symfony\Component\Form\ResolvedFormTypeFactoryInterface')
+            $this->getMock(ResolvedFormTypeFactoryInterface::class),
+            $formExtensionState
         );
 
-        $extension->expects($this->at(0))
+        $extension->expects(self::at(0))
             ->method('switchFormExtension')
             ->with(SwitchableFormRegistry::API_EXTENSION);
-        $extension->expects($this->at(1))
+        $formExtensionState->expects(self::at(0))
+            ->method('switchToApiFormExtension');
+        $extension->expects(self::at(1))
             ->method('switchFormExtension')
             ->with(SwitchableFormRegistry::DEFAULT_EXTENSION);
+        $formExtensionState->expects(self::at(1))
+            ->method('switchToDefaultFormExtension');
 
         // the first "ToApi" switch should switch to api form extension
         $this->setPrivatePropertyValue($formRegistry, 'types', null);
@@ -166,7 +189,7 @@ class SwitchableFormRegistryTest extends \PHPUnit_Framework_TestCase
      */
     protected function setPrivatePropertyValue(SwitchableFormRegistry $formRegistry, $propertyName, $value)
     {
-        $r = new \ReflectionClass('Symfony\Component\Form\FormRegistry');
+        $r = new \ReflectionClass(FormRegistry::class);
         if (!$r->hasProperty($propertyName)) {
             throw new \RuntimeException(sprintf('The "%s" property does not exist.', $propertyName));
         }

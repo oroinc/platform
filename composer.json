@@ -69,7 +69,7 @@
         "tinymce/tinymce": "4.1.*",
         "ezyang/htmlpurifier": "4.6.0",
         "hwi/oauth-bundle": "~0.3",
-        "components/jquery": "2.1.*",
+        "components/jquery": "3.1.*",
         "components/underscore": "1.7.*",
         "components/backbone": "1.1.*",
         "components/font-awesome": "~4.3.0",
@@ -79,7 +79,7 @@
         "vakata/jstree": "^3.2",
         "symfony/polyfill-php70":"1.*",
         "liuggio/excelbundle": "~2.1",
-        "components/jqueryui": "1.11.2",
+        "components/jqueryui": "1.12.*",
         "bower-asset/select2": "3.4.1",
         "bower-asset/chaplin": "1.0.0",
         "bower-asset/jquery-cookie": "1.4.1",
@@ -113,7 +113,8 @@
         "bower-asset/backbone-pageable": "1.2.3",
         "bower-asset/numeral": "1.5.2",
         "bower-asset/jquery-form": "3.37.0",
-        "npm-asset/requirejs": "2.3.*"
+        "npm-asset/requirejs": "2.3.*",
+        "doctrine/annotations": "~1.2.7"
     },
     "require-dev": {
         "sensio/generator-bundle": "2.5.3",

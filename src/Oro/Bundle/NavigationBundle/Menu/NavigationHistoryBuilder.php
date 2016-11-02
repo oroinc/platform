@@ -53,11 +53,11 @@ class NavigationHistoryBuilder extends NavigationItemBuilder
      */
     public function build(ItemInterface $menu, array $options = array(), $alias = null)
     {
-        $maxItems = $this->configOptions->get('oro_navigation.maxItems');
+        $maxItems = $this->configOptions->get('oro_navigation.max_items');
 
         if (!is_null($maxItems)) {
             // we'll hide current item, so always select +1 item
-            $options['maxItems'] = $maxItems + 1;
+            $options['max_items'] = $maxItems + 1;
         }
 
         parent::build($menu, $options, $alias);
