@@ -56,7 +56,6 @@ class WidgetAttributesTest extends \PHPUnit_Framework_TestCase
         $this->eventDispatcher = $this->getMock('Symfony\Component\EventDispatcher\EventDispatcherInterface');
 
         $this->featureChecker = $this->getMockBuilder(FeatureChecker::class)
-            ->setMethods(['isResourceEnabled'])
             ->disableOriginalConstructor()
             ->getMock();
 

@@ -315,13 +315,17 @@ class WidgetConfigs
                 $accessGranted = !isset($item['acl']) || $securityFacade->isGranted($item['acl']);
                 $applicable    = true;
                 $enabled       = $item['enabled'];
-                $routeEnabled = $featureChecker->isResourceEnabled($item['route'], 'routes');
                 if (isset($item['applicable'])) {
                     $resolved   = $resolver->resolve([$item['applicable']]);
                     $applicable = reset($resolved);
                 }
 
                 unset($item['acl'], $item['applicable'], $item['enabled']);
+
+                $routeEnabled = true;
+                if (isset($item['route'])) {
+                    $routeEnabled = $featureChecker->isResourceEnabled($item['route'], 'routes');
+                }
 
                 return $visible && $enabled && $accessGranted && $applicable && $routeEnabled;
             }
