@@ -152,7 +152,5 @@ class LayoutListener
         if (!empty($vars)) {
             $context->getResolver()->setRequired($vars);
         }
-
-        $context->set('expressions_evaluate_deferred', true);
     }
 }

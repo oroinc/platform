@@ -67,6 +67,9 @@ class LayoutFactoryBuilder implements LayoutFactoryBuilderInterface
      */
     private $expressionProcessor;
 
+    /**
+     * @param ExpressionProcessor $expressionProcessor
+     */
     public function __construct(ExpressionProcessor $expressionProcessor)
     {
         $this->expressionProcessor = $expressionProcessor;
