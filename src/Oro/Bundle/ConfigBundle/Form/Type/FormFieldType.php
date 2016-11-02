@@ -9,6 +9,7 @@ use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\OptionsResolver\Options;
 
 use Oro\Bundle\FormBundle\Utils\FormUtils;
 
@@ -29,6 +30,21 @@ class FormFieldType extends AbstractType
                 'parent_checkbox_label' => ''
             ]
         );
+
+        // adds same class for config with "resettable: true", as have config with "resettable: false"
+        $resolver->setNormalizer('attr', function (Options $options, $attr) {
+            if (!$attr) {
+                $attr = [];
+            }
+
+            if (!isset($attr['class'])) {
+                $attr['class'] = '';
+            }
+
+            $attr['class'] = sprintf('%s, control-group-%s', $attr['class'], $options['target_field_type']);
+
+            return $attr;
+        });
     }
 
     /**
