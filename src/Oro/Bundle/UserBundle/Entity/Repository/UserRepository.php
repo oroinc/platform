@@ -182,4 +182,41 @@ class UserRepository extends EntityRepository implements EmailAwareRepository
 
         $qb->getQuery()->execute();
     }
+
+    /**
+     * Return array of users which their passwords are about to expire in specified list of days
+     *
+     * @param int[] $days
+     * @return User[]
+     */
+    public function findExpiringPasswordUsers(array $days)
+    {
+        if (0 === count($days)) {
+            throw new \InvalidArgumentException('At least one notification period should be provided');
+        }
+
+        $utc = new \DateTimeZone('UTC');
+        $builder = $this->createQueryBuilder('u');
+        $conditions = [];
+
+        foreach ($days as $index => $day) {
+            $from = new \DateTime('+' . $day . ' day midnight', $utc);
+            $to = new \DateTime('+' .  $day . ' day 23:59:59', $utc);
+            $conditions[] = $builder->expr()->between(
+                'u.passwordExpiresAt',
+                ':from' . $index,
+                ':to' . $index
+            );
+            $builder->setParameter('from' . $index, $from, Type::DATETIME);
+            $builder->setParameter('to' . $index, $to, Type::DATETIME);
+        }
+
+        return $builder
+            ->select('u')
+            ->andWhere('u.enabled = :enabled')
+            ->andWhere($builder->expr()->orX()->addMultiple($conditions))
+            ->setParameter('enabled', true)
+            ->getQuery()
+            ->getResult();
+    }
 }
