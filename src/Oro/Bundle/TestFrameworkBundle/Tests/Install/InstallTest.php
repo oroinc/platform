@@ -39,7 +39,7 @@ class InstallTest extends Selenium2TestCase
         $administration = $configuration->next();
         $administration->setUsername('admin')
                     ->setPasswordFirst('admin1Q8')
-                    ->setPasswordSecond('admin')
+                    ->setPasswordSecond('admin1Q8')
                     ->setEmail('admin@example.com')
                     ->setFirstName('John')
                     ->setLastName('Doe')

@@ -120,6 +120,9 @@
     {% if reverse %}
         {% set value = value|reverse %}
     {% endif %}
+    {% if value is not iterable %}
+        {% set value = [value] %}
+    {% endif %}
     {% spaceless %}
         <title>
             {%- for element in value -%}
