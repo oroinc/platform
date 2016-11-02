@@ -68,7 +68,7 @@ class EmbedFormLayoutManagerTest extends \PHPUnit_Framework_TestCase
             ->method('getLayout')
             ->willReturnCallback(
                 function (LayoutContext $context) use ($formEntity) {
-                    $context->getResolver()->setDefined(['theme']);
+                    $context->getResolver()->setDefined(['theme', 'expressions_evaluate']);
                     $context->resolve();
 
                     self::assertEquals('embedded_default', $context->get('theme'));
@@ -114,7 +114,7 @@ class EmbedFormLayoutManagerTest extends \PHPUnit_Framework_TestCase
             ->method('getLayout')
             ->willReturnCallback(
                 function (LayoutContext $context) use ($formEntity) {
-                    $context->getResolver()->setDefined(['theme']);
+                    $context->getResolver()->setDefined(['theme', 'expressions_evaluate']);
                     $context->resolve();
 
                     self::assertEquals('embedded_default', $context->get('theme'));
