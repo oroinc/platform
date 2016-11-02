@@ -172,6 +172,11 @@ class UserRepository extends EntityRepository implements EmailAwareRepository
             ->getResult();
     }
 
+    /**
+     * Sets password expiry date of ALL users
+     *
+     * @param \DateTime|null $value
+     */
     public function updateAllUsersPasswordExpiration(\DateTime $value = null)
     {
         $qb = $this->createQueryBuilder('u');
@@ -218,5 +223,30 @@ class UserRepository extends EntityRepository implements EmailAwareRepository
             ->setParameter('enabled', true)
             ->getQuery()
             ->getResult();
+    }
+
+    /**
+     * Get array of users with expired passwords
+     *
+     * @param bool $loginDisabled  Filter by login_disabled (null to ignore)
+     * @param \DateTime|null $date password expiration date
+     *
+     * @return \Doctrine\ORM\QueryBuilder
+     */
+    public function findExpiredPasswordUsersQb($loginDisabled = false, \DateTime $date = null)
+    {
+        if (null === $date) {
+            $date = new \DateTime('now', new \DateTimeZone('UTC'));
+        }
+        $qb = $this->createQueryBuilder('u')
+            ->select('u')
+            ->andWhere('u.passwordExpiresAt >= :expiresAt')
+            ->setParameter('expiresAt', $date, Type::DATETIME);
+
+        if (null !== $loginDisabled) {
+            $qb->andWhere('u.loginDisabled = :loginDisabled')->setParameter('loginDisabled', $loginDisabled);
+        }
+
+        return $qb;
     }
 }
