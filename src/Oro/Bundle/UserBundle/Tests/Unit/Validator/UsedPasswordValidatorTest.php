@@ -10,14 +10,19 @@ use Symfony\Component\Validator\Context\ExecutionContextInterface;
 
 class UsedPasswordValidatorTest extends \PHPUnit_Framework_TestCase
 {
+    /** @var User */
+    protected $user;
+
+    /** @var UsedPassword */
     protected $constraint;
 
     protected function setUp()
     {
 
-        $user = new User();
-        $passHash1 = $this->createPasswordHistory($user);
-        $passHash2 = $this->createPasswordHistory($user);
+        $this->user = new User();
+        $this->user->setPassword('test123');
+        $passHash1 = $this->createPasswordHistory($this->user);
+        $passHash2 = $this->createPasswordHistory($this->user);
 
         $repo = $this->getMockBuilder('Doctrine\Common\Persistence\ObjectRepository')
             ->disableOriginalConstructor()
@@ -40,13 +45,15 @@ class UsedPasswordValidatorTest extends \PHPUnit_Framework_TestCase
             ->method('getManagerForClass')
             ->willReturn($om);
 
-        $configManager = $this->getMockBuilder('Oro\Bundle\ConfigBundle\Config\ConfigManager')
+        $configProvider = $this->getMockBuilder('Oro\Bundle\UserBundle\Provider\UsedPasswordConfigProvider')
             ->disableOriginalConstructor()
             ->getMock();
-        $configManager->expects($this->exactly(2))
-            ->method('get')
-            ->will($this->onConsecutiveCalls(true, 3));
-
+        $configProvider->expects($this->once())
+            ->method('isUsedPasswordCheckEnabled')
+            ->willReturn(true);
+        $configProvider->expects($this->once())
+            ->method('getUsedPasswordsCheckNumber')
+            ->willReturn(3);
         $encoder = $this->getMockBuilder('Symfony\Component\Security\Core\Encoder\PasswordEncoderInterface')
             ->disableOriginalConstructor()
             ->getMock();
@@ -61,7 +68,7 @@ class UsedPasswordValidatorTest extends \PHPUnit_Framework_TestCase
             ->method('getEncoder')
             ->willReturn($encoder);
 
-        $this->validator = new UsedPasswordValidator($registry, $configManager, $encoderFactory);
+        $this->validator = new UsedPasswordValidator($registry, $configProvider, $encoderFactory);
     }
 
     public function testValidateAlreadyUsedPassword()
@@ -70,15 +77,15 @@ class UsedPasswordValidatorTest extends \PHPUnit_Framework_TestCase
         $context->expects($this->once())
             ->method('addViolation');
         $this->validator->initialize($context);
-        $this->validator->validate('testPass123', new UsedPassword(['userId' => 123]));
+        $this->validator->validate($this->user, new UsedPassword());
     }
 
     private function createPasswordHistory(User $user)
     {
         $passwordHistory = new PasswordHistory();
-        $passwordHistory->setUser($user);
-        $passwordHistory->setSalt($user->getSalt());
-        $passwordHistory->setPasswordHash($user->getPassword());
+        $passwordHistory->setUser($this->user);
+        $passwordHistory->setSalt($this->user->getSalt());
+        $passwordHistory->setPasswordHash($this->user->getPassword());
 
         return $passwordHistory;
     }

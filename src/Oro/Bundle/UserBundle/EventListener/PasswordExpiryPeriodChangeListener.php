@@ -40,7 +40,11 @@ class PasswordExpiryPeriodChangeListener
         $settingsValueKey   = $this->getSettingsValueKey();
         $settingsEnabledKey = $this->getSettingsEnabledKey();
 
-        if (!$event->isChanged($settingsEnabledKey) && !$this->provider->isPasswordChangePeriodEnabled()) {
+        $isSettingActive = $this->provider->isPasswordChangePeriodEnabled();
+        $isSettingToggled = $event->isChanged($settingsEnabledKey);
+
+        // check if the password period setting is active and if it has been toggled
+        if (!$isSettingActive && !$isSettingToggled) {
             return;
         }
 
@@ -58,7 +62,7 @@ class PasswordExpiryPeriodChangeListener
     protected function resetPasswordExpiryDates()
     {
         $newExpiryDate = $this->provider->getPasswordExpiryDateFromNow();
-        $this->registry->getRepository('OroUserBundle:User')->setPasswordExpiresAt($newExpiryDate);
+        $this->registry->getRepository('OroUserBundle:User')->updateAllUsersPasswordExpiration($newExpiryDate);
     }
 
     /**

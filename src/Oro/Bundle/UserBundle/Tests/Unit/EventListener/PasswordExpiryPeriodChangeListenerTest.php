@@ -110,7 +110,7 @@ class PasswordExpiryPeriodChangeListenerTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
         $repo->expects($this->once())
-            ->method('setPasswordExpiresAt')
+            ->method('updateAllUsersPasswordExpiration')
             ->with($this->expiryDate);
 
         $this->registry->expects($this->atLeastOnce())

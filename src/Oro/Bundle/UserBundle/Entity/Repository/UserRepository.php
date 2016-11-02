@@ -172,7 +172,7 @@ class UserRepository extends EntityRepository implements EmailAwareRepository
             ->getResult();
     }
 
-    public function setPasswordExpiresAt(\DateTime $value = null)
+    public function updateAllUsersPasswordExpiration(\DateTime $value = null)
     {
         $qb = $this->createQueryBuilder('u');
         $qb

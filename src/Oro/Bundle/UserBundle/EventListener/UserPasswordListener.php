@@ -65,7 +65,7 @@ class UserPasswordListener
     protected function resetUserPasswordExpiryDate(User $user, EntityManager $em)
     {
         $expiryDate = $this->provider->getPasswordExpiryDateFromNow();
-        $user->setPasswordExpiresAt($expiryDate);
+        $user->updateAllUsersPasswordExpiration($expiryDate);
         $em->getUnitOfWork()->recomputeSingleEntityChangeSet($em->getClassMetadata(User::class), $user);
     }
 }

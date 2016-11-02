@@ -9,27 +9,27 @@ use Symfony\Component\Validator\ConstraintValidator;
 use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 use Symfony\Component\Security\Core\Encoder\EncoderFactoryInterface;
 
-use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\UserBundle\Validator\Constraints\UsedPassword;
+use Oro\Bundle\UserBundle\Provider\UsedPasswordConfigProvider;
 
 class UsedPasswordValidator extends ConstraintValidator
 {
     /** @var Registry */
     protected $registry;
 
-    /** @var ConfigManager */
-    protected $configManager;
+    /** @var UsedPasswordConfigProvider */
+    protected $configProvider;
 
     /** @var EncoderFactoryInterface */
     protected $encoderFactory;
 
     public function __construct(
         Registry $registry,
-        ConfigManager $configManager,
+        UsedPasswordConfigProvider $configProvider,
         EncoderFactoryInterface $encoderFactory
     ) {
         $this->registry = $registry;
-        $this->configManager = $configManager;
+        $this->configProvider = $configProvider;
         $this->encoderFactory = $encoderFactory;
     }
 
@@ -42,11 +42,11 @@ class UsedPasswordValidator extends ConstraintValidator
             throw new UnexpectedTypeException($constraint, __NAMESPACE__.'Constraint\NotBlank');
         }
 
-        if (!$this->configManager->get('oro_user.used_password_check_enabled')) {
+        if (!$this->configProvider->isUsedPasswordCheckEnabled()) {
             return;
         }
 
-        $passwordHistoryLimit = $this->configManager->get('oro_user.used_password_check_number');
+        $passwordHistoryLimit = $this->configProvider->getUsedPasswordsCheckNumber();
 
         $oldPasswords = $this->registry
             ->getManagerForClass('OroUserBundle:PasswordHistory')

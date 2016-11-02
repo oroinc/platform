@@ -500,11 +500,16 @@ services:
         tags:
             - { name: doctrine.event_listener, event: onFlush, priority: 200 }
 
+    oro_user.provider.used_password_config_provider:
+        class: Oro\Bundle\UserBundle\Provider\UsedPasswordConfigProvider
+        arguments:
+            - '@oro_config.manager'
+
     oro_user.validator.password_already_used:
         class: Oro\Bundle\UserBundle\Validator\UsedPasswordValidator
         arguments:
             - '@doctrine'
-            - '@oro_config.manager'
+            - '@oro_user.provider.used_password_config_provider'
             - '@security.encoder_factory'
         tags:
             - { name: validator.constraint_validator, alias: oro_used_password }
