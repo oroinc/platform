@@ -3,6 +3,7 @@
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Datagrid;
 
 use Oro\Bundle\DataGridBundle\Datasource\ResultRecordInterface;
+use Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker;
 use Oro\Bundle\WorkflowBundle\Datagrid\ActionPermissionProvider;
 
 class ActionPermissionProviderTest extends \PHPUnit_Framework_TestCase
@@ -12,18 +13,30 @@ class ActionPermissionProviderTest extends \PHPUnit_Framework_TestCase
      */
     protected $provider;
 
+    /**
+     * @var FeatureChecker|\PHPUnit_Framework_MockObject_MockObject
+     */
+    protected $featureChecker;
+
     protected function setUp()
     {
-        $this->provider = new ActionPermissionProvider();
+        $this->featureChecker = $this->getMockBuilder(FeatureChecker::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+        $this->provider = new ActionPermissionProvider($this->featureChecker);
     }
 
     /**
      * @param array $expected
      * @param object $input
+     * @param bool $featureEnabled
      * @dataProvider getWorkflowDefinitionPermissionsDataProvider
      */
-    public function testGetWorkflowDefinitionPermissionsSystemRelated(array $expected, $input)
+    public function testGetWorkflowDefinitionPermissionsSystemRelated(array $expected, $input, $featureEnabled)
     {
+        $this->featureChecker->expects($this->any())
+            ->method('isResourceEnabled')
+            ->willReturn($featureEnabled);
         $this->assertEquals($expected, $this->provider->getWorkflowDefinitionPermissions($input));
     }
 
@@ -52,7 +65,8 @@ class ActionPermissionProviderTest extends \PHPUnit_Framework_TestCase
                     'activate' => true,
                     'deactivate' => false
                 ),
-                'input' => $systemDefinition
+                'input' => $systemDefinition,
+                'featureEnabled' => true
             ),
             'regular definition' => array(
                 'expected' => array(
@@ -63,7 +77,32 @@ class ActionPermissionProviderTest extends \PHPUnit_Framework_TestCase
                     'activate' => true,
                     'deactivate' => false
                 ),
-                'input' => $regularDefinition
+                'input' => $regularDefinition,
+                'featureEnabled' => true
+            ),
+            'system definition feature disabled' => array(
+                'expected' => array(
+                    'view' => true,
+                    'update' => false,
+                    'clone'  => true,
+                    'delete' => false,
+                    'activate' => false,
+                    'deactivate' => false
+                ),
+                'input' => $systemDefinition,
+                'featureEnabled' => false
+            ),
+            'regular definition feature disabled' => array(
+                'expected' => array(
+                    'view' => true,
+                    'update' => false,
+                    'clone'  => true,
+                    'delete' => true,
+                    'activate' => false,
+                    'deactivate' => false
+                ),
+                'input' => $regularDefinition,
+                'featureEnabled' => false
             )
         );
     }
@@ -71,13 +110,17 @@ class ActionPermissionProviderTest extends \PHPUnit_Framework_TestCase
     /**
      * @param array $expected
      * @param object $input
+     * @param bool $featureEnabled
      * @dataProvider getWorkflowDefinitionActivationDataProvider
      */
     public function testGetWorkflowDefinitionPermissionsActivationRelated(
         array $expected,
-        $input
+        $input,
+        $featureEnabled
     ) {
-
+        $this->featureChecker->expects($this->any())
+            ->method('isResourceEnabled')
+            ->willReturn($featureEnabled);
         $this->assertEquals($expected, $this->provider->getWorkflowDefinitionPermissions($input));
     }
 
@@ -97,7 +140,8 @@ class ActionPermissionProviderTest extends \PHPUnit_Framework_TestCase
                     'activate' => true,
                     'deactivate' => false
                 ),
-                'input' => $this->getDefinitionMock(false)
+                'input' => $this->getDefinitionMock(false),
+                'featureEnabled' => true
             ),
             'active definition' => array(
                 'expected' => array(
@@ -108,7 +152,8 @@ class ActionPermissionProviderTest extends \PHPUnit_Framework_TestCase
                     'activate' => false,
                     'deactivate' => true
                 ),
-                'input' => $this->getDefinitionMock(true)
+                'input' => $this->getDefinitionMock(true),
+                'featureEnabled' => true
             ),
             'inactive definition' => array(
                 'expected' => array(
@@ -119,7 +164,44 @@ class ActionPermissionProviderTest extends \PHPUnit_Framework_TestCase
                     'activate' => true,
                     'deactivate' => false
                 ),
-                'input' => $this->getDefinitionMock(false)
+                'input' => $this->getDefinitionMock(false),
+                'featureEnabled' => true
+            ),
+            'no config feature disabled' => array(
+                'expected' => array(
+                    'view' => true,
+                    'update' => false,
+                    'clone'  => true,
+                    'delete' => true,
+                    'activate' => false,
+                    'deactivate' => false
+                ),
+                'input' => $this->getDefinitionMock(false),
+                'featureEnabled' => false
+            ),
+            'active definition feature disabled' => array(
+                'expected' => array(
+                    'view' => true,
+                    'update' => false,
+                    'clone'  => true,
+                    'delete' => true,
+                    'activate' => false,
+                    'deactivate' => false
+                ),
+                'input' => $this->getDefinitionMock(true),
+                'featureEnabled' => false
+            ),
+            'inactive definition feature disabled' => array(
+                'expected' => array(
+                    'view' => true,
+                    'update' => false,
+                    'clone'  => true,
+                    'delete' => true,
+                    'activate' => false,
+                    'deactivate' => false
+                ),
+                'input' => $this->getDefinitionMock(false),
+                'featureEnabled' => false
             )
         );
     }
