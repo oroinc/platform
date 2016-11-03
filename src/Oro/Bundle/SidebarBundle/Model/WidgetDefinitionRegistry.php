@@ -3,19 +3,28 @@
 namespace Oro\Bundle\SidebarBundle\Model;
 
 use Doctrine\Common\Collections\ArrayCollection;
+use Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker;
 
 class WidgetDefinitionRegistry
 {
+    const SIDEBAR_WIDGET_FEATURE_NAME = 'sidebar_widgets';
+
     /**
      * @var ArrayCollection
      */
     protected $widgetDefinitions;
 
     /**
+     * @var FeatureChecker
+     */
+    protected $featureChecker;
+
+    /**
      * @param array $definitions
      */
-    public function __construct(array $definitions)
+    public function __construct(array $definitions, FeatureChecker $featureChecker)
     {
+        $this->featureChecker = $featureChecker;
         $this->widgetDefinitions = new ArrayCollection();
 
         $this->setWidgetDefinitions($definitions);
@@ -27,7 +36,9 @@ class WidgetDefinitionRegistry
     public function setWidgetDefinitions(array $definitions)
     {
         foreach ($definitions as $name => $definition) {
-            $this->widgetDefinitions->set($name, $definition);
+            if ($this->featureChecker->isResourceEnabled($name, self::SIDEBAR_WIDGET_FEATURE_NAME)) {
+                $this->widgetDefinitions->set($name, $definition);
+            }
         }
     }
 

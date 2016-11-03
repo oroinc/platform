@@ -5,12 +5,14 @@ parameters:
     oro_sidebar.widget_definition.registry.class: Oro\Bundle\SidebarBundle\Model\WidgetDefinitionRegistry
     oro_sidebar.twig.extension.class: Oro\Bundle\SidebarBundle\Twig\SidebarExtension
     oro_sidebar.request.handler.class: Oro\Bundle\SidebarBundle\EventListener\RequestHandler
+    oro_sidebar.config_extension.feature.class: Oro\Bundle\SidebarBundle\Configuration\FeatureConfigurationExtension
 
 services:
     oro_sidebar.widget_definition.registry:
         class: %oro_sidebar.widget_definition.registry.class%
         arguments:
             - %oro_sidebar.sidebar_widgets_definitions%
+            - '@oro_featuretoggle.checker.feature_checker'
 
     oro_sidebar.twig.extension:
         class: %oro_sidebar.twig.extension.class%
@@ -27,3 +29,8 @@ services:
             - '@service_container'
         tags:
             - { name: kernel.event_listener, event: kernel.request, method: onKernelRequest }
+
+    oro_sidebar.config_extension.feature:
+            class: %oro_sidebar.config_extension.feature.class%
+            tags:
+                - { name: oro_feature.config_extension }

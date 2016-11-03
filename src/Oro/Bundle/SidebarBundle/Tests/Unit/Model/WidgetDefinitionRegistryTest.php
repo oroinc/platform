@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\SidebarBundle\Tests\Unit\Model;
 
+use Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker;
 use Oro\Bundle\SidebarBundle\Model\WidgetDefinitionRegistry;
 
 class WidgetDefinitionRegistryTest extends \PHPUnit_Framework_TestCase
@@ -14,7 +15,15 @@ class WidgetDefinitionRegistryTest extends \PHPUnit_Framework_TestCase
      */
     public function testGetWidgetDefinitionsByPlacement(array $definitions, $placement, array $expected)
     {
-        $registry = new WidgetDefinitionRegistry($definitions);
+        $featureChecker = $this->getMockBuilder(FeatureChecker::class)
+            ->setMethods(['isResourceEnabled'])
+            ->disableOriginalConstructor()
+            ->getMock();
+        $featureChecker->expects($this->any())
+            ->method('isResourceEnabled')
+            ->with($this->anything())
+            ->willReturn(true);
+        $registry = new WidgetDefinitionRegistry($definitions, $featureChecker);
         $actual = $registry->getWidgetDefinitionsByPlacement($placement);
         $this->assertInstanceOf('Doctrine\Common\Collections\Collection', $actual);
         $this->assertEquals($expected, $actual->toArray());
@@ -113,5 +122,28 @@ class WidgetDefinitionRegistryTest extends \PHPUnit_Framework_TestCase
                 )
             )
         );
+    }
+
+    public function testGetWidgetDefinitionsWhenFeatureIsDisabled()
+    {
+        $definitions = [
+            'empty' => [
+                [],
+                'left',
+                []
+            ]
+        ];
+
+        $featureChecker = $this->getMockBuilder(FeatureChecker::class)
+            ->setMethods(['isResourceEnabled'])
+            ->disableOriginalConstructor()
+            ->getMock();
+        $featureChecker->expects($this->once())
+            ->method('isResourceEnabled')
+            ->with($this->anything())
+            ->willReturn(false);
+        $registry = new WidgetDefinitionRegistry($definitions, $featureChecker);
+
+        $this->assertEquals([], $registry->getWidgetDefinitions()->toArray());
     }
 }
