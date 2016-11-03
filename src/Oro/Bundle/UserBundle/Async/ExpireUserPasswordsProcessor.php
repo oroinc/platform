@@ -73,7 +73,7 @@ class ExpireUserPasswordsProcessor implements MessageProcessorInterface, TopicSu
         $userIds = (array) $message->getBody();
         $template = $this->getEmailTemplate();
         if (!$template) {
-            $this->logError('Invalid expire password template');
+            $this->logError('Cannot find email template "%s"', self::TEMPLATE_NAME);
 
             return self::ACK;
         }
