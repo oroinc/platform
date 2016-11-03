@@ -3,8 +3,8 @@
 namespace Oro\Bundle\TranslationBundle\Tests\Functional\Controller;
 
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
-use Oro\Bundle\TranslationBundle\Migrations\Data\Demo\ORM\LoadTranslationUsers;
 use Oro\Bundle\TranslationBundle\Tests\Functional\DataFixtures\LoadLanguages;
+use Oro\Bundle\TranslationBundle\Tests\Functional\DataFixtures\LoadTranslationUsers;
 
 /**
  * @dbIsolation
@@ -35,7 +35,9 @@ class LanguageControllerTest extends WebTestCase
         $result = $this->getJsonResponseContent($this->client->requestGrid('oro-translation-language-grid'), 200);
         $this->assertCount(1, $result['data']);
 
-        $this->assertArrayHaskey('language', $result['data'][0]);
-        $this->assertEquals($languages[LoadLanguages::LANGUAGE3], $result['data'][0]['language']);
+        $data = array_shift($result['data']);
+
+        $this->assertArrayHasKey('language', $data);
+        $this->assertEquals($languages[LoadLanguages::LANGUAGE3], $data['language']);
     }
 }

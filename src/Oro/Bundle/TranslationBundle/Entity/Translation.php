@@ -12,11 +12,6 @@ use Doctrine\ORM\Mapping as ORM;
  */
 class Translation
 {
-    /**
-     * @deprecated
-     */
-    const DEFAULT_LOCALE = 'en';
-
     const SCOPE_SYSTEM = 0;
     const SCOPE_INSTALLED = 1;
     const SCOPE_UI = 2;
