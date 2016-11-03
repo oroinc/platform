@@ -81,6 +81,16 @@ class OroTestFrameworkBundleInstaller implements
         $this->addTestProductForeignKeys($schema);
 
         $this->activityExtension->addActivityAssociation($schema, 'test_activity', 'test_activity_target', true);
+
+        // add activity association if calendar package is installed
+        if ($schema->hasTable('oro_calendar_event')) {
+            $this->activityExtension->addActivityAssociation(
+                $schema,
+                'oro_calendar_event',
+                'test_activity_target',
+                true
+            );
+        }
     }
 
     /**
