@@ -23,6 +23,8 @@ use Oro\Bundle\ApiBundle\Util\ValueNormalizerUtil;
  */
 class NormalizeIncludedData implements ProcessorInterface
 {
+    const UPDATE_META = 'update';
+
     /** @var DoctrineHelper */
     protected $doctrineHelper;
 
@@ -185,15 +187,15 @@ class NormalizeIncludedData implements ProcessorInterface
      */
     protected function getUpdateFlag($pointer, $data, $entityClass)
     {
-        if (empty($data[JsonApiDoc::META]) || !array_key_exists('_update', $data[JsonApiDoc::META])) {
+        if (empty($data[JsonApiDoc::META]) || !array_key_exists(self::UPDATE_META, $data[JsonApiDoc::META])) {
             return false;
         }
-        $flag = $data[JsonApiDoc::META]['_update'];
+        $flag = $data[JsonApiDoc::META][self::UPDATE_META];
         if (true === $flag || false === $flag) {
             if (!$this->doctrineHelper->isManageableEntityClass($entityClass)) {
                 $this->addValidationError(
                     Constraint::VALUE,
-                    $this->buildPointer($this->buildPointer($pointer, JsonApiDoc::META), '_update'),
+                    $this->buildPointer($this->buildPointer($pointer, JsonApiDoc::META), self::UPDATE_META),
                     'Only manageable entity can be updated.'
                 );
 
@@ -205,7 +207,7 @@ class NormalizeIncludedData implements ProcessorInterface
 
         $this->addValidationError(
             Constraint::VALUE,
-            $this->buildPointer($this->buildPointer($pointer, JsonApiDoc::META), '_update'),
+            $this->buildPointer($this->buildPointer($pointer, JsonApiDoc::META), self::UPDATE_META),
             'This value should be boolean.'
         );
 

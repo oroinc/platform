@@ -233,14 +233,14 @@ class NormalizeIncludedDataTest extends FormProcessorTestCase
     {
         $requestData = [
             'included' => [
-                ['type' => 'testType', 'id' => 'testId', 'meta' => ['_update' => true]]
+                ['type' => 'testType', 'id' => 'testId', 'meta' => ['update' => true]]
             ]
         ];
         $normalizedType = 'Test\Class';
         $error = Error::createValidationError(
             Constraint::VALUE,
             'Only manageable entity can be updated.'
-        )->setSource(ErrorSource::createByPointer('/included/0/meta/_update'));
+        )->setSource(ErrorSource::createByPointer('/included/0/meta/update'));
 
         $this->doctrineHelper->expects(self::once())
             ->method('isManageableEntityClass')
@@ -264,7 +264,7 @@ class NormalizeIncludedDataTest extends FormProcessorTestCase
     {
         $requestData = [
             'included' => [
-                ['type' => 'testType', 'id' => 'testId', 'meta' => ['_update' => true]]
+                ['type' => 'testType', 'id' => 'testId', 'meta' => ['update' => true]]
             ]
         ];
         $normalizedType = 'Test\Class';
@@ -310,7 +310,7 @@ class NormalizeIncludedDataTest extends FormProcessorTestCase
     {
         $requestData = [
             'included' => [
-                ['type' => 'testType', 'id' => 'testId', 'meta' => ['_update' => true]]
+                ['type' => 'testType', 'id' => 'testId', 'meta' => ['update' => true]]
             ]
         ];
         $normalizedType = 'Test\Class';
@@ -355,7 +355,7 @@ class NormalizeIncludedDataTest extends FormProcessorTestCase
     {
         $requestData = [
             'included' => [
-                ['type' => 'testType', 'id' => 'testId', 'meta' => ['_update' => true]]
+                ['type' => 'testType', 'id' => 'testId', 'meta' => ['update' => true]]
             ]
         ];
         $error = Error::createValidationError(Constraint::ENTITY_TYPE)
@@ -378,14 +378,14 @@ class NormalizeIncludedDataTest extends FormProcessorTestCase
     {
         $requestData = [
             'included' => [
-                ['type' => 'testType', 'id' => 'testId', 'meta' => ['_update' => null]]
+                ['type' => 'testType', 'id' => 'testId', 'meta' => ['update' => null]]
             ]
         ];
         $normalizedType = 'Test\Class';
         $error = Error::createValidationError(
             Constraint::VALUE,
             'This value should be boolean.'
-        )->setSource(ErrorSource::createByPointer('/included/0/meta/_update'));
+        )->setSource(ErrorSource::createByPointer('/included/0/meta/update'));
 
         $this->doctrineHelper->expects(self::never())
             ->method('isManageableEntityClass');
@@ -407,7 +407,7 @@ class NormalizeIncludedDataTest extends FormProcessorTestCase
     {
         $requestData = [
             'included' => [
-                ['type' => 'testType', 'id' => 'testId', 'meta' => ['_update' => true]]
+                ['type' => 'testType', 'id' => 'testId', 'meta' => ['update' => true]]
             ]
         ];
         $normalizedType = 'Test\Class';

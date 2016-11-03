@@ -153,7 +153,7 @@ class RestJsonApiCreateWithIncludedTest extends RestJsonApiTestCase
                     'type'       => $this->getEntityType(Group::class),
                     'id'         => $groupId,
                     'meta'       => [
-                        '_update' => true
+                        'update' => true
                     ],
                     'attributes' => [
                         'name' => 'Test Group 1 (updated)'
