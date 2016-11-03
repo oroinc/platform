@@ -171,7 +171,7 @@ class MenuUpdateTypeTest extends FormIntegrationTestCase
         $menuItem = $this->getMock(ItemInterface::class);
         $menuItem->expects($this->any())
             ->method('getExtra')
-            ->with('aclResourceId')
+            ->with('acl_resource_id')
             ->willReturn(self::TEST_ACL_RESOURCE_ID);
 
         $form = $this->factory->create(new MenuUpdateType(), $menuUpdate, ['menu_item' => $menuItem]);

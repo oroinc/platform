@@ -9,7 +9,7 @@
     <div class="tab-content">
         {% set items = item %}
         {% for item in items %}
-            {% set showNonAuthorized = item.extras.showNonAuthorized is defined and item.extras.showNonAuthorized %}
+            {% set showNonAuthorized = item.extras.show_non_authorized is defined and item.extras.show_non_authorized %}
             {% set displayable = item.extras.isAllowed or showNonAuthorized %}
             {% if displayable and item.hasChildren and item.displayChildren %}
                 {% set tabClasses = ['tab-pane'] %}
