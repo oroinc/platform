@@ -33,6 +33,9 @@ class TranslationManager
     /** @var TranslationKey[] */
     protected $translationKeys = [];
 
+    /** @var TranslationKey[] */
+    protected $translationKeysToRemove = [];
+
     /** @var Translation[] */
     protected $translations = [];
 
@@ -51,18 +54,12 @@ class TranslationManager
      * @param string $value
      * @param string $locale
      * @param string $domain
-     * @param bool $persist
      *
      * @return Translation
      */
-    public function createTranslation(
-        $key,
-        $value,
-        $locale,
-        $domain = self::DEFAULT_DOMAIN,
-        $persist = false
-    ) {
-        $cacheKey = sprintf('%s-%s-%s', $locale, $domain, $key);
+    public function createTranslation($key, $value, $locale, $domain = self::DEFAULT_DOMAIN)
+    {
+        $cacheKey = $this->getCacheKey($locale, $domain, $key);
         if (!array_key_exists($cacheKey, $this->translations)) {
             $translationValue = new Translation();
             $translationValue
@@ -71,10 +68,6 @@ class TranslationManager
                 ->setValue($value);
 
             $this->translations[$cacheKey] = $translationValue;
-        }
-
-        if ($persist) {
-            $this->getEntityManager(Translation::class)->persist($this->translations[$cacheKey]);
         }
 
         return $this->translations[$cacheKey];
@@ -107,23 +100,21 @@ class TranslationManager
         }
 
         if (!$value && null !== $translation) {
-            $this->getEntityManager(Translation::class)->remove($translation);
-
-            $cacheKey = sprintf('%s-%s-%s', $locale, $domain, $key);
+            $cacheKey = $this->getCacheKey($locale, $domain, $key);
             $this->translations[$cacheKey] = $translation;
 
             return null;
         }
 
         if ($value && null === $translation) {
-            $translation = $this->createTranslation($key, $value, $locale, $domain, true);
+            $translation = $this->createTranslation($key, $value, $locale, $domain);
         }
 
         if (null !== $translation) {
             $translation->setValue($value);
             $translation->setScope($scope);
 
-            $cacheKey = sprintf('%s-%s-%s', $locale, $domain, $key);
+            $cacheKey = $this->getCacheKey($locale, $domain, $key);
             $this->translations[$cacheKey] = $translation;
         }
 
@@ -149,8 +140,6 @@ class TranslationManager
                 $translationKey = new TranslationKey();
                 $translationKey->setKey($key);
                 $translationKey->setDomain($domain);
-
-                $this->getEntityManager(TranslationKey::class)->persist($translationKey);
             }
 
             $this->translationKeys[$cacheKey] = $translationKey;
@@ -171,10 +160,9 @@ class TranslationManager
             ->findOneBy(['key' => $key, 'domain' => $domain]);
 
         if ($translationKey) {
-            $this->getEntityManager(TranslationKey::class)->remove($translationKey);
-
             $cacheKey = sprintf('%s-%s', $domain, $key);
             $this->translationKeys[$cacheKey] = $translationKey;
+            $this->translationKeysToRemove[$cacheKey] = $translationKey;
         }
     }
 
@@ -213,22 +201,44 @@ class TranslationManager
         if ($force) {
             $this->getEntityManager(Translation::class)->flush();
         } else {
-            $updatedItems = array_values($this->translations) + array_values($this->translationKeys);
-            if ($updatedItems) {
-                $this->getEntityManager(Translation::class)->flush($updatedItems);
+            $em = $this->getEntityManager(TranslationKey::class);
+            foreach ($this->translationKeys as $translationKey) {
+                $em->persist($translationKey);
+            }
+            if ($this->translationKeys) {
+                $em->flush(array_values($this->translationKeys));
+            }
+
+            foreach ($this->translationKeysToRemove as $translationKey) {
+                $em->remove($translationKey);
+            }
+            if ($this->translationKeysToRemove) {
+                $em->flush(array_values($this->translationKeysToRemove));
+            }
+
+            $em = $this->getEntityManager(Translation::class);
+            foreach ($this->translations as $translation) {
+                if (!$translation->getValue()) {
+                    $em->remove($translation);
+                } else {
+                    $em->persist($translation);
+                }
+            }
+            if ($this->translations) {
+                $em->flush(array_values($this->translations));
             }
         }
 
-        // clear local cache
-        $this->languages = [];
-        $this->translationKeys = [];
-        $this->translations = [];
-        $this->availableDomains = null;
+        $this->clear();
     }
 
     public function clear()
     {
-        $this->getEntityManager(Translation::class)->clear();
+        $this->languages = [];
+        $this->translationKeys = [];
+        $this->translationKeysToRemove = [];
+        $this->translations = [];
+        $this->availableDomains = null;
     }
 
     /**
@@ -316,5 +326,16 @@ class TranslationManager
     protected function getEntityRepository($class)
     {
         return $this->getEntityManager($class)->getRepository($class);
+    }
+
+    /**
+     * @param string $locale
+     * @param string $domain
+     * @param string $key
+     * @return string
+     */
+    private function getCacheKey($locale, $domain, $key)
+    {
+        return sprintf('%s-%s-%s', $locale, $domain, $key);
     }
 }
