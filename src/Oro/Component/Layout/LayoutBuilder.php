@@ -209,7 +209,10 @@ class LayoutBuilder implements LayoutBuilderInterface
         $rawLayout = $this->rawLayoutBuilder->getRawLayout();
         $rootView = $this->blockFactory->createBlockView($rawLayout, $context, $rootId);
 
-        $this->processExpressions($rawLayout, $context);
+        if ($context->getOr('expressions_evaluate')) {
+            $encoding = $context->getOr('expressions_encoding');
+            $this->processExpressions($rootView, $context, $encoding, new DataAccessor($this->registry, $context));
+        }
 
         $layout = $this->createLayout($rootView);
         $rootBlockId = $rawLayout->getRootId();
@@ -238,25 +241,21 @@ class LayoutBuilder implements LayoutBuilderInterface
     /**
      * Processes expressions that work with data
      *
-     * @param RawLayout $rawLayout
+     * @param BlockView $blockView
      * @param ContextInterface $context
+     * @param string $encoding
+     * @param DataAccessor $data
      */
-    protected function processExpressions(RawLayout $rawLayout, ContextInterface $context)
-    {
-        if (!$context->getOr('expressions_evaluate')) {
-            return;
-        }
+    protected function processExpressions(
+        BlockView $blockView,
+        ContextInterface $context,
+        $encoding,
+        DataAccessor $data
+    ) {
+        $this->expressionProcessor->processExpressions($blockView->vars, $context, $data, true, $encoding);
 
-        $encoding = $context->getOr('expressions_encoding');
-        $rootId   = $context->getOr('root_id');
-        $rootId   = $rootId ? $rawLayout->resolveId($rootId) : $rawLayout->getRootId();
-        $data     = new DataAccessor($this->registry, $context);
-
-        foreach ($rawLayout->getHierarchyIterator($rootId) as $blockId) {
-            $options = $rawLayout->getProperty($blockId, RawLayout::RESOLVED_OPTIONS, true);
-            $values = $options->toArray();
-            $this->expressionProcessor->processExpressions($values, $context, $data, true, $encoding);
-            $options->setMultiple($values);
+        foreach ($blockView->children as $childView) {
+            $this->processExpressions($childView, $context, $encoding, $data);
         }
     }
 }
