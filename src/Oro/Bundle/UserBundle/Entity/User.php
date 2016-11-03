@@ -1265,7 +1265,7 @@ class User extends ExtendUser implements
      *
      * @return $this
      */
-    public function updateAllUsersPasswordExpiration(\DateTime $passwordExpiresAt = null)
+    public function setPasswordExpiresAt(\DateTime $passwordExpiresAt = null)
     {
         $this->passwordExpiresAt = $passwordExpiresAt;
 

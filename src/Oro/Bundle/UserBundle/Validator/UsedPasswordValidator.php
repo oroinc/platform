@@ -23,6 +23,11 @@ class UsedPasswordValidator extends ConstraintValidator
     /** @var EncoderFactoryInterface */
     protected $encoderFactory;
 
+    /**
+     * @param Registry $registry
+     * @param UsedPasswordConfigProvider $configProvider
+     * @param EncoderFactoryInterface $encoderFactory
+     */
     public function __construct(
         Registry $registry,
         UsedPasswordConfigProvider $configProvider,
@@ -39,7 +44,7 @@ class UsedPasswordValidator extends ConstraintValidator
     public function validate($user, Constraint $constraint)
     {
         if (!$constraint instanceof UsedPassword) {
-            throw new UnexpectedTypeException($constraint, __NAMESPACE__.'Constraint\NotBlank');
+            throw new UnexpectedTypeException($constraint, __NAMESPACE__.'Constraint\UsedPassword');
         }
 
         if (!$this->configProvider->isUsedPasswordCheckEnabled()) {

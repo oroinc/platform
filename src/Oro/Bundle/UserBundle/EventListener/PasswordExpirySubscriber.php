@@ -12,7 +12,7 @@ use Oro\Bundle\UserBundle\Entity\User;
 
 class PasswordExpirySubscriber implements EventSubscriberInterface
 {
-    protected $periodMarkers = [1, 3, 7];
+    public static $periodMarkers = [1, 3, 7];
 
     /** @var Session */
     protected $session;
@@ -34,9 +34,7 @@ class PasswordExpirySubscriber implements EventSubscriberInterface
      */
     public static function getSubscribedEvents()
     {
-        return array(
-            SecurityEvents::INTERACTIVE_LOGIN => 'onInteractiveLogin'
-        );
+        return [SecurityEvents::INTERACTIVE_LOGIN => 'onInteractiveLogin'];
     }
 
     /**
@@ -51,7 +49,7 @@ class PasswordExpirySubscriber implements EventSubscriberInterface
             $interval = $now->diff($passwordExpiryDate);
             $days = $interval ? ($interval->d + 1) : false;
 
-            if ($days && in_array($days, $this->periodMarkers)) {
+            if ($days && in_array($days, self::$periodMarkers)) {
                 $message = $this->translator->transChoice(
                     'oro.user.password.expiration.message',
                     $days,
