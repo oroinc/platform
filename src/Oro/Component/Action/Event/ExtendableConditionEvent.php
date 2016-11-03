@@ -38,7 +38,6 @@ class ExtendableConditionEvent extends Event
 
     /**
      * @param mixed $context
-     *
      * @return $this
      */
     public function setContext($context)
