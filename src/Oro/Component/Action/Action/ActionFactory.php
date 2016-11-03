@@ -6,7 +6,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 
 use Oro\Component\ConfigExpression\ExpressionInterface;
 
-class ActionFactory
+class ActionFactory implements ActionFactoryInterface
 {
     /**
      * @var ContainerInterface

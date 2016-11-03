@@ -8,7 +8,7 @@ use Oro\Bundle\ActionBundle\Exception\ForbiddenActionGroupException;
 use Oro\Bundle\ActionBundle\Model\ActionGroup\ParametersResolver;
 use Oro\Bundle\ActionBundle\Model\Assembler\ParameterAssembler;
 
-use Oro\Component\Action\Action\ActionFactory;
+use Oro\Component\Action\Action\ActionFactoryInterface;
 use Oro\Component\Action\Action\ActionInterface;
 use Oro\Component\Action\Action\Configurable as ConfigurableAction;
 use Oro\Component\Action\Condition\Configurable as ConfigurableCondition;
@@ -16,7 +16,7 @@ use Oro\Component\ConfigExpression\ExpressionFactory as ConditionFactory;
 
 class ActionGroup
 {
-    /** @var ActionFactory */
+    /** @var ActionFactoryInterface */
     private $actionFactory;
 
     /** @var ConditionFactory */
@@ -35,14 +35,14 @@ class ActionGroup
     private $parameters;
 
     /**
-     * @param ActionFactory $actionFactory
+     * @param ActionFactoryInterface $actionFactory
      * @param ConditionFactory $conditionFactory
      * @param ParameterAssembler $parameterAssembler
      * @param ParametersResolver $parametersResolver
      * @param ActionGroupDefinition $definition
      */
     public function __construct(
-        ActionFactory $actionFactory,
+        ActionFactoryInterface $actionFactory,
         ConditionFactory $conditionFactory,
         ParameterAssembler $parameterAssembler,
         ParametersResolver $parametersResolver,

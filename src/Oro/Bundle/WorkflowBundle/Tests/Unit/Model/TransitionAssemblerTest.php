@@ -81,9 +81,7 @@ class TransitionAssemblerTest extends \PHPUnit_Framework_TestCase
         $this->conditionFactory = $this->getMockBuilder('Oro\Component\ConfigExpression\ExpressionFactory')
             ->disableOriginalConstructor()
             ->getMock();
-        $this->actionFactory = $this->getMockBuilder('Oro\Component\Action\Action\ActionFactory')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->actionFactory = $this->getMock('Oro\Component\Action\Action\ActionFactoryInterface');
         $this->assembler = new TransitionAssembler(
             $this->formOptionsAssembler,
             $this->conditionFactory,

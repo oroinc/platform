@@ -5,7 +5,7 @@ namespace Oro\Bundle\WorkflowBundle\Model;
 use Doctrine\Common\Collections\Collection;
 
 use Oro\Bundle\WorkflowBundle\Exception\UnknownAttributeException;
-use Oro\Component\Action\Action\ActionFactory;
+use Oro\Component\Action\Action\ActionFactoryInterface;
 use Oro\Component\Action\Action\Configurable as ConfigurableAction;
 use Oro\Component\Action\Exception\InvalidParameterException;
 use Oro\Component\Action\Model\AbstractAssembler as BaseAbstractAssembler;
@@ -24,14 +24,14 @@ class FormOptionsAssembler extends BaseAbstractAssembler
     protected $attributes;
 
     /**
-     * @var ActionFactory
+     * @var ActionFactoryInterface
      */
     protected $actionFactory;
 
     /**
-     * @param ActionFactory $actionFactory
+     * @param ActionFactoryInterface $actionFactory
      */
-    public function __construct(ActionFactory $actionFactory)
+    public function __construct(ActionFactoryInterface $actionFactory)
     {
         $this->actionFactory = $actionFactory;
     }

@@ -584,9 +584,7 @@ class OperationManagerTest extends \PHPUnit_Framework_TestCase
             ->setFrontendOptions($frontendOptions);
 
         /* @var $actionFactory \PHPUnit_Framework_MockObject_MockObject|ActionFactory */
-        $actionFactory = $this->getMockBuilder('Oro\Component\Action\Action\ActionFactory')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $actionFactory = $this->getMock('Oro\Component\Action\Action\ActionFactoryInterface');
 
         /* @var $conditionFactory \PHPUnit_Framework_MockObject_MockObject|ExpressionFactory */
         $conditionFactory = $this->getMockBuilder('Oro\Component\ConfigExpression\ExpressionFactory')

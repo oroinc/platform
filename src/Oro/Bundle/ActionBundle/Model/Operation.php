@@ -8,7 +8,7 @@ use Oro\Bundle\ActionBundle\Exception\ForbiddenOperationException;
 use Oro\Bundle\ActionBundle\Model\Assembler\AttributeAssembler;
 use Oro\Bundle\ActionBundle\Model\Assembler\FormOptionsAssembler;
 
-use Oro\Component\Action\Action\ActionFactory;
+use Oro\Component\Action\Action\ActionFactoryInterface;
 use Oro\Component\Action\Action\ActionInterface;
 use Oro\Component\Action\Action\Configurable as ConfigurableAction;
 use Oro\Component\Action\Condition\AbstractCondition;
@@ -17,7 +17,7 @@ use Oro\Component\ConfigExpression\ExpressionFactory as ConditionFactory;
 
 class Operation
 {
-    /** @var ActionFactory */
+    /** @var ActionFactoryInterface */
     private $actionFactory;
 
     /** @var ConditionFactory */
@@ -45,14 +45,14 @@ class Operation
     private $formOptions;
 
     /**
-     * @param ActionFactory $actionFactory
+     * @param ActionFactoryInterface $actionFactory
      * @param ConditionFactory $conditionFactory
      * @param AttributeAssembler $attributeAssembler
      * @param FormOptionsAssembler $formOptionsAssembler
      * @param OperationDefinition $definition
      */
     public function __construct(
-        ActionFactory $actionFactory,
+        ActionFactoryInterface $actionFactory,
         ConditionFactory $conditionFactory,
         AttributeAssembler $attributeAssembler,
         FormOptionsAssembler $formOptionsAssembler,

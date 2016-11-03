@@ -6,12 +6,12 @@ use Oro\Bundle\ActionBundle\Form\Type\OperationType;
 use Oro\Bundle\ActionBundle\Model\Operation;
 use Oro\Bundle\ActionBundle\Model\OperationDefinition;
 
-use Oro\Component\Action\Action\ActionFactory;
+use Oro\Component\Action\Action\ActionFactoryInterface;
 use Oro\Component\ConfigExpression\ExpressionFactory as ConditionFactory;
 
 class OperationAssembler extends AbstractAssembler
 {
-    /** @var ActionFactory */
+    /** @var ActionFactoryInterface */
     private $actionFactory;
 
     /** @var ConditionFactory */
@@ -24,13 +24,13 @@ class OperationAssembler extends AbstractAssembler
     private $formOptionsAssembler;
 
     /**
-     * @param ActionFactory $actionFactory
+     * @param ActionFactoryInterface $actionFactory
      * @param ConditionFactory $conditionFactory
      * @param AttributeAssembler $attributeAssembler
      * @param FormOptionsAssembler $formOptionsAssembler
      */
     public function __construct(
-        ActionFactory $actionFactory,
+        ActionFactoryInterface $actionFactory,
         ConditionFactory $conditionFactory,
         AttributeAssembler $attributeAssembler,
         FormOptionsAssembler $formOptionsAssembler
