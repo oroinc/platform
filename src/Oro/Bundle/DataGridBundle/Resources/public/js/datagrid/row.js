@@ -255,7 +255,12 @@ define([
                 if (_this.disposed) {
                     return;
                 }
+
                 _this.trigger('clicked', _this, options);
+                if (_this.disposed) {
+                    return;
+                }
+
                 for (var i = 0; i < _this.subviews.length; i++) {
                     var cell = _this.subviews[i];
                     if (cell.listenRowClick && _.isFunction(cell.onRowClicked)) {
