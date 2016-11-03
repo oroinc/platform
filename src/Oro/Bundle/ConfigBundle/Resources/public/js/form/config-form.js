@@ -89,7 +89,7 @@ define([
                         // force reload without hash navigation
                         window.location.reload();
 
-                        this.once('page:afterChange', function () {
+                        this.once('page:afterChange', function() {
                             // Show loading until page is fully reloaded
                             this.execute('showLoading');
                         });
