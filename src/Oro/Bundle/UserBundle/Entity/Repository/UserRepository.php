@@ -6,6 +6,7 @@ use Doctrine\ORM\EntityRepository;
 
 use Oro\Bundle\EmailBundle\Entity\EmailOrigin;
 use Oro\Bundle\EmailBundle\Entity\Repository\EmailAwareRepository;
+use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\UserBundle\Entity\User;
 
 class UserRepository extends EntityRepository implements EmailAwareRepository
@@ -147,27 +148,36 @@ class UserRepository extends EntityRepository implements EmailAwareRepository
 
     /**
      * @param string[] $emails
+     * @param Organization|null $organization
      *
      * @return User[]
      */
-    public function findUsersByEmails(array $emails)
+    public function findUsersByEmailsAndOrganization(array $emails, Organization $organization = null)
     {
         if (!$emails) {
             return [];
         }
 
-        $lowerEmails = array_map('strtolower', $emails);
+        $lowerCaseEmails = array_map('strtolower', $emails);
 
-        $qb = $this->createQueryBuilder('u');
+        $queryBuilder = $this->createQueryBuilder('user');
 
-        return $qb
-            ->select('u')
-            ->leftJoin('u.emails', 'e')
-            ->where($qb->expr()->orX(
-                $qb->expr()->in('LOWER(e.email)', $lowerEmails),
-                $qb->expr()->in('LOWER(u.email)', $lowerEmails)
-            ))
-            ->getQuery()
-            ->getResult();
+        $queryBuilder
+            ->select('user')
+            ->leftJoin('user.emails', 'email')
+            ->where($queryBuilder->expr()->orX(
+                $queryBuilder->expr()->in('LOWER(email.email)', $lowerCaseEmails),
+                $queryBuilder->expr()->in('LOWER(user.email)', $lowerCaseEmails)
+            ));
+
+        if ($organization) {
+            $queryBuilder->innerJoin('user.organizations', 'organization')
+                ->andWhere('organization = :organization')
+                ->setParameter('organization', $organization);
+        }
+
+        $query = $queryBuilder->getQuery();
+
+        return $query->getResult();
     }
 }
