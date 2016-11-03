@@ -58,10 +58,10 @@ abstract class ProcessIncludedEntities implements ProcessorInterface
             $entityData = $includedEntities->getData($entity);
             $this->processIncludedEntity(
                 $context,
-                $includedEntities->getClass($entity),
-                $includedEntities->getId($entity),
                 $includedData[$entityData->getIndex()],
                 $entity,
+                $includedEntities->getClass($entity),
+                $includedEntities->getId($entity),
                 $entityData
             );
         }
@@ -69,18 +69,18 @@ abstract class ProcessIncludedEntities implements ProcessorInterface
 
     /**
      * @param FormContext              $context
-     * @param string                   $entityClass
-     * @param mixed                    $entityId
      * @param array                    $entityRequestData
      * @param object                   $entity
+     * @param string                   $entityClass
+     * @param string                   $entityIncludeId
      * @param IncludedEntityData       $entityData
      */
     protected function processIncludedEntity(
         FormContext $context,
-        $entityClass,
-        $entityId,
         array $entityRequestData,
         $entity,
+        $entityClass,
+        $entityIncludeId,
         IncludedEntityData $entityData
     ) {
         $actionProcessor = $this->processorBag->getProcessor(
@@ -95,7 +95,7 @@ abstract class ProcessIncludedEntities implements ProcessorInterface
         $actionContext->setIncludedEntities($context->getIncludedEntities());
 
         $actionContext->setClassName($entityClass);
-        $actionContext->setId($entityId);
+        $actionContext->setId($entityIncludeId);
         $actionContext->setRequestData($entityRequestData);
         $actionContext->setResult($entity);
 

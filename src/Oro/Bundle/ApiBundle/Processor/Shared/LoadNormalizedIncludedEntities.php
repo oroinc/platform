@@ -55,8 +55,8 @@ class LoadNormalizedIncludedEntities implements ProcessorInterface
         foreach ($includedEntities as $entity) {
             $this->processIncludedEntity(
                 $context,
-                $includedEntities->getClass($entity),
                 $entity,
+                $includedEntities->getClass($entity),
                 $includedEntities->getId($entity),
                 $includedEntities->getData($entity)
             );
@@ -65,15 +65,15 @@ class LoadNormalizedIncludedEntities implements ProcessorInterface
 
     /**
      * @param FormContext        $context
-     * @param string             $entityClass
      * @param object             $entity
+     * @param string             $entityClass
      * @param string             $entityIncludeId
      * @param IncludedEntityData $entityData
      */
     protected function processIncludedEntity(
         FormContext $context,
-        $entityClass,
         $entity,
+        $entityClass,
         $entityIncludeId,
         IncludedEntityData $entityData
     ) {
