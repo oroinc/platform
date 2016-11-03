@@ -8,10 +8,11 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 abstract class AbstractFormProvider
 {
-    const USED_FOR_CACHE_ONLY_OPTION = 'usedForCacheOnlyOption';
-
     /** @var array */
     protected $forms = [];
+
+    /** @var array */
+    protected $formViews = [];
 
     /** @var FormFactoryInterface */
     protected $formFactory;
@@ -33,21 +34,55 @@ abstract class AbstractFormProvider
      * Build new form
      *
      * @param string $formName
-     * @param mixed $data
-     * @param array $options
+     * @param mixed  $data
+     * @param array  $options
+     * @param array  $cacheKeyOptions
      *
      * @return FormInterface
      */
-    protected function getForm($formName, $data = null, array $options = [])
+    protected function getForm($formName, $data = null, array $options = [], array $cacheKeyOptions = [])
     {
-        $cacheKey = $this->getCacheKey($formName, $options);
-        unset($options[self::USED_FOR_CACHE_ONLY_OPTION]);
+        $cacheKey = $this->getCacheKey($formName, $options, $cacheKeyOptions);
 
         if (!array_key_exists($cacheKey, $this->forms)) {
-            $this->forms[$cacheKey] = $this->formFactory->create($formName, $data, $options);
+            $this->forms[$cacheKey] = $this->createForm($formName, $data, $options);
         }
 
         return $this->forms[$cacheKey];
+    }
+
+    /**
+     * Retrieve form view
+     *
+     * @param string $formName
+     * @param mixed  $data
+     * @param array  $options
+     * @param array  $cacheKeyOptions
+     *
+     * @return mixed
+     */
+    protected function getFormView($formName, $data = null, array $options = [], array $cacheKeyOptions = [])
+    {
+        $cacheKey = $this->getCacheKey($formName, $options, $cacheKeyOptions);
+        if (!array_key_exists($cacheKey, $this->formViews)) {
+            $form = $this->getForm($formName, $data, $options, $cacheKeyOptions);
+
+            $this->formViews[$cacheKey] = $form->createView();
+        }
+
+        return $this->formViews[$cacheKey];
+    }
+
+    /**
+     * @param string $formName
+     * @param null   $data
+     * @param array  $options
+     *
+     * @return FormInterface
+     */
+    protected function createForm($formName, $data = null, array $options = [])
+    {
+        return $this->formFactory->create($formName, $data, $options);
     }
 
     /**
@@ -57,7 +92,7 @@ abstract class AbstractFormProvider
      * @param array  $arguments
      * @return mixed
      */
-    protected function generateUrl($name, $arguments = array())
+    protected function generateUrl($name, array $arguments = [])
     {
         return $this->router->generate($name, $arguments);
     }
@@ -66,12 +101,13 @@ abstract class AbstractFormProvider
      * Get form cache key
      *
      * @param string $formName
-     * @param array $options
+     * @param array  $options
+     * @param array  $cacheKeyOptions
      *
      * @return string
      */
-    protected function getCacheKey($formName, array $options = [])
+    protected function getCacheKey($formName, array $options = [], array $cacheKeyOptions = [])
     {
-        return sprintf('%s:%s', $formName, md5(serialize($options)));
+        return sprintf('%s:%s', $formName, md5(serialize(array_merge($options, $cacheKeyOptions))));
     }
 }
