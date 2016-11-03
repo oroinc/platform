@@ -2,15 +2,10 @@
 
 namespace Oro\Bundle\UserBundle\Form\Type;
 
-use Symfony\Component\Form\FormEvent;
-use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
-use Oro\Bundle\FormBundle\Utils\FormUtils;
-use Oro\Bundle\UserBundle\Entity\UserInterface;
-use Oro\Bundle\UserBundle\Validator\Constraints\UsedPassword;
 use Oro\Bundle\UserBundle\Form\Provider\PasswordFieldOptionsProvider;
 
 class ResetType extends AbstractType

@@ -31,9 +31,6 @@ class UserType extends AbstractType
     /** @var PasswordFieldOptionsProvider */
     protected $optionsProvider;
 
-    /** @var int */
-    protected $userId;
-
     /**
      * @param SecurityContextInterface $security Security context
      * @param SecurityFacade $securityFacade
@@ -51,14 +48,6 @@ class UserType extends AbstractType
 
         $this->isMyProfilePage = $request->attributes->get('_route') === 'oro_user_profile_update';
         $this->optionsProvider = $optionsProvider;
-
-        if ($this->isMyProfilePage) {
-            $user = $securityFacade->getLoggedUser();
-        } else {
-            $user = $request->attributes->get('entity', null);
-        }
-
-        $this->userId = $user ? $user->getId() : null;
     }
 
     /**
@@ -152,7 +141,7 @@ class UserType extends AbstractType
                     'prototype_name' => 'tag__name__'
                 ]
             )
-            ->add('change_password', ChangePasswordType::NAME, ['userId' => $this->userId])
+            ->add('change_password', ChangePasswordType::NAME)
             ->add('avatar', 'oro_image', ['label' => 'oro.user.avatar.label', 'required' => false]);
 
         $this->addInviteUserField($builder);

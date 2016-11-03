@@ -13,7 +13,6 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\UserBundle\Entity\UserManager;
 use Oro\Bundle\UserBundle\Mailer\Processor;
-use Oro\Bundle\UserBundle\Validator\Constraints\UsedPassword;
 
 /**
  * Class SetPasswordHandler
