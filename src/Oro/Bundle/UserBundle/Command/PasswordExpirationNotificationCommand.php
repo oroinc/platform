@@ -43,14 +43,10 @@ class PasswordExpirationNotificationCommand extends ContainerAwareCommand implem
         $mailManager = $container->get('oro_notification.manager.email_notification');
         $doctrine = $container->get('oro_entity.doctrine_helper');
 
-        $users = $doctrine->getEntityRepository('OroUserBundle:User')
-            ->findExpiringPasswordUsers($this->notificationDays);
-
-        if (!$users) {
-            $output->writeln('<info>No users with expiring passwords found</info>');
-
-            return;
-        }
+        $iteratorResult = $doctrine->getEntityRepository('OroUserBundle:User')
+            ->getExpiringPasswordUsersQueryBuilder($this->notificationDays)
+            ->getQuery()
+            ->iterate();
 
         $template = $doctrine->getEntityRepository('OroEmailBundle:EmailTemplate')
             ->findOneBy(['name' => 'mandatory_password_change']);
@@ -61,16 +57,18 @@ class PasswordExpirationNotificationCommand extends ContainerAwareCommand implem
             return;
         }
 
-        foreach ($users as $user) {
-            // use default sender
+        $usersCount = 0;
+        while ($results = $iteratorResult->next()) {
+            $user = $results[0];
             $notification = new EmailNotification($template, [$user->getEmail()]);
             $mailManager->process($user, [$notification]);
+            $usersCount++;
         }
 
         $output->writeln(
             sprintf(
                 '<info>Password expiration notification has been enqueued for %d users</info>',
-                count($users)
+                $usersCount
             )
         );
     }

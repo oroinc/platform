@@ -189,12 +189,12 @@ class UserRepository extends EntityRepository implements EmailAwareRepository
     }
 
     /**
-     * Return array of users which their passwords are about to expire in specified list of days
+     * Return query builder matching users which their passwords are about to expire in specified list of days
      *
      * @param int[] $days
-     * @return User[]
+     * @return \Doctrine\ORM\QueryBuilder
      */
-    public function findExpiringPasswordUsers(array $days)
+    public function getExpiringPasswordUsersQueryBuilder(array $days)
     {
         if (0 === count($days)) {
             throw new \InvalidArgumentException('At least one notification period should be provided');
@@ -220,9 +220,7 @@ class UserRepository extends EntityRepository implements EmailAwareRepository
             ->select('u')
             ->andWhere('u.enabled = :enabled')
             ->andWhere($builder->expr()->orX()->addMultiple($conditions))
-            ->setParameter('enabled', true)
-            ->getQuery()
-            ->getResult();
+            ->setParameter('enabled', true);
     }
 
     /**
