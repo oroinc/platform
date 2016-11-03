@@ -78,6 +78,8 @@ class PdoMysql extends BaseDriver
             }
         } elseif ( $searchCondition['condition'] === Query::OPERATOR_EQUALS) {
             $whereExpr = $this->createEqualsExpr($qb, implode(' ', $words), $index, $searchCondition, $setOrderBy);
+        } elseif ( $searchCondition['condition'] === Query::OPERATOR_NOT_EQUALS) {
+            $whereExpr = $this->createNotEqualsExpr($qb, implode(' ', $words), $index, $searchCondition, $setOrderBy);
         } else {
             $whereExpr = $this->createNotLikeWordsExpr($qb, $words, $index, $searchCondition);
         }
