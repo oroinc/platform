@@ -224,27 +224,23 @@ class UserRepository extends EntityRepository implements EmailAwareRepository
     }
 
     /**
-     * Get array of users with expired passwords
+     * Get array of enabled users with expired passwords
      *
-     * @param bool $loginDisabled  Filter by login_disabled (null to ignore)
-     * @param \DateTime|null $date password expiration date
-     *
-     * @return \Doctrine\ORM\QueryBuilder
+     * @return array
      */
-    public function findExpiredPasswordUsersQb($loginDisabled = false, \DateTime $date = null)
+    public function getExpiredPasswordUserIds()
     {
-        if (null === $date) {
-            $date = new \DateTime('now', new \DateTimeZone('UTC'));
-        }
-        $qb = $this->createQueryBuilder('u')
-            ->select('u')
-            ->andWhere('u.passwordExpiresAt >= :expiresAt')
-            ->setParameter('expiresAt', $date, Type::DATETIME);
+        $result = $this->createQueryBuilder('u')
+            ->select('u.id')
+            ->andWhere('u.passwordExpiresAt <= :expiresAt')
+            ->andWhere('u.loginDisabled = :loginDisabled')
+            ->andWhere('u.enabled = :enabled')
+            ->setParameter('expiresAt', new \DateTime('now', new \DateTimeZone('UTC')), Type::DATETIME)
+            ->setParameter('loginDisabled', false)
+            ->setParameter('enabled', true)
+            ->getQuery()
+            ->getArrayResult();
 
-        if (null !== $loginDisabled) {
-            $qb->andWhere('u.loginDisabled = :loginDisabled')->setParameter('loginDisabled', $loginDisabled);
-        }
-
-        return $qb;
+        return array_column($result, 'id');
     }
 }

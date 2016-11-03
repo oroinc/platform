@@ -11,16 +11,20 @@ use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
 use Oro\Component\MessageQueue\Transport\MessageInterface;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
 
+use Oro\Bundle\EmailBundle\Entity\EmailTemplate;
 use Oro\Bundle\EmailBundle\Model\EmailTemplateInterface;
 use Oro\Bundle\NotificationBundle\Model\EmailNotification;
 use Oro\Bundle\NotificationBundle\Manager\EmailNotificationManager;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\UserBundle\Entity\UserManager;
 
+/**
+ * Message Queue processor to expire passwords of users
+ * $message should include an (int) userId or (array) userIds
+ */
 class ExpireUserPasswordsProcessor implements MessageProcessorInterface, TopicSubscriberInterface
 {
     const TEMPLATE_NAME = 'force_reset_password';
-    const BATCH_SIZE = 100;
 
     /** @var LoggerInterface */
     protected $logger;
@@ -33,9 +37,6 @@ class ExpireUserPasswordsProcessor implements MessageProcessorInterface, TopicSu
 
     /** @var RegistryInterface */
     protected $doctrine;
-
-    /** @var EmailTemplateInterface */
-    protected $template;
 
     /**
      * @param EmailNotificationManager $notificationManager
@@ -61,7 +62,7 @@ class ExpireUserPasswordsProcessor implements MessageProcessorInterface, TopicSu
      */
     public static function getSubscribedTopics()
     {
-        return [Topics::FORCE_EXPIRED_PASSWORDS];
+        return [Topics::EXPIRE_USER_PASSWORDS];
     }
 
     /**
@@ -69,41 +70,18 @@ class ExpireUserPasswordsProcessor implements MessageProcessorInterface, TopicSu
      */
     public function process(MessageInterface $message, SessionInterface $session)
     {
-        $this->template = $this->doctrine->getManagerForClass('OroEmailBundle:EmailTemplate')
-            ->getRepository('OroEmailBundle:EmailTemplate')
-            ->findOneBy(['name' => self::TEMPLATE_NAME]);
+        $userIds = (array) $message->getBody();
+        $template = $this->getEmailTemplate();
+        if (!$template) {
+            $this->logError('Invalid expire password template');
 
-        $users = $this->findExpiredPasswordUsersQb()
-            ->getQuery()
-            ->iterate();
-
-        $count = 0;
-        $batch = [];
-        while ($user = $users->next()) {
-            $batch[] = $user[0];
-            if (++$count % self::BATCH_SIZE === 0) {
-                $this->processBatch($batch);
-                $batch = [];
-            }
+            return self::ACK;
         }
 
-        $this->processBatch($batch);
-
-        return self::ACK;
-    }
-
-    /**
-     * Process a batch of users
-     *
-     * @param array $users
-     */
-    protected function processBatch($users = [])
-    {
-        if (0 === count($users)) {
-            return;
-        }
+        $users = $this->getUserRepository()->findUsersByIds($userIds);
 
         foreach ($users as $user) {
+            /** @var User $user */
             $userEmail = $user->getEmail();
 
             $user->setConfirmationToken($user->generateToken());
@@ -111,24 +89,33 @@ class ExpireUserPasswordsProcessor implements MessageProcessorInterface, TopicSu
             $this->userManager->updateUser($user, false);
 
             try {
-                $passResetNotification = new EmailNotification($this->template, [$userEmail]);;
+                $passResetNotification = new EmailNotification($template, [$userEmail]);;
                 $this->notificationManager->process($user, [$passResetNotification]);
-                if (null !== $this->logger) {
-                    $this->logger->debug(sprintf('Sending expired password email to %s', $userEmail), $user->getId());
-                }
             } catch (\Exception $e) {
-                if (null !== $this->logger) {
-                    $this->logger->error(sprintf('Sending expired password email to %s failed.', $userEmail));
-                    $this->logger->error($e->getMessage());
-                }
+                $this->logError(sprintf('Sending expired password email to %s failed.', $userEmail), $e->getMessage());
             }
         }
 
         $this->getUserEntityManager()->flush();
+
+        return self::ACK;
     }
 
     /**
-     * @return \Doctrine\ORM\EntityManager|null
+     * Log error if logger is enabled
+     *
+     * @param $msg
+     * @param null $data
+     */
+    protected function logError($msg, $data = null)
+    {
+        if ($this->logger) {
+            $this->logger->error($msg, $data);
+        }
+    }
+
+    /**
+     * @return \Doctrine\ORM\EntityManager
      */
     protected function getUserEntityManager()
     {
@@ -136,10 +123,22 @@ class ExpireUserPasswordsProcessor implements MessageProcessorInterface, TopicSu
     }
 
     /**
-     * @return \Doctrine\ORM\QueryBuilder
+     * @return \Oro\Bundle\UserBundle\Entity\Repository\UserRepository
      */
-    protected function findExpiredPasswordUsersQb()
+    protected function getUserRepository()
     {
-        return $this->getUserEntityManager()->getRepository(User::class)->findExpiredPasswordUsersQb();
+        return $this->getUserEntityManager()->getRepository(User::class);
+    }
+
+    /**
+     * get Instance of the email template
+     *
+     * @return EmailTemplateInterface
+     */
+    protected function getEmailTemplate()
+    {
+        return $this->doctrine->getManagerForClass(EmailTemplate::class)
+            ->getRepository(EmailTemplate::class)
+            ->findOneBy(['name' => self::TEMPLATE_NAME]);
     }
 }

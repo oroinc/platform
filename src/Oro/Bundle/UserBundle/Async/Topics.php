@@ -4,5 +4,5 @@ namespace Oro\Bundle\UserBundle\Async;
 
 class Topics
 {
-    const FORCE_EXPIRED_PASSWORDS = 'oro.user.force_expired_passwords';
+    const EXPIRE_USER_PASSWORDS = 'oro.user.expire_user_passwords';
 }

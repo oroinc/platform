@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\UserBundle\Command;
 
+use Oro\Bundle\UserBundle\Entity\Repository\UserRepository;
+use Oro\Bundle\UserBundle\Entity\User;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -9,10 +11,10 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Oro\Bundle\CronBundle\Command\CronCommandInterface;
 use Oro\Bundle\UserBundle\Async\Topics;
 
-class ExpirePasswordsCommand extends ContainerAwareCommand implements CronCommandInterface
+class ExpireUserPasswordsCommand extends ContainerAwareCommand implements CronCommandInterface
 {
     /**
-     * Run command at 00:00 every day.
+     * Run command every hour
      *
      * @return string
      */
@@ -28,8 +30,7 @@ class ExpirePasswordsCommand extends ContainerAwareCommand implements CronComman
     {
         $this
             ->setName('oro:cron:expire-passwords')
-            ->setDescription('Disable users that have expired passwords and send them a notification')
-        ;
+            ->setDescription('Queues to disable users that have expired passwords and send them a notification');
     }
 
     /**
@@ -39,8 +40,15 @@ class ExpirePasswordsCommand extends ContainerAwareCommand implements CronComman
     {
         $container = $this->getContainer();
         $producer = $container->get('oro_message_queue.client.message_producer');
-        $producer->send(Topics::FORCE_EXPIRED_PASSWORDS, []);
+        /** @var UserRepository $repo */
+        $repo = $container->get('doctrine')->getEntityManagerForClass(User::class)->getRepository(User::class);
 
-        $output->writeln('<info>Password expiration has been queued.</info>');
+        $userIds = $repo->getExpiredPasswordUserIds();
+
+        foreach ($userIds as $userId) {
+            $producer->send(Topics::EXPIRE_USER_PASSWORDS, $userId);
+        }
+
+        $output->writeln(sprintf('<info>Password expiration has been queued for %d users.</info>', count($userIds)));
     }
 }
