@@ -254,7 +254,17 @@ services:
     oro_layout.block_type.form_start:
         parent: oro_layout.block_type.abstract_configurable
         calls:
-            - [setOptionsConfig, [{form: {required: true}, form_config: {required: true}, instance_name: ~}]]
+            -
+                - setOptionsConfig
+                -
+                    -
+                        form: {required: true}
+                        form_action: ~
+                        form_method: ~
+                        form_multipart: ~
+                        form_route_name: ~
+                        form_route_parameters: {default: []}
+                        instance_name: ~
             - [setName, ['form_start']]
         tags:
              - { name: layout.block_type, alias: form_start }

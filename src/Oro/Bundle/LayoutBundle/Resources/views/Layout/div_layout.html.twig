@@ -250,15 +250,25 @@
 
 {% block form_start_widget %}
     {% set attr = form.vars.attr|merge(attr) %}
-    {% set action = form_action is defined ? form_action : form_config.action -%}
-    {% set method = form_method is defined ? form_method : form_config.method %}
-    {% if form_enctype is not defined and form.vars.multipart %}
-        {% set enctype = 'multipart/form-data' %}
+    {% set options = {attr: attr} %}
+
+    {% set action = form_action is defined ? form_action : (form_route_name is defined ? path(form_route_name, form_route_parameters) : null) -%}
+    {% if action is not same as(null) %}
+        {% set options =  options|merge({action: action}) %}
     {% endif %}
-    {% if method not in ['GET', 'POST'] -%}
-        {% set form_method = 'POST' %}
-    {%- endif -%}
-    <form{{ block('block_attributes') }}{% if action is not same as(null) %} action="{{ action }}"{% endif %}{% if method is defined %} method="{{ form_method|default(method)|lower }}"{% endif %}{% if enctype is defined %} enctype="{{ enctype }}"{% endif %}>
+
+    {% if form_method is defined %}
+        {% if method not in ['GET', 'POST'] -%}
+            {% set form_method = 'POST' %}
+        {%- endif -%}
+        {% set options =  options|merge({method: form_method}) %}
+    {% endif %}
+
+    {% if form_multipart is defined %}
+        {% set options =  options|merge({multipart: form_multipart}) %}
+    {% endif %}
+
+    {{ form_start(form, options) }}
     {%- if form_method is defined -%}
         <input type="hidden" name="_method" value="{{ method }}" />
     {%- endif -%}

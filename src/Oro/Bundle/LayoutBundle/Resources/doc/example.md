@@ -1153,7 +1153,6 @@ layout:
                     blockType: form_start
                     options:
                         form: '=data["search_form"].getFormView()'
-                        form_config: '=data["search_form"].getFormConfig()'
                         attr:
                             id: search_mini_form
                 search_form_fields:
@@ -1324,7 +1323,6 @@ layout:
                     blockType: form_start
                     options:
                         form: '=data["product_addtocart_form"].getFormView()'
-                        form_config: '=data["product_addtocart_form"].getFormConfig()'
                         attr:
                             id: product_addtocart_form
                 form_fields:

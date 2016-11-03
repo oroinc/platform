@@ -17,19 +17,19 @@ class FormType extends AbstractType
      */
     public function configureOptions(OptionsResolver $resolver)
     {
-        $resolver->setRequired([
-            'form',
-            'form_config'
-        ]);
+        $resolver->setRequired(['form']);
 
         $resolver->setDefined([
             'form_action',
             'form_method',
-            'form_enctype',
+            'form_multipart',
+            'form_route_name',
             'preferred_fields',
             'render_rest',
             'instance_name'
         ]);
+
+        $resolver->setDefaults(['form_route_parameters' => []]);
     }
 
     /**
@@ -39,10 +39,11 @@ class FormType extends AbstractType
     {
         $this->addBlockType($builder, 'form_start', $options, [
             'form',
-            'form_config',
             'form_action',
             'form_method',
-            'form_enctype',
+            'form_multipart',
+            'form_route_name',
+            'form_route_parameters',
             'instance_name',
             'additional_block_prefixes',
         ]);
