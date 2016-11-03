@@ -44,7 +44,7 @@ class AutoResponseMessageProcessor implements MessageProcessorInterface, TopicSu
     }
 
     /**
-     * {@inheritdoc}12
+     * {@inheritdoc}
      */
     public function process(MessageInterface $message, SessionInterface $session)
     {
