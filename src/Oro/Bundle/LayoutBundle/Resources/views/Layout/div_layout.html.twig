@@ -250,8 +250,12 @@
 
 {% block form_start_widget %}
     {% set attr = form.vars.attr|merge(attr) %}
-    {% set action = action_path is defined ? action_path : (action_route_name is defined ? path(action_route_name, action_route_parameters) : null) -%}
-    {% if method is defined and method not in ['GET', 'POST'] -%}
+    {% set action = form_action is defined ? form_action : form_config.action -%}
+    {% set method = form_method is defined ? form_method : form_config.method %}
+    {% if form_enctype is not defined and form.vars.multipart %}
+        {% set enctype = 'multipart/form-data' %}
+    {% endif %}
+    {% if method not in ['GET', 'POST'] -%}
         {% set form_method = 'POST' %}
     {%- endif -%}
     <form{{ block('block_attributes') }}{% if action is not same as(null) %} action="{{ action }}"{% endif %}{% if method is defined %} method="{{ form_method|default(method)|lower }}"{% endif %}{% if enctype is defined %} enctype="{{ enctype }}"{% endif %}>
@@ -261,11 +265,7 @@
 {% endblock %}
 
 {% block form_fields_widget %}
-    {% if split_to_fields %}
-        {{ block_widget(block) }}
-    {% else %}
-        {{ form_widget(form) }}
-    {% endif %}
+    {{ form_widget(form) }}
 {% endblock %}
 
 {% block form_end_widget %}

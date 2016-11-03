@@ -1149,17 +1149,17 @@ layout:
     actions:
         - @addTree:
             items:
-                'searh_form:start':
+                searh_form_start':
                     blockType: form_start
                     options:
-                        form_name: search_form
+                        form: '=data["search_form"].getFormView()'
+                        form_config: '=data["search_form"].getFormConfig()'
                         attr:
                             id: search_mini_form
-                search_field:
-                    blockType: form_field
+                search_form_fields:
+                    blockType: form_fields
                     options:
-                        form_name: search_form
-                        field_path: search
+                        form: '=data["search_form"].getFormView()'
                 search_button:
                     blockType: button
                     options:
@@ -1170,17 +1170,17 @@ layout:
                             title: Search
                 search_autocomplete:
                     blockType: block
-                'searh_form:end':
+                searh_form_end:
                     blockType: form_end
                     options:
-                        form_name: search_form
+                        form: '=data["search_form"].getFormView()'
             tree:
                 search:
-                    'searh_form:start': ~
-                    search_field: ~
+                    searh_form_start: ~
+                    search_form_fields: ~
                     search_button: ~
                     search_autocomplete: ~
-                    'searh_form:end': ~
+                    searh_form_end: ~
 ```
 
 Note that we are using separate block types `form_start`, `form_end` and `form_field` to render the form. This allows us to easily add content inside the form (e.g. autocomplete block).
@@ -1323,19 +1323,14 @@ layout:
                 form_start:
                     blockType: form_start
                     options:
-                        form_action: /checkout
+                        form: '=data["product_addtocart_form"].getFormView()'
+                        form_config: '=data["product_addtocart_form"].getFormConfig()'
                         attr:
                             id: product_addtocart_form
-                color_field:
-                    blockType: form_field
+                form_fields:
+                    blockType: form_fields
                     options:
-                        form_name: form
-                        field_path: color
-                qty_field:
-                    blockType: form_field
-                    options:
-                        form_name: form
-                        field_path: qty
+                        form: '=data["product_addtocart_form"].getFormView()'
                 add_to_cart_button:
                     blockType: button
                     options:
@@ -1347,13 +1342,14 @@ layout:
                             class: button btn-cart
                 form_end:
                     blockType: form_end
+                    options:
+                        form: '=data["product_addtocart_form"].getFormView()'
             tree:
                 main_panel:
                     product_view:
                         product_essential:
                             form_start: ~
-                            color_field: ~
-                            qty_field: ~
+                            form_fields: ~
                             add_to_cart_button: ~
                             form_end: ~
 ```
