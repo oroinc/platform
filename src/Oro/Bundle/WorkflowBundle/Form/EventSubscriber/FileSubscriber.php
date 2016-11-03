@@ -9,15 +9,11 @@ use Symfony\Component\Validator\ConstraintViolation;
 
 use Oro\Bundle\AttachmentBundle\Entity\File;
 use Oro\Bundle\AttachmentBundle\Entity\Attachment;
-
 use Oro\Bundle\AttachmentBundle\Form\EventSubscriber\FileSubscriber as BaseFileSubscriber;
-
 use Oro\Bundle\WorkflowBundle\Utils\WorkflowHelper;
 
 class FileSubscriber extends BaseFileSubscriber
 {
-
-
     /**
      * Validate attachment field
      *
@@ -40,7 +36,7 @@ class FileSubscriber extends BaseFileSubscriber
             }
         }
 
-        if ($dataClass == 'Oro\Bundle\WorkflowBundle\Model\WorkflowData') {
+        if ($dataClass === 'Oro\Bundle\WorkflowBundle\Model\WorkflowData') {
             $data = WorkflowHelper::getRealWorkflowData($form);
             $dataClass = $data['dataClass'];
             $fieldName = $data['fieldName'];
