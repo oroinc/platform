@@ -68,12 +68,12 @@ abstract class ProcessIncludedEntities implements ProcessorInterface
     }
 
     /**
-     * @param FormContext              $context
-     * @param array                    $entityRequestData
-     * @param object                   $entity
-     * @param string                   $entityClass
-     * @param string                   $entityIncludeId
-     * @param IncludedEntityData       $entityData
+     * @param FormContext        $context
+     * @param array              $entityRequestData
+     * @param object             $entity
+     * @param string             $entityClass
+     * @param string             $entityIncludeId
+     * @param IncludedEntityData $entityData
      */
     protected function processIncludedEntity(
         FormContext $context,
