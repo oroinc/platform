@@ -17,6 +17,7 @@ define(function(require) {
         }
         if (selector === '#') {
             // new Sizzle does not support empty id selector '#'
+            // https://jquery.com/upgrade-guide/3.0/#breaking-change-jquery-quot-quot-and-find-quot-quot-are-invalid-syntax
             selector = '';
         }
         $parent = selector && $(selector);
@@ -455,7 +456,7 @@ define(function(require) {
                 var originalDropState = $dropdown.data('original-dropstate');
                 if (originalDropState) {
                     flipToInitial($dropdown);
-                    $dropdown.parents().andSelf().add(window).off('.autoflip-dropdown');
+                    $dropdown.parents().addBack().add(window).off('.autoflip-dropdown');
                 }
             });
     })();
