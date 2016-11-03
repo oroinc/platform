@@ -6,7 +6,9 @@ use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\ORM\EntityNotFoundException;
 
+use Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker;
 use Oro\Bundle\WorkflowBundle\Async\TransitionTriggerMessage;
+use Oro\Bundle\WorkflowBundle\Configuration\FeatureConfigurationExtension;
 use Oro\Bundle\WorkflowBundle\Entity\TransitionEventTrigger;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
@@ -22,6 +24,11 @@ class TransitionEventTriggerHandlerTest extends \PHPUnit_Framework_TestCase
     const ENTITY_CLASS = 'stdClass';
     const WORKFLOW_NAME = 'test_workflow';
     const TRANSITION_NAME = 'test_transition';
+
+    /**
+     * @var FeatureChecker|\PHPUnit_Framework_MockObject_MockObject
+     */
+    protected $featureChecker;
 
     /** @var WorkflowManager|\PHPUnit_Framework_MockObject_MockObject */
     private $workflowManager;
@@ -48,7 +55,11 @@ class TransitionEventTriggerHandlerTest extends \PHPUnit_Framework_TestCase
             ->with(self::ENTITY_CLASS)
             ->willReturn($this->objectManager);
 
-        $this->handler = new TransitionEventTriggerHandler($this->workflowManager, $registry);
+        $this->featureChecker = $this->getMockBuilder(FeatureChecker::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $this->handler = new TransitionEventTriggerHandler($this->workflowManager, $registry, $this->featureChecker);
 
         $this->trigger = $this->getEntity(
             TransitionEventTrigger::class,
@@ -71,6 +82,11 @@ class TransitionEventTriggerHandlerTest extends \PHPUnit_Framework_TestCase
         $entityId = 42;
         $entity = new $entityClass();
         $workflowItem = new WorkflowItem();
+
+        $this->featureChecker->expects($this->once())
+            ->method('isResourceEnabled')
+            ->with(self::WORKFLOW_NAME, FeatureConfigurationExtension::WORKFLOWS_NODE_NAME)
+            ->willReturn(true);
 
         $this->objectManager->expects($this->once())
             ->method('find')
@@ -96,6 +112,11 @@ class TransitionEventTriggerHandlerTest extends \PHPUnit_Framework_TestCase
         $entityClass = self::ENTITY_CLASS;
         $entityId = 42;
         $entity = new $entityClass();
+
+        $this->featureChecker->expects($this->once())
+            ->method('isResourceEnabled')
+            ->with(self::WORKFLOW_NAME, FeatureConfigurationExtension::WORKFLOWS_NODE_NAME)
+            ->willReturn(true);
 
         $this->objectManager->expects($this->once())
             ->method('find')
@@ -127,9 +148,34 @@ class TransitionEventTriggerHandlerTest extends \PHPUnit_Framework_TestCase
     {
         $message = TransitionTriggerMessage::create($this->trigger, $entityId);
 
+        $this->featureChecker->expects($this->once())
+            ->method('isResourceEnabled')
+            ->with(self::WORKFLOW_NAME, FeatureConfigurationExtension::WORKFLOWS_NODE_NAME)
+            ->willReturn(true);
+
         $this->setExpectedException($expectedException, $expectedMessage);
 
         $this->handler->process($this->trigger, $message);
+    }
+
+    public function testProcessDisabledFeature()
+    {
+        $entityId = 42;
+
+        $this->featureChecker->expects($this->once())
+            ->method('isResourceEnabled')
+            ->with(self::WORKFLOW_NAME, FeatureConfigurationExtension::WORKFLOWS_NODE_NAME)
+            ->willReturn(false);
+
+        $this->objectManager->expects($this->never())
+            ->method($this->anything());
+
+        $this->workflowManager->expects($this->never())
+            ->method($this->anything());
+
+        $this->assertFalse(
+            $this->handler->process($this->trigger, TransitionTriggerMessage::create($this->trigger, $entityId))
+        );
     }
 
     /**

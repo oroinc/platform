@@ -181,6 +181,7 @@ services:
             - '@oro_workflow.manager'
             - '@oro_workflow.serializer.data.serializer'
             - '@oro_workflow.handler.transition_helper'
+            - '@oro_featuretoggle.checker.feature_checker'
 
     oro_workflow.validation_loader:
         class: Oro\Bundle\WorkflowBundle\Validator\WorkflowValidationLoader
