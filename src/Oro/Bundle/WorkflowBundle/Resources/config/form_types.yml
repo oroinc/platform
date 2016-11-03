@@ -84,6 +84,7 @@ services:
             - { name: form.type_extension, alias: form, extended_type: 'Symfony\Component\Form\Extension\Core\Type\FormType' }
 
     oro_workflow.form.form.file_subscriber:
-      class: Oro\Bundle\WorkflowBundle\Form\EventSubscriber\FileSubscriber
-      decorates: oro_attachment.form.file_subscriber
-      arguments: ['@oro_attachment.validator.file_config_validator']
+        class: Oro\Bundle\WorkflowBundle\Form\EventSubscriber\FileSubscriber
+        public: false
+        decorates: oro_attachment.form.file_subscriber
+        arguments: ['@oro_attachment.validator.file_config_validator']

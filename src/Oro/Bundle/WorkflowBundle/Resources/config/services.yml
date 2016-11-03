@@ -249,6 +249,7 @@ services:
 
     oro_workflow.manager.attachment_manager:
         class: Oro\Bundle\WorkflowBundle\Manager\AttachmentManager
+        public: false
         decorates: oro_attachment.manager
         arguments:
             - '@router'

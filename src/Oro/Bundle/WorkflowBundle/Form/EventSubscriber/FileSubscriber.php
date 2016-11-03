@@ -3,10 +3,8 @@
 namespace Oro\Bundle\WorkflowBundle\Form\EventSubscriber;
 
 use Symfony\Component\Form\FormError;
-
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Validator\ConstraintViolation;
-
 use Oro\Bundle\AttachmentBundle\Entity\File;
 use Oro\Bundle\AttachmentBundle\Entity\Attachment;
 use Oro\Bundle\AttachmentBundle\Form\EventSubscriber\FileSubscriber as BaseFileSubscriber;
