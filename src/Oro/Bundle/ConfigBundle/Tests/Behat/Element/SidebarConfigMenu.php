@@ -14,6 +14,6 @@ class SidebarConfigMenu extends Element
         $link->waitFor(1500, function (NodeElement $link) {
             return $link->isVisible();
         });
-        $this->findLink($locator)->click();
+        $link->click();
     }
 }

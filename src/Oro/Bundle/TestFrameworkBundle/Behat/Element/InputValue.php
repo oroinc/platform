@@ -8,9 +8,6 @@ use Oro\Bundle\TestFrameworkBundle\Behat\Driver\OroSelenium2Driver;
 
 class InputValue implements ElementValueInterface
 {
-    const TYPE = 'type';
-    const SET  = 'set';
-
     /**
      * @var string
      */
@@ -37,13 +34,13 @@ class InputValue implements ElementValueInterface
      */
     public function set($xpath, DriverInterface $driver)
     {
-        if (self::SET === $this->inputMethod) {
+        if (InputMethod::SET === $this->inputMethod) {
             $script = <<<JS
             var node = {{ELEMENT}};
             node.value = '$this->value';
 JS;
             $driver->executeJsOnXpath($xpath, $script);
-        } elseif (self::TYPE === $this->inputMethod) {
+        } elseif (InputMethod::TYPE === $this->inputMethod) {
             $driver->typeIntoInput($xpath, $this->value);
         } else {
             throw new \RuntimeException('Unsupported input method');

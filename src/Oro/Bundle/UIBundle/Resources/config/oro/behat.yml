@@ -3,6 +3,6 @@ elements:
     selector: 'a.edit-button'
     class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Element
 
-  Flush Message:
+  Flash Message:
     selector: '.flash-messages-holder div.alert'
     class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Element

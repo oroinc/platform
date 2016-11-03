@@ -45,10 +45,10 @@ class OroMainContext extends MinkContext implements
     {
         /** @var NodeElement|false $messageElement */
         $messageElement = $this->spin(function (OroMainContext $context) use ($title) {
-            $flushMessage = $context->findElementContains('Flush Message', $title);
+            $flashMessage = $context->findElementContains('Flash Message', $title);
 
-            if ($flushMessage->isValid() && $flushMessage->isVisible()) {
-                return $flushMessage;
+            if ($flashMessage->isValid() && $flashMessage->isVisible()) {
+                return $flashMessage;
             }
 
             return false;
