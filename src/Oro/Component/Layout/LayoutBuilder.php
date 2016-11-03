@@ -204,15 +204,21 @@ class LayoutBuilder implements LayoutBuilderInterface
             $this->registry->configureContext($context);
             $context->resolve();
         }
+
         $this->layoutManipulator->applyChanges($context);
-        $rawLayout   = $this->rawLayoutBuilder->getRawLayout();
-        $rootView    = $this->blockFactory->createBlockView($rawLayout, $context, $rootId);
-        $layout      = $this->createLayout($rootView);
+        $rawLayout = $this->rawLayoutBuilder->getRawLayout();
+        $rootView = $this->blockFactory->createBlockView($rawLayout, $context, $rootId);
+
+        $this->processExpressions($rawLayout, $context);
+
+        $layout = $this->createLayout($rootView);
         $rootBlockId = $rawLayout->getRootId();
         $blockThemes = $rawLayout->getBlockThemes();
+
         foreach ($blockThemes as $blockId => $themes) {
             $layout->setBlockTheme($themes, $blockId !== $rootBlockId ? $blockId : null);
         }
+
         $formThemes = $rawLayout->getFormThemes();
         $layout->setFormTheme($formThemes);
 
@@ -227,5 +233,30 @@ class LayoutBuilder implements LayoutBuilderInterface
     protected function createLayout(BlockView $rootView)
     {
         return new Layout($rootView, $this->rendererRegistry);
+    }
+
+    /**
+     * Processes expressions that work with data
+     *
+     * @param RawLayout $rawLayout
+     * @param ContextInterface $context
+     */
+    protected function processExpressions(RawLayout $rawLayout, ContextInterface $context)
+    {
+        if (!$context->getOr('expressions_evaluate')) {
+            return;
+        }
+
+        $encoding = $context->getOr('expressions_encoding');
+        $rootId   = $context->getOr('root_id');
+        $rootId   = $rootId ? $rawLayout->resolveId($rootId) : $rawLayout->getRootId();
+        $data     = new DataAccessor($this->registry, $context);
+
+        foreach ($rawLayout->getHierarchyIterator($rootId) as $blockId) {
+            $options = $rawLayout->getProperty($blockId, RawLayout::RESOLVED_OPTIONS, true);
+            $values = $options->toArray();
+            $this->expressionProcessor->processExpressions($values, $context, $data, true, $encoding);
+            $options->setMultiple($values);
+        }
     }
 }

@@ -4,6 +4,7 @@ namespace Oro\Component\Layout;
 
 use Oro\Component\Layout\Block\Type\ContainerType;
 use Oro\Component\Layout\Block\Type\Options;
+use Oro\Component\Layout\ExpressionLanguage\ExpressionProcessor;
 
 class BlockFactory implements BlockFactoryInterface
 {
@@ -12,6 +13,9 @@ class BlockFactory implements BlockFactoryInterface
 
     /** @var DeferredLayoutManipulatorInterface */
     protected $layoutManipulator;
+
+    /** @var ExpressionProcessor */
+    protected $expressionProcessor;
 
     /** @var BlockOptionsResolver */
     protected $optionsResolver;
@@ -37,13 +41,16 @@ class BlockFactory implements BlockFactoryInterface
     /**
      * @param LayoutRegistryInterface            $registry
      * @param DeferredLayoutManipulatorInterface $layoutManipulator
+     * @param ExpressionProcessor                $expressionProcessor
      */
     public function __construct(
         LayoutRegistryInterface $registry,
-        DeferredLayoutManipulatorInterface $layoutManipulator
+        DeferredLayoutManipulatorInterface $layoutManipulator,
+        ExpressionProcessor $expressionProcessor
     ) {
-        $this->registry          = $registry;
-        $this->layoutManipulator = $layoutManipulator;
+        $this->registry            = $registry;
+        $this->layoutManipulator   = $layoutManipulator;
+        $this->expressionProcessor = $expressionProcessor;
     }
 
     /**
@@ -214,6 +221,8 @@ class BlockFactory implements BlockFactoryInterface
         // resolve options
         $resolvedOptions = new Options($this->optionsResolver->resolveOptions($blockType, $options));
 
+        $this->processExpressions($resolvedOptions);
+
         // point the block builder state to the current block
         $this->blockBuilder->initialize($id);
         // iterate from parent to current
@@ -269,7 +278,6 @@ class BlockFactory implements BlockFactoryInterface
     protected function finishBlockView(BlockView $view, $id)
     {
         $blockType = $this->rawLayout->getProperty($id, RawLayout::BLOCK_TYPE, true);
-        $options   = $this->rawLayout->getProperty($id, RawLayout::RESOLVED_OPTIONS, true);
         $types     = $this->typeHelper->getTypes($blockType);
 
         // point the block view state to the current block
@@ -294,5 +302,29 @@ class BlockFactory implements BlockFactoryInterface
             $this->rawLayout->getProperty($id, RawLayout::BLOCK_TYPE, true),
             ContainerType::NAME
         );
+    }
+
+    /**
+     * Processes expressions that don't work with data
+     *
+     * @param Options $options
+     */
+    protected function processExpressions(Options $options)
+    {
+        if (!$this->context->getOr('expressions_evaluate')) {
+            return;
+        }
+
+        $values = $options->toArray();
+        //TODO: remove this call and uncomment call below after BB-5243
+        $this->expressionProcessor->processExpressions(
+            $values,
+            $this->context,
+            $this->dataAccessor,
+            true,
+            $this->context->getOr('expressions_encoding')
+        );
+//        $this->expressionProcessor->processExpressions($values, $this->context, null, true, null);
+        $options->setMultiple($values);
     }
 }

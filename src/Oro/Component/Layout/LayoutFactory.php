@@ -75,7 +75,7 @@ class LayoutFactory implements LayoutFactoryInterface
      */
     public function createBlockFactory(DeferredLayoutManipulatorInterface $layoutManipulator)
     {
-        return new BlockFactory($this->registry, $layoutManipulator);
+        return new BlockFactory($this->registry, $layoutManipulator, $this->expressionProcessor);
     }
 
     /**
