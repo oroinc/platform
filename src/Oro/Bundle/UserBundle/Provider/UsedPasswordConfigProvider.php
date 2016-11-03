@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\UserBundle\Provider;
 
+use Oro\Bundle\ConfigBundle\Config\ConfigManager;
+
 class UsedPasswordConfigProvider
 {
     /** @var ConfigManager */

@@ -3,11 +3,11 @@
 namespace Oro\Bundle\UserBundle\Tests\Unit\EventListener;
 
 use Oro\Bundle\UserBundle\Entity\User;
-use Oro\Bundle\UserBundle\EventListener\UserPasswordListener;
+use Oro\Bundle\UserBundle\EventListener\PasswordHistoryListener;
 
-class UserPasswordListenerTest extends \PHPUnit_Framework_TestCase
+class PasswordHistoryListenerTest extends \PHPUnit_Framework_TestCase
 {
-    /** @var  UserPasswordListener */
+    /** @var  PasswordHistoryListener */
     protected $listener;
 
     /** @var \PHPUnit_Framework_MockObject_MockObject */
@@ -49,11 +49,7 @@ class UserPasswordListenerTest extends \PHPUnit_Framework_TestCase
             ->method('getEntityManager')
             ->willReturn($em);
 
-        $provider = $this->getMockBuilder('Oro\Bundle\UserBundle\Provider\PasswordChangePeriodConfigProvider')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->listener = new UserPasswordListener($provider);
+        $this->listener = new PasswordHistoryListener();
     }
 
     /**
@@ -103,7 +99,7 @@ class UserPasswordListenerTest extends \PHPUnit_Framework_TestCase
 
         $this->listener->onFlush($this->eventArgs);
     }
-    
+
     public function dataProvider()
     {
         $user = new User();

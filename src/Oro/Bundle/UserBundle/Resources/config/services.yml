@@ -493,12 +493,17 @@ services:
         arguments:
             - '@oro_config.manager'
 
-    oro_user.listener.password_listener:
-        class: Oro\Bundle\UserBundle\EventListener\UserPasswordListener
+    oro_user.listener.password_history_listener:
+        class: Oro\Bundle\UserBundle\EventListener\PasswordHistoryListener
+        tags:
+            - { name: doctrine.event_listener, event: onFlush, priority: 200 }
+
+    oro_user.listener.password_expiration_subscriber:
+        class: Oro\Bundle\UserBundle\EventListener\PasswordExpirationSubscriber
         arguments:
             - '@oro_user.provider.password_change_period_config_provider'
         tags:
-            - { name: doctrine.event_listener, event: onFlush, priority: 200 }
+            - { name: doctrine.event_subscriber }
 
     oro_user.provider.used_password_config_provider:
         class: Oro\Bundle\UserBundle\Provider\UsedPasswordConfigProvider
