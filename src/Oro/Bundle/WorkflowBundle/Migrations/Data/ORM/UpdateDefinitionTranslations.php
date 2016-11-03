@@ -28,7 +28,7 @@ class UpdateDefinitionTranslations extends AbstractFixture implements ContainerA
 
         /** @var $definitions WorkflowDefinition[] */
         $definitions = $qb->where($qb->expr()->notIn('wd.name', ':names'))
-            ->setParameter('name', $this->getWorkflowNamesFromCurrentConfiguration(), Type::TARRAY)
+            ->setParameter('names', $this->getWorkflowNamesFromCurrentConfiguration(), Type::TARRAY)
             ->getQuery()
             ->getResult();
 
@@ -55,12 +55,7 @@ class UpdateDefinitionTranslations extends AbstractFixture implements ContainerA
         $configurationProvider = $this->container->get('oro_workflow.configuration.provider.workflow_config');
         $workflowConfiguration = $configurationProvider->getWorkflowDefinitionConfiguration();
 
-        return array_map(
-            function ($config) {
-                return $config['name'];
-            },
-            $workflowConfiguration
-        );
+        return array_keys($workflowConfiguration);
     }
 
     /**
