@@ -21,7 +21,6 @@ use Oro\Bundle\EntityBundle\DependencyInjection\Compiler\VirtualFieldProvidersCo
 use Oro\Bundle\EntityBundle\DependencyInjection\Compiler\VirtualRelationProvidersCompilerPass;
 use Oro\Bundle\EntityBundle\DependencyInjection\Compiler\CustomGridFieldValidatorCompilerPass;
 use Oro\Bundle\EntityBundle\DependencyInjection\Compiler\DataCollectorCompilerPass;
-use Oro\Bundle\EntityBundle\DependencyInjection\Compiler\EntityAvatarProviderPass;
 
 class OroEntityBundle extends Bundle
 {
@@ -59,7 +58,6 @@ class OroEntityBundle extends Bundle
         $container->addCompilerPass(new CustomGridFieldValidatorCompilerPass());
         $container->addCompilerPass(new DataCollectorCompilerPass());
         $container->addCompilerPass(new EntityFallbackCompilerPass());
-        $container->addCompilerPass(new EntityAvatarProviderPass());
 
         if ($container instanceof ExtendedContainerBuilder) {
             $container->addCompilerPass(new GeneratedValueStrategyListenerPass());

@@ -448,13 +448,3 @@ services:
         arguments:
             - '@doctrine'
             - '@translator'
-
-    oro_entity.avatar_provider:
-        class: Oro\Bundle\EntityBundle\Provider
-
-    oro_entity.entity_avatar_provider:
-        class: Oro\Bundle\EntityConfigBundle\Provider\EntityAvatarProvider
-        arguments:
-            - '@oro_entity_config.provider.extend'
-        tags:
-            - { name: oro_entity.avatar_provider }
