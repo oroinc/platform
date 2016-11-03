@@ -71,9 +71,6 @@ class AjaxController extends Controller
         ];
 
         if ($data->getRefreshGrid() || !$response['success']) {
-            if (!$request->isXmlHttpRequest()) {
-                return $this->redirect($request->headers->get('referer'));
-            }
             $response['refreshGrid'] = $data->getRefreshGrid();
             $response['flashMessages'] = $this->get('session')->getFlashBag()->all();
         } elseif ($data->getRedirectUrl()) {
