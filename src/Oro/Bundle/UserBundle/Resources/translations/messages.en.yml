@@ -213,7 +213,7 @@ oro:
                 mass_action.success: Password reset completed successfully.
                 mass_action.failure: Mass reset action has failed.
                 popup.label: Reset
-            expiration.message: '{1} Your password will expire in %count% day. Please, reset it.|]1,Inf[ Your password will expire in %count% days. Please, reset it.'
+            expiration.message: '{1} Your password will expire after %count% day. Please, reset it.|{7} Your password will expire after one week. Please, reset it.|]1,Inf[ Your password will expire after %count% days. Please, reset it.'
         # password tooltip for different rules
         password_complexity:
             unrestricted: ~

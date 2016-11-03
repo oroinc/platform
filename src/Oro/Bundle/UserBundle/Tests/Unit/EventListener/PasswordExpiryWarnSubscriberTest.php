@@ -6,9 +6,9 @@ use Symfony\Component\Security\Http\Event\InteractiveLoginEvent;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 
 use Oro\Bundle\UserBundle\Entity\User;
-use Oro\Bundle\UserBundle\EventListener\PasswordExpirySubscriber;
+use Oro\Bundle\UserBundle\EventListener\PasswordExpiryWarnSubscriber;
 
-class PasswordExpirySubscriberTest extends \PHPUnit_Framework_TestCase
+class PasswordExpiryWarnSubscriberTest extends \PHPUnit_Framework_TestCase
 {
     /** @var User */
     protected $user;
@@ -24,7 +24,7 @@ class PasswordExpirySubscriberTest extends \PHPUnit_Framework_TestCase
     public function testPasswordExpirationMessage($daysToPasswordExpiry)
     {
         $now = new \DateTime('now', new \DateTimeZone('UTC'));
-        $expiryDate = $now->add(new \DateInterval('P'.($daysToPasswordExpiry - 1).'D'));
+        $expiryDate = $now->add(new \DateInterval('P'.$daysToPasswordExpiry.'D'));
         $this->user->setPasswordExpiresAt($expiryDate);
         $subscriber = $this->getSubscriber($daysToPasswordExpiry);
         $subscriber->onInteractiveLogin($this->getInteractiveLoginEvent($this->user));
@@ -57,7 +57,7 @@ class PasswordExpirySubscriberTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @param int $daysToExpiry
-     * @return PasswordExpirySubscriber
+     * @return PasswordExpiryWarnSubscriber
      */
     private function getSubscriber($daysToExpiry = 0)
     {
@@ -69,7 +69,7 @@ class PasswordExpirySubscriberTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        if (in_array($daysToExpiry, PasswordExpirySubscriber::$periodMarkers)) {
+        if (in_array($daysToExpiry, PasswordExpiryWarnSubscriber::$periodMarkers)) {
             $flashBag = $this->getMockBuilder('Symfony\Component\HttpFoundation\Session\Flash\FlashBagInterface')
                 ->getMock();
             $flashBag->expects($this->once())
@@ -80,11 +80,11 @@ class PasswordExpirySubscriberTest extends \PHPUnit_Framework_TestCase
                 ->willReturn($flashBag);
         }
         
-        return new PasswordExpirySubscriber($session, $translator);
+        return new PasswordExpiryWarnSubscriber($session, $translator);
     }
 
     public function getDaysToPasswordExpiry()
     {
-        return [array_merge([2,4,5,6,8], PasswordExpirySubscriber::$periodMarkers)];
+        return [array_merge([2,4,5,6,8], PasswordExpiryWarnSubscriber::$periodMarkers)];
     }
 }

@@ -10,7 +10,7 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 use Oro\Bundle\UserBundle\Entity\User;
 
-class PasswordExpirySubscriber implements EventSubscriberInterface
+class PasswordExpiryWarnSubscriber implements EventSubscriberInterface
 {
     public static $periodMarkers = [1, 3, 7];
 
@@ -44,19 +44,40 @@ class PasswordExpirySubscriber implements EventSubscriberInterface
     {
         $user = $event->getAuthenticationToken()->getUser();
 
-        if ($user instanceof User && null !== $passwordExpiryDate = $user->getPasswordExpiresAt()) {
-            $now = new \DateTime('now', new \DateTimeZone('UTC'));
-            $interval = $now->diff($passwordExpiryDate);
-            $days = $interval ? ($interval->d + 1) : false;
+        if (!$user instanceof User) {
+            return;
+        }
 
-            if ($days && in_array($days, self::$periodMarkers)) {
-                $message = $this->translator->transChoice(
-                    'oro.user.password.expiration.message',
-                    $days,
-                    ['%count%' => $days]
-                );
-                $this->session->getFlashBag()->add('warning', $message);
+        if (null === $passwordExpiryDate = $user->getPasswordExpiresAt()) {
+            return;
+        }
+
+        $now = new \DateTime('now', new \DateTimeZone('UTC'));
+
+        if ($passwordExpiryDate < $now) {
+            return;
+        }
+
+        $warn = false;
+        foreach (self::$periodMarkers as $days) {
+            $interval = new \DateInterval('P'. $days .'D');
+            $date = $now->add($interval)->format('Y-m-d');
+
+            if ($date === $passwordExpiryDate->format('Y-m-d')) {
+                $warn = true;
+                break;
             }
+
+            $now->sub($interval);
+        }
+
+        if ($warn) {
+            $message = $this->translator->transChoice(
+                'oro.user.password.expiration.message',
+                $days,
+                ['%count%' => $days]
+            );
+            $this->session->getFlashBag()->add('warning', $message);
         }
     }
 }

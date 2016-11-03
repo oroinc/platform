@@ -523,7 +523,7 @@ services:
             - { name: kernel.event_listener, event: oro_config.update_after, method: onConfigUpdate }
 
     oro_user.security.password_expiry_subscriber:
-        class: Oro\Bundle\UserBundle\EventListener\PasswordExpirySubscriber
+        class: Oro\Bundle\UserBundle\EventListener\PasswordExpiryWarnSubscriber
         arguments:
             - '@session'
             - '@translator'
