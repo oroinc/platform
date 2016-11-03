@@ -13,6 +13,10 @@ class PasswordChangePeriodConfigProvider
     const WEEKS  = 'weeks';
     const MONTHS = 'months';
 
+    const PASSWORD_EXPIRY_ENABLED_KEY     = 'oro_user.password_change_period_enabled';
+    const PASSWORD_EXPIRY_PERIOD_KEY      = 'oro_user.password_change_period';
+    const PASSWORD_EXPIRY_PERIOD_UNIT_KEY = 'oro_user.password_change_period_unit';
+
     /**
      * @param ConfigManager $configManager
      */
@@ -26,7 +30,7 @@ class PasswordChangePeriodConfigProvider
      */
     public function isPasswordChangePeriodEnabled()
     {
-        return (bool) $this->configManager->get('oro_user.password_change_period_enabled');
+        return (bool) $this->configManager->get(self::PASSWORD_EXPIRY_ENABLED_KEY);
     }
 
     /**
@@ -38,8 +42,8 @@ class PasswordChangePeriodConfigProvider
             return null;
         }
 
-        $periodValue = $this->configManager->get('oro_user.password_change_period');
-        $periodUnit  = $this->configManager->get('oro_user.password_change_period_unit');
+        $periodValue = $this->configManager->get(self::PASSWORD_EXPIRY_PERIOD_KEY);
+        $periodUnit  = $this->configManager->get(self::PASSWORD_EXPIRY_PERIOD_UNIT_KEY);
         $interval = 'P';
 
         switch ($periodUnit) {
