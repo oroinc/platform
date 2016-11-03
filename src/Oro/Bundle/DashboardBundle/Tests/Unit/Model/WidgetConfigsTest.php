@@ -6,6 +6,7 @@ use Oro\Bundle\DashboardBundle\Entity\Widget;
 use Oro\Bundle\DashboardBundle\Model\WidgetConfigs;
 use Oro\Bundle\DashboardBundle\Model\WidgetOptionBag;
 
+use Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker;
 use Symfony\Component\HttpFoundation\Request;
 
 class WidgetConfigsTest extends \PHPUnit_Framework_TestCase
@@ -30,6 +31,9 @@ class WidgetConfigsTest extends \PHPUnit_Framework_TestCase
 
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $eventDispatcher;
+
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    protected $featureChecker;
 
     public function setUp()
     {
@@ -63,6 +67,11 @@ class WidgetConfigsTest extends \PHPUnit_Framework_TestCase
 
         $this->eventDispatcher = $this->getMock('Symfony\Component\EventDispatcher\EventDispatcherInterface');
 
+        $this->featureChecker = $this->getMockBuilder(FeatureChecker::class)
+            ->setMethods(['isResourceEnabled'])
+            ->disableOriginalConstructor()
+            ->getMock();
+
         $this->widgetConfigs = new WidgetConfigs(
             $this->configProvider,
             $securityFacade,
@@ -70,7 +79,8 @@ class WidgetConfigsTest extends \PHPUnit_Framework_TestCase
             $this->em,
             $this->valueProvider,
             $this->translator,
-            $this->eventDispatcher
+            $this->eventDispatcher,
+            $this->featureChecker
         );
 
         $this->widgetRepository = $this->getMockBuilder('Doctrine\ORM\EntityRepository')
