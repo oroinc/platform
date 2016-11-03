@@ -7,7 +7,7 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
 use Oro\Bundle\CronBundle\Command\CronCommandInterface;
-use Oro\Bundle\NotificationBundle\Model\MassNotification;
+use Oro\Bundle\NotificationBundle\Model\EmailNotification;
 
 class PasswordExpirationNotificationCommand extends ContainerAwareCommand implements CronCommandInterface
 {
@@ -63,7 +63,7 @@ class PasswordExpirationNotificationCommand extends ContainerAwareCommand implem
 
         foreach ($users as $user) {
             // use default sender
-            $notification = new MassNotification('', '', [$user->getEmail()], $template);
+            $notification = new EmailNotification($template, [$user->getEmail()]);
             $mailManager->process($user, [$notification]);
         }
 
