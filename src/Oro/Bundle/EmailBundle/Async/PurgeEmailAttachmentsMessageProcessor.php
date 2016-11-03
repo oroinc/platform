@@ -67,16 +67,15 @@ class PurgeEmailAttachmentsMessageProcessor implements MessageProcessorInterface
 
         $ids = [];
         $lastIndex = count($emailAttachments) - 1;
-        $messageData = ($size > 0) ? ['size' => $size] : [];
+        $newMessageData = ($size > 0) ? ['size' => $size] : [];
 
         foreach ($emailAttachments as $index => $attachment) {
             $ids[] = $attachment['id'];
 
             if (count($ids) == self::LIMIT || $lastIndex == $index) {
-                $this->producer->send(
-                    Topics::PURGE_EMAIL_ATTACHMENTS_BY_IDS,
-                    array_merge($messageData, ['ids' => $ids])
-                );
+                $newMessageData['ids'] = $ids;
+
+                $this->producer->send(Topics::PURGE_EMAIL_ATTACHMENTS_BY_IDS, $newMessageData);
 
                 $ids = [];
             }
