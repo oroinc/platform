@@ -341,7 +341,7 @@ services:
     oro_email.async.add_email_association:
         class: 'Oro\Bundle\EmailBundle\Async\AddEmailAssociationMessageProcessor'
         arguments:
-            - '@oro_email.command.association_manager'
+            - '@oro_email.async.manager.association_manager'
             - '@logger'
         tags:
             - { name: 'oro_message_queue.client.message_processor' }
@@ -349,7 +349,7 @@ services:
     oro_email.async.update_email_owner_association:
         class: 'Oro\Bundle\EmailBundle\Async\UpdateEmailOwnerAssociationMessageProcessor'
         arguments:
-            - '@oro_email.command.association_manager'
+            - '@oro_email.async.manager.association_manager'
             - '@logger'
         tags:
             - { name: 'oro_message_queue.client.message_processor' }
@@ -1125,7 +1125,7 @@ services:
         arguments:
             - '@oro_email.provider.emailowners.provider'
 
-    oro_email.command.association_manager:
+    oro_email.async.manager.association_manager:
         class: Oro\Bundle\EmailBundle\Async\Manager\AssociationManager
         arguments:
             - '@oro_entity.doctrine_helper'

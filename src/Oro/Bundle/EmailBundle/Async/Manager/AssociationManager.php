@@ -47,7 +47,7 @@ class AssociationManager
     }
 
     /**
-     * Process of command oro:email:add-associations
+     * Add association to email
      *
      * @param int[] $ids
      * @param string $targetClass

@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\EmailBundle\Tests\Unit\Datagrid;
+namespace Oro\Bundle\EmailBundle\Tests\Unit\Async\Manager;
 
 use Doctrine\ORM\Query;
 
@@ -15,7 +15,7 @@ use Oro\Component\MessageQueue\Client\MessageProducerInterface;
 class AssociationManagerTest extends \PHPUnit_Framework_TestCase
 {
     /** @var AssociationManager */
-    private $ssociationManager;
+    private $associationManager;
 
     /** @var \PHPUnit_Framework_MockObject_MockObject|DoctrineHelper */
     private $doctrineHelper;
@@ -50,7 +50,7 @@ class AssociationManagerTest extends \PHPUnit_Framework_TestCase
 
         $this->producer = $this->getMock(MessageProducerInterface::class);
 
-        $this->ssociationManager = new AssociationManager(
+        $this->associationManager = new AssociationManager(
             $this->doctrineHelper,
             $this->emailActivityManager,
             $this->emailOwnersProvider,
@@ -92,7 +92,7 @@ class AssociationManagerTest extends \PHPUnit_Framework_TestCase
 
         $this->doctrineHelper->expects(self::once())->method('getEntityManager')->willReturn($entityManager);
 
-        $countNewAssociations = $this->ssociationManager->processAddAssociation($ids, $targetClass, $targetId);
+        $countNewAssociations = $this->associationManager->processAddAssociation($ids, $targetClass, $targetId);
         self::assertEquals($expectedCountAssociation, $countNewAssociations);
     }
 

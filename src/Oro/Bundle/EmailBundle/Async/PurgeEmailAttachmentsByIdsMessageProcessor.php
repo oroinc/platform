@@ -60,6 +60,10 @@ class PurgeEmailAttachmentsByIdsMessageProcessor implements MessageProcessorInte
         $emailAttachments = $this->getEmailAttachments($body['ids']);
 
         foreach ($emailAttachments as $attachment) {
+            if (isset($body['size']) && ($attachment->getSize() < $body['size'])) {
+                continue;
+            }
+
             $em->remove($attachment);
         }
         $em->flush();
@@ -84,6 +88,7 @@ class PurgeEmailAttachmentsByIdsMessageProcessor implements MessageProcessorInte
     {
         $qb = $this->getEmailAttachmentRepository()
             ->createQueryBuilder('a')
+            ->join('a.attachmentContent', 'attachment_content')
             ->where('a.id IN (:ids)')
             ->setParameter('ids', $ids)
         ;
