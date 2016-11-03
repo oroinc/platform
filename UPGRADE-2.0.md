@@ -5,6 +5,10 @@ UPGRADE FROM 1.10 to 2.0
 - LiipImagineBundle was updated to 1.5.* version.
 - Added dependency to [fxpio/composer-asset-plugin](https://github.com/fxpio/composer-asset-plugin) composer plugin.
 - All original third-party asset libraries were moved out from platform and added to composer.json as bower-asset/npm-asset dependency.
+- Upgrade to 2.0 is available only from 1.10 version. For this update
+  was added the command "oro:platform:upgrade20". Before run this command the cache has to be deleted. 
+  Command have to be run only one time. In next releases 2.x to apply release changes it will be enough run the command "oro:platform:update".
+  Upgrade from version less then 1.10 is not supported.
 
 ####Action Component
 - Deprecated constant `Oro\Component\Action\Event\ExecuteActionEvents::DEPRECATED_HANDLE_BEFORE` removed. Use `Oro\Component\Action\Event\ExecuteActionEvents::HANDLE_BEFORE` instead.
@@ -397,6 +401,7 @@ placeholders:
 - Main menu dropdown active item is now triggering a page refresh, despite the Backbone router limitations.
 - Updated jquery.mCustomScrollbar plugin to version 3.1.5.
 - Changed `form_row` block to support of form field 'hints' which allows rendering of simple help section for the respective form control.
+- Updated jQuery and jQuery-UI libraries to version 3.1.* and 1.12.* accordingly
 
 ####RequireJS:
 - Updated RequireJS library to version 2.3.*
@@ -581,3 +586,9 @@ to the [Fallback documentation](./src/Oro/Bundle/EntityBundle/Resources/doc/enti
 
 ####ImapBundle
  - The command `oro:imap:clear-mailbox` was removed. Produce message to the topic `Oro\Bundle\ImapBundle\Async\Topics::CLEAR_INACTIVE_MAILBOX` instead.
+
+####OroCalendarBundle
+- OroCalendarBundle moved to a separate package
+
+####OroInstallerBundle
+- Added interface `Oro\Bundle\InstallerBundle\CacheWarmer\NamespaceMigrationProviderInterface`. it makes available add the rules for command "oro:platform:upgrade20"
