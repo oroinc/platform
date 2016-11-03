@@ -62,6 +62,22 @@ define(function(require) {
     };
 
     /**
+     Render a text string in a table cell. The text is converted from the
+     model's raw value for this cell's column.
+     */
+    Backgrid.Cell.prototype.render = function() {
+        var $el = this.$el;
+        $el.empty();
+        var model = this.model;
+        var columnName = this.column.get('name');
+        $el.text(this.formatter.fromRaw(model.get(columnName), model));
+        //$el.addClass(columnName);
+        //this.updateStateClassesMaybe();
+        this.delegateEvents();
+        return this;
+    };
+
+    /**
      * Event binding on each cell gives perfomance slow down
      *
      * Please find support code in ../datagrid/row.js

@@ -45,7 +45,7 @@ require(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/tools
 
     $(function() {
         var $pageTitle = $('#page-title');
-        if ($pageTitle.size()) {
+        if ($pageTitle.length) {
             document.title = $('<div.>').html($('#page-title').text()).text();
         }
         layout.hideProgressBar();
@@ -358,10 +358,24 @@ require(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/tools
         $(document).on('click', '.remove-button', function(e) {
             var el = $(this);
             if (!(el.is('[disabled]') || el.hasClass('disabled'))) {
-                var message = el.data('message');
-                var confirm = new DeleteConfirmation({
-                    content: message
-                });
+                var data = {content: el.data('message')};
+
+                var okText = el.data('ok-text');
+                if (okText) {
+                    data.okText = okText;
+                }
+
+                var title = el.data('title');
+                if (title) {
+                    data.title = title;
+                }
+
+                var cancelText = el.data('cancel-text');
+                if (cancelText) {
+                    data.cancelText = cancelText;
+                }
+
+                var confirm = new DeleteConfirmation(data);
 
                 confirm.on('ok', function() {
                     mediator.execute('showLoading');

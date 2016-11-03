@@ -16,7 +16,17 @@ class MenuUpdateTest extends \PHPUnit_Framework_TestCase
 
         $update = new MenuUpdate();
         $update->setPriority($priority);
+        $update->setDivider(true);
+        $update->setIcon('test-icon');
 
-        $this->assertEquals(['position' => $priority], $update->getExtras());
+        $this->assertEquals(
+            [
+                'position' => $priority,
+                'divider' => true,
+                'icon' => 'test-icon',
+                'translate_disabled' => false
+            ],
+            $update->getExtras()
+        );
     }
 }

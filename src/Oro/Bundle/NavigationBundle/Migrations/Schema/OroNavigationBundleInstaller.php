@@ -14,7 +14,7 @@ class OroNavigationBundleInstaller implements Installation
      */
     public function getMigrationVersion()
     {
-        return 'v1_4';
+        return 'v1_5';
     }
 
     /**
@@ -30,6 +30,7 @@ class OroNavigationBundleInstaller implements Installation
         $this->createOroNavigationTitleTable($schema);
         $this->createOroNavigationMenuUpdateTable($schema);
         $this->createOroNavigationMenuUpdateTitleTable($schema);
+        $this->createOroNavigationMenuUpdateDescriptionTable($schema);
 
         /** Foreign keys generation **/
         $this->addOroNavigationHistoryForeignKeys($schema);
@@ -37,6 +38,7 @@ class OroNavigationBundleInstaller implements Installation
         $this->addOroNavigationItemPinbarForeignKeys($schema);
         $this->addOroNavigationPageStateForeignKeys($schema);
         $this->addOroNavigationMenuUpdateTitleForeignKeys($schema);
+        $this->addOroNavigationMenuUpdateDescriptionForeignKeys($schema);
     }
 
     /**
@@ -150,13 +152,17 @@ class OroNavigationBundleInstaller implements Installation
         $table->addColumn('id', 'integer', ['autoincrement' => true]);
         $table->addColumn('key', 'string', ['length' => 100]);
         $table->addColumn('parent_key', 'string', ['length' => 100, 'notnull' => false]);
-        $table->addColumn('uri', 'string', ['length' => 255, 'notnull' => false]);
+        $table->addColumn('uri', 'string', ['length' => 1023, 'notnull' => false]);
         $table->addColumn('menu', 'string', ['length' => 100]);
-        $table->addColumn('ownership_type', 'integer');
-        $table->addColumn('owner_id', 'integer', ['notnull' => false]);
+        $table->addColumn('ownership_type', 'string');
+        $table->addColumn('owner_id', 'integer', ['notnull' => true]);
+        $table->addColumn('icon', 'string', ['length' => 150, 'notnull' => false]);
         $table->addColumn('is_active', 'boolean', []);
+        $table->addColumn('is_divider', 'boolean', []);
+        $table->addColumn('is_custom', 'boolean', []);
         $table->addColumn('priority', 'integer', ['notnull' => false]);
         $table->setPrimaryKey(['id']);
+        $table->addUniqueIndex(['key', 'ownership_type', 'owner_id'], 'oro_navigation_menu_upd_uidx');
     }
 
     /**
@@ -167,6 +173,21 @@ class OroNavigationBundleInstaller implements Installation
     protected function createOroNavigationMenuUpdateTitleTable(Schema $schema)
     {
         $table = $schema->createTable('oro_navigation_menu_upd_title');
+        $table->addColumn('menu_update_id', 'integer', []);
+        $table->addColumn('localized_value_id', 'integer', []);
+        $table->setPrimaryKey(['menu_update_id', 'localized_value_id']);
+        $table->addUniqueIndex(['localized_value_id']);
+    }
+
+
+    /**
+     * Create `oro_navigation_menu_upd_descr` table
+     *
+     * @param Schema $schema
+     */
+    protected function createOroNavigationMenuUpdateDescriptionTable(Schema $schema)
+    {
+        $table = $schema->createTable('oro_navigation_menu_upd_descr');
         $table->addColumn('menu_update_id', 'integer', []);
         $table->addColumn('localized_value_id', 'integer', []);
         $table->setPrimaryKey(['menu_update_id', 'localized_value_id']);
@@ -257,6 +278,28 @@ class OroNavigationBundleInstaller implements Installation
     protected function addOroNavigationMenuUpdateTitleForeignKeys(Schema $schema)
     {
         $table = $schema->getTable('oro_navigation_menu_upd_title');
+        $table->addForeignKeyConstraint(
+            $schema->getTable('oro_fallback_localization_val'),
+            ['localized_value_id'],
+            ['id'],
+            ['onUpdate' => null, 'onDelete' => 'CASCADE']
+        );
+        $table->addForeignKeyConstraint(
+            $schema->getTable('oro_navigation_menu_upd'),
+            ['menu_update_id'],
+            ['id'],
+            ['onUpdate' => null, 'onDelete' => 'CASCADE']
+        );
+    }
+
+    /**
+     * Add `oro_navigation_menu_upd_descr` foreign keys.
+     *
+     * @param Schema $schema
+     */
+    protected function addOroNavigationMenuUpdateDescriptionForeignKeys(Schema $schema)
+    {
+        $table = $schema->getTable('oro_navigation_menu_upd_descr');
         $table->addForeignKeyConstraint(
             $schema->getTable('oro_fallback_localization_val'),
             ['localized_value_id'],
