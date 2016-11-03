@@ -1,0 +1,15 @@
+.form-row {
+    margin-bottom: $form-row-offset-x;
+
+    &__label {
+        margin-bottom: $form-row__label-offset-x;
+    }
+
+    &__content {
+        margin-bottom: $form-row__content-offset-x;
+    }
+
+    &--offset-none {
+        margin-bottom: 0;
+    }
+}

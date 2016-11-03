@@ -2,7 +2,9 @@
 
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Handler;
 
+use Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker;
 use Oro\Bundle\WorkflowBundle\Async\TransitionTriggerMessage;
+use Oro\Bundle\WorkflowBundle\Configuration\FeatureConfigurationExtension;
 use Oro\Bundle\WorkflowBundle\Entity\TransitionCronTrigger;
 use Oro\Bundle\WorkflowBundle\Entity\TransitionEventTrigger;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
@@ -24,6 +26,11 @@ class TransitionCronTriggerHandlerTest extends \PHPUnit_Framework_TestCase
     const WORKFLOW_NAME = 'test_workflow';
     const TRANSITION_NAME = 'test_transition';
 
+    /**
+     * @var FeatureChecker|\PHPUnit_Framework_MockObject_MockObject
+     */
+    protected $featureChecker;
+
     /** @var WorkflowManager|\PHPUnit_Framework_MockObject_MockObject */
     private $workflowManager;
 
@@ -44,7 +51,11 @@ class TransitionCronTriggerHandlerTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->handler = new TransitionCronTriggerHandler($this->workflowManager, $this->helper);
+        $this->featureChecker = $this->getMockBuilder(FeatureChecker::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $this->handler = new TransitionCronTriggerHandler($this->workflowManager, $this->helper, $this->featureChecker);
 
         $this->trigger = $this->getEntity(
             TransitionCronTrigger::class,
@@ -79,6 +90,11 @@ class TransitionCronTriggerHandlerTest extends \PHPUnit_Framework_TestCase
         $trigger = new TransitionCronTrigger();
         $trigger->setWorkflowDefinition($this->getEntity(WorkflowDefinition::class, ['name' => self::WORKFLOW_NAME]));
 
+        $this->featureChecker->expects($this->once())
+            ->method('isResourceEnabled')
+            ->with(self::WORKFLOW_NAME, FeatureConfigurationExtension::WORKFLOWS_NODE_NAME)
+            ->willReturn(true);
+
         $this->workflowManager->expects($this->once())->method('getWorkflow')->with(self::WORKFLOW_NAME);
         $this->workflowManager->expects($this->never())->method('massStartWorkflow');
         $this->workflowManager->expects($this->never())->method('massTransit');
@@ -92,6 +108,11 @@ class TransitionCronTriggerHandlerTest extends \PHPUnit_Framework_TestCase
         $trigger->setWorkflowDefinition($this->getEntity(WorkflowDefinition::class, ['name' => self::WORKFLOW_NAME]));
 
         $workflow = $this->getWorkflowMock();
+
+        $this->featureChecker->expects($this->once())
+            ->method('isResourceEnabled')
+            ->with(self::WORKFLOW_NAME, FeatureConfigurationExtension::WORKFLOWS_NODE_NAME)
+            ->willReturn(true);
 
         $this->workflowManager->expects($this->once())
             ->method('getWorkflow')
@@ -113,6 +134,11 @@ class TransitionCronTriggerHandlerTest extends \PHPUnit_Framework_TestCase
 
         $entityClass = self::ENTITY_CLASS;
         $entity = new $entityClass();
+
+        $this->featureChecker->expects($this->once())
+            ->method('isResourceEnabled')
+            ->with(self::WORKFLOW_NAME, FeatureConfigurationExtension::WORKFLOWS_NODE_NAME)
+            ->willReturn(true);
 
         $this->helper->expects($this->once())
             ->method('fetchEntitiesWithoutWorkflowItems')
@@ -139,6 +165,11 @@ class TransitionCronTriggerHandlerTest extends \PHPUnit_Framework_TestCase
         $workflow = $this->getWorkflowMock($this->getTransition(false));
         $workflowItem = new WorkflowItem();
 
+        $this->featureChecker->expects($this->once())
+            ->method('isResourceEnabled')
+            ->with(self::WORKFLOW_NAME, FeatureConfigurationExtension::WORKFLOWS_NODE_NAME)
+            ->willReturn(true);
+
         $this->helper->expects($this->once())
             ->method('fetchWorkflowItemsForTrigger')
             ->with($trigger, $workflow)
@@ -153,6 +184,26 @@ class TransitionCronTriggerHandlerTest extends \PHPUnit_Framework_TestCase
             ->with([['workflowItem' => $workflowItem, 'transition' => self::TRANSITION_NAME]]);
 
         $this->assertTrue($this->handler->process($trigger, TransitionTriggerMessage::create($trigger)));
+    }
+
+    public function testProcessDisabledFeature()
+    {
+        $trigger = new TransitionCronTrigger();
+        $trigger->setTransitionName(self::TRANSITION_NAME)
+            ->setWorkflowDefinition($this->getEntity(WorkflowDefinition::class, ['name' => self::WORKFLOW_NAME]));
+
+        $this->featureChecker->expects($this->once())
+            ->method('isResourceEnabled')
+            ->with(self::WORKFLOW_NAME, FeatureConfigurationExtension::WORKFLOWS_NODE_NAME)
+            ->willReturn(false);
+
+        $this->helper->expects($this->never())
+            ->method($this->anything());
+
+        $this->workflowManager->expects($this->never())
+            ->method($this->anything());
+
+        $this->assertFalse($this->handler->process($trigger, TransitionTriggerMessage::create($trigger)));
     }
 
     /**

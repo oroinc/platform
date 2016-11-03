@@ -20,7 +20,6 @@ abstract class BlockTypeTestCase extends BaseBlockTypeTestCase
         parent::initializeLayoutFactoryBuilder($layoutFactoryBuilder);
 
         $layoutFactoryBuilder
-            ->addType(new Type\InputType())
-            ->addType(new Type\TitleType());
+            ->addType(new Type\InputType());
     }
 }

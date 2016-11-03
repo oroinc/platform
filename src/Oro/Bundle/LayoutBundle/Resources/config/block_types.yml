@@ -39,7 +39,15 @@ services:
              - { name: layout.block_type, alias: head }
 
     oro_layout.block_type.title:
-        class: Oro\Bundle\LayoutBundle\Layout\Block\Type\TitleType
+        parent: oro_layout.block_type.abstract_configurable
+        calls:
+            -
+                - setOptionsConfig
+                -
+                    -
+                        value: {required: true}
+                        params: ~
+            - [setName, ['title']]
         tags:
              - { name: layout.block_type, alias: title }
 
