@@ -18,8 +18,8 @@ class PdoPgsql extends BaseDriver
     /**
      * Init additional doctrine functions
      *
-     * @param \Doctrine\ORM\EntityManager         $em
-     * @param \Doctrine\ORM\Mapping\ClassMetadata $class
+     * @param EntityManager $em
+     * @param ClassMetadata $class
      */
     public function initRepo(EntityManager $em, ClassMetadata $class)
     {
@@ -36,18 +36,21 @@ class PdoPgsql extends BaseDriver
     /**
      * Sql plain query to create fulltext index for Postgresql.
      *
+     * @param string $tableName
+     * @param string $indexName
+     *
      * @return string
      */
-    public static function getPlainSql()
+    public static function getPlainSql($tableName = 'oro_search_index_text', $indexName = 'value')
     {
-        return "CREATE INDEX value ON oro_search_index_text USING gin(to_tsvector('english', 'value'))";
+        return sprintf('CREATE INDEX %s ON %s USING gin(to_tsvector(\'english\', value))', $indexName, $tableName);
     }
 
     /**
      * Create fulltext search string for string parameters (contains)
      *
      * @param integer $index
-     * @param bool    $useFieldName
+     * @param bool $useFieldName
      *
      * @return string
      */
@@ -67,10 +70,56 @@ class PdoPgsql extends BaseDriver
     }
 
     /**
+     * @param QueryBuilder $qb
+     * @param string $index
+     * @param string $fieldValue
+     * @param bool $isOrderBy
+     */
+    protected function createContainsQueryParameter(QueryBuilder $qb, $index, $fieldValue, $isOrderBy)
+    {
+        $searchArray = explode(Query::DELIMITER, $fieldValue);
+
+        foreach ($searchArray as $key => $string) {
+            $searchArray[$key] = $string . ':*';
+        }
+
+        $stringParameter = implode(' | ', $searchArray);
+
+        $qb->setParameter('value' . $index, $stringParameter);
+
+        if ($isOrderBy) {
+            $qb->setParameter('orderByValue' . $index, $stringParameter);
+        }
+    }
+
+    /**
+     * @param QueryBuilder $qb
+     * @param string $index
+     * @param string $fieldValue
+     * @param bool $isOrderBy
+     */
+    protected function createNotContainsQueryParameter(QueryBuilder $qb, $index, $fieldValue, $isOrderBy)
+    {
+        $searchArray = explode(Query::DELIMITER, $fieldValue);
+
+        foreach ($searchArray as $key => $string) {
+            $searchArray[$key] = '!' . $string;
+        }
+
+        $stringParameter = implode(' & ', $searchArray);
+
+        $qb->setParameter('value' . $index, $stringParameter);
+
+        if ($isOrderBy) {
+            $qb->setParameter('orderByValue' . $index, $stringParameter);
+        }
+    }
+
+    /**
      * Create search string for string parameters (not contains)
      *
      * @param integer $index
-     * @param bool    $useFieldName
+     * @param bool $useFieldName
      *
      * @return string
      */
@@ -88,57 +137,17 @@ class PdoPgsql extends BaseDriver
     }
 
     /**
-     * Set string parameter for qb
-     *
-     * @param \Doctrine\ORM\QueryBuilder $qb
-     * @param integer                    $index
-     * @param string                     $fieldValue
-     * @param string                     $searchCondition
-     */
-    protected function setFieldValueStringParameter(QueryBuilder $qb, $index, $fieldValue, $searchCondition)
-    {
-        $notContains = !in_array($searchCondition, [Query::OPERATOR_CONTAINS, Query::OPERATOR_EQUALS], true);
-        $searchArray = explode(Query::DELIMITER, $fieldValue);
-
-        foreach ($searchArray as $key => $string) {
-            $searchArray[$key] = $string . ':*';
-        }
-
-        if ($notContains) {
-            foreach ($searchArray as $key => $string) {
-                $searchArray[$key] = '!' . $string;
-            }
-            $qb->setParameter('value' . $index, implode(' & ', $searchArray));
-        } else {
-            $qb->setParameter('value' . $index, implode(' | ', $searchArray));
-        }
-    }
-
-    /**
      * Set fulltext range order by
      *
-     * @param \Doctrine\ORM\QueryBuilder $qb
-     * @param int                        $index
+     * @param QueryBuilder $qb
+     * @param int $index
      */
     protected function setTextOrderBy(QueryBuilder $qb, $index)
     {
         $joinAlias = $this->getJoinAlias(Query::TYPE_TEXT, $index);
 
-        $qb->addSelect(sprintf('TsRank(%s.value, :value%s) as rankField%s', $joinAlias, $index, $index))
+        $qb->addSelect(sprintf('TsRank(%s.value, :orderByValue%s) as rankField%s', $joinAlias, $index, $index))
             ->addOrderBy(sprintf('rankField%s', $index), Criteria::DESC);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    protected function addOrderBy(Query $query, QueryBuilder $qb)
-    {
-        parent::addOrderBy($query, $qb);
-
-        // all columns from order part must be in select
-        if ($query->getOrderBy()) {
-            $qb->addSelect('orderTable.value');
-        }
     }
 
     /**
@@ -154,5 +163,106 @@ class PdoPgsql extends BaseDriver
         }
 
         return $query;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function addTextField(QueryBuilder $qb, $index, $searchCondition, $setOrderBy = true)
+    {
+        $useFieldName = $searchCondition['fieldName'] == '*' ? false : true;
+        $fieldValue = $this->filterTextFieldValue($searchCondition['fieldValue']);
+
+        // TODO Need to clarify search requirements in scope of CRM-214
+        if ($searchCondition['condition'] === Query::OPERATOR_CONTAINS) {
+            $searchString = $this->createContainsStringQuery($index, $useFieldName);
+            $this->createContainsQueryParameter($qb, $index, $fieldValue, $setOrderBy);
+        } elseif ($searchCondition['condition'] === Query::OPERATOR_EQUALS) {
+            $searchString = $this->createEqualsStringQuery($index, $useFieldName);
+            $this->createEqualsQueryParameter($qb, $index, $fieldValue, $setOrderBy);
+        } elseif ($searchCondition['condition'] === Query::OPERATOR_STARTS_WITH) {
+            $searchString = $this->createStartWithStringQuery($index, $useFieldName);
+            $this->createStartWithStringParameter($qb, $index, $fieldValue, $setOrderBy);
+        } else {
+            $searchString = $this->createNotContainsStringQuery($index, $useFieldName);
+            $this->createNotContainsQueryParameter($qb, $index, $fieldValue, $setOrderBy);
+        }
+
+        if ($useFieldName) {
+            $qb->setParameter('field' . $index, $searchCondition['fieldName']);
+        }
+
+        if ($setOrderBy) {
+            $this->setTextOrderBy($qb, $index);
+        }
+
+        return '(' . $searchString . ' ) ';
+    }
+
+    /**
+     * @param string $index
+     * @param bool $useFieldName
+     * @return string
+     */
+    public function createEqualsStringQuery($index, $useFieldName)
+    {
+        $joinAlias = $this->getJoinAlias(Query::TYPE_TEXT, $index);
+
+        $stringQuery = $joinAlias . '.value = :equals' . $index;
+
+        if ($useFieldName) {
+            $stringQuery .= ' AND ' . $joinAlias . '.field = :field' . $index;
+        }
+
+        return $stringQuery;
+
+    }
+
+    /**
+     * @param QueryBuilder $qb
+     * @param string $index
+     * @param string $fieldValue
+     * @param bool $isOrderBy
+     */
+    public function createEqualsQueryParameter(QueryBuilder $qb, $index, $fieldValue, $isOrderBy)
+    {
+        $qb->setParameter('equals' . $index, $fieldValue);
+
+        if ($isOrderBy) {
+            $qb->setParameter('orderByValue' . $index, $fieldValue);
+        }
+    }
+
+    /**
+     * @param string $index
+     * @param bool $useFieldName
+     * @return string
+     */
+    protected function createStartWithStringQuery($index, $useFieldName)
+    {
+        $joinAlias = $this->getJoinAlias(Query::TYPE_TEXT, $index);
+
+        $stringQuery = $joinAlias . '.value LIKE :startWithValue' . $index;
+
+        if ($useFieldName) {
+            $stringQuery .= ' AND ' . $joinAlias . '.field = :field' . $index;
+        }
+
+        return $stringQuery;
+    }
+
+    /**
+     * @param QueryBuilder $qb
+     * @param string $index
+     * @param string $fieldValue
+     * @param bool $isOrderBy
+     */
+    protected function createStartWithStringParameter(QueryBuilder $qb, $index, $fieldValue, $isOrderBy)
+    {
+        $qb->setParameter('startWithValue' . $index, $fieldValue . '%');
+
+        if ($isOrderBy) {
+            $qb->setParameter('orderByValue' . $index, $fieldValue);
+        }
     }
 }
