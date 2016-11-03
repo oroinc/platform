@@ -44,7 +44,7 @@ class AutoResponseMessageProcessor implements MessageProcessorInterface, TopicSu
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritdoc}12
      */
     public function process(MessageInterface $message, SessionInterface $session)
     {
@@ -69,6 +69,8 @@ class AutoResponseMessageProcessor implements MessageProcessorInterface, TopicSu
 
             return self::REJECT;
         }
+
+        //toDo: can possibly send duplicate replies. See BAP-12503
 
         $this->autoResponseManager->sendAutoResponses($email);
 
