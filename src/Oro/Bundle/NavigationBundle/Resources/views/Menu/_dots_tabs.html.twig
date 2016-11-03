@@ -5,7 +5,7 @@
 {% endblock %}
 
 {% block item_renderer %}
-    {% set showNonAuthorized = item.extras.showNonAuthorized is defined and item.extras.showNonAuthorized %}
+    {% set showNonAuthorized = item.extras.show_non_authorized is defined and item.extras.show_non_authorized %}
     {% set displayable = item.extras.isAllowed or showNonAuthorized %}
     {% if item.displayed and displayable %}
         {# displaying the item #}
@@ -13,7 +13,7 @@
         {%- set linkAttributes = item.linkAttributes %}
         {%- set labelAttributes = item.labelAttributes %}
         {% set class = [''] %}
-        {% if item.extras.activeIfFirstIsEmpty is defined and item.extras.activeIfFirstIsEmpty %}
+        {% if item.extras.active_if_first_is_empty is defined and item.extras.active_if_first_is_empty %}
             {% set class = class|merge(['show-if-empty']) %}
         {% endif %}
         <li id="{{- item.name|replace({' ': '_', '#': '_'})|lower|trim -}}-tab" class="{{ class|join(' ') }}">

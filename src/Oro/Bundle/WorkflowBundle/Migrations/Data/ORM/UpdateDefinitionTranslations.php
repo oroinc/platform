@@ -37,12 +37,10 @@ class UpdateDefinitionTranslations extends AbstractFixture implements ContainerA
         $workflowConfiguration = $configurationProvider->getWorkflowDefinitionConfiguration();
 
         if (count($workflowConfiguration)) {
-            $workflowNames = array_map(function ($config) {
-                return $config['name'];
-            }, $workflowConfiguration);
+            $workflowNames = array_keys($workflowConfiguration);
 
             $definitions = array_filter($definitions, function (WorkflowDefinition $definition) use ($workflowNames) {
-                return !in_array($definition->getName(), $workflowNames);
+                return !in_array($definition->getName(), $workflowNames, true);
             });
         }
 

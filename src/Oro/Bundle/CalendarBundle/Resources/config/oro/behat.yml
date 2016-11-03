@@ -1,4 +1,0 @@
-pages:
-  Default Calendar View:
-    class: Oro\Bundle\CalendarBundle\Tests\Behat\Page\DefaultCalendarView
-    route: oro_calendar_view_default
