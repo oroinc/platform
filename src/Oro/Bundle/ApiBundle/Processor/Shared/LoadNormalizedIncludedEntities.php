@@ -5,6 +5,7 @@ namespace Oro\Bundle\ApiBundle\Processor\Shared;
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
 use Oro\Bundle\ApiBundle\Collection\IncludedEntityData;
+use Oro\Bundle\ApiBundle\Metadata\MetaPropertyMetadata;
 use Oro\Bundle\ApiBundle\Processor\Get\GetContext;
 use Oro\Bundle\ApiBundle\Processor\RequestActionProcessor;
 use Oro\Bundle\ApiBundle\Processor\ActionProcessorBagInterface;
@@ -18,6 +19,9 @@ use Oro\Bundle\ApiBundle\Request\ApiActions;
  */
 class LoadNormalizedIncludedEntities implements ProcessorInterface
 {
+    const INCLUDE_ID_META     = 'includeId';
+    const INCLUDE_ID_PROPERTY = '__include_id__';
+
     /** @var ActionProcessorBagInterface */
     protected $processorBag;
 
@@ -53,6 +57,7 @@ class LoadNormalizedIncludedEntities implements ProcessorInterface
                 $context,
                 $includedEntities->getClass($entity),
                 $entity,
+                $includedEntities->getId($entity),
                 $includedEntities->getData($entity)
             );
         }
@@ -62,12 +67,14 @@ class LoadNormalizedIncludedEntities implements ProcessorInterface
      * @param FormContext        $context
      * @param string             $entityClass
      * @param object             $entity
+     * @param string             $entityIncludeId
      * @param IncludedEntityData $entityData
      */
     protected function processIncludedEntity(
         FormContext $context,
         $entityClass,
         $entity,
+        $entityIncludeId,
         IncludedEntityData $entityData
     ) {
         $getProcessor = $this->processorBag->getProcessor(ApiActions::GET);
@@ -94,8 +101,15 @@ class LoadNormalizedIncludedEntities implements ProcessorInterface
                 $context->addError($error);
             }
         } else {
-            $entityData->setNormalizedData($getContext->getResult());
-            $entityData->setMetadata($getContext->getMetadata());
+            $normalizedData = $getContext->getResult();
+            $metadata = $getContext->getMetadata();
+
+            $normalizedData[self::INCLUDE_ID_PROPERTY] = (string)$entityIncludeId;
+            $metadata->addMetaProperty(new MetaPropertyMetadata(self::INCLUDE_ID_PROPERTY))
+                ->setResultName(self::INCLUDE_ID_META);
+
+            $entityData->setNormalizedData($normalizedData);
+            $entityData->setMetadata($metadata);
         }
     }
 }

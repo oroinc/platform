@@ -116,6 +116,8 @@ class RestJsonApiCreateWithIncludedTest extends RestJsonApiTestCase
         self::assertEquals($this->getEntityType(Group::class), $result['included'][0]['type']);
         self::assertEquals($groupId, $result['included'][0]['id']);
         self::assertEquals('Test Group 1', $result['included'][0]['attributes']['name']);
+        self::assertNotEmpty($result['included'][0]['meta']);
+        self::assertSame('TEST_USER_GROUP_1', $result['included'][0]['meta']['includeId']);
 
         // test that both the user and the group was created in the database
         $this->getEntityManager()->clear();
@@ -179,6 +181,8 @@ class RestJsonApiCreateWithIncludedTest extends RestJsonApiTestCase
         self::assertEquals($this->getEntityType(Group::class), $result['included'][0]['type']);
         self::assertEquals($groupId, $result['included'][0]['id']);
         self::assertEquals('Test Group 1 (updated)', $result['included'][0]['attributes']['name']);
+        self::assertNotEmpty($result['included'][0]['meta']);
+        self::assertSame($groupId, $result['included'][0]['meta']['includeId']);
 
         // test that the group was updated in the database
         $this->getEntityManager()->clear();

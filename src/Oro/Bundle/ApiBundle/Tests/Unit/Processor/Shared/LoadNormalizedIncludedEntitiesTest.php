@@ -104,8 +104,17 @@ class LoadNormalizedIncludedEntitiesTest extends FormProcessorTestCase
         $this->context->getRequestHeaders()->set('test-header', 'some value');
         $this->processor->process($this->context);
 
-        self::assertSame($getResult, $includedEntityData->getNormalizedData());
-        self::assertSame($getMetadata, $includedEntityData->getMetadata());
+        self::assertSame(
+            array_merge($getResult, [LoadNormalizedIncludedEntities::INCLUDE_ID_PROPERTY => $includedEntityId]),
+            $includedEntityData->getNormalizedData()
+        );
+        $metadata = $includedEntityData->getMetadata();
+        self::assertSame($getMetadata, $metadata);
+        self::assertTrue($metadata->hasMetaProperty(LoadNormalizedIncludedEntities::INCLUDE_ID_PROPERTY));
+        self::assertEquals(
+            LoadNormalizedIncludedEntities::INCLUDE_ID_META,
+            $metadata->getMetaProperty(LoadNormalizedIncludedEntities::INCLUDE_ID_PROPERTY)->getResultName()
+        );
     }
 
     public function testProcessForExistingIncludedEntityWhenGetActionSuccess()
@@ -168,8 +177,17 @@ class LoadNormalizedIncludedEntitiesTest extends FormProcessorTestCase
         $this->context->getRequestHeaders()->set('test-header', 'some value');
         $this->processor->process($this->context);
 
-        self::assertSame($getResult, $includedEntityData->getNormalizedData());
-        self::assertSame($getMetadata, $includedEntityData->getMetadata());
+        self::assertSame(
+            array_merge($getResult, [LoadNormalizedIncludedEntities::INCLUDE_ID_PROPERTY => $includedEntityId]),
+            $includedEntityData->getNormalizedData()
+        );
+        $metadata = $includedEntityData->getMetadata();
+        self::assertSame($getMetadata, $metadata);
+        self::assertTrue($metadata->hasMetaProperty(LoadNormalizedIncludedEntities::INCLUDE_ID_PROPERTY));
+        self::assertEquals(
+            LoadNormalizedIncludedEntities::INCLUDE_ID_META,
+            $metadata->getMetaProperty(LoadNormalizedIncludedEntities::INCLUDE_ID_PROPERTY)->getResultName()
+        );
     }
 
     public function testProcessWhenGetActionHasErrors()
