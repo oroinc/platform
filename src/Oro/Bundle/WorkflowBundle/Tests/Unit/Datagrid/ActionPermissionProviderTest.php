@@ -28,12 +28,15 @@ class ActionPermissionProviderTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @param array $expected
-     * @param object $input
+     * @param ResultRecordInterface $input
      * @param bool $featureEnabled
      * @dataProvider getWorkflowDefinitionPermissionsDataProvider
      */
-    public function testGetWorkflowDefinitionPermissionsSystemRelated(array $expected, $input, $featureEnabled)
-    {
+    public function testGetWorkflowDefinitionPermissionsSystemRelated(
+        array $expected,
+        ResultRecordInterface $input,
+        $featureEnabled
+    ) {
         $this->featureChecker->expects($this->any())
             ->method('isResourceEnabled')
             ->willReturn($featureEnabled);
@@ -109,13 +112,13 @@ class ActionPermissionProviderTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @param array $expected
-     * @param object $input
+     * @param ResultRecordInterface $input
      * @param bool $featureEnabled
      * @dataProvider getWorkflowDefinitionActivationDataProvider
      */
     public function testGetWorkflowDefinitionPermissionsActivationRelated(
         array $expected,
-        $input,
+        ResultRecordInterface $input,
         $featureEnabled
     ) {
         $this->featureChecker->expects($this->any())
@@ -129,7 +132,6 @@ class ActionPermissionProviderTest extends \PHPUnit_Framework_TestCase
      */
     public function getWorkflowDefinitionActivationDataProvider()
     {
-
         return array(
             'no config' => array(
                 'expected' => array(
