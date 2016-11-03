@@ -147,6 +147,29 @@ class LayoutListenerTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('Test Layout', $responseEvent->getResponse()->getContent());
     }
 
+    public function testShouldReturnBlocksCntent()
+    {
+        $blocks = [
+            'block1' => 'Test block 1',
+            'block2' => 'Test block 2',
+        ];
+
+        $builder = $this->getMock('Oro\Component\Layout\LayoutBuilderInterface');
+        $this->setupLayoutExpectations($builder, null, $blocks);
+
+        $layoutAnnotation = new LayoutAnnotation([]);
+        $attributes = [
+            '_layout' => $layoutAnnotation,
+            'layout_block_ids' => array_keys($blocks),
+        ];
+        $responseEvent    = $this->createResponseForControllerResultEvent(
+            $attributes,
+            []
+        );
+        $this->listener->onKernelView($responseEvent);
+        $this->assertEquals(json_encode($blocks), $responseEvent->getResponse()->getContent());
+    }
+
     /**
      * @expectedException \Oro\Component\Layout\Exception\LogicException
      * @expectedExceptionMessage The @Template() annotation cannot be used together with the @Layout() annotation.
@@ -293,35 +316,46 @@ class LayoutListenerTest extends \PHPUnit_Framework_TestCase
     /**
      * @param LayoutBuilderInterface|null $builder
      * @param \Closure|null $assertContextCallback
+     * @param array $renderBlocks
      */
-    protected function setupLayoutExpectations($builder = null, \Closure $assertContextCallback = null)
-    {
+    protected function setupLayoutExpectations(
+        $builder = null,
+        \Closure $assertContextCallback = null,
+        $renderBlocks = []
+    ) {
         if (null === $builder) {
             $builder = $this->getMock('Oro\Component\Layout\LayoutBuilderInterface');
         }
-        $this->layoutManager->expects($this->once())
+        $callCount = $renderBlocks ? count($renderBlocks) : 1;
+        $this->layoutManager->expects($this->exactly($callCount))
             ->method('getLayoutBuilder')
             ->willReturn($builder);
 
-        $builder->expects($this->once())
+        $builder->expects($this->exactly($callCount))
             ->method('getLayout')
             ->willReturnCallback(
-                function (ContextInterface $context) use ($assertContextCallback) {
-                    $context->getResolver()
-                        ->setOptional(['theme'])
-                        ->setDefaults(['action' => '']);
-                    $context->resolve();
+                function (ContextInterface $context, $blockId) use ($assertContextCallback, $renderBlocks) {
+                    if (!$context->isResolved()) {
+                        $context->getResolver()
+                            ->setOptional(['theme'])
+                            ->setDefaults(['action' => '']);
+                        $context->resolve();
+                    }
 
                     if (null !== $assertContextCallback) {
                         call_user_func($assertContextCallback, $context);
                     }
 
+                    $renderContent = 'Test Layout';
+                    if ($blockId) {
+                        $renderContent = isset($renderBlocks[$blockId]) ? $renderBlocks[$blockId] : '';
+                    }
                     $layout = $this->getMockBuilder('Oro\Component\Layout\Layout')
                         ->disableOriginalConstructor()
                         ->getMock();
                     $layout->expects($this->once())
                         ->method('render')
-                        ->willReturn('Test Layout');
+                        ->willReturn($renderContent);
                     $layout->expects($this->any())
                         ->method('getView')
                         ->will($this->returnValue($this->getMock('Oro\Component\Layout\BlockView')));
