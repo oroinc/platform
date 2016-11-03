@@ -217,6 +217,9 @@ class PdoPgsql extends BaseDriver
         } elseif ($searchCondition['condition'] === Query::OPERATOR_EQUALS) {
             $searchString = $this->createEqualsStringQuery($index, $useFieldName);
             $this->createEqualsQueryParameter($qb, $index, $fieldValue, $setOrderBy);
+        } elseif ($searchCondition['condition'] === Query::OPERATOR_NOT_EQUALS) {
+            $searchString = $this->createNotEqualsStringQuery($index, $useFieldName);
+            $this->createNotEqualsQueryParameter($qb, $index, $fieldValue, $setOrderBy);
         } elseif ($searchCondition['condition'] === Query::OPERATOR_STARTS_WITH) {
             $searchString = $this->createStartWithStringQuery($index, $useFieldName);
             $this->createStartWithStringParameter($qb, $index, $fieldValue, $setOrderBy);
@@ -236,16 +239,37 @@ class PdoPgsql extends BaseDriver
         return '(' . $searchString . ' ) ';
     }
 
+
+
     /**
      * @param string $index
      * @param bool $useFieldName
      * @return string
      */
-    public function createEqualsStringQuery($index, $useFieldName)
+    protected function createEqualsStringQuery($index, $useFieldName)
     {
         $joinAlias = $this->getJoinAlias(Query::TYPE_TEXT, $index);
 
         $stringQuery = $joinAlias . '.value = :equals' . $index;
+
+        if ($useFieldName) {
+            $stringQuery .= ' AND ' . $joinAlias . '.field = :field' . $index;
+        }
+
+        return $stringQuery;
+
+    }
+
+    /**
+     * @param string $index
+     * @param bool $useFieldName
+     * @return string
+     */
+    protected function createNotEqualsStringQuery($index, $useFieldName)
+    {
+        $joinAlias = $this->getJoinAlias(Query::TYPE_TEXT, $index);
+
+        $stringQuery = $joinAlias . '.value <> :notEquals' . $index;
 
         if ($useFieldName) {
             $stringQuery .= ' AND ' . $joinAlias . '.field = :field' . $index;
@@ -261,9 +285,24 @@ class PdoPgsql extends BaseDriver
      * @param string $fieldValue
      * @param bool $isOrderBy
      */
-    public function createEqualsQueryParameter(QueryBuilder $qb, $index, $fieldValue, $isOrderBy)
+    protected function createEqualsQueryParameter(QueryBuilder $qb, $index, $fieldValue, $isOrderBy)
     {
         $qb->setParameter('equals' . $index, $fieldValue);
+
+        if ($isOrderBy) {
+            $qb->setParameter('orderByValue' . $index, $fieldValue);
+        }
+    }
+
+    /**
+     * @param QueryBuilder $qb
+     * @param string $index
+     * @param string $fieldValue
+     * @param bool $isOrderBy
+     */
+    protected function createNotEqualsQueryParameter(QueryBuilder $qb, $index, $fieldValue, $isOrderBy)
+    {
+        $qb->setParameter('notEquals' . $index, $fieldValue);
 
         if ($isOrderBy) {
             $qb->setParameter('orderByValue' . $index, $fieldValue);
