@@ -18,8 +18,8 @@ class PdoPgsql extends BaseDriver
     /**
      * Init additional doctrine functions
      *
-     * @param EntityManager $em
-     * @param ClassMetadata $class
+     * @param \Doctrine\ORM\EntityManager         $em
+     * @param \Doctrine\ORM\Mapping\ClassMetadata $class
      */
     public function initRepo(EntityManager $em, ClassMetadata $class)
     {
@@ -36,21 +36,18 @@ class PdoPgsql extends BaseDriver
     /**
      * Sql plain query to create fulltext index for Postgresql.
      *
-     * @param string $tableName
-     * @param string $indexName
-     *
      * @return string
      */
-    public static function getPlainSql($tableName = 'oro_search_index_text', $indexName = 'value')
+    public static function getPlainSql()
     {
-        return sprintf('CREATE INDEX %s ON %s USING gin(to_tsvector(\'english\', value))', $indexName, $tableName);
+        return "CREATE INDEX value ON oro_search_index_text USING gin(to_tsvector('english', 'value'))";
     }
 
     /**
      * Create fulltext search string for string parameters (contains)
      *
      * @param integer $index
-     * @param bool $useFieldName
+     * @param bool    $useFieldName
      *
      * @return string
      */
@@ -137,17 +134,57 @@ class PdoPgsql extends BaseDriver
     }
 
     /**
+     * Set string parameter for qb
+     *
+     * @param \Doctrine\ORM\QueryBuilder $qb
+     * @param integer                    $index
+     * @param string                     $fieldValue
+     * @param string                     $searchCondition
+     */
+    protected function setFieldValueStringParameter(QueryBuilder $qb, $index, $fieldValue, $searchCondition)
+    {
+        $notContains = !in_array($searchCondition, [Query::OPERATOR_CONTAINS, Query::OPERATOR_EQUALS], true);
+        $searchArray = explode(Query::DELIMITER, $fieldValue);
+
+        foreach ($searchArray as $key => $string) {
+            $searchArray[$key] = $string . ':*';
+        }
+
+        if ($notContains) {
+            foreach ($searchArray as $key => $string) {
+                $searchArray[$key] = '!' . $string;
+            }
+            $qb->setParameter('value' . $index, implode(' & ', $searchArray));
+        } else {
+            $qb->setParameter('value' . $index, implode(' | ', $searchArray));
+        }
+    }
+
+    /**
      * Set fulltext range order by
      *
-     * @param QueryBuilder $qb
-     * @param int $index
+     * @param \Doctrine\ORM\QueryBuilder $qb
+     * @param int                        $index
      */
     protected function setTextOrderBy(QueryBuilder $qb, $index)
     {
         $joinAlias = $this->getJoinAlias(Query::TYPE_TEXT, $index);
 
-        $qb->addSelect(sprintf('TsRank(%s.value, :orderByValue%s) as rankField%s', $joinAlias, $index, $index))
+        $qb->addSelect(sprintf('TsRank(%s.value, :value%s) as rankField%s', $joinAlias, $index, $index))
             ->addOrderBy(sprintf('rankField%s', $index), Criteria::DESC);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function addOrderBy(Query $query, QueryBuilder $qb)
+    {
+        parent::addOrderBy($query, $qb);
+
+        // all columns from order part must be in select
+        if ($query->getOrderBy()) {
+            $qb->addSelect('orderTable.value');
+        }
     }
 
     /**
