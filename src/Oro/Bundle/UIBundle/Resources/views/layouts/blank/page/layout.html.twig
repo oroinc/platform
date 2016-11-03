@@ -29,7 +29,100 @@
         '~class': ' wrapper'
     }) %}
 
-    <div{{ block('block_attributes') }}>
+    <div {{ block('block_attributes') }}>
         {{ block_widget(block) }}
     </div>
 {% endblock %}
+
+{% block _page_container_widget %}
+    {% set attr = layout_attr_defaults(attr, {
+        '~class': ' page-container'
+    }) %}
+
+    <div {{ block('block_attributes') }}>
+        {{ block_widget(block) }}
+    </div>
+{% endblock %}
+
+{% block _page_header_widget %}
+    {% set attr = layout_attr_defaults(attr, {
+        '~class': ' page-header'
+    }) %}
+
+    <div {{ block('block_attributes') }}>
+        {{ block_widget(block) }}
+    </div>
+{% endblock %}
+
+{% block _logo_widget %}
+    {% set attr = layout_attr_defaults(attr, {
+        '~class': ' logo',
+        'src': '/bundles/orofrontend/blank/images/logo/logo-oroacem.svg',
+        'width:': '190',
+        'height':  '35',
+        'alt': 'logo'
+    }) %}
+
+    {% if not app.request.attributes.get('_route') == 'oro_frontend_root' %}
+        <a href="{{ path('oro_frontend_root') }}">
+    {% endif %}
+
+    <img {{ block('block_attributes') }} />
+
+    {% if not app.request.attributes.get('_route') == 'oro_frontend_root' %}
+        </a>
+    {% endif %}
+{% endblock %}
+
+{% block _page_main_widget %}
+    {% set attr = layout_attr_defaults(attr, {
+        '~class': ' page-main'
+    }) %}
+
+    <main {{ block('block_attributes') }}>
+        {{ block_widget(block) }}
+    </main>
+{% endblock %}
+
+{% block _page_sidebar_widget %}
+    {% if block.count > 0 %}
+        {% set attr = layout_attr_defaults(attr, {
+            '~class': ' page-sidebar'
+        }) %}
+
+        <aside {{ block('block_attributes') }}>
+            {{ block_widget(block) }}
+        </aside>
+    {% endif %}
+{% endblock %}
+
+{% block _page_content_widget %}
+    {% set attr = layout_attr_defaults(attr, {
+        '~class': ' page-content'
+    }) %}
+
+    <section {{ block('block_attributes') }}>
+        {{ block_widget(block) }}
+    </section>
+{% endblock %}
+
+{% block _page_footer_widget %}
+    {% set attr = layout_attr_defaults(attr, {
+        '~class': ' page-footer'
+    }) %}
+
+    <footer {{ block('block_attributes') }}>
+        {{ block_widget(block) }}
+    </footer>
+{% endblock %}
+
+{% block _copyright_widget %}
+    {% set attr = layout_attr_defaults(attr, {
+        '~class': ' copyright'
+    }) %}
+
+    <p {{ block('block_attributes') }}>
+        {{ 'oro_frontend.copyright'|trans|raw }}
+    </p>
+{% endblock %}
+

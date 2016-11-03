@@ -30,10 +30,26 @@ layout:
                 body:
                     blockType: body
                 wrapper:
+                      options:
+                          attr:
+                              id: 'container'
+                      blockType: container
+                page_container:
                     blockType: container
-                    options:
-                        attr:
-                            id: 'container'
+                page_header:
+                    blockType: container
+                page_main:
+                    blockType: container
+                page_sidebar:
+                    blockType: container
+                page_content:
+                    blockType: container
+                page_footer:
+                    blockType: container
+                logo:
+                    blockType: container
+                copyright:
+                    blockType: container
                 require_js:
                     blockType: container
                 requirejs_scripts:
@@ -59,4 +75,12 @@ layout:
                         require_modules:
                             app_script: ~
                     body:
-                        wrapper: ~
+                        wrapper:
+                            page_container:
+                                page_header:
+                                    logo: ~
+                                page_main:
+                                    page_sidebar: ~
+                                    page_content: ~
+                                page_footer:
+                                    copyright: ~
