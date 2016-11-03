@@ -3,10 +3,10 @@ navigation:
         templates:
             application_menu:
                 template: 'OroNavigationBundle:Menu:application_menu.html.twig'
-                currentClass: 'active'
-                ancestorClass: 'active'
+                current_class: 'active'
+                ancestor_class: 'active'
                 allow_safe_labels: true
-                rootClass: 'nav nav-multilevel main-menu'
+                root_class: 'nav nav-multilevel main-menu'
             dots_menu:
                 template: 'OroNavigationBundle:Menu:dots_menu.html.twig'
             shortcuts:
@@ -23,24 +23,24 @@ navigation:
                 template: 'OroNavigationBundle:Menu:favorites.html.twig'
             mostviewed:
                 template: 'OroNavigationBundle:Menu:mostviewed.html.twig'
-                rootClass: 'extra-list'
+                root_class: 'extra-list'
             history:
                 template: 'OroNavigationBundle:Menu:history.html.twig'
-                rootClass: 'extra-list'
-                currentAsLink: false
+                root_class: 'extra-list'
+                current_as_link: false
 
         items:
             pinbar:
                 label: 'oro.navigation.menu.pinbar.label'
                 extras:
                     icon: 'icon-folder-close'
-                    maxItems: 10
+                    max_items: 10
                 uri: '#'
             history:
                 label: 'oro.navigation.menu.history.label'
                 extras:
                     icon: 'icon-time'
-                    activeIfFirstIsEmpty: true
+                    active_if_first_is_empty: true
                 uri: '#'
             favorite:
                 label: 'oro.navigation.menu.favorite.label'

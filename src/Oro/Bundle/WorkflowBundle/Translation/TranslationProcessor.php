@@ -38,6 +38,8 @@ class TranslationProcessor implements ConfigurationHandlerInterface, WorkflowDef
             }
         }
 
+        $this->translationHelper->flushTranslations();
+
         return $configuration;
     }
 

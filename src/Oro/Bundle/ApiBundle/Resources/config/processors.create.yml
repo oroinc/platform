@@ -147,9 +147,10 @@ services:
             - { name: oro.api.processor, action: create, group: transform_data, priority: 250 }
 
     oro_api.create.build_form_builder:
-        class: Oro\Bundle\ApiBundle\Processor\Shared\BuildFormBuilder
+        class: Oro\Bundle\ApiBundle\Processor\Create\BuildFormBuilder
         arguments:
             - '@form.factory'
+            - '@form.property_accessor'
         tags:
             - { name: oro.api.processor, action: create, group: transform_data, priority: 100 }
 
