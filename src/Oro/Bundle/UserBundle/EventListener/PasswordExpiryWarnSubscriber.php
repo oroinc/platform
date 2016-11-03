@@ -58,26 +58,22 @@ class PasswordExpiryWarnSubscriber implements EventSubscriberInterface
             return;
         }
 
-        $warn = false;
         foreach (self::$periodMarkers as $days) {
             $interval = new \DateInterval('P'. $days .'D');
             $date = $now->add($interval)->format('Y-m-d');
 
             if ($date === $passwordExpiryDate->format('Y-m-d')) {
-                $warn = true;
+                $message = $this->translator->transChoice(
+                    'oro.user.password.expiration.message',
+                    $days,
+                    ['%count%' => $days]
+                );
+                $this->session->getFlashBag()->add('warning', $message);
+
                 break;
             }
 
             $now->sub($interval);
-        }
-
-        if ($warn) {
-            $message = $this->translator->transChoice(
-                'oro.user.password.expiration.message',
-                $days,
-                ['%count%' => $days]
-            );
-            $this->session->getFlashBag()->add('warning', $message);
         }
     }
 }
