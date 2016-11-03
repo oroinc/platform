@@ -80,7 +80,7 @@ class WorkflowData implements \ArrayAccess, \IteratorAggregate, \Countable
      * Get property path for array as first accessor.
      *
      * @param string $path
-     * @return string
+     * @return PropertyPath
      */
     protected function getConstructedPropertyPath($path)
     {
