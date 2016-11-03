@@ -67,8 +67,8 @@ class PdoMysql extends BaseDriver
         );
 
         // TODO Need to clarify search requirements in scope of CRM-214
-        if (in_array($searchCondition['condition'], [Query::OPERATOR_CONTAINS, Query::OPERATOR_EQUALS])) {
-            $whereExpr  = $this->createMatchAgainstWordsExpr($qb, $words, $index, $searchCondition, $setOrderBy);
+        if ($searchCondition['condition'] === Query::OPERATOR_CONTAINS) {
+            $whereExpr = $this->createMatchAgainstWordsExpr($qb, $words, $index, $searchCondition, $setOrderBy);
             $shortWords = $this->getWordsLessThanFullTextMinWordLength($words);
             if ($shortWords) {
                 $whereExpr = $qb->expr()->orX(
@@ -76,6 +76,8 @@ class PdoMysql extends BaseDriver
                     $this->createLikeWordsExpr($qb, $shortWords, $index, $searchCondition)
                 );
             }
+        } elseif ( $searchCondition['condition'] === Query::OPERATOR_EQUALS) {
+            $whereExpr = $this->createEqualsExpr($qb, implode(' ', $words), $index, $searchCondition, $setOrderBy);
         } else {
             $whereExpr = $this->createNotLikeWordsExpr($qb, $words, $index, $searchCondition);
         }
@@ -149,6 +151,8 @@ class PdoMysql extends BaseDriver
         return $this->fullTextMinWordLength;
     }
 
+
+
     /**
      * Creates expression like MATCH_AGAINST(textField.value, :value0 'IN BOOLEAN MODE') and adds parameters
      * to $qb.
@@ -191,6 +195,80 @@ class PdoMysql extends BaseDriver
 
         return (string)$result;
     }
+
+    /**
+     * Creates expression for equals comparision
+     * to $qb.
+     *
+     * @param  QueryBuilder $qb
+     * @param  string       $words
+     * @param  string       $index
+     * @param  array        $searchCondition
+     * @param  bool         $setOrderBy
+     *
+     * @return string
+     */
+    protected function createEqualsExpr(
+        QueryBuilder $qb,
+        $words,
+        $index,
+        array $searchCondition,
+        $setOrderBy = true
+    )
+    {
+        $joinAlias = $this->getJoinAlias($searchCondition['fieldType'], $index);
+        $fieldName = $searchCondition['fieldName'];
+        $valueParameter = 'value' . $index;
+
+        $result = "$joinAlias.value == :$valueParameter";
+        $qb->setParameter($valueParameter, $fieldName);
+
+        if ($this->isConcreteField($fieldName) && !$this->isAllDataField($fieldName)) {
+            $fieldParameter = 'field' . $index;
+            $result         = $qb->expr()->andX($result, "$joinAlias.field = :$fieldParameter");
+            $qb->setParameter($fieldParameter, $fieldName);
+        }
+
+        return (string)$result;
+    }
+
+
+    /**
+     * Creates expression for NotEquals comparision
+     * to $qb.
+     *
+     * @param  QueryBuilder $qb
+     * @param  string       $words
+     * @param  string       $index
+     * @param  array        $searchCondition
+     * @param  bool         $setOrderBy
+     *
+     * @return string
+     */
+    protected function createNotEqualsExpr(
+        QueryBuilder $qb,
+        $words,
+        $index,
+        array $searchCondition,
+        $setOrderBy = true
+    )
+    {
+        $joinAlias = $this->getJoinAlias($searchCondition['fieldType'], $index);
+        $fieldName = $searchCondition['fieldName'];
+        $valueParameter = 'value' . $index;
+
+        $result = "$joinAlias.value <> :$valueParameter";
+        $qb->setParameter($valueParameter, $fieldName);
+
+        if ($this->isConcreteField($fieldName) && !$this->isAllDataField($fieldName)) {
+            $fieldParameter = 'field' . $index;
+            $result         = $qb->expr()->andX($result, "$joinAlias.field = :$fieldParameter");
+            $qb->setParameter($fieldParameter, $fieldName);
+        }
+
+        return (string)$result;
+    }
+
 
     /**
      * Creates expression like (textField.value LIKE :value0_w0 OR textField.value LIKE :value0_w1)
