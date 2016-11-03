@@ -19,7 +19,9 @@ use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 use Oro\Bundle\EntityBundle\Provider\ExclusionProviderInterface;
 use Oro\Bundle\EntityExtendBundle\Entity\Manager\AssociationManager;
+use Oro\Bundle\EntityExtendBundle\Extend\FieldTypeHelper;
 use Oro\Bundle\EntityExtendBundle\Extend\RelationType;
+use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 
 /**
  * Makes sure that identifier field names are set for ORM entities.
@@ -56,22 +58,28 @@ class CompleteDefinition implements ProcessorInterface
     /** @var AssociationManager */
     protected $associationManager;
 
+    /** @var FieldTypeHelper */
+    protected $fieldTypeHelper;
+
     /**
      * @param DoctrineHelper             $doctrineHelper
      * @param ExclusionProviderInterface $exclusionProvider
      * @param ConfigProvider             $configProvider
      * @param AssociationManager         $associationManager
+     * @param FieldTypeHelper            $fieldTypeHelper
      */
     public function __construct(
         DoctrineHelper $doctrineHelper,
         ExclusionProviderInterface $exclusionProvider,
         ConfigProvider $configProvider,
-        AssociationManager $associationManager
+        AssociationManager $associationManager,
+        FieldTypeHelper $fieldTypeHelper
     ) {
         $this->doctrineHelper = $doctrineHelper;
         $this->exclusionProvider = $exclusionProvider;
         $this->configProvider = $configProvider;
         $this->associationManager = $associationManager;
+        $this->fieldTypeHelper = $fieldTypeHelper;
     }
 
     /**
@@ -245,6 +253,42 @@ class CompleteDefinition implements ProcessorInterface
                     $targets = $this->getExtendedAssociationTargets($entityClass, $associationType, $associationKind);
                     $field->setDependsOn(array_values($targets));
                     $this->fixExtendedAssociationIdentifierDataType($field, array_keys($targets));
+                } elseif (DataType::isExtendedInverseAssociation($dataType)) {
+                    if ($field->getTargetType()) {
+                        throw new \RuntimeException(
+                            sprintf(
+                                'The "target_type" option cannot be configured for "%s::%s".',
+                                $entityClass,
+                                $fieldName
+                            )
+                        );
+                    }
+                    if ($field->getDependsOn()) {
+                        throw new \RuntimeException(
+                            sprintf(
+                                'The "depends_on" option cannot be configured for "%s::%s".',
+                                $entityClass,
+                                $fieldName
+                            )
+                        );
+                    }
+
+                    list($associationSourceClass, $associationType, $associationKind)
+                        = DataType::parseExtendedInverseAssociation($dataType);
+                    $field->setTargetClass($associationSourceClass);
+                    $reverseType = ExtendHelper::getReverseRelationType(
+                        $this->fieldTypeHelper->getUnderlyingType($associationType)
+                    );
+                    $field->setTargetType($this->getExtendedAssociationTargetType($reverseType));
+
+                    $this->completeAssociation($field, $associationSourceClass, $version, $requestType);
+                    $targets = $this->getExtendedAssociationTargets(
+                        $associationSourceClass,
+                        $associationType,
+                        $associationKind
+                    );
+                    $field->set('association-field', $targets[$entityClass]);
+                    $field->set('association-kind', $associationKind);
                 }
             }
         }

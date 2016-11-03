@@ -92,6 +92,10 @@ class BuildFormBuilder implements ProcessorInterface
             $options['property_path'] = $propertyPath;
         }
 
+        if ($fieldConfig->has('association-field')) {
+            $options['mapped'] = false;
+        }
+
         return $options;
     }
 }

@@ -104,4 +104,82 @@ class DataTypeTest extends \PHPUnit_Framework_TestCase
             [''],
         ];
     }
+
+    /**
+     * @dataProvider extendedInverseAssociationProvider
+     */
+    public function testIsExtendedInverseAssociation($dataType, $expected)
+    {
+        self::assertSame($expected, DataType::isExtendedInverseAssociation($dataType));
+    }
+
+    public function extendedInverseAssociationProvider()
+    {
+        return [
+            ['inverseAssociation:manyToOne:/Acme/Demo/Entity', true],
+            ['inverseAssociation:manyToOne:/Acme/Demo/Entity:manyToOne', true],
+            ['inverseAssociation:manyToOne:/Acme/Demo/Entity:manyToOne:kind', true],
+            ['association:manyToOne:kind', false],
+            ['string', false],
+            [null, false],
+            ['', false],
+        ];
+    }
+
+    /**
+     * @dataProvider parseExtendedInverseAssociationProvider
+     */
+    public function testParseExtendedInverseAssociation(
+        $dataType,
+        $expectedSourceClass,
+        $expectedAssociationType,
+        $expectedAssociationKind
+    ) {
+        list($associationClass, $associationType, $associationKind) =
+            DataType::parseExtendedInverseAssociation($dataType);
+        self::assertSame($expectedSourceClass, $associationClass);
+        self::assertSame($expectedAssociationType, $associationType);
+        self::assertSame($expectedAssociationKind, $associationKind);
+    }
+
+    public function parseExtendedInverseAssociationProvider()
+    {
+        return [
+            [
+                'inverseAssociation:Acme/DemoBundle/Entity/TestEntity:manyToOne',
+                'Acme/DemoBundle/Entity/TestEntity',
+                'manyToOne',
+                null
+            ],
+            [
+                'inverseAssociation:Acme/DemoBundle/Entity/TestEntity:manyToOne:kind',
+                'Acme/DemoBundle/Entity/TestEntity',
+                'manyToOne',
+                'kind'
+            ],
+        ];
+    }
+
+    /**
+     * @dataProvider invalidExtendedAssociationProvider
+     * @expectedException \InvalidArgumentException
+     */
+    public function testParseInvalidExtendedInverseAssociation($dataType)
+    {
+        DataType::parseExtendedInverseAssociation($dataType);
+    }
+
+    public function invalidExtendedInverseAssociationProvider()
+    {
+        return [
+            ['string'],
+            ['inverseAssociation'],
+            ['inverseAssociation:'],
+            ['inverseAssociation::'],
+            ['inverseAssociation:/Acme/Demo:'],
+            ['inverseAssociation:/Acme/Demo:manyToOne:'],
+            [null],
+            [''],
+        ];
+    }
 }

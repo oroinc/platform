@@ -58,8 +58,8 @@ final class DataType
     }
 
     /**
-     * Checks whether the given data-type represents an expended association.
-     * See EntityExtendBundle/Resources/doc/associations.md for details about expended associations.
+     * Checks whether the given data-type represents an extended association.
+     * See EntityExtendBundle/Resources/doc/associations.md for details about extended associations.
      *
      * @param string $dataType
      *
@@ -71,14 +71,27 @@ final class DataType
     }
 
     /**
-     * Extracts the type and the kind of an expended association.
-     * See EntityExtendBundle/Resources/doc/associations.md for details about expended associations.
+     * Checks whether the given data-type represents an inverse side of extended association.
+     * See EntityExtendBundle/Resources/doc/associations.md for details about extended associations.
+     *
+     * @param string $dataType
+     *
+     * @return bool
+     */
+    public static function isExtendedInverseAssociation($dataType)
+    {
+        return 0 === strpos($dataType, 'inverseAssociation:');
+    }
+
+    /**
+     * Extracts the type and the kind of an extended association.
+     * See EntityExtendBundle/Resources/doc/associations.md for details about extended associations.
      *
      * @param string $dataType
      *
      * @return string[] [association type, association kind]
      *
-     * @throws \InvalidArgumentException if the given data-type does not represent an expended association
+     * @throws \InvalidArgumentException if the given data-type does not represent an extended association
      */
     public static function parseExtendedAssociation($dataType)
     {
@@ -90,5 +103,28 @@ final class DataType
         }
 
         return [$type, $kind];
+    }
+
+    /**
+     * Extracts the source class, type and the kind of an inverse extended association.
+     * See EntityExtendBundle/Resources/doc/associations.md for details about extended associations.
+     *
+     * @param string $dataType
+     *
+     * @return string[] [source class name, association type, association kind]
+     *
+     * @throws \InvalidArgumentException if the given data-type does not represent an inverse part of
+     *  extended association
+     */
+    public static function parseExtendedInverseAssociation($dataType)
+    {
+        list($prefix, $source, $type, $kind) = array_pad(explode(':', $dataType, 4), 4, null);
+        if ('inverseAssociation' !== $prefix || empty($source) ||  empty($type) || '' === $kind) {
+            throw new \InvalidArgumentException(
+                sprintf('Expected a string like "inverseAssociation:/Source/Class:type[:kind]", "%s" given.', $dataType)
+            );
+        }
+
+        return [$source, $type, $kind];
     }
 }

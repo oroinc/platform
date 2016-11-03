@@ -195,6 +195,14 @@ services:
         tags:
             - { name: oro.api.processor, action: add_relationship, group: save_data, priority: -10 }
 
+    oro_api.add_relationship.save_relations:
+       class: Oro\Bundle\ApiBundle\Processor\Subresource\SaveRelations
+       arguments:
+           - '@oro_api.doctrine_helper'
+           - '@property_accessor'
+       tags:
+           - { name: oro.api.processor, action: add_relationship, group: save_data, priority: -20 }
+
     #
     # normalize_result
     #
