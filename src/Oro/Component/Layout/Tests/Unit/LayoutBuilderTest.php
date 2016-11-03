@@ -248,6 +248,12 @@ class LayoutBuilderTest extends \PHPUnit_Framework_TestCase
             ->method('configureContext')
             ->with($this->identicalTo($context));
 
+        $context->expects($this->any())
+            ->method('getOr')
+            ->will($this->returnValue(true));
+        $this->expressionProcessor->expects($this->once())
+            ->method('processExpressions');
+
         $this->layoutManipulator->expects($this->at(0))
             ->method('setBlockTheme')
             ->with('RootTheme1', $this->identicalTo(null));

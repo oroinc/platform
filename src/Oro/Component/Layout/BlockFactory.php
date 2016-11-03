@@ -316,15 +316,19 @@ class BlockFactory implements BlockFactoryInterface
         }
 
         $values = $options->toArray();
-        //TODO: remove this call and uncomment call below after BB-5243
-        $this->expressionProcessor->processExpressions(
-            $values,
-            $this->context,
-            $this->dataAccessor,
-            true,
-            $this->context->getOr('expressions_encoding')
-        );
-//        $this->expressionProcessor->processExpressions($values, $this->context, null, true, null);
+
+        if ($this->context->getOr('expressions_evaluate_deferred')) {
+            $this->expressionProcessor->processExpressions($values, $this->context, null, true, null);
+        } else {
+            $this->expressionProcessor->processExpressions(
+                $values,
+                $this->context,
+                $this->dataAccessor,
+                true,
+                $this->context->getOr('expressions_encoding')
+            );
+        }
+
         $options->setMultiple($values);
     }
 }

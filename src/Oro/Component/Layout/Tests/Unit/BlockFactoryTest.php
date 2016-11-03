@@ -41,6 +41,9 @@ class BlockFactoryTest extends LayoutTestCase
     /** @var LayoutRegistry */
     protected $registry;
 
+    /** @var ExpressionLanguage */
+    protected $expressionLanguage;
+
     /** @var BlockFactory */
     protected $blockFactory;
 
@@ -59,12 +62,12 @@ class BlockFactoryTest extends LayoutTestCase
             )
         );
 
-        $this->context           = new LayoutContext();
-        $this->rawLayoutBuilder  = new RawLayoutBuilder();
-        $this->layoutManipulator = new DeferredLayoutManipulator($this->registry, $this->rawLayoutBuilder);
-        $expressionLanguage = new ExpressionLanguage();
-        $expressionProcessor = new ExpressionProcessor($expressionLanguage, new ExpressionEncoderRegistry([]));
-        $this->blockFactory      = new BlockFactory(
+        $this->context            = new LayoutContext();
+        $this->rawLayoutBuilder   = new RawLayoutBuilder();
+        $this->layoutManipulator  = new DeferredLayoutManipulator($this->registry, $this->rawLayoutBuilder);
+        $this->expressionLanguage = new ExpressionLanguage();
+        $expressionProcessor      = new ExpressionProcessor($this->expressionLanguage, new ExpressionEncoderRegistry([]));
+        $this->blockFactory       = new BlockFactory(
             $this->registry,
             $this->layoutManipulator,
             $expressionProcessor
@@ -361,5 +364,91 @@ class BlockFactoryTest extends LayoutTestCase
             ],
             $view
         );
+    }
+
+    /**
+     * @dataProvider expressionsProvider
+     *
+     * @param bool $deferred
+     */
+    public function testProcessingExpressionsInBuildView($deferred)
+    {
+        $this->context->set('expressions_evaluate', true);
+        $this->context->set('expressions_evaluate_deferred', $deferred);
+        $this->context->set('title', 'test title');
+
+        $this->layoutManipulator
+            ->add('root', null, 'root')
+            ->add('header', 'root', 'header')
+            ->add('logo', 'header', 'logo', [
+                'title' => $this->expressionLanguage->parse('context["title"]', ['context'])
+            ]);
+
+        $view = $this->getLayoutView();
+
+        $this->assertBlockView(
+            [ // root
+                'vars'     => ['id' => 'root'],
+                'children' => [
+                    [ // header
+                        'vars'     => ['id' => 'header'],
+                        'children' => [
+                            [ // logo
+                                'vars' => ['id' => 'logo', 'title' => 'test title']
+                            ]
+                        ]
+                    ]
+                ]
+            ],
+            $view
+        );
+    }
+
+    /**
+     * @return array
+     */
+    public function expressionsProvider()
+    {
+        return [
+            ['deferred' => false],
+            ['deferred' => true],
+        ];
+    }
+
+    /**
+     * @expectedException \InvalidArgumentException
+     */
+    public function testBuildViewShouldFailWhenUsingNonProcessedExpressions()
+    {
+        $this->context->set('expressions_evaluate', false);
+        $this->context->set('title', 'test title');
+
+        $this->layoutManipulator
+            ->add('root', null, 'root')
+            ->add('header', 'root', 'header')
+            ->add('logo', 'header', 'logo', [
+                'title' => $this->expressionLanguage->parse('context["title"]', ['context'])
+            ]);
+
+        $this->getLayoutView();
+    }
+
+    /**
+     * @expectedException \InvalidArgumentException
+     */
+    public function testBuildViewShouldFailWhenUsingDataInExpressionsInDeferredMode()
+    {
+        $this->context->set('expressions_evaluate', true);
+        $this->context->set('expressions_evaluate_deferred', true);
+        $this->context->data()->set('title', 'test title');
+
+        $this->layoutManipulator
+            ->add('root', null, 'root')
+            ->add('header', 'root', 'header')
+            ->add('logo', 'header', 'logo', [
+                'title' => $this->expressionLanguage->parse('data["title"]', ['data'])
+            ]);
+
+        $this->getLayoutView();
     }
 }

@@ -209,7 +209,7 @@ class LayoutBuilder implements LayoutBuilderInterface
         $rawLayout = $this->rawLayoutBuilder->getRawLayout();
         $rootView = $this->blockFactory->createBlockView($rawLayout, $context, $rootId);
 
-        if ($context->getOr('expressions_evaluate')) {
+        if ($context->getOr('expressions_evaluate') && $context->getOr('expressions_evaluate_deferred')) {
             $encoding = $context->getOr('expressions_encoding');
             $this->processExpressions($rootView, $context, $encoding, new DataAccessor($this->registry, $context));
         }
