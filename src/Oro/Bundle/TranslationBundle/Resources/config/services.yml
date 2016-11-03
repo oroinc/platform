@@ -87,6 +87,8 @@ services:
         calls:
             - [ setApiKey, [ %oro_translation.api.oro_service.key% ] ]
             - [ setLogger, [ '@logger' ] ]
+        tags:
+            - { name: monolog.logger, channel: oro_translation }
 
     oro_translation.database_translation.metadata.cache:
         class: %oro_translation.dynamic_translation.metadata.cache.class%
