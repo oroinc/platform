@@ -198,7 +198,19 @@ define([
      */
     $.validator.prototype.init = _.wrap($.validator.prototype.init, function(init) {
         validationHandler.initialize($(this.currentForm));
-        init.apply(this, arguments);
+
+        $(this.currentForm).on('content:changed', function(event) {
+            validationHandler.initialize($(event.target));
+        });
+
+        init.apply(this, _.rest(arguments));
+        // defer used there since `elements` method expects form has validator object that is created here
+        _.defer(_.bind(this.collectPristineValues, this));
+    });
+
+    $.validator.prototype.resetForm = _.wrap($.validator.prototype.resetForm, function(resetForm) {
+        resetForm.apply(this, _.rest(arguments));
+        this.collectPristineValues();
     });
 
     /**
@@ -252,6 +264,19 @@ define([
         })(errors);
 
         this.showErrors(result);
+    };
+
+    $.validator.prototype.collectPristineValues = function() {
+        this.pristineValues = {};
+        this.elements().each(_.bind(function(index, element) {
+            if (!this.checkable(element)) {
+                this.pristineValues[element.name] = element.value;
+            }
+        }, this));
+    };
+
+    $.validator.prototype.isPristine = function(element) {
+        return this.pristineValues[element.name] === element.value;
     };
 
     /**
@@ -310,7 +335,7 @@ define([
         // ignore all invisible elements except input type=hidden
         ignore: ':hidden:not([type=hidden])',
         onfocusout: function(element, event) {
-            if (!this.checkable(element)) {
+            if (!this.checkable(element) && !this.isPristine(element)) {
                 this.element(element);
             }
         },
