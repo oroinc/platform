@@ -8,14 +8,13 @@ use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ORM\EntityManager;
 
 use Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker;
+use Oro\Bundle\WorkflowBundle\Configuration\FeatureConfigurationExtension;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Entity\Repository\WorkflowDefinitionRepository;
 use Oro\Bundle\WorkflowBundle\Exception\WorkflowNotFoundException;
 
 class WorkflowRegistry
 {
-    const FEATURE_CONFIG_WORKFLOW_KEY = 'workflows';
-
     /** @var ManagerRegistry */
     protected $managerRegistry;
 
@@ -63,14 +62,6 @@ class WorkflowRegistry
                     is_object($name) ? get_class($name) : gettype($name)
                 )
             );
-        }
-
-        if (!$this->featureChecker->isResourceEnabled($name, self::FEATURE_CONFIG_WORKFLOW_KEY)) {
-            if ($exceptionOnNotFound) {
-                throw new WorkflowNotFoundException($name);
-            } else {
-                return null;
-            }
         }
 
         if (!array_key_exists($name, $this->workflowByName)) {
@@ -141,7 +132,9 @@ class WorkflowRegistry
             $workflows = new ArrayCollection();
             foreach ($this->getEntityRepository()->findActiveForRelatedEntity($class) as $definition) {
                 $workflowName = $definition->getName();
-                if ($this->featureChecker->isResourceEnabled($workflowName, self::FEATURE_CONFIG_WORKFLOW_KEY)) {
+                if ($this->featureChecker
+                    ->isResourceEnabled($workflowName, FeatureConfigurationExtension::WORKFLOWS_NODE_NAME)
+                ) {
                     /** @var WorkflowDefinition $definition */
                     $workflows->set($workflowName, $this->getAssembledWorkflow($definition));
                 }
@@ -167,7 +160,7 @@ class WorkflowRegistry
             function (WorkflowDefinition $definition) use ($groupNames) {
                 $isResourceEnabled = $this->featureChecker->isResourceEnabled(
                     $definition->getName(),
-                    self::FEATURE_CONFIG_WORKFLOW_KEY
+                    FeatureConfigurationExtension::WORKFLOWS_NODE_NAME
                 );
                 $exclusiveActiveGroups = $definition->getExclusiveActiveGroups();
 
@@ -241,7 +234,9 @@ class WorkflowRegistry
     {
         $enabledFeaturesWorkflows = [];
         foreach ($workflowDefinitions as $definition) {
-            if ($this->featureChecker->isResourceEnabled($definition->getName(), self::FEATURE_CONFIG_WORKFLOW_KEY)) {
+            if ($this->featureChecker
+                ->isResourceEnabled($definition->getName(), FeatureConfigurationExtension::WORKFLOWS_NODE_NAME)
+            ) {
                 $enabledFeaturesWorkflows[] = $definition;
             }
         }

@@ -7,6 +7,7 @@ use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\EntityManager;
 
 use Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker;
+use Oro\Bundle\WorkflowBundle\Configuration\FeatureConfigurationExtension;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Entity\Repository\WorkflowDefinitionRepository;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowAssembler;
@@ -109,11 +110,6 @@ class WorkflowRegistryTest extends \PHPUnit_Framework_TestCase
         $workflow = $this->createWorkflow($workflowName);
         $workflowDefinition = $workflow->getDefinition();
 
-        $this->featureChecker->expects($this->exactly(2))
-            ->method('isResourceEnabled')
-            ->with($workflowName, WorkflowRegistry::FEATURE_CONFIG_WORKFLOW_KEY)
-            ->willReturn(true);
-
         $this->entityRepository->expects($this->once())
             ->method('find')
             ->with($workflowName)
@@ -127,42 +123,6 @@ class WorkflowRegistryTest extends \PHPUnit_Framework_TestCase
         $this->assertAttributeEquals([$workflowName => $workflow], 'workflowByName', $this->registry);
     }
 
-    /**
-     * @expectedException \Oro\Bundle\WorkflowBundle\Exception\WorkflowNotFoundException
-     * @expectedExceptionMessage Workflow "test_workflow" not found
-     */
-    public function testGetWorkflowForDisabledFeatureShouldThrowException()
-    {
-        $workflowName = 'test_workflow';
-
-        $this->entityRepository->expects($this->never())
-            ->method('find')
-            ->with($workflowName);
-
-        $this->featureChecker->expects($this->once())
-            ->method('isResourceEnabled')
-            ->with($workflowName, WorkflowRegistry::FEATURE_CONFIG_WORKFLOW_KEY)
-            ->willReturn(false);
-
-        $this->registry->getWorkflow($workflowName);
-    }
-
-    public function testGetWorkflowForDisabledFeatureShouldReturnNull()
-    {
-        $workflowName = 'test_workflow';
-
-        $this->entityRepository->expects($this->never())
-            ->method('find')
-            ->with($workflowName);
-
-        $this->featureChecker->expects($this->once())
-            ->method('isResourceEnabled')
-            ->with($workflowName, WorkflowRegistry::FEATURE_CONFIG_WORKFLOW_KEY)
-            ->willReturn(false);
-
-        $this->assertNull($this->registry->getWorkflow($workflowName, false));
-    }
-
     public function testGetWorkflowWithDbEntitiesUpdate()
     {
         $workflowName = 'test_workflow';
@@ -170,11 +130,6 @@ class WorkflowRegistryTest extends \PHPUnit_Framework_TestCase
         $oldDefinition->setName($workflowName)->setLabel('Old Workflow');
         $newDefinition = new WorkflowDefinition();
         $newDefinition->setName($workflowName)->setLabel('New Workflow');
-
-        $this->featureChecker->expects($this->once())
-            ->method('isResourceEnabled')
-            ->with($workflowName, WorkflowRegistry::FEATURE_CONFIG_WORKFLOW_KEY)
-            ->willReturn(true);
 
         /** @var Workflow $workflow */
         $workflow = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Model\Workflow')
@@ -209,11 +164,6 @@ class WorkflowRegistryTest extends \PHPUnit_Framework_TestCase
         $workflow = $this->createWorkflow($workflowName);
         $workflowDefinition = $workflow->getDefinition();
 
-        $this->featureChecker->expects($this->once())
-            ->method('isResourceEnabled')
-            ->with($workflowName, WorkflowRegistry::FEATURE_CONFIG_WORKFLOW_KEY)
-            ->willReturn(true);
-
         $this->entityRepository->expects($this->at(0))
             ->method('find')
             ->with($workflowName)
@@ -237,7 +187,7 @@ class WorkflowRegistryTest extends \PHPUnit_Framework_TestCase
 
         $this->featureChecker->expects($this->once())
             ->method('isResourceEnabled')
-            ->with($workflowName, WorkflowRegistry::FEATURE_CONFIG_WORKFLOW_KEY)
+            ->with($workflowName, FeatureConfigurationExtension::WORKFLOWS_NODE_NAME)
             ->willReturn(true);
 
         $this->entityRepository->expects($this->once())
@@ -259,7 +209,7 @@ class WorkflowRegistryTest extends \PHPUnit_Framework_TestCase
 
         $this->featureChecker->expects($this->once())
             ->method('isResourceEnabled')
-            ->with($workflowName, WorkflowRegistry::FEATURE_CONFIG_WORKFLOW_KEY)
+            ->with($workflowName, FeatureConfigurationExtension::WORKFLOWS_NODE_NAME)
             ->willReturn(false);
 
         $this->entityRepository->expects($this->once())
@@ -281,7 +231,7 @@ class WorkflowRegistryTest extends \PHPUnit_Framework_TestCase
 
         $this->featureChecker->expects($this->once())
             ->method('isResourceEnabled')
-            ->with($workflowName, WorkflowRegistry::FEATURE_CONFIG_WORKFLOW_KEY)
+            ->with($workflowName, FeatureConfigurationExtension::WORKFLOWS_NODE_NAME)
             ->willReturn(true);
 
         $this->entityRepository->expects($this->once())
@@ -311,8 +261,8 @@ class WorkflowRegistryTest extends \PHPUnit_Framework_TestCase
         $this->featureChecker->expects($this->exactly(2))
             ->method('isResourceEnabled')
             ->willReturnMap([
-                [$firstWorkflowName, WorkflowRegistry::FEATURE_CONFIG_WORKFLOW_KEY, null, true],
-                [$secondWorkflowName, WorkflowRegistry::FEATURE_CONFIG_WORKFLOW_KEY, null, false]
+                [$firstWorkflowName, FeatureConfigurationExtension::WORKFLOWS_NODE_NAME, null, true],
+                [$secondWorkflowName, FeatureConfigurationExtension::WORKFLOWS_NODE_NAME, null, false]
             ]);
 
         $this->entityRepository->expects($this->once())
@@ -454,11 +404,6 @@ class WorkflowRegistryTest extends \PHPUnit_Framework_TestCase
     public function testGetWorkflowNotFoundException()
     {
         $workflowName = 'not_existing_workflow';
-
-        $this->featureChecker->expects($this->once())
-            ->method('isResourceEnabled')
-            ->with($workflowName, WorkflowRegistry::FEATURE_CONFIG_WORKFLOW_KEY)
-            ->willReturn(true);
 
         $this->entityRepository->expects($this->once())
             ->method('find')
