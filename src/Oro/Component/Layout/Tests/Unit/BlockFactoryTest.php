@@ -6,8 +6,6 @@ use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
 
 use Oro\Component\Layout\Block\OptionsResolver\OptionsResolver;
 use Oro\Component\Layout\Block\Type\Options;
-use Oro\Component\Layout\ContextInterface;
-use Oro\Component\Layout\DataAccessorInterface;
 use Oro\Component\Layout\Block\Type\BaseType;
 use Oro\Component\Layout\Block\Type\ContainerType;
 use Oro\Component\Layout\BlockBuilderInterface;
@@ -23,6 +21,7 @@ use Oro\Component\Layout\LayoutContext;
 use Oro\Component\Layout\LayoutItemInterface;
 use Oro\Component\Layout\LayoutManipulatorInterface;
 use Oro\Component\Layout\LayoutRegistry;
+use Oro\Component\Layout\OptionValueBag;
 use Oro\Component\Layout\RawLayoutBuilder;
 use Oro\Component\Layout\Tests\Unit\Fixtures\AbstractExtensionStub;
 use Oro\Component\Layout\Tests\Unit\Fixtures\Layout\Block\Type;
@@ -263,20 +262,9 @@ class BlockFactoryTest extends LayoutTestCase
                         $resolver->setDefaults(
                             [
                                 'test_option_1' => '',
-                                'test_option_2' => '{BG}:red'
+                                'test_option_2' => ['background'=> 'red']
                             ]
                         );
-                    }
-                )
-            );
-        $headerBlockTypeExtension->expects($this->once())
-            ->method('normalizeOptions')
-            ->will(
-                $this->returnCallback(
-                    function (Options $options, ContextInterface $context, DataAccessorInterface $data) {
-                        if ($options['test_option_2'] === '{BG}:red') {
-                            $options['test_option_2'] = ['background'=> 'red'];
-                        }
                     }
                 )
             );
@@ -450,5 +438,38 @@ class BlockFactoryTest extends LayoutTestCase
             ]);
 
         $this->getLayoutView();
+    }
+
+    public function testResolvingValueBags()
+    {
+        $valueBag = new OptionValueBag();
+        $valueBag->add('one');
+        $valueBag->add('two');
+
+        $this->context->set('expressions_evaluate', true);
+
+        $this->layoutManipulator
+            ->add('root', null, 'root')
+            ->add('header', 'root', 'header')
+            ->add('logo', 'header', 'logo', ['title' => $valueBag]);
+
+        $view = $this->getLayoutView();
+
+        $this->assertBlockView(
+            [ // root
+                'vars'     => ['id' => 'root'],
+                'children' => [
+                    [ // header
+                        'vars'     => ['id' => 'header'],
+                        'children' => [
+                            [ // logo
+                                'vars' => ['id' => 'logo', 'title' => 'one two']
+                            ]
+                        ]
+                    ]
+                ]
+            ],
+            $view
+        );
     }
 }

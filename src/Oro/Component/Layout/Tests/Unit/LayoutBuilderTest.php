@@ -254,6 +254,11 @@ class LayoutBuilderTest extends \PHPUnit_Framework_TestCase
         $this->expressionProcessor->expects($this->once())
             ->method('processExpressions');
 
+        $optionValueBag = $this->getMock('Oro\Component\Layout\OptionValueBag');
+        $optionValueBag->expects($this->once())
+            ->method('buildValue');
+        $rootView->vars['bag'] = $optionValueBag;
+
         $this->layoutManipulator->expects($this->at(0))
             ->method('setBlockTheme')
             ->with('RootTheme1', $this->identicalTo(null));

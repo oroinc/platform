@@ -209,9 +209,17 @@ class LayoutBuilder implements LayoutBuilderInterface
         $rawLayout = $this->rawLayoutBuilder->getRawLayout();
         $rootView = $this->blockFactory->createBlockView($rawLayout, $context, $rootId);
 
-        if ($context->getOr('expressions_evaluate') && $context->getOr('expressions_evaluate_deferred')) {
+        if ($context->getOr('expressions_evaluate')) {
+            $deferred = $context->getOr('expressions_evaluate_deferred');
             $encoding = $context->getOr('expressions_encoding');
-            $this->processExpressions($rootView, $context, $encoding, new DataAccessor($this->registry, $context));
+
+            $this->processBlockViewData(
+                $rootView,
+                $context,
+                new DataAccessor($this->registry, $context),
+                $deferred,
+                $encoding
+            );
         }
 
         $layout = $this->createLayout($rootView);
@@ -243,19 +251,40 @@ class LayoutBuilder implements LayoutBuilderInterface
      *
      * @param BlockView $blockView
      * @param ContextInterface $context
-     * @param string $encoding
      * @param DataAccessor $data
+     * @param bool $deferred
+     * @param string $encoding
      */
-    protected function processExpressions(
+    protected function processBlockViewData(
         BlockView $blockView,
         ContextInterface $context,
+        DataAccessor $data,
         $encoding,
-        DataAccessor $data
+        $deferred
     ) {
-        $this->expressionProcessor->processExpressions($blockView->vars, $context, $data, true, $encoding);
+        if ($deferred) {
+            $this->expressionProcessor->processExpressions($blockView->vars, $context, $data, true, $encoding);
+        }
+
+        $this->buildValueBags($blockView);
 
         foreach ($blockView->children as $childView) {
-            $this->processExpressions($childView, $context, $encoding, $data);
+            $this->processBlockViewData($childView, $context, $data, $deferred, $encoding);
         }
+    }
+
+    /**
+     * @param BlockView $view
+     */
+    protected function buildValueBags(BlockView $view)
+    {
+        array_walk_recursive(
+            $view->vars,
+            function (&$var) {
+                if ($var instanceof OptionValueBag) {
+                    $var = $var->buildValue();
+                }
+            }
+        );
     }
 }

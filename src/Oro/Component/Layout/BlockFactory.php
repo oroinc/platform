@@ -2,6 +2,8 @@
 
 namespace Oro\Component\Layout;
 
+use Symfony\Component\ExpressionLanguage\Expression;
+
 use Oro\Component\Layout\Block\Type\ContainerType;
 use Oro\Component\Layout\Block\Type\Options;
 use Oro\Component\Layout\ExpressionLanguage\ExpressionProcessor;
@@ -222,12 +224,12 @@ class BlockFactory implements BlockFactoryInterface
         $resolvedOptions = new Options($this->optionsResolver->resolveOptions($blockType, $options));
 
         $this->processExpressions($resolvedOptions);
+        $resolvedOptions = $this->resolveValueBags($resolvedOptions);
 
         // point the block builder state to the current block
         $this->blockBuilder->initialize($id);
         // iterate from parent to current
         foreach ($types as $type) {
-            $this->registry->normalizeOptions($type->getName(), $resolvedOptions, $this->context, $this->dataAccessor);
             $type->buildBlock($this->blockBuilder, $resolvedOptions);
             $this->registry->buildBlock($type->getName(), $this->blockBuilder, $resolvedOptions);
         }
@@ -330,5 +332,26 @@ class BlockFactory implements BlockFactoryInterface
         }
 
         $options->setMultiple($values);
+    }
+
+    /**
+     * @param Options $options
+     * @return Options
+     */
+    protected function resolveValueBags(Options $options)
+    {
+        foreach ($options as $key => $value) {
+            if ($value instanceof Expression) {
+                continue;
+            }
+
+            if ($value instanceof Options) {
+                $options[$key] = $this->resolveValueBags($value);
+            } elseif ($value instanceof OptionValueBag) {
+                $options[$key] = $value->buildValue();
+            }
+        }
+
+        return $options;
     }
 }
