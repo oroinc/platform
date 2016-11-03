@@ -205,6 +205,9 @@ oro:
                 ttl_already_requested.message: The password for this user has already been requested within the last 24 hours
                 popup.message: User {{ user }} will receive reset password by email.
                 popup.question: Are you sure you want to proceed?
+            reset_password:
+                flash:
+                    success: Reset password email has been sent to user
             force_reset:
                 popup.message: User {{ user }} will receive reset password by email and will be disabled from login.
                 popup.question: Are you sure you want to proceed?

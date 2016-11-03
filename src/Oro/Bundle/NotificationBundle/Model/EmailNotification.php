@@ -16,7 +16,7 @@ class EmailNotification implements EmailNotificationInterface
      * @param EmailTemplateInterface $template
      * @param array $recipientEmails
      */
-    public function __construct(EmailTemplateInterface $template = null, $recipientEmails = [])
+    public function __construct(EmailTemplateInterface $template, array $recipientEmails = [])
     {
         $this->template = $template;
         $this->recipientEmails = $recipientEmails;

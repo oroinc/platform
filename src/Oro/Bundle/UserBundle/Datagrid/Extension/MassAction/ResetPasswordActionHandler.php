@@ -17,6 +17,8 @@ use Oro\Bundle\DataGridBundle\Extension\MassAction\MassActionResponse;
 use Oro\Bundle\DataGridBundle\Extension\MassAction\MassActionHandlerArgs;
 use Oro\Bundle\DataGridBundle\Extension\MassAction\MassActionHandlerInterface;
 use Oro\Bundle\DataGridBundle\Datasource\Orm\IterableResult;
+use Oro\Bundle\DataGridBundle\Datasource\ResultRecord;
+use Oro\Bundle\EmailBundle\Model\EmailTemplateInterface;
 use Oro\Bundle\SecurityBundle\SecurityFacade;
 
 class ResetPasswordActionHandler implements MassActionHandlerInterface
@@ -41,7 +43,7 @@ class ResetPasswordActionHandler implements MassActionHandlerInterface
     /** @var SecurityFacade */
     protected $securityFacade;
 
-    /** @var int */
+    /** @var EmailTemplateInterface */
     protected $template = null;
 
     /** @var User */
@@ -80,8 +82,9 @@ class ResetPasswordActionHandler implements MassActionHandlerInterface
     public function handle(MassActionHandlerArgs $args)
     {
         // current user will be processed last
-        $this->user = $this->getCurrentUser();
-        $user = null;
+        $processCurrent = false;
+        $currentUser = $this->getCurrentUser();
+        $currentUserId = $currentUser ? $currentUser->getId() : null;
         $massActionOptions = $args->getMassAction()->getOptions();
 
         /** @var IterableResult $results */
@@ -91,36 +94,32 @@ class ResetPasswordActionHandler implements MassActionHandlerInterface
         $this->em = $results->getSource()->getEntityManager();
         $this->template = $this->em->getRepository('OroEmailBundle:EmailTemplate')
             ->findOneBy(['name' => self::TEMPLATE_NAME]);
-
-        while ($results->current() != null) {
-            /** @var User $entity */
-            $entity = $results->current()->getRootEntity();
-
-            if (!$entity instanceof User) {
+        while ($record = $results->current()) {
+            /** @var ResultRecord $record */
+            $user = $record->getRootEntity();
+            if (!$user instanceof User) {
                 // hydration failed
                 $responseMessage = $massActionOptions->offsetGetByPath('[messages][failure]', $this->errorMessage);
 
                 return new MassActionResponse(false, $this->translator->trans($responseMessage));
             }
 
-            if ($this->user && $entity->getId() === $this->user->getId()) {
-                $user = $entity;
+            if ($currentUserId === $user->getId()) {
+                $processCurrent = true;
                 $results->next();
 
                 continue;
             }
 
-            $this->disableLoginAndNotify($entity);
-
+            $this->disableLoginAndNotify($user);
             $results->next();
         }
 
-        if (null !== $user) {
-            $this->disableLoginAndNotify($this->user);
+        if ($processCurrent) {
+            $this->disableLoginAndNotify($currentUser);
         }
 
         $this->em->flush();
-        $this->em->clear();
 
         $responseMessage = $massActionOptions->offsetGetByPath('[messages][success]', $this->successMessage);
 
