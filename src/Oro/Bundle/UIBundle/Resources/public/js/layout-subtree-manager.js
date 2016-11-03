@@ -1,36 +1,42 @@
 define([
     'jquery',
-    'underscore',
     'oroui/js/mediator',
     'oroui/js/error'
-], function($, _, mediator, Error) {
+], function($, mediator, Error) {
     'use strict';
 
     var layoutSubtreeManager;
+
     /**
      * @export oroui/js/layout-subtree-manager
      * @name   oro.layoutSubtreeManager
      */
     layoutSubtreeManager = {
         url: window.location.href,
+
         method: 'get',
-        layoutSubtreeCollection: [],
+
+        viewsCollection: {},
+
         reloadEvents: {},
 
         /**
          * Add layout subtree instance to registry.
          *
-         * @param {object} layoutSubtreeOptions
+         * @param {Object} view LayoutSubtreeView instance
          */
-        addLayoutSubtreeInstance: function(layoutSubtreeView) {
-            this.layoutSubtreeCollection[layoutSubtreeView.options.rootId] = layoutSubtreeView;
-            if (layoutSubtreeView.options.reloadEvents instanceof Array) {
-                layoutSubtreeView.options.reloadEvents.map((function(eventItem, index) {
+        addView: function(view) {
+            var blockId = view.options.blockId;
+
+            this.viewsCollection[blockId] = view;
+
+            if (view.options.reloadEvents instanceof Array) {
+                view.options.reloadEvents.map((function(eventItem) {
                     if (!this.reloadEvents[eventItem]) {
                         this.reloadEvents[eventItem] = [];
-                        mediator.on(eventItem, this._reloadLayouts.bind(this, eventItem));
+                        mediator.on(eventItem, this._reloadLayouts.bind(this, eventItem), this);
                     }
-                    this.reloadEvents[eventItem].push(layoutSubtreeView.options.rootId);
+                    this.reloadEvents[eventItem].push(blockId);
                 }).bind(this));
             }
         },
@@ -38,77 +44,46 @@ define([
         /**
          * Remove layout subtree instance from registry.
          *
-         * @param {string} rootId unique layoutSubtree identifier
+         * @param {Object} view LayoutSubtreeView instance
          */
-        removeLayoutSubtreeInstance: function(layoutSubtreeRootId) {
-            delete this.layoutSubtreeCollection[layoutSubtreeRootId];
-            Object.keys(this.reloadEvents).map((function(eventItem, eventName) {
-                var index = eventItem.indexOf(layoutSubtreeRootId);
+        removeView: function(view) {
+            var blockId = view.options.blockId;
+
+            delete this.viewsCollection[blockId];
+
+            Object.keys(this.reloadEvents).map((function(eventName) {
+                var eventBlockIds = this.reloadEvents[eventName];
+                var index = eventBlockIds.indexOf(blockId);
                 if (index > -1) {
-                    eventItem.splice(index, 1);
+                    eventBlockIds.splice(index, 1);
                 }
-                if (!eventItem.length) {
+                if (!eventBlockIds.length) {
                     delete this.reloadEvents[eventName];
-                    mediator.off(eventName, this._reloadLayouts, this);
+                    mediator.off(eventName, null, this);
                 }
             }).bind(this));
         },
 
         /**
-         * Call layoutSubtreeView methods from collection.
+         * Call view methods from collection.
          *
-         * @param {string} event name of fired event
+         * @param {Array} blockIds
+         * @param {String} methodName
+         * @param {Function|Array} [methodArguments]
          */
-        _callLayoutSubtreeViewMethod: function(idsIterator, methodName, methodParams) {
-            idsIterator.map((function(rootId) {
-                if (typeof this.layoutSubtreeCollection[rootId] !== 'undefined') {
-                    var methodArguments = typeof methodParams === 'function' ? methodParams(rootId) : [];
-                    this.layoutSubtreeCollection[rootId][methodName].apply(this.layoutSubtreeCollection[rootId], methodArguments);
+        _callViewMethod: function(blockIds, methodName, methodArguments) {
+            blockIds.map((function(blockId) {
+                var view = this.viewsCollection[blockId];
+                if (!view) {
+                    return;
                 }
-            }).bind(this));
-        },
 
-        // TODO Remove after finish backend part
-        _executeMockAjaxQuery: function(queryData, eventListeners) {
-            var dfd = $.Deferred();
-            var ajaxes = eventListeners.map(function(rootId){
-                var customAjaxDeff = $.Deferred();
-                $.ajax({
-                    url: queryData.url,
-                    method: queryData.method,
-                    data: {
-                        layout_root_id: rootId
-                    }
-                }).done(function(content){
-                    customAjaxDeff.resolve({
-                        rootId: rootId,
-                        content: content
-                    })
-                }).fail(function(jqxhr){
-                    customAjaxDeff.fail({
-                        rootId: rootId,
-                        jqxhr: jqxhr
-                    })
-                });
-                return customAjaxDeff;
-            });
-            $.when.apply($, ajaxes).then(
-                function() {
-                    var result = [];
-                    Array.prototype.slice.call(arguments).map(function(item){
-                        result[item.rootId] = item.content;
-                    });
-                    dfd.resolve(result);
-                },
-                function() {
-                    var result = [];
-                    Array.prototype.slice.call(arguments).map(function(item){
-                        result[item.rootId] = item.jqxhr;
-                    });
-                    dfd.fail(result);
+                var viewArguments = methodArguments || [];
+                if (typeof viewArguments === 'function') {
+                    viewArguments = viewArguments(blockId);
                 }
-            )
-            return dfd;
+                view[methodName].apply(view, viewArguments);
+            }).bind(this));
         },
 
         /**
@@ -118,29 +93,26 @@ define([
          */
         _reloadLayouts: function(event) {
             var self = this;
-            var eventListeners = this.reloadEvents[event] || [];
-            if (!(eventListeners instanceof Array) || !eventListeners.length) {
+            var eventBlockIds = this.reloadEvents[event] || [];
+            if (!(eventBlockIds instanceof Array) || !eventBlockIds.length) {
                 return;
             }
-            var queryData = {
+
+            this._callViewMethod(eventBlockIds, 'beforeContentLoading');
+            $.ajax({
                 url: this.url,
+                type: this.method,
                 data: {
-                    layout_root_id: eventListeners.join(',')
-                },
-                type: this.method
-            };
-            this._callLayoutSubtreeViewMethod(eventListeners, '_showLoading');
-            // TODO Uncomment after finish backend part
-            //$.ajax(queryData)
-            // TODO Remove after finish backend part
-            this._executeMockAjaxQuery(queryData, eventListeners)
+                    layout_block_ids: eventBlockIds
+                }
+            })
                 .done(function(content) {
-                    self._callLayoutSubtreeViewMethod(Object.keys(content), '_onContentLoad', function(rootId) {
-                        return [content[rootId]];
+                    self._callViewMethod(eventBlockIds, 'setContent', function(blockId) {
+                        return [content[blockId] || ''];
                     });
                 })
                 .fail(function(jqxhr) {
-                    self._callLayoutSubtreeViewMethod(eventListeners, '_hideLoading');
+                    self._callViewMethod(eventBlockIds, 'contentLoadingFail');
                     Error.handle({}, jqxhr, {enforce: true});
                 });
         }

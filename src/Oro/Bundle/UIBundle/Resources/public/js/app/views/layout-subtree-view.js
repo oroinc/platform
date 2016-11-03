@@ -9,7 +9,7 @@ define(function(require) {
 
     LayoutSubtreeView = BaseView.extend({
         options: {
-            rootId: '',
+            blockId: '',
             reloadEvents: [],
             showLoading: true
         },
@@ -17,21 +17,28 @@ define(function(require) {
         initialize: function(options) {
             this.options = $.extend(true, {}, this.options, options);
             LayoutSubtreeView.__super__.initialize.apply(this, arguments);
-            LayoutSubtreeManager.addLayoutSubtreeInstance(this);
+            LayoutSubtreeManager.addView(this);
         },
 
         dispose: function() {
-            LayoutSubtreeManager.removeLayoutSubtreeInstance(this.options.rootId);
+            LayoutSubtreeManager.removeView(this);
             return LayoutSubtreeView.__super__.dispose.apply(this, arguments);
         },
 
-        _onContentLoad: function(content) {
+        setContent: function(content) {
             this._hideLoading();
             this.$el.html($(content).children());
 
             this.disposePageComponents();
-            this.initLayout().done(function() {
-            });
+            this.initLayout();
+        },
+
+        beforeContentLoading: function() {
+            this._showLoading();
+        },
+
+        contentLoadingFail: function() {
+            this._hideLoading();
         },
 
         _showLoading: function() {
