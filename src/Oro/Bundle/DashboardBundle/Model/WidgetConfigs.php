@@ -321,47 +321,6 @@ class WidgetConfigs
     }
 
     /**
-<<<<<<< HEAD
-     * Filter widget configs based on acl enabled, applicable flag and selected items
-     *
-     * @param array   $items
-     *
-     * @return array filtered items
-     */
-    protected function filterWidgets(array $items)
-    {
-        $securityFacade = $this->securityFacade;
-        $resolver       = $this->resolver;
-        $featureChecker = $this->featureChecker;
-
-        return array_filter(
-            $items,
-            function (&$item) use ($securityFacade, $resolver, $featureChecker, &$items) {
-                $visible = true;
-                next($items);
-                $accessGranted = !isset($item['acl']) || $securityFacade->isGranted($item['acl']);
-                $applicable    = true;
-                $enabled       = $item['enabled'];
-                if (isset($item['applicable'])) {
-                    $resolved   = $resolver->resolve([$item['applicable']]);
-                    $applicable = reset($resolved);
-                }
-
-                unset($item['acl'], $item['applicable'], $item['enabled']);
-
-                $routeEnabled = true;
-                if (isset($item['route'])) {
-                    $routeEnabled = $featureChecker->isResourceEnabled($item['route'], 'routes');
-                }
-
-                return $visible && $enabled && $accessGranted && $applicable && $routeEnabled;
-            }
-        );
-    }
-
-    /**
-=======
->>>>>>> bb36d0647fb7f5adab971cad8ee4d072b8b0636b
      * @param int $id
      *
      * @return Widget

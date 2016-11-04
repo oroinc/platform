@@ -62,3 +62,5 @@ features:
             - 'user_bar_settings'
         sidebar_widgets:
             - 'recent_emails'
+        dashboard_widgets:
+            - 'recent_emails'
