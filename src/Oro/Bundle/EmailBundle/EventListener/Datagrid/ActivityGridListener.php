@@ -6,13 +6,9 @@ use Oro\Bundle\DataGridBundle\Datasource\Orm\OrmDatasource;
 use Oro\Bundle\DataGridBundle\Event\BuildAfter;
 use Oro\Bundle\EmailBundle\Datagrid\EmailGridHelper;
 use Oro\Bundle\EntityBundle\Tools\EntityRoutingHelper;
-use Oro\Bundle\FeatureToggleBundle\Checker\FeatureCheckerHolderTrait;
-use Oro\Bundle\FeatureToggleBundle\Checker\FeatureToggleableInterface;
 
-class ActivityGridListener implements FeatureToggleableInterface
+class ActivityGridListener
 {
-    use FeatureCheckerHolderTrait;
-
     /** @var EmailGridHelper */
     protected $emailGridHelper;
 
@@ -34,10 +30,6 @@ class ActivityGridListener implements FeatureToggleableInterface
      */
     public function onBuildAfter(BuildAfter $event)
     {
-        if (!$this->isFeaturesEnabled()) {
-            return;
-        }
-
         $datagrid   = $event->getDatagrid();
         $datasource = $datagrid->getDatasource();
         if ($datasource instanceof OrmDatasource) {

@@ -12,14 +12,10 @@ use Oro\Bundle\EmailBundle\Manager\EmailAttachmentManager;
 use Oro\Bundle\EmailBundle\Provider\EmailActivityListProvider;
 use Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
-use Oro\Bundle\FeatureToggleBundle\Checker\FeatureCheckerHolderTrait;
-use Oro\Bundle\FeatureToggleBundle\Checker\FeatureToggleableInterface;
 use Oro\Bundle\SecurityBundle\SecurityFacade;
 
-class EmailBodyAddListener implements FeatureToggleableInterface
+class EmailBodyAddListener
 {
-    use FeatureCheckerHolderTrait;
-
     const LINK_ATTACHMENT_CONFIG_OPTION = 'auto_link_attachments';
 
     /** @var ConfigProvider */
@@ -69,10 +65,6 @@ class EmailBodyAddListener implements FeatureToggleableInterface
      */
     public function linkToScope(EmailBodyAdded $event)
     {
-        if (!$this->isFeaturesEnabled()) {
-            return;
-        }
-
         if ($this->securityFacade->getToken() !== null
             && !$this->securityFacade->isGranted('CREATE', 'entity:' . AttachmentScope::ATTACHMENT)
         ) {
@@ -96,10 +88,6 @@ class EmailBodyAddListener implements FeatureToggleableInterface
      */
     public function updateActivityDescription(EmailBodyAdded $event)
     {
-        if (!$this->isFeaturesEnabled()) {
-            return;
-        }
-
         $this->entityManager->beginTransaction();
         try {
             $email = $event->getEmail();

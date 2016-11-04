@@ -18,7 +18,6 @@ parameters:
     oro_workflow.configuration.builder.workflow_definition.class: Oro\Bundle\WorkflowBundle\Configuration\WorkflowDefinitionConfigurationBuilder
     oro_workflow.configuration.builder.workflow_definition.handle.class: Oro\Bundle\WorkflowBundle\Configuration\WorkflowDefinitionHandleBuilder
     oro_workflow.configuration.builder.process_configuration.class: Oro\Bundle\WorkflowBundle\Configuration\ProcessConfigurationBuilder
-    oro_workflow.config_extension.feature.class: Oro\Bundle\WorkflowBundle\Configuration\FeatureConfigurationExtension
 
 services:
     oro_workflow.configuration.config.workflow_sole:
@@ -90,7 +89,7 @@ services:
         class: %oro_workflow.configuration.builder.process_configuration.class%
 
     oro_workflow.config_extension.feature:
-        class: %oro_workflow.config_extension.feature.class%
+        class: 'Oro\Bundle\WorkflowBundle\Configuration\FeatureConfigurationExtension'
         tags:
             - { name: oro_feature.config_extension }
 

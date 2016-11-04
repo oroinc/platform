@@ -4,17 +4,12 @@ namespace Oro\Bundle\EmailBundle\EventListener;
 
 use Oro\Bundle\EmailBundle\Entity\Email;
 use Oro\Bundle\EmailBundle\Entity\EmailRecipient;
-use Oro\Bundle\FeatureToggleBundle\Checker\FeatureCheckerHolderTrait;
-
-use Oro\Bundle\FeatureToggleBundle\Checker\FeatureToggleableInterface;
 use Oro\Bundle\OrganizationBundle\Entity\OrganizationAwareInterface;
 use Oro\Bundle\SearchBundle\Event\PrepareEntityMapEvent;
 use Symfony\Component\Security\Core\User\UserInterface;
 
-class SearchListener implements FeatureToggleableInterface
+class SearchListener
 {
-    use FeatureCheckerHolderTrait;
-
     const EMAIL_CLASS_NAME = 'Oro\Bundle\EmailBundle\Entity\Email';
     const EMPTY_ORGANIZATION_ID = 0;
 
@@ -23,10 +18,6 @@ class SearchListener implements FeatureToggleableInterface
      */
     public function prepareEntityMapEvent(PrepareEntityMapEvent $event)
     {
-        if (!$this->isFeaturesEnabled()) {
-            return;
-        }
-
         $data      = $event->getData();
         $className = $event->getClassName();
         if ($className === self::EMAIL_CLASS_NAME) {

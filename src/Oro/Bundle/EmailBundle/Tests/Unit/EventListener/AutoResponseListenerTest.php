@@ -4,6 +4,7 @@ namespace Oro\Bundle\EmailBundle\Tests\Unit\EventListener;
 
 use Oro\Bundle\EmailBundle\Async\Topics;
 use Oro\Bundle\EmailBundle\Manager\AutoResponseManager;
+use Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker;
 use Oro\Component\DependencyInjection\ServiceLink;
 use Oro\Component\MessageQueue\Client\MessageProducerInterface;
 
@@ -121,6 +122,38 @@ class AutoResponseListenerTest extends \PHPUnit_Framework_TestCase
 
         $listener = new AutoResponseListener($serviceLink, $producer);
         $this->writePropertyValue($listener, 'emailBodies', [$emailBody1, $emailBody2]);
+
+        $listener->postFlush($this->createPostFlushEventArgsMock());
+    }
+
+    public function testShouldNotPublishEmailIdsIfEmailFeatureIsTurnedOff()
+    {
+        $autoResponseManager = $this->createAutoResponseManagerMock();
+        $autoResponseManager
+            ->expects($this->never())
+            ->method('hasAutoResponses');
+
+        $container = new Container();
+        $container->set('service', $autoResponseManager);
+        $serviceLink = new ServiceLink($container, 'service');
+
+        $producer = $this->createMessageProducerMock();
+        $producer
+            ->expects($this->never())
+            ->method('send')
+            ->with($this->anything());
+
+        $listener = new AutoResponseListener($serviceLink, $producer);
+        $featureChecker = $this->getMockBuilder(FeatureChecker::class)
+            ->setMethods(['isFeatureEnabled'])
+            ->disableOriginalConstructor()
+            ->getMock();
+        $featureChecker->expects($this->once())
+            ->method('isFeatureEnabled')
+            ->with($this->anything())
+            ->willReturn(false);
+        $listener->setFeatureChecker($featureChecker);
+        $listener->addFeature('email');
 
         $listener->postFlush($this->createPostFlushEventArgsMock());
     }

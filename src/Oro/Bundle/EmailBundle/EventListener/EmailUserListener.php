@@ -8,13 +8,9 @@ use Doctrine\ORM\Event\PostFlushEventArgs;
 
 use Oro\Bundle\EmailBundle\Entity\EmailUser;
 use Oro\Bundle\EmailBundle\Model\WebSocket\WebSocketSendProcessor;
-use Oro\Bundle\FeatureToggleBundle\Checker\FeatureCheckerHolderTrait;
-use Oro\Bundle\FeatureToggleBundle\Checker\FeatureToggleableInterface;
 
-class EmailUserListener implements FeatureToggleableInterface
+class EmailUserListener
 {
-    use FeatureCheckerHolderTrait;
-
     const ENTITY_STATUS_NEW = 'new';
     const ENTITY_STATUS_UPDATE = 'update';
 
@@ -40,10 +36,6 @@ class EmailUserListener implements FeatureToggleableInterface
      */
     public function onFlush(OnFlushEventArgs $args)
     {
-        if (!$this->isFeaturesEnabled()) {
-            return;
-        }
-
         $uow = $args->getEntityManager()->getUnitOfWork();
         $this->collectNewEmailUserEntities($uow->getScheduledEntityInsertions());
         $this->collectUpdatedEmailUserEntities($uow->getScheduledEntityUpdates(), $uow);
@@ -56,10 +48,6 @@ class EmailUserListener implements FeatureToggleableInterface
      */
     public function postFlush(PostFlushEventArgs $args)
     {
-        if (!$this->isFeaturesEnabled()) {
-            return;
-        }
-
         $usersWithNewEmails = [];
         if (!$this->processEmailUsersEntities) {
             return;

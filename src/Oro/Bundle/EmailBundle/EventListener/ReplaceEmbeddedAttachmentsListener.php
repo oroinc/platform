@@ -4,22 +4,14 @@ namespace Oro\Bundle\EmailBundle\EventListener;
 
 use Oro\Bundle\EmailBundle\Entity\EmailAttachment;
 use Oro\Bundle\EmailBundle\Event\EmailBodyLoaded;
-use Oro\Bundle\FeatureToggleBundle\Checker\FeatureCheckerHolderTrait;
-use Oro\Bundle\FeatureToggleBundle\Checker\FeatureToggleableInterface;
 
-class ReplaceEmbeddedAttachmentsListener implements FeatureToggleableInterface
+class ReplaceEmbeddedAttachmentsListener
 {
-    use FeatureCheckerHolderTrait;
-
     /**
      * @param EmailBodyLoaded $event
      */
     public function replace(EmailBodyLoaded $event)
     {
-        if (!$this->isFeaturesEnabled()) {
-            return;
-        }
-
         $emailBody    = $event->getEmail()->getEmailBody();
         if ($emailBody !== null) {
             $content      = $emailBody->getBodyContent();

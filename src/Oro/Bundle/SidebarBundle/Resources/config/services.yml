@@ -5,7 +5,6 @@ parameters:
     oro_sidebar.widget_definition.registry.class: Oro\Bundle\SidebarBundle\Model\WidgetDefinitionRegistry
     oro_sidebar.twig.extension.class: Oro\Bundle\SidebarBundle\Twig\SidebarExtension
     oro_sidebar.request.handler.class: Oro\Bundle\SidebarBundle\EventListener\RequestHandler
-    oro_sidebar.config_extension.feature.class: Oro\Bundle\SidebarBundle\Configuration\FeatureConfigurationExtension
 
 services:
     oro_sidebar.widget_definition.registry:
@@ -30,6 +29,6 @@ services:
             - { name: kernel.event_listener, event: kernel.request, method: onKernelRequest }
 
     oro_sidebar.config_extension.feature:
-            class: %oro_sidebar.config_extension.feature.class%
+            class: 'Oro\Bundle\SidebarBundle\Configuration\FeatureConfigurationExtension'
             tags:
                 - { name: oro_feature.config_extension }

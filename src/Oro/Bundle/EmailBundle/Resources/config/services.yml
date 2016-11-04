@@ -451,7 +451,6 @@ services:
             - %oro_email.cache.available_in_template_key%
         tags:
             - { name: kernel.event_listener, event: oro.entity_config.pre_flush, method: preFlush }
-            - { name: oro_featuretogle.feature, feature: email }
 
     # email template twig instance
     oro_email.twig.string_loader:
@@ -739,7 +738,6 @@ services:
           class: %oro_email.listener.search_listener.class%
           tags:
               - { name: kernel.event_listener, event: oro_search.prepare_entity_map, method: prepareEntityMapEvent, priority: 10 }
-              - { name: oro_featuretogle.feature, feature: email }
 
     oro_email.link.entity_manager:
         tags:
@@ -849,13 +847,11 @@ services:
         tags:
             - { name: kernel.event_listener, event: oro_email.email_body_added, method: linkToScope, priority: 10 }
             - { name: kernel.event_listener, event: oro_email.email_body_added, method: updateActivityDescription, priority: 20 }
-            - { name: oro_featuretogle.feature, feature: email }
 
     oro_email.listener.replace_embedded_attachments_listener:
         class: %oro_email.listener.replace_embedded_attachments_listener.class%
         tags:
             - { name: kernel.event_listener, event: oro_email.email_body_loaded, method: replace }
-            - { name: oro_featuretogle.feature, feature: email }
 
     oro_email.provider.email_attachment_provider:
         class: %oro_email.provider.email_attachment_provider.class%
@@ -1101,7 +1097,6 @@ services:
         class: %oro_email.listener.search_aliases_listener.class%
         tags:
             - { name: kernel.event_listener, event: oro_activity.search_aliases, method: addEmailAliasEvent }
-            - { name: oro_featuretogle.feature, feature: email }
 
     oro_email.listener.prepare_result_item_listener:
         class: %oro_email.listener.prepare_result_item_listener.class%
@@ -1109,7 +1104,6 @@ services:
             - '@router'
         tags:
             - { name: kernel.event_listener, event: oro_search.prepare_result_item, method: prepareEmailItemDataEvent }
-            - { name: oro_featuretogle.feature, feature: email }
 
     oro_email.listener.prepare_context_title_listener:
         class: %oro_email.listener.prepare_context_title_listener.class%
@@ -1118,7 +1112,6 @@ services:
             - '@oro_entity.doctrine_helper'
         tags:
             - { name: kernel.event_listener, event: oro_activity.context_title, method: prepareEmailContextTitleEvent }
-            - { name: oro_featuretogle.feature, feature: email }
 
     oro_email.listener.activity_list_pre_query_build_listener:
         class: %oro_email.listener.activity_list_pre_query_build_listener.class%
