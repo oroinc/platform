@@ -162,7 +162,7 @@ class ObjectMetadataFactory
             );
             $associationMetadata->set('association-field', $targets[$entityClass]);
             $associationMetadata->setAssociationType($reverseType);
-            $associationMetadata->setIsCollection($field->isCollectionValuedAssociation());
+            $associationMetadata->setIsCollection((bool)$field->isCollectionValuedAssociation());
         } else {
             $associationMetadata->setDataType($dataType);
             $this->setAssociationType($associationMetadata, $field->isCollectionValuedAssociation());

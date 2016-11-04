@@ -55,8 +55,7 @@ class AddParentEntityIdToQuery implements ProcessorInterface
             $query->innerJoin('e.' . $joinFieldName, 'parent_entity');
         } elseif ($context->isCollection()) {
             $parentFieldConfig = $context->getParentConfig()->getField($associationName);
-            $associationField = $parentFieldConfig->get('association-field');
-            if (!$associationField) {
+            if (!$parentFieldConfig || !$parentFieldConfig->has('association-field')) {
                 // unidirectional "to-many" association
                 $query->innerJoin(
                     $parentClassName,
@@ -66,6 +65,7 @@ class AddParentEntityIdToQuery implements ProcessorInterface
                 );
             } else {
                 // inverse part of association
+                $associationField = $parentFieldConfig->get('association-field');
                 $query->innerJoin(
                     $parentClassName,
                     'parent_entity',

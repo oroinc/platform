@@ -28,6 +28,9 @@ class CompleteDefinitionTest extends ConfigProcessorTestCase
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $associationManager;
 
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    protected $fieldTypeHelper;
+
     /** @var CompleteDefinition */
     protected $processor;
 
@@ -46,12 +49,17 @@ class CompleteDefinitionTest extends ConfigProcessorTestCase
             ->getMockBuilder('Oro\Bundle\EntityExtendBundle\Entity\Manager\AssociationManager')
             ->disableOriginalConstructor()
             ->getMock();
+        $this->fieldTypeHelper = $this
+            ->getMockBuilder('Oro\Bundle\EntityExtendBundle\Extend\FieldTypeHelper')
+            ->disableOriginalConstructor()
+            ->getMock();
 
         $this->processor = new CompleteDefinition(
             $this->doctrineHelper,
             $this->exclusionProvider,
             $this->configProvider,
-            $this->associationManager
+            $this->associationManager,
+            $this->fieldTypeHelper
         );
     }
 
@@ -2776,6 +2784,161 @@ class CompleteDefinitionTest extends ConfigProcessorTestCase
                         'exclusion_policy' => 'all',
                         'depends_on'       => ['field3', 'field2']
                     ]
+                ]
+            ],
+            $this->context->getResult()
+        );
+    }
+
+    /**
+     * @expectedException \RuntimeException
+     * @expectedExceptionMessage The "target_type" option cannot be configured for "Test\Class::association1".
+     */
+    public function testProcessExtendedInverseAssociationWithCustomTargetType()
+    {
+        $config = [
+            'fields' => [
+                'association1' => [
+                    'data_type'   => 'inverseAssociation:Acme/DemoBundle/Entity:manyToOne',
+                    'target_type' => 'to-many',
+                ],
+            ]
+        ];
+
+        $rootEntityMetadata = $this->getClassMetadataMock(self::TEST_CLASS_NAME);
+
+        $this->doctrineHelper->expects($this->once())
+            ->method('isManageableEntityClass')
+            ->with(self::TEST_CLASS_NAME)
+            ->willReturn(true);
+        $this->doctrineHelper->expects($this->once())
+            ->method('getEntityMetadataForClass')
+            ->with(self::TEST_CLASS_NAME)
+            ->willReturn($rootEntityMetadata);
+
+        $this->context->setResult($this->createConfigObject($config));
+        $this->processor->process($this->context);
+    }
+
+    /**
+     * @expectedException \RuntimeException
+     * @expectedExceptionMessage The "depends_on" option cannot be configured for "Test\Class::association1".
+     */
+    public function testProcessExtendedInverseAssociationWithCustomDependsOn()
+    {
+        $config = [
+            'fields' => [
+                'association1' => [
+                    'data_type'  => 'inverseAssociation:Acme/DemoBundle/Entity:manyToOne',
+                    'depends_on' => ['field1'],
+                ],
+            ]
+        ];
+
+        $rootEntityMetadata = $this->getClassMetadataMock(self::TEST_CLASS_NAME);
+
+        $this->doctrineHelper->expects($this->once())
+            ->method('isManageableEntityClass')
+            ->with(self::TEST_CLASS_NAME)
+            ->willReturn(true);
+        $this->doctrineHelper->expects($this->once())
+            ->method('getEntityMetadataForClass')
+            ->with(self::TEST_CLASS_NAME)
+            ->willReturn($rootEntityMetadata);
+
+        $this->context->setResult($this->createConfigObject($config));
+        $this->processor->process($this->context);
+    }
+
+    public function testProcessExtendedInverseAssociation()
+    {
+        $config = [
+            'fields' => [
+                'association1' => [
+                    'data_type' => 'inverseAssociation:Test\TargetClass:manyToOne:testKind'
+                ],
+            ]
+        ];
+
+        $this->associationManager->expects($this->once())
+            ->method('getAssociationTargets')
+            ->with('Test\TargetClass', null, 'manyToOne', 'testKind')
+            ->willReturn(
+                [
+                    'Test\TargetClass1' => 'field1',
+                    'Test\TargetClass2' => 'field2',
+                    self::TEST_CLASS_NAME => 'field3'
+                ]
+            );
+        $this->fieldTypeHelper->expects($this->once())
+            ->method('getUnderlyingType')
+            ->with('manyToOne')
+            ->willReturn('manyToOne');
+
+        $rootEntityMetadata = $this->getClassMetadataMock(self::TEST_CLASS_NAME);
+        $rootEntityMetadata->expects($this->any())
+            ->method('getIdentifierFieldNames')
+            ->willReturn(['id']);
+        $rootEntityMetadata->expects($this->once())
+            ->method('getFieldNames')
+            ->willReturn(['id']);
+        $rootEntityMetadata->expects($this->once())
+            ->method('getAssociationMappings')
+            ->willReturn([]);
+
+        $this->doctrineHelper->expects($this->once())
+            ->method('isManageableEntityClass')
+            ->with(self::TEST_CLASS_NAME)
+            ->willReturn(true);
+        $this->doctrineHelper->expects($this->once())
+            ->method('getEntityMetadataForClass')
+            ->with(self::TEST_CLASS_NAME, true)
+            ->willReturn($rootEntityMetadata);
+
+        $this->configProvider->expects($this->once())
+            ->method('getConfig')
+            ->with(
+                'Test\TargetClass',
+                $this->context->getVersion(),
+                $this->context->getRequestType()
+            )
+            ->willReturn(
+                $this->createRelationConfigObject(
+                    [
+                        'identifier_field_names' => ['id'],
+                        'fields'                 => [
+                            'id' => [
+                                'data_type' => 'string'
+                            ]
+                        ]
+                    ]
+                )
+            );
+
+        $this->context->setResult($this->createConfigObject($config));
+        $this->processor->process($this->context);
+
+        $this->assertConfig(
+            [
+                'exclusion_policy'       => 'all',
+                'identifier_field_names' => ['id'],
+                'fields'                 => [
+                    'id'           => null,
+                    'association1' => [
+                        'exclusion_policy'       => 'all',
+                        'data_type'              => 'inverseAssociation:Test\TargetClass:manyToOne:testKind',
+                        'target_class'           => 'Test\TargetClass',
+                        'target_type'            => 'to-many',
+                        'identifier_field_names' => ['id'],
+                        'collapse'               => true,
+                        'fields'                 => [
+                            'id' => [
+                                'data_type' => 'string'
+                            ]
+                        ],
+                        'association-field' => 'field3',
+                        'association-kind' => 'testKind'
+                    ],
                 ]
             ],
             $this->context->getResult()

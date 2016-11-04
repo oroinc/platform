@@ -393,4 +393,39 @@ class AddParentEntityIdToQueryTest extends GetSubresourceProcessorOrmRelatedTest
             $this->context->getQuery()->getParameter('parent_entity_id')->getValue()
         );
     }
+
+    public function testProcessForInversedToManyAssociation()
+    {
+        $associationName = 'owners_records';
+        $parentId = 123;
+
+        $parentConfig = new EntityDefinitionConfig();
+        $parentConfig->addField($associationName)
+            ->set('association-field', 'user');
+
+        $query = $this->doctrineHelper
+            ->getEntityRepositoryForClass($this->getEntityClass('User'))
+            ->createQueryBuilder('e');
+
+        $this->context->setIsCollection(true);
+        $this->context->setParentClassName($this->getEntityClass('Product'));
+        $this->context->setParentId($parentId);
+        $this->context->setAssociationName($associationName);
+        $this->context->setParentConfig($parentConfig);
+        $this->context->setQuery($query);
+        $this->processor->process($this->context);
+
+        $this->assertEquals(
+            'SELECT e'
+            . ' FROM Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\User e'
+            . ' INNER JOIN Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Product parent_entity'
+            . ' WITH e.user = parent_entity'
+            . ' WHERE parent_entity = :parent_entity_id',
+            $this->context->getQuery()->getDQL()
+        );
+        $this->assertEquals(
+            $parentId,
+            $this->context->getQuery()->getParameter('parent_entity_id')->getValue()
+        );
+    }
 }

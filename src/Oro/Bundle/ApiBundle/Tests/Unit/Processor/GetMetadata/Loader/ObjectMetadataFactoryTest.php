@@ -15,6 +15,9 @@ class ObjectMetadataFactoryTest extends LoaderTestCase
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $associationManager;
 
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    protected $fieldTypeHelper;
+
     /** @var ObjectMetadataFactory */
     protected $objectMetadataFactory;
 
@@ -23,10 +26,14 @@ class ObjectMetadataFactoryTest extends LoaderTestCase
         $this->associationManager = $this->getMockBuilder(AssociationManager::class)
             ->disableOriginalConstructor()
             ->getMock();
+        $this->fieldTypeHelper = $this->getMockBuilder('Oro\Bundle\EntityExtendBundle\Extend\FieldTypeHelper')
+            ->disableOriginalConstructor()
+            ->getMock();
 
         $this->objectMetadataFactory = new ObjectMetadataFactory(
             new MetadataHelper(),
-            $this->associationManager
+            $this->associationManager,
+            $this->fieldTypeHelper
         );
     }
 
@@ -432,6 +439,49 @@ class ObjectMetadataFactoryTest extends LoaderTestCase
             ['Test\Association1Target'],
             false
         );
+
+        $result = $this->objectMetadataFactory->createAndAddAssociationMetadata(
+            $entityMetadata,
+            'Test\Class',
+            'testField',
+            $field,
+            'test'
+        );
+        self::assertSame($result, $entityMetadata->getAssociation('testField'));
+        self::assertEquals($expected, $result);
+    }
+
+    public function testCreateAndAddAssociationMetadataForToManyInverseExtendedAssociation()
+    {
+        $entityMetadata = new EntityMetadata();
+        $field = new EntityDefinitionFieldConfig();
+        $field->setDataType('inverseAssociation:Test\TargetClass:manyToOne:testKind');
+        $field->setTargetClass(EntityIdentifier::class);
+        $field->setTargetType('to-many');
+        $target = $field->createAndSetTargetEntity();
+        $target->setIdentifierFieldNames(['id']);
+        $target->addField('id')->setDataType('integer');
+
+        $this->associationManager->expects($this->once())
+            ->method('getAssociationTargets')
+            ->with('Test\TargetClass', null, 'manyToOne', 'testKind')
+            ->willReturn(['Test\Class' => 'field1']);
+
+        $this->fieldTypeHelper->expects($this->once())
+            ->method('getUnderlyingType')
+            ->with('manyToOne')
+            ->willReturn('manyToOne');
+
+        $expected = $this->createAssociationMetadata(
+            'testField',
+            'Test\TargetClass',
+            'oneToMany',
+            true,
+            null,
+            ['Test\TargetClass'],
+            false
+        );
+        $expected->set('association-field', 'field1');
 
         $result = $this->objectMetadataFactory->createAndAddAssociationMetadata(
             $entityMetadata,
