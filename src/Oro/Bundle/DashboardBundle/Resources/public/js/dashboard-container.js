@@ -28,7 +28,7 @@ define(function(require) {
          */
         options: {
             widgetIds: [],
-            handle: '.dashboard-widget .sortable',
+            handle: '.dashboard-widget .widget-header .sortable',
             columnsSelector: '.dashboard-column',
             emptyTextSelector: '> .empty-text',
             allowEdit: false,

@@ -2,132 +2,163 @@
 
 namespace Oro\Bundle\EmailBundle\Tests\Unit\EventListener;
 
-use ReflectionClass;
+use Oro\Bundle\EmailBundle\Async\Topics;
+use Oro\Bundle\EmailBundle\Manager\AutoResponseManager;
+use Oro\Component\DependencyInjection\ServiceLink;
+use Oro\Component\MessageQueue\Client\MessageProducerInterface;
 
-use Doctrine\ORM\Event\OnFlushEventArgs;
 use Doctrine\ORM\Event\PostFlushEventArgs;
 
 use Oro\Bundle\EmailBundle\Entity\Email;
 use Oro\Bundle\EmailBundle\Entity\EmailBody;
 use Oro\Bundle\EmailBundle\EventListener\AutoResponseListener;
 
+use Symfony\Component\DependencyInjection\Container;
+
 class AutoResponseListenerTest extends \PHPUnit_Framework_TestCase
 {
-    protected $autoResponseManager;
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
-    protected $em;
-    protected $uow;
-
-    protected $autoResponseListener;
-
-    public function setUp()
+    public function testCouldBeConstructedWithRequiredAttributes()
     {
-        $this->autoResponseManager =
-            $this->getMockBuilder('Oro\Bundle\EmailBundle\Manager\AutoResponseManager')
-                ->disableOriginalConstructor()
-                ->getMock();
+        new AutoResponseListener(new ServiceLink(new Container(), 'service'), $this->createMessageProducerMock());
+    }
 
-        $autoResponseManagerLink =
-            $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink')
-                ->disableOriginalConstructor()
-                ->getMock();
-        $autoResponseManagerLink->expects($this->any())
-            ->method('getService')
-            ->will($this->returnValue($this->autoResponseManager));
+    public function testShouldPublishEmailIdsIfTheyHasAutoResponse()
+    {
+        $autoResponseManager = $this->createAutoResponseManagerMock();
+        $autoResponseManager
+            ->expects($this->exactly(2))
+            ->method('hasAutoResponses')
+            ->will($this->returnValue(true))
+        ;
 
-        $this->uow = $this->getMockBuilder('Doctrine\ORM\UnitOfWork')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $container = new Container();
+        $container->set('service', $autoResponseManager);
+        $serviceLink = new ServiceLink($container, 'service');
 
-        $this->em = $this->getMockBuilder('Doctrine\ORM\EntityManager')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->em->expects($this->any())
-            ->method('getUnitOfWork')
-            ->will($this->returnValue($this->uow));
+        $producer = $this->createMessageProducerMock();
+        $producer
+            ->expects($this->once())
+            ->method('send')
+            ->with(Topics::SEND_AUTO_RESPONSES, ['ids' => [123, 12345]])
+        ;
 
-        $this->autoResponseListener = new AutoResponseListener($autoResponseManagerLink);
+        $email1 = new Email();
+        $this->writePropertyValue($email1, 'id', 123);
+
+        $emailBody1 = new EmailBody();
+        $emailBody1->setEmail($email1);
+
+        $email2 = new Email();
+        $this->writePropertyValue($email2, 'id', 12345);
+
+        $emailBody2 = new EmailBody();
+        $emailBody2->setEmail($email2);
+
+        $listener = new AutoResponseListener($serviceLink, $producer);
+        $this->writePropertyValue($listener, 'emailBodies', [$emailBody1, $emailBody2]);
+
+        $listener->postFlush($this->createPostFlushEventArgsMock());
+    }
+
+    public function testShouldNotPublishEmailIdsIfThereIsNotEmailBodies()
+    {
+        $autoResponseManager = $this->createAutoResponseManagerMock();
+        $autoResponseManager
+            ->expects($this->never())
+            ->method('hasAutoResponses')
+        ;
+
+        $container = new Container();
+        $container->set('service', $autoResponseManager);
+        $serviceLink = new ServiceLink($container, 'service');
+
+        $producer = $this->createMessageProducerMock();
+        $producer
+            ->expects($this->never())
+            ->method('send')
+        ;
+
+        $listener = new AutoResponseListener($serviceLink, $producer);
+        $listener->postFlush($this->createPostFlushEventArgsMock());
+    }
+
+    public function testShouldFilterOutEmailsWhichHasNoAutoResponse()
+    {
+        $autoResponseManager = $this->createAutoResponseManagerMock();
+        $autoResponseManager
+            ->expects($this->at(0))
+            ->method('hasAutoResponses')
+            ->will($this->returnValue(false))
+        ;
+        $autoResponseManager
+            ->expects($this->at(1))
+            ->method('hasAutoResponses')
+            ->will($this->returnValue(true))
+        ;
+
+        $container = new Container();
+        $container->set('service', $autoResponseManager);
+        $serviceLink = new ServiceLink($container, 'service');
+
+        $producer = $this->createMessageProducerMock();
+        $producer
+            ->expects($this->once())
+            ->method('send')
+            ->with(Topics::SEND_AUTO_RESPONSES, ['ids' => [12345]])
+        ;
+
+        $email1 = new Email();
+        $this->writePropertyValue($email1, 'id', 123);
+
+        $emailBody1 = new EmailBody();
+        $emailBody1->setEmail($email1);
+
+        $email2 = new Email();
+        $this->writePropertyValue($email2, 'id', 12345);
+
+        $emailBody2 = new EmailBody();
+        $emailBody2->setEmail($email2);
+
+        $listener = new AutoResponseListener($serviceLink, $producer);
+        $this->writePropertyValue($listener, 'emailBodies', [$emailBody1, $emailBody2]);
+
+        $listener->postFlush($this->createPostFlushEventArgsMock());
     }
 
     /**
-     * @dataProvider testProvider
+     * @param object $object
+     * @param string $property
+     * @param mixed  $value
      */
-    public function testListenerShouldNotFlushJobIfRulesDoesntExists(array $entityInsertions, array $expectedArgs)
+    private function writePropertyValue($object, $property, $value)
     {
-        $this->autoResponseManager
-            ->expects($this->exactly(count($entityInsertions)))
-            ->method('hasAutoResponses')
-            ->will($this->returnValue(false));
-
-        $this->uow->expects($this->once())
-            ->method('getScheduledEntityInsertions')
-            ->will($this->returnValue($entityInsertions));
-
-        $this->em->expects($this->never())
-            ->method('persist')
-            ->with(new \PHPUnit_Framework_Constraint_IsInstanceOf('JMS\JobQueueBundle\Entity\Job'));
-
-        $this->autoResponseListener->onFlush(new OnFlushEventArgs($this->em));
-        $this->autoResponseListener->postFlush(new PostFlushEventArgs($this->em));
+        $refProperty = new \ReflectionProperty(get_class($object), $property);
+        $refProperty->setAccessible(true);
+        $refProperty->setValue($object, $value);
+        $refProperty->setAccessible(false);
     }
 
     /**
-     * @dataProvider testProvider
+     * @return \PHPUnit_Framework_MockObject_MockObject|AutoResponseManager
      */
-    public function testListenerShouldFlushJobIfRulesExists(array $entityInsertions, array $expectedArgs)
+    private function createAutoResponseManagerMock()
     {
-        $this->autoResponseManager
-            ->expects($this->exactly(count($entityInsertions)))
-            ->method('hasAutoResponses')
-            ->will($this->returnValue(true));
-
-        $this->uow->expects($this->once())
-            ->method('getScheduledEntityInsertions')
-            ->will($this->returnValue($entityInsertions));
-
-        $this->em->expects($this->once())
-            ->method('persist')
-            ->with(new \PHPUnit_Framework_Constraint_IsInstanceOf('JMS\JobQueueBundle\Entity\Job'));
-
-        $this->em->expects($this->once())
-            ->method('flush');
-
-        $this->autoResponseListener->onFlush(new OnFlushEventArgs($this->em));
-        $this->autoResponseListener->postFlush(new PostFlushEventArgs($this->em));
+        return $this->getMock(AutoResponseManager::class, [], [], '', false);
     }
 
-    public function testProvider()
+    /**
+     * @return \PHPUnit_Framework_MockObject_MockObject|MessageProducerInterface
+     */
+    private function createMessageProducerMock()
     {
-        return [
-            [
-                [
-                    $this->createEmailBody(1),
-                ],
-                ['--id=1'],
-            ],
-            [
-                [
-                    $this->createEmailBody(1),
-                    $this->createEmailBody(5),
-                ],
-                ['--id=1', '--id=5'],
-            ],
-        ];
+        return $this->getMock(MessageProducerInterface::class);
     }
 
-    protected function createEmailBody($emailId)
+    /**
+     * @return \PHPUnit_Framework_MockObject_MockObject|PostFlushEventArgs
+     */
+    private function createPostFlushEventArgsMock()
     {
-        $email = new Email();
-
-        $emailRef = new ReflectionClass(get_class($email));
-        $id = $emailRef->getProperty('id');
-        $id->setAccessible(true);
-        $id->setValue($email, $emailId);
-        $id->setAccessible(false);
-
-        $emailBody = new EmailBody();
-        $emailBody->setEmail($email);
-
-        return $emailBody;
+        return $this->getMock(PostFlushEventArgs::class, [], [], '', false);
     }
 }
