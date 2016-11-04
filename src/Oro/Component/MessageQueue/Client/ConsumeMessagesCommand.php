@@ -1,16 +1,19 @@
 <?php
 namespace Oro\Component\MessageQueue\Client;
 
-use Oro\Component\MessageQueue\Client\Meta\DestinationMetaRegistry;
-use Oro\Component\MessageQueue\Consumption\ChainExtension;
-use Oro\Component\MessageQueue\Consumption\Extension\LoggerExtension;
-use Oro\Component\MessageQueue\Consumption\LimitsExtensionsCommandTrait;
-use Oro\Component\MessageQueue\Consumption\QueueConsumer;
+use Psr\Log\LoggerInterface;
+
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Logger\ConsoleLogger;
 use Symfony\Component\Console\Output\OutputInterface;
+
+use Oro\Component\MessageQueue\Client\Meta\DestinationMetaRegistry;
+use Oro\Component\MessageQueue\Consumption\ChainExtension;
+use Oro\Component\MessageQueue\Consumption\Extension\LoggerExtension;
+use Oro\Component\MessageQueue\Consumption\LimitsExtensionsCommandTrait;
+use Oro\Component\MessageQueue\Consumption\QueueConsumer;
 
 class ConsumeMessagesCommand extends Command
 {
@@ -32,20 +35,28 @@ class ConsumeMessagesCommand extends Command
     private $destinationMetaRegistry;
 
     /**
+     * @var LoggerInterface
+     */
+    private $logger;
+
+    /**
      * @param QueueConsumer $consumer
      * @param DelegateMessageProcessor $processor
      * @param DestinationMetaRegistry $destinationMetaRegistry
+     * @param LoggerInterface $logger
      */
     public function __construct(
         QueueConsumer $consumer,
         DelegateMessageProcessor $processor,
-        DestinationMetaRegistry $destinationMetaRegistry
+        DestinationMetaRegistry $destinationMetaRegistry,
+        LoggerInterface $logger
     ) {
         parent::__construct('oro:message-queue:consume');
 
         $this->consumer = $consumer;
         $this->processor = $processor;
         $this->destinationMetaRegistry = $destinationMetaRegistry;
+        $this->logger = $logger;
     }
 
     /**
@@ -89,6 +100,13 @@ class ConsumeMessagesCommand extends Command
 
         try {
             $this->consumer->consume($runtimeExtensions);
+        } catch (\Exception $e) {
+            $this->logger->error(
+                sprintf('Consume messages command exception. "%s"', $e->getMessage()),
+                ['exception' => $e]
+            );
+
+            throw $e;
         } finally {
             $this->consumer->getConnection()->close();
         }
