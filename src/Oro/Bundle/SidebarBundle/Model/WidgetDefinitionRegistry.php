@@ -17,9 +17,8 @@ class WidgetDefinitionRegistry
     /**
      * @param array $definitions
      */
-    public function __construct(array $definitions, FeatureChecker $featureChecker)
+    public function __construct(array $definitions)
     {
-        $this->featureChecker = $featureChecker;
         $this->widgetDefinitions = new ArrayCollection();
 
         $this->setWidgetDefinitions($definitions);
