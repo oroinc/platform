@@ -29,9 +29,11 @@ define(['jquery', 'oroui/js/mediator', 'underscore', 'jquery-ui'], function($, m
             this.$trigger = this.$el.find(this.options.trigger);
             this.$container = this.$el.find(this.options.container);
 
-            this.options.open = _.isBoolean(this.options.forcedState)
-                    ? this.options.forcedState
-                    : (_.isBoolean(storedState) ? storedState : this.options.open);
+            if (_.isBoolean(this.options.forcedState)) {
+                this.options.open = this.options.forcedState;
+            } else if (_.isBoolean(storedState)) {
+                this.options.open = storedState;
+            }
 
             this.$el.toggleClass(this.options.openClass, this.options.open);
 

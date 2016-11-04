@@ -28,7 +28,13 @@ class EntityFallbackResolver
     const FALLBACK_FIELD_NAME = 'fieldName';
 
     /** @var array */
-    public static $allowedTypes = [self::TYPE_BOOLEAN, self::TYPE_STRING, self::TYPE_INTEGER, self::TYPE_DECIMAL, self::TYPE_ARRAY];
+    public static $allowedTypes = [
+        self::TYPE_BOOLEAN,
+        self::TYPE_STRING,
+        self::TYPE_INTEGER,
+        self::TYPE_DECIMAL,
+        self::TYPE_ARRAY,
+    ];
 
     /**
      * @var EntityFallbackProviderInterface[]
