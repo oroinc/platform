@@ -105,9 +105,9 @@ class CallServiceMethod extends AbstractAction
     {
         $parameters = $this->getOption($this->options, 'method_parameters', []);
 
-        foreach ($parameters as $name => $value) {
-            $parameters[$name] = $this->contextAccessor->getValue($context, $value);
-        }
+        array_walk_recursive($parameters, function (&$value) use ($context) {
+            $value = $this->contextAccessor->getValue($context, $value);
+        });
 
         return $parameters;
     }
