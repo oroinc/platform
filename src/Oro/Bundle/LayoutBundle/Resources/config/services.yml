@@ -208,3 +208,13 @@ services:
     oro_layout.block_view_serializer:
         class: Symfony\Component\Serializer\Serializer
         arguments: [{}, {}]
+
+    oro_layout.block_view_serializer.block_view_normalizer:
+        class: Oro\Bundle\LayoutBundle\Layout\Serializer\BlockViewNormalizer
+        tags:
+            - { name: oro_layout.block_view_serializer.normalizer }
+
+    oro_layout.block_view_serializer.expression_normalizer:
+        class: Oro\Bundle\LayoutBundle\Layout\Serializer\ExpressionNormalizer
+        tags:
+            - { name: oro_layout.block_view_serializer.normalizer }
