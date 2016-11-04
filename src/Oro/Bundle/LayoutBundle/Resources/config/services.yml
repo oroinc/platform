@@ -204,3 +204,7 @@ services:
             - '@oro_layout.loader.image_filter'
         tags:
             - { name: kernel.event_listener, event: kernel.request }
+
+    oro_layout.block_view_serializer:
+        class: Symfony\Component\Serializer\Serializer
+        arguments: [{}, {}]
