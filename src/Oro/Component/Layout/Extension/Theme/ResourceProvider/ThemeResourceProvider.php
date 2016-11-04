@@ -13,6 +13,7 @@ use Oro\Component\Layout\Loader\LayoutUpdateLoaderInterface;
 class ThemeResourceProvider implements ResourceProviderInterface
 {
     const CACHE_KEY = 'oro_layout.theme_updates_resources';
+    const CACHE_LAST_MODIFICATION_DATE = 'oro_layout.last_modification_date';
 
     /** @var LayoutUpdateLoaderInterface */
     private $loader;
@@ -88,6 +89,9 @@ class ThemeResourceProvider implements ResourceProviderInterface
 
         if ($this->cache instanceof Cache) {
             $this->cache->save(self::CACHE_KEY, $this->resources);
+
+            $now = new \DateTime('now', new \DateTimeZone('UTC'));
+            $this->cache->save(self::CACHE_LAST_MODIFICATION_DATE, $now);
         }
     }
 
