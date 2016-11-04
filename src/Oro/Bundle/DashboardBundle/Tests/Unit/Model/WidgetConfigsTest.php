@@ -5,7 +5,6 @@ namespace Oro\Bundle\DashboardBundle\Tests\Unit\Model;
 use Oro\Bundle\DashboardBundle\Entity\Widget;
 use Oro\Bundle\DashboardBundle\Model\WidgetConfigs;
 use Oro\Bundle\DashboardBundle\Model\WidgetOptionBag;
-
 use Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker;
 use Symfony\Component\HttpFoundation\Request;
 
@@ -41,10 +40,6 @@ class WidgetConfigsTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $securityFacade = $this->getMockBuilder('Oro\Bundle\SecurityBundle\SecurityFacade')
-            ->disableOriginalConstructor()
-            ->getMock();
-
         $resolver = $this->getMock('Oro\Component\Config\Resolver\ResolverInterface');
 
         $this->em = $this->getMock('Doctrine\ORM\EntityManagerInterface');
@@ -71,16 +66,23 @@ class WidgetConfigsTest extends \PHPUnit_Framework_TestCase
             ->setMethods(['isResourceEnabled'])
             ->disableOriginalConstructor()
             ->getMock();
+        $widgetConfigVisibilityFilter = $this
+            ->getMockBuilder('Oro\Bundle\DashboardBundle\Filter\WidgetConfigVisibilityFilter')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $widgetConfigVisibilityFilter->expects($this->any())
+            ->method('filterConfigs')
+            ->will($this->returnArgument(0));
 
         $this->widgetConfigs = new WidgetConfigs(
             $this->configProvider,
-            $securityFacade,
             $resolver,
             $this->em,
             $this->valueProvider,
             $this->translator,
             $this->eventDispatcher,
-            $this->featureChecker
+            $this->featureChecker,
+            $widgetConfigVisibilityFilter
         );
 
         $this->widgetRepository = $this->getMockBuilder('Doctrine\ORM\EntityRepository')

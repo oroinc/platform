@@ -51,17 +51,25 @@ services:
         arguments:
             - '@service_container'
 
+    oro_dashboard.widget_config_visibility_filter:
+        class: Oro\Bundle\DashboardBundle\Filter\WidgetConfigVisibilityFilter
+        arguments:
+            - '@oro_security.security_facade'
+            - '@oro_dashboard.config_resolver'
+            - '@oro_featuretoggle.checker.feature_checker'
+        public: false
+
     oro_dashboard.widget_configs:
         class: %oro_dashboard.widget_configs.class%
         arguments:
             - '@oro_dashboard.config_provider'
-            - '@oro_security.security_facade'
             - '@oro_dashboard.config_resolver'
             - '@doctrine.orm.entity_manager'
             - '@oro_dashboard.widget_config_value.provider'
             - '@translator'
             - '@event_dispatcher'
             - '@oro_featuretoggle.checker.feature_checker'
+            - '@oro_dashboard.widget_config_visibility_filter'
         calls:
             - [setRequest, ["@?request="]]
 
@@ -78,6 +86,7 @@ services:
         arguments:
             - '@oro_dashboard.config_provider'
             - '@oro_dashboard.manager.state'
+            - '@oro_dashboard.widget_configs'
 
     oro_dashboard.manager.state:
         class: %oro_dashboard.manager.state.class%
@@ -316,3 +325,8 @@ services:
         class: Oro\Bundle\DashboardBundle\Form\Type\WidgetFilterType
         tags:
             - { name: form.type, alias: oro_dashboard_query_filter }
+
+    oro_dashboard.config_extension.feature:
+        class: 'Oro\Bundle\DashboardBundle\Configuration\FeatureConfigurationExtension'
+        tags:
+            - { name: oro_feature.config_extension }
