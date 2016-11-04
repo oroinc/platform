@@ -359,6 +359,7 @@ datagrid:
                 where:
                     and:
                         - f.type IN ('%oro_email.email_folder.model.class%::INBOX', '%oro_email.email_folder.model.class%::OTHER')
+                        - f.id > 0
         columns:
             receivedAt:
                 type: twig
@@ -390,6 +391,7 @@ datagrid:
                 where:
                     and:
                         - f.type = '%oro_email.email_folder.model.class%::SENT'
+                        - f.id > 0
         columns:
             sentAt:
                 data_name: email.sentAt
