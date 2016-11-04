@@ -10,24 +10,11 @@ use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 
 class OroTestFrameworkBundle implements Migration, ActivityExtensionAwareInterface
 {
+    const CALENDAR_EVENT_TABLE = 'oro_calendar_event';
+    const TEST_ACTIVITY_TABLE = 'test_activity_target';
+
     /** @var ActivityExtension */
     protected $activityExtension;
-
-    /**
-     * {@inheritdoc}
-     */
-    public function up(Schema $schema, QueryBag $queries)
-    {
-        // add activity association if calendar package is installed
-        if ($schema->hasTable('oro_calendar_event')) {
-            $this->activityExtension->addActivityAssociation(
-                $schema,
-                'oro_calendar_event',
-                'test_activity_target',
-                true
-            );
-        }
-    }
 
     /**
      * {@inheritdoc}
@@ -35,5 +22,37 @@ class OroTestFrameworkBundle implements Migration, ActivityExtensionAwareInterfa
     public function setActivityExtension(ActivityExtension $activityExtension)
     {
         $this->activityExtension = $activityExtension;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function up(Schema $schema, QueryBag $queries)
+    {
+        self::addTestActivityToCalendarEvent($schema, $this->activityExtension);
+    }
+
+    /**
+     * Add test activity to calendar event, if installing or migrating in test environment
+     *
+     * @param Schema            $schema
+     * @param ActivityExtension $activityExtension
+     */
+    public static function addTestActivityToCalendarEvent(Schema $schema, ActivityExtension $activityExtension)
+    {
+        if ($schema->hasTable(self::TEST_ACTIVITY_TABLE)) {
+            $activityTableName = $activityExtension->getAssociationTableName(
+                self::CALENDAR_EVENT_TABLE,
+                self::TEST_ACTIVITY_TABLE
+            );
+            if (!$schema->hasTable($activityTableName)) {
+                $activityExtension->addActivityAssociation(
+                    $schema,
+                    self::CALENDAR_EVENT_TABLE,
+                    self::TEST_ACTIVITY_TABLE,
+                    true
+                );
+            }
+        }
     }
 }
