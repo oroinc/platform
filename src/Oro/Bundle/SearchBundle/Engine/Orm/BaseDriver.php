@@ -123,14 +123,17 @@ abstract class BaseDriver
      */
     public function addTextField(QueryBuilder $qb, $index, $searchCondition, $setOrderBy = true)
     {
-        $useFieldName = $searchCondition['fieldName'] == '*' ? false : true;
+        $useFieldName = $searchCondition['fieldName'] === '*' ? false : true;
         $fieldValue   = $this->filterTextFieldValue($searchCondition['fieldValue']);
 
-        // TODO Need to clarify search requirements in scope of CRM-214
-        if (in_array($searchCondition['condition'], [Query::OPERATOR_CONTAINS, Query::OPERATOR_EQUALS])) {
+        if ($searchCondition['condition'] === Query::OPERATOR_CONTAINS) {
             $searchString = $this->createContainsStringQuery($index, $useFieldName);
-        } else {
+        } elseif ($searchCondition['condition'] === Query::OPERATOR_NOT_CONTAINS) {
             $searchString = $this->createNotContainsStringQuery($index, $useFieldName);
+        } elseif ($searchCondition['condition'] === Query::OPERATOR_EQUALS) {
+            $searchString = $this->createEqualsStringQuery($index, $useFieldName);
+        } else {
+            $searchString = $this->createNotEqualsStringQuery($index, $useFieldName);
         }
 
         $this->setFieldValueStringParameter($qb, $index, $fieldValue, $searchCondition['condition']);
@@ -277,6 +280,46 @@ abstract class BaseDriver
     }
 
     /**
+     * Create search string for string parameters (contains)
+     *
+     * @param integer $index
+     * @param bool    $useFieldName
+     *
+     * @return string
+     */
+    protected function createEqualsStringQuery($index, $useFieldName = true)
+    {
+        $joinAlias = $this->getJoinAlias(Query::TYPE_TEXT, $index);
+
+        $stringQuery = '';
+        if ($useFieldName) {
+            $stringQuery = $joinAlias . '.field = :field' . $index . ' AND ';
+        }
+
+        return $stringQuery . $joinAlias . '.value = :value' . $index;
+    }
+
+    /**
+     * Create search string for string parameters (not contains)
+     *
+     * @param integer $index
+     * @param bool    $useFieldName
+     *
+     * @return string
+     */
+    protected function createNotEqualsStringQuery($index, $useFieldName = true)
+    {
+        $joinAlias = $this->getJoinAlias(Query::TYPE_TEXT, $index);
+
+        $stringQuery = '';
+        if ($useFieldName) {
+            $stringQuery = $joinAlias . '.field = :field' . $index . ' AND ';
+        }
+
+        return $stringQuery . $joinAlias . '.value != :value' . $index;
+    }
+
+    /**
      * Set string parameter for qb
      *
      * @param \Doctrine\ORM\QueryBuilder $qb
@@ -286,7 +329,11 @@ abstract class BaseDriver
      */
     protected function setFieldValueStringParameter(QueryBuilder $qb, $index, $fieldValue, $searchCondition)
     {
-        $qb->setParameter('value' . $index, '%' . str_replace(' ', '%', $fieldValue) . '%');
+        if (in_array($searchCondition, [Query::OPERATOR_CONTAINS, Query::OPERATOR_NOT_CONTAINS], true)) {
+            $qb->setParameter('value' . $index, '%' . str_replace(' ', '%', $fieldValue) . '%');
+        } else {
+            $qb->setParameter('value' . $index, $fieldValue);
+        }
     }
 
     /**
@@ -366,7 +413,10 @@ abstract class BaseDriver
 
         $this->applySelectToQB($query, $qb);
         $this->applyFromToQB($query, $qb);
-        $this->applyWhereToQB($query, $qb, $setOrderBy);
+
+        // set order part in where only if no query ordering defined
+        $setOrderByInWhere = $setOrderBy && !$query->getCriteria()->getOrderings();
+        $this->applyWhereToQB($query, $qb, $setOrderByInWhere);
 
         if ($setOrderBy) {
             $this->applyOrderByToQB($query, $qb);

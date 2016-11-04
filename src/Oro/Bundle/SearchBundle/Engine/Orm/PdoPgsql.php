@@ -67,56 +67,10 @@ class PdoPgsql extends BaseDriver
     }
 
     /**
-     * @param QueryBuilder $qb
-     * @param string $index
-     * @param string $fieldValue
-     * @param bool $isOrderBy
-     */
-    protected function createContainsQueryParameter(QueryBuilder $qb, $index, $fieldValue, $isOrderBy)
-    {
-        $searchArray = explode(Query::DELIMITER, $fieldValue);
-
-        foreach ($searchArray as $key => $string) {
-            $searchArray[$key] = $string . ':*';
-        }
-
-        $stringParameter = implode(' | ', $searchArray);
-
-        $qb->setParameter('value' . $index, $stringParameter);
-
-        if ($isOrderBy) {
-            $qb->setParameter('orderByValue' . $index, $stringParameter);
-        }
-    }
-
-    /**
-     * @param QueryBuilder $qb
-     * @param string $index
-     * @param string $fieldValue
-     * @param bool $isOrderBy
-     */
-    protected function createNotContainsQueryParameter(QueryBuilder $qb, $index, $fieldValue, $isOrderBy)
-    {
-        $searchArray = explode(Query::DELIMITER, $fieldValue);
-
-        foreach ($searchArray as $key => $string) {
-            $searchArray[$key] = '!' . $string;
-        }
-
-        $stringParameter = implode(' & ', $searchArray);
-
-        $qb->setParameter('value' . $index, $stringParameter);
-
-        if ($isOrderBy) {
-            $qb->setParameter('orderByValue' . $index, $stringParameter);
-        }
-    }
-
-    /**
      * Create search string for string parameters (not contains)
      *
      * @param integer $index
-     * @param bool $useFieldName
+     * @param bool    $useFieldName
      *
      * @return string
      */
@@ -143,20 +97,23 @@ class PdoPgsql extends BaseDriver
      */
     protected function setFieldValueStringParameter(QueryBuilder $qb, $index, $fieldValue, $searchCondition)
     {
-        $notContains = !in_array($searchCondition, [Query::OPERATOR_CONTAINS, Query::OPERATOR_EQUALS], true);
-        $searchArray = explode(Query::DELIMITER, $fieldValue);
+        if (in_array($searchCondition, [Query::OPERATOR_CONTAINS, Query::OPERATOR_NOT_CONTAINS], true)) {
+            $searchArray = explode(Query::DELIMITER, $fieldValue);
 
-        foreach ($searchArray as $key => $string) {
-            $searchArray[$key] = $string . ':*';
-        }
-
-        if ($notContains) {
             foreach ($searchArray as $key => $string) {
-                $searchArray[$key] = '!' . $string;
+                $searchArray[$key] = $string . ':*';
             }
-            $qb->setParameter('value' . $index, implode(' & ', $searchArray));
+
+            if ($searchCondition === Query::OPERATOR_NOT_CONTAINS) {
+                foreach ($searchArray as $key => $string) {
+                    $searchArray[$key] = '!' . $string;
+                }
+                $qb->setParameter('value' . $index, implode(' & ', $searchArray));
+            } else {
+                $qb->setParameter('value' . $index, implode(' | ', $searchArray));
+            }
         } else {
-            $qb->setParameter('value' . $index, implode(' | ', $searchArray));
+            $qb->setParameter('value' . $index, $fieldValue);
         }
     }
 
@@ -177,19 +134,6 @@ class PdoPgsql extends BaseDriver
     /**
      * {@inheritdoc}
      */
-    protected function addOrderBy(Query $query, QueryBuilder $qb)
-    {
-        parent::addOrderBy($query, $qb);
-
-        // all columns from order part must be in select
-        if ($query->getOrderBy()) {
-            $qb->addSelect('orderTable.value');
-        }
-    }
-
-    /**
-     * {@inheritdoc}
-     */
     protected function getTruncateQuery(AbstractPlatform $dbPlatform, $tableName)
     {
         $query = parent::getTruncateQuery($dbPlatform, $tableName);
@@ -200,145 +144,5 @@ class PdoPgsql extends BaseDriver
         }
 
         return $query;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function addTextField(QueryBuilder $qb, $index, $searchCondition, $setOrderBy = true)
-    {
-        $useFieldName = $searchCondition['fieldName'] == '*' ? false : true;
-        $fieldValue = $this->filterTextFieldValue($searchCondition['fieldValue']);
-
-        // TODO Need to clarify search requirements in scope of CRM-214
-        if ($searchCondition['condition'] === Query::OPERATOR_CONTAINS) {
-            $searchString = $this->createContainsStringQuery($index, $useFieldName);
-            $this->createContainsQueryParameter($qb, $index, $fieldValue, $setOrderBy);
-        } elseif ($searchCondition['condition'] === Query::OPERATOR_EQUALS) {
-            $searchString = $this->createEqualsStringQuery($index, $useFieldName);
-            $this->createEqualsQueryParameter($qb, $index, $fieldValue, $setOrderBy);
-        } elseif ($searchCondition['condition'] === Query::OPERATOR_NOT_EQUALS) {
-            $searchString = $this->createNotEqualsStringQuery($index, $useFieldName);
-            $this->createNotEqualsQueryParameter($qb, $index, $fieldValue, $setOrderBy);
-        } elseif ($searchCondition['condition'] === Query::OPERATOR_STARTS_WITH) {
-            $searchString = $this->createStartWithStringQuery($index, $useFieldName);
-            $this->createStartWithStringParameter($qb, $index, $fieldValue, $setOrderBy);
-        } else {
-            $searchString = $this->createNotContainsStringQuery($index, $useFieldName);
-            $this->createNotContainsQueryParameter($qb, $index, $fieldValue, $setOrderBy);
-        }
-
-        if ($useFieldName) {
-            $qb->setParameter('field' . $index, $searchCondition['fieldName']);
-        }
-
-        if ($setOrderBy) {
-            $this->setTextOrderBy($qb, $index);
-        }
-
-        return '(' . $searchString . ' ) ';
-    }
-
-
-
-    /**
-     * @param string $index
-     * @param bool $useFieldName
-     * @return string
-     */
-    protected function createEqualsStringQuery($index, $useFieldName)
-    {
-        $joinAlias = $this->getJoinAlias(Query::TYPE_TEXT, $index);
-
-        $stringQuery = $joinAlias . '.value = :equals' . $index;
-
-        if ($useFieldName) {
-            $stringQuery .= ' AND ' . $joinAlias . '.field = :field' . $index;
-        }
-
-        return $stringQuery;
-
-    }
-
-    /**
-     * @param string $index
-     * @param bool $useFieldName
-     * @return string
-     */
-    protected function createNotEqualsStringQuery($index, $useFieldName)
-    {
-        $joinAlias = $this->getJoinAlias(Query::TYPE_TEXT, $index);
-
-        $stringQuery = $joinAlias . '.value <> :notEquals' . $index;
-
-        if ($useFieldName) {
-            $stringQuery .= ' AND ' . $joinAlias . '.field = :field' . $index;
-        }
-
-        return $stringQuery;
-
-    }
-
-    /**
-     * @param QueryBuilder $qb
-     * @param string $index
-     * @param string $fieldValue
-     * @param bool $isOrderBy
-     */
-    protected function createEqualsQueryParameter(QueryBuilder $qb, $index, $fieldValue, $isOrderBy)
-    {
-        $qb->setParameter('equals' . $index, $fieldValue);
-
-        if ($isOrderBy) {
-            $qb->setParameter('orderByValue' . $index, $fieldValue);
-        }
-    }
-
-    /**
-     * @param QueryBuilder $qb
-     * @param string $index
-     * @param string $fieldValue
-     * @param bool $isOrderBy
-     */
-    protected function createNotEqualsQueryParameter(QueryBuilder $qb, $index, $fieldValue, $isOrderBy)
-    {
-        $qb->setParameter('notEquals' . $index, $fieldValue);
-
-        if ($isOrderBy) {
-            $qb->setParameter('orderByValue' . $index, $fieldValue);
-        }
-    }
-
-    /**
-     * @param string $index
-     * @param bool $useFieldName
-     * @return string
-     */
-    protected function createStartWithStringQuery($index, $useFieldName)
-    {
-        $joinAlias = $this->getJoinAlias(Query::TYPE_TEXT, $index);
-
-        $stringQuery = $joinAlias . '.value LIKE :startWithValue' . $index;
-
-        if ($useFieldName) {
-            $stringQuery .= ' AND ' . $joinAlias . '.field = :field' . $index;
-        }
-
-        return $stringQuery;
-    }
-
-    /**
-     * @param QueryBuilder $qb
-     * @param string $index
-     * @param string $fieldValue
-     * @param bool $isOrderBy
-     */
-    protected function createStartWithStringParameter(QueryBuilder $qb, $index, $fieldValue, $isOrderBy)
-    {
-        $qb->setParameter('startWithValue' . $index, $fieldValue . '%');
-
-        if ($isOrderBy) {
-            $qb->setParameter('orderByValue' . $index, $fieldValue);
-        }
     }
 }
