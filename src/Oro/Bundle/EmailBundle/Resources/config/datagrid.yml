@@ -164,7 +164,7 @@ datagrid:
                 label:
                 frontend_type: html
                 template: OroEmailBundle:Email:Datagrid/Property/attachments.html.twig
-            sentAt:
+            receivedAt:
                 data_name: receivedAt
                 type: twig
                 label: oro.email.date.label
@@ -175,8 +175,8 @@ datagrid:
         sorters:
             columns:
                 subject:  { data_name: e.subject }
-                sentAt:   { data_name: receivedAt }
-            default: { sentAt: %oro_datagrid.extension.orm_sorter.class%::DIRECTION_DESC }
+                receivedAt:   { data_name: receivedAt }
+            default: { receivedAt: %oro_datagrid.extension.orm_sorter.class%::DIRECTION_DESC }
         options:
             entityHint: email
 
