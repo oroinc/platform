@@ -44,6 +44,44 @@ class PdoPgsql extends BaseDriver
     }
 
     /**
+     * Add text search to qb
+     *
+     * @param \Doctrine\ORM\QueryBuilder $qb
+     * @param integer                    $index
+     * @param array                      $searchCondition
+     * @param boolean                    $setOrderBy
+     *
+     * @return string
+     */
+    public function addTextField(QueryBuilder $qb, $index, $searchCondition, $setOrderBy = true)
+    {
+        $useFieldName = $searchCondition['fieldName'] === '*' ? false : true;
+        $fieldValue   = $this->filterTextFieldValue($searchCondition['fieldValue']);
+
+        if ($searchCondition['condition'] === Query::OPERATOR_CONTAINS) {
+            $searchString = $this->createContainsStringQuery($index, $useFieldName);
+        } elseif ($searchCondition['condition'] === Query::OPERATOR_NOT_CONTAINS) {
+            $searchString = $this->createNotContainsStringQuery($index, $useFieldName);
+        } elseif ($searchCondition['condition'] === Query::OPERATOR_EQUALS) {
+            $searchString = $this->createCompareStringQuery($index, $useFieldName);
+        } else {
+            $searchString = $this->createCompareStringQuery($index, $useFieldName, '!=');
+        }
+
+        $this->setFieldValueStringParameter($qb, $index, $fieldValue, $searchCondition['condition']);
+
+        if ($useFieldName) {
+            $qb->setParameter('field' . $index, $searchCondition['fieldName']);
+        }
+
+        if ($setOrderBy) {
+            $this->setTextOrderBy($qb, $index);
+        }
+
+        return '(' . $searchString . ' ) ';
+    }
+
+    /**
      * Create fulltext search string for string parameters (contains)
      *
      * @param integer $index
