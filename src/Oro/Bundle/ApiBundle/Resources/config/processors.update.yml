@@ -56,6 +56,11 @@ services:
         tags:
             - { name: oro.api.processor, action: update, group: normalize_input, requestType: json_api, priority: 90 }
 
+    oro_api.update.json_api.validate_included_data_dependencies:
+        class: Oro\Bundle\ApiBundle\Processor\Shared\JsonApi\ValidateIncludedDataDependencies
+        tags:
+            - { name: oro.api.processor, action: update, group: normalize_input, requestType: json_api, priority: -25 }
+
     oro_api.update.json_api.normalize_included_data:
         class: Oro\Bundle\ApiBundle\Processor\Shared\JsonApi\NormalizeIncludedData
         arguments:
