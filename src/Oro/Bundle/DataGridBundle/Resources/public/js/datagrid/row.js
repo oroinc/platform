@@ -38,7 +38,7 @@ define([
         events: function() {
             var resultEvents = {};
 
-            var events = this.cellEvents.getEventsMap();
+            var events = this.collection.getCellEventList().getEventsMap();
             // prevent CS error 'cause we must completely repeat Backbone behaviour
             for (var key in events) { // jshint forin:false
                 var match = key.match(delegateEventSplitter);
@@ -97,10 +97,11 @@ define([
             }
 
             // code related to simplified event binding
-            this.cellEvents = this.collection.getCellEventList();
-            this.listenTo(this.cellEvents, 'change', this.delegateEvents);
+            var cellEvents = this.collection.getCellEventList();
+            this.listenTo(cellEvents, 'change', this.delegateEvents);
 
             this.listenTo(this.model, 'backgrid:selected', this.onBackgridSelected);
+            this.listenTo(this.model, 'change:row_class_name', this.onRowClassNameChanged);
 
             this.columnRenderer = new ColumnRendererComponent(options);
 
@@ -173,6 +174,17 @@ define([
          */
         onBackgridSelected: function(model, isSelected) {
             this.$el.toggleClass('row-selected', isSelected);
+        },
+
+        onRowClassNameChanged: function(model) {
+            var previousClass = model.previous('row_class_name');
+            var newClass = _.result(this, 'className');
+            if (previousClass) {
+                this.$el.removeClass(previousClass);
+            }
+            if (newClass) {
+                this.$el.addClass(newClass);
+            }
         },
 
         className: function() {

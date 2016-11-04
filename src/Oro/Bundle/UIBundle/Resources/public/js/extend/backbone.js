@@ -7,11 +7,11 @@ define([
     'use strict';
 
     var OriginalBackboneView = Backbone.View;
-    Backbone.View = _.wrap(Backbone.View, function(original) {
+    Backbone.View = function(original) {
         this.subviews = [];
         this.subviewsByName = {};
-        original.apply(this, _.rest(arguments));
-    });
+        OriginalBackboneView.apply(this, arguments);
+    };
     _.extend(Backbone.View, OriginalBackboneView);
     Backbone.View.prototype = OriginalBackboneView.prototype;
 
@@ -133,8 +133,13 @@ define([
      * @protected
      */
     Backbone.View.prototype._deferredRender = function() {
+        if (this.deferredRender) {
+            // reject previous deferredRender object due to new rendering process is initiated
+            this.deferredRender.reject();
+        }
         this.deferredRender = $.Deferred();
     };
+
     /**
      * Resolves deferred render
      *
@@ -148,7 +153,7 @@ define([
             if (this.subviews.length) {
                 _.each(this.subviews, function(subview) {
                     if (subview.deferredRender) {
-                        promises.push(subview.deferredRender.promise());
+                        promises.push(subview.getDeferredRenderPromise());
                     }
                 });
             }
@@ -157,6 +162,15 @@ define([
                 delete self.deferredRender;
             });
         }
+    };
+
+    /**
+     * Create promise object from deferredRender with reference to a targetView
+     *
+     * @return {Promise|null}
+     */
+    Backbone.View.prototype.getDeferredRenderPromise = function() {
+        return this.deferredRender ? this.deferredRender.promise({targetView: this}) : null;
     };
 
     // Backbone.Model
