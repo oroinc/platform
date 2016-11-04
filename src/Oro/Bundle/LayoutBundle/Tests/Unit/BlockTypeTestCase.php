@@ -21,7 +21,6 @@ abstract class BlockTypeTestCase extends BaseBlockTypeTestCase
 
         $layoutFactoryBuilder
             ->addType(new Type\InputType())
-            ->addType(new Type\TitleType())
             ->addType(new Type\FormType());
     }
 }
