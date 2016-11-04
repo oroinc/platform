@@ -4,24 +4,22 @@ namespace Oro\Bundle\SecurityBundle\ORM\Walker;
 
 use Doctrine\Common\Collections\Criteria;
 use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\Mapping\ClassMetadataInfo;
 use Doctrine\ORM\Query;
-use Doctrine\ORM\QueryBuilder;
-use Doctrine\ORM\Query\AST\SelectStatement;
-use Doctrine\ORM\Query\AST\Subselect;
-use Doctrine\ORM\Query\AST\RangeVariableDeclaration;
-use Doctrine\ORM\Query\AST\Join;
 use Doctrine\ORM\Query\AST\ConditionalPrimary;
 use Doctrine\ORM\Query\AST\IdentificationVariableDeclaration;
-use Doctrine\ORM\Mapping\ClassMetadataInfo;
-
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-
-use Oro\Bundle\SecurityBundle\ORM\Walker\Condition\AclConditionStorage;
-use Oro\Bundle\SecurityBundle\ORM\Walker\Condition\SubRequestAclConditionStorage;
+use Doctrine\ORM\Query\AST\Join;
+use Doctrine\ORM\Query\AST\RangeVariableDeclaration;
+use Doctrine\ORM\Query\AST\SelectStatement;
+use Doctrine\ORM\Query\AST\Subselect;
+use Doctrine\ORM\QueryBuilder;
+use Oro\Bundle\SecurityBundle\Event\ProcessSelectAfter;
 use Oro\Bundle\SecurityBundle\ORM\Walker\Condition\AclCondition;
+use Oro\Bundle\SecurityBundle\ORM\Walker\Condition\AclConditionStorage;
 use Oro\Bundle\SecurityBundle\ORM\Walker\Condition\JoinAclCondition;
 use Oro\Bundle\SecurityBundle\ORM\Walker\Condition\JoinAssociationCondition;
-use Oro\Bundle\SecurityBundle\Event\ProcessSelectAfter;
+use Oro\Bundle\SecurityBundle\ORM\Walker\Condition\SubRequestAclConditionStorage;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 /**
  * Class ACLHelper
@@ -67,9 +65,10 @@ class AclHelper
     /**
      * Add ACL checks to Criteria
      *
-     * @param string   $className
+     * @param string $className
      * @param Criteria $criteria
-     * @param string   $permission
+     * @param string $permission
+     * @param array $mapField
      *
      * @return Criteria
      */
@@ -99,6 +98,44 @@ class AclHelper
         }
 
         return $criteria;
+    }
+
+    /**
+     * Add ACL checks to Criteria
+     *
+     * @param string $className
+     * @param QueryBuilder $queryBuilder
+     * @param string $permission
+     * @param array $mapField
+     *
+     * @return Criteria
+     */
+    public function applyAclToQb($className, QueryBuilder $queryBuilder, $permission, $mapField = [])
+    {
+        $conditionData = $this->builder->getAclConditionData($className, $permission);
+        if (!empty($conditionData)) {
+            list($entityField, $value, , $organizationField, $organizationValue, $ignoreOwner) = $conditionData;
+
+            if (isset($mapField[$organizationField])) {
+                $organizationField = $mapField[$organizationField];
+            }
+
+            if (isset($mapField[$entityField])) {
+                $entityField = $mapField[$entityField];
+            }
+
+            if (!is_null($organizationField) && !is_null($organizationValue)) {
+                $queryBuilder->andWhere($queryBuilder->expr()->in($organizationField, [$organizationValue]));
+            }
+            if (!$ignoreOwner && !empty($value)) {
+                if (!is_array($value)) {
+                    $value = [$value];
+                }
+                $queryBuilder->andWhere($queryBuilder->expr()->in($entityField, $value));
+            }
+        }
+
+        return $queryBuilder;
     }
 
     /**
