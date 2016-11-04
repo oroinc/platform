@@ -21,7 +21,7 @@ class PasswordExpirationSubscriberTest extends \PHPUnit_Framework_TestCase
         $this->assertSame('2016-11-03', $user->getPasswordExpiresAt()->format('Y-m-d'));
     }
 
-    public function testChaningPasswordWillChangeExpirationDate()
+    public function testChangingPasswordWillChangeExpirationDate()
     {
         $user = new User();
         $this->getListener('2016-11-03')
