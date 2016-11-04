@@ -1,0 +1,18 @@
+.primary-menu {
+  @include list-normalize();
+
+  display: flex;
+  justify-content: space-between;
+
+  &__item {
+    flex: 0 1 auto;
+
+    &--current {
+
+    }
+  }
+
+  &--vertical {
+    display: block;
+  }
+}
