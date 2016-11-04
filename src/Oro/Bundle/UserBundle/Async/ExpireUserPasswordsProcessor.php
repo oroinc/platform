@@ -89,7 +89,7 @@ class ExpireUserPasswordsProcessor implements MessageProcessorInterface, TopicSu
             $this->userManager->updateUser($user, false);
 
             try {
-                $passResetNotification = new EmailNotification($template, [$userEmail]);;
+                $passResetNotification = new EmailNotification($template, [$userEmail]);
                 $this->notificationManager->process($user, [$passResetNotification]);
             } catch (\Exception $e) {
                 $this->logError(sprintf('Sending expired password email to %s failed.', $userEmail), $e->getMessage());

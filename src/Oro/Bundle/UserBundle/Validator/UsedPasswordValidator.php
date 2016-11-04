@@ -4,6 +4,7 @@ namespace Oro\Bundle\UserBundle\Validator;
 
 use Doctrine\Bundle\DoctrineBundle\Registry;
 
+use Oro\Bundle\UserBundle\Entity\PasswordHistory;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
 use Symfony\Component\Validator\Exception\UnexpectedTypeException;
@@ -60,9 +61,9 @@ class UsedPasswordValidator extends ConstraintValidator
 
         $encoder = $this->encoderFactory->getEncoder($user);
         $newPassword = $user->getPlainPassword();
-
-        foreach ($oldPasswords as $passwordHistory) {
-            if ($encoder->isPasswordValid($passwordHistory->getPasswordHash(), $newPassword, $passwordHistory->getSalt())) {
+        /** @var PasswordHistory $oldPassword */
+        foreach ($oldPasswords as $oldPassword) {
+            if ($encoder->isPasswordValid($oldPassword->getPasswordHash(), $newPassword, $oldPassword->getSalt())) {
                 $this->context->addViolation($constraint->message);
 
                 break;
