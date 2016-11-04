@@ -947,6 +947,8 @@ services:
 
     oro_email.mailbox.process_storage:
         class: %oro_email.mailbox.process_storage.class%
+        arguments:
+            - '@oro_featuretoggle.checker.feature_checker'
 
     oro_email.mailbox_email_owner_provider:
         class: %oro_email.mailbox_email_owner_provider.class%
