@@ -61,14 +61,11 @@ class PdoMysql extends BaseDriver
      */
     public function addTextField(QueryBuilder $qb, $index, $searchCondition, $setOrderBy = true)
     {
-        $words = $this->getWords(
-            $this->filterTextFieldValue($searchCondition['fieldValue']),
-            $searchCondition['condition']
-        );
+        $fieldValue = $searchCondition['fieldValue'];
+        $words = $this->getWords($this->filterTextFieldValue($fieldValue), $searchCondition['condition']);
 
-        // TODO Need to clarify search requirements in scope of CRM-214
         if ($searchCondition['condition'] === Query::OPERATOR_CONTAINS) {
-            $whereExpr = $this->createMatchAgainstWordsExpr($qb, $words, $index, $searchCondition, $setOrderBy);
+            $whereExpr  = $this->createMatchAgainstWordsExpr($qb, $words, $index, $searchCondition, $setOrderBy);
             $shortWords = $this->getWordsLessThanFullTextMinWordLength($words);
             if ($shortWords) {
                 $whereExpr = $qb->expr()->orX(
@@ -76,12 +73,12 @@ class PdoMysql extends BaseDriver
                     $this->createLikeWordsExpr($qb, $shortWords, $index, $searchCondition)
                 );
             }
-        } elseif ( $searchCondition['condition'] === Query::OPERATOR_EQUALS) {
-            $whereExpr = $this->createEqualsExpr($qb, implode(' ', $words), $index, $searchCondition, $setOrderBy);
-        } elseif ( $searchCondition['condition'] === Query::OPERATOR_NOT_EQUALS) {
-            $whereExpr = $this->createNotEqualsExpr($qb, implode(' ', $words), $index, $searchCondition, $setOrderBy);
-        } else {
+        } elseif ($searchCondition['condition'] === Query::OPERATOR_NOT_CONTAINS) {
             $whereExpr = $this->createNotLikeWordsExpr($qb, $words, $index, $searchCondition);
+        } elseif ($searchCondition['condition'] === Query::OPERATOR_EQUALS) {
+            $whereExpr = $this->createCompareStringExpr($qb, $fieldValue, $index, $searchCondition);
+        } else {
+            $whereExpr = $this->createCompareStringExpr($qb, $fieldValue, $index, $searchCondition, '!=');
         }
 
         return '(' . $whereExpr . ')';
@@ -153,8 +150,6 @@ class PdoMysql extends BaseDriver
         return $this->fullTextMinWordLength;
     }
 
-
-
     /**
      * Creates expression like MATCH_AGAINST(textField.value, :value0 'IN BOOLEAN MODE') and adds parameters
      * to $qb.
@@ -197,80 +192,6 @@ class PdoMysql extends BaseDriver
 
         return (string)$result;
     }
-
-    /**
-     * Creates expression for equals comparision
-     * to $qb.
-     *
-     * @param  QueryBuilder $qb
-     * @param  string       $words
-     * @param  string       $index
-     * @param  array        $searchCondition
-     * @param  bool         $setOrderBy
-     *
-     * @return string
-     */
-    protected function createEqualsExpr(
-        QueryBuilder $qb,
-        $words,
-        $index,
-        array $searchCondition,
-        $setOrderBy = true
-    )
-    {
-        $joinAlias = $this->getJoinAlias($searchCondition['fieldType'], $index);
-        $fieldName = $searchCondition['fieldName'];
-        $valueParameter = 'value' . $index;
-
-        $result = "$joinAlias.value == :$valueParameter";
-        $qb->setParameter($valueParameter, $fieldName);
-
-        if ($this->isConcreteField($fieldName) && !$this->isAllDataField($fieldName)) {
-            $fieldParameter = 'field' . $index;
-            $result         = $qb->expr()->andX($result, "$joinAlias.field = :$fieldParameter");
-            $qb->setParameter($fieldParameter, $fieldName);
-        }
-
-        return (string)$result;
-    }
-
-
-    /**
-     * Creates expression for NotEquals comparision
-     * to $qb.
-     *
-     * @param  QueryBuilder $qb
-     * @param  string       $words
-     * @param  string       $index
-     * @param  array        $searchCondition
-     * @param  bool         $setOrderBy
-     *
-     * @return string
-     */
-    protected function createNotEqualsExpr(
-        QueryBuilder $qb,
-        $words,
-        $index,
-        array $searchCondition,
-        $setOrderBy = true
-    )
-    {
-        $joinAlias = $this->getJoinAlias($searchCondition['fieldType'], $index);
-        $fieldName = $searchCondition['fieldName'];
-        $valueParameter = 'value' . $index;
-
-        $result = "$joinAlias.value <> :$valueParameter";
-        $qb->setParameter($valueParameter, $fieldName);
-
-        if ($this->isConcreteField($fieldName) && !$this->isAllDataField($fieldName)) {
-            $fieldParameter = 'field' . $index;
-            $result         = $qb->expr()->andX($result, "$joinAlias.field = :$fieldParameter");
-            $qb->setParameter($fieldParameter, $fieldName);
-        }
-
-        return (string)$result;
-    }
-
 
     /**
      * Creates expression like (textField.value LIKE :value0_w0 OR textField.value LIKE :value0_w1)
@@ -333,8 +254,38 @@ class PdoMysql extends BaseDriver
         if ($this->isConcreteField($fieldName)) {
             $whereExpr .= " AND $joinAlias.field = :$fieldParameter";
             $qb->setParameter($fieldParameter, $fieldName);
+        }
 
-            return $whereExpr;
+        return $whereExpr;
+    }
+
+    /**
+     * @param  QueryBuilder $qb
+     * @param  int          $index
+     * @param  string       $value
+     * @param  array        $searchCondition
+     * @param  string       $operator
+     *
+     * @return string
+     */
+    public function createCompareStringExpr(
+        QueryBuilder $qb,
+        $value,
+        $index,
+        array $searchCondition,
+        $operator = '='
+    ) {
+        $joinAlias      = $this->getJoinAlias($searchCondition['fieldType'], $index);
+        $fieldName      = $searchCondition['fieldName'];
+        $fieldParameter = 'field' . $index;
+        $valueParameter = 'value' . $index;
+
+        $qb->setParameter($valueParameter, $value);
+
+        $whereExpr = "$joinAlias.value $operator :$valueParameter";
+        if ($this->isConcreteField($fieldName)) {
+            $whereExpr .= " AND $joinAlias.field = :$fieldParameter";
+            $qb->setParameter($fieldParameter, $fieldName);
         }
 
         return $whereExpr;
@@ -347,7 +298,7 @@ class PdoMysql extends BaseDriver
      */
     protected function isConcreteField($fieldName)
     {
-        return $fieldName == '*' ? false : true;
+        return $fieldName === '*' ? false : true;
     }
 
     /**
@@ -357,7 +308,7 @@ class PdoMysql extends BaseDriver
      */
     protected function isAllDataField($fieldName)
     {
-        return $fieldName == Indexer::TEXT_ALL_DATA_FIELD;
+        return $fieldName === Indexer::TEXT_ALL_DATA_FIELD;
     }
 
     /**

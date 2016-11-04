@@ -131,9 +131,9 @@ abstract class BaseDriver
         } elseif ($searchCondition['condition'] === Query::OPERATOR_NOT_CONTAINS) {
             $searchString = $this->createNotContainsStringQuery($index, $useFieldName);
         } elseif ($searchCondition['condition'] === Query::OPERATOR_EQUALS) {
-            $searchString = $this->createEqualsStringQuery($index, $useFieldName);
+            $searchString = $this->createCompareStringQuery($index, $useFieldName);
         } else {
-            $searchString = $this->createNotEqualsStringQuery($index, $useFieldName);
+            $searchString = $this->createCompareStringQuery($index, $useFieldName, '!=');
         }
 
         $this->setFieldValueStringParameter($qb, $index, $fieldValue, $searchCondition['condition']);
@@ -284,10 +284,11 @@ abstract class BaseDriver
      *
      * @param integer $index
      * @param bool    $useFieldName
+     * @param string  $operator
      *
      * @return string
      */
-    protected function createEqualsStringQuery($index, $useFieldName = true)
+    protected function createCompareStringQuery($index, $useFieldName = true, $operator = '=')
     {
         $joinAlias = $this->getJoinAlias(Query::TYPE_TEXT, $index);
 
@@ -296,27 +297,7 @@ abstract class BaseDriver
             $stringQuery = $joinAlias . '.field = :field' . $index . ' AND ';
         }
 
-        return $stringQuery . $joinAlias . '.value = :value' . $index;
-    }
-
-    /**
-     * Create search string for string parameters (not contains)
-     *
-     * @param integer $index
-     * @param bool    $useFieldName
-     *
-     * @return string
-     */
-    protected function createNotEqualsStringQuery($index, $useFieldName = true)
-    {
-        $joinAlias = $this->getJoinAlias(Query::TYPE_TEXT, $index);
-
-        $stringQuery = '';
-        if ($useFieldName) {
-            $stringQuery = $joinAlias . '.field = :field' . $index . ' AND ';
-        }
-
-        return $stringQuery . $joinAlias . '.value != :value' . $index;
+        return $stringQuery . $joinAlias . '.value ' . $operator . ' :value' . $index;
     }
 
     /**
