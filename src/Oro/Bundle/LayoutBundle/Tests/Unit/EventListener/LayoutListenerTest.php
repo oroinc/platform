@@ -147,7 +147,7 @@ class LayoutListenerTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('Test Layout', $responseEvent->getResponse()->getContent());
     }
 
-    public function testShouldReturnBlocksCntent()
+    public function testShouldReturnBlocksContent()
     {
         $blocks = [
             'block1' => 'Test block 1',
@@ -321,7 +321,7 @@ class LayoutListenerTest extends \PHPUnit_Framework_TestCase
     protected function setupLayoutExpectations(
         $builder = null,
         \Closure $assertContextCallback = null,
-        $renderBlocks = []
+        array $renderBlocks = []
     ) {
         if (null === $builder) {
             $builder = $this->getMock('Oro\Component\Layout\LayoutBuilderInterface');
@@ -346,23 +346,33 @@ class LayoutListenerTest extends \PHPUnit_Framework_TestCase
                         call_user_func($assertContextCallback, $context);
                     }
 
-                    $renderContent = 'Test Layout';
-                    if ($blockId) {
-                        $renderContent = isset($renderBlocks[$blockId]) ? $renderBlocks[$blockId] : '';
-                    }
-                    $layout = $this->getMockBuilder('Oro\Component\Layout\Layout')
-                        ->disableOriginalConstructor()
-                        ->getMock();
-                    $layout->expects($this->once())
-                        ->method('render')
-                        ->willReturn($renderContent);
-                    $layout->expects($this->any())
-                        ->method('getView')
-                        ->will($this->returnValue($this->getMock('Oro\Component\Layout\BlockView')));
-
-                    return $layout;
+                    return $this->getLayoutMock($renderBlocks, $blockId);
                 }
             );
+    }
+
+    /**
+     * @param array $renderBlocks
+     * @param string $blockId
+     * @return \PHPUnit_Framework_MockObject_MockObject
+     */
+    protected function getLayoutMock($renderBlocks, $blockId)
+    {
+        $renderContent = 'Test Layout';
+        if ($blockId) {
+            $renderContent = isset($renderBlocks[$blockId]) ? $renderBlocks[$blockId] : '';
+        }
+        $layout = $this->getMockBuilder('Oro\Component\Layout\Layout')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $layout->expects($this->once())
+            ->method('render')
+            ->willReturn($renderContent);
+        $layout->expects($this->any())
+            ->method('getView')
+            ->will($this->returnValue($this->getMock('Oro\Component\Layout\BlockView')));
+
+        return $layout;
     }
 
     /**
