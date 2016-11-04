@@ -70,7 +70,7 @@ class ExpireUserPasswordsProcessor implements MessageProcessorInterface, TopicSu
      */
     public function process(MessageInterface $message, SessionInterface $session)
     {
-        $userIds = (array) $message->getBody();
+        $userIds = (array) json_decode($message->getBody());
         $template = $this->getEmailTemplate();
         if (!$template) {
             $this->logError('Cannot find email template "%s"', self::TEMPLATE_NAME);
@@ -78,7 +78,7 @@ class ExpireUserPasswordsProcessor implements MessageProcessorInterface, TopicSu
             return self::ACK;
         }
 
-        $users = $this->getUserRepository()->findBy(['id' => $userIds, 'login_disabled' => false, 'enabled' => true]);
+        $users = $this->getUserRepository()->findBy(['id' => $userIds, 'loginDisabled' => false, 'enabled' => true]);
 
         foreach ($users as $user) {
             /** @var User $user */
