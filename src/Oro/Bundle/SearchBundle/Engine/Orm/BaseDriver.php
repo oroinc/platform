@@ -254,44 +254,6 @@ abstract class BaseDriver
     }
 
     /**
-     * Create search string for string parameters (contains)
-     *
-     * @param integer $index
-     * @param bool    $useFieldName
-     * @param string  $operator
-     *
-     * @return string
-     */
-    protected function createCompareStringQuery($index, $useFieldName = true, $operator = '=')
-    {
-        $joinAlias = $this->getJoinAlias(Query::TYPE_TEXT, $index);
-
-        $stringQuery = '';
-        if ($useFieldName) {
-            $stringQuery = $joinAlias . '.field = :field' . $index . ' AND ';
-        }
-
-        return $stringQuery . $joinAlias . '.value ' . $operator . ' :value' . $index;
-    }
-
-    /**
-     * Set string parameter for qb
-     *
-     * @param \Doctrine\ORM\QueryBuilder $qb
-     * @param integer                    $index
-     * @param string                     $fieldValue
-     * @param string                     $searchCondition
-     */
-    protected function setFieldValueStringParameter(QueryBuilder $qb, $index, $fieldValue, $searchCondition)
-    {
-        if (in_array($searchCondition, [Query::OPERATOR_CONTAINS, Query::OPERATOR_NOT_CONTAINS], true)) {
-            $qb->setParameter('value' . $index, '%' . str_replace(' ', '%', $fieldValue) . '%');
-        } else {
-            $qb->setParameter('value' . $index, $fieldValue);
-        }
-    }
-
-    /**
      * Add non string search to qb
      *
      * @param \Doctrine\ORM\QueryBuilder $qb

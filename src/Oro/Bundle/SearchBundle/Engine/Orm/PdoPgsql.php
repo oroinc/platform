@@ -82,6 +82,27 @@ class PdoPgsql extends BaseDriver
     }
 
     /**
+     * Create search string for string parameters (contains)
+     *
+     * @param integer $index
+     * @param bool    $useFieldName
+     * @param string  $operator
+     *
+     * @return string
+     */
+    protected function createCompareStringQuery($index, $useFieldName = true, $operator = '=')
+    {
+        $joinAlias = $this->getJoinAlias(Query::TYPE_TEXT, $index);
+
+        $stringQuery = '';
+        if ($useFieldName) {
+            $stringQuery = $joinAlias . '.field = :field' . $index . ' AND ';
+        }
+
+        return $stringQuery . $joinAlias . '.value ' . $operator . ' :value' . $index;
+    }
+
+    /**
      * Create fulltext search string for string parameters (contains)
      *
      * @param integer $index
