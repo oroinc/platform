@@ -77,10 +77,10 @@ class Configuration implements ConfigurationInterface
                 'password_numbers' => ['value' => true, 'type' => 'boolean'],
                 'password_special_chars' => ['value' => false, 'type' => 'boolean'],
                 'password_change_period_enabled' => ['value' => false, 'type' => 'boolean'],
-                'password_change_period' => ['value' => 30, 'type' => 'scalar'],
+                'password_change_period' => ['value' => 30, 'type' => 'integer'],
                 'password_change_period_unit' => ['value' => 'days'],
                 'used_password_check_enabled' => ['value' => false, 'type' => 'boolean'],
-                'used_password_check_number' => ['value' => 12, 'type' => 'scalar'],
+                'used_password_check_number' => ['value' => 12, 'type' => 'integer'],
             ]
         );
 
