@@ -78,7 +78,7 @@ services:
             - '@oro_security.encoder.mcrypt'
             - '@oro_imap.imap_email_google_oauth2_manager'
         calls:
-            - [setJobManager, ['@oro_cron.job_manager']]
+            - ['setMessageProducer', ['@oro_message_queue.client.message_producer']]
         tags:
             - { name: oro_email.email_synchronizer }
 
@@ -201,6 +201,24 @@ services:
         arguments:
             - '@oro_imap.manager.clear'
             - '@oro_message_queue.job.runner'
+            - '@logger'
+        tags:
+            - { name: 'oro_message_queue.client.message_processor' }
+
+    oro_imap.async.sync_email:
+        scope: prototype
+        class: 'Oro\Bundle\ImapBundle\Async\SyncEmailMessageProcessor'
+        arguments:
+            - '@oro_imap.email_synchronizer'
+            - '@logger'
+        tags:
+            - { name: 'oro_message_queue.client.message_processor' }
+
+    oro_imap.async.sync_emails:
+        scope: prototype
+        class: 'Oro\Bundle\ImapBundle\Async\SyncEmailsMessageProcessor'
+        arguments:
+            - '@oro_message_queue.client.message_producer'
             - '@logger'
         tags:
             - { name: 'oro_message_queue.client.message_processor' }
