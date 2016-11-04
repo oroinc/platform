@@ -163,10 +163,9 @@ class TranslationManagerTest extends \PHPUnit_Framework_TestCase
         $translation = $manager->createTranslation('key', 'value', 'locale', 'domain');
 
         $this->objectManager->expects($this->at(0))->method('persist')->with($translationKey);
-        $this->objectManager->expects($this->at(2))->method('persist')->with($translation);
+        $this->objectManager->expects($this->at(1))->method('persist')->with($translation);
+        $this->objectManager->expects($this->at(2))->method('flush')->with([$translationKey, $translation]);
 
-        $this->objectManager->expects($this->at(1))->method('flush')->with([$translationKey]);
-        $this->objectManager->expects($this->at(3))->method('flush')->with([$translation]);
         $manager->flush();
     }
 

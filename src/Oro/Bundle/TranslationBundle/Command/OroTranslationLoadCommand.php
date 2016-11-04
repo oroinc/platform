@@ -74,6 +74,7 @@ class OroTranslationLoadCommand extends ContainerAwareCommand
                 }
 
                 $translationManager->flush(true);
+                $translationManager->clear();
 
                 $output->writeln(sprintf('processed %d records.', count($messages)));
             }

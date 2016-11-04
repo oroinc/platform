@@ -14,6 +14,9 @@
                     entity_attribute: entity.entityAttributeName | default('entity'),
                     startStep: entity.startStep.name | default(null),
                     stepsDisplayOrdered: entity.stepsDisplayOrdered,
+                    priority: entity.priority,
+                    exclusive_active_groups: entity.exclusiveActiveGroups,
+                    exclusive_record_groups: entity.exclusiveRecordGroups
                 },
                 system_entities: system_entities,
                 chartOptions: {},

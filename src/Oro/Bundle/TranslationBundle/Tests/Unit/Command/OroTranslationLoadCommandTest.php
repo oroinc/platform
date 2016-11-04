@@ -123,17 +123,19 @@ class OroTranslationLoadCommandTest extends \PHPUnit_Framework_TestCase
         $this->translationManager->expects($this->at(0))->method('saveTranslation')
             ->with('key1', 'domain1-locale1-message1', 'locale1', 'domain1');
         $this->translationManager->expects($this->at(1))->method('flush');
+        $this->translationManager->expects($this->at(2))->method('clear');
 
-
-        $this->translationManager->expects($this->at(2))->method('saveTranslation')
+        $this->translationManager->expects($this->at(3))->method('saveTranslation')
             ->with('key1', 'domain2-locale1-message1', 'locale1', 'domain2')->willReturn(new \stdClass());
-        $this->translationManager->expects($this->at(3))->method('flush');
+        $this->translationManager->expects($this->at(4))->method('flush');
+        $this->translationManager->expects($this->at(5))->method('clear');
 
-        $this->translationManager->expects($this->at(4))->method('saveTranslation')
+        $this->translationManager->expects($this->at(6))->method('saveTranslation')
             ->with('key1', 'domain1-currentLocale-message1', 'currentLocale', 'domain1')->willReturn(new \stdClass());
-        $this->translationManager->expects($this->at(5))->method('saveTranslation')
+        $this->translationManager->expects($this->at(7))->method('saveTranslation')
             ->with('key2', 'domain1-currentLocale-message2', 'currentLocale', 'domain1')->willReturn(new \stdClass());
-        $this->translationManager->expects($this->at(6))->method('flush');
+        $this->translationManager->expects($this->at(8))->method('flush');
+        $this->translationManager->expects($this->at(9))->method('clear');
 
         $this->container->expects($this->at(5))->method('set')
             ->with('oro_translation.database_translation.loader', $loader);
@@ -174,11 +176,12 @@ class OroTranslationLoadCommandTest extends \PHPUnit_Framework_TestCase
         $this->translationManager->expects($this->at(0))->method('saveTranslation')
             ->with('key1', 'domain1-locale1-message1', 'locale1', 'domain1');
         $this->translationManager->expects($this->at(1))->method('flush');
+        $this->translationManager->expects($this->at(2))->method('clear');
 
-
-        $this->translationManager->expects($this->at(2))->method('saveTranslation')
+        $this->translationManager->expects($this->at(3))->method('saveTranslation')
             ->with('key1', 'domain2-locale1-message1', 'locale1', 'domain2')->willReturn(new \stdClass());
-        $this->translationManager->expects($this->at(3))->method('flush');
+        $this->translationManager->expects($this->at(4))->method('flush');
+        $this->translationManager->expects($this->at(5))->method('clear');
 
         $this->translator->expects($this->at(1))->method('rebuildCache');
 

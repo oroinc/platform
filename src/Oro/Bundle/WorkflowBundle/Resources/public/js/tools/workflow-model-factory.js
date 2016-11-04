@@ -38,7 +38,9 @@ define(function(require) {
             var configuration = options.entity.configuration;
             var translateLinks = options.entity.translateLinks;
 
-            configuration.steps = new StepCollection(this._getNodeConfiguration(configuration, 'steps', translateLinks));
+            configuration.steps = new StepCollection(
+                this._getNodeConfiguration(configuration, 'steps', translateLinks)
+            );
 
             configuration.transitions = new TransitionCollection(
                 this._getNodeConfiguration(configuration, 'transitions', translateLinks)
@@ -58,6 +60,9 @@ define(function(require) {
             configuration.entity_attribute = options.entity.entity_attribute;
             configuration.start_step = options.entity.startStep;
             configuration.steps_display_ordered = options.entity.stepsDisplayOrdered;
+            configuration.priority = options.entity.priority;
+            configuration.exclusive_active_groups = options.entity.exclusive_active_groups;
+            configuration.exclusive_record_groups = options.entity.exclusive_record_groups;
 
             var workflowModel = new WorkflowModel(configuration);
             workflowModel.setSystemEntities(options.system_entities);
@@ -114,7 +119,7 @@ define(function(require) {
          */
         _getNodeConfiguration: function(config, node, translateLinks) {
             var updateConfig = [];
-            _.each(config[node], function (item, name) {
+            _.each(config[node], function(item, name) {
                 item.name = name;
                 if (translateLinks && node in translateLinks && name in translateLinks[node]) {
                     item.translateLinks = translateLinks[node][name];

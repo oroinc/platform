@@ -28,7 +28,10 @@ define(function(require) {
             transitions: null,
             'transition_definitions': null,
             attributes: null,
-            translateLinkLabel: null
+            translateLinkLabel: null,
+            priority: 0,
+            exclusive_active_groups: [],
+            exclusive_record_groups: []
         },
 
         MAX_HISTORY_LENGTH: 50,

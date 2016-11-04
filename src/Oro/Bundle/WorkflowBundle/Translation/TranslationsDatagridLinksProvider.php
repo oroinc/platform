@@ -42,13 +42,16 @@ class TranslationsDatagridLinksProvider
 
         $linksData = [
             WorkflowConfiguration::NODE_STEPS => ['label'],
-            WorkflowConfiguration::NODE_TRANSITIONS => ['label', 'message'],
-            WorkflowConfiguration::NODE_ATTRIBUTES => ['label'],
+            WorkflowConfiguration::NODE_TRANSITIONS => ['label', 'message']
         ];
 
         foreach ($linksData as $node => $attributes) {
             $translateLinks[$node] = $this->getWorkflowNodeTranslateLinks($configuration, $node, $attributes);
         }
+
+        $translateLinks[WorkflowConfiguration::NODE_ATTRIBUTES] = $this->getTransitionAttributeNodesTranslateLinks(
+            $configuration
+        );
 
         return $translateLinks;
     }
@@ -76,5 +79,32 @@ class TranslationsDatagridLinksProvider
         }
 
         return $translateLinks;
+    }
+
+    /**
+     * @param array $configuration
+     * @return array
+     */
+    private function getTransitionAttributeNodesTranslateLinks(array $configuration)
+    {
+        $attributes = [];
+        if (!array_key_exists(WorkflowConfiguration::NODE_TRANSITIONS, $configuration)) {
+            return $attributes;
+        }
+
+        foreach ($configuration[WorkflowConfiguration::NODE_TRANSITIONS] as $transitionName => $transition) {
+            if (isset($transition['form_options']['attribute_fields'])) {
+                foreach ($transition['form_options']['attribute_fields'] as $attributeName => $attribute) {
+                    if (isset($attribute['options']['label'])) {
+                        $label = $attribute['options']['label'];
+
+                        $attributes[$attributeName][$transitionName]['label'] =
+                            $this->routeHelper->generate(['key' => $label]);
+                    }
+                }
+            }
+        }
+
+        return $attributes;
     }
 }

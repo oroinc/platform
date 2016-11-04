@@ -94,6 +94,8 @@ class TranslationManager
         /** @var TranslationRepository $repo */
         $repo = $this->getEntityRepository(Translation::class);
 
+        $this->findTranslationKey($key, $domain);
+
         $translation = $repo->findTranslation($key, $locale, $domain);
         if (!$this->canUpdateTranslation($scope, $translation)) {
             return null;
@@ -198,34 +200,35 @@ class TranslationManager
      */
     public function flush($force = false)
     {
+        $em = $this->getEntityManager(TranslationKey::class);
+        foreach ($this->translationKeys as $translationKey) {
+            $em->persist($translationKey);
+        }
+
+        foreach ($this->translationKeysToRemove as $translationKey) {
+            $em->remove($translationKey);
+        }
+
+        $em = $this->getEntityManager(Translation::class);
+        foreach ($this->translations as $translation) {
+            if (!$translation->getValue()) {
+                $em->remove($translation);
+            } else {
+                $em->persist($translation);
+            }
+        }
+
         if ($force) {
-            $this->getEntityManager(Translation::class)->flush();
+            $em->flush();
         } else {
-            $em = $this->getEntityManager(TranslationKey::class);
-            foreach ($this->translationKeys as $translationKey) {
-                $em->persist($translationKey);
-            }
-            if ($this->translationKeys) {
-                $em->flush(array_values($this->translationKeys));
-            }
+            $entities = array_merge(
+                array_values($this->translationKeys),
+                array_values($this->translationKeysToRemove),
+                array_values($this->translations)
+            );
 
-            foreach ($this->translationKeysToRemove as $translationKey) {
-                $em->remove($translationKey);
-            }
-            if ($this->translationKeysToRemove) {
-                $em->flush(array_values($this->translationKeysToRemove));
-            }
-
-            $em = $this->getEntityManager(Translation::class);
-            foreach ($this->translations as $translation) {
-                if (!$translation->getValue()) {
-                    $em->remove($translation);
-                } else {
-                    $em->persist($translation);
-                }
-            }
-            if ($this->translations) {
-                $em->flush(array_values($this->translations));
+            if ($entities) {
+                $em->flush($entities);
             }
         }
 
