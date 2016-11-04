@@ -139,28 +139,6 @@ class Query
     }
 
     /**
-     * @param ObjectManager $em
-     */
-    public function setEntityManager(ObjectManager $em)
-    {
-        $this->em = $em;
-    }
-
-    /**
-     * Init query
-     *
-     * @param string $query
-     *
-     * @return Query
-     */
-    public function createQuery($query)
-    {
-        $this->query = $query;
-
-        return $this;
-    }
-
-    /**
      * Insert list of required fields to query select
      *
      * @param mixed  $field
