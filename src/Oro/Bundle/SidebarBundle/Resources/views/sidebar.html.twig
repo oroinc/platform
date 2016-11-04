@@ -17,10 +17,17 @@
 {% endif %}
 
 {% if isDesktopVersion() and oro_config_value('oro_sidebar.sidebar_' ~ placement ~ '_active') == true %}
+    {% set widgets = oro_sidebar_get_available_widgets(placement) %}
+    {% set availableWidgets = [] %}
+    {% for widgetName, widget in widgets %}
+        {% if feature_resource_enabled(widgetName, 'sidebar_widgets') %}
+            {% set availableWidgets = availableWidgets|merge({(widgetName): widget}) %}
+        {% endif %}
+    {% endfor %}
     {% set pageComponent = {
         sidebarData: render(sidebarsGetURL),
         widgetsData: render(widgetsGetURL),
-        availableWidgets: oro_sidebar_get_available_widgets(placement),
+        availableWidgets: availableWidgets,
         urlRoot: sidebarPostURL,
         url: widgetPostURL
     } %}

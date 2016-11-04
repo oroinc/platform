@@ -15,11 +15,6 @@ class WidgetDefinitionRegistry
     protected $widgetDefinitions;
 
     /**
-     * @var FeatureChecker
-     */
-    protected $featureChecker;
-
-    /**
      * @param array $definitions
      */
     public function __construct(array $definitions, FeatureChecker $featureChecker)
@@ -36,9 +31,7 @@ class WidgetDefinitionRegistry
     public function setWidgetDefinitions(array $definitions)
     {
         foreach ($definitions as $name => $definition) {
-            if ($this->featureChecker->isResourceEnabled($name, self::SIDEBAR_WIDGET_FEATURE_NAME)) {
-                $this->widgetDefinitions->set($name, $definition);
-            }
+            $this->widgetDefinitions->set($name, $definition);
         }
     }
 

@@ -12,7 +12,6 @@ services:
         class: %oro_sidebar.widget_definition.registry.class%
         arguments:
             - %oro_sidebar.sidebar_widgets_definitions%
-            - '@oro_featuretoggle.checker.feature_checker'
 
     oro_sidebar.twig.extension:
         class: %oro_sidebar.twig.extension.class%
