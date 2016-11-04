@@ -7,7 +7,7 @@ use Doctrine\Common\Cache\Cache;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 use Oro\Component\Config\Loader\CumulativeConfigLoader;
-use Oro\Component\Config\Loader\FolderContentCumulativeLoader;
+use Oro\Component\Layout\Config\Loader\LayoutUpdateCumulativeResourceLoader;
 use Oro\Component\Layout\Loader\LayoutUpdateLoaderInterface;
 
 class ThemeResourceProvider implements ResourceProviderInterface
@@ -128,11 +128,12 @@ class ThemeResourceProvider implements ResourceProviderInterface
     private function getConfigLoader()
     {
         $filenamePatterns = $this->loader->getUpdateFileNamePatterns();
-
-        return new CumulativeConfigLoader(
+        $configLoader = new CumulativeConfigLoader(
             'oro_layout_updates_list',
-            [new FolderContentCumulativeLoader('Resources/views/layouts/', -1, false, $filenamePatterns)]
+            [new LayoutUpdateCumulativeResourceLoader('Resources/views/layouts/', -1, false, $filenamePatterns)]
         );
+
+        return $configLoader;
     }
 
     /**

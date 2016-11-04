@@ -134,9 +134,8 @@ class ThemeResourceProviderTest extends \PHPUnit_Framework_TestCase
 
         /** @var Cache|\PHPUnit_Framework_MockObject_MockObject $cache */
         $cache = $this->getMock(Cache::class);
-        $cache->expects($this->once())
-            ->method('save')
-            ->with(ThemeResourceProvider::CACHE_KEY, $result);
+        $cache->expects($this->exactly(2))
+            ->method('save');
 
         $this->provider->setCache($cache);
         $this->provider->loadResources();

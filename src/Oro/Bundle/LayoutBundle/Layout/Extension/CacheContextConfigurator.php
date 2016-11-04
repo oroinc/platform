@@ -28,8 +28,9 @@ class CacheContextConfigurator implements ContextConfiguratorInterface
      */
     public function configureContext(ContextInterface $context)
     {
+        $date = new \DateTime('now', new \DateTimeZone('UTC'));
         $context->getResolver()
-            ->setDefaults([self::MAX_MODIFICATION_DATE_PARAM => ''])
+            ->setDefaults([self::MAX_MODIFICATION_DATE_PARAM => $date->format(\DateTime::COOKIE)])
             ->setAllowedTypes([self::MAX_MODIFICATION_DATE_PARAM => 'string']);
 
         $date = $this->cache->fetch(ThemeResourceProvider::CACHE_LAST_MODIFICATION_DATE);

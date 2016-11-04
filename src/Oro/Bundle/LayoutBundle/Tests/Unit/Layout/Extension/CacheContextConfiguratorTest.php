@@ -33,7 +33,7 @@ class CacheContextConfiguratorTest extends \PHPUnit_Framework_TestCase
         $this->contextConfigurator->configureContext($context);
         $context->resolve();
 
-        $this->assertSame('', $context[CacheContextConfigurator::MAX_MODIFICATION_DATE_PARAM]);
+        $this->assertTrue(is_string($context[CacheContextConfigurator::MAX_MODIFICATION_DATE_PARAM]));
     }
 
     public function testConfigureContext()
