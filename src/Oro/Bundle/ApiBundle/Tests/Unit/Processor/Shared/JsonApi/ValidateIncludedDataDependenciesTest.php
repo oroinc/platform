@@ -86,6 +86,32 @@ class ValidateIncludedDataDependenciesTest extends FormProcessorTestCase
         self::assertFalse($this->context->hasErrors());
     }
 
+    public function testProcessDirectInverseRelationship()
+    {
+        $requestData = [
+            'data'     => [
+                'type' => 'users',
+                'id'   => 'user_1'
+            ],
+            'included' => [
+                [
+                    'type'          => 'groups',
+                    'id'            => 'included_group_1',
+                    'relationships' => [
+                        'user' => [
+                            'data' => ['type' => 'users', 'id' => 'user_1']
+                        ]
+                    ]
+                ]
+            ]
+        ];
+
+        $this->context->setRequestData($requestData);
+        $this->processor->process($this->context);
+
+        self::assertFalse($this->context->hasErrors());
+    }
+
     public function testProcessIndirectToOneRelationship()
     {
         $requestData = [
@@ -148,6 +174,96 @@ class ValidateIncludedDataDependenciesTest extends FormProcessorTestCase
                 [
                     'type' => 'grouptypes',
                     'id'   => 'included_group_type_1'
+                ],
+            ]
+        ];
+
+        $this->context->setRequestData($requestData);
+        $this->processor->process($this->context);
+
+        self::assertFalse($this->context->hasErrors());
+    }
+
+    public function testProcessIndirectInverseRelationship()
+    {
+        $requestData = [
+            'data'     => [
+                'type' => 'users',
+                'id'   => 'user_1'
+            ],
+            'included' => [
+                [
+                    'type'          => 'groups',
+                    'id'            => 'included_group_1',
+                    'relationships' => [
+                        'user' => [
+                            'data' => ['type' => 'users', 'id' => 'user_1']
+                        ]
+                    ]
+                ],
+                [
+                    'type'          => 'grouptypes',
+                    'id'            => 'included_group_type_1',
+                    'relationships' => [
+                        'group' => [
+                            'data' => ['type' => 'groups', 'id' => 'included_group_1']
+                        ]
+                    ]
+                ],
+            ]
+        ];
+
+        $this->context->setRequestData($requestData);
+        $this->processor->process($this->context);
+
+        self::assertFalse($this->context->hasErrors());
+    }
+
+    public function testProcessMixOfIndirectInverseAndNotInverseRelationship()
+    {
+        $requestData = [
+            'data'     => [
+                'type'          => 'users',
+                'relationships' => [
+                    'group' => [
+                        'data' => ['type' => 'groups', 'id' => 'included_group_1']
+                    ]
+                ]
+            ],
+            'included' => [
+                [
+                    'type'          => 'groups',
+                    'id'            => 'included_group_1',
+                    'relationships' => [
+                        'owner' => [
+                            'data' => ['type' => 'users', 'id' => 'included_user_1']
+                        ]
+                    ]
+                ],
+                [
+                    'type'          => 'grouptypes',
+                    'id'            => 'included_group_type_1',
+                    'relationships' => [
+                        'group' => [
+                            'data' => ['type' => 'groups', 'id' => 'included_group_1']
+                        ],
+                        'owner' => [
+                            'data' => ['type' => 'users', 'id' => 'included_user_1']
+                        ]
+                    ]
+                ],
+                [
+                    'type'          => 'users',
+                    'id'            => 'included_user_1',
+                    'relationships' => [
+                        'group' => [
+                            'data' => ['type' => 'groups', 'id' => 'included_group_2']
+                        ]
+                    ]
+                ],
+                [
+                    'type' => 'groups',
+                    'id'   => 'included_group_2'
                 ],
             ]
         ];

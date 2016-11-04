@@ -30,40 +30,99 @@ class ValidateIncludedDataDependencies implements ProcessorInterface
             return;
         }
 
-        $checkedItems = [];
-        $toCheckItems = [];
-
-        // find included entities that have direct relationship with the primary entity
         $primaryObject = $requestData[JsonApiDoc::DATA];
         $includedData = $requestData[JsonApiDoc::INCLUDED];
+        $checked = [];
+        $toCheck = [];
+
+        // find included entities that have direct relationship with the primary entity
+        $this->processDirectRelationships($checked, $toCheck, $includedData, $primaryObject);
+        // find included entities that have direct link to the primary entity
+        if (!empty($toCheck)) {
+            $primaryObjectKey = $this->getObjectKey($primaryObject);
+            if ($primaryObjectKey) {
+                $this->processDirectInverseRelationships($checked, $toCheck, $includedData, $primaryObjectKey);
+            }
+        }
+        // check whether the rest of included entities have indirect relationship with the primary entity
+        if (!empty($toCheck)) {
+            $this->processIndirectRelationships($checked, $toCheck, $includedData);
+        }
+
+        foreach ($toCheck as $index) {
+            $context->addError($this->createValidationError($index));
+        }
+    }
+
+    /**
+     * @param array $checked
+     * @param array $toCheck
+     * @param array $includedData
+     * @param array $primaryObject
+     */
+    protected function processDirectRelationships(
+        array &$checked,
+        array &$toCheck,
+        array $includedData,
+        array $primaryObject
+    ) {
         foreach ($includedData as $index => $object) {
             $objectKey = $this->getObjectKey($object);
             if ($this->isDependentObject($primaryObject, $objectKey)) {
-                $checkedItems[$objectKey] = $index;
+                $checked[$objectKey] = $index;
             } else {
-                $toCheckItems[$objectKey] = $index;
+                $toCheck[$objectKey] = $index;
             }
         }
+    }
 
-        // check whether the rest of included entities have indirect relationship with the primary entity
+    /**
+     * @param array  $checked
+     * @param array  $toCheck
+     * @param array  $includedData
+     * @param string $primaryObjectKey
+     */
+    protected function processDirectInverseRelationships(
+        array &$checked,
+        array &$toCheck,
+        array $includedData,
+        $primaryObjectKey
+    ) {
+        $keys = array_keys($toCheck);
+        foreach ($keys as $objectKey) {
+            $index = $toCheck[$objectKey];
+            if ($this->isDependentObject($includedData[$index], $primaryObjectKey)) {
+                unset($toCheck[$objectKey]);
+                $checked[$objectKey] = $index;
+                break;
+            }
+        }
+    }
+
+    /**
+     * @param array $checked
+     * @param array $toCheck
+     * @param array $includedData
+     */
+    protected function processIndirectRelationships(array &$checked, array &$toCheck, array $includedData)
+    {
         $hasChanges = true;
-        while ($hasChanges && !empty($toCheckItems)) {
+        while ($hasChanges && !empty($toCheck)) {
             $hasChanges = false;
-            $keys = array_keys($toCheckItems);
+            $keys = array_keys($toCheck);
             foreach ($keys as $objectKey) {
-                foreach ($checkedItems as $index) {
-                    if ($this->isDependentObject($includedData[$index], $objectKey)) {
-                        unset($toCheckItems[$objectKey]);
-                        $checkedItems[$objectKey] = $index;
+                $objectIndex = $toCheck[$objectKey];
+                foreach ($checked as $checkedObjectKey => $checkedObjectIndex) {
+                    if ($this->isDependentObject($includedData[$checkedObjectIndex], $objectKey)
+                        || $this->isDependentObject($includedData[$objectIndex], $checkedObjectKey)
+                    ) {
+                        unset($toCheck[$objectKey]);
+                        $checked[$objectKey] = $objectIndex;
                         $hasChanges = true;
                         break;
                     }
                 }
             }
-        }
-
-        foreach ($toCheckItems as $index) {
-            $context->addError($this->createValidationError($index));
         }
     }
 
