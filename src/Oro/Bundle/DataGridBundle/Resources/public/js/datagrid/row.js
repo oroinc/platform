@@ -38,7 +38,7 @@ define([
         events: function() {
             var resultEvents = {};
 
-            var events = this.cellEvents.getEventsMap();
+            var events = this.collection.getCellEventList().getEventsMap();
             // prevent CS error 'cause we must completely repeat Backbone behaviour
             for (var key in events) { // jshint forin:false
                 var match = key.match(delegateEventSplitter);
@@ -97,8 +97,8 @@ define([
             }
 
             // code related to simplified event binding
-            this.cellEvents = this.collection.getCellEventList();
-            this.listenTo(this.cellEvents, 'change', this.delegateEvents);
+            var cellEvents = this.collection.getCellEventList();
+            this.listenTo(cellEvents, 'change', this.delegateEvents);
 
             this.listenTo(this.model, 'backgrid:selected', this.onBackgridSelected);
             this.listenTo(this.model, 'change:row_class_name', this.onRowClassNameChanged);
