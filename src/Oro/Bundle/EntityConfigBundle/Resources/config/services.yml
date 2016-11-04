@@ -160,10 +160,3 @@ services:
         arguments:
             - '@oro_translation.manager.translation'
             - '@translator.default'
-
-    oro_entity_config.entity_avatar_provider:
-        class: Oro\Bundle\EntityConfigBundle\Provider\EntityAvatarProvider
-        arguments:
-            - '@oro_entity_config.provider.entity'
-        tags:
-            - { name: oro_entity.avatar_provider }

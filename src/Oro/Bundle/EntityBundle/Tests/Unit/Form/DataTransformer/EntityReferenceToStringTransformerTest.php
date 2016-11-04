@@ -2,13 +2,15 @@
 
 namespace Oro\Bundle\EntityBundle\Tests\Unit\Form\DataTransformer;
 
-use Oro\Bundle\EntityBundle\Form\DataTransformer\EntityToStringTransformer;
+use Oro\Bundle\EntityBundle\Form\DataTransformer\EntityReferenceToStringTransformer;
+
+// @todo: Remove dependencies on CRM bundles
 use Oro\Bundle\SalesBundle\Tests\Unit\Stub\Customer1;
 use Oro\Bundle\SalesBundle\Tests\Unit\Stub\Customer2;
 
-class EntityToStringTransformerTest extends \PHPUnit_Framework_TestCase
+class EntityReferenceToStringTransformerTest extends \PHPUnit_Framework_TestCase
 {
-    /** @var EntityToStringTransformer */
+    /** @var EntityReferenceToStringTransformer */
     protected $transformer;
 
     public function setUp()
@@ -35,7 +37,7 @@ class EntityToStringTransformerTest extends \PHPUnit_Framework_TestCase
                 return new $entityClass();
             }));
 
-        $this->transformer = new EntityToStringTransformer($doctrineHelper);
+        $this->transformer = new EntityReferenceToStringTransformer($doctrineHelper);
     }
 
     /**
