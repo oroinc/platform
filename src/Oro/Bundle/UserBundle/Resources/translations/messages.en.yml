@@ -197,8 +197,9 @@ oro:
             reset_password.label: Reset password
             change_password.label: Change password
             new_password.label: New password
-            enter_new_password.label: Enter new password
-            enter_new_password_again.label: Enter new password again
+            enter_new_password.label: New password
+            enter_new_password_again.label: Repeat password
+            password_mismatch: The password fields must match.
             reset.label: Reset
             already_used.message: The user has recently used this password. Please choose another.
             reset:
