@@ -226,16 +226,18 @@ class UserRepository extends EntityRepository implements EmailAwareRepository
     /**
      * Get array of enabled users with expired passwords
      *
+     * @param \DateTime $expireAt
+     *
      * @return array
      */
-    public function getExpiredPasswordUserIds()
+    public function getExpiredPasswordUserIds(\DateTime $expireAt)
     {
         $result = $this->createQueryBuilder('u')
             ->select('u.id')
             ->andWhere('u.passwordExpiresAt <= :expiresAt')
             ->andWhere('u.loginDisabled = :loginDisabled')
             ->andWhere('u.enabled = :enabled')
-            ->setParameter('expiresAt', new \DateTime('now', new \DateTimeZone('UTC')), Type::DATETIME)
+            ->setParameter('expiresAt', $expireAt, Type::DATETIME)
             ->setParameter('loginDisabled', false)
             ->setParameter('enabled', true)
             ->getQuery()

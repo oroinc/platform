@@ -78,7 +78,7 @@ class ExpireUserPasswordsProcessor implements MessageProcessorInterface, TopicSu
             return self::ACK;
         }
 
-        $users = $this->getUserRepository()->findUsersByIds($userIds);
+        $users = $this->getUserRepository()->findBy(['id' => $userIds, 'login_disabled' => false, 'enabled' => true]);
 
         foreach ($users as $user) {
             /** @var User $user */

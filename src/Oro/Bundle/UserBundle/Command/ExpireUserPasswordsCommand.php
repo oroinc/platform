@@ -14,8 +14,6 @@ use Oro\Bundle\UserBundle\Async\Topics;
 
 class ExpireUserPasswordsCommand extends ContainerAwareCommand implements CronCommandInterface
 {
-    const BATCH_SIZE = 100;
-
     /**
      * Run command every hour
      *
@@ -33,8 +31,19 @@ class ExpireUserPasswordsCommand extends ContainerAwareCommand implements CronCo
     {
         $this
             ->setName('oro:cron:expire-passwords')
-            ->setDescription('Queues batches to disable users with expired passwords and send them a notification')
-            ->addOption('batch-size', 'b', InputOption::VALUE_OPTIONAL, 'Batch size', self::BATCH_SIZE);
+            ->setDescription('Disable users with expired passwords and send them a notification')
+            ->setHelp(
+                'Command produces messages to MQ that disable all users with expired passwords.' .
+                ' By default will produce one message per user.' .
+                ' Set `--batch-size` to process multiple users per message.'
+            )
+            ->addOption(
+                'batch-size',
+                'b',
+                InputOption::VALUE_REQUIRED,
+                'Size of the batch of expired users per MQ message',
+                1
+            );
     }
 
     /**
@@ -52,7 +61,7 @@ class ExpireUserPasswordsCommand extends ContainerAwareCommand implements CronCo
             throw new \InvalidArgumentException(sprintf('Invalid batch-size option "%s"', $batchSize));
         }
 
-        $userIds = $repo->getExpiredPasswordUserIds();
+        $userIds = $repo->getExpiredPasswordUserIds(new \DateTime('now', new \DateTimeZone('UTC')));
         $batches = array_chunk($userIds, $batchSize, true);
 
         foreach ($batches as $batch) {
