@@ -119,6 +119,16 @@ class Product
         $this->updatedAt = $updatedAt;
     }
 
+    /**
+     * Emulate extended association setter
+     *
+     * @param User|null $target
+     */
+    public function setTarget($target)
+    {
+        $this->owner = $target;
+    }
+
 
     /**
      * @return string

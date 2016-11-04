@@ -196,7 +196,7 @@ services:
             - { name: oro.api.processor, action: add_relationship, group: save_data, priority: -10 }
 
     oro_api.add_relationship.save_relations:
-       class: Oro\Bundle\ApiBundle\Processor\Subresource\SaveRelations
+       class: Oro\Bundle\ApiBundle\Processor\Subresource\AddRelationship\SaveInverseRelations
        arguments:
            - '@oro_api.doctrine_helper'
            - '@property_accessor'
