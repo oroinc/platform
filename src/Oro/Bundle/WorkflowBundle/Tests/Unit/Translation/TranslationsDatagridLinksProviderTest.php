@@ -101,9 +101,17 @@ class TranslationsDatagridLinksProviderTest extends \PHPUnit_Framework_TestCase
                         'trans1' => [
                             'label' => 'trans_label1',
                             'message' => 'trans_message1',
+                            'form_options' => [
+                                'attribute_fields' => [
+                                    'attr1' => [
+                                        'options' => [
+                                            'label' => 'attr_label1'
+                                        ]
+                                    ]
+                                ]
+                            ]
                         ]
-                    ],
-                    WorkflowConfiguration::NODE_ATTRIBUTES => ['attr1' => ['label' => 'attr_label1']],
+                    ]
                 ],
                 'languagesAvailable' => true,
                 'expected' => [
@@ -115,7 +123,9 @@ class TranslationsDatagridLinksProviderTest extends \PHPUnit_Framework_TestCase
                             'message' => 'link_to_trans_message1'
                         ]
                     ],
-                    WorkflowConfiguration::NODE_ATTRIBUTES => ['attr1' => ['label' => 'link_to_attr_label1']],
+                    WorkflowConfiguration::NODE_ATTRIBUTES => ['attr1' => [
+                        'trans1' => ['label' => 'link_to_attr_label1']]
+                    ]
                 ],
             ],
             'full, languages not available' => [

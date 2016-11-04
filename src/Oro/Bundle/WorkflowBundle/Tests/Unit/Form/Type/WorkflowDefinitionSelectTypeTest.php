@@ -2,12 +2,15 @@
 
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Form\Type;
 
+use Symfony\Component\Form\ChoiceList\View\ChoiceView;
 use Symfony\Component\Form\FormInterface;
+use Symfony\Component\Form\FormView;
 use Symfony\Component\Form\PreloadedExtension;
 use Symfony\Component\Form\Test\FormIntegrationTestCase;
 use Symfony\Component\Translation\TranslatorInterface;
 
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
+use Oro\Bundle\WorkflowBundle\Helper\WorkflowTranslationHelper;
 use Oro\Bundle\WorkflowBundle\Form\Type\WorkflowDefinitionSelectType;
 use Oro\Bundle\WorkflowBundle\Model\Workflow;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowRegistry;
@@ -37,12 +40,11 @@ class WorkflowDefinitionSelectTypeTest extends FormIntegrationTestCase
     {
         parent::setUp();
 
-        $this->workflowRegistry = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Model\WorkflowRegistry')
+        $this->workflowRegistry = $this->getMockBuilder(WorkflowRegistry::class)
             ->disableOriginalConstructor()
             ->getMock();
 
         $this->translator = $this->getMock('Symfony\Component\Translation\TranslatorInterface');
-        $this->translator->expects($this->any())->method('trans')->willReturnArgument(0);
 
         $this->type = new WorkflowDefinitionSelectType($this->workflowRegistry, $this->translator);
     }
@@ -205,5 +207,23 @@ class WorkflowDefinitionSelectTypeTest extends FormIntegrationTestCase
         }
 
         return $this->definitions;
+    }
+
+    public function testFinishView()
+    {
+        $label = 'test_label';
+        $translatedLabel = 'translated_test_label';
+
+        $view = new FormView();
+        $view->vars['choices'] = [new ChoiceView([], 'test', $label)];
+
+        $this->translator->expects($this->once())
+            ->method('trans')
+            ->with($label, [], WorkflowTranslationHelper::TRANSLATION_DOMAIN)
+            ->willReturn($translatedLabel);
+
+        $this->type->finishView($view, $this->getMock(FormInterface::class), []);
+
+        $this->assertEquals([new ChoiceView([], 'test', $translatedLabel)], $view->vars['choices']);
     }
 }

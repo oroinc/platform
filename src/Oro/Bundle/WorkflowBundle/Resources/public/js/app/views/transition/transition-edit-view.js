@@ -203,7 +203,7 @@ define(function(require) {
                     'property_path': propertyPath,
                     'required': isRequired,
                     'label': label,
-                    'translateLinks': attribute.attributes.translateLinks
+                    'translateLinks': attribute.attributes.translateLinks[this.model.get('name')]
                 });
             }, this);
 

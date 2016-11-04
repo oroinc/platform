@@ -18,7 +18,7 @@ class DataNormalizerTest extends \PHPUnit_Framework_TestCase
     protected function setUp()
     {
         $this->fieldHelper = $this
-            ->getMockBuilder('Oro\Bundle\ImportExportBundle\Field\FieldHelper')
+            ->getMockBuilder('Oro\Bundle\EntityBundle\Helper\FieldHelper')
             ->disableOriginalConstructor()
             ->getMock();
 

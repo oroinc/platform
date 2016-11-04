@@ -22,9 +22,8 @@ trait TaggedServicesCompilerPassTrait
         if (!$container->hasDefinition($serviceId)) {
             return;
         }
-
         $taggedServiceIds = $container->findTaggedServiceIds($tagName);
-        if (!$taggedServiceIds) {
+        if (count($taggedServiceIds) === 0) {
             return;
         }
 
@@ -34,24 +33,24 @@ trait TaggedServicesCompilerPassTrait
             if (isset($attributes[0]['priority'])) {
                 $priority = $attributes[0]['priority'];
             }
-
             $alias = $id;
             if (isset($attributes[0]['alias'])) {
                 $alias = $attributes[0]['alias'];
             }
-
             $taggedServices[$priority][] = [new Reference($id), $alias];
         }
 
         // sort by priority ascending
         ksort($taggedServices);
+        $sortedServices = [];
+        foreach ($taggedServices as $services) {
+            $sortedServices = array_merge($sortedServices, $services);
+        }
 
         // register
         $service = $container->getDefinition($serviceId);
-        foreach ($taggedServices as $prioritedTaggedServices) {
-            foreach ($prioritedTaggedServices as $taggedService) {
-                $service->addMethodCall($addMethodName, $taggedService);
-            }
+        foreach ($sortedServices as $taggedService) {
+            $service->addMethodCall($addMethodName, $taggedService);
         }
     }
 }

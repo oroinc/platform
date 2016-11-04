@@ -15,6 +15,7 @@ use Oro\Bundle\TranslationBundle\Tests\Functional\DataFixtures\LoadLanguages;
 use Oro\Bundle\TranslationBundle\Tests\Functional\DataFixtures\LoadTranslations;
 use Oro\Bundle\TranslationBundle\Translation\KeySource\TranslationKeySource;
 use Oro\Bundle\TranslationBundle\Translation\TranslationKeyGenerator;
+use Oro\Bundle\TranslationBundle\Translation\Translator;
 
 use Oro\Bundle\WorkflowBundle\Helper\WorkflowTranslationHelper;
 use Oro\Bundle\WorkflowBundle\Translation\KeyTemplate\WorkflowTemplate;
@@ -33,7 +34,7 @@ class LoadWorkflowTranslations extends AbstractFixture implements DependentFixtu
 
     /** @var array */
     protected $workflowTranslations = [
-        Translation::DEFAULT_LOCALE => [
+        Translator::DEFAULT_LOCALE => [
             self::WORKFLOW1 => [
                 self::TRANSLATION1 => 'translation1-1.default',
             ],
@@ -65,7 +66,7 @@ class LoadWorkflowTranslations extends AbstractFixture implements DependentFixtu
 
     /** @var array */
     protected $translations = [
-        Translation::DEFAULT_LOCALE => [
+        Translator::DEFAULT_LOCALE => [
             self::TRANSLATION1 => 'translation1.default',
         ],
         LoadLanguages::LANGUAGE2 => [
@@ -89,8 +90,6 @@ class LoadWorkflowTranslations extends AbstractFixture implements DependentFixtu
      */
     public function load(ObjectManager $manager)
     {
-        // TODO: refactor that method
-
         $generator = new TranslationKeyGenerator();
 
         foreach ($this->workflowTranslations as $locale => $workflows) {
@@ -125,7 +124,7 @@ class LoadWorkflowTranslations extends AbstractFixture implements DependentFixtu
     {
         $translationManager = $this->getTranslationManager();
 
-        return $translationManager->saveValue(
+        return $translationManager->saveTranslation(
             $key,
             $value,
             $locale,

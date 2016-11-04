@@ -2,15 +2,16 @@
 
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Form\Type;
 
-use Oro\Bundle\WorkflowBundle\Helper\WorkflowTranslationHelper;
+use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\Form\PreloadedExtension;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
-use Oro\Bundle\WorkflowBundle\Model\Workflow;
+use Oro\Bundle\WorkflowBundle\Helper\WorkflowTranslationHelper;
 use Oro\Bundle\WorkflowBundle\Form\Type\WorkflowAttributesType;
 use Oro\Bundle\WorkflowBundle\Form\Type\WorkflowTransitionType;
+use Oro\Bundle\WorkflowBundle\Model\Workflow;
 use Oro\Bundle\WorkflowBundle\Validator\Constraints\TransitionIsAllowed;
 
 class WorkflowTransitionTypeTest extends AbstractWorkflowAttributesTypeTestCase
@@ -25,16 +26,19 @@ class WorkflowTransitionTypeTest extends AbstractWorkflowAttributesTypeTestCase
         $this->type = new WorkflowTransitionType();
     }
 
+    /**
+     * @return array
+     */
     protected function getExtensions()
     {
-        return array(
+        return [
             new PreloadedExtension(
-                array(
+                [
                     WorkflowAttributesType::NAME => $this->createWorkflowAttributesType(),
-                ),
-                array()
+                ],
+                []
             )
-        );
+        ];
     }
 
     public function testGetName()
@@ -105,18 +109,5 @@ class WorkflowTransitionTypeTest extends AbstractWorkflowAttributesTypeTestCase
             ],
             $result
         );
-    }
-
-    public function testFinishView()
-    {
-        $view = new FormView();
-        $view->children = [new FormView()];
-        $form = $this->getMock('Symfony\Component\Form\FormInterface');
-        $this->type->finishView($view, $form, []);
-
-        foreach ($view->children as $childView) {
-            $this->assertNotEmpty($childView->vars);
-            $this->assertEquals($childView->vars['translation_domain'], WorkflowTranslationHelper::TRANSLATION_DOMAIN);
-        }
     }
 }

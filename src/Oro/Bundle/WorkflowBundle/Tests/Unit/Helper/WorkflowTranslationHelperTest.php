@@ -40,6 +40,9 @@ class WorkflowTranslationHelperTest extends \PHPUnit_Framework_TestCase
         $this->helper = new WorkflowTranslationHelper($this->translator, $this->manager, $this->translationHelper);
     }
 
+    /**
+     * {@inheritdoc}
+     */
     protected function tearDown()
     {
         unset($this->translator, $this->manager, $this->helper, $this->translationHelper);
@@ -96,7 +99,7 @@ class WorkflowTranslationHelperTest extends \PHPUnit_Framework_TestCase
                     ],
                     [
                         WorkflowTemplate::KEY_PREFIX . '.' . $workflowName,
-                        Translation::DEFAULT_LOCALE,
+                        Translator::DEFAULT_LOCALE,
                         WorkflowTranslationHelper::TRANSLATION_DOMAIN,
                         ['key1' => 'value1', 'key2' => 'value2', $key => $fallbackValue]
                     ],
@@ -114,7 +117,7 @@ class WorkflowTranslationHelperTest extends \PHPUnit_Framework_TestCase
         $this->translator->expects($this->exactly(2))->method('getLocale')->willReturn('en');
         $this->manager
             ->expects($this->exactly(2))
-            ->method('saveValue')
+            ->method('saveTranslation')
             ->with('test_key', 'test_value', 'en', WorkflowTranslationHelper::TRANSLATION_DOMAIN);
         $this->helper->saveTranslation('test_key', 'test_value');
         $this->helper->saveTranslation('test_key', 'test_value');
@@ -125,14 +128,14 @@ class WorkflowTranslationHelperTest extends \PHPUnit_Framework_TestCase
         $this->translator->expects($this->once())->method('getLocale')->willReturn('pl');
 
         $this->manager->expects($this->at(0))
-            ->method('saveValue')
+            ->method('saveTranslation')
             ->with('test_key', 'test_value', 'pl', WorkflowTranslationHelper::TRANSLATION_DOMAIN);
         $this->manager->expects($this->at(1))
-            ->method('saveValue')
+            ->method('saveTranslation')
             ->with(
                 'test_key',
                 'test_value',
-                Translation::DEFAULT_LOCALE,
+                Translator::DEFAULT_LOCALE,
                 WorkflowTranslationHelper::TRANSLATION_DOMAIN
             );
 
@@ -171,7 +174,7 @@ class WorkflowTranslationHelperTest extends \PHPUnit_Framework_TestCase
                     ],
                     [
                         $key,
-                        Translation::DEFAULT_LOCALE,
+                        Translator::DEFAULT_LOCALE,
                         WorkflowTranslationHelper::TRANSLATION_DOMAIN,
                         $fallbackValue
                     ],
@@ -200,6 +203,13 @@ class WorkflowTranslationHelperTest extends \PHPUnit_Framework_TestCase
                 'value' => null
             ]
         ];
+    }
+
+    public function testFlushTranslations()
+    {
+        $this->manager->expects($this->once())->method('flush');
+
+        $this->helper->flushTranslations();
     }
 
     /**

@@ -60,6 +60,9 @@ define(function(require) {
             configuration.entity_attribute = options.entity.entity_attribute;
             configuration.start_step = options.entity.startStep;
             configuration.steps_display_ordered = options.entity.stepsDisplayOrdered;
+            configuration.priority = options.entity.priority;
+            configuration.exclusive_active_groups = options.entity.exclusive_active_groups;
+            configuration.exclusive_record_groups = options.entity.exclusive_record_groups;
 
             var workflowModel = new WorkflowModel(configuration);
             workflowModel.setSystemEntities(options.system_entities);

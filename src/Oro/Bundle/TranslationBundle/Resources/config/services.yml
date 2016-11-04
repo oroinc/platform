@@ -256,3 +256,5 @@ services:
         class: 'Oro\Bundle\TranslationBundle\Layout\DataProvider\TranslatorProvider'
         arguments:
             - '@translator'
+        tags:
+            - { name: layout.data_provider, alias: translator }
