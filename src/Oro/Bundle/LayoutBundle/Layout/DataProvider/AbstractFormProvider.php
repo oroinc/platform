@@ -4,6 +4,7 @@ namespace Oro\Bundle\LayoutBundle\Layout\DataProvider;
 
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormInterface;
+use Symfony\Component\Form\FormView;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 abstract class AbstractFormProvider
@@ -59,7 +60,7 @@ abstract class AbstractFormProvider
      * @param array  $options
      * @param array  $cacheKeyOptions
      *
-     * @return mixed
+     * @return FormView
      */
     protected function getFormView($formName, $data = null, array $options = [], array $cacheKeyOptions = [])
     {
