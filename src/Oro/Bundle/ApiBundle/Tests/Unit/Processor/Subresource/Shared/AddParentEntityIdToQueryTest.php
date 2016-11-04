@@ -401,14 +401,14 @@ class AddParentEntityIdToQueryTest extends GetSubresourceProcessorOrmRelatedTest
 
         $parentConfig = new EntityDefinitionConfig();
         $parentConfig->addField($associationName)
-            ->set('association-field', 'user');
+            ->set('association-field', 'owner');
 
         $query = $this->doctrineHelper
-            ->getEntityRepositoryForClass($this->getEntityClass('User'))
+            ->getEntityRepositoryForClass($this->getEntityClass('Product'))
             ->createQueryBuilder('e');
 
         $this->context->setIsCollection(true);
-        $this->context->setParentClassName($this->getEntityClass('Product'));
+        $this->context->setParentClassName($this->getEntityClass('User'));
         $this->context->setParentId($parentId);
         $this->context->setAssociationName($associationName);
         $this->context->setParentConfig($parentConfig);
@@ -417,9 +417,9 @@ class AddParentEntityIdToQueryTest extends GetSubresourceProcessorOrmRelatedTest
 
         $this->assertEquals(
             'SELECT e'
-            . ' FROM Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\User e'
-            . ' INNER JOIN Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Product parent_entity'
-            . ' WITH e.user = parent_entity'
+            . ' FROM Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Product e'
+            . ' INNER JOIN Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\User parent_entity'
+            . ' WITH e.owner = parent_entity'
             . ' WHERE parent_entity = :parent_entity_id',
             $this->context->getQuery()->getDQL()
         );
