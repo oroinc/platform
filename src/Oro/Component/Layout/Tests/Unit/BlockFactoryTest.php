@@ -65,7 +65,10 @@ class BlockFactoryTest extends LayoutTestCase
         $this->rawLayoutBuilder   = new RawLayoutBuilder();
         $this->layoutManipulator  = new DeferredLayoutManipulator($this->registry, $this->rawLayoutBuilder);
         $this->expressionLanguage = new ExpressionLanguage();
-        $expressionProcessor      = new ExpressionProcessor($this->expressionLanguage, new ExpressionEncoderRegistry([]));
+        $expressionProcessor      = new ExpressionProcessor(
+            $this->expressionLanguage,
+            new ExpressionEncoderRegistry([])
+        );
         $this->blockFactory       = new BlockFactory(
             $this->registry,
             $this->layoutManipulator,
