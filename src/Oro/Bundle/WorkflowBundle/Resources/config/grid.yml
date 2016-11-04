@@ -5,6 +5,7 @@ parameters:
 services:
     oro_workflow.datagrid.action_permission_provider:
         class: Oro\Bundle\WorkflowBundle\Datagrid\ActionPermissionProvider
+        arguments: ['@oro_featuretoggle.checker.feature_checker']
 
     oro_workflow.datagrid.abstract_entity_name_provider:
         class: %oro_workflow.datagrid.entity_name_provider.class%
