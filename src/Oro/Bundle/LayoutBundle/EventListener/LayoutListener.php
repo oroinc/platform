@@ -100,8 +100,8 @@ class LayoutListener
             $response = new Response($layout->render());
         } else {
             $this->configureContext($context, $layoutAnnotation);
-            $response = $this->getLayoutResponse($context, $layoutAnnotation, $request);
             $this->layoutContextHolder->setContext($context);
+            $response = $this->getLayoutResponse($context, $layoutAnnotation, $request);
         }
 
         $event->setResponse($response);
