@@ -8,6 +8,7 @@ use Doctrine\ORM\Event\LifecycleEventArgs;
 use Doctrine\ORM\Event\OnFlushEventArgs;
 use Doctrine\ORM\Event\PostFlushEventArgs;
 
+use Oro\Bundle\EmailBundle\Async\Topics;
 use Oro\Component\DependencyInjection\ServiceLink;
 use Oro\Bundle\EmailBundle\Entity\Email;
 use Oro\Bundle\EmailBundle\Entity\EmailUser;
@@ -15,6 +16,7 @@ use Oro\Bundle\EmailBundle\Entity\Manager\EmailActivityManager;
 use Oro\Bundle\EmailBundle\Entity\Manager\EmailOwnerManager;
 use Oro\Bundle\EmailBundle\Entity\Manager\EmailThreadManager;
 use Oro\Bundle\EmailBundle\Model\EmailActivityUpdates;
+use Oro\Component\MessageQueue\Client\MessageProducerInterface;
 
 class EntityListener
 {
@@ -42,22 +44,28 @@ class EntityListener
     /** @var EmailActivityUpdates */
     protected $emailActivityUpdates;
 
+    /** @var  MessageProducerInterface */
+    protected $producer;
+
     /**
      * @param EmailOwnerManager $emailOwnerManager
      * @param ServiceLink $emailActivityManagerLink
      * @param ServiceLink $emailThreadManagerLink
      * @param EmailActivityUpdates $emailActivityUpdates
+     * @param MessageProducerInterface $producer
      */
     public function __construct(
         EmailOwnerManager    $emailOwnerManager,
         ServiceLink          $emailActivityManagerLink,
         ServiceLink          $emailThreadManagerLink,
-        EmailActivityUpdates $emailActivityUpdates
+        EmailActivityUpdates $emailActivityUpdates,
+        MessageProducerInterface $producer
     ) {
         $this->emailOwnerManager        = $emailOwnerManager;
         $this->emailActivityManagerLink = $emailActivityManagerLink;
         $this->emailThreadManagerLink   = $emailThreadManagerLink;
         $this->emailActivityUpdates     = $emailActivityUpdates;
+        $this->producer = $producer;
     }
 
     /**
@@ -132,14 +140,23 @@ class EntityListener
      */
     protected function addAssociationWithEmailActivity(PostFlushEventArgs $event)
     {
-        $jobs = $this->emailActivityUpdates->createJobs();
-        if (!$jobs) {
+        $entities = $this->emailActivityUpdates->getFilteredOwnerEntitiesToUpdate();
+        if (! $entities) {
             return;
         }
+        
+        $entitiesIdsByClass = [];
+        foreach ($entities as $entity) {
+            $class = ClassUtils::getClass($entity);
+            $entitiesIdsByClass[$class][] = $entity->getId();
+        }
 
-        $em = $event->getEntityManager();
-        array_map([$em, 'persist'], $jobs);
-        $em->flush();
+        foreach ($entitiesIdsByClass as $class => $ids) {
+            $this->producer->send(Topics::UPDATE_EMAIL_OWNER_ASSOCIATIONS, [
+                'ownerClass' => $class,
+                'ownerIds' => $ids,
+            ]);
+        }
     }
 
     /**

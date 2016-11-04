@@ -1,20 +1,21 @@
 <?php
 
-namespace Oro\Bundle\EmailBundle\Tests\Unit\Datagrid;
+namespace Oro\Bundle\EmailBundle\Tests\Unit\Async\Manager;
 
 use Doctrine\ORM\Query;
 
-use Oro\Bundle\EmailBundle\Command\Manager\AssociationManager;
+use Oro\Bundle\EmailBundle\Async\Manager\AssociationManager;
 use Oro\Bundle\EmailBundle\Entity\Email;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EmailBundle\Entity\Manager\EmailActivityManager;
 use Oro\Bundle\EmailBundle\Provider\EmailOwnersProvider;
 use Oro\Bundle\EmailBundle\Entity\Manager\EmailManager;
+use Oro\Component\MessageQueue\Client\MessageProducerInterface;
 
 class AssociationManagerTest extends \PHPUnit_Framework_TestCase
 {
     /** @var AssociationManager */
-    private $ssociationManager;
+    private $associationManager;
 
     /** @var \PHPUnit_Framework_MockObject_MockObject|DoctrineHelper */
     private $doctrineHelper;
@@ -47,11 +48,14 @@ class AssociationManagerTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->ssociationManager = new AssociationManager(
+        $this->producer = $this->getMock(MessageProducerInterface::class);
+
+        $this->associationManager = new AssociationManager(
             $this->doctrineHelper,
             $this->emailActivityManager,
             $this->emailOwnersProvider,
-            $this->emailManager
+            $this->emailManager,
+            $this->producer
         );
     }
 
@@ -88,7 +92,7 @@ class AssociationManagerTest extends \PHPUnit_Framework_TestCase
 
         $this->doctrineHelper->expects(self::once())->method('getEntityManager')->willReturn($entityManager);
 
-        $countNewAssociations = $this->ssociationManager->processAddAssociation($ids, $targetClass, $targetId);
+        $countNewAssociations = $this->associationManager->processAddAssociation($ids, $targetClass, $targetId);
         self::assertEquals($expectedCountAssociation, $countNewAssociations);
     }
 

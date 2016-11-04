@@ -411,6 +411,20 @@ services:
         tags:
             - { name: kernel.event_listener, event: oro_menu.configure.application_menu, method: onNavigationConfigure }
 
+    oro_navigation.event_listener.navigation_items:
+        class: Oro\Bundle\NavigationBundle\EventListener\NavigationItemsListener
+        arguments:
+            - '@oro_featuretoggle.checker.feature_checker'
+        tags:
+            - { name: kernel.event_listener, event: oro_menu.configure.shortcuts, method: onNavigationConfigure }
+            - { name: kernel.event_listener, event: oro_menu.configure.application_menu, method: onNavigationConfigure }
+
+    oro_navigation.config_extension.feature:
+        class: Oro\Bundle\NavigationBundle\Configuration\FeatureConfigurationExtension
+        tags:
+            - { name: oro_feature.config_extension }
+
+
     oro_navigation.validator.max_nested_level:
         class: Oro\Bundle\NavigationBundle\Validator\Constraints\MaxNestedLevelValidator
         arguments:

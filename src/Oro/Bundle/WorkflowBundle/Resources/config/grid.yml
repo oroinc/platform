@@ -1,6 +1,7 @@
 services:
     oro_workflow.datagrid.action_permission_provider:
-        class: 'Oro\Bundle\WorkflowBundle\Datagrid\ActionPermissionProvider'
+        class: Oro\Bundle\WorkflowBundle\Datagrid\ActionPermissionProvider
+        arguments: ['@oro_featuretoggle.checker.feature_checker']
 
     oro_workflow.datagrid.abstract_entity_name_provider:
         class: 'Oro\Bundle\WorkflowBundle\Datagrid\GridEntityNameProvider'
@@ -35,12 +36,12 @@ services:
             - [addWorkflowStepColumn, ["workflowStepLabel"]]
             - [addWorkflowStepColumn, ["step"]]
             - [addWorkflowStepColumn, ["stepLabel"]]
-            
+
     oro_workflow.datagrid.listener.translation_workflow_column:
         class: 'Oro\Bundle\WorkflowBundle\Datagrid\Translation\WorkflowColumnListener'
         tags:
             - { name: kernel.event_listener, event: oro_datagrid.datagrid.build.before.oro-translation-translations-grid, method: onBuildBefore }
-            
+
     oro_workflow.datagrid.extension.restrictions:
         class: 'Oro\Bundle\WorkflowBundle\Datagrid\Extension\RestrictionsExtension'
         arguments:
