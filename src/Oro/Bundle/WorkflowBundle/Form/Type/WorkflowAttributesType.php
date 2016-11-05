@@ -14,6 +14,7 @@ use Symfony\Component\Translation\TranslatorInterface;
 use Oro\Bundle\ActionBundle\Model\Attribute;
 use Oro\Bundle\ActionBundle\Model\AttributeGuesser;
 use Oro\Bundle\SecurityBundle\Util\PropertyPathSecurityHelper;
+use Oro\Bundle\WorkflowBundle\Event\TransitionsAttributeEvent;
 use Oro\Bundle\WorkflowBundle\Form\EventListener\DefaultValuesListener;
 use Oro\Bundle\WorkflowBundle\Form\EventListener\FormInitListener;
 use Oro\Bundle\WorkflowBundle\Form\EventListener\RequiredAttributesListener;
@@ -21,7 +22,7 @@ use Oro\Bundle\WorkflowBundle\Helper\WorkflowTranslationHelper;
 use Oro\Bundle\WorkflowBundle\Model\Workflow;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowData;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowRegistry;
-use Oro\Bundle\WorkflowBundle\Event\TransitionsAttributeEvent;
+use Oro\Bundle\WorkflowBundle\Translation\KeyTemplate\WorkflowTemplate;
 
 use Oro\Component\Action\Model\ContextAccessor;
 
@@ -277,6 +278,8 @@ class WorkflowAttributesType extends AbstractType
         }
 
         // update form label
+        $domain = WorkflowTranslationHelper::TRANSLATION_DOMAIN;
+
         if (isset($attributeOptions['label'])) {
             $attributeOptions['options']['label'] = $attributeOptions['label'];
         } elseif (isset($attributeOptions['options']['label'])) {
@@ -284,14 +287,17 @@ class WorkflowAttributesType extends AbstractType
                 $attributeOptions['options']['label'] = array_shift($attributeOptions['options']['label']);
             }
 
-            $domain = WorkflowTranslationHelper::TRANSLATION_DOMAIN;
+
             $label = $attributeOptions['options']['label'];
             if ($this->translator->trans($label, [], $domain) === $label) {
                 $attributeOptions['options']['label'] = $attribute->getLabel();
             }
-            $attributeOptions['options']['translation_domain'] = $domain;
         } else {
             $attributeOptions['options']['label'] = $attribute->getLabel();
+        }
+
+        if (strpos($attributeOptions['options']['label'], WorkflowTemplate::KEY_PREFIX) === 0) {
+            $attributeOptions['options']['translation_domain'] = $domain;
         }
 
         // update required option
