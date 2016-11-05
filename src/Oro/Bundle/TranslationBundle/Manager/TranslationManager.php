@@ -103,6 +103,7 @@ class TranslationManager
 
         if (!$value && null !== $translation) {
             $cacheKey = $this->getCacheKey($locale, $domain, $key);
+            $translation->setValue($value);
             $this->translations[$cacheKey] = $translation;
 
             return null;
