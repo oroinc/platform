@@ -280,7 +280,7 @@ services:
     oro_layout.block_type.form_fields:
         parent: oro_layout.block_type.abstract_configurable
         calls:
-            - [setOptionsConfig, [{form: {required: true}, instance_name: ~, preferred_fields: ~}]]
+            - [setOptionsConfig, [{form: {required: true}, instance_name: ~}]]
             - [setName, ['form_fields']]
         tags:
              - { name: layout.block_type, alias: form_fields }

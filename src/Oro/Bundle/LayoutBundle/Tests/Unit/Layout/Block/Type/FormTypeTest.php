@@ -69,7 +69,6 @@ class FormTypeTest extends BlockTypeTestCase
         $formFields->setOptionsConfig([
             'form' => ['required' => true],
             'instance_name' => null,
-            'preferred_fields' => null,
         ]);
 
         $formEnd = new ConfigurableType();

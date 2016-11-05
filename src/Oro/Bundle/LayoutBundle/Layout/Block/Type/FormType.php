@@ -24,7 +24,6 @@ class FormType extends AbstractType
             'form_method',
             'form_multipart',
             'form_route_name',
-            'preferred_fields',
             'render_rest',
             'instance_name'
         ]);
@@ -52,7 +51,6 @@ class FormType extends AbstractType
             'form',
             'additional_block_prefixes',
             'instance_name',
-            'preferred_fields',
         ]);
 
         $this->addBlockType($builder, 'form_end', $options, [
