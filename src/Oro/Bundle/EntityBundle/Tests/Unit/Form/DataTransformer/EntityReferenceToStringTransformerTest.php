@@ -4,9 +4,7 @@ namespace Oro\Bundle\EntityBundle\Tests\Unit\Form\DataTransformer;
 
 use Oro\Bundle\EntityBundle\Form\DataTransformer\EntityReferenceToStringTransformer;
 
-// @todo: Remove dependencies on CRM bundles
-use Oro\Bundle\SalesBundle\Tests\Unit\Stub\Customer1;
-use Oro\Bundle\SalesBundle\Tests\Unit\Stub\Customer2;
+use Oro\Bundle\EntityBundle\Tests\Unit\Form\Stub\TestEntity;
 
 class EntityReferenceToStringTransformerTest extends \PHPUnit_Framework_TestCase
 {
@@ -21,12 +19,8 @@ class EntityReferenceToStringTransformerTest extends \PHPUnit_Framework_TestCase
         $doctrineHelper->expects($this->any())
             ->method('getSingleEntityIdentifier')
             ->will($this->returnCallback(function ($entity) {
-                if ($entity instanceof Customer1) {
+                if ($entity instanceof TestEntity) {
                     return 1;
-                }
-
-                if ($entity instanceof Customer2) {
-                    return 2;
                 }
 
                 return null;
@@ -56,20 +50,22 @@ class EntityReferenceToStringTransformerTest extends \PHPUnit_Framework_TestCase
                 null,
             ],
             [
-                new Customer1(),
+                new TestEntity(),
                 json_encode([
-                    'entityClass' => 'Oro\Bundle\SalesBundle\Tests\Unit\Stub\Customer1',
+                    'entityClass' => 'Oro\Bundle\EntityBundle\Tests\Unit\Form\Stub\TestEntity',
                     'entityId'    => 1,
                 ]),
             ],
-            [
-                new Customer2(),
-                json_encode([
-                    'entityClass' => 'Oro\Bundle\SalesBundle\Tests\Unit\Stub\Customer2',
-                    'entityId'    => 2,
-                ]),
-            ],
         ];
+    }
+
+    /**
+     * @expectedException \Symfony\Component\Form\Exception\UnexpectedTypeException
+     * @expectedExceptionMessage Expected argument of type "object", "integer" given
+     */
+    public function testTransformWhenInvalidValueType()
+    {
+        $this->transformer->transform(123);
     }
 
     /**
@@ -89,18 +85,46 @@ class EntityReferenceToStringTransformerTest extends \PHPUnit_Framework_TestCase
             ],
             [
                 json_encode([
-                    'entityClass' => 'Oro\Bundle\SalesBundle\Tests\Unit\Stub\Customer1',
+                    'entityClass' => 'Oro\Bundle\EntityBundle\Tests\Unit\Form\Stub\TestEntity',
                     'entityId'    => 1,
                 ]),
-                new Customer1(),
-            ],
-            [
-                json_encode([
-                    'entityClass' => 'Oro\Bundle\SalesBundle\Tests\Unit\Stub\Customer2',
-                    'entityId'    => 2,
-                ]),
-                new Customer2(),
+                new TestEntity(),
             ],
         ];
+    }
+
+    /**
+     * @expectedException \Symfony\Component\Form\Exception\TransformationFailedException
+     * @expectedExceptionMessage Expected a string.
+     */
+    public function testReverseTransformWithInvalidValueType()
+    {
+        $this->transformer->reverseTransform(123);
+    }
+
+    /**
+     * @expectedException \Symfony\Component\Form\Exception\TransformationFailedException
+     * @expectedExceptionMessage Expected an array with "entityClass" element after decoding a string.
+     */
+    public function testReverseTransformWithMissingEntityClass()
+    {
+        $this->transformer->reverseTransform(
+            json_encode([
+                'entityId' => 1
+            ])
+        );
+    }
+
+    /**
+     * @expectedException \Symfony\Component\Form\Exception\TransformationFailedException
+     * @expectedExceptionMessage Expected an array with "entityId" element after decoding a string.
+     */
+    public function testReverseTransformWithMissingEntityId()
+    {
+        $this->transformer->reverseTransform(
+            json_encode([
+                'entityClass' => 'Oro\Bundle\EntityBundle\Tests\Unit\Form\Stub\TestEntity',
+            ])
+        );
     }
 }
