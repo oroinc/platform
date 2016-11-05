@@ -22,6 +22,69 @@ class IncludedEntityCollectionTest extends \PHPUnit_Framework_TestCase
         $this->collection = new IncludedEntityCollection();
     }
 
+    public function testShouldSetPrimaryEntityId()
+    {
+        $this->collection->setPrimaryEntityId('Test\Class', '123');
+        self::assertAttributeSame(['Test\Class', '123', null], 'primaryEntity', $this->collection);
+    }
+
+    public function testShouldIsPrimaryEntityReturnFalseIfPrimaryEntityIdIsNotSet()
+    {
+        self::assertFalse($this->collection->isPrimaryEntity('Test\Class', '123'));
+    }
+
+    public function testShouldIsPrimaryEntityReturnFalseIfPrimaryEntityIdIsNull()
+    {
+        $this->collection->setPrimaryEntityId('Test\Class', null);
+        self::assertFalse($this->collection->isPrimaryEntity('Test\Class', null));
+        self::assertFalse($this->collection->isPrimaryEntity('Test\Class', '123'));
+    }
+
+    public function testShouldIsPrimaryEntityReturnTrueIfPrimaryEntityIdIsNotNull()
+    {
+        $this->collection->setPrimaryEntityId('Test\Class', '123');
+        self::assertTrue($this->collection->isPrimaryEntity('Test\Class', '123'));
+    }
+
+    public function testShouldIsPrimaryEntityReturnFalseIfPrimaryEntityClassIsNotEqualToGivenClass()
+    {
+        $this->collection->setPrimaryEntityId('Test\Class', '123');
+        self::assertFalse($this->collection->isPrimaryEntity('Test\Class1', '123'));
+    }
+
+    public function testShouldIsPrimaryEntityReturnFalseIfPrimaryEntityIdIsNotEqualToGivenId()
+    {
+        $this->collection->setPrimaryEntityId('Test\Class', '123');
+        self::assertFalse($this->collection->isPrimaryEntity('Test\Class', '456'));
+    }
+
+    /**
+     * @expectedException \LogicException
+     * @expectedExceptionMessage The primary entity identifier must be set before.
+     */
+    public function testShouldSetPrimaryEntityThrowExceptionIfPrimaryEntityIdIsNotSetYet()
+    {
+        $this->collection->setPrimaryEntity(new \stdClass());
+    }
+
+    public function testShouldSetPrimaryEntity()
+    {
+        $entityClass = 'Test\Class';
+        $entityId = '123';
+        $entity = new \stdClass();
+        $this->collection->setPrimaryEntityId($entityClass, $entityId);
+        $this->collection->setPrimaryEntity($entity);
+        self::assertAttributeSame([$entityClass, $entityId, $entity], 'primaryEntity', $this->collection);
+    }
+
+    public function testShouldBePossibleToGetAlreadySetPrimaryEntity()
+    {
+        $entity = new \stdClass();
+        $this->collection->setPrimaryEntityId('Test\Class', '123');
+        $this->collection->setPrimaryEntity($entity);
+        self::assertSame($entity, $this->collection->getPrimaryEntity());
+    }
+
     public function testShouldAddEntity()
     {
         $this->collection->add(new \stdClass(), 'Test\Class', 'testId', $this->entityData);

@@ -1,11 +1,10 @@
 <?php
 
-namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\Shared\Form;
+namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\Update;
 
-use Oro\Bundle\ApiBundle\Collection\IncludedEntityCollection;
-use Oro\Bundle\ApiBundle\Collection\IncludedEntityData;
 use Oro\Bundle\ApiBundle\Model\Error;
-use Oro\Bundle\ApiBundle\Processor\Shared\Form\NormalizeEntityId;
+use Oro\Bundle\ApiBundle\Processor\Update\NormalizeEntityId;
+use Oro\Bundle\ApiBundle\Processor\Update\UpdateContext;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\FormProcessorTestCase;
 
 class NormalizeEntityIdTest extends FormProcessorTestCase
@@ -25,25 +24,18 @@ class NormalizeEntityIdTest extends FormProcessorTestCase
         $this->processor = new NormalizeEntityId($this->entityIdTransformer);
     }
 
+    /**
+     * {@inheritdoc}
+     */
+    protected function createContext()
+    {
+        return new UpdateContext($this->configProvider, $this->metadataProvider);
+    }
+
     public function testProcessWhenIdAlreadyNormalized()
     {
         $this->context->setClassName('Test\Class');
         $this->context->setId(123);
-
-        $this->entityIdTransformer->expects($this->never())
-            ->method('reverseTransform');
-
-        $this->processor->process($this->context);
-    }
-
-    public function testProcessWhenIdBelongsToIncludedEntity()
-    {
-        $includedEntities = new IncludedEntityCollection();
-        $includedEntities->add(new \stdClass(), 'Test\Class', '123', new IncludedEntityData('/included/0', 0));
-
-        $this->context->setIncludedEntities($includedEntities);
-        $this->context->setClassName('Test\Class');
-        $this->context->setId('123');
 
         $this->entityIdTransformer->expects($this->never())
             ->method('reverseTransform');

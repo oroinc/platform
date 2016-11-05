@@ -323,4 +323,80 @@ class RestJsonApiCreateWithIncludedTest extends RestJsonApiTestCase
         self::assertNotEmpty($result['included'][1]['meta']);
         self::assertSame('BU2', $result['included'][1]['meta']['includeId']);
     }
+
+    public function testCreateIncludedEntityWithInversedDependency()
+    {
+        $org = $this->getOrganization();
+        $bu = $this->getBusinessUnit();
+
+        $entityType = $this->getEntityType(User::class);
+        $orgEntityType = $this->getEntityType(Organization::class);
+        $buEntityType = $this->getEntityType(BusinessUnit::class);
+
+        $data = [
+            'data'     => [
+                'type'          => $entityType,
+                'id'            => 'PRIMARY_USER_OBJECT',
+                'attributes'    => [
+                    'username'  => 'test_user_3',
+                    'password'  => 'TestUser#12345',
+                    'firstName' => 'Test First Name',
+                    'lastName'  => 'Test Last Name',
+                    'email'     => 'test_user_3@example.com',
+                ],
+                'relationships' => [
+                    'organization' => [
+                        'data' => ['type' => $orgEntityType, 'id' => (string)$org->getId()]
+                    ],
+                    'owner'        => [
+                        'data' => ['type' => $buEntityType, 'id' => (string)$bu->getId()]
+                    ]
+                ]
+            ],
+            'included' => [
+                [
+                    'type'          => $buEntityType,
+                    'id'            => 'BU1',
+                    'attributes'    => [
+                        'name' => 'Business Unit 1'
+                    ],
+                    'relationships' => [
+                        'organization' => [
+                            'data' => ['type' => $orgEntityType, 'id' => (string)$org->getId()]
+                        ],
+                        'owner'        => [
+                            'data' => ['type' => $buEntityType, 'id' => (string)$bu->getId()]
+                        ],
+                        'users'        => [
+                            'data' => [
+                                ['type' => $entityType, 'id' => 'PRIMARY_USER_OBJECT']
+                            ]
+                        ]
+                    ]
+                ],
+            ]
+        ];
+
+        $response = $this->request(
+            'POST',
+            $this->getUrl('oro_rest_api_post', ['entity' => $entityType]),
+            $data
+        );
+
+        self::assertResponseStatusCodeEquals($response, 201);
+        self::assertResponseContentTypeEquals($response, 'application/vnd.api+json');
+
+        $result = self::jsonToArray($response->getContent());
+
+        $userId = $result['data']['id'];
+        self::assertEquals('test_user_3', $result['data']['attributes']['username']);
+        self::assertCount(1, $result['included']);
+        self::assertEquals($buEntityType, $result['included'][0]['type']);
+        self::assertEquals('Business Unit 1', $result['included'][0]['attributes']['name']);
+        self::assertNotEmpty($result['included'][0]['meta']);
+        self::assertSame('BU1', $result['included'][0]['meta']['includeId']);
+        self::assertCount(1, $result['included'][0]['relationships']['users']['data']);
+        self::assertSame($entityType, $result['included'][0]['relationships']['users']['data'][0]['type']);
+        self::assertSame($userId, $result['included'][0]['relationships']['users']['data'][0]['id']);
+    }
 }

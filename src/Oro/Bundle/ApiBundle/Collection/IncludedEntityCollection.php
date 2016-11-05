@@ -10,9 +10,64 @@ class IncludedEntityCollection implements \Countable, \IteratorAggregate
     /** @var array [key => [entity class, entity id], ...] */
     private $keys = [];
 
+    /** @var array|null [entity class, entity id, entity] */
+    private $primaryEntity;
+
     public function __construct()
     {
         $this->collection = new KeyObjectCollection();
+    }
+
+    /**
+     * Sets the primary entity identifier.
+     *
+     * @param string $entityClass
+     * @param mixed  $entityId
+     */
+    public function setPrimaryEntityId($entityClass, $entityId)
+    {
+        $this->primaryEntity = [$entityClass, $entityId, null];
+    }
+
+    /**
+     * Checks whether the given class and id represents the primary entity.
+     *
+     * @param string $entityClass
+     * @param mixed  $entityId
+     *
+     * @return bool
+     */
+    public function isPrimaryEntity($entityClass, $entityId)
+    {
+        return
+            null !== $this->primaryEntity
+            && null !== $this->primaryEntity[1]
+            && $entityClass === $this->primaryEntity[0]
+            && $entityId === $this->primaryEntity[1];
+    }
+
+    /**
+     * Sets the primary entity.
+     *
+     * @param object $entity
+     */
+    public function setPrimaryEntity($entity)
+    {
+        if (null === $this->primaryEntity) {
+            throw new \LogicException('The primary entity identifier must be set before.');
+        }
+
+        $this->primaryEntity[2] = $entity;
+    }
+
+    /**
+     * Gets the primary entity.
+     */
+    public function getPrimaryEntity()
+    {
+        return null !== $this->primaryEntity
+            ? $this->primaryEntity[2]
+            : null;
     }
 
     /**

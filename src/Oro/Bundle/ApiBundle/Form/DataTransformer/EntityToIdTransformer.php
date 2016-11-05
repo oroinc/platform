@@ -128,6 +128,10 @@ class EntityToIdTransformer implements DataTransformerInterface
             return null;
         }
 
+        if ($this->includedEntities->isPrimaryEntity($entityClass, $entityId)) {
+            return $this->includedEntities->getPrimaryEntity();
+        }
+
         return $this->includedEntities->get($entityClass, $entityId);
     }
 

@@ -124,6 +124,23 @@ class EntityToIdTransformerTest extends OrmRelatedTestCase
         $this->assertEquals($entity, $transformer->reverseTransform($value));
     }
 
+    public function testReverseTransformWhenEntityIsPrimaryEntity()
+    {
+        $metadata = $this->getAssociationMetadata([Group::class]);
+        $includedEntities = new IncludedEntityCollection();
+        $transformer = new EntityToIdTransformer($this->doctrine, $metadata, $includedEntities);
+
+        $value = ['class' => Group::class, 'id' => 123];
+        $entity = new Group();
+        $entity->setId($value['id']);
+        $entity->setName('test');
+
+        $includedEntities->setPrimaryEntityId($value['class'], $value['id']);
+        $includedEntities->setPrimaryEntity($entity);
+
+        $this->assertEquals($entity, $transformer->reverseTransform($value));
+    }
+
     // @codingStandardsIgnoreStart
     /**
      * @expectedException \Symfony\Component\Form\Exception\TransformationFailedException

@@ -69,7 +69,7 @@ services:
             - '@oro_api.value_normalizer'
             - '@oro_api.rest.entity_id_transformer'
         tags:
-            - { name: oro.api.processor, action: update, group: normalize_input, requestType: json_api, priority: -30 }
+            - { name: oro.api.processor, action: update, group: normalize_input, requestType: json_api, priority: -45 }
 
     oro_api.update.rest.normalize_request_data:
         class: Oro\Bundle\ApiBundle\Processor\Shared\Rest\NormalizeRequestData
@@ -92,7 +92,7 @@ services:
             - { name: oro.api.processor, action: update, group: normalize_input, priority: -100 }
 
     oro_api.update.rest.normalize_entity_id:
-        class: Oro\Bundle\ApiBundle\Processor\Shared\Form\NormalizeEntityId
+        class: Oro\Bundle\ApiBundle\Processor\Update\NormalizeEntityId
         arguments:
             - '@oro_api.rest.entity_id_transformer'
         tags:
@@ -169,6 +169,11 @@ services:
         class: Oro\Bundle\ApiBundle\Processor\Shared\LoadEntityByOrmQuery
         tags:
             - { name: oro.api.processor, action: update, group: load_data, priority: -10 }
+
+    oro_api.create.set_primary_entity:
+        class: Oro\Bundle\ApiBundle\Processor\Shared\SetPrimaryEntity
+        tags:
+            - { name: oro.api.processor, action: create, group: load_data, priority: -50 }
 
     #
     # transform_data

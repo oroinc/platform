@@ -155,7 +155,7 @@ class NormalizeIncludedDataTest extends FormProcessorTestCase
 
         $this->context->setRequestData($requestData);
         $this->processor->process($this->context);
-        $this->assertEquals([], $this->context->getIncludedData());
+        $this->assertNull($this->context->getIncludedData());
         $this->assertNull($this->context->getIncludedEntities());
     }
 
@@ -180,6 +180,8 @@ class NormalizeIncludedDataTest extends FormProcessorTestCase
             ->with($normalizedType)
             ->willReturn($includedEntity);
 
+        $this->context->setClassName('Test\PrimaryClass');
+        $this->context->setId('primaryId');
         $this->context->setRequestData($requestData);
         $this->processor->process($this->context);
         $this->assertEquals(
@@ -192,6 +194,11 @@ class NormalizeIncludedDataTest extends FormProcessorTestCase
         $this->assertSame(
             $includedEntity,
             $this->context->getIncludedEntities()->get($normalizedType, 'testId')
+        );
+        $this->assertAttributeSame(
+            ['Test\PrimaryClass', 'primaryId', null],
+            'primaryEntity',
+            $this->context->getIncludedEntities()
         );
     }
 

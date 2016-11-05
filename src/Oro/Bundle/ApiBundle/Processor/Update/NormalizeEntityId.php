@@ -1,12 +1,10 @@
 <?php
 
-namespace Oro\Bundle\ApiBundle\Processor\Shared\Form;
+namespace Oro\Bundle\ApiBundle\Processor\Update;
 
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
 use Oro\Bundle\ApiBundle\Model\Error;
-use Oro\Bundle\ApiBundle\Processor\FormContext;
-use Oro\Bundle\ApiBundle\Processor\SingleItemContext;
 use Oro\Bundle\ApiBundle\Request\Constraint;
 use Oro\Bundle\ApiBundle\Request\EntityIdTransformerInterface;
 
@@ -32,17 +30,11 @@ class NormalizeEntityId implements ProcessorInterface
      */
     public function process(ContextInterface $context)
     {
-        /** @var FormContext|SingleItemContext $context */
+        /** @var UpdateContext $context */
 
         $entityId = $context->getId();
         if (!is_string($entityId)) {
             // an entity identifier does not exist or it is already normalized
-            return;
-        }
-
-        $includedEntities = $context->getIncludedEntities();
-        if (null !== $includedEntities && null !== $includedEntities->get($context->getClassName(), $entityId)) {
-            // keep the id of an included entity as is
             return;
         }
 

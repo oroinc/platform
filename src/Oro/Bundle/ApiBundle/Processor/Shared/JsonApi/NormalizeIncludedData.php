@@ -10,6 +10,7 @@ use Oro\Bundle\ApiBundle\Exception\RuntimeException;
 use Oro\Bundle\ApiBundle\Model\Error;
 use Oro\Bundle\ApiBundle\Model\ErrorSource;
 use Oro\Bundle\ApiBundle\Processor\FormContext;
+use Oro\Bundle\ApiBundle\Processor\SingleItemContext;
 use Oro\Bundle\ApiBundle\Request\Constraint;
 use Oro\Bundle\ApiBundle\Request\EntityIdTransformerInterface;
 use Oro\Bundle\ApiBundle\Request\JsonApi\JsonApiDocumentBuilder as JsonApiDoc;
@@ -63,12 +64,15 @@ class NormalizeIncludedData implements ProcessorInterface
      */
     public function process(ContextInterface $context)
     {
-        /** @var FormContext $context */
+        /** @var FormContext|SingleItemContext $context */
 
         $includedData = $context->getIncludedData();
         if (null === $includedData) {
-            $includedData = $this->normalizeIncludedData($context->getRequestData());
-            $context->setIncludedData($includedData);
+            $normalizeIncludedData = $this->normalizeIncludedData($context->getRequestData());
+            if (!empty($normalizeIncludedData)) {
+                $includedData = $normalizeIncludedData;
+                $context->setIncludedData($includedData);
+            }
         }
 
         if (empty($includedData) || null !== $context->getIncludedEntities()) {
@@ -80,6 +84,7 @@ class NormalizeIncludedData implements ProcessorInterface
         try {
             $includedEntities = $this->loadIncludedEntities($includedData);
             if (null !== $includedEntities) {
+                $includedEntities->setPrimaryEntityId($context->getClassName(), $context->getId());
                 $context->setIncludedEntities($includedEntities);
             }
         } finally {
