@@ -131,6 +131,7 @@ class FormFieldTypeTest extends TypeTestCase
                 'resettable' => $resettable,
                 'target_field_type' => 'array',
                 'target_field_options' => [],
+                'use_parent_field_options' => [],
             ]
         );
     }

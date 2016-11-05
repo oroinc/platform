@@ -1,10 +1,14 @@
+{% set email_clank_event = oro_get_email_clank_event()|json_encode %}
 require({
     config: {
         'oroemail/js/app/components/new-email-message-component': {
-            clankEvent: {{ oro_get_email_clank_event()|json_encode|raw }}
+            clankEvent: {{ email_clank_event|raw }}
         },
         'oroemail/js/app/components/sidebar-recent-emails-component': {
-            clankEvent: {{ oro_get_email_clank_event()|json_encode|raw }}
+            clankEvent: {{ email_clank_event|raw }}
+        },
+        'oroemail/js/app/unread-emails-state-holder': {
+            clankEvent: {{ email_clank_event|raw }}
         },
         'oroemail/js/util/unread-email-count-cache': {
             unreadEmailsCount: {{ oro_get_unread_emails_count()|json_encode|raw }}
