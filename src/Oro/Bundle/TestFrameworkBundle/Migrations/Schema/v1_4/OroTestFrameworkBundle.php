@@ -40,7 +40,7 @@ class OroTestFrameworkBundle implements Migration, ActivityExtensionAwareInterfa
      */
     public static function addTestActivityToCalendarEvent(Schema $schema, ActivityExtension $activityExtension)
     {
-        if ($schema->hasTable(self::TEST_ACTIVITY_TABLE)) {
+        if ($schema->hasTable(self::CALENDAR_EVENT_TABLE)) {
             $activityTableName = $activityExtension->getAssociationTableName(
                 self::CALENDAR_EVENT_TABLE,
                 self::TEST_ACTIVITY_TABLE
