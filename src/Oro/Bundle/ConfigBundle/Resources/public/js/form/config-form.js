@@ -15,7 +15,12 @@ define([
     /**
      * @extends Backbone.View
      */
-    return Backbone.View.extend({
+    var ConfigForm = Backbone.View.extend({
+
+        /**
+         * @param {Object} Where key is input name and value is changed value
+         */
+        changedValues: {},
 
         defaults: {
             pageReload: false,
@@ -34,6 +39,37 @@ define([
             this.options = _.defaults(options || {}, this.defaults, this.options);
             mediator.trigger('config-form:init', this.options);
             formDefault();
+            if (!this.options.pageReload) {
+                this.$el.on(
+                    'change',
+                    'input[data-needs-page-reload]',
+                    _.bind(this._onNeedsReloadChange, this)
+                );
+            }
+            window.view = this;
+        },
+
+        dispose: function() {
+            if (this.disposed) {
+                return;
+            }
+
+            this.$el.off('change', 'input[data-needs-page-reload]');
+
+            ConfigForm.__super__.dispose.apply(this, arguments);
+        },
+
+        _onNeedsReloadChange: function(e) {
+            var $input = $(e.target);
+            var name = $input.attr('name');
+
+            if (this.changedValues.hasOwnProperty(name)) {
+                delete this.changedValues[name];
+            } else {
+                this.changedValues[name] = $input.val();
+            }
+
+            this.options.pageReload = !_.isEmpty(this.changedValues);
         },
 
         /**
@@ -98,4 +134,6 @@ define([
             }
         }
     });
+
+    return ConfigForm;
 });

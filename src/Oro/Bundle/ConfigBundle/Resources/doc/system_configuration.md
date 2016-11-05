@@ -30,6 +30,7 @@ system_configuration:
             priority: 30                  # sort order
             description: some description # add description on the next line after group header
             tooltip: some tooltip         # add tooltip on the same line after group header
+            page_reload: false            # if true, page will be reloaded after save if something changed in the group
 ```
 
 Groups definitions will be replaced recursive from configs that will parse after original definition.
@@ -156,6 +157,7 @@ system_configuration:
                # also here can be added field tooltips
             acl_resource: 'acl_resource_name'
             priority: 20
+            page_reload: false # if true, page will be reloaded after save if field changed
 ```
 
 #### Tree

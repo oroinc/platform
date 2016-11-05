@@ -1,0 +1,174 @@
+{% extends 'OroUIBundle:actions:update.html.twig' %}
+{% form_theme form with ['OroFormBundle:Form:fields.html.twig'] %}
+{% set formAction = app.request.uri %}
+{% set entityId = entity.id %}
+
+{% if entity.key %}
+    {% set breadcrumbs = breadcrumbs|merge({'entityTitle': entity.isDivider ? 'oro.navigation.menuupdate.divider'|trans : entity.title|trans()}) %}
+{% else %}
+    {% set breadcrumbs = breadcrumbs|merge({'entityTitle': 'oro.ui.create_entity'|trans({'%entityName%': 'oro.navigation.menuupdate.entity_label'|trans})}) %}
+{% endif %}
+
+{% block navButtons %}
+    {% if entity.isDivider == false %}
+        {% set html = UI.saveAndStayButton({
+            'route': menuUpdateRoute,
+            'params': {menuName: entity.menu, key: '$key', id: ownerId}
+        }) %}
+
+        {% set html = html ~ UI.saveAndNewButton({
+            'route': menuCreateRoute,
+            'params': {menuName: entity.menu, parentKey: entity.key, id: ownerId}
+        }) %}
+
+        {{ UI.dropdownSaveButton({'html': html}) }}
+    {% endif %}
+
+    {% if not entity.isCustom or entity.id is not null %}
+        {% if entity.key %}
+            {% if entity.isCustom and entity.id is not null %}
+                {#Delete button #}
+                {{ UI.deleteButton({
+                    'label': 'oro.navigation.menuupdate.delete'|trans(),
+                    'dataUrl': path('oro_navigation_menuupdate_delete', {ownershipType: ownershipType, menuName: menuName, key: app.request.get('key')}),
+                    'dataRedirect': path(menuViewRoute, {menuName: entity.menu, id: ownerId}),
+                    'aCss': 'no-hash remove-button',
+                    'id': 'btn-remove-attribute',
+                    'entity_label': 'oro.navigation.menuupdate.entity_label'|trans,
+                }) }}
+            {% else %}
+                {% if menuItem.displayed %}
+                    {# Hide button #}
+                    <div class="pull-right btn-group icons-holder">
+                        {{ UI.ajaxButton({
+                            'aCss':  'no-hash',
+                            'iCss':  'icon-eye-close',
+                            'label': 'oro.navigation.menuupdate.hide'|trans,
+                            'title': 'oro.navigation.menuupdate.hide'|trans,
+                            'dataId': entity.id,
+                            'dataMethod': 'PUT',
+                            'dataUrl': path('oro_navigation_menuupdate_hide', {ownershipType: ownershipType, menuName: menuName, key: app.request.get('key')}),
+                            'dataRedirect': app.request.uri,
+                            'successMessage': 'oro.navigation.menuupdate.hide_success_message'
+                        }) }}
+                    </div>
+                {% else %}
+                    {# Show button #}
+                    <div class="pull-right btn-group icons-holder">
+                        {{ UI.ajaxButton({
+                            'aCss':  'no-hash',
+                            'iCss':  'icon-eye-open',
+                            'label': 'oro.navigation.menuupdate.show'|trans,
+                            'title': 'oro.navigation.menuupdate.show'|trans,
+                            'dataId': entity.id,
+                            'dataMethod': 'PUT',
+                            'dataUrl': path('oro_navigation_menuupdate_show', {ownershipType: ownershipType, menuName: menuName, key: app.request.get('key')}),
+                            'dataRedirect': app.request.uri,
+                            'successMessage': 'oro.navigation.menuupdate.show_success_message'
+                        }) }}
+                    </div>
+                {% endif %}
+            {% endif %}
+        {% endif %}
+        {% if entity.isDivider == false %}
+            {# Create Menu Item button #}
+            {% set html = UI.button({
+                'path' : path(menuCreateRoute, {menuName: entity.menu, parentKey: entity.key, id: ownerId}),
+                'aCss': 'btn-primary',
+                'label': 'oro.ui.create_entity'|trans({'%entityName%': 'oro.navigation.menuupdate.entity_label'|trans}),
+                'title': 'oro.ui.create_entity'|trans({'%entityName%': 'oro.navigation.menuupdate.entity_label'|trans})
+            }) %}
+            {# Create Divider button #}
+            {% set html = html ~ UI.ajaxButton({
+                'aCss': 'btn-primary no-hash menu-divider-create-button',
+                'label': 'oro.ui.create_entity'|trans({'%entityName%': 'oro.navigation.menuupdate.divider'|trans}),
+                'title': 'oro.ui.create_entity'|trans({'%entityName%': 'oro.navigation.menuupdate.divider'|trans}),
+                'dataMethod': 'POST',
+                'dataUrl': path('oro_navigation_menuupdate_create', {ownershipType: ownershipType, ownerId: ownerId, menuName: menuName, parentKey: app.request.get('key'), 'isDivider': true}),
+                'dataRedirect': app.request.uri,
+                'successMessage': 'oro.navigation.menuupdate.divider_created'
+            }) %}
+
+            {% set parameters = {
+                'html': html,
+                'groupKey': 'createButtons',
+                'options': {
+                    'moreButtonAttrs': {
+                        'class': 'btn-primary'
+                    }
+                }
+            } %}
+
+            {{ UI.pinnedDropdownButton(parameters) }}
+
+            {{ UI.buttonSeparator() }}
+        {% endif %}
+    {% endif %}
+{% endblock navButtons %}
+
+{% block content_data %}
+    {% set id = 'menu-update-form' %}
+
+    {% set dataBlocks = [] %}
+    {% if entity.isDivider == false %}
+        {% set dataBlocks = dataBlocks|merge([{
+            'title': 'General Information'|trans,
+            'class': 'active',
+            'subblocks': [
+                {
+                    'title': '',
+                    'data': [
+                        form_row(form.titles),
+                        form.uri is defined ? form_row(form.uri) : null,
+                        form.aclResourceId is defined ? form_row(form.aclResourceId) : null,
+                        form_row(form.icon),
+                        form_row(form.descriptions)
+                    ]
+                }
+            ]
+        }]) %}
+    {% endif %}
+
+    {% set additionalData = [] %}
+    {% for child in form.children if child.vars.extra_field is defined and child.vars.extra_field %}
+        {% set additionalData = additionalData|merge([form_row(child)]) %}
+    {% endfor %}
+    {% if additionalData is not empty %}
+        {% set dataBlocks = dataBlocks|merge([{
+            'title': 'Additional'|trans,
+            'subblocks': [{
+                'title': '',
+                'useSpan': false,
+                'data' : additionalData
+            }]
+        }] ) %}
+    {% endif %}
+
+    {% set data = {
+        'formErrors': form_errors(form)? form_errors(form) : null,
+        'dataBlocks': dataBlocks,
+    } %}
+
+    <div class="menuitem-container tree-component-container">
+        <div class="menuitem menuitem-tree tree-component">
+            {% set treeOptions = {
+                'data' : tree,
+                'nodeId': entity.key,
+                'menu' : entity.menu,
+                'ownershipType' : ownershipType,
+                'ownerId' : ownerId,
+                'updateAllowed' : true,
+                'onRootSelectRoute' : menuViewRoute,
+                'onSelectRoute' : menuUpdateRoute,
+                'onMoveRoute' : 'oro_navigation_menuupdate_move'
+            } %}
+            <div
+                    data-page-component-module="oronavigation/js/app/components/tree-manage-component"
+                    data-page-component-options="{{ treeOptions|json_encode }}"
+            ></div>
+        </div>
+    </div>
+    <div class="menuitem-data">
+        {{ parent() }}
+    </div>
+{% endblock content_data %}

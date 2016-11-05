@@ -5,6 +5,7 @@ namespace Oro\Bundle\ApiBundle\Form\Guesser;
 use Symfony\Component\Form\FormTypeGuesserInterface;
 use Symfony\Component\Form\Guess\TypeGuess;
 
+use Oro\Bundle\ApiBundle\Collection\IncludedEntityCollection;
 use Oro\Bundle\ApiBundle\Config\ConfigAccessorInterface;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionFieldConfig;
@@ -28,6 +29,9 @@ class MetadataTypeGuesser implements FormTypeGuesserInterface
     /** @var ConfigAccessorInterface|null */
     protected $configAccessor;
 
+    /** @var IncludedEntityCollection|null */
+    protected $includedEntities;
+
     /**
      * @param array          $dataTypeMappings [data type => [form type, options], ...]
      * @param DoctrineHelper $doctrineHelper
@@ -39,6 +43,14 @@ class MetadataTypeGuesser implements FormTypeGuesserInterface
     }
 
     /**
+     * @return MetadataAccessorInterface|null
+     */
+    public function getMetadataAccessor()
+    {
+        return $this->metadataAccessor;
+    }
+
+    /**
      * @param MetadataAccessorInterface|null $metadataAccessor
      */
     public function setMetadataAccessor(MetadataAccessorInterface $metadataAccessor = null)
@@ -47,11 +59,35 @@ class MetadataTypeGuesser implements FormTypeGuesserInterface
     }
 
     /**
+     * @return ConfigAccessorInterface|null
+     */
+    public function getConfigAccessor()
+    {
+        return $this->configAccessor;
+    }
+
+    /**
      * @param ConfigAccessorInterface|null $configAccessor
      */
     public function setConfigAccessor(ConfigAccessorInterface $configAccessor = null)
     {
         $this->configAccessor = $configAccessor;
+    }
+
+    /**
+     * @return IncludedEntityCollection|null
+     */
+    public function getIncludedEntities()
+    {
+        return $this->includedEntities;
+    }
+
+    /**
+     * @param IncludedEntityCollection|null $includedEntities
+     */
+    public function setIncludedEntities(IncludedEntityCollection $includedEntities = null)
+    {
+        $this->includedEntities = $includedEntities;
     }
 
     /**
@@ -195,7 +231,7 @@ class MetadataTypeGuesser implements FormTypeGuesserInterface
     {
         return $this->createTypeGuess(
             'oro_api_entity',
-            ['metadata' => $metadata],
+            ['metadata' => $metadata, 'included_entities' => $this->includedEntities],
             TypeGuess::HIGH_CONFIDENCE
         );
     }
