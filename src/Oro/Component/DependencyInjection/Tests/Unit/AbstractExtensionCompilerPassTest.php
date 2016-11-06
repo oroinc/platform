@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\WorkflowBundle\Tests\Unit\DependencyInjection\Compiler;
+namespace Oro\Component\DependencyInjection\Tests\Unit;
 
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;

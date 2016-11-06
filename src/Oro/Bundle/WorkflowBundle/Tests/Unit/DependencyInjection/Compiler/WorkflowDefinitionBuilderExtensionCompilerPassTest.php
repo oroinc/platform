@@ -4,6 +4,8 @@ namespace Oro\Bundle\WorkflowBundle\Tests\Unit\DependencyInjection\Compiler;
 
 use Oro\Bundle\WorkflowBundle\DependencyInjection\Compiler\WorkflowDefinitionBuilderExtensionCompilerPass;
 
+use Oro\Component\DependencyInjection\Tests\Unit\AbstractExtensionCompilerPassTest;
+
 class WorkflowDefinitionBuilderExtensionCompilerPassTest extends AbstractExtensionCompilerPassTest
 {
     public function testProcess()
