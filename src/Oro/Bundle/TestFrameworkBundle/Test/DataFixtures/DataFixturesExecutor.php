@@ -9,7 +9,8 @@ use Doctrine\Common\DataFixtures\SharedFixtureInterface;
 use Doctrine\Common\Persistence\ObjectManager;
 
 /**
- * Unlike to the original executor does not clear entity manager after each fixture.
+ * This ORM executor does not clear the entity manager if a data fixture
+ * implements \Oro\Bundle\TestFrameworkBundle\Test\DataFixtures\InitialFixtureInterface.
  */
 class DataFixturesExecutor extends ORMExecutor
 {
@@ -30,5 +31,8 @@ class DataFixturesExecutor extends ORMExecutor
             $fixture->setReferenceRepository($this->referenceRepository);
         }
         $fixture->load($manager);
+        if (!$fixture instanceof InitialFixtureInterface) {
+            $manager->clear();
+        }
     }
 }

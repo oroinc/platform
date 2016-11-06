@@ -4,11 +4,12 @@ namespace Oro\Bundle\TestFrameworkBundle\Tests\Functional\DataFixtures;
 
 use Doctrine\Common\DataFixtures\AbstractFixture;
 use Doctrine\Common\Persistence\ObjectManager;
+use Oro\Bundle\TestFrameworkBundle\Test\DataFixtures\InitialFixtureInterface;
 
 /**
  * Loads the first user from the database.
  */
-class LoadUser extends AbstractFixture
+class LoadUser extends AbstractFixture implements InitialFixtureInterface
 {
     /**
      * {@inheritdoc}

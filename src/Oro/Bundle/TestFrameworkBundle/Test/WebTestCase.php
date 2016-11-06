@@ -3,7 +3,6 @@
 namespace Oro\Bundle\TestFrameworkBundle\Test;
 
 use Doctrine\Common\DataFixtures\ReferenceRepository;
-use Doctrine\ORM\EntityManager;
 
 use Symfony\Component\Console\Output\StreamOutput;
 use Symfony\Component\HttpKernel\KernelInterface;
@@ -385,11 +384,8 @@ abstract class WebTestCase extends BaseWebTestCase
             $loader->addFixture($fixture);
         }
 
-        /** @var EntityManager $em */
-        $em = $container->get('doctrine')->getManager();
         $executor = new DataFixturesExecutor($container->get('doctrine')->getManager());
         $executor->execute($loader->getFixtures(), true);
-        $em->clear();
         self::$referenceRepository = $executor->getReferenceRepository();
         $this->postFixtureLoad();
     }
