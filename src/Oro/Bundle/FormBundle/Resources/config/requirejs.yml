@@ -39,7 +39,7 @@ config:
         'oroform/js/extend/validate':
             'jquery.validate': 'jquery.validate'
     paths:
-        'jquery.validate': 'bundles/oroform/lib/jquery.validate/jquery.validate.js'
+        'jquery.validate': 'bundles/bowerassets/jquery-validate/jquery.validate.js'
         'oroform/js/validator/count': 'bundles/oroform/js/validator/count.js'
         'oroform/js/validator/date': 'bundles/oroform/js/validator/date.js'
         'oroform/js/validator/datetime': 'bundles/oroform/js/validator/datetime.js'
@@ -56,6 +56,7 @@ config:
         'oroform/js/validator/type': 'bundles/oroform/js/validator/type.js'
         'oroform/js/validator/url': 'bundles/oroform/js/validator/url.js'
         'oroform/js/optional-validation-handler': 'bundles/oroform/js/optional-validation-handler.js'
+        'oroform/js/optional-validation-groups-handler': 'bundles/oroform/js/optional-validation-groups-handler.js'
 
         #inline editing
         'oroform/js/tools/frontend-type-map': 'bundles/oroform/js/tools/frontend-type-map.js'

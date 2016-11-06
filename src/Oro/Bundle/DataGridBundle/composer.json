@@ -10,7 +10,10 @@
         "oro/config": "dev-master",
         "oro/ui-bundle": "dev-master",
         "oro/requirejs-bundle": "dev-master",
-        "oro/security-bundle": "dev-master"
+        "oro/security-bundle": "dev-master",
+        "bower-asset/backgrid": "0.3.7",
+        "bower-asset/backgrid-paginator": "0.3.8",
+        "bower-asset/backbone-pageable": "1.2.3"
     },
     "autoload": {
         "psr-0": { "Oro\\Bundle\\DataGridBundle": "" }

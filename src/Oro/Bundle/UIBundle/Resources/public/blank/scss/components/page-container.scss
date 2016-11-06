@@ -1,0 +1,9 @@
+.page-container {
+    display: flex;
+    flex-direction: column;
+
+    max-width: $page-container-config-min-width;
+    min-height: $page-container-config-min-height;
+    margin: $page-container-config-offset;
+    padding: $page-container-config-inner-offset;
+}

@@ -30,6 +30,7 @@ system_configuration:
             priority: 30                  # sort order
             description: some description # add description on the next line after group header
             tooltip: some tooltip         # add tooltip on the same line after group header
+            page_reload: false            # if true, page will be reloaded after save if something changed in the group
 ```
 
 Groups definitions will be replaced recursive from configs that will parse after original definition.
@@ -137,6 +138,7 @@ Field declaration have required property `type`.
 `acl_resource` - determines acl resource to check permissions to change config field value(optional)
 `priority` - sort order for displaying(optional)
 `ui_only` - indicates whether a field is used only on UI and do not related to any variable (optional, defaults to false)
+`property_path` - overrides configuration key where field's value will be stored (by default field's name used as path)
 
 Also `options` available property here, it's just a proxy to form type definition
 
@@ -155,6 +157,7 @@ system_configuration:
                # also here can be added field tooltips
             acl_resource: 'acl_resource_name'
             priority: 20
+            page_reload: false # if true, page will be reloaded after save if field changed
 ```
 
 #### Tree

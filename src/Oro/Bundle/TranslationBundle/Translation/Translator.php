@@ -10,6 +10,7 @@ use Symfony\Component\Translation\Loader\LoaderInterface;
 use Symfony\Component\Translation\MessageSelector;
 use Symfony\Bundle\FrameworkBundle\Translation\Translator as BaseTranslator;
 
+use Oro\Bundle\TranslationBundle\Entity\Translation;
 use Oro\Bundle\TranslationBundle\Strategy\TranslationStrategyProvider;
 
 /**
@@ -330,10 +331,21 @@ class Translator extends BaseTranslator
      */
     protected function registerDynamicResources()
     {
+        $defaultLocale = isset($this->catalogues[Translation::DEFAULT_LOCALE])
+            ? $this->catalogues[Translation::DEFAULT_LOCALE]
+            : null;
+
         foreach ($this->dynamicResources as $items) {
-            foreach ($items as $item) {
-                $this->addResource($item['format'], $item['resource'], $item['code'], $item['domain']);
+            if (!$defaultLocale) {
+                foreach ($items as $item) {
+                    $this->addResource($item['format'], $item['resource'], $item['code'], $item['domain']);
+                }
             }
+        }
+
+        //prevents loding default locale many times (Default locale should be is default fallback locale)
+        if ($defaultLocale && !isset($this->catalogues[Translation::DEFAULT_LOCALE])) {
+            $this->catalogues[Translation::DEFAULT_LOCALE] = $defaultLocale;
         }
     }
 

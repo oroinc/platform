@@ -1,31 +1,34 @@
 <?php
-
 namespace Oro\Bundle\EmailBundle\EventListener;
 
 use Doctrine\ORM\Event\PostFlushEventArgs;
 
-use JMS\JobQueueBundle\Entity\Job;
-
-use Oro\Bundle\EmailBundle\Command\AutoResponseCommand;
+use Oro\Bundle\EmailBundle\Async\Topics;
 use Oro\Bundle\EmailBundle\Entity\EmailBody;
-use Oro\Bundle\EmailBundle\Entity\EmailUser;
 use Oro\Bundle\EmailBundle\Manager\AutoResponseManager;
-use Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink;
+use Oro\Component\DependencyInjection\ServiceLink;
+use Oro\Component\MessageQueue\Client\MessageProducerInterface;
 
 class AutoResponseListener extends MailboxEmailListener
 {
-    /** @var ServiceLink */
+    /**
+     * @var ServiceLink
+     */
     private $autoResponseManagerLink;
 
-    /** @var EmailUser[] */
-    protected $emailUsers = [];
+    /**
+     * @var MessageProducerInterface
+     */
+    private $producer;
 
     /**
-     * @param ServiceLink $autoResponseManagerLink
+     * @param ServiceLink              $autoResponseManagerLink
+     * @param MessageProducerInterface $producer
      */
-    public function __construct(ServiceLink $autoResponseManagerLink)
+    public function __construct(ServiceLink $autoResponseManagerLink, MessageProducerInterface $producer)
     {
         $this->autoResponseManagerLink = $autoResponseManagerLink;
+        $this->producer = $producer;
     }
 
     /**
@@ -34,18 +37,13 @@ class AutoResponseListener extends MailboxEmailListener
     public function postFlush(PostFlushEventArgs $args)
     {
         $emailIds = $this->popEmailIds();
-        if (!$emailIds) {
+        if (! $emailIds) {
             return;
         }
-
-        $jobArgs = array_map(function ($id) {
-            return sprintf('--%s=%s', AutoResponseCommand::OPTION_ID, $id);
-        }, $emailIds);
-        $job = new Job(AutoResponseCommand::NAME, $jobArgs);
-
-        $em = $args->getEntityManager();
-        $em->persist($job);
-        $em->flush();
+        
+        $this->producer->send(Topics::SEND_AUTO_RESPONSES, [
+            'ids' => $emailIds,
+        ]);
     }
 
     /**
@@ -68,7 +66,6 @@ class AutoResponseListener extends MailboxEmailListener
 
         return array_values($emailIds);
     }
-
 
     /**
      * @return AutoResponseManager

@@ -52,7 +52,7 @@ class IntegrationTypeSelectTypeTest extends \PHPUnit_Framework_TestCase
         $this->type->setDefaultOptions($resolver);
         $result = $resolver->resolve([]);
         $choiceAttr = [];
-        foreach ($result['choices'] as $choice => $label) {
+        foreach ($result['choices'] as $label => $choice) {
             $choiceAttr[$choice] = call_user_func($result['choice_attr'], $choice);
         }
         unset($result['choice_attr']);
@@ -60,8 +60,8 @@ class IntegrationTypeSelectTypeTest extends \PHPUnit_Framework_TestCase
             [
                 'empty_value' => '',
                 'choices'     => [
-                    'testType1' => 'oro.type1.label',
-                    'testType2' => 'oro.type2.label'
+                    'oro.type1.label' => 'testType1',
+                    'oro.type2.label' => 'testType2'
                 ],
                 'configs'     => [
                     'placeholder'             => 'oro.form.choose_value',

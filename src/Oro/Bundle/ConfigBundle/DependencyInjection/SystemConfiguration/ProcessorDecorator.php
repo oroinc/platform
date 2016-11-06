@@ -46,7 +46,7 @@ class ProcessorDecorator
         // validate variable names
         if (isset($result[self::FIELDS_ROOT])) {
             foreach ($result[self::FIELDS_ROOT] as $varName => $varData) {
-                if (!isset($this->variables[$varName]) && empty($varData['ui_only'])) {
+                if (!$this->isVariableNameValid($varName, $varData)) {
                     throw new InvalidConfigurationException(
                         sprintf(
                             'The system configuration variable "%s" is not defined.'
@@ -250,8 +250,12 @@ class ProcessorDecorator
                     ->end()
                     ->scalarNode('data_transformer')->end()
                     ->scalarNode('acl_resource')->end()
+                    ->scalarNode('property_path')->end()
                     ->integerNode('priority')->end()
                     ->booleanNode('ui_only')->end()
+                    ->booleanNode('page_reload')
+                        ->defaultValue(false)
+                    ->end()
                 ->end()
                 ->validate()
                     // 'data_type' be specified for all fields except 'ui_only' ones
@@ -352,5 +356,23 @@ class ProcessorDecorator
 
             $data = array_merge($data, ['section' => true]);
         }
+    }
+
+    /**
+     * Validates field name and properties with existing settings tree
+     *
+     * @param string $fieldName
+     * @param $filedOptions
+     * @return bool
+     *
+     */
+    protected function isVariableNameValid($fieldName, $filedOptions)
+    {
+        $isFieldInConfig = isset($this->variables[$fieldName]);
+        $isNotPersistentField = !empty($filedOptions['ui_only']);
+        $isAliasForAnotherFieldInConfig =
+            isset($filedOptions['property_path']) && isset($this->variables[$filedOptions['property_path']]);
+
+        return ($isFieldInConfig || $isNotPersistentField || $isAliasForAnotherFieldInConfig);
     }
 }

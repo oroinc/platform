@@ -7,7 +7,7 @@ use Symfony\Component\Form\FormView;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\OptionsResolver\Options;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 use Oro\Bundle\FormBundle\Form\EventListener\CollectionTypeSubscriber;
 
@@ -47,7 +47,7 @@ class CollectionType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults(
             [
@@ -66,13 +66,9 @@ class CollectionType extends AbstractType
             ]
         );
         $resolver->setRequired(['type']);
-        $resolver->setNormalizers(
-            [
-                'show_form_when_empty' => function (Options $options, $value) {
-                    return !$options['allow_add'] ? false : $value;
-                }
-            ]
-        );
+        $resolver->setNormalizer('show_form_when_empty', function (Options $options, $value) {
+            return !$options['allow_add'] ? false : $value;
+        });
     }
 
     /**

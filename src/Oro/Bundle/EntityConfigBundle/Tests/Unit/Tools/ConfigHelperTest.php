@@ -118,7 +118,7 @@ class ConfigHelperTest extends \PHPUnit_Framework_TestCase
             ['Acme\Bundle\SomeBundle\Entities\SomeClass', 'AcmeSomeBundle', 'SomeClass'],
             ['Acme\Bundles\SomeBundle\Entities\SomeClass', 'AcmeSomeBundle', 'SomeClass'],
             ['Gedmo\Translatable\Entity\Translation', 'GedmoTranslatable', 'Translation'],
-            ['JMS\JobQueueBundle\Entity\Job', 'JMSJobQueueBundle', 'Job'],
+            ['Oro\Bundle\UserBundle\Entity\User', 'OroUserBundle', 'User'],
             ['Extend\Entity\SomeClass', 'System', 'SomeClass'],
             ['Acme\Entity\SomeClass', 'System', 'SomeClass'],
             ['Acme\Entities\SomeClass', 'System', 'SomeClass'],

@@ -5,6 +5,14 @@ namespace Oro\Bundle\ConfigBundle\Config\Tree;
 class FieldNodeDefinition extends AbstractNodeDefinition
 {
     /**
+     * @return string
+     */
+    public function getPropertyPath()
+    {
+        return isset($this->definition['property_path']) ? $this->definition['property_path'] : $this->getName();
+    }
+
+    /**
      * Return field type
      *
      * @return string
@@ -65,6 +73,14 @@ class FieldNodeDefinition extends AbstractNodeDefinition
         $this->definition['options'][$name] = $value;
 
         return $this;
+    }
+
+    /**
+     * @return bool
+     */
+    public function needsPageReload()
+    {
+        return $this->definition['page_reload'];
     }
 
     /**

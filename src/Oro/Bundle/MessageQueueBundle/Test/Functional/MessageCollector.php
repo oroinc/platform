@@ -19,10 +19,6 @@ class MessageCollector implements MessageProducerInterface
      */
     private $sentMessages = [];
 
-    /**
-     * @var bool
-     */
-    private $enabled = false;
 
     /**
      * @param MessageProducerInterface $messageProducer
@@ -39,9 +35,7 @@ class MessageCollector implements MessageProducerInterface
     {
         $this->messageProducer->send($topic, $message);
 
-        if ($this->enabled) {
-            $this->sentMessages[] = ['topic' => $topic, 'message' => $message];
-        }
+        $this->sentMessages[] = ['topic' => $topic, 'message' => $message];
     }
 
     /**
@@ -52,6 +46,23 @@ class MessageCollector implements MessageProducerInterface
     public function getSentMessages()
     {
         return $this->sentMessages;
+    }
+
+    /**
+     * @param string $topic
+     *
+     * @return array
+     */
+    public function getTopicSentMessages($topic)
+    {
+        $topicTraces = [];
+        foreach ($this->getSentMessages() as $trace) {
+            if ($topic == $trace['topic']) {
+                $topicTraces[] = $trace;
+            }
+        }
+
+        return $topicTraces;
     }
 
     /**
@@ -66,27 +77,13 @@ class MessageCollector implements MessageProducerInterface
         return $this;
     }
 
-    /**
-     * Disables the collecting of messages.
-     *
-     * $return self
-     */
-    public function disable()
-    {
-        $this->enabled = false;
-
-        return $this;
-    }
-
-    /**
-     * Enables the collecting of messages.
-     *
-     * $return self
-     */
     public function enable()
     {
-        $this->enabled = true;
+        //toDo: Remove after merging task/CRM-5838_migrate_integration_logic_from_jms_to_mq
+    }
 
-        return $this;
+    public function disable()
+    {
+        //toDo: Remove after merging task/CRM-5838_migrate_integration_logic_from_jms_to_mq
     }
 }

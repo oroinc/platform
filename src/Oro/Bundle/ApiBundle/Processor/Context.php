@@ -17,11 +17,13 @@ use Oro\Bundle\ApiBundle\Exception\RuntimeException;
 use Oro\Bundle\ApiBundle\Filter\FilterCollection;
 use Oro\Bundle\ApiBundle\Filter\FilterValueAccessorInterface;
 use Oro\Bundle\ApiBundle\Filter\NullFilterValueAccessor;
+use Oro\Bundle\ApiBundle\Metadata\ActionMetadataExtra;
 use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
 use Oro\Bundle\ApiBundle\Metadata\MetadataExtraInterface;
 use Oro\Bundle\ApiBundle\Model\Error;
 use Oro\Bundle\ApiBundle\Provider\ConfigProvider;
 use Oro\Bundle\ApiBundle\Provider\MetadataProvider;
+use Oro\Bundle\ApiBundle\Request\DocumentBuilderInterface;
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 
 /**
@@ -32,6 +34,12 @@ class Context extends ApiContext implements ContextInterface
 {
     /** FQCN of an entity */
     const CLASS_NAME = 'class';
+
+    /**
+     * a value indicates whether errors should just stop processing
+     * or an exception should be thrown is any error occurred
+     */
+    const SOFT_ERRORS_HANDLING = 'softErrorsHandling';
 
     /** a prefix for all configuration sections */
     const CONFIG_PREFIX = 'config_';
@@ -80,6 +88,9 @@ class Context extends ApiContext implements ContextInterface
 
     /** @var ParameterBagInterface */
     private $responseHeaders;
+
+    /** @var DocumentBuilderInterface|null */
+    private $responseDocumentBuilder;
 
     /**
      * @param ConfigProvider   $configProvider
@@ -172,6 +183,22 @@ class Context extends ApiContext implements ContextInterface
         $statusCode = $this->getResponseStatusCode();
 
         return $statusCode>= 200 && $statusCode < 300;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getResponseDocumentBuilder()
+    {
+        return $this->responseDocumentBuilder;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setResponseDocumentBuilder(DocumentBuilderInterface $documentBuilder = null)
+    {
+        $this->responseDocumentBuilder = $documentBuilder;
     }
 
     /**
@@ -285,6 +312,32 @@ class Context extends ApiContext implements ContextInterface
     public function resetErrors()
     {
         $this->errors = null;
+    }
+
+    /**
+     * Gets a value indicates whether errors should just stop processing
+     * or an exception should be thrown is any error occurred.
+     *
+     * @return bool
+     */
+    public function isSoftErrorsHandling()
+    {
+        return (bool)$this->get(self::SOFT_ERRORS_HANDLING);
+    }
+
+    /**
+     * Sets a value indicates whether errors should just stop processing
+     * or an exception should be thrown is any error occurred.
+     *
+     * @param bool $softErrorsHandling
+     */
+    public function setSoftErrorsHandling($softErrorsHandling)
+    {
+        if ($softErrorsHandling) {
+            $this->set(self::SOFT_ERRORS_HANDLING, true);
+        } else {
+            $this->remove(self::SOFT_ERRORS_HANDLING);
+        }
     }
 
     /**
@@ -642,10 +695,14 @@ class Context extends ApiContext implements ContextInterface
     public function getMetadataExtras()
     {
         $extras = $this->get(self::METADATA_EXTRAS);
+        $extras = null !== $extras ? $extras : [];
+        $action = $this->getAction();
+        if ($action && (empty($extras) || !$this->hasActionMetadataExtra($extras))) {
+            $extras[] = new ActionMetadataExtra($action);
+            $this->set(self::METADATA_EXTRAS, $extras);
+        }
 
-        return null !== $extras
-            ? $extras
-            : [];
+        return $extras;
     }
 
     /**
@@ -743,6 +800,22 @@ class Context extends ApiContext implements ContextInterface
         } else {
             $this->remove(self::METADATA);
         }
+    }
+
+    /**
+     * @param MetadataExtraInterface[] $extras
+     *
+     * @return bool
+     */
+    protected function hasActionMetadataExtra(array $extras)
+    {
+        foreach ($extras as $extra) {
+            if ($extra->getName() === ActionMetadataExtra::NAME) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**

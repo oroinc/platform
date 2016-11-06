@@ -85,7 +85,7 @@ class ConfigTest extends \PHPUnit_Framework_TestCase
                 'paths' => array(
                     'oro/test' => 'empty:',
                     'require-config' => '../main-config',
-                    'require-lib' => 'ororequirejs/lib/require',
+                    'require-lib' => 'npmassets/requirejs/require',
                 ),
                 'baseUrl' => './bundles',
                 'out' => './js/app.min.js',

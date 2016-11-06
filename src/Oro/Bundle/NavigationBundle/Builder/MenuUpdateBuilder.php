@@ -5,17 +5,44 @@ namespace Oro\Bundle\NavigationBundle\Builder;
 use Knp\Menu\ItemInterface;
 
 use Oro\Bundle\LocaleBundle\Helper\LocalizationHelper;
-use Oro\Bundle\NavigationBundle\Entity\MenuUpdateInterface;
-use Oro\Bundle\NavigationBundle\Exception\ProviderNotFoundException;
+use Oro\Bundle\NavigationBundle\Exception\MaxNestingLevelExceededException;
 use Oro\Bundle\NavigationBundle\Menu\BuilderInterface;
 use Oro\Bundle\NavigationBundle\Menu\ConfigurationBuilder;
-use Oro\Bundle\NavigationBundle\Provider\MenuUpdateProviderInterface;
+use Oro\Bundle\NavigationBundle\Utils\MenuUpdateUtils;
+use Oro\Bundle\NavigationBundle\Menu\Provider\OwnershipProviderInterface;
 
 class MenuUpdateBuilder implements BuilderInterface
 {
-    /** @var MenuUpdateProviderInterface[] */
+    const OWNERSHIP_TYPE_OPTION = 'ownershipType';
+
+    /** @var array - an array of OwnershipProviders grouped by area and priority
+     * Example:
+     * [
+     *     'default' => [
+     *         100 => [
+     *             'global' => $globalProvider
+     *         ],
+     *         200 => [
+     *             'organization' => $organizationProvider
+     *         ],
+     *         300 => [
+     *             'user' => $userProvider
+     *         ],
+     *      ],
+     *     'custom' => [
+     *         100 => [
+     *             'global' => $globalProvider
+     *         ],
+     *         200 => [
+     *             'foo' => $fooProvider,
+     *             'bar' => $barProvider
+     *         ],
+     *     ]
+     * ]
+     *
+     */
     private $providers = [];
-    
+
     /** @var LocalizationHelper */
     private $localizationHelper;
 
@@ -32,96 +59,123 @@ class MenuUpdateBuilder implements BuilderInterface
      */
     public function build(ItemInterface $menu, array $options = [], $alias = null)
     {
+        $ownershipType = array_key_exists(self::OWNERSHIP_TYPE_OPTION, $options) ?
+            $options[self::OWNERSHIP_TYPE_OPTION] : null;
         $area = $menu->getExtra('area', ConfigurationBuilder::DEFAULT_AREA);
-        $provider = $this->getProvider($area);
         $menuName = $menu->getName();
-        foreach ($provider->getUpdates($menuName) as $update) {
+        $updates = $this->getUpdates($area, $menuName, $ownershipType);
+        foreach ($updates as $update) {
             if ($update->getMenu() == $menuName) {
-                $this->applyUpdate($menu, $update);
+                MenuUpdateUtils::updateMenuItem($update, $menu, $this->localizationHelper);
+            }
+        }
+
+        $this->applyDivider($menu);
+
+        /** @var ItemInterface $item */
+        foreach ($menu->getChildren() as $item) {
+            $item = MenuUpdateUtils::getItemExceededMaxNestingLevel($menu, $item);
+            if ($item) {
+                throw new MaxNestingLevelExceededException(
+                    sprintf(
+                        "Item \"%s\" exceeded max nesting level in menu \"%s\".",
+                        $item->getLabel(),
+                        $menu->getLabel()
+                    )
+                );
             }
         }
     }
 
     /**
-     * @param string $area
-     * @param MenuUpdateProviderInterface $provider
-     *
+     * @param OwnershipProviderInterface $provider
+     * @param string                     $area
+     * @param integer                    $priority
      * @return MenuUpdateBuilder
      */
-    public function addProvider($area, MenuUpdateProviderInterface $provider)
+    public function addProvider(OwnershipProviderInterface $provider, $area, $priority)
     {
-        $this->providers[$area] = $provider;
+        $this->providers[$area][$priority][$provider->getType()] = $provider;
 
         return $this;
     }
 
     /**
-     * @param $area
-     *
-     * @return MenuUpdateProviderInterface
+     * @param string $area
+     * @param string $type
+     * @return null|OwnershipProviderInterface
      */
-    private function getProvider($area)
+    public function getProvider($area, $type)
     {
-        if (!array_key_exists($area, $this->providers)) {
-            throw new ProviderNotFoundException(sprintf("Provider related to \"%s\" area not found.", $area));
-        }
-        
-        return $this->providers[$area];
+        $providers = $this->getProviders($area);
+
+        return isset($providers[$type]) ? $providers[$type] : null;
     }
 
     /**
-     * @param ItemInterface $menu
-     * @param MenuUpdateInterface $update
+     * @param string      $area
+     * @param string      $menuName
+     * @param string|null $ownershipType
+     * @return array
      */
-    private function applyUpdate(ItemInterface $menu, MenuUpdateInterface $update)
+    public function getUpdates($area, $menuName, $ownershipType = null)
     {
-        $item = $this->findMenuItem($menu, $update->getKey());
-        $parentItem = $this->findMenuItem($menu, $update->getParentKey());
-        $parentItem = $parentItem === null ? $menu : $parentItem;
+        $providers = $this->getProviders($area, $ownershipType);
 
-        if (!$item instanceof ItemInterface) {
-            $item = $parentItem->addChild($update->getKey());
+        $menuUpdates = [];
+        foreach ($providers as $ownershipProvider) {
+            $result = $ownershipProvider->getMenuUpdates($menuName);
+            $menuUpdates = array_merge($menuUpdates, $result);
         }
 
-        if ($item->getParent()->getName() != $parentItem->getName()) {
-            $item->getParent()->removeChild($item->getName());
-            $item = $parentItem->addChild($item);
-        }
-        
-        if ($update->getTitles()->count()) {
-            $title = $this->localizationHelper->getLocalizedValue($update->getTitles());
-            $item->setLabel($title->getString());
-        }
-
-        if ($update->getUri()) {
-            $item->setUri($update->getUri());
-        }
-
-        $item->setDisplay($update->isActive());
-
-        foreach ($update->getExtras() as $key => $extra) {
-            $item->setExtra($key, $extra);
-        }
+        return $menuUpdates;
     }
 
     /**
-     * @param ItemInterface $menuItem
-     * @param string $key
-     *
-     * @return ItemInterface|null
+     * Return ordered list of ownership providers started by $ownershipType
+     * @param string      $area
+     * @param string|null $ownershipType
+     * @return OwnershipProviderInterface[]
      */
-    private function findMenuItem(ItemInterface $menuItem, $key)
+    private function getProviders($area, $ownershipType = null)
     {
-        $item = $menuItem->getChild($key);
-        if (!$item) {
-            foreach ($menuItem->getChildren() as $child) {
-                $item = $this->findMenuItem($child, $key);
-                if ($item instanceof ItemInterface) {
-                    break;
-                }
+        if (!isset($this->providers[$area])) {
+            return [];
+        }
+        $providersByPriority = $this->providers[$area];
+        // convert prioritised list to flat ordered list
+        ksort($providersByPriority, SORT_NUMERIC);
+        $providers = [];
+        foreach ($providersByPriority as $list) {
+            $providers = array_merge($providers, $list);
+        }
+        // return all tree if ownershipType not defined
+        if (null === $ownershipType) {
+            return $providers;
+        }
+        $result = [];
+        foreach ($providers as $key => $provider) {
+            $result[$key] = $provider;
+            if ($key === $ownershipType) {
+                break;
             }
         }
 
-        return $item;
+        return $result;
+    }
+
+    /**
+     * @param ItemInterface $item
+     */
+    private function applyDivider(ItemInterface $item)
+    {
+        if ($item->getExtra('divider', false)) {
+            $class = trim(sprintf("%s %s", $item->getAttribute('class', ''), 'divider'));
+            $item->setAttribute('class', $class);
+        }
+
+        foreach ($item->getChildren() as $child) {
+            $this->applyDivider($child);
+        }
     }
 }

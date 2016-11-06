@@ -10,7 +10,9 @@
         "symfony/framework-bundle": "2.8.*",
         "sylius/flow-bundle": "dev-master",
         "oro/config": "dev-master",
-        "oro/cache-bundle": "dev-master"
+        "oro/cache-bundle": "dev-master",
+        "components/jquery": "2.1.*",
+        "bower-asset/jquery-ajax-queue": "0.0.1"
     },
     "require-dev": {
         "symfony/form": "~2.3",

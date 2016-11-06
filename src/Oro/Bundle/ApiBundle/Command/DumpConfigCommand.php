@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\ApiBundle\Command;
 
+use ProxyManager\Proxy\VirtualProxyInterface;
+
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -113,9 +115,7 @@ class DumpConfigCommand extends AbstractDebugCommand
         array_walk_recursive(
             $config,
             function (&$val) {
-                if ($val instanceof \Closure) {
-                    $val = '\Closure';
-                }
+                $val = $this->convertConfigValueToHumanReadableRepresentation($val);
             }
         );
         $output->write(Yaml::dump($config, 100, 4, true, true));
@@ -252,5 +252,30 @@ class DumpConfigCommand extends AbstractDebugCommand
         }
 
         return $result;
+    }
+
+    /**
+     * @param mixed $val
+     *
+     * @return mixed
+     */
+    protected function convertConfigValueToHumanReadableRepresentation($val)
+    {
+        if ($val instanceof \Closure) {
+            $val = sprintf(
+                'closure from %s',
+                (new \ReflectionFunction($val))->getClosureScopeClass()->getName()
+            );
+        } elseif (is_object($val)) {
+            if ($val instanceof VirtualProxyInterface) {
+                if (!$val->isProxyInitialized()) {
+                    $val->initializeProxy();
+                }
+                $val = $val->getWrappedValueHolderValue();
+            }
+            $val = sprintf('instance of %s', get_class($val));
+        }
+
+        return $val;
     }
 }

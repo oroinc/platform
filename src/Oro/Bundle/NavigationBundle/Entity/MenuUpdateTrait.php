@@ -5,10 +5,13 @@ namespace Oro\Bundle\NavigationBundle\Entity;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
+use Oro\Bundle\LocaleBundle\Entity\FallbackTrait;
 use Oro\Bundle\LocaleBundle\Entity\LocalizedFallbackValue;
 
 trait MenuUpdateTrait
 {
+    use FallbackTrait;
+
     /**
      * @var int
      *
@@ -44,9 +47,20 @@ trait MenuUpdateTrait
     protected $titles;
 
     /**
+     * @var Collection|LocalizedFallbackValue[]
+     *
+     * @ORM\ManyToMany(
+     *      targetEntity="Oro\Bundle\LocaleBundle\Entity\LocalizedFallbackValue",
+     *      cascade={"ALL"},
+     *      orphanRemoval=true
+     * )
+     */
+    protected $descriptions;
+
+    /**
      * @var string
      *
-     * @ORM\Column(name="uri", type="string", length=255, nullable=true)
+     * @ORM\Column(name="uri", type="string", length=1023, nullable=true)
      */
     protected $uri;
 
@@ -58,18 +72,25 @@ trait MenuUpdateTrait
     protected $menu;
 
     /**
-     * @var int
+     * @var string
      *
-     * @ORM\Column(name="ownership_type", type="integer")
+     * @ORM\Column(name="ownership_type", type="string")
      */
     protected $ownershipType;
 
     /**
      * @var int
      *
-     * @ORM\Column(name="owner_id", type="integer", nullable=true)
+     * @ORM\Column(name="owner_id", type="integer", nullable=false)
      */
     protected $ownerId;
+
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="icon", type="string", length=150, nullable=true)
+     */
+    protected $icon;
 
     /**
      * @var bool
@@ -84,6 +105,20 @@ trait MenuUpdateTrait
      * @ORM\Column(name="priority", type="integer", nullable=true)
      */
     protected $priority;
+
+    /**
+     * @var boolean
+     *
+     * @ORM\Column(name="is_divider", type="boolean")
+     */
+    protected $divider = false;
+
+    /**
+     * @var boolean
+     *
+     * @ORM\Column(name="is_custom", type="boolean")
+     */
+    protected $custom = false;
 
     /**
      * @return int
@@ -170,6 +205,63 @@ trait MenuUpdateTrait
     }
 
     /**
+     * @return Collection|LocalizedFallbackValue[]
+     */
+    public function getDescriptions()
+    {
+        return $this->descriptions;
+    }
+
+    /**
+     * @param string $value
+     * @return MenuUpdateInterface
+     */
+    public function setDefaultDescription($value)
+    {
+        $oldValue = $this->getLocalizedFallbackValue($this->descriptions);
+
+        if ($oldValue && $this->descriptions->contains($oldValue)) {
+            $this->descriptions->removeElement($oldValue);
+        }
+        $newValue = new LocalizedFallbackValue();
+        $newValue->setText($value);
+
+        if (!$this->descriptions->contains($newValue)) {
+            $this->descriptions->add($newValue);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param LocalizedFallbackValue $description
+     *
+     * @return MenuUpdateInterface
+     */
+    public function addDescription(LocalizedFallbackValue $description)
+    {
+        if (!$this->descriptions->contains($description)) {
+            $this->descriptions->add($description);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param LocalizedFallbackValue $description
+     *
+     * @return MenuUpdateInterface
+     */
+    public function removeDescription(LocalizedFallbackValue $description)
+    {
+        if ($this->descriptions->contains($description)) {
+            $this->descriptions->removeElement($description);
+        }
+
+        return $this;
+    }
+
+    /**
      * @return string
      */
     public function getUri()
@@ -210,7 +302,7 @@ trait MenuUpdateTrait
     }
 
     /**
-     * @return int
+     * @return string
      */
     public function getOwnershipType()
     {
@@ -218,7 +310,7 @@ trait MenuUpdateTrait
     }
 
     /**
-     * @param int $ownershipType
+     * @param string $ownershipType
      *
      * @return MenuUpdateInterface
      */
@@ -248,6 +340,27 @@ trait MenuUpdateTrait
 
         return $this;
     }
+
+    /**
+     * @return string
+     */
+    public function getIcon()
+    {
+        return $this->icon;
+    }
+
+    /**
+     * @param string $icon
+     *
+     * @return MenuUpdateInterface
+     */
+    public function setIcon($icon)
+    {
+        $this->icon = $icon;
+
+        return $this;
+    }
+
 
     /**
      * @return boolean
@@ -285,6 +398,64 @@ trait MenuUpdateTrait
     public function setPriority($priority)
     {
         $this->priority = $priority;
+
+        return $this;
+    }
+
+    /**
+     * @return boolean
+     */
+    public function isDivider()
+    {
+        return $this->divider;
+    }
+
+    /**
+     * @param boolean $divider
+     *
+     * @return MenuUpdateInterface
+     */
+    public function setDivider($divider)
+    {
+        $this->divider = $divider;
+
+        return $this;
+    }
+
+    /**
+     * @ORM\PrePersist
+     */
+    public function prePersist()
+    {
+        if ($this->key === null) {
+            $this->key = $this->generateKey();
+        }
+    }
+
+    /**
+     * @return string
+     */
+    private function generateKey()
+    {
+        return uniqid('menu_item_');
+    }
+
+    /**
+     * @return boolean
+     */
+    public function isCustom()
+    {
+        return $this->custom;
+    }
+
+    /**
+     * @param boolean $custom
+     *
+     * @return MenuUpdateInterface
+     */
+    public function setCustom($custom)
+    {
+        $this->custom = $custom;
 
         return $this;
     }

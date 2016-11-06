@@ -60,7 +60,7 @@ define(function(require) {
          * Parses path-string and returns array of objects
          *
          * Field Path:
-         *      account+OroCRM\[...]\Account::contacts+OroCRM\[...]\Contact::firstName
+         *      account+Oro\[...]\Account::contacts+Oro\[...]\Contact::firstName
          * Returns Chain:
          *  [{
          *      entity: {Object},
@@ -70,15 +70,15 @@ define(function(require) {
          *      entity: {Object},
          *      field: {Object},
          *      path: "account",
-         *      basePath: "account+OroCRM\[...]\Account"
+         *      basePath: "account+Oro\[...]\Account"
          *  }, {
          *      entity: {Object},
          *      field: {Object},
-         *      path: "account+OroCRM\[...]\Account::contacts",
-         *      basePath: "account+OroCRM\[...]\Account::contacts+OroCRM\[...]Contact"
+         *      path: "account+Oro\[...]\Account::contacts",
+         *      basePath: "account+Oro\[...]\Account::contacts+Oro\[...]Contact"
          *  }, {
          *      field: {Object},
-         *      path: "account+OroCRM\[...]\Account::contacts+OroCRM\[...]\Contact::firstName"
+         *      path: "account+Oro\[...]\Account::contacts+Oro\[...]\Contact::firstName"
          *  }]
          *
          * @param {string} path
@@ -164,19 +164,19 @@ define(function(require) {
          *      entity: {Object},
          *      field: {Object},
          *      path: "account",
-         *      basePath: "account+OroCRM\[...]\Account"
+         *      basePath: "account+Oro\[...]\Account"
          *  }, {
          *      entity: {Object},
          *      field: {Object},
-         *      path: "account+OroCRM\[...]\Account::contacts",
-         *      basePath: "account+OroCRM\[...]\Account::contacts+OroCRM\[...]Contact"
+         *      path: "account+Oro\[...]\Account::contacts",
+         *      basePath: "account+Oro\[...]\Account::contacts+Oro\[...]Contact"
          *  }, {
          *      field: {Object},
-         *      path: "account+OroCRM\[...]\Account::contacts+OroCRM\[...]\Contact::firstName"
+         *      path: "account+Oro\[...]\Account::contacts+Oro\[...]\Contact::firstName"
          *  }]
          *
          *  Returns Field Path:
-         *      account+OroCRM\[...]\Account::contacts+OroCRM\[...]\Contact::firstName
+         *      account+Oro\[...]\Account::contacts+Oro\[...]\Contact::firstName
          *
          * @param {Array.<Object>} chain
          * @param {number=} end - number of chain-items which need to be ignored
@@ -208,7 +208,7 @@ define(function(require) {
          * Prepares the object with field's info which can be matched for conditions
          *
          * @param {string} fieldId - Field Path, such as
-         *      account+OroCRM\[...]\Account::contacts+OroCRM\[...]\Contact::firstName
+         *      account+Oro\[...]\Account::contacts+Oro\[...]\Contact::firstName
          * @returns {Object}
          */
         getApplicableConditions: function(fieldId) {
@@ -246,7 +246,7 @@ define(function(require) {
          * Converts Field Path to Property Path
          *
          * Field Path:
-         *      account+OroCRM\[...]\Account::contacts+OroCRM\[...]\Contact::firstName
+         *      account+Oro\[...]\Account::contacts+Oro\[...]\Contact::firstName
          * Returns Property Path:
          *      account.contacts.firstName
          *
@@ -280,7 +280,7 @@ define(function(require) {
          * Property Path:
          *      account.contacts.firstName
          * Returns Field Path:
-         *      account+OroCRM\[...]\Account::contacts+OroCRM\[...]\Contact::firstName
+         *      account+Oro\[...]\Account::contacts+Oro\[...]\Contact::firstName
          *
          * @param {string} pathData
          * @returns {string}

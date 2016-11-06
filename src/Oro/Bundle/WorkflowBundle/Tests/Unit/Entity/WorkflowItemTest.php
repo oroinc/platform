@@ -13,7 +13,7 @@ use Oro\Bundle\WorkflowBundle\Entity\WorkflowTransitionRecord;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowData;
 
 /**
- * @SuppressWarnings(PHPMD.TooManyMethods)
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
 class WorkflowItemTest extends \PHPUnit_Framework_TestCase
 {
@@ -340,5 +340,18 @@ class WorkflowItemTest extends \PHPUnit_Framework_TestCase
     {
         $this->workflowItem->setEntityClass('stdClass');
         $this->workflowItem->setEntityClass('test');
+    }
+
+    public function testToString()
+    {
+        $step = new WorkflowStep();
+        $step->setName('test_step');
+
+        $this->workflowItem->setWorkflowName('test_workflow')
+            ->setEntityClass('stdClass')
+            ->setEntityId('42')
+            ->setCurrentStep($step);
+
+        $this->assertEquals('[test_workflow] stdClass:42 test_step', (string)$this->workflowItem);
     }
 }
