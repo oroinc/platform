@@ -3,16 +3,16 @@
 namespace Oro\Bundle\TestFrameworkBundle\Behat\Listener;
 
 use Behat\Testwork\EventDispatcher\Event\BeforeExerciseCompleted;
-use Oro\Bundle\TestFrameworkBundle\Behat\Dumper\DumperInterface;
+use Oro\Bundle\TestFrameworkBundle\Behat\Dumper\IsolatorInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class DumpEnvironmentSubscriber implements EventSubscriberInterface
 {
-    /** @var DumperInterface[] */
+    /** @var IsolatorInterface[] */
     protected $dumpers;
 
     /**
-     * @param DumperInterface[] $dumpers
+     * @param IsolatorInterface[] $dumpers
      */
     public function __construct(array $dumpers)
     {

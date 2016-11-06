@@ -1,25 +1,4 @@
 services:
-    oro_test.dumper.mysql:
-        class: 'Oro\Bundle\TestFrameworkBundle\Behat\Dumper\MysqlDumper'
-        arguments:
-            - '@symfony2_extension.kernel'
-        tags:
-            - { name: 'oro_test.db_dumper', driver: 'pdo_mysql' }
-
-    oro_test.dumper.pgsql:
-        class: 'Oro\Bundle\TestFrameworkBundle\Behat\Dumper\PgsqlDumper'
-        arguments:
-            - '@symfony2_extension.kernel'
-        tags:
-            - { name: 'oro_test.db_dumper', driver: 'pdo_pgsql' }
-
-    oro_test.dumper.file_cache:
-        class: Oro\Bundle\TestFrameworkBundle\Behat\Dumper\FileCacheDumper
-        arguments:
-            - '@symfony2_extension.kernel'
-        tags:
-            - { name: oro_test.dumper, priority: 20 }
-
     cli.controller.suite:
         class: Oro\Bundle\TestFrameworkBundle\Behat\Cli\SuiteController
         arguments:
@@ -54,30 +33,11 @@ services:
         tags:
             - { name: event_dispatcher.subscriber, priority: 50 }
 
-    oro_test.listener.feature_isolation_subscriber:
-        class: Oro\Bundle\TestFrameworkBundle\Behat\Listener\FeatureIsolationSubscriber
+    oro_test.listener.fixtures_subscriber:
+        class: Oro\Bundle\TestFrameworkBundle\Behat\Listener\FixturesSubscriber
         arguments:
-            - ~
             - '@oro_test.context.fixture_loader'
-            - '@oro_element_factory'
-            - '@oro_test.kernel_service_factory'
             - '@oro_test.reference_repository_initializer'
-            - '@doctrine'
-        tags:
-            - { name: 'event_dispatcher.subscriber' }
-
-    oro_test.listener.message_queue_consumer_process_subscriber:
-        class: 'Oro\Bundle\TestFrameworkBundle\Behat\Listener\MessageQueueConsumerProcessSubscriber'
-        arguments:
-            - '@symfony2_extension.kernel'
-        tags:
-            - { name: 'event_dispatcher.subscriber' }
-
-    oro_test.listener.dump_environment_subscriber:
-        class: 'Oro\Bundle\TestFrameworkBundle\Behat\Listener\DumpEnvironmentSubscriber'
-        arguments:
-            - ~
-            - '@oro_test.dumper.file_cache'
         tags:
             - { name: 'event_dispatcher.subscriber' }
 
@@ -85,6 +45,14 @@ services:
         class: 'Oro\Bundle\TestFrameworkBundle\Behat\Listener\StepDurationMeasureSubscriber'
         arguments:
             - '@definition.finder'
+
+    oro_test.listener.interactive_execution_subscriber:
+        class: 'Oro\Bundle\TestFrameworkBundle\Behat\Listener\InteractiveExecutionSubscriber'
+
+    oro_test.listener.suite_aware_subscriber:
+        class: Oro\Bundle\TestFrameworkBundle\Behat\Listener\SuiteAwareSubscriber
+        arguments:
+            - ~
 
     cli.controller.mesure_execution_time:
         class: Oro\Bundle\TestFrameworkBundle\Behat\Cli\MeasureExecutionTimeController
@@ -100,6 +68,8 @@ services:
             - '@mink'
             - '@mink.selectors_handler'
             - []
+        tags:
+            - { name: 'suite_aware' }
 
     oro_page_factory:
         class: 'Oro\Bundle\TestFrameworkBundle\Behat\Element\OroPageFactory'
@@ -129,6 +99,8 @@ services:
             - '@oro_test.entity_class_resolver'
             - '@oro_test.entity_supplement'
             - '@oro_test.alice_loader'
+        tags:
+            - { name: 'suite_aware' }
 
     oro_test.entity_class_resolver:
         class: Oro\Bundle\TestFrameworkBundle\Behat\Fixtures\EntityClassResolver
@@ -156,7 +128,7 @@ services:
         calls:
             - [setDoctrine, ['@doctrine']]
 
-    oro_test.environment.handler.scenario_environment_handlre:
+    oro_test.environment.handler.feature_environment_handler:
         class: Oro\Bundle\TestFrameworkBundle\Behat\Environment\Handler\FeatureEnvironmentHandler
         arguments:
             - '@context.factory'

@@ -1,16 +1,13 @@
 <?php
 
-namespace Oro\Bundle\TestFrameworkBundle\Behat\Dumper;
+namespace Oro\Bundle\TestFrameworkBundle\Behat\Isolation;
 
 use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Component\Process\Exception\ProcessFailedException;
 use Symfony\Component\Process\Process;
 
-abstract class AbstractDbDumper implements DumperInterface
+trait AbstractDbIsolator
 {
-    /** The max runtime for a process in seconds */
-    const TIMEOUT = 120;
-
     /** @var string */
     protected $dbHost;
 
@@ -43,12 +40,13 @@ abstract class AbstractDbDumper implements DumperInterface
 
     /**
      * @param string $commandline The command line to run
+     * @param int $timeout The timeout in seconds
      */
-    protected function runProcess($commandline)
+    protected function runProcess($commandline, $timeout = 120)
     {
         $process = new Process($commandline);
 
-        $process->setTimeout(static::TIMEOUT);
+        $process->setTimeout($timeout);
         $process->run();
 
         if (!$process->isSuccessful()) {

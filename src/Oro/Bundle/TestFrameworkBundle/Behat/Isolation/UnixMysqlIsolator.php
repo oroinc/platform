@@ -1,13 +1,15 @@
 <?php
 
-namespace Oro\Bundle\TestFrameworkBundle\Behat\Dumper;
+namespace Oro\Bundle\TestFrameworkBundle\Behat\Isolation;
 
-class MysqlDumper extends AbstractDbDumper
+use Symfony\Component\DependencyInjection\ContainerInterface;
+
+class UnixMysqlIsolator extends OsRelatedIsolator implements IsolatorInterface
 {
-    /**
-     * {@inheritdoc}
-     */
-    public function dump()
+    use AbstractDbIsolator;
+
+    /** {@inheritdoc} */
+    public function start()
     {
         $this->runProcess(sprintf(
             'MYSQL_PWD=%s mysqldump -h %s -u %s %s > %s/%4$s.sql',
@@ -19,10 +21,12 @@ class MysqlDumper extends AbstractDbDumper
         ));
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function restore()
+    /** {@inheritdoc} */
+    public function beforeTest()
+    {}
+
+    /** {@inheritdoc} */
+    public function afterTest()
     {
         $this->runProcess(sprintf(
             'MYSQL_PWD=%s mysql -e "drop database %s;" -h %s -u %s',
@@ -46,5 +50,26 @@ class MysqlDumper extends AbstractDbDumper
             $this->dbName,
             $this->cacheDir
         ));
+    }
+
+    /** {@inheritdoc} */
+    public function terminate()
+    {}
+
+    /** {@inheritdoc} */
+    public function isApplicable(ContainerInterface $container)
+    {
+        return
+            self::isApplicableOS()
+            && 'pdo_mysql' === $container->getParameter('database_driver');
+    }
+
+    /** {@inheritdoc} */
+    protected function getApplicableOs()
+    {
+        return [
+            OsRelatedIsolator::LINUX_OS,
+            OsRelatedIsolator::MAC_OS,
+        ];
     }
 }
