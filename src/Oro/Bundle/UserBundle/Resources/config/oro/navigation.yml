@@ -43,13 +43,13 @@ navigation:
                 route: 'oro_user_create'
                 extras:
                     description: 'oro.user.menu.shortcut_new_user.description'
-                    isCustomAction: true
+                    is_custom_action: true
             shortcut_list_users:
                 label: 'oro.user.menu.shortcut_list_users.label'
                 route: 'oro_user_index'
                 extras:
                     description: 'oro.user.menu.shortcut_list_users.description'
-                    isCustomAction: true
+                    is_custom_action: true
             shortcut_new_role:
                 label: 'oro.user.menu.shortcut_new_role.label'
                 route: 'oro_user_role_create'

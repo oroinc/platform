@@ -24,7 +24,11 @@ class ConfigurationCompilerPass implements CompilerPassInterface
     const FORM_TYPE_TAG                            = 'form.type';
     const FORM_TYPE_EXTENSION_TAG                  = 'form.type_extension';
     const FORM_TYPE_GUESSER_TAG                    = 'form.type_guesser';
+    const FORM_TYPE_FACTORY_SERVICE_ID             = 'form.resolved_type_factory';
     const API_FORM_REGISTRY_CLASS                  = 'Oro\Bundle\ApiBundle\Form\SwitchableFormRegistry';
+    const API_FORM_TYPE_FACTORY_CLASS              = 'Oro\Bundle\ApiBundle\Form\ApiResolvedFormTypeFactory';
+    const API_FORM_TYPE_FACTORY_SERVICE_ID         = 'oro_api.form.resolved_type_factory';
+    const API_FORM_EXTENSION_STATE_SERVICE_ID      = 'oro_api.form.state';
     const API_FORM_SWITCHABLE_EXTENSION_SERVICE_ID = 'oro_api.form.switchable_extension';
     const API_FORM_EXTENSION_SERVICE_ID            = 'oro_api.form.extension';
     const API_FORM_TYPE_TAG                        = 'oro.api.form.type';
@@ -112,6 +116,10 @@ class ConfigurationCompilerPass implements CompilerPassInterface
         $this->assertExistingFormRegistry($formRegistryDef, $container);
         $formRegistryDef->setClass(self::API_FORM_REGISTRY_CLASS);
         $formRegistryDef->replaceArgument(0, [new Reference(self::API_FORM_SWITCHABLE_EXTENSION_SERVICE_ID)]);
+        $formRegistryDef->addArgument(new Reference(self::API_FORM_EXTENSION_STATE_SERVICE_ID));
+
+        // decorates the "form.resolved_type_factory" service
+        $this->decorateFormTypeFactory($container);
 
         $apiFormDef = $container->getDefinition(self::API_FORM_SWITCHABLE_EXTENSION_SERVICE_ID);
         if ($container->hasDefinition(self::FORM_EXTENSION_SERVICE_ID)) {
@@ -162,6 +170,24 @@ class ConfigurationCompilerPass implements CompilerPassInterface
             $container->getDefinition(self::API_FORM_METADATA_GUESSER_SERVICE_ID)
                 ->replaceArgument(0, $dataTypeMappings);
         }
+    }
+
+    /**
+     * @param ContainerBuilder $container
+     */
+    protected function decorateFormTypeFactory(ContainerBuilder $container)
+    {
+        $factoryDef = new Definition(
+            self::API_FORM_TYPE_FACTORY_CLASS,
+            [
+                new Reference(self::API_FORM_TYPE_FACTORY_SERVICE_ID . '.inner'),
+                new Reference(self::API_FORM_EXTENSION_STATE_SERVICE_ID)
+            ]
+        );
+        $factoryDef->setPublic(false);
+        $factoryDef->setDecoratedService(self::FORM_TYPE_FACTORY_SERVICE_ID);
+
+        $container->setDefinition(self::API_FORM_TYPE_FACTORY_SERVICE_ID, $factoryDef);
     }
 
     /**

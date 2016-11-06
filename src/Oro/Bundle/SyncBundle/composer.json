@@ -10,7 +10,11 @@
         "symfony/symfony": "2.8.*, !=2.8.10",
         "jdare/clank-bundle": "dev-master",
         "oro/platform-bundle": "dev-master",
-        "oro/requirejs-bundle": "dev-master"
+        "oro/requirejs-bundle": "dev-master",
+        "oro/ui-bundle": "dev-master",
+        "bower-asset/autobahnjs": "0.8.0",
+        "bower-asset/when": "2.4.0",
+        "bower-asset/crypto-js": "3.1.7"
     },
     "autoload": {
         "psr-0": { "Oro\\Bundle\\SyncBundle": "" }

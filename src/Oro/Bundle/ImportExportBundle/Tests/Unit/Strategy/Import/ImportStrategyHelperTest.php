@@ -53,7 +53,7 @@ class ImportStrategyHelperTest extends \PHPUnit_Framework_TestCase
         $this->translator = $this->getMockBuilder('Symfony\Component\Translation\TranslatorInterface')
             ->getMock();
 
-        $this->fieldHelper = $this->getMockBuilder('Oro\Bundle\ImportExportBundle\Field\FieldHelper')
+        $this->fieldHelper = $this->getMockBuilder('Oro\Bundle\EntityBundle\Helper\FieldHelper')
             ->disableOriginalConstructor()
             ->getMock();
 

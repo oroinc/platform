@@ -6,6 +6,8 @@ oro:
             sent:        Sent
             unread:      Unread Emails
             view_all:    View All
+            view_email:  View Email
+            reply:       Reply
             description: This widget allows you to see most recent additions to your inbox and outbox
 
     email:
@@ -16,7 +18,7 @@ oro:
         filter.inactive: inactive
         controller:
             emailtemplate.saved.message: "Template saved"
-            job_scheduled.message: "The job has been added to the queue %link%"
+            job_scheduled.message: "The job has been added to the queue"
             job_progress: Check progress
         form:
             choose_template:                     ""
@@ -177,6 +179,7 @@ oro:
             emails:
                 action:
                     view: "View"
+                    reply: "Reply"
                     mark_as_read: "Mark As Read"
                     mark_as_unread: "Mark As Unread"
                     enable_to_change_status: "Enable to change status"

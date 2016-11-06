@@ -136,7 +136,7 @@ class NavigationHistoryBuilderTest extends \PHPUnit_Framework_TestCase
 
         $configMock->expects($this->once())
                         ->method('get')
-                        ->with($this->equalTo('oro_navigation.maxItems'))
+                        ->with($this->equalTo('oro_navigation.max_items'))
                         ->will($this->returnValue($n));
 
         $this->manipulator->expects($this->once())
