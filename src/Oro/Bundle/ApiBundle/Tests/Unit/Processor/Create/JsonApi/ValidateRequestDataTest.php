@@ -5,6 +5,10 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\Create\JsonApi;
 use Oro\Bundle\ApiBundle\Processor\Create\JsonApi\ValidateRequestData;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\FormProcessorTestCase;
 
+/**
+ * This test case contains only cases for "create" action, for common tests see
+ * @see \Oro\Bundle\ApiBundle\Tests\Unit\Processor\Shared\JsonApi\ValidateRequestDataTest
+ */
 class ValidateRequestDataTest extends FormProcessorTestCase
 {
     /** @var \PHPUnit_Framework_MockObject_MockObject */
@@ -29,7 +33,7 @@ class ValidateRequestDataTest extends FormProcessorTestCase
      */
     public function testProcessWithValidRequestData($requestData)
     {
-        $this->valueNormalizer->expects($this->once())
+        $this->valueNormalizer->expects($this->any())
             ->method('normalizeValue')
             ->with('products')
             ->willReturn('Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Product');
@@ -48,13 +52,16 @@ class ValidateRequestDataTest extends FormProcessorTestCase
                 ['data' => ['type' => 'products', 'attributes' => ['test' => null]]]
             ],
             [
-                ['data' => ['id' => '23', 'type' => 'products', 'attributes' => ['test' => null]]]
+                ['data' => ['id' => '1', 'type' => 'products', 'attributes' => ['test' => null]]]
             ],
             [
                 ['data' => ['type' => 'products', 'relationships' => ['test' => ['data' => null]]]]
             ],
             [
-                ['data' => ['type' => 'products', 'relationships' => ['test' => ['data' => []]]]],
+                ['data' => ['type' => 'products', 'relationships' => ['test' => ['data' => []]]]]
+            ],
+            [
+                ['data' => ['type' => 'products']]
             ],
         ];
     }
@@ -62,7 +69,7 @@ class ValidateRequestDataTest extends FormProcessorTestCase
     /**
      * @dataProvider invalidRequestDataProvider
      */
-    public function testProcessWithInvalidRequestData($requestData, $expectedErrorString, $pointer, $expectedCode = 400)
+    public function testProcessWithInvalidRequestData($requestData, $expectedError, $pointer)
     {
         $this->context->setClassName('Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Product');
         $this->context->setRequestData($requestData);
@@ -75,12 +82,15 @@ class ValidateRequestDataTest extends FormProcessorTestCase
         $this->processor->process($this->context);
 
         $errors = $this->context->getErrors();
-        $this->assertCount(1, $errors);
-        $error = $errors[0];
-        $this->assertEquals($expectedCode, $error->getStatusCode());
-        $this->assertEquals('request data constraint', $error->getTitle());
-        $this->assertEquals($expectedErrorString, $error->getDetail());
-        $this->assertEquals($pointer, $error->getSource()->getPointer());
+
+        $expectedError = (array)$expectedError;
+        $pointer = (array)$pointer;
+        $this->assertCount(count($expectedError), $errors);
+        foreach ($errors as $key => $error) {
+            $this->assertEquals('request data constraint', $error->getTitle());
+            $this->assertEquals($expectedError[$key], $error->getDetail());
+            $this->assertEquals($pointer[$key], $error->getSource()->getPointer());
+        }
     }
 
     /**
@@ -89,100 +99,32 @@ class ValidateRequestDataTest extends FormProcessorTestCase
     public function invalidRequestDataProvider()
     {
         return [
-            [[], 'The primary data object should exist', '/data'],
-            [['data' => null], 'The primary data object should not be empty', '/data'],
-            [['data' => []], 'The primary data object should not be empty', '/data'],
+            [
+                ['data' => ['id' => null, 'type' => 'products', 'attributes' => ['test' => null]]],
+                'The \'id\' property should not be null',
+                '/data/id'
+            ],
+            [
+                ['data' => ['id' => '', 'type' => 'products', 'attributes' => ['test' => null]]],
+                'The \'id\' property should not be blank',
+                '/data/id'
+            ],
+            [
+                ['data' => ['id' => ' ', 'type' => 'products', 'attributes' => ['test' => null]]],
+                'The \'id\' property should not be blank',
+                '/data/id'
+            ],
+            [
+                ['data' => ['id' => 1, 'type' => 'products', 'attributes' => ['test' => null]]],
+                'The \'id\' property should be a string',
+                '/data/id'
+            ],
             [['data' => ['attributes' => ['foo' => 'bar']]], 'The \'type\' property is required', '/data/type'],
             [
                 ['data' => ['type' => 'test', 'attributes' => ['foo' => 'bar']]],
                 'The \'type\' property of the primary data object should match the requested resource',
                 '/data/type',
             ],
-            [
-                ['data' => ['type' => 'products']],
-                'The primary data object should contain \'attributes\' or \'relationships\' block',
-                '/data',
-            ],
-            [
-                ['data' => ['type' => 'products']],
-                'The primary data object should contain \'attributes\' or \'relationships\' block',
-                '/data',
-            ],
-            [
-                ['data' => ['type' => 'products', 'attributes' => null]],
-                'The \'attributes\' property should be an array',
-                '/data/attributes',
-            ],
-            [
-                ['data' => ['type' => 'products', 'attributes' => []]],
-                'The \'attributes\' property should not be empty',
-                '/data/attributes',
-            ],
-            [
-                ['data' => ['type' => 'products', 'attributes' => [1, 2, 3]]],
-                'The \'attributes\' property should be an associative array',
-                '/data/attributes',
-            ],
-            [
-                ['data' => ['type' => 'products', 'relationships' => null]],
-                'The \'relationships\' property should be an array',
-                '/data/relationships',
-            ],
-            [
-                ['data' => ['type' => 'products', 'relationships' => []]],
-                'The \'relationships\' property should not be empty',
-                '/data/relationships',
-            ],
-            [
-                ['data' => ['type' => 'products', 'relationships' => [1, 2, 3]]],
-                'The \'relationships\' property should be an associative array',
-                '/data/relationships',
-            ],
-            [
-                ['data' => ['type' => 'products', 'relationships' => ['test' => null]]],
-                'The relationship should have \'data\' property',
-                '/data/relationships/test',
-            ],
-            [
-                ['data' => ['type' => 'products', 'relationships' => ['test' => []]]],
-                'The relationship should have \'data\' property',
-                '/data/relationships/test',
-            ],
-            [
-                ['data' => ['type' => 'products', 'relationships' => ['test' => ['data' => ['id' => '2']]]]],
-                'The \'type\' property is required',
-                '/data/relationships/test/data/type',
-            ],
-            [
-                [
-                    'data' => [
-                        'type'          => 'products',
-                        'relationships' => ['test' => ['data' => ['type' => 'products']]]
-                    ]
-                ],
-                'The \'id\' property is required',
-                '/data/relationships/test/data/id',
-            ],
-            [
-                [
-                    'data' => [
-                        'type'          => 'products',
-                        'relationships' => ['test' => ['data' => [['id' => '2']]]]
-                    ]
-                ],
-                'The \'type\' property is required',
-                '/data/relationships/test/data/0/type',
-            ],
-            [
-                [
-                    'data' => [
-                        'type'          => 'products',
-                        'relationships' => ['test' => ['data' => [['type' => 'products']]]]
-                    ]
-                ],
-                'The \'id\' property is required',
-                '/data/relationships/test/data/0/id',
-            ]
         ];
     }
 }
