@@ -114,7 +114,8 @@
         "bower-asset/numeral": "1.5.2",
         "bower-asset/jquery-form": "3.37.0",
         "npm-asset/requirejs": "2.3.*",
-        "doctrine/annotations": "~1.2.7"
+        "doctrine/annotations": "~1.2.7",
+        "robloach/component-installer": "0.2.*"
     },
     "require-dev": {
         "sensio/generator-bundle": "2.5.3",
