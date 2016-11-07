@@ -3,8 +3,8 @@
 namespace Oro\Bundle\WorkflowBundle\Form\Type;
 
 use Symfony\Component\Form\AbstractType;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 use Symfony\Component\OptionsResolver\Options;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
 
@@ -51,48 +51,47 @@ class WorkflowSelectType extends AbstractType
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults(
-            array(
+            [
                 'entity_class' => null,
-                'config_id'    => null, // can be extracted from parent form
-            )
+                'config_id' => null, // can be extracted from parent form
+            ]
         );
 
-        $resolver->setNormalizers(
-            array(
-                'choices' => function (Options $options, $value) {
-                    if (!empty($value)) {
-                        return $value;
-                    }
-
-                    $entityClass = $options['entity_class'];
-                    if (!$entityClass && $options->has('config_id')) {
-                        $configId = $options['config_id'];
-                        if ($configId && $configId instanceof ConfigIdInterface) {
-                            $entityClass = $configId->getClassName();
-                        }
-                    }
-
-                    $choices = array();
-                    if ($entityClass) {
-                        /** @var WorkflowDefinition[] $definitions */
-                        $definitions = $this->registry->getRepository('OroWorkflowBundle:WorkflowDefinition')
-                            ->findBy(array('relatedEntity' => $entityClass));
-
-                        foreach ($definitions as $definition) {
-                            $name = $definition->getName();
-                            $label = $definition->getLabel();
-                            $choices[$name] = $label;
-                        }
-                    }
-
-                    return $choices;
+        $resolver->setNormalizer(
+            'choices',
+            function (Options $options, $value) {
+                if (!empty($value)) {
+                    return $value;
                 }
-            )
+
+                $entityClass = $options['entity_class'];
+                if (!$entityClass && $options->offsetExists('config_id')) {
+                    $configId = $options['config_id'];
+                    if ($configId && $configId instanceof ConfigIdInterface) {
+                        $entityClass = $configId->getClassName();
+                    }
+                }
+
+                $choices = [];
+                if ($entityClass) {
+                    /** @var WorkflowDefinition[] $definitions */
+                    $definitions = $this->registry->getRepository(WorkflowDefinition::class)
+                        ->findBy(['relatedEntity' => $entityClass]);
+
+                    foreach ($definitions as $definition) {
+                        $name = $definition->getName();
+                        $label = $definition->getLabel();
+                        $choices[$name] = $label;
+                    }
+                }
+
+                return $choices;
+            }
         );
     }
 }
