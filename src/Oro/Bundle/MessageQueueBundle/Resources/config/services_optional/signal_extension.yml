@@ -1,0 +1,6 @@
+services:
+    oro_message_queue.consumption.signal_extension:
+        class: 'Oro\Component\MessageQueue\Consumption\Extension\SignalExtension'
+        public: false
+        tags:
+            - { name: 'oro_message_queue.consumption.extension' }
