@@ -10,23 +10,23 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Translation\Util\ArrayConverter;
 use Symfony\Component\Yaml\Yaml;
 
-use Oro\Bundle\TranslationBundle\Entity\Translation;
 use Oro\Bundle\TranslationBundle\Translation\Translator;
 
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
+use Oro\Bundle\WorkflowBundle\Helper\WorkflowTranslationHelper;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowManager;
 
 class DumpWorkflowTranslationsCommand extends ContainerAwareCommand
 {
+    const NAME = 'oro:workflow:translations:dump';
     const INLINE_LEVEL = 10;
-    const TRANSLATION_DOMAIN = 'workflows';
 
     /**
      * {@inheritdoc}
      */
     protected function configure()
     {
-        $this->setName('oro:workflow:translations:dump')
+        $this->setName(self::NAME)
             ->setDescription('Dump translations')
             ->addArgument(
                 'workflow',
@@ -38,7 +38,7 @@ class DumpWorkflowTranslationsCommand extends ContainerAwareCommand
                 null,
                 InputOption::VALUE_OPTIONAL,
                 'Locale whose translations should to be dumped',
-                Translation::DEFAULT_LOCALE
+                Translator::DEFAULT_LOCALE
             );
     }
 
@@ -98,11 +98,12 @@ class DumpWorkflowTranslationsCommand extends ContainerAwareCommand
     protected function processKeys(Translator $translator, array $keys, $locale)
     {
         $translations = [];
+        $domain = WorkflowTranslationHelper::TRANSLATION_DOMAIN;
         foreach ($keys as $key) {
-            if ($translator->hasTrans($key, self::TRANSLATION_DOMAIN, $locale)) {
-                $translation = $translator->trans($key, [], self::TRANSLATION_DOMAIN, $locale);
-            } elseif ($translator->hasTrans($key, self::TRANSLATION_DOMAIN, Translation::DEFAULT_LOCALE)) {
-                $translation = $translator->trans($key, [], self::TRANSLATION_DOMAIN, Translation::DEFAULT_LOCALE);
+            if ($translator->hasTrans($key, $domain, $locale)) {
+                $translation = $translator->trans($key, [], $domain, $locale);
+            } elseif ($translator->hasTrans($key, $domain, Translator::DEFAULT_LOCALE)) {
+                $translation = $translator->trans($key, [], $domain, Translator::DEFAULT_LOCALE);
             } else {
                 $translation = '';
             }

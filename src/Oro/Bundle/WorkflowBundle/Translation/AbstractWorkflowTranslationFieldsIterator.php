@@ -88,6 +88,12 @@ abstract class AbstractWorkflowTranslationFieldsIterator implements TranslationF
             foreach ($transitionConfig['form_options']['attribute_fields'] as $attributeName => &$attributeConfig) {
                 $context['attribute_name'] = $attributeName;
                 $key = $this->makeKey(TransitionAttributeLabelTemplate::class, $context);
+
+                if (isset($attributeConfig['label'])) {
+                    $attributeConfig['options']['label'] = $attributeConfig['label'];
+                    unset($attributeConfig['label']);
+                }
+
                 yield $key => $attributeConfig['options']['label'];
                 unset($context['attribute_name']);
             }

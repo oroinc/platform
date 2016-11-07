@@ -42,7 +42,7 @@ class TranslationRepository extends EntityRepository
      * @param string $domain
      * @return Translation|null
      */
-    public function findValue($key, $locale, $domain)
+    public function findTranslation($key, $locale, $domain)
     {
         $queryBuilder = $this->createQueryBuilder('t');
 

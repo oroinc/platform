@@ -2,12 +2,14 @@
 
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Form\Type;
 
-use Oro\Bundle\SecurityBundle\Util\PropertyPathSecurityHelper;
-use Symfony\Component\Form\Test\FormIntegrationTestCase;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\Form\Test\FormIntegrationTestCase;
+use Symfony\Component\Translation\TranslatorInterface;
 
 use Oro\Bundle\ActionBundle\Model\Attribute;
 use Oro\Bundle\ActionBundle\Model\AttributeGuesser;
+
+use Oro\Bundle\SecurityBundle\Util\PropertyPathSecurityHelper;
 
 use Oro\Bundle\WorkflowBundle\Form\EventListener\DefaultValuesListener;
 use Oro\Bundle\WorkflowBundle\Form\EventListener\FormInitListener;
@@ -24,7 +26,6 @@ use Oro\Bundle\WorkflowBundle\Model\Workflow;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowRegistry;
 
 use Oro\Component\Action\Model\ContextAccessor;
-use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
 abstract class AbstractWorkflowAttributesTypeTestCase extends FormIntegrationTestCase
 {
@@ -123,6 +124,17 @@ abstract class AbstractWorkflowAttributesTypeTestCase extends FormIntegrationTes
         return $result;
     }
 
+    /**
+     * @param WorkflowRegistry|null $workflowRegistry
+     * @param AttributeGuesser|null $attributeGuesser
+     * @param DefaultValuesListener|null $defaultValuesListener
+     * @param FormInitListener|null $formInitListener
+     * @param RequiredAttributesListener|null $requiredAttributesListener
+     * @param EventDispatcherInterface|null $dispatcher
+     * @param PropertyPathSecurityHelper|null $propertyPathSecurityHelper
+     * @param TranslatorInterface|null $translator
+     * @return WorkflowAttributesType
+     */
     protected function createWorkflowAttributesType(
         WorkflowRegistry $workflowRegistry = null,
         AttributeGuesser $attributeGuesser = null,
@@ -130,7 +142,8 @@ abstract class AbstractWorkflowAttributesTypeTestCase extends FormIntegrationTes
         FormInitListener $formInitListener = null,
         RequiredAttributesListener $requiredAttributesListener = null,
         EventDispatcherInterface $dispatcher = null,
-        PropertyPathSecurityHelper $propertyPathSecurityHelper = null
+        PropertyPathSecurityHelper $propertyPathSecurityHelper = null,
+        TranslatorInterface $translator = null
     ) {
         if (!$workflowRegistry) {
             $workflowRegistry = $this->createWorkflowRegistryMock();
@@ -153,6 +166,9 @@ abstract class AbstractWorkflowAttributesTypeTestCase extends FormIntegrationTes
         if (!$propertyPathSecurityHelper) {
             $propertyPathSecurityHelper = $this->createPropertyPathSecurityHelper();
         }
+        if (!$translator) {
+            $translator = $this->getMock(TranslatorInterface::class);
+        }
 
         return new WorkflowAttributesType(
             $workflowRegistry,
@@ -162,7 +178,8 @@ abstract class AbstractWorkflowAttributesTypeTestCase extends FormIntegrationTes
             $requiredAttributesListener,
             new ContextAccessor(),
             $dispatcher,
-            $propertyPathSecurityHelper
+            $propertyPathSecurityHelper,
+            $translator
         );
     }
 

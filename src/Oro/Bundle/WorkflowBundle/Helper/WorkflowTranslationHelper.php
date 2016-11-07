@@ -81,8 +81,8 @@ class WorkflowTranslationHelper
             $result = $this->values[$cacheKey][$key];
         }
 
-        if (!$result && $locale !== Translation::DEFAULT_LOCALE) {
-            $result = $this->findWorkflowTranslation($key, $workflowName, Translation::DEFAULT_LOCALE);
+        if (!$result && $locale !== Translator::DEFAULT_LOCALE) {
+            $result = $this->findWorkflowTranslation($key, $workflowName, Translator::DEFAULT_LOCALE);
         }
 
         return $result ?: $key;
@@ -95,12 +95,14 @@ class WorkflowTranslationHelper
      */
     public function findTranslation($key, $locale = null)
     {
-        $locale = $locale ?: $this->translator->getLocale();
+        if (!$locale) {
+            $locale = $this->translator->getLocale();
+        }
 
         $result = $this->translationHelper->findValue($key, $locale, self::TRANSLATION_DOMAIN);
 
-        if (!$result && $locale !== Translation::DEFAULT_LOCALE) {
-            $result = $this->findTranslation($key, Translation::DEFAULT_LOCALE);
+        if (!$result && $locale !== Translator::DEFAULT_LOCALE) {
+            $result = $this->findTranslation($key, Translator::DEFAULT_LOCALE);
         }
 
         return $result ?: $key;
@@ -109,20 +111,20 @@ class WorkflowTranslationHelper
     /**
      * @param string $key
      * @param string $value
-     *
      */
     public function saveTranslation($key, $value)
     {
         $currentLocale = $this->translator->getLocale();
         $this->saveValue($key, $value, $currentLocale);
 
-        if ($currentLocale !== Translation::DEFAULT_LOCALE) {
-            $existingValue = $this->findValue($key);
-
-            if ($existingValue === null) {
-                $this->saveValue($key, $value);
-            }
+        if ($currentLocale !== Translator::DEFAULT_LOCALE && null === $this->findValue($key)) {
+            $this->saveValue($key, $value);
         }
+    }
+
+    public function flushTranslations()
+    {
+        $this->translationManager->flush();
     }
 
     /**
@@ -130,7 +132,7 @@ class WorkflowTranslationHelper
      * @param string $locale
      * @return string
      */
-    private function findValue($key, $locale = Translation::DEFAULT_LOCALE)
+    private function findValue($key, $locale = Translator::DEFAULT_LOCALE)
     {
         return $this->translationHelper->findValue($key, $locale, self::TRANSLATION_DOMAIN);
     }
@@ -140,8 +142,14 @@ class WorkflowTranslationHelper
      * @param string $value
      * @param string $locale
      */
-    private function saveValue($key, $value, $locale = Translation::DEFAULT_LOCALE)
+    private function saveValue($key, $value, $locale = Translator::DEFAULT_LOCALE)
     {
-        $this->translationManager->saveValue($key, $value, $locale, self::TRANSLATION_DOMAIN, Translation::SCOPE_UI);
+        $this->translationManager->saveTranslation(
+            $key,
+            $value,
+            $locale,
+            self::TRANSLATION_DOMAIN,
+            Translation::SCOPE_UI
+        );
     }
 }

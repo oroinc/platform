@@ -220,6 +220,7 @@ oro:
             form:
                 workflow_to_deactivation_message: "The following workflows will be deactivated automatically according to the exclusive workflow group settings:"
                 replace_message: "Optionally you may select workflows to be deactivated. Deactivation will reset workflow data of selected workflows."
+            grid.label: "Workflow Name"
 
         workflowitem:
             entity_label:             Workflow Item

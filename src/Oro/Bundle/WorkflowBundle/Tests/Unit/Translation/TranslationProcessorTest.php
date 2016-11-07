@@ -68,6 +68,21 @@ class TranslationProcessorTest extends \PHPUnit_Framework_TestCase
         $this->processor->handle([]);
     }
 
+    public function testTranslateWorkflowDefinitionFieldsWithoutWorkflowName()
+    {
+        $this->translationHelper->expects($this->never())->method($this->anything());
+
+        $definition = new WorkflowDefinition();
+        $definition->setLabel('stored_label');
+
+        $this->processor->translateWorkflowDefinitionFields($definition);
+
+        $expected = new WorkflowDefinition();
+        $expected->setLabel('stored_label');
+
+        $this->assertEquals($expected, $definition);
+    }
+
     /**
      * @dataProvider translateWorkflowDefinitionFieldsProvider
      * @param WorkflowDefinition $definition

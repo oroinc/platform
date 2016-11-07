@@ -14,6 +14,9 @@
                     entity_attribute: entity.entityAttributeName | default('entity'),
                     startStep: entity.startStep.name | default(null),
                     stepsDisplayOrdered: entity.stepsDisplayOrdered,
+                    priority: entity.priority,
+                    exclusive_active_groups: entity.exclusiveActiveGroups,
+                    exclusive_record_groups: entity.exclusiveRecordGroups
                 },
                 system_entities: system_entities,
                 chartOptions: {},
@@ -35,7 +38,7 @@
     </label>
 {% endmacro %}
 
-{% oro_title_set({params : {"%workflow_definition.label%": entity.label} }) %}
+{% oro_title_set({params : {"%workflow_definition.label%": entity.label|trans({},'workflows')} }) %}
 {# API REST route for POST used both for create and update #}
 {% if entity.name %}
     {% set formAction = path('oro_api_workflow_definition_post', {workflowDefinition: entity.name}) %}

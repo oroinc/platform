@@ -158,7 +158,8 @@ class SystemConfigurationFormProviderTest extends FormIntegrationTestCase
             'bad field definition - no data_type'      => array(
                 'filename'  => 'bad_field_without_data_type.yml',
                 'exception' => '\Symfony\Component\Config\Definition\Exception\InvalidConfigurationException',
-                'message'   => 'The "data_type" is required except "ui_only" is defined. {"options":[]}',
+                'message'   => 'The "data_type" is required except "ui_only" is defined. '
+                    . '{"options":[],"page_reload":false}',
                 'method'    => 'getTree',
                 'arguments' => array()
             ),

@@ -91,7 +91,7 @@ require([
           }
 
           function searchByTagClose() {
-              if (searchBarInput.size()) {
+              if (searchBarInput.length) {
                   var queryString2 = searchBarInput.val();
 
                   searchBarContainer

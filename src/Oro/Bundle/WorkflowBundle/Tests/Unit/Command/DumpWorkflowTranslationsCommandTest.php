@@ -7,11 +7,11 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Yaml\Yaml;
 
-use Oro\Bundle\TranslationBundle\Entity\Translation;
 use Oro\Bundle\TranslationBundle\Translation\Translator;
 
 use Oro\Bundle\WorkflowBundle\Command\DumpWorkflowTranslationsCommand;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
+use Oro\Bundle\WorkflowBundle\Helper\WorkflowTranslationHelper;
 use Oro\Bundle\WorkflowBundle\Model\Workflow;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowManager;
 
@@ -86,6 +86,11 @@ class DumpWorkflowTranslationsCommandTest extends \PHPUnit_Framework_TestCase
         );
     }
 
+    public function testGetName()
+    {
+        $this->assertEquals(DumpWorkflowTranslationsCommand::NAME, $this->command->getName());
+    }
+
     public function testConfigure()
     {
         $this->assertNotEmpty($this->command->getDescription());
@@ -142,8 +147,8 @@ class DumpWorkflowTranslationsCommandTest extends \PHPUnit_Framework_TestCase
 
         $this->workflow->expects($this->once())->method('getDefinition')->willReturn($definition);
 
-        $domain = DumpWorkflowTranslationsCommand::TRANSLATION_DOMAIN;
-        $defaultLocale = Translation::DEFAULT_LOCALE;
+        $domain = WorkflowTranslationHelper::TRANSLATION_DOMAIN;
+        $defaultLocale = Translator::DEFAULT_LOCALE;
 
         $this->translator->expects($this->any())
             ->method('hasTrans')

@@ -41,7 +41,7 @@ define([
             this.actionArgs = null;
             if (this.deferredRender) {
                 // collects initialization promises
-                promises.push(this.deferredRender.promise(this));
+                promises.push(this.getDeferredRenderPromise());
             }
         },
 
@@ -54,8 +54,7 @@ define([
          * @override
          */
         render: function() {
-            var data;
-            data = this.getTemplateData();
+            var data = this.getTemplateData();
 
             if (!data) {
                 // no data, it is initial auto render, skip rendering

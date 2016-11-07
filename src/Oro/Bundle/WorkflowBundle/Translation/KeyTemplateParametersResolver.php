@@ -6,12 +6,11 @@ use Symfony\Component\Translation\TranslatorInterface;
 
 use Oro\Bundle\TranslationBundle\Translation\TranslationKeyTemplateInterface;
 
+use Oro\Bundle\WorkflowBundle\Helper\WorkflowTranslationHelper;
 use Oro\Bundle\WorkflowBundle\Translation\KeyTemplate;
 
 class KeyTemplateParametersResolver
 {
-    const TRANSLATION_DOMAIN = 'workflows';
-
     /** @var TranslatorInterface */
     protected $translator;
 
@@ -69,7 +68,7 @@ class KeyTemplateParametersResolver
         $resolved[$template->getKeyTemplate($template->getName())] = $this->translator->trans(
             $templateKey,
             [],
-            self::TRANSLATION_DOMAIN
+            WorkflowTranslationHelper::TRANSLATION_DOMAIN
         );
     }
 }

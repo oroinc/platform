@@ -98,7 +98,7 @@ class TranslationControllerTest extends WebTestCase
 
         $result = $this->getJsonResponseContent($this->client->getResponse(), 200);
 
-        $translation = $this->repository->findValue(
+        $translation = $this->repository->findTranslation(
             LoadTranslations::TRANSLATION1,
             LoadLanguages::LANGUAGE1,
             LoadTranslations::TRANSLATION_KEY_DOMAIN

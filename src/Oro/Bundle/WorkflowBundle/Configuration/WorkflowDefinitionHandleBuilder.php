@@ -46,7 +46,7 @@ class WorkflowDefinitionHandleBuilder extends AbstractConfigurationBuilder
 
         $configuration = $this->configuration->processConfiguration($configuration);
 
-        $this->assertConfigurationOptions($configuration, array('name'));
+        $this->assertConfigurationOptions($configuration, ['name']);
         $name = $this->getConfigurationOption($configuration, 'name');
 
         return $this->configurationBuilder->buildOneFromConfiguration($name, $configuration);

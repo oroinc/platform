@@ -87,8 +87,8 @@ class NavigationMostviewedBuilderTest extends \PHPUnit_Framework_TestCase
                 $organization,
                 $type,
                 array(
-                    'maxItems' => $maxItems,
-                    'orderBy' => array(array('field' => NavigationHistoryItem::NAVIGATION_HISTORY_COLUMN_VISIT_COUNT))
+                    'max_items' => $maxItems,
+                    'order_by' => array(array('field' => NavigationHistoryItem::NAVIGATION_HISTORY_COLUMN_VISIT_COUNT))
                 )
             )
             ->will($this->returnValue(array()));
@@ -104,7 +104,7 @@ class NavigationMostviewedBuilderTest extends \PHPUnit_Framework_TestCase
 
         $configMock->expects($this->once())
             ->method('get')
-            ->with($this->equalTo('oro_navigation.maxItems'))
+            ->with($this->equalTo('oro_navigation.max_items'))
             ->will($this->returnValue($maxItems));
 
         $menu = $this->getMockBuilder('Knp\Menu\ItemInterface')->getMock();

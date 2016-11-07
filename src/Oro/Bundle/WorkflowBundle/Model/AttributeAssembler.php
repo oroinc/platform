@@ -4,9 +4,12 @@ namespace Oro\Bundle\WorkflowBundle\Model;
 
 use Doctrine\Common\Collections\ArrayCollection;
 
+use Symfony\Component\Translation\TranslatorInterface;
+
 use Oro\Bundle\ActionBundle\Model\Attribute as BaseAttribute;
 use Oro\Bundle\ActionBundle\Model\AttributeGuesser;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
+use Oro\Bundle\WorkflowBundle\Helper\WorkflowTranslationHelper;
 
 use Oro\Component\Action\Exception\AssemblerException;
 use Oro\Component\Action\Model\AbstractAssembler as BaseAbstractAssembler;
@@ -19,11 +22,18 @@ class AttributeAssembler extends BaseAbstractAssembler
     protected $attributeGuesser;
 
     /**
-     * @param AttributeGuesser $attributeGuesser
+     * @var TranslatorInterface
      */
-    public function __construct(AttributeGuesser $attributeGuesser)
+    protected $translator;
+
+    /**
+     * @param AttributeGuesser $attributeGuesser
+     * @param TranslatorInterface $translator
+     */
+    public function __construct(AttributeGuesser $attributeGuesser, TranslatorInterface $translator)
     {
         $this->attributeGuesser = $attributeGuesser;
+        $this->translator = $translator;
     }
 
     /**
@@ -106,13 +116,33 @@ class AttributeAssembler extends BaseAbstractAssembler
         $attributeParameters = $this->attributeGuesser->guessAttributeParameters($rootClass, $propertyPath);
         if ($attributeParameters) {
             foreach ($guessedOptions as $option) {
-                if (empty($options[$option]) && !empty($attributeParameters[$option])) {
-                    $options[$option] = $attributeParameters[$option];
+                if (!empty($attributeParameters[$option])) {
+                    if (empty($options[$option])) {
+                        $options[$option] = $attributeParameters[$option];
+                    } elseif ($option === 'label') {
+                        $options[$option] = $this->guessOptionLabel($options, $attributeParameters);
+                    }
                 }
             }
         }
 
         return $options;
+    }
+
+    /**
+     * @param array $options
+     * @param array $attributeParameters
+     * @return string
+     */
+    private function guessOptionLabel(array $options, array $attributeParameters)
+    {
+        $domain = WorkflowTranslationHelper::TRANSLATION_DOMAIN;
+
+        if ($this->translator->trans($options['label'], [], $domain) === $options['label']) {
+            $options['label'] = $attributeParameters['label'];
+        }
+
+        return $options['label'];
     }
 
     /**
