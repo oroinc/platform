@@ -10,7 +10,6 @@ use Symfony\Component\Translation\Loader\LoaderInterface;
 use Symfony\Component\Translation\MessageSelector;
 use Symfony\Bundle\FrameworkBundle\Translation\Translator as BaseTranslator;
 
-use Oro\Bundle\TranslationBundle\Entity\Translation;
 use Oro\Bundle\TranslationBundle\Strategy\TranslationStrategyProvider;
 
 /**
@@ -18,6 +17,8 @@ use Oro\Bundle\TranslationBundle\Strategy\TranslationStrategyProvider;
  */
 class Translator extends BaseTranslator
 {
+    const DEFAULT_LOCALE = 'en';
+
     /** @var DynamicTranslationMetadataCache|null */
     protected $databaseTranslationMetadataCache;
 
@@ -331,8 +332,8 @@ class Translator extends BaseTranslator
      */
     protected function registerDynamicResources()
     {
-        $defaultLocale = isset($this->catalogues[Translation::DEFAULT_LOCALE])
-            ? $this->catalogues[Translation::DEFAULT_LOCALE]
+        $defaultLocale = isset($this->catalogues[Translator::DEFAULT_LOCALE])
+            ? $this->catalogues[Translator::DEFAULT_LOCALE]
             : null;
 
         foreach ($this->dynamicResources as $items) {
@@ -344,8 +345,8 @@ class Translator extends BaseTranslator
         }
 
         //prevents loding default locale many times (Default locale should be is default fallback locale)
-        if ($defaultLocale && !isset($this->catalogues[Translation::DEFAULT_LOCALE])) {
-            $this->catalogues[Translation::DEFAULT_LOCALE] = $defaultLocale;
+        if ($defaultLocale && !isset($this->catalogues[Translator::DEFAULT_LOCALE])) {
+            $this->catalogues[Translator::DEFAULT_LOCALE] = $defaultLocale;
         }
     }
 

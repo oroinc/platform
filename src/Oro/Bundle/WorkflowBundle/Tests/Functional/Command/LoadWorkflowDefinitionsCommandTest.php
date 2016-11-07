@@ -94,8 +94,8 @@ class LoadWorkflowDefinitionsCommandTest extends WebTestCase
 
         $this->assertCommandExecuted($expectedMessages);
 
-        $this->assertCount(count($definitions), $repositoryWorkflow->findAll());
-        $this->assertCount(count($triggersBefore), $repositoryTrigger->findAll());
+        $this->assertCount(count($definitions), $repositoryWorkflow->findAll(), 'definitions count should match');
+        $this->assertCount(count($triggersBefore), $repositoryTrigger->findAll(), 'triggers should match');
     }
 
     /**
@@ -156,7 +156,7 @@ class LoadWorkflowDefinitionsCommandTest extends WebTestCase
      */
     protected function assertCommandExecuted(array $messages)
     {
-        $result = $this->runCommand(self::NAME);
+        $result = $this->runCommand(self::NAME, ['--no-ansi']);
 
         $this->assertNotEmpty($result);
         foreach ($messages as $message) {

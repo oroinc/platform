@@ -169,9 +169,32 @@ Used with new class `Oro\Bundle\WorkflowBundle\Model\WorkflowExclusiveRecordGrou
 - Removed parameter `oro_workflow.listener.process_collector.class`.
 - Removed listener `oro_workflow.event_listener.scheduled_transitions_listener` (`Oro\Bundle\WorkflowBundle\EventListener\WorkflowScheduledTransitionsListener`).
 - Removed action group `oro_workflow_transition_process_schedule`.
-- Deprecated class `Oro\Bundle\WorkflowBundle\Model\AbstractStorage` removed
-- Deprecated class `Oro\Bundle\WorkflowBundle\Model\ConfigurationPass\ReplacePropertyPath` (`oro_workflow.configuration_pass.replace_property_path`) removed
-- Deprecated class `Oro\Bundle\WorkflowBundle\Model\ReplacePropertyPath\ContextAccessor` removed
+- Added possibility of translation for workflow configuration fields in file `Resources/translations/workflows.en.yml`:
+Now all following fields MUST be moved from workflow.yml configuration file in appropriate translation file under its key node. See keys and fields below:
+ `oro.workflow.{workflow_name}.label` - workflow `label` field.
+ `oro.workflow.{workflow_name}.step.{step_name}.label` - step `label` field.
+ `oro.workflow.{workflow_name}.attribute.{attribute_name}.label` - workflow attribute `label` field.
+ `oro.workflow.{workflow_name}.transition.{transition_name}.label` - transition `label` field.
+ `oro.workflow.{workflow_name}.transition.{transition_name}.warning_message` - transition `message` field.
+ `oro.workflow.{workflow_name}.transition.{transition_name}.attribute.{attribute_name}.label` - form options attribute `label` field.
+To migrate all labels from configuration translatable fields automatically you can use application command `oro:workflow:definitions:upgrade20`. 
+- Added command `oro:workflow:translations:dump` as a helper to see custom workflow translations (lack of them as well) and their keys.
+- Added `Oro\Bundle\WorkflowBundle\Configuration\WorkflowDefinitionBuilderExtensionInterface` and `oro.workflow.definition_builder.extension` service tag for usage in cases to pre-process (prepare) workflow builder configuration.
+- Added service tag `oro.workflow.configuration.handler` for request configuration procession by `Oro\Bundle\WorkflowBundle\Configuration\Handler\ConfigurationHandlerInterface`.
+- Removed `import` method from `Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition`. Use `Oro\Bundle\WorkflowBundle\Handler\Helper\WorkflowDefinitionCloner::cloneDefinition` instead.
+- Added `originalDefinition` property and second constructor argument for `Oro\Bundle\WorkflowBundle\Event\WorkflowChangesEvent` in case of definition update.
+- Container parameter `oro_workflow.workflow_item.entity.class` renamed to `oro_workflow.entity.workflow_item.class`
+- Container parameter `oro_workflow.workflow_definition.entity.class` renamed to `oro_workflow.entity.workflow_definition.class`
+- Container parameter `oro_workflow.process_trigger.entity.class` renamed to `oro_workflow.entity.process_trigger.class`
+- Container parameter `oro_workflow.process_definition.entity.class` renamed to `oro_workflow.entity.process_definition.class`
+- Added container parameter `oro_workflow.entity.transition_trigger_cron.class`
+- Added container parameter `oro_workflow.entity.transition_trigger_event.class`
+- Changed signature of constructor of `\Oro\Bundle\WorkflowBundle\Form\Type\WorkflowDefinitionSelectType`, now it takes as second argument instance of `Symfony\Component\Translation\TranslatorInterface`
+- Changed signature of constructor of `\Oro\Bundle\WorkflowBundle\Form\Type\WorkflowSelectType`, now it takes as second argument instance of `\Symfony\Component\Translation\TranslatorInterface`
+- Changed signature of constructor of `\Oro\Bundle\WorkflowBundle\Form\Type\WorkflowStepSelectType`, now it takes as second argument instance of `\Symfony\Component\Translation\TranslatorInterface`
+- Deprecated class `Oro\Bundle\WorkflowBundle\Model\AbstractStorage` removed.
+- Deprecated class `Oro\Bundle\WorkflowBundle\Model\ConfigurationPass\ReplacePropertyPath` (`oro_workflow.configuration_pass.replace_property_path`) removed.
+- Deprecated class `Oro\Bundle\WorkflowBundle\Model\ReplacePropertyPath\ContextAccessor` removed.
 
 ####LocaleBundle:
 - Added helper `Oro\Bundle\LocaleBundle\Helper\LocalizationQueryTrait` for adding necessary joins to QueryBuilder
@@ -233,6 +256,14 @@ Used with new class `Oro\Bundle\WorkflowBundle\Model\WorkflowExclusiveRecordGrou
 - Class `Oro\Bundle\LayoutBundle\Provider\ImageTypeProvider` added to provide available image types collected from all themes
 - Class `Oro\Bundle\LayoutBundle\Loader\ImageFilterLoader` added to dynamically load Imagine filters
 - Dependency injection tag `layout.image_filter.provider` added to support custom Imagine filter providers
+- Removed class `Oro\Bundle\LayoutBundle\Layout\Block\Extension\ExpressionExtension`.
+- Removed class `Oro\Bundle\LayoutBundle\Layout\Block\Extension\OptionValueBagExtension`.
+- Class `Oro\Bundle\LayoutBundle\Exception\CircularReferenceException` moved to `Oro\Component\Layout\Exception\CircularReferenceException`.
+- Class `Oro\Bundle\LayoutBundle\Layout\Encode\ExpressionEncoderInterface` moved to `Oro\Component\Layout\ExpressionLanguage\Encoder\ExpressionEncoderInterface`.
+- Class `Oro\Bundle\LayoutBundle\Layout\Encoder\ExpressionEncoderRegistry` moved to `Oro\Component\Layout\ExpressionLanguage\Encoder\ExpressionEncoderRegistry`.
+- Class `Oro\Bundle\LayoutBundle\Layout\Encoder\JsonExpressionEncoder` moved to `Oro\Component\Layout\ExpressionLanguage\Encoder\JsonExpressionEncoder`.
+- Class `Oro\Bundle\LayoutBundle\ExpressionLanguage\ExpressionManipulator` moved to `Oro\Component\Layout\ExpressionLanguage\ExpressionManipulator`.
+- Class `Oro\Bundle\LayoutBundle\Layout\Processor\ExpressionProcessor` moved to `Oro\Component\Layout\ExpressionLanguage\ExpressionProcessor`.
 
 ####ConfigBundle:
 - Class `Oro\Bundle\ConfigBundle\Config\AbstractScopeManager` added `$scopeIdentifier` of type integer, null or object as optional parameter for next methods: `getSettingValue`, `getInfo`, `set`, `reset`, `getChanges`, `flush`, `save`, `calculateChangeSet`, `reload`
@@ -274,6 +305,7 @@ Used with new class `Oro\Bundle\WorkflowBundle\Model\WorkflowExclusiveRecordGrou
 - Class `Oro/Bundle/DataGridBundle/Extension/MassAction/DeleteMassActionHandler.php`
     - construction signature was changed now it takes new argument:
         `MessageProducerInterface` $producer
+- Added helper `Oro\Bundle\DataGridBundle\Tools\DatagridRouteHelper`
 
 ####SecurityBundle
 - Removed layout context configurator `Oro\Bundle\SecurityBundle\Layout\Extension\SecurityFacadeContextConfigurator`.
@@ -332,7 +364,18 @@ Used with new class `Oro\Bundle\WorkflowBundle\Model\WorkflowExclusiveRecordGrou
 - Added new ACL permission `TRANSLATE`, should be used to determine if user has access to modify translations per language.
 - Removed `Oro\Bundle\TranslationBundle\Translation\TranslationStatusInterface`
 - Added `Oro\Bundle\TranslationBundle\DependencyInjection\Compiler\TranslationContextResolverPass`.
+- Added `Oro\Bundle\TranslationBundle\Helper\TranslationHelper` class with `oro_translation.helper.translation` as accessor for translation values in database.  
+- Added Twig extension `\Oro\Bundle\TranslationBundle\Twig\TranslationExtension` wich declare following TWIG functions:
+    - `oro_translation_debug_translator` 
+    - `translation_grid_link`
+- Added `Oro\Bundle\TranslationBundle\Translation\TranslationKeyGenerator`
+- Added `Oro\Bundle\TranslationBundle\Translation\TranslationKeySourceInterface` with 2 types of implementations `Oro\Bundle\TranslationBundle\Translation\KeySource\DynamicTranslationKeySource` and immutable one - `Oro\Bundle\TranslationBundle\Translation\KeySource\TranslationKeySource`
+- Added `Oro\Bundle\TranslationBundle\Translation\TranslationFieldsIteratorInterface` as useful way to define single point of custom structure translatable fields awareness and manipulation.
+- Added `Oro\Bundle\TranslationBundle\Translation\TranslationFieldsIteratorTrait`.
+- Added Data Provider `Oro\Bundle\TranslationBundle\Layout\DataProvider\TranslatorProvider` that provides the translator to Layouts. 
+- Added helper `Oro\Bundle\TranslationBundle\Helper\TranslationsDatagridRouteHelper`.
 
+ 
 ####EntityExtendBundle
 - `Oro\Bundle\EntityExtendBundle\Migration\EntityMetadataHelper`
     - `getEntityClassByTableName` deprecated, use `getEntityClassesByTableName` instead
