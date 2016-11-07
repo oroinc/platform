@@ -215,3 +215,8 @@ services:
     oro_layout.block_view_serializer:
         class: Symfony\Component\Serializer\Serializer
         arguments: [{}, {}]
+
+    oro_layout.option_value_bag_normaizer:
+        class: Oro\Bundle\LayoutBundle\Layout\Serializer\OptionValueBagNormalizer
+        tags:
+            - { name: oro_layout.block_view_serializer.normalizer }
