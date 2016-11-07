@@ -98,8 +98,9 @@ class AssociationToArrayAttributeConverter
     {
         $properties = $metadata->getMetaProperties();
         foreach ($properties as $name => $property) {
+            $resultName = $property->getResultName();
             if (array_key_exists($name, $data)) {
-                $result[$name] = $data[$name];
+                $result[$resultName] = $data[$name];
             }
         }
     }

@@ -7,6 +7,7 @@ use Doctrine\Common\Persistence\ManagerRegistry;
 use Symfony\Component\Form\DataTransformerInterface;
 use Symfony\Component\Form\Exception\TransformationFailedException;
 
+use Oro\Bundle\ApiBundle\Collection\IncludedEntityCollection;
 use Oro\Bundle\ApiBundle\Metadata\AssociationMetadata;
 
 class EntityToIdTransformer implements DataTransformerInterface
@@ -17,14 +18,22 @@ class EntityToIdTransformer implements DataTransformerInterface
     /** @var AssociationMetadata */
     protected $metadata;
 
+    /** @var IncludedEntityCollection|null */
+    protected $includedEntities;
+
     /**
-     * @param ManagerRegistry     $doctrine
-     * @param AssociationMetadata $metadata
+     * @param ManagerRegistry               $doctrine
+     * @param AssociationMetadata           $metadata
+     * @param IncludedEntityCollection|null $includedEntities
      */
-    public function __construct(ManagerRegistry $doctrine, AssociationMetadata $metadata)
-    {
+    public function __construct(
+        ManagerRegistry $doctrine,
+        AssociationMetadata $metadata,
+        IncludedEntityCollection $includedEntities = null
+    ) {
         $this->doctrine = $doctrine;
         $this->metadata = $metadata;
+        $this->includedEntities = $includedEntities;
     }
 
     /**
@@ -59,38 +68,71 @@ class EntityToIdTransformer implements DataTransformerInterface
         }
 
         $entityClass = $value['class'];
-        if (!in_array($entityClass, $this->metadata->getAcceptableTargetClassNames(), true)) {
+        $acceptableClassNames = $this->metadata->getAcceptableTargetClassNames();
+        if (!empty($acceptableClassNames) && !in_array($entityClass, $acceptableClassNames, true)) {
             throw new TransformationFailedException(
                 sprintf(
                     'The "%s" class is not acceptable. Acceptable classes: %s.',
                     $entityClass,
-                    implode(',', $this->metadata->getAcceptableTargetClassNames())
+                    implode(',', $acceptableClassNames)
                 )
             );
         }
 
-        $manager = $this->doctrine->getManagerForClass($entityClass);
-        if (null === $manager) {
-            throw new TransformationFailedException(
-                sprintf(
-                    'The "%s" class must be a managed Doctrine entity.',
-                    $entityClass
-                )
-            );
-        }
+        return $this->getEntity($entityClass, $value['id']);
+    }
 
-        $entity = $manager->getRepository($entityClass)->find($value['id']);
+    /**
+     * @param string $entityClass
+     * @param mixed  $entityId
+     *
+     * @return object
+     */
+    protected function getEntity($entityClass, $entityId)
+    {
+        $entity = $this->getIncludedEntity($entityClass, $entityId);
+        if (null === $entity) {
+            $manager = $this->doctrine->getManagerForClass($entityClass);
+            if (null === $manager) {
+                throw new TransformationFailedException(
+                    sprintf(
+                        'The "%s" class must be a managed Doctrine entity.',
+                        $entityClass
+                    )
+                );
+            }
+            $entity = $manager->getRepository($entityClass)->find($entityId);
+        }
         if (null === $entity) {
             throw new TransformationFailedException(
                 sprintf(
                     'An "%s" entity with "%s" identifier does not exist.',
                     $entityClass,
-                    $this->humanizeEntityId($value['id'])
+                    $this->humanizeEntityId($entityId)
                 )
             );
         }
 
         return $entity;
+    }
+
+    /**
+     * @param string $entityClass
+     * @param mixed  $entityId
+     *
+     * @return object|null
+     */
+    protected function getIncludedEntity($entityClass, $entityId)
+    {
+        if (null === $this->includedEntities) {
+            return null;
+        }
+
+        if ($this->includedEntities->isPrimaryEntity($entityClass, $entityId)) {
+            return $this->includedEntities->getPrimaryEntity();
+        }
+
+        return $this->includedEntities->get($entityClass, $entityId);
     }
 
     /**
