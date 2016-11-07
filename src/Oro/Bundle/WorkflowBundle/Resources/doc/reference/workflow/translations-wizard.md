@@ -8,7 +8,7 @@ So let's consider simple three steps that might bring relief to a workflow creat
 ***First Step***:
 
 First of all, you should have your workflow configuration itself loaded, those are placed under `<YourBundle>/Resources/config/oro/workflows.yml` file and can be loaded by `oro:workflow:definitions:load` command.
-(links: the configuration reference)
+(links: [the configuration reference](./configuration-reference.md))
 
 *For example*:
 ```bash
