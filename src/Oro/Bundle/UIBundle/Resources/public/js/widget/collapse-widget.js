@@ -31,6 +31,11 @@ define(['jquery', 'oroui/js/mediator', 'underscore', 'jquery-ui'], function($, m
             this.options.open = _.isBoolean(storedState) ? storedState : this.options.open;
 
             this.$el.toggleClass(this.options.openClass, this.options.open);
+            if (this.options.open) {
+                this.$container.show();
+            } else {
+                this.$container.hide();
+            }
 
             this.$el.addClass('init');
 
