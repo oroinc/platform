@@ -166,10 +166,13 @@ class WorkflowAssemblerTest extends \PHPUnit_Framework_TestCase
             ->with($this->isType('string'), $this->isType('array'))
             ->will(
                 $this->returnCallback(
-                    function ($id, array $parameters = array()) {
-                        $this->assertEquals('oro.workflow.transition.start', $id);
-                        $this->assertArrayHasKey('%workflow%', $parameters);
-                        return $this->getStartTransitionLabel($parameters['%workflow%']);
+                    function ($id, array $parameters = []) {
+                        if ($id === 'oro.workflow.transition.start') {
+                            $this->assertArrayHasKey('%workflow%', $parameters);
+                            return $this->getStartTransitionLabel($parameters['%workflow%']);
+                        }
+
+                        return $id;
                     }
                 )
             );
@@ -177,11 +180,19 @@ class WorkflowAssemblerTest extends \PHPUnit_Framework_TestCase
         return $translator;
     }
 
+    /**
+     * @param string $workflowLabel
+     * @return string
+     */
     protected function getStartTransitionLabel($workflowLabel)
     {
         return 'Start ' . $workflowLabel;
     }
 
+    /**
+     * @param string $name
+     * @return \PHPUnit_Framework_MockObject_MockObject
+     */
     protected function getStepMock($name)
     {
         $step = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Model\Step')
@@ -193,6 +204,11 @@ class WorkflowAssemblerTest extends \PHPUnit_Framework_TestCase
         return $step;
     }
 
+    /**
+     * @param string $isStart
+     * @param string $name
+     * @return \PHPUnit_Framework_MockObject_MockObject
+     */
     protected function getTransitionMock($isStart, $name)
     {
         $transition = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Model\Transition')
@@ -207,6 +223,10 @@ class WorkflowAssemblerTest extends \PHPUnit_Framework_TestCase
         return $transition;
     }
 
+    /**
+     * @param string $name
+     * @return \PHPUnit_Framework_MockObject_MockObject
+     */
     protected function getAttributeMock($name)
     {
         $attributeMock = $this->getMockBuilder('Oro\Bundle\ActionBundle\Model\Attribute')
