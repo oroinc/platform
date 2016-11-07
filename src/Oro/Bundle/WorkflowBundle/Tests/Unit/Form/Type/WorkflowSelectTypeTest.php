@@ -2,11 +2,19 @@
 
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Form\Type;
 
-use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
-use Symfony\Component\Form\Test\FormIntegrationTestCase;
+use Doctrine\Common\Persistence\ManagerRegistry;
 
-use Oro\Bundle\WorkflowBundle\Form\Type\WorkflowSelectType;
+use Symfony\Component\Form\ChoiceList\View\ChoiceView;
+use Symfony\Component\Form\FormInterface;
+use Symfony\Component\Form\FormView;
+use Symfony\Component\Form\Test\FormIntegrationTestCase;
+use Symfony\Component\Translation\TranslatorInterface;
+
 use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
+
+use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
+use Oro\Bundle\WorkflowBundle\Helper\WorkflowTranslationHelper;
+use Oro\Bundle\WorkflowBundle\Form\Type\WorkflowSelectType;
 
 class WorkflowSelectTypeTest extends FormIntegrationTestCase
 {
@@ -14,33 +22,31 @@ class WorkflowSelectTypeTest extends FormIntegrationTestCase
     const TEST_WORKFLOW_NAME  = 'test_workflow_name';
     const TEST_WORKFLOW_LABEL = 'Test Workflow Label';
 
-    /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
-     */
+    /** @var \PHPUnit_Framework_MockObject_MockObject|ManagerRegistry */
     protected $registry;
 
-    /**
-     * @var WorkflowSelectType
-     */
+    /** @var WorkflowSelectType */
     protected $type;
+
+    /** @var \PHPUnit_Framework_MockObject_MockObject|TranslatorInterface */
+    protected $translator;
 
     protected function setUp()
     {
         parent::setUp();
 
-        $this->registry = $this->getMockBuilder('Doctrine\Common\Persistence\ManagerRegistry')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->registry = $this->getMockBuilder(ManagerRegistry::class)->disableOriginalConstructor()->getMock();
 
-        $this->type = new WorkflowSelectType($this->registry);
+        $this->translator = $this->getMock('Symfony\Component\Translation\TranslatorInterface');
+
+        $this->type = new WorkflowSelectType($this->registry, $this->translator);
     }
 
     protected function tearDown()
     {
         parent::tearDown();
 
-        unset($this->registry);
-        unset($this->type);
+        unset($this->registry, $this->type);
     }
 
     /**
@@ -59,8 +65,8 @@ class WorkflowSelectTypeTest extends FormIntegrationTestCase
             ->getMock();
         $repository->expects($this->any())
             ->method('findBy')
-            ->with(array('relatedEntity' => self::TEST_ENTITY_CLASS))
-            ->will($this->returnValue(array($testWorkflowDefinition)));
+            ->with(['relatedEntity' => self::TEST_ENTITY_CLASS])
+            ->will($this->returnValue([$testWorkflowDefinition]));
 
         $this->registry->expects($this->any())
             ->method('getRepository')
@@ -81,39 +87,57 @@ class WorkflowSelectTypeTest extends FormIntegrationTestCase
      */
     public function setDefaultOptionsDataProvider()
     {
-        return array(
-            'no additional data' => array(
-                'inputOptions' => array(),
-                'expectedOptions' => array(
+        return [
+            'no additional data' => [
+                'inputOptions' => [],
+                'expectedOptions' => [
                     'entity_class' => null,
-                    'choices' => array(),
-                )
-            ),
-            'custom choices' => array(
-                'inputOptions' => array(
-                    'choices' => array('key' => 'value')
-                ),
-                'expectedOptions' => array(
-                    'choices' => array('key' => 'value'),
-                )
-            ),
-            'custom entity class' => array(
-                'inputOptions' => array(
+                    'choices' => [],
+                ]
+            ],
+            'custom choices' => [
+                'inputOptions' => [
+                    'choices' => ['key' => 'value']
+                ],
+                'expectedOptions' => [
+                    'choices' => ['key' => 'value'],
+                ]
+            ],
+            'custom entity class' => [
+                'inputOptions' => [
                     'entity_class' => self::TEST_ENTITY_CLASS,
-                ),
-                'expectedOptions' => array(
+                ],
+                'expectedOptions' => [
                     'entity_class' => self::TEST_ENTITY_CLASS,
-                    'choices' => array(self::TEST_WORKFLOW_NAME => self::TEST_WORKFLOW_LABEL),
-                )
-            ),
-            'parent configuration id' => array(
-                'inputOptions' => array(
+                    'choices' => [self::TEST_WORKFLOW_NAME => self::TEST_WORKFLOW_LABEL],
+                ]
+            ],
+            'parent configuration id' => [
+                'inputOptions' => [
                     'config_id' => new EntityConfigId('test', self::TEST_ENTITY_CLASS),
-                ),
-                'expectedOptions' => array(
-                    'choices' => array(self::TEST_WORKFLOW_NAME => self::TEST_WORKFLOW_LABEL),
-                )
-            ),
-        );
+                ],
+                'expectedOptions' => [
+                    'choices' => [self::TEST_WORKFLOW_NAME => self::TEST_WORKFLOW_LABEL],
+                ]
+            ],
+        ];
+    }
+
+    public function testFinishView()
+    {
+        $label = 'test_label';
+        $translatedLabel = 'translated_test_label';
+
+        $view = new FormView();
+        $view->vars['choices'] = [new ChoiceView([], 'test', $label)];
+
+        $this->translator->expects($this->once())
+            ->method('trans')
+            ->with($label, [], WorkflowTranslationHelper::TRANSLATION_DOMAIN)
+            ->willReturn($translatedLabel);
+
+        $this->type->finishView($view, $this->getMock(FormInterface::class), []);
+
+        $this->assertEquals([new ChoiceView([], 'test', $translatedLabel)], $view->vars['choices']);
     }
 }
