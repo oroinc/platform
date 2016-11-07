@@ -14,6 +14,7 @@ use Oro\Bundle\UserBundle\Validator\Constraints\PasswordComplexity;
  */
 class PasswordComplexityValidator extends ConstraintValidator
 {
+    const REGEX_LOWER_CASE = '/\p{Ll}/u';
     const REGEX_UPPER_CASE = '/\p{Lu}/u';
     const REGEX_NUMBERS = '/\p{N}/u';
     const REGEX_SPECIAL_CHARS = '/[\s!-\/:-@\[-`{|}~]/u'; // !"#$%&'()*+,-./:;<=>?@[\]^_`{|}~ + spacing
@@ -43,6 +44,10 @@ class PasswordComplexityValidator extends ConstraintValidator
         $messages = [];
         if (!$this->validMinLength($value, $constraint)) {
             $messages[] = $constraint->requireMinLengthKey;
+        }
+
+        if (!$this->validLowerCase($value, $constraint)) {
+            $messages[] = $constraint->requireLowerCaseKey;
         }
 
         if (!$this->validUpperCase($value, $constraint)) {
@@ -109,6 +114,23 @@ class PasswordComplexityValidator extends ConstraintValidator
             : $constraint->requireUpperCase;
 
         return !$isEnabled || preg_match(self::REGEX_UPPER_CASE, $value);
+    }
+
+    /**
+     * Validate lower case requirement if enabled
+     *
+     * @param $value
+     * @param PasswordComplexity $constraint
+     *
+     * @return bool
+     */
+    protected function validLowerCase($value, PasswordComplexity $constraint)
+    {
+        $isEnabled = null === $constraint->requireLowerCase
+            ? $this->configProvider->getLowerCase()
+            : $constraint->requireLowerCase;
+
+        return !$isEnabled || preg_match(self::REGEX_LOWER_CASE, $value);
     }
 
     /**
