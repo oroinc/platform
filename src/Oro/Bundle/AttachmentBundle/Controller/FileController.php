@@ -104,11 +104,11 @@ class FileController extends Controller
     public function getFilteredImageAction($id, $filter, $filename)
     {
         if (!$file = $this->getFileByIdAndFileName($id, $filename)) {
-            return $this->createNotFoundException('Image not found in the database');
+            throw $this->createNotFoundException('Image not found in the database');
         }
 
         if (!$image = $this->get('oro_attachment.image_resizer')->resizeImage($file, $filter, $force = true)) {
-            return $this->createNotFoundException('Image not found in the filesystem');
+            throw $this->createNotFoundException('Image not found in the filesystem');
         }
 
         return new Response($image->getContent(), Response::HTTP_OK, ['Content-Type' => $image->getMimeType()]);
