@@ -276,7 +276,7 @@ oro:
                 user_settings.title: User Settings
                 failed_login_limit.title: Login attempts
                 password_complexity_rules.title: Password restrictions
-                mandatory_password_change.title: Mandatory password change
+                mandatory_password_change.title: Password change policy
             fields:
                 failed_login_limit_enabled.label: Enable failed logins limit
                 failed_login_limit.label: Max login attempts
@@ -287,13 +287,7 @@ oro:
                     label: Require a special character
                     tooltip: >
                         Special chars: !"#$%&'()*+,-./:;<=>?@[\]^_`{|}~ and space
-                password_change_period_enabled.label: Enable password change period
-                password_change_period.label: Password change period
-                used_password_check_enabled.label: Enable old passwords check
-                used_password_check_number.label: Number of old passwords to match
-                password_change_period_unit:
-                    label: Unit of password change period
-                    choices:
-                        days: Days
-                        weeks: Weeks
-                        months: Months
+                password_change_period_enabled.label: Enable password change policy
+                password_change_period.label: Maximum password age (days)
+                used_password_check_enabled.label: Enable password history policy
+                used_password_check_number.label: Enforce password history

@@ -81,19 +81,6 @@ system_configuration:
                 constraints:
                     - GreaterThan:
                         value: 0
-        oro_user.password_change_period_unit:
-            data_type: string
-            type: choice
-            priority: 88
-            options:
-                label: oro.user.system_configuration.fields.password_change_period_unit.label
-                required: true
-                constraints:
-                    - NotBlank: ~
-                choices:
-                    days: oro.user.system_configuration.fields.password_change_period_unit.choices.days
-                    weeks: oro.user.system_configuration.fields.password_change_period_unit.choices.weeks
-                    months: oro.user.system_configuration.fields.password_change_period_unit.choices.months
         oro_user.used_password_check_enabled:
             data_type: boolean
             type: oro_config_checkbox
@@ -134,6 +121,5 @@ system_configuration:
                                         children:
                                             - oro_user.password_change_period_enabled
                                             - oro_user.password_change_period
-                                            - oro_user.password_change_period_unit
                                             - oro_user.used_password_check_enabled
                                             - oro_user.used_password_check_number

@@ -12,7 +12,6 @@ use Oro\Bundle\UserBundle\Provider\PasswordChangePeriodConfigProvider;
 class PasswordExpiryPeriodChangeListener
 {
     const SETTING_VALUE   = 'password_change_period';
-    const SETTING_UNIT    = 'password_change_period_unit';
     const SETTING_ENABLED = 'password_change_period_enabled';
 
     /** @var Registry */
@@ -36,7 +35,6 @@ class PasswordExpiryPeriodChangeListener
      */
     public function onConfigUpdate(ConfigUpdateEvent $event)
     {
-        $settingsUnitKey    = $this->getSettingsUnitKey();
         $settingsValueKey   = $this->getSettingsValueKey();
         $settingsEnabledKey = $this->getSettingsEnabledKey();
 
@@ -49,7 +47,6 @@ class PasswordExpiryPeriodChangeListener
         }
 
         if ($event->isChanged($settingsEnabledKey)
-            || $event->isChanged($settingsUnitKey)
             || $event->isChanged($settingsValueKey)
         ) {
             $this->resetPasswordExpiryDates();
@@ -71,14 +68,6 @@ class PasswordExpiryPeriodChangeListener
     protected function getSettingsEnabledKey()
     {
         return implode(ConfigManager::SECTION_MODEL_SEPARATOR, [OroUserExtension::ALIAS, self::SETTING_ENABLED]);
-    }
-
-    /**
-     * @return string
-     */
-    protected function getSettingsUnitKey()
-    {
-        return implode(ConfigManager::SECTION_MODEL_SEPARATOR, [OroUserExtension::ALIAS, self::SETTING_UNIT]);
     }
 
     /**
