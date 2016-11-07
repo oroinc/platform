@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\LayoutBundle\Layout\Encoder;
+namespace Oro\Component\Layout\ExpressionLanguage\Encoder;
 
 use Symfony\Component\ExpressionLanguage\ParsedExpression;
 

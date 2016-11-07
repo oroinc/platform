@@ -32,16 +32,16 @@ class ExpressionCompilerPass implements CompilerPassInterface
             return;
         }
 
-        $serviceIds       = [];
+        $serviceIds = [];
         $taggedServiceIds = $container->findTaggedServiceIds(self::EXPRESSION_ENCODER_TAG);
         foreach ($taggedServiceIds as $id => $attributes) {
             foreach ($attributes as $attr) {
-                $serviceIds[$attr['format']] = $id;
+                $serviceIds[$attr['format']] = new Reference($id);
             }
         }
 
         $encodingServiceDef = $container->getDefinition(self::EXPRESSION_ENCODING_SERVICE);
-        $encodingServiceDef->replaceArgument(1, $serviceIds);
+        $encodingServiceDef->replaceArgument(0, $serviceIds);
     }
 
     /**

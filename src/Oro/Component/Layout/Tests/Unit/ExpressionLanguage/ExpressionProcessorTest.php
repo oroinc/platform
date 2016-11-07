@@ -1,18 +1,18 @@
 <?php
 
-namespace Oro\Bundle\LayoutBundle\Tests\Unit\Layout\Processor;
+namespace Oro\Component\Layout\Tests\Unit\ExpressionLanguage;
 
 use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
 use Symfony\Component\ExpressionLanguage\Node\ConstantNode;
 use Symfony\Component\ExpressionLanguage\ParsedExpression;
 
 use Oro\Component\Layout\Action;
+use Oro\Component\Layout\ExpressionLanguage\Encoder\ExpressionEncoderRegistry;
+use Oro\Component\Layout\ExpressionLanguage\Encoder\JsonExpressionEncoder;
+use Oro\Component\Layout\ExpressionLanguage\ExpressionManipulator;
+use Oro\Component\Layout\ExpressionLanguage\ExpressionProcessor;
 use Oro\Component\Layout\LayoutContext;
 use Oro\Component\Layout\OptionValueBag;
-
-use Oro\Bundle\LayoutBundle\ExpressionLanguage\ExpressionManipulator;
-use Oro\Bundle\LayoutBundle\Layout\Processor\ExpressionProcessor;
-use Oro\Bundle\LayoutBundle\Layout\Encoder\JsonExpressionEncoder;
 
 class ExpressionProcessorTest extends \PHPUnit_Framework_TestCase
 {
@@ -29,13 +29,13 @@ class ExpressionProcessorTest extends \PHPUnit_Framework_TestCase
     {
         $this->expressionLanguage = new ExpressionLanguage();
 
-        $encoderRegistry = $this
-            ->getMockBuilder('Oro\Bundle\LayoutBundle\Layout\Encoder\ExpressionEncoderRegistry')
-            ->disableOriginalConstructor()
-            ->getMock();
+        /** @var ExpressionEncoderRegistry|\PHPUnit_Framework_MockObject_MockObject $encoderRegistry */
+        $encoderRegistry = $this->getMock(ExpressionEncoderRegistry::class, [], [], '', false);
+
         $this->encoder = new JsonExpressionEncoder(new ExpressionManipulator());
+
         $encoderRegistry->expects($this->any())
-            ->method('getEncoder')
+            ->method('get')
             ->with('json')
             ->will($this->returnValue($this->encoder));
 
@@ -134,7 +134,7 @@ class ExpressionProcessorTest extends \PHPUnit_Framework_TestCase
 
 
     /**
-     * @expectedException \Oro\Bundle\LayoutBundle\Exception\CircularReferenceException
+     * @expectedException \Oro\Component\Layout\Exception\CircularReferenceException
      * @expectedExceptionMessage Circular reference "first > second > third > first" on expression "true == first".
      */
     public function testProcessExpressionsWithCircularReference()
@@ -219,7 +219,7 @@ class ExpressionProcessorTest extends \PHPUnit_Framework_TestCase
 
         $this->processor->processExpressions($values, $context, $data, false, 'json');
         
-        $trueExprJson = __DIR__.'/data/true_expression.json';
+        $trueExprJson = __DIR__.'/Fixtures/true_expression.json';
 
         $this->assertJsonStringEqualsJsonFile(
             $trueExprJson,
@@ -253,7 +253,7 @@ class ExpressionProcessorTest extends \PHPUnit_Framework_TestCase
         $actualAddAction = $actualClassActions[0];
         $this->assertInstanceOf(Action::class, $actualAddAction);
         $this->assertJsonStringEqualsJsonFile(
-            __DIR__.'/data/class_expression.json',
+            __DIR__.'/Fixtures/class_expression.json',
             $actualAddAction->getArgument(0),
             'Failed asserting that "attr.class" is parsed and encoded'
         );
