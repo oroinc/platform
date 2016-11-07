@@ -1,3 +1,6 @@
+Workflow Translation Wizard
+===========================
+
 Currently, WorkflowBundle supports translation functionality and each workflow (in part of its text fields) can be translated into multiple languages. So a developer might be curious about how to deal with that in a case of creating new workflow configuration or updating existing one.
 
 So let's consider simple three steps that might bring relief to a workflow creation process.
