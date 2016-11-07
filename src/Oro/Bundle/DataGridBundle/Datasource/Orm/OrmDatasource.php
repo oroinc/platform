@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\DataGridBundle\Datasource\Orm;
 
-use Doctrine\ORM\Query;
 use Doctrine\ORM\QueryBuilder;
 
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
