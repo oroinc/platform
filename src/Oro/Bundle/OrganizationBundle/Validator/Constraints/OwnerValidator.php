@@ -25,7 +25,7 @@ class OwnerValidator extends ConstraintValidator
     protected $ownershipMetadataProvider;
 
     /** @var EntityOwnerAccessor */
-    protected $entityOwnerAccessor;
+    protected $ownerAccessor;
 
     /** @var BusinessUnitManager */
     protected $businessUnitManager;
@@ -40,32 +40,32 @@ class OwnerValidator extends ConstraintValidator
     protected $treeProvider;
 
     /** @var ManagerRegistry */
-    protected $registry;
+    protected $doctrine;
 
     /** @var object */
     protected $object;
 
     /**
-     * @param ManagerRegistry           $registry
+     * @param ManagerRegistry           $doctrine
      * @param BusinessUnitManager       $businessUnitManager
      * @param OwnershipMetadataProvider $ownershipMetadataProvider
-     * @param EntityOwnerAccessor       $entityOwnerAccessor
+     * @param EntityOwnerAccessor       $ownerAccessor
      * @param SecurityFacade            $securityFacade
      * @param OwnerTreeProvider         $treeProvider
      * @param AclVoter                  $aclVoter
      */
     public function __construct(
-        ManagerRegistry $registry,
+        ManagerRegistry $doctrine,
         BusinessUnitManager $businessUnitManager,
         OwnershipMetadataProvider $ownershipMetadataProvider,
-        EntityOwnerAccessor $entityOwnerAccessor,
+        EntityOwnerAccessor $ownerAccessor,
         SecurityFacade $securityFacade,
         OwnerTreeProvider $treeProvider,
         AclVoter $aclVoter
     ) {
-        $this->registry = $registry;
+        $this->doctrine = $doctrine;
         $this->ownershipMetadataProvider = $ownershipMetadataProvider;
-        $this->entityOwnerAccessor = $entityOwnerAccessor;
+        $this->ownerAccessor = $ownerAccessor;
         $this->businessUnitManager = $businessUnitManager;
         $this->aclVoter = $aclVoter;
         $this->securityFacade = $securityFacade;
@@ -81,8 +81,8 @@ class OwnerValidator extends ConstraintValidator
         $this->object = $value;
 
         $entityClass = ClassUtils::getClass($value);
-        $manager = $this->registry->getManagerForClass($entityClass);
-        if (!$manager) {
+        $manager = $this->doctrine->getManagerForClass($entityClass);
+        if (null === $manager) {
             return;
         }
 
@@ -91,7 +91,7 @@ class OwnerValidator extends ConstraintValidator
             return;
         }
 
-        $owner = $this->entityOwnerAccessor->getOwner($value);
+        $owner = $this->ownerAccessor->getOwner($value);
         if (!$owner) {
             return;
         }
@@ -103,10 +103,13 @@ class OwnerValidator extends ConstraintValidator
             $accessLevel = $this->getAccessLevel('CREATE', 'entity:' . $entityClass);
         }
 
+        $isOwnerValid = true;
         if ($accessLevel === null) {
             $isOwnerValid = false;
-        } else {
+        } elseif (null !== $owner->getId()) {
             $isOwnerValid = $this->isValidOwner($ownershipMetadata, $owner, $accessLevel);
+        } elseif ($this->ownerAccessor->getOrganization($owner) !== $this->ownerAccessor->getOrganization($value)) {
+            $isOwnerValid = false;
         }
 
         if (!$isOwnerValid) {

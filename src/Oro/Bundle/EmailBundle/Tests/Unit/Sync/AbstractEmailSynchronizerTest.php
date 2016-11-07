@@ -7,6 +7,7 @@ use Doctrine\ORM\ORMException;
 use Oro\Bundle\EmailBundle\Sync\AbstractEmailSynchronizer;
 use Oro\Bundle\EmailBundle\Tests\Unit\Fixtures\Entity\TestEmailOrigin;
 use Oro\Bundle\EmailBundle\Tests\Unit\Sync\Fixtures\TestEmailSynchronizer;
+use Oro\Component\MessageQueue\Client\MessageProducerInterface;
 
 class AbstractEmailSynchronizerTest extends \PHPUnit_Framework_TestCase
 {
@@ -604,6 +605,44 @@ class AbstractEmailSynchronizerTest extends \PHPUnit_Framework_TestCase
         $this->sync->callResetHangedOrigins();
     }
 
+    public function testScheduleSyncOriginsJobShouldThrowExceptionIfMessageQueueTopicIsNotSet()
+    {
+        $this->setExpectedException(\LogicException::class, 'Message queue topic is not set');
+
+        $this->sync->scheduleSyncOriginsJob([1,2,3]);
+    }
+
+    public function testScheduleSyncOriginsJobShouldThrowExceptionIfMessageProducerIsNotSet()
+    {
+        $refProp = new \ReflectionProperty(TestEmailSynchronizer::class, 'messageQueueTopic');
+        $refProp->setAccessible(true);
+        $refProp->setValue($this->sync, 'topic-name');
+        $refProp->setAccessible(false);
+
+        $this->setExpectedException(\LogicException::class, 'Message producer is not set');
+
+        $this->sync->scheduleSyncOriginsJob([1,2,3]);
+    }
+
+    public function testScheduleSyncOriginsJobShouldSendMessageToTopicWithIds()
+    {
+        $refProp = new \ReflectionProperty(TestEmailSynchronizer::class, 'messageQueueTopic');
+        $refProp->setAccessible(true);
+        $refProp->setValue($this->sync, 'topic-name');
+        $refProp->setAccessible(false);
+
+        $producer = $this->createMessageProducerMock();
+        $producer
+            ->expects($this->once())
+            ->method('send')
+            ->with('topic-name', ['ids' => [1,2,3]])
+        ;
+
+        $this->sync->setMessageProducer($producer);
+
+        $this->sync->scheduleSyncOriginsJob([1,2,3]);
+    }
+
     public function changeOriginSyncStateProvider()
     {
         return array(
@@ -611,5 +650,13 @@ class AbstractEmailSynchronizerTest extends \PHPUnit_Framework_TestCase
             array(AbstractEmailSynchronizer::SYNC_CODE_IN_PROCESS, false),
             array(AbstractEmailSynchronizer::SYNC_CODE_SUCCESS, true),
         );
+    }
+
+    /**
+     * @return \PHPUnit_Framework_MockObject_MockObject|MessageProducerInterface
+     */
+    private function createMessageProducerMock()
+    {
+        return $this->getMock(MessageProducerInterface::class);
     }
 }

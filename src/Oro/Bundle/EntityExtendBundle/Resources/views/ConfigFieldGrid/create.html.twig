@@ -44,18 +44,16 @@
             'use strict';
             $(function() {
                 $(document).on('change', 'form select#{{ form.type.vars.id }}', function (e) {
-                    var el = $(this),
-                        complexFieldType = el.find('option:selected').attr('value').split('||'),
-                        field_name = $('input#{{ form.fieldName.vars.id }}');
+                    var complexFieldType = $(this).find('option:selected').attr('value').split('||'),
+                        $field_name = $('input#{{ form.fieldName.vars.id }}');
 
                     if (complexFieldType !== 'undefined'
                         && complexFieldType.length > 1
                         && complexFieldType[0].split('|').length === 4
                         && complexFieldType[1]) {
-                        $(field_name).val(complexFieldType[1]).attr('readonly', 'readonly');
-                    }
-                    else if ($(field_name).attr('readonly')) {
-                        $(field_name).val('').removeAttr('readonly');
+                        $field_name.val(complexFieldType[1]).prop('readonly', true);
+                    } else if ($field_name.prop('readonly')) {
+                        $field_name.val('').prop('readonly', false);
                     }
                 });
             })
