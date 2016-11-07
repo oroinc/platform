@@ -229,15 +229,9 @@ class LayoutBuilderTest extends \PHPUnit_Framework_TestCase
         $context = $this->getMock('Oro\Component\Layout\ContextInterface');
         $rootId  = 'test_id';
 
-        $rawLayout = $this->getMockBuilder('Oro\Component\Layout\RawLayout')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $rootView  = $this->getMockBuilder('Oro\Component\Layout\BlockView')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $layout    = $this->getMockBuilder('Oro\Component\Layout\Layout')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $rawLayout = $this->getMockBuilder('Oro\Component\Layout\RawLayout')->disableOriginalConstructor()->getMock();
+        $rootView  = $this->getMockBuilder('Oro\Component\Layout\BlockView')->disableOriginalConstructor()->getMock();
+        $layout    = $this->getMockBuilder('Oro\Component\Layout\Layout')->disableOriginalConstructor()->getMock();
 
         $context->expects($this->once())
             ->method('isResolved')
@@ -298,14 +292,10 @@ class LayoutBuilderTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue($rootId));
         $rawLayout->expects($this->once())
             ->method('getBlockThemes')
-            ->will(
-                $this->returnValue(
-                    [
-                        $rootId => ['RootTheme1', 'RootTheme2', 'RootTheme3'],
-                        'test_block' => ['TestTheme1', 'TestTheme2', 'TestTheme3']
-                    ]
-                )
-            );
+            ->willReturn([
+                $rootId => ['RootTheme1', 'RootTheme2', 'RootTheme3'],
+                'test_block' => ['TestTheme1', 'TestTheme2', 'TestTheme3']
+            ]);
         $layout->expects($this->at(0))
             ->method('setBlockTheme')
             ->with(['RootTheme1', 'RootTheme2', 'RootTheme3'], $this->identicalTo(null));
@@ -323,8 +313,7 @@ class LayoutBuilderTest extends \PHPUnit_Framework_TestCase
         $layout->expects($this->once())
             ->method('setFormTheme');
 
-        $this->layoutBuilder
-            ->setBlockTheme('RootTheme1')
+        $this->layoutBuilder->setBlockTheme('RootTheme1')
             ->setBlockTheme(['RootTheme2', 'RootTheme3'])
             ->setBlockTheme(['TestTheme1', 'TestTheme2'], 'test_block')
             ->setBlockTheme('TestTheme3', 'test_block')
