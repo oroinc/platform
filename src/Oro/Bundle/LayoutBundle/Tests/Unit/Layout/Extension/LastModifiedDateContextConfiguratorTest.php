@@ -4,13 +4,13 @@ namespace Oro\Bundle\LayoutBundle\Tests\Unit\Layout\Extension;
 
 use Doctrine\Common\Cache\Cache;
 
+use Oro\Bundle\LayoutBundle\Layout\Extension\LastModifiedDateContextConfigurator;
+use Oro\Bundle\LayoutBundle\Layout\Extension\ActionContextConfigurator;
+
+use Oro\Component\Layout\Extension\Theme\ResourceProvider\ThemeResourceProvider;
 use Oro\Component\Layout\LayoutContext;
 
-use Oro\Bundle\LayoutBundle\Layout\Extension\CacheContextConfigurator;
-use Oro\Bundle\LayoutBundle\Layout\Extension\ActionContextConfigurator;
-use Oro\Component\Layout\Extension\Theme\ResourceProvider\ThemeResourceProvider;
-
-class CacheContextConfiguratorTest extends \PHPUnit_Framework_TestCase
+class LastModifiedDateContextConfiguratorTest extends \PHPUnit_Framework_TestCase
 {
     /** @var ActionContextConfigurator */
     protected $contextConfigurator;
@@ -23,7 +23,7 @@ class CacheContextConfiguratorTest extends \PHPUnit_Framework_TestCase
     protected function setUp()
     {
         $this->cache = $this->getMock('Doctrine\Common\Cache\Cache');
-        $this->contextConfigurator = new CacheContextConfigurator($this->cache);
+        $this->contextConfigurator = new LastModifiedDateContextConfigurator($this->cache);
     }
 
     public function testConfigureContextWithDefaultAction()
@@ -33,7 +33,7 @@ class CacheContextConfiguratorTest extends \PHPUnit_Framework_TestCase
         $this->contextConfigurator->configureContext($context);
         $context->resolve();
 
-        $this->assertTrue(is_string($context[CacheContextConfigurator::MAX_MODIFICATION_DATE_PARAM]));
+        $this->assertTrue(is_string($context[LastModifiedDateContextConfigurator::MAX_MODIFICATION_DATE_PARAM]));
     }
 
     public function testConfigureContext()
@@ -51,7 +51,7 @@ class CacheContextConfiguratorTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals(
             $now->format(\DateTime::COOKIE),
-            $context[CacheContextConfigurator::MAX_MODIFICATION_DATE_PARAM]
+            $context[LastModifiedDateContextConfigurator::MAX_MODIFICATION_DATE_PARAM]
         );
     }
 }

@@ -8,9 +8,9 @@ use Oro\Component\Layout\ContextInterface;
 use Oro\Component\Layout\ContextConfiguratorInterface;
 use Oro\Component\Layout\Extension\Theme\ResourceProvider\ThemeResourceProvider;
 
-class CacheContextConfigurator implements ContextConfiguratorInterface
+class LastModifiedDateContextConfigurator implements ContextConfiguratorInterface
 {
-    const MAX_MODIFICATION_DATE_PARAM = 'modification_date';
+    const MAX_MODIFICATION_DATE_PARAM = 'last_modification_date';
 
     /** @var Cache */
     private $cache;

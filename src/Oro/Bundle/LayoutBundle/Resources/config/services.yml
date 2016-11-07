@@ -81,8 +81,8 @@ services:
         tags:
             - { name: layout.context_configurator }
 
-    oro_layout.layout_context_configurator.cache:
-        class: Oro\Bundle\LayoutBundle\Layout\Extension\CacheContextConfigurator
+    oro_layout.layout_context_configurator.last_modification_date:
+        class: Oro\Bundle\LayoutBundle\Layout\Extension\LastModifiedDateContextConfigurator
         arguments:
             - '@oro_layout.theme_extension.resource_provider.cache'
         tags:
