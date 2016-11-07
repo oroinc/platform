@@ -34,7 +34,3 @@ app/console oro:translation:load
 
 Now, if you need to **update** an existing workflow you can perform same operations because dumped translations of `oro:workflow:translations:dump` would be filled by existing one and newly created nodes of text.
 To fully customize (replace config nodes, rename them) you can aways dump output of command elsewhere to be able manually choose what to update.
-
-
-
-   
