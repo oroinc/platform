@@ -109,6 +109,6 @@ abstract class AbstractFormProvider
      */
     protected function getCacheKey($formName, array $options = [], array $cacheKeyOptions = [])
     {
-        return sprintf('%s:%s', $formName, md5(serialize(array_merge($options, $cacheKeyOptions))));
+        return sprintf('%s:%s', $formName, md5(serialize(array_replace($options, $cacheKeyOptions))));
     }
 }

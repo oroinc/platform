@@ -28,7 +28,7 @@ class EmbedFormEndTypeTest extends BlockTypeTestCase
             ->with(null)
             ->will($this->returnValue($formView));
 
-        $this->context->getResolver()->setOptional([$formName]);
+        $this->context->getResolver()->setDefined([$formName]);
         $this->context->set($formName, $formAccessor);
         $view = $this->getBlockView(
             EmbedFormEndType::NAME,
@@ -61,7 +61,7 @@ class EmbedFormEndTypeTest extends BlockTypeTestCase
     {
         $formName = 'test_form';
 
-        $this->context->getResolver()->setOptional([$formName]);
+        $this->context->getResolver()->setDefined([$formName]);
         $this->context->set($formName, 123);
         $this->getBlockView(
             EmbedFormEndType::NAME,

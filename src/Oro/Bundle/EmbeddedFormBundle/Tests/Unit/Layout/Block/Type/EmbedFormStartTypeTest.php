@@ -10,6 +10,10 @@ use Oro\Bundle\EmbeddedFormBundle\Layout\Block\Type\EmbedFormStartType;
 use Oro\Bundle\EmbeddedFormBundle\Layout\Form\FormAction;
 use Oro\Bundle\EmbeddedFormBundle\Tests\Unit\BlockTypeTestCase;
 
+/**
+ * @SuppressWarnings(PHPMD.ExcessivePublicCount)
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class EmbedFormStartTypeTest extends BlockTypeTestCase
 {
     public function testResolveOptionsWithoutFormName()

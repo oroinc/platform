@@ -9,6 +9,10 @@ use Oro\Bundle\EmbeddedFormBundle\Layout\Form\DependencyInjectionFormAccessor;
 use Oro\Bundle\EmbeddedFormBundle\Layout\Form\FormAccessor;
 use Oro\Bundle\EmbeddedFormBundle\Layout\Extension\FormContextConfigurator;
 
+/**
+ * @SuppressWarnings(PHPMD.ExcessivePublicCount)
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class FormContextConfiguratorTest extends \PHPUnit_Framework_TestCase
 {
     /** @var \PHPUnit_Framework_MockObject_MockObject */

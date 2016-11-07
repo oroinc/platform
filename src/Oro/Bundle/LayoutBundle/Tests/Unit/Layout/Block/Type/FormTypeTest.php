@@ -19,7 +19,12 @@ class FormTypeTest extends BlockTypeTestCase
         $form = $this->getMock(FormView::class);
 
         $this->assertEquals(
-            ['form' => $form, 'form_route_parameters' => [], 'additional_block_prefixes' => ['test_']],
+            [
+                'form' => $form,
+                'form_route_parameters' => [],
+                'instance_name' => '',
+                'additional_block_prefixes' => ['test_']
+            ],
             $this->resolveOptions(FormType::NAME, ['form' => $form, 'additional_block_prefixes' => ['test_']])
         );
     }
@@ -60,7 +65,7 @@ class FormTypeTest extends BlockTypeTestCase
             'form_multipart' => null,
             'form_route_name' => null,
             'form_route_parameters' => ['default' => []],
-            'instance_name' => null,
+            'instance_name' => ['default' => ''],
         ]);
 
         $formFields = new ConfigurableType();
@@ -68,7 +73,7 @@ class FormTypeTest extends BlockTypeTestCase
         $formFields->setParent(BaseType::NAME);
         $formFields->setOptionsConfig([
             'form' => ['required' => true],
-            'instance_name' => null,
+            'instance_name' => ['default' => ''],
         ]);
 
         $formEnd = new ConfigurableType();
@@ -76,7 +81,7 @@ class FormTypeTest extends BlockTypeTestCase
         $formEnd->setParent(BaseType::NAME);
         $formEnd->setOptionsConfig([
             'form' => ['required' => true],
-            'instance_name' => null,
+            'instance_name' => ['default' => ''],
             'render_rest' => ['default' => []],
         ]);
 

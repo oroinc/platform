@@ -7,6 +7,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 use Oro\Component\Layout\LayoutContext;
 
 use Oro\Bundle\EmbeddedFormBundle\Layout\Extension\DependencyInjectionFormContextConfigurator;
+use Oro\Bundle\EmbeddedFormBundle\Layout\Form\DependencyInjectionFormAccessor;
 
 class DependencyInjectionFormContextConfiguratorTest extends \PHPUnit_Framework_TestCase
 {
@@ -45,7 +46,7 @@ class DependencyInjectionFormContextConfiguratorTest extends \PHPUnit_Framework_
         $context->resolve();
 
         $formAccessor = $context->get($contextOptionName);
-        $this->assertInstanceOf('Oro\Bundle\EmbeddedFormBundle\Layout\Form\DependencyInjectionFormAccessor', $formAccessor);
+        $this->assertInstanceOf(DependencyInjectionFormAccessor::class, $formAccessor);
         $this->assertAttributeEquals($serviceId, 'formServiceId', $formAccessor);
     }
 }

@@ -16,6 +16,9 @@ class EmbedFormFieldsTypeTest extends BlockTypeTestCase
 {
     /**
      * @dataProvider optionsDataProvider
+     *
+     * @param array $options
+     * @param array $expected
      */
     public function testSetDefaultOptions($options, $expected)
     {
@@ -23,6 +26,9 @@ class EmbedFormFieldsTypeTest extends BlockTypeTestCase
         $this->assertEquals($expected, $resolvedOptions);
     }
 
+    /**
+     * @return array
+     */
     public function optionsDataProvider()
     {
         return [
