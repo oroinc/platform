@@ -483,6 +483,9 @@ datagrids:
                 receivedAt:  { data_name: eu.receivedAt }
             default:
                 receivedAt: %oro_datagrid.extension.orm_sorter.class%::DIRECTION_DESC
+        options:
+            requireJSModules:
+                - oroemail/js/datagrid/listen-to-read-email-extension
 
     email-templates:
         acl_resource: oro_email_emailtemplate_index

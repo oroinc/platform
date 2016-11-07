@@ -9,13 +9,15 @@ class FieldNodeDefinitionTest extends \PHPUnit_Framework_TestCase
     const TEST_NAME = 'testNodeName';
     const TEST_TYPE = 'text';
     const TEST_ACL  = 'acl';
+    const TEST_NEEDS_PAGE_RELOAD = true;
 
     protected $testDefinition = array(
         'options'      => array(
             'some_opt' => 'some_value'
         ),
         'type'         => self::TEST_TYPE,
-        'acl_resource' => self::TEST_ACL
+        'acl_resource' => self::TEST_ACL,
+        'page_reload'  => self::TEST_NEEDS_PAGE_RELOAD,
     );
 
     public function testGetType()
@@ -76,5 +78,11 @@ class FieldNodeDefinitionTest extends \PHPUnit_Framework_TestCase
 
         $nodeWithProperttyPath = new FieldNodeDefinition(self::TEST_NAME, $testDeffinitions);
         $this->assertEquals('test_path', $nodeWithProperttyPath->getPropertyPath());
+    }
+
+    public function testNeedsPageReload()
+    {
+        $node = new FieldNodeDefinition(self::TEST_NEEDS_PAGE_RELOAD, $this->testDefinition);
+        $this->assertSame(self::TEST_NEEDS_PAGE_RELOAD, $node->needsPageReload());
     }
 }

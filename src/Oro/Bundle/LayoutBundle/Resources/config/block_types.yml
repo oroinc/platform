@@ -128,11 +128,6 @@ services:
         tags:
             - { name: layout.block_type_extension, alias: block, priority: 260 }
 
-    oro_layout.block_type_extension.option_value_bag:
-        class: Oro\Bundle\LayoutBundle\Layout\Block\Extension\OptionValueBagExtension
-        tags:
-            - { name: layout.block_type_extension, alias: block, priority: 270 }
-
     oro_layout.block_type.extension.visible:
         parent: oro_layout.block_type.extension.abstract_configurable
         calls:
