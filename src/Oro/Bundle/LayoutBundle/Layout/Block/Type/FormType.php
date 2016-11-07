@@ -25,10 +25,12 @@ class FormType extends AbstractType
             'form_multipart',
             'form_route_name',
             'render_rest',
-            'instance_name'
         ]);
 
-        $resolver->setDefaults(['form_route_parameters' => []]);
+        $resolver->setDefaults([
+            'form_route_parameters' => [],
+            'instance_name' => '',
+        ]);
     }
 
     /**
