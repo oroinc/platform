@@ -2,11 +2,11 @@
 
 namespace Oro\Bundle\UserBundle\Tests\Unit\EventListener;
 
-use Symfony\Component\Security\Http\Event\InteractiveLoginEvent;
-use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
-
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\UserBundle\EventListener\PasswordExpiryWarnSubscriber;
+use Oro\Bundle\UserBundle\Provider\PasswordChangePeriodConfigProvider;
+use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
+use Symfony\Component\Security\Http\Event\InteractiveLoginEvent;
 
 class PasswordExpiryWarnSubscriberTest extends \PHPUnit_Framework_TestCase
 {
@@ -61,6 +61,7 @@ class PasswordExpiryWarnSubscriberTest extends \PHPUnit_Framework_TestCase
      */
     private function getSubscriber($daysToExpiry = 0)
     {
+        $notificationDays = [1, 3, 7];
         $session = $this->getMockBuilder('Symfony\Component\HttpFoundation\Session\Session')
             ->disableOriginalConstructor()
             ->getMock();
@@ -69,7 +70,15 @@ class PasswordExpiryWarnSubscriberTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        if (in_array($daysToExpiry, PasswordExpiryWarnSubscriber::$periodMarkers)) {
+        $configProvider = $this->getMockBuilder(PasswordChangePeriodConfigProvider::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $configProvider->expects($this->once())
+            ->method('getNotificationDays')
+            ->willReturn($notificationDays);
+
+        if (in_array($daysToExpiry, $notificationDays)) {
             $flashBag = $this->getMockBuilder('Symfony\Component\HttpFoundation\Session\Flash\FlashBagInterface')
                 ->getMock();
             $flashBag->expects($this->once())
@@ -80,11 +89,13 @@ class PasswordExpiryWarnSubscriberTest extends \PHPUnit_Framework_TestCase
                 ->willReturn($flashBag);
         }
         
-        return new PasswordExpiryWarnSubscriber($session, $translator);
+        return new PasswordExpiryWarnSubscriber($configProvider, $session, $translator);
     }
 
     public function getDaysToPasswordExpiry()
     {
-        return [array_merge([2,4,5,6,8], PasswordExpiryWarnSubscriber::$periodMarkers)];
+        return [
+            [1, 2, 3, 4, 5, 6, 7, 8]
+        ];
     }
 }

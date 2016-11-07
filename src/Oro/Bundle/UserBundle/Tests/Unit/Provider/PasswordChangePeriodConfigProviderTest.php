@@ -20,7 +20,7 @@ class PasswordChangePeriodConfigProviderTest extends \PHPUnit_Framework_TestCase
      */
     public function testGetPasswordExpiryDateFromNow($valueMap, $expectedInterval)
     {
-        $this->configManager->expects($this->exactly(3))
+        $this->configManager->expects($this->any())
             ->method('get')
             ->will($this->returnValueMap($valueMap));
 
@@ -28,44 +28,33 @@ class PasswordChangePeriodConfigProviderTest extends \PHPUnit_Framework_TestCase
         $format = 'Y-m-d H:i';
         $now = new \DateTime('now', new \DateTimeZone('UTC'));
         $expectedDate = $now->add($expectedInterval);
+
         $this->assertSame($provider->getPasswordExpiryDateFromNow()->format($format), $expectedDate->format($format));
     }
 
     public function getConfigSettings()
     {
         return [
-            'config with days' => [
+            '3 days' => [
                 'valueMap' => [
                     [PasswordChangePeriodConfigProvider::PASSWORD_EXPIRY_ENABLED_KEY, false, false, null, true],
-                    [PasswordChangePeriodConfigProvider::PASSWORD_EXPIRY_PERIOD_KEY, false, false, null, 7],
-                    [
-                        PasswordChangePeriodConfigProvider::PASSWORD_EXPIRY_PERIOD_UNIT_KEY, false, false, null,
-                        PasswordChangePeriodConfigProvider::DAYS
-                    ]
+                    [PasswordChangePeriodConfigProvider::PASSWORD_EXPIRY_PERIOD, false, false, null, 3],
                 ],
-                'expectedInterval' => new \DateInterval('P7D')
+                'expectedInterval' => new \DateInterval('P3D')
             ],
-            'config with weeks' => [
+            '30 days' => [
                 'valueMap' => [
                     [PasswordChangePeriodConfigProvider::PASSWORD_EXPIRY_ENABLED_KEY, false, false, null, true],
-                    [PasswordChangePeriodConfigProvider::PASSWORD_EXPIRY_PERIOD_KEY, false, false, null, 2],
-                    [
-                        PasswordChangePeriodConfigProvider::PASSWORD_EXPIRY_PERIOD_UNIT_KEY, false, false, null,
-                        PasswordChangePeriodConfigProvider::WEEKS
-                    ]
+                    [PasswordChangePeriodConfigProvider::PASSWORD_EXPIRY_PERIOD, false, false, null, 30],
                 ],
-                'expectedInterval' => new \DateInterval('P14D')
+                'expectedInterval' => new \DateInterval('P30D')
             ],
-            'config with months' => [
+            '90 days' => [
                 'valueMap' => [
                     [PasswordChangePeriodConfigProvider::PASSWORD_EXPIRY_ENABLED_KEY, false, false, null, true],
-                    [PasswordChangePeriodConfigProvider::PASSWORD_EXPIRY_PERIOD_KEY, false, false, null, 1],
-                    [
-                        PasswordChangePeriodConfigProvider::PASSWORD_EXPIRY_PERIOD_UNIT_KEY, false, false, null,
-                        PasswordChangePeriodConfigProvider::MONTHS
-                    ]
+                    [PasswordChangePeriodConfigProvider::PASSWORD_EXPIRY_PERIOD, false, false, null, 90],
                 ],
-                'expectedInterval' => new \DateInterval('P1M')
+                'expectedInterval' => new \DateInterval('P90D')
             ],
         ];
     }
