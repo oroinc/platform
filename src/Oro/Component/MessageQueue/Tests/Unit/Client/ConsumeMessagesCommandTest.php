@@ -203,6 +203,52 @@ class ConsumeMessagesCommandTest extends \PHPUnit_Framework_TestCase
         ]);
     }
 
+    public function testShouldLogErrorAndThrowExceptionIfConsumeThrowsException()
+    {
+        $expectedException = new \Exception('the message');
+
+        $connection = $this->createConnectionMock();
+        $connection
+            ->expects($this->once())
+            ->method('close')
+        ;
+
+        $consumer = $this->createQueueConsumerMock();
+        $consumer
+            ->expects($this->once())
+            ->method('consume')
+            ->willThrowException($expectedException)
+        ;
+
+        $consumer
+            ->expects($this->once())
+            ->method('getConnection')
+            ->will($this->returnValue($connection))
+        ;
+
+
+        $logger = $this->createLoggerInterfaceMock();
+        $logger
+            ->expects($this->once())
+            ->method('error')
+            ->with(
+                sprintf('Consume messages command exception. "%s"', $expectedException->getMessage()),
+                ['exception' => $expectedException])
+        ;
+
+        $command = new ConsumeMessagesCommand(
+            $consumer,
+            $this->createDelegateMessageProcessorMock(),
+            $this->createDestinationMetaRegistry([]),
+            $logger
+        );
+
+        $this->setExpectedException(\Exception::class, $expectedException->getMessage());
+
+        $tester = new CommandTester($command);
+        $tester->execute([]);
+    }
+
     /**
      * @param array $destinationNames
      *
