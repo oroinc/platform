@@ -19,7 +19,7 @@ class ExpressionNormalizer implements NormalizerInterface, DenormalizerInterface
     /**
      * {@inheritdoc}
      */
-    public function normalize($object, $format = null, array $context = array())
+    public function normalize($object, $format = null, array $context = [])
     {
         /** @var ParsedExpression $parsedExpression */
         $parsedExpression = $object;
@@ -41,7 +41,7 @@ class ExpressionNormalizer implements NormalizerInterface, DenormalizerInterface
     /**
      * {@inheritdoc}
      */
-    public function denormalize($data, $class, $format = null, array $context = array())
+    public function denormalize($data, $class, $format = null, array $context = [])
     {
         return new ParsedExpression(
             $data['expression'],
