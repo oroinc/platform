@@ -4,7 +4,6 @@ use Oro\Bundle\WorkflowBundle\Form\Type\WorkflowTransitionType;
 
 return [
     'first_workflow' => [
-        'label' => 'First Workflow',
         'is_system' => true,
         'entity' => 'First\Entity',
         'start_step' => 'first_step',
@@ -16,7 +15,6 @@ return [
         ],
         'steps' => [
             'first_step' => [
-                'label' => 'First Step',
                 'order' => 1,
                 'is_final' => true,
                 'entity_acl' => [
@@ -29,7 +27,6 @@ return [
         ],
         'attributes' => [
             'first_attribute' => [
-                'label' => 'First Attribute',
                 'type' => 'object',
                 'options' => [
                     'class' => 'DateTime'
@@ -37,7 +34,6 @@ return [
                 'property_path' => null
             ],
             'second_attribute' => [
-                'label' => 'Second Attribute',
                 'type' => 'entity',
                 'property_path' => 'first_attribute.test',
                 'entity_acl' => [
@@ -51,14 +47,12 @@ return [
         ],
         'transitions' => [
             'first_transition' => [
-                'label' => 'First Transition',
                 'step_to' => 'first_step',
                 'is_start' => true,
                 'is_hidden' => true,
                 'is_unavailable_hidden' => true,
                 'acl_resource' => 'some_acl',
                 'acl_message' => 'Test ACL message',
-                'message' => 'Test message',
                 'transition_definition' => 'first_transition_definition',
                 'frontend_options' => [
                     'class' => 'foo'
@@ -159,7 +153,6 @@ return [
         'exclusive_record_groups' => ['record_group1'],
     ],
     'second_workflow' => [
-        'label' => 'Second Workflow',
         'entity' => 'Second\Entity',
         'start_step' => 'second_step',
         'priority' => 0,
@@ -168,7 +161,6 @@ return [
         ],
         'steps' => [
             'second_step' => [
-                'label' => 'Second Step',
                 'order' => 1,
                 'is_final' => false,
                 'allowed_transitions' => [],
@@ -180,7 +172,6 @@ return [
         'attributes' => [],
         'transitions' => [
             'second_transition' => [
-                'label' => 'Second Transition',
                 'step_to' => 'second_step',
                 'transition_definition' => 'second_transition_definition',
                 'frontend_options' => [
@@ -191,7 +182,6 @@ return [
                 'is_unavailable_hidden' => false,
                 'acl_resource' => null,
                 'acl_message' => null,
-                'message' => null,
                 'form_type' => WorkflowTransitionType::NAME,
                 'display_type' => 'dialog',
                 'form_options' => [],

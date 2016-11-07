@@ -278,6 +278,13 @@ define(function(require) {
 
                     mediator.once('page:afterChange', function() {
                         messenger.notificationFlashMessage('success', __('Workflow saved.'));
+                        messenger.notificationFlashMessage(
+                            'warning',
+                            __(
+                                'oro.workflow.translation_rebuild_required',
+                                {path: routing.generate('oro_translation_translation_index')}
+                            )
+                        );
                     });
                     mediator.execute('redirectTo', {url: redirectUrl}, {redirect: true});
                 }, this),

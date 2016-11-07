@@ -3,11 +3,16 @@
 namespace Oro\Bundle\WorkflowBundle\Form\Type;
 
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\ChoiceList\View\ChoiceView;
+use Symfony\Component\Form\FormInterface;
+use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Translation\TranslatorInterface;
 
 use Oro\Bundle\WorkflowBundle\Model\Workflow;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowRegistry;
+use Oro\Bundle\WorkflowBundle\Helper\WorkflowTranslationHelper;
 
 class WorkflowDefinitionSelectType extends AbstractType
 {
@@ -16,12 +21,17 @@ class WorkflowDefinitionSelectType extends AbstractType
     /** @var WorkflowRegistry */
     protected $workflowRegistry;
 
+    /** @var TranslatorInterface */
+    protected $translator;
+
     /**
      * @param WorkflowRegistry $workflowRegistry
+     * @param TranslatorInterface $translator
      */
-    public function __construct(WorkflowRegistry $workflowRegistry)
+    public function __construct(WorkflowRegistry $workflowRegistry, TranslatorInterface $translator)
     {
         $this->workflowRegistry = $workflowRegistry;
+        $this->translator = $translator;
     }
 
     /**
@@ -43,7 +53,7 @@ class WorkflowDefinitionSelectType extends AbstractType
                 if (!empty($choices)) {
                     return $choices;
                 }
-                
+
                 if (isset($options['workflow_name'])) {
                     $workflowName = $options['workflow_name'];
                     $workflows = [$this->workflowRegistry->getWorkflow($workflowName)];
@@ -58,11 +68,11 @@ class WorkflowDefinitionSelectType extends AbstractType
                 }
 
                 $definitions = [];
-                
+
                 /** @var Workflow[] $workflows */
                 foreach ($workflows as $workflow) {
                     $definition = $workflow->getDefinition();
-                    
+
                     $definitions[$definition->getName()] = $definition;
                 }
 
@@ -93,5 +103,20 @@ class WorkflowDefinitionSelectType extends AbstractType
     public function getParent()
     {
         return 'entity';
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function finishView(FormView $view, FormInterface $form, array $options)
+    {
+        /** @var ChoiceView $choiceView */
+        foreach ($view->vars['choices'] as $choiceView) {
+            $choiceView->label = $this->translator->trans(
+                $choiceView->label,
+                [],
+                WorkflowTranslationHelper::TRANSLATION_DOMAIN
+            );
+        }
     }
 }

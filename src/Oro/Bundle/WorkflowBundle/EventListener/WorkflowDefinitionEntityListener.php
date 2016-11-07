@@ -9,11 +9,9 @@ use Oro\Bundle\WorkflowBundle\Exception\WorkflowActivationException;
 use Oro\Bundle\WorkflowBundle\Model\Workflow;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowRegistry;
 
-class WorkflowActivationValidatorEntityListener
+class WorkflowDefinitionEntityListener
 {
-    /**
-     * @var WorkflowRegistry
-     */
+    /** @var WorkflowRegistry */
     private $workflowRegistry;
 
     /**

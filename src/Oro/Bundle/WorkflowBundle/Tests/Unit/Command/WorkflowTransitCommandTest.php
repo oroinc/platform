@@ -224,7 +224,7 @@ class WorkflowTransitCommandTest extends \PHPUnit_Framework_TestCase
     {
         $this->container->expects($this->any())
             ->method('getParameter')
-            ->with('oro_workflow.workflow_item.entity.class')
+            ->with('oro_workflow.entity.workflow_item.class')
             ->willReturn(self::CLASS_NAME);
 
         $this->container->expects($this->any())
