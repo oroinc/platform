@@ -12,7 +12,7 @@ use Oro\Component\Layout\BlockView;
 class BlockViewNormalizer implements NormalizerInterface, DenormalizerInterface, SerializerAwareInterface
 {
     /**
-     * @var SerializerInterface|NormalizerInterface|DenormalizerInterface
+     * @var NormalizerInterface|DenormalizerInterface
      */
     protected $serializer;
 
@@ -22,7 +22,7 @@ class BlockViewNormalizer implements NormalizerInterface, DenormalizerInterface,
     public function setSerializer(SerializerInterface $serializer)
     {
         if (!($serializer instanceof NormalizerInterface && $serializer instanceof DenormalizerInterface)) {
-            throw new \RuntimeException('BlockViewNormalizer is incompatible with provided serializer');
+            throw new \RuntimeException('BlockViewNormalizer is not compatible with provided serializer');
         }
 
         $this->serializer = $serializer;
@@ -33,7 +33,7 @@ class BlockViewNormalizer implements NormalizerInterface, DenormalizerInterface,
      */
     public function supportsNormalization($data, $format = null)
     {
-        return is_object($data) && $data instanceof BlockView;
+        return $data instanceof BlockView;
     }
 
     /**
@@ -47,13 +47,18 @@ class BlockViewNormalizer implements NormalizerInterface, DenormalizerInterface,
         $data = [];
 
         if (!empty($view->vars)) {
-            foreach ($view->vars as $key => $value) {
-                if (is_object($value)) {
-                    $data['vars'][$key] = $this->serializer->normalize($value, $format, $context);
-                } else {
-                    $data['vars'][$key] = $value;
+            $data['vars'] = $view->vars;
+            array_walk_recursive(
+                $data['vars'],
+                function (&$var) use ($format, $context) {
+                    if (is_object($var)) {
+                        $var = [
+                            'type' => get_class($var),
+                            'value' => $this->serializer->normalize($var, $format, $context),
+                        ];
+                    }
                 }
-            }
+            );
         }
 
         foreach ($view->children as $childView) {
@@ -79,18 +84,8 @@ class BlockViewNormalizer implements NormalizerInterface, DenormalizerInterface,
         $view = new BlockView();
 
         if (array_key_exists('vars', $data)) {
-            foreach ($data['vars'] as $key => $value) {
-                if (is_array($value) && array_key_exists('type', $value) && class_exists($value['type'])) {
-                    $view->vars[$key] = $this->serializer->denormalize(
-                        $value,
-                        $value['type'],
-                        $format,
-                        $context
-                    );
-                } else {
-                    $view->vars[$key] = $value;
-                }
-            }
+            $view->vars = $data['vars'];
+            $this->denormalizeVarRecursive($view->vars, $format, $context);
         }
 
         if (array_key_exists('children', $data)) {
@@ -103,5 +98,23 @@ class BlockViewNormalizer implements NormalizerInterface, DenormalizerInterface,
         }
 
         return $view;
+    }
+
+    /**
+     * @param array $var
+     * @param string $format
+     * @param array $context
+     */
+    protected function denormalizeVarRecursive(array &$var, $format, array $context)
+    {
+        foreach ($var as $key => &$value) {
+            if (is_array($value)) {
+                if (array_key_exists('type', $value) && class_exists($value['type'])) {
+                    $value = $this->serializer->denormalize($value['value'], $value['type'], $format, $context);
+                } else {
+                    $this->denormalizeVarRecursive($value, $format, $context);
+                }
+            }
+        }
     }
 }

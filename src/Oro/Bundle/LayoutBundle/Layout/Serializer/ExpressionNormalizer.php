@@ -13,7 +13,7 @@ class ExpressionNormalizer implements NormalizerInterface, DenormalizerInterface
      */
     public function supportsNormalization($data, $format = null)
     {
-        return is_object($data) && $data instanceof ParsedExpression;
+        return $data instanceof ParsedExpression;
     }
 
     /**
@@ -25,11 +25,8 @@ class ExpressionNormalizer implements NormalizerInterface, DenormalizerInterface
         $parsedExpression = $object;
 
         return [
-            'type' => ParsedExpression::class,
-            'value' => [
-                'expression' => (string)$parsedExpression,
-                'nodes' => serialize($parsedExpression->getNodes())
-            ]
+            'expression' => (string)$parsedExpression,
+            'nodes' => serialize($parsedExpression->getNodes())
         ];
     }
 
@@ -47,8 +44,8 @@ class ExpressionNormalizer implements NormalizerInterface, DenormalizerInterface
     public function denormalize($data, $class, $format = null, array $context = array())
     {
         return new ParsedExpression(
-            $data['value']['expression'],
-            unserialize($data['value']['nodes'])
+            $data['expression'],
+            unserialize($data['nodes'])
         );
     }
 }
