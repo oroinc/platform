@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\AttachmentBundle\Resizer;
 
+use Liip\ImagineBundle\Binary\BinaryInterface;
 use Liip\ImagineBundle\Imagine\Cache\CacheManager;
 
 use Psr\Log\LoggerAwareInterface;
@@ -66,7 +67,7 @@ class ImageResizer implements LoggerAwareInterface
      * @param File $image
      * @param string $filterName
      * @param bool $force
-     * @return bool False if image has been already stored and no force flag passed or on error, true otherwise
+     * @return BinaryInterface|false False if image has been already stored and no force flag passed or on error
      */
     public function resizeImage(File $image, $filterName, $force)
     {
@@ -90,7 +91,7 @@ class ImageResizer implements LoggerAwareInterface
      * @param string $filterName
      * @param string $path
      * @param bool $force
-     * @return bool
+     * @return BinaryInterface|false
      */
     protected function createAndStoreImage(File $image, $filterName, $path, $force)
     {
@@ -114,9 +115,10 @@ class ImageResizer implements LoggerAwareInterface
 
             return false;
         }
+
         $filteredBinary = $this->imageFactory->createImage($content, $filterName);
         $this->cacheManager->store($filteredBinary, $path, $filterName, $this->cacheResolverName);
 
-        return true;
+        return $filteredBinary;
     }
 }

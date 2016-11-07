@@ -101,16 +101,15 @@ class FileController extends Controller
      *   requirements={"id"="\d+"}
      * )
      */
-    public function getFilteredImageAction($id, $filter, $filename, Request $request)
+    public function getFilteredImageAction($id, $filter, $filename)
     {
-        $file = $this->getFileByIdAndFileName($id, $filename);
-        $customResolver = $this->getParameter('oro_attachment.imagine.cache.resolver.custom_web_path.name');
-        $image = $this->get('oro_attachment.image_factory')->createImage(
-            $this->get('oro_attachment.file_manager')->getContent($file),
-            $filter
-        );
+        if (!$file = $this->getFileByIdAndFileName($id, $filename)) {
+            return $this->createNotFoundException('Image not found in the database');
+        }
 
-        $this->get('liip_imagine.cache.manager')->store($image, $request->getPathInfo(), $filter, $customResolver);
+        if (!$image = $this->get('oro_attachment.image_resizer')->resizeImage($file, $filter, $force = true)) {
+            return $this->createNotFoundException('Image not found in the filesystem');
+        }
 
         return new Response($image->getContent(), Response::HTTP_OK, ['Content-Type' => $image->getMimeType()]);
     }

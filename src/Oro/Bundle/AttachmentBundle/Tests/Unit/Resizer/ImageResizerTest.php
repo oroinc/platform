@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\AttachmentBundle\Tests\Unit\Resizer;
 
+use Liip\ImagineBundle\Binary\BinaryInterface;
 use Liip\ImagineBundle\Imagine\Cache\CacheManager;
 use Liip\ImagineBundle\Model\Binary;
 
@@ -109,14 +110,20 @@ class ImageResizerTest extends \PHPUnit_Framework_TestCase
     {
         $image = $this->prepareImageAndExpectations($isStored = true);
 
-        $this->assertTrue($this->resizer->resizeImage($image, self::FILTER_NAME, $force = true));
+        $this->assertInstanceOf(
+            BinaryInterface::class,
+            $this->resizer->resizeImage($image, self::FILTER_NAME, $force = true)
+        );
     }
 
     public function testResizeImageWhenImageDoesNotExist()
     {
         $image = $this->prepareImageAndExpectations($isStored = false);
 
-        $this->assertTrue($this->resizer->resizeImage($image, self::FILTER_NAME, $force = false));
+        $this->assertInstanceOf(
+            BinaryInterface::class,
+            $this->resizer->resizeImage($image, self::FILTER_NAME, $force = false)
+        );
     }
 
     /**
