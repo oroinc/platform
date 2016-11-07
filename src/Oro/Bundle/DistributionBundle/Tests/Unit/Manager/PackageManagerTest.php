@@ -1256,7 +1256,7 @@ class PackageManagerTest extends \PHPUnit_Framework_TestCase
             $parser = new VersionParser();
         }
 
-        return new $class($name, $parser->normalize($version), $version);
+        return new $class($name, $parser->normalize($version), (string)$version);
     }
 
     /**

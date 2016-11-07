@@ -9,6 +9,7 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+use Oro\Bundle\ApiBundle\Collection\IncludedEntityCollection;
 use Oro\Bundle\ApiBundle\Form\DataTransformer\CollectionToArrayTransformer;
 use Oro\Bundle\ApiBundle\Form\DataTransformer\EntityToIdTransformer;
 use Oro\Bundle\ApiBundle\Metadata\AssociationMetadata;
@@ -33,15 +34,21 @@ class EntityType extends AbstractType
     {
         /** @var AssociationMetadata $metadata */
         $metadata = $options['metadata'];
+        /** @var IncludedEntityCollection|null $includedEntities */
+        $includedEntities = $options['included_entities'];
         if ($metadata->isCollection()) {
             $builder
                 ->addEventSubscriber(new MergeDoctrineCollectionListener())
                 ->addViewTransformer(
-                    new CollectionToArrayTransformer(new EntityToIdTransformer($this->doctrine, $metadata)),
+                    new CollectionToArrayTransformer(
+                        new EntityToIdTransformer($this->doctrine, $metadata, $includedEntities)
+                    ),
                     true
                 );
         } else {
-            $builder->addViewTransformer(new EntityToIdTransformer($this->doctrine, $metadata));
+            $builder->addViewTransformer(
+                new EntityToIdTransformer($this->doctrine, $metadata, $includedEntities)
+            );
         }
     }
 
@@ -51,9 +58,10 @@ class EntityType extends AbstractType
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver
-            ->setDefaults(['compound' => false])
+            ->setDefaults(['compound' => false, 'included_entities' => null])
             ->setRequired(['metadata'])
-            ->setAllowedTypes('metadata', ['Oro\Bundle\ApiBundle\Metadata\AssociationMetadata']);
+            ->setAllowedTypes('metadata', [AssociationMetadata::class])
+            ->setAllowedTypes('included_entities', ['null', IncludedEntityCollection::class]);
     }
 
     /**

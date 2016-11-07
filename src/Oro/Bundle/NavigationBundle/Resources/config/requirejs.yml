@@ -2,9 +2,6 @@ config:
     shim:
         'routing':
             exports: 'window.Routing'
-        'jquery.form':
-            deps:
-                - 'jquery'
     paths:
         'routing': 'bundles/fosjsrouting/js/router.js'
         'oronavigation/js/app/views/shortcuts-view': 'bundles/oronavigation/js/app/views/shortcuts-view.js'

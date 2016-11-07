@@ -5,6 +5,10 @@ UPGRADE FROM 1.10 to 2.0
 - LiipImagineBundle was updated to 1.5.* version.
 - Added dependency to [fxpio/composer-asset-plugin](https://github.com/fxpio/composer-asset-plugin) composer plugin.
 - All original third-party asset libraries were moved out from platform and added to composer.json as bower-asset/npm-asset dependency.
+- Upgrade to 2.0 is available only from 1.10 version. For this update
+  was added the command "oro:platform:upgrade20". Before run this command the cache has to be deleted. 
+  Command have to be run only one time. In next releases 2.x to apply release changes it will be enough run the command "oro:platform:update".
+  Upgrade from version less then 1.10 is not supported.
 
 ####Action Component
 - Deprecated constant `Oro\Component\Action\Event\ExecuteActionEvents::DEPRECATED_HANDLE_BEFORE` removed. Use `Oro\Component\Action\Event\ExecuteActionEvents::HANDLE_BEFORE` instead.
@@ -19,6 +23,9 @@ UPGRADE FROM 1.10 to 2.0
 ####ApiBundle
 - The `oro.api.action_processor` DI tag was removed. To add a new action processor, use `oro_api.actions` section of the ApiBundle configuration.
 - The `oro_api.config_extension` DI tag was removed. To add a new configuration extension, use `oro_api.config_extensions` section of the ApiBundle configuration.
+
+#### ImportExportBundle
+- ImportExportBundle/Field/FieldHelper.php was moved to EntityBundle/Helper/
 
 ####WorkflowBundle
 - Class `Oro\Bundle\WorkflowBundle\Model\WorkflowManager`
@@ -159,6 +166,7 @@ Used with new class `Oro\Bundle\WorkflowBundle\Model\WorkflowExclusiveRecordGrou
     - `ConfigManager $cm`,
     - `LanguageProvider $languageProvider`.
 - `oro_locale.repository.localization` inherits `oro_entity.abstract_repository`
+- Updated moment-timezone.js library to version 0.5.*
 
 ####Layout Component:
 - Interface `Oro\Component\Layout\DataProviderInterface` was removed.
@@ -193,7 +201,7 @@ Used with new class `Oro\Bundle\WorkflowBundle\Model\WorkflowExclusiveRecordGrou
 - Added interface `Oro\Component\Layout\Form\FormRendererInterface` to add fourth argument `$renderParentBlock` to method `searchAndRenderBlock` that tells renderer to search for widget in parent theme resources.
 - Added interface `Oro\Bundle\LayoutBundle\Form\TwigRendererInterface` that extends new `Oro\Component\Layout\Form\FormRendererInterface`.
 - Added interface `Oro\Component\Layout\Form\RendererEngine\FormRendererEngineInterface` that extends `Symfony\Component\Form\FormRendererEngineInterface` to add new method `switchToNextParentResource` needed for `parent_block_widget`.
-- Added interface `Oro\Bundle\LayoutBundle\Form\TwigRendererEngineInterface` that extends new `Oro\Component\Layout\Form\RendererEngine\FormRendererEngineInterface` to use it everywhere in LayoutBundle instead of `Symfony\Bridge\Twig\Form\TwigRendererEngineInterface`.
+- Added interface `Oro\Bundle\LayoutBundle\Form\TwigRendererEngineInterface` that extends new `Oro\Component\Layout\Form\RendererEngine\FormRendererEngineInterface` for using it everywhere in LayoutBundle instead of `Symfony\Bridge\Twig\Form\TwigRendererEngineInterface`.
 - Added class `Oro\Bundle\LayoutBundle\Form\BaseTwigRendererEngine` that extends `Symfony\Bridge\Twig\Form\TwigRendererEngine` and implements new `Oro\Bundle\LayoutBundle\Form\TwigRendererEngineInterface`.
 - Updated class `Oro\Bundle\LayoutBundle\Form\RendererEngine\TwigRendererEngine` to extend new `Oro\Bundle\LayoutBundle\Form\BaseTwigRendererEngine`.
 - Updated class `Oro\Bundle\LayoutBundle\Form\RendererEngine\TemplatingRendererEngine` that extends `Symfony\Component\Form\Extension\Templating\TemplatingRendererEngine` and implements `Oro\Component\Layout\Form\RendererEngine\FormRendererEngineInterface`.
@@ -203,6 +211,14 @@ Used with new class `Oro\Bundle\WorkflowBundle\Model\WorkflowExclusiveRecordGrou
 - Class `Oro\Bundle\LayoutBundle\Provider\ImageTypeProvider` added to provide available image types collected from all themes
 - Class `Oro\Bundle\LayoutBundle\Loader\ImageFilterLoader` added to dynamically load Imagine filters
 - Dependency injection tag `layout.image_filter.provider` added to support custom Imagine filter providers
+- Removed class `Oro\Bundle\LayoutBundle\Layout\Block\Extension\ExpressionExtension`.
+- Removed class `Oro\Bundle\LayoutBundle\Layout\Block\Extension\OptionValueBagExtension`.
+- Class `Oro\Bundle\LayoutBundle\Exception\CircularReferenceException` moved to `Oro\Component\Layout\Exception\CircularReferenceException`.
+- Class `Oro\Bundle\LayoutBundle\Layout\Encode\ExpressionEncoderInterface` moved to `Oro\Component\Layout\ExpressionLanguage\Encoder\ExpressionEncoderInterface`.
+- Class `Oro\Bundle\LayoutBundle\Layout\Encoder\ExpressionEncoderRegistry` moved to `Oro\Component\Layout\ExpressionLanguage\Encoder\ExpressionEncoderRegistry`.
+- Class `Oro\Bundle\LayoutBundle\Layout\Encoder\JsonExpressionEncoder` moved to `Oro\Component\Layout\ExpressionLanguage\Encoder\JsonExpressionEncoder`.
+- Class `Oro\Bundle\LayoutBundle\ExpressionLanguage\ExpressionManipulator` moved to `Oro\Component\Layout\ExpressionLanguage\ExpressionManipulator`.
+- Class `Oro\Bundle\LayoutBundle\Layout\Processor\ExpressionProcessor` moved to `Oro\Component\Layout\ExpressionLanguage\ExpressionProcessor`.
 
 ####ConfigBundle:
 - Class `Oro\Bundle\ConfigBundle\Config\AbstractScopeManager` added `$scopeIdentifier` of type integer, null or object as optional parameter for next methods: `getSettingValue`, `getInfo`, `set`, `reset`, `getChanges`, `flush`, `save`, `calculateChangeSet`, `reload`
@@ -394,6 +410,15 @@ placeholders:
 - Main menu dropdown active item is now triggering a page refresh, despite the Backbone router limitations.
 - Updated jquery.mCustomScrollbar plugin to version 3.1.5.
 - Changed `form_row` block to support of form field 'hints' which allows rendering of simple help section for the respective form control.
+- Updated jQuery and jQuery-UI libraries to version 3.1.* and 1.12.* accordingly.
+- Updated Backbone library to version 1.2.*.
+- Updated Underscore library to version 1.8.*.
+- Class `Oro\Bundle\UIBundle\Placeholder\PlaceholderProvider`
+    - construction signature was changed now it takes next arguments:
+        - `array` $placeholders
+        - `ResolverInterface` $resolver
+        - `SecurityFacade` $securityFacade
+        - `FeatureChecker` $featureChecker
 
 ####RequireJS:
 - Updated RequireJS library to version 2.3.*
@@ -404,6 +429,19 @@ placeholders:
 ####DashboardBundle:
 - Dashboards configurations now loads from `Resources/config/oro/dashboards.yml` instead of `Resources/config/dashboard.yml` file.
 - Root node for dashboards configuration in `Resources/config/oro/dashboards.yml` file were changed from `oro_dashboard_config` to `dashboards`.
+- Class `Oro\Bundle\DashboardBundle\Model\WidgetConfigs`
+    - construction signature was changed now it takes next arguments:
+        - `ConfigProvider` $configProvider,
+        - `ResolverInterface` $resolver,
+        - `EntityManagerInterface` $entityManager,
+        - `ConfigValueProvider` $valueProvider,
+        - `TranslatorInterface` $translator,
+        - `EventDispatcherInterface` $eventDispatcher,
+        - `WidgetConfigVisibilityFilter` $visibilityFilter
+    - method `filterWidgets` signature was changed now it takes next arguments:
+        - `array` $items
+        - $widgetName = null
+- Constructor of `Oro\Bundle\DashboardBundle\Model\Factory` was changed. Added `WidgetConfigs $widgetConfigs` as last argument.
 
 ####NavigationBundle:
 - Navigation configuration now loads form `Resources/config/oro/navigation.yml` instead of `Resources/config/navigation.yml` file.
@@ -412,6 +450,7 @@ placeholders:
     * `oro_titles` to `titles`
     * `oro_menu_config` to `menu_config`
     * `oro_navigation_elements` to `navigation_elements`
+- All configuration nodes in `Resources/config/oro/navigation.yml` were renamed to snake case
 - Added class `Oro\Bundle\NavigationBundle\Builder\MenuUpdateBuilder` that implements `Oro\Bundle\NavigationBundle\Menu\BuilderInterface`.
 - Added class `Oro\Bundle\NavigationBundle\DependencyInjection\Compiler\MenuUpdateProviderPass`.
 - Added `tree.$.areas`, `tree.$.max_nesting_level`, `tree.$.read_only` and `items.$.read_only` nodes to `Oro\Bundle\NavigationBundle\DependencyInjection\Configuration`.
@@ -454,12 +493,22 @@ placeholders:
 - Constructor of `Oro\Bundle\EmailBundle\Form\DataTransformer\EmailTemplateTransformer` was changed. Removed the arguments.
 - Constructor of `Oro\Bundle\EmailBundle\Form\Type\EmailTemplateRichTextType` was changed. Removed the arguments.
 - Constructor of `Oro\Bundle\EmailBundle\Form\Type\EmailType` was changed. Added `ConfigManager $configManager` as last argument.
+- Constructor of `Oro\Bundle\EmailBundle\EventListener\EntityListener` was changed. Added `MessageProducerInterface $producer` as last argument.
+- Constructor of `Oro\Bundle\EmailBundle\EventListener\AutoResponseListener` was changed. Added `MessageProducerInterface $producer` as last argument.
+- Moved class `Oro\Bundle\EmailBundle\Command\Manager\AssociationManager` to `Oro\Bundle\EmailBundle\Async\Manager`. Constructor of `Oro\Bundle\EmailBundle\Command\Manager\AssociationManager` was changed. Added `MessageProducerInterface` as last argument.
+- Service name `oro_email.command.association_manager` was changed to `oro_email.async.manager.association_manager`
 - `Oro/Bundle/EmailBundle/Cache/EntityCacheClearer` deprecated, tag on `oro_email.entity.cache.clearer` removed
 - `oro_email.email_address.entity_manager` inherits `oro_entity.abstract_entity_manager`
 - `Oro/Bundle/EmailBundle/Entity/MailboxProcessSettings` no longer inherits `Oro\Bundle\EmailBundle\Form\Model\ExtendMailboxProcessSettings`
 - `Oro\Bundle\EmailBundle\Form\Model\ExtendMailboxProcessSettings` was removed
 - Class `Oro\Bundle\EmailBundle\Form\Model\Email`
     - method `getContexts` now returns `Doctrine\Common\Collections\Collection` instead of array
+- Constructor of `Oro\Bundle\EmailBundle\Mailbox\MailboxProcessStorage` was changed. Added `FeatureChecker $featureChecker` argument.    
+- The command `oro:email:add-associations` (class `Oro\Bundle\EmailBundle\Command\AddAssociationCommand`) was removed. Produce message to the topic `oro.email.add_association_to_email` or `oro.email.add_association_to_emails` instead.
+- The command `oro:email:autoresponse` (class `Oro\Bundle\EmailBundle\Command\AutoResponseCommand`) was removed. Produce message to the topic `oro.email.send_auto_response` or `oro.email.send_auto_responses` instead.
+- The command `oro:email:flag-sync` (class `Oro\Bundle\EmailBundle\Command\EmailFlagSyncCommand`) was removed. Produce message to the topic `oro.email.sync_email_seen_flag` instead.
+- The command `oro:email-attachment:purge` (class `Oro\Bundle\EmailBundle\Command\PurgeEmailAttachmentCommand`) was removed. Produce message to the topic `oro.email.purge_email_attachments` instead.
+- The command `oro:email:update-email-owner-associations` (class `Oro/Bundle/EmailBundle/Command/UpdateEmailOwnerAssociationsCommand`) was removed. Produce message to the topic `oro.email.update_email_owner_association` or `oro.email.update_email_owner_associations` instead.
 
 ####EntityBundle
 - `oro_entity.abstract_repository` introduced. Please inherit all your doctrine repository factory services
@@ -576,4 +625,10 @@ to the [Fallback documentation](./src/Oro/Bundle/EntityBundle/Resources/doc/enti
 - All demo users will have passwords ending with '1Q' (e.g. for username 'marketing' password is 'marketing1Q'). For user 'sale' the password is 'salesale1Q'.
 
 ####ImapBundle
- - The command `oro:imap:clear-mailbox` was removed. Produce message to the topic `Oro\Bundle\ImapBundle\Async\Topics::CLEAR_INACTIVE_MAILBOX` instead.
+- The command `oro:imap:clear-mailbox` was removed. Produce message to the topic `oro.imap.clear_inactive_mailbox` instead.
+
+####OroCalendarBundle
+- OroCalendarBundle moved to a separate package
+
+####OroInstallerBundle
+- Added interface `Oro\Bundle\InstallerBundle\CacheWarmer\NamespaceMigrationProviderInterface`. it makes available add the rules for command "oro:platform:upgrade20"

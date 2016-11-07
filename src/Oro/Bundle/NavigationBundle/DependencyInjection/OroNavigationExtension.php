@@ -68,6 +68,8 @@ class OroNavigationExtension extends Extension
         $configuration = new Configuration();
         $config = $this->processConfiguration($configuration, $entitiesConfig);
 
+        $this->normalizeOptionNames($config);
+
         $loader = new Loader\YamlFileLoader($container, new FileLocator(__DIR__ . '/../Resources/config'));
         $loader->load('services.yml');
         $loader->load('content_providers.yml');
@@ -208,5 +210,43 @@ class OroNavigationExtension extends Extension
         }
 
         return null;
+    }
+
+    /**
+     * @param null|array $config
+     */
+    protected function normalizeOptionNames(&$config)
+    {
+        $normalizeMap = [
+            'templates' => [
+                'current_as_link'      => 'currentAsLink',
+                'current_class'        => 'currentClass',
+                'ancestor_class'       => 'ancestorClass',
+                'first_class'          => 'firstClass',
+                'last_class'           => 'lastClass',
+                'root_class'           => 'rootClass',
+                'is_dropdown'          => 'isDropdown',
+            ],
+            'items' => [
+                'translate_domain'     => 'translateDomain',
+                'translate_parameters' => 'translateParameters',
+                'route_parameters'     => 'routeParameters',
+                'link_attributes'      => 'linkAttributes',
+                'label_attributes'     => 'labelAttributes',
+                'children_attributes'  => 'childrenAttributes',
+                'display_children'     => 'displayChildren',
+            ],
+        ];
+
+        foreach ($normalizeMap as $configKey => $optionNameMap) {
+            foreach ($config[$configKey] as &$options) {
+                foreach ($options as $key => $value) {
+                    if (array_key_exists($key, $optionNameMap)) {
+                        unset($options[$key]);
+                        $options[$optionNameMap[$key]] = $value;
+                    }
+                }
+            }
+        }
     }
 }
