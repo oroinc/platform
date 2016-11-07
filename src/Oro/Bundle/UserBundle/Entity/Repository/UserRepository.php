@@ -189,31 +189,31 @@ class UserRepository extends EntityRepository implements EmailAwareRepository
     }
 
     /**
-     * Return query builder matching users which their passwords are about to expire in specified list of days
+     * Return query builder matching users which their passwords are about to expire in the specified list of dates
      *
-     * @param int[] $days
+     * @param array $dates Array of date period pairs [from => \DateTime, to => \DateTime] to match against
+     *
      * @return \Doctrine\ORM\QueryBuilder
      */
-    public function getExpiringPasswordUsersQueryBuilder(array $days)
+    public function getExpiringPasswordUsersQB(array $dates)
     {
-        if (0 === count($days)) {
+        if (0 === count($dates)) {
             throw new \InvalidArgumentException('At least one notification period should be provided');
         }
 
-        $utc = new \DateTimeZone('UTC');
         $builder = $this->createQueryBuilder('u');
         $conditions = [];
-
-        foreach ($days as $index => $day) {
-            $from = new \DateTime('+' . $day . ' day midnight', $utc);
-            $to = new \DateTime('+' .  $day . ' day 23:59:59', $utc);
+        foreach ($dates as $index => $period) {
+            if (!($period['from'] instanceof \DateTime && $period['to'] instanceof \DateTime)) {
+                throw new \InvalidArgumentException('Period array should include [\DateTime from, \DateTime to]');
+            }
             $conditions[] = $builder->expr()->between(
                 'u.passwordExpiresAt',
                 ':from' . $index,
                 ':to' . $index
             );
-            $builder->setParameter('from' . $index, $from, Type::DATETIME);
-            $builder->setParameter('to' . $index, $to, Type::DATETIME);
+            $builder->setParameter('from' . $index, $period['from'], Type::DATETIME);
+            $builder->setParameter('to' . $index, $period['to'], Type::DATETIME);
         }
 
         return $builder

@@ -43,8 +43,20 @@ class PasswordExpirationNotificationCommand extends ContainerAwareCommand implem
         $notificationDays = $container->get('oro_user.provider.password_change_period_config_provider')
             ->getNotificationDays();
 
+        $utc = new \DateTimeZone('UTC');
+        $periods = [];
+
+        foreach ($notificationDays as $day) {
+            $from = new \DateTime('+' . $day . ' day midnight', $utc);
+            $to = new \DateTime('+' . $day . ' day 23:59:59', $utc);
+            $periods[] = [
+                'from' => $from,
+                'to' => $to,
+            ];
+        }
+
         $iteratorResult = $doctrine->getEntityRepository('OroUserBundle:User')
-            ->getExpiringPasswordUsersQueryBuilder($notificationDays)
+            ->getExpiringPasswordUsersQB($periods)
             ->getQuery()
             ->iterate();
 
