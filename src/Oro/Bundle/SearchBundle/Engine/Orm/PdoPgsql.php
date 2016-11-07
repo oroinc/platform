@@ -55,20 +55,29 @@ class PdoPgsql extends BaseDriver
      */
     public function addTextField(QueryBuilder $qb, $index, $searchCondition, $setOrderBy = true)
     {
-        $useFieldName = $searchCondition['fieldName'] === '*' ? false : true;
-        $fieldValue   = $this->filterTextFieldValue($searchCondition['fieldValue']);
+        $useFieldName = $searchCondition['fieldName'] !== '*';
+        $condition = $searchCondition['condition'];
+        $fieldValue = $this->filterTextFieldValue($searchCondition['fieldValue']);
 
-        if ($searchCondition['condition'] === Query::OPERATOR_CONTAINS) {
-            $searchString = $this->createContainsStringQuery($index, $useFieldName);
-        } elseif ($searchCondition['condition'] === Query::OPERATOR_NOT_CONTAINS) {
-            $searchString = $this->createNotContainsStringQuery($index, $useFieldName);
-        } elseif ($searchCondition['condition'] === Query::OPERATOR_EQUALS) {
-            $searchString = $this->createCompareStringQuery($index, $useFieldName);
-        } else {
-            $searchString = $this->createCompareStringQuery($index, $useFieldName, '!=');
+        switch ($condition) {
+            case Query::OPERATOR_CONTAINS:
+                $searchString = $this->createContainsStringQuery($index, $useFieldName);
+                break;
+
+            case Query::OPERATOR_NOT_CONTAINS:
+                $searchString = $this->createNotContainsStringQuery($index, $useFieldName);
+                break;
+
+            case Query::OPERATOR_EQUALS:
+                $searchString = $this->createCompareStringQuery($index, $useFieldName);
+                break;
+
+            default:
+                $searchString = $this->createCompareStringQuery($index, $useFieldName, '!=');
+                break;
         }
 
-        $this->setFieldValueStringParameter($qb, $index, $fieldValue, $searchCondition['condition']);
+        $this->setFieldValueStringParameter($qb, $index, $fieldValue, $condition);
 
         if ($useFieldName) {
             $qb->setParameter('field' . $index, $searchCondition['fieldName']);

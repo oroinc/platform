@@ -62,23 +62,32 @@ class PdoMysql extends BaseDriver
     public function addTextField(QueryBuilder $qb, $index, $searchCondition, $setOrderBy = true)
     {
         $fieldValue = $searchCondition['fieldValue'];
-        $words = $this->getWords($this->filterTextFieldValue($fieldValue), $searchCondition['condition']);
+        $condition = $searchCondition['condition'];
+        $words = $this->getWords($this->filterTextFieldValue($fieldValue), $condition);
 
-        if ($searchCondition['condition'] === Query::OPERATOR_CONTAINS) {
-            $whereExpr  = $this->createMatchAgainstWordsExpr($qb, $words, $index, $searchCondition, $setOrderBy);
-            $shortWords = $this->getWordsLessThanFullTextMinWordLength($words);
-            if ($shortWords) {
-                $whereExpr = $qb->expr()->orX(
-                    $whereExpr,
-                    $this->createLikeWordsExpr($qb, $shortWords, $index, $searchCondition)
-                );
-            }
-        } elseif ($searchCondition['condition'] === Query::OPERATOR_NOT_CONTAINS) {
-            $whereExpr = $this->createNotLikeWordsExpr($qb, $words, $index, $searchCondition);
-        } elseif ($searchCondition['condition'] === Query::OPERATOR_EQUALS) {
-            $whereExpr = $this->createCompareStringExpr($qb, $fieldValue, $index, $searchCondition);
-        } else {
-            $whereExpr = $this->createCompareStringExpr($qb, $fieldValue, $index, $searchCondition, '!=');
+        switch ($condition) {
+            case Query::OPERATOR_CONTAINS:
+                $whereExpr  = $this->createMatchAgainstWordsExpr($qb, $words, $index, $searchCondition, $setOrderBy);
+                $shortWords = $this->getWordsLessThanFullTextMinWordLength($words);
+                if ($shortWords) {
+                    $whereExpr = $qb->expr()->orX(
+                        $whereExpr,
+                        $this->createLikeWordsExpr($qb, $shortWords, $index, $searchCondition)
+                    );
+                }
+                break;
+
+            case Query::OPERATOR_NOT_CONTAINS:
+                $whereExpr = $this->createNotLikeWordsExpr($qb, $words, $index, $searchCondition);
+                break;
+
+            case Query::OPERATOR_EQUALS:
+                $whereExpr = $this->createCompareStringExpr($qb, $fieldValue, $index, $searchCondition);
+                break;
+
+            default:
+                $whereExpr = $this->createCompareStringExpr($qb, $fieldValue, $index, $searchCondition, '!=');
+                break;
         }
 
         return '(' . $whereExpr . ')';
