@@ -414,6 +414,8 @@ placeholders:
 - Updated jquery.mCustomScrollbar plugin to version 3.1.5.
 - Changed `form_row` block to support of form field 'hints' which allows rendering of simple help section for the respective form control.
 - Updated jQuery and jQuery-UI libraries to version 3.1.* and 1.12.* accordingly.
+- Updated Backbone library to version 1.2.*.
+- Updated Underscore library to version 1.8.*.
 - Class `Oro\Bundle\UIBundle\Placeholder\PlaceholderProvider`
     - construction signature was changed now it takes next arguments:
         - `array` $placeholders

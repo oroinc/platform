@@ -32,9 +32,11 @@ define(function(require) {
         },
 
         undelegateEvents: function() {
-            _.each(this.options.reloadEvents || [], function(event) {
-                mediator.off(event, this.reloadLayout, this);
-            }, this);
+            if (this.$el) {
+                _.each(this.options.reloadEvents || [], function(event) {
+                    mediator.off(event, this.reloadLayout, this);
+                }, this);
+            }
             return LayoutSubtreeView.__super__.undelegateEvents.apply(this, arguments);
         },
 
