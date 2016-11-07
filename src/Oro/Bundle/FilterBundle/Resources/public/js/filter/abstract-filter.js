@@ -372,10 +372,10 @@ define([
                     $input.each(function() {
                         var $input = $(this);
                         if ($input.attr('value') === value) {
-                            $input.attr('checked', true);
+                            $input.prop('checked', true);
                             $input.click();
                         } else {
-                            $(this).removeAttr('checked');
+                            $input.prop('checked', false);
                         }
                     });
                     break;
@@ -476,6 +476,13 @@ define([
          */
         applyValue: function() {
             this.setValue(this._formatRawValue(this._readDOMValue()));
+        },
+
+        getState: function() {
+            return {
+                label: this.label,
+                hint: this._getCriteriaHint()
+            };
         }
     }));
 

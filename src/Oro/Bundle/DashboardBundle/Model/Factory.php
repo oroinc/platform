@@ -7,26 +7,28 @@ use Oro\Bundle\DashboardBundle\Entity\Widget;
 
 class Factory
 {
-    /**
-     * @var ConfigProvider
-     */
+    /** @var ConfigProvider */
     protected $configProvider;
 
-    /**
-     * @var StateManager
-     */
+    /** @var StateManager */
     protected $stateManager;
 
+    /** @var WidgetConfigs */
+    protected $widgetConfigs;
+
     /**
-     * @param ConfigProvider $configProvider
-     * @param StateManager   $stateManager
+     * @param ConfigProvider    $configProvider
+     * @param StateManager      $stateManager
+     * @param WidgetConfigs     $widgetConfigs
      */
     public function __construct(
         ConfigProvider $configProvider,
-        StateManager $stateManager
+        StateManager $stateManager,
+        WidgetConfigs $widgetConfigs
     ) {
         $this->configProvider = $configProvider;
         $this->stateManager   = $stateManager;
+        $this->widgetConfigs  = $widgetConfigs;
     }
 
     /**
@@ -58,6 +60,22 @@ class Factory
     public function createWidgetModel(Widget $widget)
     {
         $widgetConfig = $this->configProvider->getWidgetConfig($widget->getName());
+        $widgetState  = $this->stateManager->getWidgetState($widget);
+
+        return new WidgetModel($widget, $widgetConfig, $widgetState);
+    }
+
+    /**
+     * @param Widget $widget
+     * @return WidgetModel|null
+     */
+    public function createVisibleWidgetModel(Widget $widget)
+    {
+        $widgetConfig = $this->widgetConfigs->getWidgetConfig($widget->getName());
+        if (!$widgetConfig) {
+            return null;
+        }
+
         $widgetState  = $this->stateManager->getWidgetState($widget);
 
         return new WidgetModel($widget, $widgetConfig, $widgetState);

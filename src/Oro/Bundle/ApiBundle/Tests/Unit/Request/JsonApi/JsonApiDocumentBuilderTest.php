@@ -525,7 +525,7 @@ class JsonApiDocumentBuilderTest extends DocumentBuilderTestCase
         $association = $metadata->addAssociation(
             $this->createAssociationMetadata('category', 'Test\Category')
         );
-        $association->setDataType('scalar');
+        $association->setDataType('object');
         $association->getTargetMetadata()->addField($this->createFieldMetadata('name'));
 
         $this->documentBuilder->setDataObject($object, $metadata);
@@ -727,7 +727,7 @@ class JsonApiDocumentBuilderTest extends DocumentBuilderTestCase
             $this->createAssociationMetadata('category', 'Test\Category')
         );
         $association->setDataType('scalar');
-        $association->setCollapsed('scalar');
+        $association->setCollapsed(true);
         $association->getTargetMetadata()->removeField('id');
         $association->getTargetMetadata()->addField($this->createFieldMetadata('name'));
 
@@ -778,7 +778,7 @@ class JsonApiDocumentBuilderTest extends DocumentBuilderTestCase
             $this->createAssociationMetadata('categories', 'Test\Category', true)
         );
         $association->setDataType('array');
-        $association->setCollapsed('scalar');
+        $association->setCollapsed(true);
         $association->getTargetMetadata()->removeField('id');
         $association->getTargetMetadata()->addField($this->createFieldMetadata('name'));
 
@@ -825,6 +825,7 @@ class JsonApiDocumentBuilderTest extends DocumentBuilderTestCase
                 'id'         => 123,
                 'name'       => 'Name',
                 'meta1'      => 'Meta1',
+                'meta2'      => 'Meta2',
                 'category'   => 456,
                 'group'      => null,
                 'role'       => ['id' => 789],
@@ -847,6 +848,8 @@ class JsonApiDocumentBuilderTest extends DocumentBuilderTestCase
         $targetMetadata->addField($this->createFieldMetadata('name'));
         $targetMetadata->addField($this->createFieldMetadata('missingField'));
         $targetMetadata->addMetaProperty($this->createMetaPropertyMetadata('meta1'));
+        $targetMetadata->addMetaProperty($this->createMetaPropertyMetadata('meta2'))
+            ->setResultName('resultMeta2');
         $targetMetadata->addMetaProperty($this->createMetaPropertyMetadata('missingMeta'));
         $targetMetadata->addAssociation($this->createAssociationMetadata('category', 'Test\Category'));
         $targetMetadata->addAssociation($this->createAssociationMetadata('group', 'Test\Groups'));
@@ -879,6 +882,7 @@ class JsonApiDocumentBuilderTest extends DocumentBuilderTestCase
                             'name'          => 'Name',
                             'missingField'  => null,
                             'meta1'         => 'Meta1',
+                            'resultMeta2'   => 'Meta2',
                             'category'      => 456,
                             'group'         => null,
                             'role'          => 789,
@@ -942,6 +946,33 @@ class JsonApiDocumentBuilderTest extends DocumentBuilderTestCase
                         'detail' => 'some error details'
                     ]
                 ]
+            ],
+            $this->documentBuilder->getDocument()
+        );
+    }
+
+    public function testMetaPropertyWithResultName()
+    {
+        $object = [
+            'id'    => 123,
+            'meta1' => 'Meta1',
+        ];
+
+        $metadata = $this->getEntityMetadata('Test\Entity', ['id']);
+        $metadata->addField($this->createFieldMetadata('id'));
+        $metadata->addMetaProperty($this->createMetaPropertyMetadata('meta1'))
+            ->setResultName('resultMeta1');
+
+        $this->documentBuilder->setDataObject($object, $metadata);
+        $this->assertEquals(
+            [
+                'data'     => [
+                    'type' => 'test_entity',
+                    'id'   => '123',
+                    'meta' => [
+                        'resultMeta1' => 'Meta1',
+                    ],
+                ],
             ],
             $this->documentBuilder->getDocument()
         );

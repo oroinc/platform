@@ -1,0 +1,4 @@
+.mCS-inset-dark.mCSB_scrollTools .mCSB_dragger .mCSB_dragger_bar { background-color: #777; background-color: rgba(119,119,119,.45); }
+.mCS-inset-dark.mCSB_scrollTools .mCSB_dragger:hover .mCSB_dragger_bar { background-color: #777; background-color: rgba(119,119,119,.7); }
+.mCS-inset-dark.mCSB_scrollTools .mCSB_dragger:active .mCSB_dragger_bar,
+.mCS-inset-dark.mCSB_scrollTools .mCSB_dragger.mCSB_dragger_onDrag .mCSB_dragger_bar { background-color: #777; background-color: rgba(119,119,119,.8); }

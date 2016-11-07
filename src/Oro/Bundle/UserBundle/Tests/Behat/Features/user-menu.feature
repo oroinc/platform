@@ -25,10 +25,6 @@ Feature: User menu
     Then I should see "The email was sent" flash message
     And number of records should be 1
 
-  Scenario: My Calendar
-    Given I click My Calendar in user menu
-    Then I should be on Default Calendar View page
-
   Scenario: Logout
     Given I click Logout in user menu
     And I should be on Login page

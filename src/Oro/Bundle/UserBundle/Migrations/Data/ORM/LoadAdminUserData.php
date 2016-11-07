@@ -73,7 +73,7 @@ class LoadAdminUserData extends AbstractFixture implements DependentFixtureInter
             ->setEmail(self::DEFAULT_ADMIN_EMAIL)
             ->setEnabled(true)
             ->setOwner($businessUnit)
-            ->setPlainPassword(md5(uniqid(mt_rand(), true)))
+            ->setPlainPassword(md5(uniqid(mt_rand(), true)). '1Q')
             ->addRole($adminRole)
             ->addBusinessUnit($businessUnit)
             ->setOrganization($organization)

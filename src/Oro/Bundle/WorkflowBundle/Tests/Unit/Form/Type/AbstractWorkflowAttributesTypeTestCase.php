@@ -23,7 +23,7 @@ use Oro\Bundle\WorkflowBundle\Model\WorkflowData;
 use Oro\Bundle\WorkflowBundle\Model\Workflow;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowRegistry;
 
-use Oro\Component\Action\Model\ContextAccessor;
+use Oro\Component\ConfigExpression\ContextAccessor;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
 abstract class AbstractWorkflowAttributesTypeTestCase extends FormIntegrationTestCase

@@ -176,6 +176,7 @@ services:
             - '@oro_workflow.manager'
             - '@oro_workflow.serializer.data.serializer'
             - '@oro_workflow.handler.transition_helper'
+            - '@oro_featuretoggle.checker.feature_checker'
 
     oro_workflow.validation_loader:
         class: Oro\Bundle\WorkflowBundle\Validator\WorkflowValidationLoader
@@ -325,3 +326,10 @@ services:
         tags:
             - { name: 'oro_message_queue.client.message_processor' }
             - { name: monolog.logger, channel: oro_workflow }
+
+    oro_workflow.listener.grids_subscriber:
+        class: Oro\Bundle\WorkflowBundle\EventListener\GridsSubscriber
+        arguments:
+            - '@oro_featuretoggle.checker.feature_checker'
+        tags:
+            - { name: kernel.event_subscriber }

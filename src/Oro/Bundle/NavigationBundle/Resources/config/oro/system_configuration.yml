@@ -1,6 +1,6 @@
 system_configuration:
     fields:
-        oro_navigation.maxItems:
+        oro_navigation.max_items:
             data_type: integer
         oro_navigation.title_suffix:
             data_type: string
@@ -11,7 +11,7 @@ system_configuration:
 
     api_tree:
         look-and-feel:
-            oro_navigation.maxItems: ~
+            oro_navigation.max_items: ~
             oro_navigation.title_suffix: ~
             oro_navigation.title_delimiter: ~
             oro_navigation.breadcrumb_menu: ~
