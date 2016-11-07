@@ -9,8 +9,14 @@ abstract class TemplateTestCase extends \PHPUnit_Framework_TestCase
     /** @return TranslationKeyTemplateInterface */
     abstract public function getTemplateInstance();
 
+    /**
+     * @return void
+     */
     abstract public function testGetTemplate();
 
+    /**
+     * @return void
+     */
     abstract public function testGetRequiredKeys();
 
     /** @param string $templateString */
