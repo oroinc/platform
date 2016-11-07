@@ -1,6 +1,10 @@
 <?php
 namespace Oro\Component\MessageQueue\Tests\Unit\Client;
 
+use Psr\Log\LoggerInterface;
+
+use Symfony\Component\Console\Tester\CommandTester;
+
 use Oro\Component\MessageQueue\Client\Config;
 use Oro\Component\MessageQueue\Client\ConsumeMessagesCommand;
 use Oro\Component\MessageQueue\Client\DelegateMessageProcessor;
@@ -8,7 +12,6 @@ use Oro\Component\MessageQueue\Client\Meta\DestinationMetaRegistry;
 use Oro\Component\MessageQueue\Consumption\ChainExtension;
 use Oro\Component\MessageQueue\Consumption\QueueConsumer;
 use Oro\Component\MessageQueue\Transport\ConnectionInterface;
-use Symfony\Component\Console\Tester\CommandTester;
 
 class ConsumeMessagesCommandTest extends \PHPUnit_Framework_TestCase
 {
@@ -17,7 +20,8 @@ class ConsumeMessagesCommandTest extends \PHPUnit_Framework_TestCase
         new ConsumeMessagesCommand(
             $this->createQueueConsumerMock(),
             $this->createDelegateMessageProcessorMock(),
-            $this->createDestinationMetaRegistry([])
+            $this->createDestinationMetaRegistry([]),
+            $this->createLoggerInterfaceMock()
         );
     }
 
@@ -26,7 +30,8 @@ class ConsumeMessagesCommandTest extends \PHPUnit_Framework_TestCase
         $command = new ConsumeMessagesCommand(
             $this->createQueueConsumerMock(),
             $this->createDelegateMessageProcessorMock(),
-            $this->createDestinationMetaRegistry([])
+            $this->createDestinationMetaRegistry([]),
+            $this->createLoggerInterfaceMock()
         );
 
         $this->assertEquals('oro:message-queue:consume', $command->getName());
@@ -37,7 +42,8 @@ class ConsumeMessagesCommandTest extends \PHPUnit_Framework_TestCase
         $command = new ConsumeMessagesCommand(
             $this->createQueueConsumerMock(),
             $this->createDelegateMessageProcessorMock(),
-            $this->createDestinationMetaRegistry([])
+            $this->createDestinationMetaRegistry([]),
+            $this->createLoggerInterfaceMock()
         );
 
         $options = $command->getDefinition()->getOptions();
@@ -53,7 +59,8 @@ class ConsumeMessagesCommandTest extends \PHPUnit_Framework_TestCase
         $command = new ConsumeMessagesCommand(
             $this->createQueueConsumerMock(),
             $this->createDelegateMessageProcessorMock(),
-            $this->createDestinationMetaRegistry([])
+            $this->createDestinationMetaRegistry([]),
+            $this->createLoggerInterfaceMock()
         );
 
         $arguments = $command->getDefinition()->getArguments();
@@ -93,7 +100,13 @@ class ConsumeMessagesCommandTest extends \PHPUnit_Framework_TestCase
             'default' => [],
         ]);
 
-        $command = new ConsumeMessagesCommand($consumer, $processor, $destinationMetaRegistry);
+        $logger = $this->createLoggerInterfaceMock();
+        $logger
+            ->expects($this->never())
+            ->method('error')
+        ;
+
+        $command = new ConsumeMessagesCommand($consumer, $processor, $destinationMetaRegistry, $logger);
 
         $tester = new CommandTester($command);
         $tester->execute([]);
@@ -130,7 +143,13 @@ class ConsumeMessagesCommandTest extends \PHPUnit_Framework_TestCase
             'non-default-queue' => []
         ]);
 
-        $command = new ConsumeMessagesCommand($consumer, $processor, $destinationMetaRegistry);
+        $logger = $this->createLoggerInterfaceMock();
+        $logger
+            ->expects($this->never())
+            ->method('error')
+        ;
+
+        $command = new ConsumeMessagesCommand($consumer, $processor, $destinationMetaRegistry, $logger);
 
         $tester = new CommandTester($command);
         $tester->execute([
@@ -170,7 +189,13 @@ class ConsumeMessagesCommandTest extends \PHPUnit_Framework_TestCase
             'non-default-queue' => ['transportName' => 'non-default-transport-queue']
         ]);
 
-        $command = new ConsumeMessagesCommand($consumer, $processor, $destinationMetaRegistry);
+        $logger = $this->createLoggerInterfaceMock();
+        $logger
+            ->expects($this->never())
+            ->method('error')
+        ;
+
+        $command = new ConsumeMessagesCommand($consumer, $processor, $destinationMetaRegistry, $logger);
 
         $tester = new CommandTester($command);
         $tester->execute([
@@ -212,5 +237,13 @@ class ConsumeMessagesCommandTest extends \PHPUnit_Framework_TestCase
     protected function createQueueConsumerMock()
     {
         return $this->getMock(QueueConsumer::class, [], [], '', false);
+    }
+
+    /**
+     * @return \PHPUnit_Framework_MockObject_MockObject|LoggerInterface
+     */
+    protected function createLoggerInterfaceMock()
+    {
+        return $this->getMock(LoggerInterface::class, [], [], '', false);
     }
 }
