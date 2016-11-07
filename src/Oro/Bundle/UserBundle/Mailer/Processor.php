@@ -11,6 +11,7 @@ class Processor extends BaseProcessor
     const TEMPLATE_USER_CHANGE_PASSWORD         = 'user_change_password';
     const TEMPLATE_FORCE_RESET_PASSWORD         = 'force_reset_password';
     const TEMPLATE_USER_IMPERSONATE             = 'user_impersonate';
+    const TEMPLATE_USER_AUTO_DEACTIVATE         = 'auto_deactivate_failed_logins';
 
     /**
      * @param UserInterface $user
@@ -79,6 +80,21 @@ class Processor extends BaseProcessor
             $user,
             static::TEMPLATE_USER_IMPERSONATE,
             ['entity' => $user]
+        );
+    }
+
+    /**
+     * @param UserInterface $user
+     * @param int $limit The exceed limit
+     *
+     * @return int
+     */
+    public function sendAutoDeactivateEmail(UserInterface $user, $limit)
+    {
+        return $this->getEmailTemplateAndSendEmail(
+            $user,
+            static::TEMPLATE_USER_AUTO_DEACTIVATE,
+            ['entity' => $user, 'limit' => $limit]
         );
     }
 }

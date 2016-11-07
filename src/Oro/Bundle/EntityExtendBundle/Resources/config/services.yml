@@ -370,7 +370,7 @@ services:
     oro_entity_extend.importexport.normalizer.enum:
         class: %oro_entity_extend.importexport.normalizer.enum.class%
         arguments:
-            - "@oro_importexport.field.field_helper"
+            - "@oro_entity.helper.field_helper"
         tags:
             - { name: oro_importexport.normalizer, priority: 20 }
 

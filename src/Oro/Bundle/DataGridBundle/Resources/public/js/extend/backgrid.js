@@ -2,7 +2,7 @@ define(function(require) {
     'use strict';
 
     var _ = require('underscore');
-    var Backgrid = require('orodatagrid/lib/backgrid/backgrid');
+    var Backgrid = require('bowerassets/backgrid/lib/backgrid');
 
     /**
      * Cells should be removed durung dispose cycle
@@ -59,6 +59,22 @@ define(function(require) {
         if (Backgrid.callByNeed(column.sortable(), column, model)) $el.addClass('sortable');
         if (Backgrid.callByNeed(column.renderable(), column, model)) $el.addClass('renderable');
         */
+    };
+
+    /**
+     Render a text string in a table cell. The text is converted from the
+     model's raw value for this cell's column.
+     */
+    Backgrid.Cell.prototype.render = function() {
+        var $el = this.$el;
+        $el.empty();
+        var model = this.model;
+        var columnName = this.column.get('name');
+        $el.text(this.formatter.fromRaw(model.get(columnName), model));
+        //$el.addClass(columnName);
+        //this.updateStateClassesMaybe();
+        this.delegateEvents();
+        return this;
     };
 
     /**

@@ -5,6 +5,7 @@ use Behat\Behat\EventDispatcher\Event\AfterFeatureTested;
 use Behat\Behat\EventDispatcher\Event\BeforeFeatureTested;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpKernel\KernelInterface;
+use Symfony\Component\Process\Exception\RuntimeException;
 use Symfony\Component\Process\Process;
 
 class MessageQueueConsumerProcessSubscriber implements EventSubscriberInterface
@@ -20,7 +21,7 @@ class MessageQueueConsumerProcessSubscriber implements EventSubscriberInterface
     public function __construct(KernelInterface $kernel)
     {
         $command = sprintf(
-            './console oro:message-queue:consume --env=%s %s',
+            'exec ./console oro:message-queue:consume --env=%s %s',
             $kernel->getEnvironment(),
             $kernel->isDebug() ? '' : '--no-debug'
         );
@@ -35,6 +36,7 @@ class MessageQueueConsumerProcessSubscriber implements EventSubscriberInterface
 
     public function startMessageConsumer()
     {
+        /** Cunsumer is a demon so we need to run it asynchronously */
         $this->process->start();
     }
 

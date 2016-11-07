@@ -9,10 +9,10 @@ use Symfony\Component\Serializer\SerializerAwareInterface;
 use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Component\Serializer\Exception\InvalidArgumentException;
 
+use Oro\Bundle\EntityBundle\Helper\FieldHelper;
 use Oro\Bundle\ImportExportBundle\Event\Events;
 use Oro\Bundle\ImportExportBundle\Event\DenormalizeEntityEvent;
 use Oro\Bundle\ImportExportBundle\Event\NormalizeEntityEvent;
-use Oro\Bundle\ImportExportBundle\Field\FieldHelper;
 
 class ConfigurableEntityNormalizer extends AbstractContextModeAwareNormalizer implements SerializerAwareInterface
 {

@@ -76,6 +76,14 @@ class FieldNodeDefinition extends AbstractNodeDefinition
     }
 
     /**
+     * @return bool
+     */
+    public function needsPageReload()
+    {
+        return $this->definition['page_reload'];
+    }
+
+    /**
      * {@inheritdoc}
      */
     protected function prepareDefinition(array $definition)

@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\WorkflowBundle\Model;
 
+use Oro\Bundle\WorkflowBundle\Configuration\FeatureConfigurationExtension;
 use Oro\Bundle\WorkflowBundle\Entity\ProcessDefinition;
 
 use Oro\Component\Action\Action\ActionAssembler;
@@ -73,7 +74,7 @@ class Process
             $featureResourceDefinition = [
                 '@feature_resource_enabled' => [
                     'resource' => $this->processDefinition->getName(),
-                    'resource_type' => 'processes'
+                    'resource_type' => FeatureConfigurationExtension::PROCESSES_NODE_NAME
                 ]
             ];
 
