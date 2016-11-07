@@ -17,8 +17,9 @@
         color: $notifications-success-text-color;
     }
 
-    &--warring {
-        background-color: $notifications-warring-color;
-        color: $notifications-warring-text-color;
+    &--warning {
+        background-color: $notifications-warning-color;
+        color: $notifications-warning-text-color;
+
     }
 }

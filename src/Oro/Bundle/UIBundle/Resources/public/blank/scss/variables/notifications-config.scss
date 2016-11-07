@@ -4,8 +4,8 @@ $notifications-error-color: get-color('ui', 'error') !default;
 $notifications-error-text-color: get-color('ui', 'error-dark') !default;
 $notifications-success-color: get-color('ui', 'success') !default;
 $notifications-success-text-color: get-color('ui', 'success-dark') !default;
-$notifications-warring-color: get-color('ui', 'warring') !default;
-$notifications-warring-text-color: get-color('ui', 'warring-dark') !default;
+$notifications-warning-color: get-color('ui', 'warning') !default;
+$notifications-warning-text-color: get-color('ui', 'warning-dark') !default;
 
 $notifications-offset: 5px 0 10px 0 !default;
 $notifications-inner-offset: 6px 9px !default;
