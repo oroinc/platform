@@ -72,12 +72,14 @@ system_configuration:
             options:
                 required: false
                 label: oro.user.system_configuration.fields.password_change_period_enabled.label
+                tooltip: oro.user.system_configuration.fields.password_change_period_enabled.tooltip
         oro_user.password_change_period:
             data_type: integer
             type: integer
             priority: 89
             options:
                 label: oro.user.system_configuration.fields.password_change_period.label
+                tooltip: oro.user.system_configuration.fields.password_change_period.tooltip
                 constraints:
                     - GreaterThan:
                         value: 0
@@ -88,12 +90,14 @@ system_configuration:
             options:
                 required: false
                 label: oro.user.system_configuration.fields.used_password_check_enabled.label
+                tooltip: oro.user.system_configuration.fields.used_password_check_enabled.tooltip
         oro_user.used_password_check_number:
             data_type: integer
             type: integer
             priority: 69
             options:
                 label: oro.user.system_configuration.fields.used_password_check_number.label
+                tooltip: oro.user.system_configuration.fields.used_password_check_number.tooltip
                 constraints:
                     - GreaterThan:
                         value: 0

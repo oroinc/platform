@@ -288,6 +288,10 @@ oro:
                     tooltip: >
                         Special chars: !"#$%&'()*+,-./:;<=>?@[\]^_`{|}~ and space
                 password_change_period_enabled.label: Enable password change policy
+                password_change_period_enabled.tooltip: Enable to mandate your users to change their passwords after a certain period.
                 password_change_period.label: Maximum password age (days)
+                password_change_period.tooltip: The period of maximum password validity in days.
                 used_password_check_enabled.label: Enable password history policy
+                used_password_check_enabled.tooltip: Enable to mandate your users to change their passwords so they don't match the certain number of previous passwords.
                 used_password_check_number.label: Enforce password history
+                used_password_check_number.tooltip: The number of previous user passwords which the new password cannot match.
