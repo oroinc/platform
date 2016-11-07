@@ -12,6 +12,7 @@ use Oro\Bundle\SecurityBundle\Annotation\Acl;
 use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Form\Type\WorkflowReplacementSelectType;
+use Oro\Bundle\WorkflowBundle\Helper\WorkflowTranslationHelper;
 use Oro\Bundle\WorkflowBundle\Model\Workflow;
 use Oro\Bundle\WorkflowBundle\Translation\TranslationProcessor;
 use Oro\Bundle\WorkflowBundle\Translation\TranslationsDatagridLinksProvider;
@@ -145,12 +146,18 @@ class WorkflowDefinitionController extends Controller
         $response['workflowsToDeactivation'] = $workflowsToDeactivation;
 
         if ($form->isValid()) {
+            $translator = $this->get('translator');
+
             $workflowManager = $this->get('oro_workflow.manager');
             $workflowNames = array_merge(
                 $form->getData(),
                 array_map(
-                    function (Workflow $workflow) {
-                        return $workflow->getName();
+                    function (Workflow $workflow) use ($translator) {
+                        return $translator->trans(
+                            $workflow->getName(),
+                            [],
+                            WorkflowTranslationHelper::TRANSLATION_DOMAIN
+                        );
                     },
                     $workflowsToDeactivation
                 )
