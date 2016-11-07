@@ -133,4 +133,22 @@ class ScriptHandler extends SensioScriptHandler
             ? $options['incenteev-parameters']['parameter-key']
             : 'parameters';
     }
+
+    public static function checkComposerPlugin(Event $event)
+    {
+        $pluginInstalled = array_filter(
+            $event->getComposer()->getPluginManager()->getPlugins(),
+            function ($plugin) {
+                return is_a($plugin, 'Fxp\Composer\AssetPlugin\FxpAssetPlugin');
+            }
+        );
+
+        if (!$pluginInstalled) {
+            throw new \RuntimeException(
+                'NPM/Bower Dependency Manager for Composer is not installed. Please run from CLI:'.PHP_EOL.
+                '> composer global require fxp/composer-asset-plugin:1.2.2'.PHP_EOL.
+                'See https://github.com/fxpio/composer-asset-plugin for details and usage.'.PHP_EOL
+            );
+        }
+    }
 }
