@@ -54,6 +54,7 @@ class ContextsExtension extends AbstractExtension
     const GRID_FROM_PATH = '[source][query][from]';
     const GRID_COLUMNS_PATH = '[columns]';
     const DEFAULT_COLUMN_NAME = 'contexts';
+    const DEFAULT_COLUMN_LABEL = 'oro.activity.contexts.column.label';
     const DEFAULT_TEMPLATE = 'OroActivityBundle:Grid:Column/contexts.html.twig';
 
     /** @var EntityClassResolver */
@@ -244,7 +245,7 @@ class ContextsExtension extends AbstractExtension
         return array_merge(
             [
                 // defaults
-                'label' => 'oro.contexts.label',
+                'label' => self::DEFAULT_COLUMN_LABEL,
                 'translatable' => false,
                 'renderable' => true,
                 'template' => self::DEFAULT_TEMPLATE,
