@@ -3,6 +3,7 @@
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Form\Type;
 
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\Form\FormRegistry;
 use Symfony\Component\Form\Test\FormIntegrationTestCase;
 use Symfony\Component\Translation\TranslatorInterface;
 
@@ -38,8 +39,8 @@ abstract class AbstractWorkflowAttributesTypeTestCase extends FormIntegrationTes
      */
     protected function createWorkflow(
         $workflowName,
-        array $attributes = array(),
-        array $steps = array(),
+        array $attributes = [],
+        array $steps = [],
         $relatedEntity = null
     ) {
         $doctrineHelper = $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\DoctrineHelper')
@@ -166,9 +167,6 @@ abstract class AbstractWorkflowAttributesTypeTestCase extends FormIntegrationTes
         if (!$propertyPathSecurityHelper) {
             $propertyPathSecurityHelper = $this->createPropertyPathSecurityHelper();
         }
-        if (!$translator) {
-            $translator = $this->getMock(TranslatorInterface::class);
-        }
 
         return new WorkflowAttributesType(
             $workflowRegistry,
@@ -179,10 +177,22 @@ abstract class AbstractWorkflowAttributesTypeTestCase extends FormIntegrationTes
             new ContextAccessor(),
             $dispatcher,
             $propertyPathSecurityHelper,
-            $translator
+            $this->getTranslator($translator)
         );
     }
 
+    /**
+     * @param TranslatorInterface|null $translator
+     * @return \PHPUnit_Framework_MockObject_MockObject|TranslatorInterface
+     */
+    protected function getTranslator(TranslatorInterface $translator = null)
+    {
+        return $translator ?: $this->getMock(TranslatorInterface::class);
+    }
+
+    /**
+     * @return \PHPUnit_Framework_MockObject_MockObject|FormRegistry
+     */
     protected function createFormRegistryMock()
     {
         return $this->getMockBuilder('Symfony\Component\Form\FormRegistry')
@@ -190,30 +200,42 @@ abstract class AbstractWorkflowAttributesTypeTestCase extends FormIntegrationTes
             ->getMock();
     }
 
+    /**
+     * @return \PHPUnit_Framework_MockObject_MockObject|WorkflowRegistry
+     */
     protected function createWorkflowRegistryMock()
     {
         return $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Model\WorkflowRegistry')
             ->disableOriginalConstructor()
-            ->setMethods(array('getWorkflow'))
+            ->setMethods(['getWorkflow'])
             ->getMock();
     }
 
+    /**
+     * @return \PHPUnit_Framework_MockObject_MockObject|AttributeGuesser
+     */
     protected function createAttributeGuesserMock()
     {
         return $this->getMockBuilder('Oro\Bundle\ActionBundle\Model\AttributeGuesser')
             ->disableOriginalConstructor()
-            ->setMethods(array('guessClassAttributeForm'))
+            ->setMethods(['guessClassAttributeForm'])
             ->getMock();
     }
 
+    /**
+     * @return \PHPUnit_Framework_MockObject_MockObject|DefaultValuesListener
+     */
     protected function createDefaultValuesListenerMock()
     {
         return$this->getMockBuilder('Oro\Bundle\WorkflowBundle\Form\EventListener\DefaultValuesListener')
             ->disableOriginalConstructor()
-            ->setMethods(array('initialize', 'setDefaultValues'))
+            ->setMethods(['initialize', 'setDefaultValues'])
             ->getMock();
     }
 
+    /**
+     * @return \PHPUnit_Framework_MockObject_MockObject|FormInitListener
+     */
     protected function createFormInitListenerMock()
     {
         return$this->getMockBuilder(FormInitListener::class)
@@ -222,14 +244,20 @@ abstract class AbstractWorkflowAttributesTypeTestCase extends FormIntegrationTes
             ->getMock();
     }
 
+    /**
+     * @return \PHPUnit_Framework_MockObject_MockObject|RequiredAttributesListener
+     */
     protected function createRequiredAttributesListenerMock()
     {
         return $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Form\EventListener\RequiredAttributesListener')
             ->disableOriginalConstructor()
-            ->setMethods(array('initialize', 'onPreSetData', 'onSubmit'))
+            ->setMethods(['initialize', 'onPreSetData', 'onSubmit'])
             ->getMock();
     }
 
+    /**
+     * @return \PHPUnit_Framework_MockObject_MockObject|EventDispatcherInterface
+     */
     protected function createDispatcherMock()
     {
         return $this->getMockBuilder('Symfony\Component\EventDispatcher\EventDispatcherInterface')
@@ -237,6 +265,9 @@ abstract class AbstractWorkflowAttributesTypeTestCase extends FormIntegrationTes
             ->getMock();
     }
 
+    /**
+     * @return \PHPUnit_Framework_MockObject_MockObject|PropertyPathSecurityHelper
+     */
     protected function createPropertyPathSecurityHelper()
     {
         return $this->getMockBuilder('Oro\Bundle\SecurityBundle\Util\PropertyPathSecurityHelper')

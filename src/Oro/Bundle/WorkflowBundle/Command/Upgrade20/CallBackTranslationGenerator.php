@@ -7,14 +7,14 @@ class CallBackTranslationGenerator implements ResourceTranslationGenerator
     /**
      * @var callable
      */
-    private $callable;
+    private $callableFunc;
 
     /**
-     * @param callable $callable
+     * @param callable $callableFunc
      */
-    public function __construct(callable $callable)
+    public function __construct(callable $callableFunc)
     {
-        $this->callable = $callable;
+        $this->callableFunc = $callableFunc;
     }
 
     /**
@@ -23,6 +23,6 @@ class CallBackTranslationGenerator implements ResourceTranslationGenerator
      */
     public function generate(ConfigResource $configResource)
     {
-        return call_user_func($this->callable, $configResource);
+        return call_user_func($this->callableFunc, $configResource);
     }
 }

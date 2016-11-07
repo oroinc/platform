@@ -158,7 +158,7 @@ Now all following fields MUST be moved from workflow.yml configuration file in a
  `oro.workflow.{workflow_name}.transition.{transition_name}.label` - transition `label` field.
  `oro.workflow.{workflow_name}.transition.{transition_name}.warning_message` - transition `message` field.
  `oro.workflow.{workflow_name}.transition.{transition_name}.attribute.{attribute_name}.label` - form options attribute `label` field.
-To migrate all labels from configuration translatable fields automatically you can use following [script_gist](https://gist.githubusercontent.com/ephrin/39e189653db09ca66f4f6ddc190c40ad/raw/19d8fa59b487932ba433537170e78409399449d4/wf_labels_code_migration.php)
+To migrate all labels from configuration translatable fields automatically you can use application command `oro:workflow:definitions:upgrade20`. 
 - Added command `oro:workflow:translations:dump` as a helper to see custom workflow translations (lack of them as well) and their keys.
 - Added `Oro\Bundle\WorkflowBundle\Configuration\WorkflowDefinitionBuilderExtensionInterface` and `oro.workflow.definition_builder.extension` service tag for usage in cases to pre-process (prepare) workflow builder configuration.
 - Added service tag `oro.workflow.configuration.handler` for request configuration procession by `Oro\Bundle\WorkflowBundle\Configuration\Handler\ConfigurationHandlerInterface`.
