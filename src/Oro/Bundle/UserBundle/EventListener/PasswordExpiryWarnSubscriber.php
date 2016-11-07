@@ -2,17 +2,19 @@
 
 namespace Oro\Bundle\UserBundle\EventListener;
 
-use Symfony\Component\HttpFoundation\Session\Session;
-use Symfony\Component\Translation\TranslatorInterface;
-use Symfony\Component\Security\Http\SecurityEvents;
-use Symfony\Component\Security\Http\Event\InteractiveLoginEvent;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\HttpFoundation\Session\Session;
+use Symfony\Component\Security\Http\Event\InteractiveLoginEvent;
+use Symfony\Component\Security\Http\SecurityEvents;
+use Symfony\Component\Translation\TranslatorInterface;
 
 use Oro\Bundle\UserBundle\Entity\User;
+use Oro\Bundle\UserBundle\Provider\PasswordChangePeriodConfigProvider;
 
 class PasswordExpiryWarnSubscriber implements EventSubscriberInterface
 {
-    public static $periodMarkers = [1, 3, 7];
+    /** @var PasswordChangePeriodConfigProvider */
+    protected $configProvider;
 
     /** @var Session */
     protected $session;
@@ -21,11 +23,17 @@ class PasswordExpiryWarnSubscriber implements EventSubscriberInterface
     protected $translator;
 
     /**
+     * @param PasswordChangePeriodConfigProvider $configProvider
      * @param Session $session
+     * @param TranslatorInterface $translator
      */
-    public function __construct(Session $session, TranslatorInterface $translator)
-    {
-        $this->session    = $session;
+    public function __construct(
+        PasswordChangePeriodConfigProvider $configProvider,
+        Session $session,
+        TranslatorInterface $translator
+    ) {
+        $this->configProvider = $configProvider;
+        $this->session = $session;
         $this->translator = $translator;
     }
 
@@ -58,7 +66,7 @@ class PasswordExpiryWarnSubscriber implements EventSubscriberInterface
             return;
         }
 
-        foreach (self::$periodMarkers as $days) {
+        foreach ($this->configProvider->getNotificationDays() as $days) {
             $interval = new \DateInterval('P'. $days .'D');
             $date = $now->add($interval)->format('Y-m-d');
 

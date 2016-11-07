@@ -11,8 +11,6 @@ use Oro\Bundle\NotificationBundle\Model\EmailNotification;
 
 class PasswordExpirationNotificationCommand extends ContainerAwareCommand implements CronCommandInterface
 {
-    private $notificationDays = [1, 3, 7];
-
     /**
      * Run command at 00:00 every day.
      *
@@ -42,9 +40,11 @@ class PasswordExpirationNotificationCommand extends ContainerAwareCommand implem
         $container = $this->getContainer();
         $mailManager = $container->get('oro_notification.manager.email_notification');
         $doctrine = $container->get('oro_entity.doctrine_helper');
+        $notificationDays = $container->get('oro_user.provider.password_change_period_config_provider')
+            ->getNotificationDays();
 
         $iteratorResult = $doctrine->getEntityRepository('OroUserBundle:User')
-            ->getExpiringPasswordUsersQueryBuilder($this->notificationDays)
+            ->getExpiringPasswordUsersQueryBuilder($notificationDays)
             ->getQuery()
             ->iterate();
 

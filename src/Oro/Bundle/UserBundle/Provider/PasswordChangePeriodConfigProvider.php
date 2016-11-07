@@ -11,6 +11,7 @@ class PasswordChangePeriodConfigProvider
 
     const PASSWORD_EXPIRY_ENABLED_KEY = 'oro_user.password_change_period_enabled';
     const PASSWORD_EXPIRY_PERIOD = 'oro_user.password_change_period';
+    const PASSWORD_EXPIRY_NOTIFICATION_DAYS = 'oro_user.password_change_notification_days';
 
     /**
      * @param ConfigManager $configManager
@@ -26,6 +27,14 @@ class PasswordChangePeriodConfigProvider
     public function isPasswordChangePeriodEnabled()
     {
         return (bool) $this->configManager->get(self::PASSWORD_EXPIRY_ENABLED_KEY);
+    }
+
+    /**
+     * @return array
+     */
+    public function getNotificationDays()
+    {
+        return (array) $this->configManager->get(self::PASSWORD_EXPIRY_NOTIFICATION_DAYS);
     }
 
     /**

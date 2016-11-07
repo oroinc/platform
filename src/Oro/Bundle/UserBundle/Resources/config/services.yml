@@ -530,6 +530,7 @@ services:
     oro_user.security.password_expiry_subscriber:
         class: Oro\Bundle\UserBundle\EventListener\PasswordExpiryWarnSubscriber
         arguments:
+            - '@oro_user.provider.password_change_period_config_provider'
             - '@session'
             - '@translator'
         tags:
