@@ -136,10 +136,10 @@ abstract class BaseDriver
     /**
      * Add text search to qb
      *
-     * @param QueryBuilder $qb
-     * @param integer $index
-     * @param array $searchCondition
-     * @param boolean $setOrderBy
+     * @param \Doctrine\ORM\QueryBuilder $qb
+     * @param integer                    $index
+     * @param array                      $searchCondition
+     * @param boolean                    $setOrderBy
      *
      * @return string
      */
@@ -147,7 +147,7 @@ abstract class BaseDriver
 
     /**
      * @param string $fieldType
-     * @param int $index
+     * @param int    $index
      *
      * @return string
      */
@@ -209,7 +209,7 @@ abstract class BaseDriver
 
     /**
      * @param AbstractPlatform $dbPlatform
-     * @param string $tableName
+     * @param string           $tableName
      *
      * @return string
      */
@@ -234,6 +234,46 @@ abstract class BaseDriver
         }
 
         return $fieldValue;
+    }
+
+    /**
+     * Create search string for string parameters (contains)
+     *
+     * @param integer $index
+     * @param bool    $useFieldName
+     *
+     * @return string
+     */
+    protected function createContainsStringQuery($index, $useFieldName = true)
+    {
+        $joinAlias = $this->getJoinAlias(Query::TYPE_TEXT, $index);
+
+        $stringQuery = '';
+        if ($useFieldName) {
+            $stringQuery = $joinAlias . '.field = :field' . $index . ' AND ';
+        }
+
+        return $stringQuery . $joinAlias . '.value LIKE :value' . $index;
+    }
+
+    /**
+     * Create search string for string parameters (not contains)
+     *
+     * @param integer $index
+     * @param bool    $useFieldName
+     *
+     * @return string
+     */
+    protected function createNotContainsStringQuery($index, $useFieldName = true)
+    {
+        $joinAlias = $this->getJoinAlias(Query::TYPE_TEXT, $index);
+
+        $stringQuery = '';
+        if ($useFieldName) {
+            $stringQuery = $joinAlias . '.field = :field' . $index . ' AND ';
+        }
+
+        return $stringQuery . $joinAlias . '.value NOT LIKE :value' . $index;
     }
 
     /**
@@ -271,10 +311,10 @@ abstract class BaseDriver
      */
     protected function createNonTextQuery($joinAlias, $index, $condition, $operator)
     {
-        $openBrackets = '';
+        $openBrackets  = '';
         $closeBrackets = '';
         if ($operator === 'in') {
-            $openBrackets = '(';
+            $openBrackets  = '(';
             $closeBrackets = ')';
         }
 
@@ -301,10 +341,10 @@ abstract class BaseDriver
     }
 
     /**
-     * @param Query $query
-     * @param boolean $setOrderBy
+     * @param \Oro\Bundle\SearchBundle\Query\Query $query
+     * @param boolean                              $setOrderBy
      *
-     * @return QueryBuilder
+     * @return \Doctrine\ORM\QueryBuilder
      */
     protected function getRequestQB(Query $query, $setOrderBy = true)
     {
@@ -313,7 +353,10 @@ abstract class BaseDriver
 
         $this->applySelectToQB($query, $qb);
         $this->applyFromToQB($query, $qb);
-        $this->applyWhereToQB($query, $qb, $setOrderBy);
+
+        // set order part in where only if no query ordering defined
+        $setOrderByInWhere = $setOrderBy && !$query->getCriteria()->getOrderings();
+        $this->applyWhereToQB($query, $qb, $setOrderByInWhere);
 
         if ($setOrderBy) {
             $this->applyOrderByToQB($query, $qb);
@@ -326,7 +369,7 @@ abstract class BaseDriver
      * Parses and applies the SELECT's columns (if selected)
      * from the casual query into the search index query.
      *
-     * @param Query $query
+     * @param Query        $query
      * @param QueryBuilder $qb
      */
     protected function applySelectToQB(Query $query, QueryBuilder $qb)
@@ -378,9 +421,9 @@ abstract class BaseDriver
      * Parses and applies the WHERE expressions from the DQL
      * to the search engine's query.
      *
-     * @param Query $query
+     * @param Query        $query
      * @param QueryBuilder $qb
-     * @param string $setOrderBy
+     * @param string       $setOrderBy
      */
     protected function applyWhereToQB(Query $query, QueryBuilder $qb, $setOrderBy)
     {
@@ -418,8 +461,8 @@ abstract class BaseDriver
     /**
      * Set fulltext range order by
      *
-     * @param QueryBuilder $qb
-     * @param int $index
+     * @param \Doctrine\ORM\QueryBuilder $qb
+     * @param int                        $index
      */
     protected function setTextOrderBy(QueryBuilder $qb, $index)
     {
