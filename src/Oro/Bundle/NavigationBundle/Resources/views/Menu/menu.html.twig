@@ -32,43 +32,51 @@
     {{ block('list') -}}
 {% endblock %}
 
-{% block list %}
-    {% if item.hasChildren and options.depth is not sameas(0) and item.displayChildren %}
-        {% import _self as oro_menu %}
-        <ul{{ oro_menu.attributes(listAttributes) }}>
-            {{ block('children') }}
-        </ul>
-    {% endif %}
-{% endblock %}
+{%- block list -%}
+    {%- if item.hasChildren and options.depth is not sameas(0) and item.displayChildren -%}
+        {%- import _self as oro_menu -%}
+        {%- set childrenContent = block('children') -%}
+        {%- if childrenContent -%}
+            <ul{{ oro_menu.attributes(listAttributes) }}>
+                {{ childrenContent|raw }}
+            </ul>
+        {%- endif -%}
+    {%- endif -%}
+{%- endblock -%}
 
-{% block children %}
+{%- block children -%}
     {# save current variables #}
-    {% set currentOptions = options %}
-    {% set currentItem = item %}
+    {%- set currentOptions = options -%}
+    {%- set currentItem = item -%}
     {# update the depth for children #}
-    {% if options.depth is not none %}
-        {% set options = currentOptions|merge({'depth': currentOptions.depth - 1}) %}
-    {% endif %}
-    {% for item in currentItem.children %}
+    {%- if options.depth is not none -%}
+        {%- set options = currentOptions|merge({'depth': currentOptions.depth - 1}) -%}
+    {%- endif -%}
+    {%- for item in currentItem.children -%}
         {%- set itemAttributes = item.attributes %}
         {%- set childrenAttributes = item.childrenAttributes %}
         {%- set classes = itemAttributes.class is defined ? itemAttributes.class|split(' ') : [] %}
         {%- set childrenClasses = childrenAttributes.class is defined ? childrenAttributes.class|split(' ') : [] %}
-        {{ block('item') }}
-    {% endfor %}
+        {%- set itemContent -%}
+            {{- block('item') -}}
+        {%- endset -%}
+        {% if itemContent or item.uri != '#' %}
+            {{- itemContent|raw -}}
+        {% endif %}
+    {%- endfor -%}
     {# restore current variables #}
-    {% set item = currentItem %}
-    {% set options = currentOptions %}
-{% endblock %}
+    {%- set item = currentItem -%}
+    {%- set options = currentOptions -%}
+{%- endblock -%}
 
 {% block item %}
     {{ block('item_renderer') }}
 {% endblock %}
 
-{% block item_renderer %}
-    {% set showNonAuthorized = item.extras.showNonAuthorized is defined and item.extras.showNonAuthorized %}
-    {% set displayable = item.extras.isAllowed or showNonAuthorized %}
-    {% if item.displayed and displayable %}
+{%- block item_renderer -%}
+    {%- set showNonAuthorized = item.extras.show_non_authorized is defined and item.extras.show_non_authorized -%}
+    {%- set displayable = item.extras.isAllowed or showNonAuthorized -%}
+    {%- if item.displayed and displayable -%}
         {# building the class of the item #}
         {%- if matcher.isCurrent(item) %}
             {%- set classes = classes|merge([options.currentClass]) %}
@@ -89,21 +97,27 @@
         <li{{ oro_menu.attributes(itemAttributes) }}>
             {{ block('item_content') }}
         </li>
-    {% endif %}
-{% endblock %}
+    {%- endif -%}
+{%- endblock -%}
 
 {% block item_content %}
     {%- set linkAttributes = item.linkAttributes %}
     {%- set labelAttributes = item.labelAttributes %}
-    {%- if item.uri is not empty and (not matcher.isCurrent(item) or options.currentAsLink) %}
-        {{ block('linkElement') }}
-    {%- else %}
-        {{ block('spanElement') }}
-    {%- endif %}
+    {%- set elementContent -%}
+        {%- if item.uri is not empty and (not matcher.isCurrent(item) or options.currentAsLink) %}
+            {{ block('linkElement') }}
+        {%- else %}
+            {{ block('spanElement') }}
+        {%- endif %}
+    {%- endset -%}
     {# render the list of children#}
     {%- set childrenClasses = childrenClasses|merge(['menu_level_' ~ item.level]) %}
     {%- set listAttributes = childrenAttributes|merge({'class': childrenClasses|join(' ') }) %}
-    {{ block('list_wrapper') }}
+    {%- set wrapperContent = block('list_wrapper') -%}
+    {% if item.uri != '#' or wrapperContent %}
+        {{- elementContent|raw -}}
+        {{- wrapperContent|raw -}}
+    {% endif %}
 {% endblock %}
 
 {# list wrapper block is used to allow modification of execution context in child templates #}
@@ -137,7 +151,9 @@
     {% endif -%}
     {% if options.allow_safe_labels and item.getExtra('safe_label', false) %}
         {{- item.label|trans|raw -}}
-    {% else %}
+    {% elseif item.getExtra('translate_disabled', false) == false %}
         {{- item.label|trans(item.getExtra('translateParams', {}), item.getExtra('translateDomain', 'messages'))|title -}}
+    {% else %}
+        {{- item.label|title -}}
     {% endif %}
 {% endblock %}

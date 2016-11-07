@@ -353,7 +353,7 @@ class RestDocumentBuilderTest extends DocumentBuilderTestCase
         $association = $metadata->addAssociation(
             $this->createAssociationMetadata('category', 'Test\Category')
         );
-        $association->setDataType('scalar');
+        $association->setDataType('object');
         $association->getTargetMetadata()->addField($this->createFieldMetadata('name'));
 
         $this->documentBuilder->setDataObject($object, $metadata);
@@ -535,7 +535,7 @@ class RestDocumentBuilderTest extends DocumentBuilderTestCase
             $this->createAssociationMetadata('category', 'Test\Category')
         );
         $association->setDataType('scalar');
-        $association->setCollapsed('scalar');
+        $association->setCollapsed(true);
         $association->getTargetMetadata()->removeField('id');
         $association->getTargetMetadata()->addField($this->createFieldMetadata('name'));
 
@@ -581,7 +581,7 @@ class RestDocumentBuilderTest extends DocumentBuilderTestCase
             $this->createAssociationMetadata('categories', 'Test\Category', true)
         );
         $association->setDataType('array');
-        $association->setCollapsed('scalar');
+        $association->setCollapsed(true);
         $association->getTargetMetadata()->removeField('id');
         $association->getTargetMetadata()->addField($this->createFieldMetadata('name'));
 
@@ -722,6 +722,28 @@ class RestDocumentBuilderTest extends DocumentBuilderTestCase
                     'title'  => 'some error',
                     'detail' => 'some error details'
                 ]
+            ],
+            $this->documentBuilder->getDocument()
+        );
+    }
+
+    public function testMetaPropertyWithResultName()
+    {
+        $object = [
+            'id'    => 123,
+            'meta1' => 'Meta1',
+        ];
+
+        $metadata = $this->getEntityMetadata('Test\Entity', ['id']);
+        $metadata->addField($this->createFieldMetadata('id'));
+        $metadata->addMetaProperty($this->createMetaPropertyMetadata('meta1'))
+            ->setResultName('resultMeta1');
+
+        $this->documentBuilder->setDataObject($object, $metadata);
+        $this->assertEquals(
+            [
+                'id'          => '123',
+                'resultMeta1' => 'Meta1',
             ],
             $this->documentBuilder->getDocument()
         );

@@ -103,7 +103,9 @@ define(['underscore', 'backbone', 'oroui/js/widget/abstract-widget'
 
         delegateEvents: function(events) {
             AbstractWidget.prototype.delegateEvents.apply(this, arguments);
-            this._delegateWidgetEvents(events);
+            if (this.widget) {
+                this._delegateWidgetEvents(events);
+            }
         },
 
         _delegateWidgetEvents: function(events) {

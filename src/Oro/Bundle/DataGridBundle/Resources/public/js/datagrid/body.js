@@ -175,8 +175,17 @@ define([
             if (!_.contains(['ascending', 'descending', null], direction)) {
                 throw new RangeError('direction must be one of "ascending", "descending" or `null`');
             }
-            if (_.isString(column)) {
+            if (_.isString(column) && column.length) {
                 column = this.columns.findWhere({name: column});
+            }
+
+            var columnName = null;
+            var columnSortValue = null;
+            if (_.isObject(column)) {
+                columnName = column.get('name');
+                columnSortValue = column.sortValue();
+            } else {
+                column = null;
             }
 
             var collection = this.collection;
@@ -193,16 +202,16 @@ define([
 
             var extractorDelegate;
             if (order) {
-                extractorDelegate = column.sortValue();
+                extractorDelegate = columnSortValue;
             } else {
                 extractorDelegate = function(model) {
                     return model.cid.replace('c', '') * 1;
                 };
             }
-            var comparator = this.makeComparator(column.get('name'), order, extractorDelegate);
+            var comparator = this.makeComparator(columnName, order, extractorDelegate);
 
             if (collection instanceof PageableCollection) {
-                collection.setSorting(column.get('name'), order, {sortValue: column.sortValue()});
+                collection.setSorting(columnName, order, {sortValue: columnSortValue});
 
                 if (collection.fullCollection) {
                     if (collection.fullCollection.comparator === null ||
@@ -222,7 +231,9 @@ define([
                 collection.trigger('backgrid:sorted', column, direction, collection);
             }
 
-            column.set('direction', direction);
+            if (column) {
+                column.set('direction', direction);
+            }
 
             return this;
         }
