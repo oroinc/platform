@@ -1,16 +1,17 @@
 <?php
 
-namespace Oro\Bundle\LayoutBundle\Layout\Encoder;
+namespace Oro\Component\Layout\ExpressionLanguage\Encoder;
 
 use Symfony\Component\ExpressionLanguage\ParsedExpression;
 
 use Oro\Component\Layout\Action;
-
-use Oro\Bundle\LayoutBundle\ExpressionLanguage\ExpressionManipulator;
+use Oro\Component\Layout\ExpressionLanguage\ExpressionManipulator;
 
 class JsonExpressionEncoder implements ExpressionEncoderInterface
 {
-    /** @var ExpressionManipulator  */
+    /**
+     * @var ExpressionManipulator
+     */
     protected $expressionManipulator;
 
     public function __construct(ExpressionManipulator $expressionManipulator)

@@ -1,14 +1,13 @@
 <?php
 
-namespace Oro\Bundle\LayoutBundle\Tests\Unit\Layout\Encoder;
+namespace Oro\Component\Layout\Tests\Unit\ExpressionLanguage\Encoder;
 
 use Symfony\Component\ExpressionLanguage\Node\ConstantNode;
 use Symfony\Component\ExpressionLanguage\ParsedExpression;
 
 use Oro\Component\Layout\Action;
-
-use Oro\Bundle\LayoutBundle\ExpressionLanguage\ExpressionManipulator;
-use Oro\Bundle\LayoutBundle\Layout\Encoder\JsonExpressionEncoder;
+use Oro\Component\Layout\ExpressionLanguage\Encoder\JsonExpressionEncoder;
+use Oro\Component\Layout\ExpressionLanguage\ExpressionManipulator;
 
 class JsonExpressionEncoderTest extends \PHPUnit_Framework_TestCase
 {
@@ -32,7 +31,7 @@ class JsonExpressionEncoderTest extends \PHPUnit_Framework_TestCase
 
         $encoder = new JsonExpressionEncoder($expressionManipulator);
         $result = $encoder->encodeExpr($parsedExpression);
-        $this->assertJsonStringEqualsJsonFile(__DIR__.'/expression.json', $result);
+        $this->assertJsonStringEqualsJsonFile(__DIR__.'/Fixtures/expression.json', $result);
     }
 
     public function testEncodeActions()

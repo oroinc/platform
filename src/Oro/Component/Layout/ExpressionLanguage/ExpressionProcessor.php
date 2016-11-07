@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\LayoutBundle\Layout\Processor;
+namespace Oro\Component\Layout\ExpressionLanguage;
 
 use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
 use Symfony\Component\ExpressionLanguage\Node\NameNode;
@@ -9,10 +9,9 @@ use Symfony\Component\ExpressionLanguage\ParsedExpression;
 
 use Oro\Component\Layout\ContextInterface;
 use Oro\Component\Layout\DataAccessorInterface;
+use Oro\Component\Layout\ExpressionLanguage\Encoder\ExpressionEncoderRegistry;
+use Oro\Component\Layout\Exception\CircularReferenceException;
 use Oro\Component\Layout\OptionValueBag;
-
-use Oro\Bundle\LayoutBundle\Exception\CircularReferenceException;
-use Oro\Bundle\LayoutBundle\Layout\Encoder\ExpressionEncoderRegistry;
 
 class ExpressionProcessor
 {
@@ -183,7 +182,7 @@ class ExpressionProcessor
 
         return $evaluate
             ? $this->expressionLanguage->evaluate($expr, $values)
-            : $this->encoderRegistry->getEncoder($encoding)->encodeExpr($expr);
+            : $this->encoderRegistry->get($encoding)->encodeExpr($expr);
     }
 
     /**
@@ -247,7 +246,6 @@ class ExpressionProcessor
 
     /**
      * @param Node $node
-     *
      * @return boolean
      */
     protected function nodeWorkWithData(Node $node)
