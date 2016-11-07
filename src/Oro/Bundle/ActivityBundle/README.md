@@ -325,7 +325,7 @@ datagrid:
         # column configuration
         columns:
              contexts:                      # the column name defined in options
-                label: oro.contexts.label   # optional
+                label: oro.contexts.label   # optional, default `oro.activity.contexts.column.label`
                 renderable: true            # optional, default `true`
                 ...
 ```

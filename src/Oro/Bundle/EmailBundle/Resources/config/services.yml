@@ -897,6 +897,12 @@ services:
         tags:
             - { name: oro_entity.name_provider, priority: 0}
 
+    oro_email.email_user.provider.email_user_entity_name_provider:
+        class: Oro\Bundle\EmailBundle\Provider\EmailUserEntityNameProvider
+        public: false
+        tags:
+            - { name: oro_entity.name_provider, priority: 0 }
+
     oro_email.link.mailbox_process_storage:
         tags:
             - { name: oro_service_link,  service: oro_email.mailbox.process_storage }
