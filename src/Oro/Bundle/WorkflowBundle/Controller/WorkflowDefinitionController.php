@@ -146,22 +146,18 @@ class WorkflowDefinitionController extends Controller
         $response['workflowsToDeactivation'] = $workflowsToDeactivation;
 
         if ($form->isValid()) {
-            $translator = $this->get('translator');
-
             $workflowManager = $this->get('oro_workflow.manager');
             $workflowNames = array_merge(
                 $form->getData(),
                 array_map(
-                    function (Workflow $workflow) use ($translator) {
-                        return $translator->trans(
-                            $workflow->getName(),
-                            [],
-                            WorkflowTranslationHelper::TRANSLATION_DOMAIN
-                        );
+                    function (Workflow $workflow) {
+                        return $workflow->getName();
                     },
                     $workflowsToDeactivation
                 )
             );
+
+            $translator = $this->get('translator');
 
             $deactivated = [];
             foreach ($workflowNames as $workflowName) {
@@ -171,7 +167,11 @@ class WorkflowDefinitionController extends Controller
                     $workflowManager->resetWorkflowData($workflow->getName());
                     $workflowManager->deactivateWorkflow($workflow->getName());
 
-                    $deactivated[] = $workflow->getLabel();
+                    $deactivated[] = $translator->trans(
+                        $workflow->getLabel(),
+                        [],
+                        WorkflowTranslationHelper::TRANSLATION_DOMAIN
+                    );
                 }
             }
 
