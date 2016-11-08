@@ -2,18 +2,28 @@
 
 namespace Oro\Bundle\LayoutBundle\Tests\Unit\Layout\Serializer;
 
+use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
+use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
+use Symfony\Component\Serializer\Serializer;
+use Symfony\Component\Serializer\Encoder\JsonEncoder;
+
 use Oro\Component\Layout\OptionValueBag;
 
 use Oro\Bundle\LayoutBundle\Layout\Serializer\OptionValueBagNormalizer;
 
 class OptionValueBagNormalizerTest extends \PHPUnit_Framework_TestCase
 {
+    /** @var NormalizerInterface|DenormalizerInterface|\PHPUnit_Framework_MockObject_MockObject */
+    protected $serializer;
+
     /** @var OptionValueBagNormalizer */
     protected $normalizer;
 
     protected function setUp()
     {
         $this->normalizer = new OptionValueBagNormalizer();
+        $this->serializer = new Serializer([$this->normalizer], [new JsonEncoder()]);
+        $this->normalizer->setSerializer($this->serializer);
     }
 
     public function testSupportsNormalization()
@@ -65,6 +75,30 @@ class OptionValueBagNormalizerTest extends \PHPUnit_Framework_TestCase
                         ['method' => 'add', 'arguments' => [['one', 'two', 'three']]],
                         ['method' => 'remove', 'arguments' => [['one', 'three']]],
                     ]),
+            ],
+            'arguments with recursion object' => [
+                'actual' => $this->createOptionValueBag([
+                    ['method' => 'add',    'arguments' => [['one', 'two', 'three']]],
+                    ['method' => 'remove', 'arguments' => [
+                        $this->createOptionValueBag([
+                            ['method' => 'add', 'arguments' => ['first']]
+                        ])
+                    ]],
+                ]),
+            ],
+            'arguments with recursion array' => [
+                'actual' => $this->createOptionValueBag([
+                    ['method' => 'add', 'arguments' => [['one', 'two', 'three']]],
+                    ['method' => 'remove', 'arguments' => [[
+                        $this->createOptionValueBag([
+                            ['method' => 'add',    'arguments' => ['first']],
+                            ['method' => 'remove', 'arguments' => ['two']]
+                        ]),
+                        $this->createOptionValueBag([
+                            ['method' => 'add', 'arguments' => ['third']],
+                        ])
+                    ]]],
+                ]),
             ],
         ];
     }
