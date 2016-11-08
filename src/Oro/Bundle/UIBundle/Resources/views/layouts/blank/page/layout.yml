@@ -36,19 +36,11 @@ layout:
                       blockType: container
                 page_container:
                     blockType: container
-                page_header:
-                    blockType: container
                 page_main:
                     blockType: container
                 page_sidebar:
                     blockType: container
                 page_content:
-                    blockType: container
-                page_footer:
-                    blockType: container
-                logo:
-                    blockType: container
-                copyright:
                     blockType: container
                 require_js:
                     blockType: container
@@ -77,10 +69,6 @@ layout:
                     body:
                         wrapper:
                             page_container:
-                                page_header:
-                                    logo: ~
                                 page_main:
                                     page_sidebar: ~
                                     page_content: ~
-                                page_footer:
-                                    copyright: ~

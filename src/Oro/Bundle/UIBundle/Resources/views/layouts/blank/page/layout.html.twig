@@ -44,44 +44,38 @@
     </div>
 {% endblock %}
 
-{% block _page_header_widget %}
-    {% set attr = layout_attr_defaults(attr, {
-        '~class': ' page-header'
-    }) %}
-
-    <div {{ block('block_attributes') }}>
-        {{ block_widget(block) }}
-    </div>
-{% endblock %}
-
-{% block _logo_widget %}
-    {% set attr = layout_attr_defaults(attr, {
-        '~class': ' logo',
-        'src': '/bundles/orofrontend/blank/images/logo/logo-oroacem.svg',
-        'width:': '190',
-        'height':  '35',
-        'alt': 'logo'
-    }) %}
-
-    {% if not app.request.attributes.get('_route') == 'oro_frontend_root' %}
-        <a href="{{ path('oro_frontend_root') }}">
-    {% endif %}
-
-    <img {{ block('block_attributes') }} />
-
-    {% if not app.request.attributes.get('_route') == 'oro_frontend_root' %}
-        </a>
-    {% endif %}
-{% endblock %}
-
 {% block _page_main_widget %}
     {% set attr = layout_attr_defaults(attr, {
         '~class': ' page-main'
     }) %}
 
-    <main {{ block('block_attributes') }}>
-        {{ block_widget(block) }}
+    {% set contentClass = 'page-main__content'%}
+
+    <main{{ block('block_attributes') }}>
+        <div class="{{ contentClass }}">
+            {{ block_widget(block) }}
+        </div>
     </main>
+{% endblock %}
+
+
+{% block _page_content_widget %}
+    {% set visibleSidebarChildren = [] %}
+    {% if blocks.page_sidebar is defined %}
+        {% for child in blocks.page_sidebar.children %}
+            {% if child.vars.visible %}
+                {% set visibleSidebarChildren  = visibleSidebarChildren|merge([child]) %}
+            {% endif %}
+        {% endfor %}
+    {% endif %}
+
+    {% set attr = layout_attr_defaults(attr, {
+        '~class': ' page-content' ~ (visibleSidebarChildren|length > 0 ? ' page-content--has-sidebar')
+    }) %}
+
+    <section {{ block('block_attributes') }}>
+        {{ block_widget(block) }}
+    </section>
 {% endblock %}
 
 {% block _page_sidebar_widget %}
@@ -94,35 +88,5 @@
             {{ block_widget(block) }}
         </aside>
     {% endif %}
-{% endblock %}
-
-{% block _page_content_widget %}
-    {% set attr = layout_attr_defaults(attr, {
-        '~class': ' page-content'
-    }) %}
-
-    <section {{ block('block_attributes') }}>
-        {{ block_widget(block) }}
-    </section>
-{% endblock %}
-
-{% block _page_footer_widget %}
-    {% set attr = layout_attr_defaults(attr, {
-        '~class': ' page-footer'
-    }) %}
-
-    <footer {{ block('block_attributes') }}>
-        {{ block_widget(block) }}
-    </footer>
-{% endblock %}
-
-{% block _copyright_widget %}
-    {% set attr = layout_attr_defaults(attr, {
-        '~class': ' copyright'
-    }) %}
-
-    <p {{ block('block_attributes') }}>
-        {{ 'oro_frontend.copyright'|trans|raw }}
-    </p>
 {% endblock %}
 
