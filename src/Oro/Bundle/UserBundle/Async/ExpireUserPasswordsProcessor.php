@@ -53,11 +53,10 @@ class ExpireUserPasswordsProcessor implements MessageProcessorInterface, TopicSu
         RegistryInterface $doctrine,
         LoggerInterface $logger
     ) {
-        $this->logger = $logger;
         $this->notificationManager = $notificationManager;
-
         $this->userManager = $userManager;
         $this->doctrine = $doctrine;
+        $this->logger = $logger;
     }
 
     /**
@@ -140,7 +139,7 @@ class ExpireUserPasswordsProcessor implements MessageProcessorInterface, TopicSu
      */
     protected function getEmailTemplate()
     {
-        return $this->doctrine->getManagerForClass(EmailTemplate::class)
+        return $this->doctrine->getEntityManagerForClass(EmailTemplate::class)
             ->getRepository(EmailTemplate::class)
             ->findOneBy(['name' => self::TEMPLATE_NAME]);
     }
