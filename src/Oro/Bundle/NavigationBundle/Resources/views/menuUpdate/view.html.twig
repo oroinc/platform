@@ -1,0 +1,131 @@
+{% extends bap.layout %}
+
+{% import 'OroSyncBundle:Include:contentTags.html.twig' as navigationMacro %}
+{% import 'OroUIBundle::macros.html.twig' as UI %}
+{% from _self import resetButton %}
+{% block content %}
+    <div class="layout-content"{% if pageComponent is defined %}{{ UI.renderPageComponentAttributes(pageComponent) }}{% endif %}>
+        <div class="container-fluid page-title">
+            <div class="navigation clearfix navbar-extra navbar-extra-right">
+                <div class="row">
+                    {% set actionButtons %}
+                        <div class="pull-right">
+                            {{ resetButton({
+                                'dataUrl': path('oro_navigation_menuupdate_reset', {menuName: entity.root.name, ownershipType: ownershipType}),
+                                'dataRedirect': path(menuViewRoute, {menuName: entity.root.name, id: ownerId}),
+                                'menuKey': entity.root.name
+                            }) }}
+
+                            {{ UI.buttonSeparator() }}
+
+                            {% set html = UI.button({
+                                'path' : path(menuCreateRoute, {menuName: entity.root.name, id: ownerId}),
+                                'aCss': 'btn-primary',
+                                'label': 'oro.ui.create_entity'|trans({'%entityName%': 'oro.navigation.menuupdate.entity_label'|trans}),
+                                'title': 'oro.ui.create_entity'|trans({'%entityName%': 'oro.navigation.menuupdate.entity_label'|trans})
+                            }) %}
+
+                            {# Create Divider button #}
+                            {% set html = html ~ UI.ajaxButton({
+                            'aCss': 'btn-primary no-hash menu-divider-create-button',
+                            'label': 'oro.ui.create_entity'|trans({'%entityName%': 'oro.navigation.menuupdate.divider'|trans}),
+                            'title': 'oro.ui.create_entity'|trans({'%entityName%': 'oro.navigation.menuupdate.divider'|trans}),
+                            'dataMethod': 'POST',
+                            'dataRedirect': app.request.uri,
+                            'dataUrl': path('oro_navigation_menuupdate_create', {ownershipType: ownershipType, ownerId: ownerId, menuName: entity.name, parentKey: entity.name, 'isDivider': true}),
+                            'successMessage': 'oro.navigation.menuupdate.divider_created'
+                            }) %}
+
+                            {% set parameters = {
+                            'html': html,
+                            'groupKey': 'createButtons',
+                            'options': {
+                            'moreButtonAttrs': {
+                            'class': 'btn-primary'
+                            }
+                            }
+                            } %}
+
+                            {{ UI.pinnedDropdownButton(parameters) }}
+                        </div>
+                    {% endset %}
+                    {%  if not isMobileVersion() %}
+                        {{ actionButtons }}
+                    {%  endif %}
+                    <div class="pull-left-extra">
+                        {% block pageHeader %}
+                            {{ include('OroNavigationBundle:menuUpdate:pageHeader.html.twig') }}
+                        {% endblock pageHeader %}
+                    </div>
+                    {%  if isMobileVersion() %}
+                        {{ actionButtons }}
+                    {%  endif %}
+                </div>
+            </div>
+        </div>
+
+        <div class="layout-content scrollable-container">
+            {% block content_data %}
+                <div class="left-panel-container">
+                    <div class="placeholder">
+                        <div class="scrollable-container">
+                            <div class="left-panel scrollable-container">
+                                <div class="menu-item">
+                                    {% set treeOptions = {
+                                        'data' : tree,
+                                        'menu' : entity.root.name,
+                                        'nodeId': entity.root.name,
+                                        'ownershipType' : ownershipType,
+                                        'ownerId' : ownerId,
+                                        'updateAllowed' : true,
+                                        'onRootSelectRoute' : menuViewRoute,
+                                        'onSelectRoute' : menuUpdateRoute,
+                                        'onMoveRoute' : 'oro_navigation_menuupdate_move'
+                                    } %}
+                                    <div
+                                            data-page-component-module="oronavigation/js/app/components/tree-manage-component"
+                                            data-page-component-options="{{ treeOptions|json_encode }}"
+                                    ></div>
+                                </div>
+                            </div>
+                            <div class="content">
+                                <div class="text-center">
+                                    {{ 'oro.navigation.menuupdate.select_existing_or_create_new'|trans }}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% endblock content_data %}
+        </div>
+    </div>
+{% endblock content %}
+
+{% macro resetButton(parameters) %}
+    {% import 'OroUIBundle::macros.html.twig' as UI %}
+
+    {% set url = parameters.dataUrl is defined ? parameters.dataUrl : '' %}
+
+    {% set parameters = parameters|merge({
+        'data': {
+            'message': 'oro.navigation.menuupdate.reset_confirm'|trans({ '%menuKey%' : parameters.menuKey }),
+            'success-message': 'oro.navigation.menuupdate.reset_message'|trans({ '%menuKey%' : parameters.menuKey }),
+            'ok-text': 'oro.navigation.menuupdate.reset_ok_text'|trans,
+            'title': 'oro.navigation.menuupdate.reset_title'|trans,
+            'url': url
+        },
+        'title': 'oro.navigation.menuupdate.reset'|trans,
+        'label': 'oro.navigation.menuupdate.reset'|trans,
+        'aCss': ' btn icons-holder-text no-hash remove-button',
+        'path': 'javascript:void(0);'
+    }) %}
+
+    {% if parameters.dataRedirect is defined %}
+        {% set data = parameters.data|merge({'redirect': parameters.dataRedirect}) %}
+        {% set parameters = parameters|merge({ 'data': data }) %}
+    {% endif %}
+
+    <div class="pull-left btn-group icons-holder">
+        {{ UI.link(parameters) }}
+    </div>
+{% endmacro %}

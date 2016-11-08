@@ -11,7 +11,7 @@ use Symfony\Component\Translation\TranslatorInterface;
 
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityBundle\Provider\ChainEntityClassNameProvider;
-use Oro\Bundle\ImportExportBundle\Field\FieldHelper;
+use Oro\Bundle\EntityBundle\Helper\FieldHelper;
 use Oro\Bundle\ImportExportBundle\Field\DatabaseHelper;
 
 class ConfigurableAddOrReplaceStrategy extends AbstractImportStrategy

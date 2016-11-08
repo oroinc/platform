@@ -4,23 +4,20 @@ namespace Oro\Bundle\DashboardBundle\EventListener;
 
 use Oro\Bundle\DashboardBundle\Model\Manager;
 use Oro\Bundle\NavigationBundle\Event\ConfigureMenuEvent;
+use Oro\Bundle\NavigationBundle\Utils\MenuUpdateUtils;
 use Oro\Bundle\SecurityBundle\SecurityFacade;
 
 class NavigationListener
 {
-    /**
-     * @var SecurityFacade
-     */
+    /** @var SecurityFacade */
     protected $securityFacade;
 
-    /**
-     * @var Manager
-     */
+    /** @var Manager */
     protected $manager;
 
     /**
-     * @param SecurityFacade $securityFacade
-     * @param Manager        $manager
+     * @param SecurityFacade   $securityFacade
+     * @param Manager          $manager
      */
     public function __construct(SecurityFacade $securityFacade, Manager $manager)
     {
@@ -33,9 +30,8 @@ class NavigationListener
      */
     public function onNavigationConfigure(ConfigureMenuEvent $event)
     {
-        $dashboardTab = $event->getMenu()->getChild('dashboard_tab');
-
-        if (!$dashboardTab || !$this->securityFacade->hasLoggedUser()) {
+        $dashboardTab = MenuUpdateUtils::findMenuItem($event->getMenu(), 'dashboard_tab');
+        if ($dashboardTab === null || !$this->securityFacade->hasLoggedUser()) {
             return;
         }
 
@@ -48,17 +44,17 @@ class NavigationListener
                 $dashboardLabel = $dashboard->getLabel();
                 $dashboardLabel = strlen($dashboardLabel) > 50 ? substr($dashboardLabel, 0, 50).'...' : $dashboardLabel;
 
-                $options = array(
+                $options = [
                     'label' => $dashboardLabel,
                     'route' => 'oro_dashboard_view',
-                    'extras' => array(
+                    'extras' => [
                         'position' => 1
-                    ),
-                    'routeParameters' => array(
+                    ],
+                    'routeParameters' => [
                         'id' => $dashboardId,
                         'change_dashboard' => true
-                    )
-                );
+                    ]
+                ];
                 $dashboardTab
                     ->addChild(
                         $dashboardId . '_dashboard_menu_item',
@@ -68,10 +64,11 @@ class NavigationListener
             }
 
             $dashboardTab
-                ->addChild('divider-' . rand(1, 99999))
+                ->addChild('divider-dashboard')
                 ->setLabel('')
-                ->setAttribute('class', 'divider menu-divider')
-                ->setExtra('position', 2);
+                ->setAttribute('class', 'menu-divider')
+                ->setExtra('position', 2)
+                ->setExtra('divider', true);
         }
     }
 }
