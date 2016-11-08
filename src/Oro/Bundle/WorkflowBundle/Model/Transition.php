@@ -17,119 +17,73 @@ use Oro\Bundle\WorkflowBundle\Exception\ForbiddenTransitionException;
  */
 class Transition
 {
-    /**
-     * @var string
-     */
+    /** @var string */
     protected $name;
 
-    /**
-     * @var Step
-     */
+    /** @var Step */
     protected $stepTo;
 
-    /**
-     * @var string
-     */
+    /** @var string */
     protected $label;
 
-    /**
-     * @var ExpressionInterface|null
-     */
+    /** @var ExpressionInterface|null */
     protected $condition;
 
-    /**
-     * @var ExpressionInterface|null
-     */
+    /** @var ExpressionInterface|null */
     protected $preCondition;
 
-    /**
-     * @var ActionInterface|null
-     */
+    /** @var ActionInterface|null */
     protected $preAction;
 
-    /**
-     * @var ActionInterface|null
-     */
+    /** @var ActionInterface|null */
     protected $action;
 
-    /**
-     * @var bool
-     */
+    /** @var bool */
     protected $start = false;
 
-    /**
-     * @var bool
-     */
+    /** @var bool */
     protected $hidden = false;
 
-    /**
-     * @var array
-     */
+    /** @var array */
     protected $frontendOptions = array();
 
-    /**
-     * @var string
-     */
+    /** @var string */
     protected $formType;
 
-    /**
-     * @var string
-     */
+    /** @var string */
     protected $displayType;
 
-    /**
-     * @var array
-     */
+    /** @var array */
     protected $formOptions = array();
 
-    /**
-     * @var string
-     */
+    /** @var string */
     protected $message;
 
-    /**
-     * @var bool
-     */
+    /** @var bool */
     protected $unavailableHidden = false;
 
-    /**
-     * @var string
-     */
+    /** @var string */
     protected $pageTemplate;
 
-    /**
-     * @var string
-     */
+    /** @var string */
     protected $dialogTemplate;
 
-    /**
-     * @var string
-     */
+    /** @var string */
     protected $scheduleCron;
 
-    /**
-     * @var string
-     */
+    /** @var string */
     protected $scheduleFilter;
 
-    /**
-     * @var bool
-     */
+    /** @var bool */
     protected $scheduleCheckConditions = false;
 
-    /**
-     * @var array
-     */
+    /** @var array */
     protected $initEntities = [];
 
-    /**
-     * @var array
-     */
+    /** @var array */
     protected $initRoutes = [];
 
-    /**
-     * @var string
-     */
+    /** @var string */
     protected $initContextAttribute;
 
     /**
