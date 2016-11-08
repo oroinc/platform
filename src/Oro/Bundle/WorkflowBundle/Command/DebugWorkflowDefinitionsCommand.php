@@ -136,15 +136,32 @@ class DebugWorkflowDefinitionsCommand extends ContainerAwareCommand
                 $general['exclusive_record_groups'] = $exclusiveRecordGroups;
             }
 
-            $filter = new FilterHandler();
+            $configuration = $workflow->getConfiguration();
+
+            //Closure to clear "label" and "message" options from configuration
+            $callback = function (&$array) use (&$callback) {
+                foreach ($array as $key => &$value) {
+                    if (is_array($value)) {
+                        $countBefore = count($value);
+                        $callback($value);
+                        if (empty($value) && $countBefore) {
+                            $array[$key] = null;
+                        }
+                    }
+                    if (in_array(strtolower($key), ['label', 'message'], true)) {
+                        unset($array[$key]);
+                    }
+                }
+            };
+
+            $callback($configuration);
 
             $definition = [
                 'workflows' => [
                     $workflow->getName() =>
                         array_merge(
                             $general,
-                            $filter->handle($workflow->getConfiguration())
-                            //$workflow->getConfiguration()
+                            $configuration
                         )
                 ]
             ];
