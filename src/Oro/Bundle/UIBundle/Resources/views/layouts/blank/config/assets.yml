@@ -13,6 +13,7 @@ styles:
         - 'bundles/oroui/blank/scss/variables/section-title-config.scss'
         - 'bundles/oroui/blank/scss/variables/copyright-config.scss'
         - 'bundles/oroui/blank/scss/variables/logo-config.scss'
+        - 'bundles/oroui/blank/scss/variables/primary-menu-config.scss'
         - 'bundles/oroui/blank/scss/styles.scss'
     filters: ['cssrewrite', 'cssmin']
     output: 'css/layout/blank/styles.css'

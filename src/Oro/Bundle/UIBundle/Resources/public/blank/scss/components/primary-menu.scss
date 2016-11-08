@@ -1,18 +1,28 @@
 .primary-menu {
-  @include list-normalize();
+    @include list-normalize();
 
-  display: flex;
-  justify-content: space-between;
+    display: flex;
+    justify-content: space-between;
 
-  &__item {
-    flex: 0 1 auto;
+    &__item {
+        flex: 0 1 auto;
 
-    &--current {
+        &--current {
+            .primary-menu__link {
+                text-decoration: none;
 
+                font-weight: 700;
+            }
+        }
     }
-  }
 
-  &--vertical {
-    display: block;
-  }
+    &__link {
+        display: block;
+
+        color: $primary-menu-link-color;
+    }
+
+    &--vertical {
+        display: block;
+    }
 }
