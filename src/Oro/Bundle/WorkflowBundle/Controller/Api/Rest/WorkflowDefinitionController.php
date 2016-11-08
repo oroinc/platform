@@ -103,7 +103,7 @@ class WorkflowDefinitionController extends FOSRestController
         try {
             /** @var WorkflowDefinitionHandleBuilder $definitionBuilder */
             $definitionBuilder = $this->get('oro_workflow.configuration.builder.workflow_definition.handle');
-            $builtDefinition = $definitionBuilder->buildFromRawConfiguration($this->getConfiguration());
+            $builtDefinition = $definitionBuilder->buildFromRawConfiguration($this->getConfiguration($request));
             if (!$workflowDefinition) {
                 $this->getHandler()->createWorkflowDefinition($builtDefinition);
             } else {
