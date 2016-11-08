@@ -47,10 +47,78 @@ class PdoPgsql extends BaseDriver
     }
 
     /**
+     * Add text search to qb
+     *
+     * @param \Doctrine\ORM\QueryBuilder $qb
+     * @param integer                    $index
+     * @param array                      $searchCondition
+     * @param boolean                    $setOrderBy
+     *
+     * @return string
+     */
+    public function addTextField(QueryBuilder $qb, $index, $searchCondition, $setOrderBy = true)
+    {
+        $useFieldName = $searchCondition['fieldName'] !== '*';
+        $condition = $searchCondition['condition'];
+        $fieldValue = $this->filterTextFieldValue($searchCondition['fieldValue']);
+
+        switch ($condition) {
+            case Query::OPERATOR_CONTAINS:
+                $searchString = $this->createContainsStringQuery($index, $useFieldName);
+                break;
+
+            case Query::OPERATOR_NOT_CONTAINS:
+                $searchString = $this->createNotContainsStringQuery($index, $useFieldName);
+                break;
+
+            case Query::OPERATOR_EQUALS:
+                $searchString = $this->createCompareStringQuery($index, $useFieldName);
+                break;
+
+            default:
+                $searchString = $this->createCompareStringQuery($index, $useFieldName, '!=');
+                break;
+        }
+
+        $this->setFieldValueStringParameter($qb, $index, $fieldValue, $condition);
+
+        if ($useFieldName) {
+            $qb->setParameter('field' . $index, $searchCondition['fieldName']);
+        }
+
+        if ($setOrderBy) {
+            $this->setTextOrderBy($qb, $index);
+        }
+
+        return '(' . $searchString . ' ) ';
+    }
+
+    /**
+     * Create search string for string parameters (contains)
+     *
+     * @param integer $index
+     * @param bool    $useFieldName
+     * @param string  $operator
+     *
+     * @return string
+     */
+    protected function createCompareStringQuery($index, $useFieldName = true, $operator = '=')
+    {
+        $joinAlias = $this->getJoinAlias(Query::TYPE_TEXT, $index);
+
+        $stringQuery = '';
+        if ($useFieldName) {
+            $stringQuery = $joinAlias . '.field = :field' . $index . ' AND ';
+        }
+
+        return $stringQuery . $joinAlias . '.value ' . $operator . ' :value' . $index;
+    }
+
+    /**
      * Create fulltext search string for string parameters (contains)
      *
      * @param integer $index
-     * @param bool $useFieldName
+     * @param bool    $useFieldName
      *
      * @return string
      */
@@ -119,7 +187,7 @@ class PdoPgsql extends BaseDriver
      * Create search string for string parameters (not contains)
      *
      * @param integer $index
-     * @param bool $useFieldName
+     * @param bool    $useFieldName
      *
      * @return string
      */
@@ -137,6 +205,36 @@ class PdoPgsql extends BaseDriver
     }
 
     /**
+     * Set string parameter for qb
+     *
+     * @param \Doctrine\ORM\QueryBuilder $qb
+     * @param integer                    $index
+     * @param string                     $fieldValue
+     * @param string                     $searchCondition
+     */
+    protected function setFieldValueStringParameter(QueryBuilder $qb, $index, $fieldValue, $searchCondition)
+    {
+        if (in_array($searchCondition, [Query::OPERATOR_CONTAINS, Query::OPERATOR_NOT_CONTAINS], true)) {
+            $searchArray = explode(Query::DELIMITER, $fieldValue);
+
+            foreach ($searchArray as $key => $string) {
+                $searchArray[$key] = $string . ':*';
+            }
+
+            if ($searchCondition === Query::OPERATOR_NOT_CONTAINS) {
+                foreach ($searchArray as $key => $string) {
+                    $searchArray[$key] = '!' . $string;
+                }
+                $qb->setParameter('value' . $index, implode(' & ', $searchArray));
+            } else {
+                $qb->setParameter('value' . $index, implode(' | ', $searchArray));
+            }
+        } else {
+            $qb->setParameter('value' . $index, $fieldValue);
+        }
+    }
+
+    /**
      * Set fulltext range order by
      *
      * @param QueryBuilder $qb
@@ -146,8 +244,8 @@ class PdoPgsql extends BaseDriver
     {
         $joinAlias = $this->getJoinAlias(Query::TYPE_TEXT, $index);
 
-        $qb->addSelect(sprintf('TsRank(%s.value, :orderByValue%s) as rankField%s', $joinAlias, $index, $index))
-            ->addOrderBy(sprintf('rankField%s', $index), Criteria::DESC);
+        $qb->addSelect(sprintf('TsRank(%s.value, :value%s) as rankField%s', $joinAlias, $index, $index))
+           ->addOrderBy(sprintf('rankField%s', $index), Criteria::DESC);
     }
 
     /**
@@ -163,40 +261,6 @@ class PdoPgsql extends BaseDriver
         }
 
         return $query;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function addTextField(QueryBuilder $qb, $index, $searchCondition, $setOrderBy = true)
-    {
-        $useFieldName = $searchCondition['fieldName'] == '*' ? false : true;
-        $fieldValue = $this->filterTextFieldValue($searchCondition['fieldValue']);
-
-        // TODO Need to clarify search requirements in scope of CRM-214
-        if ($searchCondition['condition'] === Query::OPERATOR_CONTAINS) {
-            $searchString = $this->createContainsStringQuery($index, $useFieldName);
-            $this->createContainsQueryParameter($qb, $index, $fieldValue, $setOrderBy);
-        } elseif ($searchCondition['condition'] === Query::OPERATOR_EQUALS) {
-            $searchString = $this->createEqualsStringQuery($index, $useFieldName);
-            $this->createEqualsQueryParameter($qb, $index, $fieldValue, $setOrderBy);
-        } elseif ($searchCondition['condition'] === Query::OPERATOR_STARTS_WITH) {
-            $searchString = $this->createStartWithStringQuery($index, $useFieldName);
-            $this->createStartWithStringParameter($qb, $index, $fieldValue, $setOrderBy);
-        } else {
-            $searchString = $this->createNotContainsStringQuery($index, $useFieldName);
-            $this->createNotContainsQueryParameter($qb, $index, $fieldValue, $setOrderBy);
-        }
-
-        if ($useFieldName) {
-            $qb->setParameter('field' . $index, $searchCondition['fieldName']);
-        }
-
-        if ($setOrderBy) {
-            $this->setTextOrderBy($qb, $index);
-        }
-
-        return '(' . $searchString . ' ) ';
     }
 
     /**
