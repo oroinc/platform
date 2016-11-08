@@ -21,17 +21,17 @@ response:
     soap:
         data:
             -
-                entity_name: Oro\Bundle\TestFrameworkBundle\Entity\Item
-                record_string: item1@mail.com
-                record_url: http://localhost%oro_default_prefix%search/
+                entityName: Oro\Bundle\TestFrameworkBundle\Entity\Item
+                recordTitle: item1@mail.com
+                recordUrl: http://localhost%oro_default_prefix%search/
                 selectedData: []
             -
-                entity_name: Oro\Bundle\TestFrameworkBundle\Entity\Item
-                record_string: item2@mail.com
-                record_url: http://localhost%oro_default_prefix%search/
+                entityName: Oro\Bundle\TestFrameworkBundle\Entity\Item
+                recordTitle: item2@mail.com
+                recordUrl: http://localhost%oro_default_prefix%search/
                 selectedData: []
             -
-                entity_name: Oro\Bundle\TestFrameworkBundle\Entity\Item
-                record_string: item3@mail.com
-                record_url: http://localhost%oro_default_prefix%search/
+                entityName: Oro\Bundle\TestFrameworkBundle\Entity\Item
+                recordTitle: item3@mail.com
+                recordUrl: http://localhost%oro_default_prefix%search/
                 selectedData: []

@@ -71,12 +71,12 @@ class PdoPgsql extends BaseDriver
                 $searchString = $this->createNotContainsStringQuery($index, $useFieldName);
                 break;
 
-            case Query::OPERATOR_EQUALS:
-                $searchString = $this->createCompareStringQuery($index, $useFieldName);
-                break;
-
             case Query::OPERATOR_STARTS_WITH:
                 $searchString = $this->createStartWithStringQuery($index, $useFieldName);
+                break;
+
+            case Query::OPERATOR_EQUALS:
+                $searchString = $this->createCompareStringQuery($index, $useFieldName);
                 break;
 
             default:
@@ -285,7 +285,6 @@ class PdoPgsql extends BaseDriver
         }
 
         return $stringQuery;
-
     }
 
     /**
