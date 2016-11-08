@@ -148,6 +148,8 @@ class Item
 
     /**
      * Load related object
+     *
+     * @deprecated getEntity method will be removed in 2.0. Get entity manually by entityName and recordId
      * @return object
      */
     public function getEntity()
