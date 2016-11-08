@@ -28,7 +28,8 @@ class ButtonContextTest extends \PHPUnit_Framework_TestCase
             ['group', 'test_group'],
             ['executionUrl', 'test_url1'],
             ['dialogUrl', 'test_url2'],
-            ['enabled', true]
+            ['enabled', true],
+            ['unavailableHidden', true]
         ];
 
         $this->assertPropertyAccessors($this->buttonContext, $context);
