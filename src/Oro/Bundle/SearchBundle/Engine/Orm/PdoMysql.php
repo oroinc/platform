@@ -47,9 +47,9 @@ class PdoMysql extends BaseDriver
      *
      * @return string
      */
-    public static function getPlainSql()
+    public static function getPlainSql($tableName = 'oro_search_index_text', $indexName = 'value')
     {
-        return "ALTER TABLE `oro_search_index_text` ADD FULLTEXT `value` ( `value`)";
+        return sprintf('ALTER TABLE `%s` ADD FULLTEXT `%s` (`value`)', $tableName, $indexName);
     }
 
     /**
