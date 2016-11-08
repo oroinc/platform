@@ -2,21 +2,17 @@
 
 namespace Oro\Bundle\WorkflowBundle\Command;
 
-use Oro\Bundle\WorkflowBundle\Configuration\Handler\FilterHandler;
-use Oro\Bundle\WorkflowBundle\Helper\WorkflowTranslationHelper;
-use Oro\Bundle\WorkflowBundle\Model\WorkflowManager;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 
 use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-
 use Symfony\Component\Translation\TranslatorInterface;
-
 use Symfony\Component\Yaml\Yaml;
 
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
+use Oro\Bundle\WorkflowBundle\Helper\WorkflowTranslationHelper;
 
 class DebugWorkflowDefinitionsCommand extends ContainerAwareCommand
 {
@@ -102,6 +98,9 @@ class DebugWorkflowDefinitionsCommand extends ContainerAwareCommand
     /**
      * @param $workflowName
      * @param OutputInterface $output
+     *
+     * @SuppressWarnings(PHPMD.NPathComplexity)
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      *
      * @return int
      */
