@@ -596,19 +596,19 @@ services:
     oro_email.workflow.action.send_email:
         class: %oro_email.workflow.action.send_email.class%
         arguments:
-            - '@oro_action.context_accessor'
+            - '@oro_action.expression.context_accessor'
             - '@oro_email.mailer.processor'
             - '@oro_email.email.address.helper'
             - '@oro_entity.entity_name_resolver'
         calls:
             - [setLogger, ['@logger']]
         tags:
-            - { name: oro_workflow.action, alias: send_email }
+            - { name: oro_action.action, alias: send_email }
 
     oro_email.workflow.action.send_email_template:
         class: %oro_email.workflow.action.send_email_template.class%
         arguments:
-            - '@oro_action.context_accessor'
+            - '@oro_action.expression.context_accessor'
             - '@oro_email.mailer.processor'
             - '@oro_email.email.address.helper'
             - '@oro_entity.entity_name_resolver'
@@ -618,7 +618,6 @@ services:
         calls:
             - [setLogger, ['@logger']]
         tags:
-            - { name: oro_workflow.action, alias: send_email_template }
             - { name: oro_action.action, alias: send_email_template }
 
     oro_email.helper.datagrid.emails:
@@ -1023,55 +1022,55 @@ services:
     oro_email.workflow.condition.instanceof:
         class: %oro_email.workflow.condition.instanceof.class%
         tags:
-            - { name: oro_workflow.condition, alias: instanceof }
+            - { name: oro_action.condition, alias: instanceof }
 
     oro_email.workflow.condition.has_count:
         class: %oro_email.workflow.condition.has_count.class%
         tags:
-            - { name: oro_workflow.condition, alias: has_count }
+            - { name: oro_action.condition, alias: has_count }
 
     oro_email.workflow.action.parse_first_name:
         class: %oro_email.workflow.action.parse_first_name.class%
         arguments:
-            - '@oro_action.context_accessor'
+            - '@oro_action.expression.context_accessor'
             - '@oro_email.email.address.helper'
         tags:
-            - { name: oro_workflow.action, alias: parse_first_name_from_email_address }
+            - { name: oro_action.action, alias: parse_first_name_from_email_address }
 
     oro_email.workflow.action.parse_last_name:
         class: %oro_email.workflow.action.parse_last_name.class%
         arguments:
-            - '@oro_action.context_accessor'
+            - '@oro_action.expression.context_accessor'
             - '@oro_email.email.address.helper'
         tags:
-            - { name: oro_workflow.action, alias: parse_last_name_from_email_address }
+            - { name: oro_action.action, alias: parse_last_name_from_email_address }
 
     oro_email.workflow.action.request_mailboxes:
         class: %oro_email.workflow.action.request_mailboxes.class%
         arguments:
-            - '@oro_action.context_accessor'
+            - '@oro_action.expression.context_accessor'
             - '@doctrine'
             - '@oro_email.mailbox.process_storage'
         tags:
-            - { name: oro_workflow.action, alias: request_mailboxes|find_mailboxes }
+            - { name: oro_action.action, alias: request_mailboxes|find_mailboxes }
 
     oro_email.workflow.action.strip_html_tags:
         class: %oro_email.workflow.action.strip_html_tags.class%
         arguments:
-            - '@oro_action.context_accessor'
+            - '@oro_action.expression.context_accessor'
             - '@oro_ui.html_tag_helper'
         tags:
-            - { name: oro_workflow.action, alias: strip_html_tags }
+            - { name: oro_action.action, alias: strip_html_tags }
 
     oro_email.workflow.action.add_activity_target:
         class: %oro_email.workflow.action.add_activity_target.class%
         arguments:
-            - '@oro_action.context_accessor'
+            - '@oro_action.expression.context_accessor'
             - '@oro_email.email.activity.manager'
             - '@oro_activity_list.provider.chain'
             - '@doctrine.orm.entity_manager'
         tags:
-            - { name: oro_workflow.action, alias: add_email_activity_target }
+            - { name: oro_action.action, alias: add_email_activity_target }
 
     oro_email.placeholder.send_email.filter:
         class: %oro_email.placeholder.send_email.filter.class%
