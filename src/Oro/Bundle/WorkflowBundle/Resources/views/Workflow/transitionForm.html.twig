@@ -4,15 +4,15 @@
 
 {% set pageParams = transition.frontendOptions.page is defined ?transition.frontendOptions.page : null  %}
 {% if pageParams.title is defined %}
-    {% set pageTitle = pageParams.title %}
+    {% set pageTitle = pageParams.title|trans %}
 {% else %}
-    {% set pageTitle = transition.label %}
+    {% set pageTitle = transition.label|trans({},'workflows') %}
 {% endif %}
 
 {% if pageParams.parent_label is defined %}
-    {% set indexLabel = pageParams.parent_label %}
+    {% set indexLabel = pageParams.parent_label|trans %}
 {% else %}
-    {% set indexLabel = workflow.label %}
+    {% set indexLabel = workflow.label|trans({},'workflows') %}
 {% endif %}
 
 {% if pageParams.parent_route is defined %}
@@ -21,7 +21,7 @@
     {% set indexPath = null %}
 {% endif %}
 
-{% oro_title_set({params : {"%workflow_title%": pageTitle|trans ~ ' - ' ~ indexLabel|trans} }) %}
+{% oro_title_set({params : {"%workflow_title%": pageTitle ~ ' - ' ~ indexLabel} }) %}
 
 {% block navButtons %}
     {% if indexPath %}

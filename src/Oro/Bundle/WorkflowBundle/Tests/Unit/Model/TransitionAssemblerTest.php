@@ -308,7 +308,6 @@ class TransitionAssemblerTest extends \PHPUnit_Framework_TestCase
         $actualTransition = $transitions->get('test');
         $this->assertEquals('test', $actualTransition->getName(), 'Incorrect name');
         $this->assertEquals($steps['step'], $actualTransition->getStepTo(), 'Incorrect step_to');
-        $this->assertEquals($configuration['label'], $actualTransition->getLabel(), 'Incorrect label');
 
         $expectedDisplayType = WorkflowConfiguration::DEFAULT_TRANSITION_DISPLAY_TYPE;
 
@@ -394,7 +393,6 @@ class TransitionAssemblerTest extends \PHPUnit_Framework_TestCase
             'with_condition' => [
                 'configuration' => [
                     'transition_definition' => 'with_condition',
-                    'label' => 'label',
                     'step_to' => 'step',
                 ],
                 'transitionDefinition' => self::$transitionDefinitions['with_condition'],
@@ -402,7 +400,6 @@ class TransitionAssemblerTest extends \PHPUnit_Framework_TestCase
             'with_preactions' => [
                 'configuration' => [
                     'transition_definition' => 'with_condition',
-                    'label' => 'label',
                     'step_to' => 'step',
                 ],
                 'transitionDefinition' => self::$transitionDefinitions['with_preactions'],
@@ -410,7 +407,6 @@ class TransitionAssemblerTest extends \PHPUnit_Framework_TestCase
             'with_actions' => [
                 'configuration' => [
                     'transition_definition' => 'with_actions',
-                    'label' => 'label',
                     'step_to' => 'step',
                 ],
                 'transitionDefinition' => self::$transitionDefinitions['with_actions'],
@@ -420,7 +416,6 @@ class TransitionAssemblerTest extends \PHPUnit_Framework_TestCase
                     'transition_definition' => 'full_definition',
                     'acl_resource' => 'test_acl',
                     'acl_message' => 'test acl message',
-                    'label' => 'label',
                     'step_to' => 'step',
                     'schedule' => [
                         'cron' => '1 * * * *',
@@ -434,7 +429,6 @@ class TransitionAssemblerTest extends \PHPUnit_Framework_TestCase
                     'transition_definition' => 'empty_definition',
                     'acl_resource' => 'test_acl',
                     'acl_message' => 'test acl message',
-                    'label' => 'label',
                     'step_to' => 'step',
                     'is_start' => true,
                 ],

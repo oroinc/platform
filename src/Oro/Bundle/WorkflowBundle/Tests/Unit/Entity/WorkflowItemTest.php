@@ -342,6 +342,13 @@ class WorkflowItemTest extends \PHPUnit_Framework_TestCase
         $this->workflowItem->setEntityClass('test');
     }
 
+    public function testSetRedirectUrl()
+    {
+        $this->workflowItem->setRedirectUrl('test_url');
+
+        $this->assertEquals('test_url', $this->workflowItem->getResult()->get('redirectUrl'));
+    }
+
     public function testToString()
     {
         $step = new WorkflowStep();

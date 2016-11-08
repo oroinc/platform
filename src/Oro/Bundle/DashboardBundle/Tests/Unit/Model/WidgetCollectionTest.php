@@ -46,21 +46,21 @@ class WidgetsModelCollectionTest extends \PHPUnit_Framework_TestCase
 
         $this->dashboard->expects($this->once())
             ->method('getWidgets')
-            ->will($this->returnValue(array($fooWidget, $barWidget)));
+            ->will($this->returnValue([$fooWidget, $barWidget]));
 
         $this->factory->expects($this->exactly(2))
-            ->method('createWidgetModel')
+            ->method('createVisibleWidgetModel')
             ->will(
                 $this->returnValueMap(
-                    array(
-                        array($fooWidget, $fooWidgetModel),
-                        array($barWidget, $barWidgetModel),
-                    )
+                    [
+                        [$fooWidget, $fooWidgetModel],
+                        [$barWidget, $barWidgetModel],
+                    ]
                 )
             );
 
         $this->assertEquals(
-            array($fooWidgetModel, $barWidgetModel),
+            [$fooWidgetModel, $barWidgetModel],
             $this->collection->toArray()
         );
     }
