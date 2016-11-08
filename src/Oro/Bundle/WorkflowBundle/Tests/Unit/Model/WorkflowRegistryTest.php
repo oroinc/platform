@@ -333,6 +333,54 @@ class WorkflowRegistryTest extends \PHPUnit_Framework_TestCase
         ];
     }
 
+    public function testGetActiveWorkflows()
+    {
+        $entityClass = 'testEntityClass';
+        $workflowName = 'test_workflow';
+        $workflow = $this->createWorkflow($workflowName, $entityClass);
+        $workflowDefinition = $workflow->getDefinition();
+
+        $this->featureChecker->expects($this->once())
+            ->method('isResourceEnabled')
+            ->with($workflowName, FeatureConfigurationExtension::WORKFLOWS_NODE_NAME)
+            ->willReturn(true);
+
+        $this->entityRepository->expects($this->once())
+            ->method('findActive')
+            ->willReturn([$workflowDefinition]);
+        $this->prepareAssemblerMock($workflowDefinition, $workflow);
+        $this->setUpEntityManagerMock($workflowDefinition);
+
+        $this->assertEquals(
+            new ArrayCollection(['test_workflow' => $workflow]),
+            $this->registry->getActiveWorkflows($entityClass)
+        );
+    }
+
+    public function testGetActiveWorkflowsNoFeature()
+    {
+        $entityClass = 'testEntityClass';
+        $workflowName = 'test_workflow';
+        $workflow = $this->createWorkflow($workflowName, $entityClass);
+        $workflowDefinition = $workflow->getDefinition();
+
+        $this->featureChecker->expects($this->once())
+            ->method('isResourceEnabled')
+            ->with($workflowName, FeatureConfigurationExtension::WORKFLOWS_NODE_NAME)
+            ->willReturn(false);
+
+        $this->entityRepository->expects($this->once())
+            ->method('findActive')
+            ->willReturn([$workflowDefinition]);
+
+        $this->prepareAssemblerMock();
+
+        $this->assertEquals(
+            new ArrayCollection(),
+            $this->registry->getActiveWorkflows($entityClass)
+        );
+    }
+
     public function testGetActiveWorkflowsByActiveGroupsWithDisabledFeature()
     {
         $workflow1 = $this->createWorkflow('test_workflow1', 'testEntityClass');
