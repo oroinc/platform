@@ -22,8 +22,6 @@ class ButtonSearchContextTest extends \PHPUnit_Framework_TestCase
     public function testProperties()
     {
         $properties = [
-            ['entityClass', 'Test/Class'],
-            ['entityId', 1],
             ['routeName', 'test_route'],
             ['gridName', 'test_grid'],
             ['referrer', 'test_ref'],

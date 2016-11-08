@@ -41,27 +41,11 @@ class ButtonSearchContext
     }
 
     /**
-     * @param string $entityClass
-     */
-    public function setEntityClass($entityClass)
-    {
-        $this->entityClass = $entityClass;
-    }
-
-    /**
      * @return mixed
      */
     public function getEntityId()
     {
         return $this->entityId;
-    }
-
-    /**
-     * @param mixed $entityId
-     */
-    public function setEntityId($entityId)
-    {
-        $this->entityId = $entityId;
     }
 
     /**
