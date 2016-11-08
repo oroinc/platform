@@ -122,25 +122,16 @@ class WorkflowRegistry
      *
      * @param string $entityClass
      * @return Workflow[]|ArrayCollection Named collection of active Workflow instances
-     *                                    with structure: ['workflowName' => Workflow $worfklowInstance]
+     *                                    with structure: ['workflowName' => Workflow $workflowInstance]
      */
     public function getActiveWorkflowsByEntityClass($entityClass)
     {
         $class = ClassUtils::getRealClass($entityClass);
 
         if (!array_key_exists($class, $this->workflowByEntityClass)) {
-            $workflows = new ArrayCollection();
-            foreach ($this->getEntityRepository()->findActiveForRelatedEntity($class) as $definition) {
-                $workflowName = $definition->getName();
-                if ($this->featureChecker
-                    ->isResourceEnabled($workflowName, FeatureConfigurationExtension::WORKFLOWS_NODE_NAME)
-                ) {
-                    /** @var WorkflowDefinition $definition */
-                    $workflows->set($workflowName, $this->getAssembledWorkflow($definition));
-                }
-            }
-
-            $this->workflowByEntityClass[$class] = $workflows;
+            $this->workflowByEntityClass[$class] = $this->getAssembledWorkflows(
+                $this->getEntityRepository()->findActiveForRelatedEntity($class)
+            );
         }
 
         return $this->workflowByEntityClass[$class];
@@ -156,24 +147,59 @@ class WorkflowRegistry
     {
         $groupNames = array_map('strtolower', $groupNames);
         $definitions = array_filter(
-            $this->getEntityRepository()->findBy(['active' => true]),
+            $this->getEntityRepository()->findActive(),
             function (WorkflowDefinition $definition) use ($groupNames) {
-                $isResourceEnabled = $this->featureChecker->isResourceEnabled(
-                    $definition->getName(),
-                    FeatureConfigurationExtension::WORKFLOWS_NODE_NAME
-                );
                 $exclusiveActiveGroups = $definition->getExclusiveActiveGroups();
 
-                return $isResourceEnabled && (bool)array_intersect($groupNames, $exclusiveActiveGroups);
+                return (bool)array_intersect($groupNames, $exclusiveActiveGroups);
             }
         );
 
-        return array_map(
+        return $this->getAssembledWorkflows($definitions)->getValues();
+    }
+
+    /**
+     * Returns named collection of active Workflow instances with structure:
+     *      ['workflowName' => Workflow $workflowInstance]
+     *
+     * @return Workflow[]|ArrayCollection
+     */
+    public function getActiveWorkflows()
+    {
+        return $this->getAssembledWorkflows($this->getEntityRepository()->findActive());
+    }
+
+    /**
+     * @param WorkflowDefinition[] $definitions
+     *
+     * @return ArrayCollection
+     */
+    private function getAssembledWorkflows(array $definitions)
+    {
+        $assembledWorkflows = array_map(
             function ($definition) {
                 return $this->getAssembledWorkflow($definition);
             },
-            $definitions
+            array_filter(
+                $definitions,
+                function (WorkflowDefinition $definition) {
+                    $isResourceEnabled = $this->featureChecker->isResourceEnabled(
+                        $definition->getName(),
+                        FeatureConfigurationExtension::WORKFLOWS_NODE_NAME
+                    );
+                    return $isResourceEnabled;
+                }
+            )
         );
+
+        $workflows = new ArrayCollection();
+
+        /** @var Workflow $workflow */
+        foreach ($assembledWorkflows as $workflow) {
+            $workflows->set($workflow->getName(), $workflow);
+        }
+
+        return $workflows;
     }
 
     /**

@@ -300,7 +300,7 @@ class WorkflowRegistryTest extends \PHPUnit_Framework_TestCase
             ->willReturn(true);
 
         $this->entityRepository->expects($this->once())
-            ->method('findBy')
+            ->method('findActive')
             ->willReturn($activeDefinitions);
 
         $this->assertEquals($expectedWorkflows, $this->registry->getActiveWorkflowsByActiveGroups($groups));
@@ -344,7 +344,7 @@ class WorkflowRegistryTest extends \PHPUnit_Framework_TestCase
         $workflowDefinition2->setExclusiveActiveGroups(['group2', 'group3']);
 
         $this->entityRepository->expects($this->once())
-            ->method('findBy')
+            ->method('findActive')
             ->willReturn([$workflowDefinition1, $workflowDefinition2]);
 
         $this->featureChecker->expects($this->any())
@@ -393,6 +393,10 @@ class WorkflowRegistryTest extends \PHPUnit_Framework_TestCase
         $workflow->expects($this->any())
             ->method('getDefinition')
             ->willReturn($workflowDefinition);
+
+        $workflow->expects($this->any())
+            ->method('getName')
+            ->willReturn($workflowDefinition->getName());
 
         return $workflow;
     }
