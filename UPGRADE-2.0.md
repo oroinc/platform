@@ -492,6 +492,24 @@ tag if it works with extend classes
 - Oro/Bundle/SearchBundle/Entity/UpdateEntity and Oro/Bundle/SearchBundle/EventListener/UpdateSchemaDoctrineListener were removed
 - `oro_search.search.engine.indexer` service was replaced with async implementation `oro_search.async.indexer`. Use sync indexer only for test environment.
 - New helper trait Oro/Component/Testing/SearchExtensionTrait - easy access to sync indexer for test environment
+- Removed `Oro\Bundle\SearchBundle\Resolver\EntityTitleResolverInterface` and classes that implement it:
+- Changed constructor and replaced `Oro\Bundle\SearchBundle\Resolver\EntityTitleResolverInterface` with `Oro\Bundle\EntityBundle\Provider\EntityNameResolver` in classes:
+  - `Oro\Bundle\SearchBundle\Engine\AbstractIndexer`
+  - `Oro\Bundle\SearchBundle\Engine\OrmIndexer`
+  - `Oro\Bundle\SearchBundle\EventListener\PrepareResultItemListener`
+  - `Oro\Bundle\ElasticSearchBundle\Engine\ElasticSearchIndexer`
+  - `Oro\Bundle\ActivityBundle\Entity\Manager\ActivityContextApiEntityManager`
+  - `Oro\Bundle\ActivityBundle\Form\DataTransformer\ContextsToViewTransformer`
+  - `Oro\Bundle\ActivityBundle\Form\Type\ContextsSelectType`
+  - `Oro\Bundle\CalendarBundle\Form\DataTransformer\AttendeesToViewTransformer`
+- Removed (deprecated) usage of `title_fields` as they are not available on all search engines (e.g. elastic search). Entity titles will resolve using EntityNameResolver. This may affect search results (e.g. `recordTitle` and `record_string` in functional tests are changed).
+
+####ElasticSearchBundle
+- Changed constructor of `Oro\Bundle\ElasticSearchBundle\Engine\ElasticSearchIndexer`. Replaced `EntityTitleResolverInterface` with `EntityNameResolver`.
+
+####ActivityBundle:
+- Changed constructor of `Oro\Bundle\ActivityBundle\Autocomplete\ContextSearchHandler`. Replaced `ObjectMapper` with `EntityNameResolver`. Class now use EntityNameResolver instead of `title_fields`.
+
 
 ####UIBundle:
 - Placeholders configuration now loads from `Resources/config/oro/placeholders.yml` file instead of `Resources/config/placeholders.yml`.
@@ -645,6 +663,15 @@ oro_email.email_address.entity_manager:
 - Added EntityFallbackExtension service which reads fallback values of entities in twig
 - Added AbstractEntityFallbackProvider abstract service to ease adding new fallback types, please refer
 to the [Fallback documentation](./src/Oro/Bundle/EntityBundle/Resources/doc/entity_fallback.md) for details
+- `Oro\Bundle\EntityBundle\Provider\EntityNameProvider` now is the generic Entity Name Provider which resolves:
+   - 'Short' format: title based on entity fields from 'firstName', 'name', 'title', 'subject' (uses only the first that is found)
+   - 'Full' format: a space-delimited concatenation of all string fields of the entity.
+   - For both formats: will return the entity ID when fields are found but their value is empty. Same applies for both `getName` and `getNameDQL` methods. Will return `false` if no suitable fields are available.
+- Added `Oro\Bundle\EntityBundle\Provider\FallbackEntityNameProvider` which will resolve entity title in form of 'Item #1' (translates `oro.entity.item`). Can use only single-column identifiers, else returns `false`. Should be kept as last provider.
+
+####ContactBundle
+
+- `Oro\Bundle\ContactBundle\Provider\ContactEntityNameProvider` now uses phone and email as fallback when entity names are empty
 
 ####CacheBundle
 - `Oro\Bundle\CacheBundle\Manager\OroDataCacheManager` now has method `clear` to clear cache at all cache providers
@@ -713,11 +740,11 @@ to the [Fallback documentation](./src/Oro/Bundle/EntityBundle/Resources/doc/enti
 ####UserBundle
 - Added `Oro\Bundle\UserBundle\Validator\Constraints\PasswordComplexity` to User model
 - User password requirements are more restrictive by default and require 8 characters, an upper case letter, and a number.
-- Any new users or changing of existing passwords need to meet the password requirements specified in System Configuration/General Setup/Security Settings. Existing user passwords are not affected
+- Any new users or changing of existing passwords need to meet the password requirements specified in System Configuration/General Setup/User Settings. Existing user passwords are not affected
 - Removed service @oro_user.password_reset.widget_provider.actions (replaced by @oro_user.forced_password_reset.widget_provider.actions)
 
 ####DemoDataBundle
-- All demo users will have passwords ending with '1Q' (e.g. for username 'marketing' password is 'marketing1Q'). For user 'sale' the password is 'salesale1Q'.
+- All demo CRM users will have passwords ending with '1Q' (e.g. for username 'marketing' password is 'marketing1Q'). For user 'sale' the password is 'salesale1Q'.
 
 ####ImapBundle
 - The command `oro:imap:clear-mailbox` was removed. Produce message to the topic `oro.imap.clear_inactive_mailbox` instead.
