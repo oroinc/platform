@@ -233,7 +233,8 @@ class ConsumeMessagesCommandTest extends \PHPUnit_Framework_TestCase
             ->method('error')
             ->with(
                 sprintf('Consume messages command exception. "%s"', $expectedException->getMessage()),
-                ['exception' => $expectedException])
+                ['exception' => $expectedException]
+            )
         ;
 
         $command = new ConsumeMessagesCommand(
