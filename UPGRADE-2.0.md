@@ -192,9 +192,47 @@ To migrate all labels from configuration translatable fields automatically you c
 - Changed signature of constructor of `\Oro\Bundle\WorkflowBundle\Form\Type\WorkflowDefinitionSelectType`, now it takes as second argument instance of `Symfony\Component\Translation\TranslatorInterface`
 - Changed signature of constructor of `\Oro\Bundle\WorkflowBundle\Form\Type\WorkflowSelectType`, now it takes as second argument instance of `\Symfony\Component\Translation\TranslatorInterface`
 - Changed signature of constructor of `\Oro\Bundle\WorkflowBundle\Form\Type\WorkflowStepSelectType`, now it takes as second argument instance of `\Symfony\Component\Translation\TranslatorInterface`
-- Deprecated class `Oro\Bundle\WorkflowBundle\Model\AbstractStorage` removed.
-- Deprecated class `Oro\Bundle\WorkflowBundle\Model\ConfigurationPass\ReplacePropertyPath` (`oro_workflow.configuration_pass.replace_property_path`) removed.
-- Deprecated class `Oro\Bundle\WorkflowBundle\Model\ReplacePropertyPath\ContextAccessor` removed.
+- Deprecated service `oro_workflow.attribute_guesser` removed.
+- Deprecated interfaces and classes removed: 
+  * `Oro\Bundle\WorkflowBundle\Model\AbstractStorage`
+  * `Oro\Bundle\WorkflowBundle\Model\ConfigurationPass\ReplacePropertyPath` (service `oro_workflow.configuration_pass.replace_property_path`)
+  * `Oro\Bundle\WorkflowBundle\Model\ReplacePropertyPath\ContextAccessor`
+  * `Oro\Bundle\WorkflowBundle\Event\ExecuteActionEvent`
+  * `Oro\Bundle\WorkflowBundle\Event\ExecuteActionEvents`
+  * `Oro\Bundle\WorkflowBundle\Exception\ActionException`
+  * `Oro\Bundle\WorkflowBundle\Exception\InvalidParameterException`
+  * `Oro\Bundle\WorkflowBundle\Model\AbstractAssembler`
+  * `Oro\Bundle\WorkflowBundle\Model\Action\AbstractAction`
+  * `Oro\Bundle\WorkflowBundle\Model\Action\AbstractDateAction`
+  * `Oro\Bundle\WorkflowBundle\Model\Action\ActionAssembler`
+  * `Oro\Bundle\WorkflowBundle\Model\Action\ActionFactory`
+  * `Oro\Bundle\WorkflowBundle\Model\Action\ActionInterface`
+  * `Oro\Bundle\WorkflowBundle\Model\Action\AssignActiveUser`
+  * `Oro\Bundle\WorkflowBundle\Model\Action\AssignConstantValue`
+  * `Oro\Bundle\WorkflowBundle\Model\Action\AssignValue`
+  * `Oro\Bundle\WorkflowBundle\Model\Action\CallMethod`
+  * `Oro\Bundle\WorkflowBundle\Model\Action\Configurable`
+  * `Oro\Bundle\WorkflowBundle\Model\Action\CopyTagging`
+  * `Oro\Bundle\WorkflowBundle\Model\Action\CreateDate`
+  * `Oro\Bundle\WorkflowBundle\Model\Action\CreateDateTime`
+  * `Oro\Bundle\WorkflowBundle\Model\Action\CreateEntity`
+  * `Oro\Bundle\WorkflowBundle\Model\Action\CreateObject`
+  * `Oro\Bundle\WorkflowBundle\Model\Action\EventDispatcherAwareActionInterface`
+  * `Oro\Bundle\WorkflowBundle\Model\Action\FlashMessage`
+  * `Oro\Bundle\WorkflowBundle\Model\Action\FormatName`
+  * `Oro\Bundle\WorkflowBundle\Model\Action\FormatString`
+  * `Oro\Bundle\WorkflowBundle\Model\Action\Redirect`
+  * `Oro\Bundle\WorkflowBundle\Model\Action\RemoveEntity`
+  * `Oro\Bundle\WorkflowBundle\Model\Action\RequestEntity`
+  * `Oro\Bundle\WorkflowBundle\Model\Action\TranslateAction`
+  * `Oro\Bundle\WorkflowBundle\Model\Action\Traverse`
+  * `Oro\Bundle\WorkflowBundle\Model\Action\TreeExecutor`
+  * `Oro\Bundle\WorkflowBundle\Model\Action\UnsetValue`
+  * `Oro\Bundle\WorkflowBundle\Model\Attribute`
+  * `Oro\Bundle\WorkflowBundle\Model\AttributeGuesser`
+  * `Oro\Bundle\WorkflowBundle\Model\AttributeManager`
+  * `Oro\Bundle\WorkflowBundle\Model\Condition\AbstractCondition`
+  * `Oro\Bundle\WorkflowBundle\Model\Condition\Configurable`
 
 ####LocaleBundle:
 - Added helper `Oro\Bundle\LocaleBundle\Helper\LocalizationQueryTrait` for adding necessary joins to QueryBuilder
