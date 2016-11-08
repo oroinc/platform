@@ -26,18 +26,18 @@ Main Entities
 Workflow consists of several related entities.
 
 * **Step** - entity that shows current status of Workflow. Before rendering each transitions checked
-is it allowed for current Workflow Item. Contains name, label and list of allowed transitions. Entity involved
+is it allowed for current Workflow Item. Contains name and list of allowed transitions. Entity involved
 in workflow has relation to current workflow step.
 
 * **Attribute** - entity that represent one value in Workflow Item, used to render field value on a step form.
 Attribute knows about its type (string, object, entity etc.) and additional options.
-Attribute contains name and label as additional parameters.
+Attribute contains name.
 
 * **Transition** - action that change current step of Workflow Item (i.e. moves it from one step to another). Transition
 is allowed if it's Conditions are satisfied. Before Transition performed Init Actions are executed and after
 transition performed - Post Actions are executed. Transition can be used as a start transition - it means that this
 transition will start Workflow and create new instance of Workflow Item. Transition optionally could have a form. In
-this case this form will be showed to user when Transition button is clicked. Transition contains name, label and some
+this case this form will be showed to user when Transition button is clicked. Transition contains name and some
 additional options. Optionally transition can contain form with list of attributes.
 
 * **Condition** - defines whether specific Transition is allowed with specified input data. Conditions can be nested.
@@ -111,7 +111,6 @@ Here is example of such configuration:
 ```YAML
 workflows:
     b2b_flow_sales:
-        label: B2B Sales Flow
         defaults:
             active: true #workflow will be automatically activated during installation
         entity: Oro\Bundle\SalesBundle\Entity\Opportunity
@@ -174,7 +173,6 @@ some action with User entity.
 ```
 workflows:
     example_user_flow:                            # name of the workflow
-        label: 'User Workflow Example'            # workflow label for UI representation
         entity: Oro\Bundle\UserBundle\Entity\User # workflow related entity
         entity_attribute: user                    # attribute name of current entity that can be used in configuration
         start_step: started                       # step that will be assigned automatically to new entities
@@ -187,12 +185,10 @@ workflows:
         priority: 100                             # has priority of 100
         steps:                                    # list of all existing steps in workflow
             started:                              # step where user should enter firstname and lastname
-                label: 'Started'                  # step label
                 order: 10                         # order of step (ascending)
                 allowed_transitions:              # list of allowed transition from this step
                     - set_name                    # first name and last name should be entered on this transition
             processed:                            # step where user can review entered data
-                label: 'Processed'                # step label
                 order: 20                         # steps will be shown in ascending
                 allowed_transitions:              # order of step
                    - add_email                    # new email should be added on this transition
@@ -205,17 +201,14 @@ workflows:
             last_name:                                        # last name of a user
                 property_path: user.lastName                  # path to entity property (automatically defined attribute metadata)
             email_string:                                     # email string temporary attribute
-                label: 'Email'                                # attribute label
                 type: string                                  # attribute type
             email_entity:                                     # email entity temporary attribute
-                label: 'Email Entity'                         # attribute label
                 type: entity                                  # attribute type
                 options:                                      # attribute options
                     class: Oro\Bundle\UserBundle\Entity\Email # entity class name
 
         transitions:                                        # list of all existing transitions in workflow
             set_name:                                       # transition from step "started" to "processed"
-                label: 'Set Name'                           # transition label
                 step_to: processed                          # next step after transition performing
                 transition_definition: set_name_definition  # link to definition of conditions and post actions
                 form_options:                               # options which will be passed to form type of transition
@@ -232,7 +225,6 @@ workflows:
                                 constraints:                # list of constraints
                                     - NotBlank: ~           # this field must be filled
             add_email:                                      # transition from step "add_email" to "add_email" (self-transition)
-                label: 'Add Email'                          # transition label
                 step_to: processed                          # next step after transition performing
                 transition_definition: add_email_definition # link to definition of conditions and post actions
                 form_options:                               # options which will be passed to form type of transition
@@ -244,7 +236,6 @@ workflows:
                                     - NotBlank: ~           # this field must be filled
                                     - Email: ~              # field must contain valid email
             schedule_transition:                                            # transition from step "add_email" to "add_email" (self-transition)
-                label: 'Schedule'                                           # transition label
                 step_to: processed                                          # next step after transition performing
                 transition_definition: schedule_transition_definition       # link to definition of conditions and post actions
                 triggers:                                                   # transition triggers
