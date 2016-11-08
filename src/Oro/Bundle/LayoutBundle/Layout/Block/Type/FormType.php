@@ -17,9 +17,8 @@ class FormType extends AbstractType
      */
     public function configureOptions(OptionsResolver $resolver)
     {
-        $resolver->setRequired(['form']);
-
         $resolver->setDefined([
+            'form',
             'form_action',
             'form_method',
             'form_multipart',
