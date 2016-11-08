@@ -104,7 +104,7 @@ define(function(require) {
             'max_fraction_digits'
         ];
 
-        var prepareInputOptions = function(opts, optionsToIgnore) {
+        var prepareCustomOptions = function(opts, optionsToIgnore) {
             optionsToIgnore = optionsToIgnore || [];
             if (!_.isObject(opts)) {
                 return {};
@@ -115,10 +115,10 @@ define(function(require) {
 
         return {
             formatDecimal: function(value, opts) {
-                var inputOptions = prepareInputOptions(opts);
+                var customOptions = prepareCustomOptions(opts);
                 var formatOptions = this.formatOptions || {};
-                var options = localeSettings.getNumberFormats('decimal');
-                _.extend(options, formatOptions, inputOptions);
+                var decimalOptions = localeSettings.getNumberFormats('decimal');
+                var options = _.extend({}, decimalOptions, formatOptions, customOptions);
                 options.style = 'decimal';
                 var formattersChain = [
                     formatters.numeralFormat,
@@ -127,11 +127,11 @@ define(function(require) {
                 return doFormat(value, options, formattersChain);
             },
             formatMonetary: function(value, opts) {
-                var inputOptions = prepareInputOptions(opts);
-                var options = localeSettings.getNumberFormats('decimal');
+                var customOptions = prepareCustomOptions(opts);
+                var decimalOptions = localeSettings.getNumberFormats('decimal');
                 var fractionDigitsOptions = _.pick(localeSettings.getNumberFormats('currency'),
                     ['max_fraction_digits', 'min_fraction_digits']);
-                _.extend(options, fractionDigitsOptions, inputOptions);
+                var options = _.extend({}, decimalOptions, fractionDigitsOptions, customOptions);
                 options.style = 'decimal';
                 var formattersChain = [
                     formatters.numeralFormat,
@@ -161,12 +161,12 @@ define(function(require) {
                 return doFormat(value, options, formattersChain);
             },
             formatCurrency: function(value, currency, opts) {
-                var inputOptions = prepareInputOptions(opts);
-                var options = localeSettings.getNumberFormats('currency');
+                var customOptions = prepareCustomOptions(opts);
+                var currencyOptions = localeSettings.getNumberFormats('currency');
                 if (!currency) {
                     currency = localeSettings.getCurrency();
                 }
-                _.extend(options, inputOptions);
+                var options = _.extend({}, currencyOptions, customOptions);
                 options.style = 'currency';
                 options.currency_code = currency;
                 var formattersChain = [
