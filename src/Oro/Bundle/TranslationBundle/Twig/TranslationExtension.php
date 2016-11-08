@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\TranslationBundle\Twig;
 
+use Oro\Bundle\TranslationBundle\Helper\TranslationsDatagridRouteHelper;
+
 class TranslationExtension extends \Twig_Extension
 {
     const NAME = 'oro_translation';
@@ -12,11 +14,18 @@ class TranslationExtension extends \Twig_Extension
     protected $debugTranslator = false;
 
     /**
-     * @param bool $debugTranslator
+     * @var TranslationsDatagridRouteHelper
      */
-    public function __construct($debugTranslator)
+    protected $translationRouteHelper;
+
+    /**
+     * @param bool $debugTranslator
+     * @param TranslationsDatagridRouteHelper $translationRouteHelper
+     */
+    public function __construct($debugTranslator, TranslationsDatagridRouteHelper $translationRouteHelper)
     {
         $this->debugTranslator = $debugTranslator;
+        $this->translationRouteHelper = $translationRouteHelper;
     }
 
     /**
@@ -38,7 +47,8 @@ class TranslationExtension extends \Twig_Extension
                 function () {
                     return $this->debugTranslator;
                 }
-            )
+            ),
+            new \Twig_SimpleFunction('translation_grid_link', [$this->translationRouteHelper, 'generate'])
         ];
     }
 }

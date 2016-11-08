@@ -169,6 +169,8 @@ class EmailController extends Controller
         });
         $this->loadEmailBody($emails);
 
+        $this->getEmailManager()->setSeenStatus($entity, true, true);
+
         return [
             'entity' => $entity,
             'thread' => $emails,

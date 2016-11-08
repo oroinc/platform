@@ -1,5 +1,4 @@
 {% import 'OroUIBundle::macros.html.twig' as UI %}
-{% form_theme form with ['OroWorkflowBundle:Form:fields.html.twig'] %}
 
 <div class="widget-content">
     {% block transition_widget %}
@@ -36,8 +35,14 @@
         {% endblock transition_js %}
 
         {% block transition_form %}
-            {% if transition.message %}
-                <div class="alert">{{ transition.message|trans }}</div>
+            {% set transitionMessage = transition.message|trans({},'workflows') %}
+            {% if transitionMessage == transition.message %}
+                {# if no translation for message then do not show message #}
+                {% set transitionMessage = '' %}
+            {% endif %}
+
+            {% if transitionMessage %}
+                <div class="alert">{{ transitionMessage }}</div>
             {% endif %}
             <form method="post"
                   data-nohash="true"

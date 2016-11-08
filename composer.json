@@ -70,8 +70,8 @@
         "ezyang/htmlpurifier": "4.6.0",
         "hwi/oauth-bundle": "~0.3",
         "components/jquery": "3.1.*",
-        "components/underscore": "1.7.*",
-        "components/backbone": "1.1.*",
+        "bower-asset/backbone": "1.2.3",
+        "bower-asset/underscore": "1.8.3",
         "components/font-awesome": "~4.3.0",
         "piwik/device-detector": "~3.0",
         "bower-asset/jsplumb": "~1.7",
@@ -114,7 +114,8 @@
         "bower-asset/numeral": "1.5.2",
         "bower-asset/jquery-form": "3.37.0",
         "npm-asset/requirejs": "2.3.*",
-        "doctrine/annotations": "~1.2.7"
+        "doctrine/annotations": "~1.2.7",
+        "robloach/component-installer": "0.2.*"
     },
     "require-dev": {
         "sensio/generator-bundle": "2.5.3",

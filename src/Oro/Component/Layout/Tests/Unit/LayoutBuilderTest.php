@@ -22,16 +22,23 @@ class LayoutBuilderTest extends \PHPUnit_Framework_TestCase
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $renderer;
 
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    protected $expressionProcessor;
+
     /** @var LayoutBuilder|\PHPUnit_Framework_MockObject_MockObject */
     protected $layoutBuilder;
 
     protected function setUp()
     {
-        $this->registry          = $this->getMock('Oro\Component\Layout\LayoutRegistryInterface');
-        $this->rawLayoutBuilder  = $this->getMock('Oro\Component\Layout\RawLayoutBuilderInterface');
-        $this->layoutManipulator = $this->getMock('Oro\Component\Layout\DeferredLayoutManipulatorInterface');
-        $this->blockFactory      = $this->getMock('Oro\Component\Layout\BlockFactoryInterface');
-        $this->renderer          = $this->getMock('Oro\Component\Layout\LayoutRendererInterface');
+        $this->registry            = $this->getMock('Oro\Component\Layout\LayoutRegistryInterface');
+        $this->rawLayoutBuilder    = $this->getMock('Oro\Component\Layout\RawLayoutBuilderInterface');
+        $this->layoutManipulator   = $this->getMock('Oro\Component\Layout\DeferredLayoutManipulatorInterface');
+        $this->blockFactory        = $this->getMock('Oro\Component\Layout\BlockFactoryInterface');
+        $this->renderer            = $this->getMock('Oro\Component\Layout\LayoutRendererInterface');
+        $this->expressionProcessor = $this
+            ->getMockBuilder('Oro\Component\Layout\ExpressionLanguage\ExpressionProcessor')
+            ->disableOriginalConstructor()
+            ->getMock();
 
         $rendererRegistry = new LayoutRendererRegistry();
         $rendererRegistry->addRenderer('test', $this->renderer);
@@ -44,7 +51,8 @@ class LayoutBuilderTest extends \PHPUnit_Framework_TestCase
                     $this->rawLayoutBuilder,
                     $this->layoutManipulator,
                     $this->blockFactory,
-                    $rendererRegistry
+                    $rendererRegistry,
+                    $this->expressionProcessor
                 ]
             )
             ->setMethods(['createLayout'])
@@ -221,15 +229,9 @@ class LayoutBuilderTest extends \PHPUnit_Framework_TestCase
         $context = $this->getMock('Oro\Component\Layout\ContextInterface');
         $rootId  = 'test_id';
 
-        $rawLayout = $this->getMockBuilder('Oro\Component\Layout\RawLayout')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $rootView  = $this->getMockBuilder('Oro\Component\Layout\BlockView')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $layout    = $this->getMockBuilder('Oro\Component\Layout\Layout')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $rawLayout = $this->getMockBuilder('Oro\Component\Layout\RawLayout')->disableOriginalConstructor()->getMock();
+        $rootView  = $this->getMockBuilder('Oro\Component\Layout\BlockView')->disableOriginalConstructor()->getMock();
+        $layout    = $this->getMockBuilder('Oro\Component\Layout\Layout')->disableOriginalConstructor()->getMock();
 
         $context->expects($this->once())
             ->method('isResolved')
@@ -239,6 +241,17 @@ class LayoutBuilderTest extends \PHPUnit_Framework_TestCase
         $this->registry->expects($this->once())
             ->method('configureContext')
             ->with($this->identicalTo($context));
+
+        $context->expects($this->any())
+            ->method('getOr')
+            ->will($this->returnValue(true));
+        $this->expressionProcessor->expects($this->once())
+            ->method('processExpressions');
+
+        $optionValueBag = $this->getMock('Oro\Component\Layout\OptionValueBag');
+        $optionValueBag->expects($this->once())
+            ->method('buildValue');
+        $rootView->vars['bag'] = $optionValueBag;
 
         $this->layoutManipulator->expects($this->at(0))
             ->method('setBlockTheme')
@@ -279,14 +292,10 @@ class LayoutBuilderTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue($rootId));
         $rawLayout->expects($this->once())
             ->method('getBlockThemes')
-            ->will(
-                $this->returnValue(
-                    [
-                        $rootId => ['RootTheme1', 'RootTheme2', 'RootTheme3'],
-                        'test_block' => ['TestTheme1', 'TestTheme2', 'TestTheme3']
-                    ]
-                )
-            );
+            ->willReturn([
+                $rootId => ['RootTheme1', 'RootTheme2', 'RootTheme3'],
+                'test_block' => ['TestTheme1', 'TestTheme2', 'TestTheme3']
+            ]);
         $layout->expects($this->at(0))
             ->method('setBlockTheme')
             ->with(['RootTheme1', 'RootTheme2', 'RootTheme3'], $this->identicalTo(null));
@@ -304,8 +313,7 @@ class LayoutBuilderTest extends \PHPUnit_Framework_TestCase
         $layout->expects($this->once())
             ->method('setFormTheme');
 
-        $this->layoutBuilder
-            ->setBlockTheme('RootTheme1')
+        $this->layoutBuilder->setBlockTheme('RootTheme1')
             ->setBlockTheme(['RootTheme2', 'RootTheme3'])
             ->setBlockTheme(['TestTheme1', 'TestTheme2'], 'test_block')
             ->setBlockTheme('TestTheme3', 'test_block')
