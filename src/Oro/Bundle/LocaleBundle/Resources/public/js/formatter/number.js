@@ -99,18 +99,17 @@ define(function(require) {
             return result;
         };
 
-        var allowedInputOptions = [
+        var allowedCustomOptions = [
             'min_fraction_digits',
             'max_fraction_digits'
         ];
 
-        var prepareCustomOptions = function(opts, optionsToIgnore) {
-            optionsToIgnore = optionsToIgnore || [];
+        var prepareCustomOptions = function(opts) {
             if (!_.isObject(opts)) {
                 return {};
             }
 
-            return _.pick(opts, _.without(allowedInputOptions, optionsToIgnore));
+            return _.pick(opts, allowedCustomOptions);
         };
 
         return {
