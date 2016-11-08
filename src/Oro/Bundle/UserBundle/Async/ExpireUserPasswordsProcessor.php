@@ -4,7 +4,7 @@ namespace Oro\Bundle\UserBundle\Async;
 
 use Psr\Log\LoggerInterface;
 
-use Doctrine\ORM\EntityManager;
+use Doctrine\Common\Persistence\ObjectManager;
 
 use Symfony\Bridge\Doctrine\RegistryInterface;
 
@@ -117,7 +117,7 @@ class ExpireUserPasswordsProcessor implements MessageProcessorInterface, TopicSu
     }
 
     /**
-     * @return EntityManager
+     * @return ObjectManager
      */
     protected function getUserEntityManager()
     {
