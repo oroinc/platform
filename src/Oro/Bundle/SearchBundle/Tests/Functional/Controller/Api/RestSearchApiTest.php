@@ -65,10 +65,6 @@ class RestSearchApiTest extends WebTestCase
         $this->assertEquals($response['records_count'], $result['records_count']);
         $this->assertEquals($response['count'], $result['count']);
 
-        if (empty($result['data'])) {
-            $result['data'] = [];
-        }
-
         // remove ID references
         $recordsRequired = !empty($response['rest']['data'][0]['record_string']);
         foreach (array_keys($result['data']) as $key) {
