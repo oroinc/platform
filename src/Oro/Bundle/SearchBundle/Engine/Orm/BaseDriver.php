@@ -159,12 +159,16 @@ abstract class BaseDriver
     /**
      * Returns an unique ID hash, used for SQL aliases
      *
-     * @param string $prefix
+     * @param string|array $prefix
      * @return string
      */
     public function getUniqueId($prefix = '')
     {
-        return uniqid($prefix);
+        if (is_array($prefix)) {
+            $prefix = implode('_', $prefix);
+        }
+
+        return str_replace('.', '_', uniqid($prefix, true));
     }
 
     /**

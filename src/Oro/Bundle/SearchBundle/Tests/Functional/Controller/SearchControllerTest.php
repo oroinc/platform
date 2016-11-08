@@ -9,6 +9,7 @@ use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
 /**
  * @group search
+ * @dbIsolation
  */
 class SearchControllerTest extends WebTestCase
 {

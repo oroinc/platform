@@ -11,6 +11,7 @@ use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
  * @outputBuffering enabled
  * @group soap
  * @group search
+ * @dbIsolation
  */
 class SoapAdvancedSearchApiTest extends WebTestCase
 {
