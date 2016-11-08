@@ -99,11 +99,26 @@ define(function(require) {
             return result;
         };
 
+        var allowedInputOptions = [
+            'min_fraction_digits',
+            'max_fraction_digits'
+        ];
+
+        var prepareInputOptions = function(opts, optionsToIgnore) {
+            optionsToIgnore = optionsToIgnore || [];
+            if (!_.isObject(opts)) {
+                return {};
+            }
+
+            return _.pick(opts, _.without(allowedInputOptions, optionsToIgnore));
+        };
+
         return {
-            formatDecimal: function(value) {
+            formatDecimal: function(value, opts) {
+                var inputOptions = prepareInputOptions(opts);
                 var formatOptions = this.formatOptions || {};
                 var options = localeSettings.getNumberFormats('decimal');
-                _.extend(options, formatOptions);
+                _.extend(options, formatOptions, inputOptions);
                 options.style = 'decimal';
                 var formattersChain = [
                     formatters.numeralFormat,
@@ -111,11 +126,12 @@ define(function(require) {
                 ];
                 return doFormat(value, options, formattersChain);
             },
-            formatMonetary: function(value) {
+            formatMonetary: function(value, opts) {
+                var inputOptions = prepareInputOptions(opts);
                 var options = localeSettings.getNumberFormats('decimal');
                 var fractionDigitsOptions = _.pick(localeSettings.getNumberFormats('currency'),
                     ['max_fraction_digits', 'min_fraction_digits']);
-                _.extend(options, fractionDigitsOptions);
+                _.extend(options, fractionDigitsOptions, inputOptions);
                 options.style = 'decimal';
                 var formattersChain = [
                     formatters.numeralFormat,
@@ -144,11 +160,13 @@ define(function(require) {
                 ];
                 return doFormat(value, options, formattersChain);
             },
-            formatCurrency: function(value, currency) {
+            formatCurrency: function(value, currency, opts) {
+                var inputOptions = prepareInputOptions(opts);
                 var options = localeSettings.getNumberFormats('currency');
                 if (!currency) {
                     currency = localeSettings.getCurrency();
                 }
+                _.extend(options, inputOptions);
                 options.style = 'currency';
                 options.currency_code = currency;
                 var formattersChain = [
