@@ -78,15 +78,7 @@ class NavigationItemBuilder implements BuilderInterface, FeatureToggleableInterf
             $repo = $this->em->getRepository(ClassUtils::getClass($entity));
             $items = $repo->getNavigationItems($user->getId(), $currentOrganization, $alias, $options);
             foreach ($items as $item) {
-                $route = null;
-                try {
-                    $routeMatch = $this->router->match($item['url']);
-                    if (isset($routeMatch['_route'])) {
-                        $route = $routeMatch['_route'];
-                    }
-                } catch (\Exception $e) {
-                }
-
+                $route = $this->matchRoute($item);
                 if (!$this->isRouteEnabled($route)) {
                     continue;
                 }
@@ -100,6 +92,24 @@ class NavigationItemBuilder implements BuilderInterface, FeatureToggleableInterf
                     ]
                 );
             }
+        }
+    }
+
+    /**
+     * Matches a route and return its name.
+     *
+     * @param array $item
+     *
+     * @return string|null
+     */
+    protected function matchRoute($item)
+    {
+        try {
+            $routeMatch = $this->router->match($item['url']);
+
+            return isset($routeMatch['_route']) ? $routeMatch['_route'] : null;
+        } catch (\Exception $e) {
+            return null;
         }
     }
 }

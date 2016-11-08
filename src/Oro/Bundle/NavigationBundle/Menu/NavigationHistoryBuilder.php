@@ -6,9 +6,7 @@ use Knp\Menu\ItemInterface;
 use Knp\Menu\Matcher\Matcher;
 use Knp\Menu\Util\MenuManipulator;
 
-use Oro\Bundle\FeatureToggleBundle\Checker\FeatureToggleableInterface;
-
-class NavigationHistoryBuilder extends NavigationItemBuilder implements FeatureToggleableInterface
+class NavigationHistoryBuilder extends NavigationItemBuilder
 {
     /**
      * @var Matcher

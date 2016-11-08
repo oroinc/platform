@@ -20,6 +20,7 @@ services:
             - '@assets.packages'
         tags:
             - { name: twig.extension }
+            - { name: oro_featuretogle.feature, feature: email }
 
     oro_sidebar.request.handler:
         class: %oro_sidebar.request.handler.class%

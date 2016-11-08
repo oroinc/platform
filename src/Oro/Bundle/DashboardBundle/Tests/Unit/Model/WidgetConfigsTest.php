@@ -5,7 +5,6 @@ namespace Oro\Bundle\DashboardBundle\Tests\Unit\Model;
 use Oro\Bundle\DashboardBundle\Entity\Widget;
 use Oro\Bundle\DashboardBundle\Model\WidgetConfigs;
 use Oro\Bundle\DashboardBundle\Model\WidgetOptionBag;
-use Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker;
 use Symfony\Component\HttpFoundation\Request;
 
 class WidgetConfigsTest extends \PHPUnit_Framework_TestCase
@@ -30,9 +29,6 @@ class WidgetConfigsTest extends \PHPUnit_Framework_TestCase
 
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $eventDispatcher;
-
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
-    protected $featureChecker;
 
     public function setUp()
     {
@@ -62,10 +58,6 @@ class WidgetConfigsTest extends \PHPUnit_Framework_TestCase
 
         $this->eventDispatcher = $this->getMock('Symfony\Component\EventDispatcher\EventDispatcherInterface');
 
-        $this->featureChecker = $this->getMockBuilder(FeatureChecker::class)
-            ->setMethods(['isResourceEnabled'])
-            ->disableOriginalConstructor()
-            ->getMock();
         $widgetConfigVisibilityFilter = $this
             ->getMockBuilder('Oro\Bundle\DashboardBundle\Filter\WidgetConfigVisibilityFilter')
             ->disableOriginalConstructor()
@@ -81,7 +73,6 @@ class WidgetConfigsTest extends \PHPUnit_Framework_TestCase
             $this->valueProvider,
             $this->translator,
             $this->eventDispatcher,
-            $this->featureChecker,
             $widgetConfigVisibilityFilter
         );
 

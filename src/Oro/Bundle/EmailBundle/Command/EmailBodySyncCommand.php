@@ -19,7 +19,7 @@ class EmailBodySyncCommand extends ContainerAwareCommand
     /**
      * {@internaldoc}
      */
-    protected function configure()
+    public function configure()
     {
         $this
             ->setName('oro:email:body-sync')
@@ -38,9 +38,10 @@ class EmailBodySyncCommand extends ContainerAwareCommand
     /**
      * {@internaldoc}
      */
-    protected function execute(InputInterface $input, OutputInterface $output)
+    public function execute(InputInterface $input, OutputInterface $output)
     {
         $featureChecker = $this->getContainer()->get('oro_featuretoggle.checker.feature_checker');
+
         if (!$featureChecker->isFeatureEnabled('email')) {
             $output->writeln('The email feature is disabled. The command will not run.');
 

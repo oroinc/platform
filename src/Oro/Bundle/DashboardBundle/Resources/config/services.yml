@@ -68,7 +68,6 @@ services:
             - '@oro_dashboard.widget_config_value.provider'
             - '@translator'
             - '@event_dispatcher'
-            - '@oro_featuretoggle.checker.feature_checker'
             - '@oro_dashboard.widget_config_visibility_filter'
         calls:
             - [setRequest, ["@?request="]]

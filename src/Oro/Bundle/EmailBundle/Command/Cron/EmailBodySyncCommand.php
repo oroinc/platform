@@ -35,7 +35,7 @@ class EmailBodySyncCommand extends ContainerAwareCommand implements CronCommandI
     /**
      * {@inheritdoc}
      */
-    protected function configure()
+    public function configure()
     {
         $this
             ->setName('oro:cron:email-body-sync')
@@ -59,7 +59,7 @@ class EmailBodySyncCommand extends ContainerAwareCommand implements CronCommandI
     /**
      * {@inheritdoc}
      */
-    protected function execute(InputInterface $input, OutputInterface $output)
+    public function execute(InputInterface $input, OutputInterface $output)
     {
         $featureChecker = $this->getContainer()->get('oro_featuretoggle.checker.feature_checker');
         if (!$featureChecker->isFeatureEnabled('email')) {

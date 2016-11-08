@@ -140,15 +140,17 @@ class ActivityListManager
             $result = $qb->getQuery()->getResult();
         }
 
+        $viewModels = $this->getEntityViewModels(
+            $result,
+            [
+                'class' => $entityClass,
+                'id'    => $entityId,
+            ]
+        );
+
         return [
-            'count' => count($result),
-            'data' => $this->getEntityViewModels(
-                $result,
-                [
-                    'class' => $entityClass,
-                    'id'    => $entityId,
-                ]
-            )
+            'count' => count($viewModels),
+            'data' => $viewModels
         ];
     }
 

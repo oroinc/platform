@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\SidebarBundle\Tests\Unit\Model;
 
-use Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker;
 use Oro\Bundle\SidebarBundle\Model\WidgetDefinitionRegistry;
 
 class WidgetDefinitionRegistryTest extends \PHPUnit_Framework_TestCase

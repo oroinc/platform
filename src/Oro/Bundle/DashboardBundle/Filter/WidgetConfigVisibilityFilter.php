@@ -49,7 +49,7 @@ class WidgetConfigVisibilityFilter
             $enabled    = $item['enabled'];
             unset($item['acl'], $item['applicable'], $item['enabled']);
 
-            if (!$this->isItemAllowed($widgetName, $itemName, $enabled, $acl, $applicable)) {
+            if (!$this->isItemAllowed($widgetName, $itemName, $item, $enabled, $acl, $applicable)) {
                 continue;
             }
 
@@ -62,13 +62,14 @@ class WidgetConfigVisibilityFilter
     /**
      * @param string|null $widgetName
      * @param string $itemName
+     * @param array $item
      * @param bool $enabled
      * @param string|null $acl
      * @param string|null $applicable
      *
      * @return bool
      */
-    protected function isItemAllowed($widgetName, $itemName, $enabled, $acl, $applicable)
+    protected function isItemAllowed($widgetName, $itemName, $item, $enabled, $acl, $applicable)
     {
         if (!$enabled || ($acl && !$this->securityFacade->isGranted($acl))) {
             return false;
@@ -82,7 +83,11 @@ class WidgetConfigVisibilityFilter
         }
 
         $resource = $widgetName ? sprintf('%s.%s', $widgetName, $itemName) : $itemName;
-        if (!$this->featureChecker->isResourceEnabled($resource, 'dashboard_widgets')) {
+        if (!$this->featureChecker->isResourceEnabled($resource, 'dashboards')) {
+            return false;
+        }
+
+        if (isset($item['route']) && !$this->featureChecker->isResourceEnabled($item['route'], 'routes')) {
             return false;
         }
 

@@ -13,8 +13,6 @@ use Oro\Bundle\DashboardBundle\Event\WidgetItemsLoadDataEvent;
 use Oro\Bundle\DashboardBundle\Entity\Widget;
 use Oro\Bundle\DashboardBundle\Filter\WidgetConfigVisibilityFilter;
 use Oro\Bundle\DashboardBundle\Provider\ConfigValueProvider;
-use Oro\Bundle\SecurityBundle\SecurityFacade;
-use Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker;
 
 use Oro\Component\Config\Resolver\ResolverInterface;
 
@@ -41,9 +39,6 @@ class WidgetConfigs
     /** @var EventDispatcherInterface */
     protected $eventDispatcher;
 
-    /** @var FeatureChecker */
-    protected $featureChecker;
-
     /** @var WidgetConfigVisibilityFilter */
     protected $visibilityFilter;
 
@@ -66,7 +61,6 @@ class WidgetConfigs
         ConfigValueProvider $valueProvider,
         TranslatorInterface $translator,
         EventDispatcherInterface $eventDispatcher,
-        FeatureChecker $featureChecker,
         WidgetConfigVisibilityFilter $visibilityFilter
     ) {
         $this->configProvider = $configProvider;
@@ -75,7 +69,6 @@ class WidgetConfigs
         $this->valueProvider = $valueProvider;
         $this->translator = $translator;
         $this->eventDispatcher = $eventDispatcher;
-        $this->featureChecker = $featureChecker;
         $this->visibilityFilter = $visibilityFilter;
     }
 
@@ -107,10 +100,7 @@ class WidgetConfigs
                 $widgetName
             );
         }
-        unset($widget['route']);
-        unset($widget['route_parameters']);
-        unset($widget['acl']);
-        unset($widget['items']);
+        unset($widget['route'], $widget['route_parameters'], $widget['acl'], $widget['items']);
 
         $options = $widget['configuration'];
         foreach ($options as $name => $config) {

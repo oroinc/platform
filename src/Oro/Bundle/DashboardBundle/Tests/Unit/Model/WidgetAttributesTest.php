@@ -3,7 +3,6 @@
 namespace Oro\Bundle\DashboardBundle\Tests\Unit\Model;
 
 use Oro\Bundle\DashboardBundle\Model\WidgetConfigs;
-use Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker;
 
 class WidgetAttributesTest extends \PHPUnit_Framework_TestCase
 {
@@ -24,9 +23,6 @@ class WidgetAttributesTest extends \PHPUnit_Framework_TestCase
 
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $eventDispatcher;
-
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
-    protected $featureChecker;
 
     protected $widgetConfigVisibilityFilter;
 
@@ -50,9 +46,6 @@ class WidgetAttributesTest extends \PHPUnit_Framework_TestCase
 
         $this->eventDispatcher = $this->getMock('Symfony\Component\EventDispatcher\EventDispatcherInterface');
 
-        $this->featureChecker = $this->getMockBuilder(FeatureChecker::class)
-            ->disableOriginalConstructor()
-            ->getMock();
         $widgetConfigVisibilityFilter = $this
             ->getMockBuilder('Oro\Bundle\DashboardBundle\Filter\WidgetConfigVisibilityFilter')
             ->disableOriginalConstructor()
@@ -77,7 +70,6 @@ class WidgetAttributesTest extends \PHPUnit_Framework_TestCase
             $this->valueProvider,
             $this->translator,
             $this->eventDispatcher,
-            $this->featureChecker,
             $widgetConfigVisibilityFilter
         );
     }

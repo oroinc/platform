@@ -7,8 +7,6 @@ use Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker;
 
 class WidgetDefinitionRegistry
 {
-    const SIDEBAR_WIDGET_FEATURE_NAME = 'sidebar_widgets';
-
     /**
      * @var ArrayCollection
      */

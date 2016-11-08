@@ -5,10 +5,14 @@ namespace Oro\Bundle\SidebarBundle\Twig;
 use Symfony\Component\Translation\TranslatorInterface;
 use Symfony\Component\Asset\Packages as AssetHelper;
 
+use Oro\Bundle\FeatureToggleBundle\Checker\FeatureCheckerHolderTrait;
+use Oro\Bundle\FeatureToggleBundle\Checker\FeatureToggleableInterface;
 use Oro\Bundle\SidebarBundle\Model\WidgetDefinitionRegistry;
 
-class SidebarExtension extends \Twig_Extension
+class SidebarExtension extends \Twig_Extension implements FeatureToggleableInterface
 {
+    use FeatureCheckerHolderTrait;
+
     const NAME = 'oro_sidebar';
 
     /**
@@ -63,7 +67,12 @@ class SidebarExtension extends \Twig_Extension
             ->getWidgetDefinitionsByPlacement($placement)
             ->toArray();
 
-        foreach ($definitions as &$definition) {
+        foreach ($definitions as $name => &$definition) {
+            if (!$this->isResourceEnabled($name, 'sidebar_widgets')) {
+                unset($definitions[$name]);
+                continue;
+            }
+
             $definition['title'] = $this->translator->trans($definition['title']);
             if (!empty($definition['dialogIcon'])) {
                 $definition['dialogIcon'] = $this->assetHelper->getUrl($definition['dialogIcon']);

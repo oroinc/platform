@@ -3,7 +3,6 @@
 namespace Oro\Bundle\NavigationBundle\Tests\Unit\Menu;
 
 use Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker;
-use Oro\Bundle\FeatureToggleBundle\Checker\FeatureCheckerHolderTrait;
 use Oro\Bundle\NavigationBundle\Menu\NavigationHistoryBuilder;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Symfony\Bundle\FrameworkBundle\Routing\Router;
