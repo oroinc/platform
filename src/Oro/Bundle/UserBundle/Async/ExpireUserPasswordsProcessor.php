@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\UserBundle\Async;
 
+use Doctrine\ORM\EntityManager;
+
 use Psr\Log\LoggerInterface;
 
 use Symfony\Bridge\Doctrine\RegistryInterface;
@@ -17,6 +19,7 @@ use Oro\Bundle\NotificationBundle\Model\EmailNotification;
 use Oro\Bundle\NotificationBundle\Manager\EmailNotificationManager;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\UserBundle\Entity\UserManager;
+use Oro\Bundle\UserBundle\Entity\Repository\UserRepository;
 
 /**
  * Message Queue processor to expire passwords of users
@@ -115,7 +118,7 @@ class ExpireUserPasswordsProcessor implements MessageProcessorInterface, TopicSu
     }
 
     /**
-     * @return \Doctrine\ORM\EntityManager
+     * @return EntityManager
      */
     protected function getUserEntityManager()
     {
@@ -123,7 +126,7 @@ class ExpireUserPasswordsProcessor implements MessageProcessorInterface, TopicSu
     }
 
     /**
-     * @return \Oro\Bundle\UserBundle\Entity\Repository\UserRepository
+     * @return UserRepository
      */
     protected function getUserRepository()
     {

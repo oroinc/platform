@@ -3,6 +3,7 @@
 namespace Oro\Bundle\UserBundle\Migrations\Schema\v1_24;
 
 use Doctrine\DBAL\Schema\Schema;
+use Doctrine\DBAL\Schema\SchemaException;
 
 use Oro\Bundle\MigrationBundle\Migration\Migration;
 use Oro\Bundle\MigrationBundle\Migration\QueryBag;
@@ -21,7 +22,7 @@ class AddPasswordExpiresAtColumn implements Migration
      * Add password_expires_at to User
      *
      * @param Schema $schema
-     * @throws \Doctrine\DBAL\Schema\SchemaException
+     * @throws SchemaException
      */
     public static function updateOroUserTable(Schema $schema)
     {

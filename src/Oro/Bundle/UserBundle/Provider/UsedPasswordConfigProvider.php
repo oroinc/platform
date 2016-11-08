@@ -17,11 +17,17 @@ class UsedPasswordConfigProvider
         $this->configManager = $configManager;
     }
 
+    /**
+     * @return bool
+     */
     public function isUsedPasswordCheckEnabled()
     {
         return (bool) $this->configManager->get('oro_user.used_password_check_enabled');
     }
 
+    /**
+     * @return int
+     */
     public function getUsedPasswordsCheckNumber()
     {
         return (int) $this->configManager->get('oro_user.used_password_check_number');

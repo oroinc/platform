@@ -4,6 +4,7 @@ namespace Oro\Bundle\UserBundle\Entity\Repository;
 
 use Doctrine\DBAL\Types\Type;
 use Doctrine\ORM\EntityRepository;
+use Doctrine\ORM\QueryBuilder;
 
 use Oro\Bundle\EmailBundle\Entity\EmailOrigin;
 use Oro\Bundle\EmailBundle\Entity\Repository\EmailAwareRepository;
@@ -193,7 +194,7 @@ class UserRepository extends EntityRepository implements EmailAwareRepository
      *
      * @param array $dates Array of date period pairs [from => \DateTime, to => \DateTime] to match against
      *
-     * @return \Doctrine\ORM\QueryBuilder
+     * @return QueryBuilder
      */
     public function getExpiringPasswordUsersQB(array $dates)
     {
