@@ -23,8 +23,6 @@ class TransitionTest extends \PHPUnit_Framework_TestCase
             new Transition(),
             [
                 ['name', 'test'],
-                ['label', 'test'],
-                ['message', 'test'],
                 ['hidden', true],
                 ['start', true],
                 ['unavailableHidden', true],

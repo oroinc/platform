@@ -1,62 +1,55 @@
-parameters:
-    oro_workflow.form.event_listener.default_values.class: Oro\Bundle\WorkflowBundle\Form\EventListener\DefaultValuesListener
-    oro_workflow.form.event_listener.required_attributes.class: Oro\Bundle\WorkflowBundle\Form\EventListener\RequiredAttributesListener
-
-    oro_workflow.form.type.attributes.class: Oro\Bundle\WorkflowBundle\Form\Type\WorkflowAttributesType
-    oro_workflow.form.type.transition.class: Oro\Bundle\WorkflowBundle\Form\Type\WorkflowTransitionType
-    oro_workflow.form.type.workflow_step_select.class: Oro\Bundle\WorkflowBundle\Form\Type\WorkflowStepSelectType
-    oro_workflow.form.type.workflow_select.class: Oro\Bundle\WorkflowBundle\Form\Type\WorkflowSelectType
-
-    oro_workflow.form.type.workflow_definition.class: Oro\Bundle\WorkflowBundle\Form\Type\WorkflowDefinitionType
-
 services:
     oro_workflow.form.event_listener.default_values:
-        class: %oro_workflow.form.event_listener.default_values.class%
-        arguments: ['@oro_action.context_accessor']
+        class: 'Oro\Bundle\WorkflowBundle\Form\EventListener\DefaultValuesListener'
+        arguments: ['@oro_action.expression.context_accessor']
 
     oro_workflow.form.event_listener.form_init:
         class: 'Oro\Bundle\WorkflowBundle\Form\EventListener\FormInitListener'
 
     oro_workflow.form.event_listener.required_attributes:
-        class: %oro_workflow.form.event_listener.required_attributes.class%
+        class: 'Oro\Bundle\WorkflowBundle\Form\EventListener\RequiredAttributesListener'
 
     oro_workflow.form.type.attributes:
-        class: %oro_workflow.form.type.attributes.class%
+        class: 'Oro\Bundle\WorkflowBundle\Form\Type\WorkflowAttributesType'
         arguments:
             - '@oro_workflow.registry'
             - '@oro_workflow.attribute_guesser'
             - '@oro_workflow.form.event_listener.default_values'
             - '@oro_workflow.form.event_listener.form_init'
             - '@oro_workflow.form.event_listener.required_attributes'
-            - '@oro_action.context_accessor'
+            - '@oro_action.expression.context_accessor'
             - '@event_dispatcher'
             - '@oro_security.helper.property_path_helper'
+            - '@translator'
         tags:
             - { name: form.type, alias: oro_workflow_attributes }
 
     oro_workflow.form.type.transition:
-        class: %oro_workflow.form.type.transition.class%
+        class: 'Oro\Bundle\WorkflowBundle\Form\Type\WorkflowTransitionType'
         tags:
             - { name: form.type, alias: oro_workflow_transition }
 
     oro_workflow.form.type.workflow_step_select:
-        class: %oro_workflow.form.type.workflow_step_select.class%
+        class: 'Oro\Bundle\WorkflowBundle\Form\Type\WorkflowStepSelectType'
         arguments:
             - '@oro_workflow.registry'
+            - '@translator'
         tags:
             - { name: form.type, alias: oro_workflow_step_select }
 
     oro_workflow.form.type.workflow_definition_select:
-        class: Oro\Bundle\WorkflowBundle\Form\Type\WorkflowDefinitionSelectType
+        class: 'Oro\Bundle\WorkflowBundle\Form\Type\WorkflowDefinitionSelectType'
         arguments:
             - '@oro_workflow.registry'
+            - '@translator'
         tags:
             - { name: form.type, alias: oro_workflow_definition_select }
 
     oro_workflow.form.type.workflow_select:
-        class: %oro_workflow.form.type.workflow_select.class%
+        class: 'Oro\Bundle\WorkflowBundle\Form\Type\WorkflowSelectType'
         arguments:
             - '@doctrine'
+            - '@translator'
         tags:
             - { name: form.type, alias: oro_workflow_select }
 
@@ -68,34 +61,35 @@ services:
     oro_wofkflow.form.autocomplete.wofkflow_replacement.search_handler:
         class: 'Oro\Bundle\WorkflowBundle\Autocomplete\WorkflowReplacementSearchHandler'
         arguments:
-            - '%oro_workflow.workflow_definition.entity.class%'
+            - '%oro_workflow.entity.workflow_definition.class%'
             - ['label']
         calls:
             - [initDoctrinePropertiesByManagerRegistry, ['@doctrine']]
             - [setAclHelper, ['@oro_security.acl_helper']]
             - [setWorkflowRegistry, ['@oro_workflow.registry']]
+            - [setTranslator, ['@translator']]
         tags:
             - { name: oro_form.autocomplete.search_handler, alias: oro_workflow_replacement, acl_resource: oro_workflow_definition_view }
 
     oro_workflow.form.type.applicable_entities:
-        class: Oro\Bundle\WorkflowBundle\Form\Type\ApplicableEntitiesType
+        class: 'Oro\Bundle\WorkflowBundle\Form\Type\ApplicableEntitiesType'
         arguments:
             - '@oro_workflow.entity_connector'
         tags:
             - { name: form.type, alias: oro_workflow_applicable_entities}
 
     oro_workflow.form.type.workflow_definition:
-        class: %oro_workflow.form.type.workflow_definition.class%
+        class: 'Oro\Bundle\WorkflowBundle\Form\Type\WorkflowDefinitionType'
         tags:
             - { name: form.type, alias: oro_workflow_definition }
 
     oro_workflow.form.workflow_definition:
-        class: Symfony\Component\Form\Form
+        class: 'Symfony\Component\Form\Form'
         factory: ['@form.factory', 'createNamed']
         arguments: ["oro_workflow_definition_form", "oro_workflow_definition", null]
 
     oro_workflow.form.extension.restriction:
-        class: Oro\Bundle\WorkflowBundle\Form\Extension\RestrictionsExtension
+        class: 'Oro\Bundle\WorkflowBundle\Form\Extension\RestrictionsExtension'
         arguments:
             - '@oro_workflow.manager'
             - '@oro_entity.doctrine_helper'

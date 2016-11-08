@@ -38,8 +38,8 @@ class InstallTest extends Selenium2TestCase
         /** @var OroAdministration $administration */
         $administration = $configuration->next();
         $administration->setUsername('admin')
-                    ->setPasswordFirst('admin')
-                    ->setPasswordSecond('admin')
+                    ->setPasswordFirst('admin1Q8')
+                    ->setPasswordSecond('admin1Q8')
                     ->setEmail('admin@example.com')
                     ->setFirstName('John')
                     ->setLastName('Doe')

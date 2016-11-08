@@ -10,6 +10,7 @@ use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
 /**
  * @dbIsolation
+ * @group dist
  */
 class ControllersTest extends WebTestCase
 {

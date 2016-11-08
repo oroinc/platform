@@ -726,4 +726,26 @@ class RestDocumentBuilderTest extends DocumentBuilderTestCase
             $this->documentBuilder->getDocument()
         );
     }
+
+    public function testMetaPropertyWithResultName()
+    {
+        $object = [
+            'id'    => 123,
+            'meta1' => 'Meta1',
+        ];
+
+        $metadata = $this->getEntityMetadata('Test\Entity', ['id']);
+        $metadata->addField($this->createFieldMetadata('id'));
+        $metadata->addMetaProperty($this->createMetaPropertyMetadata('meta1'))
+            ->setResultName('resultMeta1');
+
+        $this->documentBuilder->setDataObject($object, $metadata);
+        $this->assertEquals(
+            [
+                'id'          => '123',
+                'resultMeta1' => 'Meta1',
+            ],
+            $this->documentBuilder->getDocument()
+        );
+    }
 }

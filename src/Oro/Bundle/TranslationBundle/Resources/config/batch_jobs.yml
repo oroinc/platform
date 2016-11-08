@@ -25,5 +25,5 @@ connector:
                     services:
                         reader:    oro_importexport.reader.csv
                         processor: oro_importexport.processor.import_delegate
-                        writer:    oro_integration.writer.persistent_batch_writer
+                        writer:    oro_translation.importexport.writer.translations
                     parameters: ~
