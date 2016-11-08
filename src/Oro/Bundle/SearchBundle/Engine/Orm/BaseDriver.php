@@ -435,7 +435,10 @@ abstract class BaseDriver
         $whereExpression = $criteria->getWhereExpression();
         if ($whereExpression) {
             $visitor = new OrmExpressionVisitor($this, $qb, $setOrderBy);
-            $qb->andWhere($visitor->dispatch($whereExpression));
+            $whereCondition = $visitor->dispatch($whereExpression);
+            if ($whereCondition) {
+                $qb->andWhere($whereCondition);
+            }
         }
     }
 
