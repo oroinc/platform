@@ -83,8 +83,6 @@ class DebugWorkflowDefinitionsCommandTest extends WebTestCase
             $listConfiguration = $this->container->get('oro_workflow.configuration.config.workflow_list');
             $configurationBuilder = $this->container->get('oro_workflow.configuration.builder.workflow_definition');
 
-            file_put_contents('c:/temp/' . $workflowName . '.yml', $result);
-
             $workflowConfiguration = Yaml::parse($result);
             $workflowConfiguration = $listConfiguration->processConfiguration($workflowConfiguration);
             $workflowDefinitions = $configurationBuilder->buildFromConfiguration($workflowConfiguration);
