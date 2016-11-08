@@ -1,15 +1,16 @@
 {% extends 'OroDashboardBundle:Dashboard:tabbedWidget.html.twig' %}
-{% import 'OroEmailBundle::macros.html.twig' as Email %}
+{% import 'OroUIBundle::macros.html.twig' as UI %}
 
-{% if unreadMailCount > 10 %}
-    {% set unreadMailCount %}
-        <div class="email-mail-count-circle">10+</div>
-    {% endset %}
-{% else %}
-    {% set unreadMailCount %}
-        <div class="email-mail-count-circle">{{ unreadMailCount }}</div>
-    {% endset %}
-{% endif %}
+{% set unreadMailCount %}
+    <div class="email-mail-count-circle" {{ UI.renderPageComponentAttributes({
+        module: 'oroui/js/app/components/view-component',
+        options: {
+            view: 'oroemail/js/app/views/unread-emails-counter-view',
+            count: unreadMailCount,
+            autoRender: true
+        }
+    }) }}></div>
+{% endset %}
 
 {% block content %}
     {% set tabs = [{

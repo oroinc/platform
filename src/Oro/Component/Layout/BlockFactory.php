@@ -2,8 +2,11 @@
 
 namespace Oro\Component\Layout;
 
+use Symfony\Component\ExpressionLanguage\Expression;
+
 use Oro\Component\Layout\Block\Type\ContainerType;
 use Oro\Component\Layout\Block\Type\Options;
+use Oro\Component\Layout\ExpressionLanguage\ExpressionProcessor;
 
 class BlockFactory implements BlockFactoryInterface
 {
@@ -12,6 +15,9 @@ class BlockFactory implements BlockFactoryInterface
 
     /** @var DeferredLayoutManipulatorInterface */
     protected $layoutManipulator;
+
+    /** @var ExpressionProcessor */
+    protected $expressionProcessor;
 
     /** @var BlockOptionsResolver */
     protected $optionsResolver;
@@ -37,13 +43,16 @@ class BlockFactory implements BlockFactoryInterface
     /**
      * @param LayoutRegistryInterface            $registry
      * @param DeferredLayoutManipulatorInterface $layoutManipulator
+     * @param ExpressionProcessor                $expressionProcessor
      */
     public function __construct(
         LayoutRegistryInterface $registry,
-        DeferredLayoutManipulatorInterface $layoutManipulator
+        DeferredLayoutManipulatorInterface $layoutManipulator,
+        ExpressionProcessor $expressionProcessor
     ) {
-        $this->registry          = $registry;
-        $this->layoutManipulator = $layoutManipulator;
+        $this->registry            = $registry;
+        $this->layoutManipulator   = $layoutManipulator;
+        $this->expressionProcessor = $expressionProcessor;
     }
 
     /**
@@ -53,9 +62,6 @@ class BlockFactory implements BlockFactoryInterface
     {
         $this->initializeState($rawLayout, $context);
         try {
-            if ($rootId === null) {
-                $rootId = $context->getOr('root_id');
-            }
             $rootId = $rootId
                 ? $this->rawLayout->resolveId($rootId)
                 : $this->rawLayout->getRootId();
@@ -214,11 +220,13 @@ class BlockFactory implements BlockFactoryInterface
         // resolve options
         $resolvedOptions = new Options($this->optionsResolver->resolveOptions($blockType, $options));
 
+        $this->processExpressions($resolvedOptions);
+        $resolvedOptions = $this->resolveValueBags($resolvedOptions);
+
         // point the block builder state to the current block
         $this->blockBuilder->initialize($id);
         // iterate from parent to current
         foreach ($types as $type) {
-            $this->registry->normalizeOptions($type->getName(), $resolvedOptions, $this->context, $this->dataAccessor);
             $type->buildBlock($this->blockBuilder, $resolvedOptions);
             $this->registry->buildBlock($type->getName(), $this->blockBuilder, $resolvedOptions);
         }
@@ -269,7 +277,6 @@ class BlockFactory implements BlockFactoryInterface
     protected function finishBlockView(BlockView $view, $id)
     {
         $blockType = $this->rawLayout->getProperty($id, RawLayout::BLOCK_TYPE, true);
-        $options   = $this->rawLayout->getProperty($id, RawLayout::RESOLVED_OPTIONS, true);
         $types     = $this->typeHelper->getTypes($blockType);
 
         // point the block view state to the current block
@@ -294,5 +301,54 @@ class BlockFactory implements BlockFactoryInterface
             $this->rawLayout->getProperty($id, RawLayout::BLOCK_TYPE, true),
             ContainerType::NAME
         );
+    }
+
+    /**
+     * Processes expressions that don't work with data
+     *
+     * @param Options $options
+     */
+    protected function processExpressions(Options $options)
+    {
+        if (!$this->context->getOr('expressions_evaluate')) {
+            return;
+        }
+
+        $values = $options->toArray();
+
+        if ($this->context->getOr('expressions_evaluate_deferred')) {
+            $this->expressionProcessor->processExpressions($values, $this->context, null, true, null);
+        } else {
+            $this->expressionProcessor->processExpressions(
+                $values,
+                $this->context,
+                $this->dataAccessor,
+                true,
+                $this->context->getOr('expressions_encoding')
+            );
+        }
+
+        $options->setMultiple($values);
+    }
+
+    /**
+     * @param Options $options
+     * @return Options
+     */
+    protected function resolveValueBags(Options $options)
+    {
+        foreach ($options as $key => $value) {
+            if ($value instanceof Expression) {
+                continue;
+            }
+
+            if ($value instanceof Options) {
+                $options[$key] = $this->resolveValueBags($value);
+            } elseif ($value instanceof OptionValueBag) {
+                $options[$key] = $value->buildValue();
+            }
+        }
+
+        return $options;
     }
 }
