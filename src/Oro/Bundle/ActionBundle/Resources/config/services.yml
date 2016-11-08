@@ -203,3 +203,8 @@ services:
             - '@service_container'
         tags:
             - { name: oro_action.condition, alias: 'service_exists' }
+
+    oro_action.provider.button_search_context:
+        class: 'Oro\Bundle\ActionBundle\Provider\ButtonSearchContextProvider'
+        arguments:
+            - '@oro_action.helper.context'
