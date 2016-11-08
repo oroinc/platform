@@ -3,6 +3,7 @@
 namespace Oro\Bundle\ApiBundle\Tests\Functional;
 
 use Oro\Bundle\TestFrameworkBundle\Entity\TestEmployee;
+use Oro\Bundle\TestFrameworkBundle\Tests\Functional\DataFixtures\LoadOrganization;
 use Oro\Bundle\UserBundle\Entity\User;
 
 /**
@@ -17,7 +18,10 @@ class GetRestJsonApiWithFiltersTest extends RestJsonApiTestCase
     {
         parent::setUp();
 
-        $this->loadFixtures(['Oro\Bundle\ApiBundle\Tests\Functional\DataFixtures\LoadFiltersTestData']);
+        $this->loadFixtures([
+            LoadOrganization::class,
+            '@OroApiBundle/Tests/Functional/DataFixtures/filters.yml'
+        ]);
     }
 
     /**
@@ -148,7 +152,7 @@ class GetRestJsonApiWithFiltersTest extends RestJsonApiTestCase
                 'statusCode'   => 200,
                 'params'       => [
                     'filter' => [
-                        'department.name' => 'TestDepartment0'
+                        'department.name' => 'TestDepartment1'
                     ],
                     'page'   => [
                         'size' => 3
