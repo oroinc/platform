@@ -41,10 +41,7 @@ class KernelIsolator implements IsolatorInterface
 
     /** {@inheritdoc} */
     public function terminate()
-    {
-        $this->kernel->getContainer()->get('doctrine')->getManager()->clear();
-        $this->kernel->shutdown();
-    }
+    {}
 
     /** {@inheritdoc} */
     public function isApplicable(ContainerInterface $container)
