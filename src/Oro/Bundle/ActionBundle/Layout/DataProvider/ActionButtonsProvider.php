@@ -5,6 +5,7 @@ namespace Oro\Bundle\ActionBundle\Layout\DataProvider;
 use Doctrine\Common\Util\ClassUtils;
 
 use Oro\Bundle\ActionBundle\Helper\ApplicationsHelper;
+use Oro\Bundle\ActionBundle\Helper\ApplicationsHelperInterface;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 
 class ActionButtonsProvider
@@ -16,10 +17,10 @@ class ActionButtonsProvider
     protected $doctrineHelper;
 
     /**
-     * @param ApplicationsHelper $applicationsHelper
+     * @param ApplicationsHelperInterface $applicationsHelper
      * @param DoctrineHelper $doctrineHelper
      */
-    public function __construct(ApplicationsHelper $applicationsHelper, DoctrineHelper $doctrineHelper)
+    public function __construct(ApplicationsHelperInterface $applicationsHelper, DoctrineHelper $doctrineHelper)
     {
         $this->applicationsHelper = $applicationsHelper;
         $this->doctrineHelper = $doctrineHelper;

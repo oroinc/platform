@@ -17,9 +17,9 @@ class DefaultOperationRequestHelper
 
     /**
      * @param RequestStack $requestStack
-     * @param ApplicationsHelper $applicationsHelper
+     * @param ApplicationsHelperInterface $applicationsHelper
      */
-    public function __construct(RequestStack $requestStack, ApplicationsHelper $applicationsHelper)
+    public function __construct(RequestStack $requestStack, ApplicationsHelperInterface $applicationsHelper)
     {
         $this->requestStack = $requestStack;
         $this->applicationsHelper = $applicationsHelper;

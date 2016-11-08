@@ -3,6 +3,7 @@
 namespace Oro\Bundle\ActionBundle\Twig;
 
 use Oro\Bundle\ActionBundle\Helper\ApplicationsHelper;
+use Oro\Bundle\ActionBundle\Helper\ApplicationsHelperInterface;
 use Oro\Bundle\ActionBundle\Helper\ContextHelper;
 use Oro\Bundle\ActionBundle\Helper\OptionsHelper;
 use Oro\Bundle\ActionBundle\Model\OperationManager;
@@ -25,13 +26,13 @@ class OperationExtension extends \Twig_Extension
 
     /**
      * @param OperationManager $manager
-     * @param ApplicationsHelper $appsHelper
+     * @param ApplicationsHelperInterface $appsHelper
      * @param ContextHelper $contextHelper
      * @param OptionsHelper $optionsHelper
      */
     public function __construct(
         OperationManager $manager,
-        ApplicationsHelper $appsHelper,
+        ApplicationsHelperInterface $appsHelper,
         ContextHelper $contextHelper,
         OptionsHelper $optionsHelper
     ) {

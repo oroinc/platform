@@ -6,6 +6,7 @@ use Doctrine\ORM\ORMException;
 
 use Oro\Bundle\ActionBundle\Configuration\ConfigurationProviderInterface;
 use Oro\Bundle\ActionBundle\Helper\ApplicationsHelper;
+use Oro\Bundle\ActionBundle\Helper\ApplicationsHelperInterface;
 use Oro\Bundle\ActionBundle\Helper\ArraySubstitution;
 use Oro\Bundle\ActionBundle\Model\Assembler\OperationAssembler;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
@@ -41,13 +42,13 @@ class OperationRegistry
     /**
      * @param ConfigurationProviderInterface $configurationProvider
      * @param OperationAssembler $assembler
-     * @param ApplicationsHelper $applicationsHelper
+     * @param ApplicationsHelperInterface $applicationsHelper
      * @param DoctrineHelper $doctrineHelper
      */
     public function __construct(
         ConfigurationProviderInterface $configurationProvider,
         OperationAssembler $assembler,
-        ApplicationsHelper $applicationsHelper,
+        ApplicationsHelperInterface $applicationsHelper,
         DoctrineHelper $doctrineHelper
     ) {
         $this->configurationProvider = $configurationProvider;

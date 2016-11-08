@@ -6,7 +6,7 @@ use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInt
 
 use Oro\Bundle\UserBundle\Entity\User;
 
-class ApplicationsHelper
+class ApplicationsHelper implements ApplicationsHelperInterface
 {
     const DEFAULT_APPLICATION = 'default';
 
@@ -25,8 +25,7 @@ class ApplicationsHelper
     }
 
     /**
-     * @param array $applications
-     * @return bool
+     * {@inheritdoc}
      */
     public function isApplicationsValid(array $applications)
     {
@@ -42,7 +41,7 @@ class ApplicationsHelper
     }
 
     /**
-     * @return string|null
+     * {@inheritdoc}
      */
     public function getCurrentApplication()
     {
@@ -52,7 +51,7 @@ class ApplicationsHelper
     }
 
     /**
-     * @return string
+     * {@inheritdoc}
      */
     public function getWidgetRoute()
     {
@@ -60,7 +59,7 @@ class ApplicationsHelper
     }
 
     /**
-     * @return string
+     * {@inheritdoc}
      */
     public function getDialogRoute()
     {
@@ -68,7 +67,7 @@ class ApplicationsHelper
     }
 
     /**
-     * @return string
+     * {@inheritdoc}
      */
     public function getExecutionRoute()
     {
