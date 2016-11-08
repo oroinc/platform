@@ -136,7 +136,6 @@ class OroUserBundleInstaller implements
         AddFirstNameLastNameIndex::addFirstNameLastNameIndex($schema);
         AddImpersonationTable::createOroUserImpersonationTable($schema);
         AddFailedLoginColumns::updateOroUserTable($schema);
-        AddPasswordHistoryTable::createOroUserPasswordHistoryTable($schema);
         AddPasswordExpiresAtColumn::updateOroUserTable($schema);
     }
 
