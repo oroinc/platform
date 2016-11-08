@@ -1,0 +1,9 @@
+{% block oro_scope_widget %}
+    <table>
+        <tr>
+            {% for child in form.children %}
+                <td>{{ form_row(child) }}</td>
+            {% endfor %}
+        </tr>
+    </table>
+{% endblock %}

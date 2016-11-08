@@ -43,7 +43,7 @@ abstract class AbstractScopeCriteriaProvider implements ScopeCriteriaProviderInt
     /**
      * @return string
      */
-    abstract protected function getCriteriaValueType();
+    abstract public function getCriteriaValueType();
 
     /**
      * @param object|array $context
