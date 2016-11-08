@@ -139,8 +139,9 @@ class JsonApiDocumentBuilder extends AbstractDocumentBuilder
     {
         $properties = $metadata->getMetaProperties();
         foreach ($properties as $name => $property) {
+            $resultName = $property->getResultName();
             if (array_key_exists($name, $data)) {
-                $result[self::META][$name] = $data[$name];
+                $result[self::META][$resultName] = $data[$name];
             }
         }
     }

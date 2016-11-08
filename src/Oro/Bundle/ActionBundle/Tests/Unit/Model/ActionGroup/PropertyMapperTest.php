@@ -7,7 +7,7 @@ use Symfony\Component\PropertyAccess\PropertyPath;
 use Oro\Bundle\ActionBundle\Model\ActionGroup\PropertyMapper;
 use Oro\Bundle\ActionBundle\Model\ActionGroupExecutionArgs;
 
-use Oro\Component\Action\Model\ContextAccessor;
+use Oro\Component\ConfigExpression\ContextAccessor;
 
 class PropertyMapperTest extends \PHPUnit_Framework_TestCase
 {
@@ -19,7 +19,7 @@ class PropertyMapperTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->mockContextAccessor = $this->getMockBuilder('Oro\Component\Action\Model\ContextAccessor')->getMock();
+        $this->mockContextAccessor = $this->getMockBuilder('Oro\Component\ConfigExpression\ContextAccessor')->getMock();
         $this->propertyMapper = new PropertyMapper($this->mockContextAccessor);
     }
 
@@ -36,7 +36,7 @@ class PropertyMapperTest extends \PHPUnit_Framework_TestCase
     public function testAccessorEnsured()
     {
         $this->assertAttributeInstanceOf(
-            'Oro\Component\Action\Model\ContextAccessor',
+            'Oro\Component\ConfigExpression\ContextAccessor',
             'accessor',
             $this->propertyMapper
         );

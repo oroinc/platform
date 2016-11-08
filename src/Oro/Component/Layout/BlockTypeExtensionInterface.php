@@ -55,16 +55,6 @@ interface BlockTypeExtensionInterface
     public function configureOptions(OptionsResolver $resolver);
 
     /**
-     * Normalize options after they was resolved.
-     * You can implement this function to manipulate block options before build.
-     *
-     * @param Options $options
-     * @param ContextInterface $context
-     * @param DataAccessorInterface $data
-     */
-    public function normalizeOptions(Options $options, ContextInterface $context, DataAccessorInterface $data);
-
-    /**
      * Returns the name of the block type being extended.
      *
      * @return string The name of the block type being extended

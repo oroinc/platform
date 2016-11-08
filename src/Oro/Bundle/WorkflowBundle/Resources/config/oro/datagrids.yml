@@ -16,7 +16,7 @@ datagrids:
                     - process.createdAt
                     - process.name as processDefinition
                 from:
-                    - { table: %oro_workflow.process_definition.entity.class%, alias: process }
+                    - { table: %oro_workflow.entity.process_definition.class%, alias: process }
         columns:
             label:
                 label: oro.workflow.processdefinition.label.label
@@ -117,10 +117,14 @@ datagrids:
                     - w.groups
                     - w.createdAt
                 from:
-                    - { table: %oro_workflow.workflow_definition.entity.class%, alias: w }
+                    - { table: %oro_workflow.entity.workflow_definition.class%, alias: w }
         columns:
             label:
                 label:         oro.workflow.workflowdefinition.label.label
+                type:          callback
+                callable:      ["@oro_workflow.helper.translation", "findTranslation"]
+                params:
+                    - label
             relatedEntity:
                 label:         oro.workflow.workflowdefinition.related_entity.label
                 data_name:     relatedEntity
@@ -177,8 +181,6 @@ datagrids:
                 params:     [ workflowDefinition ]
         sorters:
             columns:
-                label:
-                    data_name: w.label
                 active:
                     data_name: w.active
                 system:
@@ -226,9 +228,6 @@ datagrids:
         action_configuration: ["@oro_workflow.datagrid.action_permission_provider", "getWorkflowDefinitionPermissions"]
         filters:
             columns:
-                label:
-                    type: string
-                    data_name: w.label
                 relatedEntity:
                     type: choice
                     data_name: w.relatedEntity

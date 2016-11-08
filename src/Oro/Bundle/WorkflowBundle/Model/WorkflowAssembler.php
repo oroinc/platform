@@ -10,6 +10,7 @@ use Doctrine\Common\Collections\Collection;
 use Oro\Bundle\WorkflowBundle\Exception\UnknownStepException;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Configuration\WorkflowConfiguration;
+use Oro\Bundle\WorkflowBundle\Helper\WorkflowTranslationHelper;
 
 use Oro\Component\Action\Exception\AssemblerException;
 use Oro\Component\Action\Model\AbstractAssembler as BaseAbstractAssembler;
@@ -181,7 +182,11 @@ class WorkflowAssembler extends BaseAbstractAssembler
 
             $label = $this->translator->trans(
                 'oro.workflow.transition.start',
-                ['%workflow%' => $workflowDefinition->getLabel()]
+                ['%workflow%' => $this->translator->trans(
+                    $workflowDefinition->getLabel(),
+                    [],
+                    WorkflowTranslationHelper::TRANSLATION_DOMAIN
+                )]
             );
 
             $configuration[WorkflowConfiguration::NODE_TRANSITIONS][TransitionManager::DEFAULT_START_TRANSITION_NAME] =
@@ -233,7 +238,7 @@ class WorkflowAssembler extends BaseAbstractAssembler
      */
     protected function assembleTransitions(array $configuration, Collection $steps, Collection $attributes)
     {
-        $transitionsConfiguration           = $this->getOption(
+        $transitionsConfiguration = $this->getOption(
             $configuration,
             WorkflowConfiguration::NODE_TRANSITIONS,
             []

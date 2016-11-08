@@ -5,9 +5,13 @@ $charset: 'UTF-8';
 @include font-face('Roboto', '#{$global-url}/orofrontend/default/fonts/roboto/roboto-regular-webfont', 700, normal);
 @include font-face('custom-font-icon', '#{$global-url}/orofrontend/default/fonts/custom-font-icon/custom-font-icon', normal, normal);
 
-$base-font: 'Lato';
+$base-font: 'Lato','Helvetica', Arial, sans-serif;
+$bae-font-minor: 'Roboto','Helvetica', Arial, sans-serif;
 $base-font-icon: 'custom-font-icon';
+
+// Font sizes
 $base-font-size: 14px;
+$base-font-size--s: 13px;
 $base-font-size--m: 20px;
 $base-font-size--l: 23px;
 $base-line-height: 1.35;

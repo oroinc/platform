@@ -47,7 +47,7 @@
         {% if transition.frontendOptions is defined and transition.frontendOptions.dialog is defined %}
             data-dialog-options={{ transition.frontendOptions.dialog|json_encode|raw }}
         {% endif %}
-        title="{{ transition.label }}"
+        title="{{ transition.label|trans({},'workflows') }}"
         class="btn icons-holder-text workflow-transition-buttons
             {% if transition.displayType == 'dialog' %}no-hash{% endif %}
             {% if not transitionData.enabled %}disabled{% endif %}
@@ -56,7 +56,7 @@
         {% if transition.frontendOptions is defined and transition.frontendOptions.icon is defined %}
             <i class="{{ transition.frontendOptions.icon }}"></i>
         {%- endif -%}
-        {{ transition.label }}
+        {{ transition.label|trans({},'workflows') }}
     </a>
 {% endmacro %}
 
@@ -131,4 +131,12 @@
                 });
             });
     </script>
+{% endmacro %}
+
+{% macro renderGoToTranslationsIconByLink(link, large) %}
+    <span class="workflow-translatable-field">
+        <a target="_blank" href="{{ link|raw }}" title="{{ 'oro.workflow.action.workflow.go_to_translations'|trans}}">
+            <i class="fa fa-language{% if large %} large-icon{% endif %}"></i>
+        </a>
+    </span>
 {% endmacro %}
