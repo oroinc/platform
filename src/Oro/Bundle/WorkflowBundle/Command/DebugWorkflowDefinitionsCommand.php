@@ -2,12 +2,17 @@
 
 namespace Oro\Bundle\WorkflowBundle\Command;
 
+use Oro\Bundle\WorkflowBundle\Configuration\Handler\FilterHandler;
+use Oro\Bundle\WorkflowBundle\Helper\WorkflowTranslationHelper;
+use Oro\Bundle\WorkflowBundle\Model\WorkflowManager;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 
 use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
+
+use Symfony\Component\Translation\TranslatorInterface;
 
 use Symfony\Component\Yaml\Yaml;
 
@@ -53,6 +58,9 @@ class DebugWorkflowDefinitionsCommand extends ContainerAwareCommand
      */
     protected function listWorkflowDefinitions(OutputInterface $output)
     {
+        /** @var TranslatorInterface $translator */
+        $translator = $this->getContainer()->get('translator');
+
         $workflows = $this->getContainer()->get('doctrine')
             ->getRepository('Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition')
             ->findAll();
@@ -72,7 +80,7 @@ class DebugWorkflowDefinitionsCommand extends ContainerAwareCommand
             foreach ($workflows as $workflow) {
                 $row = [
                     $workflow->getName(),
-                    $workflow->getLabel(),
+                    $translator->trans($workflow->getLabel(), [], WorkflowTranslationHelper::TRANSLATION_DOMAIN),
                     $workflow->getRelatedEntity(),
                     $workflow->isSystem() ? 'System' : 'Custom',
                     $workflow->getPriority() ?: 0,
@@ -107,7 +115,6 @@ class DebugWorkflowDefinitionsCommand extends ContainerAwareCommand
 
         if ($workflow) {
             $general = [
-                'label' => $workflow->getLabel(),
                 'entity' => $workflow->getRelatedEntity(),
                 'entity_attribute' => $workflow->getEntityAttributeName(),
                 'steps_display_ordered' => $workflow->isStepsDisplayOrdered(),
@@ -129,12 +136,15 @@ class DebugWorkflowDefinitionsCommand extends ContainerAwareCommand
                 $general['exclusive_record_groups'] = $exclusiveRecordGroups;
             }
 
+            $filter = new FilterHandler();
+
             $definition = [
                 'workflows' => [
                     $workflow->getName() =>
                         array_merge(
                             $general,
-                            $workflow->getConfiguration()
+                            $filter->handle($workflow->getConfiguration())
+                            //$workflow->getConfiguration()
                         )
                 ]
             ];

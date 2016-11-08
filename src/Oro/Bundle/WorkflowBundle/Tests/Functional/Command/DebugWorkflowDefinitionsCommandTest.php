@@ -2,7 +2,10 @@
 
 namespace Oro\Bundle\WorkflowBundle\Tests\Functional\Command;
 
+use Oro\Bundle\WorkflowBundle\Helper\WorkflowTranslationHelper;
+use Oro\Bundle\WorkflowBundle\Tests\Functional\DataFixtures\LoadWorkflowDefinitionsWithGroups;
 use Symfony\Component\DependencyInjection\Container;
+use Symfony\Component\Translation\TranslatorInterface;
 use Symfony\Component\Yaml\Yaml;
 
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
@@ -25,7 +28,10 @@ class DebugWorkflowDefinitionsCommandTest extends WebTestCase
     {
         $this->initClient();
 
-        $this->loadFixtures(['Oro\Bundle\WorkflowBundle\Tests\Functional\DataFixtures\LoadWorkflowDefinitions']);
+        $this->loadFixtures([
+            'Oro\Bundle\WorkflowBundle\Tests\Functional\DataFixtures\LoadWorkflowDefinitions',
+            'Oro\Bundle\WorkflowBundle\Tests\Functional\DataFixtures\LoadWorkflowDefinitionsWithGroups',
+        ]);
 
         $this->container = $this->getContainer();
     }
@@ -39,19 +45,30 @@ class DebugWorkflowDefinitionsCommandTest extends WebTestCase
 
         $result = $this->runCommand(DebugWorkflowDefinitionsCommand::NAME, ['--no-ansi']);
 
+        /** @var TranslatorInterface $translator */
+        $translator = $this->getContainer()->get('translator');
+
         /** @var WorkflowDefinition $workflow */
         foreach ($workflows as $workflow) {
             $this->assertContains($workflow->getName(), $result);
-            $this->assertContains($workflow->getLabel(), $result);
+            $this->assertContains(
+                $translator->trans(
+                    $workflow->getLabel(),
+                    [],
+                    WorkflowTranslationHelper::TRANSLATION_DOMAIN
+                ),
+                $result
+            );
             $this->assertContains($workflow->getRelatedEntity(), $result);
         }
     }
+
     /**
      * @param string $workflowName
      *
      * @dataProvider executeDataProvider
      */
-    public function testExecuteWithArgument($workflowName)
+    public function testExecuteWithArgument($workflowName, $exists = true)
     {
         /** @var WorkflowDefinition $initialWorkflow */
         $initialWorkflow = $this->getContainer()
@@ -61,10 +78,12 @@ class DebugWorkflowDefinitionsCommandTest extends WebTestCase
 
         $result = $this->runCommand(DebugWorkflowDefinitionsCommand::NAME, [$workflowName, '--no-ansi']);
 
-        if ($initialWorkflow) {
+        if ($exists) {
             $this->assertNotContains('No workflow definitions found.', $result);
             $listConfiguration = $this->container->get('oro_workflow.configuration.config.workflow_list');
             $configurationBuilder = $this->container->get('oro_workflow.configuration.builder.workflow_definition');
+
+            file_put_contents('c:/temp/' . $workflowName . '.yml', $result);
 
             $workflowConfiguration = Yaml::parse($result);
             $workflowConfiguration = $listConfiguration->processConfiguration($workflowConfiguration);
@@ -111,10 +130,11 @@ class DebugWorkflowDefinitionsCommandTest extends WebTestCase
     public function executeDataProvider()
     {
         return [
-            [LoadWorkflowDefinitions::NO_START_STEP],
-            [LoadWorkflowDefinitions::START_TRANSITION],
-            [LoadWorkflowDefinitions::WITH_START_STEP],
-            [uniqid()],
+            [LoadWorkflowDefinitions::NO_START_STEP, true],
+            [LoadWorkflowDefinitions::WITH_START_STEP, true],
+            [uniqid(), false],
+            [LoadWorkflowDefinitionsWithGroups::WITH_GROUPS1, true],
+            [LoadWorkflowDefinitionsWithGroups::WITH_GROUPS2, true],
         ];
     }
 }

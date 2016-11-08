@@ -11,7 +11,7 @@ class FilterHandler implements ConfigurationHandlerInterface
 {
     /** @var array */
     protected static $stepKeys = [
-        'name',
+        //'name',
         'order',
         'is_final',
         '_is_start',
