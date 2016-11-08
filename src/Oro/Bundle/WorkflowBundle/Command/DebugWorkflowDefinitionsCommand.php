@@ -124,8 +124,8 @@ class DebugWorkflowDefinitionsCommand extends ContainerAwareCommand
                 ],
             ];
 
-            if ($workflow->getStartStep()) {
-                $general['start_step'] = $workflow->getStartStep()->getName();
+            if ($startStep = $workflow->getStartStep()) {
+                $general['start_step'] = $startStep->getName();
             }
 
             if (count($exclusiveActiveGroups = $workflow->getExclusiveActiveGroups())) {
