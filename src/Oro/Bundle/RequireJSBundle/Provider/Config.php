@@ -127,7 +127,7 @@ class Config
             // build-in configuration
             'require-config' => '../' . substr($configPath, 0, -3),
             // build-in require.js lib
-            'require-lib' => 'ororequirejs/lib/require',
+            'require-lib' => 'npmassets/requirejs/require',
         );
 
         $config['build']['paths'] = array_merge($config['build']['paths'], $paths);

@@ -73,7 +73,7 @@ class WorkflowDefinitionController extends FOSRestController
         } catch (\Exception $exception) {
             return $this->handleView(
                 $this->view(
-                    array('error' => $exception->getMessage()),
+                    ['error' => $exception->getMessage()],
                     Codes::HTTP_BAD_REQUEST
                 )
             );
@@ -100,11 +100,25 @@ class WorkflowDefinitionController extends FOSRestController
      */
     public function postAction(Request $request, WorkflowDefinition $workflowDefinition = null)
     {
-        if (!$workflowDefinition) {
-            $workflowDefinition = new WorkflowDefinition();
+        try {
+            /** @var WorkflowDefinitionHandleBuilder $definitionBuilder */
+            $definitionBuilder = $this->get('oro_workflow.configuration.builder.workflow_definition.handle');
+            $builtDefinition = $definitionBuilder->buildFromRawConfiguration($this->getConfiguration());
+            if (!$workflowDefinition) {
+                $this->getHandler()->createWorkflowDefinition($builtDefinition);
+            } else {
+                $this->getHandler()->updateWorkflowDefinition($workflowDefinition, $builtDefinition);
+            }
+        } catch (\Exception $exception) {
+            return $this->handleView(
+                $this->view(
+                    ['error' => $exception->getMessage()],
+                    Codes::HTTP_BAD_REQUEST
+                )
+            );
         }
 
-        return $this->putAction($workflowDefinition, $request);
+        return $this->handleView($this->view($builtDefinition->getName(), Codes::HTTP_OK));
     }
 
     /**

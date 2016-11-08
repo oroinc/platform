@@ -1,20 +1,12 @@
 config:
-    shim:
-        'autobahn':
-            deps:
-                - 'when'
-                - 'cryptojs/core'
-                - 'cryptojs/enc-base64'
-                - 'cryptojs/hmac'
-                - 'cryptojs/sha256'
-                - 'cryptojs/pbkdf2'
-            exports: 'ab'
     map:
-        'autobahn':
-            'when': 'orosync/js/extend/when'
+        '*':
+            'autobahn': 'orosync/js/extend/autobahn'
+        'orosync/js/extend/autobahn':
+            'autobahn': 'autobahn'
     paths:
-        'when': 'bundles/orosync/lib/when.js'
-        'autobahn': 'bundles/orosync/lib/autobahn.js'
+        'when': 'bundles/bowerassets/when/when.js'
+        'autobahn': 'bundles/bowerassets/autobahnjs/autobahn/autobahn.js'
 
         'orosync/js/sync': 'bundles/orosync/js/sync.js'
         'orosync/js/sync/wamp': 'bundles/orosync/js/sync/wamp.js'
@@ -22,7 +14,3 @@ config:
         'orosync/js/app/modules/content-manager-module': 'bundles/orosync/js/app/modules/content-manager-module.js'
     appmodules:
         - orosync/js/app/modules/content-manager-module
-
-build:
-    paths:
-        'autobahn': 'empty:'

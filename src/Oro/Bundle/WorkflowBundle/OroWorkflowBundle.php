@@ -11,6 +11,8 @@ use Oro\Bundle\WorkflowBundle\DependencyInjection\Compiler\AddAttributeNormalize
 use Oro\Bundle\WorkflowBundle\DependencyInjection\Compiler\AddWorkflowValidationLoaderCompilerPass;
 use Oro\Bundle\WorkflowBundle\DependencyInjection\Compiler\EventTriggerExtensionCompilerPass;
 use Oro\Bundle\WorkflowBundle\DependencyInjection\Compiler\WorkflowChangesEventsCompilerPass;
+use Oro\Bundle\WorkflowBundle\DependencyInjection\Compiler\WorkflowConfigurationHandlerCompilerPass;
+use Oro\Bundle\WorkflowBundle\DependencyInjection\Compiler\WorkflowDefinitionBuilderExtensionCompilerPass;
 
 class OroWorkflowBundle extends Bundle
 {
@@ -25,11 +27,11 @@ class OroWorkflowBundle extends Bundle
         $container->addCompilerPass(new AddWorkflowValidationLoaderCompilerPass());
         $container->addCompilerPass(new WorkflowChangesEventsCompilerPass());
         $container->addCompilerPass(new EventTriggerExtensionCompilerPass());
+        $container->addCompilerPass(new WorkflowConfigurationHandlerCompilerPass);
+        $container->addCompilerPass(new WorkflowDefinitionBuilderExtensionCompilerPass);
 
         $addTopicMetaPass = AddTopicMetaPass::create();
-        $addTopicMetaPass
-             ->add(Topics::EXECUTE_PROCESS_JOB)
-        ;
+        $addTopicMetaPass->add(Topics::EXECUTE_PROCESS_JOB);
 
         $container->addCompilerPass($addTopicMetaPass);
     }

@@ -10,7 +10,6 @@ use Oro\Bundle\WorkflowBundle\Model\WorkflowManager;
 
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
@@ -81,7 +80,7 @@ class WorkflowController extends Controller
      * @AclAncestor("oro_workflow")
      * @param string $transitionName
      * @param WorkflowItem $workflowItem
-     * @return array
+     * @return Response
      */
     public function transitionAction($transitionName, WorkflowItem $workflowItem)
     {

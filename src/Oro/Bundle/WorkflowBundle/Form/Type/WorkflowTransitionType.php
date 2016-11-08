@@ -42,8 +42,6 @@ class WorkflowTransitionType extends AbstractType
      * - "transition_name" - required, name of transition
      *
      * {@inheritdoc}
-     * @throws \Symfony\Component\OptionsResolver\Exception\AccessException
-     * @throws \Symfony\Component\OptionsResolver\Exception\UndefinedOptionsException
      */
     public function configureOptions(OptionsResolver $resolver)
     {
@@ -55,17 +53,20 @@ class WorkflowTransitionType extends AbstractType
             )
         );
 
-        $resolver->setNormalizer('constraints', function (Options $options, $constraints) {
-            if (!$constraints) {
-                $constraints = array();
+        $resolver->setNormalizer(
+            'constraints',
+            function (Options $options, $constraints) {
+                if (!$constraints) {
+                    $constraints = [];
+                }
+
+                $constraints[] = new TransitionIsAllowed(
+                    $options['workflow_item'],
+                    $options['transition_name']
+                );
+
+                return $constraints;
             }
-
-            $constraints[] = new TransitionIsAllowed(
-                $options['workflow_item'],
-                $options['transition_name']
-            );
-
-            return $constraints;
-        });
+        );
     }
 }

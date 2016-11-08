@@ -22,6 +22,9 @@ class ContextAccessorTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @dataProvider getValueDataProvider
+     * @param object|array $context
+     * @param string|PropertyPath $value
+     * @param string $expectedValue
      */
     public function testGetValue($context, $value, $expectedValue)
     {
@@ -65,8 +68,12 @@ class ContextAccessorTest extends \PHPUnit_Framework_TestCase
     /**
      * @dataProvider setValueDataProvider
      * @depends      testGetValue
+     * @param object|array $context
+     * @param PropertyPath $property
+     * @param string|PropertyPath $value
+     * @param string $expectedValue
      */
-    public function testSetValue($context, $property, $value, $expectedValue)
+    public function testSetValue($context, PropertyPath $property, $value, $expectedValue)
     {
         $this->contextAccessor->setValue($context, $property, $value);
         $actualValue = $this->contextAccessor->getValue($context, $property);

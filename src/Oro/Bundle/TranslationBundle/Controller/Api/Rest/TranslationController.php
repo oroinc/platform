@@ -123,7 +123,13 @@ class TranslationController extends FOSRestController
         /* @var $translationManager TranslationManager */
         $translationManager = $this->get('oro_translation.manager.translation');
 
-        $translation = $translationManager->saveValue($key, $data['value'], $locale, $domain, Translation::SCOPE_UI);
+        $translation = $translationManager->saveTranslation(
+            $key,
+            $data['value'],
+            $locale,
+            $domain,
+            Translation::SCOPE_UI
+        );
         $translationManager->flush();
 
         $translated = null !== $translation;

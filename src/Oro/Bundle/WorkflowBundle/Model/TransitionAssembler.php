@@ -111,7 +111,7 @@ class TransitionAssembler extends BaseAbstractAssembler
      */
     protected function assembleTransition($name, array $options, array $definition, $steps, $attributes)
     {
-        $this->assertOptions($options, array('step_to', 'label'));
+        $this->assertOptions($options, array('step_to'));
         $stepToName = $options['step_to'];
         if (empty($steps[$stepToName])) {
             throw new AssemblerException(sprintf('Step "%s" not found', $stepToName));
@@ -119,8 +119,8 @@ class TransitionAssembler extends BaseAbstractAssembler
 
         $transition = new Transition();
         $transition->setName($name)
-            ->setLabel($options['label'])
             ->setStepTo($steps[$stepToName])
+            ->setLabel($this->getOption($options, 'label'))
             ->setMessage($this->getOption($options, 'message'))
             ->setStart($this->getOption($options, 'is_start', false))
             ->setHidden($this->getOption($options, 'is_hidden', false))
