@@ -82,7 +82,7 @@ class RestAdvancedSearchApiTest extends WebTestCase
 
         $this->assertEquals(0, $result['records_count']);
         $this->assertEquals(0, $result['count']);
-        $this->assertArrayNotHasKey('data', $result);
+        $this->assertEmpty($result['data']);
     }
 
     /**
