@@ -118,6 +118,21 @@ class Transition
     protected $scheduleCheckConditions = false;
 
     /**
+     * @var array
+     */
+    protected $initEntities = [];
+
+    /**
+     * @var array
+     */
+    protected $initRoutes = [];
+
+    /**
+     * @var string
+     */
+    protected $initContextAttribute;
+
+    /**
      * Set label.
      *
      * @param string $label
@@ -610,5 +625,65 @@ class Transition
     public function __toString()
     {
         return $this->name;
+    }
+
+    /**
+     * @return array
+     */
+    public function getInitEntities()
+    {
+        return $this->initEntities;
+    }
+
+    /**
+     * @param array $initEntities
+     *
+     * @return $this
+     */
+    public function setInitEntities(array $initEntities)
+    {
+        $this->initEntities = $initEntities;
+
+        return $this;
+    }
+
+    /**
+     * @return array
+     */
+    public function getInitRoutes()
+    {
+        return $this->initRoutes;
+    }
+
+    /**
+     * @param array $initRoutes
+     *
+     * @return $this
+     */
+    public function setInitRoutes(array $initRoutes)
+    {
+        $this->initRoutes = $initRoutes;
+
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getInitContextAttribute()
+    {
+        return $this->initContextAttribute;
+    }
+
+    /**
+     * @param string $initContextAttribute
+     *
+     * @return $this
+     */
+    public function setInitContextAttribute($initContextAttribute)
+    {
+        $this->initContextAttribute = $initContextAttribute;
+
+        return $this;
     }
 }
