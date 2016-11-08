@@ -485,44 +485,27 @@ abstract class BaseDriver
         $type      = $searchCondition['fieldType'];
         $fieldName = $searchCondition['fieldName'];
 
-        $qb->setParameter(
-            sprintf('field%s', $index),
-            $fieldName
-        );
+        $joinField = $this->getJoinField($type);
+        $joinAlias = $this->getJoinAlias($type, $index);
+
+        $fieldParameter = 'field' . $index;
+        $qb->setParameter($fieldParameter, $fieldName);
 
         switch ($condition) {
             case Query::OPERATOR_EXISTS:
-                $operator = 'in';
-                break;
+                $joinCondition = "$joinAlias.field = :$fieldParameter";
+                $qb->innerJoin($joinField, $joinAlias, Join::WITH, $joinCondition);
+                return null;
+
             case Query::OPERATOR_NOT_EXISTS:
-                $operator = 'not in';
-                break;
+                $joinCondition = "$joinAlias.field = :$fieldParameter";
+                $qb->leftJoin($joinField, $joinAlias, Join::WITH, $joinCondition);
+                return "$joinAlias.id IS NULL";
+
             default:
                 throw new ExpressionSyntaxError(
                     sprintf('Unsupported operator "%s"', $condition)
                 );
         }
-
-        $subIndex = $this->getUniqueId($fieldName);
-        $subJoinField = sprintf('%s.%sFields', $subIndex, $type);
-        $subJoinAlias = $this->getJoinAlias($type, $subIndex);
-
-        $subQb = $this->em->createQueryBuilder()
-            ->select(sprintf('%s.id', $subIndex))
-            ->from($this->entityName, $subIndex)
-            ->join($subJoinField, $subJoinAlias)
-            ->andWhere(sprintf(
-                '%s.field = :field%s',
-                $subJoinAlias,
-                $index
-            ));
-
-        $queryString = '(search.id %s (%s))';
-
-        return sprintf(
-            $queryString,
-            $operator,
-            $subQb->getDQL()
-        );
     }
 }

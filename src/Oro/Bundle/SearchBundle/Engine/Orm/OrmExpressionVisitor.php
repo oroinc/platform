@@ -48,8 +48,6 @@ class OrmExpressionVisitor extends ExpressionVisitor
         $joinField = $this->driver->getJoinField($type);
         $joinAlias = $this->driver->getJoinAlias($type, $index);
 
-        $this->qb->innerJoin($joinField, $joinAlias);
-
         $searchCondition = [
             'fieldName'  => $field,
             'condition'  => $condition,
@@ -60,6 +58,8 @@ class OrmExpressionVisitor extends ExpressionVisitor
         if (in_array($comparison->getOperator(), SearchComparison::$filteringOperators)) {
             return $this->driver->addFilteringField($this->qb, $index, $searchCondition);
         }
+
+        $this->qb->innerJoin($joinField, $joinAlias);
 
         if ($type === Query::TYPE_TEXT && !in_array($condition, [Query::OPERATOR_IN, Query::OPERATOR_NOT_IN], true)) {
             if ($searchCondition['fieldValue'] === '') {
@@ -124,7 +124,10 @@ class OrmExpressionVisitor extends ExpressionVisitor
         }
 
         foreach ($expressionObjectList as $child) {
-            $expressionList[] = $this->dispatch($child);
+            $childExpr = $this->dispatch($child);
+            if ($childExpr) {
+                $expressionList[] = $childExpr;
+            }
         }
 
         switch ($expr->getType()) {
