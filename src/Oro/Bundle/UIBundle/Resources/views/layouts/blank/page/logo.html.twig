@@ -1,0 +1,19 @@
+{% block _logo_widget %}
+    {% set attr = layout_attr_defaults(attr, {
+        '~class': ' logo',
+        'src': '/bundles/orofrontend/blank/images/logo/logo-oroacem.svg',
+        'width:': '190',
+        'height':  '35',
+        'alt': 'oroCommerce logo'
+    }) %}
+
+    {% if not app.request.attributes.get('_route') == 'oro_frontend_root' %}
+        <a href="{{ path('oro_frontend_root') }}">
+    {% endif %}
+
+    <img {{ block('block_attributes') }} />
+
+    {% if not app.request.attributes.get('_route') == 'oro_frontend_root' %}
+        </a>
+    {% endif %}
+{% endblock %}
