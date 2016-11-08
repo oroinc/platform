@@ -8,6 +8,8 @@ use Oro\Bundle\UserBundle\Entity\User;
 
 class ApplicationsHelper implements ApplicationsHelperInterface
 {
+    use ApplicationsHelperTrait;
+
     const DEFAULT_APPLICATION = 'default';
 
     /** @var TokenStorageInterface */
@@ -22,22 +24,6 @@ class ApplicationsHelper implements ApplicationsHelperInterface
     public function __construct(TokenStorageInterface $tokenStorage)
     {
         $this->tokenStorage = $tokenStorage;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function isApplicationsValid(array $applications)
-    {
-        if (empty($applications)) {
-            return true;
-        }
-
-        if ($this->currentApplication === false) {
-            $this->currentApplication = $this->getCurrentApplication();
-        }
-
-        return in_array($this->currentApplication, $applications, true);
     }
 
     /**
