@@ -29,6 +29,7 @@ class WorkflowConfiguration extends AbstractConfiguration implements Configurati
 
     const DEFAULT_TRANSITION_DISPLAY_TYPE = 'dialog';
     const DEFAULT_ENTITY_ATTRIBUTE = 'entity';
+    const DEFAULT_INIT_CONTEXT_ATTRIBUTE = 'init_context';
 
     /**
      * @param array $configs
@@ -268,6 +269,15 @@ class WorkflowConfiguration extends AbstractConfiguration implements Configurati
                     ->end()
                     ->scalarNode('dialog_template')
                         ->defaultNull()
+                    ->end()
+                    ->arrayNode('init_entities')
+                        ->prototype('scalar')->end()
+                    ->end()
+                    ->arrayNode('init_routes')
+                        ->prototype('scalar')->end()
+                    ->end()
+                    ->scalarNode('init_context_attribute')
+                        ->defaultValue(self::DEFAULT_INIT_CONTEXT_ATTRIBUTE)
                     ->end()
                     ->append($this->getTransitionTriggers())
                 ->end()
