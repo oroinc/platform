@@ -2,9 +2,9 @@
 
 namespace Oro\Bundle\UserBundle\Async;
 
-use Doctrine\ORM\EntityManager;
-
 use Psr\Log\LoggerInterface;
+
+use Doctrine\ORM\EntityManager;
 
 use Symfony\Bridge\Doctrine\RegistryInterface;
 
@@ -121,7 +121,7 @@ class ExpireUserPasswordsProcessor implements MessageProcessorInterface, TopicSu
      */
     protected function getUserEntityManager()
     {
-        return $this->doctrine->getEntityManagerForClass(User::class);
+        return $this->doctrine->getManagerForClass(User::class);
     }
 
     /**
@@ -139,7 +139,7 @@ class ExpireUserPasswordsProcessor implements MessageProcessorInterface, TopicSu
      */
     protected function getEmailTemplate()
     {
-        return $this->doctrine->getEntityManagerForClass(EmailTemplate::class)
+        return $this->doctrine->getManagerForClass(EmailTemplate::class)
             ->getRepository(EmailTemplate::class)
             ->findOneBy(['name' => self::TEMPLATE_NAME]);
     }

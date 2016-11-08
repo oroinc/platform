@@ -54,7 +54,7 @@ class ExpireUserPasswordsProcessorTest extends \PHPUnit_Framework_TestCase
         $em->expects(self::once())->method('flush');
 
         $doctrine->expects(self::atLeastOnce())
-            ->method('getEntityManagerForClass')
+            ->method('getManagerForClass')
             ->willReturn($em);
 
         $this->notificationManager = $this->getMockForClass(EmailNotificationManager::class);
