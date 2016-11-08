@@ -47,9 +47,9 @@ class PdoMysql extends BaseDriver
      *
      * @return string
      */
-    public static function getPlainSql()
+    public static function getPlainSql($tableName = 'oro_search_index_text', $indexName = 'value')
     {
-        return "ALTER TABLE `oro_search_index_text` ADD FULLTEXT `value` ( `value`)";
+        return sprintf('ALTER TABLE `%s` ADD FULLTEXT `%s` (`value`)', $tableName, $indexName);
     }
 
     /**
@@ -82,6 +82,10 @@ class PdoMysql extends BaseDriver
 
             case Query::OPERATOR_NOT_CONTAINS:
                 $whereExpr = $this->createNotLikeWordsExpr($qb, $words, $index, $searchCondition);
+                break;
+
+            case Query::OPERATOR_STARTS_WITH:
+                $whereExpr = $this->createStartWithExpr($qb, $fieldValue, $index, $searchCondition);
                 break;
 
             case Query::OPERATOR_EQUALS:
@@ -305,27 +309,23 @@ class PdoMysql extends BaseDriver
 
     /**
      * @param QueryBuilder $qb
-     * @param array $words
+     * @param string $fieldValue
      * @param int $index
      * @param array $searchCondition
      * @return string
      */
-    public function createStartWithWordsExpr(
+    public function createStartWithExpr(
         QueryBuilder $qb,
-        array $words,
+        $fieldValue,
         $index,
         array $searchCondition
     ) {
         $joinAlias = $this->getJoinAlias($searchCondition['fieldType'], $index);
 
-        $result = $qb->expr()->orX();
-        foreach (array_values($words) as $key => $value) {
-            $valueParameter = 'value' . $index . '_w' . $key;
-            $result->add("$joinAlias.value LIKE :$valueParameter");
-            $qb->setParameter($valueParameter, $value . '%');
-        }
+        $valueParameter = 'value' . $index;
+        $qb->setParameter($valueParameter, $fieldValue . '%');
 
-        return $result;
+        return "$joinAlias.value LIKE :$valueParameter";
     }
 
     /**
@@ -335,7 +335,7 @@ class PdoMysql extends BaseDriver
      */
     protected function isConcreteField($fieldName)
     {
-        return $fieldName === '*' ? false : true;
+        return $fieldName !== '*';
     }
 
     /**

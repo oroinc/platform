@@ -71,6 +71,10 @@ class PdoPgsql extends BaseDriver
                 $searchString = $this->createNotContainsStringQuery($index, $useFieldName);
                 break;
 
+            case Query::OPERATOR_STARTS_WITH:
+                $searchString = $this->createStartWithStringQuery($index, $useFieldName);
+                break;
+
             case Query::OPERATOR_EQUALS:
                 $searchString = $this->createCompareStringQuery($index, $useFieldName);
                 break;
@@ -229,6 +233,8 @@ class PdoPgsql extends BaseDriver
             } else {
                 $qb->setParameter('value' . $index, implode(' | ', $searchArray));
             }
+        } elseif ($searchCondition === Query::OPERATOR_STARTS_WITH) {
+            $qb->setParameter('value' . $index, $fieldValue . '%');
         } else {
             $qb->setParameter('value' . $index, $fieldValue);
         }
@@ -279,7 +285,6 @@ class PdoPgsql extends BaseDriver
         }
 
         return $stringQuery;
-
     }
 
     /**
@@ -306,27 +311,12 @@ class PdoPgsql extends BaseDriver
     {
         $joinAlias = $this->getJoinAlias(Query::TYPE_TEXT, $index);
 
-        $stringQuery = $joinAlias . '.value LIKE :startWithValue' . $index;
+        $stringQuery = $joinAlias . '.value LIKE :value' . $index;
 
         if ($useFieldName) {
             $stringQuery .= ' AND ' . $joinAlias . '.field = :field' . $index;
         }
 
         return $stringQuery;
-    }
-
-    /**
-     * @param QueryBuilder $qb
-     * @param string $index
-     * @param string $fieldValue
-     * @param bool $isOrderBy
-     */
-    protected function createStartWithStringParameter(QueryBuilder $qb, $index, $fieldValue, $isOrderBy)
-    {
-        $qb->setParameter('startWithValue' . $index, $fieldValue . '%');
-
-        if ($isOrderBy) {
-            $qb->setParameter('orderByValue' . $index, $fieldValue);
-        }
     }
 }
