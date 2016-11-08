@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\SearchBundle\Engine\Orm;
 
-use Doctrine\Common\Collections\Expr\CompositeExpression;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\ORM\Query\Expr\Join;
@@ -491,14 +490,14 @@ abstract class BaseDriver
         $fieldParameter = 'field' . $index;
         $qb->setParameter($fieldParameter, $fieldName);
 
+        $joinCondition = "$joinAlias.field = :$fieldParameter";
+
         switch ($condition) {
             case Query::OPERATOR_EXISTS:
-                $joinCondition = "$joinAlias.field = :$fieldParameter";
                 $qb->innerJoin($joinField, $joinAlias, Join::WITH, $joinCondition);
                 return null;
 
             case Query::OPERATOR_NOT_EXISTS:
-                $joinCondition = "$joinAlias.field = :$fieldParameter";
                 $qb->leftJoin($joinField, $joinAlias, Join::WITH, $joinCondition);
                 return "$joinAlias.id IS NULL";
 
