@@ -174,9 +174,12 @@ class PdoPgsql extends BaseDriver
         $fieldValue = $this->filterTextFieldValue($searchCondition['fieldValue']);
 
         // TODO Need to clarify search requirements in scope of CRM-214
-        if (in_array($searchCondition['condition'], [Query::OPERATOR_CONTAINS, Query::OPERATOR_EQUALS])) {
+        if ($searchCondition['condition'] === Query::OPERATOR_CONTAINS) {
             $searchString = $this->createContainsStringQuery($index, $useFieldName);
             $this->createContainsQueryParameter($qb, $index, $fieldValue, $setOrderBy);
+        } elseif ($searchCondition['condition'] === Query::OPERATOR_EQUALS) {
+            $searchString = $this->createEqualsStringQuery($index, $useFieldName);
+            $this->createEqualsQueryParameter($qb, $index, $fieldValue, $setOrderBy);
         } elseif ($searchCondition['condition'] === Query::OPERATOR_STARTS_WITH) {
             $searchString = $this->createStartWithStringQuery($index, $useFieldName);
             $this->createStartWithStringParameter($qb, $index, $fieldValue, $setOrderBy);
@@ -194,6 +197,40 @@ class PdoPgsql extends BaseDriver
         }
 
         return '(' . $searchString . ' ) ';
+    }
+
+    /**
+     * @param string $index
+     * @param bool $useFieldName
+     * @return string
+     */
+    public function createEqualsStringQuery($index, $useFieldName)
+    {
+        $joinAlias = $this->getJoinAlias(Query::TYPE_TEXT, $index);
+
+        $stringQuery = $joinAlias . '.value = :equals' . $index;
+
+        if ($useFieldName) {
+            $stringQuery .= ' AND ' . $joinAlias . '.field = :field' . $index;
+        }
+
+        return $stringQuery;
+
+    }
+
+    /**
+     * @param QueryBuilder $qb
+     * @param string $index
+     * @param string $fieldValue
+     * @param bool $isOrderBy
+     */
+    public function createEqualsQueryParameter(QueryBuilder $qb, $index, $fieldValue, $isOrderBy)
+    {
+        $qb->setParameter('equals' . $index, $fieldValue);
+
+        if ($isOrderBy) {
+            $qb->setParameter('orderByValue' . $index, $fieldValue);
+        }
     }
 
     /**

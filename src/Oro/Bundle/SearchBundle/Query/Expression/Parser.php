@@ -22,19 +22,100 @@ class Parser
     protected $query;
 
     /** @var array */
-    protected $keywords;
+    protected $keywords = [
+        Query::KEYWORD_SELECT,
+        Query::KEYWORD_FROM,
+        Query::KEYWORD_WHERE,
+
+        Query::KEYWORD_AND,
+        Query::KEYWORD_OR,
+
+        Query::KEYWORD_OFFSET,
+        Query::KEYWORD_MAX_RESULTS,
+        Query::KEYWORD_ORDER_BY,
+
+        Query::KEYWORD_AS
+    ];
 
     /** @var array */
-    protected $operators;
+    protected $operators = [
+        Query::OPERATOR_GREATER_THAN,
+        Query::OPERATOR_GREATER_THAN_EQUALS,
+        Query::OPERATOR_LESS_THAN,
+        Query::OPERATOR_LESS_THAN_EQUALS,
+        Query::OPERATOR_EQUALS,
+        Query::OPERATOR_NOT_EQUALS,
+        Query::OPERATOR_IN,
+        Query::OPERATOR_NOT_IN,
+        Query::OPERATOR_CONTAINS,
+        Query::OPERATOR_NOT_CONTAINS,
+        Query::OPERATOR_STARTS_WITH,
+    ];
 
     /** @var array */
-    protected $types;
+    protected $types = [
+        Query::TYPE_TEXT,
+        Query::TYPE_DATETIME,
+        Query::TYPE_DECIMAL,
+        Query::TYPE_INTEGER,
+    ];
 
     /** @var array */
-    protected $typeOperators;
+    protected $typeOperators = [
+        Query::TYPE_TEXT     => [
+            Query::OPERATOR_CONTAINS,
+            Query::OPERATOR_NOT_CONTAINS,
+            Query::OPERATOR_EQUALS,
+            Query::OPERATOR_NOT_EQUALS,
+            Query::OPERATOR_IN,
+            Query::OPERATOR_NOT_IN,
+            Query::OPERATOR_STARTS_WITH,
+            Query::OPERATOR_EXISTS,
+            Query::OPERATOR_NOT_EXISTS,
+        ],
+        Query::TYPE_INTEGER  => [
+            Query::OPERATOR_GREATER_THAN,
+            Query::OPERATOR_GREATER_THAN_EQUALS,
+            Query::OPERATOR_LESS_THAN,
+            Query::OPERATOR_LESS_THAN_EQUALS,
+            Query::OPERATOR_EQUALS,
+            Query::OPERATOR_NOT_EQUALS,
+            Query::OPERATOR_IN,
+            Query::OPERATOR_NOT_IN,
+            Query::OPERATOR_EXISTS,
+            Query::OPERATOR_NOT_EXISTS,
+        ],
+        Query::TYPE_DECIMAL  => [
+            Query::OPERATOR_GREATER_THAN,
+            Query::OPERATOR_GREATER_THAN_EQUALS,
+            Query::OPERATOR_LESS_THAN,
+            Query::OPERATOR_LESS_THAN_EQUALS,
+            Query::OPERATOR_EQUALS,
+            Query::OPERATOR_NOT_EQUALS,
+            Query::OPERATOR_IN,
+            Query::OPERATOR_NOT_IN,
+            Query::OPERATOR_EXISTS,
+            Query::OPERATOR_NOT_EXISTS,
+        ],
+        Query::TYPE_DATETIME => [
+            Query::OPERATOR_GREATER_THAN,
+            Query::OPERATOR_GREATER_THAN_EQUALS,
+            Query::OPERATOR_LESS_THAN,
+            Query::OPERATOR_LESS_THAN_EQUALS,
+            Query::OPERATOR_EQUALS,
+            Query::OPERATOR_NOT_EQUALS,
+            Query::OPERATOR_IN,
+            Query::OPERATOR_NOT_IN,
+            Query::OPERATOR_EXISTS,
+            Query::OPERATOR_NOT_EXISTS,
+        ]
+    ];
 
     /** @var array */
-    protected $orderDirections;
+    protected $orderDirections = [
+        Query::ORDER_ASC,
+        Query::ORDER_DESC,
+    ];
 
     /**
      * @param Query|null $query
@@ -47,95 +128,6 @@ class Parser
         } else {
             $this->query = $query;
         }
-
-        $this->keywords = [
-            Query::KEYWORD_SELECT,
-            Query::KEYWORD_FROM,
-            Query::KEYWORD_WHERE,
-
-            Query::KEYWORD_AND,
-            Query::KEYWORD_OR,
-
-            Query::KEYWORD_OFFSET,
-            Query::KEYWORD_MAX_RESULTS,
-            Query::KEYWORD_ORDER_BY,
-
-            Query::KEYWORD_AS
-        ];
-
-        $this->operators = [
-            Query::OPERATOR_GREATER_THAN,
-            Query::OPERATOR_GREATER_THAN_EQUALS,
-            Query::OPERATOR_LESS_THAN,
-            Query::OPERATOR_LESS_THAN_EQUALS,
-            Query::OPERATOR_EQUALS,
-            Query::OPERATOR_NOT_EQUALS,
-            Query::OPERATOR_IN,
-            Query::OPERATOR_NOT_IN,
-            Query::OPERATOR_CONTAINS,
-            Query::OPERATOR_NOT_CONTAINS,
-            Query::OPERATOR_STARTS_WITH,
-        ];
-
-        $this->types = [
-            Query::TYPE_TEXT,
-            Query::TYPE_DATETIME,
-            Query::TYPE_DECIMAL,
-            Query::TYPE_INTEGER,
-        ];
-
-        $this->typeOperators = [
-            Query::TYPE_TEXT     => [
-                Query::OPERATOR_CONTAINS,
-                Query::OPERATOR_NOT_CONTAINS,
-                Query::OPERATOR_EQUALS,
-                Query::OPERATOR_NOT_EQUALS,
-                Query::OPERATOR_STARTS_WITH,
-                Query::OPERATOR_EXISTS,
-                Query::OPERATOR_NOT_EXISTS,
-            ],
-            Query::TYPE_INTEGER  => [
-                Query::OPERATOR_GREATER_THAN,
-                Query::OPERATOR_GREATER_THAN_EQUALS,
-                Query::OPERATOR_LESS_THAN,
-                Query::OPERATOR_LESS_THAN_EQUALS,
-                Query::OPERATOR_EQUALS,
-                Query::OPERATOR_NOT_EQUALS,
-                Query::OPERATOR_IN,
-                Query::OPERATOR_NOT_IN,
-                Query::OPERATOR_EXISTS,
-                Query::OPERATOR_NOT_EXISTS,
-            ],
-            Query::TYPE_DECIMAL  => [
-                Query::OPERATOR_GREATER_THAN,
-                Query::OPERATOR_GREATER_THAN_EQUALS,
-                Query::OPERATOR_LESS_THAN,
-                Query::OPERATOR_LESS_THAN_EQUALS,
-                Query::OPERATOR_EQUALS,
-                Query::OPERATOR_NOT_EQUALS,
-                Query::OPERATOR_IN,
-                Query::OPERATOR_NOT_IN,
-                Query::OPERATOR_EXISTS,
-                Query::OPERATOR_NOT_EXISTS,
-            ],
-            Query::TYPE_DATETIME => [
-                Query::OPERATOR_GREATER_THAN,
-                Query::OPERATOR_GREATER_THAN_EQUALS,
-                Query::OPERATOR_LESS_THAN,
-                Query::OPERATOR_LESS_THAN_EQUALS,
-                Query::OPERATOR_EQUALS,
-                Query::OPERATOR_NOT_EQUALS,
-                Query::OPERATOR_IN,
-                Query::OPERATOR_NOT_IN,
-                Query::OPERATOR_EXISTS,
-                Query::OPERATOR_NOT_EXISTS,
-            ]
-        ];
-
-        $this->orderDirections = [
-            Query::ORDER_ASC,
-            Query::ORDER_DESC,
-        ];
     }
 
     /**
@@ -400,6 +392,13 @@ class Parser
         } else {
             $fieldType = $fieldTypeToken->value;
             $fieldName = Criteria::implodeFieldTypeName($fieldType, $fieldNameToken->value);
+        }
+
+        if (!isset($this->typeOperators[$fieldType])) {
+            throw new ExpressionSyntaxError(
+                sprintf('Unknown field type "%s"', $fieldType),
+                $this->stream->current->cursor
+            );
         }
 
         /** @var Token $operatorToken */
