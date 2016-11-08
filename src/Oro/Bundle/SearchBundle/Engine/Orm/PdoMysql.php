@@ -80,6 +80,10 @@ class PdoMysql extends BaseDriver
                 }
                 break;
 
+            case Query::OPERATOR_STARTS_WITH:
+                $whereExpr = $this->createStartWithWordsExpr($qb, $words, $index, $searchCondition);
+                break;
+
             case Query::OPERATOR_NOT_CONTAINS:
                 $whereExpr = $this->createNotLikeWordsExpr($qb, $words, $index, $searchCondition);
                 break;
