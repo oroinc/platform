@@ -337,10 +337,7 @@ define(['underscore', 'orolocale/js/locale-settings/data'
         getCalendarDayOfWeekNames: function(width, asArray) {
             width = (width && this.settings.calendar.dow.hasOwnProperty(width)) ? width : 'wide';
             var result = this.settings.calendar.dow[width];
-            if (asArray) {
-                result = _.map(result, function(v) { return v; });
-            }
-            return result;
+            return asArray ? _.values(result) : _.clone(result);
         },
 
         /**
@@ -350,12 +347,27 @@ define(['underscore', 'orolocale/js/locale-settings/data'
          * @returns {Array}
          */
         getSortedDayOfWeekNames: function(width) {
-            var dowNames = this.getCalendarDayOfWeekNames(width, true);
-            _.times(this.getCalendarFirstDayOfWeek() - 1, function() {
-                dowNames.push(dowNames.shift());
+            var dowNames = this.getCalendarDayOfWeekNames(width);
+            var sortedIndexes = this.getSortedDayOfWeekNumbers();
+            return _.map(sortedIndexes, function(index) {
+                return dowNames[index];
             });
+        },
 
-            return dowNames;
+        /**
+         * Gets week day number array where numbers are sorted by locale
+         *
+         * @param {string} [width] "wide" - default |"abbreviated"|"short"|"narrow"
+         * @returns {Array}
+         */
+        getSortedDayOfWeekNumbers: function() {
+            var keys = _.keys(this.settings.calendar.dow['wide']);
+            var splitPoint = this.getCalendarFirstDayOfWeek() - 1;
+            if (splitPoint <= 0 || splitPoint >= keys.length) {
+                return keys;
+            }
+            keys = keys.slice(splitPoint).concat(keys.slice(0, splitPoint));
+            return _.map(keys, Number);
         },
 
         /**
