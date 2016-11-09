@@ -70,8 +70,11 @@ class EntityAclExtension extends AbstractAclExtension
     /** @var array */
     protected $maskBuilderIdentityToPermissions;
 
-    /** @var \ArrayObject */
-    private $masks;
+    /**
+     * Cached masks from MaskBuilder
+     * @var array
+     */
+    private $masks = [];
 
     /**
      * @param ObjectIdAccessor $objectIdAccessor
@@ -101,7 +104,6 @@ class EntityAclExtension extends AbstractAclExtension
         $this->permissionManager = $permissionManager;
         $this->groupProvider = $groupProvider;
         $this->fieldAclExtension = $fieldAclExtension;
-        $this->masks = new \ArrayObject();
     }
 
     /**
