@@ -12,10 +12,17 @@ use Oro\Component\Layout\Block\Type\Options;
 use Oro\Bundle\LayoutBundle\Layout\Block\Type\FormFieldsType;
 use Oro\Bundle\LayoutBundle\Tests\Unit\BlockTypeTestCase;
 
+/**
+ * @SuppressWarnings(PHPMD.ExcessivePublicCount)
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class FormFieldsTypeTest extends BlockTypeTestCase
 {
     /**
      * @dataProvider optionsDataProvider
+     *
+     * @param $options
+     * @param $expected
      */
     public function testSetDefaultOptions($options, $expected)
     {
@@ -23,6 +30,9 @@ class FormFieldsTypeTest extends BlockTypeTestCase
         $this->assertEquals($expected, $resolvedOptions);
     }
 
+    /**
+     * @return array
+     */
     public function optionsDataProvider()
     {
         return [

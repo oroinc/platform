@@ -125,23 +125,13 @@ class ExpressionProcessor
         $encoding = null
     ) {
         if (is_string($value) && !empty($value)) {
-            switch ($this->checkStringValue($value)) {
-                case self::STRING_IS_REGULAR:
-                    break;
-                case self::STRING_IS_EXPRESSION:
-                    $expr = $this->parseExpression($value);
-                    $value = $this->processExpression($expr, $context, $data, $evaluate, $encoding);
-                    break;
-                case self::STRING_IS_EXPRESSION_STARTED_WITH_BACKSLASH:
-                    // the backslash (\) at the begin of the array key should be removed
-                    $value = substr($value, 1);
-                    break;
-            }
+            $this->processStringValue($value, $context, $data, $evaluate, $encoding);
         } elseif (is_array($value)) {
             foreach ($value as $key => &$item) {
                 $this->processValue($item, $context, $data, $evaluate, $encoding);
                 $value[$key] = $item;
             }
+            unset($item);
         } elseif ($value instanceof OptionValueBag) {
             foreach ($value->all() as $action) {
                 $args = $action->getArguments();
@@ -152,6 +142,34 @@ class ExpressionProcessor
             }
         } elseif ($value instanceof ParsedExpression) {
             $value = $this->processExpression($value, $context, $data, $evaluate, $encoding);
+        }
+    }
+
+    /**
+     * @param mixed                 $value
+     * @param ContextInterface      $context
+     * @param DataAccessorInterface $data
+     * @param bool                  $evaluate
+     * @param null                  $encoding
+     */
+    protected function processStringValue(
+        &$value,
+        ContextInterface $context,
+        DataAccessorInterface $data = null,
+        $evaluate = true,
+        $encoding = null
+    ) {
+        switch ($this->checkStringValue($value)) {
+            case self::STRING_IS_REGULAR:
+                break;
+            case self::STRING_IS_EXPRESSION:
+                $expr = $this->parseExpression($value);
+                $value = $this->processExpression($expr, $context, $data, $evaluate, $encoding);
+                break;
+            case self::STRING_IS_EXPRESSION_STARTED_WITH_BACKSLASH:
+                // the backslash (\) at the begin of the array key should be removed
+                $value = substr($value, 1);
+                break;
         }
     }
 

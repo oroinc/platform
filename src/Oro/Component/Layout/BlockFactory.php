@@ -223,7 +223,7 @@ class BlockFactory implements BlockFactoryInterface
         $this->processExpressions($resolvedOptions);
         $resolvedOptions = $this->resolveValueBags($resolvedOptions);
 
-        if ($resolvedOptions->get('visible')) {
+        if ($resolvedOptions->get('visible') !== false) {
             // point the block builder state to the current block
             $this->blockBuilder->initialize($id);
             // iterate from parent to current
