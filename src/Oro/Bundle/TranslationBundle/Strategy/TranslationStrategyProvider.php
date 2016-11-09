@@ -24,6 +24,9 @@ class TranslationStrategyProvider
         $this->strategy = $this->strategies[$name];
     }
 
+    /**
+     * Reset current strategy
+     */
     public function resetStrategy()
     {
         $this->strategy = null;

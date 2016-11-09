@@ -12,21 +12,26 @@ class TranslationStrategyProviderTest extends \PHPUnit_Framework_TestCase
     {
         /** @var TranslationStrategyInterface $defaultStrategy */
         $defaultStrategy = $this->getMock('Oro\Bundle\TranslationBundle\Strategy\TranslationStrategyInterface');
+        $defaultStrategy->expects($this->once())->method('isApplicable')->willReturn(true);
 
-        $provider = new TranslationStrategyProvider($defaultStrategy);
+        $provider = new TranslationStrategyProvider();
+        $provider->addStrategy($defaultStrategy);
+
         $this->assertEquals($defaultStrategy, $provider->getStrategy());
     }
 
-    public function testSetStrategy()
+    public function testSelectStrategy()
     {
         $defaultName = 'default';
         $customName = 'custom';
 
         /** @var TranslationStrategyInterface|\PHPUnit_Framework_MockObject_MockObject $defaultStrategy */
         $defaultStrategy = $this->getMock('Oro\Bundle\TranslationBundle\Strategy\TranslationStrategyInterface');
+        $defaultStrategy->expects($this->once())->method('isApplicable')->willReturn(true);
         $defaultStrategy->expects($this->any())
             ->method('getName')
             ->willReturn($defaultName);
+
         /** @var TranslationStrategyInterface|\PHPUnit_Framework_MockObject_MockObject $customStrategy */
         $customStrategy = $this->getMock('Oro\Bundle\TranslationBundle\Strategy\TranslationStrategyInterface');
         $customStrategy->expects($this->any())
@@ -34,9 +39,14 @@ class TranslationStrategyProviderTest extends \PHPUnit_Framework_TestCase
             ->willReturn($customName);
 
         $provider = new TranslationStrategyProvider($defaultStrategy);
+        $provider->addStrategy($defaultStrategy);
+        $provider->addStrategy($customStrategy);
+
         $this->assertEquals($defaultStrategy, $provider->getStrategy());
         $this->assertEquals($defaultName, $provider->getStrategy()->getName());
-        $provider->setStrategy($customStrategy);
+
+        $provider->selectStrategy($customName);
+
         $this->assertEquals($customStrategy, $provider->getStrategy());
         $this->assertEquals($customName, $provider->getStrategy()->getName());
     }

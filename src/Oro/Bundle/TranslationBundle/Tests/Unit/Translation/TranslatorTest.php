@@ -459,14 +459,17 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
             ->method('getFallbackLocales')
             ->willReturn([]);
 
+        $strategyProvider->addStrategy($firstStrategy);
+        $strategyProvider->addStrategy($secondStrategy);
+
         $translator = $this->getTranslator($this->getLoader(), $strategyProvider);
 
-        $strategyProvider->setStrategy($firstStrategy);
+        $strategyProvider->selectStrategy($firstStrategyName);
         $translator->getCatalogue('en');
         $this->assertAttributeEquals($firstStrategyName, 'strategyName', $translator);
         $this->assertAttributeCount(1, 'catalogues', $translator);
 
-        $strategyProvider->setStrategy($secondStrategy);
+        $strategyProvider->selectStrategy($secondStrategyName);
         $translator->getCatalogue('ru');
         $this->assertAttributeEquals($secondStrategyName, 'strategyName', $translator);
         $this->assertAttributeCount(1, 'catalogues', $translator);
@@ -491,11 +494,14 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
             ->method('getStrategy')
             ->willReturn($strategy);
         $strategyProvider->expects($this->any())
+            ->method('getFallbackLocales')
+            ->willReturn(['en_US']);
+        $strategyProvider->expects($this->any())
             ->method('getAllFallbackLocales')
             ->with($strategy)
             ->willReturn($allFallbackLocales);
 
-        $translator = $this->getTranslator($this->getLoader(), $strategyProvider);
+        $translator = $this->getTranslator($this->getLoader(), $strategyProvider, ['cache_dir' => '/tmp']);
 
         $this->assertAttributeEmpty('strategyName', $translator);
         $this->assertEmpty($translator->getFallbackLocales());
