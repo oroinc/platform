@@ -117,20 +117,6 @@ layout:
                 visible: '=data["feature"].isFeatureEnabled("product_feature")'
 ```
 
-Use feature state in condition:
-```yaml
-layout:
-    actions:
-        - '@add':
-            id: products
-            parentId: content
-            blockType: datagrid
-            options:
-                grid_name: products-grid
-
-    conditions: '=data["feature"].isFeatureEnabled("product_feature")'
-```
-
 ####Processes, workflows, operations
 
 In Processes, workflows and operations config expression may be used to check feature state

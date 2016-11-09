@@ -2,44 +2,46 @@
 
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Model;
 
-use Symfony\Component\DependencyInjection\ContainerInterface;
-use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 
-use Oro\Bundle\WorkflowBundle\Entity\WorkflowStep;
-use Oro\Bundle\WorkflowBundle\Model\TransitionManager;
-use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
-use Oro\Bundle\WorkflowBundle\Model\Workflow;
-use Oro\Bundle\WorkflowBundle\Model\WorkflowAssembler;
+use Symfony\Component\DependencyInjection\ContainerInterface;
+
 use Oro\Bundle\WorkflowBundle\Configuration\WorkflowConfiguration;
+use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
+use Oro\Bundle\WorkflowBundle\Entity\WorkflowStep;
 use Oro\Bundle\WorkflowBundle\Model\AttributeAssembler;
 use Oro\Bundle\WorkflowBundle\Model\StepAssembler;
 use Oro\Bundle\WorkflowBundle\Model\TransitionAssembler;
+use Oro\Bundle\WorkflowBundle\Model\TransitionManager;
+use Oro\Bundle\WorkflowBundle\Model\Workflow;
+use Oro\Bundle\WorkflowBundle\Model\WorkflowAssembler;
 
 class WorkflowAssemblerTest extends \PHPUnit_Framework_TestCase
 {
-    /**
-     * @var array
-     */
-    protected $workflowParameters = array(
+    /** @var array */
+    protected $workflowParameters = [
         'name' => 'test_name',
         'label' => 'Test Label'
-    );
+    ];
 
-    protected $stepConfiguration = array(
+    /** @var array */
+    protected $stepConfiguration = [
         'label' => 'Test',
         'name' => 'test'
-    );
+    ];
 
-    protected $transitionConfiguration = array(
+    /** @var array */
+    protected $transitionConfiguration = [
         'label' => 'Test',
         'step_to' => 'test_step',
         'transition_definition' => 'test_transition_definition'
-    );
+    ];
 
-    protected $transitionDefinition = array(
-        'test_transition_definition' => array()
-    );
+    /** @var array */
+    protected $transitionDefinition = [
+        'test_transition_definition' => []
+    ];
 
     /**
      * @return Workflow
@@ -164,10 +166,13 @@ class WorkflowAssemblerTest extends \PHPUnit_Framework_TestCase
             ->with($this->isType('string'), $this->isType('array'))
             ->will(
                 $this->returnCallback(
-                    function ($id, array $parameters = array()) {
-                        $this->assertEquals('oro.workflow.transition.start', $id);
-                        $this->assertArrayHasKey('%workflow%', $parameters);
-                        return $this->getStartTransitionLabel($parameters['%workflow%']);
+                    function ($id, array $parameters = []) {
+                        if ($id === 'oro.workflow.transition.start') {
+                            $this->assertArrayHasKey('%workflow%', $parameters);
+                            return $this->getStartTransitionLabel($parameters['%workflow%']);
+                        }
+
+                        return $id;
                     }
                 )
             );
@@ -175,11 +180,19 @@ class WorkflowAssemblerTest extends \PHPUnit_Framework_TestCase
         return $translator;
     }
 
+    /**
+     * @param string $workflowLabel
+     * @return string
+     */
     protected function getStartTransitionLabel($workflowLabel)
     {
         return 'Start ' . $workflowLabel;
     }
 
+    /**
+     * @param string $name
+     * @return \PHPUnit_Framework_MockObject_MockObject
+     */
     protected function getStepMock($name)
     {
         $step = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Model\Step')
@@ -191,6 +204,11 @@ class WorkflowAssemblerTest extends \PHPUnit_Framework_TestCase
         return $step;
     }
 
+    /**
+     * @param string $isStart
+     * @param string $name
+     * @return \PHPUnit_Framework_MockObject_MockObject
+     */
     protected function getTransitionMock($isStart, $name)
     {
         $transition = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Model\Transition')
@@ -205,6 +223,10 @@ class WorkflowAssemblerTest extends \PHPUnit_Framework_TestCase
         return $transition;
     }
 
+    /**
+     * @param string $name
+     * @return \PHPUnit_Framework_MockObject_MockObject
+     */
     protected function getAttributeMock($name)
     {
         $attributeMock = $this->getMockBuilder('Oro\Bundle\ActionBundle\Model\Attribute')

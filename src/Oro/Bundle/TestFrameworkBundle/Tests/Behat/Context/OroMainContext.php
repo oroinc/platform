@@ -396,7 +396,7 @@ class OroMainContext extends MinkContext implements
         $urlPath = parse_url($this->getSession()->getCurrentUrl(), PHP_URL_PATH);
         $route = $this->getContainer()->get('router')->match($urlPath);
 
-        self::assertEquals($route['_route'], $this->getPage($page)->getRoute());
+        self::assertEquals($this->getPage($page)->getRoute(), $route['_route']);
     }
 
     /**
