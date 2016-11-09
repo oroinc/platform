@@ -71,7 +71,7 @@ class LoadEntityByExtendedAssociation implements ProcessorInterface
 
         $associationConfig = $parentConfig->getField($context->getAssociationName());
         $associationDataType = $associationConfig->getDataType();
-        if (DataType::isExtendedAssociation($associationDataType)) {
+        if (!DataType::isExtendedAssociation($associationDataType)) {
             // an association is not extended
             return;
         }

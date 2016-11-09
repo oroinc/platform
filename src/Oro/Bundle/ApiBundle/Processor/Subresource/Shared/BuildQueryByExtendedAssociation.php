@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\ApiBundle\Processor\Subresource\Shared;
 
+use Oro\Bundle\ApiBundle\Request\DataType;
+use Oro\Bundle\EntityExtendBundle\Extend\RelationType;
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
 
@@ -60,17 +62,27 @@ class BuildQueryByExtendedAssociation implements ProcessorInterface
         }
 
         $config = $context->getConfig();
-        $parentConfig = $context->getParentConfig();
-        if (null === $config || null === $parentConfig) {
+        if (null === $config) {
             // an entity configuration does not exist
             return;
         }
 
+        $parentConfig = $context->getParentConfig();
+        if (null === $parentConfig) {
+            // a parent entity configuration does not exist
+            return;
+        }
+
         $associationConfig = $parentConfig->getField($context->getAssociationName());
-        if (0 !== strpos($associationConfig->getDataType(), 'association:manyToOne')
-            || $associationConfig->getTargetType() !== 'to-one'
-        ) {
-            // an association is not extended many-to-one
+        $associationDataType = $associationConfig->getDataType();
+        if (!DataType::isExtendedAssociation($associationDataType)) {
+            // an association is not extended
+            return;
+        }
+
+        list($type, ) = DataType::parseExtendedAssociation($associationDataType);
+        if ($type !== RelationType::MANY_TO_ONE) {
+            // only many-to-one association is supported
             return;
         }
 

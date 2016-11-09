@@ -213,7 +213,6 @@ services:
             - '@oro_api.entity_serializer'
             - '@oro_api.config_provider'
             - '@oro_api.metadata_provider'
-
         tags:
             - { name: oro.api.processor, action: get_relationship, group: load_data, collection: false, priority: -9 }
 
