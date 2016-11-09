@@ -287,6 +287,7 @@ services:
             - '@oro_email.link.email.activity.manager'
             - '@oro_email.link.email.thread.manager'
             - '@oro_email.model.email_activity_updates'
+            - '@oro_message_queue.client.message_producer'
         tags:
             - { name: doctrine.event_listener, event: onFlush }
             - { name: doctrine.event_listener, event: postFlush }
@@ -307,9 +308,85 @@ services:
         class: %oro_email.listener.auto_response_listener.class%
         arguments:
             - '@oro_email.link.autoresponserule_manager'
+            - '@oro_message_queue.client.message_producer'
         tags:
             - { name: doctrine.event_listener, event: onFlush }
             - { name: doctrine.event_listener, event: postFlush }
+
+    oro_email.async.auto_response:
+        class: 'Oro\Bundle\EmailBundle\Async\AutoResponseMessageProcessor'
+        arguments:
+            - '@doctrine'
+            - '@oro_email.autoresponserule_manager'
+            - '@logger'
+        tags:
+            - { name: 'oro_message_queue.client.message_processor' }
+
+    oro_email.async.auto_responses:
+        class: 'Oro\Bundle\EmailBundle\Async\AutoResponsesMessageProcessor'
+        arguments:
+            - '@oro_message_queue.client.message_producer'
+            - '@logger'
+        tags:
+            - { name: 'oro_message_queue.client.message_processor' }
+
+    oro_email.async.add_email_associations:
+        class: 'Oro\Bundle\EmailBundle\Async\AddEmailAssociationsMessageProcessor'
+        arguments:
+            - '@oro_message_queue.client.message_producer'
+            - '@logger'
+        tags:
+            - { name: 'oro_message_queue.client.message_processor' }
+
+    oro_email.async.add_email_association:
+        class: 'Oro\Bundle\EmailBundle\Async\AddEmailAssociationMessageProcessor'
+        arguments:
+            - '@oro_email.async.manager.association_manager'
+            - '@logger'
+        tags:
+            - { name: 'oro_message_queue.client.message_processor' }
+
+    oro_email.async.update_email_owner_association:
+        class: 'Oro\Bundle\EmailBundle\Async\UpdateEmailOwnerAssociationMessageProcessor'
+        arguments:
+            - '@oro_email.async.manager.association_manager'
+            - '@logger'
+        tags:
+            - { name: 'oro_message_queue.client.message_processor' }
+
+    oro_email.async.update_email_owner_associations:
+        class: 'Oro\Bundle\EmailBundle\Async\UpdateEmailOwnerAssociationsMessageProcessor'
+        arguments:
+            - '@oro_message_queue.client.message_producer'
+            - '@logger'
+        tags:
+            - { name: 'oro_message_queue.client.message_processor' }
+
+    oro_email.async.sync_email_seen_flag:
+        class: 'Oro\Bundle\EmailBundle\Async\SyncEmailSeenFlagMessageProcessor'
+        arguments:
+            - '@doctrine'
+            - '@oro_email.email.flag.manager'
+            - '@logger'
+        tags:
+            - { name: 'oro_message_queue.client.message_processor' }
+
+    oro_email.async.purge_email_attachments:
+        class: 'Oro\Bundle\EmailBundle\Async\PurgeEmailAttachmentsMessageProcessor'
+        arguments:
+            - '@doctrine'
+            - '@oro_message_queue.client.message_producer'
+            - '@oro_config.global'
+        tags:
+            - { name: 'oro_message_queue.client.message_processor' }
+
+    oro_email.async.purge_email_attachments_by_ids:
+        class: 'Oro\Bundle\EmailBundle\Async\PurgeEmailAttachmentsByIdsMessageProcessor'
+        arguments:
+            - '@doctrine'
+            - '@logger'
+        tags:
+            - { name: 'oro_message_queue.client.message_processor' }
 
     oro_email.manager.autoresponserule.api:
         class: %oro_email.manager.autoresponserule.api.class%
@@ -519,19 +596,19 @@ services:
     oro_email.workflow.action.send_email:
         class: %oro_email.workflow.action.send_email.class%
         arguments:
-            - '@oro_action.context_accessor'
+            - '@oro_action.expression.context_accessor'
             - '@oro_email.mailer.processor'
             - '@oro_email.email.address.helper'
             - '@oro_entity.entity_name_resolver'
         calls:
             - [setLogger, ['@logger']]
         tags:
-            - { name: oro_workflow.action, alias: send_email }
+            - { name: oro_action.action, alias: send_email }
 
     oro_email.workflow.action.send_email_template:
         class: %oro_email.workflow.action.send_email_template.class%
         arguments:
-            - '@oro_action.context_accessor'
+            - '@oro_action.expression.context_accessor'
             - '@oro_email.mailer.processor'
             - '@oro_email.email.address.helper'
             - '@oro_entity.entity_name_resolver'
@@ -541,7 +618,6 @@ services:
         calls:
             - [setLogger, ['@logger']]
         tags:
-            - { name: oro_workflow.action, alias: send_email_template }
             - { name: oro_action.action, alias: send_email_template }
 
     oro_email.helper.datagrid.emails:
@@ -870,6 +946,8 @@ services:
 
     oro_email.mailbox.process_storage:
         class: %oro_email.mailbox.process_storage.class%
+        arguments:
+            - '@oro_featuretoggle.checker.feature_checker'
 
     oro_email.mailbox_email_owner_provider:
         class: %oro_email.mailbox_email_owner_provider.class%
@@ -896,6 +974,12 @@ services:
             - '@translator.default'
         tags:
             - { name: oro_entity.name_provider, priority: 0}
+
+    oro_email.email_user.provider.email_user_entity_name_provider:
+        class: Oro\Bundle\EmailBundle\Provider\EmailUserEntityNameProvider
+        public: false
+        tags:
+            - { name: oro_entity.name_provider, priority: 0 }
 
     oro_email.link.mailbox_process_storage:
         tags:
@@ -944,55 +1028,55 @@ services:
     oro_email.workflow.condition.instanceof:
         class: %oro_email.workflow.condition.instanceof.class%
         tags:
-            - { name: oro_workflow.condition, alias: instanceof }
+            - { name: oro_action.condition, alias: instanceof }
 
     oro_email.workflow.condition.has_count:
         class: %oro_email.workflow.condition.has_count.class%
         tags:
-            - { name: oro_workflow.condition, alias: has_count }
+            - { name: oro_action.condition, alias: has_count }
 
     oro_email.workflow.action.parse_first_name:
         class: %oro_email.workflow.action.parse_first_name.class%
         arguments:
-            - '@oro_action.context_accessor'
+            - '@oro_action.expression.context_accessor'
             - '@oro_email.email.address.helper'
         tags:
-            - { name: oro_workflow.action, alias: parse_first_name_from_email_address }
+            - { name: oro_action.action, alias: parse_first_name_from_email_address }
 
     oro_email.workflow.action.parse_last_name:
         class: %oro_email.workflow.action.parse_last_name.class%
         arguments:
-            - '@oro_action.context_accessor'
+            - '@oro_action.expression.context_accessor'
             - '@oro_email.email.address.helper'
         tags:
-            - { name: oro_workflow.action, alias: parse_last_name_from_email_address }
+            - { name: oro_action.action, alias: parse_last_name_from_email_address }
 
     oro_email.workflow.action.request_mailboxes:
         class: %oro_email.workflow.action.request_mailboxes.class%
         arguments:
-            - '@oro_action.context_accessor'
+            - '@oro_action.expression.context_accessor'
             - '@doctrine'
             - '@oro_email.mailbox.process_storage'
         tags:
-            - { name: oro_workflow.action, alias: request_mailboxes|find_mailboxes }
+            - { name: oro_action.action, alias: request_mailboxes|find_mailboxes }
 
     oro_email.workflow.action.strip_html_tags:
         class: %oro_email.workflow.action.strip_html_tags.class%
         arguments:
-            - '@oro_action.context_accessor'
+            - '@oro_action.expression.context_accessor'
             - '@oro_ui.html_tag_helper'
         tags:
-            - { name: oro_workflow.action, alias: strip_html_tags }
+            - { name: oro_action.action, alias: strip_html_tags }
 
     oro_email.workflow.action.add_activity_target:
         class: %oro_email.workflow.action.add_activity_target.class%
         arguments:
-            - '@oro_action.context_accessor'
+            - '@oro_action.expression.context_accessor'
             - '@oro_email.email.activity.manager'
             - '@oro_activity_list.provider.chain'
             - '@doctrine.orm.entity_manager'
         tags:
-            - { name: oro_workflow.action, alias: add_email_activity_target }
+            - { name: oro_action.action, alias: add_email_activity_target }
 
     oro_email.placeholder.send_email.filter:
         class: %oro_email.placeholder.send_email.filter.class%
@@ -1048,13 +1132,14 @@ services:
         arguments:
             - '@oro_email.provider.emailowners.provider'
 
-    oro_email.command.association_manager:
-        class: Oro\Bundle\EmailBundle\Command\Manager\AssociationManager
+    oro_email.async.manager.association_manager:
+        class: Oro\Bundle\EmailBundle\Async\Manager\AssociationManager
         arguments:
             - '@oro_entity.doctrine_helper'
             - '@oro_email.email.activity.manager'
             - '@oro_email.provider.emailowners.provider'
             - '@oro_email.email.manager'
+            - '@oro_message_queue.client.message_producer'
 
     oro_email.async.upgrade_email_body_processor:
         class: Oro\Bundle\EmailBundle\Migrations\Schema\v1_29\UpgradeEmailBodyMessageProcessor

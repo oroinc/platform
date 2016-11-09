@@ -100,6 +100,7 @@ datagrids:
                 select:
                     - partial eu.{id, email}
                     - e
+                    - eu.receivedAt as receivedAt
                     - eb.textBody AS body_content
                     - >
                         (SELECT COUNT(_ec.id)
@@ -163,8 +164,8 @@ datagrids:
                 label:
                 frontend_type: html
                 template: OroEmailBundle:Email:Datagrid/Property/attachments.html.twig
-            sentAt:
-                data_name: email.sentAt
+            receivedAt:
+                data_name: receivedAt
                 type: twig
                 label: oro.email.date.label
                 frontend_type: html
@@ -174,8 +175,8 @@ datagrids:
         sorters:
             columns:
                 subject:  { data_name: e.subject }
-                sentAt:   { data_name: e.sentAt }
-            default: { sentAt: %oro_datagrid.extension.orm_sorter.class%::DIRECTION_DESC }
+                receivedAt:   { data_name: receivedAt }
+            default: { receivedAt: %oro_datagrid.extension.orm_sorter.class%::DIRECTION_DESC }
         options:
             entityHint: email
 
@@ -341,6 +342,15 @@ datagrids:
                 type: callback
                 className: 'email-row-is-readed'
                 callable: "@oro_email.helper.datagrid.emails->getReadedRowClosure"
+            email.id: ~
+            view_thread_link:
+                type: url
+                route: oro_email_thread_widget
+                params: { id: email.id }
+            reply_email_link:
+                type: url
+                route: oro_email_email_reply
+                params: { id: email.id }
         options:
             entityHint: email
             toolbarOptions:
@@ -350,6 +360,38 @@ datagrids:
                 pageSize:
                     items: [10]
                     default_per_page: 10
+        actions:
+            reply:
+                type: dialog
+                label: oro.email.datagrid.emails.action.reply
+                link:  reply_email_link
+                icon: reply
+                widgetOptions:
+                    options:
+                        dialogOptions:
+                            title:         "@translator->trans(oro.dashboard.recent_emails.reply)"
+                            allowMaximize: false
+                            allowMinimize: false
+                            modal:         true
+                            dblclick:      maximize
+                            maximizedHeightDecreaseBy: minimize-bar
+                            width: 700
+            view_thread:
+                type: dialog
+                label: oro.email.datagrid.emails.action.view
+                link: view_thread_link
+                icon: eye-open
+                rowAction: true
+                widgetOptions:
+                    options:
+                        dialogOptions:
+                            title:         "@translator->trans(oro.dashboard.recent_emails.view_email)"
+                            allowMaximize: false
+                            allowMinimize: false
+                            modal:         true
+                            dblclick:      maximize
+                            maximizedHeightDecreaseBy: minimize-bar
+                            width: 700
 
     dashboard-recent-emails-inbox-grid:
         extends: dashboard-recent-emails-grid
@@ -358,6 +400,7 @@ datagrids:
                 where:
                     and:
                         - f.type IN ('%oro_email.email_folder.model.class%::INBOX', '%oro_email.email_folder.model.class%::OTHER')
+                        - f.id > 0
         columns:
             receivedAt:
                 type: twig
@@ -389,6 +432,7 @@ datagrids:
                 where:
                     and:
                         - f.type = '%oro_email.email_folder.model.class%::SENT'
+                        - f.id > 0
         columns:
             sentAt:
                 data_name: email.sentAt
@@ -442,6 +486,9 @@ datagrids:
                 receivedAt:  { data_name: eu.receivedAt }
             default:
                 receivedAt: %oro_datagrid.extension.orm_sorter.class%::DIRECTION_DESC
+        options:
+            requireJSModules:
+                - oroemail/js/datagrid/listen-to-read-email-extension
 
     email-templates:
         acl_resource: oro_email_emailtemplate_index

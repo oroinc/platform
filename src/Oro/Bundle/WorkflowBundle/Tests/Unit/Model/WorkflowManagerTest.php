@@ -443,7 +443,7 @@ class WorkflowManagerTest extends \PHPUnit_Framework_TestCase
 
         $workflowDefinition = new WorkflowDefinition();
         $workflowItem->setDefinition($workflowDefinition);
-        $workflowDefinition->setGroups([WorkflowDefinition::GROUP_TYPE_EXCLUSIVE_RECORD => ['group1']]);
+        $workflowDefinition->setExclusiveRecordGroups(['group1']);
         $workflow = $this->createWorkflow();
 
         $workflow->expects($this->once())
