@@ -130,6 +130,10 @@ class OrmExpressionVisitor extends ExpressionVisitor
             }
         }
 
+        if (!$expressionList) {
+            return null;
+        }
+
         switch ($expr->getType()) {
             case CompositeExpression::TYPE_AND:
                 return '(' . implode(' AND ', $expressionList) . ')';
