@@ -35,7 +35,9 @@ class ButtonSearchContextProvider
      */
     protected function buildFromContext(array $context)
     {
-        return (new ButtonSearchContext())
+        $buttonSearchContext = new ButtonSearchContext();
+
+        return $buttonSearchContext
             ->setEntity($context[ContextHelper::ENTITY_CLASS_PARAM], $context[ContextHelper::ENTITY_ID_PARAM])
             ->setGridName($context[ContextHelper::DATAGRID_PARAM])
             ->setGroup($context[ContextHelper::GROUP_PARAM])
