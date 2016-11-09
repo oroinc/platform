@@ -499,7 +499,7 @@ class Workflow
      */
     public function getInitEntities()
     {
-        return $this->getConfigurationData(WorkflowConfiguration::NODE_INIT_ENTITIES, []);
+        return $this->getConfigurationOption(WorkflowConfiguration::NODE_INIT_ENTITIES, []);
     }
 
     /**
@@ -507,7 +507,7 @@ class Workflow
      */
     public function getInitRoutes()
     {
-        return $this->getConfigurationData(WorkflowConfiguration::NODE_INIT_ROUTES, []);
+        return $this->getConfigurationOption(WorkflowConfiguration::NODE_INIT_ROUTES, []);
     }
 
     /**
@@ -516,7 +516,7 @@ class Workflow
      *
      * @return mixed
      */
-    private function getConfigurationData($nodeName, $default = null)
+    private function getConfigurationOption($nodeName, $default = null)
     {
         $configuration = $this->definition->getConfiguration();
 
