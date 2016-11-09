@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\WorkflowBundle\Command;
 
+use Doctrine\Common\Persistence\ObjectRepository;
+
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 
 use Symfony\Component\Console\Helper\Table;
@@ -16,7 +18,7 @@ use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 class DebugWorkflowDefinitionsCommand extends ContainerAwareCommand
 {
     const NAME = 'oro:debug:workflow:definitions';
-    const INLINE_DEPTH = 6;
+    const INLINE_DEPTH = 20;
 
     /**
      * {@inheritdoc}
@@ -51,14 +53,14 @@ class DebugWorkflowDefinitionsCommand extends ContainerAwareCommand
      */
     protected function listWorkflowDefinitions(OutputInterface $output)
     {
-        $workflows = $this->getContainer()->get('doctrine')
-            ->getRepository('Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition')
-            ->findAll();
+        /** @var WorkflowDefinition[] $workflows */
+        $workflows = $this->getWorkflowDefinitionRepository()->findAll();
+
         if (count($workflows)) {
             $table = new Table($output);
             $table->setHeaders(['System Name', 'Label', 'Related Entity', 'Type'])
                 ->setRows([]);
-            /** @var WorkflowDefinition $workflow */
+
             foreach ($workflows as $workflow) {
                 $row = [
                     $workflow->getName(),
@@ -79,7 +81,7 @@ class DebugWorkflowDefinitionsCommand extends ContainerAwareCommand
     }
 
     /**
-     * @param $workflowName
+     * @param string $workflowName
      * @param OutputInterface $output
      *
      * @return int
@@ -87,10 +89,7 @@ class DebugWorkflowDefinitionsCommand extends ContainerAwareCommand
     protected function dumpWorkflowDefinition($workflowName, OutputInterface $output)
     {
         /** @var WorkflowDefinition $workflow */
-        $workflow = $this->getContainer()
-            ->get('doctrine')
-            ->getRepository('Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition')
-            ->findOneBy(['name' => $workflowName]);
+        $workflow = $this->getWorkflowDefinitionRepository()->findOneBy(['name' => $workflowName]);
 
         if ($workflow) {
             $general = [
@@ -100,17 +99,14 @@ class DebugWorkflowDefinitionsCommand extends ContainerAwareCommand
                 'steps_display_ordered' => $workflow->isStepsDisplayOrdered(),
             ];
 
-            if ($workflow->getStartStep()) {
-                $general['start_step'] = $workflow->getStartStep()->getName();
+            $startStep = $workflow->getStartStep();
+            if ($startStep) {
+                $general['start_step'] = $startStep->getName();
             }
 
             $definition = [
                 'workflows' => [
-                    $workflow->getName() =>
-                        array_merge(
-                            $general,
-                            $workflow->getConfiguration()
-                        )
+                    $workflow->getName() => array_merge($general, $workflow->getConfiguration())
                 ]
             ];
 
@@ -122,5 +118,13 @@ class DebugWorkflowDefinitionsCommand extends ContainerAwareCommand
 
             return 1;
         }
+    }
+
+    /**
+     * @return ObjectRepository
+     */
+    protected function getWorkflowDefinitionRepository()
+    {
+        return $this->getContainer()->get('doctrine')->getRepository(WorkflowDefinition::class);
     }
 }
