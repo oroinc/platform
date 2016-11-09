@@ -1,3 +1,11 @@
 .page-content {
-    flex: 1;
+    width: $page-content-width;
+
+    @include clearfix();
+
+    &--has-sidebar {
+        padding: $page-content-with-sidebar-inner-offset;
+
+        order: $page-content-with-sidebar-order;
+    }
 }
