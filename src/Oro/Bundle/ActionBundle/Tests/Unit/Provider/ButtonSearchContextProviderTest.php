@@ -3,24 +3,51 @@
 namespace Oro\Bundle\ActionBundle\Tests\Unit\Provider;
 
 use Oro\Bundle\ActionBundle\Helper\ContextHelper;
+use Oro\Bundle\ActionBundle\Model\ButtonSearchContext;
 use Oro\Bundle\ActionBundle\Provider\ButtonSearchContextProvider;
 
 class ButtonSearchContextProviderTest extends \PHPUnit_Framework_TestCase
 {
-    public function testGetButtonSearchContext()
+    /** @var ContextHelper|\PHPUnit_Framework_MockObject_MockObject */
+    protected $contextHelper;
+
+    /** @var  ButtonSearchContextProvider */
+    protected $provider;
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function setUp()
     {
-        $context = $this->getContext();
-        $contextHelper = $this->getMockBuilder('Oro\Bundle\ActionBundle\Helper\ContextHelper')
+        $this->contextHelper = $this->getMockBuilder(ContextHelper::class)
             ->disableOriginalConstructor()
             ->getMock();
-        $contextHelper->expects($this->once())
+        $this->provider = new ButtonSearchContextProvider($this->contextHelper);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function tearDown()
+    {
+        unset($this->provider, $this->contextHelper);
+    }
+
+    /**
+     * @dataProvider contextProvider
+     *
+     * @param array $context
+     */
+    public function testGetButtonSearchContext(array $context)
+    {
+        $this->contextHelper->expects($this->atLeastOnce())
             ->method('getContext')
             ->willReturn($context);
 
-        $buttonSearchContextProvider = new ButtonSearchContextProvider($contextHelper);
-        $buttonSearchContext = $buttonSearchContextProvider->getButtonSearchContext();
+        $buttonSearchContext = $this->provider->getButtonSearchContext();
 
-        $this->assertInstanceOf('Oro\Bundle\ActionBundle\Model\ButtonSearchContext', $buttonSearchContext);
+        $this->assertInstanceOf(ButtonSearchContext::class, $buttonSearchContext);
+
         $this->assertSame($context[ContextHelper::GROUP_PARAM], $buttonSearchContext->getGroup());
         $this->assertSame($context[ContextHelper::DATAGRID_PARAM], $buttonSearchContext->getGridName());
         $this->assertSame($context[ContextHelper::ENTITY_CLASS_PARAM], $buttonSearchContext->getEntityClass());
@@ -32,15 +59,39 @@ class ButtonSearchContextProviderTest extends \PHPUnit_Framework_TestCase
     /**
      * @return array
      */
-    private function getContext()
+    public function contextProvider()
     {
         return [
-            ContextHelper::ROUTE_PARAM => 'route',
-            ContextHelper::FROM_URL_PARAM => 'ref',
-            ContextHelper::ENTITY_ID_PARAM => 1,
-            ContextHelper::ENTITY_CLASS_PARAM => 'Class',
-            ContextHelper::DATAGRID_PARAM => 'datagrid',
-            ContextHelper::GROUP_PARAM => 'group'
+            'correct_int' => [
+                [
+                    ContextHelper::ROUTE_PARAM => 'route',
+                    ContextHelper::FROM_URL_PARAM => 'ref',
+                    ContextHelper::ENTITY_ID_PARAM => 1,
+                    ContextHelper::ENTITY_CLASS_PARAM => 'Class',
+                    ContextHelper::DATAGRID_PARAM => 'datagrid',
+                    ContextHelper::GROUP_PARAM => 'group'
+                ]
+            ],
+            'correct_string' => [
+                [
+                    ContextHelper::ROUTE_PARAM => 'route',
+                    ContextHelper::FROM_URL_PARAM => 'ref',
+                    ContextHelper::ENTITY_ID_PARAM => uniqid(),
+                    ContextHelper::ENTITY_CLASS_PARAM => 'Class',
+                    ContextHelper::DATAGRID_PARAM => 'datagrid',
+                    ContextHelper::GROUP_PARAM => 'group'
+                ]
+            ],
+            'correct_array' => [
+                [
+                    ContextHelper::ROUTE_PARAM => 'route',
+                    ContextHelper::FROM_URL_PARAM => 'ref',
+                    ContextHelper::ENTITY_ID_PARAM => [1, uniqid()],
+                    ContextHelper::ENTITY_CLASS_PARAM => 'Class',
+                    ContextHelper::DATAGRID_PARAM => 'datagrid',
+                    ContextHelper::GROUP_PARAM => 'group'
+                ]
+            ],
         ];
     }
 }

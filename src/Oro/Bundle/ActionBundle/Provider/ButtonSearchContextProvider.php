@@ -7,7 +7,7 @@ use Oro\Bundle\ActionBundle\Model\ButtonSearchContext;
 
 class ButtonSearchContextProvider
 {
-    /** @var  ContextHelper */
+    /** @var ContextHelper */
     protected $contextHelper;
 
     /**
@@ -24,6 +24,7 @@ class ButtonSearchContextProvider
     public function getButtonSearchContext()
     {
         $context = $this->contextHelper->getContext();
+
         return $this->handlerButtonSearchContext(new ButtonSearchContext(), $context);
     }
 
@@ -43,6 +44,7 @@ class ButtonSearchContextProvider
         $buttonSearchContext->setGroup($context[ContextHelper::GROUP_PARAM]);
         $buttonSearchContext->setReferrer($context[ContextHelper::FROM_URL_PARAM]);
         $buttonSearchContext->setRouteName($context[ContextHelper::ROUTE_PARAM]);
+
         return $buttonSearchContext;
     }
 }
