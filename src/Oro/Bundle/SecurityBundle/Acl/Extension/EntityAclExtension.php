@@ -77,6 +77,12 @@ class EntityAclExtension extends AbstractAclExtension
     private $masks = [];
 
     /**
+     * Cached builders for their identities
+     * @var array
+     */
+    private $builders = [];
+
+    /**
      * @param ObjectIdAccessor                           $objectIdAccessor
      * @param EntityClassResolver                        $entityClassResolver
      * @param EntitySecurityMetadataProvider             $entityMetadataProvider
@@ -253,9 +259,7 @@ class EntityAclExtension extends AbstractAclExtension
             $permission = 'VIEW';
         }
 
-        $identity = $this->getIdentityForPermission($permission);
-
-        return new EntityMaskBuilder($identity, $this->getPermissionsForIdentity($identity));
+        return $this->getEntityMaskBuilder($this->getIdentityForPermission($permission));
     }
 
     /**
@@ -265,7 +269,7 @@ class EntityAclExtension extends AbstractAclExtension
     {
         $result = [];
         foreach ($this->getPermissionsForIdentity() as $identity => $permissions) {
-            $result[] = new EntityMaskBuilder($identity, $permissions);
+            $result[] = $this->getEntityMaskBuilder($identity);
         }
 
         return $result;
@@ -736,18 +740,13 @@ class EntityAclExtension extends AbstractAclExtension
      */
     protected function getMaskBuilderConst($maskBuilderIdentity, $constName)
     {
-        $cachedKey = $maskBuilderIdentity . $constName;
+        $cachedKey = $maskBuilderIdentity . '-' . $constName;
 
-        if (array_key_exists($cachedKey, $this->masks)) {
-            return $this->masks[$cachedKey];
+        if (!array_key_exists($cachedKey, $this->masks)) {
+            $this->masks[$cachedKey] = $this->getEntityMaskBuilder($maskBuilderIdentity)->getMask($constName);
         }
 
-        $maskBuilder = new EntityMaskBuilder(
-            $maskBuilderIdentity,
-            $this->getPermissionsForIdentity($maskBuilderIdentity)
-        );
-
-        return $this->masks[$cachedKey] = $maskBuilder->getMask($constName);
+        return $this->masks[$cachedKey];
     }
 
     /**
@@ -884,5 +883,20 @@ class EntityAclExtension extends AbstractAclExtension
         return $identity === null
             ? $this->maskBuilderIdentityToPermissions
             : $this->maskBuilderIdentityToPermissions[$identity];
+    }
+
+    /**
+     * @param int $identity
+     * @return EntityMaskBuilder
+     */
+    protected function getEntityMaskBuilder($identity)
+    {
+        if (!isset($this->builders[$identity])) {
+            $this->builders[$identity] = new EntityMaskBuilder($identity, $this->getPermissionsForIdentity($identity));
+        }
+
+        $builder = clone $this->builders[$identity];
+
+        return $builder->reset();
     }
 }
