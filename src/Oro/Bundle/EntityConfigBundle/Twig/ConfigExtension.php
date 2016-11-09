@@ -2,10 +2,13 @@
 
 namespace Oro\Bundle\EntityConfigBundle\Twig;
 
+use Doctrine\Common\Util\ClassUtils;
+
 use Symfony\Component\Routing\Exception\ExceptionInterface as RoutingException;
 use Symfony\Component\Routing\Exception\RouteNotFoundException;
 use Symfony\Component\Routing\RouterInterface;
 
+use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityBundle\Tools\EntityClassNameHelper;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
@@ -24,6 +27,9 @@ class ConfigExtension extends \Twig_Extension
     /** @var RouterInterface */
     private $router;
 
+    /** @var DoctrineHelper */
+    protected $doctrineHelper;
+
     /**
      * @param ConfigManager         $configManager
      * @param RouterInterface       $router
@@ -32,11 +38,13 @@ class ConfigExtension extends \Twig_Extension
     public function __construct(
         ConfigManager $configManager,
         RouterInterface $router,
-        EntityClassNameHelper $entityClassNameHelper
+        EntityClassNameHelper $entityClassNameHelper,
+        DoctrineHelper $doctrineHelper
     ) {
         $this->configManager         = $configManager;
         $this->router                = $router;
         $this->entityClassNameHelper = $entityClassNameHelper;
+        $this->doctrineHelper        = $doctrineHelper;
     }
 
     /**
@@ -191,25 +199,34 @@ class ConfigExtension extends \Twig_Extension
     }
 
     /**
-     * @param string $className The entity class name
-     * @param int    $id        The entity id
+     * @param object|string $entityOrClass The entity class name
+     * @param int|null      $id            The entity id
      *
      * @return string|null
      */
-    public function getViewLink($className, $id)
+    public function getViewLink($entityOrClass, $id = null)
     {
-        $route = $this->getClassRoute($className, 'view');
+        if (!$entityOrClass) {
+            return null;
+        }
+
+        if (is_object($entityOrClass)) {
+            $id = $this->doctrineHelper->getSingleEntityIdentifier($entityOrClass);
+            $entityOrClass = ClassUtils::getClass($entityOrClass);
+        }
+
+        $route = $this->getClassRoute($entityOrClass, 'view');
         if ($route) {
             return $this->router->generate($route, ['id' => $id]);
         }
 
         // Generate view link for the custom entity
-        if (ExtendHelper::isCustomEntity($className)) {
+        if (ExtendHelper::isCustomEntity($entityOrClass)) {
             return $this->router->generate(
                 'oro_entity_view',
                 [
                     'id'         => $id,
-                    'entityName' => $this->entityClassNameHelper->getUrlSafeClassName($className)
+                    'entityName' => $this->entityClassNameHelper->getUrlSafeClassName($entityOrClass)
 
                 ]
             );

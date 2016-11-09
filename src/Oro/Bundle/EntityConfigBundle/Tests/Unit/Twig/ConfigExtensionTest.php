@@ -27,8 +27,16 @@ class ConfigExtensionTest extends \PHPUnit_Framework_TestCase
         $entityClassNameHelper = $this->getMockBuilder('Oro\Bundle\EntityBundle\Tools\EntityClassNameHelper')
             ->disableOriginalConstructor()
             ->getMock();
+        $doctrineHelper = $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\DoctrineHelper')
+            ->disableOriginalConstructor()
+            ->getMock();
 
-        $this->twigExtension = new ConfigExtension($this->configManager, $router, $entityClassNameHelper);
+        $this->twigExtension = new ConfigExtension(
+            $this->configManager,
+            $router,
+            $entityClassNameHelper,
+            $doctrineHelper
+    );
     }
 
     protected function tearDown()
