@@ -19,7 +19,7 @@ class EmailBodySyncCommand extends ContainerAwareCommand
     /**
      * {@internaldoc}
      */
-    public function configure()
+    protected function configure()
     {
         $this
             ->setName('oro:email:body-sync')
@@ -38,7 +38,7 @@ class EmailBodySyncCommand extends ContainerAwareCommand
     /**
      * {@internaldoc}
      */
-    public function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output)
     {
         $featureChecker = $this->getContainer()->get('oro_featuretoggle.checker.feature_checker');
 
