@@ -180,16 +180,7 @@ class WorkflowRegistry
             function ($definition) {
                 return $this->getAssembledWorkflow($definition);
             },
-            array_filter(
-                $definitions,
-                function (WorkflowDefinition $definition) {
-                    $isResourceEnabled = $this->featureChecker->isResourceEnabled(
-                        $definition->getName(),
-                        FeatureConfigurationExtension::WORKFLOWS_NODE_NAME
-                    );
-                    return $isResourceEnabled;
-                }
-            )
+            $this->filterEnabledFeaturesWorkflows($definitions)
         );
 
         $workflows = new ArrayCollection();
@@ -258,15 +249,15 @@ class WorkflowRegistry
      */
     protected function filterEnabledFeaturesWorkflows(array $workflowDefinitions)
     {
-        $enabledFeaturesWorkflows = [];
-        foreach ($workflowDefinitions as $definition) {
-            if ($this->featureChecker
-                ->isResourceEnabled($definition->getName(), FeatureConfigurationExtension::WORKFLOWS_NODE_NAME)
-            ) {
-                $enabledFeaturesWorkflows[] = $definition;
+        return array_filter(
+            $workflowDefinitions,
+            function (WorkflowDefinition $definition) {
+                $isResourceEnabled = $this->featureChecker->isResourceEnabled(
+                    $definition->getName(),
+                    FeatureConfigurationExtension::WORKFLOWS_NODE_NAME
+                );
+                return $isResourceEnabled;
             }
-        }
-
-        return $enabledFeaturesWorkflows;
+        );
     }
 }
