@@ -131,9 +131,7 @@ abstract class AbstractEmailSynchronizer implements LoggerAwareInterface
         }
 
         $startTime = $this->getCurrentUtcDateTime();
-        if ($maxExecTimeInMin > 5) {
-            $this->clearInterval = 'PT' . ($maxExecTimeInMin * 5) . 'M';
-        }
+        $this->calculateClearInterval($maxExecTimeInMin);
         $this->resetHangedOrigins();
 
         $maxExecTimeout = $maxExecTimeInMin > 0
@@ -294,18 +292,7 @@ abstract class AbstractEmailSynchronizer implements LoggerAwareInterface
         }
 
         try {
-            $inProcessCode = $settings && $settings->isForceMode()
-                ? self::SYNC_CODE_IN_PROCESS_FORCE : self::SYNC_CODE_IN_PROCESS;
-            if ($this->changeOriginSyncState($origin, $inProcessCode)) {
-                $syncStartTime = $this->getCurrentUtcDateTime();
-                if ($settings) {
-                    $processor->setSettings($settings);
-                }
-                $processor->process($origin, $syncStartTime);
-                $this->changeOriginSyncState($origin, self::SYNC_CODE_SUCCESS, $syncStartTime);
-            } else {
-                $this->logger->info('Skip because it is already in process.');
-            }
+            $this->delegateToProcessor($origin, $processor, $settings);
         } catch (SyncFolderTimeoutException $ex) {
             $this->logger->info($ex->getMessage());
             $this->changeOriginSyncState($origin, self::SYNC_CODE_SUCCESS);
@@ -320,6 +307,30 @@ abstract class AbstractEmailSynchronizer implements LoggerAwareInterface
             );
 
             throw $ex;
+        }
+    }
+
+    /**
+     * @param EmailOrigin $origin
+     * @param AbstractEmailSynchronizationProcessor $processor
+     * @param SynchronizationProcessorSettings|null $settings
+     */
+    protected function delegateToProcessor(
+        EmailOrigin $origin,
+        AbstractEmailSynchronizationProcessor $processor,
+        SynchronizationProcessorSettings $settings = null
+    ) {
+        $inProcessCode = $settings && $settings->isForceMode()
+            ? self::SYNC_CODE_IN_PROCESS_FORCE : self::SYNC_CODE_IN_PROCESS;
+        if ($this->changeOriginSyncState($origin, $inProcessCode)) {
+            $syncStartTime = $this->getCurrentUtcDateTime();
+            if ($settings) {
+                $processor->setSettings($settings);
+            }
+            $processor->process($origin, $syncStartTime);
+            $this->changeOriginSyncState($origin, self::SYNC_CODE_SUCCESS, $syncStartTime);
+        } else {
+            $this->logger->info('Skip because it is already in process.');
         }
     }
 
@@ -576,6 +587,16 @@ abstract class AbstractEmailSynchronizer implements LoggerAwareInterface
     protected function getCurrentUtcDateTime()
     {
         return new \DateTime('now', new \DateTimeZone('UTC'));
+    }
+
+    /**
+     * @param $maxExecTimeInMin
+     */
+    protected function calculateClearInterval($maxExecTimeInMin)
+    {
+        if ($maxExecTimeInMin > 5) {
+            $this->clearInterval = 'PT' . ($maxExecTimeInMin * 5) . 'M';
+        }
     }
 
     /**
