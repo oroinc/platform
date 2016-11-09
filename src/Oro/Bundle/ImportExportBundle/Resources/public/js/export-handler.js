@@ -30,7 +30,7 @@ define(['underscore', 'orotranslation/js/translator', 'oroui/js/messenger'
             if (data.success) {
                 if (data.readsCount > 0) {
                     message = __(
-                        'Export performed successfully, {{ count }} entities were exported.',
+                        'Export performed successfully, {{ count }} entries were exported.',
                         {'count': data.readsCount}
                     );
                     var resultFileLink = '<a href="' + data.url + '" class="no-hash" target="_blank">' +
