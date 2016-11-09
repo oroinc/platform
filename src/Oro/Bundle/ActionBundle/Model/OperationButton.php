@@ -17,6 +17,10 @@ class OperationButton implements ButtonInterface
      */
     protected $buttonContext;
 
+    /**
+     * @param Operation $operation
+     * @param ButtonContext $buttonContext
+     */
     public function __construct(Operation $operation, ButtonContext $buttonContext)
     {
         $this->operation = $operation;
