@@ -70,7 +70,7 @@ class WorkflowSelectTypeTest extends FormIntegrationTestCase
 
         $this->registry->expects($this->any())
             ->method('getRepository')
-            ->with('OroWorkflowBundle:WorkflowDefinition')
+            ->with(WorkflowDefinition::class)
             ->will($this->returnValue($repository));
 
         $form = $this->factory->create($this->type, null, $inputOptions);
