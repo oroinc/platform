@@ -92,7 +92,8 @@ class LocalizationManager
             $keys = array_filter(
                 array_keys($cache),
                 function ($key) use ($ids) {
-                    return in_array($key, $ids, true);
+                    // strict comparing is not allowed because ID might be represented by a string
+                    return in_array($key, $ids);
                 }
             );
 

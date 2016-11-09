@@ -100,7 +100,7 @@ class LocalizationManagerTest extends \PHPUnit_Framework_TestCase
             3 => $this->getEntity(Localization::class, ['id' => 3]),
         ];
 
-        $ids = [1, 3];
+        $ids = [1, '3'];
 
         $result = $this->manager->getLocalizations((array)$ids);
 
@@ -119,7 +119,7 @@ class LocalizationManagerTest extends \PHPUnit_Framework_TestCase
         $this->configManager->expects($this->once())
             ->method('get')
             ->with(Configuration::getConfigKeyByName(Configuration::DEFAULT_LOCALIZATION))
-            ->willReturn(1);
+            ->willReturn('1');
 
         $this->assertSame($localization1, $this->manager->getDefaultLocalization());
     }
@@ -162,7 +162,7 @@ class LocalizationManagerTest extends \PHPUnit_Framework_TestCase
         $this->configManager->expects($this->once())
             ->method('get')
             ->with(Configuration::getConfigKeyByName(Configuration::DEFAULT_LOCALIZATION))
-            ->willReturn(13);
+            ->willReturn('13');
 
         $this->repository->expects($this->never())->method('find');
         $this->repository->expects($this->once())->method('findBy')
