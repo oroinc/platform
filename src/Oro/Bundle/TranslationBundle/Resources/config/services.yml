@@ -192,8 +192,6 @@ services:
 
     oro_translation.strategy.provider:
         class: '%oro_translation.strategy.provider.class%'
-        arguments:
-            - '@oro_translation.strategy.default'
 
     oro_translation.listener.datagrid.language:
         class: 'Oro\Bundle\TranslationBundle\EventListener\Datagrid\LanguageListener'

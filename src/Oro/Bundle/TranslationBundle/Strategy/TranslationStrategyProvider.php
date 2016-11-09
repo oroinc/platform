@@ -10,7 +10,7 @@ class TranslationStrategyProvider
     protected $strategy;
 
     /** @var TranslationStrategyInterface[] */
-    protected $strategies;
+    protected $strategies = [];
 
     /**
      * @param string $name

@@ -197,7 +197,7 @@ class LocaleListener implements EventSubscriberInterface
     }
 
     /**
-     * @return Localization
+     * @return Localization|null
      */
     protected function getCurrentLocalization()
     {

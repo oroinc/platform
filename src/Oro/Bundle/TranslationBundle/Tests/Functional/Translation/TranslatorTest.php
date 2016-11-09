@@ -5,7 +5,9 @@ namespace Oro\Bundle\TranslationBundle\Tests\Functional\Translation;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Bundle\TranslationBundle\Entity\Translation;
 use Oro\Bundle\TranslationBundle\Manager\TranslationManager;
-use Oro\Bundle\TranslationBundle\Tests\Functional\DataFixtures\LoadLanguages;
+use Oro\Bundle\TranslationBundle\Strategy\TranslationStrategyProvider;
+use Oro\Bundle\TranslationBundle\Tests\Functional\DataFixtures\LoadStrategyLanguages;
+use Oro\Bundle\TranslationBundle\Tests\Functional\Stub\Strategy\TranslationStrategy;
 use Oro\Bundle\TranslationBundle\Translation\Translator;
 
 /**
@@ -13,41 +15,85 @@ use Oro\Bundle\TranslationBundle\Translation\Translator;
  */
 class TranslatorTest extends WebTestCase
 {
+    /** @var Translator */
+    protected $translator;
+
     /**
      * {@inheritdoc}
      */
     protected function setUp()
     {
         $this->initClient([], $this->generateBasicAuthHeader(), true);
-        $this->loadFixtures([LoadLanguages::class]);
+        $this->loadFixtures([LoadStrategyLanguages::class]);
+
+        $this->translator = $this->getContainer()->get('translator.default');
     }
 
     public function testRebuildCache()
     {
-        /** @var Translator $translator */
-        $translator = $this->getContainer()->get('translator.default');
+        $provider = new TranslationStrategyProvider();
+        $this->getContainer()->set('oro_translation.strategy.provider', $provider);
+
+        $provider->addStrategy(
+            new TranslationStrategy('strategy1',['lang1' => [], 'lang2' => [], 'lang3' => [], 'lang4' => []])
+        );
+        $provider->addStrategy(
+            new TranslationStrategy('strategy2', ['lang2' => ['lang3' => ['lang4' => ['lang1' => []]]]])
+        );
+        $provider->addStrategy(
+            new TranslationStrategy('strategy3', ['lang3' => [], 'lang4' => ['lang1' => ['lang2' => []]]])
+        );
 
         // build initial cache
-        $translator->rebuildCache();
+        $this->translator->rebuildCache();
 
         $key = uniqid('TRANSLATION_KEY_', true);
-        $domain = TranslationManager::DEFAULT_DOMAIN;
-        $locale = LoadLanguages::LANGUAGE2;
-        $expectedValue = uniqid('TEST_VALUE_', true);
+        $val1 = uniqid('TEST_VALUE_', true);
+        $val2 = uniqid('TEST_VALUE_', true);
 
-        /** @var TranslationManager $manager */
+        /* @var $manager TranslationManager */
         $manager = $this->getContainer()->get('oro_translation.manager.translation');
-        $manager->saveTranslation($key, $expectedValue, $locale, $domain, Translation::SCOPE_UI);
-
+        $manager->saveTranslation($key, $val1, 'lang1', 'messages', Translation::SCOPE_UI);
+        $manager->saveTranslation($key, $val2, 'lang2', 'messages', Translation::SCOPE_UI);
         $manager->flush();
         $manager->clear();
 
-        // Ensure that catalog still contains old translated value
-        $this->assertNotEquals($expectedValue, $translator->trans($key, [], $domain, $locale));
+        $provider->selectStrategy('strategy1');
+        $this->assertTranslationEquals($key, ['lang1' => $key, 'lang2' => $key, 'lang3' => $key, 'lang4' => $key]);
 
-        $translator->rebuildCache();
+        $provider->selectStrategy('strategy2');
+        $this->assertTranslationEquals($key, ['lang1' => $key, 'lang2' => $key, 'lang3' => $key, 'lang4' => $key]);
 
-        // Ensure that catalog now contains new translated value
-        $this->assertEquals($expectedValue, $translator->trans($key, [], $domain, $locale));
+        $provider->selectStrategy('strategy3');
+        $this->assertTranslationEquals($key, ['lang1' => $key, 'lang2' => $key, 'lang3' => $key, 'lang4' => $key]);
+
+        $this->translator->rebuildCache();
+
+        $provider->selectStrategy('strategy1');
+        $this->assertTranslationEquals($key, ['lang1' => $val1, 'lang2' => $val2, 'lang3' => $key, 'lang4' => $key]);
+
+        $provider->selectStrategy('strategy2');
+        $this->assertTranslationEquals($key, ['lang1' => $val1, 'lang2' => $val2, 'lang3' => $val2, 'lang4' => $val2]);
+
+        $provider->selectStrategy('strategy3');
+        $this->assertTranslationEquals($key, ['lang1' => $val1, 'lang2' => $val2, 'lang3' => $key, 'lang4' => $key]);
+    }
+
+    /**
+     * @param string $key
+     * @param array $items
+     * @param string $domain
+     */
+    protected function assertTranslationEquals($key, array $items, $domain = 'messages')
+    {
+        $actualData = [];
+        $expectedData = [];
+
+        foreach ($items as $language => $expectedValue) {
+            $actualData[$language] = $this->translator->trans($key, [], $domain, $language);
+            $expectedData[$language] = $expectedValue;
+        }
+
+        $this->assertEquals($expectedData, $actualData);
     }
 }

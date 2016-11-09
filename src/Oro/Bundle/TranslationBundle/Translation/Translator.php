@@ -208,11 +208,14 @@ class Translator extends BaseTranslator
     {
         $cacheDir = $this->originalOptions['cache_dir'];
 
-        $tmpDir = $cacheDir . DIRECTORY_SEPARATOR . uniqid('CACHE_', true);
+        $tmpDir = $cacheDir . uniqid('', true);
 
         $options = array_merge($this->originalOptions, ['cache_dir' => $tmpDir]);
 
         $provider = $this->getStrategyProvider();
+
+        $currentStrategy = $provider->getStrategy();
+
         foreach ($provider->getStrategies() as $strategy) {
             $provider->selectStrategy($strategy->getName());
 
@@ -223,7 +226,7 @@ class Translator extends BaseTranslator
             $translator->warmUp($tmpDir);
         }
 
-        $provider->resetStrategy();
+        $provider->selectStrategy($currentStrategy->getName());
 
         $iterator = new \IteratorIterator(new \DirectoryIterator($tmpDir));
         foreach ($iterator as $path) {
