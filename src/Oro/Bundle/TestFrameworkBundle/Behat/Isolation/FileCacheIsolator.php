@@ -23,7 +23,7 @@ class FileCacheIsolator extends OsRelatedIsolator implements IsolatorInterface
     public function __construct(KernelInterface $kernel)
     {
         $this->cacheDir   = $kernel->getCacheDir();
-        $this->cacheDump  = $this->cacheDir.DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'cache_dump';
+        $this->cacheDump  = sys_get_temp_dir().DIRECTORY_SEPARATOR.'oro_cache_dump';
         $this->filesystem = new Filesystem();
     }
 
@@ -62,6 +62,7 @@ class FileCacheIsolator extends OsRelatedIsolator implements IsolatorInterface
         return [
             OsRelatedIsolator::LINUX_OS,
             OsRelatedIsolator::MAC_OS,
+            OsRelatedIsolator::WINDOWS_OS,
         ];
     }
 }
