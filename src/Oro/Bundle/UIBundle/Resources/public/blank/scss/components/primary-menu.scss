@@ -1,3 +1,5 @@
+// @theme: blank
+
 .primary-menu {
     @include list-normalize();
 
@@ -6,22 +8,18 @@
 
     &__item {
         flex: 0 1 auto;
-
-        padding: ($offset-y-s / 2) 0;
-
-        &--current {
-            .primary-menu__link {
-                text-decoration: none;
-
-                font-weight: 700;
-            }
-        }
     }
 
     &__link {
-        display: block;
-
         color: $primary-menu-link-color;
+
+        &--current {
+            color: $primary-menu-link-color-current;
+        }
+
+        &:hover {
+            color: $primary-menu-link-color-hover;
+        }
     }
 
     &--vertical {

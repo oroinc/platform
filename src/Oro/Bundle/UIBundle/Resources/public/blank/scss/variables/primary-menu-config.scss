@@ -1,3 +1,5 @@
-$primary-menu-title-offset-bottom: 9px !default;
-$primary-menu-item-inner-offset: 5px 0 0 18px !default;
-$primary-menu-link-color: get-color('additional', 'dark') !default;
+// @theme: blank
+
+$primary-menu-link-color: get-color('ui', 'normal') !default;
+$primary-menu-link-color-hover: get-color('ui', 'focus') !default;
+$primary-menu-link-color-current: get-color('ui', 'focus') !default;
