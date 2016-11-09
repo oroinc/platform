@@ -347,27 +347,12 @@ define(['underscore', 'orolocale/js/locale-settings/data'
          * @returns {Array}
          */
         getSortedDayOfWeekNames: function(width) {
-            var dowNames = this.getCalendarDayOfWeekNames(width);
-            var sortedIndexes = this.getSortedDayOfWeekNumbers();
-            return _.map(sortedIndexes, function(index) {
-                return dowNames[index];
-            });
-        },
-
-        /**
-         * Gets week day number array where numbers are sorted by locale
-         *
-         * @param {string} [width] "wide" - default |"abbreviated"|"short"|"narrow"
-         * @returns {Array}
-         */
-        getSortedDayOfWeekNumbers: function() {
-            var keys = _.keys(this.settings.calendar.dow['wide']);
+            var dowNames = this.getCalendarDayOfWeekNames(width, true);
             var splitPoint = this.getCalendarFirstDayOfWeek() - 1;
-            if (splitPoint <= 0 || splitPoint >= keys.length) {
-                return keys;
+            if (splitPoint > 0 && splitPoint < dowNames.length) {
+                dowNames = dowNames.slice(splitPoint).concat(dowNames.slice(0, splitPoint));
             }
-            keys = keys.slice(splitPoint).concat(keys.slice(0, splitPoint));
-            return _.map(keys, Number);
+            return dowNames;
         },
 
         /**

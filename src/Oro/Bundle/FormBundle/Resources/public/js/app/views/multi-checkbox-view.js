@@ -13,12 +13,14 @@ define(function(require) {
 
         VALUES_SEPARATOR: ',',
 
-        boundInput: null,
+        inputName: null,
+
+        value: [],
 
         items: null,
 
         events: {
-            'change input[type=checkbox]': 'onChange'
+            'change input[type=checkbox]': 'onCheckboxToggle'
         },
 
         /**
@@ -27,18 +29,19 @@ define(function(require) {
          * @param {Object} options
          */
         initialize: function(options) {
-            _.extend(this, _.pick(options, 'boundInput', 'items'));
+            _.extend(this, _.pick(options, 'inputName', 'items', 'value'));
             MultiCheckboxView.__super__.initialize.apply(this, arguments);
         },
 
         getTemplateData: function() {
             var data = MultiCheckboxView.__super__.getTemplateData.apply(this, arguments);
-            data.values = this.getValue();
-            data.items = this.items;
+            data.values = this.value;
+            data.options = this.items;
+            data.inputName = this.inputName;
             return data;
         },
 
-        onChange: function(e) {
+        onCheckboxToggle: function(e) {
             var values = this.getValue();
             if (e.target.checked && _.indexOf(values, e.target.value) === -1) {
                 values.push(e.target.value);
@@ -49,14 +52,14 @@ define(function(require) {
         },
 
         getValue: function() {
-            var value = this.boundInput.val();
-            return value.length > 0 ? value.split(this.VALUES_SEPARATOR) : [];
+            return this.$('[name="' + this.inputName + '"]').val();
         },
 
         setValue: function(values) {
             var oldValue = this.getValue();
             if (oldValue.length !== values.length || _.difference(oldValue, values).length !== 0) {
-                this.boundInput.val(values.join(this.VALUES_SEPARATOR)).trigger('change');
+                this.value = values;
+                this.$('[name="' + this.inputName + '"]').val(values).trigger('change');
             }
         }
     });

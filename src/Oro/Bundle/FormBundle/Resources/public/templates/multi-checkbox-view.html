@@ -1,7 +1,15 @@
 <div class="multi-checkbox-control">
-        <% _.each(items, function (item) { %>
-        <label class="multi-checkbox-control__item"><input type="checkbox" value="<%- item.value %>"
-            <% if (_.indexOf(values, item.value) !== -1) { %> checked="checked"<% } %>>
-            <span class="multi-checkbox-control_text"><%- item.text %></span></label>
+    <select multiple name="<%- inputName %>">
+        <% _.each(options, function (option) { %>
+        <option value="<%= option.value %>" title="<%- option.text %>"
+        <% if (_.indexOf(values, option.value) !== -1) { %> selected="selected"<% } %>>
+        <%- option.text %>
+        </option>
         <% }); %>
+    </select>
+    <% _.each(options, function (option) { %>
+    <label class="multi-checkbox-control__item"><input type="checkbox" value="<%- option.value %>"
+        <% if (_.indexOf(values, option.value) !== -1) { %> checked="checked"<% } %>>
+        <span class="multi-checkbox-control_text"><%- option.text %></span></label>
+    <% }); %>
 </div>
