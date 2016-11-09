@@ -8,7 +8,7 @@ use Oro\Bundle\IntegrationBundle\Manager\FieldsChangesManager;
 use Oro\Bundle\IntegrationBundle\Model\Action\RemoveFieldsChangesAction;
 use Oro\Bundle\WorkflowBundle\Model\ProcessData;
 
-use Oro\Component\Action\Model\ContextAccessor;
+use Oro\Component\ConfigExpression\ContextAccessor;
 
 class RemoveFieldsChangesActionTest extends \PHPUnit_Framework_TestCase
 {

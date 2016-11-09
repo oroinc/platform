@@ -1,0 +1,8 @@
+parameters:
+    oro_scope.entity.scope.class: Oro\Bundle\ScopeBundle\Entity\Scope
+services:
+    oro_scope.scope_manager:
+        class: Oro\Bundle\ScopeBundle\Manager\ScopeManager
+        arguments:
+         - '@doctrine'
+         - '@oro_entity.entity_field_provider.link'

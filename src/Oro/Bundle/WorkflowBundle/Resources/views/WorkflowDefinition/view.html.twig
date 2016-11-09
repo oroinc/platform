@@ -1,5 +1,5 @@
 {% extends 'OroUIBundle:actions:view.html.twig' %}
-{% import 'OroUIBundle::macros.html.twig' as macros %}
+{% import 'OroWorkflowBundle::macros.html.twig' as workflowMacros %}
 
 {% oro_title_set({params : {"%workflow_definition.label%": entity.label} }) %}
 
@@ -9,7 +9,7 @@
         module: 'oroworkflow/js/app/components/workflow-viewer-component',
         options: {
             entity: {
-                configuration: workflowConfiguration,
+                configuration: entity.configuration,
                 name: entity.name,
                 label: entity.label,
                 entity: entity.relatedEntity,
@@ -130,14 +130,18 @@
     </div>
 {% endblock breadcrumbs %}
 
-{% macro view_step_row(stepData, entity) %}
+{% macro view_step_row(stepData, entity, translateLinks) %}
+    {% import 'OroWorkflowBundle::macros.html.twig' as workflowMacros %}
     <tr>
-        <td class="step-name">
+        <td class="step-name workflow-translatable-label">
             {{ stepData.label }}
             {% if stepData.is_final %}
-                <strong title="{{ "oro.workflow.workflowdefinition.step.is_final.tooltip"|trans({}, "tooltips") }}">
+                <strong title="{{ "oro.workflow.workflowdefinition.step.is_final.tooltip"|trans }}">
                     ({{ "Final"|trans }})
                 </strong>
+            {% endif %}
+            {% if stepData.order >= 0 and translateLinks %}
+                {{ workflowMacros.renderGoToTranslationsIconByLink(translateLinks.steps[stepData.name].label) }}
             {% endif %}
         </td>
         <td class="step-transitions">
@@ -147,16 +151,19 @@
                         {% set currentTransition = entity.configuration.transitions[transitionName] %}
                         {% set toStep = entity.configuration.steps[currentTransition.step_to] %}
                         <li>
-                            <span>{{ currentTransition.label }}</span>
+                            <span>{{ currentTransition.label|trans({},'workflows') }}</span>
+                            {% if (translateLinks) %}
+                                {{ workflowMacros.renderGoToTranslationsIconByLink(translateLinks.transitions[transitionName].label) }}
+                            {% endif %}
                             <i class="icon-long-arrow-right"></i>
-                            <span title="{{ "oro.workflow.workflowdefinition.transition.step_to.tooltip"|trans({}, "tooltips") }}">{{ toStep.label }}</span>
+                            <span title="{{ "oro.workflow.workflowdefinition.transition.step_to.tooltip"|trans }}">{{ toStep.label|trans({},'workflows') }}</span>
                         </li>
                     {% endfor %}
                 </ul>
             {% endif %}
         </td>
         <td>
-            <span title="{{ "oro.workflow.workflowdefinition.step.order.tooltip"|trans({}, "tooltips") }}">
+            <span title="{{ "oro.workflow.workflowdefinition.step.order.tooltip"|trans }}">
                 {{ stepData.order }}
             </span>
         </td>
@@ -182,10 +189,49 @@
 
 {% block content_data %}
     {% set workflowDefinitionInfo %}
-        {{ oro_widget_render({
-            'widgetType': 'block',
-            'url': path('oro_workflow_definition_info', {name: entity.name}),
-        }) }}
+    <div class="widget-content">
+        <div class="row-fluid form-horizontal">
+            <div class="responsive-block">
+                {{ UI.renderHtmlProperty('oro.workflow.workflowdefinition.label.label'|trans, entity.label ~ workflowMacros.renderGoToTranslationsIconByLink(translateLinks.label) ) }}
+
+                {{ UI.renderProperty(
+                    'oro.workflow.workflowdefinition.related_entity.label'|trans,
+                    oro_entity_config_value(entity.relatedEntity, 'label')|trans
+                ) }}
+                {{ UI.renderProperty(
+                    'oro.workflow.block.view.workflow.default_step'|trans,
+                    entity.startStep ? entity.startStep.label|trans({},'workflows') : ''
+                ) }}
+                {{ UI.renderProperty(
+                    'oro.workflow.workflowdefinition.steps_display_ordered.label'|trans,
+                    entity.stepsDisplayOrdered ? 'Yes'|trans : 'No'|trans
+                ) }}
+                {{ UI.renderProperty(
+                    'oro.workflow.workflowdefinition.priority.label'|trans,
+                    entity.priority
+                ) }}
+
+                {% set activeGroups %}
+                    {% if entity.exclusiveActiveGroups is not empty %}
+                        {{ UI.renderList(entity.exclusiveActiveGroups) }}
+                    {% else %}
+                        {{ 'N/A'|trans }}
+                    {% endif %}
+                {% endset %}
+
+                {% set recordGroups %}
+                    {% if entity.exclusiveRecordGroups is not empty %}
+                        {{ UI.renderList(entity.exclusiveRecordGroups) }}
+                    {% else %}
+                        {{ 'N/A'|trans }}
+                    {% endif %}
+                {% endset %}
+
+                {{ UI.renderHtmlProperty('oro.workflow.workflowdefinition.exclusive_active_groups.label'|trans, activeGroups) }}
+                {{ UI.renderHtmlProperty('oro.workflow.workflowdefinition.exclusive_record_groups.label'|trans, recordGroups) }}
+            </div>
+        </div>
+    </div>
     {% endset %}
 
     {% set workflowStepsAndTransitions %}
@@ -209,23 +255,24 @@
                                         <th class="label-column"><span>{{ "Step"|trans }}</span></th>
                                         <th><span>{{ "Transitions"|trans }}</span></th>
                                         <th>
-                                            <span title="{{ "oro.workflow.workflowdefinition.step.order.tooltip"|trans({}, "tooltips") }}">
+                                            <span title="{{ "oro.workflow.workflowdefinition.step.order.tooltip"|trans }}">
                                                 {{ "Position"|trans }}
                                             </span>
                                         </th>
                                     </tr>
                                 </thead>
                                 <tbody class="item-container">
-                                {%- for stepData in entity.configuration.steps -%}
+                                {%- for stepName, stepData in entity.configuration.steps -%}
                                     {#
                                         System workflows wont have (Start) step stored into database.
                                         So we need to force show it for UI.
                                     #}
+                                    {% set stepData = stepData|merge({'name': stepName}) %}
                                     {% if loop.first and entity.isSystem %}
                                         {{ _self.view_start_step_row(entity) }}
                                     {% endif %}
 
-                                    {{ _self.view_step_row(stepData, entity) }}
+                                    {{ _self.view_step_row(stepData, entity, translateLinks) }}
                                 {%- else -%}
                                     {{ _self.view_start_step_row(entity) }}
                                 {%- endfor -%}

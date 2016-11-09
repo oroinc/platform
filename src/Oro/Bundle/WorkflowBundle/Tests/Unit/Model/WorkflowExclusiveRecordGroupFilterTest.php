@@ -196,9 +196,7 @@ class WorkflowExclusiveRecordGroupFilterTest extends \PHPUnit_Framework_TestCase
     {
         $definition = new WorkflowDefinition();
         $definition->setName($workflowName);
-        $definition->setGroups(
-            [WorkflowDefinition::GROUP_TYPE_EXCLUSIVE_RECORD => $exclusiveRecordGroups]
-        );
+        $definition->setExclusiveRecordGroups($exclusiveRecordGroups);
 
         $workflowMock = $this->getMockBuilder(Workflow::class)->disableOriginalConstructor()->getMock();
 
@@ -216,11 +214,7 @@ class WorkflowExclusiveRecordGroupFilterTest extends \PHPUnit_Framework_TestCase
     protected function getWorkflowItem($workflowName, array $exclusiveRecordGroups)
     {
         $definition = new WorkflowDefinition();
-        $definition->setGroups(
-            [
-                WorkflowDefinition::GROUP_TYPE_EXCLUSIVE_RECORD => $exclusiveRecordGroups
-            ]
-        );
+        $definition->setExclusiveRecordGroups($exclusiveRecordGroups);
 
         $workflowItemMock = $this->getMockBuilder(WorkflowItem::class)->disableOriginalConstructor()->getMock();
 

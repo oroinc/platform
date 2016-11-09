@@ -4,7 +4,6 @@ parameters:
     oro_action.configuration.validator.action_group.class: Oro\Bundle\ActionBundle\Configuration\ActionGroupConfigurationValidator
     oro_action.configuration.validator.operation.class: Oro\Bundle\ActionBundle\Configuration\OperationConfigurationValidator
     oro_action.configuration.provider.class: Oro\Bundle\ActionBundle\Configuration\ConfigurationProvider
-    oro_action.configuration_pass.replace_property_path.class: Oro\Bundle\ActionBundle\Model\ConfigurationPass\ReplacePropertyPath
 
 services:
     oro_action.configuration.config.operation_list:
@@ -46,7 +45,7 @@ services:
             - 'action_groups'
 
     oro_action.configuration_pass.replace_property_path:
-        class: %oro_action.configuration_pass.replace_property_path.class%
+        class: 'Oro\Component\ConfigExpression\ConfigurationPass\ReplacePropertyPath'
         arguments:
             - "data"
 
