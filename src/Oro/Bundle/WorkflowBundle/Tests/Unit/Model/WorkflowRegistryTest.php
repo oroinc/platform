@@ -335,9 +335,8 @@ class WorkflowRegistryTest extends \PHPUnit_Framework_TestCase
 
     public function testGetActiveWorkflows()
     {
-        $entityClass = 'testEntityClass';
         $workflowName = 'test_workflow';
-        $workflow = $this->createWorkflow($workflowName, $entityClass);
+        $workflow = $this->createWorkflow($workflowName);
         $workflowDefinition = $workflow->getDefinition();
 
         $this->featureChecker->expects($this->once())
@@ -352,16 +351,15 @@ class WorkflowRegistryTest extends \PHPUnit_Framework_TestCase
         $this->setUpEntityManagerMock($workflowDefinition);
 
         $this->assertEquals(
-            new ArrayCollection(['test_workflow' => $workflow]),
-            $this->registry->getActiveWorkflows($entityClass)
+            new ArrayCollection([$workflowName => $workflow]),
+            $this->registry->getActiveWorkflows()
         );
     }
 
     public function testGetActiveWorkflowsNoFeature()
     {
-        $entityClass = 'testEntityClass';
         $workflowName = 'test_workflow';
-        $workflow = $this->createWorkflow($workflowName, $entityClass);
+        $workflow = $this->createWorkflow($workflowName);
         $workflowDefinition = $workflow->getDefinition();
 
         $this->featureChecker->expects($this->once())
@@ -377,7 +375,7 @@ class WorkflowRegistryTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals(
             new ArrayCollection(),
-            $this->registry->getActiveWorkflows($entityClass)
+            $this->registry->getActiveWorkflows()
         );
     }
 
