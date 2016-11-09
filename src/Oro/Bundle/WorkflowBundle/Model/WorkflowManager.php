@@ -351,14 +351,12 @@ class WorkflowManager implements LoggerAwareInterface
     }
 
     /**
-     * @param object $entity
+     * @param object|string $entity
      * @return Workflow[]|array
      * @throws \InvalidArgumentException
      */
     public function getApplicableWorkflows($entity)
     {
-        $recordContext = new WorkflowRecordContext($entity);
-
         if (!$this->entityConnector->isApplicableEntity($entity)) {
             return [];
         }
@@ -366,8 +364,12 @@ class WorkflowManager implements LoggerAwareInterface
         $workflows = $this->workflowRegistry
             ->getActiveWorkflowsByEntityClass($this->doctrineHelper->getEntityClass($entity));
 
-        foreach ($this->applicabilityFilters as $applicabilityFilter) {
-            $workflows = $applicabilityFilter->filter($workflows, $recordContext);
+        if (is_object($entity)) {
+            $recordContext = new WorkflowRecordContext($entity);
+
+            foreach ($this->applicabilityFilters as $applicabilityFilter) {
+                $workflows = $applicabilityFilter->filter($workflows, $recordContext);
+            }
         }
 
         return $workflows->toArray();

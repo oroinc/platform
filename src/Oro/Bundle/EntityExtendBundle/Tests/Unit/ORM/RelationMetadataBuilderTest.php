@@ -149,7 +149,7 @@ class RelationMetadataBuilderTest extends \PHPUnit_Framework_TestCase
         );
     }
 
-    public function testBuildManyToOneWithAdditionalCascadeOption()
+    public function testBuildManyToOneWithAdditionalOptions()
     {
         $entityClass = 'Oro\Bundle\EntityExtendBundle\Tests\Unit\Fixtures\TestClass';
         $fieldName   = 'srcField';
@@ -174,7 +174,9 @@ class RelationMetadataBuilderTest extends \PHPUnit_Framework_TestCase
                         'owner'           => true,
                         'target_entity'   => $targetEntityClass,
                         'target_field_id' => null,
-                        'cascade'         => ['persist']
+                        'cascade'         => ['persist'],
+                        'on_delete'       => 'CASCADE',
+                        'nullable'        => false
                     ]
                 ],
                 'schema'   => [
@@ -202,9 +204,9 @@ class RelationMetadataBuilderTest extends \PHPUnit_Framework_TestCase
                     [
                         'name'                 => $fieldName . '_id',
                         'referencedColumnName' => 'id',
-                        'nullable'             => true,
+                        'nullable'             => false,
                         'unique'               => false,
-                        'onDelete'             => 'SET NULL',
+                        'onDelete'             => 'CASCADE',
                         'columnDefinition'     => null
                     ]
                 ],
