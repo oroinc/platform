@@ -8,6 +8,14 @@
 
     &__item {
         flex: 0 1 auto;
+
+        &--current {}
+
+        &--offset-m {
+            &:not(:first-child) {
+                margin-left: $offset-x-m;
+            }
+        }
     }
 
     &__link {

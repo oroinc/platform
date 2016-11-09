@@ -1,8 +1,11 @@
+// @theme: blank
+
 $page-sidebar-width: 255px !default;
 $page-sidebar-inner-offset: 0 $offset-x 0 0 !default;
 $page-sidebar-order: 1 !default;
 $page-sidebar-flex: none !default;
 
-// Mobile
-$page-sidebar-mobile-inner-offset: 0 !default;
-$page-sidebar-mobile-width: 100% !default;
+// tablet-small
+$page-sidebar-tablet-s-inner-offset: 0 !default;
+$page-sidebar-tablet-s-offset: 0 0 $offset-x !default;
+$page-sidebar-tablet-s-width: 100% !default;

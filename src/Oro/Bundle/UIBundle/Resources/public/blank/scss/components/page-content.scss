@@ -1,3 +1,5 @@
+// @theme: blank
+
 .page-content {
     width: $page-content-width;
 
@@ -7,5 +9,13 @@
         padding: $page-content-with-sidebar-inner-offset;
 
         order: $page-content-with-sidebar-order;
+    }
+}
+
+@include breakpoint('tablet-small') {
+    .page-content {
+        &--has-sidebar {
+            padding: $page-content-with-sidebar-tables-s-inner-offset;
+        }
     }
 }
