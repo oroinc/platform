@@ -12,3 +12,7 @@ $checkbox-icon-check-position-left: 50%;
 $checkbox-icon-check-transform-translate: translate(-50%, -50%);
 $checkbox-icon-check-transform-rotate: rotate(-45deg);
 $checkbox-icon-check-color: get-color('additional', 'ultra');
+
+// Checked & Focus
+$checkbox-outline-checked-focus-state:  2px solid transparentize(get-color('ui', 'focus'), .47);
+$checkbox-outline-offset-checked-focus-state: -2px;
