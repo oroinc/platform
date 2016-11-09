@@ -223,14 +223,18 @@ class BlockFactory implements BlockFactoryInterface
         $this->processExpressions($resolvedOptions);
         $resolvedOptions = $this->resolveValueBags($resolvedOptions);
 
-        // point the block builder state to the current block
-        $this->blockBuilder->initialize($id);
-        // iterate from parent to current
-        foreach ($types as $type) {
-            $type->buildBlock($this->blockBuilder, $resolvedOptions);
-            $this->registry->buildBlock($type->getName(), $this->blockBuilder, $resolvedOptions);
+        if ($resolvedOptions->get('visible')) {
+            // point the block builder state to the current block
+            $this->blockBuilder->initialize($id);
+            // iterate from parent to current
+            foreach ($types as $type) {
+                $type->buildBlock($this->blockBuilder, $resolvedOptions);
+                $this->registry->buildBlock($type->getName(), $this->blockBuilder, $resolvedOptions);
+            }
+            $this->rawLayout->setProperty($id, RawLayout::RESOLVED_OPTIONS, $resolvedOptions);
+        } else {
+            $this->rawLayout->remove($id);
         }
-        $this->rawLayout->setProperty($id, RawLayout::RESOLVED_OPTIONS, $resolvedOptions);
     }
 
     /**

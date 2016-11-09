@@ -59,6 +59,9 @@ class LayoutTestCase extends \PHPUnit_Framework_TestCase
         if (!isset($view['vars']['class_prefix'])) {
             $view['vars']['class_prefix'] = null;
         }
+        if (!isset($view['vars']['visible'])) {
+            $view['vars']['visible'] = true;
+        }
 
         if ($view['vars'] instanceof Options) {
             $merged = array_merge($vars, $view['vars']->toArray());
