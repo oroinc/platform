@@ -7,7 +7,7 @@ class ButtonContext
     /** @var string */
     protected $entityClass;
 
-    /** @var int */
+    /** @var int|string|array|null */
     protected $entityId;
 
     /** @var string */
@@ -49,7 +49,7 @@ class ButtonContext
 
     /**
      * @param string $entityClass
-     * @param int|null $entityId
+     * @param int|string|array|null $entityId
      *
      * @return $this
      */

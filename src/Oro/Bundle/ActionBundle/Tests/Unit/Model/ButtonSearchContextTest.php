@@ -41,7 +41,7 @@ class ButtonSearchContextTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @dataProvider getSetEntityProvider
+     * @dataProvider getSetEntityDataProvider
      *
      * @param int|string|array $entityId
      */
@@ -55,7 +55,7 @@ class ButtonSearchContextTest extends \PHPUnit_Framework_TestCase
     /**
      * @return array
      */
-    public function getSetEntityProvider()
+    public function getSetEntityDataProvider()
     {
         return [
             [10],

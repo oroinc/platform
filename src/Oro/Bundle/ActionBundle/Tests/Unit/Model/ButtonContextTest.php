@@ -20,6 +20,14 @@ class ButtonContextTest extends \PHPUnit_Framework_TestCase
         $this->buttonContext = new ButtonContext();
     }
 
+    /**
+     * {@inheritdoc}
+     */
+    protected function tearDown()
+    {
+        unset($this->buttonContext);
+    }
+
     public function testGetSetButtonContext()
     {
         $context = [
@@ -35,10 +43,28 @@ class ButtonContextTest extends \PHPUnit_Framework_TestCase
         $this->assertPropertyAccessors($this->buttonContext, $context);
     }
 
-    public function testSetGetEntity()
+    /**
+     * @dataProvider getSetEntityDataProvider
+     *
+     * @param int|string|array|null $entityId
+     */
+    public function testSetGetEntity($entityId)
     {
-        $this->buttonContext->setEntity('Class', 10);
+        $this->buttonContext->setEntity('Class', $entityId);
         $this->assertSame('Class', $this->buttonContext->getEntityClass());
-        $this->assertSame(10, $this->buttonContext->getEntityId());
+        $this->assertSame($entityId, $this->buttonContext->getEntityId());
+    }
+
+    /**
+     * @return array
+     */
+    public function getSetEntityDataProvider()
+    {
+        return [
+            [10],
+            [uniqid()],
+            [[10, uniqid()]],
+            [null]
+        ];
     }
 }
