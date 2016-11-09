@@ -20,14 +20,14 @@ class OperationButtonTest extends \PHPUnit_Framework_TestCase
     protected $definition;
 
     /**
-     * @var OperationButton|\PHPUnit_Framework_MockObject_MockObject
-     */
-    protected $button;
-
-    /**
-     * @var ButtonContext
+     * @var ButtonContext|\PHPUnit_Framework_MockObject_MockObject
      */
     protected $buttonContext;
+
+    /**
+     * @var OperationButton
+     */
+    protected $button;
 
     /**
      * {@inheritdoc}
