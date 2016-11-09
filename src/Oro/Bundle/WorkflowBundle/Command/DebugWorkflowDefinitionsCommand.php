@@ -11,13 +11,25 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Translation\TranslatorInterface;
 use Symfony\Component\Yaml\Yaml;
 
+use Oro\Bundle\WorkflowBundle\Entity\Repository\WorkflowDefinitionRepository;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Helper\WorkflowTranslationHelper;
 
 class DebugWorkflowDefinitionsCommand extends ContainerAwareCommand
 {
     const NAME = 'oro:debug:workflow:definitions';
-    const INLINE_DEPTH = 6;
+    const INLINE_DEPTH = 20;
+
+    /** @var array */
+    protected static $tableHeader = [
+        'System Name',
+        'Label',
+        'Related Entity',
+        'Type',
+        'Priority',
+        'Exclusive Active Group',
+        'Exclusive Record Groups'
+    ];
 
     /**
      * {@inheritdoc}
@@ -49,39 +61,37 @@ class DebugWorkflowDefinitionsCommand extends ContainerAwareCommand
      * @param OutputInterface $output
      *
      * @return int
-     *
-     * @SuppressWarnings(PHPMD.NPathComplexity)
      */
     protected function listWorkflowDefinitions(OutputInterface $output)
     {
         /** @var TranslatorInterface $translator */
         $translator = $this->getContainer()->get('translator');
 
-        $workflows = $this->getContainer()->get('doctrine')
-            ->getRepository('Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition')
-            ->findAll();
+        /** @var WorkflowDefinition[] $workflows */
+        $workflows = $this->getWorkflowDefinitionRepository()->findAll();
         if (count($workflows)) {
             $table = new Table($output);
-            $table->setHeaders([
-                'System Name',
-                'Label',
-                'Related Entity',
-                'Type',
-                'Priority',
-                'Exclusive Active Group',
-                'Exclusive Record Groups',
-            ])
-                ->setRows([]);
-            /** @var WorkflowDefinition $workflow */
+            $table->setHeaders(self::$tableHeader)->setRows([]);
+
             foreach ($workflows as $workflow) {
+                $activeGroups = implode(', ', $workflow->getExclusiveActiveGroups());
+                if (!$activeGroups) {
+                    $activeGroups = 'N/A';
+                }
+
+                $recordGroups = implode(', ', $workflow->getExclusiveRecordGroups());
+                if (!$recordGroups) {
+                    $recordGroups = 'N/A';
+                }
+
                 $row = [
                     $workflow->getName(),
                     $translator->trans($workflow->getLabel(), [], WorkflowTranslationHelper::TRANSLATION_DOMAIN),
                     $workflow->getRelatedEntity(),
                     $workflow->isSystem() ? 'System' : 'Custom',
-                    $workflow->getPriority() ?: 0,
-                    implode(', ', $workflow->getExclusiveActiveGroups()) ?: 'N/A',
-                    implode(', ', $workflow->getExclusiveRecordGroups()) ?: 'N/A',
+                    (int)$workflow->getPriority(),
+                    $activeGroups,
+                    $recordGroups
                 ];
                 $table->addRow($row);
             }
@@ -96,21 +106,15 @@ class DebugWorkflowDefinitionsCommand extends ContainerAwareCommand
     }
 
     /**
-     * @param $workflowName
+     * @param string $workflowName
      * @param OutputInterface $output
-     *
-     * @SuppressWarnings(PHPMD.NPathComplexity)
-     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      *
      * @return int
      */
     protected function dumpWorkflowDefinition($workflowName, OutputInterface $output)
     {
         /** @var WorkflowDefinition $workflow */
-        $workflow = $this->getContainer()
-            ->get('doctrine')
-            ->getRepository('Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition')
-            ->findOneBy(['name' => $workflowName]);
+        $workflow = $this->getWorkflowDefinitionRepository()->findOneBy(['name' => $workflowName]);
 
         if ($workflow) {
             $general = [
@@ -123,7 +127,8 @@ class DebugWorkflowDefinitionsCommand extends ContainerAwareCommand
                 ],
             ];
 
-            if ($startStep = $workflow->getStartStep()) {
+            $startStep = $workflow->getStartStep();
+            if ($startStep) {
                 $general['start_step'] = $startStep->getName();
             }
 
@@ -137,31 +142,11 @@ class DebugWorkflowDefinitionsCommand extends ContainerAwareCommand
 
             $configuration = $workflow->getConfiguration();
 
-            //Closure to clear "label" and "message" options from configuration
-            $callback = function (&$array) use (&$callback) {
-                foreach ($array as $key => &$value) {
-                    if (is_array($value)) {
-                        $countBefore = count($value);
-                        $callback($value);
-                        if (empty($value) && $countBefore) {
-                            $array[$key] = null;
-                        }
-                    }
-                    if (in_array(strtolower($key), ['label', 'message'], true)) {
-                        unset($array[$key]);
-                    }
-                }
-            };
-
-            $callback($configuration);
+            $this->clearConfiguration($configuration);
 
             $definition = [
                 'workflows' => [
-                    $workflow->getName() =>
-                        array_merge(
-                            $general,
-                            $configuration
-                        )
+                    $workflow->getName() => array_merge($general, $configuration)
                 ]
             ];
 
@@ -173,5 +158,34 @@ class DebugWorkflowDefinitionsCommand extends ContainerAwareCommand
 
             return 1;
         }
+    }
+
+    /**
+     * Clear "label" and "message" options from configuration
+     *
+     * @param $array
+     */
+    protected function clearConfiguration(&$array)
+    {
+        foreach ($array as $key => &$value) {
+            if (is_array($value)) {
+                $countBefore = count($value);
+                $this->clearConfiguration($value);
+                if (empty($value) && $countBefore) {
+                    $array[$key] = null;
+                }
+            }
+            if (in_array(strtolower($key), ['label', 'message'], true)) {
+                unset($array[$key]);
+            }
+        }
+    }
+
+    /**
+     * @return WorkflowDefinitionRepository
+     */
+    protected function getWorkflowDefinitionRepository()
+    {
+        return $this->getContainer()->get('doctrine')->getRepository(WorkflowDefinition::class);
     }
 }

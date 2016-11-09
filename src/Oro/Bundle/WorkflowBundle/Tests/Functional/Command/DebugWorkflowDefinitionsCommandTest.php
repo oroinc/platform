@@ -2,28 +2,23 @@
 
 namespace Oro\Bundle\WorkflowBundle\Tests\Functional\Command;
 
-use Oro\Bundle\WorkflowBundle\Helper\WorkflowTranslationHelper;
-use Oro\Bundle\WorkflowBundle\Tests\Functional\DataFixtures\LoadWorkflowDefinitionsWithGroups;
-use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\Translation\TranslatorInterface;
 use Symfony\Component\Yaml\Yaml;
 
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
-use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Command\DebugWorkflowDefinitionsCommand;
+use Oro\Bundle\WorkflowBundle\Entity\Repository\WorkflowDefinitionRepository;
+use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
+use Oro\Bundle\WorkflowBundle\Helper\WorkflowTranslationHelper;
 use Oro\Bundle\WorkflowBundle\Tests\Functional\DataFixtures\LoadWorkflowDefinitions;
+use Oro\Bundle\WorkflowBundle\Tests\Functional\DataFixtures\LoadWorkflowDefinitionsWithGroups;
 
 /**
  * @dbIsolation
  */
 class DebugWorkflowDefinitionsCommandTest extends WebTestCase
 {
-    /**
-     * @var Container
-     */
-    protected $container;
-
     protected function setUp()
     {
         $this->initClient();
@@ -32,16 +27,11 @@ class DebugWorkflowDefinitionsCommandTest extends WebTestCase
             'Oro\Bundle\WorkflowBundle\Tests\Functional\DataFixtures\LoadWorkflowDefinitions',
             'Oro\Bundle\WorkflowBundle\Tests\Functional\DataFixtures\LoadWorkflowDefinitionsWithGroups',
         ]);
-
-        $this->container = $this->getContainer();
     }
 
     public function testExecuteWithoutArgument()
     {
-        $workflows = $this->getContainer()
-            ->get('doctrine')
-            ->getRepository('Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition')
-            ->findAll();
+        $workflows = $this->getWorkflowDefinitionRepository()->findAll();
 
         $result = $this->runCommand(DebugWorkflowDefinitionsCommand::NAME, ['--no-ansi']);
 
@@ -65,27 +55,28 @@ class DebugWorkflowDefinitionsCommandTest extends WebTestCase
 
     /**
      * @param string $workflowName
+     * @param bool $exists
      *
      * @dataProvider executeDataProvider
      */
     public function testExecuteWithArgument($workflowName, $exists = true)
     {
         /** @var WorkflowDefinition $initialWorkflow */
-        $initialWorkflow = $this->getContainer()
-            ->get('doctrine')
-            ->getRepository('Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition')
-            ->findOneBy(['name' => $workflowName]);
+        $initialWorkflow = $this->getWorkflowDefinitionRepository()->findOneBy(['name' => $workflowName]);
 
         $result = $this->runCommand(DebugWorkflowDefinitionsCommand::NAME, [$workflowName, '--no-ansi']);
 
         if ($exists) {
             $this->assertNotContains('No workflow definitions found.', $result);
-            $listConfiguration = $this->container->get('oro_workflow.configuration.config.workflow_list');
-            $configurationBuilder = $this->container->get('oro_workflow.configuration.builder.workflow_definition');
 
             $workflowConfiguration = Yaml::parse($result);
-            $workflowConfiguration = $listConfiguration->processConfiguration($workflowConfiguration);
-            $workflowDefinitions = $configurationBuilder->buildFromConfiguration($workflowConfiguration);
+            $workflowConfiguration = $this->getContainer()
+                ->get('oro_workflow.configuration.config.workflow_list')
+                ->processConfiguration($workflowConfiguration);
+
+            $workflowDefinitions = $this->getContainer()
+                ->get('oro_workflow.configuration.builder.workflow_definition')
+                ->buildFromConfiguration($workflowConfiguration);
 
             $this->assertCount(1, $workflowDefinitions);
 
@@ -125,6 +116,9 @@ class DebugWorkflowDefinitionsCommandTest extends WebTestCase
         }
     }
 
+    /**
+     * @return array
+     */
     public function executeDataProvider()
     {
         return [
@@ -134,5 +128,13 @@ class DebugWorkflowDefinitionsCommandTest extends WebTestCase
             [LoadWorkflowDefinitionsWithGroups::WITH_GROUPS1, true],
             [LoadWorkflowDefinitionsWithGroups::WITH_GROUPS2, true],
         ];
+    }
+
+    /**
+     * @return WorkflowDefinitionRepository
+     */
+    protected function getWorkflowDefinitionRepository()
+    {
+        return $this->getContainer()->get('doctrine')->getRepository(WorkflowDefinition::class);
     }
 }
