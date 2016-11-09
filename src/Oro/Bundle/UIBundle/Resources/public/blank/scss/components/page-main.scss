@@ -1,3 +1,5 @@
+// @theme: blank
+
 .page-main {
     flex: 1;
 
@@ -10,6 +12,7 @@
     .page-main {
         &__content {
             flex-direction: column;
+            padding: $page-main-tablet-small-inner-offset;
         }
     }
 }

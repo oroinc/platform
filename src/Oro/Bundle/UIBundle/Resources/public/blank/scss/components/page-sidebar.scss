@@ -1,3 +1,5 @@
+// @theme: blank
+
 .page-sidebar {
     width: $page-sidebar-width;
     padding: $page-sidebar-inner-offset;
@@ -8,7 +10,8 @@
 
 @include breakpoint('tablet-small') {
     .page-sidebar {
-        width: $page-sidebar-mobile-inner-offset;
-        padding: $page-sidebar-mobile-width;
+        width: $page-sidebar-tablet-s-width;
+        margin: $page-sidebar-tablet-s-offset;
+        padding: $page-sidebar-tablet-s-inner-offset;
     }
 }

@@ -1,3 +1,5 @@
+// @theme: blank
+
 .primary-menu {
   @include list-normalize();
 
@@ -9,8 +11,12 @@
 
     padding: ($offset-y-s / 2) 0;
 
-    &--current {
+    &--current {}
 
+    &--offset-m {
+      &:not(:first-child) {
+        margin-left: $offset-x-m;
+      }
     }
   }
 
