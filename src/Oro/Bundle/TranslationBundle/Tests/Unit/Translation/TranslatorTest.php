@@ -494,9 +494,6 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
             ->method('getStrategy')
             ->willReturn($strategy);
         $strategyProvider->expects($this->any())
-            ->method('getFallbackLocales')
-            ->willReturn(['en_US']);
-        $strategyProvider->expects($this->any())
             ->method('getAllFallbackLocales')
             ->with($strategy)
             ->willReturn($allFallbackLocales);
