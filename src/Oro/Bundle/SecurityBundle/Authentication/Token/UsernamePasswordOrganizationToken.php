@@ -14,8 +14,8 @@ class UsernamePasswordOrganizationToken extends UsernamePasswordToken implements
      * @param string       $user
      * @param string       $credentials
      * @param string       $providerKey
-     * @param array        $roles
      * @param Organization $organizationContext
+     * @param array        $roles
      */
     public function __construct($user, $credentials, $providerKey, Organization $organizationContext, array $roles = [])
     {

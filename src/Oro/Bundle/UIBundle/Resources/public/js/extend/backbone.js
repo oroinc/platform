@@ -7,11 +7,11 @@ define([
     'use strict';
 
     var OriginalBackboneView = Backbone.View;
-    Backbone.View = _.wrap(Backbone.View, function(original) {
+    Backbone.View = function(original) {
         this.subviews = [];
         this.subviewsByName = {};
-        original.apply(this, _.rest(arguments));
-    });
+        OriginalBackboneView.apply(this, arguments);
+    };
     _.extend(Backbone.View, OriginalBackboneView);
     Backbone.View.prototype = OriginalBackboneView.prototype;
 

@@ -7,7 +7,7 @@ use Symfony\Component\PropertyAccess\PropertyPath;
 
 use Oro\Component\ConfigExpression\Tests\Unit\Fixtures\ItemStub;
 use Oro\Component\Action\Action\GetClassName;
-use Oro\Component\Action\Model\ContextAccessor;
+use Oro\Component\ConfigExpression\ContextAccessor;
 
 class GetClassNameTest extends \PHPUnit_Framework_TestCase
 {
