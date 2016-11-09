@@ -58,5 +58,4 @@ class WorkflowDefinitionRepositoryTest extends WebTestCase
         $this->assertContains(['name' => 'test_active_flow1'], $workflows);
         $this->assertContains(['name' => 'test_active_flow2'], $workflows);
     }
-
 }
