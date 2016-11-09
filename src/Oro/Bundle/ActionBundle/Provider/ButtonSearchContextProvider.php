@@ -25,7 +25,7 @@ class ButtonSearchContextProvider
     {
         $context = $this->contextHelper->getContext();
 
-        return $this->handlerButtonSearchContext(new ButtonSearchContext(), $context);
+        return $this->handleButtonSearchContext(new ButtonSearchContext(), $context);
     }
 
     /**
@@ -34,17 +34,13 @@ class ButtonSearchContextProvider
      *
      * @return ButtonSearchContext
      */
-    protected function handlerButtonSearchContext(ButtonSearchContext $buttonSearchContext, $context)
+    protected function handleButtonSearchContext(ButtonSearchContext $buttonSearchContext, $context)
     {
-        $buttonSearchContext->setEntity(
-            $context[ContextHelper::ENTITY_CLASS_PARAM],
-            $context[ContextHelper::ENTITY_ID_PARAM]
-        );
-        $buttonSearchContext->setGridName($context[ContextHelper::DATAGRID_PARAM]);
-        $buttonSearchContext->setGroup($context[ContextHelper::GROUP_PARAM]);
-        $buttonSearchContext->setReferrer($context[ContextHelper::FROM_URL_PARAM]);
-        $buttonSearchContext->setRouteName($context[ContextHelper::ROUTE_PARAM]);
-
-        return $buttonSearchContext;
+        return $buttonSearchContext
+            ->setEntity($context[ContextHelper::ENTITY_CLASS_PARAM], $context[ContextHelper::ENTITY_ID_PARAM])
+            ->setGridName($context[ContextHelper::DATAGRID_PARAM])
+            ->setGroup($context[ContextHelper::GROUP_PARAM])
+            ->setReferrer($context[ContextHelper::FROM_URL_PARAM])
+            ->setRouteName($context[ContextHelper::ROUTE_PARAM]);
     }
 }
