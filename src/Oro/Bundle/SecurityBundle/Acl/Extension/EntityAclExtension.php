@@ -77,14 +77,14 @@ class EntityAclExtension extends AbstractAclExtension
     private $masks = [];
 
     /**
-     * @param ObjectIdAccessor $objectIdAccessor
-     * @param EntityClassResolver $entityClassResolver
-     * @param EntitySecurityMetadataProvider $entityMetadataProvider
-     * @param MetadataProviderInterface $metadataProvider
+     * @param ObjectIdAccessor                           $objectIdAccessor
+     * @param EntityClassResolver                        $entityClassResolver
+     * @param EntitySecurityMetadataProvider             $entityMetadataProvider
+     * @param MetadataProviderInterface                  $metadataProvider
      * @param AccessLevelOwnershipDecisionMakerInterface $decisionMaker
-     * @param PermissionManager $permissionManager
-     * @param AclGroupProviderInterface $groupProvider
-     * @param FieldAclExtension $fieldAclExtension
+     * @param PermissionManager                          $permissionManager
+     * @param AclGroupProviderInterface                  $groupProvider
+     * @param FieldAclExtension                          $fieldAclExtension
      */
     public function __construct(
         ObjectIdAccessor $objectIdAccessor,
@@ -96,14 +96,14 @@ class EntityAclExtension extends AbstractAclExtension
         AclGroupProviderInterface $groupProvider,
         FieldAclExtension $fieldAclExtension
     ) {
-        $this->objectIdAccessor = $objectIdAccessor;
-        $this->entityClassResolver = $entityClassResolver;
+        $this->objectIdAccessor       = $objectIdAccessor;
+        $this->entityClassResolver    = $entityClassResolver;
         $this->entityMetadataProvider = $entityMetadataProvider;
-        $this->metadataProvider = $metadataProvider;
-        $this->decisionMaker = $decisionMaker;
-        $this->permissionManager = $permissionManager;
-        $this->groupProvider = $groupProvider;
-        $this->fieldAclExtension = $fieldAclExtension;
+        $this->metadataProvider       = $metadataProvider;
+        $this->decisionMaker          = $decisionMaker;
+        $this->permissionManager      = $permissionManager;
+        $this->groupProvider          = $groupProvider;
+        $this->fieldAclExtension      = $fieldAclExtension;
     }
 
     /**
@@ -292,8 +292,8 @@ class EntityAclExtension extends AbstractAclExtension
             $identity = $this->getServiceBits($rootMask);
             foreach ($permissions as $permission) {
                 $permissionMask = $this->getMaskBuilderConst($identity, 'GROUP_' . $permission);
-                $mask = $rootMask & $permissionMask;
-                $accessLevel = $this->getAccessLevel($mask);
+                $mask           = $rootMask & $permissionMask;
+                $accessLevel    = $this->getAccessLevel($mask);
                 if (!$metadata->hasOwner()) {
                     $ownershipPermissions = $this->getOwnershipPermissions();
 
@@ -350,7 +350,7 @@ class EntityAclExtension extends AbstractAclExtension
         $identity = $this->getServiceBits($mask);
         if ($permission !== null) {
             $permissionMask = $this->getMaskBuilderConst($identity, 'GROUP_' . $permission);
-            $mask = $mask & $permissionMask;
+            $mask           = $mask & $permissionMask;
         }
 
         $mask = $this->removeServiceBits($mask);
@@ -538,8 +538,8 @@ class EntityAclExtension extends AbstractAclExtension
     }
 
     /**
-     * @param int $accessLevel Current object access level
-     * @param mixed $object Object for test
+     * @param int   $accessLevel Current object access level
+     * @param mixed $object      Object for test
      *
      * @return int
      *
@@ -602,8 +602,8 @@ class EntityAclExtension extends AbstractAclExtension
      * Checks that the given mask represents only one access level
      *
      * @param string $permission
-     * @param int $mask
-     * @param mixed $object
+     * @param int    $mask
+     * @param mixed  $object
      *
      * @throws InvalidAclMaskException
      */
@@ -638,7 +638,7 @@ class EntityAclExtension extends AbstractAclExtension
      * Gets all valid bitmasks for the given object
      *
      * @param string $permission
-     * @param mixed $object
+     * @param mixed  $object
      *
      * @return int
      */
@@ -729,7 +729,7 @@ class EntityAclExtension extends AbstractAclExtension
     /**
      * Gets the constant value defined in the given permission mask builder
      *
-     * @param int $maskBuilderIdentity The permission mask builder identity
+     * @param int    $maskBuilderIdentity The permission mask builder identity
      * @param string $constName
      *
      * @return int
@@ -845,7 +845,7 @@ class EntityAclExtension extends AbstractAclExtension
      */
     protected function getIdentityForPrimaryKey($pk)
     {
-        $identity = (int)(($pk - 1) / EntityMaskBuilder::MAX_PERMISSIONS_IN_MASK);
+        $identity = (int) (($pk - 1) / EntityMaskBuilder::MAX_PERMISSIONS_IN_MASK);
 
         return $identity << (count(AccessLevel::$allAccessLevelNames) * EntityMaskBuilder::MAX_PERMISSIONS_IN_MASK);
     }
