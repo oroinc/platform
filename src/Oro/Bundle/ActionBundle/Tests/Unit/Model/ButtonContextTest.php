@@ -9,7 +9,7 @@ class ButtonContextTest extends \PHPUnit_Framework_TestCase
 {
     use EntityTestCaseTrait;
 
-    /** @var  ButtonContext */
+    /** @var ButtonContext */
     protected $buttonContext;
 
     /**

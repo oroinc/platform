@@ -4,31 +4,31 @@ namespace Oro\Bundle\ActionBundle\Model;
 
 class ButtonContext
 {
-    /** @var  string */
+    /** @var string */
     protected $entityClass;
 
-    /** @var  int */
+    /** @var int */
     protected $entityId;
 
-    /** @var  string */
+    /** @var string */
     protected $routeName;
 
-    /** @var  string */
+    /** @var string */
     protected $datagridName;
 
-    /** @var  string */
+    /** @var string */
     protected $group;
 
-    /** @var  string */
+    /** @var string */
     protected $executionUrl;
 
-    /** @var  string */
+    /** @var string */
     protected $dialogUrl;
 
-    /** @var  bool */
+    /** @var bool */
     protected $enabled;
 
-    /** @var  bool */
+    /** @var bool */
     protected $unavailableHidden;
 
     /**
@@ -50,11 +50,15 @@ class ButtonContext
     /**
      * @param string $entityClass
      * @param int|null $entityId
+     *
+     * @return $this
      */
     public function setEntity($entityClass, $entityId = null)
     {
         $this->entityClass = $entityClass;
         $this->entityId = $entityId;
+
+        return $this;
     }
 
     /**
@@ -67,10 +71,14 @@ class ButtonContext
 
     /**
      * @param string $routeName
+     *
+     * @return $this
      */
     public function setRouteName($routeName)
     {
         $this->routeName = $routeName;
+
+        return $this;
     }
 
     /**
@@ -83,10 +91,14 @@ class ButtonContext
 
     /**
      * @param string $datagridName
+     *
+     * @return $this
      */
     public function setDatagridName($datagridName)
     {
         $this->datagridName = $datagridName;
+
+        return $this;
     }
 
     /**
@@ -99,10 +111,14 @@ class ButtonContext
 
     /**
      * @param string $group
+     *
+     * @return $this
      */
     public function setGroup($group)
     {
         $this->group = $group;
+
+        return $this;
     }
 
     /**
@@ -115,10 +131,14 @@ class ButtonContext
 
     /**
      * @param string $executionUrl
+     *
+     * @return $this
      */
     public function setExecutionUrl($executionUrl)
     {
         $this->executionUrl = $executionUrl;
+
+        return $this;
     }
 
     /**
@@ -131,14 +151,18 @@ class ButtonContext
 
     /**
      * @param string $dialogUrl
+     *
+     * @return $this
      */
     public function setDialogUrl($dialogUrl)
     {
         $this->dialogUrl = $dialogUrl;
+
+        return $this;
     }
 
     /**
-     * @return boolean
+     * @return bool
      */
     public function isEnabled()
     {
@@ -146,11 +170,15 @@ class ButtonContext
     }
 
     /**
-     * @param boolean $enabled
+     * @param bool $enabled
+     *
+     * @return $this
      */
     public function setEnabled($enabled)
     {
         $this->enabled = $enabled;
+
+        return $this;
     }
 
     /**
@@ -163,9 +191,13 @@ class ButtonContext
 
     /**
      * @param bool $unavailableHidden
+     *
+     * @return $this
      */
     public function setUnavailableHidden($unavailableHidden)
     {
         $this->unavailableHidden = $unavailableHidden;
+
+        return $this;
     }
 }
