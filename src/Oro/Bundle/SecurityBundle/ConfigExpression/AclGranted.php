@@ -3,7 +3,6 @@
 namespace Oro\Bundle\SecurityBundle\ConfigExpression;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
-use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ORM\EntityManager;
 
 use Oro\Component\Action\Condition\AbstractCondition;
@@ -12,6 +11,7 @@ use Oro\Component\ConfigExpression\ContextAccessorAwareTrait;
 use Oro\Component\ConfigExpression\Exception\InvalidArgumentException;
 
 use Oro\Bundle\SecurityBundle\SecurityFacade;
+use Symfony\Component\Security\Acl\Util\ClassUtils;
 
 /**
  * Checks whether an access to a resource is granted.
