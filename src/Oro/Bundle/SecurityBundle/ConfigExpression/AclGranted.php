@@ -3,9 +3,8 @@
 namespace Oro\Bundle\SecurityBundle\ConfigExpression;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
+use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ORM\EntityManager;
-
-use Symfony\Component\Security\Core\Util\ClassUtils;
 
 use Oro\Component\Action\Condition\AbstractCondition;
 use Oro\Component\ConfigExpression\ContextAccessorAwareInterface;
