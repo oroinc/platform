@@ -428,13 +428,6 @@ class User extends ExtendUser implements
     protected $failedLoginCount;
 
     /**
-     * @var \DateTime $passwordExpiresAt
-     *
-     * @ORM\Column(name="password_expires_at", type="datetime", nullable=true)
-     */
-    protected $passwordExpiresAt;
-
-    /**
      * @var OrganizationInterface
      *
      * Organization that user logged in
@@ -1250,25 +1243,7 @@ class User extends ExtendUser implements
             $this->setFailedLoginCount(0);
         }
 
-        return parent::setEnabled($enabled);
-    }
-
-    /**
-     * @return \DateTime
-     */
-    public function getPasswordExpiresAt()
-    {
-        return $this->passwordExpiresAt;
-    }
-
-    /**
-     * @param \DateTime $passwordExpiresAt
-     *
-     * @return $this
-     */
-    public function setPasswordExpiresAt(\DateTime $passwordExpiresAt = null)
-    {
-        $this->passwordExpiresAt = $passwordExpiresAt;
+        parent::setEnabled($enabled);
 
         return $this;
     }

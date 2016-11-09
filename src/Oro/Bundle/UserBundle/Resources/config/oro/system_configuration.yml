@@ -9,9 +9,6 @@ system_configuration:
         password_complexity_rules:
             icon:  icon-usd
             title: oro.user.system_configuration.groups.password_complexity_rules.title
-        mandatory_password_change:
-            icon:  icon-repeat
-            title: oro.user.system_configuration.groups.mandatory_password_change.title
 
     fields:
         oro_user.failed_login_limit_enabled:
@@ -65,43 +62,6 @@ system_configuration:
                 tooltip: oro.user.system_configuration.fields.password_special_chars.tooltip
                 required: false
 
-        oro_user.password_change_period_enabled:
-            data_type: boolean
-            type: oro_config_checkbox
-            priority: 99
-            options:
-                required: false
-                label: oro.user.system_configuration.fields.password_change_period_enabled.label
-                tooltip: oro.user.system_configuration.fields.password_change_period_enabled.tooltip
-        oro_user.password_change_period:
-            data_type: integer
-            type: integer
-            priority: 89
-            options:
-                label: oro.user.system_configuration.fields.password_change_period.label
-                tooltip: oro.user.system_configuration.fields.password_change_period.tooltip
-                constraints:
-                    - GreaterThan:
-                        value: 0
-        oro_user.used_password_check_enabled:
-            data_type: boolean
-            type: oro_config_checkbox
-            priority: 79
-            options:
-                required: false
-                label: oro.user.system_configuration.fields.used_password_check_enabled.label
-                tooltip: oro.user.system_configuration.fields.used_password_check_enabled.tooltip
-        oro_user.used_password_check_number:
-            data_type: integer
-            type: integer
-            priority: 69
-            options:
-                label: oro.user.system_configuration.fields.used_password_check_number.label
-                tooltip: oro.user.system_configuration.fields.used_password_check_number.tooltip
-                constraints:
-                    - GreaterThan:
-                        value: 0
-
     tree:
         system_configuration:
             platform:
@@ -121,9 +81,3 @@ system_configuration:
                                             - oro_user.password_numbers
                                             - oro_user.password_upper_case
                                             - oro_user.password_special_chars
-                                    mandatory_password_change:
-                                        children:
-                                            - oro_user.password_change_period_enabled
-                                            - oro_user.password_change_period
-                                            - oro_user.used_password_check_enabled
-                                            - oro_user.used_password_check_number
