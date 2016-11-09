@@ -11,7 +11,7 @@ class ButtonSearchContextProviderTest extends \PHPUnit_Framework_TestCase
     /** @var ContextHelper|\PHPUnit_Framework_MockObject_MockObject */
     protected $contextHelper;
 
-    /** @var  ButtonSearchContextProvider */
+    /** @var ButtonSearchContextProvider */
     protected $provider;
 
     /**
