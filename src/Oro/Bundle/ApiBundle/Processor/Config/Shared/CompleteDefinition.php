@@ -37,6 +37,7 @@ use Oro\Bundle\EntityExtendBundle\Extend\RelationType;
  * Updates configuration of fields if other fields a linked to them using "property_path".
  * Sets "exclusion_policy = all" for the entity. It means that the configuration
  * of all fields and associations was completed.
+ * Completes configuration of fields that represent nested objects.
  * By performance reasons all these actions are done in one processor.
  *
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
@@ -209,7 +210,9 @@ class CompleteDefinition implements ProcessorInterface
             $fields = $definition->getFields();
             foreach ($fields as $fieldName => $field) {
                 $dataType = $field->getDataType();
-                if (DataType::isExtendedAssociation($dataType)) {
+                if (DataType::isNestedObject($dataType)) {
+                    $this->completeNestedObject($fieldName, $field);
+                } elseif (DataType::isExtendedAssociation($dataType)) {
                     if ($field->getTargetType()) {
                         throw new \RuntimeException(
                             sprintf(
@@ -492,11 +495,46 @@ class CompleteDefinition implements ProcessorInterface
     ) {
         $fields = $definition->getFields();
         foreach ($fields as $fieldName => $field) {
-            $targetClass = $field->getTargetClass();
-            if (!$targetClass) {
-                continue;
+            if (DataType::isNestedObject($field->getDataType())) {
+                $this->completeNestedObject($fieldName, $field);
+            } else {
+                $targetClass = $field->getTargetClass();
+                if (!$targetClass) {
+                    continue;
+                }
+                $this->completeAssociation($field, $targetClass, $version, $requestType);
             }
-            $this->completeAssociation($field, $targetClass, $version, $requestType);
+        }
+    }
+
+    /**
+     * @param string                      $fieldName
+     * @param EntityDefinitionFieldConfig $field
+     */
+    protected function completeNestedObject($fieldName, EntityDefinitionFieldConfig $field)
+    {
+        $field->setPropertyPath(ConfigUtil::IGNORE_PROPERTY_PATH);
+
+        $target = $field->getOrCreateTargetEntity();
+        $target->setExcludeAll();
+
+        $dependsOn = $field->getDependsOn();
+        if (null === $dependsOn) {
+            $dependsOn = [];
+        }
+        $targetFields = $target->getFields();
+        foreach ($targetFields as $targetFieldName => $targetField) {
+            $targetPropertyPath = $targetField->getPropertyPath($targetFieldName);
+            if (!in_array($targetPropertyPath, $dependsOn, true)) {
+                $dependsOn[] = $targetPropertyPath;
+            }
+        }
+        $field->setDependsOn($dependsOn);
+
+        $formOptions = $field->getFormOptions();
+        if (null === $formOptions || !array_key_exists('property_path', $formOptions)) {
+            $formOptions['property_path'] = $fieldName;
+            $field->setFormOptions($formOptions);
         }
     }
 }

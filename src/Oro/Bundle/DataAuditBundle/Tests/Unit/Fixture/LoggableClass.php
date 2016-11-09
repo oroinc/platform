@@ -4,12 +4,9 @@ namespace Oro\Bundle\DataAuditBundle\Tests\Unit\Fixture;
 
 use Doctrine\ORM\Mapping as ORM;
 
-use Oro\Bundle\DataAuditBundle\Metadata\Annotation as Oro;
-
 /**
  * @ORM\Entity
  * @ORM\Table
- * @Oro\Loggable
  */
 class LoggableClass
 {
@@ -23,7 +20,6 @@ class LoggableClass
     /**
      * @var string
      *
-     * @Oro\Versioned
      * @ORM\Column(type="string", length=255, unique=true)
      */
     protected $name;
@@ -31,7 +27,6 @@ class LoggableClass
     /**
      * @var LoggableCollectionClass[]
      *
-     * @Oro\Versioned()
      * @ORM\ManyToMany(targetEntity="LoggableCollectionClass")
      */
     protected $collection;
@@ -39,7 +34,6 @@ class LoggableClass
     /**
      * @var LoggableCollectionClass[]
      *
-     * @Oro\Versioned(method="getName")
      * @ORM\ManyToMany(targetEntity="LoggableCollectionClass")
      */
     protected $collectionWithMethodName;

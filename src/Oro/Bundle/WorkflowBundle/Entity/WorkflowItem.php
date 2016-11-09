@@ -705,4 +705,31 @@ class WorkflowItem extends ExtendWorkflowItem implements EntityAwareInterface
     {
         $this->updated = new \DateTime('now', new \DateTimeZone('UTC'));
     }
+
+    /**
+     * This method should be exists for compatibility with redirect action
+     *
+     * @param string $url
+     * @return $this
+     */
+    public function setRedirectUrl($url)
+    {
+        $this->result->set('redirectUrl', $url);
+
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function __toString()
+    {
+        return sprintf(
+            '[%s] %s:%s %s',
+            $this->workflowName,
+            $this->entityClass,
+            $this->entityId,
+            $this->currentStep ? $this->currentStep->getName() : null
+        );
+    }
 }

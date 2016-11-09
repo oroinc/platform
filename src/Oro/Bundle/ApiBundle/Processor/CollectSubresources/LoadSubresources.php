@@ -2,9 +2,6 @@
 
 namespace Oro\Bundle\ApiBundle\Processor\CollectSubresources;
 
-use Oro\Bundle\ApiBundle\Request\ApiActions;
-use Oro\Bundle\ApiBundle\Request\ApiResource;
-use Oro\Bundle\ApiBundle\Request\ApiSubresource;
 use Oro\Component\ChainProcessor\ProcessorInterface;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 use Oro\Bundle\ApiBundle\Config\ConfigExtraInterface;
@@ -14,6 +11,10 @@ use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
 use Oro\Bundle\ApiBundle\Metadata\MetadataExtraInterface;
 use Oro\Bundle\ApiBundle\Provider\ConfigProvider;
 use Oro\Bundle\ApiBundle\Provider\MetadataProvider;
+use Oro\Bundle\ApiBundle\Request\ApiActions;
+use Oro\Bundle\ApiBundle\Request\ApiResource;
+use Oro\Bundle\ApiBundle\Request\ApiSubresource;
+use Oro\Bundle\ApiBundle\Request\DataType;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 
 abstract class LoadSubresources implements ProcessorInterface
@@ -155,7 +156,9 @@ abstract class LoadSubresources implements ProcessorInterface
             return false;
         }
 
-        return $field->isExcluded();
+        return
+            $field->isExcluded()
+            || DataType::isAssociationAsField($field->getDataType());
     }
 
     /**

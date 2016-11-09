@@ -1,3 +1,18 @@
 api:
     entities:
-#        Oro\Bundle\ReminderBundle\Entity\Reminder: ~
+#        Oro\Bundle\ReminderBundle\Entity\Reminder:
+#            fields:
+#                interval:
+#                    data_type: nestedObject
+#                    form_options:
+#                        data_class: Oro\Bundle\ReminderBundle\Model\ReminderInterval
+#                        by_reference: false
+#                    fields:
+#                        number:
+#                            property_path: intervalNumber
+#                        unit:
+#                            property_path: intervalUnit
+#                intervalNumber:
+#                    exclude: true
+#                intervalUnit:
+#                    exclude: true

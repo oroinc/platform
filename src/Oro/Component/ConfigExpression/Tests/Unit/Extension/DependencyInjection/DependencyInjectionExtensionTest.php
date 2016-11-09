@@ -12,12 +12,16 @@ class DependencyInjectionExtensionTest extends \PHPUnit_Framework_TestCase
     /** @var DependencyInjectionExtension */
     protected $extension;
 
+    /** @var  array */
+    protected $serviceIds;
+
     protected function setUp()
     {
+        $this->serviceIds = ['test' => 'expression_service'];
         $this->container = $this->getMock('Symfony\Component\DependencyInjection\ContainerInterface');
         $this->extension = new DependencyInjectionExtension(
             $this->container,
-            ['test' => 'expression_service']
+            $this->serviceIds
         );
     }
 
@@ -46,5 +50,10 @@ class DependencyInjectionExtensionTest extends \PHPUnit_Framework_TestCase
     public function testGetUnknownExpression()
     {
         $this->extension->getExpression('unknown');
+    }
+
+    public function testGetServiceIds()
+    {
+        $this->assertSame($this->serviceIds, $this->extension->getServiceIds());
     }
 }

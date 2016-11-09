@@ -29,7 +29,7 @@
 {% endblock %}
 
 {% block item %}
-    {% if item.extras.isCustomAction is defined %}
+    {% if item.extras.is_custom_action is defined %}
         {{ block('item_renderer') }}
     {% endif %}
 {% endblock %}

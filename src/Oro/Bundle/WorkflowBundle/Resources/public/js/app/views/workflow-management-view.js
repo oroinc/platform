@@ -27,7 +27,9 @@ define(function(require) {
         options: {
             stepsEl: null,
             model: null,
-            entities: []
+            entities: [],
+            templateTranslateLink: null,
+            selectorTranslateLinkContainer: '#workflow_translate_link_label'
         },
 
         initialize: function(options) {
@@ -42,12 +44,21 @@ define(function(require) {
             });
 
             this.$entitySelectEl = this.$('[name$="[related_entity]"]');
+
+            var template = this.options.templateTranslateLink || $('#workflow-translate-link-template').html();
+            this.templateTranslateLink = _.template(template);
+
             this.initEntityFieldsLoader();
             this.listenTo(this.model.get('steps'), 'destroy ', this.onStepRemove);
         },
 
         render: function() {
             this.renderSteps();
+            if (this.model.translateLinkLabel) {
+                $(this.options.selectorTranslateLinkContainer)
+                    .html(this.templateTranslateLink({translateLink: this.model.translateLinkLabel}));
+            }
+
             return this;
         },
 

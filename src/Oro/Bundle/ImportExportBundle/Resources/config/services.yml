@@ -17,10 +17,10 @@ services:
     oro_importexport.action.execute_job:
         class: %oro_importexport.action.execute_job.class%
         arguments:
-            - '@oro_action.context_accessor'
+            - '@oro_action.expression.context_accessor'
             - '@oro_importexport.job_executor'
         tags:
-            - { name: oro_workflow.action, alias: execute_job }
+            - { name: oro_action.action, alias: execute_job }
 
     oro_importexport.formatter.formatter_provider:
         class: Oro\Bundle\ImportExportBundle\Formatter\FormatterProvider
@@ -43,7 +43,7 @@ services:
     oro_importexport.formatter.locale_number:
         class: Oro\Bundle\ImportExportBundle\Formatter\NumberTypeFormatter
         arguments:
-            - '@oro_locale.settings'
+            - '@oro_locale.formatter.number'
         tags:
             - { name: oro_importexport.formatter.formatter, data_type: currency, format_type: excel }
             - { name: oro_importexport.formatter.formatter, data_type: percent, format_type: excel }

@@ -68,6 +68,18 @@ class ConfigurationManager
     }
 
     /**
+     * @param string $resourceType
+     *
+     * @return array
+     */
+    public function getResourcesByType($resourceType)
+    {
+        $configuration = $this->configurationProvider->getResourcesConfiguration();
+
+        return array_key_exists($resourceType, $configuration) ? $configuration[$resourceType] : [];
+    }
+
+    /**
      * @param string $feature
      * @return array
      */

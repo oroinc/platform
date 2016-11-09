@@ -26,16 +26,23 @@ class EntityDataTransformer implements DataTransformerInterface
     /**
      * {@inheritdoc}
      */
-    public function transform($class, $property, $value, $config)
+    public function transform($class, $property, $value, array $config, array $context)
     {
         if (isset($config[FieldConfig::DATA_TRANSFORMER])) {
             foreach ($config[FieldConfig::DATA_TRANSFORMER] as $transformer) {
-                $value = $this->transformByCustomTransformer($transformer, $class, $property, $value, $config);
+                $value = $this->transformByCustomTransformer(
+                    $transformer,
+                    $class,
+                    $property,
+                    $value,
+                    $config,
+                    $context
+                );
             }
         }
 
         return null !== $this->baseDataTransformer
-            ? $this->baseDataTransformer->transform($class, $property, $value, $config)
+            ? $this->baseDataTransformer->transform($class, $property, $value, $config, $context)
             : $value;
     }
 
@@ -45,13 +52,20 @@ class EntityDataTransformer implements DataTransformerInterface
      * @param string $property
      * @param mixed  $value
      * @param array  $config
+     * @param array  $context
      *
      * @return mixed
      *
      * @throws \InvalidArgumentException if the given data transformer has unknown type
      */
-    protected function transformByCustomTransformer($transformer, $class, $property, $value, $config)
-    {
+    protected function transformByCustomTransformer(
+        $transformer,
+        $class,
+        $property,
+        $value,
+        array $config,
+        array $context
+    ) {
         if (is_string($transformer)) {
             $transformerService = $this->container->get($transformer, ContainerInterface::NULL_ON_INVALID_REFERENCE);
             if (null === $transformerService) {
@@ -68,13 +82,13 @@ class EntityDataTransformer implements DataTransformerInterface
         }
 
         if ($transformer instanceof DataTransformerInterface) {
-            return $transformer->transform($class, $property, $value, $config);
+            return $transformer->transform($class, $property, $value, $config, $context);
         }
         if ($transformer instanceof FormDataTransformerInterface) {
             return $transformer->transform($value);
         }
         if (is_callable($transformer)) {
-            return call_user_func($transformer, $class, $property, $value, $config);
+            return call_user_func($transformer, $class, $property, $value, $config, $context);
         }
 
         throw new \InvalidArgumentException(

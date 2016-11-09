@@ -1,0 +1,18 @@
+{#
+    Render converted currency block
+    Parameters:
+        multicurrency - special value instanceof Oro\Bundle\CurrencyBundle\Entity\MultiCurrency
+        title - property title
+        entity - the entitty instance on wich Field ACL should be checked
+        fieldName - the name of field on wich Field ACL should be checked
+#}
+{% macro convert_to_base_currency(multicurrency, title = null, entity = null, fieldName = null) %}
+    {% import 'OroUIBundle::macros.html.twig' as ui %}
+    {% set value = oro_multicurrency_rate_converter(multicurrency) %}
+    {% if value|length %}
+        <div class="base-currency-wrapper">
+            {{ ui.renderProperty(title ? title : '', value, entity, fieldName) }}
+        </div>
+    {% endif %}
+{% endmacro %}
+

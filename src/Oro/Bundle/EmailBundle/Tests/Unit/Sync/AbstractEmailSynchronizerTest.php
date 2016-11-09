@@ -2,9 +2,12 @@
 
 namespace Oro\Bundle\EmailBundle\Tests\Unit\Sync;
 
+use Doctrine\ORM\ORMException;
+
 use Oro\Bundle\EmailBundle\Sync\AbstractEmailSynchronizer;
 use Oro\Bundle\EmailBundle\Tests\Unit\Fixtures\Entity\TestEmailOrigin;
 use Oro\Bundle\EmailBundle\Tests\Unit\Sync\Fixtures\TestEmailSynchronizer;
+use Oro\Component\MessageQueue\Client\MessageProducerInterface;
 
 class AbstractEmailSynchronizerTest extends \PHPUnit_Framework_TestCase
 {
@@ -95,6 +98,50 @@ class AbstractEmailSynchronizerTest extends \PHPUnit_Framework_TestCase
             ->method('findOriginToSync')
             ->with($maxConcurrentTasks, $minExecPeriodInMin)
             ->will($this->returnValue(null));
+        $sync->expects($this->never())
+            ->method('createSynchronizationProcessor');
+
+        $sync->sync($maxConcurrentTasks, $minExecPeriodInMin);
+    }
+
+    /**
+     * @expectedException \Exception
+     */
+    public function testSyncOriginWithDoctrineError()
+    {
+        $now = new \DateTime('now', new \DateTimeZone('UTC'));
+        $maxConcurrentTasks = 3;
+        $minExecPeriodInMin = 1;
+        $origin = new TestEmailOrigin(123);
+
+        $sync = $this->getMockBuilder('Oro\Bundle\EmailBundle\Tests\Unit\Sync\Fixtures\TestEmailSynchronizer')
+            ->disableOriginalConstructor()
+            ->setMethods(
+                [
+                    'resetHangedOrigins',
+                    'findOriginToSync',
+                    'createSynchronizationProcessor',
+                    'changeOriginSyncState',
+                    'getCurrentUtcDateTime',
+                    'doSyncOrigin'
+                ]
+            )
+            ->getMock();
+        $sync->setLogger($this->logger);
+
+        $sync->expects($this->once())
+            ->method('getCurrentUtcDateTime')
+            ->will($this->returnValue($now));
+        $sync->expects($this->once())
+            ->method('resetHangedOrigins');
+        $sync->expects($this->once())
+            ->method('findOriginToSync')
+            ->with($maxConcurrentTasks, $minExecPeriodInMin)
+            ->will($this->returnValue($origin));
+        $sync->expects($this->once())
+            ->method('doSyncOrigin')
+            ->with($origin, $this->isInstanceOf('Oro\Bundle\EmailBundle\Sync\Model\SynchronizationProcessorSettings'))
+            ->will($this->throwException(new ORMException()));
         $sync->expects($this->never())
             ->method('createSynchronizationProcessor');
 
@@ -419,7 +466,7 @@ class AbstractEmailSynchronizerTest extends \PHPUnit_Framework_TestCase
             ->method('select')
             ->with(
                 'o'
-                . ', CASE WHEN o.syncCode = :inProcess THEN 0 ELSE 1 END AS HIDDEN p1'
+                . ', CASE WHEN o.syncCode = :inProcess OR o.syncCode = :inProcessForce THEN 0 ELSE 1 END AS HIDDEN p1'
                 . ', (TIMESTAMPDIFF(MINUTE, COALESCE(o.syncCodeUpdatedAt, :min), :now)'
                 . ' - (CASE o.syncCode WHEN :success THEN 0 ELSE :timeShift END)) AS HIDDEN p2'
             )
@@ -435,6 +482,10 @@ class AbstractEmailSynchronizerTest extends \PHPUnit_Framework_TestCase
         $qb->expects($this->at($index++))
             ->method('setParameter')
             ->with('inProcess', AbstractEmailSynchronizer::SYNC_CODE_IN_PROCESS)
+            ->will($this->returnValue($qb));
+        $qb->expects($this->at($index++))
+            ->method('setParameter')
+            ->with('inProcessForce', AbstractEmailSynchronizer::SYNC_CODE_IN_PROCESS_FORCE)
             ->will($this->returnValue($qb));
         $qb->expects($this->at($index++))
             ->method('setParameter')
@@ -554,6 +605,44 @@ class AbstractEmailSynchronizerTest extends \PHPUnit_Framework_TestCase
         $this->sync->callResetHangedOrigins();
     }
 
+    public function testScheduleSyncOriginsJobShouldThrowExceptionIfMessageQueueTopicIsNotSet()
+    {
+        $this->setExpectedException(\LogicException::class, 'Message queue topic is not set');
+
+        $this->sync->scheduleSyncOriginsJob([1,2,3]);
+    }
+
+    public function testScheduleSyncOriginsJobShouldThrowExceptionIfMessageProducerIsNotSet()
+    {
+        $refProp = new \ReflectionProperty(TestEmailSynchronizer::class, 'messageQueueTopic');
+        $refProp->setAccessible(true);
+        $refProp->setValue($this->sync, 'topic-name');
+        $refProp->setAccessible(false);
+
+        $this->setExpectedException(\LogicException::class, 'Message producer is not set');
+
+        $this->sync->scheduleSyncOriginsJob([1,2,3]);
+    }
+
+    public function testScheduleSyncOriginsJobShouldSendMessageToTopicWithIds()
+    {
+        $refProp = new \ReflectionProperty(TestEmailSynchronizer::class, 'messageQueueTopic');
+        $refProp->setAccessible(true);
+        $refProp->setValue($this->sync, 'topic-name');
+        $refProp->setAccessible(false);
+
+        $producer = $this->createMessageProducerMock();
+        $producer
+            ->expects($this->once())
+            ->method('send')
+            ->with('topic-name', ['ids' => [1,2,3]])
+        ;
+
+        $this->sync->setMessageProducer($producer);
+
+        $this->sync->scheduleSyncOriginsJob([1,2,3]);
+    }
+
     public function changeOriginSyncStateProvider()
     {
         return array(
@@ -561,5 +650,13 @@ class AbstractEmailSynchronizerTest extends \PHPUnit_Framework_TestCase
             array(AbstractEmailSynchronizer::SYNC_CODE_IN_PROCESS, false),
             array(AbstractEmailSynchronizer::SYNC_CODE_SUCCESS, true),
         );
+    }
+
+    /**
+     * @return \PHPUnit_Framework_MockObject_MockObject|MessageProducerInterface
+     */
+    private function createMessageProducerMock()
+    {
+        return $this->getMock(MessageProducerInterface::class);
     }
 }

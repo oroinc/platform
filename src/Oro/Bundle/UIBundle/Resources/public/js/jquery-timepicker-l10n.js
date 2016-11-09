@@ -4,7 +4,7 @@ define(function(require) {
     var $ = require('jquery');
     var __ = require('orotranslation/js/translator');
     var localeSettings = require('orolocale/js/locale-settings');
-    require('oroui/lib/jquery.timepicker-1.4.13/jquery.timepicker');
+    require('jquery.timepicker');
 
     var decimal = localeSettings.getNumberFormats('decimal').decimal_separator_symbol;
     var timeFormat = localeSettings.getVendorDateTimeFormat('php', 'time', $.fn.timepicker.defaults.timeFormat);

@@ -1,37 +1,47 @@
 <?php
+
 namespace Oro\Bundle\SearchBundle\Engine;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
+
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityBundle\ORM\OroEntityManager;
+use Oro\Bundle\EntityBundle\Provider\EntityNameResolver;
+use Oro\Bundle\SearchBundle\Engine\Orm\DbalStorer;
 use Oro\Bundle\SearchBundle\Entity\Item;
 use Oro\Bundle\SearchBundle\Entity\Repository\SearchIndexRepository;
-use Oro\Bundle\SearchBundle\Resolver\EntityTitleResolverInterface;
 
 class OrmIndexer extends AbstractIndexer
 {
     /** @var array */
     protected $drivers = [];
-    
+
     /** @var SearchIndexRepository */
     private $indexRepository;
 
     /** @var OroEntityManager */
     private $indexManager;
 
+    /** @var DbalStorer */
+    protected $dbalStorer;
+
     /**
-     * @param ManagerRegistry              $registry
-     * @param DoctrineHelper               $doctrineHelper
-     * @param ObjectMapper                 $mapper
-     * @param EntityTitleResolverInterface $entityTitleResolver
+     * @param ManagerRegistry $registry
+     * @param DoctrineHelper $doctrineHelper
+     * @param ObjectMapper $mapper
+     * @param EntityNameResolver $entityNameResolver
+     * @param DbalStorer $dbalStorer
      */
     public function __construct(
         ManagerRegistry $registry,
         DoctrineHelper $doctrineHelper,
         ObjectMapper $mapper,
-        EntityTitleResolverInterface $entityTitleResolver
+        EntityNameResolver $entityNameResolver,
+        DbalStorer $dbalStorer
     ) {
-        parent::__construct($registry, $doctrineHelper, $mapper, $entityTitleResolver);
+        parent::__construct($registry, $doctrineHelper, $mapper, $entityNameResolver);
+
+        $this->dbalStorer = $dbalStorer;
     }
 
     /**
@@ -55,7 +65,10 @@ class OrmIndexer extends AbstractIndexer
         $hasSavedEntities = $this->saveItemData($entities);
 
         if ($hasSavedEntities) {
-            $this->flush();
+            $this->getIndexManager()->getConnection()->transactional(function () {
+                $this->dbalStorer->store();
+                $this->getIndexManager()->clear();
+            });
         }
 
         return $hasSavedEntities;
@@ -136,7 +149,7 @@ class OrmIndexer extends AbstractIndexer
                 ->setChanged(false)
                 ->saveItemData($data);
 
-            $this->getIndexManager()->persist($item);
+            $this->dbalStorer->addItem($item);
 
             $hasSavedEntities = true;
         }

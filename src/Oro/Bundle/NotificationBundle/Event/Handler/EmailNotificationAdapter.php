@@ -6,7 +6,7 @@ use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ORM\EntityManager;
 
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
-use Oro\Bundle\NotificationBundle\Processor\EmailNotificationInterface;
+use Oro\Bundle\NotificationBundle\Model\EmailNotificationInterface;
 use Oro\Bundle\NotificationBundle\Entity\EmailNotification;
 
 /**
