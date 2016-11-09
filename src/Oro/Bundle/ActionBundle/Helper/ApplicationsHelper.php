@@ -8,15 +8,12 @@ use Oro\Bundle\UserBundle\Entity\User;
 
 class ApplicationsHelper implements ApplicationsHelperInterface
 {
-    use ApplicationsHelperTrait;
+    use ApplicationsHelperTrait, RouteHelperTrait;
 
     const DEFAULT_APPLICATION = 'default';
 
     /** @var TokenStorageInterface */
     protected $tokenStorage;
-
-    /** @var string */
-    protected $currentApplication = false;
 
     /**
      * @param TokenStorageInterface $tokenStorage

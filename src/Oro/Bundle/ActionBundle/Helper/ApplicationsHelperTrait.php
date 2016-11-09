@@ -4,6 +4,13 @@ namespace Oro\Bundle\ActionBundle\Helper;
 
 trait ApplicationsHelperTrait
 {
+    /** @var string */
+    protected $currentApplication = false;
+
+    /**
+     * @param array $applications
+     * @return bool
+     */
     public function isApplicationsValid(array $applications)
     {
         if (empty($applications)) {
