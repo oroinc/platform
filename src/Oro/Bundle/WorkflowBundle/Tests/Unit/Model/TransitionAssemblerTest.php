@@ -329,6 +329,11 @@ class TransitionAssemblerTest extends \PHPUnit_Framework_TestCase
             'Incorrect form_options'
         );
 
+        $initEntities = array_key_exists(WorkflowConfiguration::NODE_INIT_ENTITIES, $configuration)
+            ? $configuration[WorkflowConfiguration::NODE_INIT_ENTITIES]
+            : [];
+        $this->assertEquals($initEntities, $actualTransition->getInitEntities());
+
         $this->assertTemplate('page', $configuration, $actualTransition);
         $this->assertTemplate('dialog', $configuration, $actualTransition);
 
@@ -431,6 +436,15 @@ class TransitionAssemblerTest extends \PHPUnit_Framework_TestCase
                     'acl_message' => 'test acl message',
                     'step_to' => 'step',
                     'is_start' => true,
+                ],
+                'transitionDefinition' => self::$transitionDefinitions['empty_definition'],
+            ],
+            'with init context' => [
+                'configuration' => [
+                    'transition_definition' => 'empty_definition',
+                    'init_entities' => ['entity1', 'entity2'],
+                    'init_routes' => ['route1', 'route2'],
+                    'step_to' => 'step',
                 ],
                 'transitionDefinition' => self::$transitionDefinitions['empty_definition'],
             ],
