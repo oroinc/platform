@@ -36,7 +36,7 @@ class ConfigExtensionTest extends \PHPUnit_Framework_TestCase
             $router,
             $entityClassNameHelper,
             $doctrineHelper
-    );
+        );
     }
 
     protected function tearDown()
