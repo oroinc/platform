@@ -131,7 +131,10 @@ class TransitionAssembler extends BaseAbstractAssembler
                 $this->getOption($options, 'display_type', WorkflowConfiguration::DEFAULT_TRANSITION_DISPLAY_TYPE)
             )
             ->setPageTemplate($this->getOption($options, 'page_template'))
-            ->setDialogTemplate($this->getOption($options, 'dialog_template'));
+            ->setDialogTemplate($this->getOption($options, 'dialog_template'))
+            ->setInitEntities($this->getOption($options, WorkflowConfiguration::NODE_INIT_ENTITIES, []))
+            ->setInitRoutes($this->getOption($options, WorkflowConfiguration::NODE_INIT_ROUTES, []))
+            ->setInitContextAttribute($this->getOption($options, 'init_context_attribute'));
 
         if (!empty($definition['preactions'])) {
             $preAction = $this->actionFactory->create(ConfigurableAction::ALIAS, $definition['preactions']);
