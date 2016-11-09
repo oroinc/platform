@@ -294,13 +294,12 @@ operations:
             - '@call_service_method':
                 service: translator.default
                 method: rebuildCache
-#            - '@call_service_method':
-#                service: oro_translation.js_dumper
-#                method: dumpTranslations
+            - '@call_service_method':
+                service: oro_translation.js_dumper
+                method: dumpTranslations
             - '@flash_message':
                 message: oro.translation.translation.message.rebuild_cache
                 type: 'success'
-            - '@refresh_grid': unknown-grid
 action_groups:
     oro_translation_language_set_enabled:
         parameters:
