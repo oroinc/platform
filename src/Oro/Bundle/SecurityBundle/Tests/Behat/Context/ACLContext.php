@@ -136,6 +136,13 @@ class ACLContext extends OroFeatureContext implements OroPageObjectAware, Kernel
         $mainMenu->openAndClick('System/ User Management/ Roles');
         $this->waitForAjax();
 
+        /* It happens for create_opportunity_in_a_single_form.feature that filters are hidden until the
+         * element is clicked for unknown reason so far.
+         *
+         * This happens with both phantomjs and selenium+chrome and the fix works only for selenium+chrome
+         */
+        $this->getPage()->find('css', '.container-fluid.page-title')->click();
+
         /** @var GridFilterStringItem $filterItem */
         $filterItem = $this->createElement('GridFilters')->getFilterItem('GridFilterStringItem', 'Label');
 
