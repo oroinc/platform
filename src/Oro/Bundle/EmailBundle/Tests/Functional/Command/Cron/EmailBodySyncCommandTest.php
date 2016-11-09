@@ -58,10 +58,14 @@ class EmailBodySyncCommandTest extends WebTestCase
      */
     protected function toggleEmailFeatureValue($value)
     {
-        $configManager = $this->getContainer()->get('oro_config.scope.global');
+        $key = Configuration::getConfigKeyByName('feature_enabled');
 
-        $configManager->set(Configuration::getConfigKeyByName('feature_enabled'), (bool) $value);
+        $configManager = $this->getContainer()->get('oro_config.manager');
+        $configManager->set($key, (bool) $value);
         $configManager->flush();
+
+        $featureChecker = $this->getContainer()->get('oro_featuretoggle.checker.feature_checker');
+        $featureChecker->resetCache();
     }
 
     /**
