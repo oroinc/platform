@@ -138,7 +138,7 @@ class BlockFactory implements BlockFactoryInterface
         // build child blocks
         $iterator = $this->rawLayout->getHierarchyIterator($rootId);
         foreach ($iterator as $id) {
-            if ($this->rawLayout->hasProperty($id, RawLayout::RESOLVED_OPTIONS, true)) {
+            if (!$this->rawLayout->has($id) || $this->rawLayout->hasProperty($id, RawLayout::RESOLVED_OPTIONS, true)) {
                 // the block is already built
                 continue;
             }

@@ -267,7 +267,7 @@ class RendererTest extends LayoutTestCase
             // can be applied for items added by a block type
             ->move('form_fields:group_general', null, 'form_fields:group_additional')
             // test 'visible' option
-            ->add('invisible_container', 'root', 'head', ['visible' => '=false'])
+            ->add('invisible_container', 'root', 'head', ['visible' => false])
             ->add('invisible_child', 'invisible_container', 'meta', ['charset' => 'invisible'])
             // test 'visible' option when its value is an expression
             ->add(
