@@ -42,6 +42,10 @@ services:
         class: %oro_action.helper.applications.class%
         arguments:
             - '@security.token_storage'
+        calls:
+            - [setDialogRoute, ['oro_action_widget_form']]
+            - [setExecutionRoute, ['oro_action_operation_execute']]
+            - [setWidgetRoute, ['oro_action_widget_buttons']]
 
     oro_action.helper.restrict:
         class: %oro_action.helper.restrict.class%

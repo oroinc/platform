@@ -4,13 +4,13 @@ namespace Oro\Bundle\ActionBundle\Helper;
 
 trait RouteHelperTrait
 {
-    /** @var  string */
+    /** @var string */
     protected $dialogRoute;
 
-    /** @var  string */
+    /** @var string */
     protected $executionRoute;
 
-    /** @var  string */
+    /** @var string */
     protected $widgetRoute;
 
     /**
@@ -23,10 +23,13 @@ trait RouteHelperTrait
 
     /**
      * @param string $dialogRoute
+     * @return $this
      */
     public function setDialogRoute($dialogRoute)
     {
         $this->dialogRoute = $dialogRoute;
+
+        return $this;
     }
 
     /**
@@ -39,10 +42,13 @@ trait RouteHelperTrait
 
     /**
      * @param string $executionRoute
+     * @return $this
      */
     public function setExecutionRoute($executionRoute)
     {
         $this->executionRoute = $executionRoute;
+
+        return $this;
     }
 
     /**
@@ -55,9 +61,12 @@ trait RouteHelperTrait
 
     /**
      * @param string $widgetRoute
+     * @return $this
      */
     public function setWidgetRoute($widgetRoute)
     {
         $this->widgetRoute = $widgetRoute;
+
+        return $this;
     }
 }

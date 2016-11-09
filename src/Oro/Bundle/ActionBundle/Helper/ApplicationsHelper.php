@@ -32,28 +32,4 @@ class ApplicationsHelper implements ApplicationsHelperInterface
 
         return $token && $token->getUser() instanceof User ? self::DEFAULT_APPLICATION : null;
     }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getWidgetRoute()
-    {
-        return 'oro_action_widget_buttons';
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getDialogRoute()
-    {
-        return 'oro_action_widget_form';
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getExecutionRoute()
-    {
-        return 'oro_action_operation_execute';
-    }
 }
