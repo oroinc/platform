@@ -112,7 +112,7 @@ class WorkflowRegistry
 
         $activeWorkflowDefinitions = $this->getEntityRepository()->findActiveForRelatedEntity($class);
 
-        $items = $this->filterEnabledFeaturesWorkflows($activeWorkflowDefinitions);
+        $items = $this->filterWorkflowDefinitionsByFeatures($activeWorkflowDefinitions);
 
         return count($items) > 0;
     }
@@ -176,18 +176,9 @@ class WorkflowRegistry
      */
     private function getAssembledWorkflows(array $definitions)
     {
-        $assembledWorkflows = array_map(
-            function ($definition) {
-                return $this->getAssembledWorkflow($definition);
-            },
-            $this->filterEnabledFeaturesWorkflows($definitions)
-        );
-
         $workflows = new ArrayCollection();
-
-        /** @var Workflow $workflow */
-        foreach ($assembledWorkflows as $workflow) {
-            $workflows->set($workflow->getName(), $workflow);
+        foreach ($this->filterWorkflowDefinitionsByFeatures($definitions) as $definition) {
+            $workflows->set($definition->getName(), $this->getAssembledWorkflow($definition));
         }
 
         return $workflows;
@@ -247,16 +238,15 @@ class WorkflowRegistry
      * @param WorkflowDefinition[] $workflowDefinitions
      * @return WorkflowDefinition[]|array
      */
-    protected function filterEnabledFeaturesWorkflows(array $workflowDefinitions)
+    protected function filterWorkflowDefinitionsByFeatures(array $workflowDefinitions)
     {
         return array_filter(
             $workflowDefinitions,
             function (WorkflowDefinition $definition) {
-                $isResourceEnabled = $this->featureChecker->isResourceEnabled(
+                return $this->featureChecker->isResourceEnabled(
                     $definition->getName(),
                     FeatureConfigurationExtension::WORKFLOWS_NODE_NAME
                 );
-                return $isResourceEnabled;
             }
         );
     }
