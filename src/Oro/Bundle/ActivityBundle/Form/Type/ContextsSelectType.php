@@ -16,7 +16,7 @@ use Symfony\Component\Translation\TranslatorInterface;
 
 use Oro\Bundle\ActivityBundle\Form\DataTransformer\ContextsToViewTransformer;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
-use Oro\Bundle\SearchBundle\Resolver\EntityTitleResolverInterface;
+use Oro\Bundle\EntityBundle\Provider\EntityNameResolver;
 
 class ContextsSelectType extends AbstractType
 {
@@ -37,8 +37,8 @@ class ContextsSelectType extends AbstractType
     /** @var EventDispatcherInterface */
     protected $dispatcher;
 
-    /** @var EntityTitleResolverInterface */
-    protected $entityTitleResolver;
+    /** @var EntityNameResolver */
+    protected $entityNameResolver;
 
     /**
      * @param EntityManager         $entityManager
@@ -46,7 +46,7 @@ class ContextsSelectType extends AbstractType
      * @param TranslatorInterface   $translator
      * @param TokenStorageInterface $securityTokenStorage
      * @param EventDispatcherInterface $dispatcher
-     * @param EntityTitleResolverInterface $entityTitleResolver
+     * @param EntityNameResolver $entityNameResolver
      */
     public function __construct(
         EntityManager $entityManager,
@@ -54,14 +54,14 @@ class ContextsSelectType extends AbstractType
         TranslatorInterface $translator,
         TokenStorageInterface $securityTokenStorage,
         EventDispatcherInterface $dispatcher,
-        EntityTitleResolverInterface $entityTitleResolver
+        EntityNameResolver $entityNameResolver
     ) {
         $this->entityManager        = $entityManager;
         $this->configManager        = $configManager;
         $this->translator           = $translator;
         $this->securityTokenStorage = $securityTokenStorage;
         $this->dispatcher           = $dispatcher;
-        $this->entityTitleResolver  = $entityTitleResolver;
+        $this->entityNameResolver  = $entityNameResolver;
     }
 
     /**
@@ -77,7 +77,7 @@ class ContextsSelectType extends AbstractType
                 $this->translator,
                 $this->securityTokenStorage,
                 $this->dispatcher,
-                $this->entityTitleResolver,
+                $this->entityNameResolver,
                 $options['collectionModel']
             )
         );
