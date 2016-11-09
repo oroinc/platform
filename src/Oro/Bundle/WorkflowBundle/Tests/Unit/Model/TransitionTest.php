@@ -39,7 +39,10 @@ class TransitionTest extends \PHPUnit_Framework_TestCase
                 ['preAction', $this->getMock(ActionInterface::class)],
                 ['preCondition', $this->getMock(ExpressionInterface::class)],
                 ['condition', $this->getMock(ExpressionInterface::class)],
-                ['action', $this->getMock(ActionInterface::class)]
+                ['action', $this->getMock(ActionInterface::class)],
+                ['initEntities', ['TEST_ENTITY_1', 'TEST_ENTITY_2', 'TEST_ENTITY_3']],
+                ['initRoutes', ['TEST_ROUTE_1', 'TEST_ROUTE_2', 'TEST_ROUTE_3']],
+                ['initContextAttribute', 'testInitContextAttribute'],
             ]
         );
     }
