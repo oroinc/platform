@@ -4,6 +4,7 @@ styles:
         - 'bundles/oroui/blank/scss/variables/base-config.scss'
         - 'bundles/oroui/blank/scss/variables/page-container-config.scss'
         - 'bundles/oroui/blank/scss/variables/page-header-config.scss'
+        - 'bundles/oroui/blank/scss/variables/page-main-config.scss'
         - 'bundles/oroui/blank/scss/variables/page-content-config.scss'
         - 'bundles/oroui/blank/scss/variables/page-footer-config.scss'
         - 'bundles/oroui/blank/scss/variables/page-sidebar-config.scss'
