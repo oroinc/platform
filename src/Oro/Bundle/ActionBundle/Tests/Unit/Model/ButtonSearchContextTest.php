@@ -9,7 +9,7 @@ class ButtonSearchContextTest extends \PHPUnit_Framework_TestCase
 {
     use EntityTestCaseTrait;
 
-    /** @var  ButtonSearchContext */
+    /** @var ButtonSearchContext */
     protected $buttonSearchContext;
 
     /**
@@ -18,6 +18,14 @@ class ButtonSearchContextTest extends \PHPUnit_Framework_TestCase
     public function setUp()
     {
         $this->buttonSearchContext = new ButtonSearchContext();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function tearDown()
+    {
+        unset($this->buttonSearchContext);
     }
 
     public function testProperties()
@@ -32,10 +40,27 @@ class ButtonSearchContextTest extends \PHPUnit_Framework_TestCase
         $this->assertPropertyAccessors($this->buttonSearchContext, $properties);
     }
 
-    public function testGetSetEntity()
+    /**
+     * @dataProvider getSetEntityProvider
+     *
+     * @param int|string|array $entityId
+     */
+    public function testGetSetEntity($entityId)
     {
-        $this->buttonSearchContext->setEntity('Class', 10);
+        $this->buttonSearchContext->setEntity('Class', $entityId);
         $this->assertSame('Class', $this->buttonSearchContext->getEntityClass());
-        $this->assertSame(10, $this->buttonSearchContext->getEntityId());
+        $this->assertSame($entityId, $this->buttonSearchContext->getEntityId());
+    }
+
+    /**
+     * @return array
+     */
+    public function getSetEntityProvider()
+    {
+        return [
+            [10],
+            [uniqid()],
+            [[10, uniqid()]],
+        ];
     }
 }

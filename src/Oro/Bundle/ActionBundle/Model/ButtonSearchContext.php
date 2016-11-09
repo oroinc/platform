@@ -7,7 +7,7 @@ class ButtonSearchContext
     /** @var string */
     protected $entityClass;
 
-    /** @var mixed */
+    /** @var int|string|array */
     protected $entityId;
 
     /** @var string */
@@ -25,6 +25,7 @@ class ButtonSearchContext
     /**
      * @param string $entityClass
      * @param null|mixed $entityId
+     *
      * @return $this
      */
     public function setEntity($entityClass, $entityId = null)
@@ -44,7 +45,7 @@ class ButtonSearchContext
     }
 
     /**
-     * @return mixed
+     * @return int|string|array
      */
     public function getEntityId()
     {
@@ -61,6 +62,7 @@ class ButtonSearchContext
 
     /**
      * @param string $routeName
+     *
      * @return $this
      */
     public function setRouteName($routeName)
@@ -80,6 +82,7 @@ class ButtonSearchContext
 
     /**
      * @param string $gridName
+     *
      * @return $this
      */
     public function setGridName($gridName)
@@ -99,6 +102,7 @@ class ButtonSearchContext
 
     /**
      * @param string $referrer
+     *
      * @return $this
      */
     public function setReferrer($referrer)
@@ -118,6 +122,7 @@ class ButtonSearchContext
 
     /**
      * @param string $group
+     *
      * @return $this
      */
     public function setGroup($group)
