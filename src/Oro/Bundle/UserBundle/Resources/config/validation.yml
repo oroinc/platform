@@ -3,7 +3,6 @@ Oro\Bundle\UserBundle\Entity\User:
         - Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity: username
         - Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity: email
         - Oro\Bundle\UserBundle\Validator\Constraints\UserAuthenticationFieldsConstraint: ~
-        - Oro\Bundle\UserBundle\Validator\Constraints\UsedPassword: ~
     properties:
         username:
             - NotBlank:     ~
