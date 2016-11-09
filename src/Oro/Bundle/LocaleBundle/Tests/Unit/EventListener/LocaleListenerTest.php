@@ -81,8 +81,10 @@ class LocaleListenerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @param mixed $installed
+     * @param bool|null $installed
      * @param bool $isSetLocale
+     * @param string $expectedLanguage
+     * @param Localization|null $localization
      * @dataProvider onKernelRequestDataProvider
      */
     public function testOnKernelRequest($installed, $isSetLocale, $expectedLanguage, Localization $localization = null)
