@@ -35,7 +35,7 @@ class TranslatorTest extends WebTestCase
         $this->getContainer()->set('oro_translation.strategy.provider', $provider);
 
         $provider->addStrategy(
-            new TranslationStrategy('strategy1',['lang1' => [], 'lang2' => [], 'lang3' => [], 'lang4' => []])
+            new TranslationStrategy('strategy1', ['lang1' => [], 'lang2' => [], 'lang3' => [], 'lang4' => []])
         );
         $provider->addStrategy(
             new TranslationStrategy('strategy2', ['lang2' => ['lang3' => ['lang4' => ['lang1' => []]]]])
@@ -48,16 +48,17 @@ class TranslatorTest extends WebTestCase
         $this->translator->rebuildCache();
 
         $key = uniqid('TRANSLATION_KEY_', true);
-        $val1 = uniqid('TEST_VALUE_', true);
-        $val2 = uniqid('TEST_VALUE_', true);
+        $val1 = uniqid('TEST_VALUE1_', true);
+        $val2 = uniqid('TEST_VALUE2_', true);
 
         /* @var $manager TranslationManager */
         $manager = $this->getContainer()->get('oro_translation.manager.translation');
-        $manager->saveTranslation($key, $val1, 'lang1', 'messages', Translation::SCOPE_UI);
-        $manager->saveTranslation($key, $val2, 'lang2', 'messages', Translation::SCOPE_UI);
+        $manager->saveTranslation($key, $val1, 'lang1', TranslationManager::DEFAULT_DOMAIN, Translation::SCOPE_UI);
+        $manager->saveTranslation($key, $val2, 'lang2', TranslationManager::DEFAULT_DOMAIN, Translation::SCOPE_UI);
         $manager->flush();
         $manager->clear();
 
+        // Ensure that catalog still contains old translated values
         $provider->selectStrategy('strategy1');
         $this->assertTranslationEquals($key, ['lang1' => $key, 'lang2' => $key, 'lang3' => $key, 'lang4' => $key]);
 
@@ -69,6 +70,7 @@ class TranslatorTest extends WebTestCase
 
         $this->translator->rebuildCache();
 
+        // Ensure that catalog still contains new translated values
         $provider->selectStrategy('strategy1');
         $this->assertTranslationEquals($key, ['lang1' => $val1, 'lang2' => $val2, 'lang3' => $key, 'lang4' => $key]);
 
@@ -84,7 +86,7 @@ class TranslatorTest extends WebTestCase
      * @param array $items
      * @param string $domain
      */
-    protected function assertTranslationEquals($key, array $items, $domain = 'messages')
+    protected function assertTranslationEquals($key, array $items, $domain = TranslationManager::DEFAULT_DOMAIN)
     {
         $actualData = [];
         $expectedData = [];
