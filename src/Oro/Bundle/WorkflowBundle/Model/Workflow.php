@@ -514,7 +514,7 @@ class Workflow
      * @param string $nodeName
      * @param mixed|null $default
      *
-     * @return mixed
+     * @return mixed|null
      */
     private function getConfigurationOption($nodeName, $default = null)
     {
