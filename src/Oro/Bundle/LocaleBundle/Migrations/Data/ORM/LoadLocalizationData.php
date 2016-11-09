@@ -94,9 +94,8 @@ class LoadLocalizationData extends AbstractFixture implements ContainerAwareInte
      */
     protected function getLanguageCode($locale)
     {
-        list($language) = explode('_', $locale);
-
-        return $language;
+        // TODO: must be refactored in scope https://magecore.atlassian.net/browse/BAP-12623
+        return $locale;
     }
 
     /**
@@ -116,7 +115,7 @@ class LoadLocalizationData extends AbstractFixture implements ContainerAwareInte
      */
     protected function isSupportedLanguage($language)
     {
-        $languages = Intl::getLanguageBundle()->getLanguageNames();
+        $languages = Intl::getLocaleBundle()->getLocaleNames();
 
         return array_key_exists($language, $languages);
     }

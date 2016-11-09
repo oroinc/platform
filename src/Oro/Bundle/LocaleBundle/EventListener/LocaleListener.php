@@ -15,7 +15,9 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Routing\RequestContextAwareInterface;
 use Symfony\Component\Translation\TranslatorInterface;
 
+use Oro\Bundle\LocaleBundle\Entity\Localization;
 use Oro\Bundle\LocaleBundle\Model\LocaleSettings;
+use Oro\Bundle\LocaleBundle\Provider\CurrentLocalizationProvider;
 
 class LocaleListener implements EventSubscriberInterface
 {
@@ -33,6 +35,9 @@ class LocaleListener implements EventSubscriberInterface
 
     /** @var TranslatorInterface */
     private $translator = false;
+
+    /** @var Localization */
+    private $currentLocalization = false;
 
     /** @var ContainerInterface */
     private $container;
@@ -55,7 +60,12 @@ class LocaleListener implements EventSubscriberInterface
         }
 
         if ($this->getIsInstalled()) {
-            $language = $this->getLocaleSettings()->getLanguage();
+            // TODO: must be refactored in scope https://magecore.atlassian.net/browse/BAP-12623
+            if (null !== ($localization = $this->getCurrentLocalization())) {
+                $language = $localization->getLanguageCode();
+            } else {
+                $language = $this->getLocaleSettings()->getLanguage();
+            }
             $locale   = $this->getLocaleSettings()->getLocale();
 
             if (!$request->attributes->get('_locale')) {
@@ -184,5 +194,19 @@ class LocaleListener implements EventSubscriberInterface
         }
 
         return $this->translator;
+    }
+
+    /**
+     * @return Localization
+     */
+    protected function getCurrentLocalization()
+    {
+        if ($this->currentLocalization === false) {
+            /* @var $provider CurrentLocalizationProvider */
+            $provider = $this->container->get('oro_locale.provider.current_localization');
+            $this->currentLocalization = $provider->getCurrentLocalization();
+        }
+
+        return $this->currentLocalization;
     }
 }

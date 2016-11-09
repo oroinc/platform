@@ -187,6 +187,8 @@ services:
         arguments:
             - '@oro_translation.provider.language'
             - '%installed%'
+        tags:
+            - { name: oro_translation.extension.translation_strategy, type: default, priority: 0 }
 
     oro_translation.strategy.provider:
         class: '%oro_translation.strategy.provider.class%'

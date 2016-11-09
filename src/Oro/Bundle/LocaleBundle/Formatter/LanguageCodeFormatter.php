@@ -33,13 +33,13 @@ class LanguageCodeFormatter
      */
     public function format($code)
     {
+        // TODO: must be refactored in scope https://magecore.atlassian.net/browse/BAP-12623
         if (!$code) {
             return $this->translator->trans('N/A');
         }
 
-        $name = Intl::getLanguageBundle()->getLanguageName(
+        $name = Intl::getLocaleBundle()->getLocaleName(
             $code,
-            null,
             $this->configManager->get(self::CONFIG_KEY_DEFAULT_LANGUAGE)
         );
 
@@ -52,6 +52,7 @@ class LanguageCodeFormatter
      */
     public function formatLocale($code)
     {
+        // TODO: must be refactored in scope https://magecore.atlassian.net/browse/BAP-12623
         if (!$code) {
             return $this->translator->trans('N/A');
         }

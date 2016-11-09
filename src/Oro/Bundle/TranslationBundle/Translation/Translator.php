@@ -5,10 +5,10 @@ namespace Oro\Bundle\TranslationBundle\Translation;
 use Doctrine\Common\Cache\Cache;
 use Doctrine\Common\Cache\ClearableCache;
 
+use Symfony\Bundle\FrameworkBundle\Translation\Translator as BaseTranslator;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Translation\Loader\LoaderInterface;
 use Symfony\Component\Translation\MessageSelector;
-use Symfony\Bundle\FrameworkBundle\Translation\Translator as BaseTranslator;
 
 use Oro\Bundle\TranslationBundle\Strategy\TranslationStrategyProvider;
 
@@ -188,9 +188,17 @@ class Translator extends BaseTranslator
      */
     public function warmUp($cacheDir)
     {
+        // skip warmUp when translator doesn't use cache
+        if (null === $this->options['cache_dir']) {
+            return;
+        }
+
         $this->applyCurrentStrategy();
 
-        parent::warmUp($cacheDir);
+        $locales = array_unique($this->getFallbackLocales());
+        foreach ($locales as $locale) {
+            $this->loadCatalogue($locale);
+        }
     }
 
     /**
@@ -200,19 +208,22 @@ class Translator extends BaseTranslator
     {
         $cacheDir = $this->originalOptions['cache_dir'];
 
-        if (!$cacheDir || !is_dir($cacheDir)) {
-            $this->warmUp($cacheDir);
-            return;
-        }
-
         $tmpDir = $cacheDir . DIRECTORY_SEPARATOR . uniqid('CACHE_', true);
 
         $options = array_merge($this->originalOptions, ['cache_dir' => $tmpDir]);
 
-        $translator = new static($this->container, $this->messageSelector, $this->loaderIds, $options);
-        $translator->setDatabaseMetadataCache($this->databaseTranslationMetadataCache);
+        $provider = $this->getStrategyProvider();
+        foreach ($provider->getStrategies() as $strategy) {
+            $provider->selectStrategy($strategy->getName());
 
-        $translator->warmUp($tmpDir);
+            /* @var $translator Translator */
+            $translator = new static($this->container, $this->messageSelector, $this->loaderIds, $options);
+            $translator->setDatabaseMetadataCache($this->databaseTranslationMetadataCache);
+
+            $translator->warmUp($tmpDir);
+        }
+
+        $provider->resetStrategy();
 
         $iterator = new \IteratorIterator(new \DirectoryIterator($tmpDir));
         foreach ($iterator as $path) {

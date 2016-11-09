@@ -6,17 +6,27 @@ use Oro\Bundle\TranslationBundle\Translation\Translator;
 
 class TranslationStrategyProvider
 {
-    /**
-     * @var TranslationStrategyInterface
-     */
+    /** @var TranslationStrategyInterface */
     protected $strategy;
 
+    /** @var TranslationStrategyInterface[] */
+    protected $strategies;
+
     /**
-     * @param TranslationStrategyInterface $defaultStrategy
+     * @param string $name
      */
-    public function __construct(TranslationStrategyInterface $defaultStrategy)
+    public function selectStrategy($name)
     {
-        $this->strategy = $defaultStrategy;
+        if (!array_key_exists($name, $this->strategies)) {
+            return;
+        }
+
+        $this->strategy = $this->strategies[$name];
+    }
+
+    public function resetStrategy()
+    {
+        $this->strategy = null;
     }
 
     /**
@@ -24,15 +34,32 @@ class TranslationStrategyProvider
      */
     public function getStrategy()
     {
+        if (null === $this->strategy) {
+            foreach ($this->strategies as $strategy) {
+                if ($strategy->isApplicable()) {
+                    $this->strategy = $strategy;
+                    break;
+                }
+            }
+        }
+
         return $this->strategy;
     }
 
     /**
      * @param TranslationStrategyInterface $strategy
      */
-    public function setStrategy(TranslationStrategyInterface $strategy)
+    public function addStrategy(TranslationStrategyInterface $strategy)
     {
-        $this->strategy = $strategy;
+        $this->strategies[$strategy->getName()] = $strategy;
+    }
+
+    /**
+     * @return TranslationStrategyInterface[]
+     */
+    public function getStrategies()
+    {
+        return $this->strategies;
     }
 
     /**
@@ -72,7 +99,7 @@ class TranslationStrategyProvider
     {
         $fallbackTree = $strategy->getLocaleFallbacks();
 
-        return array_unique($this->convertTreeToPlainArray($fallbackTree));
+        return array_values(array_unique($this->convertTreeToPlainArray($fallbackTree)));
     }
 
     /**
