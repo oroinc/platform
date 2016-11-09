@@ -180,76 +180,15 @@ class UserRepository extends EntityRepository implements EmailAwareRepository
     }
 
     /**
-     * Sets password expiry date of ALL users
-     *
-     * @param \DateTime|null $value
-     */
-    public function updateAllUsersPasswordExpiration(\DateTime $value = null)
-    {
-        $qb = $this->createQueryBuilder('u');
-        $qb
-            ->update()
-            ->set('u.passwordExpiresAt', ':expiryDate')
-            ->setParameter('expiryDate', $value, Type::DATETIME);
-
-        $qb->getQuery()->execute();
-    }
-
-    /**
-     * Return query builder matching users which their passwords are about to expire in the specified list of dates
-     *
-     * @param array $dates Array of date period pairs [from => \DateTime, to => \DateTime] to match against
+     * Return query builder matching enabled users
      *
      * @return QueryBuilder
      */
-    public function getExpiringPasswordUsersQB(array $dates)
+    public function findEnabledUsersQB()
     {
-        if (0 === count($dates)) {
-            throw new \InvalidArgumentException('At least one notification period should be provided');
-        }
-
-        $builder = $this->createQueryBuilder('u');
-        $conditions = [];
-        foreach ($dates as $index => $period) {
-            if (!($period['from'] instanceof \DateTime && $period['to'] instanceof \DateTime)) {
-                throw new \InvalidArgumentException('Period array should include [\DateTime from, \DateTime to]');
-            }
-            $conditions[] = $builder->expr()->between(
-                'u.passwordExpiresAt',
-                ':from' . $index,
-                ':to' . $index
-            );
-            $builder->setParameter('from' . $index, $period['from'], Type::DATETIME);
-            $builder->setParameter('to' . $index, $period['to'], Type::DATETIME);
-        }
-
-        return $builder
+        return $this->createQueryBuilder('u')
             ->select('u')
             ->andWhere('u.enabled = :enabled')
-            ->andWhere($builder->expr()->orX()->addMultiple($conditions))
             ->setParameter('enabled', true);
-    }
-
-    /**
-     * Get array of enabled users with expired passwords
-     *
-     * @param \DateTime $expireAt
-     *
-     * @return array
-     */
-    public function getExpiredPasswordUserIds(\DateTime $expireAt)
-    {
-        $result = $this->createQueryBuilder('u')
-            ->select('u.id')
-            ->andWhere('u.passwordExpiresAt <= :expiresAt')
-            ->andWhere('u.loginDisabled = :loginDisabled')
-            ->andWhere('u.enabled = :enabled')
-            ->setParameter('expiresAt', $expireAt, Type::DATETIME)
-            ->setParameter('loginDisabled', false)
-            ->setParameter('enabled', true)
-            ->getQuery()
-            ->getArrayResult();
-
-        return array_column($result, 'id');
     }
 }
