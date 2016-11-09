@@ -7,6 +7,8 @@
   &__item {
     flex: 0 1 auto;
 
+    padding: ($offset-y-s / 2) 0;
+
     &--current {
 
     }

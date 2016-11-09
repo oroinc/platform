@@ -1,0 +1,14 @@
+.page-sidebar {
+    width: $page-sidebar-width;
+    padding: $page-sidebar-inner-offset;
+
+    order: $page-sidebar-order;
+    flex: $page-sidebar-flex;
+}
+
+@include breakpoint('tablet-small') {
+    .page-sidebar {
+        width: $page-sidebar-mobile-inner-offset;
+        padding: $page-sidebar-mobile-width;
+    }
+}
