@@ -40,7 +40,7 @@ class ButtonContext
     }
 
     /**
-     * @return int
+     * @return int|string|array|null
      */
     public function getEntityId()
     {
