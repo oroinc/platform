@@ -53,6 +53,8 @@ services:
         class: Oro\Bundle\TestFrameworkBundle\Behat\Listener\SuiteAwareSubscriber
         arguments:
             - ~
+        tags:
+            - { name: 'event_dispatcher.subscriber' }
 
     cli.controller.mesure_execution_time:
         class: Oro\Bundle\TestFrameworkBundle\Behat\Cli\MeasureExecutionTimeController
