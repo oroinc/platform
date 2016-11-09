@@ -23,7 +23,7 @@ layout:
                 theme_icon:
                     blockType: external_resource
                     options:
-                        visible: '=data["theme"].getIcon(context["theme"])!=null'
+                        visible: '=false'
                         href: '=data["asset"].getUrl(data["theme"].getIcon(context["theme"]))'
                         rel: shortcut icon
                 styles:

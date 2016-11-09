@@ -34,6 +34,9 @@ class ExpressionProcessor
     /** @var  array */
     protected $processedValues = [];
 
+    /** @var boolean */
+    protected $visible = true;
+
     /**
      * @param ExpressionLanguage        $expressionLanguage
      * @param ExpressionEncoderRegistry $encoderRegistry
@@ -69,6 +72,12 @@ class ExpressionProcessor
         $this->values = $values;
         $this->processingValues = [];
         $this->processedValues = [];
+
+        if (array_key_exists('visible', $values)) {
+            $this->processRootValue('visible', $values['visible'], $context, $data, $evaluate, $encoding);
+            $this->visible = $values['visible'];
+        }
+
         foreach ($values as $key => $value) {
             if (!array_key_exists($key, $this->processedValues)) {
                 $this->processRootValue($key, $value, $context, $data, $evaluate, $encoding);
@@ -102,7 +111,7 @@ class ExpressionProcessor
     }
 
     /**
-     * @param                       $value
+     * @param mixed                 $value
      * @param ContextInterface      $context
      * @param DataAccessorInterface $data
      * @param bool                  $evaluate
@@ -162,6 +171,10 @@ class ExpressionProcessor
         $evaluate = true,
         $encoding = null
     ) {
+        if (!$this->visible) {
+            return null;
+        }
+
         $node = $expr->getNodes();
         $deps = $this->getNotProcessedDependencies($node);
 
