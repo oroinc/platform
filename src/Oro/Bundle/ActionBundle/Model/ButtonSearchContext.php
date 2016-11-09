@@ -4,32 +4,35 @@ namespace Oro\Bundle\ActionBundle\Model;
 
 class ButtonSearchContext
 {
-    /** @var  string */
+    /** @var string */
     protected $entityClass;
 
-    /** @var  mixed */
+    /** @var mixed */
     protected $entityId;
 
-    /** @var  string */
+    /** @var string */
     protected $routeName;
 
-    /** @var  string */
+    /** @var string */
     protected $gridName;
 
-    /** @var  string */
+    /** @var string */
     protected $referrer;
 
-    /** @var  string */
+    /** @var string */
     protected $group;
 
     /**
      * @param string $entityClass
      * @param null|mixed $entityId
+     * @return $this
      */
     public function setEntity($entityClass, $entityId = null)
     {
         $this->entityClass = $entityClass;
         $this->entityId = $entityId;
+
+        return $this;
     }
 
     /**
@@ -58,10 +61,13 @@ class ButtonSearchContext
 
     /**
      * @param string $routeName
+     * @return $this
      */
     public function setRouteName($routeName)
     {
         $this->routeName = $routeName;
+
+        return $this;
     }
 
     /**
@@ -74,10 +80,13 @@ class ButtonSearchContext
 
     /**
      * @param string $gridName
+     * @return $this
      */
     public function setGridName($gridName)
     {
         $this->gridName = $gridName;
+
+        return $this;
     }
 
     /**
@@ -90,10 +99,13 @@ class ButtonSearchContext
 
     /**
      * @param string $referrer
+     * @return $this
      */
     public function setReferrer($referrer)
     {
         $this->referrer = $referrer;
+
+        return $this;
     }
 
     /**
@@ -106,9 +118,12 @@ class ButtonSearchContext
 
     /**
      * @param string $group
+     * @return $this
      */
     public function setGroup($group)
     {
         $this->group = $group;
+
+        return $this;
     }
 }

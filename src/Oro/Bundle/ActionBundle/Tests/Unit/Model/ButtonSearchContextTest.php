@@ -11,6 +11,7 @@ class ButtonSearchContextTest extends \PHPUnit_Framework_TestCase
 
     /** @var  ButtonSearchContext */
     protected $buttonSearchContext;
+
     /**
      * {@inheritdoc}
      */
