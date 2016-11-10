@@ -133,8 +133,9 @@ class LoadWorkflowDefinitionsCommandTest extends WebTestCase
         );
 
         $expectedMessages = [
-            'Invalid configuration for path "workflows.first_workflow.transitions.second_transition.triggers.0.cron"' .
-            ': invalid cron expression is not a valid CRON expression'
+            'Invalid configuration for path "workflows.first_workflow.transitions.second_transition.triggers.0.cron"',
+            'invalid cron expression is not a valid',
+            'CRON expression'
         ];
 
         $this->assertCommandExecuted($expectedMessages);
