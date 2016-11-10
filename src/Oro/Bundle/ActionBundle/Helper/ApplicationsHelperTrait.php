@@ -4,7 +4,7 @@ namespace Oro\Bundle\ActionBundle\Helper;
 
 trait ApplicationsHelperTrait
 {
-    /** @var string|null */
+    /** @var string|bool|null */
     protected $currentApplication = false;
 
     /**
