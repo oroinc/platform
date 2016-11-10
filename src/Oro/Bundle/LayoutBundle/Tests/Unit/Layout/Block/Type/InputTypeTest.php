@@ -14,6 +14,7 @@ class InputTypeTest extends BlockTypeTestCase
         $this->assertEquals(
             [
                 'type' => 'text',
+                'visible' => true
             ],
             $this->resolveOptions(InputType::NAME, [])
         );
