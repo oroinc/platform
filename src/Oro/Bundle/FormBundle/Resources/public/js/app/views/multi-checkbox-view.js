@@ -11,8 +11,6 @@ define(function(require) {
 
         template: require('tpl!oroform/templates/multi-checkbox-view.html'),
 
-        VALUES_SEPARATOR: ',',
-
         inputName: null,
 
         value: [],
