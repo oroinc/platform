@@ -208,3 +208,6 @@ services:
         class: 'Oro\Bundle\ActionBundle\Provider\ButtonSearchContextProvider'
         arguments:
             - '@oro_action.helper.context'
+
+    oro_action.provider.button_extension:
+        class: 'Oro\Bundle\ActionBundle\Provider\ButtonProvider'
