@@ -9,7 +9,6 @@ use Oro\Bundle\ApiBundle\Config\Config;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 use Oro\Bundle\ApiBundle\Processor\Subresource\Shared\BuildQueryByExtendedAssociation;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\Subresource\GetSubresourceProcessorOrmRelatedTestCase;
-use Oro\Bundle\ApiBundle\Tests\Unit\Processor\TestConfigExtra;
 use Oro\Bundle\ApiBundle\Util\CriteriaConnector;
 use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
 
@@ -20,6 +19,9 @@ class BuildQueryByExtendedAssociationTest extends GetSubresourceProcessorOrmRela
     /** @var BuildQueryByExtendedAssociation */
     protected $processor;
 
+    /**
+     * {@inheritdoc}
+     */
     protected function setUp()
     {
         parent::setUp();
@@ -39,16 +41,6 @@ class BuildQueryByExtendedAssociationTest extends GetSubresourceProcessorOrmRela
             $resolver,
             $criteriaConnector
         );
-    }
-
-    /**
-     * @param string $entityShortClass
-     *
-     * @return string
-     */
-    protected function getEntityClass($entityShortClass)
-    {
-        return self::ENTITY_NAMESPACE . $entityShortClass;
     }
 
     public function testProcessWhenCriteriaAlreadyExist()

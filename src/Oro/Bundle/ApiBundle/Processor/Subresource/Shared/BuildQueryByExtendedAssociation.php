@@ -2,17 +2,17 @@
 
 namespace Oro\Bundle\ApiBundle\Processor\Subresource\Shared;
 
-use Oro\Bundle\ApiBundle\Request\DataType;
-use Oro\Bundle\EntityExtendBundle\Extend\RelationType;
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
 
 use Oro\Bundle\ApiBundle\Collection\Criteria;
 use Oro\Bundle\ApiBundle\Processor\Subresource\GetRelationship\GetRelationshipContext;
 use Oro\Bundle\ApiBundle\Processor\Subresource\GetSubresource\GetSubresourceContext;
+use Oro\Bundle\ApiBundle\Request\DataType;
 use Oro\Bundle\ApiBundle\Util\CriteriaConnector;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
+use Oro\Bundle\EntityExtendBundle\Extend\RelationType;
 
 /**
  * Builds ORM QueryBuilder object that will be used to get an entity by its parent class and parent identifier.

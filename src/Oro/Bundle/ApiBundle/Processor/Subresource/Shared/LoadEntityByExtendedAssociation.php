@@ -5,9 +5,6 @@ namespace Oro\Bundle\ApiBundle\Processor\Subresource\Shared;
 use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ORM\QueryBuilder;
 
-use Oro\Bundle\ApiBundle\Request\DataType;
-use Oro\Bundle\EntityExtendBundle\Extend\RelationType;
-use Oro\Bundle\EntityExtendBundle\Tools\AssociationNameGenerator;
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
 use Oro\Component\EntitySerializer\EntitySerializer;
@@ -15,17 +12,20 @@ use Oro\Component\EntitySerializer\EntitySerializer;
 use Oro\Bundle\ApiBundle\Config\CustomizeLoadedDataConfigExtra;
 use Oro\Bundle\ApiBundle\Config\DataTransformersConfigExtra;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfigExtra;
-use Oro\Bundle\ApiBundle\Provider\MetadataProvider;
-use Oro\Bundle\ApiBundle\Request\ApiActions;
-use Oro\Bundle\ApiBundle\Provider\ConfigProvider;
 use Oro\Bundle\ApiBundle\Exception\RuntimeException;
 use Oro\Bundle\ApiBundle\Processor\Subresource\GetRelationship\GetRelationshipContext;
 use Oro\Bundle\ApiBundle\Processor\Subresource\GetSubresource\GetSubresourceContext;
+use Oro\Bundle\ApiBundle\Provider\MetadataProvider;
+use Oro\Bundle\ApiBundle\Provider\ConfigProvider;
+use Oro\Bundle\ApiBundle\Request\DataType;
+use Oro\Bundle\ApiBundle\Request\ApiActions;
+use Oro\Bundle\EntityExtendBundle\Extend\RelationType;
+use Oro\Bundle\EntityExtendBundle\Tools\AssociationNameGenerator;
 
 /**
  * Loads extended association entity using the EntitySerializer component.
  * As returned data is already normalized, the "normalize_data" group will be skipped.
-  */
+ */
 class LoadEntityByExtendedAssociation implements ProcessorInterface
 {
     /** @var EntitySerializer */
@@ -39,7 +39,7 @@ class LoadEntityByExtendedAssociation implements ProcessorInterface
 
     /**
      * @param EntitySerializer $entitySerializer
-     * @param ConfigProvider $configProvider
+     * @param ConfigProvider   $configProvider
      * @param MetadataProvider $metadataProvider
      */
     public function __construct(
@@ -84,9 +84,8 @@ class LoadEntityByExtendedAssociation implements ProcessorInterface
 
         /** @var QueryBuilder $queryBuilder */
         $queryBuilder = $context->getQuery();
-
         $result = $queryBuilder->getQuery()->getOneOrNullResult();
-        if (!$result) {
+        if (null === $result) {
             // associated entity not found
             return;
         }
@@ -105,9 +104,11 @@ class LoadEntityByExtendedAssociation implements ProcessorInterface
             $version = $context->getVersion();
             $requestType = $context->getRequestType();
 
-            $config = $this->configProvider->getConfig($targetClassName, $version, $requestType, $configExtras)
+            $config = $this->configProvider
+                ->getConfig($targetClassName, $version, $requestType, $configExtras)
                 ->getDefinition();
-            $metadata = $this->metadataProvider->getMetadata($targetClassName, $version, $requestType, $config);
+            $metadata = $this->metadataProvider
+                ->getMetadata($targetClassName, $version, $requestType, $config);
             $context->setMetadata($metadata);
         }
 
