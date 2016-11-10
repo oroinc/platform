@@ -78,7 +78,7 @@ class EntityAclExtension extends AbstractAclExtension
 
     /**
      * Cached builders for their identities
-     * @var array
+     * @var array|EntityMaskBuilder[]
      */
     private $builders = [];
 
