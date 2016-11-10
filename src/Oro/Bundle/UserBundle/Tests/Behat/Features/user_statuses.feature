@@ -5,8 +5,8 @@ Feature: User statuses
 
   Scenario: Disable User
     Given the following user:
-      | Username   | Password  | Status  | Authentication Status | Role      |
-      | mattjohnes | Qwe123qwe | Enabled | Active                | Sales Rep |
+      | Username   | Password  | Status  | Role      |
+      | mattjohnes | Qwe123qwe | Enabled | Sales Rep |
     When I open User for editing
     And set Status = "Inactive"
     And I save and close form
