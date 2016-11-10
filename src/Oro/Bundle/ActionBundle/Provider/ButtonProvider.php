@@ -25,6 +25,10 @@ class ButtonProvider
      */
     public function findAll(ButtonSearchContext $searchContext)
     {
+        if (0 === count($this->extensions)) {
+            return [];
+        }
+
         $buttonsData = [];
         foreach ($this->extensions as $extension) {
             $buttonsData[] = $extension->find($searchContext);
