@@ -17,3 +17,4 @@ oro:
             removed:                  The context has been removed
             add_context.label:        Add Context
             add_context_entity.label: Add Context Entity
+            column.label:               Contexts

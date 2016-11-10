@@ -245,15 +245,15 @@ oro:
                 label: Configure
 
         security:
-            password_changed.message: Your password was updated by administrator. New password was sent to you by email
-            password_reseted.message: Your password was successfully reset. You may login now.
+            password_changed.message: Your password was updated by an administrator. New password was sent to you by email.
+            password_reseted.message: Your password was successfully reset. You may log in now.
             remaining_login_attempts: '{0} You have no login attempts remaining.|{1} You have one login attempt remaining.|]1,Inf[ You have %count% login attempts remaining.'
         user_bar_settings:
             title: User bar
-        image.tooltip: The avatar must be in BMP, JPEG or PNG formats, and file must be less than %file_size% in size
-        invite.tooltip: When this option is selected, an invitation email will be send
+        image.tooltip: The avatar must be in BMP, JPEG or PNG formats, and the file must be less than %file_size% in size
+        invite.tooltip: When this option is selected, an invitation email will be sent.
         api.tooltip_text: >
-            API key could be used for authentication in third party software.
+            An API key could be used for authentication in third party software.
             Please keep your regular password in secret.
 
         dashboard:
