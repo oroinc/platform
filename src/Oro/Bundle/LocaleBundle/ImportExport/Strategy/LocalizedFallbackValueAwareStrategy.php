@@ -130,16 +130,25 @@ class LocalizedFallbackValueAwareStrategy extends ConfigurableAddOrReplaceStrate
                 /** @var Collection $collection */
                 $collection = $this->fieldHelper->getObjectValue($value, $relation);
                 if ($collection) {
-                    foreach ($collection as $key => $element) {
-                        $uow = $this->doctrineHelper->getEntityManager($element)->getUnitOfWork();
-                        // remove foreign and detached entities
-                        if (spl_object_hash($entity) !== spl_object_hash($element) &&
-                            $uow->getEntityState($element, UnitOfWork::STATE_DETACHED) === UnitOfWork::STATE_DETACHED
-                        ) {
-                            $collection->remove($key);
-                        }
-                    }
+                    $this->removedDetachedEntities($entity, $collection);
                 }
+            }
+        }
+    }
+
+    /**
+     * @param object $entity
+     * @param Collection $collection
+     */
+    protected function removedDetachedEntities($entity, Collection $collection)
+    {
+        foreach ($collection as $key => $element) {
+            $uow = $this->doctrineHelper->getEntityManager($element)->getUnitOfWork();
+            // remove foreign and detached entities
+            if (spl_object_hash($entity) !== spl_object_hash($element) &&
+                $uow->getEntityState($element, UnitOfWork::STATE_DETACHED) === UnitOfWork::STATE_DETACHED
+            ) {
+                $collection->remove($key);
             }
         }
     }
