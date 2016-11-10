@@ -10,6 +10,7 @@ use Oro\Bundle\ActionBundle\Model\AttributeManager as BaseAttributeManager;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 
 use Oro\Bundle\WorkflowBundle\Acl\AclManager;
+use Oro\Bundle\WorkflowBundle\Configuration\WorkflowConfiguration;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowTransitionRecord;
@@ -491,5 +492,34 @@ class Workflow
         $this->restrictions = $restrictions;
 
         return $this;
+    }
+
+    /**
+     * @return array[]
+     */
+    public function getInitEntities()
+    {
+        return $this->getConfigurationOption(WorkflowConfiguration::NODE_INIT_ENTITIES, []);
+    }
+
+    /**
+     * @return array[]
+     */
+    public function getInitRoutes()
+    {
+        return $this->getConfigurationOption(WorkflowConfiguration::NODE_INIT_ROUTES, []);
+    }
+
+    /**
+     * @param string $nodeName
+     * @param mixed|null $default
+     *
+     * @return mixed
+     */
+    private function getConfigurationOption($nodeName, $default = null)
+    {
+        $configuration = $this->definition->getConfiguration();
+
+        return isset($configuration[$nodeName]) ? $configuration[$nodeName] : $default;
     }
 }

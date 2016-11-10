@@ -101,7 +101,7 @@ class TransitionManager
     /**
      * Get start transitions
      *
-     * @return Collection
+     * @return Collection|Transition[]
      */
     public function getStartTransitions()
     {
