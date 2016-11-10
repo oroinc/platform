@@ -3,7 +3,7 @@ Feature: User statuses
   As Administrator
   I need to view and see changes of User statuses
 
-  Scenario: Disable User
+  Scenario: Make User available for login
     Given the following user:
       | Username   | Password  | Status  | Role      |
       | mattjohnes | Qwe123qwe | Enabled | Sales Rep |
@@ -12,7 +12,7 @@ Feature: User statuses
     And I save and close form
     Then user with "mattjohnes" username has no possibility to login to the system.
 
-  Scenario: Enable User
+  Scenario: Make User unavailable for login
     Given I open "mattjohnes" User for editing
     And set Status = "Active"
     And I save and close form
