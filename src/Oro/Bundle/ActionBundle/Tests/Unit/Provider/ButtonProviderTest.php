@@ -4,6 +4,7 @@ namespace Oro\Bundle\ActionBundle\Tests\Unit\Provider;
 
 use Oro\Bundle\ActionBundle\Model\ButtonInterface;
 use Oro\Bundle\ActionBundle\Model\ButtonProviderExtensionInterface;
+use Oro\Bundle\ActionBundle\Model\ButtonSearchContext;
 use Oro\Bundle\ActionBundle\Provider\ButtonProvider;
 
 class ButtonProviderTest extends \PHPUnit_Framework_TestCase
@@ -20,7 +21,7 @@ class ButtonProviderTest extends \PHPUnit_Framework_TestCase
     protected function setUp()
     {
         $this->buttonProvider = new ButtonProvider();
-        $this->buttonExtension = $this->getMock('Oro\Bundle\ActionBundle\Model\ButtonProviderExtensionInterface');
+        $this->buttonExtension = $this->getMock(ButtonProviderExtensionInterface::class);
         $this->buttonProvider->addExtension($this->buttonExtension);
     }
 
@@ -32,7 +33,8 @@ class ButtonProviderTest extends \PHPUnit_Framework_TestCase
      */
     public function testFindAll(array $input, array $output)
     {
-        $searchContext = $this->getMock('Oro\Bundle\ActionBundle\Model\ButtonSearchContext');
+        /** @var ButtonSearchContext $searchContext */
+        $searchContext = $this->getMock(ButtonSearchContext::class);
         $this->buttonExtension->expects($this->once())
             ->method('find')
             ->with($searchContext)
@@ -76,7 +78,7 @@ class ButtonProviderTest extends \PHPUnit_Framework_TestCase
      */
     private function getButton($order)
     {
-        $button = $this->getMock('Oro\Bundle\ActionBundle\Model\ButtonInterface');
+        $button = $this->getMock(ButtonInterface::class);
         $button->method('getOrder')
             ->willReturn($order);
         return $button;

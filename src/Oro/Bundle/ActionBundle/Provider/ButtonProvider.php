@@ -25,10 +25,11 @@ class ButtonProvider
      */
     public function findAll(ButtonSearchContext $searchContext)
     {
-        $buttons = [];
+        $buttonsData = [];
         foreach ($this->extensions as $extension) {
-            $buttons = array_merge($buttons, $extension->find($searchContext));
+            $buttonsData[] = $extension->find($searchContext);
         }
+        $buttons = call_user_func_array('array_merge', $buttonsData);
 
         usort(
             $buttons,
