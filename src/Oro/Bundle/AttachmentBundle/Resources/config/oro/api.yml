@@ -1,16 +1,26 @@
 api:
     entities:
-#        Oro\Bundle\AttachmentBundle\Entity\Attachment:
-#            fields:
-#                target:
-#                    data_type: association:manyToOne
-#        Oro\Bundle\AttachmentBundle\Entity\File:
-#            fields:
-#                filename:
-#                    exclude: true
-#                extension:
-#                    exclude: true
-#                content:
-#                    data_type: string
-#                    property_path: file
-#                    depends_on: [filename]
+        Oro\Bundle\AttachmentBundle\Entity\Attachment:
+            fields:
+                target:
+                    description: The entity to which the current attachment is belongs
+                    data_type: association:manyToOne
+            subresources:
+                target:
+                    actions:
+                        get_subresource:
+                            documentation: Get entity that is associated with the given attachment
+                        get_relationship:
+                            documentation: Get entity relationship data that is associated with the given attachment
+                        update_relationship:
+                            documentation: Change entity relationship that is associated with the given attachment
+        Oro\Bundle\AttachmentBundle\Entity\File:
+            fields:
+                filename:
+                    exclude: true
+                extension:
+                    exclude: true
+                content:
+                    data_type: string
+                    property_path: file
+                    depends_on: [filename]

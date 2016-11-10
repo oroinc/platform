@@ -3,7 +3,9 @@ oro:
         entity_label: Comment
         entity_plural_label: Comments
         id.label: Id
-        message.label: Message
+        message:
+            label: Message
+            description: The message body content
         organization.label: Organization
         owner.label: Owner
         updated_by.label: Updated by
