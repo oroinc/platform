@@ -1,19 +1,19 @@
 Feature: User statuses
-  In order to manage activity of users
+  In order to allow or deny users to login
   As Administrator
-  I need to view and see changes of User statuses
+  I need to change User statuses
 
   Scenario: Make User available for login
     Given the following user:
-      | Username   | Password  | Status  | Role      |
-      | mattjohnes | Qwe123qwe | Enabled | Sales Rep |
-    When I open User for editing
-    And set Status = "Inactive"
+      | Username   | Fisrt Name | Last Name  | Password  | Status  | Role     |
+      | mattjohnes | Matt       | Johnes     | Qwe123qwe | Active | Sales Rep |
+    When I open Matt Johnes user edit page
+    And I select "Inactive" from "Status"
     And I save and close form
-    Then user with "mattjohnes" username has no possibility to login to the system.
+    Then Matt Johnes user has no possibility to login to the Dashboard.
 
   Scenario: Make User unavailable for login
-    Given I open "mattjohnes" User for editing
-    And set Status = "Active"
+    Given I open Matt Johnes user edit page
+    And I select "Active" from "Status"
     And I save and close form
-    Then user with "mattjohnes" username could login to the system.
+    Then Matt Johnes user could login to the Dashboard.
