@@ -102,6 +102,16 @@ define(function(require) {
         },
 
         /**
+         * Sets `disabled` property directly to backend field and to datepicker widget
+         *
+         * @param {string} value
+         */
+        setDisabled: function(disabled) {
+            this.$el.prop('disabled', disabled);
+            this.$frontDateField.datepicker(disabled ? 'disable' : 'enable');
+        },
+
+        /**
          * Creates frontend field
          *
          * @param {Object} options

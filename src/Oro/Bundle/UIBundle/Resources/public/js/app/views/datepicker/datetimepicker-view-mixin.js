@@ -146,6 +146,11 @@ define(function(require) {
             this._super().initPickerWidget.apply(this, arguments);
         },
 
+        setDisabled: function(disabled) {
+            this.$frontTimeField.prop('disabled', disabled);
+            this._super().setDisabled.apply(this, arguments);
+        },
+
         /**
          * Returns timepicker popup
          *
