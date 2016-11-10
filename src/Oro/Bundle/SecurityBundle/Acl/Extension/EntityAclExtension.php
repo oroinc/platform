@@ -895,8 +895,6 @@ class EntityAclExtension extends AbstractAclExtension
             $this->builders[$identity] = new EntityMaskBuilder($identity, $this->getPermissionsForIdentity($identity));
         }
 
-        $builder = clone $this->builders[$identity];
-
-        return $builder->reset();
+        return clone $this->builders[$identity];
     }
 }
