@@ -79,8 +79,8 @@ class ButtonProviderTest extends \PHPUnit_Framework_TestCase
     private function getButton($order)
     {
         $button = $this->getMock(ButtonInterface::class);
-        $button->method('getOrder')
-            ->willReturn($order);
+        $button->method('getOrder')->willReturn($order);
+
         return $button;
     }
 }
