@@ -2,7 +2,7 @@
 {% form_theme form with 'OroFormBundle:Form:fields.html.twig' %}
 
 {% set entityName = entity.id
-    ? 'oro.entity.item'|trans({'%id%': entity.id})
+    ? entity|oro_format_name|default('oro.entity.item'|trans({'%id%': entity.id}))
     : 'oro.ui.create_entity'|trans({'%entityName%': entity_config.get('label')|trans})
 %}
 {% oro_title_set({params : {"%entityName%": entityName} }) %}

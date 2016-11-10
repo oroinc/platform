@@ -54,11 +54,9 @@ class OptionValueBag
     /**
      * Builds a block option value using the given builder
      *
-     * @param OptionValueBuilderInterface $builder
-     *
      * @return mixed The built value
      */
-    public function buildValue(OptionValueBuilderInterface $builder)
+    public function buildValue()
     {
         $actions = [
             'add' => [],
@@ -80,6 +78,8 @@ class OptionValueBag
             }
         }
 
+        $builder = $this->getBuilder();
+
         foreach ($actions as $action => $calls) {
             foreach ($calls as $arguments) {
                 call_user_func_array([$builder, $action], $arguments);
@@ -87,5 +87,34 @@ class OptionValueBag
         }
 
         return $builder->get();
+    }
+
+    /**
+     * Returns options builder based on values in value bag
+     *
+     * @return OptionValueBuilderInterface
+     */
+    protected function getBuilder()
+    {
+        $isArray = false;
+
+        // guess builder type based on arguments
+        if ($this->actions) {
+            /** @var Action $action */
+            $action = reset($this->actions);
+            $arguments = $action->getArguments();
+            if ($arguments) {
+                $argument = reset($arguments);
+                if (is_array($argument)) {
+                    $isArray = true;
+                }
+            }
+        }
+
+        if ($isArray) {
+            return new ArrayOptionValueBuilder();
+        }
+
+        return new StringOptionValueBuilder();
     }
 }

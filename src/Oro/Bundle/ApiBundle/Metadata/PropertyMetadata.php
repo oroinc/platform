@@ -65,7 +65,7 @@ abstract class PropertyMetadata extends ParameterBag
     }
 
     /**
-     * Gets the property path of a property.
+     * Gets the name of a property in the source entity.
      *
      * @return string The property path or NULL if the property is not mapped.
      */
@@ -81,7 +81,7 @@ abstract class PropertyMetadata extends ParameterBag
     }
 
     /**
-     * Sets the property path of a property.
+     * Sets the name of a property in the source entity.
      *
      * @param string|null $propertyPath The property path,
      *                                  NULL if the property path equals to name

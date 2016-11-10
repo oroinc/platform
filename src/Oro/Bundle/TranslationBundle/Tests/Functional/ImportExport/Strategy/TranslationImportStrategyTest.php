@@ -60,7 +60,7 @@ class TranslationImportStrategyTest extends AbstractTranslationImportStrategyTes
         return new TranslationImportStrategy(
             $container->get('event_dispatcher'),
             $container->get('oro_importexport.strategy.import.helper'),
-            $container->get('oro_importexport.field.field_helper'),
+            $container->get('oro_entity.helper.field_helper'),
             $container->get('oro_importexport.field.database_helper'),
             $container->get('oro_entity.entity_class_name_provider'),
             $container->get('translator'),
