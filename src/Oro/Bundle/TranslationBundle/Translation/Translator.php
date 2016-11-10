@@ -5,14 +5,20 @@ namespace Oro\Bundle\TranslationBundle\Translation;
 use Doctrine\Common\Cache\Cache;
 use Doctrine\Common\Cache\ClearableCache;
 
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Translation\Loader\LoaderInterface;
+use Symfony\Component\Translation\MessageSelector;
 use Symfony\Bundle\FrameworkBundle\Translation\Translator as BaseTranslator;
 
-use Oro\Bundle\TranslationBundle\Entity\Translation;
 use Oro\Bundle\TranslationBundle\Strategy\TranslationStrategyProvider;
 
+/**
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
+ */
 class Translator extends BaseTranslator
 {
+    const DEFAULT_LOCALE = 'en';
+
     /** @var DynamicTranslationMetadataCache|null */
     protected $databaseTranslationMetadataCache;
 
@@ -26,7 +32,7 @@ class Translator extends BaseTranslator
      *          [
      *              'resource' => DynamicResourceInterface,
      *              'format'   => string,
-     *              'locale'   => string,
+     *              'code'     => string,
      *              'domain'   => string
      *          ],
      *          ...
@@ -41,6 +47,27 @@ class Translator extends BaseTranslator
 
     /** @var string|null */
     protected $strategyName;
+
+    /** @var MessageSelector */
+    protected $messageSelector;
+
+    /** @var array */
+    protected $originalOptions;
+
+    /**
+     * {@inheritdoc}
+     */
+    public function __construct(
+        ContainerInterface $container,
+        MessageSelector $messageSelector,
+        $loaderIds = [],
+        array $options = []
+    ) {
+        $this->messageSelector = $messageSelector;
+        $this->originalOptions = $options;
+
+        parent::__construct($container, $messageSelector, $loaderIds, $options);
+    }
 
     /**
      * Collector of translations
@@ -167,6 +194,42 @@ class Translator extends BaseTranslator
     }
 
     /**
+     * Rebuilds all cached message catalogs, w/o any delay at clients side
+     */
+    public function rebuildCache()
+    {
+        $cacheDir = $this->originalOptions['cache_dir'];
+
+        if (!$cacheDir || !is_dir($cacheDir)) {
+            $this->warmUp($cacheDir);
+            return;
+        }
+
+        $tmpDir = $cacheDir . DIRECTORY_SEPARATOR . uniqid('CACHE_', true);
+
+        $options = array_merge($this->originalOptions, ['cache_dir' => $tmpDir]);
+
+        $translator = new static($this->container, $this->messageSelector, $this->loaderIds, $options);
+        $translator->setDatabaseMetadataCache($this->databaseTranslationMetadataCache);
+
+        $translator->warmUp($tmpDir);
+
+        $iterator = new \IteratorIterator(new \DirectoryIterator($tmpDir));
+        foreach ($iterator as $path) {
+            if (!$path->isFile()) {
+                continue;
+            }
+            copy($path->getPathName(), $cacheDir . DIRECTORY_SEPARATOR . $path->getFileName());
+            unlink($path->getPathName());
+        }
+
+        rmdir($tmpDir);
+
+        // cleanup local cache
+        $this->catalogues = [];
+    }
+
+    /**
      * Sets a cache of dynamic translation metadata
      *
      * @param DynamicTranslationMetadataCache $cache
@@ -269,10 +332,21 @@ class Translator extends BaseTranslator
      */
     protected function registerDynamicResources()
     {
+        $defaultLocale = isset($this->catalogues[Translator::DEFAULT_LOCALE])
+            ? $this->catalogues[Translator::DEFAULT_LOCALE]
+            : null;
+
         foreach ($this->dynamicResources as $items) {
-            foreach ($items as $item) {
-                $this->addResource($item['format'], $item['resource'], $item['locale'], $item['domain']);
+            if (!$defaultLocale) {
+                foreach ($items as $item) {
+                    $this->addResource($item['format'], $item['resource'], $item['code'], $item['domain']);
+                }
             }
+        }
+
+        //prevents loding default locale many times (Default locale should be is default fallback locale)
+        if ($defaultLocale && !isset($this->catalogues[Translator::DEFAULT_LOCALE])) {
+            $this->catalogues[Translator::DEFAULT_LOCALE] = $defaultLocale;
         }
     }
 
@@ -298,12 +372,11 @@ class Translator extends BaseTranslator
                 array_unshift($locales, $locale);
                 $locales = array_unique($locales);
 
-                $availableDomainsData = $this->container->get('doctrine')
-                    ->getRepository(Translation::ENTITY_NAME)
+                $availableDomainsData = $this->container->get('oro_translation.manager.translation')
                     ->findAvailableDomainsForLocales($locales);
                 foreach ($availableDomainsData as $item) {
                     $item['resource'] = new OrmTranslationResource(
-                        $item['locale'],
+                        $item['code'],
                         $this->databaseTranslationMetadataCache
                     );
                     $item['format']   = 'oro_database_translation';

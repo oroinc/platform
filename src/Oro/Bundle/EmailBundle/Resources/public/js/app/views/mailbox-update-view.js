@@ -48,9 +48,9 @@ define([
             var $oroEmailMailBoxEmail = this.$el.find('input[name="oro_email_mailbox[email]"]');
             if (data && data.email) {
                 $oroEmailMailBoxEmail.val(data.email);
-                $oroEmailMailBoxEmail.attr('readonly', 'readonly');
+                $oroEmailMailBoxEmail.prop('readonly', 'readonly');
             } else {
-                $oroEmailMailBoxEmail.removeAttr('readonly');
+                $oroEmailMailBoxEmail.prop('readonly', false);
             }
         }
     });

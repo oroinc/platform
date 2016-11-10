@@ -30,6 +30,7 @@ use Oro\Bundle\EmailBundle\Model\ExtendEmail;
  * @ORM\HasLifecycleCallbacks
  *
  * @Config(
+ *      routeView="oro_email_thread_view",
  *      defaultValues={
  *          "entity"={
  *              "icon"="icon-envelope"
@@ -301,7 +302,7 @@ class Email extends ExtendEmail
      */
     public function setSubject($subject)
     {
-        $this->subject = $subject;
+        $this->subject = mb_substr($subject, 0, 998, mb_detect_encoding($subject));
 
         return $this;
     }

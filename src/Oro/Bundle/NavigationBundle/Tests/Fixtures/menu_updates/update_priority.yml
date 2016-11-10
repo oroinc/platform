@@ -1,0 +1,57 @@
+menu:
+    items:
+        system:
+            label: 'System'
+            extras:
+                uri: '#system'
+        custom:
+            label: 'Custom'
+            extras:
+                uri: '#custom'
+    tree:
+        menu:
+            type: menu
+            children:
+                system: []
+                custom: []
+
+updates:
+    -
+        key: 'custom'
+        parent_key: ~
+        default_title: 'Custom'
+        uri: '#custom'
+        menu: 'menu'
+        priority: 10
+    -
+        key: 'system'
+        parent_key: ~
+        default_title: 'System'
+        uri: '#system'
+        menu: 'menu'
+        priority: 20
+
+result_menu:
+    items:
+        system:
+            label: 'System'
+            uri: '#system'
+            extras:
+                uri: '#system'
+                divider: false
+                position: 20
+                translate_disabled: false
+        custom:
+            label: 'Custom'
+            uri: '#custom'
+            extras:
+                uri: '#custom'
+                divider: false
+                position: 10
+                translate_disabled: false
+    tree:
+        menu:
+            type: menu
+            children:
+                custom: []
+                system: []

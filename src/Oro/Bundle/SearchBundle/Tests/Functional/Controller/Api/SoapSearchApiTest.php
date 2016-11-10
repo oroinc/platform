@@ -2,25 +2,45 @@
 
 namespace Oro\Bundle\SearchBundle\Tests\Functional\Controller\Api;
 
+use Oro\Bundle\SearchBundle\Tests\Functional\Controller\DataFixtures\LoadSearchItemData;
+use Oro\Bundle\SearchBundle\Tests\Functional\SearchExtensionTrait;
+use Oro\Bundle\TestFrameworkBundle\Entity\Item;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
 /**
  * @outputBuffering enabled
- * @dbIsolation
- * @dbReindex
  * @group soap
+ * @group search
  */
 class SoapSearchApiTest extends WebTestCase
 {
+    use SearchExtensionTrait;
+
     /** Default value for offset and max_records */
     const DEFAULT_VALUE = 0;
 
     protected function setUp()
     {
-        $this->initClient([], $this->generateWsseAuthHeader());
-        $this->initSoapClient();
+        parent::setUp();
 
-        $this->loadFixtures(['Oro\Bundle\SearchBundle\Tests\Functional\Controller\DataFixtures\LoadSearchItemData']);
+        $this->initClient([], $this->generateWsseAuthHeader(), true);
+        $this->initSoapClient();
+        $this->startTransaction();
+
+        $alias = $this->getSearchObjectMapper()->getEntityAlias(Item::class);
+        $this->getSearchIndexer()->resetIndex(Item::class);
+        $this->ensureItemsLoaded($alias, 0);
+
+        $this->loadFixtures([LoadSearchItemData::class], true);
+        $this->getSearchIndexer()->reindex(Item::class);
+        $this->ensureItemsLoaded($alias, LoadSearchItemData::COUNT);
+    }
+
+    protected function tearDown()
+    {
+        parent::tearDown();
+
+        $this->rollbackTransaction();
     }
 
     /**

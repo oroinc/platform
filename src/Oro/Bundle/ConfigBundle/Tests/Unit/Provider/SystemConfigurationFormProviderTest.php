@@ -1,5 +1,6 @@
 <?php
-namespace ConfigBundle\Tests\Provider;
+
+namespace Oro\Bundle\ConfigBundle\Tests\Provider;
 
 use Oro\Bundle\ConfigBundle\Config\ApiTree\SectionDefinition;
 use Oro\Bundle\ConfigBundle\Config\ApiTree\VariableDefinition;
@@ -157,7 +158,8 @@ class SystemConfigurationFormProviderTest extends FormIntegrationTestCase
             'bad field definition - no data_type'      => array(
                 'filename'  => 'bad_field_without_data_type.yml',
                 'exception' => '\Symfony\Component\Config\Definition\Exception\InvalidConfigurationException',
-                'message'   => 'The "data_type" is required except "ui_only" is defined. {"options":[]}',
+                'message'   => 'The "data_type" is required except "ui_only" is defined. '
+                    . '{"options":[],"page_reload":false}',
                 'method'    => 'getTree',
                 'arguments' => array()
             ),
@@ -297,8 +299,9 @@ class SystemConfigurationFormProviderTest extends FormIntegrationTestCase
         $subscriber = $this->getMockBuilder('Oro\Bundle\ConfigBundle\Form\EventListener\ConfigSubscriber')
             ->setMethods(array('__construct'))
             ->disableOriginalConstructor()->getMock();
+        $container = $this->getMock('Symfony\Component\DependencyInjection\ContainerInterface');
 
-        $formType       = new FormType($subscriber);
+        $formType       = new FormType($subscriber, $container);
         $formFieldType  = new FormFieldType();
         $useParentScope = new ParentScopeCheckbox();
 

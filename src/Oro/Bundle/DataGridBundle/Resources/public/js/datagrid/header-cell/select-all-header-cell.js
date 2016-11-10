@@ -94,8 +94,10 @@ define([
         },
 
         undelegateEvents: function() {
-            this.$('.dropdown-menu').off(this.eventNamespace());
-            this.$('[data-select]:checkbox').off(this.eventNamespace());
+            if (this.$el) {
+                this.$('.dropdown-menu').off(this.eventNamespace());
+                this.$('[data-select]:checkbox').off(this.eventNamespace());
+            }
             return SelectAllHeaderCell.__super__.undelegateEvents.call(this);
         },
 

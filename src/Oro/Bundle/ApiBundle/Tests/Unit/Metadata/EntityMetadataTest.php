@@ -6,6 +6,8 @@ use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
 use Oro\Bundle\ApiBundle\Metadata\FieldMetadata;
 use Oro\Bundle\ApiBundle\Metadata\AssociationMetadata;
 use Oro\Bundle\ApiBundle\Metadata\MetaPropertyMetadata;
+use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Group;
+use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 
 class EntityMetadataTest extends \PHPUnit_Framework_TestCase
 {
@@ -351,6 +353,50 @@ class EntityMetadataTest extends \PHPUnit_Framework_TestCase
         );
     }
 
+    public function testGetPropertyByPropertyPathWhenPropertyPathEqualsToName()
+    {
+        $entityMetadata = new EntityMetadata();
+        $field1 = $entityMetadata->addField(new FieldMetadata('field1'));
+        $association1 = $entityMetadata->addAssociation(new AssociationMetadata('association1'));
+        $metaProperty1 = $entityMetadata->addMetaProperty(new MetaPropertyMetadata('metaProperty1'));
+
+        $this->assertSame($field1, $entityMetadata->getPropertyByPropertyPath('field1'));
+        $this->assertSame($association1, $entityMetadata->getPropertyByPropertyPath('association1'));
+        $this->assertSame($metaProperty1, $entityMetadata->getPropertyByPropertyPath('metaProperty1'));
+        $this->assertNull($entityMetadata->getPropertyByPropertyPath('unknown'));
+    }
+
+    public function testGetPropertyByPropertyPathWhenPropertyPathIsNotEqualToName()
+    {
+        $entityMetadata = new EntityMetadata();
+        $field1 = $entityMetadata->addField(new FieldMetadata('field1'));
+        $field1->setPropertyPath('realField1');
+        $association1 = $entityMetadata->addAssociation(new AssociationMetadata('association1'));
+        $association1->setPropertyPath('realAssociation1');
+        $metaProperty1 = $entityMetadata->addMetaProperty(new MetaPropertyMetadata('metaProperty1'));
+        $metaProperty1->setPropertyPath('realMetaProperty1');
+
+        $this->assertSame($field1, $entityMetadata->getPropertyByPropertyPath('realField1'));
+        $this->assertSame($association1, $entityMetadata->getPropertyByPropertyPath('realAssociation1'));
+        $this->assertSame($metaProperty1, $entityMetadata->getPropertyByPropertyPath('realMetaProperty1'));
+        $this->assertNull($entityMetadata->getPropertyByPropertyPath('unknown'));
+    }
+
+    public function testGetPropertyByPropertyPathForIgnoredPropertyPath()
+    {
+        $entityMetadata = new EntityMetadata();
+        $field1 = $entityMetadata->addField(new FieldMetadata('field1'));
+        $field1->setPropertyPath(ConfigUtil::IGNORE_PROPERTY_PATH);
+        $association1 = $entityMetadata->addAssociation(new AssociationMetadata('association1'));
+        $association1->setPropertyPath(ConfigUtil::IGNORE_PROPERTY_PATH);
+        $metaProperty1 = $entityMetadata->addMetaProperty(new MetaPropertyMetadata('metaProperty1'));
+        $metaProperty1->setPropertyPath(ConfigUtil::IGNORE_PROPERTY_PATH);
+
+        $this->assertNull($entityMetadata->getPropertyByPropertyPath('field1'));
+        $this->assertNull($entityMetadata->getPropertyByPropertyPath('association1'));
+        $this->assertNull($entityMetadata->getPropertyByPropertyPath('metaProperty1'));
+    }
+
     public function testAttributes()
     {
         $entityMetadata = new EntityMetadata();
@@ -459,5 +505,63 @@ class EntityMetadataTest extends \PHPUnit_Framework_TestCase
         $entityMetadata->addAssociation(new AssociationMetadata('association1'));
 
         $this->assertFalse($entityMetadata->hasIdentifierFieldsOnly());
+    }
+
+    /**
+     * @expectedException \InvalidArgumentException
+     * @expectedExceptionMessage Expected argument of type "object", "integer" given.
+     */
+    public function testGetIdentifierValueForInvalidInputEntity()
+    {
+        $entityMetadata = new EntityMetadata();
+
+        $entityMetadata->getIdentifierValue(123);
+    }
+
+    // @codingStandardsIgnoreStart
+    /**
+     * @expectedException \Oro\Bundle\ApiBundle\Exception\RuntimeException
+     * @expectedExceptionMessage The entity "Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Group" does not have identifier field(s).
+     */
+    // @codingStandardsIgnoreEnd
+    public function testGetIdentifierValueForEntityWithoutId()
+    {
+        $entity = new Group();
+
+        $entityMetadata = new EntityMetadata();
+        $entityMetadata->setClassName(Group::class);
+
+        $entityMetadata->getIdentifierValue($entity);
+    }
+
+    public function testGetIdentifierValueForEntityWithSingleId()
+    {
+        $entity = new Group();
+        $entity->setId(123);
+
+        $entityMetadata = new EntityMetadata();
+        $entityMetadata->setClassName(Group::class);
+        $entityMetadata->setIdentifierFieldNames(['id']);
+
+        self::assertSame(
+            123,
+            $entityMetadata->getIdentifierValue($entity)
+        );
+    }
+
+    public function testGetIdentifierValueForEntityWithCompositeId()
+    {
+        $entity = new Group();
+        $entity->setId(123);
+        $entity->setName('test');
+
+        $entityMetadata = new EntityMetadata();
+        $entityMetadata->setClassName(Group::class);
+        $entityMetadata->setIdentifierFieldNames(['id', 'name']);
+
+        self::assertSame(
+            ['id' => 123, 'name' => 'test'],
+            $entityMetadata->getIdentifierValue($entity)
+        );
     }
 }

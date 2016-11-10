@@ -1,3 +1,4 @@
+/*global Window, HTMLDocument*/
 define(['jquery'], function($) {
     'use strict';
 
@@ -11,6 +12,33 @@ define(['jquery'], function($) {
     };
 
     $.fn.extend({
+        focus: (function(originalFocus) {
+            return function() {
+                var $elem = $(this);
+                if (!arguments.length && $elem.attr('data-focusable')) {
+                    // the element has own implementation to set focus
+                    $elem.triggerHandler('set-focus');
+                    return $elem;
+                } else {
+                    return originalFocus.apply(this, arguments);
+                }
+            };
+        })($.fn.focus),
+
+        offset: (function(originalOffset) {
+            return function() {
+                if (!arguments.length) {
+                    if (this[0] instanceof HTMLDocument) {
+                        return originalOffset.call($(this[0].documentElement));
+                    }
+                    if (this[0] instanceof Window) {
+                        return originalOffset.call($(this[0].document.documentElement));
+                    }
+                }
+                return originalOffset.apply(this, arguments);
+            };
+        })($.fn.offset),
+
         /**
          * Sets cursor to end of input
          */
@@ -42,22 +70,24 @@ define(['jquery'], function($) {
                     .not(':checkbox, :radio, :button, :submit, :disabled, :file');
             var $autoFocus = $input.filter('[autofocus]');
             if ($autoFocus.length || $input.length) {
-                ($autoFocus.length ? $autoFocus : $input).first().setCursorToEnd().focus();
+                var $element = ($autoFocus.length ? $autoFocus : $input).first();
+                if ($element.isInViewPort()) {
+                    $element.setCursorToEnd().focus();
+                }
             }
         },
 
-        focus: (function(orig) {
-            return function() {
-                var $elem = $(this);
-                if (!arguments.length && $elem.attr('data-focusable')) {
-                    // the element has own implementation to set focus
-                    $elem.triggerHandler('set-focus');
-                    return $elem;
-                } else {
-                    return orig.apply(this, arguments);
-                }
-            };
-        })($.fn.focus),
+        isInViewPort: function() {
+            var $element = $(this);
+            var elementTop = $element.offset().top;
+            var elementBottom = elementTop + $element.height();
+            var viewPortTop = $(window).scrollTop();
+            var viewPortBottom = viewPortTop + $(window).height();
+
+            return (
+                (elementTop >= viewPortTop) && (elementBottom <= viewPortBottom)
+            );
+        },
 
         /**
          * source http://stackoverflow.com/questions/13607252/getting-border-width-in-jquery

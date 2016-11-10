@@ -5,6 +5,7 @@ namespace Oro\Bundle\ApiBundle\Form\Guesser;
 use Symfony\Component\Form\FormTypeGuesserInterface;
 use Symfony\Component\Form\Guess\TypeGuess;
 
+use Oro\Bundle\ApiBundle\Collection\IncludedEntityCollection;
 use Oro\Bundle\ApiBundle\Config\ConfigAccessorInterface;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionFieldConfig;
@@ -28,6 +29,9 @@ class MetadataTypeGuesser implements FormTypeGuesserInterface
     /** @var ConfigAccessorInterface|null */
     protected $configAccessor;
 
+    /** @var IncludedEntityCollection|null */
+    protected $includedEntities;
+
     /**
      * @param array          $dataTypeMappings [data type => [form type, options], ...]
      * @param DoctrineHelper $doctrineHelper
@@ -39,6 +43,14 @@ class MetadataTypeGuesser implements FormTypeGuesserInterface
     }
 
     /**
+     * @return MetadataAccessorInterface|null
+     */
+    public function getMetadataAccessor()
+    {
+        return $this->metadataAccessor;
+    }
+
+    /**
      * @param MetadataAccessorInterface|null $metadataAccessor
      */
     public function setMetadataAccessor(MetadataAccessorInterface $metadataAccessor = null)
@@ -47,11 +59,35 @@ class MetadataTypeGuesser implements FormTypeGuesserInterface
     }
 
     /**
+     * @return ConfigAccessorInterface|null
+     */
+    public function getConfigAccessor()
+    {
+        return $this->configAccessor;
+    }
+
+    /**
      * @param ConfigAccessorInterface|null $configAccessor
      */
     public function setConfigAccessor(ConfigAccessorInterface $configAccessor = null)
     {
         $this->configAccessor = $configAccessor;
+    }
+
+    /**
+     * @return IncludedEntityCollection|null
+     */
+    public function getIncludedEntities()
+    {
+        return $this->includedEntities;
+    }
+
+    /**
+     * @param IncludedEntityCollection|null $includedEntities
+     */
+    public function setIncludedEntities(IncludedEntityCollection $includedEntities = null)
+    {
+        $this->includedEntities = $includedEntities;
     }
 
     /**
@@ -76,12 +112,23 @@ class MetadataTypeGuesser implements FormTypeGuesserInterface
             } elseif ($metadata->hasAssociation($property)) {
                 $association = $metadata->getAssociation($property);
                 if (DataType::isAssociationAsField($association->getDataType())) {
-                    return $association->isCollapsed()
-                        ? $this->getTypeGuessForCollapsedArrayAssociation($association)
-                        : $this->getTypeGuessForArrayAssociation(
-                            $association,
-                            $this->getConfigForClass($class)->getField($property)
-                        );
+                    $config = $this->getConfigForClass($class);
+                    if (null !== $config) {
+                        $fieldConfig = $config->getField($property);
+                        if (null !== $fieldConfig) {
+                            if (DataType::isNestedObject($fieldConfig->getDataType())) {
+                                return $this->getTypeGuessForNestedObjectAssociation($association, $fieldConfig);
+                            }
+                            if (!$association->isCollapsed()) {
+                                return $this->getTypeGuessForArrayAssociation($association, $fieldConfig);
+                            }
+                        }
+                    }
+                    if ($association->isCollapsed()) {
+                        return $this->getTypeGuessForCollapsedArrayAssociation($association);
+                    } else {
+                        return null;
+                    }
                 }
 
                 return $this->getTypeGuessForAssociation($association);
@@ -184,7 +231,7 @@ class MetadataTypeGuesser implements FormTypeGuesserInterface
     {
         return $this->createTypeGuess(
             'oro_api_entity',
-            ['metadata' => $metadata],
+            ['metadata' => $metadata, 'included_entities' => $this->includedEntities],
             TypeGuess::HIGH_CONFIDENCE
         );
     }
@@ -218,6 +265,29 @@ class MetadataTypeGuesser implements FormTypeGuesserInterface
                     'config'   => $config->getTargetEntity()
                 ]
             ],
+            TypeGuess::HIGH_CONFIDENCE
+        );
+    }
+
+    /**
+     * @param AssociationMetadata         $metadata
+     * @param EntityDefinitionFieldConfig $config
+     *
+     * @return TypeGuess
+     */
+    protected function getTypeGuessForNestedObjectAssociation(
+        AssociationMetadata $metadata,
+        EntityDefinitionFieldConfig $config
+    ) {
+        return $this->createTypeGuess(
+            'oro_api_compound_entity',
+            array_merge(
+                $config->getFormOptions(),
+                [
+                    'metadata' => $metadata->getTargetMetadata(),
+                    'config'   => $config->getTargetEntity()
+                ]
+            ),
             TypeGuess::HIGH_CONFIDENCE
         );
     }

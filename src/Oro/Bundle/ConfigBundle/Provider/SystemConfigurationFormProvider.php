@@ -138,7 +138,7 @@ class SystemConfigurationFormProvider extends Provider
         $name = str_replace(
             ConfigManager::SECTION_MODEL_SEPARATOR,
             ConfigManager::SECTION_VIEW_SEPARATOR,
-            $fieldDefinition->getName()
+            $fieldDefinition->getPropertyPath()
         );
 
         // take config field options form field definition
@@ -152,6 +152,10 @@ class SystemConfigurationFormProvider extends Provider
             $fieldDefinition->getOptions(),
             $configFieldOptions
         );
+        if ($fieldDefinition->needsPageReload()) {
+            $configFieldOptions['target_field_options']['attr']['data-needs-page-reload'] = '';
+            $configFieldOptions['use_parent_field_options']['attr']['data-needs-page-reload'] = '';
+        }
         $configFieldOptions['parent_checkbox_label'] = $this->getParentCheckboxLabel();
         $form->add($name, 'oro_config_form_field_type', $configFieldOptions);
     }

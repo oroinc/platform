@@ -386,7 +386,6 @@ class PackageManager
                 if (in_array($needleName, $packageRequirements)) {
                     $dependents[] = $localPackage->getName();
                     $dependents = array_merge($dependents, $this->getDependents($localPackage->getName()));
-
                 }
             },
             $localRepository->getCanonicalPackages()

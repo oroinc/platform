@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\WorkflowBundle\Controller\Api\Rest;
 
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 use FOS\RestBundle\Util\Codes;
@@ -50,7 +51,8 @@ class WorkflowDefinitionController extends FOSRestController
      * - HTTP_BAD_REQUEST (400)
      *
      * @param WorkflowDefinition $workflowDefinition
-     *
+     * @param Request $request
+     * @return Response
      * @Rest\Put(
      *      "/api/rest/{version}/workflowdefinition/{workflowDefinition}",
      *      defaults={"version"="latest", "_format"="json"}
@@ -60,19 +62,18 @@ class WorkflowDefinitionController extends FOSRestController
      *      resource=true
      * )
      * @AclAncestor("oro_workflow_definition_update")
-     * @return Response
      */
-    public function putAction(WorkflowDefinition $workflowDefinition)
+    public function putAction(WorkflowDefinition $workflowDefinition, Request $request)
     {
         try {
             /** @var WorkflowDefinitionHandleBuilder $definitionBuilder */
             $definitionBuilder = $this->get('oro_workflow.configuration.builder.workflow_definition.handle');
-            $builtDefinition = $definitionBuilder->buildFromRawConfiguration($this->getConfiguration());
+            $builtDefinition = $definitionBuilder->buildFromRawConfiguration($this->getConfiguration($request));
             $this->getHandler()->updateWorkflowDefinition($workflowDefinition, $builtDefinition);
         } catch (\Exception $exception) {
             return $this->handleView(
                 $this->view(
-                    array('error' => $exception->getMessage()),
+                    ['error' => $exception->getMessage()],
                     Codes::HTTP_BAD_REQUEST
                 )
             );
@@ -84,8 +85,9 @@ class WorkflowDefinitionController extends FOSRestController
     /**
      * Create new workflow definition
      *
+     * @param Request $request
      * @param WorkflowDefinition $workflowDefinition
-     *
+     * @return Response
      * @Rest\Post(
      *      "/api/rest/{version}/workflowdefinition/{workflowDefinition}",
      *      defaults={"version"="latest", "_format"="json", "workflowDefinition"=null}
@@ -95,15 +97,28 @@ class WorkflowDefinitionController extends FOSRestController
      *      resource=true
      * )
      * @AclAncestor("oro_workflow_definition_create")
-     * @return Response
      */
-    public function postAction(WorkflowDefinition $workflowDefinition = null)
+    public function postAction(Request $request, WorkflowDefinition $workflowDefinition = null)
     {
-        if (!$workflowDefinition) {
-            $workflowDefinition = new WorkflowDefinition();
+        try {
+            /** @var WorkflowDefinitionHandleBuilder $definitionBuilder */
+            $definitionBuilder = $this->get('oro_workflow.configuration.builder.workflow_definition.handle');
+            $builtDefinition = $definitionBuilder->buildFromRawConfiguration($this->getConfiguration($request));
+            if (!$workflowDefinition) {
+                $this->getHandler()->createWorkflowDefinition($builtDefinition);
+            } else {
+                $this->getHandler()->updateWorkflowDefinition($workflowDefinition, $builtDefinition);
+            }
+        } catch (\Exception $exception) {
+            return $this->handleView(
+                $this->view(
+                    ['error' => $exception->getMessage()],
+                    Codes::HTTP_BAD_REQUEST
+                )
+            );
         }
 
-        return $this->putAction($workflowDefinition);
+        return $this->handleView($this->view($builtDefinition->getName(), Codes::HTTP_OK));
     }
 
     /**
@@ -140,11 +155,12 @@ class WorkflowDefinitionController extends FOSRestController
     }
 
     /**
+     * @param Request $request
      * @return array
      */
-    protected function getConfiguration()
+    protected function getConfiguration(Request $request)
     {
-        return $this->getRequest()->request->all();
+        return $request->request->all();
     }
 
     /**

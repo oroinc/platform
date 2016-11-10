@@ -5,6 +5,7 @@ api:
             delete_handler: oro_user.role.handler.delete
 
         Oro\Bundle\UserBundle\Entity\User:
+            documentation_resource: '@OroUserBundle/Resources/doc/api/user.md'
             delete_handler: oro_user.handler.delete
             fields:
                 emails:
@@ -19,6 +20,14 @@ api:
                     exclude: false # set manually because this entity is marked as a dictionary
                 create:
                     exclude: false # set manually because this entity is marked as a dictionary
+                    fields:
+                        password:
+                            exclude: false # set manually because this field is excluded globally
+                            form_options:
+                                property_path: plainPassword
+                                constraints:
+                                    - NotNull: ~
+                                    - NotBlank: ~
                 update:
                     exclude: false # set manually because this entity is marked as a dictionary
 

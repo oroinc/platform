@@ -8,7 +8,7 @@ use Symfony\Component\Form\PreloadedExtension;
 use Symfony\Component\Form\Test\TypeTestCase;
 
 use Oro\Bundle\ActivityBundle\Form\Type\ContextsSelectType;
-use Oro\Bundle\SearchBundle\Resolver\EntityTitleResolverInterface;
+use Oro\Bundle\EntityBundle\Provider\EntityNameResolver;
 
 class ContextsSelectTypeTest extends TypeTestCase
 {
@@ -54,7 +54,9 @@ class ContextsSelectTypeTest extends TypeTestCase
                 ->disableOriginalConstructor()
                 ->getMock();
 
-        $this->entityTitleResolver = $this->getMock(EntityTitleResolverInterface::class);
+        $this->entityTitleResolver = $this->getMockBuilder(EntityNameResolver::class)
+            ->disableOriginalConstructor()
+            ->getMock();
     }
 
     protected function getExtensions()
@@ -82,7 +84,7 @@ class ContextsSelectTypeTest extends TypeTestCase
             $this->dispatcher,
             $this->entityTitleResolver
         );
-        $type->buildForm($builder, []);
+        $type->buildForm($builder, ['collectionModel' => false]);
     }
 
     public function testSetDefaultOptions()
@@ -92,7 +94,8 @@ class ContextsSelectTypeTest extends TypeTestCase
             ->method('setDefaults')
             ->with(
                 [
-                    'tooltip' => false,
+                    'tooltip'         => false,
+                    'collectionModel' => false,
                     'configs' => [
                         'placeholder'        => 'oro.activity.contexts.placeholder',
                         'allowClear'         => true,
@@ -126,7 +129,6 @@ class ContextsSelectTypeTest extends TypeTestCase
             $this->entityTitleResolver
         );
         $this->assertEquals('genemu_jqueryselect2_hidden', $type->getParent());
-
     }
 
     public function testGetName()

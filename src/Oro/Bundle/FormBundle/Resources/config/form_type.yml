@@ -92,6 +92,11 @@ services:
         tags:
             - { name: form.type, alias: oro_entity_identifier }
 
+    oro_form.type.entity_tree_select:
+        class: Oro\Bundle\FormBundle\Form\Type\EntityTreeSelectType
+        tags:
+            - { name: form.type, alias: oro_entity_tree_select }
+
     oro_form.type.jqueryselect2_hidden:
         class: %oro_form.type.jqueryselect2_hidden.class%
         arguments:
@@ -194,6 +199,11 @@ services:
         arguments:
             - '@oro_entity_config.provider.entity'
             - '@translator.default'
+        tags:
+            - { name: form.type_extension, alias: form, extended_type: 'Symfony\Component\Form\Extension\Core\Type\FormType' }
+
+    oro_help.form.hint_extension:
+        class: Oro\Bundle\FormBundle\Form\Extension\HintFormExtension
         tags:
             - { name: form.type_extension, alias: form, extended_type: 'Symfony\Component\Form\Extension\Core\Type\FormType' }
 

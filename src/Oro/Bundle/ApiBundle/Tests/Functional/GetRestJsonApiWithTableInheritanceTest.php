@@ -21,7 +21,7 @@ class GetRestJsonApiWithTableInheritanceTest extends RestJsonApiTestCase
     {
         parent::setUp();
 
-        $this->loadFixtures(['Oro\Bundle\ApiBundle\Tests\Functional\DataFixtures\LoadTableInheritanceData']);
+        $this->loadFixtures(['@OroApiBundle/Tests/Functional/DataFixtures/table_inheritance.yml']);
     }
 
     /**
@@ -41,7 +41,6 @@ class GetRestJsonApiWithTableInheritanceTest extends RestJsonApiTestCase
             (string)$department->getStaff()->first()->getId();
         if (isset($expects['included'][0]['id'])) {
             $expects['included'][0]['id'] = (string)(string)$department->getStaff()->first()->getId();
-
         }
 
         $entityType = $this->getEntityType(self::ENTITY_CLASS);

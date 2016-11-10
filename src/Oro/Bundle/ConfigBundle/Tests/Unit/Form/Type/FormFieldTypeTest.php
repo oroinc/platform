@@ -1,6 +1,6 @@
 <?php
 
-namespace ConfigBundle\Tests\Unit\Form\Type;
+namespace Oro\Bundle\ConfigBundle\Tests\Unit\Form\Type;
 
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvents;
@@ -131,6 +131,7 @@ class FormFieldTypeTest extends TypeTestCase
                 'resettable' => $resettable,
                 'target_field_type' => 'array',
                 'target_field_options' => [],
+                'use_parent_field_options' => [],
             ]
         );
     }

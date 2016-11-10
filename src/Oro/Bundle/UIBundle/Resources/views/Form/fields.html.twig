@@ -3,6 +3,9 @@
 {% block form_row %}
     {% spaceless %}
         <div class="control-group{% if attr.class is defined %} {{ attr.class }}{% endif %}{% if block_prefixes is defined %} control-group-{{ block_prefixes[1] }}{% endif %}">
+            {% if hint|default() and hint_position|default() == 'above' %}
+                <div{{ block('hint_attributes') }}>{{ hint|raw }}</div>
+            {% endif %}
             {% if label is not sameas(false) %}
                 <div class="control-label wrap">
                     {{ form_label(form, '' , { label_attr: label_attr}) }}
@@ -10,11 +13,28 @@
             {% endif %}
             <div class="controls{% if errors|length > 0 %} validation-error{% endif %}">
                 {{ form_widget(form) }}
+                {% if hint|default() and hint_position|default() == 'after_input' %}
+                    <div{{ block('hint_attributes') }}>{{ hint|raw }}</div>
+                {% endif %}
                 {{ form_errors(form) }}
             </div>
+            {% if hint|default() and hint_position|default() == 'below' %}
+                <div{{ block('hint_attributes') }}>{{ hint|raw }}</div>
+            {% endif %}
         </div>
     {% endspaceless %}
 {% endblock form_row %}
+
+{% block hint_attributes %}
+    {{- " " -}}
+    {%- for attrname, attrvalue in hint_attr -%}
+        {%- if attrvalue is same as(true) -%}
+            {{- attrname }}="{{ attrname }}"
+        {%- elseif attrvalue is not same as(false) -%}
+            {{- attrname }}="{{ attrvalue }}"
+        {%- endif -%}
+    {%- endfor -%}
+{% endblock hint_attributes %}
 
 {% block widget_attributes %}
     {% if errors|length > 0 %}

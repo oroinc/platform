@@ -6,19 +6,15 @@ use Doctrine\ORM\Mapping as ORM;
 
 /**
  * @ORM\Entity(repositoryClass="Oro\Bundle\TranslationBundle\Entity\Repository\TranslationRepository")
- * @ORM\Table(name="oro_translation", indexes={
- *      @ORM\Index(name="MESSAGE_IDX", columns={"`key`"}),
- *      @ORM\Index(name="MESSAGES_IDX", columns={"locale", "domain"})
+ * @ORM\Table(name="oro_translation", uniqueConstraints={
+ *      @ORM\UniqueConstraint(name="language_key_uniq", columns={"language_id", "translation_key_id"})
  * })
  */
 class Translation
 {
-    const ENTITY_NAME = 'OroTranslationBundle:Translation';
-
-    const DEFAULT_LOCALE = 'en';
-
-    const SCOPE_SYSTEM = 1;
-    const SCOPE_UI     = 2;
+    const SCOPE_SYSTEM = 0;
+    const SCOPE_INSTALLED = 1;
+    const SCOPE_UI = 2;
 
     /**
      * @ORM\Id
@@ -28,9 +24,12 @@ class Translation
     protected $id;
 
     /**
-     * @ORM\Column(name="`key`", type="string", length=255)
+     * @var TranslationKey
+     *
+     * @ORM\ManyToOne(targetEntity="Oro\Bundle\TranslationBundle\Entity\TranslationKey")
+     * @ORM\JoinColumn(name="translation_key_id", referencedColumnName="id", onDelete="CASCADE", nullable=false)
      */
-    protected $key;
+    protected $translationKey;
 
     /**
      * @ORM\Column(type="text", nullable=true)
@@ -38,14 +37,12 @@ class Translation
     protected $value;
 
     /**
-     * @ORM\Column(type="string", length=5)
+     * @var Language
+     *
+     * @ORM\ManyToOne(targetEntity="Oro\Bundle\TranslationBundle\Entity\Language")
+     * @ORM\JoinColumn(name="language_id", referencedColumnName="id", onDelete="CASCADE", nullable=false)
      */
-    protected $locale;
-
-    /**
-     * @ORM\Column(type="string", length=255)
-     */
-    protected $domain;
+    protected $language;
 
     /**
      * @var string
@@ -63,26 +60,26 @@ class Translation
     }
 
     /**
-     * @param mixed $key
+     * @param TranslationKey $key
      * @return $this
      */
-    public function setKey($key)
+    public function setTranslationKey($key)
     {
-        $this->key = $key;
+        $this->translationKey = $key;
 
         return $this;
     }
 
     /**
-     * @return mixed
+     * @return TranslationKey
      */
-    public function getKey()
+    public function getTranslationKey()
     {
-        return $this->key;
+        return $this->translationKey;
     }
 
     /**
-     * @param mixed $value
+     * @param string $value
      * @return $this
      */
     public function setValue($value)
@@ -93,7 +90,7 @@ class Translation
     }
 
     /**
-     * @return mixed
+     * @return string
      */
     public function getValue()
     {
@@ -101,41 +98,22 @@ class Translation
     }
 
     /**
-     * @param mixed $locale
+     * @param Language $language
      * @return $this
      */
-    public function setLocale($locale)
+    public function setLanguage(Language $language)
     {
-        $this->locale = $locale;
+        $this->language = $language;
 
         return $this;
     }
 
     /**
-     * @return mixed
+     * @return Language
      */
-    public function getLocale()
+    public function getLanguage()
     {
-        return $this->locale;
-    }
-
-    /**
-     * @param mixed $domain
-     * @return $this
-     */
-    public function setDomain($domain)
-    {
-        $this->domain = $domain;
-
-        return $this;
-    }
-
-    /**
-     * @return mixed
-     */
-    public function getDomain()
-    {
-        return $this->domain;
+        return $this->language;
     }
 
     /**

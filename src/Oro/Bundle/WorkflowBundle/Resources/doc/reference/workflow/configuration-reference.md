@@ -14,6 +14,7 @@ Table of Contents
    - [Example](#example-2)
  - [Transitions Configuration](#transitions-configuration)
    - [Example](#example-3)
+ - [Transition Triggers Configuration](#transition-triggers-configuration)
  - [Transition Definition Configuration](#transition-definition-configuration)
    - [Example](#example-4)
  - [Conditions Configuration](#conditions-configuration)
@@ -31,7 +32,7 @@ Overview
 
 Configuration of Workflow declares all aspects related to specific workflow:
 
-* basic properties of workflow like name and label
+* basic properties of workflow like name and entity
 * steps and transitions
 * attributes involved in workflow
 * entity that is related to workflow
@@ -65,8 +66,7 @@ imports:
 
 workflows:
     b2b_flow_lead:
-        label: 'Unqualified Sales Lead'
-        entity: OroCRM\Bundle\SalesBundle\Entity\Lead
+        entity: Oro\Bundle\SalesBundle\Entity\Lead
         entity_attribute: lead
         start_step: new
 ```
@@ -88,6 +88,20 @@ Workflow configuration cannot be merged, it means that you cannot override workf
 If you will declare a workflow and another bundle will declare it's own workflow with the same name the command will
 trigger exception and data won't be saved.
 
+Translations File
+=================
+Together with workflows configurations, for almost each sections that specified below there should be defined
+ translation text under corresponded key to display correct UI text.2
+Configuration of translations are implemented in the same way as other translation resources (you might know them by
+files placed under `<YourBundle>/Resources/translation/messages.en.yml` or
+`<YourBundle>/Resources/translations/jsmessages.en.yml`.
+For workflows there should be created their's own translations file
+`<YourBundle>Resources/translations/workflows.{lang_code}.yml`
+Where `{lang_code}` is your preferable language code for translations that gathered there.
+Further in each section that describe workflow configuration part would be note provided with a proper
+**Translatable** type for translatable fields. That field describe value that can be defined only 
+in workflows.{lang_code}.yml file but never in configuration.
+
 Defining a Workflow
 ===================
 
@@ -100,7 +114,7 @@ Single workflow configuration has next properties:
     Workflow should have a unique name in scope of all application. As workflow configuration doesn't support merging
     two workflows with the same name will lead to exception during configuration loading.
 * **label**
-    *string*
+    *Translatable*: `oro.workflow.{workflow_name}.label` 
     This value will be shown in the UI
 * **entity**
     *string*
@@ -143,10 +157,9 @@ Example
 ```
 workflows:                                                    # Root elements
     b2b_flow_sales:                                           # A unique name of workflow
-        label: B2B Sales Flow                                 # This will be shown in UI
         defaults:
             active: true                                      # Active by default (when config is loaded)
-        entity: OroCRM\Bundle\SalesBundle\Entity\Opportunity  # Workflow will be used for this entity
+        entity: Oro\Bundle\SalesBundle\Entity\Opportunity  # Workflow will be used for this entity
         entity_attribute: opportunity                         # Attribute name used to store root entity
         is_system: true                                       # Workflow is system, i.e. not editable and not deletable
         start_step: qualify                                   # Name of start step
@@ -198,7 +211,7 @@ Single attribute can be described with next configuration:
     * **entity**
         Doctrine entity, option "class" is required and it must be a Doctrine manageable class
 * **label**
-    *string*
+    *translatable*: `oro.workflow.{workflow_name}.attribute.{attribute_name}.label`
     Label can be shown in the UI
 * **entity_acl**
     Defines an ACL for the specific entity stored in this attribute.
@@ -235,14 +248,12 @@ workflows:
     b2b_flow_sales:
         # ...
         new_account:
-            label: 'Account'
             type: entity
             entity_acl:
                 delete: false
             options:
-                class: OroCRM\Bundle\AccountBundle\Entity\Account
+                class: Oro\Bundle\AccountBundle\Entity\Account
         new_company_name:
-            label: 'Company name'
             type: string
         opportunity:
             property_path: sales_funnel.opportunity
@@ -253,7 +264,7 @@ workflows:
 Steps configuration
 ===================
 
-Steps are like nodes in graph of Workflow Transitions. Step must have a unique name and label and can optionally
+Steps are like nodes in graph of Workflow Transitions. Step must have a unique name and can optionally
 contain form options, allowed transitions and other options. If Workflow has type wizard user will be able to see in
 what step Workflow instance is at the moment, possible transitions and form of current step (if it is configured
 via form options). Step can be connected with attributes via form options. On different step it is possible to attach
@@ -265,7 +276,7 @@ Summarizing all above, step has next configuration:
     *string*
     Step must have unique name in scope of Workflow
 * **label**
-    *string*
+    *Translatable*: `oro.workflow.{workflow_name}.step.{step_name}.label`
     Label of step, can be shown in UI if Workflow has type wizard
 * **order**
     *integer*
@@ -293,7 +304,6 @@ workflows:
         # ...
         steps:
             start_call:
-                label: 'Start Phone Call'
                 allowed_transitions: # list of allowed transitions from this step
                     - connected
                     - not_answered
@@ -302,11 +312,9 @@ workflows:
                         update: false
                         delete: false
             start_conversation:
-                label: 'Call Phone Conversation'
                 allowed_transitions:
                     - end_conversation
             end_call:
-                label: 'End Phone Call'
                 is_final: true
 ```
 
@@ -322,7 +330,7 @@ Transition configuration has next options:
     *string*
     A transition must have unique name in scope of Workflow. Step configuration references transitions by this value.
 * **label**
-    *string*
+    *Translatable*: `oro.workflow.{workflow_name}.transition.{transition_name}.label` 
     Label of transition, will to be shown in UI.
 * **step_to**
     *string*
@@ -346,7 +354,7 @@ Transition configuration has next options:
     *string*
     Message, that will be sown in case when acl_resource is not granted.
 * **message**
-    *string*
+    *Translatable*: `oro.workflow.{workflow_name}.transition.{transition_name}.warning_message`
     Notification message, that will be shown at frontend before transition execution.
 * **display_type**
     *string*
@@ -368,23 +376,11 @@ Transition configuration has next options:
 * **form_options**
     These options will be passed to form type of transition, they can contain options for form types of attributes that
     will be shown when user clicks transition button.
-* **schedule**
-    These options can be used to configure the schedule for performing transition. This block can contain following sub-options:
-    - **cron** (*string*) - cron-definition for scheduling time for performing transition.
-    - **filter** (*string*) - "WHERE" part of DQL expression. This option used to filter entities that will be used in transition.
-    Following aliases are available:
-        - **e** - entity
-        - **wd** - WorkflowDefinition
-        - **wi** - WorkflowItem
-        - **ws** - WorkflowStep
-
-    - **check_conditions_before_job_creation** (*boolean*, default = false) - whether to check conditions of transition before creating new `Job` for transition performing.
-    
-    Transition for entity can be performed by schedule, when entity is on the appropriate step and all defined conditions are met.
-
 * **transition_definition**
     *string*
     Name of associated transition definition.
+* **triggers**
+    Contains configuration for Workflow Transition Triggers
 
 Example
 -------
@@ -395,14 +391,10 @@ workflows:
         # ...
         transitions:
             connected:                                      # Unique name of transition
-                label: 'Connected'                          # Label can be used in UI
                 step_to: start_conversation                 # The name of next step that will be set to Workflow Item
                                                             # when transition will be performed
 
                 transition_definition: connected_definition # A reference to Transition Definition configuration
-                schedule:
-                    cron: '0 * * * *'                       # try to perform transition every hour
-                    filter: "e.expired = 1"                 # transition by schedule will be executed only for entities that have field `expired` = true
                 frontend_options:
                     icon: 'icon-ok'                         # add icon to transition button with class "icon-ok"
                     class: 'btn-primary'                    # add css class "btn-primary" to transition button
@@ -413,13 +405,102 @@ workflows:
                             options:
                                 required: false
             not_answered:
-                label: "Not answered"
                 step_to: end_call
                 transition_definition: not_answered_definition
             end_conversation:
-                label: 'End conversation'
                 step_to: end_call
                 transition_definition: end_conversation_definition
+                triggers:
+                    -
+                        cron: '* * * * *'
+                        filter: "e.someStatus = 'OPEN'"
+```
+
+*Note* Attribute `label` option for `attribute_fields` in `form_options` of transition are deprecated now. It was moved to
+workflows.{lang_code}.yml file as translatable field and has following key to define its text value:
+`oro.workflow.{workflow_name}.transition.{transition_name}.attribute.{attribute_name}.label`
+
+Transition Triggers Configuration
+=================================
+
+Transition Triggers are used to perform Transition by Event or by cron-definition.
+
+Please note that transition can be performed by trigger even if Workflow not started for the entity yet. 
+
+There are 2 types of triggers:
+
+Event trigger:
+--------------
+
+Event trigger configuration has next options.
+
+* **entity_class**
+    Class of entity that can trigger transition.
+* **event**
+    Type of the event, can have the following values: `create`, `update`, `delete`.
+* **field**
+    Only for `update` event - field name that should be updated to handle trigger.
+* **queue**
+    [boolean, default = true] Handle trigger in queue (if `true`), or in realtime (if `false`) 
+* **require**
+    String of Symfony Language Expression that should much to handle the trigger. Following aliases are available:
+    * `entity` - Entity object, that dispatched event,
+    * `mainEntity` - Entity object of triggers' workflow,
+    * `wd` - Workflow Definition object,
+    * `wi` - Workflow Item object.
+* **relation**
+    Property path to `mainEntity` relative to `entity` if they are different.
+    
+Example
+-------
+
+```
+workflows:
+    phone_call:
+        # ...
+        transitions:
+            connected:
+                ...
+                triggers:
+                    -
+                        entity_class: Oro\Bundle\SaleBundle\Entity\Quote    # entity class
+                        event: update                                       # event type
+                        field: status                                       # updated field
+                        queued: false                                       # handle trigger not in queue
+                        relation: call                                      # relation to Workflow entity
+                        require: "entity.status = 'pending'"                # expression language condition
+```
+
+Cron trigger:
+--------------
+
+Cron trigger configuration has next options.
+
+* **cron**
+    Cron definition.
+* **queue**
+    [boolean, default = true] Handle trigger in queue (if `true`), or in realtime (if `false`) 
+* **filter**
+    String of Symfony Language Expression that should much to handle the trigger. Following aliases are available:
+    * `e` - Entity,
+    * `wd` - Workflow Definition,
+    * `wi` - Workflow Item,
+    * `ws` - Current Workflow Step.
+    
+Example
+-------
+
+```
+workflows:
+    phone_call:
+        # ...
+        transitions:
+            connected:
+                ...
+                triggers:
+                    -
+                        cron: '* * * * *'                                   # cron definition
+                        filter: "e.someStatus = 'OPEN'"                     # dql-filter
 ```
 
 Transition Definition Configuration
@@ -678,60 +759,50 @@ Configuration
 ```
 workflows:
     phone_call:
-        label: 'Demo Call Workflow'
         entity: Acme\Bundle\DemoWorkflowBundle\Entity\PhoneCall
         start_step: start_call
         steps:
             start_call:
-                label: 'Start Phone Call'
                 allowed_transitions:
                     - connected
                     - not_answered
             start_conversation:
-                label: 'Call Phone Conversation'
                 allowed_transitions:
                     - end_conversation
             end_call:
-                label: 'End Phone Call'
                 is_final: true
         attributes:
             phone_call:
-                label: Phone Call
                 type: entity
                 options:
                     class: Acme\Bundle\DemoWorkflowBundle\Entity\PhoneCall
             call_timeout:
                 type: integer
-                label: 'Call Timeout'
             call_successfull:
                 type: boolean
-                label: 'Call Successful'
             conversation_successful:
                 type: boolean
-                label: 'Conversation Successful'
             conversation_comment:
                 type: string
-                label: 'Conversation Comment'
             conversation_result:
                 type: string
-                label: 'Conversation Result'
             conversation:
                 type: entity
-                label: 'Conversation'
                 options:
                     class: Acme\Bundle\DemoWorkflowBundle\Entity\PhoneConversation
         transitions:
             connected:
-                label: 'Connected'
                 step_to: start_conversation
                 transition_definition: connected_definition
             not_answered:
-                label: "Not answered"
                 step_to: end_call
                 transition_definition: not_answered_definition
             end_conversation:
-                label: 'End conversation'
                 step_to: end_call
+                form_options:
+                    attribute_fields:
+                        conversation_comment:
+                            options:
                 transition_definition: end_conversation_definition
         transition_definitions:
             connected_definition: # Try to make call connected
@@ -772,6 +843,54 @@ workflows:
                                 successful: $conversation_successful
                                 call: $phone_call
 ```
+
+Translation file configuration
+------------------------------
+To define translatable textual representation of the configuration fields we should create following translation file:
+`DemoWorkflowBundle\Resources\translations\workflows.en.yml` with following content.
+
+``` yaml
+oro:
+    workflow:
+        phone_call:
+            label: 'Demo Call Workflow'
+            step:
+                start_call:
+                    label: 'Start Phone Call'
+                start_conversation:
+                    label: 'Call Phone Conversation'
+                end_call:
+                    label: 'End Phone Call'
+            attribute:
+                phone_call:
+                    label: 'Phone Call'
+                call_timeout:
+                    label: 'Call Timeout'
+                call_successfull:
+                    label: 'Call Successful'
+                conversation_successful:
+                    label: 'Conversation Successful'
+                conversation_comment:
+                    label: 'Conversation Comment'
+                conversation_result:
+                    label: 'Conversation Result'
+                conversation:
+                    label: Conversation
+            transition:
+                connected:
+                    label: Connected
+                    warning_message: 'Going to connect...'
+                not_answered:
+                    label: 'Not answered'
+                end_conversation:
+                    label: 'End conversation'
+                    attribute:
+                        conversation_comment:
+                            label: 'Comment for the call result'
+
+```
+As usual for Symfony translations (messages) files, structure of nodes can be grouped by key dots. This code above 
+provide full tree just for example.
 
 PhoneCall Entity
 ----------------

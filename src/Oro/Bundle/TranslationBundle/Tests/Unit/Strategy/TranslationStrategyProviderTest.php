@@ -4,6 +4,7 @@ namespace Oro\Bundle\TranslationBundle\Tests\Unit\Strategy;
 
 use Oro\Bundle\TranslationBundle\Strategy\TranslationStrategyInterface;
 use Oro\Bundle\TranslationBundle\Strategy\TranslationStrategyProvider;
+use Oro\Bundle\TranslationBundle\Translation\Translator;
 
 class TranslationStrategyProviderTest extends \PHPUnit_Framework_TestCase
 {
@@ -80,7 +81,7 @@ class TranslationStrategyProviderTest extends \PHPUnit_Framework_TestCase
                     'en' => [],
                 ],
                 'locale' => 'ru',
-                'expectedFallbackLocales' => [],
+                'expectedFallbackLocales' => [Translator::DEFAULT_LOCALE],
             ],
             'complex tree defined locale first level' => [
                 'fallbackTree' => [

@@ -44,8 +44,18 @@ services:
             - '@oro_importexport.context_registry'
             - '@translator'
 
+    # Writer
+    oro_translation.importexport.writer.translations:
+        class: 'Oro\Bundle\TranslationBundle\ImportExport\Writer\TranslationWriter'
+        public: false
+        arguments:
+            - '@doctrine'
+            - '@oro_translation.manager.translation'
+
     # Normalizer
     oro_translation.importexport.normalizer.translation:
         class: 'Oro\Bundle\TranslationBundle\ImportExport\Serializer\TranslationNormalizer'
         tags:
             - { name: oro_importexport.normalizer }
+        arguments:
+            - '@oro_translation.manager.translation'

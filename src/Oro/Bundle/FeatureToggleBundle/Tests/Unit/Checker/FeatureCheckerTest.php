@@ -4,6 +4,7 @@ namespace Oro\Bundle\FeatureToggleBundle\Tests\Unit\Cache;
 
 use Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker;
 use Oro\Bundle\FeatureToggleBundle\Checker\Voter\VoterInterface;
+use Oro\Bundle\FeatureToggleBundle\Tests\Unit\Fixtures\Voter;
 use Oro\Bundle\FeatureToggleBundle\Configuration\ConfigurationManager;
 
 class FeatureCheckerTest extends \PHPUnit_Framework_TestCase
@@ -34,13 +35,8 @@ class FeatureCheckerTest extends \PHPUnit_Framework_TestCase
         $voter = $this->getMock(VoterInterface::class);
         $checker->setVoters([$voter]);
 
-        $reflectionClass = new \ReflectionClass($checker);
-        $reflectionProperty = $reflectionClass->getProperty('voters');
-        $reflectionProperty->setAccessible(true);
-        $voters = $reflectionProperty->getValue($checker);
-
-        $this->assertCount(1, $voters);
-        $this->assertInstanceOf(VoterInterface::class, $voters[0]);
+        $this->assertAttributeCount(1, 'voters', $checker);
+        $this->assertAttributeEquals([$voter], 'voters', $checker);
     }
 
     /**
@@ -52,7 +48,7 @@ class FeatureCheckerTest extends \PHPUnit_Framework_TestCase
      * @param bool $allowIfEqualGrantedDeniedDecisions
      * @param bool $expected
      */
-    public function testIsFeatureEnabled(
+    public function testIsFeatureEnabledStrategies(
         $strategy,
         array $voters,
         $allowIfAllAbstainDecisions,
@@ -91,7 +87,7 @@ class FeatureCheckerTest extends \PHPUnit_Framework_TestCase
      * @param bool $allowIfEqualGrantedDeniedDecisions
      * @param bool $expected
      */
-    public function testIsResourceEnabled(
+    public function testIsResourceEnabledStrategies(
         $strategy,
         array $voters,
         $allowIfAllAbstainDecisions,
@@ -171,19 +167,13 @@ class FeatureCheckerTest extends \PHPUnit_Framework_TestCase
             ->getMock();
 
         $checker = new FeatureChecker($configManager);
+        $this->assertFalse($checker->isFeatureEnabled('feature1'));
 
-        $checker->isFeatureEnabled('feature1');
-
-        $reflectionClass = new \ReflectionClass($checker);
-
-        $reflectionProperty = $reflectionClass->getProperty('featuresStates');
-        $reflectionProperty->setAccessible(true);
-
-        $this->assertNotEmpty($reflectionProperty->getValue($checker));
+        $this->assertAttributeNotEmpty('featuresStates', $checker);
 
         $checker->resetCache();
 
-        $this->assertEmpty($reflectionProperty->getValue($checker));
+        $this->assertAttributeEmpty('featuresStates', $checker);
     }
 
     /**
@@ -220,5 +210,172 @@ class FeatureCheckerTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue($vote));
 
         return $voter;
+    }
+
+    /**
+     * @dataProvider featureWithDependenciesDataProvider
+     * @param array $featuredEnabled
+     * @param bool $expected
+     */
+    public function testIsFeatureEnabledWithDependencies(array $featuredEnabled, $expected)
+    {
+        /** @var ConfigurationManager|\PHPUnit_Framework_MockObject_MockObject $configManager */
+        $configManager = $this->getMockBuilder(ConfigurationManager::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $configManager->expects($this->any())
+            ->method('getFeatureDependencies')
+            ->willReturnMap([
+                ['feature1', ['feature2']],
+                ['feature2', []]
+            ]);
+
+        $checker = new FeatureChecker($configManager);
+        $voter = $this->getMock(VoterInterface::class);
+        $voter->expects($this->any())
+            ->method('vote')
+            ->willReturnMap(
+                [
+                    ['feature1', null, $featuredEnabled['feature1']],
+                    ['feature2', null, $featuredEnabled['feature2']]
+                ]
+            );
+        $checker->setVoters([$voter]);
+
+        $this->assertEquals($expected, $checker->isFeatureEnabled('feature1'));
+    }
+
+    /**
+     * @dataProvider featureWithDependenciesDataProvider
+     * @param array $featuredEnabled
+     * @param bool $expected
+     */
+    public function testIsResourceEnabledWithDependencies(array $featuredEnabled, $expected)
+    {
+        $scopeIdentifier = new \stdClass();
+
+        /** @var ConfigurationManager|\PHPUnit_Framework_MockObject_MockObject $configManager */
+        $configManager = $this->getMockBuilder(ConfigurationManager::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $configManager->expects($this->any())
+            ->method('getFeatureDependencies')
+            ->willReturnMap([
+                ['feature1', ['feature2']],
+                ['feature2', []]
+            ]);
+        $configManager->expects($this->once())
+            ->method('getFeaturesByResource')
+            ->with('type', 'test')
+            ->willReturn(['feature1']);
+
+        $checker = new FeatureChecker($configManager);
+        $voter = $this->getMock(VoterInterface::class);
+        $voter->expects($this->any())
+            ->method('vote')
+            ->willReturnMap(
+                [
+                    ['feature1', $scopeIdentifier, $featuredEnabled['feature1']],
+                    ['feature2', $scopeIdentifier, $featuredEnabled['feature2']]
+                ]
+            );
+        $checker->setVoters([$voter]);
+
+        $this->assertEquals($expected, $checker->isResourceEnabled('test', 'type', $scopeIdentifier));
+    }
+
+    /**
+     * @return array
+     */
+    public function featureWithDependenciesDataProvider()
+    {
+        return [
+            'both enabled' => [['feature1' => true, 'feature2' => true], true],
+            'feature disabled' => [['feature1' => false, 'feature2' => true], false],
+            'dependency disabled' => [['feature1' => true, 'feature2' => false], false],
+        ];
+    }
+
+    /**
+     * @dataProvider getDisabledResourcesByTypeProvider
+     */
+    public function testGetDisabledResourcesByType($resourceType, array $resources, Voter $voter, $expectedResources)
+    {
+        /** @var ConfigurationManager|\PHPUnit_Framework_MockObject_MockObject $configManager */
+        $configManager = $this->getMockBuilder(ConfigurationManager::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $configManager->expects($this->any())
+            ->method('getResourcesByType')
+            ->with($resourceType)
+            ->will($this->returnValue($resources));
+        $configManager->expects($this->any())
+            ->method('getFeatureDependencies')
+            ->will($this->returnValue([]));
+
+        $featureChecker = new FeatureChecker($configManager, [$voter]);
+        $this->assertEquals($expectedResources, $featureChecker->getDisabledResourcesByType($resourceType));
+    }
+
+    public function getDisabledResourcesByTypeProvider()
+    {
+        return [
+            [
+                'type',
+                [
+                    'resource' => [
+                        'feature1',
+                    ],
+                    'resource2' => [
+                        'feature2',
+                    ],
+                ],
+                new Voter([
+                    'feature1' => Voter::FEATURE_ENABLED,
+                    'feature2' => Voter::FEATURE_ENABLED,
+                ]),
+                [],
+            ],
+            [
+                'type',
+                [
+                    'resource' => [
+                        'feature1',
+                    ],
+                    'resource2' => [
+                        'feature2',
+                    ],
+                ],
+                new Voter([
+                    'feature1' => Voter::FEATURE_ENABLED,
+                    'feature2' => Voter::FEATURE_DISABLED,
+                ]),
+                [
+                    'resource2',
+                ],
+            ],
+            [
+                'type',
+                [
+                    'resource' => [
+                        'feature1',
+                    ],
+                    'resource2' => [
+                        'feature2',
+                    ],
+                ],
+                new Voter([
+                    'feature1' => Voter::FEATURE_DISABLED,
+                    'feature2' => Voter::FEATURE_DISABLED,
+                ]),
+                [
+                    'resource',
+                    'resource2',
+                ],
+            ],
+        ];
     }
 }

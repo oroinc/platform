@@ -2,9 +2,8 @@
 
 use Oro\Bundle\WorkflowBundle\Form\Type\WorkflowTransitionType;
 
-return array(
-    'first_workflow' => array(
-        'label' => 'First Workflow',
+return [
+    'first_workflow' => [
         'is_system' => true,
         'entity' => 'First\Entity',
         'start_step' => 'first_step',
@@ -14,167 +13,196 @@ return array(
         'defaults' => [
             'active' => true,
         ],
-        'steps' => array(
-            'first_step' => array(
-                'label' => 'First Step',
+        'steps' => [
+            'first_step' => [
                 'order' => 1,
                 'is_final' => true,
-                'entity_acl' => array(
-                    'first_attribute' => array('update' => false, 'delete' => true)
-                ),
-                'allowed_transitions' => array('first_transition'),
+                'entity_acl' => [
+                    'first_attribute' => ['update' => false, 'delete' => true]
+                ],
+                'allowed_transitions' => ['first_transition'],
                 '_is_start' => '',
                 'position' => []
-            )
-        ),
-        'attributes' => array(
-            'first_attribute' => array(
-                'label' => 'First Attribute',
+            ]
+        ],
+        'attributes' => [
+            'first_attribute' => [
                 'type' => 'object',
-                'options' => array(
+                'options' => [
                     'class' => 'DateTime'
-                ),
+                ],
                 'property_path' => null
-            ),
-            'second_attribute' => array(
-                'label' => 'Second Attribute',
+            ],
+            'second_attribute' => [
                 'type' => 'entity',
                 'property_path' => 'first_attribute.test',
-                'entity_acl' => array(
+                'entity_acl' => [
                     'update' => true,
                     'delete' => false,
-                ),
-                'options' => array(
+                ],
+                'options' => [
                     'class' => 'DateTime',
-                )
-            )
-        ),
-        'transitions' => array(
-            'first_transition' => array(
-                'label' => 'First Transition',
+                ]
+            ]
+        ],
+        'transitions' => [
+            'first_transition' => [
                 'step_to' => 'first_step',
                 'is_start' => true,
                 'is_hidden' => true,
                 'is_unavailable_hidden' => true,
                 'acl_resource' => 'some_acl',
                 'acl_message' => 'Test ACL message',
-                'message' => 'Test message',
                 'transition_definition' => 'first_transition_definition',
-                'frontend_options' => array(
+                'frontend_options' => [
                     'class' => 'foo'
-                ),
+                ],
                 'form_type' => 'custom_workflow_transition',
                 'display_type' => 'page',
                 'page_template' => 'Workflow:Test:pageTemplate.html.twig',
                 'dialog_template' => 'Workflow:Test:dialogTemplate.html.twig',
-                'form_options' => array(
-                    'attribute_fields' => array(
-                        'first_attribute' => array(
+                'form_options' => [
+                    'attribute_fields' => [
+                        'first_attribute' => [
                             'form_type' => 'text',
                             'label' => 'First Attribute',
-                            'options' => array(
+                            'options' => [
                                 'required' => 1
-                            )
-                        )
-                    )
-                ),
-                'schedule' => [
-                    'cron' => '1 * * * *',
-                    'filter' => "e.field < DATE_ADD(NOW(), 1, 'day')",
-                    'check_conditions_before_job_creation' => true,
+                            ]
+                        ]
+                    ]
+                ],
+                'triggers' => [
+                    [
+                        'event' => 'create',
+                        'entity_class' => 'Other\Entity',
+                        'relation' => 'firstEntity',
+                        'require' => 'entity.firstEntity.id === main_entity.id',
+                        'queued' => true,
+                        'field' => null,
+                        'cron' => null,
+                        'filter' => null
+                    ],
+                    [
+                        'event' => 'update',
+                        'field' => 'description',
+                        'require' => 'entity === main_entity',
+                        'queued' => true,
+                        'entity_class' => null,
+                        'relation' => null,
+                        'cron' => null,
+                        'filter' => null
+                    ],
+                    [
+                        'event' => 'delete',
+                        'entity_class' => 'Other\Entity',
+                        'relation' => 'firstEntity',
+                        'require' => 'not empty(entity.firstEntity) && attributes["first_attribute"] == "ok"',
+                        'queued' => true,
+                        'field' => null,
+                        'cron' => null,
+                        'filter' => null
+                    ],
+                    [
+                        'cron' => '1 * * * *',
+                        'filter' => 'e.text = "string"',
+                        'queued' => true,
+                        'entity_class' => null,
+                        'relation' => null,
+                        'event' => null,
+                        'field' => null,
+                        'require' => null
+                    ]
                 ]
-            )
-        ),
-        'transition_definitions' => array(
-            'first_transition_definition' => array(
-                'preactions' => array(
-                    array(
+            ]
+        ],
+        'transition_definitions' => [
+            'first_transition_definition' => [
+                'preactions' => [
+                    [
                         '@custom_action' => null
-                    )
-                ),
+                    ]
+                ],
                 'preconditions' => [
                     '@true' => null,
                     '@condition1' => null,
                 ],
-                'conditions' => array(
-                    '@and' => array(
+                'conditions' => [
+                    '@and' => [
                         '@true' => null,
-                        '@or' => array(
-                            'parameters' => array(
+                        '@or' => [
+                            'parameters' => [
                                 '@true' => null,
-                                '@equals' => array(
-                                    'parameters' => array(1, 1),
+                                '@equals' => [
+                                    'parameters' => [1, 1],
                                     'message' => 'Not equals'
-                                )
-                            )
-                        ),
+                                ]
+                            ]
+                        ],
                         'message' => 'Fail upper level'
-                    )
-                ),
+                    ]
+                ],
                 'actions' => [
                     ['@custom_action2' => null],
                     ['@custom_action' => null],
-                ],
-            )
-        ),
-        'entity_restrictions' => array(),
+                ]
+            ]
+        ],
+        'entity_restrictions' => [],
         'exclusive_active_groups' => ['active_group1'],
         'exclusive_record_groups' => ['record_group1'],
-    ),
-    'second_workflow' => array(
-        'label' => 'Second Workflow',
+    ],
+    'second_workflow' => [
         'entity' => 'Second\Entity',
         'start_step' => 'second_step',
         'priority' => 0,
         'defaults' => [
             'active' => false,
         ],
-        'steps' => array(
-            'second_step' => array(
-                'label' => 'Second Step',
+        'steps' => [
+            'second_step' => [
                 'order' => 1,
                 'is_final' => false,
-                'allowed_transitions' => array(),
+                'allowed_transitions' => [],
                 '_is_start' => '',
-                'entity_acl' => array(),
+                'entity_acl' => [],
                 'position' => []
-            )
-        ),
-        'attributes' => array(),
-        'transitions' => array(
-            'second_transition' => array(
-                'label' => 'Second Transition',
+            ]
+        ],
+        'attributes' => [],
+        'transitions' => [
+            'second_transition' => [
                 'step_to' => 'second_step',
                 'transition_definition' => 'second_transition_definition',
-                'frontend_options' => array(
+                'frontend_options' => [
                     'icon' => 'bar'
-                ),
+                ],
                 'is_start' => false,
                 'is_hidden' => false,
                 'is_unavailable_hidden' => false,
                 'acl_resource' => null,
                 'acl_message' => null,
-                'message' => null,
                 'form_type' => WorkflowTransitionType::NAME,
                 'display_type' => 'dialog',
-                'form_options' => array(),
+                'form_options' => [],
                 'page_template' => null,
                 'dialog_template' => null,
-            )
-        ),
-        'transition_definitions' => array(
-            'second_transition_definition' => array(
-                'preactions' => array(),
-                'preconditions' => array(),
-                'conditions' => array(),
-                'actions' => array()
-            )
-        ),
+                'triggers' => []
+            ]
+        ],
+        'transition_definitions' => [
+            'second_transition_definition' => [
+                'preactions' => [],
+                'preconditions' => [],
+                'conditions' => [],
+                'actions' => []
+            ]
+        ],
         'is_system' => false,
         'entity_attribute' => 'entity',
         'steps_display_ordered' => false,
-        'entity_restrictions' => array(),
+        'entity_restrictions' => [],
         'exclusive_active_groups' => [],
         'exclusive_record_groups' => [],
-    )
-);
+    ]
+];

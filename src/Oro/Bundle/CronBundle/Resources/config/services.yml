@@ -24,6 +24,13 @@ services:
             - '@doctrine'
             - '%oro_cron.entity.schedule.class%'
 
+    oro_cron.deferred_scheduler:
+        class: Oro\Bundle\CronBundle\Entity\Manager\DeferredScheduler
+        arguments:
+            - '@oro_cron.schedule_manager'
+            - '@doctrine'
+            - '%oro_cron.entity.schedule.class%'
+
     oro_cron.command_args_tokenizer:
         class: 'Oro\Bundle\CronBundle\ORM\CommandArgsTokenizer'
         public: false
@@ -51,12 +58,11 @@ services:
     oro_cron.action.create_job:
         class: 'Oro\Bundle\CronBundle\Action\CreateJobAction'
         arguments:
-            - '@oro_action.context_accessor'
+            - '@oro_action.expression.context_accessor'
             - '@oro_cron.job_manager'
             - '@doctrine'
         tags:
             - { name: oro_action.action, alias: create_job }
-            - { name: oro_workflow.action, alias: create_job }
 
     oro_cron.helper.cron:
         class: 'Oro\Bundle\CronBundle\Helper\CronHelper'

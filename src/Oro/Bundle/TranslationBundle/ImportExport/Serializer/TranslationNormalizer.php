@@ -6,9 +6,21 @@ use Oro\Bundle\ImportExportBundle\Exception\UnexpectedValueException;
 use Oro\Bundle\ImportExportBundle\Serializer\Normalizer\DenormalizerInterface;
 
 use Oro\Bundle\TranslationBundle\Entity\Translation;
+use Oro\Bundle\TranslationBundle\Manager\TranslationManager;
 
 class TranslationNormalizer implements DenormalizerInterface
 {
+    /** @var TranslationManager */
+    protected $translationManager;
+
+    /**
+     * @param TranslationManager $translationManager
+     */
+    public function __construct(TranslationManager $translationManager)
+    {
+        $this->translationManager = $translationManager;
+    }
+
     /**
      * {@inheritdoc}
      */
@@ -18,11 +30,14 @@ class TranslationNormalizer implements DenormalizerInterface
             throw new UnexpectedValueException('Incorrect record format');
         }
 
-        $translation = new Translation();
-        $translation->setLocale($context['language_code'])
-            ->setDomain($data['domain'])
-            ->setKey($data['key'])
-            ->setValue($data['value']);
+        $translation = $this->translationManager->createTranslation(
+            $data['key'],
+            $data['value'],
+            $context['language_code'],
+            $data['domain']
+        );
+
+        $translation->setScope(Translation::SCOPE_UI);
 
         return $translation;
     }

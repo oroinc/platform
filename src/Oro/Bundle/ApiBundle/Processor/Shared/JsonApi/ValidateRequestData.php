@@ -2,8 +2,6 @@
 
 namespace Oro\Bundle\ApiBundle\Processor\Shared\JsonApi;
 
-use Symfony\Component\HttpFoundation\Response;
-
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
 use Oro\Component\PhpUtils\ArrayUtil;
@@ -41,17 +39,16 @@ abstract class ValidateRequestData implements ProcessorInterface
 
         $this->context = $context;
         try {
-            $pointer = $this->buildPointer('', JsonApiDoc::DATA);
+            $dataPointer = $this->buildPointer('', JsonApiDoc::DATA);
             $requestData = $context->getRequestData();
-            if ($this->validateRequestData($requestData, $pointer)) {
+            if ($this->validateRequestData($requestData, $dataPointer)) {
                 $data = $requestData[JsonApiDoc::DATA];
-                $this->validatePrimaryDataObject($data, $pointer);
-                $this->validateAttributesAndRelationships($data, $pointer);
+                $this->validatePrimaryDataObject($data, $dataPointer);
+                $this->validateAttributesAndRelationships($data, $dataPointer);
+                $this->validateIncludedEntities($requestData, '');
             }
+        } finally {
             $this->context = null;
-        } catch (\Exception $e) {
-            $this->context = null;
-            throw $e;
         }
     }
 
@@ -63,24 +60,22 @@ abstract class ValidateRequestData implements ProcessorInterface
      */
     protected function validateRequestData(array $data, $pointer)
     {
+        $isValid = true;
         if (!array_key_exists(JsonApiDoc::DATA, $data)) {
             $this->addError(
                 $pointer,
                 'The primary data object should exist'
             );
-
-            return false;
-        }
-        if (empty($data[JsonApiDoc::DATA])) {
+            $isValid = false;
+        } elseif (empty($data[JsonApiDoc::DATA])) {
             $this->addError(
                 $pointer,
                 'The primary data object should not be empty'
             );
-
-            return false;
+            $isValid = false;
         }
 
-        return true;
+        return $isValid;
     }
 
     /**
@@ -97,6 +92,7 @@ abstract class ValidateRequestData implements ProcessorInterface
      */
     protected function validatePrimaryDataObjectType(array $data, $pointer)
     {
+        $isValid = true;
         $dataClassName = ValueNormalizerUtil::convertToEntityClass(
             $this->valueNormalizer,
             $data[JsonApiDoc::TYPE],
@@ -111,11 +107,10 @@ abstract class ValidateRequestData implements ProcessorInterface
                     JsonApiDoc::TYPE
                 )
             );
-
-            return false;
+            $isValid = false;
         }
 
-        return true;
+        return $isValid;
     }
 
     /**
@@ -124,29 +119,15 @@ abstract class ValidateRequestData implements ProcessorInterface
      */
     protected function validateAttributesAndRelationships(array $data, $pointer)
     {
-        $hasAttributes = false;
-        $hasRelationships = false;
         if (array_key_exists(JsonApiDoc::ATTRIBUTES, $data)) {
-            $hasAttributes = true;
             $this->validateArray($data, JsonApiDoc::ATTRIBUTES, $pointer, true, true);
         }
-        if (array_key_exists(JsonApiDoc::RELATIONSHIPS, $data)) {
-            $hasRelationships = true;
-            if ($this->validateArray($data, JsonApiDoc::RELATIONSHIPS, $pointer, true, true)) {
-                $this->validateRelationships(
-                    $data[JsonApiDoc::RELATIONSHIPS],
-                    $this->buildPointer($pointer, JsonApiDoc::RELATIONSHIPS)
-                );
-            }
-        }
-        if (!$hasAttributes && !$hasRelationships) {
-            $this->addError(
-                $pointer,
-                sprintf(
-                    'The primary data object should contain \'%s\' or \'%s\' block',
-                    JsonApiDoc::ATTRIBUTES,
-                    JsonApiDoc::RELATIONSHIPS
-                )
+        if (array_key_exists(JsonApiDoc::RELATIONSHIPS, $data)
+            && $this->validateArray($data, JsonApiDoc::RELATIONSHIPS, $pointer, true, true)
+        ) {
+            $this->validateRelationships(
+                $data[JsonApiDoc::RELATIONSHIPS],
+                $this->buildPointer($pointer, JsonApiDoc::RELATIONSHIPS)
             );
         }
     }
@@ -180,20 +161,34 @@ abstract class ValidateRequestData implements ProcessorInterface
 
             $relationData = $relation[JsonApiDoc::DATA];
             $relationDataPointer = $this->buildPointer($relationPointer, JsonApiDoc::DATA);
-            if (ArrayUtil::isAssoc($relationData)) {
-                if (!$this->validateResourceObject($relationData, $relationDataPointer)) {
-                    $isValid = false;
-                }
-            } else {
+            if (!ArrayUtil::isAssoc($relationData)) {
                 foreach ($relationData as $key => $value) {
                     if ($this->validateResourceObject($value, $this->buildPointer($relationDataPointer, $key))) {
                         $isValid = false;
                     }
                 }
+            } elseif (!$this->validateResourceObject($relationData, $relationDataPointer)) {
+                $isValid = false;
             }
         }
 
         return $isValid;
+    }
+
+    /**
+     * @param array  $data
+     * @param string $pointer
+     */
+    protected function validateIncludedEntities(array $data, $pointer)
+    {
+        if (array_key_exists(JsonApiDoc::INCLUDED, $data)
+            && $this->validateArray($data, JsonApiDoc::INCLUDED, $pointer, true)
+        ) {
+            $includedPointer = $this->buildPointer($pointer, JsonApiDoc::INCLUDED);
+            foreach ($data[JsonApiDoc::INCLUDED] as $key => $item) {
+                $this->validateResourceObject($item, $this->buildPointer($includedPointer, $key));
+            }
+        }
     }
 
     /**
@@ -204,14 +199,15 @@ abstract class ValidateRequestData implements ProcessorInterface
      */
     protected function validateResourceObject(array $data, $pointer)
     {
-        if (!$this->validateRequired($data, JsonApiDoc::ID, $pointer)) {
-            return false;
+        $isValid = true;
+        if (!$this->validateRequiredNotBlankString($data, JsonApiDoc::TYPE, $pointer)) {
+            $isValid = false;
         }
-        if (!$this->validateRequired($data, JsonApiDoc::TYPE, $pointer)) {
-            return false;
+        if (!$this->validateRequiredNotBlankString($data, JsonApiDoc::ID, $pointer)) {
+            $isValid = false;
         }
 
-        return true;
+        return $isValid;
     }
 
     /**
@@ -223,16 +219,66 @@ abstract class ValidateRequestData implements ProcessorInterface
      */
     protected function validateRequired(array $data, $property, $pointer)
     {
+        $isValid = true;
         if (!array_key_exists($property, $data)) {
             $this->addError(
                 $this->buildPointer($pointer, $property),
                 sprintf('The \'%s\' property is required', $property)
             );
-
-            return false;
+            $isValid = false;
         }
 
-        return true;
+        return $isValid;
+    }
+
+    /**
+     * @param array  $data
+     * @param string $property
+     * @param string $pointer
+     *
+     * @return bool
+     */
+    protected function validateRequiredNotBlankString(array $data, $property, $pointer)
+    {
+        return
+            $this->validateRequired($data, $property, $pointer)
+            && $this->validateNotBlankString($data, $property, $pointer);
+    }
+
+    /**
+     * @param array  $data
+     * @param string $property
+     * @param string $pointer
+     *
+     * @return bool
+     */
+    protected function validateNotBlankString(array $data, $property, $pointer)
+    {
+        $isValid = true;
+        if (array_key_exists($property, $data)) {
+            $value = $data[$property];
+            if (null === $value) {
+                $this->addError(
+                    $this->buildPointer($pointer, $property),
+                    sprintf('The \'%s\' property should not be null', $property)
+                );
+                $isValid = false;
+            } elseif (!is_string($value)) {
+                $this->addError(
+                    $this->buildPointer($pointer, $property),
+                    sprintf('The \'%s\' property should be a string', $property)
+                );
+                $isValid = false;
+            } elseif ('' === trim($value)) {
+                $this->addError(
+                    $this->buildPointer($pointer, $property),
+                    sprintf('The \'%s\' property should not be blank', $property)
+                );
+                $isValid = false;
+            }
+        }
+
+        return $isValid;
     }
 
     /**
@@ -246,34 +292,29 @@ abstract class ValidateRequestData implements ProcessorInterface
      */
     protected function validateArray($data, $property, $pointer, $notEmpty = false, $associative = false)
     {
+        $isValid = true;
         $value = $data[$property];
-
         if (!is_array($value)) {
             $this->addError(
                 $this->buildPointer($pointer, $property),
                 sprintf('The \'%s\' property should be an array', $property)
             );
-
-            return false;
-        }
-        if ($notEmpty && empty($value)) {
+            $isValid = false;
+        } elseif ($notEmpty && empty($value)) {
             $this->addError(
                 $this->buildPointer($pointer, $property),
                 sprintf('The \'%s\' property should not be empty', $property)
             );
-
-            return false;
-        }
-        if ($associative && !ArrayUtil::isAssoc($value)) {
+            $isValid = false;
+        } elseif ($associative && !ArrayUtil::isAssoc($value)) {
             $this->addError(
                 $this->buildPointer($pointer, $property),
                 sprintf('The \'%s\' property should be an associative array', $property)
             );
-
-            return false;
+            $isValid = false;
         }
 
-        return true;
+        return $isValid;
     }
 
     /**
@@ -290,11 +331,10 @@ abstract class ValidateRequestData implements ProcessorInterface
     /**
      * @param string $pointer
      * @param string $message
-     * @param integer|null $statusCode
      */
-    protected function addError($pointer, $message, $statusCode = Response::HTTP_BAD_REQUEST)
+    protected function addError($pointer, $message)
     {
-        $error = Error::createValidationError(Constraint::REQUEST_DATA, $message, $statusCode)
+        $error = Error::createValidationError(Constraint::REQUEST_DATA, $message)
             ->setSource(ErrorSource::createByPointer($pointer));
 
         $this->context->addError($error);

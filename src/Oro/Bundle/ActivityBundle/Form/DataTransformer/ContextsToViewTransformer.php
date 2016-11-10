@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\ActivityBundle\Form\DataTransformer;
 
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ORM\EntityManager;
 
@@ -11,8 +13,8 @@ use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInt
 use Symfony\Component\Translation\TranslatorInterface;
 
 use Oro\Bundle\ActivityBundle\Event\PrepareContextTitleEvent;
+use Oro\Bundle\EntityBundle\Provider\EntityNameResolver;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
-use Oro\Bundle\SearchBundle\Resolver\EntityTitleResolverInterface;
 
 class ContextsToViewTransformer implements DataTransformerInterface
 {
@@ -31,8 +33,11 @@ class ContextsToViewTransformer implements DataTransformerInterface
     /** @var EventDispatcherInterface */
     protected $dispatcher;
 
-    /** @var EntityTitleResolverInterface */
-    protected $entityTitleResolver;
+    /** @var EntityNameResolver */
+    protected $entityNameResolver;
+
+    /** @var bool */
+    protected $collectionModel;
 
     /**
      * @param EntityManager         $entityManager
@@ -40,7 +45,8 @@ class ContextsToViewTransformer implements DataTransformerInterface
      * @param TranslatorInterface   $translator
      * @param TokenStorageInterface $securityTokenStorage
      * @param EventDispatcherInterface $dispatcher
-     * @param EntityTitleResolverInterface $entityTitleResolver
+     * @param EntityNameResolver $entityNameResolver
+     * @param bool $collectionModel True if result should be Collection instead of array
      */
     public function __construct(
         EntityManager $entityManager,
@@ -48,14 +54,16 @@ class ContextsToViewTransformer implements DataTransformerInterface
         TranslatorInterface $translator,
         TokenStorageInterface $securityTokenStorage,
         EventDispatcherInterface $dispatcher,
-        EntityTitleResolverInterface $entityTitleResolver
+        EntityNameResolver $entityNameResolver,
+        $collectionModel = false
     ) {
         $this->entityManager        = $entityManager;
         $this->configManager        = $configManager;
         $this->translator           = $translator;
         $this->securityTokenStorage = $securityTokenStorage;
         $this->dispatcher           = $dispatcher;
-        $this->entityTitleResolver  = $entityTitleResolver;
+        $this->entityNameResolver   = $entityNameResolver;
+        $this->collectionModel      = $collectionModel;
     }
 
     /**
@@ -67,7 +75,7 @@ class ContextsToViewTransformer implements DataTransformerInterface
             return '';
         }
 
-        if (is_array($value)) {
+        if (is_array($value) || $value instanceof Collection) {
             $result = [];
             $user   = $this->securityTokenStorage->getToken()->getUser();
             foreach ($value as $target) {
@@ -79,7 +87,7 @@ class ContextsToViewTransformer implements DataTransformerInterface
                     continue;
                 }
 
-                $title = $this->entityTitleResolver->resolve($target);
+                $title = $this->entityNameResolver->getName($target);
                 if ($label = $this->getClassLabel($targetClass)) {
                     $title .= ' (' . $label . ')';
                 }
@@ -128,6 +136,10 @@ class ContextsToViewTransformer implements DataTransformerInterface
                 ['id' => $ids]
             );
             $result   = array_merge($result, $entities);
+        }
+
+        if ($this->collectionModel) {
+            $result = new ArrayCollection($result);
         }
 
         return $result;

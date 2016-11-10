@@ -4,7 +4,6 @@ namespace Oro\Bundle\ActionBundle\DependencyInjection\CompilerPass;
 
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Definition;
 
 abstract class AbstractPass implements CompilerPassInterface
@@ -21,9 +20,9 @@ abstract class AbstractPass implements CompilerPassInterface
         }
 
         $types = [];
-        $conditions = $container->findTaggedServiceIds($tag);
+        $items = $container->findTaggedServiceIds($tag);
 
-        foreach ($conditions as $id => $attributes) {
+        foreach ($items as $id => $attributes) {
             $this->prepareDefinition($container->getDefinition($id));
 
             foreach ($attributes as $eachTag) {
@@ -44,6 +43,6 @@ abstract class AbstractPass implements CompilerPassInterface
      */
     protected function prepareDefinition(Definition $definition)
     {
-        $definition->setScope(ContainerInterface::SCOPE_PROTOTYPE)->setPublic(false);
+        $definition->setShared(false)->setPublic(false);
     }
 }

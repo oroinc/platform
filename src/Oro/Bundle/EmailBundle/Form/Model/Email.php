@@ -65,8 +65,8 @@ class Email implements OrganizationAwareInterface
     /** @var string */
     protected $bodyFooter = '';
 
-    /** @var object[] */
-    protected $contexts = [];
+    /** @var Collection */
+    protected $contexts;
 
     /** @var Collection */
     protected $attachments;
@@ -86,6 +86,7 @@ class Email implements OrganizationAwareInterface
     public function __construct()
     {
         $this->attachments = new ArrayCollection();
+        $this->contexts = new ArrayCollection();
     }
 
     /**
@@ -503,7 +504,7 @@ class Email implements OrganizationAwareInterface
     /**
      * Get contexts
      *
-     * @return object[]
+     * @return Collection
      */
     public function getContexts()
     {
@@ -513,12 +514,23 @@ class Email implements OrganizationAwareInterface
     /**
      * Set contexts
      *
-     * @param object[] $contexts
+     * @param object[]|Collection $contexts
      *
      * @return $this
      */
-    public function setContexts(array $contexts)
+    public function setContexts($contexts)
     {
+        if (!$contexts) {
+            $contexts = new ArrayCollection();
+        } elseif (is_array($contexts)) {
+            $contexts = new ArrayCollection($contexts);
+        } elseif (!$contexts instanceof Collection) {
+            throw new \InvalidArgumentException(sprintf(
+                'setContexts expects $contexts to be array or doctrine collection but "%s" given.',
+                is_object($contexts) ? get_class($contexts) : gettype($contexts)
+            ));
+        }
+
         $this->contexts = $contexts;
 
         return $this;

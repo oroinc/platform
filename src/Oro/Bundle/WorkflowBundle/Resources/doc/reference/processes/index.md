@@ -15,7 +15,7 @@ What are Processes?
 
 Processes provide possibility to automate tasks related to entity management. They are using main doctrine events
 to perform described tasks at the right time. Each process can be performed immediately or after some timeout.
-Processes use JMS Job bundle to provide possibility of delayed execution.
+Processes use OroMessageQueue component and the bundle to provide possibility of delayed execution.
 
 Main Entities
 -------------
@@ -88,7 +88,7 @@ processes:
         contact_definition:                                      # name of process definition
             label: 'Contact Definition'                          # label of the process definition
             enabled: true                                        # this definition is enabled (activated)
-            entity: OroCRM\Bundle\ContactBundle\Entity\Contact   # related entity
+            entity: Oro\Bundle\ContactBundle\Entity\Contact   # related entity
             order: 20                                            # processing order
             exclude_definitions: [contact_definition]            # during handling those definitions won't trigger
             preconditions:                                       # List of preconditions to check before scheduling process
@@ -122,7 +122,7 @@ In other words contact will be assigned to the current administrator.
 
 Described logic is implemented using one definition and two triggers.
 First trigger will be processed immediately after the contact is be created, and second one creates new process job
-and put it to JMS queue with priority  ``10`` and time shift ``60``, so job will be processed one minute after
+and put it to message queue with priority  ``10`` and time shift ``60``, so job will be processed one minute after
 the triggered action.
 
 When contact ``Assigned To`` field is updated then process "contact_definition" will be eventually handled and 
@@ -136,7 +136,7 @@ provoke self-triggering.
 ``app/console oro:process:configuration:load`` - after that you can create ``Contact`` of changed assigned user
 and ensure that process works.
  - Expression `$.` allows you to access main data container, for processes it is instance of `Oro\Bundle\WorkflowBundle\Model\ProcessData`.
- - Expression `$` (shortcut) or `$.data` allows you to access current entity, above in example it's `OroCRM\Bundle\ContactBundle\Entity\Contact`.
+ - Expression `$` (shortcut) or `$.data` allows you to access current entity, above in example it's `Oro\Bundle\ContactBundle\Entity\Contact`.
 
 
 Console commands
@@ -153,13 +153,6 @@ during application installation and update. Command has two optional options:
 - **--definitions** - specifies names of the process definitions that should be loaded (multiple values allowed).
 
 **Note:** You should run this command if process configuration was changed to upload your changes to DB.
-
-#### oro:process:execute:job
-
-This command simply executes process job with specified identifier. It used in the JMS jobs to execute delayed
-processes. Command has one required option:
-
-- **--id** - identifier of the process job to execute.
 
 #### oro:process:handle-trigger
 

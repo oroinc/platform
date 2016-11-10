@@ -6,7 +6,7 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 use Oro\Component\Action\Event\ExecuteActionEvent;
 use Oro\Component\Action\Event\ExecuteActionEvents;
-use Oro\Component\Action\Model\ContextAccessor;
+use Oro\Component\ConfigExpression\ContextAccessor;
 use Oro\Component\ConfigExpression\ExpressionInterface;
 
 abstract class AbstractAction implements ActionInterface, EventDispatcherAwareActionInterface
@@ -62,21 +62,11 @@ abstract class AbstractAction implements ActionInterface, EventDispatcherAwareAc
                 new ExecuteActionEvent($context, $this)
             );
 
-            $this->eventDispatcher->dispatch(
-                ExecuteActionEvents::DEPRECATED_HANDLE_BEFORE,
-                new ExecuteActionEvent($context, $this)
-            );
-
             $this->executeAction($context);
 
             // dispatch oro_action.action.handle_after event
             $this->eventDispatcher->dispatch(
                 ExecuteActionEvents::HANDLE_AFTER,
-                new ExecuteActionEvent($context, $this)
-            );
-
-            $this->eventDispatcher->dispatch(
-                ExecuteActionEvents::DEPRECATED_HANDLE_AFTER,
                 new ExecuteActionEvent($context, $this)
             );
         }

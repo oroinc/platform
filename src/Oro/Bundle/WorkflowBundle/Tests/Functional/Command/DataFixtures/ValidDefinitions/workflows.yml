@@ -1,0 +1,43 @@
+workflows:
+    workflow4:
+        entity: Oro\Bundle\TestFrameworkBundle\Entity\Item
+        entity_attribute: item
+        start_step: step1
+
+        attributes:
+            attribute1:
+                property_path: item.stringValue
+            attribute2:
+                type: boolean
+        steps:
+            step1:
+                allowed_transitions:
+                    - transition1
+            step2:
+                allowed_transitions:
+                    - transition2
+            step3: ~
+
+        transitions:
+            transition1:
+                step_to: step2
+                transition_definition: definition1
+                form_options:
+                    attribute_fields:
+                        attribute1:
+                            options:
+                                label: Attribute1 Label1
+                        attribute2: ~
+            transition2:
+                step_to: step3
+                transition_definition: definition2
+                form_options:
+                    attribute_fields:
+                        attribute1:
+                            options:
+                                label: Attribute1 Label2
+                        attribute2: ~
+                            
+        transition_definitions:
+            definition1: ~
+            definition2: ~

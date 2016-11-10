@@ -28,9 +28,9 @@ define(function(require) {
             workflow: null,
             step_from: null,
             entity_select_el: null,
-            button_example_template: '<button type="button" class="btn <%= button_color %>">' +
-                '<% if (transition_prototype_icon) { %><i class="<%= transition_prototype_icon %>"/> <% } %>' +
-                '<%= label %></button>',
+            button_example_template: '<button type="button" class="btn <%- button_color %>">' +
+                '<% if (transition_prototype_icon) { %><i class="<%- transition_prototype_icon %>"/> <% } %>' +
+                '<%- label %></button>',
             allowed_button_styles: [
                 {
                     'label': __('Gray button'),
@@ -202,7 +202,8 @@ define(function(require) {
                     'attribute_name': attributeName,
                     'property_path': propertyPath,
                     'required': isRequired,
-                    'label': label
+                    'label': label,
+                    'translateLinks': attribute.attributes.translateLinks[this.model.get('name')]
                 });
             }, this);
 

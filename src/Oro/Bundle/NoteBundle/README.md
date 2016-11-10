@@ -10,7 +10,7 @@ The following example shows how notes can be enabled for some entity:
 ``` php
 <?php
 
-namespace OroCRM\Bundle\AccountBundle\Migrations\Schema\v1_1;
+namespace Oro\Bundle\AccountBundle\Migrations\Schema\v1_1;
 
 use Doctrine\DBAL\Schema\Schema;
 
@@ -20,7 +20,7 @@ use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 use Oro\Bundle\NoteBundle\Migration\Extension\NoteExtension;
 use Oro\Bundle\NoteBundle\Migration\Extension\NoteExtensionAwareInterface;
 
-class OroCRMAccountBundle implements Migration, NoteExtensionAwareInterface
+class OroAccountBundle implements Migration, NoteExtensionAwareInterface
 {
     /** @var NoteExtension */
     protected $noteExtension;

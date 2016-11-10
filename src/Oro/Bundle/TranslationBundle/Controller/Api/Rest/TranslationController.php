@@ -3,8 +3,9 @@
 namespace Oro\Bundle\TranslationBundle\Controller\Api\Rest;
 
 use FOS\RestBundle\Controller\Annotations\NamePrefix;
-use FOS\RestBundle\Controller\Annotations\RouteResource;
+use FOS\RestBundle\Controller\Annotations\Patch;
 use FOS\RestBundle\Controller\Annotations\QueryParam;
+use FOS\RestBundle\Controller\Annotations\RouteResource;
 use FOS\RestBundle\Controller\FOSRestController;
 use FOS\RestBundle\Util\Codes;
 
@@ -12,8 +13,12 @@ use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 
 use Symfony\Component\HttpFoundation\Response;
 
+use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
 use Oro\Bundle\SoapBundle\Controller\Api\Rest\RestGetController;
 use Oro\Bundle\SoapBundle\Handler\Context;
+
+use Oro\Bundle\TranslationBundle\Entity\Translation;
+use Oro\Bundle\TranslationBundle\Manager\TranslationManager;
 
 /**
  * @RouteResource("translation")
@@ -99,5 +104,42 @@ class TranslationController extends FOSRestController
         );
 
         return $response;
+    }
+
+    /**
+     * @param string $locale
+     * @param string $domain
+     * @param string $key
+     *
+     * @return Response
+     *
+     * @Patch("translations/{locale}/{domain}/{key}/patch")
+     * @AclAncestor("oro_translation_language_translate")
+     */
+    public function patchAction($locale, $domain, $key)
+    {
+        $data = json_decode($this->get('request_stack')->getCurrentRequest()->getContent(), true);
+
+        /* @var $translationManager TranslationManager */
+        $translationManager = $this->get('oro_translation.manager.translation');
+
+        $translation = $translationManager->saveTranslation(
+            $key,
+            $data['value'],
+            $locale,
+            $domain,
+            Translation::SCOPE_UI
+        );
+        $translationManager->flush();
+
+        $translated = null !== $translation;
+
+        $response = [
+            'status' => $translated,
+            'id' => $translated ? $translation->getId() : '',
+            'value' => $translated ? $translation->getValue() : '',
+        ];
+
+        return parent::handleView($this->view($response, Codes::HTTP_OK));
     }
 }

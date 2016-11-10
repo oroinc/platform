@@ -43,7 +43,8 @@
     $breakpoints: (
         'desktop': '(min-width: ' + $breakpoint-desktop + ')',
         'tablet': '(max-width: ' +  $breakpoint-tablet + ')',
-        'mobile-portrait': '(max-width: ' +  $breakpoint-mobile-portrait + ')',
+        'tablet-small': '(max-width: ' +  $breakpoint-tablet-small + ')',
+        'mobile-landscape': '(max-width: ' +  $breakpoint-mobile-landscape + ')',
         'mobile': '(max-width: ' + $breakpoint-mobile + ')'
     );
 

@@ -3,7 +3,7 @@
 namespace Oro\Bundle\SearchBundle\Engine;
 
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Symfony\Component\PropertyAccess\PropertyAccess;
+use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 
 use Oro\Bundle\SearchBundle\Provider\SearchMappingProvider;
 use Oro\Bundle\SearchBundle\Query\Query;
@@ -27,11 +27,24 @@ abstract class AbstractMapper
     protected $mappingProvider;
 
     /**
+     * @var PropertyAccessorInterface
+     */
+    protected $propertyAccessor;
+
+    /**
      * @param SearchMappingProvider $mappingProvider
      */
     public function setMappingProvider(SearchMappingProvider $mappingProvider)
     {
         $this->mappingProvider = $mappingProvider;
+    }
+
+    /**
+     * @param PropertyAccessorInterface $propertyAccessor
+     */
+    public function setPropertyAccessor(PropertyAccessorInterface $propertyAccessor)
+    {
+        $this->propertyAccessor = $propertyAccessor;
     }
 
     /**
@@ -44,10 +57,15 @@ abstract class AbstractMapper
      */
     public function getFieldValue($objectOrArray, $fieldName)
     {
-        $propertyAccessor = PropertyAccess::createPropertyAccessor();
+        if (is_object($objectOrArray)) {
+            $getter = sprintf('get%s', $fieldName);
+            if (method_exists($objectOrArray, $getter)) {
+                return $objectOrArray->$getter();
+            }
+        }
 
         try {
-            return $propertyAccessor->getValue($objectOrArray, $fieldName);
+            return $this->propertyAccessor->getValue($objectOrArray, $fieldName);
         } catch (\Exception $e) {
             return null;
         }
@@ -163,7 +181,6 @@ abstract class AbstractMapper
                     } else {
                         $objectData[$fieldConfig['target_type']][$targetField] = $value;
                     }
-
                 }
             } else {
                 foreach ($targetFields as $targetField) {

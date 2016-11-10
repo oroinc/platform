@@ -21,21 +21,4 @@ class CommentItem extends Element
         $this->clickLink($title);
         $this->getDriver()->waitForAjax();
     }
-
-    public function clickOnAttachmentThumbnail()
-    {
-        $this->find('css', 'div.thumbnail a')->click();
-    }
-
-    public function checkDownloadLink()
-    {
-        $downLoadLink = $this->find('css', 'ul.file-menu a:contains("Download")');
-        $fileMenu = $this->find('css', 'a.file-menu');
-
-        self::assertFalse($downLoadLink->isVisible());
-        $fileMenu->click();
-
-        self::assertTrue($downLoadLink->isVisible());
-        $fileMenu->click();
-    }
 }

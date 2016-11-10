@@ -29,10 +29,7 @@ class SchemaStep extends AbstractStep
             case 'schema-update':
                 return $this->handleAjaxAction('oro:migration:load', array('--force' => true));
             case 'fixtures':
-                return $this->handleAjaxAction(
-                    'oro:migration:data:load',
-                    array('--no-interaction' => true)
-                );
+                return $this->handleAjaxAction('oro:migration:data:load', array('--no-interaction' => true));
             case 'permissions':
                 return $this->handleAjaxAction(LoadPermissionConfigurationCommand::NAME);
             case 'workflows':

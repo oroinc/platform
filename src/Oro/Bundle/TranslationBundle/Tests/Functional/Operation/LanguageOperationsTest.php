@@ -31,7 +31,7 @@ class LanguageOperationsTest extends ActionTestCase
         $language = $this->getReference(LoadLanguages::LANGUAGE1);
 
         $this->assertFalse($language->isEnabled());
-        $this->assertExecuteOperation('oro_translation_enable_language', $language->getId(), Language::class);
+        $this->assertExecuteOperation('oro_translation_language_enable', $language->getId(), Language::class);
         $language = $this->getReference(LoadLanguages::LANGUAGE1);
         $this->assertTrue($language->isEnabled());
     }
@@ -43,7 +43,7 @@ class LanguageOperationsTest extends ActionTestCase
         $language->setEnabled(true);
 
         $this->assertTrue($language->isEnabled());
-        $this->assertExecuteOperation('oro_translation_disable_language', $language->getId(), Language::class);
+        $this->assertExecuteOperation('oro_translation_language_disable', $language->getId(), Language::class);
         $language = $this->getReference(LoadLanguages::LANGUAGE1);
         $this->assertFalse($language->isEnabled());
     }
@@ -55,9 +55,9 @@ class LanguageOperationsTest extends ActionTestCase
         $language->setEnabled(true);
 
         $this->assertTrue($language->isEnabled());
-        $crawler = $this->assertOperationForm('oro_translation_add_language', $language->getId(), Language::class);
+        $crawler = $this->assertOperationForm('oro_translation_language_add', $language->getId(), Language::class);
         $form = $crawler->selectButton('Add Language')->form([
-            'oro_action_operation[language_code]' => 'en_US',
+            'oro_action_operation[language_code]' => 'zu_ZA',
         ]);
         $this->assertOperationFormSubmitted($form, 'Language has been added');
     }
@@ -100,9 +100,9 @@ class LanguageOperationsTest extends ActionTestCase
     public function testUpdateLanguage()
     {
         /** @var Language $language */
-        $language = $this->getReference(LoadLanguages::LANGUAGE1);
+        $language = $this->getReference(LoadLanguages::LANGUAGE2);
         $tmpDir = self::$kernel->getContainer()->get('oro_translation.service_provider')->getTmpDir('oro-test-trans');
-        $tmpDir .= '/' . LoadLanguages::LANGUAGE1;
+        $tmpDir .= '/' . LoadLanguages::LANGUAGE2;
         $url = $this->getOperationDialogUrl($language, 'oro_translation_language_update');
         $languageHelper = $this->getLanguageHelperMock($tmpDir);
         $languageHelper->expects($this->any())
@@ -114,11 +114,11 @@ class LanguageOperationsTest extends ActionTestCase
         $this->assertHtmlResponseStatusCodeEquals($client->getResponse(), 200);
 
         $form = $crawler->selectButton('Update')->form([
-            'oro_action_operation[language_code]' => LoadLanguages::LANGUAGE1,
+            'oro_action_operation[language_code]' => LoadLanguages::LANGUAGE2,
         ]);
 
         // temporary file would be removed automatically
-        copy(__DIR__ . '/../DataFixtures/Translations/en_CA.zip', $tmpDir . '.zip');
+        copy(__DIR__ . '/../DataFixtures/Translations/fr_FR.zip', $tmpDir . '.zip');
 
         $token = self::$kernel->getContainer()->get('session')->get('_csrf/oro_action_operation');
         $client = $this->mockLanguageHelper($languageHelper);
@@ -165,17 +165,20 @@ class LanguageOperationsTest extends ActionTestCase
     /**
      * @param Language $language
      * @param string $operationName
-     * @return Client
+     * @return string
      */
     private function getOperationDialogUrl(Language $language, $operationName)
     {
-        return $this->getUrl($this->getOperationDialogRoute(), array_merge([
-            'operationName' => $operationName,
-            'entityId' => $language->getId(),
-            'entityClass' => Language::class,
-            '_widgetContainer' => 'dialog',
-            '_wid' => 'test-uuid',
-        ], []));
+        return $this->getUrl(
+            $this->getOperationDialogRoute(),
+            [
+                'operationName' => $operationName,
+                'entityId' => $language->getId(),
+                'entityClass' => Language::class,
+                '_widgetContainer' => 'dialog',
+                '_wid' => 'test-uuid',
+            ]
+        );
     }
 
     /**

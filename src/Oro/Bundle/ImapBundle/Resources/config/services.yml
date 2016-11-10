@@ -78,7 +78,7 @@ services:
             - '@oro_security.encoder.mcrypt'
             - '@oro_imap.imap_email_google_oauth2_manager'
         calls:
-            - [setJobManager, ['@oro_cron.job_manager']]
+            - ['setMessageProducer', ['@oro_message_queue.client.message_producer']]
         tags:
             - { name: oro_email.email_synchronizer }
 
@@ -149,18 +149,22 @@ services:
     oro_imap.workflow.action.dependency_job:
         class: %oro_imap.workflow.action.dependency_job.class%
         arguments:
-            - '@oro_action.context_accessor'
+            - '@oro_action.expression.context_accessor'
             - '@doctrine'
         tags:
-            - { name: oro_workflow.action, alias: job_add_dependency }
+            - { name: oro_action.action, alias: job_add_dependency }
 
     oro_imap.form.type.google_sync_checkbox:
         class: %oro_imap.form.type.google_sync_checkbox.class%
-        arguments:
-            - '@doctrine.orm.entity_manager'
-            - '@oro_imap.imap_email_google_oauth2_manager'
         tags:
             - { name: form.type, alias: oro_config_google_imap_sync_checkbox }
+
+    oro_imap.form.google_imap_config_handler:
+        class: Oro\Bundle\ImapBundle\Form\Handler\GoogleImapConfigHandler
+        arguments:
+            - '@doctrine'
+            - '@oro_imap.imap_email_google_oauth2_manager'
+            - '@logger'
 
     oro_imap.imap_email_google_oauth2_manager:
         class: %oro_imap.imap_email_google_oauth2_manager.class%
@@ -191,3 +195,30 @@ services:
             - '@oro_imap.imap_email_google_oauth2_manager'
         tags:
             - { name: kernel.event_listener, event: oro_email.send_email_transport, method: setSmtpTransport }
+
+    oro_imap.async.clear_inactive_mailbox_message_processor:
+        class: 'Oro\Bundle\ImapBundle\Async\ClearInactiveMailboxMessageProcessor'
+        arguments:
+            - '@oro_imap.manager.clear'
+            - '@oro_message_queue.job.runner'
+            - '@logger'
+        tags:
+            - { name: 'oro_message_queue.client.message_processor' }
+
+    oro_imap.async.sync_email:
+        scope: prototype
+        class: 'Oro\Bundle\ImapBundle\Async\SyncEmailMessageProcessor'
+        arguments:
+            - '@oro_imap.email_synchronizer'
+            - '@logger'
+        tags:
+            - { name: 'oro_message_queue.client.message_processor' }
+
+    oro_imap.async.sync_emails:
+        scope: prototype
+        class: 'Oro\Bundle\ImapBundle\Async\SyncEmailsMessageProcessor'
+        arguments:
+            - '@oro_message_queue.client.message_producer'
+            - '@logger'
+        tags:
+            - { name: 'oro_message_queue.client.message_processor' }

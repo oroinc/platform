@@ -35,19 +35,11 @@ class MessageCollectorTest extends \PHPUnit_Framework_TestCase
         $this->messageCollector->send($topic, $message);
     }
 
-    public function testShouldBeDisabledByDefault()
-    {
-        $this->messageCollector->send('test topic', 'test message');
-
-        self::assertEquals([], $this->messageCollector->getSentMessages());
-    }
-
     public function testShouldCollectMessagesWhenEnabled()
     {
         $topic = 'test topic';
         $message = 'test message';
 
-        $this->messageCollector->enable();
         $this->messageCollector->send($topic, $message);
 
         self::assertEquals(
@@ -58,29 +50,9 @@ class MessageCollectorTest extends \PHPUnit_Framework_TestCase
         );
     }
 
-    public function testShouldNotCollectMessagesWhenDisabled()
-    {
-        $this->messageCollector->enable();
-        $this->messageCollector->disable();
-        $this->messageCollector->send('test topic', 'test message');
-
-        self::assertEquals([], $this->messageCollector->getSentMessages());
-    }
-
     public function testShouldAllowClearCollectedMessages()
     {
-        $this->messageCollector->enable();
         $this->messageCollector->send('test topic', 'test message');
-        $this->messageCollector->clear();
-
-        self::assertEquals([], $this->messageCollector->getSentMessages());
-    }
-
-    public function testShouldAllowClearCollectedMessagesEvenIfDisabled()
-    {
-        $this->messageCollector->enable();
-        $this->messageCollector->send('test topic', 'test message');
-        $this->messageCollector->disable();
         $this->messageCollector->clear();
 
         self::assertEquals([], $this->messageCollector->getSentMessages());
@@ -96,7 +68,6 @@ class MessageCollectorTest extends \PHPUnit_Framework_TestCase
 
         $this->setExpectedException(get_class($exception), $exception->getMessage());
 
-        $this->messageCollector->enable();
         $this->messageCollector->send('test topic', 'test message');
     }
 
@@ -105,8 +76,6 @@ class MessageCollectorTest extends \PHPUnit_Framework_TestCase
         $this->messageProducer->expects($this->once())
             ->method('send')
             ->willThrowException(new \Exception());
-
-        $this->messageCollector->enable();
 
         try {
             $this->messageCollector->send('test topic', 'test message');

@@ -4,6 +4,8 @@ namespace Oro\Bundle\ApiBundle\Metadata;
 
 use Oro\Component\ChainProcessor\ParameterBag;
 use Oro\Component\ChainProcessor\ToArrayInterface;
+use Oro\Component\PhpUtils\ReflectionUtil;
+use Oro\Bundle\ApiBundle\Exception\RuntimeException;
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 
 /**
@@ -12,28 +14,28 @@ use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 class EntityMetadata implements ToArrayInterface
 {
     /** @var string */
-    protected $className;
+    private $className;
 
     /** @var bool */
-    protected $inherited = false;
+    private $inherited = false;
 
     /** @var bool */
-    protected $hasIdGenerator = false;
+    private $hasIdGenerator = false;
 
     /** @var string[] */
-    protected $identifiers = [];
+    private $identifiers = [];
 
     /** @var MetaPropertyMetadata[] */
-    protected $metaProperties = [];
+    private $metaProperties = [];
 
     /** @var FieldMetadata[] */
-    protected $fields = [];
+    private $fields = [];
 
     /** @var AssociationMetadata[] */
-    protected $associations = [];
+    private $associations = [];
 
     /** @var ParameterBag|null */
-    protected $attributes;
+    private $attributes;
 
     /**
      * Makes a deep copy of the object.
@@ -102,7 +104,7 @@ class EntityMetadata implements ToArrayInterface
      *
      * @return array
      */
-    protected function convertPropertiesToArray(array $properties)
+    private function convertPropertiesToArray(array $properties)
     {
         $result = [];
         foreach ($properties as $name => $property) {
@@ -242,6 +244,43 @@ class EntityMetadata implements ToArrayInterface
         } elseif ($this->hasMetaProperty($oldName)) {
             $this->renameMetaProperty($oldName, $newName);
         }
+    }
+
+    /**
+     * Finds a property metadata by the given property path.
+     *
+     * @param string $propertyPath
+     *
+     * @return PropertyMetadata|null
+     */
+    public function getPropertyByPropertyPath($propertyPath)
+    {
+        $property = $this->getByPropertyPath($this->fields, $propertyPath);
+        if (null === $property) {
+            $property = $this->getByPropertyPath($this->associations, $propertyPath);
+        }
+        if (null === $property) {
+            $property = $this->getByPropertyPath($this->metaProperties, $propertyPath);
+        }
+
+        return $property;
+    }
+
+    /**
+     * @param PropertyMetadata[] $properties
+     * @param string             $propertyPath
+     *
+     * @return PropertyMetadata|null
+     */
+    private function getByPropertyPath(array $properties, $propertyPath)
+    {
+        foreach ($properties as $property) {
+            if ($property->getPropertyPath() === $propertyPath) {
+                return $property;
+            }
+        }
+
+        return null;
     }
 
     /**
@@ -556,5 +595,58 @@ class EntityMetadata implements ToArrayInterface
         return
             count($fields) === count($idFields)
             && count(array_diff_key($fields, array_flip($idFields))) === 0;
+    }
+
+    /**
+     * Extracts the identifier value of an entity represented by this metadata.
+     *
+     * @param object $entity
+     *
+     * @return mixed The value of identifier field
+     *               or array ([field name => value, ...]) if the entity has composite identifier
+     */
+    public function getIdentifierValue($entity)
+    {
+        if (!is_object($entity)) {
+            throw new \InvalidArgumentException(
+                sprintf('Expected argument of type "object", "%s" given.', gettype($entity))
+            );
+        }
+
+        $numberOfIdFields = count($this->identifiers);
+        if (0 === $numberOfIdFields) {
+            throw new RuntimeException(
+                sprintf('The entity "%s" does not have identifier field(s).', $this->className)
+            );
+        }
+
+        $reflClass = new \ReflectionClass($entity);
+        if ($numberOfIdFields > 1) {
+            $result = [];
+            foreach ($this->identifiers as $fieldName) {
+                $result[$fieldName] = $this->getPropertyValue($entity, $reflClass, $fieldName);
+            }
+
+            return $result;
+        }
+
+        return $this->getPropertyValue($entity, $reflClass, reset($this->identifiers));
+    }
+
+    /**
+     * @param object           $entity
+     * @param \ReflectionClass $reflClass
+     * @param string           $propertyName
+     *
+     * @return mixed
+     */
+    private function getPropertyValue($entity, \ReflectionClass $reflClass, $propertyName)
+    {
+        $property = ReflectionUtil::getProperty($reflClass, $propertyName);
+        if (!$property->isPublic()) {
+            $property->setAccessible(true);
+        }
+
+        return $property->getValue($entity);
     }
 }
