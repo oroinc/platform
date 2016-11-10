@@ -26,7 +26,7 @@ class ButtonProviderTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @dataProvider buttonProvider
+     * @dataProvider findAllDataProvider
      *
      * @param array $input
      * @param array $output
@@ -46,7 +46,7 @@ class ButtonProviderTest extends \PHPUnit_Framework_TestCase
     /**
      * @return array
      */
-    public function buttonProvider()
+    public function findAllDataProvider()
     {
         $button1 = $this->getButton(1);
         $button2 = $this->getButton(2);

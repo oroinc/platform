@@ -11,29 +11,19 @@ use Oro\Bundle\WorkflowBundle\Model\Workflow;
 
 class TransitionButtonTest extends \PHPUnit_Framework_TestCase
 {
-    /**
-     * @var Workflow|\PHPUnit_Framework_MockObject_MockObject
-     */
+    /** @var Workflow|\PHPUnit_Framework_MockObject_MockObject */
     protected $workflow;
 
-    /**
-     * @var WorkflowDefinition|\PHPUnit_Framework_MockObject_MockObject
-     */
+    /** @var WorkflowDefinition|\PHPUnit_Framework_MockObject_MockObject */
     protected $definition;
 
-    /**
-     * @var Transition|\PHPUnit_Framework_MockObject_MockObject
-     */
+    /** @var Transition|\PHPUnit_Framework_MockObject_MockObject */
     protected $transition;
 
-    /**
-     * @var ButtonContext|\PHPUnit_Framework_MockObject_MockObject
-     */
+    /** @var ButtonContext|\PHPUnit_Framework_MockObject_MockObject */
     protected $buttonContext;
 
-    /**
-     * @var TransitionButton
-     */
+    /** @var TransitionButton */
     protected $button;
 
     /**
@@ -41,7 +31,6 @@ class TransitionButtonTest extends \PHPUnit_Framework_TestCase
      */
     protected function setUp()
     {
-
         $this->transition = $this->getMockBuilder(Transition::class)
             ->disableOriginalConstructor()
             ->getMock();
@@ -79,7 +68,6 @@ class TransitionButtonTest extends \PHPUnit_Framework_TestCase
 
     public function testGetTemplate()
     {
-        //TODO: Must be updated https://magecore.atlassian.net/browse/BAP-12480
         $this->assertEquals(TransitionButton::DEFAULT_TEMPLATE, $this->button->getTemplate());
     }
 

@@ -10,19 +10,13 @@ class TransitionButton implements ButtonInterface
     //TODO: Must be updated at https://magecore.atlassian.net/browse/BAP-12481
     const DEFAULT_TEMPLATE = 'OroWorkflowBundle::Button\transitionButton.html.twig';
 
-    /**
-     * @var Workflow
-     */
+    /** @var Workflow */
     protected $workflow;
 
-    /**
-     * @var Transition
-     */
+    /** @var Transition */
     protected $transition;
 
-    /**
-     * @var ButtonContext
-     */
+    /*** @var ButtonContext */
     protected $buttonContext;
 
     /**
