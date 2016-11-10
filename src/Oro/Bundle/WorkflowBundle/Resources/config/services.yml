@@ -369,3 +369,11 @@ services:
             - '@oro_featuretoggle.checker.feature_checker'
         tags:
             - { name: kernel.event_subscriber }
+
+    oro_workflow.helper.applications:
+        class: 'Oro\Bundle\WorkflowBundle\Helper\WorkflowApplicationsHelper'
+        arguments:
+            - '@oro_action.helper.applications'
+        calls:
+            - [setExecutionRoute, ['oro_workflow_start_transition_form']]
+            - [setWidgetRoute, ['oro_workflow_widget_start_transition_form']]

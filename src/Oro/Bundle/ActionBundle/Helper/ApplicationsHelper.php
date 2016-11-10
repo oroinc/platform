@@ -6,15 +6,14 @@ use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInt
 
 use Oro\Bundle\UserBundle\Entity\User;
 
-class ApplicationsHelper
+class ApplicationsHelper implements ApplicationsHelperInterface
 {
+    use ApplicationsHelperTrait, RouteHelperTrait;
+
     const DEFAULT_APPLICATION = 'default';
 
     /** @var TokenStorageInterface */
     protected $tokenStorage;
-
-    /** @var string */
-    protected $currentApplication = false;
 
     /**
      * @param TokenStorageInterface $tokenStorage
@@ -25,53 +24,12 @@ class ApplicationsHelper
     }
 
     /**
-     * @param array $applications
-     * @return bool
-     */
-    public function isApplicationsValid(array $applications)
-    {
-        if (empty($applications)) {
-            return true;
-        }
-
-        if ($this->currentApplication === false) {
-            $this->currentApplication = $this->getCurrentApplication();
-        }
-
-        return in_array($this->currentApplication, $applications, true);
-    }
-
-    /**
-     * @return string|null
+     * {@inheritdoc}
      */
     public function getCurrentApplication()
     {
         $token = $this->tokenStorage->getToken();
 
         return $token && $token->getUser() instanceof User ? self::DEFAULT_APPLICATION : null;
-    }
-
-    /**
-     * @return string
-     */
-    public function getWidgetRoute()
-    {
-        return 'oro_action_widget_buttons';
-    }
-
-    /**
-     * @return string
-     */
-    public function getDialogRoute()
-    {
-        return 'oro_action_widget_form';
-    }
-
-    /**
-     * @return string
-     */
-    public function getExecutionRoute()
-    {
-        return 'oro_action_operation_execute';
     }
 }

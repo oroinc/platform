@@ -23,6 +23,9 @@ class ApplicationsHelperTest extends \PHPUnit_Framework_TestCase
             ->getMock('Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface');
 
         $this->helper = new ApplicationsHelper($this->tokenStorage);
+        $this->helper->setDialogRoute('oro_action_widget_form')
+            ->setExecutionRoute('oro_action_operation_execute')
+            ->setWidgetRoute('oro_action_widget_buttons');
     }
 
     protected function tearDown()
