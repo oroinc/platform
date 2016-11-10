@@ -5,6 +5,10 @@ system_configuration:
             title: oro.email.system_configuration.email_configuration
             page_reload: true
 
+        user_email_configuration:
+            icon:  icon-envelope
+            title: oro.email.system_configuration.email_configuration
+
         email_settings:
             title: oro.email.system_configuration.email_settings
             priority: 130
@@ -193,7 +197,7 @@ system_configuration:
                                     user_bar_settings:
                                         children:
                                             - oro_email.show_recent_emails_in_user_bar
-                            email_configuration:
+                            user_email_configuration:
                                 children:
                                     signature_configuration:
                                         children:
