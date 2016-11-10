@@ -58,15 +58,6 @@ services:
         tags:
             - { name: oro_migration.extension, extension_name: note }
 
-    oro_note.widget_provider.actions:
-        parent: oro_ui.widget_provider.action_button.abstract
-        arguments:
-            - oro_add_note_button
-            - oro_add_note_link
-        tags:
-            - { name: oro_ui.view_action_provider, group: activity, priority: -100 }
-            - { name: oro_ui.update_action_provider, group: activity, priority: -100 }
-
     oro_note.activity_list.provider:
         class: %oro_note.activity_list.provider.class%
         arguments:

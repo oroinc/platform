@@ -91,7 +91,7 @@ class NoteController extends Controller
         $entityClass = ClassUtils::getRealClass($entity);
 
         $noteEntity = new Note();
-        $noteEntity->setTarget($entity);
+        $noteEntity->addActivityTarget($entity);
 
         $formAction = $entityRoutingHelper->generateUrlByRequest(
             'oro_note_create',

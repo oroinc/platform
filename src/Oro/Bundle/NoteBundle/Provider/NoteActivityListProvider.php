@@ -193,7 +193,7 @@ class NoteActivityListProvider implements
      */
     public function getTargetEntities($entity)
     {
-        return $entity->getTargetEntities();
+        return $entity->getActivityTargetEntities();
     }
 
     /**

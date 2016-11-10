@@ -754,3 +754,11 @@ to the [Fallback documentation](./src/Oro/Bundle/EntityBundle/Resources/doc/enti
 
 ####OroInstallerBundle
 - Added interface `Oro\Bundle\InstallerBundle\CacheWarmer\NamespaceMigrationProviderInterface`. it makes available add the rules for command "oro:platform:upgrade20"
+
+####OroNoteBundle
+- "Note" was changed to the regular activity
+- Specific "Note" association type was removed
+- Oro\Bundle\NoteBundle\Migration\Extension\NoteExtension was removed
+- Oro\Bundle\NoteBundle\Migration\Extension\NoteExtensionAwareInterface was removed
+
+
