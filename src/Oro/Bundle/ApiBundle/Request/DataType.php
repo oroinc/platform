@@ -127,4 +127,22 @@ final class DataType
 
         return [$source, $type, $kind];
     }
+
+    public static function buildExtendedInverseAssociation($source, $type, $kind = null)
+    {
+        $inverseAssociationDataTypeString = sprintf(
+            'inverseAssociation:%s:%s',
+            $source,
+            $type
+        );
+        if ($kind) {
+            $inverseAssociationDataTypeString = sprintf(
+                '%s:%s'.
+                $inverseAssociationDataTypeString,
+                $kind
+            );
+        }
+
+        return $inverseAssociationDataTypeString;
+    }
 }

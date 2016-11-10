@@ -54,6 +54,12 @@ class AddParentEntityIdToQuery implements ProcessorInterface
             // bidirectional association
             $query->innerJoin('e.' . $joinFieldName, 'parent_entity');
         } elseif ($context->isCollection()) {
+
+
+
+
+
+
             $parentFieldConfig = $context->getParentConfig()->getField($associationName);
             if (!$parentFieldConfig || !$parentFieldConfig->has('association-field')) {
                 // unidirectional "to-many" association
@@ -95,9 +101,13 @@ class AddParentEntityIdToQuery implements ProcessorInterface
     protected function getAssociationName(SubresourceContext $context)
     {
         $associationName = $context->getAssociationName();
-        $propertyPath = $context->getParentConfig()
-            ->getField($associationName)
-            ->getPropertyPath();
+
+        $propertyPath = null;
+        $field = $context->getParentConfig()
+            ->getField($associationName);
+        if ($field) {
+            $propertyPath = $field->getPropertyPath();
+        }
 
         return $propertyPath ?: $associationName;
     }

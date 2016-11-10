@@ -57,6 +57,9 @@ abstract class LoadSubresources implements ProcessorInterface
             } elseif (!empty($subresourceExcludedActions)) {
                 $subresource->setExcludedActions($subresourceExcludedActions);
             }
+            if ($association->has('association-field')) {
+                $subresource->setExcludedActions(['update_relationship', 'delete_relationship']);
+            }
         } else {
             if (!$this->isAccessibleAssociation($association, $accessibleResources)) {
                 $subresource->setExcludedActions($this->getToOneRelationshipsActions());
