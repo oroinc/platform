@@ -145,6 +145,7 @@ class LayoutListener
                 $context->set('action', $action);
             }
         }
+
         $theme = $layoutAnnotation->getTheme();
         if (!empty($theme)) {
             $currentTheme = $context->getOr('theme');

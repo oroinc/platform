@@ -7,7 +7,7 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Oro\Component\Action\Event\ExecuteActionEvent;
 use Oro\Component\Action\Event\ExecuteActionEvents;
 use Oro\Component\Action\Action\AbstractAction;
-use Oro\Component\Action\Model\ContextAccessor;
+use Oro\Component\ConfigExpression\ContextAccessor;
 use Oro\Component\Action\Tests\Unit\Action\Stub\ArrayCondition;
 
 class AbstractActionTest extends \PHPUnit_Framework_TestCase

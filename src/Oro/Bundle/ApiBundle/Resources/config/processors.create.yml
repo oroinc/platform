@@ -221,7 +221,7 @@ services:
         arguments:
             - '@oro_api.doctrine_helper'
         tags:
-            - { name: oro.api.processor, action: create, group: save_data, priority: -5 }
+            - { name: oro.api.processor, action: create, group: save_data, priority: 10 }
 
     oro_api.create.save_entity:
         class: Oro\Bundle\ApiBundle\Processor\Create\SaveEntity
