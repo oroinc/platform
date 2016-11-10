@@ -60,3 +60,9 @@ services:
         class: Oro\Bundle\ReportBundle\EventListener\StoreSqlListener
         tags:
             - { name: kernel.event_listener, event: oro_datagrid.orm_datasource.result.after, method: onResultAfter }
+
+    oro_report.provider.report_entity_name:
+        class: 'Oro\Bundle\ReportBundle\Provider\ReportEntityNameProvider'
+        public: false
+        tags:
+            - { name: oro_entity.name_provider, priority: 0 }
