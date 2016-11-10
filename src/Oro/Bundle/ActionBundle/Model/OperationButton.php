@@ -42,11 +42,9 @@ class OperationButton implements ButtonInterface
     {
         $frontendOptions = $this->operation->getDefinition()->getFrontendOptions();
 
-        if (!empty($frontendOptions[static::FRONTEND_TEMPLATE_KEY])) {
-            return $frontendOptions[static::FRONTEND_TEMPLATE_KEY];
-        }
-
-        return static::DEFAULT_TEMPLATE;
+        return !empty($frontendOptions[static::FRONTEND_TEMPLATE_KEY])
+            ? $frontendOptions[static::FRONTEND_TEMPLATE_KEY]
+            : static::DEFAULT_TEMPLATE;
     }
 
     /**

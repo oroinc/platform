@@ -9,24 +9,16 @@ use Oro\Bundle\ActionBundle\Model\OperationDefinition;
 
 class OperationButtonTest extends \PHPUnit_Framework_TestCase
 {
-    /**
-     * @var Operation|\PHPUnit_Framework_MockObject_MockObject
-     */
+    /** @var Operation|\PHPUnit_Framework_MockObject_MockObject */
     protected $operation;
 
-    /**
-     * @var OperationDefinition|\PHPUnit_Framework_MockObject_MockObject
-     */
+    /** @var OperationDefinition|\PHPUnit_Framework_MockObject_MockObject */
     protected $definition;
 
-    /**
-     * @var ButtonContext|\PHPUnit_Framework_MockObject_MockObject
-     */
+    /** @var ButtonContext|\PHPUnit_Framework_MockObject_MockObject */
     protected $buttonContext;
 
-    /**
-     * @var OperationButton
-     */
+    /** @var OperationButton */
     protected $button;
 
     /**
@@ -34,10 +26,7 @@ class OperationButtonTest extends \PHPUnit_Framework_TestCase
      */
     protected function setUp()
     {
-
-        $this->definition = $this->getMockBuilder(OperationDefinition::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->definition = $this->getMock(OperationDefinition::class);
 
         $this->operation = $this->getMockBuilder(Operation::class)
             ->disableOriginalConstructor()
@@ -45,9 +34,7 @@ class OperationButtonTest extends \PHPUnit_Framework_TestCase
 
         $this->operation->expects($this->any())->method('getDefinition')->willReturn($this->definition);
 
-        $this->buttonContext = $this->getMockBuilder(ButtonContext::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->buttonContext = $this->getMock(ButtonContext::class);
 
         $this->button = new OperationButton($this->operation, $this->buttonContext);
     }
@@ -74,8 +61,8 @@ class OperationButtonTest extends \PHPUnit_Framework_TestCase
 
     public function testGetTemplateWithConfiguredFrontendOptions()
     {
-        $templateName = uniqid();
-        $this->definition->expects($this->atLeastOnce())->method('getFrontendOptions')->willReturn(
+        $templateName = uniqid('test_template', true);
+        $this->definition->expects($this->once())->method('getFrontendOptions')->willReturn(
             [OperationButton::FRONTEND_TEMPLATE_KEY => $templateName]
         );
         $this->assertEquals($templateName, $this->button->getTemplate());
