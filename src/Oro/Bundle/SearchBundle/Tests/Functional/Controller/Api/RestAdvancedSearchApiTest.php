@@ -39,11 +39,11 @@ class RestAdvancedSearchApiTest extends WebTestCase
     public function testAdvancedSearch(array $request, array $response)
     {
         $this->addOroDefaultPrefixToUrlInParameterArray($response['rest']['data'], 'record_url');
-        $requestUrl = $request['query'];
+        $queryString = $request['query'];
         $this->client->request(
             'GET',
             $this->getUrl('oro_api_get_search_advanced'),
-            ['query' => $requestUrl]
+            ['query' => $queryString]
         );
 
         $result = $this->client->getResponse();
@@ -62,6 +62,26 @@ class RestAdvancedSearchApiTest extends WebTestCase
         }
 
         $this->assertSame($response['rest']['data'], $result['data']);
+    }
+
+    public function testAdvancedSearchNoResults()
+    {
+        $queryString = 'from oro_test_item where stringValue = item5';
+
+        $this->client->request(
+            'GET',
+            $this->getUrl('oro_api_get_search_advanced'),
+            ['query' => $queryString]
+        );
+
+        $result = $this->client->getResponse();
+
+        $this->assertJsonResponseStatusCodeEquals($result, 200);
+        $result = json_decode($result->getContent(), true);
+
+        $this->assertEquals(0, $result['records_count']);
+        $this->assertEquals(0, $result['count']);
+        $this->assertArrayNotHasKey('data', $result);
     }
 
     /**

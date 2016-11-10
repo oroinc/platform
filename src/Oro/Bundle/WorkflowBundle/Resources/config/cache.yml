@@ -19,7 +19,7 @@ services:
         parent: oro_workflow.cache.trigger.abstract
         calls:
             - [ setProvider, [ '@oro_workflow.cache.provider.process_trigger' ] ]
-            - [ setTriggerClassName, [ '%oro_workflow.process_trigger.entity.class%' ] ]
+            - [ setTriggerClassName, [ '%oro_workflow.entity.process_trigger.class%' ] ]
 
     oro_workflow.cache.transition_trigger_event:
         parent: oro_workflow.cache.trigger.abstract

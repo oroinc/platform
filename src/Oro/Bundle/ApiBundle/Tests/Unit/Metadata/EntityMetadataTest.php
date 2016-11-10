@@ -6,6 +6,7 @@ use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
 use Oro\Bundle\ApiBundle\Metadata\FieldMetadata;
 use Oro\Bundle\ApiBundle\Metadata\AssociationMetadata;
 use Oro\Bundle\ApiBundle\Metadata\MetaPropertyMetadata;
+use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Group;
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 
 class EntityMetadataTest extends \PHPUnit_Framework_TestCase
@@ -504,5 +505,63 @@ class EntityMetadataTest extends \PHPUnit_Framework_TestCase
         $entityMetadata->addAssociation(new AssociationMetadata('association1'));
 
         $this->assertFalse($entityMetadata->hasIdentifierFieldsOnly());
+    }
+
+    /**
+     * @expectedException \InvalidArgumentException
+     * @expectedExceptionMessage Expected argument of type "object", "integer" given.
+     */
+    public function testGetIdentifierValueForInvalidInputEntity()
+    {
+        $entityMetadata = new EntityMetadata();
+
+        $entityMetadata->getIdentifierValue(123);
+    }
+
+    // @codingStandardsIgnoreStart
+    /**
+     * @expectedException \Oro\Bundle\ApiBundle\Exception\RuntimeException
+     * @expectedExceptionMessage The entity "Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Group" does not have identifier field(s).
+     */
+    // @codingStandardsIgnoreEnd
+    public function testGetIdentifierValueForEntityWithoutId()
+    {
+        $entity = new Group();
+
+        $entityMetadata = new EntityMetadata();
+        $entityMetadata->setClassName(Group::class);
+
+        $entityMetadata->getIdentifierValue($entity);
+    }
+
+    public function testGetIdentifierValueForEntityWithSingleId()
+    {
+        $entity = new Group();
+        $entity->setId(123);
+
+        $entityMetadata = new EntityMetadata();
+        $entityMetadata->setClassName(Group::class);
+        $entityMetadata->setIdentifierFieldNames(['id']);
+
+        self::assertSame(
+            123,
+            $entityMetadata->getIdentifierValue($entity)
+        );
+    }
+
+    public function testGetIdentifierValueForEntityWithCompositeId()
+    {
+        $entity = new Group();
+        $entity->setId(123);
+        $entity->setName('test');
+
+        $entityMetadata = new EntityMetadata();
+        $entityMetadata->setClassName(Group::class);
+        $entityMetadata->setIdentifierFieldNames(['id', 'name']);
+
+        self::assertSame(
+            ['id' => 123, 'name' => 'test'],
+            $entityMetadata->getIdentifierValue($entity)
+        );
     }
 }

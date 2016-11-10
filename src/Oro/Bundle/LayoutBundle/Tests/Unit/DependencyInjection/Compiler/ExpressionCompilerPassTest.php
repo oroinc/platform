@@ -12,7 +12,9 @@ class ExpressionCompilerPassTest extends \PHPUnit_Framework_TestCase
 {
     public function testProcess()
     {
+        /** @var ContainerBuilder|\PHPUnit_Framework_MockObject_MockObject $container */
         $container = $this->getMockBuilder(ContainerBuilder::class)->getMock();
+
         $encodingServiceDef = $this->getMockBuilder(Definition::class)->getMock();
         $languageServiceDef = $this->getMockBuilder(Definition::class)->getMock();
 
@@ -43,10 +45,10 @@ class ExpressionCompilerPassTest extends \PHPUnit_Framework_TestCase
         $encodingServiceDef->expects($this->once())
             ->method('replaceArgument')
             ->with(
-                1,
+                0,
                 [
-                    'json' => 'json_encoder',
-                    'xml'  => 'xml_encoder'
+                    'json' => new Reference('json_encoder'),
+                    'xml'  => new Reference('xml_encoder')
                 ]
             );
 

@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\Shared\JsonApi;
 
+use Oro\Bundle\ApiBundle\Collection\IncludedEntityCollection;
+use Oro\Bundle\ApiBundle\Collection\IncludedEntityData;
 use Oro\Bundle\ApiBundle\Metadata\AssociationMetadata;
 use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
 use Oro\Bundle\ApiBundle\Model\Error;
@@ -271,13 +273,13 @@ class NormalizeRequestDataTest extends FormProcessorTestCase
         $inputData = [
             'data' => [
                 'relationships' => [
-                    'toOneRelation'       => [
+                    'toOneRelation'  => [
                         'data' => [
                             'type' => 'users',
                             'id'   => '89'
                         ]
                     ],
-                    'toManyRelation'      => [
+                    'toManyRelation' => [
                         'data' => [
                             [
                                 'type' => 'groups',
@@ -338,13 +340,13 @@ class NormalizeRequestDataTest extends FormProcessorTestCase
         $inputData = [
             'data' => [
                 'relationships' => [
-                    'toOneRelation'       => [
+                    'toOneRelation'  => [
                         'data' => [
                             'type' => 'users',
                             'id'   => '89'
                         ]
                     ],
-                    'toManyRelation'      => [
+                    'toManyRelation' => [
                         'data' => [
                             [
                                 'type' => 'groups',
@@ -422,13 +424,13 @@ class NormalizeRequestDataTest extends FormProcessorTestCase
         $inputData = [
             'data' => [
                 'relationships' => [
-                    'toOneRelation'       => [
+                    'toOneRelation'  => [
                         'data' => [
                             'type' => 'users',
                             'id'   => 'val1'
                         ]
                     ],
-                    'toManyRelation'      => [
+                    'toManyRelation' => [
                         'data' => [
                             [
                                 'type' => 'groups',
@@ -491,5 +493,97 @@ class NormalizeRequestDataTest extends FormProcessorTestCase
             ],
             $this->context->getErrors()
         );
+    }
+
+    public function testProcessShouldNotNormalizeIdOfIncludedEntity()
+    {
+        $inputData = [
+            'data' => [
+                'relationships' => [
+                    'association' => [
+                        'data' => [
+                            'type' => 'users',
+                            'id'   => 'INCLUDED1'
+                        ]
+                    ]
+                ]
+            ]
+        ];
+        $includedEntities = new IncludedEntityCollection();
+        $includedEntities->add(new \stdClass(), 'Test\User', 'INCLUDED1', new IncludedEntityData('/included/0', 0));
+
+        $metadata = new EntityMetadata();
+        $associationMetadata = new AssociationMetadata();
+        $associationMetadata->setName('association');
+        $associationMetadata->setAcceptableTargetClassNames(['Test\User']);
+        $metadata->addAssociation($associationMetadata);
+
+        $requestType = $this->context->getRequestType();
+        $this->valueNormalizer->expects($this->once())
+            ->method('normalizeValue')
+            ->with('users', 'entityClass', $requestType, false)
+            ->willReturn('Test\User');
+        $this->entityIdTransformer->expects($this->never())
+            ->method('reverseTransform');
+
+        $this->context->setRequestData($inputData);
+        $this->context->setMetadata($metadata);
+        $this->context->setIncludedEntities($includedEntities);
+        $this->processor->process($this->context);
+
+        $expectedData = [
+            'association' => [
+                'id'    => 'INCLUDED1',
+                'class' => 'Test\User'
+            ],
+        ];
+
+        $this->assertEquals($expectedData, $this->context->getRequestData());
+    }
+
+    public function testProcessShouldNotNormalizeIdOfIncludedPrimaryEntity()
+    {
+        $inputData = [
+            'data' => [
+                'relationships' => [
+                    'association' => [
+                        'data' => [
+                            'type' => 'users',
+                            'id'   => 'PRIMARY1'
+                        ]
+                    ]
+                ]
+            ]
+        ];
+        $includedEntities = new IncludedEntityCollection();
+        $includedEntities->setPrimaryEntityId('Test\User', 'PRIMARY1');
+
+        $metadata = new EntityMetadata();
+        $associationMetadata = new AssociationMetadata();
+        $associationMetadata->setName('association');
+        $associationMetadata->setAcceptableTargetClassNames(['Test\User']);
+        $metadata->addAssociation($associationMetadata);
+
+        $requestType = $this->context->getRequestType();
+        $this->valueNormalizer->expects($this->once())
+            ->method('normalizeValue')
+            ->with('users', 'entityClass', $requestType, false)
+            ->willReturn('Test\User');
+        $this->entityIdTransformer->expects($this->never())
+            ->method('reverseTransform');
+
+        $this->context->setRequestData($inputData);
+        $this->context->setMetadata($metadata);
+        $this->context->setIncludedEntities($includedEntities);
+        $this->processor->process($this->context);
+
+        $expectedData = [
+            'association' => [
+                'id'    => 'PRIMARY1',
+                'class' => 'Test\User'
+            ],
+        ];
+
+        $this->assertEquals($expectedData, $this->context->getRequestData());
     }
 }
