@@ -12,7 +12,7 @@ class ButtonProviderPass implements CompilerPassInterface
     use TaggedServicesCompilerPassTrait;
 
     const EXTENSION_TAG = 'oro.action.extension.button_provider';
-    const SERVICE_ID = 'oro_action.provider.button_extension';
+    const SERVICE_ID = 'oro_action.provider.buttons';
 
     /**
      * {@inheritdoc}

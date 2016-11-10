@@ -209,5 +209,5 @@ services:
         arguments:
             - '@oro_action.helper.context'
 
-    oro_action.provider.button_extension:
+    oro_action.provider.buttons:
         class: 'Oro\Bundle\ActionBundle\Provider\ButtonProvider'
