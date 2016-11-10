@@ -14,7 +14,7 @@ class LoadEmailTemplates extends AbstractEmailFixture implements VersionedFixtur
      */
     public function getVersion()
     {
-        return '1.3';
+        return '1.2';
     }
 
     /**
