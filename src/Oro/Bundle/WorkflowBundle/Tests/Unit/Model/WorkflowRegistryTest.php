@@ -313,11 +313,11 @@ class WorkflowRegistryTest extends \PHPUnit_Framework_TestCase
     {
         $workflow1 = $this->createWorkflow('test_workflow1', 'testEntityClass');
         $workflowDefinition1 = $workflow1->getDefinition();
-        $workflowDefinition1->setGroups([WorkflowDefinition::GROUP_TYPE_EXCLUSIVE_ACTIVE => ['group1']]);
+        $workflowDefinition1->setExclusiveActiveGroups(['group1']);
 
         $workflow2 = $this->createWorkflow('test_workflow2', 'testEntityClass');
         $workflowDefinition2 = $workflow2->getDefinition();
-        $workflowDefinition2->setGroups([WorkflowDefinition::GROUP_TYPE_EXCLUSIVE_ACTIVE => ['group2', 'group3']]);
+        $workflowDefinition2->setExclusiveActiveGroups(['group2', 'group3']);
 
         return [
             'empty' => [
@@ -337,11 +337,11 @@ class WorkflowRegistryTest extends \PHPUnit_Framework_TestCase
     {
         $workflow1 = $this->createWorkflow('test_workflow1', 'testEntityClass');
         $workflowDefinition1 = $workflow1->getDefinition();
-        $workflowDefinition1->setGroups([WorkflowDefinition::GROUP_TYPE_EXCLUSIVE_ACTIVE => ['group1']]);
+        $workflowDefinition1->setExclusiveActiveGroups(['group1']);
 
         $workflow2 = $this->createWorkflow('test_workflow2', 'testEntityClass');
         $workflowDefinition2 = $workflow2->getDefinition();
-        $workflowDefinition2->setGroups([WorkflowDefinition::GROUP_TYPE_EXCLUSIVE_ACTIVE => ['group2', 'group3']]);
+        $workflowDefinition2->setExclusiveActiveGroups(['group2', 'group3']);
 
         $this->entityRepository->expects($this->once())
             ->method('findBy')

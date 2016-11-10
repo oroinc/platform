@@ -56,8 +56,8 @@ config:
         'bootstrap-transition': 'bowerassets/bootstrap/docs/assets/js/bootstrap-transition.js'
         'bootstrap-typeahead': 'bowerassets/bootstrap/docs/assets/js/bootstrap-typeahead.js'
         'bootstrap': 'bundles/oroui/lib/bootstrap.js'
-        'underscore': 'bundles/components/underscore/underscore.js'
-        'backbone': 'bundles/components/backbone/backbone.js'
+        'underscore': 'bundles/bowerassets/underscore/underscore.js'
+        'backbone': 'bundles/bowerassets/backbone/backbone.js'
         'chaplin': 'bundles/bowerassets/chaplin/chaplin.js'
 
         'controllers/page-controller': 'bundles/oroui/js/app/controllers/page-controller.js'

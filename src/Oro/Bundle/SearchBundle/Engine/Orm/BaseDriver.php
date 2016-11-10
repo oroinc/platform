@@ -121,30 +121,7 @@ abstract class BaseDriver
      *
      * @return string
      */
-    public function addTextField(QueryBuilder $qb, $index, $searchCondition, $setOrderBy = true)
-    {
-        $useFieldName = $searchCondition['fieldName'] == '*' ? false : true;
-        $fieldValue   = $this->filterTextFieldValue($searchCondition['fieldValue']);
-
-        // TODO Need to clarify search requirements in scope of CRM-214
-        if (in_array($searchCondition['condition'], [Query::OPERATOR_CONTAINS, Query::OPERATOR_EQUALS])) {
-            $searchString = $this->createContainsStringQuery($index, $useFieldName);
-        } else {
-            $searchString = $this->createNotContainsStringQuery($index, $useFieldName);
-        }
-
-        $this->setFieldValueStringParameter($qb, $index, $fieldValue, $searchCondition['condition']);
-
-        if ($useFieldName) {
-            $qb->setParameter('field' . $index, $searchCondition['fieldName']);
-        }
-
-        if ($setOrderBy) {
-            $this->setTextOrderBy($qb, $index);
-        }
-
-        return '(' . $searchString . ' ) ';
-    }
+    abstract public function addTextField(QueryBuilder $qb, $index, $searchCondition, $setOrderBy = true);
 
     /**
      * @param string $fieldType
@@ -277,19 +254,6 @@ abstract class BaseDriver
     }
 
     /**
-     * Set string parameter for qb
-     *
-     * @param \Doctrine\ORM\QueryBuilder $qb
-     * @param integer                    $index
-     * @param string                     $fieldValue
-     * @param string                     $searchCondition
-     */
-    protected function setFieldValueStringParameter(QueryBuilder $qb, $index, $fieldValue, $searchCondition)
-    {
-        $qb->setParameter('value' . $index, '%' . str_replace(' ', '%', $fieldValue) . '%');
-    }
-
-    /**
      * Add non string search to qb
      *
      * @param \Doctrine\ORM\QueryBuilder $qb
@@ -366,7 +330,10 @@ abstract class BaseDriver
 
         $this->applySelectToQB($query, $qb);
         $this->applyFromToQB($query, $qb);
-        $this->applyWhereToQB($query, $qb, $setOrderBy);
+
+        // set order part in where only if no query ordering defined
+        $setOrderByInWhere = $setOrderBy && !$query->getCriteria()->getOrderings();
+        $this->applyWhereToQB($query, $qb, $setOrderByInWhere);
 
         if ($setOrderBy) {
             $this->applyOrderByToQB($query, $qb);

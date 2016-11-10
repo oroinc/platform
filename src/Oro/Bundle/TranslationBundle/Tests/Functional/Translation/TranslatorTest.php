@@ -25,7 +25,7 @@ class TranslatorTest extends WebTestCase
     public function testRebuildCache()
     {
         /** @var Translator $translator */
-        $translator = $this->getContainer()->get('translator');
+        $translator = $this->getContainer()->get('translator.default');
 
         // build initial cache
         $translator->rebuildCache();
@@ -37,7 +37,7 @@ class TranslatorTest extends WebTestCase
 
         /** @var TranslationManager $manager */
         $manager = $this->getContainer()->get('oro_translation.manager.translation');
-        $manager->saveValue($key, $expectedValue, $locale, $domain, Translation::SCOPE_UI);
+        $manager->saveTranslation($key, $expectedValue, $locale, $domain, Translation::SCOPE_UI);
 
         $manager->flush();
         $manager->clear();

@@ -1,7 +1,4 @@
 parameters:
-    oro_workflow.configuration_pass.replace_property_path.class: Oro\Bundle\ActionBundle\Model\ConfigurationPass\ReplacePropertyPath
-
-    oro_workflow.action_assembler.class: Oro\Component\Action\Action\ActionAssembler
     oro_workflow.attribute_assembler.class: Oro\Bundle\WorkflowBundle\Model\AttributeAssembler
     oro_workflow.step_assembler.class: Oro\Bundle\WorkflowBundle\Model\StepAssembler
     oro_workflow.transition_assembler.class: Oro\Bundle\WorkflowBundle\Model\TransitionAssembler
@@ -9,32 +6,11 @@ parameters:
     oro_workflow.form_options_assembler.class: Oro\Bundle\WorkflowBundle\Model\FormOptionsAssembler
 
 services:
-    oro_workflow.configuration_pass.replace_property_path:
-        class: %oro_workflow.configuration_pass.replace_property_path.class%
-        arguments:
-            - "data"
-        deprecated: The "%service_id%" service is deprecated since since 1.10. Use "oro_action.configuration_pass.replace_property_path" instead
-
-    oro_workflow.action_assembler:
-        class: %oro_workflow.action_assembler.class%
-        arguments:
-            - '@oro_workflow.action_factory'
-            - '@oro_workflow.expression.factory'
-        calls:
-            - [addConfigurationPass, ['@oro_workflow.configuration_pass.replace_property_path']]
-        deprecated: The "%service_id%" service is deprecated since since 1.10. Use "oro_action.action_assembler" instead
-
-    oro_workflow.expression.assembler:
-        class: Oro\Component\ConfigExpression\ExpressionAssembler
-        arguments:
-            - '@oro_workflow.expression.factory'
-        calls:
-            - [addConfigurationPass,  ['@oro_workflow.configuration_pass.replace_property_path']]
-
     oro_workflow.attribute_assembler:
         class: %oro_workflow.attribute_assembler.class%
         arguments:
             - '@oro_workflow.attribute_guesser'
+            - '@translator'
 
     oro_workflow.step_assembler:
         class: %oro_workflow.step_assembler.class%
@@ -43,8 +19,8 @@ services:
         class: %oro_workflow.transition_assembler.class%
         arguments:
             - '@oro_workflow.form_options_assembler'
-            - '@oro_workflow.expression.factory'
-            - '@oro_workflow.action_factory'
+            - '@oro_action.expression.factory'
+            - '@oro_action.action_factory'
 
     oro_workflow.workflow_assembler:
         class: %oro_workflow.workflow_assembler.class%
@@ -59,9 +35,9 @@ services:
     oro_workflow.form_options_assembler:
         class: %oro_workflow.form_options_assembler.class%
         arguments:
-            - '@oro_workflow.action_factory'
+            - '@oro_action.action_factory'
         calls:
-            - [addConfigurationPass,  ['@oro_workflow.configuration_pass.replace_property_path']]
+            - [addConfigurationPass,  ['@oro_action.configuration_pass.replace_property_path']]
 
     oro_workflow.assembler.transition_trigger.cron:
         class: Oro\Bundle\WorkflowBundle\Model\TransitionTrigger\TransitionCronTriggerAssembler
