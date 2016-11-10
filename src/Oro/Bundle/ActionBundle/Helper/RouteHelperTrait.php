@@ -23,6 +23,7 @@ trait RouteHelperTrait
 
     /**
      * @param string $dialogRoute
+     *
      * @return $this
      */
     public function setDialogRoute($dialogRoute)
@@ -42,6 +43,7 @@ trait RouteHelperTrait
 
     /**
      * @param string $executionRoute
+     *
      * @return $this
      */
     public function setExecutionRoute($executionRoute)
@@ -61,6 +63,7 @@ trait RouteHelperTrait
 
     /**
      * @param string $widgetRoute
+     *
      * @return $this
      */
     public function setWidgetRoute($widgetRoute)

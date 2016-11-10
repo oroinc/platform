@@ -4,11 +4,12 @@ namespace Oro\Bundle\ActionBundle\Helper;
 
 trait ApplicationsHelperTrait
 {
-    /** @var string */
+    /** @var string|null */
     protected $currentApplication = false;
 
     /**
      * @param array $applications
+     *
      * @return bool
      */
     public function isApplicationsValid(array $applications)

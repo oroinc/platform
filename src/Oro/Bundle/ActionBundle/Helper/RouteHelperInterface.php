@@ -21,16 +21,22 @@ interface RouteHelperInterface
 
     /**
      * @param string $executionRoute
+     *
+     * @return RouteHelperInterface
      */
     public function setExecutionRoute($executionRoute);
 
     /**
      * @param string $dialogRoute
+     *
+     * @return RouteHelperInterface
      */
     public function setDialogRoute($dialogRoute);
 
     /**
      * @param string $widgetRoute
+     *
+     * @return RouteHelperInterface
      */
     public function setWidgetRoute($widgetRoute);
 }

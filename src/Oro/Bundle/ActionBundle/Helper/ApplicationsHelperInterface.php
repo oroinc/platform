@@ -6,6 +6,7 @@ interface ApplicationsHelperInterface extends RouteHelperInterface
 {
     /**
      * @param array $applications
+     *
      * @return bool
      */
     public function isApplicationsValid(array $applications);
