@@ -4,6 +4,7 @@ namespace Oro\Bundle\ActionBundle\Tests\Unit\Provider;
 
 use Oro\Bundle\ActionBundle\Model\ButtonInterface;
 use Oro\Bundle\ActionBundle\Model\ButtonProviderExtensionInterface;
+use Oro\Bundle\ActionBundle\Model\ButtonSearchContext;
 use Oro\Bundle\ActionBundle\Provider\ButtonProvider;
 
 class ButtonProviderTest extends \PHPUnit_Framework_TestCase
@@ -20,19 +21,20 @@ class ButtonProviderTest extends \PHPUnit_Framework_TestCase
     protected function setUp()
     {
         $this->buttonProvider = new ButtonProvider();
-        $this->buttonExtension = $this->getMock('Oro\Bundle\ActionBundle\Model\ButtonProviderExtensionInterface');
+        $this->buttonExtension = $this->getMock(ButtonProviderExtensionInterface::class);
         $this->buttonProvider->addExtension($this->buttonExtension);
     }
 
     /**
-     * @dataProvider buttonProvider
+     * @dataProvider findAllDataProvider
      *
      * @param array $input
      * @param array $output
      */
     public function testFindAll(array $input, array $output)
     {
-        $searchContext = $this->getMock('Oro\Bundle\ActionBundle\Model\ButtonSearchContext');
+        /** @var ButtonSearchContext $searchContext */
+        $searchContext = $this->getMock(ButtonSearchContext::class);
         $this->buttonExtension->expects($this->once())
             ->method('find')
             ->with($searchContext)
@@ -44,7 +46,7 @@ class ButtonProviderTest extends \PHPUnit_Framework_TestCase
     /**
      * @return array
      */
-    public function buttonProvider()
+    public function findAllDataProvider()
     {
         $button1 = $this->getButton(1);
         $button2 = $this->getButton(2);
@@ -76,9 +78,9 @@ class ButtonProviderTest extends \PHPUnit_Framework_TestCase
      */
     private function getButton($order)
     {
-        $button = $this->getMock('Oro\Bundle\ActionBundle\Model\ButtonInterface');
-        $button->method('getOrder')
-            ->willReturn($order);
+        $button = $this->getMock(ButtonInterface::class);
+        $button->method('getOrder')->willReturn($order);
+
         return $button;
     }
 }
