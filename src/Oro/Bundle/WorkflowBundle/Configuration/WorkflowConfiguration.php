@@ -26,6 +26,8 @@ class WorkflowConfiguration extends AbstractConfiguration implements Configurati
     const NODE_EXCLUSIVE_ACTIVE_GROUPS = 'exclusive_active_groups';
     const NODE_EXCLUSIVE_RECORD_GROUPS = 'exclusive_record_groups';
     const NODE_TRANSITION_TRIGGERS = 'triggers';
+    const NODE_INIT_ENTITIES = 'init_entities';
+    const NODE_INIT_ROUTES = 'init_routes';
 
     const DEFAULT_TRANSITION_DISPLAY_TYPE = 'dialog';
     const DEFAULT_ENTITY_ATTRIBUTE = 'entity';
@@ -270,10 +272,10 @@ class WorkflowConfiguration extends AbstractConfiguration implements Configurati
                     ->scalarNode('dialog_template')
                         ->defaultNull()
                     ->end()
-                    ->arrayNode('init_entities')
+                    ->arrayNode(self::NODE_INIT_ENTITIES)
                         ->prototype('scalar')->end()
                     ->end()
-                    ->arrayNode('init_routes')
+                    ->arrayNode(self::NODE_INIT_ROUTES)
                         ->prototype('scalar')->end()
                     ->end()
                     ->scalarNode('init_context_attribute')
