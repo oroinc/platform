@@ -7,7 +7,9 @@ use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 use Symfony\Component\Serializer\SerializerAwareInterface;
 use Symfony\Component\Serializer\SerializerInterface;
 
+use Oro\Component\Layout\ArrayCollection;
 use Oro\Component\Layout\BlockView;
+
 use Oro\Bundle\LayoutBundle\Exception\UnexpectedBlockViewVarTypeException;
 
 class BlockViewNormalizer implements NormalizerInterface, DenormalizerInterface, SerializerAwareInterface
@@ -50,7 +52,9 @@ class BlockViewNormalizer implements NormalizerInterface, DenormalizerInterface,
         /** @var BlockView $view */
         $view = $object;
 
-        $data = [];
+        $data = [
+            'id' => $view->getId()
+        ];
 
         if (!empty($view->vars)) {
             $data['vars'] = $view->vars;
@@ -97,12 +101,14 @@ class BlockViewNormalizer implements NormalizerInterface, DenormalizerInterface,
      */
     public function denormalize($data, $class, $format = null, array $context = [])
     {
-        $view = new BlockView();
+        $view = new BlockView($data['id']);
 
         $recursiveCall = array_key_exists('blockViewDenormalizeRecursiveCall', $context);
         if (!$recursiveCall) {
             $context['blockViewDenormalizeRecursiveCall'] = true;
-            $this->currentDenormalizedViews = [$view];
+            $this->currentDenormalizedViews = [
+                $view->getId() => $view
+            ];
         }
 
         if (array_key_exists('vars', $data)) {
@@ -115,14 +121,14 @@ class BlockViewNormalizer implements NormalizerInterface, DenormalizerInterface,
                 $childView = $this->denormalize($childData, $class, $format, $context);
                 $childView->parent = $view;
 
-                $this->currentDenormalizedViews[] = $childView;
+                $this->currentDenormalizedViews[$childView->getId()] = $childView;
 
                 $view->children[] = $childView;
             }
         }
 
         if (!$recursiveCall) {
-            $this->setBlocksRecursive($view, $this->currentDenormalizedViews);
+            $this->setBlocksRecursive($view, new ArrayCollection($this->currentDenormalizedViews));
         }
 
         return $view;
@@ -130,9 +136,9 @@ class BlockViewNormalizer implements NormalizerInterface, DenormalizerInterface,
 
     /**
      * @param BlockView $view
-     * @param BlockView[] $blocks
+     * @param ArrayCollection $blocks
      */
-    private function setBlocksRecursive($view, array $blocks)
+    private function setBlocksRecursive($view, ArrayCollection $blocks)
     {
         $view->blocks = $blocks;
         $view->vars['block'] = $view;

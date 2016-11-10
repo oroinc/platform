@@ -6,8 +6,10 @@ use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 use Symfony\Component\Serializer\Serializer;
 
-use Oro\Bundle\LayoutBundle\Layout\Serializer\BlockViewNormalizer;
+use Oro\Component\Layout\ArrayCollection;
 use Oro\Component\Layout\BlockView;
+
+use Oro\Bundle\LayoutBundle\Layout\Serializer\BlockViewNormalizer;
 
 class BlockViewNormalizerTest extends \PHPUnit_Framework_TestCase
 {
@@ -49,36 +51,41 @@ class BlockViewNormalizerTest extends \PHPUnit_Framework_TestCase
         return [
             'single view without vars' => [
                 'expectedResult' => [
+                    'id' => 'root',
                     'vars' => [
                         'attr' => [],
                     ]
                 ],
-                'actualView' => $this->createBlockView()
+                'actualView' => $this->createBlockView('root')
             ],
             'single view with vars' => [
                 'expectedResult' => [
+                    'id' => 'root',
                     'vars' => [
                         'attr' => [],
                         'foo' => 'bar'
                     ]
                 ],
-                'actualView' => $this->createBlockView([
+                'actualView' => $this->createBlockView('root', [
                     'foo' => 'bar'
                 ])
             ],
             'view with children' => [
                 'expectedResult' => [
+                    'id' => 'root',
                     'vars' => [
                         'attr' => [],
                         'foo' => 'bar'
                     ],
                     'children' => [
                         [
+                            'id' => 'child1',
                             'vars' => [
                                 'attr' => [],
                             ],
                             'children' => [
                                 [
+                                    'id' => 'child11',
                                     'vars' => [
                                         'attr' => [],
                                         'title' => 'test'
@@ -89,14 +96,16 @@ class BlockViewNormalizerTest extends \PHPUnit_Framework_TestCase
                     ]
                 ],
                 'actualView' => $this->createBlockView(
+                    'root',
                     [
                         'attr' => [],
                         'foo' => 'bar'
                     ],
                     [
                         $this->createBlockView(
+                            'child1',
                             [],
-                            [$this->createBlockView(['title' => 'test'])]
+                            [$this->createBlockView('child11', ['title' => 'test'])]
                         )
                     ]
                 )
@@ -108,7 +117,7 @@ class BlockViewNormalizerTest extends \PHPUnit_Framework_TestCase
     {
         $bar = (object)[];
 
-        $view = new BlockView();
+        $view = new BlockView('root');
         $view->vars = [
             'foo' => [
                 'bar' => $bar
@@ -121,6 +130,7 @@ class BlockViewNormalizerTest extends \PHPUnit_Framework_TestCase
             ->willReturn('serialized data');
 
         $expected = [
+            'id' => 'root',
             'vars' => [
                 'foo' => [
                     'bar' => [
@@ -139,7 +149,7 @@ class BlockViewNormalizerTest extends \PHPUnit_Framework_TestCase
      */
     public function testNormalizeShouldFailOnBlockViewInVars()
     {
-        $view = new BlockView();
+        $view = new BlockView('root');
         $view->vars = [
             'foo' => new BlockView()
         ];
@@ -169,33 +179,37 @@ class BlockViewNormalizerTest extends \PHPUnit_Framework_TestCase
 
     public function denormalizeWithoutObjectsInVarsProvider()
     {
-        $viewWithChildren11 = $this->createBlockView(['title' => 'test']);
-        $viewWithChildren1 = $this->createBlockView([], [$viewWithChildren11]);
-        $viewWithChildren = $this->createBlockView(
+        $child11 = $this->createBlockView('child11', ['title' => 'test']);
+        $child1 = $this->createBlockView('child1', [], [$child11]);
+        $root = $this->createBlockView(
+            'root',
             ['foo' => 'bar'],
-            [$viewWithChildren1]
+            [$child1]
         );
 
-        $viewWithChildrenBlocks = [
-            $viewWithChildren,
-            $viewWithChildren11,
-            $viewWithChildren1,
+        $blocks = [
+            'root' => $root,
+            'child1' => $child1,
+            'child11' => $child11,
         ];
 
-        foreach ($viewWithChildrenBlocks as $view) {
-            $view->blocks = $view->vars['blocks'] = $viewWithChildrenBlocks;
+        foreach ($blocks as $view) {
+            $view->blocks = $view->vars['blocks'] = new ArrayCollection($blocks);
         }
 
         return [
             'single view without vars' => [
-                'expectedView' => $this->createBlockView(),
-                'actualData' => []
+                'expectedView' => $this->createBlockView('root'),
+                'actualData' => [
+                    'id' => 'root',
+                ]
             ],
             'single view with vars' => [
-                'expectedView' => $this->createBlockView([
+                'expectedView' => $this->createBlockView('root', [
                     'foo' => 'bar'
                 ]),
                 'actualData' => [
+                    'id' => 'root',
                     'vars' => [
                         'attr' => [],
                         'foo' => 'bar'
@@ -203,19 +217,22 @@ class BlockViewNormalizerTest extends \PHPUnit_Framework_TestCase
                 ]
             ],
             'view with children' => [
-                'expectedView' => $viewWithChildren,
+                'expectedView' => $root,
                 'actualData' => [
+                    'id' => 'root',
                     'vars' => [
                         'attr' => [],
                         'foo' => 'bar',
                     ],
                     'children' => [
                         [
+                            'id' => 'child1',
                             'vars' => [
                                 'attr' => [],
                             ],
                             'children' => [
                                 [
+                                    'id' => 'child11',
                                     'vars' => [
                                         'attr' => [],
                                         'title' => 'test'
@@ -234,6 +251,7 @@ class BlockViewNormalizerTest extends \PHPUnit_Framework_TestCase
         $bar = (object)[];
 
         $data = [
+            'id' => 'root',
             'vars' => [
                 'foo' => [
                     'bar' => [
@@ -249,7 +267,7 @@ class BlockViewNormalizerTest extends \PHPUnit_Framework_TestCase
             ->with('serialized data', get_class($bar))
             ->willReturn($bar);
 
-        $expectedView = new BlockView();
+        $expectedView = new BlockView('root');
         $expectedView->vars = [
             'block' => $expectedView,
             'foo' => [
@@ -257,7 +275,9 @@ class BlockViewNormalizerTest extends \PHPUnit_Framework_TestCase
             ]
         ];
 
-        $expectedView->blocks = $expectedView->vars['blocks'] = [$expectedView];
+        $expectedView->blocks = $expectedView->vars['blocks'] = new ArrayCollection([
+            'root' => $expectedView
+        ]);
 
         $this->assertEquals(
             $expectedView,
@@ -270,14 +290,14 @@ class BlockViewNormalizerTest extends \PHPUnit_Framework_TestCase
      * @param BlockView[] $children
      * @return BlockView
      */
-    protected function createBlockView(array $vars = [], array $children = [])
+    protected function createBlockView($id, array $vars = [], array $children = [])
     {
-        $view = new BlockView();
-        $view->blocks = [$view];
+        $view = new BlockView($id);
+        $view->blocks = new ArrayCollection([$id => $view]);
         $view->vars = array_merge($vars, [
             'attr' => [],
             'block' => $view,
-            'blocks' => [$view]
+            'blocks' => $view->blocks
         ]);
         $view->children = $children;
         foreach ($children as $child) {

@@ -246,7 +246,7 @@ class BlockFactory implements BlockFactoryInterface
         $blockType = $this->rawLayout->getProperty($id, RawLayout::BLOCK_TYPE, true);
         $options   = $this->rawLayout->getProperty($id, RawLayout::RESOLVED_OPTIONS, true);
         $types     = $this->typeHelper->getTypes($blockType);
-        $view      = new BlockView($parentView);
+        $view      = new BlockView($id, $parentView);
 
         // point the block view state to the current block
         $this->block->initialize($id);

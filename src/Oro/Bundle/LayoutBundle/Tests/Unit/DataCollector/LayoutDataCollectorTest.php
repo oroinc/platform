@@ -239,7 +239,7 @@ class LayoutDataCollectorTest extends \PHPUnit_Framework_TestCase
         $blockViews[] = $rootBlock;
 
         foreach ($tree as $id => $children) {
-            $child = new BlockView($rootBlock);
+            $child = new BlockView($id, $rootBlock);
             $child->vars['id'] = $id;
 
             $this->getBlockViews($child, $children, $result);

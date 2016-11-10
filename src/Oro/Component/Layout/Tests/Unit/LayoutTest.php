@@ -106,7 +106,7 @@ class LayoutTest extends LayoutTestCase
 
         $view = new BlockView();
 
-        $childView                  = new BlockView($view);
+        $childView                  = new BlockView('', $view);
         $view->children['child_id'] = $childView;
         $this->setLayoutBlocks(['root' => $view]);
 
