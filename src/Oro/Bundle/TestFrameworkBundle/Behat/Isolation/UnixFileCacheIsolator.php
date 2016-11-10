@@ -6,7 +6,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpKernel\KernelInterface;
 
-class FileCacheIsolator extends OsRelatedIsolator implements IsolatorInterface
+class UnixFileCacheIsolator extends OsRelatedIsolator implements IsolatorInterface
 {
     /** @var string */
     protected $cacheDir;
@@ -62,7 +62,6 @@ class FileCacheIsolator extends OsRelatedIsolator implements IsolatorInterface
         return [
             OsRelatedIsolator::LINUX_OS,
             OsRelatedIsolator::MAC_OS,
-            OsRelatedIsolator::WINDOWS_OS,
         ];
     }
 }
