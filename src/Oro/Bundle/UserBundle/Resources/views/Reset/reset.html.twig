@@ -7,12 +7,6 @@
 <div class="container">
     <form action="{{ path('oro_user_reset_reset', { token: token }) }}" {{ form_enctype(form) }} method="post" class="form-signin form-reset">
         <div class="title-box">
-            {% if oro_theme_logo() %}
-                <h1 class="oro-title logo-{{ oro_theme_logo() ? 'image' : 'text' }}">
-                    <img src="{{ asset(oro_theme_logo()) }}">
-                </h1>
-                <span class="divider-vertical"></span>
-            {% endif %}
             <h2 class="title">{{ 'Password Reset'|trans }}</h2>
         </div>
         <fieldset>
