@@ -2,10 +2,11 @@
 
 namespace Oro\Bundle\FeatureToggleBundle\Tests\Unit\EventListener;
 
-use Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker;
-use Oro\Bundle\FeatureToggleBundle\EventListener\RequestListener;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
+
+use Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker;
+use Oro\Bundle\FeatureToggleBundle\EventListener\RequestListener;
 
 class RequestListenerTest extends \PHPUnit_Framework_TestCase
 {

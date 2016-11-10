@@ -8,12 +8,11 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Translation\TranslatorInterface;
 
-use Oro\Bundle\DashboardBundle\Form\Type\WidgetItemsChoiceType;
-use Oro\Bundle\DashboardBundle\Event\WidgetItemsLoadDataEvent;
 use Oro\Bundle\DashboardBundle\Entity\Widget;
+use Oro\Bundle\DashboardBundle\Event\WidgetItemsLoadDataEvent;
 use Oro\Bundle\DashboardBundle\Filter\WidgetConfigVisibilityFilter;
+use Oro\Bundle\DashboardBundle\Form\Type\WidgetItemsChoiceType;
 use Oro\Bundle\DashboardBundle\Provider\ConfigValueProvider;
-
 use Oro\Component\Config\Resolver\ResolverInterface;
 
 class WidgetConfigs

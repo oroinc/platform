@@ -2,14 +2,14 @@
 
 namespace Oro\Bundle\EmailBundle\Command;
 
-use Oro\Bundle\EmailBundle\Cache\EmailCacheManager;
-use Oro\Bundle\EmailBundle\Exception\LoadEmailBodyException;
-use Oro\Component\Log\OutputLogger;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
-
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
+
+use Oro\Bundle\EmailBundle\Cache\EmailCacheManager;
+use Oro\Bundle\EmailBundle\Exception\LoadEmailBodyException;
+use Oro\Component\Log\OutputLogger;
 
 /**
  * @deprecated Cron command oro:cron:email-body-sync should be used instead

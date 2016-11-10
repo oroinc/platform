@@ -4,20 +4,20 @@ namespace Oro\Bundle\ActivityListBundle\Provider;
 
 use Doctrine\ORM\EntityManager;
 
-use Oro\Bundle\FeatureToggleBundle\Checker\FeatureToggleableInterface;
 use Symfony\Component\Translation\TranslatorInterface;
 
+use Oro\Bundle\ActivityListBundle\Entity\ActivityList;
+use Oro\Bundle\ActivityListBundle\Model\ActivityListDateProviderInterface;
+use Oro\Bundle\ActivityListBundle\Model\ActivityListGroupProviderInterface;
+use Oro\Bundle\ActivityListBundle\Model\ActivityListProviderInterface;
 use Oro\Bundle\ActivityListBundle\Model\ActivityListUpdatedByProviderInterface;
+use Oro\Bundle\CommentBundle\Model\CommentProviderInterface;
 use Oro\Bundle\ConfigBundle\Config\ConfigManager as Config;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityBundle\Tools\EntityRoutingHelper;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\Id\ConfigIdInterface;
-use Oro\Bundle\ActivityListBundle\Entity\ActivityList;
-use Oro\Bundle\ActivityListBundle\Model\ActivityListProviderInterface;
-use Oro\Bundle\ActivityListBundle\Model\ActivityListDateProviderInterface;
-use Oro\Bundle\ActivityListBundle\Model\ActivityListGroupProviderInterface;
-use Oro\Bundle\CommentBundle\Model\CommentProviderInterface;
+use Oro\Bundle\FeatureToggleBundle\Checker\FeatureToggleableInterface;
 
 /**
  * @SuppressWarnings(PHPMD.CouplingBetweenObjects)

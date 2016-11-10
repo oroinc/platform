@@ -3,18 +3,18 @@
 namespace Oro\Bundle\NavigationBundle\Menu;
 
 use Doctrine\Common\Util\ClassUtils;
-
 use Doctrine\ORM\EntityManager;
+
 use Knp\Menu\ItemInterface;
+
+use Symfony\Bundle\FrameworkBundle\Routing\Router;
+use Symfony\Component\Security\Core\SecurityContextInterface;
 
 use Oro\Bundle\FeatureToggleBundle\Checker\FeatureCheckerHolderTrait;
 use Oro\Bundle\FeatureToggleBundle\Checker\FeatureToggleableInterface;
 use Oro\Bundle\NavigationBundle\Entity\Builder\ItemFactory;
 use Oro\Bundle\NavigationBundle\Entity\NavigationItemInterface;
-
 use Oro\Bundle\NavigationBundle\Entity\Repository\NavigationRepositoryInterface;
-use Symfony\Bundle\FrameworkBundle\Routing\Router;
-use Symfony\Component\Security\Core\SecurityContextInterface;
 
 class NavigationItemBuilder implements BuilderInterface, FeatureToggleableInterface
 {
