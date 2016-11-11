@@ -1269,18 +1269,18 @@ class ProductFormProvider extends AbstractFormProvider
     
         return $this->getFormView('acme_product_product', $data, $options);
     }
-    
+
     /**
-         * @param mixed $data
-         *
-         * @return FormInterface
-         */
-        public function getProductForm($data = null)
-        {
-            $options['action'] = $this->generateUrl(self::ADD_PRODUCT_ROUTE_NAME);
-        
-            return $this->getFormView('acme_product_product', $data, $options);
-        }
+     * @param mixed $data
+     *
+     * @return FormInterface
+     */
+    public function getProductForm($data = null)
+    {
+        $options['action'] = $this->generateUrl(self::ADD_PRODUCT_ROUTE_NAME);
+    
+        return $this->getForm('acme_product_product', $data, $options);
+    }
 }
 ```
 
@@ -1290,7 +1290,7 @@ Registering layout data provider in the DI container:
     acme_product.layout.data_provider.product_form:
         class: Acme\Bundle\ProductBundle\Layout\DataProvider\ProductFormProvider
         arguments:
-            - @form.factory
+            - '@form.factory'
             - '@router'
         tags:
             - { name: layout.data_provider, alias: acme_product_form }

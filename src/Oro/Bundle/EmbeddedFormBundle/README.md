@@ -114,4 +114,4 @@ The condition should check that your custom form type is equal to the form type 
 This will make sure that your layout updates are loaded only for your embedded form type.
 
 Note that we are using separate block types `embed_form_start`, `embed_form_end`, `embed_form_fields` and `embed_form_field` to render the form. This allows us to easily add content inside the form.
-For all this block fields we need to specify `form_name` option to bind it to our form. Also we can use only one block type`embed_form` which will create three child block: `embed_form_start`, `embed_form_fields`, `embed_form_end`.
+For all this block fields we need to specify `form_name` option to bind it to our form. Also we can use only one block type`embed_form` which will create three child blocks: `embed_form_start`, `embed_form_fields`, `embed_form_end`.
