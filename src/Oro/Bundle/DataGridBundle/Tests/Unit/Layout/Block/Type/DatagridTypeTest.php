@@ -2,11 +2,13 @@
 
 namespace Oro\Bundle\DataGridBundle\Tests\Unit\Layout\Block\Type;
 
-use Oro\Bundle\LayoutBundle\Tests\Unit\BlockTypeTestCase;
+use Oro\Bundle\DataGridBundle\Datagrid\Common\MetadataObject;
+use Oro\Bundle\DataGridBundle\Datagrid\DatagridInterface;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\DataGridBundle\Datagrid\ManagerInterface;
 use Oro\Bundle\DataGridBundle\Layout\Block\Type\DatagridType;
 use Oro\Bundle\DataGridBundle\Datagrid\NameStrategyInterface;
+use Oro\Bundle\LayoutBundle\Tests\Unit\BlockTypeTestCase;
 use Oro\Bundle\SecurityBundle\SecurityFacade;
 
 use Oro\Component\Layout\Block\OptionsResolver\OptionsResolver;
@@ -43,11 +45,12 @@ class DatagridTypeTest extends BlockTypeTestCase
         $view = $this->getBlockView(
             new DatagridType($this->nameStrategy, $this->manager, $this->securityFacade),
             [
-                'grid_name'       => 'test-grid',
-                'grid_scope'      => 'test-scope',
-                'grid_parameters' => ['foo' => 'bar'],
+                'grid_name'              => 'test-grid',
+                'grid_scope'             => 'test-scope',
+                'grid_parameters'        => ['foo' => 'bar'],
                 'grid_render_parameters' => ['foo1' => 'bar1'],
-                'split_to_cells'  => true
+                'split_to_cells'         => true,
+                'server_side_render'     => false,
             ]
         );
 
@@ -57,6 +60,7 @@ class DatagridTypeTest extends BlockTypeTestCase
         $this->assertEquals(['foo' => 'bar'], $view->vars['grid_parameters']);
         $this->assertEquals(['foo1' => 'bar1'], $view->vars['grid_render_parameters']);
         $this->assertEquals(true, $view->vars['split_to_cells']);
+        $this->assertEquals(false, $view->vars['server_side_render']);
     }
 
     public function testBuildViewWithoutScope()
@@ -80,6 +84,7 @@ class DatagridTypeTest extends BlockTypeTestCase
         $this->assertEquals(['foo' => 'bar'], $view->vars['grid_parameters']);
         $this->assertEquals(['foo1' => 'bar1'], $view->vars['grid_render_parameters']);
         $this->assertEquals(true, $view->vars['split_to_cells']);
+        $this->assertEquals(false, $view->vars['server_side_render']);
     }
 
     public function testBuildViewWithParamsOverwrite()
@@ -186,6 +191,84 @@ class DatagridTypeTest extends BlockTypeTestCase
         $type->buildBlock($builder, new Options($options));
     }
 
+    public function testBuildBlockForServerSideRendering()
+    {
+        /** @var DatagridConfiguration|\PHPUnit_Framework_MockObject_MockObject $gridConfig */
+        $gridConfig = $this
+            ->getMock('Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration', [], [], '', false);
+
+        $gridConfig->expects($this->once())
+            ->method('getAclResource')
+            ->will($this->returnValue('acl_resource'));
+
+        $this->manager
+            ->expects($this->any())
+            ->method('getConfigurationForGrid')
+            ->with('test-grid')
+            ->will($this->returnValue($gridConfig));
+
+        $this->securityFacade
+            ->expects($this->once())
+            ->method('isGranted')
+            ->with('acl_resource')
+            ->will($this->returnValue(true));
+
+        $gridMetadata = $this->getMock(MetadataObject::class, [], [], '', false);
+        $gridMetadata->expects($this->once())
+            ->method('offsetGet')
+            ->with('options')
+            ->willReturn(['toolbarOptions' => [
+                'placement' => [
+                    'top' => true,
+                    'bottom' => true
+                ]
+            ]]);
+
+        $grid = $this->getMock(DatagridInterface::class, [], [], '', false);
+        $grid->expects($this->once())
+            ->method('getMetadata')
+            ->willReturn($gridMetadata);
+
+        $this->manager
+            ->expects($this->any())
+            ->method('getDatagridByRequestParams')
+            ->with('test-grid')
+            ->will($this->returnValue($grid));
+
+        /** @var BlockBuilderInterface|\PHPUnit_Framework_MockObject_MockObject $builder */
+        $builder = $this->getMock('Oro\Component\Layout\BlockBuilderInterface');
+        $builder->expects($this->any())
+            ->method('getId')
+            ->will($this->returnValue('test_grid'));
+
+        $layoutManipulator = $this->getMock('Oro\Component\Layout\LayoutManipulatorInterface');
+        $builder->expects($this->exactly(2))
+            ->method('getLayoutManipulator')
+            ->willReturn($layoutManipulator);
+
+        $layoutManipulator->expects($this->exactly(2))
+            ->method('add')
+            ->withConsecutive(
+                [
+                    'test_grid_top_toolbar',
+                    'test_grid',
+                    'container',
+                ],
+                [
+                    'test_grid_bottom_toolbar',
+                    'test_grid',
+                    'container',
+                ]
+            );
+
+        $type = new DatagridType($this->nameStrategy, $this->manager, $this->securityFacade);
+        $options = $this->resolveOptions($type, [
+            'grid_name' => 'test-grid',
+            'server_side_render' => true
+        ]);
+        $type->buildBlock($builder, new Options($options));
+    }
+
     public function testGetName()
     {
         $type = new DatagridType($this->nameStrategy, $this->manager, $this->securityFacade);
@@ -223,6 +306,7 @@ class DatagridTypeTest extends BlockTypeTestCase
                     'grid_parameters' => [],
                     'grid_render_parameters' => [],
                     'split_to_cells' => false,
+                    'server_side_render' => false,
                 ]
             ],
             'custom' => [
@@ -234,6 +318,7 @@ class DatagridTypeTest extends BlockTypeTestCase
                     ],
                     'grid_render_parameters' => ['foo' => 'bar'],
                     'split_to_cells' => true,
+                    'server_side_render' => true,
                 ],
                 [
                     'grid_name' => 'test_grid',
@@ -243,6 +328,7 @@ class DatagridTypeTest extends BlockTypeTestCase
                     ],
                     'grid_render_parameters' => ['foo' => 'bar'],
                     'split_to_cells' => true,
+                    'server_side_render' => true,
                 ]
             ],
         ];

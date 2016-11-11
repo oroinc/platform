@@ -51,10 +51,12 @@ class DatagridType extends AbstractContainerType
         $resolver
             ->setRequired(['grid_name'])
             ->setDefined(['grid_scope'])
+            ->setDefined('server_side_render')
             ->setDefaults([
                 'grid_parameters' => [],
                 'grid_render_parameters' => [],
-                'split_to_cells' => false
+                'split_to_cells' => false,
+                'server_side_render' => false,
             ]);
     }
 
@@ -63,11 +65,23 @@ class DatagridType extends AbstractContainerType
      */
     public function buildBlock(BlockBuilderInterface $builder, Options $options)
     {
+        $id = $builder->getId();
+
+        $toolbarOptions = null;
+        if ($options['server_side_render']) {
+            if ($gridOptions = $this->getGridOptions($options['grid_name'])) {
+                $toolbarOptions = $gridOptions['toolbarOptions'];
+
+                if ($toolbarOptions['placement']['top']) {
+                    $topToolbarId = $this->generateName([$id, 'top', 'toolbar']);
+                    $builder->getLayoutManipulator()->add($topToolbarId, $id, 'container');
+                }
+            }
+        }
+
         if ($options['split_to_cells']) {
             $columns = $this->getGridColumns($options['grid_name']);
             if ($columns) {
-                $id = $builder->getId();
-
                 $headerRowId = $this->generateName([$id, 'header', 'row']);
                 $builder->getLayoutManipulator()->add($headerRowId, $id, 'datagrid_header_row');
 
@@ -89,6 +103,11 @@ class DatagridType extends AbstractContainerType
                 }
             }
         }
+
+        if ($options['server_side_render'] && $toolbarOptions && $toolbarOptions['placement']['bottom']) {
+            $bottomToolbarId = $this->generateName([$id, 'bottom', 'toolbar']);
+            $builder->getLayoutManipulator()->add($bottomToolbarId, $id, 'container');
+        }
     }
 
     /**
@@ -96,7 +115,12 @@ class DatagridType extends AbstractContainerType
      */
     public function buildView(BlockView $view, BlockInterface $block, Options $options)
     {
-        BlockUtils::setViewVarsFromOptions($view, $options, ['grid_name', 'grid_parameters', 'grid_render_parameters']);
+        BlockUtils::setViewVarsFromOptions($view, $options, [
+            'grid_name',
+            'grid_parameters',
+            'grid_render_parameters',
+            'server_side_render'
+        ]);
 
         $view->vars['split_to_cells'] = $options['split_to_cells'];
         if (!empty($options['grid_scope'])) {
@@ -107,6 +131,16 @@ class DatagridType extends AbstractContainerType
             );
         } else {
             $view->vars['grid_full_name'] = $view->vars['grid_name'];
+        }
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function finishView(BlockView $view, BlockInterface $block)
+    {
+        if ($view->vars['server_side_render']) {
+            BlockUtils::registerPlugin($view, 'server_side_datagrid');
         }
     }
 
@@ -127,6 +161,21 @@ class DatagridType extends AbstractContainerType
     {
         if ($this->isAclGrantedForGridName($gridName)) {
             return $this->manager->getConfigurationForGrid($gridName)->offsetGet('columns');
+        }
+
+        return null;
+    }
+
+    /**
+     * @param string $gridName
+     * @return null|array
+     */
+    private function getGridOptions($gridName)
+    {
+        if ($this->isAclGrantedForGridName($gridName)) {
+            $gridMetadata = $this->manager->getDatagridByRequestParams($gridName)->getMetadata();
+
+            return $gridMetadata->offsetGet('options');
         }
 
         return null;
