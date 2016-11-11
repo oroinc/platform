@@ -3,7 +3,6 @@
 namespace Oro\Bundle\SidebarBundle\Model;
 
 use Doctrine\Common\Collections\ArrayCollection;
-use Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker;
 
 class WidgetDefinitionRegistry
 {

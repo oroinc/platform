@@ -2,8 +2,9 @@
 
 namespace Oro\Bundle\SidebarBundle\Configuration;
 
-use Oro\Bundle\FeatureToggleBundle\Configuration\ConfigurationExtensionInterface;
 use Symfony\Component\Config\Definition\Builder\NodeBuilder;
+
+use Oro\Bundle\FeatureToggleBundle\Configuration\ConfigurationExtensionInterface;
 
 class FeatureConfigurationExtension implements ConfigurationExtensionInterface
 {

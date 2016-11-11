@@ -2,11 +2,11 @@
 
 namespace Oro\Bundle\EmailBundle\EventListener;
 
-use Oro\Bundle\ActivityBundle\Event\PrepareContextTitleEvent;
+use Symfony\Component\Routing\Router;
 
+use Oro\Bundle\ActivityBundle\Event\PrepareContextTitleEvent;
 use Oro\Bundle\EmailBundle\Entity\Email;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
-use Symfony\Component\Routing\Router;
 
 class PrepareContextTitleListener
 {
