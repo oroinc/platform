@@ -4,6 +4,7 @@ namespace Oro\Bundle\ActionBundle\Provider;
 
 use Oro\Bundle\ActionBundle\Helper\ApplicationsHelperInterface;
 use Oro\Bundle\ActionBundle\Helper\ContextHelper;
+use Oro\Bundle\ActionBundle\Model\ActionData;
 use Oro\Bundle\ActionBundle\Model\ButtonContext;
 use Oro\Bundle\ActionBundle\Model\ButtonProviderExtensionInterface;
 use Oro\Bundle\ActionBundle\Model\ButtonSearchContext;
@@ -51,26 +52,12 @@ class OperationButtonProviderExtension implements ButtonProviderExtensionInterfa
             $buttonSearchContext->getGroup()
         );
 
-        $actionData = $this->contextHelper->getActionData([
-            ContextHelper::ENTITY_ID_PARAM => $buttonSearchContext->getEntityId(),
-            ContextHelper::ENTITY_CLASS_PARAM => $buttonSearchContext->getEntityClass(),
-            ContextHelper::DATAGRID_PARAM => $buttonSearchContext->getGridName(),
-            ContextHelper::FROM_URL_PARAM => $buttonSearchContext->getReferrer(),
-            ContextHelper::ROUTE_PARAM => $buttonSearchContext->getRouteName(),
-        ]);
-
         $result = [];
 
         /** @var Operation $operation */
         foreach ($operations as $operation) {
-            if ($operation->isAvailable($actionData)) {
-                $buttonContext = $this->generateButtonContext($buttonSearchContext);
-                if ($operation->hasForm()) {
-                    $buttonContext->setDialogUrl($this->applicationsHelper->getDialogRoute());
-                }
-                $buttonContext->setExecutionUrl($this->applicationsHelper->getExecutionRoute());
-                $buttonContext->setEnabled($operation->isEnabled());
-                $buttonContext->setUnavailableHidden(true);
+            if ($operation->isAvailable($this->getActionData($buttonSearchContext))) {
+                $buttonContext = $this->generateButtonContext($operation, $buttonSearchContext);
                 $result[] = new OperationButton($operation, $buttonContext);
             }
         }
@@ -79,18 +66,41 @@ class OperationButtonProviderExtension implements ButtonProviderExtensionInterfa
     }
 
     /**
+     * @param Operation $operation
      * @param ButtonSearchContext $searchContext
      *
      * @return ButtonContext
      */
-    protected function generateButtonContext(ButtonSearchContext $searchContext)
+    protected function generateButtonContext(Operation $operation, ButtonSearchContext $searchContext)
     {
         $context = new ButtonContext();
         $context->setDatagridName($searchContext->getGridName());
         $context->setEntity($searchContext->getEntityClass(), $searchContext->getEntityId());
         $context->setRouteName($searchContext->getRouteName());
         $context->setGroup($searchContext->getGroup());
+        if ($operation->hasForm()) {
+            $context->setDialogUrl($this->applicationsHelper->getDialogRoute());
+        }
+        $context->setExecutionUrl($this->applicationsHelper->getExecutionRoute());
+        $context->setEnabled($operation->isEnabled());
+        $context->setUnavailableHidden(true);
 
         return $context;
+    }
+
+    /**
+     * @param ButtonSearchContext $searchContext
+     *
+     * @return ActionData
+     */
+    protected function getActionData(ButtonSearchContext $searchContext)
+    {
+        return $this->contextHelper->getActionData([
+            ContextHelper::ENTITY_ID_PARAM => $searchContext->getEntityId(),
+            ContextHelper::ENTITY_CLASS_PARAM => $searchContext->getEntityClass(),
+            ContextHelper::DATAGRID_PARAM => $searchContext->getGridName(),
+            ContextHelper::FROM_URL_PARAM => $searchContext->getReferrer(),
+            ContextHelper::ROUTE_PARAM => $searchContext->getRouteName(),
+        ]);
     }
 }
