@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\ScopeBundle\Tests\Unit\Form\Type;
 
+use Oro\Bundle\FormBundle\Form\Type\CollectionType;
 use Oro\Bundle\ScopeBundle\Form\Type\ScopeCollectionType;
 use Oro\Component\Testing\Unit\FormIntegrationTestCase;
 use Symfony\Component\OptionsResolver\OptionsResolver;
@@ -32,7 +33,7 @@ class ScopeCollectionTypeTest extends FormIntegrationTestCase
 
     public function testGetParent()
     {
-        $this->assertEquals('oro_collection', $this->formType->getParent());
+        $this->assertEquals(CollectionType::class, $this->formType->getParent());
     }
 
     public function testConfigureOptions()

@@ -15,7 +15,7 @@ class ScopeCollectionType extends AbstractType
      */
     public function getParent()
     {
-        return CollectionType::NAME;
+        return CollectionType::class;
     }
 
     /**

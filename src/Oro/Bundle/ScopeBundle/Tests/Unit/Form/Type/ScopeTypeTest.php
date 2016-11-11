@@ -5,6 +5,7 @@ namespace Oro\Bundle\ScopeBundle\Tests\Unit\Form\Type;
 use Oro\Bundle\ScopeBundle\Manager\ScopeManager;
 use Oro\Bundle\ScopeBundle\Form\Type\ScopeType;
 
+use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
@@ -59,6 +60,57 @@ class ScopeTypeTest extends \PHPUnit_Framework_TestCase
             );
 
         $this->scopeType->configureOptions($resolver);
+    }
+
+    /**
+     * @dataProvider finishViewDataProvider
+     * @param array $options
+     * @param array $children
+     * @param array $expected
+     */
+    public function testFinishView(array $options, array $children, array $expected)
+    {
+        /** @var FormView|\PHPUnit_Framework_MockObject_MockObject $view */
+        $view = new FormView();
+
+        $view->children = $children;
+
+        /** @var \Symfony\Component\Form\FormInterface|\PHPUnit_Framework_MockObject_MockObject $form */
+        $form = $this->getMockBuilder('Symfony\Component\Form\FormInterface')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $this->scopeType->finishView($view, $form, $options);
+
+        $this->assertEquals($expected, $view->children);
+    }
+
+    /**
+     * @return array
+     */
+    public function finishViewDataProvider()
+    {
+        return [
+            [
+                'options' => [
+                    ScopeType::SCOPE_FIELDS_OPTION => [
+                        'one' => '\stdClass',
+                        'two' => '\stdClass',
+                        'three' => '\stdClass'
+                    ]
+                ],
+                'children' => [
+                    'two' => new FormView(),
+                    'one' => new FormView(),
+                    'three' => new FormView()
+                ],
+                'expected' => [
+                    'three' => new FormView(),
+                    'two' => new FormView(),
+                    'one' => new FormView()
+                ]
+            ]
+        ];
     }
 
     public function testGetName()
