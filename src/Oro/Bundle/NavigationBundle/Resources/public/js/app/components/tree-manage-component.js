@@ -104,10 +104,10 @@ define(function(require) {
                 },
                 error: function(xhr) {
                     self.rollback(data);
+                    var message = __('oro.ui.jstree.move_node_error', {nodeText: data.node.text});
                     if (xhr.responseJSON.message) {
                         message = xhr.responseJSON.message;
                     }
-                    var message = __('oro.ui.jstree.move_node_error', {nodeText: data.node.text});
                     messenger.notificationFlashMessage('error', message);
                 }
             });
