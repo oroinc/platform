@@ -9,9 +9,7 @@ use Oro\Bundle\SecurityBundle\Acl\Exception\InvalidAclMaskException;
 
 abstract class AbstractAclExtension implements AclExtensionInterface
 {
-    /**
-     * @var array
-     */
+    /** @var array [permission => [mask, ...], ...] */
     protected $map;
 
     /**
@@ -27,7 +25,7 @@ abstract class AbstractAclExtension implements AclExtensionInterface
      */
     public function getMasks($permission)
     {
-        return isset($this->map[$permission])
+        return array_key_exists($permission, $this->map)
             ? $this->map[$permission]
             : null;
     }
@@ -37,7 +35,7 @@ abstract class AbstractAclExtension implements AclExtensionInterface
      */
     public function hasMasks($permission)
     {
-        return isset($this->map[$permission]);
+        return array_key_exists($permission, $this->map);
     }
 
     /**

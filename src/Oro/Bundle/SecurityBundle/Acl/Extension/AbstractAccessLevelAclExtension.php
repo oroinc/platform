@@ -56,7 +56,7 @@ abstract class AbstractAccessLevelAclExtension extends AbstractAclExtension
      *
      * @return bool
      */
-    public function isAccessGranted($triggeredMask, $object, TokenInterface $securityToken)
+    protected function isAccessGranted($triggeredMask, $object, TokenInterface $securityToken)
     {
         $organization = null;
         if ($securityToken instanceof OrganizationContextTokenInterface) {
