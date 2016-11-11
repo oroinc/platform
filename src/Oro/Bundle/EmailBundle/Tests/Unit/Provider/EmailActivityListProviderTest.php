@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\EmailBundle\Tests\Unit\Provider;
 
+use Oro\Bundle\EmailBundle\Entity\EmailUser;
 use Oro\Bundle\EmailBundle\Provider\EmailActivityListProvider;
 use Oro\Bundle\EmailBundle\Tools\EmailBodyHelper;
 use Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker;
@@ -9,7 +10,6 @@ use Oro\Bundle\FeatureToggleBundle\Checker\FeatureCheckerHolderTrait;
 use Oro\Bundle\FeatureToggleBundle\Checker\FeatureToggleableInterface;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\UserBundle\Entity\User;
-use Oro\Bundle\EmailBundle\Entity\EmailUser;
 
 class EmailActivityListProviderTest extends \PHPUnit_Framework_TestCase
 {

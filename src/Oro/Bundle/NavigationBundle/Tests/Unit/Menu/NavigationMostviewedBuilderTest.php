@@ -2,11 +2,12 @@
 
 namespace Oro\Bundle\NavigationBundle\Tests\Unit\Menu;
 
-use Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker;
-use Oro\Bundle\NavigationBundle\Menu\NavigationMostviewedBuilder;
-use Oro\Bundle\NavigationBundle\Entity\NavigationHistoryItem;
-use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Symfony\Bundle\FrameworkBundle\Routing\Router;
+
+use Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker;
+use Oro\Bundle\NavigationBundle\Entity\NavigationHistoryItem;
+use Oro\Bundle\NavigationBundle\Menu\NavigationMostviewedBuilder;
+use Oro\Bundle\OrganizationBundle\Entity\Organization;
 
 class NavigationMostviewedBuilderTest extends \PHPUnit_Framework_TestCase
 {

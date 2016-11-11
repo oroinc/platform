@@ -4,29 +4,25 @@ namespace Oro\Bundle\ActivityListBundle\Entity\Manager;
 
 use Doctrine\ORM\QueryBuilder;
 
-use Oro\Bundle\FeatureToggleBundle\Checker\FeatureToggleableInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Security\Core\Util\ClassUtils;
 
 use Oro\Bundle\ActivityBundle\EntityConfig\ActivityScope;
-
-use Oro\Bundle\ActivityListBundle\Event\ActivityListPreQueryBuildEvent;
 use Oro\Bundle\ActivityListBundle\Entity\ActivityList;
 use Oro\Bundle\ActivityListBundle\Entity\Repository\ActivityListRepository;
+use Oro\Bundle\ActivityListBundle\Event\ActivityListPreQueryBuildEvent;
 use Oro\Bundle\ActivityListBundle\Filter\ActivityListFilterHelper;
 use Oro\Bundle\ActivityListBundle\Helper\ActivityInheritanceTargetsHelper;
 use Oro\Bundle\ActivityListBundle\Helper\ActivityListAclCriteriaHelper;
 use Oro\Bundle\ActivityListBundle\Model\ActivityListGroupProviderInterface;
 use Oro\Bundle\ActivityListBundle\Provider\ActivityListChainProvider;
 use Oro\Bundle\ActivityListBundle\Tools\ActivityListEntityConfigDumperExtension;
-
-use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\CommentBundle\Entity\Manager\CommentApiManager;
-
+use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityBundle\Provider\EntityNameResolver;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
-
+use Oro\Bundle\FeatureToggleBundle\Checker\FeatureToggleableInterface;
 use Oro\Bundle\SecurityBundle\SecurityFacade;
 
 /**

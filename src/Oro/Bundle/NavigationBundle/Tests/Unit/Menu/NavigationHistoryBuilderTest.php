@@ -2,10 +2,11 @@
 
 namespace Oro\Bundle\NavigationBundle\Tests\Unit\Menu;
 
+use Symfony\Bundle\FrameworkBundle\Routing\Router;
+
 use Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker;
 use Oro\Bundle\NavigationBundle\Menu\NavigationHistoryBuilder;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
-use Symfony\Bundle\FrameworkBundle\Routing\Router;
 
 class NavigationHistoryBuilderTest extends \PHPUnit_Framework_TestCase
 {

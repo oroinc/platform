@@ -2,19 +2,18 @@
 
 namespace Oro\Bundle\EmailBundle\Tests\Unit\EventListener;
 
+use Doctrine\ORM\Event\PostFlushEventArgs;
+
+use Symfony\Component\DependencyInjection\Container;
+
 use Oro\Bundle\EmailBundle\Async\Topics;
+use Oro\Bundle\EmailBundle\Entity\Email;
+use Oro\Bundle\EmailBundle\Entity\EmailBody;
+use Oro\Bundle\EmailBundle\EventListener\AutoResponseListener;
 use Oro\Bundle\EmailBundle\Manager\AutoResponseManager;
 use Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker;
 use Oro\Component\DependencyInjection\ServiceLink;
 use Oro\Component\MessageQueue\Client\MessageProducerInterface;
-
-use Doctrine\ORM\Event\PostFlushEventArgs;
-
-use Oro\Bundle\EmailBundle\Entity\Email;
-use Oro\Bundle\EmailBundle\Entity\EmailBody;
-use Oro\Bundle\EmailBundle\EventListener\AutoResponseListener;
-
-use Symfony\Component\DependencyInjection\Container;
 
 class AutoResponseListenerTest extends \PHPUnit_Framework_TestCase
 {

@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\SidebarBundle\Twig;
 
-use Symfony\Component\Translation\TranslatorInterface;
 use Symfony\Component\Asset\Packages as AssetHelper;
+use Symfony\Component\Translation\TranslatorInterface;
 
 use Oro\Bundle\FeatureToggleBundle\Checker\FeatureCheckerHolderTrait;
 use Oro\Bundle\FeatureToggleBundle\Checker\FeatureToggleableInterface;

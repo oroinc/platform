@@ -52,6 +52,7 @@ features:
             - 'oro_api_get_email_activity_relations'
             - 'oro_api_get_email_search_relations'
         configuration:
+            - 'user_email_configuration'
             - 'email_autocomplete_configuration'
             - 'signature_configuration'
             - 'email_threads'

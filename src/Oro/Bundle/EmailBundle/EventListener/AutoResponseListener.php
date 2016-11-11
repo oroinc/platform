@@ -1,4 +1,5 @@
 <?php
+
 namespace Oro\Bundle\EmailBundle\EventListener;
 
 use Doctrine\ORM\Event\PostFlushEventArgs;
