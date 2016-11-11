@@ -1,9 +1,11 @@
 {# TODO: add row actions #}
 
 {% block datagrid_row_widget %}
-    {# TODO: add `block('block_attributes')` #}
+    {% set attr = attr|merge({
+        class: attr.class|default('') ~ " grid-row"
+    }) %}
 
-    <tr class="grid-row">
+    <tr{{ block('block_attributes') }}>
         {% for child in block if child.vars.visible -%}
             {{ block_widget(child, {'datagrid_row': datagrid_row}) }}
         {%- endfor %}
@@ -12,9 +14,11 @@
 
 {% block datagrid_cell_widget %}
     {# TODO: inject `datagrid` for getting datagrid metadata (need for rendering column) #}
-    {# TODO: add `block('block_attributes')` #}
+    {% set attr = attr|merge({
+        class: attr.class|default('') ~ " string-cell grid-cell grid-body-cell grid-body-cell-" ~ column_name
+    }) %}
 
-    <td class="string-cell grid-cell grid-body-cell grid-body-cell-{{ column_name }}">
+    <td{{ block('block_attributes') }}>
         {% for child in block if child.vars.visible -%}
             {{ block_widget(child, {'datagrid_row': datagrid_row}) }}
         {%- endfor %}

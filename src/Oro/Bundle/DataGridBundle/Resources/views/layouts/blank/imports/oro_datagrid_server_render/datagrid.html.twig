@@ -1,15 +1,26 @@
 {% block __oro_datagrid_server_render__datagrid_widget %}
-    {# TODO: add `block('block_attributes')` #}
-
     {% set datagrid = oro_datagrid_build(grid_name, grid_parameters) %}
     {% set gridId = oro_datagrid_generate_element_id(datagrid) %}
     {% set renderParams = grid_render_parameters %}
+
+    {% set attr = attr|merge({
+        id: gridId
+    }) %}
+
+    {% set gridClass = attr.class|default('') %}
+    {% set gridClass = renderParams.cssClass is defined ? gridClass ~ ' ' ~ renderParams.cssClass : gridClass %}
+    {% if gridClass %}
+        {% set attr = attr|merge({
+            class: gridClass
+        }) %}
+    {% endif %}
+
 
     {% set datagridData = oro_datagrid_data(datagrid) %}
     {% set datagridMetaData = oro_datagrid_metadata(datagrid) %}
     {% set toolbarOptions = datagridMetaData.options.toolbarOptions %}
 
-    <div id="{{ gridId }}" {% if renderParams.cssClass is defined %} class="{{ renderParams.cssClass }}"{% endif %}>
+    <div{{ block('block_attributes') }}>
         <div class="oro-datagrid">
             {% if toolbarOptions.placement.top %}
                 <div class="toolbar" data-grid-toolbar="top">

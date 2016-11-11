@@ -1,6 +1,9 @@
 {% block datagrid_header_row_widget %}
-    {# TODO: add `block('block_attributes')` #}
-    <tr class="grid-header-row">
+    {% set attr = attr|merge({
+        class: attr.class|default('') ~ " grid-header-row"
+    }) %}
+
+    <tr{{ block('block_attributes') }}>
         {% for child in block if child.vars.visible -%}
             {{ block_widget(child, {'datagrid': datagrid}) }}
         {%- endfor %}
@@ -8,11 +11,31 @@
 {% endblock %}
 
 {% block datagrid_header_cell_widget %}
-    {# TODO: inject `datagrid` for getting datagrid metadata (need for rendering column) #}
-    {# TODO: add "sortable", "renderable", "ascending" classes based on configuration #}
-    {# TODO: add `block('block_attributes')` #}
+    {% set columnAttributes = oro_datagrid_column_attributes(datagrid, column_name) %}
 
-    <th class="grid-cell grid-header-cell grid-header-cell-{{ column_name }} sortable renderable ascending string-cell">
-        {{ oro_datagrid_column_name(datagrid, column_name) }}
+    {% set columnClass = " grid-cell grid-header-cell grid-header-cell-" ~ column_name ~ " " ~columnAttributes.type ~ "-cell" %}
+    {% if columnAttributes.sortable is defined and columnAttributes.sortable %}
+        {% set columnClass = columnClass ~ " sortable" %}
+    {% endif %}
+
+    {% if columnAttributes.renderable is defined and columnAttributes.renderable %}
+        {% set columnClass = columnClass ~ " renderable" %}
+    {% endif %}
+
+    {% set attr = attr|merge({
+        class: attr.class|default('') ~ columnClass
+    }) %}
+
+    <th{{ block('block_attributes') }}>
+        {% if columnAttributes.sortable is defined and columnAttributes.sortable %}
+            <a class="grid-header-cell__link" href="#">
+                <span class="grid-header-cell__label">{{ columnAttributes.label }}</span>
+                <span class="caret"></span>
+            </a>
+        {% else %}
+            <span class="grid-header-cell__label">
+                {{ columnAttributes.label }}
+            </span>
+        {% endif %}
     </th>
 {% endblock %}
