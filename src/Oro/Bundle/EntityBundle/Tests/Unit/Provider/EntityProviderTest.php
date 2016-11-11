@@ -368,7 +368,6 @@ class EntityProviderTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue($this->extendConfig));
 
 
-
         $this->featureChecker->expects($this->at(0))
             ->method('isResourceEnabled')
             ->with($entityClassName1)
