@@ -37,7 +37,7 @@ define(function(require) {
             var dropdown = this.$('.context-items-dropdown');
             var firstItem = this.$('.activity-context-current-item');
             this.collection.on('add', function(model) {
-                var gridUrl = self.options.params.grid_path + '/' + model.attributes.className;
+                var gridUrl = encodeURI(self.options.params.grid_path + '/' + model.attributes.className);
                 var view = self.template({
                         entity: model
                     });
