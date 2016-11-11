@@ -1,9 +1,19 @@
 {% block oro_scope_widget %}
-    <table>
+    <table class="table-condensed">
         <tr>
             {% for child in form.children %}
-                <td>{{ form_row(child) }}</td>
+                <td>
+                    {{ form_label(child) }}
+                    {{ form_widget(child) }}
+                </td>
             {% endfor %}
         </tr>
     </table>
+{% endblock %}
+
+{% block oro_scope_collection_widget %}
+    <div class="scope-collection">
+        {% set attr = attr|merge({'class': (attr.class is defined ? attr.class ~ ' ' : '') ~ 'oro-options-collection' }) %}
+        {{ block('oro_collection_widget') }}
+    </div>
 {% endblock %}

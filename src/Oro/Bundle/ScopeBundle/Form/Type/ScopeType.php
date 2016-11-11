@@ -4,6 +4,8 @@ namespace Oro\Bundle\ScopeBundle\Form\Type;
 
 use Oro\Bundle\ScopeBundle\Manager\ScopeManager;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\FormInterface;
+use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
@@ -51,7 +53,26 @@ class ScopeType extends AbstractType
             }
         );
     }
-    
+
+    /**
+     * {@inheritdoc}
+     */
+    public function finishView(FormView $view, FormInterface $form, array $options)
+    {
+        /** @var FormView[] $fields */
+        $fields = [];
+        foreach (array_reverse(array_keys($options[self::SCOPE_FIELDS_OPTION])) as $field) {
+            if ($view->offsetExists($field)) {
+                $fields[$field] = $view->offsetGet($field);
+                $view->offsetUnset($field);
+            }
+        }
+
+        $view->children = $fields;
+
+        parent::finishView($view, $form, $options);
+    }
+
     /**
      * {@inheritdoc}
      */
