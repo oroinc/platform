@@ -51,7 +51,7 @@ class PasswordComplexityValidator extends ConstraintValidator
 
         $messages = [];
         // execute rule validators and collect all messages
-        foreach (self::$rules as $rule) {
+        foreach (self::$rulesMap as $rule) {
             $method = 'valid' . $rule;
             $transKey = 'require' . $rule . 'Key';
             if (!$this->$method($value, $constraint)) {
