@@ -7,13 +7,15 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
-use Symfony\Component\Translation\TranslatorInterface;
 
 use Oro\Bundle\SecurityBundle\Annotation\Acl;
 use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Form\Type\WorkflowReplacementSelectType;
+use Oro\Bundle\WorkflowBundle\Helper\WorkflowTranslationHelper;
 use Oro\Bundle\WorkflowBundle\Model\Workflow;
+use Oro\Bundle\WorkflowBundle\Translation\TranslationProcessor;
+use Oro\Bundle\WorkflowBundle\Translation\TranslationsDatagridLinksProvider;
 
 /**
  * @Route("/workflowdefinition")
@@ -34,9 +36,9 @@ class WorkflowDefinitionController extends Controller
      */
     public function indexAction()
     {
-        return array(
-            'entity_class' => $this->container->getParameter('oro_workflow.workflow_definition.entity.class')
-        );
+        return [
+            'entity_class' => $this->container->getParameter('oro_workflow.entity.workflow_definition.class')
+        ];
     }
 
     /**
@@ -81,6 +83,8 @@ class WorkflowDefinitionController extends Controller
         if ($workflowDefinition->isSystem()) {
             throw new AccessDeniedHttpException('System workflow definitions are not editable');
         }
+        $translateLinks = $this->getTranslationsDatagridLinksProvider()->getWorkflowTranslateLinks($workflowDefinition);
+        $this->getTranslationProcessor()->translateWorkflowDefinitionFields($workflowDefinition);
 
         $form = $this->get('oro_workflow.form.workflow_definition');
         $form->setData($workflowDefinition);
@@ -88,30 +92,10 @@ class WorkflowDefinitionController extends Controller
         return array(
             'form' => $form->createView(),
             'entity' => $workflowDefinition,
-            'workflowConfiguration' => $this->prepareConfiguration($workflowDefinition),
             'system_entities' => $this->get('oro_entity.entity_provider')->getEntities(),
             'delete_allowed' => true,
+            'translateLinks' => $translateLinks,
         );
-    }
-
-    /**
-     * Prepares workflow configuration to display. Translates attribute labels.
-     *
-     * @param WorkflowDefinition $workflowDefinition
-     * @return array
-     */
-    protected function prepareConfiguration(WorkflowDefinition $workflowDefinition)
-    {
-        /** @var TranslatorInterface $translator */
-        $translator = $this->get('translator');
-        $configuration = $workflowDefinition->getConfiguration();
-
-        if (isset($configuration['attributes'])) {
-            foreach ($configuration['attributes'] as $attrName => $attrConfig) {
-                $configuration['attributes'][$attrName]['translated_label'] = $translator->trans($attrConfig['label']);
-            }
-        }
-        return $configuration;
     }
 
     /**
@@ -127,29 +111,14 @@ class WorkflowDefinitionController extends Controller
      */
     public function viewAction(WorkflowDefinition $workflowDefinition)
     {
-        return array(
-            'entity' => $workflowDefinition,
-            'workflowConfiguration' => $this->prepareConfiguration($workflowDefinition),
-            'system_entities' => $this->get('oro_entity.entity_provider')->getEntities()
-        );
-    }
+        $translateLinks = $this->getTranslationsDatagridLinksProvider()->getWorkflowTranslateLinks($workflowDefinition);
+        $this->getTranslationProcessor()->translateWorkflowDefinitionFields($workflowDefinition);
 
-    /**
-     * @Route(
-     *      "/info/{name}",
-     *      name="oro_workflow_definition_info"
-     * )
-     * @AclAncestor("oro_workflow_definition_view")
-     * @Template
-     *
-     * @param WorkflowDefinition $workflowDefinition
-     * @return array
-     */
-    public function infoAction(WorkflowDefinition $workflowDefinition)
-    {
-        return array(
-            'entity' => $workflowDefinition
-        );
+        return [
+            'entity' => $workflowDefinition,
+            'system_entities' => $this->get('oro_entity.entity_provider')->getEntities(),
+            'translateLinks' => $translateLinks,
+        ];
     }
 
     /**
@@ -187,7 +156,9 @@ class WorkflowDefinitionController extends Controller
                     $workflowsToDeactivation
                 )
             );
-            
+
+            $translator = $this->get('translator');
+
             $deactivated = [];
             foreach ($workflowNames as $workflowName) {
                 if ($workflowName && $workflowManager->isActiveWorkflow($workflowName)) {
@@ -196,10 +167,14 @@ class WorkflowDefinitionController extends Controller
                     $workflowManager->resetWorkflowData($workflow->getName());
                     $workflowManager->deactivateWorkflow($workflow->getName());
 
-                    $deactivated[] = $workflow->getLabel();
+                    $deactivated[] = $translator->trans(
+                        $workflow->getLabel(),
+                        [],
+                        WorkflowTranslationHelper::TRANSLATION_DOMAIN
+                    );
                 }
             }
-            
+
             $response['deactivated'] = $deactivated;
 
             $workflowManager->activateWorkflow($workflowDefinition->getName());
@@ -223,5 +198,21 @@ class WorkflowDefinitionController extends Controller
                 return $workflow->getName() !== $workflowDefinition->getName();
             }
         );
+    }
+
+    /**
+     * @return TranslationsDatagridLinksProvider
+     */
+    protected function getTranslationsDatagridLinksProvider()
+    {
+        return $this->get('oro_workflow.translation.translations_datagrid_links_provider');
+    }
+
+    /**
+     * @return TranslationProcessor
+     */
+    protected function getTranslationProcessor()
+    {
+        return $this->get('oro_workflow.translation.processor');
     }
 }

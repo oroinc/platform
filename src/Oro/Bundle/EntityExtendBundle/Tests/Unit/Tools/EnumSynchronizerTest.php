@@ -13,7 +13,7 @@ use Oro\Bundle\EntityConfigBundle\Translation\ConfigTranslationHelper;
 use Oro\Bundle\EntityExtendBundle\Tests\Unit\Fixtures\TestEnumValue;
 use Oro\Bundle\EntityExtendBundle\Tools\EnumSynchronizer;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
-use Oro\Bundle\TranslationBundle\Entity\Translation;
+use Oro\Bundle\TranslationBundle\Translation\Translator;
 
 class EnumSynchronizerTest extends \PHPUnit_Framework_TestCase
 {
@@ -385,7 +385,7 @@ class EnumSynchronizerTest extends \PHPUnit_Framework_TestCase
     {
         $enumCode = 'test_enum';
         $enumName = 'Test Enum New';
-        $locale   = Translation::DEFAULT_LOCALE;
+        $locale   = Translator::DEFAULT_LOCALE;
 
         $this->translator->expects($this->once())
             ->method('trans')

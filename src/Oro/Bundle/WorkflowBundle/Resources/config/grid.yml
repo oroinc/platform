@@ -1,14 +1,10 @@
-parameters:
-    oro_workflow.datagrid.entity_name_provider.class: Oro\Bundle\WorkflowBundle\Datagrid\GridEntityNameProvider
-    oro_workflow.datagrid.listener.workflow_step_column.class: Oro\Bundle\WorkflowBundle\Datagrid\WorkflowStepColumnListener
-
 services:
     oro_workflow.datagrid.action_permission_provider:
         class: Oro\Bundle\WorkflowBundle\Datagrid\ActionPermissionProvider
         arguments: ['@oro_featuretoggle.checker.feature_checker']
 
     oro_workflow.datagrid.abstract_entity_name_provider:
-        class: %oro_workflow.datagrid.entity_name_provider.class%
+        class: 'Oro\Bundle\WorkflowBundle\Datagrid\GridEntityNameProvider'
         abstract: true
         arguments:
             - '@oro_entity_config.provider.entity'
@@ -26,7 +22,7 @@ services:
             - [setEntityName, ["OroWorkflowBundle:WorkflowDefinition"]]
 
     oro_workflow.datagrid.listener.workflow_step_column:
-        class: %oro_workflow.datagrid.listener.workflow_step_column.class%
+        class: 'Oro\Bundle\WorkflowBundle\Datagrid\WorkflowStepColumnListener'
         arguments:
             - '@oro_entity.doctrine_helper'
             - '@oro_entity_config.provider.workflow'
@@ -41,10 +37,22 @@ services:
             - [addWorkflowStepColumn, ["step"]]
             - [addWorkflowStepColumn, ["stepLabel"]]
 
+    oro_workflow.datagrid.listener.translation_workflow_column:
+        class: 'Oro\Bundle\WorkflowBundle\Datagrid\Translation\WorkflowColumnListener'
+        tags:
+            - { name: kernel.event_listener, event: oro_datagrid.datagrid.build.before.oro-translation-translations-grid, method: onBuildBefore }
+
     oro_workflow.datagrid.extension.restrictions:
-        class: Oro\Bundle\WorkflowBundle\Datagrid\Extension\RestrictionsExtension
+        class: 'Oro\Bundle\WorkflowBundle\Datagrid\Extension\RestrictionsExtension'
         arguments:
             - '@oro_datagrid.grid_configuration.helper'
             - '@oro_workflow.restriction.manager'
         tags:
             - { name: oro_datagrid.extension }
+
+    oro_workflow.datagrid.listener.label:
+        class: 'Oro\Bundle\WorkflowBundle\Datagrid\WorkflowDatagridLabelListener'
+        arguments:
+            - '@translator'
+        tags:
+            - { name: kernel.event_listener, event: oro_datagrid.datagrid.build.before, method: onBuildBefore,  priority: 255 }

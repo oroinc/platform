@@ -4,8 +4,8 @@ namespace Oro\Bundle\ApiBundle\Processor\Subresource\Shared;
 
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
-use Oro\Bundle\ApiBundle\Form\FormExtensionSwitcherInterface;
-use Oro\Bundle\ApiBundle\Form\Guesser\MetadataTypeGuesser;
+use Oro\Bundle\ApiBundle\Processor\FormContext;
+use Oro\Bundle\ApiBundle\Processor\Shared\SwitchFormExtension;
 use Oro\Bundle\ApiBundle\Processor\Subresource\ContextParentConfigAccessor;
 use Oro\Bundle\ApiBundle\Processor\Subresource\ContextParentMetadataAccessor;
 use Oro\Bundle\ApiBundle\Processor\Subresource\SubresourceContext;
@@ -13,34 +13,23 @@ use Oro\Bundle\ApiBundle\Processor\Subresource\SubresourceContext;
 /**
  * Switches to Data API form extension.
  */
-class InitializeApiFormExtension implements ProcessorInterface
+class InitializeApiFormExtension extends SwitchFormExtension implements ProcessorInterface
 {
-    /** @var FormExtensionSwitcherInterface */
-    protected $formExtensionSwitcher;
-
-    /** @var MetadataTypeGuesser */
-    protected $metadataTypeGuesser;
-
-    /**
-     * @param FormExtensionSwitcherInterface $formExtensionSwitcher
-     * @param MetadataTypeGuesser            $metadataTypeGuesser
-     */
-    public function __construct(
-        FormExtensionSwitcherInterface $formExtensionSwitcher,
-        MetadataTypeGuesser $metadataTypeGuesser
-    ) {
-        $this->formExtensionSwitcher = $formExtensionSwitcher;
-        $this->metadataTypeGuesser = $metadataTypeGuesser;
-    }
-
     /**
      * {@inheritdoc}
      */
     public function process(ContextInterface $context)
     {
-        /** @var SubresourceContext $context */
+        /** @var SubresourceContext|FormContext $context */
 
-        $this->formExtensionSwitcher->switchToApiFormExtension();
+        if ($this->isApiFormExtensionActivated($context)) {
+            // the API form extension is already activated
+            return;
+        }
+
+        $this->switchToApiFormExtension($context);
+        $this->rememberContext($context);
+        $this->metadataTypeGuesser->setIncludedEntities($context->getIncludedEntities());
         $this->metadataTypeGuesser->setMetadataAccessor(new ContextParentMetadataAccessor($context));
         $this->metadataTypeGuesser->setConfigAccessor(new ContextParentConfigAccessor($context));
     }

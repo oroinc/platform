@@ -34,7 +34,6 @@ parameters:
     oro_entity.entity_alias_provider.class:                  Oro\Bundle\EntityBundle\Provider\EntityAliasProvider
     oro_entity.entity_class_name_helper.class:               Oro\Bundle\EntityBundle\Tools\EntityClassNameHelper
     oro_entity.entity_name_resolver.class:                   Oro\Bundle\EntityBundle\Provider\EntityNameResolver
-    oro_entity.entity_name_provider.default.class:           Oro\Bundle\EntityBundle\Provider\EntityNameProvider
     oro_entity.entity_class_name_provider.default.class:     Oro\Bundle\EntityBundle\Provider\EntityClassNameProvider
     oro_entity.dictionary_value_list_provider.default.class: Oro\Bundle\EntityBundle\Provider\DictionaryValueListProvider
     oro_entity.orm.mapping.additional_metadata_provider.class: Oro\Bundle\EntityBundle\ORM\Mapping\AdditionalMetadataProvider
@@ -337,10 +336,19 @@ services:
             - %oro_entity.entity_name_formats%
 
     oro_entity.entity_name_provider.default:
-        class: %oro_entity.entity_name_provider.default.class%
+        class: Oro\Bundle\EntityBundle\Provider\EntityNameProvider
         public: false
         arguments:
             - '@doctrine'
+        tags:
+            - { name: oro_entity.name_provider, priority: -90 }
+
+    oro_entity.entity_name_provider.fallback:
+        class: Oro\Bundle\EntityBundle\Provider\FallbackEntityNameProvider
+        public: false
+        arguments:
+            - '@doctrine'
+            - '@translator'
         tags:
             - { name: oro_entity.name_provider, priority: -100 }
 

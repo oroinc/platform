@@ -18,7 +18,11 @@
             {% endif %}
                 <table class="workflow-entity">
                     <tr>
-                        <td class="workflow-label"><div class="workflow-label-text" title="{{ workflow.label }}">{{ workflow.label }}</div></td>
+                        <td class="workflow-label">
+                            <div class="workflow-label-text" title="{{ workflow.label|trans({},'workflows') }}">
+                                {{ workflow.label|trans({},'workflows') }}
+                            </div>
+                        </td>
                         <td class="workflow-content-container">
                             <table class="workflow-content">
                                 <tr>
@@ -54,15 +58,15 @@
                                                         {% endif %}
 
                                                         <li class="workflow-steps-item workflow-ordered-steps {% if active %}active{% endif %}">
-                                                            <div class="workflow-steps-item-arrow-container" title="{{ step.label }}">
+                                                            <div class="workflow-steps-item-arrow-container" title="{{ step.label|trans({},'workflows') }}">
                                                                 <span class="workflow-step-arrow-left"></span>
                                                                 <span class="workflow-step-arrow-right"></span>
-                                                                <span class="workflow-step-name">{{ step.label }}</span>
+                                                                <span class="workflow-step-name">{{ step.label|trans({},'workflows') }}</span>
                                                             </div>
                                                         </li>
                                                     {% else %}
                                                         <li class="workflow-steps-item workflow-unordered-steps">
-                                                            <span class="workflow-unordered-step-name">{{ step.label }}</span>
+                                                            <span class="workflow-unordered-step-name">{{ step.label|trans({},'workflows') }}</span>
                                                         </li>
                                                     {% endif %}
                                                 {% endfor %}

@@ -136,8 +136,8 @@ class ValidateRequestData implements ProcessorInterface
             return;
         }
 
-        $this->validateRequiredStringProperty($data, JsonApiDoc::ID, $pointer);
-        $this->validateRequiredStringProperty($data, JsonApiDoc::TYPE, $pointer);
+        $this->validateRequiredNotBlankString($data, JsonApiDoc::ID, $pointer);
+        $this->validateRequiredNotBlankString($data, JsonApiDoc::TYPE, $pointer);
     }
 
     /**
@@ -145,22 +145,27 @@ class ValidateRequestData implements ProcessorInterface
      * @param string $property
      * @param string $pointer
      */
-    protected function validateRequiredStringProperty(array $data, $property, $pointer)
+    protected function validateRequiredNotBlankString(array $data, $property, $pointer)
     {
         if (!array_key_exists($property, $data)) {
             $this->addError(
                 $this->buildPointer($pointer, $property),
                 sprintf('The \'%s\' property is required', $property)
             );
-        } elseif (!is_string($data[$property]) && null !== $data[$property]) {
+        } elseif (null === $data[$property]) {
+            $this->addError(
+                $this->buildPointer($pointer, $property),
+                sprintf('The \'%s\' property should not be null', $property)
+            );
+        } elseif (!is_string($data[$property])) {
             $this->addError(
                 $this->buildPointer($pointer, $property),
                 sprintf('The \'%s\' property should be a string', $property)
             );
-        } elseif ('' === $data[$property] || null === $data[$property]) {
+        } elseif ('' === trim($data[$property])) {
             $this->addError(
                 $this->buildPointer($pointer, $property),
-                sprintf('The \'%s\' property should not be empty', $property)
+                sprintf('The \'%s\' property should not be blank', $property)
             );
         }
     }
