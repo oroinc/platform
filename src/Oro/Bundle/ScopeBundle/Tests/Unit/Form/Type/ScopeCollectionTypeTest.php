@@ -42,8 +42,6 @@ class ScopeCollectionTypeTest extends FormIntegrationTestCase
         $options = $resolver->resolve();
 
         $this->assertArrayHasKey('type', $options);
-        $this->assertEquals('oro_tax_base_exclusion', $options['type']);
-        $this->assertArrayHasKey('show_form_when_empty', $options);
-        $this->assertFalse($options['show_form_when_empty']);
+        $this->assertEquals('oro_scope', $options['type']);
     }
 }
