@@ -8,7 +8,6 @@ use Symfony\Component\PropertyAccess\PropertyAccess;
 
 use Oro\Bundle\EmailBundle\Entity\EmailTemplate;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
-use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\EmailBundle\Form\Model\Email;
 
 class EmailTest extends \PHPUnit_Framework_TestCase
@@ -17,14 +16,19 @@ class EmailTest extends \PHPUnit_Framework_TestCase
      * @dataProvider propertiesDataProvider
      * @param string $property
      * @param mixed  $value
+     * @param mixed  $expectedValue
      */
-    public function testSettersAndGetters($property, $value)
+    public function testSettersAndGetters($property, $value, $expectedValue = null)
     {
+        if (!$expectedValue) {
+            $expectedValue = $value;
+        }
+
         $obj = new Email();
 
         $accessor = PropertyAccess::createPropertyAccessor();
         $accessor->setValue($obj, $property, $value);
-        $this->assertEquals($value, $accessor->getValue($obj, $property));
+        $this->assertEquals($expectedValue, $accessor->getValue($obj, $property));
     }
 
     public function propertiesDataProvider()
@@ -42,6 +46,8 @@ class EmailTest extends \PHPUnit_Framework_TestCase
             ['gridName', 'testGridName'],
             ['template', new EmailTemplate('test')],
             ['contexts', new ArrayCollection([new \stdClass()])],
+            ['contexts', [new \stdClass()], new ArrayCollection([new \stdClass()])],
+            ['contexts', null, new ArrayCollection()],
             ['organization', new Organization()]
         ];
     }

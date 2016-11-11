@@ -43,6 +43,7 @@ class EmbedFormFieldsTypeTest extends BlockTypeTestCase
                     'form_field_prefix' => 'form_',
                     'form_group_prefix' => 'form:group_',
                     'instance_name'     => '',
+                    'visible'           => true,
                 ]
             ],
             'with form_name'                 => [
@@ -58,6 +59,7 @@ class EmbedFormFieldsTypeTest extends BlockTypeTestCase
                     'form_field_prefix' => 'test_',
                     'form_group_prefix' => 'test:group_',
                     'instance_name'     => '',
+                    'visible'           => true,
                 ]
             ],
             'with form_name and form_prefix' => [
@@ -74,6 +76,7 @@ class EmbedFormFieldsTypeTest extends BlockTypeTestCase
                     'form_field_prefix' => 'test_prefix_',
                     'form_group_prefix' => 'test_prefix:group_',
                     'instance_name'     => '',
+                    'visible'           => true,
                 ]
             ],
             'all options'                    => [
@@ -94,6 +97,7 @@ class EmbedFormFieldsTypeTest extends BlockTypeTestCase
                     'form_field_prefix' => 'form_field_prefix_',
                     'form_group_prefix' => 'form_group_prefix_',
                     'instance_name'     => '',
+                    'visible'           => true,
                 ]
             ]
         ];
