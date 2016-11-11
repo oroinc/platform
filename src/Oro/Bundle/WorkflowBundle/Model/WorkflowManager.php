@@ -197,8 +197,10 @@ class WorkflowManager implements LoggerAwareInterface
         return $this->inTransaction(
             function (EntityManager $em) use ($workflow, $entity, $transition, &$data) {
                 $workflowItem = $workflow->start($entity, $data, $transition);
-                $em->persist($workflowItem);
-                $em->flush();
+                if ($workflowItem instanceof WorkflowItem) {
+                    $em->persist($workflowItem);
+                    $em->flush();
+                }
 
                 return $workflowItem;
             },

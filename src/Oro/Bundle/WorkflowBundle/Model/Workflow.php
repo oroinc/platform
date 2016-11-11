@@ -67,6 +67,9 @@ class Workflow
      */
     protected $restrictions;
 
+    /** @var \SplQueue  */
+    protected static $transitionStarted;
+
     /**
      * @param DoctrineHelper $doctrineHelper
      * @param AclManager $aclManager
@@ -150,7 +153,7 @@ class Workflow
      * @param array $data
      * @param string $startTransitionName
      *
-     * @return WorkflowItem
+     * @return WorkflowItem|null
      */
     public function start($entity, array $data = [], $startTransitionName = null)
     {
@@ -158,8 +161,13 @@ class Workflow
             $startTransitionName = TransitionManager::DEFAULT_START_TRANSITION_NAME;
         }
 
-        $workflowItem = $this->createWorkflowItem($entity, $data);
-        $this->transit($workflowItem, $startTransitionName);
+        $workflowItem = null;
+        if (true !== static::$transitionStarted) {
+            static::$transitionStarted = true;
+            $workflowItem = $this->createWorkflowItem($entity, $data);
+            $this->transit($workflowItem, $startTransitionName);
+            static::$transitionStarted = false;
+        }
 
         return $workflowItem;
     }
