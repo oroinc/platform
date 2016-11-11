@@ -207,6 +207,8 @@ class ConsumeMessagesCommandTest extends \PHPUnit_Framework_TestCase
     {
         $expectedException = new \Exception('the message');
 
+        $processor = $this->createDelegateMessageProcessorMock();
+
         $connection = $this->createConnectionMock();
         $connection
             ->expects($this->once())
@@ -216,35 +218,37 @@ class ConsumeMessagesCommandTest extends \PHPUnit_Framework_TestCase
         $consumer = $this->createQueueConsumerMock();
         $consumer
             ->expects($this->once())
+            ->method('bind')
+            ->with('aprefixt.adefaultqueuename', $this->identicalTo($processor))
+        ;
+        $consumer
+            ->expects($this->once())
             ->method('consume')
+            ->with($this->isInstanceOf(ChainExtension::class))
             ->willThrowException($expectedException)
         ;
-
         $consumer
             ->expects($this->once())
             ->method('getConnection')
             ->will($this->returnValue($connection))
         ;
 
+        $destinationMetaRegistry = $this->createDestinationMetaRegistry([
+            'default' => [],
+        ]);
 
         $logger = $this->createLoggerInterfaceMock();
         $logger
             ->expects($this->once())
             ->method('error')
-            ->with(
-                sprintf('Consume messages command exception. "%s"', $expectedException->getMessage()),
-                ['exception' => $expectedException]
-            )
+            ->with($this->identicalTo(
+                sprintf('Consume messages command exception. "%s"', $expectedException->getMessage())
+            ))
         ;
 
-        $command = new ConsumeMessagesCommand(
-            $consumer,
-            $this->createDelegateMessageProcessorMock(),
-            $this->createDestinationMetaRegistry([]),
-            $logger
-        );
-
         $this->setExpectedException(\Exception::class, $expectedException->getMessage());
+
+        $command = new ConsumeMessagesCommand($consumer, $processor, $destinationMetaRegistry, $logger);
 
         $tester = new CommandTester($command);
         $tester->execute([]);
