@@ -1,0 +1,95 @@
+{% block __oro_datagrid_server_render__datagrid_toolbar_widget %}
+    {% set attr = attr|merge({
+        class: attr.class|default('') ~ " grid-toolbar"
+    }) %}
+
+    <div{{ block('block_attributes') }}>
+        {{ block('container_widget') }}
+    </div>
+{% endblock %}
+
+{% block __oro_datagrid_server_render__datagrid_toolbar_pagination_widget %}
+    {% set attr = attr|merge({
+        class: attr.class|default('') ~ " pagination pagination-centered",
+        'data-grid-pagination': ''
+    }) %}
+
+    <div class="grid__tool">
+        <div{{ block('block_attributes') }}>
+            {# TODO: pagination #}
+
+            <span>Page:</span>
+            <div class="oro-pagination__pager">
+                <button class="oro-pagination__pager__prev disabled" data-grid-pagination-trigger data-grid-pagination-direction="prev" disabled>
+                    <i class="cf-left-open cf--base-line"></i>
+                </button>
+
+                <input type="text" class="oro-pagination__pager__input" value="1" data-grid-pagination-trigger-input>
+
+                <button class="oro-pagination__pager__next disabled" data-grid-pagination-trigger data-grid-pagination-direction="next" disabled>
+                    <i class="cf-right-open cf--base-line"></i>
+                </button>
+            </div>
+
+            <span class="hidden-sm hidden-xs">
+            of 1&nbsp;|
+            Total of 1 records
+            </span>
+        </div>
+    </div>
+{% endblock %}
+
+{% block __oro_datagrid_server_render__datagrid_toolbar_page_size_widget %}
+    {% set attr = attr|merge({
+        class: attr.class|default('') ~ " page-size pull-right form-horizontal",
+        'data-grid-pagesize': ''
+    }) %}
+
+    <div class="grid__tool">
+        <div{{ block('block_attributes') }}>
+            {# TODO: pagesize #}
+
+            <div class=" page-size pull-right form-horizontal" data-grid-pagesize="">
+                <span class="fs14 va-m_md">View per page: &nbsp;</span>
+                <div class="action-selectbox_custom_in-pager">
+                    <div class="select2-container oro-select2 input-widget" id="s2id_autogen1">
+                        <a href="javascript:void(0)" onclick="return false;" class="select2-choice" tabindex="-1">
+                            <span class="select2-chosen">25</span>
+                            <abbr class="select2-search-choice-close"></abbr>
+                            <span class="select2-arrow">
+                                <b></b>
+                            </span>
+                        </a>
+
+                        <input class="select2-focusser select2-offscreen" type="text" id="s2id_autogen2">
+                        <div class="select2-drop select2-display-none oro-select2__dropdown select2-with-searchbox">
+                            <ul class="select2-breadcrumbs"></ul>
+                            <div class="select2-search">
+                                <input type="text" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" class="select2-input">
+                            </div>
+                            <ul class="select2-results"></ul>
+                        </div>
+                    </div>
+
+                    <select class="select select--size-s select2-offscreen" name="action" data-grid-pagesize-selector="" data-bound-input-widget="select2" tabindex="-1">
+                        <option value="10" data-grid-pagesize-trigger="">10</option>
+                        <option selected="" value="25" data-grid-pagesize-trigger="">25</option>
+                        <option value="50" data-grid-pagesize-trigger="">50</option>
+                        <option value="100" data-grid-pagesize-trigger="">100</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block __oro_datagrid_server_render__datagrid_toolbar_actions_widget %}
+    {% set attr = attr|merge({
+        class: attr.class|default('') ~ " actions-panel pull-right form-horizontal",
+        'data-grid-actions-panel': ''
+    }) %}
+
+    <div{{ block('block_attributes') }}>
+        {# TODO: actions #}
+    </div>
+{% endblock %}

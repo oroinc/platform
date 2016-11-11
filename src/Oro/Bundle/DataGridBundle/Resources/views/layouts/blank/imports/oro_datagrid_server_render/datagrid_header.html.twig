@@ -1,0 +1,18 @@
+{% block datagrid_header_row_widget %}
+    {# TODO: add `block('block_attributes')` #}
+    <tr class="grid-header-row">
+        {% for child in block if child.vars.visible -%}
+            {{ block_widget(child, {'datagrid': datagrid}) }}
+        {%- endfor %}
+    </tr>
+{% endblock %}
+
+{% block datagrid_header_cell_widget %}
+    {# TODO: inject `datagrid` for getting datagrid metadata (need for rendering column) #}
+    {# TODO: add "sortable", "renderable", "ascending" classes based on configuration #}
+    {# TODO: add `block('block_attributes')` #}
+
+    <th class="grid-cell grid-header-cell grid-header-cell-{{ column_name }} sortable renderable ascending string-cell">
+        {{ oro_datagrid_column_name(datagrid, column_name) }}
+    </th>
+{% endblock %}

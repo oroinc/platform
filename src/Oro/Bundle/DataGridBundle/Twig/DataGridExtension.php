@@ -72,6 +72,7 @@ class DataGridExtension extends \Twig_Extension
             new \Twig_SimpleFunction('oro_datagrid_build_fullname', [$this, 'buildGridFullName']),
             new \Twig_SimpleFunction('oro_datagrid_build_inputname', [$this, 'buildGridInputName']),
             new \Twig_SimpleFunction('oro_datagrid_link', [$this->datagridRouteHelper, 'generate']),
+            new \Twig_SimpleFunction('oro_datagrid_column_name', [$this, 'getColumnLabel']),
         ];
     }
 
@@ -166,6 +167,27 @@ class DataGridExtension extends \Twig_Extension
     public function buildGridInputName($name)
     {
         return $this->nameStrategy->getGridUniqueName($name);
+    }
+
+    /**
+     * @param DatagridInterface $grid
+     * @param string            $columnName
+     *
+     * @return string|null
+     */
+    public function getColumnLabel(DatagridInterface $grid, $columnName)
+    {
+        $metadata = $grid->getMetadata()->toArray();
+
+        if (array_key_exists('columns', $metadata)) {
+            foreach ($metadata['columns'] as $column) {
+                if ($columnName === $column['name']) {
+                    return $column['label'];
+                }
+            }
+        }
+
+        return null;
     }
 
     /**

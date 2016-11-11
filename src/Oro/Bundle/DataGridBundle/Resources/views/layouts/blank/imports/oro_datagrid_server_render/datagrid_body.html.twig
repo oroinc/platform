@@ -1,0 +1,26 @@
+{# TODO: add row actions #}
+
+{% block datagrid_row_widget %}
+    {# TODO: add `block('block_attributes')` #}
+
+    <tr class="grid-row">
+        {% for child in block if child.vars.visible -%}
+            {{ block_widget(child, {'datagrid_row': datagrid_row}) }}
+        {%- endfor %}
+    </tr>
+{% endblock %}
+
+{% block datagrid_cell_widget %}
+    {# TODO: inject `datagrid` for getting datagrid metadata (need for rendering column) #}
+    {# TODO: add `block('block_attributes')` #}
+
+    <td class="string-cell grid-cell grid-body-cell grid-body-cell-{{ column_name }}">
+        {% for child in block if child.vars.visible -%}
+            {{ block_widget(child, {'datagrid_row': datagrid_row}) }}
+        {%- endfor %}
+    </td>
+{% endblock %}
+
+{%- block datagrid_cell_value_widget -%}
+    {{ datagrid_row[column_name] }}
+{%- endblock -%}
