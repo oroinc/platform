@@ -262,7 +262,7 @@ class TranslationManager
     /**
      * Returns the list of all existing in the database translation domains
      *
-     * @return array
+     * @return array ['domain' => '...']
      */
     public function getAvailableDomains()
     {

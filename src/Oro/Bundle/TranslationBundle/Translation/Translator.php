@@ -54,6 +54,12 @@ class Translator extends BaseTranslator
     /** @var array */
     protected $originalOptions;
 
+    /** @var array */
+    protected $resourceFiles = [];
+
+    /** @var array */
+    protected $resources = [];
+
     /**
      * {@inheritdoc}
      */
@@ -186,6 +192,24 @@ class Translator extends BaseTranslator
     /**
      * {@inheritdoc}
      */
+    public function addResource($format, $resource, $locale, $domain = null)
+    {
+        if (in_array([$locale, $format, $resource, $domain], $this->resources, true)) {
+            return;
+        }
+
+        if (is_string($resource) && is_file($resource)) {
+            $this->resourceFiles[$locale][] = $resource;
+        }
+
+        $this->resources[] = [$locale, $format, $resource, $domain];
+
+        parent::addResource($format, $resource, $locale, $domain);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function warmUp($cacheDir)
     {
         // skip warmUp when translator doesn't use cache
@@ -210,7 +234,10 @@ class Translator extends BaseTranslator
 
         $tmpDir = $cacheDir . uniqid('', true);
 
-        $options = array_merge($this->originalOptions, ['cache_dir' => $tmpDir]);
+        $options = array_merge(
+            $this->originalOptions,
+            ['cache_dir' => $tmpDir, 'resource_files' => $this->resourceFiles]
+        );
 
         $provider = $this->getStrategyProvider();
 
@@ -395,7 +422,7 @@ class Translator extends BaseTranslator
                     );
                     $item['format']   = 'oro_database_translation';
 
-                    $this->dynamicResources[$locale][] = $item;
+                    $this->dynamicResources[$item['code']][] = $item;
                 }
             }
         }
