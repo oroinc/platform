@@ -138,7 +138,7 @@ class BlockFactory implements BlockFactoryInterface
         // build child blocks
         $iterator = $this->rawLayout->getHierarchyIterator($rootId);
         foreach ($iterator as $id) {
-            if ($this->rawLayout->hasProperty($id, RawLayout::RESOLVED_OPTIONS, true)) {
+            if (!$this->rawLayout->has($id) || $this->rawLayout->hasProperty($id, RawLayout::RESOLVED_OPTIONS, true)) {
                 // the block is already built
                 continue;
             }
@@ -223,14 +223,18 @@ class BlockFactory implements BlockFactoryInterface
         $this->processExpressions($resolvedOptions);
         $resolvedOptions = $this->resolveValueBags($resolvedOptions);
 
-        // point the block builder state to the current block
-        $this->blockBuilder->initialize($id);
-        // iterate from parent to current
-        foreach ($types as $type) {
-            $type->buildBlock($this->blockBuilder, $resolvedOptions);
-            $this->registry->buildBlock($type->getName(), $this->blockBuilder, $resolvedOptions);
+        if ($resolvedOptions->get('visible') !== false) {
+            // point the block builder state to the current block
+            $this->blockBuilder->initialize($id);
+            // iterate from parent to current
+            foreach ($types as $type) {
+                $type->buildBlock($this->blockBuilder, $resolvedOptions);
+                $this->registry->buildBlock($type->getName(), $this->blockBuilder, $resolvedOptions);
+            }
+            $this->rawLayout->setProperty($id, RawLayout::RESOLVED_OPTIONS, $resolvedOptions);
+        } else {
+            $this->rawLayout->remove($id);
         }
-        $this->rawLayout->setProperty($id, RawLayout::RESOLVED_OPTIONS, $resolvedOptions);
     }
 
     /**
