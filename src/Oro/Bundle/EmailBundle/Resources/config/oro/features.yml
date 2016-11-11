@@ -64,3 +64,6 @@ features:
             - 'recent_emails'
         dashboard_widgets:
             - 'recent_emails'
+        entities:
+            - 'Oro\Bundle\EmailBundle\Entity\Email'
+            - 'Oro\Bundle\EmailBundle\Entity\EmailUser'

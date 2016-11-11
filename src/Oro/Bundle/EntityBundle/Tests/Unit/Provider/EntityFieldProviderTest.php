@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\EntityBundle\Tests\Unit\Provider;
 
+use Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker;
 use Symfony\Bridge\Doctrine\ManagerRegistry;
 use Symfony\Component\Translation\Translator;
 
@@ -52,6 +53,9 @@ class EntityFieldProviderTest extends \PHPUnit_Framework_TestCase
     /** @var ExclusionProviderInterface */
     protected $exclusionProvider;
 
+    /** @var FeatureChecker */
+    protected $featureChecker;
+
     protected function setUp()
     {
         $configManager = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\ConfigManager')
@@ -82,11 +86,17 @@ class EntityFieldProviderTest extends \PHPUnit_Framework_TestCase
 
         $this->exclusionProvider = $this->getMock('Oro\Bundle\EntityBundle\Provider\ExclusionProviderInterface');
 
+        $this->featureChecker = $this->getMockBuilder(FeatureChecker::class)
+            ->setMethods(['isResourceEnabled'])
+            ->disableOriginalConstructor()
+            ->getMock();
+
         $this->entityProvider = new EntityProvider(
             $this->entityConfigProvider,
             $this->extendConfigProvider,
             $this->entityClassResolver,
-            $this->translator
+            $this->translator,
+            $this->featureChecker
         );
         $this->entityProvider->setExclusionProvider($this->exclusionProvider);
 
