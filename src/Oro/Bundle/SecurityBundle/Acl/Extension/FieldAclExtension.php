@@ -79,6 +79,7 @@ class FieldAclExtension extends AbstractAclExtension
      * @param AccessLevelOwnershipDecisionMakerInterface $decisionMaker
      * @param EntityOwnerAccessor                        $entityOwnerAccessor
      * @param ConfigProvider                             $configProvider
+     * @param EntitySecurityMetadataProvider             $entityMetadataProvider
      */
     public function __construct(
         ObjectIdAccessor $objectIdAccessor,

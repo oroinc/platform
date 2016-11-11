@@ -2,9 +2,6 @@
 
 namespace Oro\Bundle\SecurityBundle\Acl\Extension;
 
-use Doctrine\Common\Collections\ArrayCollection;
-use Oro\Bundle\SecurityBundle\Acl\AccessLevel;
-use Oro\Bundle\SecurityBundle\Model\AclPermission;
 use Symfony\Component\Security\Acl\Model\ObjectIdentityInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 

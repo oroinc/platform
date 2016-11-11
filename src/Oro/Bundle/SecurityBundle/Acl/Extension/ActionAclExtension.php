@@ -11,23 +11,21 @@ use Oro\Bundle\SecurityBundle\Metadata\ActionMetadataProvider;
 
 class ActionAclExtension extends AbstractAclExtension
 {
-    /**
-     * @var ActionMetadataProvider
-     */
+    const NAME = 'action';
+
+    /** @var ActionMetadataProvider */
     protected $actionMetadataProvider;
 
     /**
-     * Constructor
+     * @param ActionMetadataProvider $actionMetadataProvider
      */
     public function __construct(ActionMetadataProvider $actionMetadataProvider)
     {
         $this->actionMetadataProvider = $actionMetadataProvider;
 
-        $this->map = array(
-            'EXECUTE' => array(
-                ActionMaskBuilder::MASK_EXECUTE,
-            ),
-        );
+        $this->map = [
+            'EXECUTE' => [ActionMaskBuilder::MASK_EXECUTE]
+        ];
     }
 
     /**
@@ -35,10 +33,10 @@ class ActionAclExtension extends AbstractAclExtension
      */
     public function getAccessLevelNames($object, $permissionName = null)
     {
-        return array(
-            AccessLevel::NONE_LEVEL => AccessLevel::NONE_LEVEL_NAME,
+        return [
+            AccessLevel::NONE_LEVEL   => AccessLevel::NONE_LEVEL_NAME,
             AccessLevel::SYSTEM_LEVEL => AccessLevel::getAccessLevelName(AccessLevel::SYSTEM_LEVEL)
-        );
+        ];
     }
 
     /**
@@ -56,7 +54,7 @@ class ActionAclExtension extends AbstractAclExtension
         }
 
         return $id === $this->getExtensionKey()
-            && $this->actionMetadataProvider->isKnownAction($type);
+        && $this->actionMetadataProvider->isKnownAction($type);
     }
 
     /**
@@ -64,7 +62,7 @@ class ActionAclExtension extends AbstractAclExtension
      */
     public function getExtensionKey()
     {
-        return 'action';
+        return self::NAME;
     }
 
     /**
@@ -112,7 +110,7 @@ class ActionAclExtension extends AbstractAclExtension
      */
     public function getAllMaskBuilders()
     {
-        return array(new ActionMaskBuilder());
+        return [new ActionMaskBuilder()];
     }
 
     /**
@@ -138,7 +136,7 @@ class ActionAclExtension extends AbstractAclExtension
      */
     public function getPermissions($mask = null, $setOnly = false, $byCurrentGroup = false)
     {
-        $result = array();
+        $result = [];
         if ($mask === null || !$setOnly || $mask !== 0) {
             $result[] = 'EXECUTE';
         }
@@ -151,7 +149,7 @@ class ActionAclExtension extends AbstractAclExtension
      */
     public function getAllowedPermissions(ObjectIdentity $oid, $fieldName = null)
     {
-        return array('EXECUTE');
+        return ['EXECUTE'];
     }
 
     /**
