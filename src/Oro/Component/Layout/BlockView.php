@@ -11,11 +11,6 @@ use Symfony\Component\Form\FormView;
 class BlockView extends FormView
 {
     /**
-     * @var string
-     */
-    private $id;
-
-    /**
      * All layout block views.
      *
      * @var BlockView[]
@@ -23,14 +18,11 @@ class BlockView extends FormView
     public $blocks = [];
 
     /**
-     * @param string $id
      * @param BlockView $parent
      */
-    public function __construct($id = '', BlockView $parent = null)
+    public function __construct(BlockView $parent = null)
     {
         parent::__construct($parent);
-
-        $this->id = $id;
 
         unset($this->vars['value']);
     }
@@ -40,6 +32,6 @@ class BlockView extends FormView
      */
     public function getId()
     {
-        return $this->id;
+        return array_key_exists('id', $this->vars) ? $this->vars['id'] : null;
     }
 }

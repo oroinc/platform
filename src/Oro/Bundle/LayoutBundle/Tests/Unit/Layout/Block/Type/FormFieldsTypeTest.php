@@ -236,7 +236,7 @@ class FormFieldsTypeTest extends BlockTypeTestCase
 
         $formName = 'form';
         $rootView = new BlockView();
-        $view = new BlockView('', $rootView);
+        $view = new BlockView($rootView);
         $block = $this->getMock('Oro\Component\Layout\BlockInterface');
         $formAccessor = $this->getMock('Oro\Bundle\LayoutBundle\Layout\Form\FormAccessorInterface');
 
@@ -269,7 +269,7 @@ class FormFieldsTypeTest extends BlockTypeTestCase
 
         $formName = 'form';
         $rootView = new BlockView();
-        $view = new BlockView('', $rootView);
+        $view = new BlockView($rootView);
         $block = $this->getMock('Oro\Component\Layout\BlockInterface');
         $formAccessor = $this->getMock('Oro\Bundle\LayoutBundle\Layout\Form\FormAccessorInterface');
         $context = new LayoutContext();
@@ -287,14 +287,14 @@ class FormFieldsTypeTest extends BlockTypeTestCase
         $field3View->children['field31'] = new FormView($field3View);
         $field3View->children['field32'] = new FormView($field3View);
 
-        $view->children['block1'] = new BlockView('', $view);
+        $view->children['block1'] = new BlockView($view);
         $view->children['block1']->vars['form'] = $formView->children['field1'];
         $rootView->children['block'] = $view;
-        $rootView->children['block3'] = new BlockView('', $rootView);
+        $rootView->children['block3'] = new BlockView($rootView);
         $rootView->children['block3']->vars['form'] = $field3View->children['field31'];
-        $rootView->children['block4'] = new BlockView('', $rootView);
+        $rootView->children['block4'] = new BlockView($rootView);
         // emulate remove form field blocks and then add new blocks with same ids
-        $view->children['block2'] = new BlockView('', $view);
+        $view->children['block2'] = new BlockView($view);
         $rootView->children['block4']->vars['form'] = new FormView();
 
         $this->setLayoutBlocks(['root' => $rootView]);
@@ -349,9 +349,9 @@ class FormFieldsTypeTest extends BlockTypeTestCase
         $field3View->children['field31'] = new FormView($field3View);
         $field3View->children['field32'] = new FormView($field3View);
 
-        $view->children['block1'] = new BlockView('', $view);
+        $view->children['block1'] = new BlockView($view);
         $view->children['block1']->vars['form'] = $formView['field1'];
-        $view->children['block3'] = new BlockView('', $view);
+        $view->children['block3'] = new BlockView($view);
         $view->children['block3']->vars['form'] = $field3View['field31'];
 
         $this->setLayoutBlocks(['root' => $view]);

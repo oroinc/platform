@@ -52,15 +52,12 @@ class BlockViewNormalizer implements NormalizerInterface, DenormalizerInterface,
         /** @var BlockView $view */
         $view = $object;
 
-        $data = [
-            'id' => $view->getId()
-        ];
+        $data = [];
 
         if (!empty($view->vars)) {
             $data['vars'] = $view->vars;
 
-            unset($data['vars']['block']);
-            unset($data['vars']['blocks']);
+            unset($data['vars']['block'], $data['vars']['blocks']);
 
             array_walk_recursive(
                 $data['vars'],
@@ -93,7 +90,7 @@ class BlockViewNormalizer implements NormalizerInterface, DenormalizerInterface,
      */
     public function supportsDenormalization($data, $type, $format = null)
     {
-        return $type == BlockView::class;
+        return $type === BlockView::class;
     }
 
     /**
@@ -101,7 +98,8 @@ class BlockViewNormalizer implements NormalizerInterface, DenormalizerInterface,
      */
     public function denormalize($data, $class, $format = null, array $context = [])
     {
-        $view = new BlockView($data['id']);
+        $view = new BlockView();
+        $view->vars['id'] = $data['vars']['id'];
 
         $recursiveCall = array_key_exists('blockViewDenormalizeRecursiveCall', $context);
         if (!$recursiveCall) {
