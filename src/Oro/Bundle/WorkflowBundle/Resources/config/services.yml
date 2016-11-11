@@ -339,6 +339,13 @@ services:
         tags:
             - { name: oro_translation.extension.translation_context_resolver }
 
+    oro_workflow.extension.transition_button_provider:
+        class: 'Oro\Bundle\WorkflowBundle\Extension\TransitionButtonProviderExtension'
+        arguments:
+            - '@oro_workflow.registry'
+        tags:
+           - { name: oro.action.extension.button_provider, priority: 110 }
+
     oro_workflow.translation.key_template_parameters_resolver:
         class: 'Oro\Bundle\WorkflowBundle\Translation\KeyTemplateParametersResolver'
         arguments:
