@@ -156,11 +156,10 @@ class EntityAclExtensionTest extends \PHPUnit_Framework_TestCase
             $this->tree,
             new ObjectIdAccessor($this->doctrineHelper),
             $this->decisionMaker,
+            $entityOwnerAccessor,
             $this->permissionManager,
             $this->groupProvider
         );
-
-        $this->extension->setEntityOwnerAccessor($entityOwnerAccessor);
     }
 
     private function buildTestTree()
@@ -456,6 +455,7 @@ class EntityAclExtensionTest extends \PHPUnit_Framework_TestCase
             $entityClassResolver,
             $this->securityMetadataProvider,
             $this->metadataProvider,
+            new EntityOwnerAccessor($this->metadataProvider),
             $this->decisionMaker,
             $this->permissionManager,
             $this->groupProvider,
@@ -1176,6 +1176,7 @@ class EntityAclExtensionTest extends \PHPUnit_Framework_TestCase
             $entityClassResolverMock,
             $entityMetadataProvider,
             $this->metadataProvider,
+            new EntityOwnerAccessor($this->metadataProvider),
             $this->decisionMaker,
             $this->permissionManager,
             $this->groupProvider,

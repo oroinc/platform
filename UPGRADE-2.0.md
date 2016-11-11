@@ -351,6 +351,10 @@ To migrate all labels from configuration translatable fields automatically you c
 - Added layout data provider `\Oro\Bundle\SecurityBundle\Layout\DataProvider\CurrentUserProvider` with method `getCurrentUser`, from now use `=data['current_user'].getCurrentUser()` instead of `=context["logged_user"]`.
 - ACLs configuration file now loads from `Resources/config/oro/acls.yml` file instead of `Resources/config/oro/acls.yml` file
 - ACLs configuration file now has root node in their structure named `acls`. So all ACLs should be placed under the root.
+- Removed unused properties `$metadataCache`, `$maskBuilderClassNames`, `$permissionToMaskBuilderIdentity` and `$maskBuilderIdentityToPermissions` from `Oro\Bundle\SecurityBundle\Acl\Extension\FieldAclExtension`.
+- Removed methods `getMaskBuilderConst` and `getPermissionsForIdentity` from `Oro\Bundle\SecurityBundle\Acl\Extension\FieldAclExtension`.
+- Removed methods `setEntityOwnerAccessor` and `fixMaxAccessLevel` from `Oro\Bundle\SecurityBundle\Acl\Extension\EntityAclExtension`. The accessor is injected via constructor.
+- Removed `Oro\Bundle\SecurityBundle\Acl\Extension\OwnershipDecisionMakerInterface`. Use `Oro\Bundle\SecurityBundle\Acl\Extension\AccessLevelOwnershipDecisionMakerInterface` instead.
 
 ####ImportExportBundle
 - Added new event `AFTER_JOB_EXECUTION`, for details please check out [documentation](./src/Oro/Bundle/ImportExportBundle/Resources/doc/reference/events.md).
