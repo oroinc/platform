@@ -13,6 +13,8 @@ class ActionAclExtension extends AbstractAclExtension
 {
     const NAME = 'action';
 
+    const PERMISSION_EXECUTE = 'EXECUTE';
+
     /** @var ActionMetadataProvider */
     protected $actionMetadataProvider;
 
@@ -24,7 +26,7 @@ class ActionAclExtension extends AbstractAclExtension
         $this->actionMetadataProvider = $actionMetadataProvider;
 
         $this->map = [
-            'EXECUTE' => [ActionMaskBuilder::MASK_EXECUTE]
+            self::PERMISSION_EXECUTE => [ActionMaskBuilder::MASK_EXECUTE]
         ];
     }
 
@@ -53,8 +55,9 @@ class ActionAclExtension extends AbstractAclExtension
             $type = ltrim(substr($type, $delim + 1), ' ');
         }
 
-        return $id === $this->getExtensionKey()
-        && $this->actionMetadataProvider->isKnownAction($type);
+        return
+            $id === $this->getExtensionKey()
+            && $this->actionMetadataProvider->isKnownAction($type);
     }
 
     /**
@@ -136,12 +139,11 @@ class ActionAclExtension extends AbstractAclExtension
      */
     public function getPermissions($mask = null, $setOnly = false, $byCurrentGroup = false)
     {
-        $result = [];
         if ($mask === null || !$setOnly || $mask !== 0) {
-            $result[] = 'EXECUTE';
+            return [self::PERMISSION_EXECUTE];
         }
 
-        return $result;
+        return [];
     }
 
     /**
@@ -149,7 +151,7 @@ class ActionAclExtension extends AbstractAclExtension
      */
     public function getAllowedPermissions(ObjectIdentity $oid, $fieldName = null)
     {
-        return ['EXECUTE'];
+        return [self::PERMISSION_EXECUTE];
     }
 
     /**
@@ -157,7 +159,7 @@ class ActionAclExtension extends AbstractAclExtension
      */
     public function getDefaultPermission()
     {
-        return 'EXECUTE';
+        return self::PERMISSION_EXECUTE;
     }
 
     /**
