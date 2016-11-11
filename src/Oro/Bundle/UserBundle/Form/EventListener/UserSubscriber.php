@@ -82,17 +82,25 @@ class UserSubscriber implements EventSubscriberInterface
             $form->remove('plainPassword');
         }
 
-        // do not allow user to disable his own account
+        if (!$this->isCurrentUser($entity)) {
+            $form->remove('change_password');
+        }
+
+        // do not allow editing of Enabled status
+        if (!empty($entity->getId())) {
+            return;
+        }
+
         $form->add(
             $this->factory->createNamed(
                 'enabled',
                 'choice',
-                $entity->getId() ? $entity->isEnabled() : '',
+                '',
                 [
-                    'label' => 'Status',
+                    'label' => 'oro.user.enabled.label',
                     'required' => true,
-                    'disabled' => $this->isCurrentUser($entity),
-                    'choices' => ['Inactive', 'Active'],
+                    'disabled' => false,
+                    'choices' => ['Disabled', 'Enabled'],
                     'empty_value' => 'Please select',
                     'empty_data' => '',
                     'auto_initialize' => false
@@ -100,9 +108,6 @@ class UserSubscriber implements EventSubscriberInterface
             )
         );
 
-        if (!$this->isCurrentUser($entity)) {
-            $form->remove('change_password');
-        }
     }
 
     /**

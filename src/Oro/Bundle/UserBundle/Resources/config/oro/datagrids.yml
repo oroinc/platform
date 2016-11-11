@@ -39,8 +39,8 @@ datagrids:
                         view_options:
                             key_type: 'boolean'
                 choices:
-                   - Inactive
-                   - Active
+                   - Disabled
+                   - Enabled
             createdAt:
                 label:         oro.ui.created_at
                 frontend_type: datetime

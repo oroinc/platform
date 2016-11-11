@@ -74,7 +74,7 @@
             {
                 'title': '',
                 'data': [
-                    form_row(form.enabled),
+                    form.enabled is defined ? form_row(form.enabled),
                     form_row(form.username),
                     form.plainPassword is defined ? form_row(form.plainPassword) : '',
                     form_row(form.namePrefix),
