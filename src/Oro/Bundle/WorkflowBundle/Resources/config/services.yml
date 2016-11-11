@@ -255,6 +255,9 @@ services:
             - '@oro_entity.doctrine_helper'
             - '@oro_workflow.helper.workflow_aware_entity_fetcher'
 
+    oro_workflow.helper.transition:
+        class: 'Oro\Bundle\WorkflowBundle\Helper\TransitionHelper'
+
     oro_workflow.transition_trigger.cron_scheduler:
         class: 'Oro\Bundle\WorkflowBundle\Cron\TransitionTriggerCronScheduler'
         arguments:

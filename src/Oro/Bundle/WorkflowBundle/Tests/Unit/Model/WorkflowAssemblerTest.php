@@ -5,6 +5,7 @@ namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Model;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 
+use Oro\Bundle\WorkflowBundle\Helper\TransitionHelper;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 use Oro\Bundle\WorkflowBundle\Configuration\WorkflowConfiguration;
@@ -60,7 +61,12 @@ class WorkflowAssemblerTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        return new Workflow($doctrineHelper, $aclManager, $restrictionManager);
+        $transitionHelper = $this->getMockBuilder(TransitionHelper::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
+
+        return new Workflow($doctrineHelper, $aclManager, $restrictionManager, $transitionHelper);
     }
 
     /**

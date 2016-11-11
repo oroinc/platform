@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Model;
 
+use Oro\Bundle\WorkflowBundle\Helper\TransitionHelper;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
@@ -1059,9 +1060,14 @@ class WorkflowManagerTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
+        $transitionHelper = $this->getMockBuilder(TransitionHelper::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
+
         $workflow = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Model\Workflow')
             ->setConstructorArgs(
-                [$doctrineHelper, $aclManager, $restrictionManager, null, $attributeManager, $transitionManager]
+                [$doctrineHelper, $aclManager, $restrictionManager, $transitionHelper, null, $attributeManager, $transitionManager]
             )
             ->setMethods(
                 [

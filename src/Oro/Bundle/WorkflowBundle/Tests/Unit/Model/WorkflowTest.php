@@ -11,6 +11,7 @@ use Oro\Bundle\WorkflowBundle\Acl\AclManager;
 use Oro\Bundle\WorkflowBundle\Configuration\WorkflowConfiguration;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowStep;
+use Oro\Bundle\WorkflowBundle\Helper\TransitionHelper;
 use Oro\Bundle\WorkflowBundle\Model\TransitionManager;
 use Oro\Bundle\WorkflowBundle\Model\Workflow;
 use Oro\Bundle\WorkflowBundle\Model\Step;
@@ -809,10 +810,16 @@ class WorkflowTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
+        $transitionHelper = $this->getMockBuilder(TransitionHelper::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
+
         $workflow = new Workflow(
             $this->doctrineHelper,
             $aclManager,
             $restrictionManager,
+            $transitionHelper,
             null,
             $attributeManager,
             $transitionManager

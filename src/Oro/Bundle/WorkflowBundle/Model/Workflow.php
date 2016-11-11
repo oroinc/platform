@@ -18,6 +18,7 @@ use Oro\Bundle\WorkflowBundle\Exception\ForbiddenTransitionException;
 use Oro\Bundle\WorkflowBundle\Exception\UnknownStepException;
 use Oro\Bundle\WorkflowBundle\Exception\InvalidTransitionException;
 use Oro\Bundle\WorkflowBundle\Exception\WorkflowException;
+use Oro\Bundle\WorkflowBundle\Helper\TransitionHelper;
 use Oro\Bundle\WorkflowBundle\Restriction\RestrictionManager;
 
 class Workflow
@@ -67,13 +68,14 @@ class Workflow
      */
     protected $restrictions;
 
-    /** @var \SplQueue  */
-    protected static $transitionStarted;
+    /** @var TransitionHelper */
+    protected $transitionHelper;
 
     /**
      * @param DoctrineHelper $doctrineHelper
      * @param AclManager $aclManager
      * @param RestrictionManager $restrictionManager
+     * @param TransitionHelper $transitionHelper
      * @param StepManager|null $stepManager
      * @param BaseAttributeManager|null $attributeManager
      * @param TransitionManager|null $transitionManager
@@ -82,6 +84,7 @@ class Workflow
         DoctrineHelper $doctrineHelper,
         AclManager $aclManager,
         RestrictionManager $restrictionManager,
+        TransitionHelper $transitionHelper,
         StepManager $stepManager = null,
         BaseAttributeManager $attributeManager = null,
         TransitionManager $transitionManager = null
@@ -89,6 +92,7 @@ class Workflow
         $this->doctrineHelper = $doctrineHelper;
         $this->aclManager = $aclManager;
         $this->restrictionManager = $restrictionManager;
+        $this->transitionHelper = $transitionHelper;
         $this->stepManager = $stepManager ? $stepManager : new StepManager();
         $this->attributeManager = $attributeManager ? $attributeManager : new BaseAttributeManager();
         $this->transitionManager = $transitionManager ? $transitionManager : new TransitionManager();
@@ -162,11 +166,14 @@ class Workflow
         }
 
         $workflowItem = null;
-        if (true !== static::$transitionStarted) {
-            static::$transitionStarted = true;
+        $workflowName = $this->getName();
+        if (!$this->transitionHelper->isStartedWorkflowTransition($entity, $workflowName)) {
+            $this->transitionHelper->addWorkflowTransition($entity, $workflowName);
+
             $workflowItem = $this->createWorkflowItem($entity, $data);
             $this->transit($workflowItem, $startTransitionName);
-            static::$transitionStarted = false;
+
+            $this->transitionHelper->removeWorkflowTransition($entity, $workflowName);
         }
 
         return $workflowItem;

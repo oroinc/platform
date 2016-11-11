@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Form\Type;
 
+use Oro\Bundle\WorkflowBundle\Helper\TransitionHelper;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\Form\PreloadedExtension;
@@ -73,7 +74,12 @@ class WorkflowTransitionTypeTest extends AbstractWorkflowAttributesTypeTestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $workflow = new Workflow($doctrineHelper, $aclManager, $restrictionManager);
+        $transitionHelper = $this->getMockBuilder(TransitionHelper::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
+
+        $workflow = new Workflow($doctrineHelper, $aclManager, $restrictionManager, $transitionHelper);
         $workflow->getTransitionManager()->setTransitions(array($transition));
 
         $options = array(
