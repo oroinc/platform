@@ -81,6 +81,9 @@ class TestHelper
      * @param PermissionManager $permissionManager
      * @param AclGroupProviderInterface $groupProvider
      * @return EntityAclExtension
+     *
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
+     * @SuppressWarnings(PHPMD.NPathComplexity)
      */
     public function createEntityAclExtension(
         OwnershipMetadataProvider $metadataProvider = null,
