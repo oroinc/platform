@@ -142,15 +142,9 @@ class EntityAclExtension extends AbstractAccessLevelAclExtension
             return true;
         }
 
-        $delim = strpos($type, '@');
-        if ($delim !== false) {
-            $type = ltrim(substr($type, $delim + 1), ' ');
-        }
-
+        $type = ClassUtils::getRealClass(ObjectIdentityHelper::normalizeType($type));
         if ($id === $this->getExtensionKey()) {
-            $type = $this->entityClassResolver->getEntityClass(ClassUtils::getRealClass($type));
-        } else {
-            $type = ClassUtils::getRealClass($type);
+            $type = $this->entityClassResolver->getEntityClass($type);
         }
 
         return $this->entityClassResolver->isEntity($type);
@@ -206,7 +200,7 @@ class EntityAclExtension extends AbstractAccessLevelAclExtension
             $class = $this->entityClassResolver->getEntityClass($val->getClass());
             $group = $val->getGroup();
 
-            return new ObjectIdentity($val->getType(), !empty($group) ? $group . '@' . $class : $class);
+            return new ObjectIdentity($val->getType(), ObjectIdentityHelper::buildType($class, $group));
         }
 
         return $this->fromDomainObject($val);
@@ -462,7 +456,7 @@ class EntityAclExtension extends AbstractAccessLevelAclExtension
         $type = $this->entityClassResolver->getEntityClass(ClassUtils::getRealClass($type));
 
         if ($id === $this->getExtensionKey()) {
-            return new ObjectIdentity($id, !empty($group) ? $group . '@' . $type : $type);
+            return new ObjectIdentity($id, ObjectIdentityHelper::buildType($type, $group));
         }
 
         throw new \InvalidArgumentException(

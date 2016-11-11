@@ -8,6 +8,8 @@ class ObjectIdentityHelper
 
     const IDENTITY_TYPE_DELIMITER = ':';
 
+    const GROUP_DELIMITER = '@';
+
     /**
      * Parse identity string to array of values: id, type, and fieldName
      * Examples of string formats:
@@ -117,5 +119,56 @@ class ObjectIdentityHelper
     public static function isFieldEncodedKey($key)
     {
         return (bool)strpos($key, self::FIELD_DELIMITER);
+    }
+
+    /**
+     * Removes a group identifier if exists.
+     *
+     * @param string      $type
+     * @param string|null $group
+     *
+     * @return string
+     */
+    public static function buildType($type, $group = null)
+    {
+        return empty($group)
+            ? $type
+            : $group . self::GROUP_DELIMITER . $type;
+    }
+
+    /**
+     * Removes a group identifier from the given value.
+     *
+     * @param string $type
+     *
+     * @return string
+     */
+    public static function normalizeType($type)
+    {
+        $delim = strpos($type, self::GROUP_DELIMITER);
+        if (false !== $delim) {
+            $type = ltrim(substr($type, $delim + 1), ' ');
+        }
+
+        return $type;
+    }
+
+    /**
+     * Extracts the normalized type and a group identifier from the given value.
+     *
+     * @param string $type
+     *
+     * @return array [type, group]
+     */
+    public static function parseType($type)
+    {
+        $group = null;
+        $delim = strpos($type, self::GROUP_DELIMITER);
+        if (false !== $delim) {
+            $group = strtolower(ltrim(substr($type, 0, $delim), ' '));
+            $type = ltrim(substr($type, $delim + 1), ' ');
+        }
+
+        return [$type, $group];
     }
 }

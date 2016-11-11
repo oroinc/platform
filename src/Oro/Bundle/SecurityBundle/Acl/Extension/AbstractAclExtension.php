@@ -81,15 +81,16 @@ abstract class AbstractAclExtension implements AclExtensionInterface
     /**
      * Split the given object identity descriptor
      *
-     * @param string $descriptor
-     * @param string $type [output]
-     * @param string $id [output]
-     * @param string $group
+     * @param string $descriptor The ACL descriptor to parse
+     * @param string $type       [output]
+     * @param string $id         [output]
+     * @param string $group      [output]
+     *
      * @throws \InvalidArgumentException
      */
     protected function parseDescriptor($descriptor, &$type, &$id, &$group)
     {
-        $delim = strpos($descriptor, ':');
+        $delim = strpos($descriptor, ObjectIdentityHelper::IDENTITY_TYPE_DELIMITER);
         if (!$delim) {
             throw new \InvalidArgumentException(
                 sprintf('Incorrect descriptor: %s. Expected "ExtensionKey:Class".', $descriptor)
@@ -97,21 +98,16 @@ abstract class AbstractAclExtension implements AclExtensionInterface
         }
 
         $id = strtolower(substr($descriptor, 0, $delim));
-        $type = ltrim(substr($descriptor, $delim + 1), ' ');
-
-        $delim = strpos($type, '@');
-        if ($delim !== false) {
-            $group = strtolower(ltrim(substr($type, 0, $delim), ' '));
-            $type = ltrim(substr($type, $delim + 1), ' ');
-        }
+        list($type, $group) = ObjectIdentityHelper::parseType(ltrim(substr($descriptor, $delim + 1), ' '));
     }
 
     /**
      * Builds InvalidAclMaskException object
      *
-     * @param int $mask
-     * @param mixed $object
+     * @param int         $mask
+     * @param mixed       $object
      * @param string|null $errorDescription
+     *
      * @return InvalidAclMaskException
      */
     protected function createInvalidAclMaskException($mask, $object, $errorDescription = null)

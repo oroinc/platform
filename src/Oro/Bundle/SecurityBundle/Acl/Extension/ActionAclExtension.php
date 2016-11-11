@@ -50,14 +50,9 @@ class ActionAclExtension extends AbstractAclExtension
             return $id === $this->getExtensionKey();
         }
 
-        $delim = strpos($type, '@');
-        if ($delim !== false) {
-            $type = ltrim(substr($type, $delim + 1), ' ');
-        }
-
         return
             $id === $this->getExtensionKey()
-            && $this->actionMetadataProvider->isKnownAction($type);
+            && $this->actionMetadataProvider->isKnownAction(ObjectIdentityHelper::normalizeType($type));
     }
 
     /**
@@ -97,7 +92,7 @@ class ActionAclExtension extends AbstractAclExtension
             $group = $val->getGroup();
         }
 
-        return new ObjectIdentity($id, !empty($group) ? $group . '@' . $type : $type);
+        return new ObjectIdentity($id, ObjectIdentityHelper::buildType($type, $group));
     }
 
     /**

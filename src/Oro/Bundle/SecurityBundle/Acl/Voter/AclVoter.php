@@ -11,6 +11,7 @@ use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Oro\Bundle\SecurityBundle\Acl\Domain\PermissionGrantingStrategyContextInterface;
 use Oro\Bundle\SecurityBundle\Acl\Extension\AclExtensionSelector;
 use Oro\Bundle\SecurityBundle\Acl\Extension\AclExtensionInterface;
+use Oro\Bundle\SecurityBundle\Acl\Extension\ObjectIdentityHelper;
 use Oro\Bundle\SecurityBundle\Acl\Domain\OneShotIsGrantedObserver;
 use Oro\Bundle\SecurityBundle\Acl\Group\AclGroupProviderInterface;
 
@@ -193,12 +194,9 @@ class AclVoter extends BaseAclVoter implements PermissionGrantingStrategyContext
         $group = null;
 
         if ($object instanceof ObjectIdentity) {
-            $type = $object->getType();
-
-            $delim = strpos($type, '@');
-            if ($delim) {
-                $object = new ObjectIdentity($this->object->getIdentifier(), ltrim(substr($type, $delim + 1), ' '));
-                $group = ltrim(substr($type, 0, $delim), ' ');
+            list($type, $group) = ObjectIdentityHelper::parseType($object->getType());
+            if (null !== $group) {
+                $object = new ObjectIdentity($this->object->getIdentifier(), $type);
             } else {
                 $group = AclGroupProviderInterface::DEFAULT_SECURITY_GROUP;
             }
