@@ -16,7 +16,7 @@ use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityConfigBundle\Translation\ConfigTranslationHelper;
 use Oro\Bundle\EntityExtendBundle\Entity\AbstractEnumValue;
 use Oro\Bundle\EntityExtendBundle\Entity\Repository\EnumValueRepository;
-use Oro\Bundle\TranslationBundle\Entity\Translation;
+use Oro\Bundle\TranslationBundle\Translation\Translator;
 
 /**
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
@@ -90,7 +90,7 @@ class EnumSynchronizer
                     $enumOptions        = $enumFieldConfig->get('enum_options');
 
                     if (empty($locale)) {
-                        $locale = Translation::DEFAULT_LOCALE;
+                        $locale = Translator::DEFAULT_LOCALE;
                     }
 
                     if (!empty($enumName)) {
@@ -140,7 +140,7 @@ class EnumSynchronizer
             // labels initialization
             $labelsToBeUpdated[$labelKey]       = $enumName;
             $labelsToBeUpdated[$pluralLabelKey] = $enumName;
-            if ($locale === Translation::DEFAULT_LOCALE) {
+            if ($locale === Translator::DEFAULT_LOCALE) {
                 // set empty description only for default locale
                 $labelsToBeUpdated[$descriptionKey] = '';
             }
@@ -237,7 +237,7 @@ class EnumSynchronizer
         }
 
         if (!empty($changes)) {
-            if ($locale !== Translation::DEFAULT_LOCALE) {
+            if ($locale !== Translator::DEFAULT_LOCALE) {
                 foreach ($changes as $value) {
                     $value->setLocale($locale);
                 }

@@ -520,11 +520,11 @@ class Email implements OrganizationAwareInterface
      */
     public function setContexts($contexts)
     {
-        if (is_array($contexts)) {
+        if (!$contexts) {
+            $contexts = new ArrayCollection();
+        } elseif (is_array($contexts)) {
             $contexts = new ArrayCollection($contexts);
-        }
-
-        if (!$contexts instanceof Collection) {
+        } elseif (!$contexts instanceof Collection) {
             throw new \InvalidArgumentException(sprintf(
                 'setContexts expects $contexts to be array or doctrine collection but "%s" given.',
                 is_object($contexts) ? get_class($contexts) : gettype($contexts)

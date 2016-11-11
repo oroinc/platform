@@ -41,11 +41,13 @@ class BuildSingleItemResultDocumentTest extends GetProcessorTestCase
         $this->documentBuilder->expects($this->once())
             ->method('setDataObject')
             ->with(null);
-        $this->documentBuilder->expects($this->once())
+        $this->documentBuilder->expects($this->never())
             ->method('getDocument');
 
         $this->context->setResult(null);
         $this->processor->process($this->context);
+        $this->assertSame($this->documentBuilder, $this->context->getResponseDocumentBuilder());
+        $this->assertFalse($this->context->hasResult());
     }
 
     public function testProcessContextWithoutErrorsOnNonEmptyResult()
@@ -56,12 +58,14 @@ class BuildSingleItemResultDocumentTest extends GetProcessorTestCase
         $this->documentBuilder->expects($this->once())
             ->method('setDataObject')
             ->with($result, $metadata);
-        $this->documentBuilder->expects($this->once())
+        $this->documentBuilder->expects($this->never())
             ->method('getDocument');
 
         $this->context->setResult($result);
         $this->context->setMetadata($metadata);
         $this->processor->process($this->context);
+        $this->assertSame($this->documentBuilder, $this->context->getResponseDocumentBuilder());
+        $this->assertFalse($this->context->hasResult());
     }
 
     public function testProcessWithErrors()
@@ -70,7 +74,7 @@ class BuildSingleItemResultDocumentTest extends GetProcessorTestCase
 
         $this->documentBuilder->expects($this->never())
             ->method('setDataObject');
-        $this->documentBuilder->expects($this->once())
+        $this->documentBuilder->expects($this->never())
             ->method('getDocument');
         $this->documentBuilder->expects($this->once())
             ->method('setErrorCollection')
@@ -78,7 +82,10 @@ class BuildSingleItemResultDocumentTest extends GetProcessorTestCase
 
         $this->context->setClassName('Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\User');
         $this->context->addError($error);
+        $this->context->setResult([]);
         $this->processor->process($this->context);
+        $this->assertSame($this->documentBuilder, $this->context->getResponseDocumentBuilder());
+        $this->assertFalse($this->context->hasResult());
 
         $this->assertFalse($this->context->hasErrors());
     }
@@ -90,7 +97,7 @@ class BuildSingleItemResultDocumentTest extends GetProcessorTestCase
         $this->documentBuilder->expects($this->once())
             ->method('setDataObject')
             ->willThrowException($exception);
-        $this->documentBuilder->expects($this->once())
+        $this->documentBuilder->expects($this->never())
             ->method('getDocument');
         $this->documentBuilder->expects($this->once())
             ->method('setErrorObject');
@@ -103,6 +110,8 @@ class BuildSingleItemResultDocumentTest extends GetProcessorTestCase
 
         $this->context->setResult(null);
         $this->processor->process($this->context);
+        $this->assertSame($this->documentBuilder, $this->context->getResponseDocumentBuilder());
+        $this->assertFalse($this->context->hasResult());
 
         $this->assertEquals(500, $this->context->getResponseStatusCode());
     }

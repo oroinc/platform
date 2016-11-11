@@ -1,6 +1,6 @@
 {% import 'OroEmailBundle::macros.html.twig' as EA %}
 
-{% set date = record.getValue('email.sentAt') %}
+{% set date = record.getValue('receivedAt') %}
 {% set isNew = record.getValue('is_new') %}
 
 <span class="nowrap">

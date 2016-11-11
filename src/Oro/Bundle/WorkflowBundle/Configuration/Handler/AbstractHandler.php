@@ -6,16 +6,6 @@ abstract class AbstractHandler implements ConfigurationHandlerInterface
 {
     /**
      * @param array $configuration
-     * @param array $keys
-     * @return array
-     */
-    protected function filterKeys(array $configuration, array $keys)
-    {
-        return array_intersect_key($configuration, array_flip($keys));
-    }
-
-    /**
-     * @param array $configuration
      * @param string $groupKey
      * @param string $entityName
      * @return bool

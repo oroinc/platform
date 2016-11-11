@@ -55,14 +55,16 @@ abstract class BuildResultDocument implements ProcessorInterface
                 $this->processException($context, $e);
                 $context->resetErrors();
             }
-            $context->setResult($this->documentBuilder->getDocument());
+            $context->removeResult();
+            $context->setResponseDocumentBuilder($this->documentBuilder);
         } elseif ($context->hasResult()) {
             try {
                 $this->processResult($context);
             } catch (\Exception $e) {
                 $this->processException($context, $e);
             }
-            $context->setResult($this->documentBuilder->getDocument());
+            $context->removeResult();
+            $context->setResponseDocumentBuilder($this->documentBuilder);
         }
     }
 
