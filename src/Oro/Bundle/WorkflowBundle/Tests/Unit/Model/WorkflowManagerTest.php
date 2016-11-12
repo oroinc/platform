@@ -1067,7 +1067,15 @@ class WorkflowManagerTest extends \PHPUnit_Framework_TestCase
 
         $workflow = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Model\Workflow')
             ->setConstructorArgs(
-                [$doctrineHelper, $aclManager, $restrictionManager, $transitionHelper, null, $attributeManager, $transitionManager]
+                [
+                    $doctrineHelper,
+                    $aclManager,
+                    $restrictionManager,
+                    $transitionHelper,
+                    null,
+                    $attributeManager,
+                    $transitionManager
+                ]
             )
             ->setMethods(
                 [

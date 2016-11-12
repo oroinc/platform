@@ -33,9 +33,11 @@ class TransitionHelper
      */
     public function addWorkflowTransition($entity, $workflowName)
     {
-        $this->transitionsIdentifiers->add(
-            $this->getEntityWorkflowIdentifier($entity, $workflowName)
-        );
+        if (!$this->isStartedWorkflowTransition($entity, $workflowName)) {
+            $this->transitionsIdentifiers->add(
+                $this->getEntityWorkflowIdentifier($entity, $workflowName)
+            );
+        }
     }
 
     /**
@@ -44,9 +46,11 @@ class TransitionHelper
      */
     public function removeWorkflowTransition($entity, $workflowName)
     {
-        $this->transitionsIdentifiers->removeElement(
-            $this->getEntityWorkflowIdentifier($entity, $workflowName)
-        );
+        if ($this->isStartedWorkflowTransition($entity, $workflowName)) {
+            $this->transitionsIdentifiers->removeElement(
+                $this->getEntityWorkflowIdentifier($entity, $workflowName)
+            );
+        }
     }
 
     /**
