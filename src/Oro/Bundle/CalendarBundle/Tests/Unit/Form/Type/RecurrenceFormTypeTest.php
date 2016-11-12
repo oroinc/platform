@@ -17,12 +17,10 @@ class RecurrenceFormTypeTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $validator = $this->getMockBuilder('Symfony\Component\Validator\Validator\ValidatorInterface')
-            ->getMock();
         $strategy = $this->getMockBuilder('Oro\Bundle\CalendarBundle\Model\Recurrence\StrategyInterface')
             ->getMock();
 
-        $this->model = new Recurrence($validator, $strategy);
+        $this->model = new Recurrence($strategy);
         $this->type = new RecurrenceFormType($this->model);
     }
 

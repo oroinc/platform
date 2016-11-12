@@ -72,9 +72,6 @@ class Recurrence
     const DAY_SATURDAY = 'saturday';
     /**#@-*/
 
-    /** @var ValidatorInterface */
-    protected $validator;
-
     /** @var StrategyInterface  */
     protected $recurrenceStrategy;
 
@@ -103,12 +100,10 @@ class Recurrence
     ];
 
     /**
-     * @param ValidatorInterface $validator
      * @param StrategyInterface $recurrenceStrategy
      */
-    public function __construct(ValidatorInterface $validator, StrategyInterface $recurrenceStrategy)
+    public function __construct(StrategyInterface $recurrenceStrategy)
     {
-        $this->validator = $validator;
         $this->recurrenceStrategy = $recurrenceStrategy;
     }
 
