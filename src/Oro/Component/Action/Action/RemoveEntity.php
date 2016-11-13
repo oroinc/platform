@@ -8,7 +8,7 @@ use Doctrine\ORM\EntityManager;
 
 use Oro\Component\Action\Exception\InvalidParameterException;
 use Oro\Component\Action\Exception\NotManageableEntityException;
-use Oro\Component\Action\Model\ContextAccessor;
+use Oro\Component\ConfigExpression\ContextAccessor;
 
 /**
  * Remove entity

@@ -9,7 +9,12 @@
         margin-bottom: $form-row__content-offset-x;
     }
 
-    &--offset-none {
-        margin-bottom: 0;
+    &--offset {
+        &-s {
+            margin-bottom: $offset-y-s;
+        }
+        &-none {
+            margin-bottom: 0;
+        }
     }
 }
