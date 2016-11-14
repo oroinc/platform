@@ -1,6 +1,7 @@
 datagrids:
     users-grid:
         extended_entity_name: %oro_user.entity.class%
+        views_list: "@oro_user.user.datagrid_view_list"
         options:
             entityHint: user
             entity_pagination: true
@@ -17,9 +18,12 @@ datagrids:
                     - u.createdAt
                     - u.updatedAt
                     - u.enabled
+                    - au.id as auth_status
                 from:
                     - { table: %oro_user.entity.class%, alias: u }
-
+                join:
+                    left:
+                        - { join: u.auth_status, alias: au }
         inline_editing:
             enable: true
         columns:
@@ -41,6 +45,8 @@ datagrids:
                 choices:
                    - Disabled
                    - Enabled
+            auth_status:
+                label:         oro.user.auth_status.label
             createdAt:
                 label:         oro.ui.created_at
                 frontend_type: datetime
@@ -86,6 +92,8 @@ datagrids:
                     data_name: u.updatedAt
                 enabled:
                     data_name: u.enabled
+                auth_status:
+                    data_name: as.priority
             default:
                 username: %oro_datagrid.extension.orm_sorter.class%::DIRECTION_ASC
 
@@ -111,6 +119,10 @@ datagrids:
                             choices:
                                 2: Disabled
                                 1: Enabled
+                auth_status:
+                    type:      enum
+                    data_name: au.id
+                    enum_code: auth_status
                 createdAt:
                     type: datetime
                     data_name: u.createdAt

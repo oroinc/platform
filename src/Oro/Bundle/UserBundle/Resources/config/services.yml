@@ -453,6 +453,12 @@ services:
         tags:
             - { name: oro_ui.view_action_provider, group: activity, priority: 120 }
 
+    # Datagrid
+    oro_user.user.datagrid_view_list:
+        class: Oro\Bundle\UserBundle\Datagrid\UserViewList
+        arguments:
+            - '@translator'
+
     oro_user.datagrid.extention.reset_password:
         class: Oro\Bundle\UserBundle\Datagrid\Extension\MassAction\ResetPasswordExtention
         calls:

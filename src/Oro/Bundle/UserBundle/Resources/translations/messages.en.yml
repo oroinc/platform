@@ -103,6 +103,7 @@ oro:
         email_origins.label:         Email Origins
         emails.label:                Emails
         enabled.label:               Enabled
+        auth_status.label:           Status
         entity_description:          Represent user profile
         entity_label:                User
         entity_plural_label:         Users
@@ -133,6 +134,12 @@ oro:
         username.label:              Username
         organization.label:          Organization
         business_unit.label:         Business Unit
+
+        datagrid:
+            views:
+                active: Active Users
+                cannot_login: Cannot login
+                disabled: Disabled Users
 
         impersonation:
             entity_label: Impersonation
