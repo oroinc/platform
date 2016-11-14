@@ -395,13 +395,10 @@ class CalendarEventApiTypeTest extends TypeTestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $validator = $this->getMockBuilder('Symfony\Component\Validator\Validator\ValidatorInterface')
-            ->getMock();
-
         $strategy = $this->getMockBuilder('Oro\Bundle\CalendarBundle\Model\Recurrence\StrategyInterface')
             ->getMock();
 
-        $recurrenceModel = new Recurrence($validator, $strategy);
+        $recurrenceModel = new Recurrence($strategy);
 
         $types = [
             new ReminderCollectionType($this->registry),
