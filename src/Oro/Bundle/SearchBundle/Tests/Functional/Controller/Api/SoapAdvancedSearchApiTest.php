@@ -72,6 +72,18 @@ class SoapAdvancedSearchApiTest extends WebTestCase
         $this->assertSame($response['soap']['data'], $result['elements']['item']);
     }
 
+    public function testAdvancedSearchNoResults()
+    {
+        $queryString = 'from oro_test_item where stringValue = item5';
+
+        $result = $this->soapClient->advancedSearch($queryString);
+        $result = $this->valueToArray($result);
+
+        $this->assertEquals(0, $result['recordsCount']);
+        $this->assertEquals(0, $result['count']);
+        $this->assertEmpty($result['elements']);
+    }
+
     /**
      * Data provider for SOAP API tests
      *

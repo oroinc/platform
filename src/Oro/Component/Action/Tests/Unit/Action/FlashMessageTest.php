@@ -7,7 +7,7 @@ use Symfony\Component\PropertyAccess\PropertyPath;
 use Symfony\Component\Translation\TranslatorInterface;
 
 use Oro\Component\Action\Action\FlashMessage;
-use Oro\Component\Action\Model\ContextAccessor;
+use Oro\Component\ConfigExpression\ContextAccessor;
 use Oro\Component\ConfigExpression\Tests\Unit\Fixtures\ItemStub;
 
 class FlashMessageTest extends \PHPUnit_Framework_TestCase

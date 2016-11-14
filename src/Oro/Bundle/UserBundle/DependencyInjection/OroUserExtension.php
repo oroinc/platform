@@ -28,6 +28,7 @@ class OroUserExtension extends Extension implements PrependExtensionInterface
 
         $loader = new Loader\YamlFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
         $loader->load('services.yml');
+        $loader->load('services_api.yml');
         $loader->load('form.yml');
         $loader->load('importexport.yml');
         $loader->load('mass_actions.yml');

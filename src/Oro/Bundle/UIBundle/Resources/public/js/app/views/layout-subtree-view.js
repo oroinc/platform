@@ -3,17 +3,13 @@ define(function(require) {
 
     var LayoutSubtreeView;
     var BaseView = require('oroui/js/app/views/base/view');
-    var mediator = require('oroui/js/mediator');
-    var Error = require('oroui/js/error');
     var LoadingMaskView = require('oroui/js/app/views/loading-mask-view');
+    var LayoutSubtreeManager = require('oroui/js/layout-subtree-manager');
     var $ = require('jquery');
-    var _ = require('underscore');
 
     LayoutSubtreeView = BaseView.extend({
         options: {
-            url: window.location.href,
-            rootId: '',
-            method: 'get',
+            blockId: '',
             reloadEvents: [],
             showLoading: true
         },
@@ -21,52 +17,29 @@ define(function(require) {
         initialize: function(options) {
             this.options = $.extend(true, {}, this.options, options);
             LayoutSubtreeView.__super__.initialize.apply(this, arguments);
+            LayoutSubtreeManager.addView(this);
             this.initLayout();
         },
 
-        delegateEvents: function() {
-            var result = LayoutSubtreeView.__super__.delegateEvents.apply(this, arguments);
-            _.each(this.options.reloadEvents || [], function(event) {
-                mediator.on(event, this.reloadLayout, this);
-            }, this);
-            return result;
+        dispose: function() {
+            LayoutSubtreeManager.removeView(this);
+            return LayoutSubtreeView.__super__.dispose.apply(this, arguments);
         },
 
-        undelegateEvents: function() {
-            _.each(this.options.reloadEvents || [], function(event) {
-                mediator.off(event, this.reloadLayout, this);
-            }, this);
-            return LayoutSubtreeView.__super__.undelegateEvents.apply(this, arguments);
-        },
-
-        reloadLayout: function() {
-            this._showLoading();
-            $.ajax(this.getLoadingOptions())
-                .done(_.bind(this._onContentLoad, this))
-                .fail(_.bind(this._onContentLoadFail, this));
-        },
-
-        getLoadingOptions: function() {
-            return {
-                url: this.options.url,
-                data: {
-                    layout_root_id: this.options.rootId
-                },
-                type: this.options.method
-            };
-        },
-
-        _onContentLoadFail: function(jqxhr) {
-            this._hideLoading();
-            Error.handle({}, jqxhr, {enforce: true});
-        },
-
-        _onContentLoad: function(content) {
+        setContent: function(content) {
             this._hideLoading();
             this.$el.html($(content).children());
 
             this.disposePageComponents();
             this.initLayout();
+        },
+
+        beforeContentLoading: function() {
+            this._showLoading();
+        },
+
+        contentLoadingFail: function() {
+            this._hideLoading();
         },
 
         _showLoading: function() {

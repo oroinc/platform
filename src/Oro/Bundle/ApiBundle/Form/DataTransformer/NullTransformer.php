@@ -9,6 +9,9 @@ final class NullTransformer implements DataTransformerInterface
     /** @var NullTransformer|null */
     private static $instance;
 
+    /**
+     * A private constructor to prevent create an instance of this class explicitly
+     */
     private function __construct()
     {
     }
