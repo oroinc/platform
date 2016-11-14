@@ -2,4 +2,4 @@ styles:
     inputs:
         - 'bundles/bowerassets/backgrid/lib/backgrid.css'
         - 'bundles/bowerassets/backgrid-paginator/backgrid-paginator.css'
-        - 'bundles/orodatagrid/css/less/main.less'
+        - 'bundles/orodatagrid/css/less/base.less'
