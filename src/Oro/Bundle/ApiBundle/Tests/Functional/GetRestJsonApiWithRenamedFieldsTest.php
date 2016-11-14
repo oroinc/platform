@@ -16,7 +16,7 @@ class GetRestJsonApiWithRenamedFieldsTest extends RestJsonApiTestCase
     {
         parent::setUp();
 
-        $this->loadFixtures(['Oro\Bundle\ApiBundle\Tests\Functional\DataFixtures\LoadRenamedFieldsTestData']);
+        $this->loadFixtures(['@OroApiBundle/Tests/Functional/DataFixtures/renamed_fields.yml']);
     }
 
     /**

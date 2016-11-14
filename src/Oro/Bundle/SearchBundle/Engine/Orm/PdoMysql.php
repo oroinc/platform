@@ -61,23 +61,33 @@ class PdoMysql extends BaseDriver
      */
     public function addTextField(QueryBuilder $qb, $index, $searchCondition, $setOrderBy = true)
     {
-        $words = $this->getWords(
-            $this->filterTextFieldValue($searchCondition['fieldValue']),
-            $searchCondition['condition']
-        );
+        $fieldValue = $searchCondition['fieldValue'];
+        $condition = $searchCondition['condition'];
+        $words = $this->getWords($this->filterTextFieldValue($fieldValue), $condition);
 
-        // TODO Need to clarify search requirements in scope of CRM-214
-        if (in_array($searchCondition['condition'], [Query::OPERATOR_CONTAINS, Query::OPERATOR_EQUALS])) {
-            $whereExpr  = $this->createMatchAgainstWordsExpr($qb, $words, $index, $searchCondition, $setOrderBy);
-            $shortWords = $this->getWordsLessThanFullTextMinWordLength($words);
-            if ($shortWords) {
-                $whereExpr = $qb->expr()->orX(
-                    $whereExpr,
-                    $this->createLikeWordsExpr($qb, $shortWords, $index, $searchCondition)
-                );
-            }
-        } else {
-            $whereExpr = $this->createNotLikeWordsExpr($qb, $words, $index, $searchCondition);
+        switch ($condition) {
+            case Query::OPERATOR_CONTAINS:
+                $whereExpr  = $this->createMatchAgainstWordsExpr($qb, $words, $index, $searchCondition, $setOrderBy);
+                $shortWords = $this->getWordsLessThanFullTextMinWordLength($words);
+                if ($shortWords) {
+                    $whereExpr = $qb->expr()->orX(
+                        $whereExpr,
+                        $this->createLikeWordsExpr($qb, $shortWords, $index, $searchCondition)
+                    );
+                }
+                break;
+
+            case Query::OPERATOR_NOT_CONTAINS:
+                $whereExpr = $this->createNotLikeWordsExpr($qb, $words, $index, $searchCondition);
+                break;
+
+            case Query::OPERATOR_EQUALS:
+                $whereExpr = $this->createCompareStringExpr($qb, $fieldValue, $index, $searchCondition);
+                break;
+
+            default:
+                $whereExpr = $this->createCompareStringExpr($qb, $fieldValue, $index, $searchCondition, '!=');
+                break;
         }
 
         return '(' . $whereExpr . ')';
@@ -253,8 +263,38 @@ class PdoMysql extends BaseDriver
         if ($this->isConcreteField($fieldName)) {
             $whereExpr .= " AND $joinAlias.field = :$fieldParameter";
             $qb->setParameter($fieldParameter, $fieldName);
+        }
 
-            return $whereExpr;
+        return $whereExpr;
+    }
+
+    /**
+     * @param  QueryBuilder $qb
+     * @param  int          $index
+     * @param  string       $value
+     * @param  array        $searchCondition
+     * @param  string       $operator
+     *
+     * @return string
+     */
+    public function createCompareStringExpr(
+        QueryBuilder $qb,
+        $value,
+        $index,
+        array $searchCondition,
+        $operator = '='
+    ) {
+        $joinAlias      = $this->getJoinAlias($searchCondition['fieldType'], $index);
+        $fieldName      = $searchCondition['fieldName'];
+        $fieldParameter = 'field' . $index;
+        $valueParameter = 'value' . $index;
+
+        $qb->setParameter($valueParameter, $value);
+
+        $whereExpr = "$joinAlias.value $operator :$valueParameter";
+        if ($this->isConcreteField($fieldName)) {
+            $whereExpr .= " AND $joinAlias.field = :$fieldParameter";
+            $qb->setParameter($fieldParameter, $fieldName);
         }
 
         return $whereExpr;
@@ -267,7 +307,7 @@ class PdoMysql extends BaseDriver
      */
     protected function isConcreteField($fieldName)
     {
-        return $fieldName == '*' ? false : true;
+        return $fieldName === '*' ? false : true;
     }
 
     /**
@@ -277,7 +317,7 @@ class PdoMysql extends BaseDriver
      */
     protected function isAllDataField($fieldName)
     {
-        return $fieldName == Indexer::TEXT_ALL_DATA_FIELD;
+        return $fieldName === Indexer::TEXT_ALL_DATA_FIELD;
     }
 
     /**

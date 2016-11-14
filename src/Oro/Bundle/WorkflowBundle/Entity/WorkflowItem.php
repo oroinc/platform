@@ -707,6 +707,19 @@ class WorkflowItem extends ExtendWorkflowItem implements EntityAwareInterface
     }
 
     /**
+     * This method should be exists for compatibility with redirect action
+     *
+     * @param string $url
+     * @return $this
+     */
+    public function setRedirectUrl($url)
+    {
+        $this->result->set('redirectUrl', $url);
+
+        return $this;
+    }
+
+    /**
      * @return string
      */
     public function __toString()

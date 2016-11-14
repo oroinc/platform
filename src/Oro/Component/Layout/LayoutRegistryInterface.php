@@ -117,19 +117,4 @@ interface LayoutRegistryInterface
      * @param ContextInterface $context The context
      */
     public function configureContext(ContextInterface $context);
-
-    /**
-     * Update block options after they way resolved.
-     *
-     * @param  string $name
-     * @param Options $options
-     * @param ContextInterface $context
-     * @param DataAccessorInterface $data
-     */
-    public function normalizeOptions(
-        $name,
-        Options $options,
-        ContextInterface $context,
-        DataAccessorInterface $data
-    );
 }

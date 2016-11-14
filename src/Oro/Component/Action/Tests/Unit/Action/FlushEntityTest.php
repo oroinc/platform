@@ -12,7 +12,7 @@ use Doctrine\ORM\EntityManager;
 use Oro\Bundle\ActionBundle\Model\ActionData;
 
 use Oro\Component\Action\Action\FlushEntity;
-use Oro\Component\Action\Model\ContextAccessor;
+use Oro\Component\ConfigExpression\ContextAccessor;
 
 class FlushEntityTest extends \PHPUnit_Framework_TestCase
 {

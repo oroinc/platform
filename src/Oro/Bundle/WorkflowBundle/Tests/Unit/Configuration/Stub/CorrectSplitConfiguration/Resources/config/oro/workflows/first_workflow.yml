@@ -3,7 +3,6 @@ imports:
 
 workflows:
     first_workflow:
-        label: 'First Workflow'
         is_system: true
         entity: First\Entity
         start_step: first_step
@@ -18,7 +17,6 @@ workflows:
         steps_display_ordered: true
         steps:
             first_step:
-                label: 'First Step'
                 order: 1
                 is_final: true
                 entity_acl:
@@ -28,14 +26,12 @@ workflows:
                     - first_transition
         transitions:
             first_transition:
-                label: 'First Transition'
                 step_to: first_step
                 is_start: true
                 is_hidden: true
                 is_unavailable_hidden: true
                 acl_resource: some_acl
                 acl_message: "Test ACL message"
-                message: "Test message"
                 transition_definition: first_transition_definition
                 frontend_options:
                     class: foo
