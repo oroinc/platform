@@ -12,10 +12,17 @@ use Oro\Component\Layout\Block\Type\Options;
 use Oro\Bundle\LayoutBundle\Layout\Block\Type\FormFieldsType;
 use Oro\Bundle\LayoutBundle\Tests\Unit\BlockTypeTestCase;
 
+/**
+ * @SuppressWarnings(PHPMD.ExcessivePublicCount)
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class FormFieldsTypeTest extends BlockTypeTestCase
 {
     /**
      * @dataProvider optionsDataProvider
+     *
+     * @param $options
+     * @param $expected
      */
     public function testSetDefaultOptions($options, $expected)
     {
@@ -23,6 +30,9 @@ class FormFieldsTypeTest extends BlockTypeTestCase
         $this->assertEquals($expected, $resolvedOptions);
     }
 
+    /**
+     * @return array
+     */
     public function optionsDataProvider()
     {
         return [
@@ -38,6 +48,7 @@ class FormFieldsTypeTest extends BlockTypeTestCase
                     'form_group_prefix' => 'form:group_',
                     'split_to_fields'   => false,
                     'instance_name'     => '',
+                    'visible'           => true,
                 ]
             ],
             'with form_name'                 => [
@@ -54,6 +65,7 @@ class FormFieldsTypeTest extends BlockTypeTestCase
                     'form_group_prefix' => 'test:group_',
                     'split_to_fields'   => false,
                     'instance_name'     => '',
+                    'visible'           => true,
                 ]
             ],
             'with form_name and form_prefix' => [
@@ -71,6 +83,7 @@ class FormFieldsTypeTest extends BlockTypeTestCase
                     'form_group_prefix' => 'test_prefix:group_',
                     'split_to_fields'   => false,
                     'instance_name'     => '',
+                    'visible'           => true,
                 ]
             ],
             'all options'                    => [
@@ -92,6 +105,7 @@ class FormFieldsTypeTest extends BlockTypeTestCase
                     'form_group_prefix' => 'form_group_prefix_',
                     'split_to_fields'   => false,
                     'instance_name'     => '',
+                    'visible'           => true,
                 ]
             ]
         ];
