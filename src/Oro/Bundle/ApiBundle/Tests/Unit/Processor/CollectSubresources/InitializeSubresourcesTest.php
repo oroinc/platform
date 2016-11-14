@@ -689,4 +689,71 @@ class InitializeSubresourcesTest extends \PHPUnit_Framework_TestCase
             ['scalar'],
         ];
     }
+
+    public function testProcessForInverseAssociations()
+    {
+        $resource = new ApiResource('Test\Class');
+
+        $resourceConfig = new Config();
+        $resourceConfig->setDefinition(new EntityDefinitionConfig());
+        $definition = $resourceConfig->getDefinition();
+        $field1 = $definition->addField('association1');
+        $field1->setExcluded(true);
+        $field1->set('association-field', 'field1');
+        $definition->addField('association2')->setExcluded(true);
+        $resourceMetadata = new EntityMetadata();
+        $association1 = new AssociationMetadata();
+        $association1->setName('association1');
+        $association1->setTargetClassName('Test\Association1Target');
+        $association1->setAcceptableTargetClassNames(['Test\Association1Target']);
+        $association1->setIsCollection(true);
+        $resourceMetadata->addAssociation($association1);
+        $association2 = new AssociationMetadata();
+        $association2->setName('association2');
+        $association2->setTargetClassName('Test\Association2Target');
+        $association2->setAcceptableTargetClassNames(['Test\Association2Target']);
+        $association2->setIsCollection(true);
+        $resourceMetadata->addAssociation($association2);
+
+        $this->context->getRequestType()->add(RequestType::REST);
+        $this->context->setVersion('1.1');
+        $this->context->setResources([$resource]);
+        $this->context->setAccessibleResources(['Test\Association1Target', 'Test\Association2Target']);
+
+        $this->configProvider->expects($this->once())
+            ->method('getConfig')
+            ->with(
+                $resource->getEntityClass(),
+                $this->context->getVersion(),
+                $this->context->getRequestType(),
+                [new EntityDefinitionConfigExtra()]
+            )
+            ->willReturn($resourceConfig);
+        $this->metadataProvider->expects($this->once())
+            ->method('getMetadata')
+            ->with(
+                $resource->getEntityClass(),
+                $this->context->getVersion(),
+                $this->context->getRequestType(),
+                $resourceConfig->getDefinition(),
+                [],
+                true
+            )
+            ->willReturn($resourceMetadata);
+
+        $this->processor->process($this->context);
+
+        $expectedSubresources = new ApiResourceSubresources($resource->getEntityClass());
+        $expectedSubResource = new ApiSubresource();
+        $expectedSubResource->setTargetClassName('Test\Association1Target');
+        $expectedSubResource->setAcceptableTargetClassNames(['Test\Association1Target']);
+        $expectedSubResource->setIsCollection(true);
+
+        $expectedSubresources->addSubresource('association1', $expectedSubResource);
+
+        $this->assertEquals(
+            ['Test\Class' => $expectedSubresources],
+            $this->context->getResult()->toArray()
+        );
+    }
 }

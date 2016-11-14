@@ -2937,8 +2937,9 @@ class CompleteDefinitionTest extends ConfigProcessorTestCase
                             ]
                         ],
                         'association-field' => 'field3',
-                        'association-kind' => 'testKind'
-                    ],
+                        'association-kind' => 'testKind',
+                        'exclude' => true
+                    ]
                 ]
             ],
             $this->context->getResult()

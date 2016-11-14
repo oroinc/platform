@@ -159,6 +159,11 @@ abstract class LoadSubresources implements ProcessorInterface
             return false;
         }
 
+        // we should not skip inverse extend associations if such fields exists in config
+        if ($field->has('association-field')) {
+            return false;
+        }
+
         return
             $field->isExcluded()
             || DataType::isAssociationAsField($field->getDataType());

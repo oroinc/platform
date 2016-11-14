@@ -27,15 +27,3 @@ services:
             - '@oro_api.metadata_provider'
         tags:
             - { name: oro.api.processor, action: collect_subresources, priority: -10 }
-
-    oro_api.collect_subresources.load_inverse_associations:
-         class: Oro\Bundle\ApiBundle\Processor\CollectSubresources\CollectInverseAssociationSubresources
-         arguments:
-            - '@oro_api.config_loader_factory'
-            - '@oro_api.config_bag'
-            - '@oro_api.config_provider'
-            - '@oro_api.metadata_provider'
-            - "@oro_entity_config.provider.extend"
-            - "@oro_api.value_normalizer"
-         tags:
-             - { name: oro.api.processor, action: collect_subresources, priority: -20 }
