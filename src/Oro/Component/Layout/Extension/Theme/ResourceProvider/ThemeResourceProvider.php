@@ -7,6 +7,7 @@ use Doctrine\Common\Cache\Cache;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 use Oro\Component\Config\Loader\CumulativeConfigLoader;
+use Oro\Component\Layout\BlockViewCache;
 use Oro\Component\Layout\Config\Loader\LayoutUpdateCumulativeResourceLoader;
 use Oro\Component\Layout\Loader\LayoutUpdateLoaderInterface;
 
@@ -27,14 +28,22 @@ class ThemeResourceProvider implements ResourceProviderInterface
     /** @var Cache */
     private $cache;
 
+    /** @var BlockViewCache */
+    private $blockViewCache;
+
     /**
      * @param LayoutUpdateLoaderInterface $loader
+     * @param BlockViewCache $blockViewCache
      * @param array $excludedPaths
      */
-    public function __construct(LayoutUpdateLoaderInterface $loader, array $excludedPaths = [])
-    {
+    public function __construct(
+        LayoutUpdateLoaderInterface $loader,
+        BlockViewCache $blockViewCache,
+        array $excludedPaths = []
+    ) {
         $this->loader = $loader;
         $this->excludedPaths = $excludedPaths;
+        $this->blockViewCache = $blockViewCache;
     }
 
     /**
@@ -92,6 +101,8 @@ class ThemeResourceProvider implements ResourceProviderInterface
 
             $now = new \DateTime('now', new \DateTimeZone('UTC'));
             $this->cache->save(self::CACHE_LAST_MODIFICATION_DATE, $now);
+
+            $this->blockViewCache->reset();
         }
     }
 
