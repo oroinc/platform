@@ -13,41 +13,27 @@ use Oro\Bundle\ActionBundle\Model\OperationRegistry;
 
 class OperationButtonProviderExtensionTest extends \PHPUnit_Framework_TestCase
 {
-    /**
-     * @var OperationButtonProviderExtension
-     */
+    /** @var OperationButtonProviderExtension */
     protected $extension;
 
-    /**
-     * @var \PHPUnit_Framework_MockObject_MockObject|ContextHelper
-     */
+    /** @var \PHPUnit_Framework_MockObject_MockObject|ContextHelper */
     protected $contextHelper;
 
-    /**
-     * @var \PHPUnit_Framework_MockObject_MockObject|OperationRegistry
-     */
+    /** @var \PHPUnit_Framework_MockObject_MockObject|OperationRegistry */
     protected $operationRegistry;
 
-    /**
-     * @var \PHPUnit_Framework_MockObject_MockObject|ApplicationsHelperInterface
-     */
+    /** @var \PHPUnit_Framework_MockObject_MockObject|ApplicationsHelperInterface */
     protected $applicationsHelper;
-
-    protected $actionData;
 
     /**
      * {@inheritdoc}
      */
     protected function setUp()
     {
-        $this->operationRegistry = $this
-            ->getMockBuilder(OperationRegistry::class)
+        $this->operationRegistry = $this->getMockBuilder(OperationRegistry::class)
             ->disableOriginalConstructor()
             ->getMock();
-        $this->contextHelper = $this
-            ->getMockBuilder(ContextHelper::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->contextHelper = $this->getMockBuilder(ContextHelper::class)->disableOriginalConstructor()->getMock();
 
         $this->applicationsHelper = $this->getMock(ApplicationsHelperInterface::class);
 
@@ -56,10 +42,6 @@ class OperationButtonProviderExtensionTest extends \PHPUnit_Framework_TestCase
             $this->contextHelper,
             $this->applicationsHelper
         );
-
-        $this->actionData = $this->getMockBuilder(ActionData::class)
-            ->disableOriginalConstructor()
-            ->getMock();
     }
 
     /**
@@ -67,26 +49,14 @@ class OperationButtonProviderExtensionTest extends \PHPUnit_Framework_TestCase
      */
     protected function tearDown()
     {
-        unset(
-            $this->extension,
-            $this->contextHelper,
-            $this->operationRegistry,
-            $this->applicationsHelper,
-            $this->actionData
-        );
+        unset($this->extension, $this->contextHelper, $this->operationRegistry, $this->applicationsHelper);
     }
 
-    /**
-     * @dataProvider findDataProvider
-     *
-     * @param array $operations
-     * @param ButtonSearchContext $buttonSearchContext
-     * @param $resultCount
-     */
-    public function testFind(array $operations, ButtonSearchContext $buttonSearchContext, $resultCount)
+    public function testFind()
     {
-        $this->operationRegistry
-            ->expects($this->once())
+        $buttonSearchContext = $this->createButtonSearchContext();
+
+        $this->operationRegistry->expects($this->once())
             ->method('find')
             ->with(
                 $buttonSearchContext->getEntityClass(),
@@ -94,35 +64,22 @@ class OperationButtonProviderExtensionTest extends \PHPUnit_Framework_TestCase
                 $buttonSearchContext->getGridName(),
                 $buttonSearchContext->getGroup()
             )
-            ->willReturn($operations);
+            ->willReturn(
+                [
+                    $this->createOperationMock(),
+                    $this->createOperationMock(false),
+                    $this->createOperationMock()
+                ]
+            );
 
-        $this->contextHelper
-            ->expects($this->exactly(count($operations)))
-            ->method('getActionData')
-            ->withAnyParameters()
-            ->willReturn($this->actionData);
+        $this->contextHelper->expects($this->exactly(3))->method('getActionData')->willReturn(new ActionData());
 
         $result = $this->extension->find($buttonSearchContext);
-        $this->assertCount($resultCount, $result);
+        $this->assertCount(2, $result);
 
         foreach ($result as $item) {
             $this->assertInstanceOf(OperationButton::class, $item);
         }
-    }
-
-    public function findDataProvider()
-    {
-        return [
-            'correct' => [
-                'operations' => [
-                    $this->createOperationMock(),
-                    $this->createOperationMock(false),
-                    $this->createOperationMock(),
-                ],
-                'buttonSearchContext' => $this->createButtonSearchContext(),
-                'resultCount' => 2,
-            ]
-        ];
     }
 
     /**
@@ -132,15 +89,10 @@ class OperationButtonProviderExtensionTest extends \PHPUnit_Framework_TestCase
      */
     private function createOperationMock($isAvailable = true)
     {
-        $operation = $this
-            ->getMockBuilder(Operation::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $operation
-            ->expects($this->once())
+        $operation = $this->getMockBuilder(Operation::class)->disableOriginalConstructor()->getMock();
+        $operation->expects($this->once())
             ->method('isAvailable')
-            ->withAnyParameters()
+            ->with(new ActionData())
             ->willReturn($isAvailable);
 
         return $operation;
@@ -153,8 +105,7 @@ class OperationButtonProviderExtensionTest extends \PHPUnit_Framework_TestCase
     {
         $buttonSearchContext = new ButtonSearchContext();
 
-        return $buttonSearchContext
-            ->setRouteName(uniqid())
+        return $buttonSearchContext->setRouteName(uniqid())
             ->setEntity(uniqid(), mt_rand(1, 100))
             ->setGridName(uniqid())
             ->setGroup(uniqid())
