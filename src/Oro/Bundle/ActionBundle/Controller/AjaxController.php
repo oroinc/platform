@@ -9,6 +9,7 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -69,6 +70,14 @@ class AjaxController extends Controller
             'message' => $message,
             'messages' => $this->prepareMessages($errorMessages)
         ];
+
+        // handle redirect for failure response on non ajax requests
+        if (!$request->isXmlHttpRequest() &&
+            !$response['success'] &&
+            $routeName = $request->get('route')
+        ) {
+            return new RedirectResponse($this->generateUrl($routeName));
+        }
 
         if ($data->getRefreshGrid() || !$response['success']) {
             $response['refreshGrid'] = $data->getRefreshGrid();
