@@ -7,13 +7,13 @@
         'alt': 'oroCommerce logo'
     }) %}
 
-    {% if not app.request.attributes.get('_route') == 'oro_frontend_root' %}
+    {% if not app.request.attributes.get('_route') != 'oro_frontend_root' %}
         <a href="{{ path('oro_frontend_root') }}">
     {% endif %}
 
     <img {{ block('block_attributes') }} />
 
-    {% if not app.request.attributes.get('_route') == 'oro_frontend_root' %}
+    {% if not app.request.attributes.get('_route') != 'oro_frontend_root' %}
         </a>
     {% endif %}
 {% endblock %}
