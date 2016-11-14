@@ -26,6 +26,7 @@ class ScopeCollectionType extends AbstractType
         $resolver->setDefaults(
             [
                 'type' => ScopeType::NAME,
+                'handle_primary' => false
             ]
         );
     }

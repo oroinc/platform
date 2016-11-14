@@ -183,6 +183,40 @@ class ScopeManagerTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($scope, $actualScope);
     }
 
+    public function testFindOrCreateWithoutFlush()
+    {
+        $scope = new Scope();
+        $provider = $this->getMock(ScopeCriteriaProviderInterface::class);
+        $provider->expects($this->once())
+            ->method('getCriteriaForCurrentScope')->willReturn([]);
+
+        $repository = $this->getMockBuilder(ScopeRepository::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+        $repository->expects($this->once())
+            ->method('findOneByCriteria')
+            ->willReturn(null);
+
+        $em = $this->getMock(EntityManagerInterface::class);
+        $em->expects($this->once())
+            ->method('getRepository')
+            ->willReturn($repository);
+        $em->expects($this->once())->method('persist')->with($scope);
+        $em->expects($this->never())->method('flush');
+
+        $this->registry->expects($this->exactly(2))
+            ->method('getManagerForClass')
+            ->willReturn($em);
+
+        $this->entityFieldProvider->expects($this->once())
+            ->method('getRelations')
+            ->willReturn([]);
+
+        $this->manager->addProvider('testScope', $provider);
+        $actualScope = $this->manager->findOrCreate('testScope', null, false);
+        $this->assertEquals($scope, $actualScope);
+    }
+
     public function testFindOrCreateUsingContext()
     {
         $scope = new Scope();

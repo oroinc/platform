@@ -2,8 +2,10 @@
 
 namespace Oro\Bundle\ScopeBundle\Form\Type;
 
+use Oro\Bundle\ScopeBundle\Form\DataTransformer\ScopeTransformer;
 use Oro\Bundle\ScopeBundle\Manager\ScopeManager;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\Options;
@@ -51,6 +53,16 @@ class ScopeType extends AbstractType
             function (Options $options) {
                 return $this->scopeManager->getScopeEntities($options[self::SCOPE_TYPE_OPTION]);
             }
+        );
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function buildForm(FormBuilderInterface $builder, array $options)
+    {
+        $builder->addModelTransformer(
+            new ScopeTransformer($this->scopeManager, $options[self::SCOPE_TYPE_OPTION])
         );
     }
 

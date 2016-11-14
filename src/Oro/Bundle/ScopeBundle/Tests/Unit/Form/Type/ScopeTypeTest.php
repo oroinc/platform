@@ -2,9 +2,11 @@
 
 namespace Oro\Bundle\ScopeBundle\Tests\Unit\Form\Type;
 
+use Oro\Bundle\ScopeBundle\Form\DataTransformer\ScopeTransformer;
 use Oro\Bundle\ScopeBundle\Manager\ScopeManager;
 use Oro\Bundle\ScopeBundle\Form\Type\ScopeType;
 
+use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
@@ -111,6 +113,20 @@ class ScopeTypeTest extends \PHPUnit_Framework_TestCase
                 ]
             ]
         ];
+    }
+
+    public function testBuildForm()
+    {
+        $scopeType = 'test_scope_type';
+        $scopeTransformer = new ScopeTransformer($this->scopeManager, $scopeType);
+
+        /** @var FormBuilderInterface|\PHPUnit_Framework_MockObject_MockObject $builder */
+        $builder = $this->getMock(FormBuilderInterface::class);
+        $builder->expects($this->once())
+            ->method('addModelTransformer')
+            ->with($scopeTransformer);
+
+        $this->scopeType->buildForm($builder, [ScopeType::SCOPE_TYPE_OPTION => $scopeType]);
     }
 
     public function testGetName()
