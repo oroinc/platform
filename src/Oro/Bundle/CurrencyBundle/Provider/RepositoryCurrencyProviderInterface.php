@@ -7,10 +7,20 @@ use Oro\Bundle\OrganizationBundle\Entity\Organization;
 interface RepositoryCurrencyProviderInterface
 {
     /**
-     * Returns list of unique currency codes from entity that contains multi-currency fields
+     * Return translated label of entity
      *
-     * @param Organization|null $organization
-     * @return string[]
+     * @return string
      */
-    public function getCurrencyList(Organization $organization = null);
+    public function getEntityLabel();
+
+    /**
+     * @param array             $availableCurrencies
+     * @param Organization|null $organization
+     *
+     * @return bool
+     */
+    public function hasRecordsInUnavailableCurrencies(
+        array $availableCurrencies,
+        Organization $organization = null
+    );
 }
