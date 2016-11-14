@@ -47,7 +47,7 @@ class TransitionButtonProviderExtension implements ButtonProviderExtensionInterf
             return $buttons;
         }
 
-        // Skip id DataGrid defined
+        // Skip if DataGrid defined
         if ($buttonSearchContext->getGridName()) {
             return $buttons;
         }
