@@ -12,6 +12,7 @@ Table of Contents
  - [Change delete handler for entity](#change-delete-handler-for-entity)
  - [Change the maximum number of entities that can be deleted by one request](#change-the-maximum-number-of-entities-that-can-be-deleted-by-one-request)
  - [Configure nested object](#configure-nested-object)
+ - [Turn on Extended Many-To-One Associations](#turn-on-extended-many-to-one-associations)
 
 
 Turn on API for entity
@@ -179,7 +180,7 @@ api:
 Configure nested object
 -----------------------
 
-Sometime it is required to group several fields and expose them as an nested object in Data API. For example lets suppose that an entity has two fields `intervalNumber` and `intervalUnit` but you need to expose them in API as `number` and `unit` properties of `interval` field. This can be achieved by the following configuration:
+Sometimes it is required to group several fields and expose them as an nested object in Data API. For example lets suppose that an entity has two fields `intervalNumber` and `intervalUnit` but you need to expose them in API as `number` and `unit` properties of `interval` field. This can be achieved by the following configuration:
 
 ```yaml
 api:
@@ -216,6 +217,100 @@ Here is an example how the nested objects looks in JSON.API:
         "number": 2,
         "unit": "H"
       }
+    }
+  }
+}
+```
+
+Turn on Extended Many-To-One Associations
+-----------------------------------------
+
+Under term `Extended Many-To-One Associations` we mean resources like `Attachment`, `Comment` or `Note`. Each element of such resource can be assigned to another resource like `User`, `Account`, `Contact`, etc. The relation itself between them is represented by [Many-To-One Unidirectional association](http://docs.doctrine-project.org/projects/doctrine-orm/en/latest/reference/association-mapping.html#many-to-one-unidirectional). 
+
+For more detail about such association, please refer to [Configure many-to-one associations](../../EntityExtendBundle/Resources/doc/associations.md#configure-many-to-one-associations)
+
+So, depending on current entity configuration state, each association resource (e.g. attachment) can be assigned to one of the couple of resources (e.g. user, account, contact) that supports such associations. And by calling the same method `getTarget` from the attachment side (source) it will return target entity like `user` or `account` or `contact` (depending to which the particular attachment is attached to).
+
+By default, the API engine will not automatically enable possibility to retrieve targets of such associations.
+But this behaviour can be achieved via configuration in `api.yml` files, for instance:
+
+```yaml
+api:
+    entities:
+        Oro\Bundle\AttachmentBundle\Entity\Attachment:
+            fields:
+                target:
+                    data_type: association:manyToOne
+```
+
+```yaml
+api:
+    entities:
+        Oro\Bundle\NoteBundle\Entity\Note:
+            fields:
+                target:
+                    data_type: association:manyToOne
+```
+
+After applying configuration like above, the `target` relationship will be available in scope of `get_list`, `get`, `create`, `update`, etc. actions. 
+Also it will be possible to perform actions `get_relationship`, `get_subresource`, `update_relationship`.
+
+For example:
+
+- `get_relationship` target for `attachment` with id `1` - GET /api/attachments/1/relationships/target
+
+```json
+{
+  "data": {
+    "type": "users",
+    "id": "1"
+  }
+}
+```
+
+- `get_relationship` target for `attachment` with id `2` - GET /api/attachments/2/relationships/target
+
+```json
+{
+  "data": {
+    "type": "accounts",
+    "id": "14"
+  }
+}
+```
+
+- `update_relationship` target for `attachment` with id `1` - PATCH /api/attachments/1/relationships/target
+
+and Request body, e.g.
+
+```json
+{
+  "data": {
+    "type": "users",
+    "id": "11"
+  }
+}
+```
+
+will assign the `attachment` with id `1` to the `user` with id `11`
+
+
+- `get_subresource` target for `attachment` with id `1` - GET /api/attachments/1/target
+
+```json
+{
+  "data": {
+    "type": "users",
+    "id": "1",
+    "attributes": {
+      "username": "admin",
+      "email": "admin@local.com",
+      "createdAt": "2016-10-28T12:31:01Z",
+      "updatedAt": "2016-10-28T14:43:33Z",
+      ...
+    },
+    "relationships": {
+      ...
     }
   }
 }
