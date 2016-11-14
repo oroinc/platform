@@ -23,7 +23,6 @@ class ButtonsWidgetController extends Controller
 
         return [
             'buttons' => $buttonProvider->findAll($buttonSearchContext),
-            'searchContext' => $buttonSearchContext,
         ];
     }
 }
