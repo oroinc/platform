@@ -79,9 +79,12 @@ class BlockViewCacheTest extends LayoutTestCase
             ->willReturn($this::CONTEXT_HASH_VALUE);
 
         $this->cacheProvider->expects(static::once())
-            ->method('fetch')
+            ->method('contains')
             ->with($this::CONTEXT_HASH_VALUE)
-            ->willReturn(null);
+            ->willReturn(false);
+
+        $this->cacheProvider->expects(static::never())
+            ->method('fetch');
 
         $this->assertNull($this->blockViewCache->fetch($context));
     }
@@ -95,6 +98,11 @@ class BlockViewCacheTest extends LayoutTestCase
         $context->expects(static::once())
             ->method('getHash')
             ->willReturn($this::CONTEXT_HASH_VALUE);
+
+        $this->cacheProvider->expects(static::once())
+            ->method('contains')
+            ->with($this::CONTEXT_HASH_VALUE)
+            ->willReturn(true);
 
         $this->cacheProvider->expects(static::once())
             ->method('fetch')

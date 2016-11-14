@@ -19,6 +19,10 @@ class BlockViewCache implements BlockViewCacheInterface
      */
     protected $serializer;
 
+    /**
+     * @param CacheProvider $cacheProvider
+     * @param Serializer    $serializer
+     */
     public function __construct(CacheProvider $cacheProvider, Serializer $serializer)
     {
         $this->cache = $cacheProvider;
@@ -43,9 +47,10 @@ class BlockViewCache implements BlockViewCacheInterface
     public function fetch(ContextInterface $context)
     {
         $hash = $context->getHash();
-        $cached = $this->cache->fetch($hash);
 
-        if ($cached) {
+        if ($this->cache->contains($hash)) {
+            $cached = $this->cache->fetch($hash);
+
             return $this->serializer->deserialize($cached, BlockView::class, JsonEncoder::FORMAT);
         } else {
             return null;
