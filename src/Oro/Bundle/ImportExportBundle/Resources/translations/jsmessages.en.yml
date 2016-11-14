@@ -1,6 +1,10 @@
-"Export started, please wait...": "Export started, please wait..."
-"Export performed successfully, {{ count }} entities were exported.": "Export performed successfully, {{ count }} entities were exported."
-"Export operation fails, {{ count }} error(s) found.": "Export operation fails, {{ count }} error(s) found."
-"Download error log": "Download error log"
-"Download result file": "Download result file"
-"No entities found for export.": "No entities found for export."
+oro:
+    importexport:
+        export:
+            started.message: 'Export started, please wait...'
+            success.message: 'Export performed successfully, {{ count }} {{ entities }} were exported.'
+            fail.message: 'Export operation fails, {{ count }} error(s) found.'
+            download_error_log.message: 'Download error log'
+            download_result_file.message: 'Download result file'
+            no_entities_found.message: 'No {{ entities }} found for export.'
+            error_template_download.message: 'Errors occured while downloading the template.'
