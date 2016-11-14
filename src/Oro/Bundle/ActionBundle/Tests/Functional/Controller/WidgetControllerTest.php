@@ -601,4 +601,9 @@ class WidgetControllerTest extends WebTestCase
             ],
         ];
     }
+
+    public function testButtonsNewAction()
+    {
+        //TODO: Should be covered at https://magecore.atlassian.net/browse/BAP-12485
+    }
 }
