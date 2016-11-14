@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\UserBundle\Entity\Repository;
 
-use Doctrine\DBAL\Types\Type;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\QueryBuilder;
 
