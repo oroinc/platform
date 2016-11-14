@@ -60,6 +60,7 @@ class WorkflowDefinitionCloner
             ->setStepsDisplayOrdered($source->isStepsDisplayOrdered())
             ->setSystem($source->isSystem())
             ->setPriority($source->getPriority())
+            ->setScopesConfig($source->getScopesConfig())
             ->setExclusiveActiveGroups($source->getExclusiveActiveGroups())
             ->setExclusiveRecordGroups($source->getExclusiveRecordGroups());
 
