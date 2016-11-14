@@ -19,6 +19,7 @@ use Oro\Bundle\ActionBundle\Helper\ApplicationsHelper;
 use Oro\Bundle\ActionBundle\Helper\ContextHelper;
 use Oro\Bundle\ActionBundle\Model\ActionData;
 use Oro\Bundle\ActionBundle\Model\OperationManager;
+use Symfony\Component\VarDumper\VarDumper;
 
 class WidgetController extends Controller
 {
@@ -33,6 +34,8 @@ class WidgetController extends Controller
     {
         $contextHelper = $this->getContextHelper();
         $applicationsHelper = $this->getApplicationsHelper();
+
+        //VarDumper::dump($contextHelper->getContext(),$contextHelper->getActionData());
 
         return [
             'operations' => $this->getOperationManager()->getOperations(),

@@ -55,6 +55,9 @@ class OperationButton implements ButtonInterface
         return [
             'operation' => $this->operation,
             'params' => $this->operation->getDefinition(),
+            'messages' => [],
+            'errors' => [],
+            'context' => [],
         ];
     }
 

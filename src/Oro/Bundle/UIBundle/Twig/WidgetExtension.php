@@ -97,6 +97,14 @@ class WidgetExtension extends \Twig_Extension
             $options['url'] = $this->addRequestParameters($options['url']);
         }
 
+        //if ($options['alias'] === 'action_buttons_widget_buttons') {
+        //    file_put_contents('c:/123.txt', var_export([
+        //        'elementId' => $elementId,
+        //        'options' => $options,
+        //        'widgetType' => $widgetType,
+        //    ], true));
+        //}
+
         return $environment->render(
             'OroUIBundle::widget_loader.html.twig',
             [
