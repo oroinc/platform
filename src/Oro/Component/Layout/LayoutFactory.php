@@ -16,18 +16,26 @@ class LayoutFactory implements LayoutFactoryInterface
     protected $expressionProcessor;
 
     /**
+     * @var BlockViewCache
+     */
+    private $blockViewCache;
+
+    /**
      * @param LayoutRegistryInterface         $registry
      * @param LayoutRendererRegistryInterface $rendererRegistry
      * @param ExpressionProcessor             $expressionProcessor
+     * @param BlockViewCache|null             $blockViewCache
      */
     public function __construct(
         LayoutRegistryInterface $registry,
         LayoutRendererRegistryInterface $rendererRegistry,
-        ExpressionProcessor $expressionProcessor
+        ExpressionProcessor $expressionProcessor,
+        BlockViewCache $blockViewCache = null
     ) {
         $this->registry            = $registry;
         $this->rendererRegistry    = $rendererRegistry;
         $this->expressionProcessor = $expressionProcessor;
+        $this->blockViewCache = $blockViewCache;
     }
 
     /**
@@ -93,7 +101,8 @@ class LayoutFactory implements LayoutFactoryInterface
             $layoutManipulator,
             $blockFactory,
             $this->rendererRegistry,
-            $this->expressionProcessor
+            $this->expressionProcessor,
+            $this->blockViewCache
         );
     }
 }

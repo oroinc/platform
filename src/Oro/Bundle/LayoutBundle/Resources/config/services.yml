@@ -20,6 +20,7 @@ services:
         class: %oro_layout.layout_factory_builder.class%
         arguments:
             - '@oro_layout.processor.expression'
+            - '@oro_layout.cache.block_view_cache'
         calls:
             - [addExtension, ['@oro_layout.extension']]
             - [addExtension, ['@oro_layout.theme_extension']]
@@ -214,6 +215,8 @@ services:
     oro_layout.block_view_serializer.expression_normalizer:
         class: Oro\Bundle\LayoutBundle\Layout\Serializer\ExpressionNormalizer
         arguments: [{}, {}]
+        tags:
+            - { name: oro_layout.block_view_serializer.normalizer }
 
     oro_layout.option_value_bag_normaizer:
         class: Oro\Bundle\LayoutBundle\Layout\Serializer\OptionValueBagNormalizer
