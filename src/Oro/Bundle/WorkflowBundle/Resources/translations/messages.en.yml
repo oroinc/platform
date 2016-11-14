@@ -75,6 +75,15 @@ Show Transition Labels: Show Transition Labels
 
 oro:
     workflow:
+        translation:
+            workflow.label: Workflow
+            context:
+                workflow_label: 'Workflow "{{ workflow_label }}" -> Name'
+                step_label: 'Workflow "{{ workflow_label }}" -> Step "{{ step_label }}" -> Label'
+                transition_label: 'Workflow "{{ workflow_label }}" -> Transition "{{ transition_label }}" -> Label'
+                transition_warning_message: 'Workflow "{{ workflow_label }}" -> Transition "{{ transition_label }}" -> Warning Message'
+                transition_attribute_label: 'Workflow "{{ workflow_label }}" -> Transition "{{ transition_label }}" -> Attribute "{{ transition_attribute_label }}"'
+                workflow_attribute_label: 'Workflow "{{ workflow_label }}" -> Attribute "{{ workflow_attribute_label }}"'
         action:
             process:
                 activate:   Activate
@@ -85,6 +94,7 @@ oro:
                     label: Perform workflow transitions
                     description: Reveals workflow transition buttons to the user and allows them to manipulate workflows
                 reset_data: Reset workflow "{workflow}"
+                go_to_translations: 'To translations grid'
 
         block:
             title:
@@ -210,6 +220,7 @@ oro:
             form:
                 workflow_to_deactivation_message: "The following workflows will be deactivated automatically according to the exclusive workflow group settings:"
                 replace_message: "Optionally you may select workflows to be deactivated. Deactivation will reset workflow data of selected workflows."
+            grid.label: "Workflow Name"
 
         workflowitem:
             entity_label:             Workflow Item
@@ -289,4 +300,3 @@ oro:
             name.label: Name
             position.label: Position
             final.label: Final
-

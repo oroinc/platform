@@ -215,10 +215,15 @@ services:
             - { name: oro.api.processor, action: get, group: normalize_result, requestType: json_api, priority: -55 }
             - { name: monolog.logger, channel: api }
 
+    oro_api.get.set_result_document:
+        class: Oro\Bundle\ApiBundle\Processor\Shared\SetResultDocument
+        tags:
+            - { name: oro.api.processor, action: get, group: normalize_result, priority: -150 }
+
     oro_api.get.process_errors:
         class: Oro\Bundle\ApiBundle\Processor\Shared\ProcessErrors
         tags:
-            - { name: oro.api.processor, action: get, group: normalize_result, priority: -100 }
+            - { name: oro.api.processor, action: get, group: normalize_result, priority: -190 }
 
     oro_api.get.validate_normalized_result_exists:
         class: Oro\Bundle\ApiBundle\Processor\Shared\ValidateNormalizedResultExists

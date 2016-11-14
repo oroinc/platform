@@ -6,6 +6,7 @@ use Symfony\Component\Form\Guess\TypeGuess;
 
 use Oro\Bundle\ApiBundle\Config\ConfigAccessorInterface;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
+use Oro\Bundle\ApiBundle\Collection\IncludedEntityCollection;
 use Oro\Bundle\ApiBundle\Form\Guesser\MetadataTypeGuesser;
 use Oro\Bundle\ApiBundle\Metadata\AssociationMetadata;
 use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
@@ -117,6 +118,20 @@ class MetadataTypeGuesserTest extends \PHPUnit_Framework_TestCase
         return $associationMetadata;
     }
 
+    public function testShouldGetPreviouslySetMetadataAccessor()
+    {
+        $metadataAccessor = $this->getMock('Oro\Bundle\ApiBundle\Metadata\MetadataAccessorInterface');
+        $this->typeGuesser->setMetadataAccessor($metadataAccessor);
+        self::assertSame($metadataAccessor, $this->typeGuesser->getMetadataAccessor());
+    }
+
+    public function testShouldGetPreviouslySetConfigAccessor()
+    {
+        $configAccessor = $this->getMock('Oro\Bundle\ApiBundle\Config\ConfigAccessorInterface');
+        $this->typeGuesser->setConfigAccessor($configAccessor);
+        self::assertSame($configAccessor, $this->typeGuesser->getConfigAccessor());
+    }
+
     public function testGuessRequired()
     {
         $this->assertNull($this->typeGuesser->guessRequired(self::TEST_CLASS, self::TEST_PROPERTY));
@@ -207,7 +222,32 @@ class MetadataTypeGuesserTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(
             new TypeGuess(
                 'oro_api_entity',
-                ['metadata' => $associationMetadata],
+                ['metadata' => $associationMetadata, 'included_entities' => null],
+                TypeGuess::HIGH_CONFIDENCE
+            ),
+            $this->typeGuesser->guessType(self::TEST_CLASS, self::TEST_PROPERTY)
+        );
+    }
+
+    public function testGuessTypeForToOneAssociationWithIncludedEntities()
+    {
+        $metadata = new EntityMetadata();
+        $metadata->setClassName(self::TEST_CLASS);
+        $associationMetadata = $this->createAssociationMetadata(
+            self::TEST_PROPERTY,
+            'Test\TargetEntity',
+            false,
+            'integer'
+        );
+        $metadata->addAssociation($associationMetadata);
+        $includedEntities = $this->getMock(IncludedEntityCollection::class);
+
+        $this->typeGuesser->setMetadataAccessor($this->getMetadataAccessor($metadata));
+        $this->typeGuesser->setIncludedEntities($includedEntities);
+        $this->assertEquals(
+            new TypeGuess(
+                'oro_api_entity',
+                ['metadata' => $associationMetadata, 'included_entities' => $includedEntities],
                 TypeGuess::HIGH_CONFIDENCE
             ),
             $this->typeGuesser->guessType(self::TEST_CLASS, self::TEST_PROPERTY)
@@ -230,7 +270,32 @@ class MetadataTypeGuesserTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(
             new TypeGuess(
                 'oro_api_entity',
-                ['metadata' => $associationMetadata],
+                ['metadata' => $associationMetadata, 'included_entities' => null],
+                TypeGuess::HIGH_CONFIDENCE
+            ),
+            $this->typeGuesser->guessType(self::TEST_CLASS, self::TEST_PROPERTY)
+        );
+    }
+
+    public function testGuessTypeForToManyAssociationWithIncludedEntities()
+    {
+        $metadata = new EntityMetadata();
+        $metadata->setClassName(self::TEST_CLASS);
+        $associationMetadata = $this->createAssociationMetadata(
+            self::TEST_PROPERTY,
+            'Test\TargetEntity',
+            true,
+            'integer'
+        );
+        $metadata->addAssociation($associationMetadata);
+        $includedEntities = $this->getMock(IncludedEntityCollection::class);
+
+        $this->typeGuesser->setMetadataAccessor($this->getMetadataAccessor($metadata));
+        $this->typeGuesser->setIncludedEntities($includedEntities);
+        $this->assertEquals(
+            new TypeGuess(
+                'oro_api_entity',
+                ['metadata' => $associationMetadata, 'included_entities' => $includedEntities],
                 TypeGuess::HIGH_CONFIDENCE
             ),
             $this->typeGuesser->guessType(self::TEST_CLASS, self::TEST_PROPERTY)

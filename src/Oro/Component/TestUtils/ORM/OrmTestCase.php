@@ -63,6 +63,11 @@ abstract class OrmTestCase extends \PHPUnit_Framework_TestCase
         $config->setProxyDir(__DIR__ . '/Proxies');
         $config->setProxyNamespace('Doctrine\Tests\Proxies');
 
+        // Namespace of custom functions is hardcoded in \Oro\ORM\Query\AST\FunctionFactory::create
+        // To load the custom function we need to manually include the file
+        require_once('Mocks/Functions.php');
+        $config->setCustomStringFunctions(['cast' => 'Oro\ORM\Query\AST\Functions\Cast']);
+
         if ($conn === null) {
             $conn = array(
                 'driverClass'  => 'Oro\Component\TestUtils\ORM\Mocks\DriverMock',
