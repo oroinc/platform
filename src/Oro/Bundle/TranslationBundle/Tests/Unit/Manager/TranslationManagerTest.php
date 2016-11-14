@@ -16,8 +16,12 @@ use Oro\Bundle\TranslationBundle\Provider\JsTranslationDumper;
 use Oro\Bundle\TranslationBundle\Translation\DynamicTranslationMetadataCache;
 use Oro\Bundle\TranslationBundle\Translation\Translator;
 
+use Oro\Component\Testing\Unit\EntityTrait;
+
 class TranslationManagerTest extends \PHPUnit_Framework_TestCase
 {
+    use EntityTrait;
+
     /** @var \PHPUnit_Framework_MockObject_MockObject|Registry */
     protected $registry;
 
@@ -169,6 +173,34 @@ class TranslationManagerTest extends \PHPUnit_Framework_TestCase
         $manager->flush();
     }
 
+    public function testFlushTranslationWithoutValue()
+    {
+        $key = 'test.key';
+        $value = null;
+        $locale = 'test_locale';
+        $domain = 'test_domain';
+
+        $translation = $this->createTranslation(42, $key, $value, $locale, $domain);
+
+        $this->translationKeyRepository->expects($this->any())
+            ->method('findOneBy')
+            ->willReturn($translation->getTranslationKey());
+
+        $this->translationRepository->expects($this->any())->method('findTranslation')->willReturn($translation);
+
+        $this->objectManager->expects($this->once())->method('persist')->with($translation->getTranslationKey());
+        $this->objectManager->expects($this->once())->method('remove')->with($translation);
+        $this->objectManager->expects($this->once())
+            ->method('flush')
+            ->with([$translation->getTranslationKey(), $translation]);
+
+        $manager = $this->getTranslationManager();
+
+        $this->assertNull($manager->saveTranslation($key, $value, $locale, $domain));
+
+        $manager->flush();
+    }
+
     public function testFlushWithoutChanges()
     {
         $this->objectManager->expects($this->never())->method($this->anything());
@@ -244,6 +276,33 @@ class TranslationManagerTest extends \PHPUnit_Framework_TestCase
             $this->dbTranslationMetadataCache,
             $this->translator,
             $this->jsTranslationDumper
+        );
+    }
+
+    /**
+     * @param int $id
+     * @param string $key
+     * @param string $value
+     * @param string $locale
+     * @param string $domain
+     * @return Translation
+     */
+    protected function createTranslation($id, $key, $value, $locale, $domain)
+    {
+        $translationKey = new TranslationKey();
+        $translationKey->setKey($key)->setDomain($domain);
+
+        $language = new Language();
+        $language->setCode($locale);
+
+        return $this->getEntity(
+            Translation::class,
+            [
+                'id' => $id,
+                'translationKey' => $translationKey,
+                'value' => $value,
+                'language' => $language
+            ]
         );
     }
 }

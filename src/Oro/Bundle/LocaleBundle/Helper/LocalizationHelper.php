@@ -61,4 +61,40 @@ class LocalizationHelper
     {
         return $this->getFallbackValue($values, $localization ?: $this->getCurrentLocalization());
     }
+
+    /**
+     * @param Collection $values
+     * @return LocalizedFallbackValue|null
+     */
+    public function getFirstNonEmptyLocalizedValue(Collection $values)
+    {
+        // Check default value
+        $nonEmptyValue = $this->getDefaultFallbackValue($values);
+        $data = null;
+        if ($nonEmptyValue) {
+            $data = !$this->isEmptyString($nonEmptyValue->getString()) ?: $nonEmptyValue->getText();
+        }
+
+        // Then search in collection
+        if ($this->isEmptyString($data)) {
+            foreach ($values as $value) {
+                $data = !$this->isEmptyString($value->getString()) ?: $value->getText();
+                if (!$this->isEmptyString($data)) {
+                    $nonEmptyValue = $value;
+                    break;
+                }
+            }
+        }
+
+        return $nonEmptyValue;
+    }
+
+    /**
+     * @param string $value
+     * @return bool
+     */
+    private function isEmptyString($value)
+    {
+        return $value === '' || $value === null;
+    }
 }
