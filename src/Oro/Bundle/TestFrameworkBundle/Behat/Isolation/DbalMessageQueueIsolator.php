@@ -2,6 +2,12 @@
 
 namespace Oro\Bundle\TestFrameworkBundle\Behat\Isolation;
 
+use Oro\Bundle\TestFrameworkBundle\Behat\Isolation\Event\AfterFinishTestsEvent;
+use Oro\Bundle\TestFrameworkBundle\Behat\Isolation\Event\AfterIsolatedTestEvent;
+use Oro\Bundle\TestFrameworkBundle\Behat\Isolation\Event\BeforeIsolatedTestEvent;
+use Oro\Bundle\TestFrameworkBundle\Behat\Isolation\Event\BeforeStartTestsEvent;
+use Oro\Bundle\TestFrameworkBundle\Behat\Isolation\Event\RestoreStateEvent;
+use Symfony\Component\Console\Helper\QuestionHelper;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Component\Process\Process;
@@ -28,25 +34,27 @@ class DbalMessageQueueIsolator implements IsolatorInterface
     }
 
     /** {@inheritdoc} */
-    public function start()
+    public function start(BeforeStartTestsEvent $event)
+    {
+        $event->writeln('<info>Starting message queue command</info>');
+        $this->process->start();
+    }
+
+    /** {@inheritdoc} */
+    public function beforeTest(BeforeIsolatedTestEvent $event)
     {
         $this->process->start();
     }
 
     /** {@inheritdoc} */
-    public function beforeTest()
+    public function afterTest(AfterIsolatedTestEvent $event)
     {
-        $this->process->start();
-    }
-
-    /** {@inheritdoc} */
-    public function afterTest()
-    {
+        var_dump($this->process->isSuccessful());
         $this->process->stop();
     }
 
     /** {@inheritdoc} */
-    public function terminate()
+    public function terminate(AfterFinishTestsEvent $event)
     {
         $this->process->stop();
     }
@@ -55,5 +63,27 @@ class DbalMessageQueueIsolator implements IsolatorInterface
     public function isApplicable(ContainerInterface $container)
     {
         return 'dbal' === $container->getParameter('message_queue_transport');
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function isOutdatedState()
+    {
+        return false;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function restoreState(RestoreStateEvent $event)
+    {}
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getName()
+    {
+        return 'Dbal Message Queue';
     }
 }

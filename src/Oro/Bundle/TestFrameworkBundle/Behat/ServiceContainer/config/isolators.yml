@@ -7,6 +7,20 @@ services:
     tags:
       - { name: 'event_dispatcher.subscriber' }
 
+#  oro_behat_extension.isolation.unix_file_cache_isolator:
+#    class: 'Oro\Bundle\TestFrameworkBundle\Behat\Isolation\UnixFileCacheIsolator'
+#    arguments:
+#      - '@symfony2_extension.kernel'
+#    tags:
+#      - { name: 'oro_behat.isolator', priority: 100 }
+
+  oro_behat_extension.isolation.windows_file_cache_isolator:
+    class: 'Oro\Bundle\TestFrameworkBundle\Behat\Isolation\WindowsFileCacheIsolator'
+    arguments:
+      - '@symfony2_extension.kernel'
+    tags:
+      - { name: 'oro_behat.isolator', priority: 100 }
+
   oro_behat_extension.isolation.kernel_isolator:
     class: 'Oro\Bundle\TestFrameworkBundle\Behat\Isolation\KernelIsolator'
     arguments:
@@ -21,33 +35,20 @@ services:
     tags:
       - { name: 'oro_behat.isolator', priority: 110 }
 
-  oro_behat_extension.isolation.unix_mysql_isolator:
-    class: 'Oro\Bundle\TestFrameworkBundle\Behat\Isolation\UnixMysqlIsolator'
-    arguments:
-      - '@symfony2_extension.kernel'
-    tags:
-      - { name: 'oro_behat.isolator', priority: 110 }
-
-  oro_behat_extension.isolation.unix_pgsql_isolator:
-    class: 'Oro\Bundle\TestFrameworkBundle\Behat\Isolation\UnixPgsqlIsolator'
-    arguments:
-      - '@symfony2_extension.kernel'
-    tags:
-      - { name: 'oro_behat.isolator', priority: 110 }
-
-  oro_behat_extension.isolation.unix_file_cache_isolator:
-    class: 'Oro\Bundle\TestFrameworkBundle\Behat\Isolation\UnixFileCacheIsolator'
-    arguments:
-      - '@symfony2_extension.kernel'
-    tags:
-      - { name: 'oro_behat.isolator', priority: 120 }
-
-  oro_behat_extension.isolation.windows_file_cache_isolator:
-    class: 'Oro\Bundle\TestFrameworkBundle\Behat\Isolation\WindowsFileCacheIsolator'
-    arguments:
-      - '@symfony2_extension.kernel'
-    tags:
-      - { name: 'oro_behat.isolator', priority: 120 }
+#  oro_behat_extension.isolation.unix_mysql_isolator:
+#    class: 'Oro\Bundle\TestFrameworkBundle\Behat\Isolation\UnixMysqlIsolator'
+#    arguments:
+#      - '@symfony2_extension.kernel'
+#    tags:
+#      - { name: 'oro_behat.isolator', priority: 110 }
+#
+#  oro_behat_extension.isolation.unix_pgsql_isolator:
+#    class: 'Oro\Bundle\TestFrameworkBundle\Behat\Isolation\UnixPgsqlIsolator'
+#    arguments:
+#      - '@symfony2_extension.kernel'
+#    tags:
+#      - { name: 'oro_behat.isolator', priority: 110 }
+#
 
   oro_behat_extension.isolation.dbal_message_queue_isolator:
     class: 'Oro\Bundle\TestFrameworkBundle\Behat\Isolation\DbalMessageQueueIsolator'

@@ -2,14 +2,19 @@
 
 namespace Oro\Bundle\TestFrameworkBundle\Behat\Isolation;
 
+use Oro\Bundle\TestFrameworkBundle\Behat\Isolation\Event\AfterFinishTestsEvent;
+use Oro\Bundle\TestFrameworkBundle\Behat\Isolation\Event\AfterIsolatedTestEvent;
+use Oro\Bundle\TestFrameworkBundle\Behat\Isolation\Event\BeforeIsolatedTestEvent;
+use Oro\Bundle\TestFrameworkBundle\Behat\Isolation\Event\BeforeStartTestsEvent;
+use Symfony\Component\Console\Helper\QuestionHelper;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
-class UnixMysqlIsolator extends OsRelatedIsolator implements IsolatorInterface
+final class UnixMysqlIsolator extends OsRelatedIsolator implements IsolatorInterface
 {
     use AbstractDbIsolator;
 
     /** {@inheritdoc} */
-    public function start()
+    public function start(BeforeStartTestsEvent $event)
     {
         $this->runProcess(sprintf(
             'MYSQL_PWD=%s mysqldump -h %s -u %s %s > %s/%4$s.sql',
@@ -22,11 +27,11 @@ class UnixMysqlIsolator extends OsRelatedIsolator implements IsolatorInterface
     }
 
     /** {@inheritdoc} */
-    public function beforeTest()
+    public function beforeTest(BeforeIsolatedTestEvent $event)
     {}
 
     /** {@inheritdoc} */
-    public function afterTest()
+    public function afterTest(AfterIsolatedTestEvent $event)
     {
         $this->runProcess(sprintf(
             'MYSQL_PWD=%s mysql -e "drop database %s;" -h %s -u %s',
@@ -53,7 +58,7 @@ class UnixMysqlIsolator extends OsRelatedIsolator implements IsolatorInterface
     }
 
     /** {@inheritdoc} */
-    public function terminate()
+    public function terminate(AfterFinishTestsEvent $event)
     {}
 
     /** {@inheritdoc} */
@@ -64,6 +69,14 @@ class UnixMysqlIsolator extends OsRelatedIsolator implements IsolatorInterface
             && 'pdo_mysql' === $container->getParameter('database_driver');
     }
 
+    /**
+     * {@inheritdoc}
+     */
+    public function isOutdatedState()
+    {
+        return false;
+    }
+
     /** {@inheritdoc} */
     protected function getApplicableOs()
     {
@@ -71,5 +84,13 @@ class UnixMysqlIsolator extends OsRelatedIsolator implements IsolatorInterface
             OsRelatedIsolator::LINUX_OS,
             OsRelatedIsolator::MAC_OS,
         ];
+    }
+
+    /**
+     * Restore initial state
+     * @return void
+     */
+    public function restoreState()
+    {
     }
 }

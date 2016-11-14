@@ -62,7 +62,14 @@ services:
             - '@oro_test.listener.step_duration_measure_subscriber'
             - '@event_dispatcher'
         tags:
-            - { name: 'cli.controller' }
+            - { name: 'cli.controller', priority: 500 }
+
+    cli.controller.input_output_conyroller:
+        class: Oro\Bundle\TestFrameworkBundle\Behat\Cli\InputOutputController
+        arguments:
+            - '@oro_behat_extension.isolation.test_isolation_subscriber'
+        tags:
+            - { name: 'cli.controller', priority: 100 }
 
     oro_element_factory:
         class: 'Oro\Bundle\TestFrameworkBundle\Behat\Element\OroElementFactory'

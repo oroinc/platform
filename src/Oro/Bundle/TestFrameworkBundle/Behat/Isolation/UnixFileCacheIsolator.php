@@ -2,6 +2,11 @@
 
 namespace Oro\Bundle\TestFrameworkBundle\Behat\Isolation;
 
+use Oro\Bundle\TestFrameworkBundle\Behat\Isolation\Event\AfterFinishTestsEvent;
+use Oro\Bundle\TestFrameworkBundle\Behat\Isolation\Event\AfterIsolatedTestEvent;
+use Oro\Bundle\TestFrameworkBundle\Behat\Isolation\Event\BeforeIsolatedTestEvent;
+use Oro\Bundle\TestFrameworkBundle\Behat\Isolation\Event\BeforeStartTestsEvent;
+use Symfony\Component\Console\Helper\QuestionHelper;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpKernel\KernelInterface;
@@ -28,24 +33,24 @@ class UnixFileCacheIsolator extends OsRelatedIsolator implements IsolatorInterfa
     }
 
     /** {@inheritdoc} */
-    public function start()
+    public function start(BeforeStartTestsEvent $event)
     {
         $this->filesystem->mirror($this->cacheDir, $this->cacheDump);
     }
 
     /** {@inheritdoc} */
-    public function beforeTest()
+    public function beforeTest(BeforeIsolatedTestEvent $event)
     {}
 
     /** {@inheritdoc} */
-    public function afterTest()
+    public function afterTest(AfterIsolatedTestEvent $event)
     {
         $this->filesystem->remove($this->cacheDir);
         $this->filesystem->mirror($this->cacheDump, $this->cacheDir);
     }
 
     /** {@inheritdoc} */
-    public function terminate()
+    public function terminate(AfterFinishTestsEvent $event)
     {}
 
     /** {@inheritdoc} */
@@ -63,5 +68,21 @@ class UnixFileCacheIsolator extends OsRelatedIsolator implements IsolatorInterfa
             OsRelatedIsolator::LINUX_OS,
             OsRelatedIsolator::MAC_OS,
         ];
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function isOutdatedState()
+    {
+        return false;
+    }
+
+    /**
+     * Restore initial state
+     * @return void
+     */
+    public function restoreState()
+    {
     }
 }

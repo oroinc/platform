@@ -11,6 +11,9 @@ trait AbstractDbIsolator
     /** @var string */
     protected $dbHost;
 
+    /** @var  string */
+    protected $dbPort;
+
     /** @var string */
     protected $dbName;
 
@@ -24,6 +27,11 @@ trait AbstractDbIsolator
     protected $cacheDir;
 
     /**
+     * @var string full path to DB dump file
+     */
+    protected $dbDump;
+
+    /**
      * @param KernelInterface $kernel
      */
     public function __construct(KernelInterface $kernel)
@@ -33,9 +41,11 @@ trait AbstractDbIsolator
 
         $this->cacheDir = $kernel->getCacheDir();
         $this->dbHost = $container->getParameter('database_host');
+        $this->dbPort = $container->getParameter('database_port');
         $this->dbName = $container->getParameter('database_name');
         $this->dbUser = $container->getParameter('database_user');
         $this->dbPass = $container->getParameter('database_password');
+        $this->dbDump = sys_get_temp_dir().DIRECTORY_SEPARATOR.$this->dbName;
     }
 
     /**
