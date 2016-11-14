@@ -30,7 +30,7 @@ oro:
             submenu: Submenu Item
             reset: Reset
             reset_confirm: Are you sure you want to reset menu "%menuKey%"?
-            reset_message: Menu "%menuKey%" was successfully reset
+            reset_message: "Menu \"%menuKey%\" was successfully reset. Please <a href=\"#\" onclick=\"window.location.reload(false);return false;\">reload</a> the page to see the changes applied."
             reset_ok_text: Yes, Reset
             reset_title: Reset Confirmation
             entity_label: Menu Item
@@ -48,7 +48,8 @@ oro:
             ownership_type.label: Ownership Type
             owner_id.label: Owner Id
             acl_resource_id.label: ACL Resource Id
-            saved_message: Menu item saved successfully.
+            saved_message: "Menu item saved successfully. Please <a href=\"#\" onclick=\"window.location.reload(false);return false;\">reload</a> the page to see the changes applied."
+            deleted_message: "Menu item successfully deleted. Please <a href=\"#\" onclick=\"window.location.reload(false);return false;\">reload</a> the page to see the changes applied."
             select_existing_or_create_new: Select existing menu item or create new.
             roots_plural_label: Menus
             edit_menus: Edit Menus

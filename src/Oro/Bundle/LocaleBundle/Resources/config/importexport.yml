@@ -19,6 +19,7 @@ services:
         parent: oro_importexport.strategy.configurable_add_or_replace
         calls:
             - [setLocalizedFallbackValueClass, ['%oro_locale.entity.localized_fallback_value.class%']]
+            - [setDoctrineHelper, ['@oro_entity.doctrine_helper']]
 
     oro_locale.importexport.normalizer.localized_fallback_value_collection_normalizer:
         class: 'Oro\Bundle\LocaleBundle\ImportExport\Normalizer\LocalizedFallbackValueCollectionNormalizer'

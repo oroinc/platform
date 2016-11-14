@@ -46,7 +46,7 @@ class TranslationWriter implements ItemWriterInterface
                 $this->translationManager->saveTranslation($key, $item->getValue(), $locale, $domain);
             }
 
-            $this->translationManager->flush();
+            $this->translationManager->flush(true);
 
             $em->commit();
             $em->clear();
