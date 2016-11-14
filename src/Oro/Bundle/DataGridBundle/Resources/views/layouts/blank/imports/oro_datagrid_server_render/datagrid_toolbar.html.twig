@@ -4,6 +4,7 @@
     }) %}
 
     <div{{ block('block_attributes') }}>
+        {% do block|merge_context({'datagrid': datagrid}) %}
         {{ block('container_widget') }}
     </div>
 {% endblock %}
@@ -16,24 +17,33 @@
 
     <div class="grid__tool">
         <div{{ block('block_attributes') }}>
-            {# TODO: pagination #}
+            {% set metadata = oro_datagrid_metadata(datagrid) %}
+            {% set data = oro_datagrid_data(datagrid) %}
+            {% set state = metadata %}
 
-            <span>Page:</span>
+            {% set totalRecords = data.options.totalRecords %}
+            {% set pageSize = metadata.state.pageSize %}
+            {% set currentPage = metadata.state.currentPage %}
+            {% set totalPages = pageSize == 0 ? 1 : (totalRecords / pageSize)|round %}
+
+            <span>{{ "oro.datagrid.pagination.label"|trans }}:</span>
             <div class="oro-pagination__pager">
-                <button class="oro-pagination__pager__prev disabled" data-grid-pagination-trigger data-grid-pagination-direction="prev" disabled>
+                <button class="oro-pagination__pager__prev{% if currentPage <= 1 %} disabled{% endif %}"
+                        data-grid-pagination-trigger data-grid-pagination-direction="prev"{% if currentPage <= 1 %} disabled{% endif %}>
                     <i class="cf-left-open cf--base-line"></i>
                 </button>
 
-                <input type="text" class="oro-pagination__pager__input" value="1" data-grid-pagination-trigger-input>
+                <input type="text" class="oro-pagination__pager__input" value="{{ currentPage }}" data-grid-pagination-trigger-input>
 
-                <button class="oro-pagination__pager__next disabled" data-grid-pagination-trigger data-grid-pagination-direction="next" disabled>
+                <button class="oro-pagination__pager__next{% if currentPage >= totalPages %} disabled{% endif %}"
+                        data-grid-pagination-trigger data-grid-pagination-direction="next"{% if currentPage >= totalPages %} disabled{% endif %}>
                     <i class="cf-right-open cf--base-line"></i>
                 </button>
             </div>
 
             <span class="hidden-sm hidden-xs">
-            of 1&nbsp;|
-            Total of 1 records
+                {{ "oro.datagrid.pagination.totalPages"|trans({'%totalPages%': totalPages}) }}&nbsp;|
+                {{ "oro.datagrid.pagination.totalRecords"|trans({'%totalRecords%': totalRecords}) }}
             </span>
         </div>
     </div>
@@ -45,42 +55,27 @@
         'data-grid-pagesize': ''
     }) %}
 
-    <div class="grid__tool">
-        <div{{ block('block_attributes') }}>
-            {# TODO: pagesize #}
+    {% set metadata = oro_datagrid_metadata(datagrid) %}
+    {% set pageSize = metadata.options.toolbarOptions.pageSize %}
 
-            <div class=" page-size pull-right form-horizontal" data-grid-pagesize="">
-                <span class="fs14 va-m_md">View per page: &nbsp;</span>
-                <div class="action-selectbox_custom_in-pager">
-                    <div class="select2-container oro-select2 input-widget" id="s2id_autogen1">
-                        <a href="javascript:void(0)" onclick="return false;" class="select2-choice" tabindex="-1">
-                            <span class="select2-chosen">25</span>
-                            <abbr class="select2-search-choice-close"></abbr>
-                            <span class="select2-arrow">
-                                <b></b>
-                            </span>
-                        </a>
-
-                        <input class="select2-focusser select2-offscreen" type="text" id="s2id_autogen2">
-                        <div class="select2-drop select2-display-none oro-select2__dropdown select2-with-searchbox">
-                            <ul class="select2-breadcrumbs"></ul>
-                            <div class="select2-search">
-                                <input type="text" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" class="select2-input">
-                            </div>
-                            <ul class="select2-results"></ul>
-                        </div>
+    {% if pageSize.hide == false and pageSize.items|length > 0 %}
+        <div class="grid__tool">
+            <div{{ block('block_attributes') }}>
+                <div class=" page-size pull-right form-horizontal" data-grid-pagesize>
+                    <span class="fs14 va-m_md">{{ "oro.datagrid.pagesize.label"|trans }}: &nbsp;</span>
+                    <div class="action-selectbox_custom_in-pager">
+                        <select class="select select--size-s" name="action" data-grid-pagesize-selector>
+                            {% for value in pageSize.items %}
+                                <option value="{{ value }}" data-grid-pagesize-trigger{% if value == pageSize.default_per_page %} selected{% endif %}>
+                                    {{ value }}
+                                </option>
+                            {% endfor %}
+                        </select>
                     </div>
-
-                    <select class="select select--size-s select2-offscreen" name="action" data-grid-pagesize-selector="" data-bound-input-widget="select2" tabindex="-1">
-                        <option value="10" data-grid-pagesize-trigger="">10</option>
-                        <option selected="" value="25" data-grid-pagesize-trigger="">25</option>
-                        <option value="50" data-grid-pagesize-trigger="">50</option>
-                        <option value="100" data-grid-pagesize-trigger="">100</option>
-                    </select>
                 </div>
             </div>
         </div>
-    </div>
+    {% endif %}
 {% endblock %}
 
 {% block __oro_datagrid_server_render__datagrid_toolbar_actions_widget %}
@@ -90,6 +85,7 @@
     }) %}
 
     <div{{ block('block_attributes') }}>
-        {# TODO: actions #}
+        {# TODO: add reset and refresh actions #}
+        {{ block_widget(block) }}
     </div>
 {% endblock %}

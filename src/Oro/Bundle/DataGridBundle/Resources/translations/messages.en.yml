@@ -26,6 +26,12 @@ oro:
         appearance:
             grid: Grid
             board: Kanban Board
+        pagination:
+            label: Page
+            totalPages: of %totalPages%
+            totalRecords: Total of %totalRecords% records
+        pagesize:
+            label: View per page
     grid:
         mass_action:
             label: Mass Actions

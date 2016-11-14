@@ -24,6 +24,7 @@
         <div class="oro-datagrid">
             {% if toolbarOptions.placement.top %}
                 <div class="toolbar" data-grid-toolbar="top">
+                    {% do block[id ~ '_toolbar']|merge_context({'datagrid': datagrid}) %}
                     {{ block_widget(block[id ~ '_toolbar']) }}
                 </div>
             {% endif %}
@@ -35,13 +36,13 @@
                     <div class="grid-container">
                         <table class="grid table-hover table table-bordered table-condensed">
                             <thead class="grid-header">
-                                {% do block|merge_context({'datagrid': datagrid}) %}
+                                {% do block[id ~ '_header_row']|merge_context({'datagrid': datagrid}) %}
                                 {{ block_widget(block[id ~ '_header_row']) }}
                             </thead>
 
                             <tbody class="grid-body">
                                 {% for datagrid_row in datagridData.data %}
-                                    {% do block|merge_context({'datagrid_row': datagrid_row}) %}
+                                    {% do block[id ~ '_row']|merge_context({'datagrid_row': datagrid_row}) %}
                                     {{ block_widget(block[id ~ '_row']) }}
                                 {% endfor %}
                             </tbody>
@@ -56,6 +57,7 @@
 
             {% if toolbarOptions.placement.bottom %}
                 <div class="toolbar dropup-area" data-grid-toolbar="bottom">
+                    {% do block[id ~ '_toolbar']|merge_context({'datagrid': datagrid}) %}
                     {{ block_widget(block[id ~ '_toolbar']) }}
                 </div>
             {% endif %}
