@@ -1,0 +1,4 @@
+assets:
+    css:
+        'oroscope':
+            - 'bundles/oroscope/css/style.less'
