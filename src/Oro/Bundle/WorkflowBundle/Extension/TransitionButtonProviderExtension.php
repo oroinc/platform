@@ -2,10 +2,10 @@
 
 namespace Oro\Bundle\WorkflowBundle\Extension;
 
+use Oro\Bundle\ActionBundle\Helper\ApplicationsHelperInterface;
 use Oro\Bundle\ActionBundle\Model\ButtonContext;
 use Oro\Bundle\ActionBundle\Model\ButtonProviderExtensionInterface;
 use Oro\Bundle\ActionBundle\Model\ButtonSearchContext;
-use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
 use Oro\Bundle\WorkflowBundle\Model\Transition;
 use Oro\Bundle\WorkflowBundle\Model\TransitionButton;
@@ -18,17 +18,19 @@ class TransitionButtonProviderExtension implements ButtonProviderExtensionInterf
     /** @var WorkflowRegistry */
     protected $workflowRegistry;
 
-    /** @var DoctrineHelper */
-    protected $doctrineHelper;
+    /** @var ApplicationsHelperInterface */
+    protected $applicationsHelper;
 
     /**
      * @param WorkflowRegistry $workflowRegistry
-     * @param DoctrineHelper $doctrineHelper
+     * @param ApplicationsHelperInterface $applicationsHelper
      */
-    public function __construct(WorkflowRegistry $workflowRegistry, DoctrineHelper $doctrineHelper)
-    {
+    public function __construct(
+        WorkflowRegistry $workflowRegistry,
+        ApplicationsHelperInterface $applicationsHelper
+    ) {
         $this->workflowRegistry = $workflowRegistry;
-        $this->doctrineHelper = $doctrineHelper;
+        $this->applicationsHelper = $applicationsHelper;
     }
 
     /**
@@ -37,35 +39,16 @@ class TransitionButtonProviderExtension implements ButtonProviderExtensionInterf
     public function find(ButtonSearchContext $buttonSearchContext)
     {
         $buttons = [];
-        $buttonContext = $this->generateButtonContext($buttonSearchContext);
 
         foreach ($this->workflowRegistry->getActiveWorkflows() as $workflow) {
-            $transitionNames = [];
-            if ($buttonSearchContext->getEntityClass()) {
-                $entities = $workflow->getInitEntities();
-                if (array_key_exists($buttonSearchContext->getEntityClass(), $entities)) {
-                    $transitionNames = $entities[$buttonSearchContext->getEntityClass()];
-                }
-            }
-            if ($buttonSearchContext->getRouteName()) {
-                $routes = $workflow->getInitRoutes();
-                if (array_key_exists($buttonSearchContext->getRouteName(), $routes)) {
-                    $transitionNames = array_merge($transitionNames, $routes[$buttonSearchContext->getRouteName()]);
-                }
-            }
-
-            /** @var Transition[] $transitions */
-            $transitions = array_filter(
-                $workflow->getTransitionManager()->getStartTransitions()->toArray(),
-                function (Transition $transition) use ($transitionNames) {
-                    return in_array($transition->getName(), $transitionNames, true);
-                }
-            );
-
-            $workflowItem = $this->buildWorkflowItem($workflow);
+            $transitions = $this->getInitTransitions($workflow, $buttonSearchContext);
 
             foreach ($transitions as $transition) {
-                if ($transition->isAvailable(clone $workflowItem)) {
+                $workflowItem = $this->buildWorkflowItem($transition, $workflow, $buttonSearchContext);
+                $isAvailable = $transition->isAvailable(clone $workflowItem);
+                if ($isAvailable || !$transition->isUnavailableHidden()) {
+                    $buttonContext = $this->generateButtonContext($transition, $buttonSearchContext);
+                    $buttonContext->setEnabled($isAvailable);
                     $buttons[] = new TransitionButton($transition, $workflow, $buttonContext);
                 }
             }
@@ -75,14 +58,15 @@ class TransitionButtonProviderExtension implements ButtonProviderExtensionInterf
     }
 
     /**
+     * @param Transition $transition
      * @param Workflow $workflow
      * @param ButtonSearchContext $searchContext
-
+     *
      * @return WorkflowItem
      */
-    protected function buildWorkflowItem(Workflow $workflow)
+    protected function buildWorkflowItem(Transition $transition, Workflow $workflow, ButtonSearchContext $searchContext)
     {
-        $workflowData = new WorkflowData([]);
+        $workflowData = new WorkflowData([$transition->getInitContextAttribute() => $searchContext]);
         $workflowItem = new WorkflowItem();
 
         return $workflowItem->setEntityClass($workflow->getDefinition()->getRelatedEntity())
@@ -92,18 +76,55 @@ class TransitionButtonProviderExtension implements ButtonProviderExtensionInterf
     }
 
     /**
+     * @param Transition $transition
      * @param ButtonSearchContext $searchContext
      *
      * @return ButtonContext
      */
-    protected function generateButtonContext(ButtonSearchContext $searchContext)
+    protected function generateButtonContext(Transition $transition, ButtonSearchContext $searchContext)
     {
         $context = new ButtonContext();
         $context->setDatagridName($searchContext->getGridName())
             ->setEntity($searchContext->getEntityClass(), $searchContext->getEntityId())
             ->setRouteName($searchContext->getRouteName())
-            ->setGroup($searchContext->getGroup());
+            ->setGroup($searchContext->getGroup())
+            ->setUnavailableHidden($transition->isUnavailableHidden());
+
+        if ($transition->hasForm()) {
+            $context->setDialogUrl($this->applicationsHelper->getDialogRoute());
+        }
+        $context->setExecutionUrl($this->applicationsHelper->getExecutionRoute());
 
         return $context;
+    }
+
+    /**
+     * @param Workflow $workflow
+     * @param ButtonSearchContext $searchContext
+     *
+     * @return Transition[]
+     */
+    protected function getInitTransitions(Workflow $workflow, ButtonSearchContext $searchContext)
+    {
+        $transitionNames = [];
+        if ($searchContext->getEntityClass()) {
+            $entities = $workflow->getInitEntities();
+            if (array_key_exists($searchContext->getEntityClass(), $entities)) {
+                $transitionNames = $entities[$searchContext->getEntityClass()];
+            }
+        }
+        if ($searchContext->getRouteName()) {
+            $routes = $workflow->getInitRoutes();
+            if (array_key_exists($searchContext->getRouteName(), $routes)) {
+                $transitionNames = array_merge($transitionNames, $routes[$searchContext->getRouteName()]);
+            }
+        }
+
+        return array_filter(
+            $workflow->getTransitionManager()->getStartTransitions()->toArray(),
+            function (Transition $transition) use ($transitionNames) {
+                return in_array($transition->getName(), $transitionNames, true);
+            }
+        );
     }
 }

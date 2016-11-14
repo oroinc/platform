@@ -343,7 +343,7 @@ services:
         class: 'Oro\Bundle\WorkflowBundle\Extension\TransitionButtonProviderExtension'
         arguments:
             - '@oro_workflow.registry'
-            - '@oro_entity.doctrine_helper'
+            - '@oro_workflow.helper.applications'
         tags:
            - { name: oro.action.extension.button_provider, priority: 110 }
 
