@@ -25,10 +25,8 @@ class TransitionButtonProviderExtension implements ButtonProviderExtensionInterf
      * @param WorkflowRegistry $workflowRegistry
      * @param ApplicationsHelperInterface $applicationsHelper
      */
-    public function __construct(
-        WorkflowRegistry $workflowRegistry,
-        ApplicationsHelperInterface $applicationsHelper
-    ) {
+    public function __construct(WorkflowRegistry $workflowRegistry, ApplicationsHelperInterface $applicationsHelper)
+    {
         $this->workflowRegistry = $workflowRegistry;
         $this->applicationsHelper = $applicationsHelper;
     }
