@@ -215,3 +215,13 @@ services:
 
     oro_action.provider.button:
         class: 'Oro\Bundle\ActionBundle\Provider\ButtonProvider'
+
+
+    oro_ui.provider.button.extension.operation:
+        class: 'Oro\Bundle\ActionBundle\Extension\OperationButtonProviderExtension'
+        arguments:
+            - '@oro_action.operation_registry'
+            - '@oro_action.helper.context'
+            - '@oro_action.helper.applications'
+        tags:
+            - { name: oro.action.extension.button_provider, priority: 100 }
