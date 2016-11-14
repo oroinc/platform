@@ -109,8 +109,8 @@ datagrids:
                     options:
                         field_options:
                             choices:
-                                2: Inactive
-                                1: Active
+                                2: Disabled
+                                1: Enabled
                 createdAt:
                     type: datetime
                     data_name: u.createdAt
