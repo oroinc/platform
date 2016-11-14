@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\DataGridBundle\Layout\Block\Type;
 
-use Oro\Bundle\DataGridBundle\Datagrid\DatagridInterface;
 use Oro\Bundle\DataGridBundle\Datagrid\ManagerInterface;
 use Oro\Bundle\DataGridBundle\Datagrid\NameStrategyInterface;
 use Oro\Bundle\SecurityBundle\SecurityFacade;
@@ -121,7 +120,7 @@ class DatagridType extends AbstractContainerType
     /**
      * @param string $gridName
      *
-     * @return DatagridInterface
+     * @return array
      */
     private function getGridColumns($gridName)
     {

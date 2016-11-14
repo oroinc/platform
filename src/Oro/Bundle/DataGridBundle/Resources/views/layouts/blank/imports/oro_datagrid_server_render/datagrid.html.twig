@@ -35,12 +35,14 @@
                     <div class="grid-container">
                         <table class="grid table-hover table table-bordered table-condensed">
                             <thead class="grid-header">
-                                {{ block_widget(block[id ~ '_header_row'], {'datagrid': datagrid}) }}
+                                {% do block|merge_context({'datagrid': datagrid}) %}
+                                {{ block_widget(block[id ~ '_header_row']) }}
                             </thead>
 
                             <tbody class="grid-body">
                                 {% for datagrid_row in datagridData.data %}
-                                    {{ block_widget(block[id ~ '_row'], {'datagrid_row': datagrid_row}) }}
+                                    {% do block|merge_context({'datagrid_row': datagrid_row}) %}
+                                    {{ block_widget(block[id ~ '_row']) }}
                                 {% endfor %}
                             </tbody>
 

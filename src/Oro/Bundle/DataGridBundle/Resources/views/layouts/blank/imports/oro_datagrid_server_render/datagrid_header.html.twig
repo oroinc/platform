@@ -5,7 +5,8 @@
 
     <tr{{ block('block_attributes') }}>
         {% for child in block if child.vars.visible -%}
-            {{ block_widget(child, {'datagrid': datagrid}) }}
+            {% do child|merge_context({'datagrid': datagrid}) %}
+            {{ block_widget(child) }}
         {%- endfor %}
     </tr>
 {% endblock %}

@@ -7,20 +7,21 @@
 
     <tr{{ block('block_attributes') }}>
         {% for child in block if child.vars.visible -%}
-            {{ block_widget(child, {'datagrid_row': datagrid_row}) }}
+            {% do child|merge_context({'datagrid_row': datagrid_row}) %}
+            {{ block_widget(child) }}
         {%- endfor %}
     </tr>
 {% endblock %}
 
 {% block datagrid_cell_widget %}
-    {# TODO: inject `datagrid` for getting datagrid metadata (need for rendering column) #}
     {% set attr = attr|merge({
         class: attr.class|default('') ~ " string-cell grid-cell grid-body-cell grid-body-cell-" ~ column_name
     }) %}
 
     <td{{ block('block_attributes') }}>
         {% for child in block if child.vars.visible -%}
-            {{ block_widget(child, {'datagrid_row': datagrid_row}) }}
+            {% do child|merge_context({'datagrid_row': datagrid_row}) %}
+            {{ block_widget(child) }}
         {%- endfor %}
     </td>
 {% endblock %}
