@@ -55,10 +55,6 @@ class MailboxProcessTriggerListener extends MailboxEmailListener implements
      */
     public function onFlush(OnFlushEventArgs $args)
     {
-        if (!$this->isFeaturesEnabled()) {
-            return;
-        }
-
         parent::onFlush($args);
         $this->emailBodies = array_filter(
             $this->emailBodies,
@@ -77,13 +73,10 @@ class MailboxProcessTriggerListener extends MailboxEmailListener implements
      */
     public function postFlush(PostFlushEventArgs $args)
     {
-        if (!$this->isFeaturesEnabled()) {
+        if (empty($this->emailBodies) || !$this->isFeaturesEnabled()) {
             return;
         }
 
-        if (empty($this->emailBodies)) {
-            return;
-        }
         $emailBodies = $this->emailBodies;
         $this->emailBodies = [];
 
