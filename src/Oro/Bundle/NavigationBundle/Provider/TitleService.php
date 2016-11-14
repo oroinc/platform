@@ -320,9 +320,9 @@ class TitleService implements TitleServiceInterface
      * @param array $params
      * @return $this
      */
-    public function setParams(array $params)
+    public function setParams($params)
     {
-        $this->params = $params;
+        $this->params = (array)$params;
 
         return $this;
     }
