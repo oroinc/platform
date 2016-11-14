@@ -278,6 +278,12 @@ To migrate all labels from configuration translatable fields automatically you c
 - Added `Oro\Component\Layout\Block\Type\Options` class that wraps the `array` of options and can evaluate option type (is `option` instanceof `Expression`).
 - Updated method `Oro\Component\Layout\Extension\Theme\Visitor::loadImportUpdate()` to add imported updates to updates list right after parent update instead of adding it to the end of updates list.
 - Updated `Oro\Component\Layout\BlockTypeInterface`, `Oro\Component\Layout\BlockTypeExtensionInterface`, `Oro\Component\Layout\LayoutRegistryInterface` to use the `Options` object instead of `array`.
+- Added method `Oro\Component\Layout\BlockView::getId`.
+- Added method `Oro\Component\Layout\ContextInterface::getHash`.
+- Added config loader `\Oro\Component\Layout\Config\Loader\LayoutUpdateCumulativeResourceLoader` it tracks directory structure/content updates and file modification.
+- Added interface `Oro\Component\Layout\BlockViewCacheInterface`.
+- Added class `Oro\Component\Layout\BlockViewCache`.
+- Updated method `Oro\Component\Layout\LayoutBuilder::getLayout`. Added layout cache.
 
 ####LayoutBundle
 - Removed class `Oro\Bundle\LayoutBundle\CacheWarmer\LayoutUpdatesWarmer`.
@@ -305,6 +311,12 @@ To migrate all labels from configuration translatable fields automatically you c
 - Class `Oro\Bundle\LayoutBundle\Layout\Encoder\JsonExpressionEncoder` moved to `Oro\Component\Layout\ExpressionLanguage\Encoder\JsonExpressionEncoder`.
 - Class `Oro\Bundle\LayoutBundle\ExpressionLanguage\ExpressionManipulator` moved to `Oro\Component\Layout\ExpressionLanguage\ExpressionManipulator`.
 - Class `Oro\Bundle\LayoutBundle\Layout\Processor\ExpressionProcessor` moved to `Oro\Component\Layout\ExpressionLanguage\ExpressionProcessor`.
+- Added class `Oro\Bundle\LayoutBundle\DependencyInjection\Compiler\BlockViewSerializerNormalizersPass` that collect serializers by tag `oro_layout.block_view_serializer.normalizer` and inject it to `oro_layout.block_view_serializer`:
+    * Added block view normalizer `Oro\Bundle\LayoutBundle\Layout\Serializer\BlockViewNormalizer`
+    * Added block view normalizer `Oro\Bundle\LayoutBundle\Layout\Serializer\ExpressionNormalizer`
+    * Added block view normalizer `Oro\Bundle\LayoutBundle\Layout\Serializer\OptionValueBagNormalizer`
+- Added exception class `Oro\Bundle\LayoutBundle\Exception\UnexpectedBlockViewVarTypeException`.
+- Added layout context configurator `Oro\Bundle\LayoutBundle\Layout\Extension\LastModifiedDateContextConfigurator`.
 
 ####ConfigBundle:
 - Class `Oro\Bundle\ConfigBundle\Config\AbstractScopeManager` added `$scopeIdentifier` of type integer, null or object as optional parameter for next methods: `getSettingValue`, `getInfo`, `set`, `reset`, `getChanges`, `flush`, `save`, `calculateChangeSet`, `reload`
