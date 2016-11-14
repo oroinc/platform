@@ -53,6 +53,10 @@ services:
             - '@oro_locale.manager.localization'
             - '@oro_locale.provider.current_localization'
 
+    oro_locale.helper.localization.link:
+        tags:
+            - { name: oro_service_link, service: oro_locale.helper.localization }
+
     oro_locale.listener.orm.localization_listener:
         class: 'Oro\Bundle\LocaleBundle\EventListener\ORM\LocalizationListener'
         public: false
