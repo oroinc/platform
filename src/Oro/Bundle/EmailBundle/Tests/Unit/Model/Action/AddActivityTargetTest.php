@@ -10,7 +10,7 @@ use Oro\Bundle\EmailBundle\Entity\Manager\EmailActivityManager;
 use Oro\Bundle\EmailBundle\Model\Action\AddActivityTarget;
 use Oro\Bundle\UserBundle\Entity\User;
 
-use Oro\Component\Action\Model\ContextAccessor;
+use Oro\Component\ConfigExpression\ContextAccessor;
 
 class AddActivityTargetTest extends \PHPUnit_Framework_TestCase
 {
@@ -31,7 +31,7 @@ class AddActivityTargetTest extends \PHPUnit_Framework_TestCase
 
     public function setUp()
     {
-        $this->contextAccessor = $this->getMock('Oro\Component\Action\Model\ContextAccessor');
+        $this->contextAccessor = $this->getMock('Oro\Component\ConfigExpression\ContextAccessor');
 
         $this->emailActivityManager = $this->getMockBuilder(
             'Oro\Bundle\EmailBundle\Entity\Manager\EmailActivityManager'

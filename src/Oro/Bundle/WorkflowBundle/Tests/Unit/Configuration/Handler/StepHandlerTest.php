@@ -34,153 +34,148 @@ class StepHandlerTest extends \PHPUnit_Framework_TestCase
      */
     public function handleDataProvider()
     {
-        return array(
-            'simple configuration' => array(
-                'expected' => array(
+        return [
+            'simple configuration' => [
+                'expected' => [
                     'start_step' => 'first_step',
-                    WorkflowConfiguration::NODE_STEPS => array(
+                    WorkflowConfiguration::NODE_STEPS => [
                         [
                             'name' => 'step:starting_point',
                             'order' => -1,
                             '_is_start' => true,
                             'is_final' => '',
                             'allowed_transitions' => ['start_transition'],
-                            'label' => 'step:starting_point'
                         ],
-                        array(
+                        [
                             'name' => 'first_step',
-                            'label' => 'First Step',
                             'order' => 10,
+                            'label' => 'First Step',
                             '_is_start' => false,
                             'is_final' => true,
-                            'allowed_transitions' => array(),
-                        ),
-                    ),
-                    WorkflowConfiguration::NODE_TRANSITIONS => array(
-                        array(
+                            'allowed_transitions' => [],
+                        ],
+                    ],
+                    WorkflowConfiguration::NODE_TRANSITIONS => [
+                        [
                             'name' => 'start_transition',
                             'is_start' => true,
-                        ),
-                    ),
-                ),
-                'input' => array(
+                        ],
+                    ],
+                ],
+                'input' => [
                     'start_step' => 'first_step',
-                    WorkflowConfiguration::NODE_STEPS => array(
-                        array(
+                    WorkflowConfiguration::NODE_STEPS => [
+                        [
                             'name' => 'step:starting_point',
                             'order' => -1,
                             '_is_start' => true,
                             'is_final' => false,
-                            'allowed_transitions' => array('start_transition'),
-                        ),
-                        array(
+                            'allowed_transitions' => ['start_transition'],
+                        ],
+                        [
                             'name' => 'first_step',
                             'label' => 'First Step',
                             'order' => 10,
                             '_is_start' => false,
                             'is_final' => true,
-                        ),
-                    ),
-                    WorkflowConfiguration::NODE_TRANSITIONS => array(
-                        array(
+                        ],
+                    ],
+                    WorkflowConfiguration::NODE_TRANSITIONS => [
+                        [
                             'name' => 'start_transition'
-                        ),
-                    ),
-                ),
-            ),
-            'full configuration' => array(
-                'expected' => array(
+                        ],
+                    ],
+                ],
+            ],
+            'full configuration' => [
+                'expected' => [
                     'start_step' => null,
-                    WorkflowConfiguration::NODE_STEPS => array(
+                    WorkflowConfiguration::NODE_STEPS => [
                         [
                             'name' => 'step:starting_point',
                             'order' => -1,
                             '_is_start' => true,
                             'is_final' => '',
-                            'allowed_transitions' => ['start_transition'],
-                            'label' => 'step:starting_point'
+                            'allowed_transitions' => ['start_transition']
                         ],
-                        array(
+                        [
                             'name' => 'first_step',
-                            'label' => 'First Step',
                             'order' => 10,
+                            'label' => 'First Step',
                             '_is_start' => false,
                             'is_final' => false,
-                            'entity_acl' => array('attribute' => array('delete' => false)),
-                            'allowed_transitions' => array('regular_transition'),
+                            'entity_acl' => ['attribute' => ['delete' => false]],
+                            'allowed_transitions' => ['regular_transition'],
                             'position' => [1, 100],
-                        ),
-                        array(
+                        ],
+                        [
                             'name' => 'second_step',
-                            'label' => 'second_step',
                             'order' => 20,
                             '_is_start' => false,
                             'is_final' => true,
-                            'allowed_transitions' => array(),
-                        ),
-                    ),
-                    WorkflowConfiguration::NODE_TRANSITIONS => array(
-                        array(
+                            'allowed_transitions' => [],
+                        ],
+                    ],
+                    WorkflowConfiguration::NODE_TRANSITIONS => [
+                        [
                             'name' => 'start_transition',
                             'is_start' => true,
-                        ),
-                        array(
+                        ],
+                        [
                             'name' => 'regular_transition',
                             'is_start' => false,
-                        ),
-                    ),
-                ),
-                'input' => array(
+                        ],
+                    ],
+                ],
+                'input' => [
                     'start_step' => 'unknown_step',
-                    WorkflowConfiguration::NODE_STEPS => array(
-                        array(
+                    WorkflowConfiguration::NODE_STEPS => [
+                        [
                             'name' => 'step:starting_point',
                             'order' => -1,
                             '_is_start' => true,
                             'is_final' => false,
-                            'allowed_transitions' => array('start_transition'),
-                        ),
-                        array(
+                            'allowed_transitions' => ['start_transition'],
+                        ],
+                        [
                             'name' => 'first_step',
                             'label' => 'First Step',
                             'order' => 10,
                             '_is_start' => false,
                             'is_final' => false,
-                            'entity_acl' => array('attribute' => array('delete' => false)),
-                            'allowed_transitions' => array('regular_transition', 'unknown_transition'),
-                            'unknown_first' => 'first_value',
-                            'unknown_second' => 'second_value',
+                            'entity_acl' => ['attribute' => ['delete' => false]],
+                            'allowed_transitions' => ['regular_transition', 'unknown_transition'],
                             'position' => [1, 100]
-                        ),
-                        array(
+                        ],
+                        [
                             'name' => 'second_step',
                             'order' => 20,
                             '_is_start' => false,
                             'is_final' => true,
-                        ),
-                    ),
-                    WorkflowConfiguration::NODE_TRANSITIONS => array(
-                        array(
+                        ],
+                    ],
+                    WorkflowConfiguration::NODE_TRANSITIONS => [
+                        [
                             'name' => 'start_transition',
                             'is_start' => true,
-                        ),
-                        array(
+                        ],
+                        [
                             'name' => 'regular_transition',
                             'is_start' => true,
-                        ),
-                    ),
-                ),
-            ),
-        );
+                        ],
+                    ],
+                ],
+            ],
+        ];
     }
 
     public function testHandleEmptyConfiguration()
     {
-        $configuration = array(
-            WorkflowConfiguration::NODE_STEPS => array(
-                array('is_final' => true)
-            ),
-        );
+        $configuration = [
+            WorkflowConfiguration::NODE_STEPS => [
+                ['is_final' => true]
+            ],
+        ];
 
         $result = $this->handler->handle($configuration);
 
@@ -189,9 +184,7 @@ class StepHandlerTest extends \PHPUnit_Framework_TestCase
         $step = current($steps);
 
         $this->assertArrayHasKey('name', $step);
-        $this->assertArrayHasKey('label', $step);
 
         $this->assertStringStartsWith('step_', $step['name']);
-        $this->assertEquals($step['name'], $step['label']);
     }
 }

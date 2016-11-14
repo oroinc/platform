@@ -4,7 +4,6 @@ namespace Oro\Bundle\ActionBundle\DependencyInjection\CompilerPass;
 
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Definition;
 
 abstract class AbstractPass implements CompilerPassInterface
@@ -44,6 +43,6 @@ abstract class AbstractPass implements CompilerPassInterface
      */
     protected function prepareDefinition(Definition $definition)
     {
-        $definition->setScope(ContainerInterface::SCOPE_PROTOTYPE)->setPublic(false);
+        $definition->setShared(false)->setPublic(false);
     }
 }

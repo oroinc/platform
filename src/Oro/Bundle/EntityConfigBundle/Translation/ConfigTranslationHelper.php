@@ -63,7 +63,7 @@ class ConfigTranslationHelper
         $locale = $this->translator->getLocale();
 
         foreach ($translations as $key => $value) {
-            $this->translationManager->saveValue(
+            $this->translationManager->saveTranslation(
                 $key,
                 $value,
                 $locale,

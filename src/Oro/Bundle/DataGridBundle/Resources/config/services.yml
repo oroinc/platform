@@ -20,7 +20,6 @@ parameters:
     oro_datagrid.event_listener.ormdatasource_acl.class:          Oro\Bundle\DataGridBundle\EventListener\OrmDatasourceAclListener
     oro_datagrid.event_listener.row_selection.class:              Oro\Bundle\DataGridBundle\EventListener\RowSelectionListener
     oro_datagrid.event_listener.cell_selection.class:             Oro\Bundle\DataGridBundle\EventListener\CellSelectionListener
-    oro_datagrid.twig.datagrid.class:                             Oro\Bundle\DataGridBundle\Twig\DataGridExtension
     oro_datagrid.event_listener.grid_views_load.class:            Oro\Bundle\DataGridBundle\EventListener\GridViewsLoadListener
     oro_datagrid.form.type.grid_view_type.class:                  Oro\Bundle\DataGridBundle\Form\Type\GridViewType
     oro_datagrid.form.type.sorting_type.class:                    Oro\Bundle\DataGridBundle\Form\Type\GridSortingType
@@ -109,12 +108,13 @@ services:
         class: %oro_datagrid.configuration.provider.chain.class%
 
     oro_datagrid.twig.datagrid:
-        class: %oro_datagrid.twig.datagrid.class%
+        class: 'Oro\Bundle\DataGridBundle\Twig\DataGridExtension'
         arguments:
             - '@oro_datagrid.datagrid.manager'
             - '@oro_datagrid.datagrid.name_strategy'
             - '@router'
             - '@oro_security.security_facade'
+            - '@oro_datagrid.helper.route'
         tags:
             - { name: twig.extension }
 
@@ -318,3 +318,8 @@ services:
             - @oro_datagrid.configuration.provider
         tags:
             - { name: kernel.cache_warmer }
+
+    oro_datagrid.helper.route:
+        class: 'Oro\Bundle\DataGridBundle\Tools\DatagridRouteHelper'
+        arguments:
+            - '@router.default'
