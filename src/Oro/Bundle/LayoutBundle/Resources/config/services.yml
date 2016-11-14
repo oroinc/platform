@@ -96,7 +96,7 @@ services:
         arguments:
             - '@oro_layout.expression_language.expression_manipulator'
         tags:
-            - { name: oro_layout.expression.encoder, format: json }
+            - { name: layout.expression.encoder, format: json }
 
     oro_layout.assetic.layout_formula_loader:
         public: false
