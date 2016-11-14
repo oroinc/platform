@@ -91,6 +91,14 @@ class TransitionButtonProviderExtensionTest extends \PHPUnit_Framework_TestCase
         );
     }
 
+    public function testFindWithGroupAtContext()
+    {
+        $this->assertEquals(
+            [],
+            $this->extension->find((new ButtonSearchContext())->setGroup(uniqid()))
+        );
+    }
+
     /**
      * @return array
      */
@@ -125,7 +133,7 @@ class TransitionButtonProviderExtensionTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @param TransitionManager|\PHPUnit_Framework_MockObject_MockObject$transitionManager
+     * @param TransitionManager|\PHPUnit_Framework_MockObject_MockObject $transitionManager
      *
      * @return Workflow|\PHPUnit_Framework_MockObject_MockObject
      */

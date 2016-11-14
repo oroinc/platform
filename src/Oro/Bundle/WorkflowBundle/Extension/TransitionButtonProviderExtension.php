@@ -38,6 +38,10 @@ class TransitionButtonProviderExtension implements ButtonProviderExtensionInterf
     {
         $buttons = [];
 
+        if ($buttonSearchContext->getGroup()) {
+            return $buttons;
+        }
+
         foreach ($this->workflowRegistry->getActiveWorkflows() as $workflow) {
             $transitions = $this->getInitTransitions($workflow, $buttonSearchContext);
 
