@@ -57,8 +57,6 @@ class ScopeTransformer implements DataTransformerInterface
             return null;
         }
 
-        $scope = $this->scopeManager->findOrCreate($this->scopeType, $value, false);
-
-        return $scope;
+        return $this->scopeManager->findOrCreate($this->scopeType, $value, false);
     }
 }
