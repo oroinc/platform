@@ -93,9 +93,19 @@ class TransitionButtonProviderExtensionTest extends \PHPUnit_Framework_TestCase
 
     public function testFindWithGroupAtContext()
     {
+        $this->workflowRegistry->expects($this->never())->method('getActiveWorkflows');
         $this->assertEquals(
             [],
             $this->extension->find((new ButtonSearchContext())->setGroup(uniqid()))
+        );
+    }
+
+    public function testFindWithGridNameAtContext()
+    {
+        $this->workflowRegistry->expects($this->never())->method('getActiveWorkflows');
+        $this->assertEquals(
+            [],
+            $this->extension->find((new ButtonSearchContext())->setGridName(uniqid()))
         );
     }
 

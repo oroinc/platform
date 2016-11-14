@@ -6,6 +6,8 @@ use Oro\Bundle\ActionBundle\Helper\ApplicationsHelperInterface;
 use Oro\Bundle\ActionBundle\Model\ButtonContext;
 use Oro\Bundle\ActionBundle\Model\ButtonProviderExtensionInterface;
 use Oro\Bundle\ActionBundle\Model\ButtonSearchContext;
+use Oro\Bundle\ActionBundle\Model\OperationRegistry;
+
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
 use Oro\Bundle\WorkflowBundle\Model\Transition;
 use Oro\Bundle\WorkflowBundle\Model\TransitionButton;
@@ -38,7 +40,15 @@ class TransitionButtonProviderExtension implements ButtonProviderExtensionInterf
     {
         $buttons = [];
 
-        if ($buttonSearchContext->getGroup()) {
+        $group = $buttonSearchContext->getGroup();
+
+        // Skipp if custom buttons group defined
+        if ($group && ($group !== OperationRegistry::DEFAULT_GROUP)) {
+            return $buttons;
+        }
+
+        // Skip id DataGrid defined
+        if ($buttonSearchContext->getGridName()) {
             return $buttons;
         }
 
