@@ -474,9 +474,22 @@ class WorkflowTest extends \PHPUnit_Framework_TestCase
         $entityAttribute = new Attribute();
         $entityAttribute->setName('entity');
 
+        /** @var TransitionHelper|\PHPUnit_Framework_MockObject_MockObject $transitionHelper */
+        $transitionHelper = $this->getMockBuilder(TransitionHelper::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+        $transitionHelper->expects($this->once())
+            ->method('isStartedWorkflowTransition')
+            ->with($entity, 'test_wf_name')
+            ->willReturn(false);
+        $transitionHelper->expects($this->once())
+            ->method('addWorkflowTransition');
+        $transitionHelper->expects($this->once())
+            ->method('removeWorkflowTransition');
+
         $this->assertDoctrineHelperCalled($entity, 'test_wf_name');
 
-        $workflow = $this->createWorkflow();
+        $workflow = $this->createWorkflow(null, null, null, null, $transitionHelper);
         $workflow->setDefinition($workflowDefinition);
         $workflow->getTransitionManager()->setTransitions(array($transition));
         $workflow->getAttributeManager()->setAttributes(array($entityAttribute));
@@ -791,13 +804,15 @@ class WorkflowTest extends \PHPUnit_Framework_TestCase
      * @param AclManager|\PHPUnit_Framework_MockObject_MockObject $aclManager
      * @param AttributeManager $attributeManager
      * @param TransitionManager $transitionManager
+     * @param TransitionHelper|\PHPUnit_Framework_MockObject_MockObject $transitionHelper
      * @return Workflow
      */
     protected function createWorkflow(
         $workflowName = null,
         $aclManager = null,
         $attributeManager = null,
-        $transitionManager = null
+        $transitionManager = null,
+        $transitionHelper = null
     ) {
         if (!$aclManager) {
             $aclManager = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Acl\AclManager')
@@ -810,10 +825,11 @@ class WorkflowTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $transitionHelper = $this->getMockBuilder(TransitionHelper::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
+        if (null === $transitionHelper) {
+            $transitionHelper = $this->getMockBuilder(TransitionHelper::class)
+                ->disableOriginalConstructor()
+                ->getMock();
+        }
 
         $workflow = new Workflow(
             $this->doctrineHelper,
