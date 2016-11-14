@@ -280,10 +280,11 @@ To migrate all labels from configuration translatable fields automatically you c
 - Updated `Oro\Component\Layout\BlockTypeInterface`, `Oro\Component\Layout\BlockTypeExtensionInterface`, `Oro\Component\Layout\LayoutRegistryInterface` to use the `Options` object instead of `array`.
 - Added method `Oro\Component\Layout\BlockView::getId`.
 - Added method `Oro\Component\Layout\ContextInterface::getHash`.
-- Added config loader `\Oro\Component\Layout\Config\Loader\LayoutUpdateCumulativeResourceLoader` it tracks directory structure/content updates and file modification.
+- Added config loader `\Oro\Component\Layout\Config\Loader\LayoutUpdateCumulativeResourceLoader` that tracks directory structure/content updates and files modification time.
 - Added interface `Oro\Component\Layout\BlockViewCacheInterface`.
 - Added class `Oro\Component\Layout\BlockViewCache`.
 - Updated method `Oro\Component\Layout\LayoutBuilder::getLayout`. Added layout cache.
+- Injected `BlockViewCache` into `LayoutFactoryBuilder` and passed as argument to `LayoutFactory`. From `LayoutFactory` `BlockViewCache` argument passed as argument to `LayoutBuilder` to save/fetch layout cache data.
 
 ####LayoutBundle
 - Removed class `Oro\Bundle\LayoutBundle\CacheWarmer\LayoutUpdatesWarmer`.
