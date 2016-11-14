@@ -3,6 +3,7 @@
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
+use Oro\Bundle\ScopeBundle\Entity\Scope;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowEntityAcl;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowRestriction;
@@ -36,6 +37,11 @@ class WorkflowDefinitionTest extends \PHPUnit_Framework_TestCase
         $this->assertPropertyAccessors($this->workflowDefinition, [
             ['scopesConfig', ['key1' => 'value1']],
         ]);
+
+        $this->assertPropertyCollections($this->workflowDefinition, [
+            ['scopes', new Scope()],
+        ]);
+
     }
 
     public function testName()
