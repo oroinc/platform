@@ -50,14 +50,14 @@ define(function(require) {
         },
 
         getValue: function() {
-            return this.$('[name="' + this.inputName + '"]').val();
+            return this.$('[data-name="multi-checkbox-value-keeper"]').val();
         },
 
         setValue: function(values) {
             var oldValue = this.getValue();
             if (oldValue.length !== values.length || _.difference(oldValue, values).length !== 0) {
                 this.value = values;
-                this.$('[name="' + this.inputName + '"]').val(values).trigger('change');
+                this.$('[data-name="multi-checkbox-value-keeper"]').val(values).trigger('change');
             }
         }
     });

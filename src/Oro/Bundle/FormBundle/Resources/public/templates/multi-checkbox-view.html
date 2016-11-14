@@ -1,5 +1,5 @@
 <div class="multi-checkbox-control">
-    <select multiple name="<%- inputName %>">
+    <select data-name="multi-checkbox-value-keeper" multiple <% if (inputName) { %> name="<%- inputName %>"<% } %>>
         <% _.each(options, function (option) { %>
         <option value="<%= option.value %>" title="<%- option.text %>"
         <% if (_.indexOf(values, option.value) !== -1) { %> selected="selected"<% } %>>
