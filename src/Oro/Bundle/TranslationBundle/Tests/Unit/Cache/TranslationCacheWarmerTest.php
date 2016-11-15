@@ -31,12 +31,12 @@ class TranslationCacheWarmerTest extends \PHPUnit_Framework_TestCase
     protected function setUp()
     {
         $this->innerWarmer = $this->getMockBuilder(InnerCacheWarmer::class)
-                ->disableOriginalConstructor()
-                ->getMock();
+            ->disableOriginalConstructor()
+            ->getMock();
 
         $this->strategyProvider = $this->getMockBuilder(TranslationStrategyProvider::class)
-                ->disableOriginalConstructor()
-                ->getMock();
+            ->disableOriginalConstructor()
+            ->getMock();
 
         $this->warmer = new TranslationCacheWarmer($this->innerWarmer, $this->strategyProvider);
     }
