@@ -485,7 +485,8 @@ class WorkflowManagerTest extends \PHPUnit_Framework_TestCase
 
         $this->workflowRegistry->expects($this->exactly(2))
             ->method('getWorkflow')
-            ->with($workflowName)->willReturn($workflow);
+            ->with($workflowName)
+            ->willReturn($workflow);
 
         $em = $this->getTransactionScopedEntityManager(WorkflowItem::class);
 
