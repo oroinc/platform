@@ -421,10 +421,10 @@ class WidgetController extends Controller
     protected function getStartTransitionData(Workflow $workflow, Transition $transition, $entity)
     {
         $errors = new ArrayCollection();
-        $isAllowed = $workflow->isStartTransitionAvailable($transition, $entity, [], $errors) ||
-            !$transition->isUnavailableHidden();
+        $isAllowed = $workflow->isStartTransitionAvailable($transition, $entity, [], $errors);
+        $isShown = $isAllowed || !$transition->isUnavailableHidden();
 
-        if ($isAllowed && $transition->isEmptyInitOptions()) {
+        if ($isShown && $transition->isEmptyInitOptions()) {
             return [
                 'workflow' => $workflow,
                 'transition' => $transition,
