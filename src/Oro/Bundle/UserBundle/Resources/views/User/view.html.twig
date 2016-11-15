@@ -5,6 +5,7 @@
 {% oro_title_set({params : {"%username%": fullname }}) %}
 
 {% block navButtons %}
+    {% placeholder view_navButtons with {entity: entity} %}
     {% if isDesktopVersion() %}
         {% if resource_granted('CONFIGURE', entity) and not isProfileView %}
             {{ UI.button({
@@ -63,9 +64,25 @@
     {{ parent() }}
     <div class="pull-left">
         {% if entity.enabled %}
-            <div class="badge badge-enabled status-enabled"><i class="icon-status-enabled icon-circle"></i>{{ 'Active'|trans }}</div>
+            <div class="badge badge-enabled status-enabled"><i class="icon-status-enabled icon-circle"></i>
+                {{- 'oro.user.enabled.enabled'|trans -}}
+            </div>
         {% else %}
-            <div class="badge badge-disabled status-disabled"><i class="icon-status-disabled icon-circle"></i>{{ 'Inactive'|trans }}</div>
+            <div class="badge badge-disabled status-disabled"><i class="icon-status-disabled icon-circle"></i>
+                {{- 'oro.user.enabled.disabled'|trans -}}
+            </div>
+        {% endif %}
+    </div>
+    <div class="pull-left">
+        {% if entity.authStatus.id == 'expired' %}
+            <div class="badge badge-disabled status-disabled"><i class="icon-status-disabled icon-unlock-alt"></i>
+                {{- entity.authStatus.name -}}</div>
+        {% elseif entity.authStatus.id == 'available' %}
+            <div class="badge badge-enabled status-enabled"><i class="icon-status-enabled icon-unlock"></i>
+                {{- entity.authStatus.name -}}</div>
+        {% else %}
+            <div class="badge badge-tentatively status-tentatively"><i class="icon-status-tentatively icon-lock"></i>
+                {{- entity.authStatus.name -}}</div>
         {% endif %}
     </div>
 {% endblock breadcrumbs %}

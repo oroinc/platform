@@ -258,7 +258,17 @@ oro:
             lower_case_numbers_special_chars: The password must include a lower case letter, a number, and a special character (!"#$%&'()*+,-./:;<=>?@[\]^_`{|}~ and space)
             lower_case_upper_case_numbers_special_chars: The password must include a lower case letter, an upper case letter, a number, and a special character (!"#$%&'()*+,-./:;<=>?@[\]^_`{|}~ and space)
 
+        enabled:
+            enabled: Enabled
+            disabled: Disabled
+
         action:
+            enable:
+                label: Enable user
+                success: 'User %username% enabled.'
+            disable:
+                label: Disable user
+                success: 'User %username% disabled.'
             password_management:
                 label: Manage passwords
                 description: Reset or change passwords of other users

@@ -139,6 +139,57 @@ operations:
                 messages:
                     - success: oro.user.password.force_reset.mass_action.success
                     - failure: oro.user.password.force_reset.mass_action.failure
+    user_enable:
+        label: oro.user.action.enable.label
+        acl_resource: oro_user_user_update
+        entities:
+            - Oro\Bundle\UserBundle\Entity\User
+        routes:
+            - oro_user_view
+            - oro_user_index
+        datagrids:
+            - users-grid
+        groups:
+            - datagridRowAction
+            - view_navButtons
+        order: 45
+        button_options:
+            icon: icon-ok
+            class: btn-success icons-holder-text
+        preconditions:
+            '@equal': [false, $isEnabled]
+        actions:
+            - '@run_action_group':
+                action_group: user_enable
+                parameters_mapping:
+                    data: $.data
+
+    user_disable:
+        label: oro.user.action.disable.label
+        acl_resource: oro_user_user_update
+        entities:
+            - Oro\Bundle\UserBundle\Entity\User
+        routes:
+            - oro_user_view
+            - oro_user_index
+        datagrids:
+            - users-grid
+        groups:
+            - datagridRowAction
+            - view_navButtons
+        order: 45
+        button_options:
+            icon: icon-ban-circle
+            class: btn-danger icons-holder-text
+        preconditions:
+            '@equal': [true, $isEnabled]
+        actions:
+            - '@run_action_group':
+                action_group: user_disable
+                parameters_mapping:
+                    data: $.data
+
+action_groups:
         actions:
             - '@call_method':
                 object: $.data
@@ -183,3 +234,35 @@ operations:
                     - '@flash_message':
                         message: oro.user.password.force_reset.failure.message
                         type: 'error'
+    user_enable:
+        parameters:
+            data:
+                type: Oro\Bundle\UserBundle\Entity\User
+        actions:
+            - '@assign_value': [$.data.enabled, true]
+            - '@flush_entity': $.data
+            - '@flash_message':
+                message: oro.user.action.enable.success
+                type: 'success'
+                message_parameters:
+                    'username': $.data.username
+            - '@tree':
+                conditions:
+                    '@equal': [$.data.auth_status.id, 'expired']
+                actions:
+                     - '@run_action_group':
+                         action_group: reset_password
+                         parameters_mapping:
+                             data: $.data
+    user_disable:
+        parameters:
+            data:
+                type: Oro\Bundle\UserBundle\Entity\User
+        actions:
+            - '@assign_value': [$.data.enabled, false]
+            - '@flush_entity': $.data
+            - '@flash_message':
+                message: oro.user.action.disable.success
+                type: 'success'
+                message_parameters:
+                    'username': $.data.username
