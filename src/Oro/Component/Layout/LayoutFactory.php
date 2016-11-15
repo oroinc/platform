@@ -15,9 +15,7 @@ class LayoutFactory implements LayoutFactoryInterface
     /** @var ExpressionProcessor */
     protected $expressionProcessor;
 
-    /**
-     * @var BlockViewCache
-     */
+    /** @var BlockViewCache|null */
     private $blockViewCache;
 
     /**
@@ -35,7 +33,7 @@ class LayoutFactory implements LayoutFactoryInterface
         $this->registry            = $registry;
         $this->rendererRegistry    = $rendererRegistry;
         $this->expressionProcessor = $expressionProcessor;
-        $this->blockViewCache = $blockViewCache;
+        $this->blockViewCache      = $blockViewCache;
     }
 
     /**

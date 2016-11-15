@@ -68,7 +68,7 @@ class LayoutFactoryBuilder implements LayoutFactoryBuilderInterface
     private $expressionProcessor;
 
     /**
-     * @var BlockViewCache
+     * @var BlockViewCache|null
      */
     private $blockViewCache;
 
