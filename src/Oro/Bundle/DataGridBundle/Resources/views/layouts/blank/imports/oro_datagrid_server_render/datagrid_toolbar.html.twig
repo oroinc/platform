@@ -19,7 +19,6 @@
         <div{{ block('block_attributes') }}>
             {% set metadata = oro_datagrid_metadata(datagrid) %}
             {% set data = oro_datagrid_data(datagrid) %}
-            {% set state = metadata %}
 
             {% set totalRecords = data.options.totalRecords %}
             {% set pageSize = metadata.state.pageSize %}
