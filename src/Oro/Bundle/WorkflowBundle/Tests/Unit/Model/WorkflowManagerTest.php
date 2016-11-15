@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Model;
 
-use Oro\Bundle\WorkflowBundle\Helper\TransitionHelper;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
@@ -450,7 +449,7 @@ class WorkflowManagerTest extends \PHPUnit_Framework_TestCase
         $workflow->expects($this->once())
             ->method('getDefinition')
             ->willReturn($workflowDefinition);
-        $workflow->expects($this->once())
+        $workflow->expects($this->exactly(2))
             ->method('getName')
             ->willReturn('test_workflow');
 
@@ -462,6 +461,48 @@ class WorkflowManagerTest extends \PHPUnit_Framework_TestCase
             $entity,
             $transition
         );
+    }
+
+    public function testStartWorkflowWhenAlreadyStarted()
+    {
+        $id = 1;
+        $workflowName = 'workflow_started_twice';
+        $entity = new EntityStub($id);
+        $transition = 'test_transition';
+        $workflowData = ['key' => 'value'];
+        $workflowItem = new WorkflowItem();
+        $workflowItem->getData()->add($workflowData);
+
+        $workflowDefinition = new WorkflowDefinition();
+        $workflow = $this->createWorkflow($workflowName);
+
+        $workflow->expects($this->once())->method('getDefinition')->willReturn($workflowDefinition);
+
+        $workflow->expects($this->once())
+            ->method('start')
+            ->with($entity, $workflowData, $transition)
+            ->willReturn($workflowItem);
+
+        $this->workflowRegistry->expects($this->exactly(2))
+            ->method('getWorkflow')
+            ->with($workflowName)->willReturn($workflow);
+
+        $em = $this->getTransactionScopedEntityManager(WorkflowItem::class);
+
+        $em->expects($this->once())->method('persist')->with($workflowItem);
+        $em->expects($this->once())->method('flush');
+
+        $this->doctrineHelper->expects($this->any())->method('getEntityIdentifier')
+            ->willReturnCallback(function (EntityStub $entity) {
+                return $entity->getId();
+            });
+
+        $firstWorkflowItem = $this->workflowManager->startWorkflow($workflowName, $entity, $transition, $workflowData);
+        $secondWorkflowItem = $this->workflowManager->startWorkflow($workflowName, $entity, $transition, $workflowData);
+
+        $this->assertEquals($workflowItem, $firstWorkflowItem);
+        $this->assertEquals($workflowData, $firstWorkflowItem->getData()->getValues());
+        $this->assertNull($secondWorkflowItem);
     }
 
     /**
@@ -1060,22 +1101,9 @@ class WorkflowManagerTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $transitionHelper = $this->getMockBuilder(TransitionHelper::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-
         $workflow = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Model\Workflow')
             ->setConstructorArgs(
-                [
-                    $doctrineHelper,
-                    $aclManager,
-                    $restrictionManager,
-                    $transitionHelper,
-                    null,
-                    $attributeManager,
-                    $transitionManager
-                ]
+                [$doctrineHelper, $aclManager, $restrictionManager, null, $attributeManager, $transitionManager]
             )
             ->setMethods(
                 [

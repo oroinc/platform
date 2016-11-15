@@ -61,12 +61,7 @@ class WorkflowAssemblerTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $transitionHelper = $this->getMockBuilder(TransitionHelper::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-
-        return new Workflow($doctrineHelper, $aclManager, $restrictionManager, $transitionHelper);
+        return new Workflow($doctrineHelper, $aclManager, $restrictionManager);
     }
 
     /**

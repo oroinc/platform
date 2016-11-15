@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Form\Type;
 
-use Oro\Bundle\WorkflowBundle\Helper\TransitionHelper;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\FormRegistry;
 use Symfony\Component\Form\Test\FormIntegrationTestCase;
@@ -56,11 +55,7 @@ abstract class AbstractWorkflowAttributesTypeTestCase extends FormIntegrationTes
             ->disableOriginalConstructor()
             ->getMock();
 
-        $transitionHelper = $this->getMockBuilder(TransitionHelper::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $workflow =  new Workflow($doctrineHelper, $aclManager, $restrictionManager, $transitionHelper);
+        $workflow = new Workflow($doctrineHelper, $aclManager, $restrictionManager);
 
         foreach ($attributes as $name => $attribute) {
             $workflow->getAttributeManager()->getAttributes()->set($name, $attribute);

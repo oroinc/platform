@@ -4,7 +4,6 @@ namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Serializer\Normalizer;
 
 use Doctrine\Common\Collections\ArrayCollection;
 
-use Oro\Bundle\WorkflowBundle\Helper\TransitionHelper;
 use Oro\Bundle\WorkflowBundle\Serializer\Normalizer\WorkflowDataNormalizer;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowData;
 
@@ -58,22 +57,11 @@ class WorkflowDataNormalizerTest extends \PHPUnit_Framework_TestCase
         $restrictionManager = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Restriction\RestrictionManager')
             ->disableOriginalConstructor()
             ->getMock();
-        $transitionHelper = $this->getMockBuilder(TransitionHelper::class)
-            ->disableOriginalConstructor()
-            ->getMock();
 
         $this->workflow = $this->getMock(
             'Oro\Bundle\WorkflowBundle\Model\Workflow',
             array('getName'),
-            array(
-                $doctrineHelper,
-                $aclManager,
-                $restrictionManager,
-                $transitionHelper,
-                null,
-                $this->attributeManager,
-                null
-            )
+            array($doctrineHelper, $aclManager, $restrictionManager, null, $this->attributeManager, null)
         );
         $this->attribute = $this->getMock('Oro\Bundle\ActionBundle\Model\Attribute');
         $this->normalizer = new WorkflowDataNormalizer();

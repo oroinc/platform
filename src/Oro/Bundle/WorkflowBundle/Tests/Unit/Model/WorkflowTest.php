@@ -11,7 +11,6 @@ use Oro\Bundle\WorkflowBundle\Acl\AclManager;
 use Oro\Bundle\WorkflowBundle\Configuration\WorkflowConfiguration;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowStep;
-use Oro\Bundle\WorkflowBundle\Helper\TransitionHelper;
 use Oro\Bundle\WorkflowBundle\Model\TransitionManager;
 use Oro\Bundle\WorkflowBundle\Model\Workflow;
 use Oro\Bundle\WorkflowBundle\Model\Step;
@@ -474,22 +473,9 @@ class WorkflowTest extends \PHPUnit_Framework_TestCase
         $entityAttribute = new Attribute();
         $entityAttribute->setName('entity');
 
-        /** @var TransitionHelper|\PHPUnit_Framework_MockObject_MockObject $transitionHelper */
-        $transitionHelper = $this->getMockBuilder(TransitionHelper::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-        $transitionHelper->expects($this->once())
-            ->method('isStartedWorkflowTransition')
-            ->with($entity, 'test_wf_name')
-            ->willReturn(false);
-        $transitionHelper->expects($this->once())
-            ->method('addWorkflowTransition');
-        $transitionHelper->expects($this->once())
-            ->method('removeWorkflowTransition');
-
         $this->assertDoctrineHelperCalled($entity, 'test_wf_name');
 
-        $workflow = $this->createWorkflow(null, null, null, null, $transitionHelper);
+        $workflow = $this->createWorkflow();
         $workflow->setDefinition($workflowDefinition);
         $workflow->getTransitionManager()->setTransitions(array($transition));
         $workflow->getAttributeManager()->setAttributes(array($entityAttribute));
@@ -804,15 +790,13 @@ class WorkflowTest extends \PHPUnit_Framework_TestCase
      * @param AclManager|\PHPUnit_Framework_MockObject_MockObject $aclManager
      * @param AttributeManager $attributeManager
      * @param TransitionManager $transitionManager
-     * @param TransitionHelper|\PHPUnit_Framework_MockObject_MockObject $transitionHelper
      * @return Workflow
      */
     protected function createWorkflow(
         $workflowName = null,
         $aclManager = null,
         $attributeManager = null,
-        $transitionManager = null,
-        $transitionHelper = null
+        $transitionManager = null
     ) {
         if (!$aclManager) {
             $aclManager = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Acl\AclManager')
@@ -825,17 +809,10 @@ class WorkflowTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        if (null === $transitionHelper) {
-            $transitionHelper = $this->getMockBuilder(TransitionHelper::class)
-                ->disableOriginalConstructor()
-                ->getMock();
-        }
-
         $workflow = new Workflow(
             $this->doctrineHelper,
             $aclManager,
             $restrictionManager,
-            $transitionHelper,
             null,
             $attributeManager,
             $transitionManager

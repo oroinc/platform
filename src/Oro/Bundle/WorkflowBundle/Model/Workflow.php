@@ -71,14 +71,10 @@ class Workflow
      */
     protected $restrictions;
 
-    /** @var TransitionHelper */
-    protected $transitionHelper;
-
     /**
      * @param DoctrineHelper $doctrineHelper
      * @param AclManager $aclManager
      * @param RestrictionManager $restrictionManager
-     * @param TransitionHelper $transitionHelper
      * @param StepManager|null $stepManager
      * @param BaseAttributeManager|null $attributeManager
      * @param TransitionManager|null $transitionManager
@@ -87,7 +83,6 @@ class Workflow
         DoctrineHelper $doctrineHelper,
         AclManager $aclManager,
         RestrictionManager $restrictionManager,
-        TransitionHelper $transitionHelper,
         StepManager $stepManager = null,
         BaseAttributeManager $attributeManager = null,
         TransitionManager $transitionManager = null
@@ -95,7 +90,6 @@ class Workflow
         $this->doctrineHelper = $doctrineHelper;
         $this->aclManager = $aclManager;
         $this->restrictionManager = $restrictionManager;
-        $this->transitionHelper = $transitionHelper;
         $this->stepManager = $stepManager ? $stepManager : new StepManager();
         $this->attributeManager = $attributeManager ? $attributeManager : new BaseAttributeManager();
         $this->transitionManager = $transitionManager ? $transitionManager : new TransitionManager();
@@ -160,7 +154,7 @@ class Workflow
      * @param array $data
      * @param string $startTransitionName
      *
-     * @return WorkflowItem|null
+     * @return WorkflowItem
      */
     public function start($entity, array $data = [], $startTransitionName = null)
     {
@@ -168,16 +162,8 @@ class Workflow
             $startTransitionName = TransitionManager::DEFAULT_START_TRANSITION_NAME;
         }
 
-        $workflowItem = null;
-        $workflowName = $this->getName();
-        if (!$this->transitionHelper->isStartedWorkflowTransition($entity, $workflowName)) {
-            $this->transitionHelper->addWorkflowTransition($entity, $workflowName);
-
-            $workflowItem = $this->createWorkflowItem($entity, $data);
-            $this->transit($workflowItem, $startTransitionName);
-
-            $this->transitionHelper->removeWorkflowTransition($entity, $workflowName);
-        }
+        $workflowItem = $this->createWorkflowItem($entity, $data);
+        $this->transit($workflowItem, $startTransitionName);
 
         return $workflowItem;
     }

@@ -74,12 +74,7 @@ class WorkflowTransitionTypeTest extends AbstractWorkflowAttributesTypeTestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $transitionHelper = $this->getMockBuilder(TransitionHelper::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-
-        $workflow = new Workflow($doctrineHelper, $aclManager, $restrictionManager, $transitionHelper);
+        $workflow = new Workflow($doctrineHelper, $aclManager, $restrictionManager);
         $workflow->getTransitionManager()->setTransitions(array($transition));
 
         $options = array(
