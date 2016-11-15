@@ -176,7 +176,6 @@ services:
             - { name: oro_menu.builder, alias: pinbar }
             - { name: oro_featuretogle.feature, feature: email }
 
-
     oro_navigation.favorites_menu.builder:
         class: %oro_navigation.navigation_item_menu.builder.class%
         arguments:
