@@ -45,6 +45,9 @@ UPGRADE FROM 1.10 to 2.0
 
 #### ImportExportBundle
 - ImportExportBundle/Field/FieldHelper.php was moved to EntityBundle/Helper/
+- Added fourth argument `Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider $entityConfigProvider` to `__construct` method of `Oro\Bundle\ImportExportBundle\Handler\AbstractHandler`.
+- Added fifth argument `Symfony\Component\Translation\TranslatorInterface $translator` to `__construct` method of `Oro\Bundle\ImportExportBundle\Handler\AbstractHandler`.
+- Removed method `public function setTranslator(TranslatorInterface $translator)` from `Oro\Bundle\ImportExportBundle\Handler\AbstractImportHandler`.
 
 ####WorkflowBundle
 - Class `Oro\Bundle\WorkflowBundle\Model\WorkflowManager`
@@ -302,6 +305,24 @@ To migrate all labels from configuration translatable fields automatically you c
 - Class `Oro\Bundle\LayoutBundle\Layout\Encoder\JsonExpressionEncoder` moved to `Oro\Component\Layout\ExpressionLanguage\Encoder\JsonExpressionEncoder`.
 - Class `Oro\Bundle\LayoutBundle\ExpressionLanguage\ExpressionManipulator` moved to `Oro\Component\Layout\ExpressionLanguage\ExpressionManipulator`.
 - Class `Oro\Bundle\LayoutBundle\Layout\Processor\ExpressionProcessor` moved to `Oro\Component\Layout\ExpressionLanguage\ExpressionProcessor`.
+- All logic that work with `\Oro\Bundle\LayoutBundle\Layout\Form\FormAccessor` and related blocks was moved to `EmbeddedFormBundle`:
+    * `Oro\Bundle\LayoutBundle\Layout\Form\AbstractFormAccessor` moved to `Oro\Bundle\EmbeddedFormBundle\Layout\Form\AbstractFormAccessor`
+    * `Oro\Bundle\LayoutBundle\Layout\Form\ConfigurableFormAccessorInterface` moved to `Oro\Bundle\EmbeddedFormBundle\Layout\Form\ConfigurableFormAccessorInterface`
+    * `Oro\Bundle\LayoutBundle\Layout\Form\DependencyInjectionFormAccessor` moved to `Oro\Bundle\EmbeddedFormBundle\Layout\Form\DependencyInjectionFormAccessor`
+    * `Oro\Bundle\LayoutBundle\Layout\Form\FormAccessor` moved to `Oro\Bundle\EmbeddedFormBundle\Layout\Form\FormAccessor`
+    * `Oro\Bundle\LayoutBundle\Layout\Form\FormAccessorInterface` moved to `Oro\Bundle\EmbeddedFormBundle\Layout\Form\FormAccessorInterface`
+    * `Oro\Bundle\LayoutBundle\Layout\Form\FormAction` moved to `Oro\Bundle\EmbeddedFormBundle\Layout\Form\FormAction`
+    * `Oro\Bundle\LayoutBundle\Layout\Form\FormLayoutBuilder` moved to `Oro\Bundle\EmbeddedFormBundle\Layout\Form\FormLayoutBuilder`
+    * `Oro\Bundle\LayoutBundle\Layout\Form\FormLayoutBuilderInterface` moved to `Oro\Bundle\EmbeddedFormBundle\Layout\Form\FormLayoutBuilderInterface`
+    * `Oro\Bundle\LayoutBundle\Layout\Form\GroupingFormLayoutBuilder` moved to `Oro\Bundle\EmbeddedFormBundle\Layout\Form\GroupingFormLayoutBuilder`
+    * `Oro\Bundle\LayoutBundle\Layout\Block\Type\AbstractFormType` moved to `Oro\Bundle\EmbeddedFormBundle\Layout\Block\Type\AbstractFormType`
+    * `Oro\Bundle\LayoutBundle\Layout\Block\Type\FormEndType` moved to `Oro\Bundle\EmbeddedFormBundle\Layout\Block\Type\EmbedFormEndType`
+    * `Oro\Bundle\LayoutBundle\Layout\Block\Type\FormFieldType` moved to `Oro\Bundle\EmbeddedFormBundle\Layout\Block\Type\EmbedFormFieldType`
+    * `Oro\Bundle\LayoutBundle\Layout\Block\Type\FormFieldsType` moved to `Oro\Bundle\EmbeddedFormBundle\Layout\Block\Type\EmbedFormFieldsType`
+    * `Oro\Bundle\LayoutBundle\Layout\Block\Type\FormStartType` moved to `Oro\Bundle\EmbeddedFormBundle\Layout\Block\Type\EmbedFormStartType`
+    * `Oro\Bundle\LayoutBundle\Layout\Block\Type\FormType` moved to `Oro\Bundle\EmbeddedFormBundle\Layout\Block\Type\EmbedFormType`
+- Added layout block type `Oro\Bundle\LayoutBundle\Layout\Block\Type\FormType` with new logic.
+- Layout block types `form_start`, `form_end`, `form_fields` is created as `configurable` with DI configuration.
 
 ####ConfigBundle:
 - Class `Oro\Bundle\ConfigBundle\Config\AbstractScopeManager` added `$scopeIdentifier` of type integer, null or object as optional parameter for next methods: `getSettingValue`, `getInfo`, `set`, `reset`, `getChanges`, `flush`, `save`, `calculateChangeSet`, `reload`
