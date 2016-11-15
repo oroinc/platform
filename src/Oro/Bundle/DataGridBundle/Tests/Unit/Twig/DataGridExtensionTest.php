@@ -72,7 +72,7 @@ class DataGridExtensionTest extends \PHPUnit_Framework_TestCase
             ['oro_datagrid_build_fullname', [$this->twigExtension, 'buildGridFullName']],
             ['oro_datagrid_build_inputname', [$this->twigExtension, 'buildGridInputName']],
             ['oro_datagrid_link', [$this->datagridRouteHelper, 'generate']],
-            ['oro_datagrid_column_name', [$this->twigExtension, 'getColumnLabel']],
+            ['oro_datagrid_column_attributes', [$this->twigExtension, 'getColumnAttributes']],
         ];
         /** @var \Twig_SimpleFunction[] $actualFunctions */
         $actualFunctions = $this->twigExtension->getFunctions();
