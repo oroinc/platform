@@ -201,7 +201,6 @@ oro:
             enter_new_password_again.label: Repeat password
             password_mismatch: The password fields must match.
             reset.label: Reset
-            already_used.message: The user has recently used this password. Please choose another.
             reset:
                 ttl_already_requested.message: The password for this user has already been requested within the last 24 hours
                 popup.message: User {{ user }} will receive reset password by email.
@@ -217,7 +216,6 @@ oro:
                 mass_action.success: Password reset completed successfully.
                 mass_action.failure: Mass reset action has failed.
                 popup.label: Reset
-            expiration.message: '{1} Your password will expire after %count% day. Please reset it.|{7} Your password will expire after one week. Please reset it.|]1,Inf[ Your password will expire after %count% days. Please reset it.'
         # password tooltip for different rules
         password_complexity:
             unrestricted: ~
@@ -276,7 +274,6 @@ oro:
                 user_settings.title: User Settings
                 failed_login_limit.title: Login attempts
                 password_complexity_rules.title: Password restrictions
-                mandatory_password_change.title: Password change policy
             fields:
                 failed_login_limit_enabled.label: Enable failed logins limit
                 failed_login_limit.label: Max login attempts

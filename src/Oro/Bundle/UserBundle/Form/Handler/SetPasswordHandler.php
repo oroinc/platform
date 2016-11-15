@@ -86,11 +86,11 @@ class SetPasswordHandler
                 $entity->setPlainPassword($this->form->get('password')->getData());
                 $entity->setPasswordChangedAt(new \DateTime());
 
-                $errors = $this->validator->validate($entity);
+                $errors = $this->validator->validate($entity, null, ['security']);
                 if (count($errors) > 0) {
-                    $this->form->addError(
-                        new FormError($this->translator->trans('oro.user.password.already_used.message'))
-                    );
+                    foreach ($errors as $error) {
+                        $this->form->addError(new FormError($error->getMessage()));
+                    }
 
                     return false;
                 }
