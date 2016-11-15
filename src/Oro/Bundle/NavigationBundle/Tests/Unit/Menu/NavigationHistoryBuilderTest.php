@@ -132,7 +132,7 @@ class NavigationHistoryBuilderTest extends \PHPUnit_Framework_TestCase
             ->method('isCurrent')
             ->will($this->returnValue(true));
         $this->builder->setMatcher($matcher);
-        $this->router->expects($this->exactly(2))
+        $this->router->expects($this->exactly(0))
             ->method('match')
             ->with($this->isType('string'))
             ->willReturn(['_route' => 'route']);
