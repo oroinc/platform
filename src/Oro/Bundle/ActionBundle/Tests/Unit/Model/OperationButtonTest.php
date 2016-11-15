@@ -131,7 +131,7 @@ class OperationButtonTest extends \PHPUnit_Framework_TestCase
      */
     private function assertOperationMethodsCalled(Operation $operation, OperationDefinition $definition)
     {
-        $operation->expects($this->any())->method('getDefinition')->willReturn($definition);
+        $operation->expects($this->atLeastOnce())->method('getDefinition')->willReturn($definition);
     }
 
 }
