@@ -53,6 +53,21 @@ class WidgetController extends Controller
         }
 
         $workflowManager = $this->get('oro_workflow.manager');
+        $applicableWorkflows = $workflowManager->getApplicableWorkflows($entity);
+
+        $securityFacade = $this->container->get('oro_security.security_facade');
+        array_filter(
+            $applicableWorkflows,
+            function ($workflow) use ($securityFacade) {
+                /** @var Workflow $workflow */
+                $workflowObject = sprintf('workflow:%s', $workflow->getName());
+                return true;
+                /**
+                 * TODO: after workflow ACL extension
+                 */
+                return $securityFacade->isGranted('VIEW_WORKFLOW', $workflowObject);
+            }
+        );
 
         return [
             'entityId' => $entityId,
@@ -60,7 +75,7 @@ class WidgetController extends Controller
                 function (Workflow $workflow) use ($entity, $workflowManager) {
                     return $this->getWorkflowData($entity, $workflow, $workflowManager);
                 },
-                $workflowManager->getApplicableWorkflows($entity)
+                $applicableWorkflows
             )
         ];
     }

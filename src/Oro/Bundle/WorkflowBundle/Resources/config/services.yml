@@ -332,3 +332,11 @@ services:
             - '@oro_featuretoggle.checker.feature_checker'
         tags:
             - { name: kernel.event_subscriber }
+
+    oro_workflow.condition.is_granted_workflow_transition:
+        class: 'Oro\Bundle\WorkflowBundle\Model\Condition\IsGrantedWorkflowTransition'
+        arguments:
+            - '@oro_security.security_facade'
+            - '@oro_workflow.manager'
+        tags:
+            - { name: oro_action.condition, alias: 'is_granted_workflow_transition' }
