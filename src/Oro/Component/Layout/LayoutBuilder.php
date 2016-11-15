@@ -25,12 +25,18 @@ class LayoutBuilder implements LayoutBuilderInterface
     protected $expressionProcessor;
 
     /**
+     * @var BlockViewCache
+     */
+    private $blockViewCache;
+
+    /**
      * @param LayoutRegistryInterface            $registry
      * @param RawLayoutBuilderInterface          $rawLayoutBuilder
      * @param DeferredLayoutManipulatorInterface $layoutManipulator
      * @param BlockFactoryInterface              $blockFactory
      * @param LayoutRendererRegistryInterface    $rendererRegistry
      * @param ExpressionProcessor                $expressionProcessor
+     * @param BlockViewCache|null                $blockViewCache
      */
     public function __construct(
         LayoutRegistryInterface $registry,
@@ -38,7 +44,8 @@ class LayoutBuilder implements LayoutBuilderInterface
         DeferredLayoutManipulatorInterface $layoutManipulator,
         BlockFactoryInterface $blockFactory,
         LayoutRendererRegistryInterface $rendererRegistry,
-        ExpressionProcessor $expressionProcessor
+        ExpressionProcessor $expressionProcessor,
+        BlockViewCache $blockViewCache = null
     ) {
         $this->registry            = $registry;
         $this->rawLayoutBuilder    = $rawLayoutBuilder;
@@ -46,6 +53,7 @@ class LayoutBuilder implements LayoutBuilderInterface
         $this->blockFactory        = $blockFactory;
         $this->rendererRegistry    = $rendererRegistry;
         $this->expressionProcessor = $expressionProcessor;
+        $this->blockViewCache      = $blockViewCache;
     }
 
     /**
@@ -207,7 +215,17 @@ class LayoutBuilder implements LayoutBuilderInterface
 
         $this->layoutManipulator->applyChanges($context);
         $rawLayout = $this->rawLayoutBuilder->getRawLayout();
-        $rootView = $this->blockFactory->createBlockView($rawLayout, $context, $rootId);
+
+        if ($this->blockViewCache) {
+            $rootView = $this->blockViewCache->fetch($context);
+            if ($rootView === null) {
+                $rootView = $this->blockFactory->createBlockView($rawLayout, $context, $rootId);
+
+                $this->blockViewCache->save($context, $rootView);
+            }
+        } else {
+            $rootView = $this->blockFactory->createBlockView($rawLayout, $context, $rootId);
+        }
 
         if ($context->getOr('expressions_evaluate')) {
             $deferred = $context->getOr('expressions_evaluate_deferred');
