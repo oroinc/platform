@@ -274,7 +274,7 @@ class LayoutBuilderTest extends \PHPUnit_Framework_TestCase
         $this->blockViewCache->expects($this->never())
             ->method('save');
 
-        $this->expressionProcessor->expects($this->once())
+        $this->expressionProcessor->expects($this->never())
             ->method('processExpressions');
 
         $optionValueBag = $this->getMock('Oro\Component\Layout\OptionValueBag');
@@ -369,7 +369,7 @@ class LayoutBuilderTest extends \PHPUnit_Framework_TestCase
             ->method('save')
             ->with($context, $rootView);
 
-        $this->expressionProcessor->expects($this->once())
+        $this->expressionProcessor->expects($this->never())
             ->method('processExpressions');
 
         $optionValueBag = $this->getMock('Oro\Component\Layout\OptionValueBag');
