@@ -279,6 +279,7 @@ oro:
                 failed_login_limit.label: Max login attempts
                 password_min_length.label: Minimal password length
                 password_numbers.label: Require a number
+                password_lower_case.label: Require a lowercase letter
                 password_upper_case.label: Require an uppercase letter
                 password_special_chars:
                     label: Require a special character
