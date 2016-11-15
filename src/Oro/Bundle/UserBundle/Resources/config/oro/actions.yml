@@ -110,7 +110,7 @@ operations:
         order: 50
         acl_resource: [password_management]
         button_options:
-            icon: icon-shield
+            icon: icon-unlock-alt
         frontend_options:
             confirmation:
                 title: oro.user.reset_password.popup.title
@@ -139,6 +139,15 @@ operations:
                 messages:
                     - success: oro.user.password.force_reset.mass_action.success
                     - failure: oro.user.password.force_reset.mass_action.failure
+        preconditions:
+            '@equal': [true, $isEnabled]
+        actions:
+            - '@run_action_group':
+                action_group: reset_password
+                parameters_mapping:
+                    data: $.data
+            - '@refresh_grid': users-grid
+
     user_enable:
         label: oro.user.action.enable.label
         acl_resource: oro_user_user_update
@@ -190,34 +199,17 @@ operations:
                     data: $.data
 
 action_groups:
+    reset_password:
+        parameters:
+            data:
+                type: Oro\Bundle\UserBundle\Entity\User
         actions:
-            - '@call_method':
-                object: $.data
-                method: setLoginDisabled
-                method_parameters: [true]
-            - '@call_method':
-                object: $.data
-                method: getConfirmationToken
-                attribute: $.token
-            - '@tree':
-                conditions:
-                    '@and':
-                        - '@empty': $.token
-                actions:
-                    - '@call_method':
-                        object: $.data
-                        method: generateToken
-                        attribute: $.token
-                    - '@call_method':
-                        object: $.data
-                        method: setConfirmationToken
-                        method_parameters: [$.token]
-            - '@flush_entity': $.data
             - '@call_service_method':
-                service: oro_user.mailer.processor
-                method: sendForcedResetPasswordAsAdminEmail
+                service: oro_user.handler.reset_password_handler
+                method: resetPasswordAndNotify
                 method_parameters: [$.data]
                 attribute: $.sent
+            - '@flush_entity': $.data
             - '@tree':
                 conditions:
                     '@and':
@@ -226,6 +218,8 @@ action_groups:
                     - '@flash_message':
                         message: oro.user.password.force_reset.success.message
                         type: 'success'
+                        message_parameters:
+                            'email': $.data.email
             - '@tree':
                 conditions:
                     '@and':
@@ -234,6 +228,9 @@ action_groups:
                     - '@flash_message':
                         message: oro.user.password.force_reset.failure.message
                         type: 'error'
+                        message_parameters:
+                            'email': $.data.email
+
     user_enable:
         parameters:
             data:

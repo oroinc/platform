@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\UserBundle\Migrations\Schema\v1_24;
+namespace Oro\Bundle\UserBundle\Migrations\Schema\v1_23;
 
 use Doctrine\DBAL\Schema\Schema;
 
@@ -63,7 +63,20 @@ class AddAuthStatusColumn implements Migration, ExtendExtensionAwareInterface
      */
     public function up(Schema $schema, QueryBag $queries)
     {
-        self::addAuthStatusField($schema, $this->extendExtension);
-        self::addEnumValues($queries, $this->extendExtension);
+        self::addAuthStatusFieldAndValues($schema, $queries, $this->extendExtension);
+    }
+
+    /**
+     * @param Schema $schema
+     * @param QueryBag $queries
+     * @param ExtendExtension $extendExtension
+     */
+    public static function addAuthStatusFieldAndValues(
+        Schema $schema,
+        QueryBag $queries,
+        ExtendExtension $extendExtension
+    ) {
+        self::addAuthStatusField($schema, $extendExtension);
+        self::addEnumValues($queries, $extendExtension);
     }
 }

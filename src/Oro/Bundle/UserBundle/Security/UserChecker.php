@@ -3,6 +3,7 @@
 namespace Oro\Bundle\UserBundle\Security;
 
 use Symfony\Component\HttpFoundation\Session\Flash\FlashBagInterface;
+use Symfony\Component\Security\Core\Exception\CredentialsExpiredException;
 use Symfony\Component\Security\Core\User\UserChecker as BaseUserChecker;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Translation\TranslatorInterface;
@@ -61,8 +62,8 @@ class UserChecker extends BaseUserChecker
             throw $exception;
         }
 
-        if ($user instanceof User && $user->isLoginDisabled()) {
-            $exception = new PasswordChangedException('Invalid password.');
+        if ($user instanceof User && $user->getAuthStatus() !== null && $user->getAuthStatus()->getId() === 'expired') {
+            $exception = new CredentialsExpiredException('Invalid password.');
             $exception->setUser($user);
 
             throw $exception;

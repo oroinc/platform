@@ -285,6 +285,15 @@ services:
         arguments:
             - '@oro_security.acl.sid_manager'
 
+    oro_user.handler.reset_password_handler:
+        class: Oro\Bundle\UserBundle\Handler\ResetPasswordHandler
+        arguments:
+            - '@oro_notification.manager.email_notification'
+            - '@oro_user.manager'
+            - '@oro_entity_extend.enum_value_provider'
+            - '@doctrine'
+            - '@logger'
+
     oro_user.activity_widget_provider:
         class: %oro_user.activity_widget_provider.class%
         arguments:
@@ -459,8 +468,8 @@ services:
         arguments:
             - '@translator'
 
-    oro_user.datagrid.extention.reset_password:
-        class: Oro\Bundle\UserBundle\Datagrid\Extension\MassAction\ResetPasswordExtention
+    oro_user.datagrid.extension.reset_password:
+        class: Oro\Bundle\UserBundle\Datagrid\Extension\MassAction\ResetPasswordExtension
         calls:
             - [setRequestStack, ["@request_stack"]]
         public: false
@@ -468,8 +477,12 @@ services:
         tags:
             - { name: oro_datagrid.extension }
 
+    # Security and login
+
     oro_user.security.disabled_login_subscriber:
         class: Oro\Bundle\UserBundle\Security\DisabledLoginSubscriber
-        arguments: ['@security.token_storage']
+        arguments:
+            - '@security.token_storage'
+
         tags:
             - { name: kernel.event_listener, event: kernel.request , method: onKernelRequest}

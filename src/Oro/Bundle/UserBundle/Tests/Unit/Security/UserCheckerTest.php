@@ -7,7 +7,7 @@ use Symfony\Component\Security\Core\User\UserInterface;
 
 use Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink;
 use Oro\Bundle\UserBundle\Security\UserChecker;
-use Oro\Bundle\UserBundle\Entity\User;
+use Oro\Bundle\UserBundle\Tests\Unit\Stub\UserStub as User;
 
 class UserCheckerTest extends \PHPUnit_Framework_TestCase
 {
@@ -106,7 +106,7 @@ class UserCheckerTest extends \PHPUnit_Framework_TestCase
         ];
 
         $user2 = new User();
-        $user2->getPasswordChangedAt(new \DateTime());
+        $user2->setPasswordChangedAt(new \DateTime());
         $user2->setLastLogin((new \DateTime())->modify('+1 minute'));
         $data[] = [
             'user' => $user2,

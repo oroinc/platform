@@ -218,11 +218,11 @@ oro:
             force_reset:
                 popup.message: User {{ user }} will receive reset password by email and will be disabled from login.
                 popup.question: Are you sure you want to proceed?
-                success.message: Password reset request has been sent.
-                failure.message: Password reset request has failed.
-                mass_action.success: Password reset completed successfully.
+                popup.button: Reset
+                success.message: Password reset request has been sent to %email%.
+                failure.message: Password reset request to %email% has failed.
+                mass_action.success: Password reset completed successfully. %count% emails sent.
                 mass_action.failure: Mass reset action has failed.
-                popup.label: Reset
         # password tooltip for different rules
         password_complexity:
             unrestricted: ~

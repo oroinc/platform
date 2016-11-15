@@ -81,44 +81,58 @@ class ResetController extends Controller
     }
 
     /**
+     * @param Request $request
+     * @param User $user
      * @Route(
      *     "/send-forced-password-reset-email/{id}",
      *     name="oro_user_send_forced_password_reset_email",
      *     requirements={"id"="\d+"}
      * )
      * @AclAncestor("password_management")
-     * @Template("OroUserBundle:Reset/widget:forcePasswordResetConfirmation.html.twig")
+     * @Template("OroUserBundle:Reset/dialog:forcePasswordResetConfirmation.html.twig")
+     *
+     * @return array
      */
     public function sendForcedResetEmailAction(Request $request, User $user)
     {
         $params = [
             'entity' => $user
         ];
-        if ($request->isMethod('POST')) {
-            if (null === $user->getConfirmationToken()) {
-                $user->setConfirmationToken($user->generateToken());
-            }
 
-            $this->get('session')->set(static::SESSION_EMAIL, $this->getObfuscatedEmail($user));
-            try {
-                $this->get('oro_user.mailer.processor')->sendForcedResetPasswordAsAdminEmail($user);
-            } catch (\Exception $e) {
-                $this->get('logger')->addCritical($e->getMessage(), ['exception' => $e]);
-
-                $params['processed'] = false;
-                $params['error'] = $this->get('translator')->trans('oro.email.handler.unable_to_send_email');
-
-                return $params;
-            }
-            $user->setLoginDisabled(true);
-            $this->get('oro_user.manager')->updateUser($user);
-            $params['processed'] = true;
-        } else {
+        if (!$request->isMethod('POST')) {
             $params['formAction'] = $this->get('router')->generate(
                 'oro_user_send_forced_password_reset_email',
                 ['id' => $user->getId()]
             );
+
+            return $params;
         }
+
+        $session = $this->get('session');
+        $em = $this->get('doctrine.orm.entity_manager');
+        $resetPasswordHandler = $this->get('oro_user.handler.reset_password_handler');
+        $translator = $this->get('translator');
+
+        $session->set(static::SESSION_EMAIL, $this->getObfuscatedEmail($user));
+
+        $resetPasswordSuccess = $resetPasswordHandler->resetPasswordAndNotify($user);
+        $em->flush();
+
+        $flashBag = $session->getFlashBag();
+
+        if ($resetPasswordSuccess) {
+            $flashBag->add(
+                'success',
+                $translator->trans('oro.user.password.force_reset.success.message', ['%email%' => $user->getEmail()])
+            );
+
+            return $params;
+        }
+
+        $flashBag->add(
+            'error',
+            $translator->trans('oro.user.password.force_reset.failure.message', ['%email%' => $user->getEmail()])
+        );
 
         return $params;
     }
@@ -220,11 +234,10 @@ class ResetController extends Controller
 
     /**
      * Sets user password
-     *
      * @AclAncestor("password_management")
      * @Method({"GET", "POST"})
      * @Route("/set-password/{id}", name="oro_user_reset_set_password", requirements={"id"="\d+"})
-     * @Template("OroUserBundle:Reset:update.html.twig")
+     * @Template("OroUserBundle:Reset/dialog:update.html.twig")
      */
     public function setPasswordAction(User $entity)
     {

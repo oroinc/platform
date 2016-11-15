@@ -412,13 +412,6 @@ class User extends ExtendUser implements
     protected $updatedAt;
 
     /**
-     * @var boolean $disableLogin
-     *
-     * @ORM\Column(type="boolean", name="login_disabled", options={"default"=false})
-     */
-    protected $loginDisabled;
-
-    /**
      * @var OrganizationInterface
      *
      * Organization that user logged in
@@ -435,7 +428,6 @@ class User extends ExtendUser implements
         $this->emailOrigins = new ArrayCollection();
         $this->apiKeys = new ArrayCollection();
         $this->groups = new ArrayCollection();
-        $this->loginDisabled = false;
     }
 
     /**
@@ -1179,25 +1171,5 @@ class User extends ExtendUser implements
     public function getFullName()
     {
         return sprintf('%s %s', $this->getFirstName(), $this->getLastName());
-    }
-
-    /**
-     * @return boolean
-     */
-    public function isLoginDisabled()
-    {
-        return $this->loginDisabled;
-    }
-
-    /**
-     * @param boolean $loginDisabled
-     *
-     * @return User
-     */
-    public function setLoginDisabled($loginDisabled)
-    {
-        $this->loginDisabled = $loginDisabled;
-
-        return $this;
     }
 }
