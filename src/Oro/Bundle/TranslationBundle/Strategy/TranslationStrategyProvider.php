@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\TranslationBundle\Strategy;
 
-use Oro\Bundle\TranslationBundle\Entity\Translation;
+use Oro\Bundle\TranslationBundle\Translation\Translator;
 
 class TranslationStrategyProvider
 {
@@ -46,7 +46,7 @@ class TranslationStrategyProvider
 
         $fallback = $this->findPathToLocale($fallbackTree, $locale);
         if (!$fallback) {
-            return $locale !== Translation::DEFAULT_LOCALE ? [Translation::DEFAULT_LOCALE] : [];
+            return $locale !== Translator::DEFAULT_LOCALE ? [Translator::DEFAULT_LOCALE] : [];
         }
 
         // remove current locale

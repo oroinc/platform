@@ -91,6 +91,7 @@ define(function(require) {
                 $grid: this.grid.$grid,
                 $container: this.grid.$grid.parents('.grid-scrollable-container:first'),
                 $spyScroll: this.grid.$grid.parents('[data-spy="scroll"]:first'),
+                $oroTabs: this.grid.$grid.parents('.oro-tabs:first'),
                 $collapsible: this.grid.$grid.parents('.collapse:first'),
                 $thead: this.grid.$grid.find('thead:first')
             };
@@ -111,6 +112,7 @@ define(function(require) {
             this.domCache.$collapsible.on('shown' + this.eventNamespace(), manageScroll);
             this.domCache.$document.on('scroll' + this.eventNamespace(), manageScroll);
             this.domCache.$window.on('resize' + this.eventNamespace(), updateCustomScrollbar);
+            this.domCache.$oroTabs.on('show' + this.eventNamespace(), updateCustomScrollbar);
 
             this.listenTo(mediator, 'layout:reposition', this.updateCustomScrollbar);
             this.listenTo(mediator, 'gridHeaderCellWidth:beforeUpdate', this.onGridHeaderCellWidthBeforeUpdate);

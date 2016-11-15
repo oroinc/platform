@@ -5,8 +5,9 @@ namespace Oro\Component\Action\Action;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 use Oro\Component\ConfigExpression\ExpressionInterface;
+use Oro\Component\ConfigExpression\FactoryWithTypesInterface;
 
-class ActionFactory implements ActionFactoryInterface
+class ActionFactory implements ActionFactoryInterface, FactoryWithTypesInterface
 {
     /**
      * @var ContainerInterface
@@ -60,5 +61,13 @@ class ActionFactory implements ActionFactoryInterface
         }
 
         return $action;
+    }
+
+    /**
+     * @return array
+     */
+    public function getTypes()
+    {
+        return $this->types;
     }
 }
