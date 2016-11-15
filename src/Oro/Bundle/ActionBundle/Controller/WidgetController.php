@@ -197,4 +197,21 @@ class WidgetController extends Controller
 
         return $response;
     }
+
+    /**
+     * @Route("/buttons/new", name="oro_action_buttons_widget_buttons")
+     * @Template()
+     *
+     * @return array
+     */
+    public function buttonsNewAction()
+    {
+        $buttonProvider = $this->get('oro_action.provider.button');
+        $buttonSearchContextProvider = $this->get('oro_action.provider.button_search_context');
+        $buttonSearchContext = $buttonSearchContextProvider->getButtonSearchContext();
+
+        return [
+            'buttons' => $buttonProvider->findAll($buttonSearchContext),
+        ];
+    }
 }
