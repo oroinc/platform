@@ -35,7 +35,7 @@ class ExpressionNormalizer implements NormalizerInterface, DenormalizerInterface
      */
     public function supportsDenormalization($data, $type, $format = null)
     {
-        return $type == ParsedExpression::class;
+        return $type === ParsedExpression::class;
     }
 
     /**

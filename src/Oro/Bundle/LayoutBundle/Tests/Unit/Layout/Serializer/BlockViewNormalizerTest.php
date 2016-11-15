@@ -56,7 +56,6 @@ class BlockViewNormalizerTest extends \PHPUnit_Framework_TestCase
                 'expectedResult' => [
                     'vars' => [
                         'id' => 'root',
-                        'attr' => [],
                     ],
                 ],
                 'actualView' => $this->createBlockView('root')
@@ -66,7 +65,6 @@ class BlockViewNormalizerTest extends \PHPUnit_Framework_TestCase
                     'vars' => [
                         'id' => 'root',
                         'foo' => 'bar',
-                        'attr' => [],
                     ]
                 ],
                 'actualView' => $this->createBlockView('root', [

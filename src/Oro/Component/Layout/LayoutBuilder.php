@@ -4,6 +4,9 @@ namespace Oro\Component\Layout;
 
 use Oro\Component\Layout\ExpressionLanguage\ExpressionProcessor;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class LayoutBuilder implements LayoutBuilderInterface
 {
     /** @var LayoutRegistryInterface */

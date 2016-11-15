@@ -77,6 +77,13 @@ class OptionValueBagNormalizer implements NormalizerInterface, DenormalizerInter
         ];
     }
 
+    /**
+     * @param $argument
+     * @param null $format
+     * @param array $context
+     *
+     * @return mixed
+     */
     private function parseArgument($argument, $format = null, array $context = [])
     {
         if (is_object($argument)) {
@@ -102,7 +109,7 @@ class OptionValueBagNormalizer implements NormalizerInterface, DenormalizerInter
      */
     public function supportsDenormalization($data, $type, $format = null)
     {
-        return $type == OptionValueBag::class;
+        return $type === OptionValueBag::class;
     }
 
     /**

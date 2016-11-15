@@ -7,9 +7,9 @@ use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 use Symfony\Component\Serializer\Serializer;
 use Symfony\Component\Serializer\Encoder\JsonEncoder;
 
-use Oro\Component\Layout\OptionValueBag;
-
 use Oro\Bundle\LayoutBundle\Layout\Serializer\OptionValueBagNormalizer;
+
+use Oro\Component\Layout\OptionValueBag;
 
 class OptionValueBagNormalizerTest extends \PHPUnit_Framework_TestCase
 {

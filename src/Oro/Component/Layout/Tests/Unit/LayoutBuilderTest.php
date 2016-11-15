@@ -3,13 +3,18 @@
 namespace Oro\Component\Layout\Tests\Unit;
 
 use Oro\Component\Layout\BlockViewCache;
+use Oro\Component\Layout\DataAccessor;
 use Oro\Component\Layout\LayoutBuilder;
+use Oro\Component\Layout\LayoutRegistryInterface;
 use Oro\Component\Layout\LayoutRendererRegistry;
 use Oro\Component\Layout\Tests\Unit\Stubs\LayoutContextStub;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class LayoutBuilderTest extends \PHPUnit_Framework_TestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var LayoutRegistryInterface|\PHPUnit_Framework_MockObject_MockObject */
     protected $registry;
 
     /** @var \PHPUnit_Framework_MockObject_MockObject */
@@ -274,7 +279,7 @@ class LayoutBuilderTest extends \PHPUnit_Framework_TestCase
         $this->blockViewCache->expects($this->never())
             ->method('save');
 
-        $this->expressionProcessor->expects($this->never())
+        $this->expressionProcessor->expects($this->once())
             ->method('processExpressions');
 
         $optionValueBag = $this->getMock('Oro\Component\Layout\OptionValueBag');
@@ -369,7 +374,7 @@ class LayoutBuilderTest extends \PHPUnit_Framework_TestCase
             ->method('save')
             ->with($context, $rootView);
 
-        $this->expressionProcessor->expects($this->never())
+        $this->expressionProcessor->expects($this->once())
             ->method('processExpressions');
 
         $optionValueBag = $this->getMock('Oro\Component\Layout\OptionValueBag');
