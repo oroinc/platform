@@ -4,7 +4,7 @@ namespace Oro\Bundle\CurrencyBundle\Provider;
 
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 
-interface RepositoryCurrencyProviderInterface
+interface RepositoryCurrencyCheckerProviderInterface
 {
     /**
      * Return translated label of entity
