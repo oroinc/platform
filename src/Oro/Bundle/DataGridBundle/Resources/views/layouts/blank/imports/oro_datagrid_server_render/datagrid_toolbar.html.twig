@@ -1,0 +1,90 @@
+{% block __oro_datagrid_server_render__datagrid_toolbar_widget %}
+    {% set attr = attr|merge({
+        class: attr.class|default('') ~ " grid-toolbar"
+    }) %}
+
+    <div{{ block('block_attributes') }}>
+        {% do block|merge_context({'datagrid': datagrid}) %}
+        {{ block('container_widget') }}
+    </div>
+{% endblock %}
+
+{% block __oro_datagrid_server_render__datagrid_toolbar_pagination_widget %}
+    {% set attr = attr|merge({
+        class: attr.class|default('') ~ " pagination pagination-centered",
+        'data-grid-pagination': ''
+    }) %}
+
+    <div class="grid__tool">
+        <div{{ block('block_attributes') }}>
+            {% set metadata = oro_datagrid_metadata(datagrid) %}
+            {% set data = oro_datagrid_data(datagrid) %}
+
+            {% set totalRecords = data.options.totalRecords %}
+            {% set pageSize = metadata.state.pageSize %}
+            {% set currentPage = metadata.state.currentPage %}
+            {% set totalPages = pageSize == 0 ? 1 : (totalRecords / pageSize)|round %}
+
+            <span>{{ "oro.datagrid.pagination.label"|trans }}:</span>
+            <div class="oro-pagination__pager">
+                <button class="oro-pagination__pager__prev{% if currentPage <= 1 %} disabled{% endif %}"
+                        data-grid-pagination-trigger data-grid-pagination-direction="prev"{% if currentPage <= 1 %} disabled{% endif %}>
+                    <i class="cf-left-open cf--base-line"></i>
+                </button>
+
+                <input type="text" class="oro-pagination__pager__input" value="{{ currentPage }}" data-grid-pagination-trigger-input>
+
+                <button class="oro-pagination__pager__next{% if currentPage >= totalPages %} disabled{% endif %}"
+                        data-grid-pagination-trigger data-grid-pagination-direction="next"{% if currentPage >= totalPages %} disabled{% endif %}>
+                    <i class="cf-right-open cf--base-line"></i>
+                </button>
+            </div>
+
+            <span class="hidden-sm hidden-xs">
+                {{ "oro.datagrid.pagination.totalPages"|trans({'%totalPages%': totalPages}) }}&nbsp;|
+                {{ "oro.datagrid.pagination.totalRecords"|trans({'%totalRecords%': totalRecords}) }}
+            </span>
+        </div>
+    </div>
+{% endblock %}
+
+{% block __oro_datagrid_server_render__datagrid_toolbar_page_size_widget %}
+    {% set attr = attr|merge({
+        class: attr.class|default('') ~ " page-size pull-right form-horizontal",
+        'data-grid-pagesize': ''
+    }) %}
+
+    {% set metadata = oro_datagrid_metadata(datagrid) %}
+    {% set pageSize = metadata.options.toolbarOptions.pageSize %}
+
+    {% if pageSize.hide == false and pageSize.items|length > 0 %}
+        <div class="grid__tool">
+            <div{{ block('block_attributes') }}>
+                <div class=" page-size pull-right form-horizontal" data-grid-pagesize>
+                    <span class="fs14 va-m_md">{{ "oro.datagrid.pagesize.label"|trans }}: &nbsp;</span>
+                    <div class="action-selectbox_custom_in-pager">
+                        <select class="select select--size-s" name="action" data-grid-pagesize-selector>
+                            {% for value in pageSize.items %}
+                                <option value="{{ value }}" data-grid-pagesize-trigger{% if value == pageSize.default_per_page %} selected{% endif %}>
+                                    {{ value }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+{% endblock %}
+
+{% block __oro_datagrid_server_render__datagrid_toolbar_actions_widget %}
+    {% set attr = attr|merge({
+        class: attr.class|default('') ~ " actions-panel pull-right form-horizontal",
+        'data-grid-actions-panel': ''
+    }) %}
+
+    <div{{ block('block_attributes') }}>
+        {# TODO: add reset and refresh actions #}
+        {{ block_widget(block) }}
+    </div>
+{% endblock %}

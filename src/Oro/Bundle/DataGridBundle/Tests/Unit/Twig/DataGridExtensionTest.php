@@ -4,6 +4,7 @@ namespace Oro\Bundle\DataGridBundle\Tests\Unit\Twig;
 
 use Symfony\Component\Routing\RouterInterface;
 
+use Oro\Bundle\DataGridBundle\Datagrid\Common\MetadataObject;
 use Oro\Bundle\DataGridBundle\Datagrid\ManagerInterface;
 use Oro\Bundle\DataGridBundle\Datagrid\NameStrategyInterface;
 use Oro\Bundle\DataGridBundle\Datagrid\DatagridInterface;
@@ -71,6 +72,7 @@ class DataGridExtensionTest extends \PHPUnit_Framework_TestCase
             ['oro_datagrid_build_fullname', [$this->twigExtension, 'buildGridFullName']],
             ['oro_datagrid_build_inputname', [$this->twigExtension, 'buildGridInputName']],
             ['oro_datagrid_link', [$this->datagridRouteHelper, 'generate']],
+            ['oro_datagrid_column_attributes', [$this->twigExtension, 'getColumnAttributes']],
         ];
         /** @var \Twig_SimpleFunction[] $actualFunctions */
         $actualFunctions = $this->twigExtension->getFunctions();
@@ -311,6 +313,31 @@ class DataGridExtensionTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue($expectedFullName));
 
         $this->assertEquals($expectedFullName, $this->twigExtension->buildGridFullName($gridName, $gridScope));
+    }
+
+    public function testGetColumnAttributes()
+    {
+        $columnAttributes = [
+            'name' => 'column1',
+            'label' => 'Column 1',
+            'type' => 'string'
+        ];
+
+        $metadata = $this->getMock(MetadataObject::class, [], [], '', false);
+        $metadata->expects($this->exactly(2))
+            ->method('toArray')
+            ->willReturn([
+                'columns' => [$columnAttributes]
+            ]);
+
+        /** @var \PHPUnit_Framework_MockObject_MockObject|DatagridInterface $grid */
+        $grid = $this->getMock(DatagridInterface::class);
+        $grid->expects($this->exactly(2))
+            ->method('getMetadata')
+            ->willReturn($metadata);
+
+        $this->assertEquals($columnAttributes, $this->twigExtension->getColumnAttributes($grid, 'column1'));
+        $this->assertEquals([], $this->twigExtension->getColumnAttributes($grid, 'column3'));
     }
 
     protected function tearDown()

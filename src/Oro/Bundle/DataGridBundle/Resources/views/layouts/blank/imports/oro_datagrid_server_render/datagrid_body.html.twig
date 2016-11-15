@@ -1,0 +1,31 @@
+{# TODO: add row actions #}
+
+{% block datagrid_row_widget %}
+    {% set attr = attr|merge({
+        class: attr.class|default('') ~ " grid-row"
+    }) %}
+
+    <tr{{ block('block_attributes') }}>
+        {% for child in block if child.vars.visible -%}
+            {% do child|merge_context({'datagrid_row': datagrid_row}) %}
+            {{ block_widget(child) }}
+        {%- endfor %}
+    </tr>
+{% endblock %}
+
+{% block datagrid_cell_widget %}
+    {% set attr = attr|merge({
+        class: attr.class|default('') ~ " string-cell grid-cell grid-body-cell grid-body-cell-" ~ column_name
+    }) %}
+
+    <td{{ block('block_attributes') }}>
+        {% for child in block if child.vars.visible -%}
+            {% do child|merge_context({'datagrid_row': datagrid_row}) %}
+            {{ block_widget(child) }}
+        {%- endfor %}
+    </td>
+{% endblock %}
+
+{%- block datagrid_cell_value_widget -%}
+    {{ datagrid_row[column_name] }}
+{%- endblock -%}

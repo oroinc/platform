@@ -1,0 +1,65 @@
+{% block __oro_datagrid_server_render__datagrid_widget %}
+    {% set datagrid = oro_datagrid_build(grid_name, grid_parameters) %}
+    {% set gridId = oro_datagrid_generate_element_id(datagrid) %}
+    {% set renderParams = grid_render_parameters %}
+
+    {% set attr = attr|merge({
+        id: gridId
+    }) %}
+
+    {% set gridClass = attr.class|default('') %}
+    {% set gridClass = renderParams.cssClass is defined ? gridClass ~ ' ' ~ renderParams.cssClass : gridClass %}
+    {% if gridClass %}
+        {% set attr = attr|merge({
+            class: gridClass
+        }) %}
+    {% endif %}
+
+    {% set datagridData = oro_datagrid_data(datagrid) %}
+    {% set datagridMetaData = oro_datagrid_metadata(datagrid) %}
+    {% set toolbarOptions = datagridMetaData.options.toolbarOptions %}
+
+    <div{{ block('block_attributes') }}>
+        <div class="oro-datagrid">
+            {% if toolbarOptions.placement.top %}
+                <div class="toolbar" data-grid-toolbar="top">
+                    {% do block[id ~ '_toolbar']|merge_context({'datagrid': datagrid}) %}
+                    {{ block_widget(block[id ~ '_toolbar']) }}
+                </div>
+            {% endif %}
+
+            <div class="other-scroll-container">
+                <div class="other-scroll"></div>
+
+                <div class="container-fluid grid-scrollable-container">
+                    <div class="grid-container">
+                        <table class="grid table-hover table table-bordered table-condensed">
+                            <thead class="grid-header">
+                                {% do block[id ~ '_header_row']|merge_context({'datagrid': datagrid}) %}
+                                {{ block_widget(block[id ~ '_header_row']) }}
+                            </thead>
+
+                            <tbody class="grid-body">
+                                {% for datagrid_row in datagridData.data %}
+                                    {% do block[id ~ '_row']|merge_context({'datagrid_row': datagrid_row}) %}
+                                    {{ block_widget(block[id ~ '_row']) }}
+                                {% endfor %}
+                            </tbody>
+
+                            <tfoot class="grid-footer"></tfoot>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="no-data"></div>
+            </div>
+
+            {% if toolbarOptions.placement.bottom %}
+                <div class="toolbar dropup-area" data-grid-toolbar="bottom">
+                    {% do block[id ~ '_toolbar']|merge_context({'datagrid': datagrid}) %}
+                    {{ block_widget(block[id ~ '_toolbar']) }}
+                </div>
+            {% endif %}
+        </div>
+    </div>
+{% endblock %}
