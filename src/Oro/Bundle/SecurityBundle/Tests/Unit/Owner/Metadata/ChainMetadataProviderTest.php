@@ -166,9 +166,6 @@ class ChainMetadataProviderTest extends \PHPUnit_Framework_TestCase
             [
                 'levelClassMethod' => 'getGlobalLevelClass'
             ],
-            [
-                'levelClassMethod' => 'getSystemLevelClass'
-            ]
         ];
     }
 
@@ -219,10 +216,8 @@ class ChainMetadataProviderTest extends \PHPUnit_Framework_TestCase
         $chain->addProvider('alias', $provider);
 
         $provider->expects($this->once())->method('getBasicLevelClass')->willReturn('\stdClass');
-        $provider->expects($this->once())->method('getSystemLevelClass')->willReturn('\stdClass');
 
         $this->assertEquals('\stdClass', $chain->getBasicLevelClass());
-        $this->assertEquals('\stdClass', $chain->getSystemLevelClass());
     }
 
     public function testEmulatedProvider()
@@ -245,10 +240,6 @@ class ChainMetadataProviderTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('\stdClass', $chain->getBasicLevelClass());
 
         $chain->stopProviderEmulation();
-
-        $emulated->expects($this->never())->method('getSystemLevelClass');
-        $provider->expects($this->once())->method('getSystemLevelClass')->willReturn('\stdClass');
-        $this->assertEquals('\stdClass', $chain->getSystemLevelClass());
     }
 
     /**

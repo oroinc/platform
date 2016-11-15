@@ -12,7 +12,6 @@ use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
 use Oro\Bundle\SecurityBundle\Acl\AccessLevel;
 use Oro\Bundle\SecurityBundle\Acl\Domain\EntityObjectReference;
 use Oro\Bundle\SecurityBundle\Acl\Domain\ObjectIdAccessor;
-use Oro\Bundle\SecurityBundle\Annotation\Acl as AclAnnotation;
 use Oro\Bundle\SecurityBundle\Authentication\Token\OrganizationContextTokenInterface;
 use Oro\Bundle\SecurityBundle\Metadata\EntitySecurityMetadataProvider;
 use Oro\Bundle\SecurityBundle\Owner\EntityOwnerAccessor;
@@ -20,8 +19,6 @@ use Oro\Bundle\SecurityBundle\Owner\Metadata\MetadataProviderInterface;
 
 class FieldAclExtension extends AbstractSimpleAccessLevelAclExtension
 {
-    const NAME = 'field';
-
     const PERMISSION_VIEW   = 'VIEW';
     const PERMISSION_CREATE = 'CREATE';
     const PERMISSION_EDIT   = 'EDIT';
@@ -133,7 +130,7 @@ class FieldAclExtension extends AbstractSimpleAccessLevelAclExtension
      */
     public function getExtensionKey()
     {
-        return self::NAME;
+        throw new \LogicException('Field ACL Extension does not support "getExtensionKey" method.');
     }
 
     /**
@@ -181,44 +178,7 @@ class FieldAclExtension extends AbstractSimpleAccessLevelAclExtension
      */
     public function getObjectIdentity($val)
     {
-        if (is_string($val)) {
-            $identity = $this->fromDescriptor($val);
-        } elseif ($val instanceof AclAnnotation) {
-            $class = $this->entityClassResolver->getEntityClass($val->getClass());
-            $identity = new ObjectIdentity($val->getType(), $class);
-        } else {
-            $identity = $this->fromDomainObject($val);
-        }
-
-        if (null === $identity->getIdentifier()) {
-            $identity = new ObjectIdentity('entity', $identity->getType());
-        }
-
-        return $identity;
-    }
-
-    /**
-     * Constructs an ObjectIdentity for the given domain object
-     *
-     * @param string $descriptor
-     *
-     * @return ObjectIdentity
-     * @throws \InvalidArgumentException
-     */
-    protected function fromDescriptor($descriptor)
-    {
-        $type = $id = $group = null;
-        $this->parseDescriptor($descriptor, $type, $id, $group);
-
-        $type = $this->entityClassResolver->getEntityClass(ClassUtils::getRealClass($this->getObjectClassName($type)));
-
-        if ($id === $this->getExtensionKey()) {
-            return new ObjectIdentity($id, $type);
-        }
-
-        throw new \InvalidArgumentException(
-            sprintf('Unsupported object identity descriptor: %s.', $descriptor)
-        );
+        throw new \LogicException('Field ACL Extension does not support "getObjectIdentity" method');
     }
 
     /**

@@ -13,27 +13,6 @@ abstract class AbstractSimpleAccessLevelAclExtension extends AbstractAccessLevel
     /**
      * {@inheritdoc}
      */
-    public function getAccessLevelNames($object, $permissionName = null)
-    {
-        $metadata = $this->getMetadata($object);
-        if (!$metadata->hasOwner()) {
-            return AccessLevel::getAccessLevelNames(AccessLevel::SYSTEM_LEVEL);
-        }
-
-        if ($metadata->isBasicLevelOwned()) {
-            $minLevel = AccessLevel::BASIC_LEVEL;
-        } elseif ($metadata->isLocalLevelOwned()) {
-            $minLevel = AccessLevel::LOCAL_LEVEL;
-        } else {
-            $minLevel = AccessLevel::GLOBAL_LEVEL;
-        }
-
-        return AccessLevel::getAccessLevelNames($minLevel);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
     public function getAccessLevel($mask, $permission = null, $object = null)
     {
         if (0 === $mask) {

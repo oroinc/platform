@@ -113,33 +113,14 @@ class EntityAclExtension extends AbstractAccessLevelAclExtension
     /**
      * {@inheritdoc}
      */
-    public function getAccessLevelNames($object, $permissionName = null)
-    {
-        if ($this->getObjectClassName($object) === ObjectIdentityFactory::ROOT_IDENTITY_TYPE) {
-            /**
-             * In community version root entity should not have GLOBAL(Organization) access level
-             */
-            return AccessLevel::getAccessLevelNames(
-                AccessLevel::BASIC_LEVEL,
-                AccessLevel::SYSTEM_LEVEL,
-                [AccessLevel::GLOBAL_LEVEL]
-            );
-        } else {
-            return $this->getMetadata($object)->getAccessLevelNames();
-        }
-    }
-
-    /**
-     * {@inheritdoc}
-     */
     public function supports($type, $id)
     {
         if (ObjectIdentityHelper::isFieldEncodedKey($type)) {
             $type = ObjectIdentityHelper::decodeEntityFieldInfo($type)[0];
         }
 
-        if ($type === ObjectIdentityFactory::ROOT_IDENTITY_TYPE && $id === $this->getExtensionKey()) {
-            return true;
+        if ($type === ObjectIdentityFactory::ROOT_IDENTITY_TYPE) {
+            return $id === $this->getExtensionKey();
         }
 
         $type = ClassUtils::getRealClass(ObjectIdentityHelper::normalizeType($type));

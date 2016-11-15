@@ -777,7 +777,6 @@ class FieldAclExtensionTest extends \PHPUnit_Framework_TestCase
     {
         return [
             [FieldMaskBuilder::MASK_VIEW_BASIC],
-            [FieldMaskBuilder::MASK_VIEW_SYSTEM | FieldMaskBuilder::MASK_VIEW_GLOBAL],
             [FieldMaskBuilder::MASK_VIEW_GLOBAL | FieldMaskBuilder::MASK_VIEW_DEEP],
             [FieldMaskBuilder::MASK_VIEW_DEEP | FieldMaskBuilder::MASK_VIEW_LOCAL],
         ];
@@ -807,7 +806,6 @@ class FieldAclExtensionTest extends \PHPUnit_Framework_TestCase
     {
         return [
             [FieldMaskBuilder::MASK_VIEW_BASIC],
-            [FieldMaskBuilder::MASK_VIEW_SYSTEM | FieldMaskBuilder::MASK_VIEW_GLOBAL],
             [FieldMaskBuilder::MASK_VIEW_GLOBAL | FieldMaskBuilder::MASK_VIEW_DEEP],
             [FieldMaskBuilder::MASK_VIEW_DEEP | FieldMaskBuilder::MASK_VIEW_LOCAL],
         ];
@@ -838,7 +836,6 @@ class FieldAclExtensionTest extends \PHPUnit_Framework_TestCase
     public static function validateMaskForUserOwnedInvalidProvider()
     {
         return [
-            [FieldMaskBuilder::MASK_VIEW_SYSTEM | FieldMaskBuilder::MASK_VIEW_GLOBAL],
             [FieldMaskBuilder::MASK_VIEW_GLOBAL | FieldMaskBuilder::MASK_VIEW_DEEP],
             [FieldMaskBuilder::MASK_VIEW_DEEP | FieldMaskBuilder::MASK_VIEW_LOCAL],
             [FieldMaskBuilder::MASK_VIEW_LOCAL | FieldMaskBuilder::MASK_VIEW_BASIC],
@@ -863,7 +860,6 @@ class FieldAclExtensionTest extends \PHPUnit_Framework_TestCase
             [FieldMaskBuilder::MASK_VIEW_DEEP],
             [FieldMaskBuilder::MASK_VIEW_LOCAL],
             [FieldMaskBuilder::MASK_VIEW_BASIC],
-            [FieldMaskBuilder::MASK_VIEW_SYSTEM | FieldMaskBuilder::MASK_VIEW_GLOBAL],
             [FieldMaskBuilder::MASK_VIEW_GLOBAL | FieldMaskBuilder::MASK_VIEW_DEEP],
         ];
     }

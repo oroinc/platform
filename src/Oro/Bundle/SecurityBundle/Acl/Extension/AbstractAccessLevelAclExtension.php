@@ -50,6 +50,14 @@ abstract class AbstractAccessLevelAclExtension extends AbstractAclExtension
     }
 
     /**
+     * {@inheritdoc}
+     */
+    public function getAccessLevelNames($object, $permissionName = null)
+    {
+        return $this->getMetadata($object)->getAccessLevelNames();
+    }
+
+    /**
      * @param int            $triggeredMask
      * @param mixed          $object
      * @param TokenInterface $securityToken
