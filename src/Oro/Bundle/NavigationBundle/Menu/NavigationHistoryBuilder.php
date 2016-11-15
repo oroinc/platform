@@ -86,4 +86,12 @@ class NavigationHistoryBuilder extends NavigationItemBuilder
 
         return $this;
     }
+
+    /**
+     * @inheritdoc
+     */
+    protected function getMatchedRoute($item)
+    {
+        return isset($item['route']) ? $item['route'] : null;
+    }
 }
