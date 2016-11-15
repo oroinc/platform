@@ -277,8 +277,8 @@ class LayoutBuilder implements LayoutBuilderInterface
         BlockView $blockView,
         ContextInterface $context,
         DataAccessor $data,
-        $encoding,
-        $deferred
+        $deferred,
+        $encoding
     ) {
         if ($deferred) {
             $this->expressionProcessor->processExpressions($blockView->vars, $context, $data, true, $encoding);

@@ -14,9 +14,19 @@ use Oro\Bundle\UserBundle\Validator\Constraints\PasswordComplexity;
  */
 class PasswordComplexityValidator extends ConstraintValidator
 {
+    const REGEX_LOWER_CASE = '/\p{Ll}/u';
     const REGEX_UPPER_CASE = '/\p{Lu}/u';
     const REGEX_NUMBERS = '/\p{N}/u';
     const REGEX_SPECIAL_CHARS = '/[\s!-\/:-@\[-`{|}~]/u'; // !"#$%&'()*+,-./:;<=>?@[\]^_`{|}~ + spacing
+
+    /** @var array Complexity rules to check the password validity (in order) and respective trans keys */
+    protected static $rulesMap = [
+        'validMinLength'        => 'requireMinLengthKey',
+        'validLowerCase'        => 'requireLowerCaseKey',
+        'validUpperCase'        => 'requireUpperCaseKey',
+        'validNumbers'          => 'requireNumbersKey',
+        'validSpecialCharacter' => 'requireSpecialCharacterKey',
+    ];
 
     /** @var PasswordComplexityConfigProvider */
     private $configProvider;
@@ -39,22 +49,12 @@ class PasswordComplexityValidator extends ConstraintValidator
             return;
         }
 
-        // collect all messages
         $messages = [];
-        if (!$this->validMinLength($value, $constraint)) {
-            $messages[] = $constraint->requireMinLengthKey;
-        }
-
-        if (!$this->validUpperCase($value, $constraint)) {
-            $messages[] = $constraint->requireUpperCaseKey;
-        }
-
-        if (!$this->validNumbers($value, $constraint)) {
-            $messages[] = $constraint->requireNumbersKey;
-        }
-
-        if (!$this->validSpecialChars($value, $constraint)) {
-            $messages[] = $constraint->requireSpecialCharacterKey;
+        // execute rule validators and collect all messages
+        foreach (self::$rulesMap as $method => $transKey) {
+            if (!$this->$method($value, $constraint)) {
+                $messages[] = $constraint->$transKey;
+            }
         }
 
         if (count($messages) > 0) {
@@ -112,6 +112,23 @@ class PasswordComplexityValidator extends ConstraintValidator
     }
 
     /**
+     * Validate lower case requirement if enabled
+     *
+     * @param $value
+     * @param PasswordComplexity $constraint
+     *
+     * @return bool
+     */
+    protected function validLowerCase($value, PasswordComplexity $constraint)
+    {
+        $isEnabled = null === $constraint->requireLowerCase
+            ? $this->configProvider->getLowerCase()
+            : $constraint->requireLowerCase;
+
+        return !$isEnabled || preg_match(self::REGEX_LOWER_CASE, $value);
+    }
+
+    /**
      * Validate numbers requirement if enabled
      *
      * @param $value
@@ -136,7 +153,7 @@ class PasswordComplexityValidator extends ConstraintValidator
      *
      * @return bool
      */
-    protected function validSpecialChars($value, PasswordComplexity $constraint)
+    protected function validSpecialCharacter($value, PasswordComplexity $constraint)
     {
         $isEnabled = null === $constraint->requireSpecialCharacter
             ? $this->configProvider->getSpecialChars()
