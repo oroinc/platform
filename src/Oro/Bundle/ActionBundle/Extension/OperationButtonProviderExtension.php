@@ -14,21 +14,20 @@ use Oro\Bundle\ActionBundle\Model\OperationRegistry;
 
 class OperationButtonProviderExtension implements ButtonProviderExtensionInterface
 {
-    /**
-     * @var OperationRegistry
-     */
+    /** @var OperationRegistry */
     protected $operationRegistry;
 
-    /**
-     * @var ContextHelper
-     */
+    /** @var ContextHelper */
     protected $contextHelper;
 
-    /**
-     * @var ApplicationsHelperInterface
-     */
+    /** @var ApplicationsHelperInterface */
     protected $applicationsHelper;
 
+    /**
+     * @param OperationRegistry $operationRegistry
+     * @param ContextHelper $contextHelper
+     * @param ApplicationsHelperInterface $applicationsHelper
+     */
     public function __construct(
         OperationRegistry $operationRegistry,
         ContextHelper $contextHelper,
@@ -44,21 +43,17 @@ class OperationButtonProviderExtension implements ButtonProviderExtensionInterfa
      */
     public function find(ButtonSearchContext $buttonSearchContext)
     {
-
-        $operations = $this->operationRegistry->find(
-            $buttonSearchContext->getEntityClass(),
-            $buttonSearchContext->getRouteName(),
-            $buttonSearchContext->getGridName(),
-            $buttonSearchContext->getGroup()
-        );
-
+        $operations = $this->getOperations($buttonSearchContext);
         $result = [];
 
-        /** @var Operation $operation */
         foreach ($operations as $operation) {
-            if ($operation->isAvailable($this->getActionData($buttonSearchContext))) {
-                $buttonContext = $this->generateButtonContext($operation, $buttonSearchContext);
-                $result[] = new OperationButton($operation, $buttonContext);
+            $actionData = $this->getActionData($buttonSearchContext);
+
+            if ($operation->isAvailable($actionData)) {
+                $result[] = new OperationButton(
+                    $operation,
+                    $this->generateButtonContext($operation, $buttonSearchContext)
+                );
             }
         }
 
@@ -74,18 +69,34 @@ class OperationButtonProviderExtension implements ButtonProviderExtensionInterfa
     protected function generateButtonContext(Operation $operation, ButtonSearchContext $searchContext)
     {
         $context = new ButtonContext();
-        $context->setDatagridName($searchContext->getGridName());
-        $context->setEntity($searchContext->getEntityClass(), $searchContext->getEntityId());
-        $context->setRouteName($searchContext->getRouteName());
-        $context->setGroup($searchContext->getGroup());
+        $context->setUnavailableHidden(true)
+            ->setDatagridName($searchContext->getGridName())
+            ->setEntity($searchContext->getEntityClass(), $searchContext->getEntityId())
+            ->setRouteName($searchContext->getRouteName())
+            ->setGroup($searchContext->getGroup())
+            ->setExecutionUrl($this->applicationsHelper->getExecutionRoute())
+            ->setEnabled($operation->isEnabled());
+
         if ($operation->hasForm()) {
             $context->setDialogUrl($this->applicationsHelper->getDialogRoute());
         }
-        $context->setExecutionUrl($this->applicationsHelper->getExecutionRoute());
-        $context->setEnabled($operation->isEnabled());
-        $context->setUnavailableHidden(true);
 
         return $context;
+    }
+
+    /**
+     * @param ButtonSearchContext $buttonSearchContext
+     *
+     * @return array|Operation[]
+     */
+    protected function getOperations(ButtonSearchContext $buttonSearchContext)
+    {
+        return $this->operationRegistry->find(
+            $buttonSearchContext->getEntityClass(),
+            $buttonSearchContext->getRouteName(),
+            $buttonSearchContext->getGridName(),
+            $buttonSearchContext->getGroup()
+        );
     }
 
     /**

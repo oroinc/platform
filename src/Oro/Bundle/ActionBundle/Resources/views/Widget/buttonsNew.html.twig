@@ -1,0 +1,9 @@
+{% if buttons|length %}
+	<div class="widget-content">
+		<div data-page-component-module="oroaction/js/app/components/buttons-component">
+			{% for button in buttons %}
+				{% include button.template with button.templateData %}
+			{% endfor %}
+		</div>
+	</div>
+{% endif %}
