@@ -31,7 +31,9 @@ class OperationButtonTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->buttonContext = $this->getMock(ButtonContext::class);
+        $this->buttonContext = $this->getMockBuilder(ButtonContext::class)
+            ->disableOriginalConstructor()
+            ->getMock();
 
         $this->button = new OperationButton($this->operation, $this->buttonContext);
     }
@@ -46,12 +48,13 @@ class OperationButtonTest extends \PHPUnit_Framework_TestCase
 
     public function testGetOrder()
     {
+        $order = mt_rand(10, 100);
         $definition = $this->getMockBuilder(OperationDefinition::class)->disableOriginalConstructor()->getMock();
-        $definition->expects($this->once())->method('getOrder')->willReturn(1);
+        $definition->expects($this->once())->method('getOrder')->willReturn($order);
 
-        $this->assertOperationMethodsCalled($this->operation, $definition);
+        $this->assertOperationMethodsCalled($definition);
 
-        $this->assertEquals(1, $this->button->getOrder());
+        $this->assertEquals($order, $this->button->getOrder());
     }
 
     public function testGetTemplate()
@@ -67,8 +70,8 @@ class OperationButtonTest extends \PHPUnit_Framework_TestCase
      */
     public function testGetTemplateData($group, array $expectedResult)
     {
-        $this->buttonContext->expects($this->atLeastOnce())->method('getGroup')->willReturn($group);
-        $this->assertOperationMethodsCalled($this->operation, new OperationDefinition());
+        $this->buttonContext->expects($this->once())->method('getGroup')->willReturn($group);
+        $this->assertOperationMethodsCalled(new OperationDefinition());
 
         $templateData = $this->button->getTemplateData();
         $this->assertEquals($expectedResult, $templateData);
@@ -80,40 +83,41 @@ class OperationButtonTest extends \PHPUnit_Framework_TestCase
     public function getTemplateDataDataProvider()
     {
         $customButtonOptions = ['aCss' => 'btn'];
+        $params = (new OperationDefinition())->setButtonOptions($customButtonOptions);
 
         return [
             'null as group' => [
                 'group' => null,
                 'expectedResult' => [
-                    'operation' => $this->getMockBuilder(Operation::class)->disableOriginalConstructor()->getMock(),
-                    'params' => (new OperationDefinition())->setButtonOptions($customButtonOptions),
+                    'operation' => $this->getOperationMock(),
+                    'params' => $params,
                 ],
             ],
             OperationRegistry::DEFAULT_GROUP => [
                 'group' => OperationRegistry::DEFAULT_GROUP,
                 'expectedResult' => [
-                    'operation' => $this->getMockBuilder(Operation::class)->disableOriginalConstructor()->getMock(),
-                    'params' => (new OperationDefinition())->setButtonOptions($customButtonOptions),
+                    'operation' => $this->getOperationMock(),
+                    'params' => $params,
                 ],
             ],
             OperationRegistry::VIEW_PAGE_GROUP => [
                 'group' => OperationRegistry::VIEW_PAGE_GROUP,
                 'expectedResult' => [
-                    'operation' => $this->getMockBuilder(Operation::class)->disableOriginalConstructor()->getMock(),
-                    'params' => (new OperationDefinition())->setButtonOptions($customButtonOptions),
+                    'operation' => $this->getOperationMock(),
+                    'params' => $params,
                 ],
             ],
             OperationRegistry::UPDATE_PAGE_GROUP => [
                 'group' => OperationRegistry::UPDATE_PAGE_GROUP,
                 'expectedResult' => [
-                    'operation' => $this->getMockBuilder(Operation::class)->disableOriginalConstructor()->getMock(),
-                    'params' => (new OperationDefinition())->setButtonOptions($customButtonOptions),
+                    'operation' => $this->getOperationMock(),
+                    'params' => $params,
                 ],
             ],
             'custom group' => [
                 'group' => uniqid(),
                 'expectedResult' => [
-                    'operation' => $this->getMockBuilder(Operation::class)->disableOriginalConstructor()->getMock(),
+                    'operation' => $this->getOperationMock(),
                     'params' => (new OperationDefinition())->setButtonOptions([]),
                 ],
             ],
@@ -126,12 +130,18 @@ class OperationButtonTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @param Operation|\PHPUnit_Framework_MockObject_MockObject $operation
-     * @param OperationDefinition|\PHPUnit_Framework_MockObject_MockObject $definition
+     * @param OperationDefinition $definition
      */
-    private function assertOperationMethodsCalled(Operation $operation, OperationDefinition $definition)
+    private function assertOperationMethodsCalled(OperationDefinition $definition)
     {
-        $operation->expects($this->atLeastOnce())->method('getDefinition')->willReturn($definition);
+        $this->operation->expects($this->atLeastOnce())->method('getDefinition')->willReturn($definition);
     }
 
+    /**
+     * @return \PHPUnit_Framework_MockObject_MockObject
+     */
+    private function getOperationMock()
+    {
+        return $this->getMockBuilder(Operation::class)->disableOriginalConstructor()->getMock();
+    }
 }
