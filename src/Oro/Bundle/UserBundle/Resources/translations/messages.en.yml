@@ -263,7 +263,6 @@ oro:
         security:
             password_changed.message: Your password was updated by an administrator. New password was sent to you by email.
             password_reseted.message: Your password was successfully reset. You may log in now.
-            remaining_login_attempts: '{0} You have no login attempts remaining.|{1} You have one login attempt remaining.|]1,Inf[ You have %count% login attempts remaining.'
         user_bar_settings:
             title: User bar
         image.tooltip: The avatar must be in BMP, JPEG or PNG formats, and the file must be less than %file_size% in size
@@ -283,11 +282,8 @@ oro:
         system_configuration:
             groups:
                 user_settings.title: User Settings
-                failed_login_limit.title: Login attempts
                 password_complexity_rules.title: Password restrictions
             fields:
-                failed_login_limit_enabled.label: Enable failed logins limit
-                failed_login_limit.label: Max login attempts
                 password_min_length.label: Minimal password length
                 password_numbers.label: Require a number
                 password_lower_case.label: Require a lowercase letter

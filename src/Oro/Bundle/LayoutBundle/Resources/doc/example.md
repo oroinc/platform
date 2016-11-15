@@ -1064,81 +1064,44 @@ Working with forms
 ### Non page specific form ###
 
 Let's implement a simple search form by means of the layout engine.
-To use the form in layouts we need to configure the layout context first. Since the search form persists on many pages we will add it to the layout context using another context configurator:
+To use the form in layouts we need to create layout data provider first. 
+Use abstract class [AbstractFormProvider](../../Layout/DataProvider/AbstractFormProvider.php).
+
+*Example*:
+
 ```php
-namespace Acme\Bundle\SearchBundle\Layout\Extension;
+namespace Acme\Bundle\SearchBundle\Layout\DataProvider;
 
-use Symfony\Component\Form\FormFactory;
-use Symfony\Component\OptionsResolver\Options;
+use Oro\Bundle\LayoutBundle\Layout\DataProvider\AbstractFormProvider;
 
-use Oro\Component\Layout\ContextConfiguratorInterface;
-use Oro\Component\Layout\ContextInterface;
-
-use Oro\Bundle\LayoutBundle\Layout\Form\FormAccessor;
-
-class SearchContextConfigurator implements ContextConfiguratorInterface
+class SearchFormProvider extends AbstractFormProvider
 {
-    /*
-     * FormFactory
-     */
-    protected $formFactory;
-
-    public function __construct(FormFactory $formFactory)
-    {
-        $this->formFactory = $formFactory;
-    }
+    const SEARCH_ROUTE_NAME = 'acme_search_route';
 
     /**
-     * {@inheritdoc}
+     * @param array $data
+     *
+     * @return FormView
      */
-    public function configureContext(ContextInterface $context)
+    public function getSearchFormView(array $data)
     {
-        $context->getResolver()
-            ->setDefaults(
-                [
-                    'search_form' => function (Options $options, $value) {
-                        if (null === $value) {
-                            $value = $this->createSearchForm();
-                        }
-
-                        return $value;
-                    }
-                ]
-            )
-            ->setAllowedTypes(['search_form' => ['null', 'Oro\Bundle\LayoutBundle\Layout\Form\FormAccessorInterface']]);
-    }
-
-    /*
-     * @return FormAccessor
-     */
-    protected function createSearchForm()
-    {
-        $form = $this->formFactory->create('form');
-        $form->add(
-            'search',
-            'search',
-            [
-                'attr' => [
-                    'maxlength'   => 128,
-                    'placeholder' => 'Search entire store here...',
-                ]
-            ]
-        );
-
-        return new FormAccessor($form);
+        $options['action'] = $this->generateUrl(self::SEARCH_ROUTE_NAME);
+    
+        return $this->getFormView('acme_form_search_type', $data, $options);
     }
 }
 ```
 
-Registering search context configurator in the DI container:
+Registering layout data provider in the DI container:
 
 ```yaml
-    acme_search.layout.context_configurator.search:
-        class: Acme\Bundle\SearchBundle\Layout\Extension\SearchContextConfigurator
+    acme_search.layout.data_provider.search_form:
+        class: Acme\Bundle\SearchBundle\Layout\DataProvider\SearchFormProvider
         arguments:
             - @form.factory
+            - '@router'
         tags:
-            - { name: layout.context_configurator }
+            - { name: layout.data_provider, alias: acme_search_form }
 ```
 
 Now we can add our search form into the layout.
@@ -1148,17 +1111,16 @@ layout:
     actions:
         - @addTree:
             items:
-                'searh_form:start':
+                searh_form_start':
                     blockType: form_start
                     options:
-                        form_name: search_form
+                        form: '=data["acme_search_form"].getSearchFormView()'
                         attr:
                             id: search_mini_form
-                search_field:
-                    blockType: form_field
+                search_form_fields:
+                    blockType: form_fields
                     options:
-                        form_name: search_form
-                        field_path: search
+                        form: '=data["acme_search_form"].getSearchFormView()'
                 search_button:
                     blockType: button
                     options:
@@ -1169,17 +1131,17 @@ layout:
                             title: Search
                 search_autocomplete:
                     blockType: block
-                'searh_form:end':
+                searh_form_end:
                     blockType: form_end
                     options:
-                        form_name: search_form
+                        form: '=data["acme_search_form"].getSearchFormView()'
             tree:
                 search:
-                    'searh_form:start': ~
-                    search_field: ~
+                    searh_form_start: ~
+                    search_form_fields: ~
                     search_button: ~
                     search_autocomplete: ~
-                    'searh_form:end': ~
+                    searh_form_end: ~
 ```
 
 Note that we are using separate block types `form_start`, `form_end` and `form_field` to render the form. This allows us to easily add content inside the form (e.g. autocomplete block).
@@ -1219,7 +1181,8 @@ As the result you'll be getting and HTML like this:
 
 ### Page specific form ###
 
-For the case when the form is page specific, we can return the form in the controller. We can create the form directly in the controller or return its identifier in the DI container.
+For the case when the form is page specific, we need layout data provider that return form and form view.
+In our layout updates and templates we use FormView class and in controller we use the FormInterface from the same form.
 Let's try the second approach and create the form for adding a product to the shopping cart.
 First, we'll create a new form type and register it in the container:
 
@@ -1285,18 +1248,52 @@ Also we will register the form in the container using the newly created form typ
             - 'acme_product_product'
 ```
 
-Now in our controller we can simply return the form Id from the container:
+Now we create layout data provider for getting form. Use abstract class [AbstractFormProvider](../../Layout/DataProvider/AbstractFormProvider.php).
 ```php
+namespace Acme\Bundle\ProductBundle\Layout\DataProvider;
+
+use Oro\Bundle\LayoutBundle\Layout\DataProvider\AbstractFormProvider;
+
+class ProductFormProvider extends AbstractFormProvider
+{
+    const ADD_PRODUCT_ROUTE_NAME = 'acme_product_add';
+
     /**
-     * @Route("/test", name="demo_layout_test")
-     * @Layout
+     * @param mixed $data
+     *
+     * @return FormView
      */
-    public function testAction()
+    public function getProductFormView($data = null)
     {
-        return [
-            'form' => 'acme_product.form.product'
-        ];
+        $options['action'] = $this->generateUrl(self::ADD_PRODUCT_ROUTE_NAME);
+    
+        return $this->getFormView('acme_product_product', $data, $options);
     }
+
+    /**
+     * @param mixed $data
+     *
+     * @return FormInterface
+     */
+    public function getProductForm($data = null)
+    {
+        $options['action'] = $this->generateUrl(self::ADD_PRODUCT_ROUTE_NAME);
+    
+        return $this->getForm('acme_product_product', $data, $options);
+    }
+}
+```
+
+Registering layout data provider in the DI container:
+
+```yaml
+    acme_product.layout.data_provider.product_form:
+        class: Acme\Bundle\ProductBundle\Layout\DataProvider\ProductFormProvider
+        arguments:
+            - '@form.factory'
+            - '@router'
+        tags:
+            - { name: layout.data_provider, alias: acme_product_form }
 ```
 
 Now we can render this form by adding it to the layout update file:
@@ -1322,19 +1319,13 @@ layout:
                 form_start:
                     blockType: form_start
                     options:
-                        form_action: /checkout
+                        form: '=data["acme_product_form"].getProductFormView(data["entity"])'
                         attr:
                             id: product_addtocart_form
-                color_field:
-                    blockType: form_field
+                form_fields:
+                    blockType: form_fields
                     options:
-                        form_name: form
-                        field_path: color
-                qty_field:
-                    blockType: form_field
-                    options:
-                        form_name: form
-                        field_path: qty
+                        form: '=data["acme_product_form"].getProductFormView(data["entity"])'
                 add_to_cart_button:
                     blockType: button
                     options:
@@ -1346,13 +1337,14 @@ layout:
                             class: button btn-cart
                 form_end:
                     blockType: form_end
+                    options:
+                        form: '=data["acme_product_form"].getProductFormView(data["entity"])'
             tree:
                 main_panel:
                     product_view:
                         product_essential:
                             form_start: ~
-                            color_field: ~
-                            qty_field: ~
+                            form_fields: ~
                             add_to_cart_button: ~
                             form_end: ~
 ```
@@ -1381,6 +1373,24 @@ This will output the similar HTML:
         </form>
     </div>
 </div>
+```
+
+In controller you can handle form from layout data provider:
+```
+    /**
+     * @param Product $product
+     * @return array|RedirectResponse
+     */
+    protected function add(Product $product)
+    {
+        $handler = $this->get('oro_form.model.update_handler');
+
+        return $handler->update(
+            $product,
+            $this->get('acme_product.layout.data_provider.product_form')->getProductForm($product),
+            'Product Successfully Added!',
+        );
+    }
 ```
 
 Creating new block types
