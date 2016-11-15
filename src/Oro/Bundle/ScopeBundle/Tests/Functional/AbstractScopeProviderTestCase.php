@@ -6,6 +6,8 @@ use Oro\Bundle\ScopeBundle\Entity\Scope;
 use Oro\Bundle\ScopeBundle\Tests\Unit\Stub\StubScope;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
+use Oro\Component\PropertyAccess\PropertyAccessor;
+
 class AbstractScopeProviderTestCase extends WebTestCase
 {
     protected function setUp()
@@ -42,9 +44,9 @@ class AbstractScopeProviderTestCase extends WebTestCase
     private static function createScope($field, $value)
     {
         $scope = new StubScope();
-        //using setter method as application would autoload extended entity
-        $method = 'set' . ucfirst(strtolower($field));
-        $scope->{$method}($value);
+
+        $propertyAccessor = new PropertyAccessor();
+        $propertyAccessor->setValue($scope, $field, $value);
 
         return $scope;
     }
