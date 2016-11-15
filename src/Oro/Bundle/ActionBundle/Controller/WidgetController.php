@@ -23,7 +23,7 @@ use Oro\Bundle\ActionBundle\Model\OperationManager;
 class WidgetController extends Controller
 {
     /**
-     * @Route("/buttons", name="oro_action_buttons_widget_buttons")
+     * @Route("/buttons", name="oro_action_widget_buttons_deprecated")
      * @Template()
      *
      * @param Request $request
@@ -38,7 +38,7 @@ class WidgetController extends Controller
         $applicationsHelper = $this->getApplicationsHelper();
 
         return [
-            'operations' => [],//$this->getOperationManager()->getOperations(),
+            'operations' => $this->getOperationManager()->getOperations(),
             'context' => $contextHelper->getContext(),
             'actionData' => $contextHelper->getActionData(),
             'dialogRoute' => $applicationsHelper->getDialogRoute(),
