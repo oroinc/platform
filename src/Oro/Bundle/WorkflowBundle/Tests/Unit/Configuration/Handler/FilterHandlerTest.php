@@ -31,6 +31,9 @@ class FilterHandlerTest extends \PHPUnit_Framework_TestCase
                 'incoming' => [
                     'name' => 'test_workflow',
                     'label' => 'Will be removed',
+                    WorkflowConfiguration::NODE_SCOPES => [
+                        ['scope1' => 'value1'],
+                    ],
                     WorkflowConfiguration::NODE_ATTRIBUTES => [
                         [
                             'name' => 'test_attribute',
@@ -91,6 +94,9 @@ class FilterHandlerTest extends \PHPUnit_Framework_TestCase
                 ],
                 'expected' => [
                     'name' => 'test_workflow',
+                    WorkflowConfiguration::NODE_SCOPES => [
+                        ['scope1' => 'value1'],
+                    ],
                     WorkflowConfiguration::NODE_ATTRIBUTES => [
                         [
                             'name' => 'test_attribute',

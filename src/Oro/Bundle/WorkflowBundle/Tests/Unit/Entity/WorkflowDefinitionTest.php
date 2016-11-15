@@ -3,16 +3,20 @@
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
+use Oro\Bundle\ScopeBundle\Entity\Scope;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowEntityAcl;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowRestriction;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowStep;
+use Oro\Component\Testing\Unit\EntityTestCaseTrait;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
 class WorkflowDefinitionTest extends \PHPUnit_Framework_TestCase
 {
+    use EntityTestCaseTrait;
+
     /**
      * @var WorkflowDefinition
      */
@@ -26,6 +30,18 @@ class WorkflowDefinitionTest extends \PHPUnit_Framework_TestCase
     protected function tearDown()
     {
         unset($this->workflowDefinition);
+    }
+
+    public function testAccessors()
+    {
+        $this->assertPropertyAccessors($this->workflowDefinition, [
+            ['scopesConfig', ['key1' => 'value1']],
+        ]);
+
+        $this->assertPropertyCollections($this->workflowDefinition, [
+            ['scopes', new Scope()],
+        ]);
+
     }
 
     public function testName()
@@ -217,22 +233,5 @@ class WorkflowDefinitionTest extends \PHPUnit_Framework_TestCase
         // resetting
         $this->workflowDefinition->setRestrictions([]);
         $this->assertEmpty($this->workflowDefinition->getRestrictions()->toArray());
-    }
-
-    /**
-     * @param WorkflowDefinition $definition
-     * @return array
-     */
-    protected function getDefinitionAsArray(WorkflowDefinition $definition)
-    {
-        return [
-            'name' => $definition->getName(),
-            'label' => $definition->getLabel(),
-            'steps' => $definition->getSteps(),
-            'start_step' => $definition->getStartStep(),
-            'configuration' => $definition->getConfiguration(),
-            'active_groups' => $definition->getExclusiveActiveGroups(),
-            'record_groups' => $definition->getExclusiveRecordGroups(),
-        ];
     }
 }
