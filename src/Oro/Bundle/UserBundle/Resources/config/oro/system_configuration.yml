@@ -45,6 +45,14 @@ system_configuration:
                 label: oro.user.system_configuration.fields.password_numbers.label
                 required: false
 
+        oro_user.password_lower_case:
+            data_type: boolean
+            type: oro_config_checkbox
+            priority: 25
+            options:
+                label: oro.user.system_configuration.fields.password_lower_case.label
+                required: false
+
         oro_user.password_upper_case:
             data_type: boolean
             type: oro_config_checkbox
@@ -79,5 +87,6 @@ system_configuration:
                                         children:
                                             - oro_user.password_min_length
                                             - oro_user.password_numbers
+                                            - oro_user.password_lower_case
                                             - oro_user.password_upper_case
                                             - oro_user.password_special_chars

@@ -123,29 +123,6 @@ class FormFieldTypeTest extends BlockTypeTestCase
         $this->assertFalse($formView->isRendered());
     }
 
-    public function testGetBlockViewForInvisibleField()
-    {
-        $formName = 'test_form';
-        $formPath = 'firstName';
-        $formView = new FormView();
-
-        $formAccessor = $this->getMock('Oro\Bundle\LayoutBundle\Layout\Form\FormAccessorInterface');
-        $formAccessor->expects($this->once())
-            ->method('getView')
-            ->with($formPath)
-            ->will($this->returnValue($formView));
-
-        $this->context->getResolver()->setDefined([$formName]);
-        $this->context->set($formName, $formAccessor);
-        $view = $this->getBlockView(
-            FormFieldType::NAME,
-            ['form_name' => $formName, 'field_path' => $formPath, 'visible' => false]
-        );
-
-        $this->assertSame($formView, $view->vars['form']);
-        $this->assertTrue($formView->isRendered());
-    }
-
     public function testGetBlockViewForFieldWithVisibleOptionAsNotEvaluatedExpression()
     {
         $formName = 'test_form';
