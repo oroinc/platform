@@ -5,7 +5,6 @@ namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Model;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 
-use Oro\Bundle\WorkflowBundle\Helper\TransitionHelper;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 use Oro\Bundle\WorkflowBundle\Configuration\WorkflowConfiguration;

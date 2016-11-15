@@ -18,7 +18,6 @@ use Oro\Bundle\WorkflowBundle\Exception\ForbiddenTransitionException;
 use Oro\Bundle\WorkflowBundle\Exception\UnknownStepException;
 use Oro\Bundle\WorkflowBundle\Exception\InvalidTransitionException;
 use Oro\Bundle\WorkflowBundle\Exception\WorkflowException;
-use Oro\Bundle\WorkflowBundle\Helper\TransitionHelper;
 use Oro\Bundle\WorkflowBundle\Restriction\RestrictionManager;
 
 /**
