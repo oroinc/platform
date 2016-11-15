@@ -25,6 +25,9 @@ class TranslationCacheWarmerTest extends \PHPUnit_Framework_TestCase
      */
     protected $warmer;
 
+    /**
+     * {@inheritdoc}
+     */
     protected function setUp()
     {
         $this->innerWarmer = $this->getMockBuilder(InnerCacheWarmer::class)
@@ -76,6 +79,9 @@ class TranslationCacheWarmerTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($isOptional, $this->warmer->isOptional());
     }
 
+    /**
+     * @return array
+     */
     public function optionalDataProvider()
     {
         return [

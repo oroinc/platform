@@ -69,8 +69,6 @@ class LocalizationChoicesProviderTest extends \PHPUnit_Framework_TestCase
 
     public function testGetLanguageChoices()
     {
-        // TODO: must be refactored in scope https://magecore.atlassian.net/browse/BAP-12623
-
         $this->assertConfigManagerCalled();
 
         $choices = $this->provider->getLanguageChoices();

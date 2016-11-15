@@ -52,7 +52,6 @@ class LanguageCodeFormatter
      */
     public function formatLocale($code)
     {
-        // TODO: must be refactored in scope https://magecore.atlassian.net/browse/BAP-12623
         if (!$code) {
             return $this->translator->trans('N/A');
         }

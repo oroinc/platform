@@ -47,7 +47,6 @@ class LocalizationChoicesProvider
      */
     public function getLanguageChoices()
     {
-        // TODO: must be refactored in scope https://magecore.atlassian.net/browse/BAP-12623
         return Intl::getLocaleBundle()->getLocaleNames($this->getSystemLanguage());
     }
 
@@ -56,7 +55,6 @@ class LocalizationChoicesProvider
      */
     public function getFormattingChoices()
     {
-        // TODO: must be refactored in scope https://magecore.atlassian.net/browse/BAP-12623
         return Intl::getLocaleBundle()->getLocaleNames($this->getSystemLanguage());
     }
 

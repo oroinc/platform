@@ -266,7 +266,7 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
             $this->getContainer($loader, $strategyProvider),
             new MessageSelector(),
             array('loader' => array('loader')),
-            $options
+            array_merge(['resource_files' => []], $options)
         );
 
         $translator->addResource('loader', 'foo', 'fr');
@@ -322,7 +322,7 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
             ->method('get')
             ->willReturn($this->getStrategyProvider());
         $translator = $this->getMockBuilder('Oro\Bundle\TranslationBundle\Translation\Translator')
-                ->setConstructorArgs([$container, new MessageSelector()])
+                ->setConstructorArgs([$container, new MessageSelector(), [], ['resource_files' => []]])
                 ->setMethods(['addResource'])
                 ->getMock();
         $translator->setLocale($locale);
@@ -347,7 +347,7 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
         $translator = $this->getMockBuilder('Oro\Bundle\TranslationBundle\Translation\Translator')
-            ->setConstructorArgs([$container, new MessageSelector()])
+            ->setConstructorArgs([$container, new MessageSelector(), [], ['resource_files' => []]])
             ->setMethods(['addResource'])
             ->getMock();
         $translationManager = $this

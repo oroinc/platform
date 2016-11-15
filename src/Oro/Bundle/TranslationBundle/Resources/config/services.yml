@@ -120,7 +120,7 @@ services:
         parent: oro.cache.abstract
         calls:
             - [setNamespace, [ 'oro_trans' ] ]
-            
+
     oro_translation.resource.cache:
         public: false
         class: Doctrine\Common\Cache\ArrayCache
