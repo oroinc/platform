@@ -123,27 +123,19 @@ class EmbedFormFieldTypeTest extends BlockTypeTestCase
         $this->assertFalse($formView->isRendered());
     }
 
+    /**
+     * @expectedException \Oro\Component\Layout\Exception\ItemNotFoundException
+     */
     public function testGetBlockViewForInvisibleField()
     {
         $formName = 'test_form';
         $formPath = 'firstName';
-        $formView = new FormView();
-
-        $formAccessor = $this->getMock('Oro\Bundle\EmbeddedFormBundle\Layout\Form\FormAccessorInterface');
-        $formAccessor->expects($this->once())
-            ->method('getView')
-            ->with($formPath)
-            ->will($this->returnValue($formView));
 
         $this->context->getResolver()->setDefined([$formName]);
-        $this->context->set($formName, $formAccessor);
-        $view = $this->getBlockView(
+        $this->getBlockView(
             EmbedFormFieldType::NAME,
             ['form_name' => $formName, 'field_path' => $formPath, 'visible' => false]
         );
-
-        $this->assertSame($formView, $view->vars['form']);
-        $this->assertTrue($formView->isRendered());
     }
 
     public function testGetBlockViewForFieldWithVisibleOptionAsNotEvaluatedExpression()

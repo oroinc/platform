@@ -23,7 +23,8 @@ class FormTypeTest extends BlockTypeTestCase
                 'form' => $form,
                 'form_route_parameters' => [],
                 'instance_name' => '',
-                'additional_block_prefixes' => ['test_']
+                'additional_block_prefixes' => ['test_'],
+                'visible' => true,
             ],
             $this->resolveOptions(FormType::NAME, ['form' => $form, 'additional_block_prefixes' => ['test_']])
         );
