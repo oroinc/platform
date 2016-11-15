@@ -2,8 +2,6 @@
 
 namespace Oro\Bundle\ActionBundle\Model;
 
-use Symfony\Component\VarDumper\VarDumper;
-
 class OperationButton implements ButtonInterface
 {
     const DEFAULT_TEMPLATE = 'OroActionBundle:Operation:button.html.twig';
@@ -63,11 +61,12 @@ class OperationButton implements ButtonInterface
             ],
             true
         )) {
-            if (!isset($buttonOptions['class'])) {
-                $buttonOptions['class'] = '';
+            if (!isset($buttonOptions['aCss'])) {
+                $buttonOptions['aCss'] = '';
             }
-            $buttonOptions['class'] .= ' btn ';
-        };
+
+            $buttonOptions['aCss'] .= 'btn';
+        }
 
         $definition->setButtonOptions($buttonOptions);
 

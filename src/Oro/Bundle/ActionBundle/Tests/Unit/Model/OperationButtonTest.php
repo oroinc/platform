@@ -79,7 +79,7 @@ class OperationButtonTest extends \PHPUnit_Framework_TestCase
      */
     public function getTemplateDataDataProvider()
     {
-        $customButtonOptions = ['class' => ' btn '];
+        $customButtonOptions = ['aCss' => 'btn'];
 
         return [
             'null as group' => [
