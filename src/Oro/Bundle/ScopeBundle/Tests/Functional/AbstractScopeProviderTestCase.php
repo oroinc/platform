@@ -24,7 +24,7 @@ class AbstractScopeProviderTestCase extends WebTestCase
 
         foreach ($scopeTypes as $scopeType) {
             $scope = self::createScope($scopeProviderCriteriaField, 'value');
-            //if provider would be loaded by certain scope type criteria would be filled with proper value from scope
+            //if provider would be loaded by certain scope type - criteria would be filled with proper value from scope
             $criteria = $scopeManager->getCriteriaByScope($scope, $scopeType);
             self::assertArraySubset(
                 [$scopeProviderCriteriaField => 'value'],
