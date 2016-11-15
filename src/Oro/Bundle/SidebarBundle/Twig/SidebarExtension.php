@@ -68,7 +68,7 @@ class SidebarExtension extends \Twig_Extension implements FeatureToggleableInter
             ->toArray();
 
         foreach ($definitions as $name => &$definition) {
-            if (!$this->isResourceEnabled($name, 'sidebar_widgets')) {
+            if (!$this->featureChecker->isResourceEnabled($name, 'sidebar_widgets')) {
                 unset($definitions[$name]);
                 continue;
             }

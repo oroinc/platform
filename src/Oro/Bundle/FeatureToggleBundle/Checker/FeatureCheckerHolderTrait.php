@@ -46,17 +46,6 @@ trait FeatureCheckerHolderTrait
     }
 
     /**
-     * @param string $resource
-     * @param string $resourceType
-     * @param object|int|null $scopeIdentifier
-     * @return bool
-     */
-    public function isResourceEnabled($resource, $resourceType, $scopeIdentifier = null)
-    {
-        return $this->featureChecker->isResourceEnabled($resource, $resourceType, $scopeIdentifier);
-    }
-
-    /**
      * @param string|null $route
      * @param null|int|object $scopeIdentifier
      *
