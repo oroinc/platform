@@ -38,15 +38,17 @@ datagrids:
             enabled:
                 label:         oro.user.enabled.label
                 frontend_type: select
+                editable:      false
                 inline_editing:
-                    editor:
-                        view_options:
-                            key_type: 'boolean'
+                    enable: false
                 choices:
                    - Disabled
                    - Enabled
             auth_status:
                 label:         oro.user.auth_status.label
+                editable:      false
+                inline_editing:
+                    enable: false
             createdAt:
                 label:         oro.ui.created_at
                 frontend_type: datetime
