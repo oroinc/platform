@@ -54,12 +54,6 @@ class AddParentEntityIdToQuery implements ProcessorInterface
             // bidirectional association
             $query->innerJoin('e.' . $joinFieldName, 'parent_entity');
         } elseif ($context->isCollection()) {
-
-
-
-
-
-
             $parentFieldConfig = $context->getParentConfig()->getField($associationName);
             if (!$parentFieldConfig || !$parentFieldConfig->has('association-field')) {
                 // unidirectional "to-many" association

@@ -128,6 +128,16 @@ final class DataType
         return [$source, $type, $kind];
     }
 
+    /**
+     * Build the string that represent the inverse part of the extended association.
+     * See EntityExtendBundle/Resources/doc/associations.md for details about extended associations.
+     *
+     * @param string $source
+     * @param string $type
+     * @param string $kind
+     *
+     * @return string
+     */
     public static function buildExtendedInverseAssociation($source, $type, $kind = null)
     {
         $inverseAssociationDataTypeString = sprintf(
@@ -137,7 +147,7 @@ final class DataType
         );
         if ($kind) {
             $inverseAssociationDataTypeString = sprintf(
-                '%s:%s'.
+                '%s:%s',
                 $inverseAssociationDataTypeString,
                 $kind
             );

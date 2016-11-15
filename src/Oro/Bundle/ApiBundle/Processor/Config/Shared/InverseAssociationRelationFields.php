@@ -1,23 +1,30 @@
 <?php
 
-namespace Oro\Bundle\ApiBundle\Processor\Config;
+namespace Oro\Bundle\ApiBundle\Processor\Config\Shared;
 
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionFieldConfig;
+use Oro\Bundle\ApiBundle\Processor\Config\ConfigContext;
 use Oro\Bundle\ApiBundle\Request\DataType;
 use Oro\Bundle\ApiBundle\Request\ValueNormalizer;
 use Oro\Bundle\ApiBundle\Util\ValueNormalizerUtil;
+use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityExtendBundle\Extend\RelationType;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
+use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
+
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
-use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
-use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 
+/**
+ * Collects inverse extend association relations for given source entity.
+ */
 class InverseAssociationRelationFields implements ProcessorInterface
 {
+    /** @var string */
     protected $associationClass;
 
+    /** @var string */
     protected $associationKind;
 
     /** @var ConfigProvider */
@@ -30,26 +37,38 @@ class InverseAssociationRelationFields implements ProcessorInterface
     protected $valueNormalizer;
 
     /**
-     * InverseAssociationRelationFields constructor.
-     *
-     * @param                 $associationClass
-     * @param                 $associationKind
      * @param ConfigProvider  $configProvider
      * @param DoctrineHelper  $doctrineHelper
      * @param ValueNormalizer $valueNormalizer
      */
     public function __construct(
-        $associationClass,
-        $associationKind,
         ConfigProvider $configProvider,
         DoctrineHelper $doctrineHelper,
         ValueNormalizer $valueNormalizer
     ) {
-        $this->associationClass = $associationClass;
-        $this->associationKind = $associationKind;
         $this->extendConfigProvider = $configProvider;
         $this->doctrineHelper = $doctrineHelper;
         $this->valueNormalizer = $valueNormalizer;
+    }
+
+    /**
+     * Sets the extend association source class name.
+     *
+     * @param string $associationClass
+     */
+    public function setAssociationClass($associationClass)
+    {
+        $this->associationClass = $associationClass;
+    }
+
+    /**
+     * Sets the extend association kind.
+     *
+     * @param string $associationKind
+     */
+    public function setAssociationKind($associationKind)
+    {
+        $this->associationKind = $associationKind;
     }
 
     /**
@@ -70,6 +89,7 @@ class InverseAssociationRelationFields implements ProcessorInterface
             // only manageable entities are supported
             return;
         }
+
         if (!$this->extendConfigProvider->hasConfig($this->associationClass)) {
             // only configurable entities are supported
             return;
@@ -86,7 +106,7 @@ class InverseAssociationRelationFields implements ProcessorInterface
 
         $definition = $context->getResult();
         $extendConfig = $this->extendConfigProvider->getConfig($this->associationClass);
-        $relations = $extendConfig->get('relation', []);
+        $relations = $extendConfig->get('relation', false, []);
 
         $fieldName = ValueNormalizerUtil::convertToEntityType(
             $this->valueNormalizer,

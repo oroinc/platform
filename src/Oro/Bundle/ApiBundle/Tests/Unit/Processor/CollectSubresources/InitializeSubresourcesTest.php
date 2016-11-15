@@ -707,6 +707,7 @@ class InitializeSubresourcesTest extends \PHPUnit_Framework_TestCase
         $association1->setTargetClassName('Test\Association1Target');
         $association1->setAcceptableTargetClassNames(['Test\Association1Target']);
         $association1->setIsCollection(true);
+        $association1->set('association-field', 'field1');
         $resourceMetadata->addAssociation($association1);
         $association2 = new AssociationMetadata();
         $association2->setName('association2');
@@ -748,6 +749,7 @@ class InitializeSubresourcesTest extends \PHPUnit_Framework_TestCase
         $expectedSubResource->setTargetClassName('Test\Association1Target');
         $expectedSubResource->setAcceptableTargetClassNames(['Test\Association1Target']);
         $expectedSubResource->setIsCollection(true);
+        $expectedSubResource->setExcludedActions(['update_relationship', 'delete_relationship']);
 
         $expectedSubresources->addSubresource('association1', $expectedSubResource);
 

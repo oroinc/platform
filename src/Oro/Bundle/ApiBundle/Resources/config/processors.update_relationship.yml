@@ -151,6 +151,7 @@ services:
         arguments:
             - '@form.registry'
             - '@oro_api.form.guesser.metadata'
+            - '@oro_api.form.guesser.metadata_inverse'
         tags:
             - { name: oro.api.processor, action: update_relationship, group: transform_data, priority: 250 }
 

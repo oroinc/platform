@@ -31,7 +31,7 @@ class InitializeSubresources extends LoadSubresources
 
         $accessibleResources = array_fill_keys($context->getAccessibleResources(), true);
         $resources = $context->getResources();
-        foreach ($resources as $class => $resource) {
+        foreach ($resources as $resource) {
             $subresources->add(
                 $this->createEntitySubresources($resource, $version, $requestType, $accessibleResources)
             );

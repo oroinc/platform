@@ -182,4 +182,20 @@ class DataTypeTest extends \PHPUnit_Framework_TestCase
             [''],
         ];
     }
+
+    /**
+     * @dataProvider buildExtendedInverseAssociationProvider
+     */
+    public function testBuildExtendedInverseAssociation($source, $type, $kind, $result)
+    {
+        $this->assertEquals($result, DataType::buildExtendedInverseAssociation($source, $type, $kind));
+    }
+
+    public function buildExtendedInverseAssociationProvider()
+    {
+        return [
+            ['Source\Class', 'manyToOne', null, 'inverseAssociation:Source\Class:manyToOne'],
+            ['Source\Class', 'manyToOne', 'someKind', 'inverseAssociation:Source\Class:manyToOne:someKind']
+        ];
+    }
 }
