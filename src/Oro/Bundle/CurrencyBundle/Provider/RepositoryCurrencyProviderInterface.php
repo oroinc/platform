@@ -14,13 +14,13 @@ interface RepositoryCurrencyProviderInterface
     public function getEntityLabel();
 
     /**
-     * @param array             $availableCurrencies
+     * @param array             $currenciesOnRemove
      * @param Organization|null $organization
      *
      * @return bool
      */
-    public function hasRecordsInUnavailableCurrencies(
-        array $availableCurrencies,
+    public function hasRecordsInCurrenciesOnRemove(
+        array $currenciesOnRemove,
         Organization $organization = null
     );
 }
