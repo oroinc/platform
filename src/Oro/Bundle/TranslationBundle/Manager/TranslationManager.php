@@ -191,16 +191,22 @@ class TranslationManager
             $em->persist($translationKey);
         }
 
-        foreach ($this->translationKeysToRemove as $translationKey) {
-            $em->remove($translationKey);
+        foreach ($this->translationKeysToRemove as $key => $translationKey) {
+            if ($translationKey->getId()) {
+                $em->remove($translationKey);
+            } else {
+                unset($this->translationKeysToRemove[$key]);
+            }
         }
 
         $em = $this->getEntityManager(Translation::class);
-        foreach ($this->translations as $translation) {
-            if (!$translation->getValue()) {
+        foreach ($this->translations as $key => $translation) {
+            if ($translation->getValue()) {
+                $em->persist($translation);
+            } elseif ($translation->getId()) {
                 $em->remove($translation);
             } else {
-                $em->persist($translation);
+                unset($this->translations[$key]);
             }
         }
 
