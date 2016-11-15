@@ -2,8 +2,12 @@
 
 namespace Oro\Bundle\UserBundle\Model;
 
+use Oro\Bundle\EntityExtendBundle\Entity\AbstractEnumValue;
 use Oro\Bundle\UserBundle\Entity\AbstractUser;
 
+/**
+ * @method setAuthStatus(AbstractEnumValue $enum)
+ */
 class ExtendUser extends AbstractUser
 {
     /**

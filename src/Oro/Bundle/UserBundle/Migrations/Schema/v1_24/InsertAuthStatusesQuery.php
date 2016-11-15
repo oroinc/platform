@@ -62,8 +62,8 @@ class InsertAuthStatusesQuery extends ParametrizedMigrationQuery
                 ':is_default' => true,
             ],
             [
-                ':id' => 'locked',
-                ':name' => 'Locked',
+                ':id' => 'expired',
+                ':name' => 'Password reset',
                 ':priority' => 2,
                 ':is_default' => false,
             ],
