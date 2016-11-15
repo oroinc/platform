@@ -210,7 +210,7 @@ class EmailExtension extends Twig_Extension
      */
     public function getUnreadEmailsCount()
     {
-        if (!$this->securityFacade->hasLoggedUser()) {
+        if (!$this->securityFacade->hasLoggedUser() || !$this->securityFacade->isGranted('oro_email_email_user_view')) {
             return [];
         }
 

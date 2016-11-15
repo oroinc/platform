@@ -10,21 +10,13 @@ class OroWorkflowBundleTest extends \PHPUnit_Framework_TestCase
 {
     public function testBuild()
     {
-        /** @var ContainerBuilder $containerBuilder */
+        /** @var ContainerBuilder|\PHPUnit_Framework_MockObject_MockObject $containerBuilder */
         $containerBuilder = $this->getMockBuilder('Symfony\Component\DependencyInjection\ContainerBuilder')
             ->disableOriginalConstructor()
-            ->setMethods(array('addCompilerPass'))
+            ->setMethods(['addCompilerPass'])
             ->getMock();
 
         $containerBuilder->expects($this->at(0))
-            ->method('addCompilerPass')
-            ->with(
-                $this->isInstanceOf(
-                    'Oro\Bundle\WorkflowBundle\DependencyInjection\Compiler\AddConditionAndActionCompilerPass'
-                )
-            );
-
-        $containerBuilder->expects($this->at(1))
             ->method('addCompilerPass')
             ->with(
                 $this->isInstanceOf(
@@ -32,7 +24,7 @@ class OroWorkflowBundleTest extends \PHPUnit_Framework_TestCase
                 )
             );
 
-        $containerBuilder->expects($this->at(2))
+        $containerBuilder->expects($this->at(1))
             ->method('addCompilerPass')
             ->with(
                 $this->isInstanceOf(
@@ -40,7 +32,7 @@ class OroWorkflowBundleTest extends \PHPUnit_Framework_TestCase
                 )
             );
 
-        $containerBuilder->expects($this->at(3))
+        $containerBuilder->expects($this->at(2))
             ->method('addCompilerPass')
             ->with(
                 $this->isInstanceOf(
