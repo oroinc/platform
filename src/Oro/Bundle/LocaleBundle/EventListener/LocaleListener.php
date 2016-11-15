@@ -61,12 +61,13 @@ class LocaleListener implements EventSubscriberInterface
 
         if ($this->getIsInstalled()) {
             // TODO: must be refactored in scope https://magecore.atlassian.net/browse/BAP-12623
-            if (null !== ($localization = $this->getCurrentLocalization())) {
+            $localization = $this->getCurrentLocalization();
+            if (null !== $localization) {
                 $language = $localization->getLanguageCode();
             } else {
                 $language = $this->getLocaleSettings()->getLanguage();
             }
-            $locale   = $this->getLocaleSettings()->getLocale();
+            $locale = $this->getLocaleSettings()->getLocale();
 
             if (!$request->attributes->get('_locale')) {
                 $request->setLocale($language);

@@ -13,23 +13,11 @@ class TranslationStrategyProvider
     protected $strategies = [];
 
     /**
-     * @param string $name
+     * @param TranslationStrategyInterface $strategy
      */
-    public function selectStrategy($name)
+    public function setStrategy(TranslationStrategyInterface $strategy)
     {
-        if (!array_key_exists($name, $this->strategies)) {
-            return;
-        }
-
-        $this->strategy = $this->strategies[$name];
-    }
-
-    /**
-     * Reset current strategy
-     */
-    public function resetStrategy()
-    {
-        $this->strategy = null;
+        $this->strategy = $strategy;
     }
 
     /**

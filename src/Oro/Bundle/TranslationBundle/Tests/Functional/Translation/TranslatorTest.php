@@ -25,6 +25,9 @@ class TranslatorTest extends WebTestCase
     /** @var array */
     protected $resources;
 
+    /** @var TranslationStrategy[] */
+    protected $strategies;
+
     /** @var Translator */
     protected $translator;
 
@@ -38,39 +41,14 @@ class TranslatorTest extends WebTestCase
 
         $this->translator = $this->getContainer()->get('translator.default');
 
+        $this->createStrategies();
+
         $this->provider = new TranslationStrategyProvider();
         $this->getContainer()->set('oro_translation.strategy.provider', $this->provider);
 
-        $this->provider->addStrategy(
-            new TranslationStrategy('strategy1', [
-                'lang1' => [],
-                'lang2' => [],
-                'lang3' => [],
-                'lang4' => [],
-            ])
-        );
-        $this->provider->addStrategy(
-            new TranslationStrategy('strategy2', [
-                'lang2' => [
-                    'lang3' => [
-                        'lang4' => [
-                            'lang1' => [
-                            ],
-                        ],
-                    ],
-                ],
-            ])
-        );
-        $this->provider->addStrategy(
-            new TranslationStrategy('strategy3', [
-                'lang3' => [],
-                'lang4' => [
-                    'lang1' => [
-                        'lang2' => [],
-                    ],
-                ],
-            ])
-        );
+        foreach ($this->strategies as $strategy) {
+            $this->provider->addStrategy($strategy);
+        }
 
         $cacheDir = $this->getContainer()->getParameter('kernel.cache_dir') . DIRECTORY_SEPARATOR . 'translations';
         $this->resources['lang1'] = $cacheDir . DIRECTORY_SEPARATOR . 'messages.lang1.yml';
@@ -107,35 +85,35 @@ class TranslatorTest extends WebTestCase
         $this->translator->rebuildCache();
 
         // Ensure that catalog still contains translation keys
-        $this->provider->selectStrategy('strategy1');
+        $this->provider->setStrategy($this->getStrategy('strategy1'));
         $this->assertTranslationEquals($key, ['lang1' => $key, 'lang2' => $key, 'lang3' => $key, 'lang4' => $key]);
 
-        $this->provider->selectStrategy('strategy2');
+        $this->provider->setStrategy($this->getStrategy('strategy2'));
         $this->assertTranslationEquals($key, ['lang1' => $key, 'lang2' => $key, 'lang3' => $key, 'lang4' => $key]);
 
-        $this->provider->selectStrategy('strategy3');
+        $this->provider->setStrategy($this->getStrategy('strategy3'));
         $this->assertTranslationEquals($key, ['lang1' => $key, 'lang2' => $key, 'lang3' => $key, 'lang4' => $key]);
 
         // update resources and warmUp cache
         $this->writeResource('lang1', [$key => $val1], time() + 3600);
         $this->writeResource('lang2', [$key => $val2], time() + 3600);
 
-        $this->provider->selectStrategy('strategy2');
+        $this->provider->setStrategy($this->getStrategy('strategy2'));
         $this->translator->warmUp('');
 
         // revert original cache factory
         $this->translator->setConfigCacheFactory(new ResourceCheckerConfigCacheFactory());
 
         // Ensure that catalog still contains translation keys
-        $this->provider->selectStrategy('strategy1');
+        $this->provider->setStrategy($this->getStrategy('strategy1'));
         $this->assertTranslationEquals($key, ['lang1' => $key, 'lang2' => $key, 'lang3' => $key, 'lang4' => $key]);
 
         // Ensure that catalog still contains new translated values
-        $this->provider->selectStrategy('strategy2');
+        $this->provider->setStrategy($this->getStrategy('strategy2'));
         $this->assertTranslationEquals($key, ['lang1' => $val1, 'lang2' => $val2, 'lang3' => $val2, 'lang4' => $val2]);
 
         // Ensure that catalog still contains translation keys
-        $this->provider->selectStrategy('strategy3');
+        $this->provider->setStrategy($this->getStrategy('strategy3'));
         $this->assertTranslationEquals($key, ['lang1' => $key, 'lang2' => $key, 'lang3' => $key, 'lang4' => $key]);
     }
 
@@ -156,26 +134,65 @@ class TranslatorTest extends WebTestCase
         $manager->clear();
 
         // Ensure that catalog still contains old translated values
-        $this->provider->selectStrategy('strategy1');
+        $this->provider->setStrategy($this->getStrategy('strategy1'));
         $this->assertTranslationEquals($key, ['lang1' => $key, 'lang2' => $key, 'lang3' => $key, 'lang4' => $key]);
 
-        $this->provider->selectStrategy('strategy2');
+        $this->provider->setStrategy($this->getStrategy('strategy2'));
         $this->assertTranslationEquals($key, ['lang1' => $key, 'lang2' => $key, 'lang3' => $key, 'lang4' => $key]);
 
-        $this->provider->selectStrategy('strategy3');
+        $this->provider->setStrategy($this->getStrategy('strategy3'));
         $this->assertTranslationEquals($key, ['lang1' => $key, 'lang2' => $key, 'lang3' => $key, 'lang4' => $key]);
 
         $this->translator->rebuildCache();
 
         // Ensure that catalog still contains new translated values
-        $this->provider->selectStrategy('strategy1');
+        $this->provider->setStrategy($this->getStrategy('strategy1'));
         $this->assertTranslationEquals($key, ['lang1' => $val1, 'lang2' => $val2, 'lang3' => $key, 'lang4' => $key]);
 
-        $this->provider->selectStrategy('strategy2');
+        $this->provider->setStrategy($this->getStrategy('strategy2'));
         $this->assertTranslationEquals($key, ['lang1' => $val1, 'lang2' => $val2, 'lang3' => $val2, 'lang4' => $val2]);
 
-        $this->provider->selectStrategy('strategy3');
+        $this->provider->setStrategy($this->getStrategy('strategy3'));
         $this->assertTranslationEquals($key, ['lang1' => $val1, 'lang2' => $val2, 'lang3' => $key, 'lang4' => $key]);
+    }
+
+    /**
+     * @param string $name
+     * @return TranslationStrategy
+     */
+    protected function getStrategy($name)
+    {
+        return $this->strategies[$name];
+    }
+
+    protected function createStrategies()
+    {
+        $this->strategies['strategy1'] = new TranslationStrategy('strategy1', [
+            'lang1' => [],
+            'lang2' => [],
+            'lang3' => [],
+            'lang4' => [],
+        ]);
+
+        $this->strategies['strategy2'] = new TranslationStrategy('strategy2', [
+            'lang2' => [
+                'lang3' => [
+                    'lang4' => [
+                        'lang1' => [
+                        ],
+                    ],
+                ],
+            ],
+        ]);
+
+        $this->strategies['strategy3'] = new TranslationStrategy('strategy3', [
+            'lang3' => [],
+            'lang4' => [
+                'lang1' => [
+                    'lang2' => [],
+                ],
+            ],
+        ]);
     }
 
     /**

@@ -35,7 +35,7 @@ class OroTranslationLoadCommand extends ContainerAwareCommand
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        /* @var $translationManager LanguageProvider */
+        /* @var $languageProvider LanguageProvider */
         $languageProvider = $this->getContainer()->get('oro_translation.provider.language');
         $availableLocales = array_keys($languageProvider->getAvailableLanguages());
 

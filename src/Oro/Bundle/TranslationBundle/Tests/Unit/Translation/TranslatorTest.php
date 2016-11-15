@@ -464,12 +464,12 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
 
         $translator = $this->getTranslator($this->getLoader(), $strategyProvider);
 
-        $strategyProvider->selectStrategy($firstStrategyName);
+        $strategyProvider->setStrategy($firstStrategy);
         $translator->getCatalogue('en');
         $this->assertAttributeEquals($firstStrategyName, 'strategyName', $translator);
         $this->assertAttributeCount(1, 'catalogues', $translator);
 
-        $strategyProvider->selectStrategy($secondStrategyName);
+        $strategyProvider->setStrategy($secondStrategy);
         $translator->getCatalogue('ru');
         $this->assertAttributeEquals($secondStrategyName, 'strategyName', $translator);
         $this->assertAttributeCount(1, 'catalogues', $translator);

@@ -35,24 +35,13 @@ class TranslationStrategyProviderTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($this->defaultStrategy, $this->provider->getStrategy());
     }
 
-    public function testSelectStrategy()
+    public function testSetStrategy()
     {
         $this->assertSame($this->defaultStrategy, $this->provider->getStrategy());
 
-        $this->provider->selectStrategy('custom');
+        $this->provider->setStrategy($this->customStrategy);
 
         $this->assertSame($this->customStrategy, $this->provider->getStrategy());
-    }
-
-    public function testResetStrategy()
-    {
-        $this->provider->selectStrategy('custom');
-
-        $this->assertSame($this->customStrategy, $this->provider->getStrategy());
-
-        $this->provider->resetStrategy();
-
-        $this->assertSame($this->defaultStrategy, $this->provider->getStrategy());
     }
 
     public function testGetStrategies()

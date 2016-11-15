@@ -42,6 +42,9 @@ class Translator extends BaseTranslator
      */
     protected $dynamicResources = [];
 
+    /** @var array */
+    protected $registeredResources = [];
+
     /** @var bool */
     protected $installed;
 
@@ -57,9 +60,6 @@ class Translator extends BaseTranslator
     /** @var array */
     protected $resourceFiles = [];
 
-    /** @var array */
-    protected $resources = [];
-
     /**
      * {@inheritdoc}
      */
@@ -71,6 +71,7 @@ class Translator extends BaseTranslator
     ) {
         $this->messageSelector = $messageSelector;
         $this->originalOptions = $options;
+        $this->resourceFiles = $options['resource_files'];
 
         parent::__construct($container, $messageSelector, $loaderIds, $options);
     }
@@ -194,15 +195,10 @@ class Translator extends BaseTranslator
      */
     public function addResource($format, $resource, $locale, $domain = null)
     {
-        if (in_array([$locale, $format, $resource, $domain], $this->resources, true)) {
-            return;
-        }
-
-        if (is_string($resource) && is_file($resource)) {
+        if (is_string($resource) && is_file($resource) &&
+                (!isset($this->resourceFiles[$locale]) || !in_array($resource, $this->resourceFiles, true))) {
             $this->resourceFiles[$locale][] = $resource;
         }
-
-        $this->resources[] = [$locale, $format, $resource, $domain];
 
         parent::addResource($format, $resource, $locale, $domain);
     }
@@ -219,6 +215,7 @@ class Translator extends BaseTranslator
 
         $this->applyCurrentStrategy();
 
+        // load catalogues only for needed locales
         $locales = array_unique($this->getFallbackLocales());
         foreach ($locales as $locale) {
             $this->loadCatalogue($locale);
@@ -244,7 +241,7 @@ class Translator extends BaseTranslator
         $currentStrategy = $provider->getStrategy();
 
         foreach ($provider->getStrategies() as $strategy) {
-            $provider->selectStrategy($strategy->getName());
+            $provider->setStrategy($strategy);
 
             /* @var $translator Translator */
             $translator = new static($this->container, $this->messageSelector, $this->loaderIds, $options);
@@ -253,7 +250,7 @@ class Translator extends BaseTranslator
             $translator->warmUp($tmpDir);
         }
 
-        $provider->selectStrategy($currentStrategy->getName());
+        $provider->setStrategy($currentStrategy);
 
         $iterator = new \IteratorIterator(new \DirectoryIterator($tmpDir));
         foreach ($iterator as $path) {
@@ -377,9 +374,13 @@ class Translator extends BaseTranslator
             ? $this->catalogues[Translator::DEFAULT_LOCALE]
             : null;
 
-        foreach ($this->dynamicResources as $items) {
-            if (!$defaultLocale) {
+        if (!$defaultLocale) {
+            foreach ($this->dynamicResources as $items) {
                 foreach ($items as $item) {
+                    if (in_array($item, $this->registeredResources, true)) {
+                        continue;
+                    }
+                    $this->registeredResources[] = $item;
                     $this->addResource($item['format'], $item['resource'], $item['code'], $item['domain']);
                 }
             }

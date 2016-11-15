@@ -27,15 +27,10 @@ class LoadLocalizationData extends AbstractFixture implements ContainerAwareInte
             throw new \LogicException(sprintf('There are no locale with code "%s"!', $locale));
         }
 
-        $language = $this->getLanguageCode($locale);
-        if (!$this->isSupportedLanguage($language)) {
-            throw new \LogicException(sprintf('There are no language with code "%s"!', $language));
-        }
-
-        $localization = $this->getDefaultLocalization($manager, $locale, $language);
+        $localization = $this->getDefaultLocalization($manager, $locale);
         if (!$localization) {
             $localization = new Localization();
-            $localization->setLanguageCode($language)->setFormattingCode($locale);
+            $localization->setLanguageCode($locale)->setFormattingCode($locale);
 
             $manager->persist($localization);
         }
@@ -64,15 +59,14 @@ class LoadLocalizationData extends AbstractFixture implements ContainerAwareInte
     /**
      * @param ObjectManager $manager
      * @param string $locale
-     * @param string $language
      * @return Localization
      */
-    protected function getDefaultLocalization(ObjectManager $manager, $locale, $language)
+    protected function getDefaultLocalization(ObjectManager $manager, $locale)
     {
         return $manager->getRepository('OroLocaleBundle:Localization')
             ->findOneBy(
                 [
-                    'languageCode' => $language,
+                    'languageCode' => $locale,
                     'formattingCode' => $locale
                 ]
             );
@@ -90,16 +84,6 @@ class LoadLocalizationData extends AbstractFixture implements ContainerAwareInte
 
     /**
      * @param string $locale
-     * @return string
-     */
-    protected function getLanguageCode($locale)
-    {
-        // TODO: must be refactored in scope https://magecore.atlassian.net/browse/BAP-12623
-        return $locale;
-    }
-
-    /**
-     * @param string $locale
      * @return bool
      */
     protected function isSupportedLocale($locale)
@@ -107,16 +91,5 @@ class LoadLocalizationData extends AbstractFixture implements ContainerAwareInte
         $locales = Intl::getLocaleBundle()->getLocaleNames();
 
         return array_key_exists($locale, $locales);
-    }
-
-    /**
-     * @param string $language
-     * @return bool
-     */
-    protected function isSupportedLanguage($language)
-    {
-        $languages = Intl::getLocaleBundle()->getLocaleNames();
-
-        return array_key_exists($language, $languages);
     }
 }
