@@ -34,6 +34,7 @@ class ConfigExtension extends \Twig_Extension
      * @param ConfigManager         $configManager
      * @param RouterInterface       $router
      * @param EntityClassNameHelper $entityClassNameHelper
+     * @param DoctrineHelper        $doctrineHelper
      */
     public function __construct(
         ConfigManager $configManager,
