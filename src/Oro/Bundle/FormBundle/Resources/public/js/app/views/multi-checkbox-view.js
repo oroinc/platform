@@ -2,20 +2,18 @@ define(function(require) {
     'use strict';
 
     var MultiCheckboxView;
+    var $ = require('jquery');
     var _ = require('underscore');
     var BaseView = require('oroui/js/app/views/base/view');
 
     MultiCheckboxView = BaseView.extend({
-
-        autoRender: true,
+        defaults: {
+            selectAttrs: {},
+            value: [],
+            items: null
+        },
 
         template: require('tpl!oroform/templates/multi-checkbox-view.html'),
-
-        inputName: null,
-
-        value: [],
-
-        items: null,
 
         events: {
             'change input[type=checkbox]': 'onCheckboxToggle'
@@ -27,7 +25,9 @@ define(function(require) {
          * @param {Object} options
          */
         initialize: function(options) {
-            _.extend(this, _.pick(options, 'inputName', 'items', 'value'));
+            var opts = {};
+            $.extend(true, opts, this.defaults, options);
+            _.extend(this, _.pick(opts, 'items', 'value', 'selectAttrs'));
             MultiCheckboxView.__super__.initialize.apply(this, arguments);
         },
 
@@ -35,8 +35,13 @@ define(function(require) {
             var data = MultiCheckboxView.__super__.getTemplateData.apply(this, arguments);
             data.values = this.value;
             data.options = this.items;
-            data.inputName = this.inputName;
             return data;
+        },
+
+        render: function() {
+            MultiCheckboxView.__super__.render.call(this);
+            this.getSelectElement().attr(this.selectAttrs);
+            return this;
         },
 
         onCheckboxToggle: function(e) {
@@ -49,15 +54,19 @@ define(function(require) {
             this.setValue(values);
         },
 
+        getSelectElement: function() {
+            return this.$('[data-name="multi-checkbox-value-keeper"]');
+        },
+
         getValue: function() {
-            return this.$('[data-name="multi-checkbox-value-keeper"]').val();
+            return this.getSelectElement().val();
         },
 
         setValue: function(values) {
             var oldValue = this.getValue();
             if (!_.haveEqualSet(oldValue, values)) {
                 this.value = values;
-                this.$('[data-name="multi-checkbox-value-keeper"]').val(values).trigger('change');
+                this.getSelectElement().val(values).trigger('change');
             }
         }
     });
