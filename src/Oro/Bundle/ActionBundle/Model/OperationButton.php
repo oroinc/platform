@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\ActionBundle\Model;
 
+use Symfony\Component\VarDumper\VarDumper;
+
 class OperationButton implements ButtonInterface
 {
     const DEFAULT_TEMPLATE = 'OroActionBundle:Operation:button.html.twig';
@@ -40,11 +42,7 @@ class OperationButton implements ButtonInterface
      */
     public function getTemplate()
     {
-        $frontendOptions = $this->operation->getDefinition()->getFrontendOptions();
-
-        return !empty($frontendOptions[static::FRONTEND_TEMPLATE_KEY])
-            ? $frontendOptions[static::FRONTEND_TEMPLATE_KEY]
-            : static::DEFAULT_TEMPLATE;
+        return static::DEFAULT_TEMPLATE;
     }
 
     /**
@@ -52,12 +50,30 @@ class OperationButton implements ButtonInterface
      */
     public function getTemplateData()
     {
+        $definition = $this->operation->getDefinition();
+        $buttonOptions = $definition->getButtonOptions();
+
+        if (in_array(
+            $this->getButtonContext()->getGroup(),
+            [
+                null,
+                OperationRegistry::DEFAULT_GROUP,
+                OperationRegistry::UPDATE_PAGE_GROUP,
+                OperationRegistry::VIEW_PAGE_GROUP,
+            ],
+            true
+        )) {
+            if (!isset($buttonOptions['class'])) {
+                $buttonOptions['class'] = '';
+            }
+            $buttonOptions['class'] .= ' btn ';
+        };
+
+        $definition->setButtonOptions($buttonOptions);
+
         return [
             'operation' => $this->operation,
             'params' => $this->operation->getDefinition(),
-            'messages' => [],
-            'errors' => [],
-            'context' => [],
         ];
     }
 

@@ -1,5 +1,5 @@
 {% set linkTitle = params.frontendOptions.title|default(params.label)|trans %}
-{% set linkLabel = params.label %}
+{% set linkLabel = params.label|trans %}
 
 {% block button %}
     {% set options = oro_action_frontend_options(operation) %}

@@ -1,8 +1,3 @@
-oro_action_buttons_widget:
-    resource:     "@OroActionBundle/Controller/ButtonsWidgetController.php"
-    type:         annotation
-    prefix:       /actionwidget
-
 oro_action_widget:
     resource:     "@OroActionBundle/Controller/WidgetController.php"
     type:         annotation

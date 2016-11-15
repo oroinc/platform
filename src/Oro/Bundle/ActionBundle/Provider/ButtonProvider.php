@@ -5,7 +5,6 @@ namespace Oro\Bundle\ActionBundle\Provider;
 use Oro\Bundle\ActionBundle\Model\ButtonInterface;
 use Oro\Bundle\ActionBundle\Model\ButtonProviderExtensionInterface;
 use Oro\Bundle\ActionBundle\Model\ButtonSearchContext;
-use Symfony\Component\VarDumper\VarDumper;
 
 class ButtonProvider
 {
@@ -34,8 +33,6 @@ class ButtonProvider
         foreach ($this->extensions as $extension) {
             $buttonsData[] = $extension->find($searchContext);
         }
-        VarDumper::dump([__FILE__, __LINE__, $buttonsData]);
-
         $buttons = call_user_func_array('array_merge', $buttonsData);
 
         usort(

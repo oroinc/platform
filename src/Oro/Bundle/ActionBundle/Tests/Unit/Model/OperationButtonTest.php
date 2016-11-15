@@ -6,6 +6,7 @@ use Oro\Bundle\ActionBundle\Model\ButtonContext;
 use Oro\Bundle\ActionBundle\Model\Operation;
 use Oro\Bundle\ActionBundle\Model\OperationButton;
 use Oro\Bundle\ActionBundle\Model\OperationDefinition;
+use Oro\Bundle\ActionBundle\Model\OperationRegistry;
 
 class OperationButtonTest extends \PHPUnit_Framework_TestCase
 {
@@ -26,13 +27,9 @@ class OperationButtonTest extends \PHPUnit_Framework_TestCase
      */
     protected function setUp()
     {
-        $this->definition = $this->getMock(OperationDefinition::class);
-
         $this->operation = $this->getMockBuilder(Operation::class)
             ->disableOriginalConstructor()
             ->getMock();
-
-        $this->operation->expects($this->any())->method('getDefinition')->willReturn($this->definition);
 
         $this->buttonContext = $this->getMock(ButtonContext::class);
 
@@ -44,38 +41,97 @@ class OperationButtonTest extends \PHPUnit_Framework_TestCase
      */
     protected function tearDown()
     {
-        unset($this->operation, $this->definition, $this->button, $this->buttonContext);
+        unset($this->operation, $this->button, $this->buttonContext);
     }
 
     public function testGetOrder()
     {
-        $this->definition->expects($this->once())->method('getOrder')->willReturn(1);
+        $definition = $this->getMockBuilder(OperationDefinition::class)->disableOriginalConstructor()->getMock();
+        $definition->expects($this->once())->method('getOrder')->willReturn(1);
+
+        $this->assertOperationMethodsCalled($this->operation, $definition);
+
         $this->assertEquals(1, $this->button->getOrder());
     }
 
     public function testGetTemplate()
     {
-        //TODO: Must be updated https://magecore.atlassian.net/browse/BAP-12480
         $this->assertEquals(OperationButton::DEFAULT_TEMPLATE, $this->button->getTemplate());
     }
 
-    public function testGetTemplateWithConfiguredFrontendOptions()
+    /**
+     * @dataProvider getTemplateDataDataProvider
+     *
+     * @param null|string $group
+     * @param array $expectedResult
+     */
+    public function testGetTemplateData($group, array $expectedResult)
     {
-        $templateName = uniqid('test_template', true);
-        $this->definition->expects($this->once())->method('getFrontendOptions')->willReturn(
-            [OperationButton::FRONTEND_TEMPLATE_KEY => $templateName]
-        );
-        $this->assertEquals($templateName, $this->button->getTemplate());
+        $this->buttonContext->expects($this->atLeastOnce())->method('getGroup')->willReturn($group);
+        $this->assertOperationMethodsCalled($this->operation, new OperationDefinition());
+
+        $templateData = $this->button->getTemplateData();
+        $this->assertEquals($expectedResult, $templateData);
     }
 
-    public function testGetTemplateData()
+    /**
+     * @return array
+     */
+    public function getTemplateDataDataProvider()
     {
-        //TODO: Must be updated https://magecore.atlassian.net/browse/BAP-12480
-        $this->assertInternalType('array', $this->button->getTemplateData());
+        $customButtonOptions = ['class' => ' btn '];
+
+        return [
+            'null as group' => [
+                'group' => null,
+                'expectedResult' => [
+                    'operation' => $this->getMockBuilder(Operation::class)->disableOriginalConstructor()->getMock(),
+                    'params' => (new OperationDefinition())->setButtonOptions($customButtonOptions),
+                ],
+            ],
+            OperationRegistry::DEFAULT_GROUP => [
+                'group' => OperationRegistry::DEFAULT_GROUP,
+                'expectedResult' => [
+                    'operation' => $this->getMockBuilder(Operation::class)->disableOriginalConstructor()->getMock(),
+                    'params' => (new OperationDefinition())->setButtonOptions($customButtonOptions),
+                ],
+            ],
+            OperationRegistry::VIEW_PAGE_GROUP => [
+                'group' => OperationRegistry::VIEW_PAGE_GROUP,
+                'expectedResult' => [
+                    'operation' => $this->getMockBuilder(Operation::class)->disableOriginalConstructor()->getMock(),
+                    'params' => (new OperationDefinition())->setButtonOptions($customButtonOptions),
+                ],
+            ],
+            OperationRegistry::UPDATE_PAGE_GROUP => [
+                'group' => OperationRegistry::UPDATE_PAGE_GROUP,
+                'expectedResult' => [
+                    'operation' => $this->getMockBuilder(Operation::class)->disableOriginalConstructor()->getMock(),
+                    'params' => (new OperationDefinition())->setButtonOptions($customButtonOptions),
+                ],
+            ],
+            'custom group' => [
+                'group' => uniqid(),
+                'expectedResult' => [
+                    'operation' => $this->getMockBuilder(Operation::class)->disableOriginalConstructor()->getMock(),
+                    'params' => (new OperationDefinition())->setButtonOptions([]),
+                ],
+            ],
+        ];
     }
 
     public function testGetButtonContext()
     {
         $this->assertInstanceOf(ButtonContext::class, $this->button->getButtonContext());
     }
+
+    /**
+     * @param Operation|\PHPUnit_Framework_MockObject_MockObject $operation
+     * @param OperationDefinition|\PHPUnit_Framework_MockObject_MockObject $definition
+     */
+    private function assertOperationMethodsCalled(Operation $operation, OperationDefinition $definition)
+    {
+        $operation->expects($this->any())->method('getDefinition')->willReturn($definition);
+    }
+
 }
