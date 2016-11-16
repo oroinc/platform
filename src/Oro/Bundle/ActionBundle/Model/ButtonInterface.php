@@ -19,12 +19,19 @@ interface ButtonInterface
     /**
      * Returns all data required to render template
      *
-     * @return array
+     * @param array $customData
+     *
+     * @return mixed
      */
-    public function getTemplateData();
+    public function getTemplateData(array $customData = []);
 
     /**
      * @return ButtonContext
      */
     public function getButtonContext();
+
+    /**
+     * @return string
+     */
+    public function getGroup();
 }
