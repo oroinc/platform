@@ -467,3 +467,9 @@ services:
         arguments: ['@security.token_storage']
         tags:
             - { name: kernel.event_listener, event: kernel.request , method: onKernelRequest}
+
+    oro_user.scope_criteria_provider.user:
+        class: Oro\Bundle\UserBundle\Provider\ScopeUserCriteriaProvider
+        public: false
+        arguments:
+            - "@security.token_storage"

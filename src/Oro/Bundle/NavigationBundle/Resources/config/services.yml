@@ -347,6 +347,7 @@ services:
         class: Oro\Bundle\NavigationBundle\Builder\MenuUpdateBuilder
         arguments:
             - '@oro_locale.helper.localization'
+            - '@oro_scope.scope_manager'
         tags:
             - { name: oro_menu.builder, priority: 100 }
 
@@ -448,3 +449,7 @@ services:
         tags:
             - { name: layout.data_provider, alias: title_provider }
 
+    oro_navigation.scope_criteria_provider.user:
+        parent: oro_user.scope_criteria_provider.user
+        tags:
+            - {name: oro_scope.provider, scopeType: menu_default_visibility, priority: 10}
