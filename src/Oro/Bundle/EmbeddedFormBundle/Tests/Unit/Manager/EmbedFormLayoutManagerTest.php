@@ -11,7 +11,7 @@ use Oro\Bundle\EmbeddedFormBundle\Entity\EmbeddedForm;
 use Oro\Bundle\EmbeddedFormBundle\Manager\SessionIdProviderInterface;
 use Oro\Bundle\EmbeddedFormBundle\Manager\EmbeddedFormManager;
 use Oro\Bundle\EmbeddedFormBundle\Manager\EmbedFormLayoutManager;
-use Oro\Bundle\LayoutBundle\Layout\Form\FormAccessor;
+use Oro\Bundle\EmbeddedFormBundle\Layout\Form\FormAccessor;
 
 class EmbedFormLayoutManagerTest extends \PHPUnit_Framework_TestCase
 {
@@ -68,7 +68,11 @@ class EmbedFormLayoutManagerTest extends \PHPUnit_Framework_TestCase
             ->method('getLayout')
             ->willReturnCallback(
                 function (LayoutContext $context) use ($formEntity) {
-                    $context->getResolver()->setDefined(['theme']);
+                    $context->getResolver()->setDefined([
+                        'theme',
+                        'expressions_evaluate',
+                        'expressions_evaluate_deferred'
+                    ]);
                     $context->resolve();
 
                     self::assertEquals('embedded_default', $context->get('theme'));
@@ -114,7 +118,11 @@ class EmbedFormLayoutManagerTest extends \PHPUnit_Framework_TestCase
             ->method('getLayout')
             ->willReturnCallback(
                 function (LayoutContext $context) use ($formEntity) {
-                    $context->getResolver()->setDefined(['theme']);
+                    $context->getResolver()->setDefined([
+                        'theme',
+                        'expressions_evaluate',
+                        'expressions_evaluate_deferred'
+                    ]);
                     $context->resolve();
 
                     self::assertEquals('embedded_default', $context->get('theme'));

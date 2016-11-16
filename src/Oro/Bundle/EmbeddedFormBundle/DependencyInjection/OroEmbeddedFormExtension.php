@@ -30,6 +30,7 @@ class OroEmbeddedFormExtension extends Extension
 
         $loader->load('services.yml');
         $loader->load('formatters.yml');
+        $loader->load('block_types.yml');
 
         $container->setParameter(self::SESSION_ID_FIELD_NAME_PARAM, $config[Configuration::SESSION_ID_FIELD_NAME]);
         $container->setParameter(self::CSRF_TOKEN_LIFETIME_PARAM, $config[Configuration::CSRF_TOKEN_LIFETIME]);
