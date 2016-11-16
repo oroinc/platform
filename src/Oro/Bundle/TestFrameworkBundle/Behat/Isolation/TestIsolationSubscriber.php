@@ -79,7 +79,8 @@ class TestIsolationSubscriber implements EventSubscriberInterface
                 $helper = new QuestionHelper();
                 $question = new ConfirmationQuestion(
                     sprintf(
-                        '<question>"%s" isolator discover that last time environment was not be restored properly.'.PHP_EOL
+                        '<question>"%s" isolator discover that last time '.
+                        'environment was not be restored properly.'.PHP_EOL
                         .'Do you what to restore state?(Y/n)</question>',
                         $isolator->getName()
                     ),
@@ -112,10 +113,12 @@ class TestIsolationSubscriber implements EventSubscriberInterface
     }
 
     public function beforeScenario()
-    {}
+    {
+    }
 
     public function afterScenario()
-    {}
+    {
+    }
 
     public function afterFeature()
     {

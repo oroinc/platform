@@ -22,7 +22,8 @@ class InputOutputController implements Controller
      * {@inheritdoc}
      */
     public function configure(SymfonyCommand $command)
-    {}
+    {
+    }
 
     /**
      * {@inheritdoc}

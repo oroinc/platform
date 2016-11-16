@@ -49,7 +49,7 @@ class ExtendConfigDumperTest extends \PHPUnit_Framework_TestCase
             ->getMock();
 
         $this->cacheDir = __DIR__ . DIRECTORY_SEPARATOR . 'Fixtures' . DIRECTORY_SEPARATOR
-            . 'Isolation' . DIRECTORY_SEPARATOR . 'cache';
+            . 'Dumper' . DIRECTORY_SEPARATOR . 'cache';
 
         $this->dumper = new ExtendConfigDumper(
             $this->entityManagerBag,

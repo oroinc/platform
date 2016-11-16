@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\TestFrameworkBundle\Behat\Isolation;
 
-abstract class OsRelatedIsolator
+abstract class AbstractOsRelatedIsolator
 {
     const WINDOWS_OS = 'WINDOWS';
     const LINUX_OS   = 'LINUX';

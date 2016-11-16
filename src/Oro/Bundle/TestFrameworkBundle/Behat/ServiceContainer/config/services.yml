@@ -39,7 +39,7 @@ services:
             - '@oro_test.context.fixture_loader'
             - '@oro_test.reference_repository_initializer'
         tags:
-            - { name: 'event_dispatcher.subscriber' }
+            - { name: 'event_dispatcher.subscriber', , priority: 20 }
 
     oro_test.listener.step_duration_measure_subscriber:
         class: 'Oro\Bundle\TestFrameworkBundle\Behat\Listener\StepDurationMeasureSubscriber'

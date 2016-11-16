@@ -10,48 +10,17 @@ use Symfony\Component\Console\Helper\QuestionHelper;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpKernel\KernelInterface;
+use Symfony\Component\Process\Process;
 
-class UnixFileCacheIsolator extends OsRelatedIsolator implements IsolatorInterface
+class UnixFileCacheIsolator extends AbstractFileCacheOsRelatedIsolator implements IsolatorInterface
 {
-    /** @var string */
-    protected $cacheDir;
-
-    /** @var  string */
-    protected $cacheDump;
-
-    /** @var  Filesystem */
-    protected $filesystem;
-
-    /**
-     * @param KernelInterface $kernel
-     */
-    public function __construct(KernelInterface $kernel)
-    {
-        $this->cacheDir   = $kernel->getCacheDir();
-        $this->cacheDump  = sys_get_temp_dir().DIRECTORY_SEPARATOR.'oro_cache_dump';
-        $this->filesystem = new Filesystem();
-    }
-
-    /** {@inheritdoc} */
-    public function start(BeforeStartTestsEvent $event)
-    {
-        $this->filesystem->mirror($this->cacheDir, $this->cacheDump);
-    }
-
-    /** {@inheritdoc} */
-    public function beforeTest(BeforeIsolatedTestEvent $event)
-    {}
-
-    /** {@inheritdoc} */
-    public function afterTest(AfterIsolatedTestEvent $event)
-    {
-        $this->filesystem->remove($this->cacheDir);
-        $this->filesystem->mirror($this->cacheDump, $this->cacheDir);
-    }
-
-    /** {@inheritdoc} */
-    public function terminate(AfterFinishTestsEvent $event)
-    {}
+    /** @var array */
+    protected $cacheDirectories = [
+        'doctrine',
+        'oro_data',
+        'oro_entities',
+        'oro'
+    ];
 
     /** {@inheritdoc} */
     public function isApplicable(ContainerInterface $container)
@@ -65,24 +34,85 @@ class UnixFileCacheIsolator extends OsRelatedIsolator implements IsolatorInterfa
     protected function getApplicableOs()
     {
         return [
-            OsRelatedIsolator::LINUX_OS,
-            OsRelatedIsolator::MAC_OS,
+            AbstractOsRelatedIsolator::LINUX_OS,
+            AbstractOsRelatedIsolator::MAC_OS,
         ];
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function isOutdatedState()
+    protected function replaceCache()
     {
-        return false;
+        $commands = [];
+
+        foreach ($this->cacheDirectories as $directory) {
+            $commands[] = sprintf(
+                "mv %s %s",
+                $this->cacheTempDir.'/'.$directory,
+                $this->cacheDir.'/'.$directory
+            );
+        }
+
+        $this->runProcess(implode(' && ', $commands));
+    }
+
+    protected function startCopyDumpToTempDir()
+    {
+        $this->copyDumpToTempDirProcess = new Process(sprintf(
+            "exec cp -r %s %s",
+            $this->cacheDumpDir.'/*',
+            $this->cacheTempDir.'/'
+        ));
+
+        $this->copyDumpToTempDirProcess
+            ->setTimeout(self::TIMEOUT)
+            ->start();
+    }
+
+    protected function dumpCache()
+    {
+        $commands = [];
+
+        foreach ($this->cacheDirectories as $directory) {
+            $commands[] = sprintf(
+                'cp -r %s %s',
+                $this->cacheDir.'/'.$directory,
+                $this->cacheDumpDir.'/'.$directory
+            );
+        }
+
+
+        $this->runProcess(implode(' && ', $commands));
+    }
+
+    protected function removeDumpCacheDir()
+    {
+        $this->runProcess(
+            sprintf('rm -rf %s', $this->cacheDumpDir)
+        );
+    }
+
+    protected function removeTempCacheDir()
+    {
+        $this->runProcess(
+            sprintf('rm -rf %s', $this->cacheTempDir)
+        );
+    }
+
+    protected function removeCacheDirs()
+    {
+        $commands = [];
+
+        foreach ($this->cacheDirectories as $directory) {
+            $commands[] = sprintf('rm -rf %s', $this->cacheDir.'/'.$directory);
+        }
+
+        $this->runProcess(implode(' && ', $commands));
     }
 
     /**
-     * Restore initial state
-     * @return void
+     * @return string
      */
-    public function restoreState()
+    public function getName()
     {
+        return 'Cache';
     }
 }

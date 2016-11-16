@@ -48,7 +48,8 @@ class KernelIsolator implements IsolatorInterface
 
     /** {@inheritdoc} */
     public function terminate(AfterFinishTestsEvent $event)
-    {}
+    {
+    }
 
     /** {@inheritdoc} */
     public function isApplicable(ContainerInterface $container)
@@ -68,7 +69,8 @@ class KernelIsolator implements IsolatorInterface
      * {@inheritdoc}
      */
     public function restoreState(RestoreStateEvent $event)
-    {}
+    {
+    }
 
     /**
      * {@inheritdoc}
