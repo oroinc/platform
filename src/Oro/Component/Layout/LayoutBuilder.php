@@ -2,6 +2,7 @@
 
 namespace Oro\Component\Layout;
 
+use Oro\Component\Layout\Exception\BlockViewNotFoundException;
 use Oro\Component\Layout\ExpressionLanguage\ExpressionProcessor;
 
 /**
@@ -222,12 +223,19 @@ class LayoutBuilder implements LayoutBuilderInterface
         if ($this->blockViewCache) {
             $rootView = $this->blockViewCache->fetch($context);
             if ($rootView === null) {
-                $rootView = $this->blockFactory->createBlockView($rawLayout, $context, $rootId);
+                $rootView = $this->blockFactory->createBlockView($rawLayout, $context);
 
                 $this->blockViewCache->save($context, $rootView);
             }
         } else {
-            $rootView = $this->blockFactory->createBlockView($rawLayout, $context, $rootId);
+            $rootView = $this->blockFactory->createBlockView($rawLayout, $context);
+        }
+
+        if ($rootId) {
+            $rootView = $this->findBlockById($rootView, $rootId);
+            if (!$rootView) {
+                throw new BlockViewNotFoundException(sprintf("BlockView with id \"%s\" is not found.", $rootId));
+            }
         }
 
         if ($context->getOr('expressions_evaluate')) {
@@ -307,5 +315,28 @@ class LayoutBuilder implements LayoutBuilderInterface
                 }
             }
         );
+    }
+
+    /**
+     * @param BlockView $blockView
+     * @param integer $id
+     *
+     * @return null|BlockView
+     * @throws BlockViewNotFoundException
+     */
+    private function findBlockById(BlockView $blockView, $id)
+    {
+        foreach ($blockView->children as $childView) {
+            if ($childView->getId() === $id) {
+                return $childView;
+            }
+
+            $childView = $this->findBlockById($childView, $id);
+            if ($childView) {
+                return $childView;
+            }
+        }
+
+        return null;
     }
 }

@@ -78,9 +78,9 @@ class OptionValueBagNormalizer implements NormalizerInterface, DenormalizerInter
     }
 
     /**
-     * @param $argument
-     * @param null $format
-     * @param array $context
+     * @param mixed       $argument
+     * @param string|null $format
+     * @param array       $context
      *
      * @return mixed
      */
