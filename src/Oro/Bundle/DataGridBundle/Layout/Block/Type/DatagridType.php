@@ -64,23 +64,11 @@ class DatagridType extends AbstractContainerType
      */
     public function buildBlock(BlockBuilderInterface $builder, Options $options)
     {
-        $id = $builder->getId();
-
-        $toolbarOptions = null;
-        if ($options['server_side_render']) {
-            if ($gridOptions = $this->getGridOptions($options['grid_name'])) {
-                $toolbarOptions = $gridOptions['toolbarOptions'];
-
-                if ($toolbarOptions['placement']['top']) {
-                    $topToolbarId = $this->generateName([$id, 'top', 'toolbar']);
-                    $builder->getLayoutManipulator()->add($topToolbarId, $id, 'container');
-                }
-            }
-        }
-
         if ($options['split_to_cells']) {
             $columns = $this->getGridColumns($options['grid_name']);
             if ($columns) {
+                $id = $builder->getId();
+
                 $headerRowId = $this->generateName([$id, 'header', 'row']);
                 $builder->getLayoutManipulator()->add($headerRowId, $id, 'datagrid_header_row');
 
@@ -101,11 +89,6 @@ class DatagridType extends AbstractContainerType
                         ->add($cellValueId, $cellId, 'datagrid_cell_value', ['column_name' => $columnName]);
                 }
             }
-        }
-
-        if ($options['server_side_render'] && $toolbarOptions && $toolbarOptions['placement']['bottom']) {
-            $bottomToolbarId = $this->generateName([$id, 'bottom', 'toolbar']);
-            $builder->getLayoutManipulator()->add($bottomToolbarId, $id, 'container');
         }
     }
 
@@ -182,21 +165,6 @@ class DatagridType extends AbstractContainerType
     {
         if ($this->isAclGrantedForGridName($gridName)) {
             return $this->manager->getConfigurationForGrid($gridName)->offsetGet('columns');
-        }
-
-        return null;
-    }
-
-    /**
-     * @param string $gridName
-     * @return null|array
-     */
-    private function getGridOptions($gridName)
-    {
-        if ($this->isAclGrantedForGridName($gridName)) {
-            $gridMetadata = $this->manager->getDatagridByRequestParams($gridName)->getMetadata();
-
-            return $gridMetadata->offsetGet('options');
         }
 
         return null;

@@ -5,11 +5,6 @@ layout:
             root: __root
 
     actions:
-        - '@setBlockTheme':
-            themes:
-                - 'datagrid_toolbar.html.twig'
-                - 'datagrid.html.twig'
-
         - '@setOption':
             id: __datagrid
             optionName: split_to_cells
