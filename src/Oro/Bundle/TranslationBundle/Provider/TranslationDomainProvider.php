@@ -63,9 +63,15 @@ class TranslationDomainProvider
         return $result;
     }
 
+    /**
+     * @return $this
+     */
     public function clearCache()
     {
+        $this->availableDomains = null;
         $this->cache->delete(self::AVAILABLE_DOMAINS_NODE);
+
+        return $this;
     }
 
     protected function ensureAvailableDomainsLoaded()
@@ -75,11 +81,11 @@ class TranslationDomainProvider
         }
 
         if ($this->cache->contains(self::AVAILABLE_DOMAINS_NODE)) {
-            $this->availableDomains = $this->cache->fetch(self::AVAILABLE_DOMAINS_NODE);
+            $this->availableDomains = (array)$this->cache->fetch(self::AVAILABLE_DOMAINS_NODE);
         } else {
-            $this->availableDomains = $this->getTranslationKeyRepository()->findAvailableDomains();
-
             $this->clearCache();
+
+            $this->availableDomains = $this->getTranslationKeyRepository()->findAvailableDomains();
             $this->cache->save(self::AVAILABLE_DOMAINS_NODE, $this->availableDomains);
         }
     }

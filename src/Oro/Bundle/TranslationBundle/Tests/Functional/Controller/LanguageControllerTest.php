@@ -23,6 +23,16 @@ class LanguageControllerTest extends WebTestCase
         $this->loadFixtures([LoadLanguages::class]);
     }
 
+    /**
+     * {@inheritdoc}
+     */
+    protected function postFixtureLoad()
+    {
+        parent::postFixtureLoad();
+
+        $this->getContainer()->get('oro_translation.provider.translation_domain')->clearCache();
+    }
+
     public function testIndex()
     {
         $crawler = $this->client->request('GET', $this->getUrl('oro_translation_language_index'));
