@@ -126,6 +126,9 @@ class LocaleListenerTest extends \PHPUnit_Framework_TestCase
         }
     }
 
+    /**
+     * @return array
+     */
     public function onKernelRequestDataProvider()
     {
         return [
@@ -213,7 +216,7 @@ class LocaleListenerTest extends \PHPUnit_Framework_TestCase
     {
         $event = $this->getMockBuilder('Symfony\Component\HttpKernel\Event\GetResponseEvent')
             ->disableOriginalConstructor()
-            ->setMethods(array('getRequest'))
+            ->setMethods(['getRequest'])
             ->getMock();
 
         $event->expects($this->once())

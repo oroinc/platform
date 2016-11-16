@@ -21,7 +21,7 @@ class TranslationStrategyPassTest extends \PHPUnit_Framework_TestCase
 
     public function testProcess()
     {
-        /* @var $compilerPass TranslationStrategyPass|\PHPUnit_Framework_MockObject_MockObject */
+        /** @var $compilerPass TranslationStrategyPass|\PHPUnit_Framework_MockObject_MockObject */
         $compilerPass = $this->getMockBuilder(TranslationStrategyPass::class)
             ->setMethods(['registerTaggedServices'])
             ->getMock();

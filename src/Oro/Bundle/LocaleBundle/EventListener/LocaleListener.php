@@ -202,7 +202,7 @@ class LocaleListener implements EventSubscriberInterface
     protected function getCurrentLocalization()
     {
         if ($this->currentLocalization === false) {
-            /* @var $provider CurrentLocalizationProvider */
+            /** @var $provider CurrentLocalizationProvider */
             $provider = $this->container->get('oro_locale.provider.current_localization');
             $this->currentLocalization = $provider->getCurrentLocalization();
         }

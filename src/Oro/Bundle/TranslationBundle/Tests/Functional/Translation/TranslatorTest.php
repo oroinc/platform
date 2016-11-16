@@ -126,7 +126,7 @@ class TranslatorTest extends WebTestCase
         $val1 = uniqid('TEST_VALUE1_', true);
         $val2 = uniqid('TEST_VALUE2_', true);
 
-        /* @var $manager TranslationManager */
+        /** @var $manager TranslationManager */
         $manager = $this->getContainer()->get('oro_translation.manager.translation');
         $manager->saveTranslation($key, $val1, 'lang1', TranslationManager::DEFAULT_DOMAIN, Translation::SCOPE_UI);
         $manager->saveTranslation($key, $val2, 'lang2', TranslationManager::DEFAULT_DOMAIN, Translation::SCOPE_UI);
