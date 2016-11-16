@@ -2,9 +2,7 @@
 
 namespace Oro\Bundle\SecurityBundle\Twig;
 
-use Oro\Bundle\SecurityBundle\Acl\Domain\DomainObjectWrapper;
 use Oro\Bundle\SecurityBundle\SecurityFacade;
-use Symfony\Component\Security\Acl\Domain\ObjectIdentity;
 use Symfony\Component\Security\Acl\Voter\FieldVote;
 
 class OroSecurityExtension extends \Twig_Extension
@@ -44,19 +42,6 @@ class OroSecurityExtension extends \Twig_Extension
      */
     public function checkResourceIsGranted($attributes, $object = null, $fieldName = null)
     {
-        if ($attributes === 'VIEW_WORKFLOW') {
-            return $this->securityFacade->isGranted(
-                'PERFORM_TRANSITION',
-                new FieldVote(
-                    new DomainObjectWrapper($object, new ObjectIdentity('workflow', 'b2c_flow_abandoned_shopping_cart')),
-                    'abandon'
-                )
-            );
-            return $this->securityFacade->isGranted(
-                $attributes,
-                new DomainObjectWrapper($object, new ObjectIdentity('workflow', 'b2c_flow_abandoned_shopping_cart'))
-            );
-        }
         if ($fieldName) {
             return $this->securityFacade->isGranted($attributes, new FieldVote($object, $fieldName));
         }
