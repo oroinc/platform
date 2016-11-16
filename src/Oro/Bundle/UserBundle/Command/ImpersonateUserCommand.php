@@ -72,6 +72,27 @@ class ImpersonateUserCommand extends ContainerAwareCommand
         );
         $output->writeln($url);
 
+        if (!$user instanceof User) {
+            return 0;
+        }
+
+        if (!$user->isEnabled()) {
+            $output->writeln(
+                '<comment>Warning: User is Disabled.' .
+                ' You cannot impersonate them until enabled!</comment>'
+            );
+        }
+
+        if ($user->getAuthStatus() && in_array($user->getAuthStatus()->getId(), ['expired', 'locked'])) {
+            $output->writeln(
+                sprintf(
+                    '<comment>Warning: Auth status is \'%s\'.' .
+                    ' You cannot impersonate them until it is set to \'Available\'!</comment>',
+                    $user->getAuthStatus()->getName()
+                )
+            );
+        }
+
         return 0;
     }
 

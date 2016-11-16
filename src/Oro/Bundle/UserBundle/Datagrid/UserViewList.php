@@ -21,7 +21,7 @@ class UserViewList extends AbstractViewsList
             'filters' => [
                 'auth_status' => [
                     'type' => EnumFilterType::TYPE_NOT_IN,
-                    'value' => ['locked'],
+                    'value' => ['expired'],
                 ],
                 'enabled' => [
                     'value' => BooleanFilterType::TYPE_YES,
@@ -46,15 +46,11 @@ class UserViewList extends AbstractViewsList
                 ],
                 'auth_status' => [
                     'type' => EnumFilterType::TYPE_IN,
-                    'value' => ['locked'],
+                    'value' => ['expired'],
                 ],
             ],
             'sorters' => [],
-            'columns' => [
-                'enabled' => [
-                    'renderable' => false,
-                ],
-            ],
+            'columns' => [],
         ],
         [
             'name' => 'user.disabled',
