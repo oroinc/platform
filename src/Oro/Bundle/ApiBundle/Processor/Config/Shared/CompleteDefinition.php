@@ -290,8 +290,8 @@ class CompleteDefinition implements ProcessorInterface
                         $associationType,
                         $associationKind
                     );
-                    $field->set('association-field', $targets[$entityClass]);
-                    $field->set('association-kind', $associationKind);
+                    $field->set(DataType::INVERSE_ASSOCIATION_FIELD, $targets[$entityClass]);
+                    $field->set(DataType::ASSOCIATION_KIND, $associationKind);
                 }
             }
         }

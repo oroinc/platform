@@ -7,6 +7,7 @@ use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 use Oro\Bundle\EntityExtendBundle\Tools\AssociationNameGenerator;
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
+use Oro\Bundle\ApiBundle\Request\DataType;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 
 /**
@@ -48,7 +49,7 @@ class SaveInverseRelations implements ProcessorInterface
         }
 
         $associationFieldConfig = $context->getParentConfig()->getField($context->getAssociationName());
-        if (!$associationFieldConfig->has('association-field')) {
+        if (!$associationFieldConfig->has(DataType::INVERSE_ASSOCIATION_FIELD)) {
             // association field config is no inverse part of extended association
             return;
         }
@@ -66,7 +67,7 @@ class SaveInverseRelations implements ProcessorInterface
         }
 
         $associationForm = $form->get($associationName);
-        $associationKind = $associationFieldConfig->get('association-kind');
+        $associationKind = $associationFieldConfig->get(DataType::ASSOCIATION_KIND);
         $setterMethodName = AssociationNameGenerator::generateSetTargetMethodName($associationKind) ;
         foreach ($associationForm->getNormData() as $item) {
             // set the association target (context parent entity) to the association source object

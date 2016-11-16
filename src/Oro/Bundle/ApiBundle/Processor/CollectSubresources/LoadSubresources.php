@@ -57,7 +57,7 @@ abstract class LoadSubresources implements ProcessorInterface
             } elseif (!empty($subresourceExcludedActions)) {
                 $subresource->setExcludedActions($subresourceExcludedActions);
             }
-            if ($association->has('association-field')) {
+            if ($association->has(DataType::INVERSE_ASSOCIATION_FIELD)) {
                 $subresource->setExcludedActions(['update_relationship', 'delete_relationship']);
             }
         } else {
@@ -160,7 +160,7 @@ abstract class LoadSubresources implements ProcessorInterface
         }
 
         // we should not skip inverse extend associations if such fields exists in config
-        if ($field->has('association-field')) {
+        if ($field->has(DataType::INVERSE_ASSOCIATION_FIELD)) {
             return false;
         }
 

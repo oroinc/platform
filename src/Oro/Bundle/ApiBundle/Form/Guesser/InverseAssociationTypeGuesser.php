@@ -71,7 +71,7 @@ class InverseAssociationTypeGuesser implements FormTypeGuesserInterface
                         $associationType,
                         $associationKind
                     );
-                    $associationMetadata->set('association-field', $targets[$class]);
+                    $associationMetadata->set(DataType::INVERSE_ASSOCIATION_FIELD, $targets[$class]);
                     $associationMetadata->setAssociationType($reverseType);
                     $associationMetadata->setIsCollection((bool)$fieldConfig->isCollectionValuedAssociation());
 

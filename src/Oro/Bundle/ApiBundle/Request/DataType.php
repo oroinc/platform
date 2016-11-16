@@ -21,6 +21,10 @@ final class DataType
     const ENTITY_CLASS     = 'entityClass';
     const ORDER_BY         = 'orderBy';
 
+    // todo: Delete this constants from this class.
+    const INVERSE_ASSOCIATION_FIELD = 'association-field';
+    const ASSOCIATION_KIND = 'association-kind';
+
     /**
      * Checks whether the field represents a nested object.
      *

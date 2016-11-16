@@ -160,7 +160,7 @@ class ObjectMetadataFactory
                 $associationType,
                 $associationKind
             );
-            $associationMetadata->set('association-field', $targets[$entityClass]);
+            $associationMetadata->set(DataType::INVERSE_ASSOCIATION_FIELD, $targets[$entityClass]);
             $associationMetadata->setAssociationType($reverseType);
             $associationMetadata->setIsCollection((bool)$field->isCollectionValuedAssociation());
         } else {
