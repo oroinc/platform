@@ -79,7 +79,7 @@ class NavigationItemBuilder implements BuilderInterface, FeatureToggleableInterf
             $items = $repo->getNavigationItems($user->getId(), $currentOrganization, $alias, $options);
             foreach ($items as $item) {
                 $route = $this->getMatchedRoute($item);
-                if (!$this->isRouteEnabled($route)) {
+                if (!$this->featureChecker->isResourceEnabled($route, 'routes')) {
                     continue;
                 }
 

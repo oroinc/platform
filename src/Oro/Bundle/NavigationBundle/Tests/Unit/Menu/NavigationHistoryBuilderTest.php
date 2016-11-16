@@ -54,7 +54,7 @@ class NavigationHistoryBuilderTest extends \PHPUnit_Framework_TestCase
 
         $this->builder = $this->getMockBuilder('Oro\Bundle\NavigationBundle\Menu\NavigationHistoryBuilder')
             ->setConstructorArgs(array($this->securityContext, $this->em, $this->factory, $this->router))
-            ->setMethods(array('getMenuManipulator', 'set', 'isRouteEnabled'))
+            ->setMethods(array('getMenuManipulator', 'set'))
             ->getMock();
 
         $this->featureChecker = $this->getMockBuilder(FeatureChecker::class)
@@ -136,8 +136,8 @@ class NavigationHistoryBuilderTest extends \PHPUnit_Framework_TestCase
             ->method('match')
             ->with($this->isType('string'))
             ->willReturn(['_route' => 'route']);
-        $this->builder->expects($this->exactly(2))
-            ->method('isRouteEnabled')
+        $this->featureChecker->expects($this->exactly(2))
+            ->method('isResourceEnabled')
             ->with($this->anything())
             ->willReturn(true);
         $menu->expects($this->exactly(2))
