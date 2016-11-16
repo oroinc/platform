@@ -22,7 +22,6 @@ class UserSubscriber implements EventSubscriberInterface
      */
     protected $security;
 
-
     /**
      * @param FormFactoryInterface      $factory        Factory to add new form children
      * @param SecurityContextInterface  $security       Security context
@@ -110,13 +109,13 @@ class UserSubscriber implements EventSubscriberInterface
                 ]
             )
         );
-
     }
 
     /**
      * Returns true if passed user is currently authenticated
      *
      * @param  AbstractUser $user
+     *
      * @return bool
      */
     protected function isCurrentUser(AbstractUser $user)

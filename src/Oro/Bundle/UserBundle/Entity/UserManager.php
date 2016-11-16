@@ -29,8 +29,7 @@ class UserManager extends BaseUserManager
         ManagerRegistry $registry,
         EncoderFactoryInterface $encoderFactory,
         EnumValueProvider $enumValueProvider
-    )
-    {
+    ) {
         parent::__construct($class, $registry, $encoderFactory);
 
         $this->enumValueProvider = $enumValueProvider;
@@ -47,6 +46,17 @@ class UserManager extends BaseUserManager
     public function getApi(User $user, Organization $organization)
     {
         return $this->getStorageManager()->getRepository('OroUserBundle:UserApi')->getApi($user, $organization);
+    }
+
+    /**
+     * Sets AuthStatus with enum value id
+     *
+     * @param User $user
+     * @param string $authStatus EnumValueId
+     */
+    public function setAuthStatus(User $user, $authStatus)
+    {
+        $user->setAuthStatus($this->enumValueProvider->getEnumValueByCode(self::AUTH_STATUS_ENUM_CODE, $authStatus));
     }
 
     /**
@@ -75,16 +85,5 @@ class UserManager extends BaseUserManager
 
             $user->addRole($role);
         }
-    }
-
-    /**
-     * Sets AuthStatus with enum value id
-     *
-     * @param User $user
-     * @param string $authStatus EnumValueId
-     */
-    public function setAuthStatus(User $user, $authStatus)
-    {
-        $user->setAuthStatus($this->enumValueProvider->getEnumValueByCode(self::AUTH_STATUS_ENUM_CODE, $authStatus));
     }
 }
