@@ -78,12 +78,27 @@ services:
         tags:
             - { name: monolog.logger, channel: oro_workflow }
 
+    oro_workflow.registry.definition_filter.features:
+        class: 'Oro\Bundle\WorkflowBundle\Model\Filter\FeatureCheckerWorkflowRegistryFilter'
+        public: false
+        arguments:
+            - '@oro_featuretoggle.checker.feature_checker'
+
+    oro_workflow.registry.definition_filter.scopes:
+        class: Oro\Bundle\WorkflowBundle\Model\Filter\WorkflowDefinitionScopesRegistryFilter
+        public: false
+        arguments:
+            - '@oro_scope.scope_manager'
+            - '@oro_workflow.repository.workflow_definition'
+
     oro_workflow.registry:
         class: 'Oro\Bundle\WorkflowBundle\Model\WorkflowRegistry'
         arguments:
             - '@doctrine'
             - '@oro_workflow.workflow_assembler'
-            - '@oro_featuretoggle.checker.feature_checker'
+        calls:
+            - ['addDefinitionFilter', ['@oro_workflow.registry.definition_filter.features']]
+            - ['addDefinitionFilter', ['@oro_workflow.registry.definition_filter.scopes']]
 
     oro_workflow.permission_registry:
         class: 'Oro\Bundle\WorkflowBundle\Model\WorkflowPermissionRegistry'
@@ -181,6 +196,12 @@ services:
             - '@oro_workflow.process.definitions_configurator'
             - '@oro_workflow.process.triggers_configurator'
             - '%oro_workflow.entity.process_definition.class%'
+
+    oro_workflow.repository.workflow_definition:
+        class: 'Oro\Bundle\WorkflowBundle\Entity\Repository\WorkflowDefinitionRepository'
+        parent: oro_entity.abstract_repository
+        arguments:
+            - '%oro_workflow.entity.workflow_definition.class%'
 
     oro_workflow.repository.workflow_item:
         class: 'Oro\Bundle\WorkflowBundle\Entity\Repository\WorkflowItemRepository'
