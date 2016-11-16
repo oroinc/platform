@@ -55,7 +55,7 @@ define(function(require) {
 
         setValue: function(values) {
             var oldValue = this.getValue();
-            if (oldValue.length !== values.length || _.difference(oldValue, values).length !== 0) {
+            if (!_.haveEqualSet(oldValue, values)) {
                 this.value = values;
                 this.$('[data-name="multi-checkbox-value-keeper"]').val(values).trigger('change');
             }

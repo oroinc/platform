@@ -25,7 +25,7 @@ define(function(require) {
                 return {
                     value: key,
                     text: text
-                }
+                };
             });
         }
     });
