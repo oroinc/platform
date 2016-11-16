@@ -172,6 +172,7 @@ operations:
                 action_group: user_enable
                 parameters_mapping:
                     data: $.data
+            - '@refresh_grid': users-grid
 
     user_disable:
         label: oro.user.action.disable.label
@@ -197,6 +198,7 @@ operations:
                 action_group: user_disable
                 parameters_mapping:
                     data: $.data
+            - '@refresh_grid': users-grid
 
 action_groups:
     reset_password:

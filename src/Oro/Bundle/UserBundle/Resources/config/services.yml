@@ -77,6 +77,13 @@ services:
             - '@security.context'
             - '@oro_security.acl.extension_selector'
 
+    oro_user.listener.password_changed_subscriber:
+        class: Oro\Bundle\UserBundle\EventListener\PasswordChangedSubscriber
+        arguments:
+            - '@oro_entity_extend.enum_value_provider'
+        tags:
+            - { name: doctrine.event_subscriber }
+
     oro_user.security.provider:
         class:                        %oro_user.security.provider.class%
         public:                       false

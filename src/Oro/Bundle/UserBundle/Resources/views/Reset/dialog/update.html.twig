@@ -14,6 +14,7 @@
                 mediator.trigger('widget_success:' + widget.getAlias());
                 mediator.trigger('widget_success:' + widget.getWid());
                 widget.remove();
+                mediator.execute('refreshPage');
             });
         });
         </script>
