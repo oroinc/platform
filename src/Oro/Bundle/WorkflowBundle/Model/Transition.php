@@ -622,6 +622,14 @@ class Transition
     }
 
     /**
+     * @return bool
+     */
+    public function isEmptyInitOptions()
+    {
+        return !count($this->getInitEntities()) && !count($this->getInitRoutes());
+    }
+
+    /**
      * @return string
      */
     public function getInitContextAttribute()
