@@ -453,3 +453,8 @@ services:
         parent: oro_user.scope_criteria_provider.user
         tags:
             - {name: oro_scope.provider, scopeType: menu_default_visibility, priority: 10}
+
+    oro_navigation.scope_criteria_provider.organization:
+        parent: oro_organization.scope_criteria_provider.organization
+        tags:
+            - {name: oro_scope.provider, scopeType: menu_default_visibility, priority: 20}

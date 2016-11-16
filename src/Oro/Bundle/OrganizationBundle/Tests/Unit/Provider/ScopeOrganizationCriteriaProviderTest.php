@@ -5,12 +5,13 @@ namespace Oro\Bundle\UserBundle\Tests\Unit\Provider;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 
+use Oro\Bundle\OrganizationBundle\Entity\Organization;
+use Oro\Bundle\OrganizationBundle\Provider\ScopeOrganizationCriteriaProvider;
 use Oro\Bundle\UserBundle\Entity\User;
-use Oro\Bundle\UserBundle\Provider\ScopeUserCriteriaProvider;
 
-class ScopeUserCriteriaProviderTest extends \PHPUnit_Framework_TestCase
+class ScopeOrganizationCriteriaProviderTest extends \PHPUnit_Framework_TestCase
 {
-    /** @var ScopeUserCriteriaProvider */
+    /** @var ScopeOrganizationCriteriaProvider */
     private $provider;
 
     /** @var TokenStorageInterface|\PHPUnit_Framework_MockObject_MockObject */
@@ -19,12 +20,15 @@ class ScopeUserCriteriaProviderTest extends \PHPUnit_Framework_TestCase
     protected function setUp()
     {
         $this->tokenStorage = $this->getMock(TokenStorageInterface::class);
-        $this->provider = new ScopeUserCriteriaProvider($this->tokenStorage);
+        $this->provider = new ScopeOrganizationCriteriaProvider($this->tokenStorage);
     }
 
     public function testGetCriteriaForCurrentScope()
     {
+        $organization = new Organization();
+
         $user = new User();
+        $user->setOrganization($organization);
 
         /** @var TokenInterface|\PHPUnit_Framework_MockObject_MockObject $token */
         $token = $this->getMock(TokenInterface::class);
@@ -38,7 +42,7 @@ class ScopeUserCriteriaProviderTest extends \PHPUnit_Framework_TestCase
             ->willReturn($token);
 
         $actual = $this->provider->getCriteriaForCurrentScope();
-        $this->assertEquals([ScopeUserCriteriaProvider::SCOPE_KEY => $user], $actual);
+        $this->assertEquals([ScopeOrganizationCriteriaProvider::SCOPE_KEY => $organization], $actual);
     }
 
     /**
@@ -58,28 +62,28 @@ class ScopeUserCriteriaProviderTest extends \PHPUnit_Framework_TestCase
      */
     public function contextDataProvider()
     {
-        $user = new User();
-        $userAware = new \stdClass();
-        $userAware->user = $user;
+        $organization = new Organization();
+        $organizationAware = new \stdClass();
+        $organizationAware->organization = $organization;
 
         return [
-            'array_context_with_user_key' => [
-                'context' => ['user' => $user],
-                'criteria' => ['user' => $user],
+            'array_context_with_organization_key' => [
+                'context' => ['organization' => $organization],
+                'criteria' => ['organization' => $organization],
             ],
-            'array_context_with_user_key_invalid_value' => [
-                'context' => ['user' => 123],
+            'array_context_with_organization_key_invalid_value' => [
+                'context' => ['organization' => 123],
                 'criteria' => [],
             ],
-            'array_context_without_user_key' => [
+            'array_context_without_organization_key' => [
                 'context' => [],
                 'criteria' => [],
             ],
-            'object_context_user_aware' => [
-                'context' => $userAware,
-                'criteria' => ['user' => $user],
+            'object_context_organization_aware' => [
+                'context' => $organizationAware,
+                'criteria' => ['organization' => $organization],
             ],
-            'object_context_not_user_aware' => [
+            'object_context_not_organization_aware' => [
                 'context' => new \stdClass(),
                 'criteria' => [],
             ],
