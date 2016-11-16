@@ -37,8 +37,9 @@ class LanguageCodeFormatter
             return $this->translator->trans('N/A');
         }
 
-        $name = Intl::getLocaleBundle()->getLocaleName(
+        $name = Intl::getLanguageBundle()->getLanguageName(
             $code,
+            null,
             $this->configManager->get(self::CONFIG_KEY_DEFAULT_LANGUAGE)
         );
 

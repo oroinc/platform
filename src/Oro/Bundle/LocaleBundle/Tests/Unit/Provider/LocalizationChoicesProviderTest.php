@@ -74,9 +74,9 @@ class LocalizationChoicesProviderTest extends \PHPUnit_Framework_TestCase
         $choices = $this->provider->getLanguageChoices();
 
         $this->assertInternalType('array', $choices);
-        $this->assertArrayHasKey('br_FR', $choices);
-        $this->assertArrayNotHasKey('ho', $choices);
-        $this->assertEquals('bretón (Francia)', $choices['br_FR']);
+        $this->assertArrayHasKey('zh_Hans', $choices);
+        $this->assertArrayNotHasKey('de_DE', $choices);
+        $this->assertEquals('chino simplificado', $choices['zh_Hans']);
     }
 
     public function testGetFormattingChoices()

@@ -47,7 +47,7 @@ class LocalizationChoicesProvider
      */
     public function getLanguageChoices()
     {
-        return Intl::getLocaleBundle()->getLocaleNames($this->getSystemLanguage());
+        return Intl::getLanguageBundle()->getLanguageNames($this->getSystemLanguage());
     }
 
     /**
