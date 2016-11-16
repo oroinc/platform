@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\NavigationBundle\Menu\Provider;
 
+// TODO: remove this class in ticket BB-5468
 interface OwnershipProviderInterface
 {
     /**

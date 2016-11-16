@@ -4,6 +4,7 @@ namespace Oro\Bundle\NavigationBundle\Menu\Provider;
 
 use Doctrine\ORM\EntityRepository;
 
+// TODO: remove this class in ticket BB-5468
 abstract class AbstractOwnershipProvider implements OwnershipProviderInterface
 {
     /** @var EntityRepository */

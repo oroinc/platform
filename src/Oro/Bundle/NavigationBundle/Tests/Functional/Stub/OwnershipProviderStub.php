@@ -5,6 +5,7 @@ namespace Oro\Bundle\NavigationBundle\Tests\Functional\Stub;
 use Oro\Bundle\NavigationBundle\Entity\MenuUpdateInterface;
 use Oro\Bundle\NavigationBundle\Menu\Provider\OwnershipProviderInterface;
 
+// TODO: remove this class in ticket BB-5468
 class OwnershipProviderStub implements OwnershipProviderInterface
 {
     /** @var MenuUpdateInterface[] */
