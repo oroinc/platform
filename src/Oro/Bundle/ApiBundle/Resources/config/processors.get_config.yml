@@ -164,6 +164,7 @@ services:
             - '@oro_api.resources_provider'
         tags:
             - { name: oro.api.processor, action: get_config, extra: !identifier_fields_only&definition, priority: -40 }
+            - { name: oro.api.processor, action: get_relation_config, extra: !identifier_fields_only&definition, priority: -40 }
 
     oro_api.get_config.complete_filters:
         class: Oro\Bundle\ApiBundle\Processor\Config\Shared\CompleteFilters
