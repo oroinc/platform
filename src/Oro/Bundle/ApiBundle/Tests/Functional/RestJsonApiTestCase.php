@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Functional;
 
+use Doctrine\ORM\EntityManager;
+
 use Symfony\Component\HttpFoundation\Response;
 
 use Oro\Bundle\ApiBundle\Request\RequestType;
@@ -50,5 +52,13 @@ class RestJsonApiTestCase extends ApiTestCase
         );
 
         return $this->client->getResponse();
+    }
+
+    /**
+     * @return EntityManager
+     */
+    protected function getEntityManager()
+    {
+        return $this->getContainer()->get('doctrine')->getManager();
     }
 }

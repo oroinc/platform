@@ -209,10 +209,10 @@ define(function(require) {
             });
             this.subview('email:' + emailItemView.cid, emailItemView);
             this.listenTo(emailItemView, {
-                'toggle': this.updateToggleAllAction,
+                'toggle': this.onEmailItemToggle,
                 'commentCountChanged': this.onCommentCountChange
             });
-            return emailItemView.deferredRender.promise();
+            return emailItemView.getDeferredRenderPromise();
         },
 
         /**
@@ -222,6 +222,11 @@ define(function(require) {
             _.each(this.subviews, function(emailItemView) {
                 emailItemView.refresh();
             });
+        },
+
+        onEmailItemToggle: function() {
+            this.updateToggleAllAction();
+            this.$el.trigger('content:changed');
         },
 
         /**

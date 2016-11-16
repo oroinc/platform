@@ -179,6 +179,17 @@ services:
         tags:
             - { name: oro.api.processor, action: update_relationship, group: transform_data, priority: -100 }
 
+    oro_api.update_relationship.restore_default_form_extension:
+        class: Oro\Bundle\ApiBundle\Processor\Shared\RestoreDefaultFormExtension
+        arguments:
+            - '@form.registry'
+            - '@oro_api.form.guesser.metadata'
+        tags:
+            - { name: oro.api.processor, action: update_relationship, group: transform_data, priority: -250 }
+            # add this processor to the begin of "normalize_result" group to make sure that
+            # the default form extension is restored even if an error occurred
+            - { name: oro.api.processor, action: update_relationship, group: normalize_result, priority: 250 }
+
     #
     # save_data
     #
@@ -193,14 +204,6 @@ services:
     #
     # normalize_result
     #
-
-    oro_api.update_relationship.restore_default_form_extension:
-        class: Oro\Bundle\ApiBundle\Processor\Shared\RestoreDefaultFormExtension
-        arguments:
-            - '@form.registry'
-            - '@oro_api.form.guesser.metadata'
-        tags:
-            - { name: oro.api.processor, action: update_relationship, group: normalize_result, priority: 250 }
 
     oro_api.update_relationship.rest.complete_errors:
         class: Oro\Bundle\ApiBundle\Processor\Shared\CompleteErrors
@@ -270,10 +273,15 @@ services:
             - { name: oro.api.processor, action: update_relationship, group: normalize_result, collection: false, requestType: json_api, priority: -55 }
             - { name: monolog.logger, channel: api }
 
+    oro_api.update_relationship.set_result_document:
+        class: Oro\Bundle\ApiBundle\Processor\Shared\SetResultDocument
+        tags:
+            - { name: oro.api.processor, action: update_relationship, group: normalize_result, priority: -150 }
+
     oro_api.update_relationship.process_errors:
         class: Oro\Bundle\ApiBundle\Processor\Shared\ProcessErrors
         tags:
-            - { name: oro.api.processor, action: update_relationship, group: normalize_result, priority: -100 }
+            - { name: oro.api.processor, action: update_relationship, group: normalize_result, priority: -190 }
 
     oro_api.update_relationship.json_api.validate_normalized_result_schema:
         class: Oro\Bundle\ApiBundle\Processor\Shared\JsonApi\ValidateNormalizedResultSchema

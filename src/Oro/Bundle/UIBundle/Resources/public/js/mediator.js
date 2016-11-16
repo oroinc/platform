@@ -14,6 +14,7 @@ define([
      */
     if (!mediator._listenId) {
         mediator._listenId = _.uniqueId('l');
+        mediator._listeners = {};
     }
 
     /**
