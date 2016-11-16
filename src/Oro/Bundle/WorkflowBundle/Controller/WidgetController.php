@@ -422,7 +422,9 @@ class WidgetController extends Controller
     {
         $errors = new ArrayCollection();
         $isAllowed = $workflow->isStartTransitionAvailable($transition, $entity, [], $errors);
-        if ($isAllowed || !$transition->isUnavailableHidden()) {
+        $isShown = $isAllowed || !$transition->isUnavailableHidden();
+
+        if ($isShown && $transition->isEmptyInitOptions()) {
             return [
                 'workflow' => $workflow,
                 'transition' => $transition,

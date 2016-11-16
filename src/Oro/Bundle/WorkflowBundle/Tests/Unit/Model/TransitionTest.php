@@ -397,4 +397,53 @@ class TransitionTest extends \PHPUnit_Framework_TestCase
         $obj->setFormOptions(['attribute_fields' => ['key' => 'value']]);
         $this->assertTrue($obj->hasForm());
     }
+
+    /**
+     * @dataProvider initContextProvider
+     *
+     * @param array $entities
+     * @param array $routes
+     * @param bool $result
+     */
+    public function testIsNotEmptyInitContext(array $entities, array $routes, $result)
+    {
+        $transition = new Transition();
+        $transition->setInitEntities($entities);
+        $transition->setInitRoutes($routes);
+        $this->assertSame($result, $transition->isEmptyInitOptions());
+    }
+
+    /**
+     * @return array
+     */
+    public function initContextProvider()
+    {
+        return [
+            [
+                'entities' => [],
+                'routes' => [],
+                'result' => true
+            ],
+            [
+                'entities' => ['entity'],
+                'routes' => [],
+                'result' => false
+            ],
+            [
+                'entities' => [],
+                'routes' => ['route'],
+                'result' => false
+            ],
+            [
+                'entities' => ['entity'],
+                'routes' => ['route'],
+                'result' => false
+            ],
+            [
+                'entities' => ['entity1', 'entity2'],
+                'routes' => ['route1', 'route2'],
+                'result' => false
+            ]
+        ];
+    }
 }
