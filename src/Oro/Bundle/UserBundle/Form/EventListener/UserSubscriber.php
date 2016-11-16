@@ -86,8 +86,12 @@ class UserSubscriber implements EventSubscriberInterface
             $form->remove('change_password');
         }
 
+        $enabledChoices = ['oro.user.enabled.disabled', 'oro.user.enabled.enabled'];
+
         // do not allow editing of Enabled status
         if (!empty($entity->getId())) {
+            $form->add('enabled', 'choice', ['choices' => $enabledChoices, 'mapped' => false]);
+
             return;
         }
 
@@ -100,7 +104,7 @@ class UserSubscriber implements EventSubscriberInterface
                     'label' => 'oro.user.enabled.label',
                     'required' => true,
                     'disabled' => false,
-                    'choices' => ['Disabled', 'Enabled'],
+                    'choices' => $enabledChoices,
                     'empty_value' => 'Please select',
                     'empty_data' => '',
                     'auto_initialize' => false
