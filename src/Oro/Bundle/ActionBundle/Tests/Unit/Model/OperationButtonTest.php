@@ -67,12 +67,10 @@ class OperationButtonTest extends \PHPUnit_Framework_TestCase
     /**
      * @dataProvider getTemplateDataDataProvider
      *
-     * @param null|string $group
      * @param array $expectedResult
      */
-    public function testGetTemplateData($group, array $expectedResult)
+    public function testGetTemplateData(array $expectedResult)
     {
-        $this->buttonContext->expects($this->once())->method('getGroup')->willReturn($group);
         $this->assertOperationMethodsCalled(new OperationDefinition());
 
         $templateData = $this->button->getTemplateData();
@@ -84,43 +82,11 @@ class OperationButtonTest extends \PHPUnit_Framework_TestCase
      */
     public function getTemplateDataDataProvider()
     {
-        $customButtonOptions = ['aCss' => 'btn'];
-        $params = (new OperationDefinition())->setButtonOptions($customButtonOptions);
-
         return [
-            'null as group' => [
-                'group' => null,
+            'correct' => [
                 'expectedResult' => [
                     'operation' => $this->getOperationMock(),
-                    'params' => $params,
-                ],
-            ],
-            OperationRegistry::DEFAULT_GROUP => [
-                'group' => OperationRegistry::DEFAULT_GROUP,
-                'expectedResult' => [
-                    'operation' => $this->getOperationMock(),
-                    'params' => $params,
-                ],
-            ],
-            OperationRegistry::VIEW_PAGE_GROUP => [
-                'group' => OperationRegistry::VIEW_PAGE_GROUP,
-                'expectedResult' => [
-                    'operation' => $this->getOperationMock(),
-                    'params' => $params,
-                ],
-            ],
-            OperationRegistry::UPDATE_PAGE_GROUP => [
-                'group' => OperationRegistry::UPDATE_PAGE_GROUP,
-                'expectedResult' => [
-                    'operation' => $this->getOperationMock(),
-                    'params' => $params,
-                ],
-            ],
-            'custom group' => [
-                'group' => uniqid(),
-                'expectedResult' => [
-                    'operation' => $this->getOperationMock(),
-                    'params' => (new OperationDefinition())->setButtonOptions([]),
+                    'params' => new OperationDefinition(),
                 ],
             ],
         ];

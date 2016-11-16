@@ -52,25 +52,6 @@ class OperationButton implements ButtonInterface
      */
     public function getTemplateData()
     {
-        $definition = $this->operation->getDefinition();
-        $buttonOptions = $definition->getButtonOptions();
-        $buttonGroups = [
-            null,
-            OperationRegistry::DEFAULT_GROUP,
-            OperationRegistry::UPDATE_PAGE_GROUP,
-            OperationRegistry::VIEW_PAGE_GROUP,
-        ];
-
-        if (in_array($this->getButtonContext()->getGroup(), $buttonGroups, true)) {
-            if (!isset($buttonOptions['aCss'])) {
-                $buttonOptions['aCss'] = '';
-            }
-
-            $buttonOptions['aCss'] .= 'btn';
-        }
-
-        $definition->setButtonOptions($buttonOptions);
-
         return [
             'operation' => $this->operation,
             'params' => $this->operation->getDefinition(),
