@@ -172,6 +172,11 @@ class WorkflowManager implements LoggerAwareInterface
     {
         //consider to refactor (e.g. remove) type check in favor of string usage only as most cases are
         $workflow = $workflow instanceof Workflow ? $workflow : $this->workflowRegistry->getWorkflow($workflow);
+
+        if (!$this->isStartAllowedForEntity($workflow, $entity)) {
+            return null;
+        }
+
         if (!$transition) {
             $transition = $workflow->getTransitionManager()->getDefaultStartTransition();
 
@@ -510,6 +515,31 @@ class WorkflowManager implements LoggerAwareInterface
                 return false;
             }
         }
+
+        return true;
+    }
+
+    /**
+     * Return false if the Workflow already started for the Entity
+     *
+     * @param Workflow $workflow
+     * @param object $entity
+     * @return bool
+     */
+    protected function isStartAllowedForEntity(Workflow $workflow, $entity)
+    {
+        static $startedWorkflows = [];
+
+        $entityId = $this->doctrineHelper->getSingleEntityIdentifier($entity);
+        if ($entityId && array_key_exists($workflow->getName(), $startedWorkflows)) {
+            foreach ($startedWorkflows[$workflow->getName()] as $startedEntity) {
+                $startedEntityId = $this->doctrineHelper->getSingleEntityIdentifier($startedEntity);
+                if ($startedEntityId && ($startedEntityId === $entityId)) {
+                    return false;
+                }
+            }
+        }
+        $startedWorkflows[$workflow->getName()][] = $entity;
 
         return true;
     }
