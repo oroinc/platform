@@ -25,7 +25,7 @@ class TranslationStrategyProvider
      */
     public function getStrategy()
     {
-        if (null === $this->strategy) {
+        if (!$this->strategy) {
             foreach ($this->strategies as $strategy) {
                 if ($strategy->isApplicable()) {
                     $this->strategy = $strategy;

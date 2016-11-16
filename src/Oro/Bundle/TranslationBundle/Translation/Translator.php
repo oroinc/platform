@@ -195,8 +195,7 @@ class Translator extends BaseTranslator
      */
     public function addResource($format, $resource, $locale, $domain = null)
     {
-        if (is_string($resource) && is_file($resource) &&
-                (!isset($this->resourceFiles[$locale]) || !in_array($resource, $this->resourceFiles, true))) {
+        if (is_string($resource)) {
             $this->resourceFiles[$locale][] = $resource;
         }
 
@@ -233,7 +232,15 @@ class Translator extends BaseTranslator
 
         $options = array_merge(
             $this->originalOptions,
-            ['cache_dir' => $tmpDir, 'resource_files' => $this->resourceFiles]
+            [
+                'cache_dir' => $tmpDir,
+                'resource_files' => array_map(
+                    function (array $localeResources) {
+                        return array_unique($localeResources);
+                    },
+                    $this->resourceFiles
+                )
+            ]
         );
 
         $provider = $this->getStrategyProvider();
