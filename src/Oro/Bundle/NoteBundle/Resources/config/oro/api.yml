@@ -1,0 +1,16 @@
+api:
+    entities:
+        Oro\Bundle\NoteBundle\Entity\Note:
+            fields:
+                target:
+                    description: The entity to which the current note is belongs
+                    data_type: association:manyToOne
+            subresources:
+                target:
+                    actions:
+                        get_subresource:
+                            documentation: Get entity that is associated with the given note
+                        get_relationship:
+                            documentation: Get entity relationship reference that is associated with the given note
+                        update_relationship:
+                            documentation: Change entity relationship that is associated with the given note
