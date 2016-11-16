@@ -266,7 +266,7 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
             $this->getContainer($loader, $strategyProvider),
             new MessageSelector(),
             array('loader' => array('loader')),
-            $options
+            array_merge(['resource_files' => []], $options)
         );
 
         $translator->addResource('loader', 'foo', 'fr');
@@ -322,7 +322,7 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
             ->method('get')
             ->willReturn($this->getStrategyProvider());
         $translator = $this->getMockBuilder('Oro\Bundle\TranslationBundle\Translation\Translator')
-                ->setConstructorArgs([$container, new MessageSelector()])
+                ->setConstructorArgs([$container, new MessageSelector(), [], ['resource_files' => []]])
                 ->setMethods(['addResource'])
                 ->getMock();
         $translator->setLocale($locale);
@@ -347,7 +347,7 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
         $translator = $this->getMockBuilder('Oro\Bundle\TranslationBundle\Translation\Translator')
-            ->setConstructorArgs([$container, new MessageSelector()])
+            ->setConstructorArgs([$container, new MessageSelector(), [], ['resource_files' => []]])
             ->setMethods(['addResource'])
             ->getMock();
         $translationManager = $this
@@ -459,6 +459,9 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
             ->method('getFallbackLocales')
             ->willReturn([]);
 
+        $strategyProvider->addStrategy($firstStrategy);
+        $strategyProvider->addStrategy($secondStrategy);
+
         $translator = $this->getTranslator($this->getLoader(), $strategyProvider);
 
         $strategyProvider->setStrategy($firstStrategy);
@@ -470,39 +473,5 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
         $translator->getCatalogue('ru');
         $this->assertAttributeEquals($secondStrategyName, 'strategyName', $translator);
         $this->assertAttributeCount(1, 'catalogues', $translator);
-    }
-
-    public function testWarmUp()
-    {
-        $strategyName = 'default';
-        $allFallbackLocales = ['en_US', 'en'];
-
-        /** @var TranslationStrategyInterface|\PHPUnit_Framework_MockObject_MockObject $strategy */
-        $strategy = $this->getMock('Oro\Bundle\TranslationBundle\Strategy\TranslationStrategyInterface');
-        $strategy->expects($this->any())
-            ->method('getName')
-            ->willReturn($strategyName);
-
-        /** @var TranslationStrategyProvider|\PHPUnit_Framework_MockObject_MockObject $strategyProvider */
-        $strategyProvider = $this->getMockBuilder('Oro\Bundle\TranslationBundle\Strategy\TranslationStrategyProvider')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $strategyProvider->expects($this->any())
-            ->method('getStrategy')
-            ->willReturn($strategy);
-        $strategyProvider->expects($this->any())
-            ->method('getAllFallbackLocales')
-            ->with($strategy)
-            ->willReturn($allFallbackLocales);
-
-        $translator = $this->getTranslator($this->getLoader(), $strategyProvider);
-
-        $this->assertAttributeEmpty('strategyName', $translator);
-        $this->assertEmpty($translator->getFallbackLocales());
-
-        $translator->warmUp('/cache_dir');
-
-        $this->assertAttributeEquals($strategyName, 'strategyName', $translator);
-        $this->assertEquals($allFallbackLocales, $translator->getFallbackLocales());
     }
 }
