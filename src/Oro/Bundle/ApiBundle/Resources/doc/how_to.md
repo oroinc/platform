@@ -315,3 +315,28 @@ will assign the `attachment` with id `1` to the `user` with id `11`
   }
 }
 ```
+
+Sometimes it is required to have ability to manipulate an inverse part of extend associations. For example, to see all the notes that was assigned for some entity.
+
+Developer can do this with declaration an API processor service based on [InverseAssociationRelationFields](../../ApiBundle/Processor/Config/SharedInverseAssociationRelationFields.php) class.
+
+For example:
+
+```yaml
+# your_bundle/Resources/config/services.yml
+
+you_bundle.api.add_inverse_association:
+    class: Oro\Bundle\ApiBundle\Processor\Config\Shared\InverseAssociationRelationFields
+    arguments:
+        - '@oro_entity_config.provider.extend'
+        - '@oro_api.doctrine_helper'
+        - '@oro_api.value_normalizer'
+    calls:
+        - [setAssociationClass, ['Your\Bundle\Entity\AssociationSourceEntity']]
+    tags:
+        - { name: oro.api.processor, action: get_config, extra: !identifier_fields_only&definition, priority: -29
+```
+
+During declaration, the developer should set the source class name as parameter to `setAssociationClass` method call.
+
+After that, all the target entities will have additional API resources to get relationships and subresources and an API resource to add new relationship.
