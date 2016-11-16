@@ -39,7 +39,7 @@ class OroNavigationBundleInstaller implements Installation
         $this->addOroNavigationPageStateForeignKeys($schema);
         $this->addOroNavigationMenuUpdateTitleForeignKeys($schema);
         $this->addOroNavigationMenuUpdateDescriptionForeignKeys($schema);
-        $this->addOroNavigationTitleForeignKeys($schema);
+        $this->addOroNavigationMenuUpdateForeignKeys($schema);
     }
 
     /**
@@ -319,7 +319,7 @@ class OroNavigationBundleInstaller implements Installation
      *
      * @param Schema $schema
      */
-    protected function addOroNavigationTitleForeignKeys(Schema $schema)
+    protected function addOroNavigationMenuUpdateForeignKeys(Schema $schema)
     {
         $table = $schema->getTable('oro_navigation_menu_upd');
         $table->addForeignKeyConstraint(
