@@ -59,6 +59,7 @@ services:
             - %oro_user.entity.class%
             - '@doctrine'
             - '@security.encoder_factory'
+            - '@oro_entity_extend.enum_value_provider'
 
     oro_user.manager.api:
         class: %oro_user.manager.api.class%
@@ -287,10 +288,10 @@ services:
 
     oro_user.handler.reset_password_handler:
         class: Oro\Bundle\UserBundle\Handler\ResetPasswordHandler
+        lazy: true
         arguments:
             - '@oro_notification.manager.email_notification'
             - '@oro_user.manager'
-            - '@oro_entity_extend.enum_value_provider'
             - '@doctrine'
             - '@logger'
 

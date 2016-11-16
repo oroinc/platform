@@ -11,20 +11,19 @@ use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Translation\TranslatorInterface;
 
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
-use Oro\Bundle\EntityExtendBundle\Provider\EnumValueProvider;
 use Oro\Bundle\OrganizationBundle\Entity\Manager\BusinessUnitManager;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\UserBundle\Entity\UserManager;
 
 /**
- * Class UserHandler
- *
- * @package Oro\Bundle\UserBundle\Form\Handler
+ * Handle User forms
  *
  * @SuppressWarnings(PHPMD.ExcessiveParameterList)
  */
 class UserHandler extends AbstractUserHandler
 {
+    const STATUS_AVAILABLE = 'available';
+
     /** @var DelegatingEngine */
     protected $templating;
 
@@ -46,14 +45,10 @@ class UserHandler extends AbstractUserHandler
     /** @var ConfigManager */
     protected $userConfigManager;
 
-    /** @var EnumValueProvider */
-    private $enumValueProvider;
-
     /**
      * @param FormInterface $form
      * @param Request $request
      * @param UserManager $manager
-     * @param EnumValueProvider $enumValueProvider
      * @param ConfigManager $userConfigManager
      * @param DelegatingEngine $templating
      * @param \Swift_Mailer $mailer
@@ -65,7 +60,6 @@ class UserHandler extends AbstractUserHandler
         FormInterface $form,
         Request $request,
         UserManager $manager,
-        EnumValueProvider $enumValueProvider,
         ConfigManager $userConfigManager = null,
         DelegatingEngine $templating = null,
         \Swift_Mailer $mailer = null,
@@ -74,13 +68,13 @@ class UserHandler extends AbstractUserHandler
         LoggerInterface $logger = null
     ) {
         parent::__construct($form, $request, $manager);
+
         $this->userConfigManager = $userConfigManager;
         $this->templating = $templating;
         $this->mailer = $mailer;
         $this->flashBag = $flashBag;
         $this->translator = $translator;
         $this->logger = $logger;
-        $this->enumValueProvider = $enumValueProvider;
     }
 
     /**
@@ -117,7 +111,7 @@ class UserHandler extends AbstractUserHandler
     protected function onSuccess(User $user)
     {
         if (null === $user->getAuthStatus()) {
-            $user->setAuthStatus($this->enumValueProvider->getEnumValueByCode('auth_status', 'available'));
+            $this->manager->setAuthStatus($user, self::STATUS_AVAILABLE);
         }
 
         $this->manager->updateUser($user);

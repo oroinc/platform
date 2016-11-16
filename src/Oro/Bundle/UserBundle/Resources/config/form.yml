@@ -214,7 +214,6 @@ services:
             - '@oro_user.form.user'
             - '@request'
             - '@oro_user.manager'
-            - '@oro_entity_extend.enum_value_provider'
             - '@oro_config.user'
             - '@templating'
             - '@oro_email.direct_mailer'
@@ -231,7 +230,6 @@ services:
             - '@oro_user.form.user.api'
             - '@request'
             - '@oro_user.manager'
-            - '@oro_entity_extend.enum_value_provider'
 
     oro_user.form.handler.role.api:
         class:                        %oro_user.form.handler.role.class%
@@ -251,11 +249,7 @@ services:
     oro_user.form.handler.reset:
         class:                        %oro_user.form.handler.reset.class%
         scope:                        request
-        arguments:
-            - '@oro_user.form.reset'
-            - '@request'
-            - '@oro_user.manager'
-            - '@oro_entity_extend.enum_value_provider'
+        arguments:                    ["@oro_user.form.reset", "@request", "@oro_user.manager"]
 
     oro_user.form.handler.status:
         class:                        %oro_user.form.handler.status.class%

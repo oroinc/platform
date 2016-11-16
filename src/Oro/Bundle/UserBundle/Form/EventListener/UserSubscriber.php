@@ -9,7 +9,6 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Security\Core\SecurityContextInterface;
 
 use Oro\Bundle\UserBundle\Entity\AbstractUser;
-use Oro\Bundle\UserBundle\Entity\User;
 
 class UserSubscriber implements EventSubscriberInterface
 {

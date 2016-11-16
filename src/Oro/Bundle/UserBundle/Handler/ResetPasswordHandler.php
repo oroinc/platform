@@ -7,7 +7,6 @@ use Psr\Log\LoggerInterface;
 use Doctrine\Bundle\DoctrineBundle\Registry;
 
 use Oro\Bundle\EmailBundle\Entity\EmailTemplate;
-use Oro\Bundle\EntityExtendBundle\Provider\EnumValueProvider;
 use Oro\Bundle\NotificationBundle\Manager\EmailNotificationManager;
 use Oro\Bundle\NotificationBundle\Model\EmailNotification;
 use Oro\Bundle\UserBundle\Entity\User;
@@ -24,20 +23,15 @@ class ResetPasswordHandler
     /** @var EmailTemplate */
     protected $template;
 
-    /** @var EnumValueProvider */
-    private $enumValueProvider;
-
     /**
      * @param EmailNotificationManager $mailManager
      * @param UserManager $userManager
-     * @param EnumValueProvider $enumValueProvider
      * @param Registry $registry
      * @param LoggerInterface $logger
      */
     public function __construct(
         EmailNotificationManager $mailManager,
         UserManager $userManager,
-        EnumValueProvider $enumValueProvider,
         Registry $registry,
         LoggerInterface $logger
     ) {
@@ -45,7 +39,6 @@ class ResetPasswordHandler
         $this->userManager = $userManager;
         $this->template = $registry->getRepository(EmailTemplate::class)->findOneByName(self::TEMPLATE_NAME);
         $this->logger = $logger;
-        $this->enumValueProvider = $enumValueProvider;
     }
 
     /**
@@ -66,8 +59,7 @@ class ResetPasswordHandler
             $user->setConfirmationToken($user->generateToken());
         }
 
-        $user->setAuthStatus($this->enumValueProvider->getEnumValueByCode('auth_status', self::STATUS_EXPIRED));
-
+        $this->userManager->setAuthStatus($user, self::STATUS_EXPIRED);
         $this->userManager->updateUser($user);
 
         try {

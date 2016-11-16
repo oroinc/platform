@@ -2,14 +2,40 @@
 
 namespace Oro\Bundle\UserBundle\Entity;
 
+use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\Common\Util\ClassUtils;
 
+use Symfony\Component\Security\Core\Encoder\EncoderFactoryInterface;
 use Symfony\Component\Security\Core\Role\RoleInterface;
 
+use Oro\Bundle\EntityExtendBundle\Provider\EnumValueProvider;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 
 class UserManager extends BaseUserManager
 {
+    const AUTH_STATUS_ENUM_CODE = 'auth_status';
+
+    /** @var EnumValueProvider */
+    protected $enumValueProvider;
+
+    /**
+     * @param string $class
+     * @param ManagerRegistry $registry
+     * @param EncoderFactoryInterface $encoderFactory
+     * @param EnumValueProvider $enumValueProvider
+     */
+    public function __construct(
+        $class,
+        ManagerRegistry $registry,
+        EncoderFactoryInterface $encoderFactory,
+        EnumValueProvider $enumValueProvider
+    )
+    {
+        parent::__construct($class, $registry, $encoderFactory);
+
+        $this->enumValueProvider = $enumValueProvider;
+    }
+
     /**
      * Return related repository
      *
@@ -49,5 +75,16 @@ class UserManager extends BaseUserManager
 
             $user->addRole($role);
         }
+    }
+
+    /**
+     * Sets AuthStatus with enum value id
+     *
+     * @param User $user
+     * @param string $authStatus EnumValueId
+     */
+    public function setAuthStatus(User $user, $authStatus)
+    {
+        $user->setAuthStatus($this->enumValueProvider->getEnumValueByCode(self::AUTH_STATUS_ENUM_CODE, $authStatus));
     }
 }
