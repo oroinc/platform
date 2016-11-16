@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\NoteBundle\Migrations\Schema\v1_3;
 
+use Doctrine\DBAL\Schema\Comparator;
 use Psr\Log\LoggerInterface;
 
 use Doctrine\DBAL\Types\Type;
@@ -64,6 +65,8 @@ class UpdateAssociationKindQuery implements MigrationQuery, ConnectionAwareInter
      */
     public function execute(LoggerInterface $logger)
     {
+        $fromSchema = clone $this->schema;
+
         $sql = 'SELECT id, class_name, data FROM oro_entity_config';
         $entityConfigs = $this->connection->fetchAll($sql);
         $this->logQuery($logger, $sql);
@@ -120,6 +123,15 @@ class UpdateAssociationKindQuery implements MigrationQuery, ConnectionAwareInter
         ];
         $this->connection->executeUpdate($sql, $parameters);
         $this->logQuery($logger, $sql, $parameters);
+
+        $comparator = new Comparator();
+        $platform   = $this->connection->getDatabasePlatform();
+        $schemaDiff = $comparator->compare($fromSchema, $this->schema);
+        $queries    = $schemaDiff->toSql($platform);
+        foreach ($queries as $query) {
+            $this->logQuery($logger, $query);
+            $this->connection->executeQuery($query);
+        }
     }
 
     /**
