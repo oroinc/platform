@@ -530,10 +530,10 @@ class WorkflowManager implements LoggerAwareInterface
     {
         static $startedWorkflows = [];
 
-        $entityId = $this->doctrineHelper->getEntityIdentifier($entity);
+        $entityId = $this->doctrineHelper->getSingleEntityIdentifier($entity);
         if ($entityId && array_key_exists($workflow->getName(), $startedWorkflows)) {
             foreach ($startedWorkflows[$workflow->getName()] as $startedEntity) {
-                $startedEntityId = $this->doctrineHelper->getEntityIdentifier($startedEntity);
+                $startedEntityId = $this->doctrineHelper->getSingleEntityIdentifier($startedEntity);
                 if ($startedEntityId && ($startedEntityId === $entityId)) {
                     return false;
                 }

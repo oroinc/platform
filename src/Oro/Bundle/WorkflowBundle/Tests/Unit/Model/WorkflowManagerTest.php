@@ -449,7 +449,7 @@ class WorkflowManagerTest extends \PHPUnit_Framework_TestCase
         $workflow->expects($this->once())
             ->method('getDefinition')
             ->willReturn($workflowDefinition);
-        $workflow->expects($this->exactly(2))
+        $workflow->expects($this->atLeastOnce())
             ->method('getName')
             ->willReturn('test_workflow');
 
@@ -493,7 +493,7 @@ class WorkflowManagerTest extends \PHPUnit_Framework_TestCase
         $em->expects($this->once())->method('persist')->with($workflowItem);
         $em->expects($this->once())->method('flush');
 
-        $this->doctrineHelper->expects($this->any())->method('getEntityIdentifier')
+        $this->doctrineHelper->expects($this->any())->method('getSingleEntityIdentifier')
             ->willReturnCallback(function (EntityStub $entity) {
                 return $entity->getId();
             });
@@ -1188,9 +1188,13 @@ class WorkflowManagerTest extends \PHPUnit_Framework_TestCase
             ->with($entity)
             ->will($this->returnValue(EntityStub::class));
 
+        $this->doctrineHelper->expects($this->any())->method('getSingleEntityIdentifier')
+            ->willReturnCallback(function ($entityParam) use ($entity) {
+                return $entityParam === $entity ? $entity->getId() : null;
+            });
+
         $this->doctrineHelper->expects($this->any())
             ->method('getSingleEntityIdentifier')
-            ->with($entity)
             ->will($this->returnValue($entity->getId()));
 
         $workflowItemsRepository = $this->getMockBuilder(WorkflowItemRepository::class)
