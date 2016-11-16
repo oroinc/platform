@@ -7,13 +7,18 @@ use Oro\Bundle\OrganizationBundle\Entity\Organization;
 interface RepositoryCurrencyCheckerProviderInterface
 {
     /**
-     * Return translated label of entity
+     * Return entity label translation id
      *
      * @return string
      */
     public function getEntityLabel();
 
     /**
+     * This method should return result of checking on existence
+     * entity records that use currencies that user want to remove.
+     *
+     * Pass no organization in case when user try to remove currency on system level.
+     *
      * @param array             $currenciesOnRemove
      * @param Organization|null $organization
      *
