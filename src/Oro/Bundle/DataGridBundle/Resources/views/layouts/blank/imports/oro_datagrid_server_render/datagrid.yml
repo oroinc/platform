@@ -7,14 +7,17 @@ layout:
     actions:
         - '@setBlockTheme':
             themes:
-                - 'datagrid.html.twig'
-                - 'datagrid_header.html.twig'
-                - 'datagrid_body.html.twig'
                 - 'datagrid_toolbar.html.twig'
+                - 'datagrid.html.twig'
 
         - '@setOption':
             id: __datagrid
             optionName: split_to_cells
+            optionValue: true
+
+        - '@setOption':
+            id: __datagrid
+            optionName: server_side_render
             optionValue: true
 
         - '@move':

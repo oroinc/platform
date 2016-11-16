@@ -1,6 +1,6 @@
-{% block __oro_datagrid_server_render__datagrid_toolbar_widget %}
+{% block server_render_datagrid_toolbar_widget %}
     {% set attr = attr|merge({
-        class: attr.class|default('') ~ " grid-toolbar"
+    class: attr.class|default('') ~ " grid-toolbar"
     }) %}
 
     <div{{ block('block_attributes') }}>
@@ -9,10 +9,10 @@
     </div>
 {% endblock %}
 
-{% block __oro_datagrid_server_render__datagrid_toolbar_pagination_widget %}
+{% block server_render_datagrid_toolbar_pagination_widget %}
     {% set attr = attr|merge({
-        class: attr.class|default('') ~ " pagination pagination-centered",
-        'data-grid-pagination': ''
+    class: attr.class|default('') ~ " pagination pagination-centered",
+    'data-grid-pagination': ''
     }) %}
 
     <div class="grid__tool">
@@ -48,10 +48,10 @@
     </div>
 {% endblock %}
 
-{% block __oro_datagrid_server_render__datagrid_toolbar_page_size_widget %}
+{% block server_render_datagrid_toolbar_page_size_widget %}
     {% set attr = attr|merge({
-        class: attr.class|default('') ~ " page-size pull-right form-horizontal",
-        'data-grid-pagesize': ''
+    class: attr.class|default('') ~ " page-size pull-right form-horizontal",
+    'data-grid-pagesize': ''
     }) %}
 
     {% set metadata = oro_datagrid_metadata(datagrid) %}
@@ -77,10 +77,10 @@
     {% endif %}
 {% endblock %}
 
-{% block __oro_datagrid_server_render__datagrid_toolbar_actions_widget %}
+{% block server_render_datagrid_toolbar_actions_widget %}
     {% set attr = attr|merge({
-        class: attr.class|default('') ~ " actions-panel pull-right form-horizontal",
-        'data-grid-actions-panel': ''
+    class: attr.class|default('') ~ " actions-panel pull-right form-horizontal",
+    'data-grid-actions-panel': ''
     }) %}
 
     <div{{ block('block_attributes') }}>

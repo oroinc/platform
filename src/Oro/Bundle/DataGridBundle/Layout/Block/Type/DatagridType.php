@@ -139,7 +139,29 @@ class DatagridType extends AbstractContainerType
     public function finishView(BlockView $view, BlockInterface $block)
     {
         if ($view->vars['server_side_render']) {
-            BlockUtils::registerPlugin($view, 'server_side_datagrid');
+            BlockUtils::registerPlugin($view, 'server_render_' . $view->vars['block_type']);
+
+            $namespace = substr($block->getId(), 0, strrpos($block->getId(), '_'));
+
+            foreach ($view->children as $childView) {
+                $this->addServerRenderBlockPrefix($childView, $namespace);
+            }
+        }
+    }
+
+    /**
+     * @param BlockView $view
+     * @param string $namespace
+     */
+    private function addServerRenderBlockPrefix(BlockView $view, $namespace)
+    {
+        $suffix = substr($view->vars['unique_block_prefix'], strlen($namespace) + 2);
+        $view->vars['additional_block_prefixes'][] = 'server_render_' . $view->vars['block_type'];
+        $view->vars['additional_block_prefixes'][] = 'server_render_' . $suffix;
+        $view->vars['additional_block_prefixes'] = array_unique($view->vars['additional_block_prefixes']);
+
+        foreach ($view->children as $childView) {
+            $this->addServerRenderBlockPrefix($childView, $namespace);
         }
     }
 

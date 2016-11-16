@@ -58,6 +58,13 @@ class BaseType extends AbstractType
                 $view->vars['label_attr'] = $options->get('label_attr', false);
             }
         }
+
+        // add core variables to the block view, like id, block type and variables required for rendering engine
+        $view->vars['id']                   = $block->getId();
+        $view->vars['block_type_widget_id'] = $block->getTypeName() . '_widget';
+        $view->vars['block_type']           = $block->getTypeName();
+        $view->vars['unique_block_prefix']  = '_' . preg_replace('/[^a-z0-9_]+/i', '_', $block->getId());
+        $view->vars['cache_key']            = sprintf('_%s_%s', $block->getId(), $block->getTypeName());
     }
 
     /**
@@ -75,28 +82,18 @@ class BaseType extends AbstractType
         // add the translation domain
         $view->vars['translation_domain'] = $this->getTranslationDomain($view);
 
-        // add core variables to the block view, like id, block type and variables required for rendering engine
-        $id   = $block->getId();
-        $name = $block->getTypeName();
-
         // the block prefix must contain only letters, numbers and underscores (_)
         // due to limitations of block names in TWIG
-        $uniqueBlockPrefix = '_' . preg_replace('/[^a-z0-9_]+/i', '_', $id);
-        $blockPrefixes     = $block->getTypeHelper()->getTypeNames($name);
+        $blockPrefixes = $block->getTypeHelper()->getTypeNames($block->getTypeName());
 
         if (!empty($view->vars['additional_block_prefixes'])) {
             $blockPrefixes = array_merge($blockPrefixes, $view->vars['additional_block_prefixes']);
         }
         unset($view->vars['additional_block_prefixes']);
 
-        $blockPrefixes[]   = $uniqueBlockPrefix;
+        $blockPrefixes[] = $view->vars['unique_block_prefix'];
 
-        $view->vars['id']                   = $id;
-        $view->vars['block_type']           = $name;
-        $view->vars['block_type_widget_id'] = $name . '_widget';
-        $view->vars['unique_block_prefix']  = $uniqueBlockPrefix;
-        $view->vars['block_prefixes']       = $blockPrefixes;
-        $view->vars['cache_key']            = sprintf('_%s_%s', $id, $name);
+        $view->vars['block_prefixes'] = $blockPrefixes;
 
         if (isset($view->vars['attr']['id']) && !isset($view->vars['label_attr']['for'])) {
             $view->vars['label_attr']['for'] = $view->vars['attr']['id'];

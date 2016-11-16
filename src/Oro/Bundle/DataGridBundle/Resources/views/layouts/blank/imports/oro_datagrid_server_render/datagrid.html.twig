@@ -1,4 +1,4 @@
-{% block __oro_datagrid_server_render__datagrid_widget %}
+{% block server_render_datagrid_widget %}
     {% set datagrid = oro_datagrid_build(grid_name, grid_parameters) %}
     {% set gridId = oro_datagrid_generate_element_id(datagrid) %}
     {% set renderParams = grid_render_parameters %}
@@ -11,7 +11,7 @@
     {% set gridClass = renderParams.cssClass is defined ? gridClass ~ ' ' ~ renderParams.cssClass : gridClass %}
     {% if gridClass %}
         {% set attr = attr|merge({
-            class: gridClass
+        class: gridClass
         }) %}
     {% endif %}
 
@@ -35,15 +35,15 @@
                     <div class="grid-container">
                         <table class="grid table-hover table table-bordered table-condensed">
                             <thead class="grid-header">
-                                {% do block[id ~ '_header_row']|merge_context({'datagrid': datagrid}) %}
-                                {{ block_widget(block[id ~ '_header_row']) }}
+                            {% do block[id ~ '_header_row']|merge_context({'datagrid': datagrid}) %}
+                            {{ block_widget(block[id ~ '_header_row']) }}
                             </thead>
 
                             <tbody class="grid-body">
-                                {% for datagrid_row in datagridData.data %}
-                                    {% do block[id ~ '_row']|merge_context({'datagrid_row': datagrid_row}) %}
-                                    {{ block_widget(block[id ~ '_row']) }}
-                                {% endfor %}
+                            {% for datagrid_row in datagridData.data %}
+                                {% do block[id ~ '_row']|merge_context({'datagrid_row': datagrid_row}) %}
+                                {{ block_widget(block[id ~ '_row']) }}
+                            {% endfor %}
                             </tbody>
 
                             <tfoot class="grid-footer"></tfoot>
@@ -63,3 +63,78 @@
         </div>
     </div>
 {% endblock %}
+
+{% block server_render_datagrid_header_row_widget %}
+    {% set attr = attr|merge({
+        class: attr.class|default('') ~ " grid-header-row"
+    }) %}
+
+    <tr{{ block('block_attributes') }}>
+        {% for child in block if child.vars.visible -%}
+            {% do child|merge_context({'datagrid': datagrid}) %}
+            {{ block_widget(child) }}
+        {%- endfor %}
+    </tr>
+{% endblock %}
+
+{% block server_render_datagrid_header_cell_widget %}
+    {% set columnAttributes = oro_datagrid_column_attributes(datagrid, column_name) %}
+
+    {% set columnClass = " grid-cell grid-header-cell grid-header-cell-" ~ column_name ~ " " ~columnAttributes.type ~ "-cell" %}
+    {% if columnAttributes.sortable is defined and columnAttributes.sortable %}
+        {% set columnClass = columnClass ~ " sortable" %}
+    {% endif %}
+
+    {% if columnAttributes.renderable is defined and columnAttributes.renderable %}
+        {% set columnClass = columnClass ~ " renderable" %}
+    {% endif %}
+
+    {% set attr = attr|merge({
+        class: attr.class|default('') ~ columnClass
+    }) %}
+
+    <th{{ block('block_attributes') }}>
+        {% if columnAttributes.sortable is defined and columnAttributes.sortable %}
+            <a class="grid-header-cell__link" href="#">
+                <span class="grid-header-cell__label">{{ columnAttributes.label }}</span>
+                <span class="caret"></span>
+            </a>
+        {% else %}
+            <span class="grid-header-cell__label">
+                {{ columnAttributes.label }}
+            </span>
+        {% endif %}
+    </th>
+{% endblock %}
+
+{# TODO: add row actions #}
+
+{% block server_render_datagrid_row_widget %}
+    {% set attr = attr|merge({
+        class: attr.class|default('') ~ " grid-row"
+    }) %}
+
+    <tr{{ block('block_attributes') }}>
+        {% for child in block if child.vars.visible -%}
+            {% do child|merge_context({'datagrid_row': datagrid_row}) %}
+            {{ block_widget(child) }}
+        {%- endfor %}
+    </tr>
+{% endblock %}
+
+{% block server_render_datagrid_cell_widget %}
+    {% set attr = attr|merge({
+        class: attr.class|default('') ~ " string-cell grid-cell grid-body-cell grid-body-cell-" ~ column_name
+    }) %}
+
+    <td{{ block('block_attributes') }}>
+        {% for child in block if child.vars.visible -%}
+            {% do child|merge_context({'datagrid_row': datagrid_row}) %}
+            {{ block_widget(child) }}
+        {%- endfor %}
+    </td>
+{% endblock %}
+
+{%- block server_render_datagrid_cell_value_widget -%}
+    {{ datagrid_row[column_name] }}
+{%- endblock -%}

@@ -14,6 +14,8 @@ use Oro\Bundle\SecurityBundle\SecurityFacade;
 use Oro\Component\Layout\Block\OptionsResolver\OptionsResolver;
 use Oro\Component\Layout\Block\Type\Options;
 use Oro\Component\Layout\BlockBuilderInterface;
+use Oro\Component\Layout\BlockInterface;
+use Oro\Component\Layout\BlockView;
 
 class DatagridTypeTest extends BlockTypeTestCase
 {
@@ -267,6 +269,44 @@ class DatagridTypeTest extends BlockTypeTestCase
             'server_side_render' => true
         ]);
         $type->buildBlock($builder, new Options($options));
+    }
+
+    public function testFinishView()
+    {
+        $type = new DatagridType($this->nameStrategy, $this->manager, $this->securityFacade);
+
+        $childView = $this->getMock(BlockView::class);
+        $childView->vars = [
+            'block_type' => 'datagrid_toolbar',
+            'unique_block_prefix' => '_product_datagrid_toolbar',
+            'block_prefixes' => ['block', 'datagrid_toolbar', '_product_datagrid_toolbar'],
+        ];
+
+        $view = $this->getMock(BlockView::class);
+        $view->vars = [
+            'block_type' => 'datagrid',
+            'unique_block_prefix' => '_product_datagrid',
+            'block_prefixes' => ['block', 'container', 'datagrid', '_product_datagrid'],
+            'server_side_render' => true,
+        ];
+        $view->children = [$childView];
+
+        $block = $this->getMock(BlockInterface::class);
+        $block->expects($this->any())
+            ->method('getId')
+            ->willReturn('product_datagrid');
+
+        $type->finishView($view, $block);
+
+        $this->assertEquals(
+            ['block', 'container', 'datagrid', 'server_render_datagrid', '_product_datagrid'],
+            $view->vars['block_prefixes']
+        );
+
+        $this->assertEquals(
+            ['server_render_datagrid_toolbar'],
+            $childView->vars['additional_block_prefixes']
+        );
     }
 
     public function testGetName()
