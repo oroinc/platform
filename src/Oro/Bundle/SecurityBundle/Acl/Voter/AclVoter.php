@@ -192,7 +192,7 @@ class AclVoter extends BaseAclVoter implements PermissionGrantingStrategyContext
     /**
      * @param mixed $object
      *
-     * @return string ACL group
+     * @return string|null ACL group
      */
     protected function setObject($object)
     {
@@ -214,9 +214,9 @@ class AclVoter extends BaseAclVoter implements PermissionGrantingStrategyContext
                     ? new DomainObjectWrapper($object->getDomainObject(), $identityObject)
                     : $identityObject;
             }
-        }
-        if (null === $group) {
-            $group = AclGroupProviderInterface::DEFAULT_SECURITY_GROUP;
+            if (null === $group) {
+                $group = AclGroupProviderInterface::DEFAULT_SECURITY_GROUP;
+            }
         }
 
         $this->object = $object;

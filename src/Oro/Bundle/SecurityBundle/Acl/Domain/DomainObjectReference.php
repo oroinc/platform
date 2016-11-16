@@ -7,7 +7,7 @@ use Symfony\Component\Security\Acl\Model\ObjectIdentityInterface;
 /**
  * An instance of this class can be used instead of a domain object in case if
  * you does not have an instance of a domain object,
- * but know its the class name, identifier, owner and organization ids.
+ * but know its class name, identifier, owner identifier and organization identifier.
  */
 class DomainObjectReference implements ObjectIdentityInterface
 {

@@ -5,6 +5,7 @@ namespace Oro\Bundle\SecurityBundle\Acl\Extension;
 use Symfony\Component\Security\Acl\Model\ObjectIdentityInterface;
 use Symfony\Component\Security\Acl\Exception\InvalidDomainObjectException;
 use Symfony\Component\Security\Acl\Voter\FieldVote;
+use Symfony\Component\Security\Acl\Util\ClassUtils;
 
 use Oro\Bundle\SecurityBundle\Acl\Domain\DomainObjectWrapper;
 use Oro\Bundle\SecurityBundle\Acl\Domain\ObjectIdAccessor;
@@ -136,7 +137,7 @@ class AclExtensionSelector
             }
             $id = $object->getType();
         } else {
-            $type = get_class($object);
+            $type = ClassUtils::getRealClass($object);
             $id = $this->objectIdAccessor->getId($object);
         }
 
