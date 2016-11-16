@@ -78,8 +78,8 @@ class BlockViewNormalizer implements NormalizerInterface, DenormalizerInterface,
             );
         }
 
-        foreach ($view->children as $childView) {
-            $data['children'][] = $this->normalize($childView, $format, $context);
+        foreach ($view->children as $childId => $childView) {
+            $data['children'][$childId] = $this->normalize($childView, $format, $context);
         }
 
         return $data;
@@ -115,13 +115,13 @@ class BlockViewNormalizer implements NormalizerInterface, DenormalizerInterface,
         }
 
         if (array_key_exists('children', $data)) {
-            foreach ($data['children'] as $childData) {
+            foreach ($data['children'] as $childId => $childData) {
                 $childView = $this->denormalize($childData, $class, $format, $context);
                 $childView->parent = $view;
 
                 $this->currentDenormalizedViews[$childView->getId()] = $childView;
 
-                $view->children[] = $childView;
+                $view->children[$childId] = $childView;
             }
         }
 

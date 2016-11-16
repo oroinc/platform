@@ -346,7 +346,7 @@ class LayoutBuilderTest extends \PHPUnit_Framework_TestCase
             ->setBlockTheme(['TestTheme1', 'TestTheme2'], 'test_block')
             ->setFormTheme(['TestFormTheme1', 'TestFormTheme2']);
 
-        $result = $this->layoutBuilder->getLayout($context, $rootId);
+        $result = $this->layoutBuilder->getLayout($context);
 
         $this->assertSame($layout, $result);
     }
@@ -404,7 +404,7 @@ class LayoutBuilderTest extends \PHPUnit_Framework_TestCase
         $rootId  = 'test_id';
         $this->blockFactory->expects($this->once())
             ->method('createBlockView')
-            ->with($this->identicalTo($rawLayout), $this->identicalTo($context), $rootId)
+            ->with($this->identicalTo($rawLayout), $this->identicalTo($context))
             ->will($this->returnValue($rootView));
 
         $this->layoutBuilder->expects($this->once())
@@ -443,7 +443,7 @@ class LayoutBuilderTest extends \PHPUnit_Framework_TestCase
             ->setBlockTheme(['TestTheme1', 'TestTheme2'], 'test_block')
             ->setFormTheme(['TestFormTheme1', 'TestFormTheme2']);
 
-        $result = $this->layoutBuilder->getLayout($context, $rootId);
+        $result = $this->layoutBuilder->getLayout($context);
 
         $this->assertSame($layout, $result);
     }

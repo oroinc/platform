@@ -231,12 +231,7 @@ class LayoutBuilder implements LayoutBuilderInterface
             $rootView = $this->blockFactory->createBlockView($rawLayout, $context);
         }
 
-        if ($rootId) {
-            $rootView = $this->findBlockById($rootView, $rootId);
-            if (!$rootView) {
-                throw new BlockViewNotFoundException(sprintf("BlockView with id \"%s\" is not found.", $rootId));
-            }
-        }
+        $rootView = $this->getRootView($rootView, $rootId);
 
         if ($context->getOr('expressions_evaluate')) {
             $deferred = $context->getOr('expressions_evaluate_deferred');
@@ -318,11 +313,29 @@ class LayoutBuilder implements LayoutBuilderInterface
     }
 
     /**
-     * @param BlockView $blockView
-     * @param integer $id
+     * @param BlockView    $rootView
+     * @param int|null     $rootId
      *
-     * @return null|BlockView
+     * @return BlockView
      * @throws BlockViewNotFoundException
+     */
+    private function getRootView(BlockView $rootView, $rootId)
+    {
+        if ($rootId !== null) {
+            $rootView = $this->findBlockById($rootView, $rootId);
+            if ($rootView === null) {
+                throw new BlockViewNotFoundException(sprintf("BlockView with id \"%s\" is not found.", $rootId));
+            }
+        }
+
+        return $rootView;
+    }
+
+    /**
+     * @param BlockView $blockView
+     * @param int       $id
+     *
+     * @return BlockView|null
      */
     private function findBlockById(BlockView $blockView, $id)
     {
