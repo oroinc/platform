@@ -3,7 +3,6 @@
 namespace Oro\Bundle\WorkflowBundle\Acl\Extension;
 
 use Symfony\Component\Security\Acl\Domain\ObjectIdentity;
-use Symfony\Component\Security\Acl\Model\ObjectIdentityInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 
 use Oro\Bundle\SecurityBundle\Acl\AccessLevel;
@@ -13,10 +12,10 @@ use Oro\Bundle\SecurityBundle\Acl\Extension\AbstractSimpleAccessLevelAclExtensio
 use Oro\Bundle\SecurityBundle\Acl\Extension\AccessLevelOwnershipDecisionMakerInterface;
 use Oro\Bundle\SecurityBundle\Acl\Extension\ObjectIdentityHelper;
 use Oro\Bundle\SecurityBundle\Annotation\Acl as AclAnnotation;
-use Oro\Bundle\WorkflowBundle\Model\WorkflowRegistry;
 use Oro\Bundle\SecurityBundle\Owner\EntityOwnerAccessor;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\MetadataProviderInterface;
 use Oro\Bundle\WorkflowBundle\Acl\Extension\WorkflowMaskBuilder as MaskBuilder;
+use Oro\Bundle\WorkflowBundle\Model\WorkflowRegistry;
 
 class WorkflowAclExtension extends AbstractSimpleAccessLevelAclExtension
 {
