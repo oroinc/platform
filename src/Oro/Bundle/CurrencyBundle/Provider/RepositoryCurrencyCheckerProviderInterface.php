@@ -15,17 +15,17 @@ interface RepositoryCurrencyCheckerProviderInterface
 
     /**
      * This method should return result of checking on existence
-     * entity records that use currencies that user want to remove.
+     * entity records that use currency that user want to remove.
      *
      * Pass no organization in case when user try to remove currency on system level.
      *
-     * @param array             $currenciesOnRemove
+     * @param array             $removingCurrencies
      * @param Organization|null $organization
      *
      * @return bool
      */
-    public function hasRecordsInCurrenciesOnRemove(
-        array $currenciesOnRemove,
+    public function hasRecordsWithRemovingCurrencies(
+        array $removingCurrencies,
         Organization $organization = null
     );
 }
