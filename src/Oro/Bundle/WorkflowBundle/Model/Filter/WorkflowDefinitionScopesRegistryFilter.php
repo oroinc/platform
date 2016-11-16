@@ -41,7 +41,7 @@ class WorkflowDefinitionScopesRegistryFilter implements WorkflowDefinitionFilter
          * @var ArrayCollection|WorkflowDefinition[] $otherDefinitions
          */
         list($scopeAwareDefinitions, $otherDefinitions) = $workflowDefinitions->partition(
-            function (WorkflowDefinition $workflowDefinition) {
+            function ($name, WorkflowDefinition $workflowDefinition) {
                 return count($workflowDefinition->getScopesConfig()) !== 0;
             }
         );
