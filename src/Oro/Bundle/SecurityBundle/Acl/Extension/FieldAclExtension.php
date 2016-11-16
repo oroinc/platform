@@ -3,16 +3,14 @@
 namespace Oro\Bundle\SecurityBundle\Acl\Extension;
 
 use Symfony\Component\Security\Acl\Domain\ObjectIdentity;
+use Symfony\Component\Security\Acl\Model\ObjectIdentityInterface;
 use Symfony\Component\Security\Acl\Util\ClassUtils;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
-use Oro\Bundle\EntityBundle\Exception\InvalidEntityException;
 use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
 use Oro\Bundle\SecurityBundle\Acl\AccessLevel;
-use Oro\Bundle\SecurityBundle\Acl\Domain\EntityObjectReference;
 use Oro\Bundle\SecurityBundle\Acl\Domain\ObjectIdAccessor;
-use Oro\Bundle\SecurityBundle\Authentication\Token\OrganizationContextTokenInterface;
 use Oro\Bundle\SecurityBundle\Metadata\EntitySecurityMetadataProvider;
 use Oro\Bundle\SecurityBundle\Owner\EntityOwnerAccessor;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\MetadataProviderInterface;
@@ -130,7 +128,7 @@ class FieldAclExtension extends AbstractSimpleAccessLevelAclExtension
      */
     public function getExtensionKey()
     {
-        throw new \LogicException('Field ACL Extension does not support "getExtensionKey" method.');
+        return EntityAclExtension::NAME;
     }
 
     /**
@@ -190,7 +188,7 @@ class FieldAclExtension extends AbstractSimpleAccessLevelAclExtension
      */
     protected function getObjectClassName($object)
     {
-        if ($object instanceof ObjectIdentity) {
+        if ($object instanceof ObjectIdentityInterface) {
             $className = $object->getType();
         } elseif (is_string($object)) {
             $className = $id = $group = null;
@@ -198,8 +196,6 @@ class FieldAclExtension extends AbstractSimpleAccessLevelAclExtension
                 $object = ObjectIdentityHelper::decodeEntityFieldInfo($object)[0];
             }
             $this->parseDescriptor($object, $className, $id, $group);
-        } elseif ($object instanceof EntityObjectReference) {
-            $className = $object->getType();
         } else {
             $className = ClassUtils::getRealClass($object);
         }
@@ -210,47 +206,9 @@ class FieldAclExtension extends AbstractSimpleAccessLevelAclExtension
     /**
      * {@inheritdoc}
      */
-    protected function isAccessDeniedByOrganizationContext($object, OrganizationContextTokenInterface $securityToken)
-    {
-        try {
-            // try to get entity organization value
-            if ($object instanceof EntityObjectReference) {
-                $objectOrganization = $object->getOrganizationId();
-            } else {
-                $objectOrganization = $this->entityOwnerAccessor->getOrganization($object);
-            }
-
-            if (is_object($objectOrganization)) {
-                $objectOrganization = $objectOrganization->getId();
-            }
-
-            // check entity organization with current organization
-            if ($objectOrganization && $objectOrganization !== $securityToken->getOrganizationContext()->getId()) {
-                return true;
-            }
-        } catch (InvalidEntityException $e) {
-            // in case if entity has no organization field (none ownership type)
-        }
-
-        return false;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
     protected function getMaskBuilderConst($constName)
     {
         return FieldMaskBuilder::getConst($constName);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    protected function isSupportedObject($object)
-    {
-        return
-            parent::isSupportedObject($object)
-            && !$object instanceof EntityObjectReference;
     }
 
     /**

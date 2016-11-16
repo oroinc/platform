@@ -1,0 +1,15 @@
+acls:
+    test_action:
+        label: test_action
+        type: action
+
+    test_entity_view:
+        type: entity
+        class: Oro\Bundle\TestFrameworkBundle\Entity\TestActivity
+        permission: VIEW
+
+    test_entity_delete:
+        type: entity
+        class: Oro\Bundle\TestFrameworkBundle\Entity\TestActivity
+        permission: DELETE
+

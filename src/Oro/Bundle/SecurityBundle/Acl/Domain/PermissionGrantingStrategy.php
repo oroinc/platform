@@ -190,9 +190,13 @@ class PermissionGrantingStrategy implements PermissionGrantingStrategyInterface
                                 if ($sid instanceof RoleSecurityIdentity) {
                                     // give an additional chance for the appropriate ACL extension to decide
                                     // whether an access to a domain object is granted or not
+                                    $object = $this->getContext()->getObject();
+                                    if ($object instanceof DomainObjectWrapper) {
+                                        $object = $object->getDomainObject();
+                                    }
                                     $decisionResult = $aclExt->decideIsGranting(
                                         $requiredMask,
-                                        $this->getContext()->getObject(),
+                                        $object,
                                         $this->getContext()->getSecurityToken()
                                     );
                                     if (!$decisionResult) {
@@ -264,7 +268,11 @@ class PermissionGrantingStrategy implements PermissionGrantingStrategyInterface
             if ($acl->getObjectIdentity()->getIdentifier() !== $extension->getExtensionKey()) {
                 return false;
             }
-            $aceMask = $extension->adaptRootMask($aceMask, $this->getContext()->getObject());
+            $object = $this->getContext()->getObject();
+            if ($object instanceof DomainObjectWrapper) {
+                $object = $object->getObjectIdentity();
+            }
+            $aceMask = $extension->adaptRootMask($aceMask, $object);
         }
 
         return ($extension->getServiceBits($requiredMask) === $extension->getServiceBits($aceMask));

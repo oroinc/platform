@@ -10,6 +10,7 @@ use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 
 use Oro\Bundle\EntityBundle\Exception\InvalidEntityException;
 use Oro\Bundle\SecurityBundle\Acl\AccessLevel;
+use Oro\Bundle\SecurityBundle\Acl\Domain\DomainObjectReference;
 use Oro\Bundle\SecurityBundle\Acl\Domain\ObjectIdAccessor;
 use Oro\Bundle\SecurityBundle\Acl\Exception\InvalidAclMaskException;
 use Oro\Bundle\SecurityBundle\Authentication\Token\OrganizationContextTokenInterface;
@@ -74,7 +75,24 @@ abstract class AbstractAccessLevelAclExtension extends AbstractAclExtension
             $organization = $securityToken->getOrganizationContext();
         }
 
-        $accessLevel = $this->getAccessLevel($triggeredMask);
+        return $this->isAccessGrantedByAccessLevel(
+            $this->getAccessLevel($triggeredMask),
+            $object,
+            $securityToken->getUser(),
+            $organization
+        );
+    }
+
+    /**
+     * @param int    $accessLevel
+     * @param mixed  $object
+     * @param object $user
+     * @param object $organization
+     *
+     * @return bool
+     */
+    protected function isAccessGrantedByAccessLevel($accessLevel, $object, $user, $organization)
+    {
         if (AccessLevel::SYSTEM_LEVEL === $accessLevel) {
             return true;
         }
@@ -87,14 +105,14 @@ abstract class AbstractAccessLevelAclExtension extends AbstractAclExtension
         $result = false;
         if (AccessLevel::BASIC_LEVEL === $accessLevel) {
             $result = $this->decisionMaker->isAssociatedWithBasicLevelEntity(
-                $securityToken->getUser(),
+                $user,
                 $object,
                 $organization
             );
         } else {
             if ($metadata->isBasicLevelOwned()) {
                 $result = $this->decisionMaker->isAssociatedWithBasicLevelEntity(
-                    $securityToken->getUser(),
+                    $user,
                     $object,
                     $organization
                 );
@@ -102,21 +120,21 @@ abstract class AbstractAccessLevelAclExtension extends AbstractAclExtension
             if (!$result) {
                 if (AccessLevel::LOCAL_LEVEL === $accessLevel) {
                     $result = $this->decisionMaker->isAssociatedWithLocalLevelEntity(
-                        $securityToken->getUser(),
+                        $user,
                         $object,
                         false,
                         $organization
                     );
                 } elseif (AccessLevel::DEEP_LEVEL === $accessLevel) {
                     $result = $this->decisionMaker->isAssociatedWithLocalLevelEntity(
-                        $securityToken->getUser(),
+                        $user,
                         $object,
                         true,
                         $organization
                     );
                 } elseif (AccessLevel::GLOBAL_LEVEL === $accessLevel) {
                     $result = $this->decisionMaker->isAssociatedWithGlobalLevelEntity(
-                        $securityToken->getUser(),
+                        $user,
                         $object,
                         $organization
                     );
@@ -137,9 +155,8 @@ abstract class AbstractAccessLevelAclExtension extends AbstractAclExtension
     protected function isSupportedObject($object)
     {
         return
-            null !== $object
-            && is_object($object)
-            && !$object instanceof ObjectIdentityInterface;
+            is_object($object)
+            && !$object instanceof ObjectIdentity;
     }
 
     /**
@@ -163,7 +180,7 @@ abstract class AbstractAccessLevelAclExtension extends AbstractAclExtension
      */
     protected function getObjectClassName($object)
     {
-        if ($object instanceof ObjectIdentity) {
+        if ($object instanceof ObjectIdentityInterface) {
             $className = $object->getType();
         } elseif (is_string($object)) {
             $className = $id = $group = null;
@@ -211,21 +228,35 @@ abstract class AbstractAccessLevelAclExtension extends AbstractAclExtension
      */
     protected function isAccessDeniedByOrganizationContext($object, OrganizationContextTokenInterface $securityToken)
     {
-        try {
-            // try to get entity organization value
-            $objectOrganization = $this->entityOwnerAccessor->getOrganization($object);
+        $objectOrganizationId = $this->getOrganizationId($object);
 
-            // check entity organization with current organization
-            if ($objectOrganization
-                && $objectOrganization->getId() !== $securityToken->getOrganizationContext()->getId()
-            ) {
-                return true;
-            }
+        // check entity organization with current organization
+        return
+            null !== $objectOrganizationId
+            && $objectOrganizationId !== $securityToken->getOrganizationContext()->getId();
+    }
+
+    /**
+     * @param object $object
+     *
+     * @return int|null
+     */
+    protected function getOrganizationId($object)
+    {
+        if ($object instanceof DomainObjectReference) {
+            return $object->getOrganizationId();
+        }
+
+        $organization = null;
+        try {
+            $organization = $this->entityOwnerAccessor->getOrganization($object);
         } catch (InvalidEntityException $e) {
             // in case if entity has no organization field (none ownership type)
         }
 
-        return false;
+        return null !== $organization
+            ? $organization->getId()
+            : null;
     }
 
     /**

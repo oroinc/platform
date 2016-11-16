@@ -8,6 +8,7 @@ use Symfony\Component\Security\Acl\Voter\AclVoter as BaseAclVoter;
 use Symfony\Component\Security\Acl\Voter\FieldVote;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 
+use Oro\Bundle\SecurityBundle\Acl\Domain\DomainObjectWrapper;
 use Oro\Bundle\SecurityBundle\Acl\Domain\PermissionGrantingStrategyContextInterface;
 use Oro\Bundle\SecurityBundle\Acl\Extension\AclExtensionSelector;
 use Oro\Bundle\SecurityBundle\Acl\Extension\AclExtensionInterface;
@@ -30,26 +31,26 @@ class AclVoter extends BaseAclVoter implements PermissionGrantingStrategyContext
      *
      * @var mixed
      */
-    private $object = null;
+    private $object;
 
     /**
      * The security token of the current voting operation
      *
      * @var mixed
      */
-    private $securityToken = null;
+    private $securityToken;
 
     /**
      * An ACL extension responsible to process an object of the current voting operation
      *
      * @var AclExtensionInterface
      */
-    private $extension = null;
+    private $extension;
 
     /**
      * @var OneShotIsGrantedObserver|OneShotIsGrantedObserver[]
      */
-    protected $oneShotIsGrantedObserver = null;
+    protected $oneShotIsGrantedObserver;
 
     /**
      * @var int
@@ -86,9 +87,9 @@ class AclVoter extends BaseAclVoter implements PermissionGrantingStrategyContext
      */
     public function addOneShotIsGrantedObserver(OneShotIsGrantedObserver $observer)
     {
-        if ($this->oneShotIsGrantedObserver !== null) {
+        if (null !== $this->oneShotIsGrantedObserver) {
             if (!is_array($this->oneShotIsGrantedObserver)) {
-                $this->oneShotIsGrantedObserver = array($this->oneShotIsGrantedObserver);
+                $this->oneShotIsGrantedObserver = [$this->oneShotIsGrantedObserver];
             }
             $this->oneShotIsGrantedObserver[] = $observer;
         } else {
@@ -101,40 +102,25 @@ class AclVoter extends BaseAclVoter implements PermissionGrantingStrategyContext
      */
     public function vote(TokenInterface $token, $object, array $attributes)
     {
-        $this->securityToken = $token;
-        $this->object = $object instanceof FieldVote
-            ? $object->getDomainObject()
-            : $object;
-
-        list($this->object, $group) = $this->separateAclGroupFromObject($this->object);
-
-        try {
-            $this->extension = $this->extensionSelector->select($this->object);
-        } catch (InvalidDomainObjectException $e) {
+        $extension = $this->findAclExtension($object);
+        if (null === $extension) {
             return self::ACCESS_ABSTAIN;
         }
 
-        $this->checkFieldObject($object);
-        // replace empty permissions with default ones
-        $attributesCount = count($attributes);
-        for ($i = 0; $i < $attributesCount; $i++) {
-            if (empty($attributes[$i])) {
-                $attributes[$i] = $this->extension->getDefaultPermission();
+        $this->securityToken = $token;
+        $this->extension = $extension;
+        try {
+            $attributes = $this->updateAttributes($attributes);
+            $group = $this->setObject($object);
+            $result = $this->checkAclGroup($attributes, $group);
+            if (self::ACCESS_DENIED !== $result) {
+                $result = parent::vote($token, $this->getObjectToVote($object), $attributes);
             }
-        }
-
-        //check acl group
-        $result = $this->checkAclGroup($attributes, $group);
-
-        if ($result !== self::ACCESS_DENIED) {
-            $result = parent::vote($token, $this->getObjectToVote($object), $attributes);
-        }
-
-        $this->extension = null;
-        $this->object = null;
-        $this->securityToken = null;
-        $this->triggeredMask = null;
-        if ($this->oneShotIsGrantedObserver) {
+        } finally {
+            $this->securityToken = null;
+            $this->extension = null;
+            $this->object = null;
+            $this->triggeredMask = null;
             $this->oneShotIsGrantedObserver = null;
         }
 
@@ -171,7 +157,7 @@ class AclVoter extends BaseAclVoter implements PermissionGrantingStrategyContext
     public function setTriggeredMask($mask)
     {
         $this->triggeredMask = $mask;
-        if ($this->oneShotIsGrantedObserver !== null) {
+        if (null !== $this->oneShotIsGrantedObserver) {
             if (is_array($this->oneShotIsGrantedObserver)) {
                 /** @var OneShotIsGrantedObserver $observer */
                 foreach ($this->oneShotIsGrantedObserver as $observer) {
@@ -187,32 +173,96 @@ class AclVoter extends BaseAclVoter implements PermissionGrantingStrategyContext
 
     /**
      * @param mixed $object
-     * @return array
+     *
+     * @return AclExtensionInterface|null
      */
-    protected function separateAclGroupFromObject($object)
+    protected function findAclExtension($object)
     {
-        $group = null;
+        $extension = null;
 
-        if ($object instanceof ObjectIdentity) {
-            list($type, $group) = ObjectIdentityHelper::parseType($object->getType());
-            if (null !== $group) {
-                $object = new ObjectIdentity($this->object->getIdentifier(), $type);
-            } else {
-                $group = AclGroupProviderInterface::DEFAULT_SECURITY_GROUP;
-            }
+        try {
+            $extension = $this->extensionSelector->select($object);
+        } catch (InvalidDomainObjectException $e) {
+            // do nothing here
         }
 
-        return [$object, $group];
+        return $extension;
+    }
+
+    /**
+     * @param mixed $object
+     *
+     * @return string ACL group
+     */
+    protected function setObject($object)
+    {
+        if ($object instanceof FieldVote) {
+            $object = $object->getDomainObject();
+        }
+
+        $identityObject = $object;
+        if ($object instanceof DomainObjectWrapper) {
+            $identityObject = $object->getDomainObject();
+        }
+
+        $group = null;
+        if ($identityObject instanceof ObjectIdentity) {
+            list($type, $group) = ObjectIdentityHelper::parseType($identityObject->getType());
+            if (null !== $group) {
+                $identityObject = new ObjectIdentity($identityObject->getIdentifier(), $type);
+                $object = $object instanceof DomainObjectWrapper
+                    ? new DomainObjectWrapper($object->getDomainObject(), $identityObject)
+                    : $identityObject;
+            }
+        }
+        if (null === $group) {
+            $group = AclGroupProviderInterface::DEFAULT_SECURITY_GROUP;
+        }
+
+        $this->object = $object;
+
+        return $group;
+    }
+
+    /**
+     * @param mixed $object
+     *
+     * @return mixed
+     */
+    protected function getObjectToVote($object)
+    {
+        return $object instanceof FieldVote
+            ? $object
+            : $this->object;
     }
 
     /**
      * @param array $attributes
+     *
+     * @return array
+     */
+    protected function updateAttributes(array $attributes)
+    {
+        // replace empty permissions with default ones
+        $count = count($attributes);
+        for ($i = 0; $i < $count; $i++) {
+            if (empty($attributes[$i])) {
+                $attributes[$i] = $this->extension->getDefaultPermission();
+            }
+        }
+
+        return $attributes;
+    }
+
+    /**
+     * @param array  $attributes
      * @param string $group
+     *
      * @return int
      */
     protected function checkAclGroup(array $attributes, $group)
     {
-        if ($group === null || !$this->groupProvider || !$this->object) {
+        if (null === $group || null === $this->groupProvider || !$this->object) {
             return self::ACCESS_ABSTAIN;
         }
 
@@ -234,25 +284,5 @@ class AclVoter extends BaseAclVoter implements PermissionGrantingStrategyContext
         }
 
         return $result;
-    }
-
-    /**
-     * @param mixed $object
-     *
-     * @return mixed|FieldVote
-     */
-    protected function getObjectToVote($object)
-    {
-        return $object instanceof FieldVote ? $object : $this->object;
-    }
-
-    /**
-     * @param mixed $object
-     */
-    protected function checkFieldObject($object)
-    {
-        if ($object instanceof FieldVote) {
-            $this->extension = $this->extension->getFieldExtension();
-        }
     }
 }
