@@ -44,6 +44,7 @@ class PasswordTooltipProviderTest extends \PHPUnit_Framework_TestCase
             'no rules enabled' => [
                 'configMap' => [
                     [PasswordComplexityConfigProvider::CONFIG_MIN_LENGTH, false, false, null, 0],
+                    [PasswordComplexityConfigProvider::CONFIG_LOWER_CASE, false, false, null, false],
                     [PasswordComplexityConfigProvider::CONFIG_UPPER_CASE, false, false, null, false],
                     [PasswordComplexityConfigProvider::CONFIG_NUMBERS, false, false, null, false],
                     [PasswordComplexityConfigProvider::CONFIG_SPECIAL_CHARS, false, false, null, false],
@@ -53,9 +54,6 @@ class PasswordTooltipProviderTest extends \PHPUnit_Framework_TestCase
             'min length rule' => [
                 'configMap' => [
                     [PasswordComplexityConfigProvider::CONFIG_MIN_LENGTH, false, false, null, 2],
-                    [PasswordComplexityConfigProvider::CONFIG_UPPER_CASE, false, false, null, false],
-                    [PasswordComplexityConfigProvider::CONFIG_NUMBERS, false, false, null, false],
-                    [PasswordComplexityConfigProvider::CONFIG_SPECIAL_CHARS, false, false, null, false],
                 ],
                 'expected' => PasswordTooltipProvider::BASE .
                               PasswordTooltipProvider::MIN_LENGTH,
@@ -65,7 +63,6 @@ class PasswordTooltipProviderTest extends \PHPUnit_Framework_TestCase
                 'configMap' => [
                     [PasswordComplexityConfigProvider::CONFIG_MIN_LENGTH, false, false, null, 0],
                     [PasswordComplexityConfigProvider::CONFIG_UPPER_CASE, false, false, null, true],
-                    [PasswordComplexityConfigProvider::CONFIG_NUMBERS, false, false, null, false],
                     [PasswordComplexityConfigProvider::CONFIG_SPECIAL_CHARS, false, false, null, true],
                 ],
                 'expected' => PasswordTooltipProvider::BASE .
@@ -77,12 +74,15 @@ class PasswordTooltipProviderTest extends \PHPUnit_Framework_TestCase
             'all rules' => [
                 'configMap' => [
                     [PasswordComplexityConfigProvider::CONFIG_MIN_LENGTH, false, false, null, 2],
+                    [PasswordComplexityConfigProvider::CONFIG_LOWER_CASE, false, false, null, true],
                     [PasswordComplexityConfigProvider::CONFIG_UPPER_CASE, false, false, null, true],
                     [PasswordComplexityConfigProvider::CONFIG_NUMBERS, false, false, null, true],
                     [PasswordComplexityConfigProvider::CONFIG_SPECIAL_CHARS, false, false, null, true],
                 ],
                 'expected' => PasswordTooltipProvider::BASE .
                               PasswordTooltipProvider::MIN_LENGTH .
+                              PasswordTooltipProvider::SEPARATOR .
+                              PasswordTooltipProvider::LOWER_CASE .
                               PasswordTooltipProvider::SEPARATOR .
                               PasswordTooltipProvider::UPPER_CASE .
                               PasswordTooltipProvider::SEPARATOR .
