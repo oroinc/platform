@@ -124,6 +124,15 @@ services:
     oro_translation.resource.cache:
         public: false
         class: Doctrine\Common\Cache\ArrayCache
+        
+    oro_translation.cache.translation_cache_warmer:
+        class: 'Oro\Bundle\TranslationBundle\Cache\TranslationCacheWarmer'
+        public: false
+        decorates: 'translation.warmer'
+        decoration_inner_name: 'translation.warmer.default'
+        arguments:
+            - '@translation.warmer.default'
+            - '@oro_translation.strategy.provider'
 
     oro_translation.js_dumper:
         class: 'Oro\Bundle\TranslationBundle\Provider\JsTranslationDumper'
@@ -187,11 +196,11 @@ services:
         arguments:
             - '@oro_translation.provider.language'
             - '%installed%'
+        tags:
+            - { name: oro_translation.extension.translation_strategy, priority: 0 }
 
     oro_translation.strategy.provider:
         class: '%oro_translation.strategy.provider.class%'
-        arguments:
-            - '@oro_translation.strategy.default'
 
     oro_translation.listener.datagrid.language:
         class: 'Oro\Bundle\TranslationBundle\EventListener\Datagrid\LanguageListener'

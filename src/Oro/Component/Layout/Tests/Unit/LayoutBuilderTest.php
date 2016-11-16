@@ -2,12 +2,19 @@
 
 namespace Oro\Component\Layout\Tests\Unit;
 
+use Oro\Component\Layout\BlockViewCache;
+use Oro\Component\Layout\DataAccessor;
 use Oro\Component\Layout\LayoutBuilder;
+use Oro\Component\Layout\LayoutRegistryInterface;
 use Oro\Component\Layout\LayoutRendererRegistry;
+use Oro\Component\Layout\Tests\Unit\Stubs\LayoutContextStub;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class LayoutBuilderTest extends \PHPUnit_Framework_TestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var LayoutRegistryInterface|\PHPUnit_Framework_MockObject_MockObject */
     protected $registry;
 
     /** @var \PHPUnit_Framework_MockObject_MockObject */
@@ -28,6 +35,12 @@ class LayoutBuilderTest extends \PHPUnit_Framework_TestCase
     /** @var LayoutBuilder|\PHPUnit_Framework_MockObject_MockObject */
     protected $layoutBuilder;
 
+    /** @var LayoutBuilder|\PHPUnit_Framework_MockObject_MockObject */
+    protected $layoutBuilderWithoutCache;
+
+    /** @var BlockViewCache|\PHPUnit_Framework_MockObject_MockObject */
+    protected $blockViewCache;
+
     protected function setUp()
     {
         $this->registry            = $this->getMock('Oro\Component\Layout\LayoutRegistryInterface');
@@ -40,11 +53,31 @@ class LayoutBuilderTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
+        $this->blockViewCache = $this
+            ->getMockBuilder('Oro\Component\Layout\BlockViewCache')
+            ->disableOriginalConstructor()
+            ->getMock();
+
         $rendererRegistry = new LayoutRendererRegistry();
         $rendererRegistry->addRenderer('test', $this->renderer);
         $rendererRegistry->setDefaultRenderer('test');
 
         $this->layoutBuilder = $this->getMockBuilder('Oro\Component\Layout\LayoutBuilder')
+            ->setConstructorArgs(
+                [
+                    $this->registry,
+                    $this->rawLayoutBuilder,
+                    $this->layoutManipulator,
+                    $this->blockFactory,
+                    $rendererRegistry,
+                    $this->expressionProcessor,
+                    $this->blockViewCache
+                ]
+            )
+            ->setMethods(['createLayout'])
+            ->getMock();
+
+        $this->layoutBuilderWithoutCache = $this->getMockBuilder('Oro\Component\Layout\LayoutBuilder')
             ->setConstructorArgs(
                 [
                     $this->registry,
@@ -224,103 +257,194 @@ class LayoutBuilderTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($this->layoutBuilder, $this->layoutBuilder->clear());
     }
 
-    public function testGetLayout()
+    public function testGetLayoutWithCache()
     {
-        $context = $this->getMock('Oro\Component\Layout\ContextInterface');
-        $rootId  = 'test_id';
-
         $rawLayout = $this->getMockBuilder('Oro\Component\Layout\RawLayout')->disableOriginalConstructor()->getMock();
         $rootView  = $this->getMockBuilder('Oro\Component\Layout\BlockView')->disableOriginalConstructor()->getMock();
         $layout    = $this->getMockBuilder('Oro\Component\Layout\Layout')->disableOriginalConstructor()->getMock();
 
-        $context->expects($this->once())
-            ->method('isResolved')
-            ->will($this->returnValue(false));
-        $context->expects($this->once())
-            ->method('resolve');
+        $context = new LayoutContextStub([
+            'expressions_evaluate' => true,
+            'expressions_evaluate_deferred' => true,
+        ]);
         $this->registry->expects($this->once())
             ->method('configureContext')
             ->with($this->identicalTo($context));
 
-        $context->expects($this->any())
-            ->method('getOr')
-            ->will($this->returnValue(true));
+        $this->blockViewCache->expects($this->once())
+            ->method('fetch')
+            ->with($context)
+            ->willReturn($rootView);
+
+        $this->blockViewCache->expects($this->never())
+            ->method('save');
+
         $this->expressionProcessor->expects($this->once())
             ->method('processExpressions');
 
         $optionValueBag = $this->getMock('Oro\Component\Layout\OptionValueBag');
-        $optionValueBag->expects($this->once())
-            ->method('buildValue');
+        $optionValueBag->expects($this->once())->method('buildValue');
+
         $rootView->vars['bag'] = $optionValueBag;
 
-        $this->layoutManipulator->expects($this->at(0))
+        $this->layoutManipulator->expects($this->exactly(2))
             ->method('setBlockTheme')
-            ->with('RootTheme1', $this->identicalTo(null));
-        $this->layoutManipulator->expects($this->at(1))
-            ->method('setBlockTheme')
-            ->with(['RootTheme2', 'RootTheme3'], $this->identicalTo(null));
-        $this->layoutManipulator->expects($this->at(2))
-            ->method('setBlockTheme')
-            ->with(['TestTheme1', 'TestTheme2'], 'test_block');
-        $this->layoutManipulator->expects($this->at(3))
-            ->method('setBlockTheme')
-            ->with('TestTheme3', 'test_block');
+            ->willReturnMap([
+                [['RootTheme1', 'RootTheme2']],
+                [['TestTheme1', 'TestTheme2'], 'test_block'],
+            ]);
 
-        $this->layoutManipulator->expects($this->at(4))
+        $this->layoutManipulator->expects($this->once())
             ->method('setFormTheme')
-            ->with('TestFormTheme1');
-        $this->layoutManipulator->expects($this->at(5))
-            ->method('setFormTheme')
-            ->with(['TestFormTheme2']);
+            ->with(['TestFormTheme1', 'TestFormTheme2']);
 
         $this->layoutManipulator->expects($this->once())
             ->method('applyChanges')
             ->with($this->identicalTo($context), false);
+
         $this->rawLayoutBuilder->expects($this->once())
             ->method('getRawLayout')
             ->will($this->returnValue($rawLayout));
-        $this->blockFactory->expects($this->once())
-            ->method('createBlockView')
-            ->with($this->identicalTo($rawLayout), $this->identicalTo($context), $rootId)
-            ->will($this->returnValue($rootView));
+
+        $rootId  = 'test_id';
+        $this->blockFactory->expects($this->never())
+            ->method('createBlockView');
+
         $this->layoutBuilder->expects($this->once())
             ->method('createLayout')
             ->with($this->identicalTo($rootView))
             ->will($this->returnValue($layout));
 
-        $rawLayout->expects($this->once())->method('getRootId')
+        $rawLayout->expects($this->once())
+            ->method('getRootId')
             ->will($this->returnValue($rootId));
+
         $rawLayout->expects($this->once())
             ->method('getBlockThemes')
             ->willReturn([
-                $rootId => ['RootTheme1', 'RootTheme2', 'RootTheme3'],
-                'test_block' => ['TestTheme1', 'TestTheme2', 'TestTheme3']
+                $rootId => ['RootTheme1', 'RootTheme2'],
+                'test_block' => ['TestTheme1', 'TestTheme2']
             ]);
-        $layout->expects($this->at(0))
-            ->method('setBlockTheme')
-            ->with(['RootTheme1', 'RootTheme2', 'RootTheme3'], $this->identicalTo(null));
-        $layout->expects($this->at(1))
-            ->method('setBlockTheme')
-            ->with(['TestTheme1', 'TestTheme2', 'TestTheme3'], 'test_block');
-        $layout->expects($this->exactly(2))
-            ->method('setBlockTheme');
 
-        $rawLayout->expects($this->once())->method('getFormThemes')
+        $layout->expects($this->exactly(2))
+            ->method('setBlockTheme')
+            ->willReturnMap([
+                [['RootTheme1', 'RootTheme2']],
+                [['TestTheme1', 'TestTheme2'], 'test_block']
+            ]);
+
+        $rawLayout->expects($this->once())
+            ->method('getFormThemes')
             ->will($this->returnValue(['TestFormTheme1', 'TestFormTheme2']));
-        $layout->expects($this->at(2))
+
+        $layout->expects($this->once())
             ->method('setFormTheme')
             ->with(['TestFormTheme1', 'TestFormTheme2']);
-        $layout->expects($this->once())
-            ->method('setFormTheme');
 
-        $this->layoutBuilder->setBlockTheme('RootTheme1')
-            ->setBlockTheme(['RootTheme2', 'RootTheme3'])
+        $this->layoutBuilder
+            ->setBlockTheme(['RootTheme1', 'RootTheme2'])
             ->setBlockTheme(['TestTheme1', 'TestTheme2'], 'test_block')
-            ->setBlockTheme('TestTheme3', 'test_block')
-            ->setFormTheme('TestFormTheme1')
-            ->setFormTheme(['TestFormTheme2']);
+            ->setFormTheme(['TestFormTheme1', 'TestFormTheme2']);
 
-        $result = $this->layoutBuilder->getLayout($context, $rootId);
+        $result = $this->layoutBuilder->getLayout($context);
+
+        $this->assertSame($layout, $result);
+    }
+
+    public function testGetLayoutWithoutCache()
+    {
+        $rawLayout = $this->getMockBuilder('Oro\Component\Layout\RawLayout')->disableOriginalConstructor()->getMock();
+        $rootView  = $this->getMockBuilder('Oro\Component\Layout\BlockView')->disableOriginalConstructor()->getMock();
+        $layout    = $this->getMockBuilder('Oro\Component\Layout\Layout')->disableOriginalConstructor()->getMock();
+
+        $context = new LayoutContextStub([
+            'expressions_evaluate' => true,
+            'expressions_evaluate_deferred' => true,
+        ]);
+        $this->registry->expects($this->once())
+            ->method('configureContext')
+            ->with($this->identicalTo($context));
+
+        $this->blockViewCache->expects($this->once())
+            ->method('fetch')
+            ->with($context)
+            ->willReturn(null);
+
+        $this->blockViewCache->expects($this->once())
+            ->method('save')
+            ->with($context, $rootView);
+
+        $this->expressionProcessor->expects($this->once())
+            ->method('processExpressions');
+
+        $optionValueBag = $this->getMock('Oro\Component\Layout\OptionValueBag');
+        $optionValueBag->expects($this->once())->method('buildValue');
+
+        $rootView->vars['bag'] = $optionValueBag;
+
+        $this->layoutManipulator->expects($this->exactly(2))
+            ->method('setBlockTheme')
+            ->willReturnMap([
+                [['RootTheme1', 'RootTheme2']],
+                [['TestTheme1', 'TestTheme2'], 'test_block'],
+            ]);
+
+        $this->layoutManipulator->expects($this->once())
+            ->method('setFormTheme')
+            ->with(['TestFormTheme1', 'TestFormTheme2']);
+
+        $this->layoutManipulator->expects($this->once())
+            ->method('applyChanges')
+            ->with($this->identicalTo($context), false);
+
+        $this->rawLayoutBuilder->expects($this->once())
+            ->method('getRawLayout')
+            ->will($this->returnValue($rawLayout));
+
+        $rootId  = 'test_id';
+        $this->blockFactory->expects($this->once())
+            ->method('createBlockView')
+            ->with($this->identicalTo($rawLayout), $this->identicalTo($context))
+            ->will($this->returnValue($rootView));
+
+        $this->layoutBuilder->expects($this->once())
+            ->method('createLayout')
+            ->with($this->identicalTo($rootView))
+            ->will($this->returnValue($layout));
+
+        $rawLayout->expects($this->once())
+            ->method('getRootId')
+            ->will($this->returnValue($rootId));
+
+        $rawLayout->expects($this->once())
+            ->method('getBlockThemes')
+            ->willReturn([
+                $rootId => ['RootTheme1', 'RootTheme2'],
+                'test_block' => ['TestTheme1', 'TestTheme2']
+            ]);
+
+        $layout->expects($this->exactly(2))
+            ->method('setBlockTheme')
+            ->willReturnMap([
+                [['RootTheme1', 'RootTheme2']],
+                [['TestTheme1', 'TestTheme2'], 'test_block']
+            ]);
+
+        $rawLayout->expects($this->once())
+            ->method('getFormThemes')
+            ->will($this->returnValue(['TestFormTheme1', 'TestFormTheme2']));
+
+        $layout->expects($this->once())
+            ->method('setFormTheme')
+            ->with(['TestFormTheme1', 'TestFormTheme2']);
+
+        $this->layoutBuilder
+            ->setBlockTheme(['RootTheme1', 'RootTheme2'])
+            ->setBlockTheme(['TestTheme1', 'TestTheme2'], 'test_block')
+            ->setFormTheme(['TestFormTheme1', 'TestFormTheme2']);
+
+        $result = $this->layoutBuilder->getLayout($context);
+
         $this->assertSame($layout, $result);
     }
 }

@@ -5,10 +5,10 @@ namespace Oro\Bundle\TranslationBundle\Translation;
 use Doctrine\Common\Cache\Cache;
 use Doctrine\Common\Cache\ClearableCache;
 
+use Symfony\Bundle\FrameworkBundle\Translation\Translator as BaseTranslator;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Translation\Loader\LoaderInterface;
 use Symfony\Component\Translation\MessageSelector;
-use Symfony\Bundle\FrameworkBundle\Translation\Translator as BaseTranslator;
 
 use Oro\Bundle\TranslationBundle\Strategy\TranslationStrategyProvider;
 
@@ -42,6 +42,9 @@ class Translator extends BaseTranslator
      */
     protected $dynamicResources = [];
 
+    /** @var array */
+    protected $registeredResources = [];
+
     /** @var bool */
     protected $installed;
 
@@ -54,6 +57,9 @@ class Translator extends BaseTranslator
     /** @var array */
     protected $originalOptions;
 
+    /** @var array */
+    protected $resourceFiles = [];
+
     /**
      * {@inheritdoc}
      */
@@ -65,6 +71,7 @@ class Translator extends BaseTranslator
     ) {
         $this->messageSelector = $messageSelector;
         $this->originalOptions = $options;
+        $this->resourceFiles = $options['resource_files'];
 
         parent::__construct($container, $messageSelector, $loaderIds, $options);
     }
@@ -186,11 +193,32 @@ class Translator extends BaseTranslator
     /**
      * {@inheritdoc}
      */
+    public function addResource($format, $resource, $locale, $domain = null)
+    {
+        if (is_string($resource)) {
+            $this->resourceFiles[$locale][] = $resource;
+        }
+
+        parent::addResource($format, $resource, $locale, $domain);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function warmUp($cacheDir)
     {
+        // skip warmUp when translator doesn't use cache
+        if (null === $this->options['cache_dir']) {
+            return;
+        }
+
         $this->applyCurrentStrategy();
 
-        parent::warmUp($cacheDir);
+        // load catalogues only for needed locales
+        $locales = array_unique($this->getFallbackLocales());
+        foreach ($locales as $locale) {
+            $this->loadCatalogue($locale);
+        }
     }
 
     /**
@@ -200,19 +228,36 @@ class Translator extends BaseTranslator
     {
         $cacheDir = $this->originalOptions['cache_dir'];
 
-        if (!$cacheDir || !is_dir($cacheDir)) {
-            $this->warmUp($cacheDir);
-            return;
+        $tmpDir = $cacheDir . uniqid('', true);
+
+        $options = array_merge(
+            $this->originalOptions,
+            [
+                'cache_dir' => $tmpDir,
+                'resource_files' => array_map(
+                    function (array $localeResources) {
+                        return array_unique($localeResources);
+                    },
+                    $this->resourceFiles
+                )
+            ]
+        );
+
+        $provider = $this->getStrategyProvider();
+
+        $currentStrategy = $provider->getStrategy();
+
+        foreach ($provider->getStrategies() as $strategy) {
+            $provider->setStrategy($strategy);
+
+            /* @var $translator Translator */
+            $translator = new static($this->container, $this->messageSelector, $this->loaderIds, $options);
+            $translator->setDatabaseMetadataCache($this->databaseTranslationMetadataCache);
+
+            $translator->warmUp($tmpDir);
         }
 
-        $tmpDir = $cacheDir . DIRECTORY_SEPARATOR . uniqid('CACHE_', true);
-
-        $options = array_merge($this->originalOptions, ['cache_dir' => $tmpDir]);
-
-        $translator = new static($this->container, $this->messageSelector, $this->loaderIds, $options);
-        $translator->setDatabaseMetadataCache($this->databaseTranslationMetadataCache);
-
-        $translator->warmUp($tmpDir);
+        $provider->setStrategy($currentStrategy);
 
         $iterator = new \IteratorIterator(new \DirectoryIterator($tmpDir));
         foreach ($iterator as $path) {
@@ -336,9 +381,13 @@ class Translator extends BaseTranslator
             ? $this->catalogues[Translator::DEFAULT_LOCALE]
             : null;
 
-        foreach ($this->dynamicResources as $items) {
-            if (!$defaultLocale) {
+        if (!$defaultLocale) {
+            foreach ($this->dynamicResources as $items) {
                 foreach ($items as $item) {
+                    if (in_array($item, $this->registeredResources, true)) {
+                        continue;
+                    }
+                    $this->registeredResources[] = $item;
                     $this->addResource($item['format'], $item['resource'], $item['code'], $item['domain']);
                 }
             }
@@ -381,7 +430,7 @@ class Translator extends BaseTranslator
                     );
                     $item['format']   = 'oro_database_translation';
 
-                    $this->dynamicResources[$locale][] = $item;
+                    $this->dynamicResources[$item['code']][] = $item;
                 }
             }
         }

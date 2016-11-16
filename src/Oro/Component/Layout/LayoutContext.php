@@ -193,4 +193,16 @@ class LayoutContext implements ContextInterface
     {
         return new OptionsResolver();
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getHash()
+    {
+        if (!$this->isResolved()) {
+            throw new Exception\LogicException('The context is not resolved.');
+        }
+
+        return md5(serialize($this->items));
+    }
 }
