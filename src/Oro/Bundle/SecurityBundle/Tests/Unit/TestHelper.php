@@ -77,15 +77,20 @@ class TestHelper
      * @param OwnerTree $ownerTree
      * @param ObjectIdAccessor $idAccessor
      * @param AccessLevelOwnershipDecisionMakerInterface $decisionMaker
+     * @param EntityOwnerAccessor $entityOwnerAccessor
      * @param PermissionManager $permissionManager
      * @param AclGroupProviderInterface $groupProvider
      * @return EntityAclExtension
+     *
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
+     * @SuppressWarnings(PHPMD.NPathComplexity)
      */
     public function createEntityAclExtension(
         OwnershipMetadataProvider $metadataProvider = null,
         OwnerTree $ownerTree = null,
         ObjectIdAccessor $idAccessor = null,
         AccessLevelOwnershipDecisionMakerInterface $decisionMaker = null,
+        EntityOwnerAccessor $entityOwnerAccessor = null,
         PermissionManager $permissionManager = null,
         AclGroupProviderInterface $groupProvider = null
     ) {
@@ -97,6 +102,9 @@ class TestHelper
         }
         if ($metadataProvider === null) {
             $metadataProvider = new OwnershipMetadataProviderStub($this->testCase);
+        }
+        if ($entityOwnerAccessor === null) {
+            $entityOwnerAccessor = new EntityOwnerAccessor($metadataProvider);
         }
         if ($ownerTree === null) {
             $ownerTree = new OwnerTree();
@@ -174,6 +182,7 @@ class TestHelper
             new EntityClassResolver($doctrine),
             $entityMetadataProvider,
             $metadataProvider,
+            $entityOwnerAccessor,
             $decisionMaker,
             $permissionManager ?: $this->getPermissionManagerMock($this->testCase),
             $groupProvider ?: $this->getGroupProviderMock($this->testCase),

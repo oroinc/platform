@@ -70,7 +70,7 @@ class AclVoterTest extends \PHPUnit_Framework_TestCase
         $inVoteObject = null;
         $inVoteExtension = null;
 
-        $extension = $this->assertAclExtensionCalled($expectedObject, $permissions);
+        $extension = $this->assertAclExtensionCalled($object, $permissions);
 
         $this->permissionMap
             ->expects($this->any())

@@ -36,11 +36,6 @@ interface MetadataProviderInterface
     public function getGlobalLevelClass();
 
     /**
-     * @return string
-     */
-    public function getSystemLevelClass();
-
-    /**
      * @param int    $accessLevel Current object access level
      * @param string $className   Class name to test
      *

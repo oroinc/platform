@@ -18,7 +18,7 @@ use Oro\Bundle\DataGridBundle\Extension\AbstractExtension;
 use Oro\Bundle\DataGridBundle\Extension\Formatter\Property\PropertyInterface;
 use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
-use Oro\Bundle\SecurityBundle\Acl\Domain\EntityObjectReference;
+use Oro\Bundle\SecurityBundle\Acl\Domain\DomainObjectReference;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProvider;
 
 class FieldAclExtension extends AbstractExtension
@@ -110,21 +110,20 @@ class FieldAclExtension extends AbstractExtension
 
         /** @var ResultRecord $record */
         foreach ($result->getData() as $record) {
-            $domainObjects = [];
-            foreach ($this->fieldAclConfig as $column => $fieldInfo) {
-                $alias = $fieldInfo[0];
-                if (!array_key_exists($alias, $domainObjects)) {
-                    $domainObjects[$alias] = new EntityObjectReference(
+            $entityReferences = [];
+            foreach ($this->fieldAclConfig as $columnName => $fieldData) {
+                $alias = $fieldData[0];
+                if (!array_key_exists($alias, $entityReferences)) {
+                    $entityReferences[$alias] = new DomainObjectReference(
                         $this->queryAliases[$alias],
                         $record->getValue('id'),
                         $record->getValue(sprintf(self::OWNER_FIELD_PLACEHOLDER, $alias)),
                         $record->getValue(sprintf(self::ORGANIZARION_FIELD_PLACEHOLDER, $alias))
                     );
                 }
-                $entityObject = $domainObjects[$alias];
-                if (!$this->authChecker->isGranted('VIEW', new FieldVote($entityObject, $fieldInfo[1]))) {
-                    // set column value to null if user have no access to view this value
-                    $record->setValue($column, null);
+                if (!$this->authChecker->isGranted('VIEW', new FieldVote($entityReferences[$alias], $fieldData[1]))) {
+                    // set column value to null if user does not have an access to view this value
+                    $record->setValue($columnName, null);
                 }
             }
         }

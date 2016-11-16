@@ -291,15 +291,6 @@ class OwnershipMetadataProviderTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \BadMethodCallException
-     * @expectedExceptionMessage Method getSystemLevelClass() unsupported.
-     */
-    public function testGetSystemLevelClass()
-    {
-        $this->assertFalse($this->provider->getSystemLevelClass());
-    }
-
-    /**
      * @dataProvider owningEntityNamesDataProvider
      *
      * @expectedException \InvalidArgumentException

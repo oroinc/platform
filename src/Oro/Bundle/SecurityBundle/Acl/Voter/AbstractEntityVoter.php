@@ -3,13 +3,14 @@
 namespace Oro\Bundle\SecurityBundle\Acl\Voter;
 
 use Symfony\Component\Security\Acl\Voter\FieldVote;
+use Symfony\Component\Security\Acl\Model\ObjectIdentityInterface;
+use Symfony\Component\Security\Acl\Util\ClassUtils;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authorization\Voter\VoterInterface;
-use Symfony\Component\Security\Core\Util\ClassUtils;
-use Symfony\Component\Security\Acl\Model\ObjectIdentityInterface;
 
 use Oro\Bundle\EntityBundle\Exception\NotManageableEntityException;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
+use Oro\Bundle\SecurityBundle\Acl\Extension\ObjectIdentityHelper;
 
 abstract class AbstractEntityVoter implements VoterInterface
 {
@@ -165,12 +166,7 @@ abstract class AbstractEntityVoter implements VoterInterface
     protected function getEntityClass($object)
     {
         if ($object instanceof ObjectIdentityInterface) {
-            $class = $object->getType();
-
-            $delim = strpos($class, '@');
-            if ($delim) {
-                $class = ltrim(substr($class, $delim + 1), ' ');
-            }
+            $class = ObjectIdentityHelper::normalizeType($object->getType());
         } elseif ($object instanceof FieldVote) {
             return $this->getEntityClass($object->getDomainObject());
         } else {

@@ -2,9 +2,6 @@
 
 namespace Oro\Bundle\SecurityBundle\Acl\Extension;
 
-use Doctrine\Common\Collections\ArrayCollection;
-use Oro\Bundle\SecurityBundle\Acl\AccessLevel;
-use Oro\Bundle\SecurityBundle\Model\AclPermission;
 use Symfony\Component\Security\Acl\Model\ObjectIdentityInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 
@@ -12,9 +9,7 @@ use Oro\Bundle\SecurityBundle\Acl\Exception\InvalidAclMaskException;
 
 abstract class AbstractAclExtension implements AclExtensionInterface
 {
-    /**
-     * @var array
-     */
+    /** @var array [permission => [mask, ...], ...] */
     protected $map;
 
     /**
@@ -30,7 +25,7 @@ abstract class AbstractAclExtension implements AclExtensionInterface
      */
     public function getMasks($permission)
     {
-        return isset($this->map[$permission])
+        return array_key_exists($permission, $this->map)
             ? $this->map[$permission]
             : null;
     }
@@ -40,7 +35,7 @@ abstract class AbstractAclExtension implements AclExtensionInterface
      */
     public function hasMasks($permission)
     {
-        return isset($this->map[$permission]);
+        return array_key_exists($permission, $this->map);
     }
 
     /**
@@ -86,15 +81,16 @@ abstract class AbstractAclExtension implements AclExtensionInterface
     /**
      * Split the given object identity descriptor
      *
-     * @param string $descriptor
-     * @param string $type [output]
-     * @param string $id [output]
-     * @param string $group
+     * @param string $descriptor The ACL descriptor to parse
+     * @param string $type       [output]
+     * @param string $id         [output]
+     * @param string $group      [output]
+     *
      * @throws \InvalidArgumentException
      */
     protected function parseDescriptor($descriptor, &$type, &$id, &$group)
     {
-        $delim = strpos($descriptor, ':');
+        $delim = strpos($descriptor, ObjectIdentityHelper::IDENTITY_TYPE_DELIMITER);
         if (!$delim) {
             throw new \InvalidArgumentException(
                 sprintf('Incorrect descriptor: %s. Expected "ExtensionKey:Class".', $descriptor)
@@ -102,21 +98,16 @@ abstract class AbstractAclExtension implements AclExtensionInterface
         }
 
         $id = strtolower(substr($descriptor, 0, $delim));
-        $type = ltrim(substr($descriptor, $delim + 1), ' ');
-
-        $delim = strpos($type, '@');
-        if ($delim !== false) {
-            $group = strtolower(ltrim(substr($type, 0, $delim), ' '));
-            $type = ltrim(substr($type, $delim + 1), ' ');
-        }
+        list($type, $group) = ObjectIdentityHelper::parseType(ltrim(substr($descriptor, $delim + 1), ' '));
     }
 
     /**
      * Builds InvalidAclMaskException object
      *
-     * @param int $mask
-     * @param mixed $object
+     * @param int         $mask
+     * @param mixed       $object
      * @param string|null $errorDescription
+     *
      * @return InvalidAclMaskException
      */
     protected function createInvalidAclMaskException($mask, $object, $errorDescription = null)

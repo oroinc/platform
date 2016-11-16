@@ -16,26 +16,26 @@ final class FieldMaskBuilder extends MaskBuilder
     const SERVICE_BITS          = -2048;  // 0xFFFFF800
     const REMOVE_SERVICE_BITS   = 2047;   // 0x000007FF
 
-    // These access levels give a user access to own records fields and objects fields that are shared with the user.
+    // These access levels give a user access to fields of own records.
     const MASK_VIEW_BASIC       = 1;      // 1 << 0     + IDENTITY
     const MASK_EDIT_BASIC       = 2;      // 1 << 1     + IDENTITY
 
-    // These access levels give a user access to records fields in all business units are assigned to the user.
+    // These access levels give a user access to fields of records in all business units are assigned to the user.
     const MASK_VIEW_LOCAL       = 4;      // 1 << 2     + IDENTITY
     const MASK_EDIT_LOCAL       = 8;      // 1 << 3     + IDENTITY
 
-    // These access levels give a user access to records fields in all business units are assigned to the user
+    // These access levels give a user access to fields of records in all business units are assigned to the user
     // and all business units subordinate to business units are assigned to the user.
     const MASK_VIEW_DEEP        = 16;     // 1 << 4     + IDENTITY
     const MASK_EDIT_DEEP        = 32;     // 1 << 5     + IDENTITY
 
-    // These access levels give a user access to all records fields within the organization,
+    // These access levels give a user access to all fields of records within the organization,
     // regardless of the business unit hierarchical level to which the domain object belongs
     // or the user is assigned to.
     const MASK_VIEW_GLOBAL      = 64;     // 1 << 6     + IDENTITY
     const MASK_EDIT_GLOBAL      = 128;    // 1 << 7     + IDENTITY
 
-    // These access levels give a user access to all records fields within the system.
+    // These access levels give a user access to all fields of records within the system.
     const MASK_VIEW_SYSTEM      = 256;    // 1 << 8     + IDENTITY
     const MASK_CREATE_SYSTEM    = 512;    // 1 << 9     + IDENTITY
     const MASK_EDIT_SYSTEM      = 1024;   // 1 << 10    + IDENTITY

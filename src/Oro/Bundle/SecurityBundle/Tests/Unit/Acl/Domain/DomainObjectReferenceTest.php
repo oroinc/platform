@@ -2,9 +2,9 @@
 
 namespace Oro\Bundle\SecurityBundle\Tests\Unit\Acl\Domain;
 
-use Oro\Bundle\SecurityBundle\Acl\Domain\EntityObjectReference;
+use Oro\Bundle\SecurityBundle\Acl\Domain\DomainObjectReference;
 
-class EntityObjectReferenceTest extends \PHPUnit_Framework_TestCase
+class DomainObjectReferenceTest extends \PHPUnit_Framework_TestCase
 {
     public function testGetObjectData()
     {
@@ -13,7 +13,7 @@ class EntityObjectReferenceTest extends \PHPUnit_Framework_TestCase
         $ownerId = 12;
         $organizationId = 23;
         
-        $objectReference = new EntityObjectReference($className, $objectId, $ownerId, $organizationId);
+        $objectReference = new DomainObjectReference($className, $objectId, $ownerId, $organizationId);
 
         $this->assertEquals($className, $objectReference->getType());
         $this->assertEquals($objectId, $objectReference->getIdentifier());
