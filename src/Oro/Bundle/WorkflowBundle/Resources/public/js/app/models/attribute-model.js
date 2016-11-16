@@ -11,7 +11,8 @@ define(function(require) {
             translated_label: null,
             type: null,
             property_path: null,
-            options: null
+            options: null,
+            translateLinks: []
         },
 
         initialize: function() {

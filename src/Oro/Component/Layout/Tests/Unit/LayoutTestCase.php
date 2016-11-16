@@ -39,26 +39,15 @@ class LayoutTestCase extends \PHPUnit_Framework_TestCase
     /**
      * @param array $view
      * @param array $vars
-     *
-     * @return array
      */
     protected function completeView(array &$view, $vars)
     {
-        if (!isset($view['vars'])) {
-            $view['vars'] = [];
-        }
-        if (!isset($view['vars']['id'])) {
-            $view['vars']['id'] = '';
-        }
-        if (!isset($view['vars']['attr'])) {
-            $view['vars']['attr'] = [];
-        }
-        if (!isset($view['children'])) {
-            $view['children'] = [];
-        }
-        if (!isset($view['vars']['class_prefix'])) {
-            $view['vars']['class_prefix'] = null;
-        }
+        $this->setDefaultValue($view['vars'], []);
+        $this->setDefaultValue($view['vars']['id'], '');
+        $this->setDefaultValue($view['vars']['attr'], []);
+        $this->setDefaultValue($view['vars']['class_prefix'], null);
+        $this->setDefaultValue($view['vars']['visible'], true);
+        $this->setDefaultValue($view['children'], []);
 
         if ($view['vars'] instanceof Options) {
             $merged = array_merge($vars, $view['vars']->toArray());
@@ -69,6 +58,17 @@ class LayoutTestCase extends \PHPUnit_Framework_TestCase
 
         foreach ($view['children'] as &$child) {
             $this->completeView($child, $vars);
+        }
+    }
+
+    /**
+     * @param mixed $value
+     * @param mixed $defaultValue
+     */
+    protected function setDefaultValue(&$value, $defaultValue)
+    {
+        if (!isset($value)) {
+            $value = $defaultValue;
         }
     }
 
@@ -94,13 +94,15 @@ class LayoutTestCase extends \PHPUnit_Framework_TestCase
         unset($result['vars']['block']);
 
         if ($removeAuxiliaryVariables) {
-            unset($result['vars']['translation_domain']);
-            unset($result['vars']['label']);
-            unset($result['vars']['block_type']);
-            unset($result['vars']['block_type_widget_id']);
-            unset($result['vars']['unique_block_prefix']);
-            unset($result['vars']['block_prefixes']);
-            unset($result['vars']['cache_key']);
+            unset(
+                $result['vars']['translation_domain'],
+                $result['vars']['label'],
+                $result['vars']['block_type'],
+                $result['vars']['block_type_widget_id'],
+                $result['vars']['unique_block_prefix'],
+                $result['vars']['block_prefixes'],
+                $result['vars']['cache_key']
+            );
         }
 
         return $result;
