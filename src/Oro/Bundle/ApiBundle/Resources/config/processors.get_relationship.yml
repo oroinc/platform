@@ -188,6 +188,14 @@ services:
         tags:
             - { name: oro.api.processor, action: get_relationship, group: build_query, priority: -150 }
 
+    oro_api.get_relationship.build_query_by_extended_association:
+        class: Oro\Bundle\ApiBundle\Processor\Subresource\Shared\BuildQueryByExtendedAssociation
+        arguments:
+            - '@oro_api.doctrine_helper'
+            - '@oro_entity.orm.entity_class_resolver'
+            - '@oro_api.criteria_connector'
+        tags:
+            - { name: oro.api.processor, action: get_relationship, group: build_query, collection: false, priority: -160 }
     #
     # load_data
     #
@@ -198,6 +206,15 @@ services:
             - '@oro_api.entity_serializer'
         tags:
             - { name: oro.api.processor, action: get_relationship, group: load_data, collection: true, priority: -10 }
+
+    oro_api.get_relationship.load_entity_by_extended_association.single_item:
+        class: Oro\Bundle\ApiBundle\Processor\Subresource\Shared\LoadEntityByExtendedAssociation
+        arguments:
+            - '@oro_api.entity_serializer'
+            - '@oro_api.config_provider'
+            - '@oro_api.metadata_provider'
+        tags:
+            - { name: oro.api.processor, action: get_relationship, group: load_data, collection: false, priority: -9 }
 
     oro_api.get_relationship.load_data_by_entity_serializer.single_item:
         class: Oro\Bundle\ApiBundle\Processor\Shared\LoadEntityByEntitySerializer

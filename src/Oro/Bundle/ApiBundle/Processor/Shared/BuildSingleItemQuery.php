@@ -4,7 +4,7 @@ namespace Oro\Bundle\ApiBundle\Processor\Shared;
 
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
-use Oro\Bundle\ApiBundle\Exception\RuntimeException;
+
 use Oro\Bundle\ApiBundle\Processor\SingleItemContext;
 use Oro\Bundle\ApiBundle\Util\CriteriaConnector;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
@@ -56,50 +56,8 @@ class BuildSingleItemQuery implements ProcessorInterface
 
         $query = $this->doctrineHelper->getEntityRepositoryForClass($entityClass)->createQueryBuilder('e');
         $this->criteriaConnector->applyCriteria($query, $criteria);
+        $query = $this->doctrineHelper->getQueryForSingleEntity($query, $entityClass, $context->getId());
 
-        $entityId = $context->getId();
-        $idFields = $this->doctrineHelper->getEntityIdentifierFieldNamesForClass($entityClass);
-        if (count($idFields) === 1) {
-            // single identifier
-            if (is_array($entityId)) {
-                throw new RuntimeException(
-                    sprintf(
-                        'The entity identifier cannot be an array because the entity "%s" has single primary key.',
-                        $entityClass
-                    )
-                );
-            }
-            $query
-                ->andWhere(sprintf('e.%s = :id', reset($idFields)))
-                ->setParameter('id', $entityId);
-        } else {
-            // combined identifier
-            if (!is_array($entityId)) {
-                throw new RuntimeException(
-                    sprintf(
-                        'The entity identifier must be an array because the entity "%s" has composite primary key.',
-                        $entityClass
-                    )
-                );
-            }
-            $counter = 1;
-            foreach ($idFields as $field) {
-                if (!array_key_exists($field, $entityId)) {
-                    throw new RuntimeException(
-                        sprintf(
-                            'The entity identifier array must have the key "%s" because '
-                            . 'the entity "%s" has composite primary key.',
-                            $field,
-                            $entityClass
-                        )
-                    );
-                }
-                $query
-                    ->andWhere(sprintf('e.%s = :id%d', $field, $counter))
-                    ->setParameter(sprintf('id%d', $counter), $entityId[$field]);
-                $counter++;
-            }
-        }
         $context->setQuery($query);
     }
 }
