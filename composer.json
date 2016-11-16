@@ -116,8 +116,7 @@
         "npm-asset/requirejs": "2.3.*",
         "doctrine/annotations": "~1.2.7",
         "robloach/component-installer": "0.2.*",
-        "npm-asset/normalize-scss": "6.0.0",
-        "twbs/bootstrap": "4.0.0-alpha.5"
+        "npm-asset/normalize-scss": "6.0.0"
     },
     "require-dev": {
         "sensio/generator-bundle": "2.5.3",
