@@ -59,6 +59,8 @@ class OperationButtonTest extends \PHPUnit_Framework_TestCase
 
     public function testGetTemplate()
     {
+        $definition = $this->getMockBuilder(OperationDefinition::class)->disableOriginalConstructor()->getMock();
+        $this->assertOperationMethodsCalled($definition);
         $this->assertEquals(OperationButton::DEFAULT_TEMPLATE, $this->button->getTemplate());
     }
 
@@ -127,6 +129,18 @@ class OperationButtonTest extends \PHPUnit_Framework_TestCase
     public function testGetButtonContext()
     {
         $this->assertInstanceOf(ButtonContext::class, $this->button->getButtonContext());
+    }
+
+    public function testGetTemplateWithConfiguredFrontendOptions()
+    {
+        $templateName = uniqid('test_template', true);
+        $definition = $this->getMockBuilder(OperationDefinition::class)->disableOriginalConstructor()->getMock();
+        $definition->expects($this->once())->method('getButtonOptions')->willReturn(
+            [OperationButton::BUTTON_TEMPLATE_KEY => $templateName]
+        );
+        $this->assertOperationMethodsCalled($definition);
+
+        $this->assertEquals($templateName, $this->button->getTemplate());
     }
 
     /**

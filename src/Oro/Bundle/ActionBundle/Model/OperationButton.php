@@ -5,7 +5,7 @@ namespace Oro\Bundle\ActionBundle\Model;
 class OperationButton implements ButtonInterface
 {
     const DEFAULT_TEMPLATE = 'OroActionBundle:Operation:button.html.twig';
-    const FRONTEND_TEMPLATE_KEY = 'template';
+    const BUTTON_TEMPLATE_KEY = 'template';
 
     /**
      * @var Operation
@@ -40,7 +40,11 @@ class OperationButton implements ButtonInterface
      */
     public function getTemplate()
     {
-        return static::DEFAULT_TEMPLATE;
+        $buttonOptions = $this->operation->getDefinition()->getButtonOptions();
+
+        return !empty($buttonOptions[static::BUTTON_TEMPLATE_KEY])
+            ? $buttonOptions[static::BUTTON_TEMPLATE_KEY]
+            : static::DEFAULT_TEMPLATE;
     }
 
     /**
@@ -50,17 +54,14 @@ class OperationButton implements ButtonInterface
     {
         $definition = $this->operation->getDefinition();
         $buttonOptions = $definition->getButtonOptions();
+        $buttonGroups = [
+            null,
+            OperationRegistry::DEFAULT_GROUP,
+            OperationRegistry::UPDATE_PAGE_GROUP,
+            OperationRegistry::VIEW_PAGE_GROUP,
+        ];
 
-        if (in_array(
-            $this->getButtonContext()->getGroup(),
-            [
-                null,
-                OperationRegistry::DEFAULT_GROUP,
-                OperationRegistry::UPDATE_PAGE_GROUP,
-                OperationRegistry::VIEW_PAGE_GROUP,
-            ],
-            true
-        )) {
+        if (in_array($this->getButtonContext()->getGroup(), $buttonGroups, true)) {
             if (!isset($buttonOptions['aCss'])) {
                 $buttonOptions['aCss'] = '';
             }
