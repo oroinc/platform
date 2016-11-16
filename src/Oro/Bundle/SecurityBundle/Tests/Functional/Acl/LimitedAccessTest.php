@@ -14,7 +14,7 @@ use Oro\Bundle\SecurityBundle\Annotation\Acl;
 use Oro\Bundle\SecurityBundle\Authentication\Token\UsernamePasswordOrganizationToken;
 use Oro\Bundle\SecurityBundle\SecurityFacade;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
-use Oro\Bundle\TestFrameworkBundle\Entity\TestActivity as TestEntity;
+use Oro\Bundle\TestFrameworkBundle\Entity\TestEntityWithUserOwnership as TestEntity;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\UserBundle\Entity\UserManager;
 
@@ -71,7 +71,7 @@ class LimitedAccessTest extends WebTestCase
         if (null === $this->testEntity) {
             $this->testEntity = new TestEntity();
             $this->testEntity
-                ->setMessage('test')
+                ->setName('test')
                 ->setOrganization($organization)
                 ->setOwner($em->getRepository('OroUserBundle:User')->findOneBy(['email' => self::AUTH_USER]));
             $em->persist($this->testEntity);
@@ -90,7 +90,7 @@ class LimitedAccessTest extends WebTestCase
             $aclManager->setFieldPermission(
                 $aclManager->getSid($em->getRepository('OroUserBundle:Role')->findOneBy(['role' => 'ROLE_USER'])),
                 $aclManager->getOid('entity:' . TestEntity::class),
-                'message',
+                'name',
                 $fieldEditMaskBuilder->get()
             );
             $aclManager->flush();
@@ -243,14 +243,14 @@ class LimitedAccessTest extends WebTestCase
     public function testEntityField()
     {
         self::assertFalse(
-            $this->getSecurityFacade()->isGranted('EDIT', new FieldVote($this->testEntity, 'message'))
+            $this->getSecurityFacade()->isGranted('EDIT', new FieldVote($this->testEntity, 'name'))
         );
     }
 
     public function testEntityFieldWhenAccessGranted()
     {
         self::assertTrue(
-            $this->getSecurityFacade()->isGranted('VIEW', new FieldVote($this->testEntity, 'message'))
+            $this->getSecurityFacade()->isGranted('VIEW', new FieldVote($this->testEntity, 'name'))
         );
     }
 
@@ -263,7 +263,7 @@ class LimitedAccessTest extends WebTestCase
             $this->testEntity->getOrganization()->getId()
         );
         self::assertFalse(
-            $this->getSecurityFacade()->isGranted('EDIT', new FieldVote($objectReference, 'message'))
+            $this->getSecurityFacade()->isGranted('EDIT', new FieldVote($objectReference, 'name'))
         );
     }
 
@@ -276,7 +276,7 @@ class LimitedAccessTest extends WebTestCase
             $this->testEntity->getOrganization()->getId()
         );
         self::assertTrue(
-            $this->getSecurityFacade()->isGranted('VIEW', new FieldVote($objectReference, 'message'))
+            $this->getSecurityFacade()->isGranted('VIEW', new FieldVote($objectReference, 'name'))
         );
     }
 
@@ -287,7 +287,7 @@ class LimitedAccessTest extends WebTestCase
             new ObjectIdentity($this->testEntity->getId(), TestEntity::class)
         );
         self::assertFalse(
-            $this->getSecurityFacade()->isGranted('EDIT', new FieldVote($objectReference, 'message'))
+            $this->getSecurityFacade()->isGranted('EDIT', new FieldVote($objectReference, 'name'))
         );
     }
 
@@ -298,7 +298,7 @@ class LimitedAccessTest extends WebTestCase
             new ObjectIdentity($this->testEntity->getId(), TestEntity::class)
         );
         self::assertTrue(
-            $this->getSecurityFacade()->isGranted('VIEW', new FieldVote($objectReference, 'message'))
+            $this->getSecurityFacade()->isGranted('VIEW', new FieldVote($objectReference, 'name'))
         );
     }
 }

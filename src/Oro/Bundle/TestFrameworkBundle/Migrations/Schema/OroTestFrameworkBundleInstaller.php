@@ -49,7 +49,7 @@ class OroTestFrameworkBundleInstaller implements
      */
     public function getMigrationVersion()
     {
-        return 'v1_3';
+        return 'v1_4';
     }
 
     /**
@@ -72,6 +72,7 @@ class OroTestFrameworkBundleInstaller implements
         $this->createTestProductTable($schema);
         $this->createTestProductTypeTable($schema);
         $this->createTestAuditDataTables($schema);
+        $this->createTestUserOwnershipTable($schema);
 
         /** Foreign keys generation **/
         $this->addTestSearchItemForeignKeys($schema);
@@ -79,6 +80,7 @@ class OroTestFrameworkBundleInstaller implements
         $this->addTestActivityForeignKeys($schema);
         $this->addTestPersonForeignKeys($schema);
         $this->addTestProductForeignKeys($schema);
+        $this->addTestUserOwnershipForeignKeys($schema);
 
         $this->activityExtension->addActivityAssociation($schema, 'test_activity', 'test_activity_target', true);
     }
@@ -513,6 +515,23 @@ class OroTestFrameworkBundleInstaller implements
     }
 
     /**
+     * Create test_user_ownership table
+     *
+     * @param Schema $schema
+     */
+    protected function createTestUserOwnershipTable(Schema $schema)
+    {
+        $table = $schema->createTable('test_user_ownership');
+        $table->addColumn('id', 'integer', ['autoincrement' => true]);
+        $table->addColumn('owner_id', 'integer', ['notnull' => false]);
+        $table->addColumn('organization_id', 'integer', ['notnull' => false]);
+        $table->addColumn('name', 'string', ['notnull' => false, 'length' => 255]);
+        $table->setPrimaryKey(['id']);
+        $table->addIndex(['organization_id'], 'IDX_673C997D32C8A3DE', []);
+        $table->addIndex(['owner_id'], 'IDX_673C997D7E3C61F9', []);
+    }
+
+    /**
      * Add test_person foreign keys.
      *
      * @param Schema $schema
@@ -600,6 +619,28 @@ class OroTestFrameworkBundleInstaller implements
             $schema->getTable('test_product_type'),
             ['product_type'],
             ['name'],
+            ['onDelete' => 'SET NULL', 'onUpdate' => null]
+        );
+    }
+
+    /**
+     * Add test_user_ownership foreign keys.
+     *
+     * @param Schema $schema
+     */
+    protected function addTestUserOwnershipForeignKeys(Schema $schema)
+    {
+        $table = $schema->getTable('test_user_ownership');
+        $table->addForeignKeyConstraint(
+            $schema->getTable('oro_user'),
+            ['owner_id'],
+            ['id'],
+            ['onDelete' => 'SET NULL', 'onUpdate' => null]
+        );
+        $table->addForeignKeyConstraint(
+            $schema->getTable('oro_organization'),
+            ['organization_id'],
+            ['id'],
             ['onDelete' => 'SET NULL', 'onUpdate' => null]
         );
     }
