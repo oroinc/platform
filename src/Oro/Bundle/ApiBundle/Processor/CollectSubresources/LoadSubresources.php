@@ -58,7 +58,7 @@ abstract class LoadSubresources implements ProcessorInterface
                 $subresource->setExcludedActions($subresourceExcludedActions);
             }
             if ($association->has(DataType::INVERSE_ASSOCIATION_FIELD)) {
-                $subresource->setExcludedActions(['update_relationship', 'delete_relationship']);
+                $subresource->setExcludedActions([ApiActions::UPDATE_RELATIONSHIP, ApiActions::DELETE_RELATIONSHIP]);
             }
         } else {
             if (!$this->isAccessibleAssociation($association, $accessibleResources)) {
