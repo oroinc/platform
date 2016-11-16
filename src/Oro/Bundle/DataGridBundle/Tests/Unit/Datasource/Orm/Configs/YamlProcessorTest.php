@@ -79,7 +79,7 @@ class YamlProcessorTest extends \PHPUnit_Framework_TestCase
 
         $configs = [
             'type' => 'orm',
-            'service' => $qb, // '@service.name->getDatagridQb()'
+            'query_builder' => $qb, // '@service.name->getDatagridQb()'
         ];
 
         $queryBuilder = $this->processor->processQuery($configs);
@@ -159,8 +159,8 @@ class YamlProcessorTest extends \PHPUnit_Framework_TestCase
         $qb = 'not-a-querybuilder';
 
         $configs = [
-            'type'              => 'orm',
-            'service'            => $qb,
+            'type' => 'orm',
+            'query_builder' => $qb,
         ];
 
         $this->setExpectedException(

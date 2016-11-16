@@ -30,8 +30,8 @@ class YamlProcessor implements ConfigProcessorInterface
             $queryConfig = $config['query'];
             $converter = new YamlConverter();
             return $converter->parse(['query' => $queryConfig], $this->registry);
-        } elseif (array_key_exists('service', $config)) {
-            $qb = $config['service']; // '@service.name->getDatagridQb()'
+        } elseif (array_key_exists('query_builder', $config)) {
+            $qb = $config['query_builder']; // '@service.name->getDatagridQb()'
             if ($qb instanceof QueryBuilder) {
                 return $qb;
             } else {
