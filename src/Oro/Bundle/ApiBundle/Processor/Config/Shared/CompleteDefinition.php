@@ -281,6 +281,7 @@ class CompleteDefinition implements ProcessorInterface
                     );
                     $field->setTargetType($this->getExtendedAssociationTargetType($reverseType));
 
+                    // inverse association fields should be excluded to avoid this fields in main actions
                     $field->setExcluded(true);
 
                     $this->completeAssociation($field, $associationSourceClass, $version, $requestType);

@@ -129,7 +129,6 @@ class Product
         $this->owner = $target;
     }
 
-
     /**
      * @return string
      */

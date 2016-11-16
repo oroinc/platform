@@ -13,6 +13,9 @@ class InitializeApiFormExtensionTest extends ChangeRelationshipTestCase
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $metadataTypeGuesser;
 
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    protected $inverseAssociationTypeGuesser;
+
     /** @var InitializeApiFormExtension */
     protected $processor;
 
@@ -25,10 +28,15 @@ class InitializeApiFormExtensionTest extends ChangeRelationshipTestCase
             ->getMockBuilder('Oro\Bundle\ApiBundle\Form\Guesser\MetadataTypeGuesser')
             ->disableOriginalConstructor()
             ->getMock();
+        $this->inverseAssociationTypeGuesser = $this
+            ->getMockBuilder('Oro\Bundle\ApiBundle\Form\Guesser\InverseAssociationTypeGuesser')
+            ->disableOriginalConstructor()
+            ->getMock();
 
         $this->processor = new InitializeApiFormExtension(
             $this->formExtensionSwitcher,
-            $this->metadataTypeGuesser
+            $this->metadataTypeGuesser,
+            $this->inverseAssociationTypeGuesser
         );
     }
 
@@ -40,6 +48,10 @@ class InitializeApiFormExtensionTest extends ChangeRelationshipTestCase
             ->method('setMetadataAccessor')
             ->with($this->isInstanceOf('Oro\Bundle\ApiBundle\Processor\Subresource\ContextParentMetadataAccessor'));
         $this->metadataTypeGuesser->expects($this->once())
+            ->method('setConfigAccessor')
+            ->with($this->isInstanceOf('Oro\Bundle\ApiBundle\Processor\Subresource\ContextParentConfigAccessor'));
+
+        $this->inverseAssociationTypeGuesser->expects($this->once())
             ->method('setConfigAccessor')
             ->with($this->isInstanceOf('Oro\Bundle\ApiBundle\Processor\Subresource\ContextParentConfigAccessor'));
 
