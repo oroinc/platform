@@ -72,7 +72,7 @@ class ProductDataProvider
 }
 ```
 
-Also you can implement [AbstractFormProvider](../../../../Component/Layout/DataProvider/AbstractFormProvider.php) if you use forms.
+Also you can implement [AbstractFormProvider](../../Layout/DataProvider/AbstractFormProvider.php) if you use forms.
 
 **IMPORTANT:**  DataProvider provider method should begin with `get`, `has` or `is`.
 

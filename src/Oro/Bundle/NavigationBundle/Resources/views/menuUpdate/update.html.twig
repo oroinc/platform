@@ -30,6 +30,7 @@
                 {#Delete button #}
                 {{ UI.deleteButton({
                     'label': 'oro.navigation.menuupdate.delete'|trans(),
+                    'successMessage': 'oro.navigation.menuupdate.deleted_message'|trans(),
                     'dataUrl': path('oro_navigation_menuupdate_delete', {ownershipType: ownershipType, menuName: menuName, key: app.request.get('key')}),
                     'dataRedirect': path(menuViewRoute, {menuName: entity.menu, id: ownerId}),
                     'aCss': 'no-hash remove-button',

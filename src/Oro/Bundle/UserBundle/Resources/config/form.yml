@@ -282,6 +282,7 @@ services:
             - '@oro_user.form.type.set_password.form'
             - '@oro_user.mailer.processor'
             - '@oro_user.manager'
+            - '@validator'
 
     oro_user.form.provider.password_tooltip:
         class: Oro\Bundle\UserBundle\Form\Provider\PasswordTooltipProvider

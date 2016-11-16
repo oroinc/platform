@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\SearchBundle\Tests\Unit\EventListener;
 
+use Oro\Bundle\EntityBundle\Provider\EntityNameResolver;
 use Oro\Bundle\SearchBundle\EventListener\PrepareResultItemListener;
-use Oro\Bundle\SearchBundle\Resolver\EntityTitleResolverInterface;
 
 class PrepareResultItemListenerTest extends \PHPUnit_Framework_TestCase
 {
@@ -45,7 +45,7 @@ class PrepareResultItemListenerTest extends \PHPUnit_Framework_TestCase
     /**
      * @var \PHPUnit_Framework_MockObject_MockObject
      */
-    protected $entityTitleResolver;
+    protected $entityNameResolver;
 
     /**
      * Set up test environment
@@ -76,13 +76,15 @@ class PrepareResultItemListenerTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->entityTitleResolver = $this->getMock(EntityTitleResolverInterface::class);
+        $this->entityNameResolver = $this->getMockBuilder(EntityNameResolver::class)
+            ->disableOriginalConstructor()
+            ->getMock();
 
         $this->listener = new PrepareResultItemListener(
             $this->router,
             $this->mapper,
             $this->em,
-            $this->entityTitleResolver
+            $this->entityNameResolver
         );
     }
 
@@ -311,8 +313,8 @@ class PrepareResultItemListenerTest extends \PHPUnit_Framework_TestCase
             ->with(get_class($this->entity))
             ->will($this->returnValue($repositoryMock));
 
-        $this->entityTitleResolver->expects($this->once())
-            ->method('resolve')
+        $this->entityNameResolver->expects($this->once())
+            ->method('getName')
             ->will($this->returnValue('testTitle'));
 
         $this->item->expects($this->once())
