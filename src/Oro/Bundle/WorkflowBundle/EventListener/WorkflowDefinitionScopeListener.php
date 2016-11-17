@@ -123,7 +123,7 @@ class WorkflowDefinitionScopeListener
     /**
      * @param Collection|Scope[] $from
      * @param Collection|Scope[] $to
-     * @return Collection|Scope[]
+     * @return ArrayCollection|Scope[]
      */
     private function getScopeDiff(Collection $from, Collection $to)
     {
