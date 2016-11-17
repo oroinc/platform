@@ -2,7 +2,8 @@
 
 namespace Oro\Bundle\WorkflowBundle\Model\Filter;
 
-use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
+
 use Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker;
 use Oro\Bundle\WorkflowBundle\Configuration\FeatureConfigurationExtension;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
@@ -23,7 +24,7 @@ class FeatureCheckerWorkflowRegistryFilter implements WorkflowDefinitionFilterIn
     /**
      * {@inheritdoc}
      */
-    public function filter(ArrayCollection $workflowDefinitions)
+    public function filter(Collection $workflowDefinitions)
     {
         return $workflowDefinitions->filter(function (WorkflowDefinition $workflowDefinition) {
             $workflowName = $workflowDefinition->getName();

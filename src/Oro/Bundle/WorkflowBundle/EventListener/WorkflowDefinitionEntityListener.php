@@ -34,7 +34,7 @@ class WorkflowDefinitionEntityListener
             );
 
             if (count($workflows) !== 0) {
-                throw $this->generateException($definition, $workflows);
+                throw $this->generateException($definition, $workflows->getValues());
             }
         }
     }
@@ -51,12 +51,12 @@ class WorkflowDefinitionEntityListener
                 $definition->getExclusiveActiveGroups()
             );
 
-            $workflows = array_filter($storedWorkflows, function (Workflow $workflow) use ($definition) {
+            $conflictingWorkflows = $storedWorkflows->filter(function (Workflow $workflow) use ($definition) {
                 return $definition->getName() !== $workflow->getName();
             });
 
-            if (count($workflows) !== 0) {
-                throw $this->generateException($definition, $workflows);
+            if ($conflictingWorkflows->isEmpty() === false) {
+                throw $this->generateException($definition, $conflictingWorkflows->getValues());
             }
         }
     }

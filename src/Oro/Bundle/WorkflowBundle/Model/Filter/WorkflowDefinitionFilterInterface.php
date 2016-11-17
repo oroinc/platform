@@ -2,14 +2,15 @@
 
 namespace Oro\Bundle\WorkflowBundle\Model\Filter;
 
-use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
+
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 
 interface WorkflowDefinitionFilterInterface
 {
     /**
-     * @param ArrayCollection|WorkflowDefinition[] $workflowDefinitions
-     * @return ArrayCollection|WorkflowDefinition[]
+     * @param Collection|WorkflowDefinition[] $workflowDefinitions
+     * @return Collection|WorkflowDefinition[]
      */
-    public function filter(ArrayCollection $workflowDefinitions);
+    public function filter(Collection $workflowDefinitions);
 }
