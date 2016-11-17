@@ -45,7 +45,7 @@ class AttributeAssembler extends BaseAbstractAssembler
      * @return ArrayCollection
      * @throws AssemblerException If configuration is invalid
      */
-    public function assemble(WorkflowDefinition $definition, array $configuration, array $transitionConfigurations)
+    public function assemble(WorkflowDefinition $definition, array $configuration, array $transitionConfigurations = [])
     {
         $entityAttributeName = $definition->getEntityAttributeName();
         if (!array_key_exists($entityAttributeName, $configuration)) {
@@ -59,10 +59,11 @@ class AttributeAssembler extends BaseAbstractAssembler
         }
 
         foreach ($transitionConfigurations as $transition) {
-            $initContextAttribute = array_key_exists(WorkflowConfiguration::NODE_INIT_CONTEXT_ATTRIBUTE, $transition) ?
-                $transition[WorkflowConfiguration::NODE_INIT_CONTEXT_ATTRIBUTE] :
-                WorkflowConfiguration::DEFAULT_INIT_CONTEXT_ATTRIBUTE;
+            if (!array_key_exists(WorkflowConfiguration::NODE_INIT_CONTEXT_ATTRIBUTE, $transition)) {
+                continue;
+            }
 
+            $initContextAttribute = $transition[WorkflowConfiguration::NODE_INIT_CONTEXT_ATTRIBUTE];
             if (!array_key_exists($initContextAttribute, $configuration)) {
                 $configuration[$initContextAttribute] = [
                     'label' => $initContextAttribute,
