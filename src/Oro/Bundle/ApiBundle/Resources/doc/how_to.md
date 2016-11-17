@@ -203,7 +203,7 @@ api:
                     exclude: true
 ```
 
-Please note that an entity, in this example *Oro\Bundle\ReminderBundle\Entity\Reminder*, should have `setInterval` method. This method is called by **create** and **update** actions to set the nested object. 
+Please note that an entity, in this example *Oro\Bundle\ReminderBundle\Entity\Reminder*, should have `setInterval` method. This method is called by [create](./actions.md#create-action) and [update](./actions.md#update-action) actions to set the nested object. 
 
 Here is an example how the nested objects looks in JSON.API:
 
@@ -225,14 +225,13 @@ Here is an example how the nested objects looks in JSON.API:
 Turn on Extended Many-To-One Associations
 -----------------------------------------
 
-Under term `Extended Many-To-One Associations` we mean resources like `Attachment`, `Comment` or `Note`. Each element of such resource can be assigned to another resource like `User`, `Account`, `Contact`, etc. The relation itself between them is represented by [Many-To-One Unidirectional association](http://docs.doctrine-project.org/projects/doctrine-orm/en/latest/reference/association-mapping.html#many-to-one-unidirectional). 
+For detail what are extended associations, please refer to [Associations](../../../EntityExtendBundle/Resources/doc/associations.md) topic.
 
-For more detail about such association, please refer to [Configure many-to-one associations](../../EntityExtendBundle/Resources/doc/associations.md#configure-many-to-one-associations)
+Depending on current entity configuration, each association resource (e.g. attachment) can be assigned to one of the couple of resources (e.g. user, account, contact) that supports such associations.
 
-So, depending on current entity configuration state, each association resource (e.g. attachment) can be assigned to one of the couple of resources (e.g. user, account, contact) that supports such associations. And by calling the same method `getTarget` from the attachment side (source) it will return target entity like `user` or `account` or `contact` (depending to which the particular attachment is attached to).
+### Owning side of an association 
 
-By default, the API engine will not automatically enable possibility to retrieve targets of such associations.
-But this behaviour can be achieved via configuration in `api.yml` files, for instance:
+By default, there is no possibility to retrieve targets of such associations. But this behaviour can be enabled via configuration in `Resources/config/oro/api.yml`, for instance:
 
 ```yaml
 api:
@@ -243,90 +242,19 @@ api:
                     data_type: association:manyToOne
 ```
 
-```yaml
-api:
-    entities:
-        Oro\Bundle\NoteBundle\Entity\Note:
-            fields:
-                target:
-                    data_type: association:manyToOne
-```
+After applying configuration like above, the `target` relationship will be available in scope of [get_list](./actions.md#get_list-action), [get](./actions.md#get-action), [create](./actions.md#create-action) and [update](./actions.md#update-action) actions. Also the `target` relationship will be available as subresource and it will be possible to perform [get_subresource](./actions.md#get_subresource-action), [get_relationship](./actions.md#get_relationship-action) and [update_relationship](./actions.md#update_relationship-action) actions.
 
-After applying configuration like above, the `target` relationship will be available in scope of `get_list`, `get`, `create`, `update`, etc. actions. 
-Also it will be possible to perform actions `get_relationship`, `get_subresource`, `update_relationship`.
+### Inverse side of an association 
 
-For example:
-
-- `get_relationship` target for `attachment` with id `1` - GET /api/attachments/1/relationships/target
-
-```json
-{
-  "data": {
-    "type": "users",
-    "id": "1"
-  }
-}
-```
-
-- `get_relationship` target for `attachment` with id `2` - GET /api/attachments/2/relationships/target
-
-```json
-{
-  "data": {
-    "type": "accounts",
-    "id": "14"
-  }
-}
-```
-
-- `update_relationship` target for `attachment` with id `1` - PATCH /api/attachments/1/relationships/target
-
-and Request body, e.g.
-
-```json
-{
-  "data": {
-    "type": "users",
-    "id": "11"
-  }
-}
-```
-
-will assign the `attachment` with id `1` to the `user` with id `11`
-
-
-- `get_subresource` target for `attachment` with id `1` - GET /api/attachments/1/target
-
-```json
-{
-  "data": {
-    "type": "users",
-    "id": "1",
-    "attributes": {
-      "username": "admin",
-      "email": "admin@local.com",
-      "createdAt": "2016-10-28T12:31:01Z",
-      "updatedAt": "2016-10-28T14:43:33Z",
-      ...
-    },
-    "relationships": {
-      ...
-    }
-  }
-}
-```
-
-Sometimes it is required to have ability to manipulate an inverse part of extend associations. For example, to see all the notes that was assigned for some entity.
-
-Developer can do this with declaration an API processor service based on [InverseAssociationRelationFields](../../ApiBundle/Processor/Config/SharedInverseAssociationRelationFields.php) class.
+Similar to an owning side of association the inverse part should be enabled manually. This can be done by registering [AddInverseToOneAssociation](../../ApiBundle/Processor/Config/Shared/AddInverseToOneAssociation.php) API processor.
 
 For example:
 
 ```yaml
-# your_bundle/Resources/config/services.yml
+# Resources/config/services.yml
 
-you_bundle.api.add_inverse_association:
-    class: Oro\Bundle\ApiBundle\Processor\Config\Shared\InverseAssociationRelationFields
+acme.api.add_inverse_association:
+    class: Oro\Bundle\ApiBundle\Processor\Config\Shared\AddInverseToOneAssociation
     arguments:
         - '@oro_entity_config.provider.extend'
         - '@oro_api.doctrine_helper'
@@ -337,6 +265,6 @@ you_bundle.api.add_inverse_association:
         - { name: oro.api.processor, action: get_config, extra: !identifier_fields_only&definition, priority: -29
 ```
 
-During declaration, the developer should set the source class name as parameter to `setAssociationClass` method call.
+Please note that the class name of the owning side entity should be set via `setAssociationClass` method in the service declaration. Also if an association has a kind it should be set via `setAssociationKind` method.
 
-After that, all the target entities will have additional API resources to get relationships and subresources and an API resource to add new relationship.
+After that, a relationship to the owning side entity will be available as subresource for all inverse side entities and it will be possible to perform [get_subresource](./actions.md#get_subresource-action), [get_relationship](./actions.md#get_relationship-action) and [add_relationship](./actions.md#add_relationship-action) actions.

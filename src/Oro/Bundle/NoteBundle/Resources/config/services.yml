@@ -111,7 +111,7 @@ services:
             - { name: oro_entity.exclusion_provider.api }
 
     oro_note.api.add_inverse_note_association:
-        class: Oro\Bundle\ApiBundle\Processor\Config\Shared\InverseAssociationRelationFields
+        class: Oro\Bundle\ApiBundle\Processor\Config\Shared\AddInverseToOneAssociation
         arguments:
             - '@oro_entity_config.provider.extend'
             - '@oro_api.doctrine_helper'

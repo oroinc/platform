@@ -17,9 +17,9 @@ use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
 
 /**
- * Collects inverse extend association relations for given source entity.
+ * Adds inverse side of "to-one" extended association.
  */
-class InverseAssociationRelationFields implements ProcessorInterface
+class AddInverseToOneAssociation implements ProcessorInterface
 {
     /** @var string */
     protected $associationClass;

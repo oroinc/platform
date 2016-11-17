@@ -62,7 +62,7 @@ services:
             - '@oro_security.security_facade'
 
     oro_comment.api.add_inverse_comment_association:
-        class: Oro\Bundle\ApiBundle\Processor\Config\Shared\InverseAssociationRelationFields
+        class: Oro\Bundle\ApiBundle\Processor\Config\Shared\AddInverseToOneAssociation
         arguments:
             - '@oro_entity_config.provider.extend'
             - '@oro_api.doctrine_helper'

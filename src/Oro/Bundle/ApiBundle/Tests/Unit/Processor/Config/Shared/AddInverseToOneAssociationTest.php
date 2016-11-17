@@ -4,14 +4,14 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\Config\Shared;
 
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionFieldConfig;
-use Oro\Bundle\ApiBundle\Processor\Config\Shared\InverseAssociationRelationFields;
+use Oro\Bundle\ApiBundle\Processor\Config\Shared\AddInverseToOneAssociation;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\Config\ConfigProcessorTestCase;
 use Oro\Bundle\EntityConfigBundle\Config\Config;
 use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityExtendBundle\Extend\RelationType;
 
-class InverseAssociationRelationFieldsTest extends ConfigProcessorTestCase
+class AddInverseToOneAssociationTest extends ConfigProcessorTestCase
 {
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $doctrineHelper;
@@ -22,7 +22,7 @@ class InverseAssociationRelationFieldsTest extends ConfigProcessorTestCase
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $valueNormalizer;
 
-    /** @var InverseAssociationRelationFields */
+    /** @var AddInverseToOneAssociation */
     protected $processor;
 
     protected function setUp()
@@ -39,7 +39,7 @@ class InverseAssociationRelationFieldsTest extends ConfigProcessorTestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->processor = new InverseAssociationRelationFields(
+        $this->processor = new AddInverseToOneAssociation(
             $this->extendConfigProvider,
             $this->doctrineHelper,
             $this->valueNormalizer
