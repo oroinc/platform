@@ -5,10 +5,19 @@ namespace Oro\Bundle\NavigationBundle\Migrations\Schema\v1_6;
 use Doctrine\DBAL\Schema\Schema;
 
 use Oro\Bundle\MigrationBundle\Migration\Migration;
+use Oro\Bundle\MigrationBundle\Migration\OrderedMigrationInterface;
 use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 
-class OroNavigationBundle implements Migration
+class AddScopeToMenuUpdateTable implements Migration, OrderedMigrationInterface
 {
+    /**
+     * {@inheritdoc}
+     */
+    public function getOrder()
+    {
+        return 2;
+    }
+
     /**
      * {@inheritdoc}
      */
@@ -28,8 +37,6 @@ class OroNavigationBundle implements Migration
     {
         $table = $schema->getTable('oro_navigation_menu_upd');
         $table->dropIndex('oro_navigation_menu_upd_uidx');
-        $table->dropColumn('ownership_type');
-        $table->dropColumn('owner_id');
         $table->addColumn('scope_id', 'integer', ['notnull' => true]);
         $table->addUniqueIndex(['key', 'scope_id'], 'oro_navigation_menu_upd_uidx');
     }
