@@ -399,7 +399,9 @@ class WorkflowDefinitionConfigurationBuilderTest extends \PHPUnit_Framework_Test
                     ->setName($transitionData['name'])
                     ->setInitEntities($this->getOption($transitionData, WorkflowConfiguration::NODE_INIT_ENTITIES, []))
                     ->setInitRoutes($this->getOption($transitionData, WorkflowConfiguration::NODE_INIT_ROUTES, []))
-                    ->setInitContextAttribute($this->getOption($transitionData, 'init_context_attribute', ''));
+                    ->setInitContextAttribute(
+                        $this->getOption($transitionData, WorkflowConfiguration::NODE_INIT_CONTEXT_ATTRIBUTE, '')
+                    );
                 $transitions[] = $transition;
             }
         }

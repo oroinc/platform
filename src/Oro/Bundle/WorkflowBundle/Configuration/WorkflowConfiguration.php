@@ -279,7 +279,7 @@ class WorkflowConfiguration extends AbstractConfiguration implements Configurati
                     ->arrayNode(self::NODE_INIT_ROUTES)
                         ->prototype('scalar')->end()
                     ->end()
-                    ->scalarNode('init_context_attribute')
+                    ->scalarNode(self::NODE_INIT_CONTEXT_ATTRIBUTE)
                         ->defaultValue(self::DEFAULT_INIT_CONTEXT_ATTRIBUTE)
                     ->end()
                     ->append($this->getTransitionTriggers())
