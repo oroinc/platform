@@ -96,9 +96,12 @@ class OAuthUserProviderTest extends \PHPUnit_Framework_TestCase
         $enumValueProvider = $this->getMockBuilder(EnumValueProvider::class)
             ->disableOriginalConstructor()
             ->getMock();
+        $enumValueProvider->method('getDefaultEnumValuesByCode')->willReturn(
+            new StubEnumValue('active', 'active', 0, true)
+        );
         $enumValueProvider->method('getEnumValueByCode')->willReturnCallback(
             function ($code, $id) {
-                return new StubEnumValue($id, $id);
+                return new StubEnumValue($id, $id, 0, false);
             }
         );
         $this->userManager = new UserManager(static::USER_CLASS, $this->registry, $ef, $enumValueProvider);

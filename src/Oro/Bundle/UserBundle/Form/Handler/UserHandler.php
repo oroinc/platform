@@ -22,7 +22,7 @@ use Oro\Bundle\UserBundle\Entity\UserManager;
  */
 class UserHandler extends AbstractUserHandler
 {
-    const STATUS_AVAILABLE = 'available';
+    const STATUS_ACTIVE = 'active';
 
     /** @var DelegatingEngine */
     protected $templating;
@@ -111,7 +111,7 @@ class UserHandler extends AbstractUserHandler
     protected function onSuccess(User $user)
     {
         if (null === $user->getAuthStatus()) {
-            $this->manager->setAuthStatus($user, self::STATUS_AVAILABLE);
+            $this->manager->setAuthStatus($user, self::STATUS_ACTIVE);
         }
 
         $this->manager->updateUser($user);

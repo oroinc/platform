@@ -9,7 +9,7 @@ use Oro\Bundle\UserBundle\Entity\User;
  */
 class ResetHandler extends AbstractUserHandler
 {
-    const STATUS_AVAILABLE = 'available';
+    const STATUS_ACTIVE = 'active';
 
     /**
      * {@inheritDoc}
@@ -21,7 +21,7 @@ class ResetHandler extends AbstractUserHandler
             ->setConfirmationToken(null)
             ->setPasswordRequestedAt(null);
 
-        $this->manager->setAuthStatus($user, self::STATUS_AVAILABLE);
+        $this->manager->setAuthStatus($user, self::STATUS_ACTIVE);
         $this->manager->updateUser($user);
     }
 }

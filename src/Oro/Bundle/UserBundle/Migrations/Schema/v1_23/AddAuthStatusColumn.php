@@ -33,7 +33,7 @@ class AddAuthStatusColumn implements Migration, ExtendExtensionAwareInterface
             'enum',
             'immutable_codes',
             [
-                'available',
+                'active',
                 'locked',
             ]
         );

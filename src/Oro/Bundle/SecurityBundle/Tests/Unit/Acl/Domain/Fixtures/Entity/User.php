@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\SecurityBundle\Tests\Unit\Acl\Domain\Fixtures\Entity;
 
-use Oro\Bundle\UserBundle\Entity\User as ParentUser;
+use Oro\Bundle\UserBundle\Tests\Unit\Stub\UserStub as ParentUser;
 
 class User extends ParentUser
 {

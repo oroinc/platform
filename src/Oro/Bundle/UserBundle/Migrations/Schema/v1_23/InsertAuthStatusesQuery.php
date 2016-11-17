@@ -56,8 +56,8 @@ class InsertAuthStatusesQuery extends ParametrizedMigrationQuery
 
         $statuses = [
             [
-                ':id' => 'available',
-                ':name' => 'Available',
+                ':id' => 'active',
+                ':name' => 'Active',
                 ':priority' => 1,
                 ':is_default' => true,
             ],
@@ -83,7 +83,7 @@ class InsertAuthStatusesQuery extends ParametrizedMigrationQuery
             }
         }
 
-        $defaultStatus = ['default_status' => 'available'];
+        $defaultStatus = ['default_status' => 'active'];
         $defaultStatusType = ['default_status' => Type::STRING];
 
         $sql = 'UPDATE oro_user SET auth_status_id = :default_status';

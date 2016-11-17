@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\SSOBundle\Tests\Unit\Stub;
 
-use Oro\Bundle\UserBundle\Entity\User;
+use Oro\Bundle\UserBundle\Tests\Unit\Stub\UserStub as User;
 
 class TestingUser extends User
 {

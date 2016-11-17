@@ -14,7 +14,7 @@ class UserStub extends User
         return $this->auth_status;
     }
 
-    public function setAuthStatus(AbstractEnumValue $enum)
+    public function setAuthStatus(AbstractEnumValue $enum = null)
     {
         $this->auth_status = $enum;
 

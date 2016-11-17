@@ -2,15 +2,8 @@
 
 namespace Oro\Bundle\OrganizationBundle\Tests\Unit\Fixture\Entity;
 
-use Oro\Bundle\UserBundle\Entity\User as ParentUser;
+use Oro\Bundle\UserBundle\Tests\Unit\Stub\UserStub as ParentUser;
 
 class User extends ParentUser
 {
-    /**
-     * @param int $id
-     */
-    public function setId($id)
-    {
-        $this->id = $id;
-    }
 }

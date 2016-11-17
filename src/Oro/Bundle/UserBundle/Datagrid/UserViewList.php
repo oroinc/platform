@@ -69,9 +69,6 @@ class UserViewList extends AbstractViewsList
                 'enabled' => [
                     'renderable' => false,
                 ],
-                'auth_status' => [
-                    'renderable' => false,
-                ],
             ],
         ],
     ];

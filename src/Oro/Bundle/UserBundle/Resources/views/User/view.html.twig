@@ -77,7 +77,7 @@
         {% if entity.authStatus.id == 'expired' %}
             <div class="badge badge-disabled status-disabled"><i class="icon-status-disabled icon-unlock-alt"></i>
                 {{- entity.authStatus.name -}}</div>
-        {% elseif entity.authStatus.id == 'available' %}
+        {% elseif entity.authStatus.id == 'active' %}
             <div class="badge badge-enabled status-enabled"><i class="icon-status-enabled icon-unlock"></i>
                 {{- entity.authStatus.name -}}</div>
         {% else %}

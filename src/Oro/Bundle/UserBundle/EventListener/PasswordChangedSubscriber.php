@@ -11,7 +11,7 @@ use Oro\Bundle\UserBundle\Entity\User;
 
 class PasswordChangedSubscriber implements EventSubscriber
 {
-    const STATUS_AVAILABLE = 'available';
+    const STATUS_ACTIVE = 'active';
     const STATUS_EXPIRED = 'expired';
 
     /** @var EnumValueProvider */
@@ -55,7 +55,7 @@ class PasswordChangedSubscriber implements EventSubscriber
     }
 
     /**
-     * Change 'expired' status to 'available'
+     * Change 'expired' status to 'active'
      *
      * @param  LifecycleEventArgs $args
      */
@@ -67,7 +67,7 @@ class PasswordChangedSubscriber implements EventSubscriber
         }
 
         if ($user->getAuthStatus() && $user->getAuthStatus()->getId() === self::STATUS_EXPIRED) {
-            $user->setAuthStatus($this->enumValueProvider->getEnumValueByCode('auth_status', self::STATUS_AVAILABLE));
+            $user->setAuthStatus($this->enumValueProvider->getEnumValueByCode('auth_status', self::STATUS_ACTIVE));
         }
     }
 }
