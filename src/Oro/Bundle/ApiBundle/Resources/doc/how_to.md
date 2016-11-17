@@ -246,7 +246,7 @@ After applying configuration like above, the `target` relationship will be avail
 
 ### Inverse side of an association 
 
-Similar to an owning side of association the inverse part should be enabled manually. This can be done by registering [AddInverseToOneAssociation](../../ApiBundle/Processor/Config/Shared/AddInverseToOneAssociation.php) API processor.
+Similar to an owning side of association the inverse part should be enabled manually. This can be done by registering [AddInverseToOneAssociation](../../Processor/Config/Shared/AddInverseToOneAssociation.php) processor.
 
 For example:
 
