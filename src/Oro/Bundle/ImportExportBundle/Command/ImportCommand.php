@@ -2,25 +2,20 @@
 
 namespace Oro\Bundle\ImportExportBundle\Command;
 
+use Oro\Bundle\ImportExportBundle\Async\Topics;
+use Oro\Bundle\ImportExportBundle\Handler\CliImportHandler;
+use Oro\Bundle\ImportExportBundle\Job\JobExecutor;
+use Oro\Bundle\ImportExportBundle\Processor\ProcessorRegistry;
+use Oro\Component\MessageQueue\Client\MessageProducerInterface;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputArgument;
+
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
-use Oro\Bundle\ImportExportBundle\Handler\CliImportHandler;
-use Oro\Bundle\ImportExportBundle\Job\JobExecutor;
-use Oro\Bundle\ImportExportBundle\Processor\ProcessorRegistry;
-
 class ImportCommand extends ContainerAwareCommand
 {
-    const STATUS_SUCCESS = 0;
-
-    const COMMAND_NAME = 'oro:import:csv';
-
-    const ARGUMENT_FILE = 'file';
-    const OPTION_VALIDATION_PROCESSOR = 'validation-processor';
-    const OPTION_PROCESSOR = 'processor';
 
     /**
      * {@inheritdoc}
@@ -28,24 +23,32 @@ class ImportCommand extends ContainerAwareCommand
     protected function configure()
     {
         $this
-            ->setName(self::COMMAND_NAME)
-            ->setDescription('Import data from specified file for specified entity.')
+            ->setName('oro:import:csv')
+            ->setDescription(
+                'Import data from specified file for specified entity. The import log is sent to the provided email.'
+            )
             ->addArgument(
-                self::ARGUMENT_FILE,
+                'file',
                 InputArgument::REQUIRED,
                 'File name, to import CSV data from'
             )
             ->addOption(
-                self::OPTION_VALIDATION_PROCESSOR,
+                'validation',
                 null,
-                InputOption::VALUE_REQUIRED,
-                'Name of the processor for the entity data validation contained in the CSV'
+                InputOption::VALUE_NONE,
+                'If adding this option then validation will be performed instead of import'
             )
             ->addOption(
-                self::OPTION_PROCESSOR,
+                'processor',
                 null,
                 InputOption::VALUE_REQUIRED,
-                'Name of the processor for the entity data contained in the CSV'
+                'Name of the processor for the entity data contained in the CSV (validation or import)'
+            )
+            ->addOption(
+                'email',
+                null,
+                InputOption::VALUE_REQUIRED,
+                'Email to send the log after the import is completed'
             );
     }
 
@@ -54,66 +57,59 @@ class ImportCommand extends ContainerAwareCommand
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $processorAlias = $this->handleProcessorName($input, $output);
-        $sourceFile = $input->getArgument(self::ARGUMENT_FILE);
-        $noInteraction = $input->getOption('no-interaction');
+        $sourceFile = $input->getArgument('file');
+
+        if (! is_file($sourceFile)) {
+            throw new \InvalidArgumentException(sprintf('File not found: %s', $sourceFile));
+        }
+
+        $validation = $input->hasOption('validation');
 
         $this->getImportHandler()->setImportingFileName($sourceFile);
 
-        if (!$noInteraction) {
-            $validationProcessorAlias = $this->handleProcessorName(
-                $input,
-                $output,
-                self::OPTION_VALIDATION_PROCESSOR,
-                ProcessorRegistry::TYPE_IMPORT_VALIDATION
-            );
-
-            $validationInfo = $this->getImportHandler()->handleImportValidation(
-                JobExecutor::JOB_VALIDATE_IMPORT_FROM_CSV,
-                $validationProcessorAlias
-            );
-
-            $this->renderResult($validationInfo, $output);
-
-            $confirmation = $this->getHelper('dialog')->askConfirmation(
-                $output,
-                '<question>Do you want to proceed [yes]? </question>',
-                true
-            );
-
-            if (!$confirmation) {
-                return self::STATUS_SUCCESS;
-            }
-        }
-
-        $importInfo = $this->getImportHandler()->handleImport(
-            JobExecutor::JOB_IMPORT_FROM_CSV,
-            $processorAlias
+        $processorAlias = $this->handleProcessorName(
+            $input,
+            $output,
+            $validation ? ProcessorRegistry::TYPE_IMPORT_VALIDATION : ProcessorRegistry::TYPE_IMPORT
         );
 
-        if ($noInteraction) {
-            $this->renderResult($importInfo, $output);
+        $topic = $validation ? Topics::IMPORT_CLI_VALIDATION : Topics::IMPORT_CLI;
+        $jobName = $validation ? JobExecutor::JOB_VALIDATE_IMPORT_FROM_CSV : JobExecutor::JOB_IMPORT_FROM_CSV;
+        $email = $input->getOption('email');
+
+        if ($validation && ! $email) {
+            throw new \InvalidArgumentException('Email is required for the validation!');
         }
 
-        $output->writeln('<info>' . $importInfo['message'] . '</info>');
+        $this->getMessageProducer()->send(
+            $topic,
+            [
+                'fileName' => $sourceFile,
+                'notifyEmail' => $email,
+                'jobName' =>  $jobName,
+                'processorAlias' => $processorAlias
+            ]
+        );
 
-        return self::STATUS_SUCCESS;
+        $output->writeln(
+            sprintf('%s sheduled successfully. The result will be sent to the email ')
+        );
     }
 
     /**
      * @param InputInterface  $input
      * @param OutputInterface $output
-     * @param string          $option
      * @param string          $type
      * @return string
      * @throws \InvalidArgumentException
      */
-    protected function handleProcessorName(
+    private function handleProcessorName(
         InputInterface $input,
         OutputInterface $output,
-        $option = self::OPTION_PROCESSOR,
         $type = ProcessorRegistry::TYPE_IMPORT
     ) {
+        $option = 'processor';
+
         $label = ucwords(str_replace('-', ' ', $option));
 
         if ($processor = $input->getOption($option)) {
@@ -143,7 +139,7 @@ class ImportCommand extends ContainerAwareCommand
     /**
      * @return CliImportHandler
      */
-    protected function getImportHandler()
+    private function getImportHandler()
     {
         return $this->getContainer()->get('oro_importexport.handler.import.cli');
     }
@@ -151,36 +147,16 @@ class ImportCommand extends ContainerAwareCommand
     /**
      * @return ProcessorRegistry
      */
-    protected function getProcessorRegistry()
+    private function getProcessorRegistry()
     {
         return $this->getContainer()->get('oro_importexport.processor.registry');
     }
 
     /**
-     * @param array $result
-     * @param OutputInterface $output
+     * @return MessageProducerInterface
      */
-    protected function renderResult(array $result, OutputInterface $output)
+    private function getMessageProducer()
     {
-        $rows = [];
-        if (!empty($result['counts'])) {
-            foreach ($result['counts'] as $label => $count) {
-                $rows[] = [$label, (int)$count];
-            }
-        }
-
-        if ($rows) {
-            $this
-                ->getHelper('table')
-                ->setHeaders(['Results', 'Count'])
-                ->setRows($rows)
-                ->render($output);
-        }
-
-        if (!empty($result['errors'])) {
-            foreach ($result['errors'] as $errorMessage) {
-                $output->writeln('<error>' . $errorMessage . '</error>');
-            }
-        }
+        return $this->getContainer()->get('oro_message_queue.client.message_producer');
     }
 }

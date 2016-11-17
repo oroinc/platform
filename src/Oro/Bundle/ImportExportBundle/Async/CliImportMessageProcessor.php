@@ -62,8 +62,18 @@ class CliImportMessageProcessor implements MessageProcessorInterface, TopicSubsc
     public function process(MessageInterface $message, SessionInterface $session)
     {
         $body = JSON::decode($message->getBody());
+        $body = array_replace_recursive([
+            'fileName' => null,
+            'notifyEmail' => null,
+            'jobName' => JobExecutor::JOB_IMPORT_FROM_CSV,
+            'processorAlias' => null,
+            'inputFormat' => 'csv',
+            'inputFilePrefix' => null,
+            'options' => []
+        ], $body);
 
-        if (! isset($body['alias'], $body['file_name'])) {
+
+        if (! $body['processorAlias'] || ! $body['fileName']) {
             $this->logger->critical(
                 sprintf('Invalid message: %s', $body),
                 ['message' => $message]
@@ -74,18 +84,21 @@ class CliImportMessageProcessor implements MessageProcessorInterface, TopicSubsc
 
         $result = $this->jobRunner->runUnique(
             $message->getMessageId(),
-            sprintf('oro:import:cli:%s:%s', $body['alias'], $message->getMessageId()),
+            sprintf('oro:import:cli:%s:%s', $body['processorAlias'], $message->getMessageId()),
             function () use ($body) {
-                $this->cliImportHandler->setImportingFileName($body['file_name']);
+                $this->cliImportHandler->setImportingFileName($body['fileName']);
 
                 $result = $this->cliImportHandler->handleImport(
-                    JobExecutor::JOB_IMPORT_FROM_CSV,
-                    $body['alias']
+                    $body['jobName'],
+                    $body['processorAlias'],
+                    $body['inputFormat'],
+                    $body['inputFilePrefix'],
+                    $body['options']
                 );
 
                 $summary = sprintf(
                     'Import from file %s for the %s is completed, success: %s, counts: %d, errors: %d, message: %s',
-                    $body['file_name'],
+                    $body['fileName'],
                     $result['success'],
                     $result['counts'],
                     $result['errors'],
@@ -94,7 +107,7 @@ class CliImportMessageProcessor implements MessageProcessorInterface, TopicSubsc
 
                 $this->logger->info($summary);
 
-                if (isset($body['notify_email'])) {
+                if ($body['notifyEmail']) {
                     $fromEmail = $this->configManager->get('oro_notification.email_notification_sender_email');
                     $fromName = $this->configManager->get('oro_notification.email_notification_sender_name');
                     $this->producer->send(
@@ -102,8 +115,8 @@ class CliImportMessageProcessor implements MessageProcessorInterface, TopicSubsc
                         [
                             'fromEmail' => $fromEmail,
                             'fromName' => $fromName,
-                            'toEmail' => $body['notify_email'],
-                            'subject' => $result['$message'],
+                            'toEmail' => $body['notifyEmail'],
+                            'subject' => $result['message'],
                             'body' => $summary
                         ]
                     );

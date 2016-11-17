@@ -68,7 +68,7 @@ class ImportExportController extends Controller
         return [
             'entityName' => $entityName,
             'form' => $importForm->createView(),
-            'options' => $this->getOptionsFromRequest(),
+            'options' => $this->getOptionsFromRequest($request),
             'importJob' => $importJob,
             'importValidateJob' => $importValidateJob
         ];
@@ -109,7 +109,7 @@ class ImportExportController extends Controller
             $processorAlias,
             'csv',
             null,
-            $this->getOptionsFromRequest()
+            $this->getOptionsFromRequest($request)
         );
         $result['showStrategy'] = count($existingAliases) > 1;
         $result['importJob'] = $request->get('importJob');
@@ -122,18 +122,19 @@ class ImportExportController extends Controller
      * @AclAncestor("oro_importexport_export")
      *
      * @param string $processorAlias
+     * @param Request $request
      *
      * @return JsonResponse
      */
-    public function importProcessAction($processorAlias)
+    public function importProcessAction($processorAlias, Request $request)
     {
-        $jobName = $this->getRequest()->get('importJob', JobExecutor::JOB_IMPORT_FROM_CSV);
+        $jobName = $request->get('importJob', JobExecutor::JOB_IMPORT_FROM_CSV);
         $result  = $this->getImportHandler()->handleImport(
             $jobName,
             $processorAlias,
             'csv',
             null,
-            $this->getOptionsFromRequest()
+            $this->getOptionsFromRequest($request)
         );
 
         return new JsonResponse($result);
@@ -151,7 +152,7 @@ class ImportExportController extends Controller
     {
         $jobName = $request->get('exportJob', JobExecutor::JOB_EXPORT_TO_CSV);
         $options = array_merge(
-            $this->getOptionsFromRequest(),
+            $this->getOptionsFromRequest($request),
             ['organization' => $this->getSecurityFacade()->getOrganization()]
         );
 
@@ -202,7 +203,7 @@ class ImportExportController extends Controller
         return [
             'entityName' => $entityName,
             'form' => $exportForm->createView(),
-            'options' => $this->getOptionsFromRequest(),
+            'options' => $this->getOptionsFromRequest($request),
             'exportJob' => $request->get('exportJob')
         ];
     }
@@ -239,7 +240,7 @@ class ImportExportController extends Controller
         return [
             'entityName' => $entityName,
             'form' => $exportForm->createView(),
-            'options' => $this->getOptionsFromRequest()
+            'options' => $this->getOptionsFromRequest($request)
         ];
     }
 
@@ -248,19 +249,20 @@ class ImportExportController extends Controller
      * @AclAncestor("oro_importexport_export")
      *
      * @param string $processorAlias
+     * @param Request $request
      *
      * @return Response
      */
-    public function templateExportAction($processorAlias)
+    public function templateExportAction($processorAlias, Request $request)
     {
-        $jobName = $this->getRequest()->get('exportTemplateJob', JobExecutor::JOB_EXPORT_TEMPLATE_TO_CSV);
+        $jobName = $request->get('exportTemplateJob', JobExecutor::JOB_EXPORT_TEMPLATE_TO_CSV);
         $result  = $this->getExportHandler()->getExportResult(
             $jobName,
             $processorAlias,
             ProcessorRegistry::TYPE_EXPORT_TEMPLATE,
             'csv',
             null,
-            $this->getOptionsFromRequest()
+            $this->getOptionsFromRequest($request)
         );
 
         return $this->redirect($result['url']);
@@ -330,11 +332,13 @@ class ImportExportController extends Controller
     }
 
     /**
+     * @param Request $request
+     *
      * @return array
      */
-    protected function getOptionsFromRequest()
+    protected function getOptionsFromRequest(Request $request)
     {
-        $options = $this->getRequest()->get('options', []);
+        $options = $request->get('options', []);
 
         if (!is_array($options)) {
             throw new InvalidArgumentException('Request parameter "options" must be array.');
