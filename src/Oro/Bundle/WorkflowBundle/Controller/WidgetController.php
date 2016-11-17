@@ -58,7 +58,7 @@ class WidgetController extends Controller
         $applicableWorkflows = $workflowManager->getApplicableWorkflows($entity);
 
         $securityFacade = $this->container->get('oro_security.security_facade');
-        array_filter(
+        $applicableWorkflows = array_filter(
             $applicableWorkflows,
             function ($workflow) use ($securityFacade, $entity) {
                 /** @var Workflow $workflow */
