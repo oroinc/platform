@@ -83,8 +83,6 @@ class TranslationDomainProvider
         if ($this->cache->contains(self::AVAILABLE_DOMAINS_NODE)) {
             $this->availableDomains = (array)$this->cache->fetch(self::AVAILABLE_DOMAINS_NODE);
         } else {
-            $this->clearCache();
-
             $this->availableDomains = $this->getTranslationKeyRepository()->findAvailableDomains();
             $this->cache->save(self::AVAILABLE_DOMAINS_NODE, $this->availableDomains);
         }

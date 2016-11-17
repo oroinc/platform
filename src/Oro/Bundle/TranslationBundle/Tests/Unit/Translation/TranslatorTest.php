@@ -342,7 +342,7 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
     public function testLoadingOfDynamicResources()
     {
         $locale = 'en';
-        $translate = [
+        $domains = [
             ['code' => $locale, 'domain' => 'domain1'],
             ['code' => $locale, 'domain' => 'domain2'],
             ['code' => $locale, 'domain' => 'domain3'],
@@ -388,9 +388,9 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
 
         $translationDomainProvider->expects($this->once())
             ->method('getAvailableDomainsForLocales')
-            ->willReturn($translate);
+            ->willReturn($domains);
 
-        $translator->expects($this->exactly(count($translate)))->method('addResource');
+        $translator->expects($this->exactly(count($domains)))->method('addResource');
         $translator->hasTrans('foo');
     }
 

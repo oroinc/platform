@@ -62,9 +62,6 @@ class TranslationDomainProviderTest extends \PHPUnit_Framework_TestCase
             ->with(TranslationDomainProvider::AVAILABLE_DOMAINS_NODE)
             ->willReturn(false);
         $this->cache->expects($this->once())
-            ->method('delete')
-            ->with(TranslationDomainProvider::AVAILABLE_DOMAINS_NODE);
-        $this->cache->expects($this->once())
             ->method('save')
             ->with(TranslationDomainProvider::AVAILABLE_DOMAINS_NODE, $domains);
         $this->cache->expects($this->never())->method('fetch');

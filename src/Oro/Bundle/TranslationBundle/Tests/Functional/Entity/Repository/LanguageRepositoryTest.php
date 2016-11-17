@@ -51,16 +51,6 @@ class LanguageRepositoryTest extends WebTestCase
         $this->client->getContainer()->get('security.token_storage')->setToken($token);
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function postFixtureLoad()
-    {
-        parent::postFixtureLoad();
-
-        $this->getContainer()->get('oro_translation.provider.translation_domain')->clearCache();
-    }
-
     public function testGetAvailableLanguageCodes()
     {
         $this->assertEmpty(array_diff(
