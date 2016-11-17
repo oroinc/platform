@@ -4,16 +4,15 @@ Feature: User statuses
   I need to change User statuses
 
   Scenario: Make User available for login
-    Given the following user:
-      | Username   | Fisrt Name | Last Name  | Password  | Status  | Role     |
-      | mattjohnes | Matt       | Johnes     | Qwe123qwe | Active | Sales Rep |
-    When I open Matt Johnes user edit page
+    Given Charlie Sheen active user exists in the system
+    And I login as administrator
+    When I open "Charlie Sheen" user edit page
     And I select "Inactive" from "Status"
     And I save and close form
-    Then Matt Johnes user has no possibility to login to the Dashboard.
+    Then Charlie Sheen user has no possibility to login to the Dashboard
 
   Scenario: Make User unavailable for login
-    Given I open Matt Johnes user edit page
-    And I select "Active" from "Status"
-    And I save and close form
-    Then Matt Johnes user could login to the Dashboard.
+    Given I open "Charlie Sheen" user edit page
+    And select "Active" from "Status"
+    When I save and close form
+    Then Charlie Sheen user could login to the Dashboard
