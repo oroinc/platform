@@ -41,6 +41,8 @@
 
     {# Transaltions temporary disabled due to BAP-5355 #}
     <a href="{{ transitionData['transition-url'] }}"
+        data-page-component-module="oroworkflow/js/app/components/button-component"
+        data-page-component-options="{{ {'displayType': transition.displayType}|json_encode }}"
         {% for key, value in transitionData %}
             data-{{ key }}="{{ value|e('html_attr')|raw }}"
         {% endfor %}

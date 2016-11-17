@@ -7,7 +7,6 @@ use Oro\Bundle\ActionBundle\Model\ButtonInterface;
 
 class TransitionButton implements ButtonInterface
 {
-    //TODO: Must be updated at https://magecore.atlassian.net/browse/BAP-12481
     const DEFAULT_TEMPLATE = 'OroWorkflowBundle::Button\transitionButton.html.twig';
 
     /** @var Workflow */
@@ -53,19 +52,18 @@ class TransitionButton implements ButtonInterface
     public function getTemplateData()
     {
         return [
-            //TODO: Must be updated at https://magecore.atlassian.net/browse/BAP-12481
-            //'workflow' => $this->workflow,
-            //'transition' => $this->transition,
-            //'workflowItem' => null,
-            //'transitionData' => [
-            //    'workflow' => $this->workflow->getName(),
-            //    'transition' => $this->transition->getName(),
-            //    'transition-url' => $this->buttonContext->getExecutionUrl(),
-            //    'transition-condition-messages' => null,
-            //    'isAllowed' => true,
-            //    'enabled' => $this->buttonContext->isEnabled() ?: $this->buttonContext->isUnavailableHidden(),
-            //    'errors' => []
-            //]
+            'workflow' => $this->workflow,
+            'transition' => $this->transition,
+            'workflowItem' => null,
+            'transitionData' => [
+                'workflow' => $this->workflow->getName(),
+                'transition' => $this->transition->getName(),
+                'dialog-route' => $this->buttonContext->getDialogUrl(),
+                'transition-route' => $this->buttonContext->getExecutionUrl(),
+                'transition-condition-messages' => null,
+                'isAllowed' => true,
+                'enabled' => $this->buttonContext->isEnabled() ?: $this->buttonContext->isUnavailableHidden(),
+            ],
         ];
     }
 

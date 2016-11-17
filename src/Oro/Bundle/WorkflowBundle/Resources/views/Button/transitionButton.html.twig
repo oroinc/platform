@@ -1,4 +1,34 @@
 {% import 'OroWorkflowBundle::macros.html.twig' as workflowMacros %}
+
+{% if transition.displayType == 'dialog' %}
+    {% if transition.hasForm() %}
+        {% set transitionData = transitionData|merge({'dialog-url': path(
+            transitionData['dialog-route'],
+            {
+                workflowName: workflow.name,
+                transitionName: transition.name
+            })
+        }) %}
+    {% endif %}
+    {% set transitionData = transitionData|merge({'transition-url': path(
+        transitionData['transition-route'],
+        {
+            workflowName: workflow.name,
+            transitionName: transition.name
+        })
+    }) %}
+
+{% else %}
+    {% set data = data|merge({'workflowItem': null}) %}
+    {% set transitionData = transitionData|merge({'transition-url': path(
+        'oro_workflow_start_transition_form',
+        {
+            workflowName: workflow.name,
+            transitionName: transition.name,
+        })
+    }) %}
+{% endif %}
+
 {{ workflowMacros.renderTransitionButton(
 	workflow,
 	transition,
