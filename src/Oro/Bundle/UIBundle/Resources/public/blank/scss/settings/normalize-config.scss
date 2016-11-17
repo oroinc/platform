@@ -1,0 +1,19 @@
+// @theme: blank
+
+@import 'npmassets/normalize-scss/sass/normalize/variables';
+
+// Override native config
+// The length unit in which to output vertical rhythm values.
+// Supported values: px, em, rem.
+$base-unit: 'px' !default;
+
+@import 'npmassets/normalize-scss/sass/normalize/vertical-rhythm';
+@import 'npmassets/normalize-scss/sass/normalize/normalize-mixin';
+
+@include normalize($include: sections);
+@include normalize($include: grouping);
+@include normalize($include: links);
+@include normalize($include: embedded);
+@include normalize($include: interactive);
+@include normalize($include: scripting);
+@include normalize($include: hidden);

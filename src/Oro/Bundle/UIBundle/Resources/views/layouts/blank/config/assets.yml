@@ -1,5 +1,6 @@
 styles:
     inputs:
+        - 'bundles/oroui/blank/scss/settings/normalize-config.scss' # Must be first
         - 'bundles/oroui/blank/scss/settings/global-settings.scss'
         - 'bundles/oroui/blank/scss/variables/base-config.scss'
         - 'bundles/oroui/blank/scss/variables/page-container-config.scss'
