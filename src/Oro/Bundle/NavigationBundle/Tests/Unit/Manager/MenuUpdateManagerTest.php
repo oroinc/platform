@@ -8,10 +8,10 @@ use Doctrine\ORM\EntityRepository;
 
 use Oro\Bundle\NavigationBundle\Manager\MenuUpdateManager;
 use Oro\Bundle\NavigationBundle\Menu\Helper\MenuUpdateHelper;
-use Oro\Bundle\NavigationBundle\Menu\Provider\GlobalOwnershipProvider;
 use Oro\Bundle\NavigationBundle\Provider\BuilderChainProvider;
 use Oro\Bundle\NavigationBundle\Tests\Unit\Entity\Stub\MenuItemStub;
 use Oro\Bundle\NavigationBundle\Tests\Unit\Entity\Stub\MenuUpdateStub;
+use Oro\Bundle\NavigationBundle\Tests\Unit\Menu\Provider\OwnershipProviderStub;
 use Oro\Bundle\NavigationBundle\Tests\Unit\MenuItemTestTrait;
 
 class MenuUpdateManagerTest extends \PHPUnit_Framework_TestCase
@@ -68,7 +68,7 @@ class MenuUpdateManagerTest extends \PHPUnit_Framework_TestCase
 
     public function testCreateMenuUpdate()
     {
-        $ownershipType = GlobalOwnershipProvider::TYPE;
+        $ownershipType = OwnershipProviderStub::TYPE;
         $ownerId = 1;
 
         $entity = new MenuUpdateStub();
@@ -105,7 +105,7 @@ class MenuUpdateManagerTest extends \PHPUnit_Framework_TestCase
     public function testGetMenuUpdatesByMenuAndScope()
     {
         $menuName = 'test-menu';
-        $ownershipType = GlobalOwnershipProvider::TYPE;
+        $ownershipType = OwnershipProviderStub::TYPE;
         $ownerId = 1;
 
         $update = new MenuUpdateStub();
@@ -125,7 +125,7 @@ class MenuUpdateManagerTest extends \PHPUnit_Framework_TestCase
     public function testGetMenuUpdateByKeyAndScopeWithMenuItem()
     {
         $key = 'item-1-1-1';
-        $ownershipType = GlobalOwnershipProvider::TYPE;
+        $ownershipType = OwnershipProviderStub::TYPE;
         $ownerId = 1;
 
         $update = new MenuUpdateStub();
@@ -172,7 +172,7 @@ class MenuUpdateManagerTest extends \PHPUnit_Framework_TestCase
     public function testGetMenuUpdateByKeyAndScopeWithoutMenuItem()
     {
         $key = 'item-1-1-1-1';
-        $ownershipType = GlobalOwnershipProvider::TYPE;
+        $ownershipType = OwnershipProviderStub::TYPE;
         $ownerId = 1;
 
         $update = new MenuUpdateStub();
@@ -209,7 +209,7 @@ class MenuUpdateManagerTest extends \PHPUnit_Framework_TestCase
     {
         $this->manager->setEntityClass(MenuUpdateStub::class);
 
-        $ownershipType = GlobalOwnershipProvider::TYPE;
+        $ownershipType = OwnershipProviderStub::TYPE;
         $ownerId = 1;
 
         $menu = $this->getMenu();
@@ -268,7 +268,7 @@ class MenuUpdateManagerTest extends \PHPUnit_Framework_TestCase
 
     public function testShowMenuItem()
     {
-        $ownershipType = GlobalOwnershipProvider::TYPE;
+        $ownershipType = OwnershipProviderStub::TYPE;
         $ownerId = 1;
         $menuName = 'menu';
 
@@ -334,7 +334,7 @@ class MenuUpdateManagerTest extends \PHPUnit_Framework_TestCase
 
     public function testHideMenuItem()
     {
-        $ownershipType = GlobalOwnershipProvider::TYPE;
+        $ownershipType = OwnershipProviderStub::TYPE;
         $ownerId = 1;
         $menuName = 'menu';
 
@@ -416,7 +416,7 @@ class MenuUpdateManagerTest extends \PHPUnit_Framework_TestCase
 
     public function testResetMenuUpdatesWithOwnershipType()
     {
-        $ownershipType = GlobalOwnershipProvider::TYPE;
+        $ownershipType = OwnershipProviderStub::TYPE;
         $ownerId = 1;
 
         $update = new MenuUpdateStub();
