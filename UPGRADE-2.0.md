@@ -610,8 +610,6 @@ placeholders:
     * `Oro\Bundle\NavigationBundle\Exception\NotFoundParentException`
 - Added interface `Oro\Bundle\NavigationBundle\Menu\Provider\OwnershipProviderInterface`.
 - Added class `Oro\Bundle\NavigationBundle\Menu\Provider\AbstractOwnershipProvider` that implements `Oro\Bundle\NavigationBundle\Menu\Provider\OwnershipProviderInterface`.
-- Added class `Oro\Bundle\NavigationBundle\Menu\Provider\GlobalOwnershipProvider` with service `oro_commerce_menu.ownership_provider.global`.
-- Added class `Oro\Bundle\NavigationBundle\Menu\Provider\UserOwnershipProvider` with service `oro_navigation.ownership_provider.user`.
 - Added class `Oro\Bundle\NavigationBundle\JsTree\MenuUpdateTreeHandler` that provides menu tree data in format used by `jstree`.
 - Added class `Oro\Bundle\NavigationBundle\Manager\MenuUpdateManager` with service `oro_navigation.manager.menu_update_default`.
 - Added class `Oro\Bundle\NavigationBundle\Utils\MenuUpdateUtils`.
