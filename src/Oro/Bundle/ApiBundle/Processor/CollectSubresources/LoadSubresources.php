@@ -58,20 +58,26 @@ abstract class LoadSubresources implements ProcessorInterface
                 $subresource->setExcludedActions($subresourceExcludedActions);
             }
             if ($association->has(DataType::INVERSE_ASSOCIATION_FIELD)) {
-                $subresource->setExcludedActions([ApiActions::UPDATE_RELATIONSHIP, ApiActions::DELETE_RELATIONSHIP]);
+                if (!in_array(ApiActions::UPDATE_RELATIONSHIP, $subresource->getExcludedActions(), true)) {
+                    $subresource->addExcludedAction(ApiActions::UPDATE_RELATIONSHIP);
+                }
+                if (!in_array(ApiActions::DELETE_RELATIONSHIP, $subresource->getExcludedActions(), true)) {
+                    $subresource->addExcludedAction(ApiActions::DELETE_RELATIONSHIP);
+                }
             }
         } else {
             if (!$this->isAccessibleAssociation($association, $accessibleResources)) {
                 $subresource->setExcludedActions($this->getToOneRelationshipsActions());
             } else {
                 $excludedActions = $subresourceExcludedActions;
-                if (!in_array(ApiActions::ADD_RELATIONSHIP, $excludedActions, true)) {
-                    $excludedActions[] = ApiActions::ADD_RELATIONSHIP;
-                }
-                if (!in_array(ApiActions::DELETE_RELATIONSHIP, $excludedActions, true)) {
-                    $excludedActions[] = ApiActions::DELETE_RELATIONSHIP;
-                }
                 $subresource->setExcludedActions($excludedActions);
+            }
+
+            if (!in_array(ApiActions::ADD_RELATIONSHIP, $subresource->getExcludedActions(), true)) {
+                $subresource->addExcludedAction(ApiActions::ADD_RELATIONSHIP);
+            }
+            if (!in_array(ApiActions::DELETE_RELATIONSHIP, $subresource->getExcludedActions(), true)) {
+                $subresource->addExcludedAction(ApiActions::DELETE_RELATIONSHIP);
             }
         }
 

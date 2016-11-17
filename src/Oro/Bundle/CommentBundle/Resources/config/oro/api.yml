@@ -5,6 +5,7 @@ api:
                 target:
                     description: The entity to which the current comment is belongs
                     data_type: association:manyToOne
+            subresources:
                 target:
                     actions:
                         get_subresource:
