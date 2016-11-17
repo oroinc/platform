@@ -229,7 +229,7 @@ class DebugTranslatorTest extends \PHPUnit_Framework_TestCase
             $this->getContainer($loader, $strategyProvider),
             new MessageSelector(),
             array('loader' => array('loader')),
-            $options
+            array_merge(['resource_files' => []], $options)
         );
 
         $translator->addResource('loader', 'foo', 'fr');
