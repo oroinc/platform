@@ -6,6 +6,7 @@ use Doctrine\Common\DataFixtures\DependentFixtureInterface;
 use Doctrine\Common\Persistence\ObjectManager;
 
 use Oro\Bundle\ActivityListBundle\Migrations\Data\ORM\AddActivityListsData;
+use Oro\Bundle\NoteBundle\Entity\Note;
 
 class AddNoteActivityLists extends AddActivityListsData implements DependentFixtureInterface
 {
@@ -26,7 +27,7 @@ class AddNoteActivityLists extends AddActivityListsData implements DependentFixt
     {
         $this->addActivityListsForActivityClass(
             $manager,
-            'OroNoteBundle:Note',
+            Note::class,
             'owner',
             'organization'
         );

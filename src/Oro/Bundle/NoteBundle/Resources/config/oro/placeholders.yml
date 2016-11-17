@@ -9,8 +9,7 @@ placeholders:
         oro_add_note_link:
             template: OroNoteBundle:Note:addLink.html.twig
             acl: [oro_note_create, oro_note_view]
-
+#@todo: check if this placeholder is needed
         oro_notes:
             template: OroNoteBundle:Note:notes.html.twig
-            applicable: "@oro_note.placeholder.filter->isNoteAssociationEnabled($entity$)"
             acl: oro_note_view

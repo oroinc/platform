@@ -49,7 +49,10 @@ abstract class AddActivityListsData extends AbstractFixture implements Container
         $ownerField = '',
         $organizationField = ''
     ) {
-        if ($this->container->hasParameter('installed') && $this->container->getParameter('installed')) {
+        $isApplicationInstalled = $this->container->hasParameter('installed')
+            && $this->container->getParameter('installed');
+
+        if ($isApplicationInstalled && !$this->hasRecordsInActivityList($activityClass)) {
             $provider     = $this->container->get('oro_activity_list.provider.chain');
             $queryBuilder = $manager->getRepository($activityClass)->createQueryBuilder('entity');
             $iterator     = new BufferedQueryResultIterator($queryBuilder);
@@ -71,6 +74,28 @@ abstract class AddActivityListsData extends AbstractFixture implements Container
                 $this->saveActivityLists($manager, $provider, $entities, $ownerField, $organizationField);
             }
         }
+    }
+
+    /**
+     * @param string $activityClass
+     *
+     * @return bool
+     */
+    protected function hasRecordsInActivityList($activityClass)
+    {
+        $qb  = $this->container
+            ->get('doctrine')
+            ->getRepository('OroActivityListBundle:ActivityList')
+            ->createQueryBuilder('activityList');
+
+        $activityList = $qb->select('activityList.id')
+            ->where('activityList.relatedActivityClass = :activityClass')
+            ->setMaxResults(1)
+            ->getQuery()
+            ->setParameter('activityClass', $activityClass)
+            ->getOneOrNullResult();
+
+        return (bool)$activityList;
     }
 
     /**

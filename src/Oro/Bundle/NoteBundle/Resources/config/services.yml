@@ -1,9 +1,5 @@
 parameters:
     oro_note.entity.class:                              Oro\Bundle\NoteBundle\Entity\Note
-    oro_note.placeholder.filter.class:                  Oro\Bundle\NoteBundle\Placeholder\PlaceholderFilter
-    oro_note.migration.extension.note.class:            Oro\Bundle\NoteBundle\Migration\Extension\NoteExtension
-    oro_note.entity_config_dumper.extension.class:      Oro\Bundle\NoteBundle\Tools\NoteEntityConfigDumperExtension
-    oro_note.entity_generator.extension.class:          Oro\Bundle\NoteBundle\Tools\NoteEntityGeneratorExtension
     oro_note.manager.class:                             Oro\Bundle\NoteBundle\Entity\Manager\NoteManager
     oro_note.manager.api.class:                         Oro\Bundle\NoteBundle\Entity\Manager\ApiEntityManager
     oro_note.activity_list.provider.class:              Oro\Bundle\NoteBundle\Provider\NoteActivityListProvider
@@ -35,28 +31,6 @@ services:
         arguments:
             - %oro_note.entity.class%
             - '@doctrine.orm.entity_manager'
-
-    oro_note.placeholder.filter:
-        class: %oro_note.placeholder.filter.class%
-        arguments:
-            - '@oro_note.association_helper'
-            - '@oro_entity.doctrine_helper'
-
-    oro_note.entity_config_dumper.extension:
-        class: %oro_note.entity_config_dumper.extension.class%
-        parent: oro_entity_extend.entity_config_dumper.extension.association
-        tags:
-            - { name: oro_entity_extend.entity_config_dumper_extension }
-
-    oro_note.entity_generator.extension:
-        class: %oro_note.entity_generator.extension.class%
-        tags:
-            - { name: oro_entity_extend.entity_generator_extension }
-
-    oro_note.migration.extension.note:
-        class: %oro_note.migration.extension.note.class%
-        tags:
-            - { name: oro_migration.extension, extension_name: note }
 
     oro_note.activity_list.provider:
         class: %oro_note.activity_list.provider.class%
@@ -94,9 +68,3 @@ services:
             - '@oro_entity.doctrine_helper'
         tags:
             - { name: oro_entity_merge.strategy }
-
-    oro_note.exclusion_provider:
-        class: Oro\Bundle\NoteBundle\Provider\NoteExclusionProvider
-        public: false
-        tags:
-            - { name: oro_entity.exclusion_provider.api }

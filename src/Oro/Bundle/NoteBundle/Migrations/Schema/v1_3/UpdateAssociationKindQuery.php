@@ -2,9 +2,9 @@
 
 namespace Oro\Bundle\NoteBundle\Migrations\Schema\v1_3;
 
-use Doctrine\DBAL\Schema\Comparator;
 use Psr\Log\LoggerInterface;
 
+use Doctrine\DBAL\Schema\Comparator;
 use Doctrine\DBAL\Types\Type;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Schema\Schema;
@@ -90,16 +90,11 @@ class UpdateAssociationKindQuery implements MigrationQuery, ConnectionAwareInter
         foreach ($relatedToNoteEntitiesConfigs as $entityConfigurationRow) {
             $relatedEntityClassName = $entityConfigurationRow['class_name'];
             $relatedTableName = $this->extendExtension->getTableNameByEntityClass($relatedEntityClassName);
-            $this->activityExtension->addActivityAssociation($this->schema, 'oro_note', $relatedTableName);
 
-            $entityConfigurationRow['data']['note']['enabled'] = false;
-            $sql = 'UPDATE oro_entity_config SET `data`=? WHERE id=?';
-            $parameters = [
-                $this->connection->convertToDatabaseValue($entityConfigurationRow['data'], Type::TARRAY),
-                $entityConfigurationRow['id']
-            ];
-            $this->connection->executeUpdate($sql, $parameters);
-            $this->logQuery($logger, $sql, $parameters);
+            $associationTableName = $this->activityExtension->getAssociationTableName('oro_note', $relatedTableName);
+            if (!$this->schema->hasTable($associationTableName)) {
+                $this->activityExtension->addActivityAssociation($this->schema, 'oro_note', $relatedTableName);
+            }
 
             $noteAssociationName = ExtendHelper::buildAssociationName($relatedEntityClassName);
             $sql = 'DELETE FROM oro_entity_config_field WHERE field_name=? AND entity_id=?';
