@@ -123,7 +123,7 @@ operations:
             mass_action:
                 type: resetpassword
                 label: oro.user.password.reset_password.label
-                icon: shield
+                icon: unlock-alt
                 route: oro_user_mass_password_reset
                 data_identifier: u.id
                 confirmation: true

@@ -91,7 +91,7 @@ class ListUserCommand extends ContainerAwareCommand
             $user->getUsername(),
             sprintf(
                 '%s (%s)',
-                $user->isEnabled() ? 'Active' : 'Inactive',
+                $user->isEnabled() ? 'Enabled' : 'Disabled',
                 $user->getAuthStatus() ? $user->getAuthStatus()->getName() : null
             ),
             $user->getFirstName(),

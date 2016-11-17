@@ -62,6 +62,20 @@ class UserManager extends BaseUserManager
     /**
      * {@inheritdoc}
      */
+    public function updateUser(UserInterface $user, $flush = true)
+    {
+        // make sure user has a default status
+        if ($user instanceof User && empty($user->getAuthStatus())) {
+            $defaultStatus = $this->enumValueProvider->getDefaultEnumValuesByCode(self::AUTH_STATUS_ENUM_CODE);
+            $user->setAuthStatus(reset($defaultStatus));
+        }
+
+        return parent::updateUser($user, $flush);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     protected function assertRoles(UserInterface $user)
     {
         if (count($user->getRoles()) === 0) {
