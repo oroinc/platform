@@ -52,7 +52,7 @@ class ActionAclExtension extends AbstractAclExtension
 
         return
             $id === $this->getExtensionKey()
-            && $this->actionMetadataProvider->isKnownAction(ObjectIdentityHelper::normalizeType($type));
+            && $this->actionMetadataProvider->isKnownAction(ObjectIdentityHelper::removeGroupName($type));
     }
 
     /**

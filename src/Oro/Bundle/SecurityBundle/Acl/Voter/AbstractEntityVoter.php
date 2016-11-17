@@ -166,7 +166,7 @@ abstract class AbstractEntityVoter implements VoterInterface
     protected function getEntityClass($object)
     {
         if ($object instanceof ObjectIdentityInterface) {
-            $class = ObjectIdentityHelper::normalizeType($object->getType());
+            $class = ObjectIdentityHelper::removeGroupName($object->getType());
         } elseif ($object instanceof FieldVote) {
             return $this->getEntityClass($object->getDomainObject());
         } else {

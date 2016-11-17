@@ -3,8 +3,6 @@
 namespace Oro\Bundle\SecurityBundle\Acl\Extension;
 
 use Symfony\Component\Security\Acl\Domain\ObjectIdentity;
-use Symfony\Component\Security\Acl\Model\ObjectIdentityInterface;
-use Symfony\Component\Security\Acl\Util\ClassUtils;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
@@ -180,27 +178,13 @@ class FieldAclExtension extends AbstractSimpleAccessLevelAclExtension
     }
 
     /**
-     * Gets class name for given object
-     *
-     * @param $object
-     *
-     * @return string
+     * {@inheritdoc}
      */
-    protected function getObjectClassName($object)
+    protected function parseDescriptor($descriptor, &$type, &$id, &$group)
     {
-        if ($object instanceof ObjectIdentityInterface) {
-            $className = $object->getType();
-        } elseif (is_string($object)) {
-            $className = $id = $group = null;
-            if (ObjectIdentityHelper::isFieldEncodedKey($object)) {
-                $object = ObjectIdentityHelper::decodeEntityFieldInfo($object)[0];
-            }
-            $this->parseDescriptor($object, $className, $id, $group);
-        } else {
-            $className = ClassUtils::getRealClass($object);
-        }
+        $descriptor = ObjectIdentityHelper::removeFieldName($descriptor);
 
-        return $className;
+        return parent::parseDescriptor($descriptor, $type, $id, $group);
     }
 
     /**

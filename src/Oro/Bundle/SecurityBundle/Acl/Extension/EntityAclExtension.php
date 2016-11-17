@@ -127,15 +127,13 @@ class EntityAclExtension extends AbstractAccessLevelAclExtension
      */
     public function supports($type, $id)
     {
-        if (ObjectIdentityHelper::isFieldEncodedKey($type)) {
-            $type = ObjectIdentityHelper::decodeEntityFieldInfo($type)[0];
-        }
-
         if ($type === ObjectIdentityFactory::ROOT_IDENTITY_TYPE) {
             return $id === $this->getExtensionKey();
         }
 
-        $type = ClassUtils::getRealClass(ObjectIdentityHelper::normalizeType($type));
+        $type = ClassUtils::getRealClass(
+            ObjectIdentityHelper::removeGroupName(ObjectIdentityHelper::removeFieldName($type))
+        );
         if ($id === $this->getExtensionKey()) {
             $type = $this->entityClassResolver->getEntityClass($type);
         }
