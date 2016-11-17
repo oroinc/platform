@@ -816,6 +816,24 @@ abstract class WebTestCase extends BaseWebTestCase
     }
 
     /**
+     * Sorts array by key recursively. This method is used to output failures of array response comparison in
+     * a more comprehensive way.
+     *
+     * @param array $array
+     * @return mixed
+     */
+    protected static function sortArrayByKeyRecursively(array &$array)
+    {
+        ksort($array);
+
+        foreach ($array as $key => &$value) {
+            if (is_array($value)) {
+                self::sortArrayByKeyRecursively($value);
+            }
+        }
+    }
+
+    /**
      * {@inheritdoc}
      *
      * @return Client
