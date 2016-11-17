@@ -39,6 +39,10 @@ class WorkflowDefinitionScopesRegistryFilter implements WorkflowDefinitionFilter
             }
         );
 
+        if ($scopeAwareDefinitions->isEmpty()) {
+            return $workflowDefinitions;
+        }
+
         $scopeMatches = $this->getScopeMatched($scopeAwareDefinitions->getValues());
 
         foreach ($workflowDefinitions as $key => $workflowDefinition) {
