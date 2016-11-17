@@ -8,7 +8,6 @@ use Symfony\Component\DependencyInjection\DefinitionDecorator;
 use Symfony\Component\DependencyInjection\Reference;
 
 use Oro\Bundle\LoggerBundle\Exception\InvalidConfigurationException;
-use Oro\Bundle\LoggerBundle\Monolog\DetailedLogsHandler;
 
 /**
  * This compiler pass hides detailed logs handler's nested handler for all channels
@@ -47,7 +46,9 @@ class DetailedLogsHandlerPass implements CompilerPassInterface
 
         for ($i = 0; $i < count($handlerIds); $i++) {
             $handler = $container->findDefinition($handlerIds[$i]);
-            if ($handler->getClass() == DetailedLogsHandler::class) {
+            if ($handler instanceof DefinitionDecorator &&
+                $handler->getParent() == self::DETAILED_LOGS_HANDLER_PROTOTYPE_ID
+            ) {
                 if ($i == 0) {
                     throw new InvalidConfigurationException(
                         'Detailed logger is not configured properly. Please specify nested handler'
@@ -86,7 +87,9 @@ class DetailedLogsHandlerPass implements CompilerPassInterface
                 $handlerId = (string)$call[1][0];
                 $handler = $container->findDefinition($handlerId);
 
-                if ($handler->getClass() != DetailedLogsHandler::class) {
+                if (!($handler instanceof DefinitionDecorator) ||
+                    $handler->getParent() != self::DETAILED_LOGS_HANDLER_PROTOTYPE_ID
+                ) {
                     continue;
                 }
 

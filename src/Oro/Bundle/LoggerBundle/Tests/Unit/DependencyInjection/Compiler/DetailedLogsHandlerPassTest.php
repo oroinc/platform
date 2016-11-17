@@ -4,6 +4,7 @@ namespace Oro\Bundle\LoggerBundle\Tests\Unit\DependencyInjection\Compiler;
 
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
+use Symfony\Component\DependencyInjection\DefinitionDecorator;
 use Symfony\Component\DependencyInjection\Reference;
 
 use Oro\Bundle\LoggerBundle\DependencyInjection\Compiler\DetailedLogsHandlerPass;
@@ -98,8 +99,10 @@ class DetailedLogsHandlerPassTest extends \PHPUnit_Framework_TestCase
                     case 'monolog.handler.detailed_logs_nested':
                         return $this->getMock(Definition::class, [], [], '', false);
                     case 'monolog.handler.detailed_logs':
-                        $handler = $this->getMock(Definition::class, [], [], '', false);
-                        $handler->expects($this->once())->method('getClass')->willReturn(DetailedLogsHandler::class);
+                        $handler = $this->getMock(DefinitionDecorator::class, [], [], '', false);
+                        $handler->expects($this->once())
+                            ->method('getParent')
+                            ->willReturn(DetailedLogsHandlerPass::DETAILED_LOGS_HANDLER_PROTOTYPE_ID);
                         return $handler;
                     case 'monolog.handler.nested':
                         return $this->getMock(Definition::class, [], [], '', false);
@@ -136,8 +139,10 @@ class DetailedLogsHandlerPassTest extends \PHPUnit_Framework_TestCase
             ->with('monolog.handlers_to_channels')
             ->willReturn($handlersToChannels);
 
-        $detailedLogsHandler = $this->getMock(Definition::class, [], [], '', false);
-        $detailedLogsHandler->expects($this->once())->method('getClass')->willReturn(DetailedLogsHandler::class);
+        $detailedLogsHandler = $this->getMock(DefinitionDecorator::class, [], [], '', false);
+        $detailedLogsHandler->expects($this->once())
+            ->method('getParent')
+            ->willReturn(DetailedLogsHandlerPass::DETAILED_LOGS_HANDLER_PROTOTYPE_ID);
 
         $this->containerBuilder->expects($this->once())
             ->method('findDefinition')
@@ -218,8 +223,10 @@ class DetailedLogsHandlerPassTest extends \PHPUnit_Framework_TestCase
                     case 'monolog.handler.detailed_logs_nested':
                         return $this->getMock(Definition::class, [], [], '', false);
                     case 'monolog.handler.detailed_logs':
-                        $handler = $this->getMock(Definition::class, [], [], '', false);
-                        $handler->expects($this->once())->method('getClass')->willReturn(DetailedLogsHandler::class);
+                        $handler = $this->getMock(DefinitionDecorator::class, [], [], '', false);
+                        $handler->expects($this->once())
+                            ->method('getParent')
+                            ->willReturn(DetailedLogsHandlerPass::DETAILED_LOGS_HANDLER_PROTOTYPE_ID);
                         return $handler;
                     case 'monolog.handler.nested':
                         return $this->getMock(Definition::class, [], [], '', false);
@@ -289,8 +296,10 @@ class DetailedLogsHandlerPassTest extends \PHPUnit_Framework_TestCase
 
                         return $logger;
                     case 'monolog.handler.detailed_logs':
-                        $handler = $this->getMock(Definition::class, [], [], '', false);
-                        $handler->expects($this->once())->method('getClass')->willReturn(DetailedLogsHandler::class);
+                        $handler = $this->getMock(DefinitionDecorator::class, [], [], '', false);
+                        $handler->expects($this->once())
+                            ->method('getParent')
+                            ->willReturn(DetailedLogsHandlerPass::DETAILED_LOGS_HANDLER_PROTOTYPE_ID);
                         return $handler;
                     default:
                         $this->fail("Call to findDefinition with unexpected argument: $handlerId");
