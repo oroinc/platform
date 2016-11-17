@@ -4,6 +4,7 @@ namespace Oro\Bundle\WorkflowBundle\Model;
 
 use Doctrine\Common\Collections\ArrayCollection;
 
+use Oro\Bundle\WorkflowBundle\Configuration\WorkflowConfiguration;
 use Symfony\Component\Translation\TranslatorInterface;
 
 use Oro\Bundle\ActionBundle\Model\Attribute as BaseAttribute;
@@ -39,10 +40,12 @@ class AttributeAssembler extends BaseAbstractAssembler
     /**
      * @param WorkflowDefinition $definition,
      * @param array $configuration
+     * @param array $transitionConfigurations
+     *
      * @return ArrayCollection
      * @throws AssemblerException If configuration is invalid
      */
-    public function assemble(WorkflowDefinition $definition, array $configuration)
+    public function assemble(WorkflowDefinition $definition, array $configuration, array $transitionConfigurations = [])
     {
         $entityAttributeName = $definition->getEntityAttributeName();
         if (!array_key_exists($entityAttributeName, $configuration)) {
@@ -53,6 +56,22 @@ class AttributeAssembler extends BaseAbstractAssembler
                     'class' => $definition->getRelatedEntity(),
                 ),
             );
+        }
+
+        if ($transitionConfigurations) {
+            foreach ($transitionConfigurations as $transition) {
+                $initContextAttribute = WorkflowConfiguration::DEFAULT_INIT_CONTEXT_ATTRIBUTE;
+                if (array_key_exists(WorkflowConfiguration::NODE_INIT_CONTEXT_ATTRIBUTE, $transition)) {
+                    $initContextAttribute = $transition[WorkflowConfiguration::NODE_INIT_CONTEXT_ATTRIBUTE];
+                }
+
+                if (!array_key_exists($initContextAttribute, $configuration)) {
+                    $configuration[$initContextAttribute] = [
+                        'label' => $initContextAttribute,
+                        'type' => 'array'
+                    ];
+                }
+            }
         }
 
         $attributes = new ArrayCollection();
