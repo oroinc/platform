@@ -503,15 +503,14 @@ class InstallCommand extends AbstractCommand implements InstallCommandInterface
                     '--process-isolation'  => true,
                     '--fixtures-type'      => 'demo'
                 )
+            )
+            ->runCommand(
+                'oro:workflow:scope:update',
+                [
+                    '--process-isolation' => true
+                ]
             );
         }
-
-        $commandExecutor->runCommand(
-            'oro:workflow:scope:update',
-            [
-                '--process-isolation' => true
-            ]
-        );
 
         $output->writeln('');
 

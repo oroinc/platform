@@ -36,6 +36,8 @@ class WorkflowScopeManager
     }
 
     /**
+     * Should be used only for command for loading workflow configurations
+     *
      * @param bool $isEnabled
      */
     public function setEnabled($isEnabled = true)

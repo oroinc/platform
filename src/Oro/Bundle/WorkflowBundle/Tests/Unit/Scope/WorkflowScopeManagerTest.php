@@ -101,6 +101,26 @@ class WorkflowScopeManagerTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals([$scope1, $scope2], array_values($definition->getScopes()->toArray()));
     }
 
+    public function testUpdateScopesWhenDisabled()
+    {
+        $this->scopeManager->expects($this->never())->method($this->anything());
+        $this->repository->expects($this->never())->method($this->anything());
+        $this->manager->expects($this->never())->method($this->anything());
+
+        $definition = $this->createWorkflowDefinition(
+            [[self::FIELD_NAME => self::ENTITY_ID], ['extraField' => self::ENTITY_ID]],
+            [$this->createScope(100), $this->createScope(101)]
+        );
+
+        $this->workflowScopeManager->setEnabled(false);
+        $this->workflowScopeManager->updateScopes($definition);
+
+        $this->assertEquals(
+            [$this->createScope(100), $this->createScope(101)],
+            array_values($definition->getScopes()->toArray())
+        );
+    }
+
     /**
      * @dataProvider updateScopesExceptionDataProvider
      *
