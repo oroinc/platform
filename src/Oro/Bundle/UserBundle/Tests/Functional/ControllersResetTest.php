@@ -96,7 +96,7 @@ class ControllersResetTest extends WebTestCase
         $form = $crawler->selectButton('Reset')->form();
         $this->client->submit($form);
         $result = $this->client->getResponse();
-        $this->assertContains('oro.user.reset_password.flash.success', $result->getContent());
+        $this->assertContains('success', $result->getContent());
 
         $user = $this->getContainer()->get('doctrine')->getRepository('OroUserBundle:User')->find($user->getId());
         $this->assertTrue($user->isLoginDisabled());

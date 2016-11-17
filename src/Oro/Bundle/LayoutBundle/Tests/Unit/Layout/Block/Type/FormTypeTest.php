@@ -2,98 +2,94 @@
 
 namespace Oro\Bundle\LayoutBundle\Tests\Unit\Layout\Block\Type;
 
-use Oro\Component\Layout\Block\Type\ContainerType;
-use Oro\Component\Layout\Block\Type\Options;
-use Oro\Component\Layout\BlockBuilderInterface;
-
+use Oro\Bundle\LayoutBundle\Layout\Block\Type\ConfigurableType;
 use Oro\Bundle\LayoutBundle\Layout\Block\Type\FormType;
 use Oro\Bundle\LayoutBundle\Tests\Unit\BlockTypeTestCase;
 
+use Oro\Component\Layout\Block\Type\BaseType;
+use Oro\Component\Layout\Block\Type\ContainerType;
+use Oro\Component\Layout\LayoutFactoryBuilderInterface;
+
+use Symfony\Component\Form\FormView;
+
 class FormTypeTest extends BlockTypeTestCase
 {
+    public function testSetDefaultOptions()
+    {
+        $form = $this->getMock(FormView::class);
+
+        $this->assertEquals(
+            [
+                'form' => $form,
+                'form_route_parameters' => [],
+                'instance_name' => '',
+                'additional_block_prefixes' => ['test_'],
+                'visible' => true,
+            ],
+            $this->resolveOptions(FormType::NAME, ['form' => $form, 'additional_block_prefixes' => ['test_']])
+        );
+    }
+
     public function testBuildBlock()
     {
-        $formName = 'test_form';
+        $form = $this->getMock(FormView::class);
 
-        /** @var BlockBuilderInterface|\PHPUnit_Framework_MockObject_MockObject $builder */
-        $builder = $this->getMock('Oro\Component\Layout\BlockBuilderInterface');
-        $builder->expects($this->any())
-            ->method('getId')
-            ->will($this->returnValue('form_id'));
+        $builder = $this->getBlockBuilder(FormType::NAME, [
+            'form' => $form,
+            'additional_block_prefixes' => ['test_']
+        ]);
 
-        $layoutManipulator = $this->getMock('Oro\Component\Layout\LayoutManipulatorInterface');
-        $builder->expects($this->exactly(3))
-            ->method('getLayoutManipulator')
-            ->willReturn($layoutManipulator);
+        $blockView = $this->getBlockView(FormType::NAME, [
+            'form' => $form,
+            'additional_block_prefixes' => ['test_']
+        ]);
 
-        $layoutManipulator->expects($this->exactly(3))
-            ->method('add')
-            ->withConsecutive(
-                [
-                    'form_id_start',
-                    'form_id',
-                    'form_start',
-                    [
-                        'form_name'             => 'test_form',
-                        'form_route_name'       => 'test_route',
-                        'form_route_parameters' => ['test_param' => true],
-                        'form_method'           => 'POST',
-                        'form_enctype'          => 'application/json',
-                        'instance_name'         => '',
-                        'additional_block_prefixes' => [],
-                    ],
-                ],
-                [
-                    'form_id_fields',
-                    'form_id',
-                    'form_fields',
-                    [
-                        'form_name'         => 'test_form',
-                        'form_prefix'       => 'test_prefix',
-                        'form_field_prefix' => 'test_field_prefix',
-                        'form_group_prefix' => 'test_group_prefix',
-                        'groups'            => ['main', 'additional'],
-                        'split_to_fields'   => true,
-                        'form_data'         => ['test'],
-                        'preferred_fields'  => 'first_name',
-                        'instance_name'         => '',
-                        'additional_block_prefixes' => [],
-                    ],
-                ],
-                [
-                    'form_id_end',
-                    'form_id',
-                    'form_end',
-                    [
-                        'form_name'   => 'test_form',
-                        'render_rest' => true,
-                        'instance_name' => '',
-                        'additional_block_prefixes' => [],
-                    ],
-                ]
-            );
-        $type = new FormType();
-        $options = $this->resolveOptions(
-            $type,
-            [
-                'form_name'             => $formName,
-                'form_route_name'       => 'test_route',
-                'form_route_parameters' => ['test_param' => true],
-                'form_method'           => 'POST',
-                'form_enctype'          => 'application/json',
-                'form_data'             => ['test'],
-                'form_prefix'           => 'test_prefix',
-                'form_field_prefix'     => 'test_field_prefix',
-                'form_group_prefix'     => 'test_group_prefix',
-                'render_rest'           => true,
-                'preferred_fields'      => 'first_name',
-                'groups'                => ['main', 'additional'],
-                'split_to_fields'       => true,
-                'additional_block_prefixes' => [],
-            ]
-        );
+        $this->assertEquals($blockView, $builder->getBlockView());
+        $this->assertNotNull($builder->getBlockView()->children['form_id_start']);
+        $this->assertNotNull($builder->getBlockView()->children['form_id_fields']);
+        $this->assertNotNull($builder->getBlockView()->children['form_id_end']);
+    }
 
-        $type->buildBlock($builder, new Options($options));
+    /**
+     * {@inheritdoc}
+     */
+    protected function initializeLayoutFactoryBuilder(LayoutFactoryBuilderInterface $layoutFactoryBuilder)
+    {
+        parent::initializeLayoutFactoryBuilder($layoutFactoryBuilder);
+
+        $formStart = new ConfigurableType();
+        $formStart->setName('form_start');
+        $formStart->setParent(BaseType::NAME);
+        $formStart->setOptionsConfig([
+            'form' => ['required' => true],
+            'form_action' => null,
+            'form_multipart' => null,
+            'form_route_name' => null,
+            'form_route_parameters' => ['default' => []],
+            'instance_name' => ['default' => ''],
+        ]);
+
+        $formFields = new ConfigurableType();
+        $formFields->setName('form_fields');
+        $formFields->setParent(BaseType::NAME);
+        $formFields->setOptionsConfig([
+            'form' => ['required' => true],
+            'instance_name' => ['default' => ''],
+        ]);
+
+        $formEnd = new ConfigurableType();
+        $formEnd->setName('form_end');
+        $formEnd->setParent(BaseType::NAME);
+        $formEnd->setOptionsConfig([
+            'form' => ['required' => true],
+            'instance_name' => ['default' => ''],
+            'render_rest' => ['default' => []],
+        ]);
+
+        $layoutFactoryBuilder
+            ->addType($formStart)
+            ->addType($formFields)
+            ->addType($formEnd);
     }
 
     public function testGetName()
