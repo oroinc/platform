@@ -9,7 +9,6 @@ use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
 use Oro\Component\DoctrineUtils\ORM\QueryUtils;
 use Oro\Bundle\ApiBundle\Processor\Subresource\SubresourceContext;
-use Oro\Bundle\ApiBundle\Request\DataType;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 
 /**
@@ -55,25 +54,13 @@ class AddParentEntityIdToQuery implements ProcessorInterface
             // bidirectional association
             $query->innerJoin('e.' . $joinFieldName, 'parent_entity');
         } elseif ($context->isCollection()) {
-            $parentFieldConfig = $context->getParentConfig()->getField($associationName);
-            if (!$parentFieldConfig || !$parentFieldConfig->has(DataType::INVERSE_ASSOCIATION_FIELD)) {
-                // unidirectional "to-many" association
-                $query->innerJoin(
-                    $parentClassName,
-                    'parent_entity',
-                    Join::WITH,
-                    sprintf('%s MEMBER OF parent_entity.%s', $rootAlias, $associationName)
-                );
-            } else {
-                // inverse part of association
-                $associationField = $parentFieldConfig->get(DataType::INVERSE_ASSOCIATION_FIELD);
-                $query->innerJoin(
-                    $parentClassName,
-                    'parent_entity',
-                    Join::WITH,
-                    sprintf('%s.%s = parent_entity', $rootAlias, $associationField)
-                );
-            }
+            // unidirectional "to-many" association
+            $query->innerJoin(
+                $parentClassName,
+                'parent_entity',
+                Join::WITH,
+                sprintf('%s MEMBER OF parent_entity.%s', $rootAlias, $associationName)
+            );
         } else {
             // unidirectional "to-one" association
             $query->innerJoin(
@@ -96,13 +83,9 @@ class AddParentEntityIdToQuery implements ProcessorInterface
     protected function getAssociationName(SubresourceContext $context)
     {
         $associationName = $context->getAssociationName();
-
-        $propertyPath = null;
-        $field = $context->getParentConfig()
-            ->getField($associationName);
-        if ($field) {
-            $propertyPath = $field->getPropertyPath();
-        }
+        $propertyPath = $context->getParentConfig()
+            ->getField($associationName)
+            ->getPropertyPath();
 
         return $propertyPath ?: $associationName;
     }

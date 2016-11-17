@@ -229,8 +229,6 @@ For detail what are extended associations, please refer to [Associations](../../
 
 Depending on current entity configuration, each association resource (e.g. attachment) can be assigned to one of the couple of resources (e.g. user, account, contact) that supports such associations.
 
-### Owning side of an association 
-
 By default, there is no possibility to retrieve targets of such associations. But this behaviour can be enabled via configuration in `Resources/config/oro/api.yml`, for instance:
 
 ```yaml
@@ -243,28 +241,3 @@ api:
 ```
 
 After applying configuration like above, the `target` relationship will be available in scope of [get_list](./actions.md#get_list-action), [get](./actions.md#get-action), [create](./actions.md#create-action) and [update](./actions.md#update-action) actions. Also the `target` relationship will be available as subresource and it will be possible to perform [get_subresource](./actions.md#get_subresource-action), [get_relationship](./actions.md#get_relationship-action) and [update_relationship](./actions.md#update_relationship-action) actions.
-
-### Inverse side of an association 
-
-Similar to an owning side of association the inverse part should be enabled manually. This can be done by registering [AddInverseToOneAssociation](../../Processor/Config/Shared/AddInverseToOneAssociation.php) processor.
-
-For example:
-
-```yaml
-# Resources/config/services.yml
-
-acme.api.add_inverse_association:
-    class: Oro\Bundle\ApiBundle\Processor\Config\Shared\AddInverseToOneAssociation
-    arguments:
-        - '@oro_entity_config.provider.extend'
-        - '@oro_api.doctrine_helper'
-        - '@oro_api.value_normalizer'
-    calls:
-        - [setAssociationClass, ['Your\Bundle\Entity\AssociationSourceEntity']]
-    tags:
-        - { name: oro.api.processor, action: get_config, extra: !identifier_fields_only&definition, priority: -29
-```
-
-Please note that the class name of the owning side entity should be set via `setAssociationClass` method in the service declaration. Also if an association has a kind it should be set via `setAssociationKind` method.
-
-After that, a relationship to the owning side entity will be available as subresource for all inverse side entities and it will be possible to perform [get_subresource](./actions.md#get_subresource-action), [get_relationship](./actions.md#get_relationship-action) and [add_relationship](./actions.md#add_relationship-action) actions.

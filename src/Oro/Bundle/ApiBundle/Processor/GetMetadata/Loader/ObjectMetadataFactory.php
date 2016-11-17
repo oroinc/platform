@@ -10,9 +10,7 @@ use Oro\Bundle\ApiBundle\Metadata\FieldMetadata;
 use Oro\Bundle\ApiBundle\Metadata\MetaPropertyMetadata;
 use Oro\Bundle\ApiBundle\Request\DataType;
 use Oro\Bundle\EntityExtendBundle\Entity\Manager\AssociationManager;
-use Oro\Bundle\EntityExtendBundle\Extend\FieldTypeHelper;
 use Oro\Bundle\EntityExtendBundle\Extend\RelationType;
-use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 
 class ObjectMetadataFactory
 {
@@ -22,22 +20,16 @@ class ObjectMetadataFactory
     /** @var AssociationManager */
     protected $associationManager;
 
-    /** @var FieldTypeHelper */
-    protected $fieldTypeHelper;
-
     /**
      * @param MetadataHelper     $metadataHelper
      * @param AssociationManager $associationManager
-     * @param FieldTypeHelper    $fieldTypeHelper
      */
     public function __construct(
         MetadataHelper $metadataHelper,
-        AssociationManager $associationManager,
-        FieldTypeHelper $fieldTypeHelper
+        AssociationManager $associationManager
     ) {
         $this->metadataHelper = $metadataHelper;
         $this->associationManager = $associationManager;
-        $this->fieldTypeHelper = $fieldTypeHelper;
     }
 
     /**
@@ -146,22 +138,6 @@ class ObjectMetadataFactory
             $this->setAssociationDataType($associationMetadata, $field);
             $associationMetadata->setAssociationType($associationType);
             $associationMetadata->setAcceptableTargetClassNames(array_keys($targets));
-            $associationMetadata->setIsCollection((bool)$field->isCollectionValuedAssociation());
-        } elseif (DataType::isExtendedInverseAssociation($dataType)) {
-            list($associationSourceClass, $associationType, $associationKind)
-                = DataType::parseExtendedInverseAssociation($dataType);
-            $associationMetadata->setTargetClassName($associationSourceClass);
-            $associationMetadata->setAcceptableTargetClassNames([$associationSourceClass]);
-            $reverseType = ExtendHelper::getReverseRelationType(
-                $this->fieldTypeHelper->getUnderlyingType($associationType)
-            );
-            $targets = $this->getExtendedAssociationTargets(
-                $associationSourceClass,
-                $associationType,
-                $associationKind
-            );
-            $associationMetadata->set(DataType::INVERSE_ASSOCIATION_FIELD, $targets[$entityClass]);
-            $associationMetadata->setAssociationType($reverseType);
             $associationMetadata->setIsCollection((bool)$field->isCollectionValuedAssociation());
         } else {
             $associationMetadata->setDataType($dataType);

@@ -21,10 +21,6 @@ final class DataType
     const ENTITY_CLASS     = 'entityClass';
     const ORDER_BY         = 'orderBy';
 
-    // todo: Delete this constants from this class.
-    const INVERSE_ASSOCIATION_FIELD = 'association-field';
-    const ASSOCIATION_KIND = 'association-kind';
-
     /**
      * Checks whether the field represents a nested object.
      *
@@ -75,19 +71,6 @@ final class DataType
     }
 
     /**
-     * Checks whether the given data-type represents an inverse side of extended association.
-     * See EntityExtendBundle/Resources/doc/associations.md for details about extended associations.
-     *
-     * @param string $dataType
-     *
-     * @return bool
-     */
-    public static function isExtendedInverseAssociation($dataType)
-    {
-        return 0 === strpos($dataType, 'inverseAssociation:');
-    }
-
-    /**
      * Extracts the type and the kind of an extended association.
      * See EntityExtendBundle/Resources/doc/associations.md for details about extended associations.
      *
@@ -107,56 +90,5 @@ final class DataType
         }
 
         return [$type, $kind];
-    }
-
-    /**
-     * Extracts the source class, type and the kind of an inverse extended association.
-     * See EntityExtendBundle/Resources/doc/associations.md for details about extended associations.
-     *
-     * @param string $dataType
-     *
-     * @return string[] [source class name, association type, association kind]
-     *
-     * @throws \InvalidArgumentException if the given data-type does not represent an inverse part of
-     *  extended association
-     */
-    public static function parseExtendedInverseAssociation($dataType)
-    {
-        list($prefix, $source, $type, $kind) = array_pad(explode(':', $dataType, 4), 4, null);
-        if ('inverseAssociation' !== $prefix || empty($source) ||  empty($type) || '' === $kind) {
-            throw new \InvalidArgumentException(
-                sprintf('Expected a string like "inverseAssociation:/Source/Class:type[:kind]", "%s" given.', $dataType)
-            );
-        }
-
-        return [$source, $type, $kind];
-    }
-
-    /**
-     * Build the string that represent the inverse part of the extended association.
-     * See EntityExtendBundle/Resources/doc/associations.md for details about extended associations.
-     *
-     * @param string $source
-     * @param string $type
-     * @param string $kind
-     *
-     * @return string
-     */
-    public static function buildExtendedInverseAssociation($source, $type, $kind = null)
-    {
-        $inverseAssociationDataTypeString = sprintf(
-            'inverseAssociation:%s:%s',
-            $source,
-            $type
-        );
-        if ($kind) {
-            $inverseAssociationDataTypeString = sprintf(
-                '%s:%s',
-                $inverseAssociationDataTypeString,
-                $kind
-            );
-        }
-
-        return $inverseAssociationDataTypeString;
     }
 }

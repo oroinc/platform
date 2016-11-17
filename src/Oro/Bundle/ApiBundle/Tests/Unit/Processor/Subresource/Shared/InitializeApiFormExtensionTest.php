@@ -5,7 +5,6 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\Subresource\Shared;
 use Oro\Bundle\ApiBundle\Collection\IncludedEntityCollection;
 use Oro\Bundle\ApiBundle\Config\ConfigAccessorInterface;
 use Oro\Bundle\ApiBundle\Form\FormExtensionSwitcherInterface;
-use Oro\Bundle\ApiBundle\Form\Guesser\InverseAssociationTypeGuesser;
 use Oro\Bundle\ApiBundle\Form\Guesser\MetadataTypeGuesser;
 use Oro\Bundle\ApiBundle\Metadata\MetadataAccessorInterface;
 use Oro\Bundle\ApiBundle\Processor\Subresource\ContextParentConfigAccessor;
@@ -21,9 +20,6 @@ class InitializeApiFormExtensionTest extends ChangeRelationshipTestCase
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $metadataTypeGuesser;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
-    protected $inverseMetadataTypeGuesser;
-
     /** @var InitializeApiFormExtension */
     protected $processor;
 
@@ -35,14 +31,9 @@ class InitializeApiFormExtensionTest extends ChangeRelationshipTestCase
         $this->metadataTypeGuesser = $this->getMockBuilder(MetadataTypeGuesser::class)
             ->disableOriginalConstructor()
             ->getMock();
-        $this->inverseMetadataTypeGuesser = $this->getMockBuilder(InverseAssociationTypeGuesser::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
         $this->processor = new InitializeApiFormExtension(
             $this->formExtensionSwitcher,
-            $this->metadataTypeGuesser,
-            $this->inverseMetadataTypeGuesser
+            $this->metadataTypeGuesser
         );
     }
 
@@ -68,9 +59,6 @@ class InitializeApiFormExtensionTest extends ChangeRelationshipTestCase
         $this->metadataTypeGuesser->expects($this->once())
             ->method('setConfigAccessor')
             ->with($this->isInstanceOf(ContextParentConfigAccessor::class));
-        $this->inverseMetadataTypeGuesser->expects($this->once())
-            ->method('setConfigAccessor')
-            ->with($this->isInstanceOf(ContextParentConfigAccessor::class));
 
         $this->processor->process($this->context);
 
@@ -94,8 +82,6 @@ class InitializeApiFormExtensionTest extends ChangeRelationshipTestCase
         $this->metadataTypeGuesser->expects($this->never())
             ->method('setMetadataAccessor');
         $this->metadataTypeGuesser->expects($this->never())
-            ->method('setConfigAccessor');
-        $this->inverseMetadataTypeGuesser->expects($this->never())
             ->method('setConfigAccessor');
 
         $this->context->set(InitializeApiFormExtension::API_FORM_EXTENSION_ACTIVATED, true);
@@ -128,9 +114,6 @@ class InitializeApiFormExtensionTest extends ChangeRelationshipTestCase
             ->method('setMetadataAccessor')
             ->with($this->isInstanceOf(ContextParentMetadataAccessor::class));
         $this->metadataTypeGuesser->expects($this->once())
-            ->method('setConfigAccessor')
-            ->with($this->isInstanceOf(ContextParentConfigAccessor::class));
-        $this->inverseMetadataTypeGuesser->expects($this->once())
             ->method('setConfigAccessor')
             ->with($this->isInstanceOf(ContextParentConfigAccessor::class));
 

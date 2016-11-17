@@ -2,11 +2,8 @@
 
 namespace Oro\Bundle\ApiBundle\Processor\Subresource\Shared;
 
-use Oro\Bundle\ApiBundle\Form\FormExtensionSwitcherInterface;
-use Oro\Bundle\ApiBundle\Form\Guesser\MetadataTypeGuesser;
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
-use Oro\Bundle\ApiBundle\Form\Guesser\InverseAssociationTypeGuesser;
 use Oro\Bundle\ApiBundle\Processor\FormContext;
 use Oro\Bundle\ApiBundle\Processor\Shared\SwitchFormExtension;
 use Oro\Bundle\ApiBundle\Processor\Subresource\ContextParentConfigAccessor;
@@ -18,23 +15,6 @@ use Oro\Bundle\ApiBundle\Processor\Subresource\SubresourceContext;
  */
 class InitializeApiFormExtension extends SwitchFormExtension implements ProcessorInterface
 {
-    /** @var InverseAssociationTypeGuesser */
-    protected $inverseMetadataTypeGuesser;
-
-    /**
-     * @param FormExtensionSwitcherInterface $formExtensionSwitcher
-     * @param MetadataTypeGuesser            $metadataTypeGuesser
-     * @param InverseAssociationTypeGuesser  $inverseAssociationTypeGuesser
-     */
-    public function __construct(
-        FormExtensionSwitcherInterface $formExtensionSwitcher,
-        MetadataTypeGuesser $metadataTypeGuesser,
-        InverseAssociationTypeGuesser $inverseAssociationTypeGuesser
-    ) {
-        parent::__construct($formExtensionSwitcher, $metadataTypeGuesser);
-        $this->inverseMetadataTypeGuesser = $inverseAssociationTypeGuesser;
-    }
-
     /**
      * {@inheritdoc}
      */
@@ -52,7 +32,5 @@ class InitializeApiFormExtension extends SwitchFormExtension implements Processo
         $this->metadataTypeGuesser->setIncludedEntities($context->getIncludedEntities());
         $this->metadataTypeGuesser->setMetadataAccessor(new ContextParentMetadataAccessor($context));
         $this->metadataTypeGuesser->setConfigAccessor(new ContextParentConfigAccessor($context));
-
-        $this->inverseMetadataTypeGuesser->setConfigAccessor(new ContextParentConfigAccessor($context));
     }
 }

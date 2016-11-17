@@ -19,9 +19,7 @@ use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 use Oro\Bundle\EntityBundle\Provider\ExclusionProviderInterface;
 use Oro\Bundle\EntityExtendBundle\Entity\Manager\AssociationManager;
-use Oro\Bundle\EntityExtendBundle\Extend\FieldTypeHelper;
 use Oro\Bundle\EntityExtendBundle\Extend\RelationType;
-use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 
 /**
  * Makes sure that identifier field names are set for ORM entities.
@@ -58,28 +56,22 @@ class CompleteDefinition implements ProcessorInterface
     /** @var AssociationManager */
     protected $associationManager;
 
-    /** @var FieldTypeHelper */
-    protected $fieldTypeHelper;
-
     /**
      * @param DoctrineHelper             $doctrineHelper
      * @param ExclusionProviderInterface $exclusionProvider
      * @param ConfigProvider             $configProvider
      * @param AssociationManager         $associationManager
-     * @param FieldTypeHelper            $fieldTypeHelper
      */
     public function __construct(
         DoctrineHelper $doctrineHelper,
         ExclusionProviderInterface $exclusionProvider,
         ConfigProvider $configProvider,
-        AssociationManager $associationManager,
-        FieldTypeHelper $fieldTypeHelper
+        AssociationManager $associationManager
     ) {
         $this->doctrineHelper = $doctrineHelper;
         $this->exclusionProvider = $exclusionProvider;
         $this->configProvider = $configProvider;
         $this->associationManager = $associationManager;
-        $this->fieldTypeHelper = $fieldTypeHelper;
     }
 
     /**
@@ -253,45 +245,6 @@ class CompleteDefinition implements ProcessorInterface
                     $targets = $this->getExtendedAssociationTargets($entityClass, $associationType, $associationKind);
                     $field->setDependsOn(array_values($targets));
                     $this->fixExtendedAssociationIdentifierDataType($field, array_keys($targets));
-                } elseif (DataType::isExtendedInverseAssociation($dataType)) {
-                    if ($field->getTargetType()) {
-                        throw new \RuntimeException(
-                            sprintf(
-                                'The "target_type" option cannot be configured for "%s::%s".',
-                                $entityClass,
-                                $fieldName
-                            )
-                        );
-                    }
-                    if ($field->getDependsOn()) {
-                        throw new \RuntimeException(
-                            sprintf(
-                                'The "depends_on" option cannot be configured for "%s::%s".',
-                                $entityClass,
-                                $fieldName
-                            )
-                        );
-                    }
-
-                    list($associationSourceClass, $associationType, $associationKind)
-                        = DataType::parseExtendedInverseAssociation($dataType);
-                    $field->setTargetClass($associationSourceClass);
-                    $reverseType = ExtendHelper::getReverseRelationType(
-                        $this->fieldTypeHelper->getUnderlyingType($associationType)
-                    );
-                    $field->setTargetType($this->getExtendedAssociationTargetType($reverseType));
-
-                    // inverse association fields should be excluded to avoid this fields in main actions
-                    $field->setExcluded(true);
-
-                    $this->completeAssociation($field, $associationSourceClass, $version, $requestType);
-                    $targets = $this->getExtendedAssociationTargets(
-                        $associationSourceClass,
-                        $associationType,
-                        $associationKind
-                    );
-                    $field->set(DataType::INVERSE_ASSOCIATION_FIELD, $targets[$entityClass]);
-                    $field->set(DataType::ASSOCIATION_KIND, $associationKind);
                 }
             }
         }

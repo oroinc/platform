@@ -120,16 +120,6 @@ class Product
     }
 
     /**
-     * Emulate extended association setter
-     *
-     * @param User|null $target
-     */
-    public function setTarget($target)
-    {
-        $this->owner = $target;
-    }
-
-    /**
      * @return string
      */
     public function __toString()

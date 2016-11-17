@@ -9,7 +9,6 @@ use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionFieldConfig;
 use Oro\Bundle\ApiBundle\Processor\Subresource\ChangeRelationshipContext;
-use Oro\Bundle\ApiBundle\Request\DataType;
 
 /**
  * Builds the form builder based on the parent entity configuration
@@ -91,10 +90,6 @@ class BuildFormBuilder implements ProcessorInterface
         $propertyPath = $fieldConfig->getPropertyPath();
         if ($propertyPath) {
             $options['property_path'] = $propertyPath;
-        }
-
-        if ($fieldConfig->has(DataType::INVERSE_ASSOCIATION_FIELD)) {
-            $options['mapped'] = false;
         }
 
         return $options;

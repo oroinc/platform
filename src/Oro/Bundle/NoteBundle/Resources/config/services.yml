@@ -109,14 +109,3 @@ services:
         public: false
         tags:
             - { name: oro_entity.exclusion_provider.api }
-
-    oro_note.api.add_inverse_note_association:
-        class: Oro\Bundle\ApiBundle\Processor\Config\Shared\AddInverseToOneAssociation
-        arguments:
-            - '@oro_entity_config.provider.extend'
-            - '@oro_api.doctrine_helper'
-            - '@oro_api.value_normalizer'
-        calls:
-            - [setAssociationClass, ['Oro\Bundle\NoteBundle\Entity\Note']]
-        tags:
-            - { name: oro.api.processor, action: get_config, extra: !identifier_fields_only&definition, priority: -29 }

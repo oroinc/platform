@@ -32,14 +32,6 @@ services:
         tags:
             - { name: oro.api.form.type_extension, alias: form, extended_type: 'Symfony\Component\Form\Extension\Core\Type\FormType' }
 
-    oro_api.form.guesser.metadata_inverse:
-        class: Oro\Bundle\ApiBundle\Form\Guesser\InverseAssociationTypeGuesser
-        arguments:
-            - '@oro_api.doctrine_helper'
-            - '@oro_entity_extend.association_manager'
-        tags:
-            - { name: oro.api.form.type_guesser, priority: 11 }
-
     oro_api.form.guesser.metadata:
         class: Oro\Bundle\ApiBundle\Form\Guesser\MetadataTypeGuesser
         arguments:

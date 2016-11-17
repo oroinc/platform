@@ -156,7 +156,6 @@ services:
         arguments:
             - '@form.registry'
             - '@oro_api.form.guesser.metadata'
-            - '@oro_api.form.guesser.metadata_inverse'
         tags:
             - { name: oro.api.processor, action: add_relationship, group: transform_data, priority: 250 }
 
@@ -206,14 +205,6 @@ services:
             - '@oro_api.doctrine_helper'
         tags:
             - { name: oro.api.processor, action: add_relationship, group: save_data, priority: -10 }
-
-    oro_api.add_relationship.save_relations:
-       class: Oro\Bundle\ApiBundle\Processor\Subresource\AddRelationship\SaveInverseRelations
-       arguments:
-           - '@oro_api.doctrine_helper'
-           - '@property_accessor'
-       tags:
-           - { name: oro.api.processor, action: add_relationship, group: save_data, priority: -20 }
 
     #
     # normalize_result

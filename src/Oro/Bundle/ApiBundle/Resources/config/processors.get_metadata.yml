@@ -63,7 +63,6 @@ services:
         arguments:
             - '@oro_api.load_metadata.helper'
             - '@oro_entity_extend.association_manager'
-            - '@oro_entity_extend.extend.field_type_helper'
 
     oro_api.load_metadata.helper:
         class: Oro\Bundle\ApiBundle\Processor\GetMetadata\Loader\MetadataHelper
