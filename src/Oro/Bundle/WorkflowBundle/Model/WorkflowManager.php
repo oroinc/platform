@@ -471,6 +471,7 @@ class WorkflowManager implements LoggerAwareInterface
     }
 
     /**
+     * Checks weather workflow with such name is active. Refreshes workflow instance.
      * @param string $workflowName
      * @return bool
      */

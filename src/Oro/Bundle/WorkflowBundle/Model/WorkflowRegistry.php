@@ -3,12 +3,13 @@
 namespace Oro\Bundle\WorkflowBundle\Model;
 
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ORM\EntityManager;
 
-use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Entity\Repository\WorkflowDefinitionRepository;
+use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Exception\WorkflowNotFoundException;
 use Oro\Bundle\WorkflowBundle\Model\Filter\WorkflowDefinitionFilterInterface;
 
@@ -23,7 +24,7 @@ class WorkflowRegistry
     /** @var Workflow[] */
     protected $workflowByName = [];
 
-    /** @var ArrayCollection[] */
+    /** @var Collection[] */
     protected $workflowByEntityClass = [];
 
     /** @var array|WorkflowDefinitionFilterInterface[] */
@@ -117,7 +118,7 @@ class WorkflowRegistry
      * Get Active Workflows that applicable to entity class
      *
      * @param string $entityClass
-     * @return Workflow[]|ArrayCollection Named collection of active Workflow instances
+     * @return Workflow[]|Collection Named collection of active Workflow instances
      *                                    with structure: ['workflowName' => Workflow $worfklowInstance]
      */
     public function getActiveWorkflowsByEntityClass($entityClass)
@@ -144,19 +145,20 @@ class WorkflowRegistry
      * Get Active Workflows by active groups
      *
      * @param array $groupNames
-     * @return Workflow[]|ArrayCollection
+     * @return Workflow[]|Collection
      */
     public function getActiveWorkflowsByActiveGroups(array $groupNames)
     {
         $groupNames = array_map('strtolower', $groupNames);
         $definitions = new ArrayCollection($this->getEntityRepository()->findBy(['active' => true]));
-        $definitions->filter(function (WorkflowDefinition $definition) use ($groupNames) {
-            $exclusiveActiveGroups = $definition->getExclusiveActiveGroups();
 
-            return (bool)array_intersect($groupNames, $exclusiveActiveGroups);
-        });
+        $definitions = $this->processDefinitionFilters(
+            $definitions->filter(function (WorkflowDefinition $definition) use ($groupNames) {
+                $exclusiveActiveGroups = $definition->getExclusiveActiveGroups();
 
-        $definitions = $this->processDefinitionFilters($definitions);
+                return (bool)array_intersect($groupNames, $exclusiveActiveGroups);
+            })
+        );
 
         return $definitions->map(
             function ($definition) {
@@ -166,11 +168,16 @@ class WorkflowRegistry
     }
 
     /**
-     * @param ArrayCollection|WorkflowDefinition[] $workflowDefinitions
-     * @return ArrayCollection|WorkflowDefinition[]
+     * @param Collection|WorkflowDefinition[] $workflowDefinitions
+     * @param callable $customFilter
+     * @return Collection|\Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition[]
      */
-    private function processDefinitionFilters(ArrayCollection $workflowDefinitions)
+    private function processDefinitionFilters(Collection $workflowDefinitions, callable $customFilter = null)
     {
+        if ($customFilter) {
+            $workflowDefinitions = $workflowDefinitions->filter($customFilter);
+        }
+
         foreach ($this->definitionFilters as $definitionFilter) {
             $workflowDefinitions = $definitionFilter->filter($workflowDefinitions);
         }

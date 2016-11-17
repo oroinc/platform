@@ -89,7 +89,7 @@ services:
         public: false
         arguments:
             - '@oro_scope.scope_manager'
-            - '@oro_workflow.repository.workflow_definition'
+            - '@doctrine'
 
     oro_workflow.registry:
         class: 'Oro\Bundle\WorkflowBundle\Model\WorkflowRegistry'
@@ -196,12 +196,6 @@ services:
             - '@oro_workflow.process.definitions_configurator'
             - '@oro_workflow.process.triggers_configurator'
             - '%oro_workflow.entity.process_definition.class%'
-
-    oro_workflow.repository.workflow_definition:
-        class: 'Oro\Bundle\WorkflowBundle\Entity\Repository\WorkflowDefinitionRepository'
-        parent: oro_entity.abstract_repository
-        arguments:
-            - '%oro_workflow.entity.workflow_definition.class%'
 
     oro_workflow.repository.workflow_item:
         class: 'Oro\Bundle\WorkflowBundle\Entity\Repository\WorkflowItemRepository'

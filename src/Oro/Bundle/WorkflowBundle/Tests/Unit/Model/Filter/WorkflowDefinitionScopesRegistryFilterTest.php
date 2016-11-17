@@ -3,9 +3,12 @@
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Model\Filter;
 
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Persistence\ManagerRegistry;
+use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\ORM\AbstractQuery;
 use Doctrine\ORM\Query\Expr\Join;
 use Doctrine\ORM\QueryBuilder;
+
 use Oro\Bundle\ScopeBundle\Manager\ScopeManager;
 use Oro\Bundle\ScopeBundle\Model\ScopeCriteria;
 use Oro\Bundle\WorkflowBundle\Entity\Repository\WorkflowDefinitionRepository;
@@ -17,8 +20,8 @@ class WorkflowDefinitionScopesRegistryFilterTest extends \PHPUnit_Framework_Test
     /** @var ScopeManager|\PHPUnit_Framework_MockObject_MockObject */
     private $scopeManager;
 
-    /** @var WorkflowDefinitionRepository|\PHPUnit_Framework_MockObject_MockObject */
-    private $definitionRepository;
+    /** @var ManagerRegistry|\PHPUnit_Framework_MockObject_MockObject */
+    private $doctrine;
 
     /** @var WorkflowDefinitionScopesRegistryFilter */
     private $filter;
@@ -27,9 +30,9 @@ class WorkflowDefinitionScopesRegistryFilterTest extends \PHPUnit_Framework_Test
     {
         $this->scopeManager = $this->getMockBuilder(ScopeManager::class)
             ->disableOriginalConstructor()->getMock();
-        $this->definitionRepository = $this->getMockBuilder(WorkflowDefinitionRepository::class)
-            ->disableOriginalConstructor()->getMock();
-        $this->filter = new WorkflowDefinitionScopesRegistryFilter($this->scopeManager, $this->definitionRepository);
+        $this->doctrine = $this->getMock(ManagerRegistry::class);
+
+        $this->filter = new WorkflowDefinitionScopesRegistryFilter($this->scopeManager, $this->doctrine);
     }
 
     /**
@@ -60,7 +63,7 @@ class WorkflowDefinitionScopesRegistryFilterTest extends \PHPUnit_Framework_Test
             ->disableOriginalConstructor()->setMethods(['getResult'])->getMockForAbstractClass();
         $scopeCriteria = $this->getMockBuilder(ScopeCriteria::class)->disableOriginalConstructor()->getMock();
 
-        $this->definitionRepository->expects($this->once())
+        $this->repositoryMocked()->expects($this->once())
             ->method('getByNamesQueryBuilder')->with($scopedWorkflowNames)
             ->willReturn($queryBuilder);
 
@@ -78,6 +81,27 @@ class WorkflowDefinitionScopesRegistryFilterTest extends \PHPUnit_Framework_Test
             ->method('getQuery')->willReturn($query);
 
         $query->expects($this->once())->method('getResult')->willReturn($result);
+    }
+
+    /**
+     * @return WorkflowDefinitionRepository|\PHPUnit_Framework_MockObject_MockObject
+     */
+    private function repositoryMocked()
+    {
+        $repository = $this->getMockBuilder(WorkflowDefinitionRepository::class)
+            ->disableOriginalConstructor()->getMock();
+
+        $manager = $this->getMock(ObjectManager::class);
+
+        $this->doctrine->expects($this->once())
+            ->method('getManagerForClass')->with(WorkflowDefinition::class)
+            ->willReturn($manager);
+
+        $manager->expects($this->once())
+            ->method('getRepository')->with(WorkflowDefinition::class)
+            ->willReturn($repository);
+
+        return $repository;
     }
 
     /**
