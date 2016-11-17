@@ -4,7 +4,6 @@ namespace Oro\Bundle\WorkflowBundle\Model\Filter;
 
 use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\Persistence\ManagerRegistry;
-use Doctrine\ORM\Query\Expr\Join;
 
 use Oro\Bundle\ScopeBundle\Manager\ScopeManager;
 use Oro\Bundle\WorkflowBundle\Entity\Repository\WorkflowDefinitionRepository;
@@ -61,13 +60,12 @@ class WorkflowDefinitionScopesRegistryFilter implements WorkflowDefinitionFilter
      */
     private function getScopeMatched(array $workflowDefinitions)
     {
-        $qb = $this->getWorkflowDefinitionRepository()->getByNamesQueryBuilder($this->getNames($workflowDefinitions));
-        $qb->join('wd.scopes', 'scopes', Join::WITH);
+        $scopeDefinitions = $this->getWorkflowDefinitionRepository()->getScopedByNames(
+            $this->getNames($workflowDefinitions),
+            $this->scopeManager->getCriteria('workflow_definition')
+        );
 
-        $criteria = $this->scopeManager->getCriteria('workflow_definition');
-        $criteria->applyToJoinWithPriority($qb, 'scopes');
-
-        return $this->getNames($qb->getQuery()->getResult());
+        return $this->getNames($scopeDefinitions);
     }
 
     /**

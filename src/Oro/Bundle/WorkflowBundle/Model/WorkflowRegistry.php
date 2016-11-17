@@ -24,7 +24,7 @@ class WorkflowRegistry
     /** @var Workflow[] */
     protected $workflowByName = [];
 
-    /** @var Collection[] */
+    /** @var Collection[]|array */
     protected $workflowByEntityClass = [];
 
     /** @var array|WorkflowDefinitionFilterInterface[] */
@@ -170,7 +170,7 @@ class WorkflowRegistry
     /**
      * @param Collection|WorkflowDefinition[] $workflowDefinitions
      * @param callable $customFilter
-     * @return Collection|\Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition[]
+     * @return Collection|WorkflowDefinition[]
      */
     private function processDefinitionFilters(Collection $workflowDefinitions, callable $customFilter = null)
     {

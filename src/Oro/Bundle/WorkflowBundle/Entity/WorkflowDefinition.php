@@ -250,18 +250,17 @@ class WorkflowDefinition implements DomainObjectInterface
      */
     public function getScopesConfig()
     {
-        return $this->scopesConfig;
+        $configuration = $this->getConfiguration();
+
+        return array_key_exists('scopes', $configuration) ? (array)$configuration['scopes'] : [];
     }
 
     /**
-     * @param array $config
-     * @return WorkflowDefinition
+     * @return boolean
      */
-    public function setScopesConfig(array $config)
+    public function hasScopesConfig()
     {
-        $this->scopesConfig = $config;
-
-        return $this;
+        return !empty($this->getConfiguration()['scopes']);
     }
 
     /**

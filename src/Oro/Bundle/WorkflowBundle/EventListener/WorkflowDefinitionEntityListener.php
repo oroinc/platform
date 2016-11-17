@@ -55,7 +55,7 @@ class WorkflowDefinitionEntityListener
                 return $definition->getName() !== $workflow->getName();
             });
 
-            if ($conflictingWorkflows->isEmpty() === false) {
+            if (!$conflictingWorkflows->isEmpty()) {
                 throw $this->generateException($definition, $conflictingWorkflows->getValues());
             }
         }
