@@ -14,8 +14,8 @@ use Oro\Bundle\CronBundle\Entity\Manager\JobManager;
 
 use Oro\Component\Action\Action\AbstractAction;
 use Oro\Component\Action\Exception\InvalidParameterException;
-use Oro\Component\Action\Model\ContextAccessor;
 use Oro\Component\Action\OptionsResolverTrait;
+use Oro\Component\ConfigExpression\ContextAccessor;
 
 class CreateJobAction extends AbstractAction
 {

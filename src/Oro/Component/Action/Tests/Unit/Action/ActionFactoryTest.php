@@ -129,4 +129,12 @@ class ActionFactoryTest extends \PHPUnit_Framework_TestCase
             ),
         );
     }
+
+    public function testGetTypes()
+    {
+        $types = ['type1' => 'val1', 'type2' => 'val2'];
+        $factory = $this->buildFilterFactory(['types' => $types]);
+
+        $this->assertEquals($types, $factory->getTypes());
+    }
 }
