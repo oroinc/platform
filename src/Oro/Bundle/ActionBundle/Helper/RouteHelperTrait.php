@@ -5,7 +5,10 @@ namespace Oro\Bundle\ActionBundle\Helper;
 trait RouteHelperTrait
 {
     /** @var string */
-    protected $dialogRoute;
+    protected $formDialogRoute;
+
+    /** @var string */
+    protected $formPageRoute;
 
     /** @var string */
     protected $executionRoute;
@@ -16,19 +19,39 @@ trait RouteHelperTrait
     /**
      * @return string
      */
-    public function getDialogRoute()
+    public function getFormDialogRoute()
     {
-        return $this->dialogRoute;
+        return $this->formDialogRoute;
     }
 
     /**
-     * @param string $dialogRoute
+     * @param string $formDialogRoute
      *
      * @return $this
      */
-    public function setDialogRoute($dialogRoute)
+    public function setFormDialogRoute($formDialogRoute)
     {
-        $this->dialogRoute = $dialogRoute;
+        $this->formDialogRoute = $formDialogRoute;
+
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getFormPageRoute()
+    {
+        return $this->formPageRoute;
+    }
+
+    /**
+     * @param string $formPageRoute
+     *
+     * @return $this
+     */
+    public function setFormPageRoute($formPageRoute)
+    {
+        $this->formPageRoute = $formPageRoute;
 
         return $this;
     }

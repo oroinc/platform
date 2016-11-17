@@ -118,7 +118,7 @@ class OperationButtonTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject
+     * @return Operation|\PHPUnit_Framework_MockObject_MockObject
      */
     private function getOperationMock()
     {

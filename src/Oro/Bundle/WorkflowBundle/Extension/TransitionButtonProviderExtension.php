@@ -103,9 +103,10 @@ class TransitionButtonProviderExtension implements ButtonProviderExtensionInterf
             ->setUnavailableHidden($transition->isUnavailableHidden());
 
         if ($transition->hasForm()) {
-            $context->setDialogUrl($this->applicationsHelper->getDialogRoute());
+            $context->setFormDialogRoute($this->applicationsHelper->getFormDialogRoute());
+            $context->setFormPageRoute($this->applicationsHelper->getFormPageRoute());
         }
-        $context->setExecutionUrl($this->applicationsHelper->getExecutionRoute());
+        $context->setExecutionRoute($this->applicationsHelper->getExecutionRoute());
 
         return $context;
     }

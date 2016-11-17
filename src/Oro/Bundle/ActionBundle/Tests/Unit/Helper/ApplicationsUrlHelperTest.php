@@ -48,9 +48,9 @@ class ApplicationsUrlHelperTest extends \PHPUnit_Framework_TestCase
     public function testGetDialogUrl()
     {
         $parameters = ['param1' => 'val1'];
-        
+
         $this->mockApplicationsHelper->expects($this->once())
-            ->method('getDialogRoute')
+            ->method('getFormDialogRoute')
             ->willReturn('dialog_route');
 
         $this->mockRouter->expects($this->once())
@@ -59,5 +59,21 @@ class ApplicationsUrlHelperTest extends \PHPUnit_Framework_TestCase
             ->willReturn('ok_dialog');
 
         $this->assertEquals('ok_dialog', $this->instance->getDialogUrl($parameters));
+    }
+
+    public function testGetPageUrl()
+    {
+        $parameters = ['param1' => 'val1'];
+
+        $this->mockApplicationsHelper->expects($this->once())
+            ->method('getFormPAgeRoute')
+            ->willReturn('page_route');
+
+        $this->mockRouter->expects($this->once())
+            ->method('generate')
+            ->with('page_route', $parameters)
+            ->willReturn('ok_dialog');
+
+        $this->assertEquals('ok_dialog', $this->instance->getPageUrl($parameters));
     }
 }

@@ -14,8 +14,6 @@ use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 class OperationRegistry
 {
     const DEFAULT_GROUP = '';
-    const VIEW_PAGE_GROUP = 'view_navButtons';
-    const UPDATE_PAGE_GROUP = 'update_navButtons';
 
     /** @var ConfigurationProviderInterface */
     protected $configurationProvider;

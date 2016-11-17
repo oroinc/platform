@@ -1,7 +1,6 @@
 parameters:
     oro_action.handler.delete.class: Oro\Bundle\ActionBundle\Handler\DeleteHandler
     oro_action.helper.context.class: Oro\Bundle\ActionBundle\Helper\ContextHelper
-    oro_action.helper.applications.class: Oro\Bundle\ActionBundle\Helper\ApplicationsHelper
     oro_action.helper.restrict.class: Oro\Bundle\ActionBundle\Helper\RestrictHelper
     oro_action.helper.options.class: Oro\Bundle\ActionBundle\Helper\OptionsHelper
     oro_action.helper.applications_url.class: Oro\Bundle\ActionBundle\Helper\ApplicationsUrlHelper
@@ -39,11 +38,12 @@ services:
             - '@oro_action.helper.applications'
 
     oro_action.helper.applications:
-        class: %oro_action.helper.applications.class%
+        class: 'Oro\Bundle\ActionBundle\Helper\ApplicationsHelper'
         arguments:
             - '@security.token_storage'
         calls:
-            - [setDialogRoute, ['oro_action_widget_form']]
+            - [setFormDialogRoute, ['oro_action_widget_form']]
+            - [setFormPageRoute, ['oro_action_widget_form']] #replace here
             - [setExecutionRoute, ['oro_action_operation_execute']]
             - [setWidgetRoute, ['oro_action_widget_buttons']]
 
