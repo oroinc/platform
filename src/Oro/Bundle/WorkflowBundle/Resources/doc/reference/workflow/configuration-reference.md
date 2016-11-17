@@ -776,7 +776,7 @@ transition. On this transition a new Entity of Phone Conversation is created and
 Configuration
 -------------
 
-```
+``` yaml
 workflows:
     phone_call:
         entity: Acme\Bundle\DemoWorkflowBundle\Entity\PhoneCall
@@ -811,6 +811,16 @@ workflows:
                 options:
                     class: Acme\Bundle\DemoWorkflowBundle\Entity\PhoneConversation
         transitions:
+            start_call:
+                step_to: start_conversation
+                transition_definition: create_call
+                is_start: true                         # this transition used to start new workflow
+                step_to: start_conversation            # next step after transition performing
+                transition_definition: create_call     # link to definition of conditions and post actions
+                init_context_attribute: init_source    # name of variable which contains init context
+                init_entities:                         # list of view page entities where will be displayed transition button
+                    - 'Oro\Bundle\UserBundle\Entity\User'
+                    - 'Oro\Bundle\TaskBundle\Entity\Task'
             connected:
                 step_to: start_conversation
                 transition_definition: connected_definition
@@ -825,6 +835,22 @@ workflows:
                             options:
                 transition_definition: end_conversation_definition
         transition_definitions:
+            create_call:
+                conditions:    # Check that the transition start from the entity page
+                    '@and':
+                        - '@not_empty': [$init_source.entityClass]
+                        - '@not_empty': [$init_source.entityId]               
+                actions:                                        
+                    - '@find_entity': 
+                        class: $init_source.entityClass
+                        identifier: $init_source.entityId
+                        attribute: $.user
+                    - '@tree':
+                        conditions:
+                            - '@instanceof': [$init_source.entityClass, 'Oro\Bundle\UserBundle\Entity\User']
+                        actions:
+                            - '@assign_value': [$entity.phone, $.user.phone]
+                            - '@flush_entity': $entity    # flush created entity
             connected_definition: # Try to make call connected
                 # Check that timeout is set
                 conditions:
@@ -914,7 +940,7 @@ provide full tree just for example.
 
 PhoneCall Entity
 ----------------
-```
+``` php
 <?php
 
 namespace Acme\Bundle\DemoWorkflowBundle\Entity;
@@ -1008,7 +1034,7 @@ class PhoneCall
 
 PhoneConversation Entity
 ------------------------
-```
+``` php
 <?php
 
 namespace Acme\Bundle\DemoWorkflowBundle\Entity;

@@ -249,13 +249,6 @@ workflows:
                         queued: false                                       # handle trigger not in queue
                         relation: user                                      # relation to Workflow entity
                         require: "entity.status = 'pending'"                # expression language condition
-            start_transition:                                               # transition for start new workflow from route "oro_email_view" or email view page
-                is_start: true                                              # this transition used to start new workflow
-                step_to: started                                            # next step after transition performing
-                transition_definition: start_transition_definition          # link to definition of conditions and post actions
-                init_context_attribute: my_init_context                     # name of variable which contains init context
-                init_entities:                                              # list of view page entities where will be displayed transition button
-                    - 'Oro\Bundle\UserBundle\Entity\Email'
                 init_routes:                                                # list of routes where will be displayed this transition button
                     - 'oro_email_view'
 
@@ -279,13 +272,6 @@ workflows:
             schedule_transition_definition:                       # definitions for transition "schedule_transition", no extra conditions or actions here
                 actions:                                          # list of action which will be performed after transition
                     - '@assign_value': [$user.status, 'processed'] # change user's status
-            start_transition_definition:                          # definitions for transition "start_transition" 
-                conditions:        # Check what the transition start from the entity page "Oro\Bundle\UserBundle\Entity\Email"
-                    '@and':
-                        - '@equal': [$my_init_context.entityClass, 'Oro\Bundle\UserBundle\Entity\Email']
-                        - '@not_empty': [$my_init_context.entityId]               
-                actions:                                          # list of action which will be performed after transition
-                    - '@flush_entity': $user                      # flush created entity
 ```
 
 This configuration describes Workflow that includes two steps - "set_name" and "add_email".
