@@ -2,11 +2,15 @@
 
 namespace Oro\Bundle\WorkflowBundle\Model\Condition;
 
+use Symfony\Component\Security\Acl\Domain\ObjectIdentity;
+use Symfony\Component\Security\Acl\Voter\FieldVote;
+
 use Oro\Component\ConfigExpression\Condition\AbstractCondition;
 use Oro\Component\ConfigExpression\ContextAccessorAwareInterface;
 use Oro\Component\ConfigExpression\ContextAccessorAwareTrait;
 use Oro\Component\ConfigExpression\Exception\InvalidArgumentException;
 
+use Oro\Bundle\SecurityBundle\Acl\Domain\DomainObjectWrapper;
 use Oro\Bundle\SecurityBundle\SecurityFacade;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowManager;
 
@@ -72,30 +76,34 @@ class IsGrantedWorkflowTransition extends AbstractCondition implements ContextAc
             return false;
         }
 
+        $entity = $context->getEntity();
         $workflow = $this->workflowManager->getWorkflow($context->getWorkflowName());
         $workflowName = $workflow->getName();
 
-        $workflowObject = sprintf(
-            'workflow:%s',
-            $workflowName
-        );
-        /**
-         * TODO: Uncomment after workflow ACL extension
-         */
-//        if (!$this->securityFacade->isGranted('PERFORM_TRANSITIONS', $workflowObject)) {
-//            //performing of transitions is forbidden on workflow level
-//            return false;
-//        }
-//
-//        $workflowTransitionObject = sprintf(
-//            'workflow:%s::%s',
-//            $workflowName,
-//            $this->transitionName
-//        );
-//        if (!$this->securityFacade->isGranted('PERFORM_TRANSITION', $workflowTransitionObject)) {
-//            //performing of given transition is forbidden
-//            return false;
-//        }
+        if (!$this->securityFacade->isGranted(
+            'PERFORM_TRANSITIONS',
+            new DomainObjectWrapper(
+                $entity,
+                new ObjectIdentity('workflow', $workflow->getName())
+            )
+        )) {
+            //performing of transitions is forbidden on workflow level
+            return false;
+        }
+
+        if (!$this->securityFacade->isGranted(
+            'PERFORM_TRANSITION',
+            new FieldVote(
+                new DomainObjectWrapper(
+                    $entity,
+                    new ObjectIdentity('workflow', $workflowName)
+                ),
+                $this->transitionName
+            )
+        )) {
+            //performing of given transition is forbidden
+            return false;
+        }
 
         return true;
     }
