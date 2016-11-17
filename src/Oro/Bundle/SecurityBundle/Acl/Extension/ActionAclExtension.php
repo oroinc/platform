@@ -33,12 +33,9 @@ class ActionAclExtension extends AbstractAclExtension
     /**
      * {@inheritdoc}
      */
-    public function getAccessLevelNames($object, $permissionName = null)
+    public function getExtensionKey()
     {
-        return [
-            AccessLevel::NONE_LEVEL   => AccessLevel::NONE_LEVEL_NAME,
-            AccessLevel::SYSTEM_LEVEL => AccessLevel::getAccessLevelName(AccessLevel::SYSTEM_LEVEL)
-        ];
+        return self::NAME;
     }
 
     /**
@@ -58,9 +55,58 @@ class ActionAclExtension extends AbstractAclExtension
     /**
      * {@inheritdoc}
      */
-    public function getExtensionKey()
+    public function getDefaultPermission()
     {
-        return self::NAME;
+        return self::PERMISSION_EXECUTE;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getPermissions($mask = null, $setOnly = false, $byCurrentGroup = false)
+    {
+        if ($mask === null || !$setOnly || $mask !== 0) {
+            return [self::PERMISSION_EXECUTE];
+        }
+
+        return [];
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getAllowedPermissions(ObjectIdentity $oid, $fieldName = null)
+    {
+        return [self::PERMISSION_EXECUTE];
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getClasses()
+    {
+        return $this->actionMetadataProvider->getActions();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getAccessLevelNames($object, $permissionName = null)
+    {
+        return [
+            AccessLevel::NONE_LEVEL   => AccessLevel::NONE_LEVEL_NAME,
+            AccessLevel::SYSTEM_LEVEL => AccessLevel::getAccessLevelName(AccessLevel::SYSTEM_LEVEL)
+        ];
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getAccessLevel($mask, $permission = null, $object = null)
+    {
+        return $mask === 0
+            ? AccessLevel::NONE_LEVEL
+            : AccessLevel::SYSTEM_LEVEL;
     }
 
     /**
@@ -117,51 +163,5 @@ class ActionAclExtension extends AbstractAclExtension
     public function getMaskPattern($mask)
     {
         return ActionMaskBuilder::getPatternFor($mask);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getAccessLevel($mask, $permission = null, $object = null)
-    {
-        return $mask === 0
-            ? AccessLevel::NONE_LEVEL
-            : AccessLevel::SYSTEM_LEVEL;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getPermissions($mask = null, $setOnly = false, $byCurrentGroup = false)
-    {
-        if ($mask === null || !$setOnly || $mask !== 0) {
-            return [self::PERMISSION_EXECUTE];
-        }
-
-        return [];
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getAllowedPermissions(ObjectIdentity $oid, $fieldName = null)
-    {
-        return [self::PERMISSION_EXECUTE];
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getDefaultPermission()
-    {
-        return self::PERMISSION_EXECUTE;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getClasses()
-    {
-        return $this->actionMetadataProvider->getActions();
     }
 }

@@ -97,29 +97,17 @@ class EntityAclExtension extends AbstractAccessLevelAclExtension
     /**
      * {@inheritdoc}
      */
+    public function getExtensionKey()
+    {
+        return self::NAME;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function getFieldExtension()
     {
         return $this->fieldAclExtension;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getMasks($permission)
-    {
-        $this->buildPermissionsMap();
-
-        return parent::getMasks($permission);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function hasMasks($permission)
-    {
-        $this->buildPermissionsMap();
-
-        return parent::hasMasks($permission);
     }
 
     /**
@@ -144,9 +132,21 @@ class EntityAclExtension extends AbstractAccessLevelAclExtension
     /**
      * {@inheritdoc}
      */
-    public function getExtensionKey()
+    public function getMasks($permission)
     {
-        return self::NAME;
+        $this->buildPermissionsMap();
+
+        return parent::getMasks($permission);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function hasMasks($permission)
+    {
+        $this->buildPermissionsMap();
+
+        return parent::hasMasks($permission);
     }
 
     /**
