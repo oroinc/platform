@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\WorkflowBundle\Controller;
 
-use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 
@@ -185,7 +185,7 @@ class WorkflowDefinitionController extends Controller
 
     /**
      * @param WorkflowDefinition $workflowDefinition
-     * @return Workflow[]|ArrayCollection
+     * @return Workflow[]|Collection
      */
     protected function getWorkflowsToDeactivation(WorkflowDefinition $workflowDefinition)
     {

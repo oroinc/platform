@@ -126,15 +126,14 @@ class WorkflowRegistry
         $class = ClassUtils::getRealClass($entityClass);
 
         if (!array_key_exists($class, $this->workflowByEntityClass)) {
-            $workflows = new ArrayCollection();
-            foreach ($this->getEntityRepository()->findActiveForRelatedEntity($class) as $definition) {
-                $workflowName = $definition->getName();
-                /** @var WorkflowDefinition $definition */
-                $workflows->set($workflowName, $this->getAssembledWorkflow($definition));
-            }
-
-            $workflows = $this->processDefinitionFilters($workflows);
-
+            $definitions = $this->getNamedDefinitionsCollection(
+                $this->getEntityRepository()->findActiveForRelatedEntity($class)
+            );
+            $workflows = $this->processDefinitionFilters($definitions)->map(
+                function (WorkflowDefinition $workflowDefinition) {
+                    return $this->getAssembledWorkflow($workflowDefinition);
+                }
+            );
             $this->workflowByEntityClass[$class] = $workflows;
         }
 
@@ -150,14 +149,15 @@ class WorkflowRegistry
     public function getActiveWorkflowsByActiveGroups(array $groupNames)
     {
         $groupNames = array_map('strtolower', $groupNames);
-        $definitions = new ArrayCollection($this->getEntityRepository()->findBy(['active' => true]));
+        $definitions = $this->getNamedDefinitionsCollection($this->getEntityRepository()->findBy(['active' => true]));
 
         $definitions = $this->processDefinitionFilters(
-            $definitions->filter(function (WorkflowDefinition $definition) use ($groupNames) {
+            $definitions,
+            function (WorkflowDefinition $definition) use ($groupNames) {
                 $exclusiveActiveGroups = $definition->getExclusiveActiveGroups();
 
                 return (bool)array_intersect($groupNames, $exclusiveActiveGroups);
-            })
+            }
         );
 
         return $definitions->map(
@@ -183,6 +183,22 @@ class WorkflowRegistry
         }
 
         return $workflowDefinitions;
+    }
+
+    /**
+     * @param WorkflowDefinition[] $workflowDefinitions
+     * @return Collection|Workflow[]
+     */
+    private function getNamedDefinitionsCollection(array $workflowDefinitions)
+    {
+        $workflows = new ArrayCollection();
+        foreach ($workflowDefinitions as $definition) {
+            $workflowName = $definition->getName();
+            /** @var WorkflowDefinition $definition */
+            $workflows->set($workflowName, $definition);
+        }
+
+        return $workflows;
     }
 
     /**
