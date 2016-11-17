@@ -34,7 +34,7 @@ class WorkflowDefinitionScopesRegistryFilter implements WorkflowDefinitionFilter
     {
         $scopeAwareDefinitions = $workflowDefinitions->filter(
             function (WorkflowDefinition $workflowDefinition) {
-                return count($workflowDefinition->getScopesConfig()) !== 0;
+                return $workflowDefinition->hasScopesConfig();
             }
         );
 
