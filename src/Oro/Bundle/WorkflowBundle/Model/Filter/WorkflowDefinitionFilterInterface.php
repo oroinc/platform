@@ -9,8 +9,8 @@ use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 interface WorkflowDefinitionFilterInterface
 {
     /**
-     * @param Collection|WorkflowDefinition[] $workflowDefinitions
-     * @return Collection|WorkflowDefinition[]
+     * @param WorkflowDefinition[]|Collection $workflowDefinitions
+     * @return WorkflowDefinition[]|Collection
      */
     public function filter(Collection $workflowDefinitions);
 }

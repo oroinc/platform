@@ -33,25 +33,22 @@ class WorkflowDefinitionScopesRegistryFilter implements WorkflowDefinitionFilter
      */
     public function filter(Collection $workflowDefinitions)
     {
-        /**
-         * @var Collection|WorkflowDefinition[] $scopeAwareDefinitions
-         * @var Collection|WorkflowDefinition[] $otherDefinitions
-         */
-        list($scopeAwareDefinitions, $otherDefinitions) = $workflowDefinitions->partition(
-            function ($name, WorkflowDefinition $workflowDefinition) {
+        $scopeAwareDefinitions = $workflowDefinitions->filter(
+            function (WorkflowDefinition $workflowDefinition) {
                 return count($workflowDefinition->getScopesConfig()) !== 0;
             }
         );
 
         $scopeMatches = $this->getScopeMatched($scopeAwareDefinitions->getValues());
 
-        foreach ($scopeAwareDefinitions as $name => $workflowDefinition) {
-            if (in_array($workflowDefinition->getName(), $scopeMatches, true)) {
-                $otherDefinitions->set($name, $workflowDefinition);
+        foreach ($workflowDefinitions as $key => $workflowDefinition) {
+            $name = $workflowDefinition->getName();
+            if ($scopeAwareDefinitions->contains($workflowDefinition) && !in_array($name, $scopeMatches, true)) {
+                $workflowDefinitions->remove($key);
             }
         }
 
-        return $otherDefinitions;
+        return $workflowDefinitions;
     }
 
     /**
