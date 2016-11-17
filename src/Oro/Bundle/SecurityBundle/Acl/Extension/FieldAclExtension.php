@@ -3,8 +3,6 @@
 namespace Oro\Bundle\SecurityBundle\Acl\Extension;
 
 use Symfony\Component\Security\Acl\Domain\ObjectIdentity;
-use Symfony\Component\Security\Acl\Model\ObjectIdentityInterface;
-use Symfony\Component\Security\Acl\Util\ClassUtils;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
@@ -83,9 +81,25 @@ class FieldAclExtension extends AbstractSimpleAccessLevelAclExtension
     /**
      * {@inheritdoc}
      */
+    public function getExtensionKey()
+    {
+        return EntityAclExtension::NAME;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function supports($type, $id)
     {
         throw new \LogicException('Field ACL Extension does not support "supports" method');
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getClasses()
+    {
+        throw new \LogicException('Field ACL Extension does not support "getClasses" method');
     }
 
     /**
@@ -105,14 +119,6 @@ class FieldAclExtension extends AbstractSimpleAccessLevelAclExtension
     /**
      * {@inheritdoc}
      */
-    public function getClasses()
-    {
-        throw new \LogicException('Field ACL Extension does not support "getClasses" method');
-    }
-
-    /**
-     * {@inheritdoc}
-     */
     public function getAccessLevelNames($object, $permissionName = null)
     {
         if (self::PERMISSION_CREATE === $permissionName) {
@@ -126,9 +132,17 @@ class FieldAclExtension extends AbstractSimpleAccessLevelAclExtension
     /**
      * {@inheritdoc}
      */
-    public function getExtensionKey()
+    public function decideIsGranting($triggeredMask, $object, TokenInterface $securityToken)
     {
-        return EntityAclExtension::NAME;
+        if (!$this->isSupportedObject($object)) {
+            return true;
+        }
+
+        if (!$this->isFieldLevelAclEnabled($object)) {
+            return true;
+        }
+
+        return $this->isAccessGranted($triggeredMask, $object, $securityToken);
     }
 
     /**
@@ -158,49 +172,9 @@ class FieldAclExtension extends AbstractSimpleAccessLevelAclExtension
     /**
      * {@inheritdoc}
      */
-    public function decideIsGranting($triggeredMask, $object, TokenInterface $securityToken)
-    {
-        if (!$this->isSupportedObject($object)) {
-            return true;
-        }
-
-        if (!$this->isFieldLevelAclEnabled($object)) {
-            return true;
-        }
-
-        return $this->isAccessGranted($triggeredMask, $object, $securityToken);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
     public function getObjectIdentity($val)
     {
         throw new \LogicException('Field ACL Extension does not support "getObjectIdentity" method');
-    }
-
-    /**
-     * Gets class name for given object
-     *
-     * @param $object
-     *
-     * @return string
-     */
-    protected function getObjectClassName($object)
-    {
-        if ($object instanceof ObjectIdentityInterface) {
-            $className = $object->getType();
-        } elseif (is_string($object)) {
-            $className = $id = $group = null;
-            if (ObjectIdentityHelper::isFieldEncodedKey($object)) {
-                $object = ObjectIdentityHelper::decodeEntityFieldInfo($object)[0];
-            }
-            $this->parseDescriptor($object, $className, $id, $group);
-        } else {
-            $className = ClassUtils::getRealClass($object);
-        }
-
-        return $className;
     }
 
     /**
@@ -209,6 +183,16 @@ class FieldAclExtension extends AbstractSimpleAccessLevelAclExtension
     protected function getMaskBuilderConst($constName)
     {
         return FieldMaskBuilder::getConst($constName);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function parseDescriptor($descriptor, &$type, &$id, &$group)
+    {
+        $descriptor = ObjectIdentityHelper::removeFieldName($descriptor);
+
+        return parent::parseDescriptor($descriptor, $type, $id, $group);
     }
 
     /**

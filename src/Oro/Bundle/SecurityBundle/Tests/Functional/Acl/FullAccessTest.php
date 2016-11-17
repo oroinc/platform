@@ -13,7 +13,7 @@ use Oro\Bundle\SecurityBundle\Annotation\Acl;
 use Oro\Bundle\SecurityBundle\Authentication\Token\UsernamePasswordOrganizationToken;
 use Oro\Bundle\SecurityBundle\SecurityFacade;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
-use Oro\Bundle\TestFrameworkBundle\Entity\TestActivity as TestEntity;
+use Oro\Bundle\TestFrameworkBundle\Entity\TestEntityWithUserOwnership as TestEntity;
 
 /**
  * @dbIsolation
@@ -45,7 +45,7 @@ class FullAccessTest extends WebTestCase
         if (null === $this->testEntity) {
             $this->testEntity = new TestEntity();
             $this->testEntity
-                ->setMessage('test')
+                ->setName('test')
                 ->setOrganization($organization)
                 ->setOwner($user);
             $em->persist($this->testEntity);
@@ -158,7 +158,7 @@ class FullAccessTest extends WebTestCase
     public function testEntityField()
     {
         self::assertTrue(
-            $this->getSecurityFacade()->isGranted('EDIT', new FieldVote($this->testEntity, 'message'))
+            $this->getSecurityFacade()->isGranted('EDIT', new FieldVote($this->testEntity, 'name'))
         );
     }
 
@@ -171,7 +171,7 @@ class FullAccessTest extends WebTestCase
             $this->testEntity->getOrganization()->getId()
         );
         self::assertTrue(
-            $this->getSecurityFacade()->isGranted('EDIT', new FieldVote($objectReference, 'message'))
+            $this->getSecurityFacade()->isGranted('EDIT', new FieldVote($objectReference, 'name'))
         );
     }
 
@@ -182,7 +182,7 @@ class FullAccessTest extends WebTestCase
             new ObjectIdentity($this->testEntity->getId(), TestEntity::class)
         );
         self::assertTrue(
-            $this->getSecurityFacade()->isGranted('EDIT', new FieldVote($objectReference, 'message'))
+            $this->getSecurityFacade()->isGranted('EDIT', new FieldVote($objectReference, 'name'))
         );
     }
 }

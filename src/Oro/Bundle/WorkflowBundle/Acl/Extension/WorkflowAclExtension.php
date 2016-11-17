@@ -7,8 +7,6 @@ use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 
 use Oro\Bundle\SecurityBundle\Acl\AccessLevel;
 use Oro\Bundle\SecurityBundle\Acl\Domain\ObjectIdAccessor;
-use Oro\Bundle\SecurityBundle\Acl\Domain\ObjectIdentityFactory;
-use Oro\Bundle\SecurityBundle\Acl\Extension\AbstractSimpleAccessLevelAclExtension;
 use Oro\Bundle\SecurityBundle\Acl\Extension\AccessLevelOwnershipDecisionMakerInterface;
 use Oro\Bundle\SecurityBundle\Acl\Extension\ObjectIdentityHelper;
 use Oro\Bundle\SecurityBundle\Annotation\Acl as AclAnnotation;
@@ -17,15 +15,12 @@ use Oro\Bundle\SecurityBundle\Owner\Metadata\MetadataProviderInterface;
 use Oro\Bundle\WorkflowBundle\Acl\Extension\WorkflowMaskBuilder as MaskBuilder;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowRegistry;
 
-class WorkflowAclExtension extends AbstractSimpleAccessLevelAclExtension
+class WorkflowAclExtension extends AbstractWorkflowAclExtension
 {
     const NAME = 'workflow';
 
     const PERMISSION_VIEW    = 'VIEW_WORKFLOW';
     const PERMISSION_PERFORM = 'PERFORM_TRANSITIONS';
-
-    /** @var WorkflowRegistry */
-    protected $workflowRegistry;
 
     /** @var WorkflowAclMetadataProvider */
     protected $workflowMetadataProvider;
@@ -51,8 +46,13 @@ class WorkflowAclExtension extends AbstractSimpleAccessLevelAclExtension
         WorkflowAclMetadataProvider $workflowMetadataProvider,
         WorkflowTransitionAclExtension $transitionAclExtension
     ) {
-        parent::__construct($objectIdAccessor, $metadataProvider, $entityOwnerAccessor, $decisionMaker);
-        $this->workflowRegistry = $workflowRegistry;
+        parent::__construct(
+            $objectIdAccessor,
+            $metadataProvider,
+            $entityOwnerAccessor,
+            $decisionMaker,
+            $workflowRegistry
+        );
         $this->workflowMetadataProvider = $workflowMetadataProvider;
         $this->transitionAclExtension = $transitionAclExtension;
 
@@ -90,25 +90,17 @@ class WorkflowAclExtension extends AbstractSimpleAccessLevelAclExtension
     /**
      * {@inheritdoc}
      */
-    public function getFieldExtension()
+    public function supports($type, $id)
     {
-        return $this->transitionAclExtension;
+        return $id === $this->getExtensionKey();
     }
 
     /**
      * {@inheritdoc}
      */
-    public function supports($type, $id)
+    public function getFieldExtension()
     {
-        if (ObjectIdentityHelper::isFieldEncodedKey($type)) {
-            $type = ObjectIdentityHelper::decodeEntityFieldInfo($type)[0];
-        }
-
-        if ($type === ObjectIdentityFactory::ROOT_IDENTITY_TYPE) {
-            return $id === $this->getExtensionKey();
-        }
-
-        return $id === $this->getExtensionKey();
+        return $this->transitionAclExtension;
     }
 
     /**
@@ -125,6 +117,18 @@ class WorkflowAclExtension extends AbstractSimpleAccessLevelAclExtension
     public function getAllowedPermissions(ObjectIdentity $oid, $fieldName = null)
     {
         return $this->permissions;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function decideIsGranting($triggeredMask, $object, TokenInterface $securityToken)
+    {
+        if (!$this->isSupportedObject($object)) {
+            return true;
+        }
+
+        return $this->isAccessGranted($triggeredMask, $object, $securityToken);
     }
 
     /**
@@ -171,25 +175,6 @@ class WorkflowAclExtension extends AbstractSimpleAccessLevelAclExtension
     /**
      * {@inheritdoc}
      */
-    public function decideIsGranting($triggeredMask, $object, TokenInterface $securityToken)
-    {
-        if (!$this->isSupportedObject($object)) {
-            return true;
-        }
-
-        $workflow = $this->workflowRegistry->getWorkflow($object->getType(), false);
-        if (null === $workflow) {
-            return true;
-        }
-
-        return $this->isAccessGranted($triggeredMask, $object, $securityToken);
-    }
-
-    /**
-     * {@inheritdoc}
-     *
-     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
-     */
     public function adaptRootMask($rootMask, $object)
     {
         $permissions = $this->getPermissions($rootMask, true);
@@ -222,6 +207,14 @@ class WorkflowAclExtension extends AbstractSimpleAccessLevelAclExtension
     }
 
     /**
+     * {@inheritdoc}
+     */
+    protected function getMaskBuilderConst($constName)
+    {
+        return MaskBuilder::getConst($constName);
+    }
+
+    /**
      * Constructs an ObjectIdentity for the given domain object
      *
      * @param string $descriptor
@@ -241,13 +234,5 @@ class WorkflowAclExtension extends AbstractSimpleAccessLevelAclExtension
         throw new \InvalidArgumentException(
             sprintf('Unsupported object identity descriptor: %s.', $descriptor)
         );
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    protected function getMaskBuilderConst($constName)
-    {
-        return MaskBuilder::getConst($constName);
     }
 }

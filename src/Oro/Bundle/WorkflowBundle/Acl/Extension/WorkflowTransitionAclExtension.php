@@ -3,11 +3,9 @@
 namespace Oro\Bundle\WorkflowBundle\Acl\Extension;
 
 use Symfony\Component\Security\Acl\Domain\ObjectIdentity;
-use Symfony\Component\Security\Acl\Model\ObjectIdentityInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 
 use Oro\Bundle\SecurityBundle\Acl\Domain\ObjectIdAccessor;
-use Oro\Bundle\SecurityBundle\Acl\Extension\AbstractSimpleAccessLevelAclExtension;
 use Oro\Bundle\SecurityBundle\Acl\Extension\AccessLevelOwnershipDecisionMakerInterface;
 use Oro\Bundle\SecurityBundle\Acl\Extension\ObjectIdentityHelper;
 use Oro\Bundle\SecurityBundle\Owner\EntityOwnerAccessor;
@@ -15,12 +13,9 @@ use Oro\Bundle\SecurityBundle\Owner\Metadata\MetadataProviderInterface;
 use Oro\Bundle\WorkflowBundle\Acl\Extension\WorkflowTransitionMaskBuilder as MaskBuilder;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowRegistry;
 
-class WorkflowTransitionAclExtension extends AbstractSimpleAccessLevelAclExtension
+class WorkflowTransitionAclExtension extends AbstractWorkflowAclExtension
 {
     const PERMISSION_PERFORM = 'PERFORM_TRANSITION';
-
-    /** @var WorkflowRegistry */
-    protected $workflowRegistry;
 
     /**
      * @param ObjectIdAccessor                           $objectIdAccessor
@@ -36,8 +31,13 @@ class WorkflowTransitionAclExtension extends AbstractSimpleAccessLevelAclExtensi
         AccessLevelOwnershipDecisionMakerInterface $decisionMaker,
         WorkflowRegistry $workflowRegistry
     ) {
-        parent::__construct($objectIdAccessor, $metadataProvider, $entityOwnerAccessor, $decisionMaker);
-        $this->workflowRegistry = $workflowRegistry;
+        parent::__construct(
+            $objectIdAccessor,
+            $metadataProvider,
+            $entityOwnerAccessor,
+            $decisionMaker,
+            $workflowRegistry
+        );
 
         $this->permissions = [
             self::PERMISSION_PERFORM,
@@ -97,6 +97,18 @@ class WorkflowTransitionAclExtension extends AbstractSimpleAccessLevelAclExtensi
     /**
      * {@inheritdoc}
      */
+    public function decideIsGranting($triggeredMask, $object, TokenInterface $securityToken)
+    {
+        if (!$this->isSupportedObject($object)) {
+            return true;
+        }
+
+        return $this->isAccessGranted($triggeredMask, $object, $securityToken);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function getMaskPattern($mask)
     {
         return MaskBuilder::getPatternFor($mask);
@@ -121,50 +133,18 @@ class WorkflowTransitionAclExtension extends AbstractSimpleAccessLevelAclExtensi
     /**
      * {@inheritdoc}
      */
-    public function decideIsGranting($triggeredMask, $object, TokenInterface $securityToken)
+    protected function getMaskBuilderConst($constName)
     {
-        if (!$this->isSupportedObject($object)) {
-            return true;
-        }
-
-        return $this->isAccessGranted($triggeredMask, $object, $securityToken);
-    }
-
-    /**
-     * Gets class name for given object
-     *
-     * @param $object
-     *
-     * @return string
-     */
-    protected function getObjectClassName($object)
-    {
-        if ($object instanceof ObjectIdentityInterface) {
-            $workflowName = $object->getType();
-        } elseif (is_string($object)) {
-            $workflowName = $id = $group = null;
-            if (ObjectIdentityHelper::isFieldEncodedKey($object)) {
-                $object = ObjectIdentityHelper::decodeEntityFieldInfo($object)[0];
-            }
-            $this->parseDescriptor($object, $workflowName, $id, $group);
-        } else {
-            throw new \InvalidArgumentException(
-                sprintf(
-                    'Expected argument of type "string, Symfony\Component\Security\Acl\Domain\ObjectIdentity", '
-                    . '"%s" given.',
-                    is_object($object) ? get_class($object) : gettype($object)
-                )
-            );
-        }
-
-        return $this->workflowRegistry->getWorkflow($workflowName)->getDefinition()->getRelatedEntity();
+        return MaskBuilder::getConst($constName);
     }
 
     /**
      * {@inheritdoc}
      */
-    protected function getMaskBuilderConst($constName)
+    protected function parseDescriptor($descriptor, &$type, &$id, &$group)
     {
-        return MaskBuilder::getConst($constName);
+        $descriptor = ObjectIdentityHelper::removeFieldName($descriptor);
+
+        return parent::parseDescriptor($descriptor, $type, $id, $group);
     }
 }
