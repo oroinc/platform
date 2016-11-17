@@ -110,11 +110,6 @@ class WorkflowDefinition implements DomainObjectInterface
 
     /**
      * @var array
-     */
-    protected $scopesConfig = [];
-
-    /**
-     * @var array
      *
      * @ORM\Column(name="configuration", type="array")
      */
@@ -250,18 +245,9 @@ class WorkflowDefinition implements DomainObjectInterface
      */
     public function getScopesConfig()
     {
-        return $this->scopesConfig;
-    }
+        $configuration = $this->getConfiguration();
 
-    /**
-     * @param array $config
-     * @return WorkflowDefinition
-     */
-    public function setScopesConfig(array $config)
-    {
-        $this->scopesConfig = $config;
-
-        return $this;
+        return array_key_exists('scopes', $configuration) ? (array)$configuration['scopes'] : [];
     }
 
     /**

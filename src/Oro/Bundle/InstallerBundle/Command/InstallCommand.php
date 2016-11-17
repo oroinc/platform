@@ -463,7 +463,8 @@ class InstallCommand extends AbstractCommand implements InstallCommandInterface
             ->runCommand(
                 'oro:workflow:definitions:load',
                 [
-                    '--process-isolation' => true
+                    '--process-isolation' => true,
+                    '--skip-scope-processing' => true
                 ]
             )
             ->runCommand(
@@ -504,6 +505,13 @@ class InstallCommand extends AbstractCommand implements InstallCommandInterface
                 )
             );
         }
+
+        $commandExecutor->runCommand(
+            'oro:workflow:scope:update',
+            [
+                '--process-isolation' => true
+            ]
+        );
 
         $output->writeln('');
 

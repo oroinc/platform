@@ -113,8 +113,8 @@ class WorkflowDefinitionScopesRegistryFilterTest extends \PHPUnit_Framework_Test
             'full case' => [
                 'definitions to filter' => new ArrayCollection(
                     [
-                        'wd1' => (new WorkflowDefinition)->setName('wd1')->setScopesConfig([['a' => 1]]),
-                        'wd2' => (new WorkflowDefinition)->setName('wd2')->setScopesConfig([['a' => 1]]),
+                        'wd1' => (new WorkflowDefinition)->setName('wd1')->setConfiguration(['scopes' => [['a' => 1]]]),
+                        'wd2' => (new WorkflowDefinition)->setName('wd2')->setConfiguration(['scopes' => [['a' => 1]]]),
                         'wd3' => (new WorkflowDefinition)->setName('wd3')
                     ]
                 ),
@@ -123,11 +123,11 @@ class WorkflowDefinitionScopesRegistryFilterTest extends \PHPUnit_Framework_Test
                     'wd2'
                 ],
                 'query result matched by scopes' => [
-                    (new WorkflowDefinition)->setName('wd1')->setScopesConfig([['a' => 1]])
+                    (new WorkflowDefinition)->setName('wd1')->setConfiguration(['scopes' => [['a' => 1]]])
                 ],
                 'expected' => new ArrayCollection(
                     [
-                        'wd1' => (new WorkflowDefinition)->setName('wd1')->setScopesConfig([['a' => 1]]),
+                        'wd1' => (new WorkflowDefinition)->setName('wd1')->setConfiguration(['scopes' => [['a' => 1]]]),
                         'wd3' => (new WorkflowDefinition)->setName('wd3')
                     ]
                 )
