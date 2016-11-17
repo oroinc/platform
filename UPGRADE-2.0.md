@@ -759,10 +759,13 @@ to the [Fallback documentation](./src/Oro/Bundle/EntityBundle/Resources/doc/enti
 - `Oro\Bundle\DataAuditBundle\Loggable\AuditEntityMapper` was renamed to `Oro\Bundle\DataAuditBundle\Provider\AuditEntityMapper`.
 
 ####UserBundle
-- Added `Oro\Bundle\UserBundle\Validator\Constraints\PasswordComplexity` to User model
+- Added `auth_status` extended enum property to `Oro\Bundle\UserBundle\Entity\User` entity.
+- Added `Oro\Bundle\UserBundle\Validator\Constraints\PasswordComplexity` to User model.
 - User password requirements are more restrictive by default and require 8 characters, an upper case letter, and a number.
-- Any new users or changing of existing passwords need to meet the password requirements specified in System Configuration/General Setup/User Settings. Existing user passwords are not affected
+- Any new users or changing of existing passwords need to meet the password requirements specified in System Configuration/General Setup/User Settings. Existing user passwords are not affected.
 - Removed service @oro_user.password_reset.widget_provider.actions (replaced by @oro_user.forced_password_reset.widget_provider.actions)
+- Constructor of `Oro\Bundle\UserBundle\Entity\UserManager` changed. Added 4-th parameter of type `Oro\Bundle\EntityExtendBundle\Provider\EnumValueProvider`.
+- Added method `setAuthStatus($user, $enumId)` to `Oro\Bundle\UserBundle\Entity\UserManager` method to set `auth_status` of a User by enum id.
 
 ####DemoDataBundle
 - All demo CRM users will have passwords ending with '1Q' (e.g. for username 'marketing' password is 'marketing1Q'). For user 'sale' the password is 'salesale1Q'.
