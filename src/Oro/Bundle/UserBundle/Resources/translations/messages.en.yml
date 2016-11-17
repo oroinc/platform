@@ -308,7 +308,7 @@ oro:
             fields:
                 password_min_length.label: Minimal password length
                 password_numbers.label: Require a number
-                password_lower_case.label: Require a lowercase letter
+                password_lower_case.label: Require a lower case letter
                 password_upper_case.label: Require an upper case letter
                 password_special_chars:
                     label: Require a special character

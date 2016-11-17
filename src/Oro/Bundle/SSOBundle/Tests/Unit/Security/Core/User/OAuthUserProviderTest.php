@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\SSOBundle\Tests\Entity;
 
+use Oro\Bundle\EntityExtendBundle\Provider\EnumValueProvider;
+use Oro\Component\Testing\Unit\Entity\Stub\StubEnumValue;
 use Symfony\Component\Security\Core\Encoder\EncoderFactory;
 use Symfony\Component\Security\Core\Encoder\MessageDigestPasswordEncoder;
 use Symfony\Component\Serializer\Exception\Exception;
@@ -90,8 +92,16 @@ class OAuthUserProviderTest extends \PHPUnit_Framework_TestCase
         $class->expects($this->any())
             ->method('getName')
             ->will($this->returnValue(static::USER_CLASS));
-
-        $this->userManager = new UserManager(static::USER_CLASS, $this->registry, $ef);
+        /** @var EnumValueProvider|\PHPUnit_Framework_MockObject_MockObject $enumValueProvider */
+        $enumValueProvider = $this->getMockBuilder(EnumValueProvider::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+        $enumValueProvider->method('getEnumValueByCode')->willReturnCallback(
+            function ($code, $id) {
+                return new StubEnumValue($id, $id);
+            }
+        );
+        $this->userManager = new UserManager(static::USER_CLASS, $this->registry, $ef, $enumValueProvider);
 
         $this->oauthProvider = new OAuthUserProvider($this->userManager, $this->cm);
     }
