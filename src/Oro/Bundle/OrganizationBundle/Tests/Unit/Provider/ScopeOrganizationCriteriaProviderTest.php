@@ -45,6 +45,36 @@ class ScopeOrganizationCriteriaProviderTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals([ScopeOrganizationCriteriaProvider::SCOPE_KEY => $organization], $actual);
     }
 
+    public function testGetCriteriaForCurrentScopeWithoutToken()
+    {
+        $this->tokenStorage
+            ->expects($this->once())
+            ->method('getToken')
+            ->willReturn(null);
+
+        $actual = $this->provider->getCriteriaForCurrentScope();
+        $this->assertEquals([], $actual);
+    }
+
+    public function testGetCriteriaForCurrentScopeWithoutUser()
+    {
+        $user = new \stdClass();
+
+        /** @var TokenInterface|\PHPUnit_Framework_MockObject_MockObject $token */
+        $token = $this->getMock(TokenInterface::class);
+        $token->expects($this->once())
+            ->method('getUser')
+            ->willReturn($user);
+
+        $this->tokenStorage
+            ->expects($this->once())
+            ->method('getToken')
+            ->willReturn($token);
+
+        $actual = $this->provider->getCriteriaForCurrentScope();
+        $this->assertEquals([], $actual);
+    }
+
     /**
      * @dataProvider contextDataProvider
      *
