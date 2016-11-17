@@ -74,11 +74,12 @@ class OperationButtonProviderExtension implements ButtonProviderExtensionInterfa
             ->setEntity($searchContext->getEntityClass(), $searchContext->getEntityId())
             ->setRouteName($searchContext->getRouteName())
             ->setGroup($searchContext->getGroup())
-            ->setExecutionUrl($this->applicationsHelper->getExecutionRoute())
+            ->setExecutionRoute($this->applicationsHelper->getExecutionRoute())
             ->setEnabled($operation->isEnabled());
 
         if ($operation->hasForm()) {
-            $context->setDialogUrl($this->applicationsHelper->getDialogRoute());
+            $context->setFormDialogRoute($this->applicationsHelper->getFormDialogRoute());
+            $context->setFormPageRoute($this->applicationsHelper->getFormPageRoute());
         }
 
         return $context;
