@@ -3,11 +3,13 @@
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Model;
 
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\EntityManager;
 
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Entity\Repository\WorkflowDefinitionRepository;
+use Oro\Bundle\WorkflowBundle\Model\Filter\WorkflowDefinitionFilterInterface;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowAssembler;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowRegistry;
 use Oro\Bundle\WorkflowBundle\Model\Workflow;
@@ -173,12 +175,14 @@ class WorkflowRegistryTest extends \PHPUnit_Framework_TestCase
      * @param array $groups
      * @param array $activeDefinitions
      * @param array|Workflow[] $expectedWorkflows
+     * @param WorkflowDefinitionFilterInterface $filter
      * @dataProvider getActiveWorkflowsByActiveGroupsDataProvider
      */
     public function testGetActiveWorkflowsByActiveGroups(
         array $groups,
         array $activeDefinitions,
-        array $expectedWorkflows
+        array $expectedWorkflows,
+        WorkflowDefinitionFilterInterface $filter
     ) {
         foreach ($expectedWorkflows as $at => $workflow) {
             $this->assembler->expects($this->at($at))
@@ -191,6 +195,8 @@ class WorkflowRegistryTest extends \PHPUnit_Framework_TestCase
         $this->entityRepository->expects($this->once())
             ->method('findBy')
             ->willReturn($activeDefinitions);
+
+        $this->registry->addDefinitionFilter($filter);
 
         $this->assertEquals(
             $expectedWorkflows,
@@ -206,23 +212,57 @@ class WorkflowRegistryTest extends \PHPUnit_Framework_TestCase
         $workflow1 = $this->createWorkflow('test_workflow1', 'testEntityClass');
         $workflowDefinition1 = $workflow1->getDefinition();
         $workflowDefinition1->setExclusiveActiveGroups(['group1']);
+        $filter1 = $this->createDefinitionFilterMock(
+            new ArrayCollection([]),
+            new ArrayCollection([])
+        );
+
+        $filter2 = $this->createDefinitionFilterMock(
+            new ArrayCollection(['test_workflow1' => $workflowDefinition1]),
+            new ArrayCollection(['test_workflow1' => $workflowDefinition1])
+        );
 
         $workflow2 = $this->createWorkflow('test_workflow2', 'testEntityClass');
         $workflowDefinition2 = $workflow2->getDefinition();
         $workflowDefinition2->setExclusiveActiveGroups(['group2', 'group3']);
+        $filter3 = $this->createDefinitionFilterMock(
+            new ArrayCollection(['test_workflow1' => $workflowDefinition1]),
+            new ArrayCollection([])
+        );
 
         return [
             'empty' => [
                 'groups' => [],
                 'activeDefinitions' => [],
                 'expectedWorkflows' => [],
+                'filter' => $filter1
             ],
             'filled' => [
                 'groups' => ['group1'],
                 'activeDefinitions' => [$workflowDefinition1, $workflowDefinition2],
                 'expectedWorkflows' => [$workflow1],
+                'filter' => $filter2
             ],
+            'filtered' => [
+                'groups' => ['group1'],
+                'activeDefinitions' => [$workflowDefinition1, $workflowDefinition2],
+                'expectedWorkflows' => [],
+                'filter' => $filter3
+            ]
         ];
+    }
+
+    /**
+     * @param Collection $in
+     * @param Collection $out
+     * @return WorkflowDefinitionFilterInterface|\PHPUnit_Framework_MockObject_MockObject
+     */
+    private function createDefinitionFilterMock(Collection $in, Collection $out)
+    {
+        $filter = $this->getMock(WorkflowDefinitionFilterInterface::class);
+        $filter->expects($this->once())->method('filter')->with($in)->willReturn($out);
+
+        return $filter;
     }
 
     /**
