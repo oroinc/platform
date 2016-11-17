@@ -157,6 +157,8 @@ class InitializeSubresourcesTest extends \PHPUnit_Framework_TestCase
                 'get_subresource',
                 'get_relationship',
                 'update_relationship',
+                'add_relationship',
+                'delete_relationship'
             ]
         );
         $expectedSubresources->addSubresource($toOneAssociation->getName(), $toOneAssociationSubresource);
