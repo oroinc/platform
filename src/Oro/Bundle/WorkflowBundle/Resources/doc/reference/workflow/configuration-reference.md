@@ -356,6 +356,17 @@ Transition configuration has next options:
 * **message**
     *Translatable*: `oro.workflow.{workflow_name}.transition.{transition_name}.warning_message`
     Notification message, that will be shown at frontend before transition execution.
+* **init_routes**
+    *array*
+    List of routes where will be displayed transition button. It's needed for start workflow from entities that not 
+    directly related to that workflow.
+* **init_entities**
+    *array*
+    List of entities where will be displayed transition button. It's needed for start workflow from entities that not 
+    directly related to that workflow.
+* **init_context_attribute**
+    *string*
+    Name of attribute which contains init context: routeName, entityId, entityClass, referrer, group. Default value - `init_context`
 * **display_type**
     *string*
     Frontend transition form display type. Possible options are: dialog, page.
@@ -390,6 +401,15 @@ workflows:
     phone_call:
         # ...
         transitions:
+            start_process:
+                is_start: true                              # Start new workflow
+                step_to: start_conversation                 # The name of next step that will be set to Workflow Item
+                init_context_attribute: my_init_context     # Name of attribute which contains init context
+                init_entities:                              # List of entities where will be displayed transition button "start_process"
+                    - 'Oro\Bundle\TaskBundle\Entity\Task'
+                init_routes:                                # List of routes where will be displayed transition button "start_process"
+                    - 'oro_task_view'
+                transition_definition: start
             connected:                                      # Unique name of transition
                 step_to: start_conversation                 # The name of next step that will be set to Workflow Item
                                                             # when transition will be performed
