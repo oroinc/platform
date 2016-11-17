@@ -338,6 +338,7 @@ services:
                 - '\OutOfBoundsException'
                 - 'Oro\Bundle\ApiBundle\Exception\ExceptionInterface'
                 - 'Symfony\Component\HttpKernel\Exception\HttpExceptionInterface'
+                - 'Symfony\Component\PropertyAccess\Exception\ExceptionInterface'
                 - 'Oro\Bundle\EntityBundle\Exception\EntityAliasNotFoundException'
         tags:
             - { name: oro.api.exception_text_extractor, priority: -10 }
