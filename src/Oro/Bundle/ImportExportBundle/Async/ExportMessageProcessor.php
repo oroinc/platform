@@ -1,9 +1,8 @@
 <?php
 namespace Oro\Bundle\ImportExportBundle\Async;
 
-use Psr\Log\LoggerInterface;
-
 use Oro\Bundle\ImportExportBundle\Handler\ExportHandler;
+
 use Oro\Bundle\ImportExportBundle\Processor\ProcessorRegistry;
 use Oro\Component\MessageQueue\Client\TopicSubscriberInterface;
 use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
@@ -11,6 +10,7 @@ use Oro\Component\MessageQueue\Job\JobRunner;
 use Oro\Component\MessageQueue\Transport\MessageInterface;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
 use Oro\Component\MessageQueue\Util\JSON;
+use Psr\Log\LoggerInterface;
 
 class ExportMessageProcessor implements MessageProcessorInterface, TopicSubscriberInterface
 {

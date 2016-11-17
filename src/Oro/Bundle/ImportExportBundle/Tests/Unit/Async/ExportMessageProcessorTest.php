@@ -1,15 +1,15 @@
 <?php
 namespace Oro\Bundle\ImportExportBundle\Tests\Unit\Async;
 
-use Psr\Log\LoggerInterface;
-
 use Oro\Bundle\ImportExportBundle\Async\ExportMessageProcessor;
+
 use Oro\Bundle\ImportExportBundle\Async\Topics;
 use Oro\Bundle\ImportExportBundle\Handler\ExportHandler;
 use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
 use Oro\Component\MessageQueue\Job\JobRunner;
 use Oro\Component\MessageQueue\Transport\Null\NullMessage;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
+use Psr\Log\LoggerInterface;
 
 class ExportMessageProcessorTest extends \PHPUnit_Framework_TestCase
 {
