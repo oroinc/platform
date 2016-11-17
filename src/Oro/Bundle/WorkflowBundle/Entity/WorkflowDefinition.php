@@ -251,6 +251,21 @@ class WorkflowDefinition implements DomainObjectInterface
     }
 
     /**
+     * @param array $scopesConfig
+     *
+     * @return WorkflowDefinition
+     */
+    public function setScopesConfig(array $scopesConfig)
+    {
+        $configuration = $this->getConfiguration();
+        $configuration['scopes'] = $scopesConfig;
+
+        $this->setConfiguration($configuration);
+
+        return $this;
+    }
+
+    /**
      * Set name
      *
      * @param string $name
