@@ -20,7 +20,10 @@ use Oro\Bundle\ImportExportBundle\Job\JobExecutor;
 use Oro\Bundle\ImportExportBundle\Handler\ExportHandler;
 use Oro\Bundle\ImportExportBundle\Handler\HttpImportHandler;
 use Oro\Bundle\ImportExportBundle\Processor\ProcessorRegistry;
+use Oro\Bundle\ImportExportBundle\Async\Topics;
 use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
+use Oro\Bundle\SecurityBundle\SecurityFacade;
+use Oro\Component\MessageQueue\Client\MessageProducerInterface;
 
 class ImportExportController extends Controller
 {
@@ -147,18 +150,21 @@ class ImportExportController extends Controller
     public function instantExportAction($processorAlias, Request $request)
     {
         $jobName = $request->get('exportJob', JobExecutor::JOB_EXPORT_TO_CSV);
-
-        return $this->getExportHandler()->handleExport(
-            $jobName,
-            $processorAlias,
-            ProcessorRegistry::TYPE_EXPORT,
-            'csv',
-            $request->get('filePrefix', null),
-            array_merge(
-                $this->getOptionsFromRequest(),
-                ['organization' => $this->get('oro_security.security_facade')->getOrganization()]
-            )
+        $options = array_merge(
+            $this->getOptionsFromRequest(),
+            ['organization' => $this->getSecurityFacade()->getOrganization()]
         );
+
+        $this->getMessageProducer()->send(Topics::EXPORT, [
+            'jobName' => $jobName,
+            'processorAlias' => $processorAlias,
+            'exportType' => ProcessorRegistry::TYPE_EXPORT,
+            'outputFormat' => 'csv',
+            'outputFilePrefix' => $request->get('filePrefix', null),
+            'options' => $options,
+        ]);
+
+        return new JsonResponse(['success' => true]);
     }
 
     /**
@@ -335,5 +341,21 @@ class ImportExportController extends Controller
         }
 
         return $options;
+    }
+
+    /**
+     * @return MessageProducerInterface
+     */
+    protected function getMessageProducer()
+    {
+        return $this->get('oro_message_queue.client.message_producer');
+    }
+
+    /**
+     * @return SecurityFacade
+     */
+    protected function getSecurityFacade()
+    {
+        return $this->get('oro_security.security_facad');
     }
 }
