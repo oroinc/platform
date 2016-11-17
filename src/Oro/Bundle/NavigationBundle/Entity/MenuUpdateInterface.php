@@ -6,6 +6,7 @@ use Doctrine\Common\Collections\Collection;
 
 use Oro\Bundle\LocaleBundle\Entity\Localization;
 use Oro\Bundle\LocaleBundle\Entity\LocalizedFallbackValue;
+use Oro\Bundle\ScopeBundle\Entity\Scope;
 
 interface MenuUpdateInterface
 {
@@ -139,30 +140,6 @@ interface MenuUpdateInterface
     public function setMenu($menu);
 
     /**
-     * @return string
-     */
-    public function getOwnershipType();
-
-    /**
-     * @param int $ownershipType
-     *
-     * @return MenuUpdateInterface
-     */
-    public function setOwnershipType($ownershipType);
-
-    /**
-     * @return int
-     */
-    public function getOwnerId();
-
-    /**
-     * @param int $ownerId
-     *
-     * @return MenuUpdateInterface
-     */
-    public function setOwnerId($ownerId);
-
-    /**
      * @return boolean
      */
     public function isActive();
@@ -218,4 +195,16 @@ interface MenuUpdateInterface
      * @return array
      */
     public function getExtras();
+
+    /**
+     * @return Scope
+     */
+    public function getScope();
+
+    /**
+     * @param Scope $scope
+     *
+     * @return MenuUpdateInterface
+     */
+    public function setScope(Scope $scope);
 }
