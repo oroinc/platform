@@ -3,6 +3,7 @@
 namespace Oro\Bundle\WorkflowBundle\EventListener;
 
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\Common\Persistence\ObjectRepository;
@@ -120,11 +121,11 @@ class WorkflowDefinitionScopeListener
     }
 
     /**
-     * @param ArrayCollection|Scope[] $from
-     * @param ArrayCollection|Scope[] $to
+     * @param Collection|Scope[] $from
+     * @param Collection|Scope[] $to
      * @return ArrayCollection|Scope[]
      */
-    private function getScopeDiff(ArrayCollection $from, ArrayCollection $to)
+    private function getScopeDiff(Collection $from, Collection $to)
     {
         $scopes = new ArrayCollection();
 
