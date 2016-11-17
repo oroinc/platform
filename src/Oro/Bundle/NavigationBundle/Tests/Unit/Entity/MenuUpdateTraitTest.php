@@ -7,6 +7,7 @@ use Oro\Bundle\LocaleBundle\Entity\LocalizedFallbackValue;
 use Oro\Bundle\NavigationBundle\Menu\Provider\GlobalOwnershipProvider;
 use Oro\Bundle\NavigationBundle\Tests\Unit\Entity\Stub\MenuUpdateStub;
 
+use Oro\Bundle\NavigationBundle\Tests\Unit\Menu\Provider\OwnershipProviderStub;
 use Oro\Component\Testing\Unit\EntityTestCaseTrait;
 
 class MenuUpdateTraitTest extends \PHPUnit_Framework_TestCase
@@ -21,7 +22,7 @@ class MenuUpdateTraitTest extends \PHPUnit_Framework_TestCase
             ['parentKey', 'page_container'],
             ['uri', 'uri'],
             ['menu', 'main_menu'],
-            ['ownershipType', GlobalOwnershipProvider::TYPE],
+            ['ownershipType', OwnershipProviderStub::TYPE],
             ['ownerId', 3],
             ['active', true],
             ['divider', true],
