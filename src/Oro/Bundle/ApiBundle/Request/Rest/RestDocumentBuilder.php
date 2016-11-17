@@ -124,8 +124,9 @@ class RestDocumentBuilder extends AbstractDocumentBuilder
     {
         $properties = $metadata->getMetaProperties();
         foreach ($properties as $name => $property) {
+            $resultName = $property->getResultName();
             if (array_key_exists($name, $data)) {
-                $result[$name] = $data[$name];
+                $result[$resultName] = $data[$name];
             }
         }
     }
@@ -177,6 +178,14 @@ class RestDocumentBuilder extends AbstractDocumentBuilder
         }
 
         return $this->convertObjectToArray($object, $targetMetadata);
+    }
+
+    /**
+     * @param array $object
+     */
+    protected function addRelatedObject(array $object)
+    {
+        throw new \LogicException('The included objects are not supported by this document.');
     }
 
     /**

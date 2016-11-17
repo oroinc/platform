@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\IntegrationBundle\Command;
 
+use Doctrine\DBAL\Connection;
 use Doctrine\ORM\AbstractQuery;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\QueryBuilder;
@@ -136,21 +137,26 @@ class CleanupCommand extends ContainerAwareCommand implements CronCommandInterfa
             ->createQueryBuilder('status');
 
         $expr = $queryBuilder->expr();
-
-        return $queryBuilder->resetDQLPart('select')
+        $excludes = $this->prepareExcludes();
+        $queryBuilder = $queryBuilder->resetDQLPart('select')
             ->select('status.id')
             ->where(
-                $expr->orX(
-                    $expr->andX(
-                        $expr->eq('status.code', "'" . Status::STATUS_COMPLETED . "'"),
-                        $expr->lt('status.date', "'{$completedInterval->format('Y-m-d H:i:s')}'")
+                $expr->andX(
+                    $expr->orX(
+                        $expr->andX(
+                            $expr->eq('status.code', "'" . Status::STATUS_COMPLETED . "'"),
+                            $expr->lt('status.date', "'{$completedInterval->format('Y-m-d H:i:s')}'")
+                        ),
+                        $expr->andX(
+                            $expr->eq('status.code', "'" . Status::STATUS_FAILED . "'"),
+                            $expr->lt('status.date', "'{$failedInterval->format('Y-m-d H:i:s')}'")
+                        )
                     ),
-                    $expr->andX(
-                        $expr->eq('status.code', "'" . Status::STATUS_FAILED . "'"),
-                        $expr->lt('status.date', "'{$failedInterval->format('Y-m-d H:i:s')}'")
-                    )
+                    $expr->notIn('status.id', $excludes)
                 )
             );
+
+        return $queryBuilder;
     }
 
     /**
@@ -159,5 +165,55 @@ class CleanupCommand extends ContainerAwareCommand implements CronCommandInterfa
     protected function getEntityManager()
     {
         return $this->getContainer()->get('doctrine')->getManager();
+    }
+
+    /**
+     * Exclude last connector status by date
+     *
+     * @return array
+     */
+    protected function prepareExcludes()
+    {
+        /** @var Connection $connection */
+        $connection = $this->getEntityManager()->getConnection();
+        $tableName = $this->getContainer()
+            ->get('oro_entity.orm.native_query_executor_helper')
+            ->getTableName(Status::class);
+        $selectQuery = <<<SQL
+SELECT MAX(a.id) AS id
+FROM 
+    %s AS a
+    INNER JOIN
+        (
+            SELECT  connector, MAX(date) AS minDate
+            FROM %s AS b
+            WHERE b.code = '%s'
+            GROUP BY connector
+        ) b ON a.connector = b.connector AND
+                a.date = b.minDate
+WHERE a.code = '%s'
+GROUP BY 
+    a.connector
+SQL;
+        $selectQuery = sprintf(
+            $selectQuery,
+            $tableName,
+            $tableName,
+            Status::STATUS_COMPLETED,
+            Status::STATUS_COMPLETED
+        );
+        $data = $connection->fetchAll($selectQuery);
+        $excludes = array_map(
+            function ($item) {
+                return $item['id'];
+            },
+            $data
+        );
+
+        if (empty($excludes)) {
+            return [0];
+        }
+
+        return $excludes;
     }
 }

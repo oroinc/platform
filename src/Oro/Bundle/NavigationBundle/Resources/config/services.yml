@@ -171,8 +171,10 @@ services:
             - '@security.context'
             - '@doctrine.orm.entity_manager'
             - '@oro_navigation.item.factory'
+            - '@router'
         tags:
             - { name: oro_menu.builder, alias: pinbar }
+            - { name: oro_featuretogle.feature, feature: email }
 
     oro_navigation.favorites_menu.builder:
         class: %oro_navigation.navigation_item_menu.builder.class%
@@ -180,8 +182,10 @@ services:
             - '@security.context'
             - '@doctrine.orm.entity_manager'
             - '@oro_navigation.item.factory'
+            - '@router'
         tags:
             - { name: oro_menu.builder, alias: favorite }
+            - { name: oro_featuretogle.feature, feature: email }
 
     oro_navigation.history_menu.builder:
         class: %oro_navigation.navigation_history_menu.builder.class%
@@ -189,11 +193,13 @@ services:
             - '@security.context'
             - '@doctrine.orm.entity_manager'
             - '@oro_navigation.item.factory'
+            - '@router'
         calls:
             - [ setMatcher, [ '@knp_menu.matcher' ]]
             - [ setOptions, [ '@oro_config.user' ]]
         tags:
             - { name: oro_menu.builder, alias: history }
+            - { name: oro_featuretogle.feature, feature: email }
 
     oro_navigation.mostviewed_menu.builder:
         class: %oro_navigation.navigation_mostviewed_menu.builder.class%
@@ -201,10 +207,12 @@ services:
             - '@security.context'
             - '@doctrine.orm.entity_manager'
             - '@oro_navigation.item.factory'
+            - "@router"
         calls:
             - [ setOptions, [ '@oro_config.user' ]]
         tags:
             - { name: oro_menu.builder, alias: mostviewed }
+            - { name: oro_featuretogle.feature, feature: email }
 
     knp_voter_request:
         class: %oro_navigation.menu.matcher.voter.request%
@@ -411,6 +419,20 @@ services:
         tags:
             - { name: kernel.event_listener, event: oro_menu.configure.application_menu, method: onNavigationConfigure }
 
+    oro_navigation.event_listener.navigation_items:
+        class: Oro\Bundle\NavigationBundle\EventListener\NavigationItemsListener
+        arguments:
+            - '@oro_featuretoggle.checker.feature_checker'
+        tags:
+            - { name: kernel.event_listener, event: oro_menu.configure.shortcuts, method: onNavigationConfigure }
+            - { name: kernel.event_listener, event: oro_menu.configure.application_menu, method: onNavigationConfigure }
+
+    oro_navigation.config_extension.feature:
+        class: Oro\Bundle\NavigationBundle\Configuration\FeatureConfigurationExtension
+        tags:
+            - { name: oro_feature.config_extension }
+
+
     oro_navigation.validator.max_nested_level:
         class: Oro\Bundle\NavigationBundle\Validator\Constraints\MaxNestedLevelValidator
         arguments:
@@ -424,3 +446,13 @@ services:
         arguments:
             - '@translator'
             - '@oro_locale.helper.localization'
+
+    oro_navigation.data_provider.title:
+        class: Oro\Bundle\NavigationBundle\Layout\DataProvider\NavigationTitleProvider
+        scope: request
+        arguments:
+          - '@oro_navigation.title_service'
+          - '@oro_config.user'
+        tags:
+            - { name: layout.data_provider, alias: title_provider }
+
