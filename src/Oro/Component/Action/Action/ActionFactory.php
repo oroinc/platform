@@ -5,9 +5,8 @@ namespace Oro\Component\Action\Action;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 use Oro\Component\ConfigExpression\ExpressionInterface;
-use Oro\Component\ConfigExpression\FactoryWithTypesInterface;
 
-class ActionFactory implements ActionFactoryInterface, FactoryWithTypesInterface
+class ActionFactory implements ActionFactoryInterface
 {
     /**
      * @var ContainerInterface

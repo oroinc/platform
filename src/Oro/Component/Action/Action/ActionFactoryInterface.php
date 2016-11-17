@@ -4,7 +4,9 @@ namespace Oro\Component\Action\Action;
 
 use Oro\Component\ConfigExpression\ExpressionInterface;
 
-interface ActionFactoryInterface
+use Oro\Component\ConfigExpression\FactoryWithTypesInterface;
+
+interface ActionFactoryInterface extends FactoryWithTypesInterface
 {
     /**
      * Creates an action.
