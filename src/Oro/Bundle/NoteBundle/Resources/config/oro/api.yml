@@ -3,14 +3,14 @@ api:
         Oro\Bundle\NoteBundle\Entity\Note:
             fields:
                 target:
-                    description: The entity to which the current note is belongs
+                    description: A record to which the Note record belongs to
                     data_type: association:manyToOne
             subresources:
                 target:
                     actions:
                         get_subresource:
-                            documentation: Get entity that is associated with the given note
+                            documentation: Get full information about a record to which the note belongs to
                         get_relationship:
-                            documentation: Get entity relationship reference that is associated with the given note
+                            documentation: Get a record to which the note belongs to
                         update_relationship:
-                            documentation: Change entity relationship that is associated with the given note
+                            documentation: Update a record to which the note belongs to

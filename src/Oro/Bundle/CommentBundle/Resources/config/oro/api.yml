@@ -3,15 +3,15 @@ api:
         Oro\Bundle\CommentBundle\Entity\Comment:
             fields:
                 target:
-                    description: The entity to which the current comment is belongs
+                    description: A record to which the Comment record belongs to
                     data_type: association:manyToOne
             subresources:
                 target:
                     actions:
                         get_subresource:
-                            documentation: Get entity that is associated with the given comment
+                            documentation: Get full information about a record to which the comment belongs to
                         get_relationship:
-                            documentation: Get entity relationship reference that is associated with the given comment
+                            documentation: Get a record to which the comment belongs to
                         update_relationship:
-                            documentation: Change entity relationship that is associated with the given comment
+                            documentation: Update a record to which the comment belongs to
 
