@@ -59,8 +59,9 @@ class TransitionButton implements ButtonInterface
             'transitionData' => [
                 'workflow' => $this->workflow->getName(),
                 'transition' => $this->transition->getName(),
-                'dialog-route' => $this->buttonContext->getDialogUrl(),
-                'transition-route' => $this->buttonContext->getExecutionUrl(),
+                'dialog-route' => $this->buttonContext->getFormDialogRoute(),
+                'page-route' => $this->buttonContext->getFormPageRoute(),
+                'transition-route' => $this->buttonContext->getExecutionRoute(),
                 'transition-condition-messages' => null,
                 'isAllowed' => true,
                 'enabled' => $this->buttonContext->isEnabled() ?: $this->buttonContext->isUnavailableHidden(),

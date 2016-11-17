@@ -21,7 +21,7 @@
 {% else %}
     {% set data = data|merge({'workflowItem': null}) %}
     {% set transitionData = transitionData|merge({'transition-url': path(
-        'oro_workflow_start_transition_form',
+        transitionData['page-route'],
         {
             workflowName: workflow.name,
             transitionName: transition.name,
