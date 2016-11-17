@@ -53,35 +53,38 @@ abstract class LoadSubresources implements ProcessorInterface
         $subresource->setIsCollection($association->isCollection());
         if ($association->isCollection()) {
             if (!$this->isAccessibleAssociation($association, $accessibleResources)) {
-                $subresource->setExcludedActions($this->getToManyRelationshipsActions());
+                $subresource->setExcludedActions($this->getRelationshipExcludeActions());
             } elseif (!empty($subresourceExcludedActions)) {
                 $subresource->setExcludedActions($subresourceExcludedActions);
             }
             if ($association->has(DataType::INVERSE_ASSOCIATION_FIELD)) {
-                if (!in_array(ApiActions::UPDATE_RELATIONSHIP, $subresource->getExcludedActions(), true)) {
-                    $subresource->addExcludedAction(ApiActions::UPDATE_RELATIONSHIP);
-                }
-                if (!in_array(ApiActions::DELETE_RELATIONSHIP, $subresource->getExcludedActions(), true)) {
-                    $subresource->addExcludedAction(ApiActions::DELETE_RELATIONSHIP);
-                }
+                $this->ensureActionExcluded($subresource, ApiActions::UPDATE_RELATIONSHIP);
+                $this->ensureActionExcluded($subresource, ApiActions::DELETE_RELATIONSHIP);
             }
         } else {
             if (!$this->isAccessibleAssociation($association, $accessibleResources)) {
-                $subresource->setExcludedActions($this->getToOneRelationshipsActions());
+                $subresource->setExcludedActions($this->getRelationshipExcludeActions());
             } else {
-                $excludedActions = $subresourceExcludedActions;
-                $subresource->setExcludedActions($excludedActions);
-            }
-
-            if (!in_array(ApiActions::ADD_RELATIONSHIP, $subresource->getExcludedActions(), true)) {
-                $subresource->addExcludedAction(ApiActions::ADD_RELATIONSHIP);
-            }
-            if (!in_array(ApiActions::DELETE_RELATIONSHIP, $subresource->getExcludedActions(), true)) {
-                $subresource->addExcludedAction(ApiActions::DELETE_RELATIONSHIP);
+                if (!empty($subresourceExcludedActions)) {
+                    $subresource->setExcludedActions($subresourceExcludedActions);
+                }
+                $this->ensureActionExcluded($subresource, ApiActions::ADD_RELATIONSHIP);
+                $this->ensureActionExcluded($subresource, ApiActions::DELETE_RELATIONSHIP);
             }
         }
 
         return $subresource;
+    }
+
+    /**
+     * @param ApiSubresource $subresource
+     * @param string         $action
+     */
+    protected function ensureActionExcluded(ApiSubresource $subresource, $action)
+    {
+        if (!in_array($action, $subresource->getExcludedActions(), true)) {
+            $subresource->addExcludedAction($action);
+        }
     }
 
     /**
@@ -126,19 +129,7 @@ abstract class LoadSubresources implements ProcessorInterface
     /**
      * @return string[]
      */
-    protected function getToOneRelationshipsActions()
-    {
-        return [
-            ApiActions::GET_SUBRESOURCE,
-            ApiActions::GET_RELATIONSHIP,
-            ApiActions::UPDATE_RELATIONSHIP
-        ];
-    }
-
-    /**
-     * @return string[]
-     */
-    protected function getToManyRelationshipsActions()
+    protected function getRelationshipExcludeActions()
     {
         return [
             ApiActions::GET_SUBRESOURCE,
