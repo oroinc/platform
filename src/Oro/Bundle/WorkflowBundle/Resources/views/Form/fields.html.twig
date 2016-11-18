@@ -8,3 +8,8 @@
         <button type="submit" class="btn btn-success">{{ 'Submit'|trans }}</button>
     </div>
 {% endblock %}
+
+{% block _oro_workflow_definition_form_label_widget %}
+    {{ form_widget(form) }}
+    <span id="workflow_translate_link_label"></span>
+{% endblock %}

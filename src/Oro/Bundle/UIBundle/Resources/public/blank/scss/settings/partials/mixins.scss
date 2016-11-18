@@ -44,7 +44,7 @@
         'desktop': '(min-width: ' + $breakpoint-desktop + ')',
         'tablet': '(max-width: ' +  $breakpoint-tablet + ')',
         'tablet-small': '(max-width: ' +  $breakpoint-tablet-small + ')',
-        'mobile-portrait': '(max-width: ' +  $breakpoint-mobile-portrait + ')',
+        'mobile-landscape': '(max-width: ' +  $breakpoint-mobile-landscape + ')',
         'mobile': '(max-width: ' + $breakpoint-mobile + ')'
     );
 

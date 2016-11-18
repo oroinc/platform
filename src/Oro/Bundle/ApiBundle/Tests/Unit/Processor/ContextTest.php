@@ -13,6 +13,7 @@ use Oro\Bundle\ApiBundle\Metadata\ActionMetadataExtra;
 use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
 use Oro\Bundle\ApiBundle\Model\Error;
 use Oro\Bundle\ApiBundle\Processor\Context;
+use Oro\Bundle\ApiBundle\Request\DocumentBuilderInterface;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 
@@ -214,6 +215,18 @@ class ContextTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse($this->context->isSuccessResponse());
         $this->context->setResponseStatusCode(300);
         $this->assertFalse($this->context->isSuccessResponse());
+    }
+
+    public function testResponseDocumentBuilder()
+    {
+        $this->assertNull($this->context->getResponseDocumentBuilder());
+
+        $documentBuilder = $this->getMock(DocumentBuilderInterface::class);
+        $this->context->setResponseDocumentBuilder($documentBuilder);
+        $this->assertSame($documentBuilder, $this->context->getResponseDocumentBuilder());
+
+        $this->context->setResponseDocumentBuilder(null);
+        $this->assertNull($this->context->getResponseDocumentBuilder());
     }
 
     public function testClassName()
@@ -1027,6 +1040,21 @@ class ContextTest extends \PHPUnit_Framework_TestCase
         $this->context->resetErrors();
         $this->assertFalse($this->context->hasErrors());
         $this->assertSame([], $this->context->getErrors());
+    }
+
+    public function testSoftErrorsHandling()
+    {
+        $this->assertFalse($this->context->isSoftErrorsHandling());
+        $this->assertFalse($this->context->has(Context::SOFT_ERRORS_HANDLING));
+
+        $this->context->setSoftErrorsHandling(true);
+        $this->assertTrue($this->context->isSoftErrorsHandling());
+        $this->assertTrue($this->context->has(Context::SOFT_ERRORS_HANDLING));
+        $this->assertTrue($this->context->get(Context::SOFT_ERRORS_HANDLING));
+
+        $this->context->setSoftErrorsHandling(false);
+        $this->assertFalse($this->context->isSoftErrorsHandling());
+        $this->assertFalse($this->context->has(Context::SOFT_ERRORS_HANDLING));
     }
 
     /**

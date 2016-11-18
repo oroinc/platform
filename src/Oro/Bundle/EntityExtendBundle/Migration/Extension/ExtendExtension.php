@@ -668,15 +668,15 @@ class ExtendExtension implements NameGeneratorAwareInterface
      * Adds many-to-one relation
      *
      * @param Schema       $schema
-     * @param Table|string $table            A Table object or table name
-     * @param string       $associationName  The name of a relation field
-     * @param Table|string $targetTable      A Table object or table name
-     * @param string       $targetColumnName A column name is used to show related entity
+     * @param Table|string $table              A Table object or table name
+     * @param string       $associationName    The name of a relation field
+     * @param Table|string $targetTable        A Table object or table name
+     * @param string       $targetColumnName   A column name is used to show related entity
      * @param array        $options
-     * @param string       $fieldType        The field type. By default the field type is manyToOne,
-     *                                       but you can specify another type if it is based on manyToOne.
-     *                                       In this case this type should be registered
-     *                                       in entity_extend.yml under underlying_types section
+     * @param string       $fieldType          The field type. By default the field type is manyToOne,
+     *                                         but you can specify another type if it is based on manyToOne.
+     *                                         In this case this type should be registered
+     *                                         in entity_extend.yml under underlying_types section
      */
     public function addManyToOneRelation(
         Schema $schema,
@@ -701,12 +701,25 @@ class ExtendExtension implements NameGeneratorAwareInterface
 
         $this->checkColumnsExist($targetTable, [$targetColumnName]);
 
+        $relation = $options['extend'];
+        if (array_key_exists('on_delete', $relation)) {
+            $onDelete = $relation['on_delete'];
+        } else {
+            $onDelete = 'SET NULL';
+        }
+
+        if (array_key_exists('nullable', $relation)) {
+            $notnull = !$relation['nullable'];
+        } else {
+            $notnull = false;
+        }
+
         $this->addRelation(
             $selfTable,
             $selfColumnName,
             $targetTable,
-            ['notnull' => false],
-            ['onDelete' => 'SET NULL']
+            ['notnull' => $notnull],
+            ['onDelete' => $onDelete]
         );
 
         $options[ExtendOptionsManager::TARGET_OPTION] = [

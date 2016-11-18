@@ -17,7 +17,6 @@ parameters:
     oro_translation.oro_translation.adapter.class:              Oro\Bundle\TranslationBundle\Provider\OroTranslationAdapter
     oro_translation.guzzle_client.class:                        Guzzle\Http\Client
 
-    oro_translation.twig.translation.extension.class:           Oro\Bundle\TranslationBundle\Twig\TranslationExtension
     oro_translation.packages_provider.class:                    Oro\Bundle\TranslationBundle\Provider\PackagesProvider
     oro_translation.event_listener.language_change.class:       Oro\Bundle\TranslationBundle\EventListener\LanguageChangeListener
 
@@ -57,6 +56,9 @@ services:
             - '@oro_translation.cache'
             - '@oro_translation.oro_translation_adapter'
             - '@oro_translation.packages_provider'
+            - '@logger'
+        tags:
+            - { name: monolog.logger, channel: oro_translation }
 
     # guzzle http client for crowdin
     oro_translation.guzzle_crowdin_client:
@@ -84,6 +86,8 @@ services:
         calls:
             - [ setApiKey, [ %oro_translation.api.oro_service.key% ] ]
             - [ setLogger, [ '@logger' ] ]
+        tags:
+            - { name: monolog.logger, channel: oro_translation }
 
     oro_translation.database_translation.metadata.cache:
         class: %oro_translation.dynamic_translation.metadata.cache.class%
@@ -120,6 +124,15 @@ services:
     oro_translation.resource.cache:
         public: false
         class: Doctrine\Common\Cache\ArrayCache
+        
+    oro_translation.cache.translation_cache_warmer:
+        class: 'Oro\Bundle\TranslationBundle\Cache\TranslationCacheWarmer'
+        public: false
+        decorates: 'translation.warmer'
+        decoration_inner_name: 'translation.warmer.default'
+        arguments:
+            - '@translation.warmer.default'
+            - '@oro_translation.strategy.provider'
 
     oro_translation.js_dumper:
         class: 'Oro\Bundle\TranslationBundle\Provider\JsTranslationDumper'
@@ -132,9 +145,10 @@ services:
         lazy: true
 
     oro_translation.twig.translation.extension:
-        class: %oro_translation.twig.translation.extension.class%
+        class: 'Oro\Bundle\TranslationBundle\Twig\TranslationExtension'
         arguments:
-            - %oro_translation.debug_translator%
+            - '%oro_translation.debug_translator%'
+            - '@oro_translation.helper.translation_route'
         tags:
             - { name: twig.extension }
 
@@ -182,11 +196,11 @@ services:
         arguments:
             - '@oro_translation.provider.language'
             - '%installed%'
+        tags:
+            - { name: oro_translation.extension.translation_strategy, priority: 0 }
 
     oro_translation.strategy.provider:
         class: '%oro_translation.strategy.provider.class%'
-        arguments:
-            - '@oro_translation.strategy.default'
 
     oro_translation.listener.datagrid.language:
         class: 'Oro\Bundle\TranslationBundle\EventListener\Datagrid\LanguageListener'
@@ -219,6 +233,7 @@ services:
         arguments:
             - '@oro_translation.repository.language'
             - '@oro_locale.settings'
+            - '@oro_security.acl_helper'
 
     oro_translation.helper.language:
         class: 'Oro\Bundle\TranslationBundle\Helper\LanguageHelper'
@@ -235,8 +250,25 @@ services:
             - '@doctrine'
             - '@oro_translation.database_translation.metadata.cache'
 
+    oro_translation.helper.translation:
+        class: 'Oro\Bundle\TranslationBundle\Helper\TranslationHelper'
+        arguments:
+            - '@doctrine'
+
     oro_translation.filter.language:
         class: 'Oro\Bundle\TranslationBundle\Filter\LanguageFilter'
         parent: oro_filter.entity_filter
         tags:
             - { name: oro_filter.extension.orm_filter.filter, type: language, datasource: orm }
+
+    oro_translation.helper.translation_route:
+        class: 'Oro\Bundle\TranslationBundle\Helper\TranslationsDatagridRouteHelper'
+        arguments:
+            - '@oro_datagrid.helper.route'
+
+    oro_translation.layout.data_provider.translator:
+        class: 'Oro\Bundle\TranslationBundle\Layout\DataProvider\TranslatorProvider'
+        arguments:
+            - '@translator'
+        tags:
+            - { name: layout.data_provider, alias: translator }
