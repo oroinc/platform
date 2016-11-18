@@ -1,5 +1,7 @@
 workflows:
     test_flow_with_scopes:
+        defaults:
+            active: true
         entity: Oro\Bundle\TestFrameworkBundle\Entity\WorkflowAwareEntity
         priority: 60
         scopes:
@@ -18,6 +20,8 @@ workflows:
                 transition_definition: start_transiotion_definition
 
     test_flow_without_scopes:
+        defaults:
+            active: true
         entity: Oro\Bundle\TestFrameworkBundle\Entity\WorkflowAwareEntity
         priority: 20
         start_step: open

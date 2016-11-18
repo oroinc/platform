@@ -24,9 +24,6 @@ class WorkflowRegistry
     /** @var Workflow[] */
     protected $workflowByName = [];
 
-    /** @var Collection[]|array */
-    protected $workflowByEntityClass = [];
-
     /** @var array|WorkflowDefinitionFilterInterface[] */
     protected $definitionFilters = [];
 
@@ -103,10 +100,6 @@ class WorkflowRegistry
     {
         $class = ClassUtils::getRealClass($entityClass);
 
-        if (array_key_exists($class, $this->workflowByEntityClass)) {
-            return true;
-        }
-
         $activeWorkflowDefinitions = $this->getEntityRepository()->findActiveForRelatedEntity($class);
 
         $items = $this->processDefinitionFilters(new ArrayCollection($activeWorkflowDefinitions));
@@ -125,19 +118,17 @@ class WorkflowRegistry
     {
         $class = ClassUtils::getRealClass($entityClass);
 
-        if (!array_key_exists($class, $this->workflowByEntityClass)) {
-            $definitions = $this->getNamedDefinitionsCollection(
-                $this->getEntityRepository()->findActiveForRelatedEntity($class)
-            );
-            $workflows = $this->processDefinitionFilters($definitions)->map(
-                function (WorkflowDefinition $workflowDefinition) {
-                    return $this->getAssembledWorkflow($workflowDefinition);
-                }
-            );
-            $this->workflowByEntityClass[$class] = $workflows;
-        }
+        $definitions = $this->getNamedDefinitionsCollection(
+            $this->getEntityRepository()->findActiveForRelatedEntity($class)
+        );
 
-        return $this->workflowByEntityClass[$class];
+        $workflows = $this->processDefinitionFilters($definitions)->map(
+            function (WorkflowDefinition $workflowDefinition) {
+                return $this->getAssembledWorkflow($workflowDefinition);
+            }
+        );
+
+        return $workflows;
     }
 
     /**
