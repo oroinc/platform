@@ -20,10 +20,6 @@ class UserViewList extends AbstractViewsList
             'type' => GridView::TYPE_PUBLIC,
             'icon' => 'icon-ok',
             'filters' => [
-                'auth_status' => [
-                    'type' => EnumFilterType::TYPE_NOT_IN,
-                    'value' => ['expired'],
-                ],
                 'enabled' => [
                     'value' => BooleanFilterType::TYPE_YES,
                 ],

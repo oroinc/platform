@@ -215,8 +215,12 @@ operations:
         button_options:
             icon: icon-ban-circle
             class: btn-danger icons-holder-text
+        preactions:
+            - '@get_active_user': $.currentUser
         preconditions:
-            '@equal': [true, $isEnabled]
+            '@and':
+                - '@equal': [true, $isEnabled]
+                - '@not_equal': [$id, $.currentUser.id]
         actions:
             - '@run_action_group':
                 action_group: disableUser
