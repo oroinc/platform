@@ -243,13 +243,22 @@ class WorkflowDefinition implements DomainObjectInterface
     }
 
     /**
+     * @param array $scopesConfig
+     * @return $this
+     */
+    public function setScopesConfig(array $scopesConfig)
+    {
+        $this->configuration[self::CONFIG_SCOPES] = $scopesConfig;
+
+        return $this;
+    }
+
+    /**
      * @return array
      */
     public function getScopesConfig()
     {
-        $configuration = $this->getConfiguration();
-
-        return array_key_exists('scopes', $configuration) ? (array)$configuration[self::CONFIG_SCOPES] : [];
+        return array_key_exists('scopes', $this->configuration) ? (array)$this->configuration[self::CONFIG_SCOPES] : [];
     }
 
     /**
@@ -257,7 +266,7 @@ class WorkflowDefinition implements DomainObjectInterface
      */
     public function hasScopesConfig()
     {
-        return !empty($this->getConfiguration()[self::CONFIG_SCOPES]);
+        return !empty($this->configuration[self::CONFIG_SCOPES]);
     }
 
     /**
