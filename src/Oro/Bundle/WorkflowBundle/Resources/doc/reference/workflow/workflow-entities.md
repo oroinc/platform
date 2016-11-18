@@ -675,7 +675,7 @@ Oro\Bundle\WorkflowBundle\Scope\WorkflowScopeManager
 **Description:**
 Responsible for updating collection of relations to `Oro\Bundle\ScopeBundle\Entity\Scope` entity from
 `Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition` entity and represents as property `scopes` of `WorkflowDefinition`
-entity. For generation relations used data from node `scopes` of Workflow configuration.
+entity. To generate relations it uses data from node `scopes` of Workflow configuration.
 
 **Methods:**
 * **setEnabled(bool)** - enable or disable (enabled by default) logic of manager, it helps to reload workflow configuration without any changes in table of WorkflowScope
