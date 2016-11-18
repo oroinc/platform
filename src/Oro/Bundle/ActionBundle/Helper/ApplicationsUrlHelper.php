@@ -53,7 +53,7 @@ class ApplicationsUrlHelper
     }
 
     /**
-     * @param $routeName
+     * @param string $routeName
      * @param array $parameters
      *
      * @return string
