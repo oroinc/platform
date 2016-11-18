@@ -75,6 +75,10 @@ Show Transition Labels: Show Transition Labels
 
 oro:
     workflow:
+        permission:
+            VIEW_WORKFLOW: View Workflow
+            PERFORM_TRANSITIONS: Perform transitions
+            PERFORM_TRANSITION: Perform transition
         translation:
             workflow.label: Workflow
             context:
