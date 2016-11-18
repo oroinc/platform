@@ -58,7 +58,9 @@ define(function(require) {
 
             this.createFrontField(opts);
 
-            this.$el.wrap('<span style="display:none"></span>');
+            if (this.$el[0].type !== 'hidden') {
+                this.$el.wrap('<span style="display:none"></span>');
+            }
             if (!this.nativeMode) {
                 this.initPickerWidget(opts);
             }
