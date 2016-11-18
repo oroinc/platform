@@ -5,6 +5,7 @@ namespace Oro\Bundle\NavigationBundle\Controller;
 use Doctrine\ORM\EntityManager;
 
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -13,31 +14,27 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 
 use Oro\Bundle\NavigationBundle\Entity\MenuUpdate;
-use Oro\Bundle\NavigationBundle\Menu\ConfigurationBuilder;
 use Oro\Bundle\NavigationBundle\Manager\MenuUpdateManager;
+use Oro\Bundle\ScopeBundle\Entity\Scope;
 
 class AjaxMenuController extends Controller
 {
     /**
-     * @Route("/menu/reset/{ownershipType}/{menuName}", name="oro_navigation_menuupdate_reset")
+     * @Route("/menu/reset/{scopeId}/{menuName}", name="oro_navigation_menuupdate_reset")
+     * @ParamConverter("scope", class="OroScopeBundle:Scope", options={"id" = "scopeId"})
      * @Method("DELETE")
      *
-     * @param Request $request
      * @param string  $menuName
-     * @param string  $ownershipType
+     * @param Scope   $scope
      *
      * @return Response
      */
-    public function resetAction(Request $request, $menuName, $ownershipType)
+    public function resetAction($menuName, Scope $scope)
     {
         /** @var MenuUpdateManager $manager */
         $manager = $this->get('oro_navigation.manager.menu_update_default');
 
-        $updates = $manager->getMenuUpdatesByMenuAndScope(
-            $menuName,
-            $ownershipType,
-            $this->getCurrentOwnerId($ownershipType, $request->get('ownerId'))
-        );
+        $updates = $manager->getMenuUpdatesByMenuAndScope($menuName, $scope);
 
         /** @var EntityManager $em */
         $em = $this->getDoctrine()->getManagerForClass(MenuUpdate::class);
@@ -52,21 +49,21 @@ class AjaxMenuController extends Controller
     }
 
     /**
-     * @Route("/menu/create/{menuName}/{parentKey}/{ownershipType}", name="oro_navigation_menuupdate_create")
+     * @Route("/menu/create/{menuName}/{parentKey}/{scopeId}", name="oro_navigation_menuupdate_create")
+     * @ParamConverter("scope", class="OroScopeBundle:Scope", options={"id" = "scopeId"})
      * @Method("POST")
      *
      * @param Request $request
      * @param string  $menuName
      * @param string  $parentKey
-     * @param string  $ownershipType
+     * @param Scope   $scope
      *
      * @return Response
      */
-    public function createAction(Request $request, $menuName, $parentKey, $ownershipType)
+    public function createAction(Request $request, $menuName, $parentKey, Scope $scope)
     {
         $menuUpdate = $this->get('oro_navigation.manager.menu_update_default')->createMenuUpdate(
-            $ownershipType,
-            $this->getCurrentOwnerId($ownershipType, $request->get('ownerId')),
+            $scope,
             [
                 'menu' => $menuName,
                 'parentKey' => $parentKey,
@@ -89,27 +86,22 @@ class AjaxMenuController extends Controller
     }
 
     /**
-     * @Route("/menu/delete/{ownershipType}/{menuName}/{key}", name="oro_navigation_menuupdate_delete")
+     * @Route("/menu/delete/{scopeId}/{menuName}/{key}", name="oro_navigation_menuupdate_delete")
+     * @ParamConverter("scope", class="OroScopeBundle:Scope", options={"id" = "scopeId"})
      * @Method("DELETE")
      *
-     * @param Request $request
-     * @param string  $menuName
-     * @param string  $key
-     * @param string  $ownershipType
+     * @param string $menuName
+     * @param string $key
+     * @param Scope  $scope
      *
      * @return Response
      */
-    public function deleteAction(Request $request, $menuName, $key, $ownershipType)
+    public function deleteAction($menuName, $key, Scope $scope)
     {
         /** @var MenuUpdateManager $manager */
         $manager = $this->get('oro_navigation.manager.menu_update_default');
 
-        $menuUpdate = $manager->getMenuUpdateByKeyAndScope(
-            $menuName,
-            $key,
-            $ownershipType,
-            $this->getCurrentOwnerId($ownershipType, $request->get('ownerId'))
-        );
+        $menuUpdate = $manager->getMenuUpdateByKeyAndScope($menuName, $key, $scope);
         if ($menuUpdate === null || $menuUpdate->getId() === null) {
             throw $this->createNotFoundException();
         }
@@ -130,79 +122,69 @@ class AjaxMenuController extends Controller
     }
 
     /**
-     * @Route("/menu/show/{ownershipType}/{menuName}/{key}", name="oro_navigation_menuupdate_show")
+     * @Route("/menu/show/{scopeId}/{menuName}/{key}", name="oro_navigation_menuupdate_show")
+     * @ParamConverter("scope", class="OroScopeBundle:Scope", options={"id" = "scopeId"})
      * @Method("PUT")
      *
-     * @param Request $request
      * @param string  $menuName
      * @param string  $key
-     * @param string  $ownershipType
+     * @param Scope   $scope
      *
      * @return Response
      */
-    public function showAction(Request $request, $menuName, $key, $ownershipType)
+    public function showAction($menuName, $key, Scope $scope)
     {
         /** @var MenuUpdateManager $manager */
         $manager = $this->get('oro_navigation.manager.menu_update_default');
-        $manager->showMenuItem(
-            $menuName,
-            $key,
-            $ownershipType,
-            $this->getCurrentOwnerId($ownershipType, $request->get('ownerId'))
-        );
+        $manager->showMenuItem($menuName, $key, $scope);
 
         return new JsonResponse(null, Response::HTTP_OK);
     }
 
     /**
-     * @Route("/menu/hide/{ownershipType}/{menuName}/{key}", name="oro_navigation_menuupdate_hide")
+     * @Route("/menu/hide/{scopeId}/{menuName}/{key}", name="oro_navigation_menuupdate_hide")
+     * @ParamConverter("scope", class="OroScopeBundle:Scope", options={"id" = "scopeId"})
      * @Method("PUT")
      *
-     * @param Request $request
      * @param string  $menuName
      * @param string  $key
-     * @param string  $ownershipType
+     * @param Scope   $scope
      *
      * @return Response
      */
-    public function hideAction(Request $request, $menuName, $key, $ownershipType)
+    public function hideAction($menuName, $key, Scope $scope)
     {
         /** @var MenuUpdateManager $manager */
         $manager = $this->get('oro_navigation.manager.menu_update_default');
-        $manager->hideMenuItem(
-            $menuName,
-            $key,
-            $ownershipType,
-            $this->getCurrentOwnerId($ownershipType, $request->get('ownerId'))
-        );
+        $manager->hideMenuItem($menuName, $key, $scope);
 
         return new JsonResponse(null, Response::HTTP_OK);
     }
 
     /**
-     * @Route("/menu/move/{ownershipType}/{menuName}", name="oro_navigation_menuupdate_move")
+     * @Route("/menu/move/{scopeId}/{menuName}", name="oro_navigation_menuupdate_move")
+     * @ParamConverter("scope", class="OroScopeBundle:Scope", options={"id" = "scopeId"})
      * @Method("PUT")
      *
      * @param Request $request
-     * @param int     $ownershipType
      * @param string  $menuName
+     * @param Scope   $scope
      *
      * @return Response
      */
-    public function moveAction(Request $request, $menuName, $ownershipType)
+    public function moveAction(Request $request, $menuName, Scope $scope)
     {
         /** @var MenuUpdateManager $manager */
         $manager = $this->get('oro_navigation.manager.menu_update_default');
 
         $key = $request->get('key');
-        $ownerId = $this->getCurrentOwnerId($ownershipType, $request->get('ownerId'));
         $parentKey = $request->get('parentKey');
         $position = $request->get('position');
 
         /** @var EntityManager $entityManager */
         $entityManager = $this->getDoctrine()->getManagerForClass(MenuUpdate::class);
 
-        $updates = $manager->moveMenuItem($menuName, $key, $ownershipType, $ownerId, $parentKey, $position);
+        $updates = $manager->moveMenuItem($menuName, $key, $scope, $parentKey, $position);
         foreach ($updates as $update) {
             $errors = $this->get('validator')->validate($update);
             if (count($errors)) {
@@ -217,22 +199,5 @@ class AjaxMenuController extends Controller
         $entityManager->flush();
 
         return new JsonResponse(['status' => true], Response::HTTP_OK);
-    }
-
-    /**
-     * @param string $ownershipType
-     * @param null|int $ownerId
-     *
-     * @return int
-     */
-    private function getCurrentOwnerId($ownershipType, $ownerId = null)
-    {
-        if ($ownerId) {
-            return $ownerId;
-        }
-        $area = ConfigurationBuilder::DEFAULT_AREA;
-        $provider = $this->get('oro_navigation.menu_update.builder')->getProvider($area, $ownershipType);
-
-        return $provider->getId();
     }
 }

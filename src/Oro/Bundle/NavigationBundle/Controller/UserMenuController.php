@@ -37,7 +37,7 @@ class UserMenuController extends AbstractMenuController
      */
     public function viewAction($menuName)
     {
-        return parent::view($menuName);
+        return parent::view($menuName, $this->getContext());
     }
 
     /**
@@ -52,7 +52,7 @@ class UserMenuController extends AbstractMenuController
      */
     public function createAction($menuName, $parentKey = null)
     {
-        return parent::create($menuName, $parentKey, $this->getOwnerId());
+        return parent::create($menuName, $parentKey, $this->getContext());
     }
 
     /**
@@ -67,31 +67,42 @@ class UserMenuController extends AbstractMenuController
      */
     public function updateAction($menuName, $key)
     {
-        return parent::update($menuName, $key, $this->getOwnerId());
+        return parent::update($menuName, $key, $this->getContext());
+    }
+
+    /**
+     * @return array
+     */
+    protected function getContext()
+    {
+        return ['user' => $this->getUser()->getId()];
     }
 
     /**
      * {@inheritdoc}
      */
-    protected function getOwnershipType()
+    protected function getScopeType()
     {
-        return $this->getOwnershipProvider()->getType();
+        return 'menu_default_visibility';
     }
 
     /**
-     * @return int|null
+     * {@inheritdoc}
      */
-    protected function getOwnerId()
+    protected function getManager()
     {
-        return $this->getOwnershipProvider()->getId();
+        return $this->get('oro_navigation.manager.menu_update_default');
     }
 
     /**
-     * @return \Oro\Bundle\NavigationBundle\Menu\Provider\UserOwnershipProvider
+     * {@inheritdoc}
      */
-    protected function getOwnershipProvider()
+    protected function getContextForMenuUpdateBuilder()
     {
-        return $this->get('oro_navigation.ownership_provider.user');
+        return [
+            'organization' => $this->getUser()->getCurrentOrganization()->getId(),
+            'user' => $this->getUser()->getId()
+        ];
     }
 
     /**
