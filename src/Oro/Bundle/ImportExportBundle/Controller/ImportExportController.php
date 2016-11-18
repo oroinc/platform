@@ -60,8 +60,60 @@ class ImportExportController extends Controller
                 $this->getMessageProducer()->send(Topics::IMPORT_HTTP, []);
 
                 return $this->forward(
+                    'OroImportExportBundle:ImportExport:importProcess',
+                    [
+                        'processorAlias' => $processorAlias,
+                        'fileName' => $file->getClientOriginalName()
+                    ],
+                    $request->query->all()
+                );
+            }
+        }
+
+        return [
+            'entityName' => $entityName,
+            'form' => $importForm->createView(),
+            'options' => $this->getOptionsFromRequest($request),
+            'importJob' => $importJob,
+            'importValidateJob' => $importValidateJob
+        ];
+    }
+
+    /**
+     * Take uploaded file and move it to temp dir
+     *
+     * @Route("/import-validate", name="oro_importexport_import_validate_form")
+     * @AclAncestor("oro_importexport_import")
+     * @Template("OroImportExportBundle:ImportExport:importForm.html.twig")
+     *
+     * @param Request $request
+     *
+     * @return array
+     */
+    public function importValidateFormAction(Request $request)
+    {
+        $entityName = $request->get('entity');
+        $importJob = $request->get('importJob');
+        $importValidateJob = $request->get('importValidateJob');
+
+        $importForm = $this->getImportForm($entityName);
+
+        if ($request->isMethod('POST')) {
+            $importForm->submit($request);
+
+            if ($importForm->isValid()) {
+                /** @var ImportData $data */
+                $data           = $importForm->getData();
+                $file           = $data->getFile();
+                $processorAlias = $data->getProcessorAlias();
+
+
+                return $this->forward(
                     'OroImportExportBundle:ImportExport:importValidate',
-                    ['processorAlias' => $processorAlias],
+                    [
+                        'processorAlias' => $processorAlias,
+                        'fileName' => $file->getClientOriginalName()
+                    ],
                     $request->query->all()
                 );
             }
@@ -90,14 +142,14 @@ class ImportExportController extends Controller
      *
      * @Route("/import/validate/{processorAlias}", name="oro_importexport_import_validate")
      * @AclAncestor("oro_importexport_import")
-     * @Template("OroImportExportBundle:ImportExport:importValidate.html.twig")
+     * @Template("OroImportExportBundle:ImportExport:`.html.twig")
      *
      * @param Request $request
      * @param string $processorAlias
      *
      * @return array
      */
-    public function importValidateAction(Request $request, $processorAlias)
+    public function importValidateAction(Request $request, $processorAlias, $fileName)
     {
         $processorRegistry = $this->get('oro_importexport.processor.registry');
         $entityName        = $processorRegistry
@@ -106,17 +158,19 @@ class ImportExportController extends Controller
             ->getProcessorAliasesByEntity(ProcessorRegistry::TYPE_IMPORT_VALIDATION, $entityName);
 
         $jobName = $request->get('importValidateJob', JobExecutor::JOB_VALIDATE_IMPORT_FROM_CSV);
-        $result = $this->getImportHandler()->handleImportValidation(
-            $jobName,
-            $processorAlias,
-            'csv',
-            null,
-            $this->getOptionsFromRequest($request)
-        );
-        $result['showStrategy'] = count($existingAliases) > 1;
-        $result['importJob'] = $request->get('importJob');
 
-        return $result;
+        $this->getMessageProducer()->send(
+            Topics::IMPORT_HTTP_VALIDATION,
+            [
+                'fileName' => $fileName,
+                'userId' => $this->getUser()->getId(),
+                'jobName' => $jobName,
+                'processorAlias' => $processorAlias,
+                $this->getOptionsFromRequest($request)
+            ]
+        );
+
+        return ['success' => true];
     }
 
     /**
@@ -128,18 +182,23 @@ class ImportExportController extends Controller
      *
      * @return JsonResponse
      */
-    public function importProcessAction($processorAlias, Request $request)
+    public function importProcessAction(Request $request, $processorAlias, $fileName)
     {
         $jobName = $request->get('importJob', JobExecutor::JOB_IMPORT_FROM_CSV);
-        $result  = $this->getImportHandler()->handleImport(
-            $jobName,
-            $processorAlias,
-            'csv',
-            null,
-            $this->getOptionsFromRequest($request)
+
+        $this->getMessageProducer()->send(
+            Topics::IMPORT_HTTP,
+            [
+                'fileName' => $fileName,
+                'userId' => $this->getUser()->getId(),
+                'jobName' => $jobName,
+                'processorAlias' => $processorAlias,
+                $this->getOptionsFromRequest($request)
+            ]
         );
 
-        return new JsonResponse($result);
+
+        return ['success' => true];
     }
 
     /**
