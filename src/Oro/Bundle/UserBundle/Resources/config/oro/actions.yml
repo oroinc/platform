@@ -143,10 +143,22 @@ operations:
             '@equal': [true, $isEnabled]
         actions:
             - '@run_action_group':
-                action_group: reset_password
+                action_group: resetPassword
                 parameters_mapping:
                     data: $.data
-            - '@refresh_grid': users-grid
+            - '@redirect':
+                conditions:
+                    '@and':
+                        - '@empty': $.gridName
+                        - '@not_empty': $.routes[name]
+                parameters:
+                    route: $.routes[name]
+            - '@refresh_grid':
+                conditions:
+                    '@and':
+                        - '@empty': $.routes[name]
+                        - '@not_empty': $.gridName
+                parameters: [$.gridName]
 
     user_enable:
         label: oro.user.action.enable.label
@@ -169,10 +181,22 @@ operations:
             '@equal': [false, $isEnabled]
         actions:
             - '@run_action_group':
-                action_group: user_enable
+                action_group: enableUser
                 parameters_mapping:
                     data: $.data
-            - '@refresh_grid': users-grid
+            - '@redirect':
+                conditions:
+                    '@and':
+                        - '@empty': $.gridName
+                        - '@not_empty': $.routes[name]
+                parameters:
+                    route: $.routes[name]
+            - '@refresh_grid':
+                conditions:
+                    '@and':
+                        - '@empty': $.routes[name]
+                        - '@not_empty': $.gridName
+                parameters: [$.gridName]
 
     user_disable:
         label: oro.user.action.disable.label
@@ -195,13 +219,25 @@ operations:
             '@equal': [true, $isEnabled]
         actions:
             - '@run_action_group':
-                action_group: user_disable
+                action_group: disableUser
                 parameters_mapping:
                     data: $.data
-            - '@refresh_grid': users-grid
+            - '@redirect':
+                conditions:
+                    '@and':
+                        - '@empty': $.gridName
+                        - '@not_empty': $.routes[name]
+                parameters:
+                    route: $.routes[name]
+            - '@refresh_grid':
+                conditions:
+                    '@and':
+                        - '@empty': $.routes[name]
+                        - '@not_empty': $.gridName
+                parameters: [$.gridName]
 
 action_groups:
-    reset_password:
+    resetPassword:
         parameters:
             data:
                 type: Oro\Bundle\UserBundle\Entity\User
@@ -233,7 +269,7 @@ action_groups:
                         message_parameters:
                             'email': $.data.email
 
-    user_enable:
+    enableUser:
         parameters:
             data:
                 type: Oro\Bundle\UserBundle\Entity\User
@@ -249,11 +285,11 @@ action_groups:
                 conditions:
                     '@equal': [$.data.auth_status.id, 'expired']
                 actions:
-                     - '@run_action_group':
-                         action_group: reset_password
-                         parameters_mapping:
-                             data: $.data
-    user_disable:
+                    - '@run_action_group':
+                        action_group: resetPassword
+                        parameters_mapping:
+                            data: $.data
+    disableUser:
         parameters:
             data:
                 type: Oro\Bundle\UserBundle\Entity\User
