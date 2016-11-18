@@ -30,6 +30,6 @@ services:
             - { name: kernel.event_listener, event: kernel.request, method: onKernelRequest }
 
     oro_sidebar.config_extension.feature:
-            class: 'Oro\Bundle\SidebarBundle\Configuration\FeatureConfigurationExtension'
-            tags:
-                - { name: oro_feature.config_extension }
+        class: 'Oro\Bundle\SidebarBundle\Configuration\FeatureConfigurationExtension'
+        tags:
+            - { name: oro_feature.config_extension }

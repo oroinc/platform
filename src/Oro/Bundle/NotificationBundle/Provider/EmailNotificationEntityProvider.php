@@ -14,6 +14,11 @@ use Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker;
 class EmailNotificationEntityProvider extends EntityProvider
 {
     /**
+     * @var EntityManager
+     */
+    protected $em;
+
+    /**
      * Constructor
      *
      * @param ConfigProvider      $entityConfigProvider
@@ -40,11 +45,6 @@ class EmailNotificationEntityProvider extends EntityProvider
         );
         $this->em = $em;
     }
-
-    /**
-     * @var EntityManager
-     */
-    protected $em;
 
     /**
      * {@inheritdoc}
