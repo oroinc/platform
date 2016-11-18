@@ -15,12 +15,13 @@ use Oro\Bundle\WorkflowBundle\Handler\WorkflowDefinitionHandler;
 
 class LoadWorkflowDefinitionsCommand extends ContainerAwareCommand
 {
+    const NAME = 'oro:workflow:definitions:load';
     /**
      * {@inheritdoc}
      */
     protected function configure()
     {
-        $this->setName('oro:workflow:definitions:load')
+        $this->setName(self::NAME)
             ->setDescription('Load workflow definitions from configuration files to the database')
             ->addOption(
                 'directories',

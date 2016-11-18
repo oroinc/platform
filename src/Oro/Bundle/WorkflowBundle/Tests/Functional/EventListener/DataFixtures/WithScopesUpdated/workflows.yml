@@ -1,0 +1,33 @@
+workflows:
+    test_flow_with_scopes:
+        entity: Oro\Bundle\TestFrameworkBundle\Entity\WorkflowAwareEntity
+        priority: 60
+        scopes:
+            -
+                test_activity: 2
+        steps:
+            open:
+                order: 10
+                allowed_transitions: ['start_transition']
+        transition_definitions:
+            start_transiotion_definition: ~
+        transitions:
+            start_transition:
+                step_to: open
+                is_start: true
+                transition_definition: start_transiotion_definition
+
+    test_flow_without_scopes:
+        entity: Oro\Bundle\TestFrameworkBundle\Entity\WorkflowAwareEntity
+        priority: 20
+        start_step: open
+        steps:
+            open:
+                order: 10
+                allowed_transitions: ['start_transition']
+        transition_definitions:
+            start_transiotion_definition: ~
+        transitions:
+            start_transition:
+                step_to: open
+                transition_definition: start_transiotion_definition

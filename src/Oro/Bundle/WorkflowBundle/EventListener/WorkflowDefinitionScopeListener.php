@@ -41,7 +41,7 @@ class WorkflowDefinitionScopeListener
         $definition = $event->getDefinition();
 
         if ($definition->getScopesConfig()) {
-            $this->updateScopes($event->getDefinition());
+            $this->updateScopes($definition);
         }
     }
 
