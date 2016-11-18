@@ -73,15 +73,14 @@ class HttpImportMessageProcessor implements MessageProcessorInterface, TopicSubs
         $body = JSON::decode($message->getBody());
 
         $body = array_replace_recursive([
+            'fileName' => null,
             'userId' => null,
             'jobName' => JobExecutor::JOB_IMPORT_FROM_CSV,
             'processorAlias' => null,
-            'inputFormat' => 'csv',
-            'inputFilePrefix' => null,
-            'options' => []
+            'options' => [],
         ], $body);
 
-        if (! $body['processorAlias'] || ! $body['userId']) {
+        if (! $body['fileName'] || ! $body['processorAlias'] || ! $body['userId']) {
             $this->logger->critical(
                 sprintf('Invalid message: %s', $body),
                 ['message' => $message]
@@ -94,11 +93,10 @@ class HttpImportMessageProcessor implements MessageProcessorInterface, TopicSubs
             $message->getMessageId(),
             sprintf('oro:import:http:%s:%s', $body['processorAlias'], $message->getMessageId()),
             function () use ($body) {
+                $this->httpImportHandler->setImportingFileName($body['fileName']);
                 $result = $this->httpImportHandler->handleImport(
                     $body['jobName'],
                     $body['processorAlias'],
-                    $body['inputFormat'],
-                    $body['inputFilePrefix'],
                     $body['options']
                 );
 

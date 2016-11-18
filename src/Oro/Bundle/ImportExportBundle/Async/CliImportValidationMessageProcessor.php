@@ -67,8 +67,6 @@ class CliImportValidationMessageProcessor implements MessageProcessorInterface, 
             'notifyEmail' => null,
             'jobName' => JobExecutor::JOB_VALIDATE_IMPORT_FROM_CSV,
             'processorAlias' => null,
-            'inputFormat' => 'csv',
-            'inputFilePrefix' => null,
             'options' => []
         ], $body);
 
@@ -90,8 +88,6 @@ class CliImportValidationMessageProcessor implements MessageProcessorInterface, 
                 $result = $this->cliImportHandler->handleImportValidation(
                     $body['jobName'],
                     $body['processorAlias'],
-                    $body['inputFormat'],
-                    $body['inputFilePrefix'],
                     $body['options']
                 );
 

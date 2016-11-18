@@ -2,33 +2,17 @@
 
 namespace Oro\Bundle\ImportExportBundle\Handler;
 
-use Symfony\Component\HttpFoundation\File\File;
-use Symfony\Component\HttpFoundation\Session\SessionInterface;
-use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
-use Symfony\Component\Routing\RouterInterface;
+use Oro\Bundle\ImportExportBundle\Context\StepExecutionProxyContext;
 
 use Oro\Bundle\ImportExportBundle\Processor\ProcessorRegistry;
-use Oro\Bundle\ImportExportBundle\Context\StepExecutionProxyContext;
+use Symfony\Component\Routing\RouterInterface;
 
 class HttpImportHandler extends AbstractImportHandler
 {
     /**
-     * @var SessionInterface
-     */
-    protected $session;
-
-    /**
      * @var RouterInterface
      */
     protected $router;
-
-    /**
-     * @param SessionInterface $session
-     */
-    public function setSession(SessionInterface $session)
-    {
-        $this->session = $session;
-    }
 
     /**
      * @param RouterInterface $router
@@ -109,20 +93,13 @@ class HttpImportHandler extends AbstractImportHandler
     public function handleImport(
         $jobName,
         $processorAlias,
-        $inputFormat = 'csv',
-        $inputFilePrefix = null,
         array $options = []
     ) {
-        if ($inputFilePrefix === null) {
-            $inputFilePrefix = $processorAlias;
-        }
-
-        $jobResult = $this->executeJob($jobName, $processorAlias, $inputFormat, $options, $inputFilePrefix);
+        $jobResult = $this->executeJob($jobName, $processorAlias, $options);
         $counts = $this->getValidationCounts($jobResult);
         $importInfo = '';
         
         if ($jobResult->isSuccessful()) {
-            $this->removeImportingFile($inputFormat, $inputFilePrefix);
             $message = $this->translator->trans('oro.importexport.import.success');
 
             $entityName = $this->processorRegistry->getProcessorEntityName(
@@ -149,60 +126,6 @@ class HttpImportHandler extends AbstractImportHandler
             'importInfo' => $importInfo,
             'errorsUrl'  => $errorsUrl,
         ];
-    }
-
-    /**
-     * Saves the given file in a temporary directory and remember the name of temporary file in a session
-     *
-     * @param File   $file
-     * @param string $temporaryFilePrefix
-     * @param string $temporaryFileExtension
-     */
-    public function saveImportingFile(File $file, $temporaryFilePrefix, $temporaryFileExtension)
-    {
-        $tmpFileName = $this->fileSystemOperator
-            ->generateTemporaryFileName($temporaryFilePrefix, $temporaryFileExtension);
-        $file->move(dirname($tmpFileName), basename($tmpFileName));
-
-        $this->session->set(
-            $this->getImportFileSessionKey($temporaryFilePrefix, $temporaryFileExtension),
-            $tmpFileName
-        );
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    protected function getImportingFileName($inputFormat, $inputFilePrefix = null)
-    {
-        $fileName = $this->session
-            ->get($this->getImportFileSessionKey($inputFilePrefix, $inputFormat));
-        if (!$fileName || !file_exists($fileName)) {
-            throw new BadRequestHttpException('No file to import');
-        }
-
-        return $fileName;
-    }
-
-    /**
-     * Removes session variable for the given import file
-     *
-     * @param string $inputFilePrefix
-     * @param string $inputFormat
-     */
-    protected function removeImportingFile($inputFilePrefix, $inputFormat)
-    {
-        $this->session->remove($this->getImportFileSessionKey($inputFilePrefix, $inputFormat));
-    }
-
-    /**
-     * @param string $inputFilePrefix
-     * @param string $inputFormat
-     * @return string
-     */
-    protected function getImportFileSessionKey($inputFilePrefix, $inputFormat)
-    {
-        return sprintf('oro_importexport_import_%s_%s', $inputFilePrefix, $inputFormat);
     }
 
     /**

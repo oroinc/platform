@@ -67,8 +67,6 @@ class CliImportMessageProcessor implements MessageProcessorInterface, TopicSubsc
             'notifyEmail' => null,
             'jobName' => JobExecutor::JOB_IMPORT_FROM_CSV,
             'processorAlias' => null,
-            'inputFormat' => 'csv',
-            'inputFilePrefix' => null,
             'options' => []
         ], $body);
 

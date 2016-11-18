@@ -55,7 +55,9 @@ class ImportExportController extends Controller
                 $file           = $data->getFile();
                 $processorAlias = $data->getProcessorAlias();
 
-                $this->getImportHandler()->saveImportingFile($file, $processorAlias, 'csv');
+                $this->getImportHandler()->setImportingFileName($file->getClientOriginalName());
+
+                $this->getMessageProducer()->send(Topics::IMPORT_HTTP, []);
 
                 return $this->forward(
                     'OroImportExportBundle:ImportExport:importValidate',

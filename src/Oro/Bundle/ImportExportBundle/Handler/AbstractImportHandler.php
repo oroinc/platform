@@ -2,18 +2,21 @@
 
 namespace Oro\Bundle\ImportExportBundle\Handler;
 
-use Oro\Bundle\ImportExportBundle\Processor\ProcessorRegistry;
 use Oro\Bundle\ImportExportBundle\Job\JobResult;
+use Oro\Bundle\ImportExportBundle\Processor\ProcessorRegistry;
 
 abstract class AbstractImportHandler extends AbstractHandler
 {
+    /**
+     * @var string
+     */
+    protected $importingFileName;
+
     /**
      * Handles import validation action
      *
      * @param string $jobName
      * @param string $processorAlias
-     * @param string $inputFormat
-     * @param string $inputFilePrefix
      * @param array  $options
      *
      * @return array response parameters
@@ -21,8 +24,6 @@ abstract class AbstractImportHandler extends AbstractHandler
     abstract public function handleImportValidation(
         $jobName,
         $processorAlias,
-        $inputFormat = 'csv',
-        $inputFilePrefix = null,
         array $options = []
     );
 
@@ -31,8 +32,6 @@ abstract class AbstractImportHandler extends AbstractHandler
      *
      * @param string $jobName
      * @param string $processorAlias
-     * @param string $inputFormat
-     * @param string $inputFilePrefix
      * @param array  $options
      *
      * @return array
@@ -40,30 +39,35 @@ abstract class AbstractImportHandler extends AbstractHandler
     abstract public function handleImport(
         $jobName,
         $processorAlias,
-        $inputFormat = 'csv',
-        $inputFilePrefix = null,
         array $options = []
     );
 
     /**
-     * @param $inputFormat
-     * @param null $inputFilePrefix
      * @return string
      */
-    abstract protected function getImportingFileName($inputFormat, $inputFilePrefix = null);
+    protected function getImportingFileName()
+    {
+        return $this->importingFileName;
+    }
+
+    /**
+     * @param string $fileName
+     */
+    public function setImportingFileName($fileName)
+    {
+        $this->importingFileName = $fileName;
+    }
 
     /**
      * @param string $jobName
      * @param string $processorAlias
-     * @param string $inputFormat
-     * @param string $inputFilePrefix
      * @param array $options
      *
      * @return JobResult
      */
-    protected function executeJob($jobName, $processorAlias, $inputFormat, array $options, $inputFilePrefix = null)
+    protected function executeJob($jobName, $processorAlias, array $options)
     {
-        $fileName = $this->getImportingFileName($inputFormat, $inputFilePrefix);
+        $fileName = $this->getImportingFileName();
         $entityName = $this->processorRegistry->getProcessorEntityName(
             ProcessorRegistry::TYPE_IMPORT,
             $processorAlias
@@ -119,8 +123,6 @@ abstract class AbstractImportHandler extends AbstractHandler
     /**
      * @param $jobName
      * @param $processorAlias
-     * @param $inputFormat
-     * @param $inputFilePrefix
      * @param array $options
      * @param $entityName
      * @return JobResult
@@ -128,12 +130,10 @@ abstract class AbstractImportHandler extends AbstractHandler
     protected function executeValidation(
         $jobName,
         $processorAlias,
-        $inputFormat,
-        $inputFilePrefix,
         array $options,
         $entityName
     ) {
-        $fileName = $this->getImportingFileName($inputFormat, $inputFilePrefix);
+        $fileName = $this->getImportingFileName();
         $configuration = [
             'import_validation' =>
                 array_merge(
