@@ -5,15 +5,16 @@ namespace Oro\Bundle\NoteBundle\Entity\Repository;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\QueryBuilder;
 
+use Oro\Bundle\ActivityBundle\EntityConfig\ActivityScope;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 
 class NoteRepository extends EntityRepository
 {
     /**
-     * @param string   $entityClassName
-     * @param mixed    $entityId
-     * @param int|null $page
-     * @param int|null $limit
+     * @param string    $entityClassName
+     * @param int|int[] $entityId
+     * @param int|null  $page
+     * @param int|null  $limit
      *
      * @return QueryBuilder
      */
@@ -24,11 +25,9 @@ class NoteRepository extends EntityRepository
             ->leftJoin('note.owner', 'c')
             ->leftJoin('note.updatedBy', 'u');
 
-        if (null !== $page) {
-            $qb->setFirstResult($this->getOffset($page) * $limit);
-        }
         if (null !== $limit) {
             $qb->setMaxResults($limit);
+            $qb->setFirstResult($this->getOffset($page, $limit));
         }
 
         return $qb;
@@ -38,32 +37,32 @@ class NoteRepository extends EntityRepository
      * Get offset by page
      *
      * @param  int|null $page
+     * @param  int      $limit
+     *
      * @return int
      */
-    protected function getOffset($page)
+    protected function getOffset($page, $limit)
     {
-        if (!$page !== null) {
-            $page = $page > 0 ? $page - 1 : 0;
+        $page = (int)$page;
+        if ($page > 1) {
+            return ($page - 1) * $limit;
         }
 
-        return $page;
+        return 0;
     }
 
     /**
-     * @param $entityClassName
-     * @param $entityId
+     * @param string    $entityClassName
+     * @param int|int[] $entityId
+     *
      * @return QueryBuilder
      */
     public function getBaseAssociatedNotesQB($entityClassName, $entityId)
     {
         $ids = is_array($entityId) ? $entityId : [$entityId];
+        $relationFieldName = ExtendHelper::buildAssociationName($entityClassName, ActivityScope::ASSOCIATION_KIND);
         $queryBuilder = $this->createQueryBuilder('note')
-            ->innerJoin(
-                $entityClassName,
-                'e',
-                'WITH',
-                sprintf('note.%s = e', ExtendHelper::buildAssociationName($entityClassName))
-            );
+            ->innerJoin(sprintf('note.%s', $relationFieldName), 'e');
         $queryBuilder->where($queryBuilder->expr()->in('e.id', $ids));
 
         return $queryBuilder;

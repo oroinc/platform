@@ -19,12 +19,6 @@ services:
             - '@oro_attachment.provider.attachment'
             - '@oro_attachment.manager'
 
-    oro_note.association_helper:
-        class: Oro\Bundle\NoteBundle\Tools\NoteAssociationHelper
-        public: false
-        arguments:
-            - '@oro_entity_config.config_manager'
-
     oro_note.manager.api:
         class: %oro_note.manager.api.class%
         parent: oro_soap.manager.entity_manager.abstract
@@ -37,7 +31,7 @@ services:
         arguments:
            - '@oro_entity.doctrine_helper'
            - '@oro_security.owner.entity_owner_accessor.link'
-           - '@oro_note.association_helper'
+           - '@oro_activity.association_helper'
            - '@oro_comment.association_helper'
         tags:
            - {name: oro_activity_list.provider, priority: 40}

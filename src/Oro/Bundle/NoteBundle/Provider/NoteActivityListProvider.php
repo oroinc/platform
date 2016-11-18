@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\NoteBundle\Provider;
 
+use Oro\Bundle\ActivityBundle\Tools\ActivityAssociationHelper;
 use Oro\Bundle\ActivityListBundle\Entity\ActivityList;
 use Oro\Bundle\ActivityListBundle\Model\ActivityListProviderInterface;
 use Oro\Bundle\ActivityListBundle\Entity\ActivityOwner;
@@ -12,7 +13,6 @@ use Oro\Bundle\CommentBundle\Tools\CommentAssociationHelper;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink;
 use Oro\Bundle\NoteBundle\Entity\Note;
-use Oro\Bundle\NoteBundle\Tools\NoteAssociationHelper;
 
 class NoteActivityListProvider implements
     ActivityListProviderInterface,
@@ -29,27 +29,27 @@ class NoteActivityListProvider implements
     /** @var ServiceLink */
     protected $entityOwnerAccessorLink;
 
-    /** @var NoteAssociationHelper */
-    protected $noteAssociationHelper;
+    /** @var ActivityAssociationHelper */
+    protected $activityAssociationHelper;
 
     /** @var CommentAssociationHelper */
     protected $commentAssociationHelper;
 
     /**
-     * @param DoctrineHelper           $doctrineHelper
-     * @param ServiceLink              $entityOwnerAccessorLink
-     * @param NoteAssociationHelper    $noteAssociationHelper
-     * @param CommentAssociationHelper $commentAssociationHelper
+     * @param DoctrineHelper            $doctrineHelper
+     * @param ServiceLink               $entityOwnerAccessorLink
+     * @param ActivityAssociationHelper $activityAssociationHelper
+     * @param CommentAssociationHelper  $commentAssociationHelper
      */
     public function __construct(
         DoctrineHelper $doctrineHelper,
         ServiceLink $entityOwnerAccessorLink,
-        NoteAssociationHelper $noteAssociationHelper,
+        ActivityAssociationHelper $activityAssociationHelper,
         CommentAssociationHelper $commentAssociationHelper
     ) {
-        $this->doctrineHelper           = $doctrineHelper;
-        $this->entityOwnerAccessorLink  = $entityOwnerAccessorLink;
-        $this->noteAssociationHelper    = $noteAssociationHelper;
+        $this->doctrineHelper = $doctrineHelper;
+        $this->entityOwnerAccessorLink = $entityOwnerAccessorLink;
+        $this->activityAssociationHelper = $activityAssociationHelper;
         $this->commentAssociationHelper = $commentAssociationHelper;
     }
 
@@ -58,7 +58,11 @@ class NoteActivityListProvider implements
      */
     public function isApplicableTarget($entityClass, $accessible = true)
     {
-        return $this->noteAssociationHelper->isNoteAssociationEnabled($entityClass, $accessible);
+        return $this->activityAssociationHelper->isActivityAssociationEnabled(
+            $entityClass,
+            self::ACTIVITY_CLASS,
+            $accessible
+        );
     }
 
     /**
