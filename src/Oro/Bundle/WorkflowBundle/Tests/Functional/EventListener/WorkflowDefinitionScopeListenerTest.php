@@ -4,7 +4,9 @@ namespace Oro\Bundle\WorkflowBundle\Tests\Functional\EventListener;
 
 use Oro\Bundle\TestFrameworkBundle\Entity\TestActivity;
 use Oro\Bundle\TestFrameworkBundle\Tests\Functional\TestActivityScopeProvider;
-use Oro\Bundle\WorkflowBundle\Tests\Functional\EventListener\DataFixtures\LoadTestActivitiesForScopes;
+use Oro\Bundle\WorkflowBundle\Event\WorkflowChangesEvent;
+use Oro\Bundle\WorkflowBundle\Event\WorkflowEvents;
+use Oro\Bundle\WorkflowBundle\Tests\Functional\DataFixtures\LoadTestActivitiesForScopes;
 use Oro\Bundle\WorkflowBundle\Tests\Functional\WorkflowTestCase;
 
 /**
@@ -32,11 +34,60 @@ class WorkflowDefinitionScopeListenerTest extends WorkflowTestCase
     {
         $this->loadFixtures([LoadTestActivitiesForScopes::class]);
 
-        self::loadWorkflowFrom(self::DEFAULT_WORKFLOWS);
-
+        /** @var TestActivity $activity */
         $activity = $this->getReference('test_activity_1');
 
-        $this->assertInstanceOf(TestActivity::class, $activity);
+        self::getContainer()->get('oro_workflow.changes.event.dispatcher')->addListener(
+            WorkflowEvents::WORKFLOW_BEFORE_CREATE,
+            function (WorkflowChangesEvent $changesEvent) use ($activity) {
+                $definition = $changesEvent->getDefinition();
+                if ($definition->getName() === 'test_flow_with_scopes') {
+                    $definition->setScopesConfig(
+                        [
+                            [
+                                'test_activity' => $activity->getId()
+                            ]
+                        ]
+                    );
+                }
+            }
+        );
+
+        self::loadWorkflowFrom(self::DEFAULT_WORKFLOWS);
+
+        $registry = self::getContainer()->get('oro_workflow.registry');
+        $workflow = $registry->getWorkflow('test_flow_with_scopes');
+        $scopes = $workflow->getDefinition()->getScopes();
+        $this->assertCount(1, $scopes);
+    }
+
+    /**
+     * @depends testScopesCreated
+     */
+    public function testScopesUpdated($activityId)
+    {
+        $this->loadFixtures([LoadTestActivitiesForScopes::class]);
+
+        /** @var TestActivity $activity */
+        $activity = $this->getReference('test_activity_1');
+
+        self::getContainer()->get('oro_workflow.changes.event.dispatcher')->addListener(
+            WorkflowEvents::WORKFLOW_BEFORE_CREATE,
+            function (WorkflowChangesEvent $changesEvent) use ($activity) {
+                $definition = $changesEvent->getDefinition();
+                if ($definition->getName() === 'test_flow_with_scopes') {
+                    $definition->setScopesConfig(
+                        [
+                            [
+                                'test_activity' => $activity->getId()
+                            ]
+                        ]
+                    );
+                }
+            }
+        );
+
+        self::loadWorkflowFrom(self::DEFAULT_WORKFLOWS);
 
         $registry = self::getContainer()->get('oro_workflow.registry');
         $workflow = $registry->getWorkflow('test_flow_with_scopes');
