@@ -52,6 +52,8 @@ class WorkflowDefinition implements DomainObjectInterface
     const GROUP_TYPE_EXCLUSIVE_ACTIVE = 10;
     const GROUP_TYPE_EXCLUSIVE_RECORD = 20;
 
+    const CONFIG_SCOPES = 'scopes';
+
     /**
      * @var string
      *
@@ -247,22 +249,15 @@ class WorkflowDefinition implements DomainObjectInterface
     {
         $configuration = $this->getConfiguration();
 
-        return array_key_exists('scopes', $configuration) ? (array)$configuration['scopes'] : [];
+        return array_key_exists('scopes', $configuration) ? (array)$configuration[self::CONFIG_SCOPES] : [];
     }
 
     /**
-     * @param array $scopesConfig
-     *
-     * @return WorkflowDefinition
+     * @return boolean
      */
-    public function setScopesConfig(array $scopesConfig)
+    public function hasScopesConfig()
     {
-        $configuration = $this->getConfiguration();
-        $configuration['scopes'] = $scopesConfig;
-
-        $this->setConfiguration($configuration);
-
-        return $this;
+        return !empty($this->getConfiguration()[self::CONFIG_SCOPES]);
     }
 
     /**

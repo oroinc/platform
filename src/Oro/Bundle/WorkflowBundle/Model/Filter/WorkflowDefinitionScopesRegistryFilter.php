@@ -4,7 +4,6 @@ namespace Oro\Bundle\WorkflowBundle\Model\Filter;
 
 use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\Persistence\ManagerRegistry;
-use Doctrine\ORM\Query\Expr\Join;
 
 use Oro\Bundle\ScopeBundle\Manager\ScopeManager;
 use Oro\Bundle\WorkflowBundle\Entity\Repository\WorkflowDefinitionRepository;
@@ -33,40 +32,40 @@ class WorkflowDefinitionScopesRegistryFilter implements WorkflowDefinitionFilter
      */
     public function filter(Collection $workflowDefinitions)
     {
-        /**
-         * @var Collection|WorkflowDefinition[] $scopeAwareDefinitions
-         * @var Collection|WorkflowDefinition[] $otherDefinitions
-         */
-        list($scopeAwareDefinitions, $otherDefinitions) = $workflowDefinitions->partition(
-            function ($name, WorkflowDefinition $workflowDefinition) {
-                return count($workflowDefinition->getScopesConfig()) !== 0;
+        $scopeAwareDefinitions = $workflowDefinitions->filter(
+            function (WorkflowDefinition $workflowDefinition) {
+                return $workflowDefinition->hasScopesConfig();
             }
         );
 
-        $scopeMatches = $this->getScopeMatched($scopeAwareDefinitions->getValues());
+        if ($scopeAwareDefinitions->isEmpty()) {
+            return $workflowDefinitions;
+        }
 
-        foreach ($scopeAwareDefinitions as $name => $workflowDefinition) {
-            if (in_array($workflowDefinition->getName(), $scopeMatches, true)) {
-                $otherDefinitions->set($name, $workflowDefinition);
+        $scopeMatches = $this->getScopeMatches($scopeAwareDefinitions->getValues());
+
+        foreach ($workflowDefinitions as $key => $workflowDefinition) {
+            $name = $workflowDefinition->getName();
+            if ($scopeAwareDefinitions->contains($workflowDefinition) && !in_array($name, $scopeMatches, true)) {
+                $workflowDefinitions->remove($key);
             }
         }
 
-        return $otherDefinitions;
+        return $workflowDefinitions;
     }
 
     /**
      * @param array $workflowDefinitions
      * @return array
      */
-    private function getScopeMatched(array $workflowDefinitions)
+    private function getScopeMatches(array $workflowDefinitions)
     {
-        $qb = $this->getWorkflowDefinitionRepository()->getByNamesQueryBuilder($this->getNames($workflowDefinitions));
-        $qb->join('wd.scopes', 'scopes', Join::WITH);
+        $scopeDefinitions = $this->getWorkflowDefinitionRepository()->getScopedByNames(
+            $this->getNames($workflowDefinitions),
+            $this->scopeManager->getCriteria('workflow_definition')
+        );
 
-        $criteria = $this->scopeManager->getCriteria('workflow_definition');
-        $criteria->applyToJoinWithPriority($qb, 'scopes');
-
-        return $this->getNames($qb->getQuery()->getResult());
+        return $this->getNames($scopeDefinitions);
     }
 
     /**

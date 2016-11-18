@@ -5,9 +5,6 @@ namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Model\Filter;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\Common\Persistence\ObjectManager;
-use Doctrine\ORM\AbstractQuery;
-use Doctrine\ORM\Query\Expr\Join;
-use Doctrine\ORM\QueryBuilder;
 
 use Oro\Bundle\ScopeBundle\Manager\ScopeManager;
 use Oro\Bundle\ScopeBundle\Model\ScopeCriteria;
@@ -48,39 +45,20 @@ class WorkflowDefinitionScopesRegistryFilterTest extends \PHPUnit_Framework_Test
         array $matchingScopesDefinitionsResult,
         ArrayCollection $expectedResult
     ) {
-        $this->getScopeMatchedMocking($scopedWorkflowNames, $matchingScopesDefinitionsResult);
-        $this->assertEquals($expectedResult, $this->filter->filter($incomingDefinitions));
-    }
-
-    /**
-     * @param array $scopedWorkflowNames
-     * @param array $result
-     */
-    private function getScopeMatchedMocking(array $scopedWorkflowNames, array $result)
-    {
-        $queryBuilder = $this->getMockBuilder(QueryBuilder::class)->disableOriginalConstructor()->getMock();
-        $query = $this->getMockBuilder(AbstractQuery::class)
-            ->disableOriginalConstructor()->setMethods(['getResult'])->getMockForAbstractClass();
         $scopeCriteria = $this->getMockBuilder(ScopeCriteria::class)->disableOriginalConstructor()->getMock();
-
-        $this->repositoryMocked()->expects($this->once())
-            ->method('getByNamesQueryBuilder')->with($scopedWorkflowNames)
-            ->willReturn($queryBuilder);
-
-        $queryBuilder->expects($this->once())
-            ->method('join')->with('wd.scopes', 'scopes', Join::WITH)
-            ->willReturnSelf();
 
         $this->scopeManager->expects($this->once())
             ->method('getCriteria')->with('workflow_definition')->willReturn($scopeCriteria);
 
-        $scopeCriteria->expects($this->once())
-            ->method('applyToJoinWithPriority')->with($queryBuilder, 'scopes');
+        $this->repositoryMocked()->expects($this->once())
+            ->method('getScopedByNames')->with($scopedWorkflowNames, $scopeCriteria)
+            ->willReturn($matchingScopesDefinitionsResult);
 
-        $queryBuilder->expects($this->once())
-            ->method('getQuery')->willReturn($query);
-
-        $query->expects($this->once())->method('getResult')->willReturn($result);
+        $this->assertSame(
+            $expectedResult->toArray(),
+            $this->filter->filter($incomingDefinitions)->toArray(),
+            'Entities and order should be kept.'
+        );
     }
 
     /**
@@ -109,13 +87,17 @@ class WorkflowDefinitionScopesRegistryFilterTest extends \PHPUnit_Framework_Test
      */
     public function filterDataProvider()
     {
+        $wd1 = (new WorkflowDefinition)->setName('wd1')->setConfiguration(['scopes' => ['a' => 1]]);
+        $wd2 = (new WorkflowDefinition)->setName('wd2')->setConfiguration(['scopes' => ['a' => 1]]);
+        $wd3 = (new WorkflowDefinition)->setName('wd3');
+
         return [
             'full case' => [
                 'definitions to filter' => new ArrayCollection(
                     [
-                        'wd1' => (new WorkflowDefinition)->setName('wd1')->setConfiguration(['scopes' => [['a' => 1]]]),
-                        'wd2' => (new WorkflowDefinition)->setName('wd2')->setConfiguration(['scopes' => [['a' => 1]]]),
-                        'wd3' => (new WorkflowDefinition)->setName('wd3')
+                        'wd1' => $wd1,
+                        'wd2' => $wd2,
+                        'wd3' => $wd3
                     ]
                 ),
                 'has scope configs' => [
@@ -123,12 +105,12 @@ class WorkflowDefinitionScopesRegistryFilterTest extends \PHPUnit_Framework_Test
                     'wd2'
                 ],
                 'query result matched by scopes' => [
-                    (new WorkflowDefinition)->setName('wd1')->setConfiguration(['scopes' => [['a' => 1]]])
+                    $wd1
                 ],
                 'expected' => new ArrayCollection(
                     [
-                        'wd1' => (new WorkflowDefinition)->setName('wd1')->setConfiguration(['scopes' => [['a' => 1]]]),
-                        'wd3' => (new WorkflowDefinition)->setName('wd3')
+                        'wd1' => $wd1,
+                        'wd3' => $wd3
                     ]
                 )
             ]

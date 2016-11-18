@@ -3,7 +3,9 @@
 namespace Oro\Bundle\WorkflowBundle\Entity\Repository;
 
 use Doctrine\ORM\EntityRepository;
+use Doctrine\ORM\Query\Expr\Join;
 
+use Oro\Bundle\ScopeBundle\Model\ScopeCriteria;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 
 class WorkflowDefinitionRepository extends EntityRepository
@@ -24,15 +26,18 @@ class WorkflowDefinitionRepository extends EntityRepository
 
     /**
      * @param array $names
-     * @return \Doctrine\ORM\QueryBuilder
+     * @param ScopeCriteria $scopeCriteria
+     * @return array|WorkflowDefinition[]
      */
-    public function getByNamesQueryBuilder(array $names)
+    public function getScopedByNames(array $names, ScopeCriteria $scopeCriteria)
     {
         $qb = $this->createQueryBuilder('wd', 'wd.name');
-
+        $qb->join('wd.scopes', 'scopes', Join::WITH);
         $qb->andWhere($qb->expr()->in('wd.name', ':names'));
         $qb->setParameter('names', $names);
 
-        return $qb;
+        $scopeCriteria->applyToJoinWithPriority($qb, 'scopes');
+
+        return $qb->getQuery()->getResult();
     }
 }
