@@ -8,3 +8,8 @@ oro:
             max:  "]-Inf,Inf[The value have not to be more than {{ limit }}."
             exect: "]-Inf,Inf[The value have to be equal {{ limit }}."
             nan: "Please enter a valid number."
+        datetime:
+            invalid: "This value is not a valid datetime."
+            min: "The value have to not be earlier than {{ limit }}."
+            max:  "The value have to not be later than {{ limit }}."
+

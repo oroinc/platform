@@ -97,7 +97,8 @@ define(function(require) {
             if (options.fieldsWrapper) {
                 this.$frontDateField
                     .wrap(options.fieldsWrapper)
-                    .data('isWrapped', true);
+                    .data('isWrapped', true)
+                    .before(this.$el);
             }
             this.$frontTimeField = $('<input />');
             options.timeInputAttrs.type = this.nativeMode ? 'time' : 'text';
