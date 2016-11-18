@@ -263,7 +263,7 @@ class WorkflowDefinitionConfigurationBuilderTest extends \PHPUnit_Framework_Test
     protected function filterConfiguration(array $configuration)
     {
         $configurationKeys = [
-            WorkflowConfiguration::NODE_SCOPES,
+            WorkflowDefinition::CONFIG_SCOPES,
             WorkflowConfiguration::NODE_STEPS,
             WorkflowConfiguration::NODE_ATTRIBUTES,
             WorkflowConfiguration::NODE_TRANSITIONS,

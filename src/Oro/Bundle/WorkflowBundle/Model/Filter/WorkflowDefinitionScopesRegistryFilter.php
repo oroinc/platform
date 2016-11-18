@@ -42,7 +42,7 @@ class WorkflowDefinitionScopesRegistryFilter implements WorkflowDefinitionFilter
             return $workflowDefinitions;
         }
 
-        $scopeMatches = $this->getScopeMatched($scopeAwareDefinitions->getValues());
+        $scopeMatches = $this->getScopeMatches($scopeAwareDefinitions->getValues());
 
         foreach ($workflowDefinitions as $key => $workflowDefinition) {
             $name = $workflowDefinition->getName();
@@ -58,7 +58,7 @@ class WorkflowDefinitionScopesRegistryFilter implements WorkflowDefinitionFilter
      * @param array $workflowDefinitions
      * @return array
      */
-    private function getScopeMatched(array $workflowDefinitions)
+    private function getScopeMatches(array $workflowDefinitions)
     {
         $scopeDefinitions = $this->getWorkflowDefinitionRepository()->getScopedByNames(
             $this->getNames($workflowDefinitions),
