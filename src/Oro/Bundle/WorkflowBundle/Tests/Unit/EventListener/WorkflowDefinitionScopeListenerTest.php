@@ -262,7 +262,7 @@ class WorkflowDefinitionScopeListenerTest extends \PHPUnit_Framework_TestCase
         return $this->getEntity(
             WorkflowDefinition::class,
             [
-                'scopesConfig' => $scopesConfig,
+                'configuration' => [WorkflowDefinition::CONFIG_SCOPES => $scopesConfig],
                 'scopes' => new ArrayCollection($scopes)
             ]
         );
