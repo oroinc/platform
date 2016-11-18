@@ -19,6 +19,10 @@ elements:
     selector: 'div.filter-box'
     class: Oro\Bundle\DataGridBundle\Tests\Behat\Element\GridFilters
 
+  GridFilersButton:
+    selector: 'div.toolbar div.actions-panel .action[title=Filters]'
+    class: Oro\Bundle\DataGridBundle\Tests\Behat\Element\GridFiltersButton
+
   GridFilterStringItem:
     selector: 'div.filter-item'
     class: Oro\Bundle\DataGridBundle\Tests\Behat\Element\GridFilterStringItem
