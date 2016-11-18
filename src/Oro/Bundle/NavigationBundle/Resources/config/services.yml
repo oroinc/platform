@@ -347,7 +347,6 @@ services:
         class: Oro\Bundle\NavigationBundle\Builder\MenuUpdateBuilder
         arguments:
             - '@oro_locale.helper.localization'
-            - '@oro_scope.scope_manager'
         tags:
             - { name: oro_menu.builder, priority: 100 }
 
