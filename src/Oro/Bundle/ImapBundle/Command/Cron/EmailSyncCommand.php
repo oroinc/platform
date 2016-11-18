@@ -111,6 +111,13 @@ class EmailSyncCommand extends ContainerAwareCommand implements CronCommandInter
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
+        $featureChecker = $this->getContainer()->get('oro_featuretoggle.checker.feature_checker');
+        if (!$featureChecker->isFeatureEnabled('email')) {
+            $output->writeln('The email feature is disabled. The command will not run.');
+
+            return 0;
+        }
+
         /** @var ImapEmailSynchronizer $synchronizer */
         $synchronizer = $this->getContainer()->get('oro_imap.email_synchronizer');
         $synchronizer->setLogger(new OutputLogger($output));
