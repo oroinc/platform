@@ -26,4 +26,12 @@ class BlockView extends FormView
 
         unset($this->vars['value']);
     }
+
+    /**
+     * @return string
+     */
+    public function getId()
+    {
+        return array_key_exists('id', $this->vars) ? $this->vars['id'] : null;
+    }
 }
