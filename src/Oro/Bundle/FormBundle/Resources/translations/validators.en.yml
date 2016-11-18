@@ -4,7 +4,7 @@
 oro:
     form:
         number:
-            min: "]-Inf,Inf[The value have to be more than {{ limit }}."
-            max:  "]-Inf,Inf[The value have to be less than {{ limit }}."
+            min: "]-Inf,Inf[The value have not to be less than {{ limit }}."
+            max:  "]-Inf,Inf[The value have not to be more than {{ limit }}."
             exect: "]-Inf,Inf[The value have to be equal {{ limit }}."
             nan: "Please enter a valid number."
