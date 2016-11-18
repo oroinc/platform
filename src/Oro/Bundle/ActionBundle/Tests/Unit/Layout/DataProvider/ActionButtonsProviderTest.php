@@ -33,13 +33,25 @@ class ActionButtonsProviderTest extends \PHPUnit_Framework_TestCase
     public function testGetDialogRoute()
     {
         $result = 'dialog_route';
-        
+
         $this->applicationsHelper
             ->expects($this->once())
-            ->method('getDialogRoute')
+            ->method('getFormDialogRoute')
             ->will($this->returnValue($result));
-        
+
         $this->assertSame($result, $this->provider->getDialogRoute());
+    }
+
+    public function testGetPageRoute()
+    {
+        $result = 'page_route';
+
+        $this->applicationsHelper
+            ->expects($this->once())
+            ->method('getFormPageRoute')
+            ->will($this->returnValue($result));
+
+        $this->assertSame($result, $this->provider->getPageRoute());
     }
 
     public function testGetExecutionRoute()

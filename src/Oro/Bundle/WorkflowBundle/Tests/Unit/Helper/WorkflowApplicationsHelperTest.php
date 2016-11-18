@@ -31,7 +31,8 @@ class WorkflowApplicationsHelperTest extends \PHPUnit_Framework_TestCase
     public function testGetSetRouteParam()
     {
         $parameters = [
-            ['dialogRoute', 'url1'],
+            ['formDialogRoute', 'url1'],
+            ['formPageRoute', 'url4'],
             ['executionRoute', 'url2'],
             ['widgetRoute', 'url3']
         ];

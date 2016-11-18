@@ -41,7 +41,7 @@ class WidgetController extends Controller
             'operations' => $this->getOperationManager()->getOperations(),
             'context' => $contextHelper->getContext(),
             'actionData' => $contextHelper->getActionData(),
-            'dialogRoute' => $applicationsHelper->getDialogRoute(),
+            'dialogRoute' => $applicationsHelper->getFormDialogRoute(),
             'executionRoute' => $applicationsHelper->getExecutionRoute(),
             'fromUrl' => $request->get('fromUrl'),
         ];

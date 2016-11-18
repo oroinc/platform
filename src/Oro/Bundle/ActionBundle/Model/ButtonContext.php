@@ -20,10 +20,13 @@ class ButtonContext
     protected $group;
 
     /** @var string */
-    protected $executionUrl;
+    protected $executionRoute;
 
     /** @var string */
-    protected $dialogUrl;
+    protected $formDialogRoute;
+
+    /** @var string */
+    protected $formPageRoute;
 
     /** @var bool */
     protected $enabled;
@@ -124,19 +127,19 @@ class ButtonContext
     /**
      * @return string
      */
-    public function getExecutionUrl()
+    public function getExecutionRoute()
     {
-        return $this->executionUrl;
+        return $this->executionRoute;
     }
 
     /**
-     * @param string $executionUrl
+     * @param string $executionRoute
      *
      * @return $this
      */
-    public function setExecutionUrl($executionUrl)
+    public function setExecutionRoute($executionRoute)
     {
-        $this->executionUrl = $executionUrl;
+        $this->executionRoute = $executionRoute;
 
         return $this;
     }
@@ -144,19 +147,39 @@ class ButtonContext
     /**
      * @return string
      */
-    public function getDialogUrl()
+    public function getFormDialogRoute()
     {
-        return $this->dialogUrl;
+        return $this->formDialogRoute;
     }
 
     /**
-     * @param string $dialogUrl
+     * @param string $formDialogRoute
      *
      * @return $this
      */
-    public function setDialogUrl($dialogUrl)
+    public function setFormDialogRoute($formDialogRoute)
     {
-        $this->dialogUrl = $dialogUrl;
+        $this->formDialogRoute = $formDialogRoute;
+
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getFormPageRoute()
+    {
+        return $this->formPageRoute;
+    }
+
+    /**
+     * @param string $formPageRoute
+     *
+     * @return $this
+     */
+    public function setFormPageRoute($formPageRoute)
+    {
+        $this->formPageRoute = $formPageRoute;
 
         return $this;
     }

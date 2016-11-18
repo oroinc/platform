@@ -31,7 +31,15 @@ class ActionButtonsProvider
      */
     public function getDialogRoute()
     {
-        return $this->applicationsHelper->getDialogRoute();
+        return $this->applicationsHelper->getFormDialogRoute();
+    }
+
+    /**
+     * @return string
+     */
+    public function getPageRoute()
+    {
+        return $this->applicationsHelper->getFormPageRoute();
     }
 
     /**
