@@ -34,8 +34,8 @@ Feature: Quick access menu
     And I press "Create User"
     And I fill "User Form" with:
       | Username          | userName       |
-      | Password          | 123123123Q        |
-      | Re-Enter Password | 123123123Q        |
+      | Password          | Pa$$w0rd       |
+      | Re-Enter Password | Pa$$w0rd       |
       | First Name        | First Name     |
       | Last Name         | Last Name      |
       | Primary Email     | email@test.com |

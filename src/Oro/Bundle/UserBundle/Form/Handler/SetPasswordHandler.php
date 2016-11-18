@@ -8,6 +8,7 @@ use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\UserBundle\Entity\UserManager;
@@ -40,13 +41,17 @@ class SetPasswordHandler
     /** @var UserManager */
     protected $userManager;
 
+    /** @var ValidatorInterface */
+    protected $validator;
+
     /**
-     * @param LoggerInterface     $logger
-     * @param Request             $request
+     * @param LoggerInterface $logger
+     * @param Request $request
      * @param TranslatorInterface $translator
-     * @param FormInterface       $form
-     * @param Processor           $mailerProcessor
-     * @param UserManager         $userManager
+     * @param FormInterface $form
+     * @param Processor $mailerProcessor
+     * @param UserManager $userManager
+     * @param ValidatorInterface $validator
      */
     public function __construct(
         LoggerInterface $logger,
@@ -54,7 +59,8 @@ class SetPasswordHandler
         TranslatorInterface $translator,
         FormInterface   $form,
         Processor       $mailerProcessor,
-        UserManager     $userManager
+        UserManager     $userManager,
+        ValidatorInterface $validator
     ) {
         $this->logger          = $logger;
         $this->request         = $request;
@@ -62,6 +68,7 @@ class SetPasswordHandler
         $this->form            = $form;
         $this->mailerProcessor = $mailerProcessor;
         $this->userManager     = $userManager;
+        $this->validator       = $validator;
     }
 
     /**
@@ -78,6 +85,16 @@ class SetPasswordHandler
             if ($this->form->isValid()) {
                 $entity->setPlainPassword($this->form->get('password')->getData());
                 $entity->setPasswordChangedAt(new \DateTime());
+
+                $errors = $this->validator->validate($entity, null, ['security']);
+                if (count($errors) > 0) {
+                    foreach ($errors as $error) {
+                        $this->form->addError(new FormError($error->getMessage()));
+                    }
+
+                    return false;
+                }
+
                 try {
                     $this->mailerProcessor->sendChangePasswordEmail($entity);
                 } catch (\Exception $e) {

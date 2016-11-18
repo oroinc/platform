@@ -9,7 +9,7 @@ skipped:                  Skipped
 form:
     configuration:
         database:
-            header:       MySQL database connection
+            header:       Database connection
             driver:       Driver
             host:         Host
             port:         Port
