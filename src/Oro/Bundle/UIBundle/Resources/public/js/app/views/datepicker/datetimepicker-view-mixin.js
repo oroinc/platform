@@ -147,7 +147,7 @@ define(function(require) {
         },
 
         setDisabled: function(disabled) {
-            this.$frontTimeField.prop('disabled', disabled);
+            this.$frontTimeField.prop('disabled', disabled).trigger(disabled ? 'disabled' : 'enabled');
             this._super().setDisabled.apply(this, arguments);
         },
 

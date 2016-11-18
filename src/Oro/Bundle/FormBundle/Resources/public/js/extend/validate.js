@@ -217,9 +217,12 @@ define([
      */
     $.validator.prototype.init = _.wrap($.validator.prototype.init, function(init) {
         validationHandler.initialize($(this.currentForm));
+        var validator = this;
 
         $(this.currentForm).on('content:changed', function(event) {
             validationHandler.initialize($(event.target));
+        }).on('disabled', function(e) {
+            validator.hideElementErrors(e.target);
         });
 
         init.apply(this, _.rest(arguments));
@@ -354,7 +357,7 @@ define([
         // ignore all invisible elements except input type=hidden
         ignore: ':hidden:not([type=hidden])',
         onfocusout: function(element, event) {
-            if (!this.checkable(element) && !this.isPristine(element)) {
+            if (!$(element).is(':disabled') && !this.checkable(element) && !this.isPristine(element)) {
                 this.element(element);
             }
         },
