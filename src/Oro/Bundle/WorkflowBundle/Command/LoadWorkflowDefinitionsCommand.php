@@ -16,6 +16,7 @@ use Oro\Bundle\WorkflowBundle\Handler\WorkflowDefinitionHandler;
 class LoadWorkflowDefinitionsCommand extends ContainerAwareCommand
 {
     const NAME = 'oro:workflow:definitions:load';
+
     /**
      * {@inheritdoc}
      */
