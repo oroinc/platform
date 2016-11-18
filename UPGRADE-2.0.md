@@ -342,7 +342,7 @@ To migrate all labels from configuration translatable fields automatically you c
     * `Oro\Bundle\LayoutBundle\Layout\Block\Type\FormType` moved to `Oro\Bundle\EmbeddedFormBundle\Layout\Block\Type\EmbedFormType`
 - Added layout block type `Oro\Bundle\LayoutBundle\Layout\Block\Type\FormType` with new logic.
 - Layout block types `form_start`, `form_end`, `form_fields` is created as `configurable` with DI configuration.
-- Added class `Oro\Bundle\LayoutBundle\DependencyInjection\Compiler\BlockViewSerializerNormalizersPass` that collect serializers by tag `oro_layout.block_view_serializer.normalizer` and inject it to `oro_layout.block_view_serializer`:
+- Added class `Oro\Bundle\LayoutBundle\DependencyInjection\Compiler\BlockViewSerializerNormalizersPass` that collect serializers by tag `layout.block_view_serializer.normalizer` and inject it to `oro_layout.block_view_serializer`:
     * Added block view normalizer `Oro\Bundle\LayoutBundle\Layout\Serializer\BlockViewNormalizer`
     * Added block view normalizer `Oro\Bundle\LayoutBundle\Layout\Serializer\ExpressionNormalizer`
     * Added block view normalizer `Oro\Bundle\LayoutBundle\Layout\Serializer\OptionValueBagNormalizer`

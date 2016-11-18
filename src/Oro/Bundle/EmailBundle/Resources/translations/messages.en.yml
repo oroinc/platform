@@ -41,6 +41,9 @@ oro:
 
         system_configuration:
             email_configuration: Email Configuration
+            email_settings: Email Settings
+            feature_enabled:
+                label: Enable User Emails
 
             signature_configuration:
                 label: Signature
