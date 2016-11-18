@@ -111,7 +111,7 @@ class WorkflowRegistry
 
         $items = $this->processDefinitionFilters(new ArrayCollection($activeWorkflowDefinitions));
 
-        return $items->isEmpty() === false;
+        return !$items->isEmpty();
     }
 
     /**
