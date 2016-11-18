@@ -6,11 +6,12 @@ use Doctrine\DBAL\Schema\Schema;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\EntityExtendBundle\Extend\RelationType;
 use Oro\Bundle\EntityExtendBundle\Migration\Extension\ExtendExtension;
+use Oro\Bundle\EntityExtendBundle\Migration\Extension\ExtendExtensionAwareInterface;
 use Oro\Bundle\MigrationBundle\Migration\Migration;
 use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 use Oro\Bundle\ScopeBundle\Migrations\Schema\OroScopeBundleInstaller;
 
-class OroTestFrameworkBundle implements Migration
+class OroTestFrameworkBundle implements Migration, ExtendExtensionAwareInterface
 {
     /** @var ExtendExtension */
     protected $extendExtension;
