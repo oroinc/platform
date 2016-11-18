@@ -258,6 +258,24 @@ class AjaxControllerTest extends WebTestCase
                 'statusCode' => Response::HTTP_OK,
                 'message' => self::MESSAGE_DEFAULT,
             ],
+            'redirect_invalid_non_ajax' => [
+                'config' => array_merge_recursive(
+                    $config,
+                    [
+                        'oro_action_test_action' => [
+                            'entities' => ['Oro\Bundle\TestFrameworkBundle\Entity\TestActivity'],
+                            OperationDefinition::PRECONDITIONS => ['@equal' => ['$message', 'test message wrong']],
+                        ],
+                    ]
+                ),
+                'route' => 'oro_action_widget_buttons',
+                'datagrid' => '',
+                'entityId' => null,
+                'entityClass' => 'Oro\Bundle\TestFrameworkBundle\Entity\TestActivity',
+                'statusCode' => Response::HTTP_FOUND,
+                'message' => self::MESSAGE_DEFAULT,
+                'headers' => [],
+            ],
         ];
     }
 }
