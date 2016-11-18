@@ -52,18 +52,18 @@ class WorkflowDefinitionTest extends \PHPUnit_Framework_TestCase
     {
         $this->assertEquals([], $this->workflowDefinition->getScopesConfig());
 
-        $this->workflowDefinition->setConfiguration(['scopes' => ['data']]);
+        $this->workflowDefinition->setScopesConfig(['data']);
 
         $this->assertEquals(['data'], $this->workflowDefinition->getScopesConfig());
     }
 
     public function testHasScopeConfig()
     {
-        $this->assertEquals(false, $this->workflowDefinition->hasScopesConfig());
+        $this->assertFalse($this->workflowDefinition->hasScopesConfig());
 
-        $this->workflowDefinition->setConfiguration(['scopes' => ['data']]);
+        $this->workflowDefinition->setScopesConfig(['data']);
 
-        $this->assertEquals(true, $this->workflowDefinition->hasScopesConfig());
+        $this->assertTrue($this->workflowDefinition->hasScopesConfig());
     }
 
     public function testName()
