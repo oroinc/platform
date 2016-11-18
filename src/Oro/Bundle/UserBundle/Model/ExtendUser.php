@@ -7,7 +7,7 @@ use Oro\Bundle\UserBundle\Entity\AbstractUser;
 
 /**
  * @method setAuthStatus(AbstractEnumValue $enum)
- * @method AbstractEnumValue getAuthStatus
+ * @method AbstractEnumValue getAuthStatus()
  */
 class ExtendUser extends AbstractUser
 {

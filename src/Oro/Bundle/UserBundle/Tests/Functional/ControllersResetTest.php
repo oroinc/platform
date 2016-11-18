@@ -79,7 +79,7 @@ class ControllersResetTest extends WebTestCase
     {
         /** @var User $user */
         $user = $this->getReference('simple_user');
-        $this->assertNull($user->getAuthStatus());
+        $this->assertEquals('active', $user->getAuthStatus()->getId());
 
         $crawler = $this->client->request(
             'GET',
@@ -140,6 +140,6 @@ class ControllersResetTest extends WebTestCase
         $user2 = $repo->find($user2->getId());
 
         $this->assertEquals('expired', $user->getAuthStatus()->getId());
-        $this->assertNull($user2->getAuthStatus());
+        $this->assertEquals('active', $user2->getAuthStatus()->getId());
     }
 }
