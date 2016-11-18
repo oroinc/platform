@@ -3,30 +3,11 @@ system_configuration:
         user_settings:
             icon:  icon-key
             title: oro.user.system_configuration.groups.user_settings.title
-        failed_login_limit:
-           icon: icon-signin
-           title: oro.user.system_configuration.groups.failed_login_limit.title
         password_complexity_rules:
             icon:  icon-usd
             title: oro.user.system_configuration.groups.password_complexity_rules.title
 
     fields:
-        oro_user.failed_login_limit_enabled:
-            data_type: boolean
-            type: oro_config_checkbox
-            priority: 80
-            options:
-                required: false
-                label: oro.user.system_configuration.fields.failed_login_limit_enabled.label
-        oro_user.failed_login_limit:
-            data_type: integer
-            type: integer
-            priority: 70
-            options:
-                label: oro.user.system_configuration.fields.failed_login_limit.label
-                constraints:
-                    - GreaterThan:
-                        value: 0
         oro_user.password_min_length:
             data_type: integer
             type: integer
@@ -43,6 +24,14 @@ system_configuration:
             priority: 30
             options:
                 label: oro.user.system_configuration.fields.password_numbers.label
+                required: false
+
+        oro_user.password_lower_case:
+            data_type: boolean
+            type: oro_config_checkbox
+            priority: 25
+            options:
+                label: oro.user.system_configuration.fields.password_lower_case.label
                 required: false
 
         oro_user.password_upper_case:
@@ -71,13 +60,10 @@ system_configuration:
                             user_settings:
                                 priority: 100
                                 children:
-                                    failed_login_limit:
-                                        children:
-                                            - oro_user.failed_login_limit_enabled
-                                            - oro_user.failed_login_limit
                                     password_complexity_rules:
                                         children:
                                             - oro_user.password_min_length
                                             - oro_user.password_numbers
+                                            - oro_user.password_lower_case
                                             - oro_user.password_upper_case
                                             - oro_user.password_special_chars

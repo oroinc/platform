@@ -35,6 +35,7 @@ class ACLContext extends OroFeatureContext implements OroPageObjectAware, Kernel
         $environment = $scope->getEnvironment();
         $this->oroMainContext = $environment->getContext(OroMainContext::class);
     }
+
     /**
      * @Given /^(?:|I am )logged in under (?P<organization>(\D*)) organization$/
      */
