@@ -8,6 +8,7 @@ class StubScopeCriteriaProvider implements ScopeCriteriaProviderInterface
 {
     const STUB_FIELD = 'scopeField';
     const STUB_VALUE = 'stub_value';
+    const STUB_CLASS = '\stdClass';
 
     /**
      * @param array|object $context
@@ -32,5 +33,13 @@ class StubScopeCriteriaProvider implements ScopeCriteriaProviderInterface
     public function getCriteriaField()
     {
         return self::STUB_FIELD;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getCriteriaValueType()
+    {
+        return self::STUB_CLASS;
     }
 }
