@@ -207,12 +207,8 @@ class WorkflowDefinitionConfigurationBuilderTest extends \PHPUnit_Framework_Test
                 [
                     'name' => 'entity_attribute',
                     'type' => 'entity',
-                    'entity_acl' => [
-                        'delete' => false,
-                    ],
-                    'options' => [
-                        'class' => 'TestClass',
-                    ],
+                    'entity_acl' => ['delete' => false],
+                    'options' => ['class' => 'TestClass']
                 ],
             ],
         ];
