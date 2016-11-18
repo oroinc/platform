@@ -55,7 +55,7 @@ class OrmExpressionVisitor extends ExpressionVisitor
             'fieldType'  => $type
         ];
 
-        if (in_array($comparison->getOperator(), SearchComparison::$filteringOperators)) {
+        if (in_array($comparison->getOperator(), SearchComparison::$filteringOperators, true)) {
             return $this->driver->addFilteringField($this->qb, $index, $searchCondition);
         }
 
@@ -87,7 +87,6 @@ class OrmExpressionVisitor extends ExpressionVisitor
      */
     public function walkCompositeExpression(CompositeExpression $expr)
     {
-        $expressionList       = [];
         $expressionObjectList = [];
 
         $expressions    = $expr->getExpressionList();
@@ -110,7 +109,7 @@ class OrmExpressionVisitor extends ExpressionVisitor
                 $fieldType          = Criteria::explodeFieldTypeName($fieldName)[0];
                 $key                = $this->getExpressionKey($fieldType, $operator, $value);
                 $combinedExpression = $child;
-                if ($fieldType !== Query::TYPE_TEXT && in_array($key, array_keys($expressionObjectList))) {
+                if ($fieldType !== Query::TYPE_TEXT && array_key_exists($key, $expressionObjectList)) {
                     $combinedExpression = $expressionObjectList[$key];
 
                     $combinedExpression = new Comparison(
@@ -123,6 +122,18 @@ class OrmExpressionVisitor extends ExpressionVisitor
             }
         }
 
+        return $this->walkExpressionObjectList($expr, $expressionObjectList);
+    }
+
+    /**
+     * @param CompositeExpression $expr
+     * @param array $expressionObjectList
+     * @return null|string
+     * @throws \RuntimeException
+     */
+    protected function walkExpressionObjectList(CompositeExpression $expr, array $expressionObjectList)
+    {
+        $expressionList       = [];
         foreach ($expressionObjectList as $child) {
             $childExpr = $this->dispatch($child);
             if ($childExpr) {
