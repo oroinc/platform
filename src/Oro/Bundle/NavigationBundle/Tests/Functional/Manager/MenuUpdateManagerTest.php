@@ -11,6 +11,8 @@ use Oro\Bundle\NavigationBundle\Manager\MenuUpdateManager;
 use Oro\Bundle\NavigationBundle\Tests\Functional\DataFixtures\LoadMenuUpdateData;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
+//ToDo: fix functional tests after resolve BB-5469
+
 /**
  * @dbIsolation
  */

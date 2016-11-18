@@ -11,8 +11,9 @@ use Oro\Component\Config\Loader\FolderContentCumulativeLoader;
 use Oro\Component\Testing\Unit\EntityTrait;
 use Oro\Bundle\NavigationBundle\Builder\MenuUpdateBuilder;
 use Oro\Bundle\NavigationBundle\Entity\MenuUpdate;
-use Oro\Bundle\NavigationBundle\Tests\Functional\Stub\OwnershipProviderStub;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
+
+//ToDo: cleanup OwnershipProviderStub & fix tests after resolve BB-5469
 
 class MenuUpdateBuilderTest extends WebTestCase
 {

@@ -14,6 +14,8 @@ use Oro\Bundle\NavigationBundle\JsTree\MenuUpdateTreeHandler;
 use Oro\Bundle\NavigationBundle\Menu\Helper\MenuUpdateHelper;
 use Oro\Bundle\NavigationBundle\Provider\BuilderChainProvider;
 use Oro\Bundle\NavigationBundle\Utils\MenuUpdateUtils;
+use Oro\Bundle\ScopeBundle\Manager\ScopeManager;
+use Oro\Bundle\ScopeBundle\Entity\Scope;
 
 class MenuUpdateManager
 {
@@ -29,19 +31,28 @@ class MenuUpdateManager
     /** @var string */
     private $entityClass;
 
+    /** @var string */
+    private $scopeType;
+
+    /** @var ScopeManager */
+    private $scopeManager;
+
     /**
-     * @param ManagerRegistry $managerRegistry
+     * @param ManagerRegistry      $managerRegistry
      * @param BuilderChainProvider $builderChainProvider
-     * @param MenuUpdateHelper $menuUpdateHelper
+     * @param MenuUpdateHelper     $menuUpdateHelper
+     * @param ScopeManager         $scopeManager
      */
     public function __construct(
         ManagerRegistry $managerRegistry,
         BuilderChainProvider $builderChainProvider,
-        MenuUpdateHelper $menuUpdateHelper
+        MenuUpdateHelper $menuUpdateHelper,
+        ScopeManager $scopeManager
     ) {
         $this->managerRegistry = $managerRegistry;
         $this->builderChainProvider = $builderChainProvider;
         $this->menuUpdateHelper = $menuUpdateHelper;
+        $this->scopeManager = $scopeManager;
     }
 
     /**
@@ -57,21 +68,32 @@ class MenuUpdateManager
     }
 
     /**
+     * @param string $scopeType
+     *
+     * @return MenuUpdateManager
+     */
+    public function setScopeType($scopeType)
+    {
+        $this->scopeType = $scopeType;
+
+        return $this;
+    }
+
+    /**
      * Create menu update entity
      *
-     * @param int $ownershipType
-     * @param int $ownerId
+     * @param array|object|null $context
      * @param array $options
      *
      * @return MenuUpdateInterface
      */
-    public function createMenuUpdate($ownershipType, $ownerId, array $options = [])
+    public function createMenuUpdate($context, array $options = [])
     {
         /** @var MenuUpdateInterface $entity */
         $entity = new $this->entityClass;
-        $entity
-            ->setOwnershipType($ownershipType)
-            ->setOwnerId($ownerId);
+        $scope = $this->scopeManager->find($this->scopeType, $context);
+        $entity = $entity->setScope($scope);
+
         if (isset($options['key'])) {
             $entity->setKey($options['key']);
         }
@@ -107,17 +129,15 @@ class MenuUpdateManager
 
     /**
      * @param string $menuName
-     * @param int $ownershipType
-     * @param int $ownerId
+     * @param Scope  $scope
      *
      * @return MenuUpdateInterface[]
      */
-    public function getMenuUpdatesByMenuAndScope($menuName, $ownershipType, $ownerId)
+    public function getMenuUpdatesByMenuAndScope($menuName, $scope)
     {
         return $this->getRepository()->findBy([
             'menu' => $menuName,
-            'ownershipType' => $ownershipType,
-            'ownerId' => $ownerId,
+            'scopeId' => $scope,
         ]);
     }
 
@@ -126,39 +146,36 @@ class MenuUpdateManager
      *
      * @param string $menuName
      * @param string $key
-     * @param int $ownershipType
-     * @param int $ownerId
+     * @param Scope  $scope
      *
      * @return null|MenuUpdateInterface
      */
-    public function getMenuUpdateByKeyAndScope($menuName, $key, $ownershipType, $ownerId)
+    public function getMenuUpdateByKeyAndScope($menuName, $key, $scope)
     {
         /** @var MenuUpdateInterface $update */
         $update = $this->getRepository()->findOneBy([
             'menu' => $menuName,
             'key' => $key,
-            'ownershipType' => $ownershipType,
-            'ownerId' => $ownerId,
+            'scopeId' => $scope,
         ]);
 
         if (!$update) {
-            $update = $this->createMenuUpdate($ownershipType, $ownerId, ['key' => $key, 'menu' => $menuName]);
+            $update = $this->createMenuUpdate(null, ['key' => $key, 'menu' => $menuName]);
         }
 
-        return $this->getMenuUpdateFromMenu($update, $menuName, $key, $ownershipType);
+        return $this->getMenuUpdateFromMenu($update, $menuName, $key, $scope);
     }
 
     /**
      * Get list of menu update with new position
      *
-     * @param string $menuName
+     * @param string          $menuName
      * @param ItemInterface[] $orderedChildren
-     * @param int $ownershipType
-     * @param int $ownerId
+     * @param Scope           $scope
      *
      * @return MenuUpdateInterface[]
      */
-    public function getReorderedMenuUpdates($menuName, $orderedChildren, $ownershipType, $ownerId)
+    public function getReorderedMenuUpdates($menuName, $orderedChildren, $scope)
     {
         $order = [];
         foreach ($orderedChildren as $priority => $child) {
@@ -169,8 +186,7 @@ class MenuUpdateManager
         $updates = $this->getRepository()->findBy([
             'menu' => $menuName,
             'key' => array_keys($order),
-            'ownershipType' => $ownershipType,
-            'ownerId' => $ownerId,
+            'scopeId' => $scope,
         ]);
 
         foreach ($updates as $update) {
@@ -180,8 +196,7 @@ class MenuUpdateManager
 
         foreach ($orderedChildren as $priority => $child) {
             $update = $this->createMenuUpdate(
-                $ownershipType,
-                $ownerId,
+                null,
                 ['key' => $child->getName(), 'menu' => $menuName]
             );
             MenuUpdateUtils::updateMenuUpdate($update, $child, $menuName, $this->menuUpdateHelper);
@@ -195,95 +210,90 @@ class MenuUpdateManager
     /**
      * @param string $menuName
      * @param string $key
-     * @param string $ownershipType
-     * @param int $ownerId
+     * @param Scope  $scope
      */
-    public function showMenuItem($menuName, $key, $ownershipType, $ownerId)
+    public function showMenuItem($menuName, $key, $scope)
     {
         $item = MenuUpdateUtils::findMenuItem($this->getMenu($menuName), $key);
         if ($item !== null) {
-            $update = $this->getMenuUpdateByKeyAndScope($menuName, $item->getName(), $ownershipType, $ownerId);
+            $update = $this->getMenuUpdateByKeyAndScope($menuName, $item->getName(), $scope);
             $update->setActive(true);
             $this->getEntityManager()->persist($update);
 
-            $this->showMenuItemParents($menuName, $item, $ownershipType, $ownerId);
-            $this->showMenuItemChildren($menuName, $item, $ownershipType, $ownerId);
+            $this->showMenuItemParents($menuName, $item, $scope);
+            $this->showMenuItemChildren($menuName, $item, $scope);
 
             $this->getEntityManager()->flush();
         }
     }
 
     /**
-     * @param string $menuName
+     * @param string        $menuName
      * @param ItemInterface $item
-     * @param string $ownershipType
-     * @param int $ownerId
+     * @param Scope         $scope
      */
-    private function showMenuItemParents($menuName, $item, $ownershipType, $ownerId)
+    private function showMenuItemParents($menuName, $item, $scope)
     {
         $parent = $item->getParent();
         if ($parent !== null && !$parent->isDisplayed()) {
-            $update = $this->getMenuUpdateByKeyAndScope($menuName, $parent->getName(), $ownershipType, $ownerId);
+            $update = $this->getMenuUpdateByKeyAndScope($menuName, $parent->getName(), $scope);
             $update->setActive(true);
             $this->getEntityManager()->persist($update);
 
-            $this->showMenuItemParents($menuName, $parent, $ownershipType, $ownerId);
+            $this->showMenuItemParents($menuName, $parent, $scope);
         }
     }
 
     /**
-     * @param string $menuName
+     * @param string        $menuName
      * @param ItemInterface $item
-     * @param string $ownershipType
-     * @param int $ownerId
+     * @param Scope         $scope
      */
-    private function showMenuItemChildren($menuName, $item, $ownershipType, $ownerId)
+    private function showMenuItemChildren($menuName, $item, $scope)
     {
         /** @var ItemInterface $child */
         foreach ($item->getChildren() as $child) {
-            $update = $this->getMenuUpdateByKeyAndScope($menuName, $child->getName(), $ownershipType, $ownerId);
+            $update = $this->getMenuUpdateByKeyAndScope($menuName, $child->getName(), $scope);
             $update->setActive(true);
             $this->getEntityManager()->persist($update);
 
-            $this->showMenuItemChildren($menuName, $child, $ownershipType, $ownerId);
+            $this->showMenuItemChildren($menuName, $child, $scope);
         }
     }
 
     /**
      * @param string $menuName
      * @param string $key
-     * @param string $ownershipType
-     * @param int $ownerId
+     * @param Scope  $scope
      */
-    public function hideMenuItem($menuName, $key, $ownershipType, $ownerId)
+    public function hideMenuItem($menuName, $key, $scope)
     {
         $item = MenuUpdateUtils::findMenuItem($this->getMenu($menuName), $key);
         if ($item !== null) {
-            $update = $this->getMenuUpdateByKeyAndScope($menuName, $item->getName(), $ownershipType, $ownerId);
+            $update = $this->getMenuUpdateByKeyAndScope($menuName, $item->getName(), $scope);
             $update->setActive(false);
             $this->getEntityManager()->persist($update);
 
-            $this->hideMenuItemChildren($menuName, $item, $ownershipType, $ownerId);
+            $this->hideMenuItemChildren($menuName, $item, $scope);
 
             $this->getEntityManager()->flush();
         }
     }
 
     /**
-     * @param string $menuName
+     * @param string        $menuName
      * @param ItemInterface $item
-     * @param string $ownershipType
-     * @param int $ownerId
+     * @param Scope         $scope
      */
-    private function hideMenuItemChildren($menuName, $item, $ownershipType, $ownerId)
+    private function hideMenuItemChildren($menuName, $item, $scope)
     {
         /** @var ItemInterface $child */
         foreach ($item->getChildren() as $child) {
-            $update = $this->getMenuUpdateByKeyAndScope($menuName, $child->getName(), $ownershipType, $ownerId);
+            $update = $this->getMenuUpdateByKeyAndScope($menuName, $child->getName(), $scope);
             $update->setActive(false);
             $this->getEntityManager()->persist($update);
 
-            $this->hideMenuItemChildren($menuName, $child, $ownershipType, $ownerId);
+            $this->hideMenuItemChildren($menuName, $child, $scope);
         }
     }
 
@@ -292,18 +302,17 @@ class MenuUpdateManager
      *
      * @param string $menuName
      * @param string $key
-     * @param string $ownershipType
-     * @param int $ownerId
+     * @param Scope  $scope
      * @param string $parentKey
-     * @param int $position
+     * @param int    $position
      *
      * @return MenuUpdateInterface[]
      */
-    public function moveMenuItem($menuName, $key, $ownershipType, $ownerId, $parentKey, $position)
+    public function moveMenuItem($menuName, $key, $scope, $parentKey, $position)
     {
-        $currentUpdate = $this->getMenuUpdateByKeyAndScope($menuName, $key, $ownershipType, $ownerId);
+        $currentUpdate = $this->getMenuUpdateByKeyAndScope($menuName, $key, $scope);
 
-        $parent = $this->findMenuItem($menuName, $parentKey, $ownershipType);
+        $parent = $this->findMenuItem($menuName, $parentKey, $scope);
         $currentUpdate->setParentKey($parent ? $parent->getName() : null);
 
         $i = 0;
@@ -323,7 +332,7 @@ class MenuUpdateManager
 
         $updates = array_merge(
             [$currentUpdate],
-            $this->getReorderedMenuUpdates($menuName, $order, $ownershipType, $ownerId)
+            $this->getReorderedMenuUpdates($menuName, $order, $scope)
         );
 
         return $updates;
@@ -349,15 +358,15 @@ class MenuUpdateManager
     /**
      * @param string $menuName
      * @param string $key
-     * @param int $ownershipType
+     * @param Scope  $scope
      *
      * @return ItemInterface|null
      */
-    public function findMenuItem($menuName, $key, $ownershipType)
+    public function findMenuItem($menuName, $key, $scope)
     {
         $options = [
             'ignoreCache' => true,
-            'ownershipType' => $ownershipType
+            'scopeId' => $scope
         ];
         $menu = $this->getMenu($menuName, $options);
 
@@ -368,13 +377,13 @@ class MenuUpdateManager
      * @param MenuUpdateInterface $update
      * @param string $menuName
      * @param string $key
-     * @param int $ownershipType
+     * @param Scope  $scope
      *
      * @return MenuUpdateInterface
      */
-    private function getMenuUpdateFromMenu(MenuUpdateInterface $update, $menuName, $key, $ownershipType)
+    private function getMenuUpdateFromMenu(MenuUpdateInterface $update, $menuName, $key, $scope)
     {
-        $item = $this->findMenuItem($menuName, $key, $ownershipType);
+        $item = $this->findMenuItem($menuName, $key, $scope);
 
         if ($item) {
             MenuUpdateUtils::updateMenuUpdate($update, $item, $menuName, $this->menuUpdateHelper);
@@ -412,17 +421,12 @@ class MenuUpdateManager
     /**
      * Reset menu updates depending on ownership type and owner id
      *
-     * @param int    $ownershipType
-     * @param int    $ownerId
+     * @param Scope  $scope
      * @param string $menu
      */
-    public function resetMenuUpdatesWithOwnershipType($ownershipType, $ownerId = null, $menu = null)
+    public function resetMenuUpdatesWithOwnershipType($scope, $menu = null)
     {
-        $criteria = ['ownershipType' => $ownershipType];
-
-        if ($ownerId) {
-            $criteria['ownerId'] = $ownerId;
-        }
+        $criteria['scopeId'] = $scope;
 
         if ($menu) {
             $criteria['menu'] = $menu;
