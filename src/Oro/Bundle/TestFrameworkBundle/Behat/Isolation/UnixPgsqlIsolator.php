@@ -170,7 +170,6 @@ final class UnixPgsqlIsolator extends AbstractOsRelatedIsolator implements Isola
     /** {@inheritdoc} */
     protected function restoreDbFromDump()
     {
-        var_dump('restore db from dump');
         $process = sprintf(
             'PGPASSWORD="%s" psql -h %s -U %s %s < %s',
             $this->dbPass,
