@@ -88,7 +88,7 @@ class UserSubscriber implements EventSubscriberInterface
 
         // do not allow editing of Enabled status
         if (!empty($entity->getId())) {
-            $form->add('enabled', 'choice', ['choices' => $enabledChoices, 'mapped' => false]);
+            $form->add('enabled', 'hidden', ['mapped' => false]);
 
             return;
         }

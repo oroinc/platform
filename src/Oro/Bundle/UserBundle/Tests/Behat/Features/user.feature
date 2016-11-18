@@ -16,6 +16,6 @@ Feature: User
           | Last Name         | Last Name      |
           | Primary Email     | email@test.com |
           | Roles             | Administrator  |
-          | Status            | Active         |
+          | Enabled           | Enabled        |
     And I save and close form
     Then I should see "User saved" flash message
