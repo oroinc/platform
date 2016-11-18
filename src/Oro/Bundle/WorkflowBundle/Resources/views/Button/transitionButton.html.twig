@@ -29,9 +29,11 @@
     }) %}
 {% endif %}
 
-{{ workflowMacros.renderTransitionButton(
-	workflow,
-	transition,
-	workflowItem,
-	transitionData
-) }}
+<div class="pull-left btn-group icons-holder">
+    {{ workflowMacros.renderTransitionButton(
+        workflow,
+        transition,
+        workflowItem,
+        transitionData
+    ) }}
+</div>

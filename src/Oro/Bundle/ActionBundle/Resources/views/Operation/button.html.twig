@@ -13,6 +13,7 @@
                     data-{{ name }}="{{ value is iterable ? value|json_encode : value}}"
                 {% endfor %}
                 data-options="{{ options.options|json_encode }}"
+                data-page-component-module="oroaction/js/app/components/button-component"
             >
                 <i class="{{ params.buttonOptions.icon|default('') }} {{ params.buttonOptions.iCss|default('') }} hide-text">{{ linkLabel }}</i>
                 {{ linkLabel|trim }}
