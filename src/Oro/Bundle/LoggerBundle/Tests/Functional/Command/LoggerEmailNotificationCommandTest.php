@@ -22,7 +22,7 @@ class LoggerEmailNotificationCommandTest extends WebTestCase
         $params = ['--recipients="recipient1@example.com;recipient2@example.com"'];
         $result = $this->runCommand('oro:logger:email-notification', $params);
 
-        $this->assertContains('', $result);
+        $this->assertContains('Error logs notification will be sent to listed email addresses', $result);
     }
 
     public function testRunCommandWithFailedValidation()

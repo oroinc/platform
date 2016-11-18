@@ -40,7 +40,7 @@ class LoggerLevelCommandTest extends WebTestCase
         );
 
         $this->assertEquals(
-            $disableAfter,
+            $disableAfter->getTimestamp(),
             $configUser->get(Configuration::getFullConfigKey(Configuration::LOGS_TIMESTAMP_KEY)),
             'Failed asseting that disable after is correct.',
             10
@@ -65,7 +65,7 @@ class LoggerLevelCommandTest extends WebTestCase
         );
 
         $this->assertEquals(
-            $disableAfter,
+            $disableAfter->getTimestamp(),
             $configGlobal->get(Configuration::getFullConfigKey(Configuration::LOGS_TIMESTAMP_KEY)),
             'Failed asseting that disable after is correct.',
             10
