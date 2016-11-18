@@ -147,6 +147,8 @@ class OroUserBundleInstaller implements
         DropEmailUserColumn::updateOroEmailUserTable($schema);
         AddFirstNameLastNameIndex::addFirstNameLastNameIndex($schema);
         AddImpersonationTable::createOroUserImpersonationTable($schema);
+
+        $this->addRelationsToScope($schema);
     }
 
     /**
