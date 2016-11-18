@@ -471,14 +471,13 @@ class WorkflowManager implements LoggerAwareInterface
     }
 
     /**
+     * Checks weather workflow with such name is active in refreshed instance.
      * @param string $workflowName
      * @return bool
      */
     public function isActiveWorkflow($workflowName)
     {
-        $definition = $this->workflowRegistry->getWorkflow($workflowName)->getDefinition();
-
-        return $definition->isActive();
+        return $this->workflowRegistry->getWorkflow($workflowName)->isActive();
     }
 
     /**

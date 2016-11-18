@@ -977,15 +977,13 @@ class WorkflowManagerTest extends \PHPUnit_Framework_TestCase
         $workflowName = 'test_workflow';
 
         $workflowMock = $this->getMockBuilder(Workflow::class)->disableOriginalConstructor()->getMock();
-        $workflowDefinition = $this->getMockBuilder(WorkflowDefinition::class)->getMock();
 
         $this->workflowRegistry->expects($this->once())
             ->method('getWorkflow')->with($workflowName)->willReturn($workflowMock);
         $workflowMock->expects($this->once())
-            ->method('getDefinition')->willReturn($workflowDefinition);
+            ->method('isActive')
+            ->willReturn($isActive);
 
-        $workflowDefinition->expects($this->once())
-            ->method('isActive')->willReturn($isActive);
 
         $this->assertEquals($isActive, $this->workflowManager->isActiveWorkflow($workflowName));
     }
