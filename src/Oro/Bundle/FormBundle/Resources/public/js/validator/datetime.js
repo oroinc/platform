@@ -80,7 +80,7 @@ define(function(require) {
                     default:
                         return '';
                 }
-                placeholders.limit = datetimeFormatter.formatDateTime(datetime);
+                placeholders.limit = datetimeFormatter.formatDateTimeNBSP(datetime);
             }
 
             return __(message, placeholders);
