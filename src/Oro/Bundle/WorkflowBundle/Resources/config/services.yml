@@ -383,7 +383,6 @@ services:
         arguments:
             - '@oro_action.helper.applications'
         calls:
-            - [setExecutionRoute, ['oro_workflow_start_transition_form']]
-            - [setFormDialogRoute, ['oro_workflow_start_transition_form']] #replace here
-            - [setFormPageRoute, ['oro_workflow_start_transition_form']] #replace here
-            - [setWidgetRoute, ['oro_workflow_widget_start_transition_form']]
+            - [setExecutionRoute, ['oro_api_workflow_start']]
+            - [setFormDialogRoute, ['oro_workflow_widget_start_transition_form']]
+            - [setFormPageRoute, ['oro_workflow_start_transition_form']]
