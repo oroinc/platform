@@ -24,3 +24,8 @@ services:
     swiftmailer.plugin.no_recipient.abstract:
         class: Oro\Bundle\LoggerBundle\Mailer\NoRecipientPlugin
         abstract: true
+
+    oro_logger.processor.log_message:
+        class: Monolog\Processor\PsrLogMessageProcessor
+        tags:
+            - { name: monolog.processor }
