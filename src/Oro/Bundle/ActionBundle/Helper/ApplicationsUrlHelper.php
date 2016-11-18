@@ -24,19 +24,42 @@ class ApplicationsUrlHelper
 
     /**
      * @param array $parameters
+     *
      * @return string
      */
     public function getExecutionUrl(array $parameters = [])
     {
-        return $this->router->generate($this->applicationsHelper->getExecutionRoute(), $parameters);
+        return $this->generateUrl($this->applicationsHelper->getExecutionRoute(), $parameters);
     }
 
     /**
      * @param array $parameters
+     *
      * @return string
      */
     public function getDialogUrl(array $parameters = [])
     {
-        return $this->router->generate($this->applicationsHelper->getDialogRoute(), $parameters);
+        return $this->generateUrl($this->applicationsHelper->getFormDialogRoute(), $parameters);
+    }
+
+    /**
+     * @param array $parameters
+     *
+     * @return string
+     */
+    public function getPageUrl(array $parameters = [])
+    {
+        return $this->generateUrl($this->applicationsHelper->getFormPageRoute(), $parameters);
+    }
+
+    /**
+     * @param string $routeName
+     * @param array $parameters
+     *
+     * @return string
+     */
+    private function generateUrl($routeName, array $parameters = [])
+    {
+        return $this->router->generate($routeName, $parameters);
     }
 }

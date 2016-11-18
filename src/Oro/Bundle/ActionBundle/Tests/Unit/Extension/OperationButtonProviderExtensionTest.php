@@ -18,7 +18,8 @@ class OperationButtonProviderExtensionTest extends \PHPUnit_Framework_TestCase
     const ENTITY_ID = 42;
     const ROUTE_NAME = 'test_route_name';
     const EXECUTION_ROUTE_NAME = 'test_execution_route_name';
-    const DIALOG_ROUTE_NAME = 'test_dialog_route_name';
+    const FORM_DIALOG_ROUTE_NAME = 'test_form_dialog_route_name';
+    const FORM_PAGE_ROUTE_NAME = 'test_form_page_route_name';
     const DATAGRID_NAME = 'test_datagrid_name';
     const REFERRER_URL = '/test/referrer/utl';
     const GROUP = 'test_group';
@@ -46,10 +47,18 @@ class OperationButtonProviderExtensionTest extends \PHPUnit_Framework_TestCase
         $this->contextHelper = $this->getMockBuilder(ContextHelper::class)->disableOriginalConstructor()->getMock();
 
         $this->applicationsHelper = $this->getMock(ApplicationsHelperInterface::class);
+
         $this->applicationsHelper->expects($this->any())
             ->method('getExecutionRoute')
             ->willReturn(self::EXECUTION_ROUTE_NAME);
-        $this->applicationsHelper->expects($this->any())->method('getDialogRoute')->willReturn(self::DIALOG_ROUTE_NAME);
+
+        $this->applicationsHelper->expects($this->any())
+            ->method('getFormDialogRoute')
+            ->willReturn(self::FORM_DIALOG_ROUTE_NAME);
+
+        $this->applicationsHelper->expects($this->any())
+            ->method('getFormPageRoute')
+            ->willReturn(self::FORM_PAGE_ROUTE_NAME);
 
         $this->extension = new OperationButtonProviderExtension(
             $this->operationRegistry,
@@ -154,10 +163,11 @@ class OperationButtonProviderExtensionTest extends \PHPUnit_Framework_TestCase
             ->setEntity($buttonSearchContext->getEntityClass(), $buttonSearchContext->getEntityId())
             ->setRouteName($buttonSearchContext->getRouteName())
             ->setGroup($buttonSearchContext->getGroup())
-            ->setExecutionUrl(self::EXECUTION_ROUTE_NAME);
+            ->setExecutionRoute(self::EXECUTION_ROUTE_NAME);
 
         if ($isForm) {
-            $context->setDialogUrl(self::DIALOG_ROUTE_NAME);
+            $context->setFormDialogRoute(self::FORM_DIALOG_ROUTE_NAME);
+            $context->setFormPageRoute(self::FORM_PAGE_ROUTE_NAME);
         }
 
         return $context;
