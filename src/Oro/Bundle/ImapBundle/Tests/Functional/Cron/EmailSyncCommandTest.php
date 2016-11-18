@@ -4,6 +4,7 @@ namespace Oro\Bundle\ImapBundle\Tests\Functional\Cron;
 
 use Symfony\Component\Yaml\Yaml;
 
+use Oro\Bundle\EmailBundle\DependencyInjection\Configuration;
 use Oro\Bundle\EmailBundle\Entity\Email;
 use Oro\Bundle\ImapBundle\Connector\ImapConfig;
 use Oro\Bundle\ImapBundle\Connector\ImapConnector;
@@ -129,6 +130,31 @@ class EmailSyncCommandTest extends WebTestCase
             $list = $listRepo->findAll();
             $this->$assertMethod($assertCount, count($list));
         }
+    }
+
+    public function testCommandOutputWithEmailFeatureDisabled()
+    {
+        $this->toggleEmailFeatureValue(false);
+        $result = $this->runCommand('oro:cron:imap-sync', []);
+
+        $this->assertContains('The email feature is disabled. The command will not run.', $result);
+    }
+
+    /**
+     * Disable email feature toggle
+     *
+     * @param bool $value
+     */
+    protected function toggleEmailFeatureValue($value)
+    {
+        $key = Configuration::getConfigKeyByName('feature_enabled');
+
+        $configManager = $this->getContainer()->get('oro_config.manager');
+        $configManager->set($key, (bool) $value);
+        $configManager->flush();
+
+        $featureChecker = $this->getContainer()->get('oro_featuretoggle.checker.feature_checker');
+        $featureChecker->resetCache();
     }
 
     /**
