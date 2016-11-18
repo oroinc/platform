@@ -44,7 +44,7 @@ class UserViewList extends AbstractViewsList
             'icon' => 'icon-lock',
             'filters' => [
                 'enabled' => [
-                    'value' => null,
+                    'value' => BooleanFilterType::TYPE_YES,
                 ],
                 'auth_status' => [
                     'type' => EnumFilterType::TYPE_IN,
