@@ -8,6 +8,7 @@ use Doctrine\Common\Persistence\ManagerRegistry;
 use Oro\Bundle\ScopeBundle\Manager\ScopeManager;
 use Oro\Bundle\WorkflowBundle\Entity\Repository\WorkflowDefinitionRepository;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
+use Oro\Bundle\WorkflowBundle\Scope\WorkflowScopeManager;
 
 class WorkflowDefinitionScopesRegistryFilter implements WorkflowDefinitionFilterInterface
 {
@@ -62,7 +63,7 @@ class WorkflowDefinitionScopesRegistryFilter implements WorkflowDefinitionFilter
     {
         $scopeDefinitions = $this->getWorkflowDefinitionRepository()->getScopedByNames(
             $this->getNames($workflowDefinitions),
-            $this->scopeManager->getCriteria('workflow_definition')
+            $this->scopeManager->getCriteria(WorkflowScopeManager::SCOPE_TYPE)
         );
 
         return $this->getNames($scopeDefinitions);
