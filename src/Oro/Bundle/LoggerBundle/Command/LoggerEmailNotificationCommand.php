@@ -70,6 +70,8 @@ class LoggerEmailNotificationCommand extends ContainerAwareCommand
             $errors = $this->validateRecipients($recipients);
             if (!empty($errors)) {
                 $io->error($errors);
+
+                return;
             }
             $configManager->set($recipientsConfigKey, $recipients);
             $io->text(["Error logs notification will be sent to listed email addresses:", $recipients]);

@@ -82,7 +82,10 @@ class LoggerLevelCommand extends ContainerAwareCommand
         }
 
         $configManager->set(Configuration::getFullConfigKey(Configuration::LOGS_LEVEL_KEY), $level);
-        $configManager->set(Configuration::getFullConfigKey(Configuration::LOGS_TIMESTAMP_KEY), $disableAfter->getTimestamp());
+        $configManager->set(
+            Configuration::getFullConfigKey(Configuration::LOGS_TIMESTAMP_KEY),
+            $disableAfter->getTimestamp()
+        );
 
         $configManager->flush();
 
