@@ -43,8 +43,7 @@ class YamlProcessor implements ConfigProcessorInterface
                     )
                 );
             }
-        }
-        elseif (array_key_exists('entity', $config) && array_key_exists('repository_method', $config)) {
+        } elseif (array_key_exists('entity', $config) && array_key_exists('repository_method', $config)) {
             $entity = $config['entity'];
             $method = $config['repository_method'];
             $repository = $this->registry->getRepository($entity);
