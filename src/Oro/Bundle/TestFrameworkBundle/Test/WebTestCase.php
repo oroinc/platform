@@ -2,13 +2,8 @@
 
 namespace Oro\Bundle\TestFrameworkBundle\Test;
 
-use Doctrine\Common\DataFixtures\DependentFixtureInterface;
-use Doctrine\Common\DataFixtures\Executor\ORMExecutor;
-use Doctrine\Common\DataFixtures\Purger\ORMPurger;
 use Doctrine\Common\DataFixtures\ReferenceRepository;
-use Doctrine\ORM\EntityManager;
 
-use Symfony\Bridge\Doctrine\DataFixtures\ContainerAwareLoader as DataFixturesLoader;
 use Symfony\Component\Console\Output\StreamOutput;
 use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Component\Yaml\Yaml;
@@ -20,6 +15,10 @@ use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase as BaseWebTestCase;
 
 use Oro\Bundle\NavigationBundle\Event\ResponseHashnavListener;
+use Oro\Bundle\TestFrameworkBundle\Test\DataFixtures\AliceFixtureFactory;
+use Oro\Bundle\TestFrameworkBundle\Test\DataFixtures\AliceFixtureIdentifierResolver;
+use Oro\Bundle\TestFrameworkBundle\Test\DataFixtures\DataFixturesExecutor;
+use Oro\Bundle\TestFrameworkBundle\Test\DataFixtures\DataFixturesLoader;
 use Oro\Component\Testing\DbIsolationExtension;
 
 /**
@@ -104,6 +103,18 @@ abstract class WebTestCase extends BaseWebTestCase
                 $prop->setValue($this, null);
             }
         }
+    }
+
+    public static function setUpBeforeClass()
+    {
+        /**
+         * In case we have isolated test we should have clean env before run it,
+         * so we will not have next problem:
+         * - Data provider in phpunit called before tests (even before this method) and can start a client
+         *   for not isolated tests (ex. GetRestJsonApiTest),
+         *   so we will have client without transaction started in our test
+         */
+        self::$clientInstance = null;
     }
 
     public static function tearDownAfterClass()
@@ -351,33 +362,42 @@ abstract class WebTestCase extends BaseWebTestCase
     }
 
     /**
-     * @param array $classNames
-     * @param bool  $force
+     * @param string[] $fixtures Each fixture can be a class name or a path to nelmio/alice file
+     * @param bool     $force
+     *
+     * @link https://github.com/nelmio/alice
      */
-    protected function loadFixtures(array $classNames, $force = false)
+    protected function loadFixtures(array $fixtures, $force = false)
     {
-        if (!$force) {
-            $classNames = array_filter(
-                $classNames,
-                function ($value) {
-                    return !in_array($value, self::$loadedFixtures);
-                }
-            );
+        $container = $this->getContainer();
+        $fixtureIdentifierResolver = new AliceFixtureIdentifierResolver($container->get('kernel'));
 
-            if (!$classNames) {
+        $fixtures = array_map(
+            function ($value) use ($fixtureIdentifierResolver) {
+                return $fixtureIdentifierResolver->resolveId($value);
+            },
+            $fixtures
+        );
+        if (!$force) {
+            $fixtures = array_values(array_filter(
+                $fixtures,
+                function ($value) {
+                    return !in_array($value, self::$loadedFixtures, true);
+                }
+            ));
+            if (!$fixtures) {
                 return;
             }
         }
+        self::$loadedFixtures = array_merge(self::$loadedFixtures, $fixtures);
 
-        self::$loadedFixtures = array_merge(self::$loadedFixtures, $classNames);
+        $loader = new DataFixturesLoader(new AliceFixtureFactory(), $fixtureIdentifierResolver, $container);
+        foreach ($fixtures as $fixture) {
+            $loader->addFixture($fixture);
+        }
 
-        $loader = $this->getFixtureLoader($classNames);
-        $fixtures = array_values($loader->getFixtures());
-
-        /** @var EntityManager $em */
-        $em = $this->getContainer()->get('doctrine')->getManager();
-        $executor = new ORMExecutor($em, new ORMPurger($em));
-        $executor->execute($fixtures, true);
+        $executor = new DataFixturesExecutor($container->get('doctrine')->getManager());
+        $executor->execute($loader->getFixtures(), true);
         self::$referenceRepository = $executor->getReferenceRepository();
         $this->postFixtureLoad();
     }
@@ -418,48 +438,6 @@ abstract class WebTestCase extends BaseWebTestCase
      */
     protected function postFixtureLoad()
     {
-    }
-
-    /**
-     * Retrieve Doctrine DataFixtures loader.
-     *
-     * @param array $classNames
-     *
-     * @return DataFixturesLoader
-     */
-    private function getFixtureLoader(array $classNames)
-    {
-        $loader = new DataFixturesLoader($this->getContainer());
-
-        foreach ($classNames as $className) {
-            $this->loadFixtureClass($loader, $className);
-        }
-
-        return $loader;
-    }
-
-    /**
-     * Load a data fixture class.
-     *
-     * @param DataFixturesLoader $loader
-     * @param string             $className
-     */
-    private function loadFixtureClass(DataFixturesLoader $loader, $className)
-    {
-        $fixture = new $className();
-
-        if ($loader->hasFixture($fixture)) {
-            unset($fixture);
-            return;
-        }
-
-        $loader->addFixture($fixture);
-
-        if ($fixture instanceof DependentFixtureInterface) {
-            foreach ($fixture->getDependencies() as $dependency) {
-                $this->loadFixtureClass($loader, $dependency);
-            }
-        }
     }
 
     /**

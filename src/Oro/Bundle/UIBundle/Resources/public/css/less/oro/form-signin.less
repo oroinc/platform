@@ -52,7 +52,7 @@
     }
   } // Ends .title-box
   .oro-hint {
-    width: 322px;
+    margin: 0 0 14px;
   }
   .add-on {
     width: 105px;
@@ -128,11 +128,22 @@
     background: #fff;
     .border-radius(0 0 5px 5px);
   }
+  span.validation-failed {
+    margin: 0 0 14px 14px;
+  }
 }
 .form-reset {
-  max-width: 514px !important;
+  .form-buttons{
+    margin-top: 10px;
+  }
   .add-on {
-    width: 210px; !important;
+    width: 155px;
+
+    & + input[type="text"],
+    & + input[type="password"],
+    & + select {
+      width: 156px;
+    }
   }
 }
 

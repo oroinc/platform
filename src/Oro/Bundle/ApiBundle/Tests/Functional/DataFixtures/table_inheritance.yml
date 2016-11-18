@@ -1,0 +1,8 @@
+Oro\Bundle\TestFrameworkBundle\Entity\TestDepartment:
+    test_department:
+        name: TestDepartment
+Oro\Bundle\TestFrameworkBundle\Entity\TestEmployee:
+    test_employee:
+        name: TestEmployee
+        department: '@test_department'
+        department: developer

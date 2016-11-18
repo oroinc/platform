@@ -2,9 +2,13 @@
 
 namespace Oro\Component\Layout\Tests\Unit;
 
+use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
+
 use Oro\Component\Layout\BlockFactory;
 use Oro\Component\Layout\BlockView;
 use Oro\Component\Layout\DeferredLayoutManipulator;
+use Oro\Component\Layout\ExpressionLanguage\Encoder\ExpressionEncoderRegistry;
+use Oro\Component\Layout\ExpressionLanguage\ExpressionProcessor;
 use Oro\Component\Layout\Extension\Core\CoreExtension;
 use Oro\Component\Layout\Extension\PreloadedExtension;
 use Oro\Component\Layout\LayoutContext;
@@ -47,7 +51,9 @@ class DeferredLayoutManipulatorTestCase extends LayoutTestCase
         );
         $this->rawLayoutBuilder  = new RawLayoutBuilder();
         $this->layoutManipulator = new DeferredLayoutManipulator($this->registry, $this->rawLayoutBuilder);
-        $this->blockFactory      = new BlockFactory($this->registry, $this->layoutManipulator);
+        $expressionLanguage      = new ExpressionLanguage();
+        $expressionProcessor     = new ExpressionProcessor($expressionLanguage, new ExpressionEncoderRegistry([]));
+        $this->blockFactory      = new BlockFactory($this->registry, $this->layoutManipulator, $expressionProcessor);
     }
 
     /**

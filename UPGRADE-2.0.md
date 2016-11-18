@@ -12,13 +12,32 @@ UPGRADE FROM 1.10 to 2.0
 
 ####Action Component
 - Deprecated constant `Oro\Component\Action\Event\ExecuteActionEvents::DEPRECATED_HANDLE_BEFORE` removed. Use `Oro\Component\Action\Event\ExecuteActionEvents::HANDLE_BEFORE` instead.
-- Deprecated constant `Oro\Component\Action\Event\ExecuteActionEvents::DEPRECATED_HANDLE_AFTER` was removed. Use `Oro\Component\Action\Event\ExecuteActionEvents::HANDLE_AFTER` instead.
-- Deprecated events `oro_workflow.action.handle_before` and `oro_workflow.action.handle_action` were removed.
+- Deprecated constant `Oro\Component\Action\Event\ExecuteActionEvents::DEPRECATED_HANDLE_AFTER` removed. Use `Oro\Component\Action\Event\ExecuteActionEvents::HANDLE_AFTER` instead.
+- Deprecated events `oro_workflow.action.handle_before` and `oro_workflow.action.handle_action` removed.
+- Interface Oro\Component\ConfigExpression\ContextAccessorInterface improved. All methods can accept `PropertyPathInterface` and `string`.
+- Also updated all methods of Oro\Component\ConfigExpression\ContextAccessor according to changes in Oro\Component\ConfigExpression\ContextAccessorInterface.
+- Class `Oro\Component\Action\Model\ContextAccessor`. Use `Oro\Component\ConfigExpression\ContextAccessor` (`@oro_action.expression.context_accessor`) instead.
+- Class `Oro\Component\Action\Action\ActionFactory` 
+    - implements new interface `Oro\Component\ConfigExpression\FactoryWithTypesInterface`
+- Class `Oro\Component\Action\Action\FlashMessage`
+    - method `setRequest` now accepts null value.
+
+####Config Expression Component
+- Added interface `Oro\Component\ConfigExpression\FactoryWithTypesInterface` with method `FactoryWithTypesInterface::getTypes()`
+- Class `Oro\Component\ConfigExpression\ExpressionFactory` now implements interface `Oro\Component\ConfigExpression\FactoryWithTypesInterface`
 
 ####ActionBundle
 - Class `Oro\Bundle\ActionBundle\Layout\Block\Type\ActionLineButtonsType` was removed -> block type `action_buttons` replaced with DI configuration.
 - Added class `Oro\Bundle\ActionBundle\Layout\DataProvider\ActionButtonsProvider` - layout data provider.
-- Default value for parameter `applications` in operation configuration was renamed from `backend` to `default`.
+- Default value for parameter `applications` in operation configuration renamed from `backend` to `default`.
+- Service `oro_action.context_accessor` removed. Use `oro_action.expression.context_accessor` instead.
+- Added new command `Oro\Bundle\ActionBundle\Command\DebugActionCommand (oro:debug:action)` that displays list of all actions with description.
+- Added new command `Oro\Bundle\ActionBundle\Command\DebugConditionCommand (oro:debug:condition)` that displays list of all conditions full description
+- Command `Oro\Bundle\ActionBundle\Command\DumpActionConfigurationCommand` (`oro:action:configuration:dump`) renamed to `Oro\Bundle\ActionBundle\Command\DebugOperationCommand` (`oro:debug:operation`) 
+- Tag `oro_workflow.action` removed, now for actions always using `oro_action.action`
+- Tag `oro_workflow.condition` removed, now for conditions always using `oro_action.condition`
+- Deprecated service `oro_workflow.context_accessor` removed
+- Service (`Oro\Bundle\ActionBundle\Model\ConfigurationPass\ReplacePropertyPath`) removed, use `Oro\Component\ConfigExpression\ConfigurationPass\ReplacePropertyPath` instead
 
 ####ApiBundle
 - The `oro.api.action_processor` DI tag was removed. To add a new action processor, use `oro_api.actions` section of the ApiBundle configuration.
@@ -26,6 +45,9 @@ UPGRADE FROM 1.10 to 2.0
 
 #### ImportExportBundle
 - ImportExportBundle/Field/FieldHelper.php was moved to EntityBundle/Helper/
+- Added fourth argument `Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider $entityConfigProvider` to `__construct` method of `Oro\Bundle\ImportExportBundle\Handler\AbstractHandler`.
+- Added fifth argument `Symfony\Component\Translation\TranslatorInterface $translator` to `__construct` method of `Oro\Bundle\ImportExportBundle\Handler\AbstractHandler`.
+- Removed method `public function setTranslator(TranslatorInterface $translator)` from `Oro\Bundle\ImportExportBundle\Handler\AbstractImportHandler`.
 
 ####WorkflowBundle
 - Class `Oro\Bundle\WorkflowBundle\Model\WorkflowManager`
@@ -150,6 +172,70 @@ Used with new class `Oro\Bundle\WorkflowBundle\Model\WorkflowExclusiveRecordGrou
 - Removed parameter `oro_workflow.listener.process_collector.class`.
 - Removed listener `oro_workflow.event_listener.scheduled_transitions_listener` (`Oro\Bundle\WorkflowBundle\EventListener\WorkflowScheduledTransitionsListener`).
 - Removed action group `oro_workflow_transition_process_schedule`.
+- Added possibility of translation for workflow configuration fields in file `Resources/translations/workflows.en.yml`:
+Now all following fields MUST be moved from workflow.yml configuration file in appropriate translation file under its key node. See keys and fields below:
+ `oro.workflow.{workflow_name}.label` - workflow `label` field.
+ `oro.workflow.{workflow_name}.step.{step_name}.label` - step `label` field.
+ `oro.workflow.{workflow_name}.attribute.{attribute_name}.label` - workflow attribute `label` field.
+ `oro.workflow.{workflow_name}.transition.{transition_name}.label` - transition `label` field.
+ `oro.workflow.{workflow_name}.transition.{transition_name}.warning_message` - transition `message` field.
+ `oro.workflow.{workflow_name}.transition.{transition_name}.attribute.{attribute_name}.label` - form options attribute `label` field.
+To migrate all labels from configuration translatable fields automatically you can use application command `oro:workflow:definitions:upgrade20`. 
+- Added command `oro:workflow:translations:dump` as a helper to see custom workflow translations (lack of them as well) and their keys.
+- Added `Oro\Bundle\WorkflowBundle\Configuration\WorkflowDefinitionBuilderExtensionInterface` and `oro.workflow.definition_builder.extension` service tag for usage in cases to pre-process (prepare) workflow builder configuration.
+- Added service tag `oro.workflow.configuration.handler` for request configuration procession by `Oro\Bundle\WorkflowBundle\Configuration\Handler\ConfigurationHandlerInterface`.
+- Removed `import` method from `Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition`. Use `Oro\Bundle\WorkflowBundle\Handler\Helper\WorkflowDefinitionCloner::cloneDefinition` instead.
+- Added `originalDefinition` property and second constructor argument for `Oro\Bundle\WorkflowBundle\Event\WorkflowChangesEvent` in case of definition update.
+- Container parameter `oro_workflow.workflow_item.entity.class` renamed to `oro_workflow.entity.workflow_item.class`
+- Container parameter `oro_workflow.workflow_definition.entity.class` renamed to `oro_workflow.entity.workflow_definition.class`
+- Container parameter `oro_workflow.process_trigger.entity.class` renamed to `oro_workflow.entity.process_trigger.class`
+- Container parameter `oro_workflow.process_definition.entity.class` renamed to `oro_workflow.entity.process_definition.class`
+- Added container parameter `oro_workflow.entity.transition_trigger_cron.class`
+- Added container parameter `oro_workflow.entity.transition_trigger_event.class`
+- Changed signature of constructor of `\Oro\Bundle\WorkflowBundle\Form\Type\WorkflowDefinitionSelectType`, now it takes as second argument instance of `Symfony\Component\Translation\TranslatorInterface`
+- Changed signature of constructor of `\Oro\Bundle\WorkflowBundle\Form\Type\WorkflowSelectType`, now it takes as second argument instance of `\Symfony\Component\Translation\TranslatorInterface`
+- Changed signature of constructor of `\Oro\Bundle\WorkflowBundle\Form\Type\WorkflowStepSelectType`, now it takes as second argument instance of `\Symfony\Component\Translation\TranslatorInterface`
+- Deprecated service `oro_workflow.attribute_guesser` removed.
+- Deprecated interfaces and classes removed: 
+  * `Oro\Bundle\WorkflowBundle\Model\AbstractStorage`
+  * `Oro\Bundle\WorkflowBundle\Model\ConfigurationPass\ReplacePropertyPath` (service `oro_workflow.configuration_pass.replace_property_path`)
+  * `Oro\Bundle\WorkflowBundle\Model\ReplacePropertyPath\ContextAccessor`
+  * `Oro\Bundle\WorkflowBundle\Event\ExecuteActionEvent`
+  * `Oro\Bundle\WorkflowBundle\Event\ExecuteActionEvents`
+  * `Oro\Bundle\WorkflowBundle\Exception\ActionException`
+  * `Oro\Bundle\WorkflowBundle\Exception\InvalidParameterException`
+  * `Oro\Bundle\WorkflowBundle\Model\AbstractAssembler`
+  * `Oro\Bundle\WorkflowBundle\Model\Action\AbstractAction`
+  * `Oro\Bundle\WorkflowBundle\Model\Action\AbstractDateAction`
+  * `Oro\Bundle\WorkflowBundle\Model\Action\ActionAssembler`
+  * `Oro\Bundle\WorkflowBundle\Model\Action\ActionFactory`
+  * `Oro\Bundle\WorkflowBundle\Model\Action\ActionInterface`
+  * `Oro\Bundle\WorkflowBundle\Model\Action\AssignActiveUser`
+  * `Oro\Bundle\WorkflowBundle\Model\Action\AssignConstantValue`
+  * `Oro\Bundle\WorkflowBundle\Model\Action\AssignValue`
+  * `Oro\Bundle\WorkflowBundle\Model\Action\CallMethod`
+  * `Oro\Bundle\WorkflowBundle\Model\Action\Configurable`
+  * `Oro\Bundle\WorkflowBundle\Model\Action\CopyTagging`
+  * `Oro\Bundle\WorkflowBundle\Model\Action\CreateDate`
+  * `Oro\Bundle\WorkflowBundle\Model\Action\CreateDateTime`
+  * `Oro\Bundle\WorkflowBundle\Model\Action\CreateEntity`
+  * `Oro\Bundle\WorkflowBundle\Model\Action\CreateObject`
+  * `Oro\Bundle\WorkflowBundle\Model\Action\EventDispatcherAwareActionInterface`
+  * `Oro\Bundle\WorkflowBundle\Model\Action\FlashMessage`
+  * `Oro\Bundle\WorkflowBundle\Model\Action\FormatName`
+  * `Oro\Bundle\WorkflowBundle\Model\Action\FormatString`
+  * `Oro\Bundle\WorkflowBundle\Model\Action\Redirect`
+  * `Oro\Bundle\WorkflowBundle\Model\Action\RemoveEntity`
+  * `Oro\Bundle\WorkflowBundle\Model\Action\RequestEntity`
+  * `Oro\Bundle\WorkflowBundle\Model\Action\TranslateAction`
+  * `Oro\Bundle\WorkflowBundle\Model\Action\Traverse`
+  * `Oro\Bundle\WorkflowBundle\Model\Action\TreeExecutor`
+  * `Oro\Bundle\WorkflowBundle\Model\Action\UnsetValue`
+  * `Oro\Bundle\WorkflowBundle\Model\Attribute`
+  * `Oro\Bundle\WorkflowBundle\Model\AttributeGuesser`
+  * `Oro\Bundle\WorkflowBundle\Model\AttributeManager`
+  * `Oro\Bundle\WorkflowBundle\Model\Condition\AbstractCondition`
+  * `Oro\Bundle\WorkflowBundle\Model\Condition\Configurable`
 
 ####LocaleBundle:
 - Added helper `Oro\Bundle\LocaleBundle\Helper\LocalizationQueryTrait` for adding necessary joins to QueryBuilder
@@ -192,6 +278,14 @@ Used with new class `Oro\Bundle\WorkflowBundle\Model\WorkflowExclusiveRecordGrou
 - Added `Oro\Component\Layout\Block\Type\Options` class that wraps the `array` of options and can evaluate option type (is `option` instanceof `Expression`).
 - Updated method `Oro\Component\Layout\Extension\Theme\Visitor::loadImportUpdate()` to add imported updates to updates list right after parent update instead of adding it to the end of updates list.
 - Updated `Oro\Component\Layout\BlockTypeInterface`, `Oro\Component\Layout\BlockTypeExtensionInterface`, `Oro\Component\Layout\LayoutRegistryInterface` to use the `Options` object instead of `array`.
+- Added method `Oro\Component\Layout\BlockView::getId`.
+- Added method `Oro\Component\Layout\ContextInterface::getHash`.
+- Added config loader `\Oro\Component\Layout\Config\Loader\LayoutUpdateCumulativeResourceLoader` that tracks directory structure/content updates and files modification time.
+- Added interface `Oro\Component\Layout\BlockViewCacheInterface`.
+- Added class `Oro\Component\Layout\BlockViewCache`.
+- Updated method `Oro\Component\Layout\LayoutBuilder::getLayout`. Added layout cache.
+- Injected `BlockViewCache` into `LayoutFactoryBuilder` and passed as argument to `LayoutFactory`. From `LayoutFactory` `BlockViewCache` argument passed as argument to `LayoutBuilder` to save/fetch layout cache data.
+- Update interface method arguments `Oro\Component\Layout\BlockFactoryInterface::createBlockView` - removed `$rootId`.
 
 ####LayoutBundle
 - Removed class `Oro\Bundle\LayoutBundle\CacheWarmer\LayoutUpdatesWarmer`.
@@ -211,6 +305,38 @@ Used with new class `Oro\Bundle\WorkflowBundle\Model\WorkflowExclusiveRecordGrou
 - Class `Oro\Bundle\LayoutBundle\Provider\ImageTypeProvider` added to provide available image types collected from all themes
 - Class `Oro\Bundle\LayoutBundle\Loader\ImageFilterLoader` added to dynamically load Imagine filters
 - Dependency injection tag `layout.image_filter.provider` added to support custom Imagine filter providers
+- Removed class `Oro\Bundle\LayoutBundle\Layout\Block\Extension\ExpressionExtension`.
+- Removed class `Oro\Bundle\LayoutBundle\Layout\Block\Extension\OptionValueBagExtension`.
+- Class `Oro\Bundle\LayoutBundle\Exception\CircularReferenceException` moved to `Oro\Component\Layout\Exception\CircularReferenceException`.
+- Class `Oro\Bundle\LayoutBundle\Layout\Encode\ExpressionEncoderInterface` moved to `Oro\Component\Layout\ExpressionLanguage\Encoder\ExpressionEncoderInterface`.
+- Class `Oro\Bundle\LayoutBundle\Layout\Encoder\ExpressionEncoderRegistry` moved to `Oro\Component\Layout\ExpressionLanguage\Encoder\ExpressionEncoderRegistry`.
+- Class `Oro\Bundle\LayoutBundle\Layout\Encoder\JsonExpressionEncoder` moved to `Oro\Component\Layout\ExpressionLanguage\Encoder\JsonExpressionEncoder`.
+- Class `Oro\Bundle\LayoutBundle\ExpressionLanguage\ExpressionManipulator` moved to `Oro\Component\Layout\ExpressionLanguage\ExpressionManipulator`.
+- Class `Oro\Bundle\LayoutBundle\Layout\Processor\ExpressionProcessor` moved to `Oro\Component\Layout\ExpressionLanguage\ExpressionProcessor`.
+- All logic that work with `\Oro\Bundle\LayoutBundle\Layout\Form\FormAccessor` and related blocks was moved to `EmbeddedFormBundle`:
+    * `Oro\Bundle\LayoutBundle\Layout\Form\AbstractFormAccessor` moved to `Oro\Bundle\EmbeddedFormBundle\Layout\Form\AbstractFormAccessor`
+    * `Oro\Bundle\LayoutBundle\Layout\Form\ConfigurableFormAccessorInterface` moved to `Oro\Bundle\EmbeddedFormBundle\Layout\Form\ConfigurableFormAccessorInterface`
+    * `Oro\Bundle\LayoutBundle\Layout\Form\DependencyInjectionFormAccessor` moved to `Oro\Bundle\EmbeddedFormBundle\Layout\Form\DependencyInjectionFormAccessor`
+    * `Oro\Bundle\LayoutBundle\Layout\Form\FormAccessor` moved to `Oro\Bundle\EmbeddedFormBundle\Layout\Form\FormAccessor`
+    * `Oro\Bundle\LayoutBundle\Layout\Form\FormAccessorInterface` moved to `Oro\Bundle\EmbeddedFormBundle\Layout\Form\FormAccessorInterface`
+    * `Oro\Bundle\LayoutBundle\Layout\Form\FormAction` moved to `Oro\Bundle\EmbeddedFormBundle\Layout\Form\FormAction`
+    * `Oro\Bundle\LayoutBundle\Layout\Form\FormLayoutBuilder` moved to `Oro\Bundle\EmbeddedFormBundle\Layout\Form\FormLayoutBuilder`
+    * `Oro\Bundle\LayoutBundle\Layout\Form\FormLayoutBuilderInterface` moved to `Oro\Bundle\EmbeddedFormBundle\Layout\Form\FormLayoutBuilderInterface`
+    * `Oro\Bundle\LayoutBundle\Layout\Form\GroupingFormLayoutBuilder` moved to `Oro\Bundle\EmbeddedFormBundle\Layout\Form\GroupingFormLayoutBuilder`
+    * `Oro\Bundle\LayoutBundle\Layout\Block\Type\AbstractFormType` moved to `Oro\Bundle\EmbeddedFormBundle\Layout\Block\Type\AbstractFormType`
+    * `Oro\Bundle\LayoutBundle\Layout\Block\Type\FormEndType` moved to `Oro\Bundle\EmbeddedFormBundle\Layout\Block\Type\EmbedFormEndType`
+    * `Oro\Bundle\LayoutBundle\Layout\Block\Type\FormFieldType` moved to `Oro\Bundle\EmbeddedFormBundle\Layout\Block\Type\EmbedFormFieldType`
+    * `Oro\Bundle\LayoutBundle\Layout\Block\Type\FormFieldsType` moved to `Oro\Bundle\EmbeddedFormBundle\Layout\Block\Type\EmbedFormFieldsType`
+    * `Oro\Bundle\LayoutBundle\Layout\Block\Type\FormStartType` moved to `Oro\Bundle\EmbeddedFormBundle\Layout\Block\Type\EmbedFormStartType`
+    * `Oro\Bundle\LayoutBundle\Layout\Block\Type\FormType` moved to `Oro\Bundle\EmbeddedFormBundle\Layout\Block\Type\EmbedFormType`
+- Added layout block type `Oro\Bundle\LayoutBundle\Layout\Block\Type\FormType` with new logic.
+- Layout block types `form_start`, `form_end`, `form_fields` is created as `configurable` with DI configuration.
+- Added class `Oro\Bundle\LayoutBundle\DependencyInjection\Compiler\BlockViewSerializerNormalizersPass` that collect serializers by tag `layout.block_view_serializer.normalizer` and inject it to `oro_layout.block_view_serializer`:
+    * Added block view normalizer `Oro\Bundle\LayoutBundle\Layout\Serializer\BlockViewNormalizer`
+    * Added block view normalizer `Oro\Bundle\LayoutBundle\Layout\Serializer\ExpressionNormalizer`
+    * Added block view normalizer `Oro\Bundle\LayoutBundle\Layout\Serializer\OptionValueBagNormalizer`
+- Added exception class `Oro\Bundle\LayoutBundle\Exception\UnexpectedBlockViewVarTypeException`.
+- Added layout context configurator `Oro\Bundle\LayoutBundle\Layout\Extension\LastModifiedDateContextConfigurator`.
 
 ####ConfigBundle:
 - Class `Oro\Bundle\ConfigBundle\Config\AbstractScopeManager` added `$scopeIdentifier` of type integer, null or object as optional parameter for next methods: `getSettingValue`, `getInfo`, `set`, `reset`, `getChanges`, `flush`, `save`, `calculateChangeSet`, `reload`
@@ -252,6 +378,7 @@ Used with new class `Oro\Bundle\WorkflowBundle\Model\WorkflowExclusiveRecordGrou
 - Class `Oro/Bundle/DataGridBundle/Extension/MassAction/DeleteMassActionHandler.php`
     - construction signature was changed now it takes new argument:
         `MessageProducerInterface` $producer
+- Added helper `Oro\Bundle\DataGridBundle\Tools\DatagridRouteHelper`
 
 ####SecurityBundle
 - Removed layout context configurator `Oro\Bundle\SecurityBundle\Layout\Extension\SecurityFacadeContextConfigurator`.
@@ -310,7 +437,18 @@ Used with new class `Oro\Bundle\WorkflowBundle\Model\WorkflowExclusiveRecordGrou
 - Added new ACL permission `TRANSLATE`, should be used to determine if user has access to modify translations per language.
 - Removed `Oro\Bundle\TranslationBundle\Translation\TranslationStatusInterface`
 - Added `Oro\Bundle\TranslationBundle\DependencyInjection\Compiler\TranslationContextResolverPass`.
+- Added `Oro\Bundle\TranslationBundle\Helper\TranslationHelper` class with `oro_translation.helper.translation` as accessor for translation values in database.  
+- Added Twig extension `\Oro\Bundle\TranslationBundle\Twig\TranslationExtension` wich declare following TWIG functions:
+    - `oro_translation_debug_translator` 
+    - `translation_grid_link`
+- Added `Oro\Bundle\TranslationBundle\Translation\TranslationKeyGenerator`
+- Added `Oro\Bundle\TranslationBundle\Translation\TranslationKeySourceInterface` with 2 types of implementations `Oro\Bundle\TranslationBundle\Translation\KeySource\DynamicTranslationKeySource` and immutable one - `Oro\Bundle\TranslationBundle\Translation\KeySource\TranslationKeySource`
+- Added `Oro\Bundle\TranslationBundle\Translation\TranslationFieldsIteratorInterface` as useful way to define single point of custom structure translatable fields awareness and manipulation.
+- Added `Oro\Bundle\TranslationBundle\Translation\TranslationFieldsIteratorTrait`.
+- Added Data Provider `Oro\Bundle\TranslationBundle\Layout\DataProvider\TranslatorProvider` that provides the translator to Layouts. 
+- Added helper `Oro\Bundle\TranslationBundle\Helper\TranslationsDatagridRouteHelper`.
 
+ 
 ####EntityExtendBundle
 - `Oro\Bundle\EntityExtendBundle\Migration\EntityMetadataHelper`
     - `getEntityClassByTableName` deprecated, use `getEntityClassesByTableName` instead
@@ -395,6 +533,24 @@ tag if it works with extend classes
 - Oro/Bundle/SearchBundle/Entity/UpdateEntity and Oro/Bundle/SearchBundle/EventListener/UpdateSchemaDoctrineListener were removed
 - `oro_search.search.engine.indexer` service was replaced with async implementation `oro_search.async.indexer`. Use sync indexer only for test environment.
 - New helper trait Oro/Component/Testing/SearchExtensionTrait - easy access to sync indexer for test environment
+- Removed `Oro\Bundle\SearchBundle\Resolver\EntityTitleResolverInterface` and classes that implement it:
+- Changed constructor and replaced `Oro\Bundle\SearchBundle\Resolver\EntityTitleResolverInterface` with `Oro\Bundle\EntityBundle\Provider\EntityNameResolver` in classes:
+  - `Oro\Bundle\SearchBundle\Engine\AbstractIndexer`
+  - `Oro\Bundle\SearchBundle\Engine\OrmIndexer`
+  - `Oro\Bundle\SearchBundle\EventListener\PrepareResultItemListener`
+  - `Oro\Bundle\ElasticSearchBundle\Engine\ElasticSearchIndexer`
+  - `Oro\Bundle\ActivityBundle\Entity\Manager\ActivityContextApiEntityManager`
+  - `Oro\Bundle\ActivityBundle\Form\DataTransformer\ContextsToViewTransformer`
+  - `Oro\Bundle\ActivityBundle\Form\Type\ContextsSelectType`
+  - `Oro\Bundle\CalendarBundle\Form\DataTransformer\AttendeesToViewTransformer`
+- Removed (deprecated) usage of `title_fields` as they are not available on all search engines (e.g. elastic search). Entity titles will resolve using EntityNameResolver. This may affect search results (e.g. `recordTitle` and `record_string` in functional tests are changed).
+
+####ElasticSearchBundle
+- Changed constructor of `Oro\Bundle\ElasticSearchBundle\Engine\ElasticSearchIndexer`. Replaced `EntityTitleResolverInterface` with `EntityNameResolver`.
+
+####ActivityBundle:
+- Changed constructor of `Oro\Bundle\ActivityBundle\Autocomplete\ContextSearchHandler`. Replaced `ObjectMapper` with `EntityNameResolver`. Class now use EntityNameResolver instead of `title_fields`.
+
 
 ####UIBundle:
 - Placeholders configuration now loads from `Resources/config/oro/placeholders.yml` file instead of `Resources/config/placeholders.yml`.
@@ -548,6 +704,15 @@ oro_email.email_address.entity_manager:
 - Added EntityFallbackExtension service which reads fallback values of entities in twig
 - Added AbstractEntityFallbackProvider abstract service to ease adding new fallback types, please refer
 to the [Fallback documentation](./src/Oro/Bundle/EntityBundle/Resources/doc/entity_fallback.md) for details
+- `Oro\Bundle\EntityBundle\Provider\EntityNameProvider` now is the generic Entity Name Provider which resolves:
+   - 'Short' format: title based on entity fields from 'firstName', 'name', 'title', 'subject' (uses only the first that is found)
+   - 'Full' format: a space-delimited concatenation of all string fields of the entity.
+   - For both formats: will return the entity ID when fields are found but their value is empty. Same applies for both `getName` and `getNameDQL` methods. Will return `false` if no suitable fields are available.
+- Added `Oro\Bundle\EntityBundle\Provider\FallbackEntityNameProvider` which will resolve entity title in form of 'Item #1' (translates `oro.entity.item`). Can use only single-column identifiers, else returns `false`. Should be kept as last provider.
+
+####ContactBundle
+
+- `Oro\Bundle\ContactBundle\Provider\ContactEntityNameProvider` now uses phone and email as fallback when entity names are empty
 
 ####CacheBundle
 - `Oro\Bundle\CacheBundle\Manager\OroDataCacheManager` now has method `clear` to clear cache at all cache providers
@@ -616,11 +781,11 @@ to the [Fallback documentation](./src/Oro/Bundle/EntityBundle/Resources/doc/enti
 ####UserBundle
 - Added `Oro\Bundle\UserBundle\Validator\Constraints\PasswordComplexity` to User model
 - User password requirements are more restrictive by default and require 8 characters, an upper case letter, and a number.
-- Any new users or changing of existing passwords need to meet the password requirements specified in System Configuration/General Setup/Security Settings. Existing user passwords are not affected
+- Any new users or changing of existing passwords need to meet the password requirements specified in System Configuration/General Setup/User Settings. Existing user passwords are not affected
 - Removed service @oro_user.password_reset.widget_provider.actions (replaced by @oro_user.forced_password_reset.widget_provider.actions)
 
 ####DemoDataBundle
-- All demo users will have passwords ending with '1Q' (e.g. for username 'marketing' password is 'marketing1Q'). For user 'sale' the password is 'salesale1Q'.
+- All demo CRM users will have passwords ending with '1Q' (e.g. for username 'marketing' password is 'marketing1Q'). For user 'sale' the password is 'salesale1Q'.
 
 ####ImapBundle
 - The command `oro:imap:clear-mailbox` was removed. Produce message to the topic `oro.imap.clear_inactive_mailbox` instead.

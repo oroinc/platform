@@ -163,7 +163,10 @@ class WorkflowDefinition implements DomainObjectInterface
      *
      * @ORM\Column(name="groups", type="array")
      */
-    protected $groups = [];
+    protected $groups = [
+        self::GROUP_TYPE_EXCLUSIVE_ACTIVE => [],
+        self::GROUP_TYPE_EXCLUSIVE_RECORD => [],
+    ];
 
     /**
      * @var \DateTime $created
@@ -614,29 +617,6 @@ class WorkflowDefinition implements DomainObjectInterface
     }
 
     /**
-     * @param WorkflowDefinition $definition
-     * @return WorkflowDefinition
-     */
-    public function import(WorkflowDefinition $definition)
-    {
-        $this->setName($definition->getName())
-            ->setLabel($definition->getLabel())
-            ->setRelatedEntity($definition->getRelatedEntity())
-            ->setEntityAttributeName($definition->getEntityAttributeName())
-            ->setConfiguration($definition->getConfiguration())
-            ->setSteps($definition->getSteps())
-            ->setStartStep($definition->getStartStep())
-            ->setStepsDisplayOrdered($definition->isStepsDisplayOrdered())
-            ->setEntityAcls($definition->getEntityAcls())
-            ->setRestrictions($definition->getRestrictions())
-            ->setSystem($definition->isSystem())
-            ->setPriority($definition->getPriority())
-            ->setGroups($definition->groups);
-
-        return $this;
-    }
-
-    /**
      * @return boolean
      */
     public function isSystem()
@@ -768,17 +748,6 @@ class WorkflowDefinition implements DomainObjectInterface
     }
 
     /**
-     * @param array $groups
-     * @return $this
-     */
-    public function setGroups(array $groups)
-    {
-        $this->groups = $groups;
-
-        return $this;
-    }
-
-    /**
      * @return bool
      */
     public function hasExclusiveActiveGroups()
@@ -797,6 +766,17 @@ class WorkflowDefinition implements DomainObjectInterface
     }
 
     /**
+     * @param array $groups
+     * @return $this
+     */
+    public function setExclusiveActiveGroups(array $groups)
+    {
+        $this->groups[self::GROUP_TYPE_EXCLUSIVE_ACTIVE] = $groups;
+
+        return $this;
+    }
+
+    /**
      * @return bool
      */
     public function hasExclusiveRecordGroups()
@@ -812,5 +792,16 @@ class WorkflowDefinition implements DomainObjectInterface
         return isset($this->groups[self::GROUP_TYPE_EXCLUSIVE_RECORD])
             ? $this->groups[self::GROUP_TYPE_EXCLUSIVE_RECORD]
             : [];
+    }
+
+    /**
+     * @param array $groups
+     * @return $this
+     */
+    public function setExclusiveRecordGroups(array $groups)
+    {
+        $this->groups[self::GROUP_TYPE_EXCLUSIVE_RECORD] = $groups;
+
+        return $this;
     }
 }

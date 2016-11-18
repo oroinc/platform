@@ -69,8 +69,8 @@ define(function(require) {
                     suspendedStep = this.findStepModelByElement(data.connection.suspendedElement);
                     stepFrom.getAllowedTransitions().add(transitionModel);
                     suspendedStep.getAllowedTransitions().remove(transitionModel);
-                    stepFrom.trigger('change');
-                    suspendedStep.trigger('change');
+                    stepFrom.trigger('change', stepFrom, {});
+                    suspendedStep.trigger('change', suspendedStep, {});
                 }
             } else if (!stepTo.get('_is_start')) {
                 this.model.trigger('requestAddTransition', stepFrom, stepTo);
