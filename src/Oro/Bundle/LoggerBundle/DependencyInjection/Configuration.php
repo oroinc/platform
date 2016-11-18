@@ -13,6 +13,8 @@ class Configuration implements ConfigurationInterface
     const ROOT_NODE = 'oro_logger';
     const LOGS_LEVEL_KEY = 'detailed_logs_level';
     const LOGS_TIMESTAMP_KEY = 'detailed_logs_end_timestamp';
+    const EMAIL_NOTIFICATION_RECIPIENTS = 'email_notification_recipients';
+    const EMAIL_NOTIFICATION_SUBJECT = 'email_notification_subject';
 
     /**
      * {@inheritdoc}
@@ -31,6 +33,14 @@ class Configuration implements ConfigurationInterface
             self::LOGS_TIMESTAMP_KEY => [
                 'type' => 'integer',
                 'value' => null
+            ],
+            self::EMAIL_NOTIFICATION_RECIPIENTS => [
+                'type' => 'string',
+                'value' => ''
+            ],
+            self::EMAIL_NOTIFICATION_SUBJECT => [
+                'type' => 'string',
+                'value' => 'An Error Occurred!'
             ],
         ]);
 

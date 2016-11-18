@@ -1,0 +1,9 @@
+oro:
+    logger:
+        system_configuration:
+            groups:
+                logger_notification_settings.title: 'Error logs notification'
+            fields:
+                email_notification_recipients:
+                    label: 'Recipients email addresses'
+                    tooltip: 'Leave this field empty to disable error logs notification. To send notifications to specific people, write in their email addresses separated by semicolons (;).'

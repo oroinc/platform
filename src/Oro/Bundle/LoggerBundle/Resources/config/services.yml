@@ -15,3 +15,12 @@ services:
 
     oro_logger.monolog.detailed_logs.handler:
         parent: oro_logger.monolog.detailed_logs.handler.prototype
+
+    oro_logger.message_factory:
+        class: Oro\Bundle\LoggerBundle\Mailer\MessageFactory
+        calls:
+            - ['setContainer', ['@service_container']]
+
+    swiftmailer.plugin.no_recipient.abstract:
+        class: Oro\Bundle\LoggerBundle\Mailer\NoRecipientPlugin
+        abstract: true

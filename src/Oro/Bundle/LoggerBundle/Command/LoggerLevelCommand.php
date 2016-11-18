@@ -6,6 +6,7 @@ use Psr\Log\LogLevel;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
 use Oro\Bundle\UserBundle\Entity\User;
@@ -51,7 +52,7 @@ class LoggerLevelCommand extends ContainerAwareCommand
             ->addOption(
                 self::USER_PARAM,
                 'u',
-                InputArgument::OPTIONAL,
+                InputOption::VALUE_REQUIRED,
                 'Email of existing user'
             )
             ->setDescription('Update logger level configuration')
@@ -81,7 +82,7 @@ class LoggerLevelCommand extends ContainerAwareCommand
         }
 
         $configManager->set(Configuration::getFullConfigKey(Configuration::LOGS_LEVEL_KEY), $level);
-        $configManager->set(Configuration::getFullConfigKey(Configuration::LOGS_TIMESTAMP_KEY), $disableAfter);
+        $configManager->set(Configuration::getFullConfigKey(Configuration::LOGS_TIMESTAMP_KEY), $disableAfter->getTimestamp());
 
         $configManager->flush();
 
