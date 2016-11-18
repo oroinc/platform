@@ -541,7 +541,9 @@ class OroMainContext extends MinkContext implements
 
             /** @var NodeElement $label */
             foreach ($labels as $labelElement) {
-                $text = $labelElement->getParent()->find('css', 'div.controls div.control-label')->getText();
+                $controlLabel = $labelElement->getParent()->find('css', 'div.controls div.control-label');
+                self::assertNotNull($controlLabel);
+                $text = $controlLabel->getText();
 
                 if (false !== stripos($text, $value)) {
                     continue 2;
