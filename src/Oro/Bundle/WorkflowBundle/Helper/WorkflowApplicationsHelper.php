@@ -35,12 +35,4 @@ class WorkflowApplicationsHelper implements ApplicationsHelperInterface
     {
         return $this->applicationsHelper->getCurrentApplication();
     }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getWidgetRoute()
-    {
-        return $this->widgetRoute ? $this->widgetRoute : $this->applicationsHelper->getWidgetRoute();
-    }
 }
