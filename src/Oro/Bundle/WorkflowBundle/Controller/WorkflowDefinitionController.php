@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\WorkflowBundle\Controller;
 
+use Doctrine\Common\Collections\Collection;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 
@@ -89,13 +90,13 @@ class WorkflowDefinitionController extends Controller
         $form = $this->get('oro_workflow.form.workflow_definition');
         $form->setData($workflowDefinition);
 
-        return array(
+        return [
             'form' => $form->createView(),
             'entity' => $workflowDefinition,
             'system_entities' => $this->get('oro_entity.entity_provider')->getEntities(),
             'delete_allowed' => true,
             'translateLinks' => $translateLinks,
-        );
+        ];
     }
 
     /**
@@ -143,18 +144,17 @@ class WorkflowDefinitionController extends Controller
 
         $response = $this->get('oro_form.model.update_handler')->update($workflowDefinition, $form, null);
         $response['workflow'] = $workflowDefinition->getName();
-        $response['workflowsToDeactivation'] = $workflowsToDeactivation;
+        $response['workflowsToDeactivation'] = $workflowsToDeactivation->getValues();
 
         if ($form->isValid()) {
             $workflowManager = $this->get('oro_workflow.manager');
             $workflowNames = array_merge(
                 $form->getData(),
-                array_map(
+                $workflowsToDeactivation->map(
                     function (Workflow $workflow) {
                         return $workflow->getName();
-                    },
-                    $workflowsToDeactivation
-                )
+                    }
+                )->getValues()
             );
 
             $translator = $this->get('translator');
@@ -185,15 +185,14 @@ class WorkflowDefinitionController extends Controller
 
     /**
      * @param WorkflowDefinition $workflowDefinition
-     * @return array|Workflow[]
+     * @return Workflow[]|Collection
      */
     protected function getWorkflowsToDeactivation(WorkflowDefinition $workflowDefinition)
     {
         $workflows = $this->get('oro_workflow.registry')
             ->getActiveWorkflowsByActiveGroups($workflowDefinition->getExclusiveActiveGroups());
 
-        return array_filter(
-            $workflows,
+        return $workflows->filter(
             function (Workflow $workflow) use ($workflowDefinition) {
                 return $workflow->getName() !== $workflowDefinition->getName();
             }

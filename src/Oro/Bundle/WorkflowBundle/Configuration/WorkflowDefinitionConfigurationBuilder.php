@@ -74,7 +74,6 @@ class WorkflowDefinitionConfigurationBuilder extends AbstractConfigurationBuilde
             WorkflowConfiguration::NODE_EXCLUSIVE_RECORD_GROUPS,
             []
         );
-        $scopesConfig = $this->getConfigurationOption($configuration, WorkflowConfiguration::NODE_SCOPES, []);
 
         $workflowDefinition = new WorkflowDefinition();
         $workflowDefinition
@@ -88,7 +87,6 @@ class WorkflowDefinitionConfigurationBuilder extends AbstractConfigurationBuilde
             ->setEntityAttributeName($entityAttributeName)
             ->setExclusiveActiveGroups($activeGroups)
             ->setExclusiveRecordGroups($recordGroups)
-            ->setScopesConfig($scopesConfig)
             ->setConfiguration($this->filterConfiguration($configuration));
 
         $workflow = $this->workflowAssembler->assemble($workflowDefinition, false);
@@ -184,7 +182,7 @@ class WorkflowDefinitionConfigurationBuilder extends AbstractConfigurationBuilde
     {
         $configurationKeys = [
             WorkflowConfiguration::NODE_STEPS,
-            WorkflowConfiguration::NODE_SCOPES,
+            WorkflowDefinition::CONFIG_SCOPES,
             WorkflowConfiguration::NODE_ATTRIBUTES,
             WorkflowConfiguration::NODE_TRANSITIONS,
             WorkflowConfiguration::NODE_TRANSITION_DEFINITIONS,

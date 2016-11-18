@@ -13,6 +13,7 @@ use Symfony\Component\Config\Definition\Processor;
 
 use Oro\Bundle\WorkflowBundle\Entity\EventTriggerInterface;
 use Oro\Bundle\WorkflowBundle\Entity\TransitionEventTrigger;
+use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Exception\WorkflowException;
 use Oro\Bundle\WorkflowBundle\Form\Type\WorkflowTransitionType;
 
@@ -21,7 +22,6 @@ class WorkflowConfiguration extends AbstractConfiguration implements Configurati
     const NODE_STEPS = 'steps';
     const NODE_ATTRIBUTES = 'attributes';
     const NODE_TRANSITIONS = 'transitions';
-    const NODE_SCOPES = 'scopes';
     const NODE_TRANSITION_DEFINITIONS = 'transition_definitions';
     const NODE_ENTITY_RESTRICTIONS = 'entity_restrictions';
     const NODE_EXCLUSIVE_ACTIVE_GROUPS = 'exclusive_active_groups';
@@ -90,7 +90,7 @@ class WorkflowConfiguration extends AbstractConfiguration implements Configurati
             ->integerNode('priority')
                 ->defaultValue(0)
             ->end()
-            ->arrayNode(self::NODE_SCOPES)
+            ->arrayNode(WorkflowDefinition::CONFIG_SCOPES)
                 ->prototype('variable')->end()
             ->end()
             ->append($this->getStepsNode())

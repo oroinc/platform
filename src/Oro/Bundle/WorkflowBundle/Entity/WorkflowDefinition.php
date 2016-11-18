@@ -52,6 +52,8 @@ class WorkflowDefinition implements DomainObjectInterface
     const GROUP_TYPE_EXCLUSIVE_ACTIVE = 10;
     const GROUP_TYPE_EXCLUSIVE_RECORD = 20;
 
+    const CONFIG_SCOPES = 'scopes';
+
     /**
      * @var string
      *
@@ -107,11 +109,6 @@ class WorkflowDefinition implements DomainObjectInterface
      * @ORM\Column(name="priority", type="integer", options={"default"=0})
      */
     protected $priority = 0;
-
-    /**
-     * @var array
-     */
-    protected $scopesConfig = [];
 
     /**
      * @var array
@@ -246,22 +243,30 @@ class WorkflowDefinition implements DomainObjectInterface
     }
 
     /**
+     * @param array $scopesConfig
+     * @return $this
+     */
+    public function setScopesConfig(array $scopesConfig)
+    {
+        $this->configuration[self::CONFIG_SCOPES] = $scopesConfig;
+
+        return $this;
+    }
+
+    /**
      * @return array
      */
     public function getScopesConfig()
     {
-        return $this->scopesConfig;
+        return array_key_exists('scopes', $this->configuration) ? (array)$this->configuration[self::CONFIG_SCOPES] : [];
     }
 
     /**
-     * @param array $config
-     * @return WorkflowDefinition
+     * @return boolean
      */
-    public function setScopesConfig(array $config)
+    public function hasScopesConfig()
     {
-        $this->scopesConfig = $config;
-
-        return $this;
+        return !empty($this->configuration[self::CONFIG_SCOPES]);
     }
 
     /**
