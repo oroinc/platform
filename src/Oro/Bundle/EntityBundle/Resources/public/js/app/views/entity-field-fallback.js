@@ -40,17 +40,20 @@ define(function(require) {
 
         handleUseFallbackCheckbox: function() {
             var self = this;
-            var $checkbox = $(this.options.selectors.useFallbackCheckbox);
-            var $fieldValue = $(this.options.selectors.entityFieldValue);
-            var $fallbackValue = $(this.options.selectors.fallbackSelect);
+            var $checkboxes = $(this.options.selectors.useFallbackCheckbox);
 
-            this.handleCheckboxValue($checkbox, $fieldValue, $fallbackValue);
-            $checkbox.on('click', function() {
-                self.handleCheckboxValue($checkbox, $fieldValue, $fallbackValue);
+            $checkboxes.each(function() {
+                var $checkbox = $(this);
+                self.handleCheckboxValue($checkbox);
+                $checkbox.on('click', function() {
+                    self.handleCheckboxValue($checkbox);
+                });
             });
         },
 
-        handleCheckboxValue: function($checkbox, $fieldValue, $fallbackValue) {
+        handleCheckboxValue: function($checkbox) {
+            var $fieldValue = $checkbox.parents('table').find(this.options.selectors.entityFieldValue);
+            var $fallbackValue = $checkbox.parents('table').find(this.options.selectors.fallbackSelect);
             if ($checkbox.is(':checked')) {
                 this.disableElement($fieldValue);
                 this.enableElement($fallbackValue);
