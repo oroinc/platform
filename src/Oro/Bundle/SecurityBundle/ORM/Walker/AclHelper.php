@@ -3,6 +3,7 @@
 namespace Oro\Bundle\SecurityBundle\ORM\Walker;
 
 use Doctrine\Common\Collections\Criteria;
+use Doctrine\Common\Collections\Expr\Value;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
 use Doctrine\ORM\Query;
@@ -65,10 +66,9 @@ class AclHelper
     /**
      * Add ACL checks to Criteria
      *
-     * @param string $className
+     * @param string   $className
      * @param Criteria $criteria
-     * @param string $permission
-     * @param array $mapField
+     * @param string   $permission
      *
      * @return Criteria
      */
@@ -89,53 +89,20 @@ class AclHelper
             if (!is_null($organizationField) && !is_null($organizationValue)) {
                 $criteria->andWhere(Criteria::expr()->in($organizationField, [$organizationValue]));
             }
-            if (!$ignoreOwner && !empty($value)) {
-                if (!is_array($value)) {
-                    $value = [$value];
+            if (!$ignoreOwner) {
+                if (!empty($value)) {
+                    if (!is_array($value)) {
+                        $value = [$value];
+                    }
+                    $criteria->andWhere(Criteria::expr()->in($entityField, $value));
+                } else {
+                    $expression = new Value('1=0');
+                    $criteria->andWhere($expression);
                 }
-                $criteria->andWhere(Criteria::expr()->in($entityField, $value));
             }
         }
 
         return $criteria;
-    }
-
-    /**
-     * Add ACL checks to Criteria
-     *
-     * @param string $className
-     * @param QueryBuilder $queryBuilder
-     * @param string $permission
-     * @param array $mapField
-     *
-     * @return Criteria
-     */
-    public function applyAclToQb($className, QueryBuilder $queryBuilder, $permission, $mapField = [])
-    {
-        $conditionData = $this->builder->getAclConditionData($className, $permission);
-        if (!empty($conditionData)) {
-            list($entityField, $value, , $organizationField, $organizationValue, $ignoreOwner) = $conditionData;
-
-            if (isset($mapField[$organizationField])) {
-                $organizationField = $mapField[$organizationField];
-            }
-
-            if (isset($mapField[$entityField])) {
-                $entityField = $mapField[$entityField];
-            }
-
-            if (!is_null($organizationField) && !is_null($organizationValue)) {
-                $queryBuilder->andWhere($queryBuilder->expr()->in($organizationField, [$organizationValue]));
-            }
-            if (!$ignoreOwner && !empty($value)) {
-                if (!is_array($value)) {
-                    $value = [$value];
-                }
-                $queryBuilder->andWhere($queryBuilder->expr()->in($entityField, $value));
-            }
-        }
-
-        return $queryBuilder;
     }
 
     /**
