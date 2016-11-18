@@ -361,11 +361,11 @@ datagrids:
             username:
                 label: oro.user.username.label
             enabled:
-                label:         oro.user.enabled.label
+                label: oro.user.enabled.label
                 frontend_type: select
                 choices:
-                   - Inactive
-                   - Active
+                   - Disabled
+                   - Enabled
         filters:
             columns:
                 has_role:
@@ -389,8 +389,8 @@ datagrids:
                     options:
                         field_options:
                             choices:
-                                2: Inactive
-                                1: Active
+                                2: Disabled
+                                1: Enabled
         sorters:
             multiple_sorting: true
             columns:
@@ -477,11 +477,11 @@ datagrids:
             username:
                 label: oro.user.username.label
             enabled:
-                label:         oro.user.enabled.label
+                label: oro.user.enabled.label
                 frontend_type: select
                 choices:
-                   - Inactive
-                   - Active
+                   - Disabled
+                   - Enabled
         filters:
             columns:
                 has_group:
@@ -505,8 +505,8 @@ datagrids:
                     options:
                         field_options:
                             choices:
-                                2: Inactive
-                                1: Active
+                                2: Disabled
+                                1: Enabled
         sorters:
             multiple_sorting: true
             columns:
@@ -554,8 +554,8 @@ datagrids:
                 label: oro.user.enabled.label
                 frontend_type: select
                 choices:
-                   - Inactive
-                   - Active
+                   - Disabled
+                   - Enabled
 
         properties:
             id: ~
@@ -593,8 +593,8 @@ datagrids:
                     options:
                         field_options:
                             choices:
-                                2: Inactive
-                                1: Active
+                                2: Disabled
+                                1: Enabled
 
     owner-users-select-grid:
         extended_entity_name: %oro_user.entity.class%
@@ -625,12 +625,7 @@ datagrids:
                 label: oro.user.email.label
             username:
                 label: oro.user.username.label
-            enabled:
-                label: oro.user.enabled.label
-                frontend_type: select
-                choices:
-                   - Inactive
-                   - Active
+
         properties:
             id: ~
         sorters:
@@ -643,8 +638,6 @@ datagrids:
                     data_name: u.email
                 username:
                     data_name: u.username
-                enabled:
-                    data_name: u.enabled
             default:
                 username: %oro_datagrid.extension.orm_sorter.class%::DIRECTION_ASC
         filters:
@@ -661,14 +654,6 @@ datagrids:
                 username:
                     type: string
                     data_name: u.username
-                enabled:
-                    type: boolean
-                    data_name: u.enabled
-                    options:
-                        field_options:
-                            choices:
-                                2: Inactive
-                                1: Active
 
     users-select-grid-exclude-owner:
         extends: users-select-grid
@@ -718,8 +703,8 @@ datagrids:
                 label:         oro.user.enabled.label
                 frontend_type: select
                 choices:
-                   - Inactive
-                   - Active
+                   - Disabled
+                   - Enabled
         sorters:
             columns:
                 firstName:
@@ -755,5 +740,5 @@ datagrids:
                     options:
                         field_options:
                             choices:
-                                2: Inactive
-                                1: Active
+                                2: Disabled
+                                1: Enabled

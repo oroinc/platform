@@ -148,8 +148,8 @@ datagrids:
                 label: oro.user.enabled.label
                 frontend_type: select
                 choices:
-                   - Inactive
-                   - Active
+                   - Disabled
+                   - Enabled
         filters:
             columns:
                 hasCurrentBusinessUnit:
@@ -173,8 +173,8 @@ datagrids:
                     options:
                         field_options:
                             choices:
-                                2: Inactive
-                                1: Active
+                                2: Disabled
+                                1: Enabled
         sorters:
             columns:
                 hasCurrentBusinessUnit:
@@ -217,8 +217,8 @@ datagrids:
                 label: oro.user.enabled.label
                 frontend_type: select
                 choices:
-                   - Inactive
-                   - Active
+                   - Disabled
+                   - Enabled
         sorters:
             default:
                 lastName: %oro_datagrid.extension.orm_sorter.class%::DIRECTION_ASC
@@ -243,5 +243,5 @@ datagrids:
                     options:
                         field_options:
                             choices:
-                                2: Inactive
-                                1: Active
+                                2: Disabled
+                                1: Enabled
