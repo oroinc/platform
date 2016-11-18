@@ -16,6 +16,10 @@ class BaseType extends AbstractType
      */
     public function configureOptions(OptionsResolver $optionsResolver)
     {
+        $optionsResolver->setDefaults([
+            'visible' => true
+        ]);
+
         $optionsResolver->setDefined([
             'vars',
             'attr',
@@ -35,7 +39,7 @@ class BaseType extends AbstractType
         BlockUtils::setViewVarsFromOptions(
             $view,
             $options,
-            ['translation_domain', 'additional_block_prefixes', 'class_prefix']
+            ['visible', 'translation_domain', 'additional_block_prefixes', 'class_prefix']
         );
 
         // merge the passed variables with the existing ones
