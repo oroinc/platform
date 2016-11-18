@@ -151,12 +151,6 @@ class ImportExportController extends Controller
      */
     public function importValidateAction(Request $request, $processorAlias, $fileName)
     {
-        $processorRegistry = $this->get('oro_importexport.processor.registry');
-        $entityName        = $processorRegistry
-            ->getProcessorEntityName(ProcessorRegistry::TYPE_IMPORT_VALIDATION, $processorAlias);
-        $existingAliases   = $processorRegistry
-            ->getProcessorAliasesByEntity(ProcessorRegistry::TYPE_IMPORT_VALIDATION, $entityName);
-
         $jobName = $request->get('importValidateJob', JobExecutor::JOB_VALIDATE_IMPORT_FROM_CSV);
 
         $this->getMessageProducer()->send(
