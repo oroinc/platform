@@ -75,6 +75,20 @@ abstract class AbstractDocumentBuilder implements DocumentBuilderInterface
     /**
      * {@inheritdoc}
      */
+    public function addIncludedObject($object, EntityMetadata $metadata = null)
+    {
+        if (!array_key_exists(self::DATA, $this->result)) {
+            throw new \InvalidArgumentException('A primary data should be set.');
+        }
+
+        if (null !== $object) {
+            $this->addRelatedObject($this->convertObjectToArray($object, $metadata));
+        }
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function setErrorObject(Error $error)
     {
         $this->assertNoData();
@@ -270,6 +284,11 @@ abstract class AbstractDocumentBuilder implements DocumentBuilderInterface
      * @return mixed
      */
     abstract protected function processRelatedObject($object, AssociationMetadata $associationMetadata);
+
+    /**
+     * @param array $object
+     */
+    abstract protected function addRelatedObject(array $object);
 
     /**
      * Checks that the primary data does not exist.

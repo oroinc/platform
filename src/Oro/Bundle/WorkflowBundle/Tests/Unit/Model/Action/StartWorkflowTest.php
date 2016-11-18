@@ -8,7 +8,7 @@ use Oro\Bundle\WorkflowBundle\Model\Action\StartWorkflow;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
 use Oro\Bundle\EntityBundle\Tests\Unit\ORM\Stub\ItemStub;
 
-use Oro\Component\Action\Model\ContextAccessor;
+use Oro\Component\ConfigExpression\ContextAccessor;
 
 class StartWorkflowTest extends \PHPUnit_Framework_TestCase
 {

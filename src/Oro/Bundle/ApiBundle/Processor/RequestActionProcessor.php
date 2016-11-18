@@ -67,12 +67,12 @@ class RequestActionProcessor extends ActionProcessor implements LoggerAwareInter
             /** @var ProcessorInterface $processor */
             foreach ($processors as $processor) {
                 if ($context->hasErrors() && self::NORMALIZE_RESULT_GROUP !== $processors->getGroup()) {
-                    if ($context->getLastGroup()) {
-                        // stop execution in case if the "normalize_result" group is disabled
+                    if (!$context->getLastGroup()) {
+                        // go to the "normalize_result" group
+                        $this->executeNormalizeResultProcessors($context);
+                    } elseif (!$context->isSoftErrorsHandling()) {
                         throw $this->buildErrorException($context->getErrors());
                     }
-                    // go to the "normalize_result" group
-                    $this->executeNormalizeResultProcessors($context);
                     break;
                 } else {
                     $processorId = $processors->getProcessorId();
@@ -81,24 +81,34 @@ class RequestActionProcessor extends ActionProcessor implements LoggerAwareInter
             }
         } catch (\Exception $e) {
             if (null !== $this->logger) {
-                $this->logger->error(
-                    sprintf('The execution of "%s" processor is failed.', $processorId),
-                    ['exception' => $e]
-                );
+                if ($context->isSoftErrorsHandling()) {
+                    $this->logger->warning(
+                        sprintf('An exception occurred in "%s" processor.', $processorId),
+                        ['exception' => $e]
+                    );
+                } else {
+                    $this->logger->error(
+                        sprintf('The execution of "%s" processor is failed.', $processorId),
+                        ['exception' => $e]
+                    );
+                }
             }
 
-            // rethrow an exception occurred in any processor from the "normalize_result" group,
-            // this is required to prevent circular handling of such exception
-            // also rethrow an exception in case if the "normalize_result" group is disabled
             if (self::NORMALIZE_RESULT_GROUP === $processors->getGroup() || $context->getLastGroup()) {
-                throw $e;
+                // rethrow an exception occurred in any processor from the "normalize_result" group,
+                // this is required to prevent circular handling of such exception
+                // also rethrow an exception in case if the "normalize_result" group is disabled
+                if (!$context->isSoftErrorsHandling()) {
+                    throw $e;
+                }
+                // in case if soft errors handling is enabled just add an error to the context
+                $context->addError(Error::createByException($e));
+            } else {
+                // add an error to the context
+                $context->addError(Error::createByException($e));
+                // go to the "normalize_result" group
+                $this->executeNormalizeResultProcessors($context);
             }
-
-            // add an error to the context
-            $context->addError(Error::createByException($e));
-
-            // go to the "normalize_result" group
-            $this->executeNormalizeResultProcessors($context);
         }
     }
 

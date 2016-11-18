@@ -6,7 +6,7 @@ use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\PropertyAccess\PropertyPath;
 
 use Oro\Component\Action\Exception\InvalidParameterException;
-use Oro\Component\Action\Model\ContextAccessor;
+use Oro\Component\ConfigExpression\ContextAccessor;
 
 class AssignUrl extends AbstractAction
 {

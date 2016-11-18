@@ -54,7 +54,7 @@ class TranslationNormalizerTest extends \PHPUnit_Framework_TestCase
         $context = ['language_code' => 'test_code'];
 
         $this->translationManager->expects($this->once())
-            ->method('createValue')
+            ->method('createTranslation')
             ->with('test_key', 'test_value', 'test_code', 'test_domain')
             ->willReturn($translation);
 
