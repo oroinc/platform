@@ -13,8 +13,6 @@ use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 
 class DetailedLogsHandler extends AbstractHandler implements ContainerAwareInterface
 {
-    const DEFAULT_LOG_LEVEL = 'info';
-
     /** @var HandlerInterface */
     protected $handler;
 
@@ -63,6 +61,7 @@ class DetailedLogsHandler extends AbstractHandler implements ContainerAwareInter
 
     public function close()
     {
+        $defaultLevel = $this->container->getParameter('oro_logger.detailed_logs_default_level');
         /** @var ConfigManager $config */
         $config = $this->container->get('oro_config.user');
 
@@ -72,7 +71,7 @@ class DetailedLogsHandler extends AbstractHandler implements ContainerAwareInter
 
         $detailedLoggingLevel = Logger::toMonologLevel($config->get('oro_logger.detailed_logs_level'));
         if ($detailedLoggingLevel === null) {
-            $detailedLoggingLevel = Logger::toMonologLevel(self::DEFAULT_LOG_LEVEL);
+            $detailedLoggingLevel = Logger::toMonologLevel($defaultLevel);
         }
 
         $this->handler->handleBatch(

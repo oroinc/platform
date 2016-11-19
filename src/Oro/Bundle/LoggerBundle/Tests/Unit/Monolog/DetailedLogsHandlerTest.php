@@ -29,10 +29,10 @@ class DetailedLogsHandlerTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->config = $this->getMock(ConfigManager::class, [], [], '', false);
-        $this->nestedHandler = $this->getMock(HandlerInterface::class, [], [], '', false);
+        $this->config = $this->getMockBuilder(ConfigManager::class)->disableOriginalConstructor()->getMock();
+        $this->nestedHandler = $this->getMockBuilder(HandlerInterface::class)->disableOriginalConstructor()->getMock();
 
-        $container = $this->getMock(ContainerInterface::class, [], [], '', false);
+        $container = $this->getMockBuilder(ContainerInterface::class)->disableOriginalConstructor()->getMock();
         $container->expects($this->any())
             ->method('get')
             ->with('oro_config.user')

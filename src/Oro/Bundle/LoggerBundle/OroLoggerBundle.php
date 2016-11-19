@@ -10,6 +10,9 @@ use Oro\Bundle\LoggerBundle\DependencyInjection\Compiler\DetailedLogsHandlerPass
 
 class OroLoggerBundle extends Bundle
 {
+    /**
+     * {@inheritDoc}
+     */
     public function build(ContainerBuilder $container)
     {
         parent::build($container);
