@@ -73,6 +73,10 @@ class FeatureToggleConfiguration implements ConfigurationInterface
             ->arrayNode('configuration')
                 ->prototype('variable')
                 ->end()
+            ->end()
+            ->arrayNode('entities')
+                ->prototype('variable')
+                ->end()
             ->end();
     }
 

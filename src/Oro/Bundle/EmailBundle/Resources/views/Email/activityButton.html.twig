@@ -1,6 +1,8 @@
 {% extends "OroEmailBundle:Email:activityLink.html.twig" %}
 
 {% block action_controll %}
-    {{ UI.clientButton(options) }}
+    {% if feature_enabled('email') %}
+        {{ UI.clientButton(options) }}
+    {% endif %}
 {% endblock %}
 
