@@ -5,13 +5,17 @@ namespace Oro\Bundle\CurrencyBundle\DependencyInjection;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
 
+use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\ConfigBundle\DependencyInjection\SettingsBuilder;
 
 class Configuration implements ConfigurationInterface
 {
-
     const DEFAULT_CURRENCY = 'USD';
     const DEFAULT_VIEW     = 'iso_code';
+
+    const ROOT_NAME = 'oro_currency';
+    const KEY_DEFAULT_CURRENCY = 'default_currency';
+    const KEY_CURRENCY_DISPLAY = 'currency_display';
 
     /**
      * @deprecated
@@ -20,19 +24,30 @@ class Configuration implements ConfigurationInterface
     public static $defaultCurrencies = [self::DEFAULT_CURRENCY];
 
     /**
+     * Returns full key name by it's last part
+     *
+     * @param $name string last part of the key name (one of the class cons can be used)
+     * @return string full config path key
+     */
+    public static function getConfigKeyByName($name)
+    {
+        return self::ROOT_NAME . ConfigManager::SECTION_MODEL_SEPARATOR . $name;
+    }
+
+    /**
      * {@inheritDoc}
      */
     public function getConfigTreeBuilder()
     {
         $treeBuilder = new TreeBuilder();
 
-        $rootNode = $treeBuilder->root('oro_currency');
+        $rootNode = $treeBuilder->root(self::ROOT_NAME);
 
         SettingsBuilder::append(
             $rootNode,
             [
-                'default_currency'   => ['value' => self::DEFAULT_CURRENCY, 'type' => 'scalar'],
-                'currency_display'   => ['value' => self::DEFAULT_VIEW, 'type' => 'scalar'],
+                self::KEY_DEFAULT_CURRENCY   => ['value' => self::DEFAULT_CURRENCY, 'type' => 'scalar'],
+                self::KEY_CURRENCY_DISPLAY => ['value' => self::DEFAULT_VIEW, 'type' => 'scalar'],
             ]
         );
 

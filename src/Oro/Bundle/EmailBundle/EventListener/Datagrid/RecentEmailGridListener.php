@@ -6,9 +6,13 @@ use Oro\Bundle\DataGridBundle\Datasource\Orm\OrmDatasource;
 use Oro\Bundle\DataGridBundle\Event\BuildAfter;
 use Oro\Bundle\EmailBundle\Datagrid\EmailGridHelper;
 use Oro\Bundle\EmailBundle\Datagrid\EmailQueryFactory;
+use Oro\Bundle\FeatureToggleBundle\Checker\FeatureCheckerHolderTrait;
+use Oro\Bundle\FeatureToggleBundle\Checker\FeatureToggleableInterface;
 
-class RecentEmailGridListener
+class RecentEmailGridListener implements FeatureToggleableInterface
 {
+    use FeatureCheckerHolderTrait;
+
     /** @var EmailGridHelper */
     protected $emailGridHelper;
 
@@ -30,6 +34,10 @@ class RecentEmailGridListener
      */
     public function onBuildAfter(BuildAfter $event)
     {
+        if (!$this->isFeaturesEnabled()) {
+            return;
+        }
+
         $datagrid   = $event->getDatagrid();
         $datasource = $datagrid->getDatasource();
         if ($datasource instanceof OrmDatasource) {
