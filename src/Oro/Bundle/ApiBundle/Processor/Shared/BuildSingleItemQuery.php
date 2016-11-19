@@ -55,8 +55,8 @@ class BuildSingleItemQuery implements ProcessorInterface
         }
 
         $query = $this->doctrineHelper->getEntityRepositoryForClass($entityClass)->createQueryBuilder('e');
+        $this->doctrineHelper->applyEntityIdentifierRestriction($query, $entityClass, $context->getId());
         $this->criteriaConnector->applyCriteria($query, $criteria);
-        $query = $this->doctrineHelper->getQueryForSingleEntity($query, $entityClass, $context->getId());
 
         $context->setQuery($query);
     }

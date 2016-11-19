@@ -96,13 +96,8 @@ class BuildQueryByExtendedAssociation implements ProcessorInterface
         $context->setCriteria($criteria);
 
         $query = $this->doctrineHelper->getEntityRepositoryForClass($entityClass)->createQueryBuilder('e');
+        $this->doctrineHelper->applyEntityIdentifierRestriction($query, $entityClass, $context->getParentId());
         $this->criteriaConnector->applyCriteria($query, $criteria);
-
-        $query = $this->doctrineHelper->getQueryForSingleEntity(
-            $query,
-            $entityClass,
-            $context->getParentId()
-        );
 
         $context->setQuery($query);
     }

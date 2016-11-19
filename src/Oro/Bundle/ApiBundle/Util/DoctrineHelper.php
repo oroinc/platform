@@ -5,6 +5,7 @@ namespace Oro\Bundle\ApiBundle\Util;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\QueryBuilder;
 
+use Oro\Component\DoctrineUtils\ORM\QueryUtils;
 use Oro\Component\PhpUtils\ReflectionUtil;
 
 use Oro\Bundle\ApiBundle\Collection\Criteria;
@@ -204,14 +205,15 @@ class DoctrineHelper extends BaseHelper
     }
 
     /**
-     * @param QueryBuilder $query
-     * @param string       $entityClass
-     * @param integer      $entityId
+     * Adds a restriction by entity identifier to the given query builder.
      *
-     * @return QueryBuilder
+     * @param QueryBuilder $qb
+     * @param string       $entityClass
+     * @param mixed        $entityId
      */
-    public function getQueryForSingleEntity($query, $entityClass, $entityId)
+    public function applyEntityIdentifierRestriction(QueryBuilder $qb, $entityClass, $entityId)
     {
+        $rootAlias = QueryUtils::getSingleRootAlias($qb);
         $idFields = $this->getEntityIdentifierFieldNamesForClass($entityClass);
         if (count($idFields) === 1) {
             // single identifier
@@ -223,8 +225,8 @@ class DoctrineHelper extends BaseHelper
                     )
                 );
             }
-            $query
-                ->andWhere(sprintf('e.%s = :id', reset($idFields)))
+            $qb
+                ->andWhere(sprintf('%s.%s = :id', $rootAlias, reset($idFields)))
                 ->setParameter('id', $entityId);
         } else {
             // combined identifier
@@ -248,13 +250,11 @@ class DoctrineHelper extends BaseHelper
                         )
                     );
                 }
-                $query
-                    ->andWhere(sprintf('e.%s = :id%d', $field, $counter))
+                $qb
+                    ->andWhere(sprintf('%s.%s = :id%d', $rootAlias, $field, $counter))
                     ->setParameter(sprintf('id%d', $counter), $entityId[$field]);
                 $counter++;
             }
         }
-
-        return $query;
     }
 }
