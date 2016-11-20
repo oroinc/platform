@@ -22,6 +22,9 @@ class DetailedLogsHandler extends AbstractHandler implements ContainerAwareInter
     /** @var ContainerInterface */
     protected $container;
 
+    /**
+     * {@inheritDoc}
+     */
     public function setContainer(ContainerInterface $container = null)
     {
         $this->container = $container;
@@ -61,26 +64,35 @@ class DetailedLogsHandler extends AbstractHandler implements ContainerAwareInter
 
     public function close()
     {
-        $defaultLevel = $this->container->getParameter('oro_logger.detailed_logs_default_level');
-        /** @var ConfigManager $config */
-        $config = $this->container->get('oro_config.user');
-
-        if (time() > $config->get('oro_logger.detailed_logs_end_timestamp', 0)) {
+        if (empty($this->buffer)) {
             return;
         }
-
-        $detailedLoggingLevel = Logger::toMonologLevel($config->get('oro_logger.detailed_logs_level'));
-        if ($detailedLoggingLevel === null) {
-            $detailedLoggingLevel = Logger::toMonologLevel($defaultLevel);
-        }
-
+        $monologLevel = $this->getLogLevel();
         $this->handler->handleBatch(
             array_filter(
                 $this->buffer,
-                function ($record) use ($detailedLoggingLevel) {
-                    return $record['level'] >= $detailedLoggingLevel;
+                function ($record) use ($monologLevel) {
+                    return $record['level'] >= $monologLevel;
                 }
             )
         );
+    }
+
+    /**
+     * @return int
+     */
+    private function getLogLevel()
+    {
+        $logLevel = $this->container->getParameter('oro_logger.detailed_logs_default_level');
+        if ($this->container->has('oro_config.user')) {
+            /** @var ConfigManager $config */
+            $config = $this->container->get('oro_config.user');
+            $endTimestamp = $config->get('oro_logger.detailed_logs_end_timestamp');
+            if (null !== $endTimestamp && time() <= $endTimestamp) {
+                $logLevel = $config->get('oro_logger.detailed_logs_level');
+            }
+        }
+
+        return Logger::toMonologLevel($logLevel);
     }
 }

@@ -1,6 +1,5 @@
 parameters:
     oro_logger.detailed_logs_default_level: error
-    oro_logger.email_notification_level: error
 services:
     oro_logger.event_subscriber.console_command:
         class: Oro\Bundle\LoggerBundle\EventSubscriber\ConsoleCommandSubscriber

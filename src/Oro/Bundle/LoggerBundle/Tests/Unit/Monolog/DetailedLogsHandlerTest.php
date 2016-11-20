@@ -3,8 +3,8 @@
 namespace Oro\Bundle\LoggerBundle\Tests\Unit\Monolog;
 
 use Monolog\Handler\HandlerInterface;
-use Monolog\Logger;
 
+use Monolog\Logger;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
@@ -29,14 +29,23 @@ class DetailedLogsHandlerTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->config = $this->getMockBuilder(ConfigManager::class)->disableOriginalConstructor()->getMock();
-        $this->nestedHandler = $this->getMockBuilder(HandlerInterface::class)->disableOriginalConstructor()->getMock();
+        $this->config = $this->getMockBuilder(ConfigManager::class)
+            ->setMethods(['get'])
+            ->disableOriginalConstructor()
+            ->getMock();
+        $this->nestedHandler = $this->getMockBuilder(HandlerInterface::class)
+            ->disableOriginalConstructor()
+            ->getMock();
 
         $container = $this->getMockBuilder(ContainerInterface::class)->disableOriginalConstructor()->getMock();
         $container->expects($this->any())
             ->method('get')
             ->with('oro_config.user')
             ->willReturn($this->config);
+        $container->expects($this->any())
+            ->method('has')
+            ->with('oro_config.user')
+            ->willReturn(true);
 
         $this->handler = new DetailedLogsHandler();
         $this->handler->setHandler($this->nestedHandler);
