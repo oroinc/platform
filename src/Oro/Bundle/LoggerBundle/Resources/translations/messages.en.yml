@@ -6,4 +6,4 @@ oro:
             fields:
                 email_notification_recipients:
                     label: 'Recipients email addresses'
-                    tooltip: 'Leave this field empty to disable error logs notification. To send notifications to specific people, write in their email addresses separated by semicolons (;).'
+                    tooltip: 'To send notifications to specific people, write in their email addresses separated by semicolons (;). Leave this field empty to disable error logs notification. '

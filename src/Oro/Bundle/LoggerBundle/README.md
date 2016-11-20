@@ -18,20 +18,21 @@ To disable the notifications run command with `--disable` flag.
 Or you can configure recipients list using web interface from `System > Configuration > General Setup > Appication Settings > Error Logs 
 notifications` section.
 
-To change log level for email notifications update `oro_logger.email_notification_level` container parameter, `error` level used by default. 
+To change log level for email notifications update `monolog.handlers.swift.level` parameter at `config_prod.yml`. 
 
 ### Temporarily decrease log level
-Default log level at production environment is specified by `oro_logger.detailed_logs_default_level` container parameter and equals to `error`.
+Default log level at production environment is specified by `oro_logger.detailed_logs_default_level` container parameter 
+and equals to `error`, you can update it at application configuration.
 
-To find problems you allowed to change this value for a specific time to specific user, to do this 
+To find problems you allowed to change this value for a specific time for a specific user, to do this 
 run command:  
 
     php app/console oro:logger:level debug "1 hour" --user=admin@example.com
 
-Where `debug` is log level and `1 hour` is time interval for what time the level will be used instead of default, 
+Where `debug` is log level and `1 hour` is time interval when the level will be used instead of default, 
 `--user` option contains email of user whose log will be affected.
 
-Also you can decrease logger level for all users by scipping `--user` option.
+Also you can decrease log level system wide by skipping `--user` option.
 
 ### Logging Console Commands
 
