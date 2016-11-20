@@ -3,8 +3,8 @@
 namespace Oro\Bundle\LoggerBundle\Tests\Unit\Monolog;
 
 use Monolog\Handler\HandlerInterface;
-
 use Monolog\Logger;
+
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
