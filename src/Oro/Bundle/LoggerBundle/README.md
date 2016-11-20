@@ -1,13 +1,14 @@
 OroLoggerBundle
 ===============
 
-This bundle provide ability to log system events.
-
-We use [MonologBundle](https://github.com/symfony/monolog-bundle) for logging events that implements the [PSR-3 LoggerInterface](https://github.com/php-fig/fig-standards/blob/master/accepted/PSR-3-logger-interface.md).
+This bundle extends functionality of [MonologBundle](https://github.com/symfony/monolog-bundle) to provide:
+* [Error logs email notifications](#error-logs-email-notifications)
+* [Ability to temporarily decrease log level](#temporarily-decrease-log-level)
+* [Logging Console Commands](#logging-console-commands)
 
 Please see Symfony [documentation](http://symfony.com/doc/current/logging.html) for more details how to use [MonologBundle](https://github.com/symfony/monolog-bundle).
 
-### Error logs email notifications
+### Error Logs Email Notifications
 To enable error logs email notification run console command `oro:logger:email-notification` with semicolons separated 
 recipients, for example:  
 
@@ -20,7 +21,7 @@ notifications` section.
 
 To change log level for email notifications update `monolog.handlers.swift.level` parameter at `config_prod.yml`. 
 
-### Temporarily decrease log level
+### Temporarily Decrease Log Level
 Default log level at production environment is specified by `oro_logger.detailed_logs_default_level` container parameter 
 and equals to `error`, you can update it at application configuration.
 
