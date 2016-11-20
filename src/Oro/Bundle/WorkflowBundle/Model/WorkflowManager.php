@@ -30,6 +30,9 @@ class WorkflowManager implements LoggerAwareInterface
     /** @var DoctrineHelper */
     protected $doctrineHelper;
 
+    /** @var array */
+    protected static $startedWorkflows = [];
+
     /** @var EventDispatcherInterface */
     private $eventDispatcher;
 
@@ -165,7 +168,7 @@ class WorkflowManager implements LoggerAwareInterface
      * @param string|Transition|null $transition
      * @param array $data
      * @param bool $throwGroupException
-     * @return WorkflowItem
+     * @return WorkflowItem|null
      * @throws WorkflowRecordGroupException
      */
     public function startWorkflow($workflow, $entity, $transition = null, array $data = [], $throwGroupException = true)
@@ -199,7 +202,7 @@ class WorkflowManager implements LoggerAwareInterface
             return null;
         }
 
-        return $this->inTransaction(
+        $workflowItem = $this->inTransaction(
             function (EntityManager $em) use ($workflow, $entity, $transition, &$data) {
                 $workflowItem = $workflow->start($entity, $data, $transition);
                 $em->persist($workflowItem);
@@ -209,6 +212,9 @@ class WorkflowManager implements LoggerAwareInterface
             },
             WorkflowItem::class
         );
+
+        $this->unsetStartedWorkflowForEntity($workflow, $entity);
+        return $workflowItem;
     }
 
     /**
@@ -528,7 +534,7 @@ class WorkflowManager implements LoggerAwareInterface
      */
     protected function isStartAllowedForEntity(Workflow $workflow, $entity)
     {
-        static $startedWorkflows = [];
+        $startedWorkflows = self::$startedWorkflows;
 
         $entityId = $this->doctrineHelper->getSingleEntityIdentifier($entity);
         if ($entityId && array_key_exists($workflow->getName(), $startedWorkflows)) {
@@ -539,9 +545,33 @@ class WorkflowManager implements LoggerAwareInterface
                 }
             }
         }
-        $startedWorkflows[$workflow->getName()][] = $entity;
+        self::$startedWorkflows[$workflow->getName()][] = $entity;
 
         return true;
+    }
+
+    /**
+     * Unset started workflow for entity
+     *
+     * @param Workflow $workflow
+     * @param object $entity
+     */
+    protected function unsetStartedWorkflowForEntity(Workflow $workflow, $entity)
+    {
+        $startedWorkflows = self::$startedWorkflows;
+
+        $entityId = $this->doctrineHelper->getSingleEntityIdentifier($entity);
+        if ($entityId === null || !array_key_exists($workflow->getName(), $startedWorkflows)) {
+            return;
+        }
+
+        foreach ($startedWorkflows[$workflow->getName()] as $key => $startedEntity) {
+            $startedEntityId = $this->doctrineHelper->getSingleEntityIdentifier($startedEntity);
+            if ($startedEntityId && ($startedEntityId === $entityId)) {
+                unset(self::$startedWorkflows[$workflow->getName()][$key]);
+                break;
+            }
+        }
     }
 
     /**
