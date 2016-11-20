@@ -14,7 +14,6 @@ use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
 use Oro\Bundle\ApiBundle\Metadata\FieldMetadata;
 use Oro\Bundle\ApiBundle\Processor\Subresource\GetRelationship\GetRelationshipContext;
 use Oro\Bundle\ApiBundle\Processor\Subresource\GetSubresource\GetSubresourceContext;
-use Oro\Bundle\ApiBundle\Processor\Subresource\Shared\BuildQueryByExtendedAssociation;
 use Oro\Bundle\ApiBundle\Processor\Subresource\Shared\LoadEntityByExtendedAssociation;
 
 use Oro\Bundle\ApiBundle\Request\ApiActions;
