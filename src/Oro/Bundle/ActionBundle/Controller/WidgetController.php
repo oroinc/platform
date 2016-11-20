@@ -23,27 +23,21 @@ use Oro\Bundle\ActionBundle\Model\OperationManager;
 class WidgetController extends Controller
 {
     /**
-     * @Route("/buttons", name="oro_action_widget_buttons_deprecated")
+     * @Route("/buttons", name="oro_action_widget_buttons")
      * @Template()
      *
-     * @param Request $request
-     *
      * @return array
-     *
-     * @deprecated Should be removed at https://magecore.atlassian.net/browse/BAP-12484
      */
-    public function buttonsAction(Request $request)
+    public function buttonsAction()
     {
-        $contextHelper = $this->getContextHelper();
-        $applicationsHelper = $this->getApplicationsHelper();
+        $buttonProvider = $this->get('oro_action.provider.button');
+        $buttonSearchContextProvider = $this->get('oro_action.provider.button_search_context');
+        $buttonSearchContext = $buttonSearchContextProvider->getButtonSearchContext();
+
+        $buttons = $buttonProvider->findAll($buttonSearchContext);
 
         return [
-            'operations' => $this->getOperationManager()->getOperations(),
-            'context' => $contextHelper->getContext(),
-            'actionData' => $contextHelper->getActionData(),
-            'dialogRoute' => $applicationsHelper->getFormDialogRoute(),
-            'executionRoute' => $applicationsHelper->getExecutionRoute(),
-            'fromUrl' => $request->get('fromUrl'),
+            'buttons' => $buttons,
         ];
     }
 
@@ -204,24 +198,5 @@ class WidgetController extends Controller
         }
 
         return $response;
-    }
-
-    /**
-     * @Route("/buttons/new", name="oro_action_widget_buttons")
-     * @Template()
-     *
-     * @return array
-     */
-    public function buttonsNewAction()
-    {
-        $buttonProvider = $this->get('oro_action.provider.button');
-        $buttonSearchContextProvider = $this->get('oro_action.provider.button_search_context');
-        $buttonSearchContext = $buttonSearchContextProvider->getButtonSearchContext();
-
-        $buttons = $buttonProvider->findAll($buttonSearchContext);
-
-        return [
-            'buttons' => $buttons,
-        ];
     }
 }
