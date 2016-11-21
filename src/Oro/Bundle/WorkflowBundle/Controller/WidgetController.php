@@ -88,7 +88,7 @@ class WidgetController extends Controller
         $transition = $workflow->getTransitionManager()->extractTransition($transitionName);
 
         $dataArray = [];
-        if ($transition->getInitEntities() || $transition->getInitRoutes()) {
+        if (!$transition->isEmptyInitOptions()) {
             $contextAttribute = $transition->getInitContextAttribute();
             $dataArray[$contextAttribute] = $this->get('oro_action.provider.button_search_context')
                 ->getButtonSearchContext();
