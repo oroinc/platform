@@ -2,10 +2,6 @@
 
 namespace Oro\Bundle\TestFrameworkBundle\Behat\Element;
 
-use Behat\Mink\Mink;
-use Behat\Mink\Session;
-use Symfony\Component\Routing\Router;
-
 class OroPageFactory
 {
     /**
@@ -36,7 +32,8 @@ class OroPageFactory
     {
         if (!$this->hasPage($name)) {
             throw new \InvalidArgumentException(sprintf(
-                'Could not find page with "%s" name',
+                'Could not find page with "%s" name'.
+                PHP_EOL.'Maybe you forgot to create it?',
                 $name
             ));
         }
