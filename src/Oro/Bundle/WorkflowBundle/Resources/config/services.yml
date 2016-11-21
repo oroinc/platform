@@ -78,12 +78,27 @@ services:
         tags:
             - { name: monolog.logger, channel: oro_workflow }
 
+    oro_workflow.registry.definition_filter.features:
+        class: 'Oro\Bundle\WorkflowBundle\Model\Filter\FeatureCheckerWorkflowRegistryFilter'
+        public: false
+        arguments:
+            - '@oro_featuretoggle.checker.feature_checker'
+
+    oro_workflow.registry.definition_filter.scopes:
+        class: Oro\Bundle\WorkflowBundle\Model\Filter\WorkflowDefinitionScopesRegistryFilter
+        public: false
+        arguments:
+            - '@oro_scope.scope_manager'
+            - '@doctrine'
+
     oro_workflow.registry:
         class: 'Oro\Bundle\WorkflowBundle\Model\WorkflowRegistry'
         arguments:
             - '@doctrine'
             - '@oro_workflow.workflow_assembler'
-            - '@oro_featuretoggle.checker.feature_checker'
+        calls:
+            - ['addDefinitionFilter', ['@oro_workflow.registry.definition_filter.features']]
+            - ['addDefinitionFilter', ['@oro_workflow.registry.definition_filter.scopes']]
 
     oro_workflow.permission_registry:
         class: 'Oro\Bundle\WorkflowBundle\Model\WorkflowPermissionRegistry'
@@ -152,6 +167,7 @@ services:
         arguments:
             - '@oro_workflow.changes.event.dispatcher'
             - '@doctrine'
+            - '@oro_workflow.manager'
 
     oro_workflow.process.cron_scheduler:
         class: 'Oro\Bundle\WorkflowBundle\Cron\ProcessTriggerCronScheduler'
@@ -327,8 +343,17 @@ services:
             - { name: monolog.logger, channel: oro_workflow }
 
     oro_workflow.listener.grids_subscriber:
-        class: Oro\Bundle\WorkflowBundle\EventListener\GridsSubscriber
+        class: 'Oro\Bundle\WorkflowBundle\EventListener\GridsSubscriber'
         arguments:
             - '@oro_featuretoggle.checker.feature_checker'
         tags:
             - { name: kernel.event_subscriber }
+
+    oro_workflow.manager.workflow_scope:
+        class: 'Oro\Bundle\WorkflowBundle\Scope\WorkflowScopeManager'
+        arguments:
+            - '@doctrine'
+            - '@oro_scope.scope_manager'
+            - '@logger'
+        tags:
+            - { name: monolog.logger, channel: oro_workflow }

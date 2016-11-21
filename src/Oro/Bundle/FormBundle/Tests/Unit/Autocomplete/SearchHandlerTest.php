@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\FormBundle\Tests\Unit\Autocomplete;
 
+use Doctrine\ORM\Mapping\ClassMetadata;
+use Doctrine\ORM\Mapping\ClassMetadataFactory;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\ORM\AbstractQuery;
 use Doctrine\ORM\Query\Expr;
@@ -10,7 +12,6 @@ use Doctrine\ORM\EntityManager;
 use Doctrine\Common\Persistence\ManagerRegistry;
 
 use Oro\Bundle\SearchBundle\Engine\Indexer;
-
 use Oro\Bundle\SearchBundle\Query\Result;
 use Oro\Bundle\SearchBundle\Query\Result\Item;
 use Oro\Bundle\FormBundle\Autocomplete\SearchHandler;
@@ -88,17 +89,17 @@ class SearchHandlerTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->indexer = $this->getMockBuilder('Oro\Bundle\SearchBundle\Engine\Indexer')
+        $this->indexer = $this->getMockBuilder(Indexer::class)
             ->setMethods(['simpleSearch'])
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->entityRepository = $this->getMockBuilder('Doctrine\ORM\EntityRepository')
+        $this->entityRepository = $this->getMockBuilder(EntityRepository::class)
             ->disableOriginalConstructor()
             ->setMethods(['createQueryBuilder'])
             ->getMock();
 
-        $metadata = $this->getMockBuilder('Doctrine\ORM\Mapping\ClassMetadata')
+        $metadata = $this->getMockBuilder(ClassMetadata::class)
             ->setMethods(['getSingleIdentifierFieldName'])
             ->disableOriginalConstructor()
             ->getMock();
@@ -106,7 +107,7 @@ class SearchHandlerTest extends \PHPUnit_Framework_TestCase
             ->method('getSingleIdentifierFieldName')
             ->will($this->returnValue(self::TEST_ID_FIELD));
 
-        $metadataFactory = $this->getMockBuilder('Doctrine\ORM\Mapping\ClassMetadataFactory')
+        $metadataFactory = $this->getMockBuilder(ClassMetadataFactory::class)
             ->setMethods(['getMetadataFor'])
             ->disableOriginalConstructor()
             ->getMock();
@@ -115,7 +116,7 @@ class SearchHandlerTest extends \PHPUnit_Framework_TestCase
             ->with(self::TEST_ENTITY_CLASS)
             ->will($this->returnValue($metadata));
 
-        $this->entityManager = $this->getMockBuilder('Doctrine\ORM\EntityManager')
+        $this->entityManager = $this->getMockBuilder(EntityManager::class)
             ->disableOriginalConstructor()
             ->setMethods(['getRepository', 'getMetadataFactory'])
             ->getMock();
@@ -126,33 +127,33 @@ class SearchHandlerTest extends \PHPUnit_Framework_TestCase
             ->method('getMetadataFactory')
             ->will($this->returnValue($metadataFactory));
 
-        $this->managerRegistry = $this->getMock('Doctrine\Common\Persistence\ManagerRegistry');
+        $this->managerRegistry = $this->getMock(ManagerRegistry::class);
         $this->managerRegistry->expects($this->once())
             ->method('getManagerForClass')
             ->with(self::TEST_ENTITY_CLASS)
             ->will($this->returnValue($this->entityManager));
 
-        $this->queryBuilder = $this->getMockBuilder('Doctrine\ORM\QueryBuilder')
+        $this->queryBuilder = $this->getMockBuilder(QueryBuilder::class)
             ->disableOriginalConstructor()
             ->setMethods(['expr', 'getQuery', 'where'])
             ->getMock();
 
-        $this->query = $this->getMockBuilder('Doctrine\ORM\AbstractQuery')
+        $this->query = $this->getMockBuilder(AbstractQuery::class)
             ->disableOriginalConstructor()
             ->setMethods(['getResult', 'getAST'])
             ->getMockForAbstractClass();
 
-        $this->expr = $this->getMockBuilder('Doctrine\ORM\Query\Expr')
+        $this->expr = $this->getMockBuilder(Expr::class)
             ->disableOriginalConstructor()
             ->setMethods(['in'])
             ->getMock();
 
-        $this->searchResult = $this->getMockBuilder('Oro\Bundle\SearchBundle\Query\Result')
+        $this->searchResult = $this->getMockBuilder(Result::class)
             ->setMethods(['getElements'])
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->aclHelper = $this->getMockBuilder('Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper')
+        $this->aclHelper = $this->getMockBuilder(AclHelper::class)
             ->disableOriginalConstructor()
             ->setMethods(['apply'])
             ->getMock();

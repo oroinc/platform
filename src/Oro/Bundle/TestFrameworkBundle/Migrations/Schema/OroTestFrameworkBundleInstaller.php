@@ -7,11 +7,13 @@ use Doctrine\DBAL\Schema\Schema;
 use Oro\Bundle\ActivityBundle\Migration\Extension\ActivityExtension;
 use Oro\Bundle\ActivityBundle\Migration\Extension\ActivityExtensionAwareInterface;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
+use Oro\Bundle\EntityExtendBundle\Extend\RelationType;
 use Oro\Bundle\EntityExtendBundle\Migration\Extension\ExtendExtension;
 use Oro\Bundle\EntityExtendBundle\Migration\Extension\ExtendExtensionAwareInterface;
 use Oro\Bundle\EntityExtendBundle\Migration\OroOptions;
 use Oro\Bundle\MigrationBundle\Migration\Installation;
 use Oro\Bundle\MigrationBundle\Migration\QueryBag;
+use Oro\Bundle\ScopeBundle\Migrations\Schema\OroScopeBundleInstaller;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyMethods)
@@ -49,7 +51,7 @@ class OroTestFrameworkBundleInstaller implements
      */
     public function getMigrationVersion()
     {
-        return 'v1_3';
+        return 'v1_4';
     }
 
     /**
@@ -73,6 +75,9 @@ class OroTestFrameworkBundleInstaller implements
         $this->createTestProductTypeTable($schema);
         $this->createTestAuditDataTables($schema);
 
+        /** Entity extensions generation */
+        $this->extendScopeForTestActivity($schema);
+
         /** Foreign keys generation **/
         $this->addTestSearchItemForeignKeys($schema);
         $this->addTestSearchItemValueForeignKeys($schema);
@@ -81,6 +86,16 @@ class OroTestFrameworkBundleInstaller implements
         $this->addTestProductForeignKeys($schema);
 
         $this->activityExtension->addActivityAssociation($schema, 'test_activity', 'test_activity_target', true);
+
+        // add activity association if calendar package is installed
+        if ($schema->hasTable('oro_calendar_event')) {
+            $this->activityExtension->addActivityAssociation(
+                $schema,
+                'oro_calendar_event',
+                'test_activity_target',
+                true
+            );
+        }
     }
 
     /**
@@ -525,6 +540,29 @@ class OroTestFrameworkBundleInstaller implements
             ['department_id'],
             ['id'],
             ['onDelete' => null, 'onUpdate' => null]
+        );
+    }
+
+    /**
+     * @param Schema $schema
+     */
+    private function extendScopeForTestActivity($schema)
+    {
+        $this->extendExtension->addManyToOneRelation(
+            $schema,
+            OroScopeBundleInstaller::ORO_SCOPE,
+            'test_activity',
+            'test_activity',
+            'id',
+            [
+                'extend' => [
+                    'owner' => ExtendScope::OWNER_CUSTOM,
+                    'cascade' => ['all'],
+                    'on_delete' => 'CASCADE',
+                    'nullable' => true
+                ]
+            ],
+            RelationType::MANY_TO_ONE
         );
     }
 
