@@ -7,11 +7,15 @@ use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 use Oro\Bundle\ApiBundle\Config\FiltersConfig;
 use Oro\Bundle\ApiBundle\Filter\ComparisonFilter;
 use Oro\Bundle\ApiBundle\Filter\FilterCollection;
+use Oro\Bundle\ApiBundle\Filter\FilterValue;
+use Oro\Bundle\ApiBundle\Filter\InvalidFilterValueKeyException;
 use Oro\Bundle\ApiBundle\Model\Error;
 use Oro\Bundle\ApiBundle\Model\ErrorSource;
 use Oro\Bundle\ApiBundle\Processor\Shared\RegisterDynamicFilters;
 use Oro\Bundle\ApiBundle\Request\Constraint;
 use Oro\Bundle\ApiBundle\Request\RestFilterValueAccessor;
+use Oro\Bundle\ApiBundle\Tests\Unit\Filter\RequestAwareFilterStub;
+use Oro\Bundle\ApiBundle\Tests\Unit\Filter\SelfIdentifiableFilterStub;
 use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\GetList\GetListProcessorOrmRelatedTestCase;
 
@@ -166,10 +170,8 @@ class RegisterDynamicFiltersTest extends GetListProcessorOrmRelatedTestCase
         $this->assertCount(0, $this->context->getFilters());
         $this->assertEquals(
             [
-                Error::createValidationError(
-                    Constraint::FILTER,
-                    sprintf('Filter "%s" is not supported.', 'filter[label1]')
-                )->setSource(ErrorSource::createByParameter('filter[label1]'))
+                Error::createValidationError(Constraint::FILTER, 'The filter is not supported.')
+                    ->setSource(ErrorSource::createByParameter('filter[label1]'))
             ],
             $this->context->getErrors()
         );
@@ -197,10 +199,8 @@ class RegisterDynamicFiltersTest extends GetListProcessorOrmRelatedTestCase
         $this->assertCount(0, $this->context->getFilters());
         $this->assertEquals(
             [
-                Error::createValidationError(
-                    Constraint::FILTER,
-                    sprintf('Filter "%s" is not supported.', 'filter[label]')
-                )->setSource(ErrorSource::createByParameter('filter[label]'))
+                Error::createValidationError(Constraint::FILTER, 'The filter is not supported.')
+                    ->setSource(ErrorSource::createByParameter('filter[label]'))
             ],
             $this->context->getErrors()
         );
@@ -335,10 +335,8 @@ class RegisterDynamicFiltersTest extends GetListProcessorOrmRelatedTestCase
         $this->assertCount(0, $this->context->getFilters());
         $this->assertEquals(
             [
-                Error::createValidationError(
-                    Constraint::FILTER,
-                    sprintf('Filter "%s" is not supported.', 'filter[category1.name]')
-                )->setSource(ErrorSource::createByParameter('filter[category1.name]'))
+                Error::createValidationError(Constraint::FILTER, 'The filter is not supported.')
+                    ->setSource(ErrorSource::createByParameter('filter[category1.name]'))
             ],
             $this->context->getErrors()
         );
@@ -456,5 +454,193 @@ class RegisterDynamicFiltersTest extends GetListProcessorOrmRelatedTestCase
         $expectedFilters->add('filter[category1.name1]', $expectedFilter);
 
         $this->assertEquals($expectedFilters, $this->context->getFilters());
+    }
+
+    public function testProcessForRequestTypeAwareFilter()
+    {
+        $primaryEntityConfig = $this->getEntityDefinitionConfig(['id', 'category']);
+        $primaryEntityFilters = $this->getFiltersConfig();
+
+        $request = $this->getRequest('filter[category.name]=test');
+
+        $this->configProvider->expects($this->once())
+            ->method('getConfig')
+            ->willReturn(
+                $this->getConfig(
+                    ['name'],
+                    ['name' => 'string']
+                )
+            );
+
+        $filter = new RequestAwareFilterStub('string');
+
+        $this->filterFactory->expects($this->once())
+            ->method('createFilter')
+            ->with('string', [])
+            ->willReturn($filter);
+
+        $this->context->setClassName(Entity\User::class);
+        $this->context->setConfig($primaryEntityConfig);
+        $this->context->setConfigOfFilters($primaryEntityFilters);
+        $this->context->setFilterValues(new RestFilterValueAccessor($request));
+        $this->processor->process($this->context);
+
+        $this->assertSame($this->context->getRequestType(), $filter->getRequestType());
+    }
+
+    public function testProcessForSelfIdentifiableFilter()
+    {
+        $primaryEntityConfig = $this->getEntityDefinitionConfig(['id']);
+        $primaryEntityFilters = $this->getFiltersConfig();
+
+        $request = $this->getRequest('filter[target][users]=123');
+
+        $filter = new SelfIdentifiableFilterStub('integer');
+        $filter->setFoundFilterKey('filter[target.users]');
+
+        $this->filterFactory->expects($this->never())
+            ->method('createFilter');
+
+        $this->context->setClassName(Entity\User::class);
+        $this->context->setConfig($primaryEntityConfig);
+        $this->context->setConfigOfFilters($primaryEntityFilters);
+        $this->context->setFilterValues(new RestFilterValueAccessor($request));
+        $this->context->getFilters()->add('filter[target]', $filter);
+        $this->processor->process($this->context);
+
+        $this->assertFalse($this->context->getFilters()->has('filter[target]'));
+        $this->assertSame($filter, $this->context->getFilters()->get('filter[target.users]'));
+
+        $this->assertFalse($this->context->hasErrors());
+    }
+
+    public function testProcessForSelfIdentifiableFilterWhenFilterValueWasNotFound()
+    {
+        $primaryEntityConfig = $this->getEntityDefinitionConfig(['id']);
+        $primaryEntityFilters = $this->getFiltersConfig();
+
+        $request = $this->getRequest('filter[target][users]=123');
+
+        $filter = new SelfIdentifiableFilterStub('integer');
+        $filter->setFoundFilterKey(null);
+
+        $this->filterFactory->expects($this->never())
+            ->method('createFilter');
+
+        $this->context->setClassName(Entity\User::class);
+        $this->context->setConfig($primaryEntityConfig);
+        $this->context->setConfigOfFilters($primaryEntityFilters);
+        $this->context->setFilterValues(new RestFilterValueAccessor($request));
+        $this->context->getFilters()->add('filter[target]', $filter);
+        $this->processor->process($this->context);
+
+        $this->assertSame($filter, $this->context->getFilters()->get('filter[target]'));
+
+        $this->assertEquals(
+            [
+                Error::createValidationError(Constraint::FILTER, 'The filter is not supported.')
+                    ->setSource(ErrorSource::createByParameter('filter[target][users]'))
+            ],
+            $this->context->getErrors()
+        );
+    }
+
+    public function testProcessForSelfIdentifiableFilterWhenInvalidFilterValueKeyExceptionOccurred()
+    {
+        $primaryEntityConfig = $this->getEntityDefinitionConfig(['id']);
+        $primaryEntityFilters = $this->getFiltersConfig();
+
+        $request = $this->getRequest('filter[target][users]=123');
+
+        $filter = new SelfIdentifiableFilterStub('integer');
+        $filterValue = new FilterValue('target.users', '123');
+        $filterValue->setSourceKey('filter[target][users]');
+        $exception = new InvalidFilterValueKeyException('some error', $filterValue);
+        $filter->setFoundFilterKey($exception);
+
+        $this->filterFactory->expects($this->never())
+            ->method('createFilter');
+
+        $this->context->setClassName(Entity\User::class);
+        $this->context->setConfig($primaryEntityConfig);
+        $this->context->setConfigOfFilters($primaryEntityFilters);
+        $this->context->setFilterValues(new RestFilterValueAccessor($request));
+        $this->context->getFilters()->add('filter[target]', $filter);
+        $this->processor->process($this->context);
+
+        $this->assertSame($filter, $this->context->getFilters()->get('filter[target]'));
+
+        $this->assertEquals(
+            [
+                Error::createValidationError(Constraint::FILTER)
+                    ->setInnerException($exception)
+                    ->setSource(ErrorSource::createByParameter('filter[target][users]')),
+                Error::createValidationError(Constraint::FILTER, 'The filter is not supported.')
+                    ->setSource(ErrorSource::createByParameter('filter[target][users]'))
+            ],
+            $this->context->getErrors()
+        );
+    }
+
+    public function testProcessForSelfIdentifiableFilterWhenInvalidFilterValueKeyExceptionOccurredNoSourceKey()
+    {
+        $primaryEntityConfig = $this->getEntityDefinitionConfig(['id']);
+        $primaryEntityFilters = $this->getFiltersConfig();
+
+        $request = $this->getRequest('filter[target][users]=123');
+
+        $filter = new SelfIdentifiableFilterStub('integer');
+        $filterValue = new FilterValue('target.users', '123');
+        $exception = new InvalidFilterValueKeyException('some error', $filterValue);
+        $filter->setFoundFilterKey($exception);
+
+        $this->filterFactory->expects($this->never())
+            ->method('createFilter');
+
+        $this->context->setClassName(Entity\User::class);
+        $this->context->setConfig($primaryEntityConfig);
+        $this->context->setConfigOfFilters($primaryEntityFilters);
+        $this->context->setFilterValues(new RestFilterValueAccessor($request));
+        $this->context->getFilters()->add('filter[target]', $filter);
+        $this->processor->process($this->context);
+
+        $this->assertSame($filter, $this->context->getFilters()->get('filter[target]'));
+
+        $this->assertEquals(
+            [
+                Error::createValidationError(Constraint::FILTER)
+                    ->setInnerException($exception)
+                    ->setSource(ErrorSource::createByParameter('filter[target]')),
+                Error::createValidationError(Constraint::FILTER, 'The filter is not supported.')
+                    ->setSource(ErrorSource::createByParameter('filter[target][users]'))
+            ],
+            $this->context->getErrors()
+        );
+    }
+
+    /**
+     * @expectedException \Exception
+     * @expectedExceptionMessage some error
+     */
+    public function testProcessForSelfIdentifiableFilterWhenSearchFilterKeyThrowsUnexpectedException()
+    {
+        $primaryEntityConfig = $this->getEntityDefinitionConfig(['id']);
+        $primaryEntityFilters = $this->getFiltersConfig();
+
+        $request = $this->getRequest('filter[target][users]=123');
+
+        $filter = new SelfIdentifiableFilterStub('integer');
+        $exception = new \Exception('some error');
+        $filter->setFoundFilterKey($exception);
+
+        $this->filterFactory->expects($this->never())
+            ->method('createFilter');
+
+        $this->context->setClassName(Entity\User::class);
+        $this->context->setConfig($primaryEntityConfig);
+        $this->context->setConfigOfFilters($primaryEntityFilters);
+        $this->context->setFilterValues(new RestFilterValueAccessor($request));
+        $this->context->getFilters()->add('filter[target]', $filter);
+        $this->processor->process($this->context);
     }
 }

@@ -5,6 +5,8 @@ namespace Oro\Bundle\WorkflowBundle\Form\Type;
 use Oro\Bundle\FormBundle\Form\Type\OroIconType;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints\NotBlank;
@@ -21,7 +23,7 @@ class WorkflowDefinitionType extends AbstractType
         $builder
             ->add(
                 'label',
-                'text',
+                TextType::class,
                 [
                     'label' => 'oro.workflow.workflowdefinition.label.label',
                     'required' => true,
@@ -41,7 +43,7 @@ class WorkflowDefinitionType extends AbstractType
             )
             ->add(
                 'steps_display_ordered',
-                'checkbox',
+                CheckboxType::class,
                 [
                     'label' => 'oro.workflow.workflowdefinition.steps_display_ordered.label',
                     'required' => false,

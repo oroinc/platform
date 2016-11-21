@@ -8,8 +8,8 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\ChoiceList\View\ChoiceView;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
-use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\OptionsResolver\Options;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Translation\TranslatorInterface;
 
 use Oro\Bundle\EntityConfigBundle\Config\Id\ConfigIdInterface;
@@ -61,7 +61,7 @@ class WorkflowSelectType extends AbstractType
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function configureOptions(OptionsResolver $resolver)
     {
@@ -90,7 +90,7 @@ class WorkflowSelectType extends AbstractType
                 $choices = [];
                 if ($entityClass) {
                     /** @var WorkflowDefinition[] $definitions */
-                    $definitions = $this->registry->getRepository('OroWorkflowBundle:WorkflowDefinition')
+                    $definitions = $this->registry->getRepository(WorkflowDefinition::class)
                         ->findBy(['relatedEntity' => $entityClass]);
 
                     foreach ($definitions as $definition) {

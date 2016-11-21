@@ -51,7 +51,7 @@ class NavigationHistoryBuilder extends NavigationItemBuilder
      * @param array                   $options
      * @param string|null             $alias
      */
-    public function build(ItemInterface $menu, array $options = array(), $alias = null)
+    public function build(ItemInterface $menu, array $options = [], $alias = null)
     {
         $maxItems = $this->configOptions->get('oro_navigation.max_items');
 
@@ -85,5 +85,13 @@ class NavigationHistoryBuilder extends NavigationItemBuilder
         $this->matcher = $matcher;
 
         return $this;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    protected function getMatchedRoute($item)
+    {
+        return isset($item['route']) ? $item['route'] : null;
     }
 }

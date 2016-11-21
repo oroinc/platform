@@ -34,7 +34,8 @@ define(function(require) {
                 items: this.options.items || [],
                 el: this.options._sourceElement,
                 params: this.options.params || [],
-                dialogWidgetName: this.options.dialogWidgetName
+                dialogWidgetName: this.options.dialogWidgetName,
+                gridWidgetName: this.options.gridWidgetName
             });
         },
 

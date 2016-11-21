@@ -52,21 +52,24 @@ class TransitionButton implements ButtonInterface
      */
     public function getTemplateData(array $customData = [])
     {
-        return [
+        $defaultData = [
             'workflow' => $this->workflow,
             'transition' => $this->transition,
             'workflowItem' => null,
+            'context' => $this->getButtonContext(),
             'transitionData' => [
                 'workflow' => $this->workflow->getName(),
                 'transition' => $this->transition->getName(),
                 'dialog-route' => $this->buttonContext->getFormDialogRoute(),
                 'page-route' => $this->buttonContext->getFormPageRoute(),
                 'transition-route' => $this->buttonContext->getExecutionRoute(),
-                'transition-condition-messages' => null,
-                'isAllowed' => true,
-                'enabled' => $this->buttonContext->isEnabled() ?: $this->buttonContext->isUnavailableHidden(),
+                'transition-condition-messages' => $this->buttonContext->getErrors(),
+                'isAllowed' => $this->buttonContext->isEnabled(),
+                'enabled' => $this->buttonContext->isEnabled(),
             ],
         ];
+
+        return array_merge($defaultData, $customData);
     }
 
     /**

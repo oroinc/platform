@@ -71,10 +71,42 @@ class TransitionButtonTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(TransitionButton::DEFAULT_TEMPLATE, $this->button->getTemplate());
     }
 
-    public function testGetTemplateData()
+    /**
+     * @dataProvider getTemplateDataDataProvider
+     *
+     * @param array $customData
+     */
+    public function testGetTemplateData(array $customData = [])
     {
-        //TODO: Must be updated https://magecore.atlassian.net/browse/BAP-12480
-        $this->assertInternalType('array', $this->button->getTemplateData());
+        $defaultData = [
+            'workflow' => $this->workflow,
+            'transition' => $this->transition,
+            'workflowItem' => null,
+            'context' => $this->buttonContext,
+            'transitionData' => [
+                'workflow' => $this->workflow->getName(),
+                'transition' => $this->transition->getName(),
+                'dialog-route' => $this->buttonContext->getFormDialogRoute(),
+                'page-route' => $this->buttonContext->getFormPageRoute(),
+                'transition-route' => $this->buttonContext->getExecutionRoute(),
+                'transition-condition-messages' => $this->buttonContext->getErrors(),
+                'isAllowed' => $this->buttonContext->isEnabled(),
+                'enabled' => $this->buttonContext->isEnabled(),
+            ],
+        ];
+
+        $this->assertEquals(array_merge($defaultData, $customData), $this->button->getTemplateData($customData));
+    }
+
+    /**
+     * @return array
+     */
+    public function getTemplateDataDataProvider()
+    {
+        return [
+            'no custom data' => [],
+            'with custom data' => ['customData' => ['workflowItem' => 'test_item', 'new index' => 'test value']],
+        ];
     }
 
     public function testGetButtonContext()

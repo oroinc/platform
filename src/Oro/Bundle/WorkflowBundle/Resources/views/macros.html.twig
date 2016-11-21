@@ -53,10 +53,10 @@
     {% endif %}
 
     {% set class %}
-        'btn icons-holder-text'
+        btn icons-holder-text workflow-transition-buttons
         {% if transition.displayType == 'dialog' %}no-hash{% endif %}
         {% if not transitionData.enabled %}disabled{% endif %}
-        {% if transition.frontendOptions is defined and transition.frontendOptions.class is defined %}{{ transition.frontendOptions.class }}{% endif %}"
+        {% if transition.frontendOptions is defined and transition.frontendOptions.class is defined %}{{ transition.frontendOptions.class }}{% endif %}
     {% endset %}
 
     {# Transaltions temporary disabled due to BAP-5355 #}
@@ -65,7 +65,7 @@
         'id': 'transition-%s-%s'|format(workflow.name, transition.name),
         'iCss': transition.frontendOptions is defined and transition.frontendOptions.icon is defined ? transition.frontendOptions.icon : '',
         'title': transition.label|trans({},'workflows'),
-        'class': 'btn icons-holder-text',
+        'class': class,
         'data': data,
         'label':  transition.label|trans({},'workflows')
     }) }}
