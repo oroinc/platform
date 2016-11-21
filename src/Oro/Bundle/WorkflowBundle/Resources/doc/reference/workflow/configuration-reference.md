@@ -812,8 +812,6 @@ workflows:
                     class: Acme\Bundle\DemoWorkflowBundle\Entity\PhoneConversation
         transitions:
             start_call:
-                step_to: start_conversation
-                transition_definition: create_call
                 is_start: true                         # this transition used to start new workflow
                 step_to: start_conversation            # next step after transition performing
                 transition_definition: create_call     # link to definition of conditions and post actions

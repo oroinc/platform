@@ -254,7 +254,7 @@ workflows:
             set_name_definition: []                               # definitions for transition "set_name", no extra conditions or actions here
             add_email_definition:                                 # definition for transition "add_email"
                 actions:                                          # list of action which will be performed after transition
-                    - '@create_entity':                             # create email entity
+                    - '@create_entity':                           # create email entity
                         class: Oro\Bundle\UserBundle\Entity\Email # entity class
                         attribute: $email_entity                  # entity attribute that should store this entity
                         data:                                     # data for creating entity
