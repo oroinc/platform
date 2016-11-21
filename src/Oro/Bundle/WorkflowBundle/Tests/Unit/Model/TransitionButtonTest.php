@@ -113,4 +113,9 @@ class TransitionButtonTest extends \PHPUnit_Framework_TestCase
     {
         $this->assertInstanceOf(ButtonContext::class, $this->button->getButtonContext());
     }
+
+    public function testGetGroup()
+    {
+        $this->assertEquals(OperationRegistry::DEFAULT_GROUP, $this->button->getGroup());
+    }
 }
