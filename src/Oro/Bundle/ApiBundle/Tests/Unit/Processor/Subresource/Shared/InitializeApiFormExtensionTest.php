@@ -31,6 +31,7 @@ class InitializeApiFormExtensionTest extends ChangeRelationshipTestCase
         $this->metadataTypeGuesser = $this->getMockBuilder(MetadataTypeGuesser::class)
             ->disableOriginalConstructor()
             ->getMock();
+
         $this->processor = new InitializeApiFormExtension(
             $this->formExtensionSwitcher,
             $this->metadataTypeGuesser

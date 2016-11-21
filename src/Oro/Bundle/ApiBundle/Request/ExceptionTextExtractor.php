@@ -45,7 +45,6 @@ class ExceptionTextExtractor implements ExceptionTextExtractorInterface
         if ($underlyingException instanceof ForbiddenException) {
             return Response::HTTP_FORBIDDEN;
         }
-
         if ($underlyingException instanceof PropertyAccessException) {
             return Response::HTTP_METHOD_NOT_ALLOWED;
         }
