@@ -72,7 +72,8 @@ define([
                 // @TODO: move to descendant
                 if (attrsToCompare.relatedActivityClass === 'Oro\\Bundle\\EmailBundle\\Entity\\Email') {
                     // if tread is same
-                    if (attrsToCompare.data.treadId === this.get('data').treadId) {
+                    if (attrsToCompare.data.treadId !== null &&
+                        attrsToCompare.data.treadId === this.get('data').treadId) {
                         return true;
                     }
                     // if compared model is not in tread and if tread was just created (it contains replayedEmailId)

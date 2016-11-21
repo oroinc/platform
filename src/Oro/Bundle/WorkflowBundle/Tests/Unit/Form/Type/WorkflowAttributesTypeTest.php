@@ -3,7 +3,7 @@
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Form\Type;
 
 use Symfony\Component\Form\Guess\TypeGuess;
-use Symfony\Component\Security\Acl\Voter\FieldVote;
+use Symfony\Component\Translation\TranslatorInterface;
 
 use Oro\Bundle\WorkflowBundle\Form\Type\WorkflowAttributesType;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowData;
@@ -50,6 +50,11 @@ class WorkflowAttributesTypeTest extends AbstractWorkflowAttributesTypeTestCase
      */
     protected $propertyPathSecurityHelper;
 
+    /**
+     * @var TranslatorInterface|\PHPUnit_Framework_MockObject_MockObject
+     */
+    protected $translator;
+
     protected function setUp()
     {
         parent::setUp();
@@ -61,6 +66,7 @@ class WorkflowAttributesTypeTest extends AbstractWorkflowAttributesTypeTestCase
         $this->requiredAttributesListener = $this->createRequiredAttributesListenerMock();
         $this->dispatcher = $this->createDispatcherMock();
         $this->propertyPathSecurityHelper = $this->createPropertyPathSecurityHelper();
+        $this->translator = $this->getMock(TranslatorInterface::class);
 
         $this->type = $this->createWorkflowAttributesType(
             $this->workflowRegistry,
@@ -69,7 +75,8 @@ class WorkflowAttributesTypeTest extends AbstractWorkflowAttributesTypeTestCase
             $this->formInitListener,
             $this->requiredAttributesListener,
             $this->dispatcher,
-            $this->propertyPathSecurityHelper
+            $this->propertyPathSecurityHelper,
+            $this->translator
         );
     }
 
@@ -208,7 +215,7 @@ class WorkflowAttributesTypeTest extends AbstractWorkflowAttributesTypeTestCase
                 ),
                 'childrenOptions' => array(
                     'first'  => array('label' => 'First Custom', 'required' => true),
-                    'second' => array('label' => 'Second', 'required' => false),
+                    'second' => array('label' => 'Second Custom', 'required' => false),
                 )
             ),
             'partial_fields' => array(
@@ -287,7 +294,7 @@ class WorkflowAttributesTypeTest extends AbstractWorkflowAttributesTypeTestCase
                 ),
                 'childrenOptions' => array(
                     'first'  => array(
-                        'label' => 'Attribute Label',
+                        'label' => 'Guessed Label',
                         'max_length' => 50,
                         'required' => false
                     ),

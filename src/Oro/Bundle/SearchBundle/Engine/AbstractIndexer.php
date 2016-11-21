@@ -1,13 +1,15 @@
 <?php
+
 namespace Oro\Bundle\SearchBundle\Engine;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Query\Expr\OrderBy;
+
 use Oro\Bundle\BatchBundle\ORM\Query\BufferedQueryResultIterator;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
+use Oro\Bundle\EntityBundle\Provider\EntityNameResolver;
 use Oro\Bundle\SearchBundle\Query\Mode;
-use Oro\Bundle\SearchBundle\Resolver\EntityTitleResolverInterface;
 
 abstract class AbstractIndexer implements IndexerInterface
 {
@@ -22,25 +24,25 @@ abstract class AbstractIndexer implements IndexerInterface
     /** @var ObjectMapper */
     protected $mapper;
 
-    /** @var EntityTitleResolverInterface */
-    protected $entityTitleResolver;
+    /** @var EntityNameResolver */
+    protected $entityNameResolver;
 
     /**
      * @param ManagerRegistry              $registry
      * @param DoctrineHelper               $doctrineHelper
      * @param ObjectMapper                 $mapper
-     * @param EntityTitleResolverInterface $entityTitleResolver
+     * @param EntityNameResolver           $entityNameResolver
      */
     public function __construct(
         ManagerRegistry $registry,
         DoctrineHelper $doctrineHelper,
         ObjectMapper $mapper,
-        EntityTitleResolverInterface $entityTitleResolver
+        EntityNameResolver $entityNameResolver
     ) {
         $this->registry = $registry;
         $this->doctrineHelper = $doctrineHelper;
         $this->mapper = $mapper;
-        $this->entityTitleResolver = $entityTitleResolver;
+        $this->entityNameResolver = $entityNameResolver;
     }
 
     /**
@@ -150,7 +152,7 @@ abstract class AbstractIndexer implements IndexerInterface
      */
     protected function getEntityTitle($entity)
     {
-        return $this->entityTitleResolver->resolve($entity);
+        return $this->entityNameResolver->getName($entity);
     }
 
     /**

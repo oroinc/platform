@@ -2,10 +2,11 @@
 
 namespace Oro\Component\Action\Action;
 
-use Oro\Component\Action\Exception\InvalidParameterException;
-use Oro\Component\Action\Model\ContextAccessor;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\PropertyAccess\PropertyPathInterface;
+
+use Oro\Component\Action\Exception\InvalidParameterException;
+use Oro\Component\ConfigExpression\ContextAccessor;
 
 class CallServiceMethod extends AbstractAction
 {

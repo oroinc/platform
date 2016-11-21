@@ -2,17 +2,20 @@
 
 namespace Oro\Bundle\DashboardBundle\Migrations\Data\ORM;
 
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\DataFixtures\AbstractFixture;
 use Doctrine\Common\Persistence\ObjectManager;
 
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
-use Oro\Bundle\UserBundle\Entity\User;
+use Oro\Bundle\DashboardBundle\Entity\Repository\DashboardRepository;
 use Oro\Bundle\DashboardBundle\Exception\InvalidArgumentException;
-use Oro\Bundle\DashboardBundle\Model\Manager;
 use Oro\Bundle\DashboardBundle\Model\DashboardModel;
+use Oro\Bundle\DashboardBundle\Model\Factory;
+use Oro\Bundle\DashboardBundle\Model\Manager;
 use Oro\Bundle\DashboardBundle\Model\WidgetModel;
+use Oro\Bundle\UserBundle\Entity\User;
 
 abstract class AbstractDashboardFixture extends AbstractFixture implements ContainerAwareInterface
 {
@@ -81,8 +84,24 @@ abstract class AbstractDashboardFixture extends AbstractFixture implements Conta
      */
     protected function findAdminDashboardModel(ObjectManager $manager, $dashboardName)
     {
-        return $this->getDashboardManager()
-            ->findOneDashboardModelBy(array('name' => $dashboardName, 'owner' => $this->getAdminUser($manager)));
+        $dashboard = $this->getDashboardRepository()
+            ->findOneBy(['name' => $dashboardName, 'owner' => $this->getAdminUser($manager)]);
+
+        if ($dashboard) {
+            $widgets = new ArrayCollection();
+            foreach ($dashboard->getWidgets() as $widget) {
+                $model = $this->getFactory()->createWidgetModel($widget);
+                $widgets->add($model);
+            }
+
+            return new DashboardModel(
+                $dashboard,
+                $widgets,
+                []
+            );
+        }
+
+        return null;
     }
 
     /**
@@ -113,10 +132,26 @@ abstract class AbstractDashboardFixture extends AbstractFixture implements Conta
     }
 
     /**
+     * @return Factory
+     */
+    protected function getFactory()
+    {
+        return $this->container->get('oro_dashboard.factory');
+    }
+
+    /**
      * @return Manager
      */
     protected function getDashboardManager()
     {
         return $this->container->get('oro_dashboard.manager');
+    }
+
+    /**
+     * @return DashboardRepository
+     */
+    protected function getDashboardRepository()
+    {
+        return $this->container->get('doctrine')->getRepository('OroDashboardBundle:Dashboard');
     }
 }

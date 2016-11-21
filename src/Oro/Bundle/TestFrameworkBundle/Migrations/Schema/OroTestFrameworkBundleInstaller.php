@@ -49,7 +49,7 @@ class OroTestFrameworkBundleInstaller implements
      */
     public function getMigrationVersion()
     {
-        return 'v1_2';
+        return 'v1_4';
     }
 
     /**
@@ -66,6 +66,7 @@ class OroTestFrameworkBundleInstaller implements
         $this->createTestSearchProductTable($schema);
         $this->createTestActivityTable($schema);
         $this->createTestCustomEntityTables($schema);
+        $this->createTestDefaultAndNullTable($schema);
         $this->createTestDepartmentTable($schema);
         $this->createTestPersonTable($schema);
         $this->createTestProductTable($schema);
@@ -80,6 +81,16 @@ class OroTestFrameworkBundleInstaller implements
         $this->addTestProductForeignKeys($schema);
 
         $this->activityExtension->addActivityAssociation($schema, 'test_activity', 'test_activity_target', true);
+
+        // add activity association if calendar package is installed
+        if ($schema->hasTable('oro_calendar_event')) {
+            $this->activityExtension->addActivityAssociation(
+                $schema,
+                'oro_calendar_event',
+                'test_activity_target',
+                true
+            );
+        }
     }
 
     /**
@@ -104,6 +115,28 @@ class OroTestFrameworkBundleInstaller implements
         $table = $schema->createTable('test_workflow_aware_entity');
         $table->addColumn('id', 'integer', ['autoincrement' => true]);
         $table->addColumn('name', 'string', ['notnull' => false, 'length' => 255]);
+        $table->setPrimaryKey(['id']);
+    }
+
+    /**
+     * Create test_default_and_null table
+     *
+     * @param Schema $schema
+     */
+    protected function createTestDefaultAndNullTable(Schema $schema)
+    {
+        $table = $schema->createTable('test_default_and_null');
+        $table->addColumn('id', 'integer', ['autoincrement' => true]);
+        $table->addColumn('with_default_value_string', 'string', ['notnull' => false, 'length' => 255]);
+        $table->addColumn('without_default_value_string', 'string', ['notnull' => false, 'length' => 255]);
+        $table->addColumn('with_default_value_boolean', 'boolean', ['notnull' => false]);
+        $table->addColumn('without_default_value_boolean', 'boolean', ['notnull' => false]);
+        $table->addColumn('with_default_value_integer', 'integer', ['notnull' => false]);
+        $table->addColumn('without_default_value_integer', 'integer', ['notnull' => false]);
+        $table->addColumn('with_df_not_blank', 'string', ['notnull' => false, 'length' => 255]);
+        $table->addColumn('with_df_not_null', 'string', ['notnull' => false, 'length' => 255]);
+        $table->addColumn('with_not_blank', 'string', ['notnull' => false, 'length' => 255]);
+        $table->addColumn('with_not_null', 'string', ['notnull' => false, 'length' => 255]);
         $table->setPrimaryKey(['id']);
     }
 

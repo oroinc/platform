@@ -56,6 +56,21 @@ services:
         tags:
             - { name: oro.api.processor, action: update, group: normalize_input, requestType: json_api, priority: 90 }
 
+    oro_api.update.json_api.validate_included_data_dependencies:
+        class: Oro\Bundle\ApiBundle\Processor\Shared\JsonApi\ValidateIncludedDataDependencies
+        tags:
+            - { name: oro.api.processor, action: update, group: normalize_input, requestType: json_api, priority: -25 }
+
+    oro_api.update.json_api.normalize_included_data:
+        class: Oro\Bundle\ApiBundle\Processor\Shared\JsonApi\NormalizeIncludedData
+        arguments:
+            - '@oro_api.doctrine_helper'
+            - '@oro_api.entity_instantiator'
+            - '@oro_api.value_normalizer'
+            - '@oro_api.rest.entity_id_transformer'
+        tags:
+            - { name: oro.api.processor, action: update, group: normalize_input, requestType: json_api, priority: -45 }
+
     oro_api.update.rest.normalize_request_data:
         class: Oro\Bundle\ApiBundle\Processor\Shared\Rest\NormalizeRequestData
         arguments:
@@ -77,7 +92,7 @@ services:
             - { name: oro.api.processor, action: update, group: normalize_input, priority: -100 }
 
     oro_api.update.rest.normalize_entity_id:
-        class: Oro\Bundle\ApiBundle\Processor\Shared\NormalizeEntityId
+        class: Oro\Bundle\ApiBundle\Processor\Update\NormalizeEntityId
         arguments:
             - '@oro_api.rest.entity_id_transformer'
         tags:
@@ -155,6 +170,11 @@ services:
         tags:
             - { name: oro.api.processor, action: update, group: load_data, priority: -10 }
 
+    oro_api.create.set_primary_entity:
+        class: Oro\Bundle\ApiBundle\Processor\Shared\SetPrimaryEntity
+        tags:
+            - { name: oro.api.processor, action: create, group: load_data, priority: -50 }
+
     #
     # transform_data
     #
@@ -166,6 +186,14 @@ services:
             - '@oro_api.form.guesser.metadata'
         tags:
             - { name: oro.api.processor, action: update, group: transform_data, priority: 250 }
+
+    oro_api.update.json_api.process_included_entities:
+        class: Oro\Bundle\ApiBundle\Processor\Shared\JsonApi\ProcessIncludedEntities
+        arguments:
+            - '@oro_api.action_processor_bag'
+            - '@oro_api.json_api.error_completer'
+        tags:
+            - { name: oro.api.processor, action: update, group: transform_data, requestType: json_api, priority: 200 }
 
     oro_api.update.build_form_builder:
         class: Oro\Bundle\ApiBundle\Processor\Shared\BuildFormBuilder
@@ -191,9 +219,27 @@ services:
         tags:
             - { name: oro.api.processor, action: update, group: transform_data, priority: -100 }
 
+    oro_api.update.restore_default_form_extension:
+        class: Oro\Bundle\ApiBundle\Processor\Shared\RestoreDefaultFormExtension
+        arguments:
+            - '@form.registry'
+            - '@oro_api.form.guesser.metadata'
+        tags:
+            - { name: oro.api.processor, action: update, group: transform_data, priority: -250 }
+            # add this processor to the begin of "normalize_result" group to make sure that
+            # the default form extension is restored even if an error occurred
+            - { name: oro.api.processor, action: update, group: normalize_result, priority: 250 }
+
     #
     # save_data
     #
+
+    oro_api.update.persist_included_entities:
+        class: Oro\Bundle\ApiBundle\Processor\Shared\PersistIncludedEntities
+        arguments:
+            - '@oro_api.doctrine_helper'
+        tags:
+            - { name: oro.api.processor, action: update, group: save_data, priority: 10 }
 
     oro_api.update.save_entity:
         class: Oro\Bundle\ApiBundle\Processor\Update\SaveEntity
@@ -213,17 +259,16 @@ services:
         tags:
             - { name: oro.api.processor, action: update, group: normalize_data, priority: -10 }
 
+    oro_api.update.load_normalized_included_entities:
+        class: Oro\Bundle\ApiBundle\Processor\Shared\LoadNormalizedIncludedEntities
+        arguments:
+            - '@oro_api.action_processor_bag'
+        tags:
+            - { name: oro.api.processor, action: update, group: normalize_data, priority: -50 }
+
     #
     # normalize_result
     #
-
-    oro_api.update.restore_default_form_extension:
-        class: Oro\Bundle\ApiBundle\Processor\Shared\RestoreDefaultFormExtension
-        arguments:
-            - '@form.registry'
-            - '@oro_api.form.guesser.metadata'
-        tags:
-            - { name: oro.api.processor, action: update, group: normalize_result, priority: 250 }
 
     oro_api.update.rest.complete_errors:
         class: Oro\Bundle\ApiBundle\Processor\Shared\CompleteErrors
@@ -271,10 +316,20 @@ services:
             - { name: oro.api.processor, action: update, group: normalize_result, requestType: json_api, priority: -55 }
             - { name: monolog.logger, channel: api }
 
+    oro_api.update.add_included_entities_to_result_document:
+        class: Oro\Bundle\ApiBundle\Processor\Shared\AddIncludedEntitiesToResultDocument
+        tags:
+            - { name: oro.api.processor, action: update, group: normalize_result, priority: -100 }
+
+    oro_api.update.set_result_document:
+        class: Oro\Bundle\ApiBundle\Processor\Shared\SetResultDocument
+        tags:
+            - { name: oro.api.processor, action: update, group: normalize_result, priority: -150 }
+
     oro_api.update.process_errors:
         class: Oro\Bundle\ApiBundle\Processor\Shared\ProcessErrors
         tags:
-            - { name: oro.api.processor, action: update, group: normalize_result, priority: -100 }
+            - { name: oro.api.processor, action: update, group: normalize_result, priority: -190 }
 
     oro_api.update.json_api.validate_normalized_result_schema:
         class: Oro\Bundle\ApiBundle\Processor\Shared\JsonApi\ValidateNormalizedResultSchema

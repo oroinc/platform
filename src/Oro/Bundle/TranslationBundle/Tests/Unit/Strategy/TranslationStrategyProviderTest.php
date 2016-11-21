@@ -2,43 +2,57 @@
 
 namespace Oro\Bundle\TranslationBundle\Tests\Unit\Strategy;
 
-use Oro\Bundle\TranslationBundle\Entity\Translation;
 use Oro\Bundle\TranslationBundle\Strategy\TranslationStrategyInterface;
 use Oro\Bundle\TranslationBundle\Strategy\TranslationStrategyProvider;
+use Oro\Bundle\TranslationBundle\Translation\Translator;
 
 class TranslationStrategyProviderTest extends \PHPUnit_Framework_TestCase
 {
+    /** @var TranslationStrategyInterface|\PHPUnit_Framework_MockObject_MockObject */
+    protected $defaultStrategy;
+
+    /** @var TranslationStrategyInterface|\PHPUnit_Framework_MockObject_MockObject */
+    protected $customStrategy;
+
+    /** @var TranslationStrategyProvider */
+    protected $provider;
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setUp()
+    {
+        $this->defaultStrategy = $this->getStrategy('default');
+        $this->customStrategy = $this->getStrategy('custom');
+
+        $this->provider = new TranslationStrategyProvider();
+        $this->provider->addStrategy($this->defaultStrategy);
+        $this->provider->addStrategy($this->customStrategy);
+    }
+
     public function testGetStrategy()
     {
-        /** @var TranslationStrategyInterface $defaultStrategy */
-        $defaultStrategy = $this->getMock('Oro\Bundle\TranslationBundle\Strategy\TranslationStrategyInterface');
-
-        $provider = new TranslationStrategyProvider($defaultStrategy);
-        $this->assertEquals($defaultStrategy, $provider->getStrategy());
+        $this->assertEquals($this->defaultStrategy, $this->provider->getStrategy());
     }
 
     public function testSetStrategy()
     {
-        $defaultName = 'default';
-        $customName = 'custom';
+        $this->assertSame($this->defaultStrategy, $this->provider->getStrategy());
 
-        /** @var TranslationStrategyInterface|\PHPUnit_Framework_MockObject_MockObject $defaultStrategy */
-        $defaultStrategy = $this->getMock('Oro\Bundle\TranslationBundle\Strategy\TranslationStrategyInterface');
-        $defaultStrategy->expects($this->any())
-            ->method('getName')
-            ->willReturn($defaultName);
-        /** @var TranslationStrategyInterface|\PHPUnit_Framework_MockObject_MockObject $customStrategy */
-        $customStrategy = $this->getMock('Oro\Bundle\TranslationBundle\Strategy\TranslationStrategyInterface');
-        $customStrategy->expects($this->any())
-            ->method('getName')
-            ->willReturn($customName);
+        $this->provider->setStrategy($this->customStrategy);
 
-        $provider = new TranslationStrategyProvider($defaultStrategy);
-        $this->assertEquals($defaultStrategy, $provider->getStrategy());
-        $this->assertEquals($defaultName, $provider->getStrategy()->getName());
-        $provider->setStrategy($customStrategy);
-        $this->assertEquals($customStrategy, $provider->getStrategy());
-        $this->assertEquals($customName, $provider->getStrategy()->getName());
+        $this->assertSame($this->customStrategy, $this->provider->getStrategy());
+    }
+
+    public function testGetStrategies()
+    {
+        $this->assertSame(
+            [
+                'default' => $this->defaultStrategy,
+                'custom' => $this->customStrategy
+            ],
+            $this->provider->getStrategies()
+        );
     }
 
     /**
@@ -81,7 +95,7 @@ class TranslationStrategyProviderTest extends \PHPUnit_Framework_TestCase
                     'en' => [],
                 ],
                 'locale' => 'ru',
-                'expectedFallbackLocales' => [Translation::DEFAULT_LOCALE],
+                'expectedFallbackLocales' => [Translator::DEFAULT_LOCALE],
             ],
             'complex tree defined locale first level' => [
                 'fallbackTree' => [
@@ -195,5 +209,18 @@ class TranslationStrategyProviderTest extends \PHPUnit_Framework_TestCase
                 'expectedFallbackLocales' => ['en'],
             ],
         ];
+    }
+
+    /**
+     * @param string $name
+     * @return TranslationStrategyInterface|\PHPUnit_Framework_MockObject_MockObject
+     */
+    protected function getStrategy($name)
+    {
+        $strategy = $this->getMock(TranslationStrategyInterface::class);
+        $strategy->expects($this->any())->method('isApplicable')->willReturn(true);
+        $strategy->expects($this->any())->method('getName')->willReturn($name);
+
+        return $strategy;
     }
 }
