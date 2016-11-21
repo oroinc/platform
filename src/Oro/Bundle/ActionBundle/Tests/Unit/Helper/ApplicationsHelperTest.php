@@ -23,7 +23,8 @@ class ApplicationsHelperTest extends \PHPUnit_Framework_TestCase
             ->getMock('Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface');
 
         $this->helper = new ApplicationsHelper($this->tokenStorage);
-        $this->helper->setDialogRoute('oro_action_widget_form')
+        $this->helper->setFormDialogRoute('oro_action_widget_form')
+            ->setFormPageRoute('oro_action_widget_form')
             ->setExecutionRoute('oro_action_operation_execute')
             ->setWidgetRoute('oro_action_widget_buttons');
     }
@@ -40,7 +41,7 @@ class ApplicationsHelperTest extends \PHPUnit_Framework_TestCase
 
     public function testGetDialogRoute()
     {
-        $this->assertEquals('oro_action_widget_form', $this->helper->getDialogRoute());
+        $this->assertEquals('oro_action_widget_form', $this->helper->getFormDialogRoute());
     }
 
     public function testGetExecutionRoute()

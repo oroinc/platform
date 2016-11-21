@@ -3,9 +3,13 @@
 namespace Oro\Bundle\ApiBundle\Util;
 
 use Doctrine\ORM\Mapping\ClassMetadata;
+use Doctrine\ORM\QueryBuilder;
 
+use Oro\Component\DoctrineUtils\ORM\QueryUtils;
 use Oro\Component\PhpUtils\ReflectionUtil;
+
 use Oro\Bundle\ApiBundle\Collection\Criteria;
+use Oro\Bundle\ApiBundle\Exception\RuntimeException;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper as BaseHelper;
 
 class DoctrineHelper extends BaseHelper
@@ -197,6 +201,60 @@ class DoctrineHelper extends BaseHelper
                 $property->setAccessible(true);
             }
             $property->setValue($entity, $value);
+        }
+    }
+
+    /**
+     * Adds a restriction by entity identifier to the given query builder.
+     *
+     * @param QueryBuilder $qb
+     * @param string       $entityClass
+     * @param mixed        $entityId
+     */
+    public function applyEntityIdentifierRestriction(QueryBuilder $qb, $entityClass, $entityId)
+    {
+        $rootAlias = QueryUtils::getSingleRootAlias($qb);
+        $idFields = $this->getEntityIdentifierFieldNamesForClass($entityClass);
+        if (count($idFields) === 1) {
+            // single identifier
+            if (is_array($entityId)) {
+                throw new RuntimeException(
+                    sprintf(
+                        'The entity identifier cannot be an array because the entity "%s" has single primary key.',
+                        $entityClass
+                    )
+                );
+            }
+            $qb
+                ->andWhere(sprintf('%s.%s = :id', $rootAlias, reset($idFields)))
+                ->setParameter('id', $entityId);
+        } else {
+            // combined identifier
+            if (!is_array($entityId)) {
+                throw new RuntimeException(
+                    sprintf(
+                        'The entity identifier must be an array because the entity "%s" has composite primary key.',
+                        $entityClass
+                    )
+                );
+            }
+            $counter = 1;
+            foreach ($idFields as $field) {
+                if (!array_key_exists($field, $entityId)) {
+                    throw new RuntimeException(
+                        sprintf(
+                            'The entity identifier array must have the key "%s" because '
+                            . 'the entity "%s" has composite primary key.',
+                            $field,
+                            $entityClass
+                        )
+                    );
+                }
+                $qb
+                    ->andWhere(sprintf('%s.%s = :id%d', $rootAlias, $field, $counter))
+                    ->setParameter(sprintf('id%d', $counter), $entityId[$field]);
+                $counter++;
+            }
         }
     }
 }

@@ -2,8 +2,9 @@
 
 namespace Oro\Bundle\UserBundle\Tests\Unit\Datagrid\Extension\MassAction;
 
-use Oro\Bundle\DataGridBundle\Datasource\ResultRecord;
+use Symfony\Component\Translation\TranslatorInterface;
 
+use Oro\Bundle\DataGridBundle\Datasource\ResultRecord;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\UserBundle\Datagrid\Extension\MassAction\ResetPasswordActionHandler;
 use Oro\Bundle\NotificationBundle\Model\EmailTemplate;
@@ -13,10 +14,10 @@ class ResetPasswordActionHandlerTest extends \PHPUnit_Framework_TestCase
     /** @var \PHPUnit_Framework_MockObject_MockObject|ResetPasswordActionHandler */
     protected $handler;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|ResetPasswordActionHandler */
+    /** @var \PHPUnit_Framework_MockObject_MockObject|TranslatorInterface */
     protected $translator;
 
-    /** @var  int */
+    /** @var int */
     protected $methodCalls;
 
     protected function setUp()
@@ -43,7 +44,7 @@ class ResetPasswordActionHandlerTest extends \PHPUnit_Framework_TestCase
             ->expects($this->atLeastOnce())
             ->method('updateUser');
 
-        $this->translator = $this->getMockBuilder('Symfony\Component\Translation\TranslatorInterface')
+        $this->translator = $this->getMockBuilder(TranslatorInterface::class)
             ->disableOriginalConstructor()
             ->getMock();
 
@@ -102,9 +103,6 @@ class ResetPasswordActionHandlerTest extends \PHPUnit_Framework_TestCase
             ->expects($this->atLeastOnce())
             ->method('flush');
         $em
-            ->expects($this->atLeastOnce())
-            ->method('clear');
-        $em
             ->expects($this->once())
             ->method('getRepository')
             ->will($this->returnValue($repository));
@@ -132,7 +130,10 @@ class ResetPasswordActionHandlerTest extends \PHPUnit_Framework_TestCase
             ->method('current')
             ->will($this->returnCallback(function () {
                 $this->methodCalls++;
-                return $this->methodCalls < 7 ? new ResultRecord(new User()) : null;
+                $user = new User();
+                $user->setId($this->methodCalls);
+
+                return $this->methodCalls < 7 ? new ResultRecord($user) : null;
             }));
 
         $args = $this->getMockBuilder('Oro\Bundle\DataGridBundle\Extension\MassAction\MassActionHandlerArgs')

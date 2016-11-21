@@ -1193,10 +1193,6 @@ class WorkflowManagerTest extends \PHPUnit_Framework_TestCase
                 return $entityParam === $entity ? $entity->getId() : null;
             });
 
-        $this->doctrineHelper->expects($this->any())
-            ->method('getSingleEntityIdentifier')
-            ->will($this->returnValue($entity->getId()));
-
         $workflowItemsRepository = $this->getMockBuilder(WorkflowItemRepository::class)
                 ->disableOriginalConstructor()
                 ->setMethods(['findAllByEntityMetadata'])

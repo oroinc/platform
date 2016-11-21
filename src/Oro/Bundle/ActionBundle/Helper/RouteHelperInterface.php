@@ -12,7 +12,12 @@ interface RouteHelperInterface
     /**
      * @return string
      */
-    public function getDialogRoute();
+    public function getFormDialogRoute();
+
+    /**
+     * @return string
+     */
+    public function getFormPageRoute();
 
     /**
      * @return string
@@ -27,11 +32,18 @@ interface RouteHelperInterface
     public function setExecutionRoute($executionRoute);
 
     /**
-     * @param string $dialogRoute
+     * @param string $formDialogRoute
      *
      * @return RouteHelperInterface
      */
-    public function setDialogRoute($dialogRoute);
+    public function setFormDialogRoute($formDialogRoute);
+
+    /**
+     * @param string $formPageRoute
+     *
+     * @return RouteHelperInterface
+     */
+    public function setFormPageRoute($formPageRoute);
 
     /**
      * @param string $widgetRoute

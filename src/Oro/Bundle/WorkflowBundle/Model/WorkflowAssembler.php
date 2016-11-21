@@ -7,6 +7,7 @@ use Symfony\Component\Translation\TranslatorInterface;
 
 use Doctrine\Common\Collections\Collection;
 
+use Oro\Bundle\ActionBundle\Model\Attribute;
 use Oro\Bundle\WorkflowBundle\Exception\UnknownStepException;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Configuration\WorkflowConfiguration;
@@ -212,8 +213,9 @@ class WorkflowAssembler extends BaseAbstractAssembler
     protected function assembleAttributes(WorkflowDefinition $definition, array $configuration)
     {
         $attributesConfiguration = $this->getOption($configuration, WorkflowConfiguration::NODE_ATTRIBUTES, []);
+        $transitionConfiguration = $this->getOption($configuration, WorkflowConfiguration::NODE_TRANSITIONS);
 
-        return $this->attributeAssembler->assemble($definition, $attributesConfiguration);
+        return $this->attributeAssembler->assemble($definition, $attributesConfiguration, $transitionConfiguration);
     }
 
     /**

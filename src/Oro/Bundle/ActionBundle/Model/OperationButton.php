@@ -5,7 +5,7 @@ namespace Oro\Bundle\ActionBundle\Model;
 class OperationButton implements ButtonInterface
 {
     const DEFAULT_TEMPLATE = 'OroActionBundle:Operation:button.html.twig';
-    const FRONTEND_TEMPLATE_KEY = 'template';
+    const BUTTON_TEMPLATE_KEY = 'template';
 
     /**
      * @var Operation
@@ -40,10 +40,10 @@ class OperationButton implements ButtonInterface
      */
     public function getTemplate()
     {
-        $frontendOptions = $this->operation->getDefinition()->getFrontendOptions();
+        $buttonOptions = $this->operation->getDefinition()->getButtonOptions();
 
-        return !empty($frontendOptions[static::FRONTEND_TEMPLATE_KEY])
-            ? $frontendOptions[static::FRONTEND_TEMPLATE_KEY]
+        return !empty($buttonOptions[static::BUTTON_TEMPLATE_KEY])
+            ? $buttonOptions[static::BUTTON_TEMPLATE_KEY]
             : static::DEFAULT_TEMPLATE;
     }
 

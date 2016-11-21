@@ -2,12 +2,16 @@
 
 namespace Oro\Bundle\EmailBundle\EventListener;
 
-use Oro\Bundle\EmailBundle\Entity\Email;
 use Oro\Bundle\ActivityListBundle\Event\ActivityListPreQueryBuildEvent;
+use Oro\Bundle\EmailBundle\Entity\Email;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
+use Oro\Bundle\FeatureToggleBundle\Checker\FeatureCheckerHolderTrait;
+use Oro\Bundle\FeatureToggleBundle\Checker\FeatureToggleableInterface;
 
-class ActivityListPreQueryBuildListener
+class ActivityListPreQueryBuildListener implements FeatureToggleableInterface
 {
+    use FeatureCheckerHolderTrait;
+
     /** @var DoctrineHelper */
     protected $doctrineHelper;
 
@@ -27,6 +31,10 @@ class ActivityListPreQueryBuildListener
      */
     public function prepareIdsForEmailThreadEvent(ActivityListPreQueryBuildEvent $event)
     {
+        if (!$this->isFeaturesEnabled()) {
+            return;
+        }
+
         if ($event->getTargetClass() === Email::ENTITY_CLASS) {
             /** @var Email $email */
             $email = $this->doctrineHelper->getEntity(Email::ENTITY_CLASS, $event->getTargetId());
