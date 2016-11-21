@@ -28,13 +28,8 @@ class HttpImportHandler extends AbstractImportHandler
     public function handleImportValidation(
         $jobName,
         $processorAlias,
-        $inputFormat = 'csv',
-        $inputFilePrefix = null,
         array $options = []
     ) {
-        if ($inputFilePrefix === null) {
-            $inputFilePrefix = $processorAlias;
-        }
         $entityName = $this->processorRegistry->getProcessorEntityName(
             ProcessorRegistry::TYPE_IMPORT_VALIDATION,
             $processorAlias
@@ -43,8 +38,6 @@ class HttpImportHandler extends AbstractImportHandler
         $jobResult = $this->executeValidation(
             $jobName,
             $processorAlias,
-            $inputFormat,
-            $inputFilePrefix,
             $options,
             $entityName
         );
