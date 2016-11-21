@@ -31,6 +31,9 @@ class ButtonContext
     /** @var bool */
     protected $enabled;
 
+    /** @var array */
+    protected $errors = [];
+
     /** @var bool */
     protected $unavailableHidden;
 
@@ -220,6 +223,26 @@ class ButtonContext
     public function setUnavailableHidden($unavailableHidden)
     {
         $this->unavailableHidden = $unavailableHidden;
+
+        return $this;
+    }
+
+    /**
+     * @return array
+     */
+    public function getErrors()
+    {
+        return $this->errors;
+    }
+
+    /**
+     * @param array $errors
+     *
+     * @return $this
+     */
+    public function setErrors(array $errors)
+    {
+        $this->errors = $errors;
 
         return $this;
     }

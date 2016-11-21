@@ -1,32 +1,22 @@
 {% import 'OroWorkflowBundle::macros.html.twig' as workflowMacros %}
 
+{% set params = {
+    workflowName: workflow.name,
+    transitionName: transition.name,
+    entityClass: context.entityClass,
+    entityId: context.entityId,
+    route: context.routeName,
+    datagrid: context.datagridName,
+    group: context.group,
+} %}
+
 {% if transition.displayType == 'dialog' %}
     {% if transition.hasForm() %}
-        {% set transitionData = transitionData|merge({'dialog-url': path(
-            transitionData['dialog-route'],
-            {
-                workflowName: workflow.name,
-                transitionName: transition.name
-            })
-        }) %}
+        {% set transitionData = transitionData|merge({'dialog-url': path(transitionData['dialog-route'], params) }) %}
     {% endif %}
-    {% set transitionData = transitionData|merge({'transition-url': path(
-        transitionData['transition-route'],
-        {
-            workflowName: workflow.name,
-            transitionName: transition.name
-        })
-    }) %}
-
+    {% set transitionData = transitionData|merge({'transition-url': path(transitionData['transition-route'], params) }) %}
 {% else %}
-    {% set data = data|merge({'workflowItem': null}) %}
-    {% set transitionData = transitionData|merge({'transition-url': path(
-        transitionData['page-route'],
-        {
-            workflowName: workflow.name,
-            transitionName: transition.name,
-        })
-    }) %}
+    {% set transitionData = transitionData|merge({'transition-url': path(transitionData['page-route'], params) }) %}
 {% endif %}
 
 <div class="pull-left btn-group icons-holder">
