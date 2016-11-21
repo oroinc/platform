@@ -52,7 +52,7 @@ class TransitionButton implements ButtonInterface
      */
     public function getTemplateData(array $customData = [])
     {
-        return [
+        $defaultData = [
             'workflow' => $this->workflow,
             'transition' => $this->transition,
             'workflowItem' => null,
@@ -68,6 +68,8 @@ class TransitionButton implements ButtonInterface
                 'enabled' => $this->buttonContext->isEnabled(),
             ],
         ];
+
+        return array_merge($defaultData, $customData);
     }
 
     /**
