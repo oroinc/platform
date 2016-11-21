@@ -1,0 +1,9 @@
+{% block _page_footer_widget %}
+    {% set attr = layout_attr_defaults(attr, {
+        '~class': ' page-footer'
+    }) %}
+
+    <footer {{ block('block_attributes') }}>
+        {{ block_widget(block) }}
+    </footer>
+{% endblock %}

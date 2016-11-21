@@ -6,6 +6,7 @@ use FOS\RestBundle\Controller\Annotations\NamePrefix;
 use FOS\RestBundle\Controller\Annotations\RouteResource;
 use FOS\RestBundle\Controller\FOSRestController;
 use FOS\RestBundle\Util\Codes;
+
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 
 use Symfony\Component\HttpFoundation\Request;
@@ -22,6 +23,8 @@ use Oro\Bundle\SidebarBundle\Entity\Repository\WidgetRepository;
  */
 class WidgetController extends FOSRestController
 {
+    const SIDEBAR_WIDGET_FEATURE_NAME = 'sidebar_widgets';
+
     /**
      * REST GET list
      *
@@ -40,6 +43,17 @@ class WidgetController extends FOSRestController
         if ($token instanceof OrganizationContextTokenInterface) {
             $organization = $token->getOrganizationContext();
             $items = $this->getRepository()->getWidgets($this->getUser(), $placement, $organization);
+            $featureChecker = $this->get('oro_featuretoggle.checker.feature_checker');
+            $items = array_filter(
+                $items,
+                function ($item) use ($featureChecker) {
+                    if (!isset($item['widgetName'])) {
+                        return false;
+                    }
+
+                    return $featureChecker->isResourceEnabled($item['widgetName'], self::SIDEBAR_WIDGET_FEATURE_NAME);
+                }
+            );
         }
 
         if (!$items) {

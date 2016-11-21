@@ -51,3 +51,7 @@ pages:
   User View:
     class: Oro\Bundle\UserBundle\Tests\Behat\Page\UserView
     route: 'oro_user_view'
+
+  User Edit:
+    class: Oro\Bundle\UserBundle\Tests\Behat\Page\UserEdit
+    route: 'oro_user_edit'
