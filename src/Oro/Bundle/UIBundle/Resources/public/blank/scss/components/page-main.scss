@@ -1,0 +1,18 @@
+// @theme: blank
+
+.page-main {
+    flex: 1;
+
+    &__content {
+        display: flex;
+    }
+}
+
+@include breakpoint('tablet-small') {
+    .page-main {
+        &__content {
+            flex-direction: column;
+            padding: $page-main-tablet-small-inner-offset;
+        }
+    }
+}
