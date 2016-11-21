@@ -264,6 +264,59 @@ class WorkflowControllerTest extends WebTestCase
         $this->assertEquals($workflowItem->getEntityClass(), $result['workflowItem']['entity_class']);
     }
 
+    /**
+     * @dataProvider startWorkflowDataProvider
+     *
+     * @param string $routeName
+     * @param string $entityClass
+     * @param string $transitionName
+     */
+    public function testStartWorkflowFromNonRelatedEntity($routeName, $entityClass, $transitionName)
+    {
+        $this->client->request(
+            'GET',
+            $this->getUrl(
+                'oro_workflow_api_rest_workflow_start',
+                [
+                    'workflowName' => LoadWorkflowDefinitions::WITH_START_STEP,
+                    'transitionName' => $transitionName,
+                    'entityClass' => $entityClass,
+                    'route' => $routeName
+                ]
+            )
+        );
+
+        $result = $this->getJsonResponseContent($this->client->getResponse(), 200);
+
+        $workflowItem = $this->getRepository('Oro\Bundle\WorkflowBundle\Entity\WorkflowItem')
+            ->find($result['workflowItem']['id']);
+        /** @var \Oro\Bundle\ActionBundle\Model\ButtonSearchContext $initContext */
+        $initContext = $workflowItem->getData()->get('init_context');
+
+        $this->assertInstanceOf('Oro\Bundle\ActionBundle\Model\ButtonSearchContext', $initContext);
+        $this->assertEquals($initContext->getEntityClass(), $entityClass);
+        $this->assertEquals($initContext->getRouteName(), $routeName);
+    }
+
+    /**
+     * @return array
+     */
+    public function startWorkflowDataProvider()
+    {
+        return [
+            'startFromNonRelatedEntity' => [
+                'route' => 'route1',
+                'entityClass' => 'class1',
+                'transitionName' => LoadWorkflowDefinitions::START_FROM_ENTITY_TRANSITION,
+            ],
+            'startFromRoute' => [
+                'route' => 'route2',
+                'entityClass' => 'class2',
+                'transitionName' => LoadWorkflowDefinitions::START_FROM_ROUTE_TRANSITION,
+            ]
+        ];
+    }
+
     public function testTransitAction()
     {
         $this->getWorkflowManager()->activateWorkflow(LoadWorkflowDefinitions::MULTISTEP);

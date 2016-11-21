@@ -21,13 +21,33 @@ workflows:
         steps:
             open:
                 order: 10
-                allowed_transitions: ['start_transition']
+                allowed_transitions:
+                    - start_transition
+                    - start_transition_from_entity
+                    - start_transition_from_routes
         transition_definitions:
             start_transiotion_definition: ~
+            start_transition_from_non_related_entities:
+                actions:
+                    - '@flush_entity': $entity
         transitions:
             start_transition:
                 step_to: open
                 transition_definition: start_transiotion_definition
+            start_transition_from_entities:
+                step_to: open
+                is_start: true
+                transition_definition: start_transition_from_non_related_entities
+                init_entities:
+                    - entity1
+                    - entity2
+            start_transition_from_routes:
+                step_to: open
+                is_start: true
+                transition_definition: start_transition_from_non_related_entities
+                init_routes:
+                    - route1
+                    - route2
 
     test_multistep_flow:
         entity: Oro\Bundle\TestFrameworkBundle\Entity\WorkflowAwareEntity
