@@ -67,7 +67,10 @@ class PlatformUpdateCommand extends AbstractCommand
                     )
                 )
                 ->runCommand(LoadPermissionConfigurationCommand::NAME, array('--process-isolation' => true))
-                ->runCommand('oro:workflow:definitions:load', array('--process-isolation' => true))
+                ->runCommand(
+                    'oro:workflow:definitions:load',
+                    ['--process-isolation' => true, '--skip-scope-processing' => true]
+                )
                 ->runCommand('oro:process:configuration:load', array('--process-isolation' => true))
                 ->runCommand('oro:migration:data:load', array('--process-isolation' => true))
                 ->runCommand('oro:navigation:init', array('--process-isolation' => true))
