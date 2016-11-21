@@ -79,7 +79,7 @@ class WorkflowController extends FOSRestController
             $entityClass = $workflow->getDefinition()->getRelatedEntity();
 
             $transition = $workflow->getTransitionManager()->getTransition($transitionName);
-            if ($transition->getInitEntities() || $transition->getInitRoutes()) {
+            if (!$transition->isEmptyInitOptions()) {
                 $contextAttribute = $transition->getInitContextAttribute();
                 $dataArray[$contextAttribute] = $this->get('oro_action.provider.button_search_context')
                     ->getButtonSearchContext();
