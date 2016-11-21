@@ -65,6 +65,8 @@ class AjaxControllerTest extends WebTestCase
      * @param string $redirectRoute
      * @param array $flashMessages
      * @param array $headers
+     *
+     * @SuppressWarnings(PHPMD.ExcessiveParameterList)
      */
     public function testExecuteAction(
         array $config,
