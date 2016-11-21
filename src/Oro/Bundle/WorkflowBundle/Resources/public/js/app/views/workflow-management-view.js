@@ -147,8 +147,8 @@ define(function(require) {
         _requireConfirm: function() {
             return (this.model.get('steps').length +
                 this.model.get('transitions').length +
-                    this.model.get('transition_definitions').length +
-                        this.model.get('attributes').length) > 1;
+                this.model.get('transition_definitions').length +
+                this.model.get('attributes').length) > 1;
         },
 
         _preloadEntityFieldsData: function() {
