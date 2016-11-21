@@ -175,9 +175,14 @@ class WorkflowDefinitionController extends Controller
                 }
             }
 
-            $response['deactivated'] = $deactivated;
+            try {
+                $workflowManager->activateWorkflow($workflowDefinition->getName());
 
-            $workflowManager->activateWorkflow($workflowDefinition->getName());
+                $response['deactivated'] = $deactivated;
+            } catch (\RuntimeException $e) {
+                $response['error'] = $e->getMessage();
+                unset($response['savedId']);
+            }
         }
 
         return $response;

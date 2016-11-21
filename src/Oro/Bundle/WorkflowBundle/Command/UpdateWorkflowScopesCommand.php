@@ -48,7 +48,7 @@ class UpdateWorkflowScopesCommand extends ContainerAwareCommand
                     $this->disableWorkflow($definition->getName());
 
                     $output->writeln(
-                        sprintf('Workflow "%s" disabled. Reason: %s.', $definition->getName(), $e->getMessage())
+                        sprintf('Workflow "%s" disabled. %s', $definition->getName(), $e->getMessage())
                     );
                 } else {
                     throw $e;

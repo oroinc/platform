@@ -865,7 +865,12 @@ class WorkflowManagerTest extends \PHPUnit_Framework_TestCase
             ->method('getEntityManager')->with(WorkflowDefinition::class)->willReturn($entityManager);
         $entityManager->expects($this->once())->method('flush')->with($workflowDefinition);
 
-        $this->eventDispatcher->expects($this->once())
+        $this->eventDispatcher->expects($this->at(0))
+            ->method('dispatch')->with(
+                WorkflowEvents::WORKFLOW_BEFORE_ACTIVATION,
+                new WorkflowChangesEvent($workflowDefinition)
+            );
+        $this->eventDispatcher->expects($this->at(1))
             ->method('dispatch')->with(
                 WorkflowEvents::WORKFLOW_ACTIVATED,
                 new WorkflowChangesEvent($workflowDefinition)
@@ -928,7 +933,12 @@ class WorkflowManagerTest extends \PHPUnit_Framework_TestCase
             ->method('getEntityManager')->with(WorkflowDefinition::class)->willReturn($entityManager);
         $entityManager->expects($this->once())->method('flush')->with($workflowDefinition);
 
-        $this->eventDispatcher->expects($this->once())
+        $this->eventDispatcher->expects($this->at(0))
+            ->method('dispatch')->with(
+                WorkflowEvents::WORKFLOW_BEFORE_DEACTIVATION,
+                new WorkflowChangesEvent($workflowDefinition)
+            );
+        $this->eventDispatcher->expects($this->at(1))
             ->method('dispatch')->with(
                 WorkflowEvents::WORKFLOW_DEACTIVATED,
                 new WorkflowChangesEvent($workflowDefinition)
