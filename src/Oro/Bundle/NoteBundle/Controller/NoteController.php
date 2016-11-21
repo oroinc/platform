@@ -66,15 +66,43 @@ class NoteController extends Controller
     }
 
     /**
-     * @Route("/widget/info/{id}", name="oro_note_widget_info", requirements={"id"="\d+"})
-     * @Template
+     * @Route(
+     *     "/widget/info/{id}/{renderContexts}",
+     *     name="oro_note_widget_info",
+     *     requirements={"id"="\d+", "renderContexts"="\d+"},
+     *     defaults={"renderContexts"=true}
+     * )
+     * @Template("OroNoteBundle:Note/widget:info.html.twig")
      * @AclAncestor("oro_note_view")
      */
-    public function infoAction(Note $entity)
+    public function infoAction(Note $entity, $renderContexts)
     {
         $attachmentProvider = $this->get('oro_attachment.provider.attachment');
         $attachment = $attachmentProvider->getAttachmentInfo($entity);
-        return ['entity' => $entity, 'attachment' => $attachment];
+
+        return [
+            'entity'         => $entity,
+            'target'         => $this->getTargetEntity(),
+            'renderContexts' => (bool)$renderContexts,
+            'attachment'     => $attachment
+        ];
+    }
+
+    /**
+     * Get target entity
+     *
+     * @return object|null
+     */
+    protected function getTargetEntity()
+    {
+        $entityRoutingHelper = $this->getEntityRoutingHelper();
+        $targetEntityClass   = $entityRoutingHelper->getEntityClassName($this->getRequest(), 'targetActivityClass');
+        $targetEntityId      = $entityRoutingHelper->getEntityId($this->getRequest(), 'targetActivityId');
+        if (!$targetEntityClass || !$targetEntityId) {
+            return null;
+        }
+
+        return $entityRoutingHelper->getEntity($targetEntityClass, $targetEntityId);
     }
 
     /**

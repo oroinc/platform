@@ -1,4 +1,6 @@
 Oro\Bundle\NoteBundle\Entity\Note:
+    constraints:
+        - Oro\Bundle\NoteBundle\Validator\Constraints\ContextIsNotEmptyConstraint: ~
     properties:
         message:
             - NotBlank:     ~

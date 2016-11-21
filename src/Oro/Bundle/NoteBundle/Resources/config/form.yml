@@ -39,7 +39,9 @@ services:
         arguments:
             - '@oro_note.form.note'
             - '@request'
-            - '@doctrine.orm.entity_manager'
+            - '@doctrine'
+            - '@oro_activity.manager'
+            - '@event_dispatcher'
 
     oro_note.form.handler.note_api:
         class: %oro_note.form.handler.note_api.class%

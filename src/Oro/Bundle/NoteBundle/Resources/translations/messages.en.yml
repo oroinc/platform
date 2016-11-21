@@ -27,6 +27,10 @@ oro:
         note_update:          Update {{ entity }}
         note_delete:          Delete {{ entity }}
 
+        context:
+            not_empty:
+                message:      Note context could not be empty
+
     entity_merge:
         merge_modes:
             notes_unite: Append

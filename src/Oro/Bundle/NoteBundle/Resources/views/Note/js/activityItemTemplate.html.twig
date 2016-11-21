@@ -1,4 +1,5 @@
 {% extends 'OroActivityListBundle:ActivityList/js:activityItemTemplate.html.twig' %}
+{% import 'OroActivityBundle::macros.html.twig' as AC %}
 {% set entityClass = 'Oro\\Bundle\\NoteBundle\\Entity\\Note' %}
 {% set entityName = oro_entity_config_value(entityClass, 'label')|trans %}
 
@@ -17,22 +18,31 @@
 {% endblock %}
 
 {% block activityActions %}
+
     {% set action %}
+        {# Add button for add context in the activity list item #}
         <% if (editable) { %>
-        <a href="#" class="action item-edit-button"
-           title="{{ 'oro.note.note_update'|trans({'{{ entity }}': entityName}) }}">
-            <i class="icon-edit hide-text">{{ 'oro.note.note_update'|trans({'{{ entity }}': entityName}) }}</i>
-        </a>
+            {{ AC.activity_context_link() }}
         <% } %>
     {% endset %}
     {% set actions = [action] %}
 
     {% set action %}
+        <% if (editable) { %>
+            <a href="#" class="action item-edit-button"
+               title="{{ 'oro.note.note_update'|trans({'{{ entity }}': entityName}) }}">
+                <i class="icon-edit hide-text">{{ 'oro.note.note_update'|trans({'{{ entity }}': entityName}) }}</i>
+            </a>
+        <% } %>
+    {% endset %}
+    {% set actions = actions|merge([action]) %}
+
+    {% set action %}
         <% if (removable) { %>
-        <a href="#" class="action item-remove-button"
-           title="{{ 'oro.note.note_delete'|trans({'{{ entity }}': entityName}) }}">
-            <i class="icon-trash hide-text">{{ 'oro.note.note_delete'|trans({'{{ entity }}': entityName}) }}</i>
-        </a>
+            <a href="#" class="action item-remove-button"
+               title="{{ 'oro.note.note_delete'|trans({'{{ entity }}': entityName}) }}">
+                <i class="icon-trash hide-text">{{ 'oro.note.note_delete'|trans({'{{ entity }}': entityName}) }}</i>
+            </a>
         <% } %>
     {% endset %}
     {% set actions = actions|merge([action]) %}

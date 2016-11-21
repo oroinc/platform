@@ -31,3 +31,14 @@ services:
            - '@oro_comment.association_helper'
         tags:
            - {name: oro_activity_list.provider, priority: 40}
+
+
+    oro_note.context.note_empty_validator:
+        class: Oro\Bundle\NoteBundle\Validator\ContextIsNotEmptyValidator
+        arguments:
+           - '@oro_entity.doctrine_helper'
+           - '@oro_security.owner.entity_owner_accessor.link'
+           - '@oro_activity.association_helper'
+           - '@oro_comment.association_helper'
+        tags:
+           - {name: validator.constraint_validator, alias: oro_note.context.note_empty_validator }

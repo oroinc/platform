@@ -1,7 +1,13 @@
 {## activity action template#}
 {% import 'OroUIBundle::macros.html.twig' as UI %}
+{% import 'OroActivityBundle::macros.html.twig' as AC %}
+
 <div class="widget-content form-horizontal box-content row-fluid">
     <div class="responsive-block">
+        <div class="activity-context-activity-list">
+            {{ AC.activity_contexts(entity, target, true, 'oronote/js/app/components/note-context-component') }}
+        </div>
+
         {{ UI.renderSwitchableHtmlProperty('oro.note.message.label'|trans, entity.message) }}
     </div>
     {% if attachment is not empty and attachment.attachmentURL %}

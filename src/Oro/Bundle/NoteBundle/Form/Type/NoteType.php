@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\NoteBundle\Form\Type;
 
+use Oro\Bundle\NoteBundle\Form\EventListener\UpdateActivityAssociationsSubscriber;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
@@ -32,6 +33,8 @@ class NoteType extends AbstractType
                     'required' => false
                 ]
             );
+
+        $builder->addEventSubscriber(new UpdateActivityAssociationsSubscriber());
     }
 
     /**

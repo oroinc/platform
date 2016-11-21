@@ -75,6 +75,8 @@ define([
 
         render: function() {
             this.$el.toggle(this.collection.length > 0);
+
+            this.trigger('render');
         },
 
         initEvents: function() {
