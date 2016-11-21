@@ -21,7 +21,7 @@ interface ButtonInterface
      *
      * @param array $customData
      *
-     * @return mixed
+     * @return array
      */
     public function getTemplateData(array $customData = []);
 
