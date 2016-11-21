@@ -143,7 +143,7 @@ define(function(require) {
 
             this._preloadEntityFieldsData();
         },
-        
+
         _requireConfirm: function() {
             return (this.model.get('steps').length +
                 this.model.get('transitions').length +
