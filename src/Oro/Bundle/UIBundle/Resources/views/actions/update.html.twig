@@ -24,7 +24,7 @@
             });
         </script>
     {% else %}
-
+    {% set formAction = formAction|default() %}
     {% if addQueryParameters is not defined or addQueryParameters == true %}
         {% set formAction = oro_url_add_query(formAction) %}
     {% endif %}
@@ -51,21 +51,23 @@
                                 <div class="customer-content pull-left">
                                     <div class="clearfix">
                                         {% block breadcrumbs %}
-                                            <div class="pull-left">
-                                                <div class="sub-title"><a href="{{ oro_url_add_query(breadcrumbs.indexPath) }}">{{ breadcrumbs.indexLabel }}</a></div>
-                                                <span class="separator">/</span>
-                                                {% if breadcrumbs.additional is defined %}
-                                                    {% for breadcrumb in breadcrumbs.additional %}
-                                                    <div class="sub-title"><a href="{{ oro_url_add_query(breadcrumb.indexPath) }}">{{ breadcrumb.indexLabel }}</a></div>
+                                            {% if breadcrumbs is defined %}
+                                                <div class="pull-left">
+                                                    <div class="sub-title"><a href="{{ oro_url_add_query(breadcrumbs.indexPath) }}">{{ breadcrumbs.indexLabel }}</a></div>
                                                     <span class="separator">/</span>
-                                                    {% endfor %}
-                                                {% endif %}
-                                                {% if breadcrumbs.rawEntityTitle is defined and breadcrumbs.rawEntityTitle %}
-                                                    <h1 class="user-name">{{ breadcrumbs.entityTitle|raw }}</h1>
-                                                {% else %}
-                                                    <h1 class="user-name">{{ breadcrumbs.entityTitle }}</h1>
-                                                {% endif %}
-                                            </div>
+                                                    {% if breadcrumbs.additional is defined %}
+                                                        {% for breadcrumb in breadcrumbs.additional %}
+                                                        <div class="sub-title"><a href="{{ oro_url_add_query(breadcrumb.indexPath) }}">{{ breadcrumb.indexLabel }}</a></div>
+                                                        <span class="separator">/</span>
+                                                        {% endfor %}
+                                                    {% endif %}
+                                                    {% if breadcrumbs.rawEntityTitle is defined and breadcrumbs.rawEntityTitle %}
+                                                        <h1 class="user-name">{{ breadcrumbs.entityTitle|raw }}</h1>
+                                                    {% else %}
+                                                        <h1 class="user-name">{{ breadcrumbs.entityTitle }}</h1>
+                                                    {% endif %}
+                                                </div>
+                                            {% endif %}
                                             {% block breadcrumbMessage %}{% endblock breadcrumbMessage %}
                                         {% endblock breadcrumbs %}
                                     </div>

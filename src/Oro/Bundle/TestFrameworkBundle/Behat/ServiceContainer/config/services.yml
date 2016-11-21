@@ -56,10 +56,21 @@ services:
         tags:
             - { name: 'event_dispatcher.subscriber' }
 
+    oro_test.listener.interactive_execution_subscriber:
+        class: 'Oro\Bundle\TestFrameworkBundle\Behat\Listener\InteractiveExecutionSubscriber'
+
     cli.controller.mesure_execution_time:
         class: Oro\Bundle\TestFrameworkBundle\Behat\Cli\MeasureExecutionTimeController
         arguments:
             - '@oro_test.listener.step_duration_measure_subscriber'
+            - '@event_dispatcher'
+        tags:
+            - { name: 'cli.controller' }
+
+    cli.controller.interactive_execution:
+        class: Oro\Bundle\TestFrameworkBundle\Behat\Cli\InteractiveExecutionController
+        arguments:
+            - '@oro_test.listener.interactive_execution_subscriber'
             - '@event_dispatcher'
         tags:
             - { name: 'cli.controller', priority: 500 }
