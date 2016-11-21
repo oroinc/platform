@@ -101,6 +101,7 @@ config:
         'oroform/js/app/components/select-create-inline-type-component': 'bundles/oroform/js/app/components/select-create-inline-type-component.js'
         'oroform/js/app/components/select-create-inline-type-async-component': 'bundles/oroform/js/app/components/select-create-inline-type-async-component.js'
         'oroform/js/app/components/entity-tree-select-form-type-component': 'bundles/oroform/js/app/components/entity-tree-select-form-type-component.js'
+        'oroform/js/app/views/week-day-picker-view': 'bundles/oroform/js/app/views/week-day-picker-view.js'
 build:
     paths:
         'tinymce/tinymce.min': 'empty:'

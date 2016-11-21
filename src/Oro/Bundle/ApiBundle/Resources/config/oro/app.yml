@@ -50,6 +50,8 @@ oro_api:
             supported_operators: ['=', '!=', '<', '<=', '>', '>=']
         datetime:
             supported_operators: ['=', '!=', '<', '<=', '>', '>=']
+        association:
+            factory: ['@oro_api.filter_factory.extended_association', 'createFilter']
         primaryField:
             class: Oro\Bundle\ApiBundle\Filter\PrimaryFieldFilter
 

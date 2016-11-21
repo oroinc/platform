@@ -331,7 +331,7 @@ To migrate all labels from configuration translatable fields automatically you c
     * `Oro\Bundle\LayoutBundle\Layout\Block\Type\FormType` moved to `Oro\Bundle\EmbeddedFormBundle\Layout\Block\Type\EmbedFormType`
 - Added layout block type `Oro\Bundle\LayoutBundle\Layout\Block\Type\FormType` with new logic.
 - Layout block types `form_start`, `form_end`, `form_fields` is created as `configurable` with DI configuration.
-- Added class `Oro\Bundle\LayoutBundle\DependencyInjection\Compiler\BlockViewSerializerNormalizersPass` that collect serializers by tag `oro_layout.block_view_serializer.normalizer` and inject it to `oro_layout.block_view_serializer`:
+- Added class `Oro\Bundle\LayoutBundle\DependencyInjection\Compiler\BlockViewSerializerNormalizersPass` that collect serializers by tag `layout.block_view_serializer.normalizer` and inject it to `oro_layout.block_view_serializer`:
     * Added block view normalizer `Oro\Bundle\LayoutBundle\Layout\Serializer\BlockViewNormalizer`
     * Added block view normalizer `Oro\Bundle\LayoutBundle\Layout\Serializer\ExpressionNormalizer`
     * Added block view normalizer `Oro\Bundle\LayoutBundle\Layout\Serializer\OptionValueBagNormalizer`
@@ -498,6 +498,12 @@ tag if it works with extend classes
 - Constructor of `Oro\Bundle\EntityConfigBundle\Translation\ConfigTranslationHelper` changed. Now it takes as first argument instance of `Oro\Bundle\TranslationBundle\Manager\TranslationManager` and second argument still instance of `Symfony\Component\Translation\TranslatorInterface`.
 - Changed `Oro\Bundle\EntityConfigBundle\Form\EventListener\ConfigSubscriber`, now it use `Oro\Bundle\EntityConfigBundle\Translation\ConfigTranslationHelper` to save translations instead of `Doctrine\Common\Persistence\ManagerRegistry` and `Oro\Bundle\TranslationBundle\Translation\DynamicTranslationMetadataCache`.
 - Changed `Oro\Bundle\EntityConfigBundle\Form\Type\ConfigType`, now it use `Oro\Bundle\EntityConfigBundle\Translation\ConfigTranslationHelper` to save translations.
+- Class `Oro\Bundle\EntityConfigBundle\Twig\ConfigExtension`
+    - construction signature was changed now it takes next arguments:
+        - `ConfigManager` $configManager,
+        - `RouterInterface` $router,
+        - `EntityClassNameHelper` $entityClassNameHelper,
+        - `DoctrineHelper` $doctrineHelper
 
 ####HelpBundle:
 - Help configuration now loads from `Resources/config/oro/help.yml` instead of `Resources/config/oro_help.yml` file.
