@@ -87,6 +87,7 @@ class WidgetController extends Controller
         $entityClass = $workflow->getDefinition()->getRelatedEntity();
         $transition = $workflow->getTransitionManager()->extractTransition($transitionName);
 
+        $dataArray = [];
         if ($transition->getInitEntities() || $transition->getInitRoutes()) {
             $contextAttribute = $transition->getInitContextAttribute();
             $dataArray[$contextAttribute] = $this->get('oro_action.provider.button_search_context')
@@ -134,7 +135,7 @@ class WidgetController extends Controller
                 /** @var WorkflowAwareSerializer $serializer */
                 $serializer = $this->get('oro_workflow.serializer.data.serializer');
                 $serializer->setWorkflowName($workflow->getName());
-                $data = $serializer->serialize(new WorkflowData($formAttributes), 'json');
+                $data = $serializer->serialize(new WorkflowData(array_merge($formAttributes, $dataArray)), 'json');
                 $saved = true;
 
                 $response = $this->get('oro_workflow.handler.start_transition_handler')
