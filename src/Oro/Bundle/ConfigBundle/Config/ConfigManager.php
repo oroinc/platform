@@ -87,6 +87,14 @@ class ConfigManager
     /**
      * @return string
      */
+    public function getScopeEntityName()
+    {
+        return $this->getScopeManager()->getScopedEntityName();
+    }
+
+    /**
+     * @return string
+     */
     public function getScopeInfo()
     {
         return $this->getScopeManager()->getScopeInfo();

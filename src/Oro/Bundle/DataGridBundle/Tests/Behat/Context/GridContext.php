@@ -176,8 +176,11 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
     //@codingStandardsIgnoreEnd
     public function compareRowValues($column, $comparison, $rowNumber1, $rowNumber2)
     {
-        $value1 = $this->getGrid()->getRowValue($column, $this->getNumberFromString($rowNumber1));
-        $value2 = $this->getGrid()->getRowValue($column, $this->getNumberFromString($rowNumber2));
+        $rowNumber1 = $this->getNumberFromString($rowNumber1);
+        $rowNumber2 = $this->getNumberFromString($rowNumber2);
+
+        $value1 = $this->getGrid()->getRowByNumber($rowNumber1)->getCellValue($column);
+        $value2 = $this->getGrid()->getRowByNumber($rowNumber2)->getCellValue($column);
 
         switch ($comparison) {
             case 'lower':
@@ -208,8 +211,7 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
         $grid = $this->elementFactory->findElementContains('Grid', $content);
         /** @var GridHeader $gridHeader */
         $gridHeader = $grid->getElement('GridHeader');
-        $row = $grid->findElementContains('GridRow', $content);
-        self::assertTrue($row->isValid(), sprintf('Row with "%s" not found', $content));
+        $row = $grid->getRowByContent($content);
 
         $crawler = new Crawler($row->getHtml());
         /** @var Crawler[] $columns */
@@ -303,7 +305,7 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
     public function resetFilter($filterName)
     {
         $filterItem = $this->getGridFilters()->getFilterItem('GridFilterDateTimeItem', $filterName);
-        $filterItem->find('css', 'span.reset-filter')->click();
+        $filterItem->reset();
     }
 
     /**

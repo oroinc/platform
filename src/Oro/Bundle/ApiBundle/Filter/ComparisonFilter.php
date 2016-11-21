@@ -70,7 +70,7 @@ class ComparisonFilter extends StandaloneFilter implements FieldAwareFilterInter
     protected function createExpression(FilterValue $value = null)
     {
         return null !== $value
-            ? $this->buildExpression($this->field, $value->getOperator(), $value->getValue())
+            ? $this->buildExpression($this->field, $value->getPath(), $value->getOperator(), $value->getValue())
             : null;
     }
 
@@ -78,6 +78,7 @@ class ComparisonFilter extends StandaloneFilter implements FieldAwareFilterInter
      * Creates the Expression object that can be used to filter data using the Criteria object.
      *
      * @param string      $field
+     * @param string      $path
      * @param string|null $operator
      * @param mixed       $value
      *
@@ -85,7 +86,7 @@ class ComparisonFilter extends StandaloneFilter implements FieldAwareFilterInter
      *
      * @throws \InvalidArgumentException
      */
-    protected function buildExpression($field, $operator, $value)
+    protected function buildExpression($field, $path, $operator, $value)
     {
         if (!$field) {
             throw new \InvalidArgumentException('The Field must not be empty.');
@@ -100,7 +101,7 @@ class ComparisonFilter extends StandaloneFilter implements FieldAwareFilterInter
             $operator = self::EQ;
         }
         if (in_array($operator, $this->operators, true)) {
-            $expr = $this->doBuildExpression($field, $operator, $value);
+            $expr = $this->doBuildExpression($field, $path, $operator, $value);
             if (null !== $expr) {
                 return $expr;
             }
@@ -113,12 +114,13 @@ class ComparisonFilter extends StandaloneFilter implements FieldAwareFilterInter
 
     /**
      * @param string $field
+     * @param string $path
      * @param string $operator
      * @param mixed  $value
      *
      * @return Expression|null
      */
-    protected function doBuildExpression($field, $operator, $value)
+    protected function doBuildExpression($field, $path, $operator, $value)
     {
         switch ($operator) {
             case self::EQ:

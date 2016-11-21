@@ -21,9 +21,15 @@
         'label': 'oro.config.actions.save_settings'|trans
     }) %}
     {% set restoreButton = UI.buttonType({type: 'reset', label: 'oro.config.actions.restore_saved_values'|trans }) %}
+    {% set pageReload = attribute(form.vars.block_config, activeSubGroup).page_reload %}
+    {% set isFormValid = true %}
+    {% if not form.vars.valid and form_errors(form) %}
+        {% set isFormValid = false %}
+    {% endif %}
     {% set options = {
-        pageReload: attribute(form.vars.block_config, activeSubGroup).page_reload,
+        pageReload: pageReload,
         el: '#' ~ form.vars.id,
+        isFormValid: isFormValid
     } %}
     <form
         id="{{ form.vars.id }}"
