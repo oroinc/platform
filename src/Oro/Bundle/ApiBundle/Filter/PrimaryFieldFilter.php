@@ -73,6 +73,7 @@ class PrimaryFieldFilter extends ComparisonFilter
 
         $expr = $this->buildExpression(
             $this->field . '.' . $this->dataField,
+            $value->getPath(),
             $value->getOperator(),
             $value->getValue()
         );

@@ -15,7 +15,7 @@ define(['underscore', 'orotranslation/js/translator', 'oroui/js/messenger'
         startExportNotificationMessage: function() {
             return messenger.notificationMessage(
                 'info',
-                __('Export started, please wait...')
+                __('oro.importexport.export.started.message')
             );
         },
 
@@ -30,24 +30,24 @@ define(['underscore', 'orotranslation/js/translator', 'oroui/js/messenger'
             if (data.success) {
                 if (data.readsCount > 0) {
                     message = __(
-                        'Export performed successfully, {{ count }} entities were exported.',
-                        {'count': data.readsCount}
+                        'oro.importexport.export.success.message',
+                        {'count': data.readsCount, 'entities': data.entities}
                     );
                     var resultFileLink = '<a href="' + data.url + '" class="no-hash" target="_blank">' +
-                        __('Download result file') + '</a>';
+                        __('oro.importexport.export.download_result_file.message') + '</a>';
                     message += ' ' + resultFileLink;
                     messageType = 'success';
                 } else {
-                    message = __('No entities found for export.');
+                    message = __('oro.importexport.export.no_entities_found.message', {'entities': data.entities});
                     messageType = 'info';
                 }
             } else {
                 message = __(
-                    'Export operation fails, {{ count }} error(s) found.',
+                    'oro.importexport.export.fail.message',
                     {'count': data.errorsCount}
                 );
                 var errorLogLink = '<a href="' + data.url + '" class="no-hash" target="_blank">' +
-                    __('Download error log') + '</a>';
+                    __('oro.importexport.export.download_error_log.message') + '</a>';
                 message += ' ' + errorLogLink;
                 messageType = 'error';
             }
@@ -57,7 +57,7 @@ define(['underscore', 'orotranslation/js/translator', 'oroui/js/messenger'
         handleDataTemplateDownloadErrorMessage: function() {
             return messenger.notificationMessage(
                 'error',
-                __('Errors occured while downloading the template.')
+                __('oro.importexport.export.error_template_download.message')
             );
         }
     };

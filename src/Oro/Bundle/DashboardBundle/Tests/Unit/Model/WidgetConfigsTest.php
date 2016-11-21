@@ -2,12 +2,11 @@
 
 namespace Oro\Bundle\DashboardBundle\Tests\Unit\Model;
 
+use Symfony\Component\HttpFoundation\Request;
+
 use Oro\Bundle\DashboardBundle\Entity\Widget;
 use Oro\Bundle\DashboardBundle\Model\WidgetConfigs;
 use Oro\Bundle\DashboardBundle\Model\WidgetOptionBag;
-use Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker;
-
-use Symfony\Component\HttpFoundation\Request;
 
 class WidgetConfigsTest extends \PHPUnit_Framework_TestCase
 {

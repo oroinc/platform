@@ -10,8 +10,6 @@ use Oro\Component\Layout\Layout;
 use Oro\Component\Layout\LayoutContext;
 use Oro\Component\Layout\LayoutManager;
 
-use Oro\Bundle\LayoutBundle\Layout\Form\FormAccessor;
-use Oro\Bundle\LayoutBundle\Layout\Form\FormAction;
 use Oro\Bundle\LayoutBundle\Tests\Fixtures\UserNameType;
 
 class RendererTest extends LayoutTestCase
@@ -30,12 +28,12 @@ class RendererTest extends LayoutTestCase
         $context = new LayoutContext();
         $context->getResolver()->setOptional(['form', 'body_class']);
         $form = $this->getTestForm();
-        $context->set('form', new FormAccessor($form));
+        $context->data()->set('form', $form->createView());
         $context->set('body_class', 'test-body');
 
         // revert TWIG form renderer to Symfony's default theme
         $this->getContainer()->get('twig.form.renderer')->setTheme(
-            $context->get('form')->getView(),
+            $context->data()->get('form'),
             'form_div_layout.html.twig'
         );
 
@@ -56,7 +54,7 @@ class RendererTest extends LayoutTestCase
         $context = new LayoutContext();
         $context->getResolver()->setOptional(['form', 'body_class']);
         $form = $this->getTestForm();
-        $context->set('form', new FormAccessor($form));
+        $context->data()->set('form', $form->createView());
         $context->set('body_class', 'test-body');
 
         $result   = $this->getCoreBlocksTestLayout($context)->setRenderer('php')->render();
@@ -75,18 +73,18 @@ class RendererTest extends LayoutTestCase
 
         $context = new LayoutContext();
         $context->getResolver()->setOptional(['form']);
-        $form = $this->getTestForm();
-        $context->set('form', new FormAccessor($form, FormAction::createByPath('test.php'), 'patch'));
+        $form = $this->getTestForm('test.php', 'patch');
+        $context->data()->set('form', $form->createView());
 
         // revert TWIG form renderer to Symfony's default theme
         $this->getContainer()->get('twig.form.renderer')->setTheme(
-            $context->get('form')->getView(),
+            $context->data()->get('form'),
             'form_div_layout.html.twig'
         );
 
         $layoutManager = $this->getContainer()->get('oro_layout.layout_manager');
         $result        = $layoutManager->getLayoutBuilder()
-            ->add('form:start', null, 'form_start')
+            ->add('form:start', null, 'form_start', ['form' => '=data["form"]'])
             ->getLayout($context)
             ->setRenderer('twig')
             ->render();
@@ -104,18 +102,18 @@ class RendererTest extends LayoutTestCase
 
         $context = new LayoutContext();
         $context->getResolver()->setOptional(['form']);
-        $form = $this->getTestForm();
-        $context->set('form', new FormAccessor($form, FormAction::createByPath('test.php'), 'patch'));
+        $form = $this->getTestForm('test.php', 'patch');
+        $context->data()->set('form', $form->createView());
 
         // revert TWIG form renderer to Symfony's default theme
         $this->getContainer()->get('twig.form.renderer')->setTheme(
-            $context->get('form')->getView(),
+            $context->data()->get('form'),
             'form_div_layout.html.twig'
         );
 
         $layoutManager = $this->getContainer()->get('oro_layout.layout_manager');
         $result        = $layoutManager->getLayoutBuilder()
-            ->add('form:start', null, 'form_start')
+            ->add('form:start', null, 'form_start', ['form' => '=data["form"]'])
             ->getLayout($context)
             ->setRenderer('php')
             ->render();
@@ -249,23 +247,8 @@ class RendererTest extends LayoutTestCase
                 'form',
                 'content',
                 'form_fields',
-                [
-                    'preferred_fields' => ['jobTitle', 'user.lastName'],
-                    'groups'           => [
-                        'general'    => [
-                            'title'  => 'General Info',
-                            'fields' => ['user.firstName', 'user.lastName']
-                        ],
-                        'additional' => [
-                            'title'   => 'Additional Info',
-                            'default' => true
-                        ]
-                    ]
-                ]
+                ['form'=> '=data["form"]']
             )
-            // swap 'general' and 'additional' groups to check that a layout update
-            // can be applied for items added by a block type
-            ->move('form_fields:group_general', null, 'form_fields:group_additional')
             // test 'visible' option
             ->add('invisible_container', 'root', 'head', ['visible' => false])
             ->add('invisible_child', 'invisible_container', 'meta', ['charset' => 'invisible'])
@@ -319,8 +302,15 @@ class RendererTest extends LayoutTestCase
     /**
      * @return FormInterface
      */
-    protected function getTestForm()
+    protected function getTestForm($action = null, $method = null)
     {
+        $options = ['csrf_protection' => false];
+        if ($action) {
+            $options['action'] = $action;
+        }
+        if ($method) {
+            $options['method'] = $method;
+        }
         /** @var FormFactoryInterface $formFactory */
         $formFactory = $this->getContainer()->get('form.factory');
 
@@ -328,7 +318,7 @@ class RendererTest extends LayoutTestCase
             'form_for_layout_renderer_test',
             'form',
             null,
-            ['csrf_protection' => false]
+            $options
         )
             ->add('user', new UserNameType())
             ->add('jobTitle', 'text', ['label' => 'Job Title', 'required' => false])
@@ -529,7 +519,7 @@ HTML;
     {
         // @codingStandardsIgnoreStart
         $expected = <<<HTML
-<form data-ftid="form_for_layout_renderer_test" data-name="form__form-for-layout-renderer-test" action="test.php" method="post">
+<form name="form_for_layout_renderer_test" method="post" action="test.php" data-ftid="form_for_layout_renderer_test" data-name="form__form-for-layout-renderer-test">
 <input type="hidden" name="_method" value="PATCH"/>
 HTML;
         // @codingStandardsIgnoreEnd
