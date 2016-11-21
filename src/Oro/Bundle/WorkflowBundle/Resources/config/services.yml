@@ -167,6 +167,7 @@ services:
         arguments:
             - '@oro_workflow.changes.event.dispatcher'
             - '@doctrine'
+            - '@oro_workflow.manager'
 
     oro_workflow.process.cron_scheduler:
         class: 'Oro\Bundle\WorkflowBundle\Cron\ProcessTriggerCronScheduler'
@@ -353,3 +354,6 @@ services:
         arguments:
             - '@doctrine'
             - '@oro_scope.scope_manager'
+            - '@logger'
+        tags:
+            - { name: monolog.logger, channel: oro_workflow }

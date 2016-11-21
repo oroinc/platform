@@ -87,5 +87,6 @@ services:
         arguments:
             - '@oro_workflow.manager.workflow_scope'
         tags:
+            - { name: oro_workflow.changes.listener, event: oro.workflow.before_activation, method: onActivationWorkflowDefinition }
             - { name: oro_workflow.changes.listener, event: oro.workflow.after_create, method: onCreateWorkflowDefinition }
             - { name: oro_workflow.changes.listener, event: oro.workflow.after_update, method: onUpdateWorkflowDefinition }

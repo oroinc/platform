@@ -7,6 +7,8 @@ use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\Common\Persistence\ObjectRepository;
 
+use Psr\Log\LoggerInterface;
+
 use Oro\Bundle\ScopeBundle\Entity\Scope;
 use Oro\Bundle\ScopeBundle\Manager\ScopeManager;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
@@ -30,6 +32,9 @@ class WorkflowScopeManagerTest extends \PHPUnit_Framework_TestCase
 
     /** @var ScopeManager|\PHPUnit_Framework_MockObject_MockObject */
     private $scopeManager;
+
+    /** @var LoggerInterface|\PHPUnit_Framework_MockObject_MockObject */
+    private $logger;
 
     /** @var WorkflowScopeManager */
     private $workflowScopeManager;
@@ -56,12 +61,14 @@ class WorkflowScopeManagerTest extends \PHPUnit_Framework_TestCase
 
         $this->scopeManager = $this->getMockBuilder(ScopeManager::class)->disableOriginalConstructor()->getMock();
 
-        $this->workflowScopeManager = new WorkflowScopeManager($registry, $this->scopeManager);
+        $this->logger = $this->getMock(LoggerInterface::class);
+
+        $this->workflowScopeManager = new WorkflowScopeManager($registry, $this->scopeManager, $this->logger);
     }
 
     protected function tearDown()
     {
-        unset($this->workflowScopeManager, $this->repository, $this->manager, $this->scopeManager);
+        unset($this->workflowScopeManager, $this->repository, $this->manager, $this->scopeManager, $this->logger);
     }
 
     public function testUpdateScopes()
@@ -135,6 +142,17 @@ class WorkflowScopeManagerTest extends \PHPUnit_Framework_TestCase
             ->with(WorkflowScopeManager::SCOPE_TYPE)
             ->willReturn([self::FIELD_NAME => self::ENTITY_CLASS]);
 
+        $this->logger->expects($this->once())
+            ->method('error')
+            ->with(
+                '[WorkflowScopeManager] Workflow scopes could not be updated.',
+                [
+                    'worklflow' => $definition->getName(),
+                    'scope_configs' => $definition->getScopesConfig(),
+                    'exception' => new $exception($exceptionMessage)
+                ]
+            );
+
         $this->setExpectedException($exception, $exceptionMessage);
 
         $this->workflowScopeManager->updateScopes($definition);
@@ -148,12 +166,12 @@ class WorkflowScopeManagerTest extends \PHPUnit_Framework_TestCase
         return [
             [
                 'definition' => $this->createWorkflowDefinition([['test' => self::ENTITY_ID]]),
-                'exception' => 'RuntimeException',
+                'exception' => 'Oro\Bundle\WorkflowBundle\Exception\WorkflowScopeConfigurationException',
                 'exceptionMessage' => 'Unknown field name "test" for scope type "workflow_definition".'
             ],
             [
                 'definition' => $this->createWorkflowDefinition([[self::FIELD_NAME => self::ENTITY_ID]]),
-                'exception' => 'RuntimeException',
+                'exception' => 'Oro\Bundle\WorkflowBundle\Exception\WorkflowScopeConfigurationException',
                 'exceptionMessage' => 'Could not found entity "stdClass" with id "42".'
             ]
         ];

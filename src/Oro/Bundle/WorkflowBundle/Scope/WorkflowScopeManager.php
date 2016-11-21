@@ -8,9 +8,12 @@ use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\Common\Persistence\ObjectRepository;
 
+use Psr\Log\LoggerInterface;
+
 use Oro\Bundle\ScopeBundle\Entity\Scope;
 use Oro\Bundle\ScopeBundle\Manager\ScopeManager;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
+use Oro\Bundle\WorkflowBundle\Exception\WorkflowScopeConfigurationException;
 
 class WorkflowScopeManager
 {
@@ -22,17 +25,22 @@ class WorkflowScopeManager
     /** @var ScopeManager */
     protected $scopeManager;
 
+    /** @var LoggerInterface */
+    protected $logger;
+
     /** @var bool */
     protected $enabled = true;
 
     /**
      * @param ManagerRegistry $registry
      * @param ScopeManager $scopeManager
+     * @param LoggerInterface $logger
      */
-    public function __construct(ManagerRegistry $registry, ScopeManager $scopeManager)
+    public function __construct(ManagerRegistry $registry, ScopeManager $scopeManager, LoggerInterface $logger)
     {
         $this->registry = $registry;
         $this->scopeManager = $scopeManager;
+        $this->logger = $logger;
     }
 
     /**
@@ -47,6 +55,7 @@ class WorkflowScopeManager
 
     /**
      * @param WorkflowDefinition $workflowDefinition
+     * @throws WorkflowScopeConfigurationException
      */
     public function updateScopes(WorkflowDefinition $workflowDefinition)
     {
@@ -54,7 +63,20 @@ class WorkflowScopeManager
             return;
         }
 
-        $contexts = $this->createScopeContexts($workflowDefinition->getScopesConfig());
+        try {
+            $contexts = $this->createScopeContexts($workflowDefinition->getScopesConfig());
+        } catch (WorkflowScopeConfigurationException $e) {
+            $this->logger->error(
+                '[WorkflowScopeManager] Workflow scopes could not be updated.',
+                [
+                    'worklflow' => $workflowDefinition->getName(),
+                    'scope_configs' => $workflowDefinition->getScopesConfig(),
+                    'exception' => $e
+                ]
+            );
+
+            throw $e;
+        }
 
         /** @var Scope[] $scopes */
         $scopes = new ArrayCollection();
@@ -77,6 +99,7 @@ class WorkflowScopeManager
     /**
      * @param array $scopesConfig
      * @return array
+     * @throws WorkflowScopeConfigurationException
      */
     protected function createScopeContexts(array $scopesConfig)
     {
@@ -88,14 +111,14 @@ class WorkflowScopeManager
 
             foreach ($scope as $identifier => $entityId) {
                 if (!isset($entities[$identifier])) {
-                    throw new \RuntimeException(
+                    throw new WorkflowScopeConfigurationException(
                         sprintf('Unknown field name "%s" for scope type "%s".', $identifier, self::SCOPE_TYPE)
                     );
                 }
 
                 $entity = $this->getRepository($entities[$identifier])->find($entityId);
                 if (!$entity) {
-                    throw new \RuntimeException(
+                    throw new WorkflowScopeConfigurationException(
                         sprintf('Could not found entity "%s" with id "%d".', $entities[$identifier], $entityId)
                     );
                 }

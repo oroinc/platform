@@ -63,9 +63,11 @@ UPGRADE FROM 1.10 to 2.0
     - method `getWorkflowItemsByEntity` was added to retrieve all `WorkflowItems` instances from currently active (running) workflows for the entity provided as single argument.
     - method `hasWorkflowItemsByEntity` was added to get whether entity provided as single argument has any active (running) workflows with its `WorkflowItems`.
     - method `setActiveWorkflow` was removed -> method `activateWorkflow` with just one argument as `$workflowName` should be used instead. The method now just ensures that provided workflow should be active.
-        - now the method emits event `Oro\Bundle\WorkflowBundle\Event\WorkflowEvents::WORKFLOW_ACTIVATED` if workflow was activated.
+        - the method emits event `Oro\Bundle\WorkflowBundle\Event\WorkflowEvents::WORKFLOW_BEFORE_ACTIVATION` before workflow will be activated.
+        - the method emits event `Oro\Bundle\WorkflowBundle\Event\WorkflowEvents::WORKFLOW_ACTIVATED` if workflow was activated.
     - method `deactivateWorkflow` changed its signature. Now it handles single argument as `$workflowName` to ensure that provided workflow is inactive.
-        - now the method emits event `Oro\Bundle\WorkflowBundle\Event\WorkflowEvents::WORKFLOW_DEACTIVATED` if workflow was deactivated.
+        - the method emits event `Oro\Bundle\WorkflowBundle\Event\WorkflowEvents::WORKFLOW_BEFORE_DEACTIVATION` before workflow will be deactivated.
+        - the method emits event `Oro\Bundle\WorkflowBundle\Event\WorkflowEvents::WORKFLOW_DEACTIVATED` if workflow was deactivated.
     - method `resetWorkflowData` was added with `WorkflowDefinition $workflowDefinition` as single argument. It removes from database all workflow items related to corresponding workflow.
     - method `resetWorkflowItem` was removed
 - Entity configuration (`@Config()` annotation) sub-node `workflow.active_workflow` was removed in favor of `WorkflowDefinition` field `active`. Now for proper workflow activation through configuration you should use `defaults.active: true` in corresponded workflow YAML config.
