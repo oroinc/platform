@@ -71,10 +71,8 @@ class AjaxController extends Controller
         ];
 
         // handle redirect for failure response on non ajax requests
-        if (!$request->isXmlHttpRequest() &&
-            !$response['success'] &&
-            null != ($routeName = $request->get('route'))
-        ) {
+        if (!$request->isXmlHttpRequest() && !$response['success'] && null !== ($routeName = $request->get('route'))) {
+            $this->get('session')->getFlashBag()->add('error', $response['message']);
             return $this->redirect($this->generateUrl($routeName));
         }
 
