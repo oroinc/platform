@@ -73,6 +73,19 @@ class YamlProcessorTest extends \PHPUnit_Framework_TestCase
         );
     }
 
+    public function testProcessQueryWithService()
+    {
+        $qb = new QueryBuilder($this->em);
+
+        $configs = [
+            'type' => 'orm',
+            'query_builder' => $qb,
+        ];
+
+        $queryBuilder = $this->processor->processQuery($configs);
+        $this->assertSame($queryBuilder, $qb);
+    }
+
     // @codingStandardsIgnoreStart
     /**
      * @expectedException \Oro\Bundle\DataGridBundle\Exception\DatasourceException
@@ -136,6 +149,26 @@ class YamlProcessorTest extends \PHPUnit_Framework_TestCase
                 '%s::methodNotReturnQB() must return an instance of Doctrine\ORM\QueryBuilder, %s given',
                 get_class($repo),
                 gettype(null)
+            )
+        );
+        $this->processor->processQuery($configs);
+    }
+
+    public function testServicedDoNotReturnQueryBuilderShouldThrowException()
+    {
+        $qb = 'not-a-querybuilder';
+
+        $configs = [
+            'type' => 'orm',
+            'query_builder' => $qb,
+        ];
+
+        $this->setExpectedException(
+            'Oro\Bundle\DataGridBundle\Exception\DatasourceException',
+            sprintf(
+                '%s configured with service must return an instance of Doctrine\ORM\QueryBuilder, %s given',
+                'Oro\Bundle\DataGridBundle\Datasource\Orm\Configs\YamlProcessor',
+                gettype($qb)
             )
         );
         $this->processor->processQuery($configs);

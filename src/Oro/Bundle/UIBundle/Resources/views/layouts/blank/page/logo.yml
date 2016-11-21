@@ -1,0 +1,10 @@
+layout:
+    actions:
+        - '@setBlockTheme':
+            themes: 'logo.html.twig'
+
+        - '@add':
+            id: logo
+            parentId: page_header
+            blockType: container
+
