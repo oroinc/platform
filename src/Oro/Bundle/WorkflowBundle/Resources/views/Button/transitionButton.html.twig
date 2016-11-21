@@ -1,7 +1,39 @@
 {% import 'OroWorkflowBundle::macros.html.twig' as workflowMacros %}
-{{ workflowMacros.renderTransitionButton(
-	workflow,
-	transition,
-	workflowItem,
-	transitionData
-) }}
+
+{% if transition.displayType == 'dialog' %}
+    {% if transition.hasForm() %}
+        {% set transitionData = transitionData|merge({'dialog-url': path(
+            transitionData['dialog-route'],
+            {
+                workflowName: workflow.name,
+                transitionName: transition.name
+            })
+        }) %}
+    {% endif %}
+    {% set transitionData = transitionData|merge({'transition-url': path(
+        transitionData['transition-route'],
+        {
+            workflowName: workflow.name,
+            transitionName: transition.name
+        })
+    }) %}
+
+{% else %}
+    {% set data = data|merge({'workflowItem': null}) %}
+    {% set transitionData = transitionData|merge({'transition-url': path(
+        transitionData['page-route'],
+        {
+            workflowName: workflow.name,
+            transitionName: transition.name,
+        })
+    }) %}
+{% endif %}
+
+<div class="pull-left btn-group icons-holder">
+    {{ workflowMacros.renderTransitionButton(
+        workflow,
+        transition,
+        workflowItem,
+        transitionData
+    ) }}
+</div>

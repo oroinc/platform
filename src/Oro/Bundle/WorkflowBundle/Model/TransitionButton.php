@@ -4,10 +4,10 @@ namespace Oro\Bundle\WorkflowBundle\Model;
 
 use Oro\Bundle\ActionBundle\Model\ButtonContext;
 use Oro\Bundle\ActionBundle\Model\ButtonInterface;
+use Oro\Bundle\ActionBundle\Model\OperationRegistry;
 
 class TransitionButton implements ButtonInterface
 {
-    //TODO: Must be updated at https://magecore.atlassian.net/browse/BAP-12481
     const DEFAULT_TEMPLATE = 'OroWorkflowBundle::Button\transitionButton.html.twig';
 
     /** @var Workflow */
@@ -50,22 +50,22 @@ class TransitionButton implements ButtonInterface
     /**
      * {@inheritdoc}
      */
-    public function getTemplateData()
+    public function getTemplateData(array $customData = [])
     {
         return [
-            //TODO: Must be updated at https://magecore.atlassian.net/browse/BAP-12481
-            //'workflow' => $this->workflow,
-            //'transition' => $this->transition,
-            //'workflowItem' => null,
-            //'transitionData' => [
-            //    'workflow' => $this->workflow->getName(),
-            //    'transition' => $this->transition->getName(),
-            //    'transition-url' => $this->buttonContext->getExecutionUrl(),
-            //    'transition-condition-messages' => null,
-            //    'isAllowed' => true,
-            //    'enabled' => $this->buttonContext->isEnabled() ?: $this->buttonContext->isUnavailableHidden(),
-            //    'errors' => []
-            //]
+            'workflow' => $this->workflow,
+            'transition' => $this->transition,
+            'workflowItem' => null,
+            'transitionData' => [
+                'workflow' => $this->workflow->getName(),
+                'transition' => $this->transition->getName(),
+                'dialog-route' => $this->buttonContext->getFormDialogRoute(),
+                'page-route' => $this->buttonContext->getFormPageRoute(),
+                'transition-route' => $this->buttonContext->getExecutionRoute(),
+                'transition-condition-messages' => null,
+                'isAllowed' => true,
+                'enabled' => $this->buttonContext->isEnabled() ?: $this->buttonContext->isUnavailableHidden(),
+            ],
         ];
     }
 
@@ -75,5 +75,13 @@ class TransitionButton implements ButtonInterface
     public function getButtonContext()
     {
         return $this->buttonContext;
+    }
+
+    /**
+     * @return string
+     */
+    public function getGroup()
+    {
+        return OperationRegistry::DEFAULT_GROUP;
     }
 }

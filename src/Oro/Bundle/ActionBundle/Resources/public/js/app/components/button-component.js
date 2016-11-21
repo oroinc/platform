@@ -8,7 +8,7 @@ define(function(require) {
     var _ = require('underscore');
     var $ = require('jquery');
 
-    var ButtonsComponent = BaseComponent.extend({
+    var ButtonComponent = BaseComponent.extend({
 
         /**
          * @property {Object}
@@ -18,19 +18,19 @@ define(function(require) {
         /**
          * @property {jQuery.Element}
          */
-        $container: null,
+        $button: null,
 
         /**
          * @inheritDoc
          */
         initialize: function(options) {
-            ButtonsComponent.__super__.initialize.apply(this, arguments);
+            ButtonComponent.__super__.initialize.apply(this, arguments);
 
             this.options = options || {};
 
-            this.$container = $(this.options._sourceElement);
-            this.$container
-                .on('click', 'a.action-button', _.bind(this.onClick, this));
+            this.$button = $(this.options._sourceElement);
+            this.$button
+                .on('click', _.bind(this.onClick, this));
         },
 
         /**
@@ -62,11 +62,11 @@ define(function(require) {
                 return;
             }
 
-            this.$container.off();
+            this.$button.off();
 
-            ButtonsComponent.__super__.dispose.call(this);
+            ButtonComponent.__super__.dispose.call(this);
         }
     });
 
-    return ButtonsComponent;
+    return ButtonComponent;
 });

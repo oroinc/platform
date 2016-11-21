@@ -1,4 +1,6 @@
 {% macro renderTransitionButton(workflow, transition, workflowItem, transitionData) %}
+    {% import 'OroUIBundle::macros.html.twig' as ui %}
+
     {% if transition.displayType == 'dialog' and (transitionData['dialog-url'] is not defined or not transitionData['dialog-url']) and transition.hasForm() %}
         {% set transitionData = transitionData|merge({
             'dialog-url': path(
@@ -39,68 +41,34 @@
         {% endif %}
     {% endif %}
 
+    {% set data = transitionData|merge({
+        'page-component-module': 'oroworkflow/js/app/components/button-component',
+        'page-component-options': {'displayType': transition.displayType}|json_encode,
+    }) %}
+
+    {% if transition.frontendOptions is defined and transition.frontendOptions.dialog is defined %}
+        {% set data = data|merge({
+            'data-dialog-options': transition.frontendOptions.dialog|json_encode|raw
+        }) %}
+    {% endif %}
+
+    {% set class %}
+        'btn icons-holder-text'
+        {% if transition.displayType == 'dialog' %}no-hash{% endif %}
+        {% if not transitionData.enabled %}disabled{% endif %}
+        {% if transition.frontendOptions is defined and transition.frontendOptions.class is defined %}{{ transition.frontendOptions.class }}{% endif %}"
+    {% endset %}
+
     {# Transaltions temporary disabled due to BAP-5355 #}
-    <a href="{{ transitionData['transition-url'] }}"
-        {% for key, value in transitionData %}
-            data-{{ key }}="{{ value|e('html_attr')|raw }}"
-        {% endfor %}
-        {% if transition.frontendOptions is defined and transition.frontendOptions.dialog is defined %}
-            data-dialog-options={{ transition.frontendOptions.dialog|json_encode|raw }}
-        {% endif %}
-        title="{{ transition.label|trans({},'workflows') }}"
-        class="btn icons-holder-text
-            {% if transition.displayType == 'dialog' %}no-hash{% endif %}
-            {% if not transitionData.enabled %}disabled{% endif %}
-            {% if transition.frontendOptions is defined and transition.frontendOptions.class is defined %}{{ transition.frontendOptions.class }}{% endif %}"
-        id="transition-{{ workflow.name }}-{{ transition.name }}">
-        {% if transition.frontendOptions is defined and transition.frontendOptions.icon is defined %}
-            <i class="{{ transition.frontendOptions.icon }}"></i>
-        {%- endif -%}
-        {{ transition.label|trans({},'workflows') }}
-    </a>
-{% endmacro %}
-
-{% macro renderTransitionsJs(transitionsData, blockId) %}
-    <script type="text/javascript">
-        require(['jquery', 'oroworkflow/js/transition-handler'],
-        function($, workflowTransitionHandler) {
-            'use strict';
-
-            $(function() {
-                var container = $('#{{ blockId }}');
-                {% for data in transitionsData %}
-                (function(transitionBtn) {
-                    if (transitionBtn.data('enabled')) {
-                        {% if data.transition.displayType == 'dialog' %}
-                        transitionBtn.data('executor', function() {
-                            workflowTransitionHandler.call(transitionBtn);
-                        });
-                        transitionBtn.on('click', function(e) {
-                            e.preventDefault();
-                            $(this).data('executor').call();
-                        });
-                        {% endif %}
-                        //transitionBtn.trigger('transitionHandlerInitialized');
-                    } else {
-                        transitionBtn.on('click', function(e) {
-                            e.preventDefault();
-                        });
-                        if (transitionBtn.data('transition-condition-messages')) {
-                            transitionBtn.popover({
-                                'html': true,
-                                'placement': 'bottom',
-                                'container': $('body'),
-                                'trigger': 'hover',
-                                'title': '<i class="icon-exclamation-sign"></i>' + {{ 'Unmet conditions'|trans|json_encode|raw }},
-                                'content': transitionBtn.data('transition-condition-messages')
-                            });
-                        }
-                    }
-                })(container.find('#transition-{{ data.workflow.name }}-{{ data.transition.name }}'));
-                {% endfor %}
-            });
-        });
-    </script>
+    {{ ui.link({
+        'path': transitionData['transition-url'],
+        'id': 'transition-%s-%s'|format(workflow.name, transition.name),
+        'iCss': transition.frontendOptions is defined and transition.frontendOptions.icon is defined ? transition.frontendOptions.icon : '',
+        'title': transition.label|trans({},'workflows'),
+        'class': 'btn icons-holder-text',
+        'data': data,
+        'label':  transition.label|trans({},'workflows')
+    }) }}
 {% endmacro %}
 
 {% macro renderResetButton(data, blockId) %}
