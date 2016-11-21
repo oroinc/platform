@@ -170,7 +170,7 @@ Configuration
 All Workflow entities are described in configuration. Look at example of simple Workflow configuration that performs
 some action with User entity.
 
-```
+``` yaml
 workflows:
     example_user_flow:                            # name of the workflow
         entity: Oro\Bundle\UserBundle\Entity\User # workflow related entity
@@ -254,23 +254,22 @@ workflows:
             set_name_definition: []                               # definitions for transition "set_name", no extra conditions or actions here
             add_email_definition:                                 # definition for transition "add_email"
                 actions:                                          # list of action which will be performed after transition
-                    - @create_entity:                             # create email entity
+                    - '@create_entity':                           # create email entity
                         class: Oro\Bundle\UserBundle\Entity\Email # entity class
                         attribute: $email_entity                  # entity attribute that should store this entity
                         data:                                     # data for creating entity
                             email: $email_string                  # entered email
                             user: $user                           # current user
-                    - @call_method:                               # call specific method from entity class
+                    - '@call_method':                             # call specific method from entity class
                         object: $user                             # object that should call method
                         method: addEmail                          # method that should be called
                         method_parameters:                        # parameters that will be passed to the called method
                             [$email_entity]                       # add email from temporary attribute
-                    - @unset_value:                               # unset temporary properties
+                    - '@unset_value':                             # unset temporary properties
                             [$email_string, $email_entity]        # clear email string and entity
             schedule_transition_definition:                       # definitions for transition "schedule_transition", no extra conditions or actions here
                 actions:                                          # list of action which will be performed after transition
                     - '@assign_value': [$user.status, 'processed']# change user's status
-
 ```
 
 This configuration describes Workflow that includes two steps - "set_name" and "add_email".
