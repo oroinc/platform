@@ -4,10 +4,10 @@ namespace Oro\Bundle\EmailBundle\EventListener;
 
 use Symfony\Component\Security\Core\User\UserInterface;
 
-use Oro\Bundle\SearchBundle\Event\PrepareEntityMapEvent;
 use Oro\Bundle\EmailBundle\Entity\Email;
 use Oro\Bundle\EmailBundle\Entity\EmailRecipient;
 use Oro\Bundle\OrganizationBundle\Entity\OrganizationAwareInterface;
+use Oro\Bundle\SearchBundle\Event\PrepareEntityMapEvent;
 
 class SearchListener
 {

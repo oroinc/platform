@@ -48,7 +48,7 @@ define(['jquery', 'underscore', './number'], function($, _, numberValidator) {
     }
 
     /**
-     * return only fields, with name matched to fierst element childName
+     * return only fields, with name matched to first element childName
      *
      * @param {String} collectionName
      * @param {jQuery} $fields
