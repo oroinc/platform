@@ -27,21 +27,7 @@ define(['underscore', 'orotranslation/js/translator', 'oroui/js/messenger'
         handleExportResponse: function(data) {
             var message;
             var messageType;
-            if (data.success) {
-                if (data.readsCount > 0) {
-                    message = __(
-                        'oro.importexport.export.success.message',
-                        {'count': data.readsCount, 'entities': data.entities}
-                    );
-                    var resultFileLink = '<a href="' + data.url + '" class="no-hash" target="_blank">' +
-                        __('oro.importexport.export.download_result_file.message') + '</a>';
-                    message += ' ' + resultFileLink;
-                    messageType = 'success';
-                } else {
-                    message = __('oro.importexport.export.no_entities_found.message', {'entities': data.entities});
-                    messageType = 'info';
-                }
-            } else {
+            if (! data.success) {
                 message = __(
                     'oro.importexport.export.fail.message',
                     {'count': data.errorsCount}

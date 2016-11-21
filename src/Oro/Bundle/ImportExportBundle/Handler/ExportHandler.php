@@ -90,7 +90,7 @@ class ExportHandler extends AbstractHandler
         );
 
         if ($jobResult->isSuccessful()) {
-            $url     = $this->router->generate(
+            $url = $this->router->generate(
                 'oro_importexport_export_download',
                 ['fileName' => basename($fileName)]
             );
@@ -99,7 +99,7 @@ class ExportHandler extends AbstractHandler
                 $readsCount = $context->getReadCount();
             }
         } else {
-            $url         = $this->router->generate(
+            $url = $this->router->generate(
                 'oro_importexport_error_log',
                 ['jobCode' => $jobResult->getJobCode()]
             );
@@ -129,7 +129,7 @@ class ExportHandler extends AbstractHandler
     public function handleExport(
         $jobName,
         $processorAlias,
-        $exportType = 'export',
+        $exportType = ProcessorRegistry::TYPE_EXPORT,
         $outputFormat = 'csv',
         $outputFilePrefix = null,
         array $options = []

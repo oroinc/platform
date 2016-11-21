@@ -71,9 +71,23 @@ class ExportMessageProcessor implements MessageProcessorInterface, TopicSubscrib
             $message->getMessageId(),
             $jobUniqueName,
             function () use ($body) {
-                $exportResult = $this->exportHandler->handleExport($body);
+                $exportResult = $this->exportHandler->getExportResult(
+                    $body['jobName'],
+                    $body['processor Alias'],
+                    $body['exportType'],
+                    $body['outputFormat'],
+                    $body['outputFilePrefix'],
+                    $body['options']
+                );
 
-                return $exportResult->isSuccessful();
+                $this->logger->info(sprintf(
+                    '[ExportMessageProcessor] Export result. Success: %s. ReadsCount: %s. ErrorsCount: %s',
+                    (int) $exportResult['success'],
+                    $exportResult['readsCount'],
+                    $exportResult['errorsCount']
+                ));
+
+                return $exportResult['success'];
             }
         );
 
