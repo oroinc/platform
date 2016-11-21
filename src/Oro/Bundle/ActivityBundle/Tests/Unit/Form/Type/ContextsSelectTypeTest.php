@@ -8,7 +8,7 @@ use Symfony\Component\Form\PreloadedExtension;
 use Symfony\Component\Form\Test\TypeTestCase;
 
 use Oro\Bundle\ActivityBundle\Form\Type\ContextsSelectType;
-use Oro\Bundle\SearchBundle\Resolver\EntityTitleResolverInterface;
+use Oro\Bundle\EntityBundle\Provider\EntityNameResolver;
 
 class ContextsSelectTypeTest extends TypeTestCase
 {
@@ -54,7 +54,9 @@ class ContextsSelectTypeTest extends TypeTestCase
                 ->disableOriginalConstructor()
                 ->getMock();
 
-        $this->entityTitleResolver = $this->getMock(EntityTitleResolverInterface::class);
+        $this->entityTitleResolver = $this->getMockBuilder(EntityNameResolver::class)
+            ->disableOriginalConstructor()
+            ->getMock();
     }
 
     protected function getExtensions()

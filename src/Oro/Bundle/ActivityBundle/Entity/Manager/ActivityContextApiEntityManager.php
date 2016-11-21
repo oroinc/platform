@@ -5,7 +5,6 @@ namespace Oro\Bundle\ActivityBundle\Entity\Manager;
 use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\Common\Util\ClassUtils;
 
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
@@ -17,8 +16,6 @@ use Oro\Bundle\EntityBundle\ORM\EntityAliasResolver;
 use Oro\Bundle\EntityBundle\Provider\EntityNameResolver;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
-use Oro\Bundle\SearchBundle\Engine\ObjectMapper;
-use Oro\Bundle\SearchBundle\Resolver\EntityTitleResolverInterface;
 use Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager;
 
 class ActivityContextApiEntityManager extends ApiEntityManager
@@ -38,8 +35,8 @@ class ActivityContextApiEntityManager extends ApiEntityManager
     /** @var EntityAliasResolver */
     protected $entityAliasResolver;
 
-    /** @var EntityTitleResolverInterface */
-    protected $entityTitleResolver;
+    /** @var EntityNameResolver */
+    protected $entityNameResolver;
 
     /** @var DoctrineHelper */
     protected $doctrineHelper;
@@ -51,7 +48,7 @@ class ActivityContextApiEntityManager extends ApiEntityManager
      * @param ConfigManager                 $configManager
      * @param RouterInterface               $router
      * @param EntityAliasResolver           $entityAliasResolver
-     * @param EntityTitleResolverInterface  $entityTitleResolver
+     * @param EntityNameResolver            $entityNameResolver
      * @param DoctrineHelper                $doctrineHelper
      */
     public function __construct(
@@ -61,7 +58,7 @@ class ActivityContextApiEntityManager extends ApiEntityManager
         ConfigManager $configManager,
         RouterInterface $router,
         EntityAliasResolver $entityAliasResolver,
-        EntityTitleResolverInterface $entityTitleResolver,
+        EntityNameResolver $entityNameResolver,
         DoctrineHelper $doctrineHelper
     ) {
         parent::__construct(null, $om);
@@ -71,7 +68,7 @@ class ActivityContextApiEntityManager extends ApiEntityManager
         $this->configManager        = $configManager;
         $this->router               = $router;
         $this->entityAliasResolver  = $entityAliasResolver;
-        $this->entityTitleResolver  = $entityTitleResolver;
+        $this->entityNameResolver   = $entityNameResolver;
         $this->doctrineHelper       = $doctrineHelper;
     }
 
@@ -109,7 +106,7 @@ class ActivityContextApiEntityManager extends ApiEntityManager
             $config        = $entityProvider->getConfig($targetClass);
             $safeClassName = $this->entityClassNameHelper->getUrlSafeClassName($targetClass);
 
-            $item['title'] = $this->entityTitleResolver->resolve($target);
+            $item['title'] = $this->entityNameResolver->getName($target);
 
             $item['activityClassAlias'] = $this->entityAliasResolver->getPluralAlias($class);
             $item['entityId']           = $id;
@@ -124,6 +121,18 @@ class ActivityContextApiEntityManager extends ApiEntityManager
 
             $result[] = $item;
         }
+
+        // sort list by class name (group the same classes) and then by title
+        usort(
+            $result,
+            function ($a, $b) {
+                if ($a['targetClassName'] . $a['title'] <= $b['targetClassName'] . $b['title']) {
+                    return -1;
+                }
+
+                return 1;
+            }
+        );
 
         return $result;
     }
