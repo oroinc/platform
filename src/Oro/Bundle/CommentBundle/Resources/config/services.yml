@@ -60,4 +60,3 @@ services:
             - '@oro_comment.association_helper'
             - '@oro_entity.doctrine_helper'
             - '@oro_security.security_facade'
-

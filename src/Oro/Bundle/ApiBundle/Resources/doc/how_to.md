@@ -12,6 +12,7 @@ Table of Contents
  - [Change delete handler for entity](#change-delete-handler-for-entity)
  - [Change the maximum number of entities that can be deleted by one request](#change-the-maximum-number-of-entities-that-can-be-deleted-by-one-request)
  - [Configure nested object](#configure-nested-object)
+ - [Turn on Extended Many-To-One Associations](#turn-on-extended-many-to-one-associations)
 
 
 Turn on API for entity
@@ -179,7 +180,7 @@ api:
 Configure nested object
 -----------------------
 
-Sometime it is required to group several fields and expose them as an nested object in Data API. For example lets suppose that an entity has two fields `intervalNumber` and `intervalUnit` but you need to expose them in API as `number` and `unit` properties of `interval` field. This can be achieved by the following configuration:
+Sometimes it is required to group several fields and expose them as an nested object in Data API. For example lets suppose that an entity has two fields `intervalNumber` and `intervalUnit` but you need to expose them in API as `number` and `unit` properties of `interval` field. This can be achieved by the following configuration:
 
 ```yaml
 api:
@@ -202,7 +203,7 @@ api:
                     exclude: true
 ```
 
-Please note that an entity, in this example *Oro\Bundle\ReminderBundle\Entity\Reminder*, should have `setInterval` method. This method is called by **create** and **update** actions to set the nested object. 
+Please note that an entity, in this example *Oro\Bundle\ReminderBundle\Entity\Reminder*, should have `setInterval` method. This method is called by [create](./actions.md#create-action) and [update](./actions.md#update-action) actions to set the nested object. 
 
 Here is an example how the nested objects looks in JSON.API:
 
@@ -220,3 +221,23 @@ Here is an example how the nested objects looks in JSON.API:
   }
 }
 ```
+
+Turn on Extended Many-To-One Associations
+-----------------------------------------
+
+For detail what are extended associations, please refer to [Associations](../../../EntityExtendBundle/Resources/doc/associations.md) topic.
+
+Depending on current entity configuration, each association resource (e.g. attachment) can be assigned to one of the couple of resources (e.g. user, account, contact) that supports such associations.
+
+By default, there is no possibility to retrieve targets of such associations. But this behaviour can be enabled via configuration in `Resources/config/oro/api.yml`, for instance:
+
+```yaml
+api:
+    entities:
+        Oro\Bundle\AttachmentBundle\Entity\Attachment:
+            fields:
+                target:
+                    data_type: association:manyToOne
+```
+
+After applying configuration like above, the `target` relationship will be available in scope of [get_list](./actions.md#get_list-action), [get](./actions.md#get-action), [create](./actions.md#create-action) and [update](./actions.md#update-action) actions. Also the `target` relationship will be available as subresource and it will be possible to perform [get_subresource](./actions.md#get_subresource-action), [get_relationship](./actions.md#get_relationship-action) and [update_relationship](./actions.md#update_relationship-action) actions.

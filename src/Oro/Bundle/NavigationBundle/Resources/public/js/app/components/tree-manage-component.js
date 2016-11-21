@@ -99,6 +99,8 @@ define(function(require) {
                             widget.render();
                         });
                     }
+                    var message = __('oro.navigation.menuupdate.moved_success_message', {nodeText: data.node.text});
+                    messenger.notificationFlashMessage('success', message);
                 },
                 error: function(xhr) {
                     self.rollback(data);

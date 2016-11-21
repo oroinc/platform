@@ -6,10 +6,11 @@ use Doctrine\ORM\Mapping\ClassMetadata;
 
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Bundle\ApiBundle\Exception\RuntimeException;
+use Oro\Bundle\ApiBundle\Filter\ComparisonFilter;
 use Oro\Bundle\ApiBundle\Filter\FieldAwareFilterInterface;
 use Oro\Bundle\ApiBundle\Filter\FilterFactoryInterface;
 use Oro\Bundle\ApiBundle\Filter\StandaloneFilter;
-use Oro\Bundle\ApiBundle\Filter\ComparisonFilter;
+use Oro\Bundle\ApiBundle\Filter\RequestAwareFilterInterface;
 use Oro\Bundle\ApiBundle\Processor\Context;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 
@@ -56,39 +57,48 @@ class RegisterConfiguredFilters extends RegisterFilters
             );
         }
 
-        /** @var ClassMetadata $metadata */
+        /** @var ClassMetadata|null $metadata */
         $metadata = $this->doctrineHelper->getEntityMetadataForClass($context->getClassName(), false);
+        $associationNames = $this->getAssociationNames($metadata);
         $filters = $context->getFilters();
         $fields = $configOfFilters->getFields();
-        foreach ($fields as $fieldName => $field) {
-            if ($filters->has($fieldName)) {
+        foreach ($fields as $filterKey => $field) {
+            if ($filters->has($filterKey)) {
                 continue;
             }
-            $filter = $this->createFilter($field, $field->getPropertyPath($fieldName));
+            $propertyPath = $field->getPropertyPath($filterKey);
+            $filter = $this->createFilter($field, $propertyPath);
             if (null !== $filter) {
+                if ($filter instanceof RequestAwareFilterInterface) {
+                    $filter->setRequestType($context->getRequestType());
+                }
                 if ($filter instanceof FieldAwareFilterInterface) {
                     // @todo BAP-11881. Update this code when NEQ operator for to-many collection
                     // will be implemented in Oro\Bundle\ApiBundle\Filter\ComparisonFilter
-                    if (null !== $metadata && $this->isCollection($metadata, $field->getPropertyPath($fieldName))) {
+                    if (null !== $metadata && $this->isCollection($metadata, $propertyPath)) {
                         $filter->setSupportedOperators([StandaloneFilter::EQ]);
+                    }
+                    // only EQ and NEQ operators should be available for association filters
+                    if (in_array($propertyPath, $associationNames, true)) {
+                        $filter->setSupportedOperators([ComparisonFilter::EQ, ComparisonFilter::NEQ]);
                     }
                 }
 
-                /**
-                 * For filtering by relations only EQ and NEQ operators should be available.
-                 */
-                if (null !== $metadata
-                    && in_array($fieldName, array_keys($this->doctrineHelper->getIndexedAssociations($metadata)))
-                ) {
-                    $filter->setSupportedOperators([
-                        ComparisonFilter::EQ,
-                        ComparisonFilter::NEQ
-                    ]);
-                }
-
-                $filters->add($fieldName, $filter);
+                $filters->add($filterKey, $filter);
             }
         }
+    }
+
+    /**
+     * @param ClassMetadata|null $metadata
+     *
+     * @return string[]
+     */
+    protected function getAssociationNames(ClassMetadata $metadata = null)
+    {
+        return null !== $metadata
+            ? array_keys($this->doctrineHelper->getIndexedAssociations($metadata))
+            : [];
     }
 
     /**

@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\WorkflowBundle\Extension;
 
+use Doctrine\Common\Collections\ArrayCollection;
+
 use Oro\Bundle\ActionBundle\Helper\ApplicationsHelperInterface;
 use Oro\Bundle\ActionBundle\Model\ButtonContext;
 use Oro\Bundle\ActionBundle\Model\ButtonProviderExtensionInterface;
@@ -57,10 +59,17 @@ class TransitionButtonProviderExtension implements ButtonProviderExtensionInterf
 
             foreach ($transitions as $transition) {
                 $workflowItem = $this->buildWorkflowItem($transition, $workflow, $buttonSearchContext);
-                $isAvailable = $transition->isAvailable(clone $workflowItem);
+                $errors = new ArrayCollection();
+                try {
+                    $isAvailable = $transition->isAvailable(clone $workflowItem, $errors);
+                } catch (\Exception $e) {
+                    $isAvailable = false;
+                    $errors->add(['message' => $e->getMessage(), 'parameters' => []]);
+                }
                 if ($isAvailable || !$transition->isUnavailableHidden()) {
                     $buttonContext = $this->generateButtonContext($transition, $buttonSearchContext);
                     $buttonContext->setEnabled($isAvailable);
+                    $buttonContext->setErrors($errors->toArray());
                     $buttons[] = new TransitionButton($transition, $workflow, $buttonContext);
                 }
             }
