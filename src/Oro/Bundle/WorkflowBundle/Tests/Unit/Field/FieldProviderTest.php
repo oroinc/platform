@@ -296,7 +296,6 @@ class FieldProviderTest extends EntityFieldProviderTest
         }
 
         return $expectedResult;
-
     }
 
     /**

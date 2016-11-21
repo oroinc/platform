@@ -107,7 +107,6 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
                 $this->checkFlags($imapFolder, $checkStartDate);
 
                 $this->removeManager->removeRemotelyRemovedEmails($imapFolder, $folder, $this->manager);
-
             } catch (UnselectableFolderException $e) {
                 $this->processUnselectableFolderException($folder);
             } catch (InvalidEmailFormatException $e) {

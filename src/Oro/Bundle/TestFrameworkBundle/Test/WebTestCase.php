@@ -406,7 +406,6 @@ abstract class WebTestCase extends BaseWebTestCase
      */
     protected function postFixtureLoad()
     {
-
     }
 
     /**

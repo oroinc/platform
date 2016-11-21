@@ -41,7 +41,6 @@ class EntityConfigHelper
                 $routeName = $this->getRouteByGroup($route, $groupName);
 
                 $result[$route] = $metadata->hasRoute($routeName, true) ? $metadata->getRoute($routeName, true) : null;
-
             }
         }
 

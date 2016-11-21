@@ -12,7 +12,6 @@ class TestTransport implements TransportInterface
      */
     public function init(Transport $transportEntity)
     {
-
     }
 
     /**

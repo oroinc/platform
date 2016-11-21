@@ -186,7 +186,6 @@ class RestrictionManager
                 return !$restriction['step'];
             }
         );
-
     }
 
     /**
