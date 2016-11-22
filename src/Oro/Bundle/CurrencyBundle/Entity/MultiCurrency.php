@@ -10,22 +10,21 @@ class MultiCurrency
     use CurrencyAwareTrait;
 
     protected $value;
-    protected $rate;
-    protected $baseCurrencyValue;
+    protected $baseCurrencyValue = null;
 
     /**
      * @param string $value
      * @param string $currency
-     * @param float $rate | null
+     * @param string | null $baseCurrencyValue
      * @return MultiCurrency
      */
-    public static function create($value, $currency, $rate = null)
+    public static function create($value, $currency, $baseCurrencyValue = null)
     {
         /* @var $multiCurrency self */
         $multiCurrency = new static();
         $multiCurrency->setValue($value)
             ->setCurrency($currency)
-            ->setRate($rate);
+            ->setBaseCurrencyValue($baseCurrencyValue);
 
         return $multiCurrency;
     }
@@ -50,26 +49,7 @@ class MultiCurrency
     }
 
     /**
-     * @return float
-     */
-    public function getRate()
-    {
-        return $this->rate;
-    }
-
-    /**
-     * @param float $rate
-     * @return $this
-     */
-    public function setRate($rate)
-    {
-        $this->rate = $rate;
-
-        return $this;
-    }
-
-    /**
-     * @return mixed
+     * @return string|null
      */
     public function getBaseCurrencyValue()
     {
