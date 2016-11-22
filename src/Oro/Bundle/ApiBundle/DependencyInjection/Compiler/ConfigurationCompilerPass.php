@@ -83,13 +83,22 @@ class ConfigurationCompilerPass implements CompilerPassInterface
             self::DEFAULT_FILTER_FACTORY_SERVICE_ID
         );
         if (null !== $filterFactoryServiceDef) {
-            foreach ($config['filters'] as $dataType => $parameters) {
-                $filterClassName = $parameters['class'];
-                unset($parameters['class']);
-                $filterFactoryServiceDef->addMethodCall(
-                    'addFilter',
-                    [$dataType, $filterClassName, $parameters]
-                );
+            foreach ($config['filters'] as $filterType => $parameters) {
+                if (isset($parameters['factory'])) {
+                    $factory = $parameters['factory'];
+                    unset($parameters['factory']);
+                    $filterFactoryServiceDef->addMethodCall(
+                        'addFilterFactory',
+                        [$filterType, new Reference(substr($factory[0], 1)), $factory[1], $parameters]
+                    );
+                } else {
+                    $filterClassName = $parameters['class'];
+                    unset($parameters['class']);
+                    $filterFactoryServiceDef->addMethodCall(
+                        'addFilter',
+                        [$filterType, $filterClassName, $parameters]
+                    );
+                }
             }
         }
         DependencyInjectionUtil::registerTaggedServices(

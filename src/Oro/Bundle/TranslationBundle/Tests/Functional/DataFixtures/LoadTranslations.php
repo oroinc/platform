@@ -6,11 +6,16 @@ use Doctrine\Common\DataFixtures\AbstractFixture;
 use Doctrine\Common\DataFixtures\DependentFixtureInterface;
 use Doctrine\Common\Persistence\ObjectManager;
 
+use Symfony\Component\DependencyInjection\ContainerAwareInterface;
+use Symfony\Component\DependencyInjection\ContainerAwareTrait;
+
 use Oro\Bundle\TranslationBundle\Entity\Translation;
 use Oro\Bundle\TranslationBundle\Entity\TranslationKey;
 
-class LoadTranslations extends AbstractFixture implements DependentFixtureInterface
+class LoadTranslations extends AbstractFixture implements DependentFixtureInterface, ContainerAwareInterface
 {
+    use ContainerAwareTrait;
+
     const TRANSLATION1 = 'translation.trans1';
     const TRANSLATION2 = 'translation.trans2';
     const TRANSLATION3 = 'translation.trans3';
@@ -49,6 +54,8 @@ class LoadTranslations extends AbstractFixture implements DependentFixtureInterf
         $this->createTranslation($manager, self::TRANSLATION3, LoadLanguages::LANGUAGE2);
         $this->createTranslation($manager, self::TRANSLATION4, LoadLanguages::LANGUAGE2, Translation::SCOPE_INSTALLED);
         $this->createTranslation($manager, self::TRANSLATION5, LoadLanguages::LANGUAGE2, Translation::SCOPE_UI);
+
+        $this->container->get('oro_translation.provider.translation_domain')->clearCache();
 
         $manager->flush();
     }

@@ -10,6 +10,7 @@ use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
 /**
  * @group search
+ * @dbIsolation
  */
 class OrmIndexerTest extends WebTestCase
 {

@@ -115,7 +115,13 @@ abstract class AbstractMenuController extends Controller
      */
     protected function handleUpdate(MenuUpdateInterface $menuUpdate)
     {
-        $form = $this->createForm(MenuUpdateType::NAME, $menuUpdate);
+        $menu = $this->getMenu($menuUpdate->getMenu());
+        $menuItem = null;
+        if (!$menuUpdate->isCustom()) {
+            $menuItem = MenuUpdateUtils::findMenuItem($menu, $menuUpdate->getKey());
+        }
+
+        $form = $this->createForm(MenuUpdateType::NAME, $menuUpdate, ['menu_item' => $menuItem]);
 
         $response = $this->get('oro_form.model.update_handler')->update(
             $menuUpdate,
@@ -124,17 +130,10 @@ abstract class AbstractMenuController extends Controller
         );
 
         if (is_array($response)) {
-            $menu = $this->getMenu($menuUpdate->getMenu());
-
             $response['ownershipType'] = $this->getOwnershipType();
             $response['menuName'] = $menu->getName();
             $response['tree'] = $this->createMenuTree($menu);
-
-            if ($menuUpdate->isCustom()) {
-                $response['menuItem'] = null;
-            } else {
-                $response['menuItem'] = MenuUpdateUtils::findMenuItem($menu, $menuUpdate->getKey());
-            }
+            $response['menuItem'] = $menuItem;
         }
 
         return $response;
