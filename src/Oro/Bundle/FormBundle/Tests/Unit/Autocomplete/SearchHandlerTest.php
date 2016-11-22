@@ -470,4 +470,67 @@ class SearchHandlerTest extends \PHPUnit_Framework_TestCase
 
         return $result;
     }
+
+    /**
+     * @dataProvider convertItemProvider
+     */
+    public function testConvertItem($item, $expectedItem)
+    {
+        $this->assertEquals($expectedItem, $this->searchHandler->convertItem($item));
+    }
+
+    public function convertItemProvider()
+    {
+        return [
+            'missing properties' => [
+                $this->createStdClass([]),
+                [
+                    'id' => null,
+                    'name' => null,
+                    'email' => null,
+                    'property.path' => null,
+                ],
+            ],
+            'null properties' => [
+                $this->createStdClass([
+                    'property' => null,
+                    'name' => null,
+                    'email' => null,
+                ]),
+                [
+                    'id' => null,
+                    'name' => null,
+                    'email' => null,
+                    'property.path' => null,
+                ],
+            ],
+            'properties with values' => [
+                $this->createStdClass([
+                    'id' => 1,
+                    'name' => 'nval',
+                    'email' => 'eval',
+                    'property' => [
+                        'path' => 'ppval'
+                    ],
+                ]),
+                [
+                    'id' => 1,
+                    'name' => 'nval',
+                    'email' => 'eval',
+                    'property.path' => 'ppval',
+                ],
+            ],
+        ];
+    }
+
+    /**
+     * @param \stdClass $stdClass
+     * @param array $properties
+     *
+     * @return \stdClass
+     */
+    protected function createStdClass(array $properties)
+    {
+        return json_decode(json_encode($properties));
+    }
 }
