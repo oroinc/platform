@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\SearchBundle\Tests\Unit\Engine;
 
+use Doctrine\ORM\EntityManager;
+use Symfony\Component\EventDispatcher\EventDispatcher;
 use Oro\Bundle\SearchBundle\Engine\EngineV2Interface;
 use Oro\Bundle\SearchBundle\Engine\Indexer;
 use Oro\Bundle\SearchBundle\Engine\ObjectMapper;
@@ -9,22 +11,21 @@ use Oro\Bundle\SearchBundle\Provider\SearchMappingProvider;
 use Oro\Bundle\SearchBundle\Query\Query;
 use Oro\Bundle\SearchBundle\Query\Result;
 use Oro\Bundle\SearchBundle\Query\Result\Item;
+use Oro\Bundle\SearchBundle\Security\SecurityProvider;
+use Oro\Bundle\SecurityBundle\Search\AclHelper;
 
 class IndexerTest extends \PHPUnit_Framework_TestCase
 {
     /** @var Indexer */
     protected $indexService;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
-    protected $entityManager;
-
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var ObjectMapper|\PHPUnit_Framework_MockObject_MockObject */
     protected $mapper;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var EngineV2Interface|\PHPUnit_Framework_MockObject_MockObject */
     protected $engine;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var SecurityProvider|\PHPUnit_Framework_MockObject_MockObject */
     protected $securityProvider;
 
     /** @var array */
@@ -33,13 +34,13 @@ class IndexerTest extends \PHPUnit_Framework_TestCase
     protected function setUp()
     {
         $this->config        = require rtrim(__DIR__, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR . 'searchConfig.php';
-        $this->entityManager = $this->getMockBuilder('Doctrine\ORM\EntityManager')
-            ->disableOriginalConstructor()->getMock();
         $this->engine        = $this->getMock(EngineV2Interface::class);
         $this->mapper        = new ObjectMapper(
             $this->getMock('Symfony\Component\EventDispatcher\EventDispatcherInterface'),
             $this->config
         );
+
+        /** @var EventDispatcher|\PHPUnit_Framework_MockObject_MockObject $eventDispatcher */
         $eventDispatcher = $this->getMockBuilder('Symfony\Component\EventDispatcher\EventDispatcher')
             ->disableOriginalConstructor()->getMock();
         $mapperProvider = new SearchMappingProvider($eventDispatcher);
@@ -55,11 +56,10 @@ class IndexerTest extends \PHPUnit_Framework_TestCase
             ->method('isProtectedEntity')
             ->will($this->returnValue(true));
 
+        /** @var AclHelper|\PHPUnit_Framework_MockObject_MockObject $searchAclHelper */
         $searchAclHelper = $this->getMockBuilder('Oro\Bundle\SecurityBundle\Search\AclHelper')
             ->disableOriginalConstructor()
             ->getMock();
-        $eventDispatcher = $this->getMockBuilder('Symfony\Component\EventDispatcher\EventDispatcher')
-            ->disableOriginalConstructor()->getMock();
 
         $searchAclHelper->expects($this->any())
             ->method('apply')
@@ -70,7 +70,6 @@ class IndexerTest extends \PHPUnit_Framework_TestCase
             );
 
         $this->indexService = new Indexer(
-            $this->entityManager,
             $this->engine,
             $this->mapper,
             $this->securityProvider,
@@ -83,7 +82,6 @@ class IndexerTest extends \PHPUnit_Framework_TestCase
     {
         $query = $this->indexService->select();
 
-        $this->assertAttributeEquals($this->entityManager, 'em', $query);
         $this->assertEquals($this->config, $query->getMappingConfig());
     }
 
@@ -91,7 +89,7 @@ class IndexerTest extends \PHPUnit_Framework_TestCase
     {
         $select = $this->indexService->select();
 
-        $resultItem = new Item($this->entityManager);
+        $resultItem = new Item($this->getEntityManager());
         $searchResults = [$resultItem];
 
         $this->engine->expects($this->once())
@@ -239,5 +237,15 @@ class IndexerTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($searchResults, $result->getElements());
         $this->assertEquals(count($searchResults), $result->getRecordsCount());
         $this->assertEquals($expectedQuery, $actualQuery);
+    }
+
+    /**
+     * @return EntityManager|\PHPUnit_Framework_MockObject_MockObject
+     */
+    protected function getEntityManager()
+    {
+        return $this->getMockBuilder(EntityManager::class)
+            ->disableOriginalConstructor()
+            ->getMock();
     }
 }

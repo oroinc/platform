@@ -21,8 +21,8 @@ class HtmlTagHelperTest extends \PHPUnit_Framework_TestCase
 
     public function testGetStripped()
     {
-        $actualString = '<div class="new">test</div>';
-        $expectedString = 'test';
+        $actualString = '<div class="new">test1 test2</div><div class="new">test3   test4</div>';
+        $expectedString = 'test1 test2 test3 test4';
 
         $this->assertEquals($expectedString, $this->helper->stripTags($actualString));
     }
@@ -60,13 +60,20 @@ class HtmlTagHelperTest extends \PHPUnit_Framework_TestCase
 </head>
 <body fPStyle="1" ocsi="0">
 <div style="direction: ltr;font-family: Tahoma;color: #000000;font-size: 10pt;">no subject</div>
+<div style="direction: ltr;font-family: Tahoma;color: #000000;font-size: 10pt;">no subject2</div>
+<span>same line</span><span>same line2</span>
+<p>same line</p><p>same line2</p>
 </body>
 </html>
-
 STR;
-        $this->assertEquals(
-            '<div style="font-family:Tahoma;color:#000000;font-size:10pt;">no subject</div>',
-            trim($this->helper->purify($testString))
-        );
+
+        $expected = <<<STR
+no subject
+no subject2
+same linesame line2
+same linesame line2
+STR;
+
+        $this->assertEquals($expected, $this->helper->purify($testString));
     }
 }

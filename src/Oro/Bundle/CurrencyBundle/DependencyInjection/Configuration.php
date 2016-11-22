@@ -11,7 +11,7 @@ use Oro\Bundle\ConfigBundle\DependencyInjection\SettingsBuilder;
 class Configuration implements ConfigurationInterface
 {
     const DEFAULT_CURRENCY = 'USD';
-    const DEFAULT_VIEW     = 'iso_code';
+    const DEFAULT_VIEW     = 'symbol';
 
     const ROOT_NAME = 'oro_currency';
     const KEY_DEFAULT_CURRENCY = 'default_currency';

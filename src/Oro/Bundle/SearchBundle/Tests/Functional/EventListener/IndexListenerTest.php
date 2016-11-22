@@ -9,6 +9,7 @@ use Symfony\Bridge\Doctrine\RegistryInterface;
 
 /**
  * @group search
+ * @dbIsolation
  */
 class IndexListenerTest extends WebTestCase
 {
