@@ -156,6 +156,9 @@ workflows:
 
     test_start_init_option:
         entity: Oro\Bundle\TestFrameworkBundle\Entity\WorkflowAwareEntity
+        attributes:
+            test_name:
+                type: string
         priority: 10
         start_step: step1
         steps:
@@ -181,13 +184,22 @@ workflows:
                 step_to: step2
                 is_start: true
                 transition_definition: start_transition_from_non_related_entities
-                init_entities:
-                    - entity1
-                    - entity2
+                form_options:
+                    attribute_fields:
+                        test_name:
+                            form_type: text
+                init_entities: ['entity1', 'entity2']
             start_transition_from_routes:
                 step_to: step2
                 is_start: true
                 transition_definition: start_transition_from_non_related_entities
-                init_routes:
-                    - route1
-                    - route2
+                init_routes: ['route1']
+            start_transition_from_routes_with_form:
+                step_to: step2
+                is_start: true
+                init_routes: ['route1']
+                transition_definition: start_transition_from_non_related_entities
+                form_options:
+                    attribute_fields:
+                        test_name:
+                            form_type: text
