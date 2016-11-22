@@ -73,7 +73,7 @@ class IsGrantedWorkflowTransition extends AbstractCondition implements ContextAc
     protected function isConditionAllowed($context)
     {
         if (!$this->securityFacade->hasLoggedUser()) {
-            return false;
+            return true;
         }
 
         $entity = $context->getEntity();
