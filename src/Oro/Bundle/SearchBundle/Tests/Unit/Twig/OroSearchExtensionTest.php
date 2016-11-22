@@ -45,6 +45,5 @@ class OroSearchExtensionTest extends \PHPUnit_Framework_TestCase
     {
         $filters = $this->extension->getFilters();
         $this->assertEquals(3, count($filters));
-
     }
 }

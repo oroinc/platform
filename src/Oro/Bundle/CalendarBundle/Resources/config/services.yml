@@ -396,7 +396,6 @@ services:
 
     oro_calendar.model.recurrence:
         arguments:
-            - '@validator'
             - '@oro_calendar.recurrence.strategy'
         class: '%oro_calendar.model.recurrence.class%'
 

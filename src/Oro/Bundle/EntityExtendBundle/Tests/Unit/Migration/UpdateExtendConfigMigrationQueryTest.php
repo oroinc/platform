@@ -82,6 +82,5 @@ class UpdateExtendConfigMigrationQueryTest extends \PHPUnit_Framework_TestCase
         $migrationQuery->execute($logger);
 
         $this->assertEquals(['test message'], $logger->getMessages());
-
     }
 }

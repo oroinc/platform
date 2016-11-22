@@ -105,19 +105,28 @@ class EmailController extends Controller
      */
     public function placeholderLastAction()
     {
-        $currentOrganization = $this->get('oro_security.security_facade')->getOrganization();
-        $maxEmailsDisplay = $this->container->getParameter('oro_email.flash_notification.max_emails_display');
-        $emailNotificationManager = $this->get('oro_email.manager.notification');
-
-        return [
-            'emails' => json_encode($emailNotificationManager->getEmails(
-                $this->getUser(),
-                $currentOrganization,
-                $maxEmailsDisplay,
-                null
-            )),
-            'count'=> $emailNotificationManager->getCountNewEmails($this->getUser(), $currentOrganization)
+        $result = [
+            'count' => 0,
+            'emails' => []
         ];
+
+        if ($this->get('oro_security.security_facade')->isGranted('oro_email_email_user_view')) {
+            $currentOrganization = $this->get('oro_security.security_facade')->getOrganization();
+            $maxEmailsDisplay = $this->container->getParameter('oro_email.flash_notification.max_emails_display');
+            $emailNotificationManager = $this->get('oro_email.manager.notification');
+
+            $result = [
+                'emails' => json_encode($emailNotificationManager->getEmails(
+                    $this->getUser(),
+                    $currentOrganization,
+                    $maxEmailsDisplay,
+                    null
+                )),
+                'count'=> $emailNotificationManager->getCountNewEmails($this->getUser(), $currentOrganization)
+            ];
+        }
+
+        return $result;
     }
 
     /**
@@ -140,16 +149,24 @@ class EmailController extends Controller
         if (!$maxEmailsDisplay) {
             $maxEmailsDisplay = $this->container->getParameter('oro_email.flash_notification.max_emails_display');
         }
-        $emailNotificationManager = $this->get('oro_email.manager.notification');
+
         $result = [
-            'count' => $emailNotificationManager->getCountNewEmails($this->getUser(), $currentOrganization, $folderId),
-            'emails' => $emailNotificationManager->getEmails(
-                $this->getUser(),
-                $currentOrganization,
-                $maxEmailsDisplay,
-                $folderId
-            )
+            'count' => 0,
+            'emails' => []
         ];
+
+        if ($this->get('oro_security.security_facade')->isGranted('oro_email_email_user_view')) {
+            $emailNotificationManager = $this->get('oro_email.manager.notification');
+            $result = [
+                'count' => $emailNotificationManager
+                    ->getCountNewEmails($this->getUser(), $currentOrganization, $folderId),
+                'emails' => $emailNotificationManager->getEmails(
+                    $this->getUser(),
+                    $currentOrganization,
+                    $maxEmailsDisplay,
+                    $folderId
+                )];
+        }
 
         return new JsonResponse($result);
     }

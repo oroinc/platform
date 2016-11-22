@@ -21,6 +21,5 @@ class NotFoundTest extends Selenium2TestCase
             ->assertElementPresent(
                 "//div[@class='pagination-centered popup-box-errors'][contains(., '404 Not Found')]"
             );
-
     }
 }

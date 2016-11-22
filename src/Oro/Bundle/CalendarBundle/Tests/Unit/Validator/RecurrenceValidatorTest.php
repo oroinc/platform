@@ -78,12 +78,10 @@ class RecurrenceValidatorTest extends \PHPUnit_Framework_TestCase
      */
     protected function getValidator()
     {
-        $validator = $this->getMockBuilder('Symfony\Component\Validator\Validator\ValidatorInterface')
-            ->getMock();
         $this->strategy = $this->getMockBuilder('Oro\Bundle\CalendarBundle\Model\Recurrence\StrategyInterface')
             ->getMock();
 
-        $recurrenceModel = new ModelRecurrence($validator, $this->strategy);
+        $recurrenceModel = new ModelRecurrence($this->strategy);
 
         $validator = new RecurrenceValidator($recurrenceModel);
         $validator->initialize($this->context);
