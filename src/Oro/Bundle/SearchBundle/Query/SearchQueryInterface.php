@@ -4,6 +4,7 @@ namespace Oro\Bundle\SearchBundle\Query;
 
 use Doctrine\Common\Collections\Expr\Expression;
 
+use Oro\Bundle\SearchBundle\Query\Criteria\Criteria;
 use Oro\Bundle\SearchBundle\Query\Result\Item;
 
 interface SearchQueryInterface
@@ -41,19 +42,44 @@ interface SearchQueryInterface
      *
      * @param      $fieldName
      * @param null $enforcedFieldType
-     * @return mixed
+     * @return SearchQueryInterface
      */
     public function addSelect($fieldName, $enforcedFieldType = null);
+
+    /**
+     * Returns the columns that are being selected from the DB.
+     * Ignores aliases information.
+     *
+     * @return array
+     */
+    public function getSelect();
 
     /**
      * Returning the aliases found in the select expressions.
      * When adding a select field using addSelect(), a special SQL
      * syntax is supported for renaming fields. This method returns
      * the alias=>original field association array.
+     * Note that it won't return fields without aliases set.
      *
      * @return array
      */
     public function getSelectAliases();
+
+    /**
+     * Returns the data fields that are returned in the results.
+     * Fields can contain type prefixes. Aliases are respected.
+     * Result is a combination of getSelect() and getSelectAliases().
+     *
+     * @return array
+     */
+    public function getSelectDataFields();
+
+    /**
+     * Returning the WHERE clause parts.
+     *
+     * @return Criteria
+     */
+    public function getCriteria();
 
     /**
      * Same as from(). Added for clarity.
