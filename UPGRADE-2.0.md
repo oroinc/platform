@@ -43,7 +43,7 @@ UPGRADE FROM 1.10 to 2.0
 - Added `Oro\Bundle\ActionBundle\Helper\RouteHelperInterface`, that declare getters and setters for `widgetRoute`, `formDialogRoute`, `formPageRoute`, `executionRoute`
 - Added `Oro\Bundle\ActionBundle\Helper\RouteHelperTrait`, that implement methods for `Oro\Bundle\ActionBundle\Helper\RouteHelperInterface`
 - Changes in `Oro\Bundle\ActionBundle\Helper\ApplicationsHelper`
-    - implements `Oro\Bundle\ActionBundle\Helper\ApplicationsHelperInterface`
+    - implemented `Oro\Bundle\ActionBundle\Helper\ApplicationsHelperInterface`
     - removed unused methods
     - used traits `Oro\Bundle\ActionBundle\Helper\ApplicationsHelperTrait` and `Oro\Bundle\ActionBundle\Helper\RouteHelperTrait`
     - registered as service `oro_action.helper.applications` with configured routes
@@ -68,16 +68,16 @@ UPGRADE FROM 1.10 to 2.0
 - Registered compiler pass `ButtonProviderPass` into `Oro\Bundle\ActionBundle\OroActionBundle`
 - Added `Oro\Bundle\ActionBundle\Model\OperationButton`, that implement `ButtonInterface` and specific logic for operation buttons
 - Added `Oro\Bundle\ActionBundle\Extension\OperationButtonProviderExtension`, that provide operation buttons
-    - implement `find()` method
+    - implemented `find()` method
     - registered by tag `oro.action.extension.button_provider`
-- Changed `Oro\Bundle\ActionBundle\Controller\WidgetController::buttonsAction`, now it use `@oro_action.provider.button` and `@oro_action.provider.button_search_context` to provide buttons
+- Changed `Oro\Bundle\ActionBundle\Controller\WidgetController::buttonsAction`, now it use `oro_action.provider.button` and `oro_action.provider.button_search_context` to provide buttons
 - Added `Oro\Bundle\ActionBundle\Layout\DataProvider\LayoutButtonProvider`, that provide buttons for layouts
     - methods `getAll()` and `getByGroup()`
     - registered as layout provider `button_provider`
 - Changes in `Oro\Bundle\ActionBundle\Twig\OperationExtension`
     - used `Oro\Bundle\ActionBundle\Helper\ApplicationsHelperInterface` instead of `Oro\Bundle\ActionBundle\Helper\ApplicationsHelper`
     - removed usage of `OperationManager`
-    - added filter `oro_action_has_buttons` used `Oro\Bundle\ActionBundle\Provider\ButtonProvider` and `Oro\Bundle\ActionBundle\Provider\ButtonSearchContextProvider`
+    - added filter `oro_action_has_buttons`, used `Oro\Bundle\ActionBundle\Provider\ButtonProvider` and `Oro\Bundle\ActionBundle\Provider\ButtonSearchContextProvider`
     - removed filter `has_operations`
 - Renamed js component ButtonsComponent to ButtonComponent
 
@@ -295,10 +295,10 @@ To migrate all labels from configuration translatable fields automatically you c
 - Changed `Oro\Bundle\WorkflowBundle\Controller\WorkflowController::startTransitionAction`, now it use transition init options
 - Added method `findActive()` to `Oro\Bundle\WorkflowBundle\Entity\Repository\WorkflowDefinitionRepository`
 - Added `Oro\Bundle\WorkflowBundle\Extension\TransitionButtonProviderExtension`, that provide transition buttons
-    - implement `find()` method
+    - implemented `find()` method
     - registered by tag `oro.action.extension.button_provider`
 - Added `Oro\Bundle\WorkflowBundle\Helper\WorkflowApplicationsHelper`
-    - implement `Oro\Bundle\ActionBundle\Helper\ApplicationsHelperInterface`
+    - implemented `Oro\Bundle\ActionBundle\Helper\ApplicationsHelperInterface`
     - used trait `Oro\Bundle\ActionBundle\Helper\RouteHelperTrait`
     - implemented methods `isApplicationsValid()` and `getCurrentApplication`
     - registered as service `oro_workflow.helper.applications` with configured routes
