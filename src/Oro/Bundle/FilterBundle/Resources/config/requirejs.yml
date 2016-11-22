@@ -23,3 +23,4 @@ config:
         'orofilter/js/datafilter-wrapper': 'bundles/orofilter/js/datafilter-wrapper.js'
         'orofilter/js/multiselect-decorator': 'bundles/orofilter/js/multiselect-decorator.js'
         'orofilter/js/filter-hint': 'bundles/orofilter/js/filter-hint.js'
+        'oro/filter/date-grouping-filter': 'bundles/orofilter/js/filter/date-grouping-filter.js'

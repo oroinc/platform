@@ -75,6 +75,31 @@ class ReportController extends Controller
     }
 
     /**
+     * @Route("/view/{gridName}", name="oro_report_view", requirements={"gridName"="[-\w]+"})
+     *
+     * @Template
+     * @Acl(
+     *      id="oro_report_view",
+     *      type="entity",
+     *      permission="VIEW",
+     *      class="OroReportBundle:Report"
+     * )
+     *
+     * @param string $gridName
+     * @return array
+     */
+    public function viewFromGridAction($gridName)
+    {
+        $configuration = $this->get('oro_datagrid.datagrid.manager')->getConfigurationForGrid($gridName);
+        $pageTitle = isset($configuration['pageTitle']) ? $configuration['pageTitle'] : $gridName;
+
+        return [
+            'pageTitle' => $this->get('translator')->trans($pageTitle),
+            'gridName'  => $gridName,
+        ];
+    }
+
+    /**
      * @Route("/create", name="oro_report_create")
      * @Template("OroReportBundle:Report:update.html.twig")
      * @Acl(

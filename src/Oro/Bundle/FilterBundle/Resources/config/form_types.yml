@@ -130,3 +130,11 @@ services:
             - '@oro_entity_extend.enum_value_provider'
         tags:
             - { name: form.type, alias: oro_type_dictionary_filter }
+
+    oro_filter.form.type.date_grouping:
+            class: Oro\Bundle\FilterBundle\Form\Type\Filter\DateGroupingFilterType
+            arguments:
+                - '@translator'
+                - '@oro_filter.provider.datemodifierprovider'
+            tags:
+                - { name: form.type, alias: oro_type_date_grouping_filter }
