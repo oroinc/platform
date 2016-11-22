@@ -142,7 +142,7 @@ class ActionFactoryTest extends \PHPUnit_Framework_TestCase
     {
         $factory = $this->buildActionFactory();
 
-        $this->assertFalse($factory->isTypeExists('гтлтщцт'));
+        $this->assertFalse($factory->isTypeExists('unknown'));
         $this->assertTrue($factory->isTypeExists(self::TEST_TYPE));
     }
 }
