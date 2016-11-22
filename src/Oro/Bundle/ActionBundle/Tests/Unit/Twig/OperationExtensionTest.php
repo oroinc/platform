@@ -6,7 +6,6 @@ use Oro\Bundle\ActionBundle\Helper\ApplicationsHelper;
 use Oro\Bundle\ActionBundle\Helper\ContextHelper;
 use Oro\Bundle\ActionBundle\Helper\OptionsHelper;
 use Oro\Bundle\ActionBundle\Model\ButtonSearchContext;
-use Oro\Bundle\ActionBundle\Model\OperationManager;
 use Oro\Bundle\ActionBundle\Provider\ButtonProvider;
 use Oro\Bundle\ActionBundle\Provider\ButtonSearchContextProvider;
 use Oro\Bundle\ActionBundle\Twig\OperationExtension;
@@ -15,9 +14,6 @@ class OperationExtensionTest extends \PHPUnit_Framework_TestCase
 {
     const ROUTE = 'test_route';
     const REQUEST_URI = '/test/request/uri';
-
-    /** @var \PHPUnit_Framework_MockObject_MockObject|OperationManager */
-    protected $operationManager;
 
     /** @var \PHPUnit_Framework_MockObject_MockObject|ApplicationsHelper */
     protected $appsHelper;
@@ -42,10 +38,6 @@ class OperationExtensionTest extends \PHPUnit_Framework_TestCase
      */
     protected function setUp()
     {
-        $this->operationManager = $this->getMockBuilder('Oro\Bundle\ActionBundle\Model\OperationManager')
-            ->disableOriginalConstructor()
-            ->getMock();
-
         $this->appsHelper = $this->getMockBuilder('Oro\Bundle\ActionBundle\Helper\ApplicationsHelper')
             ->disableOriginalConstructor()
             ->getMock();
@@ -68,7 +60,6 @@ class OperationExtensionTest extends \PHPUnit_Framework_TestCase
             ->getMock();
 
         $this->extension = new OperationExtension(
-            $this->operationManager,
             $this->appsHelper,
             $this->contextHelper,
             $this->optionsHelper,
@@ -81,7 +72,6 @@ class OperationExtensionTest extends \PHPUnit_Framework_TestCase
     {
         unset(
             $this->extension,
-            $this->actionManager,
             $this->appsHelper,
             $this->contextHelper,
             $this->optionsHelper,
@@ -97,8 +87,8 @@ class OperationExtensionTest extends \PHPUnit_Framework_TestCase
 
     public function testGetFunctions()
     {
+        /** @var \Twig_SimpleFunction[] $functions */
         $functions = $this->extension->getFunctions();
-        $this->assertCount(5, $functions);
 
         $expectedFunctions = [
             'oro_action_widget_parameters' => [
@@ -111,11 +101,6 @@ class OperationExtensionTest extends \PHPUnit_Framework_TestCase
                 'Oro\Bundle\ActionBundle\Helper\ApplicationsHelper',
                 'getWidgetRoute',
             ],
-            'has_operations' => [
-                false,
-                'Oro\Bundle\ActionBundle\Model\OperationManager',
-                'hasOperations',
-            ],
             'oro_action_frontend_options' => [
                 false,
                 'Oro\Bundle\ActionBundle\Helper\OptionsHelper',
@@ -123,12 +108,13 @@ class OperationExtensionTest extends \PHPUnit_Framework_TestCase
             ],
             'oro_action_has_buttons' => [
                 false,
-                '\Oro\Bundle\ActionBundle\Twig\OperationExtension',
+                OperationExtension::class,
                 'hasButtons',
             ],
         ];
 
-        /** @var \Twig_SimpleFunction $function */
+        $this->assertCount(count($expectedFunctions), $functions);
+
         foreach ($functions as $function) {
             $this->assertInstanceOf('\Twig_SimpleFunction', $function);
             $this->assertArrayHasKey($function->getName(), $expectedFunctions);
@@ -156,7 +142,7 @@ class OperationExtensionTest extends \PHPUnit_Framework_TestCase
 
         $this->buttonSearchContextProvider
             ->expects($this->once())
-            ->method('buildFromContext')
+            ->method('getButtonSearchContext')
             ->willReturn(new ButtonSearchContext());
 
         $this->buttonProvider->expects($this->once())->method('hasButtons')->willReturn($value);
