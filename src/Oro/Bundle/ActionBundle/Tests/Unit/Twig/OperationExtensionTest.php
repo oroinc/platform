@@ -5,7 +5,10 @@ namespace Oro\Bundle\ActionBundle\Tests\Unit\Twig;
 use Oro\Bundle\ActionBundle\Helper\ApplicationsHelper;
 use Oro\Bundle\ActionBundle\Helper\ContextHelper;
 use Oro\Bundle\ActionBundle\Helper\OptionsHelper;
+use Oro\Bundle\ActionBundle\Model\ButtonSearchContext;
 use Oro\Bundle\ActionBundle\Model\OperationManager;
+use Oro\Bundle\ActionBundle\Provider\ButtonProvider;
+use Oro\Bundle\ActionBundle\Provider\ButtonSearchContextProvider;
 use Oro\Bundle\ActionBundle\Twig\OperationExtension;
 
 class OperationExtensionTest extends \PHPUnit_Framework_TestCase
@@ -22,11 +25,17 @@ class OperationExtensionTest extends \PHPUnit_Framework_TestCase
     /** @var OperationExtension */
     protected $extension;
 
-    /** @var ContextHelper */
+    /** @var \PHPUnit_Framework_MockObject_MockObject|ContextHelper */
     protected $contextHelper;
 
-    /** @var OptionsHelper */
+    /** @var \PHPUnit_Framework_MockObject_MockObject|OptionsHelper */
     protected $optionsHelper;
+
+    /** @var \PHPUnit_Framework_MockObject_MockObject|ButtonProvider */
+    protected $buttonProvider;
+
+    /** @var \PHPUnit_Framework_MockObject_MockObject|ButtonSearchContextProvider */
+    protected $buttonSearchContextProvider;
 
     /**
      * {@inheritdoc}
@@ -49,17 +58,36 @@ class OperationExtensionTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
+        $this->buttonProvider = $this->getMockBuilder('Oro\Bundle\ActionBundle\Provider\ButtonProvider')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $this->buttonSearchContextProvider = $this
+            ->getMockBuilder('Oro\Bundle\ActionBundle\Provider\ButtonSearchContextProvider')
+            ->disableOriginalConstructor()
+            ->getMock();
+
         $this->extension = new OperationExtension(
             $this->operationManager,
             $this->appsHelper,
             $this->contextHelper,
-            $this->optionsHelper
+            $this->optionsHelper,
+            $this->buttonProvider,
+            $this->buttonSearchContextProvider
         );
     }
 
     protected function tearDown()
     {
-        unset($this->extension, $this->actionManager, $this->appsHelper, $this->contextHelper, $this->optionsHelper);
+        unset(
+            $this->extension,
+            $this->actionManager,
+            $this->appsHelper,
+            $this->contextHelper,
+            $this->optionsHelper,
+            $this->buttonProvider,
+            $this->buttonSearchContextProvider
+        );
     }
 
     public function testGetName()
@@ -70,7 +98,7 @@ class OperationExtensionTest extends \PHPUnit_Framework_TestCase
     public function testGetFunctions()
     {
         $functions = $this->extension->getFunctions();
-        $this->assertCount(4, $functions);
+        $this->assertCount(5, $functions);
 
         $expectedFunctions = [
             'oro_action_widget_parameters' => [
@@ -93,6 +121,11 @@ class OperationExtensionTest extends \PHPUnit_Framework_TestCase
                 'Oro\Bundle\ActionBundle\Helper\OptionsHelper',
                 'getFrontendOptions',
             ],
+            'oro_action_has_buttons' => [
+                false,
+                '\Oro\Bundle\ActionBundle\Twig\OperationExtension',
+                'hasButtons',
+            ],
         ];
 
         /** @var \Twig_SimpleFunction $function */
@@ -106,5 +139,39 @@ class OperationExtensionTest extends \PHPUnit_Framework_TestCase
             $this->assertInstanceOf($expectedFunction[1], $callable[0]);
             $this->assertEquals($expectedFunction[2], $callable[1]);
         }
+    }
+
+    /**
+     * @dataProvider hasButtonsDataProvider
+     *
+     * @param bool $value
+     *
+     * @throws \PHPUnit_Framework_Exception
+     */
+    public function testHasButtons($value)
+    {
+        $this->contextHelper->expects($this->once())
+            ->method('getContext')
+            ->willReturn([]);
+
+        $this->buttonSearchContextProvider
+            ->expects($this->once())
+            ->method('buildFromContext')
+            ->willReturn(new ButtonSearchContext());
+
+        $this->buttonProvider->expects($this->once())->method('hasButtons')->willReturn($value);
+
+        $this->extension->hasButtons([]);
+    }
+
+    /**
+     * @return array
+     */
+    public function hasButtonsDataProvider()
+    {
+        return [
+            'has_buttons' => [true],
+            'has_no_buttons' => [false],
+        ];
     }
 }

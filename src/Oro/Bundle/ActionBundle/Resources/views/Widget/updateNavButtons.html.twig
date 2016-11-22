@@ -4,6 +4,6 @@
 
 {% include 'OroActionBundle:Widget:_widget.html.twig' %}
 
-{% if has_operations(params) %}
+{% if oro_action_has_buttons(params) %}
     {{ UI.buttonSeparator() }}
 {% endif %}
