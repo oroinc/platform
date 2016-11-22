@@ -165,29 +165,24 @@ class WorkflowRegistry
      */
     private function getAssembledWorkflows(array $definitions)
     {
-        $workflows = new ArrayCollection();
         $definitions = $this->getNamedDefinitionsCollection($definitions);
 
-        foreach ($this->processDefinitionFilters($definitions) as $definition) {
-            $workflows->set($definition->getName(), $this->getAssembledWorkflow($definition));
-        }
-
-        return $workflows;
+        return $this->processDefinitionFilters($definitions)
+            ->map(
+                function (WorkflowDefinition $workflowDefinition) {
+                    return $this->getAssembledWorkflow($workflowDefinition);
+                }
+            );
     }
 
     /**
      * @param Collection|WorkflowDefinition[] $workflowDefinitions
-     * @param callable $customFilter
      * @return Collection|WorkflowDefinition[]
      */
-    private function processDefinitionFilters(Collection $workflowDefinitions, callable $customFilter = null)
+    private function processDefinitionFilters(Collection $workflowDefinitions)
     {
         if ($workflowDefinitions->isEmpty()) {
             return $workflowDefinitions;
-        }
-
-        if ($customFilter) {
-            $workflowDefinitions = $workflowDefinitions->filter($customFilter);
         }
 
         foreach ($this->definitionFilters as $definitionFilter) {
