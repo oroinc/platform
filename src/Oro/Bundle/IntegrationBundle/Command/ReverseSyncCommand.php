@@ -55,18 +55,16 @@ class ReverseSyncCommand extends Command implements ContainerAwareInterface
 
         $integration = $integrationRepository->getOrLoadById($integrationId);
         if (empty($integration)) {
-            throw new \InvalidArgumentException('Integration with given ID not found');
+            throw new \InvalidArgumentException(sprintf('Integration with id "%s" is not found', $integrationId));
         }
 
         $output->writeln(sprintf(
-            'Run revers sync for "%s" integration and "%s" connector.',
+            'Schedule reverse sync for "%s" integration and "%s" connector.',
             $integration->getName(),
             $connector
         ));
 
         $this->getReverseSyncScheduler()->schedule($integration->getId(), $connector, $connectorParameters);
-
-        $output->writeln('Completed');
     }
 
     /**
@@ -86,7 +84,7 @@ class ReverseSyncCommand extends Command implements ContainerAwareInterface
             foreach ($connectorParameters as $parameterString) {
                 $parameterConfigArray = explode('=', $parameterString);
                 if (!isset($parameterConfigArray[1])) {
-                    throw new \LogicException('Format for connector parameters is parameterKey=parameterValue');
+                    throw new \LogicException('Connector parameters should be in "parameterKey=parameterValue" format');
                 }
                 $result[$parameterConfigArray[0]] = $parameterConfigArray[1];
             }

@@ -22,13 +22,6 @@ class ReversSyncCommandTest extends WebTestCase
         $this->loadFixtures([LoadChannelData::class]);
     }
 
-    public function testShouldOutputHelpForTheCommand()
-    {
-        $result = $this->runCommand('oro:integration:reverse:sync', ['--help']);
-
-        $this->assertContains("Usage:\n  oro:integration:reverse:sync [options]", $result);
-    }
-
     public function testShouldNotSendReverseSyncIntegrationWithoutConnector()
     {
         /** @var Channel $integration */
@@ -38,8 +31,7 @@ class ReversSyncCommandTest extends WebTestCase
             '--integration='.$integration->getId()
         ]);
 
-        $this->assertNotContains('Run revers sync for "Foo Integration" integration', $result);
-        $this->assertNotContains('Completed', $result);
+        $this->assertNotContains('Schedule reverse sync for "Foo Integration" integration', $result);
         $this->assertContains('Connector must be set', $result);
 
         self::assertEmptyMessages(Topics::REVERS_SYNC_INTEGRATION);
@@ -55,8 +47,7 @@ class ReversSyncCommandTest extends WebTestCase
             '--connector=TestChannel'
         ]);
 
-        $this->assertContains('Run revers sync for "Foo Integration" integration', $result);
-        $this->assertContains('Completed', $result);
+        $this->assertContains('Schedule reverse sync for "Foo Integration" integration', $result);
 
         self::assertMessageSent(
             Topics::REVERS_SYNC_INTEGRATION,
@@ -84,8 +75,7 @@ class ReversSyncCommandTest extends WebTestCase
             'barConnectorOption=barValue',
         ]);
 
-        $this->assertContains('Run revers sync for "Foo Integration" integration', $result);
-        $this->assertContains('Completed', $result);
+        $this->assertContains('Schedule reverse for "Foo Integration" integration', $result);
 
         self::assertMessageSent(
             Topics::REVERS_SYNC_INTEGRATION,

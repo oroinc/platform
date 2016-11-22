@@ -10,7 +10,6 @@ use FOS\RestBundle\Util\Codes;
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 use Oro\Bundle\IntegrationBundle\Entity\Channel;
 use Oro\Bundle\IntegrationBundle\Entity\Channel as Integration;
-use Oro\Bundle\IntegrationBundle\Manager\GenuineSyncScheduler;
 use Oro\Bundle\IntegrationBundle\Utils\EditModeUtils;
 use Oro\Bundle\SecurityBundle\Annotation\Acl;
 use Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager;
@@ -160,13 +159,5 @@ class IntegrationController extends FOSRestController
     public function getManager()
     {
         return $this->get('oro_integration.manager.api');
-    }
-
-    /**
-     * @return GenuineSyncScheduler
-     */
-    protected function getSyncScheduler()
-    {
-        return $this->get('oro_integration.genuine_sync_scheduler');
     }
 }

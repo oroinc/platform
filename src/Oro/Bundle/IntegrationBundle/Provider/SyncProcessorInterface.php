@@ -2,16 +2,16 @@
 
 namespace Oro\Bundle\IntegrationBundle\Provider;
 
-use Oro\Bundle\IntegrationBundle\Entity\Channel;
+use Oro\Bundle\IntegrationBundle\Entity\Channel as Integration;
 
 interface SyncProcessorInterface
 {
     /**
-     * @param Channel $channel
+     * @param Integration $integration
      * @param $connector
      * @param array $connectorParameters
      *
      * @return bool
      */
-    public function process(Channel $channel, $connector, array $connectorParameters = []);
+    public function process(Integration $integration, $connector, array $connectorParameters = []);
 }

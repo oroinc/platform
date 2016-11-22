@@ -5,6 +5,8 @@ processes:
             enabled: true
             entity:  Oro\Bundle\IntegrationBundle\Entity\Channel
             order:   10
+            preconditions:
+                '@equal': [$enabled, true]
             actions_configuration:
                 - '@call_service_method':
                     service: 'oro_integration.genuine_sync_scheduler'

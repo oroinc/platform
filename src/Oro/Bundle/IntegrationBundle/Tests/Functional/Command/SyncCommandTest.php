@@ -36,8 +36,7 @@ class SyncCommandTest extends WebTestCase
 
         $result = $this->runCommand('oro:cron:integration:sync', ['--integration='.$integration->getId()]);
 
-        $this->assertContains('Run sync for "Foo Integration" integration.', $result);
-        $this->assertContains('Completed', $result);
+        $this->assertContains('Schedule sync for "Foo Integration" integration.', $result);
 
         $traces = self::getMessageCollector()->getTopicSentMessages(Topics::SYNC_INTEGRATION);
 
@@ -64,8 +63,7 @@ class SyncCommandTest extends WebTestCase
             'barConnectorOption=barValue',
         ]);
 
-        $this->assertContains('Run sync for "Foo Integration" integration.', $result);
-        $this->assertContains('Completed', $result);
+        $this->assertContains('Schedule sync for "Foo Integration" integration.', $result);
 
         $traces = self::getMessageCollector()->getTopicSentMessages(Topics::SYNC_INTEGRATION);
 

@@ -5,18 +5,13 @@ use Doctrine\DBAL\Connection;
 use Doctrine\ORM\Configuration;
 use Doctrine\ORM\EntityManagerInterface;
 
-use Psr\Log\LoggerInterface;
-
-use Symfony\Bridge\Doctrine\RegistryInterface;
-use Symfony\Component\DependencyInjection\ContainerAwareInterface;
-use Symfony\Component\HttpFoundation\ParameterBag;
-use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
-
 use Oro\Bundle\IntegrationBundle\Async\SyncIntegrationProcessor;
+
 use Oro\Bundle\IntegrationBundle\Async\Topics;
 use Oro\Bundle\IntegrationBundle\Entity\Channel as Integration;
 use Oro\Bundle\IntegrationBundle\Entity\Transport;
 use Oro\Bundle\IntegrationBundle\Provider\AbstractSyncProcessor;
+
 use Oro\Bundle\IntegrationBundle\Provider\SyncProcessorRegistry;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\SecurityBundle\Authentication\Token\ConsoleToken;
@@ -27,6 +22,11 @@ use Oro\Component\MessageQueue\Transport\Null\NullMessage;
 use Oro\Component\MessageQueue\Transport\Null\NullSession;
 use Oro\Component\MessageQueue\Util\JSON;
 use Oro\Component\Testing\ClassExtensionTrait;
+use Psr\Log\LoggerInterface;
+use Symfony\Bridge\Doctrine\RegistryInterface;
+use Symfony\Component\DependencyInjection\ContainerAwareInterface;
+use Symfony\Component\HttpFoundation\ParameterBag;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
 class SyncIntegrationProcessorTest extends \PHPUnit_Framework_TestCase
 {
@@ -114,7 +114,7 @@ class SyncIntegrationProcessorTest extends \PHPUnit_Framework_TestCase
             ->expects($this->once())
             ->method('find')
             ->with(Integration::class, 'theIntegrationId')
-            ->willReturn(null);
+            ->willReturn(null)
         ;
 
         $registryStub = $this->createRegistryStub($entityManagerMock);
@@ -145,7 +145,7 @@ class SyncIntegrationProcessorTest extends \PHPUnit_Framework_TestCase
             ->expects($this->once())
             ->method('find')
             ->with(Integration::class, 'theIntegrationId')
-            ->willReturn($integration);
+            ->willReturn($integration)
         ;
 
         $registryStub = $this->createRegistryStub($entityManagerMock);
@@ -178,7 +178,7 @@ class SyncIntegrationProcessorTest extends \PHPUnit_Framework_TestCase
             ->expects($this->once())
             ->method('find')
             ->with(Integration::class, 'theIntegrationId')
-            ->willReturn($integration);
+            ->willReturn($integration)
         ;
 
         $jobRunner = new JobRunner();
@@ -256,7 +256,7 @@ class SyncIntegrationProcessorTest extends \PHPUnit_Framework_TestCase
             ->expects($this->once())
             ->method('find')
             ->with(Integration::class, 'theIntegrationId')
-            ->willReturn($integration);
+            ->willReturn($integration)
         ;
 
         $registryStub = $this->createRegistryStub($entityManagerMock);
@@ -301,7 +301,7 @@ class SyncIntegrationProcessorTest extends \PHPUnit_Framework_TestCase
             ->expects($this->once())
             ->method('find')
             ->with(Integration::class, 'theIntegrationId')
-            ->willReturn($integration);
+            ->willReturn($integration)
         ;
 
         $registryStub = $this->createRegistryStub($entityManagerMock);
@@ -344,7 +344,7 @@ class SyncIntegrationProcessorTest extends \PHPUnit_Framework_TestCase
             ->expects($this->once())
             ->method('find')
             ->with(Integration::class, 'theIntegrationId')
-            ->willReturn($integration);
+            ->willReturn($integration)
         ;
 
         $registryStub = $this->createRegistryStub($entityManagerMock);
@@ -387,7 +387,7 @@ class SyncIntegrationProcessorTest extends \PHPUnit_Framework_TestCase
             ->expects($this->once())
             ->method('find')
             ->with(Integration::class, 'theIntegrationId')
-            ->willReturn($integration);
+            ->willReturn($integration)
         ;
 
         $registryStub = $this->createRegistryStub($entityManagerMock);

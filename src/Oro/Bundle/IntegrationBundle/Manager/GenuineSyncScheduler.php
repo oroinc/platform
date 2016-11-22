@@ -25,7 +25,7 @@ class GenuineSyncScheduler
 
     /**
      * @param int $integrationId
-     * @param null $connector
+     * @param string|null $connector
      * @param array $connectorParameters
      */
     public function schedule($integrationId, $connector = null, array $connectorParameters = [])

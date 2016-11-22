@@ -22,7 +22,7 @@ trait MessageQueueAssertTrait
      *
      * @afterClass
      */
-    public static function tearDownAfterClassMessageCollector1()
+    public static function tearDownAfterClassMessageCollector()
     {
         if (isset(self::$messageCollector)) {
             self::$messageCollector = null;

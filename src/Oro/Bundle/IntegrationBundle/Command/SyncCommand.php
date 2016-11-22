@@ -68,8 +68,8 @@ class SyncCommand extends Command implements CronCommandInterface, ContainerAwar
 
         if ($integrationId) {
             $integration = $integrationRepository->getOrLoadById($integrationId);
-            if (false == $integration) {
-                throw new \LogicException(sprintf('Integration with given ID "%d" not found', $integrationId));
+            if (! $integration) {
+                throw new \LogicException(sprintf('Integration with id "%s" is not found', $integrationId));
             }
 
             $integrations = [$integration];
@@ -79,12 +79,10 @@ class SyncCommand extends Command implements CronCommandInterface, ContainerAwar
 
         /* @var Integration $integration */
         foreach ($integrations as $integration) {
-            $output->writeln(sprintf('Run sync for "%s" integration.', $integration->getName()));
+            $output->writeln(sprintf('Schedule sync for "%s" integration.', $integration->getName()));
 
             $this->getSyncScheduler()->schedule($integration->getId(), $connector, $connectorParameters);
         }
-
-        $output->writeln('Completed');
     }
 
     /**
@@ -104,7 +102,7 @@ class SyncCommand extends Command implements CronCommandInterface, ContainerAwar
                 $parameterConfigArray = explode('=', $parameterString);
                 if (!isset($parameterConfigArray[1])) {
                     throw new \LogicException(sprintf(
-                        'Format for connector parameters is parameterKey=parameterValue. Got `%s`',
+                        'Connector parameters should be in "parameterKey=parameterValue" format. Got "%s".',
                         $parameterString
                     ));
                 }

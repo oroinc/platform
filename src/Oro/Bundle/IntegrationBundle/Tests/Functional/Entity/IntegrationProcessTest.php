@@ -13,7 +13,7 @@ use Oro\Component\MessageQueue\Client\MessagePriority;
 /**
  * @dbIsolationPerTest
  */
-class ChannelTest extends WebTestCase
+class IntegrationProcessTest extends WebTestCase
 {
     use MessageQueueExtension;
 
@@ -25,10 +25,11 @@ class ChannelTest extends WebTestCase
         $this->loadFixtures([LoadChannelData::class]);
     }
 
+    /**
+     * test for schedule_integration process
+     */
     public function testShouldScheduleIntegrationSyncMessageOnCreate()
     {
-        // test for modern bug free programming language called YAML
-
         $userManager = self::getContainer()->get('oro_user.manager');
         $admin = $userManager->findUserByEmail(LoadAdminUserData::DEFAULT_ADMIN_EMAIL);
 
@@ -54,10 +55,11 @@ class ChannelTest extends WebTestCase
         self::assertEquals(MessagePriority::VERY_LOW, $traces[0]['message']->getPriority());
     }
 
+    /**
+     * test for schedule_integration process
+     */
     public function testShouldScheduleIntegrationSyncMessageWhenEnabledFieldIsChangedOnUpdate()
     {
-        // test for modern bug free programming language called YAML
-
         /** @var Integration $integration */
         $integration = $this->getReference('oro_integration:foo_integration');
 
