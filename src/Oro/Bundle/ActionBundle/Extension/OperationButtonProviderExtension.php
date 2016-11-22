@@ -6,7 +6,6 @@ use Oro\Bundle\ActionBundle\Helper\ApplicationsHelperInterface;
 use Oro\Bundle\ActionBundle\Helper\ContextHelper;
 use Oro\Bundle\ActionBundle\Model\ActionData;
 use Oro\Bundle\ActionBundle\Model\ButtonContext;
-use Oro\Bundle\ActionBundle\Model\ButtonProviderExtensionInterface;
 use Oro\Bundle\ActionBundle\Model\ButtonSearchContext;
 use Oro\Bundle\ActionBundle\Model\Operation;
 use Oro\Bundle\ActionBundle\Model\OperationButton;

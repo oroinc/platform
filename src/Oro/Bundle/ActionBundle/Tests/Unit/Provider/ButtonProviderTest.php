@@ -3,7 +3,7 @@
 namespace Oro\Bundle\ActionBundle\Tests\Unit\Provider;
 
 use Oro\Bundle\ActionBundle\Model\ButtonInterface;
-use Oro\Bundle\ActionBundle\Model\ButtonProviderExtensionInterface;
+use Oro\Bundle\ActionBundle\Extension\ButtonProviderExtensionInterface;
 use Oro\Bundle\ActionBundle\Model\ButtonSearchContext;
 use Oro\Bundle\ActionBundle\Provider\ButtonProvider;
 
