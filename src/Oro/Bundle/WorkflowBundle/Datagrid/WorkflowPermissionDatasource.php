@@ -73,12 +73,9 @@ class WorkflowPermissionDatasource extends RolePrivilegeAbstractProvider impleme
                 'identity'    => $privilege->getIdentity()->getId(),
                 'entity'      => $this->translator->trans($privilege->getIdentity()->getName()),
                 'group'       => $this->getPrivilegeCategory($privilege, $categories),
-                'permissions' => []
+                'permissions' => [],
+                'fields'      => $this->getFieldPrivileges($privilege->getFields())
             ];
-            $fields = $this->getFieldPrivileges($privilege->getFields());
-            if (count($fields)) {
-                $item['fields'] = $fields;
-            }
             $item = $this->preparePermissions($privilege, $item);
             $gridData[] = new ResultRecord($item);
         }
@@ -115,27 +112,16 @@ class WorkflowPermissionDatasource extends RolePrivilegeAbstractProvider impleme
     protected function preparePermissions(AclPrivilege $privilege, $item)
     {
         $permissions = [];
-        foreach ($privilege->getPermissions() as $permissionName => $permission) {
-            if ($this->isSupportedPermission($permissionName)) {
-                $privilegePermission = $this->getPrivilegePermission(
-                    $privilege,
-                    $permission
-                );
-                $permissions[$permission->getName()] = $privilegePermission;
-            }
+        foreach ($privilege->getPermissions() as $permission) {
+            $privilegePermission = $this->getPrivilegePermission(
+                $privilege,
+                $permission
+            );
+            $permissions[$permission->getName()] = $privilegePermission;
         }
-        $item['permissions'] = $this->sortPermissions($permissions);
-        return $item;
-    }
+        $item['permissions'] = array_values($permissions);
 
-    /**
-     * @param string $permissionName
-     *
-     * @return bool
-     */
-    protected function isSupportedPermission($permissionName)
-    {
-        return true;
+        return $item;
     }
 
     /**
@@ -170,24 +156,5 @@ class WorkflowPermissionDatasource extends RolePrivilegeAbstractProvider impleme
     protected function getRoleTranslationPrefix()
     {
         return AclAccessLevelSelectorType::TRANSLATE_KEY_ACCESS_LEVEL . '.';
-    }
-
-    /**
-     * Sort permissions by the alphabet.
-     *
-     * @param array $permissions
-     *
-     * @return array
-     */
-    protected function sortPermissions(array $permissions)
-    {
-        $result = [];
-        if (count($permissions)) {
-            ksort($permissions);
-            foreach ($permissions as $permission) {
-                $result[] = $permission;
-            }
-        }
-        return $result;
     }
 }
