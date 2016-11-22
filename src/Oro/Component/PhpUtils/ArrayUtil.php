@@ -344,6 +344,8 @@ class ArrayUtil
      * @param mixed $indexKey
      *
      * @return array
+     *
+     * @deprecated since 1.10. Use native array_column instead
      */
     public static function arrayColumn(array $array, $columnKey, $indexKey = null)
     {

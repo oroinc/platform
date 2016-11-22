@@ -41,11 +41,6 @@ abstract class AbstractScopeCriteriaProvider implements ScopeCriteriaProviderInt
     abstract public function getCriteriaField();
 
     /**
-     * @return string
-     */
-    abstract public function getCriteriaValueType();
-
-    /**
      * @param object|array $context
      * @return mixed|null
      */

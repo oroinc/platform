@@ -6,7 +6,6 @@ use Doctrine\ORM\QueryBuilder;
 
 use Symfony\Component\Translation\TranslatorInterface;
 
-
 use Oro\Bundle\FormBundle\Autocomplete\SearchHandler;
 
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
@@ -110,7 +109,7 @@ class WorkflowReplacementSearchHandler extends SearchHandler
         $searchTerm = substr($search, 0, $delimiterPos);
         $workflowName = substr($search, $delimiterPos + 1);
 
-        return [$searchTerm, (string) $workflowName];
+        return [$searchTerm, (string)$workflowName];
     }
 
     /**
@@ -119,18 +118,15 @@ class WorkflowReplacementSearchHandler extends SearchHandler
      */
     protected function getWorkflowNamesForExclusion($workflowName)
     {
-        $workflow = $this->workflowRegistry->getWorkflow($workflowName);
+        $workflow = $this->workflowRegistry->getWorkflow($workflowName, false);
         if ($workflow) {
-            $activeWorkflows = $this->workflowRegistry->getActiveWorkflowsByActiveGroups(
+            $workflows = $this->workflowRegistry->getActiveWorkflowsByActiveGroups(
                 $workflow->getDefinition()->getExclusiveActiveGroups()
-            );
-
-            $workflows = array_map(
+            )->map(
                 function (Workflow $workflow) {
                     return $workflow->getName();
-                },
-                $activeWorkflows
-            );
+                }
+            )->getValues();
         }
 
         $workflows[] = $workflowName;

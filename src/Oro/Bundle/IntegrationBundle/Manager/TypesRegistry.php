@@ -343,6 +343,20 @@ class TypesRegistry
     }
 
     /**
+     * Checks if there is at least one connector.
+     *
+     * @param Integration $integration
+     *
+     * @return boolean
+     */
+    public function supportsSync(Integration $integration)
+    {
+        $connectors = $this->getRegisteredConnectorsTypes($integration->getType());
+
+        return $connectors->count() > 0;
+    }
+
+    /**
      * Returns type of default owner for entities created by this integration.
      *
      * @param string|null $integrationType

@@ -165,21 +165,21 @@ class ScopeManager
     }
 
     /**
-     * @param $scopeType
+     * @param string $scopeType
      * @return array
      */
     public function getScopeEntities($scopeType)
     {
         $entities = [];
-        
+
         $providers = $this->getProviders($scopeType);
         foreach ($providers as $provider) {
-            $entities[$provider->getCriteriaField()] = [$provider->getCriteriaValueType()];
+            $entities[$provider->getCriteriaField()] = $provider->getCriteriaValueType();
         }
-        
+
         return $entities;
     }
-    
+
     /**
      * @param Scope $scope
      * @param string $type

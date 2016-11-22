@@ -36,7 +36,7 @@ class StubScopeCriteriaProvider implements ScopeCriteriaProviderInterface
     }
 
     /**
-     * @return string
+     * {@inheritdoc}
      */
     public function getCriteriaValueType()
     {
