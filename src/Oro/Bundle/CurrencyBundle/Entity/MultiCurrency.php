@@ -11,6 +11,7 @@ class MultiCurrency
 
     protected $value;
     protected $rate;
+    protected $baseCurrencyValue;
 
     /**
      * @param string $value
@@ -63,6 +64,25 @@ class MultiCurrency
     public function setRate($rate)
     {
         $this->rate = $rate;
+
+        return $this;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getBaseCurrencyValue()
+    {
+        return $this->baseCurrencyValue;
+    }
+
+    /**
+     * @param $baseCurrencyValue
+     * @return $this
+     */
+    public function setBaseCurrencyValue($baseCurrencyValue)
+    {
+        $this->baseCurrencyValue = $baseCurrencyValue;
 
         return $this;
     }
