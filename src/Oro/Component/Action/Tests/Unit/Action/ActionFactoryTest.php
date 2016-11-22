@@ -18,20 +18,20 @@ class ActionFactoryTest extends \PHPUnit_Framework_TestCase
     /**
      * @var array
      */
-    protected $allowedTypes = array(
+    protected $allowedTypes = [
         self::TEST_TYPE => self::TEST_TYPE_SERVICE
-    );
+    ];
 
     /**
      * @param array $arguments
      * @return ActionFactory
      */
-    protected function buildFilterFactory($arguments = array())
+    protected function buildActionFactory($arguments = [])
     {
-        $defaultArguments = array(
+        $defaultArguments = [
             'container' => $this->getMockForAbstractClass('Symfony\Component\DependencyInjection\ContainerInterface'),
             'types'     => $this->allowedTypes
-        );
+        ];
         $arguments = array_merge($defaultArguments, $arguments);
 
         return new ActionFactory($arguments['container'], $arguments['types']);
@@ -43,7 +43,7 @@ class ActionFactoryTest extends \PHPUnit_Framework_TestCase
      */
     public function testCreateNoType()
     {
-        $factory = $this->buildFilterFactory();
+        $factory = $this->buildActionFactory();
         $factory->create(null);
     }
 
@@ -53,7 +53,7 @@ class ActionFactoryTest extends \PHPUnit_Framework_TestCase
      */
     public function testCreateIncorrectType()
     {
-        $factory = $this->buildFilterFactory();
+        $factory = $this->buildActionFactory();
         $factory->create('unknown_type');
     }
 
@@ -63,7 +63,7 @@ class ActionFactoryTest extends \PHPUnit_Framework_TestCase
      */
     public function testCreateIncorrectInterface()
     {
-        $factory = $this->buildFilterFactory();
+        $factory = $this->buildActionFactory();
         $factory->create(self::TEST_TYPE);
     }
 
@@ -106,7 +106,7 @@ class ActionFactoryTest extends \PHPUnit_Framework_TestCase
             ->with($id)
             ->will($this->returnValue($action));
 
-        $factory = $this->buildFilterFactory(array('container' => $container));
+        $factory = $this->buildActionFactory(array('container' => $container));
 
         $this->assertEquals($action, $factory->create($type, $options, $condition));
     }
@@ -133,8 +133,16 @@ class ActionFactoryTest extends \PHPUnit_Framework_TestCase
     public function testGetTypes()
     {
         $types = ['type1' => 'val1', 'type2' => 'val2'];
-        $factory = $this->buildFilterFactory(['types' => $types]);
+        $factory = $this->buildActionFactory(['types' => $types]);
 
         $this->assertEquals($types, $factory->getTypes());
+    }
+
+    public function testIsTypeExists()
+    {
+        $factory = $this->buildActionFactory();
+
+        $this->assertFalse($factory->isTypeExists('гтлтщцт'));
+        $this->assertTrue($factory->isTypeExists(self::TEST_TYPE));
     }
 }

@@ -141,3 +141,19 @@ services:
         class: Oro\Component\ConfigExpression\Condition\NoElements
         tags:
             - { name: oro_action.condition, alias: no_elements }
+
+    oro_action.expression.condition_available:
+        class: 'Oro\Component\ConfigExpression\Condition\ExpressionAvailable'
+        arguments:
+            - '@oro_action.expression.factory'
+            - 'condition_available'
+        tags:
+            - { name: oro_action.condition, alias: condition_available }
+
+    oro_action.expression.action_available:
+        class: 'Oro\Component\ConfigExpression\Condition\ExpressionAvailable'
+        arguments:
+            - '@oro_action.action_factory'
+            - 'action_available'
+        tags:
+            - { name: oro_action.condition, alias: action_available }
