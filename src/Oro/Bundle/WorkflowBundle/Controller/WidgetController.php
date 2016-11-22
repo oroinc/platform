@@ -14,9 +14,11 @@ use Symfony\Component\Form\Form;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
+use Symfony\Component\Security\Acl\Domain\ObjectIdentity;
 
 use Oro\Bundle\EntityBundle\Exception\NotManageableEntityException;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
+use Oro\Bundle\SecurityBundle\Acl\Domain\DomainObjectWrapper;
 use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
 use Oro\Bundle\WorkflowBundle\Model\Step;
@@ -53,6 +55,22 @@ class WidgetController extends Controller
         }
 
         $workflowManager = $this->get('oro_workflow.manager');
+        $applicableWorkflows = $workflowManager->getApplicableWorkflows($entity);
+
+        $securityFacade = $this->container->get('oro_security.security_facade');
+        $applicableWorkflows = array_filter(
+            $applicableWorkflows,
+            function ($workflow) use ($securityFacade, $entity) {
+                /** @var Workflow $workflow */
+                return $securityFacade->isGranted(
+                    'VIEW_WORKFLOW',
+                    new DomainObjectWrapper(
+                        $entity,
+                        new ObjectIdentity('workflow', $workflow->getName())
+                    )
+                );
+            }
+        );
 
         return [
             'entityId' => $entityId,
@@ -60,7 +78,7 @@ class WidgetController extends Controller
                 function (Workflow $workflow) use ($entity, $workflowManager) {
                     return $this->getWorkflowData($entity, $workflow, $workflowManager);
                 },
-                $workflowManager->getApplicableWorkflows($entity)
+                $applicableWorkflows
             )
         ];
     }
