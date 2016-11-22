@@ -463,49 +463,6 @@ class WorkflowManagerTest extends \PHPUnit_Framework_TestCase
         );
     }
 
-    public function testStartWorkflowWhenAlreadyStarted()
-    {
-        $id = 1;
-        $workflowName = 'workflow_started_twice';
-        $entity = new EntityStub($id);
-        $transition = 'test_transition';
-        $workflowData = ['key' => 'value'];
-        $workflowItem = new WorkflowItem();
-        $workflowItem->getData()->add($workflowData);
-
-        $workflowDefinition = new WorkflowDefinition();
-        $workflow = $this->createWorkflow($workflowName);
-
-        $workflow->expects($this->once())->method('getDefinition')->willReturn($workflowDefinition);
-
-        $workflow->expects($this->once())
-            ->method('start')
-            ->with($entity, $workflowData, $transition)
-            ->willReturn($workflowItem);
-
-        $this->workflowRegistry->expects($this->exactly(2))
-            ->method('getWorkflow')
-            ->with($workflowName)
-            ->willReturn($workflow);
-
-        $em = $this->getTransactionScopedEntityManager(WorkflowItem::class);
-
-        $em->expects($this->once())->method('persist')->with($workflowItem);
-        $em->expects($this->once())->method('flush');
-
-        $this->doctrineHelper->expects($this->any())->method('getSingleEntityIdentifier')
-            ->willReturnCallback(function (EntityStub $entity) {
-                return $entity->getId();
-            });
-
-        $firstWorkflowItem = $this->workflowManager->startWorkflow($workflowName, $entity, $transition, $workflowData);
-        $secondWorkflowItem = $this->workflowManager->startWorkflow($workflowName, $entity, $transition, $workflowData);
-
-        $this->assertEquals($workflowItem, $firstWorkflowItem);
-        $this->assertEquals($workflowData, $firstWorkflowItem->getData()->getValues());
-        $this->assertNull($secondWorkflowItem);
-    }
-
     /**
      * @param array $source
      * @param array $expected
