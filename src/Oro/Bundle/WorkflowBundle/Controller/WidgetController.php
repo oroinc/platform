@@ -45,7 +45,7 @@ class WidgetController extends Controller
      */
     public function entityWorkflowsAction($entityClass, $entityId)
     {
-        $entity = $this->getEntityReference($entityClass, $entityId);
+        $entity = $this->getOrCreateEntityReference($entityClass, $entityId);
         if (!$entity) {
             throw $this->createNotFoundException(
                 sprintf('Entity \'%s\' with id \'%d\' not found', $entityClass, $entityId)
@@ -81,15 +81,24 @@ class WidgetController extends Controller
     {
         $entityId = $request->get('entityId', 0);
 
-        /** @var DoctrineHelper $doctrineHelper */
-        $doctrineHelper = $this->get('oro_entity.doctrine_helper');
-
         /** @var WorkflowManager $workflowManager */
         $workflowManager = $this->get('oro_workflow.manager');
         $workflow = $workflowManager->getWorkflow($workflowName);
         $entityClass = $workflow->getDefinition()->getRelatedEntity();
+        $transition = $workflow->getTransitionManager()->extractTransition($transitionName);
 
-        $entity = $this->getEntityReference($entityClass, $entityId);
+        $dataArray = [];
+        if (!$transition->isEmptyInitOptions()) {
+            $contextAttribute = $transition->getInitContextAttribute();
+            $dataArray[$contextAttribute] = $this->get('oro_action.provider.button_search_context')
+                ->getButtonSearchContext();
+            $entityId = null;
+        }
+
+        $entity = $this->getOrCreateEntityReference($entityClass, $entityId);
+
+        /** @var DoctrineHelper $doctrineHelper */
+        $doctrineHelper = $this->get('oro_entity.doctrine_helper');
 
         $workflowItem = $workflow->createWorkflowItem($entity);
         $transition = $workflow->getTransitionManager()->extractTransition($transitionName);
@@ -126,7 +135,7 @@ class WidgetController extends Controller
                 /** @var WorkflowAwareSerializer $serializer */
                 $serializer = $this->get('oro_workflow.serializer.data.serializer');
                 $serializer->setWorkflowName($workflow->getName());
-                $data = $serializer->serialize(new WorkflowData($formAttributes), 'json');
+                $data = $serializer->serialize(new WorkflowData(array_merge($formAttributes, $dataArray)), 'json');
                 $saved = true;
 
                 $response = $this->get('oro_workflow.handler.start_transition_handler')
@@ -321,7 +330,7 @@ class WidgetController extends Controller
 
         /** @var WorkflowManager $workflowManager */
         $workflowManager = $this->get('oro_workflow.manager');
-        $entity = $this->getEntityReference($entityClass, $entityId);
+        $entity = $this->getOrCreateEntityReference($entityClass, $entityId);
 
         $workflows = $workflowManager->getApplicableWorkflows($entity);
         foreach ($workflows as $workflow) {
@@ -444,7 +453,7 @@ class WidgetController extends Controller
      * @throws BadRequestHttpException
      * @return mixed
      */
-    protected function getEntityReference($entityClass, $entityId)
+    protected function getOrCreateEntityReference($entityClass, $entityId = null)
     {
         /** @var DoctrineHelper $doctrineHelper */
         $doctrineHelper = $this->get('oro_entity.doctrine_helper');
