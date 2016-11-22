@@ -2,10 +2,9 @@
 
 namespace Oro\Bundle\NoteBundle\Controller;
 
-use Symfony\Component\Security\Core\Util\ClassUtils;
-
 use FOS\RestBundle\Util\Codes;
 
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Bundle\FrameworkBundle\Routing\Router;
 use Symfony\Component\HttpFoundation\Response;
@@ -106,20 +105,19 @@ class NoteController extends Controller
     }
 
     /**
-     * @Route("/create/{entityClass}/{entityId}", name="oro_note_create")
+     * @Route("/create", name="oro_note_create")
      *
      * @Template("OroNoteBundle:Note:update.html.twig")
      * @AclAncestor("oro_note_create")
      */
-    public function createAction($entityClass, $entityId)
+    public function createAction(Request $request)
     {
         $entityRoutingHelper = $this->getEntityRoutingHelper();
 
-        $entity      = $entityRoutingHelper->getEntity($entityClass, $entityId);
-        $entityClass = ClassUtils::getRealClass($entity);
+        $entityClass = $entityRoutingHelper->getEntityClassName($request);
+        $entityId = $entityRoutingHelper->getEntityId($request);
 
         $noteEntity = new Note();
-        $noteEntity->addActivityTarget($entity);
 
         $formAction = $entityRoutingHelper->generateUrlByRequest(
             'oro_note_create',

@@ -4,6 +4,7 @@ namespace Oro\Bundle\SoapBundle\Handler;
 
 use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\ORM\EntityNotFoundException;
+
 use Oro\Bundle\SecurityBundle\Exception\ForbiddenException;
 use Oro\Bundle\OrganizationBundle\Ownership\OwnerDeletionManager;
 use Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager;
@@ -11,7 +12,7 @@ use Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager;
 /**
  * A class encapsulates a business logic responsible to delete entity
  */
-class DeleteHandler
+class DeleteHandler implements DeleteHandlerInterface
 {
     /**
      * @var OwnerDeletionManager

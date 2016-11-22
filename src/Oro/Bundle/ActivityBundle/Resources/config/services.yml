@@ -130,12 +130,22 @@ services:
             - '@oro_activity.manager'
             - '@oro_search.index'
 
+    oro_activity.handler.delete.activity_entity_registry:
+        class: Oro\Bundle\ActivityBundle\Entity\Manager\ActivityEntityDeleteHandlerRegistry
+
+    oro_activity.handler.delete.activity_entity_proxy:
+        class: Oro\Bundle\ActivityBundle\Entity\Manager\ActivityEntityDeleteHandlerProxy
+        arguments:
+            - '@oro_activity.handler.delete.activity_entity_registry'
+
     oro_activity.handler.delete.activity_entity:
-        class: %oro_activity.handler.delete.activity_entity.class%
+        class: '%oro_activity.handler.delete.activity_entity.class%'
         parent: oro_soap.handler.delete.abstract
         calls:
             - [setSecurityFacade, ['@oro_security.security_facade']]
             - [setActivityManager, ['@oro_activity.manager']]
+        tags:
+            - { name: oro_activity.activity_entity_delete_handler }
 
     oro_activity.form.handler.autocomplete:
         class: Oro\Bundle\ActivityBundle\Autocomplete\ContextSearchHandler

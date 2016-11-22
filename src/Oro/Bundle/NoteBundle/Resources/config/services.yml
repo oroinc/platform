@@ -42,3 +42,9 @@ services:
            - '@oro_comment.association_helper'
         tags:
            - {name: validator.constraint_validator, alias: oro_note.context.note_empty_validator }
+
+    oro_note.handler.delete.activity_entity:
+        class: Oro\Bundle\NoteBundle\Entity\Manager\NoteActivityEntityDeleteHandler
+        parent: oro_activity.handler.delete.activity_entity
+        tags:
+            - { name: oro_activity.activity_entity_delete_handler, priority: -10 }

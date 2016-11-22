@@ -79,11 +79,12 @@ class ContextsExtension extends AbstractTypeExtension
             'contexts',
             'oro_activity_contexts_select',
             [
-                'label'     => 'oro.activity.contexts.label',
-                'tooltip'   => 'oro.activity.contexts.tooltip',
-                'required'  => false,
-                'read_only' => false,
-                'mapped'    => false,
+                'label'          => 'oro.activity.contexts.label',
+                'tooltip'        => 'oro.activity.contexts.tooltip',
+                'required'       => false,
+                'read_only'      => false,
+                'mapped'         => false,
+                'error_bubbling' => false,
                 'configs'   => [
                     'route_name'       => 'oro_activity_form_autocomplete_search',
                     'route_parameters' => [

@@ -13,7 +13,7 @@ use Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager;
 use Oro\Bundle\SoapBundle\Handler\DeleteHandler;
 use Oro\Bundle\SoapBundle\Model\RelationIdentifier;
 
-class ActivityEntityDeleteHandler extends DeleteHandler
+class ActivityEntityDeleteHandler extends DeleteHandler implements ActivityEntityDeleteHandlerInterface
 {
     /** @var SecurityFacade */
     protected $securityFacade;
@@ -86,5 +86,13 @@ class ActivityEntityDeleteHandler extends DeleteHandler
         if (!$this->securityFacade->isGranted('VIEW', $entity)) {
             throw new ForbiddenException('has no view permissions for related entity');
         }
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function isApplicable(RelationIdentifier $relationIdentifier)
+    {
+        return true;
     }
 }
