@@ -19,6 +19,8 @@ oro:
         change_password:
             flash:
                 success: The password has been changed
+        password:
+            password_mismatch: The password fields must match.
     role:
         tabs:
             all.label: All
