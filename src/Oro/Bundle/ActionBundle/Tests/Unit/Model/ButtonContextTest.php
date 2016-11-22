@@ -38,7 +38,8 @@ class ButtonContextTest extends \PHPUnit_Framework_TestCase
             ['formDialogRoute', 'test_url2'],
             ['formPageRoute', 'test_url3'],
             ['enabled', true],
-            ['unavailableHidden', true]
+            ['unavailableHidden', true],
+            ['errors', ['test_error'], []],
         ];
 
         $this->assertPropertyAccessors($this->buttonContext, $context);
