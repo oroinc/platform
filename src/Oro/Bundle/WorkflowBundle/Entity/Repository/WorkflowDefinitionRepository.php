@@ -40,4 +40,12 @@ class WorkflowDefinitionRepository extends EntityRepository
 
         return $qb->getQuery()->getResult();
     }
+
+    /**
+     * @return WorkflowDefinition[]
+     */
+    public function findActive()
+    {
+        return $this->findBy(['active' => true], ['priority' => 'ASC']);
+    }
 }

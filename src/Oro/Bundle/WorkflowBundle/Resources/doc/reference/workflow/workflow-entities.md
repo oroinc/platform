@@ -144,6 +144,7 @@ list of errors;
 * **hasForm()** - if transition has form or not;
 * **isHidden()** - check is current transition can be displayed;
 * **isUnavailableHidden()** - check is current transition can be hidden;
+* **isEmptyInitOptions()** - check that the not set init options: init_routes, init_entities for current transition
 
 Attribute
 ---------

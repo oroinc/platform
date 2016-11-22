@@ -318,6 +318,14 @@ services:
         tags:
             - { name: oro_translation.extension.translation_context_resolver }
 
+    oro_workflow.extension.transition_button_provider:
+        class: 'Oro\Bundle\WorkflowBundle\Extension\TransitionButtonProviderExtension'
+        arguments:
+            - '@oro_workflow.registry'
+            - '@oro_workflow.helper.applications'
+        tags:
+           - { name: oro.action.extension.button_provider, priority: 110 }
+
     oro_workflow.translation.key_template_parameters_resolver:
         class: 'Oro\Bundle\WorkflowBundle\Translation\KeyTemplateParametersResolver'
         arguments:
@@ -357,3 +365,12 @@ services:
             - '@logger'
         tags:
             - { name: monolog.logger, channel: oro_workflow }
+
+    oro_workflow.helper.applications:
+        class: 'Oro\Bundle\WorkflowBundle\Helper\WorkflowApplicationsHelper'
+        arguments:
+            - '@oro_action.helper.applications'
+        calls:
+            - [setExecutionRoute, ['oro_api_workflow_start']]
+            - [setFormDialogRoute, ['oro_workflow_widget_start_transition_form']]
+            - [setFormPageRoute, ['oro_workflow_start_transition_form']]
