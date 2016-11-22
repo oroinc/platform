@@ -134,7 +134,8 @@ class WorkflowRegistry
     public function getActiveWorkflowsByActiveGroups(array $groupNames)
     {
         $groupNames = array_map('strtolower', $groupNames);
-        $definitions = $this->processDefinitionFilters(
+
+        $definitions = array_filter(
             $this->getEntityRepository()->findActive(),
             function (WorkflowDefinition $definition) use ($groupNames) {
                 $exclusiveActiveGroups = $definition->getExclusiveActiveGroups();
@@ -143,7 +144,7 @@ class WorkflowRegistry
             }
         );
 
-        return $this->getAssembledWorkflows($definitions)->getValues();
+        return $this->getAssembledWorkflows($definitions);
     }
 
     /**
@@ -181,6 +182,10 @@ class WorkflowRegistry
      */
     private function processDefinitionFilters(Collection $workflowDefinitions, callable $customFilter = null)
     {
+        if ($workflowDefinitions->isEmpty()) {
+            return $workflowDefinitions;
+        }
+
         if ($customFilter) {
             $workflowDefinitions = $workflowDefinitions->filter($customFilter);
         }

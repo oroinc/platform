@@ -255,13 +255,15 @@ class WorkflowRegistryTest extends \PHPUnit_Framework_TestCase
     public function testGetActiveWorkflows()
     {
         $workflowName = 'test_workflow';
-        $workflow = $this->createWorkflow($workflowName);
+        $workflow = $this->createWorkflow($workflowName, 'testEntityClass');
         $workflowDefinition = $workflow->getDefinition();
+        $workflowDefinition->setExclusiveActiveGroups(['group1']);
 
-        $this->featureChecker->expects($this->once())
-            ->method('isResourceEnabled')
-            ->with($workflowName, FeatureConfigurationExtension::WORKFLOWS_NODE_NAME)
-            ->willReturn(true);
+        $filter = $this->createDefinitionFilterMock(
+            new ArrayCollection([$workflowName => $workflowDefinition]),
+            new ArrayCollection([$workflowName => $workflowDefinition])
+        );
+        $this->registry->addDefinitionFilter($filter);
 
         $this->entityRepository->expects($this->once())
             ->method('findActive')
@@ -278,13 +280,15 @@ class WorkflowRegistryTest extends \PHPUnit_Framework_TestCase
     public function testGetActiveWorkflowsNoFeature()
     {
         $workflowName = 'test_workflow';
-        $workflow = $this->createWorkflow($workflowName);
+        $workflow = $this->createWorkflow($workflowName, 'testEntityClass');
         $workflowDefinition = $workflow->getDefinition();
+        $workflowDefinition->setExclusiveActiveGroups(['group1']);
 
-        $this->featureChecker->expects($this->once())
-            ->method('isResourceEnabled')
-            ->with($workflowName, FeatureConfigurationExtension::WORKFLOWS_NODE_NAME)
-            ->willReturn(false);
+        $filter = $this->createDefinitionFilterMock(
+            new ArrayCollection([$workflowName => $workflowDefinition]),
+            new ArrayCollection([])
+        );
+        $this->registry->addDefinitionFilter($filter);
 
         $this->entityRepository->expects($this->once())
             ->method('findActive')
@@ -312,9 +316,11 @@ class WorkflowRegistryTest extends \PHPUnit_Framework_TestCase
             ->method('findActive')
             ->willReturn([$workflowDefinition1, $workflowDefinition2]);
 
-        $this->featureChecker->expects($this->any())
-            ->method('isResourceEnabled')
-            ->willReturn(false);
+        $filter = $this->createDefinitionFilterMock(
+            new ArrayCollection(['test_workflow1' => $workflowDefinition1]),
+            new ArrayCollection()
+        );
+        $this->registry->addDefinitionFilter($filter);
 
         $this->assertEmpty($this->registry->getActiveWorkflowsByActiveGroups(['group1']));
     }
