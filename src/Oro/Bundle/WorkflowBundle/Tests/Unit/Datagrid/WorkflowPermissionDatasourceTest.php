@@ -124,7 +124,6 @@ class WorkflowPermissionDatasourceTest extends \PHPUnit_Framework_TestCase
         $result = $this->datasource->getResults();
 
         $this->validateResult($result);
-
     }
 
     protected function validateResult($result)

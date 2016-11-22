@@ -94,7 +94,7 @@ class RolePageListenerTest extends \PHPUnit_Framework_TestCase
         $data = $event->getFormData();
         $this->assertCount(4, $data['dataBlocks']);
         $workflowBlock = $data['dataBlocks'][3];
-        $this->assertEquals('oro.workflow.translation.workflow.label_trans', $workflowBlock['title']);
+        $this->assertEquals('oro.workflow.workflowdefinition.entity_plural_label_trans', $workflowBlock['title']);
         $this->assertEquals(
             [['data' => [$renderedHtml]]],
             $workflowBlock['subblocks']
@@ -166,7 +166,7 @@ class RolePageListenerTest extends \PHPUnit_Framework_TestCase
         $data = $event->getData();
         $this->assertCount(4, $data['dataBlocks']);
         $workflowBlock = $data['dataBlocks'][3];
-        $this->assertEquals('oro.workflow.translation.workflow.label_trans', $workflowBlock['title']);
+        $this->assertEquals('oro.workflow.workflowdefinition.entity_plural_label_trans', $workflowBlock['title']);
         $this->assertEquals(
             [['data' => [$renderedHtml]]],
             $workflowBlock['subblocks']

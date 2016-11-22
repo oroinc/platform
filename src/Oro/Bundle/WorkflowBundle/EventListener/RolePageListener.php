@@ -100,7 +100,7 @@ class RolePageListener
             // insert Workflow ACL Grid block after the entity block
             if ($id === 2) {
                 $resultBlocks[] = [
-                    'title'     => $this->translator->trans('oro.workflow.translation.workflow.label'),
+                    'title'     => $this->translator->trans('oro.workflow.workflowdefinition.entity_plural_label'),
                     'subblocks' => [
                         [
                             'data' => [
