@@ -362,6 +362,5 @@ services:
         class: 'Oro\Bundle\WorkflowBundle\Model\Condition\IsGrantedWorkflowTransition'
         arguments:
             - '@oro_security.security_facade'
-            - '@oro_workflow.manager'
         tags:
             - { name: oro_action.condition, alias: 'is_granted_workflow_transition' }
