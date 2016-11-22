@@ -40,7 +40,7 @@ class ItemControllerTest extends WebTestCase
         // default datagrid UPDATE and DELETE operations and DELETE mass action, it's index page for 'items-grid'
         $data = $this->assertDataGrid($crawler, 'items-grid');
 
-        $this->assertCount(1, $data['data']);
+        $this->assertCount(3, $data['data']);
 
         $this->assertArrayHasKey('update', $data['data'][0]['action_configuration']);
         $this->assertArrayHasKey('delete', $data['data'][0]['action_configuration']);
@@ -109,7 +109,7 @@ class ItemControllerTest extends WebTestCase
 
         $data = $this->getJsonResponseContent($this->client->getResponse(), 200);
 
-        $this->assertCount(1, $data['data']);
+        $this->assertCount(3, $data['data']);
 
         $this->assertArrayHasKey('update', $data['data'][0]['action_configuration']);
         $this->assertArrayHasKey('delete', $data['data'][0]['action_configuration']);

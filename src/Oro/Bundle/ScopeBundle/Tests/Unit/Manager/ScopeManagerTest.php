@@ -208,4 +208,14 @@ class ScopeManagerTest extends \PHPUnit_Framework_TestCase
         $actualScope = $this->manager->findOrCreate('testScope', $context);
         $this->assertEquals($scope, $actualScope);
     }
+
+    public function testGetScopeEntities()
+    {
+        $this->manager->addProvider('scope_type', new StubScopeCriteriaProvider());
+        $expected = [
+            StubScopeCriteriaProvider::STUB_FIELD => StubScopeCriteriaProvider::STUB_CLASS
+        ];
+
+        $this->assertEquals($expected, $this->manager->getScopeEntities('scope_type'));
+    }
 }

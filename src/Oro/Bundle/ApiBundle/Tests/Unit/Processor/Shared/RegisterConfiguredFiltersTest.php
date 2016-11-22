@@ -8,6 +8,7 @@ use Oro\Bundle\ApiBundle\Filter\ComparisonFilter;
 use Oro\Bundle\ApiBundle\Filter\FilterCollection;
 use Oro\Bundle\ApiBundle\Filter\SortFilter;
 use Oro\Bundle\ApiBundle\Processor\Shared\RegisterConfiguredFilters;
+use Oro\Bundle\ApiBundle\Tests\Unit\Filter\RequestAwareFilterStub;
 use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\GetList\GetListProcessorOrmRelatedTestCase;
 
@@ -305,5 +306,31 @@ class RegisterConfiguredFiltersTest extends GetListProcessorOrmRelatedTestCase
         $expectedFilters->add('sort', $expectedFilter);
 
         $this->assertEquals($expectedFilters, $this->context->getFilters());
+    }
+
+    public function testProcessForRequestTypeAwareFilter()
+    {
+        $className = 'Test\Class';
+        $this->notManageableClassNames = [$className];
+
+        $filtersConfig = new FiltersConfig();
+        $filtersConfig->setExcludeAll();
+
+        $filterConfig = new FilterFieldConfig();
+        $filterConfig->setDataType('string');
+        $filtersConfig->addField('someField', $filterConfig);
+
+        $filter = new RequestAwareFilterStub('string');
+
+        $this->filterFactory->expects($this->once())
+            ->method('createFilter')
+            ->with('string', [])
+            ->willReturn($filter);
+
+        $this->context->setClassName($className);
+        $this->context->setConfigOfFilters($filtersConfig);
+        $this->processor->process($this->context);
+
+        $this->assertSame($this->context->getRequestType(), $filter->getRequestType());
     }
 }

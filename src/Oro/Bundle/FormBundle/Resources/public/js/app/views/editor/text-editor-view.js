@@ -69,7 +69,7 @@ define(function(require) {
     TextEditorView = BaseView.extend(/** @exports TextEditorView.prototype */{
         autoRender: true,
         tagName: 'form',
-        template: require('tpl!../../../../templates/text-editor.html'),
+        template: require('tpl!../../../../templates/editor/text-editor.html'),
         className: 'text-editor',
         inputType: 'text',
         events: {

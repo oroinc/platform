@@ -226,7 +226,7 @@ layout:
             optionValue: Hello World!
         - @add:
             id: test_text
-            parentId: content
+            parentId: page_content
             blockType: text
             options:
                 text: Layouts. Hello World!
