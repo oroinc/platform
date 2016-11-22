@@ -3,6 +3,7 @@
 namespace Oro\Bundle\WorkflowBundle\Model\Condition;
 
 use Oro\Bundle\WorkflowBundle\Model\WorkflowManager;
+
 use Oro\Component\Action\Condition\AbstractCondition;
 use Oro\Component\ConfigExpression\Exception\InvalidArgumentException;
 
