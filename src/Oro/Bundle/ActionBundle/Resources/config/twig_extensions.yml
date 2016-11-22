@@ -9,5 +9,7 @@ services:
             - '@oro_action.helper.applications'
             - '@oro_action.helper.context'
             - '@oro_action.helper.options'
+            - '@oro_action.provider.button'
+            - '@oro_action.provider.button_search_context'
         tags:
             - { name: twig.extension }
