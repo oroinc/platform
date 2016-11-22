@@ -131,8 +131,6 @@ class OperationExtensionTest extends \PHPUnit_Framework_TestCase
      * @dataProvider hasButtonsDataProvider
      *
      * @param bool $value
-     *
-     * @throws \PHPUnit_Framework_Exception
      */
     public function testHasButtons($value)
     {
@@ -147,7 +145,7 @@ class OperationExtensionTest extends \PHPUnit_Framework_TestCase
 
         $this->buttonProvider->expects($this->once())->method('hasButtons')->willReturn($value);
 
-        $this->extension->hasButtons([]);
+        $this->assertEquals($value, $this->extension->hasButtons([]));
     }
 
     /**
