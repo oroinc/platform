@@ -51,6 +51,7 @@ Table of Contents
    - [Workflow Data Normalizer](#workflow-data-normalizer)
    - [Attribute Normalizer](#attribute-normalizer)
    - [Parameter Pass](#parameter-pass)
+   - [Workflow Scope Manager](#workflow-scope-manager)
 
 Main Entities
 =============
@@ -666,3 +667,17 @@ Passes through configuration and replaces access properties (f.e. $property) wit
 
 **Methods:**
 * **pass(data)** - replaces access properties with Property Path instances.
+
+Workflow Scope Manager
+----------------------
+**Class:**
+Oro\Bundle\WorkflowBundle\Scope\WorkflowScopeManager
+
+**Description:**
+Responsible for updating collection of relations to `Oro\Bundle\ScopeBundle\Entity\Scope` entity from
+`Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition` entity and represents as property `scopes` of `WorkflowDefinition`
+entity. To generate relations it uses data from node `scopes` of Workflow configuration.
+
+**Methods:**
+* **setEnabled(bool)** - enable or disable (enabled by default) logic of manager, it helps to reload workflow configuration without any changes in table of WorkflowScope
+* **updateScopes(WorkflowDefinition)** - update list of WorkflowScope entities in database by scope configuration of current WorkflowDefinition

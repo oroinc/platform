@@ -24,7 +24,6 @@ class StubScope extends Scope
         $this->attributes = $attributes;
     }
 
-
     /**
      * @return mixed
      */
