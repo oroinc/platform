@@ -183,6 +183,10 @@ class TransitionAssembler extends BaseAbstractAssembler
             if ($aclMessage) {
                 $aclPreConditionDefinition['message'] = $aclMessage;
             }
+
+            /**
+             * @see AclGranted
+             */
             $aclPreCondition = ['@acl_granted' => $aclPreConditionDefinition];
 
             if (empty($definition['preconditions'])) {
@@ -197,6 +201,9 @@ class TransitionAssembler extends BaseAbstractAssembler
             }
         }
 
+        /**
+         * @see IsGrantedWorkflowTransition
+         */
         $precondition = ['@is_granted_workflow_transition' => ['parameters' => [$transitionName]]];
         if (empty($definition['preconditions'])) {
             $definition['preconditions'] = $precondition;

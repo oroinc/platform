@@ -14,6 +14,11 @@ use Oro\Bundle\SecurityBundle\Acl\Domain\DomainObjectWrapper;
 use Oro\Bundle\SecurityBundle\SecurityFacade;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowManager;
 
+/**
+ * PreCondition used to perform ACL check for ability to:
+ *  - perform all transitions (PERFORM_TRANSITIONS)
+ *  - perform specific transition (PERFORM_TRANSITION)
+ */
 class IsGrantedWorkflowTransition extends AbstractCondition implements ContextAccessorAwareInterface
 {
     use ContextAccessorAwareTrait;
@@ -52,8 +57,7 @@ class IsGrantedWorkflowTransition extends AbstractCondition implements ContextAc
      */
     public function initialize(array $options)
     {
-        $count = count($options);
-        if ($count === 1) {
+        if (1 === count($options)) {
             $this->transitionName = reset($options);
             if (!$this->transitionName) {
                 throw new InvalidArgumentException('ACL object must not be empty.');
