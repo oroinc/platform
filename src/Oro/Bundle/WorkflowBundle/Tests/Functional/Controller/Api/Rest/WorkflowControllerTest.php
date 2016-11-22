@@ -264,6 +264,41 @@ class WorkflowControllerTest extends WebTestCase
         $this->assertEquals($workflowItem->getEntityClass(), $result['workflowItem']['entity_class']);
     }
 
+    public function testTransitAction()
+    {
+        $this->getWorkflowManager()->activateWorkflow(LoadWorkflowDefinitions::MULTISTEP);
+
+        $testEntity = $this->createNewEntity();
+
+        $this->assertActiveWorkflow($testEntity, LoadWorkflowDefinitions::MULTISTEP);
+
+        $workflowItem = $this->getWorkflowItem($testEntity, LoadWorkflowDefinitions::MULTISTEP);
+
+        $this->client->request(
+            'GET',
+            $this->getUrl(
+                'oro_workflow_api_rest_workflow_transit',
+                [
+                    'workflowItemId' => $workflowItem->getId(),
+                    'transitionName' => LoadWorkflowDefinitions::MULTISTEP_START_TRANSITION,
+                ]
+            )
+        );
+
+        $result = $this->getJsonResponseContent($this->client->getResponse(), 200);
+
+        $this->assertEquals($workflowItem->getId(), $result['workflowItem']['id']);
+        $this->assertEquals($workflowItem->getWorkflowName(), $result['workflowItem']['workflow_name']);
+        $this->assertEquals($workflowItem->getEntityId(), $result['workflowItem']['entity_id']);
+        $this->assertEquals($workflowItem->getEntityClass(), $result['workflowItem']['entity_class']);
+
+        $workflowItemNew = $this->getRepository('Oro\Bundle\WorkflowBundle\Entity\WorkflowItem')
+            ->find($workflowItem->getId());
+
+        $this->assertNotEquals($workflowItem->getCurrentStep(), $workflowItemNew->getCurrentStep());
+        $this->assertEquals('second_point', $workflowItemNew->getCurrentStep()->getName());
+    }
+
     /**
      * @dataProvider startWorkflowDataProvider
      *
@@ -278,7 +313,7 @@ class WorkflowControllerTest extends WebTestCase
             $this->getUrl(
                 'oro_workflow_api_rest_workflow_start',
                 [
-                    'workflowName' => LoadWorkflowDefinitions::WITH_START_STEP,
+                    'workflowName' => LoadWorkflowDefinitions::WITH_INIT_OPTION,
                     'transitionName' => $transitionName,
                     'entityClass' => $entityClass,
                     'route' => $routeName
@@ -315,41 +350,6 @@ class WorkflowControllerTest extends WebTestCase
                 'transitionName' => LoadWorkflowDefinitions::START_FROM_ROUTE_TRANSITION,
             ]
         ];
-    }
-
-    public function testTransitAction()
-    {
-        $this->getWorkflowManager()->activateWorkflow(LoadWorkflowDefinitions::MULTISTEP);
-
-        $testEntity = $this->createNewEntity();
-
-        $this->assertActiveWorkflow($testEntity, LoadWorkflowDefinitions::MULTISTEP);
-
-        $workflowItem = $this->getWorkflowItem($testEntity, LoadWorkflowDefinitions::MULTISTEP);
-
-        $this->client->request(
-            'GET',
-            $this->getUrl(
-                'oro_workflow_api_rest_workflow_transit',
-                [
-                    'workflowItemId' => $workflowItem->getId(),
-                    'transitionName' => LoadWorkflowDefinitions::MULTISTEP_START_TRANSITION,
-                ]
-            )
-        );
-
-        $result = $this->getJsonResponseContent($this->client->getResponse(), 200);
-
-        $this->assertEquals($workflowItem->getId(), $result['workflowItem']['id']);
-        $this->assertEquals($workflowItem->getWorkflowName(), $result['workflowItem']['workflow_name']);
-        $this->assertEquals($workflowItem->getEntityId(), $result['workflowItem']['entity_id']);
-        $this->assertEquals($workflowItem->getEntityClass(), $result['workflowItem']['entity_class']);
-
-        $workflowItemNew = $this->getRepository('Oro\Bundle\WorkflowBundle\Entity\WorkflowItem')
-            ->find($workflowItem->getId());
-
-        $this->assertNotEquals($workflowItem->getCurrentStep(), $workflowItemNew->getCurrentStep());
-        $this->assertEquals('second_point', $workflowItemNew->getCurrentStep()->getName());
     }
 
     /**
