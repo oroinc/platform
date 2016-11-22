@@ -87,6 +87,7 @@ class OperationButtonTest extends \PHPUnit_Framework_TestCase
                 'expectedResult' => [
                     'operation' => $this->getOperationMock(),
                     'params' => new OperationDefinition(),
+                    'aClass' => '',
                 ],
             ],
         ];

@@ -4,6 +4,7 @@ namespace Oro\Bundle\WorkflowBundle\Model;
 
 use Oro\Bundle\ActionBundle\Model\ButtonContext;
 use Oro\Bundle\ActionBundle\Model\ButtonInterface;
+use Oro\Bundle\ActionBundle\Model\OperationRegistry;
 
 class TransitionButton implements ButtonInterface
 {
@@ -50,7 +51,7 @@ class TransitionButton implements ButtonInterface
     /**
      * {@inheritdoc}
      */
-    public function getTemplateData()
+    public function getTemplateData(array $customData = [])
     {
         return [
             //TODO: Must be updated at https://magecore.atlassian.net/browse/BAP-12481
@@ -75,5 +76,13 @@ class TransitionButton implements ButtonInterface
     public function getButtonContext()
     {
         return $this->buttonContext;
+    }
+
+    /**
+     * @return string
+     */
+    public function getGroup()
+    {
+        return OperationRegistry::DEFAULT_GROUP;
     }
 }

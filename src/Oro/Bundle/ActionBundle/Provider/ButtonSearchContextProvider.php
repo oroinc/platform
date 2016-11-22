@@ -19,13 +19,13 @@ class ButtonSearchContextProvider
     }
 
     /**
+     * @param array|null $context
+     *
      * @return ButtonSearchContext
      */
-    public function getButtonSearchContext()
+    public function getButtonSearchContext(array $context = null)
     {
-        $context = $this->contextHelper->getContext();
-
-        return $this->buildFromContext($context);
+        return $this->buildFromContext($this->contextHelper->getContext($context));
     }
 
     /**

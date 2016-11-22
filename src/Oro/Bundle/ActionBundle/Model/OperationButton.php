@@ -50,12 +50,16 @@ class OperationButton implements ButtonInterface
     /**
      * {@inheritdoc}
      */
-    public function getTemplateData()
+    public function getTemplateData(array $customData = [])
     {
-        return [
+        $defaultData = [
+            'aClass' => ''
+        ];
+
+        return array_merge($defaultData, $customData, [
             'operation' => $this->operation,
             'params' => $this->operation->getDefinition(),
-        ];
+        ]);
     }
 
     /**
@@ -64,5 +68,15 @@ class OperationButton implements ButtonInterface
     public function getButtonContext()
     {
         return $this->buttonContext;
+    }
+
+    /**
+     * @return string
+     */
+    public function getGroup()
+    {
+        $buttonOptions = $this->operation->getDefinition()->getButtonOptions();
+
+        return isset($buttonOptions['group']) ? $buttonOptions['group'] : null;
     }
 }

@@ -44,4 +44,20 @@ class ButtonProvider
 
         return $buttons;
     }
+
+    /**
+     * @param ButtonSearchContext $searchContext
+     *
+     * @return bool
+     */
+    public function hasButtons(ButtonSearchContext $searchContext)
+    {
+        foreach ($this->extensions as $extension) {
+            if (count($extension->find($searchContext))) {
+                return true;
+            }
+        }
+
+        return false;
+    }
 }
