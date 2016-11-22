@@ -199,7 +199,6 @@ oro:
             new_password.label: New password
             enter_new_password.label: New password
             enter_new_password_again.label: Repeat password
-            password_mismatch: The password fields must match.
             reset.label: Reset
             reset:
                 ttl_already_requested.message: The password for this user has already been requested within the last 24 hours
