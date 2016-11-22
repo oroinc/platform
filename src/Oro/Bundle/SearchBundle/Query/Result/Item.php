@@ -76,16 +76,16 @@ class Item
         $recordId = null,
         $recordTitle = null,
         $recordUrl = null,
-        $selectedData = [],
-        $entityConfig = []
+        array $selectedData = [],
+        array $entityConfig = []
     ) {
         $this->em           = $em;
         $this->entityName   = $entityName;
         $this->recordId     = empty($recordId) ? 0 : $recordId;
         $this->recordTitle  = $recordTitle;
         $this->recordUrl    = $recordUrl;
-        $this->selectedData = is_array($selectedData) ? $selectedData : [];
-        $this->entityConfig = empty($entityConfig) ? [] : $entityConfig;
+        $this->selectedData = $selectedData;
+        $this->entityConfig = $entityConfig;
 
         $this->propertyAccessor = new PropertyAccessor();
     }
@@ -148,6 +148,8 @@ class Item
 
     /**
      * Load related object
+     *
+     * @deprecated getEntity method will be removed in 2.0. Get entity manually by entityName and recordId
      * @return object
      */
     public function getEntity()

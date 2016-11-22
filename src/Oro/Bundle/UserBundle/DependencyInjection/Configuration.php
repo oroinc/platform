@@ -48,8 +48,6 @@ class Configuration implements ConfigurationInterface
         SettingsBuilder::append(
             $rootNode,
             [
-                'failed_login_limit_enabled' => ['value' => true, 'type' => 'boolean'],
-                'failed_login_limit' => ['value' => 10, 'type' => 'scalar'],
                 'password_min_length' => ['value' => 8, 'type' => 'scalar'],
                 'password_lower_case' => ['value' => true, 'type' => 'boolean'],
                 'password_upper_case' => ['value' => true, 'type' => 'boolean'],

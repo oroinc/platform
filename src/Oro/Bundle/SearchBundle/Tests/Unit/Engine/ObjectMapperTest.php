@@ -333,7 +333,7 @@ class ObjectMapperTest extends \PHPUnit_Framework_TestCase
 
     public function testNonExistsConfig()
     {
-        $this->assertEquals(false, $this->mapper->getEntityConfig('non exists entity'));
+        $this->assertEquals([], $this->mapper->getEntityConfig('non exists entity'));
     }
 
     public function testSelectedData()
@@ -343,11 +343,11 @@ class ObjectMapperTest extends \PHPUnit_Framework_TestCase
             ->getMock();
 
         $query->expects($this->once())
-            ->method('getSelect')
+            ->method('getSelectDataFields')
             ->willReturn([
-                'text.sku',
-                'text.defaultName',
-                'notExistingField'
+                'text.sku' => 'sku',
+                'text.defaultName' => 'defaultName',
+                'notExistingField' => 'notExistingField'
             ]);
 
         $item = [

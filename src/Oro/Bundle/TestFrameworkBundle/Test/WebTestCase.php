@@ -29,7 +29,7 @@ use Oro\Component\Testing\DbIsolationExtension;
 abstract class WebTestCase extends BaseWebTestCase
 {
     use DbIsolationExtension;
-    
+
     /** Annotation names */
     const DB_ISOLATION_ANNOTATION = 'dbIsolation';
     const DB_ISOLATION_PER_TEST_ANNOTATION = 'dbIsolationPerTest';
@@ -95,7 +95,7 @@ abstract class WebTestCase extends BaseWebTestCase
             $this->rollbackTransaction();
             self::$loadedFixtures = [];
         }
-        
+
         $refClass = new \ReflectionClass($this);
         foreach ($refClass->getProperties() as $prop) {
             if (!$prop->isStatic() && 0 !== strpos($prop->getDeclaringClass()->getName(), 'PHPUnit_')) {
@@ -103,6 +103,18 @@ abstract class WebTestCase extends BaseWebTestCase
                 $prop->setValue($this, null);
             }
         }
+    }
+
+    public static function setUpBeforeClass()
+    {
+        /**
+         * In case we have isolated test we should have clean env before run it,
+         * so we will not have next problem:
+         * - Data provider in phpunit called before tests (even before this method) and can start a client
+         *   for not isolated tests (ex. GetRestJsonApiTest),
+         *   so we will have client without transaction started in our test
+         */
+        self::$clientInstance = null;
     }
 
     public static function tearDownAfterClass()

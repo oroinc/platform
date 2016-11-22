@@ -1,57 +1,58 @@
 <?php
+
 namespace Oro\Bundle\TestFrameworkBundle\Migrations\Schema\v1_4;
 
 use Doctrine\DBAL\Schema\Schema;
+use Oro\Bundle\ActivityBundle\Migration\Extension\ActivityExtension;
+use Oro\Bundle\ActivityBundle\Migration\Extension\ActivityExtensionAwareInterface;
 use Oro\Bundle\MigrationBundle\Migration\Migration;
 use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 
-class OroTestFrameworkBundle implements Migration
+class OroTestFrameworkBundle implements Migration, ActivityExtensionAwareInterface
 {
+    const CALENDAR_EVENT_TABLE = 'oro_calendar_event';
+    const TEST_ACTIVITY_TABLE = 'test_activity_target';
+
+    /** @var ActivityExtension */
+    protected $activityExtension;
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setActivityExtension(ActivityExtension $activityExtension)
+    {
+        $this->activityExtension = $activityExtension;
+    }
+
     /**
      * {@inheritdoc}
      */
     public function up(Schema $schema, QueryBag $queries)
     {
-        $this->createTestUserOwnershipTable($schema);
-        $this->addTestUserOwnershipForeignKeys($schema);
+        self::addTestActivityToCalendarEvent($schema, $this->activityExtension);
     }
 
     /**
-     * Create test_user_ownership table
+     * Add test activity to calendar event, if installing or migrating in test environment
      *
-     * @param Schema $schema
+     * @param Schema            $schema
+     * @param ActivityExtension $activityExtension
      */
-    protected function createTestUserOwnershipTable(Schema $schema)
+    public static function addTestActivityToCalendarEvent(Schema $schema, ActivityExtension $activityExtension)
     {
-        $table = $schema->createTable('test_user_ownership');
-        $table->addColumn('id', 'integer', ['autoincrement' => true]);
-        $table->addColumn('owner_id', 'integer', ['notnull' => false]);
-        $table->addColumn('organization_id', 'integer', ['notnull' => false]);
-        $table->addColumn('name', 'string', ['notnull' => false, 'length' => 255]);
-        $table->setPrimaryKey(['id']);
-        $table->addIndex(['organization_id'], 'IDX_673C997D32C8A3DE', []);
-        $table->addIndex(['owner_id'], 'IDX_673C997D7E3C61F9', []);
-    }
-
-    /**
-     * Add test_user_ownership foreign keys.
-     *
-     * @param Schema $schema
-     */
-    protected function addTestUserOwnershipForeignKeys(Schema $schema)
-    {
-        $table = $schema->getTable('test_user_ownership');
-        $table->addForeignKeyConstraint(
-            $schema->getTable('oro_user'),
-            ['owner_id'],
-            ['id'],
-            ['onDelete' => 'SET NULL', 'onUpdate' => null]
-        );
-        $table->addForeignKeyConstraint(
-            $schema->getTable('oro_organization'),
-            ['organization_id'],
-            ['id'],
-            ['onDelete' => 'SET NULL', 'onUpdate' => null]
-        );
+        if ($schema->hasTable(self::CALENDAR_EVENT_TABLE)) {
+            $activityTableName = $activityExtension->getAssociationTableName(
+                self::CALENDAR_EVENT_TABLE,
+                self::TEST_ACTIVITY_TABLE
+            );
+            if (!$schema->hasTable($activityTableName)) {
+                $activityExtension->addActivityAssociation(
+                    $schema,
+                    self::CALENDAR_EVENT_TABLE,
+                    self::TEST_ACTIVITY_TABLE,
+                    true
+                );
+            }
+        }
     }
 }

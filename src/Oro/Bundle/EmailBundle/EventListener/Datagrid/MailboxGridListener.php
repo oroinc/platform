@@ -8,10 +8,14 @@ use Doctrine\ORM\EntityManager;
 use Oro\Bundle\DataGridBundle\Datasource\Orm\OrmDatasource;
 use Oro\Bundle\DataGridBundle\Event\BuildAfter;
 use Oro\Bundle\DataGridBundle\Event\PreBuild;
+use Oro\Bundle\FeatureToggleBundle\Checker\FeatureCheckerHolderTrait;
+use Oro\Bundle\FeatureToggleBundle\Checker\FeatureToggleableInterface;
 use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
 
-class MailboxGridListener
+class MailboxGridListener implements FeatureToggleableInterface
 {
+    use FeatureCheckerHolderTrait;
+
     const REDIRECT_DATA_KEY = 'redirectData';
 
     const PATH_UPDATE_LINK_DIRECT_PARAMS = '[properties][update_link][direct_params]';
@@ -37,6 +41,10 @@ class MailboxGridListener
      */
     public function onPreBuild(PreBuild $event)
     {
+        if (!$this->isFeaturesEnabled()) {
+            return;
+        }
+
         $parameters = $event->getParameters();
         if (!$parameters->has(static::REDIRECT_DATA_KEY)) {
             return;
@@ -61,6 +69,10 @@ class MailboxGridListener
      */
     public function onBuildAfter(BuildAfter $event)
     {
+        if (!$this->isFeaturesEnabled()) {
+            return;
+        }
+
         /** @var OrmDatasource $ormDataSource */
         $ormDataSource = $event->getDatagrid()->getDatasource();
         $queryBuilder = $ormDataSource->getQueryBuilder();

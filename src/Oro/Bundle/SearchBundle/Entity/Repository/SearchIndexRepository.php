@@ -7,6 +7,7 @@ use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\Common\Util\ClassUtils;
 
+use Oro\Bundle\SearchBundle\Engine\Orm\BaseDriver;
 use Oro\Bundle\SearchBundle\Entity\Item;
 use Oro\Bundle\SearchBundle\Query\Query;
 
@@ -69,6 +70,11 @@ class SearchIndexRepository extends EntityRepository
      */
     public function setDriversClasses($drivers)
     {
+        foreach ($drivers as $driver) {
+            if (!is_a($driver, BaseDriver::class, true)) {
+                throw new \InvalidArgumentException('Wrong driver class passed, please check configuration');
+            }
+        }
         $this->drivers = $drivers;
     }
 

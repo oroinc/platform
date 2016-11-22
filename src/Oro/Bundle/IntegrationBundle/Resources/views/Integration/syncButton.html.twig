@@ -1,0 +1,6 @@
+{% import 'OroUIBundle::macros.html.twig' as UI %}
+{{ UI.clientButton({
+    'dataUrl': path('oro_integration_schedule', { 'id': entity.id }) ,
+    'aCss':   'no-hash schedule-button',
+    'label' : 'oro.integration.button.sync'|trans
+}) }}

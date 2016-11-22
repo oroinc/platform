@@ -82,6 +82,15 @@ services:
         tags:
             - { name: oro_workflow.changes.subscriber }
 
+    oro_workflow.listener.workflow_definition_scope:
+        class: 'Oro\Bundle\WorkflowBundle\EventListener\WorkflowDefinitionScopeListener'
+        arguments:
+            - '@oro_workflow.manager.workflow_scope'
+        tags:
+            - { name: oro_workflow.changes.listener, event: oro.workflow.before_activation, method: onActivationWorkflowDefinition }
+            - { name: oro_workflow.changes.listener, event: oro.workflow.after_create, method: onCreateWorkflowDefinition }
+            - { name: oro_workflow.changes.listener, event: oro.workflow.after_update, method: onUpdateWorkflowDefinition }
+
     oro_workflow.event_listener.role_page_listener:
         class: 'Oro\Bundle\WorkflowBundle\EventListener\RolePageListener'
         arguments:
