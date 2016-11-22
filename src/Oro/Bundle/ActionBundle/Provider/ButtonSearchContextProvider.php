@@ -19,13 +19,13 @@ class ButtonSearchContextProvider
     }
 
     /**
+     * @param array|null $context
+     *
      * @return ButtonSearchContext
      */
-    public function getButtonSearchContext()
+    public function getButtonSearchContext(array $context = null)
     {
-        $context = $this->contextHelper->getContext();
-
-        return $this->buildFromContext($context);
+        return $this->buildFromContext($this->contextHelper->getContext($context));
     }
 
     /**
@@ -33,35 +33,15 @@ class ButtonSearchContextProvider
      *
      * @return ButtonSearchContext
      */
-    public function buildFromContext(array $context)
+    protected function buildFromContext(array $context)
     {
         $buttonSearchContext = new ButtonSearchContext();
 
-        if (isset($context[ContextHelper::ENTITY_CLASS_PARAM])) {
-            if (isset($context[ContextHelper::ENTITY_CLASS_PARAM])) {
-                $buttonSearchContext
-                    ->setEntity($context[ContextHelper::ENTITY_CLASS_PARAM], $context[ContextHelper::ENTITY_ID_PARAM]);
-            } else {
-                $buttonSearchContext->setEntity($context[ContextHelper::ENTITY_CLASS_PARAM]);
-            }
-        }
-
-        if (isset($context[ContextHelper::DATAGRID_PARAM])) {
-            $buttonSearchContext->setGridName($context[ContextHelper::DATAGRID_PARAM]);
-        }
-
-        if (isset($context[ContextHelper::GROUP_PARAM])) {
-            $buttonSearchContext->setGroup($context[ContextHelper::GROUP_PARAM]);
-        }
-
-        if (isset($context[ContextHelper::FROM_URL_PARAM])) {
-            $buttonSearchContext->setReferrer($context[ContextHelper::FROM_URL_PARAM]);
-        }
-
-        if (isset($context[ContextHelper::ROUTE_PARAM])) {
-            $buttonSearchContext->setRouteName($context[ContextHelper::ROUTE_PARAM]);
-        }
-
-        return $buttonSearchContext;
+        return $buttonSearchContext
+            ->setEntity($context[ContextHelper::ENTITY_CLASS_PARAM], $context[ContextHelper::ENTITY_ID_PARAM])
+            ->setGridName($context[ContextHelper::DATAGRID_PARAM])
+            ->setGroup($context[ContextHelper::GROUP_PARAM])
+            ->setReferrer($context[ContextHelper::FROM_URL_PARAM])
+            ->setRouteName($context[ContextHelper::ROUTE_PARAM]);
     }
 }

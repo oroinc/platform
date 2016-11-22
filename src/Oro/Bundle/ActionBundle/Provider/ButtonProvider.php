@@ -52,10 +52,6 @@ class ButtonProvider
      */
     public function hasButtons(ButtonSearchContext $searchContext)
     {
-        if (0 === count($this->extensions)) {
-            return false;
-        }
-
         foreach ($this->extensions as $extension) {
             if (count($extension->find($searchContext))) {
                 return true;
