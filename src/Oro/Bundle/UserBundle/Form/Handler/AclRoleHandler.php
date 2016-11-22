@@ -315,8 +315,10 @@ class AclRoleHandler
         $decodedPrivileges = json_decode($this->form->get('privileges')->getData(), true);
         $formPrivileges = [];
         foreach ($this->privilegeConfig as $fieldName => $config) {
-            $privilegesArray = $decodedPrivileges[$fieldName];
-            $formPrivileges = array_merge($formPrivileges, $this->decodeAclPrivileges($privilegesArray, $config));
+            if (array_key_exists($fieldName, $decodedPrivileges)) {
+                $privilegesArray = $decodedPrivileges[$fieldName];
+                $formPrivileges = array_merge($formPrivileges, $this->decodeAclPrivileges($privilegesArray, $config));
+            }
         }
 
         array_walk(
