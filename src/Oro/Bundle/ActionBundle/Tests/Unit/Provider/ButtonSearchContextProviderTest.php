@@ -92,9 +92,7 @@ class ButtonSearchContextProviderTest extends \PHPUnit_Framework_TestCase
                 ]
             ],
             'empty' => [
-                [
-
-                ]
+                []
             ],
             'empty_class_name' => [
                 [
