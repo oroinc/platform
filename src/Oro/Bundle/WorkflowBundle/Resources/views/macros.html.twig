@@ -25,7 +25,7 @@
         }) %}
     {% endif %}
 
-    {% if transitionData['transition-condition-messages'] %}
+    {% if transitionData['transition-condition-messages'] is defined %}
         {% set conditionMessages = [] %}
         {% for error in transitionData['transition-condition-messages'] %}
             {% set conditionMessages = conditionMessages|merge(['<li>' ~ error.message|trans(error.parameters) ~ '</li>']) %}

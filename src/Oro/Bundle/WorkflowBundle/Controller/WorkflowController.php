@@ -46,6 +46,11 @@ class WorkflowController extends Controller
             'entityId' => $request->get('entityId', 0)
         ];
 
+        if (!$transition->isEmptyInitOptions()) {
+            $context = $this->get('oro_action.helper.context')->getContext();
+            $routeParams = array_merge($routeParams, $context);
+        }
+
         // dispatch oro_workflow.start_transition.handle_before_render event
         $event = new StartTransitionEvent($workflow, $transition, $routeParams);
         $this->get('event_dispatcher')->dispatch(
