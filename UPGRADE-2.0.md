@@ -39,9 +39,9 @@ UPGRADE FROM 1.10 to 2.0
 - Deprecated service `oro_workflow.context_accessor` removed
 - Service (`Oro\Bundle\ActionBundle\Model\ConfigurationPass\ReplacePropertyPath`) removed, use `Oro\Component\ConfigExpression\ConfigurationPass\ReplacePropertyPath` instead
 - Added `Oro\Bundle\ActionBundle\Helper\ApplicationsHelperInterface`, that declare methods `isApplicationsValid()` and `getCurrentApplication()`
-- Added `Oro\Bundle\ActionBundle\Helper\ApplicationsHelperTrait`, that implement `isApplicationsValid()`
+- Added `Oro\Bundle\ActionBundle\Helper\ApplicationsHelperTrait`, that implements `isApplicationsValid()`
 - Added `Oro\Bundle\ActionBundle\Helper\RouteHelperInterface`, that declare getters and setters for `widgetRoute`, `formDialogRoute`, `formPageRoute`, `executionRoute`
-- Added `Oro\Bundle\ActionBundle\Helper\RouteHelperTrait`, that implement methods for `Oro\Bundle\ActionBundle\Helper\RouteHelperInterface`
+- Added `Oro\Bundle\ActionBundle\Helper\RouteHelperTrait`, that implements methods for `Oro\Bundle\ActionBundle\Helper\RouteHelperInterface`
 - Changes in `Oro\Bundle\ActionBundle\Helper\ApplicationsHelper`
     - implemented `Oro\Bundle\ActionBundle\Helper\ApplicationsHelperInterface`
     - removed unused methods
@@ -59,14 +59,14 @@ UPGRADE FROM 1.10 to 2.0
 - Added `Oro\Bundle\ActionBundle\Model\ButtonSearchContext`, that wrap parameters needed for searching of a buttons
 - Added `Oro\Bundle\ActionBundle\Provider\ButtonSearchContextProvider` for providing ButtonSearchContext by array context
 - Added `Oro\Bundle\ActionBundle\Model\ButtonInterface`, that declare methods for rendering of a button, `getOrder()`, `getTemplate()`, `getTemplateData()`, `getButtonContext()` and `getGroup()`
-- Added `Oro\Bundle\ActionBundle\Model\ButtonContext`, that provide context for `ButtonInterface`
+- Added `Oro\Bundle\ActionBundle\Model\ButtonContext`, that should be used to provide required context data to `ButtonInterface`
 - Added `Oro\Bundle\ActionBundle\Model\ButtonProviderExtensionInterface`, that declare method `find()` for collect buttons from extensions
 - Added `Oro\Bundle\ActionBundle\Provider\ButtonProvider` for providing buttons from extensions
     - methods `findAll()` and `hasButtons()` 
     - registered as service `oro_action.provider.button`
 - Added `Oro\Bundle\ActionBundle\DependencyInjection\CompilerPass\ButtonProviderPass`, that collect button providers by tag `oro.action.extension.button_provider` and inject it to `oro_action.provider.button`
 - Registered compiler pass `ButtonProviderPass` into `Oro\Bundle\ActionBundle\OroActionBundle`
-- Added `Oro\Bundle\ActionBundle\Model\OperationButton`, that implement `ButtonInterface` and specific logic for operation buttons
+- Added `Oro\Bundle\ActionBundle\Model\OperationButton`, that implements `ButtonInterface` and specific logic for operation buttons
 - Added `Oro\Bundle\ActionBundle\Extension\OperationButtonProviderExtension`, that provide operation buttons
     - implemented `find()` method
     - registered by tag `oro.action.extension.button_provider`
@@ -305,7 +305,7 @@ To migrate all labels from configuration translatable fields automatically you c
 - Changed `Oro\Bundle\WorkflowBundle\Model\AttributeAssembler::assemble`, now it processing WorkflowConfiguration::NODE_INIT_CONTEXT_ATTRIBUTE
 - Changed `Oro\Bundle\WorkflowBundle\Model\Transition`, added properties $initEntities, $initRoutes, $initContextAttribute and getters/setters for it
 - Changed `Oro\Bundle\WorkflowBundle\Model\TransitionAssembler::assembleTransition`, now it process NODE_INIT_ENTITIES, NODE_INIT_ROUTES, NODE_INIT_CONTEXT_ATTRIBUTE
-- Added `Oro\Bundle\WorkflowBundle\Model\TransitionButton`, that implement `ButtonInterface` and specific logic for transition buttons
+- Added `Oro\Bundle\WorkflowBundle\Model\TransitionButton`, that implements `ButtonInterface` and specific logic for transition buttons
 - Changed `Oro\Bundle\WorkflowBundle\Model\Workflow`, added methods `getInitEntities()` and `getInitRoutes()` to obtain the appropriate options from the configuration
 - Changed `Oro\Bundle\WorkflowBundle\Model\WorkflowAssembler::assembleAttributes`, now it pass transition configuration into `AttributeAssembler::assemble()`
 - Changes in `Oro\Bundle\WorkflowBundle\Model\WorkflowRegistry`
