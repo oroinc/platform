@@ -55,6 +55,9 @@ services:
         arguments:
             - '@oro_importexport.handler.export'
             - '@oro_message_queue.job.runner'
+            - '@oro_message_queue.client.message_producer'
+            - '@oro_config.user'
+            - '@oro_entity.doctrine_helper'
             - '@logger'
         tags:
             - { name: 'oro_message_queue.client.message_processor' }

@@ -1,15 +1,21 @@
 <?php
 namespace Oro\Bundle\ImportExportBundle\Tests\Unit\Async;
 
-use Oro\Bundle\ImportExportBundle\Async\ExportMessageProcessor;
+use Doctrine\ORM\EntityRepository;
 
+use Psr\Log\LoggerInterface;
+
+use Oro\Bundle\ConfigBundle\Config\ConfigManager;
+use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
+use Oro\Bundle\ImportExportBundle\Async\ExportMessageProcessor;
 use Oro\Bundle\ImportExportBundle\Async\Topics;
 use Oro\Bundle\ImportExportBundle\Handler\ExportHandler;
+use Oro\Bundle\UserBundle\Entity\User;
+use Oro\Component\MessageQueue\Client\MessageProducerInterface;
 use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
 use Oro\Component\MessageQueue\Job\JobRunner;
 use Oro\Component\MessageQueue\Transport\Null\NullMessage;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
-use Psr\Log\LoggerInterface;
 
 class ExportMessageProcessorTest extends \PHPUnit_Framework_TestCase
 {
@@ -18,6 +24,9 @@ class ExportMessageProcessorTest extends \PHPUnit_Framework_TestCase
         new ExportMessageProcessor(
             $this->createExportHandlerMock(),
             $this->createJobRunnerMock(),
+            $this->createMessageProducerMock(),
+            $this->createConfigManagerMock(),
+            $this->createDoctrineHelperMock(),
             $this->createLoggerInterfaceMock()
         );
     }
@@ -28,17 +37,21 @@ class ExportMessageProcessorTest extends \PHPUnit_Framework_TestCase
         $logger
             ->expects($this->once())
             ->method('critical')
-            ->with('[ExportMessageProcessor] Got invalid message: "{"processorAlias":"alias"}"')
+            ->with('[ExportMessageProcessor] Got invalid message: "{"processorAlias":"alias","userId":1}"')
         ;
 
         $message = new NullMessage();
         $message->setBody(json_encode([
             'processorAlias' => 'alias',
+            'userId' => 1
         ]));
 
         $processor = new ExportMessageProcessor(
             $this->createExportHandlerMock(),
             $this->createJobRunnerMock(),
+            $this->createMessageProducerMock(),
+            $this->createConfigManagerMock(),
+            $this->createDoctrineHelperMock(),
             $logger
         );
 
@@ -53,17 +66,21 @@ class ExportMessageProcessorTest extends \PHPUnit_Framework_TestCase
         $logger
             ->expects($this->once())
             ->method('critical')
-            ->with('[ExportMessageProcessor] Got invalid message: "{"jobName":"name"}"')
+            ->with('[ExportMessageProcessor] Got invalid message: "{"jobName":"name","userId":1}"')
         ;
 
         $message = new NullMessage();
         $message->setBody(json_encode([
             'jobName' => 'name',
+            'userId' => 1,
         ]));
 
         $processor = new ExportMessageProcessor(
             $this->createExportHandlerMock(),
             $this->createJobRunnerMock(),
+            $this->createMessageProducerMock(),
+            $this->createConfigManagerMock(),
+            $this->createDoctrineHelperMock(),
             $logger
         );
 
@@ -72,32 +89,27 @@ class ExportMessageProcessorTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(MessageProcessorInterface::REJECT, $result);
     }
 
-    public function testShouldRunUniqueJobAndRejectOnFailedExport()
+    public function testShouldRejectMessageAndLogCriticalIfUserIdIsMissing()
     {
         $logger = $this->createLoggerInterfaceMock();
         $logger
-            ->expects($this->never())
+            ->expects($this->once())
             ->method('critical')
+            ->with('[ExportMessageProcessor] Got invalid message: "{"jobName":"name","processorAlias":"alias"}"')
         ;
 
         $message = new NullMessage();
-        $message->setMessageId(123);
         $message->setBody(json_encode([
             'jobName' => 'name',
             'processorAlias' => 'alias',
         ]));
 
-        $jobRunner = $this->createJobRunnerMock();
-        $jobRunner
-            ->expects($this->once())
-            ->method('runUnique')
-            ->with(123, Topics::EXPORT .'_alias')
-            ->willReturn(false)
-        ;
-
         $processor = new ExportMessageProcessor(
             $this->createExportHandlerMock(),
-            $jobRunner,
+            $this->createJobRunnerMock(),
+            $this->createMessageProducerMock(),
+            $this->createConfigManagerMock(),
+            $this->createDoctrineHelperMock(),
             $logger
         );
 
@@ -106,38 +118,50 @@ class ExportMessageProcessorTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(MessageProcessorInterface::REJECT, $result);
     }
 
-    public function testShouldRunUniqueJobAndAckOnSuccessExport()
+    public function testShouldRejectMessageAndLogCriticalIfUserNotFound()
     {
+        $repository = $this->getMock(EntityRepository::class, [], [], '', false);
+        $repository
+            ->expects($this->once())
+            ->method('find')
+            ->with(1)
+            ->willReturn(null)
+        ;
+
+        $doctrineHelper = $this->createDoctrineHelperMock();
+        $doctrineHelper
+            ->expects($this->once())
+            ->method('getEntityRepository')
+            ->with(User::class)
+            ->willReturn($repository)
+        ;
+
         $logger = $this->createLoggerInterfaceMock();
         $logger
-            ->expects($this->never())
+            ->expects($this->once())
             ->method('critical')
+            ->with('[ExportMessageProcessor] Cannot find user by id "1"')
         ;
 
         $message = new NullMessage();
-        $message->setMessageId(123);
         $message->setBody(json_encode([
             'jobName' => 'name',
             'processorAlias' => 'alias',
+            'userId' => 1,
         ]));
-
-        $jobRunner = $this->createJobRunnerMock();
-        $jobRunner
-            ->expects($this->once())
-            ->method('runUnique')
-            ->with(123, Topics::EXPORT .'_alias')
-            ->willReturn(true)
-        ;
 
         $processor = new ExportMessageProcessor(
             $this->createExportHandlerMock(),
-            $jobRunner,
+            $this->createJobRunnerMock(),
+            $this->createMessageProducerMock(),
+            $this->createConfigManagerMock(),
+            $doctrineHelper,
             $logger
         );
 
         $result = $processor->process($message, $this->createSessionMock());
 
-        $this->assertEquals(MessageProcessorInterface::ACK, $result);
+        $this->assertEquals(MessageProcessorInterface::REJECT, $result);
     }
 
     public function testShouldReturnSubscribedTopics()
@@ -162,6 +186,30 @@ class ExportMessageProcessorTest extends \PHPUnit_Framework_TestCase
     private function createJobRunnerMock()
     {
         return $this->getMock(JobRunner::class, [], [], '', false);
+    }
+
+    /**
+     * @return \PHPUnit_Framework_MockObject_MockObject|MessageProducerInterface
+     */
+    private function createMessageProducerMock()
+    {
+        return $this->getMock(MessageProducerInterface::class, [], [], '', false);
+    }
+
+    /**
+     * @return \PHPUnit_Framework_MockObject_MockObject|ConfigManager
+     */
+    private function createConfigManagerMock()
+    {
+        return $this->getMock(ConfigManager::class, [], [], '', false);
+    }
+
+    /**
+     * @return \PHPUnit_Framework_MockObject_MockObject|DoctrineHelper
+     */
+    private function createDoctrineHelperMock()
+    {
+        return $this->getMock(DoctrineHelper::class, [], [], '', false);
     }
 
     /**

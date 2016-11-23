@@ -150,18 +150,18 @@ class ImportExportController extends Controller
     public function instantExportAction($processorAlias, Request $request)
     {
         $jobName = $request->get('exportJob', JobExecutor::JOB_EXPORT_TO_CSV);
+        $filePrefix = $request->get('filePrefix', null);
         $options = array_merge(
             $this->getOptionsFromRequest($request),
-            ['organization' => $this->getSecurityFacade()->getOrganization()]
+            ['organization' => (string) $this->getSecurityFacade()->getOrganization()]
         );
 
         $this->getMessageProducer()->send(Topics::EXPORT, [
             'jobName' => $jobName,
             'processorAlias' => $processorAlias,
-            'exportType' => ProcessorRegistry::TYPE_EXPORT,
-            'outputFormat' => 'csv',
-            'outputFilePrefix' => $request->get('filePrefix', null),
+            'outputFilePrefix' => $filePrefix,
             'options' => $options,
+            'userId' => $this->getUser()->getId(),
         ]);
 
         return new JsonResponse(['success' => true]);

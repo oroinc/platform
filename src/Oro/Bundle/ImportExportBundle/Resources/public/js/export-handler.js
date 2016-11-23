@@ -14,8 +14,8 @@ define(['underscore', 'orotranslation/js/translator', 'oroui/js/messenger'
          */
         startExportNotificationMessage: function() {
             return messenger.notificationMessage(
-                'info',
-                __('oro.importexport.export.started.message')
+                'success',
+                __('oro.importexport.export.starting.message')
             );
         },
 
@@ -27,14 +27,11 @@ define(['underscore', 'orotranslation/js/translator', 'oroui/js/messenger'
         handleExportResponse: function(data) {
             var message;
             var messageType;
-            if (! data.success) {
-                message = __(
-                    'oro.importexport.export.fail.message',
-                    {'count': data.errorsCount}
-                );
-                var errorLogLink = '<a href="' + data.url + '" class="no-hash" target="_blank">' +
-                    __('oro.importexport.export.download_error_log.message') + '</a>';
-                message += ' ' + errorLogLink;
+            if (data.hasOwnProperty('success') && data.success) {
+                message = __('oro.importexport.export.success.message');
+                messageType = 'success';
+            } else {
+                message = __('oro.importexport.export.fail.message');
                 messageType = 'error';
             }
             messenger.notificationMessage(messageType, message);
