@@ -91,7 +91,7 @@ class SearchEntityConfigListenerTest extends \PHPUnit_Framework_TestCase
             ->willReturn(['searchable' => [false, true]]);
 
         $this->searchMappingProvider->expects(self::once())
-            ->method('clearMappingCache');
+            ->method('clearCache');
         $this->searchIndexer->expects(self::once())
             ->method('reindex')
             ->with([$searchConfig->getId()->getClassName()]);
@@ -125,7 +125,7 @@ class SearchEntityConfigListenerTest extends \PHPUnit_Framework_TestCase
             ->willReturn(['searchable' => [false, true]]);
 
         $this->searchMappingProvider->expects(self::once())
-            ->method('clearMappingCache');
+            ->method('clearCache');
         $this->searchIndexer->expects(self::once())
             ->method('reindex')
             ->with([self::TEST_CLASS]);
@@ -161,7 +161,7 @@ class SearchEntityConfigListenerTest extends \PHPUnit_Framework_TestCase
             ->willReturn(['searchable' => [false, true]]);
 
         $this->searchMappingProvider->expects(self::once())
-            ->method('clearMappingCache');
+            ->method('clearCache');
         $this->searchIndexer->expects(self::once())
             ->method('reindex')
             ->with(['Test\Class1', 'Test\Class2']);
@@ -188,7 +188,7 @@ class SearchEntityConfigListenerTest extends \PHPUnit_Framework_TestCase
             ->willReturn(['searchable' => [false, true]]);
 
         $this->searchMappingProvider->expects(self::never())
-            ->method('clearMappingCache');
+            ->method('clearCache');
         $this->searchIndexer->expects(self::never())
             ->method('reindex');
 
@@ -207,7 +207,7 @@ class SearchEntityConfigListenerTest extends \PHPUnit_Framework_TestCase
         $this->configManager->expects(self::never())
             ->method('getConfigChangeSet');
         $this->searchMappingProvider->expects(self::never())
-            ->method('clearMappingCache');
+            ->method('clearCache');
         $this->searchIndexer->expects(self::never())
             ->method('reindex');
 
@@ -229,7 +229,7 @@ class SearchEntityConfigListenerTest extends \PHPUnit_Framework_TestCase
             ->willReturn([]);
 
         $this->searchMappingProvider->expects(self::never())
-            ->method('clearMappingCache');
+            ->method('clearCache');
         $this->searchIndexer->expects(self::never())
             ->method('reindex');
 
@@ -250,7 +250,7 @@ class SearchEntityConfigListenerTest extends \PHPUnit_Framework_TestCase
             ->willReturn(['searchable' => [false, true]]);
 
         $this->searchMappingProvider->expects(self::never())
-            ->method('clearMappingCache');
+            ->method('clearCache');
         $this->searchIndexer->expects(self::never())
             ->method('reindex');
 

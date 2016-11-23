@@ -9,6 +9,7 @@ Table of Contents
  - [Workflow Fields](#workflow-fields)
  - [Activation State](#activation-state)
  - [Mutually Exclusive Workflows](#mutually-exclusive-workflows)
+ - [Filtering by Scopes](#filtering-by-scopes)
  - [Configuration](#configuration)
  - [Console commands](#console-commands)
 
@@ -164,6 +165,25 @@ For example `first_workflow` and `second_workflow` workflows. In a case when we 
 Then, when new `SomeEntity` entity will be persisted, a system would perform `second_workflow` workflow start transition first.
 Additionally, if start transition of dominant workflow has unmet its conditions to start, then the second workflow would have a chance to start its flow as well.
 
+Filtering by Scopes
+-------------------
+
+If the scope configuration is provided for the workflow, the Oro application will use only the workflows, selected by filtering all available workflows using the scopes defined for `worflow_definition` scope type. 
+
+Example of scope configuration in :
+```
+        scope:
+            -
+                scopeField1: 2
+            -
+                scopeField1: 42
+                scopeField2: 3
+                scopeField3: 77             
+```
+**Note**: The scopeField1, scopeField2, and scopeField3 are scope criteria that are delivered by scope providers. Scope provider should be registered in Oro application for the `workflow_definition` scope type.  
+
+For more information about scopes see  ../../../../../ScopeBundle/Resources/doc/scope.md.
+
 Configuration
 -------------
 
@@ -183,6 +203,13 @@ workflows:
         exclusive_record_groups:
             - unique_run                          # only one started workflow for the `entity` from specified groups can exist at time
         priority: 100                             # has priority of 100
+        scopes:
+            -                                     # definition of configuration for one scope
+                scopeField1: 42                   # context for scope will have field `scopeField1` and entity with id `42`
+            -
+                scopeField1: 42
+                scopeField2: 3
+                scopeField3: 77
         steps:                                    # list of all existing steps in workflow
             started:                              # step where user should enter firstname and lastname
                 order: 10                         # order of step (ascending)

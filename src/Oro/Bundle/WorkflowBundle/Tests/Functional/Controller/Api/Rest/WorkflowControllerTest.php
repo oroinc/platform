@@ -6,9 +6,9 @@ use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\Common\Persistence\ObjectRepository;
 use Doctrine\ORM\EntityManager;
 
+use Oro\Bundle\ActionBundle\Model\ButtonSearchContext;
 use Oro\Bundle\TestFrameworkBundle\Entity\WorkflowAwareEntity;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
-
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
 use Oro\Bundle\WorkflowBundle\Model\Workflow;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowManager;
@@ -297,6 +297,59 @@ class WorkflowControllerTest extends WebTestCase
 
         $this->assertNotEquals($workflowItem->getCurrentStep(), $workflowItemNew->getCurrentStep());
         $this->assertEquals('second_point', $workflowItemNew->getCurrentStep()->getName());
+    }
+
+    /**
+     * @dataProvider startWorkflowDataProvider
+     *
+     * @param string $routeName
+     * @param string $entityClass
+     * @param string $transitionName
+     */
+    public function testStartWorkflowFromNonRelatedEntity($routeName, $entityClass, $transitionName)
+    {
+        $this->client->request(
+            'GET',
+            $this->getUrl(
+                'oro_workflow_api_rest_workflow_start',
+                [
+                    'workflowName' => LoadWorkflowDefinitions::WITH_INIT_OPTION,
+                    'transitionName' => $transitionName,
+                    'entityClass' => $entityClass,
+                    'route' => $routeName
+                ]
+            )
+        );
+
+        $result = $this->getJsonResponseContent($this->client->getResponse(), 200);
+
+        $workflowItem = $this->getRepository(WorkflowItem::class)
+            ->find($result['workflowItem']['id']);
+        /** @var ButtonSearchContext $initContext */
+        $initContext = $workflowItem->getData()->get('init_context');
+
+        $this->assertInstanceOf(ButtonSearchContext::class, $initContext);
+        $this->assertEquals($initContext->getEntityClass(), $entityClass);
+        $this->assertEquals($initContext->getRouteName(), $routeName);
+    }
+
+    /**
+     * @return array
+     */
+    public function startWorkflowDataProvider()
+    {
+        return [
+            'startFromNonRelatedEntity' => [
+                'route' => 'route1',
+                'entityClass' => 'class1',
+                'transitionName' => LoadWorkflowDefinitions::START_FROM_ENTITY_TRANSITION,
+            ],
+            'startFromRoute' => [
+                'route' => 'route2',
+                'entityClass' => 'class2',
+                'transitionName' => LoadWorkflowDefinitions::START_FROM_ROUTE_TRANSITION,
+            ]
+        ];
     }
 
     /**

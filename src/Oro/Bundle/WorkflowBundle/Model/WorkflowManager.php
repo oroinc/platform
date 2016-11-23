@@ -42,6 +42,9 @@ class WorkflowManager implements LoggerAwareInterface
     /** @var WorkflowApplicabilityFilterInterface[] */
     private $applicabilityFilters = [];
 
+    /** @var array */
+    private $startedWorkflows = [];
+
     /**
      * @param WorkflowRegistry $workflowRegistry
      * @param DoctrineHelper $doctrineHelper
@@ -165,7 +168,7 @@ class WorkflowManager implements LoggerAwareInterface
      * @param string|Transition|null $transition
      * @param array $data
      * @param bool $throwGroupException
-     * @return WorkflowItem
+     * @return WorkflowItem|null
      * @throws WorkflowRecordGroupException
      */
     public function startWorkflow($workflow, $entity, $transition = null, array $data = [], $throwGroupException = true)
@@ -185,7 +188,9 @@ class WorkflowManager implements LoggerAwareInterface
             }
         }
 
-        if (!$this->isStartAllowedByRecordGroups($entity, $workflow->getDefinition()->getExclusiveRecordGroups())) {
+        if ($this->doctrineHelper->getSingleEntityIdentifier($entity) !== null &&
+            !$this->isStartAllowedByRecordGroups($entity, $workflow->getDefinition()->getExclusiveRecordGroups())
+        ) {
             if ($throwGroupException) {
                 throw new WorkflowRecordGroupException(
                     sprintf(
@@ -199,7 +204,7 @@ class WorkflowManager implements LoggerAwareInterface
             return null;
         }
 
-        return $this->inTransaction(
+        $workflowItem = $this->inTransaction(
             function (EntityManager $em) use ($workflow, $entity, $transition, &$data) {
                 $workflowItem = $workflow->start($entity, $data, $transition);
                 $em->persist($workflowItem);
@@ -209,6 +214,9 @@ class WorkflowManager implements LoggerAwareInterface
             },
             WorkflowItem::class
         );
+        $this->unsetStartedWorkflowForEntity($workflow, $entity);
+
+        return $workflowItem;
     }
 
     /**
@@ -462,8 +470,14 @@ class WorkflowManager implements LoggerAwareInterface
         $definition = $this->workflowRegistry->getWorkflow($workflowName)->getDefinition();
 
         if ((bool)$isActive !== $definition->isActive()) {
+            $this->eventDispatcher->dispatch(
+                $isActive ? WorkflowEvents::WORKFLOW_BEFORE_ACTIVATION : WorkflowEvents::WORKFLOW_BEFORE_DEACTIVATION,
+                new WorkflowChangesEvent($definition)
+            );
+
             $definition->setActive($isActive);
             $this->doctrineHelper->getEntityManager(WorkflowDefinition::class)->flush($definition);
+
             $this->eventDispatcher->dispatch(
                 $isActive ? WorkflowEvents::WORKFLOW_ACTIVATED : WorkflowEvents::WORKFLOW_DEACTIVATED,
                 new WorkflowChangesEvent($definition)
@@ -476,14 +490,13 @@ class WorkflowManager implements LoggerAwareInterface
     }
 
     /**
+     * Checks weather workflow with such name is active in refreshed instance.
      * @param string $workflowName
      * @return bool
      */
     public function isActiveWorkflow($workflowName)
     {
-        $definition = $this->workflowRegistry->getWorkflow($workflowName)->getDefinition();
-
-        return $definition->isActive();
+        return $this->workflowRegistry->getWorkflow($workflowName)->isActive();
     }
 
     /**
@@ -528,20 +541,40 @@ class WorkflowManager implements LoggerAwareInterface
      */
     protected function isStartAllowedForEntity(Workflow $workflow, $entity)
     {
-        static $startedWorkflows = [];
-
         $entityId = $this->doctrineHelper->getSingleEntityIdentifier($entity);
-        if ($entityId && array_key_exists($workflow->getName(), $startedWorkflows)) {
-            foreach ($startedWorkflows[$workflow->getName()] as $startedEntity) {
+        if ($entityId && array_key_exists($workflow->getName(), $this->startedWorkflows)) {
+            foreach ($this->startedWorkflows[$workflow->getName()] as $startedEntity) {
                 $startedEntityId = $this->doctrineHelper->getSingleEntityIdentifier($startedEntity);
                 if ($startedEntityId && ($startedEntityId === $entityId)) {
                     return false;
                 }
             }
         }
-        $startedWorkflows[$workflow->getName()][] = $entity;
+        $this->startedWorkflows[$workflow->getName()][] = $entity;
 
         return true;
+    }
+
+    /**
+     * Unset started workflow for entity
+     *
+     * @param Workflow $workflow
+     * @param object $entity
+     */
+    protected function unsetStartedWorkflowForEntity(Workflow $workflow, $entity)
+    {
+        $entityId = $this->doctrineHelper->getSingleEntityIdentifier($entity);
+        if ($entityId === null || !array_key_exists($workflow->getName(), $this->startedWorkflows)) {
+            return;
+        }
+
+        foreach ($this->startedWorkflows[$workflow->getName()] as $key => $startedEntity) {
+            $startedEntityId = $this->doctrineHelper->getSingleEntityIdentifier($startedEntity);
+            if ($startedEntityId && ($startedEntityId === $entityId)) {
+                unset($this->startedWorkflows[$workflow->getName()][$key]);
+                break;
+            }
+        }
     }
 
     /**

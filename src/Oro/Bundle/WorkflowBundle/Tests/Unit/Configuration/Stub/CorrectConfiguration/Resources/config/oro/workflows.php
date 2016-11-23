@@ -13,6 +13,15 @@ return [
         'defaults' => [
             'active' => true,
         ],
+        'scopes' => [
+           [
+               'scope1' => 'value1',
+               'scope2' => 'value2',
+           ],
+           [
+               'scope1' => 'value3',
+           ],
+        ],
         'steps' => [
             'first_step' => [
                 'order' => 1,
@@ -159,6 +168,7 @@ return [
         'entity' => 'Second\Entity',
         'start_step' => 'second_step',
         'priority' => 0,
+        'scopes' => [],
         'defaults' => [
             'active' => false,
         ],

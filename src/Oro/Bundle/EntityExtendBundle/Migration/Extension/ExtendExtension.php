@@ -21,6 +21,10 @@ use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 use Oro\Bundle\MigrationBundle\Tools\DbIdentifierNameGenerator;
 use Oro\Bundle\MigrationBundle\Migration\Extension\NameGeneratorAwareInterface;
 
+/**
+ * @SuppressWarnings(PHPMD.ExcessiveClassLength)
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
+ */
 class ExtendExtension implements NameGeneratorAwareInterface
 {
     /**
@@ -825,6 +829,18 @@ class ExtendExtension implements NameGeneratorAwareInterface
     public function getEntityClassByTableName($tableName)
     {
         return $this->entityMetadataHelper->getEntityClassByTableName($tableName);
+    }
+
+    /**
+     * Gets an entity full class name by a table name
+     *
+     * @param string $tableName
+     *
+     * @return array
+     */
+    public function getEntityClassesByTableName($tableName)
+    {
+        return $this->entityMetadataHelper->getEntityClassesByTableName($tableName);
     }
 
     /**

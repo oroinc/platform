@@ -63,9 +63,11 @@ UPGRADE FROM 1.10 to 2.0
     - method `getWorkflowItemsByEntity` was added to retrieve all `WorkflowItems` instances from currently active (running) workflows for the entity provided as single argument.
     - method `hasWorkflowItemsByEntity` was added to get whether entity provided as single argument has any active (running) workflows with its `WorkflowItems`.
     - method `setActiveWorkflow` was removed -> method `activateWorkflow` with just one argument as `$workflowName` should be used instead. The method now just ensures that provided workflow should be active.
-        - now the method emits event `Oro\Bundle\WorkflowBundle\Event\WorkflowEvents::WORKFLOW_ACTIVATED` if workflow was activated.
+        - the method emits event `Oro\Bundle\WorkflowBundle\Event\WorkflowEvents::WORKFLOW_BEFORE_ACTIVATION` before workflow will be activated.
+        - the method emits event `Oro\Bundle\WorkflowBundle\Event\WorkflowEvents::WORKFLOW_ACTIVATED` if workflow was activated.
     - method `deactivateWorkflow` changed its signature. Now it handles single argument as `$workflowName` to ensure that provided workflow is inactive.
-        - now the method emits event `Oro\Bundle\WorkflowBundle\Event\WorkflowEvents::WORKFLOW_DEACTIVATED` if workflow was deactivated.
+        - the method emits event `Oro\Bundle\WorkflowBundle\Event\WorkflowEvents::WORKFLOW_BEFORE_DEACTIVATION` before workflow will be deactivated.
+        - the method emits event `Oro\Bundle\WorkflowBundle\Event\WorkflowEvents::WORKFLOW_DEACTIVATED` if workflow was deactivated.
     - method `resetWorkflowData` was added with `WorkflowDefinition $workflowDefinition` as single argument. It removes from database all workflow items related to corresponding workflow.
     - method `resetWorkflowItem` was removed
 - Entity configuration (`@Config()` annotation) sub-node `workflow.active_workflow` was removed in favor of `WorkflowDefinition` field `active`. Now for proper workflow activation through configuration you should use `defaults.active: true` in corresponded workflow YAML config.
@@ -106,28 +108,25 @@ UPGRADE FROM 1.10 to 2.0
 * Added `Oro\Bundle\WorkflowBundle\Model\WorkflowEntityConnector` class with purpose to check whether entity can be used in workflow as related.
 * Entity `Oro\Bundle\WorkflowBundle\Entity\WorkflowItem` now has `entityClass` field with its related workflow entity class name.
 * Service '@oro_workflow.manager' (class `Oro\Bundle\WorkflowBundle\Model\WorkflowManager`) was refactored in favor of multiple workflows support.
-* Method `Oro\Bundle\WorkflowBundle\Model\WorkflowManager::getApplicableWorkflowByEntityClass` was deprecated and its usage will raise an exception. Usage of `Oro\Bundle\WorkflowBundle\Model\WorkflowManager::getApplicableWorkflows` is recommended instead.
-* Interface `Oro\Bundle\WorkflowBundle\Entity\WorkflowAwareInterface` marked as deprecated. Its usage is forbidden.
-* Trait `Oro\Bundle\WorkflowBundle\Entity\WorkflowAwareTrait` was marked as deprecated. Its usage is forbidden.
-* Updated class constructor `Oro\Bundle\WorkflowBundle\Model\Workflow`, the first argument is `Oro\Bundle\EntityBundle\ORM\DoctrineHelper`.
+* Method `Oro\Bundle\WorkflowBundle\Model\WorkflowManager::getApplicableWorkflowByEntityClass` removed. Use `Oro\Bundle\WorkflowBundle\Model\WorkflowManager::getApplicableWorkflows` instead.
+* Interface `Oro\Bundle\WorkflowBundle\Entity\WorkflowAwareInterface` should no longer be used for entities. It completely changed.
+* Trait `Oro\Bundle\WorkflowBundle\Entity\WorkflowAwareTrait` removed.
 * Removed class `Oro\Bundle\WorkflowBundle\Field\FieldProvider` and its usages.
 * Removed class `Oro\Bundle\WorkflowBundle\Field\FieldGenerator` and its usages.
-* Updated all Unit Tests to support new `Oro\Bundle\WorkflowBundle\Model\Workflow`
-* Definition for `oro_workflow.prototype.workflow` was changed, removed `Oro\Bundle\WorkflowBundle\Model\EntityConnector` dependency
-* Updated class constructor `Oro\Bundle\WorkflowBundle\Configuration\WorkflowDefinitionConfigurationBuilder`, removed second argument `$fieldGenerator`
-* Updated REST callback `oro_api_workflow_entity_get`, now it uses `oro_entity.entity_provider` service to collect entities and fields
+* Definition for `oro_workflow.prototype.workflow` was changed, removed `Oro\Bundle\WorkflowBundle\Model\EntityConnector` dependency.
+* Updated class constructor `Oro\Bundle\WorkflowBundle\Configuration\WorkflowDefinitionConfigurationBuilder`, removed second argument `$fieldGenerator`.
+* Updated REST callback `oro_api_workflow_entity_get`, now it uses `oro_entity.entity_provider` service to collect entities and fields.
 * Removed following services:
     * oro_workflow.field_generator
     * oro_workflow.exclusion_provider
     * oro_workflow.entity_provider
     * oro_workflow.entity_field_provider
     * oro_workflow.entity_field_list_provider
-* Removed `Oro\Bundle\WorkflowBundle\Field\FieldGenerator` dependency from class `Oro\Bundle\WorkflowBundle\Model\EntityConnector`
 * Removed `Oro\Bundle\WorkflowBundle\Field\FieldGenerator` dependency from class `Oro\Bundle\WorkflowBundle\Datagrid\WorkflowStepColumnListener`, for now all required constants moved to this class
-* Added a new method `getActiveWorkflowsByEntityClass`, that returns all found workflows for an entity class
-* Added a new method `hasActiveWorkflowsByEntityClass`, that indicates if an entity class has one or more linked workflows
-* Removed method `getActiveWorkflowByEntityClass` from `Oro\Bundle\WorkflowBundle\Model\WorkflowRegistry`, use `getActiveWorkflowsByEntityClass`
-* Removed method `hasActiveWorkflowByEntityClass` from `Oro\Bundle\WorkflowBundle\Model\WorkflowRegistry`, use `hasActiveWorkflowsByEntityClass`
+* Added a new method `Oro\Bundle\WorkflowBundle\Model\WorkflowRegistry::getActiveWorkflowsByEntityClass`, that returns all found workflows for an entity class
+* Added a new method `Oro\Bundle\WorkflowBundle\Model\WorkflowRegistry::hasActiveWorkflowsByEntityClass`, that indicates if an entity class has one or more linked workflows
+* Removed method `getActiveWorkflowByEntityClass` from `Oro\Bundle\WorkflowBundle\Model\WorkflowRegistry`, use `getActiveWorkflowsByEntityClass` instead.
+* Removed method `hasActiveWorkflowByEntityClass` from `Oro\Bundle\WorkflowBundle\Model\WorkflowRegistry`, use `hasActiveWorkflowsByEntityClass` instead.
 * Class `Oro\Bundle\WorkflowBundle\Form\EventListener\InitActionsListener` renamed to `Oro\Bundle\WorkflowBundle\Form\EventListener\FormInitListener`.
 * Service 'oro_workflow.form.event_listener.init_actions' was renamed to `oro_workflow.form.event_listener.form_init`.
 * Fourth constructor argument of class `Oro\Bundle\WorkflowBundle\Form\Type\WorkflowAttributesType` was changed from `InitActionsListener $initActionsListener` to `FormInitListener $formInitListener`.
@@ -141,8 +140,7 @@ UPGRADE FROM 1.10 to 2.0
 - Added `WorkflowDefinition` property with workflow YAML configuration node `priority` to be able regulate order of workflow acceptance in cases with cross-functionality.
     For example `workflow_record_group` with two workflows in one group and auto start transition will be sorted by priority and started only one with higher priority value.
 * Removed service `@oro_workflow.manager.system_config` and its class `Oro\Bundle\WorkflowBundle\Model\WorkflowSystemConfigManager` as now there no entity configuration for active workflows. Activation and deactivation of a workflow now should be managed through WorkflowManager (`Oro\Bundle\WorkflowBundle\Model\WorkflowManager`- `@@oro_workflow.manager`)
-* Method `getApplicableWorkflows` in `Oro\Bundle\WorkflowBundle\Model\WorkflowManager` now accepts ONLY entity instance. Class name support was removed.
-* Added new interface `WorkflowApplicabilityFilterInterface` with method `Oro\Bundle\WorkflowBundle\Model\WorkflowManager::addApplicabilityFilter(WorkflowApplicabilityFilterInterface $filter)` for ability to additionally filter applicable workflows for an entity.
+               * Added new interface `WorkflowApplicabilityFilterInterface` with method `Oro\Bundle\WorkflowBundle\Model\WorkflowManager::addApplicabilityFilter(WorkflowApplicabilityFilterInterface $filter)` for ability to additionally filter applicable workflows for an entity.
 Used with new class `Oro\Bundle\WorkflowBundle\Model\WorkflowExclusiveRecordGroupFilter` now represents `exclusive_record_groups` functionality part.
 * Added `priority` property to `Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition` and workflow configuration to be able configure priorities in workflow applications.
 * Added `isActive` property to `Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition` instead of EntityConfig
@@ -150,16 +148,15 @@ Used with new class `Oro\Bundle\WorkflowBundle\Model\WorkflowExclusiveRecordGrou
 * Added methods `getExclusiveRecordGroups` and `getExclusiveActiveGroups` to `Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition`
 * `getName`, `getLabel` and `isActive` methods of `Oro\Bundle\WorkflowBundle\Model\Workflow` now are proxy methods to its `Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition` instance.
 * Removed method `getStartTransitions` from `Oro\Bundle\WorkflowBundle\Model\WorkflowManager` -  `$workflow->getTransitionManager()->getStartTransitions()` can be used instead
-* Entity config `workflow.active_workflows` was removed. Use workfows configuration boolean node `defaults.active` instead.
 * The command `oro:process:execute:job` was removed.
 * Processes configuration file now loads from `Resorces/config/oro/processes.yml` file instead of `Resources/config/oro/process.yml`
 * Processes configuration in `oro/processes.yml` file now gathered under `processes: ...` root node.
 - `oro_workflow.repository.workflow_item` inherits `oro_entity.abstract_repository`.
 - Service `oro_workflow.generator.trigger_schedule_options_verifier` (`Oro\Bundle\WorkflowBundle\Model\TriggerScheduleOptionsVerifier`) removed.
-- Service `oro_workflow.transition_schedule.process_configuration_generator` (`Oro\Bundle\WorkflowBundle\Model\TransitionSchedule\ProcessConfigurationGenerator`) wasremoved.
-- Service `oro_workflow.transition_schedule.items_fetcher` (`Oro\Bundle\WorkflowBundle\Model\TransitionSchedule\ItemsFetcher`) was removed.
-- Service `oro_workflow.transition_schedule.query_factory` (`Oro\Bundle\WorkflowBundle\Model\TransitionSchedule\TransitionQueryFactory`) was removed.
-- Service `oro_workflow.cache.process_trigger` (`Oro\Bundle\WorkflowBundle\Cache\ProcessTriggerCache`) was removed.
+- Service `oro_workflow.transition_schedule.process_configuration_generator` (`Oro\Bundle\WorkflowBundle\Model\TransitionSchedule\ProcessConfigurationGenerator`) removed.
+- Service `oro_workflow.transition_schedule.items_fetcher` (`Oro\Bundle\WorkflowBundle\Model\TransitionSchedule\ItemsFetcher`) removed.
+- Service `oro_workflow.transition_schedule.query_factory` (`Oro\Bundle\WorkflowBundle\Model\TransitionSchedule\TransitionQueryFactory`) removed.
+- Service `oro_workflow.cache.process_trigger` (`Oro\Bundle\WorkflowBundle\Cache\ProcessTriggerCache`) removed.
 - Model `Oro\Bundle\WorkflowBundle\Model\TransitionSchedule\ScheduledTransitionProcessName` removed.
 - Class `Oro\Bundle\WorkflowBundle\Model\ProcessTriggerCronScheduler` was moved to `Oro\Bundle\WorkflowBundle\Cron\ProcessTriggerCronScheduler` and constructor signature was changed to `DeferredScheduler $deferredScheduler`.
 - Added new entity `Oro\Bundle\WorkflowBundle\Entity\TransitionCronTrigger`.
@@ -236,6 +233,15 @@ To migrate all labels from configuration translatable fields automatically you c
   * `Oro\Bundle\WorkflowBundle\Model\AttributeManager`
   * `Oro\Bundle\WorkflowBundle\Model\Condition\AbstractCondition`
   * `Oro\Bundle\WorkflowBundle\Model\Condition\Configurable`
+- Added new option `--skip-scope-processing` to command `oro:workflow:definitions:load` that skip workflow scope loading.
+- Added new command `oro:workflow:scope:update` that update scopes for workflow definitions already loaded to database.
+- Added new node `sopes` to `Oro\Bundle\WorkflowBundle\Configuration\WorkflowConfiguration`.
+- Added method `Oro\Bundle\WorkflowBundle\Entity\Repository\WorkflowDefinitionRepository::getScopedByNames(array $names, ScopeCriteria $scopeCriteria)`.
+- Added ManyToMany relation from `WorkflowDefinition` to `Oro\Bundle\ScopeBundle\Entity\Scope`.
+- Added interface `Oro\Bundle\WorkflowBundle\Model/Filter\WorkflowDefinitionFilterInterface.` It can be used for extensions of `WorkflowRegisty`.
+- Removed third constructor argument `Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider $configProvider` of `WorkflowRegistry`.
+- Added method `public function addDefinitionFilter(WorkflowDefinitionFilterInterface $definitionFilter)` to `WorkflowRegistry`.
+- Added listener `oro_workflow.listener.workflow_definition_scope` for creating or updating `WorflowDefinition` to update `WorkflowScope` entities.
 
 ####LocaleBundle:
 - Added helper `Oro\Bundle\LocaleBundle\Helper\LocalizationQueryTrait` for adding necessary joins to QueryBuilder
@@ -253,6 +259,17 @@ To migrate all labels from configuration translatable fields automatically you c
     - `LanguageProvider $languageProvider`.
 - `oro_locale.repository.localization` inherits `oro_entity.abstract_repository`
 - Updated moment-timezone.js library to version 0.5.*
+
+####SearchBundle
+- Changed all `private` fields and accessors to `protected` in `Oro/Bundle/SearchBundle/Entity/IndexDecimal`, `Oro/Bundle/SearchBundle/Entity/IndexInteger`,
+`Oro/Bundle/SearchBundle/Entity/IndexText`, `Oro/Bundle/SearchBundle/Entity/Item`
+- Constructor of class `Oro/Bundle/Engine/FulltextIndexManager` was changed. New optional arguments `$tableName` and `$indexName` was added.
+- Methods `PdoMysql::getPlainSql` and `PdoPgsql::getPlainSql` were changed. New optional arguments `$tableName` and `$indexName` was added
+- `\Oro\Bundle\SearchBundle\Provider\AbstractSearchMappingProvider::getEntityConfig` returns empty array if config not found
+- `\Oro\Bundle\SearchBundle\Provider\AbstractSearchMappingProvider::getEntityModeConfig` default value is Mode::NORMAL if configurations is mepty
+- `\Oro\Bundle\SearchBundle\Engine\ObjectMapper::mapSelectedData` returns empty array if data fields not found
+- `\Oro\Bundle\SearchBundle\Query\Result\Item::_construct` signature changed, array type hintings added
+
 
 ####Layout Component:
 - Interface `Oro\Component\Layout\DataProviderInterface` was removed.
@@ -473,6 +490,8 @@ throws `\RuntimeException` if cache initialization failed. Make sure you don't a
 - `cache_warmer` is decorated to allow disable cache warming during extend commands calls. Tag your warmer with `oro_entity_extend.warmer`
 tag if it works with extend classes
 - Changed `Oro\Bundle\EntityExtendBundle\Tools\EnumSynchronizer`, now it use `Oro\Bundle\EntityConfigBundle\Translation\ConfigTranslationHelper` to save translations instead of `Doctrine\Common\Persistence\ManagerRegistry` and `Oro\Bundle\TranslationBundle\Translation\DynamicTranslationMetadataCache`.
+- `Oro\Bundle\EntityExtendBundle\EventListener\ExtendFieldValueRenderListener::getValueForCollection` always return array
+- `Oro\Bundle\EntityExtendBundle\Grid\AbstractFieldsExtension` added support of to-one relations
 
 ####ApiBundle:
 - API configuration file now loads from `Resources/config/oro/api.yml` instead of `Resources/config/api.yml`.
@@ -483,6 +502,7 @@ tag if it works with extend classes
 
 ####TestFrameworkBundle:
 - Behat elements now loads from `Resources/config/oro/behat.yml` file instead of `Resources/config/behat_elements.yml`.
+- `Oro\Bundle\TestFrameworkBundle\Test\Client::requestGrid` accepts route to test grid as optional last argument. Request pushed to `@request_stack` for proper request emulation
 
 ####ChartBundle:
 - Charts configurations now loads from `Resources/config/oro/charts.yml` file instead of `Resources/config/oro/chart.yml`.
@@ -498,6 +518,7 @@ tag if it works with extend classes
 - Constructor of `Oro\Bundle\EntityConfigBundle\Translation\ConfigTranslationHelper` changed. Now it takes as first argument instance of `Oro\Bundle\TranslationBundle\Manager\TranslationManager` and second argument still instance of `Symfony\Component\Translation\TranslatorInterface`.
 - Changed `Oro\Bundle\EntityConfigBundle\Form\EventListener\ConfigSubscriber`, now it use `Oro\Bundle\EntityConfigBundle\Translation\ConfigTranslationHelper` to save translations instead of `Doctrine\Common\Persistence\ManagerRegistry` and `Oro\Bundle\TranslationBundle\Translation\DynamicTranslationMetadataCache`.
 - Changed `Oro\Bundle\EntityConfigBundle\Form\Type\ConfigType`, now it use `Oro\Bundle\EntityConfigBundle\Translation\ConfigTranslationHelper` to save translations.
+- `Oro\Bundle\EntityConfigBundle\Config\ConfigManager::flush` now flushes $models only
 - Class `Oro\Bundle\EntityConfigBundle\Twig\ConfigExtension`
     - construction signature was changed now it takes next arguments:
         - `ConfigManager` $configManager,
@@ -666,6 +687,7 @@ placeholders:
 
 ####EntityBundle
 - `oro_entity.abstract_repository` introduced. Please inherit all your doctrine repository factory services
+- `Oro\Bundle\EntityBundle\ORM\DatabaseDriverInterface::getName` introduced
 
 Before
 ```
