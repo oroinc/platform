@@ -276,7 +276,7 @@ datagrids:
             sorters: ~
             options:
                 requireJSModules:
-                    - orouser/js/datagrid/roles-datagrid-builder
+                    - oroworkflow/js/datagrid/workflow-datagrid-builder
                 toolbarOptions:
                     placement:
                         top: false

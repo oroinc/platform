@@ -12,8 +12,12 @@ use Oro\Component\ConfigExpression\Exception\InvalidArgumentException;
 
 use Oro\Bundle\SecurityBundle\Acl\Domain\DomainObjectWrapper;
 use Oro\Bundle\SecurityBundle\SecurityFacade;
-use Oro\Bundle\WorkflowBundle\Model\WorkflowManager;
 
+/**
+ * Used to perform ACL check for ability to perform transition
+ *  - all transitions check (PERFORM_TRANSITIONS)
+ *  - specific transition check (PERFORM_TRANSITION)
+ */
 class IsGrantedWorkflowTransition extends AbstractCondition implements ContextAccessorAwareInterface
 {
     use ContextAccessorAwareTrait;
@@ -23,20 +27,15 @@ class IsGrantedWorkflowTransition extends AbstractCondition implements ContextAc
     /** @var SecurityFacade */
     protected $securityFacade;
 
-    /** @var WorkflowManager */
-    protected $workflowManager;
-
     /** @var string */
     protected $transitionName;
 
     /**
      * @param SecurityFacade  $securityFacade
-     * @param WorkflowManager $workflowManager
      */
-    public function __construct(SecurityFacade $securityFacade, WorkflowManager $workflowManager)
+    public function __construct(SecurityFacade $securityFacade)
     {
         $this->securityFacade = $securityFacade;
-        $this->workflowManager = $workflowManager;
     }
 
     /**
@@ -52,8 +51,7 @@ class IsGrantedWorkflowTransition extends AbstractCondition implements ContextAc
      */
     public function initialize(array $options)
     {
-        $count = count($options);
-        if ($count === 1) {
+        if (1 === count($options)) {
             $this->transitionName = reset($options);
             if (!$this->transitionName) {
                 throw new InvalidArgumentException('ACL object must not be empty.');
@@ -77,15 +75,11 @@ class IsGrantedWorkflowTransition extends AbstractCondition implements ContextAc
         }
 
         $entity = $context->getEntity();
-        $workflow = $this->workflowManager->getWorkflow($context->getWorkflowName());
-        $workflowName = $workflow->getName();
+        $workflowName = $context->getWorkflowName();
 
         if (!$this->securityFacade->isGranted(
             'PERFORM_TRANSITIONS',
-            new DomainObjectWrapper(
-                $entity,
-                new ObjectIdentity('workflow', $workflow->getName())
-            )
+            new DomainObjectWrapper($entity, new ObjectIdentity('workflow', $workflowName))
         )) {
             //performing of transitions is forbidden on workflow level
             return false;
@@ -94,10 +88,7 @@ class IsGrantedWorkflowTransition extends AbstractCondition implements ContextAc
         if (!$this->securityFacade->isGranted(
             'PERFORM_TRANSITION',
             new FieldVote(
-                new DomainObjectWrapper(
-                    $entity,
-                    new ObjectIdentity('workflow', $workflowName)
-                ),
+                new DomainObjectWrapper($entity, new ObjectIdentity('workflow', $workflowName)),
                 $this->transitionName
             )
         )) {
