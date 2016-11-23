@@ -29,9 +29,9 @@ An *Operation* can be enabled or disabled. Other fields of the operation contain
 options, an order of display buttons.
  More options see in [Operation Configuration](#operation-configuration).
  
- * [**Buttons**](./buttons.md) - bring a way to expose any kind of actions (Operations, for example) to UI for a proper context through a 
- specific (ButtonsProviderExtension)[../../Model/ButtonProviderExtensionInterface.php] together with
-  (Buttons)[../../Model/ButtonInterface.php] that were matched by a context.
+  * [**Buttons**](./buttons.md) - bring a way to expose any kind of actions (Operations, for example) to UI for a proper context through a 
+ specific [ButtonsProviderExtension](../../Model/ButtonProviderExtensionInterface.php) together with
+  [Buttons](../../Model/ButtonInterface.php) that were matched by a context.
      
   * [**ActionGroup**](./action-groups.md) - another one of the main models in ActionBundle. A named bunch of Actions with entry
 `parameters` (required or optional, typed or not) and conditions. 
