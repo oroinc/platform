@@ -34,4 +34,9 @@ interface ButtonInterface
      * @return string
      */
     public function getGroup();
+
+    /**
+     * @return array
+     */
+    public function getAttributesData();
 }

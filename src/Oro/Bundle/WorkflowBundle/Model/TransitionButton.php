@@ -36,7 +36,7 @@ class TransitionButton implements ButtonInterface
      */
     public function getOrder()
     {
-        return $this->workflow->getDefinition()->getPriority();
+        return $this->workflow->getDefinition()->getPriority() + 100;
     }
 
     /**
@@ -86,5 +86,30 @@ class TransitionButton implements ButtonInterface
     public function getGroup()
     {
         return OperationRegistry::DEFAULT_GROUP;
+    }
+
+    /**
+     * @return array
+     */
+    public function getAttributesData()
+    {
+        $definition = $this->transition;
+
+        $frontendOptions = $definition->getFrontendOptions();
+
+        if (!empty($frontendOptions['title'])) {
+            $title = $frontendOptions['title'];
+        } else {
+            $title = $definition->getLabel();
+        }
+        $icon = !empty($buttonOptions['icon']) ? $buttonOptions['icon'] : '';
+
+        return [
+            'name' => $this->transition->getName(),
+            'label' => $this->transition->getLabel(),
+            'title' => $title,
+            'icon' =>  $icon,
+            'button' => $this->operation,
+        ];
     }
 }

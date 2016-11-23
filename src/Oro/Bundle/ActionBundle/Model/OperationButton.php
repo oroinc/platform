@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\ActionBundle\Model;
 
+use Oro\Bundle\TranslationBundle\Manager\TranslationManager;
+
 class OperationButton implements ButtonInterface
 {
     const DEFAULT_TEMPLATE = 'OroActionBundle:Operation:button.html.twig';
@@ -59,6 +61,7 @@ class OperationButton implements ButtonInterface
         return array_merge($defaultData, $customData, [
             'operation' => $this->operation,
             'params' => $this->operation->getDefinition(),
+            'buttonContext' => $this->buttonContext,
         ]);
     }
 
@@ -78,5 +81,31 @@ class OperationButton implements ButtonInterface
         $buttonOptions = $this->operation->getDefinition()->getButtonOptions();
 
         return isset($buttonOptions['group']) ? $buttonOptions['group'] : null;
+    }
+
+    /**
+     * @return array
+     */
+    public function getAttributesData()
+    {
+        $definition = $this->operation->getDefinition();
+
+        $frontendOptions = $definition->getFrontendOptions();
+        $buttonOptions = $definition->getButtonOptions();
+        if (!empty($frontendOptions['title'])) {
+            $title = $frontendOptions['title'];
+        } else {
+            $title = $definition->getLabel();
+        }
+        $icon = !empty($buttonOptions['icon']) ? $buttonOptions['icon'] : '';
+
+        return [
+            'name' => $definition->getName(),
+            'label' => $definition->getLabel(),
+            'title' => $title,
+            'icon' => $icon,
+            'action' => $this->operation,
+            'trans_domain' => TranslationManager::DEFAULT_DOMAIN,
+        ];
     }
 }

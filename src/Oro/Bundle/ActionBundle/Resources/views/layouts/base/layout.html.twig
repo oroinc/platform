@@ -19,6 +19,16 @@
     {% endspaceless %}
 {% endmacro %}
 
+{% macro get_button_attributes(button, cssClasses) %}
+	{% set entityClass = button.buttonContext.getEntityClass() %}
+	{% set entityId  =  button.buttonContext.getEntityId() %}
+	{% spaceless %}
+		{% if(button.templateData.operation is defined and button.templateData.operation.definition is defined)  %}
+			{{ _self.get_action_attributes(button.getAttributesData(), entityClass, entityId, cssClasses) }}
+		{% endif %}
+	{% endspaceless %}
+{% endmacro %}
+
 {% block action_line_buttons_widget %}
     {% set attr = attr|merge({
         class: attr.class|default('') ~ " row-fluid",
