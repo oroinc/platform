@@ -19,7 +19,7 @@ services:
         class: %oro_layout.layout_factory_builder.class%
         arguments:
             - '@oro_layout.processor.expression'
-            - '@oro_layout.cache.block_view_cache'
+            - "@=parameter('kernel.environment') == 'prod' ? service('oro_layout.cache.block_view_cache') : null"
         calls:
             - [addExtension, ['@oro_layout.extension']]
             - [addExtension, ['@oro_layout.theme_extension']]
