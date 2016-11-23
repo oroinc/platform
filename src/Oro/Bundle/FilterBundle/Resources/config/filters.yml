@@ -174,11 +174,20 @@ services:
         tags:
             - { name: oro_filter.extension.orm_filter.filter, type: multi_enum, datasource: orm }
 
-    oro_filter.date_grouping_range_filter:
+    oro_filter.date_grouping_filter:
         class: Oro\Bundle\FilterBundle\Filter\DateGroupingFilter
         arguments:
             - '@form.factory'
             - '@oro_filter.filter_utility'
             - '@oro_filter.date_filter_utility'
         tags:
-            - { name: oro_filter.extension.orm_filter.filter, type: date-grouping, datasource: orm }
+            - { name: oro_filter.extension.orm_filter.filter, type: date_grouping, datasource: orm }
+
+    oro_filter.skip_empty_periods_filter:
+        class: Oro\Bundle\FilterBundle\Filter\SkipEmptyPeriodsFilter
+        arguments:
+            - '@form.factory'
+            - '@oro_filter.filter_utility'
+            - '@oro_filter.date_filter_utility'
+        tags:
+            - { name: oro_filter.extension.orm_filter.filter, type: skip_empty_periods, datasource: orm }

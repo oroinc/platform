@@ -4,13 +4,11 @@ namespace Oro\Bundle\FilterBundle\Form\Type\Filter;
 
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
-class DateGroupingFilterType extends AbstractChoiceType
+class SkipEmptyPeriodsFilterType extends AbstractChoiceType
 {
-    const NAME = 'oro_type_date_grouping_filter';
-    const TYPE_DAY = 'day';
-    const TYPE_MONTH = 'month';
-    const TYPE_QUARTER = 'quarter';
-    const TYPE_YEAR = 'year';
+    const NAME = 'oro_type_skip_empty_periods_filter';
+    const TYPE_YES = 'Yes';
+    const TYPE_NO = 'No';
 
     /**
      * {@inheritDoc}
@@ -45,7 +43,7 @@ class DateGroupingFilterType extends AbstractChoiceType
             array(
                 'field_type'       => 'choice',
                 'field_options'    => ['choices' => $this->getGroupChoices()],
-                'default_value'    => self::TYPE_DAY,
+                'default_value'    => self::TYPE_YES,
                 'null_value'       => null,
                 'class'            => null,
                 'populate_default' => true,
@@ -56,9 +54,7 @@ class DateGroupingFilterType extends AbstractChoiceType
     protected function getGroupChoices()
     {
         return [
-            self::TYPE_MONTH,
-            self::TYPE_QUARTER,
-            self::TYPE_YEAR,
+            self::TYPE_NO,
         ];
     }
 }

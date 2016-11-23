@@ -138,3 +138,11 @@ services:
                 - '@oro_filter.provider.datemodifierprovider'
             tags:
                 - { name: form.type, alias: oro_type_date_grouping_filter }
+
+    oro_filter.form.type.skip_empty_periods:
+        class: Oro\Bundle\FilterBundle\Form\Type\Filter\SkipEmptyPeriodsFilterType
+        arguments:
+            - '@translator'
+            - '@oro_filter.provider.datemodifierprovider'
+        tags:
+            - { name: form.type, alias: oro_type_skip_empty_periods_filter }
