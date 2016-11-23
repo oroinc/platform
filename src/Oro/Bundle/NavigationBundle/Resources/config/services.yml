@@ -358,22 +358,19 @@ services:
         tags:
             - { name: oro_menu.builder, priority: 100 }
 
-    oro_navigation.repository.menu_update:
-        parent: oro_entity.abstract_repository
-        arguments:
-            - '%oro_navigation.entity.menu_update.class%'
-
     oro_navigation.ownership_provider.global:
         class: Oro\Bundle\NavigationBundle\Menu\Provider\GlobalOwnershipProvider
         arguments:
-            - '@oro_navigation.repository.menu_update'
+            - '@doctrine'
+            - '%oro_navigation.entity.menu_update.class%'
         tags:
             - { name: oro_navigation.ownership_provider, area: default, priority: 100 }
 
     oro_navigation.ownership_provider.user:
         class: Oro\Bundle\NavigationBundle\Menu\Provider\UserOwnershipProvider
         arguments:
-            - '@oro_navigation.repository.menu_update'
+            - '@doctrine'
+            - '%oro_navigation.entity.menu_update.class%'
             - '@security.token_storage'
         tags:
             - { name: oro_navigation.ownership_provider, area: default, priority: 200 }
