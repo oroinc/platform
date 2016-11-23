@@ -357,7 +357,10 @@ class ConfigurableAddOrReplaceStrategy extends AbstractImportStrategy
             if (null !== $value) {
                 if ('' !== $value) {
                     if (is_object($value)) {
-                        $notEmptyValues[$fieldName] = $this->databaseHelper->getIdentifier($value);
+                        $identifier = $this->databaseHelper->getIdentifier($value);
+                        if ($identifier !== null) {
+                            $notEmptyValues[$fieldName] = $identifier;
+                        }
                     } else {
                         $notEmptyValues[$fieldName] = $value;
                     }
