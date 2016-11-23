@@ -35,11 +35,17 @@ class MessageFactory
     {
         /** @var \Swift_Mailer $mailer */
         $mailer = $this->container->get('swiftmailer.mailer.default');
-        /** @var ConfigManager $config */
-        $config = $this->container->get('oro_config.global');
 
         /** @var \Swift_Message $message */
         $message = $mailer->createMessage();
+
+        if (!$this->container->has('oro_config.global')) {
+            return $message;
+        }
+
+        /** @var ConfigManager $config */
+        $config = $this->container->get('oro_config.global');
+
         $recipients = $config->get(Configuration::getFullConfigKey(Configuration::EMAIL_NOTIFICATION_RECIPIENTS));
         if (!empty($recipients)) {
             $recipients = explode(';', $recipients);

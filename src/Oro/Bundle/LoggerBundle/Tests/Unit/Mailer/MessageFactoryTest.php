@@ -45,6 +45,10 @@ class MessageFactoryTest extends \PHPUnit_Framework_TestCase
                     ['oro_config.global', 1, $config],
                 ]
             );
+        $container->expects($this->once())
+            ->method('has')
+            ->with('oro_config.global')
+            ->willReturn(true);
 
         $messageFactory->setContainer($container);
         $messageFactory->createMessage('text', []);
@@ -52,5 +56,31 @@ class MessageFactoryTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('Subject', $message->getSubject());
         $this->assertEquals(['recipient1@example.com' => null, 'recipient2@example.com' => null], $message->getTo());
         $this->assertEquals(['sender@example.com' => null], $message->getFrom());
+    }
+
+    public function testCreateMessageWithoutConfig()
+    {
+        $messageFactory = new MessageFactory();
+        $message = new \Swift_Message();
+
+        $mailer = $this->getMockBuilder(\Swift_Mailer::class)->disableOriginalConstructor()->getMock();
+        $mailer->expects($this->once())
+            ->method('createMessage')
+            ->willReturn($message);
+
+        $container = $this->getMock(ContainerInterface::class);
+        $container->expects($this->once())
+            ->method('get')
+            ->with('swiftmailer.mailer.default')
+            ->willReturn($mailer);
+
+        $container->expects($this->once())
+            ->method('has')
+            ->with('oro_config.global')
+            ->willReturn(false);
+
+
+        $messageFactory->setContainer($container);
+        $messageFactory->createMessage('text', []);
     }
 }

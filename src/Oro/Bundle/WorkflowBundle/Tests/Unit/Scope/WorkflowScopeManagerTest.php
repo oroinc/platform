@@ -172,7 +172,7 @@ class WorkflowScopeManagerTest extends \PHPUnit_Framework_TestCase
             [
                 'definition' => $this->createWorkflowDefinition([[self::FIELD_NAME => self::ENTITY_ID]]),
                 'exception' => 'Oro\Bundle\WorkflowBundle\Exception\WorkflowScopeConfigurationException',
-                'exceptionMessage' => 'Could not found entity "stdClass" with id "42".'
+                'exceptionMessage' => 'Cannot find entity "stdClass" with id "42".'
             ]
         ];
     }
