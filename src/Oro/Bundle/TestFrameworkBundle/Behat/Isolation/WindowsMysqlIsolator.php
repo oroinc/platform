@@ -121,7 +121,7 @@ class WindowsMysqlIsolator extends AbstractDbOsRelatedIsolator implements Isolat
     {
         $this->restoreDbFromDumpProcess = $this->runProcess(sprintf(
             'for table in `mysql -h %s -u %s -p%s -s -N -e "use %s;show tables from %4$s;"`; '.
-            'do mysql -u root -p06021980 -s -N -e "use %4$s;rename table %4$s.$table to %5$s.$table;"; done;',
+            'do mysql -h %1$s -u %2$s -p%3$s -s -N -e "use %4$s;rename table %4$s.$table to %5$s.$table;"; done;',
             $this->dbHost,
             $this->dbUser,
             $this->dbPass,
