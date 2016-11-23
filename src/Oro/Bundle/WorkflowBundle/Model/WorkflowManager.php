@@ -45,6 +45,9 @@ class WorkflowManager implements LoggerAwareInterface
     /** @var WorkflowApplicabilityFilterInterface[] */
     private $applicabilityFilters = [];
 
+    /** @var array */
+    private $startedWorkflows = [];
+
     /**
      * @param WorkflowRegistry $workflowRegistry
      * @param DoctrineHelper $doctrineHelper
@@ -188,7 +191,9 @@ class WorkflowManager implements LoggerAwareInterface
             }
         }
 
-        if (!$this->isStartAllowedByRecordGroups($entity, $workflow->getDefinition()->getExclusiveRecordGroups())) {
+        if ($this->doctrineHelper->getSingleEntityIdentifier($entity) !== null &&
+            !$this->isStartAllowedByRecordGroups($entity, $workflow->getDefinition()->getExclusiveRecordGroups())
+        ) {
             if ($throwGroupException) {
                 throw new WorkflowRecordGroupException(
                     sprintf(
@@ -540,15 +545,15 @@ class WorkflowManager implements LoggerAwareInterface
     protected function isStartAllowedForEntity(Workflow $workflow, $entity)
     {
         $entityId = $this->doctrineHelper->getSingleEntityIdentifier($entity);
-        if ($entityId && array_key_exists($workflow->getName(), self::$startedWorkflows)) {
-            foreach (self::$startedWorkflows[$workflow->getName()] as $startedEntity) {
+        if ($entityId && array_key_exists($workflow->getName(), $this->startedWorkflows)) {
+            foreach ($this->startedWorkflows[$workflow->getName()] as $startedEntity) {
                 $startedEntityId = $this->doctrineHelper->getSingleEntityIdentifier($startedEntity);
                 if ($startedEntityId && ($startedEntityId === $entityId)) {
                     return false;
                 }
             }
         }
-        self::$startedWorkflows[$workflow->getName()][] = $entity;
+        $this->startedWorkflows[$workflow->getName()][] = $entity;
 
         return true;
     }
