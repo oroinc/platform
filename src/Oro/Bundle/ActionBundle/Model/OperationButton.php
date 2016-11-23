@@ -18,13 +18,20 @@ class OperationButton implements ButtonInterface
     protected $buttonContext;
 
     /**
+     * @var ActionData
+     */
+    protected $data;
+
+    /**
      * @param Operation $operation
      * @param ButtonContext $buttonContext
+     * @param ActionData $data
      */
-    public function __construct(Operation $operation, ButtonContext $buttonContext)
+    public function __construct(Operation $operation, ButtonContext $buttonContext, ActionData $data)
     {
         $this->operation = $operation;
         $this->buttonContext = $buttonContext;
+        $this->data = $data;
     }
 
     /**
@@ -59,6 +66,7 @@ class OperationButton implements ButtonInterface
         return array_merge($defaultData, $customData, [
             'operation' => $this->operation,
             'params' => $this->operation->getDefinition(),
+            'actionData' => $this->data
         ]);
     }
 

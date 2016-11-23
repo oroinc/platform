@@ -51,7 +51,8 @@ class OperationButtonProviderExtension implements ButtonProviderExtensionInterfa
             if ($operation->isAvailable($actionData)) {
                 $result[] = new OperationButton(
                     $operation,
-                    $this->generateButtonContext($operation, $buttonSearchContext)
+                    $this->generateButtonContext($operation, $buttonSearchContext),
+                    $actionData
                 );
             }
         }

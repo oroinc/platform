@@ -108,8 +108,8 @@ class OperationButtonProviderExtensionTest extends \PHPUnit_Framework_TestCase
                 'operations' => [$operation1, $this->createOperationMock(false), $operation2],
                 'buttonSearchContext' => $buttonSearchContext,
                 'expected' => [
-                    new OperationButton($operation1, $buttonContext1),
-                    new OperationButton($operation2, $buttonContext2)
+                    new OperationButton($operation1, $buttonContext1, new ActionData()),
+                    new OperationButton($operation2, $buttonContext2, new ActionData())
                 ]
             ],
             'not available' => [
