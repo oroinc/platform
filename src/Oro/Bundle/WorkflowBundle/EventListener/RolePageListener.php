@@ -44,8 +44,13 @@ class RolePageListener
             return;
         }
 
-        if ($this->request->attributes->get('_route') !== 'oro_user_role_update') {
-            // we are not at edit role page
+        $route = $this->request->attributes->get('_route');
+        $routeParameters = $this->request->attributes->get('_route_params');
+
+        if (!(($route === 'oro_action_widget_form' && $routeParameters['operationName'] === 'clone_role')
+            || in_array($route, ['oro_user_role_update', 'oro_user_role_create'], true))
+        ) {
+            // we are not at manipulate role page
             return;
         }
 
@@ -69,7 +74,7 @@ class RolePageListener
         }
 
         if ($this->request->attributes->get('_route') !== 'oro_user_role_view') {
-            // we are not at edit view page
+            // we are not at view role page
             return;
         }
 

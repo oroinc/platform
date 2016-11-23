@@ -41,7 +41,7 @@ class RolePageListenerTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals([], $event->getFormData());
     }
 
-    public function testOnUpdatePageRenderOnNonUpdateRolePage()
+    public function testOnUpdatePageRenderOnWrongPage()
     {
         $event = new BeforeFormRenderEvent(
             $this->getMock('Symfony\Component\Form\FormView'),
@@ -56,7 +56,31 @@ class RolePageListenerTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals([], $event->getFormData());
     }
 
-    public function testOnUpdatePageRender()
+    public function testOnUpdatePageRenderOnNonCloneRolePage()
+    {
+        $event = new BeforeFormRenderEvent(
+            $this->getMock('Symfony\Component\Form\FormView'),
+            [],
+            $this->getMock('\Twig_Environment')
+        );
+
+        $this->listener->setRequest(
+            new Request(
+                [],
+                [],
+                ['_route' => 'oro_action_widget_form', '_route_params' => ['operationName' => 'some_operation']]
+            )
+        );
+
+        $this->listener->onUpdatePageRender($event);
+
+        $this->assertEquals([], $event->getFormData());
+    }
+
+    /**
+     * @dataProvider onUpdatePageRenderRoutesProvider
+     */
+    public function testOnUpdatePageRender($routeName, $routeParameters = [])
     {
         $entity = new Role();
         $form = new FormView();
@@ -87,7 +111,7 @@ class RolePageListenerTest extends \PHPUnit_Framework_TestCase
             ->willReturn($renderedHtml);
 
 
-        $this->listener->setRequest(new Request([], [], ['_route' => 'oro_user_role_update']));
+        $this->listener->setRequest(new Request([], [], ['_route' => $routeName, '_route_params' => $routeParameters]));
 
         $this->listener->onUpdatePageRender($event);
 
@@ -99,6 +123,15 @@ class RolePageListenerTest extends \PHPUnit_Framework_TestCase
             [['data' => [$renderedHtml]]],
             $workflowBlock['subblocks']
         );
+    }
+
+    public function onUpdatePageRenderRoutesProvider()
+    {
+        return [
+            ['oro_user_role_update'],
+            ['oro_user_role_create'],
+            ['oro_action_widget_form', ['operationName' => 'clone_role']],
+        ];
     }
 
     public function testOnViewPageRenderWithoutRequest()
