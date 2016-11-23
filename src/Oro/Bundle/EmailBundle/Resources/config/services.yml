@@ -347,6 +347,14 @@ services:
         tags:
             - { name: 'oro_message_queue.client.message_processor' }
 
+    oro_email.async.update_email_associations:
+        class: 'Oro\Bundle\EmailBundle\Async\UpdateEmailAssociationsMessageProcessor'
+        arguments:
+            - '@oro_email.async.manager.association_manager'
+            - '@logger'
+        tags:
+            - { name: 'oro_message_queue.client.message_processor' }
+
     oro_email.async.update_email_owner_association:
         class: 'Oro\Bundle\EmailBundle\Async\UpdateEmailOwnerAssociationMessageProcessor'
         arguments:
