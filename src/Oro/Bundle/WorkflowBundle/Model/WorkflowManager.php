@@ -212,8 +212,8 @@ class WorkflowManager implements LoggerAwareInterface
             },
             WorkflowItem::class
         );
-
         $this->unsetStartedWorkflowForEntity($workflow, $entity);
+
         return $workflowItem;
     }
 
@@ -539,11 +539,9 @@ class WorkflowManager implements LoggerAwareInterface
      */
     protected function isStartAllowedForEntity(Workflow $workflow, $entity)
     {
-        $startedWorkflows = self::$startedWorkflows;
-
         $entityId = $this->doctrineHelper->getSingleEntityIdentifier($entity);
-        if ($entityId && array_key_exists($workflow->getName(), $startedWorkflows)) {
-            foreach ($startedWorkflows[$workflow->getName()] as $startedEntity) {
+        if ($entityId && array_key_exists($workflow->getName(), self::$startedWorkflows)) {
+            foreach (self::$startedWorkflows[$workflow->getName()] as $startedEntity) {
                 $startedEntityId = $this->doctrineHelper->getSingleEntityIdentifier($startedEntity);
                 if ($startedEntityId && ($startedEntityId === $entityId)) {
                     return false;
@@ -563,14 +561,12 @@ class WorkflowManager implements LoggerAwareInterface
      */
     protected function unsetStartedWorkflowForEntity(Workflow $workflow, $entity)
     {
-        $startedWorkflows = self::$startedWorkflows;
-
         $entityId = $this->doctrineHelper->getSingleEntityIdentifier($entity);
-        if ($entityId === null || !array_key_exists($workflow->getName(), $startedWorkflows)) {
+        if ($entityId === null || !array_key_exists($workflow->getName(), self::$startedWorkflows)) {
             return;
         }
 
-        foreach ($startedWorkflows[$workflow->getName()] as $key => $startedEntity) {
+        foreach (self::$startedWorkflows[$workflow->getName()] as $key => $startedEntity) {
             $startedEntityId = $this->doctrineHelper->getSingleEntityIdentifier($startedEntity);
             if ($startedEntityId && ($startedEntityId === $entityId)) {
                 unset(self::$startedWorkflows[$workflow->getName()][$key]);

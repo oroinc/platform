@@ -4,11 +4,11 @@ namespace Oro\Bundle\WorkflowBundle\Model;
 
 use Doctrine\Common\Collections\ArrayCollection;
 
-use Oro\Bundle\ActionBundle\Model\ButtonSearchContext;
 use Symfony\Component\Translation\TranslatorInterface;
 
 use Oro\Bundle\ActionBundle\Model\Attribute as BaseAttribute;
 use Oro\Bundle\ActionBundle\Model\AttributeGuesser;
+use Oro\Bundle\ActionBundle\Model\ButtonSearchContext;
 use Oro\Bundle\WorkflowBundle\Configuration\WorkflowConfiguration;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Helper\WorkflowTranslationHelper;
