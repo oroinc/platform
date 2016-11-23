@@ -93,7 +93,7 @@ trait FallbackTrait
         );
 
         if ($filteredValues->count() > 1) {
-            $title = $localization ? $localization->getName() : 'default';
+            $title = $localization ? $localization->getName() : Localization::DEFAULT_LOCALIZATION;
             throw new \LogicException(sprintf('There must be only one %s title', $title));
         }
 

@@ -191,8 +191,6 @@ datagrids:
                     data_name: w.createdAt
                 relatedEntity:
                     data_name: w.relatedEntity
-            default:
-                label: %oro_datagrid.extension.orm_sorter.class%::DIRECTION_ASC
         actions:
             view:
                 type:          navigate
