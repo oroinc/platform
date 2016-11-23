@@ -17,11 +17,9 @@ use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
-use Oro\Bundle\EntityExtendBundle\Extend\RelationType;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 use Oro\Bundle\FilterBundle\Grid\Extension\Configuration as FilterConfiguration;
 use Oro\Bundle\DataGridBundle\Extension\FieldAcl\Configuration as FieldAclConfiguration;
-use Oro\Component\PhpUtils\ArrayUtil;
 
 abstract class AbstractFieldsExtension extends AbstractExtension
 {
@@ -64,22 +62,7 @@ abstract class AbstractFieldsExtension extends AbstractExtension
     {
         $fields = $this->getFields($config);
         foreach ($fields as $field) {
-            $fieldName = $field->getFieldName();
-            $columnOptions =
-                [
-                    DatagridGuesser::FORMATTER => $config->offsetGetByPath(
-                        sprintf('[%s][%s]', FormatterConfiguration::COLUMNS_KEY, $fieldName),
-                        []
-                    ),
-                    DatagridGuesser::SORTER => $config->offsetGetByPath(
-                        sprintf('%s[%s]', SorterConfiguration::COLUMNS_PATH, $fieldName),
-                        []
-                    ),
-                    DatagridGuesser::FILTER => $config->offsetGetByPath(
-                        sprintf('%s[%s]', FilterConfiguration::COLUMNS_PATH, $fieldName),
-                        []
-                    ),
-                ];
+            $columnOptions = [];
             $this->prepareColumnOptions($field, $columnOptions);
             $this->datagridGuesser->setColumnOptions($config, $field->getFieldName(), $columnOptions);
         }
@@ -98,9 +81,9 @@ abstract class AbstractFieldsExtension extends AbstractExtension
         $entityClassName = $this->entityClassResolver->getEntityClass($this->getEntityName($config));
 
         /** @var QueryBuilder $qb */
-        $qb = $datasource->getQueryBuilder();
+        $qb        = $datasource->getQueryBuilder();
         $fromParts = $qb->getDQLPart('from');
-        $alias = false;
+        $alias     = false;
 
         /** @var From $fromPart */
         foreach ($fromParts as $fromPart) {
@@ -115,17 +98,6 @@ abstract class AbstractFieldsExtension extends AbstractExtension
             $qb->from($entityClassName, $alias);
         }
 
-        $this->buildExpression($fields, $qb, $config, $alias);
-    }
-
-    /**
-     * @param FieldConfigId[] $fields
-     * @param QueryBuilder $qb
-     * @param DatagridConfiguration $config
-     * @param string $alias
-     */
-    public function buildExpression(array $fields, QueryBuilder $qb, DatagridConfiguration $config, $alias)
-    {
         $relationIndex    = 0;
         $relationTemplate = 'auto_rel_%d';
         foreach ($fields as $field) {
@@ -138,33 +110,16 @@ abstract class AbstractFieldsExtension extends AbstractExtension
                     $columnDataName = $fieldName;
                     $sorterDataName = sprintf('%s.%s', $joinAlias, $extendFieldConfig->get('target_field'));
                     $selectExpr     = sprintf('IDENTITY(%s.%s) as %s', $alias, $fieldName, $fieldName);
-                    $filterDataName = sprintf('%s.%s', $alias, $fieldName);
                     break;
                 case 'multiEnum':
                     $columnDataName = ExtendHelper::getMultiEnumSnapshotFieldName($fieldName);
                     $sorterDataName = sprintf('%s.%s', $alias, $columnDataName);
-                    $filterDataName = sprintf('%s.%s', $alias, $fieldName);
                     $selectExpr     = $sorterDataName;
-                    break;
-                case RelationType::MANY_TO_ONE:
-                case RelationType::ONE_TO_ONE:
-                case RelationType::TO_ONE:
-                    $extendFieldConfig = $this->getFieldConfig('extend', $field);
-                    $qb->leftJoin(sprintf('%s.%s', $alias, $fieldName), $fieldName);
-
-                    $dataName = $fieldName.'_data';
-                    $targetField = $extendFieldConfig->get('target_field');
-                    $dataFieldName = sprintf('%s.%s', $fieldName, $targetField);
-                    if ($qb->getDQLPart('groupBy')) {
-                        $qb->addGroupBy($dataFieldName);
-                    }
-                    $selectExpr = sprintf('%s as %s', $dataFieldName, $dataName);
-                    $columnDataName = $sorterDataName = $dataName;
-                    $filterDataName = sprintf('IDENTITY(%s.%s)', $alias, $fieldName);
                     break;
                 default:
                     $columnDataName = $fieldName;
-                    $selectExpr = $sorterDataName = $filterDataName = sprintf('%s.%s', $alias, $fieldName);
+                    $sorterDataName = sprintf('%s.%s', $alias, $fieldName);
+                    $selectExpr     = $sorterDataName;
                     break;
             }
 
@@ -175,15 +130,14 @@ abstract class AbstractFieldsExtension extends AbstractExtension
                 sprintf('[%s][%s][data_name]', FormatterConfiguration::COLUMNS_KEY, $fieldName),
                 $columnDataName
             );
-
-            $path = sprintf('%s[%s][data_name]', SorterConfiguration::COLUMNS_PATH, $fieldName);
-            if ($fieldName === $config->offsetGetByPath($path, $fieldName)) {
-                $config->offsetSetByPath($path, $sorterDataName);
-            }
-            $path = sprintf('%s[%s][data_name]', FilterConfiguration::COLUMNS_PATH, $fieldName);
-            if ($fieldName === $config->offsetGetByPath($path, $fieldName)) {
-                $config->offsetSetByPath($path, $filterDataName);
-            }
+            $config->offsetSetByPath(
+                sprintf('%s[%s][data_name]', SorterConfiguration::COLUMNS_PATH, $fieldName),
+                $sorterDataName
+            );
+            $config->offsetSetByPath(
+                sprintf('%s[%s][data_name]', FilterConfiguration::COLUMNS_PATH, $fieldName),
+                sprintf('%s.%s', $alias, $fieldName)
+            );
 
             // add Field ACL configuration
             $config->offsetSetByPath(
@@ -235,50 +189,20 @@ abstract class AbstractFieldsExtension extends AbstractExtension
         $isRequired   = $gridVisibilityValue === DatagridScope::IS_VISIBLE_MANDATORY;
         $isRenderable = $isRequired ? : $gridVisibilityValue === DatagridScope::IS_VISIBLE_TRUE;
 
-        $columnOptions = ArrayUtil::arrayMergeRecursiveDistinct(
-            [
-                DatagridGuesser::FORMATTER => [
-                    'label' => $this->getFieldConfig('entity', $field)->get('label', false, $fieldName),
-                    'renderable' => $isRenderable,
-                    'required' => $isRequired,
-                ],
-                DatagridGuesser::SORTER => [
-                    'data_name' => $fieldName,
-                ],
-                DatagridGuesser::FILTER => [
-                    'data_name' => $fieldName,
-                    'enabled' => false,
-                ],
+        $columnOptions = [
+            DatagridGuesser::FORMATTER => [
+                'label'      => $this->getFieldConfig('entity', $field)->get('label') ? : $fieldName,
+                'renderable' => $isRenderable,
+                'required'   => $isRequired
             ],
-            $columnOptions
-        );
-
-        switch ($field->getFieldType()) {
-            case RelationType::MANY_TO_ONE:
-            case RelationType::ONE_TO_ONE:
-            case RelationType::TO_ONE:
-                $extendFieldConfig = $this->getFieldConfig('extend', $field);
-                $columnOptions = ArrayUtil::arrayMergeRecursiveDistinct(
-                    $columnOptions,
-                    [
-                        DatagridGuesser::FILTER => [
-                            'type' => 'entity',
-                            'translatable' => true,
-                            'options' => [
-                                'field_type' => 'entity',
-                                'field_options' => [
-                                    'class' => $extendFieldConfig->get('target_entity'),
-                                    'property' => $extendFieldConfig->get('target_field'),
-                                    'multiple' => true,
-                                ],
-                            ],
-                        ],
-                    ]
-                );
-                break;
-            default:
-                break;
-        }
+            DatagridGuesser::SORTER    => [
+                'data_name' => $fieldName
+            ],
+            DatagridGuesser::FILTER    => [
+                'data_name' => $fieldName,
+                'enabled'   => false
+            ],
+        ];
 
         $this->datagridGuesser->applyColumnGuesses(
             $field->getClassName(),

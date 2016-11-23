@@ -169,7 +169,7 @@ class ExtendFieldValueRenderListener
      * @param ConfigIdInterface $fieldConfigId
      *
      * @throws \Doctrine\ORM\Mapping\MappingException
-     * @return array
+     * @return array|string
      */
     protected function getValueForSingleRelation($targetEntity, ConfigIdInterface $fieldConfigId)
     {
@@ -179,7 +179,7 @@ class ExtendFieldValueRenderListener
         $targetClassName = $fieldConfig->get('target_entity');
 
         if (!class_exists($targetClassName)) {
-            return ['title' => ''];
+            return '';
         }
 
         $title = (string)$this->propertyAccessor->getValue($targetEntity, $targetFieldName);
@@ -198,7 +198,7 @@ class ExtendFieldValueRenderListener
             ];
         }
 
-        return ['title' => $title];
+        return $title;
     }
 
     /**
