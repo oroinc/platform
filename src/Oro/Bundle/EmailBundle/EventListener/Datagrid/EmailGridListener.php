@@ -13,10 +13,14 @@ use Oro\Bundle\DataGridBundle\Entity\Manager\GridViewManager;
 use Oro\Bundle\DataGridBundle\Event\BuildAfter;
 use Oro\Bundle\DataGridBundle\Event\OrmResultBeforeQuery;
 use Oro\Bundle\EmailBundle\Datagrid\EmailQueryFactory;
+use Oro\Bundle\FeatureToggleBundle\Checker\FeatureCheckerHolderTrait;
+use Oro\Bundle\FeatureToggleBundle\Checker\FeatureToggleableInterface;
 use Oro\Bundle\SecurityBundle\SecurityFacade;
 
-class EmailGridListener
+class EmailGridListener implements FeatureToggleableInterface
 {
+    use FeatureCheckerHolderTrait;
+
     /**
      * @var EmailQueryFactory
      */
@@ -59,6 +63,10 @@ class EmailGridListener
      */
     public function onResultBeforeQuery(OrmResultBeforeQuery $event)
     {
+        if (!$this->isFeaturesEnabled()) {
+            return;
+        }
+
         $qb = $event->getQueryBuilder();
         if ($this->filterJoins) {
             $this->removeJoinByRootAndAliases($qb, $this->filterJoins);
@@ -73,6 +81,10 @@ class EmailGridListener
      */
     public function onBuildAfter(BuildAfter $event)
     {
+        if (!$this->isFeaturesEnabled()) {
+            return;
+        }
+
         /** @var OrmDatasource $ormDataSource */
         $ormDataSource = $event->getDatagrid()->getDatasource();
         $queryBuilder  = $ormDataSource->getQueryBuilder();

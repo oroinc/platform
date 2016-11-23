@@ -7,7 +7,6 @@ use Doctrine\ORM\Mapping\ClassMetadataInfo;
 
 use Oro\Bundle\EntityBundle\ORM\DatabaseDriverInterface;
 use Oro\Bundle\SearchBundle\Engine\Orm\PdoMysql;
-use Oro\Bundle\SearchBundle\Entity\IndexText;
 
 class FulltextIndexListener
 {
@@ -17,11 +16,18 @@ class FulltextIndexListener
     protected $databaseDriver;
 
     /**
-     * @param string $databaseDriver
+     * @var string
      */
-    public function __construct($databaseDriver)
+    protected $textIndexTableName;
+
+    /**
+     * @param string $databaseDriver
+     * @param string $textIndexTableName
+     */
+    public function __construct($databaseDriver, $textIndexTableName)
     {
         $this->databaseDriver = $databaseDriver;
+        $this->textIndexTableName = $textIndexTableName;
     }
 
     /**
@@ -36,7 +42,7 @@ class FulltextIndexListener
         /** @var ClassMetadataInfo $classMetadata */
         $classMetadata = $event->getClassMetadata();
 
-        if ($classMetadata->getTableName() !== IndexText::TABLE_NAME) {
+        if ($classMetadata->getTableName() !== $this->textIndexTableName) {
             return;
         }
 

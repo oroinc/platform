@@ -9,6 +9,7 @@ use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
 /**
  * @group search
+ * @dbIsolation
  */
 class SearchControllerTest extends WebTestCase
 {
@@ -24,7 +25,6 @@ class SearchControllerTest extends WebTestCase
         parent::setUp();
 
         $this->initClient([], $this->generateBasicAuthHeader(), true);
-        $this->startTransaction();
 
         $alias = $this->getSearchObjectMapper()->getEntityAlias(Item::class);
         $this->getSearchIndexer()->resetIndex(Item::class);

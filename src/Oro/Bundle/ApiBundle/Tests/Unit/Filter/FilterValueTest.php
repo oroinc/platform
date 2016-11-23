@@ -43,4 +43,13 @@ class FilterValueTest extends \PHPUnit_Framework_TestCase
 
         $this->assertNull($filterValue->getOperator());
     }
+
+    public function testGetSetSourceKey()
+    {
+        $filterValue = new FilterValue('path', 'value', 'operator');
+
+        $this->assertNull($filterValue->getSourceKey());
+        $filterValue->setSourceKey('key');
+        $this->assertSame('key', $filterValue->getSourceKey());
+    }
 }

@@ -5,9 +5,9 @@ The goal of this bundle is to make a creation of different kinds of Data APIs as
 
 The main idea of this bundle is to provide some default implementation which can be reused and easily changed for any entity if required.
 
-To achieve this, this bundle is implemented based on two ORO components: [ChainProcessor](../../Component/ChainProcessor/) and [EntitySerializer](../../Component/EntitySerializer/). The ChainProcessor component is responsible to organize data processing flow. The EntitySerializer component provides the fast access to entities data.
+To achieve this, this bundle is implemented based on the following components: [ChainProcessor](../../Component/ChainProcessor/), [EntitySerializer](../../Component/EntitySerializer/) and [Symfony Form](https://symfony.com/doc/current/components/form.html). The ChainProcessor component is responsible to organize data processing flow. The EntitySerializer component provides the fast access to entities data. The Symfony Form component provides a flexible way to map request data to entity object. 
 
-Also we use [FOSRestBundle](https://github.com/FriendsOfSymfony/FOSRestBundle) and [NelmioApiDocBundle](https://github.com/nelmio/NelmioApiDocBundle) for REST API.
+Also [FOSRestBundle](https://github.com/FriendsOfSymfony/FOSRestBundle) and [NelmioApiDocBundle](https://github.com/nelmio/NelmioApiDocBundle) are used for REST API.
 
 **Notes**:
  - The main format for REST API is described in [JSON API](http://jsonapi.org/). Please be sure that you are familiar with it before you start creating REST API for your entities.

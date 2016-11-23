@@ -55,7 +55,7 @@ class OrmIndexer extends AbstractIndexer
     /**
      * {@inheritdoc}
      */
-    public function save($entity, $context = [])
+    public function save($entity, array $context = [])
     {
         $entities = $this->getEntitiesArray($entity);
         if (false == $entities) {
@@ -77,7 +77,7 @@ class OrmIndexer extends AbstractIndexer
     /**
      * {@inheritdoc}
      */
-    public function delete($entity, $context = [])
+    public function delete($entity, array $context = [])
     {
         $entities = $this->getEntitiesArray($entity);
         if (!$entities) {
@@ -103,7 +103,7 @@ class OrmIndexer extends AbstractIndexer
     /**
      * {@inheritdoc}
      */
-    public function resetIndex($class = null, $context = [])
+    public function resetIndex($class = null, array $context = [])
     {
         if (false == $class) {
             $this->clearAllSearchIndexes();
