@@ -3,15 +3,17 @@
     {% set dynamicFields = oro_get_dynamic_fields(entity, entity_class) %}
     {% if dynamicFields is defined and dynamicFields|length %}
         {% for fieldName, item in dynamicFields %}
-            {{ ui.renderHtmlProperty(
-                item.label|trans,
-                _self.formatDynamicFieldValue(
-                    entity,
-                    entity_class,
-                    fieldName,
-                    item
-                )
-            ) }}
+            {% if feature_resource_enabled(fieldName, 'field_configs') %}
+                {{ ui.renderHtmlProperty(
+                    item.label|trans,
+                    _self.formatDynamicFieldValue(
+                        entity,
+                        entity_class,
+                        fieldName,
+                        item
+                    )
+                ) }}
+            {% endif %}
         {% endfor %}
     {% endif %}
 {% endmacro %}
