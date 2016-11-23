@@ -2,13 +2,6 @@ define(function(require) {
     'use strict';
 
     var ActivityContextComponent;
-    var $ = require('jquery');
-    var _ = require('underscore');
-    var __ = require('orotranslation/js/translator');
-    var routing = require('routing');
-    var widgetManager = require('oroui/js/widget-manager');
-    var messenger = require('oroui/js/messenger');
-    var mediator = require('oroui/js/mediator');
     var BaseComponent = require('oroactivity/js/app/components/activity-context-activity-component');
     var ActivityContextActivityView = require('oronote/js/app/views/note-context-component-view');
 

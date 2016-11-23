@@ -8,10 +8,10 @@ define([
 
     ActivityContextActivityView = BaseView.extend({
         initialize: function() {
-            this.on('render', function(){
-                var $icons =this.$el.find('i.icon-remove');
+            this.on('render', function() {
+                var $icons = this.$el.find('i.icon-remove');
 
-                if (this.collection.length == 1) {
+                if (this.collection.length === 1) {
                     $icons.css('visibility', 'hidden');
                 } else {
                     $icons.css('visibility', 'visible');
