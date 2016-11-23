@@ -703,7 +703,6 @@ services:
         class: Oro\Bundle\SecurityBundle\Acl\Extension\FieldAclExtension
         arguments:
             - '@oro_security.acl.object_id_accessor'
-            - '@oro_entity.orm.entity_class_resolver'
             - '@oro_security.owner.metadata_provider.chain'
             - '@oro_security.owner.ownership_decision_maker.chain'
             - '@oro_security.owner.entity_owner_accessor'

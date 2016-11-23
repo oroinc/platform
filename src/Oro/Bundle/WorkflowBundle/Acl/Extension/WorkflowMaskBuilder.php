@@ -51,7 +51,7 @@ final class WorkflowMaskBuilder extends MaskBuilder
     const CODE_VIEW_WORKFLOW       = 'V';
     const CODE_PERFORM_TRANSITIONS = 'P';
 
-    const PATTERN_ALL_OFF = '(VP) system:.. global:.. deep:.. local:.. basic:..';
+    const PATTERN_ALL_OFF = '(PV) system:.. global:.. deep:.. local:.. basic:..';
 
     /**
      * Constructor

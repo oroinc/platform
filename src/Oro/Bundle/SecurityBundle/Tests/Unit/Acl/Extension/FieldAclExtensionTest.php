@@ -449,10 +449,21 @@ class FieldAclExtensionTest extends \PHPUnit_Framework_TestCase
     {
         $this->assertEquals([new FieldMaskBuilder()], $this->extension->getAllMaskBuilders());
     }
-    
+
+    /**
+     * @expectedException \LogicException
+     */
+    public function testGetExtensionKey()
+    {
+        $this->extension->getExtensionKey();
+    }
+
+    /**
+     * @expectedException \LogicException
+     */
     public function testAdaptRootMask()
     {
-        $this->assertEquals(132, $this->extension->adaptRootMask(132, new \stdClass()));
+        $this->extension->adaptRootMask(132, new \stdClass());
     }
 
     public function testGetAccessLevel()

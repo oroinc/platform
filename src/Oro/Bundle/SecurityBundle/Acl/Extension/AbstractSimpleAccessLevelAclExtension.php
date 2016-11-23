@@ -59,6 +59,40 @@ abstract class AbstractSimpleAccessLevelAclExtension extends AbstractAccessLevel
     /**
      * {@inheritdoc}
      */
+    public function adaptRootMask($rootMask, $object)
+    {
+        $permissions = $this->getPermissions($rootMask, true);
+        if (!empty($permissions)) {
+            $metadata = $this->getMetadata($object);
+            foreach ($permissions as $permission) {
+                $permissionMask = $this->getMaskBuilderConst('GROUP_' . $permission);
+                $mask = $rootMask & $permissionMask;
+                $accessLevel = $this->getAccessLevel($mask);
+                if (!$metadata->hasOwner()) {
+                    if ($accessLevel < AccessLevel::SYSTEM_LEVEL) {
+                        $rootMask &= ~$this->removeServiceBits($mask);
+                        $rootMask |= $this->getMaskBuilderConst('MASK_' . $permission . '_SYSTEM');
+                    }
+                } elseif ($metadata->isGlobalLevelOwned()) {
+                    if ($accessLevel < AccessLevel::GLOBAL_LEVEL) {
+                        $rootMask &= ~$this->removeServiceBits($mask);
+                        $rootMask |= $this->getMaskBuilderConst('MASK_' . $permission . '_GLOBAL');
+                    }
+                } elseif ($metadata->isLocalLevelOwned()) {
+                    if ($accessLevel < AccessLevel::LOCAL_LEVEL) {
+                        $rootMask &= ~$this->removeServiceBits($mask);
+                        $rootMask |= $this->getMaskBuilderConst('MASK_' . $permission . '_LOCAL');
+                    }
+                }
+            }
+        }
+
+        return $rootMask;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function validateMask($mask, $object, $permission = null)
     {
         if (0 === $mask) {

@@ -172,7 +172,7 @@ class FieldAclExtension extends AbstractExtension
             // check if given entity should to do field ACL checks
             if (array_key_exists($alias, $this->queryAliases)) {
                 $this->fieldAclConfig[$columnName] = [$alias, $fieldName];
-                if (!in_array($alias, $aliases)) {
+                if (!in_array($alias, $aliases, true)) {
                     $aliases[] = $alias;
                 }
             }
@@ -234,7 +234,6 @@ class FieldAclExtension extends AbstractExtension
                     'IDENTITY(%s.%s) as %s',
                     $alias,
                     $organizationField,
-                    $organizationField .
                     sprintf(self::ORGANIZARION_FIELD_PLACEHOLDER, $alias)
                 );
                 $qb->addSelect($selectExpr);
