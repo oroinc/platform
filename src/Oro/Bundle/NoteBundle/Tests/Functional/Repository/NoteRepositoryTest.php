@@ -2,8 +2,6 @@
 
 namespace Oro\Bundle\NoteBundle\Tests\Functional\Repository;
 
-use Oro\Bundle\AccountBundle\Entity\Account;
-use Oro\Bundle\ContactBundle\Entity\Contact;
 use Oro\Bundle\NoteBundle\Entity\Repository\NoteRepository;
 use Oro\Bundle\NoteBundle\Tests\Functional\DataFixtures\LoadNoteData;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
@@ -56,7 +54,7 @@ class NoteRepositoryTest extends WebTestCase
         return [
             'Query execution should return correct result without page and limit params provided' => [
                 'data' => [
-                    'class' => Contact::class,
+                    'class' => 'Oro\Bundle\ContactBundle\Entity\Contact',
                     'relatedEntityReference' => 'oro_note:contact:alex_smith',
                     'page' => null,
                     'limit' => null
@@ -68,7 +66,7 @@ class NoteRepositoryTest extends WebTestCase
             ],
             'Query execution should return correct result with page and limit param provided' => [
                 'data' => [
-                    'class' => Account::class,
+                    'class' => 'Oro\Bundle\AccountBundle\Entity\Account',
                     'relatedEntityReference' => 'oro_note:account:john_doe',
                     'page' => 2,
                     'limit' => 2
