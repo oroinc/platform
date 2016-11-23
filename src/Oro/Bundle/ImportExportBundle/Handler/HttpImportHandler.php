@@ -5,6 +5,7 @@ namespace Oro\Bundle\ImportExportBundle\Handler;
 use Oro\Bundle\ImportExportBundle\Context\StepExecutionProxyContext;
 
 use Oro\Bundle\ImportExportBundle\Processor\ProcessorRegistry;
+use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\Routing\RouterInterface;
 
 class HttpImportHandler extends AbstractImportHandler
@@ -119,6 +120,34 @@ class HttpImportHandler extends AbstractImportHandler
             'importInfo' => $importInfo,
             'errorsUrl'  => $errorsUrl,
         ];
+    }
+
+
+    /**
+     * Saves the given file in a temporary directory and returns its name
+     *
+     * @param File $file
+     * @param $temporaryFilePrefix
+     *
+     * @return string
+     */
+    public function saveImportingFile(File $file, $temporaryFilePrefix)
+    {
+        $tmpFileName = $this->fileSystemOperator
+            ->generateTemporaryFileName($temporaryFilePrefix);
+        $file->move(dirname($tmpFileName), basename($tmpFileName));
+
+        return $tmpFileName;
+    }
+
+    /**
+     * @param string $inputFilePrefix
+     * @param string $inputFormat
+     * @return string
+     */
+    protected function getImportFileSessionKey($inputFilePrefix, $inputFormat)
+    {
+        return sprintf('oro_importexport_import_%s_%s', $inputFilePrefix, $inputFormat);
     }
 
     /**
