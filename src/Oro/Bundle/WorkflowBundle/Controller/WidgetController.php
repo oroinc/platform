@@ -38,7 +38,7 @@ class WidgetController extends Controller
 
     /**
      * @Route("/entity-workflows/{entityClass}/{entityId}", name="oro_workflow_widget_entity_workflows")
-     * @Template("OroWorkflowBundle:Widget/widget:entityWorkflows.html.twig")
+     * @Template
      * @AclAncestor("oro_workflow")
      *
      * @param string $entityClass
@@ -326,7 +326,7 @@ class WidgetController extends Controller
 
     /**
      * @Route("/buttons/{entityClass}/{entityId}", name="oro_workflow_widget_buttons")
-     * @Template("OroWorkflowBundle:Widget/widget:buttons.html.twig")
+     * @Template
      * @AclAncestor("oro_workflow")
      *
      * @param string $entityClass
