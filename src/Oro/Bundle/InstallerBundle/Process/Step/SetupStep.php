@@ -30,14 +30,7 @@ class SetupStep extends AbstractStep
 
     public function forwardAction(ProcessContextInterface $context)
     {
-        $adminUser = $this
-            ->getDoctrine()
-            ->getRepository('OroUserBundle:User')
-            ->findOneBy(array('username' => LoadAdminUserData::DEFAULT_ADMIN_USERNAME));
-
-        if (!$adminUser) {
-            throw new \RuntimeException("Admin user wasn't loaded in fixtures.");
-        }
+        $adminUser = $this->getAdminUser();
 
         $form = $this->createForm('oro_installer_setup');
         $form->setData($adminUser);
@@ -81,5 +74,26 @@ class SetupStep extends AbstractStep
                 'form' => $form->createView()
             )
         );
+    }
+
+    /**
+     * @return User
+     * @throws \RuntimeException
+     */
+    private function getAdminUser()
+    {
+        $repository = $this->getDoctrine()->getRepository('OroUserBundle:Role');
+
+        $adminRole = $repository->findOneBy(['role' => User::ROLE_ADMINISTRATOR]);
+        if (!$adminRole) {
+            throw new \RuntimeException("Administrator role wasn't loaded in fixtures.");
+        }
+
+        $adminUser = $repository->getFirstMatchedUser($adminRole);
+        if (!$adminUser) {
+            throw new \RuntimeException("Admin user wasn't loaded in fixtures.");
+        }
+
+        return $adminUser;
     }
 }
