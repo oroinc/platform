@@ -45,6 +45,10 @@ class MessageFactoryTest extends \PHPUnit_Framework_TestCase
                     ['oro_config.global', 1, $config],
                 ]
             );
+        $container->expects($this->once())
+            ->method('has')
+            ->with('oro_config.global')
+            ->willReturn(true);
 
         $messageFactory->setContainer($container);
         $messageFactory->createMessage('text', []);
@@ -74,6 +78,7 @@ class MessageFactoryTest extends \PHPUnit_Framework_TestCase
             ->method('has')
             ->with('oro_config.global')
             ->willReturn(false);
+
 
         $messageFactory->setContainer($container);
         $messageFactory->createMessage('text', []);
