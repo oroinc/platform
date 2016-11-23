@@ -75,7 +75,7 @@ class ReversSyncCommandTest extends WebTestCase
             'barConnectorOption=barValue',
         ]);
 
-        $this->assertContains('Schedule reverse for "Foo Integration" integration', $result);
+        $this->assertContains('Schedule reverse sync for "Foo Integration" integration', $result);
 
         self::assertMessageSent(
             Topics::REVERS_SYNC_INTEGRATION,

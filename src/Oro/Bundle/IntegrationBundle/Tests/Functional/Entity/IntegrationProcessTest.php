@@ -58,7 +58,7 @@ class IntegrationProcessTest extends WebTestCase
     /**
      * test for schedule_integration process
      */
-    public function testShouldScheduleIntegrationSyncMessageWhenEnabledFieldIsChangedOnUpdate()
+    public function testShouldNotScheduleIntegrationSyncMessageWhenChangongEnabledToFalse()
     {
         /** @var Integration $integration */
         $integration = $this->getReference('oro_integration:foo_integration');
@@ -67,6 +67,31 @@ class IntegrationProcessTest extends WebTestCase
         self::assertTrue($integration->isEnabled());
 
         $integration->setEnabled(false);
+
+        $this->getEntityManager()->persist($integration);
+        $this->getEntityManager()->flush();
+
+        $traces = self::getMessageCollector()->getTopicSentMessages(Topics::SYNC_INTEGRATION);
+        self::assertCount(0, $traces);
+    }
+
+
+    /**
+     * test for schedule_integration process
+     */
+    public function testShouldNotScheduleIntegrationSyncMessageWhenChangongEnabledToTrue()
+    {
+        /** @var Integration $integration */
+        $integration = $this->getReference('oro_integration:foo_integration');
+
+        $integration->setEnabled(false);
+
+        $this->getEntityManager()->persist($integration);
+        $this->getEntityManager()->flush();
+
+        self::getMessageCollector()->clear();
+
+        $integration->setEnabled(true);
 
         $this->getEntityManager()->persist($integration);
         $this->getEntityManager()->flush();
