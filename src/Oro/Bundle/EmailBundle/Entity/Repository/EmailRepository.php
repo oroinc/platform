@@ -7,6 +7,7 @@ use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\QueryBuilder;
 
 use Oro\Bundle\EmailBundle\Entity\Email;
+use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Component\PhpUtils\ArrayUtil;
@@ -162,6 +163,48 @@ class EmailRepository extends EntityRepository
                 $this->createEmailsByOwnerEntityQbs($entity, $ownerColumnName)
             )
         );
+    }
+
+    /**
+     * Returns QueryBuilder which returns ids or all owner records which have at least one email
+     *
+     * @param string $ownerClassName
+     * @param string $ownerIdentifierName
+     * @param string $ownerColumnName
+     *
+     * @return QueryBuilder
+     */
+    public function getOwnerIdsWithEmailsQb($ownerClassName, $ownerIdentifierName, $ownerColumnName)
+    {
+        $qb = $this->_em->createQueryBuilder();
+
+        return $qb
+            ->select(sprintf('owner.%s', $ownerIdentifierName))
+            ->from($ownerClassName, 'owner')
+            ->where($qb->expr()->orX(
+                // has incoming email
+                $qb->expr()->exists(
+                    $this
+                        ->createQueryBuilder('e')
+                        ->select('e.id')
+                        ->join('e.recipients', 'r')
+                        ->join('r.emailAddress', 'ea')
+                        ->andWhere(sprintf('ea.%s = owner.%s', $ownerColumnName, $ownerIdentifierName))
+                        ->andWhere('ea.hasOwner = :hasOwner')
+                        ->getDQL()
+                ),
+                // has outgoing email
+                $qb->expr()->exists(
+                    $this
+                        ->createQueryBuilder('e2')
+                        ->select('e2.id')
+                        ->join('e2.fromEmailAddress', 'ea2')
+                        ->andWhere(sprintf('ea2.%s = owner.%s', $ownerColumnName, $ownerIdentifierName))
+                        ->andWhere('ea2.hasOwner = :hasOwner')
+                        ->getDQL()
+                )
+            ))
+            ->setParameter('hasOwner', true);
     }
 
     /**

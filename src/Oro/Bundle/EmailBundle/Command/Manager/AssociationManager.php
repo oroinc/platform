@@ -9,6 +9,7 @@ use JMS\JobQueueBundle\Entity\Job;
 
 use Oro\Bundle\BatchBundle\ORM\Query\BufferedQueryResultIterator;
 use Oro\Bundle\EmailBundle\Command\AddAssociationCommand;
+use Oro\Bundle\EmailBundle\Command\UpdateEmailOwnerAssociationsCommand;
 use Oro\Bundle\EmailBundle\Entity\Email;
 use Oro\Bundle\EmailBundle\Entity\Manager\EmailManager;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
@@ -18,6 +19,7 @@ use Oro\Bundle\EmailBundle\Provider\EmailOwnersProvider;
 class AssociationManager
 {
     const EMAIL_BUFFER_SIZE = 100;
+    const OWNER_IDS_BUFFER_SIZE = 100;
 
     /** @var DoctrineHelper */
     protected $doctrineHelper;
@@ -68,6 +70,46 @@ class AssociationManager
         $this->doctrineHelper->getEntityManager('Oro\Bundle\EmailBundle\Entity\Email')->flush();
 
         return $countNewAssociations;
+    }
+
+    /**
+     * Makes sure that all email owners have assigned their emails
+     */
+    public function processUpdateAllEmailOwners()
+    {
+        $jobManager = $this->doctrineHelper->getEntityManagerForClass(Job::class);
+
+        $emailOwnerClasseNames = $this->emailOwnersProvider->getSupportedEmailOwnerClassNames();
+        foreach ($emailOwnerClasseNames as $emailOwnerClassName) {
+            $ownerColumnName = $this->emailOwnersProvider->getOwnerColumnName($emailOwnerClassName);
+            if (!$ownerColumnName) {
+                continue;
+            }
+
+            $ownerIdsQb = $this->doctrineHelper
+                ->getEntityRepository(Email::class)
+                ->getOwnerIdsWithEmailsQb(
+                    $emailOwnerClassName,
+                    $this->doctrineHelper->getSingleEntityIdentifierFieldName($emailOwnerClassName),
+                    $ownerColumnName
+                );
+
+            $ownerIds = (new BufferedQueryResultIterator($ownerIdsQb))
+                ->setBufferSize(self::OWNER_IDS_BUFFER_SIZE)
+                ->setPageLoadedCallback(function (array $rows) use ($emailOwnerClassName, $jobManager) {
+                    $job = new Job(
+                        UpdateEmailOwnerAssociationsCommand::COMMAND_NAME,
+                        array_merge([$emailOwnerClassName], array_map('current', $rows))
+                    );
+                    $jobManager->persist($job);
+                    $jobManager->flush();
+                    $jobManager->clear();
+                });
+
+            // iterate through ownerIds to call pageLoadedCallback
+            foreach ($ownerIds as $ownerId) {
+            }
+        }
     }
 
     /**
