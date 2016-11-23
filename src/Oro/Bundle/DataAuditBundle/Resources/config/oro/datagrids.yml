@@ -15,7 +15,6 @@ datagrids:
                     objectName: a.objectName
                     objectId: a.objectId
                     loggedAt: a.loggedAt
-                    author:  CONCAT(u.firstName, ' ', u.lastName, ' - ', u.email) as author
                     organization: o.name as organization
                 from:
                     - { table: OroDataAuditBundle:AbstractAudit, alias: a }
@@ -35,6 +34,9 @@ datagrids:
                         user:
                             join: ua.user
                             alias: u
+                        impersonation:
+                            join: ua.impersonation
+                            alias: i
                 where:
                     and:
                         - o.id = @oro_security.security_facade->getOrganizationId
@@ -62,6 +64,8 @@ datagrids:
                 frontend_type: html
             author:
                 label: oro.dataaudit.datagrid.author
+                type: callback
+                callable: "@oro_dataaudit.datagrid.author_provider->getAuthor"
             organization:
                 label: oro.dataaudit.datagrid.organization
             loggedAt:
@@ -81,7 +85,7 @@ datagrids:
                 objectId:
                     data_name: a.objectId
                 author:
-                    data_name: author
+                    data_name: ua.user
                 loggedAt:
                     data_name: a.loggedAt
             default:
@@ -130,7 +134,6 @@ datagrids:
                     audit: a
                     id: a.id
                     loggedAt: a.loggedAt
-                    author:  CONCAT(u.firstName, ' ', u.lastName, ' - ', u.email) as author
                 from:
                     - { table: OroDataAuditBundle:AbstractAudit, alias: a }
                 join:
@@ -146,14 +149,17 @@ datagrids:
                         user:
                             join: ua.user
                             alias: u
+                        impersonation:
+                            join: ua.impersonation
+                            alias: i
                 where:
                     and:
                         - a.objectClass = :objectClass AND a.objectId = :objectId
         columns:
             author:
                 label: oro.dataaudit.datagrid.author
-                type: field
-                frontend_type: string
+                type: callback
+                callable: "@oro_dataaudit.datagrid.author_provider->getAuthor"
             loggedAt:
                 label: oro.dataaudit.datagrid.logged_at
                 type: field
@@ -174,7 +180,7 @@ datagrids:
         sorters:
             columns:
                 author:
-                    data_name: author
+                    data_name: ua.user
                 loggedAt:
                     data_name: a.loggedAt
             default:
