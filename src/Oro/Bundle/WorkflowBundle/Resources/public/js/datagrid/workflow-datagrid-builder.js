@@ -3,7 +3,6 @@ define(function(require) {
 
     var workflowDatagridBuilder;
     var _ = require('underscore');
-    var mediator = require('oroui/js/mediator');
     var PermissionModel = require('orouser/js/models/role/permission-model');
     var AccessLevelsCollection = require('orouser/js/models/role/access-levels-collection');
     var BaseCollection = require('oroui/js/app/models/base/collection');
