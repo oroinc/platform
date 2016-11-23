@@ -12,7 +12,6 @@ use Oro\Bundle\EntityBundle\Provider\EntityAliasProviderInterface;
 class EntityAliasProvider implements EntityAliasProviderInterface
 {
     protected static $classes = [
-        'Oro\Bundle\TestFrameworkBundle\Entity\Item',
         'Oro\Bundle\TestFrameworkBundle\Entity\Item2',
         'Oro\Bundle\TestFrameworkBundle\Entity\ItemValue',
         'Oro\Bundle\TestFrameworkBundle\Entity\Product',

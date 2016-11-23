@@ -74,4 +74,18 @@ class ExpressionFactory implements ExpressionFactoryInterface, FactoryWithTypesI
 
         return call_user_func_array('array_merge', $services);
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function isTypeExists($name)
+    {
+        foreach ($this->extensions as $extension) {
+            if ($extension->hasExpression($name)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
 }

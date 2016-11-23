@@ -124,24 +124,30 @@ class Client extends BaseClient
      * @param array|string $gridParameters
      * @param array $filter
      * @param bool $isRealRequest
+     * @param string $route
      * @return Response
      */
-    public function requestGrid($gridParameters, $filter = array(), $isRealRequest = false)
-    {
+    public function requestGrid(
+        $gridParameters,
+        $filter = array(),
+        $isRealRequest = false,
+        $route = 'oro_datagrid_index'
+    ) {
         list($gridName, $gridParameters) = $this->parseGridParameters($gridParameters, $filter);
 
         if ($isRealRequest) {
             $this->request(
                 'GET',
-                $this->getUrl('oro_datagrid_index', $gridParameters)
+                $this->getUrl($route, $gridParameters)
             );
 
             return $this->getResponse();
         } else {
             $container = $this->getContainer();
 
-            $request = Request::create($this->getUrl('oro_datagrid_index', $gridParameters));
+            $request = Request::create($this->getUrl($route, $gridParameters));
             $container->get('oro_datagrid.datagrid.request_parameters_factory')->setRequest($request);
+            $container->get('request_stack')->push($request);
             /** @var Manager $gridManager */
             $gridManager = $container->get('oro_datagrid.datagrid.manager');
             $gridConfig  = $gridManager->getConfigurationForGrid($gridName);

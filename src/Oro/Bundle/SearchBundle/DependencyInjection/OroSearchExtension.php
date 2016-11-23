@@ -87,9 +87,8 @@ class OroSearchExtension extends Extension
         $engineLoader = new CumulativeConfigLoader('oro_search', $ymlLoader);
         $engineResources = $engineLoader->load($container);
 
-        if (!empty($engineResources)) {
-            $resource = end($engineResources);
-            $serviceLoader->load($resource->path);
+        foreach ($engineResources as $engineResource) {
+            $serviceLoader->load($engineResource->path);
         }
     }
 
