@@ -267,7 +267,7 @@ services:
             - '@oro_locale.formatter.name.link'
             - '@oro_locale.dql.formatter.name.link'
         tags:
-            - { name: oro_entity.name_provider, priority: -90 }
+            - { name: oro_entity.name_provider, priority: -80 }
 
     oro_locale.validator.localization:
         class: 'Oro\Bundle\LocaleBundle\Validator\Constraints\LocalizationValidator'

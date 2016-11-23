@@ -3,13 +3,14 @@
 namespace Oro\Bundle\SearchBundle\Tests\Functional\Controller\Api;
 
 use Oro\Bundle\SearchBundle\Tests\Functional\Controller\DataFixtures\LoadSearchItemData;
+use Oro\Bundle\SearchBundle\Tests\Functional\SearchExtensionTrait;
 use Oro\Bundle\TestFrameworkBundle\Entity\Item;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
-use Oro\Component\Testing\SearchExtensionTrait;
 
 /**
  * @outputBuffering enabled
  * @group soap
+ * @group search
  */
 class SoapAdvancedSearchApiTest extends WebTestCase
 {
@@ -27,8 +28,14 @@ class SoapAdvancedSearchApiTest extends WebTestCase
         $this->initClient([], $this->generateWsseAuthHeader(), true);
         $this->initSoapClient();
         $this->startTransaction();
+
+        $alias = $this->getSearchObjectMapper()->getEntityAlias(Item::class);
+        $this->getSearchIndexer()->resetIndex(Item::class);
+        $this->ensureItemsLoaded($alias, 0);
+
         $this->loadFixtures([LoadSearchItemData::class], true);
         $this->getSearchIndexer()->reindex(Item::class);
+        $this->ensureItemsLoaded($alias, LoadSearchItemData::COUNT);
     }
 
     protected function tearDown()
@@ -63,6 +70,18 @@ class SoapAdvancedSearchApiTest extends WebTestCase
 
         $this->addOroDefaultPrefixToUrlInParameterArray($response['soap']['data'], 'recordUrl');
         $this->assertSame($response['soap']['data'], $result['elements']['item']);
+    }
+
+    public function testAdvancedSearchNoResults()
+    {
+        $queryString = 'from oro_test_item where stringValue = item5';
+
+        $result = $this->soapClient->advancedSearch($queryString);
+        $result = $this->valueToArray($result);
+
+        $this->assertEquals(0, $result['recordsCount']);
+        $this->assertEquals(0, $result['count']);
+        $this->assertEmpty($result['elements']);
     }
 
     /**

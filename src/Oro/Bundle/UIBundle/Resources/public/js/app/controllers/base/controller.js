@@ -85,7 +85,7 @@ define(function(require) {
     promiseLoads = [
         // add DOM Ready promise to loads promises,
         // in order to prevent route action execution before the page is ready
-        $.ready.promise()
+        $.ready
     ];
 
     /**
