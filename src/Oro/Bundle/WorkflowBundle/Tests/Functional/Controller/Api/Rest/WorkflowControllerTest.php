@@ -6,9 +6,9 @@ use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\Common\Persistence\ObjectRepository;
 use Doctrine\ORM\EntityManager;
 
+use Oro\Bundle\ActionBundle\Model\ButtonSearchContext;
 use Oro\Bundle\TestFrameworkBundle\Entity\WorkflowAwareEntity;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
-
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
 use Oro\Bundle\WorkflowBundle\Model\Workflow;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowManager;
@@ -323,12 +323,12 @@ class WorkflowControllerTest extends WebTestCase
 
         $result = $this->getJsonResponseContent($this->client->getResponse(), 200);
 
-        $workflowItem = $this->getRepository('Oro\Bundle\WorkflowBundle\Entity\WorkflowItem')
+        $workflowItem = $this->getRepository(WorkflowItem::class)
             ->find($result['workflowItem']['id']);
-        /** @var \Oro\Bundle\ActionBundle\Model\ButtonSearchContext $initContext */
+        /** @var ButtonSearchContext $initContext */
         $initContext = $workflowItem->getData()->get('init_context');
 
-        $this->assertInstanceOf('Oro\Bundle\ActionBundle\Model\ButtonSearchContext', $initContext);
+        $this->assertInstanceOf(ButtonSearchContext::class, $initContext);
         $this->assertEquals($initContext->getEntityClass(), $entityClass);
         $this->assertEquals($initContext->getRouteName(), $routeName);
     }
