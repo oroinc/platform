@@ -9,6 +9,7 @@ use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\SecurityBundle\Acl\AccessLevel;
 use Oro\Bundle\SecurityBundle\Acl\Domain\ObjectIdAccessor;
 use Oro\Bundle\SecurityBundle\Acl\Domain\ObjectIdentityFactory;
+use Oro\Bundle\SecurityBundle\Acl\Extension\EntityAclExtension;
 use Oro\Bundle\SecurityBundle\Acl\Extension\FieldAclExtension;
 use Oro\Bundle\SecurityBundle\Acl\Extension\FieldMaskBuilder;
 use Oro\Bundle\SecurityBundle\Metadata\EntitySecurityMetadataProvider;
@@ -450,20 +451,33 @@ class FieldAclExtensionTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals([new FieldMaskBuilder()], $this->extension->getAllMaskBuilders());
     }
 
-    /**
-     * @expectedException \LogicException
-     */
     public function testGetExtensionKey()
     {
-        $this->extension->getExtensionKey();
+        $this->assertEquals(EntityAclExtension::NAME, $this->extension->getExtensionKey());
     }
 
     /**
      * @expectedException \LogicException
      */
-    public function testAdaptRootMask()
+    public function testSupports()
     {
-        $this->extension->adaptRootMask(132, new \stdClass());
+        $this->extension->supports('', '');
+    }
+
+    /**
+     * @expectedException \LogicException
+     */
+    public function testGetClasses()
+    {
+        $this->extension->getClasses();
+    }
+
+    /**
+     * @expectedException \LogicException
+     */
+    public function testGetObjectIdentity()
+    {
+        $this->extension->getObjectIdentity('');
     }
 
     public function testGetAccessLevel()

@@ -12,6 +12,7 @@ use Oro\Bundle\SecurityBundle\Owner\EntityOwnerAccessor;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\MetadataProviderInterface;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadata;
 use Oro\Bundle\SecurityBundle\Tests\Unit\Acl\Extension\Stub\DomainObjectStub;
+use Oro\Bundle\WorkflowBundle\Acl\Extension\WorkflowAclExtension;
 use Oro\Bundle\WorkflowBundle\Acl\Extension\WorkflowTransitionAclExtension;
 use Oro\Bundle\WorkflowBundle\Acl\Extension\WorkflowTransitionMaskBuilder;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
@@ -61,12 +62,9 @@ class WorkflowTransitionAclExtensionTest extends \PHPUnit_Framework_TestCase
         );
     }
 
-    /**
-     * @expectedException \LogicException
-     */
     public function testGetExtensionKey()
     {
-        $this->extension->getExtensionKey();
+        $this->assertEquals(WorkflowAclExtension::NAME, $this->extension->getExtensionKey());
     }
 
     /**
@@ -91,14 +89,6 @@ class WorkflowTransitionAclExtensionTest extends \PHPUnit_Framework_TestCase
     public function testGetObjectIdentity()
     {
         $this->extension->getObjectIdentity('');
-    }
-
-    /**
-     * @expectedException \LogicException
-     */
-    public function testAdaptRootMask()
-    {
-        $this->extension->adaptRootMask(0, new \stdClass());
     }
 
     public function testGetAllowedPermissions()
