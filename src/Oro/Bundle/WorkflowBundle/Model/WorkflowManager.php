@@ -42,6 +42,9 @@ class WorkflowManager implements LoggerAwareInterface
     /** @var WorkflowApplicabilityFilterInterface[] */
     private $applicabilityFilters = [];
 
+    /** @var array */
+    private $startedWorkflows = [];
+
     /**
      * @param WorkflowRegistry $workflowRegistry
      * @param DoctrineHelper $doctrineHelper
@@ -535,18 +538,16 @@ class WorkflowManager implements LoggerAwareInterface
      */
     protected function isStartAllowedForEntity(Workflow $workflow, $entity)
     {
-        static $startedWorkflows = [];
-
         $entityId = $this->doctrineHelper->getSingleEntityIdentifier($entity);
-        if ($entityId && array_key_exists($workflow->getName(), $startedWorkflows)) {
-            foreach ($startedWorkflows[$workflow->getName()] as $startedEntity) {
+        if ($entityId && array_key_exists($workflow->getName(), $this->startedWorkflows)) {
+            foreach ($this->startedWorkflows[$workflow->getName()] as $startedEntity) {
                 $startedEntityId = $this->doctrineHelper->getSingleEntityIdentifier($startedEntity);
                 if ($startedEntityId && ($startedEntityId === $entityId)) {
                     return false;
                 }
             }
         }
-        $startedWorkflows[$workflow->getName()][] = $entity;
+        $this->startedWorkflows[$workflow->getName()][] = $entity;
 
         return true;
     }
