@@ -10,7 +10,6 @@ use FOS\RestBundle\Controller\Annotations as Rest;
 use FOS\RestBundle\Controller\FOSRestController;
 use FOS\RestBundle\Util\Codes;
 
-use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
 use Oro\Bundle\EntityBundle\Provider\EntityWithFieldsProvider;
 use Oro\Bundle\EntityBundle\Exception\InvalidEntityException;
 
@@ -26,7 +25,6 @@ class EntityController extends FOSRestController
      *      defaults={"version"="latest", "_format"="json"}
      * )
      * @ApiDoc(description="Get entity with fields", resource=true)
-     * @AclAncestor("oro_workflow")
      *
      * @return Response
      */

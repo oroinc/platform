@@ -30,59 +30,59 @@
 
 {% block navButtons %}
     {{ parent() }}
-    {% if resource_granted('oro_workflow') %}
-        {% if isActive %}
-            {% set idButton = entity.name ~ '-workflow-deactivate-btn' %}
 
-            <span
-                data-page-component-module="oroui/js/app/components/view-component"
-                data-page-component-options="{{ {
-                    view: 'oroworkflow/js/app/views/workflow-deactivate-btn-view',
-                    selectors: {
-                        button: '#' ~ idButton
-                    }
-                }|json_encode }}">
+    {% if isActive %}
+        {% set idButton = entity.name ~ '-workflow-deactivate-btn' %}
 
-                {{ UI.button({
-                    'aCss':  'no-hash btn-danger',
-                    'iCss':  'icon-remove',
-                    'id':    idButton,
-                    'label': 'oro.workflow.workflowdefinition.datagrid.deactivate'|trans,
-                    'path':  path('oro_api_workflow_deactivate', {'workflowDefinition': entity.name}),
-                    'title': 'oro.workflow.workflowdefinition.datagrid.deactivate'|trans,
-                    'data': {
-                        'name': entity.name,
-                        'label': entity.label
-                    }
-                }) }}
-            </span>
-        {% else %}
-            {% set idButton = entity.name ~ '-workflow-activate-btn' %}
+        <span
+            data-page-component-module="oroui/js/app/components/view-component"
+            data-page-component-options="{{ {
+                view: 'oroworkflow/js/app/views/workflow-deactivate-btn-view',
+                selectors: {
+                    button: '#' ~ idButton
+                }
+            }|json_encode }}">
 
-            <span
-                data-page-component-module="oroui/js/app/components/view-component"
-                data-page-component-options="{{ {
-                    view: 'oroworkflow/js/app/views/workflow-activate-btn-view',
-                    selectors: {
-                        button: '#' ~ idButton
-                    }
-                }|json_encode }}">
+            {{ UI.button({
+                'aCss':  'no-hash btn-danger',
+                'iCss':  'icon-remove',
+                'id':    idButton,
+                'label': 'oro.workflow.workflowdefinition.datagrid.deactivate'|trans,
+                'path':  path('oro_api_workflow_deactivate', {'workflowDefinition': entity.name}),
+                'title': 'oro.workflow.workflowdefinition.datagrid.deactivate'|trans,
+                'data': {
+                    'name': entity.name,
+                    'label': entity.label
+                }
+            }) }}
+        </span>
+    {% else %}
+        {% set idButton = entity.name ~ '-workflow-activate-btn' %}
 
-                {{ UI.button({
-                    'aCss': 'no-hash btn-success',
-                    'iCss': 'icon-ok',
-                    'id': idButton,
-                    'label': 'oro.workflow.workflowdefinition.datagrid.activate'|trans,
-                    'path': path('oro_api_workflow_activate', {'workflowDefinition': entity.name}),
-                    'title': 'oro.workflow.workflowdefinition.datagrid.activate'|trans,
-                    'data': {
-                        'name': entity.name,
-                        'label': entity.label
-                    }
-                }) }}
-            </span>
-        {% endif %}
+        <span
+            data-page-component-module="oroui/js/app/components/view-component"
+            data-page-component-options="{{ {
+                view: 'oroworkflow/js/app/views/workflow-activate-btn-view',
+                selectors: {
+                    button: '#' ~ idButton
+                }
+            }|json_encode }}">
+
+            {{ UI.button({
+                'aCss': 'no-hash btn-success',
+                'iCss': 'icon-ok',
+                'id': idButton,
+                'label': 'oro.workflow.workflowdefinition.datagrid.activate'|trans,
+                'path': path('oro_api_workflow_activate', {'workflowDefinition': entity.name}),
+                'title': 'oro.workflow.workflowdefinition.datagrid.activate'|trans,
+                'data': {
+                    'name': entity.name,
+                    'label': entity.label
+                }
+            }) }}
+        </span>
     {% endif %}
+
     {% if not entity.system %}
         {% if resource_granted('EDIT', entity) %}
             {{ UI.editButton({
