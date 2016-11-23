@@ -6,7 +6,6 @@ use Symfony\Component\Security\Acl\Domain\ObjectIdentity;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
-use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
 use Oro\Bundle\SecurityBundle\Acl\AccessLevel;
 use Oro\Bundle\SecurityBundle\Acl\Domain\ObjectIdAccessor;
 use Oro\Bundle\SecurityBundle\Metadata\EntitySecurityMetadataProvider;
@@ -19,9 +18,6 @@ class FieldAclExtension extends AbstractSimpleAccessLevelAclExtension
     const PERMISSION_CREATE = 'CREATE';
     const PERMISSION_EDIT   = 'EDIT';
 
-    /** @var EntityClassResolver */
-    protected $entityClassResolver;
-
     /** @var ConfigProvider */
     protected $securityConfigProvider;
 
@@ -30,7 +26,6 @@ class FieldAclExtension extends AbstractSimpleAccessLevelAclExtension
 
     /**
      * @param ObjectIdAccessor                           $objectIdAccessor
-     * @param EntityClassResolver                        $entityClassResolver
      * @param MetadataProviderInterface                  $metadataProvider
      * @param AccessLevelOwnershipDecisionMakerInterface $decisionMaker
      * @param EntityOwnerAccessor                        $entityOwnerAccessor
@@ -39,7 +34,6 @@ class FieldAclExtension extends AbstractSimpleAccessLevelAclExtension
      */
     public function __construct(
         ObjectIdAccessor $objectIdAccessor,
-        EntityClassResolver $entityClassResolver,
         MetadataProviderInterface $metadataProvider,
         AccessLevelOwnershipDecisionMakerInterface $decisionMaker,
         EntityOwnerAccessor $entityOwnerAccessor,
@@ -47,7 +41,6 @@ class FieldAclExtension extends AbstractSimpleAccessLevelAclExtension
         EntitySecurityMetadataProvider $entityMetadataProvider
     ) {
         parent::__construct($objectIdAccessor, $metadataProvider, $entityOwnerAccessor, $decisionMaker);
-        $this->entityClassResolver = $entityClassResolver;
         $this->securityConfigProvider = $configProvider;
         $this->entityMetadataProvider = $entityMetadataProvider;
 
@@ -83,7 +76,7 @@ class FieldAclExtension extends AbstractSimpleAccessLevelAclExtension
      */
     public function getExtensionKey()
     {
-        return EntityAclExtension::NAME;
+        throw new \LogicException('Field ACL Extension does not support "getExtensionKey" method.');
     }
 
     /**
@@ -91,7 +84,7 @@ class FieldAclExtension extends AbstractSimpleAccessLevelAclExtension
      */
     public function supports($type, $id)
     {
-        throw new \LogicException('Field ACL Extension does not support "supports" method');
+        throw new \LogicException('Field ACL Extension does not support "supports" method.');
     }
 
     /**
@@ -99,7 +92,23 @@ class FieldAclExtension extends AbstractSimpleAccessLevelAclExtension
      */
     public function getClasses()
     {
-        throw new \LogicException('Field ACL Extension does not support "getClasses" method');
+        throw new \LogicException('Field ACL Extension does not support "getClasses" method.');
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getObjectIdentity($val)
+    {
+        throw new \LogicException('Field ACL Extension does not support "getObjectIdentity" method.');
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function adaptRootMask($rootMask, $object)
+    {
+        throw new \LogicException('Field ACL Extension does not support "adaptRootMask" method.');
     }
 
     /**
@@ -167,14 +176,6 @@ class FieldAclExtension extends AbstractSimpleAccessLevelAclExtension
     public function getAllMaskBuilders()
     {
         return [new FieldMaskBuilder()];
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getObjectIdentity($val)
-    {
-        throw new \LogicException('Field ACL Extension does not support "getObjectIdentity" method');
     }
 
     /**

@@ -287,7 +287,6 @@ class TestHelper
                 ->getMock();
         return new FieldAclExtension(
             $idAccessor,
-            new EntityClassResolver($doctrine),
             $metadataProvider,
             $decisionMaker,
             $entityOwnerAccessor,

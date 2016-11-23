@@ -5,7 +5,6 @@ namespace Oro\Bundle\WorkflowBundle\Acl\Extension;
 use Symfony\Component\Security\Acl\Domain\ObjectIdentity;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 
-use Oro\Bundle\SecurityBundle\Acl\AccessLevel;
 use Oro\Bundle\SecurityBundle\Acl\Domain\ObjectIdAccessor;
 use Oro\Bundle\SecurityBundle\Acl\Extension\AccessLevelOwnershipDecisionMakerInterface;
 use Oro\Bundle\SecurityBundle\Acl\Extension\ObjectIdentityHelper;
@@ -137,12 +136,15 @@ class WorkflowAclExtension extends AbstractWorkflowAclExtension
     public function getObjectIdentity($val)
     {
         if (is_string($val)) {
-            return $this->fromDescriptor($val);
+            $type = $id = $group = null;
+            $this->parseDescriptor($val, $type, $id, $group);
+            if ($this->getExtensionKey() !== $id) {
+                throw new \InvalidArgumentException(sprintf('Unsupported object identity descriptor: %s.', $val));
+            }
+
+            return new ObjectIdentity($id, ObjectIdentityHelper::buildType($type, $group));
         } elseif ($val instanceof AclAnnotation) {
-            return new ObjectIdentity(
-                $val->getType(),
-                ObjectIdentityHelper::buildType($val->getClass(), $val->getGroup())
-            );
+            throw new \InvalidArgumentException('Workflow ACL Extension does not support ACL annotations.');
         }
 
         return $this->fromDomainObject($val);
@@ -175,64 +177,8 @@ class WorkflowAclExtension extends AbstractWorkflowAclExtension
     /**
      * {@inheritdoc}
      */
-    public function adaptRootMask($rootMask, $object)
-    {
-        $permissions = $this->getPermissions($rootMask, true);
-        if (!empty($permissions)) {
-            $metadata = $this->getMetadata($object);
-            foreach ($permissions as $permission) {
-                $permissionMask = $this->getMaskBuilderConst('GROUP_' . $permission);
-                $mask = $rootMask & $permissionMask;
-                $accessLevel = $this->getAccessLevel($mask);
-                if (!$metadata->hasOwner()) {
-                    if ($accessLevel < AccessLevel::SYSTEM_LEVEL) {
-                        $rootMask &= ~$this->removeServiceBits($mask);
-                        $rootMask |= $this->getMaskBuilderConst('MASK_' . $permission . '_SYSTEM');
-                    }
-                } elseif ($metadata->isGlobalLevelOwned()) {
-                    if ($accessLevel < AccessLevel::GLOBAL_LEVEL) {
-                        $rootMask &= ~$this->removeServiceBits($mask);
-                        $rootMask |= $this->getMaskBuilderConst('MASK_' . $permission . '_GLOBAL');
-                    }
-                } elseif ($metadata->isLocalLevelOwned()) {
-                    if ($accessLevel < AccessLevel::LOCAL_LEVEL) {
-                        $rootMask &= ~$this->removeServiceBits($mask);
-                        $rootMask |= $this->getMaskBuilderConst('MASK_' . $permission . '_LOCAL');
-                    }
-                }
-            }
-        }
-
-        return $rootMask;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
     protected function getMaskBuilderConst($constName)
     {
         return MaskBuilder::getConst($constName);
-    }
-
-    /**
-     * Constructs an ObjectIdentity for the given domain object
-     *
-     * @param string $descriptor
-     *
-     * @return ObjectIdentity
-     * @throws \InvalidArgumentException
-     */
-    protected function fromDescriptor($descriptor)
-    {
-        $type = $id = $group = null;
-        $this->parseDescriptor($descriptor, $type, $id, $group);
-
-        if ($id === $this->getExtensionKey()) {
-            return new ObjectIdentity($id, ObjectIdentityHelper::buildType($type, $group));
-        }
-
-        throw new \InvalidArgumentException(
-            sprintf('Unsupported object identity descriptor: %s.', $descriptor)
-        );
     }
 }
