@@ -185,7 +185,9 @@ class WorkflowManager implements LoggerAwareInterface
             }
         }
 
-        if (!$this->isStartAllowedByRecordGroups($entity, $workflow->getDefinition()->getExclusiveRecordGroups())) {
+        if ($this->doctrineHelper->getSingleEntityIdentifier($entity) !== null &&
+            !$this->isStartAllowedByRecordGroups($entity, $workflow->getDefinition()->getExclusiveRecordGroups())
+        ) {
             if ($throwGroupException) {
                 throw new WorkflowRecordGroupException(
                     sprintf(
