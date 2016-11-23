@@ -24,20 +24,20 @@ class PgsqlDumper extends AbstractDbDumper
      */
     public function restore()
     {
-        $this->runProcess(sprintf(
-            'PGPASSWORD="%s" psql -c "drop database %s;" -h %s -U %s',
+        $process = sprintf(
+            'PGPASSWORD="%s" psql -h %s -U %s %s -t -c "'.
+            'select \'drop table \"\' || tablename || \'\" cascade;\' from pg_tables where schemaname=\'public\'"'.
+            '| psql -h %s -U %s %s',
             $this->dbPass,
+            $this->dbHost,
+            $this->dbUser,
             $this->dbName,
             $this->dbHost,
-            $this->dbUser
-        ));
-        $this->runProcess(sprintf(
-            'PGPASSWORD="%s" psql -c "create database %s;" -h %s -U %s ',
-            $this->dbPass,
-            $this->dbName,
-            $this->dbHost,
-            $this->dbUser
-        ));
+            $this->dbUser,
+            $this->dbName
+        );
+        $this->runProcess($process);
+
         $this->runProcess(sprintf(
             'PGPASSWORD="%s" psql -h %s -U %s %s < %s/%4$s.sql',
             $this->dbPass,

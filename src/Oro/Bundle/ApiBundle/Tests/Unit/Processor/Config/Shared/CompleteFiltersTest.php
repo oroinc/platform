@@ -431,4 +431,101 @@ class CompleteFiltersTest extends ConfigProcessorTestCase
             $this->context->getFilters()
         );
     }
+
+    public function testProcessExtendedAssociations()
+    {
+        $config = [
+            'exclusion_policy' => 'all',
+            'fields'           => [
+                'field1' => [
+                    'data_type' => 'association:manyToOne'
+                ],
+                'field2' => [
+                    'data_type' => 'association:manyToOne:kind'
+                ],
+                'field3' => [
+                    'data_type' => 'association:manyToOne'
+                ],
+                'field4' => [
+                    'data_type' => 'association:manyToOne',
+                    'exclude'   => true
+                ],
+            ]
+        ];
+
+        $filters = [
+            'fields' => [
+                'field3' => [
+                    'data_type'   => 'string',
+                    'type'        => 'myAssociation',
+                    'allow_array' => false,
+                    'options'     => [
+                        'option1' => 'val1'
+                    ]
+                ]
+            ]
+        ];
+
+        $rootEntityMetadata = $this->getClassMetadataMock(self::TEST_CLASS_NAME);
+
+        $this->doctrineHelper->expects($this->once())
+            ->method('isManageableEntityClass')
+            ->with(self::TEST_CLASS_NAME)
+            ->willReturn(true);
+        $this->doctrineHelper->expects($this->once())
+            ->method('getEntityMetadataForClass')
+            ->with(self::TEST_CLASS_NAME)
+            ->willReturn($rootEntityMetadata);
+        $this->doctrineHelper->expects($this->once())
+            ->method('getIndexedFields')
+            ->with($this->identicalTo($rootEntityMetadata))
+            ->willReturn([]);
+        $this->doctrineHelper->expects($this->once())
+            ->method('getIndexedAssociations')
+            ->with($this->identicalTo($rootEntityMetadata))
+            ->willReturn([]);
+
+        $this->context->setResult($this->createConfigObject($config));
+        $this->context->setFilters($this->createConfigObject($filters, ConfigUtil::FILTERS));
+        $this->processor->process($this->context);
+
+        $this->assertConfig(
+            [
+                'exclusion_policy' => 'all',
+                'fields'           => [
+                    'field1' => [
+                        'data_type'   => 'integer',
+                        'type'        => 'association',
+                        'allow_array' => true,
+                        'options'     => [
+                            'associationOwnerClass' => self::TEST_CLASS_NAME,
+                            'associationType'       => 'manyToOne',
+                            'associationKind'       => null
+                        ]
+                    ],
+                    'field2' => [
+                        'data_type'   => 'integer',
+                        'type'        => 'association',
+                        'allow_array' => true,
+                        'options'     => [
+                            'associationOwnerClass' => self::TEST_CLASS_NAME,
+                            'associationType'       => 'manyToOne',
+                            'associationKind'       => 'kind'
+                        ]
+                    ],
+                    'field3' => [
+                        'data_type' => 'string',
+                        'type'      => 'myAssociation',
+                        'options'   => [
+                            'option1'               => 'val1',
+                            'associationOwnerClass' => self::TEST_CLASS_NAME,
+                            'associationType'       => 'manyToOne',
+                            'associationKind'       => null
+                        ]
+                    ],
+                ]
+            ],
+            $this->context->getFilters()
+        );
+    }
 }

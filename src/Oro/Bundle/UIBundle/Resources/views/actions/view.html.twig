@@ -71,35 +71,37 @@
                         <div class="customer-content">
                             <div class="top-row">
                                 {% block breadcrumbs %}
-                                    <div class="pull-left">
-                                        {% if breadcrumbs.indexLabel is defined %}
-                                        <div class="sub-title">
-                                        {%- if breadcrumbs.indexPath is defined -%}
-                                            <a href="{{ oro_url_add_query(breadcrumbs.indexPath) }}">{{ breadcrumbs.indexLabel }}</a>
-                                        {%- else -%}
-                                            {{ breadcrumbs.indexLabel }}
-                                        {%- endif -%}
+                                    {% if breadcrumbs is defined %}
+                                        <div class="pull-left">
+                                            {% if breadcrumbs.indexLabel is defined %}
+                                            <div class="sub-title">
+                                            {%- if breadcrumbs.indexPath is defined -%}
+                                                <a href="{{ oro_url_add_query(breadcrumbs.indexPath) }}">{{ breadcrumbs.indexLabel }}</a>
+                                            {%- else -%}
+                                                {{ breadcrumbs.indexLabel }}
+                                            {%- endif -%}
+                                            </div>
+                                            <span class="separator">/</span>
+                                            {% endif %}
+                                            {% if breadcrumbs.additional is defined %}
+                                                {% for breadcrumb in breadcrumbs.additional %}
+                                                    <div class="sub-title">
+                                                    {%- if breadcrumb.indexPath is defined -%}
+                                                        <a href="{{ breadcrumb.indexPath }}">{{ breadcrumb.indexLabel }}</a>
+                                                    {%- else -%}
+                                                        {{ breadcrumb.indexLabel }}
+                                                    {%- endif -%}
+                                                    </div>
+                                                    <span class="separator">/</span>
+                                                {% endfor %}
+                                            {% endif %}
+                                            {% if breadcrumbs.rawEntityTitle is defined and breadcrumbs.rawEntityTitle %}
+                                                <h1 class="user-name">{{ breadcrumbs.entityTitle|raw }}</h1>
+                                            {% else %}
+                                                <h1 class="user-name">{{ breadcrumbs.entityTitle }}</h1>
+                                            {% endif %}
                                         </div>
-                                        <span class="separator">/</span>
-                                        {% endif %}
-                                        {% if breadcrumbs.additional is defined %}
-                                            {% for breadcrumb in breadcrumbs.additional %}
-                                                <div class="sub-title">
-                                                {%- if breadcrumb.indexPath is defined -%}
-                                                    <a href="{{ breadcrumb.indexPath }}">{{ breadcrumb.indexLabel }}</a>
-                                                {%- else -%}
-                                                    {{ breadcrumb.indexLabel }}
-                                                {%- endif -%}
-                                                </div>
-                                                <span class="separator">/</span>
-                                            {% endfor %}
-                                        {% endif %}
-                                        {% if breadcrumbs.rawEntityTitle is defined and breadcrumbs.rawEntityTitle %}
-                                            <h1 class="user-name">{{ breadcrumbs.entityTitle|raw }}</h1>
-                                        {% else %}
-                                            <h1 class="user-name">{{ breadcrumbs.entityTitle }}</h1>
-                                        {% endif %}
-                                    </div>
+                                    {% endif %}
                                     {% block breadcrumbMessage %}{% endblock breadcrumbMessage %}
                                 {% endblock breadcrumbs %}
                             </div>

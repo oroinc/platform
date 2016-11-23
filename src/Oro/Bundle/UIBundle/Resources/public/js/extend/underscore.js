@@ -25,6 +25,17 @@ define(['underscore', 'asap'], function(_, asap) {
 
         trim: function(text) {
             return text.replace(/^\s*/, '').replace(/\s*$/, '');
+        },
+
+        /**
+         * Compares two arrays if they have the same set of elements
+         *
+         * @param firstArray {Array}
+         * @param secondArray {Array}
+         * @returns {boolean}
+         */
+        haveEqualSet: function(firstArray, secondArray) {
+            return firstArray.length === secondArray.length && _.difference(firstArray, secondArray).length === 0;
         }
     });
 

@@ -12,6 +12,8 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class Orm extends AbstractEngine
 {
+    const ENGINE_NAME = 'orm';
+
     /** @var SearchIndexRepository */
     private $indexRepository;
 

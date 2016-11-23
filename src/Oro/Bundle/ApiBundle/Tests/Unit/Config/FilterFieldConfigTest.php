@@ -139,13 +139,16 @@ class FilterFieldConfigTest extends \PHPUnit_Framework_TestCase
     public function testType()
     {
         $config = new FilterFieldConfig();
+        $this->assertFalse($config->hasType());
         $this->assertNull($config->getType());
 
         $config->setType('test');
+        $this->assertTrue($config->hasType());
         $this->assertEquals('test', $config->getType());
         $this->assertEquals(['type' => 'test'], $config->toArray());
 
         $config->setType(null);
+        $this->assertFalse($config->hasType());
         $this->assertNull($config->getType());
         $this->assertEquals([], $config->toArray());
     }

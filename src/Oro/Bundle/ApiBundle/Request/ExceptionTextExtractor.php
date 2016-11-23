@@ -4,6 +4,7 @@ namespace Oro\Bundle\ApiBundle\Request;
 
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
+use Symfony\Component\PropertyAccess\Exception\AccessException as PropertyAccessException;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
 use Oro\Component\ChainProcessor\Exception\ExecutionFailedException;
@@ -43,6 +44,9 @@ class ExceptionTextExtractor implements ExceptionTextExtractorInterface
         }
         if ($underlyingException instanceof ForbiddenException) {
             return Response::HTTP_FORBIDDEN;
+        }
+        if ($underlyingException instanceof PropertyAccessException) {
+            return Response::HTTP_METHOD_NOT_ALLOWED;
         }
 
         return Response::HTTP_INTERNAL_SERVER_ERROR;

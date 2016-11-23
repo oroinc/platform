@@ -91,7 +91,7 @@ services:
         arguments:
             - '@oro_layout.expression_language.expression_manipulator'
         tags:
-            - { name: oro_layout.expression.encoder, format: json }
+            - { name: layout.expression.encoder, format: json }
 
     oro_layout.assetic.layout_formula_loader:
         public: false
@@ -197,15 +197,15 @@ services:
     oro_layout.block_view_serializer.block_view_normalizer:
         class: Oro\Bundle\LayoutBundle\Layout\Serializer\BlockViewNormalizer
         tags:
-            - { name: oro_layout.block_view_serializer.normalizer }
+            - { name: layout.block_view_serializer.normalizer }
 
     oro_layout.block_view_serializer.expression_normalizer:
         class: Oro\Bundle\LayoutBundle\Layout\Serializer\ExpressionNormalizer
         arguments: [{}, {}]
         tags:
-            - { name: oro_layout.block_view_serializer.normalizer }
+            - { name: layout.block_view_serializer.normalizer }
 
     oro_layout.option_value_bag_normaizer:
         class: Oro\Bundle\LayoutBundle\Layout\Serializer\OptionValueBagNormalizer
         tags:
-            - { name: oro_layout.block_view_serializer.normalizer }
+            - { name: layout.block_view_serializer.normalizer }

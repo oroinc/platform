@@ -7,6 +7,7 @@ use Symfony\Component\HttpKernel\Bundle\Bundle;
 
 use Oro\Bundle\TranslationBundle\DependencyInjection\Compiler\DebugTranslatorPass;
 use Oro\Bundle\TranslationBundle\DependencyInjection\Compiler\TranslationContextResolverPass;
+use Oro\Bundle\TranslationBundle\DependencyInjection\Compiler\TranslationStrategyPass;
 use Oro\Bundle\TranslationBundle\DependencyInjection\Compiler\TranslatorDependencyPass;
 
 class OroTranslationBundle extends Bundle
@@ -19,5 +20,6 @@ class OroTranslationBundle extends Bundle
         $container->addCompilerPass(new TranslatorDependencyPass());
         $container->addCompilerPass(new DebugTranslatorPass());
         $container->addCompilerPass(new TranslationContextResolverPass());
+        $container->addCompilerPass(new TranslationStrategyPass());
     }
 }

@@ -39,6 +39,43 @@ datagrids:
                 ....   # some query configuration
 ```
 
+#####Datasource as service
+Other than the `query` yaml-oriented provider, ORM datasource supports an alternative `query_builder` service-oriented provider. 
+Basically it is possible to use any arbitrary method that returns a valid `Doctrine\ORM\QueryBuilder` instance.
+
+``` php
+// @acme_demo.user.repository
+public class UserRepository 
+{
+    // ....
+
+    /**
+    * @return Doctrine\ORM\QueryBuilder
+    */
+    public function getUsersQb()
+    {
+        return $this->em->createQueryBuilder()
+            ->from('AcmeDemoBundle:User', 'u')
+            ->select('u')
+            // ->where(...)
+            // ->join(...)
+            // ->orderBy(...)
+        ;
+    }
+}
+
+``` 
+
+In the datagrid configuration just provide the service and method name:
+
+``` yaml
+datagrids:
+    acme-demo-datagrid:
+        source:
+            type: orm  # datasource type
+            query_builder: "@acme_demo.user.repository->getUsersQb"
+```
+
 #####Parameters binding
 
 If datasource supports parameters binding, additional option "bind_parameters" can be specified. For example
@@ -59,6 +96,9 @@ datagrids:
             bind_parameters:
                 group_id: groupId
 ```
+
+Parameters binding is also supported while using the `query_builder` notation for the ORM data source. 
+Each binding will call `->setParameter('group_id', group_id)` automatically upon the provided builder. 
 
 [More about parameters binding](./parameter_binding.md).
 

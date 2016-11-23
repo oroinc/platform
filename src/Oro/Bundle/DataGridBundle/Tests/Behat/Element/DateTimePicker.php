@@ -4,6 +4,8 @@ namespace Oro\Bundle\DataGridBundle\Tests\Behat\Element;
 
 use Behat\Mink\Element\NodeElement;
 use Oro\Bundle\TestFrameworkBundle\Behat\Element\Element;
+use Oro\Bundle\TestFrameworkBundle\Behat\Element\InputMethod;
+use Oro\Bundle\TestFrameworkBundle\Behat\Element\InputValue;
 
 class DateTimePicker extends Element
 {
@@ -16,25 +18,9 @@ class DateTimePicker extends Element
 
         $this->getMonthPicker()->selectOption($dateTime->format('M'));
         $this->getYearPicker()->selectOption($dateTime->format('Y'));
-        $dateValue = (string) $dateTime->format('j');
+        $this->getCalendarDate($dateTime->format('j'))->click();
 
-        /** @var NodeElement $date */
-        foreach ($this->getCalendar()->findAll('css', 'tbody a') as $date) {
-            if ($date->getText() === $dateValue) {
-                $date->click();
-            }
-        }
-
-        $timePicker = $this->getTimePicker();
-        $timePicker->setValue($dateTime->format('H:i'));
-        $timePicker->click();
-        $this->clickSelectedTime();
-    }
-
-    protected function clickSelectedTime()
-    {
-        $timeSelect = $this->findVisible('css', '.ui-timepicker-wrapper');
-        $timeSelect->find('css', 'li.ui-timepicker-selected')->click();
+        $this->getTimePicker()->setValue($dateTime);
     }
 
     /**
@@ -62,11 +48,11 @@ class DateTimePicker extends Element
     }
 
     /**
-     * @return NodeElement|null
+     * @return TimePicker
      */
     protected function getTimePicker()
     {
-        return $this->find('css', 'input.timepicker-input');
+        return $this->getElement('TimePicker');
     }
 
     /**
@@ -75,5 +61,14 @@ class DateTimePicker extends Element
     protected function getDatePicker()
     {
         return $this->find('css', 'input.datepicker-input');
+    }
+
+    /**
+     * @param int|string $dateValue
+     * @return NodeElement|null
+     */
+    protected function getCalendarDate($dateValue)
+    {
+        return $this->getCalendar()->find('css', "tbody a:contains('$dateValue')");
     }
 }
