@@ -5,12 +5,10 @@ use Doctrine\DBAL\Connection;
 use Doctrine\ORM\Configuration;
 use Doctrine\ORM\EntityManagerInterface;
 
-use Psr\Log\LoggerInterface;
-
-use Symfony\Component\DependencyInjection\ContainerAwareInterface;
-
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
+
 use Oro\Bundle\IntegrationBundle\Async\ReversSyncIntegrationProcessor;
+
 use Oro\Bundle\IntegrationBundle\Async\Topics;
 use Oro\Bundle\IntegrationBundle\Entity\Channel as Integration;
 use Oro\Bundle\IntegrationBundle\Manager\TypesRegistry;
@@ -24,6 +22,8 @@ use Oro\Component\MessageQueue\Transport\Null\NullMessage;
 use Oro\Component\MessageQueue\Transport\Null\NullSession;
 use Oro\Component\MessageQueue\Util\JSON;
 use Oro\Component\Testing\ClassExtensionTrait;
+use Psr\Log\LoggerInterface;
+use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 
 class ReversSyncIntegrationProcessorTest extends \PHPUnit_Framework_TestCase
 {
@@ -301,7 +301,7 @@ class ReversSyncIntegrationProcessorTest extends \PHPUnit_Framework_TestCase
             ->expects($this->once())
             ->method('find')
             ->with(Integration::class, 'theIntegrationId')
-            ->willReturn($integration);
+            ->willReturn($integration)
         ;
 
         $doctrineHelperStub = $this->createDoctrineHelperStub($entityManagerMock);

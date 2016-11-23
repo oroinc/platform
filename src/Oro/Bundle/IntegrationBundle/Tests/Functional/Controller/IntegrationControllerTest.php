@@ -52,7 +52,7 @@ class IntegrationControllerTest extends WebTestCase
     }
 
 
-    public function testShouldScheduleSyncJobIfIntegrationActive()
+    public function testShouldScheduleSyncJobForActiveIntegration()
     {
         $channel = $this->createChannel();
         $this->entityManager->persist($channel);

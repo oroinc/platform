@@ -228,7 +228,7 @@ class SomeTest extends WebTestCase
 }
 ```
 
-In unit tests you are usually need to pass the message producer to a service you test. To get correct instance of the message producer just use `self::getMessageProducer()`, e.g.:
+In unit tests you are usually need to pass the message producer to a service you test. To fetch correct instance of message producer in the unit tests use `self::getMessageProducer()`, e.g.:
 
 ```php
 <?php

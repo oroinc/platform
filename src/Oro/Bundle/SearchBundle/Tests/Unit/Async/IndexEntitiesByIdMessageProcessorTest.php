@@ -4,7 +4,6 @@ namespace Oro\Bundle\SearchBundle\Tests\Unit\Async;
 use Oro\Bundle\MessageQueueBundle\Test\Unit\MessageQueueExtension;
 use Oro\Bundle\SearchBundle\Async\IndexEntitiesByIdMessageProcessor;
 use Oro\Bundle\SearchBundle\Async\Topics;
-use Oro\Component\MessageQueue\Client\MessageProducerInterface;
 use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
 use Oro\Component\MessageQueue\Transport\Null\NullMessage;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
@@ -17,7 +16,7 @@ class IndexEntitiesByIdMessageProcessorTest extends \PHPUnit_Framework_TestCase
     public function testCouldBeConstructedByRequiredArguments()
     {
         new IndexEntitiesByIdMessageProcessor(
-            $this->getMock(MessageProducerInterface::class),
+            self::getMessageProducer(),
             $this->createLoggerMock()
         );
     }

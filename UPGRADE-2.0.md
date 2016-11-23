@@ -521,6 +521,7 @@ tag if it works with extend classes
 ####IntegrationBundle:
 - Integration configuration file now loads from `Resources/config/oro/integrations.yml` file instead of `Resources/config/integration_settings.yml`.
 - Root node for integration config file `Resources/config/oro/integrations.yml` were changed from `oro_integration` to `integrations`.
+- The `Oro\Bundle\IntegrationBundle\Command\ReverseSyncCommand` command was removed.
 
 ####EntityConfigBundle:
 - Entity configuration now loads from `Resources/config/oro/entity_config.yml` file instead of `Resources/config/entity_config.yml`.
