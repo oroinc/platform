@@ -30,9 +30,6 @@ class WorkflowManager implements LoggerAwareInterface
     /** @var DoctrineHelper */
     protected $doctrineHelper;
 
-    /** @var array */
-    protected static $startedWorkflows = [];
-
     /** @var EventDispatcherInterface */
     private $eventDispatcher;
 
@@ -567,14 +564,14 @@ class WorkflowManager implements LoggerAwareInterface
     protected function unsetStartedWorkflowForEntity(Workflow $workflow, $entity)
     {
         $entityId = $this->doctrineHelper->getSingleEntityIdentifier($entity);
-        if ($entityId === null || !array_key_exists($workflow->getName(), self::$startedWorkflows)) {
+        if ($entityId === null || !array_key_exists($workflow->getName(), $this->startedWorkflows)) {
             return;
         }
 
-        foreach (self::$startedWorkflows[$workflow->getName()] as $key => $startedEntity) {
+        foreach ($this->startedWorkflows[$workflow->getName()] as $key => $startedEntity) {
             $startedEntityId = $this->doctrineHelper->getSingleEntityIdentifier($startedEntity);
             if ($startedEntityId && ($startedEntityId === $entityId)) {
-                unset(self::$startedWorkflows[$workflow->getName()][$key]);
+                unset($this->startedWorkflows[$workflow->getName()][$key]);
                 break;
             }
         }
