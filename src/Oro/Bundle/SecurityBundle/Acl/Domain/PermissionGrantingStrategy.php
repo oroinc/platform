@@ -263,9 +263,9 @@ class PermissionGrantingStrategy implements PermissionGrantingStrategyInterface
         AclExtensionInterface $extension
     ) {
         $aceMask = $ace->getMask();
-
-        if ($acl->getObjectIdentity()->getType() === ObjectIdentityFactory::ROOT_IDENTITY_TYPE) {
-            if ($acl->getObjectIdentity()->getIdentifier() !== $extension->getExtensionKey()) {
+        $oid = $acl->getObjectIdentity();
+        if (ObjectIdentityFactory::ROOT_IDENTITY_TYPE === $oid->getType()) {
+            if ($oid->getIdentifier() !== $extension->getExtensionKey()) {
                 return false;
             }
             $object = $this->getContext()->getObject();
@@ -292,8 +292,9 @@ class PermissionGrantingStrategy implements PermissionGrantingStrategyInterface
      * Strategy EQUAL:
      *     The ACE will be considered applicable when the bitmasks are equal.
      *
-     * @param integer        $requiredMask
-     * @param EntryInterface $ace
+     * @param integer               $requiredMask
+     * @param EntryInterface        $ace
+     * @param AclExtensionInterface $extension
      *
      * @return bool
      * @throws \RuntimeException if the ACE strategy is not supported

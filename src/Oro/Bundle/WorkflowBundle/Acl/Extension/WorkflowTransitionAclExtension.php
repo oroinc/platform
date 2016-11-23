@@ -59,7 +59,7 @@ class WorkflowTransitionAclExtension extends AbstractWorkflowAclExtension
      */
     public function getExtensionKey()
     {
-        throw new \LogicException('Workflow Transition ACL Extension does not support "getExtensionKey" method.');
+        return WorkflowAclExtension::NAME;
     }
 
     /**
@@ -84,14 +84,6 @@ class WorkflowTransitionAclExtension extends AbstractWorkflowAclExtension
     public function getObjectIdentity($val)
     {
         throw new \LogicException('Workflow Transition ACL Extension does not support "getObjectIdentity" method.');
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function adaptRootMask($rootMask, $object)
-    {
-        throw new \LogicException('Workflow Transition ACL Extension does not support "adaptRootMask" method.');
     }
 
     /**

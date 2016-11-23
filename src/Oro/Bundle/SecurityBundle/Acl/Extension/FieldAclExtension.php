@@ -76,7 +76,7 @@ class FieldAclExtension extends AbstractSimpleAccessLevelAclExtension
      */
     public function getExtensionKey()
     {
-        throw new \LogicException('Field ACL Extension does not support "getExtensionKey" method.');
+        return EntityAclExtension::NAME;
     }
 
     /**
@@ -101,14 +101,6 @@ class FieldAclExtension extends AbstractSimpleAccessLevelAclExtension
     public function getObjectIdentity($val)
     {
         throw new \LogicException('Field ACL Extension does not support "getObjectIdentity" method.');
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function adaptRootMask($rootMask, $object)
-    {
-        throw new \LogicException('Field ACL Extension does not support "adaptRootMask" method.');
     }
 
     /**
