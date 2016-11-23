@@ -22,3 +22,23 @@ services:
             - [setParent, ['action_line_buttons']]
         tags:
             - { name: layout.block_type, alias: action_combined_buttons }
+
+    oro_action.layout.block_type.line_buttons:
+        parent: oro_layout.block_type.abstract_configurable
+        calls:
+            - [setName, ['line_buttons']]
+            -
+                - setOptionsConfig
+                -
+                    -
+                        buttons: {required: true}
+        tags:
+            - { name: layout.block_type, alias: line_buttons }
+
+    oro_action.layout.block_type.combined_buttons:
+        parent: oro_layout.block_type.abstract_configurable
+        calls:
+            - [setName, ['combined_buttons']]
+            - [setParent, ['line_buttons']]
+        tags:
+            - { name: layout.block_type, alias: combined_buttons }

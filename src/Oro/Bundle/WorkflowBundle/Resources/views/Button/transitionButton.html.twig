@@ -19,11 +19,12 @@
     {% set transitionData = transitionData|merge({'transition-url': path(transitionData['page-route'], params) }) %}
 {% endif %}
 
-<div class="pull-left btn-group icons-holder">
+{% if not onlyLink|default(false) %}<div class="pull-left btn-group icons-holder">{% endif %}
     {{ workflowMacros.renderTransitionButton(
         workflow,
         transition,
         workflowItem,
-        transitionData
+        transitionData,
+	    onlyLink|default(false)
     ) }}
-</div>
+{% if not onlyLink|default(false) %}</div>{% endif %}

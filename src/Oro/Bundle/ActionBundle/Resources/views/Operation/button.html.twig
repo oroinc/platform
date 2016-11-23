@@ -4,7 +4,7 @@
 
 {% block button %}
     {% set options = oro_action_frontend_options(operation) %}
-    {% if onlyLink is not defined %}<div class="pull-left btn-group icons-holder">{% endif %}
+	{% if not onlyLink|default(false) %}<div class="pull-left btn-group icons-holder">{% endif %}
         {% block link %}
             <a {% if (params.id is defined) %}id="{{ params.id }}"{% endif %}
                 href="{{ (options.options.url and not isAjax) ? options.options.url : 'javascript:void(0);' }}"
@@ -16,9 +16,9 @@
                 data-options="{{ options.options|json_encode }}"
                 data-page-component-module="oroaction/js/app/components/button-component"
             >
-                <i class="{{ params.buttonOptions.icon|default('') }} {{ params.buttonOptions.iCss|default('') }} hide-text">{{ linkLabel }}</i>
+                <i class="{{ params.buttonOptions.icon|default('') }} {{ params.buttonOptions.iCss|default('') }} hide-text"></i>
                 {{ linkLabel|trim }}
             </a>
         {% endblock %}
-    {% if onlyLink is not defined %}</div>{% endif %}
+	{% if not onlyLink|default(false) %}</div>{% endif %}
 {% endblock %}
