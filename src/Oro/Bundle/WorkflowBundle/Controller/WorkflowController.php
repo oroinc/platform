@@ -3,6 +3,7 @@
 namespace Oro\Bundle\WorkflowBundle\Controller;
 
 use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
+use Oro\Bundle\ActionBundle\Helper\ApplicationsHelperInterface;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
 use Oro\Bundle\WorkflowBundle\Event\StartTransitionEvent;
 use Oro\Bundle\WorkflowBundle\Event\StartTransitionEvents;
@@ -65,11 +66,11 @@ class WorkflowController extends Controller
                 'transition' => $transition,
                 'workflow' => $workflow,
                 'transitionUrl' => $this->generateUrl(
-                    'oro_api_workflow_start',
+                    $this->getApplicationsHelper()->getExecutionRoute(),
                     $routeParams
                 ),
                 'transitionFormUrl' => $this->generateUrl(
-                    'oro_workflow_widget_start_transition_form',
+                    $this->getApplicationsHelper()->getFormDialogRoute(),
                     $routeParams
                 )
             ]
@@ -114,5 +115,13 @@ class WorkflowController extends Controller
                 )
             ]
         );
+    }
+
+    /**
+     * @return ApplicationsHelperInterface
+     */
+    protected function getApplicationsHelper()
+    {
+        return $this->container->get('oro_workflow.helper.applications');
     }
 }
