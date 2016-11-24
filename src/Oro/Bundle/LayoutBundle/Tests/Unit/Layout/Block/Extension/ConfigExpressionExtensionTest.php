@@ -94,7 +94,7 @@ class ConfigExpressionExtensionTest extends \PHPUnit_Framework_TestCase
             ->will(
                 $this->returnValueMap(
                     [
-                        [['@true' => null], new Condition\True()],
+                        [['@true' => null], new Condition\TrueCompatible()],
                         [['@value' => ['$context.css_class']], $classExpr]
                     ]
                 )
@@ -228,7 +228,7 @@ class ConfigExpressionExtensionTest extends \PHPUnit_Framework_TestCase
             ->will(
                 $this->returnValueMap(
                     [
-                        [['@true' => null], new Condition\True()],
+                        [['@true' => null], new Condition\TrueCompatible()],
                         [['@value' => ['$context.css_class']], $classExpr]
                     ]
                 )

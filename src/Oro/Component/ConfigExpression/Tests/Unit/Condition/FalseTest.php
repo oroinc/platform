@@ -11,7 +11,7 @@ class FalseTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->condition = new Condition\False();
+        $this->condition = new Condition\FalseCompatible();
     }
 
     public function testEvaluate()

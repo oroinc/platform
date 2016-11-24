@@ -143,7 +143,7 @@ class RendererTest extends LayoutTestCase
             ->add('head', 'root', 'head', ['title' => 'Test'])
             ->add('meta', 'head', 'meta', ['charset' => 'UTF-8'])
             ->add('style', 'head', 'style', ['content' => 'body { color: red; }', 'scoped' => true])
-            ->add('external_style', 'head', 'style', ['src' => 'test.css', 'scoped' => new Condition\False()])
+            ->add('external_style', 'head', 'style', ['src' => 'test.css', 'scoped' => new Condition\FalseCompatible()])
             ->add(
                 'script',
                 'head',
@@ -151,7 +151,7 @@ class RendererTest extends LayoutTestCase
                 [
                     'content' => 'alert(\'test\');',
                     'async'   => true,
-                    'defer'   => new Condition\False()
+                    'defer'   => new Condition\FalseCompatible()
                 ]
             )
             ->add('external_resource', 'head', 'external_resource', ['href' => 'test.css', 'rel' => 'stylesheet'])
@@ -254,7 +254,7 @@ class RendererTest extends LayoutTestCase
                 ['charset' => 'invisible_by_expr_raw']
             )
             // test 'visible' option when its value is already assembled expression
-            ->add('invisible_by_expr_container', 'root', 'head', ['visible' => new Condition\False()])
+            ->add('invisible_by_expr_container', 'root', 'head', ['visible' => new Condition\FalseCompatible()])
             ->add('invisible_by_expr_child', 'invisible_by_expr_container', 'meta', ['charset' => 'invisible_by_expr'])
             // test buttons
             ->add(

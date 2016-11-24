@@ -7,7 +7,7 @@ use Oro\Component\ConfigExpression\Exception;
 /**
  * Implements logical TRUE constant.
  */
-class True extends AbstractCondition
+class TrueCompatible extends AbstractCondition
 {
     /**
      * {@inheritdoc}
