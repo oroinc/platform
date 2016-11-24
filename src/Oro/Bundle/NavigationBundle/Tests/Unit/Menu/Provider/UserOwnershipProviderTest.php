@@ -2,7 +2,8 @@
 
 namespace Oro\Bundle\NavigationBundle\Tests\Unit\Menu\Provider;
 
-use Doctrine\ORM\EntityRepository;
+use Doctrine\Common\Persistence\ManagerRegistry;
+
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 
@@ -17,25 +18,20 @@ class UserOwnershipProviderTest extends \PHPUnit_Framework_TestCase
     private $provider;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject|EntityRepository
-     */
-    private $entityRepository;
-
-    /**
      * @var \PHPUnit_Framework_MockObject_MockObject|TokenStorageInterface
      */
     private $tokenStorage;
 
     public function setUp()
     {
-        $this->entityRepository = $this->getMockBuilder(EntityRepository::class)
-            ->setMethods(['getMenuUpdates'])
+        /** @var ManagerRegistry|\PHPUnit_Framework_MockObject_MockObject $registry */
+        $registry = $this->getMockBuilder(ManagerRegistry::class)
             ->disableOriginalConstructor()
             ->getMock();
 
         $this->tokenStorage = $this->getMock(TokenStorageInterface::class);
 
-        $this->provider = new UserOwnershipProvider($this->entityRepository, $this->tokenStorage);
+        $this->provider = new UserOwnershipProvider($registry, '\EntityClass', $this->tokenStorage);
     }
 
     public function testGetType()
