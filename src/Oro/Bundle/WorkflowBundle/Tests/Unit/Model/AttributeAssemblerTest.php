@@ -4,6 +4,7 @@ namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Model;
 
 use Oro\Bundle\ActionBundle\Model\Attribute;
 use Oro\Bundle\ActionBundle\Model\AttributeGuesser;
+use Oro\Bundle\ActionBundle\Model\ButtonSearchContext;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Model\AttributeAssembler;
 use Symfony\Component\Translation\TranslatorInterface;
@@ -314,7 +315,12 @@ class AttributeAssemblerTest extends \PHPUnit_Framework_TestCase
             ),
             'add_init_context_attribute' => array(
                 array(),
-                $this->getAttribute('attribute_one', 'attribute_one', 'array'),
+                $this->getAttribute(
+                    'attribute_one',
+                    'attribute_one',
+                    'object',
+                    array('class' => ButtonSearchContext::class)
+                ),
                 array(),
                 array(
                     'transition1' => array('init_context_attribute' => 'attribute_one'),

@@ -560,6 +560,8 @@ throws `\RuntimeException` if cache initialization failed. Make sure you don't a
 - `cache_warmer` is decorated to allow disable cache warming during extend commands calls. Tag your warmer with `oro_entity_extend.warmer`
 tag if it works with extend classes
 - Changed `Oro\Bundle\EntityExtendBundle\Tools\EnumSynchronizer`, now it use `Oro\Bundle\EntityConfigBundle\Translation\ConfigTranslationHelper` to save translations instead of `Doctrine\Common\Persistence\ManagerRegistry` and `Oro\Bundle\TranslationBundle\Translation\DynamicTranslationMetadataCache`.
+- `Oro\Bundle\EntityExtendBundle\EventListener\ExtendFieldValueRenderListener::getValueForCollection` always return array
+- `Oro\Bundle\EntityExtendBundle\Grid\AbstractFieldsExtension` added support of to-one relations
 
 ####ApiBundle:
 - API configuration file now loads from `Resources/config/oro/api.yml` instead of `Resources/config/api.yml`.
@@ -570,6 +572,7 @@ tag if it works with extend classes
 
 ####TestFrameworkBundle:
 - Behat elements now loads from `Resources/config/oro/behat.yml` file instead of `Resources/config/behat_elements.yml`.
+- `Oro\Bundle\TestFrameworkBundle\Test\Client::requestGrid` accepts route to test grid as optional last argument. Request pushed to `@request_stack` for proper request emulation
 
 ####ChartBundle:
 - Charts configurations now loads from `Resources/config/oro/charts.yml` file instead of `Resources/config/oro/chart.yml`.
@@ -585,6 +588,7 @@ tag if it works with extend classes
 - Constructor of `Oro\Bundle\EntityConfigBundle\Translation\ConfigTranslationHelper` changed. Now it takes as first argument instance of `Oro\Bundle\TranslationBundle\Manager\TranslationManager` and second argument still instance of `Symfony\Component\Translation\TranslatorInterface`.
 - Changed `Oro\Bundle\EntityConfigBundle\Form\EventListener\ConfigSubscriber`, now it use `Oro\Bundle\EntityConfigBundle\Translation\ConfigTranslationHelper` to save translations instead of `Doctrine\Common\Persistence\ManagerRegistry` and `Oro\Bundle\TranslationBundle\Translation\DynamicTranslationMetadataCache`.
 - Changed `Oro\Bundle\EntityConfigBundle\Form\Type\ConfigType`, now it use `Oro\Bundle\EntityConfigBundle\Translation\ConfigTranslationHelper` to save translations.
+- `Oro\Bundle\EntityConfigBundle\Config\ConfigManager::flush` now flushes $models only
 - Class `Oro\Bundle\EntityConfigBundle\Twig\ConfigExtension`
     - construction signature was changed now it takes next arguments:
         - `ConfigManager` $configManager,

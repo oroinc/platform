@@ -8,6 +8,7 @@ use Symfony\Component\Translation\TranslatorInterface;
 
 use Oro\Bundle\ActionBundle\Model\Attribute as BaseAttribute;
 use Oro\Bundle\ActionBundle\Model\AttributeGuesser;
+use Oro\Bundle\ActionBundle\Model\ButtonSearchContext;
 use Oro\Bundle\WorkflowBundle\Configuration\WorkflowConfiguration;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Helper\WorkflowTranslationHelper;
@@ -67,7 +68,10 @@ class AttributeAssembler extends BaseAbstractAssembler
             if (!array_key_exists($initContextAttribute, $configuration)) {
                 $configuration[$initContextAttribute] = [
                     'label' => $initContextAttribute,
-                    'type' => 'array'
+                    'type' => 'object',
+                    'options' => [
+                        'class' => ButtonSearchContext::class
+                    ],
                 ];
             }
         }
