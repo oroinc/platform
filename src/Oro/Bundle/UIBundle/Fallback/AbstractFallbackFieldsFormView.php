@@ -49,12 +49,12 @@ abstract class AbstractFallbackFieldsFormView
      */
     protected function addBlockToEntityView(
         BeforeListRenderEvent
-        $event, $templateName,
+        $event,
+        $templateName,
         $entity,
         $blockId = 0,
         $subBlockId = 0
-    )
-    {
+    ) {
         $template = $event->getEnvironment()->render(
             $templateName,
             ['entity' => $entity]
@@ -76,8 +76,7 @@ abstract class AbstractFallbackFieldsFormView
         $sectionTitle = null,
         $blockId = 0,
         $subBlockId = 0
-    )
-    {
+    ) {
         $template = $event->getEnvironment()->render(
             $templateName,
             ['form' => $event->getFormView()]
