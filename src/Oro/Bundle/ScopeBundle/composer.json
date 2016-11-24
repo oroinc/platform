@@ -1,0 +1,23 @@
+{
+  "name": "oro/scope-bundle",
+  "type": "symfony-bundle",
+  "description": "BAP Scope Bundle",
+  "keywords": ["BAP"],
+  "homepage": "https://github.com/laboro/ScopeBundle",
+  "license": "MIT",
+  "require": {
+    "php": ">=5.5.9",
+    "symfony/symfony": "2.8.*, !=2.8.10",
+    "oro/platform-bundle": "dev-master"
+  },
+  "autoload": {
+    "psr-0": { "Oro\\Bundle\\ScopeBundle": "" }
+  },
+  "target-dir": "Oro/Bundle/ScopeBundle",
+  "minimum-stability": "dev",
+  "extra": {
+    "branch-alias": {
+      "dev-master": "1.0-dev"
+    }
+  }
+}
