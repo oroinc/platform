@@ -43,7 +43,7 @@ class ConfigFileValidator
      *
      * @return \Symfony\Component\Validator\ConstraintViolationListInterface
      */
-    public function validate(ComponentFile $file, $dataClass, $fieldName = '')
+    public function validate($file, $dataClass, $fieldName = '')
     {
         /** @var Config $entityAttachmentConfig */
         if ($fieldName === '') {

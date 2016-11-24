@@ -21,6 +21,10 @@ use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 use Oro\Bundle\MigrationBundle\Tools\DbIdentifierNameGenerator;
 use Oro\Bundle\MigrationBundle\Migration\Extension\NameGeneratorAwareInterface;
 
+/**
+ * @SuppressWarnings(PHPMD.ExcessiveClassLength)
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
+ */
 class ExtendExtension implements NameGeneratorAwareInterface
 {
     /**
@@ -828,6 +832,18 @@ class ExtendExtension implements NameGeneratorAwareInterface
     }
 
     /**
+     * Gets an entity full class name by a table name
+     *
+     * @param string $tableName
+     *
+     * @return array
+     */
+    public function getEntityClassesByTableName($tableName)
+    {
+        return $this->entityMetadataHelper->getEntityClassesByTableName($tableName);
+    }
+
+    /**
      * Gets a table name by entity full class name
      *
      * @param string $className
@@ -1007,6 +1023,9 @@ class ExtendExtension implements NameGeneratorAwareInterface
         }
         if (!isset($options['extend']['owner'])) {
             $options['extend']['owner'] = ExtendScope::OWNER_SYSTEM;
+        }
+        if (!isset($options[ExtendOptionsManager::MODE_OPTION])) {
+            $options[ExtendOptionsManager::MODE_OPTION] = ConfigModel::MODE_READONLY;
         }
     }
 }

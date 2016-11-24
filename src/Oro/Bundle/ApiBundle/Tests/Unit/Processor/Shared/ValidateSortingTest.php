@@ -68,6 +68,31 @@ class ValidateSortingTest extends GetListProcessorOrmRelatedTestCase
         );
     }
 
+    public function testProcessWhenSortByExcludedFieldRequestedAndSortFilterHasSourceKey()
+    {
+        $sortersConfig = $this->getSortersConfig(['id']);
+        $sortersConfig->getField('id')->setExcluded(true);
+
+        $sorterFilter = new SortFilter('integer');
+        $filters      = new FilterCollection();
+        $filters->add('sort', $sorterFilter);
+
+        $this->prepareFilters();
+        $this->context->getFilterValues()->get('sort')->setSourceKey('sortFilterSourceKey');
+
+        $this->context->setConfigOfSorters($sortersConfig);
+        $this->context->set('filters', $filters);
+        $this->processor->process($this->context);
+
+        $this->assertEquals(
+            [
+                Error::createValidationError('sort constraint', 'Sorting by "id" field is not supported.')
+                    ->setSource(ErrorSource::createByParameter('sortFilterSourceKey'))
+            ],
+            $this->context->getErrors()
+        );
+    }
+
     public function testProcessWhenNoSorters()
     {
         $sortersConfig = $this->getSortersConfig();

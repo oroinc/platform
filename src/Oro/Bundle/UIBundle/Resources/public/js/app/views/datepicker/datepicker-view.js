@@ -58,7 +58,9 @@ define(function(require) {
 
             this.createFrontField(opts);
 
-            this.$el.wrap('<span style="display:none"></span>');
+            if (this.$el[0].type !== 'hidden') {
+                this.$el.wrap('<span style="display:none"></span>');
+            }
             if (!this.nativeMode) {
                 this.initPickerWidget(opts);
             }
@@ -99,6 +101,17 @@ define(function(require) {
             if (this.$el.val() !== value) {
                 this.$el.val(value).trigger('change');
             }
+        },
+
+        /**
+         * Sets `disabled` property directly to backend field and to datepicker widget
+         *
+         * @param {boolean} disabled
+         */
+        setDisabled: function(disabled) {
+            var event = disabled ? 'disabled' : 'enabled';
+            this.$el.prop('disabled', disabled).trigger(event);
+            this.$frontDateField.datepicker(disabled ? 'disable' : 'enable').trigger(event);
         },
 
         /**
