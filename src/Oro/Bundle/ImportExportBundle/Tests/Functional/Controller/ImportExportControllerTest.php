@@ -12,7 +12,7 @@ class ImportExportControllerTest extends WebTestCase
 
     protected function setUp()
     {
-        $this->initClient(array(), $this->generateBasicAuthHeader());
+        $this->initClient([], $this->generateBasicAuthHeader());
         $this->client->useHashNavigation(true);
     }
 
