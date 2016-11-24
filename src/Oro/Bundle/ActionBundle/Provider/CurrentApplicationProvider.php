@@ -1,19 +1,19 @@
 <?php
 
-namespace Oro\Bundle\ActionBundle\Helper;
-
-use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
+namespace Oro\Bundle\ActionBundle\Provider;
 
 use Oro\Bundle\UserBundle\Entity\User;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
-class ApplicationsHelper implements ApplicationsHelperInterface
+class CurrentApplicationProvider implements CurrentApplicationProviderInterface
 {
-    use ApplicationsHelperTrait, RouteHelperTrait;
-
-    const DEFAULT_APPLICATION = 'default';
+    use CurrentApplicationProviderTrait;
 
     /** @var TokenStorageInterface */
     protected $tokenStorage;
+
+    /** @var string|bool|null */
+    protected $currentApplication = false;
 
     /**
      * @param TokenStorageInterface $tokenStorage
@@ -30,6 +30,6 @@ class ApplicationsHelper implements ApplicationsHelperInterface
     {
         $token = $this->tokenStorage->getToken();
 
-        return $token && $token->getUser() instanceof User ? self::DEFAULT_APPLICATION : null;
+        return $token && $token->getUser() instanceof User ? static::DEFAULT_APPLICATION : null;
     }
 }

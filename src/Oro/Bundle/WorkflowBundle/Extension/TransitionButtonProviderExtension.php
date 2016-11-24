@@ -4,11 +4,11 @@ namespace Oro\Bundle\WorkflowBundle\Extension;
 
 use Doctrine\Common\Collections\ArrayCollection;
 
-use Oro\Bundle\ActionBundle\Helper\ApplicationsHelperInterface;
-use Oro\Bundle\ActionBundle\Model\ButtonContext;
 use Oro\Bundle\ActionBundle\Extension\ButtonProviderExtensionInterface;
+use Oro\Bundle\ActionBundle\Model\ButtonContext;
 use Oro\Bundle\ActionBundle\Model\ButtonSearchContext;
 use Oro\Bundle\ActionBundle\Model\OperationRegistry;
+use Oro\Bundle\ActionBundle\Provider\RouteProviderInterface;
 
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
 use Oro\Bundle\WorkflowBundle\Model\Transition;
@@ -22,17 +22,20 @@ class TransitionButtonProviderExtension implements ButtonProviderExtensionInterf
     /** @var WorkflowRegistry */
     protected $workflowRegistry;
 
-    /** @var ApplicationsHelperInterface */
-    protected $applicationsHelper;
+    /** @var RouteProviderInterface */
+    protected $routeProvider;
+
+    /** @var ButtonContext */
+    private $baseButtonContext;
 
     /**
      * @param WorkflowRegistry $workflowRegistry
-     * @param ApplicationsHelperInterface $applicationsHelper
+     * @param RouteProviderInterface $routeProvider
      */
-    public function __construct(WorkflowRegistry $workflowRegistry, ApplicationsHelperInterface $applicationsHelper)
+    public function __construct(WorkflowRegistry $workflowRegistry, RouteProviderInterface $routeProvider)
     {
         $this->workflowRegistry = $workflowRegistry;
-        $this->applicationsHelper = $applicationsHelper;
+        $this->routeProvider = $routeProvider;
     }
 
     /**
@@ -44,7 +47,7 @@ class TransitionButtonProviderExtension implements ButtonProviderExtensionInterf
 
         $group = $buttonSearchContext->getGroup();
 
-        // Skipp if custom buttons group defined
+        // Skip if custom buttons group defined
         if ($group && ($group !== OperationRegistry::DEFAULT_GROUP)) {
             return $buttons;
         }
@@ -75,6 +78,8 @@ class TransitionButtonProviderExtension implements ButtonProviderExtensionInterf
             }
         }
 
+        $this->baseButtonContext = null;
+
         return $buttons;
     }
 
@@ -104,18 +109,22 @@ class TransitionButtonProviderExtension implements ButtonProviderExtensionInterf
      */
     protected function generateButtonContext(Transition $transition, ButtonSearchContext $searchContext)
     {
-        $context = new ButtonContext();
-        $context->setDatagridName($searchContext->getGridName())
-            ->setEntity($searchContext->getEntityClass(), $searchContext->getEntityId())
-            ->setRouteName($searchContext->getRouteName())
-            ->setGroup($searchContext->getGroup())
-            ->setUnavailableHidden($transition->isUnavailableHidden());
+        if (!$this->baseButtonContext) {
+            $this->baseButtonContext = new ButtonContext();
+            $this->baseButtonContext->setDatagridName($searchContext->getGridName())
+                ->setEntity($searchContext->getEntityClass(), $searchContext->getEntityId())
+                ->setRouteName($searchContext->getRouteName())
+                ->setGroup($searchContext->getGroup())
+                ->setExecutionRoute($this->routeProvider->getExecutionRoute());
+        }
+
+        $context = clone $this->baseButtonContext;
+        $context->setUnavailableHidden($transition->isUnavailableHidden());
 
         if ($transition->hasForm()) {
-            $context->setFormDialogRoute($this->applicationsHelper->getFormDialogRoute());
-            $context->setFormPageRoute($this->applicationsHelper->getFormPageRoute());
+            $context->setFormDialogRoute($this->routeProvider->getFormDialogRoute());
+            $context->setFormPageRoute($this->routeProvider->getFormPageRoute());
         }
-        $context->setExecutionRoute($this->applicationsHelper->getExecutionRoute());
 
         return $context;
     }

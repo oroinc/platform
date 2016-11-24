@@ -35,6 +35,7 @@ class ButtonProviderTest extends \PHPUnit_Framework_TestCase
     {
         /** @var ButtonSearchContext $searchContext */
         $searchContext = $this->getMock(ButtonSearchContext::class);
+
         $this->buttonExtension->expects($this->once())
             ->method('find')
             ->with($searchContext)
@@ -79,7 +80,7 @@ class ButtonProviderTest extends \PHPUnit_Framework_TestCase
     private function getButton($order)
     {
         $button = $this->getMock(ButtonInterface::class);
-        $button->method('getOrder')->willReturn($order);
+        $button->expects($this->any())->method('getOrder')->willReturn($order);
 
         return $button;
     }

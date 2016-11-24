@@ -5,10 +5,9 @@ namespace Oro\Bundle\ActionBundle\Model;
 use Doctrine\ORM\ORMException;
 
 use Oro\Bundle\ActionBundle\Configuration\ConfigurationProviderInterface;
-use Oro\Bundle\ActionBundle\Helper\ApplicationsHelper;
-use Oro\Bundle\ActionBundle\Helper\ApplicationsHelperInterface;
 use Oro\Bundle\ActionBundle\Helper\ArraySubstitution;
 use Oro\Bundle\ActionBundle\Model\Assembler\OperationAssembler;
+use Oro\Bundle\ActionBundle\Provider\CurrentApplicationProviderInterface;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 
 class OperationRegistry
@@ -21,8 +20,8 @@ class OperationRegistry
     /** @var OperationAssembler */
     protected $assembler;
 
-    /** @var ApplicationsHelper */
-    protected $applicationsHelper;
+    /** @var CurrentApplicationProviderInterface */
+    protected $applicationProvider;
 
     /** @var DoctrineHelper */
     protected $doctrineHelper;
@@ -42,18 +41,18 @@ class OperationRegistry
     /**
      * @param ConfigurationProviderInterface $configurationProvider
      * @param OperationAssembler $assembler
-     * @param ApplicationsHelperInterface $applicationsHelper
+     * @param CurrentApplicationProviderInterface $applicationProvider
      * @param DoctrineHelper $doctrineHelper
      */
     public function __construct(
         ConfigurationProviderInterface $configurationProvider,
         OperationAssembler $assembler,
-        ApplicationsHelperInterface $applicationsHelper,
+        CurrentApplicationProviderInterface $applicationProvider,
         DoctrineHelper $doctrineHelper
     ) {
         $this->configurationProvider = $configurationProvider;
         $this->assembler = $assembler;
-        $this->applicationsHelper = $applicationsHelper;
+        $this->applicationProvider = $applicationProvider;
         $this->doctrineHelper = $doctrineHelper;
         $this->substitution = new ArraySubstitution();
     }
@@ -158,7 +157,7 @@ class OperationRegistry
             return false;
         }
 
-        if (!$this->applicationsHelper->isApplicationsValid((array)$config['applications'])) {
+        if (!$this->applicationProvider->isApplicationsValid((array)$config['applications'])) {
             return false;
         }
 

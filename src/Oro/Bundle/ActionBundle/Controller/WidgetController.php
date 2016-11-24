@@ -118,14 +118,6 @@ class WidgetController extends Controller
     }
 
     /**
-     * @return ApplicationsHelper
-     */
-    protected function getApplicationsHelper()
-    {
-        return $this->get('oro_action.helper.applications');
-    }
-
-    /**
      * @param \Exception $e
      * @param Collection $errors
      *

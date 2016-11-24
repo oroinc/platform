@@ -5,16 +5,16 @@ namespace Oro\Bundle\ActionBundle\Tests\Unit\Helper;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 
-use Oro\Bundle\ActionBundle\Helper\ApplicationsHelper;
 use Oro\Bundle\ActionBundle\Helper\DefaultOperationRequestHelper;
+use Oro\Bundle\ActionBundle\Provider\RouteProviderInterface;
 
 class DefaultOperationRequestHelperTest extends \PHPUnit_Framework_TestCase
 {
     /** @var \PHPUnit_Framework_MockObject_MockObject|RequestStack */
     protected $requestStack;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|ApplicationsHelper */
-    protected $applicationsHelper;
+    /** @var \PHPUnit_Framework_MockObject_MockObject|RouteProviderInterface */
+    protected $routeProvider;
 
     /** @var DefaultOperationRequestHelper */
     protected $helper;
@@ -28,11 +28,11 @@ class DefaultOperationRequestHelperTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->applicationsHelper = $this->getMockBuilder('Oro\Bundle\ActionBundle\Helper\ApplicationsHelper')
+        $this->routeProvider = $this->getMockBuilder(RouteProviderInterface::class)
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->helper = new DefaultOperationRequestHelper($this->requestStack, $this->applicationsHelper);
+        $this->helper = new DefaultOperationRequestHelper($this->requestStack, $this->routeProvider);
     }
 
     /**
@@ -48,7 +48,7 @@ class DefaultOperationRequestHelperTest extends \PHPUnit_Framework_TestCase
             ->method('getMasterRequest')
             ->willReturn($masterRequest);
 
-        $this->applicationsHelper->expects($executionRoute ? $this->once() : $this->never())
+        $this->routeProvider->expects($executionRoute ? $this->once() : $this->never())
             ->method('getExecutionRoute')
             ->willReturn($executionRoute);
 
@@ -123,7 +123,7 @@ class DefaultOperationRequestHelperTest extends \PHPUnit_Framework_TestCase
             ->method('getMasterRequest')
             ->willReturn($masterRequest);
 
-        $this->applicationsHelper->expects($executionRoute ? $this->once() : $this->never())
+        $this->routeProvider->expects($executionRoute ? $this->once() : $this->never())
             ->method('getExecutionRoute')
             ->willReturn($executionRoute);
 

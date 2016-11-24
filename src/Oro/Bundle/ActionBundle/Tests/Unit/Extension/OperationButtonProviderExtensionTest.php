@@ -3,7 +3,6 @@
 namespace Oro\Bundle\ActionBundle\Tests\Unit\Extension;
 
 use Oro\Bundle\ActionBundle\Extension\OperationButtonProviderExtension;
-use Oro\Bundle\ActionBundle\Helper\ApplicationsHelperInterface;
 use Oro\Bundle\ActionBundle\Helper\ContextHelper;
 use Oro\Bundle\ActionBundle\Model\ActionData;
 use Oro\Bundle\ActionBundle\Model\ButtonContext;
@@ -11,6 +10,7 @@ use Oro\Bundle\ActionBundle\Model\ButtonSearchContext;
 use Oro\Bundle\ActionBundle\Model\Operation;
 use Oro\Bundle\ActionBundle\Model\OperationButton;
 use Oro\Bundle\ActionBundle\Model\OperationRegistry;
+use Oro\Bundle\ActionBundle\Provider\RouteProviderInterface;
 
 class OperationButtonProviderExtensionTest extends \PHPUnit_Framework_TestCase
 {
@@ -33,8 +33,8 @@ class OperationButtonProviderExtensionTest extends \PHPUnit_Framework_TestCase
     /** @var \PHPUnit_Framework_MockObject_MockObject|OperationRegistry */
     protected $operationRegistry;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|ApplicationsHelperInterface */
-    protected $applicationsHelper;
+    /** @var \PHPUnit_Framework_MockObject_MockObject|RouteProviderInterface */
+    protected $routeProvider;
 
     /**
      * {@inheritdoc}
@@ -46,24 +46,24 @@ class OperationButtonProviderExtensionTest extends \PHPUnit_Framework_TestCase
             ->getMock();
         $this->contextHelper = $this->getMockBuilder(ContextHelper::class)->disableOriginalConstructor()->getMock();
 
-        $this->applicationsHelper = $this->getMock(ApplicationsHelperInterface::class);
+        $this->routeProvider = $this->getMock(RouteProviderInterface::class);
 
-        $this->applicationsHelper->expects($this->any())
+        $this->routeProvider->expects($this->any())
             ->method('getExecutionRoute')
             ->willReturn(self::EXECUTION_ROUTE_NAME);
 
-        $this->applicationsHelper->expects($this->any())
+        $this->routeProvider->expects($this->any())
             ->method('getFormDialogRoute')
             ->willReturn(self::FORM_DIALOG_ROUTE_NAME);
 
-        $this->applicationsHelper->expects($this->any())
+        $this->routeProvider->expects($this->any())
             ->method('getFormPageRoute')
             ->willReturn(self::FORM_PAGE_ROUTE_NAME);
 
         $this->extension = new OperationButtonProviderExtension(
             $this->operationRegistry,
             $this->contextHelper,
-            $this->applicationsHelper
+            $this->routeProvider
         );
     }
 
@@ -72,7 +72,7 @@ class OperationButtonProviderExtensionTest extends \PHPUnit_Framework_TestCase
      */
     protected function tearDown()
     {
-        unset($this->extension, $this->contextHelper, $this->operationRegistry, $this->applicationsHelper);
+        unset($this->extension, $this->contextHelper, $this->operationRegistry, $this->routeProvider);
     }
 
     /**
@@ -85,7 +85,7 @@ class OperationButtonProviderExtensionTest extends \PHPUnit_Framework_TestCase
     public function testFind(array $operations, ButtonSearchContext $buttonSearchContext, array $expected)
     {
         $this->assertOperationRegistryMethodsCalled($operations, $buttonSearchContext);
-        $this->assertContextHelperCalled($operations);
+        $this->assertContextHelperCalled();
 
         $this->assertEquals($expected, $this->extension->find($buttonSearchContext));
     }
@@ -190,13 +190,8 @@ class OperationButtonProviderExtensionTest extends \PHPUnit_Framework_TestCase
             ->willReturn($operations);
     }
 
-    /**
-     * @param array $operations
-     */
-    private function assertContextHelperCalled(array $operations = [])
+    private function assertContextHelperCalled()
     {
-        $this->contextHelper->expects($this->exactly(count($operations)))
-            ->method('getActionData')
-            ->willReturn(new ActionData());
+        $this->contextHelper->expects($this->once())->method('getActionData')->willReturn(new ActionData());
     }
 }

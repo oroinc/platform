@@ -30,19 +30,20 @@ class ButtonContextTest extends \PHPUnit_Framework_TestCase
 
     public function testGetSetButtonContext()
     {
-        $context = [
-            ['routeName', 'test_route'],
-            ['datagridName', 'datagrid'],
-            ['group', 'test_group'],
-            ['executionRoute', 'test_url1'],
-            ['formDialogRoute', 'test_url2'],
-            ['formPageRoute', 'test_url3'],
-            ['enabled', true],
-            ['unavailableHidden', true],
-            ['errors', ['test_error'], []],
-        ];
-
-        $this->assertPropertyAccessors($this->buttonContext, $context);
+        $this->assertPropertyAccessors(
+            $this->buttonContext,
+            [
+                ['routeName', 'test_route'],
+                ['datagridName', 'datagrid'],
+                ['group', 'test_group'],
+                ['executionRoute', 'test_url1'],
+                ['formDialogRoute', 'test_url2'],
+                ['formPageRoute', 'test_url3'],
+                ['enabled', true],
+                ['unavailableHidden', true],
+                ['errors', ['test_error'], []],
+            ]
+        );
     }
 
     /**

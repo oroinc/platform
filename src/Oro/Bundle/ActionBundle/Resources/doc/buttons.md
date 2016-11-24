@@ -21,7 +21,7 @@ For example, Operations are implemented in the same way and the button provider 
         arguments:
             - '@oro_action.operation_registry'
             - '@oro_action.helper.context'
-            - '@oro_action.helper.applications'
+            - '@oro_action.provider.route'
         tags:
             - { name: oro.action.extension.button_provider, priority: 100 }
 

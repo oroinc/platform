@@ -38,19 +38,17 @@ UPGRADE FROM 1.10 to 2.0
 - Tag `oro_workflow.condition` removed, now for conditions always using `oro_action.condition`
 - Deprecated service `oro_workflow.context_accessor` removed
 - Service (`Oro\Bundle\ActionBundle\Model\ConfigurationPass\ReplacePropertyPath`) removed, use `Oro\Component\ConfigExpression\ConfigurationPass\ReplacePropertyPath` instead
-- Added `Oro\Bundle\ActionBundle\Helper\ApplicationsHelperInterface` and trait `Oro\Bundle\ActionBundle\Helper\ApplicationsHelperTrait`, interface declare methods `isApplicationsValid()` and `getCurrentApplication()`
-- Added `Oro\Bundle\ActionBundle\Helper\RouteHelperInterface` and trait `Oro\Bundle\ActionBundle\Helper\RouteHelperTrait`, interface declare getters and setters for `widgetRoute`, `formDialogRoute`, `formPageRoute`, `executionRoute`
-- Changes in `Oro\Bundle\ActionBundle\Helper\ApplicationsHelper`:
-    - implemented `Oro\Bundle\ActionBundle\Helper\ApplicationsHelperInterface`
-    - method `getDialogRoute()` changed to `setFormDialogRoute()`
-    - registered as service `oro_action.helper.applications` with configured routes
+- Added `Oro\Bundle\ActionBundle\Provider\CurrentApplicationProviderInterface` and trait `Oro\Bundle\ActionBundle\Provider\CurrentApplicationProviderTrait`, interface declare methods `isApplicationsValid()` and `getCurrentApplication()`
+- Added `Oro\Bundle\ActionBundle\Provider\RouteProviderInterface` and trait `Oro\Bundle\ActionBundle\Provider\RouteProviderTrait`, interface declare getters and setters for `widgetRoute`, `formDialogRoute`, `formPageRoute`, `executionRoute`
+- Deleted `Oro\Bundle\ActionBundle\Helper\ApplicationsHelper`.
+Please use `Oro\Bundle\ActionBundle\Provider\CurrentApplicationProvider` and `Oro\Bundle\ActionBundle\Provider\RouteProvider` instead.
 - Changes in `Oro\Bundle\ActionBundle\Helper\ApplicationsUrlHelper`:
-    - type of first argument of `__construct()` changed to `Oro\Bundle\ActionBundle\Helper\ApplicationsHelperInterface`
+    - type of first argument of `__construct()` changed to `Oro\Bundle\ActionBundle\Provider\RouteProviderInterface`
     - implemented method `getPageUrl()`, that used `ApplicationsHelperInterface::getFormDialogRoute()`
-- Type of second argument of `Oro\Bundle\ActionBundle\Helper\DefaultOperationRequestHelper::__construct()` changed to `Oro\Bundle\ActionBundle\Helper\ApplicationsHelperInterface`
-- Type of third argument of `Oro\Bundle\ActionBundle\Model\OperationRegistry::__construct()` changed to `Oro\Bundle\ActionBundle\Helper\ApplicationsHelperInterface`
+- Type of second argument of `Oro\Bundle\ActionBundle\Helper\DefaultOperationRequestHelper::__construct()` changed to `Oro\Bundle\ActionBundle\Provider\CurrentApplicationProviderInterface`
+- Type of third argument of `Oro\Bundle\ActionBundle\Model\OperationRegistry::__construct()` changed to `Oro\Bundle\ActionBundle\Provider\CurrentApplicationProviderInterface`
 - Changes in `Oro\Bundle\ActionBundle\Layout\DataProvider`:
-    - type of first argument of `__construct()` changed to `Oro\Bundle\ActionBundle\Helper\ApplicationsHelperInterface`
+    - type of first argument of `__construct()` changed to `Oro\Bundle\ActionBundle\Provider\CurrentApplicationProviderInterface`
     - implemented method `getPageRoute()`
 - Added `Oro\Bundle\ActionBundle\Model\ButtonSearchContext`, that wrap parameters needed for searching of a buttons
 - Added `Oro\Bundle\ActionBundle\Provider\ButtonSearchContextProvider` for providing ButtonSearchContext by array context
@@ -71,7 +69,7 @@ UPGRADE FROM 1.10 to 2.0
     - registered as layout provider `button_provider`
 - Changes in `Oro\Bundle\ActionBundle\Twig\OperationExtension`:
     - first argument `Oro\Bundle\ActionBundle\Model\OperationManager $manager` of `__construct()` removed
-    - type of second argument changed from `Oro\Bundle\ActionBundle\Helper\ApplicationsHelper` to `Oro\Bundle\ActionBundle\Helper\ApplicationsHelperInterface` and now it first argument
+    - type of second argument changed from `Oro\Bundle\ActionBundle\Helper\ApplicationsHelper` to `Oro\Bundle\ActionBundle\Provider\CurrentApplicationProviderInterface` and now it first argument
     - added fourth argument `Oro\Bundle\ActionBundle\Provider\ButtonProvider $buttonProvider` of `__construct()`
     - added fifth argument `Oro\Bundle\ActionBundle\Provider\ButtonSearchContextProvider $searchContextProvider` of `__construct()`
     - added filter `oro_action_has_buttons`, used `Oro\Bundle\ActionBundle\Provider\ButtonProvider` and `Oro\Bundle\ActionBundle\Provider\ButtonSearchContextProvider`
@@ -294,9 +292,6 @@ To migrate all labels from configuration translatable fields automatically you c
 - Added `Oro\Bundle\WorkflowBundle\Extension\TransitionButtonProviderExtension`, that provide transition buttons
     - implemented `find()` method
     - registered by tag `oro.action.extension.button_provider`
-- Added `Oro\Bundle\WorkflowBundle\Helper\WorkflowApplicationsHelper`:
-    - implemented `Oro\Bundle\ActionBundle\Helper\ApplicationsHelperInterface`
-    - registered as service `oro_workflow.helper.applications` with configured routes
 - Changed `Oro\Bundle\WorkflowBundle\Model\AttributeAssembler::assemble`, now it processing WorkflowConfiguration::NODE_INIT_CONTEXT_ATTRIBUTE
 - Changed `Oro\Bundle\WorkflowBundle\Model\Transition`, added properties $initEntities, $initRoutes, $initContextAttribute and getters/setters for it
 - Changed `Oro\Bundle\WorkflowBundle\Model\TransitionAssembler::assembleTransition`, now it process NODE_INIT_ENTITIES, NODE_INIT_ROUTES, NODE_INIT_CONTEXT_ATTRIBUTE

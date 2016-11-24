@@ -2,19 +2,18 @@
 
 namespace Oro\Bundle\ActionBundle\Twig;
 
-use Oro\Bundle\ActionBundle\Helper\ApplicationsHelper;
-use Oro\Bundle\ActionBundle\Helper\ApplicationsHelperInterface;
 use Oro\Bundle\ActionBundle\Helper\ContextHelper;
 use Oro\Bundle\ActionBundle\Helper\OptionsHelper;
 use Oro\Bundle\ActionBundle\Provider\ButtonProvider;
 use Oro\Bundle\ActionBundle\Provider\ButtonSearchContextProvider;
+use Oro\Bundle\ActionBundle\Provider\RouteProviderInterface;
 
 class OperationExtension extends \Twig_Extension
 {
     const NAME = 'oro_action';
 
-    /** @var ApplicationsHelper */
-    protected $appsHelper;
+    /** @var RouteProviderInterface */
+    protected $routeProvider;
 
     /** @var ContextHelper */
     protected $contextHelper;
@@ -29,20 +28,20 @@ class OperationExtension extends \Twig_Extension
     protected $searchContextProvider;
 
     /**
-     * @param ApplicationsHelperInterface $appsHelper
+     * @param RouteProviderInterface $routeProvider
      * @param ContextHelper $contextHelper
      * @param OptionsHelper $optionsHelper
      * @param ButtonProvider $buttonProvider
      * @param ButtonSearchContextProvider $searchContextProvider
      */
     public function __construct(
-        ApplicationsHelperInterface $appsHelper,
+        RouteProviderInterface $routeProvider,
         ContextHelper $contextHelper,
         OptionsHelper $optionsHelper,
         ButtonProvider $buttonProvider,
         ButtonSearchContextProvider $searchContextProvider
     ) {
-        $this->appsHelper = $appsHelper;
+        $this->routeProvider = $routeProvider;
         $this->contextHelper = $contextHelper;
         $this->optionsHelper = $optionsHelper;
         $this->buttonProvider = $buttonProvider;
@@ -68,7 +67,7 @@ class OperationExtension extends \Twig_Extension
                 [$this->contextHelper, 'getActionParameters'],
                 ['needs_context' => true]
             ),
-            new \Twig_SimpleFunction('oro_action_widget_route', [$this->appsHelper, 'getWidgetRoute']),
+            new \Twig_SimpleFunction('oro_action_widget_route', [$this->routeProvider, 'getWidgetRoute']),
             new \Twig_SimpleFunction('oro_action_frontend_options', [$this->optionsHelper, 'getFrontendOptions']),
             new \Twig_SimpleFunction('oro_action_has_buttons', [$this, 'hasButtons']),
         ];
