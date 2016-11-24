@@ -28,7 +28,11 @@ use Oro\Bundle\LocaleBundle\Model\ExtendLocalization;
  *              "type"="ACL",
  *              "group_name"="",
  *              "category"="account_management"
- *          }
+ *          },
+ *          "form"={
+ *              "form_type"="oro_locale_localization_select",
+ *              "grid_name"="oro-locale-localizations-select-grid",
+ *          },
  *      }
  * )
  */

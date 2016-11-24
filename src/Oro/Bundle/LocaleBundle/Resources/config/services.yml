@@ -338,3 +338,11 @@ services:
             - '@oro_locale.helper.localization'
         tags:
             - { name: layout.data_provider, alias: locale }
+
+    oro_locale.localization_scope_criteria_provider:
+        class: 'Oro\Bundle\LocaleBundle\Provider\LocalizationScopeCriteriaProvider'
+        public: false
+        arguments:
+            - "@oro_locale.provider.current_localization"
+        tags:
+            - {name: oro_scope.provider, scopeType: web_content, priority: 1}

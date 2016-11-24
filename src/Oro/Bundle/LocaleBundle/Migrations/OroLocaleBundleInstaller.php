@@ -4,17 +4,35 @@ namespace Oro\Bundle\LocaleBundle\Migrations\Schema;
 
 use Doctrine\DBAL\Schema\Schema;
 
+use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
+use Oro\Bundle\EntityExtendBundle\Extend\RelationType;
+use Oro\Bundle\EntityExtendBundle\Migration\Extension\ExtendExtension;
+use Oro\Bundle\EntityExtendBundle\Migration\Extension\ExtendExtensionAwareInterface;
 use Oro\Bundle\MigrationBundle\Migration\Installation;
 use Oro\Bundle\MigrationBundle\Migration\QueryBag;
+use Oro\Bundle\ScopeBundle\Migrations\Schema\OroScopeBundleInstaller;
 
-class OroLocaleBundleInstaller implements Installation
+class OroLocaleBundleInstaller implements Installation, ExtendExtensionAwareInterface
 {
+    /** @var ExtendExtension */
+    protected $extendExtension;
+
     /**
      * {@inheritdoc}
      */
     public function getMigrationVersion()
     {
-        return 'v1_0';
+        return 'v1_1';
+    }
+
+    /**
+     * Sets the ExtendExtension
+     *
+     * @param ExtendExtension $extendExtension
+     */
+    public function setExtendExtension(ExtendExtension $extendExtension)
+    {
+        $this->extendExtension = $extendExtension;
     }
 
     /**
@@ -135,6 +153,29 @@ class OroLocaleBundleInstaller implements Installation
             ['localization_id'],
             ['id'],
             ['onDelete' => 'CASCADE', 'onUpdate' => null]
+        );
+    }
+
+    /**
+     * @param Schema $schema
+     */
+    protected function addRelationsToScope(Schema $schema)
+    {
+        $this->extendExtension->addManyToOneRelation(
+            $schema,
+            OroScopeBundleInstaller::ORO_SCOPE,
+            'localization',
+            'oro_localization',
+            'id',
+            [
+                'extend' => [
+                    'owner' => ExtendScope::OWNER_CUSTOM,
+                    'cascade' => ['all'],
+                    'on_delete' => 'CASCADE',
+                    'nullable' => true
+                ]
+            ],
+            RelationType::MANY_TO_ONE
         );
     }
 }

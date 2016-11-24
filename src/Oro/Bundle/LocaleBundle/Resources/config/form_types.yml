@@ -98,6 +98,15 @@ services:
         tags:
             - { name: oro_form.autocomplete.search_handler, alias: oro_localization_parent, acl_resource: oro_locale_localization_view }
 
+    oro_locale.form.autocomplete.localization.search_handler:
+        public: false
+        parent: oro_form.autocomplete.search_handler
+        arguments:
+            - '%oro_locale.entity.localization.class%'
+            - ["name"]
+        tags:
+            - { name: oro_form.autocomplete.search_handler, alias: oro_localization, acl_resource: oro_locale_localization_view }
+
     oro_locale.form.type.language_select:
         class: Oro\Bundle\LocaleBundle\Form\Type\LanguageSelectType
         arguments:
@@ -121,3 +130,13 @@ services:
             - '@oro_locale.provider.localization_choices'
         tags:
             - { name: form.type, alias: oro_locale_localization_selection }
+
+    oro_locale.form.type.localization_select:
+        class: 'Oro\Bundle\LocaleBundle\Form\Type\LocalizationSelectType'
+        tags:
+            - { name: form.type, alias: oro_locale_localization_select }
+
+    oro_locale.form.extension.localization_scope:
+        class: 'Oro\Bundle\LocaleBundle\Form\Extension\LocalizationScopeExtension'
+        tags:
+            - { name: form.type_extension, extended_type: Oro\Bundle\ScopeBundle\Form\Type\ScopeType }

@@ -33,6 +33,7 @@ oro.locale:
                 select_parent_localization: 'Please select parent localization...'
                 select_language: 'Please select language...'
                 select_formatting: 'Please select formatting...'
+                choose: 'Choose a localization...'
 
     localizedfallbackvalue:
         entity_label: 'Localized fallback value'
