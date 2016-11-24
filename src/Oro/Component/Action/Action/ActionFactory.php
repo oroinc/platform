@@ -70,4 +70,12 @@ class ActionFactory implements FactoryWithTypesInterface
     {
         return $this->types;
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function isTypeExists($name)
+    {
+        return isset($this->types[$name]);
+    }
 }

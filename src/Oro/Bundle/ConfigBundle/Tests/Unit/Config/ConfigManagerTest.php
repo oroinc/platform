@@ -136,7 +136,8 @@ class ConfigManagerTest extends \PHPUnit_Framework_TestCase
         $afterEvent  = new ConfigUpdateEvent(
             [
                 $greetingKey => ['old' => 'old value', 'new' => 'updated value']
-            ]
+            ],
+            'user'
         );
 
         $loadEvent = new ConfigGetEvent($this->manager, $greetingKey, 'old value', false, $idValue);
@@ -222,7 +223,8 @@ class ConfigManagerTest extends \PHPUnit_Framework_TestCase
             [
                 $greetingKey => ['old' => 'old value', 'new' => 'updated value'],
                 $levelKey    => ['old' => 2000, 'new' => 20]
-            ]
+            ],
+            'user'
         );
 
         $greetingOldValueLoadEvent = new ConfigGetEvent($this->manager, $greetingKey, 'old value', false, $idValue);

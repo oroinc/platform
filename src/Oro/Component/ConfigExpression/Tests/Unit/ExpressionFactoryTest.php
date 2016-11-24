@@ -140,4 +140,19 @@ class ExpressionFactoryTest extends \PHPUnit_Framework_TestCase
 
         $this->assertSame($types, $this->factory->getTypes());
     }
+
+    public function testIsTypeExists()
+    {
+        $this->extension->expects($this->exactly(2))
+            ->method('hasExpression')
+            ->willReturnMap(
+                [
+                    ['not_exists', false],
+                    ['exists', true]
+                ]
+            );
+
+        $this->assertFalse($this->factory->isTypeExists('not_exists'));
+        $this->assertTrue($this->factory->isTypeExists('exists'));
+    }
 }

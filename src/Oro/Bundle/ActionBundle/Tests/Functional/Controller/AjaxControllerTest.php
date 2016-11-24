@@ -62,7 +62,11 @@ class AjaxControllerTest extends WebTestCase
      * @param string $entityClass
      * @param int $statusCode
      * @param string $message
+     * @param string $redirectRoute
+     * @param array $flashMessages
      * @param array $headers
+     *
+     * @SuppressWarnings(PHPMD.ExcessiveParameterList)
      */
     public function testExecuteAction(
         array $config,
@@ -72,7 +76,9 @@ class AjaxControllerTest extends WebTestCase
         $entityClass,
         $statusCode,
         $message,
-        $headers = ['HTTP_X-Requested-With' => 'XMLHttpRequest']
+        $redirectRoute = '',
+        array $flashMessages = [],
+        array $headers = ['HTTP_X-Requested-With' => 'XMLHttpRequest']
     ) {
         $this->cacheProvider->save(self::ROOT_NODE_NAME, $config);
 
@@ -100,12 +106,12 @@ class AjaxControllerTest extends WebTestCase
         $this->assertEquals($message, $this->entity->getMessage());
         $this->assertResponseStatusCodeEquals($result, $statusCode);
 
-        if ($statusCode === Response::HTTP_FOUND) {
-            $this->assertContains(
-                $this->getContainer()->get('router')->generate('oro_action_widget_buttons'),
-                $result->getContent()
-            );
+        if ($result->isRedirection()) {
+            $location = $this->getContainer()->get('router')->generate($redirectRoute);
+            $this->assertTrue($result->isRedirect($location));
         }
+
+        $this->assertEquals($flashMessages, $this->getContainer()->get('session')->getFlashBag()->all());
     }
 
     /**
@@ -233,6 +239,8 @@ class AjaxControllerTest extends WebTestCase
                 'entityClass' => 'Oro\Bundle\TestFrameworkBundle\Entity\TestActivity',
                 'statusCode' => Response::HTTP_FOUND,
                 'message' => self::MESSAGE_DEFAULT,
+                'redirectRoute' => 'oro_action_widget_buttons',
+                'flashMessages' => [],
                 'headers' => []
             ],
             'redirect ajax' => [
@@ -257,6 +265,26 @@ class AjaxControllerTest extends WebTestCase
                 'entityClass' => 'Oro\Bundle\TestFrameworkBundle\Entity\TestActivity',
                 'statusCode' => Response::HTTP_OK,
                 'message' => self::MESSAGE_DEFAULT,
+            ],
+            'redirect_invalid_non_ajax' => [
+                'config' => array_merge_recursive(
+                    $config,
+                    [
+                        'oro_action_test_action' => [
+                            'entities' => ['Oro\Bundle\TestFrameworkBundle\Entity\TestActivity'],
+                            OperationDefinition::PRECONDITIONS => ['@equal' => ['$message', 'test message wrong']],
+                        ],
+                    ]
+                ),
+                'route' => 'oro_action_widget_buttons',
+                'datagrid' => '',
+                'entityId' => null,
+                'entityClass' => 'Oro\Bundle\TestFrameworkBundle\Entity\TestActivity',
+                'statusCode' => Response::HTTP_FOUND,
+                'message' => self::MESSAGE_DEFAULT,
+                'redirectRoute' => 'oro_action_widget_buttons',
+                'flashMessages' => ['error' => ['Operation with name "oro_action_test_action" not found']],
+                'headers' => [],
             ],
         ];
     }

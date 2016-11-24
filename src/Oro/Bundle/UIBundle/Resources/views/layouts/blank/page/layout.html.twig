@@ -29,7 +29,64 @@
         '~class': ' wrapper'
     }) %}
 
-    <div{{ block('block_attributes') }}>
+    <div {{ block('block_attributes') }}>
         {{ block_widget(block) }}
     </div>
 {% endblock %}
+
+{% block _page_container_widget %}
+    {% set attr = layout_attr_defaults(attr, {
+        '~class': ' page-container'
+    }) %}
+
+    <div {{ block('block_attributes') }}>
+        {{ block_widget(block) }}
+    </div>
+{% endblock %}
+
+{% block _page_main_widget %}
+    {% set attr = layout_attr_defaults(attr, {
+        '~class': ' page-main'
+    }) %}
+
+    {% set contentClass = 'page-main__content'%}
+
+    <main{{ block('block_attributes') }}>
+        <div class="{{ contentClass }}">
+            {{ block_widget(block) }}
+        </div>
+    </main>
+{% endblock %}
+
+
+{% block _page_content_widget %}
+    {% set visibleSidebarChildren = [] %}
+    {% if blocks.page_sidebar is defined %}
+        {% for child in blocks.page_sidebar.children %}
+            {% if child.vars.visible %}
+                {% set visibleSidebarChildren  = visibleSidebarChildren|merge([child]) %}
+            {% endif %}
+        {% endfor %}
+    {% endif %}
+
+    {% set attr = layout_attr_defaults(attr, {
+        '~class': ' page-content' ~ (visibleSidebarChildren|length > 0 ? ' page-content--has-sidebar')
+    }) %}
+
+    <section {{ block('block_attributes') }}>
+        {{ block_widget(block) }}
+    </section>
+{% endblock %}
+
+{% block _page_sidebar_widget %}
+    {% if block.count > 0 %}
+        {% set attr = layout_attr_defaults(attr, {
+            '~class': ' page-sidebar'
+        }) %}
+
+        <aside {{ block('block_attributes') }}>
+            {{ block_widget(block) }}
+        </aside>
+    {% endif %}
+{% endblock %}
+
