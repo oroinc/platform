@@ -5,9 +5,9 @@ namespace Oro\Bundle\EmailBundle\Entity\Manager;
 use Doctrine\Bundle\DoctrineBundle\Registry;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\QueryBuilder;
-
 use Oro\Bundle\EmailBundle\Entity\EmailOrigin;
 use Oro\Bundle\EmailBundle\Entity\Mailbox;
+use Oro\Bundle\EmailBundle\Model\FolderType;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\UserBundle\Entity\User;
 
@@ -60,7 +60,7 @@ class MailboxManager
     }
 
     /**
-     * Returns a list of mailbox emails available to user logged under organization.
+     * Returns a list of mailbox emails available to user logged under organization from which he can send emails.
      *
      * @param User|integer $user User or user id
      * @param Organization|null $organization
@@ -71,6 +71,10 @@ class MailboxManager
     {
         $result = $this->createAvailableMailboxesQuery($user, $organization)
             ->select('mb.email AS email')
+            ->join('mb.origin', '_o')
+            ->join('_o.folders', '_f')
+            ->andWhere('_f.type = :sentFolderType')
+            ->setParameter('sentFolderType', FolderType::SENT)
             ->getQuery()
             ->getResult();
 

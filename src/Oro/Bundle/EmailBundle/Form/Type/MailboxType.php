@@ -79,9 +79,9 @@ class MailboxType extends AbstractType
         ]);
 
         if ($this->userConfigManager->get('oro_imap.enable_google_imap')) {
-            $builder->add('imapAccountType', 'oro_imap_choice_account_type');
+            $builder->add('imapAccountType', 'oro_imap_choice_account_type', ['error_bubbling' => false]);
         } else {
-            $builder->add('origin', 'oro_imap_configuration');
+            $builder->add('origin', 'oro_imap_configuration', ['error_bubbling' => false]);
         }
 
         $builder->add('processType', 'choice', [
