@@ -48,6 +48,22 @@ class FieldMaskBuilderTest extends \PHPUnit_Framework_TestCase
         );
     }
 
+    public function testRemoveServiceBits()
+    {
+        $this->assertEquals(
+            FieldMaskBuilder::REMOVE_SERVICE_BITS,
+            FieldMaskBuilder::GROUP_ALL
+        );
+    }
+
+    public function testServiceBits()
+    {
+        $this->assertEquals(
+            FieldMaskBuilder::SERVICE_BITS,
+            ~FieldMaskBuilder::REMOVE_SERVICE_BITS
+        );
+    }
+
     public function testGetEmptyPattern()
     {
         $builder = new FieldMaskBuilder();

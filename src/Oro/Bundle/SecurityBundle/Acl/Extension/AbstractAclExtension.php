@@ -49,22 +49,6 @@ abstract class AbstractAclExtension implements AclExtensionInterface
     /**
      * {@inheritdoc}
      */
-    public function getServiceBits($mask)
-    {
-        return 0;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function removeServiceBits($mask)
-    {
-        return $mask;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
     public function getDefaultPermission()
     {
         return '';

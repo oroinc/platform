@@ -12,6 +12,9 @@ use Oro\Bundle\SecurityBundle\Acl\Permission\MaskBuilder;
  */
 final class WorkflowTransitionMaskBuilder extends MaskBuilder
 {
+    const SERVICE_BITS        = -32; // 0xFFFFFFE0
+    const REMOVE_SERVICE_BITS = 31;  // 0x0000001F
+
     // These access levels give a user access to own workflow transitions.
     const MASK_PERFORM_TRANSITION_BASIC  = 1;  // 1 << 1
 

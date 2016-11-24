@@ -12,6 +12,9 @@ use Oro\Bundle\SecurityBundle\Acl\Permission\MaskBuilder;
  */
 final class FieldMaskBuilder extends MaskBuilder
 {
+    const SERVICE_BITS        = -2048; // 0xFFFFF800
+    const REMOVE_SERVICE_BITS = 2047;  // 0x000007FF
+
     // These access levels give a user access to fields of own records.
     const MASK_VIEW_BASIC    = 1;    // 1 << 0
     const MASK_EDIT_BASIC    = 2;    // 1 << 1

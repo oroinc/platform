@@ -164,4 +164,20 @@ class ActionAclExtension extends AbstractAclExtension
     {
         return ActionMaskBuilder::getPatternFor($mask);
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getServiceBits($mask)
+    {
+        return $mask & ActionMaskBuilder::SERVICE_BITS;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function removeServiceBits($mask)
+    {
+        return $mask & ActionMaskBuilder::REMOVE_SERVICE_BITS;
+    }
 }

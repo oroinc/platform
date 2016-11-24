@@ -92,16 +92,11 @@ class AclVoterTest extends \PHPUnit_Framework_TestCase
                             $inVoteObject = $this->voter->getObject();
                             $inVoteExtension = $this->voter->getAclExtension();
 
-                            $this->voter->setTriggeredMask(1);
+                            $this->voter->setTriggeredMask(1, AccessLevel::LOCAL_LEVEL);
 
                             return null;
                         }
                     );
-
-            $extension->expects($this->once())
-                ->method('getAccessLevel')
-                ->with(1)
-                ->willReturn(AccessLevel::LOCAL_LEVEL);
 
             $this->assertIsGrantedObserverCalled();
         }

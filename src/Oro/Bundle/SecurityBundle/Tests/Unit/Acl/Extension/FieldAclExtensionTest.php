@@ -457,6 +457,66 @@ class FieldAclExtensionTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * @dataProvider getServiceBitsProvider
+     */
+    public function testGetServiceBits($mask, $expectedMask)
+    {
+        self::assertEquals($expectedMask, $this->extension->getServiceBits($mask));
+    }
+
+    public function getServiceBitsProvider()
+    {
+        return [
+            'zero mask'                        => [
+                FieldMaskBuilder::GROUP_NONE,
+                FieldMaskBuilder::GROUP_NONE
+            ],
+            'not zero mask'                    => [
+                FieldMaskBuilder::MASK_EDIT_SYSTEM,
+                FieldMaskBuilder::GROUP_NONE
+            ],
+            'zero mask, not zero identity'     => [
+                FieldMaskBuilder::REMOVE_SERVICE_BITS + 1,
+                FieldMaskBuilder::REMOVE_SERVICE_BITS + 1
+            ],
+            'not zero mask, not zero identity' => [
+                (FieldMaskBuilder::REMOVE_SERVICE_BITS + 1) | FieldMaskBuilder::MASK_EDIT_SYSTEM,
+                FieldMaskBuilder::REMOVE_SERVICE_BITS + 1
+            ],
+        ];
+    }
+
+    /**
+     * @dataProvider removeServiceBitsProvider
+     */
+    public function testRemoveServiceBits($mask, $expectedMask)
+    {
+        self::assertEquals($expectedMask, $this->extension->removeServiceBits($mask));
+    }
+
+    public function removeServiceBitsProvider()
+    {
+        return [
+            'zero mask'                        => [
+                FieldMaskBuilder::GROUP_NONE,
+                FieldMaskBuilder::GROUP_NONE
+            ],
+            'not zero mask'                    => [
+                FieldMaskBuilder::MASK_EDIT_SYSTEM,
+                FieldMaskBuilder::MASK_EDIT_SYSTEM
+            ],
+            'zero mask, not zero identity'     => [
+                FieldMaskBuilder::REMOVE_SERVICE_BITS + 1,
+                FieldMaskBuilder::GROUP_NONE
+            ],
+            'not zero mask, not zero identity' => [
+                (FieldMaskBuilder::REMOVE_SERVICE_BITS + 1) | FieldMaskBuilder::MASK_EDIT_SYSTEM,
+                FieldMaskBuilder::MASK_EDIT_SYSTEM
+            ],
+        ];
+    }
+
+    /**
      * @expectedException \LogicException
      */
     public function testSupports()

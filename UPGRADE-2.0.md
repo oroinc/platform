@@ -409,6 +409,11 @@ To migrate all labels from configuration translatable fields automatically you c
 - Removed `Oro\Bundle\SecurityBundle\Acl\Extension\OwnershipDecisionMakerInterface`. Use `Oro\Bundle\SecurityBundle\Acl\Extension\AccessLevelOwnershipDecisionMakerInterface` instead.
 - Removed unused method `getSystemLevelClass` from `Oro\Bundle\SecurityBundle\Owner\Metadata\MetadataProviderInterface`.
 - Class `Oro\Bundle\SecurityBundle\Acl\Domain\EntityObjectReference` marked as deprecated. Use `Oro\Bundle\SecurityBundle\Acl\Domain\DomainObjectReference` instead.
+- Removed unused class `Oro\Bundle\SecurityBundle\Acl\Extension\BaseEntityMaskBuilder`.
+- Changed signature of `setTriggeredMask` method of `Oro\Bundle\SecurityBundle\Acl\Domain\PermissionGrantingStrategyContextInterface`. Added `int $accessLevel` parameter.
+- Changed signature of `isMasksComparable` method of `Oro\Bundle\SecurityBundle\Acl\Domain\PermissionGrantingStrategy`. Added `mixed $object` parameter.
+- Changed signature of the constructor of `Oro\Bundle\SecurityBundle\Acl\Extension\FieldAclExtension`. Removed `$entityClassResolver` parameter.
+
 
 ####ImportExportBundle
 - Added new event `AFTER_JOB_EXECUTION`, for details please check out [documentation](./src/Oro/Bundle/ImportExportBundle/Resources/doc/reference/events.md).

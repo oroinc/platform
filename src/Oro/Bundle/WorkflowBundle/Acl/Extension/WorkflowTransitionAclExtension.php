@@ -141,6 +141,22 @@ class WorkflowTransitionAclExtension extends AbstractWorkflowAclExtension
     /**
      * {@inheritdoc}
      */
+    public function getServiceBits($mask)
+    {
+        return $mask & MaskBuilder::SERVICE_BITS;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function removeServiceBits($mask)
+    {
+        return $mask & MaskBuilder::REMOVE_SERVICE_BITS;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     protected function parseDescriptor($descriptor, &$type, &$id, &$group)
     {
         $descriptor = ObjectIdentityHelper::removeFieldName($descriptor);

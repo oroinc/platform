@@ -26,6 +26,22 @@ class WorkflowTransitionMaskBuilderTest extends \PHPUnit_Framework_TestCase
         );
     }
 
+    public function testRemoveServiceBits()
+    {
+        $this->assertEquals(
+            WorkflowTransitionMaskBuilder::REMOVE_SERVICE_BITS,
+            WorkflowTransitionMaskBuilder::GROUP_ALL
+        );
+    }
+
+    public function testServiceBits()
+    {
+        $this->assertEquals(
+            WorkflowTransitionMaskBuilder::SERVICE_BITS,
+            ~WorkflowTransitionMaskBuilder::REMOVE_SERVICE_BITS
+        );
+    }
+
     public function testGetEmptyPattern()
     {
         $builder = new WorkflowTransitionMaskBuilder();

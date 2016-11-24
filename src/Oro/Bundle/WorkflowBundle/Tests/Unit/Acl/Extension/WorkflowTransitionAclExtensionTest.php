@@ -126,6 +126,68 @@ class WorkflowTransitionAclExtensionTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * @dataProvider getServiceBitsProvider
+     */
+    public function testGetServiceBits($mask, $expectedMask)
+    {
+        self::assertEquals($expectedMask, $this->extension->getServiceBits($mask));
+    }
+
+    public function getServiceBitsProvider()
+    {
+        return [
+            'zero mask'                        => [
+                WorkflowTransitionMaskBuilder::GROUP_NONE,
+                WorkflowTransitionMaskBuilder::GROUP_NONE
+            ],
+            'not zero mask'                    => [
+                WorkflowTransitionMaskBuilder::MASK_PERFORM_TRANSITION_SYSTEM,
+                WorkflowTransitionMaskBuilder::GROUP_NONE
+            ],
+            'zero mask, not zero identity'     => [
+                WorkflowTransitionMaskBuilder::REMOVE_SERVICE_BITS + 1,
+                WorkflowTransitionMaskBuilder::REMOVE_SERVICE_BITS + 1
+            ],
+            'not zero mask, not zero identity' => [
+                (WorkflowTransitionMaskBuilder::REMOVE_SERVICE_BITS + 1)
+                | WorkflowTransitionMaskBuilder::MASK_PERFORM_TRANSITION_SYSTEM,
+                WorkflowTransitionMaskBuilder::REMOVE_SERVICE_BITS + 1
+            ],
+        ];
+    }
+
+    /**
+     * @dataProvider removeServiceBitsProvider
+     */
+    public function testRemoveServiceBits($mask, $expectedMask)
+    {
+        self::assertEquals($expectedMask, $this->extension->removeServiceBits($mask));
+    }
+
+    public function removeServiceBitsProvider()
+    {
+        return [
+            'zero mask'                        => [
+                WorkflowTransitionMaskBuilder::GROUP_NONE,
+                WorkflowTransitionMaskBuilder::GROUP_NONE
+            ],
+            'not zero mask'                    => [
+                WorkflowTransitionMaskBuilder::MASK_PERFORM_TRANSITION_SYSTEM,
+                WorkflowTransitionMaskBuilder::MASK_PERFORM_TRANSITION_SYSTEM
+            ],
+            'zero mask, not zero identity'     => [
+                WorkflowTransitionMaskBuilder::REMOVE_SERVICE_BITS + 1,
+                WorkflowTransitionMaskBuilder::GROUP_NONE
+            ],
+            'not zero mask, not zero identity' => [
+                (WorkflowTransitionMaskBuilder::REMOVE_SERVICE_BITS + 1)
+                | WorkflowTransitionMaskBuilder::MASK_PERFORM_TRANSITION_SYSTEM,
+                WorkflowTransitionMaskBuilder::MASK_PERFORM_TRANSITION_SYSTEM
+            ],
+        ];
+    }
+
+    /**
      * @dataProvider notSupportedObjectProvider
      */
     public function testDecideIsGrantingForNotSupportedObject($object)

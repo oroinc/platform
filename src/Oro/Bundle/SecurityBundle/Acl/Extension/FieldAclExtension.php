@@ -173,6 +173,22 @@ class FieldAclExtension extends AbstractSimpleAccessLevelAclExtension
     /**
      * {@inheritdoc}
      */
+    public function getServiceBits($mask)
+    {
+        return $mask & FieldMaskBuilder::SERVICE_BITS;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function removeServiceBits($mask)
+    {
+        return $mask & FieldMaskBuilder::REMOVE_SERVICE_BITS;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     protected function getMaskBuilderConst($constName)
     {
         return FieldMaskBuilder::getConst($constName);

@@ -177,6 +177,22 @@ class WorkflowAclExtension extends AbstractWorkflowAclExtension
     /**
      * {@inheritdoc}
      */
+    public function getServiceBits($mask)
+    {
+        return $mask & MaskBuilder::SERVICE_BITS;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function removeServiceBits($mask)
+    {
+        return $mask & MaskBuilder::REMOVE_SERVICE_BITS;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     protected function getMaskBuilderConst($constName)
     {
         return MaskBuilder::getConst($constName);

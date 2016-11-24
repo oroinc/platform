@@ -69,7 +69,7 @@ class PermissionGrantingStrategy implements PermissionGrantingStrategyInterface
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function isGranted(AclInterface $acl, array $masks, array $sids, $administrativeMode = false)
     {
@@ -103,7 +103,7 @@ class PermissionGrantingStrategy implements PermissionGrantingStrategyInterface
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function isFieldGranted(AclInterface $acl, $field, array $masks, array $sids, $administrativeMode = false)
     {
@@ -146,18 +146,6 @@ class PermissionGrantingStrategy implements PermissionGrantingStrategyInterface
      * identities should be at the beginning of the SIDs array in order for this
      * strategy to produce intuitive authorization decisions.
      *
-     * First, we will iterate over permissions, then over security identities.
-     * For each combination of permission, and identity we will test the
-     * available ACEs until we find one which is applicable.
-     *
-     * The first applicable ACE will make the ultimate decision for the
-     * permission/identity combination. If it is granting, this method will return
-     * true, if it is denying, the method will continue to check the next
-     * permission/identity combination.
-     *
-     * This process is repeated until either a granting ACE is found, or no
-     * permission/identity combinations are left.
-     *
      * @param AclInterface                $acl
      * @param EntryInterface[]            $aces               An array of ACE to check against
      * @param array                       $masks              An array of permission masks
@@ -165,8 +153,9 @@ class PermissionGrantingStrategy implements PermissionGrantingStrategyInterface
      * @param boolean                     $administrativeMode True turns off audit logging
      *
      * @return boolean|null true if granting access; false if denying access; null if ACE was not found.
-     * @throws NoAceFoundException
+     *
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
+     * @SuppressWarnings(PHPMD.NPathComplexity)
      */
     protected function hasSufficientPermissions(
         AclInterface $acl,
@@ -179,25 +168,27 @@ class PermissionGrantingStrategy implements PermissionGrantingStrategyInterface
         $triggeredMask = 0;
         $result = false;
 
-        $aclExt = $this->getContext()->getAclExtension();
+        $context = $this->getContext();
+        $securityToken = $context->getSecurityToken();
+        $object = $context->getObject();
+        if ($object instanceof DomainObjectWrapper) {
+            $object = $object->getDomainObject();
+        }
+        $extension = $context->getAclExtension();
         foreach ($sids as $sid) {
             foreach ($aces as $ace) {
                 if ($sid->equals($ace->getSecurityIdentity())) {
                     foreach ($masks as $requiredMask) {
-                        if ($this->isMasksComparable($requiredMask, $ace, $acl, $aclExt)) {
-                            if ($this->isAceApplicable($requiredMask, $ace, $aclExt)) {
+                        if ($this->isMasksComparable($object, $requiredMask, $ace, $acl, $extension)) {
+                            if ($this->isAceApplicable($requiredMask, $ace, $extension)) {
                                 $isGranting = $ace->isGranting();
                                 if ($sid instanceof RoleSecurityIdentity) {
                                     // give an additional chance for the appropriate ACL extension to decide
                                     // whether an access to a domain object is granted or not
-                                    $object = $this->getContext()->getObject();
-                                    if ($object instanceof DomainObjectWrapper) {
-                                        $object = $object->getDomainObject();
-                                    }
-                                    $decisionResult = $aclExt->decideIsGranting(
+                                    $decisionResult = $extension->decideIsGranting(
                                         $requiredMask,
                                         $object,
-                                        $this->getContext()->getSecurityToken()
+                                        $securityToken
                                     );
                                     if (!$decisionResult) {
                                         $isGranting = !$isGranting;
@@ -206,7 +197,9 @@ class PermissionGrantingStrategy implements PermissionGrantingStrategyInterface
 
                                 if ($isGranting) {
                                     // the access is granted if there is at least one granting ACE
-                                    if ($aclExt->getAccessLevel($requiredMask) > $aclExt->getAccessLevel($triggeredMask)
+                                    if (null === $triggeredAce
+                                        || $extension->getAccessLevel($requiredMask, null, $object)
+                                        > $extension->getAccessLevel($triggeredMask, null, $object)
                                     ) {
                                         // the current ACE gives more permissions than previous one
                                         $triggeredAce = $ace;
@@ -219,10 +212,7 @@ class PermissionGrantingStrategy implements PermissionGrantingStrategyInterface
                                     $triggeredAce = $ace;
                                     $triggeredMask = $requiredMask;
                                 }
-                            } elseif (0 !== count(array_diff(
-                                $aclExt->getPermissions($requiredMask, true),
-                                $aclExt->getPermissions($ace->getMask(), true)
-                            ))) {
+                            } elseif ($this->containsExtraPermissions($requiredMask, $ace, $extension)) {
                                 $triggeredAce = $ace;
                                 $triggeredMask = $requiredMask;
                             }
@@ -232,11 +222,14 @@ class PermissionGrantingStrategy implements PermissionGrantingStrategyInterface
             }
         }
 
-        if ($triggeredAce === null) {
+        if (null === $triggeredAce) {
             // ACE was not found
             return null;
         } else {
-            $this->getContext()->setTriggeredMask($triggeredMask);
+            $context->setTriggeredMask(
+                $triggeredMask,
+                $extension->getAccessLevel($triggeredMask, null, $object)
+            );
         }
 
         if (!$administrativeMode && null !== $this->auditLogger) {
@@ -249,6 +242,7 @@ class PermissionGrantingStrategy implements PermissionGrantingStrategyInterface
     /**
      * Compares ACE mask with the required mask
      *
+     * @param mixed                 $object
      * @param integer               $requiredMask
      * @param EntryInterface        $ace
      * @param AclInterface          $acl
@@ -257,6 +251,7 @@ class PermissionGrantingStrategy implements PermissionGrantingStrategyInterface
      * @return bool Return true if ace's mask matches
      */
     protected function isMasksComparable(
+        $object,
         $requiredMask,
         EntryInterface $ace,
         AclInterface $acl,
@@ -267,10 +262,6 @@ class PermissionGrantingStrategy implements PermissionGrantingStrategyInterface
         if (ObjectIdentityFactory::ROOT_IDENTITY_TYPE === $oid->getType()) {
             if ($oid->getIdentifier() !== $extension->getExtensionKey()) {
                 return false;
-            }
-            $object = $this->getContext()->getObject();
-            if ($object instanceof DomainObjectWrapper) {
-                $object = $object->getObjectIdentity();
             }
             $aceMask = $extension->adaptRootMask($aceMask, $object);
         }
@@ -314,5 +305,31 @@ class PermissionGrantingStrategy implements PermissionGrantingStrategyInterface
             default:
                 throw new \RuntimeException(sprintf('The strategy "%s" is not supported.', $strategy));
         }
+    }
+
+    /**
+     * Checks whether the required mask has at least one permission that does not exist in the given ACE mask
+     *
+     * @param int                   $requiredMask
+     * @param EntryInterface        $ace
+     * @param AclExtensionInterface $extension
+     *
+     * @return bool
+     */
+    protected function containsExtraPermissions($requiredMask, EntryInterface $ace, AclExtensionInterface $extension)
+    {
+        // the implemented algorithm does the same as
+        // return 0 !== count(array_diff(
+        //        $extension->getPermissions($requiredMask, true),
+        //        $extension->getPermissions($ace->getMask(), true)
+        //     ));
+
+        $requiredMask = $extension->removeServiceBits($requiredMask);
+        $aceMask = $extension->removeServiceBits($ace->getMask());
+
+        return
+            0 !== $requiredMask
+            && $requiredMask !== $aceMask
+            && $extension->removeServiceBits(~0) !== $aceMask;
     }
 }

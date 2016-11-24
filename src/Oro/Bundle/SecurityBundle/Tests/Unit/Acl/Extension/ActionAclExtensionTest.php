@@ -5,6 +5,7 @@ namespace Oro\Bundle\SecurityBundle\Tests\Unit\Acl\Extension;
 use Symfony\Component\Security\Acl\Domain\ObjectIdentity;
 
 use Oro\Bundle\SecurityBundle\Acl\Extension\ActionAclExtension;
+use Oro\Bundle\SecurityBundle\Acl\Extension\ActionMaskBuilder;
 use Oro\Bundle\SecurityBundle\Annotation\Acl as AclAnnotation;
 use Oro\Bundle\SecurityBundle\Metadata\ActionMetadataProvider;
 
@@ -189,6 +190,66 @@ class ActionAclExtensionTest extends \PHPUnit_Framework_TestCase
                 'setOnly' => true,
                 'byCurrentGroup' => true,
                 'expected' => [],
+            ],
+        ];
+    }
+
+    /**
+     * @dataProvider getServiceBitsProvider
+     */
+    public function testGetServiceBits($mask, $expectedMask)
+    {
+        self::assertEquals($expectedMask, $this->extension->getServiceBits($mask));
+    }
+
+    public function getServiceBitsProvider()
+    {
+        return [
+            'zero mask'                        => [
+                ActionMaskBuilder::GROUP_NONE,
+                ActionMaskBuilder::GROUP_NONE
+            ],
+            'not zero mask'                    => [
+                ActionMaskBuilder::MASK_EXECUTE,
+                ActionMaskBuilder::GROUP_NONE
+            ],
+            'zero mask, not zero identity'     => [
+                ActionMaskBuilder::REMOVE_SERVICE_BITS + 1,
+                ActionMaskBuilder::REMOVE_SERVICE_BITS + 1
+            ],
+            'not zero mask, not zero identity' => [
+                (ActionMaskBuilder::REMOVE_SERVICE_BITS + 1) | ActionMaskBuilder::MASK_EXECUTE,
+                ActionMaskBuilder::REMOVE_SERVICE_BITS + 1
+            ],
+        ];
+    }
+
+    /**
+     * @dataProvider removeServiceBitsProvider
+     */
+    public function testRemoveServiceBits($mask, $expectedMask)
+    {
+        self::assertEquals($expectedMask, $this->extension->removeServiceBits($mask));
+    }
+
+    public function removeServiceBitsProvider()
+    {
+        return [
+            'zero mask'                        => [
+                ActionMaskBuilder::GROUP_NONE,
+                ActionMaskBuilder::GROUP_NONE
+            ],
+            'not zero mask'                    => [
+                ActionMaskBuilder::MASK_EXECUTE,
+                ActionMaskBuilder::MASK_EXECUTE
+            ],
+            'zero mask, not zero identity'     => [
+                ActionMaskBuilder::REMOVE_SERVICE_BITS + 1,
+                ActionMaskBuilder::GROUP_NONE
+            ],
+            'not zero mask, not zero identity' => [
+                (ActionMaskBuilder::REMOVE_SERVICE_BITS + 1) | ActionMaskBuilder::MASK_EXECUTE,
+                ActionMaskBuilder::MASK_EXECUTE
             ],
         ];
     }

@@ -337,15 +337,15 @@ class PermissionGrantingStrategyTest extends \PHPUnit_Framework_TestCase
     {
         return [
             ['all', 1 << 0 | 1 << 1, 1 << 0, true],
-            ['all', 1 << 0 | 1 << 1, 1 << 2, false],
+            ['all', 1 << 0 | 1 << 1, 1 << 2, false, false],
             ['all', 1 << 5 | 1 << 6, 1 << 2, false, false],
             ['all', 1 << 0 | 1 << 10, 1 << 0 | 1 << 10, true],
-            ['all', 1 << 0 | 1 << 1, 1 << 0 | 1 << 1 | 1 << 2, false],
+            ['all', 1 << 0 | 1 << 1, 1 << 0 | 1 << 1 | 1 << 2, false, false],
             ['any', 1 << 0 | 1 << 1, 1 << 0, true],
             ['any', 1 << 0 | 1 << 1, 1 << 0 | 1 << 2, true],
-            ['any', 1 << 0 | 1 << 1, 1 << 2, false],
-            ['equal', 1 << 0 | 1 << 1, 1 << 0, false],
-            ['equal', 1 << 0 | 1 << 1, 1 << 1, false],
+            ['any', 1 << 0 | 1 << 1, 1 << 2, false, false],
+            ['equal', 1 << 0 | 1 << 1, 1 << 0, false, false],
+            ['equal', 1 << 0 | 1 << 1, 1 << 1, false, false],
             ['equal', 1 << 0 | 1 << 1, 1 << 0 | 1 << 1, true],
         ];
     }

@@ -53,11 +53,6 @@ class AclVoter extends BaseAclVoter implements PermissionGrantingStrategyContext
     protected $oneShotIsGrantedObserver;
 
     /**
-     * @var int
-     */
-    protected $triggeredMask;
-
-    /**
      * @var AclGroupProviderInterface
      */
     protected $groupProvider;
@@ -120,7 +115,6 @@ class AclVoter extends BaseAclVoter implements PermissionGrantingStrategyContext
             $this->securityToken = null;
             $this->extension = null;
             $this->object = null;
-            $this->triggeredMask = null;
             $this->oneShotIsGrantedObserver = null;
         }
 
@@ -154,19 +148,16 @@ class AclVoter extends BaseAclVoter implements PermissionGrantingStrategyContext
     /**
      * {@inheritdoc}
      */
-    public function setTriggeredMask($mask)
+    public function setTriggeredMask($mask, $accessLevel)
     {
-        $this->triggeredMask = $mask;
         if (null !== $this->oneShotIsGrantedObserver) {
             if (is_array($this->oneShotIsGrantedObserver)) {
                 /** @var OneShotIsGrantedObserver $observer */
                 foreach ($this->oneShotIsGrantedObserver as $observer) {
-                    $observer->setAccessLevel($this->extension->getAccessLevel($mask, null, $this->object));
+                    $observer->setAccessLevel($accessLevel);
                 }
             } else {
-                $this->oneShotIsGrantedObserver->setAccessLevel(
-                    $this->extension->getAccessLevel($mask, null, $this->object)
-                );
+                $this->oneShotIsGrantedObserver->setAccessLevel($accessLevel);
             }
         }
     }
