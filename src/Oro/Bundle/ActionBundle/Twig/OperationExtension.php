@@ -62,7 +62,7 @@ class OperationExtension extends \Twig_Extension
      */
     public function getFunctions()
     {
-        return array(
+        return [
             new \Twig_SimpleFunction(
                 'oro_action_widget_parameters',
                 [$this->contextHelper, 'getActionParameters'],
@@ -71,7 +71,7 @@ class OperationExtension extends \Twig_Extension
             new \Twig_SimpleFunction('oro_action_widget_route', [$this->appsHelper, 'getWidgetRoute']),
             new \Twig_SimpleFunction('oro_action_frontend_options', [$this->optionsHelper, 'getFrontendOptions']),
             new \Twig_SimpleFunction('oro_action_has_buttons', [$this, 'hasButtons']),
-        );
+        ];
     }
 
     /**
