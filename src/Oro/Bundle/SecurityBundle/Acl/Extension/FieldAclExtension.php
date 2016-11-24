@@ -96,15 +96,16 @@ class FieldAclExtension extends AbstractSimpleAccessLevelAclExtension
         if ($type === ObjectIdentityFactory::ROOT_IDENTITY_TYPE) {
             $result = true;
         } else {
-            $securityConfig = $this->configManager->getEntityConfig(
-                'security',
-                ClassUtils::getRealClass(
-                    ObjectIdentityHelper::removeGroupName(ObjectIdentityHelper::removeFieldName($type))
-                )
+            $result = false;
+            $entityClass = ClassUtils::getRealClass(
+                ObjectIdentityHelper::removeGroupName(ObjectIdentityHelper::removeFieldName($type))
             );
-            $result =
-                $securityConfig->get('field_acl_supported')
-                && $securityConfig->get('field_acl_enabled');
+            if ($this->configManager->hasConfig($entityClass)) {
+                $securityConfig = $this->configManager->getEntityConfig('security', $entityClass);
+                $result =
+                    $securityConfig->get('field_acl_supported')
+                    && $securityConfig->get('field_acl_enabled');
+            }
         }
 
         $this->supportedTypes[$type] = $result;

@@ -7,7 +7,6 @@ use Symfony\Component\Security\Core\Util\ClassUtils;
 use Symfony\Component\Security\Acl\Domain\ObjectIdentity;
 
 use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
-
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\SecurityBundle\Acl\AccessLevel;
 use Oro\Bundle\SecurityBundle\Acl\Domain\ObjectIdAccessor;
@@ -389,6 +388,22 @@ class EntityAclExtensionTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(
             ['VIEW', 'CREATE', 'EDIT', 'DELETE', 'ASSIGN', 'PERMIT'],
             $this->extension->getPermissions()
+        );
+    }
+
+    public function testGetPermissionsByMask()
+    {
+        $this->assertEquals(
+            ['VIEW', 'CREATE', 'EDIT'],
+            $this->extension->getPermissions(1)
+        );
+    }
+
+    public function testGetPermissionsAreSetInMask()
+    {
+        $this->assertEquals(
+            ['VIEW'],
+            $this->extension->getPermissions(1, true)
         );
     }
 

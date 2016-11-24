@@ -41,27 +41,13 @@ class EntityAclExtension extends AbstractAccessLevelAclExtension
     /** @var FieldAclExtension */
     protected $fieldAclExtension;
 
-    /**
-     * key = Permission
-     * value = The identity of a permission mask builder
-     *
-     * @var int[]
-     */
-    protected $permissionToMaskBuilderIdentity;
+    /** @var int[] [permission => the identity of a permission mask builder, ...] */
+    private $permissionsToIdentity;
 
-    /** @var array */
-    protected $maskBuilderIdentityToPermissions;
+    /** @var array [the identity of a permission mask builder => [permission, ...], ...] */
+    private $identityToPermissions;
 
-    /**
-     * Cached masks from MaskBuilder
-     * @var array
-     */
-    private $masks = [];
-
-    /**
-     * Cached builders for their identities
-     * @var array|EntityMaskBuilder[]
-     */
+    /** @var EntityMaskBuilder[] [the identity of a permission mask builder => EntityMaskBuilder, ...] */
     private $builders = [];
 
     /**
@@ -87,11 +73,11 @@ class EntityAclExtension extends AbstractAccessLevelAclExtension
         FieldAclExtension $fieldAclExtension
     ) {
         parent::__construct($objectIdAccessor, $metadataProvider, $entityOwnerAccessor, $decisionMaker);
-        $this->entityClassResolver    = $entityClassResolver;
+        $this->entityClassResolver = $entityClassResolver;
         $this->entityMetadataProvider = $entityMetadataProvider;
-        $this->permissionManager      = $permissionManager;
-        $this->groupProvider          = $groupProvider;
-        $this->fieldAclExtension      = $fieldAclExtension;
+        $this->permissionManager = $permissionManager;
+        $this->groupProvider = $groupProvider;
+        $this->fieldAclExtension = $fieldAclExtension;
     }
 
     /**
@@ -206,7 +192,7 @@ class EntityAclExtension extends AbstractAccessLevelAclExtension
             $permission = 'VIEW';
         }
 
-        return $this->getEntityMaskBuilder($this->getIdentityForPermission($permission));
+        return clone $this->getEntityMaskBuilder($this->getIdentityForPermission($permission));
     }
 
     /**
@@ -215,8 +201,9 @@ class EntityAclExtension extends AbstractAccessLevelAclExtension
     public function getAllMaskBuilders()
     {
         $result = [];
-        foreach ($this->getPermissionsForIdentity() as $identity => $permissions) {
-            $result[] = $this->getEntityMaskBuilder($identity);
+        $map = $this->getIdentityToPermissionsMap();
+        foreach ($map as $identity => $permissions) {
+            $result[] = clone $this->getEntityMaskBuilder($identity);
         }
 
         return $result;
@@ -320,30 +307,30 @@ class EntityAclExtension extends AbstractAccessLevelAclExtension
      */
     public function getPermissions($mask = null, $setOnly = false, $byCurrentGroup = false)
     {
-        $map = $this->getPermissionsToIdentityMap($byCurrentGroup);
-
         if ($mask === null) {
-            return array_keys($map);
+            return array_keys($this->getPermissionsToIdentityMap($byCurrentGroup));
         }
-
-        $result = [];
         if (!$setOnly) {
-            $identity = $this->getServiceBits($mask);
-            foreach ($map as $permission => $id) {
-                if ($id === $identity) {
-                    $result[] = $permission;
-                }
-            }
-        } elseif (0 !== $this->removeServiceBits($mask)) {
-            $identity = $this->getServiceBits($mask);
-            $mask = $this->removeServiceBits($mask);
-            foreach ($map as $permission => $id) {
-                if ($id === $identity) {
+            $result = $this->getPermissionsForIdentity($this->getServiceBits($mask));
+        } else {
+            $result = [];
+            if (0 !== $this->removeServiceBits($mask)) {
+                $identity = $this->getServiceBits($mask);
+                $mask = $this->removeServiceBits($mask);
+                $permissions = $this->getPermissionsForIdentity($identity);
+                foreach ($permissions as $permission) {
                     if (0 !== ($mask & $this->getMaskBuilderConst($identity, 'GROUP_' . $permission))) {
                         $result[] = $permission;
                     }
                 }
             }
+        }
+
+        if ($byCurrentGroup && !empty($result)) {
+            $result = array_intersect(
+                $result,
+                array_keys($this->permissionManager->getPermissionsMap($this->groupProvider->getGroup()))
+            );
         }
 
         return $result;
@@ -543,25 +530,19 @@ class EntityAclExtension extends AbstractAccessLevelAclExtension
     /**
      * Gets the constant value defined in the given permission mask builder
      *
-     * @param int    $maskBuilderIdentity The permission mask builder identity
-     * @param string $constName
+     * @param int    $identity  The permission mask builder identity
+     * @param string $constName The name of a constant
      *
      * @return int
      */
-    protected function getMaskBuilderConst($maskBuilderIdentity, $constName)
+    protected function getMaskBuilderConst($identity, $constName)
     {
-        $cachedKey = $maskBuilderIdentity . '-' . $constName;
-
-        if (!array_key_exists($cachedKey, $this->masks)) {
-            $this->masks[$cachedKey] = $this->getEntityMaskBuilder($maskBuilderIdentity)->getMask($constName);
-        }
-
-        return $this->masks[$cachedKey];
+        return $this->getEntityMaskBuilder($identity)->getMask($constName);
     }
 
     protected function loadPermissions()
     {
-        if (null !== $this->permissionToMaskBuilderIdentity && null !== $this->maskBuilderIdentityToPermissions) {
+        if (null !== $this->permissionsToIdentity && null !== $this->identityToPermissions) {
             return;
         }
 
@@ -575,8 +556,8 @@ class EntityAclExtension extends AbstractAccessLevelAclExtension
                 $identity = $this->getIdentityForPrimaryKey($pk);
                 $number = $this->getPermissionNumber($pk);
 
-                $this->permissionToMaskBuilderIdentity[$permission] = $identity;
-                $this->maskBuilderIdentityToPermissions[$identity][$number] = $permission;
+                $this->permissionsToIdentity[$permission] = $identity;
+                $this->identityToPermissions[$identity][$number] = $permission;
             }
         }
     }
@@ -591,9 +572,9 @@ class EntityAclExtension extends AbstractAccessLevelAclExtension
 
         $permissions = array_keys($this->getPermissionsToIdentityMap());
         foreach ($permissions as $permission) {
-            $maskBuilder = $this->getMaskBuilder($permission);
             $masks = [];
 
+            $maskBuilder = $this->getEntityMaskBuilder($this->getIdentityForPermission($permission));
             foreach (AccessLevel::$allAccessLevelNames as $accessLevel) {
                 $masks[] = $maskBuilder->getMask('MASK_' . $permission . '_' . $accessLevel);
             }
@@ -609,8 +590,8 @@ class EntityAclExtension extends AbstractAccessLevelAclExtension
     protected function getPermissionsToIdentityMap($byCurrentGroup = false)
     {
         $this->loadPermissions();
-        $map = $this->permissionToMaskBuilderIdentity;
 
+        $map = $this->permissionsToIdentity;
         if ($byCurrentGroup) {
             $permissions = $this->permissionManager->getPermissionsMap($this->groupProvider->getGroup());
 
@@ -655,28 +636,40 @@ class EntityAclExtension extends AbstractAccessLevelAclExtension
     }
 
     /**
-     * @param int|null $identity
-     * @return array
+     * @return array [identity => [permission, ...], ...]
      */
-    protected function getPermissionsForIdentity($identity = null)
+    protected function getIdentityToPermissionsMap()
     {
         $this->loadPermissions();
 
-        return $identity === null
-            ? $this->maskBuilderIdentityToPermissions
-            : $this->maskBuilderIdentityToPermissions[$identity];
+        return $this->identityToPermissions;
     }
 
     /**
      * @param int $identity
+     * @return string[]
+     */
+    protected function getPermissionsForIdentity($identity)
+    {
+        $this->loadPermissions();
+
+        return $this->identityToPermissions[$identity];
+    }
+
+    /**
+     * @param int $identity
+     *
      * @return EntityMaskBuilder
      */
     protected function getEntityMaskBuilder($identity)
     {
-        if (!isset($this->builders[$identity])) {
-            $this->builders[$identity] = new EntityMaskBuilder($identity, $this->getPermissionsForIdentity($identity));
+        if (isset($this->builders[$identity])) {
+            return $this->builders[$identity];
         }
 
-        return clone $this->builders[$identity];
+        $maskBuilder = new EntityMaskBuilder($identity, $this->getPermissionsForIdentity($identity));
+        $this->builders[$identity] = $maskBuilder;
+
+        return $maskBuilder;
     }
 }

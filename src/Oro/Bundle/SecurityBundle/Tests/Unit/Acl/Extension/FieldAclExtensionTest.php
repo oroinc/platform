@@ -510,6 +510,20 @@ class FieldAclExtensionTest extends \PHPUnit_Framework_TestCase
         );
     }
 
+    public function testSupportsForNotConfigurableEntity()
+    {
+        $entityClass = 'Test\Entity';
+
+        $this->configManager->expects($this->once())
+            ->method('hasConfig')
+            ->with($entityClass)
+            ->willReturn(false);
+
+        self::assertFalse(
+            $this->extension->supports($entityClass, '')
+        );
+    }
+
     public function testSupportsWhenFieldAclIsEnabled()
     {
         $entityClass = 'Test\Entity';
@@ -525,7 +539,11 @@ class FieldAclExtensionTest extends \PHPUnit_Framework_TestCase
                     ['field_acl_enabled', false, null, true]
                 ]
             );
-        $this->configManager->expects($this->any())
+        $this->configManager->expects($this->once())
+            ->method('hasConfig')
+            ->with($entityClass)
+            ->willReturn(true);
+        $this->configManager->expects($this->once())
             ->method('getEntityConfig')
             ->with('security', $entityClass)
             ->willReturn($config);
@@ -550,7 +568,11 @@ class FieldAclExtensionTest extends \PHPUnit_Framework_TestCase
                     ['field_acl_enabled', false, null, false]
                 ]
             );
-        $this->configManager->expects($this->any())
+        $this->configManager->expects($this->once())
+            ->method('hasConfig')
+            ->with($entityClass)
+            ->willReturn(true);
+        $this->configManager->expects($this->once())
             ->method('getEntityConfig')
             ->with('security', $entityClass)
             ->willReturn($config);
@@ -571,7 +593,11 @@ class FieldAclExtensionTest extends \PHPUnit_Framework_TestCase
             ->method('get')
             ->with('field_acl_supported', false, null)
             ->willReturn(false);
-        $this->configManager->expects($this->any())
+        $this->configManager->expects($this->once())
+            ->method('hasConfig')
+            ->with($entityClass)
+            ->willReturn(true);
+        $this->configManager->expects($this->once())
             ->method('getEntityConfig')
             ->with('security', $entityClass)
             ->willReturn($config);
@@ -596,7 +622,11 @@ class FieldAclExtensionTest extends \PHPUnit_Framework_TestCase
                     ['field_acl_enabled', false, null, true]
                 ]
             );
-        $this->configManager->expects($this->any())
+        $this->configManager->expects($this->once())
+            ->method('hasConfig')
+            ->with($entityClass)
+            ->willReturn(true);
+        $this->configManager->expects($this->once())
             ->method('getEntityConfig')
             ->with('security', $entityClass)
             ->willReturn($config);
@@ -621,7 +651,11 @@ class FieldAclExtensionTest extends \PHPUnit_Framework_TestCase
                     ['field_acl_enabled', false, null, true]
                 ]
             );
-        $this->configManager->expects($this->any())
+        $this->configManager->expects($this->once())
+            ->method('hasConfig')
+            ->with($entityClass)
+            ->willReturn(true);
+        $this->configManager->expects($this->once())
             ->method('getEntityConfig')
             ->with('security', $entityClass)
             ->willReturn($config);
