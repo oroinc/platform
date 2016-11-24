@@ -22,23 +22,27 @@ class SwiftMailerHandlerPass implements CompilerPassInterface
         if ($container->hasParameter(self::SWIFTMAILER_MAILERS)) {
             $mailers = $container->getParameter(self::SWIFTMAILER_MAILERS);
             foreach ($mailers as $name => $mailer) {
-                $this->configureMailerDecorator($name, $container);
+                $this->configureMailerDecorator($name, $mailer, $container);
             }
         }
     }
 
     /**
-     * @param string $name
+     * @param string           $name
+     * @param string           $mailer
      * @param ContainerBuilder $container
      */
     protected function configureMailerDecorator(
         $name,
+        $mailer,
         ContainerBuilder $container
     ) {
+        $pluginName = sprintf('swiftmailer.mailer.%s.plugin.no_recipient', $name);
+
         $definitionDecorator = new DefinitionDecorator('swiftmailer.plugin.no_recipient.abstract');
-        $container->setDefinition(sprintf('swiftmailer.mailer.%s.plugin.no_recipient', $name), $definitionDecorator);
-        $container->getDefinition(sprintf('swiftmailer.mailer.%s.plugin.no_recipient', $name))->addTag(
-            sprintf('swiftmailer.%s.plugin', $name)
-        );
+        $container->setDefinition($pluginName, $definitionDecorator);
+
+        $container->getDefinition($mailer)
+            ->addMethodCall('registerPlugin', [$container->getDefinition($pluginName)]);
     }
 }
