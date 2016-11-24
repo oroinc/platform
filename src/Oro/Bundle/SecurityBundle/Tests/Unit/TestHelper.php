@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\SecurityBundle\Tests\Unit;
 
-use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
+use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\SecurityBundle\Acl\Domain\ObjectIdAccessor;
 use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
 use Oro\Bundle\SecurityBundle\Acl\Extension\AccessLevelOwnershipDecisionMakerInterface;
@@ -195,7 +195,7 @@ class TestHelper
      * @param OwnerTree $ownerTree
      * @param ObjectIdAccessor $idAccessor
      * @param AccessLevelOwnershipDecisionMakerInterface $decisionMaker
-     * @param ConfigProvider $configProvider
+     * @param ConfigManager $configManager
      * @return FieldAclExtension
      */
     public function createFieldAclExtension(
@@ -203,7 +203,7 @@ class TestHelper
         OwnerTree $ownerTree = null,
         ObjectIdAccessor $idAccessor = null,
         AccessLevelOwnershipDecisionMakerInterface $decisionMaker = null,
-        ConfigProvider $configProvider = null
+        ConfigManager $configManager = null
     ) {
         if ($idAccessor === null) {
             $doctrineHelper = $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\DoctrineHelper')
@@ -290,7 +290,7 @@ class TestHelper
             $metadataProvider,
             $decisionMaker,
             $entityOwnerAccessor,
-            $configProvider,
+            $configManager,
             $entityMetadataProvider
         );
     }

@@ -3,11 +3,13 @@
 namespace Oro\Bundle\SecurityBundle\Acl\Extension;
 
 use Symfony\Component\Security\Acl\Domain\ObjectIdentity;
+use Symfony\Component\Security\Acl\Util\ClassUtils;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 
-use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
+use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\SecurityBundle\Acl\AccessLevel;
 use Oro\Bundle\SecurityBundle\Acl\Domain\ObjectIdAccessor;
+use Oro\Bundle\SecurityBundle\Acl\Domain\ObjectIdentityFactory;
 use Oro\Bundle\SecurityBundle\Metadata\EntitySecurityMetadataProvider;
 use Oro\Bundle\SecurityBundle\Owner\EntityOwnerAccessor;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\MetadataProviderInterface;
@@ -18,18 +20,21 @@ class FieldAclExtension extends AbstractSimpleAccessLevelAclExtension
     const PERMISSION_CREATE = 'CREATE';
     const PERMISSION_EDIT   = 'EDIT';
 
-    /** @var ConfigProvider */
-    protected $securityConfigProvider;
+    /** @var ConfigManager */
+    protected $configManager;
 
     /** @var EntitySecurityMetadataProvider */
     protected $entityMetadataProvider;
+
+    /** @var array */
+    protected $supportedTypes = [];
 
     /**
      * @param ObjectIdAccessor                           $objectIdAccessor
      * @param MetadataProviderInterface                  $metadataProvider
      * @param AccessLevelOwnershipDecisionMakerInterface $decisionMaker
      * @param EntityOwnerAccessor                        $entityOwnerAccessor
-     * @param ConfigProvider                             $configProvider
+     * @param ConfigManager                              $configManager
      * @param EntitySecurityMetadataProvider             $entityMetadataProvider
      */
     public function __construct(
@@ -37,11 +42,11 @@ class FieldAclExtension extends AbstractSimpleAccessLevelAclExtension
         MetadataProviderInterface $metadataProvider,
         AccessLevelOwnershipDecisionMakerInterface $decisionMaker,
         EntityOwnerAccessor $entityOwnerAccessor,
-        ConfigProvider $configProvider,
+        ConfigManager $configManager,
         EntitySecurityMetadataProvider $entityMetadataProvider
     ) {
         parent::__construct($objectIdAccessor, $metadataProvider, $entityOwnerAccessor, $decisionMaker);
-        $this->securityConfigProvider = $configProvider;
+        $this->configManager = $configManager;
         $this->entityMetadataProvider = $entityMetadataProvider;
 
         $this->permissions = [
@@ -84,7 +89,27 @@ class FieldAclExtension extends AbstractSimpleAccessLevelAclExtension
      */
     public function supports($type, $id)
     {
-        throw new \LogicException('Field ACL Extension does not support "supports" method.');
+        if (array_key_exists($type, $this->supportedTypes)) {
+            return $this->supportedTypes[$type];
+        }
+
+        if ($type === ObjectIdentityFactory::ROOT_IDENTITY_TYPE) {
+            $result = true;
+        } else {
+            $securityConfig = $this->configManager->getEntityConfig(
+                'security',
+                ClassUtils::getRealClass(
+                    ObjectIdentityHelper::removeGroupName(ObjectIdentityHelper::removeFieldName($type))
+                )
+            );
+            $result =
+                $securityConfig->get('field_acl_supported')
+                && $securityConfig->get('field_acl_enabled');
+        }
+
+        $this->supportedTypes[$type] = $result;
+
+        return $result;
     }
 
     /**
@@ -136,10 +161,6 @@ class FieldAclExtension extends AbstractSimpleAccessLevelAclExtension
     public function decideIsGranting($triggeredMask, $object, TokenInterface $securityToken)
     {
         if (!$this->isSupportedObject($object)) {
-            return true;
-        }
-
-        if (!$this->isFieldLevelAclEnabled($object)) {
             return true;
         }
 
@@ -202,19 +223,5 @@ class FieldAclExtension extends AbstractSimpleAccessLevelAclExtension
         $descriptor = ObjectIdentityHelper::removeFieldName($descriptor);
 
         return parent::parseDescriptor($descriptor, $type, $id, $group);
-    }
-
-    /**
-     * @param object $object
-     *
-     * @return bool
-     */
-    protected function isFieldLevelAclEnabled($object)
-    {
-        $securityConfig = $this->securityConfigProvider->getConfig($this->getObjectClassName($object));
-
-        return
-            $securityConfig->get('field_acl_supported')
-            && $securityConfig->get('field_acl_enabled');
     }
 }

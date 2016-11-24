@@ -67,7 +67,7 @@ class WorkflowTransitionAclExtension extends AbstractWorkflowAclExtension
      */
     public function supports($type, $id)
     {
-        throw new \LogicException('Workflow Transition ACL Extension does not support "supports" method.');
+        return true;
     }
 
     /**

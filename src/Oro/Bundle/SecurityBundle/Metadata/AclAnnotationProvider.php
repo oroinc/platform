@@ -3,6 +3,8 @@
 namespace Oro\Bundle\SecurityBundle\Metadata;
 
 use Doctrine\Common\Cache\CacheProvider;
+use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
+use Oro\Bundle\SecurityBundle\Acl\Extension\EntityAclExtension;
 use Oro\Bundle\SecurityBundle\Annotation\Loader\AclAnnotationLoaderInterface;
 use Oro\Bundle\SecurityBundle\Annotation\Acl as AclAnnotation;
 
@@ -10,28 +12,25 @@ class AclAnnotationProvider
 {
     const CACHE_KEY = 'data';
 
-    /**
-     * @var AclAnnotationLoaderInterface[]
-     */
-    protected $loaders = array();
+    /** @var AclAnnotationLoaderInterface[] */
+    protected $loaders = [];
 
-    /**
-     * @var CacheProvider
-     */
+    /** @var EntityClassResolver */
+    protected $entityClassResolver;
+
+    /** @var CacheProvider|null */
     protected $cache;
 
-    /**
-     * @var AclAnnotationStorage
-     */
-    protected $storage = null;
+    /** @var AclAnnotationStorage */
+    protected $storage;
 
     /**
-     * Constructor
-     *
-     * @param CacheProvider $cache
+     * @param EntityClassResolver $entityClassResolver
+     * @param CacheProvider|null  $cache
      */
-    public function __construct(CacheProvider $cache = null)
+    public function __construct(EntityClassResolver $entityClassResolver, CacheProvider $cache = null)
     {
+        $this->entityClassResolver = $entityClassResolver;
         $this->cache = $cache;
     }
 
@@ -171,6 +170,14 @@ class AclAnnotationProvider
         $data = new AclAnnotationStorage();
         foreach ($this->loaders as $loader) {
             $loader->load($data);
+        }
+
+        // this small hack increases performance of Oro\Bundle\SecurityBundle\Acl\Extension\AclExtensionSelector
+        $annotations = $data->getAnnotations();
+        foreach ($annotations as $annotation) {
+            if (EntityAclExtension::NAME === $annotation->getType()) {
+                $annotation->setClass($this->entityClassResolver->getEntityClass($annotation->getClass()));
+            }
         }
 
         if ($this->cache) {

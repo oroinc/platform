@@ -25,6 +25,9 @@ use Oro\Bundle\SecurityBundle\Tests\Unit\TestHelper;
 use Oro\Bundle\SecurityBundle\Tests\Unit\Stub\OwnershipMetadataProviderStub;
 use Oro\Bundle\SecurityBundle\Owner\OwnerTree;
 
+/**
+ * @SuppressWarnings(PHPMD.ExcessiveClassLength)
+ */
 class FieldAclExtensionTest extends \PHPUnit_Framework_TestCase
 {
     /** @var FieldAclExtension */
@@ -97,7 +100,7 @@ class FieldAclExtensionTest extends \PHPUnit_Framework_TestCase
     protected $doctrineHelper;
 
     /** @var \PHPUnit_Framework_MockObject_MockObject */
-    protected $config;
+    protected $configManager;
 
     protected function setUp()
     {
@@ -173,24 +176,16 @@ class FieldAclExtensionTest extends \PHPUnit_Framework_TestCase
         );
         $this->decisionMaker->setContainer($container);
 
-        $configProvider = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
+        $this->configManager = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\ConfigManager')
             ->disableOriginalConstructor()
             ->getMock();
-
-        $this->config = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\Config')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $configProvider->expects($this->any())
-            ->method('getConfig')
-            ->willReturn($this->config);
 
         $this->extension = TestHelper::get($this)->createFieldAclExtension(
             $this->metadataProvider,
             $this->tree,
             new ObjectIdAccessor($this->doctrineHelper),
             $this->decisionMaker,
-            $configProvider
+            $this->configManager
         );
     }
 
@@ -397,14 +392,6 @@ class FieldAclExtensionTest extends \PHPUnit_Framework_TestCase
      */
     public function testDecideIsGranting($triggeredMask, $user, $organization, $object, $expectedResult)
     {
-        $this->config->expects($this->any())
-            ->method('get')
-            ->willReturnMap(
-                [
-                    ['field_acl_supported', false, null, true],
-                    ['field_acl_enabled', false, null, true]
-                ]
-            );
         $this->buildTestTree();
         if ($object instanceof TestEntity && $object->getOwner() !== null) {
             $owner = $object->getOwner();
@@ -516,12 +503,132 @@ class FieldAclExtensionTest extends \PHPUnit_Framework_TestCase
         ];
     }
 
-    /**
-     * @expectedException \LogicException
-     */
-    public function testSupports()
+    public function testSupportsForRootObjectIdentity()
     {
-        $this->extension->supports('', '');
+        self::assertTrue(
+            $this->extension->supports(ObjectIdentityFactory::ROOT_IDENTITY_TYPE, '')
+        );
+    }
+
+    public function testSupportsWhenFieldAclIsEnabled()
+    {
+        $entityClass = 'Test\Entity';
+
+        $config = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\Config')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $config->expects($this->exactly(2))
+            ->method('get')
+            ->willReturnMap(
+                [
+                    ['field_acl_supported', false, null, true],
+                    ['field_acl_enabled', false, null, true]
+                ]
+            );
+        $this->configManager->expects($this->any())
+            ->method('getEntityConfig')
+            ->with('security', $entityClass)
+            ->willReturn($config);
+
+        self::assertTrue(
+            $this->extension->supports($entityClass, '')
+        );
+    }
+
+    public function testSupportsWhenFieldAclIsDisabled()
+    {
+        $entityClass = 'Test\Entity';
+
+        $config = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\Config')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $config->expects($this->exactly(2))
+            ->method('get')
+            ->willReturnMap(
+                [
+                    ['field_acl_supported', false, null, true],
+                    ['field_acl_enabled', false, null, false]
+                ]
+            );
+        $this->configManager->expects($this->any())
+            ->method('getEntityConfig')
+            ->with('security', $entityClass)
+            ->willReturn($config);
+
+        self::assertFalse(
+            $this->extension->supports($entityClass, '')
+        );
+    }
+
+    public function testSupportsWhenFieldAclIsNotSupported()
+    {
+        $entityClass = 'Test\Entity';
+
+        $config = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\Config')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $config->expects($this->once())
+            ->method('get')
+            ->with('field_acl_supported', false, null)
+            ->willReturn(false);
+        $this->configManager->expects($this->any())
+            ->method('getEntityConfig')
+            ->with('security', $entityClass)
+            ->willReturn($config);
+
+        self::assertFalse(
+            $this->extension->supports($entityClass, '')
+        );
+    }
+
+    public function testSupportsWhenTypeContainsFieldName()
+    {
+        $entityClass = 'Test\Entity';
+
+        $config = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\Config')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $config->expects($this->exactly(2))
+            ->method('get')
+            ->willReturnMap(
+                [
+                    ['field_acl_supported', false, null, true],
+                    ['field_acl_enabled', false, null, true]
+                ]
+            );
+        $this->configManager->expects($this->any())
+            ->method('getEntityConfig')
+            ->with('security', $entityClass)
+            ->willReturn($config);
+
+        self::assertTrue(
+            $this->extension->supports($entityClass . '::testField', '')
+        );
+    }
+
+    public function testSupportsWhenTypeContainsGroupAndFieldName()
+    {
+        $entityClass = 'Test\Entity';
+
+        $config = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\Config')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $config->expects($this->exactly(2))
+            ->method('get')
+            ->willReturnMap(
+                [
+                    ['field_acl_supported', false, null, true],
+                    ['field_acl_enabled', false, null, true]
+                ]
+            );
+        $this->configManager->expects($this->any())
+            ->method('getEntityConfig')
+            ->with('security', $entityClass)
+            ->willReturn($config);
+
+        self::assertTrue(
+            $this->extension->supports($entityClass . '::testField@testGroup', '')
+        );
     }
 
     /**

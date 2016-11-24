@@ -67,12 +67,9 @@ class WorkflowTransitionAclExtensionTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(WorkflowAclExtension::NAME, $this->extension->getExtensionKey());
     }
 
-    /**
-     * @expectedException \LogicException
-     */
     public function testSupports()
     {
-        $this->extension->supports('', '');
+        self::assertTrue($this->extension->supports('', ''));
     }
 
     /**
