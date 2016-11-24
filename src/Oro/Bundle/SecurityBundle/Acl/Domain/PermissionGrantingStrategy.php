@@ -318,18 +318,15 @@ class PermissionGrantingStrategy implements PermissionGrantingStrategyInterface
      */
     protected function containsExtraPermissions($requiredMask, EntryInterface $ace, AclExtensionInterface $extension)
     {
-        // the implemented algorithm does the same as
-        // return 0 !== count(array_diff(
-        //        $extension->getPermissions($requiredMask, true),
-        //        $extension->getPermissions($ace->getMask(), true)
-        //     ));
-
         $requiredMask = $extension->removeServiceBits($requiredMask);
         $aceMask = $extension->removeServiceBits($ace->getMask());
 
         return
             0 !== $requiredMask
             && $requiredMask !== $aceMask
-            && $extension->removeServiceBits(~0) !== $aceMask;
+            && 0 !== count(array_diff(
+                $extension->getPermissions($requiredMask, true),
+                $extension->getPermissions($ace->getMask(), true)
+            ));
     }
 }
