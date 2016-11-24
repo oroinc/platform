@@ -29,6 +29,7 @@
         right: 0;
         left: auto;
         margin: 0;
+        padding: 10px 15px;
 
         z-index: 80;
 
@@ -36,13 +37,11 @@
 
         min-width: $oro-toolbar-toolbar-min-width;
 
-        padding: 10px 15px;
-
         font-size: $base-font-size;
 
         background: get-color('additional', 'ultra');
-        border-radius: 2px;
-        box-shadow: 0 4px 5px 0 rgba(0,0,0,.4);
+        border-radius: 4px;
+        box-shadow: 1px 2px 8px rgba(0,0,0,.4);
     }
 
     &__list {
