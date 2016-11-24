@@ -12,9 +12,6 @@ class CurrentApplicationProvider implements CurrentApplicationProviderInterface
     /** @var TokenStorageInterface */
     protected $tokenStorage;
 
-    /** @var string|bool|null */
-    protected $currentApplication = false;
-
     /**
      * @param TokenStorageInterface $tokenStorage
      */
