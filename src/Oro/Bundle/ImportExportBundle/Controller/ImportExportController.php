@@ -175,9 +175,10 @@ class ImportExportController extends Controller
      *
      * @return JsonResponse
      */
-    public function importProcessAction(Request $request, $processorAlias, $fileName)
+    public function importProcessAction(Request $request, $processorAlias)
     {
         $jobName = $request->get('importJob', JobExecutor::JOB_IMPORT_FROM_CSV);
+        $fileName = $request->get('fileName', null);
 
         $this->getMessageProducer()->send(
             Topics::IMPORT_HTTP,
@@ -191,7 +192,7 @@ class ImportExportController extends Controller
         );
 
 
-        return ['success' => true];
+        return new JsonResponse(['success' => true]);
     }
 
     /**

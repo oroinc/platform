@@ -113,6 +113,7 @@ class HttpImportValidationMessageProcessor implements MessageProcessorInterface,
 
                 $summary = sprintf(
                     'Import validation for the %s is completed, success: %s, info: %s, errors url: %s, message: %s',
+                    $result['fileName'],
                     $result['success'],
                     $result['importInfo'],
                     $result['errorsUrl'],

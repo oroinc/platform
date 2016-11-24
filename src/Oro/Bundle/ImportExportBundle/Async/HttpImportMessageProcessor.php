@@ -102,6 +102,7 @@ class HttpImportMessageProcessor implements MessageProcessorInterface, TopicSubs
 
                 $summary = sprintf(
                     'Import for the %s is completed, success: %s, info: %s, errors url: %s, message: %s',
+                    $result['fileName'],
                     $result['success'],
                     $result['importInfo'],
                     $result['errorsUrl'],
