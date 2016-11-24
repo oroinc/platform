@@ -181,6 +181,9 @@ class OwnershipEntityConfigDumperExtensionTest extends \PHPUnit_Framework_TestCa
                             ],
                             'dataaudit' => [
                                 'auditable' => true
+                            ],
+                            'datagrid' => [
+                                'is_visible' => 0
                             ]
                         ]
                     );
@@ -206,6 +209,9 @@ class OwnershipEntityConfigDumperExtensionTest extends \PHPUnit_Framework_TestCa
                             ],
                             'dataaudit' => [
                                 'auditable' => true
+                            ],
+                            'datagrid' => [
+                                'is_visible' => 0
                             ]
                         ]
                     );
@@ -229,6 +235,9 @@ class OwnershipEntityConfigDumperExtensionTest extends \PHPUnit_Framework_TestCa
                             ],
                             'dataaudit' => [
                                 'auditable' => true
+                            ],
+                            'datagrid' => [
+                                'is_visible' => 0
                             ]
                         ]
                     );

@@ -43,30 +43,20 @@ Add Scope Criterion
 -------------------
 To add criterion to the scope, extend Scope entity using migration, as shown int the following example:
 ```
-class OroAccountBundleScopeRelations implements Migration, ExtendExtensionAwareInterface
+class OroAccountBundleScopeRelations implements Migration, ScopeExtensionAwareInterface
 {
-    ...
+    use ScopeExtensionAwareTrait;
     
     /**
      * {@inheritdoc}
      */
     public function up(Schema $schema, QueryBag $queries)
     {
-        $this->extendExtension->addManyToOneRelation(
+        $this->scopeExtension->addScopeAssociation(
             $schema,
-            OroScopeBundleInstaller::ORO_SCOPE,
             'account',
             OroAccountBundleInstaller::ORO_ACCOUNT_TABLE_NAME,
-            'id',
-            [
-                'extend' => [
-                    'owner' => ExtendScope::OWNER_CUSTOM,
-                    'cascade' => ['all'],
-                    'on_delete' => 'CASCADE',
-                    'nullable' => true
-                ]
-            ],
-            RelationType::MANY_TO_ONE
+            'name'
         );
     }
 }

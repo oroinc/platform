@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\OrganizationBundle\Tools;
 
+use Oro\Bundle\EntityBundle\EntityConfig\DatagridScope;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
@@ -126,7 +127,10 @@ class OwnershipEntityConfigDumperExtension extends AbstractEntityConfigDumperExt
                     ],
                     'dataaudit' => [
                         'auditable' => true
-                    ]
+                    ],
+                    'datagrid' => [
+                        'is_visible' => DatagridScope::IS_VISIBLE_FALSE,
+                    ],
                 ]
             );
         }
