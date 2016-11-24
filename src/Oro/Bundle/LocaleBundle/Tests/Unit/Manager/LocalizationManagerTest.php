@@ -5,6 +5,7 @@ namespace Oro\Bundle\LocaleBundle\Tests\Unit\Provider;
 use Doctrine\Common\Persistence\ObjectRepository;
 
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
+use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\LocaleBundle\DependencyInjection\Configuration;
 use Oro\Bundle\LocaleBundle\Entity\Localization;
 use Oro\Bundle\LocaleBundle\Manager\LocalizationManager;
@@ -17,6 +18,9 @@ class LocalizationManagerTest extends \PHPUnit_Framework_TestCase
 
     /** @var ObjectRepository|\PHPUnit_Framework_MockObject_MockObject */
     protected $repository;
+
+    /** @var DoctrineHelper|\PHPUnit_Framework_MockObject_MockObject */
+    protected $doctrineHelper;
 
     /** @var LocalizationManager */
     protected $manager;
@@ -33,6 +37,14 @@ class LocalizationManagerTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
+        $this->doctrineHelper = $this->getMockBuilder(DoctrineHelper::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+        $this->doctrineHelper->expects($this->once())
+            ->method('getEntityRepositoryForClass')
+            ->with(Localization::class)
+            ->willReturn($this->repository);
+
         $this->configManager = $this->getMockBuilder(ConfigManager::class)
             ->disableOriginalConstructor()
             ->getMock();
@@ -44,7 +56,7 @@ class LocalizationManagerTest extends \PHPUnit_Framework_TestCase
             2 => $this->getEntity(Localization::class, ['id' => 2]),
         ];
 
-        $this->manager = new LocalizationManager($this->repository, $this->configManager);
+        $this->manager = new LocalizationManager($this->doctrineHelper, $this->configManager);
     }
 
     public function tearDown()
@@ -88,7 +100,7 @@ class LocalizationManagerTest extends \PHPUnit_Framework_TestCase
             3 => $this->getEntity(Localization::class, ['id' => 3]),
         ];
 
-        $ids = [1, 3];
+        $ids = [1, '3'];
 
         $result = $this->manager->getLocalizations((array)$ids);
 
@@ -107,7 +119,7 @@ class LocalizationManagerTest extends \PHPUnit_Framework_TestCase
         $this->configManager->expects($this->once())
             ->method('get')
             ->with(Configuration::getConfigKeyByName(Configuration::DEFAULT_LOCALIZATION))
-            ->willReturn(1);
+            ->willReturn('1');
 
         $this->assertSame($localization1, $this->manager->getDefaultLocalization());
     }
@@ -150,7 +162,7 @@ class LocalizationManagerTest extends \PHPUnit_Framework_TestCase
         $this->configManager->expects($this->once())
             ->method('get')
             ->with(Configuration::getConfigKeyByName(Configuration::DEFAULT_LOCALIZATION))
-            ->willReturn(13);
+            ->willReturn('13');
 
         $this->repository->expects($this->never())->method('find');
         $this->repository->expects($this->once())->method('findBy')

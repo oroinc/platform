@@ -9,29 +9,50 @@ use Doctrine\ORM\QueryBuilder;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\EntityManager;
 
+use Oro\Bundle\SearchBundle\Entity\AbstractItem;
+use Oro\Bundle\SearchBundle\Exception\ExpressionSyntaxError;
 use Oro\Bundle\SearchBundle\Query\Criteria\Criteria;
 use Oro\Bundle\SearchBundle\Query\Query;
 
+/**
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
+ */
 abstract class BaseDriver
 {
+    const EXPRESSION_TYPE_OR  = 'OR';
+    const EXPRESSION_TYPE_AND = 'AND';
+
     /**
      * @var string
      */
     protected $entityName;
 
     /**
-     * @var \Doctrine\ORM\EntityManager
+     * @var EntityManager
      */
     protected $em;
 
     /**
-     * @param \Doctrine\ORM\EntityManager         $em
-     * @param \Doctrine\ORM\Mapping\ClassMetadata $class
+     * @var array
+     */
+    protected $associationMappings;
+
+    /**
+     * @param EntityManager $em
+     * @param ClassMetadata $class
+     * @throws \InvalidArgumentException
      */
     public function initRepo(EntityManager $em, ClassMetadata $class)
     {
+        if (!is_a($class->name, AbstractItem::class, true)) {
+            throw new \InvalidArgumentException(
+                'ClassMetadata doesn\'t represent Oro\Bundle\SearchBundle\Entity\Item class or its descendant'
+            );
+        }
+
+        $this->associationMappings = $class->associationMappings;
         $this->entityName = $class->name;
-        $this->em         = $em;
+        $this->em = $em;
     }
 
     /**
@@ -52,7 +73,7 @@ abstract class BaseDriver
      * Search query by Query builder object
      * Can contains duplicates and we can not use HYDRATE_OBJECT because of performance issue. Will be fixed in BAP-7166
      *
-     * @param \Oro\Bundle\SearchBundle\Query\Query $query
+     * @param Query $query
      *
      * @return array
      */
@@ -79,7 +100,7 @@ abstract class BaseDriver
     /**
      * Get count of records without limit parameters in query
      *
-     * @param \Oro\Bundle\SearchBundle\Query\Query $query
+     * @param Query $query
      *
      * @return integer
      */
@@ -137,11 +158,16 @@ abstract class BaseDriver
     /**
      * Returns an unique ID hash, used for SQL aliases
      *
+     * @param string|array $prefix
      * @return string
      */
-    public function getUniqueId()
+    public function getUniqueId($prefix = '')
     {
-        return str_replace('.', '_', uniqid('', true));
+        if (is_array($prefix)) {
+            $prefix = implode('_', $prefix);
+        }
+
+        return str_replace('.', '_', uniqid($prefix, true));
     }
 
     /**
@@ -158,29 +184,29 @@ abstract class BaseDriver
 
     /**
      * @param AbstractPlatform $dbPlatform
-     * @param Connection       $connection
+     * @param Connection $connection
      */
     protected function truncateEntities(AbstractPlatform $dbPlatform, Connection $connection)
     {
-        $this->truncateTable($dbPlatform, $connection, 'OroSearchBundle:Item');
-        $this->truncateTable($dbPlatform, $connection, 'OroSearchBundle:IndexDecimal');
-        $this->truncateTable($dbPlatform, $connection, 'OroSearchBundle:IndexText');
-        $this->truncateTable($dbPlatform, $connection, 'OroSearchBundle:IndexInteger');
-        $this->truncateTable($dbPlatform, $connection, 'OroSearchBundle:IndexDatetime');
+        $this->truncateTable($dbPlatform, $connection, $this->entityName);
+        $this->truncateTable($dbPlatform, $connection, $this->associationMappings['textFields']['targetEntity']);
+        $this->truncateTable($dbPlatform, $connection, $this->associationMappings['integerFields']['targetEntity']);
+        $this->truncateTable($dbPlatform, $connection, $this->associationMappings['decimalFields']['targetEntity']);
+        $this->truncateTable($dbPlatform, $connection, $this->associationMappings['datetimeFields']['targetEntity']);
     }
 
     /**
      * Truncate query for table
      *
      * @param AbstractPlatform $dbPlatform
-     * @param Connection       $connection
-     * @param string           $entityName
+     * @param Connection $connection
+     * @param string $entityName
      */
     protected function truncateTable(AbstractPlatform $dbPlatform, Connection $connection, $entityName)
     {
         /** @var ClassMetadata $metadata */
         $metadata = $this->em->getClassMetadata($entityName);
-        $query    = $this->getTruncateQuery($dbPlatform, $metadata->getTableName());
+        $query = $this->getTruncateQuery($dbPlatform, $metadata->getTableName());
         $connection->executeUpdate($query);
     }
 
@@ -256,15 +282,15 @@ abstract class BaseDriver
     /**
      * Add non string search to qb
      *
-     * @param \Doctrine\ORM\QueryBuilder $qb
-     * @param integer                    $index
-     * @param array                      $searchCondition
+     * @param QueryBuilder $qb
+     * @param integer $index
+     * @param array $searchCondition
      *
      * @return string
      */
     public function addNonTextField(QueryBuilder $qb, $index, $searchCondition)
     {
-        $value     = $searchCondition['fieldValue'];
+        $value = $searchCondition['fieldValue'];
         $joinAlias = $this->getJoinAlias($searchCondition['fieldType'], $index);
         $qb->setParameter('field' . $index, $searchCondition['fieldName']);
         $qb->setParameter('value' . $index, $value);
@@ -360,14 +386,15 @@ abstract class BaseDriver
         foreach ($selects as $select) {
             list($type, $name) = Criteria::explodeFieldTypeName($select);
 
-            $uniqIndex = $this->getUniqueId();
+            $uniqIndex = $this->getUniqueId($name);
             $joinField = $this->getJoinField($type);
             $joinAlias = $this->getJoinAlias($type, $uniqIndex);
 
-            $withClause = sprintf('%s.field = :param%s', $joinAlias, $uniqIndex);
+            $param = sprintf('param%s', $uniqIndex);
+            $withClause = sprintf('%s.field = :%s', $joinAlias, $param);
 
             $qb->leftJoin($joinField, $joinAlias, Join::WITH, $withClause)
-                ->setParameter('param' . $uniqIndex, $name);
+                ->setParameter($param, $name);
 
             $qb->addSelect($joinAlias . '.value as ' . $name);
         }
@@ -377,8 +404,8 @@ abstract class BaseDriver
      * Parses and applies the FROM part to the search engine's
      * query.
      *
-     * @param \Oro\Bundle\SearchBundle\Query\Query $query
-     * @param \Doctrine\ORM\QueryBuilder           $qb
+     * @param Query $query
+     * @param QueryBuilder $qb
      */
     protected function applyFromToQB(Query $query, QueryBuilder $qb)
     {
@@ -408,7 +435,10 @@ abstract class BaseDriver
         $whereExpression = $criteria->getWhereExpression();
         if ($whereExpression) {
             $visitor = new OrmExpressionVisitor($this, $qb, $setOrderBy);
-            $qb->andWhere($visitor->dispatch($whereExpression));
+            $whereCondition = $visitor->dispatch($whereExpression);
+            if ($whereCondition) {
+                $qb->andWhere($whereCondition);
+            }
         }
     }
 
@@ -416,8 +446,8 @@ abstract class BaseDriver
      * Applies the ORDER BY part from the Query to the
      * search engine's query.
      *
-     * @param \Oro\Bundle\SearchBundle\Query\Query $query
-     * @param \Doctrine\ORM\QueryBuilder           $qb
+     * @param Query $query
+     * @param QueryBuilder $qb
      */
     protected function applyOrderByToQB(Query $query, QueryBuilder $qb)
     {
@@ -442,5 +472,42 @@ abstract class BaseDriver
      */
     protected function setTextOrderBy(QueryBuilder $qb, $index)
     {
+    }
+
+    /**
+     * @param \Doctrine\ORM\QueryBuilder $qb
+     * @param integer                    $index
+     * @param array                      $searchCondition
+     *
+     * @return string
+     */
+    public function addFilteringField(QueryBuilder $qb, $index, $searchCondition)
+    {
+        $condition = $searchCondition['condition'];
+        $type      = $searchCondition['fieldType'];
+        $fieldName = $searchCondition['fieldName'];
+
+        $joinField = $this->getJoinField($type);
+        $joinAlias = $this->getJoinAlias($type, $index);
+
+        $fieldParameter = 'field' . $index;
+        $qb->setParameter($fieldParameter, $fieldName);
+
+        $joinCondition = "$joinAlias.field = :$fieldParameter";
+
+        switch ($condition) {
+            case Query::OPERATOR_EXISTS:
+                $qb->innerJoin($joinField, $joinAlias, Join::WITH, $joinCondition);
+                return null;
+
+            case Query::OPERATOR_NOT_EXISTS:
+                $qb->leftJoin($joinField, $joinAlias, Join::WITH, $joinCondition);
+                return "$joinAlias.id IS NULL";
+
+            default:
+                throw new ExpressionSyntaxError(
+                    sprintf('Unsupported operator "%s"', $condition)
+                );
+        }
     }
 }

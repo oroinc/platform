@@ -17,6 +17,7 @@ use Oro\Bundle\TestFrameworkBundle\Behat\Driver\OroSelenium2Factory;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\Exception\OutOfBoundsException;
 use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
@@ -27,10 +28,9 @@ use Symfony\Component\Yaml\Yaml;
 
 class OroTestFrameworkExtension implements TestworkExtension
 {
-    const DUMPER_TAG = 'oro_test.dumper';
-
+    const ISOLATOR_TAG = 'oro_behat.isolator';
+    const SUITE_AWARE_TAG = 'suite_aware';
     const ELEMENTS_CONFIG_ROOT = 'elements';
-
     const PAGES_CONFIG_ROOT = 'pages';
 
     /**
@@ -41,8 +41,8 @@ class OroTestFrameworkExtension implements TestworkExtension
         $container->get(Symfony2Extension::KERNEL_ID)->registerBundles();
         $this->processBundleAutoload($container);
         $this->processElements($container);
-        $this->processDbDumpers($container);
         $this->processIsolationSubscribers($container);
+        $this->processSuiteAwareSubscriber($container);
         $container->get(Symfony2Extension::KERNEL_ID)->shutdown();
     }
 
@@ -97,6 +97,7 @@ class OroTestFrameworkExtension implements TestworkExtension
     {
         $loader = new YamlFileLoader($container, new FileLocator(__DIR__ . '/config'));
         $loader->load('services.yml');
+        $loader->load('isolators.yml');
         $loader->load('kernel_services.yml');
 
         $container->setParameter('oro_test.shared_contexts', $config['shared_contexts']);
@@ -105,15 +106,6 @@ class OroTestFrameworkExtension implements TestworkExtension
         // Remove reboot kernel after scenario because we have isolation in feature layer instead of scenario
         $container->getDefinition('symfony2_extension.context_initializer.kernel_aware')
             ->clearTag(EventDispatcherExtension::SUBSCRIBER_TAG);
-    }
-
-    /**
-     * @param ContainerBuilder $container
-     */
-    public function processDbDumpers(ContainerBuilder $container)
-    {
-        $dbDumper = $this->getDbDumper($container);
-        $dbDumper->addTag(self::DUMPER_TAG, ['priority' => 100]);
     }
 
     /**
@@ -128,7 +120,7 @@ class OroTestFrameworkExtension implements TestworkExtension
     {
         $dumpers = [];
 
-        foreach ($container->findTaggedServiceIds(self::DUMPER_TAG) as $id => $attributes) {
+        foreach ($container->findTaggedServiceIds(self::ISOLATOR_TAG) as $id => $attributes) {
             $priority = isset($attributes[0]['priority']) ? $attributes[0]['priority'] : 0;
             $dumpers[$priority][] = new Reference($id);
         }
@@ -137,39 +129,24 @@ class OroTestFrameworkExtension implements TestworkExtension
         krsort($dumpers);
         $dumpers = call_user_func_array('array_merge', $dumpers);
 
-        $container->getDefinition('oro_test.listener.feature_isolation_subscriber')->replaceArgument(
-            0,
-            $dumpers
-        );
-        $container->getDefinition('oro_test.listener.dump_environment_subscriber')->replaceArgument(
+        $container->getDefinition('oro_behat_extension.isolation.test_isolation_subscriber')->replaceArgument(
             0,
             $dumpers
         );
     }
 
-    /**
-     * @param ContainerBuilder $container
-     * @return Definition
-     */
-    private function getDbDumper(ContainerBuilder $container)
+    private function processSuiteAwareSubscriber(ContainerBuilder $container)
     {
-        $driver = $container->get(Symfony2Extension::KERNEL_ID)->getContainer()->getParameter('database_driver');
+        $services = [];
 
-        $taggedServices = $container->findTaggedServiceIds(
-            'oro_test.db_dumper'
-        );
-
-        foreach ($taggedServices as $id => $tags) {
-            foreach ($tags as $attributes) {
-                if ($attributes['driver'] !== $driver) {
-                    continue;
-                }
-
-                return $container->getDefinition($id);
-            }
+        foreach ($container->findTaggedServiceIds(self::SUITE_AWARE_TAG) as $id => $attributes) {
+            $services[] = new Reference($id);
         }
 
-        throw new \InvalidArgumentException(sprintf('You must specify db dumper service for "%s" driver', $driver));
+        $container->getDefinition('oro_test.listener.suite_aware_subscriber')->replaceArgument(
+            0,
+            $services
+        );
     }
 
     /**

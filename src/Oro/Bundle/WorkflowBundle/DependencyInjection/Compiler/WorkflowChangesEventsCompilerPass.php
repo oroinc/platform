@@ -32,11 +32,22 @@ class WorkflowChangesEventsCompilerPass implements CompilerPassInterface
                         )
                     );
                 }
+
+                if (!isset($attributes['method'])) {
+                    throw new \InvalidArgumentException(
+                        sprintf(
+                            'Service "%s" must define the "method" attribute on "%s" tags.',
+                            $service,
+                            self::CHANGES_LISTENER_TAG
+                        )
+                    );
+                }
+
                 $dispatcherDefinition->addMethodCall(
                     'addListener',
                     [
                         $attributes['event'],
-                        new Reference($service),
+                        [new Reference($service), $attributes['method']],
                         array_key_exists('priority', $attributes) ? $attributes['priority'] : 0
                     ]
                 );
