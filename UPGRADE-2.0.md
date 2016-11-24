@@ -467,6 +467,7 @@ To migrate all labels from configuration translatable fields automatically you c
 
  
 ####EntityExtendBundle
+- Extend fields default mode is `Oro\Bundle\EntityConfigBundle\Entity\ConfigModel::MODE_READONLY`
 - `Oro\Bundle\EntityExtendBundle\Migration\EntityMetadataHelper`
     - `getEntityClassByTableName` deprecated, use `getEntityClassesByTableName` instead
     - removed property `tableToClassMap` in favour of `tableToClassesMap`
