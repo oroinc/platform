@@ -94,9 +94,6 @@ oro:
                 deactivate: Deactivate
 
             workflow:
-                general:
-                    label: Perform workflow transitions
-                    description: Reveals workflow transition buttons to the user and allows them to manipulate workflows
                 reset_data: Reset workflow "{workflow}"
                 go_to_translations: 'To translations grid'
 

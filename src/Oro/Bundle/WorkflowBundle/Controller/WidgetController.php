@@ -19,7 +19,6 @@ use Symfony\Component\Security\Acl\Domain\ObjectIdentity;
 use Oro\Bundle\EntityBundle\Exception\NotManageableEntityException;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\SecurityBundle\Acl\Domain\DomainObjectWrapper;
-use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
 use Oro\Bundle\WorkflowBundle\Model\Step;
 use Oro\Bundle\WorkflowBundle\Model\Tools\WorkflowStepHelper;
@@ -39,7 +38,6 @@ class WidgetController extends Controller
     /**
      * @Route("/entity-workflows/{entityClass}/{entityId}", name="oro_workflow_widget_entity_workflows")
      * @Template
-     * @AclAncestor("oro_workflow")
      *
      * @param string $entityClass
      * @param int $entityId
@@ -88,7 +86,6 @@ class WidgetController extends Controller
      *      "/transition/create/attributes/{workflowName}/{transitionName}",
      *      name="oro_workflow_widget_start_transition_form"
      * )
-     * @AclAncestor("oro_workflow")
      *
      * @param string $transitionName
      * @param string $workflowName
@@ -173,7 +170,6 @@ class WidgetController extends Controller
      *      name="oro_workflow_widget_transition_form"
      * )
      * @ParamConverter("workflowItem", options={"id"="workflowItemId"})
-     * @AclAncestor("oro_workflow")
      *
      * @param string $transitionName
      * @param WorkflowItem $workflowItem
@@ -327,7 +323,6 @@ class WidgetController extends Controller
     /**
      * @Route("/buttons/{entityClass}/{entityId}", name="oro_workflow_widget_buttons")
      * @Template
-     * @AclAncestor("oro_workflow")
      *
      * @param string $entityClass
      * @param int $entityId
