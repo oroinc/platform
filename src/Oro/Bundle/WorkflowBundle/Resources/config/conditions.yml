@@ -1,0 +1,7 @@
+services:
+    oro_workflow.expression.workflow_available_by_record_group:
+        class: 'Oro\Bundle\WorkflowBundle\Model\Condition\WorkflowAvailableByRecordGroup'
+        arguments:
+            - '@oro_workflow.manager'
+        tags:
+            - { name: oro_action.condition, alias: workflow_available_by_record_group }

@@ -59,3 +59,4 @@ OroApiBundle Documentation
    - [Change delete handler for entity](./how_to.md#change-delete-handler-for-entity)
    - [Change the maximum number of entities that can be deleted by one request](./how_to.md#change-the-maximum-number-of-entities-that-can-be-deleted-by-one-request)
    - [Configure nested object](./how_to.md#configure-nested-object)
+   - [Turn on Extended Many-To-One Associations](./how_to.md#turn-on-extended-many-to-one-associations)

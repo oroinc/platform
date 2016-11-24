@@ -20,6 +20,8 @@ class InstallationStep extends AbstractStep
         switch ($action) {
             case 'fixtures':
                 return $this->handleAjaxAction('oro:migration:data:load', array('--fixtures-type' => 'demo'));
+            case 'workflow-scopes':
+                return $this->handleAjaxAction('oro:workflow:scope:update', ['--disable-on-error' => true]);
             case 'navigation':
                 return $this->handleAjaxAction('oro:navigation:init');
             case 'js-routing':

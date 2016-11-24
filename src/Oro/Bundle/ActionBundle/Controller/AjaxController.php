@@ -70,6 +70,12 @@ class AjaxController extends Controller
             'messages' => $this->prepareMessages($errorMessages)
         ];
 
+        // handle redirect for failure response on non ajax requests
+        if (!$request->isXmlHttpRequest() && !$response['success'] && null !== ($routeName = $request->get('route'))) {
+            $this->get('session')->getFlashBag()->add('error', $response['message']);
+            return $this->redirect($this->generateUrl($routeName));
+        }
+
         if ($data->getRefreshGrid() || !$response['success']) {
             $response['refreshGrid'] = $data->getRefreshGrid();
             $response['flashMessages'] = $this->get('session')->getFlashBag()->all();
