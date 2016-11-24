@@ -63,6 +63,7 @@ class DynamicFieldsExtension extends AbstractFieldsExtension
             if ($extendConfig->is('owner', ExtendScope::OWNER_CUSTOM)
                 && ExtendHelper::isFieldAccessible($extendConfig)
                 && $datagridConfigProvider->getConfigById($fieldId)->is('is_visible')
+                && $datagridConfigProvider->getConfigById($fieldId)->is('with_join')
             ) {
                 $viewConfig = $viewConfigProvider->getConfig($entityClassName, $fieldId->getFieldName());
                 $fields[] = [
