@@ -1,6 +1,6 @@
 Feature: two-factor authentication via email
   In order to increase login security level
-  As Administrator
+  As Administrator user
   I need to manage two-factor authentication using email
 
   Scenario: turn on two-factor authentication
