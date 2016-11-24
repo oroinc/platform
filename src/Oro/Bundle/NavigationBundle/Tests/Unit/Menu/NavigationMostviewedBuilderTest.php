@@ -2,8 +2,11 @@
 
 namespace Oro\Bundle\NavigationBundle\Tests\Unit\Menu;
 
-use Oro\Bundle\NavigationBundle\Menu\NavigationMostviewedBuilder;
+use Symfony\Bundle\FrameworkBundle\Routing\Router;
+
+use Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker;
 use Oro\Bundle\NavigationBundle\Entity\NavigationHistoryItem;
+use Oro\Bundle\NavigationBundle\Menu\NavigationMostviewedBuilder;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 
 class NavigationMostviewedBuilderTest extends \PHPUnit_Framework_TestCase
@@ -24,6 +27,16 @@ class NavigationMostviewedBuilderTest extends \PHPUnit_Framework_TestCase
     protected $builder;
 
     /**
+     * @var Router
+     */
+    protected $router;
+
+    /**
+     * @var FeatureChecker
+     */
+    protected $featureChecker;
+
+    /**
      * @var \Oro\Bundle\NavigationBundle\Entity\Builder\ItemFactory
      */
     protected $factory;
@@ -35,8 +48,21 @@ class NavigationMostviewedBuilderTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
         $this->factory = $this->getMock('Oro\Bundle\NavigationBundle\Entity\Builder\ItemFactory');
+        $this->router = $this->getMockBuilder('Symfony\Bundle\FrameworkBundle\Routing\Router')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $this->featureChecker = $this->getMockBuilder(FeatureChecker::class)
+            ->disableOriginalConstructor()
+            ->getMock();
 
-        $this->builder = new NavigationMostviewedBuilder($this->securityContext, $this->em, $this->factory);
+        $this->builder = new NavigationMostviewedBuilder(
+            $this->securityContext,
+            $this->em,
+            $this->factory,
+            $this->router
+        );
+        $this->builder->setFeatureChecker($this->featureChecker);
+        $this->builder->addFeature('email');
     }
 
     public function testBuild()

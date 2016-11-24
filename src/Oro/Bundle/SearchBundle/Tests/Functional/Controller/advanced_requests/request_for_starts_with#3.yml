@@ -1,0 +1,9 @@
+request:
+    query: "from oro_test_item where stringValue starts_with tem"
+response:
+    records_count: 0
+    count: 0
+    rest:
+        data: []
+    soap:
+        data: []

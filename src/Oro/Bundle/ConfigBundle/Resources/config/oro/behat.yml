@@ -2,3 +2,7 @@ elements:
   SystemConfigForm:
     selector: form
     class: Oro\Bundle\ConfigBundle\Tests\Behat\Element\SystemConfigForm
+
+  SidebarConfigMenu:
+    selector: 'div.system-configuration-container div.left-panel'
+    class: Oro\Bundle\ConfigBundle\Tests\Behat\Element\SidebarConfigMenu

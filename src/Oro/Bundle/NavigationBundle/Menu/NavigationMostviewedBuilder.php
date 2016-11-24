@@ -37,4 +37,12 @@ class NavigationMostviewedBuilder extends NavigationItemBuilder
         }
         parent::build($menu, $options, $alias);
     }
+
+    /**
+     * @inheritdoc
+     */
+    protected function getMatchedRoute($item)
+    {
+        return isset($item['route']) ? $item['route'] : null;
+    }
 }

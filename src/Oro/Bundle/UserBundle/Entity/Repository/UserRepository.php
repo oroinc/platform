@@ -3,6 +3,7 @@
 namespace Oro\Bundle\UserBundle\Entity\Repository;
 
 use Doctrine\ORM\EntityRepository;
+use Doctrine\ORM\QueryBuilder;
 
 use Oro\Bundle\EmailBundle\Entity\EmailOrigin;
 use Oro\Bundle\EmailBundle\Entity\Repository\EmailAwareRepository;
@@ -175,5 +176,18 @@ class UserRepository extends EntityRepository implements EmailAwareRepository
             ))
             ->getQuery()
             ->getResult();
+    }
+
+    /**
+     * Return query builder matching enabled users
+     *
+     * @return QueryBuilder
+     */
+    public function findEnabledUsersQB()
+    {
+        return $this->createQueryBuilder('u')
+            ->select('u')
+            ->andWhere('u.enabled = :enabled')
+            ->setParameter('enabled', true);
     }
 }

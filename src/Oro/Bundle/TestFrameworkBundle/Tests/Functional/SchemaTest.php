@@ -58,6 +58,8 @@ class SchemaTest extends WebTestCase
                 // reference from myisam table
                 'ALTER TABLE oro_search_index_text ADD CONSTRAINT FK_A0243539126F525E FOREIGN KEY (item_id) ' .
                 'REFERENCES oro_search_item (id)',
+                'ALTER TABLE oro_website_search_text ADD CONSTRAINT FK_B178C6FC126F525E FOREIGN KEY (item_id) ' .
+                'REFERENCES oro_website_search_item (id)',
                 // https://github.com/doctrine/dbal-documentation/blob/master/en/reference/known-vendor-issues.rst
                 'ALTER TABLE oro_audit_field CHANGE old_datetimetz old_datetimetz DATETIME DEFAULT NULL, ' .
                 'CHANGE new_datetimetz new_datetimetz DATETIME DEFAULT NULL',
@@ -73,12 +75,7 @@ class SchemaTest extends WebTestCase
 
             $platform = $em->getConnection()->getDatabasePlatform()->getName();
             if (array_key_exists($platform, $ignoredQueries)) {
-                $queries = array_filter(
-                    $queries,
-                    function ($query) use ($ignoredQueries, $platform) {
-                        return !in_array($query, $ignoredQueries[$platform], true);
-                    }
-                );
+                $queries = array_diff($queries, $ignoredQueries[$platform]);
             }
 
             $this->assertEmpty($queries, implode("\n", $queries));

@@ -5,7 +5,9 @@ oro:
         entity_description:  Represent attachments
 
         id.label:            Id
-        comment.label:       Comment
+        comment:
+            label:           Comment
+            description:     Attachment comment body content
         file.label:          File
         owner.label:         Owner
         organization.label:  Organization

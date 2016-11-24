@@ -211,4 +211,21 @@ class LayoutContextTest extends \PHPUnit_Framework_TestCase
             $this->context->data()
         );
     }
+
+    public function testGetHash()
+    {
+        $this->context->resolve();
+        $hash = $this->context->getHash();
+
+        $this->assertEquals(md5(serialize([])), $hash);
+    }
+
+    /**
+     * @expectedException \Oro\Component\Layout\Exception\LogicException
+     * @expectedExceptionMessage The context is not resolved.
+     */
+    public function testGetHashThrowAnException()
+    {
+        $this->context->getHash();
+    }
 }

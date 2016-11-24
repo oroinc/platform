@@ -31,5 +31,7 @@
 } %}
 
 {% block action_controll %}
-    {{ UI.clientLink(options) }}
+    {% if feature_enabled('email') %}
+        {{ UI.clientLink(options) }}
+    {% endif %}
 {% endblock %}

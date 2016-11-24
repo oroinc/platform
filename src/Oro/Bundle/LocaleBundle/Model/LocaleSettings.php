@@ -6,7 +6,7 @@ use Symfony\Component\Intl\Intl;
 
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\LocaleBundle\DependencyInjection\Configuration as LocaleConfiguration;
-use Oro\Bundle\CurrencyBundle\DependencyInjection\Configuration as CurrencyConfiguration;
+use Oro\Bundle\CurrencyBundle\DependencyInjection\Configuration as CurrencyConfig;
 
 /**
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
@@ -294,9 +294,11 @@ class LocaleSettings
     public function getCurrency()
     {
         if (null === $this->currency) {
-            $this->currency = $this->configManager->get('oro_currency.default_currency');
+            $this->currency = $this->configManager->get(
+                CurrencyConfig::getConfigKeyByName(CurrencyConfig::KEY_DEFAULT_CURRENCY)
+            );
             if (!$this->currency) {
-                $this->currency = CurrencyConfiguration::DEFAULT_CURRENCY;
+                $this->currency = CurrencyConfig::DEFAULT_CURRENCY;
             }
         }
         return $this->currency;
