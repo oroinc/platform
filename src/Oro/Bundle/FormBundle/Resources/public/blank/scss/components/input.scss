@@ -12,6 +12,10 @@
 
     box-sizing: border-box;
 
+    &::-ms-clear {
+        display: none;
+    }
+
     @include element-state('hover') {
         border-color: $input-border-color-hover-state;
     }

@@ -8,11 +8,11 @@
     }
 }
 
-@include breakpoint('tablet-small') {
+@include breakpoint('tablet') {
     .page-main {
         &__content {
             flex-direction: column;
-            padding: $page-main-tablet-small-inner-offset;
+            padding: $page-main-tablet-inner-offset;
         }
     }
 }
