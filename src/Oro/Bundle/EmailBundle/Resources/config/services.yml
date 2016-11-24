@@ -473,6 +473,13 @@ services:
         tags:
             - { name: validator.constraint_validator, alias: oro_email.email_recipients_validator }
 
+    oro_email.validator.mailbox_origin:
+        class: Oro\Bundle\EmailBundle\Validator\MailboxOriginValidator
+        arguments:
+            - @translator
+        tags:
+            - { name: validator.constraint_validator, alias: oro_email.validator.mailbox_origin }
+
     oro_email.datagrid_query_factory:
         class: %oro_email.datagrid_query_factory.class%
         arguments:

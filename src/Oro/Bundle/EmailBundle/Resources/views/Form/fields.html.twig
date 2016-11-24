@@ -296,12 +296,15 @@
 {% endblock %}
 
 {% block oro_email_mailbox_widget %}
-    {% if  form.children.imapAccountType is defined %}
-        {% set imapAccountType = form_widget(form.children.imapAccountType) %}
-    {% endif %}
-    {% if  form.children.origin is defined %}
-        {% set imapAccountType = form_widget(form.children.origin) %}
-    {% endif %}
+    {% set imapAccountType %}
+        {% if  form.children.origin is defined %}
+            {{ form_widget(form.children.origin) }}
+            {{ form_errors(form.children.origin) }}
+        {% elseif form.children.imapAccountType is defined %}
+            {{ form_widget(form.children.imapAccountType) }}
+            {{ form_errors(form.children.imapAccountType) }}
+        {% endif %}
+    {% endset %}
 
     {% set process = form_row(form.children.processType) ~
         form_widget(form.children.processSettings) %}
