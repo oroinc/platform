@@ -2,6 +2,9 @@
 
 namespace Oro\Bundle\NavigationBundle\Tests\Unit\Menu;
 
+use Symfony\Bundle\FrameworkBundle\Routing\Router;
+
+use Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker;
 use Oro\Bundle\NavigationBundle\Menu\NavigationHistoryBuilder;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 
@@ -27,6 +30,12 @@ class NavigationHistoryBuilderTest extends \PHPUnit_Framework_TestCase
      */
     protected $manipulator;
 
+    /** @var  Router */
+    protected $router;
+
+    /** @var  FeatureChecker */
+    protected $featureChecker;
+
     /**
      * @var \Oro\Bundle\NavigationBundle\Entity\Builder\ItemFactory
      */
@@ -39,15 +48,24 @@ class NavigationHistoryBuilderTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
         $this->factory = $this->getMock('Oro\Bundle\NavigationBundle\Entity\Builder\ItemFactory');
+        $this->router = $this->getMockBuilder('Symfony\Bundle\FrameworkBundle\Routing\Router')
+            ->disableOriginalConstructor()
+            ->getMock();
 
         $this->builder = $this->getMockBuilder('Oro\Bundle\NavigationBundle\Menu\NavigationHistoryBuilder')
-            ->setConstructorArgs(array($this->securityContext, $this->em, $this->factory))
-            ->setMethods(array('getMenuManipulator'))
+            ->setConstructorArgs(array($this->securityContext, $this->em, $this->factory, $this->router))
+            ->setMethods(array('getMenuManipulator', 'set'))
+            ->getMock();
+
+        $this->featureChecker = $this->getMockBuilder(FeatureChecker::class)
+            ->disableOriginalConstructor()
             ->getMock();
 
         $this->manipulator = $this->getMock('Knp\Menu\Util\MenuManipulator');
         $this->builder->expects($this->any())->method('getMenuManipulator')
             ->will($this->returnValue($this->manipulator));
+        $this->builder->setFeatureChecker($this->featureChecker);
+        $this->builder->addFeature('email');
     }
 
     public function testBuild()
@@ -71,7 +89,6 @@ class NavigationHistoryBuilderTest extends \PHPUnit_Framework_TestCase
         $token->expects($this->once())
             ->method('getUser')
             ->will($this->returnValue($user));
-
         $token->expects($this->once())
             ->method('getOrganizationContext')
             ->will($this->returnValue($organization));
@@ -114,9 +131,15 @@ class NavigationHistoryBuilderTest extends \PHPUnit_Framework_TestCase
         $matcher->expects($this->once())
             ->method('isCurrent')
             ->will($this->returnValue(true));
-
         $this->builder->setMatcher($matcher);
-
+        $this->router->expects($this->exactly(0))
+            ->method('match')
+            ->with($this->isType('string'))
+            ->willReturn(['_route' => 'route']);
+        $this->featureChecker->expects($this->exactly(2))
+            ->method('isResourceEnabled')
+            ->with($this->anything())
+            ->willReturn(true);
         $menu->expects($this->exactly(2))
             ->method('addChild');
         $menu->expects($this->once())
@@ -133,12 +156,10 @@ class NavigationHistoryBuilderTest extends \PHPUnit_Framework_TestCase
         $configMock = $this->getMockBuilder('Oro\Bundle\ConfigBundle\Config\ConfigManager')
                         ->disableOriginalConstructor()
                         ->getMock();
-
         $configMock->expects($this->once())
                         ->method('get')
                         ->with($this->equalTo('oro_navigation.max_items'))
                         ->will($this->returnValue($n));
-
         $this->manipulator->expects($this->once())
             ->method('slice')
             ->with($menu, 0, $n);

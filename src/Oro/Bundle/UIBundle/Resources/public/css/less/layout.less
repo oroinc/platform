@@ -16,8 +16,14 @@ html{
 }
 
 .responsive-section {
-  .inner-grid {/* todo: need delete negative margins - ask Vova Eremenko for details*/
-    margin:-@contentPadding -@contentPadding @contentPadding -@contentPadding;
+  .inner-grid {/* todo: when it needs to upgrade to bootstrap4, check negative margins*/
+    margin: -@contentPadding -@contentPadding @contentPadding 0;
+  }
+
+  .responsive-cell {
+    .inner-grid {
+      margin: -@contentPadding -@contentPadding @contentPadding -@contentPadding;
+    }
   }
 }
 

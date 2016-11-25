@@ -7,6 +7,8 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class CurrencyType extends AbstractType
 {
+    const CONFIG_FORM_NAME = 'oro_currency___default_currency';
+
     /**
      * {@inheritdoc}
      */

@@ -135,8 +135,6 @@ class ActionsProvider
                 'name' => $definition->getName(),
                 'label' => $this->translator->trans($definition->getLabel()),
                 'title' => $this->translator->trans($title),
-//                'hasDialog' => $operation->hasForm(),
-//                'showDialog' => !empty($frontendOptions['show_dialog']),
                 'icon' =>  $icon,
                 'action' => $operation,
             ];

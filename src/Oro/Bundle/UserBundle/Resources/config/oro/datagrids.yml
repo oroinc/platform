@@ -324,8 +324,7 @@ datagrids:
                     data_name: u.firstName
                 lastName:
                     data_name: u.lastName
-            default:
-                id: %oro_datagrid.extension.orm_sorter.class%::DIRECTION_ASC
+            disable_default_sorting: true
 
         filters: []
 

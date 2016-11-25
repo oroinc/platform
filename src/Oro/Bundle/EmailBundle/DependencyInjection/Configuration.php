@@ -5,6 +5,7 @@ namespace Oro\Bundle\EmailBundle\DependencyInjection;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
 
+use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\ConfigBundle\DependencyInjection\SettingsBuilder;
 
 /**
@@ -45,6 +46,7 @@ class Configuration implements ConfigurationInterface
         SettingsBuilder::append(
             $rootNode,
             [
+                'feature_enabled' => ['value' => true],
                 'signature' => ['value' => ''],
                 'append_signature' => ['value' => true],
                 'default_button_reply' => ['value' => true],
@@ -59,5 +61,14 @@ class Configuration implements ConfigurationInterface
         );
 
         return $treeBuilder;
+    }
+
+    /**
+     * @param string $name
+     * @return string
+     */
+    public static function getConfigKeyByName($name)
+    {
+        return sprintf('oro_email%s%s', ConfigManager::SECTION_MODEL_SEPARATOR, $name);
     }
 }

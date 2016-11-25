@@ -82,7 +82,7 @@ class OroLayoutExtension extends Extension
 
         $excludedPaths = $this->getExcludedPaths($excludedResources);
         $themeResourceProviderDef = $container->getDefinition(self::THEME_RESOURCE_PROVIDER_SERVICE_ID);
-        $themeResourceProviderDef->replaceArgument(1, $excludedPaths);
+        $themeResourceProviderDef->replaceArgument(2, $excludedPaths);
 
         $this->addClassesToCompile(['Oro\Bundle\LayoutBundle\EventListener\ThemeListener']);
     }

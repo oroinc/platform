@@ -1,6 +1,10 @@
 .link {
     color: $link-color;
 
+    &--current {
+        color: $link-color-current;
+    }
+
     &:hover {
         color: $link-color-hover;
     }
