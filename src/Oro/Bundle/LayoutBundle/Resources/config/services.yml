@@ -158,7 +158,7 @@ services:
     oro_layout.provider.image_type:
         class: Oro\Bundle\LayoutBundle\Provider\ImageTypeProvider
         arguments:
-            - @oro_layout.theme_manager
+            - '@oro_layout.theme_manager'
 
     oro_layout.provider.requirejs_config:
         class: Oro\Bundle\LayoutBundle\Provider\RequireJSConfigProvider
