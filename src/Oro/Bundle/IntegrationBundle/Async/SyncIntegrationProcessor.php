@@ -135,6 +135,7 @@ class SyncIntegrationProcessor implements MessageProcessorInterface, ContainerAw
 
         $result = $this->jobRunner->runUnique($ownerId, $jobName, function () use ($integration, $body) {
             $processor = $this->syncProcessorRegistry->getProcessorForIntegration($integration);
+            $processor->getLoggerStrategy()->setLogger($this->logger);
 
             return $processor->process(
                 $integration,
