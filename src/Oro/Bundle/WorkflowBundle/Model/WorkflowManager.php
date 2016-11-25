@@ -168,7 +168,7 @@ class WorkflowManager implements LoggerAwareInterface
      * @param string|Transition|null $transition
      * @param array $data
      * @param bool $throwGroupException
-     * @return WorkflowItem
+     * @return WorkflowItem|null
      * @throws WorkflowRecordGroupException
      */
     public function startWorkflow($workflow, $entity, $transition = null, array $data = [], $throwGroupException = true)
@@ -204,7 +204,7 @@ class WorkflowManager implements LoggerAwareInterface
             return null;
         }
 
-        return $this->inTransaction(
+        $workflowItem = $this->inTransaction(
             function (EntityManager $em) use ($workflow, $entity, $transition, &$data) {
                 $workflowItem = $workflow->start($entity, $data, $transition);
                 $em->persist($workflowItem);
@@ -214,6 +214,9 @@ class WorkflowManager implements LoggerAwareInterface
             },
             WorkflowItem::class
         );
+        $this->unsetStartedWorkflowForEntity($workflow, $entity);
+
+        return $workflowItem;
     }
 
     /**
@@ -550,6 +553,28 @@ class WorkflowManager implements LoggerAwareInterface
         $this->startedWorkflows[$workflow->getName()][] = $entity;
 
         return true;
+    }
+
+    /**
+     * Unset started workflow for entity
+     *
+     * @param Workflow $workflow
+     * @param object $entity
+     */
+    protected function unsetStartedWorkflowForEntity(Workflow $workflow, $entity)
+    {
+        $entityId = $this->doctrineHelper->getSingleEntityIdentifier($entity);
+        if ($entityId === null || !array_key_exists($workflow->getName(), $this->startedWorkflows)) {
+            return;
+        }
+
+        foreach ($this->startedWorkflows[$workflow->getName()] as $key => $startedEntity) {
+            $startedEntityId = $this->doctrineHelper->getSingleEntityIdentifier($startedEntity);
+            if ($startedEntityId && ($startedEntityId === $entityId)) {
+                unset($this->startedWorkflows[$workflow->getName()][$key]);
+                break;
+            }
+        }
     }
 
     /**

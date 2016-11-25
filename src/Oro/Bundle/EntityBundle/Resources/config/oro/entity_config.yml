@@ -129,7 +129,7 @@ entity_config:
                         require_schema_update: true
                         value_type:         integer
                         default_value:      1
-                        allowed_type:       [string, integer, smallint, bigint, boolean, datetime, date, time, float, decimal, money, percent, enum, multiEnum]
+                        allowed_type:       [string, integer, smallint, bigint, boolean, datetime, date, time, float, decimal, money, percent, enum, multiEnum, manyToOne, oneToOne, ref-one]
                         required_property:
                             config_id:
                                 scope:      extend

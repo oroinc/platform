@@ -4,9 +4,9 @@ namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Extension;
 
 use Doctrine\Common\Collections\ArrayCollection;
 
-use Oro\Bundle\ActionBundle\Helper\ApplicationsHelperInterface;
 use Oro\Bundle\ActionBundle\Model\ButtonContext;
 use Oro\Bundle\ActionBundle\Model\ButtonSearchContext;
+use Oro\Bundle\ActionBundle\Provider\RouteProviderInterface;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Extension\TransitionButtonProviderExtension;
 use Oro\Bundle\WorkflowBundle\Model\Transition;
@@ -22,8 +22,8 @@ class TransitionButtonProviderExtensionTest extends \PHPUnit_Framework_TestCase
     /** @var WorkflowRegistry|\PHPUnit_Framework_MockObject_MockObject */
     protected $workflowRegistry;
 
-    /** @var ApplicationsHelperInterface|\PHPUnit_Framework_MockObject_MockObject */
-    protected $applicationsHelper;
+    /** @var RouteProviderInterface|\PHPUnit_Framework_MockObject_MockObject */
+    protected $routeProvider;
 
     /** @var TransitionButtonProviderExtension */
     protected $extension;
@@ -37,9 +37,9 @@ class TransitionButtonProviderExtensionTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->applicationsHelper = $this->getMock(ApplicationsHelperInterface::class);
+        $this->routeProvider = $this->getMock(RouteProviderInterface::class);
 
-        $this->extension = new TransitionButtonProviderExtension($this->workflowRegistry, $this->applicationsHelper);
+        $this->extension = new TransitionButtonProviderExtension($this->workflowRegistry, $this->routeProvider);
     }
 
     /**
@@ -47,7 +47,7 @@ class TransitionButtonProviderExtensionTest extends \PHPUnit_Framework_TestCase
      */
     protected function tearDown()
     {
-        unset($this->workflowRegistry, $this->applicationsHelper, $this->extension);
+        unset($this->workflowRegistry, $this->routeProvider, $this->extension);
     }
 
     /**

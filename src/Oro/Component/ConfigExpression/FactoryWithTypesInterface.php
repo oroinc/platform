@@ -11,7 +11,7 @@ interface FactoryWithTypesInterface
 
     /**
      * @param string $name
-     * "@return bool
+     * @return bool
      */
     public function isTypeExists($name);
 }

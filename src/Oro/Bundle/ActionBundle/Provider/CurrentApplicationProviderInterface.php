@@ -1,9 +1,11 @@
 <?php
 
-namespace Oro\Bundle\ActionBundle\Helper;
+namespace Oro\Bundle\ActionBundle\Provider;
 
-interface ApplicationsHelperInterface extends RouteHelperInterface
+interface CurrentApplicationProviderInterface
 {
+    const DEFAULT_APPLICATION = 'default';
+
     /**
      * @param array $applications
      *

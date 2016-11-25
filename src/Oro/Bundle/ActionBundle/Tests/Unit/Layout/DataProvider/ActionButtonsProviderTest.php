@@ -5,13 +5,13 @@ namespace Oro\Bundle\ActionBundle\Tests\Unit\Layout\DataProvider;
 use Doctrine\Common\Util\ClassUtils;
 
 use Oro\Bundle\ActionBundle\Layout\DataProvider\ActionButtonsProvider;
-use Oro\Bundle\ActionBundle\Helper\ApplicationsHelper;
+use Oro\Bundle\ActionBundle\Provider\RouteProviderInterface;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 
 class ActionButtonsProviderTest extends \PHPUnit_Framework_TestCase
 {
-    /** @var ApplicationsHelper|\PHPUnit_Framework_MockObject_MockObject */
-    protected $applicationsHelper;
+    /** @var RouteProviderInterface|\PHPUnit_Framework_MockObject_MockObject */
+    protected $routeProvider;
 
     /** @var DoctrineHelper|\PHPUnit_Framework_MockObject_MockObject */
     protected $doctrineHelper;
@@ -24,17 +24,17 @@ class ActionButtonsProviderTest extends \PHPUnit_Framework_TestCase
      */
     protected function setUp()
     {
-        $this->applicationsHelper = $this->getMock(ApplicationsHelper::class, [], [], '', false);
+        $this->routeProvider = $this->getMock(RouteProviderInterface::class, [], [], '', false);
         $this->doctrineHelper = $this->getMock(DoctrineHelper::class, [], [], '', false);
 
-        $this->provider = new ActionButtonsProvider($this->applicationsHelper, $this->doctrineHelper);
+        $this->provider = new ActionButtonsProvider($this->routeProvider, $this->doctrineHelper);
     }
 
     public function testGetDialogRoute()
     {
         $result = 'dialog_route';
 
-        $this->applicationsHelper
+        $this->routeProvider
             ->expects($this->once())
             ->method('getFormDialogRoute')
             ->will($this->returnValue($result));
@@ -46,7 +46,7 @@ class ActionButtonsProviderTest extends \PHPUnit_Framework_TestCase
     {
         $result = 'page_route';
 
-        $this->applicationsHelper
+        $this->routeProvider
             ->expects($this->once())
             ->method('getFormPageRoute')
             ->will($this->returnValue($result));
@@ -58,7 +58,7 @@ class ActionButtonsProviderTest extends \PHPUnit_Framework_TestCase
     {
         $result = 'execution_route';
 
-        $this->applicationsHelper
+        $this->routeProvider
             ->expects($this->once())
             ->method('getExecutionRoute')
             ->will($this->returnValue($result));

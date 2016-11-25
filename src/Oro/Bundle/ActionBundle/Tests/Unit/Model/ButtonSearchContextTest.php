@@ -30,14 +30,15 @@ class ButtonSearchContextTest extends \PHPUnit_Framework_TestCase
 
     public function testProperties()
     {
-        $properties = [
-            ['routeName', 'test_route'],
-            ['gridName', 'test_grid'],
-            ['referrer', 'test_ref'],
-            ['group', 'test_group']
-        ];
-
-        $this->assertPropertyAccessors($this->buttonSearchContext, $properties);
+        $this->assertPropertyAccessors(
+            $this->buttonSearchContext,
+            [
+                ['routeName', 'test_route'],
+                ['gridName', 'test_grid'],
+                ['referrer', 'test_ref'],
+                ['group', 'test_group']
+            ]
+        );
     }
 
     /**

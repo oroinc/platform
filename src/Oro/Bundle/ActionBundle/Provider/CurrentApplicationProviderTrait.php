@@ -1,8 +1,8 @@
 <?php
 
-namespace Oro\Bundle\ActionBundle\Helper;
+namespace Oro\Bundle\ActionBundle\Provider;
 
-trait ApplicationsHelperTrait
+trait CurrentApplicationProviderTrait
 {
     /** @var string|bool|null */
     protected $currentApplication = false;
@@ -23,5 +23,13 @@ trait ApplicationsHelperTrait
         }
 
         return in_array($this->currentApplication, $applications, true);
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getCurrentApplication()
+    {
+        return null;
     }
 }

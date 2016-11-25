@@ -1,52 +1,32 @@
 <?php
 
-namespace Oro\Bundle\ActionBundle\Tests\Unit\Helper;
+namespace Oro\Bundle\ActionBundle\Tests\Unit\Provider;
 
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 
-use Oro\Bundle\ActionBundle\Helper\ApplicationsHelper;
+use Oro\Bundle\ActionBundle\Provider\CurrentApplicationProvider;
 use Oro\Bundle\UserBundle\Entity\User;
 
-class ApplicationsHelperTest extends \PHPUnit_Framework_TestCase
+class CurrentApplicationProviderTest extends \PHPUnit_Framework_TestCase
 {
     /** @var \PHPUnit_Framework_MockObject_MockObject|TokenStorageInterface */
     protected $tokenStorage;
 
-    /** @var ApplicationsHelper */
-    protected $helper;
+    /** @var CurrentApplicationProvider */
+    protected $provider;
 
     protected function setUp()
     {
-        $this->tokenStorage = $this
-            ->getMock('Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface');
+        $this->tokenStorage = $this->getMock(TokenStorageInterface::class);
 
-        $this->helper = new ApplicationsHelper($this->tokenStorage);
-        $this->helper->setFormDialogRoute('oro_action_widget_form')
-            ->setFormPageRoute('oro_action_widget_form')
-            ->setExecutionRoute('oro_action_operation_execute')
-            ->setWidgetRoute('oro_action_widget_buttons');
+        $this->provider = new CurrentApplicationProvider($this->tokenStorage);
     }
 
     protected function tearDown()
     {
-        unset($this->helper, $this->tokenStorage);
-    }
-
-    public function testGetWidgetRoute()
-    {
-        $this->assertEquals('oro_action_widget_buttons', $this->helper->getWidgetRoute());
-    }
-
-    public function testGetDialogRoute()
-    {
-        $this->assertEquals('oro_action_widget_form', $this->helper->getFormDialogRoute());
-    }
-
-    public function testGetExecutionRoute()
-    {
-        $this->assertEquals('oro_action_operation_execute', $this->helper->getExecutionRoute());
+        unset($this->provider, $this->tokenStorage);
     }
 
     /**
@@ -58,11 +38,9 @@ class ApplicationsHelperTest extends \PHPUnit_Framework_TestCase
      */
     public function testIsApplicationsValid(array $applications, $token, $expectedResult)
     {
-        $this->tokenStorage->expects($this->any())
-            ->method('getToken')
-            ->willReturn($token);
+        $this->tokenStorage->expects($this->any())->method('getToken')->willReturn($token);
 
-        $this->assertEquals($expectedResult, $this->helper->isApplicationsValid($applications));
+        $this->assertEquals($expectedResult, $this->provider->isApplicationsValid($applications));
     }
 
     /**
@@ -73,11 +51,9 @@ class ApplicationsHelperTest extends \PHPUnit_Framework_TestCase
      */
     public function testGetCurrentApplication($token, $expectedResult)
     {
-        $this->tokenStorage->expects($this->any())
-            ->method('getToken')
-            ->willReturn($token);
+        $this->tokenStorage->expects($this->any())->method('getToken')->willReturn($token);
 
-        $this->assertSame($expectedResult, $this->helper->getCurrentApplication());
+        $this->assertSame($expectedResult, $this->provider->getCurrentApplication());
     }
 
     /**

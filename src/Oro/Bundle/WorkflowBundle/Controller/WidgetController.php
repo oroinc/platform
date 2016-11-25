@@ -29,6 +29,8 @@ use Oro\Bundle\WorkflowBundle\Serializer\WorkflowAwareSerializer;
 
 /**
  * @Route("/workflowwidget")
+ *
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
 class WidgetController extends Controller
 {
@@ -72,6 +74,8 @@ class WidgetController extends Controller
      * )
      * @AclAncestor("oro_workflow")
      *
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
+     *
      * @param string $transitionName
      * @param string $workflowName
      * @param Request $request
@@ -79,6 +83,7 @@ class WidgetController extends Controller
      */
     public function startTransitionFormAction($transitionName, $workflowName, Request $request)
     {
+        //TODO: refactor method in https://magecore.atlassian.net/browse/BB-5253
         $entityId = $request->get('entityId', 0);
 
         /** @var WorkflowManager $workflowManager */
