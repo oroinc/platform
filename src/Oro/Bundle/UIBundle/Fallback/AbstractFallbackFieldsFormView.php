@@ -47,7 +47,7 @@ abstract class AbstractFallbackFieldsFormView
      * @param int $blockId
      * @param int $subBlockId
      */
-    protected function addBlockToEntityView(
+    public function addBlockToEntityView(
         BeforeListRenderEvent
         $event,
         $templateName,
@@ -70,7 +70,7 @@ abstract class AbstractFallbackFieldsFormView
      * @param int $blockId
      * @param int $subBlockId
      */
-    protected function addBlockToEntityEdit(
+    public function addBlockToEntityEdit(
         BeforeListRenderEvent $event,
         $templateName,
         $sectionTitle = null,
@@ -93,7 +93,7 @@ abstract class AbstractFallbackFieldsFormView
         $expectedLabel = $this->translator->trans($sectionTitle);
         foreach ($data['dataBlocks'] as $blockId => $blockData) {
             if ($blockData['title'] == $expectedLabel) {
-                $scrollData->addSubBlockData($blockId, 0, $template);
+                $scrollData->addSubBlockData($blockId, $subBlockId, $template);
 
                 return;
             }
@@ -104,7 +104,7 @@ abstract class AbstractFallbackFieldsFormView
      * @param $entityPath
      * @return null|object
      */
-    protected function getEntityFromRequest($entityPath)
+    public function getEntityFromRequest($entityPath)
     {
         $request = $this->requestStack->getCurrentRequest();
 
