@@ -59,7 +59,7 @@ class OroMessageQueueExtension extends Extension
         // @see BAP-12051
         // php pcntl extension available only for UNIX like systems
         if (extension_loaded('pcntl')) {
-            $loader->load('services_optional/signal_extension.yml');
+            $loader->load('optional_services.yml');
         }
 
         foreach ($config['transport'] as $name => $transportConfig) {
