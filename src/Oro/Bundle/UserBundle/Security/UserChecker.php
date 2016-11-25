@@ -45,8 +45,11 @@ class UserChecker extends BaseUserChecker
     {
         parent::checkPreAuth($user);
 
-        if ($user instanceof User
-            && null !== $this->securityContextLink->getService()->getToken()
+        if (!$user instanceof User) {
+            return;
+        }
+
+        if (null !== $this->securityContextLink->getService()->getToken()
             && null !== $user->getPasswordChangedAt()
             && null !== $user->getLastLogin()
             && $user->getPasswordChangedAt() > $user->getLastLogin()
@@ -62,27 +65,11 @@ class UserChecker extends BaseUserChecker
             throw $exception;
         }
 
-        if ($user instanceof User && $this->isExpiredPassword($user)) {
-            $exception = new CredentialsExpiredException('Invalid password.');
+        if ($user->getAuthStatus() && $user->getAuthStatus()->getId() === 'expired') {
+            $exception = new CredentialsExpiredException('Password expired.');
             $exception->setUser($user);
 
             throw $exception;
         }
-    }
-
-    /**
-     * @param User $user
-     *
-     * @return bool
-     */
-    protected function isExpiredPassword(User $user)
-    {
-        $now = new \DateTime('now', new \DateTimeZone('UTC'));
-
-        if (($user->getPasswordExpiresAt() < $now)) {
-            return true;
-        }
-
-        return $user->getAuthStatus() && $user->getAuthStatus()->getId() === 'expired';
     }
 }
