@@ -51,6 +51,9 @@ An example of adding field by migration:
             'view' => [
                 'is_displayable' => false,
             ],
+            'datagrid' => [
+                'is_visible' => DatagridScope::IS_VISIBLE_FALSE,
+            ],
             'fallback' => [
                 'fallbackList' => [
                     'someFallbackId' => ['fieldName' => 'someFieldName'],

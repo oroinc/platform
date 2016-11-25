@@ -6,3 +6,8 @@ services:
         arguments:
          - '@doctrine'
          - '@oro_entity.entity_field_provider.link'
+
+    oro_scope.migration.extension.scope:
+        class: 'Oro\Bundle\ScopeBundle\Migration\Extension\ScopeExtension'
+        tags:
+            - { name: oro_migration.extension, extension_name: scope }
