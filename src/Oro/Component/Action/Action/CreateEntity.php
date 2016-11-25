@@ -7,7 +7,7 @@ use Doctrine\ORM\EntityManager;
 
 use Oro\Component\Action\Exception\ActionException;
 use Oro\Component\Action\Exception\NotManageableEntityException;
-use Oro\Component\Action\Model\ContextAccessor;
+use Oro\Component\ConfigExpression\ContextAccessor;
 
 class CreateEntity extends CreateObject
 {

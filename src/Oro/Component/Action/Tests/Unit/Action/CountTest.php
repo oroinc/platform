@@ -9,7 +9,7 @@ use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\PropertyAccess\PropertyPath;
 
 use Oro\Component\Action\Action\Count;
-use Oro\Component\Action\Model\ContextAccessor;
+use Oro\Component\ConfigExpression\ContextAccessor;
 use Oro\Component\Action\Tests\Unit\Action\Stub\StubStorage;
 
 class CountTest extends \PHPUnit_Framework_TestCase

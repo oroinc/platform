@@ -4,9 +4,18 @@ namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Model;
 
 use Oro\Bundle\ActionBundle\Model\Attribute;
 use Oro\Bundle\WorkflowBundle\Model\AttributeAssembler;
+use Symfony\Component\Translation\TranslatorInterface;
 
 class AttributeAssemblerTest extends \PHPUnit_Framework_TestCase
 {
+    /** @var TranslatorInterface */
+    protected $translator;
+
+    protected function setUp()
+    {
+        $this->translator = $this->getMock(TranslatorInterface::class);
+    }
+
     /**
      * @dataProvider invalidOptionsDataProvider
      *
@@ -18,7 +27,7 @@ class AttributeAssemblerTest extends \PHPUnit_Framework_TestCase
     {
         $this->setExpectedException($exception, $message);
 
-        $assembler = new AttributeAssembler($this->getAttributeGuesser());
+        $assembler = new AttributeAssembler($this->getAttributeGuesser(), $this->translator);
         $definition = $this->getWorkflowDefinition();
         $assembler->assemble($definition, $configuration);
     }
@@ -134,7 +143,7 @@ class AttributeAssemblerTest extends \PHPUnit_Framework_TestCase
                 ->will($this->returnValue($guessedParameters));
         }
 
-        $assembler = new AttributeAssembler($attributeGuesser);
+        $assembler = new AttributeAssembler($attributeGuesser, $this->translator);
         $definition = $this->getWorkflowDefinition();
         $definition->expects($this->once())
             ->method('getEntityAttributeName')

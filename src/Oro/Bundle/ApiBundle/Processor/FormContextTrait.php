@@ -5,14 +5,25 @@ namespace Oro\Bundle\ApiBundle\Processor;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormInterface;
 
-/**
- * @method bool has($key)
- * @method mixed get($key)
- * @method void set($key, $value)
- * @method void remove($key)
- */
+use Oro\Bundle\ApiBundle\Collection\IncludedEntityCollection;
+
 trait FormContextTrait
 {
+    /** @var array */
+    protected $requestData;
+
+    /** @var array */
+    protected $includedData;
+
+    /** @var IncludedEntityCollection|null */
+    protected $includedEntities;
+
+    /** @var FormBuilderInterface|null */
+    protected $formBuilder;
+
+    /** @var FormInterface|null */
+    protected $form;
+
     /**
      * Returns request data.
      *
@@ -20,7 +31,7 @@ trait FormContextTrait
      */
     public function getRequestData()
     {
-        return $this->get(FormContext::REQUEST_DATA);
+        return $this->requestData;
     }
 
     /**
@@ -30,7 +41,47 @@ trait FormContextTrait
      */
     public function setRequestData(array $requestData)
     {
-        $this->set(FormContext::REQUEST_DATA, $requestData);
+        $this->requestData = $requestData;
+    }
+
+    /**
+     * Returns additional data included into the request.
+     *
+     * @return array
+     */
+    public function getIncludedData()
+    {
+        return $this->includedData;
+    }
+
+    /**
+     * Sets additional data included into the request.
+     *
+     * @param array $includedData
+     */
+    public function setIncludedData(array $includedData)
+    {
+        $this->includedData = $includedData;
+    }
+
+    /**
+     * Returns a collection contains additional entities included into the request data.
+     *
+     * @return IncludedEntityCollection|null
+     */
+    public function getIncludedEntities()
+    {
+        return $this->includedEntities;
+    }
+
+    /**
+     * Sets a collection contains additional entities included into the request data.
+     *
+     * @param IncludedEntityCollection|null $includedEntities
+     */
+    public function setIncludedEntities(IncludedEntityCollection $includedEntities = null)
+    {
+        $this->includedEntities = $includedEntities;
     }
 
     /**
@@ -40,7 +91,7 @@ trait FormContextTrait
      */
     public function hasFormBuilder()
     {
-        return $this->has(FormContext::FORM_BUILDER);
+        return null !== $this->formBuilder;
     }
 
     /**
@@ -50,7 +101,7 @@ trait FormContextTrait
      */
     public function getFormBuilder()
     {
-        return $this->get(FormContext::FORM_BUILDER);
+        return $this->formBuilder;
     }
 
     /**
@@ -60,11 +111,7 @@ trait FormContextTrait
      */
     public function setFormBuilder(FormBuilderInterface $formBuilder = null)
     {
-        if ($formBuilder) {
-            $this->set(FormContext::FORM_BUILDER, $formBuilder);
-        } else {
-            $this->remove(FormContext::FORM_BUILDER);
-        }
+        $this->formBuilder = $formBuilder;
     }
 
     /**
@@ -74,7 +121,7 @@ trait FormContextTrait
      */
     public function hasForm()
     {
-        return $this->has(FormContext::FORM);
+        return null !== $this->form;
     }
 
     /**
@@ -84,7 +131,7 @@ trait FormContextTrait
      */
     public function getForm()
     {
-        return $this->get(FormContext::FORM);
+        return $this->form;
     }
 
     /**
@@ -94,10 +141,6 @@ trait FormContextTrait
      */
     public function setForm(FormInterface $form = null)
     {
-        if ($form) {
-            $this->set(FormContext::FORM, $form);
-        } else {
-            $this->remove(FormContext::FORM);
-        }
+        $this->form = $form;
     }
 }

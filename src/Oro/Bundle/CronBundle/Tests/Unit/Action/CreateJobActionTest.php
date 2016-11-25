@@ -14,7 +14,7 @@ use Oro\Bundle\ActionBundle\Model\ActionData;
 use Oro\Bundle\CronBundle\Action\CreateJobAction;
 use Oro\Bundle\CronBundle\Entity\Manager\JobManager;
 
-use Oro\Component\Action\Model\ContextAccessor;
+use Oro\Component\ConfigExpression\ContextAccessor;
 
 class CreateJobActionTest extends \PHPUnit_Framework_TestCase
 {

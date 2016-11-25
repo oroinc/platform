@@ -10,8 +10,8 @@ use Symfony\Component\Translation\MessageCatalogue;
 use Oro\Bundle\ImportExportBundle\Context\ContextInterface;
 use Oro\Bundle\ImportExportBundle\Context\ContextRegistry;
 
-use Oro\Bundle\TranslationBundle\Entity\Translation;
 use Oro\Bundle\TranslationBundle\ImportExport\Reader\TranslationReader;
+use Oro\Bundle\TranslationBundle\Translation\Translator;
 
 class TranslationReaderTest extends \PHPUnit_Framework_TestCase
 {
@@ -124,8 +124,8 @@ class TranslationReaderTest extends \PHPUnit_Framework_TestCase
     {
         return [
             [
-                Translation::DEFAULT_LOCALE,
-                new MessageCatalogue(Translation::DEFAULT_LOCALE, [
+                Translator::DEFAULT_LOCALE,
+                new MessageCatalogue(Translator::DEFAULT_LOCALE, [
                     'domain1' => [
                         'key2' => 'domain1-default-message2',
                         'key1' => 'domain1-default-message1',
@@ -134,7 +134,7 @@ class TranslationReaderTest extends \PHPUnit_Framework_TestCase
             ],
             [
                 'locale1',
-                new MessageCatalogue(Translation::DEFAULT_LOCALE, [
+                new MessageCatalogue(Translator::DEFAULT_LOCALE, [
                     'domain1' => [
                         'key1' => 'domain1-locale1-message1',
                     ],

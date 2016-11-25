@@ -443,7 +443,7 @@ class WorkflowManagerTest extends \PHPUnit_Framework_TestCase
 
         $workflowDefinition = new WorkflowDefinition();
         $workflowItem->setDefinition($workflowDefinition);
-        $workflowDefinition->setGroups([WorkflowDefinition::GROUP_TYPE_EXCLUSIVE_RECORD => ['group1']]);
+        $workflowDefinition->setExclusiveRecordGroups(['group1']);
         $workflow = $this->createWorkflow();
 
         $workflow->expects($this->once())
@@ -865,7 +865,12 @@ class WorkflowManagerTest extends \PHPUnit_Framework_TestCase
             ->method('getEntityManager')->with(WorkflowDefinition::class)->willReturn($entityManager);
         $entityManager->expects($this->once())->method('flush')->with($workflowDefinition);
 
-        $this->eventDispatcher->expects($this->once())
+        $this->eventDispatcher->expects($this->at(0))
+            ->method('dispatch')->with(
+                WorkflowEvents::WORKFLOW_BEFORE_ACTIVATION,
+                new WorkflowChangesEvent($workflowDefinition)
+            );
+        $this->eventDispatcher->expects($this->at(1))
             ->method('dispatch')->with(
                 WorkflowEvents::WORKFLOW_ACTIVATED,
                 new WorkflowChangesEvent($workflowDefinition)
@@ -928,7 +933,12 @@ class WorkflowManagerTest extends \PHPUnit_Framework_TestCase
             ->method('getEntityManager')->with(WorkflowDefinition::class)->willReturn($entityManager);
         $entityManager->expects($this->once())->method('flush')->with($workflowDefinition);
 
-        $this->eventDispatcher->expects($this->once())
+        $this->eventDispatcher->expects($this->at(0))
+            ->method('dispatch')->with(
+                WorkflowEvents::WORKFLOW_BEFORE_DEACTIVATION,
+                new WorkflowChangesEvent($workflowDefinition)
+            );
+        $this->eventDispatcher->expects($this->at(1))
             ->method('dispatch')->with(
                 WorkflowEvents::WORKFLOW_DEACTIVATED,
                 new WorkflowChangesEvent($workflowDefinition)
@@ -977,15 +987,13 @@ class WorkflowManagerTest extends \PHPUnit_Framework_TestCase
         $workflowName = 'test_workflow';
 
         $workflowMock = $this->getMockBuilder(Workflow::class)->disableOriginalConstructor()->getMock();
-        $workflowDefinition = $this->getMockBuilder(WorkflowDefinition::class)->getMock();
 
         $this->workflowRegistry->expects($this->once())
             ->method('getWorkflow')->with($workflowName)->willReturn($workflowMock);
         $workflowMock->expects($this->once())
-            ->method('getDefinition')->willReturn($workflowDefinition);
+            ->method('isActive')
+            ->willReturn($isActive);
 
-        $workflowDefinition->expects($this->once())
-            ->method('isActive')->willReturn($isActive);
 
         $this->assertEquals($isActive, $this->workflowManager->isActiveWorkflow($workflowName));
     }

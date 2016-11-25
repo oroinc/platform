@@ -6,7 +6,7 @@ use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\Routing\RouterInterface;
 
 use Oro\Component\Action\Action\AssignUrl;
-use Oro\Component\Action\Model\ContextAccessor;
+use Oro\Component\ConfigExpression\ContextAccessor;
 use Oro\Component\ConfigExpression\Tests\Unit\Fixtures\ItemStub;
 
 class AssignUrlTest extends \PHPUnit_Framework_TestCase

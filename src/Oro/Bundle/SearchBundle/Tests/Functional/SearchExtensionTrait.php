@@ -30,9 +30,10 @@ trait SearchExtensionTrait
      *
      * @param string $alias
      * @param int $itemsCount
+     * @param string $searchService
      * @throws \LogicException
      */
-    protected function ensureItemsLoaded($alias, $itemsCount)
+    protected function ensureItemsLoaded($alias, $itemsCount, $searchService = 'oro_search.search.engine')
     {
         $query = new Query();
         $query->from($alias);
@@ -40,7 +41,7 @@ trait SearchExtensionTrait
         $requestCounts = 5;
         do {
             /** @var Result $result */
-            $result = $this->getContainer()->get('oro_search.search.engine')->search($query);
+            $result = $this->getContainer()->get($searchService)->search($query);
             $actualLoaded = $result->getRecordsCount();
             $isLoaded = $actualLoaded === $itemsCount;
             if (!$isLoaded) {

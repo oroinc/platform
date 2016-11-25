@@ -2,10 +2,12 @@
 
 namespace Oro\Bundle\WorkflowBundle\Tests\Functional\Controller\Api\Rest;
 
+use Doctrine\Common\Inflector\Inflector;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
 use Oro\Bundle\WorkflowBundle\Exception\WorkflowNotFoundException;
 use Oro\Bundle\WorkflowBundle\Model\Workflow;
+use Oro\Bundle\WorkflowBundle\Translation\KeyTemplate\WorkflowTemplate;
 
 /**
  * @dbIsolation
@@ -87,8 +89,21 @@ class WorkflowDefinitionControllerTest extends WebTestCase
 
         $workflow = $this->getDefinition(self::TEST_DEFINITION_NAME);
         $this->assertInstanceOf('Oro\Bundle\WorkflowBundle\Model\Workflow', $workflow);
-        $this->assertEquals($updated['label'], $workflow->getLabel());
+
+        $this->assertEquals(
+            WorkflowTemplate::KEY_PREFIX . '.' . $this->prepareWorkflowName(self::TEST_DEFINITION_NAME) . '.label',
+            $workflow->getLabel()
+        );
         $this->assertEquals(self::TEST_DEFINITION_NAME, $workflow->getName());
+    }
+
+    /**
+     * @param string $name
+     * @return mixed
+     */
+    protected function prepareWorkflowName($name)
+    {
+        return preg_replace('/\s+/', '_', trim(Inflector::tableize($name)));
     }
 
     /**

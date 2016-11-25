@@ -13,7 +13,7 @@ use Oro\Bundle\ActionBundle\Model\Operation;
 use Oro\Bundle\ActionBundle\Model\OptionsAssembler;
 use Oro\Bundle\ActionBundle\Model\OperationDefinition;
 
-use Oro\Component\Action\Model\ContextAccessor;
+use Oro\Component\ConfigExpression\ContextAccessor;
 
 class OptionsHelperTest extends \PHPUnit_Framework_TestCase
 {

@@ -131,15 +131,22 @@ class ValidateRequestDataTest extends ChangeRelationshipProcessorTestCase
             [
                 ['data' => ['type' => null, 'id' => null]],
                 [
-                    ['The \'id\' property should not be empty', '/data/id'],
-                    ['The \'type\' property should not be empty', '/data/type']
+                    ['The \'id\' property should not be null', '/data/id'],
+                    ['The \'type\' property should not be null', '/data/type']
                 ]
             ],
             [
                 ['data' => ['type' => '', 'id' => '']],
                 [
-                    ['The \'id\' property should not be empty', '/data/id'],
-                    ['The \'type\' property should not be empty', '/data/type']
+                    ['The \'id\' property should not be blank', '/data/id'],
+                    ['The \'type\' property should not be blank', '/data/type']
+                ]
+            ],
+            [
+                ['data' => ['type' => ' ', 'id' => ' ']],
+                [
+                    ['The \'id\' property should not be blank', '/data/id'],
+                    ['The \'type\' property should not be blank', '/data/type']
                 ]
             ],
             [
@@ -221,15 +228,22 @@ class ValidateRequestDataTest extends ChangeRelationshipProcessorTestCase
             [
                 ['data' => [['type' => null, 'id' => null]]],
                 [
-                    ['The \'id\' property should not be empty', '/data/0/id'],
-                    ['The \'type\' property should not be empty', '/data/0/type']
+                    ['The \'id\' property should not be null', '/data/0/id'],
+                    ['The \'type\' property should not be null', '/data/0/type']
                 ]
             ],
             [
                 ['data' => [['type' => '', 'id' => '']]],
                 [
-                    ['The \'id\' property should not be empty', '/data/0/id'],
-                    ['The \'type\' property should not be empty', '/data/0/type']
+                    ['The \'id\' property should not be blank', '/data/0/id'],
+                    ['The \'type\' property should not be blank', '/data/0/type']
+                ]
+            ],
+            [
+                ['data' => [['type' => ' ', 'id' => ' ']]],
+                [
+                    ['The \'id\' property should not be blank', '/data/0/id'],
+                    ['The \'type\' property should not be blank', '/data/0/type']
                 ]
             ],
             [

@@ -125,18 +125,49 @@ class Configuration implements ConfigurationInterface
                 ->info('A definition of filters')
                 ->example(
                     [
-                        'string' => [
-                            'class' => 'Oro\Bundle\ApiBundle\Filter\ComparisonFilter',
-                            'supported_operators' => ['=', '!=']
+                        'integer' => [
+                            'supported_operators' => ['=', '!=', '<', '<=', '>', '>=']
+                        ],
+                        'primaryField' => [
+                            'class' => 'Oro\Bundle\ApiBundle\Filter\PrimaryFieldFilter'
+                        ],
+                        'association' => [
+                            'factory' => ['@oro_api.filter_factory.association', 'createFilter']
                         ]
                     ]
                 )
                 ->useAttributeAsKey('name')
                 ->prototype('array')
+                    ->validate()
+                        ->always(function ($value) {
+                            if (empty($value['factory'])) {
+                                unset($value['factory']);
+                                if (empty($value['class'])) {
+                                    $value['class'] = 'Oro\Bundle\ApiBundle\Filter\ComparisonFilter';
+                                }
+                            }
+
+                            return $value;
+                        })
+                    ->end()
+                        ->validate()
+                            ->ifTrue(function ($value) {
+                                return !empty($value['class']) && !empty($value['factory']);
+                            })
+                            ->thenInvalid('The "class" and "factory" should not be used together.')
+                        ->end()
                     ->children()
                         ->scalarNode('class')
                             ->cannotBeEmpty()
-                            ->defaultValue('Oro\Bundle\ApiBundle\Filter\ComparisonFilter')
+                        ->end()
+                        ->arrayNode('factory')
+                            ->validate()
+                                ->ifTrue(function ($value) {
+                                    return count($value) !== 2 || 0 !== strpos($value[0], '@');
+                                })
+                                ->thenInvalid('Expected [\'@serviceId\', \'methodName\']')
+                            ->end()
+                            ->prototype('scalar')->cannotBeEmpty()->end()
                         ->end()
                         ->arrayNode('supported_operators')
                             ->prototype('scalar')->end()

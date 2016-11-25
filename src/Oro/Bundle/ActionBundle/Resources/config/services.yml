@@ -51,7 +51,7 @@ services:
         arguments:
             - '@oro_action.helper.context'
             - '@oro_action.options_assembler'
-            - '@oro_action.context_accessor'
+            - '@oro_action.expression.context_accessor'
             - '@oro_action.helper.applications_url'
             - '@translator'
 

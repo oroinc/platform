@@ -6,7 +6,7 @@ use Symfony\Component\Translation\TranslatorBagInterface;
 
 use Oro\Bundle\ImportExportBundle\Context\ContextRegistry;
 use Oro\Bundle\ImportExportBundle\Reader\AbstractReader;
-use Oro\Bundle\TranslationBundle\Entity\Translation;
+use Oro\Bundle\TranslationBundle\Translation\Translator;
 
 class TranslationReader extends AbstractReader
 {
@@ -55,7 +55,7 @@ class TranslationReader extends AbstractReader
         }
 
         if (!isset($this->messages[$locale])) {
-            $defaultMessages = $this->getMessages(Translation::DEFAULT_LOCALE);
+            $defaultMessages = $this->getMessages(Translator::DEFAULT_LOCALE);
             $originalMessages = $this->getMessages($locale);
 
             $messages = array_merge($defaultMessages, $originalMessages);

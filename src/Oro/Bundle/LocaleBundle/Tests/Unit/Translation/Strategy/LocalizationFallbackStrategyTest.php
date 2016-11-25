@@ -41,6 +41,11 @@ class LocalizationFallbackStrategyTest extends \PHPUnit_Framework_TestCase
         $this->strategy->setEntityClass('Oro\Bundle\LocaleBundle\Entity\Localization');
     }
 
+    public function testIsApplicable()
+    {
+        $this->assertTrue($this->strategy->isApplicable());
+    }
+
     /**
      * @dataProvider getLocaleFallbacksDataProvider
      *

@@ -25,6 +25,9 @@ class SwitchableFormRegistry extends FormRegistry implements FormExtensionSwitch
     /** @var FormExtensionState */
     protected $extensionState;
 
+    /** @var int */
+    private $switchCounter = 0;
+
     /**
      * @param FormExtensionInterface[]         $extensions
      * @param ResolvedFormTypeFactoryInterface $resolvedTypeFactory
@@ -58,8 +61,13 @@ class SwitchableFormRegistry extends FormRegistry implements FormExtensionSwitch
      */
     public function switchToDefaultFormExtension()
     {
-        $this->switchFormExtension(self::DEFAULT_EXTENSION);
-        $this->extensionState->switchToDefaultFormExtension();
+        if ($this->switchCounter > 0) {
+            $this->switchCounter--;
+            if (0 === $this->switchCounter) {
+                $this->switchFormExtension(self::DEFAULT_EXTENSION);
+                $this->extensionState->switchToDefaultFormExtension();
+            }
+        }
     }
 
     /**
@@ -67,8 +75,11 @@ class SwitchableFormRegistry extends FormRegistry implements FormExtensionSwitch
      */
     public function switchToApiFormExtension()
     {
-        $this->switchFormExtension(self::API_EXTENSION);
-        $this->extensionState->switchToApiFormExtension();
+        if (0 === $this->switchCounter) {
+            $this->switchFormExtension(self::API_EXTENSION);
+            $this->extensionState->switchToApiFormExtension();
+        }
+        $this->switchCounter++;
     }
 
     /**

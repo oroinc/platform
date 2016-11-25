@@ -5,12 +5,13 @@ namespace Oro\Bundle\LayoutBundle\Tests\Unit\Layout\Block\Extension;
 use Oro\Component\Layout\Block\Type\BaseType;
 use Oro\Component\Layout\Block\Type\Options;
 use Oro\Component\Layout\BlockView;
+use Oro\Component\Layout\ExpressionLanguage\Encoder\ExpressionEncoderRegistry;
+use Oro\Component\Layout\ExpressionLanguage\Encoder\JsonExpressionEncoder;
+use Oro\Component\Layout\ExpressionLanguage\ExpressionManipulator;
 use Oro\Component\Layout\LayoutContext;
 use Oro\Component\Layout\OptionValueBag;
 
-use Oro\Bundle\LayoutBundle\ExpressionLanguage\ExpressionManipulator;
 use Oro\Bundle\LayoutBundle\Layout\Block\Extension\ClassAttributeExtension;
-use Oro\Bundle\LayoutBundle\Layout\Encoder\JsonExpressionEncoder;
 
 class ClassAttributeExtensionTest extends \PHPUnit_Framework_TestCase
 {
@@ -19,12 +20,13 @@ class ClassAttributeExtensionTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
+        /** @var ExpressionEncoderRegistry|\PHPUnit_Framework_MockObject_MockObject $encoderRegistry */
         $encoderRegistry = $this
-            ->getMockBuilder('Oro\Bundle\LayoutBundle\Layout\Encoder\ExpressionEncoderRegistry')
+            ->getMockBuilder('Oro\Component\Layout\ExpressionLanguage\Encoder\ExpressionEncoderRegistry')
             ->disableOriginalConstructor()
             ->getMock();
         $encoderRegistry->expects($this->any())
-            ->method('getEncoder')
+            ->method('get')
             ->with('json')
             ->will($this->returnValue(new JsonExpressionEncoder(new ExpressionManipulator())));
 

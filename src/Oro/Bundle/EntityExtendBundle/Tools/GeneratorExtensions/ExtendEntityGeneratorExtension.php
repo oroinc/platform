@@ -99,7 +99,7 @@ class ExtendEntityGeneratorExtension extends AbstractEntityGeneratorExtension
 
         $toStringBody = empty($toString)
             ? 'return (string) $this->getId();'
-            : 'return (string)' . implode(' . ', $toString) . ';';
+            : 'return (string)' . implode(' . " " . ', $toString) . ';';
         $class->setMethod($this->generateClassMethod('__toString', $toStringBody));
     }
 

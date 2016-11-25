@@ -30,6 +30,14 @@ class DefaultTranslationStrategy implements TranslationStrategyInterface
     /**
      * {@inheritdoc}
      */
+    public function isApplicable()
+    {
+        return true;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function getName()
     {
         return self::NAME;

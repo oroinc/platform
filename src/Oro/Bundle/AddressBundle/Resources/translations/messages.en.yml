@@ -20,7 +20,7 @@ oro:
         name_prefix.label:   Name prefix
         name_suffix.label:   Name suffix
         organization.label:  Organization
-        postal_code.label:   Zip/postal code
+        postal_code.label:   Zip/Postal Code
         region.label:        State
         region_text.label:   State
         street.label:        Street

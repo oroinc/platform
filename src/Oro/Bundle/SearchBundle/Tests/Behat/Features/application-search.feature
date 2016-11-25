@@ -50,7 +50,7 @@ Feature: Application search
     And I select "All" from search types
     And I type "John" in "search"
     And I should see 1 search suggestion
-    And I follow "admin"
+    And I follow "John Doe User"
     And I should be on User View page
 
   Scenario: No results search

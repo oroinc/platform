@@ -82,6 +82,9 @@ class SendEmailMessageProcessor implements MessageProcessorInterface, TopicSubsc
 
         $this->mailerProcessor->processEmbeddedImages($emailMessage);
 
+
+        //toDo: can possibly send duplicate replies. See BAP-12503
+
         if (! $this->mailer->send($emailMessage)) {
             $this->logger->critical(
                 sprintf(

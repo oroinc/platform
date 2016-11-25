@@ -34,11 +34,4 @@ abstract class AbstractBlockTypeExtension implements BlockTypeExtensionInterface
     public function configureOptions(OptionsResolver $resolver)
     {
     }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function normalizeOptions(Options $options, ContextInterface $context, DataAccessorInterface $data)
-    {
-    }
 }

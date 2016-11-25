@@ -87,4 +87,17 @@ class MetaPropertyMetadataTest extends \PHPUnit_Framework_TestCase
         $propertyMetadata->setDataType('dataType');
         $this->assertEquals('dataType', $propertyMetadata->getDataType());
     }
+
+    public function testResultName()
+    {
+        $propertyMetadata = new MetaPropertyMetadata();
+
+        $this->assertNull($propertyMetadata->getResultName());
+        $propertyMetadata->setName('name');
+        $this->assertEquals('name', $propertyMetadata->getResultName());
+        $propertyMetadata->setResultName('resultName');
+        $this->assertEquals('resultName', $propertyMetadata->getResultName());
+        $propertyMetadata->setResultName(null);
+        $this->assertEquals('name', $propertyMetadata->getResultName());
+    }
 }

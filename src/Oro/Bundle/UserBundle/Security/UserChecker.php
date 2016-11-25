@@ -5,11 +5,11 @@ namespace Oro\Bundle\UserBundle\Security;
 use Symfony\Component\HttpFoundation\Session\Flash\FlashBagInterface;
 use Symfony\Component\Security\Core\User\UserChecker as BaseUserChecker;
 use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Component\Translation\TranslatorInterface;
 
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\UserBundle\Exception\PasswordChangedException;
 use Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink;
-use Symfony\Component\Translation\TranslatorInterface;
 
 class UserChecker extends BaseUserChecker
 {

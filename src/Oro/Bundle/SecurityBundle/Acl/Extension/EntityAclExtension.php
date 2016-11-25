@@ -5,8 +5,8 @@ namespace Oro\Bundle\SecurityBundle\Acl\Extension;
 use Symfony\Component\Security\Acl\Domain\ObjectIdentity;
 use Symfony\Component\Security\Acl\Exception\InvalidDomainObjectException;
 use Symfony\Component\Security\Acl\Model\ObjectIdentityInterface;
+use Symfony\Component\Security\Acl\Util\ClassUtils;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
-use Symfony\Component\Security\Core\Util\ClassUtils;
 
 use Oro\Bundle\EntityBundle\Exception\InvalidEntityException;
 use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
@@ -69,6 +69,18 @@ class EntityAclExtension extends AbstractAclExtension
 
     /** @var array */
     protected $maskBuilderIdentityToPermissions;
+
+    /**
+     * Cached masks from MaskBuilder
+     * @var array
+     */
+    private $masks = [];
+
+    /**
+     * Cached builders for their identities
+     * @var array|EntityMaskBuilder[]
+     */
+    private $builders = [];
 
     /**
      * @param ObjectIdAccessor                           $objectIdAccessor
@@ -247,9 +259,7 @@ class EntityAclExtension extends AbstractAclExtension
             $permission = 'VIEW';
         }
 
-        $identity = $this->getIdentityForPermission($permission);
-
-        return new EntityMaskBuilder($identity, $this->getPermissionsForIdentity($identity));
+        return $this->getEntityMaskBuilder($this->getIdentityForPermission($permission));
     }
 
     /**
@@ -259,7 +269,7 @@ class EntityAclExtension extends AbstractAclExtension
     {
         $result = [];
         foreach ($this->getPermissionsForIdentity() as $identity => $permissions) {
-            $result[] = new EntityMaskBuilder($identity, $permissions);
+            $result[] = $this->getEntityMaskBuilder($identity);
         }
 
         return $result;
@@ -270,10 +280,7 @@ class EntityAclExtension extends AbstractAclExtension
      */
     public function getMaskPattern($mask)
     {
-        $identity    = $this->getServiceBits($mask);
-        $maskBuilder = new EntityMaskBuilder($identity, $this->getPermissionsForIdentity($identity));
-
-        return $maskBuilder->getPatternFor($mask);
+        return EntityMaskBuilder::getPatternFor($mask);
     }
 
     /**
@@ -659,7 +666,7 @@ class EntityAclExtension extends AbstractAclExtension
 
             foreach ($this->getOwnershipPermissions() as $ownershipPermission) {
                 $maskName = 'MASK_' . $ownershipPermission . '_SYSTEM';
-                
+
                 if ($maskBuilder->hasMask($maskName)) {
                     $maskBuilder->remove($ownershipPermission . '_SYSTEM');
                 }
@@ -733,12 +740,13 @@ class EntityAclExtension extends AbstractAclExtension
      */
     protected function getMaskBuilderConst($maskBuilderIdentity, $constName)
     {
-        $maskBuilder = new EntityMaskBuilder(
-            $maskBuilderIdentity,
-            $this->getPermissionsForIdentity($maskBuilderIdentity)
-        );
+        $cachedKey = $maskBuilderIdentity . '-' . $constName;
 
-        return $maskBuilder->getMask($constName);
+        if (!array_key_exists($cachedKey, $this->masks)) {
+            $this->masks[$cachedKey] = $this->getEntityMaskBuilder($maskBuilderIdentity)->getMask($constName);
+        }
+
+        return $this->masks[$cachedKey];
     }
 
     /**
@@ -875,5 +883,18 @@ class EntityAclExtension extends AbstractAclExtension
         return $identity === null
             ? $this->maskBuilderIdentityToPermissions
             : $this->maskBuilderIdentityToPermissions[$identity];
+    }
+
+    /**
+     * @param int $identity
+     * @return EntityMaskBuilder
+     */
+    protected function getEntityMaskBuilder($identity)
+    {
+        if (!isset($this->builders[$identity])) {
+            $this->builders[$identity] = new EntityMaskBuilder($identity, $this->getPermissionsForIdentity($identity));
+        }
+
+        return clone $this->builders[$identity];
     }
 }

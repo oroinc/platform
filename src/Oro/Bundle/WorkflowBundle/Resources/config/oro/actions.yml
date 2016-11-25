@@ -9,32 +9,30 @@ operations:
         datagrids:
             - workflow-definitions-grid
         acl_resource: [CREATE, entity:Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition]
+        replace: [preactions]
         preactions:
+            - '@call_service_method':
+                service: oro_action.helper.default_operation_request
+                method: getRequestRoute
+                attribute: $.requestRoute
+            - '@call_service_method':
+                  service: oro_entity_config.helper.entity_config
+                  method: getRoutes
+                  method_parameters: [$.data, ['name']]
+                  attribute: $.routes
             - '@tree':
                 conditions:
                     '@and':
-                        - '@eq': [$.requestRoute, 'oro_action_widget_form']
+                        - '@not_blank': $.data
+                        - '@eq': [$.requestRoute, 'oro_action_widget_form'] # display a form template
                 actions:
-                    - '@call_method':
-                        conditions:
-                            @and:
-                                - '@not_blank': $.data
-                        attribute: $.configuration
-                        object: $.data
-                        method: getConfiguration
-                    - '@tree':
-                        conditions:
-                            @and:
-                                - '@not_empty': $.configuration[attributes]
-                        actions:
-                            - '@foreach':
-                                array: $.configuration[attributes]
-                                value: $.val
-                                actions:
-                                    - '@trans':
-                                        id: $.val[label]
-                                        attribute: $.val[translated_label]
-                    - '@assign_value': [$.workflowConfiguration, $.configuration]
+                    - '@call_service_method':
+                        service: oro_workflow.translation.processor
+                        method: translateWorkflowDefinitionFields
+                        method_parameters: [$.data]
+                    - '@clone_object':
+                        target: $.data
+                        attribute: $.clone
                     - '@call_service_method':
                         service: oro_entity.entity_provider
                         method: getEntities

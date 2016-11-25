@@ -10,9 +10,10 @@ use Oro\Bundle\WorkflowBundle\Model\WorkflowManager;
 
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 
 /**
  * @Route("/workflow")
@@ -20,6 +21,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 class WorkflowController extends Controller
 {
     const DEFAULT_TRANSITION_TEMPLATE = 'OroWorkflowBundle:Workflow:transitionForm.html.twig';
+
     /**
      * @Route(
      *      "/start/{workflowName}/{transitionName}",
@@ -28,9 +30,10 @@ class WorkflowController extends Controller
      * @AclAncestor("oro_workflow")
      * @param string $workflowName
      * @param string $transitionName
-     * @return array
+     * @param Request $request
+     * @return Response
      */
-    public function startTransitionAction($workflowName, $transitionName)
+    public function startTransitionAction($workflowName, $transitionName, Request $request)
     {
         /** @var WorkflowManager $workflowManager */
         $workflowManager = $this->get('oro_workflow.manager');
@@ -40,7 +43,7 @@ class WorkflowController extends Controller
         $routeParams = [
             'workflowName' => $workflow->getName(),
             'transitionName' => $transition->getName(),
-            'entityId' => $this->getRequest()->get('entityId', 0)
+            'entityId' => $request->get('entityId', 0)
         ];
 
         // dispatch oro_workflow.start_transition.handle_before_render event
@@ -77,7 +80,7 @@ class WorkflowController extends Controller
      * @AclAncestor("oro_workflow")
      * @param string $transitionName
      * @param WorkflowItem $workflowItem
-     * @return array
+     * @return Response
      */
     public function transitionAction($transitionName, WorkflowItem $workflowItem)
     {

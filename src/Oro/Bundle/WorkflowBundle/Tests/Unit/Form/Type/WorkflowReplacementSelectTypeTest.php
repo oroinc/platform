@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Form\Type;
 
+use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
@@ -75,7 +76,7 @@ class WorkflowReplacementSelectTypeTest extends \PHPUnit_Framework_TestCase
      */
     public function testBuildView($workflow, $expectedId)
     {
-        $form = $this->getMock('Symfony\Component\Form\FormInterface');
+        $form = $this->getMock(FormInterface::class);
 
         $formView = new FormView();
 

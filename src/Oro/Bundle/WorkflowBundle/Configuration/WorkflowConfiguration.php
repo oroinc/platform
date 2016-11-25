@@ -13,6 +13,7 @@ use Symfony\Component\Config\Definition\Processor;
 
 use Oro\Bundle\WorkflowBundle\Entity\EventTriggerInterface;
 use Oro\Bundle\WorkflowBundle\Entity\TransitionEventTrigger;
+use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Exception\WorkflowException;
 use Oro\Bundle\WorkflowBundle\Form\Type\WorkflowTransitionType;
 
@@ -62,10 +63,6 @@ class WorkflowConfiguration extends AbstractConfiguration implements Configurati
             ->scalarNode('name')
                 ->cannotBeEmpty()
             ->end()
-            ->scalarNode('label')
-                ->isRequired()
-                ->cannotBeEmpty()
-            ->end()
             ->scalarNode('entity')
                 ->isRequired()
                 ->cannotBeEmpty()
@@ -93,6 +90,9 @@ class WorkflowConfiguration extends AbstractConfiguration implements Configurati
             ->integerNode('priority')
                 ->defaultValue(0)
             ->end()
+            ->arrayNode(WorkflowDefinition::CONFIG_SCOPES)
+                ->prototype('variable')->end()
+            ->end()
             ->append($this->getStepsNode())
             ->append($this->getAttributesNode())
             ->append($this->getTransitionsNode())
@@ -118,10 +118,6 @@ class WorkflowConfiguration extends AbstractConfiguration implements Configurati
             ->prototype('array')
                 ->children()
                     ->scalarNode('name')
-                        ->cannotBeEmpty()
-                    ->end()
-                    ->scalarNode('label')
-                        ->isRequired()
                         ->cannotBeEmpty()
                     ->end()
                     ->integerNode('order')
@@ -172,9 +168,6 @@ class WorkflowConfiguration extends AbstractConfiguration implements Configurati
                 ->children()
                     ->scalarNode('name')
                         ->cannotBeEmpty()
-                    ->end()
-                    ->scalarNode('label')
-                        ->defaultNull()
                     ->end()
                     ->scalarNode('type')
                         ->defaultNull()
@@ -230,10 +223,6 @@ class WorkflowConfiguration extends AbstractConfiguration implements Configurati
                     ->scalarNode('name')
                         ->cannotBeEmpty()
                     ->end()
-                    ->scalarNode('label')
-                        ->isRequired()
-                        ->cannotBeEmpty()
-                    ->end()
                     ->scalarNode('step_to')
                         ->isRequired()
                         ->cannotBeEmpty()
@@ -251,9 +240,6 @@ class WorkflowConfiguration extends AbstractConfiguration implements Configurati
                         ->defaultNull()
                     ->end()
                     ->scalarNode('acl_message')
-                        ->defaultNull()
-                    ->end()
-                    ->scalarNode('message')
                         ->defaultNull()
                     ->end()
                     ->scalarNode('transition_definition')

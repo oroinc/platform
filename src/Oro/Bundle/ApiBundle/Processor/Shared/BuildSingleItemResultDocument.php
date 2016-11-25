@@ -5,7 +5,8 @@ namespace Oro\Bundle\ApiBundle\Processor\Shared;
 use Oro\Bundle\ApiBundle\Processor\Context;
 
 /**
- * Builds response based on the Context state.
+ * Builds response based on the Context state
+ * and add the response document builder to the Context.
  */
 class BuildSingleItemResultDocument extends BuildResultDocument
 {

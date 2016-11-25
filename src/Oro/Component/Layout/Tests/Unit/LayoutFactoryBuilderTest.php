@@ -6,6 +6,7 @@ use Oro\Component\Layout\Block\Type\Options;
 use Oro\Component\Layout\BlockBuilderInterface;
 use Oro\Component\Layout\BlockTypeExtensionInterface;
 use Oro\Component\Layout\BlockTypeInterface;
+use Oro\Component\Layout\ExpressionLanguage\ExpressionProcessor;
 use Oro\Component\Layout\Extension\ExtensionInterface;
 use Oro\Component\Layout\LayoutFactoryBuilder;
 use Oro\Component\Layout\LayoutItemInterface;
@@ -15,12 +16,19 @@ use Oro\Component\Layout\DeferredLayoutManipulatorInterface;
 
 class LayoutFactoryBuilderTest extends \PHPUnit_Framework_TestCase
 {
+    /** @var ExpressionProcessor|\PHPUnit_Framework_MockObject_MockObject */
+    protected $expressionProcessor;
+
     /** @var LayoutFactoryBuilder */
     protected $layoutFactoryBuilder;
 
     protected function setUp()
     {
-        $this->layoutFactoryBuilder = new LayoutFactoryBuilder();
+        $this->expressionProcessor = $this
+            ->getMockBuilder('Oro\Component\Layout\ExpressionLanguage\ExpressionProcessor')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $this->layoutFactoryBuilder = new LayoutFactoryBuilder($this->expressionProcessor);
     }
 
     public function testGetEmptyLayoutFactory()

@@ -25,7 +25,7 @@ class TransitionManager
     }
 
     /**
-     * @return Collection
+     * @return Transition[]|Collection
      */
     public function getTransitions()
     {

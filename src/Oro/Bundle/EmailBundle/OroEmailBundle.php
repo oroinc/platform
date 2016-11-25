@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\EmailBundle;
 
+use Oro\Bundle\EmailBundle\Async\Topics;
+use Oro\Bundle\MessageQueueBundle\DependencyInjection\Compiler\AddTopicMetaPass;
 use Symfony\Component\ClassLoader\UniversalClassLoader;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\Filesystem\Filesystem;
@@ -59,6 +61,20 @@ class OroEmailBundle extends Bundle
         $container->addCompilerPass(new TwigSandboxConfigurationPass());
         $container->addCompilerPass(new EmailRecipientsProviderPass());
         $container->addCompilerPass(new MailboxProcessPass());
+
+        $addTopicPass = AddTopicMetaPass::create()
+            ->add(Topics::SEND_AUTO_RESPONSE, 'Send auto response for single email')
+            ->add(Topics::SEND_AUTO_RESPONSES, 'Send auto response for multiple emails')
+            ->add(Topics::ADD_ASSOCIATION_TO_EMAIL, 'Add association to single email')
+            ->add(Topics::ADD_ASSOCIATION_TO_EMAILS, 'Add association to multiple emails')
+            ->add(Topics::UPDATE_EMAIL_OWNER_ASSOCIATION, 'Updates single email for email owner')
+            ->add(Topics::UPDATE_EMAIL_OWNER_ASSOCIATIONS, 'Updates multiple emails for email owner')
+            ->add(Topics::SYNC_EMAIL_SEEN_FLAG, 'Synchronization email flags')
+            ->add(Topics::PURGE_EMAIL_ATTACHMENTS, 'Purge email attachments')
+            ->add(Topics::PURGE_EMAIL_ATTACHMENTS_BY_IDS, 'Purge email attachments by ids')
+        ;
+
+        $container->addCompilerPass($addTopicPass);
     }
 
     /**

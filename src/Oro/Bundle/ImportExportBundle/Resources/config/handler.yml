@@ -13,13 +13,13 @@ services:
             - '@oro_importexport.job_executor'
             - '@oro_importexport.processor.registry'
             - '@oro_importexport.file.file_system_operator'
+            - '@oro_entity_config.provider.entity'
+            - '@translator'
 
     oro_importexport.handler.import.abstract:
         class: %oro_importexport.handler.import.abstract.class%
         absract: true
         parent: oro_importexport.handler.abstract
-        calls:
-            - [setTranslator, ['@translator']]
 
     oro_importexport.handler.import.http:
         class: %oro_importexport.handler.import.http.class%

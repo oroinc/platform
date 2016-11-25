@@ -6,7 +6,7 @@ use Symfony\Component\PropertyAccess\PropertyPathInterface;
 
 use Oro\Bundle\WorkflowBundle\Model\WorkflowManager;
 
-use Oro\Component\Action\Model\ContextAccessor;
+use Oro\Component\ConfigExpression\ContextAccessor;
 use Oro\Component\Action\Exception\InvalidParameterException;
 use Oro\Component\Action\Action\AbstractAction as ComponentAbstractAction;
 

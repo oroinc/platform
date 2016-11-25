@@ -1,5 +1,5 @@
 {% extends 'OroUserBundle::layout.html.twig' %}
-{% form_theme form with 'OroFormBundle:Form:fields.html.twig' %}
+{% form_theme form with 'OroUIBundle:Form:login.html.twig' %}
 
 {% block bodyClass %}login-page{% endblock %}
 
@@ -7,31 +7,16 @@
 <div class="container">
     <form action="{{ path('oro_user_reset_reset', { token: token }) }}" {{ form_enctype(form) }} method="post" class="form-signin form-reset">
         <div class="title-box">
-            {% if oro_theme_logo() %}
-                <h1 class="oro-title logo-{{ oro_theme_logo() ? 'image' : 'text' }}">
-                    <img src="{{ asset(oro_theme_logo()) }}">
-                </h1>
-                <span class="divider-vertical"></span>
-            {% endif %}
             <h2 class="title">{{ 'Password Reset'|trans }}</h2>
         </div>
         <fieldset>
-            <div>
-                {{ form_errors(form.plainPassword.first) }}
-            </div>
-            <div class="input-prepend">
-                {{ form_label(form.plainPassword.first, null, {'label_attr': {'class': 'add-on'}}) }}
-                {{ form_widget(form.plainPassword.first) }}
-            </div>
-            <div>
-                {{ form_errors(form.plainPassword.second) }}
-            </div>
-            <div class="input-prepend">
-                {{ form_label(form.plainPassword.second, null, {'label_attr': {'class': 'add-on'}}) }}
-                {{ form_widget(form.plainPassword.second) }}
-            </div>
-            <div>
-                {{ form_widget(form._token) }}
+            {% if form.vars.errors|length > 0 %}
+                <div class="alert alert-error">
+                    {{ form_errors(form) }}
+                </div>
+            {% endif %}
+            {{ form_rest(form) }}
+            <div class="form-buttons">
                 <button class="btn btn-large extra-submit btn-primary" type="submit">{{ 'Reset'|trans }}</button>
                 <a href="{{ path('oro_user_security_login') }}" class="btn btn-large extra-btn-large">{{ 'Cancel'|trans }}</a>
             </div>

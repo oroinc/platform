@@ -141,6 +141,7 @@ class ConfigurableBlockTestCase extends BaseBlockTypeTestCase
             'option_required' => 'required_value',
             'option_default_false' => false,
             'option_default_null' => null,
+            'visible' => true,
         ], $this->resolveOptions(static::TYPE_NAME, ['option_required' => 'required_value']));
     }
 
@@ -152,6 +153,7 @@ class ConfigurableBlockTestCase extends BaseBlockTypeTestCase
             'option_required' => 'required_value',
             'option_default_false' => false,
             'option_default_null' => null,
+            'visible' => true,
         ], $this->resolveOptions(static::TYPE_NAME, [
             'option' => 'value',
             'option_default' => 'default_value',

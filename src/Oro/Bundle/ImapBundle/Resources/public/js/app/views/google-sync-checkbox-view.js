@@ -145,7 +145,7 @@ define(function(require) {
          * Remove check status for checkbox
          */
         unCheck: function() {
-            this.$el.find('input').removeAttr('checked');
+            this.$el.find('input').prop('checked', false);
         }
     });
 

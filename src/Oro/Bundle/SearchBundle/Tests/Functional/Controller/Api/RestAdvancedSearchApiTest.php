@@ -39,11 +39,11 @@ class RestAdvancedSearchApiTest extends WebTestCase
     public function testAdvancedSearch(array $request, array $response)
     {
         $this->addOroDefaultPrefixToUrlInParameterArray($response['rest']['data'], 'record_url');
-        $requestUrl = $request['query'];
+        $queryString = $request['query'];
         $this->client->request(
             'GET',
             $this->getUrl('oro_api_get_search_advanced'),
-            ['query' => $requestUrl]
+            ['query' => $queryString]
         );
 
         $result = $this->client->getResponse();
@@ -54,6 +54,7 @@ class RestAdvancedSearchApiTest extends WebTestCase
         //compare result
         $this->assertEquals($response['records_count'], $result['records_count']);
         $this->assertEquals($response['count'], $result['count']);
+
         $this->assertSameSize($response['rest']['data'], $result['data']);
 
         // remove ID references

@@ -2,11 +2,14 @@
 
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Autocomplete;
 
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\Query;
 use Doctrine\ORM\QueryBuilder;
+
+use Symfony\Component\Translation\TranslatorInterface;
 
 use Oro\Bundle\WorkflowBundle\Autocomplete\WorkflowReplacementSearchHandler;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
@@ -28,6 +31,9 @@ class WorkflowReplacementSearchHandlerTest extends \PHPUnit_Framework_TestCase
 
     /** @var WorkflowRegistry|\PHPUnit_Framework_MockObject_MockObject */
     protected $workflowRegistry;
+
+    /** @var TranslatorInterface|\PHPUnit_Framework_MockObject_MockObject */
+    protected $translator;
 
     /** @var WorkflowReplacementSearchHandler */
     protected $searchHandler;
@@ -53,6 +59,9 @@ class WorkflowReplacementSearchHandlerTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
+        $this->translator = $this->getMock(TranslatorInterface::class);
+        $this->translator->expects($this->any())->method('trans')->willReturnArgument(0);
+
         $this->entityRepository->expects($this->any())->method('createQueryBuilder')->willReturn($this->queryBuilder);
         $this->queryBuilder->expects($this->any())->method('getQuery')->willReturn($this->query);
         $this->queryBuilder->expects($this->any())->method('expr')->willReturn(new Query\Expr());
@@ -60,6 +69,7 @@ class WorkflowReplacementSearchHandlerTest extends \PHPUnit_Framework_TestCase
         $this->searchHandler = new WorkflowReplacementSearchHandler(self::TEST_ENTITY_CLASS, ['label']);
         $this->searchHandler->initDoctrinePropertiesByManagerRegistry($this->getManagerRegistryMock());
         $this->searchHandler->setWorkflowRegistry($this->workflowRegistry);
+        $this->searchHandler->setTranslator($this->translator);
     }
 
     public function testSearchWithoutDelimiter()
@@ -142,7 +152,7 @@ class WorkflowReplacementSearchHandlerTest extends \PHPUnit_Framework_TestCase
 
         $this->workflowRegistry->expects($this->once())
             ->method('getWorkflow')
-            ->with('entity1')
+            ->with('entity1', false)
             ->willReturn(null);
 
         $this->query->expects($this->once())->method('getResult')->willReturn([
@@ -179,13 +189,15 @@ class WorkflowReplacementSearchHandlerTest extends \PHPUnit_Framework_TestCase
 
         $this->workflowRegistry->expects($this->once())
             ->method('getWorkflow')
-            ->with('entity1')
+            ->with('entity1', false)
             ->willReturn($workflow);
 
         $this->workflowRegistry->expects($this->once())
             ->method('getActiveWorkflowsByActiveGroups')
             ->with(['entity1_group'])
-            ->willReturn([$workflow, $this->getWorkflowMock('entity2'), $this->getWorkflowMock('entity3')]);
+            ->willReturn(
+                new ArrayCollection([$workflow, $this->getWorkflowMock('entity2'), $this->getWorkflowMock('entity3')])
+            );
 
         $this->query->expects($this->once())->method('getResult')->willReturn([
             $this->getDefinition('item3', 'label3', true),

@@ -9,6 +9,7 @@ use Symfony\Bridge\Doctrine\RegistryInterface;
 
 /**
  * @group search
+ * @dbIsolation
  */
 class IndexListenerTest extends WebTestCase
 {
@@ -32,7 +33,6 @@ class IndexListenerTest extends WebTestCase
     public function testShouldCreateSearchIndexForEntityIfItWasCreated()
     {
         $em = $this->getDoctrine()->getManagerForClass(Item::class);
-        self::getMessageCollector()->enable();
         self::getMessageCollector()->clear();
 
         // test
@@ -58,7 +58,6 @@ class IndexListenerTest extends WebTestCase
         $item = new Item();
         $em->persist($item);
         $em->flush();
-        self::getMessageCollector()->enable();
         self::getMessageCollector()->clear();
 
         // test
@@ -83,7 +82,7 @@ class IndexListenerTest extends WebTestCase
         $item = new Item();
         $em->persist($item);
         $em->flush();
-        self::getMessageCollector()->enable();
+
         self::getMessageCollector()->clear();
 
         $itemId = $item->getId();

@@ -420,10 +420,6 @@ define(function(require) {
 
             this.pluginManager.dispose();
 
-            _.each(this.columns.models, function(column) {
-                column.dispose();
-            });
-
             this.filteredColumns.dispose();
             delete this.filteredColumns;
 

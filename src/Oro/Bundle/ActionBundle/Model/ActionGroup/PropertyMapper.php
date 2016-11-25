@@ -6,7 +6,7 @@ use Symfony\Component\PropertyAccess\PropertyPathInterface;
 
 use Oro\Bundle\ActionBundle\Model\ActionGroupExecutionArgs;
 
-use Oro\Component\Action\Model\ContextAccessor;
+use Oro\Component\ConfigExpression\ContextAccessor;
 
 class PropertyMapper
 {

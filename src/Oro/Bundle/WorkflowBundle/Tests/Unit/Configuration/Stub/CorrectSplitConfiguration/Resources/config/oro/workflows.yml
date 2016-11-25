@@ -3,19 +3,16 @@ imports:
 
 workflows:
     second_workflow:
-        label: 'Second Workflow'
         entity: Second\Entity
         start_step: second_step
         steps:
             second_step:
-                label: 'Second Step'
                 order: 1
                 is_final: false
                 allowed_transitions: []
         attributes: []
         transitions:
             second_transition:
-                label: 'Second Transition'
                 step_to: second_step
                 transition_definition: second_transition_definition
                 frontend_options:

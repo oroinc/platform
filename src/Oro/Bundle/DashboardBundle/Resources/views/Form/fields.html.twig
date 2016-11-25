@@ -96,9 +96,9 @@
                 }
                 $(isDefault).change(function() {
                     if ($(this).is(':checked')) {
-                        $(title).prop('readonly', 'readonly');
+                        $(title).prop('readonly', true);
                     } else {
-                        $(title).removeAttr('readonly');
+                        $(title).prop('readonly', false );
                     }
                 });
             });

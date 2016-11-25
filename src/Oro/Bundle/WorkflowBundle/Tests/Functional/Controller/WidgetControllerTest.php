@@ -12,6 +12,7 @@ use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowManager;
 use Oro\Bundle\WorkflowBundle\Tests\Functional\DataFixtures\LoadWorkflowDefinitions;
+use Oro\Bundle\WorkflowBundle\Translation\KeyTemplate\WorkflowTemplate;
 
 /**
  * @dbIsolation
@@ -66,8 +67,20 @@ class WidgetControllerTest extends WebTestCase
         $this->assertNotEmpty($crawler->html());
         $this->assertContains('transition-test_multistep_flow-starting_point_transition', $crawler->html());
         $this->assertContains('transition-test_start_step_flow-start_transition', $crawler->html());
-        $this->assertContains('Open', $crawler->html());
-        $this->assertContains('(Start)', $crawler->html());
+        $this->assertContains($this->getStepLabel('test_active_flow1', 'step1'), $crawler->html());
+        $this->assertContains($this->getStepLabel('test_active_flow2', 'step1'), $crawler->html());
+        $this->assertContains($this->getStepLabel('test_start_step_flow', 'open'), $crawler->html());
+        $this->assertContains($this->getStepLabel('test_multistep_flow', 'starting_point'), $crawler->html());
+    }
+
+    /**
+     * @param string $workflowName
+     * @param string $stepName
+     * @return string
+     */
+    protected function getStepLabel($workflowName, $stepName)
+    {
+        return WorkflowTemplate::KEY_PREFIX . '.' . $workflowName . '.step.' . $stepName . '.label';
     }
 
     public function testStartTransitionFormAction()

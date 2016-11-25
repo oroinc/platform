@@ -10,8 +10,10 @@ use Symfony\Component\Form\ChoiceList\View\ChoiceView;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\Form\PreloadedExtension;
 use Symfony\Component\Form\Test\FormIntegrationTestCase;
+use Symfony\Component\Translation\TranslatorInterface;
 
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowStep;
+use Oro\Bundle\WorkflowBundle\Helper\WorkflowTranslationHelper;
 use Oro\Bundle\WorkflowBundle\Form\Type\WorkflowStepSelectType;
 use Oro\Bundle\WorkflowBundle\Model\Workflow;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowRegistry;
@@ -27,16 +29,27 @@ class WorkflowStepSelectTypeTest extends FormIntegrationTestCase
     /** @var WorkflowStepSelectType */
     protected $type;
 
+    /** @var \PHPUnit_Framework_MockObject_MockObject|TranslatorInterface */
+    protected $translator;
+
     protected function setUp()
     {
         $this->workflowRegistry = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Model\WorkflowRegistry')
             ->disableOriginalConstructor()
             ->getMock();
 
+        $this->translator = $this->getMock('Symfony\Component\Translation\TranslatorInterface');
+        $this->translator->expects($this->any())->method('trans')->willReturnCallback(
+            function ($label) {
+                return 'transtaled_' . $label;
+            }
+        );
+
         $this->repository = $this->getMockBuilder('Doctrine\ORM\EntityRepository')
             ->disableOriginalConstructor()
             ->getMock();
-        $this->type = new WorkflowStepSelectType($this->workflowRegistry);
+
+        $this->type = new WorkflowStepSelectType($this->workflowRegistry, $this->translator);
 
         parent::setUp();
     }
@@ -151,8 +164,8 @@ class WorkflowStepSelectTypeTest extends FormIntegrationTestCase
             ['workflow_name' => 'test']
         );
 
-        $this->assertEquals('step1label', $view->vars['choices'][0]->label);
-        $this->assertEquals('step2label', $view->vars['choices'][1]->label);
+        $this->assertEquals('transtaled_step1label', $view->vars['choices'][0]->label);
+        $this->assertEquals('transtaled_step2label', $view->vars['choices'][1]->label);
     }
 
     public function testFinishViewWithMoreThanOneWorkflow()
@@ -177,8 +190,8 @@ class WorkflowStepSelectTypeTest extends FormIntegrationTestCase
             ['workflow_entity_class' => '\stdClass']
         );
 
-        $this->assertEquals('wf_l1: step1label', $view->vars['choices'][0]->label);
-        $this->assertEquals('wf_l2: step2label', $view->vars['choices'][1]->label);
+        $this->assertEquals('transtaled_wf_l1: transtaled_step1label', $view->vars['choices'][0]->label);
+        $this->assertEquals('transtaled_wf_l2: transtaled_step2label', $view->vars['choices'][1]->label);
     }
 
     /**
@@ -197,6 +210,7 @@ class WorkflowStepSelectTypeTest extends FormIntegrationTestCase
     /**
      * @param string $class
      * @param string $definitionLabel
+     *
      * @return \PHPUnit_Framework_MockObject_MockObject|Workflow|WorkflowStep
      */
     protected function getWorkflowDefinitionAwareClassMock($class, $definitionLabel = null)

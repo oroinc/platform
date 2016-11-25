@@ -7,8 +7,8 @@ use Symfony\Component\PropertyAccess\PropertyPath;
 use Symfony\Component\PropertyAccess\PropertyPathInterface;
 
 use Oro\Component\Action\Action\AbstractAction;
-use Oro\Component\Action\Model\ContextAccessor;
 use Oro\Component\Action\OptionsResolverTrait;
+use Oro\Component\ConfigExpression\ContextAccessor;
 
 use Oro\Bundle\ActionBundle\Model\ActionGroup;
 use Oro\Bundle\ActionBundle\Model\ActionGroupExecutionArgs;

@@ -7,17 +7,33 @@ oro:
             invalid_username: The Email with same value id used by another customer. Please choose another Username.
             invalid_password:
                 min_length: The password must be at least {{ length }} characters long
-                upper_case: The password must include an uppercase letter
+                lower_case: The password must include a lower case letter
+                upper_case: The password must include an upper case letter
                 numbers:    The password must include a number
                 special_chars:  The password must include a special character
-                min_length_upper_case: The password must be at least {{ length }} characters long and include an uppercase letter
+                min_length_lower_case: The password must be at least {{ length }} characters long and include a lower case letter
+                min_length_upper_case: The password must be at least {{ length }} characters long and include an upper case letter
                 min_length_numbers: The password must be at least {{ length }} characters long and include a number
                 min_length_special_chars: The password must be at least {{ length }} characters long and include a special character
-                min_length_upper_case_numbers: The password must be at least {{ length }} characters long and include an uppercase letter and a number
-                min_length_upper_case_special_chars: The password must be at least {{ length }} characters long and include an uppercase letter and a special character
+                min_length_upper_case_numbers: The password must be at least {{ length }} characters long and include an upper case letter and a number
+                min_length_upper_case_special_chars: The password must be at least {{ length }} characters long and include an upper case letter and a special character
                 min_length_numbers_special_chars: The password must be at least {{ length }} characters long and include a number and a special character
-                min_length_upper_case_numbers_special_chars: The password must be at least {{ length }} characters long and include an uppercase letter, a number, and a special character
-                upper_case_numbers: The password must include an uppercase letter and a number
-                upper_case_special_chars: The password must include an uppercase letter and a special character
+                min_length_upper_case_numbers_special_chars: The password must be at least {{ length }} characters long and include an upper case letter, a number, and a special character
+                upper_case_numbers: The password must include an upper case letter and a number
+                upper_case_special_chars: The password must include an upper case letter and a special character
                 numbers_special_chars: The password must include a number and a special character
-                upper_case_numbers_special_chars: The password must include an uppercase letter, a number and a special character
+                upper_case_numbers_special_chars: The password must include an upper case letter, a number and a special character
+                min_length_lower_case_upper_case: The password must be at least {{ length }} characters long and include a lower case letter and an upper case letter
+                min_length_lower_case_numbers: The password must be at least {{ length }} characters long and include a lower case letter and a number
+                min_length_lower_case_special_chars: The password must be at least {{ length }} characters long and include a lower case letter and a special character
+                min_length_lower_case_upper_case_numbers: The password must be at least {{ length }} characters long and include a lower case letter, an upper case letter, and a number
+                min_length_lower_case_upper_case_special_chars: The password must be at least {{ length }} characters long and include a lower case letter, an upper case letter, and a special character
+                min_length_lower_case_numbers_special_chars: The password must be at least {{ length }} characters long and include a lower case letter, a number, and a special character
+                min_length_lower_case_upper_case_numbers_special_chars: The password must be at least {{ length }} characters long and include a lower case letter, an upper case letter, a number, and a special character
+                lower_case_upper_case: The password must include a lower case letter and an upper case letter
+                lower_case_numbers: The password must include a lower case letter and a number
+                lower_case_special_chars: The password must include a lower case letter and a special character
+                lower_case_upper_case_numbers: The password must include a lower case letter, an upper case letter and a number
+                lower_case_upper_case_special_chars: The password must include a lower case letter, an upper case letter and a special character
+                lower_case_numbers_special_chars: The password must include a lower case letter, a number and a special character
+                lower_case_upper_case_numbers_special_chars: The password must include a lower case letter, an upper case letter, a number, and a special character

@@ -28,6 +28,7 @@ class HistoryItemRepository extends EntityRepository implements NavigationReposi
                     'ni.id',
                     'ni.url',
                     'ni.title',
+                    'ni.route',
                 )
             )
         )

@@ -351,14 +351,12 @@ class WorkflowManager implements LoggerAwareInterface
     }
 
     /**
-     * @param object $entity
+     * @param object|string $entity
      * @return Workflow[]|array
      * @throws \InvalidArgumentException
      */
     public function getApplicableWorkflows($entity)
     {
-        $recordContext = new WorkflowRecordContext($entity);
-
         if (!$this->entityConnector->isApplicableEntity($entity)) {
             return [];
         }
@@ -366,8 +364,12 @@ class WorkflowManager implements LoggerAwareInterface
         $workflows = $this->workflowRegistry
             ->getActiveWorkflowsByEntityClass($this->doctrineHelper->getEntityClass($entity));
 
-        foreach ($this->applicabilityFilters as $applicabilityFilter) {
-            $workflows = $applicabilityFilter->filter($workflows, $recordContext);
+        if (is_object($entity)) {
+            $recordContext = new WorkflowRecordContext($entity);
+
+            foreach ($this->applicabilityFilters as $applicabilityFilter) {
+                $workflows = $applicabilityFilter->filter($workflows, $recordContext);
+            }
         }
 
         return $workflows->toArray();
@@ -455,8 +457,14 @@ class WorkflowManager implements LoggerAwareInterface
         $definition = $this->workflowRegistry->getWorkflow($workflowName)->getDefinition();
 
         if ((bool)$isActive !== $definition->isActive()) {
+            $this->eventDispatcher->dispatch(
+                $isActive ? WorkflowEvents::WORKFLOW_BEFORE_ACTIVATION : WorkflowEvents::WORKFLOW_BEFORE_DEACTIVATION,
+                new WorkflowChangesEvent($definition)
+            );
+
             $definition->setActive($isActive);
             $this->doctrineHelper->getEntityManager(WorkflowDefinition::class)->flush($definition);
+
             $this->eventDispatcher->dispatch(
                 $isActive ? WorkflowEvents::WORKFLOW_ACTIVATED : WorkflowEvents::WORKFLOW_DEACTIVATED,
                 new WorkflowChangesEvent($definition)
@@ -469,14 +477,13 @@ class WorkflowManager implements LoggerAwareInterface
     }
 
     /**
+     * Checks weather workflow with such name is active in refreshed instance.
      * @param string $workflowName
      * @return bool
      */
     public function isActiveWorkflow($workflowName)
     {
-        $definition = $this->workflowRegistry->getWorkflow($workflowName)->getDefinition();
-
-        return $definition->isActive();
+        return $this->workflowRegistry->getWorkflow($workflowName)->isActive();
     }
 
     /**

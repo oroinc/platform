@@ -1,0 +1,133 @@
+<?php
+
+namespace Oro\Bundle\ActionBundle\Tests\Unit\Command;
+
+use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
+use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\DependencyInjection\ContainerInterface;
+
+use Oro\Bundle\ActionBundle\Tests\Unit\Command\Stub\OutputStub;
+use Oro\Bundle\ActionBundle\Tests\Unit\Stub\TestEntity1;
+
+use Oro\Component\ConfigExpression\FactoryWithTypesInterface;
+
+abstract class AbstractDebugCommandTestCase extends \PHPUnit_Framework_TestCase
+{
+    /** @var FactoryWithTypesInterface|\PHPUnit_Framework_MockObject_MockObject */
+    protected $factory;
+
+    /** @var ContainerInterface|\PHPUnit_Framework_MockObject_MockObject */
+    protected $container;
+
+    /** @var InputInterface|\PHPUnit_Framework_MockObject_MockObject */
+    protected $input;
+
+    /** @var ContainerAwareCommand */
+    protected $command;
+
+    /** @var OutputStub */
+    protected $output;
+
+    protected function setUp()
+    {
+        $this->factory = $this->getMock(FactoryWithTypesInterface::class);
+
+        $this->container = $this->getMock(ContainerInterface::class);
+        $this->container->expects($this->any())
+            ->method('get')
+            ->willReturnCallback(
+                function ($serviceId) {
+                    return $serviceId === $this->getFactoryServiceId() ? $this->factory : new TestEntity1();
+                }
+            );
+
+        $this->input = $this->getMock(InputInterface::class);
+        $this->output = new OutputStub();
+        $this->command = $this->getCommandInstance();
+        $this->command->setContainer($this->container);
+    }
+
+    /**
+     * @param array $types
+     * @param array $expected
+     * @param string|null $argument
+     *
+     * @dataProvider executeProvider
+     */
+    public function testExecute(array $types, array $expected, $argument = null)
+    {
+        $this->factory->expects($this->once())->method('getTypes')->willReturn($types);
+
+        $this->input->expects($this->once())->method('getArgument')->willReturn($argument);
+
+        $this->command->run($this->input, $this->output);
+
+        $outputContent = implode("\n", $this->output->messages);
+        foreach ($expected as $message) {
+            $this->assertContains($message, $outputContent);
+        }
+    }
+
+    /**
+     * @return array
+     */
+    public function executeProvider()
+    {
+        return [
+            'no types' => [
+                'types' => [],
+                'expected' => [
+                    'Short Description',
+                ],
+            ],
+            'with types' => [
+                'types' => [
+                    'name1' => 'type1',
+                    'name2' => 'type2',
+                ],
+                'expected' => [
+                    'Short Description',
+                    'name1',
+                    'name2',
+                    'This is description',
+                    'of the class',
+                ],
+            ],
+            'no types with argument' => [
+                'types' => [],
+                'expected' => [
+                    'Type "name1" is not found',
+                ],
+                'argument' => 'name1',
+            ],
+            'with types with argument' => [
+                'types' => [
+                    'name1' => 'type1',
+                    'name2' => 'type2',
+                ],
+                'expected' => [
+                    'Full Description',
+                    'name1',
+                    'type1',
+                    'Class TestEntity1',
+                ],
+                'argument' => 'name1',
+            ],
+        ];
+    }
+
+    /**
+     * @return string
+     */
+    abstract protected function getFactoryServiceId();
+
+    /**
+     * @return string
+     */
+    abstract protected function getArgumentName();
+
+    /**
+     * @return ContainerAwareCommand
+     */
+    abstract protected function getCommandInstance();
+}

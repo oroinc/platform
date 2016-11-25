@@ -217,11 +217,10 @@ services:
     oro_tag.workflow.action.copy_tagging.class:
         class: %oro_tag.workflow.action.copy_tagging.class%
         arguments:
-            - '@oro_action.context_accessor'
+            - '@oro_action.expression.context_accessor'
             - '@oro_tag.tag.manager'
             - '@oro_tag.helper.taggable_helper'
         tags:
-            - { name: oro_workflow.action, alias: copy_tagging }
             - { name: oro_action.action, alias: copy_tagging }
 
     oro_tag.event_listener.import_export_tags_subscriber:

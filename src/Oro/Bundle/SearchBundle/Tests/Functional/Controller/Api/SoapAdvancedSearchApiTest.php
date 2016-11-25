@@ -11,6 +11,7 @@ use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
  * @outputBuffering enabled
  * @group soap
  * @group search
+ * @dbIsolation
  */
 class SoapAdvancedSearchApiTest extends WebTestCase
 {
@@ -58,18 +59,22 @@ class SoapAdvancedSearchApiTest extends WebTestCase
         $this->assertEquals($response['records_count'], $result['recordsCount']);
         $this->assertEquals($response['count'], $result['count']);
 
-        // if only one element
-        if (empty($result['elements']['item'][0])) {
-            $result['elements']['item'] = [$result['elements']['item']];
-        }
+        if ($response['count'] > 0) {
+            // if only one element
+            if (empty($result['elements']['item'][0])) {
+                $result['elements']['item'] = [$result['elements']['item']];
+            }
 
-        // remove ID references
-        foreach (array_keys($result['elements']['item']) as $key) {
-            unset($result['elements']['item'][$key]['recordId']);
-        }
+            // remove ID references
+            foreach (array_keys($result['elements']['item']) as $key) {
+                unset($result['elements']['item'][$key]['recordId']);
+            }
 
-        $this->addOroDefaultPrefixToUrlInParameterArray($response['soap']['data'], 'recordUrl');
-        $this->assertSame($response['soap']['data'], $result['elements']['item']);
+            $this->addOroDefaultPrefixToUrlInParameterArray($response['soap']['data'], 'recordUrl');
+            $this->assertSame($response['soap']['data'], $result['elements']['item']);
+        } else {
+            $this->assertArrayNotHasKey('item', $result['elements']);
+        }
     }
 
     /**

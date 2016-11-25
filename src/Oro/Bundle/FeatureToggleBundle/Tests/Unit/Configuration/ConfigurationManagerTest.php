@@ -109,4 +109,49 @@ class ConfigurationManagerTest extends \PHPUnit_Framework_TestCase
 
         $this->assertNull($this->configurationManager->getFeatureByToggle('wrong_toggle_key'));
     }
+
+    /**
+     * @dataProvider getResourcesByTypeProvider
+     */
+    public function testGetResourcesByType($resourceType, array $configuration, array $expectedResources)
+    {
+        $this->configurationProvider->expects($this->once())
+            ->method('getResourcesConfiguration')
+            ->willReturn($configuration);
+
+        $this->assertEquals($expectedResources, $this->configurationManager->getResourcesByType($resourceType));
+    }
+
+    public function getResourcesByTypeProvider()
+    {
+        return [
+            'non existing resource' => [
+                'nonExisting',
+                [
+                    'resource1' => [
+                        'feature1_1',
+                        'feature1_2',
+                    ],
+                ],
+                [],
+            ],
+            'existing resource' => [
+                'resource1',
+                [
+                    'resource1' => [
+                        'feature1_1',
+                        'feature1_2',
+                    ],
+                    'resource2' => [
+                        'feature2_1',
+                        'feature2_2',
+                    ],
+                ],
+                [
+                    'feature1_1',
+                    'feature1_2',
+                ],
+            ],
+        ];
+    }
 }

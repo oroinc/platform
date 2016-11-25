@@ -2,6 +2,7 @@
     height: 100%;
 
     text-align: center;
+    font-size: 0;
 
     &::before,
     &__content {
@@ -17,9 +18,11 @@
     }
 
     &__content {
-        width: 99%;
+        width: 100%;
 
+        font-size: $base-font-size;
         text-align: left;
+
         vertical-align: middle;
     }
 }

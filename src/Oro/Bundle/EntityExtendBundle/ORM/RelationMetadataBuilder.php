@@ -88,12 +88,22 @@ class RelationMetadataBuilder implements MetadataBuilderInterface
         if (!empty($relation['target_field_id'])) {
             $builder->inversedBy($relation['target_field_id']->getFieldName());
         }
+        if (!empty($relation['on_delete'])) {
+            $onDelete = $relation['on_delete'];
+        } else {
+            $onDelete = 'SET NULL';
+        }
+        if (array_key_exists('nullable', $relation) && null !== $relation['nullable']) {
+            $nullable = $relation['nullable'];
+        } else {
+            $nullable = true;
+        }
         $builder->addJoinColumn(
             $this->getManyToOneColumnName($fieldId, $targetIdColumn),
             $targetIdColumn,
-            true,
+            $nullable,
             false,
-            'SET NULL'
+            $onDelete
         );
         foreach ($cascade as $cascadeType) {
             $builder->{'cascade' . ucfirst($cascadeType)}();

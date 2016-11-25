@@ -34,9 +34,13 @@ class DashboardController extends Controller
             return $activeTabContent;
         } else {
             $currentOrganization = $this->get('security.context')->getToken()->getOrganizationContext();
-            $unreadMailCount = $this
-                ->get('oro_email.manager.notification')
-                ->getCountNewEmails($loggedUser, $currentOrganization);
+
+            $unreadMailCount = 0;
+            if ($this->get('oro_security.security_facade')->isGranted('oro_email_email_user_view')) {
+                $unreadMailCount = $this
+                    ->get('oro_email.manager.notification')
+                    ->getCountNewEmails($loggedUser, $currentOrganization);
+            }
 
             $params = array_merge(
                 [

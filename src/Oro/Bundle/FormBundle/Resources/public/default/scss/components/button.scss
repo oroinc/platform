@@ -3,3 +3,9 @@
         min-width: 200px;
     }
 }
+
+@include breakpoint('mobile-landscape') {
+    .button--full-in-mobile {
+        width: 100%;
+    }
+}

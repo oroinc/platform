@@ -2,6 +2,12 @@
 
 namespace Oro\Component\Layout;
 
+use Oro\Component\Layout\Exception\BlockViewNotFoundException;
+use Oro\Component\Layout\ExpressionLanguage\ExpressionProcessor;
+
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class LayoutBuilder implements LayoutBuilderInterface
 {
     /** @var LayoutRegistryInterface */
@@ -19,25 +25,39 @@ class LayoutBuilder implements LayoutBuilderInterface
     /** @var LayoutRendererRegistryInterface */
     protected $rendererRegistry;
 
+    /** @var ExpressionProcessor */
+    protected $expressionProcessor;
+
+    /**
+     * @var BlockViewCache
+     */
+    private $blockViewCache;
+
     /**
      * @param LayoutRegistryInterface            $registry
      * @param RawLayoutBuilderInterface          $rawLayoutBuilder
      * @param DeferredLayoutManipulatorInterface $layoutManipulator
      * @param BlockFactoryInterface              $blockFactory
      * @param LayoutRendererRegistryInterface    $rendererRegistry
+     * @param ExpressionProcessor                $expressionProcessor
+     * @param BlockViewCache|null                $blockViewCache
      */
     public function __construct(
         LayoutRegistryInterface $registry,
         RawLayoutBuilderInterface $rawLayoutBuilder,
         DeferredLayoutManipulatorInterface $layoutManipulator,
         BlockFactoryInterface $blockFactory,
-        LayoutRendererRegistryInterface $rendererRegistry
+        LayoutRendererRegistryInterface $rendererRegistry,
+        ExpressionProcessor $expressionProcessor,
+        BlockViewCache $blockViewCache = null
     ) {
-        $this->registry          = $registry;
-        $this->rawLayoutBuilder  = $rawLayoutBuilder;
-        $this->layoutManipulator = $layoutManipulator;
-        $this->blockFactory      = $blockFactory;
-        $this->rendererRegistry  = $rendererRegistry;
+        $this->registry            = $registry;
+        $this->rawLayoutBuilder    = $rawLayoutBuilder;
+        $this->layoutManipulator   = $layoutManipulator;
+        $this->blockFactory        = $blockFactory;
+        $this->rendererRegistry    = $rendererRegistry;
+        $this->expressionProcessor = $expressionProcessor;
+        $this->blockViewCache      = $blockViewCache;
     }
 
     /**
@@ -196,15 +216,44 @@ class LayoutBuilder implements LayoutBuilderInterface
             $this->registry->configureContext($context);
             $context->resolve();
         }
+
         $this->layoutManipulator->applyChanges($context);
-        $rawLayout   = $this->rawLayoutBuilder->getRawLayout();
-        $rootView    = $this->blockFactory->createBlockView($rawLayout, $context, $rootId);
-        $layout      = $this->createLayout($rootView);
+        $rawLayout = $this->rawLayoutBuilder->getRawLayout();
+
+        if ($this->blockViewCache) {
+            $rootView = $this->blockViewCache->fetch($context);
+            if ($rootView === null) {
+                $rootView = $this->blockFactory->createBlockView($rawLayout, $context);
+
+                $this->blockViewCache->save($context, $rootView);
+            }
+        } else {
+            $rootView = $this->blockFactory->createBlockView($rawLayout, $context);
+        }
+
+        $rootView = $this->getRootView($rootView, $rootId);
+
+        if ($context->getOr('expressions_evaluate')) {
+            $deferred = $context->getOr('expressions_evaluate_deferred');
+            $encoding = $context->getOr('expressions_encoding');
+
+            $this->processBlockViewData(
+                $rootView,
+                $context,
+                new DataAccessor($this->registry, $context),
+                $deferred,
+                $encoding
+            );
+        }
+
+        $layout = $this->createLayout($rootView);
         $rootBlockId = $rawLayout->getRootId();
         $blockThemes = $rawLayout->getBlockThemes();
+
         foreach ($blockThemes as $blockId => $themes) {
             $layout->setBlockTheme($themes, $blockId !== $rootBlockId ? $blockId : null);
         }
+
         $formThemes = $rawLayout->getFormThemes();
         $layout->setFormTheme($formThemes);
 
@@ -219,5 +268,88 @@ class LayoutBuilder implements LayoutBuilderInterface
     protected function createLayout(BlockView $rootView)
     {
         return new Layout($rootView, $this->rendererRegistry);
+    }
+
+    /**
+     * Processes expressions that work with data
+     *
+     * @param BlockView $blockView
+     * @param ContextInterface $context
+     * @param DataAccessor $data
+     * @param bool $deferred
+     * @param string $encoding
+     */
+    protected function processBlockViewData(
+        BlockView $blockView,
+        ContextInterface $context,
+        DataAccessor $data,
+        $deferred,
+        $encoding
+    ) {
+        if ($deferred) {
+            $this->expressionProcessor->processExpressions($blockView->vars, $context, $data, true, $encoding);
+        }
+
+        $this->buildValueBags($blockView);
+
+        foreach ($blockView->children as $childView) {
+            $this->processBlockViewData($childView, $context, $data, $deferred, $encoding);
+        }
+    }
+
+    /**
+     * @param BlockView $view
+     */
+    protected function buildValueBags(BlockView $view)
+    {
+        array_walk_recursive(
+            $view->vars,
+            function (&$var) {
+                if ($var instanceof OptionValueBag) {
+                    $var = $var->buildValue();
+                }
+            }
+        );
+    }
+
+    /**
+     * @param BlockView    $rootView
+     * @param int|null     $rootId
+     *
+     * @return BlockView
+     * @throws BlockViewNotFoundException
+     */
+    private function getRootView(BlockView $rootView, $rootId)
+    {
+        if ($rootId !== null) {
+            $rootView = $this->findBlockById($rootView, $rootId);
+            if ($rootView === null) {
+                throw new BlockViewNotFoundException(sprintf("BlockView with id \"%s\" is not found.", $rootId));
+            }
+        }
+
+        return $rootView;
+    }
+
+    /**
+     * @param BlockView $blockView
+     * @param int       $id
+     *
+     * @return BlockView|null
+     */
+    private function findBlockById(BlockView $blockView, $id)
+    {
+        foreach ($blockView->children as $childView) {
+            if ($childView->getId() === $id) {
+                return $childView;
+            }
+
+            $childView = $this->findBlockById($childView, $id);
+            if ($childView) {
+                return $childView;
+            }
+        }
+
+        return null;
     }
 }

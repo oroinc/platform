@@ -6,7 +6,7 @@ use Symfony\Component\Form\FormEvents;
 
 use Oro\Bundle\WorkflowBundle\Form\EventListener\DefaultValuesListener;
 
-use Oro\Component\Action\Model\ContextAccessor;
+use Oro\Component\ConfigExpression\ContextAccessor;
 
 class DefaultValuesListenerTest extends \PHPUnit_Framework_TestCase
 {
@@ -27,7 +27,7 @@ class DefaultValuesListenerTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->contextAccessor = $this->getMockBuilder('Oro\Component\Action\Model\ContextAccessor')
+        $this->contextAccessor = $this->getMockBuilder('Oro\Component\ConfigExpression\ContextAccessor')
             ->disableOriginalConstructor()
             ->getMock();
 

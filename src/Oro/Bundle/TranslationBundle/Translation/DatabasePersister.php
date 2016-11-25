@@ -90,7 +90,7 @@ class DatabasePersister
     private function write($locale, array $items)
     {
         foreach ($items as $item) {
-            $this->translationManager->saveValue(
+            $this->translationManager->saveTranslation(
                 $item['key'],
                 $item['translation'],
                 $locale,

@@ -496,10 +496,10 @@ services:
     oro_entity_extend.model.action.request_enum_entity:
         class: Oro\Bundle\EntityExtendBundle\Model\Action\RequestEnumEntity
         arguments:
-            - '@oro_action.context_accessor'
+            - '@oro_action.expression.context_accessor'
             - '@doctrine'
         tags:
-            - { name: oro_workflow.action, alias: request_enum_entity }
+            - { name: oro_action.action, alias: request_enum_entity }
 
     oro_entity_extend.cache_warmer:
         class: 'Oro\Bundle\EntityExtendBundle\Cache\CacheWarmerAggregate'

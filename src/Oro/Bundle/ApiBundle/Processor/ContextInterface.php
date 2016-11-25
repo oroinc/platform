@@ -14,6 +14,7 @@ use Oro\Bundle\ApiBundle\Filter\FilterValueAccessorInterface;
 use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
 use Oro\Bundle\ApiBundle\Metadata\MetadataExtraInterface;
 use Oro\Bundle\ApiBundle\Model\Error;
+use Oro\Bundle\ApiBundle\Request\DocumentBuilderInterface;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 
 interface ContextInterface extends ComponentContextInterface
@@ -92,16 +93,30 @@ interface ContextInterface extends ComponentContextInterface
     /**
      * Sets the response status code.
      *
-     * @param $statusCode
+     * @param int $statusCode
      */
     public function setResponseStatusCode($statusCode);
 
     /**
      * Indicates whether a result document represents a success response.
      *
-     * @return int|null
+     * @return bool
      */
     public function isSuccessResponse();
+
+    /**
+     * Gets the response document builder.
+     *
+     * @return DocumentBuilderInterface|null
+     */
+    public function getResponseDocumentBuilder();
+
+    /**
+     * Sets the response document builder.
+     *
+     * @param DocumentBuilderInterface|null $documentBuilder
+     */
+    public function setResponseDocumentBuilder(DocumentBuilderInterface $documentBuilder = null);
 
     /**
      * Gets a list of filters is used to add additional restrictions to a query is used to get result data.
