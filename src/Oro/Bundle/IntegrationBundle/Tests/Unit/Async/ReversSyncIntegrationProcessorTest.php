@@ -11,6 +11,7 @@ use Oro\Bundle\IntegrationBundle\Async\ReversSyncIntegrationProcessor;
 
 use Oro\Bundle\IntegrationBundle\Async\Topics;
 use Oro\Bundle\IntegrationBundle\Entity\Channel as Integration;
+use Oro\Bundle\IntegrationBundle\Logger\LoggerStrategy;
 use Oro\Bundle\IntegrationBundle\Manager\TypesRegistry;
 use Oro\Bundle\IntegrationBundle\Provider\ConnectorInterface;
 use Oro\Bundle\IntegrationBundle\Provider\ReverseSyncProcessor;
@@ -342,7 +343,14 @@ class ReversSyncIntegrationProcessorTest extends \PHPUnit_Framework_TestCase
      */
     private function createReversSyncProcessorMock()
     {
-        return $this->getMock(ReverseSyncProcessor::class, [], [], '', false);
+        $reverseSyncProcessor =  $this->getMock(ReverseSyncProcessor::class, [], [], '', false);
+        $reverseSyncProcessor
+            ->expects($this->any())
+            ->method('getLoggerStrategy')
+            ->willReturn(new LoggerStrategy())
+        ;
+
+        return $reverseSyncProcessor;
     }
 
     /**

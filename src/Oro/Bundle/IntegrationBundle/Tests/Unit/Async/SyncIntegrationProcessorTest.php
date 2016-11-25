@@ -10,6 +10,7 @@ use Oro\Bundle\IntegrationBundle\Async\SyncIntegrationProcessor;
 use Oro\Bundle\IntegrationBundle\Async\Topics;
 use Oro\Bundle\IntegrationBundle\Entity\Channel as Integration;
 use Oro\Bundle\IntegrationBundle\Entity\Transport;
+use Oro\Bundle\IntegrationBundle\Logger\LoggerStrategy;
 use Oro\Bundle\IntegrationBundle\Provider\AbstractSyncProcessor;
 
 use Oro\Bundle\IntegrationBundle\Provider\SyncProcessorRegistry;
@@ -521,7 +522,14 @@ class SyncIntegrationProcessorTest extends \PHPUnit_Framework_TestCase
      */
     private function createSyncProcessorMock()
     {
-        return $this->getMock(AbstractSyncProcessor::class, ['process'], [], '', false);
+        $syncProcessor = $this->getMock(AbstractSyncProcessor::class, ['process', 'getLoggerStrategy'], [], '', false);
+        $syncProcessor
+            ->expects($this->any())
+            ->method('getLoggerStrategy')
+            ->willReturn(new LoggerStrategy())
+        ;
+
+        return $syncProcessor;
     }
 
     /**
