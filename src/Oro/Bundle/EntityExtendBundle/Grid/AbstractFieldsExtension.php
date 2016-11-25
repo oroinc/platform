@@ -2,12 +2,8 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Grid;
 
-use Doctrine\ORM\Query\Expr\From;
-use Doctrine\ORM\QueryBuilder;
-
 use Oro\Bundle\DataGridBundle\Datagrid\DatagridGuesser;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
-use Oro\Bundle\DataGridBundle\Datasource\DatasourceInterface;
 use Oro\Bundle\DataGridBundle\Datasource\Orm\OrmDatasource;
 use Oro\Bundle\DataGridBundle\Extension\AbstractExtension;
 use Oro\Bundle\DataGridBundle\Extension\Formatter\Configuration as FormatterConfiguration;
@@ -63,6 +59,10 @@ abstract class AbstractFieldsExtension extends AbstractExtension
     public function processConfigs(DatagridConfiguration $config)
     {
         $fields = $this->getFields($config);
+        if (empty($fields)) {
+            return;
+        }
+
         foreach ($fields as $field) {
             $fieldName = $field->getFieldName();
             $columnOptions =
@@ -83,48 +83,36 @@ abstract class AbstractFieldsExtension extends AbstractExtension
             $this->prepareColumnOptions($field, $columnOptions);
             $this->datagridGuesser->setColumnOptions($config, $field->getFieldName(), $columnOptions);
         }
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function visitDatasource(DatagridConfiguration $config, DatasourceInterface $datasource)
-    {
-        $fields = $this->getFields($config);
-        if (empty($fields)) {
-            return;
-        }
 
         $entityClassName = $this->entityClassResolver->getEntityClass($this->getEntityName($config));
-
-        /** @var QueryBuilder $qb */
-        $qb = $datasource->getQueryBuilder();
-        $fromParts = $qb->getDQLPart('from');
         $alias = false;
-
-        /** @var From $fromPart */
-        foreach ($fromParts as $fromPart) {
-            if ($this->entityClassResolver->getEntityClass($fromPart->getFrom()) == $entityClassName) {
-                $alias = $fromPart->getAlias();
+        $from = $config->offsetGetByPath('[source][query][from]', []);
+        if ($from) {
+            foreach ($from as $part) {
+                if ($part['table'] === $entityClassName) {
+                    $alias = $part['alias'];
+                }
             }
         }
 
         if ($alias === false) {
-            // add entity if it not exists in from clause
             $alias = 'o';
-            $qb->from($entityClassName, $alias);
+            $from[] = [
+                'table' => $entityClassName,
+                'alias' => $alias
+            ];
+            $config->offsetSetByPath('[source][query][from]', $from);
         }
 
-        $this->buildExpression($fields, $qb, $config, $alias);
+        $this->buildExpression($fields, $config, $alias);
     }
 
     /**
      * @param FieldConfigId[] $fields
-     * @param QueryBuilder $qb
      * @param DatagridConfiguration $config
      * @param string $alias
      */
-    public function buildExpression(array $fields, QueryBuilder $qb, DatagridConfiguration $config, $alias)
+    public function buildExpression(array $fields, DatagridConfiguration $config, $alias)
     {
         $relationIndex    = 0;
         $relationTemplate = 'auto_rel_%d';
@@ -134,7 +122,10 @@ abstract class AbstractFieldsExtension extends AbstractExtension
                 case 'enum':
                     $extendFieldConfig = $this->getFieldConfig('extend', $field);
                     $joinAlias         = sprintf($relationTemplate, ++$relationIndex);
-                    $qb->leftJoin(sprintf('%s.%s', $alias, $fieldName), $joinAlias);
+                    $config->offsetAddToArrayByPath(
+                        '[source][query][join][left]',
+                        [['join' => sprintf('%s.%s', $alias, $fieldName), 'alias' => $joinAlias]]
+                    );
                     $columnDataName = $fieldName;
                     $sorterDataName = sprintf('%s.%s', $joinAlias, $extendFieldConfig->get('target_field'));
                     $selectExpr     = sprintf('IDENTITY(%s.%s) as %s', $alias, $fieldName, $fieldName);
@@ -148,15 +139,22 @@ abstract class AbstractFieldsExtension extends AbstractExtension
                     break;
                 case RelationType::MANY_TO_ONE:
                 case RelationType::ONE_TO_ONE:
-                case RelationType::TO_ONE:
                     $extendFieldConfig = $this->getFieldConfig('extend', $field);
-                    $qb->leftJoin(sprintf('%s.%s', $alias, $fieldName), $fieldName);
+                    $config->offsetAddToArrayByPath(
+                        '[source][query][join][left]',
+                        [['join' => sprintf('%s.%s', $alias, $fieldName), 'alias' => $fieldName]]
+                    );
 
                     $dataName = $fieldName.'_data';
-                    $targetField = $extendFieldConfig->get('target_field');
+                    $targetField = $extendFieldConfig->get('target_field', false, 'id');
                     $dataFieldName = sprintf('%s.%s', $fieldName, $targetField);
-                    if ($qb->getDQLPart('groupBy')) {
-                        $qb->addGroupBy($dataFieldName);
+
+                    $groupBy = $config->offsetGetByPath('[source][query][groupBy]');
+                    if ($groupBy) {
+                        $config->offsetSetByPath(
+                            '[source][query][groupBy]',
+                            implode(',', [$groupBy, $dataFieldName])
+                        );
                     }
                     $selectExpr = sprintf('%s as %s', $dataFieldName, $dataName);
                     $columnDataName = $sorterDataName = $dataName;
@@ -168,7 +166,7 @@ abstract class AbstractFieldsExtension extends AbstractExtension
                     break;
             }
 
-            $qb->addSelect($selectExpr);
+            $config->offsetAddToArrayByPath('[source][query][select]', [$selectExpr]);
 
             // set real "data name" for filters and sorters
             $config->offsetSetByPath(
