@@ -86,29 +86,4 @@ class TransitionButton implements ButtonInterface
     {
         return OperationRegistry::DEFAULT_GROUP;
     }
-
-    /**
-     * @return array
-     */
-    public function getAttributesData()
-    {
-        $definition = $this->transition;
-
-        $frontendOptions = $definition->getFrontendOptions();
-
-        if (!empty($frontendOptions['title'])) {
-            $title = $frontendOptions['title'];
-        } else {
-            $title = $definition->getLabel();
-        }
-        $icon = !empty($buttonOptions['icon']) ? $buttonOptions['icon'] : '';
-
-        return [
-            'name' => $this->transition->getName(),
-            'label' => $this->transition->getLabel(),
-            'title' => $title,
-            'icon' =>  $icon,
-            'button' => $this->operation,
-        ];
-    }
 }
