@@ -44,6 +44,7 @@ define(['underscore', 'backbone', 'oroui/js/widget/abstract-widget'
             this.widget.addClass(this.options.cssClass);
             this.widgetContentContainer = this.widget.find(this.options.contentContainer);
             this.initializeWidget(options);
+            this.delegateEvents();
         },
 
         setTitle: function(title) {

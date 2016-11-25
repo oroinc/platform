@@ -119,7 +119,7 @@ class WorkflowScopeManager
                 $entity = $this->getRepository($entities[$identifier])->find($entityId);
                 if (!$entity) {
                     throw new WorkflowScopeConfigurationException(
-                        sprintf('Could not found entity "%s" with id "%d".', $entities[$identifier], $entityId)
+                        sprintf('Cannot find entity "%s" with id "%d".', $entities[$identifier], $entityId)
                     );
                 }
 

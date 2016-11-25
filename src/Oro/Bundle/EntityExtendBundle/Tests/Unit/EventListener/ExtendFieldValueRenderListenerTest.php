@@ -139,10 +139,10 @@ class ExtendFieldValueRenderListenerTest extends \PHPUnit_Framework_TestCase
     /**
      * @dataProvider relationsDataProvider
      *
-     * @param array        $data
-     * @param array|string $expected
+     * @param array $data
+     * @param array $expected
      */
-    public function testBeforeValueRenderProceedSingleRelations(array $data, $expected)
+    public function testBeforeValueRenderProceedSingleRelations(array $data, array $expected)
     {
         $entity = $this->getMock('\StdClass');
         $value = $this->getMock('\StdClass', ['getId']);
@@ -268,7 +268,7 @@ class ExtendFieldValueRenderListenerTest extends \PHPUnit_Framework_TestCase
                     'id' => null,
                     'field' => null
                 ],
-                'expected' => ''
+                'expected' => ['title' => '']
             ],
             'If Route Not Found will return text' => [
                 'data' => [
@@ -278,7 +278,7 @@ class ExtendFieldValueRenderListenerTest extends \PHPUnit_Framework_TestCase
                     'field' => 'username',
                     'title' => 'test title'
                 ],
-                'expected' => 'test title'
+                'expected' => ['title' => 'test title']
             ],
             'entity class exists, route exists, permission granted' => [
                 'data' => [
@@ -308,7 +308,7 @@ class ExtendFieldValueRenderListenerTest extends \PHPUnit_Framework_TestCase
                     'field' => 'username',
                     'title' => 'test title'
                 ],
-                'expected' => 'test title'
+                'expected' => ['title' => 'test title']
             ],
             'entity class extend, permission granted' => [
                 'data' => [

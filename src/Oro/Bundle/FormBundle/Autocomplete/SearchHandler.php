@@ -7,7 +7,6 @@ use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\QueryBuilder;
 
-use Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
 
@@ -314,10 +313,10 @@ class SearchHandler implements SearchHandlerInterface
             $propertyPath = implode('', $keys);
         }
 
-        try {
-            return $this->propertyAccessor->getValue($item, $propertyPath);
-        } catch (NoSuchPropertyException $e) {
+        if (!$this->propertyAccessor->isReadable($item, $propertyPath)) {
             return null;
         }
+
+        return $this->propertyAccessor->getValue($item, $propertyPath);
     }
 }

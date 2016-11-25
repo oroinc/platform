@@ -43,7 +43,9 @@ define(function(require) {
          * @inheritDoc
          */
         parse: function(response) {
-            this._state.set('totalItemsQuantity', response.count || 0);
+            if (!this.disposed) {
+                this._state.set('totalItemsQuantity', response.count || 0);
+            }
             return LoadMoreCollection.__super__.parse.apply(this, arguments);
         },
 
