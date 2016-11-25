@@ -6,8 +6,10 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Translation\TranslatorInterface;
 
-use Oro\Bundle\ProductBundle\Entity\Product;
-use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
+use Doctrine\Common\Persistence\ManagerRegistry;
+use Doctrine\ORM\EntityManager;
+
+use Oro\Bundle\UIBundle\Tests\Unit\Fallback\ProductStub;
 use Oro\Bundle\UIBundle\View\ScrollData;
 use Oro\Bundle\UIBundle\Event\BeforeListRenderEvent;
 
@@ -19,9 +21,9 @@ class AbstractFallbackFieldsFormViewTest extends \PHPUnit_Framework_TestCase
     protected $translator;
 
     /**
-     * @var DoctrineHelper|\PHPUnit_Framework_MockObject_MockObject
+     * @var ManagerRegistry|\PHPUnit_Framework_MockObject_MockObject
      */
-    protected $doctrineHelper;
+    protected $doctrine;
 
     /**
      * @var RequestStack|\PHPUnit_Framework_MockObject_MockObject
@@ -50,13 +52,13 @@ class AbstractFallbackFieldsFormViewTest extends \PHPUnit_Framework_TestCase
         $this->event = $this->getMockBuilder(BeforeListRenderEvent::class)
             ->disableOriginalConstructor()
             ->getMock();
-        $this->doctrineHelper = $this->getMockBuilder(DoctrineHelper::class)
+        $this->doctrine = $this->getMockBuilder(ManagerRegistry::class)
             ->disableOriginalConstructor()
             ->getMock();
         $this->translator = $this->getMock(TranslatorInterface::class);
         $this->fallbackFieldsFormView = new FallbackFieldsFormViewStub(
             $this->requestStack,
-            $this->doctrineHelper,
+            $this->doctrine,
             $this->translator
         );
         $this->scrollData = $this->getMock(ScrollData::class);
@@ -65,22 +67,22 @@ class AbstractFallbackFieldsFormViewTest extends \PHPUnit_Framework_TestCase
     public function testAddBlockToEntityView()
     {
         $env = $this->getMockBuilder(\Twig_Environment::class)->disableOriginalConstructor()->getMock();
-        $env->expects($this->once())->method('render');
+        $env->expects($this->once())->method('render')->willReturn('Rendered template');
         $this->event->expects($this->once())->method('getEnvironment')->willReturn($env);
         $this->scrollData->expects($this->once())->method('addSubBlockData');
         $this->event->expects($this->once())->method('getScrollData')->willReturn($this->scrollData);
 
         $this->fallbackFieldsFormView->addBlockToEntityView(
             $this->event,
-            'OroInventoryBundle:Product:inventoryThreshold.html.twig',
-            new Product()
+            'fallbackView.html.twig',
+            new ProductStub()
         );
     }
 
     public function testAddBlockToEntityEdit()
     {
         $env = $this->getMockBuilder(\Twig_Environment::class)->disableOriginalConstructor()->getMock();
-        $env->expects($this->once())->method('render');
+        $env->expects($this->once())->method('render')->willReturn('Rendered template');
         $this->event->expects($this->once())->method('getEnvironment')->willReturn($env);
         $this->scrollData->expects($this->once())->method('getData')->willReturn(
             ['dataBlocks' => [1 => ['title' => 'oro.catalog.sections.default_options.trans']]]
@@ -97,7 +99,7 @@ class AbstractFallbackFieldsFormViewTest extends \PHPUnit_Framework_TestCase
 
         $this->fallbackFieldsFormView->addBlockToEntityEdit(
             $this->event,
-            'OroInventoryBundle:Product:inventoryThreshold.html.twig',
+            'fallbackView.html.twig',
             'oro.catalog.sections.default_options'
         );
     }
@@ -115,9 +117,16 @@ class AbstractFallbackFieldsFormViewTest extends \PHPUnit_Framework_TestCase
             ->expects($this->once())
             ->method('getCurrentRequest')
             ->willReturn($currentRequest);
-        $this->doctrineHelper->expects($this->once())
-            ->method('getEntityReference')
-            ->willReturn($this->getMock(Product::class));
-        $this->fallbackFieldsFormView->getEntityFromRequest(Product::class);
+        $em = $this->getMockBuilder(EntityManager::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+        $em->expects($this->once())
+            ->method('getReference')
+            ->willReturn(ProductStub::class);
+        $this->doctrine->expects($this->once())
+            ->method('getManagerForClass')
+            ->with(ProductStub::class)
+            ->willReturn($em);
+        $this->fallbackFieldsFormView->getEntityFromRequest(ProductStub::class);
     }
 }

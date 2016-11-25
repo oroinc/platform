@@ -5,7 +5,9 @@ namespace Oro\Bundle\UIBundle\Fallback;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Translation\TranslatorInterface;
 
-use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
+use Doctrine\Common\Persistence\ManagerRegistry;
+use Doctrine\ORM\EntityManager;
+
 use Oro\Bundle\UIBundle\Event\BeforeListRenderEvent;
 
 abstract class AbstractFallbackFieldsFormView
@@ -16,9 +18,9 @@ abstract class AbstractFallbackFieldsFormView
     protected $requestStack;
 
     /**
-     * @var DoctrineHelper
+     * @var ManagerRegistry
      */
-    protected $doctrineHelper;
+    protected $doctrine;
 
     /**
      * @var TranslatorInterface
@@ -27,16 +29,16 @@ abstract class AbstractFallbackFieldsFormView
 
     /**
      * @param RequestStack $requestStack
-     * @param DoctrineHelper $doctrineHelper
+     * @param ManagerRegistry $doctrineHelper
      * @param TranslatorInterface $translator
      */
     public function __construct(
         RequestStack $requestStack,
-        DoctrineHelper $doctrineHelper,
+        ManagerRegistry $doctrine,
         TranslatorInterface $translator
     ) {
         $this->requestStack = $requestStack;
-        $this->doctrineHelper = $doctrineHelper;
+        $this->doctrine = $doctrine;
         $this->translator = $translator;
     }
 
@@ -117,6 +119,8 @@ abstract class AbstractFallbackFieldsFormView
             return null;
         }
 
-        return $this->doctrineHelper->getEntityReference($entityPath, $entityId);
+        /** @var EntityManager $em */
+        $em = $this->doctrine->getManagerForClass($entityPath);
+        return $em->getReference($entityPath, $entityId);
     }
 }
