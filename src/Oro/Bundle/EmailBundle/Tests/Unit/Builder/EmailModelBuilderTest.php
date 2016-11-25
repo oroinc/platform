@@ -110,12 +110,12 @@ class EmailModelBuilderTest extends \PHPUnit_Framework_TestCase
 
         $this->email = $this->getMockBuilder('Oro\Bundle\EmailBundle\Entity\Email')
             ->setMethods(
-                ['getActivityTargetEntities', 'getFromEmailAddress', 'getId', 'getTo', 'getCc', 'getEmailBody']
+                ['getActivityTargets', 'getFromEmailAddress', 'getId', 'getTo', 'getCc', 'getEmailBody']
             )
             ->getMock();
 
         $this->email->expects($this->any())
-            ->method('getActivityTargetEntities')
+            ->method('getActivityTargets')
             ->willReturn([]);
 
         $this->factory = new Factory();

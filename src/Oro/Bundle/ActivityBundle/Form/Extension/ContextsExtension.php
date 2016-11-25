@@ -117,7 +117,7 @@ class ContextsExtension extends AbstractTypeExtension
             $contexts          = [];
 
             if ($entity->getId()) {
-                $contexts = $entity->getActivityTargetEntities();
+                $contexts = $entity->getActivityTargets();
             } elseif ($targetEntityClass && $this->request->getMethod() === 'GET') {
                 $contexts[] = $this->entityRoutingHelper->getEntity($targetEntityClass, $targetEntityId);
             }
