@@ -3,11 +3,14 @@ namespace Oro\Bundle\IntegrationBundle\Async;
 
 use Doctrine\ORM\EntityManagerInterface;
 
-use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
+use Psr\Log\LoggerInterface;
 
+use Symfony\Component\DependencyInjection\ContainerAwareInterface;
+use Symfony\Component\DependencyInjection\ContainerAwareTrait;
+
+use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\IntegrationBundle\Entity\Channel as Integration;
 use Oro\Bundle\IntegrationBundle\Exception\LogicException;
-
 use Oro\Bundle\IntegrationBundle\Manager\TypesRegistry;
 use Oro\Bundle\IntegrationBundle\Provider\ReverseSyncProcessor;
 use Oro\Bundle\IntegrationBundle\Provider\TwoWaySyncConnectorInterface;
@@ -17,9 +20,6 @@ use Oro\Component\MessageQueue\Job\JobRunner;
 use Oro\Component\MessageQueue\Transport\MessageInterface;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
 use Oro\Component\MessageQueue\Util\JSON;
-use Psr\Log\LoggerInterface;
-use Symfony\Component\DependencyInjection\ContainerAwareInterface;
-use Symfony\Component\DependencyInjection\ContainerAwareTrait;
 
 class ReversSyncIntegrationProcessor implements
     MessageProcessorInterface,
