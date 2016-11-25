@@ -10,7 +10,7 @@ use Symfony\Component\Translation\TranslatorInterface;
 
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\UserBundle\Exception\PasswordChangedException;
-use Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink;
+use Oro\Component\DependencyInjection\ServiceLink;
 
 class UserChecker extends BaseUserChecker
 {
@@ -62,11 +62,27 @@ class UserChecker extends BaseUserChecker
             throw $exception;
         }
 
-        if ($user instanceof User && $user->getAuthStatus() !== null && $user->getAuthStatus()->getId() === 'expired') {
+        if ($user instanceof User && $this->isExpiredPassword($user)) {
             $exception = new CredentialsExpiredException('Invalid password.');
             $exception->setUser($user);
 
             throw $exception;
         }
+    }
+
+    /**
+     * @param User $user
+     *
+     * @return bool
+     */
+    protected function isExpiredPassword(User $user)
+    {
+        $now = new \DateTime('now', new \DateTimeZone('UTC'));
+
+        if (($user->getPasswordExpiresAt() < $now)) {
+            return true;
+        }
+
+        return $user->getAuthStatus() && $user->getAuthStatus()->getId() === 'expired';
     }
 }
