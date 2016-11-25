@@ -271,6 +271,16 @@ To migrate all labels from configuration translatable fields automatically you c
 - `\Oro\Bundle\SearchBundle\Query\Result\Item::_construct` signature changed, array type hintings added
 
 
+####OroIntegrationBundle:
+- The option `--integration-id` renamed to `--integration` in `oro:cron:integration:sync` cli command.
+- The option `--force` were removed from `oro:cron:integration:sync` cli command. Pass it as connector option  `force=true`.
+- The option `--transport-batch-size force` were removed from `oro:cron:integration:sync` cli command.
+- The option `--params` were removed from `oro:integration:reverse:sync` cli command. Use `--connector-parameters` instead.
+- The `SyncScheduler::schedule` method signature was changed. 
+- The `GenuineSyncScheduler::schedule` method signature was changed.
+- The parameter `oro_integration.genuine_sync_scheduler.class` was removed.
+- The parameter `oro_integration.reverse_sync.processor.class` was removed.
+
 ####Layout Component:
 - Interface `Oro\Component\Layout\DataProviderInterface` was removed.
 - Abstract class `Oro\Component\Layout\AbstractServerRenderDataProvider` was removed.
@@ -512,6 +522,7 @@ tag if it works with extend classes
 ####IntegrationBundle:
 - Integration configuration file now loads from `Resources/config/oro/integrations.yml` file instead of `Resources/config/integration_settings.yml`.
 - Root node for integration config file `Resources/config/oro/integrations.yml` were changed from `oro_integration` to `integrations`.
+- The `Oro\Bundle\IntegrationBundle\Command\ReverseSyncCommand` command was removed.
 
 ####EntityConfigBundle:
 - Entity configuration now loads from `Resources/config/oro/entity_config.yml` file instead of `Resources/config/entity_config.yml`.
