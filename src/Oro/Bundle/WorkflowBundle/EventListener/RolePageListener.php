@@ -54,12 +54,14 @@ class RolePageListener
             return;
         }
 
-        $event->setFormData($this->addWorkflowACLDatagrid(
-            $event->getFormData(),
-            $event->getTwigEnvironment(),
-            $event->getForm()->vars['value'],
-            false
-        ));
+        $event->setFormData(
+            $this->addWorkflowAclDatagrid(
+                $event->getFormData(),
+                $event->getTwigEnvironment(),
+                $event->getEntity() ?: $event->getForm()->vars['value'],
+                false
+            )
+        );
     }
 
     /**
@@ -78,12 +80,14 @@ class RolePageListener
             return;
         }
 
-        $event->setData($this->addWorkflowACLDatagrid(
-            $event->getData(),
-            $event->getTwigEnvironment(),
-            $event->getEntity(),
-            true
-        ));
+        $event->setData(
+            $this->addWorkflowAclDatagrid(
+                $event->getData(),
+                $event->getTwigEnvironment(),
+                $event->getEntity(),
+                true
+            )
+        );
     }
 
     /**
@@ -96,7 +100,7 @@ class RolePageListener
      *
      * @return array
      */
-    protected function addWorkflowACLDatagrid($pageData, \Twig_Environment $twigEnvironment, Role $entity, $readOnly)
+    protected function addWorkflowAclDatagrid($pageData, \Twig_Environment $twigEnvironment, Role $entity, $readOnly)
     {
         $dataBlocks = $pageData['dataBlocks'];
         $resultBlocks = [];

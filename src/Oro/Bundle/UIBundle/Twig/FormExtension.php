@@ -50,9 +50,9 @@ class FormExtension extends \Twig_Extension
      * @param FormView $form
      * @return array
      */
-    public function process(Twig_Environment $environment, array $data, FormView $form)
+    public function process(Twig_Environment $environment, array $data, FormView $form, $entity)
     {
-        $event = new BeforeFormRenderEvent($form, $data, $environment);
+        $event = new BeforeFormRenderEvent($form, $data, $environment, $entity);
         $this->eventDispatcher->dispatch(Events::BEFORE_UPDATE_FORM_RENDER, $event);
 
         return $event->getFormData();

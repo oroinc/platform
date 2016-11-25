@@ -49,7 +49,7 @@ class FormExtensionTest extends \PHPUnit_Framework_TestCase
                  $this->isInstanceOf('Oro\Bundle\UIBundle\Event\BeforeFormRenderEvent')
              );
         $formData = array("test");
-        $this->assertEquals($formData, $this->extension->process($env, $formData, $formView));
+        $this->assertEquals($formData, $this->extension->process($env, $formData, $formView, new \stdClass()));
     }
 
     public function testGetFunctions()
