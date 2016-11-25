@@ -106,11 +106,9 @@ class ConsumeMessagesCommand extends Command
                 ['exception' => $e]
             );
 
-            $this->consumer->getConnection()->close();
-
             throw $e;
+        } finally {
+            $this->consumer->getConnection()->close();
         }
-
-        $this->consumer->getConnection()->close();
     }
 }
