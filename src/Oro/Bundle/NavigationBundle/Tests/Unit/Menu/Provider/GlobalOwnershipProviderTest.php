@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\NavigationBundle\Tests\Unit\Menu\Provider;
 
-use Doctrine\ORM\EntityRepository;
+use Doctrine\Common\Persistence\ManagerRegistry;
 
 use Oro\Bundle\NavigationBundle\Menu\Provider\GlobalOwnershipProvider;
 
@@ -13,19 +13,14 @@ class GlobalOwnershipProviderTest extends \PHPUnit_Framework_TestCase
      */
     private $provider;
 
-    /**
-     * @var \PHPUnit_Framework_MockObject_MockObject|EntityRepository
-     */
-    private $entityRepository;
-
     public function setUp()
     {
-        $this->entityRepository = $this->getMockBuilder(EntityRepository::class)
-            ->setMethods(['getMenuUpdates'])
+        /** @var ManagerRegistry|\PHPUnit_Framework_MockObject_MockObject $registry */
+        $registry = $this->getMockBuilder(ManagerRegistry::class)
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->provider = new GlobalOwnershipProvider($this->entityRepository);
+        $this->provider = new GlobalOwnershipProvider($registry, '\EntityClass');
     }
 
     public function testGetId()
