@@ -172,7 +172,7 @@ If the scope configuration is provided for the workflow, the Oro application wil
 
 Example of scope configuration in :
 ```
-        scope:
+        scopes:
             -
                 scopeField1: 2
             -
@@ -182,7 +182,7 @@ Example of scope configuration in :
 ```
 **Note**: The scopeField1, scopeField2, and scopeField3 are scope criteria that are delivered by scope providers. Scope provider should be registered in Oro application for the `workflow_definition` scope type.  
 
-For more information about scopes see  ../../../../../ScopeBundle/Resources/doc/scope.md.
+For more information about scopes see [ScopeBundle documentation](../../../../../ScopeBundle/Resources/doc/scope.md).
 
 Configuration
 -------------

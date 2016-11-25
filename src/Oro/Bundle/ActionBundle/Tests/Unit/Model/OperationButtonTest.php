@@ -2,11 +2,11 @@
 
 namespace Oro\Bundle\ActionBundle\Tests\Unit\Model;
 
+use Oro\Bundle\ActionBundle\Model\ActionData;
 use Oro\Bundle\ActionBundle\Model\ButtonContext;
 use Oro\Bundle\ActionBundle\Model\Operation;
 use Oro\Bundle\ActionBundle\Model\OperationButton;
 use Oro\Bundle\ActionBundle\Model\OperationDefinition;
-use Oro\Bundle\ActionBundle\Model\OperationRegistry;
 
 class OperationButtonTest extends \PHPUnit_Framework_TestCase
 {
@@ -35,7 +35,7 @@ class OperationButtonTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->button = new OperationButton($this->operation, $this->buttonContext);
+        $this->button = new OperationButton($this->operation, $this->buttonContext, new ActionData());
     }
 
     /**
@@ -88,6 +88,7 @@ class OperationButtonTest extends \PHPUnit_Framework_TestCase
                     'operation' => $this->getOperationMock(),
                     'params' => new OperationDefinition(),
                     'aClass' => '',
+                    'actionData' => new ActionData()
                 ],
             ],
         ];

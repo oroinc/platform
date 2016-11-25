@@ -82,7 +82,6 @@ class TransitionButtonTest extends \PHPUnit_Framework_TestCase
         $defaultData = [
             'workflow' => $this->workflow,
             'transition' => $this->transition,
-            'workflowItem' => null,
             'context' => $this->buttonContext,
             'transitionData' => [
                 'workflow' => $this->workflow->getName(),

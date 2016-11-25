@@ -41,9 +41,7 @@ class ButtonSearchContextProviderTest extends \PHPUnit_Framework_TestCase
     {
         $context = $this->normalizeContext($context);
 
-        $this->contextHelper->expects($this->atLeastOnce())
-            ->method('getContext')
-            ->willReturn($context);
+        $this->contextHelper->expects($this->once())->method('getContext')->willReturn($context);
 
         $buttonSearchContext = $this->provider->getButtonSearchContext($context);
 

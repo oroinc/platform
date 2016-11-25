@@ -287,14 +287,17 @@ class Workflow
 
         $repo = $this->doctrineHelper->getEntityRepositoryForClass('Oro\Bundle\WorkflowBundle\Entity\WorkflowItem');
 
+        $workflowItem = null;
         $entityClass = $this->doctrineHelper->getEntityClass($entity);
         $entityId = $this->doctrineHelper->getSingleEntityIdentifier($entity);
 
-        $workflowItem = $repo->findOneBy([
-            'workflowName' => $this->getName(),
-            'entityId' => $entityId,
-            'entityClass' => $entityClass
-        ]);
+        if ($entityId !== null) {
+            $workflowItem = $repo->findOneBy([
+                'workflowName' => $this->getName(),
+                'entityId' => $entityId,
+                'entityClass' => $entityClass
+            ]);
+        }
 
         if (!$workflowItem) {
             $workflowItem = new WorkflowItem();

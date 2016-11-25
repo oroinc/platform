@@ -8,7 +8,7 @@ define(function(require) {
     var $ = require('jquery');
     var __ = require('orotranslation/js/translator');
 
-    var ButtonsComponent = BaseComponent.extend({
+    var ButtonComponent = BaseComponent.extend({
 
         /**
          * @property {Object}
@@ -26,7 +26,7 @@ define(function(require) {
          * @inheritDoc
          */
         initialize: function(options) {
-            ButtonsComponent.__super__.initialize.apply(this, arguments);
+            ButtonComponent.__super__.initialize.apply(this, arguments);
 
             this.options = options || {};
 
@@ -74,9 +74,9 @@ define(function(require) {
 
             this.$button.off();
 
-            ButtonsComponent.__super__.dispose.call(this);
+            ButtonComponent.__super__.dispose.call(this);
         }
     });
 
-    return ButtonsComponent;
+    return ButtonComponent;
 });

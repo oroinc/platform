@@ -1,6 +1,9 @@
 <?php
 
-namespace Oro\Bundle\ActionBundle\Model;
+namespace Oro\Bundle\ActionBundle\Extension;
+
+use Oro\Bundle\ActionBundle\Model\ButtonInterface;
+use Oro\Bundle\ActionBundle\Model\ButtonSearchContext;
 
 interface ButtonProviderExtensionInterface
 {

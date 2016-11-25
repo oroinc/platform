@@ -55,7 +55,6 @@ class TransitionButton implements ButtonInterface
         $defaultData = [
             'workflow' => $this->workflow,
             'transition' => $this->transition,
-            'workflowItem' => null,
             'context' => $this->getButtonContext(),
             'transitionData' => [
                 'workflow' => $this->workflow->getName(),

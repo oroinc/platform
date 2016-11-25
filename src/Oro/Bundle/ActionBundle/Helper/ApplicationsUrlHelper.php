@@ -2,23 +2,24 @@
 
 namespace Oro\Bundle\ActionBundle\Helper;
 
+use Oro\Bundle\ActionBundle\Provider\RouteProviderInterface;
 use Symfony\Component\Routing\RouterInterface;
 
 class ApplicationsUrlHelper
 {
-    /** @var ApplicationsHelper */
-    private $applicationsHelper;
+    /** @var RouteProviderInterface */
+    private $routeProvider;
 
     /** @var RouterInterface */
     private $router;
 
     /**
-     * @param ApplicationsHelperInterface $applicationsHelper
+     * @param RouteProviderInterface $routeProvider
      * @param RouterInterface $router
      */
-    public function __construct(ApplicationsHelperInterface $applicationsHelper, RouterInterface $router)
+    public function __construct(RouteProviderInterface $routeProvider, RouterInterface $router)
     {
-        $this->applicationsHelper = $applicationsHelper;
+        $this->routeProvider = $routeProvider;
         $this->router = $router;
     }
 
@@ -29,7 +30,7 @@ class ApplicationsUrlHelper
      */
     public function getExecutionUrl(array $parameters = [])
     {
-        return $this->generateUrl($this->applicationsHelper->getExecutionRoute(), $parameters);
+        return $this->generateUrl($this->routeProvider->getExecutionRoute(), $parameters);
     }
 
     /**
@@ -39,7 +40,7 @@ class ApplicationsUrlHelper
      */
     public function getDialogUrl(array $parameters = [])
     {
-        return $this->generateUrl($this->applicationsHelper->getFormDialogRoute(), $parameters);
+        return $this->generateUrl($this->routeProvider->getFormDialogRoute(), $parameters);
     }
 
     /**
@@ -49,7 +50,7 @@ class ApplicationsUrlHelper
      */
     public function getPageUrl(array $parameters = [])
     {
-        return $this->generateUrl($this->applicationsHelper->getFormPageRoute(), $parameters);
+        return $this->generateUrl($this->routeProvider->getFormPageRoute(), $parameters);
     }
 
     /**

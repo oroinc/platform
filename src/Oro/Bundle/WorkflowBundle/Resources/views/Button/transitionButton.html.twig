@@ -28,3 +28,6 @@
 	    onlyLink|default(false)
     ) }}
 {% if not onlyLink|default(false) %}</div>{% endif %}
+<div class="pull-left btn-group icons-holder">
+    {{ workflowMacros.renderTransitionButton(workflow, transition, null, transitionData) }}
+</div>

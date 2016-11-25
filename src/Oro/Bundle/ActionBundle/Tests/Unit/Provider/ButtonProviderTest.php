@@ -3,7 +3,7 @@
 namespace Oro\Bundle\ActionBundle\Tests\Unit\Provider;
 
 use Oro\Bundle\ActionBundle\Model\ButtonInterface;
-use Oro\Bundle\ActionBundle\Model\ButtonProviderExtensionInterface;
+use Oro\Bundle\ActionBundle\Extension\ButtonProviderExtensionInterface;
 use Oro\Bundle\ActionBundle\Model\ButtonSearchContext;
 use Oro\Bundle\ActionBundle\Provider\ButtonProvider;
 
@@ -35,6 +35,7 @@ class ButtonProviderTest extends \PHPUnit_Framework_TestCase
     {
         /** @var ButtonSearchContext $searchContext */
         $searchContext = $this->getMock(ButtonSearchContext::class);
+
         $this->buttonExtension->expects($this->once())
             ->method('find')
             ->with($searchContext)
@@ -79,7 +80,7 @@ class ButtonProviderTest extends \PHPUnit_Framework_TestCase
     private function getButton($order)
     {
         $button = $this->getMock(ButtonInterface::class);
-        $button->method('getOrder')->willReturn($order);
+        $button->expects($this->any())->method('getOrder')->willReturn($order);
 
         return $button;
     }

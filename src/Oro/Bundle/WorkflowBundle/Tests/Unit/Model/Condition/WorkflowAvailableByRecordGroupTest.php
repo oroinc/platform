@@ -6,6 +6,7 @@ use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Model\Condition\WorkflowAvailableByRecordGroup;
 use Oro\Bundle\WorkflowBundle\Model\Workflow;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowManager;
+use Oro\Component\ConfigExpression\Exception\InvalidArgumentException;
 
 class WorkflowAvailableByRecordGroupTest extends \PHPUnit_Framework_TestCase
 {
@@ -112,12 +113,12 @@ class WorkflowAvailableByRecordGroupTest extends \PHPUnit_Framework_TestCase
         return [
             [
                 'options' => [],
-                'exception' => 'Oro\Component\ConfigExpression\Exception\InvalidArgumentException',
+                'exception' => InvalidArgumentException::class,
                 'exceptionMessage' => 'Group name parameter is required'
             ],
             [
                 'options' => ['group_name' => 'test'],
-                'exception' => 'Oro\Component\ConfigExpression\Exception\InvalidArgumentException',
+                'exception' => InvalidArgumentException::class,
                 'exceptionMessage' => 'Entity class parameter is required'
             ]
         ];

@@ -4,6 +4,8 @@ namespace Oro\Bundle\ActionBundle\Tests\Functional\Controller;
 
 use Oro\Bundle\ActionBundle\Model\OperationDefinition;
 use Oro\Bundle\ActionBundle\Tests\Functional\DataFixtures\LoadTestEntityData;
+use Oro\Bundle\ActionBundle\Tests\Functional\Stub\ButtonProviderExtensionStub;
+use Oro\Bundle\ActionBundle\Tests\Functional\Stub\ButtonStub;
 use Oro\Bundle\CacheBundle\Provider\FilesystemCache;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Bundle\TestFrameworkBundle\Tests\Functional\DataFixtures\LoadItems;
@@ -57,6 +59,7 @@ class WidgetControllerTest extends WebTestCase
     public function testButtonsOperation(array $config, $route, $entityId, $entityClass, array $expected)
     {
         $this->cacheProvider->save(self::ROOT_NODE_NAME, $config);
+        $this->getContainer()->get('oro_action.provider.button')->addExtension(new ButtonProviderExtensionStub());
 
         if ($entityId) {
             $entityId = $this->entityId;
@@ -336,7 +339,7 @@ class WidgetControllerTest extends WebTestCase
                 'route' => 'oro_action_test_route',
                 'entityId' => true,
                 'entityClass' => 'Oro\Bundle\TestFrameworkBundle\Entity\TestActivity',
-                'expected' => [$label]
+                'expected' => [$label, ButtonStub::LABEL]
             ],
             'existing entity wrong conditions' => [
                 'config' => array_merge_recursive(
@@ -600,10 +603,5 @@ class WidgetControllerTest extends WebTestCase
                 OperationDefinition::ACTIONS => ['Edit', 'Delete'],
             ],
         ];
-    }
-
-    public function testButtonsNewAction()
-    {
-        //TODO: Should be covered at https://magecore.atlassian.net/browse/BAP-12485
     }
 }

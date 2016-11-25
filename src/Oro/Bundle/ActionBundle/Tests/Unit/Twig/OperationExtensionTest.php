@@ -2,12 +2,12 @@
 
 namespace Oro\Bundle\ActionBundle\Tests\Unit\Twig;
 
-use Oro\Bundle\ActionBundle\Helper\ApplicationsHelper;
 use Oro\Bundle\ActionBundle\Helper\ContextHelper;
 use Oro\Bundle\ActionBundle\Helper\OptionsHelper;
 use Oro\Bundle\ActionBundle\Model\ButtonSearchContext;
 use Oro\Bundle\ActionBundle\Provider\ButtonProvider;
 use Oro\Bundle\ActionBundle\Provider\ButtonSearchContextProvider;
+use Oro\Bundle\ActionBundle\Provider\RouteProviderInterface;
 use Oro\Bundle\ActionBundle\Twig\OperationExtension;
 
 class OperationExtensionTest extends \PHPUnit_Framework_TestCase
@@ -15,8 +15,8 @@ class OperationExtensionTest extends \PHPUnit_Framework_TestCase
     const ROUTE = 'test_route';
     const REQUEST_URI = '/test/request/uri';
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|ApplicationsHelper */
-    protected $appsHelper;
+    /** @var \PHPUnit_Framework_MockObject_MockObject|RouteProviderInterface */
+    protected $routeProvider;
 
     /** @var OperationExtension */
     protected $extension;
@@ -38,9 +38,7 @@ class OperationExtensionTest extends \PHPUnit_Framework_TestCase
      */
     protected function setUp()
     {
-        $this->appsHelper = $this->getMockBuilder('Oro\Bundle\ActionBundle\Helper\ApplicationsHelper')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->routeProvider = $this->getMock(RouteProviderInterface::class);
 
         $this->contextHelper = $this->getMockBuilder('Oro\Bundle\ActionBundle\Helper\ContextHelper')
             ->disableOriginalConstructor()
@@ -60,7 +58,7 @@ class OperationExtensionTest extends \PHPUnit_Framework_TestCase
             ->getMock();
 
         $this->extension = new OperationExtension(
-            $this->appsHelper,
+            $this->routeProvider,
             $this->contextHelper,
             $this->optionsHelper,
             $this->buttonProvider,
@@ -72,7 +70,7 @@ class OperationExtensionTest extends \PHPUnit_Framework_TestCase
     {
         unset(
             $this->extension,
-            $this->appsHelper,
+            $this->routeProvider,
             $this->contextHelper,
             $this->optionsHelper,
             $this->buttonProvider,
@@ -98,7 +96,7 @@ class OperationExtensionTest extends \PHPUnit_Framework_TestCase
             ],
             'oro_action_widget_route' => [
                 false,
-                'Oro\Bundle\ActionBundle\Helper\ApplicationsHelper',
+                'Oro\Bundle\ActionBundle\Provider\RouteProviderInterface',
                 'getWidgetRoute',
             ],
             'oro_action_frontend_options' => [

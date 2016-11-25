@@ -30,14 +30,10 @@ class WidgetController extends Controller
      */
     public function buttonsAction()
     {
-        $buttonProvider = $this->get('oro_action.provider.button');
-        $buttonSearchContextProvider = $this->get('oro_action.provider.button_search_context');
-        $buttonSearchContext = $buttonSearchContextProvider->getButtonSearchContext();
-
-        $buttons = $buttonProvider->findAll($buttonSearchContext);
+        $buttonSearchContext = $this->get('oro_action.provider.button_search_context')->getButtonSearchContext();
 
         return [
-            'buttons' => $buttons,
+            'buttons' => $this->get('oro_action.provider.button')->findAll($buttonSearchContext),
         ];
     }
 
@@ -119,14 +115,6 @@ class WidgetController extends Controller
     protected function getContextHelper()
     {
         return $this->get('oro_action.helper.context');
-    }
-
-    /**
-     * @return ApplicationsHelper
-     */
-    protected function getApplicationsHelper()
-    {
-        return $this->get('oro_action.helper.applications');
     }
 
     /**

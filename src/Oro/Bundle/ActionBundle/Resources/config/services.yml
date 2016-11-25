@@ -35,17 +35,20 @@ services:
         public: true
         arguments:
             - '@request_stack'
-            - '@oro_action.helper.applications'
+            - '@oro_action.provider.route'
 
-    oro_action.helper.applications:
-        class: 'Oro\Bundle\ActionBundle\Helper\ApplicationsHelper'
+    oro_action.provider.current_application:
+        class: 'Oro\Bundle\ActionBundle\Provider\CurrentApplicationProvider'
         arguments:
             - '@security.token_storage'
-        calls:
-            - [setFormDialogRoute, ['oro_action_widget_form']]
-            - [setFormPageRoute, ['oro_action_widget_form']]
-            - [setExecutionRoute, ['oro_action_operation_execute']]
-            - [setWidgetRoute, ['oro_action_widget_buttons']]
+
+    oro_action.provider.route:
+        class: 'Oro\Bundle\ActionBundle\Provider\RouteProvider'
+        arguments:
+            - 'oro_action_widget_form'
+            - 'oro_action_widget_form'
+            - 'oro_action_operation_execute'
+            - 'oro_action_widget_buttons'
 
     oro_action.helper.restrict:
         class: %oro_action.helper.restrict.class%
@@ -62,7 +65,7 @@ services:
     oro_action.helper.applications_url:
         class: %oro_action.helper.applications_url.class%
         arguments:
-            - '@oro_action.helper.applications'
+            - '@oro_action.provider.route'
             - '@router'
 
     oro_action.operation_registry:
@@ -70,7 +73,7 @@ services:
         arguments:
             - '@oro_action.configuration.provider.operations'
             - '@oro_action.assembler.operation'
-            - '@oro_action.helper.applications'
+            - '@oro_action.provider.current_application'
             - '@oro_entity.doctrine_helper'
 
     oro_action.action_group_registry:
@@ -198,7 +201,7 @@ services:
     oro_action.layout.data_provider.action_buttons:
         class: 'Oro\Bundle\ActionBundle\Layout\DataProvider\ActionButtonsProvider'
         arguments:
-            - '@oro_action.helper.applications'
+            - '@oro_action.provider.route'
             - '@oro_entity.doctrine_helper'
         tags:
             - { name: layout.data_provider, alias: action_buttons }
@@ -230,6 +233,6 @@ services:
         arguments:
             - '@oro_action.operation_registry'
             - '@oro_action.helper.context'
-            - '@oro_action.helper.applications'
+            - '@oro_action.provider.route'
         tags:
             - { name: oro.action.extension.button_provider, priority: 100 }
