@@ -28,7 +28,7 @@
             {% endif %}
             {% if groups|length %}
                 {% for groupName, groupButtons in groups %}
-                    {% if renderedButtons %}
+                    {% if groupButtons %}
                         {{ UI.dropdownButton({
                             'label': groupName|trans,
                             'html': groupButtons|join()
