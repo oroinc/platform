@@ -1,4 +1,4 @@
-Feature two-factor authentication via email
+Feature: two-factor authentication via email
   In order to increase login security level
   As Administrator
   I need to manage two-factor authentication using email
