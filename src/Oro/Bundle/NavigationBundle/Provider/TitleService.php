@@ -148,8 +148,12 @@ class TitleService implements TitleServiceInterface
                     $title = $data['short_template'];
                 } else {
                     $title = $data['template'];
-                    $prefix = array_key_exists('prefix', $data) ? $data['prefix'] : null;
-                    $suffix = array_key_exists('suffix', $data) ? $data['suffix'] : null;
+                    if (array_key_exists('prefix', $data)) {
+                        $prefix = $data['prefix'];
+                    }
+                    if (array_key_exists('suffix', $data)) {
+                        $suffix = $data['suffix'];
+                    }
                 }
             } catch (\RuntimeException $e) {
                 // wrong json string - ignore title
