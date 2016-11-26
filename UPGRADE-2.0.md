@@ -676,6 +676,8 @@ placeholders:
         - `ArrayLoader` $loader,
         - `MenuManipulator` $manipulator
 - Added new command `oro:navigation:menu:reset` that removes changes in menus for different scopes.
+- Removed class `Oro\Bundle\NavigationBundle\Title\StoredTitle`.
+- Changed signature of constructor of `Oro\Bundle\NavigationBundle\Provider\TitleService`. Parameter `Serializer $serializer` was removed. 
 
 ####EmailBundle
 - Constructor of `Oro\Bundle\EmailBundle\Form\DataTransformer\EmailTemplateTransformer` was changed. Removed the arguments.

@@ -4,9 +4,6 @@ namespace Oro\Bundle\NavigationBundle\Provider;
 
 use Symfony\Component\Routing\Route;
 
-use JMS\Serializer\Exception\RuntimeException;
-use JMS\Serializer\Serializer;
-
 use Doctrine\Common\Persistence\ObjectManager;
 
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
@@ -14,7 +11,6 @@ use Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink;
 use Oro\Bundle\NavigationBundle\Entity\Title;
 use Oro\Bundle\NavigationBundle\Title\TitleReader\ConfigReader;
 use Oro\Bundle\NavigationBundle\Title\TitleReader\AnnotationsReader;
-use Oro\Bundle\NavigationBundle\Title\StoredTitle;
 use Oro\Bundle\NavigationBundle\Menu\BreadcrumbManagerInterface;
 
 /**
@@ -55,14 +51,14 @@ class TitleService implements TitleServiceInterface
      *
      * @var array
      */
-    private $suffix = null;
+    private $suffix;
 
     /**
      * Current title prefix
      *
      * @var array
      */
-    private $prefix = null;
+    private $prefix;
 
     /**
      * @var TitleProvider
@@ -80,11 +76,6 @@ class TitleService implements TitleServiceInterface
     private $em;
 
     /**
-     * @var Serializer
-     */
-    protected $serializer = null;
-
-    /**
      * @var ServiceLink
      */
     protected $breadcrumbManagerLink;
@@ -99,7 +90,6 @@ class TitleService implements TitleServiceInterface
      * @param ConfigReader $configReader
      * @param TitleTranslator $titleTranslator
      * @param ObjectManager $em
-     * @param Serializer $serializer
      * @param $userConfigManager
      * @param ServiceLink $breadcrumbManagerLink
      * @param TitleProvider $titleProvider
@@ -109,7 +99,6 @@ class TitleService implements TitleServiceInterface
         ConfigReader $configReader,
         TitleTranslator $titleTranslator,
         ObjectManager $em,
-        Serializer $serializer,
         $userConfigManager,
         ServiceLink $breadcrumbManagerLink,
         TitleProvider $titleProvider
@@ -117,7 +106,6 @@ class TitleService implements TitleServiceInterface
         $this->readers = [$reader, $configReader];
         $this->titleTranslator = $titleTranslator;
         $this->em = $em;
-        $this->serializer = $serializer;
         $this->userConfigManager = $userConfigManager;
         $this->breadcrumbManagerLink = $breadcrumbManagerLink;
         $this->titleProvider = $titleProvider;
@@ -142,7 +130,7 @@ class TitleService implements TitleServiceInterface
      * @param string $suffix
      * @param bool   $isJSON
      * @param bool   $isShort
-     * @return $this
+     * @return string
      */
     public function render(
         $params = [],
@@ -152,24 +140,18 @@ class TitleService implements TitleServiceInterface
         $isJSON = false,
         $isShort = false
     ) {
-        if (!is_null($title) && $isJSON) {
+        if (null !== $title && $isJSON) {
             try {
-                /** @var $data \Oro\Bundle\NavigationBundle\Title\StoredTitle */
-                $data =  $this->serializer->deserialize(
-                    $title,
-                    'Oro\Bundle\NavigationBundle\Title\StoredTitle',
-                    'json'
-                );
-
-                $params = $data->getParams();
+                $data = $this->jsonDecode($title);
+                $params = $data['params'];
                 if ($isShort) {
-                    $title = $data->getShortTemplate();
+                    $title = $data['short_template'];
                 } else {
-                    $title = $data->getTemplate();
-                    $prefix = $data->getPrefix();
-                    $suffix = $data->getSuffix();
+                    $title = $data['template'];
+                    $prefix = array_key_exists('prefix', $data) ? $data['prefix'] : null;
+                    $suffix = array_key_exists('suffix', $data) ? $data['suffix'] : null;
                 }
-            } catch (RuntimeException $e) {
+            } catch (\RuntimeException $e) {
                 // wrong json string - ignore title
                 $params = [];
                 $title  = 'Untitled';
@@ -181,25 +163,23 @@ class TitleService implements TitleServiceInterface
             $params = $this->getParams();
         }
         if ($isShort) {
-            if (is_null($title)) {
+            if (null === $title) {
                 $title = $this->getShortTemplate();
             }
         } else {
-            if (is_null($title)) {
+            if (null === $title) {
                 $title = $this->getTemplate();
             }
-            if (is_null($prefix)) {
+            if (null === $prefix) {
                 $prefix = $this->prefix;
             }
-            if (is_null($suffix)) {
+            if (null === $suffix) {
                 $suffix = $this->suffix;
             }
             $title = $prefix . $title . $suffix;
         }
 
-        $title = $this->titleTranslator->trans($title, $params);
-
-        return $title;
+        return $this->titleTranslator->trans($title, $params);
     }
 
     /**
@@ -452,8 +432,9 @@ class TitleService implements TitleServiceInterface
     /**
      * Get short title
      *
-     * @param $title
-     * @param $route
+     * @param string $title
+     * @param string $route
+     * @return string
      */
     protected function getShortTitle($title, $route)
     {
@@ -474,14 +455,56 @@ class TitleService implements TitleServiceInterface
      */
     public function getSerialized()
     {
-        $storedTitle = new StoredTitle();
-        $storedTitle
-            ->setTemplate($this->getTemplate())
-            ->setShortTemplate($this->getShortTemplate())
-            ->setParams($this->getParams())
-            ->setPrefix($this->prefix)
-            ->setSuffix($this->suffix);
+        $data = [
+            'template'       => $this->getTemplate(),
+            'short_template' => $this->getShortTemplate(),
+            'params'         => $this->getParams()
+        ];
+        if ($this->prefix) {
+            $data['prefix'] = $this->prefix;
+        }
+        if ($this->suffix) {
+            $data['suffix'] = $this->suffix;
+        }
 
-        return $this->serializer->serialize($storedTitle, 'json');
+        return $this->jsonEncode($data);
+    }
+
+    /**
+     * @param array $data
+     *
+     * @return string
+     */
+    protected function jsonEncode(array $data)
+    {
+        $encoded = json_encode($data, JSON_UNESCAPED_UNICODE);
+        if (JSON_ERROR_NONE !== json_last_error()) {
+            throw new \RuntimeException(sprintf(
+                'The title serialization failed. Error: %s. Message: %s.',
+                json_last_error(),
+                json_last_error_msg()
+            ));
+        }
+
+        return $encoded;
+    }
+
+    /**
+     * @param string $encoded
+     *
+     * @return array
+     */
+    protected function jsonDecode($encoded)
+    {
+        $data = json_decode($encoded, true);
+        if (JSON_ERROR_NONE !== json_last_error()) {
+            throw new \RuntimeException(sprintf(
+                'The title deserialization failed. Error: %s. Message: %s.',
+                json_last_error(),
+                json_last_error_msg()
+            ));
+        }
+
+        return $data;
     }
 }

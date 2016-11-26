@@ -3,6 +3,9 @@ namespace Oro\Bundle\NavigationBundle\Tests\Unit\Provider;
 
 use Oro\Bundle\NavigationBundle\Provider\TitleService;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class TitleServiceTest extends \PHPUnit_Framework_TestCase
 {
     /**
@@ -24,11 +27,6 @@ class TitleServiceTest extends \PHPUnit_Framework_TestCase
      * @var \PHPUnit_Framework_MockObject_MockObject
      */
     protected $titleTranslator;
-
-    /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
-     */
-    protected $serializer;
 
     /**
      * @var \PHPUnit_Framework_MockObject_MockObject
@@ -74,10 +72,6 @@ class TitleServiceTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->serializer = $this->getMockBuilder('JMS\Serializer\Serializer')
-            ->disableOriginalConstructor()
-            ->getMock();
-
         $this->repository = $this->getMockBuilder('Doctrine\ORM\EntityRepository')
             ->disableOriginalConstructor()
             ->getMock();
@@ -105,7 +99,6 @@ class TitleServiceTest extends \PHPUnit_Framework_TestCase
             $this->configReader,
             $this->titleTranslator,
             $this->em,
-            $this->serializer,
             $this->userConfigManager,
             $breadcrumbLink,
             $this->titleProvider
@@ -126,36 +119,74 @@ class TitleServiceTest extends \PHPUnit_Framework_TestCase
 
     public function testRenderStored()
     {
-        $data = 'test data';
-
-        $storedTitleMock = $this->getMock('Oro\Bundle\NavigationBundle\Title\StoredTitle');
-
-        $this->serializer->expects($this->once())
-            ->method('deserialize')
-            ->with($data, 'Oro\Bundle\NavigationBundle\Title\StoredTitle', 'json')
-            ->will($this->returnValue($storedTitleMock));
-
-        $storedTitleMock->expects($this->once())
-            ->method('getParams');
-
-        $storedTitleMock->expects($this->once())
-            ->method('getTemplate')
-            ->will($this->returnValue('string'));
-
-        $storedTitleMock->expects($this->once())
-            ->method('getPrefix');
-
-        $storedTitleMock->expects($this->once())
-            ->method('getSuffix');
+        $data = '{"template":"test template","short_template":"test short template","params":{"prm1":"val1"},'
+            . '"prefix":"test prefix","suffix":"test suffix"}';
 
         $this->titleTranslator->expects($this->once())
             ->method('trans')
-            ->with('string', [])
-            ->will($this->returnValue('string'));
+            ->with('test prefixtest templatetest suffix', ['prm1' => 'val1'])
+            ->will($this->returnValue('translated template'));
 
-        $result = $this->titleService->render(array(), $data, null, null, true);
+        $result = $this->titleService->render([], $data, null, null, true);
 
-        $this->assertTrue(is_string($result));
+        $this->assertEquals('translated template', $result);
+    }
+
+    public function testRenderStoredForShortTemplate()
+    {
+        $data = '{"template":"test template","short_template":"test short template","params":{"prm1":"val1"},'
+            . '"prefix":"test prefix","suffix":"test suffix"}';
+
+        $this->titleTranslator->expects($this->once())
+            ->method('trans')
+            ->with('test short template', ['prm1' => 'val1'])
+            ->will($this->returnValue('translated short template'));
+
+        $result = $this->titleService->render([], $data, null, null, true, true);
+
+        $this->assertEquals('translated short template', $result);
+    }
+
+    public function testRenderStoredWithoutOptionalData()
+    {
+        $data = '{"template":"test template","short_template":"test short template","params":{"prm1":"val1"}}';
+
+        $this->titleTranslator->expects($this->once())
+            ->method('trans')
+            ->with('test template', ['prm1' => 'val1'])
+            ->will($this->returnValue('translated template'));
+
+        $result = $this->titleService->render([], $data, null, null, true);
+
+        $this->assertEquals('translated template', $result);
+    }
+
+    public function testRenderStoredWithEmptyData()
+    {
+        $data = '{"template":null,"short_template":null,"params":[]}';
+
+        $this->titleTranslator->expects($this->once())
+            ->method('trans')
+            ->with('', [])
+            ->will($this->returnValue(''));
+
+        $result = $this->titleService->render([], $data, null, null, true);
+
+        $this->assertEquals('', $result);
+    }
+
+    public function testRenderStoredInvalidData()
+    {
+        $data = 'invalid';
+
+        $this->titleTranslator->expects($this->once())
+            ->method('trans')
+            ->with('Untitled', [])
+            ->will($this->returnValue('translated Untitled'));
+
+        $result = $this->titleService->render([], $data, null, null, true);
+
+        $this->assertEquals('translated Untitled', $result);
     }
 
     public function testRenderShort()
@@ -353,15 +384,36 @@ class TitleServiceTest extends \PHPUnit_Framework_TestCase
 
     public function testGetSerialized()
     {
-        $testValue = 'test value';
+        $this->titleService->setTemplate('test template');
+        $this->titleService->setShortTemplate('test short template');
+        $this->titleService->setParams(['prm1' => 'val1']);
+        $this->titleService->setPrefix('test prefix');
+        $this->titleService->setSuffix('test suffix');
 
-        $this->serializer->expects($this->once())
-            ->method('serialize')
-            ->with($this->isInstanceOf('\Oro\Bundle\NavigationBundle\Title\StoredTitle'), $this->equalTo('json'))
-            ->will($this->returnValue($testValue));
+        $this->assertEquals(
+            '{"template":"test template","short_template":"test short template","params":{"prm1":"val1"},'
+            . '"prefix":"test prefix","suffix":"test suffix"}',
+            $this->titleService->getSerialized()
+        );
+    }
 
-        $result = $this->titleService->getSerialized();
+    public function testGetSerializedWithoutOptionalData()
+    {
+        $this->titleService->setTemplate('test template');
+        $this->titleService->setShortTemplate('test short template');
+        $this->titleService->setParams(['prm1' => 'val1']);
 
-        $this->assertEquals($testValue, $result);
+        $this->assertEquals(
+            '{"template":"test template","short_template":"test short template","params":{"prm1":"val1"}}',
+            $this->titleService->getSerialized()
+        );
+    }
+
+    public function testGetSerializedWithEmptyData()
+    {
+        $this->assertEquals(
+            '{"template":null,"short_template":null,"params":[]}',
+            $this->titleService->getSerialized()
+        );
     }
 }
