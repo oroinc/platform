@@ -259,7 +259,7 @@ define(function(require) {
             var optionsSelectors = [];
 
             _.each(filters, function(filter) {
-                if (!filter.isRendered()) {
+                if (filter.shouldBeVisible() && !filter.isRendered()) {
                     var oldEl = filter.$el;
                     // filter rendering process replaces $el
                     filter.render();
@@ -328,7 +328,7 @@ define(function(require) {
                 if (_.isFunction(filter.setDropdownContainer)) {
                     filter.setDropdownContainer(this.dropdownContainer);
                 }
-                if (!filter.enabled) {
+                if (!filter.enabled || !filter.shouldBeVisible()) {
                     // append element to reserve space
                     // empty elements are hidden by default
                     $filterItems.append(filter.$el);

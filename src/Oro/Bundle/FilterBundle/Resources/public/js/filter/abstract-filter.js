@@ -41,6 +41,13 @@ define([
         enabled: false,
 
         /**
+         * Is filter visible in UI
+         *
+         * @property {Boolean}
+         */
+        visible: true,
+
+        /**
          * Is filter enabled by default
          *
          * @property {Boolean}
@@ -103,7 +110,7 @@ define([
          * @param {Boolean} [options.enabled]
          */
         initialize: function(options) {
-            var opts = _.pick(options || {}, 'enabled', 'canDisable', 'placeholder', 'showLabel', 'label',
+            var opts = _.pick(options || {}, 'enabled', 'visible', 'canDisable', 'placeholder', 'showLabel', 'label',
                 'templateSelector', 'templateTheme');
             _.extend(this, opts);
 
@@ -164,6 +171,10 @@ define([
             return this;
         },
 
+        shouldBeVisible: function() {
+            return this.visible;
+        },
+
         /**
          * Disable filter
          *
@@ -185,7 +196,9 @@ define([
          * @return {*}
          */
         show: function() {
-            this.$el.css('display', 'inline-block');
+            if (this.shouldBeVisible()) {
+                this.$el.css('display', 'inline-block');
+            }
             return this;
         },
 
