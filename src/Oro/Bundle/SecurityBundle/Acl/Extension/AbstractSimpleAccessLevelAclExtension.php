@@ -19,14 +19,17 @@ abstract class AbstractSimpleAccessLevelAclExtension extends AbstractAccessLevel
             return AccessLevel::NONE_LEVEL;
         }
 
-        if ($permission !== null) {
+        if (null !== $permission) {
             $mask &= $this->getMaskBuilderConst('GROUP_' . $permission);
         }
 
         $result = AccessLevel::NONE_LEVEL;
-        foreach (AccessLevel::$allAccessLevelNames as $accessLevel) {
-            if (0 !== ($mask & $this->getMaskBuilderConst('GROUP_' . $accessLevel))) {
-                $result = AccessLevel::getConst($accessLevel . '_LEVEL');
+        if (0 !== $mask) {
+            foreach (self::ACCESS_LEVELS as $accessLevelName => $accessLevel) {
+                if (0 !== ($mask & $this->getMaskBuilderConst('GROUP_' . $accessLevelName))) {
+                    $result = $accessLevel;
+                    break;
+                }
             }
         }
 

@@ -20,6 +20,15 @@ use Oro\Bundle\SecurityBundle\Owner\EntityOwnerAccessor;
 
 abstract class AbstractAccessLevelAclExtension extends AbstractAclExtension
 {
+    /** All access levels from the most to the least permissive level */
+    const ACCESS_LEVELS = [
+        'SYSTEM' => AccessLevel::SYSTEM_LEVEL,
+        'GLOBAL' => AccessLevel::GLOBAL_LEVEL,
+        'DEEP'   => AccessLevel::DEEP_LEVEL,
+        'LOCAL'  => AccessLevel::LOCAL_LEVEL,
+        'BASIC'  => AccessLevel::BASIC_LEVEL
+    ];
+
     /** @var ObjectIdAccessor */
     protected $objectIdAccessor;
 
@@ -174,7 +183,7 @@ abstract class AbstractAccessLevelAclExtension extends AbstractAclExtension
     /**
      * Gets class name for the given object
      *
-     * @param $object
+     * @param mixed $object
      *
      * @return string
      */

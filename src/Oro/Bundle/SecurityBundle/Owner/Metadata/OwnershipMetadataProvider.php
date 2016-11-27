@@ -190,11 +190,10 @@ class OwnershipMetadataProvider extends AbstractMetadataProvider
      */
     public function getMaxAccessLevel($accessLevel, $className = null)
     {
-        if ($className && $accessLevel === AccessLevel::SYSTEM_LEVEL) {
+        if (AccessLevel::SYSTEM_LEVEL === $accessLevel && $className) {
             $metadata = $this->getMetadata($className);
-
-            if ($metadata->hasOwner()) {
-                $checkOwnerType = in_array(
+            if ($metadata->hasOwner()
+                && in_array(
                     $metadata->getOwnerType(),
                     [
                         OwnershipMetadata::OWNER_TYPE_BUSINESS_UNIT,
@@ -202,11 +201,9 @@ class OwnershipMetadataProvider extends AbstractMetadataProvider
                         OwnershipMetadata::OWNER_TYPE_ORGANIZATION
                     ],
                     true
-                );
-
-                if ($checkOwnerType) {
-                    $accessLevel = AccessLevel::GLOBAL_LEVEL;
-                }
+                )
+            ) {
+                $accessLevel = AccessLevel::GLOBAL_LEVEL;
             }
         }
 
