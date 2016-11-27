@@ -81,6 +81,38 @@ html{
   }
 }
 
+.responsive-section {
+  figure {
+    display: table;
+    margin: 5px auto 1rem;
+  }
+
+  figcaption {
+    display: table-caption;
+    caption-side: bottom;
+    margin: 10px 0 0;
+    
+    font-size: 0.88rem;
+    text-align: center;
+  }
+
+  .cms-page__figure_right,
+  .cms-page__figure_left {
+    clear: both;
+  }
+
+
+  .cms-page__figure_right {
+    float: right;
+    margin-left: 20px;
+  }
+
+  .cms-page__figure_left {
+    float: left;
+    margin-right: 20px;
+  }
+}
+
 .container-fluid > .responsive-section {
   margin: 0 -@horizontalPadding;
   padding-right: @horizontalPadding;
