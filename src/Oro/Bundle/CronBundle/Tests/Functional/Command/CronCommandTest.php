@@ -78,8 +78,6 @@ class CronCommandTest extends WebTestCase
                 'Processing command "oro:cron:batch:cleanup": new command found, setting up schedule..',
                 'Processing command "oro:cron:cleanup": new command found, setting up schedule..',
                 'Processing command "oro:cron:imap-sync": new command found, setting up schedule..',
-                'Processing command "oro:cron:import-tracking": new command found, setting up schedule..',
-                'Processing command "oro:cron:tracking:parse": new command found, setting up schedule..',
                 'Processing command "oro:cron:send-reminders": new command found, setting up schedule..',
                 'Processing command "oro:cron:cleanup --dry-run": added to job queue'
             ],
@@ -88,8 +86,6 @@ class CronCommandTest extends WebTestCase
                 'Processing command "oro:cron:batch:cleanup": already exists in job queue',
                 'Processing command "oro:cron:cleanup": already exists in job queue',
                 'Processing command "oro:cron:imap-sync": already exists in job queue',
-                'Processing command "oro:cron:import-tracking": already exists in job queue',
-                'Processing command "oro:cron:tracking:parse": already exists in job queue',
                 'Processing command "oro:cron:send-reminders": already exists in job queue',
                 'Processing command "oro:cron:cleanup --dry-run": already exists in job queue'
             ],
@@ -98,8 +94,6 @@ class CronCommandTest extends WebTestCase
                 'Processing command "oro:cron:batch:cleanup": added to job queue',
                 'Processing command "oro:cron:cleanup": added to job queue',
                 'Processing command "oro:cron:imap-sync": added to job queue',
-                'Processing command "oro:cron:import-tracking": added to job queue',
-                'Processing command "oro:cron:tracking:parse": added to job queue',
                 'Processing command "oro:cron:send-reminders": added to job queue',
                 'Processing command "oro:cron:cleanup --dry-run": already exists in job queue'
             ],
@@ -108,8 +102,6 @@ class CronCommandTest extends WebTestCase
                 'Processing command "oro:cron:batch:cleanup": skipped',
                 'Processing command "oro:cron:cleanup": skipped',
                 'Processing command "oro:cron:imap-sync": skipped',
-                'Processing command "oro:cron:import-tracking": skipped',
-                'Processing command "oro:cron:tracking:parse": skipped',
                 'Processing command "oro:cron:send-reminders": skipped',
                 'Processing command "oro:cron:cleanup --dry-run": skipped'
             ]
