@@ -44,8 +44,8 @@ abstract class AbstractFallbackFieldsFormView
 
     /**
      * @param BeforeListRenderEvent $event
-     * @param $templateName
-     * @param $entity
+     * @param string $templateName
+     * @param object $entity
      * @param int $blockId
      * @param int $subBlockId
      */
@@ -67,7 +67,7 @@ abstract class AbstractFallbackFieldsFormView
 
     /**
      * @param BeforeListRenderEvent $event
-     * @param $templateName
+     * @param string $templateName
      * @param null $sectionTitle
      * @param int $blockId
      * @param int $subBlockId
@@ -103,7 +103,7 @@ abstract class AbstractFallbackFieldsFormView
     }
 
     /**
-     * @param $entityPath
+     * @param string $entityPath
      * @return null|object
      */
     public function getEntityFromRequest($entityPath)
