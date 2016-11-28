@@ -80,7 +80,7 @@ class CurrencyNameHelper
                 $currencyName = sprintf(
                     "%s (%s)",
                     $currencyName,
-                    $this->getCurrencyName($currencyIsoCode, $this->viewTypeProvider->getViewType())
+                    $this->getCurrencyName($currencyIsoCode, ViewTypeProviderInterface::VIEW_TYPE_ISO_CODE)
                 );
                 break;
             case ViewTypeProviderInterface::VIEW_TYPE_NAME:
