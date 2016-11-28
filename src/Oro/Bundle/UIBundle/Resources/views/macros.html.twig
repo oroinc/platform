@@ -178,7 +178,11 @@
     {% set iconHtml = '' %}
     {% if parameters.iCss is defined %}
         {% set iconHtml %}
-        <i class="{{ parameters.iCss }} hide-text" >{{ parameters.label }}</i>
+        <i class="{{ parameters.iCss }} hide-text" >
+	        {% if parameters.showIconText is defined and parameters.showIconText %}
+		        {{ parameters.label }}
+	        {% endif %}
+        </i>
         {% endset %}
     {% else %}
     {% endif %}
