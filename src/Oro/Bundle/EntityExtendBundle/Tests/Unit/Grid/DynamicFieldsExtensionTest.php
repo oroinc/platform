@@ -169,7 +169,7 @@ class DynamicFieldsExtensionTest extends AbstractFieldsExtensionTestCase
             ->method('getIds')
             ->with($className)
             ->will($this->returnValue([$fieldId]));
-        $this->extendConfigProvider->expects($this->once())
+        $this->extendConfigProvider->expects($this->atLeastOnce())
             ->method('getConfigById')
             ->with($this->identicalTo($fieldId))
             ->will($this->returnValue($extendConfig));
@@ -177,7 +177,7 @@ class DynamicFieldsExtensionTest extends AbstractFieldsExtensionTestCase
             ->method('getConfig')
             ->with(self::ENTITY_CLASS, self::FIELD_NAME)
             ->will($this->returnValue($extendConfig));
-        $this->datagridConfigProvider->expects($this->once())
+        $this->datagridConfigProvider->expects($this->atLeastOnce())
             ->method('getConfigById')
             ->with($this->identicalTo($fieldId))
             ->will($this->returnValue($datagridFieldConfig));
