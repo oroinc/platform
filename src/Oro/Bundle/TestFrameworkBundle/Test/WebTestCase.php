@@ -173,6 +173,19 @@ abstract class WebTestCase extends BaseWebTestCase
     }
 
     /**
+     * @param string $login
+     */
+    protected function loginUser($login)
+    {
+        if ('' !== $login) {
+            self::$clientInstance->setServerParameters(static::generateBasicAuthHeader($login, $login));
+        } else {
+            self::$clientInstance->setServerParameters([]);
+            $this->client->getCookieJar()->clear();
+        }
+    }
+
+    /**
      * Reset client and rollback transaction
      */
     protected function resetClient()
