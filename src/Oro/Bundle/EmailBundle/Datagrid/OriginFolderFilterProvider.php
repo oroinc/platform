@@ -128,7 +128,9 @@ class OriginFolderFilterProvider
     {
         $systemMailboxes = $this->getMailboxes();
         foreach ($systemMailboxes as $mailbox) {
-            $origin = $mailbox->getOrigin();
+            if (!$origin = $mailbox->getOrigin()) {
+                continue;
+            }
             $folders = $origin->getFolders();
             $mailbox = $mailbox->getLabel();
             $folders = $this->filterFolders($folders->toArray());
