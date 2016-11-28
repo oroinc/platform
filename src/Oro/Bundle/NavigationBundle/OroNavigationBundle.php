@@ -24,7 +24,6 @@ class OroNavigationBundle extends Bundle
 
         $container->addCompilerPass(new MenuBuilderChainPass());
         $container->addCompilerPass(new ChainBreadcrumbManagerPass());
-        $container->addCompilerPass(new MenuUpdateProviderPass());
         $container->addCompilerPass(new DynamicAssetVersionPass('routing'));
         $container->addCompilerPass(new MenuExtensionPass());
 

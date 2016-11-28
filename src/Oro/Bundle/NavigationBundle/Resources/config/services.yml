@@ -355,6 +355,8 @@ services:
         class: Oro\Bundle\NavigationBundle\Builder\MenuUpdateBuilder
         arguments:
             - '@oro_locale.helper.localization'
+            - '@oro_scope.scope_manager'
+            - '@oro_navigation.manager.registry'
         tags:
             - { name: oro_menu.builder, priority: 100 }
 
@@ -387,6 +389,11 @@ services:
         parent: oro_navigation.manager.menu_update_abstract
         calls:
             - [ setEntityClass, [ '%oro_navigation.entity.menu_update.class%' ]]
+
+    oro_navigation.manager.registry:
+        class: Oro\Bundle\NavigationBundle\Manager\MenuUpdateManagerRegistry
+        calls:
+            - [addManager, ['menu_default_visibility', '@oro_navigation.manager.menu_update_default']]
 
     oro_navigation.widget_provider.actions.edit_menus:
         parent: oro_ui.widget_provider.action_button.abstract
@@ -441,12 +448,12 @@ services:
         tags:
             - { name: layout.data_provider, alias: title_provider }
 
-    oro_navigation.scope_criteria_provider.user:
-        parent: oro_user.scope_criteria_provider.user
+    oro_navigation.scope_criteria_provider.organization:
+        parent: oro_organization.scope_criteria_provider.organization
         tags:
             - {name: oro_scope.provider, scopeType: menu_default_visibility, priority: 10}
 
-    oro_navigation.scope_criteria_provider.organization:
-        parent: oro_organization.scope_criteria_provider.organization
+    oro_navigation.scope_criteria_provider.user:
+        parent: oro_user.scope_criteria_provider.user
         tags:
             - {name: oro_scope.provider, scopeType: menu_default_visibility, priority: 20}

@@ -51,7 +51,7 @@ class ScopeUserCriteriaProvider extends AbstractScopeCriteriaProvider
     /**
      * {@inheritdoc}
      */
-    protected function getCriteriaValueType()
+    public function getCriteriaValueType()
     {
         return User::class;
     }
