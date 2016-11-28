@@ -7,13 +7,13 @@ use Doctrine\DBAL\Schema\Schema;
 use Oro\Bundle\ActivityBundle\Migration\Extension\ActivityExtension;
 use Oro\Bundle\ActivityBundle\Migration\Extension\ActivityExtensionAwareInterface;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
-use Oro\Bundle\EntityExtendBundle\Extend\RelationType;
 use Oro\Bundle\EntityExtendBundle\Migration\Extension\ExtendExtension;
 use Oro\Bundle\EntityExtendBundle\Migration\Extension\ExtendExtensionAwareInterface;
 use Oro\Bundle\EntityExtendBundle\Migration\OroOptions;
 use Oro\Bundle\MigrationBundle\Migration\Installation;
 use Oro\Bundle\MigrationBundle\Migration\QueryBag;
-use Oro\Bundle\ScopeBundle\Migrations\Schema\OroScopeBundleInstaller;
+use Oro\Bundle\ScopeBundle\Migration\Extension\ScopeExtensionAwareInterface;
+use Oro\Bundle\ScopeBundle\Migration\Extension\ScopeExtensionAwareTrait;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyMethods)
@@ -22,8 +22,11 @@ use Oro\Bundle\ScopeBundle\Migrations\Schema\OroScopeBundleInstaller;
 class OroTestFrameworkBundleInstaller implements
     Installation,
     ActivityExtensionAwareInterface,
-    ExtendExtensionAwareInterface
+    ExtendExtensionAwareInterface,
+    ScopeExtensionAwareInterface
 {
+    use ScopeExtensionAwareTrait;
+
     /** @var ActivityExtension */
     protected $activityExtension;
 
@@ -548,22 +551,7 @@ class OroTestFrameworkBundleInstaller implements
      */
     private function extendScopeForTestActivity($schema)
     {
-        $this->extendExtension->addManyToOneRelation(
-            $schema,
-            OroScopeBundleInstaller::ORO_SCOPE,
-            'test_activity',
-            'test_activity',
-            'id',
-            [
-                'extend' => [
-                    'owner' => ExtendScope::OWNER_CUSTOM,
-                    'cascade' => ['all'],
-                    'on_delete' => 'CASCADE',
-                    'nullable' => true
-                ]
-            ],
-            RelationType::MANY_TO_ONE
-        );
+        $this->scopeExtension->addScopeAssociation($schema, 'test_activity', 'test_activity', 'id');
     }
 
     /**

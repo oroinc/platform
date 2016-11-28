@@ -3,87 +3,15 @@
 namespace Oro\Bundle\MessageQueueBundle\Test\Functional;
 
 use Oro\Component\MessageQueue\Client\MessageProducerInterface;
+use Oro\Bundle\MessageQueueBundle\Test\MessageCollector as BaseMessageCollector;
 
-/**
- * This class is intended to be used in functional tests and allows to get sent messages.
- */
-class MessageCollector implements MessageProducerInterface
+class MessageCollector extends BaseMessageCollector
 {
-    /**
-     * @var MessageProducerInterface
-     */
-    private $messageProducer;
-
-    /**
-     * @var array [['topic' => topic name, 'message' => message (string|array|Message)], ...]
-     */
-    private $sentMessages = [];
-
-
     /**
      * @param MessageProducerInterface $messageProducer
      */
     public function __construct(MessageProducerInterface $messageProducer)
     {
-        $this->messageProducer = $messageProducer;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function send($topic, $message)
-    {
-        $this->messageProducer->send($topic, $message);
-
-        $this->sentMessages[] = ['topic' => $topic, 'message' => $message];
-    }
-
-    /**
-     * Gets all sent messages.
-     *
-     * @return array [['topic' => topic name, 'message' => message (string|array|Message)], ...]
-     */
-    public function getSentMessages()
-    {
-        return $this->sentMessages;
-    }
-
-    /**
-     * @param string $topic
-     *
-     * @return array
-     */
-    public function getTopicSentMessages($topic)
-    {
-        $topicTraces = [];
-        foreach ($this->getSentMessages() as $trace) {
-            if ($topic == $trace['topic']) {
-                $topicTraces[] = $trace;
-            }
-        }
-
-        return $topicTraces;
-    }
-
-    /**
-     * Removes all collected messages.
-     *
-     * $return self
-     */
-    public function clear()
-    {
-        $this->sentMessages = [];
-
-        return $this;
-    }
-
-    public function enable()
-    {
-        //toDo: Remove after merging task/CRM-5838_migrate_integration_logic_from_jms_to_mq
-    }
-
-    public function disable()
-    {
-        //toDo: Remove after merging task/CRM-5838_migrate_integration_logic_from_jms_to_mq
+        parent::__construct($messageProducer);
     }
 }
