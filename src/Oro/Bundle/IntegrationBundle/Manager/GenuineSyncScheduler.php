@@ -2,55 +2,45 @@
 
 namespace Oro\Bundle\IntegrationBundle\Manager;
 
-use Doctrine\Common\Persistence\ManagerRegistry;
-use JMS\JobQueueBundle\Entity\Job;
-use Oro\Bundle\IntegrationBundle\Command\SyncCommand;
-use Oro\Bundle\IntegrationBundle\Entity\Channel as Integration;
-use Oro\Bundle\IntegrationBundle\Exception\LogicException;
+use Oro\Bundle\IntegrationBundle\Async\Topics;
+use Oro\Component\MessageQueue\Client\Message;
+use Oro\Component\MessageQueue\Client\MessagePriority;
+use Oro\Component\MessageQueue\Client\MessageProducerInterface;
 
 /**
  * This class is responsible for job scheduling.
  */
 class GenuineSyncScheduler
 {
-    /** @var ManagerRegistry */
-    protected $registry;
+    /** @var MessageProducerInterface */
+    protected $producer;
 
     /**
-     * @param ManagerRegistry $registry
+     * @param MessageProducerInterface $producer
      */
-    public function __construct(ManagerRegistry $registry)
+    public function __construct(MessageProducerInterface $producer)
     {
-        $this->registry = $registry;
+        $this->producer = $producer;
     }
 
     /**
-     * Schedules sync job
-     *
-     * @param Integration $integration
-     * @param bool        $force
-     *
-     * @return Job
+     * @param int $integrationId
+     * @param string|null $connector
+     * @param array $connectorParameters
      */
-    public function schedule(Integration $integration, $force = false)
+    public function schedule($integrationId, $connector = null, array $connectorParameters = [])
     {
-        if (false === $integration->isEnabled()) {
-            throw new LogicException(sprintf('The integration is not active. Id: %s', $integration->getId()));
-        }
-
-        $jobParameters = [
-            '--integration-id=' . $integration->getId(),
-            '-v'
-        ];
-        if ($force) {
-            $jobParameters[] = '--force';
-        }
-        $job = new Job(SyncCommand::COMMAND_NAME, $jobParameters);
-
-        $em = $this->registry->getManagerForClass('OroIntegrationBundle:Channel');
-        $em->persist($job);
-        $em->flush();
-
-        return $job;
+        $this->producer->send(
+            Topics::SYNC_INTEGRATION,
+            new Message(
+                [
+                    'integration_id'       => $integrationId,
+                    'connector_parameters' => $connectorParameters,
+                    'connector'            => $connector,
+                    'transport_batch_size' => 100,
+                ],
+                MessagePriority::VERY_LOW
+            )
+        );
     }
 }
