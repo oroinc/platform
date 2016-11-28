@@ -3,6 +3,7 @@
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\DependencyInjection\Compiler;
 
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
 
 use Oro\Bundle\WorkflowBundle\DependencyInjection\Compiler\WorkflowChangesEventsCompilerPass;
@@ -76,26 +77,26 @@ class WorkflowChangesEventsCompilerPassTest extends \PHPUnit_Framework_TestCase
             ->with('oro_workflow.changes.listener')->willReturn(
                 [
                     'service1' => [
-                        ['event' => 'event1', 'priority' => 42],
-                        ['event' => 'event2']
+                        ['event' => 'event1', 'method' => 'process1', 'priority' => 42],
+                        ['event' => 'event2', 'method' => 'process2']
                     ],
-                    'service2' => [['event' => 'event3']],
+                    'service2' => [['event' => 'event3', 'method' => 'process3']],
                 ]
             );
 
         $definition->expects($this->at(0))->method('addMethodCall')->with(
             'addListener',
-            ['event1', new Reference('service1'), 42]
+            ['event1', [new Reference('service1'), 'process1'], 42]
         );
 
         $definition->expects($this->at(1))->method('addMethodCall')->with(
             'addListener',
-            ['event2', new Reference('service1'), 0]
+            ['event2', [new Reference('service1'), 'process2'], 0]
         );
 
         $definition->expects($this->at(2))->method('addMethodCall')->with(
             'addListener',
-            ['event3', new Reference('service2'), 0]
+            ['event3', [new Reference('service2'), 'process3'], 0]
         );
 
         //no subscribers
@@ -104,6 +105,22 @@ class WorkflowChangesEventsCompilerPassTest extends \PHPUnit_Framework_TestCase
             ->with('oro_workflow.changes.subscriber')->willReturn([]);
 
         $definition->expects($this->never())->method('addSubscriber');
+
+        $this->pass->process($this->containerBuilderMock);
+    }
+
+    public function testProcessListenersWithoutMethod()
+    {
+        $this->setExpectedException(
+            'InvalidArgumentException',
+            'Service "service1" must define the "method" attribute on "oro_workflow.changes.listener" tags.'
+        );
+
+        $this->containerBuilderMock->expects($this->once())->method('hasDefinition')->willReturn(true);
+        $this->containerBuilderMock->expects($this->once())
+            ->method('findTaggedServiceIds')
+            ->with(WorkflowChangesEventsCompilerPass::CHANGES_LISTENER_TAG)
+            ->willReturn(['service1' => [['event' => 'event1']]]);
 
         $this->pass->process($this->containerBuilderMock);
     }

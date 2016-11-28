@@ -22,7 +22,8 @@ define(function(require) {
             selectors: {
                 form: null
             },
-            buttonName: ''
+            buttonName: '',
+            error: null
         },
 
         /**
@@ -37,6 +38,10 @@ define(function(require) {
                 this.options._wid,
                 function(widget) {
                     if (!self.options.success) {
+                        if (self.options.error) {
+                            mediator.execute('showMessage', 'error', self.options.error);
+                        }
+
                         widget.getAction(self.options.buttonName, 'adopted', function(action) {
                             action.on('click', _.bind(self.onClick, self));
                         });

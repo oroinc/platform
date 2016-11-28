@@ -14,6 +14,8 @@ use Oro\Bundle\MigrationBundle\Migration\Loader\DataFixturesLoader;
 
 class LoadDataFixturesCommand extends ContainerAwareCommand
 {
+    const COMMAND_NAME = 'oro:migration:data:load';
+
     const MAIN_FIXTURES_TYPE = 'main';
     const DEMO_FIXTURES_TYPE = 'demo';
 
@@ -25,7 +27,7 @@ class LoadDataFixturesCommand extends ContainerAwareCommand
      */
     protected function configure()
     {
-        $this->setName('oro:migration:data:load')
+        $this->setName(static::COMMAND_NAME)
             ->setDescription('Load data fixtures.')
             ->addOption(
                 'fixtures-type',

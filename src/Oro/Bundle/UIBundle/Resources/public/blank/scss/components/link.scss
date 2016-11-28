@@ -1,7 +1,5 @@
-.link {
-    color: $link-color;
+// @theme: blank;
 
-    &:hover {
-        color: $link-color-hover;
-    }
+.link {
+    @include link();
 }

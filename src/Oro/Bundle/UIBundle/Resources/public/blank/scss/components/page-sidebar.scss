@@ -1,0 +1,17 @@
+// @theme: blank
+
+.page-sidebar {
+    width: $page-sidebar-width;
+    padding: $page-sidebar-inner-offset;
+
+    order: $page-sidebar-order;
+    flex: $page-sidebar-flex;
+}
+
+@include breakpoint('tablet-small') {
+    .page-sidebar {
+        width: $page-sidebar-tablet-s-width;
+        margin: $page-sidebar-tablet-s-offset;
+        padding: $page-sidebar-tablet-s-inner-offset;
+    }
+}

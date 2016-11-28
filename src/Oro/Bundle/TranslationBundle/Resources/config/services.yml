@@ -248,7 +248,20 @@ services:
         class: 'Oro\Bundle\TranslationBundle\Manager\TranslationManager'
         arguments:
             - '@doctrine'
+            - '@oro_translation.provider.translation_domain'
             - '@oro_translation.database_translation.metadata.cache'
+
+    oro_translation.cache.provider.domains:
+        parent: oro.cache.abstract
+        public: false
+        calls:
+            - [ setNamespace, [ 'oro_translation_domains' ] ]
+
+    oro_translation.provider.translation_domain:
+        class: 'Oro\Bundle\TranslationBundle\Provider\TranslationDomainProvider'
+        arguments:
+            - '@doctrine'
+            - '@oro_translation.cache.provider.domains'
 
     oro_translation.helper.translation:
         class: 'Oro\Bundle\TranslationBundle\Helper\TranslationHelper'

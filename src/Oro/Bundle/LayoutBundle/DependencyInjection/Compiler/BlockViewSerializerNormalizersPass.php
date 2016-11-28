@@ -9,7 +9,7 @@ use Symfony\Component\DependencyInjection\Reference;
 class BlockViewSerializerNormalizersPass implements CompilerPassInterface
 {
     const BLOCK_VIEW_SERIALIZER_SERVICE_ID = 'oro_layout.block_view_serializer';
-    const BLOCK_VIEW_SERIALIZER_NORMALIZER_TAG = 'oro_layout.block_view_serializer.normalizer';
+    const BLOCK_VIEW_SERIALIZER_NORMALIZER_TAG = 'layout.block_view_serializer.normalizer';
 
     /**
      * {@inheritdoc}

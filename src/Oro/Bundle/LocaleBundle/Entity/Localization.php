@@ -36,6 +36,8 @@ class Localization extends ExtendLocalization implements DatesAwareInterface
 {
     use DatesAwareTrait;
 
+    const DEFAULT_LOCALIZATION = 'default';
+
     /**
      * @var int
      *

@@ -308,7 +308,7 @@ services:
     oro_locale.manager.localization:
         class: 'Oro\Bundle\LocaleBundle\Manager\LocalizationManager'
         arguments:
-            - '@oro_locale.repository.localization'
+            - '@oro_entity.doctrine_helper'
             - '@oro_config.global'
 
     oro_locale.provider.current_localization:
