@@ -176,10 +176,10 @@
 {% macro link(parameters) %}
     {# need to remove spaces just before label #}
     {% set iconHtml = '' %}
-    {% if parameters.iCss is defined %}
+    {% if parameters.iCss is defined and parameters.iCss %}
         {% set iconHtml %}
         <i class="{{ parameters.iCss }} hide-text" >
-	        {% if parameters.showIconText is defined and parameters.showIconText %}
+	        {% if not parameters.noIconText|default(false)%}
 		        {{ parameters.label }}
 	        {% endif %}
         </i>

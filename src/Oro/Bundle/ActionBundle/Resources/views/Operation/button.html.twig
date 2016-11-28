@@ -21,7 +21,9 @@
                 data-options="{{ options.options|json_encode }}"
                 data-page-component-module="oroaction/js/app/components/button-component"
             >
-                <i class="{{ params.buttonOptions.icon|default('') }} {{ params.buttonOptions.iCss|default('') }} hide-text"></i>
+	            {% if not noIcon|default(false) %}
+                    <i class="{{ params.buttonOptions.icon|default('') }} {{ params.buttonOptions.iCss|default('') }} hide-text"></i>
+	            {% endif %}
                 {{ linkLabel|trim }}
             </a>
         {% endblock %}
