@@ -1024,5 +1024,8 @@ class ExtendExtension implements NameGeneratorAwareInterface
         if (!isset($options['extend']['owner'])) {
             $options['extend']['owner'] = ExtendScope::OWNER_SYSTEM;
         }
+        if (!isset($options[ExtendOptionsManager::MODE_OPTION])) {
+            $options[ExtendOptionsManager::MODE_OPTION] = ConfigModel::MODE_READONLY;
+        }
     }
 }
