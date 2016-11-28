@@ -12,7 +12,7 @@
     }
 }
 
-@include breakpoint('tablet-small') {
+@include breakpoint('tablet') {
     .page-content {
         &--has-sidebar {
             padding: $page-content-with-sidebar-tables-s-inner-offset;
