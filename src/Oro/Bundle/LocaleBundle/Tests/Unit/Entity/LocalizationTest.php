@@ -75,21 +75,36 @@ class LocalizationTest extends \PHPUnit_Framework_TestCase
         $entity = new Localization();
         $this->assertEmpty($entity->getTitles()->toArray());
 
-        $defaultTitle = $this->createLocalizedValue('default', 1);
+        $defaultTitle = $this->createLocalizedValue('default', true);
         $firstTitle = $this->createLocalizedValue('test1');
         $secondTitle = $this->createLocalizedValue('test2');
 
-        $entity->addTitle($defaultTitle)->addTitle($firstTitle)->addTitle($secondTitle)->addTitle($secondTitle);
+        $parentLocalization = new Localization();
 
-        $this->assertCount(3, $entity->getTitles()->toArray());
-        $this->assertEquals([$defaultTitle, $firstTitle, $secondTitle], array_values($entity->getTitles()->toArray()));
+        $localization = new Localization();
+        $localization->setParentLocalization($parentLocalization);
+        $withParentTitle = $this->createLocalizedValue('testParent', false, $parentLocalization);
+
+        $entity->addTitle($defaultTitle)
+            ->addTitle($firstTitle)
+            ->addTitle($secondTitle)
+            ->addTitle($secondTitle)
+            ->addTitle($withParentTitle);
+
+        $this->assertCount(4, $entity->getTitles()->toArray());
+        $this->assertEquals(
+            [$defaultTitle, $firstTitle, $secondTitle, $withParentTitle],
+            array_values($entity->getTitles()->toArray())
+        );
 
         $this->assertEquals($secondTitle, $entity->getTitle($secondTitle->getLocalization()));
         $this->assertEquals($defaultTitle, $entity->getTitle());
+        $this->assertEquals($withParentTitle, $entity->getTitle($localization));
+        $this->assertEquals($defaultTitle->getString(), $entity->getTitle(new Localization()));
 
         $entity->removeTitle($firstTitle)->removeTitle($firstTitle)->removeTitle($defaultTitle);
 
-        $this->assertEquals([$secondTitle], array_values($entity->getTitles()->toArray()));
+        $this->assertEquals([$secondTitle, $withParentTitle], array_values($entity->getTitles()->toArray()));
     }
 
     public function testGetDefaultTitle()
@@ -134,14 +149,17 @@ class LocalizationTest extends \PHPUnit_Framework_TestCase
     /**
      * @param string $value
      * @param bool|false $default
+     * @param Localization $localization
      * @return LocalizedFallbackValue
      */
-    protected function createLocalizedValue($value, $default = false)
+    protected function createLocalizedValue($value, $default = false, Localization $localization = null)
     {
         $localized = (new LocalizedFallbackValue())->setString('some string');
 
         if (!$default) {
-            $localization = new Localization();
+            if (!$localization) {
+                $localization = new Localization();
+            }
             $localization->setDefaultTitle($value);
 
             $localized->setLocalization($localization);
