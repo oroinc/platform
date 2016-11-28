@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\SearchBundle\Tests\Unit\Query\Factory;
 
-use Oro\Bundle\DataGridBundle\Datagrid\DatagridInterface;
 use Oro\Bundle\SearchBundle\Engine\Indexer;
 use Oro\Bundle\SearchBundle\Query\Factory\QueryFactory;
 use Oro\Bundle\SearchBundle\Query\IndexerQuery;
@@ -21,11 +20,10 @@ class QueryFactoryTest extends \PHPUnit_Framework_TestCase
             ->method('select')
             ->willReturn($query);
 
-        $grid   = $this->getMock(DatagridInterface::class);
         $config = [];
 
         $factory = new QueryFactory($indexer);
-        $result  = $factory->create($grid, $config);
+        $result  = $factory->create($config);
 
         $this->assertInstanceOf(IndexerQuery::class, $result);
     }

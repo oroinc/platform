@@ -10,6 +10,7 @@ class FilterUtility
     const CONDITION_KEY     = 'filter_condition';
     const BY_HAVING_KEY     = 'filter_by_having';
     const ENABLED_KEY       = 'enabled';
+    const VISIBLE_KEY       = 'visible';
     const TYPE_KEY          = 'type';
     const FRONTEND_TYPE_KEY = 'ftype';
     const DATA_NAME_KEY     = 'data_name';

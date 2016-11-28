@@ -17,6 +17,12 @@ define(function(require) {
             this.model = UnreadEmailsStateHolder.getModel();
             this.model.set('count', options.count);
             UnreadEmailsCounterView.__super__.initialize.apply(this, arguments);
+        },
+
+        render: function() {
+            UnreadEmailsCounterView.__super__.render.call(this);
+            this.$el.toggle(Number(this.model.get('count')) > 0);
+            return this;
         }
     });
 

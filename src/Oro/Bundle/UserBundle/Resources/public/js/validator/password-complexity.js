@@ -7,11 +7,13 @@ define([
     var defaultParam = {
         message: 'Invalid value {{ value }}.',
         requireMinLength: 0,
+        requireLowerCase: false,
         requireUpperCase: false,
         requireNumbers: false,
         requireSpecialCharacter: false,
         baseKey: 'oro.user.message.invalid_password.',
         requireMinLengthKey: 'min_length',
+        requireLowerCaseKey: 'lower_case',
         requireUpperCaseKey: 'upper_case',
         requireNumbersKey: 'numbers',
         requireSpecialCharacterKey: 'special_chars'
@@ -27,6 +29,10 @@ define([
 
             if (value.length < param.requireMinLength) {
                 messages.push(param.requireMinLengthKey);
+            }
+
+            if (Boolean(param.requireLowerCase) && !unicodeMatcher.matchLowerCase(value)) {
+                messages.push(param.requireLowerCaseKey);
             }
 
             if (Boolean(param.requireUpperCase) && !unicodeMatcher.matchUpperCase(value)) {

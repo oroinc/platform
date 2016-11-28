@@ -11,6 +11,7 @@ class PasswordComplexityConfigProvider
 {
     const CONFIG_MIN_LENGTH = 'oro_user.password_min_length';
     const CONFIG_NUMBERS = 'oro_user.password_numbers';
+    const CONFIG_LOWER_CASE = 'oro_user.password_lower_case';
     const CONFIG_UPPER_CASE = 'oro_user.password_upper_case';
     const CONFIG_SPECIAL_CHARS = 'oro_user.password_special_chars';
 
@@ -20,6 +21,7 @@ class PasswordComplexityConfigProvider
     public static $configKeys = [
         self::CONFIG_MIN_LENGTH => 'int',
         self::CONFIG_NUMBERS => 'bool',
+        self::CONFIG_LOWER_CASE => 'bool',
         self::CONFIG_UPPER_CASE => 'bool',
         self::CONFIG_SPECIAL_CHARS => 'bool',
     ];
@@ -58,6 +60,16 @@ class PasswordComplexityConfigProvider
     public function getMinLength()
     {
         return (int) $this->configManager->get(self::CONFIG_MIN_LENGTH);
+    }
+
+    /**
+     * Get the lower case requirement for passwords
+     *
+     * @return bool
+     */
+    public function getLowerCase()
+    {
+        return (bool) $this->configManager->get(self::CONFIG_LOWER_CASE);
     }
 
     /**

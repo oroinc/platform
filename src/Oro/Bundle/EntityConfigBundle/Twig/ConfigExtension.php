@@ -2,10 +2,14 @@
 
 namespace Oro\Bundle\EntityConfigBundle\Twig;
 
+use Doctrine\Common\Util\ClassUtils;
+
 use Symfony\Component\Routing\Exception\ExceptionInterface as RoutingException;
 use Symfony\Component\Routing\Exception\RouteNotFoundException;
 use Symfony\Component\Routing\RouterInterface;
+use Oro\Bundle\ConfigBundle\Exception\UnexpectedTypeException;
 
+use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityBundle\Tools\EntityClassNameHelper;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
@@ -24,19 +28,25 @@ class ConfigExtension extends \Twig_Extension
     /** @var RouterInterface */
     private $router;
 
+    /** @var DoctrineHelper */
+    protected $doctrineHelper;
+
     /**
      * @param ConfigManager         $configManager
      * @param RouterInterface       $router
      * @param EntityClassNameHelper $entityClassNameHelper
+     * @param DoctrineHelper        $doctrineHelper
      */
     public function __construct(
         ConfigManager $configManager,
         RouterInterface $router,
-        EntityClassNameHelper $entityClassNameHelper
+        EntityClassNameHelper $entityClassNameHelper,
+        DoctrineHelper $doctrineHelper
     ) {
         $this->configManager         = $configManager;
         $this->router                = $router;
         $this->entityClassNameHelper = $entityClassNameHelper;
+        $this->doctrineHelper        = $doctrineHelper;
     }
 
     /**
@@ -60,6 +70,7 @@ class ConfigExtension extends \Twig_Extension
             new \Twig_SimpleFunction('oro_entity_route', [$this, 'getClassRoute']),
             new \Twig_SimpleFunction('oro_entity_metadata_value', [$this, 'getClassMetadataValue']),
             new \Twig_SimpleFunction('oro_entity_view_link', [$this, 'getViewLink']),
+            new \Twig_SimpleFunction('oro_entity_object_view_link', [$this, 'getEntityViewLink']),
         ];
     }
 
@@ -210,11 +221,27 @@ class ConfigExtension extends \Twig_Extension
                 [
                     'id'         => $id,
                     'entityName' => $this->entityClassNameHelper->getUrlSafeClassName($className)
-
                 ]
             );
         }
 
         return null;
+    }
+
+    /**
+     * @param $entity object
+     *
+     * @return string|null
+     */
+    public function getEntityViewLink($entity)
+    {
+        if (!is_object($entity)) {
+            throw new UnexpectedTypeException($entity, 'object');
+        }
+
+        $className = ClassUtils::getClass($entity);
+        $id = $this->doctrineHelper->getSingleEntityIdentifier($entity);
+
+        return $this->getViewLink($className, $id);
     }
 }

@@ -50,7 +50,7 @@ class SearchEntityConfigListener
     public function postFlush(PostFlushConfigEvent $event)
     {
         if ($this->classNames) {
-            $this->searchMappingProvider->clearMappingCache();
+            $this->searchMappingProvider->clearCache();
             $this->searchIndexer->reindex($this->classNames);
 
             $this->classNames = [];

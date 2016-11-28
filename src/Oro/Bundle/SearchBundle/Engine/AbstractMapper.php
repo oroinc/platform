@@ -7,6 +7,7 @@ use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 
 use Oro\Bundle\SearchBundle\Provider\SearchMappingProvider;
 use Oro\Bundle\SearchBundle\Query\Query;
+use Oro\Bundle\SearchBundle\Query\Mode;
 
 abstract class AbstractMapper
 {
@@ -90,7 +91,7 @@ abstract class AbstractMapper
      *
      * @param string $entity
      *
-     * @return bool|array
+     * @return array
      */
     public function getEntityConfig($entity)
     {
@@ -107,9 +108,9 @@ abstract class AbstractMapper
     public function getEntityModeConfig($entity)
     {
         $config = $this->getEntityConfig($entity);
-        $value  = false;
+        $value  = Mode::NORMAL;
 
-        if (false !== $config) {
+        if ($config) {
             $value = $config['mode'];
         }
 

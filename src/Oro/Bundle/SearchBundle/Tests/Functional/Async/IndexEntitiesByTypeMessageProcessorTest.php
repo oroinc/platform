@@ -63,7 +63,6 @@ class IndexEntitiesByTypeMessageProcessorTest extends WebTestCase
         ]));
 
         $this->getSearchIndexer()->resetIndex(Item::class);
-        self::getMessageCollector()->enable();
         self::getMessageCollector()->clear();
 
         $this->getIndexEntitiesByTypeMessageProcessor()->process($message, $this->createQueueSessionMock());

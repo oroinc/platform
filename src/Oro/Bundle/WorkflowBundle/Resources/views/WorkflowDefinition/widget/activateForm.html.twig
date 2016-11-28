@@ -8,7 +8,8 @@
          'selectors': {
              'form': '#' ~ form.vars.id
          },
-         'buttonName': 'activate'
+         'buttonName': 'activate',
+         'error': error is defined ? error : null
      }|json_encode }}">
 
     {% if form.vars.errors|length > 0 %}

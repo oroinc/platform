@@ -1,0 +1,33 @@
+parameters:
+    oro_logger.detailed_logs_default_level: error
+services:
+    oro_logger.event_subscriber.console_command:
+        class: Oro\Bundle\LoggerBundle\EventSubscriber\ConsoleCommandSubscriber
+        arguments:
+            - '@logger'
+        tags:
+            - { name: kernel.event_subscriber }
+            - { name: monolog.logger, channel: console }
+
+    oro_logger.monolog.detailed_logs.handler.prototype:
+        abstract: true
+        class: Oro\Bundle\LoggerBundle\Monolog\DetailedLogsHandler
+        calls:
+            - ['setContainer', ['@service_container']]
+
+    oro_logger.monolog.detailed_logs.handler:
+        parent: oro_logger.monolog.detailed_logs.handler.prototype
+
+    oro_logger.message_factory:
+        class: Oro\Bundle\LoggerBundle\Mailer\MessageFactory
+        calls:
+            - ['setContainer', ['@service_container']]
+
+    swiftmailer.plugin.no_recipient.abstract:
+        class: Oro\Bundle\LoggerBundle\Mailer\NoRecipientPlugin
+        abstract: true
+
+    oro_logger.processor.log_message:
+        class: Monolog\Processor\PsrLogMessageProcessor
+        tags:
+            - { name: monolog.processor }

@@ -139,7 +139,7 @@ class GetRestJsonApiWithFiltersTest extends RestJsonApiTestCase
                         [
                             'status' => '400',
                             'title'  => 'filter constraint',
-                            'detail' => 'Filter "filter[wrongFieldName]" is not supported.',
+                            'detail' => 'The filter is not supported.',
                             'source' => [
                                 'parameter' => 'filter[wrongFieldName]'
                             ]

@@ -5,13 +5,13 @@
     "keywords": ["ORO", "BAP", "Test", "PhpUnit", "Utils", "Util"],
     "license": "MIT",
     "require": {
-        "php": ">=5.5.9"
+        "php": ">=5.6"
     },
     "require-dev": {
-      "doctrine/common": "~2.3",
-      "doctrine/dbal": "~2.3",
-      "doctrine/orm": "~2.3",
-      "symfony/filesystem": "~2.3"
+      "doctrine/common": "2.5.*",
+      "doctrine/dbal": "2.5.*",
+      "doctrine/orm": "2.5.*",
+      "symfony/filesystem": "2.8.*"
     },
     "autoload": {
         "psr-0": { "Oro\\Component\\TestUtils": "" }

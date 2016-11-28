@@ -124,7 +124,13 @@ class HttpImportHandler extends AbstractImportHandler
         if ($jobResult->isSuccessful()) {
             $this->removeImportingFile($inputFormat, $inputFilePrefix);
             $message = $this->translator->trans('oro.importexport.import.success');
-            $importInfo = $this->getImportInfo($counts);
+
+            $entityName = $this->processorRegistry->getProcessorEntityName(
+                ProcessorRegistry::TYPE_IMPORT,
+                $processorAlias
+            );
+
+            $importInfo = $this->getImportInfo($counts, $entityName);
         } else {
             $message = $this->translator->trans('oro.importexport.import.error');
         }
@@ -200,10 +206,11 @@ class HttpImportHandler extends AbstractImportHandler
     }
 
     /**
-     * @param $counts
+     * @param array $counts
+     * @param string $entityName
      * @return string
      */
-    protected function getImportInfo($counts)
+    protected function getImportInfo($counts, $entityName)
     {
         $add = 0;
         $update = 0;
@@ -220,7 +227,7 @@ class HttpImportHandler extends AbstractImportHandler
 
         $importInfo = $this->translator->trans(
             'oro.importexport.import.alert',
-            ['%added%' => $add, '%updated%' => $update]
+            ['%added%' => $add, '%updated%' => $update, '%entities%' => $this->getEntityPluralName($entityName)]
         );
 
         return $importInfo;

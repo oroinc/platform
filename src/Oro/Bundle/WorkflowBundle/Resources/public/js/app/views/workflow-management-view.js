@@ -128,16 +128,11 @@ define(function(require) {
                 router: 'oro_api_workflow_entity_get',
                 routingParams: {},
                 confirm: confirm,
-                requireConfirm: _.bind(function() {
-                    return this.model.get('steps').length > 1 &&
-                        (this.model.get('transitions').length +
-                            this.model.get('transition_definitions').length +
-                            this.model.get('attributes').length) > 0;
-                }, this)
+                requireConfirm: _.bind(this._requireConfirm, this)
             });
 
             this.$entitySelectEl.on('change', _.bind(function() {
-                if (!this.model.get('entity')) {
+                if (!this._requireConfirm()) {
                     this.model.set('entity', this.$entitySelectEl.val());
                 }
             }, this));
@@ -147,6 +142,13 @@ define(function(require) {
             }, this));
 
             this._preloadEntityFieldsData();
+        },
+
+        _requireConfirm: function() {
+            return (this.model.get('steps').length +
+                this.model.get('transitions').length +
+                this.model.get('transition_definitions').length +
+                this.model.get('attributes').length) > 1;
         },
 
         _preloadEntityFieldsData: function() {

@@ -18,4 +18,13 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
             $configuration->getConfigTreeBuilder()
         );
     }
+
+    public function testGetConfigKeyByName()
+    {
+        $this->assertEquals('oro_currency.foo', Configuration::getConfigKeyByName('foo'));
+        $this->assertEquals(
+            'oro_currency.default_currency',
+            Configuration::getConfigKeyByName(Configuration::KEY_DEFAULT_CURRENCY)
+        );
+    }
 }

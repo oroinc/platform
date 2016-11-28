@@ -1,0 +1,9 @@
+{% block _page_header_widget %}
+    {% set attr = layout_attr_defaults(attr, {
+        '~class': ' page-header'
+    }) %}
+
+    <header {{ block('block_attributes') }}>
+        {{ block_widget(block) }}
+    </header>
+{% endblock %}

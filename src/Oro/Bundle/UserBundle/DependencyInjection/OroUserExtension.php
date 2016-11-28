@@ -18,6 +18,8 @@ use Oro\Bundle\SecurityBundle\DependencyInjection\Extension\SecurityExtensionHel
  */
 class OroUserExtension extends Extension implements PrependExtensionInterface
 {
+    const ALIAS = 'oro_user';
+
     /**
      * {@inheritDoc}
      */
@@ -46,5 +48,13 @@ class OroUserExtension extends Extension implements PrependExtensionInterface
     {
         /** @var ExtendedContainerBuilder $container */
         SecurityExtensionHelper::makeFirewallLatest($container, 'main');
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getAlias()
+    {
+        return self::ALIAS;
     }
 }
