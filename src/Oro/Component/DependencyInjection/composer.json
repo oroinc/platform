@@ -5,8 +5,8 @@
     "keywords": ["ORO", "BAP", "DIC", "DependencyInjection", "injection"],
     "license": "MIT",
     "require": {
-        "php": ">=5.5.9",
-        "symfony/dependency-injection": "~2.3"
+        "php": ">=5.6",
+        "symfony/dependency-injection": "2.8.*"
     },
     "autoload": {
         "psr-0": { "Oro\\Component\\DependencyInjection": "" }

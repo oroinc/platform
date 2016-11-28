@@ -6,10 +6,13 @@ use Doctrine\Common\Persistence\ManagerRegistry;
 
 use Oro\Bundle\EmailBundle\Entity\EmailOrigin;
 use Oro\Bundle\EmailBundle\Sync\AbstractEmailSynchronizer;
+use Oro\Bundle\EmailBundle\Sync\AbstractEmailSynchronizationProcessor;
 use Oro\Bundle\EmailBundle\Sync\KnownEmailAddressCheckerFactory;
+use Oro\Bundle\EmailBundle\Sync\Model\SynchronizationProcessorSettings;
 use Oro\Bundle\ImapBundle\Async\Topics;
 use Oro\Bundle\ImapBundle\Connector\ImapConfig;
 use Oro\Bundle\ImapBundle\Connector\ImapConnectorFactory;
+use Oro\Bundle\ImapBundle\Exception\SocketTimeoutException;
 use Oro\Bundle\ImapBundle\Manager\ImapEmailGoogleOauth2Manager;
 use Oro\Bundle\ImapBundle\Manager\ImapEmailManager;
 use Oro\Bundle\ImapBundle\Entity\UserEmailOrigin;
@@ -100,5 +103,30 @@ class ImapEmailSynchronizer extends AbstractEmailSynchronizer
             new ImapEmailManager($this->connectorFactory->createImapConnector($config)),
             $this->getKnownEmailAddressChecker()
         );
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function delegateToProcessor(
+        EmailOrigin $origin,
+        AbstractEmailSynchronizationProcessor $processor,
+        SynchronizationProcessorSettings $settings = null
+    ) {
+        try {
+            parent::delegateToProcessor($origin, $processor, $settings);
+        } catch (SocketTimeoutException $ex) {
+            $this->logger->warning(
+                sprintf(
+                    'Exit because of "%s" origin\'s socket timed out. Error: "%s"',
+                    $origin->getId(),
+                    $ex->getMessage()
+                ),
+                $ex->getSocketMetadata()
+            );
+            $this->changeOriginSyncState($origin, self::SYNC_CODE_SUCCESS);
+
+            return;
+        }
     }
 }

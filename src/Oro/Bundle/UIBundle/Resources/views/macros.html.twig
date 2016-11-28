@@ -817,6 +817,10 @@
         ]
 #}
 {% macro buttonType(parameters) %}
+    {% set defaultParameters = {
+        'type' : 'button'
+    } %}
+    {% set parameters = defaultParameters|merge(parameters) %}
     <div class="btn-group">
         <button type="{{ parameters.type }}" class="btn {% if (parameters.class is defined) %}{{ parameters.class }}{% endif %}{% if (parameters.action is defined) %} action-button{% endif %}"
                 {% if (parameters.action is defined) %}data-action="{{ parameters.action }}"{% endif %}

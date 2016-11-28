@@ -24,6 +24,7 @@ api:
                         password:
                             exclude: false # set manually because this field is excluded globally
                             form_options:
+                                property_path: plainPassword
                                 constraints:
                                     - NotNull: ~
                                     - NotBlank: ~

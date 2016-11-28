@@ -1,0 +1,12 @@
+services:
+    oro_scope.scoped_entity_type:
+        class: 'Oro\Bundle\ScopeBundle\Form\Type\ScopedDataType'
+        arguments:
+            - "@doctrine"
+        tags:
+            - { name: form.type, alias: oro_scoped_data_type }
+
+    oro_scope.for_scope_criteria_resolver:
+        class: 'Oro\Bundle\ScopeBundle\Form\FormScopeCriteriaResolver'
+        arguments:
+            - '@oro_scope.scope_manager'

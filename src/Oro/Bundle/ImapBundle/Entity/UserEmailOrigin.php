@@ -74,7 +74,7 @@ class UserEmailOrigin extends EmailOrigin
      *
      * @var string
      *
-     * @ORM\Column(name="imap_password", type="string", length=100, nullable=true)
+     * @ORM\Column(name="imap_password", type="text", length=16777216, nullable=true)
      */
     protected $password;
 

@@ -7,43 +7,6 @@ parameters:
     oro_workflow.entity.transition_trigger_event.class: Oro\Bundle\WorkflowBundle\Entity\TransitionEventTrigger
 
 services:
-    oro_workflow.attribute_guesser:
-        class: 'Oro\Bundle\ActionBundle\Model\AttributeGuesser'
-        arguments:
-            - '@form.registry'
-            - '@doctrine'
-            - '@oro_entity_config.provider.entity'
-            - '@oro_entity_config.provider.form'
-        calls:
-            # mapping from doctrine type to attribute parameters
-            - [addDoctrineTypeMapping, ["string", "string"]]
-            - [addDoctrineTypeMapping, ["integer", "integer"]]
-            - [addDoctrineTypeMapping, ["smallint", "integer"]]
-            - [addDoctrineTypeMapping, ["bigint", "integer"]]
-            - [addDoctrineTypeMapping, ["boolean", "boolean"]]
-            - [addDoctrineTypeMapping, ["decimal", "float"]]
-            - [addDoctrineTypeMapping, ["date", "object", { class: "DateTime" }]]
-            - [addDoctrineTypeMapping, ["time", "object", { class: "DateTime" }]]
-            - [addDoctrineTypeMapping, ["datetime", "object", { class: "DateTime" }]]
-            - [addDoctrineTypeMapping, ["datetimetz", "object", { class: "DateTime" }]]
-            - [addDoctrineTypeMapping, ["text", "string"]]
-            - [addDoctrineTypeMapping, ["array", "array"]]
-            - [addDoctrineTypeMapping, ["simple_array", "array"]]
-            - [addDoctrineTypeMapping, ["json_array", "array"]]
-            - [addDoctrineTypeMapping, ["float", "float"]]
-            - [addDoctrineTypeMapping, ["guid", "string"]]
-            # custom types
-            - [addDoctrineTypeMapping, ["percent", "float"]]
-            - [addDoctrineTypeMapping, ["money", "float"]]
-            # mapping from attribute type to form parameters
-            - [addFormTypeMapping, ["string", "text"]]
-            - [addFormTypeMapping, ["int", "integer", { precision: 0 }]]
-            - [addFormTypeMapping, ["integer", "integer", { precision: 0 }]]
-            - [addFormTypeMapping, ["bool", "checkbox"]]
-            - [addFormTypeMapping, ["boolean", "checkbox"]]
-            - [addFormTypeMapping, ["float", "number"]]
-        deprecated: The "%service_id%" service is deprecated since since 1.10. Use "oro_action.attribute_guesser" instead
-
     oro_workflow.datagrid.action.workflow_activate:
         class: 'Oro\Bundle\WorkflowBundle\Datagrid\Action\WorkflowActivateAction'
         scope: prototype
@@ -115,12 +78,27 @@ services:
         tags:
             - { name: monolog.logger, channel: oro_workflow }
 
+    oro_workflow.registry.definition_filter.features:
+        class: 'Oro\Bundle\WorkflowBundle\Model\Filter\FeatureCheckerWorkflowRegistryFilter'
+        public: false
+        arguments:
+            - '@oro_featuretoggle.checker.feature_checker'
+
+    oro_workflow.registry.definition_filter.scopes:
+        class: Oro\Bundle\WorkflowBundle\Model\Filter\WorkflowDefinitionScopesRegistryFilter
+        public: false
+        arguments:
+            - '@oro_scope.scope_manager'
+            - '@doctrine'
+
     oro_workflow.registry:
         class: 'Oro\Bundle\WorkflowBundle\Model\WorkflowRegistry'
         arguments:
             - '@doctrine'
             - '@oro_workflow.workflow_assembler'
-            - '@oro_featuretoggle.checker.feature_checker'
+        calls:
+            - ['addDefinitionFilter', ['@oro_workflow.registry.definition_filter.features']]
+            - ['addDefinitionFilter', ['@oro_workflow.registry.definition_filter.scopes']]
 
     oro_workflow.permission_registry:
         class: 'Oro\Bundle\WorkflowBundle\Model\WorkflowPermissionRegistry'
@@ -189,6 +167,7 @@ services:
         arguments:
             - '@oro_workflow.changes.event.dispatcher'
             - '@doctrine'
+            - '@oro_workflow.manager'
 
     oro_workflow.process.cron_scheduler:
         class: 'Oro\Bundle\WorkflowBundle\Cron\ProcessTriggerCronScheduler'
@@ -364,8 +343,17 @@ services:
             - { name: monolog.logger, channel: oro_workflow }
 
     oro_workflow.listener.grids_subscriber:
-        class: Oro\Bundle\WorkflowBundle\EventListener\GridsSubscriber
+        class: 'Oro\Bundle\WorkflowBundle\EventListener\GridsSubscriber'
         arguments:
             - '@oro_featuretoggle.checker.feature_checker'
         tags:
             - { name: kernel.event_subscriber }
+
+    oro_workflow.manager.workflow_scope:
+        class: 'Oro\Bundle\WorkflowBundle\Scope\WorkflowScopeManager'
+        arguments:
+            - '@doctrine'
+            - '@oro_scope.scope_manager'
+            - '@logger'
+        tags:
+            - { name: monolog.logger, channel: oro_workflow }

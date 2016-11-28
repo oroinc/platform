@@ -14,6 +14,7 @@ class PasswordFieldOptionsProvider
      * @var array Map of config keys and suggest password character subsets
      */
     public static $suggestPasswordRulesMap = [
+        PasswordComplexityConfigProvider::CONFIG_LOWER_CASE => 'lower_case',
         PasswordComplexityConfigProvider::CONFIG_UPPER_CASE => 'upper_case',
         PasswordComplexityConfigProvider::CONFIG_NUMBERS => 'numbers',
         PasswordComplexityConfigProvider::CONFIG_SPECIAL_CHARS => 'special_chars',
@@ -69,6 +70,7 @@ class PasswordFieldOptionsProvider
         return [
             'requireMinLength' => $this->passwordConfigProvider->getMinLength(),
             'requireNumbers' => $this->passwordConfigProvider->getNumbers(),
+            'requireLowerCase' => $this->passwordConfigProvider->getLowerCase(),
             'requireUpperCase' => $this->passwordConfigProvider->getUpperCase(),
             'requireSpecialCharacter' => $this->passwordConfigProvider->getSpecialChars(),
         ];

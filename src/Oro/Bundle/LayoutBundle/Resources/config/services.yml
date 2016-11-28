@@ -1,7 +1,6 @@
 parameters:
     oro_layout.layout_factory_builder.class:    Oro\Component\Layout\LayoutFactoryBuilder
     oro_layout.layout_manager.class:            Oro\Component\Layout\LayoutManager
-    oro_layout.form_layout_builder.class:       Oro\Bundle\LayoutBundle\Layout\Form\GroupingFormLayoutBuilder
 
 services:
     oro_layout.extension:
@@ -20,6 +19,7 @@ services:
         class: %oro_layout.layout_factory_builder.class%
         arguments:
             - '@oro_layout.processor.expression'
+            - "@=!parameter('kernel.debug') ? service('oro_layout.cache.block_view_cache') : null"
         calls:
             - [addExtension, ['@oro_layout.extension']]
             - [addExtension, ['@oro_layout.theme_extension']]
@@ -29,11 +29,6 @@ services:
         class: %oro_layout.layout_manager.class%
         arguments:
             - '@oro_layout.layout_factory_builder'
-
-    oro_layout.form_layout_builder:
-        class: %oro_layout.form_layout_builder.class%
-        calls:
-            - [addSimpleFormTypes, [['choice', 'datetime', 'date', 'time']]]
 
     oro_layout.text.helper:
         class: Oro\Component\Layout\Templating\TextHelper
@@ -57,13 +52,6 @@ services:
         tags:
             - { name: layout.context_configurator, priority: -100 }
 
-    oro_layout.layout_context_configurator.form:
-        class: Oro\Bundle\LayoutBundle\Layout\Extension\FormContextConfigurator
-        arguments:
-            - '@service_container'
-        tags:
-            - { name: layout.context_configurator, priority: -100 }
-
     oro_layout.layout_context_configurator.route:
         class: Oro\Bundle\LayoutBundle\Layout\Extension\RouteContextConfigurator
         calls:
@@ -73,6 +61,13 @@ services:
 
     oro_layout.layout_context_configurator.expression:
         class: Oro\Bundle\LayoutBundle\Layout\Extension\ExpressionContextConfigurator
+        tags:
+            - { name: layout.context_configurator }
+
+    oro_layout.layout_context_configurator.last_modification_date:
+        class: Oro\Bundle\LayoutBundle\Layout\Extension\LastModifiedDateContextConfigurator
+        arguments:
+            - '@oro_layout.theme_extension.resource_provider.cache'
         tags:
             - { name: layout.context_configurator }
 
@@ -96,7 +91,7 @@ services:
         arguments:
             - '@oro_layout.expression_language.expression_manipulator'
         tags:
-            - { name: oro_layout.expression.encoder, format: json }
+            - { name: layout.expression.encoder, format: json }
 
     oro_layout.assetic.layout_formula_loader:
         public: false
@@ -191,3 +186,26 @@ services:
             - '@oro_layout.loader.image_filter'
         tags:
             - { name: kernel.event_listener, event: kernel.request }
+
+    oro_layout.block_view_serializer:
+        class: Symfony\Component\Serializer\Serializer
+        arguments: [{}, {'json': '@oro_layout.block_view_serializer.json_encoder'}]
+
+    oro_layout.block_view_serializer.json_encoder:
+        class: Symfony\Component\Serializer\Encoder\JsonEncoder
+
+    oro_layout.block_view_serializer.block_view_normalizer:
+        class: Oro\Bundle\LayoutBundle\Layout\Serializer\BlockViewNormalizer
+        tags:
+            - { name: layout.block_view_serializer.normalizer }
+
+    oro_layout.block_view_serializer.expression_normalizer:
+        class: Oro\Bundle\LayoutBundle\Layout\Serializer\ExpressionNormalizer
+        arguments: [{}, {}]
+        tags:
+            - { name: layout.block_view_serializer.normalizer }
+
+    oro_layout.option_value_bag_normaizer:
+        class: Oro\Bundle\LayoutBundle\Layout\Serializer\OptionValueBagNormalizer
+        tags:
+            - { name: layout.block_view_serializer.normalizer }

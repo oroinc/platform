@@ -41,7 +41,7 @@ class WorkflowTransitionType extends AbstractType
      * - "workflow_item" - required, instance of WorkflowItem entity
      * - "transition_name" - required, name of transition
      *
-     * @param OptionsResolver $resolver
+     * {@inheritdoc}
      */
     public function configureOptions(OptionsResolver $resolver)
     {
@@ -57,7 +57,7 @@ class WorkflowTransitionType extends AbstractType
             'constraints',
             function (Options $options, $constraints) {
                 if (!$constraints) {
-                    $constraints = array();
+                    $constraints = [];
                 }
 
                 $constraints[] = new TransitionIsAllowed(

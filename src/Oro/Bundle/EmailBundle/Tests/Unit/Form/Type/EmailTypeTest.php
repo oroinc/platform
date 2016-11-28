@@ -23,6 +23,7 @@ use Oro\Bundle\EmailBundle\Form\Type\EmailAttachmentsType;
 use Oro\Bundle\EmailBundle\Form\Type\EmailTemplateSelectType;
 use Oro\Bundle\EmailBundle\Form\Type\EmailAddressFromType;
 use Oro\Bundle\EmailBundle\Form\Type\EmailAddressRecipientsType;
+use Oro\Bundle\EntityBundle\Provider\EntityNameResolver;
 use Oro\Bundle\UserBundle\Entity\User;
 
 class EmailTypeTest extends TypeTestCase
@@ -173,7 +174,9 @@ class EmailTypeTest extends TypeTestCase
         $eventDispatcher = $this->getMockBuilder('Symfony\Component\EventDispatcher\EventDispatcher')
             ->disableOriginalConstructor()
             ->getMock();
-        $entityTitleResolver = $this->getMock('Oro\Bundle\SearchBundle\Resolver\EntityTitleResolverInterface');
+        $entityTitleResolver = $this->getMockBuilder(EntityNameResolver::class)
+                    ->disableOriginalConstructor()
+                    ->getMock();
 
         $contextsSelectType = new ContextsSelectType(
             $em,

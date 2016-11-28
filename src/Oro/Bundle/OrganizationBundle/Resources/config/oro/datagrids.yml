@@ -181,8 +181,6 @@ datagrids:
                     data_name: hasCurrentBusinessUnit
             default:
                 hasCurrentBusinessUnit: %oro_datagrid.extension.orm_sorter.class%::DIRECTION_DESC
-                lastName: %oro_datagrid.extension.orm_sorter.class%::DIRECTION_ASC
-
         options:
             entityHint: user
             rowSelection:

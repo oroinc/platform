@@ -100,6 +100,7 @@ datagrids:
                 select:
                     - partial eu.{id, email}
                     - e
+                    - eu.receivedAt as receivedAt
                     - eb.textBody AS body_content
                     - >
                         (SELECT COUNT(_ec.id)
@@ -163,8 +164,8 @@ datagrids:
                 label:
                 frontend_type: html
                 template: OroEmailBundle:Email:Datagrid/Property/attachments.html.twig
-            sentAt:
-                data_name: email.sentAt
+            receivedAt:
+                data_name: receivedAt
                 type: twig
                 label: oro.email.date.label
                 frontend_type: html
@@ -174,8 +175,8 @@ datagrids:
         sorters:
             columns:
                 subject:  { data_name: e.subject }
-                sentAt:   { data_name: e.sentAt }
-            default: { sentAt: %oro_datagrid.extension.orm_sorter.class%::DIRECTION_DESC }
+                receivedAt:   { data_name: receivedAt }
+            default: { receivedAt: %oro_datagrid.extension.orm_sorter.class%::DIRECTION_DESC }
         options:
             entityHint: email
 
@@ -399,6 +400,7 @@ datagrids:
                 where:
                     and:
                         - f.type IN ('%oro_email.email_folder.model.class%::INBOX', '%oro_email.email_folder.model.class%::OTHER')
+                        - f.id > 0
         columns:
             receivedAt:
                 type: twig
@@ -430,6 +432,7 @@ datagrids:
                 where:
                     and:
                         - f.type = '%oro_email.email_folder.model.class%::SENT'
+                        - f.id > 0
         columns:
             sentAt:
                 data_name: email.sentAt

@@ -1,0 +1,27 @@
+services:
+    oro_embedded_form.block_type.embed_form:
+        class: Oro\Bundle\EmbeddedFormBundle\Layout\Block\Type\EmbedFormType
+        tags:
+            - { name: layout.block_type, alias: embed_form }
+
+    oro_embedded_form.block_type.embed_form_fields:
+        class: Oro\Bundle\EmbeddedFormBundle\Layout\Block\Type\EmbedFormFieldsType
+        arguments:
+            - '@oro_embedded_form.form_layout_builder'
+        tags:
+            - { name: layout.block_type, alias: embed_form_fields }
+
+    oro_embedded_form.block_type.embed_form_start:
+        class: Oro\Bundle\EmbeddedFormBundle\Layout\Block\Type\EmbedFormStartType
+        tags:
+            - { name: layout.block_type, alias: embed_form_start }
+
+    oro_embedded_form.block_type.embed_form_end:
+        class: Oro\Bundle\EmbeddedFormBundle\Layout\Block\Type\EmbedFormEndType
+        tags:
+            - { name: layout.block_type, alias: embed_form_end }
+
+    oro_embedded_form.block_type.embed_form_field:
+        class: Oro\Bundle\EmbeddedFormBundle\Layout\Block\Type\EmbedFormFieldType
+        tags:
+            - { name: layout.block_type, alias: embed_form_field }

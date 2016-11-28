@@ -149,8 +149,7 @@ Single workflow configuration has next properties:
     Contains configuration for Workflow Restrictions
 * **defaults** - node for default workflow configuration values that can be changed in UI later. 
     * **active** - determine if workflow should be active right after first load of configuration.
-
-
+* **scopes** - list of scopes configurations used for filtering workflow by scopes
 
 Example
 -------
@@ -168,6 +167,9 @@ workflows:                                                    # Root elements
         exclusive_active_groups: [b2b_sales]                  # Only one active workflow from 'b2b_sales' group can be active
         exclusive_record_groups:
             - sales                                           # Only one workflow from group 'sales' can be started at time for the entity
+        scopes:
+            -                                                 # Definition of configuration for one scope
+                scope_field: 42                               
         attributes:                                           # configuration for Attributes
                                                               # ...
         steps:                                                # configuration for Steps

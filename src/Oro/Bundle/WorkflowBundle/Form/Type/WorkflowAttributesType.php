@@ -6,8 +6,8 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Exception\InvalidConfigurationException;
 use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 use Symfony\Component\OptionsResolver\Options;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\PropertyAccess\PropertyPath;
 use Symfony\Component\Translation\TranslatorInterface;
 
@@ -182,7 +182,7 @@ class WorkflowAttributesType extends AbstractType
                 );
             }
             if (null === $attributeOptions) {
-                $attributeOptions = array();
+                $attributeOptions = [];
             }
             $fieldName = $attribute->getName();
             if (isset($attributes[$fieldName])) {
@@ -260,7 +260,7 @@ class WorkflowAttributesType extends AbstractType
 
         // set default form options
         if (!isset($attributeOptions['options'])) {
-            $attributeOptions['options'] = array();
+            $attributeOptions['options'] = [];
         }
 
         // try to guess form type and form options
@@ -339,49 +339,50 @@ class WorkflowAttributesType extends AbstractType
      * - "workflow"                 - optional, instance of Workflow
      * - "disable_attribute_fields" - optional, a flag to disable all attributes fields
      *
-     * @param OptionsResolverInterface $resolver
+     * {@inheritdoc}
      */
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    public function configureOptions(OptionsResolver $resolver)
     {
-        $resolver->setRequired(array('workflow_item'));
+        $resolver->setRequired(['workflow_item']);
 
         $resolver->setDefaults(
-            array(
+            [
                 'workflow' => function (Options $options, $workflow) {
                     if (!$workflow) {
                         $workflowName = $options['workflow_item']->getWorkflowName();
                         $workflow = $this->workflowRegistry->getWorkflow($workflowName);
                     }
+
                     return $workflow;
                 }
-            )
+            ]
         );
-        $resolver->setOptional(
-            array(
+        $resolver->setDefined(
+            [
                 'attribute_fields',
                 'attribute_default_values',
                 'form_init',
                 'workflow'
-            )
+            ]
         );
 
         $resolver->setDefaults(
-            array(
+            [
                 'data_class' => 'Oro\Bundle\WorkflowBundle\Model\WorkflowData',
                 'disable_attribute_fields' => false,
-                'attribute_fields' => array(),
-                'attribute_default_values' => array()
-            )
+                'attribute_fields' => [],
+                'attribute_default_values' => []
+            ]
         );
 
         $resolver->setAllowedTypes(
-            array(
+            [
                 'workflow_item' => 'Oro\Bundle\WorkflowBundle\Entity\WorkflowItem',
                 'workflow' => 'Oro\Bundle\WorkflowBundle\Model\Workflow',
                 'attribute_fields' => 'array',
                 'attribute_default_values' => 'array',
                 'form_init' => 'Oro\Component\Action\Action\ActionInterface',
-            )
+            ]
         );
     }
 

@@ -13,6 +13,8 @@ class PasswordComplexity extends Constraint
 
     public $requireMinLengthKey = 'min_length';
 
+    public $requireLowerCaseKey = 'lower_case';
+
     public $requireUpperCaseKey = 'upper_case';
 
     public $requireNumbersKey = 'numbers';
@@ -23,6 +25,8 @@ class PasswordComplexity extends Constraint
      * @var int Known constraint options
      */
     public $requireMinLength;
+
+    public $requireLowerCase;
 
     public $requireUpperCase;
 

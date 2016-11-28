@@ -370,7 +370,7 @@ define(function(require) {
                 stepFrom
                     .getAllowedTransitions(this.model)
                     .add(transition);
-                stepFrom.trigger('change');
+                stepFrom.trigger('change', stepFrom, {});
             }
         },
 

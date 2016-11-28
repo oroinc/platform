@@ -12,6 +12,8 @@ use Oro\Bundle\EntityExtendBundle\Migration\Extension\ExtendExtensionAwareInterf
 use Oro\Bundle\EntityExtendBundle\Migration\OroOptions;
 use Oro\Bundle\MigrationBundle\Migration\Installation;
 use Oro\Bundle\MigrationBundle\Migration\QueryBag;
+use Oro\Bundle\ScopeBundle\Migration\Extension\ScopeExtensionAwareInterface;
+use Oro\Bundle\ScopeBundle\Migration\Extension\ScopeExtensionAwareTrait;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyMethods)
@@ -20,8 +22,11 @@ use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 class OroTestFrameworkBundleInstaller implements
     Installation,
     ActivityExtensionAwareInterface,
-    ExtendExtensionAwareInterface
+    ExtendExtensionAwareInterface,
+    ScopeExtensionAwareInterface
 {
+    use ScopeExtensionAwareTrait;
+
     /** @var ActivityExtension */
     protected $activityExtension;
 
@@ -49,7 +54,7 @@ class OroTestFrameworkBundleInstaller implements
      */
     public function getMigrationVersion()
     {
-        return 'v1_3';
+        return 'v1_4';
     }
 
     /**
@@ -73,6 +78,9 @@ class OroTestFrameworkBundleInstaller implements
         $this->createTestProductTypeTable($schema);
         $this->createTestAuditDataTables($schema);
 
+        /** Entity extensions generation */
+        $this->extendScopeForTestActivity($schema);
+
         /** Foreign keys generation **/
         $this->addTestSearchItemForeignKeys($schema);
         $this->addTestSearchItemValueForeignKeys($schema);
@@ -81,6 +89,16 @@ class OroTestFrameworkBundleInstaller implements
         $this->addTestProductForeignKeys($schema);
 
         $this->activityExtension->addActivityAssociation($schema, 'test_activity', 'test_activity_target', true);
+
+        // add activity association if calendar package is installed
+        if ($schema->hasTable('oro_calendar_event')) {
+            $this->activityExtension->addActivityAssociation(
+                $schema,
+                'oro_calendar_event',
+                'test_activity_target',
+                true
+            );
+        }
     }
 
     /**
@@ -526,6 +544,14 @@ class OroTestFrameworkBundleInstaller implements
             ['id'],
             ['onDelete' => null, 'onUpdate' => null]
         );
+    }
+
+    /**
+     * @param Schema $schema
+     */
+    private function extendScopeForTestActivity($schema)
+    {
+        $this->scopeExtension->addScopeAssociation($schema, 'test_activity', 'test_activity', 'id');
     }
 
     /**

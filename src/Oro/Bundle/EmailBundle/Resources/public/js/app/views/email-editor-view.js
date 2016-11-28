@@ -216,9 +216,9 @@ define(function(require) {
                 }
             }
             if (this.model.get('bodyFooter')) {
-                body += this.model.get('bodyFooter');
+                body = '<body>' + body;
+                body += this.model.get('bodyFooter') + '</body>';
             }
-
             return body;
         }
     });

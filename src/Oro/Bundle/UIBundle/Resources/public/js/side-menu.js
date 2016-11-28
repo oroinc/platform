@@ -56,7 +56,7 @@ define(['jquery', 'backbone', './mediator', 'jquery-ui'], function($, Backbone, 
             var self = this;
             $groups.add($root).each(function(i) {
                 var $group = $(this);
-                var $header = $group.find('a[href=#]>span').first();
+                var $header = $group.find('a[href="#"]>span').first();
                 var $target = $group.find('.accordion-body').first();
 
                 var targetId = self._getGroupId(i + 1);
