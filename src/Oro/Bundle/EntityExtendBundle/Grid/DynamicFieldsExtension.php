@@ -2,12 +2,14 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Grid;
 
+use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Component\PhpUtils\ArrayUtil;
 
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\DataGridBundle\Datagrid\DatagridGuesser;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
+use Oro\Bundle\EntityExtendBundle\Extend\RelationType;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 
 class DynamicFieldsExtension extends AbstractFieldsExtension
@@ -63,7 +65,7 @@ class DynamicFieldsExtension extends AbstractFieldsExtension
             if ($extendConfig->is('owner', ExtendScope::OWNER_CUSTOM)
                 && ExtendHelper::isFieldAccessible($extendConfig)
                 && $datagridConfigProvider->getConfigById($fieldId)->is('is_visible')
-                && $datagridConfigProvider->getConfigById($fieldId)->is('with_join')
+                && $this->isWithJoin($fieldId, $datagridConfigProvider)
             ) {
                 $viewConfig = $viewConfigProvider->getConfig($entityClassName, $fieldId->getFieldName());
                 $fields[] = [
@@ -93,5 +95,19 @@ class DynamicFieldsExtension extends AbstractFieldsExtension
         if ($this->getFieldConfig('datagrid', $field)->is('show_filter')) {
             $columnOptions[DatagridGuesser::FILTER]['enabled'] = true;
         }
+    }
+
+    /**
+     * @param FieldConfigId     $fieldConfigId
+     * @param ConfigProvider    $datagridConfigProvider
+     * @return bool
+     */
+    protected function isWithJoin(FieldConfigId $fieldConfigId, ConfigProvider $datagridConfigProvider)
+    {
+        $relationArray = [RelationType::MANY_TO_ONE, RelationType::ONE_TO_ONE];
+        $fieldType = $fieldConfigId->getFieldType();
+
+        return in_array($fieldType, $relationArray) ?
+            $datagridConfigProvider->getConfigById($fieldConfigId)->is('with_join') : true;
     }
 }
