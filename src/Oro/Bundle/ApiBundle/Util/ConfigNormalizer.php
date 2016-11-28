@@ -4,6 +4,7 @@ namespace Oro\Bundle\ApiBundle\Util;
 
 use Oro\Component\EntitySerializer\ConfigNormalizer as BaseConfigNormalizer;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionFieldConfig as FieldConfig;
+use Oro\Bundle\ApiBundle\Request\DataType;
 
 /**
  * This class should be synchronized with the config normalizer for ObjectNormalizer.
@@ -21,6 +22,9 @@ class ConfigNormalizer extends BaseConfigNormalizer
             foreach ($config[ConfigUtil::FIELDS] as $fieldName => $field) {
                 if (!is_array($field)) {
                     continue;
+                }
+                if ($this->isExtendedAssociation($field)) {
+                    $field[ConfigUtil::PROPERTY_PATH] = ConfigUtil::IGNORE_PROPERTY_PATH;
                 }
                 if ($this->isIgnoredField($field)) {
                     $toRemove[] = $fieldName;
@@ -92,5 +96,17 @@ class ConfigNormalizer extends BaseConfigNormalizer
         return
             !empty($config[ConfigUtil::PROPERTY_PATH])
             && ConfigUtil::IGNORE_PROPERTY_PATH === $config[ConfigUtil::PROPERTY_PATH];
+    }
+
+    /**
+     * @param array $config The config of a field
+     *
+     * @return bool
+     */
+    protected function isExtendedAssociation(array $config)
+    {
+        return
+            !empty($config[FieldConfig::DATA_TYPE])
+            && DataType::isExtendedAssociation($config[FieldConfig::DATA_TYPE]);
     }
 }
