@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\EventListener\Extension;
 
-use Oro\Component\MessageQueue\Client\MessageProducerInterface;
-
+use Oro\Bundle\MessageQueueBundle\Test\Unit\MessageQueueExtension;
+use Oro\Bundle\WorkflowBundle\Async\Topics;
 use Oro\Bundle\WorkflowBundle\Entity\EventTriggerInterface;
 use Oro\Bundle\WorkflowBundle\Entity\ProcessDefinition;
 use Oro\Bundle\WorkflowBundle\Entity\ProcessJob;
@@ -15,9 +15,13 @@ use Oro\Bundle\WorkflowBundle\Model\ProcessData;
 use Oro\Bundle\WorkflowBundle\Model\ProcessHandler;
 use Oro\Bundle\WorkflowBundle\Model\ProcessLogger;
 use Oro\Bundle\WorkflowBundle\Model\ProcessSchedulePolicy;
+use Oro\Component\MessageQueue\Client\Message;
+use Oro\Component\MessageQueue\Client\MessagePriority;
 
 class ProcessTriggerExtensionTest extends AbstractEventTriggerExtensionTest
 {
+    use MessageQueueExtension;
+
     /** @var \PHPUnit_Framework_MockObject_MockObject|ProcessTriggerRepository */
     protected $repository;
 
@@ -32,9 +36,6 @@ class ProcessTriggerExtensionTest extends AbstractEventTriggerExtensionTest
 
     /** @var \PHPUnit_Framework_MockObject_MockObject|ProcessSchedulePolicy */
     protected $schedulePolicy;
-
-    /** @var \PHPUnit_Framework_MockObject_MockObject|MessageProducerInterface */
-    protected $messageProducer;
 
     protected function setUp()
     {
@@ -65,18 +66,13 @@ class ProcessTriggerExtensionTest extends AbstractEventTriggerExtensionTest
 
         $this->schedulePolicy = $this->getMock(ProcessSchedulePolicy::class);
 
-        $this->messageProducer = $this->getMockBuilder(MessageProducerInterface::class)
-            ->disableOriginalConstructor()
-            ->getMock()
-        ;
-
         $this->extension = new ProcessTriggerExtension(
             $this->doctrineHelper,
             $this->handler,
             $this->logger,
             $this->triggerCache,
             $this->schedulePolicy,
-            $this->messageProducer
+            self::getMessageProducer()
         );
     }
 
@@ -373,6 +369,8 @@ class ProcessTriggerExtensionTest extends AbstractEventTriggerExtensionTest
         $this->handler->expects($this->once())->method('finishTrigger')->with($expectedTrigger, $expectedData);
 
         $this->extension->process($this->entityManager);
+
+        self::assertMessagesEmpty(Topics::EXECUTE_PROCESS_JOB);
     }
 
     public function testProcessHandledProcessUnmetPreConditions()
@@ -401,6 +399,8 @@ class ProcessTriggerExtensionTest extends AbstractEventTriggerExtensionTest
         $this->handler->expects($this->never())->method('finishTrigger')->with($expectedTrigger, $expectedData);
 
         $this->extension->process($this->entityManager);
+
+        self::assertMessagesEmpty(Topics::EXECUTE_PROCESS_JOB);
     }
 
     /**
@@ -442,6 +442,7 @@ class ProcessTriggerExtensionTest extends AbstractEventTriggerExtensionTest
         $this->extension->process($this->entityManager);
 
         $this->assertAttributeEmpty('queuedJobs', $this->extension);
+        self::assertMessagesCount(Topics::EXECUTE_PROCESS_JOB, 3);
     }
 
     /**
@@ -563,6 +564,11 @@ class ProcessTriggerExtensionTest extends AbstractEventTriggerExtensionTest
         $this->handler->expects($this->never())->method('handleTrigger');
 
         $this->extension->process($this->entityManager);
+
+        self::assertMessageSent(
+            Topics::EXECUTE_PROCESS_JOB,
+            new Message(['process_job_id' => null], MessagePriority::NORMAL)
+        );
     }
 
     public function testProcessRemovedEntityHashes()
@@ -591,6 +597,7 @@ class ProcessTriggerExtensionTest extends AbstractEventTriggerExtensionTest
         $this->extension->process($this->entityManager);
 
         $this->assertAttributeEmpty('removedEntityHashes', $this->extension);
+        self::assertMessagesEmpty(Topics::EXECUTE_PROCESS_JOB);
     }
 
     /**
