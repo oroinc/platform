@@ -80,4 +80,8 @@
     transition: all linear 150ms;
 }
 
+@function strip-units($value) {
+    @return $value / ($value * 0 + 1);
+}
+
 @import 'mixins-for-components';
