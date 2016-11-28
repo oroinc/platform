@@ -150,6 +150,7 @@ class DynamicFieldsExtensionTest extends AbstractFieldsExtensionTestCase
         );
         $datagridFieldConfig->set('show_filter', true);
         $datagridFieldConfig->set('is_visible', DatagridScope::IS_VISIBLE_TRUE);
+        $datagridFieldConfig->set('with_join', true);
 
         $viewFieldConfig = new Config(
             new FieldConfigId('view', self::ENTITY_CLASS, self::FIELD_NAME, $fieldType)
