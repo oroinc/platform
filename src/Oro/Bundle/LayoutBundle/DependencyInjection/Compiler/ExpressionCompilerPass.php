@@ -8,10 +8,10 @@ use Symfony\Component\DependencyInjection\Reference;
 
 class ExpressionCompilerPass implements CompilerPassInterface
 {
-    const EXPRESSION_ENCODER_TAG = 'oro_layout.expression.encoder';
+    const EXPRESSION_ENCODER_TAG = 'layout.expression.encoder';
     const EXPRESSION_ENCODING_SERVICE = 'oro_layout.expression.encoder_registry';
 
-    const EXPRESSION_LANGUAGE_PROVIDER_TAG = 'oro_layout.expression_language_provider';
+    const EXPRESSION_LANGUAGE_PROVIDER_TAG = 'layout.expression_language_provider';
     const EXPRESSION_LANGUAGE_SERVICE = 'oro_layout.expression_language';
 
     /**

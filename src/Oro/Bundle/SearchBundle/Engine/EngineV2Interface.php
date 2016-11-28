@@ -15,5 +15,5 @@ interface EngineV2Interface
      *
      * @return Result
      */
-    public function search(Query $query, $context = []);
+    public function search(Query $query, array $context = []);
 }

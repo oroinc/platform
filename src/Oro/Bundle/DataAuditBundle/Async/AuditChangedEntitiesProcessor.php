@@ -88,9 +88,7 @@ class AuditChangedEntitiesProcessor implements MessageProcessorInterface, TopicS
             AbstractAudit::ACTION_REMOVE
         );
 
-        $message = new Message();
-        $message->setPriority(MessagePriority::VERY_LOW);
-        $message->setBody($body);
+        $message = new Message($body, MessagePriority::VERY_LOW);
 
         $this->messageProducer->send(Topics::ENTITIES_RELATIONS_CHANGED, $message);
         $this->messageProducer->send(Topics::ENTITIES_INVERSED_RELATIONS_CHANGED, $message);

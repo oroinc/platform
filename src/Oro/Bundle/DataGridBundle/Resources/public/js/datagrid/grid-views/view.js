@@ -463,20 +463,14 @@ define(function(require) {
          * @param {GridViewModel} model
          */
         _onModelRemove: function(model) {
-            var viewId = this.collection.state.gridView;
-            viewId = viewId === this.DEFAULT_GRID_VIEW_ID ? viewId : parseInt(viewId, 10);
+            this.collection.state.gridView = this.DEFAULT_GRID_VIEW_ID;
 
-            if (model.id === viewId) {
-                this.collection.state.gridView = this.DEFAULT_GRID_VIEW_ID;
-                this.viewDirty = !this._isCurrentStateSynchronized();
-            }
-
+            var systemModel = this._getDefaultSystemViewModel();
             if (model.get('is_default')) {
-                var systemModel = this._getDefaultSystemViewModel();
                 systemModel.set({is_default: true});
             }
 
-            this.render();
+            this.changeView(systemModel);
         },
 
         /**

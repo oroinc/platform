@@ -2,8 +2,6 @@
 
 namespace Oro\Bundle\SearchBundle\Query;
 
-use Doctrine\Common\Collections\Expr\Expression;
-
 use Oro\Bundle\SearchBundle\Engine\Indexer;
 
 class IndexerQuery extends AbstractSearchQuery
@@ -29,20 +27,6 @@ class IndexerQuery extends AbstractSearchQuery
     public function __call($name, $args)
     {
         return call_user_func_array(array($this->query, $name), $args);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function addWhere(Expression $expression, $type = self::WHERE_AND)
-    {
-        if (self::WHERE_AND === $type) {
-            $this->query->getCriteria()->andWhere($expression);
-        } elseif (self::WHERE_OR === $type) {
-            $this->query->getCriteria()->orWhere($expression);
-        }
-
-        return $this;
     }
 
     /**

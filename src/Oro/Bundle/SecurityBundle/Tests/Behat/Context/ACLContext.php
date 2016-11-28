@@ -35,6 +35,7 @@ class ACLContext extends OroFeatureContext implements OroPageObjectAware, Kernel
         $environment = $scope->getEnvironment();
         $this->oroMainContext = $environment->getContext(OroMainContext::class);
     }
+
     /**
      * @Given /^(?:|I am )logged in under (?P<organization>(\D*)) organization$/
      */
@@ -135,6 +136,8 @@ class ACLContext extends OroFeatureContext implements OroPageObjectAware, Kernel
         $mainMenu = $this->createElement('MainMenu');
         $mainMenu->openAndClick('System/ User Management/ Roles');
         $this->waitForAjax();
+
+        $this->createElement('GridFilersButton')->open();
 
         /** @var GridFilterStringItem $filterItem */
         $filterItem = $this->createElement('GridFilters')->getFilterItem('GridFilterStringItem', 'Label');

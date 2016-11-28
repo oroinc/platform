@@ -9,7 +9,9 @@ oro:
         id.label:             Id
         add.label:            Add
         save.label:           Save
-        message.label:        Message
+        message:
+            label:            Message
+            description:      The message body content
         attachment.label:     Attachment
         owner.label:          Created By
         organization.label:   Organization

@@ -16,8 +16,6 @@ use Oro\Bundle\TranslationBundle\Tests\Functional\DataFixtures\LoadTranslations;
 
 /**
  * @dbIsolation
- *
- * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
 class TranslationManagerTest extends WebTestCase
 {
@@ -212,43 +210,6 @@ class TranslationManagerTest extends WebTestCase
                 'domain' => LoadTranslations::TRANSLATION_KEY_DOMAIN
             ])
         );
-    }
-
-    public function testFindAvailableDomainsForLocales()
-    {
-        $domains = [];
-
-        /* @var $repository TranslationKeyRepository */
-        $repository = $this->getRepository(TranslationKey::class);
-        foreach ($repository->findAvailableDomains() as $domain) {
-            $domains[] = [
-                'code' => LoadLanguages::LANGUAGE2,
-                'domain' => $domain
-            ];
-        }
-
-        $this->assertEquals($domains, $this->manager->findAvailableDomainsForLocales([LoadLanguages::LANGUAGE2]));
-    }
-
-    public function testGetAvailableDomains()
-    {
-        $domains = $this->manager->getAvailableDomains();
-
-        $this->assertContains('test_domain', $domains);
-        $this->assertGreaterThanOrEqual(1, count($domains));
-
-        $uniqueDomain = uniqid('DOMAIN_', true);
-        $uniqueKey = uniqid('KEY_', true);
-
-        $this->assertNotContains($uniqueDomain, $domains);
-
-        $this->manager->findTranslationKey($uniqueKey, $uniqueDomain);
-        $this->manager->flush();
-
-        $domains = $this->manager->getAvailableDomains();
-
-        $this->assertContains($uniqueDomain, $domains);
-        $this->assertGreaterThanOrEqual(2, count($domains));
     }
 
     /**

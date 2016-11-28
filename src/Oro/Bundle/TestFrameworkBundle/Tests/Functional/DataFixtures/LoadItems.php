@@ -10,6 +10,8 @@ use Oro\Bundle\TestFrameworkBundle\Entity\Item;
 class LoadItems extends AbstractFixture
 {
     const ITEM1 = 'test-item1';
+    const ITEM2 = 'test-item2';
+    const ITEM3 = 'test-item3';
 
     /**
      * @var array
@@ -17,6 +19,12 @@ class LoadItems extends AbstractFixture
     protected $items = [
         self::ITEM1 => [
             'stringValue' => 'value1',
+        ],
+        self::ITEM2 => [
+            'stringValue' => 'value2',
+        ],
+        self::ITEM3 => [
+            'stringValue' => 'value3',
         ],
     ];
 
