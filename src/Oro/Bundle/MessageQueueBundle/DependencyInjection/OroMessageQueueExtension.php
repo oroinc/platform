@@ -56,6 +56,12 @@ class OroMessageQueueExtension extends Extension
         $loader->load('services.yml');
         $loader->load('job.yml');
 
+        // @see BAP-12051
+        // php pcntl extension available only for UNIX like systems
+        if (extension_loaded('pcntl')) {
+            $loader->load('optional_services.yml');
+        }
+
         foreach ($config['transport'] as $name => $transportConfig) {
             $this->factories[$name]->createService($container, $transportConfig);
         }
