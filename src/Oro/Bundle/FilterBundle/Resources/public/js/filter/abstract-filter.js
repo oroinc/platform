@@ -171,10 +171,6 @@ define([
             return this;
         },
 
-        shouldBeVisible: function() {
-            return this.visible;
-        },
-
         /**
          * Disable filter
          *
@@ -196,7 +192,7 @@ define([
          * @return {*}
          */
         show: function() {
-            if (this.shouldBeVisible()) {
+            if (this.visible) {
                 this.$el.css('display', 'inline-block');
             }
             return this;
