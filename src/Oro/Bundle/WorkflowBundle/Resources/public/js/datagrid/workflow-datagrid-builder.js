@@ -6,13 +6,17 @@ define(function(require) {
     var PermissionModel = require('orouser/js/models/role/permission-model');
     var AccessLevelsCollection = require('orouser/js/models/role/access-levels-collection');
     var BaseCollection = require('oroui/js/app/models/base/collection');
-    var RowView = require('orouser/js/datagrid/action-permissions-row-view');
+    var RowView = require('oroworkflow/js/datagrid/workflow-action-permissions-row-view');
     var ReadonlyRowView = require('orouser/js/datagrid/action-permissions-readonly-row-view');
 
     workflowDatagridBuilder = {
         processDatagridOptions: function(deferred, options) {
             var reg = /\\/g;
             options.themeOptions.rowView = options.themeOptions.readonly ? ReadonlyRowView : RowView;
+            if (options.metadata.options.access_level_route) {
+                options.themeOptions.rowView.accessLevelRouteName = options.metadata.options.access_level_route;
+            }
+
             _.each(options.data.data, function(item) {
                 item.permissions = new BaseCollection(item.permissions, {
                     model: PermissionModel

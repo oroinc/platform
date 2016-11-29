@@ -12,11 +12,14 @@ define(function(require) {
     ActionPermissionsRowView = ActionPermissionsReadonlyRowView.extend({
         permissionItemView: PermissionView,
         fieldItemView: FieldView,
+        accessLevelRouteName: null,
         initialize: function(options) {
             ActionPermissionsRowView.__super__.initialize.call(this, options);
+            if (null !== options.themeOptions.rowView.accessLevelRouteName) {
+                this.fieldItemView.accessLevelRouteName = options.themeOptions.rowView.accessLevelRouteName;
+            }
             this.listenTo(this.model.get('permissions'), 'change', this.onAccessLevelChange);
         },
-
         render: function() {
             ActionPermissionsRowView.__super__.render.call(this);
             var rolePermissionsActionView = new RolePermissionsActionView({
@@ -32,7 +35,6 @@ define(function(require) {
 
             return this;
         },
-
         onAccessLevelChange: function(model) {
             mediator.trigger('securityAccessLevelsComponent:link:click', {
                 accessLevel: model.get('access_level'),
