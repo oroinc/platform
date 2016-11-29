@@ -87,7 +87,7 @@ class ResetPasswordHandler
     protected function getNotification(User $user)
     {
         if (null === $this->template) {
-            $this->registry->getRepository(EmailTemplate::class)->findOneByName(self::TEMPLATE_NAME);
+            $this->template = $this->registry->getRepository(EmailTemplate::class)->findOneByName(self::TEMPLATE_NAME);
         }
 
         return new EmailNotification($this->template, [$user->getEmail()]);

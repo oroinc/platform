@@ -80,7 +80,7 @@ class ControllersResetTest extends WebTestCase
     {
         /** @var User $user */
         $user = $this->getReference('simple_user');
-        $this->assertEquals('active', $user->getAuthStatus()->getId());
+        $this->assertEquals(UserManager::STATUS_ACTIVE, $user->getAuthStatus()->getId());
 
         $crawler = $this->client->request(
             'GET',
