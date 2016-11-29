@@ -833,5 +833,5 @@ to the [Fallback documentation](./src/Oro/Bundle/EntityBundle/Resources/doc/enti
 
 ####OroTrackingBundle
 - Moved ``TrackingBundle`` to a separate ``marketing`` package, required by default in the CRM applications.
-- Added ``Oro\\Bundle\\TrackingBundle\\Composer\\TrackingInstaller::symlinkTrackingScript`` Composer script to be executed on ``post-install-cmd`` and ``post-update-cmd``, to symlink the ``tracking.php`` front controller to application's ``/web`` folder.
+- Added ``Oro\\Bundle\\TrackingBundle\\Composer\\TrackingInstaller::copyTrackingScript`` Composer script to be executed on ``post-install-cmd`` and ``post-update-cmd``, to copy the ``tracking.php`` front controller to application's ``/web`` folder.
 - Deleted ``tracking.php`` front controllers from applications.
