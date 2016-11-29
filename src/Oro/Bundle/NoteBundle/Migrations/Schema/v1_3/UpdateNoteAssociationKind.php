@@ -8,10 +8,16 @@ use Oro\Bundle\ActivityBundle\Migration\Extension\ActivityExtension;
 use Oro\Bundle\ActivityBundle\Migration\Extension\ActivityExtensionAwareInterface;
 use Oro\Bundle\EntityExtendBundle\Migration\Extension\ExtendExtension;
 use Oro\Bundle\EntityExtendBundle\Migration\Extension\ExtendExtensionAwareInterface;
+use Oro\Bundle\MigrationBundle\Migration\Extension\NameGeneratorAwareInterface;
 use Oro\Bundle\MigrationBundle\Migration\Migration;
 use Oro\Bundle\MigrationBundle\Migration\QueryBag;
+use Oro\Bundle\MigrationBundle\Tools\DbIdentifierNameGenerator;
 
-class UpdateNoteAssociationKind implements Migration, ExtendExtensionAwareInterface, ActivityExtensionAwareInterface
+class UpdateNoteAssociationKind implements
+    Migration,
+    ExtendExtensionAwareInterface,
+    ActivityExtensionAwareInterface,
+    NameGeneratorAwareInterface
 {
     /**
      * @var ActivityExtension
@@ -24,6 +30,11 @@ class UpdateNoteAssociationKind implements Migration, ExtendExtensionAwareInterf
     protected $extendExtension;
 
     /**
+     * @var DbIdentifierNameGenerator
+     */
+    protected $nameGenerator;
+
+    /**
      * @param Schema   $schema
      * @param QueryBag $queries
      *
@@ -34,7 +45,8 @@ class UpdateNoteAssociationKind implements Migration, ExtendExtensionAwareInterf
         $query = new UpdateAssociationKindQuery(
             $schema,
             $this->activityExtension,
-            $this->extendExtension
+            $this->extendExtension,
+            $this->nameGenerator
         );
         $queries->addPostQuery($query);
     }
@@ -53,5 +65,15 @@ class UpdateNoteAssociationKind implements Migration, ExtendExtensionAwareInterf
     public function setActivityExtension(ActivityExtension $activityExtension)
     {
         $this->activityExtension = $activityExtension;
+    }
+
+    /**
+     * Sets the database identifier name generator
+     *
+     * @param DbIdentifierNameGenerator $nameGenerator
+     */
+    public function setNameGenerator(DbIdentifierNameGenerator $nameGenerator)
+    {
+        $this->nameGenerator = $nameGenerator;
     }
 }

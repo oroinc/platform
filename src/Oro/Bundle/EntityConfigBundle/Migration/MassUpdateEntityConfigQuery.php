@@ -135,7 +135,9 @@ class MassUpdateEntityConfigQuery implements MigrationQuery, ConnectionAwareInte
 
         foreach ($this->valuesForRemove as $scope => $codes) {
             foreach ($codes as $code) {
-                unset($entityConfigData[$scope][$code]);
+                if (isset($entityConfigData[$scope][$code])) {
+                    unset($entityConfigData[$scope][$code]);
+                }
             }
         }
         foreach ($this->valuesForUpdate as $scope => $newScopeConfigurationValues) {
