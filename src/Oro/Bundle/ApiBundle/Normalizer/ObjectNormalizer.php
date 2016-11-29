@@ -12,9 +12,6 @@ use Oro\Bundle\ApiBundle\Config\EntityDefinitionFieldConfig;
 use Oro\Bundle\ApiBundle\Exception\RuntimeException;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 
-/**
- * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
- */
 class ObjectNormalizer
 {
     const MAX_NESTING_LEVEL = 1;
@@ -34,25 +31,31 @@ class ObjectNormalizer
     /** @var ConfigNormalizer */
     protected $configNormalizer;
 
+    /** @var DataNormalizer */
+    protected $dataNormalizer;
+
     /**
      * @param ObjectNormalizerRegistry $normalizerRegistry
      * @param DoctrineHelper           $doctrineHelper
      * @param DataAccessorInterface    $dataAccessor
      * @param DataTransformerInterface $dataTransformer
      * @param ConfigNormalizer         $configNormalizer
+     * @param DataNormalizer           $dataNormalizer
      */
     public function __construct(
         ObjectNormalizerRegistry $normalizerRegistry,
         DoctrineHelper $doctrineHelper,
         DataAccessorInterface $dataAccessor,
         DataTransformerInterface $dataTransformer,
-        ConfigNormalizer $configNormalizer
+        ConfigNormalizer $configNormalizer,
+        DataNormalizer $dataNormalizer
     ) {
         $this->normalizerRegistry = $normalizerRegistry;
         $this->doctrineHelper = $doctrineHelper;
         $this->dataAccessor = $dataAccessor;
         $this->dataTransformer = $dataTransformer;
         $this->configNormalizer = $configNormalizer;
+        $this->dataNormalizer = $dataNormalizer;
     }
 
     /**
@@ -71,6 +74,11 @@ class ObjectNormalizer
                 $config = $normalizedConfig;
             }
             $object = $this->normalizeValue($object, is_array($object) ? 0 : 1, $context, $config);
+            if (null !== $config) {
+                $data = [$object];
+                $data = $this->dataNormalizer->normalizeData($data, $config);
+                $object = reset($data);
+            }
         }
 
         return $object;
@@ -138,9 +146,6 @@ class ObjectNormalizer
      * @param array                  $context
      *
      * @return array
-     *
-     * @SuppressWarnings(PHPMD.NPathComplexity)
-     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     protected function normalizeObjectByConfig($object, $level, EntityDefinitionConfig $config, $context)
     {
@@ -169,45 +174,12 @@ class ObjectNormalizer
             } elseif ($this->dataAccessor->tryGetValue($object, $propertyPath, $value) && null !== $value) {
                 $targetEntity = $field->getTargetEntity();
                 if (null !== $targetEntity) {
-                    $childFieldNames = array_keys($targetEntity->getFields());
-                    if ($field->isCollapsed() && count($childFieldNames) === 1) {
-                        $childFieldName = reset($childFieldNames);
-                        $isCollection = $field->hasTargetType()
-                            ? $field->isCollectionValuedAssociation()
-                            : $value instanceof \Traversable;
-                        if ($isCollection) {
-                            if (!$value instanceof \Traversable && !is_array($value)) {
-                                throw new RuntimeException(
-                                    sprintf(
-                                        'A value of "%s" field of entity "%s" should be "%s". Got: %s.',
-                                        $propertyPath,
-                                        ClassUtils::getClass($object),
-                                        '\Traversable or array',
-                                        is_object($value) ? get_class($value) : gettype($value)
-                                    )
-                                );
-                            }
-                            $childValue = [];
-                            foreach ($value as $val) {
-                                $childVal = null;
-                                $this->dataAccessor->tryGetValue($val, $childFieldName, $childVal);
-                                $childValue[] = $childVal;
-                            }
-                        } else {
-                            $childValue = null;
-                            if (!$this->dataAccessor->tryGetValue($value, $childFieldName, $childValue)) {
-                                continue;
-                            }
-                        }
-                        $value = $childValue;
-                    } else {
-                        $value = $this->normalizeValue($value, $level + 1, $context, $targetEntity);
-                    }
+                    $value = $this->normalizeValue($value, $level + 1, $context, $targetEntity);
                 } else {
                     $value = $this->transformValue($entityClass, $fieldName, $value, $context, $field);
                 }
             }
-            $result[$fieldName] = $value;
+            $result[$propertyPath] = $value;
         }
 
         $postSerializeHandler = $config->getPostSerializeHandler();

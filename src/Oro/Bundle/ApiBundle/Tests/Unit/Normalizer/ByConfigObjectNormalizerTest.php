@@ -10,6 +10,7 @@ use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 use Oro\Bundle\ApiBundle\Config\FiltersConfigExtension;
 use Oro\Bundle\ApiBundle\Config\SortersConfigExtension;
 use Oro\Bundle\ApiBundle\Normalizer\ConfigNormalizer;
+use Oro\Bundle\ApiBundle\Normalizer\DataNormalizer;
 use Oro\Bundle\ApiBundle\Normalizer\DateTimeNormalizer;
 use Oro\Bundle\ApiBundle\Normalizer\ObjectNormalizer;
 use Oro\Bundle\ApiBundle\Normalizer\ObjectNormalizerRegistry;
@@ -37,7 +38,8 @@ class ByConfigObjectNormalizerTest extends \PHPUnit_Framework_TestCase
             new DoctrineHelper($doctrine),
             new EntityDataAccessor(),
             new EntityDataTransformer($this->getMock('Symfony\Component\DependencyInjection\ContainerInterface')),
-            new ConfigNormalizer()
+            new ConfigNormalizer(),
+            new DataNormalizer()
         );
 
         $normalizers->addNormalizer(
@@ -259,6 +261,7 @@ class ByConfigObjectNormalizerTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(
             [
                 'id'        => 123,
+                'category'  => null,
                 'category1' => null,
                 'owner'     => null
             ],
@@ -388,6 +391,7 @@ class ByConfigObjectNormalizerTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(
             [
                 'id'        => 123,
+                'category'  => null,
                 'category1' => null,
                 'owner'     => [
                     'name'    => 'user_name',
@@ -398,12 +402,10 @@ class ByConfigObjectNormalizerTest extends \PHPUnit_Framework_TestCase
         );
     }
 
-    // @codingStandardsIgnoreStart
     /**
-     * @expectedException \Oro\Bundle\ApiBundle\Exception\RuntimeException
-     * @expectedExceptionMessage A value of "groups" field of entity "Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\User" should be "\Traversable or array". Got: string.
+     * @expectedException \RuntimeException
+     * @expectedExceptionMessage A value of "groups" field should be "null or array". Got: string.
      */
-    // @codingStandardsIgnoreEnd
     public function testNormalizeObjectWithInvalidValueForToManyRelation()
     {
         $data = $this->createProductObject();

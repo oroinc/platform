@@ -95,9 +95,14 @@ services:
             - '@oro_api.entity_accessor'
             - '@oro_api.entity_serializer.data_transformer'
             - '@oro_api.object_normalizer.config_normalizer'
+            - '@oro_api.object_normalizer.data_normalizer'
 
     oro_api.object_normalizer.config_normalizer:
         class: Oro\Bundle\ApiBundle\Normalizer\ConfigNormalizer
+        public: false
+
+    oro_api.object_normalizer.data_normalizer:
+        class: Oro\Bundle\ApiBundle\Normalizer\DataNormalizer
         public: false
 
     oro_api.object_normalizer_registry:
