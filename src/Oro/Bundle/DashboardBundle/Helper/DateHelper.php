@@ -11,6 +11,9 @@ use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
 use Oro\Bundle\FilterBundle\Form\Type\Filter\AbstractDateFilterType;
 use Oro\Bundle\LocaleBundle\Model\LocaleSettings;
 
+/**
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
+ */
 class DateHelper
 {
     const YEAR_TYPE_DAYS  = 1460;
