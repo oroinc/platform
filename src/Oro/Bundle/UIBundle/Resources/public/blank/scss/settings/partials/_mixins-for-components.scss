@@ -9,3 +9,7 @@
         color: $link-color-hover;
     }
 }
+
+%base-transition {
+    transition: all linear 150ms;
+}
