@@ -830,3 +830,8 @@ to the [Fallback documentation](./src/Oro/Bundle/EntityBundle/Resources/doc/enti
 
 ####OroInstallerBundle
 - Added interface `Oro\Bundle\InstallerBundle\CacheWarmer\NamespaceMigrationProviderInterface`. it makes available add the rules for command "oro:platform:upgrade20"
+
+####OroTrackingBundle
+- Moved ``TrackingBundle`` to a separate ``marketing`` package, required by default in the CRM applications.
+- Added ``Oro\\Bundle\\TrackingBundle\\Composer\\TrackingInstaller::symlinkTrackingScript`` Composer script to be executed on ``post-install-cmd`` and ``post-update-cmd``, to symlink the ``tracking.php`` front controller to application's ``/web`` folder.
+- Deleted ``tracking.php`` front controllers from applications.
