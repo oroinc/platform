@@ -209,7 +209,7 @@ class UserManagerTest extends \PHPUnit_Framework_TestCase
     {
         $user = new User();
         $this->assertNull($user->getAuthStatus());
-        $this->userManager->setAuthStatus($user, 'expired');
-        $this->assertEquals('expired', $user->getAuthStatus()->getId());
+        $this->userManager->setAuthStatus($user, UserManager::STATUS_EXPIRED);
+        $this->assertEquals(UserManager::STATUS_EXPIRED, $user->getAuthStatus()->getId());
     }
 }

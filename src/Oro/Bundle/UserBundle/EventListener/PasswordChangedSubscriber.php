@@ -8,11 +8,10 @@ use Doctrine\ORM\Event\PreUpdateEventArgs;
 
 use Oro\Bundle\EntityExtendBundle\Provider\EnumValueProvider;
 use Oro\Bundle\UserBundle\Entity\User;
+use Oro\Bundle\UserBundle\Entity\UserManager;
 
 class PasswordChangedSubscriber implements EventSubscriber
 {
-    const STATUS_ACTIVE = 'active';
-    const STATUS_EXPIRED = 'expired';
 
     /** @var EnumValueProvider */
     protected $enumValueProvider;
@@ -66,8 +65,10 @@ class PasswordChangedSubscriber implements EventSubscriber
             return;
         }
 
-        if ($user->getAuthStatus() && $user->getAuthStatus()->getId() === self::STATUS_EXPIRED) {
-            $user->setAuthStatus($this->enumValueProvider->getEnumValueByCode('auth_status', self::STATUS_ACTIVE));
+        if ($user->getAuthStatus() && $user->getAuthStatus()->getId() === UserManager::STATUS_EXPIRED) {
+            $user->setAuthStatus(
+                $this->enumValueProvider->getEnumValueByCode('auth_status', UserManager::STATUS_ACTIVE)
+            );
         }
     }
 }

@@ -7,6 +7,7 @@ use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 
 use Oro\Component\Testing\Unit\Entity\Stub\StubEnumValue;
 
+use Oro\Bundle\UserBundle\Entity\UserManager;
 use Oro\Bundle\UserBundle\Tests\Unit\Stub\UserStub as User;
 use Oro\Bundle\UserBundle\Security\DisabledLoginSubscriber;
 
@@ -37,7 +38,7 @@ class DisabledLoginSubscriberTest extends \PHPUnit_Framework_TestCase
 
     public function testOnKernelRequestWithExpiredUser()
     {
-        $enum = new StubEnumValue('expired', 'expired');
+        $enum = new StubEnumValue(UserManager::STATUS_EXPIRED, UserManager::STATUS_EXPIRED);
         $this->user->setAuthStatus($enum);
 
         $this->tokenStorage->expects($this->once())
@@ -73,6 +74,7 @@ class DisabledLoginSubscriberTest extends \PHPUnit_Framework_TestCase
 
     public function testOnKernelRequestWithAllowedUser()
     {
+        // custom added status
         $enum = new StubEnumValue('allowed', 'allowed');
         $this->user->setAuthStatus($enum);
         $this->tokenStorage->expects($this->never())

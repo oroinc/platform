@@ -9,6 +9,7 @@ use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
+use Oro\Bundle\UserBundle\Entity\UserManager;
 use Oro\Bundle\UserBundle\Entity\User;
 
 /**
@@ -21,7 +22,7 @@ class DisabledLoginSubscriber implements EventSubscriberInterface
 
     /** @var array Disallowed auth statuses */
     static protected $disallowed = [
-        'expired',
+        UserManager::STATUS_EXPIRED,
     ];
 
     /**

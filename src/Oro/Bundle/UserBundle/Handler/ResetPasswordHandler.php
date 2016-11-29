@@ -18,10 +18,12 @@ use Oro\Bundle\UserBundle\Entity\UserManager;
 class ResetPasswordHandler
 {
     const TEMPLATE_NAME = 'force_reset_password';
-    const STATUS_EXPIRED = 'expired';
 
     /** @var EmailTemplate */
     protected $template;
+
+    /** @var Registry */
+    protected $registry;
 
     /**
      * @param EmailNotificationManager $mailManager
@@ -37,8 +39,9 @@ class ResetPasswordHandler
     ) {
         $this->mailManager = $mailManager;
         $this->userManager = $userManager;
-        $this->template = $registry->getRepository(EmailTemplate::class)->findOneByName(self::TEMPLATE_NAME);
+        $this->template = null;
         $this->logger = $logger;
+        $this->registry = $registry;
     }
 
     /**
@@ -59,7 +62,7 @@ class ResetPasswordHandler
             $user->setConfirmationToken($user->generateToken());
         }
 
-        $this->userManager->setAuthStatus($user, self::STATUS_EXPIRED);
+        $this->userManager->setAuthStatus($user, UserManager::STATUS_EXPIRED);
         $this->userManager->updateUser($user);
 
         try {
@@ -83,6 +86,10 @@ class ResetPasswordHandler
      */
     protected function getNotification(User $user)
     {
+        if (null === $this->template) {
+            $this->registry->getRepository(EmailTemplate::class)->findOneByName(self::TEMPLATE_NAME);
+        }
+
         return new EmailNotification($this->template, [$user->getEmail()]);
     }
 }

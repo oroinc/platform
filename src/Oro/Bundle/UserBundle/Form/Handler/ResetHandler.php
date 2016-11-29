@@ -3,14 +3,13 @@
 namespace Oro\Bundle\UserBundle\Form\Handler;
 
 use Oro\Bundle\UserBundle\Entity\User;
+use Oro\Bundle\UserBundle\Entity\UserManager;
 
 /**
  * Handle Reset password forms
  */
 class ResetHandler extends AbstractUserHandler
 {
-    const STATUS_ACTIVE = 'active';
-
     /**
      * {@inheritDoc}
      */
@@ -21,7 +20,7 @@ class ResetHandler extends AbstractUserHandler
             ->setConfirmationToken(null)
             ->setPasswordRequestedAt(null);
 
-        $this->manager->setAuthStatus($user, self::STATUS_ACTIVE);
+        $this->manager->setAuthStatus($user, UserManager::STATUS_ACTIVE);
         $this->manager->updateUser($user);
     }
 }

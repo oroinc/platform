@@ -6,6 +6,7 @@ use Psr\Log\LoggerInterface;
 
 use Doctrine\DBAL\Types\Type;
 
+use Oro\Bundle\UserBundle\Entity\UserManager;
 use Oro\Bundle\MigrationBundle\Migration\ArrayLogger;
 use Oro\Bundle\MigrationBundle\Migration\ParametrizedMigrationQuery;
 use Oro\Bundle\EntityExtendBundle\Migration\Extension\ExtendExtension;
@@ -56,13 +57,13 @@ class InsertAuthStatusesQuery extends ParametrizedMigrationQuery
 
         $statuses = [
             [
-                ':id' => 'active',
+                ':id' => UserManager::STATUS_ACTIVE,
                 ':name' => 'Active',
                 ':priority' => 1,
                 ':is_default' => true,
             ],
             [
-                ':id' => 'expired',
+                ':id' => UserManager::STATUS_EXPIRED,
                 ':name' => 'Password reset',
                 ':priority' => 2,
                 ':is_default' => false,
@@ -83,7 +84,7 @@ class InsertAuthStatusesQuery extends ParametrizedMigrationQuery
             }
         }
 
-        $defaultStatus = ['default_status' => 'active'];
+        $defaultStatus = ['default_status' => UserManager::STATUS_ACTIVE];
         $defaultStatusType = ['default_status' => Type::STRING];
 
         $sql = 'UPDATE oro_user SET auth_status_id = :default_status';

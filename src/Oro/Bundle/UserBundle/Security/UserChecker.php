@@ -9,6 +9,7 @@ use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Translation\TranslatorInterface;
 
 use Oro\Bundle\UserBundle\Entity\User;
+use Oro\Bundle\UserBundle\Entity\UserManager;
 use Oro\Bundle\UserBundle\Exception\PasswordChangedException;
 use Oro\Component\DependencyInjection\ServiceLink;
 
@@ -65,7 +66,7 @@ class UserChecker extends BaseUserChecker
             throw $exception;
         }
 
-        if ($user->getAuthStatus() && $user->getAuthStatus()->getId() === 'expired') {
+        if ($user->getAuthStatus() && $user->getAuthStatus()->getId() === UserManager::STATUS_EXPIRED) {
             $exception = new CredentialsExpiredException('Password expired.');
             $exception->setUser($user);
 

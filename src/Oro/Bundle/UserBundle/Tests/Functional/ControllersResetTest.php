@@ -4,6 +4,7 @@ namespace Oro\Bundle\UserBundle\Tests\Functional;
 
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Bundle\UserBundle\Entity\User;
+use Oro\Bundle\UserBundle\Entity\UserManager;
 
 /**
  * @dbIsolation
@@ -99,7 +100,7 @@ class ControllersResetTest extends WebTestCase
         $this->assertContains('widget.remove', $result->getContent());
 
         $user = $this->getContainer()->get('doctrine')->getRepository('OroUserBundle:User')->find($user->getId());
-        $this->assertEquals('expired', $user->getAuthStatus()->getId());
+        $this->assertEquals(UserManager::STATUS_EXPIRED, $user->getAuthStatus()->getId());
     }
 
     public function testMassPasswordResetAction()
@@ -139,7 +140,7 @@ class ControllersResetTest extends WebTestCase
         $user = $repo->find($user->getId());
         $user2 = $repo->find($user2->getId());
 
-        $this->assertEquals('expired', $user->getAuthStatus()->getId());
-        $this->assertEquals('active', $user2->getAuthStatus()->getId());
+        $this->assertEquals(UserManager::STATUS_EXPIRED, $user->getAuthStatus()->getId());
+        $this->assertEquals(UserManager::STATUS_ACTIVE, $user2->getAuthStatus()->getId());
     }
 }

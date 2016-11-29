@@ -4,6 +4,7 @@ namespace Oro\Bundle\UserBundle\Placeholder;
 
 use Oro\Bundle\SecurityBundle\SecurityFacade;
 use Oro\Bundle\UserBundle\Entity\User;
+use Oro\Bundle\UserBundle\Entity\UserManager;
 
 class PlaceholderFilter
 {
@@ -28,7 +29,10 @@ class PlaceholderFilter
      */
     public function isPasswordManageEnabled($entity)
     {
-        if ($entity instanceof User && $entity->getAuthStatus() && $entity->getAuthStatus()->getId() === 'expired') {
+        if ($entity instanceof User &&
+            $entity->getAuthStatus() &&
+            $entity->getAuthStatus()->getId() === UserManager::STATUS_EXPIRED
+        ) {
             return false;
         }
 

@@ -9,6 +9,7 @@ use Oro\Bundle\EntityExtendBundle\Migration\Extension\ExtendExtensionAwareInterf
 use Oro\Bundle\EntityExtendBundle\Migration\OroOptions;
 use Oro\Bundle\MigrationBundle\Migration\Migration;
 use Oro\Bundle\MigrationBundle\Migration\QueryBag;
+use Oro\Bundle\UserBundle\Entity\UserManager;
 
 class AddAuthStatusColumn implements Migration, ExtendExtensionAwareInterface
 {
@@ -33,8 +34,8 @@ class AddAuthStatusColumn implements Migration, ExtendExtensionAwareInterface
             'enum',
             'immutable_codes',
             [
-                'active',
-                'locked',
+                UserManager::STATUS_ACTIVE,
+                UserManager::STATUS_EXPIRED,
             ]
         );
 

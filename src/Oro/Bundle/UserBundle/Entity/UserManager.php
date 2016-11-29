@@ -14,6 +14,8 @@ use Oro\Bundle\OrganizationBundle\Entity\Organization;
 class UserManager extends BaseUserManager
 {
     const AUTH_STATUS_ENUM_CODE = 'auth_status';
+    const STATUS_ACTIVE = 'active';
+    const STATUS_EXPIRED = 'expired';
 
     /** @var EnumValueProvider */
     protected $enumValueProvider;
@@ -65,7 +67,7 @@ class UserManager extends BaseUserManager
     public function updateUser(UserInterface $user, $flush = true)
     {
         // make sure user has a default status
-        if ($user instanceof User && empty($user->getAuthStatus())) {
+        if ($user instanceof User && null === $user->getAuthStatus()) {
             $defaultStatus = $this->enumValueProvider->getDefaultEnumValuesByCode(self::AUTH_STATUS_ENUM_CODE);
             $defaultStatus = is_array($defaultStatus) ? reset($defaultStatus) : $defaultStatus;
 

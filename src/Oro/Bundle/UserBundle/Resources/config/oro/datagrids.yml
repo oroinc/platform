@@ -95,7 +95,7 @@ datagrids:
                 enabled:
                     data_name: u.enabled
                 auth_status:
-                    data_name: as.priority
+                    data_name: au.priority
             default:
                 username: %oro_datagrid.extension.orm_sorter.class%::DIRECTION_ASC
 
