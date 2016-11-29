@@ -2,21 +2,28 @@
 
 namespace Oro\Bundle\UserBundle\Security;
 
+use Symfony\Component\Security\Core\Exception\CredentialsExpiredException;
 use Symfony\Component\Security\Core\Security;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
-use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
+use Oro\Bundle\UserBundle\Entity\UserManager;
 use Oro\Bundle\UserBundle\Entity\User;
-use Oro\Bundle\UserBundle\Exception\PasswordChangedException;
 
+/**
+ * Stop user from accessing the system if they are deactivated
+ */
 class DisabledLoginSubscriber implements EventSubscriberInterface
 {
     /** @var TokenStorageInterface */
     protected $tokenStorage  = false;
+
+    /** @var array Disallowed auth statuses */
+    static protected $disallowed = [
+        UserManager::STATUS_EXPIRED,
+    ];
 
     /**
      * @param TokenStorageInterface $tokenStorage
@@ -41,23 +48,31 @@ class DisabledLoginSubscriber implements EventSubscriberInterface
      */
     public function onKernelRequest(GetResponseEvent $event)
     {
-        /** @var TokenInterface $token */
         if (null === $token = $this->tokenStorage->getToken()) {
             return;
         }
 
         $user = $token->getUser();
 
-        if ($user instanceof User && $user->isLoginDisabled()) {
-            $this->tokenStorage->setToken(null);
-            $exception = new PasswordChangedException('Invalid password.');
-            $exception->setUser($user);
-            /** @var Request $request */
-            $request = $event->getRequest();
+        if (!$user instanceof User) {
+            return;
+        }
 
-            if ($request->hasSession()) {
-                $request->getSession()->set(Security::AUTHENTICATION_ERROR, $exception);
-            }
+        // allow `null` or statues that are not included in `self::$disallowed`
+        $isAllowed = $user->getAuthStatus() ? !in_array($user->getAuthStatus()->getId(), self::$disallowed) : true;
+
+        if ($isAllowed) {
+            return;
+        }
+
+        $this->tokenStorage->setToken(null);
+        $exception = new CredentialsExpiredException('Invalid password.');
+        $exception->setUser($user);
+
+        $request = $event->getRequest();
+
+        if ($request->hasSession()) {
+            $request->getSession()->set(Security::AUTHENTICATION_ERROR, $exception);
         }
     }
 }

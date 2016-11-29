@@ -11,7 +11,7 @@ use Oro\Bundle\DataGridBundle\Datasource\DatasourceInterface;
 use Oro\Bundle\DataGridBundle\Extension\AbstractExtension;
 use Oro\Bundle\DataGridBundle\Datasource\Orm\OrmDatasource;
 
-class ResetPasswordExtention extends AbstractExtension
+class ResetPasswordExtension extends AbstractExtension
 {
     const USERS_GRID_NAME = 'users-grid';
 
@@ -30,7 +30,7 @@ class ResetPasswordExtention extends AbstractExtension
             $name &&
             $name == self::USERS_GRID_NAME &&
             $request &&
-            $request->get('actionName', false) == 'reset_password';
+            $request->get('actionName', false) === 'reset_password';
     }
 
     /**

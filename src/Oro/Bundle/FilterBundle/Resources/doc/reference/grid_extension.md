@@ -4,7 +4,7 @@ Grid Extension
 Overview
 --------
 
-Filter bundle provides extension for data grid with ORM datasource.
+Filter bundle provides extension for data grid with ORM and Search datasources.
 Filters could be added to datagrid in the `datagrids.yml` file for specified datagrid under `filters` node.
 Definition of any filter has required option `data_name` that should be reference to column in query and type - filter type.
 For example:
@@ -27,6 +27,7 @@ For example:
                     data_name: g.id
                     enabled: true|false #whether filter enabled or not. If filter is not enabled it will not be displayed in filter list but will be accessible in filter management.
                     disabled: true|false #If filter is disabled it will not be displayed in filter list and will not be available in filter management.
+                    visible: true|false #If set to "false" - filter will not be displayed anywhere in UI. However, one can still set filter's value in backend or via url in frontend
 
 ```
 

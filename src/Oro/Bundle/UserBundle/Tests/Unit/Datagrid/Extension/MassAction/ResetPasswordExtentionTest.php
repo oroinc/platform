@@ -4,15 +4,15 @@ namespace Oro\Bundle\UserBundle\Tests\Unit\Datagrid\Extension\MassAction;
 
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 
-use Oro\Bundle\UserBundle\Datagrid\Extension\MassAction\ResetPasswordExtention;
+use Oro\Bundle\UserBundle\Datagrid\Extension\MassAction\ResetPasswordExtension;
 
-class ResetPasswordExtentionTest extends \PHPUnit_Framework_TestCase
+class ResetPasswordExtensionTest extends \PHPUnit_Framework_TestCase
 {
     /** @var  \PHPUnit_Framework_MockObject_MockObject|DatagridConfiguration */
     protected $configuration;
 
-    /** @var  ResetPasswordExtention */
-    protected $resetExtention;
+    /** @var  ResetPasswordExtension */
+    protected $resetExtension;
 
     protected function setUp()
     {
@@ -20,7 +20,7 @@ class ResetPasswordExtentionTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->resetExtention = new ResetPasswordExtention();
+        $this->resetExtension = new ResetPasswordExtension();
     }
 
     public function testIsApplicable()
@@ -46,10 +46,10 @@ class ResetPasswordExtentionTest extends \PHPUnit_Framework_TestCase
             ->expects($this->once())
             ->method('offsetGetOr')
             ->with('name', null)
-            ->will($this->returnValue(ResetPasswordExtention::USERS_GRID_NAME));
+            ->will($this->returnValue(ResetPasswordExtension::USERS_GRID_NAME));
 
-        $this->resetExtention->setRequestStack($requestStack);
-        $this->assertTrue($this->resetExtention->isApplicable($this->configuration));
+        $this->resetExtension->setRequestStack($requestStack);
+        $this->assertTrue($this->resetExtension->isApplicable($this->configuration));
     }
 
     public function testVisitDatasource()
@@ -73,6 +73,6 @@ class ResetPasswordExtentionTest extends \PHPUnit_Framework_TestCase
             ->expects($this->once())
             ->method('setQueryBuilder');
 
-        $this->resetExtention->visitDatasource($this->configuration, $dataSource);
+        $this->resetExtension->visitDatasource($this->configuration, $dataSource);
     }
 }
