@@ -112,7 +112,7 @@ abstract class AbstractAPIAdapter implements APIAdapterInterface
         $dirs = [];
 
         foreach ($files as $remotePath) {
-            $subFolders = explode(DIRECTORY_SEPARATOR, dirname($remotePath));
+            $subFolders = array_filter(explode(DIRECTORY_SEPARATOR, dirname($remotePath)));
 
             $currentDir = [];
             foreach ($subFolders as $folderName) {
@@ -124,6 +124,6 @@ abstract class AbstractAPIAdapter implements APIAdapterInterface
             }
         }
 
-        return $dirs;
+        return array_unique($dirs);
     }
 }

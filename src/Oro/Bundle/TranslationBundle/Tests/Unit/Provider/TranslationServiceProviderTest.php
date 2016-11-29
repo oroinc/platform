@@ -268,6 +268,44 @@ class TranslationServiceProviderTest extends \PHPUnit_Framework_TestCase
         ];
     }
 
+    /**
+     * @dataProvider processDirsProvider
+     *
+     * @param $inputDirs
+     * @param $expectedDirs
+     */
+    public function testProcessDirs($inputDirs, $expectedDirs)
+    {
+        $method = new \ReflectionMethod(
+            $this->className,
+            'processDirs'
+        );
+        $method->setAccessible(true);
+
+        $this->assertEquals($expectedDirs, $method->invoke($this->service, $inputDirs));
+    }
+
+    /**
+     * @return array
+     */
+    public function processDirsProvider()
+    {
+        return [
+            [
+                'inputDirs' => '/some/dir',
+                'expectedDirs' => ['/some/dir'],
+            ],
+            [
+                'inputDirs' => '/some/dir/',
+                'expectedDirs' => ['/some/dir'],
+            ],
+            [
+                'inputDirs' => ['/some/dir', '/some/dir2/'],
+                'expectedDirs' => ['/some/dir', '/some/dir2'],
+            ],
+        ];
+    }
+
     public function testRenameFiles()
     {
         $targetPath = $this->testPath . DIRECTORY_SEPARATOR;
