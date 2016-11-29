@@ -4,6 +4,8 @@ OroEntityExtendBundle
 - Allows to add an additional fields into existing entities
 - Allows to add an additional relations into existing entities
 - Allows to add new entities
+- Added support (with_join flag to Datagrid entity config)
+- Enum fields join is made using Datagrid config instead of join using QueryBuild
 
 All additions can be done through UI or using [migration scripts](../MigrationBundle/README.md).
 
