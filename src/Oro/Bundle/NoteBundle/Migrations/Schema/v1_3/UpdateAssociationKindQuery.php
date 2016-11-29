@@ -90,7 +90,10 @@ class UpdateAssociationKindQuery implements MigrationQuery, ConnectionAwareInter
         foreach ($entityConfigs as $entityConfigurationRow) {
             $targetEntityClassName = $entityConfigurationRow['class_name'];
             $targetTableName = $this->extendExtension->getTableNameByEntityClass($targetEntityClassName);
-            if (!$targetTableName || !$this->schema->hasTable($targetTableName)) {
+            $noteAssociationColumnName = $this->getNoteAssociationColumnName($targetEntityClassName);
+            if (!$targetTableName
+                || !$this->schema->hasTable($targetTableName)
+                || !$this->schema->getTable('oro_note')->hasColumn($noteAssociationColumnName)) {
                 continue;
             }
             $entitiesForDataMigration[$targetEntityClassName] = $targetTableName;
