@@ -19,6 +19,18 @@
     {% set transitionData = transitionData|merge({'transition-url': path(transitionData['page-route'], params) }) %}
 {% endif %}
 
+{# Show button for start or transit workflow #}
+{% set transitionMessage = transition.message|trans({},'workflows') %}
+{% if transitionMessage == transition.message %}
+    {# if no translation for message then do not show message #}
+    {% set transitionMessage = '' %}
+{% endif %}
+
+{% set transitionData = transitionData|merge({
+    'transition-label': transition.label|trans({},'workflows'),
+    'message': transitionMessage|nl2br
+}) %}
+
 <div class="pull-left btn-group icons-holder">
     {{ workflowMacros.renderTransitionButton(workflow, transition, null, transitionData) }}
 </div>
