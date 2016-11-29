@@ -192,7 +192,7 @@ class UpdateAssociationKindQuery implements MigrationQuery, ConnectionAwareInter
      */
     protected function saveEntityConfig(LoggerInterface $logger, array $entityConfig)
     {
-        $sql = 'UPDATE oro_entity_config SET `data`=? WHERE id=?';
+        $sql = 'UPDATE oro_entity_config SET data=? WHERE id=?';
         $parameters = [
             $this->connection->convertToDatabaseValue($entityConfig['data'], Type::TARRAY),
             $entityConfig['id']
