@@ -39,6 +39,7 @@ class FeatureToggleConfigurationTest extends \PHPUnit_Framework_TestCase
                 'routes' => [],
                 'configuration' => [],
                 'entities' => [],
+                'field_configs' => [],
             ]
         ];
 
@@ -55,6 +56,7 @@ class FeatureToggleConfigurationTest extends \PHPUnit_Framework_TestCase
                 'routes' => ['oro_feature_route'],
                 'configuration' => ['oro_feature', 'oro_another'],
                 'entities' => [],
+                'field_configs' => [],
             ],
         ];
 
@@ -66,6 +68,7 @@ class FeatureToggleConfigurationTest extends \PHPUnit_Framework_TestCase
                 'routes' => ['oro_feature_route'],
                 'configuration' => ['oro_feature', 'oro_another'],
                 'entities' => [],
+                'field_configs' => [],
             ]
         ];
 
