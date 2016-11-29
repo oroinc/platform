@@ -832,9 +832,18 @@ to the [Fallback documentation](./src/Oro/Bundle/EntityBundle/Resources/doc/enti
 - Added interface `Oro\Bundle\InstallerBundle\CacheWarmer\NamespaceMigrationProviderInterface`. it makes available add the rules for command "oro:platform:upgrade20"
 
 ####OroNoteBundle
-- "Note" was changed to the regular activity
+- "Note" entity was changed to the regular activity
+- "note" entity config scope was removed
 - Specific "Note" association type was removed
 - Oro\Bundle\NoteBundle\Migration\Extension\NoteExtension was removed
 - Oro\Bundle\NoteBundle\Migration\Extension\NoteExtensionAwareInterface was removed
-
-
+- Oro\Bundle\NoteBundle\Migration\Extension\NoteExtensionAwareInterface was removed
+- Oro\Bundle\NoteBundle\Placeholder\PlaceholderFilter was removed
+- Oro\Bundle\NoteBundle\Provider\NoteExclusionProvider was removed
+- Oro\Bundle\NoteBundle\Tools\NoteAssociationHelper was removed
+- Oro\Bundle\NoteBundle\Tools\NoteEntityConfigDumperExtension was removed
+- Oro\Bundle\NoteBundle\Tools\NoteEntityGeneratorExtension was removed
+- Oro\Bundle\NoteBundle\EventListener\MergeListener was removed.
+- Oro\Bundle\NoteBundle\Model\MergeModes was removed.
+- Oro\Bundle\NoteBundle\Model\Strategy\ReplaceStrategy was removed.
+- Oro\Bundle\NoteBundle\Model\Strategy\UniteStrategy was removed.
