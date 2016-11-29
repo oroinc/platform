@@ -4,7 +4,7 @@ namespace Oro\Component\MessageQueue\Client;
 class Message
 {
     /**
-     * @var string|null
+     * @var mixed
      */
     private $body;
 
@@ -24,7 +24,7 @@ class Message
     private $timestamp;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $priority;
 
@@ -52,14 +52,20 @@ class Message
      */
     private $properties = [];
 
-    public function __construct()
+    /**
+     * @param mixed       $body     Can be null, scalar or array
+     * @param string|null $priority Can be any value from {@see Oro\Component\MessageQueue\Client\MessagePriority)
+     */
+    public function __construct($body = null, $priority = null)
     {
+        $this->body = $body;
+        $this->priority = $priority;
         $this->headers = [];
         $this->properties = [];
     }
 
     /**
-     * @return null|string
+     * @return mixed Can be null, scalar or array
      */
     public function getBody()
     {
@@ -67,11 +73,15 @@ class Message
     }
 
     /**
-     * @param null|string $body
+     * @param mixed $body Can be null, scalar or array
+     *
+     * @return self
      */
     public function setBody($body)
     {
         $this->body = $body;
+
+        return $this;
     }
 
     /**
@@ -84,10 +94,14 @@ class Message
 
     /**
      * @param string|null $contentType
+     *
+     * @return self
      */
     public function setContentType($contentType)
     {
         $this->contentType = $contentType;
+
+        return $this;
     }
 
     /**
@@ -100,10 +114,14 @@ class Message
 
     /**
      * @param string $messageId
+     *
+     * @return self
      */
     public function setMessageId($messageId)
     {
         $this->messageId = $messageId;
+
+        return $this;
     }
 
     /**
@@ -116,13 +134,19 @@ class Message
 
     /**
      * @param int $timestamp
+     *
+     * @return self
      */
     public function setTimestamp($timestamp)
     {
         $this->timestamp = $timestamp;
+
+        return $this;
     }
 
     /**
+     * @see Oro\Component\MessageQueue\Client\MessagePriority
+     *
      * @return string
      */
     public function getPriority()
@@ -131,11 +155,15 @@ class Message
     }
 
     /**
-     * @param string $priority
+     * @param string $priority Can be any value from {@see Oro\Component\MessageQueue\Client\MessagePriority)
+     *
+     * @return self
      */
     public function setPriority($priority)
     {
         $this->priority = $priority;
+
+        return $this;
     }
 
     /**
@@ -150,10 +178,14 @@ class Message
 
     /**
      * @param int|null $expire
+     *
+     * @return self
      */
     public function setExpire($expire)
     {
         $this->expire = $expire;
+
+        return $this;
     }
 
     /**
@@ -170,10 +202,14 @@ class Message
      * Set delay in seconds
      *
      * @param int|null $delay
+     *
+     * @return self
      */
     public function setDelay($delay)
     {
         $this->delay = $delay;
+
+        return $this;
     }
 
     /**
@@ -198,18 +234,26 @@ class Message
     /**
      * @param string $name
      * @param mixed $value
+     *
+     * @return self
      */
     public function setHeader($name, $value)
     {
         $this->headers[$name] = $value;
+
+        return $this;
     }
 
     /**
      * @param array $headers
+     *
+     * @return self
      */
     public function setHeaders(array $headers)
     {
         $this->headers = $headers;
+
+        return $this;
     }
 
     /**
@@ -222,10 +266,14 @@ class Message
 
     /**
      * @param array $properties
+     *
+     * @return self
      */
     public function setProperties(array $properties)
     {
         $this->properties = $properties;
+
+        return $this;
     }
 
     /**
@@ -242,9 +290,13 @@ class Message
     /**
      * @param string $name
      * @param mixed $value
+     *
+     * @return self
      */
     public function setProperty($name, $value)
     {
         $this->properties[$name] = $value;
+
+        return $this;
     }
 }
