@@ -26,6 +26,10 @@ class BuildNestedObjects implements ProcessorInterface
         }
 
         $config = $context->getConfig();
+        if (null === $config) {
+            return;
+        }
+
         $hasChanges = false;
         $fields = $config->getFields();
         foreach ($fields as $fieldName => $field) {

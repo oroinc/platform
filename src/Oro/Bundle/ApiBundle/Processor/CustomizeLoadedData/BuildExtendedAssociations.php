@@ -37,8 +37,13 @@ class BuildExtendedAssociations implements ProcessorInterface
             return;
         }
 
+        $config = $context->getConfig();
+        if (null === $config) {
+            return;
+        }
+
         $hasChanges = false;
-        $fields = $context->getConfig()->getFields();
+        $fields = $config->getFields();
         foreach ($fields as $fieldName => $field) {
             if (!$field->isExcluded()
                 && DataType::isExtendedAssociation($field->getDataType())

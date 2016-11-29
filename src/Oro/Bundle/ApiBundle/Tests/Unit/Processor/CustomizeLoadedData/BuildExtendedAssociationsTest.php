@@ -4,7 +4,6 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\CustomizeLoadedData;
 
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 use Oro\Bundle\ApiBundle\Processor\CustomizeLoadedData\BuildExtendedAssociations;
-use Oro\Bundle\ApiBundle\Processor\CustomizeLoadedData\BuildNestedObjects;
 use Oro\Bundle\ApiBundle\Processor\CustomizeLoadedData\CustomizeLoadedDataContext;
 use Oro\Bundle\EntityExtendBundle\Entity\Manager\AssociationManager;
 
@@ -32,6 +31,16 @@ class BuildExtendedAssociationsTest extends \PHPUnit_Framework_TestCase
     {
         $this->processor->process($this->context);
         $this->assertFalse($this->context->hasResult());
+    }
+
+    public function testProcessWithoutConfig()
+    {
+        $data = [
+            'field1' => 123
+        ];
+
+        $this->context->setResult($data);
+        $this->processor->process($this->context);
     }
 
     public function testProcessWithoutExtendedAssociations()
