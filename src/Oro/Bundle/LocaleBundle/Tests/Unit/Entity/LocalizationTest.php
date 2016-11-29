@@ -6,10 +6,12 @@ use Oro\Bundle\LocaleBundle\Entity\LocalizedFallbackValue;
 use Oro\Bundle\LocaleBundle\Tests\Unit\Entity\Stub\Localization;
 
 use Oro\Component\Testing\Unit\EntityTestCaseTrait;
+use Oro\Component\Testing\Unit\EntityTrait;
 
 class LocalizationTest extends \PHPUnit_Framework_TestCase
 {
     use EntityTestCaseTrait;
+    use EntityTrait;
 
     public function testAccessors()
     {
@@ -72,16 +74,17 @@ class LocalizationTest extends \PHPUnit_Framework_TestCase
 
     public function testTitleAccessors()
     {
-        $entity = new Localization();
+        $entity = $this->getEntity(Localization::class, ['id' => 1]);
         $this->assertEmpty($entity->getTitles()->toArray());
 
         $defaultTitle = $this->createLocalizedValue('default', true);
         $firstTitle = $this->createLocalizedValue('test1');
-        $secondTitle = $this->createLocalizedValue('test2');
+        $secondTitleLocalization = $this->getEntity(Localization::class, ['id' => 2]);
+        $secondTitle = $this->createLocalizedValue('test2', false, $secondTitleLocalization);
 
-        $parentLocalization = new Localization();
+        $parentLocalization = $this->getEntity(Localization::class, ['id' => 3]);
 
-        $localization = new Localization();
+        $localization = $this->getEntity(Localization::class, ['id' => 4]);
         $localization->setParentLocalization($parentLocalization);
         $withParentTitle = $this->createLocalizedValue('testParent', false, $parentLocalization);
 
