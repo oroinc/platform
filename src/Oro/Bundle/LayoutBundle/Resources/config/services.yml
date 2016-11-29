@@ -24,6 +24,7 @@ services:
             - [addExtension, ['@oro_layout.extension']]
             - [addExtension, ['@oro_layout.theme_extension']]
             - [setDefaultRenderer, ['%oro_layout.templating.default%']]
+            - [setDebug, ['%kernel.debug%']]
 
     oro_layout.layout_manager:
         class: %oro_layout.layout_manager.class%
