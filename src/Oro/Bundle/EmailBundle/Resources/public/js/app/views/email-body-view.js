@@ -34,6 +34,7 @@ define(function(require) {
             _.extend(this, _.pick(options, ['bodyContent', 'styles']));
             this.$frame = this.$el;
             this.$frame.on('emailShown', _.bind(this._updateHeight, this));
+            this.$frame.on('load', this.reattachBody.bind(this));
             this.setElement(this.$el.contents().find('html'));
             EmailBodyView.__super__.initialize.apply(this, arguments);
         },

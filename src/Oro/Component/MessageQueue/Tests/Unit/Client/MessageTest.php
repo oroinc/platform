@@ -9,12 +9,19 @@ class MessageTest extends \PHPUnit_Framework_TestCase
     {
         new Message();
     }
-    
+
+    public function testCouldBeSetBodyAndPriorityViaConstructor()
+    {
+        $message = new Message('theBody', 'thePriority');
+        self::assertEquals('theBody', $message->getBody());
+        self::assertEquals('thePriority', $message->getPriority());
+    }
+
     public function testShouldAllowGetPreviouslySetBody()
     {
         $message = new Message();
         
-        $message->setBody('theBody');
+        self::assertSame($message, $message->setBody('theBody'));
         
         self::assertSame('theBody', $message->getBody());
     }
@@ -23,7 +30,7 @@ class MessageTest extends \PHPUnit_Framework_TestCase
     {
         $message = new Message();
 
-        $message->setContentType('theContentType');
+        self::assertSame($message, $message->setContentType('theContentType'));
 
         self::assertSame('theContentType', $message->getContentType());
     }
@@ -32,7 +39,7 @@ class MessageTest extends \PHPUnit_Framework_TestCase
     {
         $message = new Message();
 
-        $message->setDelay('theDelay');
+        self::assertSame($message, $message->setDelay('theDelay'));
 
         self::assertSame('theDelay', $message->getDelay());
     }
@@ -41,7 +48,7 @@ class MessageTest extends \PHPUnit_Framework_TestCase
     {
         $message = new Message();
 
-        $message->setExpire('theExpire');
+        self::assertSame($message, $message->setExpire('theExpire'));
 
         self::assertSame('theExpire', $message->getExpire());
     }
@@ -50,7 +57,7 @@ class MessageTest extends \PHPUnit_Framework_TestCase
     {
         $message = new Message();
 
-        $message->setPriority('thePriority');
+        self::assertSame($message, $message->setPriority('thePriority'));
 
         self::assertSame('thePriority', $message->getPriority());
     }
@@ -59,7 +66,7 @@ class MessageTest extends \PHPUnit_Framework_TestCase
     {
         $message = new Message();
 
-        $message->setMessageId('theMessageId');
+        self::assertSame($message, $message->setMessageId('theMessageId'));
 
         self::assertSame('theMessageId', $message->getMessageId());
     }
@@ -68,7 +75,7 @@ class MessageTest extends \PHPUnit_Framework_TestCase
     {
         $message = new Message();
 
-        $message->setTimestamp('theTimestamp');
+        self::assertSame($message, $message->setTimestamp('theTimestamp'));
 
         self::assertSame('theTimestamp', $message->getTimestamp());
     }
@@ -84,7 +91,7 @@ class MessageTest extends \PHPUnit_Framework_TestCase
     {
         $message = new Message();
 
-        $message->setHeaders(['foo' => 'fooVal']);
+        self::assertSame($message, $message->setHeaders(['foo' => 'fooVal']));
 
         self::assertSame(['foo' => 'fooVal'], $message->getHeaders());
     }
@@ -93,7 +100,7 @@ class MessageTest extends \PHPUnit_Framework_TestCase
     {
         $message = new Message();
 
-        $message->setHeader('foo', 'fooVal');
+        self::assertSame($message, $message->setHeader('foo', 'fooVal'));
 
         self::assertSame('fooVal', $message->getHeader('foo'));
     }
@@ -116,7 +123,7 @@ class MessageTest extends \PHPUnit_Framework_TestCase
     {
         $message = new Message();
 
-        $message->setProperties(['foo' => 'fooVal']);
+        self::assertSame($message, $message->setProperties(['foo' => 'fooVal']));
 
         self::assertSame(['foo' => 'fooVal'], $message->getProperties());
     }
@@ -125,7 +132,7 @@ class MessageTest extends \PHPUnit_Framework_TestCase
     {
         $message = new Message();
 
-        $message->setProperty('foo', 'fooVal');
+        self::assertSame($message, $message->setProperty('foo', 'fooVal'));
 
         self::assertSame('fooVal', $message->getProperty('foo'));
     }
