@@ -14,6 +14,7 @@
                 mediator.trigger('widget_success:' + widget.getAlias());
                 mediator.trigger('widget_success:' + widget.getWid());
                 widget.remove();
+                mediator.execute('refreshPage');
             });
         });
         </script>
@@ -92,7 +93,6 @@
         <div class="form-container">
             <form id="{{ form.vars.id }}" name="{{ form.vars.name }}" action="{{ formAction }}" method="post" class="change-password-form">
                 <fieldset class="form form-horizontal">
-                    {{ form_row(form.password) }}
                     {% if not form.vars.valid and form.vars.errors|length %}
                         <div class="alert alert-error">
                             <div class="message">
@@ -100,6 +100,7 @@
                             </div>
                         </div>
                     {% endif %}
+                    {{ form_row(form.password) }}
                 </fieldset>
                 <fieldset class="form-horizontal">
                     {{ form_rest(form) }}
