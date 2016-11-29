@@ -4,8 +4,8 @@ namespace Oro\Bundle\EmailBundle\EventListener;
 
 use Symfony\Component\Routing\Router;
 
-use Oro\Bundle\EmailBundle\Entity\Email;
 use Oro\Bundle\ActivityBundle\Event\PrepareContextTitleEvent;
+use Oro\Bundle\EmailBundle\Entity\Email;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 
 class PrepareContextTitleListener

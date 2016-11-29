@@ -337,13 +337,15 @@ class ArrayUtil
     /**
      * Return the values from a single column in the input array
      *
-     * http://php.net/manual/en/function.array-column.php
+     * @link http://php.net/manual/en/function.array-column.php
      *
      * @param array $array
      * @param mixed $columnKey
      * @param mixed $indexKey
      *
      * @return array
+     *
+     * @deprecated since 1.10. Use native array_column instead
      */
     public static function arrayColumn(array $array, $columnKey, $indexKey = null)
     {

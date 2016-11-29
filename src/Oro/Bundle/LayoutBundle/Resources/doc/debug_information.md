@@ -6,6 +6,9 @@ In **Symfony Profiler** page you can find section **Layout** that contains:
  - **Context Items**
  - **Context Data Items**
  - **Layout Tree**
+ 
+**IMPORTANT:** [Layout data collector](../../DataCollector/LayoutDataCollector.php) collect debug information only if layout cache is fresh. 
+See [Layout cache](./layout_cache.md) section.
 
 ### Layout Tree
 

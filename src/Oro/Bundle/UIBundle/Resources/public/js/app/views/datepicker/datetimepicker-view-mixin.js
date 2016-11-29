@@ -97,7 +97,8 @@ define(function(require) {
             if (options.fieldsWrapper) {
                 this.$frontDateField
                     .wrap(options.fieldsWrapper)
-                    .data('isWrapped', true);
+                    .data('isWrapped', true)
+                    .before(this.$el);
             }
             this.$frontTimeField = $('<input />');
             options.timeInputAttrs.type = this.nativeMode ? 'time' : 'text';
@@ -144,6 +145,11 @@ define(function(require) {
                 this.$frontTimeField.prop('disabled', true);
             }
             this._super().initPickerWidget.apply(this, arguments);
+        },
+
+        setDisabled: function(disabled) {
+            this.$frontTimeField.prop('disabled', disabled).trigger(disabled ? 'disabled' : 'enabled');
+            this._super().setDisabled.apply(this, arguments);
         },
 
         /**

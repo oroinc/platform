@@ -21,6 +21,11 @@ use Oro\Bundle\SecurityBundle\Authentication\Token\OrganizationContextTokenInter
 
 class ResponseHistoryListener
 {
+    /** @var array */
+    public static $excludedActions = [
+        'Oro\Bundle\FrontendBundle\Controller\FrontendController::exceptionAction',
+    ];
+
     /** @var string */
     protected $historyItemFQCN;
 
@@ -69,8 +74,7 @@ class ResponseHistoryListener
      */
     public function onResponse(FilterResponseEvent $event)
     {
-        if (HttpKernel::MASTER_REQUEST != $event->getRequestType()) {
-            // Do not do anything
+        if (!$this->shouldSaveHistory($event)) {
             return null;
         }
 
@@ -140,6 +144,26 @@ class ResponseHistoryListener
 
         if ($eventManager instanceof OroEventManager) {
             $eventManager->clearDisabledListeners();
+        }
+
+        return true;
+    }
+
+    /**
+     * @param FilterResponseEvent $event
+     * @return bool
+     */
+    private function shouldSaveHistory(FilterResponseEvent $event)
+    {
+        if (HttpKernel::MASTER_REQUEST != $event->getRequestType()) {
+            // Do not do anything
+            return false;
+        }
+
+        //exclude exceptions, history should not save exception pages
+        $attributes = $event->getRequest()->attributes;
+        if (isset($attributes) && in_array($attributes->get('_controller'), self::$excludedActions)) {
+            return false;
         }
 
         return true;

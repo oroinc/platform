@@ -25,6 +25,26 @@ class ScopeCriteria implements \IteratorAggregate
 
     /**
      * @param QueryBuilder $qb
+     * @param string       $alias
+     * @param array        $ignoreFields
+     *
+     * @return QueryBuilder
+     */
+    public function applyWhereWithPriority(QueryBuilder $qb, $alias, array $ignoreFields = [])
+    {
+        foreach ($this->context as $field => $value) {
+            if (in_array($field, $ignoreFields)) {
+                continue;
+            }
+
+            $qb->andWhere($this->resolveBasicCondition($qb, $alias, $field, $value, true));
+        }
+
+        return $qb;
+    }
+
+    /**
+     * @param QueryBuilder $qb
      * @param string $alias
      * @param array $ignoreFields
      * @return QueryBuilder

@@ -171,8 +171,10 @@ services:
             - '@security.context'
             - '@doctrine.orm.entity_manager'
             - '@oro_navigation.item.factory'
+            - '@router'
         tags:
             - { name: oro_menu.builder, alias: pinbar }
+            - { name: oro_featuretogle.feature, feature: email }
 
     oro_navigation.favorites_menu.builder:
         class: %oro_navigation.navigation_item_menu.builder.class%
@@ -180,8 +182,10 @@ services:
             - '@security.context'
             - '@doctrine.orm.entity_manager'
             - '@oro_navigation.item.factory'
+            - '@router'
         tags:
             - { name: oro_menu.builder, alias: favorite }
+            - { name: oro_featuretogle.feature, feature: email }
 
     oro_navigation.history_menu.builder:
         class: %oro_navigation.navigation_history_menu.builder.class%
@@ -189,11 +193,13 @@ services:
             - '@security.context'
             - '@doctrine.orm.entity_manager'
             - '@oro_navigation.item.factory'
+            - '@router'
         calls:
             - [ setMatcher, [ '@knp_menu.matcher' ]]
             - [ setOptions, [ '@oro_config.user' ]]
         tags:
             - { name: oro_menu.builder, alias: history }
+            - { name: oro_featuretogle.feature, feature: email }
 
     oro_navigation.mostviewed_menu.builder:
         class: %oro_navigation.navigation_mostviewed_menu.builder.class%
@@ -201,10 +207,12 @@ services:
             - '@security.context'
             - '@doctrine.orm.entity_manager'
             - '@oro_navigation.item.factory'
+            - "@router"
         calls:
             - [ setOptions, [ '@oro_config.user' ]]
         tags:
             - { name: oro_menu.builder, alias: mostviewed }
+            - { name: oro_featuretogle.feature, feature: email }
 
     knp_voter_request:
         class: %oro_navigation.menu.matcher.voter.request%
@@ -350,22 +358,19 @@ services:
         tags:
             - { name: oro_menu.builder, priority: 100 }
 
-    oro_navigation.repository.menu_update:
-        parent: oro_entity.abstract_repository
-        arguments:
-            - '%oro_navigation.entity.menu_update.class%'
-
     oro_navigation.ownership_provider.global:
         class: Oro\Bundle\NavigationBundle\Menu\Provider\GlobalOwnershipProvider
         arguments:
-            - '@oro_navigation.repository.menu_update'
+            - '@doctrine'
+            - '%oro_navigation.entity.menu_update.class%'
         tags:
             - { name: oro_navigation.ownership_provider, area: default, priority: 100 }
 
     oro_navigation.ownership_provider.user:
         class: Oro\Bundle\NavigationBundle\Menu\Provider\UserOwnershipProvider
         arguments:
-            - '@oro_navigation.repository.menu_update'
+            - '@doctrine'
+            - '%oro_navigation.entity.menu_update.class%'
             - '@security.token_storage'
         tags:
             - { name: oro_navigation.ownership_provider, area: default, priority: 200 }

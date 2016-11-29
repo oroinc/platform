@@ -77,11 +77,7 @@
         {% if entity.enabled %}
         <div class="btn-group">
             {% set buttonsHtml %}
-                {{ UI.clientButton({
-                    'dataUrl': path('oro_integration_schedule', { 'id': entity.id }) ,
-                    'aCss':   'no-hash schedule-button',
-                    'label' : 'oro.integration.button.sync'|trans
-                }) }}
+                {% placeholder oro_integration_sync_button with {'entity': entity} %}
                 {% placeholder oro_integration_force_sync_button with {'entity': entity} %}
             {% endset %}
             {{ UI.pinnedDropdownButton({'html': buttonsHtml}) }}

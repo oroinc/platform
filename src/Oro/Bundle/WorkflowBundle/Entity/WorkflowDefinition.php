@@ -8,9 +8,10 @@ use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\Collections\ArrayCollection;
 
-use Oro\Bundle\WorkflowBundle\Exception\WorkflowException;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
+use Oro\Bundle\ScopeBundle\Entity\Scope;
+use Oro\Bundle\WorkflowBundle\Exception\WorkflowException;
 
 /**
  * @ORM\Table(name="oro_workflow_definition")
@@ -50,6 +51,8 @@ class WorkflowDefinition implements DomainObjectInterface
 {
     const GROUP_TYPE_EXCLUSIVE_ACTIVE = 10;
     const GROUP_TYPE_EXCLUSIVE_RECORD = 20;
+
+    const CONFIG_SCOPES = 'scopes';
 
     /**
      * @var string
@@ -113,6 +116,22 @@ class WorkflowDefinition implements DomainObjectInterface
      * @ORM\Column(name="configuration", type="array")
      */
     protected $configuration = [];
+
+    /**
+     * @var Scope[]|Collection
+     *
+     * @ORM\ManyToMany(targetEntity="Oro\Bundle\ScopeBundle\Entity\Scope")
+     * @ORM\JoinTable(
+     *      name="oro_workflow_scopes",
+     *      joinColumns={
+     *          @ORM\JoinColumn(name="workflow_name", referencedColumnName="name", onDelete="CASCADE")
+     *      },
+     *      inverseJoinColumns={
+     *          @ORM\JoinColumn(name="scope_id", referencedColumnName="id", onDelete="CASCADE")
+     *      }
+     * )
+     */
+    protected $scopes;
 
     /**
      * @var WorkflowStep[]|Collection
@@ -201,6 +220,7 @@ class WorkflowDefinition implements DomainObjectInterface
      */
     public function __construct()
     {
+        $this->scopes = new ArrayCollection();
         $this->steps = new ArrayCollection();
         $this->entityAcls = new ArrayCollection();
         $this->restrictions = new ArrayCollection();
@@ -220,6 +240,33 @@ class WorkflowDefinition implements DomainObjectInterface
     public function __toString()
     {
         return (string)$this->getLabel();
+    }
+
+    /**
+     * @param array $scopesConfig
+     * @return $this
+     */
+    public function setScopesConfig(array $scopesConfig)
+    {
+        $this->configuration[self::CONFIG_SCOPES] = $scopesConfig;
+
+        return $this;
+    }
+
+    /**
+     * @return array
+     */
+    public function getScopesConfig()
+    {
+        return array_key_exists('scopes', $this->configuration) ? (array)$this->configuration[self::CONFIG_SCOPES] : [];
+    }
+
+    /**
+     * @return boolean
+     */
+    public function hasScopesConfig()
+    {
+        return !empty($this->configuration[self::CONFIG_SCOPES]);
     }
 
     /**
@@ -321,6 +368,40 @@ class WorkflowDefinition implements DomainObjectInterface
     public function setStepsDisplayOrdered($stepsDisplayOrdered)
     {
         $this->stepsDisplayOrdered = $stepsDisplayOrdered;
+
+        return $this;
+    }
+
+    /**
+     * @return Scope[]|Collection
+     */
+    public function getScopes()
+    {
+        return $this->scopes;
+    }
+
+    /**
+     * @param Scope $scope
+     * @return $this
+     */
+    public function addScope(Scope $scope)
+    {
+        if (!$this->scopes->contains($scope)) {
+            $this->scopes->add($scope);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param Scope $scope
+     * @return $this
+     */
+    public function removeScope(Scope $scope)
+    {
+        if ($this->scopes->contains($scope)) {
+            $this->scopes->removeElement($scope);
+        }
 
         return $this;
     }

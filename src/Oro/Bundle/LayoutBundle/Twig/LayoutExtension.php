@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\LayoutBundle\Twig;
 
+use Symfony\Component\Form\FormView;
+
 use Oro\Component\PhpUtils\ArrayUtil;
 use Oro\Component\Layout\Templating\TextHelper;
 use Oro\Component\Layout\BlockView;
@@ -81,6 +83,10 @@ class LayoutExtension extends \Twig_Extension
             new \Twig_SimpleFunction(
                 'layout_attr_defaults',
                 [$this, 'defaultAttributes']
+            ),
+            new \Twig_SimpleFunction(
+                'set_class_prefix_to_form',
+                [$this, 'setClassPrefixToForm']
             )
         ];
     }
@@ -138,6 +144,25 @@ class LayoutExtension extends \Twig_Extension
         }
 
         return $attr;
+    }
+
+    /**
+     * @param FormView $formView
+     * @param $classPrefix
+     */
+    public function setClassPrefixToForm(FormView $formView, $classPrefix)
+    {
+        $formView->vars['class_prefix'] = $classPrefix;
+
+        if (empty($formView->children) && !isset($formView->vars['prototype'])) {
+            return;
+        }
+        foreach ($formView->children as $child) {
+            $this->setClassPrefixToForm($child, $classPrefix);
+        }
+        if (isset($formView->vars['prototype'])) {
+            $this->setClassPrefixToForm($formView->vars['prototype'], $classPrefix);
+        }
     }
 
     /**

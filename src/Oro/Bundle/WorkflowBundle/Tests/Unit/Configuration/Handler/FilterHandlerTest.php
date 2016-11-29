@@ -4,6 +4,7 @@ namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Configuration\Handler;
 
 use Oro\Bundle\WorkflowBundle\Configuration\Handler\FilterHandler;
 use Oro\Bundle\WorkflowBundle\Configuration\WorkflowConfiguration;
+use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 
 class FilterHandlerTest extends \PHPUnit_Framework_TestCase
 {
@@ -31,6 +32,9 @@ class FilterHandlerTest extends \PHPUnit_Framework_TestCase
                 'incoming' => [
                     'name' => 'test_workflow',
                     'label' => 'Will be removed',
+                    WorkflowDefinition::CONFIG_SCOPES => [
+                        ['scope1' => 'value1'],
+                    ],
                     WorkflowConfiguration::NODE_ATTRIBUTES => [
                         [
                             'name' => 'test_attribute',
@@ -91,6 +95,9 @@ class FilterHandlerTest extends \PHPUnit_Framework_TestCase
                 ],
                 'expected' => [
                     'name' => 'test_workflow',
+                    WorkflowDefinition::CONFIG_SCOPES => [
+                        ['scope1' => 'value1'],
+                    ],
                     WorkflowConfiguration::NODE_ATTRIBUTES => [
                         [
                             'name' => 'test_attribute',

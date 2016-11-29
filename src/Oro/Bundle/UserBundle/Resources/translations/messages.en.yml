@@ -102,7 +102,8 @@ oro:
         phone.label:                 Phone
         email_origins.label:         Email Origins
         emails.label:                Emails
-        enabled.label:               Status
+        enabled.label:               Enabled
+        auth_status.label:           Status
         entity_description:          Represent user profile
         entity_label:                User
         entity_plural_label:         Users
@@ -114,7 +115,7 @@ oro:
         last_login.label:            Last logged in
         last_name.label:             Last name
         login_count.label:           Login count
-        login_disabled.label:        Login disabled
+        password_expires_at.label:   Password expires at
         failed_login_count.label:    Failed login count
         middle_name.label:           Middle name
         name_prefix.label:           Name prefix
@@ -132,6 +133,12 @@ oro:
         username.label:              Username
         organization.label:          Organization
         business_unit.label:         Business Unit
+
+        datagrid:
+            views:
+                active: Active Users
+                cannot_login: Cannot login
+                disabled: Disabled Users
 
         impersonation:
             entity_label: Impersonation
@@ -196,41 +203,71 @@ oro:
             reset_password.label: Reset password
             change_password.label: Change password
             new_password.label: New password
-            enter_new_password.label: Enter new password
-            enter_new_password_again.label: Enter new password again
+            enter_new_password.label: New password
+            enter_new_password_again.label: Repeat password
+            password_mismatch: The password fields must match.
             reset.label: Reset
             reset:
                 ttl_already_requested.message: The password for this user has already been requested within the last 24 hours
                 popup.message: User {{ user }} will receive reset password by email.
                 popup.question: Are you sure you want to proceed?
+            reset_password:
+                flash:
+                    success: Reset password email has been sent to user
             force_reset:
                 popup.message: User {{ user }} will receive reset password by email and will be disabled from login.
                 popup.question: Are you sure you want to proceed?
-                success.message: Password reset request has been sent.
-                failure.message: Password reset request has failed.
-                mass_action.success: Password reset completed successfully.
+                popup.button: Reset
+                success.message: Password reset request has been sent to %email%.
+                failure.message: Password reset request to %email% has failed.
+                mass_action.success: Password reset completed successfully. %count% emails sent.
                 mass_action.failure: Mass reset action has failed.
-                popup.label: Reset
         # password tooltip for different rules
         password_complexity:
             unrestricted: ~
             min_length: The password must be at least {{ length }} characters long
-            upper_case: The password must include an uppercase letter
+            lower_case: The password must include a lower case letter
+            upper_case: The password must include an upper case letter
             numbers:    The password must include a number
             special_chars:  The password must include a special character (!"#$%&'()*+,-./:;<=>?@[\]^_`{|}~ and space)
-            min_length_upper_case: The password must be at least {{ length }} characters long and include an uppercase letter
+            min_length_upper_case: The password must be at least {{ length }} characters long and include an upper case letter
             min_length_numbers: The password must be at least {{ length }} characters long and include a number
             min_length_special_chars: The password must be at least {{ length }} characters long and include a special character (!"#$%&'()*+,-./:;<=>?@[\]^_`{|}~ and space)
-            min_length_upper_case_numbers: The password must be at least {{ length }} characters long and include an uppercase letter and a number
-            min_length_upper_case_special_chars: The password must be at least {{ length }} characters long and include an uppercase letter and a special character (!"#$%&'()*+,-./:;<=>?@[\]^_`{|}~ and space)
+            min_length_upper_case_numbers: The password must be at least {{ length }} characters long and include an upper case letter and a number
+            min_length_upper_case_special_chars: The password must be at least {{ length }} characters long and include an upper case letter and a special character (!"#$%&'()*+,-./:;<=>?@[\]^_`{|}~ and space)
             min_length_numbers_special_chars: The password must be at least {{ length }} characters long and include a number and a special character (!"#$%&'()*+,-./:;<=>?@[\]^_`{|}~ and space)
-            min_length_upper_case_numbers_special_chars: The password must be at least {{ length }} characters long and include an uppercase letter, a number, and a special character (!"#$%&'()*+,-./:;<=>?@[\]^_`{|}~ and space)
-            upper_case_numbers: The password must include an uppercase letter and a number
-            upper_case_special_chars: The password must include an uppercase letter and a special character (!"#$%&'()*+,-./:;<=>?@[\]^_`{|}~ and space)
+            min_length_upper_case_numbers_special_chars: The password must be at least {{ length }} characters long and include an upper case letter, a number, and a special character (!"#$%&'()*+,-./:;<=>?@[\]^_`{|}~ and space)
+            upper_case_numbers: The password must include an upper case letter and a number
+            upper_case_special_chars: The password must include an upper case letter and a special character (!"#$%&'()*+,-./:;<=>?@[\]^_`{|}~ and space)
             numbers_special_chars: The password must include a number and a special character (!"#$%&'()*+,-./:;<=>?@[\]^_`{|}~ and space)
-            upper_case_numbers_special_chars: The password must include an uppercase letter, a number and a special character (!"#$%&'()*+,-./:;<=>?@[\]^_`{|}~ and space)
+            upper_case_numbers_special_chars: The password must include an upper case letter, a number and a special character (!"#$%&'()*+,-./:;<=>?@[\]^_`{|}~ and space)
+            min_length_lower_case: The password must be at least {{ length }} characters long and include a lower case letter
+            min_length_lower_case_upper_case: The password must be at least {{ length }} characters long and include a lower case letter, and an upper case letter
+            min_length_lower_case_numbers: The password must be at least {{ length }} characters long and include a lower case letter, and a number
+            min_length_lower_case_special_chars: The password must be at least {{ length }} characters long and include a lower case letter, and a special character (!"#$%&'()*+,-./:;<=>?@[\]^_`{|}~ and space)
+            min_length_lower_case_upper_case_numbers: The password must be at least {{ length }} characters long and include a lower case letter, an upper case letter, and a number
+            min_length_lower_case_upper_case_special_chars: The password must be at least {{ length }} characters long and include a lower case letter, an upper case letter, and a special character (!"#$%&'()*+,-./:;<=>?@[\]^_`{|}~ and space)
+            min_length_lower_case_numbers_special_chars: The password must be at least {{ length }} characters long and include a lower case letter, a number, and a special character (!"#$%&'()*+,-./:;<=>?@[\]^_`{|}~ and space)
+            min_length_lower_case_upper_case_numbers_special_chars: The password must be at least {{ length }} characters long and include a lower case letter, an upper case letter, a number, and a special character (!"#$%&'()*+,-./:;<=>?@[\]^_`{|}~ and space)
+            lower_case_upper_case: The password must include a lower case letter and an upper case letter
+            lower_case_numbers:    The password must include a lower case letter and a number
+            lower_case_special_chars:  The password must include a lower case letter and a special character (!"#$%&'()*+,-./:;<=>?@[\]^_`{|}~ and space)
+            lower_case_upper_case_numbers: The password must include a lower case letter, an upper case letter, and a number
+            lower_case_upper_case_special_chars: The password must include a lower case letter, an upper case letter, and a special character (!"#$%&'()*+,-./:;<=>?@[\]^_`{|}~ and space)
+            lower_case_numbers_special_chars: The password must include a lower case letter, a number, and a special character (!"#$%&'()*+,-./:;<=>?@[\]^_`{|}~ and space)
+            lower_case_upper_case_numbers_special_chars: The password must include a lower case letter, an upper case letter, a number, and a special character (!"#$%&'()*+,-./:;<=>?@[\]^_`{|}~ and space)
+
+        enabled:
+            enabled: Enabled
+            disabled: Disabled
 
         action:
+            enable:
+                label: Enable user
+                success: 'User %username% enabled.'
+            disable:
+                label: Disable user
+                success: 'User %username% disabled.'
             password_management:
                 label: Manage passwords
                 description: Reset or change passwords of other users
@@ -247,7 +284,6 @@ oro:
         security:
             password_changed.message: Your password was updated by an administrator. New password was sent to you by email.
             password_reseted.message: Your password was successfully reset. You may log in now.
-            remaining_login_attempts: '{0} You have no login attempts remaining.|{1} You have one login attempt remaining.|]1,Inf[ You have %count% login attempts remaining.'
         user_bar_settings:
             title: User bar
         image.tooltip: The avatar must be in BMP, JPEG or PNG formats, and the file must be less than %file_size% in size
@@ -267,14 +303,12 @@ oro:
         system_configuration:
             groups:
                 user_settings.title: User Settings
-                failed_login_limit.title: Login attempts
                 password_complexity_rules.title: Password restrictions
             fields:
-                failed_login_limit_enabled.label: Enable failed logins limit
-                failed_login_limit.label: Max login attempts
                 password_min_length.label: Minimal password length
                 password_numbers.label: Require a number
-                password_upper_case.label: Require an uppercase letter
+                password_lower_case.label: Require a lower case letter
+                password_upper_case.label: Require an upper case letter
                 password_special_chars:
                     label: Require a special character
                     tooltip: >

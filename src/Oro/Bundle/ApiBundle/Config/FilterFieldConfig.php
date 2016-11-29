@@ -64,6 +64,16 @@ class FilterFieldConfig implements FieldConfigInterface
     }
 
     /**
+     * Indicates whether the filter type is set.
+     *
+     * @return bool
+     */
+    public function hasType()
+    {
+        return array_key_exists(self::TYPE, $this->items);
+    }
+
+    /**
      * Gets the filter type.
      *
      * @return string|null

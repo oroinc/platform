@@ -39,27 +39,27 @@ Block types
 
 The **OroLayoutBundle** introduces a set of block types that allow to easily build HTML layout structure.
 
-| Type name | Type class | Default HTML output |
-|-----------|------------|-------------|
-| `root` | | `<html>` |
-| `head` | | `<head>` |
-| `title` | | `<title>` |
-| `meta` | [MetaType.php](../../Layout/Block/Type/MetaType.php) | `<meta>` |
-| `style` | [StyleType.php](../../Layout/Block/Type/StyleType.php) | `<style>` with content or `<link>` with external resource |
-| `script` | [ScriptType.php](../../Layout/Block/Type/ScriptType.php) | `<script>` |
-| `external_resource` | [ExternalResourceType.php](../../Layout/Block/Type/ExternalResourceType.php) | `<link>` |
-| `body` | | `<body>` |
-| `form_start` | [FormStartType.php](../../Layout/Block/Type/FormStartType.php) | `<form>` |
-| `form_end` | [FormEndType.php](../../Layout/Block/Type/FormEndType.php) | `</form>` |
-| `form` | [FormType.php](../../Layout/Block/Type/FormType.php) | Creates three child block: `form_start`, `form_fields`, `form_end` |
-| `form_fields` | [FormFieldsType.php](../../Layout/Block/Type/FormFieldsType.php) | Adds form fields based on the Symfony form |
-| `form_field` | [FormFieldType.php](../../Layout/Block/Type/FormFieldType.php) |  Block will be rendered differently depending on the field type of the Symfony form |
-| `fieldset` | | `<fieldset>` |
-| `link` | [LinkType.php](../../Layout/Block/Type/LinkType.php) | `<a>` |
-| `list` | | `<ul>` |
-| `ordered_list` | [OrderedListType.php](../../Layout/Block/Type/OrderedListType.php) | `<ol>` |
-| `list_item` | | `<li>`, this block type can be used if you want to control rendering of `li` tag and its attributes |
-| `text` | | Text node |
-| `input` | [InputType.php](../../Layout/Block/Type/InputType.php) | Input node |
-| `button` | | `<button>` or `<input type="submit/reset/button">` |
-| `button_group` | | Nothing, this is just a logical grouping of buttons. You can define how to render the button group in your application |
+| Type name | Default HTML output |
+|-----------|-------------|
+| `root` | `<html>` |
+| `head` | `<head>` |
+| `title` | `<title>` |
+| `meta` | `<meta>` |
+| `style` | `<style>` with content or `<link>` with external resource |
+| `script` | `<script>` |
+| `external_resource` | `<link>` |
+| `body` | `<body>` |
+| `form_start` | `<form>` |
+| `form_end` | `</form>` |
+| `form` | Creates three child block: `form_start`, `form_fields`, `form_end` |
+| `form_fields` | Adds form fields based on the Symfony form |
+| `form_field` |  Block will be rendered differently depending on the field type of the Symfony form |
+| `fieldset` | `<fieldset>` |
+| `link` | `<a>` |
+| `list` | `<ul>` |
+| `ordered_list` | `<ol>` |
+| `list_item` | `<li>`, this block type can be used if you want to control rendering of `li` tag and its attributes |
+| `text` | Text node |
+| `input` | Input node |
+| `button` | `<button>` or `<input type="submit/reset/button">` |
+| `button_group` | Nothing, this is just a logical grouping of buttons. You can define how to render the button group in your application |
