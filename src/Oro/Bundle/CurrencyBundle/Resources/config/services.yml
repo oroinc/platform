@@ -109,3 +109,6 @@ services:
             - '@oro_locale.settings'
             - '@oro_currency.config.currency'
 
+    oro_currency.converter.rate:
+        class: Oro\Bundle\CurrencyBundle\Converter\RateConverter
+        public: false
