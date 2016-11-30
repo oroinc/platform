@@ -11,6 +11,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
 use Oro\Bundle\ScopeBundle\Entity\Scope;
+use Oro\Bundle\WorkflowBundle\Configuration\WorkflowConfiguration;
 use Oro\Bundle\WorkflowBundle\Exception\WorkflowException;
 
 /**
@@ -884,5 +885,15 @@ class WorkflowDefinition implements DomainObjectInterface
         $this->groups[self::GROUP_TYPE_EXCLUSIVE_RECORD] = $groups;
 
         return $this;
+    }
+
+    /**
+     * @return array
+     */
+    public function getDisabledOperations()
+    {
+        return isset($this->configuration[WorkflowConfiguration::NODE_DISABLE_OPERATIONS])
+            ? $this->configuration[WorkflowConfiguration::NODE_DISABLE_OPERATIONS]
+            : [];
     }
 }

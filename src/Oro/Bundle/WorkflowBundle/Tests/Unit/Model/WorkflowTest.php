@@ -887,12 +887,6 @@ class WorkflowTest extends \PHPUnit_Framework_TestCase
             'property' => 'initEntities',
             'node' => WorkflowConfiguration::NODE_INIT_ENTITIES
         ];
-
-        yield [
-            'data' => ['operation1' => ['entity'], 'operation2' => ['entity']],
-            'property' => 'disabledOperations',
-            'node' => WorkflowConfiguration::NODE_DISABLE_OPERATIONS
-        ];
     }
 
     /**
