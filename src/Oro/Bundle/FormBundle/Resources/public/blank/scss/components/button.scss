@@ -1,4 +1,5 @@
-.button {
+.button,
+.btn {
     @include base-ui-element($use-base-style-for-button,
                              $button-padding,
                              $button-font-size,
