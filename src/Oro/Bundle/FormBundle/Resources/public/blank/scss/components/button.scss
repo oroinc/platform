@@ -11,12 +11,6 @@
                              $button-color
                             );
 
-    text-decoration: none;
-
-    touch-action: manipulation;
-    cursor: pointer;
-    user-select: none;
-
     @include element-state('hover') {
         text-decoration: none;
 

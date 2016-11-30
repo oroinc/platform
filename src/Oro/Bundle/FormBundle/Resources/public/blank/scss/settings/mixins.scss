@@ -36,6 +36,16 @@
 
         vertical-align: middle;
 
+        text-decoration: none;
+
+        touch-action: manipulation;
+
+        white-space: nowrap;
+
+        cursor: pointer;
+
+        user-select: none;
+
         &--full,
         &.full {
             width: 100%;

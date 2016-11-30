@@ -1,12 +1,80 @@
-.button,
-.btn {
+@mixin button-basic-states(
+    $size-m: 8px 15px,
+    $size-s: 6px 18px
+) {
+    @extend %base-transition;
+
+    &[disabled] {
+        opacity: .65;
+    }
+
     &--large {
         min-width: 200px;
     }
+
+    &--size {
+        &-m {
+            padding: $size-m;
+        }
+
+        &-s {
+            padding: $size-s;
+        }
+    }
+
+    &--offset {
+        &-m {
+            margin-left: $offset-y-m;
+        }
+    }
+}
+
+.button,
+.btn {
+    @include button-basic-states();
 }
 
 @include breakpoint('mobile-landscape') {
     .button--full-in-mobile {
         width: 100%;
     }
+}
+
+.button-info,
+.btn-info {
+    @include  base-ui-element(
+                $use-base-style: true,
+                $padding: 11px 25px,
+                $border: 1px solid get-color('additional', 'darker'),
+                $border-radius: 4px,
+                $background-color: get-color('additional', 'darker'),
+                $color: get-color('additional', 'ultra')
+            );
+
+    @include element-state('hover') {
+        text-decoration: none;
+
+        color: get-color('additional', 'ultra');
+    }
+
+    @include button-basic-states();
+}
+
+.btn-link {
+    @include  base-ui-element(
+                $use-base-style: true,
+                $padding: 11px 6px,
+                $border: 1px solid transparent,
+                $border-radius: null,
+                $background-color: transparent,
+                $color: get-color('ui', 'normal')
+            );
+
+    @include element-state('hover') {
+        text-decoration: none;
+
+        color: get-color('ui', 'focus');
+    }
+
+    @include button-basic-states($size-m: 8px 6px, $size-s: 6px);
 }
