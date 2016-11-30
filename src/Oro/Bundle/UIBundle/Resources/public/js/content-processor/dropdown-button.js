@@ -142,7 +142,7 @@ define(['jquery', 'underscore', 'jquery-ui'], function($, _) {
             return $buttons.filter('.btn')
                 .removeClass(function(index, css) {
                     return (css.match(/\bbtn(-\S+)?/g) || []).join(' ');
-                }).wrap('<li></li>').parent();
+                }).addClass('dropdown-item').wrap('<li></li>').parent();
         }
     });
 
