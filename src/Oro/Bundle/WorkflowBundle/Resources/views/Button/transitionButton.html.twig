@@ -23,10 +23,11 @@
     {{ workflowMacros.renderTransitionButton(
         workflow,
         transition,
-	    workflowItem|default(null),
+        workflowItem|default(null),
         transitionData,
-	    onlyLink|default(false),
-	    noIcon|default(false),
-        noIconText|default(false)
+        onlyLink|default(false),
+        noIcon|default(false),
+        noIconText|default(false),
+        aClass|default('')
     ) }}
 {% if not onlyLink|default(false) %}</div>{% endif %}

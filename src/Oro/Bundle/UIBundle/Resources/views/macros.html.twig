@@ -179,9 +179,9 @@
     {% if parameters.iCss is defined and parameters.iCss %}
         {% set iconHtml %}
         <i class="{{ parameters.iCss }} hide-text" >
-	        {% if not parameters.noIconText|default(false)%}
-		        {{ parameters.label }}
-	        {% endif %}
+            {% if not parameters.noIconText|default(false)%}
+                {{ parameters.label }}
+            {% endif %}
         </i>
         {% endset %}
     {% else %}

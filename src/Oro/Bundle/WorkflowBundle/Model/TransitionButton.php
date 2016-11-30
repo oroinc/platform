@@ -36,7 +36,7 @@ class TransitionButton implements ButtonInterface
      */
     public function getOrder()
     {
-        return $this->workflow->getDefinition()->getPriority() + 100;
+        return $this->workflow->getDefinition()->getPriority();
     }
 
     /**

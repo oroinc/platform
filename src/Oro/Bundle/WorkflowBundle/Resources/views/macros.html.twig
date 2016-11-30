@@ -1,4 +1,4 @@
-{% macro renderTransitionButton(workflow, transition, workflowItem, transitionData, onlyLink, noIcon, noIconText) %}
+{% macro renderTransitionButton(workflow, transition, workflowItem, transitionData, onlyLink, noIcon, noIconText, aClass) %}
     {% import 'OroUIBundle::macros.html.twig' as ui %}
 
     {% if transition.displayType == 'dialog' and (transitionData['dialog-url'] is not defined or not transitionData['dialog-url']) and transition.hasForm() %}
@@ -53,22 +53,23 @@
     {% endif %}
 
     {% set label %}
-		{{ transition.label|trans({},'workflows') }}
+        {{ transition.label|trans({},'workflows') }}
     {% endset %}
 
     {% set class %}
-	    icons-holder-text
-	    {% if not onlyLink|default(false) %}btn workflow-transition-buttons{% endif %}
+        {{ aClass }}
+        icons-holder-text
+        {% if not onlyLink|default(false) %}btn workflow-transition-buttons{% endif %}
         {% if transition.displayType == 'dialog' %}no-hash{% endif %}
         {% if not transitionData.enabled %}disabled{% endif %}
         {% if transition.frontendOptions is defined and transition.frontendOptions.class is defined %}{{ transition.frontendOptions.class }}{% endif %}
     {% endset %}
 
-	{% if noIcon|default(false) %}
-		{% set iCss = false %}
-	{% else %}
-		{% set iCss = transition.frontendOptions is defined and transition.frontendOptions.icon is defined ? transition.frontendOptions.icon : '' %}
-	{% endif %}
+    {% if noIcon|default(false) %}
+        {% set iCss = false %}
+    {% else %}
+        {% set iCss = transition.frontendOptions.icon is defined ? transition.frontendOptions.icon : '' %}
+    {% endif %}
 
     {# Transaltions temporary disabled due to BAP-5355 #}
     {{ ui.link({
@@ -79,7 +80,7 @@
         'class': class,
         'data': data,
         'label': label,
-	    'noIconText': noIconText|default(false),
+        'noIconText': noIconText|default(false),
     }) }}
 {% endmacro %}
 
