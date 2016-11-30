@@ -2,7 +2,6 @@ define(function(require) {
     'use strict';
 
     var WorkflowActionPermissionsRowView;
-    var _ = require('underscore');
     var mediator = require('oroui/js/mediator');
     var ActionPermissionsRowView = require('orouser/js/datagrid/action-permissions-row-view');
     var FieldView = require('./workflow-action-permissions-field-view');
