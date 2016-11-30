@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\ActionBundle\Tests\Unit\Filter;
+namespace Oro\Bundle\ActionBundle\Tests\Unit\Filter\Stub;
 
 use Oro\Bundle\ActionBundle\Model\OperationRegistryFilterInterface;
 
