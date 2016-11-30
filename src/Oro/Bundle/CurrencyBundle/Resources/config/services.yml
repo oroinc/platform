@@ -31,7 +31,7 @@ services:
 
     #currencyConfig
     oro_currency.config.currency:
-        class: 'Oro\Bundle\CurrencyBundle\Config\CurrencyConfigManager'
+        class: 'Oro\Bundle\CurrencyBundle\Config\DefaultCurrencyConfigManager'
         lazy: true
         arguments:
             - '@oro_config.manager'

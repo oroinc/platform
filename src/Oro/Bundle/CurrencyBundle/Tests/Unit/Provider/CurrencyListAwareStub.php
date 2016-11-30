@@ -2,12 +2,18 @@
 
 namespace Oro\Bundle\CurrencyBundle\Tests\Unit\Provider;
 
-use Oro\Bundle\CurrencyBundle\Provider\CurrencyProviderInterface;
+use Oro\Bundle\CurrencyBundle\Provider\CurrencyListAwareInterface;
 
-class CurrencyStubProvider implements CurrencyProviderInterface
+class CurrencyListAwareStub implements CurrencyListAwareInterface
 {
+    /**
+     * @var array
+     */
     private $currencyList = ['USD', 'EUR'];
 
+    /**
+     * {@inheritdoc}
+     */
     public function getCurrencyList()
     {
         return $this->currencyList;

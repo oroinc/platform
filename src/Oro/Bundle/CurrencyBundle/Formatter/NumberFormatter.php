@@ -2,24 +2,27 @@
 
 namespace Oro\Bundle\CurrencyBundle\Formatter;
 
+use Oro\Bundle\CurrencyBundle\Config\CurrenciesViewTypeAwareInterface;
 use Oro\Bundle\LocaleBundle\Formatter\NumberFormatter as BaseFormatter;
 use Oro\Bundle\LocaleBundle\Model\LocaleSettings;
-use Oro\Bundle\CurrencyBundle\Config\CurrencyConfigManager;
 
 class NumberFormatter extends BaseFormatter
 {
-    protected $currencyConfigManager;
+    /**
+     * @var CurrenciesViewTypeAwareInterface
+     */
+    protected $viewTypeAware;
 
     /**
      * NumberFormatter constructor.
-     *
-     * @param LocaleSettings        $localeSettings
-     * @param CurrencyConfigManager $currencyConfigManager
+
+     * @param LocaleSettings $localeSettings
+     * @param CurrenciesViewTypeAwareInterface $viewTypeAware
      */
-    public function __construct(LocaleSettings $localeSettings, CurrencyConfigManager $currencyConfigManager)
+    public function __construct(LocaleSettings $localeSettings, CurrenciesViewTypeAwareInterface $viewTypeAware)
     {
         parent::__construct($localeSettings);
-        $this->currencyConfigManager = $currencyConfigManager;
+        $this->viewTypeAware = $viewTypeAware;
     }
 
     /**
@@ -55,7 +58,7 @@ class NumberFormatter extends BaseFormatter
             }
         );
 
-        if ($this->currencyConfigManager->getViewType() === CurrencyConfigManager::VIEW_TYPE_ISO_CODE) {
+        if ($this->viewTypeAware->getViewType() === CurrenciesViewTypeAwareInterface::VIEW_TYPE_ISO_CODE) {
             $localizedCurrencySymbol =
                 $this->isCurrencySymbolPrepend($currencyCode, $locale) ?
                     sprintf('%s ', $localizedCurrencySymbol) : $localizedCurrencySymbol;

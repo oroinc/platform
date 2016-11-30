@@ -4,9 +4,8 @@ namespace Oro\Bundle\CurrencyBundle\Config;
 
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\CurrencyBundle\DependencyInjection\Configuration as CurrencyConfig;
-use Oro\Bundle\CurrencyBundle\Provider\CurrencyProviderInterface;
 
-class CurrencyConfigManager implements CurrencyConfigInterface, CurrencyProviderInterface
+class DefaultCurrencyConfigManager implements CurrencyConfigInterface, CurrenciesViewTypeAwareInterface
 {
     /**
      * @var ConfigManager
