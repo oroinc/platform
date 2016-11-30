@@ -233,8 +233,6 @@ To migrate all labels from configuration translatable fields automatically you c
   * `Oro\Bundle\WorkflowBundle\Model\AttributeManager`
   * `Oro\Bundle\WorkflowBundle\Model\Condition\AbstractCondition`
   * `Oro\Bundle\WorkflowBundle\Model\Condition\Configurable`
-- Added new option `--skip-scope-processing` to command `oro:workflow:definitions:load` that skip workflow scope loading.
-- Added new command `oro:workflow:scope:update` that update scopes for workflow definitions already loaded to database.
 - Added new node `sopes` to `Oro\Bundle\WorkflowBundle\Configuration\WorkflowConfiguration`.
 - Added method `Oro\Bundle\WorkflowBundle\Entity\Repository\WorkflowDefinitionRepository::getScopedByNames(array $names, ScopeCriteria $scopeCriteria)`.
 - Added ManyToMany relation from `WorkflowDefinition` to `Oro\Bundle\ScopeBundle\Entity\Scope`.

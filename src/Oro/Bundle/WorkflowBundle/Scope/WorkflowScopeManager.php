@@ -28,9 +28,6 @@ class WorkflowScopeManager
     /** @var LoggerInterface */
     protected $logger;
 
-    /** @var bool */
-    protected $enabled = true;
-
     /**
      * @param ManagerRegistry $registry
      * @param ScopeManager $scopeManager
@@ -44,27 +41,18 @@ class WorkflowScopeManager
     }
 
     /**
-     * Should be used only for command for loading workflow configurations
-     *
-     * @param bool $isEnabled
-     */
-    public function setEnabled($isEnabled = true)
-    {
-        $this->enabled = (bool)$isEnabled;
-    }
-
-    /**
      * @param WorkflowDefinition $workflowDefinition
+     * @param bool $resetScopes
      * @throws WorkflowScopeConfigurationException
      */
-    public function updateScopes(WorkflowDefinition $workflowDefinition)
+    public function updateScopes(WorkflowDefinition $workflowDefinition, $resetScopes = false)
     {
-        if (!$this->enabled) {
-            return;
-        }
+        $contexts = [];
 
         try {
-            $contexts = $this->createScopeContexts($workflowDefinition->getScopesConfig());
+            if (!$resetScopes) {
+                $contexts = $this->createScopeContexts($workflowDefinition->getScopesConfig());
+            }
         } catch (WorkflowScopeConfigurationException $e) {
             $this->logger->error(
                 '[WorkflowScopeManager] Workflow scopes could not be updated.',
