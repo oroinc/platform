@@ -107,6 +107,8 @@ services:
             - '@oro_layout.theme_manager'
             - '@filesystem'
             - "%kernel.root_dir%/../web/"
+        calls:
+            - ['setLogger', ['@logger']]
         tags:
             - { name: assetic.formula_resource, loader: layout }
 
