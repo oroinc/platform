@@ -92,8 +92,75 @@ class WorkflowAclMetadataProviderTest extends \PHPUnit_Framework_TestCase
     {
         $workflowName = 'workflow1';
         $workflowConfiguration = [
+            'steps'       => [
+                'next_step' => ['label' => 'next step']
+            ],
             'transitions' => [
-                'transition1' => ['label' => 'transition 1']
+                'transition1' => ['label' => 'transition 1', 'step_to' => 'next_step']
+            ]
+        ];
+
+        $query = $this->loadWorkflowExpectations();
+        $query->expects(self::once())
+            ->method('getArrayResult')
+            ->willReturn(
+                [
+                    [
+                        'name'          => $workflowName,
+                        'label'         => 'workflow 1',
+                        'configuration' => $workflowConfiguration
+                    ]
+                ]
+            );
+        $this->featureChecker->expects(self::once())
+            ->method('isResourceEnabled')
+            ->with($workflowName)
+            ->willReturn(true);
+        $this->translator->expects(self::any())
+            ->method('trans')
+            ->willReturnCallback(function ($label, $parameters, $domain) {
+                $result = 'translated: ' . $label;
+                if (!empty($parameters)) {
+                    foreach ($parameters as $key => $val) {
+                        $result .= ' ' . $key . ': (' . $val . ')';
+                    }
+                }
+                if (!empty($domain)) {
+                    $result .= ' domain: ' . $domain;
+                }
+
+                return $result;
+            });
+
+        $expectedTransition = new FieldSecurityMetadata(
+            'transition1',
+            'translated: transition 1 domain: workflows',
+            [],
+            'translated: oro.workflow.transition.description %toStep%: (translated: next step domain: workflows)'
+        );
+        $expectedMetadata = new WorkflowAclMetadata(
+            $workflowName,
+            'translated: workflow 1 domain: workflows',
+            '',
+            [$expectedTransition]
+        );
+        self::assertEquals(
+            [$expectedMetadata],
+            $this->workflowAclMetadataProvider->getMetadata()
+        );
+        // test that the local cache is used
+        self::assertEquals(
+            [$expectedMetadata],
+            $this->workflowAclMetadataProvider->getMetadata()
+        );
+    }
+
+    public function testGetMetadataWhenStepDoesNotExist()
+    {
+        $workflowName = 'workflow1';
+        $workflowConfiguration = [
+            'transitions' => [
+                'transition1' => ['label' => 'transition 1', 'step_to' => 'next_step']
             ]
         ];
 
@@ -134,7 +201,50 @@ class WorkflowAclMetadataProviderTest extends \PHPUnit_Framework_TestCase
             [$expectedMetadata],
             $this->workflowAclMetadataProvider->getMetadata()
         );
-        // test that the local cache is used
+    }
+
+    public function testGetMetadataWhenTransitionDoesNotHaveStepTo()
+    {
+        $workflowName = 'workflow1';
+        $workflowConfiguration = [
+            'transitions' => [
+                'transition1' => ['label' => 'transition 1']
+            ]
+        ];
+
+        $query = $this->loadWorkflowExpectations();
+        $query->expects(self::once())
+            ->method('getArrayResult')
+            ->willReturn(
+                [
+                    [
+                        'name'          => $workflowName,
+                        'label'         => 'workflow 1',
+                        'configuration' => $workflowConfiguration
+                    ]
+                ]
+            );
+        $this->featureChecker->expects(self::once())
+            ->method('isResourceEnabled')
+            ->with($workflowName)
+            ->willReturn(true);
+        $this->translator->expects(self::any())
+            ->method('trans')
+            ->with(self::isType('string'), [], 'workflows')
+            ->willReturnCallback(function ($label) {
+                return 'translated: ' . $label;
+            });
+
+        $expectedTransition = new FieldSecurityMetadata(
+            'transition1',
+            'translated: transition 1'
+        );
+        $expectedMetadata = new WorkflowAclMetadata(
+            $workflowName,
+            'translated: workflow 1',
+            '',
+            [$expectedTransition]
+        );
         self::assertEquals(
             [$expectedMetadata],
             $this->workflowAclMetadataProvider->getMetadata()

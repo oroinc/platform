@@ -79,6 +79,7 @@ class WorkflowPermissionDatasourceTest extends \PHPUnit_Framework_TestCase
         $privilege1Transition1 = new AclPrivilege();
         $privilege1Transition1->setIdentity(new AclPrivilegeIdentity('workflow:workflow1:transition1', 'transition11'));
         $privilege1Transition1->addPermission(new AclPermission('PERFORM_TRANSITION', 3));
+        $privilege1Transition1->setDescription('Transition 11');
 
         $privilege1Transition2 = new AclPrivilege();
         $privilege1Transition2->setIdentity(new AclPrivilegeIdentity('workflow:workflow1:transition2', 'transition12'));
@@ -134,7 +135,7 @@ class WorkflowPermissionDatasourceTest extends \PHPUnit_Framework_TestCase
         /** @var ResultRecord $item1 */
         $item1 = $result[0];
         $this->assertEquals('workflow:workflow1', $item1->getValue('identity'));
-        $this->assertEquals('workflow 1_trans', $item1->getValue('entity'));
+        $this->assertEquals('workflow 1', $item1->getValue('entity'));
         $permissions = $item1->getValue('permissions');
         $this->assertCount(2, $permissions);
         $permission1 = $permissions[0];
@@ -154,7 +155,8 @@ class WorkflowPermissionDatasourceTest extends \PHPUnit_Framework_TestCase
         $transition1 = $transitions1[0];
         $this->assertEquals('workflow:workflow1:transition1', $transition1['identity']);
         $this->assertEquals('transition11', $transition1['name']);
-        $this->assertEquals('transition11_trans', $transition1['label']);
+        $this->assertEquals('transition11', $transition1['label']);
+        $this->assertEquals('Transition 11', $transition1['description']);
         $permissions = $transition1['permissions'];
         $this->assertCount(1, $permissions);
         $permission1 = $permissions[0];
@@ -166,7 +168,8 @@ class WorkflowPermissionDatasourceTest extends \PHPUnit_Framework_TestCase
         $transition2 = $transitions1[1];
         $this->assertEquals('workflow:workflow1:transition2', $transition2['identity']);
         $this->assertEquals('transition12', $transition2['name']);
-        $this->assertEquals('transition12_trans', $transition2['label']);
+        $this->assertEquals('transition12', $transition2['label']);
+        $this->assertNull($transition2['description']);
         $permissions = $transition2['permissions'];
         $this->assertCount(1, $permissions);
         $permission1 = $permissions[0];

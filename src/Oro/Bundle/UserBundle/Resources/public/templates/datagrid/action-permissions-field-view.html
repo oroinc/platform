@@ -1,2 +1,2 @@
-<div class="field-name"><%- label %></div>
+<div class="field-name"<% if(!_.isUndefined(obj.description) && !_.isEmpty(obj.description)) { %> title="<%- description %>"<% } %>><%- label %></div>
 <ul data-name="field-permissions-items" class="action-permissions"></ul>

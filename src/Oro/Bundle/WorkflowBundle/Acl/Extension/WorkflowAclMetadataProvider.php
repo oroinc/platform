@@ -96,9 +96,24 @@ class WorkflowAclMetadataProvider
         $transitions = [];
         if (isset($workflowConfiguration['transitions']) && is_array($workflowConfiguration['transitions'])) {
             foreach ($workflowConfiguration['transitions'] as $transitionName => $transitionRow) {
+                $description = null;
+                if (!empty($transitionRow['step_to'])
+                    && !empty($workflowConfiguration['steps'][$transitionRow['step_to']])
+                ) {
+                    $description = $this->translator->trans(
+                        'oro.workflow.transition.description',
+                        [
+                            '%toStep%' => $this->transLabel(
+                                $workflowConfiguration['steps'][$transitionRow['step_to']]['label']
+                            )
+                        ]
+                    );
+                }
                 $transitions[] = new FieldSecurityMetadata(
                     $transitionName,
-                    $this->transLabel($transitionRow['label'])
+                    $this->transLabel($transitionRow['label']),
+                    [],
+                    $description
                 );
             }
         }

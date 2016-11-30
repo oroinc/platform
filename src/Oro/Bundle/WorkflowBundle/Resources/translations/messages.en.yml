@@ -164,6 +164,7 @@ oro:
 
         transition:
             start: "Start %workflow%"
+            description: 'To step: %toStep%'
 
         workflowdefinition:
             entity_label:                 Workflow

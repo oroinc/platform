@@ -285,6 +285,7 @@ class AclPrivilegeRepository
                     $fieldInfo->getLabel()
                 )
             );
+            $privilege->setDescription($fieldInfo->getDescription());
 
             $this->addFieldPermissions(
                 $sid,
