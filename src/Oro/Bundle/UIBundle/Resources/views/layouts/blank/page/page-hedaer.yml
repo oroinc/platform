@@ -1,0 +1,10 @@
+layout:
+    actions:
+        - '@setBlockTheme':
+            themes: 'page-header.html.twig'
+
+        - '@add':
+            id: page_header
+            parentId: page_container
+            blockType: container
+            prepend: true

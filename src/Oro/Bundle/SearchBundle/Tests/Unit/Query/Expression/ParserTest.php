@@ -33,7 +33,11 @@ class ParserTest extends \PHPUnit_Framework_TestCase
         $this->assertContains('text.test2', $query->getSelect());
     }
 
-    private function generateTokens($elements)
+    /**
+     * @param array $elements
+     * @return array
+     */
+    private function generateTokens(array $elements)
     {
         $result = [];
 

@@ -4,9 +4,10 @@ namespace Oro\Bundle\UserBundle\Tests\Unit\Datagrid\Extension\MassAction;
 
 use Oro\Bundle\DataGridBundle\Datasource\ResultRecord;
 
-use Oro\Bundle\UserBundle\Entity\User;
+use Oro\Bundle\UserBundle\Tests\Unit\Stub\UserStub as User;
 use Oro\Bundle\UserBundle\Datagrid\Extension\MassAction\ResetPasswordActionHandler;
 use Oro\Bundle\NotificationBundle\Model\EmailTemplate;
+use Oro\Bundle\UserBundle\Handler\ResetPasswordHandler;
 
 class ResetPasswordActionHandlerTest extends \PHPUnit_Framework_TestCase
 {
@@ -29,34 +30,18 @@ class ResetPasswordActionHandlerTest extends \PHPUnit_Framework_TestCase
             ->method('getLoggedUser')
             ->willReturn(new User());
 
-        $processor = $this->getMockBuilder('Oro\Bundle\NotificationBundle\Manager\EmailNotificationManager')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $processor
-            ->expects($this->atLeastOnce())
-            ->method('process');
-
-        $userManager = $this->getMockBuilder('Oro\Bundle\UserBundle\Entity\UserManager')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $userManager
-            ->expects($this->atLeastOnce())
-            ->method('updateUser');
-
         $this->translator = $this->getMockBuilder('Symfony\Component\Translation\TranslatorInterface')
             ->disableOriginalConstructor()
             ->getMock();
 
-        $logger = $this->getMockBuilder('Psr\Log\LoggerInterface')
+        $resetPasswordHandler = $this->getMockBuilder(ResetPasswordHandler::class)
             ->disableOriginalConstructor()
             ->getMock();
 
         $this->methodCalls = 0;
         $this->handler = new ResetPasswordActionHandler(
-            $processor,
-            $userManager,
+            $resetPasswordHandler,
             $this->translator,
-            $logger,
             $securityFacade
         );
     }
@@ -68,32 +53,7 @@ class ResetPasswordActionHandlerTest extends \PHPUnit_Framework_TestCase
         $this->translator
             ->expects($this->once())
             ->method('trans')
-            ->will($this->returnValue($responseMessage));
-
-        $options = $this->getMockBuilder('Oro\Bundle\DataGridBundle\Extension\Action\ActionConfiguration')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $options
-            ->expects($this->once())
-            ->method('offsetGetByPath')
-            ->will($this->returnValue($responseMessage));
-
-        $massAction = $this
-            ->getMockBuilder('Oro\Bundle\DataGridBundle\Extension\MassAction\Actions\MassActionInterface')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $massAction
-            ->expects($this->once())
-            ->method('getOptions')
-            ->will($this->returnValue($options));
-
-        $repository = $this->getMockBuilder('Doctrine\ORM\EntityRepository')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $repository
-            ->expects($this->once())
-            ->method('findOneBy')
-            ->will($this->returnValue(new EmailTemplate()));
+            ->willReturn($responseMessage);
 
         $em = $this->getMockBuilder('Doctrine\ORM\EntityManager')
             ->disableOriginalConstructor()
@@ -101,13 +61,6 @@ class ResetPasswordActionHandlerTest extends \PHPUnit_Framework_TestCase
         $em
             ->expects($this->atLeastOnce())
             ->method('flush');
-        $em
-            ->expects($this->atLeastOnce())
-            ->method('clear');
-        $em
-            ->expects($this->once())
-            ->method('getRepository')
-            ->will($this->returnValue($repository));
 
         $qb = $this->getMockBuilder('Doctrine\ORM\QueryBuilder')
             ->disableOriginalConstructor()
@@ -115,7 +68,7 @@ class ResetPasswordActionHandlerTest extends \PHPUnit_Framework_TestCase
         $qb
             ->expects($this->once())
             ->method('getEntityManager')
-            ->will($this->returnValue($em));
+            ->willReturn($em);
 
         $results = $this->getMockBuilder('Oro\Bundle\DataGridBundle\Datasource\Orm\IterableResult')
             ->disableOriginalConstructor()
@@ -123,29 +76,28 @@ class ResetPasswordActionHandlerTest extends \PHPUnit_Framework_TestCase
         $results
             ->expects($this->once())
             ->method('getSource')
-            ->will($this->returnValue($qb));
+            ->willReturn($qb);
+        $results
+            ->expects($this->atLeastOnce())
+            ->method('rewind');
         $results
             ->expects($this->atLeastOnce())
             ->method('next');
         $results
             ->expects($this->atLeastOnce())
             ->method('current')
-            ->will($this->returnCallback(function () {
+            ->willReturnCallback(function () {
                 $this->methodCalls++;
                 return $this->methodCalls < 7 ? new ResultRecord(new User()) : null;
-            }));
+            });
 
         $args = $this->getMockBuilder('Oro\Bundle\DataGridBundle\Extension\MassAction\MassActionHandlerArgs')
             ->disableOriginalConstructor()
             ->getMock();
         $args
             ->expects($this->once())
-            ->method('getMassAction')
-            ->will($this->returnValue($massAction));
-        $args
-            ->expects($this->once())
             ->method('getResults')
-            ->will($this->returnValue($results));
+            ->willReturn($results);
 
         $response = $this->handler->handle($args);
 

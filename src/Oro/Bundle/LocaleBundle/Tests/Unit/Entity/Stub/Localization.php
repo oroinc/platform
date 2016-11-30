@@ -9,6 +9,16 @@ class Localization extends BaseLocalization
     use LocalizedEntityTrait;
 
     /**
+     * Because of magic methods in this class Oro\Component\Testing\Unit\EntityTrait can not set id correctly
+     * without direct accessor
+     * @param int $id
+     */
+    public function setId($id)
+    {
+        $this->id = $id;
+    }
+
+    /**
      * {@inheritdoc}
      */
     public function __call($name, $arguments)

@@ -75,6 +75,10 @@ Show Transition Labels: Show Transition Labels
 
 oro:
     workflow:
+        permission:
+            VIEW_WORKFLOW: View Workflow
+            PERFORM_TRANSITIONS: Perform transitions
+            PERFORM_TRANSITION: Perform transition
         translation:
             workflow.label: Workflow
             context:
@@ -90,9 +94,6 @@ oro:
                 deactivate: Deactivate
 
             workflow:
-                general:
-                    label: Perform workflow transitions
-                    description: Reveals workflow transition buttons to the user and allows them to manipulate workflows
                 reset_data: Reset workflow "{workflow}"
                 go_to_translations: 'To translations grid'
 
@@ -186,6 +187,7 @@ oro:
             groups.label:                 Groups
             exclusive_active_groups.label: "Exclusive Active Groups"
             exclusive_record_groups.label: "Exclusive Record Groups"
+            scopes.label:                 Workflow Scopes
 
             attribute:
                 property_path.tooltip:    "This is the field of the workflow entity or its related entities that will be appear on the view form of the transition. Use these if you want user to add or edit some entity data in the transition."

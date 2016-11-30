@@ -16,7 +16,8 @@ interface AclExtensionInterface
      * Checks if the ACL extension supports an object of the given type and with the given id.
      *
      * @param string $type A type of an object to test
-     * @param mixed $id An id of an object to test
+     * @param mixed  $id   An id of an object to test
+     *
      * @return bool true if this class is valid ACL extension for the given object; otherwise, false
      */
     public function supports($type, $id);
@@ -34,19 +35,19 @@ interface AclExtensionInterface
     /**
      * Checks if the given bitmask is valid for the given object.
      *
-     * This method throws InvalidAclMaskException if the mask is invalid.
-     *
-     * @param int $mask The bitmask
-     * @param mixed $object An object to test
+     * @param int         $mask       The bitmask
+     * @param mixed       $object     An object to test
      * @param string|null $permission If null checks all permissions; otherwise, check only the given permission
-     * @throws InvalidAclMaskException
+     *
+     * @throws InvalidAclMaskException if the mask is invalid
      */
     public function validateMask($mask, $object, $permission = null);
 
     /**
-     * Constructs an ObjectIdentity for the given object
+     * Constructs an ObjectIdentity for the given object.
      *
      * @param mixed $val A domain object, object identity descriptor (id:type) or ACL annotation
+     *
      * @return ObjectIdentity
      */
     public function getObjectIdentity($val);
@@ -61,12 +62,13 @@ interface AclExtensionInterface
      * a permission name the required mask builder supports.
      *
      * @param string $permission
+     *
      * @return MaskBuilder
      */
     public function getMaskBuilder($permission);
 
     /**
-     * Gets all mask builders supported this ACL extension
+     * Gets all mask builders supported this ACL extension.
      *
      * As one ACL extension may support several bitmasks (and as result it gives us an ability to
      * associate several ACEs with the same domain object) we need a separate implementation of the builder
@@ -77,9 +79,10 @@ interface AclExtensionInterface
     public function getAllMaskBuilders();
 
     /**
-     * Gets a human-readable representation of the given mask
+     * Gets a human-readable representation of the given mask.
      *
      * @param int $mask
+     *
      * @return string
      */
     public function getMaskPattern($mask);
@@ -90,14 +93,16 @@ interface AclExtensionInterface
      * The security identity must have been granted access to at least one of these bitmasks.
      *
      * @param string $permission
+     *
      * @return array may return null if permission/object combination is not supported
      */
     public function getMasks($permission);
 
     /**
-     * Determines whether the ACL extension contains the given permission
+     * Determines whether the ACL extension contains the given permission.
      *
      * @param string $permission
+     *
      * @return bool
      */
     public function hasMasks($permission);
@@ -107,32 +112,35 @@ interface AclExtensionInterface
      * As the root mask is more general and cannot take in account a specific of each domain object
      * it should be adapted before it can be applied to a particular domain object.
      *
-     * @param int $rootMask
+     * @param int   $rootMask
      * @param mixed $object
+     *
      * @return int The ACE mask without redundant bits
      */
     public function adaptRootMask($rootMask, $object);
 
     /**
-     * Remove all bits except service ones from the given mask
+     * Remove all bits except service ones from the given mask.
      *
      * As one ACL extension may support several bitmasks (and as result it gives us an ability to
      * associate several ACEs with the same domain object) we need a way to differentiate them.
      * It is an aim of service bits in a bitmask.
      *
      * @param int $mask
+     *
      * @return int The mask without service bits
      */
     public function getServiceBits($mask);
 
     /**
-     * Remove service bits from the given mask
+     * Remove service bits from the given mask.
      *
      * As one ACL extension may support several bitmasks (and as result it gives us an ability to
      * associate several ACEs with the same domain object) we need a way to differentiate them.
      * It is an aim of service bits in a bitmask.
      *
      * @param int $mask
+     *
      * @return int The mask without service bits
      */
     public function removeServiceBits($mask);
@@ -144,9 +152,10 @@ interface AclExtensionInterface
      * If $mask argument contains a bitmask for several permissions you must specify a permission
      * for which the access level you need to check.
      *
-     * @param int $mask
+     * @param int    $mask
      * @param string $permission
-     * @param mixed $object An object to test
+     * @param mixed  $object An object to test
+     *
      * @return int Can be one of AccessLevel::*_LEVEL constants
      */
     public function getAccessLevel($mask, $permission = null, $object = null);
@@ -158,13 +167,14 @@ interface AclExtensionInterface
      * all permissions which can be encoded in the given mask or only a list of
      * permissions are set in the given mask.
      * And if is needed to get permissions specified only for current application
-     * group name you can use $$byCurrentGroup. By default will be returned all
+     * group name you can use $byCurrentGroup. By default will be returned all
      * supported permissions for ACL extension for all application groups.
      *
-     * @param int|null $mask The bitmask
-     * @param bool $setOnly Determines whether all permissions can be encoded in the given mask should be returned
-     *                      or only permissions are set in the given mask.
-     * @param bool $byCurrentGroup If true will be returned supported permission only for current application group.
+     * @param int|null $mask           The bitmask
+     * @param bool     $setOnly        Determines whether all permissions that can be encoded in the given mask
+     *                                 should be returned or only permissions are set in the given mask.
+     * @param bool     $byCurrentGroup If true returns supported permission only for current application group.
+     *
      * @return string[]
      */
     public function getPermissions($mask = null, $setOnly = false, $byCurrentGroup = false);
@@ -203,27 +213,26 @@ interface AclExtensionInterface
      * You can use this method to perform an additional check whether an access to the particular object is granted.
      * This method is called by the PermissionGrantingStrategy class after the suitable ACE found.
      *
-     * @param int $triggeredMask The triggered mask
-     * @param mixed $object
+     * @param int            $triggeredMask The triggered mask
+     * @param mixed          $object
      * @param TokenInterface $securityToken
+     *
      * @return bool
      */
     public function decideIsGranting($triggeredMask, $object, TokenInterface $securityToken);
 
     /**
-     * Gets list of available access levels for given object
+     * Gets list of available access levels for given object.
      *
      * @param object      $object
      * @param string|null $permissionName
      *
-     * @return array key = access level code,
-     *   key = access level code,
-     *   value = access level name
+     * @return array [access level code => access level name, ...]
      */
     public function getAccessLevelNames($object, $permissionName = null);
 
     /**
-     * Returns Field ACL extension
+     * Returns ACL extension that should be used for fields.
      *
      * @return AclExtensionInterface|null
      */

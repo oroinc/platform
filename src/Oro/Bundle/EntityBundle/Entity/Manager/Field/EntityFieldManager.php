@@ -8,6 +8,7 @@ use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
 
+use Symfony\Component\Form\FormInterface;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 
 use Oro\Bundle\EntityBundle\Form\EntityField\Handler\EntityApiBaseHandler;
@@ -91,7 +92,7 @@ class EntityFieldManager
     protected function processUpdate($entity, $content)
     {
         $form = $this->formBuilder->build($entity, $content);
-        $data = $this->presetData($entity);
+        $data = $this->presetData($entity, $form);
 
         foreach ($content as $fieldName => $fieldValue) {
             $fieldValue = $this->cleanupValue($fieldValue);
@@ -104,16 +105,17 @@ class EntityFieldManager
     }
 
     /**
-     * @param $entity
+     * @param object $entity
+     * @param FormInterface $form
      *
      * @return array
      */
-    protected function presetData($entity)
+    protected function presetData($entity, $form)
     {
         $accessor = PropertyAccess::createPropertyAccessor();
         $data = [];
         $metadata = $this->getMetadataConfig($entity);
-        if (!$metadata || $metadata->isGlobalLevelOwned()) {
+        if (!$metadata || $metadata->isGlobalLevelOwned() || !$form->offsetExists($metadata->getOwnerFieldName())) {
             return $data;
         }
 

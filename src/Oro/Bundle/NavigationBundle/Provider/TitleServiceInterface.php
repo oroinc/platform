@@ -19,7 +19,7 @@ interface TitleServiceInterface
      * @param null  $title
      * @param null  $prefix
      * @param null  $suffix
-     * @return $this
+     * @return string
      */
     public function render($params = array(), $title = null, $prefix = null, $suffix = null);
 

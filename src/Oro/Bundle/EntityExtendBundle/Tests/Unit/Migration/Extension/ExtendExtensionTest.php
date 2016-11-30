@@ -10,7 +10,7 @@ use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityConfigBundle\Entity\ConfigModel;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\EntityExtendBundle\Extend\FieldTypeHelper;
-use Oro\Bundle\EntityExtendBundle\Extend\RelationType;
+use Oro\Bundle\EntityExtendBundle\Migration\EntityMetadataHelper;
 use Oro\Bundle\EntityExtendBundle\Migration\ExtendOptionsManager;
 use Oro\Bundle\EntityExtendBundle\Migration\ExtendOptionsParser;
 use Oro\Bundle\EntityExtendBundle\Migration\Extension\ExtendExtension;
@@ -23,7 +23,7 @@ use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
  */
 class ExtendExtensionTest extends \PHPUnit_Framework_TestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var EntityMetadataHelper|\PHPUnit_Framework_MockObject_MockObject */
     protected $entityMetadataHelper;
 
     /** @var ExtendOptionsManager */
@@ -591,7 +591,8 @@ class ExtendExtensionTest extends \PHPUnit_Framework_TestCase
                                 'enum'   => [
                                     'enum_code' => $enumCode
                                 ]
-                            ]
+                            ],
+                            'mode' => 'readonly'
                         ]
                     ],
                 ],
@@ -667,7 +668,8 @@ class ExtendExtensionTest extends \PHPUnit_Framework_TestCase
                                 'enum'   => [
                                     'enum_code' => $enumCode
                                 ]
-                            ]
+                            ],
+                            'mode' => 'readonly'
                         ]
                     ],
                 ],
@@ -854,7 +856,8 @@ class ExtendExtensionTest extends \PHPUnit_Framework_TestCase
                                         'oneToMany|Acme\AcmeBundle\Entity\Entity1|'
                                         . 'Acme\AcmeBundle\Entity\Entity2|relation_column1',
                                 ]
-                            ]
+                            ],
+                            'mode' => 'readonly'
                         ]
                     ],
                 ],
@@ -928,7 +931,8 @@ class ExtendExtensionTest extends \PHPUnit_Framework_TestCase
                                         'oneToMany|Acme\AcmeBundle\Entity\Entity1|'
                                         . 'Acme\AcmeBundle\Entity\Entity2|relation_column1',
                                 ]
-                            ]
+                            ],
+                            'mode' => 'readonly'
                         ]
                     ],
                 ],
@@ -999,7 +1003,8 @@ class ExtendExtensionTest extends \PHPUnit_Framework_TestCase
                                         'oneToMany|Acme\AcmeBundle\Entity\Entity1|'
                                         . 'Acme\AcmeBundle\Entity\Entity2|relation_column1',
                                 ]
-                            ]
+                            ],
+                            'mode' => 'readonly'
                         ]
                     ],
                 ],
@@ -1075,6 +1080,7 @@ class ExtendExtensionTest extends \PHPUnit_Framework_TestCase
                                 ]
                             ],
                             'type'    => 'manyToOne',
+                            'mode' => 'readonly'
                         ]
                     ]
                 ],
@@ -1323,7 +1329,8 @@ class ExtendExtensionTest extends \PHPUnit_Framework_TestCase
                                         'manyToMany|Acme\AcmeBundle\Entity\Entity1|'
                                         . 'Acme\AcmeBundle\Entity\Entity2|relation_column1',
                                 ]
-                            ]
+                            ],
+                            'mode' => 'readonly'
                         ]
                     ],
                 ],
@@ -1401,7 +1408,8 @@ class ExtendExtensionTest extends \PHPUnit_Framework_TestCase
                                         'manyToMany|Acme\AcmeBundle\Entity\Entity1|'
                                         . 'Acme\AcmeBundle\Entity\Entity2|relation_column1',
                                 ]
-                            ]
+                            ],
+                            'mode' => 'readonly'
                         ]
                     ],
                 ],
@@ -1478,7 +1486,8 @@ class ExtendExtensionTest extends \PHPUnit_Framework_TestCase
                                         'manyToMany|Acme\AcmeBundle\Entity\Entity1|'
                                         . 'Acme\AcmeBundle\Entity\Entity2|relation_column1',
                                 ]
-                            ]
+                            ],
+                            'mode' => 'readonly'
                         ]
                     ],
                 ],
@@ -1561,6 +1570,7 @@ class ExtendExtensionTest extends \PHPUnit_Framework_TestCase
                                 ]
                             ],
                             'type'    => 'manyToMany',
+                            'mode' => 'readonly'
                         ]
                     ]
                 ],
@@ -1673,7 +1683,8 @@ class ExtendExtensionTest extends \PHPUnit_Framework_TestCase
                                         'manyToOne|Acme\AcmeBundle\Entity\Entity1|'
                                         . 'Acme\AcmeBundle\Entity\Entity2|relation_column1',
                                 ]
-                            ]
+                            ],
+                            'mode' => 'readonly'
                         ]
                     ],
                 ],
@@ -1741,7 +1752,8 @@ class ExtendExtensionTest extends \PHPUnit_Framework_TestCase
                                     'on_delete' => 'CASCADE',
                                     'nullable' => false
                                 ]
-                            ]
+                            ],
+                            'mode' => 'readonly'
                         ]
                     ],
                 ],
@@ -1820,6 +1832,7 @@ class ExtendExtensionTest extends \PHPUnit_Framework_TestCase
                                 ]
                             ],
                             'type'    => 'oneToMany',
+                            'mode' => 'readonly'
                         ]
                     ]
                 ],

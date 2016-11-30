@@ -1,3 +1,5 @@
+// @theme: blank;
+
 @mixin after() {
     content: '';
 
@@ -73,3 +75,9 @@
         }
     }
 }
+
+%base-transition {
+    transition: all linear 150ms;
+}
+
+@import 'mixins-for-components';

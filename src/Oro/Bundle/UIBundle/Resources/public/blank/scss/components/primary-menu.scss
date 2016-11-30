@@ -1,0 +1,37 @@
+// @theme: blank
+
+.primary-menu {
+    @include list-normalize();
+
+    display: flex;
+
+    &__item {
+        flex: 0 1 auto;
+
+        padding: $primary-menu-item-inner-offset;
+
+        &--current {}
+
+        &--offset-m {
+            &:not(:first-child) {
+                margin-left: $offset-x-m;
+            }
+        }
+    }
+
+    &__link {
+        color: $primary-menu-link-color;
+
+        &--current {
+            color: $primary-menu-link-color-current;
+        }
+
+        &:hover {
+            color: $primary-menu-link-color-hover;
+        }
+    }
+
+    &--vertical {
+        display: block;
+    }
+}

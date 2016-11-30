@@ -356,21 +356,24 @@ class ConfigurationProviderTest extends \PHPUnit_Framework_TestCase
                             'description' => 'Description 1',
                             'dependencies' => ['feature2'],
                             'routes' => ['f1_route1', 'f1_route2', 'f1_route3'],
-                            'configuration' => ['config_section1', 'config_leaf1', 'config_leaf2']
+                            'configuration' => ['config_section1', 'config_leaf1', 'config_leaf2'],
+                            'entities' => [],
                         ],
                         'feature2' => [
                             'label' => 'Feature 2',
                             'toggle' => 'toggle2',
                             'dependencies' => [],
                             'routes' => ['f1_route3'],
-                            'configuration' => ['config_leaf2']
+                            'configuration' => ['config_leaf2'],
+                            'entities' => [],
                         ],
                         'feature3' => [
                             'label' => 'Feature 3',
                             'toggle' => 'toggle3',
                             'dependencies' => ['feature1'],
                             'routes' => [],
-                            'configuration' => []
+                            'configuration' => [],
+                            'entities' => [],
                         ],
                     ],
                     ConfigurationProvider::INTERNAL => [

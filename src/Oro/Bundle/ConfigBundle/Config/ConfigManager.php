@@ -87,6 +87,14 @@ class ConfigManager
     /**
      * @return string
      */
+    public function getScopeEntityName()
+    {
+        return $this->getScopeManager()->getScopedEntityName();
+    }
+
+    /**
+     * @return string
+     */
     public function getScopeInfo()
     {
         return $this->getScopeManager()->getScopeInfo();
@@ -254,7 +262,7 @@ class ConfigManager
         $this->localCache->clear();
 
         $changeSet = new ConfigChangeSet($this->buildChangeSet($updated, $removed, $oldValues));
-        $event = new ConfigUpdateEvent($changeSet);
+        $event = new ConfigUpdateEvent($changeSet, $this->scope, $this->getScopeId());
         $this->eventDispatcher->dispatch(ConfigUpdateEvent::EVENT_NAME, $event);
 
         return $changeSet;

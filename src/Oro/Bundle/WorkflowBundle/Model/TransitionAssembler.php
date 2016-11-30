@@ -139,7 +139,8 @@ class TransitionAssembler extends BaseAbstractAssembler
             $transition->setPreAction($preAction);
         }
 
-        $definition['preconditions'] = $this->addAclPreConditions($options, $definition);
+        $definition['preconditions'] = $this->addAclPreConditions($options, $definition, $name);
+
         if (!empty($definition['preconditions'])) {
             $condition = $this->conditionFactory->create(ConfigurableCondition::ALIAS, $definition['preconditions']);
             $transition->setPreCondition($condition);
@@ -167,35 +168,55 @@ class TransitionAssembler extends BaseAbstractAssembler
     }
 
     /**
-     * @param array $options
-     * @param array $definition
+     * @param array  $options
+     * @param array  $definition
+     * @param string $transitionName
      * @return array
      */
-    protected function addAclPreConditions(array $options, array $definition)
+    protected function addAclPreConditions(array $options, array $definition, $transitionName)
     {
         $aclResource = $this->getOption($options, 'acl_resource');
 
         if ($aclResource) {
-            $aclPreConditionDefinition = array('parameters' => array($aclResource));
+            $aclPreConditionDefinition = ['parameters' => [$aclResource]];
             $aclMessage = $this->getOption($options, 'acl_message');
             if ($aclMessage) {
                 $aclPreConditionDefinition['message'] = $aclMessage;
             }
-            $aclPreCondition = array('@acl_granted' => $aclPreConditionDefinition);
+
+            /**
+             * @see AclGranted
+             */
+            $aclPreCondition = ['@acl_granted' => $aclPreConditionDefinition];
 
             if (empty($definition['preconditions'])) {
                 $definition['preconditions'] = $aclPreCondition;
             } else {
-                $definition['preconditions'] = array(
-                    '@and' => array(
+                $definition['preconditions'] = [
+                    '@and' => [
                         $aclPreCondition,
                         $definition['preconditions']
-                    )
-                );
+                    ]
+                ];
             }
         }
 
-        return !empty($definition['preconditions']) ? $definition['preconditions'] : array();
+        /**
+         * @see IsGrantedWorkflowTransition
+         */
+        $precondition = ['@is_granted_workflow_transition' => ['parameters' => [$transitionName]]];
+        if (empty($definition['preconditions'])) {
+            $definition['preconditions'] = $precondition;
+        } else {
+            $definition['preconditions'] = [
+                '@and' => [
+                    $precondition,
+                    $definition['preconditions']
+                ]
+            ];
+        }
+
+        return !empty($definition['preconditions']) ? $definition['preconditions'] : [];
     }
 
     /**

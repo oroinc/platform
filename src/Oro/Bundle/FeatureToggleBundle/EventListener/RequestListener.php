@@ -2,9 +2,11 @@
 
 namespace Oro\Bundle\FeatureToggleBundle\EventListener;
 
-use Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+
+use Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker;
 
 class RequestListener
 {
@@ -26,13 +28,13 @@ class RequestListener
      */
     public function onRequest(GetResponseEvent $event)
     {
-        if (!$event->isMasterRequest()) {
-            return;
-        }
-
         $route = $event->getRequest()->get('_route');
         if (!$this->featureChecker->isResourceEnabled($route, 'routes')) {
-            throw new NotFoundHttpException();
+            if ($event->isMasterRequest()) {
+                throw new NotFoundHttpException();
+            }
+
+            $event->setResponse(new Response());
         }
     }
 }

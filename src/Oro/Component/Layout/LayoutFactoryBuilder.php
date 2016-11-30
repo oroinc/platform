@@ -68,11 +68,35 @@ class LayoutFactoryBuilder implements LayoutFactoryBuilderInterface
     private $expressionProcessor;
 
     /**
-     * @param ExpressionProcessor $expressionProcessor
+     * @var BlockViewCache|null
      */
-    public function __construct(ExpressionProcessor $expressionProcessor)
+    private $blockViewCache;
+
+    /**
+     * @var boolean
+     */
+    private $debug = false;
+
+    /**
+     * @param ExpressionProcessor $expressionProcessor
+     * @param BlockViewCache|null $blockViewCache
+     */
+    public function __construct(ExpressionProcessor $expressionProcessor, BlockViewCache $blockViewCache = null)
     {
         $this->expressionProcessor = $expressionProcessor;
+        $this->blockViewCache = $blockViewCache;
+    }
+
+    /**
+     * @param boolean $debug
+     *
+     * @return LayoutFactoryBuilder
+     */
+    public function setDebug($debug)
+    {
+        $this->debug = $debug;
+
+        return $this;
     }
 
     /**
@@ -168,6 +192,14 @@ class LayoutFactoryBuilder implements LayoutFactoryBuilderInterface
             $rendererRegistry->setDefaultRenderer($defaultRenderer);
         }
 
-        return new LayoutFactory($registry, $rendererRegistry, $this->expressionProcessor);
+        return new LayoutFactory($registry, $rendererRegistry, $this->expressionProcessor, $this->getBlockViewCache());
+    }
+
+    /**
+     * @return BlockViewCache|null
+     */
+    private function getBlockViewCache()
+    {
+        return $this->debug === false ? $this->blockViewCache : null;
     }
 }

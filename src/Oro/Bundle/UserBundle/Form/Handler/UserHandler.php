@@ -16,9 +16,7 @@ use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\UserBundle\Entity\UserManager;
 
 /**
- * Class UserHandler
- *
- * @package Oro\Bundle\UserBundle\Form\Handler
+ * Handle User forms
  *
  * @SuppressWarnings(PHPMD.ExcessiveParameterList)
  */
@@ -68,6 +66,7 @@ class UserHandler extends AbstractUserHandler
         LoggerInterface $logger = null
     ) {
         parent::__construct($form, $request, $manager);
+
         $this->userConfigManager = $userConfigManager;
         $this->templating = $templating;
         $this->mailer = $mailer;
@@ -109,6 +108,10 @@ class UserHandler extends AbstractUserHandler
      */
     protected function onSuccess(User $user)
     {
+        if (null === $user->getAuthStatus()) {
+            $this->manager->setAuthStatus($user, UserManager::STATUS_ACTIVE);
+        }
+
         $this->manager->updateUser($user);
 
         if ($this->form->has('inviteUser')
