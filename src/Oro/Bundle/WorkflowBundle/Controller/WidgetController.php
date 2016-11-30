@@ -30,6 +30,7 @@ use Oro\Bundle\WorkflowBundle\Serializer\WorkflowAwareSerializer;
 
 /**
  * @Route("/workflowwidget")
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
 class WidgetController extends Controller
 {
@@ -53,20 +54,10 @@ class WidgetController extends Controller
         }
 
         $workflowManager = $this->get('oro_workflow.manager');
-        $applicableWorkflows = $workflowManager->getApplicableWorkflows($entity);
-
-        $securityFacade = $this->container->get('oro_security.security_facade');
         $applicableWorkflows = array_filter(
-            $applicableWorkflows,
-            function ($workflow) use ($securityFacade, $entity) {
-                /** @var Workflow $workflow */
-                return $securityFacade->isGranted(
-                    'VIEW_WORKFLOW',
-                    new DomainObjectWrapper(
-                        $entity,
-                        new ObjectIdentity('workflow', $workflow->getName())
-                    )
-                );
+            $workflowManager->getApplicableWorkflows($entity),
+            function (Workflow $workflow) use ($entity) {
+                return $this->isWorkflowPermissionGranted('VIEW_WORKFLOW', $workflow->getName(), $entity);
             }
         );
 
@@ -418,6 +409,15 @@ class WidgetController extends Controller
                 $startTransitionData = $this->getStartTransitionData($workflow, $defaultStartTransition, $entity);
                 if ($startTransitionData !== null) {
                     $transitionsData[$defaultStartTransition->getName()] = $startTransitionData;
+                } elseif (!$this->isWorkflowPermissionGranted('PERFORM_TRANSITIONS', $workflow->getName(), $entity)) {
+                    // extra case to show start transition (step name and disabled button)
+                    // even if transitions performing is forbidden with ACL
+                    $transitionsData[$defaultStartTransition->getName()] = [
+                        'workflow' => $workflow,
+                        'transition' => $transition,
+                        'isAllowed' => false,
+                        'errors' => new ArrayCollection()
+                    ];
                 }
             }
         }
@@ -478,5 +478,21 @@ class WidgetController extends Controller
     protected function getEntityManager()
     {
         return $this->getDoctrine()->getManagerForClass('OroWorkflowBundle:WorkflowItem');
+    }
+
+    /**
+     * @param string $permission
+     * @param string $workflowName
+     * @param object $entity
+     * @return bool
+     */
+    protected function isWorkflowPermissionGranted($permission, $workflowName, $entity)
+    {
+        $securityFacade = $this->container->get('oro_security.security_facade');
+
+        return $securityFacade->isGranted(
+            $permission,
+            new DomainObjectWrapper($entity, new ObjectIdentity('workflow', $workflowName))
+        );
     }
 }
