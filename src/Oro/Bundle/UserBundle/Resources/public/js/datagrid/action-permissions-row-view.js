@@ -15,9 +15,7 @@ define(function(require) {
         accessLevelRouteName: null,
         initialize: function(options) {
             ActionPermissionsRowView.__super__.initialize.call(this, options);
-            if (null !== options.themeOptions.rowView.accessLevelRouteName) {
-                this.fieldItemView.accessLevelRouteName = options.themeOptions.rowView.accessLevelRouteName;
-            }
+            this.fieldItemView.accessLevelRouteName = options.themeOptions.rowView.accessLevelRouteName || null;
             this.listenTo(this.model.get('permissions'), 'change', this.onAccessLevelChange);
         },
         render: function() {

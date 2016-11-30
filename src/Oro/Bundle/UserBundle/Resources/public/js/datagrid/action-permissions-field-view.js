@@ -19,9 +19,7 @@ define(function(require) {
             ActionPermissionsFieldView.__super__.initialize.call(this, options);
             var permissionCollection = this.model.get('permissions');
             var routeParameters = {
-                routeName: ActionPermissionsFieldView.accessLevelRouteName
-                    ? ActionPermissionsFieldView.accessLevelRouteName
-                    : 'oro_security_access_levels'
+                routeName: ActionPermissionsFieldView.accessLevelRouteName || 'oro_security_access_levels'
             };
             permissionCollection.each(function(model) {
                 routeParameters.oid = model.get('identity').replace(/\\/g, '_');

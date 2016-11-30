@@ -14,9 +14,7 @@ define(function(require) {
         processDatagridOptions: function(deferred, options) {
             var reg = /\\/g;
             options.themeOptions.rowView = options.themeOptions.readonly ? ReadonlyRowView : RowView;
-            if (options.metadata.options.access_level_route) {
-                options.themeOptions.rowView.accessLevelRouteName = options.metadata.options.access_level_route;
-            }
+            options.themeOptions.rowView.accessLevelRouteName = options.metadata.options.access_level_route || null;
             _.each(options.data.data, function(item) {
                 item.permissions = new BaseCollection(item.permissions, {
                     model: PermissionModel
