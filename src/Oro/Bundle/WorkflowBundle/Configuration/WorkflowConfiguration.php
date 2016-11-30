@@ -30,7 +30,7 @@ class WorkflowConfiguration extends AbstractConfiguration implements Configurati
     const NODE_INIT_ENTITIES = 'init_entities';
     const NODE_INIT_ROUTES = 'init_routes';
     const NODE_INIT_CONTEXT_ATTRIBUTE = 'init_context_attribute';
-    const NODE_DISABLE_OPERATION = 'disable_operations';
+    const NODE_DISABLE_OPERATIONS = 'disable_operations';
 
     const DEFAULT_TRANSITION_DISPLAY_TYPE = 'dialog';
     const DEFAULT_ENTITY_ATTRIBUTE = 'entity';
@@ -116,7 +116,7 @@ class WorkflowConfiguration extends AbstractConfiguration implements Configurati
     protected function getDisableOperationsNode()
     {
         $treeBuilder = new TreeBuilder();
-        $rootNode = $treeBuilder->root(self::NODE_DISABLE_OPERATION);
+        $rootNode = $treeBuilder->root(self::NODE_DISABLE_OPERATIONS);
         $rootNode->useAttributeAsKey('name')
             ->prototype('array')
                 ->prototype('scalar')->end()

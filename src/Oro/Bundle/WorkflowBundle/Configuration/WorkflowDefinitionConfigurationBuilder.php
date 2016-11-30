@@ -211,6 +211,7 @@ class WorkflowDefinitionConfigurationBuilder extends AbstractConfigurationBuilde
             WorkflowConfiguration::NODE_ENTITY_RESTRICTIONS,
             WorkflowConfiguration::NODE_INIT_ENTITIES,
             WorkflowConfiguration::NODE_INIT_ROUTES,
+            WorkflowConfiguration::NODE_DISABLE_OPERATIONS,
         ];
 
         return array_intersect_key($configuration, array_flip($configurationKeys));
