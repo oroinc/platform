@@ -174,14 +174,11 @@ class UpdateAssociationKindQuery implements MigrationQuery, ConnectionAwareInter
         $this->logQuery($logger, $sql, $parameters);
         unset($noteEntityConfig['data']['extend']['schema']['relation'][$noteAssociationName]);
 
-        $noteRelationClassName = empty($this->oldClassNames[$targetEntityClassName])
-            ? $targetEntityClassName
-            : $this->oldClassNames[$targetEntityClassName];
         $relationKeyName = ExtendHelper::buildRelationKey(
             'Oro\Bundle\NoteBundle\Entity\Note',
             $noteAssociationName,
             'manyToOne',
-            $noteRelationClassName
+            $targetEntityClassName
         );
         unset($noteEntityConfig['data']['extend']['relation'][$relationKeyName]);
     }
