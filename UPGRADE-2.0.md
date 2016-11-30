@@ -2,6 +2,7 @@ UPGRADE FROM 1.10 to 2.0
 ========================
 
 ####General
+- Changed minimum required php version to 5.6
 - LiipImagineBundle was updated to 1.5.* version.
 - Added dependency to [fxpio/composer-asset-plugin](https://github.com/fxpio/composer-asset-plugin) composer plugin.
 - All original third-party asset libraries were moved out from platform and added to composer.json as bower-asset/npm-asset dependency.
@@ -271,6 +272,16 @@ To migrate all labels from configuration translatable fields automatically you c
 - `\Oro\Bundle\SearchBundle\Query\Result\Item::_construct` signature changed, array type hintings added
 
 
+####OroIntegrationBundle:
+- The option `--integration-id` renamed to `--integration` in `oro:cron:integration:sync` cli command.
+- The option `--force` were removed from `oro:cron:integration:sync` cli command. Pass it as connector option  `force=true`.
+- The option `--transport-batch-size force` were removed from `oro:cron:integration:sync` cli command.
+- The option `--params` were removed from `oro:integration:reverse:sync` cli command. Use `--connector-parameters` instead.
+- The `SyncScheduler::schedule` method signature was changed. 
+- The `GenuineSyncScheduler::schedule` method signature was changed.
+- The parameter `oro_integration.genuine_sync_scheduler.class` was removed.
+- The parameter `oro_integration.reverse_sync.processor.class` was removed.
+
 ####Layout Component:
 - Interface `Oro\Component\Layout\DataProviderInterface` was removed.
 - Abstract class `Oro\Component\Layout\AbstractServerRenderDataProvider` was removed.
@@ -524,6 +535,7 @@ tag if it works with extend classes
 ####IntegrationBundle:
 - Integration configuration file now loads from `Resources/config/oro/integrations.yml` file instead of `Resources/config/integration_settings.yml`.
 - Root node for integration config file `Resources/config/oro/integrations.yml` were changed from `oro_integration` to `integrations`.
+- The `Oro\Bundle\IntegrationBundle\Command\ReverseSyncCommand` command was removed.
 
 ####EntityConfigBundle:
 - Entity configuration now loads from `Resources/config/oro/entity_config.yml` file instead of `Resources/config/entity_config.yml`.
@@ -816,13 +828,13 @@ to the [Fallback documentation](./src/Oro/Bundle/EntityBundle/Resources/doc/enti
 - `Oro\Bundle\DataAuditBundle\Loggable\AuditEntityMapper` was renamed to `Oro\Bundle\DataAuditBundle\Provider\AuditEntityMapper`.
 
 ####UserBundle
-- Added `Oro\Bundle\UserBundle\Validator\Constraints\PasswordComplexity` to User model
+- Added `auth_status` extended enum property to `Oro\Bundle\UserBundle\Entity\User` entity.
+- Added `Oro\Bundle\UserBundle\Validator\Constraints\PasswordComplexity` to User model.
 - User password requirements are more restrictive by default and require 8 characters, an upper case letter, and a number.
-- Any new users or changing of existing passwords need to meet the password requirements specified in System Configuration/General Setup/User Settings. Existing user passwords are not affected
+- Any new users or changing of existing passwords need to meet the password requirements specified in System Configuration/General Setup/User Settings. Existing user passwords are not affected.
 - Removed service @oro_user.password_reset.widget_provider.actions (replaced by @oro_user.forced_password_reset.widget_provider.actions)
-
-####DemoDataBundle
-- All demo CRM users will have passwords ending with '1Q' (e.g. for username 'marketing' password is 'marketing1Q'). For user 'sale' the password is 'salesale1Q'.
+- Constructor of `Oro\Bundle\UserBundle\Entity\UserManager` changed. Added 4-th parameter of type `Oro\Bundle\EntityExtendBundle\Provider\EnumValueProvider`.
+- Added method `setAuthStatus($user, $enumId)` to `Oro\Bundle\UserBundle\Entity\UserManager` method to set `auth_status` of a User by enum id.
 
 ####ImapBundle
 - The command `oro:imap:clear-mailbox` was removed. Produce message to the topic `oro.imap.clear_inactive_mailbox` instead.

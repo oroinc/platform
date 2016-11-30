@@ -102,7 +102,8 @@ oro:
         phone.label:                 Phone
         email_origins.label:         Email Origins
         emails.label:                Emails
-        enabled.label:               Status
+        enabled.label:               Enabled
+        auth_status.label:           Status
         entity_description:          Represent user profile
         entity_label:                User
         entity_plural_label:         Users
@@ -114,7 +115,6 @@ oro:
         last_login.label:            Last logged in
         last_name.label:             Last name
         login_count.label:           Login count
-        login_disabled.label:        Login disabled
         password_expires_at.label:   Password expires at
         failed_login_count.label:    Failed login count
         middle_name.label:           Middle name
@@ -133,6 +133,12 @@ oro:
         username.label:              Username
         organization.label:          Organization
         business_unit.label:         Business Unit
+
+        datagrid:
+            views:
+                active: Active Users
+                cannot_login: Cannot login
+                disabled: Disabled Users
 
         impersonation:
             entity_label: Impersonation
@@ -211,11 +217,11 @@ oro:
             force_reset:
                 popup.message: User {{ user }} will receive reset password by email and will be disabled from login.
                 popup.question: Are you sure you want to proceed?
-                success.message: Password reset request has been sent.
-                failure.message: Password reset request has failed.
-                mass_action.success: Password reset completed successfully.
+                popup.button: Reset
+                success.message: Password reset request has been sent to %email%.
+                failure.message: Password reset request to %email% has failed.
+                mass_action.success: Password reset completed successfully. %count% emails sent.
                 mass_action.failure: Mass reset action has failed.
-                popup.label: Reset
         # password tooltip for different rules
         password_complexity:
             unrestricted: ~
@@ -251,7 +257,17 @@ oro:
             lower_case_numbers_special_chars: The password must include a lower case letter, a number, and a special character (!"#$%&'()*+,-./:;<=>?@[\]^_`{|}~ and space)
             lower_case_upper_case_numbers_special_chars: The password must include a lower case letter, an upper case letter, a number, and a special character (!"#$%&'()*+,-./:;<=>?@[\]^_`{|}~ and space)
 
+        enabled:
+            enabled: Enabled
+            disabled: Disabled
+
         action:
+            enable:
+                label: Enable user
+                success: 'User %username% enabled.'
+            disable:
+                label: Disable user
+                success: 'User %username% disabled.'
             password_management:
                 label: Manage passwords
                 description: Reset or change passwords of other users
@@ -291,7 +307,7 @@ oro:
             fields:
                 password_min_length.label: Minimal password length
                 password_numbers.label: Require a number
-                password_lower_case.label: Require a lowercase letter
+                password_lower_case.label: Require a lower case letter
                 password_upper_case.label: Require an upper case letter
                 password_special_chars:
                     label: Require a special character

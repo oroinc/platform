@@ -9,7 +9,6 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Security\Core\SecurityContextInterface;
 
 use Oro\Bundle\UserBundle\Entity\AbstractUser;
-use Oro\Bundle\UserBundle\Entity\User;
 
 class UserSubscriber implements EventSubscriberInterface
 {
@@ -22,7 +21,6 @@ class UserSubscriber implements EventSubscriberInterface
      * @var SecurityContextInterface
      */
     protected $security;
-
 
     /**
      * @param FormFactoryInterface      $factory        Factory to add new form children
@@ -82,33 +80,42 @@ class UserSubscriber implements EventSubscriberInterface
             $form->remove('plainPassword');
         }
 
-        // do not allow user to disable his own account
+        if (!$this->isCurrentUser($entity)) {
+            $form->remove('change_password');
+        }
+
+        $enabledChoices = ['oro.user.enabled.disabled', 'oro.user.enabled.enabled'];
+
+        // do not allow editing of Enabled status
+        if (!empty($entity->getId())) {
+            $form->add('enabled', 'hidden', ['mapped' => false]);
+
+            return;
+        }
+
         $form->add(
             $this->factory->createNamed(
                 'enabled',
                 'choice',
-                $entity->getId() ? $entity->isEnabled() : '',
+                '',
                 [
-                    'label' => 'Status',
+                    'label' => 'oro.user.enabled.label',
                     'required' => true,
-                    'disabled' => $this->isCurrentUser($entity),
-                    'choices' => ['Inactive', 'Active'],
+                    'disabled' => false,
+                    'choices' => $enabledChoices,
                     'empty_value' => 'Please select',
                     'empty_data' => '',
                     'auto_initialize' => false
                 ]
             )
         );
-
-        if (!$this->isCurrentUser($entity)) {
-            $form->remove('change_password');
-        }
     }
 
     /**
      * Returns true if passed user is currently authenticated
      *
      * @param  AbstractUser $user
+     *
      * @return bool
      */
     protected function isCurrentUser(AbstractUser $user)

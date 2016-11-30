@@ -337,7 +337,7 @@ class ArrayUtil
     /**
      * Return the values from a single column in the input array
      *
-     * http://php.net/manual/en/function.array-column.php
+     * @link http://php.net/manual/en/function.array-column.php
      *
      * @param array $array
      * @param mixed $columnKey
