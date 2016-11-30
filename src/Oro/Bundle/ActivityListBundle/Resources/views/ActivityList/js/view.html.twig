@@ -1,3 +1,5 @@
+{% import 'OroActivityBundle::macros.html.twig' as AC %}
+
 <script type="text/html" id="{{ id|e('html_attr')|raw }}">
     <div class="accordion-group">
         <div class="accordion-heading clearfix">
@@ -13,15 +15,6 @@
             </div>
             <div class="actions">
                 {% block activityActions %}
-                    <div class="more-bar-holder">
-                        <div class="dropdown">
-                            <a href="#" data-toggle="dropdown" class="dropdown-toggle activity-item">...</a>
-                            <div class="dropdown-menu activity-item pull-right launchers-dropdown-menu">
-                                {% block activityActionsList %}
-                                {% endblock %}
-                            </div>
-                        </div>
-                    </div>
                 {% endblock %}
             </div>
             <div class="extra-info">

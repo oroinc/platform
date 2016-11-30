@@ -59,7 +59,7 @@
     </div>
 {% endmacro %}
 
-{% macro activity_context_link() %}
+{% macro activity_context_link(showText) %}
     {% import 'OroUIBundle::macros.html.twig' as UI %}
     <a href="#" title="{{ 'oro.activity.contexts.placeholder'|trans|raw }}"
        data-url="<%= routing.generate('oro_activity_context', {'id': relatedActivityId, 'activity': relatedActivityClass }) %>"
@@ -82,7 +82,38 @@
             }
         }) }}>
         <i class="fa-link hide-text">{{ 'oro.activity.contexts.placeholder'|trans|raw }}</i>
+        {{ showText|default() ? 'oro.activity.contexts.placeholder'|trans|raw : '' }}
     </a>
+{% endmacro %}
+
+{% macro verticalActionsList(actions) %}
+    <div class="dropdown vertical-actions">
+        <a href="#" data-toggle="dropdown" class="dropdown-toggle activity-item">...</a>
+        <ul class="dropdown-menu activity-item pull-right">
+            {% for action in actions|default([]) %}
+                <li>
+                    {{ action|raw }}
+                </li>
+            {% endfor %}
+        </ul>
+    </div>
+{% endmacro %}
+
+{% macro horizontalActionsList(actions) %}
+    <div class="more-bar-holder">
+        <div class="dropdown">
+            <a href="#" data-toggle="dropdown" class="dropdown-toggle activity-item">...</a>
+            <div class="dropdown-menu activity-item pull-right launchers-dropdown-menu">
+                <ul class="nav nav-pills icons-holder launchers-list">
+                    {% for action in actions|default([]) %}
+                        <li class="launcher-item">
+                            {{ action|raw }}
+                        </li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+    </div>
 {% endmacro %}
 
 {# Button for add context on the activity list item view page #}

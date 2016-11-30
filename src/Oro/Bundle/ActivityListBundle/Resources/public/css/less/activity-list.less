@@ -63,6 +63,46 @@
       &:hover {
         background-color: transparent;
       }
+      .actions {
+        position: static;
+        .vertical-actions .dropdown-toggle {
+          padding: 0;
+          color: #999;
+          font-size: 16px;
+          line-height: .7em;
+          width: 23px;
+          height: 19px;
+          float: left;
+          &:hover,
+          &:focus {
+            border: 0;
+            text-decoration: none;
+          }
+        }
+        .vertical-actions .dropdown-menu {
+          right: 30px;
+          top: -5px;
+
+          &.pull-right:before {
+            position: absolute;
+            top: 9px;
+            right: -14px;
+            display: inline-block;
+            border: 7px solid transparent;
+            border-left-color: rgba(0, 0, 0, 0.2);
+            content: '';
+          }
+          &.pull-right:after {
+            position: absolute;
+            top: 10px;
+            right: -12px;
+            display: inline-block;
+            border: 6px solid transparent;
+            border-left-color: white;
+            content: '';
+          }
+        }
+      }
       .user {
         font-style: normal;
       }
@@ -138,7 +178,6 @@
       float: right;
       margin: 8px 0 0 8px;
       overflow: visible;
-      .horizontal-icon-menu;
     }
     > .details {
       margin: 9px 7px 0 0;

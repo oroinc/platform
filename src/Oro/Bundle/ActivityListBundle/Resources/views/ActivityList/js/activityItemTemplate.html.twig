@@ -4,12 +4,6 @@
     <i class="{{ oro_entity_config_value(entityClass|default(), 'icon')|raw }}"></i>
 {% endblock %}
 
-{% block activityActionsList %}
-<ul class="nav nav-pills icons-holder launchers-list">
-    {% for action in actions|default([]) %}
-        <li class="launcher-item">
-            {{ action|raw }}
-        </li>
-    {% endfor %}
-</ul>
+{% block activityActions %}
+    {{ AC.horizontalActionsList(actions) }}
 {% endblock %}
