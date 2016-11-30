@@ -38,6 +38,9 @@ class OperationRegistry
     /** @var array */
     private $entityNames = [];
 
+    /** @var OperationRegistryFilterInterface[] */
+    private $filters;
+
     /**
      * @param ConfigurationProviderInterface $configurationProvider
      * @param OperationAssembler $assembler
@@ -94,7 +97,7 @@ class OperationRegistry
         $this->substitution->setMap($replacements);
         $this->substitution->apply($operations);
 
-        return $operations;
+        return $this->filter($operations, $entityClass, $datagrid, $route);
     }
 
     /**
@@ -271,5 +274,33 @@ class OperationRegistry
         }
 
         return $this->entityNames[$entityName];
+    }
+
+    /**
+     * @param OperationRegistryFilterInterface $operationRegistryFilter
+     */
+    public function addFilter(OperationRegistryFilterInterface $operationRegistryFilter)
+    {
+        $this->filters[] = $operationRegistryFilter;
+    }
+
+    /**
+     * @param Operation[] $operations
+     * @param string|null $entityClass
+     * @param string|null $datagrid
+     * @param string|null $route
+     * @return Operation[]
+     */
+    private function filter($operations, $entityClass, $datagrid, $route)
+    {
+        if (count($this->filters) === 0) {
+            return $operations;
+        }
+
+        foreach ($this->filters as $filter) {
+            $operations = $filter->filter($operations, $entityClass, $route, $datagrid);
+        }
+
+        return $operations;
     }
 }
