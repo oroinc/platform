@@ -2,12 +2,16 @@
 
 namespace Oro\Bundle\SecurityBundle\Tests\Unit\Metadata;
 
+use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
 use Oro\Bundle\SecurityBundle\Metadata\AclAnnotationProvider;
 use Oro\Bundle\SecurityBundle\Metadata\AclAnnotationStorage;
 use Oro\Bundle\SecurityBundle\Annotation\Acl as AclAnnotation;
 
 class AclAnnotationProviderTest extends \PHPUnit_Framework_TestCase
 {
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    protected $entityClassResolver;
+
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $cache;
 
@@ -19,6 +23,9 @@ class AclAnnotationProviderTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
+        $this->entityClassResolver = $this->getMockBuilder(EntityClassResolver::class)
+            ->disableOriginalConstructor()
+            ->getMock();
         $this->cache = $this->getMockForAbstractClass(
             'Doctrine\Common\Cache\CacheProvider',
             array(),
@@ -29,7 +36,7 @@ class AclAnnotationProviderTest extends \PHPUnit_Framework_TestCase
             array('fetch', 'save', 'delete', 'deleteAll')
         );
         $this->loader = $this->getMock('Oro\Bundle\SecurityBundle\Annotation\Loader\AclAnnotationLoaderInterface');
-        $this->provider = new AclAnnotationProvider($this->cache);
+        $this->provider = new AclAnnotationProvider($this->entityClassResolver, $this->cache);
         $this->provider->addLoader($this->loader);
     }
 
@@ -37,20 +44,24 @@ class AclAnnotationProviderTest extends \PHPUnit_Framework_TestCase
     {
         $this->loader->expects($this->once())
             ->method('load')
-            ->will(
-                $this->returnCallback(
-                    function ($storage) {
-                        /** @var AclAnnotationStorage $storage */
-                        $storage->add(
-                            new AclAnnotation(array('id' => 'test', 'type' => 'entity')),
-                            'SomeClass',
-                            'SomeMethod'
-                        );
-                    }
-                )
-            );
+            ->willReturnCallback(function ($storage) {
+                /** @var AclAnnotationStorage $storage */
+                $storage->add(
+                    new AclAnnotation(['id' => 'test', 'type' => 'entity', 'class' => 'Test:Entity']),
+                    'SomeClass',
+                    'SomeMethod'
+                );
+            });
+        $this->entityClassResolver->expects(self::any())
+            ->method('getEntityClass')
+            ->willReturnCallback(function ($className) {
+                return str_replace(':', '\\', $className);
+            });
 
-        $this->assertEquals('test', $this->provider->findAnnotationById('test')->getId());
+        $foundAnnotation = $this->provider->findAnnotationById('test');
+        $this->assertNotNull($foundAnnotation);
+        $this->assertEquals('test', $foundAnnotation->getId());
+        $this->assertEquals('Test\Entity', $foundAnnotation->getClass());
         $this->assertNull($this->provider->findAnnotationById('unknown'));
 
         $this->assertEquals('test', $this->provider->findAnnotation('SomeClass', 'SomeMethod')->getId());

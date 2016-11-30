@@ -190,8 +190,10 @@ class TransitionAssemblerTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @dataProvider configurationDataProvider
+     *
      * @param array $configuration
      * @param array $transitionDefinition
+     *
      * @SuppressWarnings(PHPMD.NPathComplexity)
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
@@ -245,6 +247,14 @@ class TransitionAssemblerTest extends \PHPUnit_Framework_TestCase
                 ->will($this->returnValue($expectedPreCondition));
             $count++;
         }
+        $this->conditionFactory->expects($this->at($count))
+            ->method('create')
+            ->with(
+                ConfigurableCondition::ALIAS,
+                ['@is_granted_workflow_transition' => ['parameters' => ['test']]]
+            )
+            ->will($this->returnValue($expectedPreCondition));
+        $count++;
 
         if (array_key_exists('conditions', $transitionDefinition)) {
             $expectedCondition = $this->createCondition();
@@ -332,11 +342,8 @@ class TransitionAssemblerTest extends \PHPUnit_Framework_TestCase
         $this->assertTemplate('page', $configuration, $actualTransition);
         $this->assertTemplate('dialog', $configuration, $actualTransition);
 
-        if ($preConditions) {
-            $this->assertEquals($expectedPreCondition, $actualTransition->getPreCondition(), 'Incorrect Precondition');
-        } else {
-            $this->assertNull($actualTransition->getPreCondition(), 'Incorrect Precondition');
-        }
+        $this->assertNotNull($actualTransition->getPreCondition(), 'Incorrect Precondition');
+        $this->assertEquals($expectedPreCondition, $actualTransition->getPreCondition(), 'Incorrect Precondition');
 
         if (array_key_exists('schedule', $configuration)) {
             $scheduleDefinition = $configuration['schedule'];
@@ -348,6 +355,7 @@ class TransitionAssemblerTest extends \PHPUnit_Framework_TestCase
 
         $this->assertSame($expectedCondition, $actualTransition->getCondition(), 'Incorrect condition');
         $this->assertSame($expectedPreAction, $actualTransition->getPreAction(), 'Incorrect preaction');
+
         $this->assertSame($expectedPostAction, $actualTransition->getAction(), 'Incorrect action');
     }
 
@@ -410,31 +418,248 @@ class TransitionAssemblerTest extends \PHPUnit_Framework_TestCase
                     'step_to' => 'step',
                 ],
                 'transitionDefinition' => self::$transitionDefinitions['with_actions'],
-            ],
-            'full_definition' => [
-                'configuration' => [
-                    'transition_definition' => 'full_definition',
-                    'acl_resource' => 'test_acl',
-                    'acl_message' => 'test acl message',
-                    'step_to' => 'step',
-                    'schedule' => [
-                        'cron' => '1 * * * *',
-                        'filter' => 'e.field < 1'
-                    ],
-                ],
-                'transitionDefinition' => self::$transitionDefinitions['full_definition'],
-            ],
-            'start_transition' => [
-                'configuration' => [
-                    'transition_definition' => 'empty_definition',
-                    'acl_resource' => 'test_acl',
-                    'acl_message' => 'test acl message',
-                    'step_to' => 'step',
-                    'is_start' => true,
-                ],
-                'transitionDefinition' => self::$transitionDefinitions['empty_definition'],
-            ],
+            ]
         ];
+    }
+
+    public function testAssembleWithIsTrueCondition()
+    {
+        $configuration = [
+            'transition_definition' => 'with_condition',
+            'step_to' => 'step',
+        ];
+        $transitionDefinition = self::$transitionDefinitions['with_condition'];
+
+        $steps      = ['step' => $this->createStep()];
+        $attributes = ['attribute' => $this->createAttribute()];
+
+        $expectedCondition = $expectedPreCondition   = $this->createCondition();
+
+        $this->conditionFactory->expects($this->at(0))->method('create')
+            ->with(
+                ConfigurableCondition::ALIAS,
+                ['@is_granted_workflow_transition' => ['parameters' => ['test']]]
+            )
+            ->will($this->returnValue($expectedPreCondition));
+        $this->conditionFactory->expects($this->at(1))->method('create')
+            ->with(ConfigurableCondition::ALIAS, $transitionDefinition['conditions'])
+            ->will($this->returnValue($expectedCondition));
+        $this->conditionFactory->expects($this->exactly(2))->method('create');
+
+        $this->formOptionsAssembler->expects($this->once())->method('assemble')
+            ->with([], $attributes, 'transition', 'test')
+            ->will($this->returnArgument(0));
+
+        $transitions = $this->assembler->assemble(
+            ['test' => $configuration],
+            self::$transitionDefinitions,
+            $steps,
+            $attributes
+        );
+
+        $this->assertInstanceOf('Doctrine\Common\Collections\ArrayCollection', $transitions);
+        $this->assertCount(1, $transitions);
+        $this->assertTrue($transitions->containsKey('test'));
+
+        /** @var Transition $actualTransition */
+        $actualTransition = $transitions->get('test');
+        $this->assertEquals('test', $actualTransition->getName(), 'Incorrect name');
+        $this->assertEquals($steps['step'], $actualTransition->getStepTo(), 'Incorrect step_to');
+
+        $this->assertEquals(
+            WorkflowConfiguration::DEFAULT_TRANSITION_DISPLAY_TYPE,
+            $actualTransition->getDisplayType(),
+            'Incorrect display type'
+        );
+        $this->assertEmpty($actualTransition->getFrontendOptions());
+        $this->assertFalse($actualTransition->isStart());
+        $this->assertEquals('oro_workflow_transition', $actualTransition->getFormType());
+        $this->assertEmpty($actualTransition->getFormOptions());
+
+        $configuration = array_merge(
+            [
+                'is_start' => false,
+                'form_type' => WorkflowTransitionType::NAME,
+                'form_options' => [],
+                'frontend_options' => [],
+            ],
+            $configuration
+        );
+        $this->assertTemplate('page', $configuration, $actualTransition);
+        $this->assertTemplate('dialog', $configuration, $actualTransition);
+
+        $this->assertNotNull($actualTransition->getCondition());
+        $this->assertSame($expectedCondition, $actualTransition->getCondition(), 'Incorrect condition');
+
+        $this->assertNotNull($actualTransition->getPreCondition());
+        $this->assertEquals($expectedPreCondition, $actualTransition->getPreCondition(), 'Incorrect Precondition');
+
+        $this->assertNull($actualTransition->getPreAction());
+        $this->assertNull($actualTransition->getAction());
+    }
+
+    public function testAssembleWithFullDefinition()
+    {
+        $configuration = [
+            'transition_definition' => 'full_definition',
+            'acl_resource' => 'test_acl',
+            'acl_message' => 'test acl message',
+            'step_to' => 'step',
+            'schedule' => ['cron' => '1 * * * *', 'filter' => 'e.field < 1']
+        ];
+        $transitionDefinition = self::$transitionDefinitions['full_definition'];
+
+        $steps = ['step' => $this->createStep()];
+        $attributes = ['attribute' => $this->createAttribute()];
+        $expectedPreAction = $expectedPostAction = null;
+        $expectedCondition = $expectedPreCondition = $this->createCondition();
+
+        $preConditions = [
+            '@and' => [
+                ['@is_granted_workflow_transition' => ['parameters' => ['test']]],
+                ['@and' => [
+                    ['@acl_granted' => [
+                        'parameters' => [$configuration['acl_resource']], 'message' => $configuration['acl_message']
+                    ]],
+                    ['@true' => null]
+                ]]
+            ]
+        ];
+        $this->conditionFactory->expects($this->at(0))->method('create')
+            ->with(ConfigurableCondition::ALIAS, $preConditions)
+            ->will($this->returnValue($expectedPreCondition));
+        $this->conditionFactory->expects($this->at(1))->method('create')
+            ->with(ConfigurableCondition::ALIAS, $transitionDefinition['conditions'])
+            ->will($this->returnValue($expectedCondition));
+        $this->conditionFactory->expects($this->exactly(2))->method('create');
+
+        $this->actionFactory->expects($this->exactly(2))
+            ->method('create')
+            ->with(ConfigurableAction::ALIAS, self::isType('array'))
+            ->willReturnCallback(function ($type, $config) use (&$expectedPreAction, &$expectedPostAction) {
+                $action = $this->createAction();
+                if ($config === self::$actions['preactions']) {
+                    $expectedPreAction = $action;
+                }
+                if ($config === self::$actions['actions']) {
+                    $expectedPostAction = $action;
+                }
+                return $action;
+            });
+
+        $this->formOptionsAssembler->expects($this->once())->method('assemble')
+            ->with([], $attributes, 'transition', 'test')
+            ->will($this->returnArgument(0));
+
+        $transitions = $this->assembler->assemble(
+            ['test' => $configuration],
+            self::$transitionDefinitions,
+            $steps,
+            $attributes
+        );
+
+        $this->assertInstanceOf('Doctrine\Common\Collections\ArrayCollection', $transitions);
+        $this->assertCount(1, $transitions);
+        $this->assertTrue($transitions->containsKey('test'));
+
+        /** @var Transition $actualTransition */
+        $actualTransition = $transitions->get('test');
+        $this->assertEquals('test', $actualTransition->getName(), 'Incorrect name');
+        $this->assertEquals($steps['step'], $actualTransition->getStepTo(), 'Incorrect step_to');
+
+        $this->assertEmpty($actualTransition->getFrontendOptions());
+        $this->assertFalse($actualTransition->isStart());
+        $this->assertEquals(WorkflowTransitionType::NAME, $actualTransition->getFormType());
+        $this->assertEquals([], $actualTransition->getFormOptions());
+
+        $this->assertTemplate('page', $configuration, $actualTransition);
+        $this->assertTemplate('dialog', $configuration, $actualTransition);
+
+        $this->assertNotNull($actualTransition->getPreCondition(), 'Incorrect Precondition');
+        $this->assertEquals($expectedPreCondition, $actualTransition->getPreCondition(), 'Incorrect Precondition');
+
+        $scheduleDefinition = $configuration['schedule'];
+        $this->assertEquals((string) $scheduleDefinition['cron'], $actualTransition->getScheduleCron());
+        $this->assertEquals((string) $scheduleDefinition['filter'], $actualTransition->getScheduleFilter());
+
+        $this->assertSame($expectedCondition, $actualTransition->getCondition(), 'Incorrect condition');
+        $this->assertSame($expectedPreAction, $actualTransition->getPreAction(), 'Incorrect preaction');
+        $this->assertSame($expectedPostAction, $actualTransition->getAction(), 'Incorrect action');
+    }
+
+    public function testAssembleWithEmptyDefinition()
+    {
+        $configuration = [
+            'transition_definition' => 'empty_definition',
+            'acl_resource' => 'test_acl',
+            'acl_message' => 'test acl message',
+            'step_to' => 'step',
+            'is_start' => true,
+        ];
+
+        $steps = ['step' => $this->createStep()];
+        $attributes = ['attribute' => $this->createAttribute()];
+
+        $expectedPreCondition   = $this->createCondition();
+
+        $preConditions = [
+            '@and' => [
+                ['@is_granted_workflow_transition' => ['parameters' => ['test']]],
+                ['@acl_granted' => [
+                    'parameters' => [$configuration['acl_resource']],
+                    'message' => $configuration['acl_message']
+                ]]
+            ]
+        ];
+        $this->conditionFactory->expects($this->once())
+            ->method('create')
+            ->with(ConfigurableCondition::ALIAS, $preConditions)
+            ->will($this->returnValue($expectedPreCondition));
+
+        $this->actionFactory->expects($this->never())->method('create');
+
+        $this->formOptionsAssembler->expects($this->once())
+            ->method('assemble')
+            ->with([], $attributes, 'transition', 'test')
+            ->will($this->returnArgument(0));
+
+        $transitions = $this->assembler->assemble(
+            ['test' => $configuration],
+            self::$transitionDefinitions,
+            $steps,
+            $attributes
+        );
+
+        $this->assertInstanceOf('Doctrine\Common\Collections\ArrayCollection', $transitions);
+        $this->assertCount(1, $transitions);
+        $this->assertTrue($transitions->containsKey('test'));
+
+        /** @var Transition $actualTransition */
+        $actualTransition = $transitions->get('test');
+
+        $this->assertEquals('test', $actualTransition->getName(), 'Incorrect name');
+        $this->assertEquals($steps['step'], $actualTransition->getStepTo(), 'Incorrect step_to');
+        $this->assertEquals(
+            WorkflowConfiguration::DEFAULT_TRANSITION_DISPLAY_TYPE,
+            $actualTransition->getDisplayType(),
+            'Incorrect display type'
+        );
+
+        $this->assertEquals([], $actualTransition->getFrontendOptions(), 'Incorrect frontend_options');
+        $this->assertTrue($actualTransition->isStart(), 'Incorrect is_start');
+
+        $this->assertEquals(WorkflowTransitionType::NAME, $actualTransition->getFormType(), 'Incorrect form_type');
+        $this->assertEmpty($actualTransition->getFormOptions(), 'Incorrect form_options');
+
+        $this->assertTemplate('page', $configuration, $actualTransition);
+        $this->assertTemplate('dialog', $configuration, $actualTransition);
+
+        $this->assertNotNull($actualTransition->getPreCondition(), 'Incorrect Precondition');
+        $this->assertEquals($expectedPreCondition, $actualTransition->getPreCondition(), 'Incorrect Precondition');
+
+        $this->assertNull($actualTransition->getCondition(), 'Incorrect condition');
+        $this->assertNull($actualTransition->getPreAction(), 'Incorrect preaction');
+        $this->assertNull($actualTransition->getAction(), 'Incorrect action');
     }
 
     /**

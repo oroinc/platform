@@ -161,12 +161,11 @@ services:
             - '@oro_entity.orm.entity_class_resolver'
             - '@oro_security.entity_security_metadata_provider'
             - '@oro_security.owner.metadata_provider.chain'
+            - '@oro_security.owner.entity_owner_accessor'
             - '@oro_security.owner.ownership_decision_maker.chain'
             - '@oro_security.acl.permission_manager'
             - '@oro_security.acl.group_provider.chain'
             - '@oro_security.acl.extension.field'
-        calls:
-            - [setEntityOwnerAccessor, ['@oro_security.owner.entity_owner_accessor']]
         tags:
             - { name: oro_security.acl.extension, priority: 20 }
 
@@ -328,7 +327,8 @@ services:
     oro_security.acl.annotation_provider:
         class: %oro_security.acl.annotation_provider.class%
         arguments:
-          - '@oro_security.acl.annotation_provider.cache'
+            - '@oro_entity.orm.entity_class_resolver'
+            - '@oro_security.acl.annotation_provider.cache'
 
     oro_security.acl.annotation_provider.cache:
         public: false
@@ -704,11 +704,10 @@ services:
         class: Oro\Bundle\SecurityBundle\Acl\Extension\FieldAclExtension
         arguments:
             - '@oro_security.acl.object_id_accessor'
-            - '@oro_entity.orm.entity_class_resolver'
             - '@oro_security.owner.metadata_provider.chain'
             - '@oro_security.owner.ownership_decision_maker.chain'
             - '@oro_security.owner.entity_owner_accessor'
-            - '@oro_entity_config.provider.security'
+            - '@oro_entity_config.config_manager'
             - '@oro_security.entity_security_metadata_provider'
 
     oro_security.serializer.acl_filter:
