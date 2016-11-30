@@ -858,13 +858,13 @@ class WorkflowTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @dataProvider configurationsOptionProvider
+     * @dataProvider configurationOptionProvider
      *
      * @param array $data
      * @param string $property
      * @param string $node
      */
-    public function testGetConfigurationsOption($data, $property, $node)
+    public function testGetConfigurationOption($data, $property, $node)
     {
         $accessor = PropertyAccess::createPropertyAccessor();
         $workflow = $this->createWorkflow();
@@ -874,7 +874,7 @@ class WorkflowTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($data, $accessor->getValue($workflow, $property));
     }
 
-    public function configurationsOptionProvider()
+    public function configurationOptionProvider()
     {
         yield [
             'data' => ['route1' => ['trans1']],
