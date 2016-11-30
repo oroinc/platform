@@ -4,7 +4,7 @@ namespace Oro\Bundle\SecurityBundle\Encoder;
 
 use ass\XmlSecurity\Key\Aes256Cbc as Cipher;
 
-class Mcrypt
+class Mcrypt implements SymmetricCrypterInterface
 {
     /** @var string */
     protected $key;

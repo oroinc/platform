@@ -59,8 +59,16 @@ trait FallbackTrait
     private function getLocalizedFallbackValue(Collection $values, Localization $localization = null)
     {
         $value = $this->getValue($values, $localization);
-        if ($value && $localization) {
-            switch ($value->getFallback()) {
+        if ($localization) {
+            if ($value) {
+                $fallbackType = $value->getFallback();
+            } elseif ($localization->getParentLocalization()) {
+                $fallbackType = FallbackType::PARENT_LOCALIZATION;
+            } else {
+                $fallbackType = FallbackType::SYSTEM;
+            }
+
+            switch ($fallbackType) {
                 case FallbackType::PARENT_LOCALIZATION:
                     $value = $this->getLocalizedFallbackValue($values, $localization->getParentLocalization());
                     break;
@@ -88,7 +96,13 @@ trait FallbackTrait
     {
         $filteredValues = $values->filter(
             function (LocalizedFallbackValue $title) use ($localization) {
-                return $localization === $title->getLocalization();
+                if ($localization === $title->getLocalization()) {
+                    return true;
+                } elseif (!$localization || !$title->getLocalization()) {
+                    return false;
+                }
+
+                return $localization->getId() === $title->getLocalization()->getId();
             }
         );
 
