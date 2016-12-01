@@ -38,11 +38,13 @@ class WorkflowConfiguration extends AbstractConfiguration implements Configurati
 
     /**
      * @param array $configs
+     *
      * @return array
      */
     public function processConfiguration(array $configs)
     {
         $processor = new Processor();
+
         return $processor->processConfiguration($this, array($configs));
     }
 
@@ -60,6 +62,7 @@ class WorkflowConfiguration extends AbstractConfiguration implements Configurati
 
     /**
      * @param NodeBuilder $nodeBuilder
+     *
      * @return NodeBuilder
      */
     public function addWorkflowNodes(NodeBuilder $nodeBuilder)
@@ -501,6 +504,7 @@ class WorkflowConfiguration extends AbstractConfiguration implements Configurati
 
     /**
      * @param string $nodeName
+     *
      * @return NodeDefinition
      */
     protected function getGroupsNode($nodeName)
