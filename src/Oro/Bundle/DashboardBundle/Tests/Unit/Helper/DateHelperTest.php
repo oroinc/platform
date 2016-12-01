@@ -427,4 +427,117 @@ class DateHelperTest extends OrmTestCase
             ]
         ];
     }
+
+    /**
+     * @dataProvider getFormatStringsProvider
+     */
+    public function testGetFormatStrings(\DateTime $start, \DateTime $end, array $expectedValue)
+    {
+        $this->assertEquals($expectedValue, $this->helper->getFormatStrings($start, $end));
+    }
+
+    public function getFormatStringsProvider()
+    {
+        return [
+            'year' => [
+                new \DateTime('2010-01-01', new \DateTimeZone('UTC')),
+                new \DateTime('2015-01-01', new \DateTimeZone('UTC')),
+                [
+                    'intervalString' => 'P1Y',
+                    'valueStringFormat' => 'Y',
+                    'viewType' => 'year',
+                ]
+            ],
+            'month' => [
+                new \DateTime('2010-01-01', new \DateTimeZone('UTC')),
+                new \DateTime('2010-05-01', new \DateTimeZone('UTC')),
+                [
+                    'intervalString' => 'P1M',
+                    'valueStringFormat' => 'Y-m',
+                    'viewType' => 'month',
+                ]
+            ],
+            'date' => [
+                new \DateTime('2010-01-01', new \DateTimeZone('UTC')),
+                new \DateTime('2010-03-15', new \DateTimeZone('UTC')),
+                [
+                    'intervalString' => 'P1W',
+                    'valueStringFormat' => 'Y-W',
+                    'viewType' => 'date',
+                ]
+            ],
+            'day' => [
+                new \DateTime('2010-01-01', new \DateTimeZone('UTC')),
+                new \DateTime('2010-01-15', new \DateTimeZone('UTC')),
+                [
+                    'intervalString' => 'P1D',
+                    'valueStringFormat' => 'Y-m-d',
+                    'viewType' => 'day',
+                ]
+            ],
+            'time' => [
+                new \DateTime('2010-01-01', new \DateTimeZone('UTC')),
+                new \DateTime('2010-01-02', new \DateTimeZone('UTC')),
+                [
+                    'intervalString' => 'PT1H',
+                    'valueStringFormat' => 'Y-m-d-H',
+                    'viewType' => 'time',
+                ]
+            ],
+        ];
+    }
+
+    /**
+     * @dataProvider getKeyGeneratesKeysFromGetDatePeriod
+     */
+    public function testGetKeyGeneratesKeysFromGetDatePeriod(
+        \DateTime $start,
+        \DateTime $end,
+        array $row,
+        $expectedViewType
+    ) {
+        $formatStrings = $this->helper->getFormatStrings($start, $end);
+        $this->assertEquals($expectedViewType, $formatStrings['viewType']);
+
+        $this->assertArrayHasKey(
+            $this->helper->getKey($start, $end, $row),
+            $this->helper->getDatePeriod($start, $end)
+        );
+    }
+
+    public function getKeyGeneratesKeysFromGetDatePeriod()
+    {
+        return [
+            'year' => [
+                new \DateTime('2010-01-01', new \DateTimeZone('UTC')),
+                new \DateTime('2015-01-01', new \DateTimeZone('UTC')),
+                ['yearCreated' => '2010'],
+                'year',
+            ],
+            'month' => [
+                new \DateTime('2010-01-01', new \DateTimeZone('UTC')),
+                new \DateTime('2010-05-01', new \DateTimeZone('UTC')),
+                ['yearCreated' => '2010', 'monthCreated' => '4'],
+                'month',
+            ],
+            'date' => [
+                new \DateTime('2010-01-01', new \DateTimeZone('UTC')),
+                new \DateTime('2010-03-15', new \DateTimeZone('UTC')),
+                ['yearCreated' => '2010', 'weekCreated' => '1'],
+                'date',
+            ],
+            'time with hour having 1 digit' => [
+                new \DateTime('2010-01-01', new \DateTimeZone('UTC')),
+                new \DateTime('2010-01-02', new \DateTimeZone('UTC')),
+                ['dateCreated' => '2010-01-01', 'hourCreated' => '5'],
+                'time',
+            ],
+            'time with hour having 2 digits' => [
+                new \DateTime('2010-01-01', new \DateTimeZone('UTC')),
+                new \DateTime('2010-01-02', new \DateTimeZone('UTC')),
+                ['dateCreated' => '2010-01-01', 'hourCreated' => '11'],
+                'time',
+            ],
+        ];
+    }
 }

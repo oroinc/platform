@@ -11,9 +11,9 @@ use Symfony\Component\Console\Helper\QuestionHelper;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Process\Process;
 
-final class UnixMysqlIsolator extends AbstractDbOsRelatedIsolator implements IsolatorInterface
+final class UnixMysqlAsyncIsolator extends AbstractDbOsRelatedIsolator implements IsolatorInterface
 {
-    const TIMEOUT = '120';
+    const TIMEOUT = '240';
 
     protected $connection;
 
