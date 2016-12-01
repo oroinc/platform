@@ -1,3 +1,4 @@
+@not-automated
 Feature: two-factor authentication via email
   In order to increase login security level
   As Administrator user
