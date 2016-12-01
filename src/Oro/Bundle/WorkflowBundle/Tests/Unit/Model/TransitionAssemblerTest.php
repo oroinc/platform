@@ -432,7 +432,7 @@ class TransitionAssemblerTest extends \PHPUnit_Framework_TestCase
                     'transition_definition' => 'empty_definition',
                     'init_entities' => ['entity1', 'entity2'],
                     'init_routes' => ['route1', 'route2'],
-                    'step_to' => 'step',
+                    'step_to' => 'target_step',
                 ],
                 'transitionDefinition' => self::$transitionDefinitions['empty_definition'],
             ]
