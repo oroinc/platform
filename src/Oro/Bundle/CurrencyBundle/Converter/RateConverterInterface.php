@@ -7,8 +7,10 @@ use Oro\Bundle\CurrencyBundle\Entity\MultiCurrency;
 interface RateConverterInterface
 {
     /**
-    * @param MultiCurrency $currency
-    * @return float
-    */
-    public function getBaseCurencyAmount(MultiCurrency $currency);
+     * Returns amount base currency
+     * @param MultiCurrency $currency
+     *
+     * @return float
+     */
+    public function getBaseCurrencyAmount(MultiCurrency $currency);
 }

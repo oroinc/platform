@@ -11,7 +11,7 @@ class RateConverter implements RateConverterInterface
      *
      * @return float
      */
-    public function getBaseCurencyAmount(MultiCurrency $currency)
+    public function getBaseCurrencyAmount(MultiCurrency $currency)
     {
         return $currency->getValue();
     }

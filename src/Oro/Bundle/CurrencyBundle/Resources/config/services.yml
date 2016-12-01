@@ -112,3 +112,8 @@ services:
     oro_currency.converter.rate:
         class: Oro\Bundle\CurrencyBundle\Converter\RateConverter
         public: false
+
+    oro_currency.converter.rate.link:
+        tags:
+            - { name: oro_service_link, service: oro_currency.converter.rate }
+
