@@ -45,6 +45,12 @@ class UpgradeCommand extends AbstractCommand
         if ($force) {
             $commandExecutor = $this->getCommandExecutor($input, $output);
             $commandExecutor->runCommand('oro:platform:upgrade20:db-configs', ['--force' => true]);
+
+            $commandExecutor->runCommand(
+                'cache:warmup',
+                ['--no-optional-warmers' => true, '--process-isolation' => true]
+            );
+
             $updateParams = ['--process-isolation' => true];
             foreach ($input->getOptions() as $key => $value) {
                 if ($value) {

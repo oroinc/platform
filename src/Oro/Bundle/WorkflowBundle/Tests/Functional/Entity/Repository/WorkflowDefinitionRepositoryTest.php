@@ -86,4 +86,17 @@ class WorkflowDefinitionRepositoryTest extends WebTestCase
     {
         $this->scopeManager->addProvider(WorkflowScopeManager::SCOPE_TYPE, $provider);
     }
+
+    public function testFindActive()
+    {
+        $workflows = array_map(
+            function (WorkflowDefinition $definition) {
+                return ['name' => $definition->getName()];
+            },
+            $this->repository->findActive()
+        );
+        $this->assertGreaterThanOrEqual(2, count($workflows));
+        $this->assertContains(['name' => 'test_active_flow1'], $workflows);
+        $this->assertContains(['name' => 'test_active_flow2'], $workflows);
+    }
 }

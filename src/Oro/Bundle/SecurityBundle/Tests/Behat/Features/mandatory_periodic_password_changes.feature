@@ -1,3 +1,4 @@
+@not-automated
 Feature: Mandatory periodic password changes
   In order to increase login security level
   As Administrator

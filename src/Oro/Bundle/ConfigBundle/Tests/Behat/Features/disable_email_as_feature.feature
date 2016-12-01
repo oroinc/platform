@@ -1,3 +1,4 @@
+@not-automated
 Feature: Disable Emails
   In order to lightweight the system
   As Administrator
