@@ -518,14 +518,6 @@ class Workflow
     }
 
     /**
-     * @return array
-     */
-    public function getDisabledOperations()
-    {
-        return $this->getConfigurationOption(WorkflowConfiguration::NODE_DISABLE_OPERATIONS, []);
-    }
-
-    /**
      * @param string $nodeName
      * @param mixed|null $default
      *
