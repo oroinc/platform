@@ -372,3 +372,8 @@ services:
             - 'oro_workflow_widget_start_transition_form'
             - 'oro_workflow_start_transition_form'
             - 'oro_api_workflow_start'
+
+    oro_workflow.transition_view_data.manager:
+        class: 'Oro\Bundle\WorkflowBundle\Model\TransitionViewDataManager'
+        arguments:
+            - '@oro_workflow.manager'
