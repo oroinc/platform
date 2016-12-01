@@ -9,13 +9,14 @@ use Oro\Bundle\UserBundle\Entity\Repository\RoleRepository;
 use Oro\Bundle\UserBundle\Entity\Role;
 use Oro\Bundle\UserBundle\Entity\User;
 use OroEntityProxy\OroEmailBundle\EmailAddressProxy;
+use Symfony\Component\HttpKernel\KernelInterface;
 
 class ReferenceRepositoryInitializer
 {
     /**
-     * @var EntityManager
+     * @var KernelInterface
      */
-    protected $em;
+    protected $kernel;
 
     /**
      * @var AliceCollection
@@ -26,9 +27,9 @@ class ReferenceRepositoryInitializer
      * @param Registry $registry
      * @param AliceCollection $referenceRepository
      */
-    public function __construct(Registry $registry, AliceCollection $referenceRepository)
+    public function __construct(KernelInterface $kernel, AliceCollection $referenceRepository)
     {
-        $this->em = $registry->getManager();
+        $this->kernel = $kernel;
         $this->referenceRepository = $referenceRepository;
     }
 
@@ -48,7 +49,7 @@ class ReferenceRepositoryInitializer
         $this->referenceRepository->set('business_unit', $user->getOwner());
         $this->referenceRepository->set(
             'adminEmailAddress',
-            $this->em->getRepository(EmailAddressProxy::class)->findOneBy([])
+            $this->getEntityManager()->getRepository(EmailAddressProxy::class)->findOneBy([])
         );
     }
 
@@ -62,7 +63,15 @@ class ReferenceRepositoryInitializer
 
     public function getRole($role)
     {
-        return $this->em->getRepository(Role::class)->findOneBy(['role' => $role]);
+        return $this->getEntityManager()->getRepository(Role::class)->findOneBy(['role' => $role]);
+    }
+
+    /**
+     * @return EntityManager
+     */
+    protected function getEntityManager()
+    {
+        return $this->kernel->getContainer()->get('doctrine')->getManager();
     }
 
     /**
@@ -72,7 +81,7 @@ class ReferenceRepositoryInitializer
     protected function getDefaultUser()
     {
         /** @var RoleRepository $repository */
-        $repository = $this->em->getRepository('OroUserBundle:Role');
+        $repository = $this->getEntityManager()->getRepository('OroUserBundle:Role');
         $role       = $repository->findOneBy(['role' => User::ROLE_ADMINISTRATOR]);
 
         if (!$role) {
