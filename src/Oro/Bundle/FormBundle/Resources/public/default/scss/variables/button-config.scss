@@ -1,13 +1,14 @@
 // @theme: default;
 
 // Default
+$button-padding: 21px 12px;
 $button-border: 1px solid get-color('primary', 'base');
 $button-background-color: get-color('primary', 'base');
-$button-color: $base-ui-element-color;
+$button-color: get-color('additional', 'ultra');
 
 // Hover
 $button-border-color-hover-state: get-color('primary', 'base');
-$button-color-hover-state: get-color('additional', 'ultra');;
+$button-color-hover-state: get-color('additional', 'ultra');
 
 // Focus
 $button-border-color-focus-state: $button-border-color-hover-state;

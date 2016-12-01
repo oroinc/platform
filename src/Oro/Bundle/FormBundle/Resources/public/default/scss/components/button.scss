@@ -8,7 +8,10 @@
 
     @include element-state('hover') {
         text-decoration: none;
-        box-shadow: $shadow
+    }
+
+    @include element-state('active') {
+        box-shadow: $shadow;
     }
 
     &[disabled] {
@@ -42,16 +45,17 @@
 
 .button,
 .btn {
+    text-align: center;
+
     @include element-state('hover') {
         background: lighten(get-color('primary', 'base'), 5%);
     }
 
     @include button-basic-states();
-}
 
-@include breakpoint('mobile-landscape') {
-    .button--full-in-mobile {
-        width: 100%;
+    &.theme-btn {
+        padding: 0 29px;
+        line-height: 47px;
     }
 }
 
@@ -107,4 +111,10 @@
     }
 
     @include button-basic-states();
+}
+
+@include breakpoint('mobile-landscape') {
+    .button--full-in-mobile {
+        width: 100%;
+    }
 }
