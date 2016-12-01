@@ -8,6 +8,7 @@ use Symfony\Component\Form\FormConfigBuilder;
 use Symfony\Component\Form\FormConfigInterface;
 
 use Oro\Bundle\ApiBundle\Form\DataMapper\AppendRelationshipMapper;
+use Oro\Bundle\ApiBundle\Metadata\AssociationMetadata;
 use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\EntityWithoutGettersAndSetters;
 use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Group;
 use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Product;
@@ -445,5 +446,48 @@ class AppendRelationshipMapperTest extends \PHPUnit_Framework_TestCase
         $form = $this->getForm($config);
 
         $this->mapper->mapFormsToData([$form], $product);
+    }
+
+    public function testMapFormsToDataElementsShouldBeAddedToCollectionInCaseOfExtendedToManyAssociation()
+    {
+        $group1 = new Group();
+        $group1->setName('group1');
+        $group2 = new Group();
+        $group2->setName('group2');
+        $group3 = new Group();
+        $group3->setName('group3');
+        $user = new User();
+        $product = new Product();
+        $product->setName('test product');
+
+        $user->addGroup($group1);
+        $user->addGroup($group2);
+        $propertyPath = $this->getPropertyPath('targets');
+
+        $this->propertyAccessor->expects($this->any())
+            ->method('getValue')
+            ->with($user, $propertyPath)
+            ->willReturn($user->getTargets());
+
+        $metadata = new AssociationMetadata();
+        $metadata->setIsCollection(true);
+
+        $config = new FormConfigBuilder('targets', null, $this->dispatcher, ['metadata' => $metadata]);
+        $config->setByReference(true);
+        $config->setPropertyPath($propertyPath);
+        $config->setData([$group2, $group3, $product]);
+        $form = $this->getForm($config);
+
+        $this->mapper->mapFormsToData([$form], $user);
+
+        $expectedGroups = new ArrayCollection();
+        $expectedGroups->add($group1);
+        $expectedGroups->add($group2);
+        $expectedGroups->add($group3);
+        $this->assertEquals($expectedGroups, $user->getGroups());
+
+        $expectedProducts = new ArrayCollection();
+        $expectedProducts->add($product);
+        $this->assertEquals($expectedProducts, $user->getProducts());
     }
 }
