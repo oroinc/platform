@@ -507,6 +507,78 @@ class WorkflowAclMetadataProviderTest extends \PHPUnit_Framework_TestCase
         );
     }
 
+    public function testStartTransitionShouldNotDuplicateAnotherTransition()
+    {
+        $workflowName = 'workflow1';
+        $workflowConfiguration = [
+            'steps'       => [
+                'step1'     => [
+                    'allowed_transitions' => ['start_transition'],
+                    'label'               => 'step 1',
+                    '_is_start'           => true
+                ],
+                'next_step' => ['label' => 'next step']
+            ],
+            'transitions' => [
+                'start_transition' => ['label' => 'start transition', 'step_to' => 'next_step', 'is_start' => true],
+            ]
+        ];
+
+        $query = $this->loadWorkflowExpectations();
+        $query->expects(self::once())
+            ->method('getArrayResult')
+            ->willReturn(
+                [
+                    [
+                        'name'          => $workflowName,
+                        'label'         => 'workflow 1',
+                        'configuration' => $workflowConfiguration
+                    ]
+                ]
+            );
+        $this->featureChecker->expects(self::once())
+            ->method('isResourceEnabled')
+            ->with($workflowName)
+            ->willReturn(true);
+        $this->translator->expects(self::any())
+            ->method('trans')
+            ->willReturnCallback(function ($label, $parameters, $domain) {
+                $result = 'translated: ' . $label;
+                if (!empty($parameters)) {
+                    foreach ($parameters as $key => $val) {
+                        $result .= ' ' . $key . ': (' . $val . ')';
+                    }
+                }
+                if (!empty($domain)) {
+                    $result .= ' [domain: ' . $domain . ']';
+                }
+
+                return $result;
+            });
+
+        $expectedMetadata = new WorkflowAclMetadata(
+            $workflowName,
+            'translated: workflow 1 [domain: workflows]',
+            '',
+            [
+                new FieldSecurityMetadata(
+                    'start_transition||next_step',
+                    'translated: start transition [domain: workflows] '
+                    . "(translated: step 1 [domain: workflows] \u{2192} translated: next step [domain: workflows])"
+                )
+            ]
+        );
+        self::assertEquals(
+            [$expectedMetadata],
+            $this->workflowAclMetadataProvider->getMetadata()
+        );
+        // test that the local cache is used
+        self::assertEquals(
+            [$expectedMetadata],
+            $this->workflowAclMetadataProvider->getMetadata()
+        );
+    }
+
     public function testSortingOfTransitions()
     {
         $workflowName = 'workflow1';

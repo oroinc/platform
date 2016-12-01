@@ -22,8 +22,8 @@ class WorkflowAclMetadataProvider
     const LABEL               = 'label';
     const ORDER               = 'order';
     const STEP_TO             = 'step_to';
-    const START_STEP          = 'start_step';
     const IS_START            = 'is_start';
+    const IS_START_STEP       = '_is_start';
 
     /** transition name (from step -> to step) */
     const TRANSITION_LABEL_TEMPLATE = "%s (%s \u{2192} %s)";
@@ -110,6 +110,7 @@ class WorkflowAclMetadataProvider
         $result = [];
         $steps = $this->getSteps($workflowConfig);
         $transitions = $this->getTransitions($workflowConfig);
+        $addedStartTransitions = [];
         foreach ($steps as $stepName => $stepConfig) {
             if (!empty($stepConfig[self::ALLOWED_TRANSITIONS])) {
                 $order = $this->getAttribute($stepConfig, self::ORDER, 0);
@@ -117,8 +118,14 @@ class WorkflowAclMetadataProvider
                     if (isset($transitions[$transitionName])) {
                         $transitionConfig = $transitions[$transitionName];
                         $toStep = $this->getAttribute($transitionConfig, self::STEP_TO);
+                        $fromStep = null;
+                        if (!$this->getAttribute($stepConfig, self::IS_START_STEP, false)) {
+                            $fromStep = $stepName;
+                        } else {
+                            $addedStartTransitions[$transitionName] = true;
+                        }
                         $result[$order][] = new FieldSecurityMetadata(
-                            $this->getTransitionIdentifier($transitionName, $stepName, $toStep),
+                            $this->getTransitionIdentifier($transitionName, $fromStep, $toStep),
                             $this->getTransitionLabel($workflowConfig, $transitionName, $stepName, $toStep)
                         );
                     }
@@ -126,8 +133,11 @@ class WorkflowAclMetadataProvider
             }
         }
         foreach ($transitions as $transitionName => $transitionConfig) {
-            if ($this->getAttribute($transitionConfig, self::IS_START, false)
-                || TransitionManager::DEFAULT_START_TRANSITION_NAME === $transitionName
+            if (!isset($addedStartTransitions[$transitionName])
+                && (
+                    $this->getAttribute($transitionConfig, self::IS_START, false)
+                    || TransitionManager::DEFAULT_START_TRANSITION_NAME === $transitionName
+                )
             ) {
                 $toStep = $this->getAttribute($transitionConfig, self::STEP_TO);
                 $result[-1][] = new FieldSecurityMetadata(
