@@ -118,14 +118,11 @@ class WorkflowAclMetadataProvider
                     if (isset($transitions[$transitionName])) {
                         $transitionConfig = $transitions[$transitionName];
                         $toStep = $this->getAttribute($transitionConfig, self::STEP_TO);
-                        $fromStep = null;
-                        if (!$this->getAttribute($stepConfig, self::IS_START_STEP, false)) {
-                            $fromStep = $stepName;
-                        } else {
+                        if ($this->getAttribute($stepConfig, self::IS_START_STEP, false)) {
                             $addedStartTransitions[$transitionName] = true;
                         }
                         $result[$order][] = new FieldSecurityMetadata(
-                            $this->getTransitionIdentifier($transitionName, $fromStep, $toStep),
+                            $this->getTransitionIdentifier($transitionName, $stepName, $toStep),
                             $this->getTransitionLabel($workflowConfig, $transitionName, $stepName, $toStep)
                         );
                     }

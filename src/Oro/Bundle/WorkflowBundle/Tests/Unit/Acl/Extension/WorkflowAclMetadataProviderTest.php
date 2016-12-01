@@ -562,7 +562,7 @@ class WorkflowAclMetadataProviderTest extends \PHPUnit_Framework_TestCase
             '',
             [
                 new FieldSecurityMetadata(
-                    'start_transition||next_step',
+                    'start_transition|step1|next_step',
                     'translated: start transition [domain: workflows] '
                     . "(translated: step 1 [domain: workflows] \u{2192} translated: next step [domain: workflows])"
                 )
