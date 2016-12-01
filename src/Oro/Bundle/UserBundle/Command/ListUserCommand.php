@@ -67,13 +67,14 @@ class ListUserCommand extends ContainerAwareCommand
         if (!empty($input->getOption('roles'))) {
             $builder
                 ->leftJoin('u.roles', 'r')
+                ->leftJoin('u.auth_status', 'au')
                 ->andWhere('r.label IN (:roles)')
                 ->setParameter('roles', $input->getOption('roles'));
         }
 
         $table = new Table($output);
         $table
-            ->setHeaders(['ID', 'Username', 'Status', 'First Name', 'Last Name', 'Roles'])
+            ->setHeaders(['ID', 'Username', 'Enabled (Auth Status)', 'First Name', 'Last Name', 'Roles'])
             ->setRows(array_map([$this, 'getUserRow'], $builder->getQuery()->getResult()))
             ->render()
         ;
@@ -88,7 +89,11 @@ class ListUserCommand extends ContainerAwareCommand
         return [
             $user->getId(),
             $user->getUsername(),
-            $user->isEnabled() ? 'Active' : 'Inactive',
+            sprintf(
+                '%s (%s)',
+                $user->isEnabled() ? 'Enabled' : 'Disabled',
+                $user->getAuthStatus() ? $user->getAuthStatus()->getName() : null
+            ),
             $user->getFirstName(),
             $user->getLastName(),
             implode(', ', $user->getRoles())
