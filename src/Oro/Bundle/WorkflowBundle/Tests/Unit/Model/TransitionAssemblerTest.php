@@ -14,6 +14,9 @@ use Oro\Component\Action\Action\Configurable as ConfigurableAction;
 use Oro\Component\Action\Condition\Configurable as ConfigurableCondition;
 use Oro\Component\ConfigExpression\ExpressionInterface;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class TransitionAssemblerTest extends \PHPUnit_Framework_TestCase
 {
     /**
@@ -423,6 +426,15 @@ class TransitionAssemblerTest extends \PHPUnit_Framework_TestCase
                     'step_to' => 'step',
                 ],
                 'transitionDefinition' => self::$transitionDefinitions['with_actions'],
+            ],
+            'with init context' => [
+                'configuration' => [
+                    'transition_definition' => 'empty_definition',
+                    'init_entities' => ['entity1', 'entity2'],
+                    'init_routes' => ['route1', 'route2'],
+                    'step_to' => 'step',
+                ],
+                'transitionDefinition' => self::$transitionDefinitions['empty_definition'],
             ]
         ];
     }
