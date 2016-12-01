@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\WorkflowBundle\Controller;
 
-use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
 use Oro\Bundle\WorkflowBundle\Event\StartTransitionEvent;
 use Oro\Bundle\WorkflowBundle\Event\StartTransitionEvents;
@@ -27,7 +26,6 @@ class WorkflowController extends Controller
      *      "/start/{workflowName}/{transitionName}",
      *      name="oro_workflow_start_transition_form"
      * )
-     * @AclAncestor("oro_workflow")
      * @param string $workflowName
      * @param string $transitionName
      * @param Request $request
@@ -82,7 +80,7 @@ class WorkflowController extends Controller
      *      name="oro_workflow_transition_form"
      * )
      * @ParamConverter("workflowItem", options={"id"="workflowItemId"})
-     * @AclAncestor("oro_workflow")
+     *
      * @param string $transitionName
      * @param WorkflowItem $workflowItem
      * @return Response

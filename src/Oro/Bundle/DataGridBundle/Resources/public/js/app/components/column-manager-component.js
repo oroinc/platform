@@ -153,6 +153,7 @@ define(function(require) {
          * @protected
          */
         _applyState: function(collection, state) {
+            state = state || collection.state;
             var columnsState = state.columns;
             var attrs;
 

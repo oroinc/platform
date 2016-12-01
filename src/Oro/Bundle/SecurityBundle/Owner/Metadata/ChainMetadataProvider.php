@@ -97,14 +97,6 @@ class ChainMetadataProvider implements MetadataProviderInterface
     /**
      * {@inheritDoc}
      */
-    public function getSystemLevelClass()
-    {
-        return $this->getSupportedProvider()->getSystemLevelClass();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
     public function getMaxAccessLevel($accessLevel, $className = null)
     {
         return $this->getSupportedProvider()->getMaxAccessLevel($accessLevel, $className);

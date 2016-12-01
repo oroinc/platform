@@ -46,6 +46,16 @@ abstract class AbstractFieldsExtensionTestCase extends \PHPUnit_Framework_TestCa
             ->disableOriginalConstructor()
             ->getMock();
 
+        $this->entityClassResolver->expects($this->any())
+            ->method('getEntityClass')
+            ->willReturnMap(
+                [
+                    [self::ENTITY_CLASS, self::ENTITY_CLASS],
+                    [self::ENTITY_NAME, self::ENTITY_CLASS],
+                    [\stdClass::class, \stdClass::class],
+                ]
+            );
+
         $this->entityConfigProvider = $this->getConfigProviderMock();
         $this->extendConfigProvider = $this->getConfigProviderMock();
         $this->datagridConfigProvider = $this->getConfigProviderMock();
@@ -77,11 +87,6 @@ abstract class AbstractFieldsExtensionTestCase extends \PHPUnit_Framework_TestCa
 
     public function testProcessConfigsNoFields()
     {
-        $this->entityClassResolver->expects($this->once())
-            ->method('getEntityClass')
-            ->with(self::ENTITY_NAME)
-            ->will($this->returnValue(self::ENTITY_CLASS));
-
         $this->configManager->expects($this->once())->method('hasConfig')->willReturn(false);
         $this->configManager->expects($this->never())->method('getConfig');
 
@@ -98,11 +103,6 @@ abstract class AbstractFieldsExtensionTestCase extends \PHPUnit_Framework_TestCa
     public function testProcessConfigs()
     {
         $fieldType = 'string';
-
-        $this->entityClassResolver->expects($this->atLeastOnce())
-            ->method('getEntityClass')
-            ->with(self::ENTITY_NAME)
-            ->will($this->returnValue(self::ENTITY_CLASS));
 
         $this->setExpectationForGetFields(self::ENTITY_CLASS, self::FIELD_NAME, $fieldType);
 
@@ -140,7 +140,7 @@ abstract class AbstractFieldsExtensionTestCase extends \PHPUnit_Framework_TestCa
                     ],
                     'source' => [
                         'query' => [
-                            'from' => [['table' => 'Test\Entity', 'alias' => 'o']],
+                            'from' => [['table' => self::ENTITY_CLASS, 'alias' => 'o']],
                             'select' => ['o.testField'],
                         ],
                     ],
@@ -154,11 +154,6 @@ abstract class AbstractFieldsExtensionTestCase extends \PHPUnit_Framework_TestCa
     public function testProcessConfigsWithFrom()
     {
         $fieldType = 'string';
-
-        $this->entityClassResolver->expects($this->atLeastOnce())
-            ->method('getEntityClass')
-            ->with(self::ENTITY_NAME)
-            ->will($this->returnValue(self::ENTITY_CLASS));
 
         $this->setExpectationForGetFields(self::ENTITY_CLASS, self::FIELD_NAME, $fieldType);
 
@@ -231,11 +226,6 @@ abstract class AbstractFieldsExtensionTestCase extends \PHPUnit_Framework_TestCa
 
         $targetFieldName = 'testRel';
         $relAlias = 'auto_rel_1';
-
-        $this->entityClassResolver->expects($this->any())
-            ->method('getEntityClass')
-            ->with(self::ENTITY_NAME)
-            ->will($this->returnValue(self::ENTITY_CLASS));
 
         $this->setExpectationForGetFields(
             self::ENTITY_CLASS,
@@ -317,11 +307,6 @@ abstract class AbstractFieldsExtensionTestCase extends \PHPUnit_Framework_TestCa
 
         $targetFieldName = 'testRel';
 
-        $this->entityClassResolver->expects($this->any())
-            ->method('getEntityClass')
-            ->with(self::ENTITY_NAME)
-            ->will($this->returnValue(self::ENTITY_CLASS));
-
         $this->setExpectationForGetFields(
             self::ENTITY_CLASS,
             self::FIELD_NAME,
@@ -389,11 +374,6 @@ abstract class AbstractFieldsExtensionTestCase extends \PHPUnit_Framework_TestCa
 
     public function testProcessConfigsForNotConfigurableEntity()
     {
-        $this->entityClassResolver->expects($this->once())
-            ->method('getEntityClass')
-            ->with(self::ENTITY_NAME)
-            ->will($this->returnValue(self::ENTITY_CLASS));
-
         $this->configManager->expects($this->once())
             ->method('hasConfig')
             ->with(self::ENTITY_CLASS)
@@ -406,11 +386,6 @@ abstract class AbstractFieldsExtensionTestCase extends \PHPUnit_Framework_TestCa
     public function testProcessConfigsToOne()
     {
         $fieldType = 'manyToOne';
-
-        $this->entityClassResolver->expects($this->atLeastOnce())
-            ->method('getEntityClass')
-            ->with(self::ENTITY_NAME)
-            ->will($this->returnValue(self::ENTITY_CLASS));
 
         $this->setExpectationForGetFields(
             self::ENTITY_CLASS,
@@ -464,7 +439,7 @@ abstract class AbstractFieldsExtensionTestCase extends \PHPUnit_Framework_TestCa
                     ],
                     'source' => [
                         'query' => [
-                            'from' => [['table' => 'Test\Entity', 'alias' => 'o']],
+                            'from' => [['table' => self::ENTITY_CLASS, 'alias' => 'o']],
                             'select' => ['testField.name as testField_data'],
                             'join' => [
                                 'left' => [

@@ -70,11 +70,6 @@ class DynamicFieldsExtensionTest extends AbstractFieldsExtensionTestCase
     {
         $fieldType = 'string';
 
-        $this->entityClassResolver->expects($this->atLeastOnce())
-            ->method('getEntityClass')
-            ->with(self::ENTITY_NAME)
-            ->will($this->returnValue(self::ENTITY_CLASS));
-
         $this->setExpectationForGetFields(self::ENTITY_CLASS, self::FIELD_NAME, $fieldType);
 
         $config = $this->getDatagridConfiguration();
@@ -111,7 +106,7 @@ class DynamicFieldsExtensionTest extends AbstractFieldsExtensionTestCase
                     ],
                     'source' => [
                         'query' => [
-                            'from' => [['table' => 'Test\Entity', 'alias' => 'o']],
+                            'from' => [['table' => self::ENTITY_CLASS, 'alias' => 'o']],
                             'select' => ['o.testField'],
                         ],
                     ],

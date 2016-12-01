@@ -59,6 +59,7 @@ services:
             - %oro_user.entity.class%
             - '@doctrine'
             - '@security.encoder_factory'
+            - '@oro_entity_extend.enum_value_provider'
 
     oro_user.manager.api:
         class: %oro_user.manager.api.class%
@@ -75,6 +76,13 @@ services:
             - '@doctrine.orm.entity_manager'
             - '@security.context'
             - '@oro_security.acl.extension_selector'
+
+    oro_user.listener.password_changed_subscriber:
+        class: Oro\Bundle\UserBundle\EventListener\PasswordChangedSubscriber
+        arguments:
+            - '@oro_entity_extend.enum_value_provider'
+        tags:
+            - { name: doctrine.event_subscriber }
 
     oro_user.security.provider:
         class:                        %oro_user.security.provider.class%
@@ -285,6 +293,15 @@ services:
         arguments:
             - '@oro_security.acl.sid_manager'
 
+    oro_user.handler.reset_password_handler:
+        class: Oro\Bundle\UserBundle\Handler\ResetPasswordHandler
+        lazy: true
+        arguments:
+            - '@oro_notification.manager.email_notification'
+            - '@oro_user.manager'
+            - '@doctrine'
+            - '@logger'
+
     oro_user.activity_widget_provider:
         class: %oro_user.activity_widget_provider.class%
         arguments:
@@ -453,8 +470,14 @@ services:
         tags:
             - { name: oro_ui.view_action_provider, group: activity, priority: 120 }
 
-    oro_user.datagrid.extention.reset_password:
-        class: Oro\Bundle\UserBundle\Datagrid\Extension\MassAction\ResetPasswordExtention
+    # Datagrid
+    oro_user.user.datagrid_view_list:
+        class: Oro\Bundle\UserBundle\Datagrid\UserViewList
+        arguments:
+            - '@translator'
+
+    oro_user.datagrid.extension.reset_password:
+        class: Oro\Bundle\UserBundle\Datagrid\Extension\MassAction\ResetPasswordExtension
         calls:
             - [setRequestStack, ["@request_stack"]]
         public: false
@@ -462,8 +485,12 @@ services:
         tags:
             - { name: oro_datagrid.extension }
 
+    # Security and login
+
     oro_user.security.disabled_login_subscriber:
         class: Oro\Bundle\UserBundle\Security\DisabledLoginSubscriber
-        arguments: ['@security.token_storage']
+        arguments:
+            - '@security.token_storage'
+
         tags:
             - { name: kernel.event_listener, event: kernel.request , method: onKernelRequest}
