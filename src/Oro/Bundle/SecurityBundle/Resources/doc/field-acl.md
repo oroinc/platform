@@ -136,17 +136,17 @@ As result, $isGranted variable will contain true value if access is granted and 
 
 $entity parameter should contain an instance of entity you want to check.
 
-In case if you does not have entity instance but have the class name, id of record, owner and organization ids of this record, you can use `EntityObjectReference` class:
+In case if you does not have entity instance but have the class name, id of record, owner and organization ids of this record, you can use `DomainObjectReference` class:
  
 ``` php
 <?php
 ....
-use Oro\Bundle\SecurityBundle\Acl\Domain\EntityObjectReference;
+use Oro\Bundle\SecurityBundle\Acl\Domain\DomainObjectReference;
 use Oro\Bundle\SecurityBundle\SecurityFacade;
 use Symfony\Component\Security\Acl\Voter\FieldVote;
 ...
 
-$entityReference = new EntityObjectReference($entityClassName, $entityId, $ownerId, $organizationId);
+$entityReference = new DomainObjectReference($entityClassName, $entityId, $ownerId, $organizationId);
 $isGranted = $this->securityFacade->isGranted('VIEW', new FieldVote($entityReference, 'fieldName'));
 
 ``` 
