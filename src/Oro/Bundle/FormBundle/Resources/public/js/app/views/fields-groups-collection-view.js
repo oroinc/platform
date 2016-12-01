@@ -21,8 +21,10 @@ define(function(require) {
         onPrimaryClick: function(e) {
             this.$(this.PRIMARY_FILED_SELECTOR).each(function() {
                 this.checked = false;
+                $(this).trigger('change');
             });
             e.target.checked = true;
+            $(e.target).trigger('change');
         },
 
         /**
