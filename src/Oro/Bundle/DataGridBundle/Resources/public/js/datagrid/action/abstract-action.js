@@ -75,6 +75,7 @@ define([
         defaultMessages: {
             confirm_title: 'Execution Confirmation',
             confirm_content: 'Are you sure you want to do this?',
+            confirm_content_params: {},
             confirm_ok: 'Yes, do it',
             confirm_cancel: 'Cancel',
             success: 'Action performed.',
@@ -303,7 +304,7 @@ define([
             if (!this.confirmModal) {
                 this.confirmModal = (new this.confirmModalConstructor({
                     title: __(this.messages.confirm_title),
-                    content: __(this.messages.confirm_content),
+                    content: __(this.messages.confirm_content, this.messages.confirm_content_params),
                     okText: __(this.messages.confirm_ok),
                     cancelText: __(this.messages.confirm_cancel)
                 }));
