@@ -8,6 +8,7 @@ use Oro\Bundle\ActionBundle\Model\Attribute;
 use Oro\Bundle\ActionBundle\Model\AttributeManager;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\WorkflowBundle\Acl\AclManager;
+use Oro\Bundle\WorkflowBundle\Configuration\WorkflowConfiguration;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowStep;
 use Oro\Bundle\WorkflowBundle\Model\TransitionManager;
@@ -852,6 +853,26 @@ class WorkflowTest extends \PHPUnit_Framework_TestCase
         $workflow = $this->createWorkflow(null, null, $attributeManager);
         $expected = array('name' => 'path');
         $this->assertEquals($expected, $workflow->getAttributesMapping());
+    }
+
+    public function testGetInitEntities()
+    {
+        $workflow = $this->createWorkflow();
+        $data = ['entity1' => ['trans1']];
+        $workflow->getDefinition()->setConfiguration([
+            WorkflowConfiguration::NODE_INIT_ENTITIES => $data,
+        ]);
+        $this->assertEquals($data, $workflow->getInitEntities());
+    }
+
+    public function testGetInitRoutes()
+    {
+        $workflow = $this->createWorkflow();
+        $data = ['route1' => ['trans1']];
+        $workflow->getDefinition()->setConfiguration([
+            WorkflowConfiguration::NODE_INIT_ROUTES => $data,
+        ]);
+        $this->assertEquals($data, $workflow->getInitRoutes());
     }
 
     /**

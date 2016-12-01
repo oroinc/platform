@@ -7,6 +7,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 
 use Oro\Bundle\ActionBundle\DependencyInjection\CompilerPass\ActionPass;
+use Oro\Bundle\ActionBundle\DependencyInjection\CompilerPass\ButtonProviderPass;
 use Oro\Bundle\ActionBundle\DependencyInjection\CompilerPass\ConditionPass;
 use Oro\Bundle\ActionBundle\DependencyInjection\CompilerPass\ConfigurationPass;
 use Oro\Bundle\ActionBundle\DependencyInjection\CompilerPass\MassActionProviderPass;
@@ -24,5 +25,6 @@ class OroActionBundle extends Bundle
         $container->addCompilerPass(new ActionPass(), PassConfig::TYPE_AFTER_REMOVING);
         $container->addCompilerPass(new ConfigurationPass(), PassConfig::TYPE_AFTER_REMOVING);
         $container->addCompilerPass(new MassActionProviderPass(), PassConfig::TYPE_AFTER_REMOVING);
+        $container->addCompilerPass(new ButtonProviderPass(), PassConfig::TYPE_AFTER_REMOVING);
     }
 }

@@ -75,8 +75,16 @@ class WorkflowController extends FOSRestController
 
             $workflow = $workflowManager->getWorkflow($workflowName);
             $entityClass = $workflow->getDefinition()->getRelatedEntity();
-            $entity = $this->getEntityReference($entityClass, $entityId);
 
+            $transition = $workflow->getTransitionManager()->getTransition($transitionName);
+            if (!$transition->isEmptyInitOptions()) {
+                $contextAttribute = $transition->getInitContextAttribute();
+                $dataArray[$contextAttribute] = $this->get('oro_action.provider.button_search_context')
+                    ->getButtonSearchContext();
+                $entityId = null;
+            }
+
+            $entity = $this->getOrCreateEntityReference($entityClass, $entityId);
             $workflowItem = $workflowManager->startWorkflow($workflowName, $entity, $transitionName, $dataArray);
         } catch (HttpException $e) {
             return $this->handleError($e->getMessage(), $e->getStatusCode());
@@ -103,14 +111,14 @@ class WorkflowController extends FOSRestController
     }
 
     /**
-     * Try to get reference to entity
+     * Try to get or create reference to entity
      *
      * @param string $entityClass
      * @param mixed $entityId
      * @throws BadRequestHttpException
      * @return mixed
      */
-    protected function getEntityReference($entityClass, $entityId)
+    protected function getOrCreateEntityReference($entityClass, $entityId)
     {
         /** @var DoctrineHelper $doctrineHelper */
         $doctrineHelper = $this->get('oro_entity.doctrine_helper');

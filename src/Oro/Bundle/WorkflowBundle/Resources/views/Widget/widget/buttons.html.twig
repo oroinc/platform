@@ -69,8 +69,6 @@
                     ) }}
                 {% endfor %}
 
-            {{ workflowMacros.renderTransitionsJs(workflow.transitionsData, blockId) }}
-
             {% if workflow.resetAllowed and workflow.workflowItem %}
                 {% set data = {
                     'url': path('oro_api_workflow_delete', {workflowItemId: workflow.workflowItem.id}),
