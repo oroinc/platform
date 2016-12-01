@@ -11,9 +11,23 @@ use Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker;
 use Oro\Bundle\SecurityBundle\Metadata\FieldSecurityMetadata;
 use Oro\Bundle\WorkflowBundle\Configuration\FeatureConfigurationExtension;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
+use Oro\Bundle\WorkflowBundle\Model\TransitionManager;
+use Oro\Bundle\WorkflowBundle\Helper\WorkflowTranslationHelper;
 
 class WorkflowAclMetadataProvider
 {
+    const STEPS               = 'steps';
+    const TRANSITIONS         = 'transitions';
+    const ALLOWED_TRANSITIONS = 'allowed_transitions';
+    const LABEL               = 'label';
+    const ORDER               = 'order';
+    const STEP_TO             = 'step_to';
+    const START_STEP          = 'start_step';
+    const IS_START            = 'is_start';
+
+    /** transition name (from step -> to step) */
+    const TRANSITION_LABEL_TEMPLATE = "%s (%s \u{2192} %s)";
+
     /** @var ManagerRegistry */
     protected $doctrine;
 
@@ -87,38 +101,169 @@ class WorkflowAclMetadataProvider
     }
 
     /**
-     * @param array $workflowConfiguration
+     * @param array $workflowConfig
      *
      * @return array
      */
-    protected function loadWorkflowTransitions(array $workflowConfiguration)
+    protected function loadWorkflowTransitions(array $workflowConfig)
     {
-        $transitions = [];
-        if (isset($workflowConfiguration['transitions']) && is_array($workflowConfiguration['transitions'])) {
-            foreach ($workflowConfiguration['transitions'] as $transitionName => $transitionRow) {
-                $description = null;
-                if (!empty($transitionRow['step_to'])
-                    && !empty($workflowConfiguration['steps'][$transitionRow['step_to']])
-                ) {
-                    $description = $this->translator->trans(
-                        'oro.workflow.transition.description',
-                        [
-                            '%toStep%' => $this->transLabel(
-                                $workflowConfiguration['steps'][$transitionRow['step_to']]['label']
-                            )
-                        ]
-                    );
+        $result = [];
+        $steps = $this->getSteps($workflowConfig);
+        $transitions = $this->getTransitions($workflowConfig);
+        foreach ($steps as $stepName => $stepConfig) {
+            if (!empty($stepConfig[self::ALLOWED_TRANSITIONS])) {
+                $order = $this->getAttribute($stepConfig, self::ORDER, 0);
+                foreach ($stepConfig[self::ALLOWED_TRANSITIONS] as $transitionName) {
+                    if (isset($transitions[$transitionName])) {
+                        $transitionConfig = $transitions[$transitionName];
+                        $toStep = $this->getAttribute($transitionConfig, self::STEP_TO);
+                        $result[$order][] = new FieldSecurityMetadata(
+                            $this->getTransitionIdentifier($transitionName, $stepName, $toStep),
+                            $this->getTransitionLabel($workflowConfig, $transitionName, $stepName, $toStep)
+                        );
+                    }
                 }
-                $transitions[] = new FieldSecurityMetadata(
-                    $transitionName,
-                    $this->transLabel($transitionRow['label']),
-                    [],
-                    $description
+            }
+        }
+        foreach ($transitions as $transitionName => $transitionConfig) {
+            if ($this->getAttribute($transitionConfig, self::IS_START, false)
+                || TransitionManager::DEFAULT_START_TRANSITION_NAME === $transitionName
+            ) {
+                $toStep = $this->getAttribute($transitionConfig, self::STEP_TO);
+                $result[-1][] = new FieldSecurityMetadata(
+                    $this->getTransitionIdentifier($transitionName, null, $toStep),
+                    $this->getStartTransitionLabel($workflowConfig, $transitionName, $toStep)
                 );
             }
         }
+        if (!empty($result)) {
+            ksort($result);
+            $result = call_user_func_array('array_merge', $result);
+        }
 
-        return $transitions;
+        return $result;
+    }
+
+    /**
+     * @param string $transitionName
+     * @param string $fromStep
+     * @param string $toStep
+     *
+     * @return string
+     */
+    protected function getTransitionIdentifier($transitionName, $fromStep, $toStep)
+    {
+        return sprintf('%s|%s|%s', $transitionName, $fromStep, $toStep);
+    }
+
+    /**
+     * @param array  $workflowConfig
+     * @param string $transitionName
+     * @param string $fromStep
+     * @param string $toStep
+     *
+     * @return string
+     */
+    protected function getTransitionLabel(array $workflowConfig, $transitionName, $fromStep, $toStep)
+    {
+        return sprintf(
+            self::TRANSITION_LABEL_TEMPLATE,
+            $this->getTransitionDefinitionLabel($workflowConfig, $transitionName),
+            $this->getStepLabel($workflowConfig, $fromStep),
+            $this->getStepLabel($workflowConfig, $toStep)
+        );
+    }
+
+    /**
+     * @param array  $workflowConfig
+     * @param string $transitionName
+     * @param string $toStep
+     *
+     * @return string
+     */
+    protected function getStartTransitionLabel(array $workflowConfig, $transitionName, $toStep)
+    {
+        return sprintf(
+            self::TRANSITION_LABEL_TEMPLATE,
+            $this->getTransitionDefinitionLabel($workflowConfig, $transitionName),
+            $this->translator->trans('(Start)', [], 'jsmessages'),
+            $this->getStepLabel($workflowConfig, $toStep)
+        );
+    }
+
+    /**
+     * @param array  $data
+     * @param string $attributeName
+     * @param mixed  $defaultValue
+     *
+     * @return mixed
+     */
+    protected function getAttribute(array $data, $attributeName, $defaultValue = null)
+    {
+        $result = $defaultValue;
+        if (!empty($data[$attributeName])) {
+            $result = $data[$attributeName];
+        }
+
+        return $result;
+    }
+
+    /**
+     * @param array $workflowConfig
+     *
+     * @return array
+     */
+    protected function getSteps(array $workflowConfig)
+    {
+        if (isset($workflowConfig[self::STEPS]) && is_array($workflowConfig[self::STEPS])) {
+            return $workflowConfig[self::STEPS];
+        }
+
+        return [];
+    }
+
+    /**
+     * @param array $workflowConfig
+     *
+     * @return array
+     */
+    protected function getTransitions(array $workflowConfig)
+    {
+        if (isset($workflowConfig[self::TRANSITIONS]) && is_array($workflowConfig[self::TRANSITIONS])) {
+            return $workflowConfig[self::TRANSITIONS];
+        }
+
+        return [];
+    }
+
+    /**
+     * @param array  $workflowConfig
+     * @param string $transitionName
+     *
+     * @return string|null
+     */
+    protected function getTransitionDefinitionLabel(array $workflowConfig, $transitionName)
+    {
+        if (!empty($workflowConfig[self::TRANSITIONS][$transitionName])) {
+            return $this->transLabel($workflowConfig[self::TRANSITIONS][$transitionName][self::LABEL]);
+        }
+
+        return null;
+    }
+
+    /**
+     * @param array  $workflowConfig
+     * @param string $stepName
+     *
+     * @return string|null
+     */
+    protected function getStepLabel(array $workflowConfig, $stepName)
+    {
+        if (!empty($workflowConfig[self::STEPS][$stepName])) {
+            return $this->transLabel($workflowConfig[self::STEPS][$stepName][self::LABEL]);
+        }
+
+        return null;
     }
 
     /**
@@ -149,6 +294,6 @@ class WorkflowAclMetadataProvider
      */
     protected function transLabel($label)
     {
-        return $this->translator->trans($label, [], 'workflows');
+        return $this->translator->trans($label, [], WorkflowTranslationHelper::TRANSLATION_DOMAIN);
     }
 }

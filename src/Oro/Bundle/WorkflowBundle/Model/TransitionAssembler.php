@@ -204,7 +204,14 @@ class TransitionAssembler extends BaseAbstractAssembler
         /**
          * @see IsGrantedWorkflowTransition
          */
-        $precondition = ['@is_granted_workflow_transition' => ['parameters' => [$transitionName]]];
+        $precondition = [
+            '@is_granted_workflow_transition' => [
+                'parameters' => [
+                    $transitionName,
+                    $this->getOption($options, 'step_to')
+                ]
+            ]
+        ];
         if (empty($definition['preconditions'])) {
             $definition['preconditions'] = $precondition;
         } else {

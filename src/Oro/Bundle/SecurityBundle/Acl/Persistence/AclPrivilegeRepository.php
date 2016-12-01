@@ -10,7 +10,6 @@ use Symfony\Component\Security\Acl\Model\SecurityIdentityInterface as SID;
 use Symfony\Component\Security\Acl\Domain\ObjectIdentity as OID;
 use Symfony\Component\Security\Acl\Model\EntryInterface;
 use Symfony\Component\Security\Acl\Model\AclInterface;
-use Symfony\Component\Translation\TranslatorInterface;
 
 use Oro\Bundle\SecurityBundle\Acl\AccessLevel;
 use Oro\Bundle\SecurityBundle\Acl\Domain\ObjectIdentityFactory;
@@ -36,18 +35,11 @@ class AclPrivilegeRepository
     protected $manager;
 
     /**
-     * @var TranslatorInterface
+     * @param AclManager $manager
      */
-    protected $translator;
-
-    /**
-     * @param AclManager          $manager
-     * @param TranslatorInterface $translator
-     */
-    public function __construct(AclManager $manager, TranslatorInterface $translator)
+    public function __construct(AclManager $manager)
     {
         $this->manager = $manager;
-        $this->translator = $translator;
     }
 
     /**
@@ -73,7 +65,7 @@ class AclPrivilegeRepository
         foreach ($extensionKeyOrKeys as $extensionKey) {
             $extension = $this->manager->getExtensionSelector()->selectByExtensionKey($extensionKey);
             foreach ($extension->getPermissions() as $permission) {
-                if (!in_array($permission, $result)) {
+                if (!in_array($permission, $result, true)) {
                     $result[] = $permission;
                 }
             }
@@ -297,8 +289,6 @@ class AclPrivilegeRepository
             );
             $privileges->add($privilege);
         }
-
-        $this->sortPrivileges($privileges);
 
         return $privileges;
     }
@@ -629,7 +619,7 @@ class AclPrivilegeRepository
         foreach ($privileges->getIterator() as $privilege) {
             $isRoot = false !== strpos($privilege->getIdentity()->getId(), ObjectIdentityFactory::ROOT_IDENTITY_TYPE);
             $label = !$isRoot
-                ? $this->translator->trans($privilege->getIdentity()->getName())
+                ? $privilege->getIdentity()->getName()
                 : null;
 
             $data[] = [$privilege, $isRoot, $label];
@@ -831,7 +821,7 @@ class AclPrivilegeRepository
                 }
             } else {
                 foreach ($extension->getPermissions($mask) as $permission) {
-                    if (!$privilege->hasPermission($permission) && in_array($permission, $permissions)) {
+                    if (!$privilege->hasPermission($permission) && in_array($permission, $permissions, true)) {
                         $privilege->addPermission($this->getAclPermission($extension, $permission, $mask, $privilege));
                     }
                 }

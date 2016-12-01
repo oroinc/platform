@@ -71,7 +71,7 @@ class WorkflowPermissionDatasource extends RolePrivilegeAbstractProvider impleme
             /** @var AclPrivilege $privilege */
             $item = [
                 'identity'    => $privilege->getIdentity()->getId(),
-                'entity'      => $privilege->getIdentity()->getName(),
+                'label'       => $privilege->getIdentity()->getName(),
                 'group'       => $this->getPrivilegeCategory($privilege, $categories),
                 'permissions' => [],
                 'fields'      => $this->getFieldPrivileges($privilege->getFields())
@@ -94,7 +94,6 @@ class WorkflowPermissionDatasource extends RolePrivilegeAbstractProvider impleme
             /** @var AclPrivilege $privilege */
             $item = [
                 'identity'    => $privilege->getIdentity()->getId(),
-                'name'        => $privilege->getIdentity()->getName(),
                 'label'       => $privilege->getIdentity()->getName(),
                 'description' => $privilege->getDescription(),
                 'permissions' => []

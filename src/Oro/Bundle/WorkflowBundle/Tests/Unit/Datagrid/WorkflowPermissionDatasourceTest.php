@@ -105,12 +105,11 @@ class WorkflowPermissionDatasourceTest extends \PHPUnit_Framework_TestCase
         $privileges = new ArrayCollection(['workflow' => new ArrayCollection([$privilege1, $privilege2])]);
         $this->aclRoleHandler->expects($this->any())->method('getAllPrivileges')->willReturn($privileges);
 
-        $this->translator->expects($this->any())->method('trans')
-            ->willReturnCallback(
-                function ($value) {
-                    return $value . '_trans';
-                }
-            );
+        $this->translator->expects($this->any())
+            ->method('trans')
+            ->willReturnCallback(function ($value) {
+                return 'translated: ' . $value;
+            });
 
         $this->permissionManager->expects($this->any())->method('getPermissionByName')
             ->willReturnCallback(
@@ -135,48 +134,46 @@ class WorkflowPermissionDatasourceTest extends \PHPUnit_Framework_TestCase
         /** @var ResultRecord $item1 */
         $item1 = $result[0];
         $this->assertEquals('workflow:workflow1', $item1->getValue('identity'));
-        $this->assertEquals('workflow 1', $item1->getValue('entity'));
+        $this->assertEquals('workflow 1', $item1->getValue('label'));
         $permissions = $item1->getValue('permissions');
         $this->assertCount(2, $permissions);
         $permission1 = $permissions[0];
         $this->assertEquals('VIEW_WORKFLOW', $permission1['name']);
-        $this->assertEquals('oro.workflow.permission.VIEW_WORKFLOW_trans', $permission1['label']);
+        $this->assertEquals('translated: oro.workflow.permission.VIEW_WORKFLOW', $permission1['label']);
         $this->assertEquals('workflow:workflow1', $permission1['identity']);
         $this->assertEquals(4, $permission1['access_level']);
-        $this->assertEquals('oro.security.access-level.GLOBAL_trans', $permission1['access_level_label']);
+        $this->assertEquals('translated: oro.security.access-level.GLOBAL', $permission1['access_level_label']);
         $permission2 = $permissions[1];
         $this->assertEquals('PERFORM_TRANSITIONS', $permission2['name']);
-        $this->assertEquals('oro.workflow.permission.PERFORM_TRANSITIONS_trans', $permission2['label']);
+        $this->assertEquals('translated: oro.workflow.permission.PERFORM_TRANSITIONS', $permission2['label']);
         $this->assertEquals('workflow:workflow1', $permission2['identity']);
         $this->assertEquals(3, $permission2['access_level']);
-        $this->assertEquals('oro.security.access-level.DEEP_trans', $permission2['access_level_label']);
+        $this->assertEquals('translated: oro.security.access-level.DEEP', $permission2['access_level_label']);
         $transitions1 = $item1->getValue('fields');
         $this->assertCount(2, $transitions1);
         $transition1 = $transitions1[0];
         $this->assertEquals('workflow:workflow1:transition1', $transition1['identity']);
-        $this->assertEquals('transition11', $transition1['name']);
         $this->assertEquals('transition11', $transition1['label']);
         $this->assertEquals('Transition 11', $transition1['description']);
         $permissions = $transition1['permissions'];
         $this->assertCount(1, $permissions);
         $permission1 = $permissions[0];
         $this->assertEquals('PERFORM_TRANSITION', $permission1['name']);
-        $this->assertEquals('oro.workflow.permission.PERFORM_TRANSITION_trans', $permission1['label']);
+        $this->assertEquals('translated: oro.workflow.permission.PERFORM_TRANSITION', $permission1['label']);
         $this->assertEquals('workflow:workflow1:transition1', $permission1['identity']);
         $this->assertEquals(3, $permission1['access_level']);
-        $this->assertEquals('oro.security.access-level.DEEP_trans', $permission1['access_level_label']);
+        $this->assertEquals('translated: oro.security.access-level.DEEP', $permission1['access_level_label']);
         $transition2 = $transitions1[1];
         $this->assertEquals('workflow:workflow1:transition2', $transition2['identity']);
-        $this->assertEquals('transition12', $transition2['name']);
         $this->assertEquals('transition12', $transition2['label']);
         $this->assertNull($transition2['description']);
         $permissions = $transition2['permissions'];
         $this->assertCount(1, $permissions);
         $permission1 = $permissions[0];
         $this->assertEquals('PERFORM_TRANSITION', $permission1['name']);
-        $this->assertEquals('oro.workflow.permission.PERFORM_TRANSITION_trans', $permission1['label']);
+        $this->assertEquals('translated: oro.workflow.permission.PERFORM_TRANSITION', $permission1['label']);
         $this->assertEquals('workflow:workflow1:transition2', $permission1['identity']);
         $this->assertEquals(1, $permission1['access_level']);
-        $this->assertEquals('oro.security.access-level.BASIC_trans', $permission1['access_level_label']);
+        $this->assertEquals('translated: oro.security.access-level.BASIC', $permission1['access_level_label']);
     }
 }
