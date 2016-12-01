@@ -108,24 +108,21 @@ class WorkflowScopeManagerTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals([$scope1, $scope2], array_values($definition->getScopes()->toArray()));
     }
 
-    public function testUpdateScopesWhenDisabled()
+    public function testUpdateScopesWithresetFlag()
     {
         $this->scopeManager->expects($this->never())->method($this->anything());
         $this->repository->expects($this->never())->method($this->anything());
-        $this->manager->expects($this->never())->method($this->anything());
+        $this->manager->expects($this->once())->method('flush');
 
         $definition = $this->createWorkflowDefinition(
             [[self::FIELD_NAME => self::ENTITY_ID], ['extraField' => self::ENTITY_ID]],
-            [$this->createScope(100), $this->createScope(101)]
-        );
-
-        $this->workflowScopeManager->setEnabled(false);
-        $this->workflowScopeManager->updateScopes($definition);
-
-        $this->assertEquals(
             [$this->createScope(100), $this->createScope(101)],
-            array_values($definition->getScopes()->toArray())
+            false
         );
+
+        $this->workflowScopeManager->updateScopes($definition, true);
+
+        $this->assertEmpty($definition->getScopes()->toArray());
     }
 
     /**
@@ -180,13 +177,15 @@ class WorkflowScopeManagerTest extends \PHPUnit_Framework_TestCase
     /**
      * @param array $scopesConfig
      * @param array $scopes
+     * @param bool $active
      * @return WorkflowDefinition
      */
-    protected function createWorkflowDefinition(array $scopesConfig = [], array $scopes = [])
+    protected function createWorkflowDefinition(array $scopesConfig = [], array $scopes = [], $active = true)
     {
         return $this->getEntity(
             WorkflowDefinition::class,
             [
+                'active' => $active,
                 'configuration' => ['scopes' => $scopesConfig],
                 'scopes' => new ArrayCollection($scopes)
             ]

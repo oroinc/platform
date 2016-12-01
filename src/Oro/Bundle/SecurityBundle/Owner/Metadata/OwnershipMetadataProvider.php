@@ -44,11 +44,6 @@ class OwnershipMetadataProvider extends AbstractMetadataProvider
     protected $userClass;
 
     /**
-     * @var OwnershipMetadataProvider
-     */
-    private $noOwnershipMetadata;
-
-    /**
      * @param array               $owningEntityNames
      * @param ConfigProvider      $configProvider
      * @param EntityClassResolver $entityClassResolver
@@ -70,7 +65,7 @@ class OwnershipMetadataProvider extends AbstractMetadataProvider
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     protected function setAccessLevelClasses(array $owningEntityNames, EntityClassResolver $entityClassResolver = null)
     {
@@ -87,27 +82,15 @@ class OwnershipMetadataProvider extends AbstractMetadataProvider
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
-    protected function getNoOwnershipMetadata()
+    protected function createNoOwnershipMetadata()
     {
-        if (!$this->noOwnershipMetadata) {
-            $this->noOwnershipMetadata = new OwnershipMetadata();
-        }
-
-        return $this->noOwnershipMetadata;
+        return new OwnershipMetadata();
     }
 
     /**
-     * {@inheritDoc}
-     */
-    public function getSystemLevelClass()
-    {
-        throw new \BadMethodCallException('Method getSystemLevelClass() unsupported.');
-    }
-
-    /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function getGlobalLevelClass()
     {
@@ -127,7 +110,7 @@ class OwnershipMetadataProvider extends AbstractMetadataProvider
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function getLocalLevelClass($deep = false)
     {
@@ -147,7 +130,7 @@ class OwnershipMetadataProvider extends AbstractMetadataProvider
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function getBasicLevelClass()
     {
@@ -167,7 +150,7 @@ class OwnershipMetadataProvider extends AbstractMetadataProvider
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function supports()
     {
@@ -175,7 +158,7 @@ class OwnershipMetadataProvider extends AbstractMetadataProvider
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     protected function getOwnershipMetadata(ConfigInterface $config)
     {
@@ -203,15 +186,14 @@ class OwnershipMetadataProvider extends AbstractMetadataProvider
      * Fix Access Level for given object. Change it from SYSTEM_LEVEL to GLOBAL_LEVEL
      * if object have owner type OWNER_TYPE_BUSINESS_UNIT, OWNER_TYPE_USER or OWNER_TYPE_ORGANIZATION
      *
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function getMaxAccessLevel($accessLevel, $className = null)
     {
-        if ($className && $accessLevel === AccessLevel::SYSTEM_LEVEL) {
+        if (AccessLevel::SYSTEM_LEVEL === $accessLevel && $className) {
             $metadata = $this->getMetadata($className);
-
-            if ($metadata->hasOwner()) {
-                $checkOwnerType = in_array(
+            if ($metadata->hasOwner()
+                && in_array(
                     $metadata->getOwnerType(),
                     [
                         OwnershipMetadata::OWNER_TYPE_BUSINESS_UNIT,
@@ -219,11 +201,9 @@ class OwnershipMetadataProvider extends AbstractMetadataProvider
                         OwnershipMetadata::OWNER_TYPE_ORGANIZATION
                     ],
                     true
-                );
-
-                if ($checkOwnerType) {
-                    $accessLevel = AccessLevel::GLOBAL_LEVEL;
-                }
+                )
+            ) {
+                $accessLevel = AccessLevel::GLOBAL_LEVEL;
             }
         }
 
