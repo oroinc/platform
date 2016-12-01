@@ -87,4 +87,12 @@ class OperationButton implements ButtonInterface
 
         return isset($buttonOptions['group']) ? $buttonOptions['group'] : null;
     }
+
+    /**
+     * @return Operation
+     */
+    public function getOperation()
+    {
+        return $this->operation;
+    }
 }

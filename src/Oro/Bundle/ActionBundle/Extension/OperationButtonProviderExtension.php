@@ -5,6 +5,7 @@ namespace Oro\Bundle\ActionBundle\Extension;
 use Oro\Bundle\ActionBundle\Helper\ContextHelper;
 use Oro\Bundle\ActionBundle\Model\ActionData;
 use Oro\Bundle\ActionBundle\Model\ButtonContext;
+use Oro\Bundle\ActionBundle\Model\ButtonInterface;
 use Oro\Bundle\ActionBundle\Model\ButtonSearchContext;
 use Oro\Bundle\ActionBundle\Model\Operation;
 use Oro\Bundle\ActionBundle\Model\OperationButton;
@@ -64,6 +65,24 @@ class OperationButtonProviderExtension implements ButtonProviderExtensionInterfa
         $this->baseButtonContext = null;
 
         return $result;
+    }
+
+    /**
+     * {@inheritdoc}
+     * @param OperationButton $button
+     */
+    public function isAvailable(ButtonInterface $button, ButtonSearchContext $buttonSearchContext)
+    {
+        return $this->supports($button) &&
+            $button->getOperation()->isAvailable($this->getActionData($buttonSearchContext));
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function supports(ButtonInterface $button)
+    {
+        return $button instanceof OperationButton;
     }
 
     /**

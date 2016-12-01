@@ -111,6 +111,11 @@ class OperationButtonTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($templateName, $this->button->getTemplate());
     }
 
+    public function testGetOperation()
+    {
+        $this->assertEquals($this->operation, $this->button->getOperation());
+    }
+
     /**
      * @param OperationDefinition $definition
      */

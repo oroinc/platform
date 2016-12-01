@@ -12,4 +12,17 @@ interface ButtonProviderExtensionInterface
      * @return ButtonInterface[]
      */
     public function find(ButtonSearchContext $buttonSearchContext);
+
+    /**
+     * @param ButtonInterface $button
+     * @param ButtonSearchContext $buttonSearchContext
+     * @return bool
+     */
+    public function isAvailable(ButtonInterface $button, ButtonSearchContext $buttonSearchContext);
+
+    /**
+     * @param ButtonInterface $button
+     * @return bool
+     */
+    public function supports(ButtonInterface $button);
 }
