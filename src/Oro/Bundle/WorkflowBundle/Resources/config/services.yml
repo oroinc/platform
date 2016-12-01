@@ -322,7 +322,7 @@ services:
         class: 'Oro\Bundle\WorkflowBundle\Extension\TransitionButtonProviderExtension'
         arguments:
             - '@oro_workflow.registry'
-            - '@oro_workflow.provider.route'
+            - '@oro_workflow.provider.start_transition_route'
         tags:
            - { name: oro.action.extension.button_provider, priority: 110 }
 
@@ -366,9 +366,16 @@ services:
         tags:
             - { name: monolog.logger, channel: oro_workflow }
 
-    oro_workflow.provider.route:
+    oro_workflow.provider.start_transition_route:
         class: 'Oro\Bundle\ActionBundle\Provider\RouteProvider'
         arguments:
             - 'oro_workflow_widget_start_transition_form'
             - 'oro_workflow_start_transition_form'
             - 'oro_api_workflow_start'
+
+    oro_workflow.provider.transition_route:
+        class: 'Oro\Bundle\ActionBundle\Provider\RouteProvider'
+        arguments:
+            - 'oro_workflow_widget_transition_form'
+            - 'oro_workflow_transition_form'
+            - 'oro_api_workflow_transit'
