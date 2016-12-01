@@ -649,7 +649,7 @@ class Transition
      */
     public function isEmptyInitOptions()
     {
-        return !count($this->getInitEntities()) && !count($this->getInitRoutes());
+        return !count($this->getInitEntities()) && !count($this->getInitRoutes()) && !count($this->getInitDatagrids());
     }
 
     /**
