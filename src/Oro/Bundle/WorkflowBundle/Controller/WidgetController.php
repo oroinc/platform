@@ -105,7 +105,7 @@ class WidgetController extends Controller
         /** @var DoctrineHelper $doctrineHelper */
         $doctrineHelper = $this->get('oro_entity.doctrine_helper');
 
-        $workflowItem = $workflow->createWorkflowItem($entity);
+        $workflowItem = $workflow->createWorkflowItem($entity, $dataArray);
         $transition = $workflow->getTransitionManager()->extractTransition($transitionName);
         $transitionForm = $this->getTransitionForm($workflowItem, $transition);
 
