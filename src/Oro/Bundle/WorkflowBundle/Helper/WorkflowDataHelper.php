@@ -61,6 +61,8 @@ class WorkflowDataHelper
     }
 
     /**
+     * Return array with serialized workflow data for $entity
+     *
      * @param object $entity
      * @param Workflow $workflow
      *
@@ -68,12 +70,43 @@ class WorkflowDataHelper
      */
     protected function getWorkflowData($entity, Workflow $workflow)
     {
+        $transitionsData = [];
         $workflowItem = $this->workflowManager->getWorkflowItem($entity, $workflow->getName());
 
-        $transitionData = $workflowItem
-            ? $this->getAvailableTransitionsDataByWorkflowItem($workflowItem)
-            : $this->getAvailableStartTransitionsData($workflow, $entity);
+        $transitions = $workflowItem
+            ? $this->getAllowedTransitions($workflow, $workflowItem)
+            : $this->getAllowedStartTransitions($workflow, $entity);
 
+        foreach ($transitions as $transition) {
+            $transitionsData[$transition->getName()] = $this->getTransitionData($transition);
+        }
+
+        return [
+            'name' => $workflow->getName(),
+            'label' => $workflow->getLabel(),
+            'isStarted' => $workflowItem !== null,
+            'workflowItemId' => $workflowItem ? $workflowItem->getId() : null,
+            'stepsData' => $this->getStepsData($entity, $workflow, $workflowItem, $transitions),
+            'transitionsData' => $transitionsData,
+        ];
+    }
+
+    /**
+     * Return serialized steps data
+     *
+     * @param object $entity
+     * @param Workflow $workflow
+     * @param WorkflowItem|null $workflowItem
+     * @param array $transitions
+     *
+     * @return array
+     */
+    protected function getStepsData(
+        $entity,
+        Workflow $workflow,
+        WorkflowItem $workflowItem = null,
+        array $transitions = []
+    ) {
         $isStepsDisplayOrdered = $workflow->getDefinition()->isStepsDisplayOrdered();
         $currentStep = $workflowItem ? $workflowItem->getCurrentStep() : null;
 
@@ -84,15 +117,7 @@ class WorkflowDataHelper
             $steps = $stepManager->getOrderedSteps(true, true)->toArray();
 
             if ($workflowItem) {
-                $startStepNames = array_map(
-                    function (array $data) {
-                        /** @var Transition $transition */
-                        $transition = $data['transition'];
-
-                        return $transition->getStepTo()->getName();
-                    },
-                    $this->getAvailableStartTransitionsData($workflow, $entity)
-                );
+                $startStepNames = $this->getStartStepNames($entity, $workflow);
 
                 $way = array_merge(
                     $helper->getStepsBefore($workflowItem, $startStepNames, true),
@@ -112,13 +137,10 @@ class WorkflowDataHelper
             $steps = [$stepManager->getStep($currentStep->getName())];
         } else {
             $steps = array_map(
-                function (array $data) {
-                    /** @var Transition $transition */
-                    $transition = $data['transition'];
-
+                function (Transition $transition) {
                     return $transition->getStepTo();
                 },
-                $transitionData
+                $transitions
             );
         }
 
@@ -134,17 +156,28 @@ class WorkflowDataHelper
         );
 
         return [
-            'name' => $workflow->getName(),
-            'label' => $workflow->getLabel(),
-            'isStarted' => $workflowItem !== null,
-            'stepsData' => [
-                'isOrdered' => $isStepsDisplayOrdered,
-                'steps' => $steps,
-            ],
-            'transitionsData' => $transitionData,
+            'isOrdered' => $isStepsDisplayOrdered,
+            'steps' => $steps,
         ];
     }
 
+    /**
+     * Get step names from start transitions
+     *
+     * @param $entity
+     * @param Workflow $workflow
+     *
+     * @return array
+     */
+    protected function getStartStepNames($entity, Workflow $workflow)
+    {
+        return array_map(
+            function (array $data) {
+                return $data['transition']->getStepTo()->getName();
+            },
+            $this->getAllowedStartTransitions($workflow, $entity)
+        );
+    }
     /**
      * @param Transition $transition
      *
@@ -168,99 +201,95 @@ class WorkflowDataHelper
 
     /**
      * Get transitions data for view based on workflow item.
-     *
+
+*
+     * @param Workflow $workflow
      * @param WorkflowItem $workflowItem
      *
-     * @return array
+     * @return Transition[]
      */
-    protected function getAvailableTransitionsDataByWorkflowItem(WorkflowItem $workflowItem)
+    protected function getAllowedTransitions(Workflow $workflow, WorkflowItem $workflowItem)
     {
-        $transitionsData = [];
-        $transitions = $this->workflowManager->getTransitionsByWorkflowItem($workflowItem);
-        /** @var Transition $transition */
-        foreach ($transitions as $transition) {
-            if (!$transition->isHidden()) {
-                $errors = new ArrayCollection();
-                $isAllowed = $this->workflowManager->isTransitionAvailable($workflowItem, $transition, $errors);
-                if ($isAllowed || !$transition->isUnavailableHidden()) {
-                    $transitionsData[$transition->getName()] = [
-                        'workflowItemId' => $workflowItem->getId(),
-                        'transition' => $this->getTransitionData($transition),
-                        'isAllowed' => $isAllowed,
-                        'errors' => $errors,
-                    ];
-                }
+        $transitions = [];
+        $availableTransitions = $workflow->getTransitionsByWorkflowItem($workflowItem);
+
+        foreach ($availableTransitions as $transition) {
+            if ($this->isTransitionAllowed($workflow, $transition, $workflowItem)) {
+                $transitions[$transition->getName()] = $transition;
             }
         }
 
-        return $transitionsData;
+        return $transitions;
     }
 
     /**
-     * Get start transitions data for view based on workflow and entity.
+     * Get array of start transitions available for workflow
      *
-     * @param Workflow $workflow
+     *@param Workflow $workflow
      * @param object $entity
      *
-     * @return array
+     * @return Transition[]
      */
-    protected function getAvailableStartTransitionsData(Workflow $workflow, $entity)
+    protected function getAllowedStartTransitions(Workflow $workflow, $entity)
     {
-        $transitionsData = [];
+        $transitions = [];
+        $startTransitions = $workflow->getTransitionManager()->getStartTransitions();
 
-        $transitions = $workflow->getTransitionManager()->getStartTransitions();
-        /** @var Transition $transition */
-        foreach ($transitions as $transition) {
-            if (!$transition->isHidden()) {
-                $transitionData = $this->getStartTransitionData($workflow, $transition, $entity);
-                if ($transitionData !== null) {
-                    $transitionsData[$transition->getName()] = $transitionData;
-                }
+        foreach ($startTransitions as $startTransition) {
+            if ($this->isStartTransitionAllowed($workflow, $startTransition, $entity)) {
+                $transitions[$startTransition->getName()] = $startTransition;
             }
+        }
+
+        if (!empty($transitions) || !$workflow->getStepManager()->hasStartStep()) {
+            return $transitions;
         }
 
         // extra case to show start transition
-        if (empty($transitionsData) && $workflow->getStepManager()->hasStartStep()) {
-            $defaultStartTransition = $workflow->getTransitionManager()->getDefaultStartTransition();
-            if ($defaultStartTransition) {
-                $startTransitionData = $this->getStartTransitionData($workflow, $defaultStartTransition, $entity);
-                if ($startTransitionData !== null) {
-                    $transitionsData[$defaultStartTransition->getName()] = $startTransitionData;
-                } elseif (!$this->isWorkflowPermissionGranted('PERFORM_TRANSITIONS', $workflow->getName(), $entity)) {
-                    // extra case to show start transition (step name and disabled button)
-                    // even if transitions performing is forbidden with ACL
-                    $transitionsData[$defaultStartTransition->getName()] = [
-                        'transition' => $this->getTransitionData($transition),
-                        'isAllowed' => false,
-                        'errors' => new ArrayCollection(),
-                    ];
-                }
-            }
+        $defaultStartTransition = $workflow->getTransitionManager()->getDefaultStartTransition();
+
+        if (null !== $defaultStartTransition) {
+            $transitions[$defaultStartTransition->getName()] = $defaultStartTransition;
         }
 
-        return $transitionsData;
+        return $transitions;
     }
 
     /**
+     * Check if transition is start and allowed
+     *
      * @param Workflow $workflow
      * @param Transition $transition
      * @param object $entity
      *
-     * @return array|null
+     * @return bool
      */
-    protected function getStartTransitionData(Workflow $workflow, Transition $transition, $entity)
+    protected function isStartTransitionAllowed(Workflow $workflow, Transition $transition, $entity)
     {
         $errors = new ArrayCollection();
-        $isAllowed = $workflow->isStartTransitionAvailable($transition, $entity, [], $errors);
-        if ($isAllowed || !$transition->isUnavailableHidden()) {
-            return [
-                'transition' => $this->getTransitionData($transition),
-                'isAllowed' => $isAllowed,
-                'errors' => $errors,
-            ];
-        }
 
-        return null;
+        return $workflow->isStartTransitionAvailable($transition, $entity, [], $errors)
+               && !$transition->isHidden()
+               && !$transition->isUnavailableHidden();
+    }
+
+    /**
+     * Check if transition is available for WorkflowItem and allowed
+     *
+     * @param Workflow $workflow
+     * @param Transition $transition
+     * @param WorkflowItem $workflowItem
+     *
+     * @return bool
+     * @internal param object $entity
+     */
+    protected function isTransitionAllowed(Workflow $workflow, Transition $transition, WorkflowItem $workflowItem)
+    {
+        $errors = new ArrayCollection();
+
+        return $workflow->isTransitionAvailable($workflowItem, $transition, $errors)
+               && !$transition->isHidden()
+               && !$transition->isUnavailableHidden();
     }
 
     /**
@@ -272,9 +301,8 @@ class WorkflowDataHelper
      */
     protected function isWorkflowPermissionGranted($permission, $workflowName, $entity)
     {
-        return $this->securityFacade->isGranted(
-            $permission,
-            new DomainObjectWrapper($entity, new ObjectIdentity('workflow', $workflowName))
-        );
+        $domainObject = new DomainObjectWrapper($entity, new ObjectIdentity('workflow', $workflowName));
+
+        return $this->securityFacade->isGranted($permission, $domainObject);
     }
 }
