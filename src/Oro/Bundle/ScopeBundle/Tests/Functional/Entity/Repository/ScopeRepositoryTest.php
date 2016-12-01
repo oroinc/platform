@@ -45,6 +45,16 @@ class ScopeRepositoryTest extends WebTestCase
         $this->assertSame([$scope->getId()], $ids);
     }
 
+    public function testFindIdentifiersByCriteriaWithPriority()
+    {
+        $criteria = new ScopeCriteria([]);
+        $ids = $this->getRepository()->findIdentifiersByCriteriaWithPriority($criteria);
+
+        /** @var Scope $scope */
+        $scope = $this->getReference(LoadScopeData::DEFAULT_SCOPE);
+        $this->assertSame([$scope->getId()], $ids);
+    }
+
     /**
      * @return ScopeRepository
      */

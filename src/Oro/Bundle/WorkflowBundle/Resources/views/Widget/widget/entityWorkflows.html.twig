@@ -1,5 +1,5 @@
 {% import 'OroWorkflowBundle::macros.html.twig' as workflowMacros %}
-
+{% if workflows|length > 0 %}
 <div class="widget-content widget-content-bordered">
     <div {% if workflows|length > 1 %}
         class="workflow-collapse"
@@ -91,3 +91,4 @@
         {% endfor %}
     </div>
 </div>
+{% endif %}

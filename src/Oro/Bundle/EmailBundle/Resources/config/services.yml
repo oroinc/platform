@@ -347,6 +347,14 @@ services:
         tags:
             - { name: 'oro_message_queue.client.message_processor' }
 
+    oro_email.async.update_email_associations:
+        class: 'Oro\Bundle\EmailBundle\Async\UpdateEmailAssociationsMessageProcessor'
+        arguments:
+            - '@oro_email.async.manager.association_manager'
+            - '@logger'
+        tags:
+            - { name: 'oro_message_queue.client.message_processor' }
+
     oro_email.async.update_email_owner_association:
         class: 'Oro\Bundle\EmailBundle\Async\UpdateEmailOwnerAssociationMessageProcessor'
         arguments:
@@ -550,6 +558,13 @@ services:
         class: %oro_email.validator.email_recipients_validator.class%
         tags:
             - { name: validator.constraint_validator, alias: oro_email.email_recipients_validator }
+
+    oro_email.validator.mailbox_origin:
+        class: Oro\Bundle\EmailBundle\Validator\MailboxOriginValidator
+        arguments:
+            - @translator
+        tags:
+            - { name: validator.constraint_validator, alias: oro_email.validator.mailbox_origin }
 
     oro_email.datagrid_query_factory:
         class: %oro_email.datagrid_query_factory.class%

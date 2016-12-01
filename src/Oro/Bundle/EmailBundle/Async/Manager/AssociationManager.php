@@ -16,6 +16,7 @@ use Oro\Component\MessageQueue\Client\MessageProducerInterface;
 class AssociationManager
 {
     const EMAIL_BUFFER_SIZE = 100;
+    const OWNER_IDS_BUFFER_SIZE = 500;
 
     /** @var DoctrineHelper */
     protected $doctrineHelper;
@@ -71,6 +72,44 @@ class AssociationManager
         $this->doctrineHelper->getEntityManager('Oro\Bundle\EmailBundle\Entity\Email')->flush();
 
         return $countNewAssociations;
+    }
+
+    /**
+     * Makes sure that all email owners have assigned their emails
+     */
+    public function processUpdateAllEmailOwners()
+    {
+        $emailOwnerClasseNames = $this->emailOwnersProvider->getSupportedEmailOwnerClassNames();
+        foreach ($emailOwnerClasseNames as $emailOwnerClassName) {
+            $ownerColumnName = $this->emailOwnersProvider->getOwnerColumnName($emailOwnerClassName);
+            if (!$ownerColumnName) {
+                continue;
+            }
+
+            $ownerIdsQb = $this->doctrineHelper
+                ->getEntityRepository(Email::class)
+                ->getOwnerIdsWithEmailsQb(
+                    $emailOwnerClassName,
+                    $this->doctrineHelper->getSingleEntityIdentifierFieldName($emailOwnerClassName),
+                    $ownerColumnName
+                );
+
+            $ownerIds = (new BufferedQueryResultIterator($ownerIdsQb))
+                ->setBufferSize(self::OWNER_IDS_BUFFER_SIZE)
+                ->setPageLoadedCallback(function (array $rows) use ($emailOwnerClassName) {
+                    $this->producer->send(
+                        Topics::UPDATE_EMAIL_OWNER_ASSOCIATIONS,
+                        [
+                            'ownerClass' => $emailOwnerClassName,
+                            'ownerIds' => array_map('current', $rows),
+                        ]
+                    );
+                });
+
+            // iterate through ownerIds to call pageLoadedCallback
+            foreach ($ownerIds as $ownerId) {
+            }
+        }
     }
 
     /**
