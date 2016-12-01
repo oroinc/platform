@@ -83,6 +83,9 @@ class Transition
     /** @var array */
     protected $initRoutes = [];
 
+    /** @var array */
+    protected $initDatagrids = [];
+
     /** @var string */
     protected $initContextAttribute;
 
@@ -617,6 +620,26 @@ class Transition
     public function setInitRoutes(array $initRoutes)
     {
         $this->initRoutes = $initRoutes;
+
+        return $this;
+    }
+
+    /**
+     * @return array
+     */
+    public function getInitDatagrids()
+    {
+        return $this->initDatagrids;
+    }
+
+    /**
+     * @param array $initDatagrids
+     *
+     * @return $this
+     */
+    public function setInitDatagrids(array $initDatagrids)
+    {
+        $this->initDatagrids = $initDatagrids;
 
         return $this;
     }
