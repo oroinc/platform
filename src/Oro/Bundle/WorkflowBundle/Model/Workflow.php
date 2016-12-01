@@ -518,6 +518,14 @@ class Workflow
     }
 
     /**
+     * @return array[]
+     */
+    public function getInitDatagrids()
+    {
+        return $this->getConfigurationOption(WorkflowConfiguration::NODE_INIT_DATAGRIDS, []);
+    }
+
+    /**
      * @param string $nodeName
      * @param mixed|null $default
      *

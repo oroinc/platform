@@ -194,6 +194,7 @@ class WorkflowDefinitionConfigurationBuilderTest extends \PHPUnit_Framework_Test
                     'name' => 'transit1',
                     WorkflowConfiguration::NODE_INIT_ENTITIES => ['entity1', 'entity2'],
                     WorkflowConfiguration::NODE_INIT_ROUTES => ['route1', 'route2'],
+                    WorkflowConfiguration::NODE_INIT_DATAGRIDS => ['datagrid1', 'datagrid2'],
                     'is_start' => true,
                 ],
             ],
@@ -236,6 +237,10 @@ class WorkflowDefinitionConfigurationBuilderTest extends \PHPUnit_Framework_Test
                                     'route1' => ['transit1'],
                                     'route2' => ['transit1'],
                                 ],
+                                WorkflowConfiguration::NODE_INIT_DATAGRIDS => [
+                                    'datagrid1' => ['transit1'],
+                                    'datagrid2' => ['transit1'],
+                                ],
                             ]
                         )
                     ),
@@ -270,6 +275,7 @@ class WorkflowDefinitionConfigurationBuilderTest extends \PHPUnit_Framework_Test
             WorkflowConfiguration::NODE_TRANSITION_DEFINITIONS,
             WorkflowConfiguration::NODE_INIT_ENTITIES,
             WorkflowConfiguration::NODE_INIT_ROUTES,
+            WorkflowConfiguration::NODE_INIT_DATAGRIDS,
         ];
 
         return array_intersect_key($configuration, array_flip($configurationKeys));
@@ -401,6 +407,9 @@ class WorkflowDefinitionConfigurationBuilderTest extends \PHPUnit_Framework_Test
                     ->setName($transitionData['name'])
                     ->setInitEntities($this->getOption($transitionData, WorkflowConfiguration::NODE_INIT_ENTITIES, []))
                     ->setInitRoutes($this->getOption($transitionData, WorkflowConfiguration::NODE_INIT_ROUTES, []))
+                    ->setInitDatagrids(
+                        $this->getOption($transitionData, WorkflowConfiguration::NODE_INIT_DATAGRIDS, [])
+                    )
                     ->setInitContextAttribute(
                         $this->getOption($transitionData, WorkflowConfiguration::NODE_INIT_CONTEXT_ATTRIBUTE, '')
                     );

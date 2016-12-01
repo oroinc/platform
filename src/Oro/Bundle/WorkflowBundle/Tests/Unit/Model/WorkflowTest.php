@@ -875,6 +875,16 @@ class WorkflowTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($data, $workflow->getInitRoutes());
     }
 
+    public function testGetInitDatagrids()
+    {
+        $workflow = $this->createWorkflow();
+        $data = ['datagrid1' => ['trans1']];
+        $workflow->getDefinition()->setConfiguration([
+            WorkflowConfiguration::NODE_INIT_DATAGRIDS => $data,
+        ]);
+        $this->assertEquals($data, $workflow->getInitDatagrids());
+    }
+
     /**
      * @param object $entity
      * @param string $workflowName
