@@ -92,6 +92,7 @@ services:
             - '@oro_message_queue.client.message_producer'
             - '@doctrine'
             - '@oro_config.user'
+            - "@security.token_storage"
             - '@logger'
         tags:
             - { name: 'oro_message_queue.client.message_processor' }
@@ -104,6 +105,7 @@ services:
             - '@oro_message_queue.client.message_producer'
             - '@doctrine'
             - '@oro_config.user'
+            - "@security.token_storage"
             - '@logger'
         tags:
             - { name: 'oro_message_queue.client.message_processor' }

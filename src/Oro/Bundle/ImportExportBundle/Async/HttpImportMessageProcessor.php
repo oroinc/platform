@@ -6,6 +6,7 @@ use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\ImportExportBundle\Handler\HttpImportHandler;
 use Oro\Bundle\ImportExportBundle\Job\JobExecutor;
 use Oro\Bundle\NotificationBundle\Async\Topics as NotificationTopics;
+use Oro\Bundle\SecurityBundle\Authentication\Token\OrganizationToken;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Component\MessageQueue\Client\MessageProducerInterface;
 use Oro\Component\MessageQueue\Client\TopicSubscriberInterface;
@@ -16,6 +17,7 @@ use Oro\Component\MessageQueue\Transport\SessionInterface;
 use Oro\Component\MessageQueue\Util\JSON;
 use Psr\Log\LoggerInterface;
 use Symfony\Bridge\Doctrine\RegistryInterface;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
 class HttpImportMessageProcessor implements MessageProcessorInterface, TopicSubscriberInterface
 {
@@ -45,6 +47,11 @@ class HttpImportMessageProcessor implements MessageProcessorInterface, TopicSubs
     private $configManager;
 
     /**
+     * @var TokenStorageInterface
+     */
+    private $tokenStorage;
+
+    /**
      * @var LoggerInterface
      */
     private $logger;
@@ -55,6 +62,7 @@ class HttpImportMessageProcessor implements MessageProcessorInterface, TopicSubs
         MessageProducerInterface $producer,
         RegistryInterface $doctrine,
         ConfigManager $configManager,
+        TokenStorageInterface $tokenStorage,
         LoggerInterface $logger
     ) {
         $this->httpImportHandler = $httpImportHandler;
@@ -62,6 +70,7 @@ class HttpImportMessageProcessor implements MessageProcessorInterface, TopicSubs
         $this->producer = $producer;
         $this->doctrine = $doctrine;
         $this->configManager = $configManager;
+        $this->tokenStorage = $tokenStorage;
         $this->logger = $logger;
     }
 
@@ -89,10 +98,23 @@ class HttpImportMessageProcessor implements MessageProcessorInterface, TopicSubs
             return self::REJECT;
         }
 
+        $user =  $this->doctrine->getRepository(User::class)->find($body['userId']);
+        if (! $user instanceof User) {
+            $this->logger->error(
+                sprintf('User not found: %s', $body['userId']),
+                ['message' => $message]
+            );
+
+            return self::REJECT;
+        }
+
         $result = $this->jobRunner->runUnique(
             $message->getMessageId(),
             sprintf('oro:import:http:%s:%s', $body['processorAlias'], $message->getMessageId()),
-            function () use ($body) {
+            function () use ($body, $user) {
+                $token = new OrganizationToken($user->getOrganization(), $user->getRoles());
+                // need to log the user in to use acl
+                $this->tokenStorage->setToken($token);
                 $this->httpImportHandler->setImportingFileName($body['fileName']);
                 $result = $this->httpImportHandler->handleImport(
                     $body['jobName'],
@@ -102,7 +124,7 @@ class HttpImportMessageProcessor implements MessageProcessorInterface, TopicSubs
 
                 $summary = sprintf(
                     'Import for the %s is completed, success: %s, info: %s, errors url: %s, message: %s',
-                    $result['fileName'],
+                    $body['fileName'],
                     $result['success'],
                     $result['importInfo'],
                     $result['errorsUrl'],
@@ -111,22 +133,19 @@ class HttpImportMessageProcessor implements MessageProcessorInterface, TopicSubs
 
                 $this->logger->info($summary);
 
-                $repository = $this->doctrine->getRepository(User::class);
-                $user = $repository->find($body['userId']);
-                if ($user instanceof User) {
-                    $fromEmail = $this->configManager->get('oro_notification.email_notification_sender_email');
-                    $fromName = $this->configManager->get('oro_notification.email_notification_sender_name');
-                    $this->producer->send(
-                        NotificationTopics::SEND_NOTIFICATION_EMAIL,
-                        [
-                            'fromEmail' => $fromEmail,
-                            'fromName' => $fromName,
-                            'toEmail' => $user->getEmail(),
-                            'subject' => $result['message'],
-                            'body' => $summary
-                        ]
-                    );
-                }
+                $fromEmail = $this->configManager->get('oro_notification.email_notification_sender_email');
+                $fromName = $this->configManager->get('oro_notification.email_notification_sender_name');
+                $this->producer->send(
+                    NotificationTopics::SEND_NOTIFICATION_EMAIL,
+                    [
+                        'fromEmail' => $fromEmail,
+                        'fromName' => $fromName,
+                        'toEmail' => $user->getEmail(),
+                        'subject' => $result['message'],
+                        'body' => $summary
+                    ]
+                );
+
 
                 return $result['success'];
             }

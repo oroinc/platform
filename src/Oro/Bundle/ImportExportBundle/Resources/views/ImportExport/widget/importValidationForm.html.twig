@@ -8,7 +8,7 @@
               data-nohash="true"
               id="{{ form.vars.id }}"
               name="{{ form.vars.name }}"
-              action="{{ path('oro_importexport_import_form', {entity: entityName, importJob: importJob, importValidateJob: importValidateJob, options: options}) }}"
+              action="{{ path('oro_importexport_import_validation_form', {entity: entityName, importJob: importJob, importValidateJob: importValidateJob, options: options}) }}"
               class="form-horizontal"
               {{ form_enctype(form) }}>
 
@@ -38,7 +38,7 @@
                     action.on('click', function() {
                         Messanger.notificationFlashMessage(
                             'info',
-                            {{ 'Import started...'|trans|json_encode|raw }}
+                            {{ 'Import validation started...'|trans|json_encode|raw }}
                         );
                     });
                 });

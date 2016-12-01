@@ -80,9 +80,9 @@ class ImportExportController extends Controller
     /**
      * Take uploaded file and move it to temp dir
      *
-     * @Route("/import-validate", name="oro_importexport_import_validate_form")
+     * @Route("/import-validate", name="oro_importexport_import_validation_form")
      * @AclAncestor("oro_importexport_import")
-     * @Template("OroImportExportBundle:ImportExport:importForm.html.twig")
+     * @Template("OroImportExportBundle:ImportExport:importValidationForm.html.twig")
      *
      * @param Request $request
      *
@@ -148,9 +148,10 @@ class ImportExportController extends Controller
      *
      * @return array
      */
-    public function importValidateAction(Request $request, $processorAlias, $fileName)
+    public function importValidateAction(Request $request, $processorAlias)
     {
         $jobName = $request->get('importValidateJob', JobExecutor::JOB_VALIDATE_IMPORT_FROM_CSV);
+        $fileName = $request->get('fileName', null);
 
         $this->getMessageProducer()->send(
             Topics::IMPORT_HTTP_VALIDATION,
@@ -163,7 +164,7 @@ class ImportExportController extends Controller
             ]
         );
 
-        return ['success' => true];
+        return new JsonResponse(['success' => true]);
     }
 
     /**

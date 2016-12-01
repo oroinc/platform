@@ -6,6 +6,7 @@ use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\ImportExportBundle\Handler\HttpImportHandler;
 use Oro\Bundle\ImportExportBundle\Job\JobExecutor;
 use Oro\Bundle\NotificationBundle\Async\Topics as NotificationTopics;
+use Oro\Bundle\SecurityBundle\Authentication\Token\OrganizationToken;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Component\MessageQueue\Client\MessageProducerInterface;
 use Oro\Component\MessageQueue\Client\TopicSubscriberInterface;
@@ -16,6 +17,7 @@ use Oro\Component\MessageQueue\Transport\SessionInterface;
 use Oro\Component\MessageQueue\Util\JSON;
 use Psr\Log\LoggerInterface;
 use Symfony\Bridge\Doctrine\RegistryInterface;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
 class HttpImportValidationMessageProcessor implements MessageProcessorInterface, TopicSubscriberInterface
 {
@@ -45,6 +47,11 @@ class HttpImportValidationMessageProcessor implements MessageProcessorInterface,
     private $configManager;
 
     /**
+     * @var TokenStorageInterface
+     */
+    private $tokenStorage;
+
+    /**
      * @var LoggerInterface
      */
     private $logger;
@@ -55,6 +62,7 @@ class HttpImportValidationMessageProcessor implements MessageProcessorInterface,
         MessageProducerInterface $producer,
         RegistryInterface $doctrine,
         ConfigManager $configManager,
+        TokenStorageInterface $tokenStorage,
         LoggerInterface $logger
     ) {
         $this->httpImportHandler = $httpImportHandler;
@@ -62,6 +70,7 @@ class HttpImportValidationMessageProcessor implements MessageProcessorInterface,
         $this->producer = $producer;
         $this->doctrine = $doctrine;
         $this->configManager = $configManager;
+        $this->tokenStorage = $tokenStorage;
         $this->logger = $logger;
     }
 
@@ -104,6 +113,9 @@ class HttpImportValidationMessageProcessor implements MessageProcessorInterface,
             $message->getMessageId(),
             sprintf('oro:import_validation:http:%s:%s', $body['processorAlias'], $message->getMessageId()),
             function () use ($body, $user) {
+                $token = new OrganizationToken($user->getOrganization(), $user->getRoles());
+                // need to log the user in to use acl
+                $this->tokenStorage->setToken($token);
                 $this->httpImportHandler->setImportingFileName($body['fileName']);
                 $result = $this->httpImportHandler->handleImportValidation(
                     $body['jobName'],
@@ -113,8 +125,8 @@ class HttpImportValidationMessageProcessor implements MessageProcessorInterface,
 
                 $summary = sprintf(
                     'Import validation for the %s is completed, success: %s, info: %s, errors url: %s, message: %s',
-                    $result['fileName'],
-                    $result['success'],
+                    $body['fileName'],
+                    $result['success'] ? 'true' : 'false',
                     $result['importInfo'],
                     $result['errorsUrl'],
                     $result['message']

@@ -14,6 +14,7 @@ define(function(require) {
         options: {
             selectors: {
                 importButton: '.import-btn',
+                importValidationButton: '.import-validation-btn',
                 exportButton: '.export-btn',
                 templateButton: '.template-btn'
             },
@@ -21,6 +22,7 @@ define(function(require) {
         },
 
         $importButton: null,
+        $importValidationButton: null,
         $exportButton: null,
         $templateButton: null,
 
@@ -36,10 +38,12 @@ define(function(require) {
             this.options = _.defaults(options || {}, this.options);
 
             this.$importButton = this.$el.find(this.options.selectors.importButton);
+            this.$importValidationButton = this.$el.find(this.options.selectors.importValidationButton);
             this.$exportButton = this.$el.find(this.options.selectors.exportButton);
             this.$templateButton = this.$el.find(this.options.selectors.templateButton);
 
             this.$importButton.on('click' + this.eventNamespace(), _.bind(this.onImportClick, this));
+            this.$importValidationButton.on('click' + this.eventNamespace(), _.bind(this.onImportValidationClick, this));
             this.$exportButton.on('click' + this.eventNamespace(), _.bind(this.onExportClick, this));
             this.$templateButton.on('click' + this.eventNamespace(), _.bind(this.onTemplateClick, this));
 
@@ -53,6 +57,15 @@ define(function(require) {
             e.preventDefault();
 
             this.importExportManager.handleImport();
+        },
+
+        /**
+         * @param {jQuery.Event} e
+         */
+        onImportValidationClick: function(e) {
+            e.preventDefault();
+
+            this.importExportManager.handleImportValidation();
         },
 
         /**

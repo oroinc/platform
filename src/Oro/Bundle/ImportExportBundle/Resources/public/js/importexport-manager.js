@@ -23,7 +23,9 @@ define(function(require) {
             entity: null,
 
             importTitle: 'Import',
+            importValidationTitle: 'Import Validation',
             importRoute: 'oro_importexport_import_form',
+            importValidationRoute: 'oro_importexport_import_validation_form',
             importJob: null,
             importValidateJob: null,
 
@@ -84,6 +86,38 @@ define(function(require) {
                 url: routing.generate(this.options.importRoute, $.extend({}, this.routeOptions)),
                 dialogOptions: {
                     title: this.options.importTitle
+                }
+            });
+
+            if (!_.isEmpty(this.options.datagridName) || this.options.refreshPageOnSuccess) {
+                var self = this;
+
+                widget.on('importComplete', function(data) {
+                    if (data.success) {
+                        if (self.options.refreshPageOnSuccess) {
+                            if (!_.isEmpty(self.options.afterRefreshPageMessage)) {
+                                mediator.once('page:afterChange', function() {
+                                    mediator.execute(
+                                        'showFlashMessage',
+                                        'warning',
+                                        self.options.afterRefreshPageMessage
+                                    );
+                                });
+                            }
+                            mediator.execute('refreshPage');
+                        } else if (!_.isEmpty(self.options.datagridName)) {
+                            mediator.trigger('datagrid:doRefresh:' + self.options.datagridName);
+                        }
+                    }
+                });
+            }
+        },
+
+        handleImportValidation: function() {
+            var widget = this._renderDialogWidget({
+                url: routing.generate(this.options.importValidationRoute, $.extend({}, this.routeOptions)),
+                dialogOptions: {
+                    title: this.options.importValidationTitle
                 }
             });
 
