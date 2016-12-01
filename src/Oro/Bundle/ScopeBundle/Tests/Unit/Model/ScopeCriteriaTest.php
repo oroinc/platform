@@ -4,6 +4,7 @@ namespace Oro\Bundle\ScopeBundle\Tests\Unit\Model;
 
 use Doctrine\ORM\Query\Expr;
 use Doctrine\ORM\QueryBuilder;
+
 use Oro\Bundle\ApiBundle\Collection\Join;
 use Oro\Bundle\ScopeBundle\Entity\Scope;
 use Oro\Bundle\ScopeBundle\Model\ScopeCriteria;
@@ -45,6 +46,36 @@ class ScopeCriteriaTest extends \PHPUnit_Framework_TestCase
             ->with('scope_param_fieldWithValue', 1);
 
         $criteria->applyWhere($qb, 'scope', ['ignoredField']);
+    }
+
+    public function testApplyWhereWithPriority()
+    {
+        /** @var QueryBuilder|\PHPUnit_Framework_MockObject_MockObject $qb */
+        $qb = $this->getMockBuilder(QueryBuilder::class)->disableOriginalConstructor()->getMock();
+        $criteria = new ScopeCriteria(
+            [
+                'nullField' => null,
+                'notNullField' => ScopeCriteria::IS_NOT_NULL,
+                'fieldWithValue' => 1,
+                'ignoredField' => 2,
+            ]
+        );
+        $qb->method('expr')->willReturn(new Expr());
+        $qb->expects($this->exactly(3))
+            ->method('andWhere')
+            ->withConsecutive(
+                ['scope.nullField IS NULL'],
+                ['scope.notNullField IS NOT NULL'],
+                [new Expr\Orx([
+                    new Expr\Comparison('scope.fieldWithValue', '=', ':scope_param_fieldWithValue'),
+                    'scope.fieldWithValue IS NULL'
+                ])]
+            );
+        $qb->expects($this->once())
+            ->method('setParameter')
+            ->with('scope_param_fieldWithValue', 1);
+
+        $criteria->applyWhereWithPriority($qb, 'scope', ['ignoredField']);
     }
 
     public function testApplyToJoin()

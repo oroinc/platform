@@ -134,7 +134,7 @@
         {% endif %}
         <div class="layout-content">
             {% block content_data %}
-                {% set data = oro_form_process(data, form) %}
+                {% set data = oro_form_process(data, form, entity) %}
 
                 {% if entity and data is defined and data.dataBlocks is defined %}
                     {% set dataBlocks = data.dataBlocks %}
