@@ -91,3 +91,13 @@ services:
             - { name: oro_workflow.changes.listener, event: oro.workflow.before_deactivation, method: onDeactivationWorkflowDefinition }
             - { name: oro_workflow.changes.listener, event: oro.workflow.after_create, method: onCreateWorkflowDefinition }
             - { name: oro_workflow.changes.listener, event: oro.workflow.after_update, method: onUpdateWorkflowDefinition }
+
+    oro_workflow.event_listener.role_page_listener:
+        class: 'Oro\Bundle\WorkflowBundle\EventListener\RolePageListener'
+        arguments:
+            - '@translator'
+        calls:
+            - [setRequest, ['@?request=']]
+        tags:
+            - { name: kernel.event_listener, event: entity_form.render.before, method: onUpdatePageRender }
+            - { name: kernel.event_listener, event: entity_view.render.before, method: onViewPageRender }

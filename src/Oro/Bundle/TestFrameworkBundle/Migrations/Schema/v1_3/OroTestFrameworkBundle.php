@@ -3,26 +3,14 @@
 namespace Oro\Bundle\TestFrameworkBundle\Migrations\Schema\v1_3;
 
 use Doctrine\DBAL\Schema\Schema;
-use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
-use Oro\Bundle\EntityExtendBundle\Extend\RelationType;
-use Oro\Bundle\EntityExtendBundle\Migration\Extension\ExtendExtension;
-use Oro\Bundle\EntityExtendBundle\Migration\Extension\ExtendExtensionAwareInterface;
 use Oro\Bundle\MigrationBundle\Migration\Migration;
 use Oro\Bundle\MigrationBundle\Migration\QueryBag;
-use Oro\Bundle\ScopeBundle\Migrations\Schema\OroScopeBundleInstaller;
+use Oro\Bundle\ScopeBundle\Migration\Extension\ScopeExtensionAwareInterface;
+use Oro\Bundle\ScopeBundle\Migration\Extension\ScopeExtensionAwareTrait;
 
-class OroTestFrameworkBundle implements Migration, ExtendExtensionAwareInterface
+class OroTestFrameworkBundle implements Migration, ScopeExtensionAwareInterface
 {
-    /** @var ExtendExtension */
-    protected $extendExtension;
-
-    /**
-     * {@inheritdoc}
-     */
-    public function setExtendExtension(ExtendExtension $extendExtension)
-    {
-        $this->extendExtension = $extendExtension;
-    }
+    use ScopeExtensionAwareTrait;
 
     /**
      * {@inheritdoc}
@@ -62,21 +50,6 @@ class OroTestFrameworkBundle implements Migration, ExtendExtensionAwareInterface
      */
     protected function extendScopeForTestActivity($schema)
     {
-        $this->extendExtension->addManyToOneRelation(
-            $schema,
-            OroScopeBundleInstaller::ORO_SCOPE,
-            'test_activity',
-            'test_activity',
-            'id',
-            [
-                'extend' => [
-                    'owner' => ExtendScope::OWNER_CUSTOM,
-                    'cascade' => ['all'],
-                    'on_delete' => 'CASCADE',
-                    'nullable' => true
-                ]
-            ],
-            RelationType::MANY_TO_ONE
-        );
+        $this->scopeExtension->addScopeAssociation($schema, 'test_activity', 'test_activity', 'id');
     }
 }

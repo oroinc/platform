@@ -113,6 +113,13 @@ Run tests with PhantomJs
 vendor/bin/behat
 ```
 
+#### Fail tests
+
+If in some kind of reasons some of your tests was fail, you can view
+**screenshots** at {application_root}/app/logs/
+
+Use ```behat -v``` parameter to behat command, add get more details in verbose output
+
 ### Architecture
 
 Mink provide ```MinkContext``` with basic feature steps.

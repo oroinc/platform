@@ -12,7 +12,7 @@ final class AccessLevel
      *
      * @var string[]
      */
-    public static $allAccessLevelNames = array('BASIC', 'LOCAL', 'DEEP', 'GLOBAL', 'SYSTEM');
+    public static $allAccessLevelNames = ['BASIC', 'LOCAL', 'DEEP', 'GLOBAL', 'SYSTEM'];
 
     const NONE_LEVEL_NAME = 'NONE';
 
@@ -58,6 +58,7 @@ final class AccessLevel
      * Gets constant value by its name
      *
      * @param string $name
+     *
      * @return int
      */
     public static function getConst($name)
@@ -69,6 +70,7 @@ final class AccessLevel
      * Gets the name of an access level by the given value of the constant
      *
      * @param int $value
+     *
      * @return string|null
      */
     public static function getAccessLevelName($value)
@@ -87,22 +89,18 @@ final class AccessLevel
      * @param int   $maxLevel      The max level to find names to. The default value is SYSTEM_LEVEL
      * @param array $excludeLevels Levels to exclude
      *
-     * @return array
-     *   key = access level code,
-     *   value = access level name
+     * @return array [access level code => access level name, ...]
      */
     public static function getAccessLevelNames(
         $minLevel = self::BASIC_LEVEL,
         $maxLevel = self::SYSTEM_LEVEL,
-        $excludeLevels = []
+        array $excludeLevels = []
     ) {
         $names = [self::NONE_LEVEL_NAME];
         for ($level = $minLevel; $level <= $maxLevel; $level++) {
-            if (in_array($level, $excludeLevels)) {
-                continue;
+            if (!in_array($level, $excludeLevels, true)) {
+                $names[$level] = self::getAccessLevelName($level);
             }
-            $name          = self::getAccessLevelName($level);
-            $names[$level] = $name;
         }
 
         return $names;

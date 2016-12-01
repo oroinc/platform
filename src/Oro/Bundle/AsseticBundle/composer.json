@@ -6,7 +6,7 @@
     "homepage": "https://github.com/laboro/AsseticBundle",
     "license": "MIT",
     "require": {
-        "php": ">=5.5.9",
+        "php": ">=5.6",
         "symfony/symfony": "2.8.*, !=2.8.10",
         "kriswallsmith/assetic": "1.1.*@dev",
         "oro/config": "dev-master"
