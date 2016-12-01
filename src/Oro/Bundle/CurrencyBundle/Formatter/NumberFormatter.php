@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\CurrencyBundle\Formatter;
 
+use Oro\Bundle\CurrencyBundle\Provider\ViewTypeProviderInterface;
 use Oro\Bundle\LocaleBundle\Formatter\NumberFormatter as BaseFormatter;
 use Oro\Bundle\LocaleBundle\Model\LocaleSettings;
 use Oro\Bundle\CurrencyBundle\Config\CurrencyConfigManager;
@@ -55,7 +56,7 @@ class NumberFormatter extends BaseFormatter
             }
         );
 
-        if ($this->currencyConfigManager->getViewType() === CurrencyConfigManager::VIEW_TYPE_ISO_CODE) {
+        if ($this->currencyConfigManager->getViewType() === ViewTypeProviderInterface::VIEW_TYPE_ISO_CODE) {
             $localizedCurrencySymbol =
                 $this->isCurrencySymbolPrepend($currencyCode, $locale) ?
                     sprintf('%s ', $localizedCurrencySymbol) : $localizedCurrencySymbol;

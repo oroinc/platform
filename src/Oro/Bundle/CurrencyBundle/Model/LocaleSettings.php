@@ -3,6 +3,7 @@
 namespace Oro\Bundle\CurrencyBundle\Model;
 
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
+use Oro\Bundle\CurrencyBundle\Provider\ViewTypeProviderInterface;
 use Oro\Bundle\LocaleBundle\Model\CalendarFactoryInterface;
 use Oro\Bundle\LocaleBundle\Model\LocaleSettings as BaseLocaleSettings;
 use Oro\Bundle\CurrencyBundle\Config\CurrencyConfigManager;
@@ -32,7 +33,7 @@ class LocaleSettings extends BaseLocaleSettings
      */
     public function getCurrencySymbolByCurrency($currencyCode = null)
     {
-        if ($this->currencyConfigManager->getViewType() === CurrencyConfigManager::VIEW_TYPE_ISO_CODE) {
+        if ($this->currencyConfigManager->getViewType() === ViewTypeProviderInterface::VIEW_TYPE_ISO_CODE) {
             return $currencyCode;
         }
 
