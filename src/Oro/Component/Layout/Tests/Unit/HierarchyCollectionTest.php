@@ -4,6 +4,9 @@ namespace Oro\Component\Layout\Tests\Unit;
 
 use Oro\Component\Layout\HierarchyCollection;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class HierarchyCollectionTest extends \PHPUnit_Framework_TestCase
 {
     /** @var HierarchyCollection */

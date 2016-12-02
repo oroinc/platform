@@ -83,6 +83,8 @@ class HierarchyCollection
      * @param array       $children  The child hierarchy
      *
      * @throws Exception\LogicException if the operation failed
+     *
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     public function add(array $parentPath, $id, $siblingId = null, $prepend = null, array $children = [])
     {
