@@ -16,7 +16,7 @@ class ContextNotEmpty extends Constraint
      */
     public function validatedBy()
     {
-        return 'oro_note.context.note_empty_validator';
+        return 'oro_note.context.not_empty_validator';
     }
 
     public function getTargets()

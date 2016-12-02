@@ -67,7 +67,6 @@ class ContextNotEmptyValidatorTest extends \PHPUnit_Framework_TestCase
         $this->expectAddViolation(
             $this->once(),
             $this->constraint->message,
-            [],
             $targetEntities,
             'contexts'
         );
@@ -85,7 +84,6 @@ class ContextNotEmptyValidatorTest extends \PHPUnit_Framework_TestCase
     protected function expectAddViolation(
         \PHPUnit_Framework_MockObject_Matcher_Invocation $matcher,
         $message,
-        array $parameters,
         $invalidValue,
         $path
     ) {
@@ -95,11 +93,6 @@ class ContextNotEmptyValidatorTest extends \PHPUnit_Framework_TestCase
             ->method('buildViolation')
             ->with($message, [])
             ->will($this->returnValue($builder));
-
-        $builder->expects($this->once())
-            ->method('setParameters')
-            ->with($parameters)
-            ->will($this->returnSelf());
 
         $builder->expects($this->once())
             ->method('setInvalidValue')

@@ -33,7 +33,7 @@ services:
            - {name: oro_activity_list.provider, priority: 40}
 
 
-    oro_note.context.note_empty_validator:
+    oro_note.context.not_empty_validator:
         class: Oro\Bundle\NoteBundle\Validator\ContextNotEmptyValidator
         arguments:
            - '@oro_entity.doctrine_helper'
@@ -41,7 +41,7 @@ services:
            - '@oro_activity.association_helper'
            - '@oro_comment.association_helper'
         tags:
-           - {name: validator.constraint_validator, alias: oro_note.context.note_empty_validator }
+           - {name: validator.constraint_validator, alias: oro_note.context.not_empty_validator }
 
     oro_note.handler.delete.activity_entity:
         class: Oro\Bundle\NoteBundle\Entity\Manager\NoteActivityEntityDeleteHandler

@@ -5,12 +5,15 @@ namespace Oro\Bundle\NoteBundle\Validator;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
+use Symfony\Component\Validator\Violation\ConstraintViolationBuilderInterface;
 
 use Oro\Bundle\NoteBundle\Entity\Note;
 use Oro\Bundle\NoteBundle\Validator\Constraints\ContextNotEmpty;
 
 class ContextNotEmptyValidator extends ConstraintValidator
 {
+    const VIOLATION_PATH = 'contexts';
+
     /**
      * Checks if the passed note has at least one relation with entity through context field.
      *
@@ -22,14 +25,8 @@ class ContextNotEmptyValidator extends ConstraintValidator
         $this->assertArgumentsHaveExpectedType($value, $constraint);
 
         $activityTargetEntities = $value->getActivityTargetEntities();
-
         if (!count($activityTargetEntities)) {
-            $this->addViolation(
-                $constraint->message,
-                [],
-                $activityTargetEntities,
-                'contexts'
-            );
+            $this->addViolation($constraint->message, $activityTargetEntities);
         }
     }
 
@@ -47,7 +44,7 @@ class ContextNotEmptyValidator extends ConstraintValidator
                 sprintf(
                     'Value should be an instanceof "%s", "%s" given.',
                     Note::class,
-                    is_object($value) ? get_class($value) : gettype($value)
+                    $this->getType($value)
                 )
             );
         }
@@ -57,37 +54,46 @@ class ContextNotEmptyValidator extends ConstraintValidator
                 sprintf(
                     'Constraint should be an instanceof "%s", "%s" given.',
                     ContextNotEmpty::class,
-                    is_object($value) ? get_class($value) : gettype($value)
+                    $this->getType($constraint)
                 )
             );
         }
     }
 
     /**
-     * @param string $message
-     * @param array $parameters
-     * @param string|null $invalidValue
-     * @param string|null $path
+     * @param mixed $value
+     *
+     * @return string
      */
-    protected function addViolation($message, array $parameters = [], $invalidValue = null, $path = null)
+    protected function getType($value)
+    {
+        return is_object($value) ? get_class($value) : gettype($value);
+    }
+
+    /**
+     * @param string     $message
+     * @param mixed      $invalidValue
+     */
+    protected function addViolation($message, $invalidValue = null)
+    {
+        $violationBuilder = $this->getViolationBuilder($message);
+        $violationBuilder
+            ->setInvalidValue($invalidValue)
+            ->atPath(self::VIOLATION_PATH)
+            ->addViolation();
+    }
+
+    /**
+     * @param string $message
+     *
+     * @return ConstraintViolationBuilderInterface
+     */
+    protected function getViolationBuilder($message)
     {
         if ($this->context instanceof ExecutionContextInterface) {
-            $violationBuilder = $this->context->buildViolation($message)
-                ->setParameters($parameters)
-                ->setInvalidValue($invalidValue);
-            if ($path) {
-                $violationBuilder->atPath($path);
-            }
-            $violationBuilder->addViolation();
+            return $this->context->buildViolation($message);
         } else {
-            /** @var  $violationBuilder */
-            $violationBuilder = $this->buildViolation($message)
-                ->setInvalidValue($invalidValue)
-                ->setParameters($parameters);
-            if ($path) {
-                $violationBuilder->atPath($path);
-            }
-            $violationBuilder->addViolation();
+            return $this->buildViolation($message);
         }
     }
 }
