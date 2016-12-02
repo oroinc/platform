@@ -11,10 +11,15 @@ define([
      * @export  oroworkflow/js/transition-executor
      * @class   oro.WorkflowTransitionExecutor
      */
-    return function(element, data) {
-        mediator.execute('showLoading');
+    return function(element, data, pageRefresh) {
+        if (pageRefresh) {
+            mediator.execute('showLoading');
+        }
+
+        element.trigger('transitions_start');
+
         $.getJSON(element.data('transition-url'), data ? {'data': data} : null)
-            .done(TransitionEventHandlers.getOnSuccess(element))
-            .fail(TransitionEventHandlers.getOnFailure(element));
+            .done(TransitionEventHandlers.getOnSuccess(element, pageRefresh))
+            .fail(TransitionEventHandlers.getOnFailure(element, pageRefresh));
     };
 });

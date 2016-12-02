@@ -12,7 +12,9 @@ define([
      * @export  oroworkflow/js/transition-handler
      * @class   oroworkflow.WorkflowTransitionHandler
      */
-    return function() {
+    return function(pageRefresh) {
+        var pageRefresh = _.isUndefined(pageRefresh) ? true : pageRefresh;
+
         var element = $(this);
         if (element.data('_in-progress')) {
             return;
@@ -53,7 +55,7 @@ define([
                 transitionFormWidget.on('widgetRemove', resetInProgress);
                 transitionFormWidget.on('formSave', function(data) {
                     transitionFormWidget.remove();
-                    performTransition(element, data);
+                    performTransition(element, data, pageRefresh);
                 });
                 transitionFormWidget.render();
             });
@@ -65,14 +67,14 @@ define([
                     content: message
                 });
                 confirm.on('ok', function() {
-                    performTransition(element);
+                    performTransition(element, null, pageRefresh);
                 });
                 confirm.on('cancel', function() {
                     resetInProgress();
                 });
                 confirm.open();
             } else {
-                performTransition(element);
+                performTransition(element, null, pageRefresh);
             }
         }
     };

@@ -5,6 +5,7 @@ define(function(require) {
     var $ = require('jquery');
     var _ = require('underscore');
     var BaseView = require('oroui/js/app/views/base/view');
+    var mediator = require('oroui/js/mediator');
     var routing = require('routing');
     var dateTimeFormatter = require('orolocale/js/formatter/datetime');
     var LoadingMaskView = require('oroui/js/app/views/loading-mask-view');
@@ -109,7 +110,12 @@ define(function(require) {
         onTransition: function(e) {
             e.preventDefault();
             var $el = $(e.target);
-            TransitionHandler.call($el);
+
+            $el.one('transitions_success', function() {
+                mediator.trigger('widget_success:activity_list:item:update');
+            });
+
+            TransitionHandler.call($el, false);
         },
 
         onEdit: function() {
