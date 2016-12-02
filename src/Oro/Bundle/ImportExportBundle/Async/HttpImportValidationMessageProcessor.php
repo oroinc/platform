@@ -124,12 +124,17 @@ class HttpImportValidationMessageProcessor implements MessageProcessorInterface,
                 );
 
                 $summary = sprintf(
-                    'Import validation for the %s is completed, success: %s, info: %s, errors url: %s, message: %s',
+                    'Import validation for the %s from %s is completed.
+                     Success: %s.
+                     Info: %s.
+                     Errors url: %s.
+                     Errors: %s',
                     $body['fileName'],
+                    $result['entityName'],
                     $result['success'] ? 'true' : 'false',
-                    $result['importInfo'],
+                    json_encode($result['counts']),
                     $result['errorsUrl'],
-                    $result['message']
+                    json_encode($result['errors'])
                 );
 
                 $this->logger->info($summary);

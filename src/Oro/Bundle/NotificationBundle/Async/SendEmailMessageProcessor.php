@@ -46,7 +46,6 @@ class SendEmailMessageProcessor implements MessageProcessorInterface, TopicSubsc
      */
     public function process(MessageInterface $message, SessionInterface $session)
     {
-        return self::ACK;
         $data = JSON::decode($message->getBody());
 
         $data = array_merge([

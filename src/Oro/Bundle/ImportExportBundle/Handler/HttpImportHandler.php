@@ -51,7 +51,8 @@ class HttpImportHandler extends AbstractImportHandler
         if (!empty($counts['errors'])) {
             $errorsUrl = $this->router->generate(
                 'oro_importexport_error_log',
-                ['jobCode' => $jobResult->getJobCode()]
+                ['jobCode' => $jobResult->getJobCode()],
+                RouterInterface::ABSOLUTE_URL
             );
 
             $contextErrors = [];
