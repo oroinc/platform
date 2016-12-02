@@ -1,38 +1,78 @@
-@mixin button-basic-states(
-    $size-l: 15px 22px,
-    $size-m: 8px 15px,
-    $size-s: 6px 18px,
-    $shadow: inset 0 3px 5px 0 rgba(0,0,0, .35)
-) {
+.button,
+.btn {
+    $btn-shadow: inset 0 3px 5px 0 rgba(0,0,0, .35) !default;
+
+    text-align: center;
+
     @extend %base-transition;
 
     @include element-state('hover') {
-        text-decoration: none;
+        background: darken(get-color('additional', 'middle'), 50%);
     }
 
     @include element-state('active') {
-        box-shadow: $shadow;
+        box-shadow:  $btn-shadow;
     }
 
     &[disabled] {
         opacity: .65;
     }
 
+    //
+    &--action {
+        border-color: get-color('additional', 'darker');
+        background-color: get-color('additional', 'darker');
+        color: get-color('additional', 'ultra');
+
+        @include element-state('hover') {
+            border-color: lighten(get-color('additional', 'darker'), 5%);
+            background: lighten(get-color('additional', 'darker'), 5%);
+            color: get-color('additional', 'ultra');
+        }
+    }
+
+    &--info {
+        border-color: get-color('primary', 'base') ;
+        background-color: get-color('primary', 'base');
+        color: get-color('additional', 'ultra');
+
+        @include element-state('hover') {
+            border-color: lighten(get-color('primary', 'base'), 5%);
+            background-color: lighten(get-color('primary', 'base'), 5%);
+            color: get-color('additional', 'ultra');
+        }
+    }
+
+    &--link {
+        border-color: transparent;
+        background-color: transparent;
+        color: get-color('ui', 'normal');
+
+        @include element-state('hover') {
+            color: get-color('ui', 'focus');
+        }
+
+        @include element-state('active') {
+            box-shadow: none;
+        }
+    }
+
+    //
     &--large {
         min-width: 200px;
     }
 
     &--size {
         &-l {
-            padding: $size-l;
+            padding: 15px 22px;
         }
 
         &-m {
-            padding: $size-m;
+            padding: 8px 15px;
         }
 
         &-s {
-            padding: $size-s;
+            padding: 6px 18px;
         }
     }
 
@@ -43,78 +83,11 @@
     }
 }
 
-.button,
-.btn {
-    text-align: center;
-
-    @include element-state('hover') {
-        background: lighten(get-color('primary', 'base'), 5%);
-    }
-
-    @include button-basic-states();
-
-    &.theme-btn {
-        padding: 0 29px;
-        line-height: 47px;
-    }
-}
-
-.button-info,
-.btn-info {
-    @include  base-ui-element(
-                $use-base-style: true,
-                $padding: $base-ui-element-offset,
-                $border: 1px solid get-color('additional', 'darker'),
-                $border-radius: $base-ui-element-border-radius,
-                $background-color: get-color('additional', 'darker'),
-                $color: get-color('additional', 'ultra')
-            );
-
-    @include element-state('hover') {
-        color: get-color('additional', 'ultra');
-    }
-
-    @include button-basic-states();
-}
-
-.button-link,
-.btn-link {
-    @include  base-ui-element(
-                $use-base-style: true,
-                $padding: $base-ui-element-offset,
-                $border: 1px solid transparent,
-                $border-radius: null,
-                $background-color: transparent,
-                $color: get-color('ui', 'normal')
-            );
-
-    @include element-state('hover') {
-        color: get-color('ui', 'focus');
-    }
-
-    @include button-basic-states($size-m: 8px 6px, $size-s: 6px, $shadow: null);
-}
-
-.button-primary,
-.btn-primary {
-    @include  base-ui-element(
-            $use-base-style: true,
-            $padding: $base-ui-element-offset,
-            $border: 1px solid get-color('additional', 'middle'),
-            $border-radius: $base-ui-element-border-radius,
-            $background-color: get-color('additional', 'middle'),
-            $color:get-color('additional', 'ultra')
-    );
-
-    @include element-state('hover') {
-        color: get-color('additional', 'ultra');
-    }
-
-    @include button-basic-states();
-}
-
 @include breakpoint('mobile-landscape') {
-    .button--full-in-mobile {
-        width: 100%;
+    .button,
+    .btn {
+        &--full-in-mobile {
+            width: 100%;
+        }
     }
 }
