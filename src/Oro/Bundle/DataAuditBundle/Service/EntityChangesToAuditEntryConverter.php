@@ -61,6 +61,7 @@ class EntityChangesToAuditEntryConverter
      * @param \DateTime       $loggedAt
      * @param EntityReference $user
      * @param EntityReference $organization
+     * @param EntityReference $impersonation
      * @param string|null     $auditDefaultAction
      */
     public function convert(
@@ -69,6 +70,7 @@ class EntityChangesToAuditEntryConverter
         \DateTime $loggedAt,
         EntityReference $user,
         EntityReference $organization,
+        EntityReference $impersonation,
         $auditDefaultAction = null
     ) {
         $auditEntryClass = $this->auditEntityMapper->getAuditEntryClass($this->getEntityByReference($user));
@@ -103,7 +105,8 @@ class EntityChangesToAuditEntryConverter
                     $entityId,
                     $loggedAt,
                     $user,
-                    $organization
+                    $organization,
+                    $impersonation
                 );
             }
             if (!$audit->getAction()) {
@@ -130,6 +133,7 @@ class EntityChangesToAuditEntryConverter
      * @param \DateTime       $loggedAt
      * @param EntityReference $user
      * @param EntityReference $organization
+     * @param EntityReference $impersonation
      * @param string          $auditDefaultAction
      */
     public function convertSkipFields(
@@ -138,6 +142,7 @@ class EntityChangesToAuditEntryConverter
         \DateTime $loggedAt,
         EntityReference $user,
         EntityReference $organization,
+        EntityReference $impersonation,
         $auditDefaultAction
     ) {
         $auditEntryClass = $this->auditEntityMapper->getAuditEntryClass($this->getEntityByReference($user));
@@ -161,6 +166,7 @@ class EntityChangesToAuditEntryConverter
                     $loggedAt,
                     $user,
                     $organization,
+                    $impersonation,
                     $auditDefaultAction
                 );
             }
@@ -234,9 +240,12 @@ class EntityChangesToAuditEntryConverter
      * @param \DateTime       $loggedAt
      * @param EntityReference $user
      * @param EntityReference $organization
+     * @param EntityReference $impersonation
      * @param string|null     $action
      *
      * @return AbstractAudit
+     *
+     * @SuppressWarnings(PHPMD.ExcessiveParameterList)
      */
     private function createAuditEntity(
         EntityManager $auditEntityManager,
@@ -247,6 +256,7 @@ class EntityChangesToAuditEntryConverter
         \DateTime $loggedAt,
         EntityReference $user,
         EntityReference $organization,
+        EntityReference $impersonation,
         $action = null
     ) {
         /** @var AbstractAudit $audit */
@@ -257,6 +267,7 @@ class EntityChangesToAuditEntryConverter
         $audit->setLoggedAt($loggedAt);
         $audit->setUser($this->getEntityByReference($user));
         $audit->setOrganization($this->getEntityByReference($organization));
+        $audit->setImpersonation($this->getEntityByReference($impersonation));
         $audit->setObjectName(
             $this->entityNameProvider->getEntityName($auditEntryClass, $entityClass, $entityId)
         );

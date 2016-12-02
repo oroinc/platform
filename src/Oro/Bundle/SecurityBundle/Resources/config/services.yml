@@ -124,7 +124,6 @@ services:
         class: %oro_security.acl.privilege_repository.class%
         arguments:
             - '@oro_security.acl.manager'
-            - '@translator'
 
     oro_security.acl.sid_manager:
         class: %oro_security.acl.sid_manager.class%
@@ -303,6 +302,7 @@ services:
             - '@oro_entity_config.provider.entity'
             - '@oro_entity_config.provider.extend'
             - '@doctrine'
+            - '@translator'
             - '@oro_security.entity_security_metadata_provider.cache'
 
     oro_security.entity_security_metadata_provider.cache:
@@ -316,6 +316,7 @@ services:
         class: %oro_security.action_metadata_provider.class%
         arguments:
             - '@oro_security.acl.annotation_provider'
+            - '@translator'
             - '@oro_security.action_metadata_provider.cache'
 
     oro_security.action_metadata_provider.cache:

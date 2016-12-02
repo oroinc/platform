@@ -1,10 +1,13 @@
 <?php
+
 namespace Oro\Bundle\DataAuditBundle\Async;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
+
 use Oro\Bundle\DataAuditBundle\Model\EntityReference;
 use Oro\Bundle\DataAuditBundle\Service\EntityChangesToAuditEntryConverter;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
+use Oro\Bundle\UserBundle\Entity\Impersonation;
 use Oro\Component\MessageQueue\Client\TopicSubscriberInterface;
 use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
 use Oro\Component\MessageQueue\Transport\MessageInterface;
@@ -51,12 +54,18 @@ class AuditChangedEntitiesRelationsProcessor implements MessageProcessorInterfac
             $organization = new EntityReference(Organization::class, $body['organization_id']);
         }
 
+        $impersonation = new EntityReference();
+        if (isset($body['impersonation_id'])) {
+            $impersonation = new EntityReference(Impersonation::class, $body['impersonation_id']);
+        }
+
         $this->entityChangesToAuditEntryConverter->convert(
             $body['collections_updated'],
             $transactionId,
             $loggedAt,
             $user,
-            $organization
+            $organization,
+            $impersonation
         );
         
         return self::ACK;

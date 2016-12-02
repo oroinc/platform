@@ -42,6 +42,9 @@ class WorkflowManager implements LoggerAwareInterface
     /** @var WorkflowApplicabilityFilterInterface[] */
     private $applicabilityFilters = [];
 
+    /** @var array */
+    private $startedWorkflows = [];
+
     /**
      * @param WorkflowRegistry         $workflowRegistry
      * @param DoctrineHelper           $doctrineHelper
@@ -165,13 +168,18 @@ class WorkflowManager implements LoggerAwareInterface
      * @param string|Transition|null $transition
      * @param array                  $data
      * @param bool                   $throwGroupException
-     * @return WorkflowItem
+     * @return WorkflowItem|null
      * @throws WorkflowRecordGroupException
      */
     public function startWorkflow($workflow, $entity, $transition = null, array $data = [], $throwGroupException = true)
     {
         //consider to refactor (e.g. remove) type check in favor of string usage only as most cases are
         $workflow = $workflow instanceof Workflow ? $workflow : $this->workflowRegistry->getWorkflow($workflow);
+
+        if (!$this->isStartAllowedForEntity($workflow, $entity)) {
+            return null;
+        }
+
         if (!$transition) {
             $transition = $workflow->getTransitionManager()->getDefaultStartTransition();
 
@@ -180,7 +188,9 @@ class WorkflowManager implements LoggerAwareInterface
             }
         }
 
-        if (!$this->isStartAllowedByRecordGroups($entity, $workflow->getDefinition()->getExclusiveRecordGroups())) {
+        if ($this->doctrineHelper->getSingleEntityIdentifier($entity) !== null &&
+            !$this->isStartAllowedByRecordGroups($entity, $workflow->getDefinition()->getExclusiveRecordGroups())
+        ) {
             if ($throwGroupException) {
                 throw new WorkflowRecordGroupException(
                     sprintf(
@@ -194,7 +204,7 @@ class WorkflowManager implements LoggerAwareInterface
             return null;
         }
 
-        return $this->inTransaction(
+        $workflowItem = $this->inTransaction(
             function (EntityManager $em) use ($workflow, $entity, $transition, &$data) {
                 $workflowItem = $workflow->start($entity, $data, $transition);
                 $em->persist($workflowItem);
@@ -204,6 +214,9 @@ class WorkflowManager implements LoggerAwareInterface
             },
             WorkflowItem::class
         );
+        $this->unsetStartedWorkflowForEntity($workflow, $entity);
+
+        return $workflowItem;
     }
 
     /**
@@ -518,6 +531,51 @@ class WorkflowManager implements LoggerAwareInterface
         }
 
         return true;
+    }
+
+    /**
+     * Return false if the Workflow already started for the Entity
+     *
+     * @param Workflow $workflow
+     * @param object $entity
+     * @return bool
+     */
+    protected function isStartAllowedForEntity(Workflow $workflow, $entity)
+    {
+        $entityId = $this->doctrineHelper->getSingleEntityIdentifier($entity);
+        if ($entityId && array_key_exists($workflow->getName(), $this->startedWorkflows)) {
+            foreach ($this->startedWorkflows[$workflow->getName()] as $startedEntity) {
+                $startedEntityId = $this->doctrineHelper->getSingleEntityIdentifier($startedEntity);
+                if ($startedEntityId && ($startedEntityId === $entityId)) {
+                    return false;
+                }
+            }
+        }
+        $this->startedWorkflows[$workflow->getName()][] = $entity;
+
+        return true;
+    }
+
+    /**
+     * Unset started workflow for entity
+     *
+     * @param Workflow $workflow
+     * @param object $entity
+     */
+    protected function unsetStartedWorkflowForEntity(Workflow $workflow, $entity)
+    {
+        $entityId = $this->doctrineHelper->getSingleEntityIdentifier($entity);
+        if ($entityId === null || !array_key_exists($workflow->getName(), $this->startedWorkflows)) {
+            return;
+        }
+
+        foreach ($this->startedWorkflows[$workflow->getName()] as $key => $startedEntity) {
+            $startedEntityId = $this->doctrineHelper->getSingleEntityIdentifier($startedEntity);
+            if ($startedEntityId && ($startedEntityId === $entityId)) {
+                unset($this->startedWorkflows[$workflow->getName()][$key]);
+                break;
+            }
+        }
     }
 
     /**

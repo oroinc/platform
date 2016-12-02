@@ -6,7 +6,7 @@ define(function(require) {
     var PermissionModel = require('orouser/js/models/role/permission-model');
     var AccessLevelsCollection = require('orouser/js/models/role/access-levels-collection');
     var BaseCollection = require('oroui/js/app/models/base/collection');
-    var RowView = require('orouser/js/datagrid/action-permissions-row-view');
+    var RowView = require('oroworkflow/js/datagrid/workflow-action-permissions-row-view');
     var ReadonlyRowView = require('orouser/js/datagrid/action-permissions-readonly-row-view');
 
     workflowDatagridBuilder = {
