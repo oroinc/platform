@@ -12,6 +12,7 @@ use Oro\Bundle\MigrationBundle\Migration\Extension\NameGeneratorAwareInterface;
 use Oro\Bundle\MigrationBundle\Migration\Migration;
 use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 use Oro\Bundle\MigrationBundle\Tools\DbIdentifierNameGenerator;
+use Oro\Bundle\NoteBundle\Migration\UpdateAssociationKindQuery;
 
 class UpdateNoteAssociationKind implements
     Migration,

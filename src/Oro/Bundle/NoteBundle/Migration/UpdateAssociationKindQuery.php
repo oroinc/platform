@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\NoteBundle\Migrations\Schema\v1_3;
+namespace Oro\Bundle\NoteBundle\Migration;
 
 use Psr\Log\LoggerInterface;
 

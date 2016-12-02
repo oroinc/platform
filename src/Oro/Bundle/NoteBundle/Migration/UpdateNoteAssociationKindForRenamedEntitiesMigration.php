@@ -13,7 +13,6 @@ use Oro\Bundle\MigrationBundle\Migration\Extension\NameGeneratorAwareInterface;
 use Oro\Bundle\MigrationBundle\Migration\Migration;
 use Oro\Bundle\MigrationBundle\Migration\OrderedMigrationInterface;
 use Oro\Bundle\MigrationBundle\Migration\QueryBag;
-use Oro\Bundle\NoteBundle\Migrations\Schema\v1_3\UpdateAssociationKindQuery;
 use Oro\Bundle\MigrationBundle\Tools\DbIdentifierNameGenerator;
 
 abstract class UpdateNoteAssociationKindForRenamedEntitiesMigration implements
