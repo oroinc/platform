@@ -13,7 +13,7 @@ define([
      * @class   oroworkflow.WorkflowTransitionHandler
      */
     return function(pageRefresh) {
-        var pageRefresh = _.isUndefined(pageRefresh) ? true : pageRefresh;
+        pageRefresh = _.isUndefined(pageRefresh) ? true : pageRefresh;
 
         var element = $(this);
         if (element.data('_in-progress')) {

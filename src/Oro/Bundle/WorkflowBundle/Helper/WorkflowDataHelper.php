@@ -150,14 +150,34 @@ class WorkflowDataHelper
             'transitionName' => $transition->getName(),
             'entityId' => $entity->getId(),
         ];
+
         if ($isStarted) {
+            $urlParams = [
+                'transitionName' => $transition->getName(),
+                'workflowItemId' => $workflowItem->getId(),
+            ];
+
+            if ($transition->getDisplayType() === 'dialog') {
+                if ($transition->hasForm()) {
+                    return [
+                        'dialogUrl' => $this->router->generate(
+                            'oro_workflow_widget_transition_form',
+                            $urlParams,
+                            UrlGeneratorInterface::ABSOLUTE_URL
+                        ),
+                        'transitionUrl' => $this->router->generate(
+                            'oro_api_workflow_transit',
+                            $urlParams,
+                            UrlGeneratorInterface::ABSOLUTE_URL
+                        ),
+                    ];
+                }
+            }
+
             return [
                 'transitionUrl' => $this->router->generate(
                     'oro_api_workflow_transit',
-                    [
-                        'transitionName' => $transition->getName(),
-                        'workflowItemId' => $workflowItem->getId(),
-                    ],
+                    $urlParams,
                     UrlGeneratorInterface::ABSOLUTE_URL
                 ),
             ];
@@ -190,7 +210,7 @@ class WorkflowDataHelper
 
         return [
             'transitionUrl' => $this->router->generate(
-                'oro_workflow_start_transition_form',
+                'oro_workflow_transition_form',
                 $urlParams,
                 UrlGeneratorInterface::ABSOLUTE_URL
             ),
