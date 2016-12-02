@@ -16,6 +16,7 @@ use Oro\Bundle\ApiBundle\DependencyInjection\Compiler\DataTransformerConfigurati
 use Oro\Bundle\ApiBundle\DependencyInjection\Compiler\EntityAliasesConfigurationCompilerPass;
 use Oro\Bundle\ApiBundle\DependencyInjection\Compiler\ExceptionTextExtractorConfigurationCompilerPass;
 use Oro\Bundle\ApiBundle\DependencyInjection\Compiler\ExclusionProviderConfigurationCompilerPass;
+use Oro\Bundle\ApiBundle\DependencyInjection\Compiler\QueryExpressionCompilerPass;
 
 class OroApiBundle extends Bundle
 {
@@ -32,6 +33,7 @@ class OroApiBundle extends Bundle
         $container->addCompilerPass(new ExclusionProviderConfigurationCompilerPass());
         $container->addCompilerPass(new ExceptionTextExtractorConfigurationCompilerPass());
         $container->addCompilerPass(new ConstraintTextExtractorConfigurationCompilerPass());
+        $container->addCompilerPass(new QueryExpressionCompilerPass());
         $container->addCompilerPass(
             new LoadProcessorsCompilerPass(
                 'oro_api.processor_bag',

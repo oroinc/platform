@@ -5,6 +5,9 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Util;
 use Doctrine\ORM\QueryBuilder;
 
 use Oro\Bundle\ApiBundle\Collection\Criteria;
+use Oro\Bundle\ApiBundle\Collection\QueryExpressionVisitorFactory;
+use Oro\Bundle\ApiBundle\Collection\QueryVisitorExpression\EqComparisonExpression;
+use Oro\Bundle\ApiBundle\Collection\QueryVisitorExpression\OrCompositeExpression;
 use Oro\Bundle\ApiBundle\Tests\Unit\OrmRelatedTestCase;
 use Oro\Bundle\ApiBundle\Util\CriteriaConnector;
 use Oro\Bundle\ApiBundle\Util\CriteriaNormalizer;
@@ -21,14 +24,21 @@ class CriteriaConnectorTest extends OrmRelatedTestCase
     /** @var CriteriaConnector */
     protected $criteriaConnector;
 
+    protected $expressionVisitorFactory;
+
     protected function setUp()
     {
         parent::setUp();
 
         $this->criteria = new Criteria(new EntityClassResolver($this->doctrine));
+        $this->expressionVisitorFactory = new QueryExpressionVisitorFactory(
+            ['OR' => new OrCompositeExpression()],
+            ['=' => new EqComparisonExpression()]
+        );
         $this->criteriaConnector = new CriteriaConnector(
             new CriteriaNormalizer(),
-            new CriteriaPlaceholdersResolver()
+            new CriteriaPlaceholdersResolver(),
+            $this->expressionVisitorFactory
         );
     }
 
@@ -249,5 +259,31 @@ class CriteriaConnectorTest extends OrmRelatedTestCase
             . ' LEFT JOIN owner1.owner owner2'
             . ' ORDER BY owner2.name ASC'
         );
+    }
+
+    public function testCriteriaWithFirstResult()
+    {
+        $qb = new QueryBuilder($this->em);
+        $qb->select('e')->from($this->getEntityClass('User'), 'e');
+        $this->criteria->setFirstResult(12);
+
+        $this->assertEquals(0, $qb->getFirstResult());
+
+        $this->criteriaConnector->applyCriteria($qb, $this->criteria);
+
+        $this->assertEquals(12, $qb->getFirstResult());
+    }
+
+    public function testCriteriaWithMaxResultsResult()
+    {
+        $qb = new QueryBuilder($this->em);
+        $qb->select('e')->from($this->getEntityClass('User'), 'e');
+        $this->criteria->setMaxResults(3);
+
+        $this->assertEquals(0, $qb->getMaxResults());
+
+        $this->criteriaConnector->applyCriteria($qb, $this->criteria);
+
+        $this->assertEquals(3, $qb->getMaxResults());
     }
 }
