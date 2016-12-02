@@ -28,8 +28,8 @@ services:
     tags:
       - { name: 'oro_behat.isolator', priority: 110 }
 
-  oro_behat_extension.isolation.unix_mysql_isolator:
-    class: 'Oro\Bundle\TestFrameworkBundle\Behat\Isolation\UnixMysqlIsolator'
+  oro_behat_extension.isolation.unix_mysql_simple_isolator:
+    class: 'Oro\Bundle\TestFrameworkBundle\Behat\Isolation\UnixMysqlSyncIsolator'
     arguments:
       - '@symfony2_extension.kernel'
     tags:
@@ -54,4 +54,15 @@ services:
     arguments:
       - '@symfony2_extension.kernel'
     tags:
-      - { name: 'oro_behat.isolator', priority: 130 }
+      - { name: 'oro_behat.isolator', priority: 200 }
+
+  oro_behat_extension.isolation.doctrine_isolator:
+    class: 'Oro\Bundle\TestFrameworkBundle\Behat\Isolation\DoctrineIsolator'
+    arguments:
+      - '@symfony2_extension.kernel'
+      - '@oro_test.context.fixture_loader'
+      - '@oro_test.reference_repository_initializer'
+      - '@oro_test.alice_loader'
+    tags:
+      - { name: 'oro_behat.isolator', priority: 300 }
+      - { name: 'suite_aware' }

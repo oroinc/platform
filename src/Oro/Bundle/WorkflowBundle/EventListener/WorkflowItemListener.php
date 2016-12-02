@@ -97,6 +97,16 @@ class WorkflowItemListener
                 throw new WorkflowException('Workflow item does not contain related entity');
             }
             $entityId = $this->doctrineHelper->getSingleEntityIdentifier($entity);
+
+            if (null === $entityId) {
+                throw new WorkflowException(
+                    sprintf(
+                        'Workflow "%s" can not be started because ID of related entity is null',
+                        $workflowItem->getWorkflowName()
+                    )
+                );
+            }
+
             $workflowItem->setEntityId($entityId);
 
             $entityClass = $this->doctrineHelper->getEntityClass($entity);

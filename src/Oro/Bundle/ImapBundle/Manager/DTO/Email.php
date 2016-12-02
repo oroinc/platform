@@ -103,11 +103,12 @@ class Email extends EmailHeader
         if ($this->attachments === null) {
             $this->attachments = array();
 
-            if ($this->getBody()->getContent() === self::EMAIL_EMPTY_BODY_CONTENT) {
+            $attachments = $this->message->getAttachments();
+            if (!$attachments && $this->getBody()->getContent() === self::EMAIL_EMPTY_BODY_CONTENT) {
                 $attachment = $this->message->getMessageAsAttachment();
-                $attachments = $attachment === null ? [] : [$attachment];
-            } else {
-                $attachments = $this->message->getAttachments();
+                if ($attachment) {
+                    $attachments[] = $attachment;
+                }
             }
 
             foreach ($attachments as $a) {
