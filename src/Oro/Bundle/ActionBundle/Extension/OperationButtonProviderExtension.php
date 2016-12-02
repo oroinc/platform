@@ -103,7 +103,9 @@ class OperationButtonProviderExtension implements ButtonProviderExtensionInterfa
      */
     protected function getOperations(ButtonSearchContext $buttonSearchContext)
     {
-        return $this->operationRegistry->find(OperationFindCriteria::createFromButtonSearchContext($buttonSearchContext));
+        return $this->operationRegistry->find(
+            OperationFindCriteria::createFromButtonSearchContext($buttonSearchContext)
+        );
     }
 
     /**

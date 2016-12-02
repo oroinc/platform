@@ -76,6 +76,8 @@ Please use `Oro\Bundle\ActionBundle\Provider\CurrentApplicationProvider` and `Or
     - added filter `oro_action_has_buttons`, used `Oro\Bundle\ActionBundle\Provider\ButtonProvider` and `Oro\Bundle\ActionBundle\Provider\ButtonSearchContextProvider`
     - removed filter `has_operations`
 - Renamed js component `oroaction/js/app/components/buttons-component` to `oroaction/js/app/components/button-component` (from plural to single)
+- Added tag `oro_action.operation_registry.filter` to be able to register custom final filters for `Oro\Bundle\ActionBundle\Model\OperationRegistry::find` result. Custom filter must implement `Oro\Bundle\ActionBundle\Model\OperationRegistryFilterInterface`
+- Changed signature for `Oro\Bundle\ActionBundle\Model\OperationRegistry::find` it now accepts only one argument `Oro\Bundle\ActionBundle\Model\Criteria\OperationFindCriteria`.
 
 ####ApiBundle
 - The `oro.api.action_processor` DI tag was removed. To add a new action processor, use `oro_api.actions` section of the ApiBundle configuration.
@@ -298,6 +300,7 @@ To migrate all labels from configuration translatable fields automatically you c
 - Changed `Oro\Bundle\WorkflowBundle\Model\Workflow`, added methods `getInitEntities()` and `getInitRoutes()` to obtain the appropriate options from the configuration
 - Changed `Oro\Bundle\WorkflowBundle\Model\WorkflowAssembler::assembleAttributes`, now it pass transition configuration into `AttributeAssembler::assemble()`
 - Added method `getActiveWorkflows()` to `Oro\Bundle\WorkflowBundle\Model\WorkflowRegistry`
+- Added class `Oro\Bundle\WorkflowBundle\Filter\WorkflowOperationFilter` and registered as an additional (tag: `oro_action.operation_registry.filter`) filter for OperationRegistry.
 
 ####LocaleBundle:
 - Added helper `Oro\Bundle\LocaleBundle\Helper\LocalizationQueryTrait` for adding necessary joins to QueryBuilder

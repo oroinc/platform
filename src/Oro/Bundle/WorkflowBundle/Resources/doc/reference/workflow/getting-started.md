@@ -10,6 +10,7 @@ Table of Contents
  - [Activation State](#activation-state)
  - [Mutually Exclusive Workflows](#mutually-exclusive-workflows)
  - [Filtering by Scopes](#filtering-by-scopes)
+ - [Disabling Operations](#disabling-operations)
  - [Configuration](#configuration)
  - [Console commands](#console-commands)
 
@@ -171,7 +172,7 @@ Filtering by Scopes
 If the scope configuration is provided for the workflow, the Oro application will use only the workflows, selected by filtering all available workflows using the scopes defined for `worflow_definition` scope type. 
 
 Example of scope configuration in :
-```
+```YAML
         scopes:
             -
                 scopeField1: 2
@@ -184,13 +185,32 @@ Example of scope configuration in :
 
 For more information about scopes see [ScopeBundle documentation](../../../../../ScopeBundle/Resources/doc/scope.md).
 
+Disabling Operations
+--------------------
+
+Some of workflows can be used to expand already existent configuration and replace old (primitive) behavior.
+So that usually some simple custom behavior on Oro based applications were managed through [Operations](../../../../../ActionBundle/Resources/doc/operations.md).
+And when you have created more advanced way to manage business logic trough specific workflow configuration you might need to disable those operations.
+It can be done trough `disable_operations` configuration node:
+
+```YAML
+        disable_operations:
+            operation_one:      #disable operation for custom entities (match by context)
+                - EntityClass1
+                - EntityClass2
+                - EntityClass3
+            operation_two: ~    #disable operation for any occurrences 
+
+```
+
+
 Configuration
 -------------
 
 All Workflow entities are described in configuration. Look at example of simple Workflow configuration that performs
 some action with User entity.
 
-``` yaml
+```YAML
 workflows:
     example_user_flow:                            # name of the workflow
         entity: Oro\Bundle\UserBundle\Entity\User # workflow related entity
