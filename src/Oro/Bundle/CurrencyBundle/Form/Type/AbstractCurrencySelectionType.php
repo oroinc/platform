@@ -86,9 +86,11 @@ abstract class AbstractCurrencySelectionType extends AbstractType
         ]);
 
         $resolver->setNormalizer('choice_label', function (Options $options, $value) {
-            $viewType = $options['compact']
-                ? ViewTypeProviderInterface::VIEW_TYPE_ISO_CODE
-                : ViewTypeProviderInterface::VIEW_TYPE_FULL_NAME;
+            $viewType = null;
+
+            if ($options['compact']) {
+                $viewType = ViewTypeProviderInterface::VIEW_TYPE_ISO_CODE;
+            }
 
             return function ($currencyCode) use ($viewType) {
                 return $this->currencyNameHelper->getCurrencyName($currencyCode, $viewType);
