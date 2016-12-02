@@ -74,8 +74,8 @@ class ExpressionProcessor
         $this->processedValues = [];
 
         if (array_key_exists('visible', $values)) {
-            $this->processRootValue('visible', $values['visible'], $context, $data, $evaluate, $encoding);
             $this->visible = $values['visible'];
+            $this->processRootValue('visible', $this->visible, $context, $data, $evaluate, $encoding);
         }
 
         foreach ($values as $key => $value) {

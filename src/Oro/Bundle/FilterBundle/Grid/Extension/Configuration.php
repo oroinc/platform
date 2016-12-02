@@ -51,6 +51,7 @@ class Configuration implements ConfigurationInterface
                             ->end()
                             ->booleanNode(FilterUtility::BY_HAVING_KEY)->end()
                             ->booleanNode(FilterUtility::ENABLED_KEY)->defaultTrue()->end()
+                            ->booleanNode(FilterUtility::VISIBLE_KEY)->defaultTrue()->end()
                             ->booleanNode(FilterUtility::TRANSLATABLE_KEY)->defaultTrue()->end()
                         ->end()
                     ->end()

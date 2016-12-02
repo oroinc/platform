@@ -412,7 +412,7 @@ class DbalMessageConsumerTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue($dbal))
         ;
         $connection
-            ->expects($this->exactly(3))
+            ->expects($this->exactly(2))
             ->method('getTableName')
             ->will($this->returnValue('tableName'))
         ;
@@ -461,7 +461,7 @@ class DbalMessageConsumerTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue($dbal))
         ;
         $connection
-            ->expects($this->exactly(2))
+            ->expects($this->once())
             ->method('getTableName')
             ->will($this->returnValue('tableName'))
         ;
@@ -474,6 +474,7 @@ class DbalMessageConsumerTest extends \PHPUnit_Framework_TestCase
         ;
 
         $consumer = new DbalMessageConsumer($session, new DbalDestination('queue'));
+        $consumer->setPollingInterval(100);
         $result = $consumer->receive(1);
 
         $this->assertEmpty($result);
@@ -499,7 +500,7 @@ class DbalMessageConsumerTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue($dbal))
         ;
         $connection
-            ->expects($this->exactly(2))
+            ->expects($this->once())
             ->method('getTableName')
             ->will($this->returnValue('tableName'))
         ;
@@ -539,7 +540,7 @@ class DbalMessageConsumerTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue($dbal))
         ;
         $connection
-            ->expects($this->exactly(2))
+            ->expects($this->once())
             ->method('getTableName')
             ->will($this->returnValue('tableName'))
         ;
@@ -587,7 +588,7 @@ class DbalMessageConsumerTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue($dbal))
         ;
         $connection
-            ->expects($this->exactly(3))
+            ->expects($this->exactly(2))
             ->method('getTableName')
             ->will($this->returnValue('tableName'))
         ;
@@ -643,7 +644,7 @@ class DbalMessageConsumerTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue($dbal))
         ;
         $connection
-            ->expects($this->exactly(3))
+            ->expects($this->exactly(2))
             ->method('getTableName')
             ->will($this->returnValue('tableName'))
         ;

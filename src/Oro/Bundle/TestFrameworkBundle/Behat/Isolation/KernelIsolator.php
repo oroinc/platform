@@ -42,7 +42,6 @@ class KernelIsolator implements IsolatorInterface
     /** {@inheritdoc} */
     public function afterTest(AfterIsolatedTestEvent $event)
     {
-        $this->kernel->getContainer()->get('doctrine')->getManager()->clear();
         $this->kernel->shutdown();
     }
 

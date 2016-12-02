@@ -311,11 +311,7 @@ define([
 
         render: function() {
             this._deferredRender();
-            if (this.template) {
-                this.renderCustomTemplate();
-            } else {
-                Row.__super__.render.apply(this, arguments);
-            }
+            Row.__super__.render.apply(this, arguments);
             var state = {selected: false};
             this.model.trigger('backgrid:isSelected', this.model, state);
             this.$el.toggleClass('row-selected', state.selected);
@@ -333,6 +329,14 @@ define([
             }
 
             return this;
+        },
+
+        renderAllItems: function() {
+            if (this.template) {
+                this.renderCustomTemplate();
+            } else {
+                return Row.__super__.renderAllItems.apply(this, arguments);
+            }
         },
 
         renderCustomTemplate: function() {

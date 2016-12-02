@@ -12,15 +12,14 @@ use Oro\Bundle\WorkflowBundle\EventListener\Extension\TransitionEventTriggerExte
 use Oro\Bundle\WorkflowBundle\Handler\TransitionEventTriggerHandler;
 use Oro\Bundle\WorkflowBundle\Helper\TransitionEventTriggerHelper;
 
-use Oro\Component\MessageQueue\Client\MessageProducerInterface;
+use Oro\Bundle\MessageQueueBundle\Test\Unit\MessageQueueExtension;
 
 class TransitionEventTriggerExtensionTest extends AbstractEventTriggerExtensionTest
 {
+    use MessageQueueExtension;
+
     /** @var \PHPUnit_Framework_MockObject_MockObject|TransitionEventTriggerRepository */
     protected $repository;
-
-    /** @var \PHPUnit_Framework_MockObject_MockObject|MessageProducerInterface */
-    protected $producer;
 
     /** @var \PHPUnit_Framework_MockObject_MockObject|TransitionEventTriggerHelper */
     protected $helper;
@@ -42,8 +41,6 @@ class TransitionEventTriggerExtensionTest extends AbstractEventTriggerExtensionT
             ->with(TransitionEventTrigger::class)
             ->willReturn($this->repository);
 
-        $this->producer = $this->getMock(MessageProducerInterface::class);
-
         $this->helper = $this->getMockBuilder(TransitionEventTriggerHelper::class)
             ->disableOriginalConstructor()
             ->getMock();
@@ -55,7 +52,7 @@ class TransitionEventTriggerExtensionTest extends AbstractEventTriggerExtensionT
         $this->extension = new TransitionEventTriggerExtension(
             $this->doctrineHelper,
             $this->triggerCache,
-            $this->producer,
+            self::getMessageProducer(),
             $this->helper,
             $this->handler
         );
@@ -65,7 +62,7 @@ class TransitionEventTriggerExtensionTest extends AbstractEventTriggerExtensionT
     {
         parent::tearDown();
 
-        unset($this->producer, $this->helper, $this->handler, $this->repository);
+        unset($this->helper, $this->handler, $this->repository);
     }
 
     /**
@@ -222,8 +219,6 @@ class TransitionEventTriggerExtensionTest extends AbstractEventTriggerExtensionT
             ->with($expectedTrigger, $entity)
             ->willReturn($mainEntity);
 
-        $this->producer->expects($this->never())->method($this->anything());
-
         $this->handler->expects($this->once())
             ->method('process')
             ->with($expectedTrigger, TransitionTriggerMessage::create($expectedTrigger, null))
@@ -232,6 +227,8 @@ class TransitionEventTriggerExtensionTest extends AbstractEventTriggerExtensionT
         $this->callPreFunctionByEventName(EventTriggerInterface::EVENT_CREATE, $entity);
 
         $this->extension->process($this->entityManager);
+
+        self::assertMessagesEmpty(TransitionTriggerProcessor::EVENT_TOPIC_NAME);
     }
 
     public function testProcessWithoutMainEntity()
@@ -243,11 +240,12 @@ class TransitionEventTriggerExtensionTest extends AbstractEventTriggerExtensionT
         $this->helper->expects($this->any())->method('getMainEntity')->willReturn(null);
 
         $this->handler->expects($this->never())->method($this->anything());
-        $this->producer->expects($this->never())->method($this->anything());
 
         $this->callPreFunctionByEventName(EventTriggerInterface::EVENT_CREATE, $this->getMainEntity());
 
         $this->extension->process($this->entityManager);
+
+        self::assertMessagesEmpty(TransitionTriggerProcessor::EVENT_TOPIC_NAME);
     }
 
     /**
@@ -275,20 +273,18 @@ class TransitionEventTriggerExtensionTest extends AbstractEventTriggerExtensionT
 
         $this->handler->expects($this->never())->method($this->anything());
 
-        $this->producer->expects($this->once())
-            ->method('send')
-            ->with(
-                TransitionTriggerProcessor::EVENT_TOPIC_NAME,
-                [
-                    TransitionTriggerMessage::TRANSITION_TRIGGER => $expectedTrigger->getId(),
-                    TransitionTriggerMessage::MAIN_ENTITY => null
-                ]
-            );
-
         $this->callPreFunctionByEventName(EventTriggerInterface::EVENT_CREATE, $entity);
 
         $this->extension->setForceQueued($forceQueued);
         $this->extension->process($this->entityManager);
+
+        self::assertMessageSent(
+            TransitionTriggerProcessor::EVENT_TOPIC_NAME,
+            [
+                TransitionTriggerMessage::TRANSITION_TRIGGER => $expectedTrigger->getId(),
+                TransitionTriggerMessage::MAIN_ENTITY => null
+            ]
+        );
     }
 
     /**
