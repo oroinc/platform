@@ -4,8 +4,10 @@ namespace Oro\Bundle\DataAuditBundle\Entity;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\UserBundle\Entity\AbstractUser;
+use Oro\Bundle\UserBundle\Entity\Impersonation;
 
 /**
  * @ORM\Entity(repositoryClass="Oro\Bundle\DataAuditBundle\Entity\Repository\AuditRepository")
@@ -99,6 +101,14 @@ abstract class AbstractAudit
      * @ORM\JoinColumn(name="organization_id", referencedColumnName="id", onDelete="SET NULL")
      */
     protected $organization;
+
+    /**
+     * @var Impersonation $impersonation
+     *
+     * @ORM\ManyToOne(targetEntity="Oro\Bundle\UserBundle\Entity\Impersonation")
+     * @ORM\JoinColumn(name="impersonation_id", referencedColumnName="id", onDelete="SET NULL")
+     */
+    protected $impersonation;
 
     /**
      * @var string $transactionId
@@ -215,6 +225,25 @@ abstract class AbstractAudit
     public function getOrganization()
     {
         return $this->organization;
+    }
+
+    /**
+     * @param Impersonation $impersonation
+     * @return $this
+     */
+    public function setImpersonation(Impersonation $impersonation = null)
+    {
+        $this->impersonation = $impersonation;
+
+        return $this;
+    }
+
+    /**
+     * @return Impersonation
+     */
+    public function getImpersonation()
+    {
+        return $this->impersonation;
     }
 
     /**
