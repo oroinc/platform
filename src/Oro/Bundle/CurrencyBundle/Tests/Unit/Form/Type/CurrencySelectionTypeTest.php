@@ -20,7 +20,7 @@ class CurrencySelectionTypeTest extends FormIntegrationTestCase
     /**
      * @var \PHPUnit_Framework_MockObject_MockObject|CurrencyProviderInterface
      */
-    protected $configManager;
+    protected $currencyProvider;
 
     /**
      * @var \PHPUnit_Framework_MockObject_MockObject|\Oro\Bundle\LocaleBundle\Model\LocaleSettings
@@ -39,7 +39,7 @@ class CurrencySelectionTypeTest extends FormIntegrationTestCase
     {
         parent::setUp();
 
-        $this->configManager = $this->getMockBuilder(CurrencyProviderInterface::class)
+        $this->currencyProvider = $this->getMockBuilder(CurrencyProviderInterface::class)
             ->setMethods([
                 'getCurrencyList',
                 'getDefaultCurrency',
@@ -60,7 +60,7 @@ class CurrencySelectionTypeTest extends FormIntegrationTestCase
         $this->currencyNameHelper = new CurrencyNameHelperStub();
 
         $this->formType = new CurrencySelectionType(
-            $this->configManager,
+            $this->currencyProvider,
             $this->localeSettings,
             $this->currencyNameHelper
         );
@@ -83,7 +83,7 @@ class CurrencySelectionTypeTest extends FormIntegrationTestCase
         $submittedData
     ) {
         $hasCustomCurrencies = isset($inputOptions['currencies_list']) || !empty($inputOptions['full_currency_list']);
-        $this->configManager->expects($hasCustomCurrencies ? $this->never() : $this->once())
+        $this->currencyProvider->expects($hasCustomCurrencies ? $this->never() : $this->once())
             ->method('getCurrencyList')
             ->willReturn($allowedCurrencies);
 

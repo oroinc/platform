@@ -23,7 +23,7 @@ abstract class AbstractCurrencySelectionType extends AbstractType
     /**
      * $var CurrencyConfigInterface
      */
-    protected $currencyConfig;
+    protected $currencyProvider;
     /**
      * @var LocaleSettings
      */
@@ -40,18 +40,18 @@ abstract class AbstractCurrencySelectionType extends AbstractType
     protected $currencyNameHelper;
 
     /**
-     * @param CurrencyProviderInterface $currencyConfig
+     * @param CurrencyProviderInterface $currencyProvider
      * @param LocaleSettings $localeSettings
      * @param CurrencyNameHelper $currencyNameHelper
      */
     public function __construct(
-        CurrencyProviderInterface $currencyConfig,
+        CurrencyProviderInterface $currencyProvider,
         LocaleSettings $localeSettings,
         CurrencyNameHelper $currencyNameHelper
     ) {
-        $this->currencyConfig       = $currencyConfig;
-        $this->localeSettings       = $localeSettings;
-        $this->currencyNameHelper   = $currencyNameHelper;
+        $this->currencyProvider = $currencyProvider;
+        $this->localeSettings = $localeSettings;
+        $this->currencyNameHelper = $currencyNameHelper;
     }
 
     /**
@@ -189,7 +189,7 @@ abstract class AbstractCurrencySelectionType extends AbstractType
      */
     protected function getCurrencies()
     {
-        return $this->currencyConfig->getCurrencyList();
+        return $this->currencyProvider->getCurrencyList();
     }
 
     /**
@@ -197,7 +197,7 @@ abstract class AbstractCurrencySelectionType extends AbstractType
      */
     protected function getDefaultCurrency()
     {
-        return $this->currencyConfig->getDefaultCurrency();
+        return $this->currencyProvider->getDefaultCurrency();
     }
 
     /**
