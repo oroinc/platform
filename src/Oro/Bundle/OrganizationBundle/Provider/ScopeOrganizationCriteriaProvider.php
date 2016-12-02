@@ -52,7 +52,7 @@ class ScopeOrganizationCriteriaProvider extends AbstractScopeCriteriaProvider
     /**
      * {@inheritdoc}
      */
-    protected function getCriteriaValueType()
+    public function getCriteriaValueType()
     {
         return Organization::class;
     }

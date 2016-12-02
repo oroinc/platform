@@ -14,6 +14,7 @@ use Oro\Bundle\NavigationBundle\Tests\Unit\Entity\Stub\MenuUpdateStub;
 use Oro\Bundle\NavigationBundle\Tests\Unit\MenuItemTestTrait;
 use Oro\Bundle\ScopeBundle\Entity\Scope;
 use Oro\Bundle\ScopeBundle\Manager\ScopeManager;
+use Oro\Component\Testing\Unit\EntityTrait;
 
 class MenuUpdateManagerTest extends \PHPUnit_Framework_TestCase
 {
@@ -21,6 +22,7 @@ class MenuUpdateManagerTest extends \PHPUnit_Framework_TestCase
     const SCOPE_TYPE = 'scope_type';
 
     use MenuItemTestTrait;
+    use EntityTrait;
 
     /** @var EntityRepository|\PHPUnit_Framework_MockObject_MockObject */
     protected $entityRepository;
@@ -45,7 +47,11 @@ class MenuUpdateManagerTest extends \PHPUnit_Framework_TestCase
      */
     protected function setUp()
     {
-        $this->entityRepository = $this->getMock(EntityRepository::class, [], [], '', false);
+        $this->entityRepository = $this->getMock(EntityRepository::class, [
+            'findBy',
+            'findOneBy',
+            'findMenuUpdatesByScopeIds',
+        ], [], '', false);
 
         $this->entityManager = $this->getMock(EntityManager::class, [], [], '', false);
         $this->entityManager
@@ -144,6 +150,34 @@ class MenuUpdateManagerTest extends \PHPUnit_Framework_TestCase
 
         $result = $this->manager->getMenuUpdatesByMenuAndScope($menuName, $scope);
         $this->assertEquals([$update], $result);
+    }
+
+    public function testGetMenuUpdatesByScopeIds()
+    {
+        $menuName = 'test-menu';
+        $scopeIds = [2, 5, 1];
+
+        $update1 = new MenuUpdateStub();
+        $update1->setKey('update_1');
+        $update1->setScope($this->getEntity(Scope::class, ['id' => 5]));
+        $update2 = new MenuUpdateStub();
+        $update2->setKey('update_2');
+        $update2->setScope($this->getEntity(Scope::class, ['id' => 1]));
+        $update3 = new MenuUpdateStub();
+        $update3->setKey('update_3');
+        $update3->setScope($this->getEntity(Scope::class, ['id' => 2]));
+
+        $this->manager->setEntityClass(MenuUpdateStub::class);
+
+        $this->entityRepository
+            ->expects($this->once())
+            ->method('findMenuUpdatesByScopeIds')
+            ->with($menuName, $scopeIds)
+            ->willReturn([$update1, $update2, $update3]);
+
+        $result = $this->manager->getMenuUpdatesByScopeIds($menuName, $scopeIds);
+
+        $this->assertEquals([$update2, $update1, $update3], $result);
     }
 
     public function testGetMenuUpdateByKeyAndScopeWithMenuItem()
