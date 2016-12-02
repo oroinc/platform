@@ -1,11 +1,14 @@
 <?php
+
 namespace Oro\Bundle\DataAuditBundle\Async;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
+
 use Oro\Bundle\DataAuditBundle\Entity\AbstractAudit;
 use Oro\Bundle\DataAuditBundle\Model\EntityReference;
 use Oro\Bundle\DataAuditBundle\Service\EntityChangesToAuditEntryConverter;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
+use Oro\Bundle\UserBundle\Entity\Impersonation;
 use Oro\Component\MessageQueue\Client\Message;
 use Oro\Component\MessageQueue\Client\MessagePriority;
 use Oro\Component\MessageQueue\Client\MessageProducerInterface;
@@ -61,12 +64,18 @@ class AuditChangedEntitiesProcessor implements MessageProcessorInterface, TopicS
             $organization = new EntityReference(Organization::class, $body['organization_id']);
         }
 
+        $impersonation = new EntityReference();
+        if (isset($body['impersonation_id'])) {
+            $impersonation = new EntityReference(Impersonation::class, $body['impersonation_id']);
+        }
+
         $this->entityChangesToAuditEntryConverter->convert(
             $body['entities_inserted'],
             $transactionId,
             $loggedAt,
             $user,
             $organization,
+            $impersonation,
             AbstractAudit::ACTION_CREATE
         );
 
@@ -76,6 +85,7 @@ class AuditChangedEntitiesProcessor implements MessageProcessorInterface, TopicS
             $loggedAt,
             $user,
             $organization,
+            $impersonation,
             AbstractAudit::ACTION_UPDATE
         );
 
@@ -85,6 +95,7 @@ class AuditChangedEntitiesProcessor implements MessageProcessorInterface, TopicS
             $loggedAt,
             $user,
             $organization,
+            $impersonation,
             AbstractAudit::ACTION_REMOVE
         );
 
