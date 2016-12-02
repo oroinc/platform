@@ -13,6 +13,7 @@ Table of Contents
  - [Change the maximum number of entities that can be deleted by one request](#change-the-maximum-number-of-entities-that-can-be-deleted-by-one-request)
  - [Configure nested object](#configure-nested-object)
  - [Turn on Extended Many-To-One Associations](#turn-on-extended-many-to-one-associations)
+ - [Turn on Extended Many-To-Many Associations](#turn-on-extended-many-to-many-associations)
 
 
 Turn on API for entity
@@ -241,3 +242,43 @@ api:
 ```
 
 After applying configuration like above, the `target` relationship will be available in scope of [get_list](./actions.md#get_list-action), [get](./actions.md#get-action), [create](./actions.md#create-action) and [update](./actions.md#update-action) actions. Also the `target` relationship will be available as subresource and it will be possible to perform [get_subresource](./actions.md#get_subresource-action), [get_relationship](./actions.md#get_relationship-action) and [update_relationship](./actions.md#update_relationship-action) actions.
+
+The `data_type` parameter has format: `association:relationType:associationKind`, where
+
+ - `relationType` part should have 'manyToOne' value for extended Many-To-One Associations;
+ - `associationKind` - optional part. The association kind.
+
+Turn on Extended Many-To-Many Associations
+-----------------------------------------
+
+For detail what are extended associations, please refer to [Associations](../../../EntityExtendBundle/Resources/doc/associations.md) topic.
+
+Depending on current entity configuration, each association resource (e.g. call) can be assigned to several resources (e.g. user, account, contact) that supports such associations.
+
+By default, there is no possibility to retrieve targets of such associations. But this behaviour can be enabled via configuration in `Resources/config/oro/api.yml`, for instance:
+
+```yaml
+api:
+    entities:
+        Oro\Bundle\CallBundle\Entity\Callt:
+            fields:
+                activityTargets:
+                    data_type: association:manyToMany:activity
+```
+
+After applying configuration like above, the `activityTargets` relationship will be available in scope of 
+[get_list](./actions.md#get_list-action), 
+[get](./actions.md#get-action), 
+[create](./actions.md#create-action) and 
+[update](./actions.md#update-action) actions. 
+Also the `activityTargets` relationship will be available as subresource and it will be possible to perform 
+[get_subresource](./actions.md#get_subresource-action), 
+[get_relationship](./actions.md#get_relationship-action), 
+[add_relationship](./actions.md#add_relationship-action),
+[update_relationship](./actions.md#update_relationship-action) and.
+[delete_relationship](./actions.md#delete_relationship-action) actions.
+
+The `data_type` parameter has format: `association:relationType:associationKind`, where
+
+ - `relationType` part should have 'manyToMany' value for extended Many-To-Many Associations;
+ - `associationKind` - optional part. The association kind.
