@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\ActionBundle\Tests\Unit\Filter\Stub;
 
+use Oro\Bundle\ActionBundle\Model\Criteria\OperationFindCriteria;
 use Oro\Bundle\ActionBundle\Model\OperationRegistryFilterInterface;
 
 class CallbackOperationRegistryFilter implements OperationRegistryFilterInterface
@@ -16,8 +17,8 @@ class CallbackOperationRegistryFilter implements OperationRegistryFilterInterfac
     }
 
     /** {@inheritdoc} */
-    public function filter(array $operations, $entityClass, $route, $datagrid)
+    public function filter(array $operations, OperationFindCriteria $findCriteria)
     {
-        return call_user_func($this->callable, $operations, $entityClass, $datagrid, $route);
+        return call_user_func($this->callable, $operations, $findCriteria);
     }
 }

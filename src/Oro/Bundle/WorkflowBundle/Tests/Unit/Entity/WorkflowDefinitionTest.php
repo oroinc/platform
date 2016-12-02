@@ -67,6 +67,24 @@ class WorkflowDefinitionTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($this->workflowDefinition->hasScopesConfig());
     }
 
+    public function testGetHasDisabledOperations()
+    {
+        $definition = new WorkflowDefinition();
+
+        $this->assertEquals([], $definition->getDisabledOperations());
+        $this->assertFalse($definition->hasDisabledOperations());
+
+        $disabledOperationsConfig = [
+            'operation' => ['className'],
+            'operationWithoutClass' => []
+        ];
+
+        $definition->setConfiguration([WorkflowConfiguration::NODE_DISABLE_OPERATIONS => $disabledOperationsConfig]);
+
+        $this->assertEquals($disabledOperationsConfig, $definition->getDisabledOperations());
+        $this->assertTrue($definition->hasDisabledOperations());
+    }
+
     public function testName()
     {
         $this->assertNull($this->workflowDefinition->getName());

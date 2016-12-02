@@ -7,13 +7,12 @@ use Doctrine\ORM\ORMException;
 use Oro\Bundle\ActionBundle\Configuration\ConfigurationProviderInterface;
 use Oro\Bundle\ActionBundle\Helper\ArraySubstitution;
 use Oro\Bundle\ActionBundle\Model\Assembler\OperationAssembler;
+use Oro\Bundle\ActionBundle\Model\Criteria\OperationFindCriteria;
 use Oro\Bundle\ActionBundle\Provider\CurrentApplicationProviderInterface;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 
 class OperationRegistry
 {
-    const DEFAULT_GROUP = '';
-
     /** @var ConfigurationProviderInterface */
     protected $configurationProvider;
 
@@ -61,24 +60,21 @@ class OperationRegistry
     }
 
     /**
-     * @param string|null $entityClass
-     * @param string|null $route
-     * @param string|null $datagrid
-     * @param string|array|null $group
+     * @param OperationFindCriteria $criteria
      * @return Operation[]
      */
-    public function find($entityClass, $route, $datagrid, $group = null)
+    public function find(OperationFindCriteria $criteria)
     {
         $this->loadConfiguration();
 
-        $configurations = $this->filterByGroup($group);
+        $configurations = $this->filterByGroup($criteria->getGroups());
 
         /** @var Operation[] $operations */
         $operations = [];
         $replacements = [];
 
         foreach ($configurations as $name => $config) {
-            if (!$this->isApplicable($config, $entityClass, $route, $datagrid)) {
+            if (!$this->isApplicable($config, $criteria)) {
                 continue;
             }
 
@@ -97,7 +93,7 @@ class OperationRegistry
         $this->substitution->setMap($replacements);
         $this->substitution->apply($operations);
 
-        return $this->filter($operations, $entityClass, $datagrid, $route);
+        return $this->filter($operations, $criteria);
     }
 
     /**
@@ -133,28 +129,24 @@ class OperationRegistry
     }
 
     /**
-     * @param string|array|null $group
+     * @param array $expectedGroups
      * @return array
      */
-    protected function filterByGroup($group = null)
+    protected function filterByGroup(array $expectedGroups)
     {
-        $expected = $this->normalizeGroups($group);
+        return array_filter($this->configuration, function (array $operation) use ($expectedGroups) {
+            $groups = (array)$operation['groups'] ?: [ButtonInterface::DEFAULT_GROUP];
 
-        return array_filter($this->configuration, function (array $operation) use ($expected) {
-            $groups = (array)$operation['groups'] ?: [static::DEFAULT_GROUP];
-
-            return 0 !== count(array_intersect($expected, $groups));
+            return 0 !== count(array_intersect($expectedGroups, $groups));
         });
     }
 
     /**
      * @param array $config
-     * @param string|null $entityClass
-     * @param string|null $route
-     * @param string|null $datagrid
+     * @param OperationFindCriteria $findCriteria
      * @return bool
      */
-    protected function isApplicable(array $config, $entityClass, $route, $datagrid)
+    protected function isApplicable(array $config, OperationFindCriteria $findCriteria)
     {
         if (!(bool)$config['enabled']) {
             return false;
@@ -164,20 +156,20 @@ class OperationRegistry
             return false;
         }
 
-        return $this->isEntityClassMatched($entityClass, $config) ||
-            $this->isRouteMatched($route, $config) ||
-            $this->isDatagridMatched($datagrid, $config);
+        return $this->isEntityClassMatched($findCriteria, $config) ||
+            $this->isRouteMatched($findCriteria, $config) ||
+            $this->isDatagridMatched($findCriteria, $config);
     }
 
     /**
-     * @param string $className
+     * @param OperationFindCriteria $criteria
      * @param array $config
      * @return bool
      */
-    private function isEntityClassMatched($className, array $config)
+    private function isEntityClassMatched(OperationFindCriteria $criteria, array $config)
     {
         return $this->match(
-            $className,
+            $criteria->getEntityClass(),
             $this->filterEntities((array)$config['entities']),
             $this->filterEntities((array)$config['exclude_entities']),
             (bool)$config['for_all_entities']
@@ -185,24 +177,25 @@ class OperationRegistry
     }
 
     /**
-     * @param string $route
+     * @param OperationFindCriteria $criteria
      * @param array $config
      * @return bool
      */
-    private function isRouteMatched($route, array $config)
+    private function isRouteMatched(OperationFindCriteria $criteria, array $config)
     {
+        $route = $criteria->getRoute();
         return $route && in_array($route, $config['routes'], true);
     }
 
     /**
-     * @param string $datagrid
+     * @param OperationFindCriteria $criteria
      * @param array $config
      * @return bool
      */
-    private function isDatagridMatched($datagrid, array $config)
+    private function isDatagridMatched(OperationFindCriteria $criteria, array $config)
     {
         return $this->match(
-            $datagrid,
+            $criteria->getDatagrid(),
             (array)$config['datagrids'],
             (array)$config['exclude_datagrids'],
             (bool)$config['for_all_datagrids']
@@ -223,26 +216,6 @@ class OperationRegistry
         }
 
         return ($forAll && !in_array($value, $exclusion, true)) || (!$forAll && in_array($value, $inclusion, true));
-    }
-
-    /**
-     * @param string|array|null $group
-     * @return array
-     */
-    protected function normalizeGroups($group)
-    {
-        $groups = (array)$group;
-
-        if (!$groups) {
-            $groups = [static::DEFAULT_GROUP];
-        }
-
-        return array_map(
-            function ($group) {
-                return (string)$group;
-            },
-            $groups
-        );
     }
 
     /**
@@ -286,19 +259,17 @@ class OperationRegistry
 
     /**
      * @param Operation[] $operations
-     * @param string|null $entityClass
-     * @param string|null $datagrid
-     * @param string|null $route
+     * @param OperationFindCriteria $findCriteria
      * @return Operation[]
      */
-    private function filter($operations, $entityClass, $datagrid, $route)
+    private function filter($operations, OperationFindCriteria $findCriteria)
     {
         if (count($this->filters) === 0) {
             return $operations;
         }
 
         foreach ($this->filters as $filter) {
-            $operations = $filter->filter($operations, $entityClass, $route, $datagrid);
+            $operations = $filter->filter($operations, $findCriteria);
         }
 
         return $operations;

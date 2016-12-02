@@ -8,9 +8,10 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 class OperationRegistryFilterPass implements CompilerPassInterface
 {
+    use TaggedServicesCompilerPassTrait;
+    
     const OPERATION_REGISTRY_SERVICE_ID = 'oro_action.operation_registry';
     const OPERATION_REGISTRY_FILTER_TAG = 'oro_action.operation_registry.filter';
-    use TaggedServicesCompilerPassTrait;
 
     /** {@inheritdoc} */
     public function process(ContainerBuilder $container)

@@ -203,15 +203,15 @@ class WorkflowDefinitionConfigurationBuilder extends AbstractConfigurationBuilde
     protected function filterConfiguration(array $configuration)
     {
         $configurationKeys = [
-            WorkflowConfiguration::NODE_STEPS,
             WorkflowDefinition::CONFIG_SCOPES,
+            WorkflowConfiguration::NODE_DISABLE_OPERATIONS,
+            WorkflowConfiguration::NODE_STEPS,
             WorkflowConfiguration::NODE_ATTRIBUTES,
             WorkflowConfiguration::NODE_TRANSITIONS,
             WorkflowConfiguration::NODE_TRANSITION_DEFINITIONS,
             WorkflowConfiguration::NODE_ENTITY_RESTRICTIONS,
             WorkflowConfiguration::NODE_INIT_ENTITIES,
             WorkflowConfiguration::NODE_INIT_ROUTES,
-            WorkflowConfiguration::NODE_DISABLE_OPERATIONS,
         ];
 
         return array_intersect_key($configuration, array_flip($configurationKeys));

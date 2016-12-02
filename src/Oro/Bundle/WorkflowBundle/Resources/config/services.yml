@@ -372,3 +372,10 @@ services:
             - 'oro_workflow_widget_start_transition_form'
             - 'oro_workflow_start_transition_form'
             - 'oro_api_workflow_start'
+
+    oro_workflow.operation_registry.filter:
+        class: Oro\Bundle\WorkflowBundle\Filter\WorkflowOperationFilter
+        arguments:
+            - '@doctrine'
+        tags:
+            - { name: oro_action.operation_registry.filter }

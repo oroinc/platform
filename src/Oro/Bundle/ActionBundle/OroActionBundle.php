@@ -27,6 +27,6 @@ class OroActionBundle extends Bundle
         $container->addCompilerPass(new ConfigurationPass(), PassConfig::TYPE_AFTER_REMOVING);
         $container->addCompilerPass(new MassActionProviderPass(), PassConfig::TYPE_AFTER_REMOVING);
         $container->addCompilerPass(new ButtonProviderPass(), PassConfig::TYPE_AFTER_REMOVING);
-        $container->addCompilerPass(new OperationRegistryFilterPass(), PassConfig::TYPE_AFTER_REMOVING);
+        $container->addCompilerPass(new OperationRegistryFilterPass());
     }
 }

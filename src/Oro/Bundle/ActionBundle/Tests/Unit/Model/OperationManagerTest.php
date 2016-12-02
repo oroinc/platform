@@ -10,6 +10,7 @@ use Oro\Bundle\ActionBundle\Model\ActionData;
 use Oro\Bundle\ActionBundle\Model\ActionGroupRegistry;
 use Oro\Bundle\ActionBundle\Model\Assembler\AttributeAssembler;
 use Oro\Bundle\ActionBundle\Model\Assembler\FormOptionsAssembler;
+use Oro\Bundle\ActionBundle\Model\Criteria\OperationFindCriteria;
 use Oro\Bundle\ActionBundle\Model\Operation;
 use Oro\Bundle\ActionBundle\Model\OperationDefinition;
 use Oro\Bundle\ActionBundle\Model\OperationManager;
@@ -123,7 +124,7 @@ class OperationManagerTest extends \PHPUnit_Framework_TestCase
 
         $this->operationRegistry->expects($this->once())
             ->method('find')
-            ->with($class, $route, $datagrid, $group)
+            ->with(new OperationFindCriteria($class, $route, $datagrid, $group))
             ->willReturn($operations);
 
         $this->assertGetOperations($expected, $context);

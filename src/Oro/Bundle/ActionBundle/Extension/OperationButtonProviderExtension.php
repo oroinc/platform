@@ -6,6 +6,7 @@ use Oro\Bundle\ActionBundle\Helper\ContextHelper;
 use Oro\Bundle\ActionBundle\Model\ActionData;
 use Oro\Bundle\ActionBundle\Model\ButtonContext;
 use Oro\Bundle\ActionBundle\Model\ButtonSearchContext;
+use Oro\Bundle\ActionBundle\Model\Criteria\OperationFindCriteria;
 use Oro\Bundle\ActionBundle\Model\Operation;
 use Oro\Bundle\ActionBundle\Model\OperationButton;
 use Oro\Bundle\ActionBundle\Model\OperationRegistry;
@@ -102,12 +103,7 @@ class OperationButtonProviderExtension implements ButtonProviderExtensionInterfa
      */
     protected function getOperations(ButtonSearchContext $buttonSearchContext)
     {
-        return $this->operationRegistry->find(
-            $buttonSearchContext->getEntityClass(),
-            $buttonSearchContext->getRouteName(),
-            $buttonSearchContext->getGridName(),
-            $buttonSearchContext->getGroup()
-        );
+        return $this->operationRegistry->find(OperationFindCriteria::createFromButtonSearchContext($buttonSearchContext));
     }
 
     /**

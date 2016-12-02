@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\WorkflowBundle\Tests\Functional\Model;
 
+use Oro\Bundle\ActionBundle\Model\Criteria\OperationFindCriteria;
 use Oro\Bundle\ActionBundle\Model\Operation;
 use Oro\Bundle\ActionBundle\Model\OperationRegistry;
 use Oro\Bundle\CacheBundle\Provider\FilesystemCache;
@@ -44,9 +45,11 @@ class OperationRegistryTest extends WebTestCase
     public function testFindWithDisablingFromWorkflows()
     {
         $operations = $this->operationRegistry->find(
-            'Oro\Bundle\TestFrameworkBundle\Entity\Item',
-            'test_operation_route',
-            'test_operation_datagrid'
+            new OperationFindCriteria(
+                'Oro\Bundle\TestFrameworkBundle\Entity\Item',
+                'test_operation_route',
+                'test_operation_datagrid'
+            )
         );
 
         $this->assertCount(1, $operations);
