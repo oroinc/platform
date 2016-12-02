@@ -58,7 +58,7 @@ class OroUserBundleInstaller implements
      */
     public function getMigrationVersion()
     {
-        return 'v1_23';
+        return 'v1_24';
     }
 
     /**
@@ -220,6 +220,7 @@ class OroUserBundleInstaller implements
         $table->addColumn('password_requested', 'datetime', ['notnull' => false, 'precision' => 0]);
         $table->addColumn('last_login', 'datetime', ['notnull' => false, 'precision' => 0]);
         $table->addColumn('login_count', 'integer', ['default' => '0', 'precision' => 0, 'unsigned' => true]);
+        $table->addColumn('login_disabled', 'boolean', ['default' => false]);
         $table->addColumn('createdAt', 'datetime', ['precision' => 0]);
         $table->addColumn('updatedAt', 'datetime', ['precision' => 0]);
         $table->addUniqueIndex(['username'], 'UNIQ_F82840BCF85E0677');
