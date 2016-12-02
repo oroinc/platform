@@ -32,7 +32,7 @@ interface LayoutBuilderInterface extends LayoutManipulatorInterface
         $blockType,
         array $options = [],
         $siblingId = null,
-        $prepend = false
+        $prepend = null
     );
 
     /**
@@ -51,12 +51,12 @@ interface LayoutBuilderInterface extends LayoutManipulatorInterface
      * @param string|null $parentId  The id or alias of a parent item the specified item is moved to
      *                               If this parameter is null only the order of the item is changed
      * @param string|null $siblingId The id or alias of an item which should be nearest neighbor
-     * @param bool        $prepend   Determines whether the moving item should be located before or after
+     * @param bool|null   $prepend   Determines whether the moving item should be located before or after
      *                               the specified sibling item
      *
      * @return self
      */
-    public function move($id, $parentId = null, $siblingId = null, $prepend = false);
+    public function move($id, $parentId = null, $siblingId = null, $prepend = null);
 
     /**
      * Creates an alias for the specified item

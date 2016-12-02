@@ -271,6 +271,52 @@ class HierarchyCollectionTest extends \PHPUnit_Framework_TestCase
         );
     }
 
+    public function testAddLast()
+    {
+        // prepare hierarchy
+        $this->hierarchyCollection->add([], 'root');
+        $this->hierarchyCollection->add(['root'], 'item1');
+        $this->hierarchyCollection->add(['root'], 'item2');
+
+        // do test
+        $this->hierarchyCollection->add(['root'], 'item3', null, false);
+        $this->hierarchyCollection->add(['root'], 'item4');
+        $this->assertSame(
+            [
+                'root' => [
+                    'item1' => [],
+                    'item2' => [],
+                    'item4' => [],
+                    'item3' => [],
+                ]
+            ],
+            $this->hierarchyCollection->get([])
+        );
+    }
+
+    public function testAddFirst()
+    {
+        // prepare hierarchy
+        $this->hierarchyCollection->add([], 'root');
+        $this->hierarchyCollection->add(['root'], 'item1');
+        $this->hierarchyCollection->add(['root'], 'item2');
+
+        // do test
+        $this->hierarchyCollection->add(['root'], 'item3');
+        $this->hierarchyCollection->add(['root'], 'item4', null, true);
+        $this->assertSame(
+            [
+                'root' => [
+                    'item4' => [],
+                    'item1' => [],
+                    'item2' => [],
+                    'item3' => [],
+                ]
+            ],
+            $this->hierarchyCollection->get([])
+        );
+    }
+
     public function testMove()
     {
         // prepare hierarchy
