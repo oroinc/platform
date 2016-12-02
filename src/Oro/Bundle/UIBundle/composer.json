@@ -6,7 +6,7 @@
     "homepage": "https://github.com/laboro/UIBundle",
     "license": "MIT",
     "require": {
-        "php": ">=5.5.9",
+        "php": ">=5.6",
         "symfony/framework-bundle": "2.8.*",
         "kriswallsmith/assetic": "1.1.*@dev",
         "symfony/assetic-bundle": "2.1.*",
@@ -19,7 +19,7 @@
         "components/jquery": "3.1.*",
         "bower-asset/backbone": "1.2.3",
         "bower-asset/underscore": "1.8.3",
-        "vakata/jstree": "^3.2",
+        "vakata/jstree": "3.3.*",
         "components/jqueryui": "1.12.*",
         "bower-asset/select2": "3.4.1",
         "bower-asset/chaplin": "1.0.0",
