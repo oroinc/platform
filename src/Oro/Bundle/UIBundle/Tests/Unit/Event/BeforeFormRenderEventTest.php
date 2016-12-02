@@ -15,8 +15,9 @@ class BeforeFormRenderEventTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
         $formData = array('test');
+        $entity = new \stdClass();
 
-        $event = new BeforeFormRenderEvent($formView, $formData, $env);
+        $event = new BeforeFormRenderEvent($formView, $formData, $env, $entity);
 
         $this->assertEquals($formView, $event->getForm());
         $this->assertEquals($formData, $event->getFormData());
@@ -24,5 +25,6 @@ class BeforeFormRenderEventTest extends \PHPUnit_Framework_TestCase
         $formDataNew = array('test_new');
         $event->setFormData($formDataNew);
         $this->assertEquals($formDataNew, $event->getFormData());
+        $this->assertEquals($entity, $event->getEntity());
     }
 }

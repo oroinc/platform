@@ -3,12 +3,12 @@
 namespace Oro\Bundle\ActionBundle\Tests\Unit\Model;
 
 use Oro\Bundle\ActionBundle\Configuration\ConfigurationProviderInterface;
-use Oro\Bundle\ActionBundle\Helper\ApplicationsHelper;
 use Oro\Bundle\ActionBundle\Helper\ContextHelper;
 use Oro\Bundle\ActionBundle\Model\Assembler\AttributeAssembler;
 use Oro\Bundle\ActionBundle\Model\Assembler\FormOptionsAssembler;
 use Oro\Bundle\ActionBundle\Model\Assembler\OperationAssembler;
 use Oro\Bundle\ActionBundle\Model\OperationRegistry;
+use Oro\Bundle\ActionBundle\Provider\CurrentApplicationProviderInterface;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 
 use Oro\Component\Action\Action\ActionFactory;
@@ -22,8 +22,8 @@ class OperationRegistryTest extends \PHPUnit_Framework_TestCase
     /** @var OperationAssembler */
     protected $assembler;
 
-    /** @var ApplicationsHelper|\PHPUnit_Framework_MockObject_MockObject */
-    protected $applicationsHelper;
+    /** @var CurrentApplicationProviderInterface|\PHPUnit_Framework_MockObject_MockObject */
+    protected $applicationProvider;
 
     /** @var DoctrineHelper|\PHPUnit_Framework_MockObject_MockObject */
     protected $doctrineHelper;
@@ -71,10 +71,8 @@ class OperationRegistryTest extends \PHPUnit_Framework_TestCase
             'Oro\Bundle\ActionBundle\Model\Assembler\FormOptionsAssembler'
         )->disableOriginalConstructor()->getMock();
 
-        $this->applicationsHelper = $this->getMockBuilder('Oro\Bundle\ActionBundle\Helper\ApplicationsHelper')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->applicationsHelper->expects($this->any())
+        $this->applicationProvider = $this->getMock(CurrentApplicationProviderInterface::class);
+        $this->applicationProvider->expects($this->any())
             ->method('isApplicationsValid')
             ->willReturnCallback(
                 function (array $applications) {
@@ -105,7 +103,7 @@ class OperationRegistryTest extends \PHPUnit_Framework_TestCase
         $this->registry = new OperationRegistry(
             $this->configurationProvider,
             $this->assembler,
-            $this->applicationsHelper,
+            $this->applicationProvider,
             $this->doctrineHelper
         );
     }

@@ -5,10 +5,10 @@
     "keywords": ["ORO", "BAP", "Routing"],
     "license": "MIT",
     "require": {
-        "php": ">=5.5.9",
-        "symfony/config": "~2.3",
-        "symfony/http-kernel": "~2.3",
-        "symfony/routing": "~2.3",
+        "php": ">=5.6",
+        "symfony/config": "2.8.*",
+        "symfony/http-kernel": "2.8.*",
+        "symfony/routing": "2.8.*",
         "oro/php-utils": "dev-master"
     },
     "autoload": {
