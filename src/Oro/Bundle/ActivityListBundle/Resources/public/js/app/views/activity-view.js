@@ -110,8 +110,11 @@ define(function(require) {
         onTransition: function(e) {
             e.preventDefault();
             var $el = $(e.target);
+            var activityModel = this.model;
 
             $el.one('transitions_success', function() {
+                // manually update the model in case the workflow transition does not change any of it's attributes
+                activityModel.set('updatedAt', new Date());
                 mediator.trigger('widget_success:activity_list:item:update');
             });
 
