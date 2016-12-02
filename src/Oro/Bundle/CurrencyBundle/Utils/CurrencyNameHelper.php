@@ -5,7 +5,7 @@ namespace Oro\Bundle\CurrencyBundle\Utils;
 use Symfony\Component\Intl\Intl;
 
 use Oro\Bundle\CurrencyBundle\Entity\Price;
-use Oro\Bundle\CurrencyBundle\Provider\CurrencyListAwareInterface;
+use Oro\Bundle\CurrencyBundle\Provider\CurrencyListProviderInterface;
 use Oro\Bundle\CurrencyBundle\Provider\ViewTypeProviderInterface;
 use Oro\Bundle\LocaleBundle\Formatter\NumberFormatter;
 use Oro\Bundle\LocaleBundle\Model\LocaleSettings;
@@ -25,13 +25,13 @@ class CurrencyNameHelper
      * @param LocaleSettings $localeSettings
      * @param NumberFormatter $formatter
      * @param ViewTypeProviderInterface $viewTypeProvider
-     * @param CurrencyListAwareInterface $currencyProvider
+     * @param CurrencyListProviderInterface $currencyProvider
      */
     public function __construct(
         LocaleSettings $localeSettings,
         NumberFormatter $formatter,
         ViewTypeProviderInterface $viewTypeProvider,
-        CurrencyListAwareInterface $currencyProvider
+        CurrencyListProviderInterface $currencyProvider
     ) {
         $this->viewTypeProvider     = $viewTypeProvider;
         $this->localeSettings       = $localeSettings;

@@ -4,12 +4,14 @@ namespace Oro\Bundle\CurrencyBundle\Tests\Units\Utils;
 
 use Oro\Bundle\CurrencyBundle\Entity\Price;
 use Oro\Bundle\CurrencyBundle\Provider\ViewTypeProviderInterface;
-use Oro\Bundle\CurrencyBundle\Tests\Unit\Provider\CurrencyListAwareStub;
+use Oro\Bundle\CurrencyBundle\Tests\Unit\Provider\CurrencyListProviderStub;
 use Oro\Bundle\CurrencyBundle\Utils\CurrencyNameHelper;
 
 class CurrencyNameHelperTest extends \PHPUnit_Framework_TestCase implements ViewTypeProviderInterface
 {
-    /** @var  string */
+    /**
+     * @var string
+     */
     private $viewType;
 
     /**
@@ -30,7 +32,7 @@ class CurrencyNameHelperTest extends \PHPUnit_Framework_TestCase implements View
             $this->getLocaleStub('en'),
             $this->formatter,
             $this,
-            new CurrencyListAwareStub()
+            new CurrencyListProviderStub()
         );
 
         $this->viewType = ViewTypeProviderInterface::VIEW_TYPE_ISO_CODE;
@@ -46,7 +48,7 @@ class CurrencyNameHelperTest extends \PHPUnit_Framework_TestCase implements View
             $this->getLocaleStub('fr'),
             $this->formatter,
             $this,
-            new CurrencyListAwareStub()
+            new CurrencyListProviderStub()
         );
 
         $this->viewType = ViewTypeProviderInterface::VIEW_TYPE_ISO_CODE;
@@ -62,7 +64,7 @@ class CurrencyNameHelperTest extends \PHPUnit_Framework_TestCase implements View
             $this->getLocaleStub('en'),
             $this->formatter,
             $this,
-            new CurrencyListAwareStub()
+            new CurrencyListProviderStub()
         );
 
         $this->viewType = ViewTypeProviderInterface::VIEW_TYPE_SYMBOL;
@@ -72,24 +74,31 @@ class CurrencyNameHelperTest extends \PHPUnit_Framework_TestCase implements View
     public function testGetCurrencyChoices()
     {
         $this->viewType = ViewTypeProviderInterface::VIEW_TYPE_SYMBOL;
-        $currencyProvider = new CurrencyListAwareStub();
+        $currencyProvider = new CurrencyListProviderStub();
         $currencyProvider->setCurrencyList(['USD', 'EUR']);
 
         $currencyNameHelper = new CurrencyNameHelper(
             $this->getLocaleStub('en'),
             $this->formatter,
             $this,
-            new CurrencyListAwareStub()
+            new CurrencyListProviderStub()
         );
 
         $this->assertEquals(['USD' => '$', 'EUR' => '€'], $currencyNameHelper->getCurrencyChoices());
     }
 
+    /**
+     * @return string
+     */
     public function getViewType()
     {
         return $this->viewType;
     }
 
+    /**
+     * @param string $localeCode
+     * @return \PHPUnit_Framework_MockObject_MockObject
+     */
     private function getLocaleStub($localeCode)
     {
         $localeSettings = $this->getMockBuilder('Oro\Bundle\LocaleBundle\Model\LocaleSettings')
@@ -125,7 +134,7 @@ class CurrencyNameHelperTest extends \PHPUnit_Framework_TestCase implements View
             $this->getLocaleStub('en'),
             $this->formatter,
             $this,
-            new CurrencyListAwareStub()
+            new CurrencyListProviderStub()
         );
 
         $this->formatter->expects($this->once())->method('formatCurrency')

@@ -3,9 +3,9 @@
 namespace Oro\Bundle\CurrencyBundle\Tests\Unit\Config;
 
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
-use Oro\Bundle\CurrencyBundle\Config\DefaultCurrencyConfigManager;
+use Oro\Bundle\CurrencyBundle\Config\DefaultCurrencyConfigProvider;
 
-class CurrencyConfigManagerTest extends \PHPUnit_Framework_TestCase
+class DefaultCurrencyConfigProviderTest extends \PHPUnit_Framework_TestCase
 {
     /**
      * @var \PHPUnit_Framework_MockObject_MockObject|ConfigManager
@@ -33,7 +33,7 @@ class CurrencyConfigManagerTest extends \PHPUnit_Framework_TestCase
     public function testGetCurrencyList()
     {
         $expectedCount = 1;
-        $currencyConfigManager = new DefaultCurrencyConfigManager($this->configManager);
+        $currencyConfigManager = new DefaultCurrencyConfigProvider($this->configManager);
 
         $this->assertCount($expectedCount, $currencyConfigManager->getCurrencyList());
     }

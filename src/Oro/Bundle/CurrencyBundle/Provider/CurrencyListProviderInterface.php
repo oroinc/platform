@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\CurrencyBundle\Provider;
 
-interface CurrencyListAwareInterface
+interface CurrencyListProviderInterface
 {
     /**
      * Returns list of currencies which available in system

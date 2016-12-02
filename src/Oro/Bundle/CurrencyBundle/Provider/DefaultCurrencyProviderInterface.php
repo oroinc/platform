@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\CurrencyBundle\Provider;
 
-interface DefaultCurrencyAwareInterface
+interface DefaultCurrencyProviderInterface
 {
     /**
      * Returned default currency from system config

@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\CurrencyBundle\Tests\Unit\Form\Type;
 
-use Oro\Bundle\CurrencyBundle\Config\CurrencyConfigInterface;
 use Oro\Bundle\CurrencyBundle\Form\Type\CurrencySelectionType;
+use Oro\Bundle\CurrencyBundle\Provider\CurrencyProviderInterface;
 use Oro\Bundle\CurrencyBundle\Tests\Unit\Utils\CurrencyNameHelperStub;
 use Symfony\Component\Form\ChoiceList\View\ChoiceView;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -18,7 +18,7 @@ class CurrencySelectionTypeTest extends FormIntegrationTestCase
     protected $formType;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject|CurrencyConfigInterface
+     * @var \PHPUnit_Framework_MockObject_MockObject|CurrencyProviderInterface
      */
     protected $configManager;
 
@@ -27,6 +27,9 @@ class CurrencySelectionTypeTest extends FormIntegrationTestCase
      */
     protected $localeSettings;
 
+    /**
+     * @var CurrencyNameHelperStub
+     */
     private $currencyNameHelper;
 
     /**
@@ -36,7 +39,7 @@ class CurrencySelectionTypeTest extends FormIntegrationTestCase
     {
         parent::setUp();
 
-        $this->configManager = $this->getMockBuilder(CurrencyConfigInterface::class)
+        $this->configManager = $this->getMockBuilder(CurrencyProviderInterface::class)
             ->setMethods([
                 'getCurrencyList',
                 'getDefaultCurrency',
@@ -54,7 +57,6 @@ class CurrencySelectionTypeTest extends FormIntegrationTestCase
             ->method('getLocale')
             ->willReturn(\Locale::getDefault());
 
-        /** @var \PHPUnit_Framework_MockObject_MockObject|\Oro\Bundle\CurrencyBundle\Utils\CurrencyNameHelper */
         $this->currencyNameHelper = new CurrencyNameHelperStub();
 
         $this->formType = new CurrencySelectionType(

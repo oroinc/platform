@@ -832,10 +832,10 @@ to the [Fallback documentation](./src/Oro/Bundle/EntityBundle/Resources/doc/enti
 - Added interface `Oro\Bundle\InstallerBundle\CacheWarmer\NamespaceMigrationProviderInterface`. it makes available add the rules for command "oro:platform:upgrade20"
 
 #### CurrencyBundle
-- `Oro\Bundle\CurrencyBundle\Config\CurrenciesViewTypeAwareInterface` was added
-- `Oro\Bundle\CurrencyBundle\Provider\CurrencyProviderInterface` was renamed to `CurrencyListAwareInterface`
-- `Oro\Bundle\CurrencyBundle\Provider\DefaultCurrencyAwareInterface` was added
-- `Oro\Bundle\CurrencyBundle\Config\CurrencyConfigInterface` extends `Oro\Bundle\CurrencyBundle\Provider\CurrencyProviderInterface` and `Oro\Bundle\CurrencyBundle\Provider\DefaultCurrencyAwareInterface` now 
 - `getViewType` method was removed form `Oro\Bundle\CurrencyBundle\Config\CurrencyConfigInterface`
-- `Oro\Bundle\CurrencyBundle\Config\CurrencyConfigManager` was renamed to `DefaultCurrencyConfigManager`
-- `VIEW_TYPE_SYMBOL` and `VIEW_TYPE_ISO_CODE` constants were moved from `Oro\Bundle\CurrencyBundle\Config\CurrencyConfigInterface` to `Oro\Bundle\CurrencyBundle\Config\CurrenciesViewTypeAwareInterface` 
+- `VIEW_TYPE_SYMBOL` and `VIEW_TYPE_ISO_CODE` constants were removed from `Oro\Bundle\CurrencyBundle\Config\CurrencyConfigInterface` 
+- `Oro\Bundle\CurrencyBundle\Provider\CurrencyProviderInterface` was renamed to `CurrencyListProviderInterface`
+- `Oro\Bundle\CurrencyBundle\Provider\DefaultCurrencyProviderInterface` was added
+- `Oro\Bundle\CurrencyBundle\Config\CurrencyConfigInterface` was renamed to `Oro\Bundle\CurrencyBundle\Provider\CurrencyProviderInterface`
+- `Oro\Bundle\CurrencyBundle\Provider\CurrencyProviderInterface` extends `Oro\Bundle\CurrencyBundle\Provider\CurrencyListProviderInterface` and `Oro\Bundle\CurrencyBundle\Provider\DefaultCurrencyProviderInterface` 
+- `Oro\Bundle\CurrencyBundle\Config\CurrencyConfigManager` was renamed to `DefaultCurrencyConfigProvider`
