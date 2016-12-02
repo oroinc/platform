@@ -291,4 +291,32 @@ class Localization extends ExtendLocalization implements DatesAwareInterface
 
         return $this;
     }
+
+    /**
+     * @return array
+     */
+    public function getHierarchy()
+    {
+        return $this->getLocaleHierarchy($this);
+    }
+
+    /**
+     * @param Localization $localization
+     * @return array
+     */
+    protected function getLocaleHierarchy(Localization $localization)
+    {
+        $localeHierarchy = [];
+
+        $parent = $localization->getParentLocalization();
+        if ($parent) {
+            $localeHierarchy[] = $parent->getId();
+            $localeHierarchy = array_merge($localeHierarchy, $this->getLocaleHierarchy($parent));
+        } else {
+            // For default value without locale
+            $localeHierarchy = [null];
+        }
+
+        return $localeHierarchy;
+    }
 }

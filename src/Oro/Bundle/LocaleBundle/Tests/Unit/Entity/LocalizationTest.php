@@ -6,10 +6,12 @@ use Oro\Bundle\LocaleBundle\Entity\LocalizedFallbackValue;
 use Oro\Bundle\LocaleBundle\Tests\Unit\Entity\Stub\Localization;
 
 use Oro\Component\Testing\Unit\EntityTestCaseTrait;
+use Oro\Component\Testing\Unit\EntityTrait;
 
 class LocalizationTest extends \PHPUnit_Framework_TestCase
 {
     use EntityTestCaseTrait;
+    use EntityTrait;
 
     public function testAccessors()
     {
@@ -148,5 +150,18 @@ class LocalizationTest extends \PHPUnit_Framework_TestCase
         }
 
         return $localized;
+    }
+
+    public function testGetHierarchy()
+    {
+        $parentLocalizationId = 42;
+        $parentLocalization = $this->getEntity(
+            'Oro\Bundle\LocaleBundle\Entity\Localization',
+            ['id' => $parentLocalizationId]
+        );
+        $localization = new Localization();
+        $localization->setParentLocalization($parentLocalization);
+
+        $this->assertEquals([$parentLocalizationId, null], $localization->getHierarchy());
     }
 }
