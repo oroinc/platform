@@ -233,6 +233,8 @@ services:
         arguments:
             - '@oro_workflow.manager'
             - '@oro_security.security_facade'
+            - '@translator'
+            - '@router'
 
     oro_workflow.helper.transition_cron_trigger:
         class: 'Oro\Bundle\WorkflowBundle\Helper\TransitionCronTriggerHelper'

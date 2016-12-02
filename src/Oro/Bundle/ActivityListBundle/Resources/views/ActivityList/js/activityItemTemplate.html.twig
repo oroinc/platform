@@ -5,5 +5,38 @@
 {% endblock %}
 
 {% block activityActions %}
-    {{ AC.horizontalActionsList(actions) }}
+    {% set action %}
+        <% if (workflowsData) { %>
+            <% _.each(workflowsData, function(workflow) { %>
+                <% console.log(workflow) %>
+                <% if (workflow.transitionsData.length > 0) { %>
+                    <li role="separator" class="divider"></li>
+                    <% _.each(workflow.transitionsData, function(transition) { %>
+                        <li>
+                            <a href="#"
+                               class="transition-item"
+                               id="transition-<%- workflow.name %>-<%- transition.name %>"
+                               data-transition-url="<%- transition.transitionUrl %>"
+                               data-transition-label="<%- transition.label %>"
+                            <% if (transition.dialogUrl) { %>
+                               data-dialog-url="<%- transition.dialogUrl %>"
+                                <% if (transition.frontendOptions.dialog) { %>
+                                    data-dialog-options="<%- JSON.stringify(transition.frontendOptions.dialog) %>"
+                                <% } %>
+                            <% }else { %>
+                                message="<%- 'start?' %>"
+                            <% } %>
+                            >
+                                <i class="<%- transition.frontendOptions.icon %> hide-text"><%- transition.label %></i>
+                                <%- transition.label %>
+                            </a>
+                        </li>
+                    <% }) %>
+                <% } %>
+            <% }) %>
+        <% } %>
+    {% endset %}
+    {% set actions = actions|merge([action]) %}
+
+    {{ AC.verticalActionsList(actions) }}
 {% endblock %}

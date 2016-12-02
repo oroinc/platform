@@ -9,6 +9,7 @@ define(function(require) {
     var dateTimeFormatter = require('orolocale/js/formatter/datetime');
     var LoadingMaskView = require('oroui/js/app/views/loading-mask-view');
     var CommentComponent = require('orocomment/js/app/components/comment-component');
+    var TransitionHandler = require('oroworkflow/js/transition-handler');
 
     ActivityView = BaseView.extend({
         options: {
@@ -30,6 +31,7 @@ define(function(require) {
             'class': 'list-item'
         },
         events: {
+            'click .transition-item': 'onTransition',
             'click .item-edit-button': 'onEdit',
             'click .item-remove-button': 'onDelete',
             'click .accordion-toggle': 'onToggle',
@@ -102,6 +104,13 @@ define(function(require) {
             }
             this.initLayout();
             return this;
+        },
+
+        onTransition: function(e) {
+            e.preventDefault();
+            console.log(e.target);
+            var $el = $(e.target);
+            TransitionHandler.call($el);
         },
 
         onEdit: function() {

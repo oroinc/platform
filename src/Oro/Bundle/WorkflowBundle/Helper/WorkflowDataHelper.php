@@ -4,7 +4,9 @@ namespace Oro\Bundle\WorkflowBundle\Helper;
 
 use Doctrine\Common\Collections\ArrayCollection;
 
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Security\Acl\Domain\ObjectIdentity;
+use Symfony\Component\Translation\TranslatorInterface;
 
 use Oro\Bundle\SecurityBundle\Acl\Domain\DomainObjectWrapper;
 use Oro\Bundle\SecurityBundle\SecurityFacade;
@@ -24,16 +26,31 @@ class WorkflowDataHelper
     protected $workflowManager;
 
     /** @var SecurityFacade */
-    private $securityFacade;
+    protected $securityFacade;
+
+    /** @var TranslatorInterface */
+    protected $translator;
+
+    /** @var UrlGeneratorInterface */
+    protected $router;
 
     /**
      * @param WorkflowManager $workflowManager
      * @param SecurityFacade $securityFacade
+     * @param TranslatorInterface $translator
+     * @param UrlGeneratorInterface $router
      */
-    public function __construct(WorkflowManager $workflowManager, SecurityFacade $securityFacade)
+    public function __construct(
+        WorkflowManager $workflowManager,
+        SecurityFacade $securityFacade,
+        TranslatorInterface $translator,
+        UrlGeneratorInterface $router
+    )
     {
         $this->workflowManager = $workflowManager;
         $this->securityFacade = $securityFacade;
+        $this->translator = $translator;
+        $this->router = $router;
     }
 
     /**
@@ -77,17 +94,108 @@ class WorkflowDataHelper
             ? $this->getAllowedTransitions($workflow, $workflowItem)
             : $this->getAllowedStartTransitions($workflow, $entity);
 
+        $workflowItemId = $workflowItem !== null ? $workflowItem->getId() : null;
+
         foreach ($transitions as $transition) {
-            $transitionsData[$transition->getName()] = $this->getTransitionData($transition);
+            $transitionsData[] = array_merge(
+                $this->getTransitionData($transition),
+                $this->getTransitionUrl($transition, $entity, $workflow, $workflowItem)
+            );
         }
 
         return [
             'name' => $workflow->getName(),
             'label' => $workflow->getLabel(),
-            'isStarted' => $workflowItem !== null,
-            'workflowItemId' => $workflowItem ? $workflowItem->getId() : null,
+            'isStarted' => $workflowItemId !== null,
+            'workflowItemId' => $workflowItemId,
             'stepsData' => $this->getStepsData($entity, $workflow, $workflowItem, $transitions),
             'transitionsData' => $transitionsData,
+        ];
+    }
+
+    /**
+     * @param Transition $transition
+     *
+     * @return array
+     */
+    protected function getTransitionData(Transition $transition)
+    {
+        return [
+            'name' => $transition->getName(),
+            'label' => $this->translator->trans($transition->getLabel(), [], 'workflows'),
+            'isStart' => $transition->isStart(),
+            'hasForm' => $transition->hasForm(),
+            'displayType' => $transition->getDisplayType(),
+            'frontendOptions' => $transition->getFrontendOptions(),
+        ];
+    }
+
+    /**
+     * @param Transition $transition
+     * @param $entity
+     * @param Workflow $workflow
+     * @param WorkflowItem $workflowItem
+     *
+     * @return string|null
+     */
+    protected function getTransitionUrl(
+        Transition $transition,
+        $entity,
+        Workflow $workflow,
+        WorkflowItem $workflowItem = null
+    ) {
+        $isStarted = $workflowItem !== null;
+        $urlParams = [
+            'workflowName' => $workflow->getName(),
+            'transitionName' => $transition->getName(),
+            'entityId' => $entity->getId(),
+        ];
+
+        if (!$isStarted && $transition->getDisplayType() === 'dialog') {
+            if ($transition->hasForm()) {
+                return [
+                    'dialogUrl' => $this->router->generate(
+                        'oro_workflow_widget_start_transition_form',
+                        $urlParams,
+                        UrlGeneratorInterface::ABSOLUTE_URL
+                    ),
+                    'transitionUrl' => $this->router->generate(
+                        'oro_api_workflow_start',
+                        $urlParams,
+                        UrlGeneratorInterface::ABSOLUTE_URL
+                    ),
+                ];
+            }
+
+            return [
+                'transitionUrl' => $this->router->generate(
+                    'oro_api_workflow_start',
+                    $urlParams,
+                    UrlGeneratorInterface::ABSOLUTE_URL
+                ),
+            ];
+        }
+
+        if ($isStarted) {
+            return [
+                'transitionUrl' => $this->router->generate(
+                    'oro_api_workflow_transit',
+                    [
+                        'transitionName' => $transition->getName(),
+                        'workflowItemId' => $workflowItem->getId(),
+                    ],
+                    UrlGeneratorInterface::ABSOLUTE_URL
+                ),
+            ];
+        }
+
+        // start workflow
+        return [
+            'transitionUrl' => $this->router->generate(
+                'oro_workflow_start_transition_form',
+                $urlParams,
+                UrlGeneratorInterface::ABSOLUTE_URL
+            ),
         ];
     }
 
@@ -177,26 +285,6 @@ class WorkflowDataHelper
             },
             $this->getAllowedStartTransitions($workflow, $entity)
         );
-    }
-    /**
-     * @param Transition $transition
-     *
-     * @return array
-     */
-    protected function getTransitionData(Transition $transition)
-    {
-        if ($transition->isUnavailableHidden()) {
-            return null;
-        }
-
-        return [
-            'name' => $transition->getName(),
-            'label' => $transition->getLabel(),
-            'isStart' => $transition->isStart(),
-            'hasForm' => $transition->hasForm(),
-            'displayType' => $transition->getDisplayType(),
-            'frontendOptions' => $transition->getFrontendOptions(),
-        ];
     }
 
     /**

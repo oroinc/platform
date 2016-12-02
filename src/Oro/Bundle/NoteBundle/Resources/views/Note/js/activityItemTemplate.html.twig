@@ -22,6 +22,7 @@
         <a href="#" class="action item-edit-button"
            title="{{ 'oro.note.note_update'|trans({'{{ entity }}': entityName}) }}">
             <i class="fa-pencil-square-o hide-text">{{ 'oro.note.note_update'|trans({'{{ entity }}': entityName}) }}</i>
+            {{ 'oro.note.note_update'|trans({'{{ entity }}': entityName}) }}
         </a>
         <% } %>
     {% endset %}
@@ -32,6 +33,7 @@
         <a href="#" class="action item-remove-button"
            title="{{ 'oro.note.note_delete'|trans({'{{ entity }}': entityName}) }}">
             <i class="fa-trash-o hide-text">{{ 'oro.note.note_delete'|trans({'{{ entity }}': entityName}) }}</i>
+            {{ 'oro.note.note_delete'|trans({'{{ entity }}': entityName}) }}
         </a>
         <% } %>
     {% endset %}
