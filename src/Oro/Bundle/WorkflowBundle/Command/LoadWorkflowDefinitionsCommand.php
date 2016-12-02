@@ -35,12 +35,6 @@ class LoadWorkflowDefinitionsCommand extends ContainerAwareCommand
                 null,
                 InputOption::VALUE_OPTIONAL | InputOption::VALUE_IS_ARRAY,
                 'Names of the workflow definitions that should be loaded'
-            )
-            ->addOption(
-                'skip-scope-processing',
-                null,
-                InputOption::VALUE_NONE,
-                'Skip updating WorkflowScope entities for existing WorkflowDefinition entities'
             );
     }
 
@@ -75,8 +69,6 @@ class LoadWorkflowDefinitionsCommand extends ContainerAwareCommand
                 ->getEntityRepository(WorkflowDefinition::class);
             $workflowDefinitions = $configurationBuilder->buildFromConfiguration($workflowConfiguration);
 
-            $this->setWorkflowScopeManagerEnabled(!$input->getOption('skip-scope-processing'));
-
             foreach ($workflowDefinitions as $workflowDefinition) {
                 $output->writeln(sprintf('  <comment>></comment> <info>%s</info>', $workflowDefinition->getName()));
 
@@ -95,18 +87,8 @@ class LoadWorkflowDefinitionsCommand extends ContainerAwareCommand
                     $output->writeln(Yaml::dump($workflowDefinition->getConfiguration(), 10));
                 }
             }
-
-            $this->setWorkflowScopeManagerEnabled();
         } else {
             $output->writeln('No workflow definitions found.');
         }
-    }
-
-    /**
-     * @param bool $isEnabled
-     */
-    protected function setWorkflowScopeManagerEnabled($isEnabled = true)
-    {
-        $this->getContainer()->get('oro_workflow.manager.workflow_scope')->setEnabled($isEnabled);
     }
 }

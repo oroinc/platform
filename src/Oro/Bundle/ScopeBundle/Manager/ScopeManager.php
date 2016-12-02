@@ -110,7 +110,6 @@ class ScopeManager
      */
     public function findRelatedScopeIds($scopeType, $context = null)
     {
-
         $criteria = $this->getCriteriaForRelatedScopes($scopeType, $context);
 
         /** @var ScopeRepository $scopeRepository */
@@ -118,6 +117,23 @@ class ScopeManager
             ->getRepository(Scope::class);
 
         return $scopeRepository->findIdentifiersByCriteria($criteria);
+    }
+
+    /**
+     * @param string     $scopeType
+     * @param array|null $context
+     *
+     * @return array
+     */
+    public function findRelatedScopeIdsWithPriority($scopeType, $context = null)
+    {
+        $criteria = $this->getCriteria($scopeType, $context);
+
+        /** @var ScopeRepository $scopeRepository */
+        $scopeRepository = $this->registry->getManagerForClass(Scope::class)
+            ->getRepository(Scope::class);
+
+        return $scopeRepository->findIdentifiersByCriteriaWithPriority($criteria);
     }
 
     /**

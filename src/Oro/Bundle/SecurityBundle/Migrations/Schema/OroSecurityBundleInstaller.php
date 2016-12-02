@@ -4,7 +4,6 @@ namespace Oro\Bundle\SecurityBundle\Migrations\Schema;
 
 use Doctrine\DBAL\Schema\Schema;
 
-use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerAwareTrait;
 
@@ -20,7 +19,7 @@ class OroSecurityBundleInstaller implements Installation, ContainerAwareInterfac
      */
     public function getMigrationVersion()
     {
-        return 'v1_2';
+        return 'v1_3';
     }
 
     /**
@@ -30,6 +29,9 @@ class OroSecurityBundleInstaller implements Installation, ContainerAwareInterfac
     {
         // create symfony acl tables
         $this->container->get('security.acl.dbal.schema')->addToSchema($schema);
+        $schema->getTable($this->container->getParameter('security.acl.dbal.entry_table_name'))
+            ->getColumn('field_name')
+            ->setLength(255);
 
         /** Tables generation **/
         $this->createOroSecurityPermApplyEntityTable($schema);

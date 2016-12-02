@@ -1,3 +1,5 @@
+// @theme: blank
+
 .input {
     @include base-ui-element($use-base-style-for-input,
                              $input-padding,
@@ -12,6 +14,10 @@
 
     box-sizing: border-box;
 
+    &::-ms-clear {
+        display: none;
+    }
+
     @include element-state('hover') {
         border-color: $input-border-color-hover-state;
     }
@@ -22,5 +28,9 @@
 
     @include element-state('error') {
         border-color: $input-border-color-error-state;
+    }
+
+    &--short {
+        width: $input-width-short;
     }
 }

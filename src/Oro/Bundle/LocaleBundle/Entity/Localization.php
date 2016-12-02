@@ -214,7 +214,7 @@ class Localization extends ExtendLocalization implements DatesAwareInterface
     }
 
     /**
-     * @return Localization
+     * @return Localization|null
      */
     public function getParentLocalization()
     {
