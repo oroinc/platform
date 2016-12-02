@@ -39,7 +39,7 @@ class ButtonSearchContextProvider
 
         return $buttonSearchContext
             ->setEntity($context[ContextHelper::ENTITY_CLASS_PARAM], $context[ContextHelper::ENTITY_ID_PARAM])
-            ->setGridName($context[ContextHelper::DATAGRID_PARAM])
+            ->setDatagrid($context[ContextHelper::DATAGRID_PARAM])
             ->setGroup($context[ContextHelper::GROUP_PARAM])
             ->setReferrer($context[ContextHelper::FROM_URL_PARAM])
             ->setRouteName($context[ContextHelper::ROUTE_PARAM]);

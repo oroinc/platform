@@ -34,7 +34,7 @@ class ButtonSearchContextTest extends \PHPUnit_Framework_TestCase
             $this->buttonSearchContext,
             [
                 ['routeName', 'test_route'],
-                ['gridName', 'test_grid'],
+                ['datagrid', 'test_grid'],
                 ['referrer', 'test_ref'],
                 ['group', 'test_group']
             ]

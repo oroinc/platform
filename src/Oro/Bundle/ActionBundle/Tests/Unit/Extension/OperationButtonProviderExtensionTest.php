@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\ActionBundle\Tests\Unit\Extension;
 
+use Oro\Bundle\ActionBundle\Exception\UnsupportedButtonException;
 use Oro\Bundle\ActionBundle\Extension\OperationButtonProviderExtension;
 use Oro\Bundle\ActionBundle\Helper\ContextHelper;
 use Oro\Bundle\ActionBundle\Model\ActionData;
@@ -12,7 +13,11 @@ use Oro\Bundle\ActionBundle\Model\Operation;
 use Oro\Bundle\ActionBundle\Model\OperationButton;
 use Oro\Bundle\ActionBundle\Model\OperationRegistry;
 use Oro\Bundle\ActionBundle\Provider\RouteProviderInterface;
+use Oro\Bundle\ActionBundle\Tests\Unit\Stub\StubButton;
 
+/**
+ * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
+ */
 class OperationButtonProviderExtensionTest extends \PHPUnit_Framework_TestCase
 {
     const ENTITY_CLASS = 'stdClass';
@@ -76,30 +81,53 @@ class OperationButtonProviderExtensionTest extends \PHPUnit_Framework_TestCase
         unset($this->extension, $this->contextHelper, $this->operationRegistry, $this->routeProvider);
     }
 
-    public function testFind()
+    /**
+     * @dataProvider findDataProvider
+     *
+     * @param array $operations
+     * @param ButtonSearchContext $buttonSearchContext
+     * @param array $expected
+     */
+    public function testFind(array $operations, ButtonSearchContext $buttonSearchContext, array $expected)
+    {
+        $this->assertOperationRegistryMethodsCalled($operations, $buttonSearchContext);
+        $this->assertContextHelperCalled();
+
+        $this->assertEquals($expected, $this->extension->find($buttonSearchContext));
+    }
+
+    /**
+     * @return array
+     */
+    public function findDataProvider()
     {
         $operation1 = $this->createOperationMock(true);
         $operation2 = $this->createOperationMock(true, true);
         $operationNotAvailable = $this->createOperationMock(false);
 
         $buttonSearchContext = $this->createButtonSearchContext();
+
         $buttonContext1 = $this->createButtonContext($buttonSearchContext);
         $buttonContext2 = $this->createButtonContext($buttonSearchContext, true);
 
-        $this->assertOperationRegistryMethodsCalled(
-            [$operation1, $operationNotAvailable, $operation2],
-            $buttonSearchContext
-        );
-        $this->assertContextHelperCalled();
+        $actionData =  new ActionData();
 
-        $this->assertEquals(
-            [
-                new OperationButton($operation1, $buttonContext1, new ActionData()),
-                new OperationButton($operationNotAvailable, $buttonContext1, new ActionData()),
-                new OperationButton($operation2, $buttonContext2, new ActionData()),
+        return [
+            'array' => [
+                'operations' => [$operation1, $operationNotAvailable, $operation2],
+                'buttonSearchContext' => $buttonSearchContext,
+                'expected' => [
+                    new OperationButton($operation1, $buttonContext1, $actionData),
+                    new OperationButton($operationNotAvailable, $buttonContext1, $actionData),
+                    new OperationButton($operation2, $buttonContext2, $actionData),
+                ]
             ],
-            $this->extension->find($buttonSearchContext)
-        );
+            'not available' => [
+                'operations' => [$operationNotAvailable],
+                'buttonSearchContext' => $buttonSearchContext,
+                'expected' => [new OperationButton($operationNotAvailable, $buttonContext1, $actionData)]
+            ]
+        ];
     }
 
     /**
@@ -121,7 +149,7 @@ class OperationButtonProviderExtensionTest extends \PHPUnit_Framework_TestCase
     {
         $operationButtonAvailable = $this->createOperationButton(true);
         $operationButtonNotAvailable = $this->createOperationButton(false);
-        $notOperationButtonAvailable = $this->getMock(ButtonInterface::class);
+
 
         return [
             'available' => [
@@ -131,12 +159,23 @@ class OperationButtonProviderExtensionTest extends \PHPUnit_Framework_TestCase
             'not available' => [
                 'button' => $operationButtonNotAvailable,
                 'expected' => false
-            ],
-            'not supported' => [
-                'button' => $notOperationButtonAvailable,
-                'expected' => false
-            ],
+            ]
         ];
+    }
+
+    public function testIsAvailableException()
+    {
+        $this->assertContextHelperCalled(0);
+
+        $stubButton = new StubButton();
+
+        $this->setExpectedException(
+            UnsupportedButtonException::class,
+            'Button Oro\Bundle\ActionBundle\Tests\Unit\Stub\StubButton is not supported by ' .
+            'Oro\Bundle\ActionBundle\Extension\OperationButtonProviderExtension. Can not determine availability'
+        );
+
+        $this->extension->isAvailable($stubButton, $this->createButtonSearchContext());
     }
 
     public function testSupports()
@@ -183,7 +222,7 @@ class OperationButtonProviderExtensionTest extends \PHPUnit_Framework_TestCase
 
         return $buttonSearchContext->setRouteName(self::ROUTE_NAME)
             ->setEntity(self::ENTITY_CLASS, self::ENTITY_ID)
-            ->setGridName(self::DATAGRID_NAME)
+            ->setDatagrid(self::DATAGRID_NAME)
             ->setGroup(self::GROUP)
             ->setReferrer(self::REFERRER_URL);
     }
@@ -198,7 +237,7 @@ class OperationButtonProviderExtensionTest extends \PHPUnit_Framework_TestCase
     {
         $context = new ButtonContext();
         $context->setUnavailableHidden(true)
-            ->setDatagridName($buttonSearchContext->getGridName())
+            ->setDatagridName($buttonSearchContext->getDatagrid())
             ->setEntity($buttonSearchContext->getEntityClass(), $buttonSearchContext->getEntityId())
             ->setRouteName($buttonSearchContext->getRouteName())
             ->setGroup($buttonSearchContext->getGroup())
@@ -223,7 +262,7 @@ class OperationButtonProviderExtensionTest extends \PHPUnit_Framework_TestCase
             ->with(
                 $buttonSearchContext->getEntityClass(),
                 $buttonSearchContext->getRouteName(),
-                $buttonSearchContext->getGridName(),
+                $buttonSearchContext->getDatagrid(),
                 $buttonSearchContext->getGroup()
             )
             ->willReturn($operations);

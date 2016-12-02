@@ -14,7 +14,7 @@ class ButtonSearchContext
     protected $routeName;
 
     /** @var string */
-    protected $gridName;
+    protected $datagrid;
 
     /** @var string */
     protected $referrer;
@@ -75,19 +75,19 @@ class ButtonSearchContext
     /**
      * @return string
      */
-    public function getGridName()
+    public function getDatagrid()
     {
-        return $this->gridName;
+        return $this->datagrid;
     }
 
     /**
-     * @param string $gridName
+     * @param string $datagrid
      *
      * @return $this
      */
-    public function setGridName($gridName)
+    public function setDatagrid($datagrid)
     {
-        $this->gridName = $gridName;
+        $this->datagrid = $datagrid;
 
         return $this;
     }

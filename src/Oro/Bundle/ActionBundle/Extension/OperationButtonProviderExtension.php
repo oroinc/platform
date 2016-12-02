@@ -2,6 +2,9 @@
 
 namespace Oro\Bundle\ActionBundle\Extension;
 
+use Doctrine\Common\Collections\Collection;
+
+use Oro\Bundle\ActionBundle\Exception\UnsupportedButtonException;
 use Oro\Bundle\ActionBundle\Helper\ContextHelper;
 use Oro\Bundle\ActionBundle\Model\ActionData;
 use Oro\Bundle\ActionBundle\Model\ButtonContext;
@@ -12,6 +15,9 @@ use Oro\Bundle\ActionBundle\Model\OperationButton;
 use Oro\Bundle\ActionBundle\Model\OperationRegistry;
 use Oro\Bundle\ActionBundle\Provider\RouteProviderInterface;
 
+/**
+ * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
+ */
 class OperationButtonProviderExtension implements ButtonProviderExtensionInterface
 {
     /** @var OperationRegistry */
@@ -67,8 +73,21 @@ class OperationButtonProviderExtension implements ButtonProviderExtensionInterfa
      * {@inheritdoc}
      * @param OperationButton $button
      */
-    public function isAvailable(ButtonInterface $button, ButtonSearchContext $buttonSearchContext)
-    {
+    public function isAvailable(
+        ButtonInterface $button,
+        ButtonSearchContext $buttonSearchContext,
+        Collection $errors = null
+    ) {
+        if (!$this->supports($button)) {
+            throw new UnsupportedButtonException(
+                sprintf(
+                    'Button %s is not supported by %s. Can not determine availability.',
+                    get_class($button),
+                    get_class($this)
+                )
+            );
+        }
+
         return $this->supports($button) &&
             $button->getOperation()->isAvailable($this->getActionData($buttonSearchContext));
     }
@@ -92,7 +111,7 @@ class OperationButtonProviderExtension implements ButtonProviderExtensionInterfa
         if (!$this->baseButtonContext) {
             $this->baseButtonContext = new ButtonContext();
             $this->baseButtonContext->setUnavailableHidden(true)
-                ->setDatagridName($searchContext->getGridName())
+                ->setDatagridName($searchContext->getDatagrid())
                 ->setEntity($searchContext->getEntityClass(), $searchContext->getEntityId())
                 ->setRouteName($searchContext->getRouteName())
                 ->setGroup($searchContext->getGroup())
@@ -120,7 +139,7 @@ class OperationButtonProviderExtension implements ButtonProviderExtensionInterfa
         return $this->operationRegistry->find(
             $buttonSearchContext->getEntityClass(),
             $buttonSearchContext->getRouteName(),
-            $buttonSearchContext->getGridName(),
+            $buttonSearchContext->getDatagrid(),
             $buttonSearchContext->getGroup()
         );
     }
@@ -135,7 +154,7 @@ class OperationButtonProviderExtension implements ButtonProviderExtensionInterfa
         return $this->contextHelper->getActionData([
             ContextHelper::ENTITY_ID_PARAM => $searchContext->getEntityId(),
             ContextHelper::ENTITY_CLASS_PARAM => $searchContext->getEntityClass(),
-            ContextHelper::DATAGRID_PARAM => $searchContext->getGridName(),
+            ContextHelper::DATAGRID_PARAM => $searchContext->getDatagrid(),
             ContextHelper::FROM_URL_PARAM => $searchContext->getReferrer(),
             ContextHelper::ROUTE_PARAM => $searchContext->getRouteName(),
         ]);

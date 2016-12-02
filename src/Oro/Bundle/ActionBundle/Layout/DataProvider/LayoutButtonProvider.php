@@ -68,7 +68,7 @@ class LayoutButtonProvider
     private function prepareButtonSearchContext($entity = null, $group = null)
     {
         $buttonSearchContext = $this->contextProvider->getButtonSearchContext();
-        $buttonSearchContext->setGridName(null);
+        $buttonSearchContext->setDatagrid(null);
 
         if (is_object($entity) &&
             !$this->doctrineHelper->isNewEntity($entity)

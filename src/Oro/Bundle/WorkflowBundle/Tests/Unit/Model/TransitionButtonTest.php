@@ -118,4 +118,14 @@ class TransitionButtonTest extends \PHPUnit_Framework_TestCase
     {
         $this->assertEquals(OperationRegistry::DEFAULT_GROUP, $this->button->getGroup());
     }
+
+    public function testGetTransition()
+    {
+        $this->assertEquals($this->transition, $this->button->getTransition());
+    }
+
+    public function testGetWorkflow()
+    {
+        $this->assertEquals($this->workflow, $this->button->getWorkflow());
+    }
 }

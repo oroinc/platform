@@ -86,4 +86,20 @@ class TransitionButton implements ButtonInterface
     {
         return OperationRegistry::DEFAULT_GROUP;
     }
+
+    /**
+     * @return Workflow
+     */
+    public function getWorkflow()
+    {
+        return $this->workflow;
+    }
+
+    /**
+     * @return Transition
+     */
+    public function getTransition()
+    {
+        return $this->transition;
+    }
 }

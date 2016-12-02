@@ -2,8 +2,9 @@
 
 namespace Oro\Bundle\WorkflowBundle\Extension;
 
-use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 
+use Oro\Bundle\ActionBundle\Exception\UnsupportedButtonException;
 use Oro\Bundle\ActionBundle\Extension\ButtonProviderExtensionInterface;
 use Oro\Bundle\ActionBundle\Model\ButtonContext;
 use Oro\Bundle\ActionBundle\Model\ButtonInterface;
@@ -18,7 +19,7 @@ use Oro\Bundle\WorkflowBundle\Model\Workflow;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowData;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowRegistry;
 
-class TransitionButtonProviderExtension implements ButtonProviderExtensionInterface
+class StartTransitionButtonProviderExtension implements ButtonProviderExtensionInterface
 {
     /** @var WorkflowRegistry */
     protected $workflowRegistry;
@@ -53,29 +54,12 @@ class TransitionButtonProviderExtension implements ButtonProviderExtensionInterf
             return $buttons;
         }
 
-        // Skip if DataGrid defined
-        if ($buttonSearchContext->getGridName()) {
-            return $buttons;
-        }
-
         foreach ($this->workflowRegistry->getActiveWorkflows() as $workflow) {
             $transitions = $this->getInitTransitions($workflow, $buttonSearchContext);
 
             foreach ($transitions as $transition) {
-                $workflowItem = $this->buildWorkflowItem($transition, $workflow, $buttonSearchContext);
-                $errors = new ArrayCollection();
-                try {
-                    $isAvailable = $transition->isAvailable(clone $workflowItem, $errors);
-                } catch (\Exception $e) {
-                    $isAvailable = false;
-                    $errors->add(['message' => $e->getMessage(), 'parameters' => []]);
-                }
-                if ($isAvailable || !$transition->isUnavailableHidden()) {
-                    $buttonContext = $this->generateButtonContext($transition, $buttonSearchContext);
-                    $buttonContext->setEnabled($isAvailable);
-                    $buttonContext->setErrors($errors->toArray());
-                    $buttons[] = new TransitionButton($transition, $workflow, $buttonContext);
-                }
+                $buttonContext = $this->generateButtonContext($transition, $buttonSearchContext);
+                $buttons[] = new TransitionButton($transition, $workflow, $buttonContext);
             }
         }
 
@@ -86,11 +70,39 @@ class TransitionButtonProviderExtension implements ButtonProviderExtensionInterf
 
     /**
      * {@inheritdoc}
+     * @param TransitionButton $button
      */
-    public function isAvailable(ButtonInterface $button, ButtonSearchContext $buttonSearchContext)
-    {
-        // ToDo: should be updated in BAP-12867
-        return $this->supports($button);
+    public function isAvailable(
+        ButtonInterface $button,
+        ButtonSearchContext $buttonSearchContext,
+        Collection $errors = null
+    ) {
+        if (!$this->supports($button)) {
+            throw new UnsupportedButtonException(
+                sprintf(
+                    'Button %s is not supported by %s. Can not determine availability.',
+                    get_class($button),
+                    get_class($this)
+                )
+            );
+        }
+
+        $workflowItem = $this->buildWorkflowItem(
+            $button->getTransition(),
+            $button->getWorkflow(),
+            $buttonSearchContext
+        );
+
+        try {
+            $isAvailable = $button->getTransition()->isAvailable($workflowItem, $errors);
+        } catch (\Exception $e) {
+            $isAvailable = false;
+            if (null !== $errors) {
+                $errors->add(['message' => $e->getMessage(), 'parameters' => []]);
+            }
+        }
+
+        return $isAvailable;
     }
 
     /**
@@ -98,8 +110,7 @@ class TransitionButtonProviderExtension implements ButtonProviderExtensionInterf
      */
     public function supports(ButtonInterface $button)
     {
-        // ToDo: should be updated in BAP-12867
-        return true;
+        return $button instanceof TransitionButton && $button->getTransition()->isStart();
     }
 
     /**
@@ -111,13 +122,12 @@ class TransitionButtonProviderExtension implements ButtonProviderExtensionInterf
      */
     protected function buildWorkflowItem(Transition $transition, Workflow $workflow, ButtonSearchContext $searchContext)
     {
-        $workflowData = new WorkflowData([$transition->getInitContextAttribute() => $searchContext]);
         $workflowItem = new WorkflowItem();
 
         return $workflowItem->setEntityClass($workflow->getDefinition()->getRelatedEntity())
             ->setDefinition($workflow->getDefinition())
             ->setWorkflowName($workflow->getName())
-            ->setData($workflowData);
+            ->setData(new WorkflowData([$transition->getInitContextAttribute() => $searchContext]));
     }
 
     /**
@@ -130,7 +140,7 @@ class TransitionButtonProviderExtension implements ButtonProviderExtensionInterf
     {
         if (!$this->baseButtonContext) {
             $this->baseButtonContext = new ButtonContext();
-            $this->baseButtonContext->setDatagridName($searchContext->getGridName())
+            $this->baseButtonContext->setDatagridName($searchContext->getDatagrid())
                 ->setEntity($searchContext->getEntityClass(), $searchContext->getEntityId())
                 ->setRouteName($searchContext->getRouteName())
                 ->setGroup($searchContext->getGroup())
@@ -156,19 +166,11 @@ class TransitionButtonProviderExtension implements ButtonProviderExtensionInterf
      */
     protected function getInitTransitions(Workflow $workflow, ButtonSearchContext $searchContext)
     {
-        $transitionNames = [];
-        if ($searchContext->getEntityClass()) {
-            $entities = $workflow->getInitEntities();
-            if (array_key_exists($searchContext->getEntityClass(), $entities)) {
-                $transitionNames = $entities[$searchContext->getEntityClass()];
-            }
-        }
-        if ($searchContext->getRouteName()) {
-            $routes = $workflow->getInitRoutes();
-            if (array_key_exists($searchContext->getRouteName(), $routes)) {
-                $transitionNames = array_merge($transitionNames, $routes[$searchContext->getRouteName()]);
-            }
-        }
+        $transitionNames = array_merge(
+            $this->getNodeInitTransitions($searchContext->getEntityClass(), $workflow->getInitEntities()),
+            $this->getNodeInitTransitions($searchContext->getRouteName(), $workflow->getInitRoutes()),
+            $this->getNodeInitTransitions($searchContext->getDatagrid(), $workflow->getInitDatagrids())
+        );
 
         return array_filter(
             $workflow->getTransitionManager()->getStartTransitions()->toArray(),
@@ -176,5 +178,15 @@ class TransitionButtonProviderExtension implements ButtonProviderExtensionInterf
                 return in_array($transition->getName(), $transitionNames, true);
             }
         );
+    }
+
+    /**
+     * @param $value
+     * @param array|null $data
+     * @return array
+     */
+    private function getNodeInitTransitions($value, array $data = null)
+    {
+        return ($data && array_key_exists($value, $data)) ? $data[$value] : [];
     }
 }

@@ -2,6 +2,9 @@
 
 namespace Oro\Bundle\ActionBundle\Extension;
 
+use Doctrine\Common\Collections\Collection;
+
+use Oro\Bundle\ActionBundle\Exception\UnsupportedButtonException;
 use Oro\Bundle\ActionBundle\Model\ButtonInterface;
 use Oro\Bundle\ActionBundle\Model\ButtonSearchContext;
 
@@ -16,9 +19,15 @@ interface ButtonProviderExtensionInterface
     /**
      * @param ButtonInterface $button
      * @param ButtonSearchContext $buttonSearchContext
+     * @param Collection $errors
      * @return bool
+     * @throws UnsupportedButtonException
      */
-    public function isAvailable(ButtonInterface $button, ButtonSearchContext $buttonSearchContext);
+    public function isAvailable(
+        ButtonInterface $button,
+        ButtonSearchContext $buttonSearchContext,
+        Collection $errors = null
+    );
 
     /**
      * @param ButtonInterface $button
