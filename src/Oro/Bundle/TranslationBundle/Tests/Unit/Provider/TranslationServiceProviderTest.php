@@ -290,18 +290,21 @@ class TranslationServiceProviderTest extends \PHPUnit_Framework_TestCase
      */
     public function processDirsProvider()
     {
+        $dir1 = implode(DIRECTORY_SEPARATOR, ['some', 'dir1']);
+        $dir2 = implode(DIRECTORY_SEPARATOR, ['some', 'dir2']);
+
         return [
-            [
-                'inputDirs' => '/some/dir',
-                'expectedDirs' => ['/some/dir'],
+            'string' => [
+                'inputDirs' => $dir1,
+                'expectedDirs' => [$dir1],
             ],
-            [
-                'inputDirs' => '/some/dir/',
-                'expectedDirs' => ['/some/dir'],
+            'string not trimmed' => [
+                'inputDirs' => $dir1 . DIRECTORY_SEPARATOR,
+                'expectedDirs' => [$dir1],
             ],
-            [
-                'inputDirs' => ['/some/dir', '/some/dir2/'],
-                'expectedDirs' => ['/some/dir', '/some/dir2'],
+            'array' => [
+                'inputDirs' => [$dir1, $dir2 . DIRECTORY_SEPARATOR],
+                'expectedDirs' => [$dir1, $dir2],
             ],
         ];
     }

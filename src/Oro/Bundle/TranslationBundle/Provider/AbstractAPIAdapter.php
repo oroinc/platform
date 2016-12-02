@@ -112,15 +112,16 @@ abstract class AbstractAPIAdapter implements APIAdapterInterface
         $dirs = [];
 
         foreach ($files as $remotePath) {
-            $subFolders = array_filter(explode(DIRECTORY_SEPARATOR, dirname($remotePath)));
+            $remotePath = str_replace(DIRECTORY_SEPARATOR, '/', dirname($remotePath));
+            $subFolders = array_filter(explode('/', $remotePath));
 
             $currentDir = [];
             foreach ($subFolders as $folderName) {
                 $currentDir[] = $folderName;
 
                 // crowdin understand only "/" as directory separator
-                $path         = implode('/', $currentDir);
-                $dirs[]  = $path;
+                $path = implode('/', $currentDir);
+                $dirs[] = $path;
             }
         }
 
