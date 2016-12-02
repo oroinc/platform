@@ -2,4 +2,4 @@ oro:
     note:
         context:
             not_empty:
-                message:      Note context could not be empty
+                message: Note context could not be empty.

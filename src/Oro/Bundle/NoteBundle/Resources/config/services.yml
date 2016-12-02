@@ -34,7 +34,7 @@ services:
 
 
     oro_note.context.note_empty_validator:
-        class: Oro\Bundle\NoteBundle\Validator\ContextIsNotEmptyValidator
+        class: Oro\Bundle\NoteBundle\Validator\ContextNotEmptyValidator
         arguments:
            - '@oro_entity.doctrine_helper'
            - '@oro_security.owner.entity_owner_accessor.link'

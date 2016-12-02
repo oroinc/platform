@@ -4,7 +4,7 @@ namespace Oro\Bundle\NoteBundle\Validator\Constraints;
 
 use Symfony\Component\Validator\Constraint;
 
-class ContextIsNotEmptyConstraint extends Constraint
+class ContextNotEmpty extends Constraint
 {
     /**
      * @var string
