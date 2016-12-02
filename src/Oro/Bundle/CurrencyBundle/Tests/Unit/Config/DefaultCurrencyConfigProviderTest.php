@@ -12,29 +12,22 @@ class DefaultCurrencyConfigProviderTest extends \PHPUnit_Framework_TestCase
      */
     protected $configManager;
 
-    /**
-     * @var int
-     */
-    protected $allAvailableCurrenciesCount;
-
     public function setUp()
     {
         $this->configManager = $this->getMockBuilder('Oro\Bundle\ConfigBundle\Config\ConfigManager')
-                                    ->disableOriginalConstructor()
-                                    ->setMethods(['get'])
-                                    ->getMock();
+            ->disableOriginalConstructor()
+            ->setMethods(['get'])
+            ->getMock();
 
         $this->configManager->method('get')
-                            ->with('oro_currency.default_currency')
-                            ->willReturn('USD');
+            ->with('oro_currency.default_currency')
+            ->willReturn('USD');
     }
-
 
     public function testGetCurrencyList()
     {
-        $expectedCount = 1;
         $currencyConfigManager = new DefaultCurrencyConfigProvider($this->configManager);
 
-        $this->assertCount($expectedCount, $currencyConfigManager->getCurrencyList());
+        $this->assertCount(1, $currencyConfigManager->getCurrencyList());
     }
 }
