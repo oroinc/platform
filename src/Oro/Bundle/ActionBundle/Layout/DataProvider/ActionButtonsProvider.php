@@ -4,24 +4,24 @@ namespace Oro\Bundle\ActionBundle\Layout\DataProvider;
 
 use Doctrine\Common\Util\ClassUtils;
 
-use Oro\Bundle\ActionBundle\Helper\ApplicationsHelper;
+use Oro\Bundle\ActionBundle\Provider\RouteProviderInterface;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 
 class ActionButtonsProvider
 {
-    /** @var ApplicationsHelper */
-    protected $applicationsHelper;
+    /** @var RouteProviderInterface */
+    protected $routeProvider;
 
     /** @var DoctrineHelper */
     protected $doctrineHelper;
 
     /**
-     * @param ApplicationsHelper $applicationsHelper
+     * @param RouteProviderInterface $routeProvider
      * @param DoctrineHelper $doctrineHelper
      */
-    public function __construct(ApplicationsHelper $applicationsHelper, DoctrineHelper $doctrineHelper)
+    public function __construct(RouteProviderInterface $routeProvider, DoctrineHelper $doctrineHelper)
     {
-        $this->applicationsHelper = $applicationsHelper;
+        $this->routeProvider = $routeProvider;
         $this->doctrineHelper = $doctrineHelper;
     }
 
@@ -30,7 +30,15 @@ class ActionButtonsProvider
      */
     public function getDialogRoute()
     {
-        return $this->applicationsHelper->getDialogRoute();
+        return $this->routeProvider->getFormDialogRoute();
+    }
+
+    /**
+     * @return string
+     */
+    public function getPageRoute()
+    {
+        return $this->routeProvider->getFormPageRoute();
     }
 
     /**
@@ -38,7 +46,7 @@ class ActionButtonsProvider
      */
     public function getExecutionRoute()
     {
-        return $this->applicationsHelper->getExecutionRoute();
+        return $this->routeProvider->getExecutionRoute();
     }
 
     /**

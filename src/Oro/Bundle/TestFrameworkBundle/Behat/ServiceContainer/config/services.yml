@@ -8,6 +8,13 @@ services:
         tags:
             - { name: cli.controller, priority: 1100 }
 
+    cli.controller.available_suites:
+        class: Oro\Bundle\TestFrameworkBundle\Behat\Cli\AvailableSuitesController
+        arguments:
+            - '@suite.registry'
+        tags:
+            - { name: cli.controller, priority: 1100 }
+
     mink.listener.sessions:
         class: Oro\Bundle\TestFrameworkBundle\Behat\Listener\SessionsListener
         arguments:
@@ -25,21 +32,6 @@ services:
             - '@symfony2_extension.kernel'
         tags:
             - { name: event_dispatcher.subscriber, priority: 10 }
-
-    oro_test.listener.set_locale_subscriber:
-        class: Oro\Bundle\TestFrameworkBundle\Behat\Listener\SetLocaleSubscriber
-        arguments:
-            - '@oro_config.global'
-        tags:
-            - { name: event_dispatcher.subscriber, priority: 50 }
-
-    oro_test.listener.fixtures_subscriber:
-        class: Oro\Bundle\TestFrameworkBundle\Behat\Listener\FixturesSubscriber
-        arguments:
-            - '@oro_test.context.fixture_loader'
-            - '@oro_test.reference_repository_initializer'
-        tags:
-            - { name: 'event_dispatcher.subscriber', , priority: 20 }
 
     oro_test.listener.step_duration_measure_subscriber:
         class: 'Oro\Bundle\TestFrameworkBundle\Behat\Listener\StepDurationMeasureSubscriber'
@@ -115,7 +107,7 @@ services:
     oro_test.context.fixture_loader:
         class: Oro\Bundle\TestFrameworkBundle\Behat\Fixtures\FixtureLoader
         arguments:
-            - '@doctrine'
+            - '@symfony2_extension.kernel'
             - '@oro_test.entity_class_resolver'
             - '@oro_test.entity_supplement'
             - '@oro_test.alice_loader'
@@ -129,7 +121,7 @@ services:
     oro_test.entity_supplement:
         class: Oro\Bundle\TestFrameworkBundle\Behat\Fixtures\EntitySupplement
         arguments:
-            - '@doctrine'
+            - '@symfony2_extension.kernel'
             - '@oro_test.reference_repository'
             - '@oro_security.owner.metadata_provider.chain'
 
@@ -140,13 +132,11 @@ services:
     oro_test.reference_repository_initializer:
         class: '%oro_test.reference_initializer_class%'
         arguments:
-            - '@doctrine'
+            - '@symfony2_extension.kernel'
             - '@oro_test.reference_repository'
 
     oro_test.alice_loader:
         class: Oro\Bundle\TestFrameworkBundle\Behat\Fixtures\OroAliceLoader
-        calls:
-            - [setDoctrine, ['@doctrine']]
 
     oro_test.environment.handler.feature_environment_handler:
         class: Oro\Bundle\TestFrameworkBundle\Behat\Environment\Handler\FeatureEnvironmentHandler
