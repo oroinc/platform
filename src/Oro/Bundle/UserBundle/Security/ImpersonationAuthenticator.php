@@ -92,11 +92,13 @@ class ImpersonationAuthenticator implements GuardAuthenticatorInterface
     public function onAuthenticationSuccess(Request $request, TokenInterface $token, $providerKey)
     {
         $impersonation = $this->getImpersonation($this->getCredentials($request));
+        $token->setAttribute('IMPERSONATION', $impersonation->getId());
 
         $event = new ImpersonationSuccessEvent($impersonation);
         $this->eventDispatcher->dispatch(ImpersonationSuccessEvent::EVENT_NAME, $event);
 
         $impersonation->setLoginAt(new \DateTime('now', new \DateTimeZone('UTC')));
+        $impersonation->setIpAddress($request->getClientIp());
         $this->em->flush();
     }
 
