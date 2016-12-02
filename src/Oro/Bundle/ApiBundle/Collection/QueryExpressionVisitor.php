@@ -2,11 +2,12 @@
 
 namespace Oro\Bundle\ApiBundle\Collection;
 
-use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Expr\CompositeExpression;
 use Doctrine\Common\Collections\Expr\Value;
 use Doctrine\Common\Collections\Expr\ExpressionVisitor;
 use Doctrine\Common\Collections\Expr\Comparison;
+use Doctrine\ORM\Query\Expr as ExpressionBuilder;
+use Doctrine\ORM\Query\Parameter;
 use Doctrine\ORM\Query\QueryException;
 
 use Oro\Bundle\ApiBundle\Collection\QueryVisitorExpression\ComparisonExpressionInterface;
@@ -20,8 +21,11 @@ class QueryExpressionVisitor extends ExpressionVisitor
     /** @var array */
     private $queryAliases;
 
-    /** @var array */
+    /** @var Parameter[] */
     private $parameters = [];
+
+    /** @var ExpressionBuilder */
+    private $expressionBuilder;
 
     /** @var CompositeExpressionInterface[] */
     private $compositeExpressions = [];
@@ -30,10 +34,10 @@ class QueryExpressionVisitor extends ExpressionVisitor
     private $comparisonExpressions = [];
 
     /**
-     * @param array $compositeExpressions
-     * @param array $comparisonExpressions
+     * @param CompositeExpressionInterface[]  $compositeExpressions  [type => expression, ...]
+     * @param ComparisonExpressionInterface[] $comparisonExpressions [operator => expression, ...]
      */
-    public function __construct($compositeExpressions = [], $comparisonExpressions = [])
+    public function __construct(array $compositeExpressions = [], array $comparisonExpressions = [])
     {
         $this->compositeExpressions = $compositeExpressions;
         $this->comparisonExpressions = $comparisonExpressions;
@@ -49,27 +53,45 @@ class QueryExpressionVisitor extends ExpressionVisitor
 
     /**
      * Gets bound parameters.
-     * Filled after {@link dispach()}.
      *
-     * @return ArrayCollection
+     * @return Parameter[]
      */
     public function getParameters()
     {
-        return new ArrayCollection($this->parameters);
+        return $this->parameters;
     }
 
     /**
-     * Add new parameter.
+     * Binds a new parameter.
      *
-     * @param mixed $value
+     * @param Parameter|string $parameter An instance of Parameter object or the name of a parameter
+     * @param mixed            $value     The value of a parameter
+     * @param mixed            $type      The data type of a parameter
      */
-    public function addParameter($value)
+    public function addParameter($parameter, $value = null, $type = null)
     {
-        $this->parameters[] = $value;
+        if (!$parameter instanceof Parameter) {
+            $parameter = $this->createParameter($parameter, $value, $type);
+        }
+        $this->parameters[] = $parameter;
     }
 
     /**
-     * Build placeholder string for given parameter name.
+     * Creates a new instance of Parameter.
+     *
+     * @param string $name
+     * @param mixed  $value
+     * @param mixed  $type
+     *
+     * @return Parameter
+     */
+    public function createParameter($name, $value, $type = null)
+    {
+        return new Parameter($name, $value, $type);
+    }
+
+    /**
+     * Builds placeholder string for given parameter name.
      *
      * @param $parameterName
      *
@@ -81,27 +103,41 @@ class QueryExpressionVisitor extends ExpressionVisitor
     }
 
     /**
-     * {@inheritDoc}
+     * Gets a builder that can be used to create a different kind of expressions.
+     *
+     * @return ExpressionBuilder
      */
-    public function walkCompositeExpression(CompositeExpression $expr)
+    public function getExpressionBuilder()
     {
-        $expressionList = [];
-
-        foreach ($expr->getExpressionList() as $child) {
-            $expressionList[] = $this->dispatch($child);
+        if (null === $this->expressionBuilder) {
+            $this->expressionBuilder = new ExpressionBuilder();
         }
 
-        $expressionType = $expr->getType();
-
-        if (array_key_exists($expressionType, $this->compositeExpressions)) {
-            return $this->compositeExpressions[$expressionType]->walkCompositeExpression($expressionList);
-        }
-
-        throw new QueryException('Unknown composite ' . $expr->getType());
+        return $this->expressionBuilder;
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
+     */
+    public function walkCompositeExpression(CompositeExpression $expr)
+    {
+        $expressionType = $expr->getType();
+        if (!isset($this->compositeExpressions[$expressionType])) {
+            throw new QueryException('Unknown composite ' . $expr->getType());
+        }
+
+        $processedExpressions = [];
+        $expressions = $expr->getExpressionList();
+        foreach ($expressions as $expression) {
+            $processedExpressions[] = $this->dispatch($expression);
+        }
+
+        return $this->compositeExpressions[$expressionType]
+            ->walkCompositeExpression($processedExpressions);
+    }
+
+    /**
+     * {@inheritdoc}
      */
     public function walkComparison(Comparison $comparison)
     {
@@ -109,43 +145,61 @@ class QueryExpressionVisitor extends ExpressionVisitor
             throw new QueryException('No aliases are set before invoking walkComparison().');
         }
 
-        $field = $this->queryAliases[0] . '.' . $comparison->getField();
-
-        foreach ($this->queryAliases as $alias) {
-            if (strpos($comparison->getField() . '.', $alias . '.') === 0) {
-                $field = $comparison->getField();
-                break;
-            }
-        }
-
-        $parameterName = str_replace('.', '_', $comparison->getField());
-
-        foreach ($this->parameters as $parameter) {
-            if ($parameter->getName() === $parameterName) {
-                $parameterName .= '_' . count($this->parameters);
-                break;
-            }
-        }
-
-        // try to find the comparison expression by operator.
         $operator = $comparison->getOperator();
-        if (array_key_exists($operator, $this->comparisonExpressions)) {
-            return $this->comparisonExpressions[$operator]->walkComparisonExpression(
+        if (!isset($this->comparisonExpressions[$operator])) {
+            throw new QueryException('Unknown comparison operator: ' . $comparison->getOperator());
+        }
+
+        return $this->comparisonExpressions[$operator]
+            ->walkComparisonExpression(
                 $this,
                 $comparison,
-                $parameterName,
-                $field
+                $this->getFieldName($comparison->getField()),
+                $this->getParameterName($comparison->getField())
             );
-        }
-
-        throw new QueryException("Unknown comparison operator: " . $comparison->getOperator());
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function walkValue(Value $value)
     {
         return $value->getValue();
+    }
+
+    /**
+     * @param string $fieldName
+     *
+     * @return string
+     */
+    private function getFieldName($fieldName)
+    {
+        $result = $this->queryAliases[0] . '.' . $fieldName;
+        foreach ($this->queryAliases as $alias) {
+            if (0 === strpos($fieldName . '.', $alias . '.')) {
+                $result = $fieldName;
+                break;
+            }
+        }
+
+        return $result;
+    }
+
+    /**
+     * @param string $fieldName
+     *
+     * @return string
+     */
+    private function getParameterName($fieldName)
+    {
+        $result = str_replace('.', '_', $fieldName);
+        foreach ($this->parameters as $parameter) {
+            if ($parameter->getName() === $result) {
+                $result .= '_' . count($this->parameters);
+                break;
+            }
+        }
+
+        return $result;
     }
 }

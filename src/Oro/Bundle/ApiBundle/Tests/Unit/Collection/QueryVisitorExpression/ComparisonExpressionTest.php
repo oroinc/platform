@@ -16,14 +16,14 @@ class ComparisonExpressionTest extends \PHPUnit_Framework_TestCase
         $expression = new ComparisonExpression();
         $expressionVisitor = new QueryExpressionVisitor();
         $comparison = new Comparison('test', '>', 5);
+        $fieldName = 'a.test';
         $parameterName = 'test_2';
-        $field = 'a.test';
 
         $result = $expression->walkComparisonExpression(
             $expressionVisitor,
             $comparison,
-            $parameterName,
-            $field
+            $fieldName,
+            $parameterName
         );
 
         $this->assertEquals(
@@ -33,7 +33,7 @@ class ComparisonExpressionTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals(
             [new Parameter('test_2', 5, 'integer')],
-            $expressionVisitor->getParameters()->toArray()
+            $expressionVisitor->getParameters()
         );
     }
 }

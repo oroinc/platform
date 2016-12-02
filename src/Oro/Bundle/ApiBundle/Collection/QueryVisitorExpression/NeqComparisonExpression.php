@@ -3,32 +3,33 @@
 namespace Oro\Bundle\ApiBundle\Collection\QueryVisitorExpression;
 
 use Doctrine\Common\Collections\Expr\Comparison;
-use Doctrine\ORM\Query\Parameter;
-use Doctrine\ORM\Query\Expr;
 
 use Oro\Bundle\ApiBundle\Collection\QueryExpressionVisitor;
 
+/**
+ * Represents NOT EQUAL TO comparison expression.
+ */
 class NeqComparisonExpression implements ComparisonExpressionInterface
 {
     /**
      * {@inheritdoc}
      */
     public function walkComparisonExpression(
-        QueryExpressionVisitor $expressionVisitor,
+        QueryExpressionVisitor $visitor,
         Comparison $comparison,
-        $parameterName,
-        $field
+        $fieldName,
+        $parameterName
     ) {
-        $expr = new Expr();
-        if ($expressionVisitor->walkValue($comparison->getValue()) === null) {
-            return $expr->isNotNull($field);
+        $value = $visitor->walkValue($comparison->getValue());
+        if (null === $value) {
+            return $visitor->getExpressionBuilder()->isNotNull($fieldName);
         }
 
         // set parameter
-        $parameter = new Parameter($parameterName, $expressionVisitor->walkValue($comparison->getValue()));
-        $expressionVisitor->addParameter($parameter);
+        $visitor->addParameter($parameterName, $value);
 
         // generate expression
-        return $expr->neq($field, $expressionVisitor->buildPlaceholder($parameterName));
+        return $visitor->getExpressionBuilder()
+            ->neq($fieldName, $visitor->buildPlaceholder($parameterName));
     }
 }

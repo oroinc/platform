@@ -3,30 +3,28 @@
 namespace Oro\Bundle\ApiBundle\Collection\QueryVisitorExpression;
 
 use Doctrine\Common\Collections\Expr\Comparison;
-use Doctrine\ORM\Query\Parameter;
-use Doctrine\ORM\Query\Expr;
 
 use Oro\Bundle\ApiBundle\Collection\QueryExpressionVisitor;
 
+/**
+ * Represents MEMBER OF comparison expression.
+ */
 class MemberOfComparisonExpression implements ComparisonExpressionInterface
 {
-    const OPERATOR = 'MEMBER OF';
-
     /**
      * {@inheritdoc}
      */
     public function walkComparisonExpression(
-        QueryExpressionVisitor $expressionVisitor,
+        QueryExpressionVisitor $visitor,
         Comparison $comparison,
-        $parameterName,
-        $field
+        $fieldName,
+        $parameterName
     ) {
         // set parameter
-        $parameter = new Parameter($parameterName, $expressionVisitor->walkValue($comparison->getValue()));
-        $expressionVisitor->addParameter($parameter);
+        $visitor->addParameter($parameterName, $visitor->walkValue($comparison->getValue()));
 
         // generate expression
-        $expr = new Expr();
-        return $expr->isMemberOf($expressionVisitor->buildPlaceholder($parameterName), $field);
+        return $visitor->getExpressionBuilder()
+            ->isMemberOf($visitor->buildPlaceholder($parameterName), $fieldName);
     }
 }

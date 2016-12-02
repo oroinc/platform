@@ -5,8 +5,6 @@ namespace Oro\Bundle\ApiBundle\Filter;
 use Doctrine\Common\Collections\Expr\Comparison;
 use Doctrine\Common\Collections\Expr\CompositeExpression;
 
-use Oro\Bundle\ApiBundle\Collection\QueryVisitorExpression\MemberOfComparisonExpression;
-use Oro\Bundle\ApiBundle\Collection\QueryVisitorExpression\NotCompositeExpression;
 use Oro\Bundle\ApiBundle\Exception\RuntimeException;
 use Oro\Bundle\EntityExtendBundle\Entity\Manager\AssociationManager;
 use Oro\Bundle\EntityExtendBundle\Extend\RelationType;
@@ -67,24 +65,17 @@ class ExtendedAssociationFilter extends AssociationFilter
     {
         $this->assertFilterValuePath($field, $path);
 
-        if ($this->associationType === RelationType::MANY_TO_MANY) {
-            $fieldName = $this->getFieldName(substr($path, strlen($field) + 1));
-            if ($operator === self::EQ) {
-                return new Comparison($fieldName, MemberOfComparisonExpression::OPERATOR, $value);
-            } else {
-                return new CompositeExpression(
-                    NotCompositeExpression::TYPE,
-                    [new Comparison($fieldName, MemberOfComparisonExpression::OPERATOR, $value)]
-                );
+        $fieldName = $this->getFieldName(substr($path, strlen($field) + 1));
+        if (RelationType::MANY_TO_MANY === $this->associationType) {
+            $expr = new Comparison($fieldName, 'MEMBER OF', $value);
+            if (self::NEQ === $operator) {
+                $expr = new CompositeExpression('NOT', [$expr]);
             }
+
+            return $expr;
         }
 
-        return parent::doBuildExpression(
-            $this->getFieldName(substr($path, strlen($field) + 1)),
-            $path,
-            $operator,
-            $value
-        );
+        return parent::doBuildExpression($fieldName, $path, $operator, $value);
     }
 
     /**

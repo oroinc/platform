@@ -5,11 +5,11 @@ namespace Oro\Bundle\ApiBundle\Collection\QueryVisitorExpression;
 interface CompositeExpressionInterface
 {
     /**
-     * Get composite expression by expressions into the target query language output.
+     * Builds a composite expression.
      *
-     * @param array $expressionList
+     * @param array $expressions
      *
      * @return mixed
      */
-    public function walkCompositeExpression(array $expressionList);
+    public function walkCompositeExpression(array $expressions);
 }

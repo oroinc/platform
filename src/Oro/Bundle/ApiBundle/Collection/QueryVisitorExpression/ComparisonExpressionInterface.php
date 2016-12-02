@@ -8,19 +8,19 @@ use Oro\Bundle\ApiBundle\Collection\QueryExpressionVisitor;
 interface ComparisonExpressionInterface
 {
     /**
-     * Get expression by comparison expression into the target query language output.
+     * Builds a comparison expression.
      *
-     * @param QueryExpressionVisitor $expressionVisitor
+     * @param QueryExpressionVisitor $visitor
      * @param Comparison             $comparison
+     * @param string                 $fieldName
      * @param string                 $parameterName
-     * @param string                 $field
      *
      * @return mixed
      */
     public function walkComparisonExpression(
-        QueryExpressionVisitor $expressionVisitor,
+        QueryExpressionVisitor $visitor,
         Comparison $comparison,
-        $parameterName,
-        $field
+        $fieldName,
+        $parameterName
     );
 }

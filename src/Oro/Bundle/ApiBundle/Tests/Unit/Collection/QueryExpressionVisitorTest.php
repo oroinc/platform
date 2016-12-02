@@ -2,15 +2,15 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Collection;
 
-use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Expr\Comparison;
 use Doctrine\Common\Collections\Expr\CompositeExpression;
 use Doctrine\Common\Collections\Expr\Value;
 use Doctrine\DBAL\Connection;
+use Doctrine\ORM\Query\Expr as ExpressionBuilder;
 use Doctrine\ORM\Query\Expr\Andx;
+use Doctrine\ORM\Query\Expr\Comparison as OrmComparison;
 use Doctrine\ORM\Query\Expr\Func;
 use Doctrine\ORM\Query\Parameter;
-use Doctrine\ORM\Query\Expr\Comparison as OrmComparison;
 
 use Oro\Bundle\ApiBundle\Collection\QueryExpressionVisitor;
 use Oro\Bundle\ApiBundle\Collection\QueryVisitorExpression\AndCompositeExpression;
@@ -19,16 +19,58 @@ use Oro\Bundle\ApiBundle\Collection\QueryVisitorExpression\InComparisonExpressio
 
 class QueryExpressionVisitorTest extends \PHPUnit_Framework_TestCase
 {
-    public function testParameters()
+    public function testGetEmptyParameters()
     {
         $expressionVisitor = new QueryExpressionVisitor();
-        $expressionVisitor->addParameter('first');
-        $expressionVisitor->addParameter(2);
-        $expressionVisitor->addParameter([3]);
+
+        $this->assertSame([], $expressionVisitor->getParameters());
+    }
+
+    public function testGetParameters()
+    {
+        $expressionVisitor = new QueryExpressionVisitor();
+
+        $parameter = new Parameter('prm1', 'val1');
+        $expressionVisitor->addParameter($parameter);
+
+        $this->assertEquals([$parameter], $expressionVisitor->getParameters());
+    }
+
+    public function testAddParameterObject()
+    {
+        $expressionVisitor = new QueryExpressionVisitor();
+
+        $parameter = new Parameter('prm1', 'val1');
+        $expressionVisitor->addParameter($parameter);
+
+        $this->assertEquals([$parameter], $expressionVisitor->getParameters());
+    }
+
+    public function testAddParameterWithoutType()
+    {
+        $expressionVisitor = new QueryExpressionVisitor();
+
+        $expressionVisitor->addParameter('prm1', 'val1');
+
+        $this->assertEquals([new Parameter('prm1', 'val1')], $expressionVisitor->getParameters());
+    }
+
+    public function testAddParameterWithType()
+    {
+        $expressionVisitor = new QueryExpressionVisitor();
+
+        $expressionVisitor->addParameter('prm1', 'val1', 'string');
+
+        $this->assertEquals([new Parameter('prm1', 'val1', 'string')], $expressionVisitor->getParameters());
+    }
+
+    public function testCreateParameter()
+    {
+        $expressionVisitor = new QueryExpressionVisitor();
 
         $this->assertEquals(
-            new ArrayCollection(['first', 2, [3]]),
-            $expressionVisitor->getParameters()
+            new Parameter('prm1', 'val1', 'string'),
+            $expressionVisitor->createParameter('prm1', 'val1', 'string')
         );
     }
 
@@ -36,6 +78,16 @@ class QueryExpressionVisitorTest extends \PHPUnit_Framework_TestCase
     {
         $expressionVisitor = new QueryExpressionVisitor();
         $this->assertEquals(':test', $expressionVisitor->buildPlaceholder('test'));
+    }
+
+    public function testGetExpressionBuilder()
+    {
+        $expressionVisitor = new QueryExpressionVisitor();
+
+        $this->assertInstanceOf(
+            ExpressionBuilder::class,
+            $expressionVisitor->getExpressionBuilder()
+        );
     }
 
     public function testWalkValue()
@@ -91,7 +143,7 @@ class QueryExpressionVisitorTest extends \PHPUnit_Framework_TestCase
                 new Parameter('e_id', 12, 'integer'),
                 new Parameter('e_id_2', 25, 'integer'),
             ],
-            $expressionVisitor->getParameters()->toArray()
+            $expressionVisitor->getParameters()
         );
     }
 
@@ -126,7 +178,7 @@ class QueryExpressionVisitorTest extends \PHPUnit_Framework_TestCase
             [
                 new Parameter('e_test', [1, 2, 3], Connection::PARAM_INT_ARRAY)
             ],
-            $expressionVisitor->getParameters()->toArray()
+            $expressionVisitor->getParameters()
         );
     }
 

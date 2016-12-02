@@ -5,10 +5,9 @@ namespace Oro\Bundle\ApiBundle\Util;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\ORM\Query\QueryException;
 
-use Oro\Bundle\ApiBundle\Collection\QueryExpressionVisitorFactory;
 use Oro\Component\DoctrineUtils\ORM\QueryUtils;
 use Oro\Bundle\ApiBundle\Collection\Criteria;
-use Oro\Bundle\ApiBundle\Collection\QueryExpressionVisitor;
+use Oro\Bundle\ApiBundle\Collection\QueryExpressionVisitorFactory;
 
 class CriteriaConnector
 {
@@ -81,39 +80,42 @@ class CriteriaConnector
             throw new QueryException('No aliases are set before invoking addCriteria().');
         }
 
-        $expressionVisitor = $this->expressionVisitorFactory->getExpressionVisitor();
-        $expressionVisitor->setQueryAliases($qb->getAllAliases());
+        $expressionVisitor = $this->expressionVisitorFactory->createExpressionVisitor();
+        $expressionVisitor->setQueryAliases($allAliases);
 
-        if ($whereExpression = $criteria->getWhereExpression()) {
+        $whereExpression = $criteria->getWhereExpression();
+        if (null !== $whereExpression) {
             $qb->andWhere($expressionVisitor->dispatch($whereExpression));
-            foreach ($expressionVisitor->getParameters() as $parameter) {
+            $parameters = $expressionVisitor->getParameters();
+            foreach ($parameters as $parameter) {
                 $qb->getParameters()->add($parameter);
             }
         }
 
-        if ($criteria->getOrderings()) {
-            foreach ($criteria->getOrderings() as $sort => $order) {
-                $hasValidAlias = false;
-                foreach ($allAliases as $alias) {
-                    if (strpos($sort . '.', $alias . '.') === 0) {
-                        $hasValidAlias = true;
-                        break;
-                    }
+        $orderings = $criteria->getOrderings();
+        foreach ($orderings as $sort => $order) {
+            $hasValidAlias = false;
+            foreach ($allAliases as $alias) {
+                if (0 === strpos($sort . '.', $alias . '.')) {
+                    $hasValidAlias = true;
+                    break;
                 }
-
-                if (!$hasValidAlias) {
-                    $sort = $allAliases[0] . '.' . $sort;
-                }
-
-                $qb->addOrderBy($sort, $order);
             }
+
+            if (!$hasValidAlias) {
+                $sort = $allAliases[0] . '.' . $sort;
+            }
+
+            $qb->addOrderBy($sort, $order);
         }
 
         // Overwrite limits only if they was set in criteria
-        if (($firstResult = $criteria->getFirstResult()) !== null) {
+        $firstResult = $criteria->getFirstResult();
+        if (null !== $firstResult) {
             $qb->setFirstResult($firstResult);
         }
-        if (($maxResults = $criteria->getMaxResults()) !== null) {
+        $maxResults = $criteria->getMaxResults();
+        if (null !== $maxResults) {
             $qb->setMaxResults($maxResults);
         }
     }

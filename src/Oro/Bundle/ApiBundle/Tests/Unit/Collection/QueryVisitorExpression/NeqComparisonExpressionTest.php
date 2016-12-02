@@ -16,14 +16,14 @@ class NeqComparisonExpressionTest extends \PHPUnit_Framework_TestCase
         $expression = new NeqComparisonExpression();
         $expressionVisitor = new QueryExpressionVisitor();
         $comparison = new Comparison('test', 'NEQ', 'text');
+        $fieldName = 'a.test';
         $parameterName = 'test_2';
-        $field = 'a.test';
 
         $result = $expression->walkComparisonExpression(
             $expressionVisitor,
             $comparison,
-            $parameterName,
-            $field
+            $fieldName,
+            $parameterName
         );
 
         $this->assertEquals(
@@ -33,7 +33,7 @@ class NeqComparisonExpressionTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals(
             [new Parameter('test_2', 'text', \PDO::PARAM_STR)],
-            $expressionVisitor->getParameters()->toArray()
+            $expressionVisitor->getParameters()
         );
     }
 
@@ -42,14 +42,14 @@ class NeqComparisonExpressionTest extends \PHPUnit_Framework_TestCase
         $expression = new NeqComparisonExpression();
         $expressionVisitor = new QueryExpressionVisitor();
         $comparison = new Comparison('test', 'NEQ', null);
+        $fieldName = 'a.test';
         $parameterName = 'test_2';
-        $field = 'a.test';
 
         $result = $expression->walkComparisonExpression(
             $expressionVisitor,
             $comparison,
-            $parameterName,
-            $field
+            $fieldName,
+            $parameterName
         );
 
         $this->assertEquals(
@@ -58,7 +58,7 @@ class NeqComparisonExpressionTest extends \PHPUnit_Framework_TestCase
         );
 
         $this->assertEmpty(
-            $expressionVisitor->getParameters()->toArray()
+            $expressionVisitor->getParameters()
         );
     }
 }

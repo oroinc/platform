@@ -261,29 +261,46 @@ class CriteriaConnectorTest extends OrmRelatedTestCase
         );
     }
 
+    public function testCriteriaWhenFirstResultIsNotSet()
+    {
+        $qb = new QueryBuilder($this->em);
+        $qb->select('e')->from($this->getEntityClass('User'), 'e');
+
+        $this->criteriaConnector->applyCriteria($qb, $this->criteria);
+
+        $this->assertNull($qb->getFirstResult());
+    }
+
     public function testCriteriaWithFirstResult()
     {
         $qb = new QueryBuilder($this->em);
         $qb->select('e')->from($this->getEntityClass('User'), 'e');
-        $this->criteria->setFirstResult(12);
 
-        $this->assertEquals(0, $qb->getFirstResult());
+        $this->criteria->setFirstResult(12);
 
         $this->criteriaConnector->applyCriteria($qb, $this->criteria);
 
-        $this->assertEquals(12, $qb->getFirstResult());
+        $this->assertSame(12, $qb->getFirstResult());
     }
 
-    public function testCriteriaWithMaxResultsResult()
+    public function testCriteriaWhenMaxResultsIsNotSet()
+    {
+        $qb = new QueryBuilder($this->em);
+        $qb->select('e')->from($this->getEntityClass('User'), 'e');
+
+        $this->criteriaConnector->applyCriteria($qb, $this->criteria);
+
+        $this->assertNull($qb->getMaxResults());
+    }
+
+    public function testCriteriaWithMaxResults()
     {
         $qb = new QueryBuilder($this->em);
         $qb->select('e')->from($this->getEntityClass('User'), 'e');
         $this->criteria->setMaxResults(3);
 
-        $this->assertEquals(0, $qb->getMaxResults());
-
         $this->criteriaConnector->applyCriteria($qb, $this->criteria);
 
-        $this->assertEquals(3, $qb->getMaxResults());
+        $this->assertSame(3, $qb->getMaxResults());
     }
 }

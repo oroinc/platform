@@ -4,22 +4,22 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Collection;
 
 use Oro\Bundle\ApiBundle\Collection\QueryExpressionVisitor;
 use Oro\Bundle\ApiBundle\Collection\QueryExpressionVisitorFactory;
-use Oro\Bundle\ApiBundle\Collection\QueryVisitorExpression\AndCompositeExpression;
-use Oro\Bundle\ApiBundle\Collection\QueryVisitorExpression\InComparisonExpression;
+use Oro\Bundle\ApiBundle\Collection\QueryVisitorExpression\ComparisonExpressionInterface;
+use Oro\Bundle\ApiBundle\Collection\QueryVisitorExpression\CompositeExpressionInterface;
 
 class QueryExpressionVisitorFactoryTest extends \PHPUnit_Framework_TestCase
 {
-    public function testGetExpressionVisitor()
+    public function testCreateExpressionVisitor()
     {
-        $compositeExpressions = ['AND' => new AndCompositeExpression()];
-        $comparisonExpressions = ['IN' => new InComparisonExpression()];
+        $compositeExpressions = ['AND' => $this->getMock(CompositeExpressionInterface::class)];
+        $comparisonExpressions = ['=' => $this->getMock(ComparisonExpressionInterface::class)];
 
         $factory = new QueryExpressionVisitorFactory(
             $compositeExpressions,
             $comparisonExpressions
         );
 
-        $expressionVisitor = $factory->getExpressionVisitor();
+        $expressionVisitor = $factory->createExpressionVisitor();
 
         $this->assertEquals(
             new QueryExpressionVisitor($compositeExpressions, $comparisonExpressions),

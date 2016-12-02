@@ -16,14 +16,14 @@ class EqComparisonExpressionTest extends \PHPUnit_Framework_TestCase
         $expression = new EqComparisonExpression();
         $expressionVisitor = new QueryExpressionVisitor();
         $comparison = new Comparison('test', 'EQ', 'text');
+        $fieldName = 'a.test';
         $parameterName = 'test_2';
-        $field = 'a.test';
 
         $result = $expression->walkComparisonExpression(
             $expressionVisitor,
             $comparison,
-            $parameterName,
-            $field
+            $fieldName,
+            $parameterName
         );
 
         $this->assertEquals(
@@ -33,7 +33,7 @@ class EqComparisonExpressionTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals(
             [new Parameter('test_2', 'text', \PDO::PARAM_STR)],
-            $expressionVisitor->getParameters()->toArray()
+            $expressionVisitor->getParameters()
         );
     }
 
@@ -42,14 +42,14 @@ class EqComparisonExpressionTest extends \PHPUnit_Framework_TestCase
         $expression = new EqComparisonExpression();
         $expressionVisitor = new QueryExpressionVisitor();
         $comparison = new Comparison('test', 'EQ', null);
+        $fieldName = 'a.test';
         $parameterName = 'test_2';
-        $field = 'a.test';
 
         $result = $expression->walkComparisonExpression(
             $expressionVisitor,
             $comparison,
-            $parameterName,
-            $field
+            $fieldName,
+            $parameterName
         );
 
         $this->assertEquals(
@@ -58,7 +58,7 @@ class EqComparisonExpressionTest extends \PHPUnit_Framework_TestCase
         );
 
         $this->assertEmpty(
-            $expressionVisitor->getParameters()->toArray()
+            $expressionVisitor->getParameters()
         );
     }
 }

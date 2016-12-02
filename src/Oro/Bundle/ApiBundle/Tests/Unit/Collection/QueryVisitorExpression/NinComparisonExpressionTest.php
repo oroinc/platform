@@ -17,14 +17,14 @@ class NinComparisonExpressionTest extends \PHPUnit_Framework_TestCase
         $expression = new NinComparisonExpression();
         $expressionVisitor = new QueryExpressionVisitor();
         $comparison = new Comparison('test', 'NIN', [1, 2, 3]);
+        $fieldName = 'a.test';
         $parameterName = 'test_2';
-        $field = 'a.test';
 
         $result = $expression->walkComparisonExpression(
             $expressionVisitor,
             $comparison,
-            $parameterName,
-            $field
+            $fieldName,
+            $parameterName
         );
 
         $this->assertEquals(
@@ -34,7 +34,7 @@ class NinComparisonExpressionTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals(
             [new Parameter('test_2', [1, 2, 3], Connection::PARAM_INT_ARRAY)],
-            $expressionVisitor->getParameters()->toArray()
+            $expressionVisitor->getParameters()
         );
     }
 }

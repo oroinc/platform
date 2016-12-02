@@ -3,28 +3,28 @@
 namespace Oro\Bundle\ApiBundle\Collection\QueryVisitorExpression;
 
 use Doctrine\Common\Collections\Expr\Comparison;
-use Doctrine\ORM\Query\Parameter;
-use Doctrine\ORM\Query\Expr;
 
 use Oro\Bundle\ApiBundle\Collection\QueryExpressionVisitor;
 
+/**
+ * Represents NOT IN comparison expression.
+ */
 class NinComparisonExpression implements ComparisonExpressionInterface
 {
     /**
      * {@inheritdoc}
      */
     public function walkComparisonExpression(
-        QueryExpressionVisitor $expressionVisitor,
+        QueryExpressionVisitor $visitor,
         Comparison $comparison,
-        $parameterName,
-        $field
+        $fieldName,
+        $parameterName
     ) {
         // set parameter
-        $parameter = new Parameter($parameterName, $expressionVisitor->walkValue($comparison->getValue()));
-        $expressionVisitor->addParameter($parameter);
+        $visitor->addParameter($parameterName, $visitor->walkValue($comparison->getValue()));
 
         // generate expression
-        $expr = new Expr();
-        return $expr->notIn($field, $expressionVisitor->buildPlaceholder($parameterName));
+        return $visitor->getExpressionBuilder()
+            ->notIn($fieldName, $visitor->buildPlaceholder($parameterName));
     }
 }

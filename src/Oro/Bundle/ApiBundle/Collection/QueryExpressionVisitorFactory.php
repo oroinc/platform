@@ -14,21 +14,21 @@ class QueryExpressionVisitorFactory
     private $comparisonExpressions = [];
 
     /**
-     * @param array $compositeExpressions
-     * @param array $comparisonExpressions
+     * @param CompositeExpressionInterface[]  $compositeExpressions  [type => expression, ...]
+     * @param ComparisonExpressionInterface[] $comparisonExpressions [operator => expression, ...]
      */
-    public function __construct($compositeExpressions = [], $comparisonExpressions = [])
+    public function __construct(array $compositeExpressions = [], array $comparisonExpressions = [])
     {
         $this->compositeExpressions = $compositeExpressions;
         $this->comparisonExpressions = $comparisonExpressions;
     }
 
     /**
-     * Returns new instance of QueryExpressionVisitor.
+     * Creates a new instance of QueryExpressionVisitor.
      *
      * @return QueryExpressionVisitor
      */
-    public function getExpressionVisitor()
+    public function createExpressionVisitor()
     {
         return new QueryExpressionVisitor($this->compositeExpressions, $this->comparisonExpressions);
     }
