@@ -32,7 +32,7 @@ use Oro\Bundle\UserBundle\Migrations\Schema\v1_18\AddEmailUserColumn;
 use Oro\Bundle\UserBundle\Migrations\Schema\v1_18\DropEmailUserColumn;
 use Oro\Bundle\UserBundle\Migrations\Schema\v1_19\AddFirstNameLastNameIndex;
 use Oro\Bundle\UserBundle\Migrations\Schema\v1_22\AddImpersonationTable;
-use Oro\Bundle\UserBundle\Migrations\Schema\v1_23\AddAuthStatusColumn;
+use Oro\Bundle\UserBundle\Migrations\Schema\v1_24\AddAuthStatusColumn;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyMethods)
