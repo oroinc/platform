@@ -846,18 +846,31 @@ to the [Fallback documentation](./src/Oro/Bundle/EntityBundle/Resources/doc/enti
 - Added interface `Oro\Bundle\InstallerBundle\CacheWarmer\NamespaceMigrationProviderInterface`. it makes available add the rules for command "oro:platform:upgrade20"
 
 ####OroNoteBundle
-- "Note" entity was changed to the regular activity
-- "note" entity config scope was removed
-- Specific "Note" association type was removed
-- Oro\Bundle\NoteBundle\Migration\Extension\NoteExtension was removed
-- Oro\Bundle\NoteBundle\Migration\Extension\NoteExtensionAwareInterface was removed
-- Oro\Bundle\NoteBundle\Migration\Extension\NoteExtensionAwareInterface was removed
-- Oro\Bundle\NoteBundle\Placeholder\PlaceholderFilter was removed
-- Oro\Bundle\NoteBundle\Provider\NoteExclusionProvider was removed
-- Oro\Bundle\NoteBundle\Tools\NoteAssociationHelper was removed
-- Oro\Bundle\NoteBundle\Tools\NoteEntityConfigDumperExtension was removed
-- Oro\Bundle\NoteBundle\Tools\NoteEntityGeneratorExtension was removed
-- Oro\Bundle\NoteBundle\EventListener\MergeListener was removed.
-- Oro\Bundle\NoteBundle\Model\MergeModes was removed.
-- Oro\Bundle\NoteBundle\Model\Strategy\ReplaceStrategy was removed.
-- Oro\Bundle\NoteBundle\Model\Strategy\UniteStrategy was removed.
+- Implementation of activity list relation with entity  `Oro\Bundle\NoteBundle\Entity\Note` was changed. Now the entity is a regular activity entity like others: Email, Task, Call, Email, etc.
+
+Before
+- One Note could be related only to one entity in the Activity List.
+
+After
+- One Note could be related to many entities in the Activity List. Context field can be used to add Note to multiple entities.
+
+- Added implementation of `Oro\Bundle\ActivityBundle\Model\ActivityInterface` to `Oro\Bundle\NoteBundle\Entity\Note`.
+- Extra classes and services were removed as unnecessary after Note entity became a regular activity entity. See detailed list of removed items below. 
+- Class `Oro\Bundle\NoteBundle\Migration\Extension\NoteExtension` was removed. Generic extension `Oro\Bundle\ActivityBundle\Migration\Extension\ActivityExtension` is used to add relation of entity with Note as Activity.
+- Class `Oro\Bundle\NoteBundle\Migration\Extension\NoteExtensionAwareInterface` was removed. Generic interface `\Oro\Bundle\ActivityBundle\Migration\Extension\ActivityExtensionAwareInterface` should be used instead in schema migrations.
+- Entity config with scope "note" was removed after Note entity became a regular Activity entity.
+- Class `Oro\Bundle\NoteBundle\Placeholder\PlaceholderFilter` and service `oro_note.placeholder.filter` were removed.
+- Class `Oro\Bundle\NoteBundle\Provider\NoteExclusionProvider` and service `oro_note.exclusion_provider` were removed.
+- Class `Oro\Bundle\NoteBundle\Tools\NoteAssociationHelper` and service `oro_note.association_helper` were removed.
+- Class `Oro\Bundle\NoteBundle\Tools\NoteEntityConfigDumperExtension` and service `oro_note.entity_config_dumper.extension` were removed.
+- Class `Oro\Bundle\NoteBundle\Tools\NoteEntityGeneratorExtension` and service `oro_note.entity_generator.extension` were removed.
+- Class `Oro\Bundle\NoteBundle\EventListener\MergeListener` and service `oro_note.listener.merge_listener` were removed. Generic class `Oro\Bundle\ActivityListBundle\EventListener\MergeListener` for activity entities now is used instead.
+- Class `Oro\Bundle\NoteBundle\Model\MergeModes` was removed. Generic class `Oro\Bundle\ActivityListBundle\Model\MergeModes` for activity entities now is used instead.
+- Class `Oro\Bundle\NoteBundle\Model\Strategy\ReplaceStrategy` and service `oro_note.strategy.replace` were removed. Generic class `Oro\Bundle\ActivityListBundle\Model\Strategy\ReplaceStrategy` for activity entities now is used instead.
+- Class `Oro\Bundle\NoteBundle\Model\Stratgy\UniteStrategy` and service `oro_note.strategy.unite` were removed. Generic class `Oro\Bundle\ActivityListBundle\Model\Strategy\UniteStrategy` for activity entities now is used instead.
+- Service `oro_note.widget_provider.actions` was removed.
+- Added parameter `renderContexts` to route controller action `Oro\Bundle\NoteBundle\Controller\Note::infoAction` (route `oro_note_widget_info`). Default value of the parameter is `true`. 
+- Changed signature of controller action `Oro\Bundle\NoteBundle\Controller\Note::createAction`. The parameters of route `oro_note_create` remain the same as before - `entityClass` and `entityId`.
+- View template `OroNoteBundle:Note:js/activityItemTemplate.html.twig` was changed. 
+- View template `OroNoteBundle:Note:widget/info.html.twig` was changed.
+- Add JS mobules `oronote/js/app/components/note-context-component.js` and `oronote/js/app/components/notes-component.js`. These modules responsible to disable possibility to remove last entity in the context field or Note.  
