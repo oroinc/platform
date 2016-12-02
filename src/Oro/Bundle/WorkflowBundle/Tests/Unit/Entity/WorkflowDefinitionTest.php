@@ -4,6 +4,7 @@ namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Oro\Bundle\ScopeBundle\Entity\Scope;
+use Oro\Bundle\WorkflowBundle\Configuration\WorkflowConfiguration;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowEntityAcl;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowRestriction;
@@ -255,5 +256,19 @@ class WorkflowDefinitionTest extends \PHPUnit_Framework_TestCase
         // resetting
         $this->workflowDefinition->setRestrictions([]);
         $this->assertEmpty($this->workflowDefinition->getRestrictions()->toArray());
+    }
+
+    public function testGetDisabledOperations()
+    {
+        $configuration = [
+            WorkflowConfiguration::NODE_DISABLE_OPERATIONS => [
+                'operation' => ['entity']
+            ]
+        ];
+        $this->workflowDefinition->setConfiguration($configuration);
+        $this->assertSame(
+            $configuration[WorkflowConfiguration::NODE_DISABLE_OPERATIONS],
+            $this->workflowDefinition->getDisabledOperations()
+        );
     }
 }
