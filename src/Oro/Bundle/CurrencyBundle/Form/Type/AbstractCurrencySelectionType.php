@@ -21,9 +21,10 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 abstract class AbstractCurrencySelectionType extends AbstractType
 {
     /**
-     * $var CurrencyConfigInterface
+     * @var CurrencyProviderInterface
      */
     protected $currencyProvider;
+
     /**
      * @var LocaleSettings
      */
