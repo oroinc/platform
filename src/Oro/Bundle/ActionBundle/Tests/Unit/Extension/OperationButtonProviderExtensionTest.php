@@ -6,6 +6,7 @@ use Oro\Bundle\ActionBundle\Extension\OperationButtonProviderExtension;
 use Oro\Bundle\ActionBundle\Helper\ContextHelper;
 use Oro\Bundle\ActionBundle\Model\ActionData;
 use Oro\Bundle\ActionBundle\Model\ButtonContext;
+use Oro\Bundle\ActionBundle\Model\ButtonInterface;
 use Oro\Bundle\ActionBundle\Model\ButtonSearchContext;
 use Oro\Bundle\ActionBundle\Model\Operation;
 use Oro\Bundle\ActionBundle\Model\OperationButton;
@@ -121,6 +122,49 @@ class OperationButtonProviderExtensionTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * @dataProvider isAvailableDataProvider
+     *
+     * @param ButtonInterface $button
+     * @param bool $expected
+     */
+    public function testIsAvailable(ButtonInterface $button, $expected)
+    {
+        $this->assertContextHelperCalled((int) ($button instanceof OperationButton));
+        $this->assertEquals($expected, $this->extension->isAvailable($button, $this->createButtonSearchContext()));
+    }
+
+    /**
+     * @return array
+     */
+    public function isAvailableDataProvider()
+    {
+        $operationButtonAvailable = $this->createOperationButton(true);
+        $operationButtonNotAvailable = $this->createOperationButton(false);
+        $notOperationButtonAvailable = $this->getMock(ButtonInterface::class);
+
+        return [
+            'available' => [
+                'button' => $operationButtonAvailable,
+                'expected' => true
+            ],
+            'not available' => [
+                'button' => $operationButtonNotAvailable,
+                'expected' => false
+            ],
+            'not supported' => [
+                'button' => $notOperationButtonAvailable,
+                'expected' => false
+            ],
+        ];
+    }
+
+    public function testSupports()
+    {
+        $this->assertTrue($this->extension->supports($this->createOperationButton()));
+        $this->assertFalse($this->extension->supports($this->getMock(ButtonInterface::class)));
+    }
+
+    /**
      * @param bool $isAvailable
      * @param bool $withForm
      *
@@ -129,10 +173,24 @@ class OperationButtonProviderExtensionTest extends \PHPUnit_Framework_TestCase
     private function createOperationMock($isAvailable = false, $withForm = false)
     {
         $operation = $this->getMockBuilder(Operation::class)->disableOriginalConstructor()->getMock();
-        $operation->expects($this->once())->method('isAvailable')->with(new ActionData())->willReturn($isAvailable);
-        $operation->expects($this->once())->method('hasForm')->willReturn($withForm);
+        $operation->expects($this->any())->method('isAvailable')->willReturn($isAvailable);
+        $operation->expects($isAvailable?$this->atLeastOnce():$this->never())->method('hasForm')->willReturn($withForm);
 
         return $operation;
+    }
+
+    /**
+     * @param bool $isOperationAvailable
+     *
+     * @return OperationButton
+     */
+    private function createOperationButton($isOperationAvailable = false)
+    {
+        $buttonSearchContext = $this->createButtonSearchContext();
+        $buttonContext = $this->createButtonContext($buttonSearchContext);
+        $data = new ActionData();
+
+        return new OperationButton($this->createOperationMock($isOperationAvailable), $buttonContext, $data);
     }
 
     /**
@@ -190,8 +248,13 @@ class OperationButtonProviderExtensionTest extends \PHPUnit_Framework_TestCase
             ->willReturn($operations);
     }
 
-    private function assertContextHelperCalled()
+    /**
+     * @param int $callsCount
+     */
+    private function assertContextHelperCalled($callsCount = 1)
     {
-        $this->contextHelper->expects($this->once())->method('getActionData')->willReturn(new ActionData());
+        $this->contextHelper->expects($this->exactly($callsCount))
+            ->method('getActionData')
+            ->willReturn(new ActionData());
     }
 }

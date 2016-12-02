@@ -6,6 +6,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 
 use Oro\Bundle\ActionBundle\Extension\ButtonProviderExtensionInterface;
 use Oro\Bundle\ActionBundle\Model\ButtonContext;
+use Oro\Bundle\ActionBundle\Model\ButtonInterface;
 use Oro\Bundle\ActionBundle\Model\ButtonSearchContext;
 use Oro\Bundle\ActionBundle\Model\OperationRegistry;
 use Oro\Bundle\ActionBundle\Provider\RouteProviderInterface;
@@ -81,6 +82,24 @@ class TransitionButtonProviderExtension implements ButtonProviderExtensionInterf
         $this->baseButtonContext = null;
 
         return $buttons;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function isAvailable(ButtonInterface $button, ButtonSearchContext $buttonSearchContext)
+    {
+        // ToDo: should be updated in BAP-12867
+        return $this->supports($button);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function supports(ButtonInterface $button)
+    {
+        // ToDo: should be updated in BAP-12867
+        return true;
     }
 
     /**
