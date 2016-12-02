@@ -108,7 +108,6 @@ define(function(require) {
 
         onTransition: function(e) {
             e.preventDefault();
-            console.log(e.target);
             var $el = $(e.target);
             TransitionHandler.call($el);
         },

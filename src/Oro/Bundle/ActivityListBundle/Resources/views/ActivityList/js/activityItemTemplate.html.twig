@@ -8,13 +8,11 @@
     {% set action %}
         <% if (workflowsData) { %>
             <% _.each(workflowsData, function(workflow) { %>
-                <% console.log(workflow) %>
                 <% if (workflow.transitionsData.length > 0) { %>
                     <li role="separator" class="divider"></li>
                     <% _.each(workflow.transitionsData, function(transition) { %>
                         <li>
-                            <a href="#"
-                               class="transition-item"
+                            <a href="#" class="transition-item"
                                id="transition-<%- workflow.name %>-<%- transition.name %>"
                                data-transition-url="<%- transition.transitionUrl %>"
                                data-transition-label="<%- transition.label %>"
@@ -23,7 +21,7 @@
                                 <% if (transition.frontendOptions.dialog) { %>
                                     data-dialog-options="<%- JSON.stringify(transition.frontendOptions.dialog) %>"
                                 <% } %>
-                            <% }else { %>
+                            <% } else { %>
                                 message="<%- 'start?' %>"
                             <% } %>
                             >
