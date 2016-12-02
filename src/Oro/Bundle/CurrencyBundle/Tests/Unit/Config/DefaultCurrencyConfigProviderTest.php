@@ -14,7 +14,7 @@ class DefaultCurrencyConfigProviderTest extends \PHPUnit_Framework_TestCase
 
     public function setUp()
     {
-        $this->configManager = $this->getMockBuilder('Oro\Bundle\ConfigBundle\Config\ConfigManager')
+        $this->configManager = $this->getMockBuilder(ConfigManager::class)
             ->disableOriginalConstructor()
             ->setMethods(['get'])
             ->getMock();
@@ -26,8 +26,8 @@ class DefaultCurrencyConfigProviderTest extends \PHPUnit_Framework_TestCase
 
     public function testGetCurrencyList()
     {
-        $currencyConfigManager = new DefaultCurrencyConfigProvider($this->configManager);
+        $defaultCurrencyConfigProvider = new DefaultCurrencyConfigProvider($this->configManager);
 
-        $this->assertCount(1, $currencyConfigManager->getCurrencyList());
+        $this->assertCount(1, $defaultCurrencyConfigProvider->getCurrencyList());
     }
 }
