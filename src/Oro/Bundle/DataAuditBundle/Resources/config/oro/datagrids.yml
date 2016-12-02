@@ -15,6 +15,7 @@ datagrids:
                     objectName: a.objectName
                     objectId: a.objectId
                     loggedAt: a.loggedAt
+                    author:  CONCAT(u.firstName, ' ', u.lastName, ' - ', u.email) as author
                     organization: o.name as organization
                 from:
                     - { table: OroDataAuditBundle:AbstractAudit, alias: a }
