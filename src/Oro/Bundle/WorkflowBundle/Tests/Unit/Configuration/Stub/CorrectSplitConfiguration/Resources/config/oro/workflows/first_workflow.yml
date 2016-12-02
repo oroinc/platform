@@ -14,6 +14,7 @@ workflows:
                 scope2: value2
             -
                 scope1: value3
+        datagrids: ['datagrid1', 'datagrid2']
         defaults:
             active: true
         exclusive_active_groups:

@@ -22,6 +22,7 @@ return [
                'scope1' => 'value3',
            ],
         ],
+        'datagrids' => ['datagrid1', 'datagrid2'],
         'steps' => [
             'first_step' => [
                 'order' => 1,
@@ -170,6 +171,7 @@ return [
         'start_step' => 'second_step',
         'priority' => 0,
         'scopes' => [],
+        'datagrids' => [],
         'defaults' => [
             'active' => false,
         ],
