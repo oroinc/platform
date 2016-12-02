@@ -76,49 +76,30 @@ class OperationButtonProviderExtensionTest extends \PHPUnit_Framework_TestCase
         unset($this->extension, $this->contextHelper, $this->operationRegistry, $this->routeProvider);
     }
 
-    /**
-     * @dataProvider findDataProvider
-     *
-     * @param array $operations
-     * @param ButtonSearchContext $buttonSearchContext
-     * @param array $expected
-     */
-    public function testFind(array $operations, ButtonSearchContext $buttonSearchContext, array $expected)
-    {
-        $this->assertOperationRegistryMethodsCalled($operations, $buttonSearchContext);
-        $this->assertContextHelperCalled();
-
-        $this->assertEquals($expected, $this->extension->find($buttonSearchContext));
-    }
-
-    /**
-     * @return array
-     */
-    public function findDataProvider()
+    public function testFind()
     {
         $operation1 = $this->createOperationMock(true);
         $operation2 = $this->createOperationMock(true, true);
+        $operationNotAvailable = $this->createOperationMock(false);
 
         $buttonSearchContext = $this->createButtonSearchContext();
-
         $buttonContext1 = $this->createButtonContext($buttonSearchContext);
         $buttonContext2 = $this->createButtonContext($buttonSearchContext, true);
 
-        return [
-            'single' => [
-                'operations' => [$operation1, $this->createOperationMock(false), $operation2],
-                'buttonSearchContext' => $buttonSearchContext,
-                'expected' => [
-                    new OperationButton($operation1, $buttonContext1, new ActionData()),
-                    new OperationButton($operation2, $buttonContext2, new ActionData())
-                ]
+        $this->assertOperationRegistryMethodsCalled(
+            [$operation1, $operationNotAvailable, $operation2],
+            $buttonSearchContext
+        );
+        $this->assertContextHelperCalled();
+
+        $this->assertEquals(
+            [
+                new OperationButton($operation1, $buttonContext1, new ActionData()),
+                new OperationButton($operationNotAvailable, $buttonContext1, new ActionData()),
+                new OperationButton($operation2, $buttonContext2, new ActionData()),
             ],
-            'not available' => [
-                'operations' => [$this->createOperationMock(false)],
-                'buttonSearchContext' => $buttonSearchContext,
-                'expected' => []
-            ]
-        ];
+            $this->extension->find($buttonSearchContext)
+        );
     }
 
     /**
@@ -174,7 +155,7 @@ class OperationButtonProviderExtensionTest extends \PHPUnit_Framework_TestCase
     {
         $operation = $this->getMockBuilder(Operation::class)->disableOriginalConstructor()->getMock();
         $operation->expects($this->any())->method('isAvailable')->willReturn($isAvailable);
-        $operation->expects($isAvailable?$this->atLeastOnce():$this->never())->method('hasForm')->willReturn($withForm);
+        $operation->expects($this->any())->method('hasForm')->willReturn($withForm);
 
         return $operation;
     }
