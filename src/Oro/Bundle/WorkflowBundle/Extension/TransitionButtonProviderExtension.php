@@ -8,7 +8,9 @@ use Oro\Bundle\ActionBundle\Model\ButtonContext;
 use Oro\Bundle\ActionBundle\Model\ButtonInterface;
 use Oro\Bundle\ActionBundle\Model\ButtonSearchContext;
 use Oro\Bundle\ActionBundle\Provider\RouteProviderInterface;
+
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
+
 use Oro\Bundle\WorkflowBundle\Entity\Repository\WorkflowItemRepository;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
 use Oro\Bundle\WorkflowBundle\Model\Transition;
@@ -40,7 +42,7 @@ class TransitionButtonProviderExtension extends AbstractButtonProviderExtension
      */
     public function supports(ButtonInterface $button)
     {
-        return $button instanceof TransitionButton;
+        return $button instanceof TransitionButton && !$button->getTransition()->isStart();
     }
 
     /**
