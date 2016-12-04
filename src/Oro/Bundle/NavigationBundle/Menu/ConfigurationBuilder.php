@@ -12,7 +12,8 @@ use Oro\Component\Config\Resolver\ResolverInterface;
 
 class ConfigurationBuilder implements BuilderInterface
 {
-    const DEFAULT_AREA = 'default';
+    // TODO: rename `area` to `scope_type`
+    const DEFAULT_AREA = 'menu_default_visibility';
 
     /** @var array */
     protected $configuration;

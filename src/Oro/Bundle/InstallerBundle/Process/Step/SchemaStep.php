@@ -33,7 +33,7 @@ class SchemaStep extends AbstractStep
             case 'permissions':
                 return $this->handleAjaxAction(LoadPermissionConfigurationCommand::NAME);
             case 'workflows':
-                return $this->handleAjaxAction('oro:workflow:definitions:load');
+                return $this->handleAjaxAction('oro:workflow:definitions:load', ['--skip-scope-processing' => true]);
             case 'processes':
                 return $this->handleAjaxAction('oro:process:configuration:load');
         }

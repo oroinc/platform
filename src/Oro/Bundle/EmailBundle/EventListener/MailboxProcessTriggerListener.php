@@ -13,14 +13,18 @@ use Psr\Log\LoggerAwareTrait;
 use Oro\Bundle\EmailBundle\Entity\EmailBody;
 use Oro\Bundle\EmailBundle\Mailbox\MailboxProcessStorage;
 use Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink;
+use Oro\Bundle\FeatureToggleBundle\Checker\FeatureCheckerHolderTrait;
+use Oro\Bundle\FeatureToggleBundle\Checker\FeatureToggleableInterface;
 use Oro\Bundle\WorkflowBundle\Entity\ProcessDefinition;
 use Oro\Bundle\WorkflowBundle\Entity\ProcessTrigger;
 use Oro\Bundle\WorkflowBundle\Model\ProcessData;
 use Oro\Bundle\WorkflowBundle\Model\ProcessHandler;
 
-class MailboxProcessTriggerListener extends MailboxEmailListener implements LoggerAwareInterface
+class MailboxProcessTriggerListener extends MailboxEmailListener implements
+    LoggerAwareInterface,
+    FeatureToggleableInterface
 {
-    use LoggerAwareTrait;
+    use LoggerAwareTrait, FeatureCheckerHolderTrait;
 
     /** @var ProcessHandler */
     protected $handler;
@@ -69,9 +73,10 @@ class MailboxProcessTriggerListener extends MailboxEmailListener implements Logg
      */
     public function postFlush(PostFlushEventArgs $args)
     {
-        if (empty($this->emailBodies)) {
+        if (empty($this->emailBodies) || !$this->isFeaturesEnabled()) {
             return;
         }
+
         $emailBodies = $this->emailBodies;
         $this->emailBodies = [];
 

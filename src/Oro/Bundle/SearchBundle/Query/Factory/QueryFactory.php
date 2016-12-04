@@ -22,7 +22,7 @@ class QueryFactory implements QueryFactoryInterface
     /**
      * {@inheritdoc}
      */
-    public function create(DatagridInterface $grid, array $config)
+    public function create(array $config = [])
     {
         return new IndexerQuery(
             $this->indexer,

@@ -6,6 +6,12 @@ workflows:
         entity_attribute: my_entity
         steps_display_ordered: true
         priority: 1
+        scopes:
+            - 
+                scope1: value1
+                scope2: value2
+            -
+                scope1: value3
         defaults:
             active: true
         exclusive_active_groups:

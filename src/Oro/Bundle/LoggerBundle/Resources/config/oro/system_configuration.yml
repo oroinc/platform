@@ -1,0 +1,28 @@
+system_configuration:
+    groups:
+        logger_notification_settings:
+            title: oro.logger.system_configuration.groups.logger_notification_settings.title
+    fields:
+        oro_logger.email_notification_recipients:
+            data_type: string
+            type: textarea
+            priority: 10
+            options:
+                required: false
+                label: oro.logger.system_configuration.fields.email_notification_recipients.label
+                tooltip: oro.logger.system_configuration.fields.email_notification_recipients.tooltip
+    tree:
+        system_configuration:
+            platform:
+                children:
+                    general_setup:
+                        children:
+                            application_settings:
+                                children:
+                                    logger_notification_settings:
+                                        children:
+                                            - oro_logger.email_notification_recipients
+
+    api_tree:
+        application:
+            oro_logger.email_notification_recipients: ~

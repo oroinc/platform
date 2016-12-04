@@ -110,7 +110,7 @@ layout:
     actions:
         - '@add':
             id: products
-            parentId: content
+            parentId: page_content
             blockType: datagrid
             options:
                 grid_name: products-grid

@@ -11,6 +11,7 @@ use Behat\Symfony2Extension\Context\KernelAwareContext;
 use Behat\Symfony2Extension\Context\KernelDictionary;
 use Doctrine\Common\Inflector\Inflector;
 use Oro\Bundle\AttachmentBundle\Tests\Behat\Element\AttachmentItem;
+use Oro\Bundle\DataGridBundle\Tests\Behat\Element\Grid;
 use Oro\Bundle\FormBundle\Tests\Behat\Element\OroForm;
 use Oro\Bundle\NavigationBundle\Tests\Behat\Element\MainMenu;
 use Oro\Bundle\TestFrameworkBundle\Behat\Driver\OroSelenium2Driver;
@@ -42,13 +43,25 @@ class OroMainContext extends MinkContext implements
      */
     public function iShouldSeeFlashMessage($title)
     {
-        $messageElement = $this->spin(function (MinkContext $context) {
-            return $context->getSession()->getPage()->find('css', '.flash-messages-holder div.alert');
+        /** @var NodeElement|false $messageElement */
+        $messageElement = $this->spin(function (OroMainContext $context) use ($title) {
+            $flashMessage = $context->findElementContains('Flash Message', $title);
+
+            if ($flashMessage->isValid() && $flashMessage->isVisible()) {
+                return $flashMessage;
+            }
+
+            return false;
         });
 
         self::assertNotFalse($messageElement, 'Flash message not found on page');
         $flashMessage = $messageElement->getText();
-        $messageElement->find('css', 'button.close')->press();
+
+        $closeButton = $messageElement->find('css', 'button.close');
+
+        if ($closeButton->isVisible()) {
+            $closeButton->press();
+        }
 
         self::assertContains($title, $flashMessage, sprintf(
             'Expect that "%s" flash message contains "%s" string, but it isn\'t',
@@ -387,6 +400,14 @@ class OroMainContext extends MinkContext implements
     }
 
     /**
+     * @Given /^(?:|I )open (?P<pageName>[\w\s\/]+) page$/
+     */
+    public function openPage($pageName)
+    {
+        $this->getPage($pageName)->open();
+    }
+
+    /**
      * @Given press select entity button on :field field
      */
     public function pressSelectEntityButton($field)
@@ -442,7 +463,7 @@ class OroMainContext extends MinkContext implements
      * Find and assert field value
      * It's valid for entity edit or entity view page
      *
-     * @When /^([\w\s]*) field should have ([\w\s]*) value$/
+     * @When /^(?P<fieldName>[\w\s]*) field should has (?P<fieldValue>.+) value$/
      */
     public function fieldShouldHaveValue($fieldName, $fieldValue)
     {
@@ -470,6 +491,32 @@ class OroMainContext extends MinkContext implements
     }
 
     /**
+     * Inline edit field
+     *
+     * @When /^(?:|I )edit (?P<field>.+) as "(?P<value>.*)"$/
+     * @When /^(?:|I )edit "(?P<entityTitle>[^"]+)" (?P<field>.+) as "(?P<value>.*)"$/
+     */
+    public function inlineEditField($field, $value, $entityTitle = null)
+    {
+        /** @var Grid $grid */
+        $grid = $this->createElement('Grid');
+
+        if (null === $entityTitle) {
+            $row = $grid->getRowByContent($entityTitle);
+        } else {
+            $rows = $grid->getRows();
+            self::assertCount(1, $rows, sprintf('Expect one row in grid but got %s.'.
+                PHP_EOL.'You can specify row content for edit field in specific row.'));
+
+            $row = array_shift($rows);
+        }
+
+        $row->setCellValue($field, $value);
+        $this->iShouldSeeFlashMessage('Inline edits are being saved');
+        $this->iShouldSeeFlashMessage('Record has been succesfully updated');
+    }
+
+    /**
      * Assert text by label in page.
      * Example: Then I should see call with:
      *            | Subject             | Proposed Charlie to star in new film |
@@ -486,21 +533,25 @@ class OroMainContext extends MinkContext implements
         $page = $this->getSession()->getPage();
 
         foreach ($table->getRows() as $row) {
-            $labels = $page->findAll('xpath', sprintf('//label[text()="%s"]', $row[0]));
+            list($label, $value) = $row;
+            $labelElement = $this->findElementContains('Label', $label);
+            $labels = $page->findAll('xpath', $labelElement->getXpath());
 
-            self::assertNotCount(0, $labels, sprintf('Can\'t find "%s" label', $row[0]));
+            self::assertNotCount(0, $labels, sprintf('Can\'t find "%s" label', $label));
 
             /** @var NodeElement $label */
-            foreach ($labels as $label) {
-                $text = $label->getParent()->find('css', 'div.controls div.control-label')->getText();
+            foreach ($labels as $labelElement) {
+                $controlLabel = $labelElement->getParent()->find('css', 'div.controls div.control-label');
+                self::assertNotNull($controlLabel);
+                $text = $controlLabel->getText();
 
-                if (1 === preg_match(sprintf('/%s/i', preg_quote($row[1])), $text)) {
+                if (false !== stripos($text, $value)) {
                     continue 2;
                 }
             }
 
             self::fail(
-                sprintf('Found %s "%s" labels, but no one has "%s" text value', count($labels), $row[0], $row[1])
+                sprintf('Found %s "%s" labels, but no one has "%s" text value', count($labels), $label, $value)
             );
         }
     }

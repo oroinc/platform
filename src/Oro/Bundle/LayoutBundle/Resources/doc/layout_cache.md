@@ -20,7 +20,7 @@ List of normalizers that used in `oro_layout.block_view_serializer`:
 * `oro_layout.block_view_serializer.expression_normalizer` - [ExpressionNormalizer](../../Layout/Serializer/ExpressionNormalizer.php)
 * `oro_layout.option_value_bag_normaizer` - [OptionValueBagNormalizer](../../Layout/Serializer/OptionValueBagNormalizer.php)
 
-All normalizers registered as a service in DI container with the tag `oro_layout.block_view_serializer.normalizer`.
+All normalizers registered as a service in DI container with the tag `layout.block_view_serializer.normalizer`.
 
 Expressions / evaluate and evaluate deferred
 ----------------------------

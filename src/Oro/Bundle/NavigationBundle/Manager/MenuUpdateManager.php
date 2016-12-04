@@ -9,6 +9,7 @@ use Doctrine\ORM\EntityRepository;
 use Knp\Menu\ItemInterface;
 
 use Oro\Bundle\NavigationBundle\Entity\MenuUpdateInterface;
+use Oro\Bundle\NavigationBundle\Entity\Repository\MenuUpdateRepository;
 use Oro\Bundle\NavigationBundle\Exception\NotFoundParentException;
 use Oro\Bundle\NavigationBundle\JsTree\MenuUpdateTreeHandler;
 use Oro\Bundle\NavigationBundle\Menu\Helper\MenuUpdateHelper;
@@ -139,6 +140,47 @@ class MenuUpdateManager
             'menu' => $menuName,
             'scopeId' => $scope,
         ]);
+    }
+
+    /**
+     * @param string $menuName
+     * @param array  $scopeIds
+     *
+     * @return MenuUpdateInterface[]
+     */
+    public function getMenuUpdatesByScopeIds($menuName, array $scopeIds)
+    {
+        /** @var MenuUpdateRepository $repository */
+        $repository = $this->getRepository();
+        $result = $repository->findMenuUpdatesByScopeIds($menuName, $scopeIds);
+
+        return $this->applyScopeOrder($result, $scopeIds);
+    }
+
+    /**
+     * @param MenuUpdateInterface[] $updates
+     * @param array                 $scopeIds
+     *
+     * @return MenuUpdateInterface[]
+     */
+    private function applyScopeOrder(array $updates, array $scopeIds)
+    {
+        $scopeIds = array_reverse($scopeIds);
+
+        $groupedResult = array_fill_keys($scopeIds, []);
+        foreach ($updates as $update) {
+            $groupedResult[$update->getScope()->getId()][] = $update;
+        }
+
+        $result = [];
+        foreach ($groupedResult as $group) {
+            /** @var MenuUpdateInterface $update */
+            foreach ($group as $update) {
+                $result[$update->getKey()] = $update;
+            }
+        }
+
+        return array_values($result);
     }
 
     /**

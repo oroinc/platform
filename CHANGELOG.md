@@ -1,3 +1,9 @@
+CHANGELOG for 2.0
+=================
+This changelog references the relevant changes (new features, changes and bugs) done in 2.0 versions.
+  * Changed minimum required php version to 5.6
+  * Extend fields default mode is `Oro\Bundle\EntityConfigBundle\Entity\ConfigModel::MODE_READONLY`
+
 CHANGELOG for 1.10.0
 ===================
 This changelog references the relevant changes (new features, changes and bugs) done in 1.10.0 versions.

@@ -83,6 +83,9 @@ class CurrencyNameHelper
                     $this->getCurrencyName($currencyIsoCode, $this->viewTypeProvider->getViewType())
                 );
                 break;
+            case ViewTypeProviderInterface::VIEW_TYPE_NAME:
+                $currencyName = $this->intlCurrencyBundle->getCurrencyName($currencyIsoCode, $locale);
+                break;
             case ViewTypeProviderInterface::VIEW_TYPE_ISO_CODE:
             default:
                 $currencyName = $currencyIsoCode;

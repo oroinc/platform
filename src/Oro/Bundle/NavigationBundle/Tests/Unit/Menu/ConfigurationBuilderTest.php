@@ -121,7 +121,7 @@ class ConfigurationBuilderTest extends \PHPUnit_Framework_TestCase
                         ]
                     ]
                 ],
-                'expectedArea' => 'default',
+                'expectedArea' => 'menu_default_visibility',
             ],
             'with area' => [
                 'options' => [
