@@ -11,16 +11,14 @@ use Oro\Bundle\NavigationBundle\Menu\Helper\MenuUpdateHelper;
 use Oro\Bundle\NavigationBundle\Provider\BuilderChainProvider;
 use Oro\Bundle\NavigationBundle\Tests\Unit\Entity\Stub\MenuItemStub;
 use Oro\Bundle\NavigationBundle\Tests\Unit\Entity\Stub\MenuUpdateStub;
+use Oro\Bundle\NavigationBundle\Tests\Unit\Menu\Provider\OwnershipProviderStub;
 use Oro\Bundle\NavigationBundle\Tests\Unit\MenuItemTestTrait;
 use Oro\Bundle\ScopeBundle\Entity\Scope;
-use Oro\Bundle\ScopeBundle\Manager\ScopeManager;
 use Oro\Component\Testing\Unit\EntityTrait;
 
 class MenuUpdateManagerTest extends \PHPUnit_Framework_TestCase
 {
     const MENU_ID = 'menu';
-    const SCOPE_TYPE = 'scope_type';
-
     use MenuItemTestTrait;
     use EntityTrait;
 
@@ -35,9 +33,6 @@ class MenuUpdateManagerTest extends \PHPUnit_Framework_TestCase
 
     /** @var  MenuUpdateHelper|\PHPUnit_Framework_MockObject_MockObject */
     protected $menuUpdateHelper;
-
-    /** @var  ScopeManager|\PHPUnit_Framework_MockObject_MockObject */
-    protected $scopeManager;
 
     /** @var MenuUpdateManager */
     protected $manager;
@@ -70,41 +65,33 @@ class MenuUpdateManagerTest extends \PHPUnit_Framework_TestCase
 
         $this->builderChainProvider = $this->getMock(BuilderChainProvider::class, [], [], '', false);
         $this->menuUpdateHelper = $this->getMock(MenuUpdateHelper::class, [], [], '', false);
-        $this->scopeManager = $this->getMock(ScopeManager::class, [], [], '', false);
 
         $this->manager = new MenuUpdateManager(
             $managerRegistry,
             $this->builderChainProvider,
-            $this->menuUpdateHelper,
-            $this->scopeManager
+            $this->menuUpdateHelper
         );
     }
 
     public function testCreateMenuUpdate()
     {
+        $ownershipType = OwnershipProviderStub::TYPE;
+        $ownerId = 1;
+
         $entity = new MenuUpdateStub();
-
-        $this->manager->setScopeType($this::SCOPE_TYPE);
-        $context = ['scopeAttribute' => new \stdClass()];
-        $scope = new Scope();
-
-        $this->scopeManager->expects($this::once())
-            ->method('find')
-            ->with($this::SCOPE_TYPE, $context)
-            ->willReturn($scope);
-
         $entity
-            ->setScope($scope)
+            ->setOwnershipType($ownershipType)
+            ->setOwnerId($ownerId)
             ->setMenu(self::MENU_ID)
         ;
 
         $this->manager->setEntityClass(MenuUpdateStub::class);
-        $result = $this->manager->createMenuUpdate($context, ['menu'=> self::MENU_ID]);
+        $result = $this->manager->createMenuUpdate($ownershipType, $ownerId, ['menu'=> self::MENU_ID]);
         $entity->setKey($result->getKey());
 
         $this->assertEquals($entity, $result);
-
-        $this->assertEquals($entity->getScope(), $result->getScope());
+        $this->assertEquals($entity->getOwnershipType(), $result->getOwnershipType());
+        $this->assertEquals($entity->getOwnerId(), $result->getOwnerId());
     }
 
     /**
@@ -114,41 +101,31 @@ class MenuUpdateManagerTest extends \PHPUnit_Framework_TestCase
     public function testCreateMenuUpdateForNotExistingParent()
     {
         $menu = new MenuItemStub();
-
-        $this->manager->setScopeType($this::SCOPE_TYPE);
-        $context = ['scopeAttribute' => new \stdClass()];
-        $scope = new Scope();
-
-        $this->scopeManager->expects($this::once())
-            ->method('find')
-            ->with($this::SCOPE_TYPE, $context)
-            ->willReturn($scope);
-
-
         $this->builderChainProvider->expects($this->any())
             ->method('get')
             ->with(self::MENU_ID)
             ->willReturn($menu);
         $this->manager->setEntityClass(MenuUpdateStub::class);
-        $this->manager->createMenuUpdate($context, ['menu' => self::MENU_ID, 'parentKey' => 'parent_key']);
+        $this->manager->createMenuUpdate('test', 5, ['menu' => self::MENU_ID, 'parentKey' => 'parent_key']);
     }
 
     public function testGetMenuUpdatesByMenuAndScope()
     {
         $menuName = 'test-menu';
+        $ownershipType = OwnershipProviderStub::TYPE;
+        $ownerId = 1;
 
         $update = new MenuUpdateStub();
-        $scope = new Scope();
 
         $this->manager->setEntityClass(MenuUpdateStub::class);
 
         $this->entityRepository
             ->expects($this->once())
             ->method('findBy')
-            ->with(['menu' => $menuName, 'scopeId' => $scope])
+            ->with(['menu' => $menuName, 'ownershipType' => $ownershipType, 'ownerId' => $ownerId])
             ->will($this->returnValue([$update]));
 
-        $result = $this->manager->getMenuUpdatesByMenuAndScope($menuName, $scope);
+        $result = $this->manager->getMenuUpdatesByMenuAndScope($menuName, $ownershipType, $ownerId);
         $this->assertEquals([$update], $result);
     }
 
@@ -183,20 +160,16 @@ class MenuUpdateManagerTest extends \PHPUnit_Framework_TestCase
     public function testGetMenuUpdateByKeyAndScopeWithMenuItem()
     {
         $key = 'item-1-1-1';
-        $scope = new Scope();
-        $this->manager->setScopeType($this::SCOPE_TYPE);
+        $ownershipType = OwnershipProviderStub::TYPE;
+        $ownerId = 1;
 
         $update = new MenuUpdateStub();
         $update
-            ->setScope($scope)
+            ->setOwnershipType($ownershipType)
+            ->setOwnerId($ownerId)
             ->setKey($key)
             ->setCustom(false)
         ;
-
-        $this->scopeManager->expects($this::once())
-            ->method('find')
-            ->with($this::SCOPE_TYPE, null)
-            ->willReturn($scope);
 
         $menu = $this->getMenu();
 
@@ -211,7 +184,7 @@ class MenuUpdateManagerTest extends \PHPUnit_Framework_TestCase
         $this->entityRepository
             ->expects($this->once())
             ->method('findOneBy')
-            ->with(['menu' => 'menu', 'key' => $key, 'scopeId' => $scope])
+            ->with(['menu' => 'menu', 'key' => $key, 'ownershipType' => $ownershipType, 'ownerId' => $ownerId])
             ->will($this->returnValue(null));
 
         $this->builderChainProvider
@@ -220,7 +193,7 @@ class MenuUpdateManagerTest extends \PHPUnit_Framework_TestCase
             ->with(self::MENU_ID)
             ->will($this->returnValue($menu));
 
-        $result = $this->manager->getMenuUpdateByKeyAndScope('menu', $key, $scope);
+        $result = $this->manager->getMenuUpdateByKeyAndScope('menu', $key, $ownershipType, $ownerId);
 
         $update
             ->setDefaultTitle('item-1-1-1')
@@ -234,21 +207,17 @@ class MenuUpdateManagerTest extends \PHPUnit_Framework_TestCase
     public function testGetMenuUpdateByKeyAndScopeWithoutMenuItem()
     {
         $key = 'item-1-1-1-1';
-        $scope = new Scope();
-        $this->manager->setScopeType($this::SCOPE_TYPE);
+        $ownershipType = OwnershipProviderStub::TYPE;
+        $ownerId = 1;
 
         $update = new MenuUpdateStub();
         $update
-            ->setScope($scope)
+            ->setOwnershipType($ownershipType)
+            ->setOwnerId($ownerId)
             ->setKey($key)
             ->setCustom(true)
             ->setMenu(self::MENU_ID)
         ;
-
-        $this->scopeManager->expects($this::once())
-            ->method('find')
-            ->with($this::SCOPE_TYPE, null)
-            ->willReturn($scope);
 
         $menu = $this->getMenu();
 
@@ -257,7 +226,7 @@ class MenuUpdateManagerTest extends \PHPUnit_Framework_TestCase
         $this->entityRepository
             ->expects($this->once())
             ->method('findOneBy')
-            ->with(['menu' => self::MENU_ID, 'key' => $key, 'scopeId' => $scope])
+            ->with(['menu' => self::MENU_ID, 'key' => $key, 'ownershipType' => $ownershipType, 'ownerId' => $ownerId])
             ->will($this->returnValue(null));
 
         $this->builderChainProvider
@@ -266,7 +235,7 @@ class MenuUpdateManagerTest extends \PHPUnit_Framework_TestCase
             ->with(self::MENU_ID)
             ->will($this->returnValue($menu));
 
-        $result = $this->manager->getMenuUpdateByKeyAndScope('menu', $key, $scope);
+        $result = $this->manager->getMenuUpdateByKeyAndScope('menu', $key, $ownershipType, $ownerId);
 
         $this->assertEquals($update, $result);
     }
@@ -275,13 +244,8 @@ class MenuUpdateManagerTest extends \PHPUnit_Framework_TestCase
     {
         $this->manager->setEntityClass(MenuUpdateStub::class);
 
-        $scope = new Scope();
-        $this->manager->setScopeType($this::SCOPE_TYPE);
-
-        $this->scopeManager->expects($this::exactly(2))
-            ->method('find')
-            ->with($this::SCOPE_TYPE, null)
-            ->willReturn($scope);
+        $ownershipType = OwnershipProviderStub::TYPE;
+        $ownerId = 1;
 
         $menu = $this->getMenu();
 
@@ -307,7 +271,8 @@ class MenuUpdateManagerTest extends \PHPUnit_Framework_TestCase
             ->with([
                 'menu' => 'menu',
                 'key' => ['item-1', 'item-2', 'item-3', 'item-4'],
-                'scopeId' => $scope,
+                'ownershipType' => $ownershipType,
+                'ownerId' => $ownerId,
             ])
             ->will($this->returnValue($updates));
 
@@ -317,7 +282,8 @@ class MenuUpdateManagerTest extends \PHPUnit_Framework_TestCase
         $update0->setMenu('menu');
         $update0->setParentKey(null);
         $update0->setPriority(0);
-        $update0->setScope($scope);
+        $update0->setOwnershipType($ownershipType);
+        $update0->setOwnerId($ownerId);
 
         $update2 = new MenuUpdateStub();
         $update2->setKey('item-3');
@@ -325,25 +291,21 @@ class MenuUpdateManagerTest extends \PHPUnit_Framework_TestCase
         $update2->setMenu('menu');
         $update0->setParentKey(null);
         $update2->setPriority(2);
-        $update2->setScope($scope);
+        $update2->setOwnershipType($ownershipType);
+        $update2->setOwnerId($ownerId);
 
         $orderedChildren = array_values($menu->getChildren());
         $this->assertEquals(
             [$update1, $update3, $update0, $update2],
-            $this->manager->getReorderedMenuUpdates('menu', $orderedChildren, $scope)
+            $this->manager->getReorderedMenuUpdates('menu', $orderedChildren, $ownershipType, $ownerId)
         );
     }
 
     public function testShowMenuItem()
     {
+        $ownershipType = OwnershipProviderStub::TYPE;
+        $ownerId = 1;
         $menuName = 'menu';
-        $scope = new Scope();
-        $this->manager->setScopeType($this::SCOPE_TYPE);
-
-        $this->scopeManager->expects($this::exactly(3))
-            ->method('find')
-            ->with($this::SCOPE_TYPE, null)
-            ->willReturn($scope);
 
         $this->manager->setEntityClass(MenuUpdateStub::class);
 
@@ -361,7 +323,8 @@ class MenuUpdateManagerTest extends \PHPUnit_Framework_TestCase
         $update1 = new MenuUpdateStub();
         $update1
             ->setMenu($menuName)
-            ->setScope($scope)
+            ->setOwnershipType($ownershipType)
+            ->setOwnerId($ownerId)
             ->setKey('item-1')
             ->setParentKey(null)
             ->setCustom(false)
@@ -372,7 +335,8 @@ class MenuUpdateManagerTest extends \PHPUnit_Framework_TestCase
         $update11 = new MenuUpdateStub();
         $update11
             ->setMenu($menuName)
-            ->setScope($scope)
+            ->setOwnershipType($ownershipType)
+            ->setOwnerId($ownerId)
             ->setKey('item-1-1')
             ->setParentKey('item-1')
             ->setCustom(false)
@@ -383,7 +347,8 @@ class MenuUpdateManagerTest extends \PHPUnit_Framework_TestCase
         $update111 = new MenuUpdateStub();
         $update111
             ->setMenu($menuName)
-            ->setScope($scope)
+            ->setOwnershipType($ownershipType)
+            ->setOwnerId($ownerId)
             ->setKey('item-1-1-1')
             ->setParentKey('item-1-1')
             ->setCustom(false)
@@ -399,19 +364,14 @@ class MenuUpdateManagerTest extends \PHPUnit_Framework_TestCase
                 $this->equalTo($update111)
             ));
 
-        $this->manager->showMenuItem($menuName, 'item-1-1', $scope);
+        $this->manager->showMenuItem($menuName, 'item-1-1', $ownershipType, $ownerId);
     }
 
     public function testHideMenuItem()
     {
+        $ownershipType = OwnershipProviderStub::TYPE;
+        $ownerId = 1;
         $menuName = 'menu';
-        $scope = new Scope();
-        $this->manager->setScopeType($this::SCOPE_TYPE);
-
-        $this->scopeManager->expects($this::exactly(2))
-            ->method('find')
-            ->with($this::SCOPE_TYPE, null)
-            ->willReturn($scope);
 
         $this->manager->setEntityClass(MenuUpdateStub::class);
 
@@ -426,7 +386,8 @@ class MenuUpdateManagerTest extends \PHPUnit_Framework_TestCase
         $update11 = new MenuUpdateStub();
         $update11
             ->setMenu($menuName)
-            ->setScope($scope)
+            ->setOwnershipType($ownershipType)
+            ->setOwnerId($ownerId)
             ->setKey('item-1-1')
             ->setParentKey('item-1')
             ->setCustom(false)
@@ -437,7 +398,8 @@ class MenuUpdateManagerTest extends \PHPUnit_Framework_TestCase
         $update111 = new MenuUpdateStub();
         $update111
             ->setMenu($menuName)
-            ->setScope($scope)
+            ->setOwnershipType($ownershipType)
+            ->setOwnerId($ownerId)
             ->setKey('item-1-1-1')
             ->setParentKey('item-1-1')
             ->setCustom(false)
@@ -452,7 +414,7 @@ class MenuUpdateManagerTest extends \PHPUnit_Framework_TestCase
                 $this->equalTo($update111)
             ));
 
-        $this->manager->hideMenuItem($menuName, 'item-1-1', $scope);
+        $this->manager->hideMenuItem($menuName, 'item-1-1', $ownershipType, $ownerId);
     }
 
     public function testGetMenu()
@@ -470,28 +432,27 @@ class MenuUpdateManagerTest extends \PHPUnit_Framework_TestCase
 
     public function testFindMenuItem()
     {
-        $scope = new Scope();
-        $this->manager->setScopeType($this::SCOPE_TYPE);
+        $ownershipType = 1;
 
         $menu = $this->getMenu();
 
         $this->builderChainProvider
             ->expects($this->once())
             ->method('get')
-            ->with('menu', ['ignoreCache' => true, 'scopeId' => $scope])
+            ->with('menu', ['ignoreCache' => true, 'ownershipType' => $ownershipType])
             ->will($this->returnValue($menu));
 
         $item = $menu->getChild('item-1')
             ->getChild('item-1-1')
             ->getChild('item-1-1-1');
 
-        $this->assertEquals($item, $this->manager->findMenuItem('menu', 'item-1-1-1', $scope));
+        $this->assertEquals($item, $this->manager->findMenuItem('menu', 'item-1-1-1', $ownershipType));
     }
 
     public function testResetMenuUpdatesWithOwnershipType()
     {
-        $scope = new Scope();
-        $this->manager->setScopeType($this::SCOPE_TYPE);
+        $ownershipType = OwnershipProviderStub::TYPE;
+        $ownerId = 1;
 
         $update = new MenuUpdateStub();
 
@@ -500,7 +461,7 @@ class MenuUpdateManagerTest extends \PHPUnit_Framework_TestCase
         $this->entityRepository
             ->expects($this->once())
             ->method('findBy')
-            ->with(['scopeId' => $scope])
+            ->with(['ownershipType' => $ownershipType, 'ownerId' => $ownerId])
             ->will($this->returnValue([$update]));
 
         $this->entityManager
@@ -513,6 +474,6 @@ class MenuUpdateManagerTest extends \PHPUnit_Framework_TestCase
             ->method('flush')
             ->with([$update]);
 
-        $this->manager->resetMenuUpdatesWithOwnershipType($scope);
+        $this->manager->resetMenuUpdatesWithOwnershipType($ownershipType, $ownerId);
     }
 }

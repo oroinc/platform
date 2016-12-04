@@ -13,8 +13,6 @@ use Oro\Bundle\NavigationBundle\Builder\MenuUpdateBuilder;
 use Oro\Bundle\NavigationBundle\Entity\MenuUpdate;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
-//ToDo: cleanup OwnershipProviderStub & fix tests after resolve BB-5469
-
 class MenuUpdateBuilderTest extends WebTestCase
 {
     use EntityTrait;
