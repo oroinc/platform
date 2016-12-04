@@ -384,13 +384,11 @@ services:
             - "@doctrine"
             - "@oro_menu.builder_chain"
             - "@oro_navigation.menu_helper.menu_update"
-            - "@oro_scope.scope_manager"
 
     oro_navigation.manager.menu_update_default:
         parent: oro_navigation.manager.menu_update_abstract
         calls:
             - [ setEntityClass, [ '%oro_navigation.entity.menu_update.class%' ]]
-            - [ setScopeType, [ 'menu_default_visibility' ]]
 
     oro_navigation.manager.registry:
         class: Oro\Bundle\NavigationBundle\Manager\MenuUpdateManagerRegistry

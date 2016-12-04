@@ -4,6 +4,9 @@ namespace Oro\Bundle\NavigationBundle\Entity\Repository;
 
 use Doctrine\ORM\EntityRepository;
 
+use Oro\Bundle\NavigationBundle\Entity\MenuUpdateInterface;
+use Oro\Bundle\ScopeBundle\Entity\Scope;
+
 class MenuUpdateRepository extends EntityRepository
 {
     /**
@@ -23,6 +26,48 @@ class MenuUpdateRepository extends EntityRepository
             'scopeIds' => $scopeIds
         ]);
 
-        return $qb->getQuery()->getResult();
+        $result = $qb->getQuery()->getResult();
+
+        return $this->applyScopeOrder($result, $scopeIds);
+    }
+
+    /**
+     * @param string $menuName
+     * @param Scope  $scope
+     *
+     * @return MenuUpdateInterface[]
+     */
+    public function findMenuUpdatesByScope($menuName, $scope)
+    {
+        return $this->findBy([
+            'menu' => $menuName,
+            'scopeId' => $scope,
+        ]);
+    }
+
+    /**
+     * @param MenuUpdateInterface[] $updates
+     * @param array                 $scopeIds
+     *
+     * @return MenuUpdateInterface[]
+     */
+    private function applyScopeOrder(array $updates, array $scopeIds)
+    {
+        $scopeIds = array_reverse($scopeIds);
+
+        $groupedResult = array_fill_keys($scopeIds, []);
+        foreach ($updates as $update) {
+            $groupedResult[$update->getScope()->getId()][] = $update;
+        }
+
+        $result = [];
+        foreach ($groupedResult as $group) {
+            /** @var MenuUpdateInterface $update */
+            foreach ($group as $update) {
+                $result[$update->getKey()] = $update;
+            }
+        }
+
+        return array_values($result);
     }
 }

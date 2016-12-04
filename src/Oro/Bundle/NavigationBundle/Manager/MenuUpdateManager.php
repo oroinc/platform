@@ -9,13 +9,11 @@ use Doctrine\ORM\EntityRepository;
 use Knp\Menu\ItemInterface;
 
 use Oro\Bundle\NavigationBundle\Entity\MenuUpdateInterface;
-use Oro\Bundle\NavigationBundle\Entity\Repository\MenuUpdateRepository;
 use Oro\Bundle\NavigationBundle\Exception\NotFoundParentException;
 use Oro\Bundle\NavigationBundle\JsTree\MenuUpdateTreeHandler;
 use Oro\Bundle\NavigationBundle\Menu\Helper\MenuUpdateHelper;
 use Oro\Bundle\NavigationBundle\Provider\BuilderChainProvider;
 use Oro\Bundle\NavigationBundle\Utils\MenuUpdateUtils;
-use Oro\Bundle\ScopeBundle\Manager\ScopeManager;
 use Oro\Bundle\ScopeBundle\Entity\Scope;
 
 class MenuUpdateManager
@@ -32,67 +30,58 @@ class MenuUpdateManager
     /** @var string */
     private $entityClass;
 
-    /** @var string */
-    private $scopeType;
-
-    /** @var ScopeManager */
-    private $scopeManager;
-
     /**
      * @param ManagerRegistry      $managerRegistry
      * @param BuilderChainProvider $builderChainProvider
      * @param MenuUpdateHelper     $menuUpdateHelper
-     * @param ScopeManager         $scopeManager
      */
     public function __construct(
         ManagerRegistry $managerRegistry,
         BuilderChainProvider $builderChainProvider,
-        MenuUpdateHelper $menuUpdateHelper,
-        ScopeManager $scopeManager
+        MenuUpdateHelper $menuUpdateHelper
     ) {
         $this->managerRegistry = $managerRegistry;
         $this->builderChainProvider = $builderChainProvider;
         $this->menuUpdateHelper = $menuUpdateHelper;
-        $this->scopeManager = $scopeManager;
     }
 
     /**
      * @param string $entityClass
-     *
-     * @return MenuUpdateManager
      */
     public function setEntityClass($entityClass)
     {
         $this->entityClass = $entityClass;
-
-        return $this;
     }
 
     /**
-     * @param string $scopeType
+     * Get menu built by BuilderChainProvider
      *
-     * @return MenuUpdateManager
+     * @param string $name
+     * @param array $options
+     *
+     * @return ItemInterface
      */
-    public function setScopeType($scopeType)
+    public function getMenu($name, array $options = [])
     {
-        $this->scopeType = $scopeType;
+        $options = array_merge($options, [
+            'ignoreCache' => true
+        ]);
 
-        return $this;
+        return $this->builderChainProvider->get($name, $options);
     }
 
     /**
      * Create menu update entity
      *
-     * @param array|object|null $context
+     * @param Scope $scope
      * @param array $options
      *
      * @return MenuUpdateInterface
      */
-    public function createMenuUpdate($context, array $options = [])
+    public function createMenuUpdate(Scope $scope, array $options = [])
     {
         /** @var MenuUpdateInterface $entity */
         $entity = new $this->entityClass;
-        $scope = $this->scopeManager->find($this->scopeType, $context);
         $entity = $entity->setScope($scope);
 
         if (isset($options['key'])) {
@@ -129,61 +118,6 @@ class MenuUpdateManager
     }
 
     /**
-     * @param string $menuName
-     * @param Scope  $scope
-     *
-     * @return MenuUpdateInterface[]
-     */
-    public function getMenuUpdatesByMenuAndScope($menuName, $scope)
-    {
-        return $this->getRepository()->findBy([
-            'menu' => $menuName,
-            'scopeId' => $scope,
-        ]);
-    }
-
-    /**
-     * @param string $menuName
-     * @param array  $scopeIds
-     *
-     * @return MenuUpdateInterface[]
-     */
-    public function getMenuUpdatesByScopeIds($menuName, array $scopeIds)
-    {
-        /** @var MenuUpdateRepository $repository */
-        $repository = $this->getRepository();
-        $result = $repository->findMenuUpdatesByScopeIds($menuName, $scopeIds);
-
-        return $this->applyScopeOrder($result, $scopeIds);
-    }
-
-    /**
-     * @param MenuUpdateInterface[] $updates
-     * @param array                 $scopeIds
-     *
-     * @return MenuUpdateInterface[]
-     */
-    private function applyScopeOrder(array $updates, array $scopeIds)
-    {
-        $scopeIds = array_reverse($scopeIds);
-
-        $groupedResult = array_fill_keys($scopeIds, []);
-        foreach ($updates as $update) {
-            $groupedResult[$update->getScope()->getId()][] = $update;
-        }
-
-        $result = [];
-        foreach ($groupedResult as $group) {
-            /** @var MenuUpdateInterface $update */
-            foreach ($group as $update) {
-                $result[$update->getKey()] = $update;
-            }
-        }
-
-        return array_values($result);
-    }
-
-    /**
      * Get existing or create new MenuUpdate for specified menu, key and scope
      *
      * @param string $menuName
@@ -192,61 +126,38 @@ class MenuUpdateManager
      *
      * @return null|MenuUpdateInterface
      */
-    public function getMenuUpdateByKeyAndScope($menuName, $key, $scope)
+    public function findOrCreateMenuUpdate($menuName, $key, Scope $scope)
     {
         /** @var MenuUpdateInterface $update */
         $update = $this->getRepository()->findOneBy([
             'menu' => $menuName,
             'key' => $key,
-            'scopeId' => $scope,
+            'scope' => $scope,
         ]);
 
         if (!$update) {
-            $update = $this->createMenuUpdate(null, ['key' => $key, 'menu' => $menuName]);
+            $update = $this->createMenuUpdate($scope, ['key' => $key, 'menu' => $menuName]);
         }
 
         return $this->getMenuUpdateFromMenu($update, $menuName, $key, $scope);
     }
 
     /**
-     * Get list of menu update with new position
+     * @param string $menuName
+     * @param string $key
+     * @param Scope  $scope
      *
-     * @param string          $menuName
-     * @param ItemInterface[] $orderedChildren
-     * @param Scope           $scope
-     *
-     * @return MenuUpdateInterface[]
+     * @return ItemInterface|null
      */
-    public function getReorderedMenuUpdates($menuName, $orderedChildren, $scope)
+    public function findMenuItem($menuName, $key, Scope $scope)
     {
-        $order = [];
-        foreach ($orderedChildren as $priority => $child) {
-            $order[$child->getName()] = $priority;
-        }
+        $options = [
+            'ignoreCache' => true,
+            'scope' => $scope
+        ];
+        $menu = $this->getMenu($menuName, $options);
 
-        /** @var MenuUpdateInterface[] $updates */
-        $updates = $this->getRepository()->findBy([
-            'menu' => $menuName,
-            'key' => array_keys($order),
-            'scopeId' => $scope,
-        ]);
-
-        foreach ($updates as $update) {
-            $update->setPriority($order[$update->getKey()]);
-            unset($orderedChildren[$order[$update->getKey()]]);
-        }
-
-        foreach ($orderedChildren as $priority => $child) {
-            $update = $this->createMenuUpdate(
-                null,
-                ['key' => $child->getName(), 'menu' => $menuName]
-            );
-            MenuUpdateUtils::updateMenuUpdate($update, $child, $menuName, $this->menuUpdateHelper);
-            $update->setPriority($priority);
-            $updates[] = $update;
-        }
-
-        return $updates;
+        return MenuUpdateUtils::findMenuItem($menu, $key);
     }
 
     /**
@@ -254,11 +165,11 @@ class MenuUpdateManager
      * @param string $key
      * @param Scope  $scope
      */
-    public function showMenuItem($menuName, $key, $scope)
+    public function showMenuItem($menuName, $key, Scope $scope)
     {
         $item = MenuUpdateUtils::findMenuItem($this->getMenu($menuName), $key);
         if ($item !== null) {
-            $update = $this->getMenuUpdateByKeyAndScope($menuName, $item->getName(), $scope);
+            $update = $this->findOrCreateMenuUpdate($menuName, $item->getName(), $scope);
             $update->setActive(true);
             $this->getEntityManager()->persist($update);
 
@@ -274,11 +185,11 @@ class MenuUpdateManager
      * @param ItemInterface $item
      * @param Scope         $scope
      */
-    private function showMenuItemParents($menuName, $item, $scope)
+    private function showMenuItemParents($menuName, $item, Scope $scope)
     {
         $parent = $item->getParent();
         if ($parent !== null && !$parent->isDisplayed()) {
-            $update = $this->getMenuUpdateByKeyAndScope($menuName, $parent->getName(), $scope);
+            $update = $this->findOrCreateMenuUpdate($menuName, $parent->getName(), $scope);
             $update->setActive(true);
             $this->getEntityManager()->persist($update);
 
@@ -291,11 +202,11 @@ class MenuUpdateManager
      * @param ItemInterface $item
      * @param Scope         $scope
      */
-    private function showMenuItemChildren($menuName, $item, $scope)
+    private function showMenuItemChildren($menuName, $item, Scope $scope)
     {
         /** @var ItemInterface $child */
         foreach ($item->getChildren() as $child) {
-            $update = $this->getMenuUpdateByKeyAndScope($menuName, $child->getName(), $scope);
+            $update = $this->findOrCreateMenuUpdate($menuName, $child->getName(), $scope);
             $update->setActive(true);
             $this->getEntityManager()->persist($update);
 
@@ -308,11 +219,11 @@ class MenuUpdateManager
      * @param string $key
      * @param Scope  $scope
      */
-    public function hideMenuItem($menuName, $key, $scope)
+    public function hideMenuItem($menuName, $key, Scope $scope)
     {
         $item = MenuUpdateUtils::findMenuItem($this->getMenu($menuName), $key);
         if ($item !== null) {
-            $update = $this->getMenuUpdateByKeyAndScope($menuName, $item->getName(), $scope);
+            $update = $this->findOrCreateMenuUpdate($menuName, $item->getName(), $scope);
             $update->setActive(false);
             $this->getEntityManager()->persist($update);
 
@@ -327,11 +238,11 @@ class MenuUpdateManager
      * @param ItemInterface $item
      * @param Scope         $scope
      */
-    private function hideMenuItemChildren($menuName, $item, $scope)
+    private function hideMenuItemChildren($menuName, ItemInterface $item, Scope $scope)
     {
         /** @var ItemInterface $child */
         foreach ($item->getChildren() as $child) {
-            $update = $this->getMenuUpdateByKeyAndScope($menuName, $child->getName(), $scope);
+            $update = $this->findOrCreateMenuUpdate($menuName, $child->getName(), $scope);
             $update->setActive(false);
             $this->getEntityManager()->persist($update);
 
@@ -350,9 +261,9 @@ class MenuUpdateManager
      *
      * @return MenuUpdateInterface[]
      */
-    public function moveMenuItem($menuName, $key, $scope, $parentKey, $position)
+    public function moveMenuItem($menuName, $key, Scope $scope, $parentKey, $position)
     {
-        $currentUpdate = $this->getMenuUpdateByKeyAndScope($menuName, $key, $scope);
+        $currentUpdate = $this->findOrCreateMenuUpdate($menuName, $key, $scope);
 
         $parent = $this->findMenuItem($menuName, $parentKey, $scope);
         $currentUpdate->setParentKey($parent ? $parent->getName() : null);
@@ -381,38 +292,65 @@ class MenuUpdateManager
     }
 
     /**
-     * Get menu built by BuilderChainProvider
-     *
-     * @param string $name
-     * @param array $options
-     *
-     * @return ItemInterface
+     * @param Scope  $scope
+     * @param string $menu
      */
-    public function getMenu($name, $options = [])
+    public function deleteMenuUpdates($scope, $menu = null)
     {
-        $options = array_merge($options, [
-            'ignoreCache' => true
-        ]);
+        $criteria['scope'] = $scope;
 
-        return $this->builderChainProvider->get($name, $options);
+        if ($menu) {
+            $criteria['menu'] = $menu;
+        }
+
+        $menuUpdates = $this->getRepository()->findBy($criteria);
+
+        foreach ($menuUpdates as $menuUpdate) {
+            $this->getEntityManager()->remove($menuUpdate);
+        }
+
+        $this->getEntityManager()->flush($menuUpdates);
     }
 
     /**
-     * @param string $menuName
-     * @param string $key
-     * @param Scope  $scope
+     * Get list of menu update with new position
      *
-     * @return ItemInterface|null
+     * @param string          $menuName
+     * @param ItemInterface[] $orderedChildren
+     * @param Scope           $scope
+     *
+     * @return MenuUpdateInterface[]
      */
-    public function findMenuItem($menuName, $key, $scope)
+    private function getReorderedMenuUpdates($menuName, $orderedChildren, Scope $scope)
     {
-        $options = [
-            'ignoreCache' => true,
-            'scopeId' => $scope
-        ];
-        $menu = $this->getMenu($menuName, $options);
+        $order = [];
+        foreach ($orderedChildren as $priority => $child) {
+            $order[$child->getName()] = $priority;
+        }
 
-        return MenuUpdateUtils::findMenuItem($menu, $key);
+        /** @var MenuUpdateInterface[] $updates */
+        $updates = $this->getRepository()->findBy([
+            'menu' => $menuName,
+            'key' => array_keys($order),
+            'scope' => $scope,
+        ]);
+
+        foreach ($updates as $update) {
+            $update->setPriority($order[$update->getKey()]);
+            unset($orderedChildren[$order[$update->getKey()]]);
+        }
+
+        foreach ($orderedChildren as $priority => $child) {
+            $update = $this->createMenuUpdate(
+                $scope,
+                ['key' => $child->getName(), 'menu' => $menuName]
+            );
+            MenuUpdateUtils::updateMenuUpdate($update, $child, $menuName, $this->menuUpdateHelper);
+            $update->setPriority($priority);
+            $updates[] = $update;
+        }
+
+        return $updates;
     }
 
     /**
@@ -423,7 +361,7 @@ class MenuUpdateManager
      *
      * @return MenuUpdateInterface
      */
-    private function getMenuUpdateFromMenu(MenuUpdateInterface $update, $menuName, $key, $scope)
+    private function getMenuUpdateFromMenu(MenuUpdateInterface $update, $menuName, $key, Scope $scope)
     {
         $item = $this->findMenuItem($menuName, $key, $scope);
 
@@ -439,7 +377,7 @@ class MenuUpdateManager
     /**
      * @return EntityRepository
      */
-    private function getRepository()
+    public function getRepository()
     {
         return $this->getEntityManager()->getRepository($this->entityClass);
     }
@@ -450,36 +388,5 @@ class MenuUpdateManager
     private function getEntityManager()
     {
         return $this->managerRegistry->getManagerForClass($this->entityClass);
-    }
-
-    /**
-     * @return string
-     */
-    public function generateKey()
-    {
-        return uniqid('menu_item_', false);
-    }
-
-    /**
-     * Reset menu updates depending on ownership type and owner id
-     *
-     * @param Scope  $scope
-     * @param string $menu
-     */
-    public function resetMenuUpdatesWithOwnershipType($scope, $menu = null)
-    {
-        $criteria['scopeId'] = $scope;
-
-        if ($menu) {
-            $criteria['menu'] = $menu;
-        }
-
-        $menuUpdates = $this->getRepository()->findBy($criteria);
-
-        foreach ($menuUpdates as $menuUpdate) {
-            $this->getEntityManager()->remove($menuUpdate);
-        }
-
-        $this->getEntityManager()->flush($menuUpdates);
     }
 }
