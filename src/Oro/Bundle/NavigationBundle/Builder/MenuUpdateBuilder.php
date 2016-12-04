@@ -5,6 +5,7 @@ namespace Oro\Bundle\NavigationBundle\Builder;
 use Knp\Menu\ItemInterface;
 
 use Oro\Bundle\LocaleBundle\Helper\LocalizationHelper;
+use Oro\Bundle\NavigationBundle\Entity\Repository\MenuUpdateRepository;
 use Oro\Bundle\NavigationBundle\Exception\MaxNestingLevelExceededException;
 use Oro\Bundle\NavigationBundle\Manager\MenuUpdateManagerRegistry;
 use Oro\Bundle\NavigationBundle\Menu\BuilderInterface;
@@ -83,9 +84,10 @@ class MenuUpdateBuilder implements BuilderInterface
     {
         $scopeIds = $this->scopeManager->findRelatedScopeIdsWithPriority($scopeType, $scopeContext);
 
-        $manager = $this->registry->getManager($scopeType);
+        /** @var MenuUpdateRepository $repo */
+        $repo = $this->registry->getManager($scopeType)->getRepository();
 
-        return $manager->getMenuUpdatesByScopeIds($menuName, $scopeIds);
+        return $repo->findMenuUpdatesByScopeIds($menuName, $scopeIds);
     }
 
     /**
