@@ -4,8 +4,8 @@ namespace Oro\Bundle\ActionBundle\Tests\Unit\Button;
 
 use Oro\Bundle\ActionBundle\Button\ButtonsCollection;
 use Oro\Bundle\ActionBundle\Extension\ButtonProviderExtensionInterface;
-use Oro\Bundle\ActionBundle\Model\ButtonInterface;
-use Oro\Bundle\ActionBundle\Model\ButtonSearchContext;
+use Oro\Bundle\ActionBundle\Button\ButtonInterface;
+use Oro\Bundle\ActionBundle\Button\ButtonSearchContext;
 
 class ButtonsCollectionTest extends \PHPUnit_Framework_TestCase
 {
