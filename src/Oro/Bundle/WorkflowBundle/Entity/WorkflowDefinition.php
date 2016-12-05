@@ -11,6 +11,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
 use Oro\Bundle\ScopeBundle\Entity\Scope;
+use Oro\Bundle\WorkflowBundle\Configuration\WorkflowConfiguration;
 use Oro\Bundle\WorkflowBundle\Exception\WorkflowException;
 
 /**
@@ -51,7 +52,6 @@ class WorkflowDefinition implements DomainObjectInterface
 {
     const GROUP_TYPE_EXCLUSIVE_ACTIVE = 10;
     const GROUP_TYPE_EXCLUSIVE_RECORD = 20;
-
     const CONFIG_SCOPES = 'scopes';
 
     /**
@@ -229,7 +229,7 @@ class WorkflowDefinition implements DomainObjectInterface
     public function __clone()
     {
         if ($this->name) {
-            $this->setName($this->getName() . uniqid('_clone_'));
+            $this->setName($this->getName() . uniqid('_clone_', false));
             $this->setSystem(false);
         }
     }
@@ -258,7 +258,8 @@ class WorkflowDefinition implements DomainObjectInterface
      */
     public function getScopesConfig()
     {
-        return array_key_exists('scopes', $this->configuration) ? (array)$this->configuration[self::CONFIG_SCOPES] : [];
+        return array_key_exists(self::CONFIG_SCOPES, $this->configuration) ?
+            (array)$this->configuration[self::CONFIG_SCOPES] : [];
     }
 
     /**
@@ -267,6 +268,23 @@ class WorkflowDefinition implements DomainObjectInterface
     public function hasScopesConfig()
     {
         return !empty($this->configuration[self::CONFIG_SCOPES]);
+    }
+
+    /**
+     * @return array
+     */
+    public function getDisabledOperations()
+    {
+        return array_key_exists(WorkflowConfiguration::NODE_DISABLE_OPERATIONS, $this->configuration) ?
+            $this->configuration[WorkflowConfiguration::NODE_DISABLE_OPERATIONS] : [];
+    }
+
+    /**
+     * @return bool
+     */
+    public function hasDisabledOperations()
+    {
+        return !empty($this->configuration[WorkflowConfiguration::NODE_DISABLE_OPERATIONS]);
     }
 
     /**

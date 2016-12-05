@@ -39,6 +39,8 @@ workflows:
                     delete: false
                 options:
                     class: DateTime
+        disable_operations:
+            operation1: [entity1, entity2]
         transitions:
             first_transition:
                 step_to: first_step

@@ -4,6 +4,8 @@ namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Model;
 
 use Doctrine\Common\Collections\ArrayCollection;
 
+use Symfony\Component\PropertyAccess\PropertyAccess;
+
 use Oro\Bundle\ActionBundle\Model\Attribute;
 use Oro\Bundle\ActionBundle\Model\AttributeManager;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
@@ -855,24 +857,36 @@ class WorkflowTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($expected, $workflow->getAttributesMapping());
     }
 
-    public function testGetInitEntities()
+    /**
+     * @dataProvider configurationOptionProvider
+     *
+     * @param array $data
+     * @param string $property
+     * @param string $node
+     */
+    public function testGetConfigurationOption($data, $property, $node)
     {
+        $accessor = PropertyAccess::createPropertyAccessor();
         $workflow = $this->createWorkflow();
-        $data = ['entity1' => ['trans1']];
         $workflow->getDefinition()->setConfiguration([
-            WorkflowConfiguration::NODE_INIT_ENTITIES => $data,
+            $node => $data,
         ]);
-        $this->assertEquals($data, $workflow->getInitEntities());
+        $this->assertEquals($data, $accessor->getValue($workflow, $property));
     }
 
-    public function testGetInitRoutes()
+    public function configurationOptionProvider()
     {
-        $workflow = $this->createWorkflow();
-        $data = ['route1' => ['trans1']];
-        $workflow->getDefinition()->setConfiguration([
-            WorkflowConfiguration::NODE_INIT_ROUTES => $data,
-        ]);
-        $this->assertEquals($data, $workflow->getInitRoutes());
+        yield [
+            'data' => ['route1' => ['trans1']],
+            'property' => 'initRoutes',
+            'node' => WorkflowConfiguration::NODE_INIT_ROUTES
+        ];
+
+        yield [
+            'data' => ['entity1' => ['trans1']],
+            'property' => 'initEntities',
+            'node' => WorkflowConfiguration::NODE_INIT_ENTITIES
+        ];
     }
 
     /**
