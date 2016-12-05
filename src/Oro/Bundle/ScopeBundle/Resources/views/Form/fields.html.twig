@@ -3,7 +3,9 @@
         <tr>
             {% for child in form.children %}
                 <td>
-                    {{ form_label(child) }}
+                    {% if child.vars.label is not empty %}
+                        {{ form_label(child) }}
+                    {% endif %}
                     {{ form_widget(child) }}
                 </td>
             {% endfor %}
