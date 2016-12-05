@@ -16,6 +16,7 @@ use Oro\Bundle\ImportExportBundle\Context\ContextInterface;
 use Oro\Bundle\ImportExportBundle\Exception\InvalidArgumentException;
 use Oro\Bundle\ImportExportBundle\Exception\LogicException;
 use Oro\Bundle\ImportExportBundle\Converter\ConfigurableTableDataConverter;
+use Oro\Bundle\SecurityBundle\SecurityFacade;
 
 class ImportStrategyHelper
 {
@@ -47,25 +48,31 @@ class ImportStrategyHelper
      */
     protected $configurableDataConverter;
 
+    /** @var SecurityFacade */
+    protected $securityFacade;
+
     /**
      * @param ManagerRegistry $managerRegistry
      * @param ValidatorInterface $validator
      * @param TranslatorInterface $translator
      * @param FieldHelper $fieldHelper
      * @param ConfigurableTableDataConverter $configurableDataConverter
+     * @param SecurityFacade $securityFacade
      */
     public function __construct(
         ManagerRegistry $managerRegistry,
         ValidatorInterface $validator,
         TranslatorInterface $translator,
         FieldHelper $fieldHelper,
-        ConfigurableTableDataConverter $configurableDataConverter
+        ConfigurableTableDataConverter $configurableDataConverter,
+        SecurityFacade $securityFacade
     ) {
         $this->managerRegistry = $managerRegistry;
         $this->validator = $validator;
         $this->translator = $translator;
         $this->fieldHelper = $fieldHelper;
         $this->configurableDataConverter = $configurableDataConverter;
+        $this->securityFacade = $securityFacade;
     }
 
     /**
@@ -74,6 +81,33 @@ class ImportStrategyHelper
     public function setConfigProvider(ConfigProvider $extendConfigProvider)
     {
         $this->extendConfigProvider = $extendConfigProvider;
+    }
+
+    /**
+     * Checks if an access to a resource is granted to the caller
+     *
+     * @param string|string[] $attributes Can be a role name(s), permission name(s), an ACL annotation id,
+     *                                    string in format "permission;descriptor"
+     *                                    (VIEW;entity:AcmeDemoBundle:AcmeEntity, EDIT;action:acme_action)
+     *                                    or something else, it depends on registered security voters
+     * @param  mixed          $entity     A domain object, object identity or object identity descriptor (id:type)
+     *                                    (entity:Acme/DemoBundle/Entity/AcmeEntity,  action:some_action)
+     *
+     * @param  string        $method
+     * @return bool
+     */
+    public function isGranted($attributes, $entity, $method=null)
+    {
+        if (!$this->securityFacade->hasLoggedUser()) {
+            return true;
+        }
+        if ($method) {
+            $isGranted = $this->securityFacade->isClassMethodGranted($entity, $method);
+        } else {
+            $isGranted = $this->securityFacade->isGranted($attributes, $entity);
+        }
+
+        return $isGranted;
     }
 
     /**
@@ -114,10 +148,13 @@ class ImportStrategyHelper
             ),
             $excludedProperties
         );
-
         foreach ($importedEntityProperties as $propertyName) {
             // we should not overwrite deleted fields
             if ($this->isDeletedField($basicEntityClass, $propertyName)) {
+                continue;
+            }
+//        TODO should implement first parameter
+            if (!$this->isGranted('EDIT', $basicEntityClass, $propertyName)) {
                 continue;
             }
             $importedValue = $this->fieldHelper->getObjectValue($importedEntity, $propertyName);

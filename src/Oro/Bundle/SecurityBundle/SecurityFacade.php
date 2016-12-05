@@ -80,6 +80,7 @@ class SecurityFacade
             $this->logger->debug(
                 sprintf('Check an access using "%s" ACL annotation.', $annotation->getId())
             );
+//            TODO should use AuthorizationChecker
             $isGranted = $this->securityContext->isGranted(
                 $annotation->getPermission(),
                 $this->objectIdentityFactory->get($annotation)

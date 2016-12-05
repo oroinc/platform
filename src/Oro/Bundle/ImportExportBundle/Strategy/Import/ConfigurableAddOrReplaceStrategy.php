@@ -110,6 +110,10 @@ class ConfigurableAddOrReplaceStrategy extends AbstractImportStrategy
         $entityClass = ClassUtils::getClass($entity);
         // find and cache existing or new entity
         $existingEntity = $this->findExistingEntity($entity, $searchContext);
+//        TODO should implement first parameter
+        if (!$this->strategyHelper->isGranted("EDIT", $existingEntity)) {
+            return null;
+        }
         if ($existingEntity) {
             $existingOid = spl_object_hash($existingEntity);
             if (isset($this->cachedEntities[$existingOid])) {
@@ -189,6 +193,11 @@ class ConfigurableAddOrReplaceStrategy extends AbstractImportStrategy
         foreach ($fields as $key => $field) {
             $fieldName = $field['name'];
             if ($this->isFieldExcluded($entityName, $fieldName, $itemData)) {
+                $excludedFields[] = $fieldName;
+                unset($fields[$key]);
+            }
+//        TODO should implement first parameter
+            if (!$this->strategyHelper->isGranted('EDIT', $entityName, $fieldName)) {
                 $excludedFields[] = $fieldName;
                 unset($fields[$key]);
             }
