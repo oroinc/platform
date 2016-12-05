@@ -5,15 +5,15 @@ namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Extension;
 use Doctrine\Common\Collections\ArrayCollection;
 
 use Oro\Bundle\ActionBundle\Exception\UnsupportedButtonException;
-use Oro\Bundle\ActionBundle\Model\ButtonContext;
-use Oro\Bundle\ActionBundle\Model\ButtonInterface;
-use Oro\Bundle\ActionBundle\Model\ButtonSearchContext;
+use Oro\Bundle\ActionBundle\Button\ButtonContext;
+use Oro\Bundle\ActionBundle\Button\ButtonInterface;
+use Oro\Bundle\ActionBundle\Button\ButtonSearchContext;
 use Oro\Bundle\ActionBundle\Provider\RouteProviderInterface;
 use Oro\Bundle\ActionBundle\Tests\Unit\Stub\StubButton;
+use Oro\Bundle\WorkflowBundle\Button\StartTransitionButton;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Extension\StartTransitionButtonProviderExtension;
 use Oro\Bundle\WorkflowBundle\Model\Transition;
-use Oro\Bundle\WorkflowBundle\Model\TransitionButton;
 use Oro\Bundle\WorkflowBundle\Model\TransitionManager;
 use Oro\Bundle\WorkflowBundle\Model\Workflow;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowRegistry;
@@ -88,7 +88,7 @@ class StartTransitionButtonProviderExtensionTest extends \PHPUnit_Framework_Test
                 ->setEntity($entityClass)
                 ->setRouteName($routeName)
                 ->setDatagridName($datagrid);
-            $buttons = [new TransitionButton($transition, $workflow, $buttonContext)];
+            $buttons = [new StartTransitionButton($transition, $workflow, $buttonContext)];
         } else {
             $buttons = [];
         }
@@ -227,7 +227,7 @@ class StartTransitionButtonProviderExtensionTest extends \PHPUnit_Framework_Test
      * @param bool $isAvailable
      * @param bool $isStart
      *
-     * @return TransitionButton
+     * @return StartTransitionButton
      */
     private function createTransitionButton($isAvailable = false, $isStart = true)
     {
@@ -239,6 +239,6 @@ class StartTransitionButtonProviderExtensionTest extends \PHPUnit_Framework_Test
 
         $workflow = $this->getWorkflow($transitionManager);
 
-        return new TransitionButton($transition, $workflow, new ButtonContext());
+        return new StartTransitionButton($transition, $workflow, new ButtonContext());
     }
 }
