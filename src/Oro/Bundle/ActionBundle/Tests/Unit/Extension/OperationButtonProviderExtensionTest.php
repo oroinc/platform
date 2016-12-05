@@ -7,6 +7,7 @@ use Oro\Bundle\ActionBundle\Helper\ContextHelper;
 use Oro\Bundle\ActionBundle\Model\ActionData;
 use Oro\Bundle\ActionBundle\Model\ButtonContext;
 use Oro\Bundle\ActionBundle\Model\ButtonSearchContext;
+use Oro\Bundle\ActionBundle\Model\Criteria\OperationFindCriteria;
 use Oro\Bundle\ActionBundle\Model\Operation;
 use Oro\Bundle\ActionBundle\Model\OperationButton;
 use Oro\Bundle\ActionBundle\Model\OperationRegistry;
@@ -181,12 +182,7 @@ class OperationButtonProviderExtensionTest extends \PHPUnit_Framework_TestCase
     {
         $this->operationRegistry->expects($this->once())
             ->method('find')
-            ->with(
-                $buttonSearchContext->getEntityClass(),
-                $buttonSearchContext->getRouteName(),
-                $buttonSearchContext->getGridName(),
-                $buttonSearchContext->getGroup()
-            )
+            ->with(OperationFindCriteria::createFromButtonSearchContext($buttonSearchContext))
             ->willReturn($operations);
     }
 
