@@ -46,10 +46,10 @@ class WorkflowManager implements LoggerAwareInterface
     private $startedWorkflows = [];
 
     /**
-     * @param WorkflowRegistry $workflowRegistry
-     * @param DoctrineHelper $doctrineHelper
+     * @param WorkflowRegistry         $workflowRegistry
+     * @param DoctrineHelper           $doctrineHelper
      * @param EventDispatcherInterface $eventDispatcher
-     * @param WorkflowEntityConnector $entityConnector
+     * @param WorkflowEntityConnector  $entityConnector
      */
     public function __construct(
         WorkflowRegistry $workflowRegistry,
@@ -98,8 +98,8 @@ class WorkflowManager implements LoggerAwareInterface
 
     /**
      * @param string|Transition $transition
-     * @param WorkflowItem $workflowItem
-     * @param Collection $errors
+     * @param WorkflowItem      $workflowItem
+     * @param Collection        $errors
      * @return bool
      */
     public function isTransitionAvailable(WorkflowItem $workflowItem, $transition, Collection $errors = null)
@@ -110,11 +110,11 @@ class WorkflowManager implements LoggerAwareInterface
     }
 
     /**
-     * @param string|Workflow $workflow
+     * @param string|Workflow   $workflow
      * @param string|Transition $transition
-     * @param object $entity
-     * @param array $data
-     * @param Collection $errors
+     * @param object            $entity
+     * @param array             $data
+     * @param Collection        $errors
      * @return bool
      */
     public function isStartTransitionAvailable(
@@ -163,11 +163,11 @@ class WorkflowManager implements LoggerAwareInterface
     }
 
     /**
-     * @param string $workflow
-     * @param object $entity
+     * @param string                 $workflow
+     * @param object                 $entity
      * @param string|Transition|null $transition
-     * @param array $data
-     * @param bool $throwGroupException
+     * @param array                  $data
+     * @param bool                   $throwGroupException
      * @return WorkflowItem|null
      * @throws WorkflowRecordGroupException
      */
@@ -244,7 +244,7 @@ class WorkflowManager implements LoggerAwareInterface
     /**
      * Perform workflow item transition.
      *
-     * @param WorkflowItem $workflowItem
+     * @param WorkflowItem      $workflowItem
      * @param string|Transition $transition
      */
     public function transit(WorkflowItem $workflowItem, $transition)
@@ -255,9 +255,9 @@ class WorkflowManager implements LoggerAwareInterface
     }
 
     /**
-     * @param Workflow $workflow
+     * @param Workflow     $workflow
      * @param WorkflowItem $workflowItem
-     * @param string $transition
+     * @param string       $transition
      */
     private function transitWorkflow(Workflow $workflow, WorkflowItem $workflowItem, $transition)
     {
@@ -271,9 +271,9 @@ class WorkflowManager implements LoggerAwareInterface
                     $this->logger->info(
                         'Workflow transition is complete',
                         [
-                            'workflow' => $workflow,
+                            'workflow'     => $workflow,
                             'workflowItem' => $workflowItem,
-                            'transition' => $transition
+                            'transition'   => $transition
                         ]
                     );
                 }
@@ -286,7 +286,7 @@ class WorkflowManager implements LoggerAwareInterface
      * Tries to transit workflow and checks weather given transition is allowed.
      * Returns true on success - false otherwise.
      * @param WorkflowItem $workflowItem
-     * @param string $transition
+     * @param string       $transition
      * @return bool
      */
     public function transitIfAllowed(WorkflowItem $workflowItem, $transition)
@@ -344,7 +344,7 @@ class WorkflowManager implements LoggerAwareInterface
 
     /**
      * @param callable $callable
-     * @param string $entityClass
+     * @param string   $entityClass
      * @return mixed
      * @throws \Exception
      */
@@ -374,8 +374,9 @@ class WorkflowManager implements LoggerAwareInterface
             return [];
         }
 
-        $workflows = $this->workflowRegistry
-            ->getActiveWorkflowsByEntityClass($this->doctrineHelper->getEntityClass($entity));
+        $workflows = $this->workflowRegistry->getActiveWorkflowsByEntityClass(
+            $this->doctrineHelper->getEntityClass($entity)
+        );
 
         if (is_object($entity)) {
             $recordContext = new WorkflowRecordContext($entity);
@@ -462,14 +463,14 @@ class WorkflowManager implements LoggerAwareInterface
 
     /**
      * @param string $workflowName
-     * @param bool $isActive
+     * @param bool   $isActive
      * @return bool weather workflow was changed his state
      */
     private function setWorkflowStatus($workflowName, $isActive)
     {
         $definition = $this->workflowRegistry->getWorkflow($workflowName)->getDefinition();
 
-        if ((bool)$isActive !== $definition->isActive()) {
+        if ((bool) $isActive !== $definition->isActive()) {
             $this->eventDispatcher->dispatch(
                 $isActive ? WorkflowEvents::WORKFLOW_BEFORE_ACTIVATION : WorkflowEvents::WORKFLOW_BEFORE_DEACTIVATION,
                 new WorkflowChangesEvent($definition)
@@ -517,7 +518,7 @@ class WorkflowManager implements LoggerAwareInterface
 
     /**
      * @param object $entity
-     * @param array $recordGroups
+     * @param array  $recordGroups
      * @return bool
      */
     protected function isStartAllowedByRecordGroups($entity, array $recordGroups)

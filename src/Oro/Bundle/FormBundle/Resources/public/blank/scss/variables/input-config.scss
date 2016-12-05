@@ -1,6 +1,9 @@
+// @theme: blank
+
 $use-base-style-for-input: true !default;
 
 // Default
+$input-width-short: 80px !default;
 $input-padding: 8px 9px !default;
 $input-font-size: $base-ui-element-font-size !default;
 $input-font-family: $base-ui-element-font-family !default;

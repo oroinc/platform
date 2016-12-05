@@ -8,6 +8,8 @@ class ObjectIdentityHelper
 
     const IDENTITY_TYPE_DELIMITER = ':';
 
+    const GROUP_DELIMITER = '@';
+
     /**
      * Parse identity string to array of values: id, type, and fieldName
      * Examples of string formats:
@@ -43,7 +45,7 @@ class ObjectIdentityHelper
      */
     public static function encodeIdentityString($extensionKey, $class)
     {
-        return sprintf('%s%s%s', $extensionKey, self::IDENTITY_TYPE_DELIMITER, $class);
+        return $extensionKey . self::IDENTITY_TYPE_DELIMITER . $class;
     }
 
     /**
@@ -71,7 +73,8 @@ class ObjectIdentityHelper
     }
 
     /**
-     * Return true if given string is encoded identity (f.e. entity:\Acme\Demo\Entity::some_field or action:some_action)
+     * Return true if given string is encoded identity
+     * e.g. entity:Acme\Demo\Entity::some_field or action:some_action
      *
      * @param string $identityString
      *
@@ -83,15 +86,32 @@ class ObjectIdentityHelper
     }
 
     /**
+     * Removes a field name from the given descriptor.
+     *
+     * @param string $val
+     *
+     * @return string
+     */
+    public static function removeFieldName($val)
+    {
+        $delim = strpos($val, self::FIELD_DELIMITER);
+        if (false !== $delim) {
+            $val = substr($val, 0, $delim);
+        }
+
+        return $val;
+    }
+
+    /**
      * Decode identity string to array with class and field names.
      *
-     * @param string $key
+     * @param string $val
      *
      * @return array [className, fieldName]
      */
-    public static function decodeEntityFieldInfo($key)
+    public static function decodeEntityFieldInfo($val)
     {
-        return explode(self::FIELD_DELIMITER, $key);
+        return explode(self::FIELD_DELIMITER, $val, 2);
     }
 
     /**
@@ -104,18 +124,72 @@ class ObjectIdentityHelper
      */
     public static function encodeEntityFieldInfo($entityClassName, $fieldName)
     {
-        return sprintf('%s%s%s', $entityClassName, self::FIELD_DELIMITER, $fieldName);
+        return $entityClassName . self::FIELD_DELIMITER . $fieldName;
     }
 
     /**
      * Return true if given identity string contains class and field information.
      *
-     * @param string $key
+     * @param string $val
      *
      * @return bool
      */
-    public static function isFieldEncodedKey($key)
+    public static function isFieldEncodedKey($val)
     {
-        return (bool)strpos($key, self::FIELD_DELIMITER);
+        return (bool)strpos($val, self::FIELD_DELIMITER);
+    }
+
+    /**
+     * Builds a string that should be used as a type of an object identity.
+     *
+     * @param string      $type
+     * @param string|null $group
+     *
+     * @return string
+     */
+    public static function buildType($type, $group = null)
+    {
+        return empty($group)
+            ? $type
+            : $group . self::GROUP_DELIMITER . $type;
+    }
+
+    /**
+     * Removes a group identifier from the given value.
+     *
+     * @param string $type
+     *
+     * @return string
+     */
+    public static function removeGroupName($type)
+    {
+        $delim = strpos($type, self::GROUP_DELIMITER);
+        if (false !== $delim) {
+            $type = ltrim(substr($type, $delim + 1), ' ');
+        }
+
+        return $type;
+    }
+
+    /**
+     * Extracts the normalized type and a group identifier from the given value.
+     * Examples of types:
+     *  Acme\DemoBundle\SomeEntity
+     *  Acme\DemoBundle\SomeEntity@some_group
+     *
+     * @param string $type
+     *
+     * @return array [type, group]
+     */
+    public static function parseType($type)
+    {
+        $group = null;
+        $delim = strpos($type, self::GROUP_DELIMITER);
+        if (false !== $delim) {
+            $group = strtolower(ltrim(substr($type, 0, $delim), ' '));
+            $type = ltrim(substr($type, $delim + 1), ' ');
+        }
+
+        return [$type, $group];
     }
 }

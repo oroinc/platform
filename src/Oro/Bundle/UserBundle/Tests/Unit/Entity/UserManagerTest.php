@@ -8,8 +8,10 @@ use Doctrine\Common\Persistence\ObjectManager;
 
 use Symfony\Component\Security\Core\Encoder\EncoderFactoryInterface;
 
+use Oro\Component\Testing\Unit\Entity\Stub\StubEnumValue;
+use Oro\Bundle\EntityExtendBundle\Provider\EnumValueProvider;
 use Oro\Bundle\UserBundle\Entity\Role;
-use Oro\Bundle\UserBundle\Entity\User;
+use Oro\Bundle\UserBundle\Tests\Unit\Stub\UserStub as User;
 use Oro\Bundle\UserBundle\Entity\UserApi;
 use Oro\Bundle\UserBundle\Entity\UserManager;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
@@ -62,7 +64,17 @@ class UserManagerTest extends \PHPUnit_Framework_TestCase
 
         $this->om->expects($this->any())->method('getClassMetadata')->willReturn($this->metadata);
 
-        $this->userManager = new UserManager(static::USER_CLASS, $this->registry, $this->ef);
+        /** @var EnumValueProvider $enumValueProvider */
+        $enumValueProvider = $this->getMockBuilder(EnumValueProvider::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+        $enumValueProvider->method('getEnumValueByCode')->willReturnCallback(
+            function ($code, $id) {
+                return new StubEnumValue($id, $id);
+            }
+        );
+
+        $this->userManager = new UserManager(User::class, $this->registry, $this->ef, $enumValueProvider);
     }
 
     protected function tearDown()
@@ -191,5 +203,13 @@ class UserManagerTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue($repository));
 
         $this->userManager->updateUser($user);
+    }
+
+    public function testSetAuthStatus()
+    {
+        $user = new User();
+        $this->assertNull($user->getAuthStatus());
+        $this->userManager->setAuthStatus($user, UserManager::STATUS_EXPIRED);
+        $this->assertEquals(UserManager::STATUS_EXPIRED, $user->getAuthStatus()->getId());
     }
 }

@@ -65,6 +65,7 @@ class OroEmailBundle extends Bundle
         $addTopicPass = AddTopicMetaPass::create()
             ->add(Topics::SEND_AUTO_RESPONSE, 'Send auto response for single email')
             ->add(Topics::SEND_AUTO_RESPONSES, 'Send auto response for multiple emails')
+            ->add(Topics::UPDATE_ASSOCIATIONS_TO_EMAILS, 'Update associations to emails')
             ->add(Topics::ADD_ASSOCIATION_TO_EMAIL, 'Add association to single email')
             ->add(Topics::ADD_ASSOCIATION_TO_EMAILS, 'Add association to multiple emails')
             ->add(Topics::UPDATE_EMAIL_OWNER_ASSOCIATION, 'Updates single email for email owner')

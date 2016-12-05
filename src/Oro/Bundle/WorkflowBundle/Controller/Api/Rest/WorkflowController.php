@@ -12,7 +12,6 @@ use Symfony\Component\HttpKernel\Exception\HttpException;
 // Annotations import
 use FOS\RestBundle\Controller\Annotations as Rest;
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
-use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
 
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
@@ -47,7 +46,6 @@ class WorkflowController extends FOSRestController
      *      defaults={"version"="latest", "_format"="json"}
      * )
      * @ApiDoc(description="Start workflow for entity from transition", resource=true)
-     * @AclAncestor("oro_workflow")
      *
      * @param string $workflowName
      * @param string $transitionName
@@ -152,7 +150,6 @@ class WorkflowController extends FOSRestController
      * )
      * @ParamConverter("workflowItem", options={"id"="workflowItemId"})
      * @ApiDoc(description="Perform transition for workflow item", resource=true)
-     * @AclAncestor("oro_workflow")
      *
      * @param WorkflowItem $workflowItem
      * @param string $transitionName
@@ -193,7 +190,6 @@ class WorkflowController extends FOSRestController
      * )
      * @ParamConverter("workflowItem", options={"id"="workflowItemId"})
      * @ApiDoc(description="Get workflow item", resource=true)
-     * @AclAncestor("oro_workflow")
      *
      * @param WorkflowItem $workflowItem
      * @return Response
@@ -223,7 +219,6 @@ class WorkflowController extends FOSRestController
      * )
      * @ParamConverter("workflowItem", options={"id"="workflowItemId"})
      * @ApiDoc(description="Delete workflow item", resource=true)
-     * @AclAncestor("oro_workflow")
      *
      * @param WorkflowItem $workflowItem
      * @return Response
@@ -246,7 +241,6 @@ class WorkflowController extends FOSRestController
      *      defaults={"version"="latest", "_format"="json"}
      * )
      * @ApiDoc(description="Activate workflow", resource=true)
-     * @AclAncestor("oro_workflow")
      *
      * @param WorkflowDefinition $workflowDefinition
      * @return Response
@@ -281,7 +275,6 @@ class WorkflowController extends FOSRestController
      *      defaults={"version"="latest", "_format"="json"}
      * )
      * @ApiDoc(description="Deactivate workflow", resource=true)
-     * @AclAncestor("oro_workflow")
      *
      * @param WorkflowDefinition $workflowDefinition
      * @return Response
