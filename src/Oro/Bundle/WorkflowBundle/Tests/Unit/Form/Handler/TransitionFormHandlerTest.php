@@ -3,13 +3,14 @@
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Form\Extension;
 
 use Doctrine\ORM\EntityManager;
-
 use Doctrine\ORM\UnitOfWork;
-use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
-use Oro\Bundle\WorkflowBundle\Form\Handler\TransitionFormHandler;
+
 use Symfony\Component\Form\Form;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
+
+use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
+use Oro\Bundle\WorkflowBundle\Form\Handler\TransitionFormHandler;
 
 class TransitionFormHandlerTest extends \PHPUnit_Framework_TestCase
 {
