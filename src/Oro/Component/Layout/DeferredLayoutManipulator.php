@@ -127,7 +127,7 @@ class DeferredLayoutManipulator implements DeferredLayoutManipulatorInterface
         $blockType,
         array $options = [],
         $siblingId = null,
-        $prepend = false
+        $prepend = null
     ) {
         $this->actions[self::GROUP_ADD][++$this->lastIndex] = [
             self::ADD,
@@ -157,7 +157,7 @@ class DeferredLayoutManipulator implements DeferredLayoutManipulatorInterface
     /**
      * {@inheritdoc}
      */
-    public function move($id, $parentId = null, $siblingId = null, $prepend = false)
+    public function move($id, $parentId = null, $siblingId = null, $prepend = null)
     {
         $this->actions[self::GROUP_ADD][++$this->lastIndex] = [
             self::MOVE,

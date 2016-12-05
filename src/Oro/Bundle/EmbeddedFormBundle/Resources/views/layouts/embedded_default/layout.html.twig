@@ -1,0 +1,31 @@
+{% block embed_form_start_widget %}
+    {% set attr = form.vars.attr|merge(attr) %}
+    {% set action = action_path is defined ? action_path : (action_route_name is defined ? path(action_route_name, action_route_parameters) : null) -%}
+    {% if method is defined and method not in ['GET', 'POST'] -%}
+        {% set form_method = 'POST' %}
+    {%- endif -%}
+    <form{{ block('block_attributes') }}{% if action is not same as(null) %} action="{{ action }}"{% endif %}{% if method is defined %} method="{{ form_method|default(method)|lower }}"{% endif %}{% if enctype is defined %} enctype="{{ enctype }}"{% endif %}>
+    {%- if form_method is defined -%}
+        <input type="hidden" name="_method" value="{{ method }}" />
+    {%- endif -%}
+{% endblock %}
+
+{% block embed_form_fields_widget %}
+    {{ block_widget(block) }}
+{% endblock %}
+
+{% block embed_form_end_widget %}
+    {{ form_end(form,  {'render_rest': render_rest}) }}
+{% endblock %}
+
+{% block embed_form_field_widget %}
+    {{ form_row(form) }}
+{% endblock %}
+
+{% block embed_form_errors_widget %}
+    {% if form.vars.errors|length > 0 %}
+        <div{{ block('block_attributes') }}>
+            {{ form_errors(form) }}
+        </div>
+    {% endif %}
+{% endblock %}

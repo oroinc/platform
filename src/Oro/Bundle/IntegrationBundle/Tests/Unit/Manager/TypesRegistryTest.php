@@ -2,7 +2,9 @@
 
 namespace Oro\Bundle\IntegrationBundle\Tests\Unit\Manager;
 
+use Oro\Bundle\IntegrationBundle\Entity\Channel;
 use Oro\Bundle\IntegrationBundle\Manager\TypesRegistry;
+use Oro\Bundle\IntegrationBundle\Provider\ConnectorInterface;
 use Oro\Bundle\IntegrationBundle\Tests\Unit\Stub\IntegrationTypeWithIcon;
 use Oro\Bundle\IntegrationBundle\Tests\Unit\Stub\IntegrationTypeWithoutIcon;
 use Oro\Bundle\IntegrationBundle\Provider\TransportInterface;
@@ -94,5 +96,43 @@ class TypesRegistryTest extends \PHPUnit_Framework_TestCase
             'Doctrine\Common\Collections\Collection',
             $this->typesRegistry->getRegisteredTransportTypes(self::CHANNEL_TYPE_ONE)
         );
+    }
+
+    public function testSupportsSyncWithConnectors()
+    {
+        $expectedIntegrationType = 'someType';
+
+        $integrationMock = $this
+            ->getMockBuilder(Channel::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $integrationMock
+            ->expects($this->once())
+            ->method('getType')
+            ->willReturn($expectedIntegrationType);
+
+        $this->typesRegistry->addConnectorType(
+            $expectedIntegrationType.'Type',
+            $expectedIntegrationType,
+            $this->getMock(ConnectorInterface::class)
+        );
+
+        $this->assertTrue($this->typesRegistry->supportsSync($integrationMock));
+    }
+
+    public function testSupportsSyncWithoutConnectors()
+    {
+        $integrationMock = $this
+            ->getMockBuilder(Channel::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $integrationMock
+            ->expects($this->once())
+            ->method('getType')
+            ->willReturn('someIntegrationType');
+
+        $this->assertFalse($this->typesRegistry->supportsSync($integrationMock));
     }
 }

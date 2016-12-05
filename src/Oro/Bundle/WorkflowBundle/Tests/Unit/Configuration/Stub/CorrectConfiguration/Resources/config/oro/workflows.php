@@ -13,6 +13,15 @@ return [
         'defaults' => [
             'active' => true,
         ],
+        'scopes' => [
+           [
+               'scope1' => 'value1',
+               'scope2' => 'value2',
+           ],
+           [
+               'scope1' => 'value3',
+           ],
+        ],
         'steps' => [
             'first_step' => [
                 'order' => 1,
@@ -72,6 +81,9 @@ return [
                         ]
                     ]
                 ],
+                'init_entities' => ['entity1'],
+                'init_routes' => ['route1'],
+                'init_context_attribute' => 'test_init_context',
                 'triggers' => [
                     [
                         'event' => 'create',
@@ -156,6 +168,7 @@ return [
         'entity' => 'Second\Entity',
         'start_step' => 'second_step',
         'priority' => 0,
+        'scopes' => [],
         'defaults' => [
             'active' => false,
         ],
@@ -187,7 +200,10 @@ return [
                 'form_options' => [],
                 'page_template' => null,
                 'dialog_template' => null,
-                'triggers' => []
+                'triggers' => [],
+                'init_entities' => [],
+                'init_routes' => [],
+                'init_context_attribute' => 'init_context',
             ]
         ],
         'transition_definitions' => [

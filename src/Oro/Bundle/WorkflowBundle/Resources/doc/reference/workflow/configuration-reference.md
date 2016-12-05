@@ -149,8 +149,7 @@ Single workflow configuration has next properties:
     Contains configuration for Workflow Restrictions
 * **defaults** - node for default workflow configuration values that can be changed in UI later. 
     * **active** - determine if workflow should be active right after first load of configuration.
-
-
+* **scopes** - list of scopes configurations used for filtering workflow by scopes
 
 Example
 -------
@@ -168,6 +167,9 @@ workflows:                                                    # Root elements
         exclusive_active_groups: [b2b_sales]                  # Only one active workflow from 'b2b_sales' group can be active
         exclusive_record_groups:
             - sales                                           # Only one workflow from group 'sales' can be started at time for the entity
+        scopes:
+            -                                                 # Definition of configuration for one scope
+                scope_field: 42                               
         attributes:                                           # configuration for Attributes
                                                               # ...
         steps:                                                # configuration for Steps
@@ -356,6 +358,17 @@ Transition configuration has next options:
 * **message**
     *Translatable*: `oro.workflow.{workflow_name}.transition.{transition_name}.warning_message`
     Notification message, that will be shown at frontend before transition execution.
+* **init_routes**
+    *array*
+    List of routes where will be displayed transition button. It's needed for start workflow from entities that not 
+    directly related to that workflow.
+* **init_entities**
+    *array*
+    List of entities where will be displayed transition button. It's needed for start workflow from entities that not 
+    directly related to that workflow.
+* **init_context_attribute**
+    *string*
+    Name of attribute which contains init context: routeName, entityId, entityClass, referrer, group. Default value - `init_context`
 * **display_type**
     *string*
     Frontend transition form display type. Possible options are: dialog, page.
@@ -390,6 +403,15 @@ workflows:
     phone_call:
         # ...
         transitions:
+            start_process:
+                is_start: true                              # Start new workflow
+                step_to: start_conversation                 # The name of next step that will be set to Workflow Item
+                init_context_attribute: my_init_context     # Name of attribute which contains init context
+                init_entities:                              # List of entities where will be displayed transition button "start_process"
+                    - 'Oro\Bundle\TaskBundle\Entity\Task'
+                init_routes:                                # List of routes where will be displayed transition button "start_process"
+                    - 'oro_task_view'
+                transition_definition: start
             connected:                                      # Unique name of transition
                 step_to: start_conversation                 # The name of next step that will be set to Workflow Item
                                                             # when transition will be performed
@@ -756,7 +778,7 @@ transition. On this transition a new Entity of Phone Conversation is created and
 Configuration
 -------------
 
-```
+``` yaml
 workflows:
     phone_call:
         entity: Acme\Bundle\DemoWorkflowBundle\Entity\PhoneCall
@@ -791,6 +813,14 @@ workflows:
                 options:
                     class: Acme\Bundle\DemoWorkflowBundle\Entity\PhoneConversation
         transitions:
+            start_call:
+                is_start: true                         # this transition used to start new workflow
+                step_to: start_conversation            # next step after transition performing
+                transition_definition: create_call     # link to definition of conditions and post actions
+                init_context_attribute: init_source    # name of variable which contains init context
+                init_entities:                         # list of view page entities where will be displayed transition button
+                    - 'Oro\Bundle\UserBundle\Entity\User'
+                    - 'Oro\Bundle\TaskBundle\Entity\Task'
             connected:
                 step_to: start_conversation
                 transition_definition: connected_definition
@@ -805,6 +835,22 @@ workflows:
                             options:
                 transition_definition: end_conversation_definition
         transition_definitions:
+            create_call:
+                conditions:    # Check that the transition start from the entity page
+                    '@and':
+                        - '@not_empty': [$init_source.entityClass]
+                        - '@not_empty': [$init_source.entityId]               
+                actions:                                        
+                    - '@find_entity': 
+                        class: $init_source.entityClass
+                        identifier: $init_source.entityId
+                        attribute: $.user
+                    - '@tree':
+                        conditions:
+                            - '@instanceof': [$init_source.entityClass, 'Oro\Bundle\UserBundle\Entity\User']
+                        actions:
+                            - '@assign_value': [$entity.phone, $.user.phone]
+                            - '@flush_entity': $entity    # flush created entity
             connected_definition: # Try to make call connected
                 # Check that timeout is set
                 conditions:
@@ -894,7 +940,7 @@ provide full tree just for example.
 
 PhoneCall Entity
 ----------------
-```
+``` php
 <?php
 
 namespace Acme\Bundle\DemoWorkflowBundle\Entity;
@@ -988,7 +1034,7 @@ class PhoneCall
 
 PhoneConversation Entity
 ------------------------
-```
+``` php
 <?php
 
 namespace Acme\Bundle\DemoWorkflowBundle\Entity;

@@ -20,7 +20,7 @@ class FixturesContext extends OroFeatureContext implements FixtureLoaderAwareInt
      *     | hello world! |
      *     | <sentence()> |
      *
-     * @Given /^(?:the|there are) following ([\w ]+):?$/
+     * @Given /^(?:the|there are|there is) following ([\w ]+):?$/
      */
     public function theFollowing($name, TableNode $table)
     {

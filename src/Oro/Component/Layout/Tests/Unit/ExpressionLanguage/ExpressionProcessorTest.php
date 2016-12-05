@@ -263,4 +263,27 @@ class ExpressionProcessorTest extends \PHPUnit_Framework_TestCase
             'Failed asserting that an expression in "label_attr" is parsed and encoded'
         );
     }
+
+    public function testProcessExpressionsWithVisibleFalse()
+    {
+        $context = new LayoutContext();
+        $data = $this->getMock('Oro\Component\Layout\DataAccessorInterface');
+
+        $values['expr_string'] = '=true';
+        $values['scalar'] = 123;
+        $values['attr']['enabled'] = '=true';
+        $values['attr']['data-scalar'] = 'foo';
+        $values['array_with_expr'] = ['item1' => 'val1', 'item2' => '=true'];
+        $values['visible'] = '=false';
+
+        $this->processor->processExpressions($values, $context, $data, true, null);
+
+        $this->assertFalse($values['visible'], 'Failed asserting that an expression is evaluated');
+
+        $this->assertNull($values['expr_string']);
+        $this->assertSame(123, $values['scalar']);
+        $this->assertNull($values['attr']['enabled']);
+        $this->assertSame('foo', $values['attr']['data-scalar']);
+        $this->assertSame(['item1' => 'val1', 'item2' => null], $values['array_with_expr']);
+    }
 }

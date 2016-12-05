@@ -9,7 +9,7 @@ skipped:                  Skipped
 form:
     configuration:
         database:
-            header:       MySQL database connection
+            header:       Database connection
             driver:       Driver
             host:         Host
             port:         Port
@@ -89,6 +89,7 @@ process:
             localization:  Dump localization
             assets:        Install assets
             assetic:       Dump assetic
+            translation-load: Load translations
             translation:   Prepare translations
             requirejs:     Optimize JS resources (optional)
             finish:        Clear cache to finalize installation

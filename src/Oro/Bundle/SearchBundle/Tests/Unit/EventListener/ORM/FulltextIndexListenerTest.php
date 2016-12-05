@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\SearchBundle\Tests\Unit\EventListener\ORM;
 
+use Doctrine\ORM\Event\LoadClassMetadataEventArgs;
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
 
 use Oro\Bundle\EntityBundle\ORM\DatabaseDriverInterface;
@@ -12,7 +13,7 @@ use Oro\Bundle\SearchBundle\EventListener\ORM\FulltextIndexListener;
 class FulltextIndexListenerTest extends \PHPUnit_Framework_TestCase
 {
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var LoadClassMetadataEventArgs|\PHPUnit_Framework_MockObject_MockObject
      */
     protected $event;
 
@@ -38,27 +39,41 @@ class FulltextIndexListenerTest extends \PHPUnit_Framework_TestCase
             ->setMethods([])
             ->disableOriginalConstructor()
             ->getMock();
+    }
 
-        $this->listener = new FulltextIndexListener(DatabaseDriverInterface::DRIVER_MYSQL);
+    /**
+     * @param string $databaseDriver
+     * @param string $textIndexTableName
+     */
+    protected function initListener($databaseDriver, $textIndexTableName)
+    {
+        $this->listener = new FulltextIndexListener($databaseDriver, $textIndexTableName);
     }
 
     public function testPlatformNotMatch()
     {
-        $listener = new FulltextIndexListener('not_mysql');
+        $this->initListener('not_mysql', 'expectedTextIndexTableName');
 
         $this->event
             ->expects($this->never())
             ->method('getClassMetadata');
 
-        $listener->loadClassMetadata($this->event);
+        $this->metadata
+            ->expects($this->never())
+            ->method('getTable');
+
+        $this->listener->loadClassMetadata($this->event);
+        $this->assertNull($this->metadata->table);
     }
 
     public function testTableNotMatch()
     {
+        $this->initListener(DatabaseDriverInterface::DRIVER_MYSQL, 'expectedTextIndexTableName');
+
         $this->metadata
             ->expects($this->once())
             ->method('getTableName')
-            ->will($this->returnValue('not_search'));
+            ->will($this->returnValue('notExpectedTextIndexTableName'));
 
         $this->event
             ->expects($this->once())
@@ -66,10 +81,13 @@ class FulltextIndexListenerTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue($this->metadata));
 
         $this->listener->loadClassMetadata($this->event);
+        $this->assertNull($this->metadata->table);
     }
 
     public function testAddedOptions()
     {
+        $this->initListener(DatabaseDriverInterface::DRIVER_MYSQL, IndexText::TABLE_NAME);
+
         $this->metadata
             ->expects($this->once())
             ->method('getTableName')

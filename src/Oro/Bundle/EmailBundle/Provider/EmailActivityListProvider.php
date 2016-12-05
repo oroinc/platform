@@ -6,8 +6,8 @@ use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ORM\QueryBuilder;
 
 use Symfony\Bundle\FrameworkBundle\Routing\Router;
-use Symfony\Component\Routing\Exception\RouteNotFoundException;
 use Symfony\Component\PropertyAccess\PropertyAccess;
+use Symfony\Component\Routing\Exception\RouteNotFoundException;
 use Symfony\Component\Security\Core\SecurityContextInterface;
 
 use Oro\Bundle\ActivityBundle\Tools\ActivityAssociationHelper;
@@ -26,6 +26,8 @@ use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityBundle\Provider\EntityNameResolver;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink;
+use Oro\Bundle\FeatureToggleBundle\Checker\FeatureCheckerHolderTrait;
+use Oro\Bundle\FeatureToggleBundle\Checker\FeatureToggleableInterface;
 use Oro\Bundle\SecurityBundle\Authentication\Token\OrganizationContextTokenInterface;
 use Oro\Bundle\UIBundle\Tools\HtmlTagHelper;
 
@@ -42,8 +44,11 @@ class EmailActivityListProvider implements
     ActivityListProviderInterface,
     ActivityListDateProviderInterface,
     ActivityListGroupProviderInterface,
-    CommentProviderInterface
+    CommentProviderInterface,
+    FeatureToggleableInterface
 {
+    use FeatureCheckerHolderTrait;
+
     const ACTIVITY_CLASS = 'Oro\Bundle\EmailBundle\Entity\Email';
     const ACL_CLASS = 'Oro\Bundle\EmailBundle\Entity\EmailUser';
 

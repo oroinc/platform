@@ -13,6 +13,7 @@ use Symfony\Component\Config\Definition\Processor;
 
 use Oro\Bundle\WorkflowBundle\Entity\EventTriggerInterface;
 use Oro\Bundle\WorkflowBundle\Entity\TransitionEventTrigger;
+use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Exception\WorkflowException;
 use Oro\Bundle\WorkflowBundle\Form\Type\WorkflowTransitionType;
 
@@ -26,9 +27,13 @@ class WorkflowConfiguration extends AbstractConfiguration implements Configurati
     const NODE_EXCLUSIVE_ACTIVE_GROUPS = 'exclusive_active_groups';
     const NODE_EXCLUSIVE_RECORD_GROUPS = 'exclusive_record_groups';
     const NODE_TRANSITION_TRIGGERS = 'triggers';
+    const NODE_INIT_ENTITIES = 'init_entities';
+    const NODE_INIT_ROUTES = 'init_routes';
+    const NODE_INIT_CONTEXT_ATTRIBUTE = 'init_context_attribute';
 
     const DEFAULT_TRANSITION_DISPLAY_TYPE = 'dialog';
     const DEFAULT_ENTITY_ATTRIBUTE = 'entity';
+    const DEFAULT_INIT_CONTEXT_ATTRIBUTE = 'init_context';
 
     /**
      * @param array $configs
@@ -88,6 +93,9 @@ class WorkflowConfiguration extends AbstractConfiguration implements Configurati
             ->end()
             ->integerNode('priority')
                 ->defaultValue(0)
+            ->end()
+            ->arrayNode(WorkflowDefinition::CONFIG_SCOPES)
+                ->prototype('variable')->end()
             ->end()
             ->append($this->getStepsNode())
             ->append($this->getAttributesNode())
@@ -268,6 +276,15 @@ class WorkflowConfiguration extends AbstractConfiguration implements Configurati
                     ->end()
                     ->scalarNode('dialog_template')
                         ->defaultNull()
+                    ->end()
+                    ->arrayNode(self::NODE_INIT_ENTITIES)
+                        ->prototype('scalar')->end()
+                    ->end()
+                    ->arrayNode(self::NODE_INIT_ROUTES)
+                        ->prototype('scalar')->end()
+                    ->end()
+                    ->scalarNode(self::NODE_INIT_CONTEXT_ATTRIBUTE)
+                        ->defaultValue(self::DEFAULT_INIT_CONTEXT_ATTRIBUTE)
                     ->end()
                     ->append($this->getTransitionTriggers())
                 ->end()

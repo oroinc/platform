@@ -1,6 +1,7 @@
 datagrids:
     users-grid:
         extended_entity_name: %oro_user.entity.class%
+        views_list: "@oro_user.user.datagrid_view_list"
         options:
             entityHint: user
             entity_pagination: true
@@ -17,9 +18,12 @@ datagrids:
                     - u.createdAt
                     - u.updatedAt
                     - u.enabled
+                    - au.id as auth_status
                 from:
                     - { table: %oro_user.entity.class%, alias: u }
-
+                join:
+                    left:
+                        - { join: u.auth_status, alias: au }
         inline_editing:
             enable: true
         columns:
@@ -34,13 +38,17 @@ datagrids:
             enabled:
                 label:         oro.user.enabled.label
                 frontend_type: select
+                editable:      false
                 inline_editing:
-                    editor:
-                        view_options:
-                            key_type: 'boolean'
+                    enable: false
                 choices:
-                   - Inactive
-                   - Active
+                   - Disabled
+                   - Enabled
+            auth_status:
+                label:         oro.user.auth_status.label
+                editable:      false
+                inline_editing:
+                    enable: false
             createdAt:
                 label:         oro.ui.created_at
                 frontend_type: datetime
@@ -86,6 +94,8 @@ datagrids:
                     data_name: u.updatedAt
                 enabled:
                     data_name: u.enabled
+                auth_status:
+                    data_name: au.priority
             default:
                 username: %oro_datagrid.extension.orm_sorter.class%::DIRECTION_ASC
 
@@ -109,8 +119,12 @@ datagrids:
                     options:
                         field_options:
                             choices:
-                                2: Inactive
-                                1: Active
+                                2: Disabled
+                                1: Enabled
+                auth_status:
+                    type:      enum
+                    data_name: au.id
+                    enum_code: auth_status
                 createdAt:
                     type: datetime
                     data_name: u.createdAt
@@ -310,8 +324,7 @@ datagrids:
                     data_name: u.firstName
                 lastName:
                     data_name: u.lastName
-            default:
-                id: %oro_datagrid.extension.orm_sorter.class%::DIRECTION_ASC
+            disable_default_sorting: true
 
         filters: []
 
@@ -347,11 +360,11 @@ datagrids:
             username:
                 label: oro.user.username.label
             enabled:
-                label:         oro.user.enabled.label
+                label: oro.user.enabled.label
                 frontend_type: select
                 choices:
-                   - Inactive
-                   - Active
+                   - Disabled
+                   - Enabled
         filters:
             columns:
                 has_role:
@@ -375,8 +388,8 @@ datagrids:
                     options:
                         field_options:
                             choices:
-                                2: Inactive
-                                1: Active
+                                2: Disabled
+                                1: Enabled
         sorters:
             multiple_sorting: true
             columns:
@@ -396,40 +409,40 @@ datagrids:
                     excluded: '#roleRemoveUsers'
 
     role-permission-grid:
-            acl_resource: oro_user_role_update
-            source:
-                type: role-permission-provider
-            columns:
-                entity:
-                    label: "Entity"
-                    data_name: entity
-                    frontend_type: string
-                    translatable: true
-                permissions:
-                    label: "Permissions"
-                    data_name: permissions
-                    frontend_type: action-permissions
-                identity:
-                    data_name: identity
-                    frontend_type: string
-                    renderable: false
-                group:
-                    data_name: group
-                    frontend_type: string
-                    renderable: false
-                fields:
-                    data_name: fields
-                    frontend_type: array
-                    renderable: false
-            filters: ~
-            sorters: ~
-            options:
-                requireJSModules:
-                    - orouser/js/datagrid/roles-datagrid-builder
-                toolbarOptions:
-                    placement:
-                        top: false
-                        bottom: false
+        acl_resource: oro_user_role_update
+        source:
+            type: role-permission-provider
+        columns:
+            label:
+                label: "Entity"
+                data_name: label
+                frontend_type: string
+                translatable: true
+            permissions:
+                label: "Permissions"
+                data_name: permissions
+                frontend_type: action-permissions
+            identity:
+                data_name: identity
+                frontend_type: string
+                renderable: false
+            group:
+                data_name: group
+                frontend_type: string
+                renderable: false
+            fields:
+                data_name: fields
+                frontend_type: array
+                renderable: false
+        filters: ~
+        sorters: ~
+        options:
+            requireJSModules:
+                - orouser/js/datagrid/roles-datagrid-builder
+            toolbarOptions:
+                placement:
+                    top: false
+                    bottom: false
 
     group-users-grid:
         extends: user-relation-grid
@@ -463,11 +476,11 @@ datagrids:
             username:
                 label: oro.user.username.label
             enabled:
-                label:         oro.user.enabled.label
+                label: oro.user.enabled.label
                 frontend_type: select
                 choices:
-                   - Inactive
-                   - Active
+                   - Disabled
+                   - Enabled
         filters:
             columns:
                 has_group:
@@ -491,8 +504,8 @@ datagrids:
                     options:
                         field_options:
                             choices:
-                                2: Inactive
-                                1: Active
+                                2: Disabled
+                                1: Enabled
         sorters:
             multiple_sorting: true
             columns:
@@ -540,8 +553,8 @@ datagrids:
                 label: oro.user.enabled.label
                 frontend_type: select
                 choices:
-                   - Inactive
-                   - Active
+                   - Disabled
+                   - Enabled
 
         properties:
             id: ~
@@ -579,8 +592,8 @@ datagrids:
                     options:
                         field_options:
                             choices:
-                                2: Inactive
-                                1: Active
+                                2: Disabled
+                                1: Enabled
 
     owner-users-select-grid:
         extended_entity_name: %oro_user.entity.class%
@@ -611,12 +624,7 @@ datagrids:
                 label: oro.user.email.label
             username:
                 label: oro.user.username.label
-            enabled:
-                label: oro.user.enabled.label
-                frontend_type: select
-                choices:
-                   - Inactive
-                   - Active
+
         properties:
             id: ~
         sorters:
@@ -629,8 +637,6 @@ datagrids:
                     data_name: u.email
                 username:
                     data_name: u.username
-                enabled:
-                    data_name: u.enabled
             default:
                 username: %oro_datagrid.extension.orm_sorter.class%::DIRECTION_ASC
         filters:
@@ -647,14 +653,6 @@ datagrids:
                 username:
                     type: string
                     data_name: u.username
-                enabled:
-                    type: boolean
-                    data_name: u.enabled
-                    options:
-                        field_options:
-                            choices:
-                                2: Inactive
-                                1: Active
 
     users-select-grid-exclude-owner:
         extends: users-select-grid
@@ -704,8 +702,8 @@ datagrids:
                 label:         oro.user.enabled.label
                 frontend_type: select
                 choices:
-                   - Inactive
-                   - Active
+                   - Disabled
+                   - Enabled
         sorters:
             columns:
                 firstName:
@@ -741,5 +739,5 @@ datagrids:
                     options:
                         field_options:
                             choices:
-                                2: Inactive
-                                1: Active
+                                2: Disabled
+                                1: Enabled

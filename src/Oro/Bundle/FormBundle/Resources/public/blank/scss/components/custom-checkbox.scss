@@ -1,7 +1,10 @@
+// @theme: blank
+
 .custom-checkbox {
     position: relative;
 
     display: inline-block;
+    vertical-align: middle;
 
     &__input {
         position: absolute;

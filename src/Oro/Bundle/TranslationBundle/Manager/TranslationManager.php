@@ -2,30 +2,30 @@
 
 namespace Oro\Bundle\TranslationBundle\Manager;
 
-use Doctrine\Bundle\DoctrineBundle\Registry;
+use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityRepository;
 
 use Oro\Bundle\TranslationBundle\Entity\Language;
 use Oro\Bundle\TranslationBundle\Entity\Repository\LanguageRepository;
-use Oro\Bundle\TranslationBundle\Entity\Repository\TranslationKeyRepository;
 use Oro\Bundle\TranslationBundle\Entity\Repository\TranslationRepository;
 use Oro\Bundle\TranslationBundle\Entity\Translation;
 use Oro\Bundle\TranslationBundle\Entity\TranslationKey;
+use Oro\Bundle\TranslationBundle\Provider\TranslationDomainProvider;
 use Oro\Bundle\TranslationBundle\Translation\DynamicTranslationMetadataCache;
 
 class TranslationManager
 {
     const DEFAULT_DOMAIN = 'messages';
 
-    /** @var Registry */
+    /** @var ManagerRegistry */
     protected $registry;
+
+    /** @var TranslationDomainProvider */
+    protected $domainProvier;
 
     /** @var DynamicTranslationMetadataCache */
     protected $dbTranslationMetadataCache;
-
-    /** @var array */
-    protected $availableDomains;
 
     /** @var Language[] */
     protected $languages = [];
@@ -40,12 +40,17 @@ class TranslationManager
     protected $translations = [];
 
     /**
-     * @param Registry $registry
+     * @param ManagerRegistry $registry
+     * @param TranslationDomainProvider $domainProvier
      * @param DynamicTranslationMetadataCache $dbTranslationMetadataCache
      */
-    public function __construct(Registry $registry, DynamicTranslationMetadataCache $dbTranslationMetadataCache)
-    {
+    public function __construct(
+        ManagerRegistry $registry,
+        TranslationDomainProvider $domainProvier,
+        DynamicTranslationMetadataCache $dbTranslationMetadataCache
+    ) {
         $this->registry = $registry;
+        $this->domainProvier = $domainProvier;
         $this->dbTranslationMetadataCache = $dbTranslationMetadataCache;
     }
 
@@ -191,16 +196,22 @@ class TranslationManager
             $em->persist($translationKey);
         }
 
-        foreach ($this->translationKeysToRemove as $translationKey) {
-            $em->remove($translationKey);
+        foreach ($this->translationKeysToRemove as $key => $translationKey) {
+            if ($translationKey->getId()) {
+                $em->remove($translationKey);
+            } else {
+                unset($this->translationKeysToRemove[$key]);
+            }
         }
 
         $em = $this->getEntityManager(Translation::class);
-        foreach ($this->translations as $translation) {
-            if (!$translation->getValue()) {
+        foreach ($this->translations as $key => $translation) {
+            if ($translation->getValue()) {
+                $em->persist($translation);
+            } elseif ($translation->getId()) {
                 $em->remove($translation);
             } else {
-                $em->persist($translation);
+                unset($this->translations[$key]);
             }
         }
 
@@ -227,49 +238,7 @@ class TranslationManager
         $this->translationKeys = [];
         $this->translationKeysToRemove = [];
         $this->translations = [];
-        $this->availableDomains = null;
-    }
-
-    /**
-     * Returns the list of all existing in the database translation domains for the given locales.
-     *
-     * @param string[] $locales
-     *
-     * @return array [['code' = '...', 'domain' => '...'], ...]
-     */
-    public function findAvailableDomainsForLocales(array $locales)
-    {
-        if (null === $this->availableDomains) {
-            /** @var TranslationKeyRepository $repo */
-            $repo = $this->getEntityRepository(TranslationKey::class);
-
-            $this->availableDomains = $repo->findAvailableDomains();
-        }
-
-        $result = [];
-        foreach ($locales as $locale) {
-            foreach ($this->availableDomains as $domain) {
-                $result[] = [
-                    'code' => $locale,
-                    'domain' => $domain,
-                ];
-            }
-        }
-
-        return $result;
-    }
-
-    /**
-     * Returns the list of all existing in the database translation domains
-     *
-     * @return array
-     */
-    public function getAvailableDomains()
-    {
-        /** @var TranslationKeyRepository $repo */
-        $repo = $this->getEntityRepository(TranslationKey::class);
-
-        return $repo->findAvailableDomains();
+        $this->domainProvier->clearCache();
     }
 
     /**

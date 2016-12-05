@@ -17,6 +17,8 @@ class WorkflowDefinitionClonerTest extends \PHPUnit_Framework_TestCase
 
         $clonedDefinition = WorkflowDefinitionCloner::cloneDefinition($definition);
 
+        $this->assertSameMainFields($definition, $clonedDefinition);
+
         $this->assertEquals($definition, $clonedDefinition);
         $this->assertNotSame($definition, $clonedDefinition);
 
@@ -34,12 +36,33 @@ class WorkflowDefinitionClonerTest extends \PHPUnit_Framework_TestCase
 
         WorkflowDefinitionCloner::mergeDefinition($definition, $sourceDefinition);
 
+        $this->assertSameMainFields($definition, $sourceDefinition);
+        
         $this->assertEquals($definition, $sourceDefinition);
         $this->assertNotSame($definition, $sourceDefinition);
 
         $this->assertSame($definition->getStartStep(), $sourceDefinition->getStartStep());
 
         $this->assertObjectsDefinitions($definition, $sourceDefinition);
+    }
+
+    /**
+     * @param WorkflowDefinition $definition1
+     * @param WorkflowDefinition $definition2
+     */
+    protected function assertSameMainFields(WorkflowDefinition $definition1, WorkflowDefinition $definition2)
+    {
+        $this->assertSame($definition1->getName(), $definition2->getName());
+        $this->assertSame($definition1->getLabel(), $definition2->getLabel());
+        $this->assertSame($definition1->getRelatedEntity(), $definition2->getRelatedEntity());
+        $this->assertSame($definition1->getEntityAttributeName(), $definition2->getEntityAttributeName());
+        $this->assertSame($definition1->getConfiguration(), $definition2->getConfiguration());
+        $this->assertSame($definition1->isStepsDisplayOrdered(), $definition2->isStepsDisplayOrdered());
+        $this->assertSame($definition1->isSystem(), $definition2->isSystem());
+        $this->assertSame($definition1->getPriority(), $definition2->getPriority());
+        $this->assertSame($definition1->getScopesConfig(), $definition2->getScopesConfig());
+        $this->assertSame($definition1->getExclusiveActiveGroups(), $definition2->getExclusiveActiveGroups());
+        $this->assertSame($definition1->getExclusiveRecordGroups(), $definition2->getExclusiveRecordGroups());
     }
 
     /**

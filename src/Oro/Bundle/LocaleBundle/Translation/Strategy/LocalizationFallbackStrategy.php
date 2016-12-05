@@ -12,7 +12,7 @@ use Oro\Bundle\TranslationBundle\Strategy\TranslationStrategyInterface;
 
 class LocalizationFallbackStrategy implements TranslationStrategyInterface
 {
-    const NAME = 'oro_localalization_fallback_strategy';
+    const NAME = 'oro_localization_fallback_strategy';
     const CACHE_KEY = 'localization_fallbacks';
 
     /**
@@ -38,6 +38,14 @@ class LocalizationFallbackStrategy implements TranslationStrategyInterface
     {
         $this->registry = $registry;
         $this->cacheProvider = $cacheProvider;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function isApplicable()
+    {
+        return true;
     }
 
     /**

@@ -10,12 +10,12 @@ Feature: User
     And press "Create User"
     When I fill "User Form" with:
           | Username          | userName       |
-          | Password          | 123123123Q     |
-          | Re-Enter Password | 123123123Q     |
+          | Password          | Pa$$w0rd       |
+          | Re-Enter Password | Pa$$w0rd       |
           | First Name        | First Name     |
           | Last Name         | Last Name      |
           | Primary Email     | email@test.com |
           | Roles             | Administrator  |
-          | Status            | Active         |
+          | Enabled           | Enabled        |
     And I save and close form
     Then I should see "User saved" flash message
