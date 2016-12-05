@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\ActionBundle\Tests\Unit\Layout\DataProvider;
 
+use Oro\Bundle\ActionBundle\Button\ButtonSearchContext;
 use Oro\Bundle\ActionBundle\Layout\DataProvider\LayoutButtonProvider;
-use Oro\Bundle\ActionBundle\Model\ButtonSearchContext;
 use Oro\Bundle\ActionBundle\Provider\ButtonProvider;
 use Oro\Bundle\ActionBundle\Provider\ButtonSearchContextProvider;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;

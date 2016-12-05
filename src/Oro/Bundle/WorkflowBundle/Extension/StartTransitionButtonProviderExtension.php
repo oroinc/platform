@@ -4,11 +4,11 @@ namespace Oro\Bundle\WorkflowBundle\Extension;
 
 use Doctrine\Common\Collections\Collection;
 
+use Oro\Bundle\ActionBundle\Button\ButtonContext;
+use Oro\Bundle\ActionBundle\Button\ButtonInterface;
+use Oro\Bundle\ActionBundle\Button\ButtonSearchContext;
 use Oro\Bundle\ActionBundle\Exception\UnsupportedButtonException;
 use Oro\Bundle\ActionBundle\Extension\ButtonProviderExtensionInterface;
-use Oro\Bundle\ActionBundle\Model\ButtonContext;
-use Oro\Bundle\ActionBundle\Model\ButtonInterface;
-use Oro\Bundle\ActionBundle\Model\ButtonSearchContext;
 use Oro\Bundle\ActionBundle\Model\OperationRegistry;
 use Oro\Bundle\ActionBundle\Provider\RouteProviderInterface;
 

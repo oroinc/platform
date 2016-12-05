@@ -10,15 +10,6 @@
     group: context.group,
 } %}
 
-{% if transition.displayType == 'dialog' %}
-    {% if transition.hasForm() %}
-        {% set transitionData = transitionData|merge({'dialog-url': path(transitionData['dialog-route'], params) }) %}
-    {% endif %}
-    {% set transitionData = transitionData|merge({'transition-url': path(transitionData['transition-route'], params) }) %}
-{% else %}
-    {% set transitionData = transitionData|merge({'transition-url': path(transitionData['page-route'], params) }) %}
-{% endif %}
-
 {# Show button for start or transit workflow #}
 {% set transitionMessage = transition.message|trans({},'workflows') %}
 {% if transitionMessage == transition.message %}
@@ -26,10 +17,21 @@
     {% set transitionMessage = '' %}
 {% endif %}
 
-{% set transitionData = transitionData|merge({
+{% set transitionData = {
     'transition-label': transition.label|trans({},'workflows'),
-    'message': transitionMessage|nl2br
-}) %}
+    'message': transitionMessage|nl2br,
+    'transition-condition-messages': context.errors,
+    'enabled': context.enabled
+} %}
+
+{% if transition.displayType == 'dialog' %}
+    {% if transition.hasForm() %}
+        {% set transitionData = transitionData|merge({'dialog-url': path(context.formDialogRoute, params) }) %}
+    {% endif %}
+    {% set transitionData = transitionData|merge({'transition-url': path(context.executionRoute, params) }) %}
+{% else %}
+    {% set transitionData = transitionData|merge({'transition-url': path(context.formPageRoute, params) }) %}
+{% endif %}
 
 <div class="pull-left btn-group icons-holder">
     {{ workflowMacros.renderTransitionButton(workflow, transition, null, transitionData) }}

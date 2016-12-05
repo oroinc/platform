@@ -1,12 +1,14 @@
 <?php
 
-namespace Oro\Bundle\WorkflowBundle\Model;
+namespace Oro\Bundle\WorkflowBundle\Button;
 
-use Oro\Bundle\ActionBundle\Model\ButtonContext;
-use Oro\Bundle\ActionBundle\Model\ButtonInterface;
+use Oro\Bundle\ActionBundle\Button\ButtonContext;
+use Oro\Bundle\ActionBundle\Button\ButtonInterface;
 use Oro\Bundle\ActionBundle\Model\OperationRegistry;
+use Oro\Bundle\WorkflowBundle\Model\Transition;
+use Oro\Bundle\WorkflowBundle\Model\Workflow;
 
-class TransitionButton implements ButtonInterface
+abstract class AbstractTransitionButton implements ButtonInterface
 {
     const DEFAULT_TEMPLATE = 'OroWorkflowBundle::Button\transitionButton.html.twig';
 
@@ -52,23 +54,14 @@ class TransitionButton implements ButtonInterface
      */
     public function getTemplateData(array $customData = [])
     {
-        $defaultData = [
-            'workflow' => $this->workflow,
-            'transition' => $this->transition,
-            'context' => $this->getButtonContext(),
-            'transitionData' => [
-                'workflow' => $this->workflow->getName(),
-                'transition' => $this->transition->getName(),
-                'dialog-route' => $this->buttonContext->getFormDialogRoute(),
-                'page-route' => $this->buttonContext->getFormPageRoute(),
-                'transition-route' => $this->buttonContext->getExecutionRoute(),
-                'transition-condition-messages' => $this->buttonContext->getErrors(),
-                'isAllowed' => $this->buttonContext->isEnabled(),
-                'enabled' => $this->buttonContext->isEnabled(),
+        return array_merge(
+            [
+                'workflow' => $this->workflow,
+                'transition' => $this->transition,
+                'context' => $this->getButtonContext()
             ],
-        ];
-
-        return array_merge($defaultData, $customData);
+            $customData
+        );
     }
 
     /**
