@@ -45,8 +45,7 @@ class WorkflowDataHelper
         SecurityFacade $securityFacade,
         TranslatorInterface $translator,
         UrlGeneratorInterface $router
-    )
-    {
+    ) {
         $this->workflowManager = $workflowManager;
         $this->securityFacade = $securityFacade;
         $this->translator = $translator;
