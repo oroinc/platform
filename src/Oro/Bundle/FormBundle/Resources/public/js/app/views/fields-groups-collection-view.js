@@ -3,6 +3,7 @@ define(function(require) {
 
     var FieldsGroupsCollectionView;
     var BaseView = require('oroui/js/app/views/base/view');
+    var $ = require('jquery');
 
     FieldsGroupsCollectionView = BaseView.extend({
         PRIMARY_FILED_SELECTOR: '[name$="[primary]"]',
