@@ -120,15 +120,20 @@ class WorkflowDataHelper
      */
     protected function getTransitionData(Transition $transition)
     {
+        $messageTranslation = $this->translator->trans($transition->getMessage(), [], 'workflows');
+
+        // Do not show untranslated messages (i.e. user left the message input empty)
+        if (!$transition->getMessage() || $messageTranslation === $transition->getMessage()) {
+            $messageTranslation = '';
+        }
+
         return [
             'name' => $transition->getName(),
             'label' => $this->translator->trans($transition->getLabel(), [], 'workflows'),
             'isStart' => $transition->isStart(),
             'hasForm' => $transition->hasForm(),
             'displayType' => $transition->getDisplayType(),
-            'message' => !empty($transition->getMessage())
-                ? $this->translator->trans($transition->getMessage(), [], 'workflows')
-                : null,
+            'message' => $messageTranslation,
             'frontendOptions' => $transition->getFrontendOptions(),
         ];
     }
