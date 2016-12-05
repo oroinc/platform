@@ -111,7 +111,7 @@ class DynamicFieldsExtensionTest extends AbstractFieldsExtensionTestCase
                     ],
                     'source' => [
                         'query' => [
-                            'from' => [['table' => 'Test\Entity', 'alias' => 'o']],
+                            'from' => [['table' => self::ENTITY_CLASS, 'alias' => 'o']],
                             'select' => ['o.testField'],
                         ],
                     ],

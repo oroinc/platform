@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Grid;
 
-use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Component\PhpUtils\ArrayUtil;
 
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
@@ -11,6 +10,8 @@ use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\EntityExtendBundle\Extend\RelationType;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
+use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
+use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 
 class DynamicFieldsExtension extends AbstractFieldsExtension
 {
@@ -62,10 +63,11 @@ class DynamicFieldsExtension extends AbstractFieldsExtension
         /** @var FieldConfigId $fieldId */
         foreach ($fieldIds as $fieldId) {
             $extendConfig = $extendConfigProvider->getConfigById($fieldId);
+            $config = $datagridConfigProvider->getConfigById($fieldId);
             if ($extendConfig->is('owner', ExtendScope::OWNER_CUSTOM)
                 && ExtendHelper::isFieldAccessible($extendConfig)
-                && $datagridConfigProvider->getConfigById($fieldId)->is('is_visible')
-                && $this->isWithJoin($fieldId, $datagridConfigProvider)
+                && $config->is('is_visible')
+                && $this->isWithJoin($fieldId, $config)
             ) {
                 $viewConfig = $viewConfigProvider->getConfig($entityClassName, $fieldId->getFieldName());
                 $fields[] = [
@@ -102,12 +104,12 @@ class DynamicFieldsExtension extends AbstractFieldsExtension
      * @param ConfigProvider    $datagridConfigProvider
      * @return bool
      */
-    protected function isWithJoin(FieldConfigId $fieldConfigId, ConfigProvider $datagridConfigProvider)
+    protected function isWithJoin(FieldConfigId $fieldConfigId, ConfigInterface $config)
     {
         $relationArray = [RelationType::MANY_TO_ONE, RelationType::ONE_TO_ONE];
         $fieldType = $fieldConfigId->getFieldType();
 
         return in_array($fieldType, $relationArray) ?
-            $datagridConfigProvider->getConfigById($fieldConfigId)->is('with_join') : true;
+            $config->is('with_join') : true;
     }
 }
