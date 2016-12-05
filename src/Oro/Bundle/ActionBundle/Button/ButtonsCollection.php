@@ -48,6 +48,10 @@ class ButtonsCollection implements \IteratorAggregate, \Countable
         return $this;
     }
 
+    /**
+     * @param callable $filter callable(ButtonInterface $button, ButtonProviderExtensionInterface $extension):bool
+     * @return static
+     */
     public function filter(callable $filter)
     {
         $collection = new static;
@@ -64,27 +68,7 @@ class ButtonsCollection implements \IteratorAggregate, \Countable
     }
 
     /**
-     * @param ButtonSearchContext $searchContext
-     *
-     * @return $this
-     */
-    public function filterAvailable(ButtonSearchContext $searchContext)
-    {
-        $collection = new static;
-        /** @var ButtonInterface $button */
-        foreach ($this->buttonsMap as $button) {
-            /**@var ButtonProviderExtensionInterface $extension */
-            $extension = $this->buttonsMap[$button];
-
-            if ($extension->isAvailable($button, $searchContext)) {
-                $collection->addButton($button, $extension);
-            }
-        }
-
-        return $collection;
-    }
-
-    /**
+     * callable(ButtonInterface $button, ButtonProviderExtensionInterface $extension): ButtonInterface
      * @param callable $callable
      * @return $this
      */
