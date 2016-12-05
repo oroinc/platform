@@ -346,6 +346,42 @@ class WeeklyStrategyTest extends AbstractTestStrategy
                     '2016-05-22',
                 ],
             ],
+            'start and startTime are close, week interval' => [
+                'params' => [
+                    'daysOfWeek' => [
+                        'monday',
+                        'friday'
+                    ],
+                    'interval' => 1,
+                    'occurrences' => 2,
+                    'start' => '2016-11-13',
+                    'end' => '2016-11-19',
+                    'startTime' => '2016-11-14',
+                    'endTime' => '9999-12-31',
+                ],
+                'expected' => [
+                    '2016-11-14',
+                    '2016-11-18',
+                ],
+            ],
+            'start and startTime are close, month interval' => [
+                'params' => [
+                    'daysOfWeek' => [
+                        'monday',
+                        'friday'
+                    ],
+                    'interval' => 1,
+                    'occurrences' => 2,
+                    'start' => '2016-09-24',
+                    'end' => '2016-11-05',
+                    'startTime' => '2016-09-26',
+                    'endTime' => '9999-12-31',
+                ],
+                'expected' => [
+                    '2016-09-26',
+                    '2016-09-30',
+                ],
+            ],
         ];
     }
 

@@ -5,6 +5,24 @@ namespace Oro\Bundle\CalendarBundle\Model\Recurrence;
 use Oro\Bundle\CalendarBundle\Entity;
 use Oro\Bundle\CalendarBundle\Model\Recurrence;
 
+/**
+ * Class WeeklyStrategy
+ * @package Oro\Bundle\CalendarBundle\Model\Recurrence
+ *
+ * The weekly strategy for the first week takes into account only that days that are later than start
+ * of recurrence and then it selects next days according to its interval.
+ * For example, the rule 'Weekly every 2 weeks on Monday, Friday every 2 weeks'
+ * starting on Thursday, the 6th of October, 2016 will work in such way:
+ *
+ *  S   M   T   W   T   F   S
+ *                          1
+ *  2   3   4   5   6  [7]  8
+ *  9  10  11  12  13  14  15
+ * 16 [17] 18  19  20 [21] 22
+ * 23  24  25  26  27  28  29
+ * 30 [31]
+ *
+ */
 class WeeklyStrategy extends AbstractStrategy
 {
     /**
@@ -25,18 +43,22 @@ class WeeklyStrategy extends AbstractStrategy
         //week days should be sorted in standard sequence (sun, mon, tue...)
         $this->sortWeekDays($weekDays);
 
-        $firstDay = reset($weekDays);
-        $startTime = new \DateTime("previous $firstDay {$recurrence->getStartTime()->format('c')}");
+        $startTimeNumericDay = $recurrence->getStartTime()->format('w');
+        //move startTime to the first day of week
+        $startTime = new \DateTime("-$startTimeNumericDay days {$recurrence->getStartTime()->format('c')}");
         /** @var float $fromStartInterval */
         $fromStartInterval = 0;
         $interval = $recurrence->getInterval();
         $fullWeeks = 0;
+        //check if there were events before start of dates interval, so if yes we should calculate how many times
         if ($start > $startTime) {
             $dateInterval = $start->diff($startTime);
+            //it calculates total occurrences were between $start and $startTime
             $fromStartInterval = floor(((int)$dateInterval->format('%a') + 1) / 7 / $interval) * count($weekDays);
             foreach ($weekDays as $day) {
                 $currentDay = new \DateTime($day, $this->getTimeZone());
                 if ($currentDay->format('w') < $recurrence->getStartTime()->format('w')) {
+                    //for the first week the items before startTime must not be taken into account
                     $fromStartInterval = $fromStartInterval == 0 ? $fromStartInterval : $fromStartInterval - 1;
                 }
             }
@@ -62,7 +84,7 @@ class WeeklyStrategy extends AbstractStrategy
                 ) {
                     $result[] = $next;
                 }
-                
+
                 $fromStartInterval = $next >= $recurrence->getStartTime() ? $fromStartInterval +1 : $fromStartInterval;
             }
             $fullWeeks += $interval;
