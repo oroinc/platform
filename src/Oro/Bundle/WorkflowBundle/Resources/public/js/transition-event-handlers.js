@@ -1,10 +1,11 @@
 /*jslint nomen:true*/
 /*global define*/
 define([
+    'underscore',
     'oroui/js/messenger',
     'orotranslation/js/translator',
     'oroui/js/mediator'
-], function(messenger, __, mediator) {
+], function(_, messenger, __, mediator) {
     'use strict';
 
     /**
@@ -14,8 +15,19 @@ define([
      * @class   oro.WorkflowTransitionEventHandlers
      */
     return {
+        getOnStart: function(element, pageRefresh) {
+            return function() {
+                if (pageRefresh) {
+                    mediator.execute('showLoading');
+                }
+
+                element.trigger('transitions_start');
+            };
+        },
         getOnSuccess: function(element, pageRefresh) {
             return function(response) {
+                pageRefresh = _.isUndefined(pageRefresh) ? true : pageRefresh;
+
                 if (pageRefresh) {
                     mediator.execute('hideLoading');
                 }
@@ -48,6 +60,8 @@ define([
         },
         getOnFailure: function(element, pageRefresh) {
             return function(jqxhr, textStatus, error) {
+                pageRefresh = _.isUndefined(pageRefresh) ? true : pageRefresh;
+
                 if (pageRefresh) {
                     mediator.execute('hideLoading');
                 }

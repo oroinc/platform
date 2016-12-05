@@ -12,11 +12,7 @@ define([
      * @class   oro.WorkflowTransitionExecutor
      */
     return function(element, data, pageRefresh) {
-        if (pageRefresh) {
-            mediator.execute('showLoading');
-        }
-
-        element.trigger('transitions_start');
+        TransitionEventHandlers.getOnStart(element, pageRefresh)();
 
         $.getJSON(element.data('transition-url'), data ? {'data': data} : null)
             .done(TransitionEventHandlers.getOnSuccess(element, pageRefresh))
