@@ -51,7 +51,7 @@ class ButtonsCollection implements \IteratorAggregate, \Countable
     /**
      * @param ButtonSearchContext $searchContext
      *
-     * @return static
+     * @return $this
      */
     public function filterAvailable(ButtonSearchContext $searchContext)
     {
@@ -64,6 +64,34 @@ class ButtonsCollection implements \IteratorAggregate, \Countable
             if ($extension->isAvailable($button, $searchContext)) {
                 $collection->addButton($button, $extension);
             }
+        }
+
+        return $collection;
+    }
+
+    /**
+     * @param callable $callable
+     * @return $this
+     */
+    public function map(callable $callable)
+    {
+        $collection = new static();
+
+        /**@var ButtonInterface $button */
+        foreach ($this->buttonsMap as $button) {
+            /** @var ButtonProviderExtensionInterface $extension */
+            $extension = $this->buttonsMap[$button];
+            $mappedButton = call_user_func($callable, $button, $extension);
+            if (!$mappedButton instanceof ButtonInterface) {
+                throw new ButtonCollectionMapException(
+                    sprintf(
+                        'Map callback should return `%s` as result got `%s` instead.',
+                        ButtonInterface::class,
+                        is_object($mappedButton) ? get_class($mappedButton) : gettype($mappedButton)
+                    )
+                );
+            }
+            $collection->addButton($mappedButton, $extension);
         }
 
         return $collection;

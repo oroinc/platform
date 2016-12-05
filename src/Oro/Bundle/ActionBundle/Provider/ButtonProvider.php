@@ -3,6 +3,7 @@
 namespace Oro\Bundle\ActionBundle\Provider;
 
 use Oro\Bundle\ActionBundle\Button\ButtonInterface;
+use Oro\Bundle\ActionBundle\Button\ButtonsCollection;
 use Oro\Bundle\ActionBundle\Button\ButtonSearchContext;
 use Oro\Bundle\ActionBundle\Extension\ButtonProviderExtensionInterface;
 
@@ -21,28 +22,45 @@ class ButtonProvider
 
     /**
      * @param ButtonSearchContext $searchContext
+     * @return ButtonsCollection
+     */
+    public function match(ButtonSearchContext $searchContext)
+    {
+        $collection = new ButtonsCollection();
+
+        foreach ($this->extensions as $extension) {
+            $collection->consume($extension, $searchContext);
+        }
+
+        return $collection;
+    }
+
+    /**
+     * @param ButtonSearchContext $searchContext
+     * @return ButtonInterface[]
+     */
+    public function findAvailable(ButtonSearchContext $searchContext)
+    {
+        return $this->match($searchContext)->filterAvailable($searchContext)->toArray();
+    }
+
+    /**
+     * @param ButtonSearchContext $searchContext
      * @return ButtonInterface[]
      */
     public function findAll(ButtonSearchContext $searchContext)
     {
-        if (0 === count($this->extensions)) {
-            return [];
-        }
-
-        $buttonsData = [];
-        foreach ($this->extensions as $extension) {
-            $buttonsData[] = $extension->find($searchContext);
-        }
-        $buttons = call_user_func_array('array_merge', $buttonsData);
-
-        usort(
-            $buttons,
-            function (ButtonInterface $a, ButtonInterface $b) {
-                return $a->getOrder() - $b->getOrder();
+        $mappedState = $this->match($searchContext)->map(
+            function (ButtonInterface $button, ButtonProviderExtensionInterface $extension) use ($searchContext) {
+                $newButton = clone $button;
+                $newButton->getButtonContext()->setEnabled(
+                    $extension->isAvailable($newButton, $searchContext)
+                );
+                return $newButton;
             }
         );
 
-        return $buttons;
+        return $mappedState->toArray();
     }
 
     /**

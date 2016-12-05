@@ -41,7 +41,7 @@ class ButtonProviderTest extends \PHPUnit_Framework_TestCase
             ->with($searchContext)
             ->willReturn($input);
 
-        $this->assertSame($output, $this->buttonProvider->findAll($searchContext));
+        $this->assertSame($output, $this->buttonProvider->findAvailable($searchContext));
     }
 
     /**
