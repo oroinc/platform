@@ -7,7 +7,6 @@ use Oro\Bundle\ActionBundle\Extension\ButtonProviderExtensionInterface;
 use Oro\Bundle\ActionBundle\Button\ButtonContext;
 use Oro\Bundle\ActionBundle\Button\ButtonInterface;
 use Oro\Bundle\ActionBundle\Button\ButtonSearchContext;
-use Oro\Bundle\ActionBundle\Model\OperationRegistry;
 use Oro\Bundle\ActionBundle\Provider\RouteProviderInterface;
 
 use Oro\Bundle\WorkflowBundle\Model\Transition;
@@ -44,7 +43,7 @@ abstract class AbstractButtonProviderExtension implements ButtonProviderExtensio
         $group = $buttonSearchContext->getGroup();
 
         // Skip if custom buttons group defined
-        if ($group && ($group !== OperationRegistry::DEFAULT_GROUP)) {
+        if ($group && ($group !== ButtonInterface::DEFAULT_GROUP)) {
             return $buttons;
         }
 

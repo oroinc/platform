@@ -174,7 +174,7 @@ class TransitionButtonProviderExtensionTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException UnsupportedButtonException
+     * @expectedException \Oro\Bundle\ActionBundle\Exception\UnsupportedButtonException
      */
     public function testIsAvailableWhenButtonNotSupported()
     {
