@@ -33,7 +33,8 @@ abstract class AbstractViewsList
 
     /**
      * Return all system views that defined in ViewList
-     * @return array
+     *
+     * @return View[]
      */
     public function getSystemViewsList()
     {

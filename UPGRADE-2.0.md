@@ -39,6 +39,43 @@ UPGRADE FROM 1.10 to 2.0
 - Tag `oro_workflow.condition` removed, now for conditions always using `oro_action.condition`
 - Deprecated service `oro_workflow.context_accessor` removed
 - Service (`Oro\Bundle\ActionBundle\Model\ConfigurationPass\ReplacePropertyPath`) removed, use `Oro\Component\ConfigExpression\ConfigurationPass\ReplacePropertyPath` instead
+- Added `Oro\Bundle\ActionBundle\Provider\CurrentApplicationProviderInterface` and trait `Oro\Bundle\ActionBundle\Provider\CurrentApplicationProviderTrait`, interface declare methods `isApplicationsValid()` and `getCurrentApplication()`
+- Added `Oro\Bundle\ActionBundle\Provider\RouteProviderInterface` and trait `Oro\Bundle\ActionBundle\Provider\RouteProviderTrait`, interface declare getters and setters for `widgetRoute`, `formDialogRoute`, `formPageRoute`, `executionRoute`
+- Deleted `Oro\Bundle\ActionBundle\Helper\ApplicationsHelper`.
+Please use `Oro\Bundle\ActionBundle\Provider\CurrentApplicationProvider` and `Oro\Bundle\ActionBundle\Provider\RouteProvider` instead.
+- Changes in `Oro\Bundle\ActionBundle\Helper\ApplicationsUrlHelper`:
+    - type of first argument of `__construct()` changed to `Oro\Bundle\ActionBundle\Provider\RouteProviderInterface`
+    - implemented method `getPageUrl()`, that used `ApplicationsHelperInterface::getFormDialogRoute()`
+- Type of second argument of `Oro\Bundle\ActionBundle\Helper\DefaultOperationRequestHelper::__construct()` changed to `Oro\Bundle\ActionBundle\Provider\CurrentApplicationProviderInterface`
+- Type of third argument of `Oro\Bundle\ActionBundle\Model\OperationRegistry::__construct()` changed to `Oro\Bundle\ActionBundle\Provider\CurrentApplicationProviderInterface`
+- Changes in `Oro\Bundle\ActionBundle\Layout\DataProvider`:
+    - type of first argument of `__construct()` changed to `Oro\Bundle\ActionBundle\Provider\CurrentApplicationProviderInterface`
+    - implemented method `getPageRoute()`
+- Added `Oro\Bundle\ActionBundle\Model\ButtonSearchContext`, that wrap parameters needed for searching of a buttons
+- Added `Oro\Bundle\ActionBundle\Provider\ButtonSearchContextProvider` for providing ButtonSearchContext by array context
+- Added `Oro\Bundle\ActionBundle\Model\ButtonInterface`, that declare methods for rendering of a button, `getOrder()`, `getTemplate()`, `getTemplateData()`, `getButtonContext()` and `getGroup()`
+- Added `Oro\Bundle\ActionBundle\Model\ButtonContext`, that should be used to provide required context data to `ButtonInterface`
+- Added `Oro\Bundle\ActionBundle\Model\ButtonProviderExtensionInterface`, that declare method `find()` for collect buttons from extensions
+- Added `Oro\Bundle\ActionBundle\Provider\ButtonProvider` for providing buttons from extensions
+    - methods `findAll()` and `hasButtons()` 
+    - registered as service `oro_action.provider.button`
+- Added `Oro\Bundle\ActionBundle\DependencyInjection\CompilerPass\ButtonProviderPass`, that collect button providers by tag `oro.action.extension.button_provider` and inject it to `oro_action.provider.button`
+- Added `Oro\Bundle\ActionBundle\Model\OperationButton`, that implements `ButtonInterface` and specific logic for operation buttons
+- Added `Oro\Bundle\ActionBundle\Extension\OperationButtonProviderExtension`, that provide operation buttons
+    - implemented `find()` method
+    - registered by tag `oro.action.extension.button_provider`
+- Changed `Oro\Bundle\ActionBundle\Controller\WidgetController::buttonsAction`, now it use `oro_action.provider.button` and `oro_action.provider.button_search_context` to provide buttons
+- Added `Oro\Bundle\ActionBundle\Layout\DataProvider\LayoutButtonProvider`, that provide buttons for layouts
+    - methods `getAll()` and `getByGroup()`
+    - registered as layout provider `button_provider`
+- Changes in `Oro\Bundle\ActionBundle\Twig\OperationExtension`:
+    - first argument `Oro\Bundle\ActionBundle\Model\OperationManager $manager` of `__construct()` removed
+    - type of second argument changed from `Oro\Bundle\ActionBundle\Helper\ApplicationsHelper` to `Oro\Bundle\ActionBundle\Provider\CurrentApplicationProviderInterface` and now it first argument
+    - added fourth argument `Oro\Bundle\ActionBundle\Provider\ButtonProvider $buttonProvider` of `__construct()`
+    - added fifth argument `Oro\Bundle\ActionBundle\Provider\ButtonSearchContextProvider $searchContextProvider` of `__construct()`
+    - added filter `oro_action_has_buttons`, used `Oro\Bundle\ActionBundle\Provider\ButtonProvider` and `Oro\Bundle\ActionBundle\Provider\ButtonSearchContextProvider`
+    - removed filter `has_operations`
+- Renamed js component `oroaction/js/app/components/buttons-component` to `oroaction/js/app/components/button-component` (from plural to single)
 
 ####ApiBundle
 - The `oro.api.action_processor` DI tag was removed. To add a new action processor, use `oro_api.actions` section of the ApiBundle configuration.
@@ -234,8 +271,6 @@ To migrate all labels from configuration translatable fields automatically you c
   * `Oro\Bundle\WorkflowBundle\Model\AttributeManager`
   * `Oro\Bundle\WorkflowBundle\Model\Condition\AbstractCondition`
   * `Oro\Bundle\WorkflowBundle\Model\Condition\Configurable`
-- Added new option `--skip-scope-processing` to command `oro:workflow:definitions:load` that skip workflow scope loading.
-- Added new command `oro:workflow:scope:update` that update scopes for workflow definitions already loaded to database.
 - Added new node `sopes` to `Oro\Bundle\WorkflowBundle\Configuration\WorkflowConfiguration`.
 - Added method `Oro\Bundle\WorkflowBundle\Entity\Repository\WorkflowDefinitionRepository::getScopedByNames(array $names, ScopeCriteria $scopeCriteria)`.
 - Added ManyToMany relation from `WorkflowDefinition` to `Oro\Bundle\ScopeBundle\Entity\Scope`.
@@ -243,6 +278,26 @@ To migrate all labels from configuration translatable fields automatically you c
 - Removed third constructor argument `Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider $configProvider` of `WorkflowRegistry`.
 - Added method `public function addDefinitionFilter(WorkflowDefinitionFilterInterface $definitionFilter)` to `WorkflowRegistry`.
 - Added listener `oro_workflow.listener.workflow_definition_scope` for creating or updating `WorflowDefinition` to update `WorkflowScope` entities.
+- Changes in `Oro\Bundle\WorkflowBundle\Configuration\WorkflowConfiguration`:
+    - added constants `NODE_INIT_ENTITIES`, `NODE_INIT_ROUTES`, `NODE_INIT_CONTEXT_ATTRIBUTE`, `DEFAULT_INIT_CONTEXT_ATTRIBUTE`
+    - added nodes for constants `NODE_INIT_ENTITIES`, `NODE_INIT_ROUTES`, `NODE_INIT_CONTEXT_ATTRIBUTE` into `transitions`
+- Changes in `Oro\Bundle\WorkflowBundle\Configuration\WorkflowDefinitionConfigurationBuilder`:
+    - added processing of a init context from all transitions (`NODE_INIT_ENTITIES`, `NODE_INIT_ROUTES`, `NODE_INIT_CONTEXT_ATTRIBUTE`)
+    - added nodes `NODE_INIT_ENTITIES`, `NODE_INIT_ROUTES`, `NODE_INIT_CONTEXT_ATTRIBUTE` into white list of a transition configuration filter
+- Changed `Oro\Bundle\WorkflowBundle\Controller\Api\Rest\WorkflowController::startAction`, now it use transition init options and `oro_action.provider.button_search_context`
+- Changed `Oro\Bundle\WorkflowBundle\Controller\WidgetController::startTransitionFormAction`, now it use transition init options and `oro_action.provider.button_search_context`
+- Changed `Oro\Bundle\WorkflowBundle\Controller\WorkflowController::startTransitionAction`, now it use transition init options
+- Added method `findActive()` to `Oro\Bundle\WorkflowBundle\Entity\Repository\WorkflowDefinitionRepository`
+- Added `Oro\Bundle\WorkflowBundle\Extension\TransitionButtonProviderExtension`, that provide transition buttons
+    - implemented `find()` method
+    - registered by tag `oro.action.extension.button_provider`
+- Changed `Oro\Bundle\WorkflowBundle\Model\AttributeAssembler::assemble`, now it processing WorkflowConfiguration::NODE_INIT_CONTEXT_ATTRIBUTE
+- Changed `Oro\Bundle\WorkflowBundle\Model\Transition`, added properties $initEntities, $initRoutes, $initContextAttribute and getters/setters for it
+- Changed `Oro\Bundle\WorkflowBundle\Model\TransitionAssembler::assembleTransition`, now it process NODE_INIT_ENTITIES, NODE_INIT_ROUTES, NODE_INIT_CONTEXT_ATTRIBUTE
+- Added `Oro\Bundle\WorkflowBundle\Model\TransitionButton`, that implements `ButtonInterface` and specific logic for transition buttons
+- Changed `Oro\Bundle\WorkflowBundle\Model\Workflow`, added methods `getInitEntities()` and `getInitRoutes()` to obtain the appropriate options from the configuration
+- Changed `Oro\Bundle\WorkflowBundle\Model\WorkflowAssembler::assembleAttributes`, now it pass transition configuration into `AttributeAssembler::assemble()`
+- Added method `getActiveWorkflows()` to `Oro\Bundle\WorkflowBundle\Model\WorkflowRegistry`
 
 ####LocaleBundle:
 - Added helper `Oro\Bundle\LocaleBundle\Helper\LocalizationQueryTrait` for adding necessary joins to QueryBuilder
@@ -414,6 +469,20 @@ To migrate all labels from configuration translatable fields automatically you c
 - Added layout data provider `\Oro\Bundle\SecurityBundle\Layout\DataProvider\CurrentUserProvider` with method `getCurrentUser`, from now use `=data['current_user'].getCurrentUser()` instead of `=context["logged_user"]`.
 - ACLs configuration file now loads from `Resources/config/oro/acls.yml` file instead of `Resources/config/oro/acls.yml` file
 - ACLs configuration file now has root node in their structure named `acls`. So all ACLs should be placed under the root.
+- Removed unused properties `$metadataCache`, `$maskBuilderClassNames`, `$permissionToMaskBuilderIdentity` and `$maskBuilderIdentityToPermissions` from `Oro\Bundle\SecurityBundle\Acl\Extension\FieldAclExtension`.
+- Removed methods `getMaskBuilderConst` and `getPermissionsForIdentity` from `Oro\Bundle\SecurityBundle\Acl\Extension\FieldAclExtension`.
+- Removed methods `setEntityOwnerAccessor` and `fixMaxAccessLevel` from `Oro\Bundle\SecurityBundle\Acl\Extension\EntityAclExtension`. The accessor is injected via constructor.
+- Removed `Oro\Bundle\SecurityBundle\Acl\Extension\OwnershipDecisionMakerInterface`. Use `Oro\Bundle\SecurityBundle\Acl\Extension\AccessLevelOwnershipDecisionMakerInterface` instead.
+- Removed unused method `getSystemLevelClass` from `Oro\Bundle\SecurityBundle\Owner\Metadata\MetadataProviderInterface`.
+- Class `Oro\Bundle\SecurityBundle\Acl\Domain\EntityObjectReference` marked as deprecated. Use `Oro\Bundle\SecurityBundle\Acl\Domain\DomainObjectReference` instead.
+- Removed unused class `Oro\Bundle\SecurityBundle\Acl\Extension\BaseEntityMaskBuilder`.
+- Changed signature of `setTriggeredMask` method of `Oro\Bundle\SecurityBundle\Acl\Domain\PermissionGrantingStrategyContextInterface`. Added `int $accessLevel` parameter.
+- Removed method `isMasksComparable` of `Oro\Bundle\SecurityBundle\Acl\Domain\PermissionGrantingStrategy`. This was done by performance reasons.
+- Changed signature of the constructor of `Oro\Bundle\SecurityBundle\Acl\Extension\FieldAclExtension`. Removed `$entityClassResolver` parameter. Parameter `ConfigProvider $configProvider` replaced with `ConfigManager $configManager`.
+- Changed signature of the constructor of `Oro\Bundle\SecurityBundle\Metadata\AclAnnotationProvider`. Added `EntityClassResolver $entityClassResolver` parameter.
+- Changed signature of the constructor of `Oro\Bundle\SecurityBundle\Acl\Persistence\AclPrivilegeRepository`. Removed `$translator` parameter.
+- Changed signature of the constructor of `Oro\Bundle\SecurityBundle\Metadata\ActionMetadataProvider`. Added `TranslatorInterface $translator` parameter.
+- Changed signature of the constructor of `Oro\Bundle\SecurityBundle\Metadata\EntitySecurityMetadataProvider`. Added `TranslatorInterface $translator` parameter.
 
 ####ImportExportBundle
 - Added new event `AFTER_JOB_EXECUTION`, for details please check out [documentation](./src/Oro/Bundle/ImportExportBundle/Resources/doc/reference/events.md).
@@ -676,6 +745,8 @@ placeholders:
         - `ArrayLoader` $loader,
         - `MenuManipulator` $manipulator
 - Added new command `oro:navigation:menu:reset` that removes changes in menus for different scopes.
+- Removed class `Oro\Bundle\NavigationBundle\Title\StoredTitle`.
+- Changed signature of constructor of `Oro\Bundle\NavigationBundle\Provider\TitleService`. Parameter `Serializer $serializer` was removed. 
 
 ####EmailBundle
 - Constructor of `Oro\Bundle\EmailBundle\Form\DataTransformer\EmailTemplateTransformer` was changed. Removed the arguments.
@@ -814,13 +885,13 @@ to the [Fallback documentation](./src/Oro/Bundle/EntityBundle/Resources/doc/enti
 - `Oro\Bundle\DataAuditBundle\Loggable\AuditEntityMapper` was renamed to `Oro\Bundle\DataAuditBundle\Provider\AuditEntityMapper`.
 
 ####UserBundle
-- Added `Oro\Bundle\UserBundle\Validator\Constraints\PasswordComplexity` to User model
+- Added `auth_status` extended enum property to `Oro\Bundle\UserBundle\Entity\User` entity.
+- Added `Oro\Bundle\UserBundle\Validator\Constraints\PasswordComplexity` to User model.
 - User password requirements are more restrictive by default and require 8 characters, an upper case letter, and a number.
-- Any new users or changing of existing passwords need to meet the password requirements specified in System Configuration/General Setup/User Settings. Existing user passwords are not affected
+- Any new users or changing of existing passwords need to meet the password requirements specified in System Configuration/General Setup/User Settings. Existing user passwords are not affected.
 - Removed service @oro_user.password_reset.widget_provider.actions (replaced by @oro_user.forced_password_reset.widget_provider.actions)
-
-####DemoDataBundle
-- All demo CRM users will have passwords ending with '1Q' (e.g. for username 'marketing' password is 'marketing1Q'). For user 'sale' the password is 'salesale1Q'.
+- Constructor of `Oro\Bundle\UserBundle\Entity\UserManager` changed. Added 4-th parameter of type `Oro\Bundle\EntityExtendBundle\Provider\EnumValueProvider`.
+- Added method `setAuthStatus($user, $enumId)` to `Oro\Bundle\UserBundle\Entity\UserManager` method to set `auth_status` of a User by enum id.
 
 ####ImapBundle
 - The command `oro:imap:clear-mailbox` was removed. Produce message to the topic `oro.imap.clear_inactive_mailbox` instead.

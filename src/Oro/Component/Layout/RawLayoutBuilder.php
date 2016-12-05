@@ -40,7 +40,7 @@ class RawLayoutBuilder implements RawLayoutBuilderInterface
         $blockType,
         array $options = [],
         $siblingId = null,
-        $prepend = false
+        $prepend = null
     ) {
         try {
             $this->validateBlockType($blockType);
@@ -88,7 +88,7 @@ class RawLayoutBuilder implements RawLayoutBuilderInterface
     /**
      * {@inheritdoc}
      */
-    public function move($id, $parentId = null, $siblingId = null, $prepend = false)
+    public function move($id, $parentId = null, $siblingId = null, $prepend = null)
     {
         try {
             $this->rawLayout->move($id, $parentId, $siblingId, $prepend);

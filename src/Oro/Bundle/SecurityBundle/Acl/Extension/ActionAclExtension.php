@@ -11,34 +11,31 @@ use Oro\Bundle\SecurityBundle\Metadata\ActionMetadataProvider;
 
 class ActionAclExtension extends AbstractAclExtension
 {
-    /**
-     * @var ActionMetadataProvider
-     */
+    const NAME = 'action';
+
+    const PERMISSION_EXECUTE = 'EXECUTE';
+
+    /** @var ActionMetadataProvider */
     protected $actionMetadataProvider;
 
     /**
-     * Constructor
+     * @param ActionMetadataProvider $actionMetadataProvider
      */
     public function __construct(ActionMetadataProvider $actionMetadataProvider)
     {
         $this->actionMetadataProvider = $actionMetadataProvider;
 
-        $this->map = array(
-            'EXECUTE' => array(
-                ActionMaskBuilder::MASK_EXECUTE,
-            ),
-        );
+        $this->map = [
+            self::PERMISSION_EXECUTE => [ActionMaskBuilder::MASK_EXECUTE]
+        ];
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getAccessLevelNames($object, $permissionName = null)
+    public function getExtensionKey()
     {
-        return array(
-            AccessLevel::NONE_LEVEL => AccessLevel::NONE_LEVEL_NAME,
-            AccessLevel::SYSTEM_LEVEL => AccessLevel::getAccessLevelName(AccessLevel::SYSTEM_LEVEL)
-        );
+        return self::NAME;
     }
 
     /**
@@ -50,21 +47,66 @@ class ActionAclExtension extends AbstractAclExtension
             return $id === $this->getExtensionKey();
         }
 
-        $delim = strpos($type, '@');
-        if ($delim !== false) {
-            $type = ltrim(substr($type, $delim + 1), ' ');
-        }
-
-        return $id === $this->getExtensionKey()
-            && $this->actionMetadataProvider->isKnownAction($type);
+        return
+            $id === $this->getExtensionKey()
+            && $this->actionMetadataProvider->isKnownAction(ObjectIdentityHelper::removeGroupName($type));
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getExtensionKey()
+    public function getDefaultPermission()
     {
-        return 'action';
+        return self::PERMISSION_EXECUTE;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getPermissions($mask = null, $setOnly = false, $byCurrentGroup = false)
+    {
+        if ($mask === null || !$setOnly || $mask !== 0) {
+            return [self::PERMISSION_EXECUTE];
+        }
+
+        return [];
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getAllowedPermissions(ObjectIdentity $oid, $fieldName = null)
+    {
+        return [self::PERMISSION_EXECUTE];
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getClasses()
+    {
+        return $this->actionMetadataProvider->getActions();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getAccessLevelNames($object, $permissionName = null)
+    {
+        return [
+            AccessLevel::NONE_LEVEL   => AccessLevel::NONE_LEVEL_NAME,
+            AccessLevel::SYSTEM_LEVEL => AccessLevel::getAccessLevelName(AccessLevel::SYSTEM_LEVEL)
+        ];
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getAccessLevel($mask, $permission = null, $object = null)
+    {
+        return $mask === 0
+            ? AccessLevel::NONE_LEVEL
+            : AccessLevel::SYSTEM_LEVEL;
     }
 
     /**
@@ -96,7 +138,7 @@ class ActionAclExtension extends AbstractAclExtension
             $group = $val->getGroup();
         }
 
-        return new ObjectIdentity($id, !empty($group) ? $group . '@' . $type : $type);
+        return new ObjectIdentity($id, ObjectIdentityHelper::buildType($type, $group));
     }
 
     /**
@@ -112,7 +154,7 @@ class ActionAclExtension extends AbstractAclExtension
      */
     public function getAllMaskBuilders()
     {
-        return array(new ActionMaskBuilder());
+        return [new ActionMaskBuilder()];
     }
 
     /**
@@ -126,47 +168,16 @@ class ActionAclExtension extends AbstractAclExtension
     /**
      * {@inheritdoc}
      */
-    public function getAccessLevel($mask, $permission = null, $object = null)
+    public function getServiceBits($mask)
     {
-        return $mask === 0
-            ? AccessLevel::NONE_LEVEL
-            : AccessLevel::SYSTEM_LEVEL;
+        return $mask & ActionMaskBuilder::SERVICE_BITS;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getPermissions($mask = null, $setOnly = false, $byCurrentGroup = false)
+    public function removeServiceBits($mask)
     {
-        $result = array();
-        if ($mask === null || !$setOnly || $mask !== 0) {
-            $result[] = 'EXECUTE';
-        }
-
-        return $result;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getAllowedPermissions(ObjectIdentity $oid, $fieldName = null)
-    {
-        return array('EXECUTE');
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getDefaultPermission()
-    {
-        return 'EXECUTE';
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getClasses()
-    {
-        return $this->actionMetadataProvider->getActions();
+        return $mask & ActionMaskBuilder::REMOVE_SERVICE_BITS;
     }
 }

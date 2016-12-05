@@ -88,7 +88,7 @@ class CrowdinAdapter extends AbstractAPIAdapter
     }
 
     /**
-     * @param string $files
+     * @param array $files
      * @param string $mode 'add' or 'update'
      *
      * @return bool

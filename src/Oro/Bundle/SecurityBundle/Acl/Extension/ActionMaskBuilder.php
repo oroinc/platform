@@ -9,13 +9,18 @@ use Oro\Bundle\SecurityBundle\Acl\Permission\MaskBuilder;
  */
 final class ActionMaskBuilder extends MaskBuilder
 {
-    const MASK_EXECUTE            = 1;         // 1 << 0
+    const SERVICE_BITS        = -2; // 0xFFFFFFFE
+    const REMOVE_SERVICE_BITS = 1;  // 0x00000001
+
+    const MASK_EXECUTE = 1;
 
     // Some useful groups of bitmasks
-    const GROUP_NONE              = 0;
-    const GROUP_ALL               = 1;         // 1 << 0
+    const GROUP_NONE = 0;
+    const GROUP_ALL  = 1;
 
-    const CODE_EXECUTE      = 'E';
+    const CODE_EXECUTE = 'E';
+
+    const PATTERN_ALL_OFF = '(E) .';
 
     /**
      * Constructor

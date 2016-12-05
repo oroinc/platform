@@ -4,7 +4,6 @@ namespace Oro\Bundle\CurrencyBundle\Tests\Unit\Utils;
 
 use Symfony\Component\Intl\Intl;
 
-use Oro\Bundle\CurrencyBundle\Provider\ViewTypeProviderInterface;
 use Oro\Bundle\CurrencyBundle\Utils\CurrencyNameHelper;
 
 class CurrencyNameHelperStub extends CurrencyNameHelper
@@ -14,14 +13,20 @@ class CurrencyNameHelperStub extends CurrencyNameHelper
         $this->intlCurrencyBundle = Intl::getCurrencyBundle();
     }
 
+    /**
+     * @param string $currencyIsoCode
+     * @param string|null $nameViewStyle
+     * @return string
+     */
     public function getCurrencyName($currencyIsoCode, $nameViewStyle = null)
     {
-        if (ViewTypeProviderInterface::VIEW_TYPE_ISO_CODE === $nameViewStyle) {
-            return $currencyIsoCode;
-        }
-        return $this->intlCurrencyBundle->getCurrencyName($currencyIsoCode);
+        return sprintf('%s-%s', $currencyIsoCode, $nameViewStyle);
     }
 
+    /**
+     * @param string|null $nameViewStyle
+     * @return array
+     */
     public function getCurrencyChoices($nameViewStyle = null)
     {
         return ['USD', 'EUR'];
