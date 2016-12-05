@@ -111,7 +111,7 @@ class OperationManagerTest extends \PHPUnit_Framework_TestCase
      * @param array $operations
      * @param array $expected
      */
-    public function testgetOperations(
+    public function testGetOperations(
         $class,
         $route,
         $datagrid,
@@ -176,6 +176,18 @@ class OperationManagerTest extends \PHPUnit_Framework_TestCase
                 'datagrid' => null,
                 'group' => null,
                 'context' => ['entityClass' => 'Oro\Bundle\ActionBundle\Tests\Unit\Stub\TestEntity1'],
+                'operations' => [],
+                'expectedOperations' => []
+            ],
+            'entity1 without id with datagrid' => [
+                'entityClass' => 'Oro\Bundle\ActionBundle\Tests\Unit\Stub\TestEntity1',
+                'route' => null,
+                'datagrid' => 'grid1',
+                'group' => null,
+                'context' => [
+                    'entityClass' => 'Oro\Bundle\ActionBundle\Tests\Unit\Stub\TestEntity1',
+                    'datagrid' => 'grid1'
+                ],
                 'operations' => [],
                 'expectedOperations' => []
             ],

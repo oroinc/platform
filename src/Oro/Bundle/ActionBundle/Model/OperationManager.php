@@ -84,7 +84,9 @@ class OperationManager
 
         $operations = $this->operationRegistry->find(
             new OperationFindCriteria(
-                $context[ContextHelper::ENTITY_ID_PARAM] ? $context[ContextHelper::ENTITY_CLASS_PARAM] : null,
+                $context[ContextHelper::ENTITY_ID_PARAM] || $context[ContextHelper::DATAGRID_PARAM]
+                    ? $context[ContextHelper::ENTITY_CLASS_PARAM]
+                    : null,
                 $context[ContextHelper::ROUTE_PARAM],
                 $context[ContextHelper::DATAGRID_PARAM],
                 $context[ContextHelper::GROUP_PARAM]
