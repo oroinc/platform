@@ -41,7 +41,11 @@ class ButtonProvider
      */
     public function findAvailable(ButtonSearchContext $searchContext)
     {
-        return $this->match($searchContext)->filterAvailable($searchContext)->toArray();
+        return $this->match($searchContext)->filter(
+            function (ButtonInterface $button, ButtonProviderExtensionInterface $extension) use ($searchContext) {
+                return $extension->isAvailable($button, $searchContext);
+            }
+        )->toArray();
     }
 
     /**
@@ -56,6 +60,7 @@ class ButtonProvider
                 $newButton->getButtonContext()->setEnabled(
                     $extension->isAvailable($newButton, $searchContext)
                 );
+
                 return $newButton;
             }
         );

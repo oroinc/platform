@@ -48,20 +48,6 @@ class ButtonsCollectionTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($buttons, $this->collection->toArray());
     }
 
-    public function testFilterAvailable()
-    {
-        $buttons = [$this->getButtonMock(), $this->getButtonMock()];
-        $extension = $this->getExtensionMock($buttons);
-
-        $extension->expects($this->at(1))->method('isAvailable')->willReturn(true);
-        $extension->expects($this->at(2))->method('isAvailable')->willReturn(false);
-
-        $this->collection->consume($extension, $this->searchContext);
-        $filtered = $this->collection->filterAvailable($this->searchContext);
-        $this->assertInstanceOf(ButtonsCollection::class, $filtered);
-        $this->assertCount(1, $filtered);
-    }
-
     public function testGetIterator()
     {
         $this->assertInstanceOf(\ArrayIterator::class, $this->collection->getIterator());

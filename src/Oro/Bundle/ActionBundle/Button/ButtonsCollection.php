@@ -48,6 +48,21 @@ class ButtonsCollection implements \IteratorAggregate, \Countable
         return $this;
     }
 
+    public function filter(callable $filter)
+    {
+        $collection = new static;
+
+        /** @var ButtonInterface $button */
+        foreach ($this->buttonsMap as $button) {
+            $extension = $this->buttonsMap[$button];
+            if (call_user_func($filter, $button, $extension)) {
+                $collection->addButton($button, $extension);
+            }
+        }
+
+        return $collection;
+    }
+
     /**
      * @param ButtonSearchContext $searchContext
      *
