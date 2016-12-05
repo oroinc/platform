@@ -45,7 +45,7 @@ class ImportLayoutManipulator implements LayoutManipulatorInterface
         $blockType,
         array $options = [],
         $siblingId = null,
-        $prepend = false
+        $prepend = null
     ) {
         $this->addAdditionalBlockPrefixOption($id, $options);
 
@@ -79,7 +79,7 @@ class ImportLayoutManipulator implements LayoutManipulatorInterface
     /**
      * {@inheritDoc}
      */
-    public function move($id, $parentId = null, $siblingId = null, $prepend = false)
+    public function move($id, $parentId = null, $siblingId = null, $prepend = null)
     {
         $this
             ->replaceRoot($id)
