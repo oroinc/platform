@@ -218,7 +218,7 @@ class WorkflowDataHelper
 
         return [
             'transitionUrl' => $this->router->generate(
-                'oro_workflow_transition_form',
+                'oro_workflow_start_transition_form',
                 $urlParams,
                 UrlGeneratorInterface::ABSOLUTE_URL
             ),
