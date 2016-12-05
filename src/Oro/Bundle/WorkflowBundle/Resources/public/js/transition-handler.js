@@ -43,7 +43,7 @@ define([
                 };
                 var additionalOptions = element.data('dialog-options');
                 if (additionalOptions) {
-                    if (additionalOptions.dialogOptions !== undefined) {
+                    if (!_.isUndefined(additionalOptions)) {
                         additionalOptions.dialogOptions = _.extend(
                             dialogOptions.dialogOptions,
                             additionalOptions.dialogOptions

@@ -126,6 +126,9 @@ class WorkflowDataHelper
             'isStart' => $transition->isStart(),
             'hasForm' => $transition->hasForm(),
             'displayType' => $transition->getDisplayType(),
+            'message' => !empty($transition->getMessage())
+                ? $this->translator->trans($transition->getMessage(), [], 'workflows')
+                : null,
             'frontendOptions' => $transition->getFrontendOptions(),
         ];
     }
@@ -145,11 +148,6 @@ class WorkflowDataHelper
         WorkflowItem $workflowItem = null
     ) {
         $isStarted = $workflowItem !== null;
-        $urlParams = [
-            'workflowName' => $workflow->getName(),
-            'transitionName' => $transition->getName(),
-            'entityId' => $entity->getId(),
-        ];
 
         if ($isStarted) {
             $urlParams = [
@@ -182,6 +180,12 @@ class WorkflowDataHelper
                 ),
             ];
         }
+
+        $urlParams = [
+            'workflowName' => $workflow->getName(),
+            'transitionName' => $transition->getName(),
+            'entityId' => $entity->getId(),
+        ];
 
         if ($transition->getDisplayType() === 'dialog') {
             if ($transition->hasForm()) {
@@ -375,8 +379,7 @@ class WorkflowDataHelper
         $errors = new ArrayCollection();
 
         return $workflow->isStartTransitionAvailable($transition, $entity, [], $errors)
-               && !$transition->isHidden()
-               && !$transition->isUnavailableHidden();
+               && !$transition->isHidden();
     }
 
     /**
@@ -394,8 +397,7 @@ class WorkflowDataHelper
         $errors = new ArrayCollection();
 
         return $workflow->isTransitionAvailable($workflowItem, $transition, $errors)
-               && !$transition->isHidden()
-               && !$transition->isUnavailableHidden();
+               && !$transition->isHidden();
     }
 
     /**
