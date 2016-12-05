@@ -63,7 +63,16 @@ class LayoutResource implements ResourceInterface
      */
     public function isFresh($timestamp)
     {
-        return true;
+        $maxLastModified = 0;
+
+        foreach ($this->themeManager->getAllThemes() as $theme) {
+            $assets = $this->collectThemeAssets($theme);
+            foreach ($assets as $assetKey => $asset) {
+                $maxLastModified = max($maxLastModified, $this->getLastModified($asset['inputs']));
+            }
+        }
+
+        return $maxLastModified > $timestamp;
     }
 
     /**
@@ -183,7 +192,7 @@ class LayoutResource implements ResourceInterface
 
         $file = realpath($this->outputDir) . '/' . $output . '.'. $extension;
 
-        $mtime = $this->getLastModified($inputs, $extension);
+        $mtime = $this->getLastModified($inputs);
         if (!array_key_exists($file, $this->mtimeOutputs) || $this->mtimeOutputs[$file] < $mtime) {
             $inputsContent = '';
             foreach ($inputs as $input) {
@@ -203,11 +212,10 @@ class LayoutResource implements ResourceInterface
 
     /**
      * @param array  $inputs
-     * @param string $extension
      *
      * @return int|mixed
      */
-    private function getLastModified(array $inputs, $extension)
+    private function getLastModified(array $inputs)
     {
         $mtime = 0;
         foreach ($inputs as $input) {

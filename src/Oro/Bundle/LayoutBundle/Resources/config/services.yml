@@ -96,9 +96,17 @@ services:
 
     oro_layout.assetic.layout_formula_loader:
         public: false
-        class: Oro\Bundle\LayoutBundle\Assetic\LayoutFormulaLoader
+        class: '%assetic.cached_formula_loader.class%'
+        arguments:
+            - '@oro_layout.assetic.layout_formula_loader.real'
+            - '@assetic.config_cache'
+            - '%kernel.debug%'
         tags:
             - { name: assetic.formula_loader, alias: layout }
+
+    oro_layout.assetic.layout_formula_loader.real:
+        public: false
+        class: Oro\Bundle\LayoutBundle\Assetic\LayoutFormulaLoader
 
     oro_layout.assetic.layout_resource:
         public: false
