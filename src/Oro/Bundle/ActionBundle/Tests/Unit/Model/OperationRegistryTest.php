@@ -7,8 +7,12 @@ use Oro\Bundle\ActionBundle\Helper\ContextHelper;
 use Oro\Bundle\ActionBundle\Model\Assembler\AttributeAssembler;
 use Oro\Bundle\ActionBundle\Model\Assembler\FormOptionsAssembler;
 use Oro\Bundle\ActionBundle\Model\Assembler\OperationAssembler;
+use Oro\Bundle\ActionBundle\Model\Criteria\OperationFindCriteria;
+use Oro\Bundle\ActionBundle\Model\Operation;
 use Oro\Bundle\ActionBundle\Model\OperationRegistry;
+use Oro\Bundle\ActionBundle\Model\OperationRegistryFilterInterface;
 use Oro\Bundle\ActionBundle\Provider\CurrentApplicationProviderInterface;
+use Oro\Bundle\ActionBundle\Tests\Unit\Filter\Stub\CallbackOperationRegistryFilter;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 
 use Oro\Component\Action\Action\ActionFactory;
@@ -123,10 +127,14 @@ class OperationRegistryTest extends \PHPUnit_Framework_TestCase
             ->method('getConfiguration')
             ->willReturn($this->getConfiguration());
 
-        $this->assertEquals($expected, array_keys($this->registry->find($entityClass, $route, $datagrid, $group)));
+        $this->assertEquals($expected, array_keys($this->registry->find(
+            new OperationFindCriteria($entityClass, $route, $datagrid, $group)
+        )));
 
         // get operations from local cache
-        $this->assertEquals($expected, array_keys($this->registry->find($entityClass, $route, $datagrid, $group)));
+        $this->assertEquals($expected, array_keys($this->registry->find(
+            new OperationFindCriteria($entityClass, $route, $datagrid, $group)
+        )));
     }
 
     /**
@@ -245,21 +253,21 @@ class OperationRegistryTest extends \PHPUnit_Framework_TestCase
             'entity3 substitution of operation15 by operation16' => [
                 'entityClass' => 'Oro\Bundle\ActionBundle\Tests\Unit\Stub\TestEntity3',
                 'route' => null,
-                'datagrid' =>  null,
+                'datagrid' => null,
                 'group' => null,
                 'expected' => ['operation13', 'operation14']
             ],
             'operation17 matched by group but no substitution and no appearance' => [
                 'entityClass' => null,
                 'route' => null,
-                'datagrid' =>  null,
+                'datagrid' => null,
                 'group' => 'group4',
                 'expected' => []
             ],
             'substitute conditional only for specific entity and common group' => [
                 'entityClass' => 'Oro\Bundle\ActionBundle\Tests\Unit\Stub\TestEntity3',
                 'route' => null,
-                'datagrid' =>  null,
+                'datagrid' => null,
                 'group' => 'limited',
                 'expected' => ['operation18']
             ]
@@ -430,25 +438,153 @@ class OperationRegistryTest extends \PHPUnit_Framework_TestCase
             ],
         ];
 
-        return array_map(
-            function ($config) {
-                return array_merge(
-                    [
-                        'enabled' => true,
-                        'applications' => [],
-                        'groups' => [],
-                        'entities' => [],
-                        'exclude_entities' => [],
-                        'for_all_entities' => false,
-                        'routes' => [],
-                        'datagrids' => [],
-                        'exclude_datagrids' => [],
-                        'for_all_datagrids' => false
-                    ],
-                    $config
+        return array_map([$this, 'createOperationConfig'], $configuration);
+    }
+
+    /**
+     * @param array $config
+     * @return array
+     */
+    private function createOperationConfig(array $config)
+    {
+        return array_merge(
+            [
+                'label' => uniqid('operation_', false),
+                'enabled' => true,
+                'applications' => [],
+                'groups' => [],
+                'entities' => [],
+                'exclude_entities' => [],
+                'for_all_entities' => false,
+                'routes' => [],
+                'datagrids' => [],
+                'exclude_datagrids' => [],
+                'for_all_datagrids' => false
+            ],
+            $config
+        );
+    }
+
+    public function testOuterFilterArguments()
+    {
+        $this->configurationProvider->expects($this->once())
+            ->method('getConfiguration')
+            ->willReturn(
+                [
+                    'operation1' => $this->createOperationConfig(
+                        [
+                            'datagrids' => 'd1',
+                            'label' => 'Operation1'
+                        ]
+                    )
+                ]
+            );
+
+        $filter = $this->getMock(OperationRegistryFilterInterface::class);
+
+        $criteria3 = new OperationFindCriteria('e1', 'r1', 'd1');
+        $filter->expects($this->once())->method('filter')->with(
+            $this->callback(
+                function (array $operations) {
+                    return $operations['operation1'] instanceof Operation && count($operations) === 1;
+                }
+            ),
+            $criteria3
+        );
+        $this->registry->addFilter($filter);
+        $this->registry->find($criteria3);
+    }
+
+    public function testOuterFiltering()
+    {
+        $this->configurationProvider->expects($this->once())
+            ->method('getConfiguration')
+            ->willReturn(
+                [
+                    'operation1' => $this->createOperationConfig([
+                        'for_all_entities' => true,
+                        'datagrids' => ['d1', 'd2']
+                    ]),
+                    'operation2' => $this->createOperationConfig([
+                        'for_all_entities' => true,
+                        'datagrids' => ['d1', 'd2']
+                    ]),
+                    'operation3' => $this->createOperationConfig([
+                        'for_all_entities' => true,
+                        'datagrids' => ['d1', 'd2']
+                    ])
+                ]
+            );
+
+        $this->assertEquals(
+            ['operation1', 'operation2', 'operation3'],
+            array_keys($this->registry->find(new OperationFindCriteria('e1', 'r1', 'd1')))
+        );
+
+        $this->registry->addFilter($this->createFilter(
+            function (Operation $operation, OperationFindCriteria $criteria) {
+                if ($criteria->getEntityClass() === 'e1') {
+                    return $operation->getName() !== 'operation1';
+                }
+
+                return true;
+            }
+        ));
+
+        $this->registry->addFilter($this->createFilter(
+            function (Operation $operation, OperationFindCriteria $criteria) {
+                if ($criteria->getEntityClass() === 'e2') {
+                    return $operation->getName() !== 'operation2';
+                }
+
+                return true;
+            }
+        ));
+
+        $this->registry->addFilter($this->createFilter(
+            function (Operation $operation, OperationFindCriteria $criteria) {
+                if ($criteria->getEntityClass() === 'e3') {
+                    return $operation->getName() !== 'operation3';
+                }
+
+                return true;
+            }
+        ));
+
+        $this->assertEquals(
+            ['operation2', 'operation3'],
+            array_keys($this->registry->find(new OperationFindCriteria('e1', null, null))),
+            'first filter should be applied'
+        );
+
+        $this->assertEquals(
+            ['operation1', 'operation3'],
+            array_keys($this->registry->find(new OperationFindCriteria('e2', null, null))),
+            'second filter should be applied'
+        );
+
+        $this->assertEquals(
+            ['operation1', 'operation2'],
+            array_keys($this->registry->find(new OperationFindCriteria('e3', null, null))),
+            'third filter should be applied'
+        );
+    }
+
+    /**
+     * @param callable $callable
+     * @return CallbackOperationRegistryFilter
+     */
+    private function createFilter(callable $callable)
+    {
+        return new CallbackOperationRegistryFilter(
+            function (array $operations, OperationFindCriteria $criteria) use ($callable) {
+                return array_filter(
+                    $operations,
+                    function (Operation $operation) use ($criteria, $callable) {
+                        return call_user_func($callable, $operation, $criteria);
+                    }
                 );
-            },
-            $configuration
+            }
         );
     }
 }

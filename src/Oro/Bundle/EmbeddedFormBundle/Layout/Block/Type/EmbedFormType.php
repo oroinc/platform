@@ -120,10 +120,12 @@ class EmbedFormType extends AbstractType
         array $passedOptions
     ) {
         $options = $options->toArray();
-        foreach ($options['additional_block_prefixes'] as &$blockPrefix) {
-            $blockPrefix .=  self::FIELD_SEPARATOR . $shortName;
+        if (isset($options['additional_block_prefixes'])) {
+            foreach ($options['additional_block_prefixes'] as &$blockPrefix) {
+                $blockPrefix .= self::FIELD_SEPARATOR.$shortName;
+            }
+            unset($blockPrefix);
         }
-        unset($blockPrefix);
 
         $builder->getLayoutManipulator()->add(
             $builder->getId() . self::FIELD_SEPARATOR . $shortName,

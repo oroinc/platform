@@ -730,6 +730,88 @@ The same positioning can be achieved using `move` action. Let's move our languag
         prepend: true
 ```
 Note that if `siblingId` is not specified the block will be positioned as the first block in the container.
+In case when you need to place block at the last position, you should use the `prepand: false` with `siblingId: ~`.
+
+Example (with different cases of ordering):
+```yaml
+    - '@addTree':
+        items:
+            content:
+                blockType: container
+            content_block_last:
+                blockType: block
+            content_block_first:
+                blockType: block
+            content_block_1:
+                blockType: block
+            content_block_2:
+                blockType: block
+            content_block_3:
+                blockType: block
+        tree:
+            content:
+                content_block_last_1: ~
+                content_block_first_2: ~
+                content_block_1: ~
+                content_block_2: ~
+                content_block_3: ~
+    
+    - '@move':
+        id: content_block_last_1
+        parentId: content
+        siblingId: ~
+        prepend: false
+    
+    - '@add':
+        id: content_block_last_2
+        blockType: block
+        parentId: content
+        siblingId: ~
+        prepend: false
+    
+    - '@move':
+        id: content_block_1
+        parentId: content
+        siblingId: content_block_2
+        prepend: true
+    
+    - '@move':
+        id: content_block_2
+        parentId: content
+        siblingId: ~
+        prepend: ~
+    
+    - '@move':
+        id: content_block_3
+        parentId: content
+        siblingId: content_block_2
+        prepend: false
+    
+    - '@move':
+        id: content_block_first_2
+        parentId: content
+        siblingId: ~
+        prepend: true
+    
+    - '@add':
+        id: content_block_first_1
+        blockType: block
+        parentId: content
+        siblingId: ~
+        prepend: true
+```
+
+Result will be (tree):
+```yaml
+    content:
+        content_block_first_1: ~
+        content_block_first_2: ~
+        content_block_1: ~
+        content_block_2: ~
+        content_block_3: ~
+        content_block_last_1: ~
+        content_block_last_2: ~
+```
 
 Extending exiting block types
 ----------------------------------

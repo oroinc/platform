@@ -21,6 +21,8 @@ workflows:
         exclusive_record_groups:
             - 'record_group1'
         steps_display_ordered: true
+        disable_operations:
+            operation1: [entity1, entity2]
         steps:
             first_step:
                 order: 1
