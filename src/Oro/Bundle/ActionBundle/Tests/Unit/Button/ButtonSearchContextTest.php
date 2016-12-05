@@ -1,8 +1,8 @@
 <?php
 
-namespace Oro\Bundle\ActionBundle\Tests\Unit\Model;
+namespace Oro\Bundle\ActionBundle\Tests\Unit\Button;
 
-use Oro\Bundle\ActionBundle\Model\ButtonSearchContext;
+use Oro\Bundle\ActionBundle\Button\ButtonSearchContext;
 use Oro\Component\Testing\Unit\EntityTestCaseTrait;
 
 class ButtonSearchContextTest extends \PHPUnit_Framework_TestCase

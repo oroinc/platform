@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\ActionBundle\Provider;
 
+use Oro\Bundle\ActionBundle\Button\ButtonSearchContext;
 use Oro\Bundle\ActionBundle\Helper\ContextHelper;
-use Oro\Bundle\ActionBundle\Model\ButtonSearchContext;
 
 class ButtonSearchContextProvider
 {

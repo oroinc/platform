@@ -5,8 +5,8 @@ namespace Oro\Bundle\ActionBundle\Extension;
 use Doctrine\Common\Collections\Collection;
 
 use Oro\Bundle\ActionBundle\Exception\UnsupportedButtonException;
-use Oro\Bundle\ActionBundle\Model\ButtonInterface;
-use Oro\Bundle\ActionBundle\Model\ButtonSearchContext;
+use Oro\Bundle\ActionBundle\Button\ButtonInterface;
+use Oro\Bundle\ActionBundle\Button\ButtonSearchContext;
 
 interface ButtonProviderExtensionInterface
 {

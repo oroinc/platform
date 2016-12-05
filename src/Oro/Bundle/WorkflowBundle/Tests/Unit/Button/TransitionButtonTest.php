@@ -1,13 +1,13 @@
 <?php
 
-namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Model;
+namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Button;
 
-use Oro\Bundle\ActionBundle\Model\ButtonContext;
+use Oro\Bundle\ActionBundle\Button\ButtonContext;
 use Oro\Bundle\ActionBundle\Model\OperationRegistry;
 
+use Oro\Bundle\WorkflowBundle\Button\TransitionButton;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Model\Transition;
-use Oro\Bundle\WorkflowBundle\Model\TransitionButton;
 use Oro\Bundle\WorkflowBundle\Model\Workflow;
 
 class TransitionButtonTest extends \PHPUnit_Framework_TestCase
@@ -82,17 +82,7 @@ class TransitionButtonTest extends \PHPUnit_Framework_TestCase
         $defaultData = [
             'workflow' => $this->workflow,
             'transition' => $this->transition,
-            'context' => $this->buttonContext,
-            'transitionData' => [
-                'workflow' => $this->workflow->getName(),
-                'transition' => $this->transition->getName(),
-                'dialog-route' => $this->buttonContext->getFormDialogRoute(),
-                'page-route' => $this->buttonContext->getFormPageRoute(),
-                'transition-route' => $this->buttonContext->getExecutionRoute(),
-                'transition-condition-messages' => $this->buttonContext->getErrors(),
-                'isAllowed' => $this->buttonContext->isEnabled(),
-                'enabled' => $this->buttonContext->isEnabled(),
-            ],
+            'context' => $this->buttonContext
         ];
 
         $this->assertEquals(array_merge($defaultData, $customData), $this->button->getTemplateData($customData));
@@ -119,13 +109,13 @@ class TransitionButtonTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(OperationRegistry::DEFAULT_GROUP, $this->button->getGroup());
     }
 
+    public function testGetWorkflow()
+    {
+        $this->assertSame($this->workflow, $this->button->getWorkflow());
+    }
+
     public function testGetTransition()
     {
         $this->assertEquals($this->transition, $this->button->getTransition());
-    }
-
-    public function testGetWorkflow()
-    {
-        $this->assertEquals($this->workflow, $this->button->getWorkflow());
     }
 }

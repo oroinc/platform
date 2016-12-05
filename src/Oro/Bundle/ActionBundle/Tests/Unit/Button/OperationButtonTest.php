@@ -1,11 +1,11 @@
 <?php
 
-namespace Oro\Bundle\ActionBundle\Tests\Unit\Model;
+namespace Oro\Bundle\ActionBundle\Tests\Unit\Button;
 
+use Oro\Bundle\ActionBundle\Button\ButtonContext;
+use Oro\Bundle\ActionBundle\Button\OperationButton;
 use Oro\Bundle\ActionBundle\Model\ActionData;
-use Oro\Bundle\ActionBundle\Model\ButtonContext;
 use Oro\Bundle\ActionBundle\Model\Operation;
-use Oro\Bundle\ActionBundle\Model\OperationButton;
 use Oro\Bundle\ActionBundle\Model\OperationDefinition;
 
 class OperationButtonTest extends \PHPUnit_Framework_TestCase

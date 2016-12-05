@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\ActionBundle\Tests\Unit\Stub;
 
-use Oro\Bundle\ActionBundle\Model\ButtonContext;
-use Oro\Bundle\ActionBundle\Model\ButtonInterface;
+use Oro\Bundle\ActionBundle\Button\ButtonContext;
+use Oro\Bundle\ActionBundle\Button\ButtonInterface;
 
 class StubButton implements ButtonInterface
 {
