@@ -48,7 +48,7 @@ class CurrencyNameHelperTest extends \PHPUnit_Framework_TestCase implements View
             $this->getLocaleStub('en'),
             $this->formatter,
             $this,
-            new CurrencyStubProvider()
+            new CurrencyListProviderStub()
         );
 
         $this->viewType = ViewTypeProviderInterface::VIEW_TYPE_FULL_NAME;
