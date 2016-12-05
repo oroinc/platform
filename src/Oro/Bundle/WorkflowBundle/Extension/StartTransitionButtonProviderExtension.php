@@ -7,14 +7,10 @@ use Doctrine\Common\Collections\Collection;
 use Oro\Bundle\ActionBundle\Button\ButtonContext;
 use Oro\Bundle\ActionBundle\Button\ButtonInterface;
 use Oro\Bundle\ActionBundle\Button\ButtonSearchContext;
-use Oro\Bundle\ActionBundle\Exception\UnsupportedButtonException;
-use Oro\Bundle\ActionBundle\Extension\ButtonProviderExtensionInterface;
-use Oro\Bundle\ActionBundle\Model\OperationRegistry;
-use Oro\Bundle\ActionBundle\Provider\RouteProviderInterface;
 
+use Oro\Bundle\WorkflowBundle\Button\StartTransitionButton;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
 use Oro\Bundle\WorkflowBundle\Model\Transition;
-use Oro\Bundle\WorkflowBundle\Model\TransitionButton;
 use Oro\Bundle\WorkflowBundle\Model\Workflow;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowData;
 
@@ -22,7 +18,7 @@ class StartTransitionButtonProviderExtension extends AbstractButtonProviderExten
 {
     /**
      * {@inheritdoc}
-     * @param TransitionButton $button
+     * @param StartTransitionButton $button
      */
     public function isAvailable(
         ButtonInterface $button,
@@ -56,7 +52,7 @@ class StartTransitionButtonProviderExtension extends AbstractButtonProviderExten
      */
     public function supports(ButtonInterface $button)
     {
-        return $button instanceof TransitionButton && $button->getTransition()->isStart();
+        return $button instanceof StartTransitionButton && $button->getTransition()->isStart();
     }
 
     /**
@@ -113,6 +109,6 @@ class StartTransitionButtonProviderExtension extends AbstractButtonProviderExten
         Workflow $workflow,
         ButtonContext $buttonContext
     ) {
-        return new TransitionButton($transition, $workflow, $buttonContext);
+        return new StartTransitionButton($transition, $workflow, $buttonContext);
     }
 }
