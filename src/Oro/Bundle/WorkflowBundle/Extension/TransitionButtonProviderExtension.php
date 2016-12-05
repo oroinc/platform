@@ -88,6 +88,7 @@ class TransitionButtonProviderExtension extends AbstractButtonProviderExtension
             $workflow->getDefinition()->getRelatedEntity() === $searchContext->getEntityClass()
         ) {
             $transitions = $workflow->getTransitionManager()->getTransitions()->toArray();
+
             return array_filter($transitions, function (Transition $transition) {
                 return !$transition->isStart();
             });
@@ -110,6 +111,7 @@ class TransitionButtonProviderExtension extends AbstractButtonProviderExtension
     /**
      * @param Workflow $workflow
      * @param ButtonSearchContext $searchContext
+     *
      * @return null|WorkflowItem
      */
     protected function getWorkflowItem(Workflow $workflow, ButtonSearchContext $searchContext)

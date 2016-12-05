@@ -35,14 +35,12 @@ abstract class AbstractButtonProviderExtension implements ButtonProviderExtensio
         $this->routeProvider = $routeProvider;
     }
 
-
     /**
      * {@inheritdoc}
      */
     public function find(ButtonSearchContext $buttonSearchContext)
     {
         $buttons = [];
-
         $group = $buttonSearchContext->getGroup();
 
         // Skip if custom buttons group defined
@@ -94,6 +92,7 @@ abstract class AbstractButtonProviderExtension implements ButtonProviderExtensio
 
     /**
      * @param ButtonInterface $button
+     *
      * @return UnsupportedButtonException
      */
     protected function createUnsupportedButtonException(ButtonInterface $button)
@@ -114,7 +113,6 @@ abstract class AbstractButtonProviderExtension implements ButtonProviderExtensio
      * @return Transition[]
      */
     abstract protected function getTransitions(Workflow $workflow, ButtonSearchContext $searchContext);
-
 
     /**
      * @param Transition $transition

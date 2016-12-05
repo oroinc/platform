@@ -892,8 +892,8 @@ class WorkflowDefinition implements DomainObjectInterface
      */
     public function getDatagrids()
     {
-        return array_key_exists(self::CONFIG_DATAGRIDS, $this->configuration) ?
-            (array)$this->configuration[self::CONFIG_DATAGRIDS]
+        return array_key_exists(self::CONFIG_DATAGRIDS, $this->configuration)
+            ? (array)$this->configuration[self::CONFIG_DATAGRIDS]
             : [];
     }
 }

@@ -94,6 +94,7 @@ class StartTransitionButtonProviderExtension extends AbstractButtonProviderExten
     /**
      * @param $value
      * @param array|null $data
+     *
      * @return array
      */
     private function getNodeInitTransitions($value, array $data = null)

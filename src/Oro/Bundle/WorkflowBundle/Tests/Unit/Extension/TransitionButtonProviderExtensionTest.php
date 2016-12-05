@@ -7,8 +7,11 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Oro\Bundle\ActionBundle\Button\ButtonContext;
 use Oro\Bundle\ActionBundle\Button\ButtonInterface;
 use Oro\Bundle\ActionBundle\Button\ButtonSearchContext;
+use Oro\Bundle\ActionBundle\Exception\UnsupportedButtonException;
 use Oro\Bundle\ActionBundle\Provider\RouteProviderInterface;
+
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
+
 use Oro\Bundle\WorkflowBundle\Entity\Repository\WorkflowItemRepository;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
@@ -171,7 +174,7 @@ class TransitionButtonProviderExtensionTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \Oro\Bundle\ActionBundle\Exception\UnsupportedButtonException
+     * @expectedException UnsupportedButtonException
      */
     public function testIsAvailableWhenButtonNotSupported()
     {
@@ -219,6 +222,7 @@ class TransitionButtonProviderExtensionTest extends \PHPUnit_Framework_TestCase
                 ->disableOriginalConstructor()->getMock();
             $button->expects($this->any())->method('getWorkflow')->willReturn($workflow);
             $button->expects($this->any())->method('getTransition')->willReturn($transition);
+
             return $button;
         };
 
