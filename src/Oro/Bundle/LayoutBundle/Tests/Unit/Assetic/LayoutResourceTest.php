@@ -5,6 +5,9 @@ namespace Oro\Bundle\LayoutBundle\Tests\Unit\Assetic;
 use Oro\Bundle\LayoutBundle\Assetic\LayoutResource;
 use Oro\Component\Layout\Extension\Theme\Model\ThemeManager;
 use Oro\Component\Layout\Extension\Theme\Model\ThemeFactory;
+
+use Psr\Log\LoggerInterface;
+
 use Symfony\Component\Filesystem\Filesystem;
 
 class LayoutResourceTest extends \PHPUnit_Framework_TestCase
@@ -22,6 +25,7 @@ class LayoutResourceTest extends \PHPUnit_Framework_TestCase
             new Filesystem(),
             __DIR__
         );
+        $this->layoutResource->setLogger($this->getMock(LoggerInterface::class));
     }
 
     protected function tearDown()
@@ -46,7 +50,7 @@ class LayoutResourceTest extends \PHPUnit_Framework_TestCase
     protected function getThemes()
     {
         $asset = [
-            'inputs' => ['styles.css', 'styles.scss', 'styles.less'],
+            'inputs' => ['sample_data/styles.css', 'styles.scss', 'styles.less'],
             'filters' => ['filters'],
             'output' => 'output.css',
         ];
@@ -91,7 +95,12 @@ class LayoutResourceTest extends \PHPUnit_Framework_TestCase
 
     public function testIsFresh()
     {
-        $this->assertTrue($this->layoutResource->isFresh(1));
+        $now = time();
+
+        touch(__DIR__ . '/sample_data/styles.css');
+
+        $this->assertFalse($this->layoutResource->isFresh($now + 1000));
+        $this->assertTrue($this->layoutResource->isFresh($now - 1000));
     }
 
     public function testToString()

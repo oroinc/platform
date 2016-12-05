@@ -4,6 +4,8 @@ namespace Oro\Bundle\ActionBundle\Button;
 
 interface ButtonInterface
 {
+    const DEFAULT_GROUP = '';
+
     /**
      * @return int
      */

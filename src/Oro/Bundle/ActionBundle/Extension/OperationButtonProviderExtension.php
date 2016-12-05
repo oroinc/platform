@@ -11,6 +11,7 @@ use Oro\Bundle\ActionBundle\Button\OperationButton;
 use Oro\Bundle\ActionBundle\Exception\UnsupportedButtonException;
 use Oro\Bundle\ActionBundle\Helper\ContextHelper;
 use Oro\Bundle\ActionBundle\Model\ActionData;
+use Oro\Bundle\ActionBundle\Model\Criteria\OperationFindCriteria;
 use Oro\Bundle\ActionBundle\Model\Operation;
 use Oro\Bundle\ActionBundle\Model\OperationRegistry;
 use Oro\Bundle\ActionBundle\Provider\RouteProviderInterface;
@@ -134,10 +135,7 @@ class OperationButtonProviderExtension implements ButtonProviderExtensionInterfa
     protected function getOperations(ButtonSearchContext $buttonSearchContext)
     {
         return $this->operationRegistry->find(
-            $buttonSearchContext->getEntityClass(),
-            $buttonSearchContext->getRouteName(),
-            $buttonSearchContext->getDatagrid(),
-            $buttonSearchContext->getGroup()
+            OperationFindCriteria::createFromButtonSearchContext($buttonSearchContext)
         );
     }
 

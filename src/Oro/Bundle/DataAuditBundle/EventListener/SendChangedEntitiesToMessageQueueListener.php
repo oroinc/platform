@@ -161,6 +161,10 @@ class SendChangedEntitiesToMessageQueueListener implements OptionalListenerInter
                 if ($securityToken instanceof OrganizationContextTokenInterface) {
                     $body['organization_id'] = $securityToken->getOrganizationContext()->getId();
                 }
+
+                if ($securityToken->hasAttribute('IMPERSONATION')) {
+                    $body['impersonation_id'] = $securityToken->getAttribute('IMPERSONATION');
+                }
             }
 
             $body['entities_inserted'] = $this->processInsertions($em);

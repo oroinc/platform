@@ -10,6 +10,7 @@ use Oro\Bundle\ActionBundle\Exception\UnsupportedButtonException;
 use Oro\Bundle\ActionBundle\Extension\OperationButtonProviderExtension;
 use Oro\Bundle\ActionBundle\Helper\ContextHelper;
 use Oro\Bundle\ActionBundle\Model\ActionData;
+use Oro\Bundle\ActionBundle\Model\Criteria\OperationFindCriteria;
 use Oro\Bundle\ActionBundle\Model\Operation;
 use Oro\Bundle\ActionBundle\Model\OperationRegistry;
 use Oro\Bundle\ActionBundle\Provider\RouteProviderInterface;
@@ -256,12 +257,7 @@ class OperationButtonProviderExtensionTest extends \PHPUnit_Framework_TestCase
     {
         $this->operationRegistry->expects($this->once())
             ->method('find')
-            ->with(
-                $buttonSearchContext->getEntityClass(),
-                $buttonSearchContext->getRouteName(),
-                $buttonSearchContext->getDatagrid(),
-                $buttonSearchContext->getGroup()
-            )
+            ->with(OperationFindCriteria::createFromButtonSearchContext($buttonSearchContext))
             ->willReturn($operations);
     }
 

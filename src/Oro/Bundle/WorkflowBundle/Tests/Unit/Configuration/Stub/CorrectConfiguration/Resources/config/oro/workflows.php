@@ -55,6 +55,9 @@ return [
                 ]
             ]
         ],
+        'disable_operations' => [
+            'operation1' => ['entity1', 'entity2']
+        ],
         'transitions' => [
             'first_transition' => [
                 'step_to' => 'first_step',
@@ -185,6 +188,7 @@ return [
                 'position' => []
             ]
         ],
+        'disable_operations' => [],
         'attributes' => [],
         'transitions' => [
             'second_transition' => [

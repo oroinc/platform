@@ -376,6 +376,37 @@ class SendChangedEntitiesToMessageQueueListenerTest extends WebTestCase
         $this->assertSame(123, $message->getBody()['organization_id']);
     }
 
+    public function testShouldSendImpersonationInfoIfPresent()
+    {
+        $organization = new Organization();
+        $organization->setId(123);
+
+        $token = new OrganizationToken($organization);
+        $token->setAttribute('IMPERSONATION', 69);
+
+        /** @var TokenStorageInterface $tokenStorage */
+        $tokenStorage = $this->getContainer()->get('security.token_storage');
+        $tokenStorage->setToken($token);
+
+        $em = $this->getEntityManager();
+
+        $entity = new TestAuditDataOwner();
+        $entity->setStringProperty('aString');
+        $em->persist($entity);
+        $em->flush();
+
+        $sentMessages = self::getSentMessages();
+        $this->assertCount(1, $sentMessages);
+
+        //guard
+        $this->assertEquals(Topics::ENTITIES_CHANGED, $sentMessages[0]['topic']);
+
+        $message = $sentMessages[0]['message'];
+
+        $this->assertArrayHasKey('impersonation_id', $message->getBody());
+        $this->assertSame(69, $message->getBody()['impersonation_id']);
+    }
+
     /**
      * @return EntityManagerInterface
      */

@@ -27,6 +27,11 @@ class HierarchyCollection
     protected $hierarchy = [];
 
     /**
+     * @var array
+     */
+    protected $offsets = [];
+
+    /**
      * Returns the identifier of the root item
      *
      * @return string
@@ -78,11 +83,14 @@ class HierarchyCollection
      * @param array       $children  The child hierarchy
      *
      * @throws Exception\LogicException if the operation failed
+     *
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
-    public function add(array $parentPath, $id, $siblingId = null, $prepend = false, array $children = [])
+    public function add(array $parentPath, $id, $siblingId = null, $prepend = null, array $children = [])
     {
         $current          = &$this->hierarchy;
         $parentPathLength = count($parentPath);
+        $key              = null;
         for ($i = 0; $i < $parentPathLength; $i++) {
             if (!isset($current[$parentPath[$i]])) {
                 if ($i === 0) {
@@ -106,7 +114,8 @@ class HierarchyCollection
                     );
                 }
             }
-            $current = &$current[$parentPath[$i]];
+            $key = $parentPath[$i];
+            $current = &$current[$key];
         }
         if (isset($current[$id])) {
             throw new Exception\LogicException(
@@ -120,7 +129,19 @@ class HierarchyCollection
         if (!$siblingId) {
             if ($prepend && !empty($current)) {
                 $current = array_merge([$id => $children], $current);
+            } elseif ($prepend === false) {
+                $current[$id] = $children;
+                if (!array_key_exists($key, $this->offsets)) {
+                    $this->offsets[$key] = 0;
+                }
+                $this->offsets[$key]--;
             } else {
+                if (array_key_exists($key, $this->offsets)) {
+                    $offset = $this->offsets[$key];
+                    $firstPart = array_slice($current, 0, count($current) + $offset, true);
+                    $lastPart = array_slice($current, $offset, null, true);
+                    $current = array_merge($firstPart, [$id => $children], $lastPart);
+                }
                 $current[$id] = $children;
             }
         } elseif (!isset($current[$siblingId])) {

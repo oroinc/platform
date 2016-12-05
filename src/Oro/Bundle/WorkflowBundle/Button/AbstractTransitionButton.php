@@ -77,7 +77,7 @@ abstract class AbstractTransitionButton implements ButtonInterface
      */
     public function getGroup()
     {
-        return OperationRegistry::DEFAULT_GROUP;
+        return ButtonInterface::DEFAULT_GROUP;
     }
 
     /**
