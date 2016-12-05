@@ -385,8 +385,3 @@ services:
             - '@doctrine'
         tags:
             - { name: oro_action.operation_registry.filter }
-
-    oro_workflow.transition_view_data.manager:
-        class: 'Oro\Bundle\WorkflowBundle\Model\TransitionViewDataManager'
-        arguments:
-            - '@oro_workflow.manager'
