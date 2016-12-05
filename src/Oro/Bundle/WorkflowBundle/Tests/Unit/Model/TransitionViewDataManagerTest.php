@@ -34,7 +34,6 @@ class TransitionViewDataManagerTest extends \PHPUnit_Framework_TestCase
         $this->transition->expects($this->once())->method('isHidden')->willReturn(false);
         $this->transition->expects($this->any())->method('isEmptyInitOptions')->willReturn(true);
         $this->transition->expects($this->once())->method('getName')->willReturn('test');
-
     }
 
     /**

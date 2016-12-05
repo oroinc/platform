@@ -26,11 +26,9 @@ use Oro\Bundle\WorkflowBundle\Model\Transition;
 use Oro\Bundle\WorkflowBundle\Model\Workflow;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowData;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowManager;
-use Oro\Bundle\WorkflowBundle\Serializer\WorkflowAwareSerializer;
 
 /**
  * @Route("/workflowwidget")
- * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
 class WidgetController extends Controller
 {
@@ -78,8 +76,6 @@ class WidgetController extends Controller
      *      name="oro_workflow_widget_start_transition_form"
      * )
      *
-     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
-     *
      * @param string $transitionName
      * @param string $workflowName
      * @param Request $request
@@ -87,16 +83,14 @@ class WidgetController extends Controller
      */
     public function startTransitionFormAction($transitionName, $workflowName, Request $request)
     {
-        //TODO: refactor method in https://magecore.atlassian.net/browse/BB-5253
         $entityId = $request->get('entityId', 0);
-
         /** @var WorkflowManager $workflowManager */
         $workflowManager = $this->get('oro_workflow.manager');
         $workflow = $workflowManager->getWorkflow($workflowName);
         $entityClass = $workflow->getDefinition()->getRelatedEntity();
         $transition = $workflow->getTransitionManager()->extractTransition($transitionName);
-
         $dataArray = [];
+
         if (!$transition->isEmptyInitOptions()) {
             $contextAttribute = $transition->getInitContextAttribute();
             $dataArray[$contextAttribute] = $this->get('oro_action.provider.button_search_context')
@@ -105,53 +99,25 @@ class WidgetController extends Controller
         }
 
         $entity = $this->getOrCreateEntityReference($entityClass, $entityId);
-
-        /** @var DoctrineHelper $doctrineHelper */
-        $doctrineHelper = $this->get('oro_entity.doctrine_helper');
-
-        $workflowItem = $workflow->createWorkflowItem($entity, $dataArray);
-        $transition = $workflow->getTransitionManager()->extractTransition($transitionName);
+        $workflowItem = $workflow->createWorkflowItem($entity);
         $transitionForm = $this->getTransitionForm($workflowItem, $transition);
+        $formOptions = $transition->getFormOptions();
+        $formAttributes = $workflowItem->getData()->getValues(
+            array_keys($formOptions['attribute_fields'])
+        );
+
+        $saved = $this->get('oro_workflow.handler.transition.form')
+            ->handleTransitionForm($transitionForm, $formAttributes);
 
         $data = null;
-        $saved = false;
-        if ($request->isMethod('POST')) {
-            $transitionForm->submit($request);
-
-            if ($transitionForm->isValid()) {
-                // Create new WorkflowData instance with all data required to start.
-                // Original WorkflowData can not be used, as some attributes may be set by reference
-                // So, serialized data will not contain all required data.
-                $formOptions = $transition->getFormOptions();
-                $attributes = array_keys($formOptions['attribute_fields']);
-
-                $formAttributes = $workflowItem->getData()->getValues($attributes);
-                foreach ($formAttributes as $value) {
-                    // Need to persist all new entities to allow serialization
-                    // and correct passing to API start method of all input data.
-                    // Form validation already performed, so all these entities are valid
-                    // and they can be used in workflow start action.
-                    if (is_object($value) && $doctrineHelper->isManageableEntity($value)) {
-                        $entityManager = $doctrineHelper->getEntityManager($value);
-                        $unitOfWork = $entityManager->getUnitOfWork();
-                        if (!$unitOfWork->isInIdentityMap($value) || $unitOfWork->isScheduledForInsert($value)) {
-                            $entityManager->persist($value);
-                            $entityManager->flush($value);
-                        }
-                    }
-                }
-
-                /** @var WorkflowAwareSerializer $serializer */
-                $serializer = $this->get('oro_workflow.serializer.data.serializer');
-                $serializer->setWorkflowName($workflow->getName());
-                $data = $serializer->serialize(new WorkflowData(array_merge($formAttributes, $dataArray)), 'json');
-                $saved = true;
-
-                $response = $this->get('oro_workflow.handler.start_transition_handler')
-                    ->handle($workflow, $transition, $data, $entity);
-                if ($response) {
-                    return $response;
-                }
+        if ($saved) {
+            $serializer = $this->get('oro_workflow.serializer.data.serializer');
+            $serializer->setWorkflowName($workflow->getName());
+            $data = $serializer->serialize(new WorkflowData(array_merge($formAttributes, $dataArray)), 'json');
+            $response = $this->get('oro_workflow.handler.start_transition_handler')
+                ->handle($workflow, $transition, $data, $entity);
+            if ($response) {
+                return $response;
             }
         }
 
