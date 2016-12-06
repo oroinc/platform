@@ -58,11 +58,19 @@ class Impersonation
      */
     protected $loginAt;
 
+    /**
+     * @var string $ipAddress
+     *
+     * @ORM\Column(name="ip_address", type="string", length=255, nullable=false, options={"default": "127.0.0.1"})
+     */
+    protected $ipAddress;
+
     public function __construct()
     {
         $this->token = bin2hex(hash('sha1', uniqid(mt_rand(), true), true));
         $this->expireAt = new \DateTime('now', new \DateTimeZone('UTC'));
         $this->notify = true;
+        $this->ipAddress = '127.0.0.1';
     }
 
     /**
@@ -154,5 +162,23 @@ class Impersonation
     public function hasNotify()
     {
         return $this->notify;
+    }
+
+    /**
+     * @param string $ipAddress The IP address of the impersonator
+     */
+    public function setIpAddress($ipAddress)
+    {
+        $this->ipAddress = $ipAddress;
+
+        return $this;
+    }
+
+    /**
+     * @return string The IP address of the impersonator
+     */
+    public function getIpAddress()
+    {
+        return $this->ipAddress;
     }
 }

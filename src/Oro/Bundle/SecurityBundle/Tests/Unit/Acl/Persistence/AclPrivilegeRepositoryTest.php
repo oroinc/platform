@@ -36,9 +36,6 @@ class AclPrivilegeRepositoryTest extends \PHPUnit_Framework_TestCase
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     private $aceProvider;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
-    private $translator;
-
     protected function setUp()
     {
         $this->extension = $this->getMock('Oro\Bundle\SecurityBundle\Acl\Extension\AclExtensionInterface');
@@ -90,11 +87,7 @@ class AclPrivilegeRepositoryTest extends \PHPUnit_Framework_TestCase
             ->method('getAceProvider')
             ->will($this->returnValue($this->aceProvider));
 
-        $this->translator = $this->getMockBuilder('Symfony\Component\Translation\TranslatorInterface')
-            ->disableOriginalConstructor()
-            ->getMockForAbstractClass();
-
-        $this->repository = new AclPrivilegeRepository($this->manager, $this->translator);
+        $this->repository = new AclPrivilegeRepository($this->manager);
     }
 
     public function testGetPermissionNames()
@@ -295,10 +288,6 @@ class AclPrivilegeRepositoryTest extends \PHPUnit_Framework_TestCase
                     }
                 )
             );
-
-        $this->translator->expects($this->exactly(2))
-            ->method('trans')
-            ->will($this->returnArgument(0));
 
         $result = $this->repository->getPrivileges($sid);
 

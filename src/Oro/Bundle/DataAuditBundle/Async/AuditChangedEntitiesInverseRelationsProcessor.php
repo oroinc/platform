@@ -1,11 +1,14 @@
 <?php
+
 namespace Oro\Bundle\DataAuditBundle\Async;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\EntityManagerInterface;
+
 use Oro\Bundle\DataAuditBundle\Model\EntityReference;
 use Oro\Bundle\DataAuditBundle\Service\EntityChangesToAuditEntryConverter;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
+use Oro\Bundle\UserBundle\Entity\Impersonation;
 use Oro\Component\MessageQueue\Client\TopicSubscriberInterface;
 use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
 use Oro\Component\MessageQueue\Transport\MessageInterface;
@@ -52,6 +55,11 @@ class AuditChangedEntitiesInverseRelationsProcessor implements MessageProcessorI
             $organization = new EntityReference(Organization::class, $body['organization_id']);
         }
 
+        $impersonation = new EntityReference();
+        if (isset($body['impersonation_id'])) {
+            $impersonation = new EntityReference(Impersonation::class, $body['impersonation_id']);
+        }
+
         $map = [];
 
         // one to one, one to many, many to many inverse side
@@ -70,7 +78,8 @@ class AuditChangedEntitiesInverseRelationsProcessor implements MessageProcessorI
             $transactionId,
             $loggedAt,
             $user,
-            $organization
+            $organization,
+            $impersonation
         );
 
         return self::ACK;

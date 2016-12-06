@@ -59,6 +59,10 @@ define(function(require) {
             var permission = data.identityId + '::' + data.permissionName;
             var category = data.category;
 
+            if (_.isUndefined(category)) {
+                return;
+            }
+
             // update changes information
             if (data.isInitialValue) {
                 delete this.changesByCategory[category][permission];

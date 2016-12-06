@@ -203,12 +203,13 @@ class AclProtectedFieldTypeExtension extends AbstractTypeExtension
             return false;
         }
 
-        try {
-            $securityConfig    = $this->configProvider->getConfig($className);
-            $isFieldAclEnabled = ($securityConfig->get('field_acl_supported')
-                && $securityConfig->get('field_acl_enabled'));
+        if ($this->configProvider->hasConfig($className)) {
+            $securityConfig = $this->configProvider->getConfig($className);
+            $isFieldAclEnabled =
+                $securityConfig->get('field_acl_supported')
+                && $securityConfig->get('field_acl_enabled');
             $this->showRestricted = $securityConfig->get('show_restricted_fields');
-        } catch (\Exception $e) {
+        } else {
             $isFieldAclEnabled = false;
             $this->showRestricted = true;
         }

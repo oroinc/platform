@@ -8,7 +8,7 @@
     flex: $page-sidebar-flex;
 }
 
-@include breakpoint('tablet-small') {
+@include breakpoint('tablet') {
     .page-sidebar {
         width: $page-sidebar-tablet-s-width;
         margin: $page-sidebar-tablet-s-offset;

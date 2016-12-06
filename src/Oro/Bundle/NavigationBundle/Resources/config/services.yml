@@ -257,7 +257,6 @@ services:
           - '@oro_navigation.title_config_reader'
           - '@oro_navigation.title_translator'
           - '@doctrine.orm.entity_manager'
-          - '@serializer'
           - '@oro_config.user'
           - '@oro_navigation.chain_breadcrumb_manager.link'
           - '@oro_navigation.title_provider'

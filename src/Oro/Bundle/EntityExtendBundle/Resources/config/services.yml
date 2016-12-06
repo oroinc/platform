@@ -277,6 +277,15 @@ services:
         tags:
             - { name: oro_migration.extension, extension_name: extend }
 
+    oro_entity_extend.migration.extension.converToExtend:
+        class: Oro\Bundle\EntityExtendBundle\Migration\Extension\ConvertToExtendExtension
+        arguments:
+            - "@oro_entity_extend.migration.options_manager"
+            - "@oro_entity_extend.migration.entity_metadata_helper"
+            - "@oro_entity_config.config_model_manager"
+        tags:
+            - { name: oro_migration.extension, extension_name: conver_to_extend }
+
     oro_entity_extend.migration.extension.rename:
         class: %oro_entity_extend.migration.extension.rename.class%
         arguments:

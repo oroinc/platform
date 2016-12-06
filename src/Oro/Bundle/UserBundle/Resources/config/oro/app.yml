@@ -42,3 +42,24 @@ security:
             guard:
                 authenticators:
                     - oro_user.impersonation_authenticator
+
+oro_user:
+    privileges:
+        entity:
+            label: 'oro.user.privileges.entity.label'
+            view_type: 'grid'
+            types:
+                - 'entity'
+            field_type: 'oro_acl_access_level_selector'
+            fix_values: false
+            default_value: 5
+            show_default: true
+        action:
+            label: 'oro.user.privileges.action.label'
+            view_type: 'list'
+            types:
+                - 'action'
+            field_type: 'oro_acl_access_level_selector'
+            fix_values: false
+            default_value: 1
+            show_default: false

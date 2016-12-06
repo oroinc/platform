@@ -12,6 +12,9 @@ use Oro\Bundle\WorkflowBundle\Entity\WorkflowEntityAcl;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Model\Step;
 use Oro\Bundle\WorkflowBundle\Model\StepManager;
+use Oro\Bundle\WorkflowBundle\Model\Transition;
+use Oro\Bundle\WorkflowBundle\Model\TransitionManager;
+use Oro\Bundle\WorkflowBundle\Model\Workflow;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowAssembler;
 
 class WorkflowDefinitionConfigurationBuilderTest extends \PHPUnit_Framework_TestCase
@@ -58,48 +61,16 @@ class WorkflowDefinitionConfigurationBuilderTest extends \PHPUnit_Framework_Test
      * @param array $expectedData
      * @param array $expectedAcls
      * @dataProvider buildFromConfigurationDataProvider
-     *
-     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
-     * @SuppressWarnings(PHPMD.NPathComplexity)
      */
     public function testBuildFromConfiguration(array $inputData, array $expectedData, array $expectedAcls = [])
     {
         $workflowConfiguration = current($inputData);
+        $definition = new WorkflowDefinition();
+        $definition->setConfiguration($workflowConfiguration);
 
-        $steps = [];
-        if (!empty($workflowConfiguration[WorkflowConfiguration::NODE_STEPS])) {
-            foreach ($workflowConfiguration[WorkflowConfiguration::NODE_STEPS] as $stepData) {
-                $step = new Step();
-                $step->setName($stepData['name']);
-                if (!empty($stepData['entity_acl'])) {
-                    $step->setEntityAcls($stepData['entity_acl']);
-                }
-                if (array_key_exists('is_final', $stepData)) {
-                    $step->setFinal($stepData['is_final']);
-                }
-                $steps[] = $step;
-            }
-        }
-        if (!empty($workflowConfiguration['start_step'])) {
-            $step = new Step();
-            $step->setName($workflowConfiguration['start_step']);
-            $steps[] = $step;
-        }
-        $stepManager = new StepManager($steps);
-
-        $attributes = [];
-        if (!empty($workflowConfiguration[WorkflowConfiguration::NODE_ATTRIBUTES])) {
-            foreach ($workflowConfiguration[WorkflowConfiguration::NODE_ATTRIBUTES] as $attributeData) {
-                $attribute = new Attribute();
-                $attribute->setName($attributeData['name']);
-                $attribute->setType($attributeData['type']);
-                if (!empty($attributeData['entity_acl'])) {
-                    $attribute->setEntityAcl($attributeData['entity_acl']);
-                }
-                $attributes[] = $attribute;
-            }
-        }
-        $attributeManager = new AttributeManager($attributes);
+        $stepManager = new StepManager($this->getSteps($workflowConfiguration));
+        $attributeManager = new AttributeManager($this->getAttributes($workflowConfiguration));
+        $transitionManager = new TransitionManager($this->getTransitions($workflowConfiguration));
 
         $activeGroups = [];
         $recordGroups = [];
@@ -116,9 +87,10 @@ class WorkflowDefinitionConfigurationBuilderTest extends \PHPUnit_Framework_Test
             );
         }
 
-        $workflow = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Model\Workflow')
+        /** @var Workflow|\PHPUnit_Framework_MockObject_MockObject $workflow */
+        $workflow = $this->getMockBuilder(Workflow::class)
             ->disableOriginalConstructor()
-            ->setMethods(['getStepManager', 'getAttributeManager', 'getRestrictions'])
+            ->setMethods(['getStepManager', 'getAttributeManager', 'getRestrictions', 'getTransitionManager'])
             ->getMock();
         $workflow->expects($this->any())
             ->method('getStepManager')
@@ -126,9 +98,13 @@ class WorkflowDefinitionConfigurationBuilderTest extends \PHPUnit_Framework_Test
         $workflow->expects($this->any())
             ->method('getAttributeManager')
             ->will($this->returnValue($attributeManager));
+        $workflow->expects($this->once())
+            ->method('getTransitionManager')
+            ->willReturn($transitionManager);
         $workflow->expects($this->any())
             ->method('getRestrictions')
             ->will($this->returnValue([]));
+        $workflow->setDefinition($definition);
 
         $this->workflowAssembler->expects($this->once())
             ->method('assemble')
@@ -158,6 +134,8 @@ class WorkflowDefinitionConfigurationBuilderTest extends \PHPUnit_Framework_Test
 
     /**
      * @return array
+     *
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
     public function buildFromConfigurationDataProvider()
     {
@@ -211,6 +189,14 @@ class WorkflowDefinitionConfigurationBuilderTest extends \PHPUnit_Framework_Test
                     'options' => ['class' => 'TestClass']
                 ],
             ],
+            WorkflowConfiguration::NODE_TRANSITIONS => [
+                [
+                    'name' => 'transit1',
+                    WorkflowConfiguration::NODE_INIT_ENTITIES => ['entity1', 'entity2'],
+                    WorkflowConfiguration::NODE_INIT_ROUTES => ['route1', 'route2'],
+                    'is_start' => true,
+                ],
+            ],
         ];
 
         return [
@@ -238,7 +224,21 @@ class WorkflowDefinitionConfigurationBuilderTest extends \PHPUnit_Framework_Test
                     'entity' => 'My\Entity',
                     'defaults' => ['active' => false],
                     'priority' => 1,
-                    'configuration' => $this->filterConfiguration($maximumConfiguration),
+                    'configuration' => $this->filterConfiguration(
+                        array_merge(
+                            $maximumConfiguration,
+                            [
+                                WorkflowConfiguration::NODE_INIT_ENTITIES => [
+                                    'entity1' => ['transit1'],
+                                    'entity2' => ['transit1'],
+                                ],
+                                WorkflowConfiguration::NODE_INIT_ROUTES => [
+                                    'route1' => ['transit1'],
+                                    'route2' => ['transit1'],
+                                ],
+                            ]
+                        )
+                    ),
                 ],
                 'expected_acls' => [
                     [
@@ -268,6 +268,8 @@ class WorkflowDefinitionConfigurationBuilderTest extends \PHPUnit_Framework_Test
             WorkflowConfiguration::NODE_ATTRIBUTES,
             WorkflowConfiguration::NODE_TRANSITIONS,
             WorkflowConfiguration::NODE_TRANSITION_DEFINITIONS,
+            WorkflowConfiguration::NODE_INIT_ENTITIES,
+            WorkflowConfiguration::NODE_INIT_ROUTES,
         ];
 
         return array_intersect_key($configuration, array_flip($configurationKeys));
@@ -328,5 +330,96 @@ class WorkflowDefinitionConfigurationBuilderTest extends \PHPUnit_Framework_Test
 
         $this->setExpectedException(\Exception::class, 'interrupted by extension');
         $this->builder->buildOneFromConfiguration($name, $configuration);
+    }
+
+    /**
+     * @param array $configuration
+     *
+     * @return Step[]
+     */
+    private function getSteps(array $configuration)
+    {
+        $steps = [];
+        if (!empty($configuration[WorkflowConfiguration::NODE_STEPS])) {
+            foreach ($configuration[WorkflowConfiguration::NODE_STEPS] as $stepData) {
+                $step = new Step();
+                $step->setName($stepData['name']);
+                if (!empty($stepData['entity_acl'])) {
+                    $step->setEntityAcls($stepData['entity_acl']);
+                }
+                if (array_key_exists('is_final', $stepData)) {
+                    $step->setFinal($stepData['is_final']);
+                }
+                $steps[] = $step;
+            }
+        }
+        if (!empty($configuration['start_step'])) {
+            $step = new Step();
+            $step->setName($configuration['start_step']);
+            $steps[] = $step;
+        }
+
+        return $steps;
+    }
+
+    /**
+     * @param array $configuration
+     *
+     * @return Attribute[]
+     */
+    private function getAttributes(array $configuration)
+    {
+        $attributes = [];
+        if (!empty($configuration[WorkflowConfiguration::NODE_ATTRIBUTES])) {
+            foreach ($configuration[WorkflowConfiguration::NODE_ATTRIBUTES] as $attributeData) {
+                $attribute = new Attribute();
+                $attribute->setName($attributeData['name'])
+                    ->setType($attributeData['type']);
+                if (!empty($attributeData['entity_acl'])) {
+                    $attribute->setEntityAcl($attributeData['entity_acl']);
+                }
+                $attributes[] = $attribute;
+            }
+        }
+
+        return $attributes;
+    }
+
+    /**
+     * @param array $configuration
+     *
+     * @return Transition[]
+     */
+    private function getTransitions(array $configuration)
+    {
+        $transitions = [];
+        if (!empty($configuration[WorkflowConfiguration::NODE_TRANSITIONS])) {
+            foreach ($configuration[WorkflowConfiguration::NODE_TRANSITIONS] as $transitionData) {
+                $transition = new Transition();
+                $transition
+                    ->setStart($this->getOption($transitionData, 'is_start', false))
+                    ->setName($transitionData['name'])
+                    ->setInitEntities($this->getOption($transitionData, WorkflowConfiguration::NODE_INIT_ENTITIES, []))
+                    ->setInitRoutes($this->getOption($transitionData, WorkflowConfiguration::NODE_INIT_ROUTES, []))
+                    ->setInitContextAttribute(
+                        $this->getOption($transitionData, WorkflowConfiguration::NODE_INIT_CONTEXT_ATTRIBUTE, '')
+                    );
+                $transitions[] = $transition;
+            }
+        }
+
+        return $transitions;
+    }
+
+    /**
+     * @param array $data
+     * @param string $option
+     * @param mixed $default
+     *
+     * @return mixed
+     */
+    private function getOption(array $data, $option, $default = null)
+    {
+        return isset($data[$option]) ? $data[$option] : $default;
     }
 }

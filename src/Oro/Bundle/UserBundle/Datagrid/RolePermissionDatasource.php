@@ -72,7 +72,7 @@ class RolePermissionDatasource extends RolePrivilegeAbstractProvider implements 
             /** @var AclPrivilege $privilege */
             $item = [
                 'identity' => $privilege->getIdentity()->getId(),
-                'entity' => $this->translator->trans($privilege->getIdentity()->getName()),
+                'label' => $privilege->getIdentity()->getName(),
                 'group' => $this->getPrivilegeCategory($privilege, $categories),
                 'permissions' => []
             ];
@@ -99,8 +99,7 @@ class RolePermissionDatasource extends RolePrivilegeAbstractProvider implements 
             /** @var AclPrivilege $privilege */
             $item =  [
                 'identity' => $privilege->getIdentity()->getId(),
-                'name' => $privilege->getIdentity()->getName(),
-                'label' => $this->translator->trans($privilege->getIdentity()->getName()),
+                'label' => $privilege->getIdentity()->getName(),
                 'permissions' => []
             ];
             $result[] = $this->preparePermissions($privilege, $item);

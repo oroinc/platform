@@ -4,6 +4,7 @@ namespace Oro\Bundle\LayoutBundle\Layout\DataProvider;
 
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormInterface;
+use Symfony\Component\Form\FormTypeInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
@@ -34,19 +35,19 @@ abstract class AbstractFormProvider
     /**
      * Build new form
      *
-     * @param string $formName
-     * @param mixed  $data
-     * @param array  $options
-     * @param array  $cacheKeyOptions
+     * @param string|FormTypeInterface $type
+     * @param mixed                    $data
+     * @param array                    $options
+     * @param array                    $cacheKeyOptions
      *
      * @return FormInterface
      */
-    protected function getForm($formName, $data = null, array $options = [], array $cacheKeyOptions = [])
+    protected function getForm($type, $data = null, array $options = [], array $cacheKeyOptions = [])
     {
-        $cacheKey = $this->getCacheKey($formName, $options, $cacheKeyOptions);
+        $cacheKey = $this->getCacheKey($type, $options, $cacheKeyOptions);
 
         if (!array_key_exists($cacheKey, $this->forms)) {
-            $this->forms[$cacheKey] = $this->createForm($formName, $data, $options);
+            $this->forms[$cacheKey] = $this->createForm($type, $data, $options);
         }
 
         return $this->forms[$cacheKey];
@@ -55,18 +56,18 @@ abstract class AbstractFormProvider
     /**
      * Retrieve form view
      *
-     * @param string $formName
-     * @param mixed  $data
-     * @param array  $options
-     * @param array  $cacheKeyOptions
+     * @param string|FormTypeInterface $type
+     * @param mixed                    $data
+     * @param array                    $options
+     * @param array                    $cacheKeyOptions
      *
      * @return FormView
      */
-    protected function getFormView($formName, $data = null, array $options = [], array $cacheKeyOptions = [])
+    protected function getFormView($type, $data = null, array $options = [], array $cacheKeyOptions = [])
     {
-        $cacheKey = $this->getCacheKey($formName, $options, $cacheKeyOptions);
+        $cacheKey = $this->getCacheKey($type, $options, $cacheKeyOptions);
         if (!array_key_exists($cacheKey, $this->formViews)) {
-            $form = $this->getForm($formName, $data, $options, $cacheKeyOptions);
+            $form = $this->getForm($type, $data, $options, $cacheKeyOptions);
 
             $this->formViews[$cacheKey] = $form->createView();
         }
@@ -75,15 +76,15 @@ abstract class AbstractFormProvider
     }
 
     /**
-     * @param string $formName
-     * @param null   $data
-     * @param array  $options
+     * @param string|FormTypeInterface $type
+     * @param null                     $data
+     * @param array                    $options
      *
      * @return FormInterface
      */
-    protected function createForm($formName, $data = null, array $options = [])
+    protected function createForm($type, $data = null, array $options = [])
     {
-        return $this->formFactory->create($formName, $data, $options);
+        return $this->formFactory->create($type, $data, $options);
     }
 
     /**
@@ -91,6 +92,7 @@ abstract class AbstractFormProvider
      *
      * @param string $name
      * @param array  $arguments
+     *
      * @return mixed
      */
     protected function generateUrl($name, array $arguments = [])
@@ -101,17 +103,21 @@ abstract class AbstractFormProvider
     /**
      * Get form cache key
      *
-     * @param string $formName
-     * @param array  $formOptions
-     * @param array  $cacheKeyOptions
+     * @param string|FormTypeInterface $type
+     * @param array                    $formOptions
+     * @param array                    $cacheKeyOptions
      *
      * @return string
      */
-    protected function getCacheKey($formName, array $formOptions = [], array $cacheKeyOptions = [])
+    protected function getCacheKey($type, array $formOptions = [], array $cacheKeyOptions = [])
     {
         $options = array_replace($formOptions, $cacheKeyOptions);
         ksort($options);
 
-        return sprintf('%s:%s', $formName, md5(serialize($options)));
+        if ($type instanceof FormTypeInterface) {
+            $type = get_class($type);
+        }
+
+        return sprintf('%s:%s', $type, md5(serialize($options)));
     }
 }
