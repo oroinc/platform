@@ -124,7 +124,7 @@ class DeleteMassActionExtension extends AbstractExtension
 
         return [
             'type'            => 'delete',
-            'icon'            => 'trash',
+            'icon'            => 'trash-o',
             'label'           => 'oro.grid.action.delete',
             'entity_name'     => $entity,
             'data_identifier' => $this->getDataIdentifier($config),

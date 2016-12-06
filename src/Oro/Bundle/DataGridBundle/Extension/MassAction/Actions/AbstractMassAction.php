@@ -18,7 +18,7 @@ class AbstractMassAction extends AbstractAction implements MassActionInterface
 
         if (!empty($options['icon'])) {
             $options['launcherOptions'] = [
-                'iconClassName' => 'icon-' . $options['icon']
+                'iconClassName' => 'fa-' . $options['icon']
             ];
             unset($options['icon']);
         }

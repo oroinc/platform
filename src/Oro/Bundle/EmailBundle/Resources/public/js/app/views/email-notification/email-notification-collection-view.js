@@ -79,7 +79,7 @@ define(function(require) {
 
         updateViewMode: function() {
             if (!this.isActiveTypeDropDown('notification')) {
-                var $iconEnvelope = this.$el.find('.oro-dropdown-toggle .icon-envelope');
+                var $iconEnvelope = this.$el.find('.oro-dropdown-toggle .fa-envelope');
                 if (this.collection.models.length === 0) {
                     this.setModeDropDownMenu('empty');
                     $iconEnvelope.removeClass('highlight');

@@ -33,7 +33,7 @@ use Oro\Bundle\EmailBundle\Model\ExtendEmail;
  *      routeView="oro_email_thread_view",
  *      defaultValues={
  *          "entity"={
- *              "icon"="icon-envelope"
+ *              "icon"="fa-envelope"
  *          },
  *          "grouping"={
  *              "groups"={"activity"}

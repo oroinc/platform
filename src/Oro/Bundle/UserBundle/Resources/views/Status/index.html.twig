@@ -9,11 +9,11 @@
 
     {% for status in statuses %}
         <div class="alert {% if user.currentStatus == status %}alert-success{% endif %}">
-            <a href="{{ path('oro_user_status_delete', { id: status.id }) }}" class="close" type="button"><i class="icon-trash"></i></a>
+            <a href="{{ path('oro_user_status_delete', { id: status.id }) }}" class="close" type="button"><i class="fa-trash-o"></i></a>
             {% if user.currentStatus != status %}
-                <a href="{{ path('oro_user_status_set_current', { id: status.id }) }}" class="close" type="button"><i class="icon-plus-sign"></i></a>
+                <a href="{{ path('oro_user_status_set_current', { id: status.id }) }}" class="close" type="button"><i class="fa-plus-circle"></i></a>
             {% else %}
-                <a href="{{ path('oro_user_status_clear_current') }}" class="close" type="button"><i class="icon-minus-sign"></i></a>
+                <a href="{{ path('oro_user_status_clear_current') }}" class="close" type="button"><i class="fa-minus-circle"></i></a>
             {% endif %}
             <p>{{ status.createdAt|oro_format_date }}</p>
             <h3>{{ status.status }}</h3>

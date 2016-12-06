@@ -22,7 +22,7 @@ use Oro\Bundle\LocaleBundle\Model\ExtendLocalization;
  *      routeUpdate="oro_locale_localization_update",
  *      defaultValues={
  *          "entity"={
- *              "icon"="icon-list"
+ *              "icon"="fa-list"
  *          },
  *          "security"={
  *              "type"="ACL",
