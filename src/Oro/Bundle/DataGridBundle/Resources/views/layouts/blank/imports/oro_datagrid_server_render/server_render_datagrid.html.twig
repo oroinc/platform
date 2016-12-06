@@ -1,7 +1,9 @@
-{% block server_render_datagrid_widget %}
+{% block __oro_datagrid_server_render__datagrid_widget %}
     {% set datagrid = oro_datagrid_build(grid_name, grid_parameters) %}
+
     {% set gridId = oro_datagrid_generate_element_id(datagrid) %}
     {% set renderParams = grid_render_parameters %}
+    {% set themeOptions = renderParams.themeOptions %}
 
     {% set attr = attr|merge({
         id: gridId
@@ -19,11 +21,13 @@
     {% set datagridMetaData = oro_datagrid_metadata(datagrid) %}
     {% set toolbarOptions = datagridMetaData.options.toolbarOptions %}
 
+    {% do block[id ~ '_toolbar']|merge_context({'datagrid': datagrid}) %}
+    {% do block[id ~ '_header_row']|merge_context({'datagrid': datagrid}) %}
+
     <div{{ block('block_attributes') }}>
         <div class="oro-datagrid">
             {% if toolbarOptions.placement.top %}
                 <div class="toolbar" data-grid-toolbar="top">
-                    {% do block[id ~ '_toolbar']|merge_context({'datagrid': datagrid}) %}
                     {{ block_widget(block[id ~ '_toolbar']) }}
                 </div>
             {% endif %}
@@ -33,21 +37,32 @@
 
                 <div class="container-fluid grid-scrollable-container">
                     <div class="grid-container">
-                        <table class="grid table-hover table table-bordered table-condensed">
-                            <thead class="grid-header">
-                                {% do block[id ~ '_header_row']|merge_context({'datagrid': datagrid}) %}
-                                {{ block_widget(block[id ~ '_header_row']) }}
-                            </thead>
+                        <div class="grid table-hover table table-bordered table-condensed">
+                            {% if themeOptions.headerHide is not defined or themeOptions.headerHide == false %}
+                                <div class="grid-header">
+                                    {{ block_widget(block[id ~ '_header_row']) }}
+                                </div>
+                            {% endif %}
 
-                            <tbody class="grid-body">
+                            <div class="{{ themeOptions.bodyClassName }}">
                                 {% for datagrid_row in datagridData.data %}
-                                    {% do block[id ~ '_row']|merge_context({'datagrid_row': datagrid_row}) %}
-                                    {{ block_widget(block[id ~ '_row']) }}
-                                {% endfor %}
-                            </tbody>
+                                    {% set child = block[id ~'_row'] %}
 
-                            <tfoot class="grid-footer"></tfoot>
-                        </table>
+                                    {% set childAttr = layout_attr_defaults(child.vars.attr, {
+                                        'class': themeOptions.rowClassName
+                                    }) %}
+                                    {% set childAttr = layout_attr_defaults(childAttr, themeOptions.rowAttributes) %}
+
+                                    {% do child|merge_context({
+                                        'datagrid_row': datagrid_row,
+                                        'themeOptions': themeOptions
+                                    }) %}
+                                    {{ block_widget(child, {'attr': childAttr}) }}
+                                {% endfor %}
+                            </div>
+
+                            <div class="grid-footer"></div>
+                        </div>
                     </div>
                 </div>
 
@@ -56,7 +71,6 @@
 
             {% if toolbarOptions.placement.bottom %}
                 <div class="toolbar dropup-area" data-grid-toolbar="bottom">
-                    {% do block[id ~ '_toolbar']|merge_context({'datagrid': datagrid}) %}
                     {{ block_widget(block[id ~ '_toolbar']) }}
                 </div>
             {% endif %}
@@ -64,20 +78,19 @@
     </div>
 {% endblock %}
 
-{% block server_render_datagrid_header_row_widget %}
+{% block __oro_datagrid_server_render__datagrid_header_row_widget %}
     {% set attr = attr|merge({
         class: attr.class|default('') ~ " grid-header-row"
     }) %}
 
-    <tr{{ block('block_attributes') }}>
+    <div{{ block('block_attributes') }}>
         {% for child in block if child.vars.visible -%}
-            {% do child|merge_context({'datagrid': datagrid}) %}
             {{ block_widget(child) }}
         {%- endfor %}
-    </tr>
+    </div>
 {% endblock %}
 
-{% block server_render_datagrid_header_cell_widget %}
+{% block __oro_datagrid_server_render__datagrid_header_cell_widget %}
     {% set columnAttributes = oro_datagrid_column_attributes(datagrid, column_name) %}
 
     {% set columnClass = " grid-cell grid-header-cell grid-header-cell-" ~ column_name ~ " " ~columnAttributes.type ~ "-cell" %}
@@ -93,7 +106,7 @@
         class: attr.class|default('') ~ columnClass
     }) %}
 
-    <th{{ block('block_attributes') }}>
+    <div{{ block('block_attributes') }}>
         {% if columnAttributes.sortable is defined and columnAttributes.sortable %}
             <a class="grid-header-cell__link" href="#">
                 <span class="grid-header-cell__label">{{ columnAttributes.label }}</span>
@@ -104,35 +117,33 @@
                 {{ columnAttributes.label }}
             </span>
         {% endif %}
-    </th>
+    </div>
 {% endblock %}
 
-{% block server_render_datagrid_row_widget %}
+{% block __oro_datagrid_server_render__datagrid_row_widget %}
     {% set attr = attr|merge({
         class: attr.class|default('') ~ " grid-row"
     }) %}
 
-    <tr{{ block('block_attributes') }}>
+    <div{{ block('block_attributes') }}>
         {% for child in block if child.vars.visible -%}
-            {% do child|merge_context({'datagrid_row': datagrid_row}) %}
             {{ block_widget(child) }}
         {%- endfor %}
-    </tr>
+    </div>
 {% endblock %}
 
-{% block server_render_datagrid_cell_widget %}
+{% block __oro_datagrid_server_render__datagrid_cell_widget %}
     {% set attr = attr|merge({
         class: attr.class|default('') ~ " string-cell grid-cell grid-body-cell grid-body-cell-" ~ column_name
     }) %}
 
-    <td{{ block('block_attributes') }}>
+    <div{{ block('block_attributes') }}>
         {% for child in block if child.vars.visible -%}
-            {% do child|merge_context({'datagrid_row': datagrid_row}) %}
             {{ block_widget(child) }}
         {%- endfor %}
-    </td>
+    </div>
 {% endblock %}
 
-{%- block server_render_datagrid_cell_value_widget -%}
+{%- block __oro_datagrid_server_render__datagrid_cell_value_widget -%}
     {{ datagrid_row[column_name] }}
 {%- endblock -%}

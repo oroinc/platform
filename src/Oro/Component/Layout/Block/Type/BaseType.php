@@ -17,7 +17,8 @@ class BaseType extends AbstractType
     public function configureOptions(OptionsResolver $optionsResolver)
     {
         $optionsResolver->setDefaults([
-            'visible' => true
+            'visible' => true,
+            'additional_block_prefixes' => []
         ]);
 
         $optionsResolver->setDefined([
@@ -26,8 +27,7 @@ class BaseType extends AbstractType
             'label',
             'label_attr',
             'translation_domain',
-            'class_prefix',
-            'additional_block_prefixes'
+            'class_prefix'
         ]);
     }
 

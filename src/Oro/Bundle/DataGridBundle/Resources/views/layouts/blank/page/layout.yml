@@ -1,6 +1,0 @@
-layout:
-    actions:
-        - '@setBlockTheme':
-            themes:
-                - 'server_render_datagrid.html.twig'
-                - 'server_render_datagrid_toolbar.html.twig'
