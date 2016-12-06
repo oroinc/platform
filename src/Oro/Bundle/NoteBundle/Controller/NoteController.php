@@ -25,24 +25,6 @@ class NoteController extends Controller
 {
     /**
      * @Route(
-     *      "/view/widget/{entityClass}/{entityId}",
-     *      name="oro_note_widget_notes"
-     * )
-     *
-     * @AclAncestor("oro_note_view")
-     * @Template("OroNoteBundle:Note:notes.html.twig")
-     */
-    public function widgetAction($entityClass, $entityId)
-    {
-        $entity = $this->getEntityRoutingHelper()->getEntity($entityClass, $entityId);
-
-        return [
-            'entity' => $entity
-        ];
-    }
-
-    /**
-     * @Route(
      *      "/view/{entityClass}/{entityId}",
      *      name="oro_note_notes"
      * )

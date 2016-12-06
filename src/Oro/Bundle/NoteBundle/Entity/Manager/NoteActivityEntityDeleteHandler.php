@@ -27,7 +27,6 @@ class NoteActivityEntityDeleteHandler extends ActivityEntityDeleteHandler
         /** @var EntityManager $em */
         $em = $manager->getObjectManager();
 
-
         /** @var Note $entity */
         $entity = $em->find($id->getOwnerEntityClass(), $id->getOwnerEntityId());
         if ($entity) {

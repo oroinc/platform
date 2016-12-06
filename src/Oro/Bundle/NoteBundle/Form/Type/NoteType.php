@@ -4,11 +4,9 @@ namespace Oro\Bundle\NoteBundle\Form\Type;
 
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\Form\FormInterface;
-use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\Validator\Constraints\NotBlank;
 
-use Oro\Bundle\NoteBundle\Form\EventListener\UpdateActivityAssociationsSubscriber;
 use Oro\Bundle\NoteBundle\Entity\Note;
 
 class NoteType extends AbstractType
@@ -35,18 +33,6 @@ class NoteType extends AbstractType
                     'required' => false
                 ]
             );
-
-        $builder->addEventSubscriber(new UpdateActivityAssociationsSubscriber());
-    }
-
-    /**
-     * @param FormView      $view
-     * @param FormInterface $form
-     * @param array         $options
-     */
-    public function finishView(FormView $view, FormInterface $form, array $options)
-    {
-        $view->children['contexts']->vars['required'] = true;
     }
 
     /**
@@ -61,7 +47,13 @@ class NoteType extends AbstractType
                 'ownership_disabled'      => true,
                 'dynamic_fields_disabled' => true,
                 'csrf_protection'         => true,
-                'cascade_validation'      => true
+                'cascade_validation'      => true,
+                'contexts_options'   => [
+                    'constraints' => [
+                        new NotBlank()
+                    ],
+                    'required' => true
+                ]
             ]
         );
     }

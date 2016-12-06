@@ -47,7 +47,7 @@
         {% set options = options|merge(targetEntity) %}
     {% endif %}
 
-    {% set component = component is defined
+    {% set component = component is defined and component
         ? component
         : 'oroactivity/js/app/components/activity-context-activity-component' %}
 

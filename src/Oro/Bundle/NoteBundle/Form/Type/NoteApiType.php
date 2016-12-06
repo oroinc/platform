@@ -5,7 +5,6 @@ namespace Oro\Bundle\NoteBundle\Form\Type;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
-use Oro\Bundle\NoteBundle\Form\EventListener\UpdateActivityAssociationsSubscriber;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\NoteBundle\Entity\Note;
 use Oro\Bundle\NoteBundle\Form\EventListener\NoteSubscriber;
@@ -38,7 +37,6 @@ class NoteApiType extends NoteType
 
         $builder->addEventSubscriber(new PatchSubscriber());
         $builder->addEventSubscriber(new NoteSubscriber($this->configManager));
-        $builder->addEventSubscriber(new UpdateActivityAssociationsSubscriber());
     }
 
     /**
