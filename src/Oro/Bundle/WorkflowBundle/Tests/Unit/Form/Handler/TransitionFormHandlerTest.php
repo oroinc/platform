@@ -15,7 +15,7 @@ use Oro\Bundle\WorkflowBundle\Form\Handler\TransitionFormHandler;
 class TransitionFormHandlerTest extends \PHPUnit_Framework_TestCase
 {
     /** @var UnitOfWork|\PHPUnit_Framework_MockObject_MockObject */
-    private $unitOfWorkMock;
+    private $unitOfWork;
 
     /** @var EntityManager|\PHPUnit_Framework_MockObject_MockObject*/
     private $entityManager;
@@ -45,14 +45,14 @@ class TransitionFormHandlerTest extends \PHPUnit_Framework_TestCase
             ->method('getCurrentRequest')
             ->willReturn($this->request);
 
-        $this->unitOfWorkMock = $this->getMockBuilder(UnitOfWork::class)
+        $this->unitOfWork = $this->getMockBuilder(UnitOfWork::class)
             ->disableOriginalConstructor()->getMock();
 
         $this->entityManager = $this->getMockBuilder(EntityManager::class)
             ->disableOriginalConstructor()->getMock();
         $this->entityManager->expects($this->any())
             ->method('getUnitOfWork')
-            ->willReturn($this->unitOfWorkMock);
+            ->willReturn($this->unitOfWork);
         $this->entityManager->expects($this->any())
             ->method('isManageableEntity')->willReturn(true);
 
@@ -87,21 +87,22 @@ class TransitionFormHandlerTest extends \PHPUnit_Framework_TestCase
      */
     public function formDataProvider()
     {
-        return [
-            'testFormSubmitWhenMethodIsNotPost' => [
-                'result' => false,
-                'isMethod' => false,
-            ],
-            'testWhenFormNotValid' => [
-                'result' => false,
-                'isMethod' => true,
-                'isValid' => false,
-            ],
-            'testWhenFormIsValid' => [
-                'result' => true,
-                'isMethod' => true,
-                'isValid' => true,
-            ]
+
+        yield 'testSubmitWhenMethodIsNotPost' => [
+            'result' => false,
+            'isMethod' => false,
+        ];
+
+        yield 'testSubmitWhenFormNotValid' => [
+            'result' => false,
+            'isMethod' => true,
+            'isValid' => false,
+        ];
+
+        yield 'testSubmitWhenFormIsValid' => [
+            'result' => true,
+            'isMethod' => true,
+            'isValid' => true,
         ];
     }
 
@@ -111,7 +112,7 @@ class TransitionFormHandlerTest extends \PHPUnit_Framework_TestCase
      * @param bool $isScheduled
      * @param array $formAttributes
      *
-     * @dataProvider formAttributeDataProvider
+     * @dataProvider formAttributesDataProvider
      */
     public function testFlushAttribute($isFlush, array $formAttributes, $isInIdentityMap = true, $isScheduled = false)
     {
@@ -120,9 +121,9 @@ class TransitionFormHandlerTest extends \PHPUnit_Framework_TestCase
             ->willReturn(true);
 
         $form = $this->createTransitionForm(true, true);
-        $this->unitOfWorkMock->expects($this->any())->method('isInIdentityMap')
+        $this->unitOfWork->expects($this->any())->method('isInIdentityMap')
             ->willReturn($isInIdentityMap);
-        $this->unitOfWorkMock->expects($this->any())->method('isScheduledForInsert')
+        $this->unitOfWork->expects($this->any())->method('isScheduledForInsert')
             ->willReturn($isScheduled);
         $this->doctrineHelper->expects($this->any())
             ->method('isManageableEntity')->willReturn(true);
@@ -136,32 +137,32 @@ class TransitionFormHandlerTest extends \PHPUnit_Framework_TestCase
     /**
      * @return array
      */
-    public function formAttributeDataProvider()
+    public function formAttributesDataProvider()
     {
-        yield [
+        yield 'testFlushWhenEmptyAttributes' => [
             'isFlush' => false,
             'formAttributes' => [],
         ];
 
-        yield [
+        yield 'testFlushWhenAttributeInIdentityMap' => [
             'isFlush' => false,
             'formAttributes' => ['attribute' => new \stdClass()],
             'isInIdentityMap' => true,
         ];
 
-        yield [
+        yield 'testFlushWhenAttributeIsNotObject' => [
             'isFlush' => false,
             'formAttributes' => ['attribute' => 'string'],
             'isInIdentityMap' => true,
         ];
 
-        yield [
+        yield 'testFlushWhenAttributeNotInIdentityMap' => [
             'isFlush' => true,
             'formAttributes' => ['attribute' => new \stdClass()],
             'isInIdentityMap' => false
         ];
 
-        yield [
+        yield 'testFlushWhenAttributeIsScheduledForInsert' => [
             'isFlush' => true,
             'formAttributes' => ['attribute' => new \stdClass()],
             'isInIdentityMap' => true,
