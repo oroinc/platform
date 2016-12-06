@@ -2,6 +2,7 @@
 
 namespace Oro\Component\Layout\Tests\Unit;
 
+use Oro\Component\Layout\ContextItemInterface;
 use Oro\Component\Layout\LayoutContext;
 
 class LayoutContextTest extends \PHPUnit_Framework_TestCase
@@ -218,6 +219,18 @@ class LayoutContextTest extends \PHPUnit_Framework_TestCase
         $hash = $this->context->getHash();
 
         $this->assertEquals(md5(serialize([])), $hash);
+    }
+
+    public function testGetHashWithContextItemInterfaceDescendantItems()
+    {
+        $item = $this->getMock(ContextItemInterface::class);
+        $item->expects($this->once())->method('toString')->willReturn('value');
+
+        $this->context->getResolver()->setOptional(['item']);
+        $this->context->set('item', $item);
+        $this->context->resolve();
+
+        $this->assertEquals(md5(serialize(['item' => 'value'])), $this->context->getHash());
     }
 
     /**
