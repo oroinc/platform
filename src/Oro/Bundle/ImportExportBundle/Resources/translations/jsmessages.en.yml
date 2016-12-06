@@ -5,3 +5,11 @@ oro:
             success.message: 'Export started successfully. You will receive email notification upon completion.'
             fail.message: 'Could not start export, please try again.'
             error_template_download.message: 'Errors occured while downloading the template.'
+        import:
+            starting.message: 'Starting import...'
+            success.message: 'Import started successfully. You will receive email notification upon completion.'
+            fail.message: 'Could not start import, please try again.'
+        import_validation:
+            starting.message: 'Starting import validation...'
+            success.message: 'Import validation started successfully. You will receive email notification upon completion.'
+            fail.message: 'Could not start import validation, please try again.'

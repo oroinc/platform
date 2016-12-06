@@ -31,15 +31,33 @@
     </div>
 
     <script type="text/javascript">
-        require(['oroui/js/widget-manager', 'oroui/js/messenger'],
-        function(WidgetManager, Messanger) {
+        require(['underscore', 'orotranslation/js/translator', 'oroui/js/widget-manager', 'oroui/js/messenger'],
+        function(_, __, WidgetManager, Messenger) {
             WidgetManager.getWidgetInstance({{ app.request.get('_wid')|json_encode|raw }}, function(widget) {
+                widget._onContentLoad = function (content) {
+                    if (_.has(content, 'success') && content.success) {
+                        Messenger.notificationFlashMessage(
+                            'success',
+                            __('oro.importexport.import_validation.success.message')
+                        );
+                    } else {
+                        Messenger.notificationFlashMessage(
+                            'error',
+                            __('oro.importexport.import_validation.fail.message')
+                        );
+                    }
+
+                    widget.remove();
+                };
+
                 widget.getAction('form_submit', 'adopted', function(action) {
                     action.on('click', function() {
-                        Messanger.notificationFlashMessage(
-                            'info',
-                            {{ 'Import validation started...'|trans|json_encode|raw }}
+                        Messenger.notificationFlashMessage(
+                            'success',
+                            __('oro.importexport.import_validation.starting.message')
                         );
+
+                        widget.hide();
                     });
                 });
             });
