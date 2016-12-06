@@ -109,7 +109,7 @@
 .query-designer-columns-grid-container tbody tr {
     cursor: default;
 }
-.query-designer-grid-container i.icon-list {
+.query-designer-grid-container i.fa-list {
     cursor: move;
     cursor: -moz-grab;
     cursor: -webkit-grab;

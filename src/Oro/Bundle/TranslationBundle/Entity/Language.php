@@ -18,7 +18,7 @@ use Oro\Bundle\UserBundle\Entity\Ownership\UserAwareTrait;
  * @Config(
  *      defaultValues={
  *          "entity"={
- *              "icon"="icon-flag"
+ *              "icon"="fa-flag"
  *          },
  *          "ownership"={
  *              "owner_type"="USER",

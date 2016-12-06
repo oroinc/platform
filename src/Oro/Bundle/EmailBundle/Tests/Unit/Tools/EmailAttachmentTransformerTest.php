@@ -99,7 +99,7 @@ class EmailAttachmentTransformerTest extends \PHPUnit_Framework_TestCase
 
          $this->manager->expects($this->once())
             ->method('getAttachmentIconClass')
-            ->willReturn('icon-class');
+            ->willReturn('fa-class');
 
         $this->emailAttachmentManager->expects($this->once())
             ->method('getResizedImageUrl')
@@ -114,7 +114,7 @@ class EmailAttachmentTransformerTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(2, $attachmentModel->getType());
         $this->assertEquals($attachmentEntity, $attachmentModel->getEmailAttachment());
         $this->assertEquals('imageurl.jpg', $attachmentModel->getPreview());
-        $this->assertEquals('icon-class', $attachmentModel->getIcon());
+        $this->assertEquals('fa-class', $attachmentModel->getIcon());
     }
 
     public function testOroToModel()
@@ -135,7 +135,7 @@ class EmailAttachmentTransformerTest extends \PHPUnit_Framework_TestCase
 
         $this->manager->expects($this->once())
             ->method('getAttachmentIconClass')
-            ->willReturn('icon-class');
+            ->willReturn('fa-class');
 
         $this->manager->expects($this->once())
             ->method('getResizedImageUrl')
@@ -153,7 +153,7 @@ class EmailAttachmentTransformerTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(1, $attachmentModel->getType());
         $this->assertEquals(null, $attachmentModel->getEmailAttachment());
         $this->assertEquals('imageurl.jpg', $attachmentModel->getPreview());
-        $this->assertEquals('icon-class', $attachmentModel->getIcon());
+        $this->assertEquals('fa-class', $attachmentModel->getIcon());
     }
 
     public function testOroToEntity()
