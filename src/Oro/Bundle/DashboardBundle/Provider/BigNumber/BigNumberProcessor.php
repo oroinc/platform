@@ -68,7 +68,7 @@ class BigNumberProcessor
                     $previousInterval = $this->dateHelper->getLastWeekPeriod(-1);
                 }
 
-                $previousData['value']        = call_user_func($getter, $previousInterval);
+                $previousData['value']        = call_user_func($getter, $previousInterval, $owners);
                 $previousData['dateRange']    = $previousInterval;
                 $previousData['lessIsBetter'] = $lessIsBetter;
             }
