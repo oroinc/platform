@@ -86,8 +86,7 @@ class OperationButtonProviderExtension implements ButtonProviderExtensionInterfa
             );
         }
 
-        return $this->supports($button) &&
-            $button->getOperation()->isAvailable($this->getActionData($buttonSearchContext));
+        return $button->getOperation()->isAvailable($this->getActionData($buttonSearchContext));
     }
 
     /**

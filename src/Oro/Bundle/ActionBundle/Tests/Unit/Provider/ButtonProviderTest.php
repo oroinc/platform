@@ -2,18 +2,21 @@
 
 namespace Oro\Bundle\ActionBundle\Tests\Unit\Provider;
 
+use Oro\Bundle\ActionBundle\Button\ButtonContext;
 use Oro\Bundle\ActionBundle\Button\ButtonInterface;
+use Oro\Bundle\ActionBundle\Button\ButtonsCollection;
 use Oro\Bundle\ActionBundle\Button\ButtonSearchContext;
 use Oro\Bundle\ActionBundle\Extension\ButtonProviderExtensionInterface;
 use Oro\Bundle\ActionBundle\Provider\ButtonProvider;
+use Oro\Bundle\TestFrameworkBundle\Test\Stub\CallableStub;
 
 class ButtonProviderTest extends \PHPUnit_Framework_TestCase
 {
     /** @var ButtonProvider */
     protected $buttonProvider;
 
-    /** @var ButtonProviderExtensionInterface|\PHPUnit_Framework_MockObject_MockObject */
-    protected $buttonExtension;
+    /** @var ButtonProviderExtensionInterface[]|\PHPUnit_Framework_MockObject_MockObject[] */
+    private $extensions = [];
 
     /**
      * {@inheritdoc}
@@ -21,8 +24,65 @@ class ButtonProviderTest extends \PHPUnit_Framework_TestCase
     protected function setUp()
     {
         $this->buttonProvider = new ButtonProvider();
-        $this->buttonExtension = $this->getMock(ButtonProviderExtensionInterface::class);
-        $this->buttonProvider->addExtension($this->buttonExtension);
+    }
+
+    public function testMatch()
+    {
+        $searchContext = $this->getMock(ButtonSearchContext::class);
+
+        $button1 = $this->getButton();
+        $button2 = $this->getButton();
+        $button3 = $this->getButton();
+
+        $extension1 = $this->extension('one');
+        $extension1->expects($this->once())->method('find')->willReturn([$button1]);
+        $extension2 = $this->extension('two');
+        $extension2->expects($this->once())->method('find')->willReturn([$button2, $button3]);
+
+        $collection = $this->buttonProvider->match($searchContext);
+        $this->assertInstanceOf(ButtonsCollection::class, $collection);
+
+        //checking correct mapping button => extension at collection
+        $callable = $this->getMock(CallableStub::class);
+        $callable->expects($this->at(0))
+            ->method('__invoke')
+            ->with(
+                $this->identicalTo($button1),
+                $this->identicalTo($extension1)
+            )->willReturn($button1);
+
+        $callable->expects($this->at(1))
+            ->method('__invoke')
+            ->with(
+                $this->identicalTo($button2),
+                $this->identicalTo($extension2)
+            )->willReturn($button2);
+
+        $callable->expects($this->at(2))
+            ->method('__invoke')
+            ->with(
+                $this->identicalTo($button3),
+                $this->identicalTo($extension2)
+            )->willReturn($button3);
+
+        $collection->map($callable);
+    }
+
+    /**
+     * @param string $identifier
+     * @return ButtonProviderExtensionInterface|\PHPUnit_Framework_MockObject_MockObject
+     */
+    private function extension($identifier)
+    {
+        if (isset($this->extensions[$identifier])) {
+            return $this->extensions[$identifier];
+        }
+
+        $this->extensions[$identifier] = $this->getMock(ButtonProviderExtensionInterface::class);
+
+        $this->buttonProvider->addExtension($this->extensions[$identifier]);
+
+        return $this->extensions[$identifier];
     }
 
     /**
@@ -36,12 +96,12 @@ class ButtonProviderTest extends \PHPUnit_Framework_TestCase
         /** @var ButtonSearchContext $searchContext */
         $searchContext = $this->getMock(ButtonSearchContext::class);
 
-        $this->buttonExtension->expects($this->once())
+        $this->extension('one')->expects($this->once())
             ->method('find')
             ->with($searchContext)
             ->willReturn($input);
 
-        $this->assertSame($output, $this->buttonProvider->findAvailable($searchContext));
+        $this->assertEquals($output, $this->buttonProvider->findAll($searchContext));
     }
 
     /**
@@ -54,21 +114,21 @@ class ButtonProviderTest extends \PHPUnit_Framework_TestCase
         $button3 = $this->getButton(3);
 
         return [
-            [
+            'no input' => [
                 'input' => [],
                 'output' => []
             ],
-            [
+            'one button' => [
                 'input' => [$button2],
                 'output' => [$button2]
             ],
-            [
+            'just ordered' => [
                 'input' => [$button2, $button1, $button3],
                 'output' => [$button1, $button2, $button3]
             ],
-            [
+            'with same will be overridden' => [
                 'input' => [$button3, $button3, $button2],
-                'output' => [$button2, $button3, $button3]
+                'output' => [$button2, $button3]
             ]
         ];
     }
@@ -77,10 +137,12 @@ class ButtonProviderTest extends \PHPUnit_Framework_TestCase
      * @param int $order
      * @return ButtonInterface|\PHPUnit_Framework_MockObject_MockObject
      */
-    private function getButton($order)
+    private function getButton($order = 1)
     {
         $button = $this->getMock(ButtonInterface::class);
+        $buttonContext = new ButtonContext();
         $button->expects($this->any())->method('getOrder')->willReturn($order);
+        $button->expects($this->any())->method('getButtonContext')->willReturn($buttonContext);
 
         return $button;
     }
