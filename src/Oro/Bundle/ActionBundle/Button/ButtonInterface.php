@@ -7,6 +7,21 @@ interface ButtonInterface
     const DEFAULT_GROUP = '';
 
     /**
+     * @return string
+     */
+    public function getName();
+
+    /**
+     * @return string
+     */
+    public function getLabel();
+
+    /**
+     * @return string
+     */
+    public function getIcon();
+
+    /**
      * @return int
      */
     public function getOrder();
@@ -26,6 +41,11 @@ interface ButtonInterface
      * @return array
      */
     public function getTemplateData(array $customData = []);
+
+//    /**
+//     * @return array
+//     */
+//    public function getDatagridData();
 
     /**
      * @return ButtonContext

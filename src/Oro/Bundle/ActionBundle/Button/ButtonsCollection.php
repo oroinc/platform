@@ -98,6 +98,27 @@ class ButtonsCollection implements \IteratorAggregate, \Countable
     }
 
     /**
+     * @param callable $callable
+     * @return $this
+     */
+    public function filter(callable $callable)
+    {
+        $collection = new static();
+
+        /**@var ButtonInterface $button */
+        foreach ($this->buttonsMap as $button) {
+            /** @var ButtonProviderExtensionInterface $extension */
+            $extension = $this->buttonsMap[$button];
+            $result = call_user_func($callable, $button, $extension);
+            if ($result) {
+                $collection->addButton($button, $extension);
+            }
+        }
+
+        return $collection;
+    }
+
+    /**
      * @return ButtonInterface[] - sorted by order array of buttins
      */
     public function toArray()

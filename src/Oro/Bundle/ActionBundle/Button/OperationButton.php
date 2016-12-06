@@ -40,6 +40,32 @@ class OperationButton implements ButtonInterface
     /**
      * {@inheritdoc}
      */
+    public function getName()
+    {
+        return $this->operation->getName();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getLabel()
+    {
+        return $this->operation->getDefinition()->getLabel();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getIcon()
+    {
+        $buttonOptions = $this->operation->getDefinition()->getButtonOptions();
+
+        return isset($buttonOptions['icon']) ? $buttonOptions['icon'] : null;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function getOrder()
     {
         return $this->operation->getDefinition()->getOrder();
@@ -66,11 +92,26 @@ class OperationButton implements ButtonInterface
             'aClass' => ''
         ];
 
-        return array_merge($defaultData, $customData, [
-            'operation' => $this->operation,
-            'params' => $this->operation->getDefinition(),
-            'actionData' => $this->data
-        ]);
+        return array_merge(
+            $defaultData,
+            $customData,
+            [
+                'operation' => $this->operation,
+                'params' => $this->operation->getDefinition(),
+                'actionData' => $this->data,
+                'additionalData' => $this->getDatagridData()
+            ]
+        );
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    private function getDatagridData()
+    {
+        $datagridOptions = $this->operation->getDefinition()->getDatagridOptions();
+
+        return isset($datagridOptions['data']) ? $datagridOptions['data'] : [];
     }
 
     /**
