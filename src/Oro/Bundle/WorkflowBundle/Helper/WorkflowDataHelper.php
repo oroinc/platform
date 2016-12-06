@@ -92,7 +92,7 @@ class WorkflowDataHelper
             foreach ($this->getAllowedStartTransitions($workflow, $entity) as $transition) {
                 $transitionsData[] = array_merge(
                     $this->getTransitionData($transition),
-                    $this->getStartTransitionUrl($workflow, $transition, $entity)
+                    $this->getStartTransitionUrls($workflow, $transition, $entity)
                 );
             }
 
@@ -108,7 +108,7 @@ class WorkflowDataHelper
         foreach ($this->getAllowedTransitions($workflow, $workflowItem) as $transition) {
             $transitionsData[] = array_merge(
                 $this->getTransitionData($transition),
-                $this->getTransitionUrl($transition, $workflowItem)
+                $this->getTransitionUrls($transition, $workflowItem)
             );
         }
 
@@ -152,45 +152,30 @@ class WorkflowDataHelper
      *
      * @return array
      */
-    protected function getTransitionUrl(Transition $transition, WorkflowItem $workflowItem)
+    protected function getTransitionUrls(Transition $transition, WorkflowItem $workflowItem)
     {
         $parameters = [
             'transitionName' => $transition->getName(),
             'workflowItemId' => $workflowItem->getId(),
         ];
 
-        if ($transition->getDisplayType() !== 'dialog') {
-            return [
-                'transitionUrl' => $this->router->generate(
-                    'oro_api_workflow_transit',
-                    $parameters,
-                    UrlGeneratorInterface::ABSOLUTE_URL
-                ),
-            ];
-        }
-
-        if ($transition->hasForm()) {
-            return [
-                'dialogUrl' => $this->router->generate(
-                    'oro_workflow_widget_transition_form',
-                    $parameters,
-                    UrlGeneratorInterface::ABSOLUTE_URL
-                ),
-                'transitionUrl' => $this->router->generate(
-                    'oro_api_workflow_transit',
-                    $parameters,
-                    UrlGeneratorInterface::ABSOLUTE_URL
-                ),
-            ];
-        }
-
-        return [
+        $urls = [
             'transitionUrl' => $this->router->generate(
                 'oro_api_workflow_transit',
                 $parameters,
                 UrlGeneratorInterface::ABSOLUTE_URL
             ),
         ];
+
+        if ($transition->hasForm()) {
+            $urls['dialogUrl'] = $this->router->generate(
+                'oro_workflow_widget_transition_form',
+                $parameters,
+                UrlGeneratorInterface::ABSOLUTE_URL
+            );
+        }
+
+        return $urls;
     }
 
     /**
@@ -200,7 +185,7 @@ class WorkflowDataHelper
      *
      * @return array
      */
-    protected function getStartTransitionUrl(Workflow $workflow, Transition $transition, $entity)
+    protected function getStartTransitionUrls(Workflow $workflow, Transition $transition, $entity)
     {
         $parameters = [
             'workflowName' => $workflow->getName(),
@@ -208,38 +193,23 @@ class WorkflowDataHelper
             'entityId' => $entity->getId(),
         ];
 
-        if ($transition->getDisplayType() !== 'dialog') {
-            return [
-                'transitionUrl' => $this->router->generate(
-                    'oro_workflow_start_transition_form',
-                    $parameters,
-                    UrlGeneratorInterface::ABSOLUTE_URL
-                ),
-            ];
-        }
-
-        if (!$transition->hasForm()) {
-            return [
-                'transitionUrl' => $this->router->generate(
-                    'oro_api_workflow_start',
-                    $parameters,
-                    UrlGeneratorInterface::ABSOLUTE_URL
-                ),
-            ];
-        }
-
-        return [
-            'dialogUrl' => $this->router->generate(
-                'oro_workflow_widget_start_transition_form',
-                $parameters,
-                UrlGeneratorInterface::ABSOLUTE_URL
-            ),
+        $urls = [
             'transitionUrl' => $this->router->generate(
                 'oro_api_workflow_start',
                 $parameters,
                 UrlGeneratorInterface::ABSOLUTE_URL
             ),
         ];
+
+        if ($transition->hasForm()) {
+            $urls['dialogUrl'] = $this->router->generate(
+                'oro_workflow_widget_start_transition_form',
+                $parameters,
+                UrlGeneratorInterface::ABSOLUTE_URL
+            );
+        }
+
+        return $urls;
     }
 
     /**

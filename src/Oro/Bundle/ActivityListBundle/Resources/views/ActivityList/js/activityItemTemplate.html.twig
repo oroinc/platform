@@ -36,7 +36,7 @@
             <% }) %>
         <% } %>
     {% endset %}
-    {% set actions = actions|merge([action]) %}
+    {% set actions = actions|default([])|merge([action]) %}
 
     {{ AC.verticalActionsList(actions) }}
 {% endblock %}
