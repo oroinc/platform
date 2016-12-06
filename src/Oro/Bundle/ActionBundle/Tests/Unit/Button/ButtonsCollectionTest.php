@@ -48,6 +48,51 @@ class ButtonsCollectionTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($buttons, $this->collection->toArray());
     }
 
+    public function testToList()
+    {
+        $button1 = $this->getButtonMock(1);
+        $button2 = $this->getButtonMock(2);
+        $extension = $this->getExtensionMock([$button2, $button1]);
+        $this->collection->consume($extension, $this->searchContext);
+
+        $this->assertSame([$button1, $button2], $this->collection->toList(), 'Must be ordered list.');
+    }
+
+    public function testFilter()
+    {
+        $button1 = $this->getButtonMock(1);
+        $button2 = $this->getButtonMock(2);
+        $extension = $this->getExtensionMock([$button2, $button1]);
+        $this->collection->consume($extension, $this->searchContext);
+
+        $filtered = $this->collection->filter(function (ButtonInterface $button) {
+            return $button->getOrder() === 2;
+        });
+
+        $this->assertInstanceOf(ButtonsCollection::class, $filtered, 'Instance of ButtonStorage expected.');
+        $this->assertNotSame($this->collection, $filtered, 'New instance expected.');
+
+        $this->assertSame([$button2], $filtered->toArray(), 'Same buttons instances but filtered.');
+    }
+
+    public function testMap()
+    {
+        $button1 = $this->getButtonMock(2);
+        $button2 = $this->getButtonMock(1);
+        $extension = $this->getExtensionMock([$button1, $button2]);
+        $this->collection->consume($extension, $this->searchContext);
+
+        $mapped = $this->collection->map(function (ButtonInterface $button, ButtonProviderExtensionInterface $extension) {
+            return clone $button;
+        });
+
+        $this->assertInstanceOf(ButtonsCollection::class, $mapped, 'Instance of ButtonStorage expected.');
+        $this->assertNotSame($this->collection, $mapped, 'New instance expected.');
+
+        $this->assertNotSame([$button1, $button2], $mapped->toArray(), 'Cloned buttons expected.');
+        $this->assertEquals([$button1, $button2], $mapped->toArray(), 'Buttons are equals by data.');
+    }
+
     public function testGetIterator()
     {
         $this->assertInstanceOf(\ArrayIterator::class, $this->collection->getIterator());
@@ -71,13 +116,13 @@ class ButtonsCollectionTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * @param int $order
      * @return ButtonInterface|\PHPUnit_Framework_MockObject_MockObject
-     * @throws \PHPUnit_Framework_Exception
      */
-    protected function getButtonMock()
+    protected function getButtonMock($order = 1)
     {
         $button = $this->getMockBuilder(ButtonInterface::class)->getMockForAbstractClass();
-        $button->expects($this->any())->method('getOrder')->willReturn(1);
+        $button->expects($this->any())->method('getOrder')->willReturn($order);
 
         return $button;
     }

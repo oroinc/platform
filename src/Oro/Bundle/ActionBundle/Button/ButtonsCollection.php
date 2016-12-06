@@ -6,11 +6,11 @@ use Oro\Bundle\ActionBundle\Extension\ButtonProviderExtensionInterface;
 
 class ButtonsCollection implements \IteratorAggregate, \Countable
 {
-    /** @var \SplObjectStorage */
+    /** @var \SplObjectStorage (ButtonInterface -> ButtonProviderExtensionInterface) */
     private $buttonsMap;
 
     /** @var ButtonInterface[]|null - initialized array */
-    private $buttonsArray;
+    private $buttonsList;
 
     public function __construct()
     {
@@ -20,20 +20,17 @@ class ButtonsCollection implements \IteratorAggregate, \Countable
     /**
      * @param ButtonInterface $button
      * @param ButtonProviderExtensionInterface $extension
-     *
-     * @return $this
      */
     protected function addButton(ButtonInterface $button, ButtonProviderExtensionInterface $extension)
     {
-        //map modified so initialized array should be cleared
-        $this->buttonsArray = null;
+        //map modified so initialized list should be cleared
+        $this->buttonsList = null;
 
         $this->buttonsMap->attach($button, $extension);
-
-        return $this;
     }
 
     /**
+     * Maps all matches of buttons by ButtonSearchContext in ButtonProviderExtensionInterface into the storage.
      * @param ButtonProviderExtensionInterface $extension
      * @param ButtonSearchContext $searchContext
      *
@@ -69,10 +66,10 @@ class ButtonsCollection implements \IteratorAggregate, \Countable
 
     /**
      * callable(ButtonInterface $button, ButtonProviderExtensionInterface $extension): ButtonInterface
-     * @param callable $callable
-     * @return $this
+     * @param callable $map
+     * @return static
      */
-    public function map(callable $callable)
+    public function map(callable $map)
     {
         $collection = new static();
 
@@ -80,7 +77,7 @@ class ButtonsCollection implements \IteratorAggregate, \Countable
         foreach ($this->buttonsMap as $button) {
             /** @var ButtonProviderExtensionInterface $extension */
             $extension = $this->buttonsMap[$button];
-            $mappedButton = call_user_func($callable, $button, $extension);
+            $mappedButton = call_user_func($map, $button, $extension);
             if (!$mappedButton instanceof ButtonInterface) {
                 throw new ButtonCollectionMapException(
                     sprintf(
@@ -97,26 +94,46 @@ class ButtonsCollection implements \IteratorAggregate, \Countable
     }
 
     /**
-     * @return ButtonInterface[] - sorted by order array of buttins
+     * @return ButtonInterface[]
      */
     public function toArray()
     {
+        return iterator_to_array($this->buttonsMap);
+    }
+
+    /**
+     * @return ButtonInterface[] - ordered list (numeric array) of buttons
+     */
+    public function toList()
+    {
         //if array is already initialized - return it
-        if ($this->buttonsArray !== null) {
-            return $this->buttonsArray;
+        if ($this->buttonsList !== null) {
+            return $this->buttonsList;
         }
 
-        $this->buttonsArray = [];
+        $this->buttonsList = $this->toArray();
 
-        foreach ($this->buttonsMap as $button) {
-            $this->buttonsArray[] = $button;
-        }
-
-        usort($this->buttonsArray, function (ButtonInterface $b1, ButtonInterface $b2) {
+        usort($this->buttonsList, function (ButtonInterface $b1, ButtonInterface $b2) {
             return $b1->getOrder() - $b2->getOrder();
         });
 
-        return $this->buttonsArray;
+        return $this->buttonsList;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getIterator()
+    {
+        return new \ArrayIterator($this->toList());
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function count()
+    {
+        return count($this->toArray());
     }
 
     /**
@@ -127,21 +144,5 @@ class ButtonsCollection implements \IteratorAggregate, \Countable
     public function __toString()
     {
         return __CLASS__ . '@' . spl_object_hash($this);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getIterator()
-    {
-        return new \ArrayIterator($this->toArray());
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function count()
-    {
-        return count($this->toArray());
     }
 }
