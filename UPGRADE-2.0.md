@@ -934,3 +934,7 @@ After
 - View template `OroNoteBundle:Note:js/activityItemTemplate.html.twig` was changed. 
 - View template `OroNoteBundle:Note:widget/info.html.twig` was changed.
 - Add JS mobules `oronote/js/app/components/note-context-component.js` and `oronote/js/app/components/notes-component.js`. These modules responsible to disable possibility to remove last entity in the context field or Note.  
+- Note handler `Oro\Bundle\NoteBundle\Form\Handler\NoteHandler` constructor was changed.
+- Parameter `oro_note.manager.api.class` was removed from container
+- Parameter `oro_note.activity_list.provider.class` was removed from container
+- Parameter `oro_note.manager.class` was removed from container

@@ -1,0 +1,16 @@
+{% if resource_granted('oro_note_view') %}
+    {% import 'OroUIBundle::macros.html.twig' as UI %}
+
+    {% set widgetContent %}
+        {{ oro_widget_render({
+            'widgetType': 'block',
+            'url': path('oro_note_widget_notes', {
+                entityClass: oro_class_name(entity, true),
+                entityId: entity.id
+            }),
+            'title': 'oro.note.entity_plural_label'|trans,
+            'cssClass': 'list-widget notes-widget',
+        }) }}
+    {% endset %}
+    {{ UI.scrollSubblock(null, [widgetContent]) }}
+{% endif %}
