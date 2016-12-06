@@ -6,6 +6,7 @@ use Doctrine\Common\Collections\Collection;
 
 use Oro\Bundle\ActionBundle\Exception\OperationNotFoundException;
 use Oro\Bundle\ActionBundle\Helper\ContextHelper;
+use Oro\Bundle\ActionBundle\Model\Criteria\OperationFindCriteria;
 
 class OperationManager
 {
@@ -82,10 +83,14 @@ class OperationManager
         $actionData = $this->contextHelper->getActionData($context);
 
         $operations = $this->operationRegistry->find(
-            $context[ContextHelper::ENTITY_ID_PARAM] ? $context[ContextHelper::ENTITY_CLASS_PARAM] : null,
-            $context[ContextHelper::ROUTE_PARAM],
-            $context[ContextHelper::DATAGRID_PARAM],
-            $context[ContextHelper::GROUP_PARAM]
+            new OperationFindCriteria(
+                $context[ContextHelper::ENTITY_ID_PARAM] || $context[ContextHelper::DATAGRID_PARAM]
+                    ? $context[ContextHelper::ENTITY_CLASS_PARAM]
+                    : null,
+                $context[ContextHelper::ROUTE_PARAM],
+                $context[ContextHelper::DATAGRID_PARAM],
+                $context[ContextHelper::GROUP_PARAM]
+            )
         );
 
         if ($onlyAvailable) {

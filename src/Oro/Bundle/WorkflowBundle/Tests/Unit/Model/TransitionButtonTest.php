@@ -3,8 +3,8 @@
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Model;
 
 use Oro\Bundle\ActionBundle\Model\ButtonContext;
-use Oro\Bundle\ActionBundle\Model\OperationRegistry;
 
+use Oro\Bundle\ActionBundle\Model\ButtonInterface;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Model\Transition;
 use Oro\Bundle\WorkflowBundle\Model\TransitionButton;
@@ -116,6 +116,6 @@ class TransitionButtonTest extends \PHPUnit_Framework_TestCase
 
     public function testGetGroup()
     {
-        $this->assertEquals(OperationRegistry::DEFAULT_GROUP, $this->button->getGroup());
+        $this->assertEquals(ButtonInterface::DEFAULT_GROUP, $this->button->getGroup());
     }
 }
