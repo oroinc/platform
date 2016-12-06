@@ -18,6 +18,8 @@ define([
     SelectCell = Backgrid.SelectCell.extend({
         events: {},
 
+        optionValues: [],
+
         /**
          * @inheritDoc
          */
@@ -27,7 +29,6 @@ define([
             }
 
             if (options.column.get('metadata').choices) {
-                this.optionValues = [];
                 _.each(options.column.get('metadata').choices, function(value, key) {
                     this.optionValues.push([_.escape(textUtil.prepareText(value)), key]);
                 }, this);
@@ -47,6 +48,10 @@ define([
          * @inheritDoc
          */
         render: function() {
+            if (!this.optionValues.length) {
+                return;
+            }
+
             var render = SelectCell.__super__.render.apply(this, arguments);
 
             this.enterEditMode();
