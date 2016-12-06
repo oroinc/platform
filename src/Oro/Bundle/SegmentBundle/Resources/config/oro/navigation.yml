@@ -6,7 +6,7 @@ navigation:
                 uri: '#'
                 extras:
                     position: 50
-                    icon: icon-folder-open
+                    icon: fa-folder-open
 
             segments_divider:
                 label: ''

@@ -186,7 +186,7 @@ define(function(require) {
                 delayedIconRender: function() {
                     if (!this.$el.find('> [data-role="edit"]').length) {
                         this.$el.append('<i data-role="edit" ' +
-                            'class="icon-pencil skip-row-click hide-text inline-editor__edit-action"' +
+                            'class="fa-pencil skip-row-click hide-text inline-editor__edit-action"' +
                             'title="' + __('Edit') + '">' + __('Edit') + '</i>');
                         this.$el.attr('title', inlineEditingPlugin.helpMessage);
                     }
