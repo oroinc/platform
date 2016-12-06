@@ -19,6 +19,7 @@ use Oro\Bundle\TestFrameworkBundle\Behat\Context\AssertTrait;
 use Oro\Bundle\TestFrameworkBundle\Behat\Element\CollectionField;
 use Oro\Bundle\TestFrameworkBundle\Behat\Element\Form;
 use Oro\Bundle\TestFrameworkBundle\Behat\Element\OroPageObjectAware;
+use Oro\Bundle\UserBundle\Tests\Behat\Element\UserMenu;
 
 /**
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
@@ -285,20 +286,11 @@ class OroMainContext extends MinkContext implements
      */
     public function iClickLinkInUserMenu($needle)
     {
+        /** @var UserMenu $userMenu */
         $userMenu = $this->createElement('UserMenu');
-        $userMenu->find('css', 'i.icon-sort-down')->click();
-        $links = $userMenu->findAll('css', 'ul.dropdown-menu li a');
-
-        /** @var NodeElement $link */
-        foreach ($links as $link) {
-            if (preg_match(sprintf('/%s/i', $needle), $link->getText())) {
-                $link->click();
-
-                return;
-            }
-        }
-
-        self::fail(sprintf('Can\'t find "%s" item in user menu', $needle));
+        self::assertTrue($userMenu->isValid());
+        $userMenu->open();
+        $userMenu->clickLink($needle);
     }
 
     /**
@@ -400,11 +392,26 @@ class OroMainContext extends MinkContext implements
     }
 
     /**
+     * Example: Given I open Opportunity Create page
+     * Example: Given I open Account Index page
+     *
      * @Given /^(?:|I )open (?P<pageName>[\w\s\/]+) page$/
      */
     public function openPage($pageName)
     {
         $this->getPage($pageName)->open();
+    }
+
+    /**
+     * Example: Given I open "Charlie" Account edit page
+     * Example: When I open "Supper sale" opportunity edit page
+     *
+     * @Given /^(?:|I )open "(?P<title>[\w\s]+)" (?P<entity>[\w\s]+) edit page$/
+     */
+    public function openEntityEditPage($title, $entity)
+    {
+        $pageName = preg_replace('/\s+/', ' ', ucwords($entity)).' Edit';
+        $this->getPage($pageName)->open(['title' => $title]);
     }
 
     /**

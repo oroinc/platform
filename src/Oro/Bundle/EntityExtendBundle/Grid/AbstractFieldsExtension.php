@@ -89,7 +89,7 @@ abstract class AbstractFieldsExtension extends AbstractExtension
         $from = $config->offsetGetByPath('[source][query][from]', []);
         if ($from) {
             foreach ($from as $part) {
-                if ($part['table'] === $entityClassName) {
+                if ($this->entityClassResolver->getEntityClass($part['table']) === $entityClassName) {
                     $alias = $part['alias'];
                 }
             }

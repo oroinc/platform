@@ -3,12 +3,10 @@
 namespace Oro\Bundle\SecurityBundle\Owner;
 
 use Oro\Bundle\SecurityBundle\Acl\Domain\ObjectIdAccessor;
-use Oro\Bundle\SecurityBundle\Acl\Extension\OwnershipDecisionMakerInterface;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProvider;
 use Oro\Bundle\UserBundle\Entity\User;
 
-class EntityOwnershipDecisionMaker extends AbstractEntityOwnershipDecisionMaker implements
-    OwnershipDecisionMakerInterface
+class EntityOwnershipDecisionMaker extends AbstractEntityOwnershipDecisionMaker
 {
     /**
      * @deprecated since 1.8, use getTreeProvider method instead

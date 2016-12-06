@@ -22,7 +22,7 @@ class EntitySecurityMetadataTest extends \PHPUnit_Framework_TestCase
             'SomeCategory',
             [
                 'first' => new FieldSecurityMetadata('first', 'First Label'),
-                'second' => new FieldSecurityMetadata('second', 'Second Label', ['VIEW'])
+                'second' => new FieldSecurityMetadata('second', 'Second Label', ['VIEW'], 'Second Description')
             ]
         );
     }
@@ -63,6 +63,9 @@ class EntitySecurityMetadataTest extends \PHPUnit_Framework_TestCase
         $fields = $emptyEntity->getFields();
         static::assertCount(2, $fields);
         static::assertEquals(new FieldSecurityMetadata('first', 'First Label'), $fields['first']);
-        static::assertEquals(new FieldSecurityMetadata('second', 'Second Label', ['VIEW']), $fields['second']);
+        static::assertEquals(
+            new FieldSecurityMetadata('second', 'Second Label', ['VIEW'], 'Second Description'),
+            $fields['second']
+        );
     }
 }

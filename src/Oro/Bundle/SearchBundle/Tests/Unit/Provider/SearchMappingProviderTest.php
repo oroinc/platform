@@ -57,7 +57,7 @@ class SearchMappingProviderTest extends AbstractSearchMappingProviderTest
             ->expects($this->never())
             ->method('dispatch');
 
-        $this->assertEquals($this->testMapping, $this->provider->getMappingConfig());
+        $this->assertEquals($this->testMapping, $this->getProvider()->getMappingConfig());
     }
 
     public function testGetMappingConfig()
@@ -87,8 +87,8 @@ class SearchMappingProviderTest extends AbstractSearchMappingProviderTest
             ->method('save')
             ->with(SearchMappingProvider::CACHE_KEY, []);
 
-        $this->assertEquals([], $this->provider->getMappingConfig());
-        $this->assertEquals([], $this->provider->getMappingConfig());
+        $this->assertEquals([], $this->getProvider()->getMappingConfig());
+        $this->assertEquals([], $this->getProvider()->getMappingConfig());
     }
 
     public function testClearMappingCache()
@@ -98,7 +98,7 @@ class SearchMappingProviderTest extends AbstractSearchMappingProviderTest
             ->method('delete')
             ->with(SearchMappingProvider::CACHE_KEY);
 
-        $this->provider->clearCache();
+        $this->getProvider()->clearCache();
     }
 
     /**
@@ -106,9 +106,11 @@ class SearchMappingProviderTest extends AbstractSearchMappingProviderTest
      */
     protected function getProvider()
     {
-        $provider = new SearchMappingProvider($this->eventDispatcher, $this->cache);
-        $provider->setMappingConfig($this->testMapping);
+        if (!$this->provider) {
+            $this->provider = new SearchMappingProvider($this->eventDispatcher, $this->cache);
+            $this->provider->setMappingConfig($this->testMapping);
+        }
 
-        return $provider;
+        return $this->provider;
     }
 }
