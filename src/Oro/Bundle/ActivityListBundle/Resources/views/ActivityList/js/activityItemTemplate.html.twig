@@ -1,42 +1,17 @@
 {% extends 'OroActivityListBundle:ActivityList/js:view.html.twig' %}
-{% import 'OroActivityBundle::macros.html.twig' as AC %}
 
 {% block activityIcon %}
     <i class="{{ oro_entity_config_value(entityClass|default(), 'icon')|raw }}"></i>
 {% endblock %}
 
 {% block activityActions %}
-    {% set action %}
-        <% if (workflowsData && workflowsData.length > 0) { %>
-            <% _.each(workflowsData, function(workflow) { %>
-                <% if (workflow.transitionsData.length > 0) { %>
-                    <li role="separator" class="divider"></li>
-                    <% _.each(workflow.transitionsData, function(transition) { %>
-                        <li>
-                            <a href="<%- transition.transitionUrl %>" class="transition-item"
-                               id="transition-<%- workflow.name %>-<%- transition.name %>"
-                               data-transition-url="<%- transition.transitionUrl %>"
-                               data-transition-label="<%- transition.label %>"
-                               data-message="<%- transition.message %>"
-                                <% if (transition.dialogUrl) { %>
-                                   data-dialog-url="<%- transition.dialogUrl %>"
-                                    <% if (transition.frontendOptions.dialog) { %>
-                                        data-dialog-options="<%- JSON.stringify(transition.frontendOptions.dialog) %>"
-                                    <% } %>
-                                <% } %>
-                            >
-                                <% if (transition.frontendOptions && transition.frontendOptions.icon) { %>
-                                <i class="<%- transition.frontendOptions.icon %> hide-text"><%- transition.label %></i>
-                                <% } %>
-                                <%- transition.label %>
-                            </a>
-                        </li>
-                    <% }) %>
-                <% } %>
-            <% }) %>
-        <% } %>
-    {% endset %}
-    {% set actions = actions|default([])|merge([action]) %}
-
-    {{ AC.verticalActionsList(actions) }}
+    <div class="dropdown vertical-actions activity-actions">
+        <a href="#" data-toggle="dropdown" class="dropdown-toggle activity-item">...</a>
+        <ul class="dropdown-menu activity-item pull-right">
+            {% for action in actions|default([]) %}
+                <li class="activity-action">{{ action|raw }}</li>
+            {% endfor %}
+            {% include 'OroActivityListBundle:ActivityList/js:workflowTemplate.html.twig' %}
+        </ul>
+    </div>
 {% endblock %}
