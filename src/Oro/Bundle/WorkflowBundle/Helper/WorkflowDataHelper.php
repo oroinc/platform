@@ -11,14 +11,12 @@ use Symfony\Component\Translation\TranslatorInterface;
 use Oro\Bundle\SecurityBundle\Acl\Domain\DomainObjectWrapper;
 use Oro\Bundle\SecurityBundle\SecurityFacade;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
-use Oro\Bundle\WorkflowBundle\Model\Step;
-use Oro\Bundle\WorkflowBundle\Model\Tools\WorkflowStepHelper;
 use Oro\Bundle\WorkflowBundle\Model\Transition;
 use Oro\Bundle\WorkflowBundle\Model\Workflow;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowManager;
 
 /**
- * Helper for getting entity workflows data
+ * Helper for getting entity workflows data used by UI
  */
 class WorkflowDataHelper
 {
@@ -61,6 +59,7 @@ class WorkflowDataHelper
      */
     public function getEntityWorkflowsData($entity)
     {
+        $workflows = [];
         $applicableWorkflows = array_filter(
             $this->workflowManager->getApplicableWorkflows($entity),
             function (Workflow $workflow) use ($entity) {
@@ -68,16 +67,15 @@ class WorkflowDataHelper
             }
         );
 
-        return array_map(
-            function (Workflow $workflow) use ($entity) {
-                return $this->getWorkflowData($entity, $workflow);
-            },
-            $applicableWorkflows
-        );
+        foreach ($applicableWorkflows as $workflow) {
+            $workflows[] = $this->getWorkflowData($entity, $workflow);
+        }
+
+        return $workflows;
     }
 
     /**
-     * Return array with serialized workflow data for $entity
+     * Return serialized $workflow data for $entity
      *
      * @param object $entity
      * @param Workflow $workflow
@@ -89,25 +87,36 @@ class WorkflowDataHelper
         $transitionsData = [];
         $workflowItem = $this->workflowManager->getWorkflowItem($entity, $workflow->getName());
 
-        $transitions = $workflowItem
-            ? $this->getAllowedTransitions($workflow, $workflowItem)
-            : $this->getAllowedStartTransitions($workflow, $entity);
+        // start workflow
+        if (null === $workflowItem) {
+            foreach ($this->getAllowedStartTransitions($workflow, $entity) as $transition) {
+                $transitionsData[] = array_merge(
+                    $this->getTransitionData($transition),
+                    $this->getStartTransitionUrl($workflow, $transition, $entity)
+                );
+            }
 
-        $workflowItemId = $workflowItem !== null ? $workflowItem->getId() : null;
+            return [
+                'name' => $workflow->getName(),
+                'label' => $workflow->getLabel(),
+                'isStarted' => false,
+                'workflowItemId' => null,
+                'transitionsData' => $transitionsData,
+            ];
+        }
 
-        foreach ($transitions as $transition) {
+        foreach ($this->getAllowedTransitions($workflow, $workflowItem) as $transition) {
             $transitionsData[] = array_merge(
                 $this->getTransitionData($transition),
-                $this->getTransitionUrl($transition, $entity, $workflow, $workflowItem)
+                $this->getTransitionUrl($transition, $workflowItem)
             );
         }
 
         return [
             'name' => $workflow->getName(),
             'label' => $workflow->getLabel(),
-            'isStarted' => $workflowItemId !== null,
-            'workflowItemId' => $workflowItemId,
-            'stepsData' => $this->getStepsData($entity, $workflow, $workflowItem, $transitions),
+            'isStarted' => true,
+            'workflowItemId' => $workflowItem->getId(),
             'transitionsData' => $transitionsData,
         ];
     }
@@ -139,78 +148,37 @@ class WorkflowDataHelper
 
     /**
      * @param Transition $transition
-     * @param $entity
-     * @param Workflow $workflow
      * @param WorkflowItem $workflowItem
      *
-     * @return string|null
+     * @return array
      */
-    protected function getTransitionUrl(
-        Transition $transition,
-        $entity,
-        Workflow $workflow,
-        WorkflowItem $workflowItem = null
-    ) {
-        $isStarted = $workflowItem !== null;
+    protected function getTransitionUrl(Transition $transition, WorkflowItem $workflowItem)
+    {
+        $parameters = [
+            'transitionName' => $transition->getName(),
+            'workflowItemId' => $workflowItem->getId(),
+        ];
 
-        if ($isStarted) {
-            $urlParams = [
-                'transitionName' => $transition->getName(),
-                'workflowItemId' => $workflowItem->getId(),
-            ];
-
-            if ($transition->getDisplayType() === 'dialog') {
-                if ($transition->hasForm()) {
-                    return [
-                        'dialogUrl' => $this->router->generate(
-                            'oro_workflow_widget_transition_form',
-                            $urlParams,
-                            UrlGeneratorInterface::ABSOLUTE_URL
-                        ),
-                        'transitionUrl' => $this->router->generate(
-                            'oro_api_workflow_transit',
-                            $urlParams,
-                            UrlGeneratorInterface::ABSOLUTE_URL
-                        ),
-                    ];
-                }
-            }
-
+        if ($transition->getDisplayType() !== 'dialog') {
             return [
                 'transitionUrl' => $this->router->generate(
                     'oro_api_workflow_transit',
-                    $urlParams,
+                    $parameters,
                     UrlGeneratorInterface::ABSOLUTE_URL
                 ),
             ];
         }
 
-        $urlParams = [
-            'workflowName' => $workflow->getName(),
-            'transitionName' => $transition->getName(),
-            'entityId' => $entity->getId(),
-        ];
-
-        if ($transition->getDisplayType() === 'dialog') {
-            if ($transition->hasForm()) {
-                return [
-                    'dialogUrl' => $this->router->generate(
-                        'oro_workflow_widget_start_transition_form',
-                        $urlParams,
-                        UrlGeneratorInterface::ABSOLUTE_URL
-                    ),
-                    'transitionUrl' => $this->router->generate(
-                        'oro_api_workflow_start',
-                        $urlParams,
-                        UrlGeneratorInterface::ABSOLUTE_URL
-                    ),
-                ];
-            }
-
+        if ($transition->hasForm()) {
             return [
+                'dialogUrl' => $this->router->generate(
+                    'oro_workflow_widget_transition_form',
+                    $parameters,
+                    UrlGeneratorInterface::ABSOLUTE_URL
+                ),
                 'transitionUrl' => $this->router->generate(
-                    'oro_api_workflow_start',
-                    $urlParams,
+                    'oro_api_workflow_transit',
+                    $parameters,
                     UrlGeneratorInterface::ABSOLUTE_URL
                 ),
             ];
@@ -218,105 +186,65 @@ class WorkflowDataHelper
 
         return [
             'transitionUrl' => $this->router->generate(
-                'oro_workflow_start_transition_form',
-                $urlParams,
+                'oro_api_workflow_transit',
+                $parameters,
                 UrlGeneratorInterface::ABSOLUTE_URL
             ),
         ];
     }
 
     /**
-     * Return serialized steps data
-     *
-     * @param object $entity
      * @param Workflow $workflow
-     * @param WorkflowItem|null $workflowItem
-     * @param array $transitions
+     * @param Transition $transition
+     * @param object $entity
      *
      * @return array
      */
-    protected function getStepsData(
-        $entity,
-        Workflow $workflow,
-        WorkflowItem $workflowItem = null,
-        array $transitions = []
-    ) {
-        $isStepsDisplayOrdered = $workflow->getDefinition()->isStepsDisplayOrdered();
-        $currentStep = $workflowItem ? $workflowItem->getCurrentStep() : null;
+    protected function getStartTransitionUrl(Workflow $workflow, Transition $transition, $entity)
+    {
+        $parameters = [
+            'workflowName' => $workflow->getName(),
+            'transitionName' => $transition->getName(),
+            'entityId' => $entity->getId(),
+        ];
 
-        $helper = new WorkflowStepHelper($workflow);
-        $stepManager = $workflow->getStepManager();
-
-        if ($isStepsDisplayOrdered) {
-            $steps = $stepManager->getOrderedSteps(true, true)->toArray();
-
-            if ($workflowItem) {
-                $startStepNames = $this->getStartStepNames($entity, $workflow);
-
-                $way = array_merge(
-                    $helper->getStepsBefore($workflowItem, $startStepNames, true),
-                    $helper->getStepsAfter($stepManager->getStep($currentStep->getName()), true, true)
-                );
-
-                $steps = array_intersect($steps, $way);
-            }
-
-            $steps = array_map(
-                function ($stepName) use ($stepManager) {
-                    return $stepManager->getStep($stepName);
-                },
-                $steps
-            );
-        } elseif ($currentStep) {
-            $steps = [$stepManager->getStep($currentStep->getName())];
-        } else {
-            $steps = array_map(
-                function (Transition $transition) {
-                    return $transition->getStepTo();
-                },
-                $transitions
-            );
+        if ($transition->getDisplayType() !== 'dialog') {
+            return [
+                'transitionUrl' => $this->router->generate(
+                    'oro_workflow_start_transition_form',
+                    $parameters,
+                    UrlGeneratorInterface::ABSOLUTE_URL
+                ),
+            ];
         }
 
-        $steps = array_map(
-            function (Step $step) use ($currentStep, $helper) {
-                return [
-                    'label' => $step->getLabel(),
-                    'active' => $currentStep && $step->getName() === $currentStep->getName(),
-                    'possibleStepsCount' => count($helper->getStepsAfter($step)),
-                ];
-            },
-            $steps
-        );
+        if (!$transition->hasForm()) {
+            return [
+                'transitionUrl' => $this->router->generate(
+                    'oro_api_workflow_start',
+                    $parameters,
+                    UrlGeneratorInterface::ABSOLUTE_URL
+                ),
+            ];
+        }
 
         return [
-            'isOrdered' => $isStepsDisplayOrdered,
-            'steps' => $steps,
+            'dialogUrl' => $this->router->generate(
+                'oro_workflow_widget_start_transition_form',
+                $parameters,
+                UrlGeneratorInterface::ABSOLUTE_URL
+            ),
+            'transitionUrl' => $this->router->generate(
+                'oro_api_workflow_start',
+                $parameters,
+                UrlGeneratorInterface::ABSOLUTE_URL
+            ),
         ];
     }
 
     /**
-     * Get step names from start transitions
-     *
-     * @param $entity
-     * @param Workflow $workflow
-     *
-     * @return array
-     */
-    protected function getStartStepNames($entity, Workflow $workflow)
-    {
-        return array_map(
-            function (array $data) {
-                return $data['transition']->getStepTo()->getName();
-            },
-            $this->getAllowedStartTransitions($workflow, $entity)
-        );
-    }
-
-    /**
      * Get transitions data for view based on workflow item.
-
-*
+     *
      * @param Workflow $workflow
      * @param WorkflowItem $workflowItem
      *
@@ -339,7 +267,7 @@ class WorkflowDataHelper
     /**
      * Get array of start transitions available for workflow
      *
-     *@param Workflow $workflow
+     * @param Workflow $workflow
      * @param object $entity
      *
      * @return Transition[]
@@ -394,7 +322,6 @@ class WorkflowDataHelper
      * @param WorkflowItem $workflowItem
      *
      * @return bool
-     * @internal param object $entity
      */
     protected function isTransitionAllowed(Workflow $workflow, Transition $transition, WorkflowItem $workflowItem)
     {

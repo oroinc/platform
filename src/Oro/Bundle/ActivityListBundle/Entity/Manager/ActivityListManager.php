@@ -64,7 +64,7 @@ class ActivityListManager
     protected $eventDispatcher;
 
     /** @var WorkflowDataHelper */
-    private $workflowHelper;
+    protected $workflowHelper;
 
     /**
      * @param SecurityFacade                   $securityFacade
@@ -77,7 +77,7 @@ class ActivityListManager
      * @param ActivityListAclCriteriaHelper    $aclHelper
      * @param ActivityInheritanceTargetsHelper $activityInheritanceTargetsHelper
      * @param EventDispatcherInterface         $eventDispatcher
-     * @param WorkflowDataHelper                 $workflowHelper
+     * @param WorkflowDataHelper               $workflowHelper
      * @SuppressWarnings(PHPMD.ExcessiveParameterList)
      */
     public function __construct(

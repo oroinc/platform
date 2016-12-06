@@ -1,4 +1,5 @@
 {% extends 'OroActivityListBundle:ActivityList/js:view.html.twig' %}
+{% import 'OroActivityBundle::macros.html.twig' as AC %}
 
 {% block activityIcon %}
     <i class="{{ oro_entity_config_value(entityClass|default(), 'icon')|raw }}"></i>
@@ -6,13 +7,13 @@
 
 {% block activityActions %}
     {% set action %}
-        <% if (workflowsData) { %>
+        <% if (workflowsData && workflowsData.length > 0) { %>
             <% _.each(workflowsData, function(workflow) { %>
                 <% if (workflow.transitionsData.length > 0) { %>
                     <li role="separator" class="divider"></li>
                     <% _.each(workflow.transitionsData, function(transition) { %>
                         <li>
-                            <a href="#" class="transition-item"
+                            <a href="<%- transition.transitionUrl %>" class="transition-item"
                                id="transition-<%- workflow.name %>-<%- transition.name %>"
                                data-transition-url="<%- transition.transitionUrl %>"
                                data-transition-label="<%- transition.label %>"
@@ -24,7 +25,9 @@
                                     <% } %>
                                 <% } %>
                             >
+                                <% if (transition.frontendOptions && transition.frontendOptions.icon) { %>
                                 <i class="<%- transition.frontendOptions.icon %> hide-text"><%- transition.label %></i>
+                                <% } %>
                                 <%- transition.label %>
                             </a>
                         </li>
