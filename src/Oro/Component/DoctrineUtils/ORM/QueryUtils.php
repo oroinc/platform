@@ -5,12 +5,12 @@ namespace Oro\Component\DoctrineUtils\ORM;
 use Doctrine\Common\Collections\Criteria;
 use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\DBAL\SQLParserUtils;
+use Doctrine\ORM\Mapping\ClassMetadataInfo;
 use Doctrine\ORM\Query;
 use Doctrine\ORM\Query\Expr;
 use Doctrine\ORM\Query\QueryException;
 use Doctrine\ORM\Query\ResultSetMapping;
 use Doctrine\ORM\QueryBuilder;
-
 use Oro\Component\PhpUtils\ArrayUtil;
 
 /**
@@ -501,6 +501,76 @@ class QueryUtils
             foreach ($joins as $join) {
                 if ($join->getAlias() === $alias) {
                     return $join;
+                }
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * @param QueryBuilder $qb
+     * @param string $alias
+     *
+     * @return bool
+     */
+    public static function isToOne(QueryBuilder $qb, $alias)
+    {
+        $rootAliases = $qb->getRootAliases();
+        if (count($rootAliases) !== 1) {
+            return false;
+        }
+
+        $joins = [];
+        $currentAlias = $alias;
+        while ($parentAliasWithJoin = static::findParentAliasWithJoin($qb, $currentAlias)) {
+            $currentAlias = key($parentAliasWithJoin);
+            $joins[] = reset($parentAliasWithJoin);
+        }
+
+        if ($currentAlias !== $rootAliases[0]) {
+            return false;
+        }
+
+        $rootEntities = $qb->getRootEntities();
+        $em = $qb->getEntityManager();
+
+        $metadata = $em->getClassMetadata($rootEntities[0]);
+        $startIndex = count($joins) - 1;
+        for ($i = $startIndex; $i >= 0; $i--) {
+            list(, $field) = explode('.', $joins[$i]);
+            if (!isset($metadata->associationMappings[$field])) {
+                return false;
+            }
+
+            $assoc = $metadata->associationMappings[$field];
+
+            if (!($assoc['type'] & ClassMetadataInfo::TO_ONE)) {
+                return false;
+            }
+
+            $metadata = $em->getClassMetadata($assoc['targetEntity']);
+        }
+
+        return true;
+    }
+
+    /**
+     * @param QueryBuilder $qb
+     * @param string $alias
+     *
+     * @return array
+     * [parent alias, join]
+     */
+    protected static function findParentAliasWithJoin(QueryBuilder $qb, $alias)
+    {
+        $joinPart = $qb->getDQLPart('join');
+        foreach ($joinPart as $joins) {
+            foreach ($joins as $join) {
+                if ($join->getAlias() === $alias) {
+                    list($parentAlias) = explode('.', $join->getJoin());
+
+                    return [$parentAlias => $join->getJoin()];
                 }
             }
         }
