@@ -2,8 +2,11 @@
 
 namespace Oro\Bundle\CurrencyBundle\Rounding;
 
+use Oro\DBAL\Types\MoneyType;
+
 class PriceRoundingService extends AbstractRoundingService
 {
+    const FALLBACK_PRECISION = MoneyType::TYPE_SCALE;
     const DEFAULT_ROUND_TYPE = RoundingServiceInterface::ROUND_HALF_UP;
     const DEFAULT_PRECISION  = 2;
 
