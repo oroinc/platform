@@ -39,19 +39,6 @@ class OperationManager
 
     /**
      * @param string $operationName
-     * @param array|null $context
-     * @param Collection|null $errors
-     * @return ActionData
-     */
-    public function executeByContext($operationName, array $context = null, Collection $errors = null)
-    {
-        $actionData = $this->contextHelper->getActionData($context);
-
-        return $this->execute($operationName, $actionData, $errors);
-    }
-
-    /**
-     * @param string $operationName
      * @param ActionData $actionData
      * @param Collection|null $errors
      * @return ActionData
@@ -61,15 +48,6 @@ class OperationManager
         $this->getOperation($operationName, $actionData)->execute($actionData, $errors);
 
         return $actionData;
-    }
-
-    /**
-     * @param array|null $context
-     * @return bool
-     */
-    public function hasOperations(array $context = null)
-    {
-        return count($this->getOperations($context)) > 0;
     }
 
     /**

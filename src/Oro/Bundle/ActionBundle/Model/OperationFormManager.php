@@ -7,6 +7,7 @@ use Symfony\Component\Form\FormFactoryInterface;
 
 use Oro\Bundle\ActionBundle\Helper\ContextHelper;
 
+//todo @ephrin BAP-12875 rename to OperationFormHandler, move WidgetController::formAction here
 class OperationFormManager
 {
     /** @var FormFactoryInterface */
