@@ -117,27 +117,4 @@ class OperationManager
 
         return $operation->isAvailable($actionData);
     }
-
-    /**
-     * @param string $operationName
-     * @param array|null $context
-     * @return string
-     */
-    public function getFrontendTemplate($operationName, array $context = null)
-    {
-        $template = self::DEFAULT_FORM_TEMPLATE;
-        $operation = $this->getOperation($operationName, $this->contextHelper->getActionData($context), false);
-
-        if ($operation) {
-            $frontendOptions = $operation->getDefinition()->getFrontendOptions();
-
-            if (array_key_exists('template', $frontendOptions)) {
-                $template = $frontendOptions['template'];
-            } elseif (array_key_exists('show_dialog', $frontendOptions) && !$frontendOptions['show_dialog']) {
-                $template = self::DEFAULT_PAGE_TEMPLATE;
-            }
-        }
-
-        return $template;
-    }
 }

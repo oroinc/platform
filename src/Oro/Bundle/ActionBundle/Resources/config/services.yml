@@ -130,12 +130,13 @@ services:
         calls:
             - [addConfigurationPass, ['@oro_action.configuration_pass.replace_property_path']]
 
-    oro_action.form_manager:
-        class: %oro_action.form_manager.class%
+    oro_action.button.operation.widget_form_handler:
+        class: Oro\Bundle\ActionBundle\Handler\OperationWidgetFormHandler
         arguments:
             - '@form.factory'
-            - '@oro_action.operation_manager'
             - '@oro_action.helper.context'
+            - '@oro_action.operation_registry'
+            - '@translator'
 
     oro_action.api_manager:
         class: %oro_action.api_manager.class%
