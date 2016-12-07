@@ -1,18 +1,21 @@
 <?php
-namespace Oro\Bundle\ImportExportBundle\Async;
+namespace Oro\Bundle\DataGridBundle\Async;
 
 use Psr\Log\LoggerInterface;
 
-use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorage;
-use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
+use Oro\Bundle\DataGridBundle\Datagrid\ParameterBag;
+use Oro\Bundle\DataGridBundle\Extension\Action\ActionExtension;
+use Oro\Bundle\DataGridBundle\Handler\ExportHandler;
+use Oro\Bundle\DataGridBundle\ImportExport\DatagridExportConnector;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
-use Oro\Bundle\ImportExportBundle\Handler\ExportHandler;
-use Oro\Bundle\ImportExportBundle\Processor\ProcessorRegistry;
+use Oro\Bundle\ImportExportBundle\Formatter\FormatterProvider;
+use Oro\Bundle\ImportExportBundle\Processor\ExportProcessor;
+use Oro\Bundle\ImportExportBundle\Writer\FileStreamWriter;
 use Oro\Bundle\NotificationBundle\Async\Topics as EmailTopics;
-use Oro\Bundle\OrganizationBundle\Entity\Organization;
-use Oro\Bundle\SecurityBundle\SecurityFacade;
+use Oro\Bundle\SecurityBundle\Authentication\Token\UsernamePasswordOrganizationToken;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Component\MessageQueue\Client\MessageProducerInterface;
 use Oro\Component\MessageQueue\Client\TopicSubscriberInterface;
@@ -22,7 +25,7 @@ use Oro\Component\MessageQueue\Transport\MessageInterface;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
 use Oro\Component\MessageQueue\Util\JSON;
 
-class ExportMessageProcessor implements MessageProcessorInterface, TopicSubscriberInterface
+abstract class AbstractExportMessageProcessor implements MessageProcessorInterface, TopicSubscriberInterface
 {
     /**
      * @var ExportHandler
@@ -50,12 +53,22 @@ class ExportMessageProcessor implements MessageProcessorInterface, TopicSubscrib
     private $doctrineHelper;
 
     /**
-     * @var SecurityFacade
+     * @var DatagridExportConnector
      */
-    private $securityFacade;
+    private $exportConnector;
 
     /**
-     * @var TokenStorage
+     * @var ExportProcessor
+     */
+    private $exportProcessor;
+
+    /**
+     * @var FileStreamWriter
+     */
+    private $exportWriter;
+
+    /**
+     * @var TokenStorageInterface
      */
     private $tokenStorage;
 
@@ -70,8 +83,9 @@ class ExportMessageProcessor implements MessageProcessorInterface, TopicSubscrib
      * @param MessageProducerInterface $producer
      * @param ConfigManager $configManager
      * @param DoctrineHelper $doctrineHelper
-     * @param SecurityFacade $securityFacade
-     * @param TokenStorage $tokenStorage
+     * @param DatagridExportConnector $exportConnector
+     * @param ExportProcessor $exportProcessor
+     * @param TokenStorageInterface $tokenStorage
      * @param LoggerInterface $logger
      */
     public function __construct(
@@ -80,8 +94,9 @@ class ExportMessageProcessor implements MessageProcessorInterface, TopicSubscrib
         MessageProducerInterface $producer,
         ConfigManager $configManager,
         DoctrineHelper $doctrineHelper,
-        SecurityFacade $securityFacade,
-        TokenStorage $tokenStorage,
+        DatagridExportConnector $exportConnector,
+        ExportProcessor $exportProcessor,
+        TokenStorageInterface $tokenStorage,
         LoggerInterface $logger
     ) {
         $this->exportHandler = $exportHandler;
@@ -89,9 +104,18 @@ class ExportMessageProcessor implements MessageProcessorInterface, TopicSubscrib
         $this->producer = $producer;
         $this->configManager = $configManager;
         $this->doctrineHelper = $doctrineHelper;
-        $this->securityFacade = $securityFacade;
+        $this->exportConnector = $exportConnector;
+        $this->exportProcessor = $exportProcessor;
         $this->tokenStorage = $tokenStorage;
         $this->logger = $logger;
+    }
+
+    /**
+     * @param FileStreamWriter $exportWriter
+     */
+    public function setWriter(FileStreamWriter $exportWriter)
+    {
+        $this->exportWriter = $exportWriter;
     }
 
     /**
@@ -101,19 +125,19 @@ class ExportMessageProcessor implements MessageProcessorInterface, TopicSubscrib
     {
         $body = JSON::decode($message->getBody());
         $body = array_replace_recursive([
-            'jobName' => null,
-            'processorAlias' => null,
+            'format' => null,
+            'batchSize' => 200,
+            'parameters' => [
+                'gridName' => null,
+                'gridParameters' => [],
+                FormatterProvider::FORMAT_TYPE => 'excel',
+            ],
             'userId' => null,
-            'organizationId' => null,
-            'exportType' => ProcessorRegistry::TYPE_EXPORT,
-            'outputFormat' => 'csv',
-            'outputFilePrefix' => null,
-            'options' => [],
         ], $body);
 
-        if (! isset($body['jobName'], $body['processorAlias'], $body['userId'])) {
+        if (! isset($body['userId'], $body['parameters'], $body['parameters']['gridName'], $body['format'])) {
             $this->logger->critical(
-                sprintf('[ExportMessageProcessor] Got invalid message: "%s"', $message->getBody()),
+                sprintf('[DataGridExportMessageProcessor] Got invalid message: "%s"', $message->getBody()),
                 ['message' => $message]
             );
 
@@ -124,44 +148,46 @@ class ExportMessageProcessor implements MessageProcessorInterface, TopicSubscrib
         $user = $this->doctrineHelper->getEntityRepository(User::class)->find($body['userId']);
         if (! $user) {
             $this->logger->critical(
-                sprintf('[ExportMessageProcessor] Cannot find user by id "%s"', $body['userId']),
+                sprintf('[DataGridExportMessageProcessor] Cannot find user by id "%s"', $body['userId']),
                 ['message' => $message]
             );
 
             return self::REJECT;
         }
 
-        $jobUniqueName = Topics::EXPORT . '_' . $body['processorAlias'];
-
-        $token = new UsernamePasswordToken($user, null, 'main', $user->getRoles());
+        $token = new UsernamePasswordOrganizationToken($user, null, 'main', $user->getOrganization(), $user->getRoles());
         $this->tokenStorage->setToken($token);
 
-        if (isset($body['organizationId'])) {
-            $body['options']['organization'] = $this->doctrineHelper->getEntityRepository(Organization::class)
-                ->find($body['organizationId']);
-        }
+        $contextParameters = new ParameterBag($body['parameters']['gridParameters']);
+        $contextParameters->set(ActionExtension::ENABLE_ACTIONS_PARAMETER, false);
+        $body['parameters']['gridParameters'] = $contextParameters;
+
+        $jobUniqueName = sprintf(
+            'datagrid_export_%s_%s_%s',
+            $body['format'],
+            $body['parameters']['gridName'],
+            $message->getMessageId()
+        );
 
         $result = $this->jobRunner->runUnique(
             $message->getMessageId(),
             $jobUniqueName,
             function () use ($body, $jobUniqueName, $user) {
-                $exportResult = $this->exportHandler->getExportResult(
-                    $body['jobName'],
-                    $body['processorAlias'],
-                    $body['exportType'],
-                    $body['outputFormat'],
-                    $body['outputFilePrefix'],
-                    $body['options']
+                $exportResult = $this->exportHandler->handle(
+                    $this->exportConnector,
+                    $this->exportProcessor,
+                    $this->exportWriter,
+                    $body['parameters'],
+                    $body['batchSize'],
+                    $body['format']
                 );
 
-                $this->sendNotificationMessage($jobUniqueName, $exportResult, $user);
-
                 $this->logger->info(sprintf(
-                    '[ExportMessageProcessor] Export result. Success: %s. ReadsCount: %s. ErrorsCount: %s',
-                    $exportResult['success'],
-                    $exportResult['readsCount'],
-                    $exportResult['errorsCount']
+                    '[DataGridExportMessageProcessor] Export result. Success: %s.',
+                    $exportResult['success']
                 ));
+
+                $this->sendNotificationMessage($jobUniqueName, $exportResult, $user);
 
                 return $exportResult['success'];
             }
@@ -177,27 +203,14 @@ class ExportMessageProcessor implements MessageProcessorInterface, TopicSubscrib
      * @param array $exportResult
      * @param User $user
      */
-    protected function sendNotificationMessage($jobUniqueName, array $exportResult, $user)
+    protected function sendNotificationMessage($jobUniqueName, array $exportResult, User $user)
     {
-        $subject = sprintf('Export result for job %s', $jobUniqueName);
+        $subject = sprintf('Grid export result for job %s', $jobUniqueName);
 
         if ($exportResult['success']) {
-            if ($exportResult['readsCount']) {
-                $body = sprintf(
-                    'Export performed successfully, %s %s were exported. Download link: %s',
-                    $exportResult['readsCount'],
-                    $exportResult['entities'],
-                    $exportResult['url']
-                );
-            } else {
-                $body = sprintf('No %s found for export.', $exportResult['entities']);
-            }
+            $body = sprintf('Grid export performed successfully. Download link: %s', $exportResult['url']);
         } else {
-            $body = sprintf(
-                'Export operation fails, %s error(s) found. Error log: %s',
-                $exportResult['errorsCount'],
-                $exportResult['url']
-            );
+            $body = 'Grid export operation fails.';
         }
 
         $this->producer->send(EmailTopics::SEND_NOTIFICATION_EMAIL, [
@@ -207,13 +220,5 @@ class ExportMessageProcessor implements MessageProcessorInterface, TopicSubscrib
             'subject' => $subject,
             'body' => $body,
         ]);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public static function getSubscribedTopics()
-    {
-        return [Topics::EXPORT];
     }
 }

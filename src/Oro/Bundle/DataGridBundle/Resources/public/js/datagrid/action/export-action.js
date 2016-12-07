@@ -2,8 +2,9 @@ define([
     'jquery',
     'underscore',
     './abstract-action',
-    'orotranslation/js/translator'
-], function($, _, AbstractAction, __) {
+    'orotranslation/js/translator',
+    'oroui/js/mediator'
+], function($, _, AbstractAction, __, mediator) {
     'use strict';
 
     var ExportAction;
@@ -23,6 +24,12 @@ define([
         /** @property {Boolean} */
         isModalBinded: false,
 
+        messages: {
+            starting: 'oro.datagrid.export.starting.message',
+            success: 'oro.datagrid.export.success.message',
+            fail: 'oro.datagrid.export.fail.message',
+        },
+
         /** @property {Object} */
         defaultMessages: {
             confirm_title: 'Export Confirmation',
@@ -34,14 +41,15 @@ define([
          * {@inheritdoc}
          */
         initialize: function(options) {
-            this.launcherOptions = {
-                runAction: false
-            };
             this.route = 'oro_datagrid_export_action';
             this.route_parameters = {
                 gridName: options.datagrid.name
             };
             this.collection = options.datagrid.collection;
+            this.reloadData = false;
+            this.frontend_handle = 'ajax';
+
+            this.on('preExecute', _.bind(this._preExecuteSubscriber, this));
 
             ExportAction.__super__.initialize.apply(this, arguments);
         },
@@ -65,6 +73,29 @@ define([
             });
 
             return launcher;
+        },
+
+        /**
+         * {@inheritdoc}
+         */
+        _preExecuteSubscriber: function() {
+            mediator.execute('showFlashMessage', 'success', this.messages.starting);
+        },
+
+        /**
+         * {@inheritdoc}
+         */
+        getActionParameters: function() {
+            return _.extend({format: this.actionKey}, this.collection.getFetchData())
+        },
+
+        /**
+         * {@inheritdoc}
+         */
+        _onAjaxError: function(jqXHR) {
+            mediator.execute('showFlashMessage', 'error', this.messages.fail);
+
+            ExportAction.__super__._onAjaxError.apply(this, arguments);
         },
 
         createWarningModalForMaxRecords: function($el, launcher) {
