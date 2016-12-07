@@ -75,8 +75,7 @@ class DatagridType extends AbstractContainerType
                 $this->addChild($builder, $rootId, $options, $rowId, 'datagrid_row');
 
                 foreach ($columns as $columnName => $column) {
-
-                    $headerCellId = $this->generateName([$rowId, 'header', 'cell', $columnName]);
+                    $headerCellId = $this->generateName([$rootId, 'header', 'cell', $columnName]);
                     $this->addChild(
                         $builder,
                         $headerRowId,
@@ -86,7 +85,7 @@ class DatagridType extends AbstractContainerType
                         ['column_name' => $columnName]
                     );
 
-                    $cellId = $this->generateName([$rowId, 'cell', $columnName]);
+                    $cellId = $this->generateName([$rootId, 'cell', $columnName]);
                     $this->addChild(
                         $builder,
                         $rowId,
@@ -96,7 +95,7 @@ class DatagridType extends AbstractContainerType
                         ['column_name' => $columnName]
                     );
 
-                    $cellValueId = $this->generateName([$rowId, 'cell', $columnName, 'value']);
+                    $cellValueId = $this->generateName([$rootId, 'cell', $columnName, 'value']);
                     $this->addChild(
                         $builder,
                         $cellId,
@@ -211,10 +210,13 @@ class DatagridType extends AbstractContainerType
     {
         $name = ImportLayoutManipulator::NAMESPACE_PLACEHOLDER . $childBlockType;
 
-        foreach ($rootOptions['additional_block_prefixes'] as $prefix) {
-            $parts = explode(ImportLayoutManipulator::NAMESPACE_PLACEHOLDER, $prefix);
-            $lastPart = ImportLayoutManipulator::NAMESPACE_PLACEHOLDER . end($parts);
-            $childOptions['additional_block_prefixes'][] = preg_replace('/' . $lastPart . '$/', $name, $prefix);
+        $options = $rootOptions->toArray();
+        if (array_key_exists('additional_block_prefixes', $options)) {
+            foreach ($options['additional_block_prefixes'] as $prefix) {
+                $parts = explode(ImportLayoutManipulator::NAMESPACE_PLACEHOLDER, $prefix);
+                $lastPart = ImportLayoutManipulator::NAMESPACE_PLACEHOLDER . end($parts);
+                $childOptions['additional_block_prefixes'][] = preg_replace('/' . $lastPart . '$/', $name, $prefix);
+            }
         }
 
         return $childOptions;

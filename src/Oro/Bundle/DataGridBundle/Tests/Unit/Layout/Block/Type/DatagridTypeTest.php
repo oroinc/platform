@@ -52,7 +52,6 @@ class DatagridTypeTest extends BlockTypeTestCase
                 'grid_parameters'        => ['foo' => 'bar'],
                 'grid_render_parameters' => ['foo1' => 'bar1'],
                 'split_to_cells'         => true,
-                'server_side_render'     => false,
             ]
         );
 
@@ -62,7 +61,6 @@ class DatagridTypeTest extends BlockTypeTestCase
         $this->assertEquals(['foo' => 'bar'], $view->vars['grid_parameters']);
         $this->assertEquals(['foo1' => 'bar1'], $view->vars['grid_render_parameters']);
         $this->assertEquals(true, $view->vars['split_to_cells']);
-        $this->assertEquals(false, $view->vars['server_side_render']);
     }
 
     public function testBuildViewWithoutScope()
@@ -86,7 +84,6 @@ class DatagridTypeTest extends BlockTypeTestCase
         $this->assertEquals(['foo' => 'bar'], $view->vars['grid_parameters']);
         $this->assertEquals(['foo1' => 'bar1'], $view->vars['grid_render_parameters']);
         $this->assertEquals(true, $view->vars['split_to_cells']);
-        $this->assertEquals(false, $view->vars['server_side_render']);
     }
 
     public function testBuildViewWithParamsOverwrite()
@@ -156,11 +153,25 @@ class DatagridTypeTest extends BlockTypeTestCase
                     'test_grid_header_row',
                     'test_grid',
                     'datagrid_header_row',
+                    [
+                        'additional_block_prefixes' => [
+                            'additional_prefix',
+                            '__test__datagrid_header_row',
+                            '__test__import__datagrid_header_row'
+                        ]
+                    ]
                 ],
                 [
                     'test_grid_row',
                     'test_grid',
                     'datagrid_row',
+                    [
+                        'additional_block_prefixes' => [
+                            'additional_prefix',
+                            '__test__datagrid_row',
+                            '__test__import__datagrid_row'
+                        ]
+                    ]
                 ],
                 [
                     'test_grid_header_cell_column_1',
@@ -168,6 +179,11 @@ class DatagridTypeTest extends BlockTypeTestCase
                     'datagrid_header_cell',
                     [
                         'column_name' => 'column_1',
+                        'additional_block_prefixes' => [
+                            'additional_prefix',
+                            '__test__datagrid_header_cell',
+                            '__test__import__datagrid_header_cell'
+                        ]
                     ],
                 ],
                 [
@@ -176,6 +192,11 @@ class DatagridTypeTest extends BlockTypeTestCase
                     'datagrid_cell',
                     [
                         'column_name' => 'column_1',
+                        'additional_block_prefixes' => [
+                            'additional_prefix',
+                            '__test__datagrid_cell',
+                            '__test__import__datagrid_cell'
+                        ]
                     ],
                 ],
                 [
@@ -184,12 +205,25 @@ class DatagridTypeTest extends BlockTypeTestCase
                     'datagrid_cell_value',
                     [
                         'column_name' => 'column_1',
+                        'additional_block_prefixes' => [
+                            'additional_prefix',
+                            '__test__datagrid_cell_value',
+                            '__test__import__datagrid_cell_value'
+                        ]
                     ],
                 ]
             );
 
         $type = new DatagridType($this->nameStrategy, $this->manager, $this->securityFacade);
-        $options = $this->resolveOptions($type, ['grid_name' => 'test-grid', 'split_to_cells' => true]);
+        $options = $this->resolveOptions($type, [
+            'grid_name' => 'test-grid',
+            'split_to_cells' => true,
+            'additional_block_prefixes' => [
+                'additional_prefix',
+                '__test__datagrid',
+                '__test__import__datagrid'
+            ]
+        ]);
         $type->buildBlock($builder, new Options($options));
     }
 
@@ -209,7 +243,6 @@ class DatagridTypeTest extends BlockTypeTestCase
             'block_type' => 'datagrid',
             'unique_block_prefix' => '_product_datagrid',
             'block_prefixes' => ['block', 'container', 'datagrid', '_product_datagrid'],
-            'server_side_render' => true,
         ];
         $view->children = [$childView];
 
@@ -221,13 +254,8 @@ class DatagridTypeTest extends BlockTypeTestCase
         $type->finishView($view, $block);
 
         $this->assertEquals(
-            ['block', 'container', 'datagrid', 'server_render_datagrid', '_product_datagrid'],
+            ['block', 'container', 'datagrid', '_product_datagrid'],
             $view->vars['block_prefixes']
-        );
-
-        $this->assertEquals(
-            ['server_render_datagrid_toolbar'],
-            $childView->vars['additional_block_prefixes']
         );
     }
 
@@ -268,7 +296,6 @@ class DatagridTypeTest extends BlockTypeTestCase
                     'grid_parameters' => [],
                     'grid_render_parameters' => [],
                     'split_to_cells' => false,
-                    'server_side_render' => false,
                 ]
             ],
             'custom' => [
@@ -280,7 +307,6 @@ class DatagridTypeTest extends BlockTypeTestCase
                     ],
                     'grid_render_parameters' => ['foo' => 'bar'],
                     'split_to_cells' => true,
-                    'server_side_render' => true,
                 ],
                 [
                     'grid_name' => 'test_grid',
@@ -290,7 +316,6 @@ class DatagridTypeTest extends BlockTypeTestCase
                     ],
                     'grid_render_parameters' => ['foo' => 'bar'],
                     'split_to_cells' => true,
-                    'server_side_render' => true,
                 ]
             ],
         ];
