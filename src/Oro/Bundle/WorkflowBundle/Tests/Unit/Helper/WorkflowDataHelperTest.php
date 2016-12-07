@@ -46,10 +46,8 @@ class WorkflowDataHelperTest extends \PHPUnit_Framework_TestCase
         $this->translator = $this->getMockBuilder(TranslatorInterface::class)->disableOriginalConstructor()->getMock();
         $this->router = $this->getMockBuilder(UrlGeneratorInterface::class)->disableOriginalConstructor()->getMock();
         $this->router->expects($this->any())->method('generate')->willReturnCallback(
-            function () {
-                $args = func_get_args();
-
-                return sprintf('%s/%s', $args[0], implode('/', $args[1]));
+            function ($route, array $params) {
+                return sprintf('%s/%s', $route, implode('/', $params));
             }
         );
     }
