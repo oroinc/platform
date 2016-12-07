@@ -5,22 +5,23 @@ namespace Oro\Bundle\CurrencyBundle\Formatter;
 use Oro\Bundle\CurrencyBundle\Provider\ViewTypeProviderInterface;
 use Oro\Bundle\LocaleBundle\Formatter\NumberFormatter as BaseFormatter;
 use Oro\Bundle\LocaleBundle\Model\LocaleSettings;
-use Oro\Bundle\CurrencyBundle\Config\CurrencyConfigManager;
 
 class NumberFormatter extends BaseFormatter
 {
-    protected $currencyConfigManager;
+    /**
+     * @var ViewTypeProviderInterface
+     */
+    protected $viewTypeProvider;
 
     /**
      * NumberFormatter constructor.
-     *
-     * @param LocaleSettings        $localeSettings
-     * @param CurrencyConfigManager $currencyConfigManager
+     * @param LocaleSettings $localeSettings
+     * @param ViewTypeProviderInterface $viewTypeProvider
      */
-    public function __construct(LocaleSettings $localeSettings, CurrencyConfigManager $currencyConfigManager)
+    public function __construct(LocaleSettings $localeSettings, ViewTypeProviderInterface $viewTypeProvider)
     {
         parent::__construct($localeSettings);
-        $this->currencyConfigManager = $currencyConfigManager;
+        $this->viewTypeProvider = $viewTypeProvider;
     }
 
     /**
@@ -29,9 +30,9 @@ class NumberFormatter extends BaseFormatter
     public function formatCurrency(
         $value,
         $currency = null,
-        array $attributes = array(),
-        array $textAttributes = array(),
-        array $symbols = array(),
+        array $attributes = [],
+        array $textAttributes = [],
+        array $symbols = [],
         $locale = null
     ) {
         if (!$currency) {
@@ -56,7 +57,7 @@ class NumberFormatter extends BaseFormatter
             }
         );
 
-        if ($this->currencyConfigManager->getViewType() === ViewTypeProviderInterface::VIEW_TYPE_ISO_CODE) {
+        if ($this->viewTypeProvider->getViewType() === ViewTypeProviderInterface::VIEW_TYPE_ISO_CODE) {
             $localizedCurrencySymbol =
                 $this->isCurrencySymbolPrepend($currencyCode, $locale) ?
                     sprintf('%s ', $localizedCurrencySymbol) : $localizedCurrencySymbol;

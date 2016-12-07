@@ -42,13 +42,13 @@ datagrids:
             view:
                 type: navigate
                 label: oro.grid.action.view
-                icon: eye-open
+                icon: eye
                 link: view_link
                 rowAction: true
             update:
                 type: navigate
                 label: oro.grid.action.update
-                icon: edit
+                icon: pencil-square-o
                 link: update_link
         sorters:
             columns:
@@ -113,7 +113,7 @@ datagrids:
             update:
                 type: navigate
                 label: oro.grid.action.update
-                icon: edit
+                icon: pencil-square-o
                 link: update_link
                 rowAction: true
         sorters:
