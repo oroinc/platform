@@ -56,6 +56,13 @@ class AbstractFallbackFieldsFormViewTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
         $this->translator = $this->getMock(TranslatorInterface::class);
+        $this->translator->expects($this->any())
+            ->method('trans')
+            ->willReturnCallback(
+                function ($id) {
+                    return $id . '.trans';
+                }
+            );
         $this->fallbackFieldsFormView = new FallbackFieldsFormViewStub(
             $this->requestStack,
             $this->doctrine,
@@ -76,6 +83,29 @@ class AbstractFallbackFieldsFormViewTest extends \PHPUnit_Framework_TestCase
             $this->event,
             'fallbackView.html.twig',
             new ProductStub()
+        );
+    }
+
+    public function testAddBlockToEntityViewWithSectionTitle()
+    {
+        $env = $this->getMockBuilder(\Twig_Environment::class)->disableOriginalConstructor()->getMock();
+        $env->expects($this->once())->method('render')->willReturn('Rendered template');
+        $this->event->expects($this->once())->method('getEnvironment')->willReturn($env);
+        $this->scrollData->expects($this->once())
+            ->method('getData')
+            ->willReturn(
+                [
+                    ScrollData::DATA_BLOCKS => [1 => [ScrollData::TITLE => 'oro.product.sections.inventory.trans']],
+                ]
+            );
+        $this->scrollData->expects($this->once())->method('addSubBlockData');
+        $this->event->expects($this->once())->method('getScrollData')->willReturn($this->scrollData);
+
+        $this->fallbackFieldsFormView->addBlockToEntityView(
+            $this->event,
+            'fallbackView.html.twig',
+            new ProductStub(),
+            'oro.product.sections.inventory'
         );
     }
 
