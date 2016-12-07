@@ -2,8 +2,6 @@
 
 namespace Oro\Bundle\SearchBundle\Engine;
 
-use Doctrine\Common\Persistence\ObjectManager;
-
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 use Oro\Bundle\SearchBundle\Query\Expression\Lexer;
@@ -34,9 +32,6 @@ class Indexer
     /** @var EngineV2Interface */
     protected $engine;
 
-    /** @var ObjectManager */
-    protected $em;
-
     /** @var ObjectMapper */
     protected $mapper;
 
@@ -50,7 +45,6 @@ class Indexer
     protected $isAllowedApplyAcl = true;
 
     /**
-     * @param ObjectManager       $em
      * @param EngineV2Interface   $engine
      * @param ObjectMapper        $mapper
      * @param SecurityProvider    $securityProvider
@@ -58,14 +52,12 @@ class Indexer
      * @param EventDispatcherInterface $dispatcher
      */
     public function __construct(
-        ObjectManager            $em,
         EngineV2Interface        $engine,
         ObjectMapper             $mapper,
         SecurityProvider         $securityProvider,
         AclHelper                $searchAclHelper,
         EventDispatcherInterface $dispatcher
     ) {
-        $this->em               = $em;
         $this->engine           = $engine;
         $this->mapper           = $mapper;
         $this->securityProvider = $securityProvider;
@@ -185,7 +177,6 @@ class Indexer
         $query = new Query();
 
         $query->setMappingConfig($this->mapper->getMappingConfig());
-        $query->setEntityManager($this->em);
 
         return $query;
     }

@@ -76,12 +76,14 @@ class CurrencyNameHelper
                 }
                 break;
             case ViewTypeProviderInterface::VIEW_TYPE_FULL_NAME:
-                $currencyName = $this->intlCurrencyBundle->getCurrencyName($currencyIsoCode, $locale);
                 $currencyName = sprintf(
                     "%s (%s)",
-                    $currencyName,
-                    $this->getCurrencyName($currencyIsoCode, $this->viewTypeProvider->getViewType())
+                    $this->intlCurrencyBundle->getCurrencyName($currencyIsoCode, $locale),
+                    $currencyIsoCode
                 );
+                break;
+            case ViewTypeProviderInterface::VIEW_TYPE_NAME:
+                $currencyName = $this->intlCurrencyBundle->getCurrencyName($currencyIsoCode, $locale);
                 break;
             case ViewTypeProviderInterface::VIEW_TYPE_ISO_CODE:
             default:

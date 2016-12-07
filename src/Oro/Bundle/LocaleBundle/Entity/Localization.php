@@ -22,7 +22,7 @@ use Oro\Bundle\LocaleBundle\Model\ExtendLocalization;
  *      routeUpdate="oro_locale_localization_update",
  *      defaultValues={
  *          "entity"={
- *              "icon"="icon-list"
+ *              "icon"="fa-list"
  *          },
  *          "security"={
  *              "type"="ACL",
@@ -35,6 +35,8 @@ use Oro\Bundle\LocaleBundle\Model\ExtendLocalization;
 class Localization extends ExtendLocalization implements DatesAwareInterface
 {
     use DatesAwareTrait;
+
+    const DEFAULT_LOCALIZATION = 'default';
 
     /**
      * @var int
@@ -208,7 +210,7 @@ class Localization extends ExtendLocalization implements DatesAwareInterface
     }
 
     /**
-     * @return Localization
+     * @return Localization|null
      */
     public function getParentLocalization()
     {

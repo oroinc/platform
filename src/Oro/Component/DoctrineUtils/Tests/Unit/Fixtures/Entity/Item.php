@@ -16,4 +16,16 @@ class Item
      * @ORM\Column(type="integer")
      */
     protected $id;
+
+    /**
+     * @ORM\ManyToMany(targetEntity="Person")
+     */
+    protected $persons;
+
+    /**
+     * @var Person
+     *
+     * @ORM\OneToOne(targetEntity="Person")
+     */
+    protected $owner;
 }

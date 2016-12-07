@@ -3,7 +3,7 @@
 namespace Oro\Bundle\CurrencyBundle\Config;
 
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
-use Oro\Bundle\CurrencyBundle\DependencyInjection\Configuration as CurrencyConfiguration;
+use Oro\Bundle\CurrencyBundle\DependencyInjection\Configuration as CurrencyConfig;
 use Oro\Bundle\CurrencyBundle\Provider\CurrencyProviderInterface;
 
 class CurrencyConfigManager implements CurrencyConfigInterface, CurrencyProviderInterface
@@ -28,7 +28,9 @@ class CurrencyConfigManager implements CurrencyConfigInterface, CurrencyProvider
      */
     public function getDefaultCurrency()
     {
-        return $this->configManager->get('oro_currency.default_currency');
+        return $this->configManager->get(CurrencyConfig::getConfigKeyByName(
+            CurrencyConfig::KEY_DEFAULT_CURRENCY
+        ));
     }
 
     /**
@@ -36,7 +38,9 @@ class CurrencyConfigManager implements CurrencyConfigInterface, CurrencyProvider
      */
     public function getViewType()
     {
-        return $this->configManager->get('oro_currency.currency_display');
+        return $this->configManager->get(CurrencyConfig::getConfigKeyByName(
+            CurrencyConfig::KEY_CURRENCY_DISPLAY
+        ));
     }
 
     /**

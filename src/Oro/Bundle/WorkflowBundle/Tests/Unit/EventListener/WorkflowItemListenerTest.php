@@ -126,6 +126,21 @@ class WorkflowItemListenerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * @expectedException \Oro\Bundle\WorkflowBundle\Exception\WorkflowException
+     * @expectedExceptionMessage Workflow "test_workflow" can not be started because ID of related entity is null
+     */
+    public function testUpdateWorkflowItemNoEntityRelationIdException()
+    {
+        $workflowItem = $this->getMockBuilder(WorkflowItem::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+        $workflowItem->expects($this->once())->method('getWorkflowName')->willReturn('test_workflow');
+        $workflowItem->expects($this->once())->method('getEntity')->willReturn(new \stdClass());
+
+        $this->listener->postPersist($this->getEvent($workflowItem));
+    }
+
+    /**
      * @param bool $hasWorkflowItems
      * @dataProvider preRemoveDataProvider
      */

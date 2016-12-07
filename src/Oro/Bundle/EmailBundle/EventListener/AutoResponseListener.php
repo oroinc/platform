@@ -1,4 +1,5 @@
 <?php
+
 namespace Oro\Bundle\EmailBundle\EventListener;
 
 use Doctrine\ORM\Event\PostFlushEventArgs;
@@ -6,11 +7,15 @@ use Doctrine\ORM\Event\PostFlushEventArgs;
 use Oro\Bundle\EmailBundle\Async\Topics;
 use Oro\Bundle\EmailBundle\Entity\EmailBody;
 use Oro\Bundle\EmailBundle\Manager\AutoResponseManager;
+use Oro\Bundle\FeatureToggleBundle\Checker\FeatureCheckerHolderTrait;
+use Oro\Bundle\FeatureToggleBundle\Checker\FeatureToggleableInterface;
 use Oro\Component\DependencyInjection\ServiceLink;
 use Oro\Component\MessageQueue\Client\MessageProducerInterface;
 
-class AutoResponseListener extends MailboxEmailListener
+class AutoResponseListener extends MailboxEmailListener implements FeatureToggleableInterface
 {
+    use FeatureCheckerHolderTrait;
+
     /**
      * @var ServiceLink
      */
@@ -36,8 +41,12 @@ class AutoResponseListener extends MailboxEmailListener
      */
     public function postFlush(PostFlushEventArgs $args)
     {
+        if (!$this->isFeaturesEnabled()) {
+            return;
+        }
+
         $emailIds = $this->popEmailIds();
-        if (! $emailIds) {
+        if (!$emailIds) {
             return;
         }
         

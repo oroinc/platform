@@ -7,8 +7,13 @@ use Doctrine\Common\Persistence\Mapping\ClassMetadata;
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfigExtra;
 use Oro\Bundle\ApiBundle\Config\FiltersConfigExtra;
+use Oro\Bundle\ApiBundle\Filter\FilterCollection;
 use Oro\Bundle\ApiBundle\Filter\FilterFactoryInterface;
+use Oro\Bundle\ApiBundle\Filter\FilterValue;
+use Oro\Bundle\ApiBundle\Filter\InvalidFilterValueKeyException;
+use Oro\Bundle\ApiBundle\Filter\SelfIdentifiableFilterInterface;
 use Oro\Bundle\ApiBundle\Filter\StandaloneFilter;
+use Oro\Bundle\ApiBundle\Filter\RequestAwareFilterInterface;
 use Oro\Bundle\ApiBundle\Model\Error;
 use Oro\Bundle\ApiBundle\Model\ErrorSource;
 use Oro\Bundle\ApiBundle\Processor\Context;
@@ -54,27 +59,69 @@ class RegisterDynamicFilters extends RegisterFilters
         if (!empty($filterValues)) {
             $filters = $context->getFilters();
             $knownFilterKeys = [];
+            $renameMap = [];
             foreach ($filters as $filterKey => $filter) {
-                if ($allFilterValues->has($filterKey)) {
+                if ($filter instanceof SelfIdentifiableFilterInterface) {
+                    try {
+                        $actualFilterKey = $filter->searchFilterKey($filterValues);
+                        if ($actualFilterKey) {
+                            $knownFilterKeys[$actualFilterKey] = true;
+                            $renameMap[$filterKey] = $actualFilterKey;
+                        }
+                    } catch (InvalidFilterValueKeyException $e) {
+                        $context->addError(
+                            Error::createValidationError(Constraint::FILTER)
+                                ->setInnerException($e)
+                                ->setSource(
+                                    ErrorSource::createByParameter(
+                                        $e->getFilterValue()->getSourceKey() ?: $filterKey
+                                    )
+                                )
+                        );
+                    }
+                } elseif ($allFilterValues->has($filterKey)) {
                     $knownFilterKeys[$filterKey] = true;
                 }
             }
-            foreach ($filterValues as $filterKey => $filterValue) {
-                if (isset($knownFilterKeys[$filterKey])) {
-                    continue;
-                }
+            $this->renameFilters($filters, $renameMap);
+            $this->addDynamicFilters($filters, $filterValues, $knownFilterKeys, $context);
+        }
+    }
 
-                $filter = $this->getFilter($filterValue->getPath(), $context);
-                if ($filter) {
-                    $filters->add($filterKey, $filter);
-                } else {
-                    $context->addError(
-                        Error::createValidationError(
-                            Constraint::FILTER,
-                            sprintf('Filter "%s" is not supported.', $filterKey)
-                        )->setSource(ErrorSource::createByParameter($filterKey))
-                    );
-                }
+    /**
+     * @param FilterCollection $filters
+     * @param array            $renameMap
+     */
+    protected function renameFilters($filters, $renameMap)
+    {
+        foreach ($renameMap as $filterKey => $newFilterKey) {
+            $filter = $filters->get($filterKey);
+            $filters->remove($filterKey);
+            $filters->add($newFilterKey, $filter);
+        }
+    }
+
+    /**
+     * @param FilterCollection $filters
+     * @param FilterValue[]    $filterValues
+     * @param string[]         $knownFilterKeys
+     * @param Context          $context
+     */
+    protected function addDynamicFilters($filters, $filterValues, $knownFilterKeys, $context)
+    {
+        foreach ($filterValues as $filterKey => $filterValue) {
+            if (isset($knownFilterKeys[$filterKey])) {
+                continue;
+            }
+
+            $filter = $this->getFilter($filterValue->getPath(), $context);
+            if ($filter) {
+                $filters->add($filterKey, $filter);
+            } else {
+                $context->addError(
+                    Error::createValidationError(Constraint::FILTER, 'The filter is not supported.')
+                        ->setSource(ErrorSource::createByParameter($filterValue->getSourceKey() ?: $filterKey))
+                );
             }
         }
     }
@@ -101,6 +148,9 @@ class RegisterDynamicFilters extends RegisterFilters
         list($filterConfig, $propertyPath, $isCollection) = $filterInfo;
         $filter = $this->createFilter($filterConfig, $propertyPath);
         if (null !== $filter) {
+            if ($filter instanceof RequestAwareFilterInterface) {
+                $filter->setRequestType($context->getRequestType());
+            }
             // @todo BAP-11881. Update this code when NEQ operator for to-many collection
             // will be implemented in Oro\Bundle\ApiBundle\Filter\ComparisonFilter
             if ($isCollection) {

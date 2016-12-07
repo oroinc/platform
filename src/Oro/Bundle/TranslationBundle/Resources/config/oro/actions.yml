@@ -6,7 +6,7 @@ operations:
         routes:
             - oro_translation_language_index
         button_options:
-            icon: icon-plus
+            icon: fa-plus
         frontend_options:
             options:
                 width: 375
@@ -43,7 +43,7 @@ operations:
             - oro-translation-language-grid
         order: 10
         button_options:
-            icon: icon-remove
+            icon: fa-close
         preactions:
             - '@call_service_method':
                 service: oro_translation.helper.language
@@ -74,7 +74,7 @@ operations:
             - oro-translation-language-grid
         order: 10
         button_options:
-            icon: icon-ok
+            icon: fa-check
         preconditions:
             '@equal': [$enabled, false]
         actions:
@@ -243,7 +243,7 @@ operations:
         datagrids:
             - oro-translation-language-grid
         button_options:
-            icon: icon-cloud-download
+            icon: fa-cloud-download
         frontend_options:
             title: oro.translation.action.install.title
             options:
@@ -265,7 +265,7 @@ operations:
             - oro-translation-language-grid
         label: oro.translation.action.update
         button_options:
-            icon: icon-cloud-download
+            icon: fa-cloud-download
         frontend_options:
             title: oro.translation.action.update.title
             options:
@@ -287,7 +287,7 @@ operations:
         routes:
             - oro_translation_translation_index
         button_options:
-            icon: icon-refresh
+            icon: fa-refresh
             class: btn-danger icons-holder-text
         acl_resource: oro_translation_language_translate
         actions:

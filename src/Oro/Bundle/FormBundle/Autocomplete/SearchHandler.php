@@ -7,7 +7,6 @@ use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\QueryBuilder;
 
-use Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
 
@@ -156,6 +155,40 @@ class SearchHandler implements SearchHandlerInterface
     }
 
     /**
+     * {@inheritdoc}
+     */
+    public function convertItem($item)
+    {
+        $result = [];
+
+        if ($this->idFieldName) {
+            $result[$this->idFieldName] = $this->getPropertyValue($this->idFieldName, $item);
+        }
+
+        foreach ($this->getProperties() as $property) {
+            $result[$property] = $this->getPropertyValue($property, $item);
+        }
+
+        return $result;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getEntityName()
+    {
+        return $this->entityName;
+    }
+
+    /**
+     * @param AclHelper $aclHelper
+     */
+    public function setAclHelper(AclHelper $aclHelper)
+    {
+        $this->aclHelper = $aclHelper;
+    }
+
+    /**
      * @throws \RuntimeException
      */
     protected function checkAllDependenciesInjected()
@@ -260,24 +293,6 @@ class SearchHandler implements SearchHandlerInterface
     }
 
     /**
-     * {@inheritdoc}
-     */
-    public function convertItem($item)
-    {
-        $result = [];
-
-        if ($this->idFieldName) {
-            $result[$this->idFieldName] = $this->getPropertyValue($this->idFieldName, $item);
-        }
-
-        foreach ($this->properties as $property) {
-            $result[$property] = $this->getPropertyValue($property, $item);
-        }
-
-        return $result;
-    }
-
-    /**
      * @param string $propertyPath
      * @param object|array $item
      * @return mixed
@@ -298,26 +313,10 @@ class SearchHandler implements SearchHandlerInterface
             $propertyPath = implode('', $keys);
         }
 
-        try {
-            return $this->propertyAccessor->getValue($item, $propertyPath);
-        } catch (NoSuchPropertyException $e) {
+        if (!$this->propertyAccessor->isReadable($item, $propertyPath)) {
             return null;
         }
-    }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getEntityName()
-    {
-        return $this->entityName;
-    }
-
-    /**
-     * @param AclHelper $aclHelper
-     */
-    public function setAclHelper(AclHelper $aclHelper)
-    {
-        $this->aclHelper = $aclHelper;
+        return $this->propertyAccessor->getValue($item, $propertyPath);
     }
 }

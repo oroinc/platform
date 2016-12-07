@@ -1,0 +1,14 @@
+services:
+    oro_workflow.expression.workflow_available_by_record_group:
+        class: 'Oro\Bundle\WorkflowBundle\Model\Condition\WorkflowAvailableByRecordGroup'
+        arguments:
+            - '@oro_workflow.manager'
+        tags:
+            - { name: oro_action.condition, alias: workflow_available_by_record_group }
+
+    oro_workflow.condition.is_granted_workflow_transition:
+        class: 'Oro\Bundle\WorkflowBundle\Model\Condition\IsGrantedWorkflowTransition'
+        arguments:
+            - '@oro_security.security_facade'
+        tags:
+            - { name: oro_action.condition, alias: 'is_granted_workflow_transition' }

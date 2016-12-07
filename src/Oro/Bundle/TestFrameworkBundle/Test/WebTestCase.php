@@ -29,7 +29,7 @@ use Oro\Component\Testing\DbIsolationExtension;
 abstract class WebTestCase extends BaseWebTestCase
 {
     use DbIsolationExtension;
-    
+
     /** Annotation names */
     const DB_ISOLATION_ANNOTATION = 'dbIsolation';
     const DB_ISOLATION_PER_TEST_ANNOTATION = 'dbIsolationPerTest';
@@ -95,7 +95,7 @@ abstract class WebTestCase extends BaseWebTestCase
             $this->rollbackTransaction();
             self::$loadedFixtures = [];
         }
-        
+
         $refClass = new \ReflectionClass($this);
         foreach ($refClass->getProperties() as $prop) {
             if (!$prop->isStatic() && 0 !== strpos($prop->getDeclaringClass()->getName(), 'PHPUnit_')) {
@@ -170,6 +170,19 @@ abstract class WebTestCase extends BaseWebTestCase
         }
 
         $this->client = self::$clientInstance;
+    }
+
+    /**
+     * @param string $login
+     */
+    protected function loginUser($login)
+    {
+        if ('' !== $login) {
+            self::$clientInstance->setServerParameters(static::generateBasicAuthHeader($login, $login));
+        } else {
+            self::$clientInstance->setServerParameters([]);
+            $this->client->getCookieJar()->clear();
+        }
     }
 
     /**

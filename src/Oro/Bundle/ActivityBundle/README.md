@@ -188,7 +188,7 @@ activityButton.html.twig
             entityId: entity.id
     }) ,
     'aCss': 'no-hash',
-    'iCss': 'icon-envelope',
+    'iCss': 'fa-envelope',
     'dataId': entity.id,
     'label' : 'oro.email.send_email'|trans,
     'widget' : {
@@ -221,7 +221,7 @@ activityLink.html.twig
             entityId: entity.id
     }),
     'aCss': 'no-hash',
-    'iCss': 'icon-envelope',
+    'iCss': 'fa-envelope',
     'dataId': entity.id,
     'label' : 'oro.email.send_email'|trans,
     'widget' : {
