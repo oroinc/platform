@@ -60,30 +60,39 @@ class LayoutButtonProviderTest extends \PHPUnit_Framework_TestCase
      *
      * @param object|null $entity
      * @param bool $isNew
-     * @param string $expectSetEntity
      */
-    public function testGetAll($entity, $isNew, $expectSetEntity)
+    public function testGetAll($entity, $isNew)
     {
         $this->doctrineHelper->expects($this->any())
             ->method('isNewEntity')
             ->willReturn($isNew);
-        $this->doctrineHelper->expects($this->$expectSetEntity())
-            ->method('getEntityClass')
-            ->with($entity)
-            ->willReturn('class');
-        $this->doctrineHelper->expects($this->$expectSetEntity())
-            ->method('getEntityIdentifier')
-            ->with($entity)
-            ->willReturn('entity_id');
+
+        if (!is_null($entity)) {
+            $this->doctrineHelper->expects($this->atLeastOnce())
+                ->method('getEntityClass')
+                ->with($entity)
+                ->willReturn('class');
+            if (!$isNew) {
+                $this->doctrineHelper->expects($this->atLeastOnce())
+                    ->method('getSingleEntityIdentifier')
+                    ->with($entity)
+                    ->willReturn('entity_id');
+            }
+        }
 
         $this->buttonProvider->expects($this->once())
             ->method('findAll')
             ->with(
-                $this->callback(function (ButtonSearchContext $buttonSearchContext) use ($expectSetEntity) {
-                    if ($expectSetEntity === 'once') {
-                        return $buttonSearchContext->getEntityClass() === 'class' &&
+                $this->callback(function (ButtonSearchContext $buttonSearchContext) use ($isNew, $entity) {
+                    if (!is_null($entity)) {
+                        if (!$isNew) {
+                            return $buttonSearchContext->getEntityClass() === 'class' &&
                             $buttonSearchContext->getEntityId() === 'entity_id';
+                        }
+
+                        return $buttonSearchContext->getEntityClass() === 'class';
                     }
+
                     return true;
                 })
             );
@@ -94,19 +103,21 @@ class LayoutButtonProviderTest extends \PHPUnit_Framework_TestCase
     /**
      * @dataProvider dataGroupsProvider
      *
-     * @param string $group
+     * @param string|null $datagrid
+     * @param string|null $group
      */
-    public function testGetByGroup($group)
+    public function testGetByGroup($datagrid, $group)
     {
         $this->buttonProvider->expects($this->once())
             ->method('findAll')
             ->with(
-                $this->callback(function (ButtonSearchContext $buttonSearchContext) use ($group) {
-                    return ($group !== null) ? $buttonSearchContext->getGroup() === $group : true;
+                $this->callback(function (ButtonSearchContext $buttonSearchContext) use ($group, $datagrid) {
+                    return ($buttonSearchContext->getGroup() === $group) &&
+                    ($buttonSearchContext->getDatagrid() === $datagrid);
                 })
             );
 
-        $this->layoutButtonProvider->getByGroup(null, $group);
+        $this->layoutButtonProvider->getByGroup(null, $datagrid, $group);
     }
 
     /**
@@ -118,17 +129,14 @@ class LayoutButtonProviderTest extends \PHPUnit_Framework_TestCase
             'testWhenEntityIsNew' => [
                 'entity' => new \stdClass(),
                 'isNew' => true,
-                'expectSetEntityCalls' => 'never'
             ],
             'testWhenEntityIsNull' => [
                 'entity' => null,
                 'isNew' => false,
-                'expectSetEntityCalls' => 'never'
             ],
             'testWhenEntityIsFlushed' => [
                 'entity' => new \stdClass(),
                 'isNew' => false,
-                'expectSetEntityCalls' => 'once'
             ],
         ];
     }
@@ -139,9 +147,11 @@ class LayoutButtonProviderTest extends \PHPUnit_Framework_TestCase
     public function dataGroupsProvider()
     {
         return [
-            ['groups1'],
-            ['groups2'],
-            [null]
+            ['datagrid', 'groups1'],
+            ['datagrid', 'groups2'],
+            ['datagrid', null],
+            [null, 'group'],
+            [null, null],
         ];
     }
 }
