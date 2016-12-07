@@ -81,7 +81,7 @@ class LayoutButtonProviderTest extends \PHPUnit_Framework_TestCase
         }
 
         $this->buttonProvider->expects($this->once())
-            ->method('findAll')
+            ->method('findAvailable')
             ->with(
                 $this->callback(function (ButtonSearchContext $buttonSearchContext) use ($isNew, $entity) {
                     if (!is_null($entity)) {
@@ -109,7 +109,7 @@ class LayoutButtonProviderTest extends \PHPUnit_Framework_TestCase
     public function testGetByGroup($datagrid, $group)
     {
         $this->buttonProvider->expects($this->once())
-            ->method('findAll')
+            ->method('findAvailable')
             ->with(
                 $this->callback(function (ButtonSearchContext $buttonSearchContext) use ($group, $datagrid) {
                     return ($buttonSearchContext->getGroup() === $group) &&

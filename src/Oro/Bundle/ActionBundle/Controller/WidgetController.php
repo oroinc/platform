@@ -33,7 +33,7 @@ class WidgetController extends Controller
         $buttonSearchContext = $this->get('oro_action.provider.button_search_context')->getButtonSearchContext();
 
         return [
-            'buttons' => $this->get('oro_action.provider.button')->findAll($buttonSearchContext),
+            'buttons' => $this->get('oro_action.provider.button')->findAvailable($buttonSearchContext),
         ];
     }
 
