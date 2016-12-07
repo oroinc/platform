@@ -5,10 +5,8 @@ namespace Oro\Bundle\ImportExportBundle\Strategy\Import;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\Util\ClassUtils;
 use Doctrine\Common\Collections\ArrayCollection;
-
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Translation\TranslatorInterface;
-
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityBundle\Provider\ChainEntityClassNameProvider;
 use Oro\Bundle\EntityBundle\Helper\FieldHelper;
@@ -111,6 +109,15 @@ class ConfigurableAddOrReplaceStrategy extends AbstractImportStrategy
         // find and cache existing or new entity
         $existingEntity = $this->findExistingEntity($entity, $searchContext);
         if ($existingEntity) {
+            if (!$this->strategyHelper->isGranted("EDIT", $existingEntity)) {
+                $error = $this->translator->trans(
+                    'oro.importexport.import.errors.access_denied_entity',
+                    ['%entity_name%' => $entityClass,]
+                );
+                $this->context->addError($error);
+
+                return null;
+            }
             $existingOid = spl_object_hash($existingEntity);
             if (isset($this->cachedEntities[$existingOid])) {
                 return $existingEntity;
@@ -149,6 +156,15 @@ class ConfigurableAddOrReplaceStrategy extends AbstractImportStrategy
             }
 
             $this->databaseHelper->resetIdentifier($entity);
+            if (!$this->strategyHelper->isGranted("CREATE", $entity)) {
+                $error = $this->translator->trans(
+                    'oro.importexport.import.errors.access_denied_entity',
+                    ['%entity_name%' => $entityClass,]
+                );
+                $this->context->addError($error);
+
+                return null;
+            }
             $this->cachedEntities[$oid] = $entity;
         }
 
@@ -191,6 +207,16 @@ class ConfigurableAddOrReplaceStrategy extends AbstractImportStrategy
             if ($this->isFieldExcluded($entityName, $fieldName, $itemData)) {
                 $excludedFields[] = $fieldName;
                 unset($fields[$key]);
+            }
+            if (!$this->strategyHelper->isGranted('EDIT', $entity, $fieldName)) {
+                $error = $this->translator->trans(
+                    'oro.importexport.import.errors.access_denied_property_entity',
+                    [
+                        '%property_name%' => $fieldName,
+                        '%entity_name%' => $entityName,
+                    ]
+                );
+                $this->context->addError($error);
             }
         }
 

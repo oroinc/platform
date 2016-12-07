@@ -6,6 +6,7 @@ use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ORM\EntityManager;
 
+use Symfony\Component\Security\Acl\Voter\FieldVote;
 use Symfony\Component\Translation\TranslatorInterface;
 use Symfony\Component\Validator\ConstraintViolationInterface;
 use Symfony\Component\Validator\ValidatorInterface;
@@ -16,6 +17,7 @@ use Oro\Bundle\ImportExportBundle\Context\ContextInterface;
 use Oro\Bundle\ImportExportBundle\Exception\InvalidArgumentException;
 use Oro\Bundle\ImportExportBundle\Exception\LogicException;
 use Oro\Bundle\ImportExportBundle\Converter\ConfigurableTableDataConverter;
+use Oro\Bundle\SecurityBundle\SecurityFacade;
 
 class ImportStrategyHelper
 {
@@ -48,24 +50,32 @@ class ImportStrategyHelper
     protected $configurableDataConverter;
 
     /**
+     * @var SecurityFacade
+     */
+    protected $securityFacade;
+
+    /**
      * @param ManagerRegistry $managerRegistry
      * @param ValidatorInterface $validator
      * @param TranslatorInterface $translator
      * @param FieldHelper $fieldHelper
      * @param ConfigurableTableDataConverter $configurableDataConverter
+     * @param SecurityFacade $securityFacade
      */
     public function __construct(
         ManagerRegistry $managerRegistry,
         ValidatorInterface $validator,
         TranslatorInterface $translator,
         FieldHelper $fieldHelper,
-        ConfigurableTableDataConverter $configurableDataConverter
+        ConfigurableTableDataConverter $configurableDataConverter,
+        SecurityFacade $securityFacade
     ) {
         $this->managerRegistry = $managerRegistry;
         $this->validator = $validator;
         $this->translator = $translator;
         $this->fieldHelper = $fieldHelper;
         $this->configurableDataConverter = $configurableDataConverter;
+        $this->securityFacade = $securityFacade;
     }
 
     /**
@@ -74,6 +84,30 @@ class ImportStrategyHelper
     public function setConfigProvider(ConfigProvider $extendConfigProvider)
     {
         $this->extendConfigProvider = $extendConfigProvider;
+    }
+
+    /**
+     * Checks if an access to a resource is granted to the caller
+     *
+     * @param string|string[] $attributes Can be a role name(s), permission name(s), an ACL annotation id,
+     *                                    string in format "permission;descriptor"
+     *                                    (VIEW;entity:AcmeDemoBundle:AcmeEntity, EDIT;action:acme_action)
+     *                                    or something else, it depends on registered security voters
+     * @param  mixed          $obj        A domain object, object identity or object identity descriptor
+     *
+     * @param  string         $property
+     * @return bool
+     */
+    public function isGranted($attributes, $obj, $property=null)
+    {
+        if (!$this->securityFacade->hasLoggedUser()) {
+            return true;
+        }
+        if ($property && !($obj instanceof FieldVote)) {
+            $obj = new FieldVote($obj, $property);
+        }
+
+        return $this->securityFacade->isGranted($attributes, $obj);
     }
 
     /**
@@ -114,10 +148,21 @@ class ImportStrategyHelper
             ),
             $excludedProperties
         );
-
         foreach ($importedEntityProperties as $propertyName) {
             // we should not overwrite deleted fields
             if ($this->isDeletedField($basicEntityClass, $propertyName)) {
+                continue;
+            }
+            if (!$this->isGranted('EDIT', $importedEntity, $propertyName)) {
+                $error = $this->translator->trans(
+                    'oro.importexport.import.errors.access_denied_property_entity',
+                    [
+                        '%property_name%' => $propertyName,
+                        '%entity_name%' => $basicEntityClass,
+                    ]
+                );
+                $this->context->addError($error);
+
                 continue;
             }
             $importedValue = $this->fieldHelper->getObjectValue($importedEntity, $propertyName);
