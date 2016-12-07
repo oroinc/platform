@@ -280,7 +280,7 @@ class WorkflowDataHelper
     {
         $errors = new ArrayCollection();
 
-        return $workflow->isStartTransitionAvailable($transition, $entity, [], $errors)
+        return $workflow->isStartTransitionAvailable($transition->getName(), $entity, [], $errors)
                && !$transition->isHidden();
     }
 
@@ -297,7 +297,7 @@ class WorkflowDataHelper
     {
         $errors = new ArrayCollection();
 
-        return $workflow->isTransitionAvailable($workflowItem, $transition, $errors)
+        return $workflow->isTransitionAvailable($workflowItem, $transition->getName(), $errors)
                && !$transition->isHidden();
     }
 
