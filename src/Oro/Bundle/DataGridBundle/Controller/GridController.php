@@ -4,7 +4,6 @@ namespace Oro\Bundle\DataGridBundle\Controller;
 
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
-use Akeneo\Bundle\BatchBundle\Item\ItemWriterInterface;
 
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -12,10 +11,12 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
-use Oro\Bundle\DataGridBundle\Extension\Action\ActionExtension;
+use Oro\Bundle\DataGridBundle\Async\Topics;
+use Oro\Bundle\DataGridBundle\Datagrid\RequestParameterBagFactory;
 use Oro\Bundle\DataGridBundle\Extension\MassAction\MassActionDispatcher;
 use Oro\Bundle\DataGridBundle\Exception\UserInputErrorExceptionInterface;
 use Oro\Bundle\ImportExportBundle\Formatter\FormatterProvider;
+use Oro\Component\MessageQueue\Client\MessageProducerInterface;
 
 class GridController extends Controller
 {
@@ -122,40 +123,38 @@ class GridController extends Controller
      *      requirements={"gridName"="[\w\:-]+"}
      * )
      *
+     * @param Request $request
      * @param string $gridName
      *
-     * @return Response
+     * @return JsonResponse
      */
-    public function exportAction($gridName)
+    public function exportAction(Request $request, $gridName)
     {
-        // Export time execution depends on a size of data
-        ignore_user_abort(false);
-        set_time_limit(0);
+        $result['successful'] = false;
 
-        $request     = $this->getRequest();
-        $format      = $request->query->get('format');
-        $csvWriterId = 'oro_importexport.writer.echo.csv';
-        $writerId    = sprintf('oro_importexport.writer.echo.%s', $format);
+        $format = $request->query->get('format');
+        $formatType = $request->query->get('format_type', 'excel');
+        $gridParameters = $this->getRequestParametersFactory()->fetchParameters($gridName);
+        $userId = $this->getUser()->getId();
 
-        /** @var ItemWriterInterface $writer */
-        $writer            = $this->has($writerId) ? $this->get($writerId) : $this->get($csvWriterId);
-        $parametersFactory = $this->get('oro_datagrid.datagrid.request_parameters_factory');
-        $parameters        = $parametersFactory->createParameters($gridName);
-        $parameters->set(ActionExtension::ENABLE_ACTIONS_PARAMETER, false);
-        $response = $this->get('oro_datagrid.handler.export')->handle(
-            $this->get('oro_datagrid.importexport.export_connector'),
-            $this->get('oro_datagrid.importexport.processor.export'),
-            $writer,
-            [
-                'gridName'                     => $gridName,
-                'gridParameters'               => $parameters,
-                FormatterProvider::FORMAT_TYPE => $request->query->get('format_type', 'excel')
-            ],
-            self::EXPORT_BATCH_SIZE,
-            $format
-        );
+        $topicName = Topics::getTopicNameByExportFormat($format);
 
-        return $response->send();
+        if ($topicName) {
+            $this->getMessageProducer()->send($topicName, [
+                'format' => $format,
+                'batchSize' => self::EXPORT_BATCH_SIZE,
+                'parameters' => [
+                    'gridName' => $gridName,
+                    'gridParameters' => $gridParameters,
+                    FormatterProvider::FORMAT_TYPE => $formatType,
+                ],
+                'userId' => $userId,
+            ]);
+
+            $result['successful'] = true;
+        }
+
+        return new JsonResponse($result);
     }
 
     /**
@@ -211,5 +210,21 @@ class GridController extends Controller
         }
 
         return $renderParams;
+    }
+
+    /**
+     * @return MessageProducerInterface
+     */
+    protected function getMessageProducer()
+    {
+        return $this->get('oro_message_queue.client.message_producer');
+    }
+
+    /**
+     * @return RequestParameterBagFactory
+     */
+    protected function getRequestParametersFactory()
+    {
+        return $this->get('oro_datagrid.datagrid.request_parameters_factory');
     }
 }
