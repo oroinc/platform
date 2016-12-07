@@ -21,7 +21,7 @@ define(['jquery'], function($) {
 
     Print.prototype.init = function() {
         if (this.core.s.print) {
-            var printButton = '<span class="icon icon-print lg-print lg-icon"></span>';
+            var printButton = '<span class="fa-print lg-print lg-icon"></span>';
             this.core.$outer.find('.lg-toolbar').append(printButton);
             this.print();
         }

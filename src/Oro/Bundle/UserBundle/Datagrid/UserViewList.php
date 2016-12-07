@@ -18,7 +18,7 @@ class UserViewList extends AbstractViewsList
             'is_default' => true,
             'grid_name' => self::GRID_NAME,
             'type' => GridView::TYPE_PUBLIC,
-            'icon' => 'icon-ok',
+            'icon' => 'fa-check',
             'filters' => [
                 'enabled' => [
                     'value' => BooleanFilterType::TYPE_YES,
@@ -37,7 +37,7 @@ class UserViewList extends AbstractViewsList
             'is_default' => false,
             'grid_name' => self::GRID_NAME,
             'type' => GridView::TYPE_PUBLIC,
-            'icon' => 'icon-lock',
+            'icon' => 'fa-lock',
             'filters' => [
                 'enabled' => [
                     'value' => BooleanFilterType::TYPE_YES,
@@ -56,7 +56,7 @@ class UserViewList extends AbstractViewsList
             'is_default' => false,
             'grid_name' => self::GRID_NAME,
             'type' => GridView::TYPE_PUBLIC,
-            'icon' => 'icon-ban-circle',
+            'icon' => 'fa-ban',
             'filters' => [
                 'enabled' => [
                     'value' => BooleanFilterType::TYPE_NO,
