@@ -7,6 +7,7 @@ use Oro\Bundle\ImportExportBundle\Handler\HttpImportHandler;
 use Oro\Bundle\ImportExportBundle\Job\JobExecutor;
 use Oro\Bundle\NotificationBundle\Async\Topics as NotificationTopics;
 use Oro\Bundle\SecurityBundle\Authentication\Token\UsernamePasswordOrganizationToken;
+use Oro\Bundle\SecurityProBundle\Tokens\ProUsernamePasswordOrganizationToken;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Component\MessageQueue\Client\MessageProducerInterface;
 use Oro\Component\MessageQueue\Client\TopicSubscriberInterface;
@@ -112,7 +113,7 @@ class HttpImportMessageProcessor implements MessageProcessorInterface, TopicSubs
             $message->getMessageId(),
             sprintf('oro:import:http:%s:%s', $body['processorAlias'], $message->getMessageId()),
             function () use ($body, $user) {
-                $token = new UsernamePasswordOrganizationToken($user, null, 'import', $user->getOrganization(), $user->getRoles());
+                $token = new ProUsernamePasswordOrganizationToken($user, null, 'import', $user->getOrganization(), $user->getRoles());
                 $this->tokenStorage->setToken($token);
                 $this->httpImportHandler->setImportingFileName($body['fileName']);
 //                 should also send acl attribute

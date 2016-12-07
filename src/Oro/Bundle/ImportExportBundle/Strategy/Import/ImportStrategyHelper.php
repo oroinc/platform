@@ -6,6 +6,7 @@ use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ORM\EntityManager;
 
+use Symfony\Component\Security\Acl\Voter\FieldVote;
 use Symfony\Component\Translation\TranslatorInterface;
 use Symfony\Component\Validator\ConstraintViolationInterface;
 use Symfony\Component\Validator\ValidatorInterface;
@@ -48,7 +49,9 @@ class ImportStrategyHelper
      */
     protected $configurableDataConverter;
 
-    /** @var SecurityFacade */
+    /**
+     * @var SecurityFacade
+     */
     protected $securityFacade;
 
     /**
@@ -90,24 +93,21 @@ class ImportStrategyHelper
      *                                    string in format "permission;descriptor"
      *                                    (VIEW;entity:AcmeDemoBundle:AcmeEntity, EDIT;action:acme_action)
      *                                    or something else, it depends on registered security voters
-     * @param  mixed          $entity     A domain object, object identity or object identity descriptor (id:type)
-     *                                    (entity:Acme/DemoBundle/Entity/AcmeEntity,  action:some_action)
+     * @param  mixed          $obj        A domain object, object identity or object identity descriptor
      *
-     * @param  string        $method
+     * @param  string         $property
      * @return bool
      */
-    public function isGranted($attributes, $entity, $method=null)
+    public function isGranted($attributes, $obj, $property=null)
     {
         if (!$this->securityFacade->hasLoggedUser()) {
             return true;
         }
-        if ($method) {
-            $isGranted = $this->securityFacade->isClassMethodGranted($entity, $method);
-        } else {
-            $isGranted = $this->securityFacade->isGranted($attributes, $entity);
+        if ($property && !($obj instanceof FieldVote)) {
+            $obj = new FieldVote($obj, $property);
         }
 
-        return $isGranted;
+        return $this->securityFacade->isGranted($attributes, $obj);
     }
 
     /**
@@ -153,8 +153,16 @@ class ImportStrategyHelper
             if ($this->isDeletedField($basicEntityClass, $propertyName)) {
                 continue;
             }
-//        TODO should implement first parameter
-            if (!$this->isGranted('EDIT', $basicEntityClass, $propertyName)) {
+            if (!$this->isGranted('EDIT', $importedEntity, $propertyName)) {
+                $error = $this->translator->trans(
+                    'oro.importexport.import.errors.access_denied_property_entity',
+                    [
+                        '%property_name%' => $propertyName,
+                        '%entity_name%' => $basicEntityClass,
+                    ]
+                );
+                $this->context->addError($error);
+
                 continue;
             }
             $importedValue = $this->fieldHelper->getObjectValue($importedEntity, $propertyName);
