@@ -24,6 +24,17 @@ class JobRepository extends JMSJobRepository
     protected $closeJobMethod;
 
     /**
+     * These jobs were closed, but cannot be detached since there are jobs which have the job in dependencies
+     * (Job::dependencies)
+     *
+     * Detaching such job would cause doctrine thinking that the jobs in dependencies are new entities and exception
+     * would be thrown once the job would be updated.
+     *
+     * @var Job[]
+     */
+    protected $jobsPendingDetach = [];
+
+    /**
      * {@inheritdoc}
      */
     public function __construct($em, ClassMetadata $class)
@@ -45,7 +56,6 @@ class JobRepository extends JMSJobRepository
      */
     public function closeJob(Job $job, $finalState)
     {
-
         $this->_em->getConnection()->beginTransaction();
         try {
             $visited = array();
@@ -61,13 +71,19 @@ class JobRepository extends JMSJobRepository
                     continue;
                 }
 
-                $this->_em->detach($job);
+                if ($this->jobCanBeSafelyDetached($job)) {
+                    $this->_em->detach($job);
+                } else {
+                    $this->jobsPendingDetach[spl_object_hash($job)] = $job;
+                }
             }
         } catch (\Exception $ex) {
             $this->_em->getConnection()->rollback();
 
             throw $ex;
         }
+
+        $this->detachJobsPendingDetach();
     }
 
     /**
@@ -115,5 +131,37 @@ class JobRepository extends JMSJobRepository
             ->executeQuery($query, ['id' => $job->getId()])
             ->fetchAll(\PDO::FETCH_COLUMN);
         return $jobIds;
+    }
+
+    protected function detachJobsPendingDetach()
+    {
+        foreach ($this->jobsPendingDetach as $k => $job) {
+            if ($this->jobCanBeSafelyDetached($job)) {
+                $this->_em->detach($job);
+                unset($this->jobsPendingDetach[$k]);
+            }
+        }
+    }
+
+    /**
+     * Checks if job can be safely detached
+     * (is not in Job::dependencies of another job)
+     *
+     * @param Job $job
+     *
+     * @return boolean
+     */
+    protected function jobCanBeSafelyDetached(Job $job)
+    {
+        $uow = $this->_em->getUnitOfWork();
+        $identityMap = $uow->getIdentityMap();
+        $managedJobs = isset($identityMap[Job::class]) ? $identityMap[Job::class] : [];
+        foreach ($managedJobs as $managedJob) {
+            if ($managedJob !== $job && $managedJob->hasDependency($job)) {
+                return false;
+            }
+        }
+
+        return true;
     }
 }
