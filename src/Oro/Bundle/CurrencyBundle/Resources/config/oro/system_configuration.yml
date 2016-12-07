@@ -2,7 +2,7 @@ system_configuration:
     groups:
         currency:
             title: oro.currency.system_configuration.groups.currency.title
-            icon: 'icon-money'
+            icon: 'fa-money'
             page_reload: true
         currency_settings:
             title: oro.currency.system_configuration.groups.currency_settings.title

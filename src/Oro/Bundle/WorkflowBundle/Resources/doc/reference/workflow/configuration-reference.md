@@ -422,7 +422,7 @@ workflows:
 
                 transition_definition: connected_definition # A reference to Transition Definition configuration
                 frontend_options:
-                    icon: 'icon-ok'                         # add icon to transition button with class "icon-ok"
+                    icon: 'fa-check'                         # add icon to transition button with class "fa-check"
                     class: 'btn-primary'                    # add css class "btn-primary" to transition button
                 form_options:
                     attribute_fields:                       # fields of form that will be shown when transition button is clicked
