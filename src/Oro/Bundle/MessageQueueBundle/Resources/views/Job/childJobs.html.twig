@@ -10,11 +10,11 @@
         {% include 'OroMessageQueueBundle:Job/Datagrid:status.html.twig' with {'record': {'rootEntity': entity}} %}
 
         {% if entity.unique %}
-            <div class="badge badge-info status-box"><i class="icon-status-enabled icon-circle"></i>{{ 'oro.message_queue_job.header.unique'|trans }}</div>
+            <div class="badge badge-info status-box"><i class="icon-status-enabled fa-circle"></i>{{ 'oro.message_queue_job.header.unique'|trans }}</div>
         {% endif %}
 
         {% if entity.interrupted %}
-            <div class="badge badge-info status-box"><i class="icon-status-enabled icon-circle"></i>{{ 'oro.message_queue_job.header.interrupted'|trans }}</div>
+            <div class="badge badge-info status-box"><i class="icon-status-enabled fa-circle"></i>{{ 'oro.message_queue_job.header.interrupted'|trans }}</div>
         {% endif %}
     </div>
 {% endblock breadcrumbs %}

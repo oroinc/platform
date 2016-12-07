@@ -13,7 +13,7 @@ class EmailView extends Page
     public function open(array $parameters = [])
     {
         $userMenu = $this->elementFactory->createElement('UserMenu');
-        $userMenu->find('css', 'i.icon-sort-down')->click();
+        $userMenu->find('css', 'i.fa-sort-desc')->click();
 
         $userMenu->clickLink('My Emails');
 

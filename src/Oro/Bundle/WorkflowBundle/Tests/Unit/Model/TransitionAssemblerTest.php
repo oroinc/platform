@@ -14,6 +14,9 @@ use Oro\Component\Action\Action\Configurable as ConfigurableAction;
 use Oro\Component\Action\Condition\Configurable as ConfigurableCondition;
 use Oro\Component\ConfigExpression\ExpressionInterface;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class TransitionAssemblerTest extends \PHPUnit_Framework_TestCase
 {
     /**
@@ -115,7 +118,7 @@ class TransitionAssemblerTest extends \PHPUnit_Framework_TestCase
             'no transition_definition' => [
                 [
                     'name' => [
-                        '' => 'test'
+                        '' => 'test_transition'
                     ]
                 ]
             ]
@@ -130,7 +133,7 @@ class TransitionAssemblerTest extends \PHPUnit_Framework_TestCase
     public function testUnknownTransitionDefinitionAssembler($definitions)
     {
         $configuration = [
-            'test' => [
+            'test_transition' => [
                 'transition_definition' => 'unknown'
             ]
         ];
@@ -163,7 +166,7 @@ class TransitionAssemblerTest extends \PHPUnit_Framework_TestCase
     public function testUnknownStepException($steps)
     {
         $configuration = [
-            'test' => [
+            'test_transition' => [
                 'transition_definition' => 'transition_definition',
                 'label' => 'label',
                 'step_to' => 'unknown'
@@ -201,7 +204,7 @@ class TransitionAssemblerTest extends \PHPUnit_Framework_TestCase
     public function testAssemble(array $configuration, array $transitionDefinition)
     {
         $steps = [
-            'step' => $this->createStep()
+            'target_step' => $this->createStep()
         ];
 
         $attributes = [
@@ -251,7 +254,7 @@ class TransitionAssemblerTest extends \PHPUnit_Framework_TestCase
             ->method('create')
             ->with(
                 ConfigurableCondition::ALIAS,
-                ['@is_granted_workflow_transition' => ['parameters' => ['test']]]
+                ['@is_granted_workflow_transition' => ['parameters' => ['test_transition', 'target_step']]]
             )
             ->will($this->returnValue($expectedPreCondition));
         $count++;
@@ -289,12 +292,12 @@ class TransitionAssemblerTest extends \PHPUnit_Framework_TestCase
                 isset($configuration['form_options']) ? $configuration['form_options'] : [],
                 $attributes,
                 'transition',
-                'test'
+                'test_transition'
             )
             ->will($this->returnArgument(0));
 
         $transitions = $this->assembler->assemble(
-            ['test' => $configuration],
+            ['test_transition' => $configuration],
             self::$transitionDefinitions,
             $steps,
             $attributes
@@ -312,12 +315,12 @@ class TransitionAssemblerTest extends \PHPUnit_Framework_TestCase
 
         $this->assertInstanceOf('Doctrine\Common\Collections\ArrayCollection', $transitions);
         $this->assertCount(1, $transitions);
-        $this->assertTrue($transitions->containsKey('test'));
+        $this->assertTrue($transitions->containsKey('test_transition'));
 
         /** @var Transition $actualTransition */
-        $actualTransition = $transitions->get('test');
-        $this->assertEquals('test', $actualTransition->getName(), 'Incorrect name');
-        $this->assertEquals($steps['step'], $actualTransition->getStepTo(), 'Incorrect step_to');
+        $actualTransition = $transitions->get('test_transition');
+        $this->assertEquals('test_transition', $actualTransition->getName(), 'Incorrect name');
+        $this->assertEquals($steps['target_step'], $actualTransition->getStepTo(), 'Incorrect step_to');
 
         $expectedDisplayType = WorkflowConfiguration::DEFAULT_TRANSITION_DISPLAY_TYPE;
 
@@ -338,6 +341,11 @@ class TransitionAssemblerTest extends \PHPUnit_Framework_TestCase
             $actualTransition->getFormOptions(),
             'Incorrect form_options'
         );
+
+        $initEntities = array_key_exists(WorkflowConfiguration::NODE_INIT_ENTITIES, $configuration)
+            ? $configuration[WorkflowConfiguration::NODE_INIT_ENTITIES]
+            : [];
+        $this->assertEquals($initEntities, $actualTransition->getInitEntities());
 
         $this->assertTemplate('page', $configuration, $actualTransition);
         $this->assertTemplate('dialog', $configuration, $actualTransition);
@@ -386,7 +394,7 @@ class TransitionAssemblerTest extends \PHPUnit_Framework_TestCase
                 'configuration' => [
                     'transition_definition' => 'empty_definition',
                     'label' => 'label',
-                    'step_to' => 'step',
+                    'step_to' => 'target_step',
                     'form_type' => 'custom_workflow_transition',
                     'display_type' => 'page',
                     'form_options' => [
@@ -401,23 +409,32 @@ class TransitionAssemblerTest extends \PHPUnit_Framework_TestCase
             'with_condition' => [
                 'configuration' => [
                     'transition_definition' => 'with_condition',
-                    'step_to' => 'step',
+                    'step_to' => 'target_step',
                 ],
                 'transitionDefinition' => self::$transitionDefinitions['with_condition'],
             ],
             'with_preactions' => [
                 'configuration' => [
                     'transition_definition' => 'with_condition',
-                    'step_to' => 'step',
+                    'step_to' => 'target_step',
                 ],
                 'transitionDefinition' => self::$transitionDefinitions['with_preactions'],
             ],
             'with_actions' => [
                 'configuration' => [
                     'transition_definition' => 'with_actions',
-                    'step_to' => 'step',
+                    'step_to' => 'target_step',
                 ],
                 'transitionDefinition' => self::$transitionDefinitions['with_actions'],
+            ],
+            'with init context' => [
+                'configuration' => [
+                    'transition_definition' => 'empty_definition',
+                    'init_entities' => ['entity1', 'entity2'],
+                    'init_routes' => ['route1', 'route2'],
+                    'step_to' => 'target_step',
+                ],
+                'transitionDefinition' => self::$transitionDefinitions['empty_definition'],
             ]
         ];
     }
@@ -426,11 +443,11 @@ class TransitionAssemblerTest extends \PHPUnit_Framework_TestCase
     {
         $configuration = [
             'transition_definition' => 'with_condition',
-            'step_to' => 'step',
+            'step_to' => 'target_step',
         ];
         $transitionDefinition = self::$transitionDefinitions['with_condition'];
 
-        $steps      = ['step' => $this->createStep()];
+        $steps      = ['target_step' => $this->createStep()];
         $attributes = ['attribute' => $this->createAttribute()];
 
         $expectedCondition = $expectedPreCondition   = $this->createCondition();
@@ -438,7 +455,7 @@ class TransitionAssemblerTest extends \PHPUnit_Framework_TestCase
         $this->conditionFactory->expects($this->at(0))->method('create')
             ->with(
                 ConfigurableCondition::ALIAS,
-                ['@is_granted_workflow_transition' => ['parameters' => ['test']]]
+                ['@is_granted_workflow_transition' => ['parameters' => ['test_transition', 'target_step']]]
             )
             ->will($this->returnValue($expectedPreCondition));
         $this->conditionFactory->expects($this->at(1))->method('create')
@@ -447,11 +464,11 @@ class TransitionAssemblerTest extends \PHPUnit_Framework_TestCase
         $this->conditionFactory->expects($this->exactly(2))->method('create');
 
         $this->formOptionsAssembler->expects($this->once())->method('assemble')
-            ->with([], $attributes, 'transition', 'test')
+            ->with([], $attributes, 'transition', 'test_transition')
             ->will($this->returnArgument(0));
 
         $transitions = $this->assembler->assemble(
-            ['test' => $configuration],
+            ['test_transition' => $configuration],
             self::$transitionDefinitions,
             $steps,
             $attributes
@@ -459,12 +476,12 @@ class TransitionAssemblerTest extends \PHPUnit_Framework_TestCase
 
         $this->assertInstanceOf('Doctrine\Common\Collections\ArrayCollection', $transitions);
         $this->assertCount(1, $transitions);
-        $this->assertTrue($transitions->containsKey('test'));
+        $this->assertTrue($transitions->containsKey('test_transition'));
 
         /** @var Transition $actualTransition */
-        $actualTransition = $transitions->get('test');
-        $this->assertEquals('test', $actualTransition->getName(), 'Incorrect name');
-        $this->assertEquals($steps['step'], $actualTransition->getStepTo(), 'Incorrect step_to');
+        $actualTransition = $transitions->get('test_transition');
+        $this->assertEquals('test_transition', $actualTransition->getName(), 'Incorrect name');
+        $this->assertEquals($steps['target_step'], $actualTransition->getStepTo(), 'Incorrect step_to');
 
         $this->assertEquals(
             WorkflowConfiguration::DEFAULT_TRANSITION_DISPLAY_TYPE,
@@ -504,19 +521,19 @@ class TransitionAssemblerTest extends \PHPUnit_Framework_TestCase
             'transition_definition' => 'full_definition',
             'acl_resource' => 'test_acl',
             'acl_message' => 'test acl message',
-            'step_to' => 'step',
+            'step_to' => 'target_step',
             'schedule' => ['cron' => '1 * * * *', 'filter' => 'e.field < 1']
         ];
         $transitionDefinition = self::$transitionDefinitions['full_definition'];
 
-        $steps = ['step' => $this->createStep()];
+        $steps = ['target_step' => $this->createStep()];
         $attributes = ['attribute' => $this->createAttribute()];
         $expectedPreAction = $expectedPostAction = null;
         $expectedCondition = $expectedPreCondition = $this->createCondition();
 
         $preConditions = [
             '@and' => [
-                ['@is_granted_workflow_transition' => ['parameters' => ['test']]],
+                ['@is_granted_workflow_transition' => ['parameters' => ['test_transition', 'target_step']]],
                 ['@and' => [
                     ['@acl_granted' => [
                         'parameters' => [$configuration['acl_resource']], 'message' => $configuration['acl_message']
@@ -548,11 +565,11 @@ class TransitionAssemblerTest extends \PHPUnit_Framework_TestCase
             });
 
         $this->formOptionsAssembler->expects($this->once())->method('assemble')
-            ->with([], $attributes, 'transition', 'test')
+            ->with([], $attributes, 'transition', 'test_transition')
             ->will($this->returnArgument(0));
 
         $transitions = $this->assembler->assemble(
-            ['test' => $configuration],
+            ['test_transition' => $configuration],
             self::$transitionDefinitions,
             $steps,
             $attributes
@@ -560,12 +577,12 @@ class TransitionAssemblerTest extends \PHPUnit_Framework_TestCase
 
         $this->assertInstanceOf('Doctrine\Common\Collections\ArrayCollection', $transitions);
         $this->assertCount(1, $transitions);
-        $this->assertTrue($transitions->containsKey('test'));
+        $this->assertTrue($transitions->containsKey('test_transition'));
 
         /** @var Transition $actualTransition */
-        $actualTransition = $transitions->get('test');
-        $this->assertEquals('test', $actualTransition->getName(), 'Incorrect name');
-        $this->assertEquals($steps['step'], $actualTransition->getStepTo(), 'Incorrect step_to');
+        $actualTransition = $transitions->get('test_transition');
+        $this->assertEquals('test_transition', $actualTransition->getName(), 'Incorrect name');
+        $this->assertEquals($steps['target_step'], $actualTransition->getStepTo(), 'Incorrect step_to');
 
         $this->assertEmpty($actualTransition->getFrontendOptions());
         $this->assertFalse($actualTransition->isStart());
@@ -593,18 +610,18 @@ class TransitionAssemblerTest extends \PHPUnit_Framework_TestCase
             'transition_definition' => 'empty_definition',
             'acl_resource' => 'test_acl',
             'acl_message' => 'test acl message',
-            'step_to' => 'step',
+            'step_to' => 'target_step',
             'is_start' => true,
         ];
 
-        $steps = ['step' => $this->createStep()];
+        $steps = ['target_step' => $this->createStep()];
         $attributes = ['attribute' => $this->createAttribute()];
 
         $expectedPreCondition   = $this->createCondition();
 
         $preConditions = [
             '@and' => [
-                ['@is_granted_workflow_transition' => ['parameters' => ['test']]],
+                ['@is_granted_workflow_transition' => ['parameters' => ['test_transition', 'target_step']]],
                 ['@acl_granted' => [
                     'parameters' => [$configuration['acl_resource']],
                     'message' => $configuration['acl_message']
@@ -620,11 +637,11 @@ class TransitionAssemblerTest extends \PHPUnit_Framework_TestCase
 
         $this->formOptionsAssembler->expects($this->once())
             ->method('assemble')
-            ->with([], $attributes, 'transition', 'test')
+            ->with([], $attributes, 'transition', 'test_transition')
             ->will($this->returnArgument(0));
 
         $transitions = $this->assembler->assemble(
-            ['test' => $configuration],
+            ['test_transition' => $configuration],
             self::$transitionDefinitions,
             $steps,
             $attributes
@@ -632,13 +649,13 @@ class TransitionAssemblerTest extends \PHPUnit_Framework_TestCase
 
         $this->assertInstanceOf('Doctrine\Common\Collections\ArrayCollection', $transitions);
         $this->assertCount(1, $transitions);
-        $this->assertTrue($transitions->containsKey('test'));
+        $this->assertTrue($transitions->containsKey('test_transition'));
 
         /** @var Transition $actualTransition */
-        $actualTransition = $transitions->get('test');
+        $actualTransition = $transitions->get('test_transition');
 
-        $this->assertEquals('test', $actualTransition->getName(), 'Incorrect name');
-        $this->assertEquals($steps['step'], $actualTransition->getStepTo(), 'Incorrect step_to');
+        $this->assertEquals('test_transition', $actualTransition->getName(), 'Incorrect name');
+        $this->assertEquals($steps['target_step'], $actualTransition->getStepTo(), 'Incorrect step_to');
         $this->assertEquals(
             WorkflowConfiguration::DEFAULT_TRANSITION_DISPLAY_TYPE,
             $actualTransition->getDisplayType(),

@@ -1,4 +1,4 @@
-UPGRADE FROM 1.10 to 2.0 
+UPGRADE FROM 1.10 to 2.0
 ========================
 
 ####General
@@ -7,7 +7,7 @@ UPGRADE FROM 1.10 to 2.0
 - Added dependency to [fxpio/composer-asset-plugin](https://github.com/fxpio/composer-asset-plugin) composer plugin.
 - All original third-party asset libraries were moved out from platform and added to composer.json as bower-asset/npm-asset dependency.
 - Upgrade to 2.0 is available only from 1.10 version. For this update
-  was added the command "oro:platform:upgrade20". Before run this command the cache has to be deleted. 
+  was added the command "oro:platform:upgrade20". Before run this command the cache has to be deleted.
   Command have to be run only one time. In next releases 2.x to apply release changes it will be enough run the command "oro:platform:update".
   Upgrade from version less then 1.10 is not supported.
 
@@ -18,7 +18,7 @@ UPGRADE FROM 1.10 to 2.0
 - Interface Oro\Component\ConfigExpression\ContextAccessorInterface improved. All methods can accept `PropertyPathInterface` and `string`.
 - Also updated all methods of Oro\Component\ConfigExpression\ContextAccessor according to changes in Oro\Component\ConfigExpression\ContextAccessorInterface.
 - Class `Oro\Component\Action\Model\ContextAccessor`. Use `Oro\Component\ConfigExpression\ContextAccessor` (`@oro_action.expression.context_accessor`) instead.
-- Class `Oro\Component\Action\Action\ActionFactory` 
+- Class `Oro\Component\Action\Action\ActionFactory`
     - implements new interface `Oro\Component\ConfigExpression\FactoryWithTypesInterface`
 - Class `Oro\Component\Action\Action\FlashMessage`
     - method `setRequest` now accepts null value.
@@ -34,11 +34,50 @@ UPGRADE FROM 1.10 to 2.0
 - Service `oro_action.context_accessor` removed. Use `oro_action.expression.context_accessor` instead.
 - Added new command `Oro\Bundle\ActionBundle\Command\DebugActionCommand (oro:debug:action)` that displays list of all actions with description.
 - Added new command `Oro\Bundle\ActionBundle\Command\DebugConditionCommand (oro:debug:condition)` that displays list of all conditions full description
-- Command `Oro\Bundle\ActionBundle\Command\DumpActionConfigurationCommand` (`oro:action:configuration:dump`) renamed to `Oro\Bundle\ActionBundle\Command\DebugOperationCommand` (`oro:debug:operation`) 
+- Command `Oro\Bundle\ActionBundle\Command\DumpActionConfigurationCommand` (`oro:action:configuration:dump`) renamed to `Oro\Bundle\ActionBundle\Command\DebugOperationCommand` (`oro:debug:operation`)
 - Tag `oro_workflow.action` removed, now for actions always using `oro_action.action`
 - Tag `oro_workflow.condition` removed, now for conditions always using `oro_action.condition`
 - Deprecated service `oro_workflow.context_accessor` removed
 - Service (`Oro\Bundle\ActionBundle\Model\ConfigurationPass\ReplacePropertyPath`) removed, use `Oro\Component\ConfigExpression\ConfigurationPass\ReplacePropertyPath` instead
+- Added `Oro\Bundle\ActionBundle\Provider\CurrentApplicationProviderInterface` and trait `Oro\Bundle\ActionBundle\Provider\CurrentApplicationProviderTrait`, interface declare methods `isApplicationsValid()` and `getCurrentApplication()`
+- Added `Oro\Bundle\ActionBundle\Provider\RouteProviderInterface` and trait `Oro\Bundle\ActionBundle\Provider\RouteProviderTrait`, interface declare getters and setters for `widgetRoute`, `formDialogRoute`, `formPageRoute`, `executionRoute`
+- Deleted `Oro\Bundle\ActionBundle\Helper\ApplicationsHelper`.
+Please use `Oro\Bundle\ActionBundle\Provider\CurrentApplicationProvider` and `Oro\Bundle\ActionBundle\Provider\RouteProvider` instead.
+- Changes in `Oro\Bundle\ActionBundle\Helper\ApplicationsUrlHelper`:
+    - type of first argument of `__construct()` changed to `Oro\Bundle\ActionBundle\Provider\RouteProviderInterface`
+    - implemented method `getPageUrl()`, that used `ApplicationsHelperInterface::getFormDialogRoute()`
+- Type of second argument of `Oro\Bundle\ActionBundle\Helper\DefaultOperationRequestHelper::__construct()` changed to `Oro\Bundle\ActionBundle\Provider\CurrentApplicationProviderInterface`
+- Type of third argument of `Oro\Bundle\ActionBundle\Model\OperationRegistry::__construct()` changed to `Oro\Bundle\ActionBundle\Provider\CurrentApplicationProviderInterface`
+- Changes in `Oro\Bundle\ActionBundle\Layout\DataProvider`:
+    - type of first argument of `__construct()` changed to `Oro\Bundle\ActionBundle\Provider\CurrentApplicationProviderInterface`
+    - implemented method `getPageRoute()`
+- Added `Oro\Bundle\ActionBundle\Model\ButtonSearchContext`, that wrap parameters needed for searching of a buttons
+- Added `Oro\Bundle\ActionBundle\Provider\ButtonSearchContextProvider` for providing ButtonSearchContext by array context
+- Added `Oro\Bundle\ActionBundle\Model\ButtonInterface`, that declare methods for rendering of a button, `getOrder()`, `getTemplate()`, `getTemplateData()`, `getButtonContext()` and `getGroup()`
+- Added `Oro\Bundle\ActionBundle\Model\ButtonContext`, that should be used to provide required context data to `ButtonInterface`
+- Added `Oro\Bundle\ActionBundle\Model\ButtonProviderExtensionInterface`, that declare method `find()` for collect buttons from extensions
+- Added `Oro\Bundle\ActionBundle\Provider\ButtonProvider` for providing buttons from extensions
+    - methods `findAll()` and `hasButtons()` 
+    - registered as service `oro_action.provider.button`
+- Added `Oro\Bundle\ActionBundle\DependencyInjection\CompilerPass\ButtonProviderPass`, that collect button providers by tag `oro.action.extension.button_provider` and inject it to `oro_action.provider.button`
+- Added `Oro\Bundle\ActionBundle\Model\OperationButton`, that implements `ButtonInterface` and specific logic for operation buttons
+- Added `Oro\Bundle\ActionBundle\Extension\OperationButtonProviderExtension`, that provide operation buttons
+    - implemented `find()` method
+    - registered by tag `oro.action.extension.button_provider`
+- Changed `Oro\Bundle\ActionBundle\Controller\WidgetController::buttonsAction`, now it use `oro_action.provider.button` and `oro_action.provider.button_search_context` to provide buttons
+- Added `Oro\Bundle\ActionBundle\Layout\DataProvider\LayoutButtonProvider`, that provide buttons for layouts
+    - methods `getAll()` and `getByGroup()`
+    - registered as layout provider `button_provider`
+- Changes in `Oro\Bundle\ActionBundle\Twig\OperationExtension`:
+    - first argument `Oro\Bundle\ActionBundle\Model\OperationManager $manager` of `__construct()` removed
+    - type of second argument changed from `Oro\Bundle\ActionBundle\Helper\ApplicationsHelper` to `Oro\Bundle\ActionBundle\Provider\CurrentApplicationProviderInterface` and now it first argument
+    - added fourth argument `Oro\Bundle\ActionBundle\Provider\ButtonProvider $buttonProvider` of `__construct()`
+    - added fifth argument `Oro\Bundle\ActionBundle\Provider\ButtonSearchContextProvider $searchContextProvider` of `__construct()`
+    - added filter `oro_action_has_buttons`, used `Oro\Bundle\ActionBundle\Provider\ButtonProvider` and `Oro\Bundle\ActionBundle\Provider\ButtonSearchContextProvider`
+    - removed filter `has_operations`
+- Renamed js component `oroaction/js/app/components/buttons-component` to `oroaction/js/app/components/button-component` (from plural to single)
+- Added tag `oro_action.operation_registry.filter` to be able to register custom final filters for `Oro\Bundle\ActionBundle\Model\OperationRegistry::find` result. Custom filter must implement `Oro\Bundle\ActionBundle\Model\OperationRegistryFilterInterface`
+- Changed signature for `Oro\Bundle\ActionBundle\Model\OperationRegistry::find` it now accepts only one argument `Oro\Bundle\ActionBundle\Model\Criteria\OperationFindCriteria`.
 
 ####ApiBundle
 - The `oro.api.action_processor` DI tag was removed. To add a new action processor, use `oro_api.actions` section of the ApiBundle configuration.
@@ -178,7 +217,7 @@ Now all following fields MUST be moved from workflow.yml configuration file in a
  `oro.workflow.{workflow_name}.transition.{transition_name}.label` - transition `label` field.
  `oro.workflow.{workflow_name}.transition.{transition_name}.warning_message` - transition `message` field.
  `oro.workflow.{workflow_name}.transition.{transition_name}.attribute.{attribute_name}.label` - form options attribute `label` field.
-To migrate all labels from configuration translatable fields automatically you can use application command `oro:workflow:definitions:upgrade20`. 
+To migrate all labels from configuration translatable fields automatically you can use application command `oro:workflow:definitions:upgrade20`.
 - Added command `oro:workflow:translations:dump` as a helper to see custom workflow translations (lack of them as well) and their keys.
 - Added `Oro\Bundle\WorkflowBundle\Configuration\WorkflowDefinitionBuilderExtensionInterface` and `oro.workflow.definition_builder.extension` service tag for usage in cases to pre-process (prepare) workflow builder configuration.
 - Added service tag `oro.workflow.configuration.handler` for request configuration procession by `Oro\Bundle\WorkflowBundle\Configuration\Handler\ConfigurationHandlerInterface`.
@@ -194,7 +233,7 @@ To migrate all labels from configuration translatable fields automatically you c
 - Changed signature of constructor of `\Oro\Bundle\WorkflowBundle\Form\Type\WorkflowSelectType`, now it takes as second argument instance of `\Symfony\Component\Translation\TranslatorInterface`
 - Changed signature of constructor of `\Oro\Bundle\WorkflowBundle\Form\Type\WorkflowStepSelectType`, now it takes as second argument instance of `\Symfony\Component\Translation\TranslatorInterface`
 - Deprecated service `oro_workflow.attribute_guesser` removed.
-- Deprecated interfaces and classes removed: 
+- Deprecated interfaces and classes removed:
   * `Oro\Bundle\WorkflowBundle\Model\AbstractStorage`
   * `Oro\Bundle\WorkflowBundle\Model\ConfigurationPass\ReplacePropertyPath` (service `oro_workflow.configuration_pass.replace_property_path`)
   * `Oro\Bundle\WorkflowBundle\Model\ReplacePropertyPath\ContextAccessor`
@@ -234,8 +273,6 @@ To migrate all labels from configuration translatable fields automatically you c
   * `Oro\Bundle\WorkflowBundle\Model\AttributeManager`
   * `Oro\Bundle\WorkflowBundle\Model\Condition\AbstractCondition`
   * `Oro\Bundle\WorkflowBundle\Model\Condition\Configurable`
-- Added new option `--skip-scope-processing` to command `oro:workflow:definitions:load` that skip workflow scope loading.
-- Added new command `oro:workflow:scope:update` that update scopes for workflow definitions already loaded to database.
 - Added new node `sopes` to `Oro\Bundle\WorkflowBundle\Configuration\WorkflowConfiguration`.
 - Added method `Oro\Bundle\WorkflowBundle\Entity\Repository\WorkflowDefinitionRepository::getScopedByNames(array $names, ScopeCriteria $scopeCriteria)`.
 - Added ManyToMany relation from `WorkflowDefinition` to `Oro\Bundle\ScopeBundle\Entity\Scope`.
@@ -243,6 +280,27 @@ To migrate all labels from configuration translatable fields automatically you c
 - Removed third constructor argument `Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider $configProvider` of `WorkflowRegistry`.
 - Added method `public function addDefinitionFilter(WorkflowDefinitionFilterInterface $definitionFilter)` to `WorkflowRegistry`.
 - Added listener `oro_workflow.listener.workflow_definition_scope` for creating or updating `WorflowDefinition` to update `WorkflowScope` entities.
+- Changes in `Oro\Bundle\WorkflowBundle\Configuration\WorkflowConfiguration`:
+    - added constants `NODE_INIT_ENTITIES`, `NODE_INIT_ROUTES`, `NODE_INIT_CONTEXT_ATTRIBUTE`, `DEFAULT_INIT_CONTEXT_ATTRIBUTE`
+    - added nodes for constants `NODE_INIT_ENTITIES`, `NODE_INIT_ROUTES`, `NODE_INIT_CONTEXT_ATTRIBUTE` into `transitions`
+- Changes in `Oro\Bundle\WorkflowBundle\Configuration\WorkflowDefinitionConfigurationBuilder`:
+    - added processing of a init context from all transitions (`NODE_INIT_ENTITIES`, `NODE_INIT_ROUTES`, `NODE_INIT_CONTEXT_ATTRIBUTE`)
+    - added nodes `NODE_INIT_ENTITIES`, `NODE_INIT_ROUTES`, `NODE_INIT_CONTEXT_ATTRIBUTE` into white list of a transition configuration filter
+- Changed `Oro\Bundle\WorkflowBundle\Controller\Api\Rest\WorkflowController::startAction`, now it use transition init options and `oro_action.provider.button_search_context`
+- Changed `Oro\Bundle\WorkflowBundle\Controller\WidgetController::startTransitionFormAction`, now it use transition init options and `oro_action.provider.button_search_context`
+- Changed `Oro\Bundle\WorkflowBundle\Controller\WorkflowController::startTransitionAction`, now it use transition init options
+- Added method `findActive()` to `Oro\Bundle\WorkflowBundle\Entity\Repository\WorkflowDefinitionRepository`
+- Added `Oro\Bundle\WorkflowBundle\Extension\TransitionButtonProviderExtension`, that provide transition buttons
+    - implemented `find()` method
+    - registered by tag `oro.action.extension.button_provider`
+- Changed `Oro\Bundle\WorkflowBundle\Model\AttributeAssembler::assemble`, now it processing WorkflowConfiguration::NODE_INIT_CONTEXT_ATTRIBUTE
+- Changed `Oro\Bundle\WorkflowBundle\Model\Transition`, added properties $initEntities, $initRoutes, $initContextAttribute and getters/setters for it
+- Changed `Oro\Bundle\WorkflowBundle\Model\TransitionAssembler::assembleTransition`, now it process NODE_INIT_ENTITIES, NODE_INIT_ROUTES, NODE_INIT_CONTEXT_ATTRIBUTE
+- Added `Oro\Bundle\WorkflowBundle\Model\TransitionButton`, that implements `ButtonInterface` and specific logic for transition buttons
+- Changed `Oro\Bundle\WorkflowBundle\Model\Workflow`, added methods `getInitEntities()` and `getInitRoutes()` to obtain the appropriate options from the configuration
+- Changed `Oro\Bundle\WorkflowBundle\Model\WorkflowAssembler::assembleAttributes`, now it pass transition configuration into `AttributeAssembler::assemble()`
+- Added method `getActiveWorkflows()` to `Oro\Bundle\WorkflowBundle\Model\WorkflowRegistry`
+- Added class `Oro\Bundle\WorkflowBundle\Filter\WorkflowOperationFilter` and registered as an additional (tag: `oro_action.operation_registry.filter`) filter for OperationRegistry.
 
 ####LocaleBundle:
 - Added helper `Oro\Bundle\LocaleBundle\Helper\LocalizationQueryTrait` for adding necessary joins to QueryBuilder
@@ -425,7 +483,9 @@ To migrate all labels from configuration translatable fields automatically you c
 - Removed method `isMasksComparable` of `Oro\Bundle\SecurityBundle\Acl\Domain\PermissionGrantingStrategy`. This was done by performance reasons.
 - Changed signature of the constructor of `Oro\Bundle\SecurityBundle\Acl\Extension\FieldAclExtension`. Removed `$entityClassResolver` parameter. Parameter `ConfigProvider $configProvider` replaced with `ConfigManager $configManager`.
 - Changed signature of the constructor of `Oro\Bundle\SecurityBundle\Metadata\AclAnnotationProvider`. Added `EntityClassResolver $entityClassResolver` parameter.
-
+- Changed signature of the constructor of `Oro\Bundle\SecurityBundle\Acl\Persistence\AclPrivilegeRepository`. Removed `$translator` parameter.
+- Changed signature of the constructor of `Oro\Bundle\SecurityBundle\Metadata\ActionMetadataProvider`. Added `TranslatorInterface $translator` parameter.
+- Changed signature of the constructor of `Oro\Bundle\SecurityBundle\Metadata\EntitySecurityMetadataProvider`. Added `TranslatorInterface $translator` parameter.
 
 ####ImportExportBundle
 - Added new event `AFTER_JOB_EXECUTION`, for details please check out [documentation](./src/Oro/Bundle/ImportExportBundle/Resources/doc/reference/events.md).
@@ -477,18 +537,18 @@ To migrate all labels from configuration translatable fields automatically you c
 - Added new ACL permission `TRANSLATE`, should be used to determine if user has access to modify translations per language.
 - Removed `Oro\Bundle\TranslationBundle\Translation\TranslationStatusInterface`
 - Added `Oro\Bundle\TranslationBundle\DependencyInjection\Compiler\TranslationContextResolverPass`.
-- Added `Oro\Bundle\TranslationBundle\Helper\TranslationHelper` class with `oro_translation.helper.translation` as accessor for translation values in database.  
+- Added `Oro\Bundle\TranslationBundle\Helper\TranslationHelper` class with `oro_translation.helper.translation` as accessor for translation values in database.
 - Added Twig extension `\Oro\Bundle\TranslationBundle\Twig\TranslationExtension` wich declare following TWIG functions:
-    - `oro_translation_debug_translator` 
+    - `oro_translation_debug_translator`
     - `translation_grid_link`
 - Added `Oro\Bundle\TranslationBundle\Translation\TranslationKeyGenerator`
 - Added `Oro\Bundle\TranslationBundle\Translation\TranslationKeySourceInterface` with 2 types of implementations `Oro\Bundle\TranslationBundle\Translation\KeySource\DynamicTranslationKeySource` and immutable one - `Oro\Bundle\TranslationBundle\Translation\KeySource\TranslationKeySource`
 - Added `Oro\Bundle\TranslationBundle\Translation\TranslationFieldsIteratorInterface` as useful way to define single point of custom structure translatable fields awareness and manipulation.
 - Added `Oro\Bundle\TranslationBundle\Translation\TranslationFieldsIteratorTrait`.
-- Added Data Provider `Oro\Bundle\TranslationBundle\Layout\DataProvider\TranslatorProvider` that provides the translator to Layouts. 
+- Added Data Provider `Oro\Bundle\TranslationBundle\Layout\DataProvider\TranslatorProvider` that provides the translator to Layouts.
 - Added helper `Oro\Bundle\TranslationBundle\Helper\TranslationsDatagridRouteHelper`.
 
- 
+
 ####EntityExtendBundle
 - Extend fields default mode is `Oro\Bundle\EntityConfigBundle\Entity\ConfigModel::MODE_READONLY`
 - `Oro\Bundle\EntityExtendBundle\Migration\EntityMetadataHelper`
@@ -608,6 +668,7 @@ placeholders:
     items: ...
 ```
 - Main menu dropdown active item is now triggering a page refresh, despite the Backbone router limitations.
+- Upgrade Font-awesome component to 4.6.* version.
 - Updated jquery.mCustomScrollbar plugin to version 3.1.5.
 - Changed `form_row` block to support of form field 'hints' which allows rendering of simple help section for the respective form control.
 - Updated jQuery and jQuery-UI libraries to version 3.1.* and 1.12.* accordingly.
@@ -705,7 +766,7 @@ placeholders:
 - `Oro\Bundle\EmailBundle\Form\Model\ExtendMailboxProcessSettings` was removed
 - Class `Oro\Bundle\EmailBundle\Form\Model\Email`
     - method `getContexts` now returns `Doctrine\Common\Collections\Collection` instead of array
-- Constructor of `Oro\Bundle\EmailBundle\Mailbox\MailboxProcessStorage` was changed. Added `FeatureChecker $featureChecker` argument.    
+- Constructor of `Oro\Bundle\EmailBundle\Mailbox\MailboxProcessStorage` was changed. Added `FeatureChecker $featureChecker` argument.
 - The command `oro:email:add-associations` (class `Oro\Bundle\EmailBundle\Command\AddAssociationCommand`) was removed. Produce message to the topic `oro.email.add_association_to_email` or `oro.email.add_association_to_emails` instead.
 - The command `oro:email:autoresponse` (class `Oro\Bundle\EmailBundle\Command\AutoResponseCommand`) was removed. Produce message to the topic `oro.email.send_auto_response` or `oro.email.send_auto_responses` instead.
 - The command `oro:email:flag-sync` (class `Oro\Bundle\EmailBundle\Command\EmailFlagSyncCommand`) was removed. Produce message to the topic `oro.email.sync_email_seen_flag` instead.

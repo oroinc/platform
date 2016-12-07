@@ -135,7 +135,7 @@ class BoardExtensionTest extends \PHPUnit_Framework_TestCase
             [
                 'type' => BoardExtension::APPEARANCE_TYPE,
                 'plugin' => Configuration::DEFAULT_PLUGIN,
-                'icon' => 'icon-th',
+                'icon' => 'fa-th',
                 'id' => 'board1',
                 'label' => 'translated board label',
                 'group_by' => 'group_field',

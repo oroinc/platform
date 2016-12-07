@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\TestFrameworkBundle\Behat\Isolation;
 
+use Doctrine\DBAL\Connection;
+use Doctrine\ORM\EntityManager;
 use Oro\Bundle\TestFrameworkBundle\Behat\Isolation\Event\AfterFinishTestsEvent;
 use Oro\Bundle\TestFrameworkBundle\Behat\Isolation\Event\AfterIsolatedTestEvent;
 use Oro\Bundle\TestFrameworkBundle\Behat\Isolation\Event\BeforeIsolatedTestEvent;
@@ -9,6 +11,7 @@ use Oro\Bundle\TestFrameworkBundle\Behat\Isolation\Event\BeforeStartTestsEvent;
 use Oro\Bundle\TestFrameworkBundle\Behat\Isolation\Event\RestoreStateEvent;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpKernel\KernelInterface;
+use Symfony\Component\Process\Exception\RuntimeException;
 use Symfony\Component\Process\Process;
 
 class DbalMessageQueueIsolator implements IsolatorInterface
@@ -17,11 +20,6 @@ class DbalMessageQueueIsolator implements IsolatorInterface
      * @var KernelInterface
      */
     private $kernel;
-
-    /**
-     * @var Process
-     */
-    private $process;
 
     /**
      * @param KernelInterface $kernel
@@ -39,14 +37,29 @@ class DbalMessageQueueIsolator implements IsolatorInterface
     /** {@inheritdoc} */
     public function beforeTest(BeforeIsolatedTestEvent $event)
     {
-        $this->createProcess();
-        $this->process->start();
+        $command = sprintf(
+            './console oro:message-queue:consume --env=%s %s > /dev/null 2>&1 &',
+            $this->kernel->getEnvironment(),
+            $this->kernel->isDebug() ? '' : '--no-debug'
+        );
+        $process = new Process($command, $this->kernel->getRootDir());
+        $process->run();
     }
 
     /** {@inheritdoc} */
     public function afterTest(AfterIsolatedTestEvent $event)
     {
-        $this->process->stop();
+        /** @var EntityManager $em */
+        $em = $this->kernel->getContainer()->get('doctrine')->getManager();
+        DbalMessageQueueIsolator::waitForMessageQueue($em->getConnection());
+
+        $process = new Process('pkill -f oro:message-queue:consume', $this->kernel->getRootDir());
+
+        try {
+            $process->run();
+        } catch (RuntimeException $e) {
+            //it's ok
+        }
     }
 
     /** {@inheritdoc} */
@@ -83,14 +96,22 @@ class DbalMessageQueueIsolator implements IsolatorInterface
         return 'Dbal Message Queue';
     }
 
-    protected function createProcess()
+    /**
+     * @param Connection $connection
+     */
+    public static function waitForMessageQueue(Connection $connection, $timeLimit = 60)
     {
-        $command = sprintf(
-            'exec ./console oro:message-queue:consume --env=%s %s',
-            $this->kernel->getEnvironment(),
-            $this->kernel->isDebug() ? '' : '--no-debug'
-        );
+        $time = $timeLimit;
+        $result = $connection->executeQuery("SELECT * FROM oro_message_queue")->rowCount();
 
-        $this->process = new Process($command, $this->kernel->getRootDir());
+        while (0 !== $result) {
+            if ($time <= 0) {
+                throw new RuntimeException('Message Queue was not process messages during time limit');
+            }
+
+            $result = $connection->executeQuery("SELECT * FROM oro_message_queue")->rowCount();
+            usleep(250000);
+            $time -= 0.25;
+        }
     }
 }

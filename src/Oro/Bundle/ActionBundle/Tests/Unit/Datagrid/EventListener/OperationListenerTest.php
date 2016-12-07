@@ -435,7 +435,7 @@ class OperationListenerTest extends \PHPUnit_Framework_TestCase
             'label' => $label,
             'rowAction' => false,
             'link' => '#',
-            'icon' => 'edit',
+            'icon' => 'pencil-square-o',
         ], $data);
     }
 
