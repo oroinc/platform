@@ -42,8 +42,8 @@
     {% endif %}
 
     {% set data = transitionData|merge({
-        'page-component-module': 'oroworkflow/js/app/components/button-component',
-        'page-component-options': {'displayType': transition.displayType}|json_encode,
+        'page-component-module': transitionData['page-component-module']|default('oroworkflow/js/app/components/button-component'),
+        'page-component-options': transitionData['page-component-options']|default({})|merge({'displayType': transition.displayType})|json_encode,
     }) %}
 
     {% if transition.frontendOptions is defined and transition.frontendOptions.dialog is defined %}

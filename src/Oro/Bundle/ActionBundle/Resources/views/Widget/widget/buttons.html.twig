@@ -15,7 +15,7 @@
             {% set groups = groups|merge({(groupName): groups[groupName]|default([])|merge([link])}) %}
         {% else %}
             {% set renderedButton %}
-                {% include button.template with button.getTemplateData({'aClass' : 'btn'}) %}
+                {% include button.template with button.getTemplateData({'aClass' : 'btn action-button'}) %}
             {% endset %}
             {% set renderedButtons = renderedButtons|merge([renderedButton]) %}
         {% endif %}

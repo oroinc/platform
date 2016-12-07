@@ -10,6 +10,7 @@
     group: context.group,
 } %}
 
+{% set transitionData = transition.frontendOptions.data|default({})|merge(transitionData) %}
 {% if transition.displayType == 'dialog' %}
     {% if transition.hasForm() %}
         {% set transitionData = transitionData|merge({'dialog-url': path(transitionData['dialog-route'], params) }) %}

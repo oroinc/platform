@@ -152,18 +152,18 @@ class Workflow
      *
      * @param object $entity
      * @param array $data
-     * @param string $startTransitionName
+     * @param string|Transition $startTransition
      *
      * @return WorkflowItem
      */
-    public function start($entity, array $data = [], $startTransitionName = null)
+    public function start($entity, array $data = [], $startTransition = null)
     {
-        if (null === $startTransitionName) {
-            $startTransitionName = TransitionManager::DEFAULT_START_TRANSITION_NAME;
+        if (null === $startTransition) {
+            $startTransition = TransitionManager::DEFAULT_START_TRANSITION_NAME;
         }
 
         $workflowItem = $this->createWorkflowItem($entity, $data);
-        $this->transit($workflowItem, $startTransitionName);
+        $this->transit($workflowItem, $startTransition);
 
         return $workflowItem;
     }
