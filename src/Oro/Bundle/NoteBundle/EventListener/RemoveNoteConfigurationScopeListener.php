@@ -29,7 +29,7 @@ class RemoveNoteConfigurationScopeListener
     public function onPreUp(PreMigrationEvent $event)
     {
         $version = $event->getLoadedVersion('OroNoteBundle');
-        if ($version && version_compare($version, '1_3', '<')) {
+        if ($version && version_compare($version, 'v1_3', '<')) {
             $this->isApplicable = true;
         }
     }
