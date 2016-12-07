@@ -3,7 +3,7 @@
 {% set isAjax = false %}
 
 {% block button %}
-    {% set options = oro_action_frontend_options(operation) %}
+    {% set options = oro_action_frontend_options(button) %}
     {% if onlyLink is not defined %}<div class="pull-left btn-group icons-holder">{% endif %}
         {% block link %}
             <a {% if (params.id is defined) %}id="{{ params.id }}"{% endif %}

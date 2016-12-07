@@ -62,6 +62,7 @@ class ButtonsCollection implements \IteratorAggregate, \Countable
             $extension = $this->buttonsMap[$button];
 
             if ($extension->isAvailable($button, $searchContext)) {
+                $button->getButtonContext()->setEnabled(true);
                 $collection->addButton($button, $extension);
             }
         }

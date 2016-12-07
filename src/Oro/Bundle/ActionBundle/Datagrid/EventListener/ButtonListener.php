@@ -203,8 +203,7 @@ class ButtonListener
         }
 
         //TODO should be refactored in https://magecore.atlassian.net/browse/BAP-12873
-        //$frontendOptions = $this->optionsHelper->getFrontendOptions($operation, $context);
-        $frontendOptions = ['options' => [], 'data' => []];
+        $frontendOptions = $this->optionsHelper->getFrontendOptions($button, $this->contextHelper->getContext());
 
         return array_merge($frontendOptions['options'], $frontendOptions['data']);
     }

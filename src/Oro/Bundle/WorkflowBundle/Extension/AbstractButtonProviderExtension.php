@@ -43,7 +43,7 @@ abstract class AbstractButtonProviderExtension implements ButtonProviderExtensio
         $group = $buttonSearchContext->getGroup();
 
         // Skip if custom buttons group defined
-        if ($group && ($group !== ButtonInterface::DEFAULT_GROUP)) {
+        if ($group && ($group !== ButtonInterface::DEFAULT_GROUP) && !is_array($group)) {
             return $buttons;
         }
 

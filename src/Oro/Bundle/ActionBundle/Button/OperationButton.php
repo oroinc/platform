@@ -99,7 +99,22 @@ class OperationButton implements ButtonInterface
                 'operation' => $this->operation,
                 'params' => $this->operation->getDefinition(),
                 'actionData' => $this->data,
-                'additionalData' => $this->getDatagridData()
+
+                'frontendOptions' => $this->operation->getDefinition()->getFrontendOptions(),
+                'buttonOptions' => $this->operation->getDefinition()->getButtonOptions(),
+                'hasForm' => $this->operation->hasForm(),
+                'showDialog' => true,
+                'routeParams' => [
+                    'operationName' => $this->operation->getName(),
+                    'entityClass' => $this->buttonContext->getEntityClass(),
+                    'entityId' => $this->buttonContext->getEntityId(),
+                    'route' => $this->buttonContext->getRouteName(),
+                    'datagrid' => $this->buttonContext->getDatagridName(),
+                    'group' => $this->buttonContext->getGroup(),
+                ],
+                'executionRoute' => $this->buttonContext->getExecutionRoute(),
+                'dialogRoute' => $this->buttonContext->getFormDialogRoute(),
+                'additionalData' => $this->getDatagridData(),
             ]
         );
     }
@@ -138,5 +153,16 @@ class OperationButton implements ButtonInterface
     public function getOperation()
     {
         return $this->operation;
+    }
+
+    /**
+     * @param ActionData $data
+     * @return Operation
+     */
+    public function setData(ActionData $data)
+    {
+        $this->data = $data;
+
+        return $this;
     }
 }

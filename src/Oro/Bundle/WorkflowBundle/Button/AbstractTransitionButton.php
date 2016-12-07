@@ -79,12 +79,32 @@ abstract class AbstractTransitionButton implements ButtonInterface
      */
     public function getTemplateData(array $customData = [])
     {
+        $showDialog = $this->transition->getDisplayType() !== 'page';
+
         return array_merge(
             [
                 'workflow' => $this->workflow,
                 'transition' => $this->transition,
                 'context' => $this->getButtonContext(),
-                'additionalData' => []
+
+                'frontendOptions' => $this->transition->getFrontendOptions(),
+                'hasForm' => $this->transition->hasForm(),
+                'showDialog' => $showDialog,
+                'routeParams' => [
+                    'workflowName' => $this->workflow->getName(),
+                    'transitionName' => $this->transition->getName(),
+                    'entityClass' => $this->buttonContext->getEntityClass(),
+                    'entityId' => $this->buttonContext->getEntityId(),
+                    'route' => $this->buttonContext->getRouteName(),
+                    'datagrid' => $this->buttonContext->getDatagridName(),
+                    'group' => $this->buttonContext->getGroup(),
+                ],
+                'executionRoute' => $this->buttonContext->getExecutionRoute(),
+                'dialogRoute' => $showDialog
+                    ? $this->buttonContext->getFormDialogRoute()
+                    : $this->buttonContext->getFormPageRoute(),
+                'translationDomain' => 'workflows',
+                'additionalData' => [],
             ],
             $customData
         );
