@@ -4,7 +4,7 @@
 
 {% block menu %}
     <a id="back-to-installed" href="{{ path('oro_distribution_package_listinstalled') }}">
-        <i class="icon icon-reply"></i>
+        <i class="fa-reply"></i>
         {{ 'Back to Installed Packages'|trans }}
     </a>
 {% endblock %}
@@ -12,7 +12,7 @@
 {% block body %}
     {% if saved %}
         <div class="alert fade in alert-success">
-            <i class="icon icon-success"></i>
+            <i class="fa-success"></i>
             <button type="button" class="close" data-dismiss="alert">&times;</button>
             {{ 'oro.distribution.messages.settings_saved'|trans }}
         </div>

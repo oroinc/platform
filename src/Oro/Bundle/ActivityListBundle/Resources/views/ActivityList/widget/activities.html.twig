@@ -21,7 +21,7 @@
                 <div class="actions-panel pull-right">
                     {{ UI.clientLink({
                         'aCss': 'action btn',
-                        'iCss': 'icon-refresh',
+                        'iCss': 'fa-refresh',
                         'label': ' ' ~ ('Refresh'|trans),
                         'dataAttributes': {'action-name': 'refresh', 'section': 'top'}
                     }) }}
@@ -31,7 +31,7 @@
                 <ul class="icons-holder">
                     <li class="pagination-previous {% if pager.current == 1 %} disabled {% endif %}">
                         <a href="#" data-section="top" data-action-name="goto_previous">
-                            <i class="icon-chevron-left hide-text"></i>
+                            <i class="fa-chevron-left hide-text"></i>
                             {% if oro_config_value('oro_activity_list.sorting_direction') == 'DESC' %}
                                 {{ 'oro.activitylist.pagination.newer'|trans }}
                             {% else %}
@@ -46,7 +46,7 @@
                             {% else %}
                                 {{ 'oro.activitylist.pagination.newer'|trans }}
                             {% endif %}
-                            <i class="icon-chevron-right hide-text"></i>
+                            <i class="fa-chevron-right hide-text"></i>
                         </a>
                     </li>
                 </ul>
