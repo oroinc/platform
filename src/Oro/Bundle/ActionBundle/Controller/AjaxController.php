@@ -12,9 +12,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-use Oro\Bundle\ActionBundle\Helper\ContextHelper;
 use Oro\Bundle\ActionBundle\Model\ActionData;
-use Oro\Bundle\ActionBundle\Model\OperationManager;
 use Oro\Bundle\ActionBundle\Exception\OperationNotFoundException;
 use Oro\Bundle\ActionBundle\Exception\ForbiddenOperationException;
 use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
@@ -31,24 +29,26 @@ class AjaxController extends Controller
      */
     public function executeAction(Request $request, $operationName)
     {
-        $data = $this->getContextHelper()->getActionData();
-
         $errors = new ArrayCollection();
         $code = Response::HTTP_OK;
         $message = '';
 
+        $handler = $this->get('oro_action.handler.operation_execution');
+
+        $data = $handler->getData($request);
+
         try {
-            $this->getOperationManager()->execute($operationName, $data, $errors);
-        } catch (OperationNotFoundException $e) {
+            $data = $handler->execute($operationName, $data, $request, $errors);
+        } catch (OperationNotFoundException $exception) {
             $code = Response::HTTP_NOT_FOUND;
-        } catch (ForbiddenOperationException $e) {
+        } catch (ForbiddenOperationException $exception) {
             $code = Response::HTTP_FORBIDDEN;
-        } catch (\Exception $e) {
+        } catch (\Exception $exception) {
             $code = Response::HTTP_INTERNAL_SERVER_ERROR;
         }
 
-        if (!empty($e)) {
-            $message = $e->getMessage();
+        if (isset($exception)) {
+            $message = $exception->getMessage();
         }
 
         return $this->handleResponse($request, $data, $code, $message, $errors);
@@ -104,21 +104,5 @@ class AjaxController extends Controller
         }
 
         return $result;
-    }
-
-    /**
-     * @return OperationManager
-     */
-    protected function getOperationManager()
-    {
-        return $this->get('oro_action.operation_manager');
-    }
-
-    /**
-     * @return ContextHelper
-     */
-    protected function getContextHelper()
-    {
-        return $this->get('oro_action.helper.context');
     }
 }

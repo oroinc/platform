@@ -36,7 +36,7 @@ class WidgetController extends Controller
      */
     public function formAction(Request $request, $operationName)
     {
-        $handler = $this->get('oro_action.button.operation.widget_form_handler');
+        $handler = $this->get('oro_action.handler.button.operation.widget_form');
 
         $data = $handler->getData($operationName, $request);
 
