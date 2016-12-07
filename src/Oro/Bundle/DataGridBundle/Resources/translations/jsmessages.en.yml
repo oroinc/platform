@@ -134,6 +134,9 @@ oro:
                 ascending: Low to High
                 descending: High to Low
         export:
+            starting.message: Starting export...
+            success.message: Export started successfully. You will receive email notification upon completion.
+            fail.message: Could not start export, please try again.
             max_limit_message: >
                 The maximum number of records that can be exported at once is {{ max_limit }}.<br/>
                 Are you sure you want to export {{ total }} records?
