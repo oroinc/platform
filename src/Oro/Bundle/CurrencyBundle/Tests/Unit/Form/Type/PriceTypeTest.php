@@ -2,15 +2,13 @@
 
 namespace Oro\Bundle\CurrencyBundle\Tests\Unit\Form\Type;
 
-use Symfony\Component\Form\PreloadedExtension;
-
-use Oro\Component\Testing\Unit\FormIntegrationTestCase;
-
-use Oro\Bundle\LocaleBundle\Model\LocaleSettings;
-use Oro\Bundle\ConfigBundle\Config\ConfigManager;
-use Oro\Bundle\CurrencyBundle\Form\Type\CurrencySelectionType;
 use Oro\Bundle\CurrencyBundle\Entity\Price;
+use Oro\Bundle\CurrencyBundle\Form\Type\CurrencySelectionType;
 use Oro\Bundle\CurrencyBundle\Form\Type\PriceType;
+use Oro\Bundle\CurrencyBundle\Provider\CurrencyProviderInterface;
+use Oro\Bundle\LocaleBundle\Model\LocaleSettings;
+use Oro\Component\Testing\Unit\FormIntegrationTestCase;
+use Symfony\Component\Form\PreloadedExtension;
 
 class PriceTypeTest extends FormIntegrationTestCase
 {
@@ -34,12 +32,12 @@ class PriceTypeTest extends FormIntegrationTestCase
      */
     protected function getExtensions()
     {
-        /* @var $configManager \PHPUnit_Framework_MockObject_MockObject|ConfigManager */
-        $configManager = $this->getMockBuilder('Oro\Bundle\CurrencyBundle\Config\CurrencyConfigManager')
+        /* @var $currencyProvider \PHPUnit_Framework_MockObject_MockObject|CurrencyProviderInterface */
+        $currencyProvider = $this->getMockBuilder(CurrencyProviderInterface::class)
             ->disableOriginalConstructor()
-            ->getMock();
+            ->getMockForAbstractClass();
 
-        $configManager->expects($this->any())
+        $currencyProvider->expects($this->any())
             ->method('getCurrencyList')
             ->will($this->returnValue(['USD', 'EUR']));
 
@@ -58,7 +56,7 @@ class PriceTypeTest extends FormIntegrationTestCase
         return [
             new PreloadedExtension(
                 [CurrencySelectionType::NAME => new CurrencySelectionType(
-                    $configManager,
+                    $currencyProvider,
                     $localeSettings,
                     $currencyNameHelper
                 )],

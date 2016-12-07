@@ -3,28 +3,30 @@
 namespace Oro\Bundle\CurrencyBundle\Model;
 
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
+use Oro\Bundle\CurrencyBundle\Provider\ViewTypeProviderInterface;
 use Oro\Bundle\LocaleBundle\Model\CalendarFactoryInterface;
 use Oro\Bundle\LocaleBundle\Model\LocaleSettings as BaseLocaleSettings;
-use Oro\Bundle\CurrencyBundle\Config\CurrencyConfigManager;
 
 class LocaleSettings extends BaseLocaleSettings
 {
-    protected $currencyConfigManager;
+    /**
+     * @var ViewTypeProviderInterface
+     */
+    protected $viewTypeProvider;
 
     /**
      * LocaleSettings constructor.
-     *
-     * @param ConfigManager            $configManager
+     * @param ConfigManager $configManager
      * @param CalendarFactoryInterface $calendarFactory
-     * @param CurrencyConfigManager    $currencyConfigManager
+     * @param ViewTypeProviderInterface $viewTypeProvider
      */
     public function __construct(
         ConfigManager $configManager,
         CalendarFactoryInterface $calendarFactory,
-        CurrencyConfigManager $currencyConfigManager
+        ViewTypeProviderInterface $viewTypeProvider
     ) {
         parent::__construct($configManager, $calendarFactory);
-        $this->currencyConfigManager = $currencyConfigManager;
+        $this->viewTypeProvider = $viewTypeProvider;
     }
 
     /**
@@ -32,7 +34,7 @@ class LocaleSettings extends BaseLocaleSettings
      */
     public function getCurrencySymbolByCurrency($currencyCode = null)
     {
-        if ($this->currencyConfigManager->getViewType() === CurrencyConfigManager::VIEW_TYPE_ISO_CODE) {
+        if ($this->viewTypeProvider->getViewType() === ViewTypeProviderInterface::VIEW_TYPE_ISO_CODE) {
             return $currencyCode;
         }
 

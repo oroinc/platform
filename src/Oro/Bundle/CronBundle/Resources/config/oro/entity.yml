@@ -1,5 +1,0 @@
-oro_entity:
-    entity_aliases:
-        JMS\JobQueueBundle\Entity\Job:
-            alias:        job
-            plural_alias: jobs

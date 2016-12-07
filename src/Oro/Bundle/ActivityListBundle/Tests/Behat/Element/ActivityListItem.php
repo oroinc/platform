@@ -38,7 +38,7 @@ class ActivityListItem extends Element
     public function deleteAllContexts()
     {
         foreach ($this->getContexts() as $context) {
-            $context->find('css', 'i.icon-remove')->click();
+            $context->find('css', 'i.fa-close')->click();
         }
     }
 

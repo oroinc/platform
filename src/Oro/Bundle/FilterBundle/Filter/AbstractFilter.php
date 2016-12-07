@@ -397,7 +397,7 @@ abstract class AbstractFilter implements FilterInterface
      */
     protected function findRelatedJoin(FilterDatasourceAdapterInterface $ds)
     {
-        if (!$ds instanceof OrmFilterDatasourceAdapter) {
+        if (!$ds instanceof OrmFilterDatasourceAdapter || $this->isToOne($ds)) {
             return null;
         }
 
@@ -474,5 +474,22 @@ abstract class AbstractFilter implements FilterInterface
         }
 
         return $expressions;
+    }
+
+    /**
+     * @param FilterDatasourceAdapterInterface $ds
+     *
+     * @return bool
+     */
+    protected function isToOne(FilterDatasourceAdapterInterface $ds)
+    {
+        if (!$ds instanceof OrmFilterDatasourceAdapter) {
+            return false;
+        }
+
+        $fieldName = $this->get(FilterUtility::DATA_NAME_KEY);
+        list($joinAlias) = explode('.', $fieldName);
+
+        return QueryUtils::isToOne($ds->getQueryBuilder(), $joinAlias);
     }
 }

@@ -467,7 +467,7 @@ a.button:hover {
     color: #fff
 }
 
-.button.disabled span:after, .button.disabled:before, .button.disabled[class^=icon-]:before {
+.button.disabled span:after, .button.disabled:before, .button.disabled[class^="fa-"]:before {
     opacity: .2
 }
 

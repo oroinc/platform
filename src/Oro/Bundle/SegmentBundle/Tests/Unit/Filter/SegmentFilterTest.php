@@ -339,8 +339,7 @@ class SegmentFilterTest extends OrmTestCase
 
         $expectedResult = [
             'SELECT t1.name FROM OroSegmentBundle:CmsUser t1',
-            'WHERE EXISTS(SELECT ts1.id FROM OroSegmentBundle:CmsUser ts1' .
-            ' WHERE ts1.name LIKE :param1 AND ts1.id = t1.id)'
+            'WHERE t1.id IN(SELECT ts1.id FROM OroSegmentBundle:CmsUser ts1 WHERE ts1.name LIKE :param1)'
         ];
         $expectedResult = implode(' ', $expectedResult);
 
@@ -383,8 +382,7 @@ class SegmentFilterTest extends OrmTestCase
 
         $expectedResult = [
             'SELECT t1.name FROM OroSegmentBundle:CmsUser t1 WHERE',
-            'EXISTS(SELECT ts1.id FROM OroSegmentBundle:SegmentSnapshot ts1 ' .
-            'WHERE ts1.segmentId = :segment AND ts1.integerEntityId = t1.id)'
+            't1.id IN(SELECT ts1.id FROM OroSegmentBundle:SegmentSnapshot ts1 WHERE ts1.segmentId = :segment)'
         ];
         $expectedResult = implode(' ', $expectedResult);
 
