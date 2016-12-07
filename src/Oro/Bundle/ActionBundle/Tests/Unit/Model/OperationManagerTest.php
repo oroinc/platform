@@ -10,6 +10,7 @@ use Oro\Bundle\ActionBundle\Model\ActionData;
 use Oro\Bundle\ActionBundle\Model\ActionGroupRegistry;
 use Oro\Bundle\ActionBundle\Model\Assembler\AttributeAssembler;
 use Oro\Bundle\ActionBundle\Model\Assembler\FormOptionsAssembler;
+use Oro\Bundle\ActionBundle\Model\Criteria\OperationFindCriteria;
 use Oro\Bundle\ActionBundle\Model\Operation;
 use Oro\Bundle\ActionBundle\Model\OperationDefinition;
 use Oro\Bundle\ActionBundle\Model\OperationManager;
@@ -110,7 +111,7 @@ class OperationManagerTest extends \PHPUnit_Framework_TestCase
      * @param array $operations
      * @param array $expected
      */
-    public function testgetOperations(
+    public function testGetOperations(
         $class,
         $route,
         $datagrid,
@@ -123,7 +124,7 @@ class OperationManagerTest extends \PHPUnit_Framework_TestCase
 
         $this->operationRegistry->expects($this->once())
             ->method('find')
-            ->with($class, $route, $datagrid, $group)
+            ->with(new OperationFindCriteria($class, $route, $datagrid, $group))
             ->willReturn($operations);
 
         $this->assertGetOperations($expected, $context);
@@ -175,6 +176,18 @@ class OperationManagerTest extends \PHPUnit_Framework_TestCase
                 'datagrid' => null,
                 'group' => null,
                 'context' => ['entityClass' => 'Oro\Bundle\ActionBundle\Tests\Unit\Stub\TestEntity1'],
+                'operations' => [],
+                'expectedOperations' => []
+            ],
+            'entity1 without id with datagrid' => [
+                'entityClass' => 'Oro\Bundle\ActionBundle\Tests\Unit\Stub\TestEntity1',
+                'route' => null,
+                'datagrid' => 'grid1',
+                'group' => null,
+                'context' => [
+                    'entityClass' => 'Oro\Bundle\ActionBundle\Tests\Unit\Stub\TestEntity1',
+                    'datagrid' => 'grid1'
+                ],
                 'operations' => [],
                 'expectedOperations' => []
             ],

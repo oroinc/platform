@@ -179,7 +179,7 @@ class SegmentFilter extends EntityFilter
 
         /**@var OrmExpressionBuilder $expressionBuilder */
         $expressionBuilder = $ds->expr();
-        $expr              = $expressionBuilder->exists($query->getDQL());
+        $expr              = $expressionBuilder->in($this->get(FilterUtility::DATA_NAME_KEY), $query->getDQL());
 
         $this->applyFilterToClause($ds, $expr);
 
@@ -209,8 +209,6 @@ class SegmentFilter extends EntityFilter
             $queryBuilder = $this->staticSegmentQueryBuilderLink->getService()->getQueryBuilder($segment);
         }
         $field = $this->get(FilterUtility::DATA_NAME_KEY);
-
-        $queryBuilder->andWhere($this->getIdentityFieldWithAlias($queryBuilder, $segment) . ' = ' . $field);
 
         return $queryBuilder;
     }

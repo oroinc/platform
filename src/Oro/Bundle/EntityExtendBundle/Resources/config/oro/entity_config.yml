@@ -7,7 +7,7 @@ entity_config:
                     name:                   oro.entity_extend.entity_config.extend.entity.grid_action.remove
                     route:                  'oro_entityextend_entity_remove'
                     type:                   'ajaxdelete'
-                    icon:                   'trash'
+                    icon:                   'trash-o'
                     filter:                 { extend_owner: 'Custom', extend_state: ['New', 'Requires update', 'Active']}
                     args:                   ['id']
                 -
@@ -146,7 +146,7 @@ entity_config:
                     name:                   oro.entity_extend.entity_config.extend.field.grid_action.remove
                     route:                  'oro_entityextend_field_remove'
                     type:                   'ajaxdeletefield'
-                    icon:                   'trash'
+                    icon:                   'trash-o'
                     filter:                 { extend_owner: 'Custom', mode: 'default', extend_state: ['New', 'Requires update', 'Active', 'Restored'] }
                     args:                   ['id']
                 -

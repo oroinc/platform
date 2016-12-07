@@ -1,7 +1,7 @@
 system_configuration:
     groups:
         application_settings:
-            icon:        icon-desktop
+            icon:        fa-desktop
             title:       oro.ui.system_configuration.groups.application_settings.title
             page_reload: true
 
