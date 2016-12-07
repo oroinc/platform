@@ -151,10 +151,10 @@ services:
             - ''
             - '@doctrine.orm.entity_manager'
 
-    oro_action.datagrid.event_listener.operation:
-        class: 'Oro\Bundle\ActionBundle\Datagrid\EventListener\OperationListener'
+    oro_action.datagrid.event_listener.button:
+        class: 'Oro\Bundle\ActionBundle\Datagrid\EventListener\ButtonListener'
         arguments:
-            - '@oro_action.operation_manager'
+            - '@oro_action.provider.button'
             - '@oro_action.helper.context'
             - '@oro_action.datagrid.mass_action_provider.registry'
             - '@oro_action.helper.options'

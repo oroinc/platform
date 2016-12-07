@@ -52,11 +52,9 @@ class LayoutButtonProvider
      */
     public function getByGroup($entity = null, $group = null)
     {
-        $buttons = $this->buttonProvider->findAll(
+        return $this->buttonProvider->findAvailable(
             $this->prepareButtonSearchContext($entity, $group)
         );
-
-        return $buttons;
     }
 
     /**
