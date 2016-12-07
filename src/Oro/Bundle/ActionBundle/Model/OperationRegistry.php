@@ -98,7 +98,6 @@ class OperationRegistry
     }
 
     /**
-     * //todo @ephrin rename to `get` with exception (OperationNotFoundException)
      * @param string $name
      * @return null|Operation
      */
@@ -110,7 +109,6 @@ class OperationRegistry
         if (array_key_exists($name, $this->operations)) {
             $operation = $this->operations[$name];
 
-            //todo @ephrin no need to check private property content, make one type array
             if (!$operation instanceof Operation) {
                 $operation = $this->assembler->createOperation($name, $this->configuration[$name]);
 
@@ -222,7 +220,6 @@ class OperationRegistry
     }
 
     /**
-     * Todo @epthin move filterEntities to config provider
      * @param array $entities
      * @return array
      */
@@ -232,7 +229,6 @@ class OperationRegistry
     }
 
     /**
-     * //todo @ephrin ask @msulima about logic of null value
      * @param string $entityName
      * @return string|bool
      */

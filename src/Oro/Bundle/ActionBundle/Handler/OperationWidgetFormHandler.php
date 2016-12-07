@@ -23,24 +23,16 @@ class OperationWidgetFormHandler
     const DEFAULT_FORM_TEMPLATE = 'OroActionBundle:Operation:form.html.twig';
     const DEFAULT_PAGE_TEMPLATE = 'OroActionBundle:Operation:page.html.twig';
 
-    /**
-     * @var ContextHelper
-     */
+    /** @var ContextHelper */
     private $contextHelper;
 
-    /**
-     * @var OperationRegistry
-     */
+    /** @var OperationRegistry */
     private $operationRegistry;
 
-    /**
-     * @var FormFactoryInterface
-     */
+    /** @var FormFactoryInterface */
     private $formFactory;
 
-    /**
-     * @var TranslatorInterface
-     */
+    /** @var TranslatorInterface */
     private $translator;
 
     /**
@@ -61,6 +53,11 @@ class OperationWidgetFormHandler
         $this->translator = $translator;
     }
 
+    /**
+     * @param string $name
+     * @param Request $request
+     * @return array
+     */
     public function getData($name, Request $request)
     {
         $data = $this->contextHelper->getActionData();
@@ -86,7 +83,12 @@ class OperationWidgetFormHandler
      */
     public function handle(array $data, Request $request, FlashBagInterface $flashBag)
     {
-        //todo checks?
+        $this->validateData($data);
+
+        /**
+         * @var ActionData $actionData
+         * @var Operation $operation
+         */
         $actionData = $data['actionData'];
         $operation = $data['operation'];
 
@@ -256,5 +258,23 @@ class OperationWidgetFormHandler
     private function hasRedirect(array $params)
     {
         return empty($params['_wid']) && !empty($params['response']['redirectUrl']);
+    }
+
+    /**
+     * @param array $data
+     */
+    private function validateData(array $data)
+    {
+        if (!isset($data['actionData']) || !$data['actionData'] instanceof ActionData) {
+            throw new \DomainException(
+                'No action data specified. Cannot handle.'
+            );
+        }
+
+        if (!isset($data['operation']) || !$data['operation'] instanceof Operation) {
+            throw new \DomainException(
+                'Operation is not defined. Cannot handle.'
+            );
+        }
     }
 }
