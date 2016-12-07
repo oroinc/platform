@@ -98,8 +98,13 @@ class CronCommand extends ContainerAwareCommand
     {
         $jobs = [];
         $em = $this->getEntityManager('OroCronBundle:Schedule');
+        $featureChecker = $this->getContainer()->get('oro_featuretoggle.checker.feature_checker');
 
         foreach ($commands as $name => $command) {
+            if (!$featureChecker->isResourceEnabled($name, 'cron_jobs')) {
+                continue;
+            }
+
             $output->write(
                 sprintf('Processing command "<info>%s</info>": ', $name),
                 false,
@@ -148,8 +153,13 @@ class CronCommand extends ContainerAwareCommand
     protected function processSchedules(OutputInterface $output, Collection $schedules)
     {
         $jobs = [];
+        $featureChecker = $this->getContainer()->get('oro_featuretoggle.checker.feature_checker');
 
         foreach ($schedules as $schedule) {
+            if (!$featureChecker->isResourceEnabled($schedule->getCommand(), 'cron_jobs')) {
+                continue;
+            }
+
             if (!$this->getApplication()->has($schedule->getCommand())) {
                 continue;
             }

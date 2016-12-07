@@ -13,6 +13,7 @@ use Symfony\Component\PropertyAccess\PropertyPath;
 use Oro\Bundle\ActionBundle\Model\ActionData;
 use Oro\Bundle\CronBundle\Action\CreateJobAction;
 use Oro\Bundle\CronBundle\Entity\Manager\JobManager;
+use Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker;
 
 use Oro\Component\ConfigExpression\ContextAccessor;
 
@@ -30,6 +31,9 @@ class CreateJobActionTest extends \PHPUnit_Framework_TestCase
     /** @var ObjectManager|\PHPUnit_Framework_MockObject_MockObject */
     protected $objectManager;
 
+    /** @var FeatureChecker|\PHPUnit_Framework_MockObject_MockObject */
+    protected $featureChecker;
+
     /** @var CreateJobAction */
     protected $createJobAction;
 
@@ -45,7 +49,16 @@ class CreateJobActionTest extends \PHPUnit_Framework_TestCase
 
         $this->objectManager = $this->getMock('Doctrine\Common\Persistence\ObjectManager');
 
-        $this->createJobAction = new CreateJobAction(new ContextAccessor(), $this->jobManager, $this->managerRegistry);
+        $this->featureChecker = $this->getMockBuilder(FeatureChecker::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $this->createJobAction = new CreateJobAction(
+            new ContextAccessor(),
+            $this->jobManager,
+            $this->managerRegistry,
+            $this->featureChecker
+        );
         $this->createJobAction->setDispatcher($this->eventDispatcher);
     }
 
@@ -168,6 +181,11 @@ class CreateJobActionTest extends \PHPUnit_Framework_TestCase
         $this->objectManager->expects($this->once())->method('persist');
         $this->objectManager->expects($this->once())->method('flush');
 
+        $this->featureChecker->expects($this->once())
+            ->method('isResourceEnabled')
+            ->with('help')
+            ->willReturn(true);
+
         $context = new ActionData();
         $this->createJobAction->execute($context);
 
@@ -200,6 +218,11 @@ class CreateJobActionTest extends \PHPUnit_Framework_TestCase
         $this->objectManager->expects($this->once())->method('persist');
         $this->objectManager->expects($this->once())->method('flush');
 
+        $this->featureChecker->expects($this->once())
+            ->method('isResourceEnabled')
+            ->with('help')
+            ->willReturn(true);
+
         $context = new ActionData();
         $this->createJobAction->execute($context);
 
@@ -223,6 +246,11 @@ class CreateJobActionTest extends \PHPUnit_Framework_TestCase
 
         $this->objectManager->expects($this->never())->method('persist');
         $this->objectManager->expects($this->never())->method('flush');
+
+        $this->featureChecker->expects($this->once())
+            ->method('isResourceEnabled')
+            ->with('help')
+            ->willReturn(true);
 
         $context = new ActionData();
         $this->createJobAction->execute($context);
@@ -249,6 +277,11 @@ class CreateJobActionTest extends \PHPUnit_Framework_TestCase
 
         $this->objectManager->expects($this->once())->method('persist');
         $this->objectManager->expects($this->never())->method('flush'); // <-- not expected
+
+        $this->featureChecker->expects($this->once())
+            ->method('isResourceEnabled')
+            ->with('help')
+            ->willReturn(true);
 
         $context = new ActionData();
         $this->createJobAction->execute($context);
@@ -277,6 +310,35 @@ class CreateJobActionTest extends \PHPUnit_Framework_TestCase
 
         $this->objectManager->expects($this->once())->method('persist');
         $this->objectManager->expects($this->once())->method('flush');
+
+        $this->featureChecker->expects($this->once())
+            ->method('isResourceEnabled')
+            ->with('help')
+            ->willReturn(true);
+
+        $context = new ActionData();
+        $this->createJobAction->execute($context);
+
+        $this->assertArrayNotHasKey('result', $context, 'no result should be provided');
+    }
+
+    public function testExecuteActionNotCreatedBecauseOfDisabledCommand()
+    {
+        $this->createJobAction->initialize([
+            CreateJobAction::OPTION_COMMAND => 'help',
+            CreateJobAction::OPTION_ALLOW_DUPLICATES => false,
+            CreateJobAction::OPTION_ATTRIBUTE => new PropertyPath('result')
+        ]);
+
+        $this->jobManager->expects($this->never())->method('hasJobInQueue');
+
+        $this->objectManager->expects($this->never())->method('persist');
+        $this->objectManager->expects($this->never())->method('flush');
+
+        $this->featureChecker->expects($this->once())
+            ->method('isResourceEnabled')
+            ->with('help')
+            ->willReturn(false);
 
         $context = new ActionData();
         $this->createJobAction->execute($context);

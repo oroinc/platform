@@ -11,6 +11,7 @@ use Symfony\Component\OptionsResolver\Exception\InvalidArgumentException;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 use Oro\Bundle\CronBundle\Entity\Manager\JobManager;
+use Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker;
 
 use Oro\Component\Action\Action\AbstractAction;
 use Oro\Component\Action\Exception\InvalidParameterException;
@@ -38,6 +39,9 @@ class CreateJobAction extends AbstractAction
     /** @var JobManager */
     private $jobManager;
 
+    /** @var FeatureChecker */
+    private $featureChecker;
+
     /**
      * @param ContextAccessor $contextAccessor
      * @param JobManager $jobManager
@@ -46,12 +50,14 @@ class CreateJobAction extends AbstractAction
     public function __construct(
         ContextAccessor $contextAccessor,
         JobManager $jobManager,
-        ManagerRegistry $registry
+        ManagerRegistry $registry,
+        FeatureChecker $featureChecker
     ) {
         parent::__construct($contextAccessor);
 
         $this->jobManager = $jobManager;
         $this->registry = $registry;
+        $this->featureChecker = $featureChecker;
     }
 
     /**
@@ -118,6 +124,10 @@ class CreateJobAction extends AbstractAction
     {
         if (null === $this->options) {
             throw new \RuntimeException('Action is not initialized.');
+        }
+
+        if (!$this->featureChecker->isResourceEnabled($this->options[self::OPTION_COMMAND], 'cron_jobs')) {
+            return;
         }
 
         $args = [];

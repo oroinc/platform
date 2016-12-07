@@ -8,6 +8,7 @@ use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Oro\Bundle\CronBundle\Command\CronCommand;
 use Oro\Bundle\ImapBundle\Command\Cron\EmailSyncCommand;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
+use Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker;
 
 /**
  * @dbIsolation
@@ -66,6 +67,23 @@ class CronCommandTest extends WebTestCase
         $this->checkMessage('AllJobSkip', $result);
     }
 
+    public function testDisabledAllJobs()
+    {
+        $this->mockCronHelper();
+        $this->mockFeatureChecker();
+        $command = $this->application->find('oro:cron');
+        $commandTester = new CommandTester($command);
+        $commandTester->execute([
+            'command' => $command->getName(),
+            '--skipCheckDaemon' => true,
+        ]);
+
+        $result = $this->runCommand(CronCommand::COMMAND_NAME, ['-vvv' => true]);
+        $this->assertNotEmpty($result);
+
+        $this->assertEquals("\nAll commands finished\n", $result);
+    }
+
     /**
      * @param string $key
      * @param string $result
@@ -112,7 +130,7 @@ class CronCommandTest extends WebTestCase
                 'Processing command "oro:cron:tracking:parse": skipped',
                 'Processing command "oro:cron:send-reminders": skipped',
                 'Processing command "oro:cron:cleanup --dry-run": skipped'
-            ]
+            ],
         ];
 
         foreach ($messages[$key] as $message) {
@@ -137,5 +155,19 @@ class CronCommandTest extends WebTestCase
         $mockCronHelper->expects($this->any())->method('createCron')->willReturn($cronExpression);
 
         $this->getContainer()->set('oro_cron.helper.cron', $mockCronHelper);
+    }
+
+    protected function mockFeatureChecker()
+    {
+        $featureChecker = $this->getMockBuilder(FeatureChecker::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $featureChecker->expects($this->any())
+            ->method('isResourceEnabled')
+            ->with($this->anything())
+            ->willReturn(false);
+
+        $this->getContainer()->set('oro_featuretoggle.checker.feature_checker', $featureChecker);
     }
 }
