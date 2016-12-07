@@ -451,7 +451,7 @@ class InstallCommand extends AbstractCommand implements InstallCommandInterface
                 [
                     '--force'             => true,
                     '--process-isolation' => true,
-                    '--timeout'           => $commandExecutor->getDefaultOption('process-timeout')
+                    '--timeout'           => $commandExecutor->getDefaultOption('process-timeout'),
                 ]
             )
             ->runCommand(
@@ -482,7 +482,7 @@ class InstallCommand extends AbstractCommand implements InstallCommandInterface
                 'oro:migration:data:load',
                 [
                     '--process-isolation' => true,
-                    '--no-interaction'    => true
+                    '--no-interaction'    => true,
                 ]
             );
 
@@ -506,7 +506,7 @@ class InstallCommand extends AbstractCommand implements InstallCommandInterface
                 'oro:migration:data:load',
                 [
                     '--process-isolation'  => true,
-                    '--fixtures-type'      => 'demo'
+                    '--fixtures-type'      => 'demo',
                 ]
             );
         }
