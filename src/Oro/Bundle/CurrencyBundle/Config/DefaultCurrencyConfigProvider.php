@@ -6,7 +6,7 @@ use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\CurrencyBundle\DependencyInjection\Configuration as CurrencyConfig;
 use Oro\Bundle\CurrencyBundle\Provider\CurrencyProviderInterface;
 
-class CurrencyConfigManager implements CurrencyConfigInterface, CurrencyProviderInterface
+class DefaultCurrencyConfigProvider implements CurrencyProviderInterface
 {
     /**
      * @var ConfigManager
@@ -30,16 +30,6 @@ class CurrencyConfigManager implements CurrencyConfigInterface, CurrencyProvider
     {
         return $this->configManager->get(CurrencyConfig::getConfigKeyByName(
             CurrencyConfig::KEY_DEFAULT_CURRENCY
-        ));
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getViewType()
-    {
-        return $this->configManager->get(CurrencyConfig::getConfigKeyByName(
-            CurrencyConfig::KEY_CURRENCY_DISPLAY
         ));
     }
 
