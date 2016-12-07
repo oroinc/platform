@@ -91,7 +91,7 @@ class OperationManager
      * @return Operation
      * @throws OperationNotFoundException
      */
-    public function getOperation($operationName, ActionData $actionData, $checkAvailable = true)
+    private function getOperation($operationName, ActionData $actionData, $checkAvailable = true)
     {
         $operation = $this->operationRegistry->findByName($operationName);
         if (!$operation instanceof Operation || ($checkAvailable && !$operation->isAvailable($actionData))) {
