@@ -353,15 +353,15 @@ class DataGridExtensionTest extends \PHPUnit_Framework_TestCase
      *
      * @param string $queryString
      * @param integer $page
-     * @param string $expectedUrl
+     * @param array $expectedParameters
      */
-    public function testGetPageUrl($queryString, $page, $expectedUrl)
+    public function testGetPageUrl($queryString, $page, array $expectedParameters)
     {
         $gridName = 'test';
 
         $request = $this->getMock(Request::class);
-        $request->expects($this->once())->method('getPathInfo')->willReturn('/');
         $request->expects($this->once())->method('getQueryString')->willReturn($queryString);
+        $request->expects($this->once())->method('get')->with('_route')->willReturn('test_route');
 
         $this->requestStack->expects($this->any())
             ->method('getCurrentRequest')
@@ -370,28 +370,49 @@ class DataGridExtensionTest extends \PHPUnit_Framework_TestCase
         $grid = $this->getMock(DatagridInterface::class);
         $grid->expects($this->any())->method('getName')->willReturn($gridName);
 
-        $this->assertEquals($expectedUrl, $this->twigExtension->getPageUrl($grid, $page));
+        $this->router
+            ->expects($this->once())
+            ->method('generate')
+            ->with('test_route', $expectedParameters)
+            ->willReturn('test_url');
+
+        $this->assertEquals('test_url', $this->twigExtension->getPageUrl($grid, $page));
     }
 
+    /**
+     * @return array
+     */
     public function getPageUrlProvider()
     {
-        $gridName = 'test';
-
         return [
             'with empty query string' => [
                 'queryString' => '',
                 'page' => 5,
-                'expectedUrl' => "/?grid%5B$gridName%5D=i%3D5"
+                'expectedParameters' => [
+                    'grid' => [
+                        'test' => 'i=5'
+                    ]
+                ]
             ],
             'with not empty query string but without grid params' => [
                 'queryString' => 'foo=bar&bar=baz',
                 'page' => 5,
-                'expectedUrl' => "/?foo=bar&bar=baz&grid%5B$gridName%5D=i%3D5"
+                'expectedParameters' => [
+                    'foo' => 'bar',
+                    'bar' => 'baz',
+                    'grid' => [
+                        'test' => 'i=5'
+                    ]
+                ]
             ],
             'with grid params in query sting' => [
-                'queryString' => "grid%5B$gridName%5D=i%3D4",
+                'queryString' => 'grid%5Btest%5D=i%3D4',
                 'page' => 5,
-                'expectedUrl' => "/?grid%5B$gridName%5D=i%3D5"
+                'expectedParameters' => [
+                    'grid' => [
+                        'test' => 'i=5'
+                    ]
+                ]
             ],
         ];
     }

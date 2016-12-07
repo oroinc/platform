@@ -202,17 +202,18 @@ class DataGridExtension extends \Twig_Extension
      * Generates url based on current uri with replaced current page parameter
      *
      * @param DatagridInterface $grid
-     * @param integer $page
+     * @param integer           $page
+     *
      * @return string
      */
     public function getPageUrl(DatagridInterface $grid, $page)
     {
-        $pathInfo = $this->requestStack->getCurrentRequest()->getPathInfo();
-        $queryString = $this->requestStack->getCurrentRequest()->getQueryString();
-        $gridParams = [];
+        $request = $this->requestStack->getCurrentRequest();
 
+        $queryString = $request->getQueryString();
         parse_str($queryString, $queryStringComponents);
 
+        $gridParams = [];
         if (isset($queryStringComponents['grid'][$grid->getName()])) {
             parse_str($queryStringComponents['grid'][$grid->getName()], $gridParams);
         }
@@ -220,7 +221,9 @@ class DataGridExtension extends \Twig_Extension
         $gridParams['i'] = $page;
         $queryStringComponents['grid'][$grid->getName()] = http_build_query($gridParams);
 
-        return $pathInfo . '?' . http_build_query($queryStringComponents);
+        $route = $request->get('_route');
+
+        return $this->router->generate($route, $queryStringComponents);
     }
 
     /**
