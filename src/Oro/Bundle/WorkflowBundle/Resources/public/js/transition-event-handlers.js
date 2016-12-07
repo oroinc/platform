@@ -47,6 +47,7 @@ define([
                     messenger.notificationFlashMessage('error', __('Could not perform transition'));
                 });
                 element.trigger('transitions_failure', [jqxhr, textStatus, error]);
+                mediator.trigger('workflow:transitions_failure', element, jqxhr, textStatus, error);
             };
         }
     };
