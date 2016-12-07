@@ -207,10 +207,10 @@ class ImportExportController extends Controller
     {
         $jobName = $request->get('exportJob', JobExecutor::JOB_EXPORT_TO_CSV);
         $filePrefix = $request->get('filePrefix', null);
-        $options = array_merge(
-            $this->getOptionsFromRequest($request),
-            ['organization' => (string) $this->getSecurityFacade()->getOrganization()]
-        );
+        $options = $this->getOptionsFromRequest($request);
+
+        $organization = $this->getSecurityFacade()->getOrganization();
+        $organizationId = $organization ? $organization->getId() : null;
 
         $this->getMessageProducer()->send(Topics::EXPORT, [
             'jobName' => $jobName,
@@ -218,6 +218,7 @@ class ImportExportController extends Controller
             'outputFilePrefix' => $filePrefix,
             'options' => $options,
             'userId' => $this->getUser()->getId(),
+            'organizationId' => $organizationId,
         ]);
 
         return new JsonResponse(['success' => true]);

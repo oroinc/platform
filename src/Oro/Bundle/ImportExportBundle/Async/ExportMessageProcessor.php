@@ -3,11 +3,16 @@ namespace Oro\Bundle\ImportExportBundle\Async;
 
 use Psr\Log\LoggerInterface;
 
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorage;
+use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
+
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\ImportExportBundle\Handler\ExportHandler;
 use Oro\Bundle\ImportExportBundle\Processor\ProcessorRegistry;
 use Oro\Bundle\NotificationBundle\Async\Topics as EmailTopics;
+use Oro\Bundle\OrganizationBundle\Entity\Organization;
+use Oro\Bundle\SecurityBundle\SecurityFacade;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Component\MessageQueue\Client\MessageProducerInterface;
 use Oro\Component\MessageQueue\Client\TopicSubscriberInterface;
@@ -45,6 +50,16 @@ class ExportMessageProcessor implements MessageProcessorInterface, TopicSubscrib
     private $doctrineHelper;
 
     /**
+     * @var SecurityFacade
+     */
+    private $securityFacade;
+
+    /**
+     * @var TokenStorage
+     */
+    private $tokenStorage;
+
+    /**
      * @var LoggerInterface
      */
     private $logger;
@@ -55,6 +70,8 @@ class ExportMessageProcessor implements MessageProcessorInterface, TopicSubscrib
      * @param MessageProducerInterface $producer
      * @param ConfigManager $configManager
      * @param DoctrineHelper $doctrineHelper
+     * @param SecurityFacade $securityFacade
+     * @param TokenStorage $tokenStorage
      * @param LoggerInterface $logger
      */
     public function __construct(
@@ -63,6 +80,8 @@ class ExportMessageProcessor implements MessageProcessorInterface, TopicSubscrib
         MessageProducerInterface $producer,
         ConfigManager $configManager,
         DoctrineHelper $doctrineHelper,
+        SecurityFacade $securityFacade,
+        TokenStorage $tokenStorage,
         LoggerInterface $logger
     ) {
         $this->exportHandler = $exportHandler;
@@ -70,6 +89,8 @@ class ExportMessageProcessor implements MessageProcessorInterface, TopicSubscrib
         $this->producer = $producer;
         $this->configManager = $configManager;
         $this->doctrineHelper = $doctrineHelper;
+        $this->securityFacade = $securityFacade;
+        $this->tokenStorage = $tokenStorage;
         $this->logger = $logger;
     }
 
@@ -83,6 +104,7 @@ class ExportMessageProcessor implements MessageProcessorInterface, TopicSubscrib
             'jobName' => null,
             'processorAlias' => null,
             'userId' => null,
+            'organizationId' => null,
             'exportType' => ProcessorRegistry::TYPE_EXPORT,
             'outputFormat' => 'csv',
             'outputFilePrefix' => null,
@@ -110,6 +132,14 @@ class ExportMessageProcessor implements MessageProcessorInterface, TopicSubscrib
         }
 
         $jobUniqueName = Topics::EXPORT . '_' . $body['processorAlias'];
+
+        $token = new UsernamePasswordToken($user, null, 'main', $user->getRoles());
+        $this->tokenStorage->setToken($token);
+
+        if (isset($body['organizationId'])) {
+            $body['options']['organization'] = $this->doctrineHelper->getEntityRepository(Organization::class)
+                ->find($body['organizationId']);
+        }
 
         $result = $this->jobRunner->runUnique(
             $message->getMessageId(),
