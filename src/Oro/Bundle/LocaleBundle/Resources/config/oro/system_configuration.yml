@@ -2,10 +2,10 @@ system_configuration:
     groups:
         localization:
             title: oro.locale.system_configuration.groups.localization.title
-            icon:  'icon-flag'
+            icon:  'fa-flag'
         language_settings:
             title: oro.locale.system_configuration.groups.language_settings.title
-            icon:  'icon-font'
+            icon:  'fa-font'
             page_reload: true
         language_languages:
             title: oro.locale.system_configuration.groups.language_languages.title

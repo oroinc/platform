@@ -15,10 +15,10 @@
             <div class="pull-right">
                 <span class="email-sent-date">
                     <span class="comment-count" style="display:none" title="{{ 'oro.comment.quantity_label'|trans }}">
-                        <i class="icon icon-comment"></i><span class="count"></span>
+                        <i class="fa-comment"></i><span class="count"></span>
                     </span>
                     {% if email.emailBody and email.emailBody.hasAttachments %}
-                        <i class="icon-paper-clip email-has-attachment"></i>
+                        <i class="fa-paperclip email-has-attachment"></i>
                     {% endif %}
                     {{ EA.date_smart_format(email.sentAt) }}
                 </span>
@@ -57,10 +57,10 @@
                 {% endif %}
                 <div class="email-sent-date">
                     <span class="comment-count" style="display:none" title="{{ 'oro.comment.quantity_label'|trans }}">
-                        <i class="icon icon-comment"></i><span class="count"></span>
+                        <i class="fa-comment"></i><span class="count"></span>
                     </span>
                     {% if email.emailBody and email.emailBody.hasAttachments %}
-                        <i class="icon-paper-clip email-has-attachment"></i>
+                        <i class="fa-paperclip email-has-attachment"></i>
                     {% endif %}
                     {{ EA.date_smart_format(email.sentAt) }}<br />
                 </div>

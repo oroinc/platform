@@ -150,6 +150,7 @@ Single workflow configuration has next properties:
 * **defaults** - node for default workflow configuration values that can be changed in UI later. 
     * **active** - determine if workflow should be active right after first load of configuration.
 * **scopes** - list of scopes configurations used for filtering workflow by scopes
+* **disable_operations** - an array of [operation](../../../../../ActionBundle/Resources/doc/operations.md) names (as keys) and related entities for witch the operation should be disabled. 
 
 Example
 -------
@@ -169,7 +170,10 @@ workflows:                                                    # Root elements
             - sales                                           # Only one workflow from group 'sales' can be started at time for the entity
         scopes:
             -                                                 # Definition of configuration for one scope
-                scope_field: 42                               
+                scope_field: 42
+        disable_operations:
+            operation_for_simple_sale: ~                      # disables specified operation in system (can be empty array - [])
+            operation_create_sale: [OrderBundle\Entity\Order] # disables operation for OrderBundle\Entity\Order entity
         attributes:                                           # configuration for Attributes
                                                               # ...
         steps:                                                # configuration for Steps
@@ -418,7 +422,7 @@ workflows:
 
                 transition_definition: connected_definition # A reference to Transition Definition configuration
                 frontend_options:
-                    icon: 'icon-ok'                         # add icon to transition button with class "icon-ok"
+                    icon: 'fa-check'                         # add icon to transition button with class "fa-check"
                     class: 'btn-primary'                    # add css class "btn-primary" to transition button
                 form_options:
                     attribute_fields:                       # fields of form that will be shown when transition button is clicked

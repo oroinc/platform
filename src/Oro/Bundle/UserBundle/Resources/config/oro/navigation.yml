@@ -8,7 +8,7 @@ navigation:
                     class: 'mobile-hide'
                 extras:
                     position: 100
-                    icon: icon-gear
+                    icon: fa-gear
             users_management:
                 label: 'oro.user.menu.users_management.label'
                 uri: '#'

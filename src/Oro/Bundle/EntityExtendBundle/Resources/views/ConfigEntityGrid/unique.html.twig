@@ -43,7 +43,7 @@
     <div data-content="{{ name }}">
         <div class="row-oro oro-multiselect-holder unique-keys">
             <a class="removeRow pull-right" href="javascript: void(0);" type="button" data-related="{{ name }}">
-                <i class="icon-remove"></i>
+                <i class="fa-close"></i>
             </a>
             {{ form_errors(form) }}
             {{ form_row(form.name) }}
@@ -60,7 +60,7 @@
                     {{ _self.unique_collection_prototype(field) }}
                 {% endfor %}
             </div>
-            <a class="btn add-list-item pull-left" href="javascript: void(0);"><i class="icon-plus"></i>{{ 'Add'|trans }}</a>
+            <a class="btn add-list-item pull-left" href="javascript: void(0);"><i class="fa-plus"></i>{{ 'Add'|trans }}</a>
         </div>
     {% endspaceless %}
 {% endblock unique_collection_widget %}

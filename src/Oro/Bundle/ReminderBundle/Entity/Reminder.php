@@ -23,7 +23,7 @@ use Oro\Bundle\UserBundle\Entity\User;
  * @Config(
  *      defaultValues={
  *          "entity"={
- *              "icon"="icon-bell"
+ *              "icon"="fa-bell-o"
  *          },
  *          "note"={
  *              "immutable"=true
