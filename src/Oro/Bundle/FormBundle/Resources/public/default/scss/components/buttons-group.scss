@@ -7,12 +7,12 @@
         display: inline-block;
 
         min-width: 30px;
-        min-height: 27px;
 
-        padding: 0 4px;
+        padding: 4px;
 
         text-decoration: none;
         text-align: center;
+        font-size: $base-font-size + 2;
 
         background: get-color('additional', 'ultra');
         border: 1px solid get-color('additional', 'middle');
@@ -57,4 +57,8 @@
             }
         }
     }
+
+   [class^="fa-"] {
+       vertical-align: baseline;
+   }
 }
