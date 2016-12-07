@@ -9,9 +9,9 @@
             {{ form_widget(form.attachment) }}
             <% if (attachmentURL) { %>
             <div class="attachment-item">
-                <i class="icon-paper-clip"></i>
+                <i class="fa-paperclip"></i>
                 <a href="<%- attachmentURL %>" class="no-hash" title="<%- attachmentFileName %>"><%- attachmentFileName %></a> (<%- attachmentSize %>)
-                <button class="btn btn-link icon-remove remove-attachment" type="button"></button>
+                <button class="btn btn-link fa-close remove-attachment" type="button"></button>
             </div>
             <% } %>
         </div>

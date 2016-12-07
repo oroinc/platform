@@ -14,7 +14,7 @@ class OroDataGridBundleInstaller implements Installation
      */
     public function getMigrationVersion()
     {
-        return 'v1_4';
+        return 'v1_5';
     }
 
     /**
@@ -27,6 +27,9 @@ class OroDataGridBundleInstaller implements Installation
         $this->createOroGridViewUserTable($schema);
     }
 
+    /**
+     * @param Schema $schema
+     */
     protected function createAppearanceTypeTable(Schema $schema)
     {
         $table = $schema->createTable('oro_grid_appearance_type');
