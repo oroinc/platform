@@ -35,6 +35,11 @@ class WorkflowDataProviderTest extends \PHPUnit_Framework_TestCase
         $this->workflowDataProvider = new WorkflowDataProvider($this->workflowManager, $this->transitionDataProvider);
     }
 
+    protected function tearDown()
+    {
+        unset($this->transitionDataProvider, $this->workflowManager, $this->workflowDataProvider);
+    }
+
     public function testBasicWorkflowData()
     {
         $workflow = $this->getWorkflow();
@@ -138,6 +143,7 @@ class WorkflowDataProviderTest extends \PHPUnit_Framework_TestCase
         $collection = $this->getMock(Collection::class);
         $collection->expects($this->any())->method('toArray')->willReturn([]);
         $collection->expects($this->any())->method('filter')->willReturn(clone $collection);
+
         return $collection;
     }
 }
