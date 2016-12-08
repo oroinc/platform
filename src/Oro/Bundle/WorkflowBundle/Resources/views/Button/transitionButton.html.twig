@@ -24,6 +24,8 @@
     'enabled': context.enabled
 } %}
 
+{% set transitionData = transition.frontendOptions.data|default({})|merge(transitionData) %}
+
 {% if transition.displayType == 'dialog' %}
     {% if transition.hasForm() %}
         {% set transitionData = transitionData|merge({'dialog-url': path(context.formDialogRoute, params) }) %}
@@ -32,7 +34,15 @@
 {% else %}
     {% set transitionData = transitionData|merge({'transition-url': path(context.formPageRoute, params) }) %}
 {% endif %}
-
-<div class="pull-left btn-group icons-holder">
-    {{ workflowMacros.renderTransitionButton(workflow, transition, null, transitionData) }}
-</div>
+{% if not onlyLink|default(false) %}<div class="pull-left btn-group icons-holder">{% endif %}
+    {{ workflowMacros.renderTransitionButton(
+        workflow,
+        transition,
+        workflowItem|default(null),
+        transitionData,
+        onlyLink|default(false),
+        noIcon|default(false),
+        noIconText|default(false),
+        aClass|default('')
+    ) }}
+{% if not onlyLink|default(false) %}</div>{% endif %}

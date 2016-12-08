@@ -17,7 +17,7 @@ define([
             part:  'value',
             dateParts: null,
             dateVars: null,
-            tooltipTemplate: '<i class="icon-info-sign" data-content="<%- content %>"' +
+            tooltipTemplate: '<i class="fa-info-circle" data-content="<%- content %>"' +
                 ' data-placement="top" data-toggle="popover" data-original-title="<%- title %>"></i>',
             htmlTemplate: '<div class="ui-datevariables-div <%- attributes %>">' +
                 '<b><%- title %></b><%= tooltipHTML %><ul>' +

@@ -26,7 +26,7 @@ system_configuration:
     groups:
         platform: #unique name
             title: 'Platform'             # title is required
-            icon:  icon-hdd
+            icon:  fa-hdd-o
             priority: 30                  # sort order
             description: some description # add description on the next line after group header
             tooltip: some tooltip         # add tooltip on the same line after group header

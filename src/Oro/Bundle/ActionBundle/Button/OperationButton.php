@@ -99,6 +99,7 @@ class OperationButton implements ButtonInterface
                 'operation' => $this->operation,
                 'params' => $this->operation->getDefinition(),
                 'actionData' => $this->data,
+                'buttonContext' => $this->buttonContext,
                 'additionalData' => $this->getDatagridData()
             ]
         );

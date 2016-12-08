@@ -85,7 +85,7 @@ class EntityProviderTest extends \PHPUnit_Framework_TestCase
             [
                 'label'        => 'Test Label',
                 'plural_label' => 'Test Plural Label',
-                'icon'         => 'icon-test',
+                'icon'         => 'fa-test',
             ]
         );
         $this->entityConfigProvider->expects($this->any())
@@ -99,7 +99,7 @@ class EntityProviderTest extends \PHPUnit_Framework_TestCase
             'name'         => $entityClassName,
             'label'        => 'Test Label',
             'plural_label' => 'Test Plural Label',
-            'icon'         => 'icon-test',
+            'icon'         => 'fa-test',
         ];
 
         $this->assertEquals($expected, $result);
@@ -121,7 +121,7 @@ class EntityProviderTest extends \PHPUnit_Framework_TestCase
             [
                 'label'        => 'C',
                 'plural_label' => 'B',
-                'icon'         => 'icon-test1',
+                'icon'         => 'fa-test1',
             ]
         );
         $entityConfig2 = $this->getEntityConfig(
@@ -129,7 +129,7 @@ class EntityProviderTest extends \PHPUnit_Framework_TestCase
             [
                 'label'        => 'B',
                 'plural_label' => 'A',
-                'icon'         => 'icon-test2',
+                'icon'         => 'fa-test2',
             ]
         );
         $entityConfig3 = $this->getEntityConfig(
@@ -137,7 +137,7 @@ class EntityProviderTest extends \PHPUnit_Framework_TestCase
             [
                 'label'        => 'A',
                 'plural_label' => 'C',
-                'icon'         => 'icon-test3',
+                'icon'         => 'fa-test3',
             ]
         );
         $entityConfig4 = $this->getEntityConfig(
@@ -145,7 +145,7 @@ class EntityProviderTest extends \PHPUnit_Framework_TestCase
             [
                 'label'        => 'A',
                 'plural_label' => 'C',
-                'icon'         => 'icon-test3',
+                'icon'         => 'fa-test3',
             ]
         );
         $entityConfig5 = $this->getEntityConfig(
@@ -153,7 +153,7 @@ class EntityProviderTest extends \PHPUnit_Framework_TestCase
             [
                 'label'        => 'A',
                 'plural_label' => 'C',
-                'icon'         => 'icon-test3',
+                'icon'         => 'fa-test3',
             ]
         );
 
@@ -240,19 +240,19 @@ class EntityProviderTest extends \PHPUnit_Framework_TestCase
                 'name'         => $entityClassName2,
                 'label'        => 'B',
                 'plural_label' => 'A',
-                'icon'         => 'icon-test2',
+                'icon'         => 'fa-test2',
             ],
             [
                 'name'         => $entityClassName1,
                 'label'        => 'C',
                 'plural_label' => 'B',
-                'icon'         => 'icon-test1',
+                'icon'         => 'fa-test1',
             ],
             [
                 'name'         => $entityClassName3,
                 'label'        => 'A',
                 'plural_label' => 'C',
-                'icon'         => 'icon-test3',
+                'icon'         => 'fa-test3',
             ],
         ];
 
@@ -265,19 +265,19 @@ class EntityProviderTest extends \PHPUnit_Framework_TestCase
                 'name'         => $entityClassName3,
                 'label'        => 'A',
                 'plural_label' => 'C',
-                'icon'         => 'icon-test3',
+                'icon'         => 'fa-test3',
             ],
             [
                 'name'         => $entityClassName2,
                 'label'        => 'B',
                 'plural_label' => 'A',
-                'icon'         => 'icon-test2',
+                'icon'         => 'fa-test2',
             ],
             [
                 'name'         => $entityClassName1,
                 'label'        => 'C',
                 'plural_label' => 'B',
-                'icon'         => 'icon-test1',
+                'icon'         => 'fa-test1',
             ],
         ];
         $this->assertEquals($expected, $result);
@@ -297,7 +297,7 @@ class EntityProviderTest extends \PHPUnit_Framework_TestCase
             [
                 'label' => 'C',
                 'plural_label' => 'B',
-                'icon' => 'icon-test1',
+                'icon' => 'fa-test1',
             ]
         );
         $entityConfig2 = $this->getEntityConfig(
@@ -305,7 +305,7 @@ class EntityProviderTest extends \PHPUnit_Framework_TestCase
             [
                 'label' => 'B',
                 'plural_label' => 'A',
-                'icon' => 'icon-test2',
+                'icon' => 'fa-test2',
             ]
         );
         $entityConfig3 = $this->getEntityConfig(
@@ -313,7 +313,7 @@ class EntityProviderTest extends \PHPUnit_Framework_TestCase
             [
                 'label' => 'A',
                 'plural_label' => 'C',
-                'icon' => 'icon-test3',
+                'icon' => 'fa-test3',
             ]
         );
 
@@ -388,13 +388,13 @@ class EntityProviderTest extends \PHPUnit_Framework_TestCase
                 'name' => $entityClassName1,
                 'label' => 'C',
                 'plural_label' => 'B',
-                'icon' => 'icon-test1',
+                'icon' => 'fa-test1',
             ],
             [
                 'name' => $entityClassName3,
                 'label' => 'A',
                 'plural_label' => 'C',
-                'icon' => 'icon-test3',
+                'icon' => 'fa-test3',
             ],
         ];
 

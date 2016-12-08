@@ -243,7 +243,7 @@ class ButtonListener
      */
     protected function getRowsActionsConfig(ButtonInterface $button)
     {
-        $icon = $button->getIcon() ? str_ireplace('icon-', '', $button->getIcon()) : 'edit';
+        $icon = $button->getIcon() ? str_ireplace('fa-', '', $button->getIcon()) : 'pencil-square-o';
 
         $config = array_merge(
             [
