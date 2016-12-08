@@ -167,3 +167,8 @@ datagrids:
         sorters:
             default:
                 name: %oro_datagrid.extension.orm_sorter.class%::DIRECTION_ASC
+
+    oro-locale-localizations-select-grid:
+        extends: oro-locale-localizations-grid
+        options:
+            entity_pagination: false

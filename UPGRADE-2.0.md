@@ -888,6 +888,29 @@ to the [Fallback documentation](./src/Oro/Bundle/EntityBundle/Resources/doc/enti
 - `Oro\Bundle\DataAuditBundle\EventListener\AuditGridListener` was removed. Similar functionality can be found in `Oro\Bundle\DataAuditBundle\Datagrid\EntityTypeProvider`.
 - `Oro\Bundle\DataAuditBundle\Loggable\AuditEntityMapper` was renamed to `Oro\Bundle\DataAuditBundle\Provider\AuditEntityMapper`.
 
+####ImapBundle
+ - The command `oro:imap:clear-mailbox` was removed. Produce message to the topic `Oro\Bundle\ImapBundle\Async\Topics::CLEAR_INACTIVE_MAILBOX` instead.
+
+
+####CronBundle
+- Removed class `Oro\Bundle\CronBundle\Action\CreateJobAction`, service `oro_cron.action.create_job` and action `@create_job`
+- Removed class `Oro\Bundle\CronBundle\Controller\JobController`.
+- Removed class `Oro\Bundle\CronBundle\DependencyInjection\Compiler\JobSerializerMetadataPass`.
+- Removed class `Oro\Bundle\CronBundle\DependencyInjection\Compiler\JobStatisticParameterPass`.
+- Removed class `Oro\Bundle\CronBundle\Entity\Manager\JobManager` and service `oro_cron.job_manager`.
+- Removed class `Oro\Bundle\CronBundle\Entity\Repository\JobRepository`.
+- Removed class `Oro\Bundle\CronBundle\Job\Daemon` and service `oro_cron.job_daemon`
+- Removed class `Oro\Bundle\CronBundle\JobQueue\JMSJobQueueBundle`
+- Added command `oro:cron:definitions:load` (class `Oro\Bundle\CronBundle\Command\CronDefinitionsLoadCommand`) to load cron command definitions to schedule table
+- Temporary added listener `Oro\Bundle\CronBundle\Migrations\Schema\v2_0\SchemaColumnDefinitionListener` to prevent default behavior for `jms_job_safe_object` type. 
+- Removed command `oro:cron:cleanup` (class `Oro\Bundle\CronBundle\Command\CleanupCommand`).
+- Removed command `oro:daemon` (class `Oro\Bundle\CronBundle\Command\DaemonMonitorCommand`).
+- Removed command `oro:jms-job-queue:count` (class `Oro\Bundle\CronBundle\Command\JmsJobCountCommand`).
+- Command `oro:cron` (class `Oro\Bundle\CronBundle\Command\CronCommand`)  doesn't have option `skipCheckDaemon` any more.
+- Parameters `max_concurrent_jobs`, `max_runtime`, `jms_statistics` under `oro_cron` root were removed.
+- Removed listener `Oro\Bundle\CronBundle\EventListener\JobSubscriber`
+- Removed listener `Oro\Bundle\CronBundle\EventListener\LoadClassMetadataSubscriber` and service `oro_cron.listener.load_class_metadata_subscriber`
+
 ####UserBundle
 - Added `auth_status` extended enum property to `Oro\Bundle\UserBundle\Entity\User` entity.
 - Added `Oro\Bundle\UserBundle\Validator\Constraints\PasswordComplexity` to User model.
@@ -899,12 +922,22 @@ to the [Fallback documentation](./src/Oro/Bundle/EntityBundle/Resources/doc/enti
 
 ####ImapBundle
 - The command `oro:imap:clear-mailbox` was removed. Produce message to the topic `oro.imap.clear_inactive_mailbox` instead.
+- Removed action `@job_add_dependency`
 
 ####OroCalendarBundle
 - OroCalendarBundle moved to a separate package
 
 ####OroInstallerBundle
 - Added interface `Oro\Bundle\InstallerBundle\CacheWarmer\NamespaceMigrationProviderInterface`. it makes available add the rules for command "oro:platform:upgrade20"
+
+#### CurrencyBundle
+- `getViewType` method was removed form `Oro\Bundle\CurrencyBundle\Config\CurrencyConfigInterface`
+- `VIEW_TYPE_SYMBOL` and `VIEW_TYPE_ISO_CODE` constants were removed from `Oro\Bundle\CurrencyBundle\Config\CurrencyConfigInterface` 
+- `Oro\Bundle\CurrencyBundle\Provider\CurrencyProviderInterface` was renamed to `CurrencyListProviderInterface`
+- `Oro\Bundle\CurrencyBundle\Provider\DefaultCurrencyProviderInterface` was added
+- `Oro\Bundle\CurrencyBundle\Config\CurrencyConfigInterface` was renamed to `Oro\Bundle\CurrencyBundle\Provider\CurrencyProviderInterface`
+- `Oro\Bundle\CurrencyBundle\Provider\CurrencyProviderInterface` extends `Oro\Bundle\CurrencyBundle\Provider\CurrencyListProviderInterface` and `Oro\Bundle\CurrencyBundle\Provider\DefaultCurrencyProviderInterface` 
+- `Oro\Bundle\CurrencyBundle\Config\CurrencyConfigManager` was renamed to `DefaultCurrencyConfigProvider`
 
 ####OroTrackingBundle
 - Moved ``TrackingBundle`` to a separate ``marketing`` package, required by default in the CRM applications.
