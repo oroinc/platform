@@ -275,7 +275,7 @@ operations:
     demo_operation:
         # ...
         button_options:
-            icon: icon-ok
+            icon: fa-check
             class: btn
             group: aсme.demo.operations.demogroup.label
             template: OroActionBundle:Operation:button.html.twig

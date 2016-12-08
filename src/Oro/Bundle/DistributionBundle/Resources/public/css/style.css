@@ -168,11 +168,11 @@ table.table {
     vertical-align: bottom;
 }
 
-#alerts .icon-success:before {
+#alerts .fa-success:before {
     content: "\f00c"
 }
 
-#alerts .icon-error:before {
+#alerts .fa-error:before {
     content: "\f06a"
 }
 

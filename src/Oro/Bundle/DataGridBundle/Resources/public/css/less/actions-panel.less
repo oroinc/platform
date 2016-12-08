@@ -32,7 +32,7 @@
         }
       }
     }
-    .icon-sort-by-attributes-alt, .icon-sort-by-attributes {
+    .fa-sort-amount-desc, .fa-sort-amount-asc {
       height: 14px;
       vertical-align: middle;
       padding-left: 8px;
@@ -77,35 +77,7 @@
     margin-right: 5px;
   }
 }
-.grid-toolbar .actions-panel.pull-right {
-  /* hide text label for actions in right panel */
-  .action {
-    font: 0/0 a;
-    color: transparent;
-    text-shadow: none;
-    background-color: transparent;
-    &.pressed {
-      #gradient > .vertical(#e7e7e7, #f2f2f2);
-      box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.15), 0 1px 2px rgba(0, 0, 0, 0.05);
-    }
-    [class^="icon-"], [class*=" icon-"] {
-      font: @baseFontSize/26px 'FontAwesome';
-      color: @btnTextColor;
-      &.hide-text {
-        .hide-text();
-      }
-      &:before {
-        line-height: 26px;
-        margin: 0;
-      }
-      &.icon-align-justify:before{
-        font-size: 14px;
-        margin-left: -1px;
-      }
-    }
-  }
-}
-.dropdown-menu > li > a > i.icon-align-justify:before{
+.dropdown-menu > li > a > i.fa-align-justify:before{
   font-size: 14px;
   margin-left: -1px;
 }

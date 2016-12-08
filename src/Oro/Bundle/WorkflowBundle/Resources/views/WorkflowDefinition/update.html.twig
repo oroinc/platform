@@ -355,11 +355,11 @@
         <td><span title="{{ "oro.workflow.workflowdefinition.step.order.tooltip"|trans({}, "tooltips") }}"><%- order %></span></td>
         <td class="step-actions">
             <div class="pull-right">
-                <a href="#" class="add-step-transition" title="{{ 'Add transition to this step'|trans}}" class="action"><i class="icon-plus-sign hide-text"/></a>
+                <a href="#" class="add-step-transition" title="{{ 'Add transition to this step'|trans}}" class="action"><i class="fa-plus-circle hide-text"/></a>
                 <% if (!_is_start) { %>
-                    <a href="#" class="edit-step action" title="{{ 'Update this step'|trans}}"><i class="icon-edit hide-text"/></a>
-                    <a href="#" class="clone-step action" title="{{ 'Clone this step'|trans}}"><i class="icon-copy hide-text"/></a>
-                    <a href="#" class="delete-step action" title="{{ 'Delete this step'|trans}}"><i class="icon-trash hide-text"/></a>
+                    <a href="#" class="edit-step action" title="{{ 'Update this step'|trans}}"><i class="fa-pencil-square-o hide-text"/></a>
+                    <a href="#" class="clone-step action" title="{{ 'Clone this step'|trans}}"><i class="fa-files-o hide-text"/></a>
+                    <a href="#" class="delete-step action" title="{{ 'Delete this step'|trans}}"><i class="fa-trash-o hide-text"/></a>
                 <% } %>
             </div>
         </td>
@@ -370,9 +370,9 @@
             <% if (name && !_is_clone && typeof translateLinks !== 'undefined' && translateLinks.label) { %>
                 {{ workflowMacros.renderGoToTranslationsIconByLink('<%- translateLinks.label %>') }}
             <% } %>
-        <a href="#" class="clone-transition action" title="{{ 'Clone this transition'|trans }}"><i class="icon-copy hide-text"></i></a>
-        <a href="#" class="delete-transition action" title="{{ 'Delete this transition'|trans }}"><i class="icon-trash hide-text"></i></a>
-        <i class="icon-long-arrow-right"/>
+        <a href="#" class="clone-transition action" title="{{ 'Clone this transition'|trans }}"><i class="fa-files-o hide-text"></i></a>
+        <a href="#" class="delete-transition action" title="{{ 'Delete this transition'|trans }}"><i class="fa-trash-o hide-text"></i></a>
+        <i class="fa-long-arrow-right"/>
         <span title="{{ "oro.workflow.workflowdefinition.transition.step_to.tooltip"|trans }}"><%- stepToLabel %></span>
     </script>
 
@@ -402,8 +402,8 @@
 
                 <div class="clearfix">
                     <div class="pull-right" style="margin-top: -35px;">
-                        <button type="reset" class="btn hide"><i class="icon-undo"></i> {{ 'Reset'|trans }}</button>
-                        <button type="submit" class="btn btn-success"><i class="icon-plus"></i> {{ 'Add'|trans }}</button>
+                        <button type="reset" class="btn hide"><i class="fa-undo"></i> {{ 'Reset'|trans }}</button>
+                        <button type="submit" class="btn btn-success"><i class="fa-plus"></i> {{ 'Add'|trans }}</button>
                     </div>
                 </div>
             </div>
@@ -450,9 +450,9 @@
         <td class="step-actions">
             <div class="pull-right">
                 <% if (is_entity_attribute) { %>
-                <a href="#" class="edit-form-option action" title="{{ 'Update field'|trans }}"><i class="icon-edit hide-text"/></a>
+                <a href="#" class="edit-form-option action" title="{{ 'Update field'|trans }}"><i class="fa-pencil-square-o hide-text"/></a>
                 <% } %>
-                <a href="#" class="delete-form-option action" title="{{ 'Delete field'|trans }}"><i class="icon-trash hide-text"/></a>
+                <a href="#" class="delete-form-option action" title="{{ 'Delete field'|trans }}"><i class="fa-trash-o hide-text"/></a>
             </div>
         </td>
     </script>
@@ -487,7 +487,7 @@
         <td><span title="{{ "oro.workflow.workflowdefinition.transition.step_to.tooltip"|trans }}"><%- stepToLabel %></span></td>
         <td class="transition-actions">
             <div class="pull-right">
-                <a href="#" class="delete-transition action" title="{{ 'Delete this transition'|trans }}"><i class="icon-trash hide-text"/></a>
+                <a href="#" class="delete-transition action" title="{{ 'Delete this transition'|trans }}"><i class="fa-trash-o hide-text"/></a>
             </div>
         </td>
     </script>
@@ -521,9 +521,9 @@
 
     <div class="workflow-definition-buttons clearfix">
         <div class="pull-right">
-            <button type="button" class="btn btn-primary add-transition-btn"><i class="icon-plus"></i> {{ 'Add transition'|trans }}</button>
-            <button type="button" class="btn btn-primary add-step-btn"><i class="icon-plus"></i> {{ 'Add step'|trans }}</button>
-            <button type="button" class="btn btn-primary refresh-btn"><i class="icon-refresh"></i> {{ 'Auto sort'|trans }}</button>
+            <button type="button" class="btn btn-primary add-transition-btn"><i class="fa-plus"></i> {{ 'Add transition'|trans }}</button>
+            <button type="button" class="btn btn-primary add-step-btn"><i class="fa-plus"></i> {{ 'Add step'|trans }}</button>
+            <button type="button" class="btn btn-primary refresh-btn"><i class="fa-refresh"></i> {{ 'Auto sort'|trans }}</button>
         </div>
         <div class="pull-right workflow-history-container"></div>
     </div>

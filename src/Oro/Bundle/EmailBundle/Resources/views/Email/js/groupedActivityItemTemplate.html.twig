@@ -61,7 +61,7 @@
                             'height': 600
                         }
                     }
-                    }) }}><i class="icon-link hide-text">{{ 'oro.activity.contexts.placeholder'|trans|raw }}</i></a>
+                    }) }}><i class="fa-link hide-text">{{ 'oro.activity.contexts.placeholder'|trans|raw }}</i></a>
         {% endif %}
     {% endset %}
     {% set actions = [action] %}
@@ -85,7 +85,7 @@
                         'width': 1000
                     }
                 }
-            }) }}><i class="icon-reply hide-text">{{ 'oro.email.reply'|trans|raw }}</i></a>
+            }) }}><i class="fa-reply hide-text">{{ 'oro.email.reply'|trans|raw }}</i></a>
         {% endif %}
     {% endset %}
     {% set actions = actions|merge([action]) %}
@@ -109,7 +109,7 @@
                             'width': 1000
                         }
                     }
-                }) }}><i class="icon-reply-all hide-text">{{ 'oro.email.reply_all'|trans|raw }}</i></a>
+                }) }}><i class="fa-reply-all hide-text">{{ 'oro.email.reply_all'|trans|raw }}</i></a>
     {% endif %}
     {% endset %}
     {% set actions = actions|merge([action]) %}
@@ -133,7 +133,7 @@
                         'width': 1000
                     }
                 }
-            }) }}><i class="icon-mail-forward hide-text">{{ 'oro.email.forward'|trans|raw }}</i></a>
+            }) }}><i class="fa-mail-forward hide-text">{{ 'oro.email.forward'|trans|raw }}</i></a>
         {% endif %}
     {% endset %}
     {% set actions = actions|merge([action]) %}
@@ -141,7 +141,7 @@
     {% set action %}
         <a href="<%= routing.generate('oro_email_thread_view', {'id': relatedActivityId}) %>"
            title="{{ 'oro.email.view'|trans|raw }}"><i
-                class="icon-eye-open hide-text">{{ 'oro.email.view'|trans|raw }}</i></a>
+                class="fa-eye hide-text">{{ 'oro.email.view'|trans|raw }}</i></a>
     {% endset %}
     {% set actions = actions|merge([action]) %}
 

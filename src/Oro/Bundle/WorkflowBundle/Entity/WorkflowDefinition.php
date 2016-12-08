@@ -22,7 +22,7 @@ use Oro\Bundle\WorkflowBundle\Exception\WorkflowException;
  *      routeView="oro_workflow_definition_view",
  *      defaultValues={
  *          "entity"={
- *              "icon"="icon-exchange"
+ *              "icon"="fa-exchange"
  *          },
  *          "security"={
  *              "type"="ACL",
