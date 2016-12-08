@@ -434,26 +434,6 @@ class MenuUpdateManagerTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($menu, $this->manager->getMenu('menu'));
     }
 
-    public function testFindMenuItem()
-    {
-        $scope = new Scope();
-        $this->manager->setScopeType($this::SCOPE_TYPE);
-
-        $menu = $this->getMenu();
-
-        $this->builderChainProvider
-            ->expects($this->once())
-            ->method('get')
-            ->with('menu', ['ignoreCache' => true, 'scopeId' => $scope])
-            ->will($this->returnValue($menu));
-
-        $item = $menu->getChild('item-1')
-            ->getChild('item-1-1')
-            ->getChild('item-1-1-1');
-
-        $this->assertEquals($item, $this->manager->findMenuItem('menu', 'item-1-1-1', $scope));
-    }
-
     public function testResetMenuUpdatesWithOwnershipType()
     {
         $scope = new Scope();

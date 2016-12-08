@@ -299,46 +299,6 @@ trait MenuUpdateTrait
     /**
      * @return string
      */
-    public function getOwnershipType()
-    {
-        return $this->ownershipType;
-    }
-
-    /**
-     * @param string $ownershipType
-     *
-     * @return MenuUpdateInterface
-     */
-    public function setOwnershipType($ownershipType)
-    {
-        $this->ownershipType = $ownershipType;
-
-        return $this;
-    }
-
-    /**
-     * @return int
-     */
-    public function getOwnerId()
-    {
-        return $this->ownerId;
-    }
-
-    /**
-     * @param int $ownerId
-     *
-     * @return MenuUpdateInterface
-     */
-    public function setOwnerId($ownerId)
-    {
-        $this->ownerId = $ownerId;
-
-        return $this;
-    }
-
-    /**
-     * @return string
-     */
     public function getIcon()
     {
         return $this->icon;

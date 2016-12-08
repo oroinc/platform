@@ -2,12 +2,13 @@
 
 namespace Oro\Bundle\NavigationBundle\Builder;
 
+use Doctrine\Common\Persistence\ManagerRegistry;
+
 use Knp\Menu\ItemInterface;
 
 use Oro\Bundle\LocaleBundle\Helper\LocalizationHelper;
 use Oro\Bundle\NavigationBundle\Entity\Repository\MenuUpdateRepository;
 use Oro\Bundle\NavigationBundle\Exception\MaxNestingLevelExceededException;
-use Oro\Bundle\NavigationBundle\Manager\MenuUpdateManagerRegistry;
 use Oro\Bundle\NavigationBundle\Menu\BuilderInterface;
 use Oro\Bundle\NavigationBundle\Menu\ConfigurationBuilder;
 use Oro\Bundle\NavigationBundle\Utils\MenuUpdateUtils;
@@ -23,18 +24,24 @@ class MenuUpdateBuilder implements BuilderInterface
     /** @var ScopeManager */
     private $scopeManager;
 
-    /** @var MenuUpdateManagerRegistry */
+    /** @var ManagerRegistry */
     private $registry;
+
+    /** @var string */
+    private $scopeType;
+
+    /** @var string */
+    private $className;
 
     /**
      * @param LocalizationHelper        $localizationHelper
      * @param ScopeManager              $scopeManager
-     * @param MenuUpdateManagerRegistry $registry
+     * @param ManagerRegistry $registry
      */
     public function __construct(
         LocalizationHelper $localizationHelper,
         ScopeManager $scopeManager,
-        MenuUpdateManagerRegistry $registry
+        ManagerRegistry $registry
     ) {
         $this->localizationHelper = $localizationHelper;
         $this->scopeManager = $scopeManager;
@@ -42,15 +49,33 @@ class MenuUpdateBuilder implements BuilderInterface
     }
 
     /**
+     * @param string $scopeType
+     */
+    public function setScopeType($scopeType)
+    {
+        $this->scopeType = $scopeType;
+    }
+
+    /**
+     * @param string $className
+     */
+    public function setClassName($className)
+    {
+        $this->className = $className;
+    }
+
+    /**
      * {@inheritdoc}
      */
     public function build(ItemInterface $menu, array $options = [], $alias = null)
     {
+        $scopeType = $menu->getExtra('scope_type', ConfigurationBuilder::DEFAULT_SCOPE_TYPE);
+        if ($scopeType !== $this->scopeType) {
+            return;
+        }
+
         $scopeContext = array_key_exists(self::SCOPE_CONTEXT_OPTION, $options) ?
             $options[self::SCOPE_CONTEXT_OPTION] : null;
-
-        $scopeType = $menu->getExtra('scope_type', ConfigurationBuilder::DEFAULT_AREA);
-
         $updates = $this->getUpdates($menu->getName(), $scopeType, $scopeContext);
         foreach ($updates as $update) {
             MenuUpdateUtils::updateMenuItem($update, $menu, $this->localizationHelper);
@@ -85,7 +110,7 @@ class MenuUpdateBuilder implements BuilderInterface
         $scopeIds = $this->scopeManager->findRelatedScopeIdsWithPriority($scopeType, $scopeContext);
 
         /** @var MenuUpdateRepository $repo */
-        $repo = $this->registry->getManager($scopeType)->getRepository();
+        $repo = $this->registry->getManagerForClass($this->className)->getRepository($this->className);
 
         return $repo->findMenuUpdatesByScopeIds($menuName, $scopeIds);
     }

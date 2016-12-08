@@ -31,10 +31,7 @@ class AjaxMenuController extends Controller
      */
     public function resetAction($menuName, Scope $scope)
     {
-        /** @var MenuUpdateManager $manager */
-        $manager = $this->get('oro_navigation.manager.menu_update_default');
-
-        $updates = $manager->getMenuUpdatesByMenuAndScope($menuName, $scope);
+        $updates = $this->getMenuUpdateManager()->getRepository()->findMenuUpdatesByScope($menuName, $scope);
 
         /** @var EntityManager $em */
         $em = $this->getDoctrine()->getManagerForClass(MenuUpdate::class);
@@ -62,7 +59,7 @@ class AjaxMenuController extends Controller
      */
     public function createAction(Request $request, $menuName, $parentKey, Scope $scope)
     {
-        $menuUpdate = $this->get('oro_navigation.manager.menu_update_default')->createMenuUpdate(
+        $menuUpdate = $this->getMenuUpdateManager()->createMenuUpdate(
             $scope,
             [
                 'menu' => $menuName,
@@ -98,10 +95,9 @@ class AjaxMenuController extends Controller
      */
     public function deleteAction($menuName, $key, Scope $scope)
     {
-        /** @var MenuUpdateManager $manager */
-        $manager = $this->get('oro_navigation.manager.menu_update_default');
+        $manager = $this->getMenuUpdateManager();
 
-        $menuUpdate = $manager->getMenuUpdateByKeyAndScope($menuName, $key, $scope);
+        $menuUpdate = $manager->findOrCreateMenuUpdate($menuName, $key, $scope);
         if ($menuUpdate === null || $menuUpdate->getId() === null) {
             throw $this->createNotFoundException();
         }
@@ -134,9 +130,7 @@ class AjaxMenuController extends Controller
      */
     public function showAction($menuName, $key, Scope $scope)
     {
-        /** @var MenuUpdateManager $manager */
-        $manager = $this->get('oro_navigation.manager.menu_update_default');
-        $manager->showMenuItem($menuName, $key, $scope);
+        $this->getMenuUpdateManager()->showMenuItem($menuName, $key, $scope);
 
         return new JsonResponse(null, Response::HTTP_OK);
     }
@@ -154,9 +148,7 @@ class AjaxMenuController extends Controller
      */
     public function hideAction($menuName, $key, Scope $scope)
     {
-        /** @var MenuUpdateManager $manager */
-        $manager = $this->get('oro_navigation.manager.menu_update_default');
-        $manager->hideMenuItem($menuName, $key, $scope);
+        $this->getMenuUpdateManager()->hideMenuItem($menuName, $key, $scope);
 
         return new JsonResponse(null, Response::HTTP_OK);
     }
@@ -174,8 +166,7 @@ class AjaxMenuController extends Controller
      */
     public function moveAction(Request $request, $menuName, Scope $scope)
     {
-        /** @var MenuUpdateManager $manager */
-        $manager = $this->get('oro_navigation.manager.menu_update_default');
+        $manager = $this->getMenuUpdateManager();
 
         $key = $request->get('key');
         $parentKey = $request->get('parentKey');
@@ -199,5 +190,13 @@ class AjaxMenuController extends Controller
         $entityManager->flush();
 
         return new JsonResponse(['status' => true], Response::HTTP_OK);
+    }
+
+    /**
+     * @return MenuUpdateManager
+     */
+    protected function getMenuUpdateManager()
+    {
+        return $this->get('oro_navigation.manager.menu_update');
     }
 }

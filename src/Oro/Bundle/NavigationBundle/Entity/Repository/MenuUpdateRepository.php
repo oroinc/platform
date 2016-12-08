@@ -41,7 +41,7 @@ class MenuUpdateRepository extends EntityRepository
     {
         return $this->findBy([
             'menu' => $menuName,
-            'scopeId' => $scope,
+            'scope' => $scope,
         ]);
     }
 

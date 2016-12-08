@@ -37,7 +37,7 @@ class GlobalMenuController extends AbstractMenuController
      */
     public function viewAction($menuName)
     {
-        return $this->view($menuName, $this->getContext());
+        return $this->view($menuName);
     }
 
     /**
@@ -52,7 +52,7 @@ class GlobalMenuController extends AbstractMenuController
      */
     public function createAction($menuName, $parentKey = null)
     {
-        return parent::create($menuName, $parentKey, $this->getContext());
+        return parent::create($menuName, $parentKey);
     }
 
     /**
@@ -67,15 +67,7 @@ class GlobalMenuController extends AbstractMenuController
      */
     public function updateAction($menuName, $key)
     {
-        return parent::update($menuName, $key, $this->getContext());
-    }
-
-    /**
-     * @return array
-     */
-    protected function getContext()
-    {
-        return [];
+        return parent::update($menuName, $key);
     }
 
     /**
@@ -83,25 +75,15 @@ class GlobalMenuController extends AbstractMenuController
      */
     protected function getScopeType()
     {
-        return 'menu_default_visibility';
+        return $this->getParameter('oro_navigation.menu_update.scope_type');
     }
 
     /**
      * {@inheritdoc}
      */
-    protected function getManager()
+    protected function getMenuUpdateManager()
     {
-        return $this->get('oro_navigation.manager.menu_update_default');
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    protected function getContextForMenuUpdateBuilder()
-    {
-        return [
-            'organization' => $this->getUser()->getCurrentOrganization()->getId()
-        ];
+        return $this->get('oro_navigation.manager.menu_update');
     }
 
     /**

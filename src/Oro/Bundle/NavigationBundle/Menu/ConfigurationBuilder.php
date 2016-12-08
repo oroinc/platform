@@ -12,8 +12,7 @@ use Oro\Component\Config\Resolver\ResolverInterface;
 
 class ConfigurationBuilder implements BuilderInterface
 {
-    // TODO: rename `area` to `scope_type`
-    const DEFAULT_AREA = 'menu_default_visibility';
+    const DEFAULT_SCOPE_TYPE = 'menu_default_visibility';
 
     /** @var array */
     protected $configuration;
@@ -68,7 +67,7 @@ class ConfigurationBuilder implements BuilderInterface
                         $menu->setExtras($menuTreeElement['extras']);
                     }
 
-                    $defaultArea = ConfigurationBuilder::DEFAULT_AREA;
+                    $defaultArea = ConfigurationBuilder::DEFAULT_SCOPE_TYPE;
                     $this->setExtraFromConfig($menu, $menuTreeElement, 'type');
                     $this->setExtraFromConfig($menu, $menuTreeElement, 'area', $defaultArea);
                     $this->setExtraFromConfig($menu, $menuTreeElement, 'read_only', false);

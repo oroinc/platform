@@ -78,7 +78,8 @@ define(function(require) {
                 async: false,
                 type: 'PUT',
                 url: routing.generate(self.onMoveRoute, {
-                    scopeId: this.scopeId
+                    scopeId: this.scopeId,
+                    menuName: this.menu
                 }),
                 data: {
                     key: data.node.id,

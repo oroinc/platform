@@ -3,6 +3,7 @@
 namespace Oro\Bundle\NavigationBundle\Validator\Constraints;
 
 use Oro\Bundle\LocaleBundle\Helper\LocalizationHelper;
+use Oro\Bundle\NavigationBundle\Builder\MenuUpdateBuilder;
 use Oro\Bundle\NavigationBundle\Entity\MenuUpdateInterface;
 use Oro\Bundle\NavigationBundle\Provider\BuilderChainProvider;
 use Oro\Bundle\NavigationBundle\Utils\MenuUpdateUtils;
@@ -39,7 +40,10 @@ class MaxNestedLevelValidator extends ConstraintValidator
     {
         $options = [
             'ignoreCache' => true,
-            'ownershipType' => $entity->getOwnershipType()
+            MenuUpdateBuilder::SCOPE_CONTEXT_OPTION => [
+                'organization' => $entity->getScope()->getOrganization(),
+                'user' => $entity->getScope()->getUser()
+            ]
         ];
 
         $menu = $this->builderChainProvider->get($entity->getMenu(), $options);

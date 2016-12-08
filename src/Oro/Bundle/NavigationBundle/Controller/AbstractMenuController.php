@@ -26,12 +26,7 @@ abstract class AbstractMenuController extends Controller
     /**
      * @return MenuUpdateManager
      */
-    abstract protected function getManager();
-
-    /**
-     * @return array
-     */
-    abstract protected function getContextForMenuUpdateBuilder();
+    abstract protected function getMenuUpdateManager();
 
     /**
      * @throws AccessDeniedException
@@ -53,13 +48,14 @@ abstract class AbstractMenuController extends Controller
     /**
      * @param string $menuName
      * @param array  $context
+     * @param array  $menuTreeContext
      * @return array
      */
-    protected function view($menuName, array $context)
+    protected function view($menuName, array $context = [], array $menuTreeContext = [])
     {
         $this->checkAcl();
 
-        $menu = $this->getMenu($menuName);
+        $menu = $this->getMenu($menuName, $menuTreeContext);
 
         return [
             'entity' => $menu,
@@ -72,15 +68,16 @@ abstract class AbstractMenuController extends Controller
      * @param string $menuName
      * @param string $parentKey
      * @param array  $context
+     * @param array  $menuTreeContext
      * @return array|RedirectResponse
      */
-    protected function create($menuName, $parentKey, array $context)
+    protected function create($menuName, $parentKey, array $context = [], array $menuTreeContext = [])
     {
         $this->checkAcl();
 
         /** @var MenuUpdate $menuUpdate */
-        $menuUpdate = $this->getManager()->createMenuUpdate(
-            $context,
+        $menuUpdate = $this->getMenuUpdateManager()->createMenuUpdate(
+            $this->getScope($context),
             [
                 'menu' => $menuName,
                 'parentKey' => $parentKey,
@@ -88,37 +85,39 @@ abstract class AbstractMenuController extends Controller
             ]
         );
 
-        return $this->handleUpdate($menuUpdate, $context);
+        return $this->handleUpdate($menuUpdate, $context, $menuTreeContext);
     }
 
     /**
-     * @param string  $menuName
-     * @param string  $key
-     * @param array   $context
+     * @param string $menuName
+     * @param string $key
+     * @param array  $context
+     * @param array  $menuTreeContext
      * @return array|RedirectResponse
      */
-    protected function update($menuName, $key, array $context)
+    protected function update($menuName, $key, array $context = [], array $menuTreeContext = [])
     {
         $this->checkAcl();
 
-        $menuUpdate = $this->getManager()->getMenuUpdateByKeyAndScope($menuName, $key, $this->getScope($context));
+        $menuUpdate = $this->getMenuUpdateManager()->findOrCreateMenuUpdate($menuName, $key, $this->getScope($context));
         if (!$menuUpdate->getKey()) {
             throw $this->createNotFoundException(
                 sprintf("Item \"%s\" in \"%s\" not found.", $key, $menuName)
             );
         }
 
-        return $this->handleUpdate($menuUpdate, $context);
+        return $this->handleUpdate($menuUpdate, $context, $menuTreeContext);
     }
 
     /**
      * @param MenuUpdateInterface $menuUpdate
      * @param array               $context
+     * @param array               $menuTreeContext
      * @return array|RedirectResponse
      */
-    protected function handleUpdate(MenuUpdateInterface $menuUpdate, array $context)
+    protected function handleUpdate(MenuUpdateInterface $menuUpdate, array $context = [], array $menuTreeContext = [])
     {
-        $menu = $this->getMenu($menuUpdate->getMenu());
+        $menu = $this->getMenu($menuUpdate->getMenu(), $menuTreeContext);
         $menuItem = null;
         if (!$menuUpdate->isCustom()) {
             $menuItem = MenuUpdateUtils::findMenuItem($menu, $menuUpdate->getKey());
@@ -155,15 +154,16 @@ abstract class AbstractMenuController extends Controller
     }
 
     /**
-     * @param $menuName
+     * @param       $menuName
+     * @param array $menuTreeContext
      * @return ItemInterface
      */
-    protected function getMenu($menuName)
+    protected function getMenu($menuName, array $menuTreeContext = [])
     {
         $options = [
-            MenuUpdateBuilder::SCOPE_CONTEXT_OPTION => $this->getContextForMenuUpdateBuilder()
+            MenuUpdateBuilder::SCOPE_CONTEXT_OPTION => $menuTreeContext
         ];
-        $menu = $this->getManager()->getMenu($menuName, $options);
+        $menu = $this->getMenuUpdateManager()->getMenu($menuName, $options);
         if (!count($menu->getChildren())) {
             throw $this->createNotFoundException(sprintf("Menu \"%s\" not found.", $menuName));
         }

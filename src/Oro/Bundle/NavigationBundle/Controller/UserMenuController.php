@@ -7,6 +7,7 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 
 use Symfony\Component\HttpFoundation\RedirectResponse;
 
+use Oro\Bundle\SecurityBundle\Authentication\Token\OrganizationContextTokenInterface;
 use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
 
 /**
@@ -37,7 +38,7 @@ class UserMenuController extends AbstractMenuController
      */
     public function viewAction($menuName)
     {
-        return parent::view($menuName, $this->getContext());
+        return parent::view($menuName, $this->getContext(), $this->getMenuTreeContext());
     }
 
     /**
@@ -45,14 +46,14 @@ class UserMenuController extends AbstractMenuController
      * @Template("OroNavigationBundle:UserMenu:update.html.twig")
      * @AclAncestor("oro_navigation_manage_menus")
      *
-     * @param string $menuName
+     * @param string      $menuName
      * @param string|null $parentKey
      *
      * @return array|RedirectResponse
      */
     public function createAction($menuName, $parentKey = null)
     {
-        return parent::create($menuName, $parentKey, $this->getContext());
+        return parent::create($menuName, $parentKey, $this->getContext(), $this->getMenuTreeContext());
     }
 
     /**
@@ -67,15 +68,26 @@ class UserMenuController extends AbstractMenuController
      */
     public function updateAction($menuName, $key)
     {
-        return parent::update($menuName, $key, $this->getContext());
+        return parent::update($menuName, $key, $this->getContext(), $this->getMenuTreeContext());
     }
 
     /**
      * @return array
      */
-    protected function getContext()
+    private function getContext()
     {
-        return ['user' => $this->getUser()->getId()];
+        return ['user' => $this->getUser()];
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    private function getMenuTreeContext()
+    {
+        return [
+            'organization' => $this->getCurrentOrganization(),
+            'user' => $this->getUser()
+        ];
     }
 
     /**
@@ -83,26 +95,15 @@ class UserMenuController extends AbstractMenuController
      */
     protected function getScopeType()
     {
-        return 'menu_default_visibility';
+        return $this->getParameter('oro_navigation.menu_update.scope_type');
     }
 
     /**
      * {@inheritdoc}
      */
-    protected function getManager()
+    protected function getMenuUpdateManager()
     {
-        return $this->get('oro_navigation.manager.menu_update_default');
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    protected function getContextForMenuUpdateBuilder()
-    {
-        return [
-            'organization' => $this->getUser()->getCurrentOrganization()->getId(),
-            'user' => $this->getUser()->getId()
-        ];
+        return $this->get('oro_navigation.manager.menu_update');
     }
 
     /**
@@ -113,5 +114,17 @@ class UserMenuController extends AbstractMenuController
         if (!$this->get('oro_security.security_facade')->isGranted('oro_user_user_update')) {
             throw $this->createAccessDeniedException();
         }
+    }
+
+    /**
+     * @return null|\Oro\Bundle\OrganizationBundle\Entity\Organization
+     */
+    protected function getCurrentOrganization()
+    {
+        if (null === $token = $this->container->get('security.token_storage')->getToken()) {
+            return null;
+        }
+
+        return $token instanceof OrganizationContextTokenInterface ? $token->getOrganizationContext() : null;
     }
 }
