@@ -65,46 +65,6 @@ class OperationManagerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @dataProvider executeDataProvider
-     *
-     * @param ActionData $actionData
-     */
-    public function testExecute(ActionData $actionData)
-    {
-        $operation = $this->createOperationMock($actionData);
-        $operation->expects($this->any())
-            ->method('execute')
-            ->willReturn(function ($param1, $param2) use ($actionData) {
-                $this->assertSame($actionData, $param1);
-                $this->assertSame($this->errorsCollection, $param2);
-            });
-
-        $this->operationRegistry->expects($this->once())
-            ->method('findByName')
-            ->with('test_operation')
-            ->willReturn($operation);
-
-        $this->manager->execute('test_operation', $actionData, $this->errorsCollection);
-
-        $this->assertEmpty($this->errorsCollection->toArray());
-    }
-
-    /**
-     * @return array
-     */
-    public function executeDataProvider()
-    {
-        return [
-            'empty data' => [
-                'actionData' => new ActionData()
-            ],
-            'with entity' => [
-                'actionData' => new ActionData(['data' => new \stdClass])
-            ],
-        ];
-    }
-
-    /**
      * @param array $expectedOperations
      * @param array $inputContext
      */

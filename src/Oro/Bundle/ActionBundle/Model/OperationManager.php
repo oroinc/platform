@@ -2,9 +2,6 @@
 
 namespace Oro\Bundle\ActionBundle\Model;
 
-use Doctrine\Common\Collections\Collection;
-
-use Oro\Bundle\ActionBundle\Exception\OperationNotFoundException;
 use Oro\Bundle\ActionBundle\Helper\ContextHelper;
 use Oro\Bundle\ActionBundle\Model\Criteria\OperationFindCriteria;
 
@@ -35,19 +32,6 @@ class OperationManager
         $this->operationRegistry = $operationRegistry;
         $this->actionGroupRegistry = $actionGroupRegistry;
         $this->contextHelper = $contextHelper;
-    }
-
-    /**
-     * @param string $operationName
-     * @param ActionData $actionData
-     * @param Collection|null $errors
-     * @return ActionData
-     */
-    public function execute($operationName, ActionData $actionData, Collection $errors = null)
-    {
-        $this->getOperation($operationName, $actionData)->execute($actionData, $errors);
-
-        return $actionData;
     }
 
     /**
@@ -82,23 +66,6 @@ class OperationManager
         });
 
         return $operations;
-    }
-
-    /**
-     * @param string $operationName
-     * @param ActionData $actionData
-     * @param bool $checkAvailable
-     * @return Operation
-     * @throws OperationNotFoundException
-     */
-    private function getOperation($operationName, ActionData $actionData, $checkAvailable = true)
-    {
-        $operation = $this->operationRegistry->findByName($operationName);
-        if (!$operation instanceof Operation || ($checkAvailable && !$operation->isAvailable($actionData))) {
-            throw new OperationNotFoundException($operationName);
-        }
-
-        return $operation;
     }
 
     /**
