@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\DataGridBundle\Tests\Unit\Twig;
 
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Routing\RouterInterface;
 
 use Oro\Bundle\DataGridBundle\Datagrid\Common\MetadataObject;
@@ -36,24 +38,29 @@ class DataGridExtensionTest extends \PHPUnit_Framework_TestCase
     /** @var \PHPUnit_Framework_MockObject_MockObject|DatagridRouteHelper */
     protected $datagridRouteHelper;
 
+    /** @var \PHPUnit_Framework_MockObject_MockObject|RequestStack */
+    protected $requestStack;
+
     protected function setUp()
     {
-        $this->manager = $this->getMock('Oro\\Bundle\\DataGridBundle\\Datagrid\\ManagerInterface');
-        $this->nameStrategy = $this->getMock('Oro\\Bundle\\DataGridBundle\\Datagrid\\NameStrategyInterface');
-        $this->router = $this->getMock('Symfony\\Component\\Routing\\RouterInterface');
-        $this->securityFacade = $this->getMockBuilder('Oro\\Bundle\\SecurityBundle\\SecurityFacade')
+        $this->manager = $this->getMock(ManagerInterface::class);
+        $this->nameStrategy = $this->getMock(NameStrategyInterface::class);
+        $this->router = $this->getMock(RouterInterface::class);
+        $this->securityFacade = $this->getMockBuilder(SecurityFacade::class)
             ->disableOriginalConstructor()
             ->getMock();
         $this->datagridRouteHelper = $this->getMockBuilder(DatagridRouteHelper::class)
             ->disableOriginalConstructor()
             ->getMock();
+        $this->requestStack = $this->getMock(RequestStack::class);
 
         $this->twigExtension = new DataGridExtension(
             $this->manager,
             $this->nameStrategy,
             $this->router,
             $this->securityFacade,
-            $this->datagridRouteHelper
+            $this->datagridRouteHelper,
+            $this->requestStack
         );
     }
 
@@ -73,6 +80,7 @@ class DataGridExtensionTest extends \PHPUnit_Framework_TestCase
             ['oro_datagrid_build_inputname', [$this->twigExtension, 'buildGridInputName']],
             ['oro_datagrid_link', [$this->datagridRouteHelper, 'generate']],
             ['oro_datagrid_column_attributes', [$this->twigExtension, 'getColumnAttributes']],
+            ['oro_datagrid_get_page_url', [$this->twigExtension, 'getPageUrl']],
         ];
         /** @var \Twig_SimpleFunction[] $actualFunctions */
         $actualFunctions = $this->twigExtension->getFunctions();
@@ -338,6 +346,75 @@ class DataGridExtensionTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals($columnAttributes, $this->twigExtension->getColumnAttributes($grid, 'column1'));
         $this->assertEquals([], $this->twigExtension->getColumnAttributes($grid, 'column3'));
+    }
+
+    /**
+     * @dataProvider getPageUrlProvider
+     *
+     * @param string $queryString
+     * @param integer $page
+     * @param array $expectedParameters
+     */
+    public function testGetPageUrl($queryString, $page, array $expectedParameters)
+    {
+        $gridName = 'test';
+
+        $request = $this->getMock(Request::class);
+        $request->expects($this->once())->method('getQueryString')->willReturn($queryString);
+        $request->expects($this->once())->method('get')->with('_route')->willReturn('test_route');
+
+        $this->requestStack->expects($this->any())
+            ->method('getCurrentRequest')
+            ->willReturn($request);
+
+        $grid = $this->getMock(DatagridInterface::class);
+        $grid->expects($this->any())->method('getName')->willReturn($gridName);
+
+        $this->router
+            ->expects($this->once())
+            ->method('generate')
+            ->with('test_route', $expectedParameters)
+            ->willReturn('test_url');
+
+        $this->assertEquals('test_url', $this->twigExtension->getPageUrl($grid, $page));
+    }
+
+    /**
+     * @return array
+     */
+    public function getPageUrlProvider()
+    {
+        return [
+            'with empty query string' => [
+                'queryString' => '',
+                'page' => 5,
+                'expectedParameters' => [
+                    'grid' => [
+                        'test' => 'i=5'
+                    ]
+                ]
+            ],
+            'with not empty query string but without grid params' => [
+                'queryString' => 'foo=bar&bar=baz',
+                'page' => 5,
+                'expectedParameters' => [
+                    'foo' => 'bar',
+                    'bar' => 'baz',
+                    'grid' => [
+                        'test' => 'i=5'
+                    ]
+                ]
+            ],
+            'with grid params in query sting' => [
+                'queryString' => 'grid%5Btest%5D=i%3D4',
+                'page' => 5,
+                'expectedParameters' => [
+                    'grid' => [
+                        'test' => 'i=5'
+                    ]
+                ]
+            ],
+        ];
     }
 
     protected function tearDown()

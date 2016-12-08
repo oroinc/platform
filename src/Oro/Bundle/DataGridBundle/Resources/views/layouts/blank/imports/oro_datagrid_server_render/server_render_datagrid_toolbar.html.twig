@@ -21,17 +21,19 @@
 
         <span>{{ "oro.datagrid.pagination.label"|trans }}:</span>
         <div class="oro-pagination__pager">
-            <button class="oro-pagination__pager__prev{% if currentPage <= 1 %} disabled{% endif %}"
-                    data-grid-pagination-trigger data-grid-pagination-direction="prev"{% if currentPage <= 1 %} disabled{% endif %}>
+            <a href="{% if currentPage <= 1 %}#{% else %}{{ oro_datagrid_get_page_url(datagrid, currentPage - 1) }}{% endif %}"
+               class="oro-pagination__pager__prev{% if currentPage <= 1 %} disabled{% endif %}"
+               data-grid-pagination-trigger data-grid-pagination-direction="prev">
                 <i class="cf-left-open cf--base-line"></i>
-            </button>
+            </a>
 
             <input type="text" class="oro-pagination__pager__input" value="{{ currentPage }}" data-grid-pagination-trigger-input>
 
-            <button class="oro-pagination__pager__next{% if currentPage >= totalPages %} disabled{% endif %}"
-                    data-grid-pagination-trigger data-grid-pagination-direction="next"{% if currentPage >= totalPages %} disabled{% endif %}>
+            <a href="{% if currentPage >= totalPages %}#{% else %}{{ oro_datagrid_get_page_url(datagrid, currentPage + 1) }}{% endif %}"
+               class="oro-pagination__pager__next{% if currentPage >= totalPages %} disabled{% endif %}"
+               data-grid-pagination-trigger data-grid-pagination-direction="next">
                 <i class="cf-right-open cf--base-line"></i>
-            </button>
+            </a>
         </div>
 
         <span class="hidden-sm hidden-xs">
