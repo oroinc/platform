@@ -10,6 +10,8 @@
     group: context.group,
 } %}
 
+{% set transitionData = transition.frontendOptions.data|default({})|merge(transitionData) %}
+
 {# Show button for start or transit workflow #}
 {% set transitionMessage = transition.message|trans({},'workflows') %}
 {% if transitionMessage == transition.message %}
@@ -32,7 +34,15 @@
 {% else %}
     {% set transitionData = transitionData|merge({'transition-url': path(context.formPageRoute, params) }) %}
 {% endif %}
-
-<div class="pull-left btn-group icons-holder">
-    {{ workflowMacros.renderTransitionButton(workflow, transition, null, transitionData) }}
-</div>
+{% if not onlyLink|default(false) %}<div class="pull-left btn-group icons-holder">{% endif %}
+    {{ workflowMacros.renderTransitionButton(
+        workflow,
+        transition,
+        workflowItem|default(null),
+        transitionData,
+        onlyLink|default(false),
+        noIcon|default(false),
+        noIconText|default(false),
+        aClass|default('')
+    ) }}
+{% if not onlyLink|default(false) %}</div>{% endif %}

@@ -2,7 +2,7 @@ system_configuration:
     groups:
         development_settings:
             title: oro.layout.system_configuration.groups.development_settings.title
-            icon:  'icon-wrench'
+            icon:  'fa-wrench'
         development_layout_settings:
             title: oro.layout.system_configuration.groups.development_layout_settings.title
 

@@ -6,13 +6,13 @@
                     data-title="{{ oro_title_render_serialized() }}"
                     data-title-rendered-short="{{ oro_title_render_short() }}"
                     title="{{ 'oro.navigation.favorites.button.title'|trans }}">
-                        <i class="icon-star hide-text">{{ 'oro.navigation.favorites.button'|trans }}</i>
+                        <i class="fa-star hide-text">{{ 'oro.navigation.favorites.button'|trans }}</i>
             </button>
             <button class="btn minimize-button" {% if contentProviderContent['pinButton'] == false %}style="display: none"{% endif %}
                     data-title="{{ oro_title_render_serialized() }}"
                     data-title-rendered-short="{{ oro_title_render_short() }}"
                     title="{{ 'oro.navigation.pins.button.title'|trans }}">
-                        <i class="icon-pushpin hide-text">{{ 'oro.navigation.pins.button'|trans }}</i>
+                        <i class="fa-thumb-tack hide-text">{{ 'oro.navigation.pins.button'|trans }}</i>
             </button>
         </div>
     </div>

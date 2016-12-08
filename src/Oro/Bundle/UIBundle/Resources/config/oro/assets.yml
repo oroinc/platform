@@ -16,7 +16,6 @@ assets:
             - 'bundles/bowerassets/jquery-ui-multiselect-widget/jquery.multiselect.css'
             - 'bundles/bowerassets/jquery-ui-multiselect-widget/jquery.multiselect.filter.css'
             # customized libraries' styles
-            - 'bundles/oroui/css/font-awesome-4.3/font-awesome.css'
             - 'bundles/oroui/css/jquery-ui.grid.css'
             - 'bundles/oroui/css/jquery-ui.custom.css'
             - 'bundles/oroui/css/lightgallery/lightgallery.css'

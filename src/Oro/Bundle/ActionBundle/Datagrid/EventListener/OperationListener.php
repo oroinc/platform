@@ -230,7 +230,7 @@ class OperationListener
     protected function getRowsActionsConfig(Operation $operation)
     {
         $buttonOptions = $operation->getDefinition()->getButtonOptions();
-        $icon = !empty($buttonOptions['icon']) ? str_ireplace('icon-', '', $buttonOptions['icon']) : 'edit';
+        $icon = !empty($buttonOptions['icon']) ? str_ireplace('fa-', '', $buttonOptions['icon']) : 'pencil-square-o';
 
         $datagridOptions = $operation->getDefinition()->getDatagridOptions();
 

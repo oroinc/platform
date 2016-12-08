@@ -69,7 +69,8 @@ class OperationButton implements ButtonInterface
         return array_merge($defaultData, $customData, [
             'operation' => $this->operation,
             'params' => $this->operation->getDefinition(),
-            'actionData' => $this->data
+            'actionData' => $this->data,
+            'buttonContext' => $this->buttonContext,
         ]);
     }
 

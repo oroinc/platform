@@ -55,7 +55,7 @@ Example:
 
 ```yml
 title:     "Task list"
-iconClass: "icon-tasks"
+iconClass: "fa-tasks"
 dialogIcon: "bundles/orocrmtask/sidebar_widgets/assigned_tasks/img/icon-task.png"
 module:    "orocrm/sidebar/widget/assigned_tasks"
 placement: "both"

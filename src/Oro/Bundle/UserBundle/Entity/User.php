@@ -38,7 +38,7 @@ use Oro\Bundle\UserBundle\Security\AdvancedApiUserInterface;
  *      routeView="oro_user_view",
  *      defaultValues={
  *          "entity"={
- *              "icon"="icon-user"
+ *              "icon"="fa-user"
  *          },
  *          "grouping"={
  *              "groups"={"dictionary"}

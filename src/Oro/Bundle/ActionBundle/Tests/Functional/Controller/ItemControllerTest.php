@@ -148,7 +148,7 @@ class ItemControllerTest extends WebTestCase
      */
     protected function assertPageContainsOperations(Crawler $crawler, array $operations)
     {
-        $node = $crawler->filter('a.action-button');
+        $node = $crawler->filter('a.operation-button');
 
         $this->assertCount(count($operations), $node);
 
