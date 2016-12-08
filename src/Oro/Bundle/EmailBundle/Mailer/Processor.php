@@ -210,10 +210,17 @@ class Processor
                 $this->mailer->prepareSmtpTransport($emailOrigin);
             }
         }
-
+        $messageId = $message->getId();
         if (!$this->mailer->send($message)) {
             throw new \Swift_SwiftException('An email was not delivered.');
         }
+
+        /**
+         * We expect message->getId() to be id of the sent message later,
+         * but sending of the message generates new id after it's sent
+         * (https://github.com/swiftmailer/swiftmailer/issues/335)
+         */
+        $message->setId($messageId);
     }
 
     /**
@@ -468,7 +475,7 @@ class Processor
      */
     protected function prepareEmailUser(EmailModel $model, $origin, $message, $messageDate, $parentMessageId)
     {
-        $messageId = '<' . $message->generateId() . '>';
+        $messageId = '<' . $message->getId() . '>';
         $emailUser = $this->createEmailUser($model, $messageDate, $origin);
         if ($origin) {
             $emailUser->addFolder($this->getFolder($model->getFrom(), $origin));
