@@ -539,15 +539,22 @@ class ActivityListManager
             $activityField = current(array_keys($association['relationToSourceKeyColumns']));
             $targetField = current(array_keys($association['relationToTargetKeyColumns']));
 
-            $where = "WHERE $targetField = :sourceEntityId AND $activityField IN(" . implode(',', $activityIds) . ")";
             $dbConnection = $this->doctrineHelper
                 ->getEntityManager(ActivityList::ENTITY_NAME)
-                ->getConnection()
-                ->prepare("UPDATE $tableName SET $targetField = :masterEntityId $where");
+                ->getConnection();
 
-            $dbConnection->bindValue('masterEntityId', $newTargetId);
-            $dbConnection->bindValue('sourceEntityId', $oldTargetId);
-            $dbConnection->execute();
+            // to avoid of duplication activity lists and activities items we need to clear these relations
+            // from the master record before update
+            $where = "WHERE $targetField = :masterEntityId AND $activityField IN(" . implode(',', $activityIds) . ")";
+            $stmt = $dbConnection->prepare("DELETE FROM $tableName $where");
+            $stmt->bindValue('masterEntityId', $newTargetId);
+            $stmt->execute();
+
+            $where = "WHERE $targetField = :sourceEntityId AND $activityField IN(" . implode(',', $activityIds) . ")";
+            $stmt = $dbConnection->prepare("UPDATE $tableName SET $targetField = :masterEntityId $where");
+            $stmt->bindValue('masterEntityId', $newTargetId);
+            $stmt->bindValue('sourceEntityId', $oldTargetId);
+            $stmt->execute();
         }
 
         return $this;

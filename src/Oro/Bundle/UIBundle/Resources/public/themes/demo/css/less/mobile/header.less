@@ -4,16 +4,16 @@
     color: @headerTextColor;
   }
   #main-menu-toggle {
-    &:hover [class^='icon-'] {
+    &:hover [class^="fa-"] {
       border:1px solid darken(#2a5ab1,10%);
       #gradient > .vertical(@baseGradientColorStart, darken(@baseGradientColorStart,20%));
     }
-    &:active [class^='icon-'],
-    &:focus [class^='icon-'] {
+    &:active [class^="fa-"],
+    &:focus [class^="fa-"] {
       border:1px solid darken(#2a5ab1,10%);
       #gradient > .vertical(darken(@baseGradientColorStart,10%), darken(@baseGradientColorStart,20%));
     }
-    &.open > .dropdown-toggle [class^='icon-'] {
+    &.open > .dropdown-toggle [class^="fa-"] {
       border:1px solid darken(#2a5ab1,10%);
       #gradient > .vertical(@baseGradientColorStart, darken(@baseGradientColorStart,20%));
     }

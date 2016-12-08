@@ -355,7 +355,7 @@
                 {% endif %}
             </div>
             {% if allow_add %}
-            <a class="btn add-list-item" href="javascript: void(0);"><i class="icon-plus"></i>{{ form.vars.add_label|default('oro.form.collection.add')|trans }}</a>
+            <a class="btn add-list-item" href="javascript: void(0);"><i class="fa-plus"></i>{{ form.vars.add_label|default('oro.form.collection.add')|trans }}</a>
             {% endif %}
         </div>
         {% if handle_primary and (prototype is not defined or prototype.primary is defined) %}
@@ -584,10 +584,10 @@
             {{ form_widget(form) }}
 
             {% if isButtonsEnabled %}
-                <button class="add-on btn entity-select-btn"><i class="icon-bars"></i></button>
+                <button class="add-on btn entity-select-btn"><i class="fa-bars"></i></button>
 
                 {% if form.vars.create_enabled %}
-                    <button class="btn entity-create-btn"><i class="icon-plus"></i></button>
+                    <button class="btn entity-create-btn"><i class="fa-plus"></i></button>
                 {% endif %}
             {% endif %}
         </div>
@@ -684,4 +684,17 @@
          data-layout="separate" >
         {{ form_widget(form) }}
     </div>
+{% endblock %}
+
+{% block oro_entity_tree_select_row %}
+    {{ block('form_row') }}
+{% endblock %}
+
+{% block oro_entity_tree_select_widget %}
+    <div data-page-component-module="{{ form.vars.pageComponentModule }}"
+         data-page-component-options="{{ form.vars.treeOptions|json_encode }}">
+    </div>
+
+    {{ form_widget(form) }}
+    {{ form_errors(form) }}
 {% endblock %}

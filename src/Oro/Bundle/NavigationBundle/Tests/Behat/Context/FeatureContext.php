@@ -143,7 +143,7 @@ class FeatureContext extends OroFeatureContext implements OroPageObjectAware, Ke
      */
     public function clickBarsIcon()
     {
-        $this->getPage()->find('css', 'i.icon-bars')->click();
+        $this->getPage()->find('css', 'i.fa-bars')->click();
     }
 
     /**

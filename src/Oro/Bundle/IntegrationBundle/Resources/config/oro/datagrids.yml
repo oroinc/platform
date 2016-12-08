@@ -80,7 +80,7 @@ datagrids:
                 type:         navigate
                 link:         update_link
                 acl_resource: oro_integration_update
-                icon:         edit
+                icon:         pencil-square-o
                 label:        oro.grid.action.update
                 rowAction:    true
             schedule:
@@ -93,19 +93,19 @@ datagrids:
                 type:         ajax
                 acl_resource: oro_integration_update
                 label:        oro.integration.datagrid.action.activate
-                icon:         ok
+                icon:         check
                 link:         activate_link
             deactivate:
                 type:         ajax
                 acl_resource: oro_integration_update
                 label:        oro.integration.datagrid.action.deactivate
-                icon:         remove
+                icon:         close
                 link:         deactivate_link
             delete:
                 type:         delete
                 link:         delete_link
                 acl_resource: oro_integration_delete
-                icon:         trash
+                icon:         trash-o
                 label:        oro.grid.action.delete
                 defaultMessages:
                     confirm_content: oro.integration.delete_sync_integration_window.content
