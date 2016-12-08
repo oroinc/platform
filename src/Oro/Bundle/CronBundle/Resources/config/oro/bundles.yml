@@ -1,3 +1,2 @@
 bundles:
     - { name: Oro\Bundle\CronBundle\OroCronBundle, priority: -80 }
-    - { name: JMS\JobQueueBundle\JMSJobQueueBundle, kernel: true, priority: 80 }
