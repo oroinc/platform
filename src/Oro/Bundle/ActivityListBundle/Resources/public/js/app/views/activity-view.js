@@ -104,8 +104,8 @@ define(function(require) {
             return this;
         },
 
-        onEdit: function() {
-            this.model.collection.trigger('toEdit', this.model);
+        onEdit: function(e) {
+            this.model.collection.trigger('toEdit', this.model, this.$(e.currentTarget).data('actionExtraOptions'));
         },
 
         onDelete: function() {
