@@ -17,7 +17,7 @@
                         <span class="context-label"><%- entity.get('title') %></span>
                     <% }  %>
                     {% if  resource_granted('EDIT', entity) %}
-                        <i class="icon-remove"></i>
+                        <i class="fa-close"></i>
                     {% endif %}
                 </span>
         </div>
@@ -81,7 +81,7 @@
                 }
             }
         }) }}>
-        <i class="icon-link hide-text">{{ 'oro.activity.contexts.placeholder'|trans|raw }}</i>
+        <i class="fa-link hide-text">{{ 'oro.activity.contexts.placeholder'|trans|raw }}</i>
     </a>
 {% endmacro %}
 
@@ -96,7 +96,7 @@
                 activity: oro_class_name(entity, true)
             }),
             'aCss': 'no-hash',
-            'iCss': 'icon-link hide-text',
+            'iCss': 'fa-link hide-text',
             'dataId': entity.id,
             'label' : 'oro.activity.contexts.add_context.label'|trans,
             'widget' : {

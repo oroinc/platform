@@ -92,7 +92,7 @@ datagrids:
                 type: ajax
                 acl_resource:  oro_workflow_definition_delete
                 label: oro.message_queue_job.grid.action.interrupt
-                icon: remove
+                icon: close
                 link: interrupt_root_job_link
         action_configuration: ['@oro_message_queue.job.grid.root_job_action_configuration', 'getConfiguration']
 

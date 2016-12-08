@@ -7,7 +7,6 @@ use Doctrine\Common\Collections\Collection;
 use Oro\Bundle\ActionBundle\Button\ButtonContext;
 use Oro\Bundle\ActionBundle\Button\ButtonInterface;
 use Oro\Bundle\ActionBundle\Button\ButtonSearchContext;
-use Oro\Bundle\ActionBundle\Extension\ButtonProviderExtensionInterface;
 use Oro\Bundle\ActionBundle\Provider\RouteProviderInterface;
 
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
@@ -85,7 +84,7 @@ class TransitionButtonProviderExtension extends AbstractButtonProviderExtension
     protected function getTransitions(Workflow $workflow, ButtonSearchContext $searchContext)
     {
         if ($searchContext->getDatagrid() &&
-            in_array($searchContext->getDatagrid(), $workflow->getDefinition()->getDatagrids()) &&
+            in_array($searchContext->getDatagrid(), $workflow->getDefinition()->getDatagrids(), true) &&
             $workflow->getDefinition()->getRelatedEntity() === $searchContext->getEntityClass()
         ) {
             $transitions = $workflow->getTransitionManager()->getTransitions()->toArray();

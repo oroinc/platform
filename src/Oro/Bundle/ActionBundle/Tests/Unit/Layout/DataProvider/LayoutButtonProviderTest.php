@@ -60,41 +60,36 @@ class LayoutButtonProviderTest extends \PHPUnit_Framework_TestCase
      *
      * @param object|null $entity
      * @param bool $isNew
+     * @param string $expectSetEntityClass
+     * @param string $expectSetEntityId
      */
-    public function testGetAll($entity, $isNew)
+    public function testGetAll($entity, $isNew, $expectSetEntityClass, $expectSetEntityId)
     {
-        $this->doctrineHelper->expects($this->any())
-            ->method('isNewEntity')
-            ->willReturn($isNew);
-
-        if (!is_null($entity)) {
-            $this->doctrineHelper->expects($this->atLeastOnce())
-                ->method('getEntityClass')
-                ->with($entity)
-                ->willReturn('class');
-            if (!$isNew) {
-                $this->doctrineHelper->expects($this->atLeastOnce())
-                    ->method('getSingleEntityIdentifier')
-                    ->with($entity)
-                    ->willReturn('entity_id');
-            }
-        }
+        $this->doctrineHelper->expects($this->any())->method('isNewEntity')->willReturn($isNew);
+        $this->doctrineHelper->expects($this->$expectSetEntityClass())
+            ->method('getEntityClass')
+            ->with($entity)
+            ->willReturn('class');
+        $this->doctrineHelper->expects($this->$expectSetEntityId())
+            ->method('getSingleEntityIdentifier')
+            ->with($entity)
+            ->willReturn('entity_id');
 
         $this->buttonProvider->expects($this->once())
             ->method('findAvailable')
             ->with(
-                $this->callback(function (ButtonSearchContext $buttonSearchContext) use ($isNew, $entity) {
-                    if (!is_null($entity)) {
-                        if (!$isNew) {
-                            return $buttonSearchContext->getEntityClass() === 'class' &&
-                            $buttonSearchContext->getEntityId() === 'entity_id';
+                $this->callback(
+                    function (ButtonSearchContext $searchContext) use ($expectSetEntityClass, $expectSetEntityId) {
+                        if ($expectSetEntityClass === 'once') {
+                            $entityId = $expectSetEntityId === 'once' ? 'entity_id' : null;
+
+                            return $searchContext->getEntityClass() === 'class' &&
+                                $searchContext->getEntityId() === $entityId;
                         }
 
-                        return $buttonSearchContext->getEntityClass() === 'class';
+                        return true;
                     }
-
-                    return true;
-                })
+                )
             );
 
         $this->layoutButtonProvider->getAll($entity);
@@ -129,14 +124,20 @@ class LayoutButtonProviderTest extends \PHPUnit_Framework_TestCase
             'testWhenEntityIsNew' => [
                 'entity' => new \stdClass(),
                 'isNew' => true,
+                'expectSetEntityClassCalls' => 'once',
+                'expectSetEntityIdCalls' => 'never'
             ],
             'testWhenEntityIsNull' => [
                 'entity' => null,
                 'isNew' => false,
+                'expectSetEntityClassCalls' => 'never',
+                'expectSetEntityIdCalls' => 'never'
             ],
             'testWhenEntityIsFlushed' => [
                 'entity' => new \stdClass(),
                 'isNew' => false,
+                'expectSetEntityClassCalls' => 'once',
+                'expectSetEntityIdCalls' => 'once'
             ],
         ];
     }

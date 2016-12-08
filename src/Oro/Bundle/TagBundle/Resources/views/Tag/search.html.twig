@@ -24,7 +24,7 @@
         <div class="oro-page collapsible-sidebar clearfix">
             <div class="oro-page-sidebar search-entity-types-column dropdown">
                 <a href="javascript: void(0);" class="dropdown-toggle" data-toggle="dropdown">
-                    <i class="icon-filter"></i>
+                    <i class="fa-filter"></i>
                     {% if selectedResult.label is defined and selectedResult.count is defined%}
                         {{ selectedResult.label|trans}}
                         {% set selectedResultCount = selectedResult.count %}
@@ -32,7 +32,7 @@
                         {{ 'oro.search.result.all'|trans }}
                         {% set selectedResultCount = groupedResults[''].count %}
                     {% endif %}
-                    ({{ selectedResultCount }}) <i class="icon-sort-down"></i>
+                    ({{ selectedResultCount }}) <i class="fa-sort-desc"></i>
                 </a>
                 <ul class="dropdown-menu" role="menu" aria-labelledby="dropdownMenu">
                 {% for alias, type in groupedResults %}
@@ -42,16 +42,16 @@
                         {% set iconClass = type.icon %}
                     {% else %}
                         {% set label = 'oro.search.result.all' %}
-                        {% set iconClass = 'icon-search' %}
+                        {% set iconClass = 'fa-search' %}
                     {% endif %}
 
                     {% if iconClass is empty %}
-                        {% set iconClass = 'icon-file' %}
+                        {% set iconClass = 'fa-file' %}
                     {% endif %}
 
                     <li{% if selected %} class="selected"{% endif %}>
                         <a href="{{ path('oro_tag_search', { from: alias, id: tag.id }) }}">
-                            {% if selected %}<i class="icon-chevron-right pull-right"></i>{% endif %}
+                            {% if selected %}<i class="fa-chevron-right pull-right"></i>{% endif %}
                             <i class="{{ iconClass }}"></i>
                             {{ label|trans }} ({{ type.count }})
                         </a>
