@@ -96,7 +96,13 @@ trait FallbackTrait
     {
         $filteredValues = $values->filter(
             function (LocalizedFallbackValue $title) use ($localization) {
-                return $localization === $title->getLocalization();
+                if ($localization === $title->getLocalization()) {
+                    return true;
+                } elseif (!$localization || !$title->getLocalization()) {
+                    return false;
+                }
+
+                return $localization->getId() === $title->getLocalization()->getId();
             }
         );
 

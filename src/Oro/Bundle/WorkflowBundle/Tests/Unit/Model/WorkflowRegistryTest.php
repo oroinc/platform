@@ -193,7 +193,7 @@ class WorkflowRegistryTest extends \PHPUnit_Framework_TestCase
         }
 
         $this->entityRepository->expects($this->once())
-            ->method('findBy')
+            ->method('findActive')
             ->willReturn($activeDefinitions);
 
         $this->registry->addDefinitionFilter($filter);
@@ -252,6 +252,79 @@ class WorkflowRegistryTest extends \PHPUnit_Framework_TestCase
         ];
     }
 
+    public function testGetActiveWorkflows()
+    {
+        $workflowName = 'test_workflow';
+        $workflow = $this->createWorkflow($workflowName, 'testEntityClass');
+        $workflowDefinition = $workflow->getDefinition();
+        $workflowDefinition->setExclusiveActiveGroups(['group1']);
+
+        $filter = $this->createDefinitionFilterMock(
+            new ArrayCollection([$workflowName => $workflowDefinition]),
+            new ArrayCollection([$workflowName => $workflowDefinition])
+        );
+        $this->registry->addDefinitionFilter($filter);
+
+        $this->entityRepository->expects($this->once())
+            ->method('findActive')
+            ->willReturn([$workflowDefinition]);
+        $this->prepareAssemblerMock($workflowDefinition, $workflow);
+        $this->setUpEntityManagerMock($workflowDefinition);
+
+        $this->assertEquals(
+            new ArrayCollection([$workflowName => $workflow]),
+            $this->registry->getActiveWorkflows()
+        );
+    }
+
+    public function testGetActiveWorkflowsNoFeature()
+    {
+        $workflowName = 'test_workflow';
+        $workflow = $this->createWorkflow($workflowName, 'testEntityClass');
+        $workflowDefinition = $workflow->getDefinition();
+        $workflowDefinition->setExclusiveActiveGroups(['group1']);
+
+        $filter = $this->createDefinitionFilterMock(
+            new ArrayCollection([$workflowName => $workflowDefinition]),
+            new ArrayCollection([])
+        );
+        $this->registry->addDefinitionFilter($filter);
+
+        $this->entityRepository->expects($this->once())
+            ->method('findActive')
+            ->willReturn([$workflowDefinition]);
+
+        $this->prepareAssemblerMock();
+
+        $this->assertEquals(
+            new ArrayCollection(),
+            $this->registry->getActiveWorkflows()
+        );
+    }
+
+    public function testGetActiveWorkflowsByActiveGroupsWithDisabledFeature()
+    {
+        $workflow1 = $this->createWorkflow('test_workflow1', 'testEntityClass');
+        $workflowDefinition1 = $workflow1->getDefinition();
+        $workflowDefinition1->setExclusiveActiveGroups(['group1']);
+
+        $workflow2 = $this->createWorkflow('test_workflow2', 'testEntityClass');
+        $workflowDefinition2 = $workflow2->getDefinition();
+        $workflowDefinition2->setExclusiveActiveGroups(['group2', 'group3']);
+
+        $this->entityRepository->expects($this->once())
+            ->method('findActive')
+            ->willReturn([$workflowDefinition1, $workflowDefinition2]);
+
+        $filter = $this->createDefinitionFilterMock(
+            new ArrayCollection(['test_workflow1' => $workflowDefinition1]),
+            new ArrayCollection()
+        );
+        $this->registry->addDefinitionFilter($filter);
+
+        $this->assertEmpty($this->registry->getActiveWorkflowsByActiveGroups(['group1']));
+    }
+
     /**
      * @param Collection $in
      * @param Collection $out
@@ -304,6 +377,10 @@ class WorkflowRegistryTest extends \PHPUnit_Framework_TestCase
         $workflow->expects($this->any())
             ->method('getDefinition')
             ->willReturn($workflowDefinition);
+
+        $workflow->expects($this->any())
+            ->method('getName')
+            ->willReturn($workflowDefinition->getName());
 
         return $workflow;
     }

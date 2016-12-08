@@ -139,9 +139,10 @@ class ScopeManager
     /**
      * @param string $scopeType
      * @param array|object $context
+     * @param bool $flush
      * @return Scope
      */
-    public function findOrCreate($scopeType, $context = null)
+    public function findOrCreate($scopeType, $context = null, $flush = true)
     {
         $criteria = $this->getCriteria($scopeType, $context);
 
@@ -161,7 +162,10 @@ class ScopeManager
             /** @var EntityManager $manager */
             $manager = $this->registry->getManagerForClass(Scope::class);
             $manager->persist($scope);
-            $manager->flush($scope);
+
+            if ($flush) {
+                $manager->flush($scope);
+            }
         }
 
         return $scope;

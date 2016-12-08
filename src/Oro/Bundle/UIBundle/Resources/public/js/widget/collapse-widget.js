@@ -11,6 +11,7 @@ define(['jquery', 'oroui/js/mediator', 'underscore', 'jquery-ui'], function($, m
             breakpoint: 0,
             storageKey: '',
             open: null,
+            forcedState: null,
             uid: '',
             openClass: 'expanded',
             animationSpeed: 250
@@ -30,18 +31,24 @@ define(['jquery', 'oroui/js/mediator', 'underscore', 'jquery-ui'], function($, m
             this.$trigger = this.$el.find(this.options.trigger);
             this.$container = this.$el.find(this.options.container);
 
-            this.options.open = _.isBoolean(storedState) ? storedState : this.options.open;
-
-            this.$el.toggleClass(this.options.openClass, this.options.open);
-            if (this.options.open) {
-                this.$container.show();
-            } else {
-                this.$container.hide();
+            if (_.isBoolean(this.options.forcedState)) {
+                this.options.open = this.options.forcedState;
+            } else if (_.isBoolean(storedState)) {
+                this.options.open = storedState;
             }
 
             this.$el.addClass('init');
 
             this._initEvents();
+
+            if (this._isEnabled()) {
+                this.$el.toggleClass(this.options.openClass, this.options.open);
+                if (this.options.open) {
+                    this.$container.show();
+                } else {
+                    this.$container.hide();
+                }
+            }
         },
 
         _initEvents: function() {
@@ -51,7 +58,7 @@ define(['jquery', 'oroui/js/mediator', 'underscore', 'jquery-ui'], function($, m
         },
 
         _toggle: function(event) {
-            if (this.options.breakpoint && $(window).outerWidth() >= this.options.breakpoint) {
+            if (!this._isEnabled()) {
                 return;
             }
             var self = this;
@@ -96,6 +103,13 @@ define(['jquery', 'oroui/js/mediator', 'underscore', 'jquery-ui'], function($, m
             } else {
                 this.$el.siblings().show(this.options.animationSpeed);
             }
+        },
+
+        _isEnabled: function() {
+            if (this.options.breakpoint && $(window).outerWidth() >= this.options.breakpoint) {
+                return false;
+            }
+            return true;
         }
     });
 

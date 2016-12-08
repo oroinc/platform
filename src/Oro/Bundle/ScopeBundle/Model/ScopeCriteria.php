@@ -3,6 +3,7 @@
 namespace Oro\Bundle\ScopeBundle\Model;
 
 use Doctrine\Common\Collections\Criteria;
+use Doctrine\DBAL\Platforms\PostgreSqlPlatform;
 use Doctrine\ORM\Query\Expr\Join;
 use Doctrine\ORM\QueryBuilder;
 
@@ -16,7 +17,7 @@ class ScopeCriteria implements \IteratorAggregate
     protected $context = [];
 
     /**
-     * @param $context
+     * @param array $context
      */
     public function __construct(array $context)
     {
@@ -33,7 +34,7 @@ class ScopeCriteria implements \IteratorAggregate
     public function applyWhereWithPriority(QueryBuilder $qb, $alias, array $ignoreFields = [])
     {
         foreach ($this->context as $field => $value) {
-            if (in_array($field, $ignoreFields)) {
+            if (in_array($field, $ignoreFields, true)) {
                 continue;
             }
 
@@ -49,10 +50,10 @@ class ScopeCriteria implements \IteratorAggregate
      * @param array $ignoreFields
      * @return QueryBuilder
      */
-    public function applyWhere(QueryBuilder $qb, $alias, $ignoreFields = [])
+    public function applyWhere(QueryBuilder $qb, $alias, array $ignoreFields = [])
     {
         foreach ($this->context as $field => $value) {
-            if (in_array($field, $ignoreFields)) {
+            if (in_array($field, $ignoreFields, true)) {
                 continue;
             }
             $aliasedField = $alias.'.'.$field;
@@ -79,7 +80,7 @@ class ScopeCriteria implements \IteratorAggregate
      * @param string $alias
      * @param array $ignoreFields
      */
-    public function applyToJoin(QueryBuilder $qb, $alias, $ignoreFields = [])
+    public function applyToJoin(QueryBuilder $qb, $alias, array $ignoreFields = [])
     {
         /** @var Join[] $joins */
         $joins = $qb->getDQLPart('join');
@@ -92,7 +93,7 @@ class ScopeCriteria implements \IteratorAggregate
      * @param string $alias
      * @param array $ignoreFields
      */
-    public function applyToJoinWithPriority(QueryBuilder $qb, $alias, $ignoreFields = [])
+    public function applyToJoinWithPriority(QueryBuilder $qb, $alias, array $ignoreFields = [])
     {
         /** @var Join[] $joins */
         $joins = $qb->getDQLPart('join');
@@ -121,7 +122,7 @@ class ScopeCriteria implements \IteratorAggregate
 
             if ($join->getAlias() === $alias) {
                 foreach ($this->context as $field => $value) {
-                    if (in_array($field, $ignoreFields) || in_array($field, $usedFields)) {
+                    if (in_array($field, $ignoreFields, true) || in_array($field, $usedFields, true)) {
                         continue;
                     }
                     $parts[] = $this->resolveBasicCondition($qb, $alias, $field, $value, $withPriority);
@@ -136,10 +137,10 @@ class ScopeCriteria implements \IteratorAggregate
 
     /**
      * @param QueryBuilder $qb
-     * @param $alias
-     * @param $field
-     * @param $value
-     * @param $withPriority
+     * @param string $alias
+     * @param string $field
+     * @param mixed $value
+     * @param bool $withPriority
      * @return array
      */
     protected function resolveBasicCondition(QueryBuilder $qb, $alias, $field, $value, $withPriority)
@@ -161,7 +162,13 @@ class ScopeCriteria implements \IteratorAggregate
             }
             $qb->setParameter($paramName, $value);
             if ($withPriority) {
-                $qb->addOrderBy($aliasedField, Criteria::DESC);
+                // TODO: Make this code platform independent. BB-6090
+                // NULLs are sorted to end on mysql for DESC and to top on PostgreSQL
+                $sortOrder = Criteria::DESC;
+                if ($qb->getEntityManager()->getConnection()->getDatabasePlatform() instanceof PostgreSqlPlatform) {
+                    $sortOrder = Criteria::ASC;
+                }
+                $qb->addOrderBy($aliasedField, $sortOrder);
             }
         }
 
@@ -184,7 +191,7 @@ class ScopeCriteria implements \IteratorAggregate
             );
         }
 
-        return implode(" AND ", $parts);
+        return implode(' AND ', $parts);
     }
 
     /**
@@ -194,7 +201,7 @@ class ScopeCriteria implements \IteratorAggregate
      */
     protected function applyJoinWithModifiedCondition(QueryBuilder $qb, $condition, Join $join)
     {
-        if (Join::INNER_JOIN == $join->getJoinType()) {
+        if (Join::INNER_JOIN === $join->getJoinType()) {
             $qb->innerJoin(
                 $join->getJoin(),
                 $join->getAlias(),
@@ -203,7 +210,7 @@ class ScopeCriteria implements \IteratorAggregate
                 $join->getIndexBy()
             );
         }
-        if (Join::LEFT_JOIN == $join->getJoinType()) {
+        if (Join::LEFT_JOIN === $join->getJoinType()) {
             $qb->leftJoin(
                 $join->getJoin(),
                 $join->getAlias(),
@@ -238,7 +245,7 @@ class ScopeCriteria implements \IteratorAggregate
     protected function getUsedFields($condition, $alias)
     {
         $fields = [];
-        $parts = explode('AND', $condition);
+        $parts = explode(' AND ', $condition);
         foreach ($parts as $part) {
             $matches = [];
             preg_match(sprintf('/%s\.\w+/', $alias), $part, $matches);

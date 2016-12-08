@@ -133,6 +133,9 @@ oro:
             currency:
                 ascending: Low to High
                 descending: High to Low
+            decimal:
+                ascending: Low to High
+                descending: High to Low
         export:
             max_limit_message: >
                 The maximum number of records that can be exported at once is {{ max_limit }}.<br/>

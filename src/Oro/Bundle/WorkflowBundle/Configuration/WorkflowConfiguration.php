@@ -27,17 +27,24 @@ class WorkflowConfiguration extends AbstractConfiguration implements Configurati
     const NODE_EXCLUSIVE_ACTIVE_GROUPS = 'exclusive_active_groups';
     const NODE_EXCLUSIVE_RECORD_GROUPS = 'exclusive_record_groups';
     const NODE_TRANSITION_TRIGGERS = 'triggers';
+    const NODE_INIT_ENTITIES = 'init_entities';
+    const NODE_INIT_ROUTES = 'init_routes';
+    const NODE_INIT_CONTEXT_ATTRIBUTE = 'init_context_attribute';
+    const NODE_DISABLE_OPERATIONS = 'disable_operations';
 
     const DEFAULT_TRANSITION_DISPLAY_TYPE = 'dialog';
     const DEFAULT_ENTITY_ATTRIBUTE = 'entity';
+    const DEFAULT_INIT_CONTEXT_ATTRIBUTE = 'init_context';
 
     /**
      * @param array $configs
+     *
      * @return array
      */
     public function processConfiguration(array $configs)
     {
         $processor = new Processor();
+
         return $processor->processConfiguration($this, array($configs));
     }
 
@@ -55,6 +62,7 @@ class WorkflowConfiguration extends AbstractConfiguration implements Configurati
 
     /**
      * @param NodeBuilder $nodeBuilder
+     *
      * @return NodeBuilder
      */
     public function addWorkflowNodes(NodeBuilder $nodeBuilder)
@@ -93,6 +101,7 @@ class WorkflowConfiguration extends AbstractConfiguration implements Configurati
             ->arrayNode(WorkflowDefinition::CONFIG_SCOPES)
                 ->prototype('variable')->end()
             ->end()
+            ->append($this->getDisableOperationsNode())
             ->append($this->getStepsNode())
             ->append($this->getAttributesNode())
             ->append($this->getTransitionsNode())
@@ -102,6 +111,21 @@ class WorkflowConfiguration extends AbstractConfiguration implements Configurati
             ->append($this->getGroupsNode(self::NODE_EXCLUSIVE_RECORD_GROUPS));
 
         return $nodeBuilder;
+    }
+
+    /**
+     * @return NodeDefinition
+     */
+    protected function getDisableOperationsNode()
+    {
+        $treeBuilder = new TreeBuilder();
+        $rootNode = $treeBuilder->root(self::NODE_DISABLE_OPERATIONS);
+        $rootNode->useAttributeAsKey('name')
+            ->prototype('array')
+                ->prototype('scalar')->end()
+            ->end();
+
+        return $rootNode;
     }
 
     /**
@@ -272,6 +296,15 @@ class WorkflowConfiguration extends AbstractConfiguration implements Configurati
                     ->end()
                     ->scalarNode('dialog_template')
                         ->defaultNull()
+                    ->end()
+                    ->arrayNode(self::NODE_INIT_ENTITIES)
+                        ->prototype('scalar')->end()
+                    ->end()
+                    ->arrayNode(self::NODE_INIT_ROUTES)
+                        ->prototype('scalar')->end()
+                    ->end()
+                    ->scalarNode(self::NODE_INIT_CONTEXT_ATTRIBUTE)
+                        ->defaultValue(self::DEFAULT_INIT_CONTEXT_ATTRIBUTE)
                     ->end()
                     ->append($this->getTransitionTriggers())
                 ->end()
@@ -471,6 +504,7 @@ class WorkflowConfiguration extends AbstractConfiguration implements Configurati
 
     /**
      * @param string $nodeName
+     *
      * @return NodeDefinition
      */
     protected function getGroupsNode($nodeName)

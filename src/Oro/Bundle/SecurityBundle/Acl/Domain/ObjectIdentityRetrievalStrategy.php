@@ -10,14 +10,10 @@ use Symfony\Component\Security\Acl\Exception\InvalidDomainObjectException;
  */
 class ObjectIdentityRetrievalStrategy implements ObjectIdentityRetrievalStrategyInterface
 {
-    /**
-     * @var ObjectIdentityFactory
-     */
-    protected $objectIdentityFactory = null;
+    /** @var ObjectIdentityFactory */
+    protected $objectIdentityFactory;
 
     /**
-     * Constructor
-     *
      * @param ObjectIdentityFactory $objectIdentityFactory
      */
     public function __construct(ObjectIdentityFactory $objectIdentityFactory)
@@ -30,6 +26,10 @@ class ObjectIdentityRetrievalStrategy implements ObjectIdentityRetrievalStrategy
      */
     public function getObjectIdentity($domainObject)
     {
+        if ($domainObject instanceof DomainObjectWrapper) {
+            return $domainObject->getObjectIdentity();
+        }
+
         try {
             return $this->objectIdentityFactory->get($domainObject);
         } catch (InvalidDomainObjectException $failed) {

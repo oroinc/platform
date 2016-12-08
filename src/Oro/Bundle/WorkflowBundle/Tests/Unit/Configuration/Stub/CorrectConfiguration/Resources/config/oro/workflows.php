@@ -54,6 +54,9 @@ return [
                 ]
             ]
         ],
+        'disable_operations' => [
+            'operation1' => ['entity1', 'entity2']
+        ],
         'transitions' => [
             'first_transition' => [
                 'step_to' => 'first_step',
@@ -81,6 +84,9 @@ return [
                         ]
                     ]
                 ],
+                'init_entities' => ['entity1'],
+                'init_routes' => ['route1'],
+                'init_context_attribute' => 'test_init_context',
                 'triggers' => [
                     [
                         'event' => 'create',
@@ -179,6 +185,7 @@ return [
                 'position' => []
             ]
         ],
+        'disable_operations' => [],
         'attributes' => [],
         'transitions' => [
             'second_transition' => [
@@ -197,7 +204,10 @@ return [
                 'form_options' => [],
                 'page_template' => null,
                 'dialog_template' => null,
-                'triggers' => []
+                'triggers' => [],
+                'init_entities' => [],
+                'init_routes' => [],
+                'init_context_attribute' => 'init_context',
             ]
         ],
         'transition_definitions' => [

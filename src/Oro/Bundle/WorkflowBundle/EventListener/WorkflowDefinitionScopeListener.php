@@ -29,12 +29,20 @@ class WorkflowDefinitionScopeListener
     /**
      * @param WorkflowChangesEvent $event
      */
+    public function onDeactivationWorkflowDefinition(WorkflowChangesEvent $event)
+    {
+        $this->workflowScopeManager->updateScopes($event->getDefinition(), true);
+    }
+
+    /**
+     * @param WorkflowChangesEvent $event
+     */
     public function onCreateWorkflowDefinition(WorkflowChangesEvent $event)
     {
         $definition = $event->getDefinition();
 
         if ($definition->getScopesConfig()) {
-            $this->workflowScopeManager->updateScopes($event->getDefinition());
+            $this->workflowScopeManager->updateScopes($event->getDefinition(), !$definition->isActive());
         }
     }
 
@@ -47,7 +55,7 @@ class WorkflowDefinitionScopeListener
         $originalDefinition = $event->getOriginalDefinition();
 
         if ($definition->getScopesConfig() !== $originalDefinition->getScopesConfig()) {
-            $this->workflowScopeManager->updateScopes($event->getDefinition());
+            $this->workflowScopeManager->updateScopes($event->getDefinition(), !$definition->isActive());
         }
     }
 }

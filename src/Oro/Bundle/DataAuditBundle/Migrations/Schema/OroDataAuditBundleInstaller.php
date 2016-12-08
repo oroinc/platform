@@ -4,6 +4,7 @@ namespace Oro\Bundle\DataAuditBundle\Migrations\Schema;
 
 use Doctrine\DBAL\Schema\Schema;
 
+use Oro\Bundle\DataAuditBundle\Migrations\Schema\v1_9\AddImpersonationColumn;
 use Oro\Bundle\MigrationBundle\Migration\Installation;
 use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 
@@ -14,7 +15,7 @@ class OroDataAuditBundleInstaller implements Installation
      */
     public function getMigrationVersion()
     {
-        return 'v1_8';
+        return 'v1_9';
     }
 
     /**
@@ -24,6 +25,8 @@ class OroDataAuditBundleInstaller implements Installation
     {
         $this->createAudit($schema);
         $this->createAuditField($schema);
+
+        AddImpersonationColumn::addImpersonationColumn($schema);
     }
 
     /**

@@ -4,6 +4,7 @@ namespace Oro\Bundle\UserBundle\Tests\Functional;
 
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Bundle\UserBundle\Entity\User;
+use Oro\Bundle\UserBundle\Entity\UserManager;
 
 /**
  * @dbIsolation
@@ -79,7 +80,7 @@ class ControllersResetTest extends WebTestCase
     {
         /** @var User $user */
         $user = $this->getReference('simple_user');
-        $this->assertNotTrue($user->isLoginDisabled());
+        $this->assertEquals(UserManager::STATUS_ACTIVE, $user->getAuthStatus()->getId());
 
         $crawler = $this->client->request(
             'GET',
@@ -96,22 +97,20 @@ class ControllersResetTest extends WebTestCase
         $form = $crawler->selectButton('Reset')->form();
         $this->client->submit($form);
         $result = $this->client->getResponse();
-        $this->assertContains('success', $result->getContent());
+        $this->assertContains('widget.remove', $result->getContent());
 
         $user = $this->getContainer()->get('doctrine')->getRepository('OroUserBundle:User')->find($user->getId());
-        $this->assertTrue($user->isLoginDisabled());
+        $this->assertEquals(UserManager::STATUS_EXPIRED, $user->getAuthStatus()->getId());
     }
 
     public function testMassPasswordResetAction()
     {
         /** @var User $user */
         $user = $this->getReference('simple_user');
-        $this->assertNotTrue($user->isLoginDisabled());
-        /** @var User $user */
+        /** @var User $user2 */
         $user2 = $this->getReference('simple_user2');
-        $this->assertNotTrue($user2->isLoginDisabled());
 
-        $ids = [$user->getId(), $user2->getId()];
+        $ids = [$user->getId()];
         $crawler = $this->client->request(
             'GET',
             $this->getUrl(
@@ -131,9 +130,17 @@ class ControllersResetTest extends WebTestCase
 
         $this->assertContains(
             [
-                'successful' => true
+                'successful' => true,
+                'count' => 1,
             ],
             $response
         );
+
+        $repo = $this->getContainer()->get('doctrine')->getRepository('OroUserBundle:User');
+        $user = $repo->find($user->getId());
+        $user2 = $repo->find($user2->getId());
+
+        $this->assertEquals(UserManager::STATUS_EXPIRED, $user->getAuthStatus()->getId());
+        $this->assertEquals(UserManager::STATUS_ACTIVE, $user2->getAuthStatus()->getId());
     }
 }
