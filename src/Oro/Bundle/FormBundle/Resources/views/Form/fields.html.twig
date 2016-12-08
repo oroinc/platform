@@ -685,3 +685,16 @@
         {{ form_widget(form) }}
     </div>
 {% endblock %}
+
+{% block oro_entity_tree_select_row %}
+    {{ block('form_row') }}
+{% endblock %}
+
+{% block oro_entity_tree_select_widget %}
+    <div data-page-component-module="{{ form.vars.pageComponentModule }}"
+         data-page-component-options="{{ form.vars.treeOptions|json_encode }}">
+    </div>
+
+    {{ form_widget(form) }}
+    {{ form_errors(form) }}
+{% endblock %}

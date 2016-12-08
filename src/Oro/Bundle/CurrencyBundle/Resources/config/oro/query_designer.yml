@@ -1,0 +1,11 @@
+query_designer:
+    filters:
+        string:
+            applicable: [{type: currency}]
+        number:
+            applicable: [{type: money_value}]
+    aggregates:
+        string:
+            applicable: [{type: currency}]
+        number:
+            applicable: [{type: money_value}]
