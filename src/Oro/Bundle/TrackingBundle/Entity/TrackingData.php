@@ -14,7 +14,7 @@ use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
  * @Config(
  *  defaultValues={
  *      "entity"={
- *          "icon"="icon-external-link"
+ *          "icon"="fa-external-link"
  *      }
  *  }
  * )

@@ -99,7 +99,7 @@ class OperationButton implements ButtonInterface
                 'operation' => $this->operation,
                 'params' => $this->operation->getDefinition(),
                 'actionData' => $this->data,
-
+                'buttonContext' => $this->buttonContext,
                 'frontendOptions' => $this->operation->getDefinition()->getFrontendOptions(),
                 'buttonOptions' => $this->operation->getDefinition()->getButtonOptions(),
                 'hasForm' => $this->operation->hasForm(),

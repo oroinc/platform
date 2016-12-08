@@ -253,7 +253,7 @@ class ActivityContext extends OroFeatureContext implements OroPageObjectAware, S
     public function selectUserInActivityContextSelector($needle)
     {
         $contextSelector = $this->createElement('ContextSelector');
-        $contextSelector->find('css', 'span.icon-caret-down')->click();
+        $contextSelector->find('css', 'span.fa-caret-down')->click();
         $contexts = $contextSelector->findAll('css', 'ul.context-items-dropdown li');
 
         /** @var NodeElement $context */

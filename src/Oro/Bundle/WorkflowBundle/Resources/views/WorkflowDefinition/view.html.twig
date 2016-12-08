@@ -45,7 +45,7 @@
 
             {{ UI.button({
                 'aCss':  'no-hash btn-danger',
-                'iCss':  'icon-remove',
+                'iCss':  'fa-close',
                 'id':    idButton,
                 'label': 'oro.workflow.workflowdefinition.datagrid.deactivate'|trans,
                 'path':  path('oro_api_workflow_deactivate', {'workflowDefinition': entity.name}),
@@ -70,7 +70,7 @@
 
             {{ UI.button({
                 'aCss': 'no-hash btn-success',
-                'iCss': 'icon-ok',
+                'iCss': 'fa-check',
                 'id': idButton,
                 'label': 'oro.workflow.workflowdefinition.datagrid.activate'|trans,
                 'path': path('oro_api_workflow_activate', {'workflowDefinition': entity.name}),
@@ -123,9 +123,9 @@
 
     <div class="pull-left">
         {% if isActive %}
-            <div class="badge badge-enabled status-enabled"><i class="icon-status-enabled icon-circle"></i>{{ 'Active'|trans }}</div>
+            <div class="badge badge-enabled status-enabled"><i class="icon-status-enabled fa-circle"></i>{{ 'Active'|trans }}</div>
         {% else %}
-            <div class="badge badge-disabled status-disabled"><i class="icon-status-disabled icon-circle"></i>{{ 'Inactive'|trans }}</div>
+            <div class="badge badge-disabled status-disabled"><i class="icon-status-disabled fa-circle"></i>{{ 'Inactive'|trans }}</div>
         {% endif %}
     </div>
 {% endblock breadcrumbs %}
@@ -155,7 +155,7 @@
                             {% if (translateLinks) %}
                                 {{ workflowMacros.renderGoToTranslationsIconByLink(translateLinks.transitions[transitionName].label) }}
                             {% endif %}
-                            <i class="icon-long-arrow-right"></i>
+                            <i class="fa-long-arrow-right"></i>
                             <span title="{{ "oro.workflow.workflowdefinition.transition.step_to.tooltip"|trans }}">{{ toStep.label|trans({},'workflows') }}</span>
                         </li>
                     {% endfor %}

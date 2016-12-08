@@ -26,7 +26,7 @@ use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
  * @Config(
  *      defaultValues={
  *          "entity"={
- *              "icon"="icon-tag"
+ *              "icon"="fa-tag"
  *          },
  *          "ownership"={
  *              "owner_type"="USER",

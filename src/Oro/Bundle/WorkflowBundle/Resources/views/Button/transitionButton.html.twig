@@ -15,10 +15,19 @@
     'transition-url': path(executionRoute, routeParams),
 } %}
 
+{% set transitionData = transition.frontendOptions.data|default({})|merge(transitionData) %}
 {% if hasForm and showDialog %}
     {% set transitionData = transitionData|merge({'dialog-url': path(dialogRoute, routeParams) }) %}
 {% endif %}
-
-<div class="pull-left btn-group icons-holder">
-    {{ workflowMacros.renderTransitionButton(workflow, transition, null, transitionData) }}
-</div>
+{% if not onlyLink|default(false) %}<div class="pull-left btn-group icons-holder">{% endif %}
+    {{ workflowMacros.renderTransitionButton(
+        workflow,
+        transition,
+        workflowItem|default(null),
+        transitionData,
+        onlyLink|default(false),
+        noIcon|default(false),
+        noIconText|default(false),
+        aClass|default('')
+    ) }}
+{% if not onlyLink|default(false) %}</div>{% endif %}

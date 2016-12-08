@@ -9,7 +9,7 @@ class UserMenu extends Element
 {
     public function open()
     {
-        $this->find('css', 'i.icon-sort-down')->click();
+        $this->find('css', 'i.fa-sort-desc')->click();
     }
 
     /**

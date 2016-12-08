@@ -32,14 +32,14 @@ class DictionaryTest extends OrmTestCase
         $reader         = new AnnotationReader();
         $metadataDriver = new AnnotationDriver(
             $reader,
-            'Oro\Bundle\EntityExtendBundle\Tests\Unit\Filter\Fixtures'
+            'Oro\Bundle\FilterBundle\Tests\Unit\Filter\Fixtures'
         );
 
         $this->em = $this->getTestEntityManager();
         $this->em->getConfiguration()->setMetadataDriverImpl($metadataDriver);
         $this->em->getConfiguration()->setEntityNamespaces(
             [
-                'Stub' => 'Oro\Bundle\EntityExtendBundle\Tests\Unit\Filter\Fixtures'
+                'Stub' => 'Oro\Bundle\FilterBundle\Tests\Unit\Filter\Fixtures'
             ]
         );
 

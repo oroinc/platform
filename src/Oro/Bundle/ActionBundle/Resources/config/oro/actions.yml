@@ -53,7 +53,7 @@ operations:
         frontend_options:
             title: oro.action.edit_entity
         button_options:
-            icon: icon-edit
+            icon: fa-pencil-square-o
         actions:
             - '@redirect':
                 route: $.routes[update]
@@ -83,7 +83,7 @@ operations:
                 message_parameters:
                     entityLabel: $.entityLabel
         button_options:
-            icon: icon-trash
+            icon: fa-trash-o
         actions:
             - '@run_action_group':
                 action_group: DELETE
@@ -152,7 +152,7 @@ operations:
         frontend_options:
             title: oro.action.clone_entity
         button_options:
-            icon: icon-copy
+            icon: fa-files-o
 action_groups:
     DELETE:
         parameters:

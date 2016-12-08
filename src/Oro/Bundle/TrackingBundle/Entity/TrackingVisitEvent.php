@@ -14,7 +14,7 @@ use Oro\Bundle\TrackingBundle\Model\ExtendTrackingVisitEvent;
  * @Config(
  *  defaultValues={
  *      "entity"={
- *          "icon"="icon-external-link"
+ *          "icon"="fa-external-link"
  *      }
  *  }
  * )
