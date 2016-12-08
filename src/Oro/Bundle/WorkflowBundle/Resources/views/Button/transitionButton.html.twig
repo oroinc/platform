@@ -10,8 +10,6 @@
     group: context.group,
 } %}
 
-{% set transitionData = transition.frontendOptions.data|default({})|merge(transitionData) %}
-
 {# Show button for start or transit workflow #}
 {% set transitionMessage = transition.message|trans({},'workflows') %}
 {% if transitionMessage == transition.message %}
@@ -25,6 +23,8 @@
     'transition-condition-messages': context.errors,
     'enabled': context.enabled
 } %}
+
+{% set transitionData = transition.frontendOptions.data|default({})|merge(transitionData) %}
 
 {% if transition.displayType == 'dialog' %}
     {% if transition.hasForm() %}
