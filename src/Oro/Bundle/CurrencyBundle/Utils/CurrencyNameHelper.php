@@ -2,13 +2,12 @@
 
 namespace Oro\Bundle\CurrencyBundle\Utils;
 
-use Symfony\Component\Intl\Intl;
-
 use Oro\Bundle\CurrencyBundle\Entity\Price;
-use Oro\Bundle\CurrencyBundle\Provider\CurrencyProviderInterface;
+use Oro\Bundle\CurrencyBundle\Provider\CurrencyListProviderInterface;
 use Oro\Bundle\CurrencyBundle\Provider\ViewTypeProviderInterface;
 use Oro\Bundle\LocaleBundle\Formatter\NumberFormatter;
 use Oro\Bundle\LocaleBundle\Model\LocaleSettings;
+use Symfony\Component\Intl\Intl;
 
 class CurrencyNameHelper
 {
@@ -18,22 +17,26 @@ class CurrencyNameHelper
     /** @var \Symfony\Component\Intl\ResourceBundle\CurrencyBundleInterface  */
     protected $intlCurrencyBundle;
 
-    /**
-     * @var NumberFormatter
-     */
+    /** @var NumberFormatter */
     protected $formatter;
 
+    /**
+     * @param LocaleSettings $localeSettings
+     * @param NumberFormatter $formatter
+     * @param ViewTypeProviderInterface $viewTypeProvider
+     * @param CurrencyListProviderInterface $currencyListProvider
+     */
     public function __construct(
         LocaleSettings $localeSettings,
         NumberFormatter $formatter,
         ViewTypeProviderInterface $viewTypeProvider,
-        CurrencyProviderInterface $currencyProvider
+        CurrencyListProviderInterface $currencyListProvider
     ) {
-        $this->viewTypeProvider     = $viewTypeProvider;
-        $this->localeSettings       = $localeSettings;
-        $this->formatter            = $formatter;
-        $this->currencyProvider     = $currencyProvider;
-        $this->intlCurrencyBundle   = Intl::getCurrencyBundle();
+        $this->viewTypeProvider = $viewTypeProvider;
+        $this->localeSettings = $localeSettings;
+        $this->formatter = $formatter;
+        $this->currencyProvider = $currencyListProvider;
+        $this->intlCurrencyBundle = Intl::getCurrencyBundle();
     }
 
     /**
@@ -76,10 +79,11 @@ class CurrencyNameHelper
                 }
                 break;
             case ViewTypeProviderInterface::VIEW_TYPE_FULL_NAME:
+                $currencyName = $this->intlCurrencyBundle->getCurrencyName($currencyIsoCode, $locale);
                 $currencyName = sprintf(
                     "%s (%s)",
-                    $this->intlCurrencyBundle->getCurrencyName($currencyIsoCode, $locale),
-                    $currencyIsoCode
+                    $currencyName,
+                    $this->getCurrencyName($currencyIsoCode, $this->viewTypeProvider->getViewType())
                 );
                 break;
             case ViewTypeProviderInterface::VIEW_TYPE_NAME:
