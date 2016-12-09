@@ -7,17 +7,13 @@ use Assetic\Factory\AssetFactory;
 use Assetic\Filter\DependencyExtractorInterface;
 use Assetic\Filter\ScssphpFilter;
 
-use Leafo\ScssPhp\Exception\CompilerException;
-
-use Psr\Log\LoggerInterface;
-
 class ScssphpFilterDecorator implements DependencyExtractorInterface
 {
     /** @var ScssphpFilter */
     private $scssphpFilter;
 
-    /** @var LoggerInterface */
-    private $logger;
+    /** @var boolean */
+    private $skipFilterLoading = false;
 
     /**
      * @param ScssphpFilter $scssphpFilter
@@ -28,23 +24,68 @@ class ScssphpFilterDecorator implements DependencyExtractorInterface
     }
 
     /**
-     * @param LoggerInterface $logger
-     *
-     * @return ScssphpFilterDecorator
+     * @param bool $enable
      */
-    public function setLogger(LoggerInterface $logger)
+    public function enableCompass($enable = true)
     {
-        $this->logger = $logger;
-
-        return $this;
+        $this->scssphpFilter->enableCompass($enable);
     }
 
     /**
-     * {@inheritdoc}
+     * @return boolean
      */
-    public function getChildren(AssetFactory $factory, $content, $loadPath = null)
+    public function isCompassEnabled()
     {
-        return $this->scssphpFilter->getChildren($factory, $content, $loadPath);
+        return $this->scssphpFilter->isCompassEnabled();
+    }
+
+    /**
+     * @param string $formatter
+     */
+    public function setFormatter($formatter)
+    {
+        $this->scssphpFilter->setFormatter($formatter);
+    }
+
+    /**
+     * @param array $variables
+     */
+    public function setVariables(array $variables)
+    {
+        $this->scssphpFilter->setVariables($variables);
+    }
+
+    /**
+     * @param mixed $variable
+     */
+    public function addVariable($variable)
+    {
+        $this->scssphpFilter->addVariable($variable);
+    }
+
+    /**
+     * @param array $paths
+     */
+    public function setImportPaths(array $paths)
+    {
+        $this->scssphpFilter->setImportPaths($paths);
+    }
+
+    /**
+     * @param string $path
+     */
+    public function addImportPath($path)
+    {
+        $this->scssphpFilter->addImportPath($path);
+    }
+
+    /**
+     * @param string $name
+     * @param callable $callable
+     */
+    public function registerFunction($name, $callable)
+    {
+        $this->scssphpFilter->registerFunction($name, $callable);
     }
 
     /**
@@ -52,13 +93,8 @@ class ScssphpFilterDecorator implements DependencyExtractorInterface
      */
     public function filterLoad(AssetInterface $asset)
     {
-        try {
+        if (!$this->skipFilterLoading) {
             $this->scssphpFilter->filterLoad($asset);
-        } catch (CompilerException $e) {
-            $this->logger->debug(
-                sprintf('Error in method %s::filterLoad() with message: %s', ScssphpFilter::class, $e->getMessage()),
-                ['asset' => ['sourcePath' => $asset->getSourcePath()]]
-            );
         }
     }
 
@@ -68,5 +104,17 @@ class ScssphpFilterDecorator implements DependencyExtractorInterface
     public function filterDump(AssetInterface $asset)
     {
         $this->scssphpFilter->filterDump($asset);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getChildren(AssetFactory $factory, $content, $loadPath = null)
+    {
+        $this->skipFilterLoading = true;
+        $children = $this->scssphpFilter->getChildren($factory, $content, $loadPath);
+        $this->skipFilterLoading = false;
+
+        return $children;
     }
 }
