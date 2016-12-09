@@ -95,14 +95,6 @@ abstract class WebTestCase extends BaseWebTestCase
             $this->rollbackTransaction();
             self::$loadedFixtures = [];
         }
-
-        $refClass = new \ReflectionClass($this);
-        foreach ($refClass->getProperties() as $prop) {
-            if (!$prop->isStatic() && 0 !== strpos($prop->getDeclaringClass()->getName(), 'PHPUnit_')) {
-                $prop->setAccessible(true);
-                $prop->setValue($this, null);
-            }
-        }
     }
 
     public static function setUpBeforeClass()
