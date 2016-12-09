@@ -3,6 +3,7 @@
 namespace Oro\Bundle\ActionBundle\Provider;
 
 use Oro\Bundle\ActionBundle\Button\ButtonInterface;
+use Oro\Bundle\ActionBundle\Button\ButtonsCollection;
 use Oro\Bundle\ActionBundle\Button\ButtonSearchContext;
 use Oro\Bundle\ActionBundle\Extension\ButtonProviderExtensionInterface;
 
@@ -21,28 +22,52 @@ class ButtonProvider
 
     /**
      * @param ButtonSearchContext $searchContext
+     * @return ButtonsCollection
+     */
+    public function match(ButtonSearchContext $searchContext)
+    {
+        $collection = new ButtonsCollection();
+
+        foreach ($this->extensions as $extension) {
+            $collection->consume($extension, $searchContext);
+        }
+
+        return $collection;
+    }
+
+    /**
+     * @param ButtonSearchContext $searchContext
+     * @return ButtonInterface[]
+     */
+    public function findAvailable(ButtonSearchContext $searchContext)
+    {
+        $storage = $this->match($searchContext)->filter(
+            function (ButtonInterface $button, ButtonProviderExtensionInterface $extension) use ($searchContext) {
+                return $extension->isAvailable($button, $searchContext);
+            }
+        );
+
+        return $storage->toList();
+    }
+
+    /**
+     * @param ButtonSearchContext $searchContext
      * @return ButtonInterface[]
      */
     public function findAll(ButtonSearchContext $searchContext)
     {
-        if (0 === count($this->extensions)) {
-            return [];
-        }
+        $mapped = $this->match($searchContext)->map(
+            function (ButtonInterface $button, ButtonProviderExtensionInterface $extension) use ($searchContext) {
+                $newButton = clone $button;
+                $newButton->getButtonContext()->setEnabled(
+                    $extension->isAvailable($newButton, $searchContext)
+                );
 
-        $buttonsData = [];
-        foreach ($this->extensions as $extension) {
-            $buttonsData[] = $extension->find($searchContext);
-        }
-        $buttons = call_user_func_array('array_merge', $buttonsData);
-
-        usort(
-            $buttons,
-            function (ButtonInterface $a, ButtonInterface $b) {
-                return $a->getOrder() - $b->getOrder();
+                return $newButton;
             }
         );
 
-        return $buttons;
+        return $mapped->toList();
     }
 
     /**
