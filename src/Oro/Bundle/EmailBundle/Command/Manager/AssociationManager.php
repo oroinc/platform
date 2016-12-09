@@ -124,9 +124,9 @@ class AssociationManager
     {
         $ownerQb = $this->createOwnerQb($ownerClassName, $ownerId);
         $owners = $this->getOwnerIterator($ownerQb);
-        $dependenceJob = null;
         $countNewJob = 0;
         foreach ($owners as $owner) {
+            $dependenceJob = null;
             $emailsQB = $this->emailOwnersProvider->getQBEmailsByOwnerEntity($owner);
 
             /** @var QueryBuilder $emailQB */

@@ -81,6 +81,7 @@ define([
         defaultMessages: {
             confirm_title: 'Execution Confirmation',
             confirm_content: 'Are you sure you want to do this?',
+            confirm_content_params: {},
             confirm_ok: 'Yes, do it',
             confirm_cancel: 'Cancel',
             success: 'Action performed.',
@@ -332,7 +333,7 @@ define([
          * @return {String}
          */
         getConfirmContentMessage: function() {
-            return __(this.messages.confirm_content);
+            return __(this.messages.confirm_content, this.messages.confirm_content_params);
         },
 
         /**

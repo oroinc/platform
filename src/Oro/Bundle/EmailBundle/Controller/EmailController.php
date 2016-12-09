@@ -189,10 +189,16 @@ class EmailController extends Controller
      */
     public function threadWidgetAction(Email $entity)
     {
-        $emails = $this->get('oro_email.email.thread.provider')->getThreadEmails(
-            $this->get('doctrine')->getManager(),
-            $entity
-        );
+        $emails = [];
+        if ($this->getRequest()->get('showSingleEmail', false)) {
+            $emails[] = $entity;
+        } else {
+            $emails = $this->get('oro_email.email.thread.provider')->getThreadEmails(
+                $this->get('doctrine')->getManager(),
+                $entity
+            );
+        }
+
         $emails = array_filter($emails, function ($email) {
             return $this->get('security.context')->isGranted('VIEW', $email);
         });
