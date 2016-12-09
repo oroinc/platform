@@ -116,6 +116,10 @@ datagrid:
         options:
             entityHint: channel
             entity_pagination: true
+            mass_actions:
+                delete:
+                    enabled: false
+
     oro-integration-status-grid:
         acl_resource: oro_integration_view
         source:
