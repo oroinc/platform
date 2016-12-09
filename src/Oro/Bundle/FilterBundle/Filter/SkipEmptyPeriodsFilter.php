@@ -4,9 +4,18 @@ namespace Oro\Bundle\FilterBundle\Filter;
 
 use Oro\Bundle\FilterBundle\Datasource\FilterDatasourceAdapterInterface;
 use Oro\Bundle\FilterBundle\Form\Type\Filter\SkipEmptyPeriodsFilterType;
+use Symfony\Component\Form\FormFactoryInterface;
 
 class SkipEmptyPeriodsFilter extends ChoiceFilter
 {
+    /** @var bool */
+    protected $active = false;
+
+    public function __construct(FormFactoryInterface $factory, FilterUtility $util)
+    {
+        parent::__construct($factory, $util);
+    }
+
     /**
      * {@inheritdoc}
      */
@@ -16,11 +25,25 @@ class SkipEmptyPeriodsFilter extends ChoiceFilter
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    protected function buildExpr(FilterDatasourceAdapterInterface $ds, $comparisonType, $fieldName, $data)
+    public function apply(FilterDatasourceAdapterInterface $ds, $data)
     {
-        //TODO: Create the query for grouping the result by day
-        return parent::buildExpr($ds, $comparisonType, $fieldName, $data);
+        $data = $this->parseData($data);
+        if (!$data || !array_key_exists('value', $data) || !is_array($data['value'])) {
+            return false;
+        }
+
+        $this->active = true;
+
+        return true;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isActive()
+    {
+        return $this->active;
     }
 }
