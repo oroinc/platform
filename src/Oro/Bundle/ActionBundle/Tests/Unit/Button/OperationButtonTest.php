@@ -24,9 +24,7 @@ class OperationButtonTest extends \PHPUnit_Framework_TestCase
      */
     protected function setUp()
     {
-        $this->operation = $this->getMockBuilder(Operation::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->operation = $this->getOperationMock();
 
         $this->button = new OperationButton($this->operation, new ButtonContext(), new ActionData());
     }
@@ -37,6 +35,37 @@ class OperationButtonTest extends \PHPUnit_Framework_TestCase
     protected function tearDown()
     {
         unset($this->operation, $this->button);
+    }
+
+    public function testGetName()
+    {
+        $name = 'test_name';
+        $this->operation->expects($this->once())->method('getName')->willReturn($name);
+
+        $this->assertEquals($name, $this->button->getName());
+    }
+
+    public function testGetLabel()
+    {
+        $label = 'test_label';
+        $definition = $this->getMockBuilder(OperationDefinition::class)->disableOriginalConstructor()->getMock();
+        $definition->expects($this->once())->method('getLabel')->willReturn($label);
+
+        $this->assertOperationMethodsCalled($definition);
+        $this->assertEquals($label, $this->button->getLabel());
+    }
+
+    public function testGetIcon()
+    {
+        $definition = $this->getMockBuilder(OperationDefinition::class)->disableOriginalConstructor()->getMock();
+        $this->assertOperationMethodsCalled($definition);
+
+        $this->assertNull($this->button->getIcon());
+
+        $icon = 'test-icon';
+        $definition->expects($this->once())->method('getButtonOptions')->willReturn(['icon' => $icon]);
+
+        $this->assertEquals($icon, $this->button->getIcon());
     }
 
     public function testGetOrder()
@@ -82,7 +111,8 @@ class OperationButtonTest extends \PHPUnit_Framework_TestCase
                     'params' => new OperationDefinition(),
                     'aClass' => '',
                     'actionData' => new ActionData(),
-                    'buttonContext' => new ButtonContext()
+                    'buttonContext' => new ButtonContext(),
+                    'additionalData' => []
                 ],
             ],
         ];

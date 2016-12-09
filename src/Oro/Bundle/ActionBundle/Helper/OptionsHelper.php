@@ -4,6 +4,7 @@ namespace Oro\Bundle\ActionBundle\Helper;
 
 use Symfony\Component\Translation\TranslatorInterface;
 
+use Oro\Bundle\ActionBundle\Button\ButtonInterface;
 use Oro\Bundle\ActionBundle\Model\ActionData;
 use Oro\Bundle\ActionBundle\Model\Operation;
 use Oro\Bundle\ActionBundle\Model\OptionsAssembler;
@@ -49,18 +50,18 @@ class OptionsHelper
     }
 
     /**
-     * @param Operation $operation
-     * @param array $context
+     * @param ButtonInterface $button
      * @return array
      */
-    public function getFrontendOptions(Operation $operation, array $context = null)
+    public function getFrontendOptions(ButtonInterface $button)
     {
-        $actionContext = $this->contextHelper->getContext($context);
-        $actionData = $this->contextHelper->getActionData($actionContext);
+        //TODO: will be fixed in https://magecore.atlassian.net/browse/BAP-12873
+        //$actionContext = $this->contextHelper->getContext($context);
+        //$actionData = $this->contextHelper->getActionData($actionContext);
 
         return [
-            'options' => $this->createOptions($operation, $actionData, $actionContext),
-            'data' => $this->createData($operation, $actionData)
+            'options' => [],//$this->createOptions($operation, $actionData, $actionContext),
+            'data' => []//$this->createData($operation, $actionData)
         ];
     }
 
