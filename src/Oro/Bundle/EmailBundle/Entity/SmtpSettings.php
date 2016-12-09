@@ -46,14 +46,14 @@ class SmtpSettings
     /**
      * @var string
      *
-     * @ORM\Column(name="host", type="string", length=255, nullable=false)
+     * @ORM\Column(name="host", type="string", length=255, nullable=true)
      */
     protected $host;
 
     /**
      * @var string
      *
-     * @ORM\Column(name="port", type="integer", length=10, nullable=false)
+     * @ORM\Column(name="port", type="integer", length=10, nullable=true)
      */
     protected $port;
 
@@ -62,7 +62,7 @@ class SmtpSettings
      *
      * @var string
      *
-     * @ORM\Column(name="encryption", type="string", length=3, nullable=false)
+     * @ORM\Column(name="encryption", type="string", length=3, nullable=true)
      */
     protected $encryption;
 

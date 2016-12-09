@@ -38,3 +38,22 @@ Oro\Bundle\EmailBundle\Entity\Mailbox:
     properties:
         origin:
             - Oro\Bundle\EmailBundle\Validator\Constraints\MailboxOrigin: ~
+
+Oro\Bundle\EmailBundle\Entity\SmtpSettings:
+    properties:
+        host:
+            - NotBlank: ~
+            - Length:
+                min: 3
+                max: 255
+        port:
+            - NotBlank: ~
+            - Type:
+                type: integer
+        encryption:
+            - Choice:
+                choices: [ssl, tls]
+        username:
+            - NotBlank: ~
+            - Type:
+                type: string

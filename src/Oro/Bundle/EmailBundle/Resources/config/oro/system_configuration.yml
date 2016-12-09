@@ -13,6 +13,10 @@ system_configuration:
             title: oro.email.system_configuration.email_settings
             priority: 130
 
+        smtp_settings:
+            title: oro.email.system_configuration.smtp_settings
+            priority: 125
+
         email_autocomplete_configuration:
             title: oro.email.system_configuration.email_autocomplete_configuration.label
             priority: 120
@@ -98,6 +102,41 @@ system_configuration:
                 label: false
                 required: false
                 resettable: false
+
+        oro_email.smtp_settings_host:
+            data_type: string
+            type: text
+            options:
+                label: oro.email.system_configuration.smtp_settings.host.label
+
+        oro_email.smtp_settings_port:
+            data_type: number
+            type: number
+            options:
+                label: oro.email.system_configuration.smtp_settings.port.label
+
+        oro_email.smtp_settings_encryption:
+            data_type: string
+            type: choice
+            options:
+                label: oro.email.system_configuration.smtp_settings.encryption.label
+                choices:
+                    #'': oro.email.system_configuration.smtp_settings.encryption.empty.label
+                    ssl: oro.email.system_configuration.smtp_settings.encryption.ssl.label
+                    tls: oro.email.system_configuration.smtp_settings.encryption.tls.label
+
+        oro_email.smtp_settings_username:
+            data_type: string
+            type: text
+            options:
+                label: oro.email.system_configuration.smtp_settings.username.label
+
+        oro_email.smtp_settings_password:
+            data_type: string
+            type: password
+            options:
+                label: oro.email.system_configuration.smtp_settings.password.label
+
         oro_email.show_recent_emails_in_user_bar:
             data_type: boolean
             type: oro_config_checkbox
@@ -166,6 +205,13 @@ system_configuration:
                                     email_settings:
                                         children:
                                             - oro_email.feature_enabled
+                                    smtp_settings:
+                                        children:
+                                            - oro_email.smtp_settings_host
+                                            - oro_email.smtp_settings_port
+                                            - oro_email.smtp_settings_encryption
+                                            - oro_email.smtp_settings_username
+                                            - oro_email.smtp_settings_password
                                     email_autocomplete_configuration:
                                         children:
                                             - oro_email.minimum_input_length

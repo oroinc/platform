@@ -25,6 +25,8 @@ parameters:
     oro_email.form.type.mailbox_grid.class:               Oro\Bundle\EmailBundle\Form\Type\MailboxGridType
     oro_email.form.type.mailbox.class:                    Oro\Bundle\EmailBundle\Form\Type\MailboxType
     oro_email.form.handler.mailbox.class:                 Oro\Bundle\EmailBundle\Form\Handler\MailboxHandler
+    oro_email.form.type.smtp_settings.class:              Oro\Bundle\EmailBundle\Form\Type\SmtpSettingsType
+    oro_email.form.handler.smtp_settings.class:           Oro\Bundle\EmailBundle\Form\Handler\SmtpSettingsHandler
     oro_email.form.factory.class:                         Oro\Bundle\EmailBundle\Form\Model\Factory
     oro_email.form.type.email_folder_tree.class:          Oro\Bundle\EmailBundle\Form\Type\EmailFolderTreeType
     oro_email.form.type.filter.originfolder.class:        Oro\Bundle\EmailBundle\Form\Type\Filter\ChoiceOriginFolderFilterType
@@ -234,6 +236,29 @@ services:
             - '@request'
             - '@doctrine'
             - '@oro_email.mailbox.process_storage'
+            - '@event_dispatcher'
+
+    oro_email.form.type.smtp_settings:
+        class: %oro_email.form.type.smtp_settings.class%
+        arguments:
+            - '@oro_security.encoder.mcrypt'
+        tags:
+            - { name: form.type, alias: oro_email_smtp_settings }
+
+    oro_email.form.smtp_settings:
+        class: Symfony\Component\Form\Form
+        factory: [@form.factory, createNamed]
+        arguments:
+            - "oro_email_smtp_settings"
+            - "oro_email_smtp_settings"
+
+    oro_email.form.handler.smtp_settings:
+        class: %oro_email.form.handler.smtp_settings.class%
+        scope: request
+        arguments:
+            - '@request'
+            - '@oro_email.form.smtp_settings'
+            - '@doctrine'
             - '@event_dispatcher'
 
     oro_email.form.factory:
