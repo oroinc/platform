@@ -10,12 +10,12 @@ use Doctrine\ORM\Event\PostFlushEventArgs;
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
 use Doctrine\ORM\UnitOfWork;
 
+use Symfony\Component\PropertyAccess\PropertyAccessor;
+
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\PlatformBundle\EventListener\OptionalListenerInterface;
 use Oro\Bundle\SearchBundle\Engine\IndexerInterface;
 use Oro\Bundle\SearchBundle\Provider\SearchMappingProvider;
-
-use Oro\Component\PropertyAccess\PropertyAccessor;
 
 class IndexListener implements OptionalListenerInterface
 {
@@ -63,12 +63,16 @@ class IndexListener implements OptionalListenerInterface
     /**
      * @param DoctrineHelper $doctrineHelper
      * @param IndexerInterface $searchIndexer
+     * @param PropertyAccessor $propertyAccessor
      */
-    public function __construct(DoctrineHelper $doctrineHelper, IndexerInterface $searchIndexer)
-    {
+    public function __construct(
+        DoctrineHelper $doctrineHelper,
+        IndexerInterface $searchIndexer,
+        PropertyAccessor $propertyAccessor
+    ) {
         $this->doctrineHelper   = $doctrineHelper;
         $this->searchIndexer    = $searchIndexer;
-        $this->propertyAccessor = new PropertyAccessor();
+        $this->propertyAccessor = $propertyAccessor;
     }
 
     /**

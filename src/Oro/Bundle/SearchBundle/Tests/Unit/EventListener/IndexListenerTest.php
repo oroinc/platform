@@ -7,6 +7,8 @@ use Doctrine\ORM\Event\OnFlushEventArgs;
 use Doctrine\ORM\Event\PostFlushEventArgs;
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
 
+use Symfony\Component\PropertyAccess\PropertyAccessor;
+
 use Oro\Bundle\SearchBundle\Engine\IndexerInterface;
 use Oro\Bundle\SearchBundle\EventListener\IndexListener;
 use Oro\Bundle\SearchBundle\Provider\SearchMappingProvider;
@@ -218,7 +220,7 @@ class IndexListenerTest extends \PHPUnit_Framework_TestCase
      */
     protected function createListener()
     {
-        $listener = new IndexListener($this->doctrineHelper, $this->searchIndexer);
+        $listener = new IndexListener($this->doctrineHelper, $this->searchIndexer, new PropertyAccessor());
         $listener->setEntitiesConfig($this->entitiesMapping);
 
         $eventDispatcher = $this->getMockBuilder('Symfony\Component\EventDispatcher\EventDispatcher')

@@ -59,6 +59,7 @@ services:
         arguments:
             - '@oro_entity.doctrine_helper'
             - '@oro_search.async.indexer'
+            - '@property_accessor'
         calls:
             - [setEntitiesConfig, [%oro_search.entities_config%]]
             - [setMappingProvider,  ['@oro_search.provider.search_mapping']]
