@@ -45,7 +45,7 @@ class DateGroupingFilter extends ChoiceFilter
                 $this->addFilter(DateGroupingFilterType::TYPE_YEAR, $qb);
                 $qb->addSelect(
                     sprintf(
-                        "CONCAT(%s, ' ', %s, ' ', %s) as $columnName",
+                        "CONCAT(%s, '-', %s, '-', %s) as $columnName",
                         $this->groupingNames[DateGroupingFilterType::TYPE_DAY],
                         $this->groupingNames[DateGroupingFilterType::TYPE_MONTH],
                         $this->groupingNames[DateGroupingFilterType::TYPE_YEAR]
@@ -57,7 +57,7 @@ class DateGroupingFilter extends ChoiceFilter
                 $this->addFilter(DateGroupingFilterType::TYPE_YEAR, $qb);
                 $qb->addSelect(
                     sprintf(
-                        "CONCAT(%s, ' ', %s) as $columnName",
+                        "CONCAT(%s, '-', %s) as $columnName",
                         $this->groupingNames[DateGroupingFilterType::TYPE_MONTH],
                         $this->groupingNames[DateGroupingFilterType::TYPE_YEAR]
                     )
@@ -68,7 +68,7 @@ class DateGroupingFilter extends ChoiceFilter
                 $this->addFilter(DateGroupingFilterType::TYPE_YEAR, $qb);
                 $qb->addSelect(
                     sprintf(
-                        "CONCAT(%s, ' ', %s) as $columnName",
+                        "CONCAT(%s, '-', %s) as $columnName",
                         $this->groupingNames[DateGroupingFilterType::TYPE_QUARTER],
                         $this->groupingNames[DateGroupingFilterType::TYPE_YEAR]
                     )

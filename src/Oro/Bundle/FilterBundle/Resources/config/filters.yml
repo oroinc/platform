@@ -188,6 +188,6 @@ services:
         arguments:
             - '@form.factory'
             - '@oro_filter.filter_utility'
-            - '@oro_filter.date_filter_utility'
+            - '@event_dispatcher'
         tags:
             - { name: oro_filter.extension.orm_filter.filter, type: skip_empty_periods, datasource: orm }
