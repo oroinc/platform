@@ -42,11 +42,6 @@ interface ButtonInterface
      */
     public function getTemplateData(array $customData = []);
 
-//    /**
-//     * @return array
-//     */
-//    public function getDatagridData();
-
     /**
      * @return ButtonContext
      */

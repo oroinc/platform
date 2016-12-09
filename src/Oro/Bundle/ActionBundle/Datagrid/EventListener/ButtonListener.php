@@ -202,8 +202,7 @@ class ButtonListener
             return false;
         }
 
-        //TODO should be refactored in https://magecore.atlassian.net/browse/BAP-12873
-        $frontendOptions = $this->optionsHelper->getFrontendOptions($button, $this->contextHelper->getContext());
+        $frontendOptions = $this->optionsHelper->getFrontendOptions($button);
 
         return array_merge($frontendOptions['options'], $frontendOptions['data']);
     }
@@ -242,8 +241,7 @@ class ButtonListener
      */
     protected function getRowsActionsConfig(ButtonInterface $button)
     {
-        $icon = !empty($buttonOptions['icon']) ? str_ireplace('icon-', '', $buttonOptions['icon']) : 'pencil-square-o';
-        $icon = $button->getIcon() ? str_ireplace('fa-', '', $button->getIcon()) : 'edit';
+        $icon = $button->getIcon() ? str_ireplace('fa-', '', $button->getIcon()) : 'pencil-square-o';
 
         $config = array_merge(
             [
@@ -275,21 +273,20 @@ class ButtonListener
                 continue;
             }
 
-            $operation = $button->getOperation();
-            $datagridOptions = $operation->getDefinition()->getDatagridOptions();
+            $datagridOptions = $button->getOperation()->getDefinition()->getDatagridOptions();
 
             if (!empty($datagridOptions['mass_action_provider'])) {
                 $provider = $this->providerRegistry->getProvider($datagridOptions['mass_action_provider']);
 
                 if ($provider) {
                     foreach ($provider->getActions() as $name => $massAction) {
-                        $actions[$operation->getName() . $name] = $massAction;
+                        $actions[$button->getName() . $name] = $massAction;
                     }
                 }
             } elseif (!empty($datagridOptions['mass_action'])) {
-                $actions[$operation->getName()] = array_merge(
+                $actions[$button->getName()] = array_merge(
                     [
-                        'label' => $operation->getDefinition()->getLabel()
+                        'label' => $button->getLabel()
                     ],
                     $datagridOptions['mass_action']
                 );
