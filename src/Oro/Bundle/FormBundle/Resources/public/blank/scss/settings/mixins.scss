@@ -90,5 +90,12 @@
             @content;
         }
     }
+
+    @else if $state == 'disabled' {
+        &.disabled,
+        &:disabled {
+            @content;
+        }
+    }
 }
 
