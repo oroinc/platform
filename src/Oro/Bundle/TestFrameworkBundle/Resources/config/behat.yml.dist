@@ -25,6 +25,8 @@ default: &default
                 - Oro\Bundle\ActivityListBundle\Tests\Behat\Context\ActivityContext
                 - Oro\Bundle\DataGridBundle\Tests\Behat\Context\GridContext
                 - Oro\Bundle\SecurityBundle\Tests\Behat\Context\ACLContext
+                - Oro\Bundle\SearchBundle\Tests\Behat\Context\SearchContext
+                - Oro\Bundle\ImportExportBundle\Tests\Behat\Context\ImportExportContext
     suites: []
 
 selenium2:
