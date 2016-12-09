@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\ImportExportBundle\Async;
+namespace Oro\Bundle\ImportExportBundle\Async\Import;
 
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\ImportExportBundle\Handler\CliImportHandler;
@@ -14,8 +14,9 @@ use Oro\Component\MessageQueue\Transport\MessageInterface;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
 use Oro\Component\MessageQueue\Util\JSON;
 use Psr\Log\LoggerInterface;
+use Oro\Bundle\ImportExportBundle\Async\Topics;
 
-class CliImportValidationMessageProcessor implements MessageProcessorInterface, TopicSubscriberInterface
+class CliImportMessageProcessor implements MessageProcessorInterface, TopicSubscriberInterface
 {
     /**
      * @var CliImportHandler
@@ -65,14 +66,15 @@ class CliImportValidationMessageProcessor implements MessageProcessorInterface, 
         $body = array_replace_recursive([
             'fileName' => null,
             'notifyEmail' => null,
-            'jobName' => JobExecutor::JOB_VALIDATE_IMPORT_FROM_CSV,
+            'jobName' => JobExecutor::JOB_IMPORT_FROM_CSV,
             'processorAlias' => null,
             'options' => []
         ], $body);
 
-        if (! $body['processorAlias'] || ! $body['fileName'] || ! $body['notifyEmail']) {
+
+        if (! $body['processorAlias'] || ! $body['fileName']) {
             $this->logger->critical(
-                sprintf('Invalid message:  %s', $body),
+                sprintf('Invalid message: %s', $body),
                 ['message' => $message]
             );
 
@@ -81,19 +83,20 @@ class CliImportValidationMessageProcessor implements MessageProcessorInterface, 
 
         $result = $this->jobRunner->runUnique(
             $message->getMessageId(),
-            sprintf('oro:import_validation:cli:%s:%s', $body['processorAlias'], $message->getMessageId()),
+            sprintf('oro:import:cli:%s:%s', $body['processorAlias'], $message->getMessageId()),
             function () use ($body) {
                 $this->cliImportHandler->setImportingFileName($body['fileName']);
 
-                $result = $this->cliImportHandler->handleImportValidation(
+                $result = $this->cliImportHandler->handleImport(
                     $body['jobName'],
                     $body['processorAlias'],
+                    $body['inputFormat'],
+                    $body['inputFilePrefix'],
                     $body['options']
                 );
 
                 $summary = sprintf(
-                    'Import validation from file %s for the %s is completed,
-                    success: %s, counts: %d, errors: %d, message: %s',
+                    'Import from file %s for the %s is completed, success: %s, counts: %d, errors: %d, message: %s',
                     $body['fileName'],
                     $result['success'],
                     $result['counts'],
@@ -103,18 +106,20 @@ class CliImportValidationMessageProcessor implements MessageProcessorInterface, 
 
                 $this->logger->info($summary);
 
-                $fromEmail = $this->configManager->get('oro_notification.email_notification_sender_email');
-                $fromName = $this->configManager->get('oro_notification.email_notification_sender_name');
-                $this->producer->send(
-                    NotificationTopics::SEND_NOTIFICATION_EMAIL,
-                    [
-                        'fromEmail' => $fromEmail,
-                        'fromName' => $fromName,
-                        'toEmail' => $body['notifyEmail'],
-                        'subject' => $result['message'],
-                        'body' => $summary
-                    ]
-                );
+                if ($body['notifyEmail']) {
+                    $fromEmail = $this->configManager->get('oro_notification.email_notification_sender_email');
+                    $fromName = $this->configManager->get('oro_notification.email_notification_sender_name');
+                    $this->producer->send(
+                        NotificationTopics::SEND_NOTIFICATION_EMAIL,
+                        [
+                            'fromEmail' => $fromEmail,
+                            'fromName' => $fromName,
+                            'toEmail' => $body['notifyEmail'],
+                            'subject' => $result['message'],
+                            'body' => $summary
+                        ]
+                    );
+                }
 
                 return $result['success'];
             }
@@ -128,6 +133,6 @@ class CliImportValidationMessageProcessor implements MessageProcessorInterface, 
      */
     public static function getSubscribedTopics()
     {
-        return [Topics::IMPORT_CLI_VALIDATION];
+        return [Topics::IMPORT_CLI];
     }
 }
