@@ -20,7 +20,8 @@
     {% set action %}
         <% if (editable) { %>
         <a href="#" class="action item-edit-button"
-           title="{{ 'oro.note.note_update'|trans({'{{ entity }}': entityName}) }}">
+           title="{{ 'oro.note.note_update'|trans({'{{ entity }}': entityName}) }}"
+           data-action-extra-options="{{ {dialogOptions: {width: 1000}}|json_encode }}">
             <i class="fa-pencil-square-o hide-text">{{ 'oro.note.note_update'|trans({'{{ entity }}': entityName}) }}</i>
             {{ 'oro.note.note_update'|trans({'{{ entity }}': entityName}) }}
         </a>

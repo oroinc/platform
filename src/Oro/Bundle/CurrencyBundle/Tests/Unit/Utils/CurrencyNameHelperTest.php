@@ -51,8 +51,11 @@ class CurrencyNameHelperTest extends \PHPUnit_Framework_TestCase implements View
             new CurrencyListProviderStub()
         );
 
-        $this->viewType = ViewTypeProviderInterface::VIEW_TYPE_FULL_NAME;
-        $this->assertEquals('US Dollar (USD)', $currencyNameHelper->getCurrencyName('USD'));
+        $this->viewType = ViewTypeProviderInterface::VIEW_TYPE_ISO_CODE;
+        $this->assertEquals(
+            'US Dollar (USD)',
+            $currencyNameHelper->getCurrencyName('USD', ViewTypeProviderInterface::VIEW_TYPE_FULL_NAME)
+        );
     }
 
     public function testGetCurrencyNameForFrenchLocale()

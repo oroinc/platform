@@ -122,17 +122,18 @@ class CurrencySelectionTypeTest extends FormIntegrationTestCase
     public function submitDataProvider()
     {
         $currencyBundle = Intl::getCurrencyBundle();
-
+        $usdName = $currencyBundle->getCurrencyName('USD');
+        $gbpName = $currencyBundle->getCurrencyName('GBP');
+        $rubName = $currencyBundle->getCurrencyName('RUB');
+        $uahName = $currencyBundle->getCurrencyName('UAH');
+        
         return [
             'full currency name and data from system config' => [
                 'allowedCurrencies' => ['UAH', 'USD'],
                 'inputOptions' => [],
                 'expectedOptions' => [
                     'compact' => false,
-                    'choices' => [
-                        new ChoiceView('UAH', 'UAH', 'UAH-full_name'),
-                        new ChoiceView('USD', 'USD', 'USD-full_name'),
-                    ]
+                    'choices' => [new ChoiceView('UAH', 'UAH', $uahName), new ChoiceView('USD', 'USD', $usdName)]
                 ],
                 'submittedData' => 'UAH'
             ],
@@ -143,10 +144,7 @@ class CurrencySelectionTypeTest extends FormIntegrationTestCase
                 ],
                 'expectedOptions' => [
                     'compact' => true,
-                    'choices' => [
-                        new ChoiceView('USD', 'USD', 'USD-iso_code'),
-                        new ChoiceView('UAH', 'UAH', 'UAH-iso_code'),
-                    ]
+                    'choices' => [ new ChoiceView('USD', 'USD', 'USD'), new ChoiceView('UAH', 'UAH', 'UAH')]
                 ],
                 'submittedData' => 'UAH'
             ],
@@ -158,9 +156,7 @@ class CurrencySelectionTypeTest extends FormIntegrationTestCase
                 ],
                 'expectedOptions' => [
                     'compact' => false,
-                    'choices' => [
-                        new ChoiceView('RUB', 'RUB', 'RUB-full_name'),
-                    ]
+                    'choices' => [ new ChoiceView('RUB', 'RUB', $rubName) ]
                 ],
                 'submittedData' => 'RUB'
             ],
@@ -172,9 +168,9 @@ class CurrencySelectionTypeTest extends FormIntegrationTestCase
                 'expectedOptions' => [
                     'compact' => false,
                     'choices' => [
-                        new ChoiceView('UAH', 'UAH', 'UAH-full_name'),
-                        new ChoiceView('USD', 'USD', 'USD-full_name'),
-                        new ChoiceView('GBP', 'GBP', 'GBP-full_name'),
+                        new ChoiceView('UAH', 'UAH', $uahName),
+                        new ChoiceView('USD', 'USD', $usdName),
+                        new ChoiceView('GBP', 'GBP', $gbpName),
                     ]
                 ],
                 'submittedData' => 'UAH'
@@ -188,10 +184,7 @@ class CurrencySelectionTypeTest extends FormIntegrationTestCase
                 ],
                 'expectedOptions' => [
                     'compact' => true,
-                    'choices' => [
-                        new ChoiceView('RUB', 'RUB', 'RUB-iso_code'),
-                        new ChoiceView('GBP', 'GBP', 'GBP-iso_code'),
-                    ]
+                    'choices' => [new ChoiceView('RUB', 'RUB', 'RUB'), new ChoiceView('GBP', 'GBP', 'GBP')]
                 ],
                 'submittedData' => 'GBP'
             ],

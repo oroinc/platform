@@ -121,8 +121,8 @@ define(function(require) {
             transitionHandler.call($el, false);
         },
 
-        onEdit: function() {
-            this.model.collection.trigger('toEdit', this.model);
+        onEdit: function(e) {
+            this.model.collection.trigger('toEdit', this.model, this.$(e.currentTarget).data('actionExtraOptions'));
         },
 
         onDelete: function() {
