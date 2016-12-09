@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\ActionBundle\Button;
+namespace Oro\Bundle\ActionBundle\Exception;
 
 class ButtonCollectionMapException extends \RuntimeException
 {

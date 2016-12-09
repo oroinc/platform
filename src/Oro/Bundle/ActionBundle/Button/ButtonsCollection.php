@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\ActionBundle\Button;
 
+use Oro\Bundle\ActionBundle\Exception\ButtonCollectionMapException;
 use Oro\Bundle\ActionBundle\Extension\ButtonProviderExtensionInterface;
 
 class ButtonsCollection implements \IteratorAggregate, \Countable
