@@ -11,6 +11,7 @@ define(function(require) {
     var BaseComponent = require('oroui/js/app/components/base/component');
     var PageableCollection = require('orodatagrid/js/pageable-collection');
     var Grid = require('orodatagrid/js/datagrid/grid');
+    var BackendGrid = require('oroproduct/js/app/datagrid/backend-grid');
     var mapActionModuleName = require('orodatagrid/js/map-action-module-name');
     var mapCellModuleName = require('orodatagrid/js/map-cell-module-name');
     var gridContentManager = require('orodatagrid/js/content-manager');
@@ -201,6 +202,7 @@ define(function(require) {
          * Build grid
          */
         build: function() {
+            var GridConstructor = this.data.backendGrid ? BackendGrid : Grid;
             var collectionModels;
             var collectionOptions;
             var grid;
@@ -229,8 +231,10 @@ define(function(require) {
 
             this.$el.hide();
             options.el = this.$el[0];
-            options.themeOptionsConfigurator(Grid, options);
-            grid = new Grid(_.extend({collection: collection}, options));
+
+            options.themeOptionsConfigurator(GridConstructor, options);
+            grid = new GridConstructor(_.extend({collection: collection}, options));
+
             this.grid = grid;
             grid.render();
             if (this.changeAppearanceEnabled) {

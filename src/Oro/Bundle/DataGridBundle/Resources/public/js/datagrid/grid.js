@@ -269,8 +269,10 @@ define(function(require) {
             }
 
             // must construct body first so it listens to backgrid:sort first
-            this.body = new this.body(bodyOptions);
-            this.subview('body', this.body);
+            if (this.body) {
+                this.body = new this.body(bodyOptions);
+                this.subview('body', this.body);
+            }
 
             if (this.header) {
                 this.header = new this.header(headerOptions);
@@ -945,7 +947,9 @@ define(function(require) {
             if (this.footer) {
                 this.$grid.append(this.footer.render().$el);
             }
-            this.$grid.append(this.body.render().$el);
+            if (this.body) {
+                this.$grid.append(this.body.render().$el);
+            }
 
             mediator.trigger('grid_load:complete', this.collection, this.$grid);
         },

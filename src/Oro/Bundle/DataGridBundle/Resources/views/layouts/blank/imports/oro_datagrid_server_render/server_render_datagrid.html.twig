@@ -18,13 +18,48 @@
     {% endif %}
 
     {% set datagridData = oro_datagrid_data(datagrid) %}
+
+    {% set datagridData = datagridData|merge({
+        backendGrid: true
+    }) %}
+
     {% set datagridMetaData = oro_datagrid_metadata(datagrid) %}
     {% set toolbarOptions = datagridMetaData.options.toolbarOptions %}
 
     {% do block[id ~ '_toolbar']|merge_context({'datagrid': datagrid}) %}
     {% do block[id ~ '_header_row']|merge_context({'datagrid': datagrid}) %}
 
-    <div{{ block('block_attributes') }}>
+    {% set enableFilters = renderParams.enableFilters is defined ? renderParams.enableFilters : true %}
+    {% if isMobileVersion() %}
+        {% set enableToggleFilters = false %}
+    {% elseif renderParams.enableToggleFilters is defined %}
+        {% set enableToggleFilters = renderParams.enableToggleFilters %}
+    {% else %}
+        {% set enableToggleFilters = true %}
+    {% endif %}
+    {% set options  = {
+        el: '#' ~ gridId,
+        gridName: oro_datagrid_build_fullname(datagrid.name, datagrid.scope),
+        builders: datagridMetaData.requireJSModules,
+        metadata: datagridMetaData,
+        data: datagridData,
+        enableFilters: enableFilters,
+        enableToggleFilters: enableToggleFilters,
+        filtersStateElement: renderParams.filtersStateElement is defined ? renderParams.filtersStateElement : null,
+        enableViews: renderParams.enableViews is defined ? renderParams.enableViews : enableFilters,
+        showViewsInNavbar: renderParams.showViewsInNavbar is defined ? renderParams.showViewsInNavbar : false,
+        inputName: oro_datagrid_build_inputname(datagrid.name),
+        themeOptions: renderParams.themeOptions|default({}),
+        toolbarOptions: renderParams.toolbarOptions|default({})
+    } %}
+
+    <div id="{{ gridId }}"
+         data-page-component-module="orodatagrid/js/app/components/datagrid-component"
+         data-page-component-name="{{ options.gridName }}"
+         data-page-component-options="{{ options|json_encode }}"
+         data-layout="separate"
+            {% if renderParams.cssClass is defined %} class="{{ renderParams.cssClass }}" {% endif %}
+    >
         <div class="oro-datagrid">
             {% if toolbarOptions.placement.top %}
                 <div class="toolbar" data-grid-toolbar="top">
