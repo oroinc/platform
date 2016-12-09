@@ -53,6 +53,7 @@ oro:
             entity_id: Entity id
             data: Data
             organization: Organization
+            author_impersonation: " (impersonated from %ipAddress%)"
 
         entity_config:
             entity:

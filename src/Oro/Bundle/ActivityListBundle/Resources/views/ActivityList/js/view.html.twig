@@ -13,15 +13,6 @@
             </div>
             <div class="actions">
                 {% block activityActions %}
-                    <div class="more-bar-holder">
-                        <div class="dropdown">
-                            <a href="#" data-toggle="dropdown" class="dropdown-toggle activity-item">...</a>
-                            <div class="dropdown-menu activity-item pull-right launchers-dropdown-menu">
-                                {% block activityActionsList %}
-                                {% endblock %}
-                            </div>
-                        </div>
-                    </div>
                 {% endblock %}
             </div>
             <div class="extra-info">
@@ -35,7 +26,7 @@
                 </div>
                 <div class="comment-count"<% if (!commentCount) { %> style="display:none"<% } %>
                     title="<%= _.__('oro.activitylist.comment.quantity_label') %>">
-                    <i class="icon icon-comment"></i><span class="count"><%= commentCount %></span>
+                    <i class="fa-comment"></i><span class="count"><%= commentCount %></span>
                 </div>
                 <div class="created-at">
                     {% block activityDate %}

@@ -4,7 +4,7 @@ You must select at least {{ limit }} role:  You must select at least {{ limit }}
 oro:
     user:
         message:
-            invalid_username: The Email with same value id used by another customer. Please choose another Username.
+            invalid_username: This email is already registered by another user. Please provide unique email address.
             invalid_password:
                 min_length: The password must be at least {{ length }} characters long
                 lower_case: The password must include a lower case letter

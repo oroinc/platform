@@ -4,9 +4,9 @@ namespace Oro\Bundle\InstallerBundle\Process\Step;
 
 use Doctrine\ORM\EntityManager;
 
-use Sylius\Bundle\FlowBundle\Process\Context\ProcessContextInterface;
-
 use Oro\Bundle\SecurityBundle\Command\LoadPermissionConfigurationCommand;
+
+use Sylius\Bundle\FlowBundle\Process\Context\ProcessContextInterface;
 
 class SchemaStep extends AbstractStep
 {
@@ -19,30 +19,32 @@ class SchemaStep extends AbstractStep
                 // suppress warning: ini_set(): A session is active. You cannot change the session
                 // module's ini settings at this time
                 error_reporting(E_ALL ^ E_WARNING);
-                return $this->handleAjaxAction('cache:clear', array('--no-optional-warmers' => true));
+                return $this->handleAjaxAction('cache:clear', ['--no-optional-warmers' => true]);
             case 'clear-config':
-                return $this->handleAjaxAction('oro:entity-config:cache:clear', array('--no-warmup' => true));
+                return $this->handleAjaxAction('oro:entity-config:cache:clear', ['--no-warmup' => true]);
             case 'clear-extend':
-                return $this->handleAjaxAction('oro:entity-extend:cache:clear', array('--no-warmup' => true));
+                return $this->handleAjaxAction('oro:entity-extend:cache:clear', ['--no-warmup' => true]);
             case 'schema-drop':
                 return $this->handleDropDatabase($context);
             case 'schema-update':
-                return $this->handleAjaxAction('oro:migration:load', array('--force' => true));
+                return $this->handleAjaxAction('oro:migration:load', ['--force' => true]);
             case 'fixtures':
-                return $this->handleAjaxAction('oro:migration:data:load', array('--no-interaction' => true));
+                return $this->handleAjaxAction('oro:migration:data:load', ['--no-interaction' => true]);
             case 'permissions':
                 return $this->handleAjaxAction(LoadPermissionConfigurationCommand::NAME);
             case 'workflows':
-                return $this->handleAjaxAction('oro:workflow:definitions:load', ['--skip-scope-processing' => true]);
+                return $this->handleAjaxAction('oro:workflow:definitions:load');
+            case 'crons':
+                return $this->handleAjaxAction('oro:cron:definitions:load');
             case 'processes':
                 return $this->handleAjaxAction('oro:process:configuration:load');
         }
 
         return $this->render(
             'OroInstallerBundle:Process/Step:schema.html.twig',
-            array(
+            [
                 'dropDatabase' => in_array($context->getStorage()->get('dropDatabase', 'none'), ['app', 'full'], true)
-            )
+            ]
         );
     }
 
@@ -61,7 +63,7 @@ class SchemaStep extends AbstractStep
                 if ($manager instanceof EntityManager) {
                     $exitCode = $this->runCommand(
                         'doctrine:schema:drop',
-                        array('--force' => true, '--em' => $name)
+                        ['--force' => true, '--em' => $name]
                     );
                     if ($exitCode) {
                         break;
@@ -73,7 +75,7 @@ class SchemaStep extends AbstractStep
         } elseif ($dropDatabase === 'full') {
             return $this->handleAjaxAction(
                 'doctrine:schema:drop',
-                array('--force' => true, '--full-database' => true)
+                ['--force' => true, '--full-database' => true]
             );
         } else {
             return true;
