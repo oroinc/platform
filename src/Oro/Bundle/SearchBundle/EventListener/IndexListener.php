@@ -3,14 +3,19 @@
 namespace Oro\Bundle\SearchBundle\EventListener;
 
 use Doctrine\Common\Util\ClassUtils;
+use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Event\OnClearEventArgs;
 use Doctrine\ORM\Event\OnFlushEventArgs;
 use Doctrine\ORM\Event\PostFlushEventArgs;
+use Doctrine\ORM\Mapping\ClassMetadataInfo;
 use Doctrine\ORM\UnitOfWork;
+
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\PlatformBundle\EventListener\OptionalListenerInterface;
 use Oro\Bundle\SearchBundle\Engine\IndexerInterface;
 use Oro\Bundle\SearchBundle\Provider\SearchMappingProvider;
+
+use Oro\Component\PropertyAccess\PropertyAccessor;
 
 class IndexListener implements OptionalListenerInterface
 {
@@ -51,13 +56,19 @@ class IndexListener implements OptionalListenerInterface
     protected $enabled = true;
 
     /**
+     * @var PropertyAccessor
+     */
+    protected $propertyAccessor;
+
+    /**
      * @param DoctrineHelper $doctrineHelper
      * @param IndexerInterface $searchIndexer
      */
     public function __construct(DoctrineHelper $doctrineHelper, IndexerInterface $searchIndexer)
     {
-        $this->doctrineHelper = $doctrineHelper;
-        $this->searchIndexer   = $searchIndexer;
+        $this->doctrineHelper   = $doctrineHelper;
+        $this->searchIndexer    = $searchIndexer;
+        $this->propertyAccessor = new PropertyAccessor();
     }
 
     /**
@@ -99,9 +110,13 @@ class IndexListener implements OptionalListenerInterface
 
         // schedule saved entities
         // inserted and updated entities should be processed as is
+        $inserts = $unitOfWork->getScheduledEntityInsertions();
+        $updates = $unitOfWork->getScheduledEntityUpdates();
         $savedEntities = array_merge(
-            $unitOfWork->getScheduledEntityInsertions(),
-            $this->getEntitiesWithUpdatedIndexedFields($unitOfWork)
+            $inserts,
+            $this->getEntitiesWithUpdatedIndexedFields($unitOfWork),
+            $this->getAssociatedEntitiesToReindex($entityManager, $inserts),
+            $this->getAssociatedEntitiesToReindex($entityManager, $updates)
         );
         foreach ($savedEntities as $hash => $entity) {
             if (empty($this->savedEntities[$hash]) && $this->isSupported($entity)) {
@@ -148,6 +163,42 @@ class IndexListener implements OptionalListenerInterface
             $fieldsToReindex = array_intersect($indexedFields, array_keys($changeSet));
             if ($fieldsToReindex) {
                 $entitiesToReindex[$hash] = $entity;
+            }
+        }
+
+        return $entitiesToReindex;
+    }
+
+    /**
+     * @param EntityManager $entityManager
+     * @param array $entities
+     *
+     * @return array
+     */
+    protected function getAssociatedEntitiesToReindex(EntityManager $entityManager, $entities)
+    {
+        $entitiesToReindex = [];
+
+        foreach ($entities as $entity) {
+            $className = ClassUtils::getClass($entity);
+            $meta = $entityManager->getClassMetadata($className);
+
+            foreach ($meta->getAssociationMappings() as $association) {
+                if (!empty($association['inversedBy'])) {
+                    $targetClass = $association['targetEntity'];
+
+                    if (!$this->mappingProvider->hasFieldsMapping($targetClass)) {
+                        continue;
+                    }
+
+                    if ($association['type'] == ClassMetadataInfo::MANY_TO_ONE) {
+                        $targetEntity = $this->propertyAccessor->getValue($entity, $association['fieldName']);
+                        if (null != $targetEntity) {
+                            $targetHash = spl_object_hash($targetEntity);
+                            $entitiesToReindex[$targetHash] = $targetEntity;
+                        }
+                    }
+                }
             }
         }
 
