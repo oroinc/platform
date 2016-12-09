@@ -59,12 +59,7 @@ class ButtonsCollection implements \IteratorAggregate, \Countable
             /** @var ButtonProviderExtensionInterface $extension */
             $extension = $this->buttonsMap[$button];
 
-<<<<<<< HEAD
-            if ($extension->isAvailable($button, $searchContext)) {
-                $button->getButtonContext()->setEnabled(true);
-=======
             if (call_user_func($filter, $button, $extension)) {
->>>>>>> remotes/origin/ticket/BAP-12872
                 $collection->addButton($button, $extension);
             }
         }
