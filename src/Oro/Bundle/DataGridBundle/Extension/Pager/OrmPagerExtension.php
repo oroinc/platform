@@ -55,7 +55,7 @@ class OrmPagerExtension extends AbstractExtension
     {
         if ($datasource instanceof OrmDatasource) {
             if ($datasource->getCountQb()) {
-                $this->pager->setCountQb($datasource->getCountQb());
+                $this->pager->setCountQb($datasource->getCountQb(), $datasource->getCountQueryHints());
             }
             $this->pager->setQueryBuilder($datasource->getQueryBuilder());
             $this->pager->setSkipAclCheck($config->isDatasourceSkipAclApply());
