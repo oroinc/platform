@@ -169,9 +169,11 @@ class UpdateNoteAssociationKindQuery extends ParametrizedMigrationQuery
     protected function getNoteEntityConfig(LoggerInterface $logger)
     {
         $sql = 'SELECT id, class_name, data FROM oro_entity_config WHERE class_name = ?';
-        $this->logQuery($logger, $sql);
+        $parameters = ['Oro\Bundle\NoteBundle\Entity\Note'];
 
-        $noteEntityConfig = $this->connection->fetchAssoc($sql, ['Oro\Bundle\NoteBundle\Entity\Note']);
+        $this->logQuery($logger, $sql, $parameters);
+
+        $noteEntityConfig = $this->connection->fetchAssoc($sql, $parameters);
         $noteEntityConfig['data'] = $this->connection->convertToPHPValue($noteEntityConfig['data'], Type::TARRAY);
 
         return $noteEntityConfig;
