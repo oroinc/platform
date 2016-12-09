@@ -6,17 +6,17 @@ use Psr\Log\LoggerInterface;
 
 use Doctrine\DBAL\Schema\Comparator;
 use Doctrine\DBAL\Types\Type;
-use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Schema\Schema;
 
+use Oro\Bundle\ActivityBundle\Migration\Extension\ActivityExtension;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendDbIdentifierNameGenerator;
 use Oro\Bundle\EntityExtendBundle\Migration\Extension\ExtendExtension;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
-use Oro\Bundle\ActivityBundle\Migration\Extension\ActivityExtension;
-use Oro\Bundle\MigrationBundle\Migration\ConnectionAwareInterface;
-use Oro\Bundle\MigrationBundle\Migration\MigrationQuery;
+use Oro\Bundle\NoteBundle\Entity\Note;
+use Oro\Bundle\MigrationBundle\Migration\ArrayLogger;
+use Oro\Bundle\MigrationBundle\Migration\ParametrizedMigrationQuery;
 
-class UpdateAssociationKindQuery implements MigrationQuery, ConnectionAwareInterface
+class UpdateNoteAssociationKindQuery extends ParametrizedMigrationQuery
 {
     /**
      * @var Schema
@@ -32,11 +32,6 @@ class UpdateAssociationKindQuery implements MigrationQuery, ConnectionAwareInter
      * @var ExtendExtension
      */
     protected $extendExtension;
-
-    /**
-     * @var Connection
-     */
-    protected $connection;
 
     /**
      * @var ExtendDbIdentifierNameGenerator
@@ -73,13 +68,31 @@ class UpdateAssociationKindQuery implements MigrationQuery, ConnectionAwareInter
      */
     public function getDescription()
     {
-        return 'Update Note Activity association kind';
+        $logger = new ArrayLogger();
+        $logger->info(
+            sprintf(
+                'Update activity association kind for entity %s.',
+                Note::class
+            )
+        );
+        $this->doExecute($logger, true);
+
+        return $logger->getMessages();
     }
 
     /**
      * {@inheritdoc}
      */
     public function execute(LoggerInterface $logger)
+    {
+        $this->doExecute($logger);
+    }
+
+    /**
+     * @param LoggerInterface $logger
+     * @param boolean $dryRun
+     */
+    protected function doExecute(LoggerInterface $logger, $dryRun = false)
     {
         $fromSchema = clone $this->schema;
 
@@ -103,17 +116,22 @@ class UpdateAssociationKindQuery implements MigrationQuery, ConnectionAwareInter
                 $this->activityExtension->addActivityAssociation($this->schema, 'oro_note', $targetTableName);
             }
 
-            $this->removeOldNoteAssociation($logger, $targetEntityClassName, $noteEntityConfig);
+            $this->removeOldNoteAssociation($logger, $targetEntityClassName, $noteEntityConfig, $dryRun);
 
             unset($entityConfigurationRow['data']['note']['enabled']);
-            $this->saveEntityConfig($logger, $entityConfigurationRow);
+            $this->saveEntityConfig($logger, $entityConfigurationRow, $dryRun);
         }
 
-        $this->saveEntityConfig($logger, $noteEntityConfig);
-        $this->applyActivityAssociationSchemaChanges($logger, $fromSchema);
+        $this->saveEntityConfig($logger, $noteEntityConfig, $dryRun);
+        $this->applyActivityAssociationSchemaChanges($logger, $fromSchema, $dryRun);
 
         foreach ($entitiesForDataMigration as $targetEntityClassName => $targetTableName) {
-            $this->migrateNoteRelationDataToActivityRelationKind($targetTableName, $targetEntityClassName);
+            $this->migrateNoteRelationDataToActivityRelationKind(
+                $logger,
+                $targetTableName,
+                $targetEntityClassName,
+                $dryRun
+            );
         }
     }
 
@@ -125,8 +143,9 @@ class UpdateAssociationKindQuery implements MigrationQuery, ConnectionAwareInter
     protected function getApplicableEntityConfigs(LoggerInterface $logger)
     {
         $sql = 'SELECT id, class_name, data FROM oro_entity_config';
-        $entityConfigs = $this->connection->fetchAll($sql);
         $this->logQuery($logger, $sql);
+
+        $entityConfigs = $this->connection->fetchAll($sql);
 
         $targetEntitiesConfigs = [];
         foreach ($entityConfigs as $entityConfig) {
@@ -149,9 +168,10 @@ class UpdateAssociationKindQuery implements MigrationQuery, ConnectionAwareInter
      */
     protected function getNoteEntityConfig(LoggerInterface $logger)
     {
-        $sql = 'SELECT id, class_name, data FROM oro_entity_config WHERE class_name=?';
-        $noteEntityConfig = $this->connection->fetchAssoc($sql, ['Oro\Bundle\NoteBundle\Entity\Note']);
+        $sql = 'SELECT id, class_name, data FROM oro_entity_config WHERE class_name = ?';
         $this->logQuery($logger, $sql);
+
+        $noteEntityConfig = $this->connection->fetchAssoc($sql, ['Oro\Bundle\NoteBundle\Entity\Note']);
         $noteEntityConfig['data'] = $this->connection->convertToPHPValue($noteEntityConfig['data'], Type::TARRAY);
 
         return $noteEntityConfig;
@@ -161,17 +181,25 @@ class UpdateAssociationKindQuery implements MigrationQuery, ConnectionAwareInter
      * @param LoggerInterface $logger
      * @param string          $targetEntityClassName
      * @param array           $noteEntityConfig
+     * @param boolean         $dryRun
      */
     protected function removeOldNoteAssociation(
         LoggerInterface $logger,
         $targetEntityClassName,
-        array &$noteEntityConfig
+        array &$noteEntityConfig,
+        $dryRun
     ) {
         $noteAssociationName = $this->getNoteAssociationName($targetEntityClassName);
-        $sql = 'DELETE FROM oro_entity_config_field WHERE field_name=? AND entity_id=?';
+
+        $sql = 'DELETE FROM oro_entity_config_field WHERE field_name = ? AND entity_id= ?';
         $parameters = [$noteAssociationName, $noteEntityConfig['id']];
-        $this->connection->executeUpdate($sql, $parameters);
+
         $this->logQuery($logger, $sql, $parameters);
+
+        if (!$dryRun) {
+            $this->connection->executeUpdate($sql, $parameters);
+        }
+
         unset($noteEntityConfig['data']['extend']['schema']['relation'][$noteAssociationName]);
 
         $relationKeyName = ExtendHelper::buildRelationKey(
@@ -186,40 +214,54 @@ class UpdateAssociationKindQuery implements MigrationQuery, ConnectionAwareInter
     /**
      * @param LoggerInterface $logger
      * @param array           $entityConfig
+     * @param boolean         $dryRun
      */
-    protected function saveEntityConfig(LoggerInterface $logger, array $entityConfig)
+    protected function saveEntityConfig(LoggerInterface $logger, array $entityConfig, $dryRun)
     {
-        $sql = 'UPDATE oro_entity_config SET data=? WHERE id=?';
+        $sql = 'UPDATE oro_entity_config SET data = ? WHERE id = ?';
         $parameters = [
             $this->connection->convertToDatabaseValue($entityConfig['data'], Type::TARRAY),
             $entityConfig['id']
         ];
-        $this->connection->executeUpdate($sql, $parameters);
+
         $this->logQuery($logger, $sql, $parameters);
+
+        if (!$dryRun) {
+            $this->connection->executeUpdate($sql, $parameters);
+        }
     }
 
     /**
      * @param LoggerInterface $logger
-     * @param                 $fromSchema
+     * @param Schema          $fromSchema
+     * @param boolean         $dryRun
      */
-    protected function applyActivityAssociationSchemaChanges(LoggerInterface $logger, $fromSchema)
+    protected function applyActivityAssociationSchemaChanges(LoggerInterface $logger, Schema $fromSchema, $dryRun)
     {
         $comparator = new Comparator();
         $platform = $this->connection->getDatabasePlatform();
         $schemaDiff = $comparator->compare($fromSchema, $this->schema);
         $queries = $schemaDiff->toSql($platform);
-        foreach ($queries as $query) {
-            $this->logQuery($logger, $query);
-            $this->connection->executeQuery($query);
+        foreach ($queries as $sql) {
+            $this->logQuery($logger, $sql);
+            if (!$dryRun) {
+                $this->connection->executeUpdate($sql);
+            }
         }
     }
 
-    /**\
+    /**
+     * @param LoggerInterface $logger
      * @param string $targetTable
      * @param string $targetClass
+     * @param boolean $dryRun
      */
-    protected function migrateNoteRelationDataToActivityRelationKind($targetTable, $targetClass)
-    {
+    protected function migrateNoteRelationDataToActivityRelationKind(
+        LoggerInterface $logger,
+        $targetTable,
+        $targetClass,
+        $dryRun
+    ) {
         $associationTableName = $this->activityExtension->getAssociationTableName('oro_note', $targetTable);
 
         $associationColumnName = $this->nameGenerator->generateManyToManyJoinTableColumnName($targetClass);
@@ -230,7 +272,12 @@ class UpdateAssociationKindQuery implements MigrationQuery, ConnectionAwareInter
           SELECT id, $noteAssociationColumnName
           FROM oro_note WHERE $noteAssociationColumnName IS NOT NULL
 SQL;
-        $this->connection->executeUpdate($sql);
+
+        $this->logQuery($logger, $sql);
+
+        if (!$dryRun) {
+            $this->connection->executeUpdate($sql);
+        }
 
         $schemaManager = $this->connection->getSchemaManager();
         foreach ($schemaManager->listTableForeignKeys('oro_note') as $foreignKey) {
@@ -240,7 +287,11 @@ SQL;
         }
 
         $sql = "ALTER TABLE oro_note DROP COLUMN {$noteAssociationColumnName}";
-        $this->connection->executeUpdate($sql);
+        $this->logQuery($logger, $sql);
+
+        if (!$dryRun) {
+            $this->connection->executeUpdate($sql);
+        }
     }
 
     /**
@@ -271,24 +322,6 @@ SQL;
     }
 
     /**
-     * @param LoggerInterface $logger
-     * @param string          $sql
-     * @param array           $params
-     */
-    protected function logQuery(LoggerInterface $logger, $sql, array $params = [])
-    {
-        $logger->debug(sprintf('Query: %s %s Parameters: %', $sql, PHP_EOL, print_r($params, true)));
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function setConnection(Connection $connection)
-    {
-        $this->connection = $connection;
-    }
-
-    /**
      * @param array $classNamesMapping ['current class name' => 'old class name']
      */
     public function registerOldClassNames(array $classNamesMapping)
@@ -301,13 +334,9 @@ SQL;
     /**
      * @param string $class
      * @param string $oldClassName
-     *
-     * @return UpdateAssociationKindQuery
      */
     public function registerOldClassNameForClass($class, $oldClassName)
     {
         $this->oldClassNames[$class] = $oldClassName;
-
-        return $this;
     }
 }

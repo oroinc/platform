@@ -6,6 +6,12 @@ use Oro\Bundle\MigrationBundle\Event\PostMigrationEvent;
 use Oro\Bundle\MigrationBundle\Event\PreMigrationEvent;
 use Oro\Bundle\NoteBundle\Migration\RemoveNoteConfigurationScopeMigration;
 
+/**
+ * When existing Oro application is updating to version 2.0 a migration is added
+ * to remove outdated configuration scope from Note entity.
+ *
+ * @see \Oro\Bundle\NoteBundle\Migration\RemoveNoteConfigurationScopeMigration
+ */
 class RemoveNoteConfigurationScopeListener
 {
     /**

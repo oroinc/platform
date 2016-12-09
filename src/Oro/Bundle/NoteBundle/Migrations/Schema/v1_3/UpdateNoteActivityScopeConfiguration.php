@@ -11,7 +11,6 @@ use Oro\Bundle\NoteBundle\Entity\Note;
 
 class UpdateNoteActivityScopeConfiguration implements Migration
 {
-
     /**
      * @param Schema   $schema
      * @param QueryBag $queries

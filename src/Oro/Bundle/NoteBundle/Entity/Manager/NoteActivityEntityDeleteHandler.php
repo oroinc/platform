@@ -32,7 +32,12 @@ class NoteActivityEntityDeleteHandler extends ActivityEntityDeleteHandler
         if ($entity) {
             $targetEntities = $entity->getActivityTargetEntities();
             if (count($targetEntities) == 1 && $this->isTargetRequestedForDelete(reset($targetEntities), $id)) {
-                throw new InvalidArgumentException('The last "Note" activity target could not be removed');
+                throw new InvalidArgumentException(
+                    sprintf(
+                        'The last activity target entity of %s could not be removed.',
+                        Note::class
+                    )
+                );
             }
         }
 

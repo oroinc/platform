@@ -34,10 +34,10 @@ class NoteHandler
     protected $activityManager;
 
     /**
-     * @param FormInterface            $form
-     * @param Request                  $request
-     * @param ManagerRegistry          $managerRegistry
-     * @param ActivityManager          $activityManager
+     * @param FormInterface   $form
+     * @param Request         $request
+     * @param ManagerRegistry $managerRegistry
+     * @param ActivityManager $activityManager
      */
     public function __construct(
         FormInterface $form,

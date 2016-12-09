@@ -7,10 +7,10 @@ use Psr\Log\LoggerInterface;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Types\Type;
 
-use Oro\Bundle\MigrationBundle\Migration\ConnectionAwareInterface;
-use Oro\Bundle\MigrationBundle\Migration\MigrationQuery;
+use Oro\Bundle\MigrationBundle\Migration\ArrayLogger;
+use Oro\Bundle\MigrationBundle\Migration\ParametrizedMigrationQuery;
 
-class RemoveNoteConfigurationScopeQuery implements MigrationQuery, ConnectionAwareInterface
+class RemoveNoteConfigurationScopeQuery extends ParametrizedMigrationQuery
 {
     /**
      * @var Connection
@@ -22,7 +22,16 @@ class RemoveNoteConfigurationScopeQuery implements MigrationQuery, ConnectionAwa
      */
     public function getDescription()
     {
-        return 'Remove Note configuration scope from entities config';
+        $logger = new ArrayLogger();
+        $logger->info(
+            sprintf(
+                'Remove outdated entity configuration data with scope name "%s".',
+                'note'
+            )
+        );
+        $this->doExecute($logger, true);
+
+        return $logger->getMessages();
     }
 
     /**
@@ -30,7 +39,18 @@ class RemoveNoteConfigurationScopeQuery implements MigrationQuery, ConnectionAwa
      */
     public function execute(LoggerInterface $logger)
     {
+        $this->doExecute($logger);
+    }
+
+    /**
+     * @param LoggerInterface $logger
+     * @param boolean $dryRun
+     */
+    protected function doExecute(LoggerInterface $logger, $dryRun = false)
+    {
         $sql = 'SELECT id, class_name, data FROM oro_entity_config';
+        $this->logQuery($logger, $sql);
+
         $entityConfigs = $this->connection->fetchAll($sql);
         $entityConfigs = array_map(function ($entityConfig) {
             $entityConfig['data'] = empty($entityConfig['data'])
@@ -42,21 +62,17 @@ class RemoveNoteConfigurationScopeQuery implements MigrationQuery, ConnectionAwa
 
         foreach ($entityConfigs as $entityConfig) {
             unset($entityConfig['data']['note']);
-            $this->connection->executeUpdate(
-                'UPDATE oro_entity_config SET data=? WHERE id=?',
-                [
-                    $this->connection->convertToDatabaseValue($entityConfig['data'], Type::TARRAY),
-                    $entityConfig['id']
-                ]
-            );
-        }
-    }
+            $sql = 'UPDATE oro_entity_config SET data = ? WHERE id = ?';
+            $parameters = [
+                $this->connection->convertToDatabaseValue($entityConfig['data'], Type::TARRAY),
+                $entityConfig['id']
+            ];
 
-    /**
-     * {@inheritdoc}
-     */
-    public function setConnection(Connection $connection)
-    {
-        $this->connection = $connection;
+            $this->logQuery($logger, $sql, $parameters);
+
+            if (!$dryRun) {
+                $this->connection->executeUpdate($sql, $parameters);
+            }
+        }
     }
 }

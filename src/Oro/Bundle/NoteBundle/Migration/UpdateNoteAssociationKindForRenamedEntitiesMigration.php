@@ -41,14 +41,14 @@ abstract class UpdateNoteAssociationKindForRenamedEntitiesMigration implements
      */
     public function up(Schema $schema, QueryBag $queries)
     {
-        $updateAssociationKindQuery = new UpdateAssociationKindQuery(
+        $updateNoteAssociationKindQuery = new UpdateNoteAssociationKindQuery(
             $schema,
             $this->activityExtension,
             $this->extendExtension,
             $this->nameGenerator
         );
-        $updateAssociationKindQuery->registerOldClassNames($this->getRenamedEntitiesNames($schema));
-        $queries->addPostQuery($updateAssociationKindQuery);
+        $updateNoteAssociationKindQuery->registerOldClassNames($this->getRenamedEntitiesNames($schema));
+        $queries->addPostQuery($updateNoteAssociationKindQuery);
     }
 
     /**
