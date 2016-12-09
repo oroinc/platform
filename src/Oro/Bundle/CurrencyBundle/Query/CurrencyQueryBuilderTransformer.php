@@ -9,15 +9,6 @@ class CurrencyQueryBuilderTransformer implements CurrencyQueryBuilderTransformer
     /**
      * {@inheritdoc}
      */
-    public function transformSelect(QueryBuilder $qb, $originalFieldName, $newFieldName)
-    {
-        $query = $this->getTransformSelectQuery($originalFieldName, $qb, null, true, $newFieldName);
-        $qb->addSelect($query);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
     public function getTransformSelectQuery(
         $originalFieldName,
         QueryBuilder $qb = null,

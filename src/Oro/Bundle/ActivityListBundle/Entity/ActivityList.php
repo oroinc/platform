@@ -27,7 +27,7 @@ use Oro\Bundle\EntityBundle\EntityProperty\UpdatedByAwareInterface;
  * @Config(
  *      defaultValues={
  *          "entity"={
- *              "icon"="icon-align-justify"
+ *              "icon"="fa-align-justify"
  *          },
  *          "ownership"={
  *              "owner_type"="ORGANIZATION",

@@ -89,7 +89,7 @@ operations:
         groups:
             - view_navButtons
         button_options:
-            icon: icon-edit
+            icon: fa-pencil-square-o
         actions:
             - '@redirect':
                 parameters:
@@ -110,7 +110,7 @@ operations:
         order: 50
         acl_resource: [password_management]
         button_options:
-            icon: icon-unlock-alt
+            icon: fa-unlock-alt
         frontend_options:
             confirmation:
                 title: oro.user.reset_password.popup.title
@@ -175,7 +175,7 @@ operations:
             - view_navButtons
         order: 45
         button_options:
-            icon: icon-ok
+            icon: fa-check
             class: btn-success icons-holder-text
         preconditions:
             '@equal': [false, $isEnabled]
@@ -213,7 +213,7 @@ operations:
             - view_navButtons
         order: 45
         button_options:
-            icon: icon-ban-circle
+            icon: fa-ban
             class: btn-danger icons-holder-text
         preactions:
             - '@get_active_user': $.currentUser

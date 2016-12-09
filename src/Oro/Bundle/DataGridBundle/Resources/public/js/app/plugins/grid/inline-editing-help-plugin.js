@@ -17,7 +17,7 @@ define(function(require) {
             $(document.body).append(
                 '<div class="inline-editing-help-wrapper">' +
                     '<div class="inline-editing-help">' +
-                        '<i class="icon-info"></i>' +
+                        '<i class="fa-info"></i>' +
                     '</div>' +
                     '<div class="inline-editing-help-content popover bottom">' +
                         '<div class="arrow"></div>' +
