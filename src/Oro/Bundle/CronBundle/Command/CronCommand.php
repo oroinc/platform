@@ -39,8 +39,12 @@ class CronCommand extends ContainerAwareCommand
         }
 
         $schedules = $this->getAllSchedules();
+        $featureChecker = $this->getContainer()->get('oro_featuretoggle.checker.feature_checker');
 
         foreach ($schedules as $schedule) {
+            if (!$featureChecker->isResourceEnabled($schedule->getCommand(), 'cron_jobs')) {
+                continue;
+            }
             $cronExpression = $this->getCronHelper()->createCron($schedule->getDefinition());
             if ($cronExpression->isDue()) {
                 $output->writeln(

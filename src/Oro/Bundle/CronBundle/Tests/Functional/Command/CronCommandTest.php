@@ -67,6 +67,18 @@ class CronCommandTest extends WebTestCase
         $this->assertArrayHasKey('arguments', $message['message']);
     }
 
+    public function testDisabledAllJobs()
+    {
+        $this->mockCronHelper(true);
+        $this->mockFeatureChecker();
+
+
+        $result = $this->runCommand('oro:cron', ['-vvv' => true]);
+        $this->assertNotEmpty($result);
+
+        $this->assertEquals("All commands scheduled\n", $result);
+    }
+
     /**
      * @param string $key
      * @param string $result
