@@ -68,6 +68,8 @@
     }
 
     &--link {
+        padding: 2px 5px;
+
         border-color: transparent;
         background-color: transparent;
         color: get-color('ui', 'normal');
