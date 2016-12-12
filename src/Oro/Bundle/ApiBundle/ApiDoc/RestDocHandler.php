@@ -19,6 +19,7 @@ use Oro\Bundle\ApiBundle\Filter\StandaloneFilter;
 use Oro\Bundle\ApiBundle\Filter\StandaloneFilterWithDefaultValue;
 use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
 use Oro\Bundle\ApiBundle\Processor\ActionProcessorBagInterface;
+use Oro\Bundle\ApiBundle\Processor\Config\Shared\CompleteDescriptions;
 use Oro\Bundle\ApiBundle\Processor\Context;
 use Oro\Bundle\ApiBundle\Processor\Subresource\SubresourceContext;
 use Oro\Bundle\ApiBundle\Request\ApiActions;
@@ -33,7 +34,6 @@ class RestDocHandler implements HandlerInterface
 {
     const ID_ATTRIBUTE   = 'id';
     const ID_PLACEHOLDER = '{id}';
-    const ID_DESCRIPTION = 'The identifier of an entity';
 
     /** @var RestDocViewDetector */
     protected $docViewDetector;
@@ -302,7 +302,7 @@ class RestDocHandler implements HandlerInterface
             [
                 'dataType'    => ApiDocDataTypeConverter::convertToApiDocDataType($dataType),
                 'requirement' => $this->getIdRequirement($metadata),
-                'description' => self::ID_DESCRIPTION
+                'description' => CompleteDescriptions::ID_DESCRIPTION
             ]
         );
     }

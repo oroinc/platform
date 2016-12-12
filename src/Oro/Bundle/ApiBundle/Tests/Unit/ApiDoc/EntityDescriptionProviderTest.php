@@ -8,15 +8,21 @@ use Oro\Bundle\ApiBundle\ApiDoc\EntityDescriptionProvider;
 use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity;
 use Oro\Bundle\ApiBundle\Tests\Unit\OrmRelatedTestCase;
 use Oro\Bundle\EntityBundle\Provider\EntityClassNameProviderInterface;
-use Oro\Bundle\EntityConfigBundle\Tests\Unit\ConfigProviderMock;
+use Oro\Bundle\EntityConfigBundle\Config\Config;
+use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
+use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
+use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 
+/**
+ * @SuppressWarnings(PHPMD.ExcessiveClassLength)
+ */
 class EntityDescriptionProviderTest extends OrmRelatedTestCase
 {
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $entityClassNameProvider;
 
-    /** @var ConfigProviderMock */
-    protected $entityConfigProvider;
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    protected $configManager;
 
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $translator;
@@ -31,14 +37,13 @@ class EntityDescriptionProviderTest extends OrmRelatedTestCase
         $this->entityClassNameProvider = $this->getMock(EntityClassNameProviderInterface::class);
         $this->translator = $this->getMock(TranslatorInterface::class);
 
-        $configManager = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\ConfigManager')
+        $this->configManager = $this->getMockBuilder(ConfigManager::class)
             ->disableOriginalConstructor()
             ->getMock();
-        $this->entityConfigProvider = new ConfigProviderMock($configManager, 'entity');
 
         $this->entityDescriptionProvider = new EntityDescriptionProvider(
             $this->entityClassNameProvider,
-            $this->entityConfigProvider,
+            $this->configManager,
             $this->doctrineHelper,
             $this->translator
         );
@@ -135,7 +140,18 @@ class EntityDescriptionProviderTest extends OrmRelatedTestCase
         $entityClass = Entity\Product::class;
         $expectedValue = null;
 
-        $this->entityConfigProvider->addEntityConfig($entityClass, []);
+        $this->configManager->expects(self::once())
+            ->method('hasConfig')
+            ->with($entityClass)
+            ->willReturn(true);
+        $this->configManager->expects(self::once())
+            ->method('isHiddenModel')
+            ->with($entityClass)
+            ->willReturn(false);
+        $this->configManager->expects(self::once())
+            ->method('getEntityConfig')
+            ->with('entity', $entityClass)
+            ->willReturn($this->getEntityConfig($entityClass, []));
 
         self::assertSame(
             $expectedValue,
@@ -155,7 +171,19 @@ class EntityDescriptionProviderTest extends OrmRelatedTestCase
         $entityDescription = 'description trans key';
         $expectedValue = null;
 
-        $this->entityConfigProvider->addEntityConfig($entityClass, ['description' => $entityDescription]);
+        $this->configManager->expects(self::once())
+            ->method('hasConfig')
+            ->with($entityClass)
+            ->willReturn(true);
+        $this->configManager->expects(self::once())
+            ->method('isHiddenModel')
+            ->with($entityClass)
+            ->willReturn(false);
+        $this->configManager->expects(self::once())
+            ->method('getEntityConfig')
+            ->with('entity', $entityClass)
+            ->willReturn($this->getEntityConfig($entityClass, ['description' => $entityDescription]));
+
         $this->translator->expects(self::once())
             ->method('trans')
             ->with($entityDescription)
@@ -179,11 +207,51 @@ class EntityDescriptionProviderTest extends OrmRelatedTestCase
         $entityDescription = 'description trans key';
         $expectedValue = 'description';
 
-        $this->entityConfigProvider->addEntityConfig($entityClass, ['description' => $entityDescription]);
+        $this->configManager->expects(self::once())
+            ->method('hasConfig')
+            ->with($entityClass)
+            ->willReturn(true);
+        $this->configManager->expects(self::once())
+            ->method('isHiddenModel')
+            ->with($entityClass)
+            ->willReturn(false);
+        $this->configManager->expects(self::once())
+            ->method('getEntityConfig')
+            ->with('entity', $entityClass)
+            ->willReturn($this->getEntityConfig($entityClass, ['description' => $entityDescription]));
+
         $this->translator->expects(self::once())
             ->method('trans')
             ->with($entityDescription)
             ->willReturn($expectedValue);
+
+        self::assertSame(
+            $expectedValue,
+            $this->entityDescriptionProvider->getEntityDocumentation($entityClass)
+        );
+
+        // test that the result is cached
+        self::assertSame(
+            $expectedValue,
+            $this->entityDescriptionProvider->getEntityDocumentation($entityClass)
+        );
+    }
+
+    public function testGetEntityDocumentationForHiddenConfigurableEntity()
+    {
+        $entityClass = Entity\Product::class;
+        $expectedValue = null;
+
+        $this->configManager->expects(self::once())
+            ->method('hasConfig')
+            ->with($entityClass)
+            ->willReturn(true);
+        $this->configManager->expects(self::once())
+            ->method('isHiddenModel')
+            ->with($entityClass)
+            ->willReturn(true);
+        $this->configManager->expects(self::never())
+            ->method('getEntityConfig');
 
         self::assertSame(
             $expectedValue,
@@ -241,7 +309,18 @@ class EntityDescriptionProviderTest extends OrmRelatedTestCase
         $fieldName = 'updatedAt';
         $expectedValue = 'updated at';
 
-        $this->entityConfigProvider->addEntityConfig($entityClass, []);
+        $this->configManager->expects(self::exactly(2))
+            ->method('hasConfig')
+            ->willReturnMap(
+                [
+                    [$entityClass, null, true],
+                    [$entityClass, $fieldName, false],
+                ]
+            );
+        $this->configManager->expects(self::once())
+            ->method('isHiddenModel')
+            ->with($entityClass)
+            ->willReturn(false);
 
         self::assertSame(
             $expectedValue,
@@ -261,7 +340,26 @@ class EntityDescriptionProviderTest extends OrmRelatedTestCase
         $fieldName = 'updatedAt';
         $expectedValue = 'updated at';
 
-        $this->entityConfigProvider->addEntityConfig($entityClass, []);
+        $this->configManager->expects(self::exactly(2))
+            ->method('hasConfig')
+            ->willReturnMap(
+                [
+                    [$entityClass, null, true],
+                    [$entityClass, $fieldName, true],
+                ]
+            );
+        $this->configManager->expects(self::exactly(2))
+            ->method('isHiddenModel')
+            ->willReturnMap(
+                [
+                    [$entityClass, null, false],
+                    [$entityClass, $fieldName, false],
+                ]
+            );
+        $this->configManager->expects(self::once())
+            ->method('getFieldConfig')
+            ->with('entity', $entityClass, $fieldName)
+            ->willReturn($this->getFieldConfig($entityClass, $fieldName, []));
 
         self::assertSame(
             $expectedValue,
@@ -282,13 +380,27 @@ class EntityDescriptionProviderTest extends OrmRelatedTestCase
         $fieldLabel = 'label trans key';
         $expectedValue = 'updated at';
 
-        $this->entityConfigProvider->addEntityConfig($entityClass, []);
-        $this->entityConfigProvider->addFieldConfig(
-            $entityClass,
-            $fieldName,
-            'datetime',
-            ['label' => $fieldLabel]
-        );
+        $this->configManager->expects(self::exactly(2))
+            ->method('hasConfig')
+            ->willReturnMap(
+                [
+                    [$entityClass, null, true],
+                    [$entityClass, $fieldName, true],
+                ]
+            );
+        $this->configManager->expects(self::exactly(2))
+            ->method('isHiddenModel')
+            ->willReturnMap(
+                [
+                    [$entityClass, null, false],
+                    [$entityClass, $fieldName, false],
+                ]
+            );
+        $this->configManager->expects(self::once())
+            ->method('getFieldConfig')
+            ->with('entity', $entityClass, $fieldName)
+            ->willReturn($this->getFieldConfig($entityClass, $fieldName, ['label' => $fieldLabel]));
+
         $this->translator->expects(self::once())
             ->method('trans')
             ->with($fieldLabel)
@@ -313,17 +425,100 @@ class EntityDescriptionProviderTest extends OrmRelatedTestCase
         $fieldLabel = 'label trans key';
         $expectedValue = 'label';
 
-        $this->entityConfigProvider->addEntityConfig($entityClass, []);
-        $this->entityConfigProvider->addFieldConfig(
-            $entityClass,
-            $fieldName,
-            'datetime',
-            ['label' => $fieldLabel]
-        );
+        $this->configManager->expects(self::exactly(2))
+            ->method('hasConfig')
+            ->willReturnMap(
+                [
+                    [$entityClass, null, true],
+                    [$entityClass, $fieldName, true],
+                ]
+            );
+        $this->configManager->expects(self::exactly(2))
+            ->method('isHiddenModel')
+            ->willReturnMap(
+                [
+                    [$entityClass, null, false],
+                    [$entityClass, $fieldName, false],
+                ]
+            );
+        $this->configManager->expects(self::once())
+            ->method('getFieldConfig')
+            ->with('entity', $entityClass, $fieldName)
+            ->willReturn($this->getFieldConfig($entityClass, $fieldName, ['label' => $fieldLabel]));
+
         $this->translator->expects(self::once())
             ->method('trans')
             ->with($fieldLabel)
             ->willReturn($expectedValue);
+
+        self::assertSame(
+            $expectedValue,
+            $this->entityDescriptionProvider->getFieldDescription($entityClass, $fieldName)
+        );
+
+        // test that the result is cached
+        self::assertSame(
+            $expectedValue,
+            $this->entityDescriptionProvider->getFieldDescription($entityClass, $fieldName)
+        );
+    }
+
+    public function testGetFieldDescriptionForHiddenConfigurableEntity()
+    {
+        $entityClass = Entity\Product::class;
+        $fieldName = 'updatedAt';
+        $expectedValue = 'updated at';
+
+        $this->configManager->expects(self::once())
+            ->method('hasConfig')
+            ->with($entityClass, null)
+            ->willReturn(true);
+        $this->configManager->expects(self::once())
+            ->method('isHiddenModel')
+            ->with($entityClass, null)
+            ->willReturn(true);
+        $this->configManager->expects(self::never())
+            ->method('getFieldConfig');
+
+        self::assertSame(
+            $expectedValue,
+            $this->entityDescriptionProvider->getFieldDescription($entityClass, $fieldName)
+        );
+
+        // test that the result is cached
+        self::assertSame(
+            $expectedValue,
+            $this->entityDescriptionProvider->getFieldDescription($entityClass, $fieldName)
+        );
+    }
+
+    public function testGetFieldDescriptionForHiddenConfigurableField()
+    {
+        $entityClass = Entity\Product::class;
+        $fieldName = 'updatedAt';
+        $expectedValue = 'updated at';
+
+        $this->configManager->expects(self::exactly(2))
+            ->method('hasConfig')
+            ->willReturnMap(
+                [
+                    [$entityClass, null, true],
+                    [$entityClass, $fieldName, true],
+                ]
+            );
+        $this->configManager->expects(self::exactly(2))
+            ->method('isHiddenModel')
+            ->willReturnMap(
+                [
+                    [$entityClass, null, false],
+                    [$entityClass, $fieldName, true],
+                ]
+            );
+        $this->configManager->expects(self::never())
+            ->method('getFieldConfig');
+
+        $this->translator->expects(self::never())
+            ->method('trans');
 
         self::assertSame(
             $expectedValue,
@@ -344,13 +539,29 @@ class EntityDescriptionProviderTest extends OrmRelatedTestCase
         $fieldLabel = 'label trans key';
         $expectedValue = 'label';
 
-        $this->entityConfigProvider->addEntityConfig($entityClass, []);
-        $this->entityConfigProvider->addFieldConfig(
-            Entity\Category::class,
-            'name',
-            'string',
-            ['label' => $fieldLabel]
-        );
+        $this->configManager->expects(self::exactly(3))
+            ->method('hasConfig')
+            ->willReturnMap(
+                [
+                    [$entityClass, null, true],
+                    [Entity\Category::class, null, true],
+                    [Entity\Category::class, 'name', true],
+                ]
+            );
+        $this->configManager->expects(self::exactly(3))
+            ->method('isHiddenModel')
+            ->willReturnMap(
+                [
+                    [$entityClass, null, false],
+                    [Entity\Category::class, null, false],
+                    [Entity\Category::class, 'name', false],
+                ]
+            );
+        $this->configManager->expects(self::once())
+            ->method('getFieldConfig')
+            ->with('entity', Entity\Category::class, 'name')
+            ->willReturn($this->getFieldConfig(Entity\Category::class, 'name', ['label' => $fieldLabel]));
+
         $this->translator->expects(self::once())
             ->method('trans')
             ->with($fieldLabel)
@@ -374,7 +585,19 @@ class EntityDescriptionProviderTest extends OrmRelatedTestCase
         $propertyPath = 'category.name';
         $expectedValue = null;
 
-        $this->entityConfigProvider->addEntityConfig($entityClass, []);
+        $this->configManager->expects(self::exactly(2))
+            ->method('hasConfig')
+            ->willReturnMap(
+                [
+                    [$entityClass, null, true],
+                    [Entity\Category::class, null, false],
+                ]
+            );
+        $this->configManager->expects(self::once())
+            ->method('isHiddenModel')
+            ->with($entityClass)
+            ->willReturn(false);
+
         $this->translator->expects(self::never())
             ->method('trans');
 
@@ -434,7 +657,18 @@ class EntityDescriptionProviderTest extends OrmRelatedTestCase
         $fieldName = 'updatedAt';
         $expectedValue = null;
 
-        $this->entityConfigProvider->addEntityConfig($entityClass, []);
+        $this->configManager->expects(self::exactly(2))
+            ->method('hasConfig')
+            ->willReturnMap(
+                [
+                    [$entityClass, null, true],
+                    [$entityClass, $fieldName, false],
+                ]
+            );
+        $this->configManager->expects(self::once())
+            ->method('isHiddenModel')
+            ->with($entityClass)
+            ->willReturn(false);
 
         self::assertSame(
             $expectedValue,
@@ -454,8 +688,26 @@ class EntityDescriptionProviderTest extends OrmRelatedTestCase
         $fieldName = 'updatedAt';
         $expectedValue = null;
 
-        $this->entityConfigProvider->addEntityConfig($entityClass, []);
-        $this->entityConfigProvider->addFieldConfig($entityClass, $fieldName, 'datetime', []);
+        $this->configManager->expects(self::exactly(2))
+            ->method('hasConfig')
+            ->willReturnMap(
+                [
+                    [$entityClass, null, true],
+                    [$entityClass, $fieldName, true],
+                ]
+            );
+        $this->configManager->expects(self::exactly(2))
+            ->method('isHiddenModel')
+            ->willReturnMap(
+                [
+                    [$entityClass, null, false],
+                    [$entityClass, $fieldName, false],
+                ]
+            );
+        $this->configManager->expects(self::once())
+            ->method('getFieldConfig')
+            ->with('entity', $entityClass, $fieldName)
+            ->willReturn($this->getFieldConfig($entityClass, $fieldName, []));
 
         self::assertSame(
             $expectedValue,
@@ -476,13 +728,27 @@ class EntityDescriptionProviderTest extends OrmRelatedTestCase
         $fieldDescription = 'description trans key';
         $expectedValue = null;
 
-        $this->entityConfigProvider->addEntityConfig($entityClass, []);
-        $this->entityConfigProvider->addFieldConfig(
-            $entityClass,
-            $fieldName,
-            'datetime',
-            ['description' => $fieldDescription]
-        );
+        $this->configManager->expects(self::exactly(2))
+            ->method('hasConfig')
+            ->willReturnMap(
+                [
+                    [$entityClass, null, true],
+                    [$entityClass, $fieldName, true],
+                ]
+            );
+        $this->configManager->expects(self::exactly(2))
+            ->method('isHiddenModel')
+            ->willReturnMap(
+                [
+                    [$entityClass, null, false],
+                    [$entityClass, $fieldName, false],
+                ]
+            );
+        $this->configManager->expects(self::once())
+            ->method('getFieldConfig')
+            ->with('entity', $entityClass, $fieldName)
+            ->willReturn($this->getFieldConfig($entityClass, $fieldName, ['description' => $fieldDescription]));
+
         $this->translator->expects(self::once())
             ->method('trans')
             ->with($fieldDescription)
@@ -507,17 +773,100 @@ class EntityDescriptionProviderTest extends OrmRelatedTestCase
         $fieldDescription = 'description trans key';
         $expectedValue = 'description';
 
-        $this->entityConfigProvider->addEntityConfig($entityClass, []);
-        $this->entityConfigProvider->addFieldConfig(
-            $entityClass,
-            $fieldName,
-            'datetime',
-            ['description' => $fieldDescription]
-        );
+        $this->configManager->expects(self::exactly(2))
+            ->method('hasConfig')
+            ->willReturnMap(
+                [
+                    [$entityClass, null, true],
+                    [$entityClass, $fieldName, true],
+                ]
+            );
+        $this->configManager->expects(self::exactly(2))
+            ->method('isHiddenModel')
+            ->willReturnMap(
+                [
+                    [$entityClass, null, false],
+                    [$entityClass, $fieldName, false],
+                ]
+            );
+        $this->configManager->expects(self::once())
+            ->method('getFieldConfig')
+            ->with('entity', $entityClass, $fieldName)
+            ->willReturn($this->getFieldConfig($entityClass, $fieldName, ['description' => $fieldDescription]));
+
         $this->translator->expects(self::once())
             ->method('trans')
             ->with($fieldDescription)
             ->willReturn($expectedValue);
+
+        self::assertSame(
+            $expectedValue,
+            $this->entityDescriptionProvider->getFieldDocumentation($entityClass, $fieldName)
+        );
+
+        // test that the result is cached
+        self::assertSame(
+            $expectedValue,
+            $this->entityDescriptionProvider->getFieldDocumentation($entityClass, $fieldName)
+        );
+    }
+
+    public function testGetFieldDocumentationForHiddenConfigurableEntity()
+    {
+        $entityClass = Entity\Product::class;
+        $fieldName = 'updatedAt';
+        $expectedValue = null;
+
+        $this->configManager->expects(self::once())
+            ->method('hasConfig')
+            ->with($entityClass, null)
+            ->willReturn(true);
+        $this->configManager->expects(self::once())
+            ->method('isHiddenModel')
+            ->with($entityClass, null)
+            ->willReturn(true);
+        $this->configManager->expects(self::never())
+            ->method('getFieldConfig');
+
+        self::assertSame(
+            $expectedValue,
+            $this->entityDescriptionProvider->getFieldDocumentation($entityClass, $fieldName)
+        );
+
+        // test that the result is cached
+        self::assertSame(
+            $expectedValue,
+            $this->entityDescriptionProvider->getFieldDocumentation($entityClass, $fieldName)
+        );
+    }
+
+    public function testGetFieldDocumentationForHiddenConfigurableField()
+    {
+        $entityClass = Entity\Product::class;
+        $fieldName = 'updatedAt';
+        $expectedValue = null;
+
+        $this->configManager->expects(self::exactly(2))
+            ->method('hasConfig')
+            ->willReturnMap(
+                [
+                    [$entityClass, null, true],
+                    [$entityClass, $fieldName, true],
+                ]
+            );
+        $this->configManager->expects(self::exactly(2))
+            ->method('isHiddenModel')
+            ->willReturnMap(
+                [
+                    [$entityClass, null, false],
+                    [$entityClass, $fieldName, true],
+                ]
+            );
+        $this->configManager->expects(self::never())
+            ->method('getFieldConfig');
+
+        $this->translator->expects(self::never())
+            ->method('trans');
 
         self::assertSame(
             $expectedValue,
@@ -538,13 +887,29 @@ class EntityDescriptionProviderTest extends OrmRelatedTestCase
         $fieldDescription = 'description trans key';
         $expectedValue = 'description';
 
-        $this->entityConfigProvider->addEntityConfig($entityClass, []);
-        $this->entityConfigProvider->addFieldConfig(
-            Entity\Category::class,
-            'name',
-            'string',
-            ['description' => $fieldDescription]
-        );
+        $this->configManager->expects(self::exactly(3))
+            ->method('hasConfig')
+            ->willReturnMap(
+                [
+                    [$entityClass, null, true],
+                    [Entity\Category::class, null, true],
+                    [Entity\Category::class, 'name', true],
+                ]
+            );
+        $this->configManager->expects(self::exactly(3))
+            ->method('isHiddenModel')
+            ->willReturnMap(
+                [
+                    [$entityClass, null, false],
+                    [Entity\Category::class, null, false],
+                    [Entity\Category::class, 'name', false],
+                ]
+            );
+        $this->configManager->expects(self::once())
+            ->method('getFieldConfig')
+            ->with('entity', Entity\Category::class, 'name')
+            ->willReturn($this->getFieldConfig(Entity\Category::class, 'name', ['description' => $fieldDescription]));
+
         $this->translator->expects(self::once())
             ->method('trans')
             ->with($fieldDescription)
@@ -568,7 +933,19 @@ class EntityDescriptionProviderTest extends OrmRelatedTestCase
         $propertyPath = 'category.name';
         $expectedValue = null;
 
-        $this->entityConfigProvider->addEntityConfig($entityClass, []);
+        $this->configManager->expects(self::exactly(2))
+            ->method('hasConfig')
+            ->willReturnMap(
+                [
+                    [$entityClass, null, true],
+                    [Entity\Category::class, null, false],
+                ]
+            );
+        $this->configManager->expects(self::once())
+            ->method('isHiddenModel')
+            ->with($entityClass)
+            ->willReturn(false);
+
         $this->translator->expects(self::never())
             ->method('trans');
 
@@ -582,5 +959,72 @@ class EntityDescriptionProviderTest extends OrmRelatedTestCase
             $expectedValue,
             $this->entityDescriptionProvider->getFieldDocumentation($entityClass, $propertyPath)
         );
+    }
+
+    public function testGetFieldDocumentationForRelatedHiddenConfigurableEntity()
+    {
+        $entityClass = Entity\Product::class;
+        $propertyPath = 'category.name';
+        $expectedValue = null;
+
+        $this->configManager->expects(self::exactly(2))
+            ->method('hasConfig')
+            ->willReturnMap(
+                [
+                    [$entityClass, null, true],
+                    [Entity\Category::class, null, true],
+                ]
+            );
+        $this->configManager->expects(self::exactly(2))
+            ->method('isHiddenModel')
+            ->willReturnMap(
+                [
+                    [$entityClass, null, false],
+                    [Entity\Category::class, null, true],
+                ]
+            );
+
+        $this->translator->expects(self::never())
+            ->method('trans');
+
+        self::assertSame(
+            $expectedValue,
+            $this->entityDescriptionProvider->getFieldDocumentation($entityClass, $propertyPath)
+        );
+
+        // test that the result is cached
+        self::assertSame(
+            $expectedValue,
+            $this->entityDescriptionProvider->getFieldDocumentation($entityClass, $propertyPath)
+        );
+    }
+
+    /**
+     * @param string $entityClass
+     * @param array  $values
+     *
+     * @return Config
+     */
+    protected function getEntityConfig($entityClass, array $values)
+    {
+        $config = new Config(new EntityConfigId('entity', $entityClass));
+        $config->setValues($values);
+
+        return $config;
+    }
+
+    /**
+     * @param string $entityClass
+     * @param string $fieldName
+     * @param array  $values
+     *
+     * @return Config
+     */
+    protected function getFieldConfig($entityClass, $fieldName, array $values)
+    {
+        $config = new Config(new FieldConfigId('entity', $entityClass, $fieldName));
+        $config->setValues($values);
+
+        return $config;
     }
 }
