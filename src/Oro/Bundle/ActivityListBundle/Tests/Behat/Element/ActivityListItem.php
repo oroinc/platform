@@ -22,8 +22,8 @@ class ActivityListItem extends Element
      */
     public function getActionLink($linkTitle)
     {
-        $this->find('css', 'div.actions a.dropdown-toggle')->mouseOver();
-        $links = $this->findAll('css', 'li.launcher-item a');
+        $this->find('css', 'div.activity-actions a.dropdown-toggle')->mouseOver();
+        $links = $this->findAll('css', 'li.activity-action a');
 
         /** @var NodeElement $link */
         foreach ($links as $link) {

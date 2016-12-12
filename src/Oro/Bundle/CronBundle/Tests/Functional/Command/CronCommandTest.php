@@ -2,11 +2,11 @@
 
 namespace Oro\Bundle\CronBundle\Tests\Functinal\Command;
 
-use Symfony\Component\Console\Tester\CommandTester;
-use Symfony\Bundle\FrameworkBundle\Console\Application;
-
-use Oro\Bundle\CronBundle\Command\CronCommand;
-use Oro\Bundle\ImapBundle\Command\Cron\EmailSyncCommand;
+use Cron\CronExpression;
+use Oro\Bundle\CronBundle\Async\Topics;
+use Oro\Bundle\CronBundle\Helper\CronHelper;
+use Oro\Bundle\CronBundle\Tests\Functional\Command\DataFixtures\LoadScheduleData;
+use Oro\Bundle\MessageQueueBundle\Test\Functional\MessageQueueExtension;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker;
 
@@ -15,73 +15,56 @@ use Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker;
  */
 class CronCommandTest extends WebTestCase
 {
-    /** @var Application */
-    protected $application;
+    use MessageQueueExtension;
 
     protected function setUp()
     {
         $this->initClient();
-        $this->loadFixtures([
-            'Oro\Bundle\CronBundle\Tests\Functional\Command\DataFixtures\LoadScheduleData'
-        ]);
 
-        $kernel = self::getContainer()->get('kernel');
-        $this->application = new Application($kernel);
-        $this->application->add(new CronCommand());
+        $this->loadFixtures([
+            LoadScheduleData::class
+        ]);
     }
 
-    public function testCheckRunDuplicateJob()
+    public function testShouldRunAndScheduleIfCommandDue()
     {
         $this->mockCronHelper(true);
 
-        $result = $this->runCommand(CronCommand::COMMAND_NAME, ['--skipCheckDaemon' => true, '-vvv' => true]);
+        $result = $this->runCommand('oro:cron', ['-vvv']);
         $this->assertNotEmpty($result);
 
-        $this->checkMessage('allJobNew', $result);
-
-        $result = $this->runCommand(CronCommand::COMMAND_NAME, ['-vvv' => true]);
-        $this->checkMessage('AllJobAdded', $result);
-
-        for ($i = 1; $i < EmailSyncCommand::MAX_JOBS_COUNT; $i++) {
-            $result = $this->runCommand(CronCommand::COMMAND_NAME, ['-vvv' => true]);
-            $this->assertRegexp('/Processing command "oro:cron:imap-sync": added to job queue/', $result);
-        }
-
-        $result = $this->runCommand(CronCommand::COMMAND_NAME, ['-vvv' => true]);
-        $this->checkMessage('AllJobAlreadyExist', $result);
+        $this->assertContains('Scheduling run for command oro:test', $result);
+        $this->assertContains('All commands scheduled', $result);
     }
 
-    public function testSkipAllJob()
+    public function testShouldRunAndNotScheduleIfNotCommandDue()
     {
-        $this->mockCronHelper();
-        $command = $this->application->find('oro:cron');
-        $commandTester = new CommandTester($command);
-        $commandTester->execute(array(
-            'command'      => $command->getName(),
-            '--skipCheckDaemon' => true,
-        ));
+        $this->mockCronHelper(false);
 
-        $result = $this->runCommand(CronCommand::COMMAND_NAME, ['-vvv' => true]);
+        $result = $this->runCommand('oro:cron', ['-vvv']);
+
         $this->assertNotEmpty($result);
-
-        $this->checkMessage('AllJobSkip', $result);
+        $this->assertContains('Skipping command oro:test', $result);
+        $this->assertContains('All commands scheduled', $result);
     }
 
-    public function testDisabledAllJobs()
+    public function testShouldSendMessageIfCommandDue()
     {
-        $this->mockCronHelper();
-        $this->mockFeatureChecker();
-        $command = $this->application->find('oro:cron');
-        $commandTester = new CommandTester($command);
-        $commandTester->execute([
-            'command' => $command->getName(),
-            '--skipCheckDaemon' => true,
-        ]);
+        $this->mockCronHelper(true);
 
-        $result = $this->runCommand(CronCommand::COMMAND_NAME, ['-vvv' => true]);
-        $this->assertNotEmpty($result);
+        $this->runCommand('oro:cron');
 
-        $this->assertEquals("\nAll commands finished\n", $result);
+        $messages = self::getMessageCollector()->getTopicSentMessages(Topics::RUN_COMMAND);
+
+        $this->assertGreaterThan(0, $messages);
+
+        $message = $messages[0];
+
+        $this->assertInternalType('array', $message);
+        $this->assertArrayHasKey('message', $message);
+        $this->assertInternalType('array', $message['message']);
+        $this->assertArrayHasKey('command', $message['message']);
+        $this->assertArrayHasKey('arguments', $message['message']);
     }
 
     /**
@@ -143,11 +126,11 @@ class CronCommandTest extends WebTestCase
      */
     protected function mockCronHelper($isDue = false)
     {
-        $mockCronHelper = $this->getMockBuilder('Oro\Bundle\CronBundle\Helper\CronHelper')
+        $mockCronHelper = $this->getMockBuilder(CronHelper::class)
             ->disableOriginalConstructor()
             ->getMock();
 
-        $cronExpression = $this->getMockBuilder('Cron\CronExpression')
+        $cronExpression = $this->getMockBuilder(CronExpression::class)
             ->disableOriginalConstructor()
             ->getMock();
         $cronExpression->expects($this->any())->method('isDue')->willReturn($isDue);
