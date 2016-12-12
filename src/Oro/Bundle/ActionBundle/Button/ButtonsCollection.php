@@ -58,7 +58,7 @@ class ButtonsCollection implements \IteratorAggregate, \Countable
         foreach ($this->buttonsMap as $button) {
             $extension = $this->buttonsMap[$button];
             if (call_user_func($filter, $button, $extension)) {
-                $collection->addButton(clone $button, $extension);
+                $collection->addButton($button, $extension);
             }
         }
 
