@@ -137,7 +137,7 @@ class OroTagBundleInstaller implements Installation
         $table->addColumn('created', 'datetime', []);
         $table->addColumn('updated', 'datetime', []);
         $table->setPrimaryKey(['id']);
-        $table->addUniqueIndex(['name', 'organization_id'], 'name_organization_idx');
+        $table->addIndex(['name', 'organization_id'], 'name_organization_idx');
         $table->addIndex(['user_owner_id'], 'IDX_B18F16C79EB185F9', []);
         /** End of generate table oro_tag_tag **/
 
