@@ -34,6 +34,7 @@ class OroTagBundleInstaller implements Installation
         $this->addOroTagTagForeignKeys($schema);
 
         $this->addTaxonomy($schema);
+        $this->addOroTaxonomyForeignKeys($schema);
     }
 
     /**
@@ -148,7 +149,29 @@ class OroTagBundleInstaller implements Installation
             $table,
             ['taxonomy_id'],
             ['id'],
-            ['onDelete' => 'SET NULL', 'onUpdate' => null]
+            ['onDelete' => null, 'onUpdate' => null]
+        );
+    }
+
+    /**
+     * Add oro_tag_taxonomy foreign keys.
+     *
+     * @param Schema $schema
+     */
+    protected function addOroTaxonomyForeignKeys(Schema $schema)
+    {
+        $table = $schema->getTable('oro_tag_taxonomy');
+        $table->addForeignKeyConstraint(
+            $schema->getTable('oro_organization'),
+            ['organization_id'],
+            ['id'],
+            ['onUpdate' => null, 'onDelete' => 'SET NULL']
+        );
+        $table->addForeignKeyConstraint(
+            $schema->getTable('oro_user'),
+            ['user_owner_id'],
+            ['id'],
+            ['onUpdate' => null, 'onDelete' => 'SET NULL']
         );
     }
 }
