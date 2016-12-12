@@ -4,8 +4,6 @@ namespace Oro\Component\Layout;
 
 /**
  * Provides methods to manage the layout structure and configuration.
- *
- * NOTES: If a new "fluent" methods are added to this interface do not forget to re-declare it in inherited interfaces.
  */
 interface LayoutManipulatorInterface
 {
