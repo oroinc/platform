@@ -9,11 +9,19 @@ use Oro\Bundle\TestFrameworkBundle\Behat\Element\OroPageObjectAware;
 use Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context\PageObjectDictionary;
 use Symfony\Component\DomCrawler\Crawler;
 
-class FeatureContext extends OroFeatureContext implements OroPageObjectAware
+class SearchContext extends OroFeatureContext implements OroPageObjectAware
 {
     use PageObjectDictionary;
 
     /**
+     * Assert entity tipes and result count on search results page
+     * Example: And I should see following search entity types:
+     *            | Type            | N | isSelected |
+     *            | All             | 3 | yes        |
+     *            | Business Units  | 1 |            |
+     *            | Calendar events | 1 |            |
+     *            | Organizations   | 1 |            |
+     *
      * @Then /^(?:|I )should see following search entity types:$/
      */
     public function iShouldSeeFollowingSearchEntityTypes(TableNode $table)
@@ -55,6 +63,13 @@ class FeatureContext extends OroFeatureContext implements OroPageObjectAware
     }
 
     /**
+     * Assert search results with its types
+     * Example: And I should see following search results:
+     *            | Title                | Type          |
+     *            | Common Organization  | Organization  |
+     *            | Common Event         | Calendar      |
+     *            | Common Business Unit | Business Unit |
+     *
      * @Then /^(?:|I )should see following search results:$/
      */
     public function iShouldSeeFollowingSearchResults(TableNode $table)
@@ -85,6 +100,9 @@ class FeatureContext extends OroFeatureContext implements OroPageObjectAware
     }
 
     /**
+     * Filter search results by entity type
+     * Example: Given I filter result by "Calendar" type
+     *
      * @Given /^(?:|I )filter result by "(?P<type>[^"]+)" type$/
      */
     public function iFilterResultByEntityType($type)
@@ -96,6 +114,11 @@ class FeatureContext extends OroFeatureContext implements OroPageObjectAware
     }
 
     /**
+     * Select search type of entity in search type
+     * Example: Given I follow "Search"
+     *          And I select "Business Unit" from search types
+     *          And I type "Some kind of Business Unit" in "search"
+     *
      * @Given /^(?:|I )select "(?P<type>[^"]+)" from search types$/
      */
     public function iSelectFromSearchTypes($type)
@@ -113,6 +136,11 @@ class FeatureContext extends OroFeatureContext implements OroPageObjectAware
     }
 
     /**
+     * Assert number of suggestion in entity search after typing in search input area
+     * Example: Given I follow "Search"
+     *          And type "Common" in "search"
+     *          And I should see 3 search suggestions
+     *
      * @Given /^(?:|I )should see (?P<number>\d+) search suggestion(?:|s)$/
      */
     public function iShouldSeeSearchSuggestion($number)

@@ -115,6 +115,12 @@ define([
         this.disposed = true;
         return typeof Object.freeze === 'function' ? Object.freeze(this) : void 0;
     };
+    Backbone.View.prototype.setElement = _.wrap(Backbone.View.prototype.setElement, function(setElement, element) {
+        if (this.$el) {
+            this.disposePageComponents();
+        }
+        return setElement.call(this, element);
+    });
     Backbone.View.prototype.eventNamespace = function() {
         return '.delegateEvents' + this.cid;
     };

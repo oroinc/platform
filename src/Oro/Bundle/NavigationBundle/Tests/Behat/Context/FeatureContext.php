@@ -21,6 +21,10 @@ class FeatureContext extends OroFeatureContext implements OroPageObjectAware, Ke
     use PageObjectDictionary, KernelDictionary;
 
     /**
+     * This step used for system configuration field
+     * Go to System/Configuration and see the fields with default checkboxes
+     * Example: And uncheck Use Default for "Position" field
+     *
      * @Given uncheck Use Default for :label field
      */
     public function uncheckUseDefaultForField($label)
@@ -31,6 +35,8 @@ class FeatureContext extends OroFeatureContext implements OroPageObjectAware, Ke
     }
 
     /**
+     * Save system configuration. It just press 'Save settings' button
+     *
      * @When I save setting
      */
     public function iSaveSetting()
@@ -39,6 +45,8 @@ class FeatureContext extends OroFeatureContext implements OroPageObjectAware, Ke
     }
 
     /**
+     * Assert that menu on left side
+     *
      * @Then menu must be on left side
      * @Then menu is on the left side
      */
@@ -57,6 +65,10 @@ class FeatureContext extends OroFeatureContext implements OroPageObjectAware, Ke
     }
 
     /**
+     * Click link in shortcuts search results
+     * Example: And click "Create new user" in shortcuts search results
+     * Example: And click "Compose email" in shortcuts search results
+     *
      * @When /^(?:|I )click "(?P<link>[^"]+)" in shortcuts search results$/
      */
     public function clickInShortcutsSearchResults($link)
@@ -77,6 +89,10 @@ class FeatureContext extends OroFeatureContext implements OroPageObjectAware, Ke
     }
 
     /**
+     * Pin or unpin page
+     * Example: When I pin page
+     * Example: And unpin page
+     *
      * @When /^(?:|I )(?P<action>(pin|unpin)) page$/
      */
     public function iPinPage($action)
@@ -102,6 +118,10 @@ class FeatureContext extends OroFeatureContext implements OroPageObjectAware, Ke
     }
 
     /**
+     * Assert that link present is NOT on pin bar
+     * Example: And Users link must not be in pin holder
+     * Example: And Create User link must not be in pin holder
+     *
      * @Given /^(?P<link>[\w\s]+) link must not be in pin holder$/
      */
     public function usersLinkMustNotBeInPinHolder($link)
@@ -111,6 +131,10 @@ class FeatureContext extends OroFeatureContext implements OroPageObjectAware, Ke
     }
 
     /**
+     * Assert that link is present on pin bar
+     * Example: Then Users link must be in pin holder
+     * Example: Then Create User link must be in pin holder
+     *
      * @Then /^(?P<link>[\w\s]+) link must be in pin holder$/
      */
     public function linkMustBeInPinHolder($link)
@@ -120,6 +144,10 @@ class FeatureContext extends OroFeatureContext implements OroPageObjectAware, Ke
     }
 
     /**
+     * Click link in pin bar
+     * Example: When follow Users link in pin holder
+     * Example: When I follow Create User link in pin holder
+     *
      * @When /^(?:|I )follow (?P<link>[\w\s]+) link in pin holder$/
      */
     public function followUsersLinkInPinHolder($link)
@@ -147,6 +175,14 @@ class FeatureContext extends OroFeatureContext implements OroPageObjectAware, Ke
     }
 
     /**
+     * Example: And go to next pages:
+     *            | Reports & Segments/ Manage Custom Reports |
+     *            | System/ User Management/ Users            |
+     *            | Dashboards/ Manage Dashboards             |
+     *            | System/ User Management/ Users            |
+     *            | Dashboards/ Manage Dashboards             |
+     *            | Dashboards/ Dashboard                     |
+     *
      * @When /^(?:|I )go to next pages:$/
      */
     public function goToPages(TableNode $table)
@@ -225,6 +261,12 @@ class FeatureContext extends OroFeatureContext implements OroPageObjectAware, Ke
     }
 
     /**
+     * Assert hystory tab including links positions
+     * Example: Then History must looks like:
+     *            | Manage dashboards - Dashboards             |
+     *            | Users - User Management - System           |
+     *            | Manage Custom Reports - Reports & Segments |
+     *
      * @Then /^(?P<tab>(History|Most Viewed|Favorites)) must looks like:$/
      */
     public function historyMustLooksLike($tab, TableNode $table)
@@ -247,6 +289,11 @@ class FeatureContext extends OroFeatureContext implements OroPageObjectAware, Ke
     }
 
     /**
+     * Assert that some of 'three minuses menu' tab is empty
+     * Example: Then History is empty
+     * Example: And Favorites is empty
+     * Example: And Most Viewed is empty
+     *
      * @Then /^(?P<tab>(History|Most Viewed|Favorites)) is empty$/
      */
     public function tabContentIsEmpty($tab)
@@ -262,6 +309,11 @@ class FeatureContext extends OroFeatureContext implements OroPageObjectAware, Ke
     }
 
     /**
+     * Make active some of 'three minuses menu' tab
+     * Example: Given I choose Most Viewed tab
+     * Example: And choose Favorites tab
+     * Example: And choose History tab
+     *
      * @When /^(?:|I )choose (?P<link>(History|Most Viewed|Favorites)) tab$/
      */
     public function chooseQuickMenuTab($link)
@@ -277,6 +329,10 @@ class FeatureContext extends OroFeatureContext implements OroPageObjectAware, Ke
     }
 
     /**
+     * Add or remove page from faborites
+     * Example: Given I add page to favorites
+     * Example: And I remove page from favorites
+     *
      * @When /^(?:|I )(?P<action>(add|remove)) page (to|from) favorites$/
      */
     public function iAddOrRemovePageToFavorites($action)
@@ -302,6 +358,9 @@ class FeatureContext extends OroFeatureContext implements OroPageObjectAware, Ke
     }
 
     /**
+     * Removed record from favorites
+     * Example: And I remove "Active Users - Users - User Management - System" from favorites
+     *
      * @When /^(?:|I )remove "(?P<record>[^"]+)" from favorites$/
      */
     public function removeFromFavorites($record)
@@ -327,6 +386,8 @@ class FeatureContext extends OroFeatureContext implements OroPageObjectAware, Ke
     }
 
     /**
+     * Example: And I click on "Active Users - Users - User Management - System" in Favorites
+     *
      * @Then /^(?:|I )click on "(?P<record>[^"]+)" in Favorites$/
      */
     public function iClickOnInFavorites($record)

@@ -379,6 +379,7 @@
     {% import 'OroUIBundle::macros.html.twig' as UI %}
     <div {{ UI.renderPageComponentAttributes({
         module: 'oroui/js/app/components/view-component',
+        name: 'from_validation',
         options: {
             _sourceElement: '#' ~ form.vars.id,
             view: 'oroform/js/app/views/form-validate-view',
