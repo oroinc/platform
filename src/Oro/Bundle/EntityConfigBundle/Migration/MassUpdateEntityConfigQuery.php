@@ -112,6 +112,7 @@ class MassUpdateEntityConfigQuery implements MigrationQuery, ConnectionAwareInte
                             scope = ? AND
                             code = ?
                     ";
+                $value = $this->convertEntityConfigIndexValueToDatabaseValue($value);
                 $parameters = [$value, $entityConfigId, $scope, $code];
                 $statement = $this->connection->prepare($sql);
                 $statement->execute($parameters);
@@ -120,6 +121,23 @@ class MassUpdateEntityConfigQuery implements MigrationQuery, ConnectionAwareInte
                 $logger->debug($sql);
             }
         }
+    }
+
+    /**
+     * @param bool|string|array $originalValue
+     *
+     * @return string
+     */
+    protected function convertEntityConfigIndexValueToDatabaseValue($originalValue)
+    {
+        $convertedValue = $originalValue;
+        if (is_bool($originalValue)) {
+            $convertedValue = (int)$originalValue;
+        } elseif (is_array($originalValue)) {
+            $convertedValue = json_encode($originalValue);
+        }
+
+        return (string)$convertedValue;
     }
 
     /**

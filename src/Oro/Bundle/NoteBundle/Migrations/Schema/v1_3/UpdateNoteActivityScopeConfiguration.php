@@ -27,6 +27,11 @@ class UpdateNoteActivityScopeConfiguration implements Migration
                     'acl'                  => 'oro_note_view',
                     'action_button_widget' => 'oro_add_note_button',
                     'action_link_widget'   => 'oro_add_note_link'
+                ],
+                'grouping' => [
+                    'groups' => [
+                        'activity'
+                    ]
                 ]
             ]
         );
