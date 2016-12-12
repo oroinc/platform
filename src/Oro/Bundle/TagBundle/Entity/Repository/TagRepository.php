@@ -40,7 +40,7 @@ class TagRepository extends EntityRepository
                 Join::WITH,
                 't2.recordId IN (:entityIds) AND t2.entityName = :entityClassName'
             )
-            ->join(
+            ->leftJoin(
                 't.taxonomy',
                 'tx',
                 Join::WITH,
