@@ -38,6 +38,14 @@ class OperationButton implements ButtonInterface
     }
 
     /**
+     * @param ActionData $actionData
+     */
+    public function setActionData(ActionData $actionData)
+    {
+        $this->data = $actionData;
+    }
+
+    /**
      * {@inheritdoc}
      */
     public function getOrder()
