@@ -380,7 +380,7 @@ datagrids:
                 type: dialog
                 label: oro.email.datagrid.emails.action.view
                 link: view_thread_link
-                icon: eye-open
+                icon: eye
                 rowAction: true
                 widgetOptions:
                     options:
