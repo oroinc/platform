@@ -83,10 +83,6 @@ abstract class AbstractTransitionButton implements ButtonInterface
 
         return array_merge(
             [
-                'workflow' => $this->workflow,
-                'transition' => $this->transition,
-                'context' => $this->getButtonContext(),
-
                 'frontendOptions' => $this->transition->getFrontendOptions(),
                 'hasForm' => $this->transition->hasForm(),
                 'showDialog' => $showDialog,
@@ -103,8 +99,7 @@ abstract class AbstractTransitionButton implements ButtonInterface
                 'dialogRoute' => $showDialog
                     ? $this->buttonContext->getFormDialogRoute()
                     : $this->buttonContext->getFormPageRoute(),
-                'translationDomain' => 'workflows',
-                'additionalData' => [],
+                'additionalData' => $this->getDatagridData(),
             ],
             $customData
         );
@@ -127,11 +122,19 @@ abstract class AbstractTransitionButton implements ButtonInterface
     }
 
     /**
-     * @return string
+     * {@inheritdoc}
      */
     public function getGroup()
     {
         return ButtonInterface::DEFAULT_GROUP;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getTranslationDomain()
+    {
+        return 'workflows';
     }
 
     /**

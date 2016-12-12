@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\ActionBundle\Datagrid\EventListener;
 
+use Symfony\Component\Translation\TranslatorInterface;
+
 use Oro\Bundle\ActionBundle\Button\ButtonInterface;
 use Oro\Bundle\ActionBundle\Button\ButtonsCollection;
 use Oro\Bundle\ActionBundle\Button\ButtonSearchContext;
@@ -36,6 +38,9 @@ class ButtonListener
     /** @var GridConfigurationHelper */
     protected $gridConfigurationHelper;
 
+    /** @var TranslatorInterface */
+    protected $translator;
+
     /** @var ButtonSearchContext */
     protected $searchContext;
 
@@ -51,19 +56,22 @@ class ButtonListener
      * @param MassActionProviderRegistry $providerRegistry
      * @param OptionsHelper $optionsHelper
      * @param GridConfigurationHelper $gridConfigurationHelper
+     * @param TranslatorInterface $translator
      */
     public function __construct(
         ButtonProvider $buttonProvider,
         ContextHelper $contextHelper,
         MassActionProviderRegistry $providerRegistry,
         OptionsHelper $optionsHelper,
-        GridConfigurationHelper $gridConfigurationHelper
+        GridConfigurationHelper $gridConfigurationHelper,
+        TranslatorInterface $translator
     ) {
         $this->buttonProvider = $buttonProvider;
         $this->contextHelper = $contextHelper;
         $this->providerRegistry = $providerRegistry;
         $this->optionsHelper = $optionsHelper;
         $this->gridConfigurationHelper = $gridConfigurationHelper;
+        $this->translator = $translator;
     }
 
     /**
@@ -246,7 +254,7 @@ class ButtonListener
         $config = array_merge(
             [
                 'type' => 'action-widget',
-                'label' => $button->getLabel(),
+                'label' => $this->translator->trans($button->getLabel(), [], $button->getTranslationDomain()),
                 'rowAction' => false,
                 'link' => '#',
                 'icon' => $icon,
@@ -286,7 +294,7 @@ class ButtonListener
             } elseif (!empty($datagridOptions['mass_action'])) {
                 $actions[$button->getName()] = array_merge(
                     [
-                        'label' => $button->getLabel()
+                        'label' => $this->translator->trans($button->getLabel(), [], $button->getTranslationDomain()),
                     ],
                     $datagridOptions['mass_action']
                 );

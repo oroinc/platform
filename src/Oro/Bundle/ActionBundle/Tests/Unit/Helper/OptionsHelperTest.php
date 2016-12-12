@@ -3,9 +3,9 @@
 namespace Oro\Bundle\ActionBundle\Tests\Unit\Helper;
 
 use Symfony\Component\PropertyAccess\PropertyPath;
+use Symfony\Bundle\FrameworkBundle\Routing\Router;
 use Symfony\Component\Translation\TranslatorInterface;
 
-use Oro\Bundle\ActionBundle\Helper\ApplicationsUrlHelper;
 use Oro\Bundle\ActionBundle\Helper\ContextHelper;
 use Oro\Bundle\ActionBundle\Helper\OptionsHelper;
 use Oro\Bundle\ActionBundle\Model\ActionData;
@@ -20,8 +20,8 @@ class OptionsHelperTest extends \PHPUnit_Framework_TestCase
     /** @var ContextHelper|\PHPUnit_Framework_MockObject_MockObject */
     protected $contextHelper;
 
-    /** @var ApplicationsUrlHelper|\PHPUnit_Framework_MockObject_MockObject */
-    protected $applicationsUrlHelper;
+    /** @var Router|\PHPUnit_Framework_MockObject_MockObject */
+    protected $router;
 
     /** @var OptionsAssembler|\PHPUnit_Framework_MockObject_MockObject */
     protected $optionsAssembler;
@@ -41,7 +41,7 @@ class OptionsHelperTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->applicationsUrlHelper = $this->getMockBuilder('Oro\Bundle\ActionBundle\Helper\ApplicationsUrlHelper')
+        $this->router = $this->getMockBuilder(Router::class)
             ->disableOriginalConstructor()
             ->getMock();
 
@@ -52,10 +52,7 @@ class OptionsHelperTest extends \PHPUnit_Framework_TestCase
         $this->mockTranslator = $this->getMockBuilder('Symfony\Component\Translation\TranslatorInterface')->getMock();
 
         $this->helper = new OptionsHelper(
-            $this->contextHelper,
-            $this->optionsAssembler,
-            new ContextAccessor(),
-            $this->applicationsUrlHelper,
+            $this->router,
             $this->mockTranslator
         );
     }
@@ -86,12 +83,12 @@ class OptionsHelperTest extends \PHPUnit_Framework_TestCase
             ->method('assemble')
             ->willReturn($inputData['buttonOptions']);
 
-        $this->applicationsUrlHelper->expects($this->once())
+        $this->router->expects($this->once())
             ->method('getExecutionUrl')
             ->with($inputData['routerContext'])
             ->willReturn($inputData['executionUrl']);
 
-        $this->applicationsUrlHelper->expects($this->once())
+        $this->router->expects($this->once())
             ->method('getDialogUrl')
             ->with($inputData['routerContext'])
             ->willReturn($inputData['dialogUrl']);

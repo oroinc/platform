@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\ActionBundle\Tests\Unit\Datagrid\EventListener;
 
+use Symfony\Bridge\Twig\Tests\Extension\Fixtures\StubTranslator;
+
 use Oro\Bundle\ActionBundle\Button\ButtonContext;
 use Oro\Bundle\ActionBundle\Button\ButtonInterface;
 use Oro\Bundle\ActionBundle\Button\ButtonsCollection;
@@ -111,7 +113,8 @@ class ButtonListenerTest extends \PHPUnit_Framework_TestCase
             $contextHelper,
             $this->massActionProviderRegistry,
             $optionsHelper,
-            $this->gridConfigurationHelper
+            $this->gridConfigurationHelper,
+            new StubTranslator()
         );
     }
 
@@ -275,7 +278,7 @@ class ButtonListenerTest extends \PHPUnit_Framework_TestCase
                 ),
                 'expected' => true,
                 'expectedConfiguration' => [
-                    'actions' => ['action3' => $this->getRowActionConfig('Action 3 label', ['key1' => 'value1'])],
+                    'actions' => ['action3' => $this->getRowActionConfig('[trans]Action 3 label[/trans]', ['key1' => 'value1'])],
                 ]
             ],
             'should not replace existing default action' => [
@@ -310,7 +313,7 @@ class ButtonListenerTest extends \PHPUnit_Framework_TestCase
                 'expectedConfiguration' => [
                     'actions' => [
                         'action3' => ['label' => 'default action3'],
-                        'test_operation' => $this->getRowActionConfig(),
+                        'test_operation' => $this->getRowActionConfig('[trans][/trans]'),
                     ]
                 ]
             ],

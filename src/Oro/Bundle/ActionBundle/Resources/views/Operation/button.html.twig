@@ -16,6 +16,9 @@
                 {% endfor %}
                 data-options="{{ options.options|json_encode }}"
                 data-page-component-module="oroaction/js/app/components/button-component"
+                {% if not button.buttonContext.enabled %}
+                    disabled="disabled"
+                {% endif %}
             >
                 {% if not noIcon|default(false) %}
                     <i class="{{ params.buttonOptions.icon|default('') }} {{ params.buttonOptions.iCss|default('') }} hide-text"></i>

@@ -149,6 +149,7 @@ services:
             - '@oro_action.datagrid.mass_action_provider.registry'
             - '@oro_action.helper.options'
             - '@oro_datagrid.grid_configuration.helper'
+            - '@translator'
         calls:
             - [setGroups, [['', 'datagridRowAction']]]
         tags:

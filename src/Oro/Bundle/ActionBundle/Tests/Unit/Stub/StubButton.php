@@ -54,4 +54,10 @@ class StubButton implements ButtonInterface
     {
         return 'test_name';
     }
+
+    /** {@inheritdoc} */
+    public function getTranslationDomain()
+    {
+        return 'test_domain';
+    }
 }

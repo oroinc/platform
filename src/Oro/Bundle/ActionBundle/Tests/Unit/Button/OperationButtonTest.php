@@ -86,36 +86,38 @@ class OperationButtonTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(OperationButton::DEFAULT_TEMPLATE, $this->button->getTemplate());
     }
 
-    /**
-     * @dataProvider getTemplateDataDataProvider
-     *
-     * @param array $expectedResult
-     */
-    public function testGetTemplateData(array $expectedResult)
+    public function testGetTemplateData()
     {
+        $definition = $this->getMockBuilder(OperationDefinition::class)->disableOriginalConstructor()->getMock();
+        $this->assertOperationMethodsCalled($definition);
+
+        $defaultData = [
+            'params' => $this->operation->getDefinition(),
+            'actionData' => new ActionData(),
+            'frontendOptions' => null,
+            'buttonOptions' => null,
+            'hasForm' => null,
+            'showDialog' => true,
+            'routeParams' => [
+                'operationName' => $this->operation->getDefinition()->getName(),
+                'entityClass' => null,
+                'entityId' => null,
+                'route' => null,
+                'datagrid' => null,
+                'group' => null,
+            ],
+            'executionRoute' => null,
+            'dialogRoute' => null,
+            'additionalData' => [],
+            'aClass' => '',
+        ];
+
         $this->assertOperationMethodsCalled(new OperationDefinition());
 
-        $templateData = $this->button->getTemplateData();
-        $this->assertEquals($expectedResult, $templateData);
-    }
 
-    /**
-     * @return array
-     */
-    public function getTemplateDataDataProvider()
-    {
-        return [
-            'correct' => [
-                'expectedResult' => [
-                    'operation' => $this->getOperationMock(),
-                    'params' => new OperationDefinition(),
-                    'aClass' => '',
-                    'actionData' => new ActionData(),
-                    'buttonContext' => new ButtonContext(),
-                    'additionalData' => []
-                ],
-            ],
-        ];
+
+        $templateData = $this->button->getTemplateData();
+        $this->assertEquals($defaultData, $templateData);
     }
 
     public function testGetButtonContext()

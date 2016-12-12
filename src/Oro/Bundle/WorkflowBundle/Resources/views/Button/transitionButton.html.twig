@@ -1,28 +1,28 @@
 {% import 'OroWorkflowBundle::macros.html.twig' as workflowMacros %}
 
 {# Show button for start or transit workflow #}
-{% set transitionMessage = transition.message|trans({}, translationDomain) %}
-{% if transitionMessage == transition.message %}
+{% set transitionMessage = button.transition.message|trans({}, button.translationDomain) %}
+{% if transitionMessage == button.transition.message %}
     {# if no translation for message then do not show message #}
     {% set transitionMessage = '' %}
 {% endif %}
 
 {% set transitionData = {
-    'transition-label': transition.label|trans({},'workflows'),
+    'transition-label': button.label|trans({},'workflows'),
     'message': transitionMessage|nl2br,
-    'transition-condition-messages': context.errors,
-    'enabled': context.enabled,
+    'transition-condition-messages': button.buttonContext.errors,
+    'enabled': button.buttonContext.enabled,
     'transition-url': path(executionRoute, routeParams),
 } %}
 
-{% set transitionData = transition.frontendOptions.data|default({})|merge(transitionData) %}
+{% set transitionData = frontendOptions.data|default({})|merge(transitionData) %}
 {% if hasForm and showDialog %}
     {% set transitionData = transitionData|merge({'dialog-url': path(dialogRoute, routeParams) }) %}
 {% endif %}
 {% if not onlyLink|default(false) %}<div class="pull-left btn-group icons-holder">{% endif %}
     {{ workflowMacros.renderTransitionButton(
-        workflow,
-        transition,
+        button.workflow,
+        button.transition,
         workflowItem|default(null),
         transitionData,
         onlyLink|default(false),

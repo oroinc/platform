@@ -69,8 +69,7 @@ class OptionsHelper
             'dialogOptions' => [
                 'title' => $this->getTitle(
                     $button,
-                    $frontendOptions,
-                    isset($data['translationDomain']) ? $data['translationDomain'] : null
+                    $frontendOptions
                 ),
                 'dialogOptions' => !empty($frontendOptions['options']) ? $frontendOptions['options'] : []
             ],
@@ -87,15 +86,14 @@ class OptionsHelper
     /**
      * @param ButtonInterface $button
      * @param array $frontendOptions
-     * @param string $domain
      * @return string
      */
-    protected function getTitle(ButtonInterface $button, array $frontendOptions, $domain = null)
+    protected function getTitle(ButtonInterface $button, array $frontendOptions)
     {
         $title = isset($frontendOptions['title']) ? $frontendOptions['title'] : $button->getLabel();
         $titleParams = isset($frontendOptions['title_parameters']) ? $frontendOptions['title_parameters'] : [];
 
-        return $this->translator->trans($title, $titleParams, $domain);
+        return $this->translator->trans($title, $titleParams, $button->getTranslationDomain());
     }
 
     /**

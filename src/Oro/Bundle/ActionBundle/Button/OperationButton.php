@@ -96,10 +96,8 @@ class OperationButton implements ButtonInterface
             $defaultData,
             $customData,
             [
-                'operation' => $this->operation,
                 'params' => $this->operation->getDefinition(),
                 'actionData' => $this->data,
-                'buttonContext' => $this->buttonContext,
                 'frontendOptions' => $this->operation->getDefinition()->getFrontendOptions(),
                 'buttonOptions' => $this->operation->getDefinition()->getButtonOptions(),
                 'hasForm' => $this->operation->hasForm(),
@@ -138,13 +136,21 @@ class OperationButton implements ButtonInterface
     }
 
     /**
-     * @return string
+     * {@inheritdoc}
      */
     public function getGroup()
     {
         $buttonOptions = $this->operation->getDefinition()->getButtonOptions();
 
         return isset($buttonOptions['group']) ? $buttonOptions['group'] : null;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getTranslationDomain()
+    {
+        return null;
     }
 
     /**

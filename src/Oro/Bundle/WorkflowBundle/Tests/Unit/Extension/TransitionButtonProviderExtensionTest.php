@@ -7,7 +7,6 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Oro\Bundle\ActionBundle\Button\ButtonContext;
 use Oro\Bundle\ActionBundle\Button\ButtonInterface;
 use Oro\Bundle\ActionBundle\Button\ButtonSearchContext;
-use Oro\Bundle\ActionBundle\Exception\UnsupportedButtonException;
 use Oro\Bundle\ActionBundle\Provider\RouteProviderInterface;
 
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
@@ -122,6 +121,7 @@ class TransitionButtonProviderExtensionTest extends \PHPUnit_Framework_TestCase
      */
     public function testFind($expected, $entityClass = null, $datagrid = null)
     {
+        /** @var Transition|\PHPUnit_Framework_MockObject_MockObject $transition */
         $transition = $this->getMock(Transition::class);
 
         $transitionManager = $this->getMock(TransitionManager::class);
@@ -129,14 +129,7 @@ class TransitionButtonProviderExtensionTest extends \PHPUnit_Framework_TestCase
             ->method('getTransitions')
             ->willReturn(new ArrayCollection([$transition]));
 
-        $workflow = $this->getWorkflow(
-            $transitionManager,
-            [
-                'init_entities' => [
-                    self::ENTITY_CLASS => ['transition1', 'transition2'],
-                ],
-            ]
-        );
+        $workflow = $this->getWorkflow($transitionManager);
 
         $this->workflowRegistry->expects($this->once())
             ->method('getActiveWorkflows')
@@ -165,16 +158,16 @@ class TransitionButtonProviderExtensionTest extends \PHPUnit_Framework_TestCase
     public function findDataProvider()
     {
         return [
-            [
+            'not matched entity' => [
                 'expected' => false,
                 'entityClass' => 'class',
             ],
-            [
+            'matched datagrid, not matched entity' => [
                 'expected' => false,
                 'entityClass' => 'test_entity',
                 'datagrid' => self::DATAGRID_NAME
             ],
-            [
+            'matched' => [
                 'expected' => true,
                 'entityClass' => self::ENTITY,
                 'datagrid' => self::DATAGRID_NAME
@@ -259,16 +252,11 @@ class TransitionButtonProviderExtensionTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @param TransitionManager|\PHPUnit_Framework_MockObject_MockObject $transitionManager
-     * @param array $configuration
-     * @param array $exclusiveRecordGroups
-     *
      * @return Workflow|\PHPUnit_Framework_MockObject_MockObject
      */
-    private function getWorkflow(
-        TransitionManager $transitionManager,
-        array $configuration = [],
-        array $exclusiveRecordGroups = []
-    ) {
+    private function getWorkflow(TransitionManager $transitionManager)
+    {
+        /** @var Workflow|\PHPUnit_Framework_MockObject_MockObject $workflow */
         $workflow = $this->getMockBuilder(Workflow::class)
             ->setMethods(['getTransitionManager'])
             ->disableOriginalConstructor()
@@ -277,14 +265,9 @@ class TransitionButtonProviderExtensionTest extends \PHPUnit_Framework_TestCase
         $definition = $this->getMock(WorkflowDefinition::class);
         $definition->expects($this->any())->method('getDatagrids')->willReturn([self::DATAGRID_NAME]);
         $definition->expects($this->any())->method('getRelatedEntity')->willReturn(self::ENTITY);
-        $definition = (new WorkflowDefinition())
-            ->setRelatedEntity('entity_related')
-            ->setConfiguration($configuration)
-            ->setExclusiveRecordGroups($exclusiveRecordGroups);
 
         $workflow->setDefinition($definition);
 
-        $workflow->expects($this->any())->method('getDefinition')->willReturn($definition);
         $workflow->expects($this->any())->method('getTransitionManager')->willReturn($transitionManager);
 
         return $workflow;
