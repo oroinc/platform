@@ -38,11 +38,11 @@ class OroAsseticExtension extends Extension
      */
     public function getBundlesAssetsConfiguration(ContainerBuilder $container, array $config)
     {
-        $result = array(
+        $result = [
             'css_debug_groups' => $config['css_debug'],
             'css_debug_all'    => $config['css_debug_all'],
-            'css'              => array()
-        );
+            'css'              => []
+        ];
 
         $configLoader = new CumulativeConfigLoader(
             'oro_assetic',

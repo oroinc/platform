@@ -48,9 +48,9 @@ class PlatformUpdateCommand extends AbstractCommand
         $force = $input->getOption('force');
 
         if ($force) {
-            $assetsOptions = array(
-                '--exclude' => array('OroInstallerBundle')
-            );
+            $assetsOptions = [
+                '--exclude' => ['OroInstallerBundle']
+            ];
             if ($input->hasOption('symlink') && $input->getOption('symlink')) {
                 $assetsOptions['--symlink'] = true;
             }
@@ -60,26 +60,28 @@ class PlatformUpdateCommand extends AbstractCommand
             $commandExecutor
                 ->runCommand(
                     'oro:migration:load',
-                    array(
+                    [
                         '--process-isolation' => true,
                         '--force'             => true,
                         '--timeout'           => $commandExecutor->getDefaultOption('process-timeout')
-                    )
+                    ]
                 )
-                ->runCommand(LoadPermissionConfigurationCommand::NAME, array('--process-isolation' => true))
+                ->runCommand(LoadPermissionConfigurationCommand::NAME, ['--process-isolation' => true])
                 ->runCommand(
                     'oro:workflow:definitions:load',
-                    ['--process-isolation' => true, '--skip-scope-processing' => true]
+                    ['--process-isolation' => true]
                 )
                 ->runCommand(
-                    'oro:workflow:scope:update',
-                    ['--process-isolation' => true, '--disable-on-error' => true]
+                    'oro:cron:definitions:load',
+                    [
+                        '--process-isolation' => true
+                    ]
                 )
-                ->runCommand('oro:process:configuration:load', array('--process-isolation' => true))
-                ->runCommand('oro:migration:data:load', array('--process-isolation' => true))
-                ->runCommand('oro:navigation:init', array('--process-isolation' => true))
-                ->runCommand('router:cache:clear', array('--process-isolation' => true))
-                ->runCommand('oro:message-queue:create-queues', array('--process-isolation' => true))
+                ->runCommand('oro:process:configuration:load', ['--process-isolation' => true])
+                ->runCommand('oro:migration:data:load', ['--process-isolation' => true])
+                ->runCommand('oro:navigation:init', ['--process-isolation' => true])
+                ->runCommand('router:cache:clear', ['--process-isolation' => true])
+                ->runCommand('oro:message-queue:create-queues', ['--process-isolation' => true])
             ;
 
             if (!$input->getOption('skip-translations')) {
@@ -91,12 +93,12 @@ class PlatformUpdateCommand extends AbstractCommand
                 $commandExecutor
                     ->runCommand('oro:assets:install', $assetsOptions)
                     ->runCommand('assetic:dump')
-                    ->runCommand('fos:js-routing:dump', array('--process-isolation' => true))
-                    ->runCommand('oro:localization:dump', array('--process-isolation' => true))
-                    ->runCommand('oro:translation:dump', array('--process-isolation' => true))
+                    ->runCommand('fos:js-routing:dump', ['--process-isolation' => true])
+                    ->runCommand('oro:localization:dump', ['--process-isolation' => true])
+                    ->runCommand('oro:translation:dump', ['--process-isolation' => true])
                     ->runCommand(
                         'oro:requirejs:build',
-                        array('--ignore-errors' => true, '--process-isolation' => true)
+                        ['--ignore-errors' => true, '--process-isolation' => true]
                     );
             }
         } else {

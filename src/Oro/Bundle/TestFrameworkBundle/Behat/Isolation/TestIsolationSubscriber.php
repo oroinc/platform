@@ -36,6 +36,9 @@ class TestIsolationSubscriber implements EventSubscriberInterface
     /** @var InputInterface */
     protected $input;
 
+    /** @var  bool */
+    protected $skip;
+
     /**
      * @param IsolatorInterface[] $isolators
      */
@@ -74,14 +77,18 @@ class TestIsolationSubscriber implements EventSubscriberInterface
 
     public function beforeExercise()
     {
+        if ($this->skip) {
+            return;
+        }
+
         foreach ($this->isolators as $isolator) {
             if ($isolator->isOutdatedState()) {
                 $helper = new QuestionHelper();
                 $question = new ConfirmationQuestion(
                     sprintf(
                         '<question>"%s" isolator discover that last time '.
-                        'environment was not be restored properly.'.PHP_EOL
-                        .'Do you what to restore state?(Y/n)</question>',
+                        'environment was not restored properly.'.PHP_EOL
+                        .'Do you what to restore the state?(Y/n)</question>',
                         $isolator->getName()
                     ),
                     true,
@@ -103,9 +110,16 @@ class TestIsolationSubscriber implements EventSubscriberInterface
         $this->output->writeln('<comment>Application ready for tests</comment>');
     }
 
-    public function beforeFeature()
+    /**
+     * @param BeforeFeatureTested $event
+     */
+    public function beforeFeature(BeforeFeatureTested $event)
     {
-        $event = new BeforeIsolatedTestEvent();
+        if ($this->skip) {
+            return;
+        }
+
+        $event = new BeforeIsolatedTestEvent($event->getFeature());
 
         foreach ($this->isolators as $isolator) {
             $isolator->beforeTest($event);
@@ -114,14 +128,24 @@ class TestIsolationSubscriber implements EventSubscriberInterface
 
     public function beforeScenario()
     {
+        if ($this->skip) {
+            return;
+        }
     }
 
     public function afterScenario()
     {
+        if ($this->skip) {
+            return;
+        }
     }
 
     public function afterFeature()
     {
+        if ($this->skip) {
+            return;
+        }
+
         $event = new AfterIsolatedTestEvent();
 
         foreach ($this->reverseIsolators as $isolator) {
@@ -131,6 +155,10 @@ class TestIsolationSubscriber implements EventSubscriberInterface
 
     public function afterExercise()
     {
+        if ($this->skip) {
+            return;
+        }
+
         $event = new AfterFinishTestsEvent($this->output);
 
         $this->output->writeln('<comment>Begin clean up isolation environment</comment>');
@@ -154,5 +182,13 @@ class TestIsolationSubscriber implements EventSubscriberInterface
     public function setInput(InputInterface $input)
     {
         $this->input = $input;
+    }
+
+    /**
+     * @param bool $skip
+     */
+    public function setSkip($skip)
+    {
+        $this->skip = $skip;
     }
 }

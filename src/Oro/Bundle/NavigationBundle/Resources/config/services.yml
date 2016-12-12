@@ -257,7 +257,6 @@ services:
           - '@oro_navigation.title_config_reader'
           - '@oro_navigation.title_translator'
           - '@doctrine.orm.entity_manager'
-          - '@serializer'
           - '@oro_config.user'
           - '@oro_navigation.chain_breadcrumb_manager.link'
           - '@oro_navigation.title_provider'
@@ -314,6 +313,15 @@ services:
         class:                        %oro_navigation.form.type.pagestate.class%
         tags:
             - { name: form.type, alias: pagestate }
+
+    oro_navigation.form.type.route_select:
+        class: Oro\Bundle\NavigationBundle\Form\Type\RouteChoiceType
+        arguments:
+            - '@router.default'
+            - '@doctrine'
+            - '@translator'
+        tags:
+            - { name: form.type, alias: oro_route_choice }
 
     oro_navigation.form.handler.pagestate:
         class:                        %oro_navigation.form.handler.pagestate.class%

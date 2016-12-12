@@ -50,7 +50,7 @@ datagrids:
                 type:          dialog
                 acl_resource:  oro_attachment_update
                 label:         oro.grid.action.update
-                icon:          edit
+                icon:          pencil-square-o
                 link:          update_link
                 widgetOptions:
                     reload-grid-name: attachment-grid
@@ -68,5 +68,5 @@ datagrids:
                 type:          delete
                 acl_resource:  oro_attachment_delete
                 label:         oro.grid.action.delete
-                icon:          trash
+                icon:          trash-o
                 link:          delete_link

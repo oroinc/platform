@@ -160,7 +160,7 @@ define(
             getReminderMessage: function(reminder) {
                 var message = '';
                 try {
-                    message = '<i class="icon-bell"></i>';
+                    message = '<i class="fa-bell-o"></i>';
                     var template = $('.reminder_templates[data-identifier="' + reminder.templateId + '"]').html();
                     if ($.trim(template) === '') {
                         template = $('.reminder_templates[data-identifier="default"]').html();
