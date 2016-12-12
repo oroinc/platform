@@ -5,10 +5,12 @@ define(function(require) {
     var $ = require('jquery');
     var _ = require('underscore');
     var BaseView = require('oroui/js/app/views/base/view');
+    var mediator = require('oroui/js/mediator');
     var routing = require('routing');
     var dateTimeFormatter = require('orolocale/js/formatter/datetime');
     var LoadingMaskView = require('oroui/js/app/views/loading-mask-view');
     var CommentComponent = require('orocomment/js/app/components/comment-component');
+    var transitionHandler = require('oroworkflow/js/transition-handler');
 
     ActivityView = BaseView.extend({
         options: {
@@ -30,6 +32,7 @@ define(function(require) {
             'class': 'list-item'
         },
         events: {
+            'click .transition-item': 'onTransition',
             'click .item-edit-button': 'onEdit',
             'click .item-remove-button': 'onDelete',
             'click .accordion-toggle': 'onToggle',
@@ -96,7 +99,7 @@ define(function(require) {
             this.$('.dropdown-menu.activity-item').on('mouseleave', function() {
                 $(this).parent().find('a.dropdown-toggle').trigger('click');
             });
-            if (this.$('.dropdown-menu.activity-item .launcher-item').children().length === 0) {
+            if (this.$('.dropdown-menu.activity-item li').children().length === 0) {
                 this.$('.dropdown-menu.activity-item').hide();
                 this.$('.dropdown-toggle.activity-item').text('');
             }
@@ -104,8 +107,22 @@ define(function(require) {
             return this;
         },
 
-        onEdit: function() {
-            this.model.collection.trigger('toEdit', this.model);
+        onTransition: function(e) {
+            e.preventDefault();
+            var $el = $(e.target);
+            var activityModel = this.model;
+
+            $el.one('transitions_success', function() {
+                // manually update the model in case the workflow transition does not change any of it's attributes
+                activityModel.set('updatedAt', new Date());
+                mediator.trigger('widget_success:activity_list:item:update');
+            });
+
+            transitionHandler.call($el, false);
+        },
+
+        onEdit: function(e) {
+            this.model.collection.trigger('toEdit', this.model, this.$(e.currentTarget).data('actionExtraOptions'));
         },
 
         onDelete: function() {

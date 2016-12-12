@@ -2,11 +2,11 @@
 
 namespace Oro\Bundle\InstallerBundle\Command;
 
-use Oro\Bundle\SecurityBundle\Command\LoadPermissionConfigurationCommand;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
-
 use Symfony\Component\Console\Output\OutputInterface;
+
+use Oro\Bundle\SecurityBundle\Command\LoadPermissionConfigurationCommand;
 
 class PlatformUpdateCommand extends AbstractCommand
 {
