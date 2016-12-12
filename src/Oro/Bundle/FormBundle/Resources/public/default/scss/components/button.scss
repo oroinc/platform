@@ -51,6 +51,23 @@
         }
     }
 
+    &-primary,
+    &---primary{
+        border-color: get-color('additional', 'middle') ;
+        background-color: get-color('additional', 'middle');
+        color: get-color('additional', 'ultra');
+
+        @include element-state('hover') {
+            border-color: lighten(get-color('additional', 'middle'), 5%);
+            background-color: lighten(get-color('additional', 'middle'), 5%);
+            color: get-color('additional', 'ultra');
+        }
+
+        @include element-state('focus') {
+            border-color: lighten(get-color('additional', 'middle'), 5%);
+        }
+    }
+
     &--link {
         border-color: transparent;
         background-color: transparent;
