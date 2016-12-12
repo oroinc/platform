@@ -5,12 +5,15 @@ use Doctrine\ORM\EntityRepository;
 
 use Psr\Log\LoggerInterface;
 
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
+
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\ImportExportBundle\Async\ExportMessageProcessor;
 use Oro\Bundle\ImportExportBundle\Async\Topics;
 use Oro\Bundle\ImportExportBundle\Handler\ExportHandler;
 use Oro\Bundle\UserBundle\Entity\User;
+use Oro\Bundle\SecurityBundle\SecurityFacade;
 use Oro\Component\MessageQueue\Client\MessageProducerInterface;
 use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
 use Oro\Component\MessageQueue\Job\JobRunner;
@@ -27,53 +30,44 @@ class ExportMessageProcessorTest extends \PHPUnit_Framework_TestCase
             $this->createMessageProducerMock(),
             $this->createConfigManagerMock(),
             $this->createDoctrineHelperMock(),
+            $this->createSecurityFacadeMock(),
+            $this->createTokenStorageInterfaceMock(),
             $this->createLoggerInterfaceMock()
         );
     }
 
-    public function testShouldRejectMessageAndLogCriticalIfJobNameIsMissing()
+    public function messageBodyLoggerCriticalDataProvider()
     {
-        $logger = $this->createLoggerInterfaceMock();
-        $logger
-            ->expects($this->once())
-            ->method('critical')
-            ->with('[ExportMessageProcessor] Got invalid message: "{"processorAlias":"alias","userId":1}"')
-        ;
-
-        $message = new NullMessage();
-        $message->setBody(json_encode([
-            'processorAlias' => 'alias',
-            'userId' => 1
-        ]));
-
-        $processor = new ExportMessageProcessor(
-            $this->createExportHandlerMock(),
-            $this->createJobRunnerMock(),
-            $this->createMessageProducerMock(),
-            $this->createConfigManagerMock(),
-            $this->createDoctrineHelperMock(),
-            $logger
-        );
-
-        $result = $processor->process($message, $this->createSessionMock());
-
-        $this->assertEquals(MessageProcessorInterface::REJECT, $result);
+        return [
+            [
+                '[ExportMessageProcessor] Got invalid message: "{"processorAlias":"alias","userId":1}"',
+                ['processorAlias' => 'alias', 'userId' => 1],
+            ],
+            [
+                '[ExportMessageProcessor] Got invalid message: "{"jobName":"name","userId":1}"',
+                ['jobName' => 'name', 'userId' => 1],
+            ],
+            [
+                '[ExportMessageProcessor] Got invalid message: "{"jobName":"name","processorAlias":"alias"}"',
+                ['jobName' => 'name', 'processorAlias' => 'alias'],
+            ],
+        ];
     }
 
-    public function testShouldRejectMessageAndLogCriticalIfProcessorAliasIsMissing()
+    /**
+     * @dataProvider messageBodyLoggerCriticalDataProvider
+     */
+    public function testShouldRejectMessageAndLogCriticalIfRequiredParametersAreMissing($loggerMessage, $messageBody)
     {
         $logger = $this->createLoggerInterfaceMock();
         $logger
             ->expects($this->once())
             ->method('critical')
-            ->with('[ExportMessageProcessor] Got invalid message: "{"jobName":"name","userId":1}"')
+            ->with($loggerMessage)
         ;
 
         $message = new NullMessage();
-        $message->setBody(json_encode([
-            'jobName' => 'name',
-            'userId' => 1,
-        ]));
+        $message->setBody(json_encode($messageBody));
 
         $processor = new ExportMessageProcessor(
             $this->createExportHandlerMock(),
@@ -81,39 +75,12 @@ class ExportMessageProcessorTest extends \PHPUnit_Framework_TestCase
             $this->createMessageProducerMock(),
             $this->createConfigManagerMock(),
             $this->createDoctrineHelperMock(),
+            $this->createSecurityFacadeMock(),
+            $this->createTokenStorageInterfaceMock(),
             $logger
         );
 
-        $result = $processor->process($message, $this->createSessionMock());
-
-        $this->assertEquals(MessageProcessorInterface::REJECT, $result);
-    }
-
-    public function testShouldRejectMessageAndLogCriticalIfUserIdIsMissing()
-    {
-        $logger = $this->createLoggerInterfaceMock();
-        $logger
-            ->expects($this->once())
-            ->method('critical')
-            ->with('[ExportMessageProcessor] Got invalid message: "{"jobName":"name","processorAlias":"alias"}"')
-        ;
-
-        $message = new NullMessage();
-        $message->setBody(json_encode([
-            'jobName' => 'name',
-            'processorAlias' => 'alias',
-        ]));
-
-        $processor = new ExportMessageProcessor(
-            $this->createExportHandlerMock(),
-            $this->createJobRunnerMock(),
-            $this->createMessageProducerMock(),
-            $this->createConfigManagerMock(),
-            $this->createDoctrineHelperMock(),
-            $logger
-        );
-
-        $result = $processor->process($message, $this->createSessionMock());
+        $result = $processor->process($message, $this->createSessionInterfaceMock());
 
         $this->assertEquals(MessageProcessorInterface::REJECT, $result);
     }
@@ -156,10 +123,12 @@ class ExportMessageProcessorTest extends \PHPUnit_Framework_TestCase
             $this->createMessageProducerMock(),
             $this->createConfigManagerMock(),
             $doctrineHelper,
+            $this->createSecurityFacadeMock(),
+            $this->createTokenStorageInterfaceMock(),
             $logger
         );
 
-        $result = $processor->process($message, $this->createSessionMock());
+        $result = $processor->process($message, $this->createSessionInterfaceMock());
 
         $this->assertEquals(MessageProcessorInterface::REJECT, $result);
     }
@@ -223,8 +192,24 @@ class ExportMessageProcessorTest extends \PHPUnit_Framework_TestCase
     /**
      * @return \PHPUnit_Framework_MockObject_MockObject|SessionInterface
      */
-    private function createSessionMock()
+    private function createSessionInterfaceMock()
     {
-        return $this->getMock(SessionInterface::class);
+        return $this->getMock(SessionInterface::class, [], [], '', false);
+    }
+
+    /**
+     * @return \PHPUnit_Framework_MockObject_MockObject|SecurityFacade
+     */
+    private function createSecurityFacadeMock()
+    {
+        return $this->getMock(SecurityFacade::class, [], [], '', false);
+    }
+
+    /**
+     * @return \PHPUnit_Framework_MockObject_MockObject|TokenStorageInterface
+     */
+    private function createTokenStorageInterfaceMock()
+    {
+        return $this->getMock(TokenStorageInterface::class, [], [], '', false);
     }
 }

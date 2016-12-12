@@ -155,8 +155,7 @@ abstract class AbstractExportMessageProcessor implements MessageProcessorInterfa
             return self::REJECT;
         }
 
-        $token = new UsernamePasswordOrganizationToken($user, null, 'main', $user->getOrganization(), $user->getRoles());
-        $this->tokenStorage->setToken($token);
+        $this->authorizeUser($user);
 
         $contextParameters = new ParameterBag($body['parameters']['gridParameters']);
         $contextParameters->set(ActionExtension::ENABLE_ACTIONS_PARAMETER, false);
@@ -194,6 +193,22 @@ abstract class AbstractExportMessageProcessor implements MessageProcessorInterfa
         );
 
         return $result ? self::ACK : self::REJECT;
+    }
+
+    /**
+     * @param User $user
+     */
+    protected function authorizeUser(User $user)
+    {
+        $token = new UsernamePasswordOrganizationToken(
+            $user,
+            null,
+            'main',
+            $user->getOrganization(),
+            $user->getRoles()
+        );
+
+        $this->tokenStorage->setToken($token);
     }
 
     /**

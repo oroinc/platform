@@ -2,11 +2,15 @@
 
 namespace Oro\Bundle\ImportExportBundle\Async;
 
+use Psr\Log\LoggerInterface;
+
+use Symfony\Bridge\Doctrine\RegistryInterface;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
+
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\ImportExportBundle\Handler\HttpImportHandler;
 use Oro\Bundle\ImportExportBundle\Job\JobExecutor;
 use Oro\Bundle\NotificationBundle\Async\Topics as NotificationTopics;
-use Oro\Bundle\SecurityBundle\Authentication\Token\UsernamePasswordOrganizationToken;
 use Oro\Bundle\SecurityProBundle\Tokens\ProUsernamePasswordOrganizationToken;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Component\MessageQueue\Client\MessageProducerInterface;
@@ -16,9 +20,6 @@ use Oro\Component\MessageQueue\Job\JobRunner;
 use Oro\Component\MessageQueue\Transport\MessageInterface;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
 use Oro\Component\MessageQueue\Util\JSON;
-use Psr\Log\LoggerInterface;
-use Symfony\Bridge\Doctrine\RegistryInterface;
-use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
 class HttpImportMessageProcessor implements MessageProcessorInterface, TopicSubscriberInterface
 {
@@ -113,10 +114,10 @@ class HttpImportMessageProcessor implements MessageProcessorInterface, TopicSubs
             $message->getMessageId(),
             sprintf('oro:import:http:%s:%s', $body['processorAlias'], $message->getMessageId()),
             function () use ($body, $user) {
-                $token = new ProUsernamePasswordOrganizationToken($user, null, 'import', $user->getOrganization(), $user->getRoles());
-                $this->tokenStorage->setToken($token);
+                $this->authorizeUser($user);
+
                 $this->httpImportHandler->setImportingFileName($body['fileName']);
-//                 should also send acl attribute
+                // should also send acl attribute
                 $result = $this->httpImportHandler->handleImport(
                     $body['jobName'],
                     $body['processorAlias'],
@@ -155,6 +156,21 @@ class HttpImportMessageProcessor implements MessageProcessorInterface, TopicSubs
         return $result ? self::ACK : self::REJECT;
     }
 
+    /**
+     * @param User $user
+     */
+    protected function authorizeUser(User $user)
+    {
+        $token = new ProUsernamePasswordOrganizationToken(
+            $user,
+            null,
+            'import',
+            $user->getOrganization(),
+            $user->getRoles()
+        );
+
+        $this->tokenStorage->setToken($token);
+    }
 
     /**
      * {@inheritdoc}

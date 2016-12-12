@@ -171,8 +171,7 @@ class SendChangedEntitiesToMessageQueueListener implements OptionalListenerInter
             $body['entities_updated'] = $this->processUpdates($em);
             $body['entities_deleted'] = $this->processDeletions($em);
             $body['collections_updated'] = $this->processCollectionUpdates($em);
-            if (
-                empty($body['entities_inserted']) &&
+            if (empty($body['entities_inserted']) &&
                 empty($body['entities_updated']) &&
                 empty($body['entities_deleted']) &&
                 empty($body['collections_updated'])

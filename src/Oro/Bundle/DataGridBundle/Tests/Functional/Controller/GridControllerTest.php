@@ -53,7 +53,8 @@ class GridControllerTest extends WebTestCase
                     '_parameters' => ['view' => '__all__'],
                     '_appearance' => ['_type' => 'grid'],
                     '_sort_by' => ['name' => 'ASC'],
-                    '_columns' => 'name1.contactName1.contactEmail1.contactPhone1.ownerName1.createdAt1.updatedAt1.tags1',
+                    '_columns' => 'name1.contactName1.contactEmail1.'
+                        .'contactPhone1.ownerName1.createdAt1.updatedAt1.tags1',
 
                 ],
                 FormatterProvider::FORMAT_TYPE => 'excel',
