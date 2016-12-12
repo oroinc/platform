@@ -34,6 +34,9 @@ class FeatureContext extends OroFeatureContext implements
     }
 
     /**
+     * Open dashboard login page
+     * It's generated from 'oro_user_security_login' route name for current application
+     *
      * @Given I am on (Login) page
      */
     public function iAmOnLoginPage()
@@ -43,6 +46,8 @@ class FeatureContext extends OroFeatureContext implements
     }
 
     /**
+     * Load "user.yml" alice fixture from UserBundle suite
+     *
      * @Given (Charlie Sheen) (active) user exists in the system
      */
     public function charlieUserInTheSystem()
@@ -51,6 +56,8 @@ class FeatureContext extends OroFeatureContext implements
     }
 
     /**
+     * Assert that user with 'charlie' username has access to dashboard
+     *
      * @Then (Charlie Sheen) user could login to the Dashboard
      */
     public function charlieCanLogin()
@@ -65,6 +72,8 @@ class FeatureContext extends OroFeatureContext implements
     }
 
     /**
+     * Assert that user with 'charlie' username has NOT access to dashboard
+     *
      * @Then (Charlie Sheen) user has no possibility to login to the Dashboard
      */
     public function charlieCantLogin()

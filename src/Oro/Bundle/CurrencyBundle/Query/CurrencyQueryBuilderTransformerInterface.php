@@ -13,7 +13,7 @@ interface CurrencyQueryBuilderTransformerInterface
      * @param null         $newFieldName
      *
      * @return string
-     * @throws \Exception
+     * @throws \InvalidArgumentException in case
      */
     public function getTransformSelectQuery(
         $originalFieldName,
@@ -21,13 +21,4 @@ interface CurrencyQueryBuilderTransformerInterface
         $rootAlias = null,
         $newFieldName = null
     );
-
-    /**
-     * @param QueryBuilder $qb
-     * @param $originalFieldName
-     * @param $newFieldName
-     *
-     * @throws \Exception
-     */
-    public function transformSelect(QueryBuilder $qb, $originalFieldName, $newFieldName);
 }

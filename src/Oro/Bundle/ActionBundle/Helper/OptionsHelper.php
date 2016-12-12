@@ -51,12 +51,17 @@ class OptionsHelper
     /**
      * @param Operation $operation
      * @param array $context
+     * @param ActionData $actionData
+     *
      * @return array
      */
-    public function getFrontendOptions(Operation $operation, array $context = null)
+    public function getFrontendOptions(Operation $operation, array $context = null, ActionData $actionData = null)
     {
         $actionContext = $this->contextHelper->getContext($context);
-        $actionData = $this->contextHelper->getActionData($actionContext);
+
+        if (null === $actionData) {
+            $actionData = $this->contextHelper->getActionData($actionContext);
+        }
 
         return [
             'options' => $this->createOptions($operation, $actionData, $actionContext),
