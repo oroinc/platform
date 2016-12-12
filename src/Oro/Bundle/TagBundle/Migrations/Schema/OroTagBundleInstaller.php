@@ -149,7 +149,7 @@ class OroTagBundleInstaller implements Installation
             $table,
             ['taxonomy_id'],
             ['id'],
-            ['onDelete' => null, 'onUpdate' => null]
+            ['onDelete' => 'SET NULL', 'onUpdate' => null]
         );
     }
 

@@ -36,7 +36,7 @@ class AddTagTaxonomy implements Migration
             $table,
             ['taxonomy_id'],
             ['id'],
-            ['onDelete' => null, 'onUpdate' => null]
+            ['onDelete' => 'SET NULL', 'onUpdate' => null]
         );
         $table->addForeignKeyConstraint(
             $schema->getTable('oro_organization'),
