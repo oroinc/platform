@@ -3,10 +3,9 @@
 namespace Oro\Bundle\IntegrationBundle\Tests\Functional\Controller\Api\Rest;
 
 use Doctrine\ORM\EntityManager;
-
-use JMS\JobQueueBundle\Entity\Job;
-use Oro\Bundle\IntegrationBundle\Command\SyncCommand;
+use Oro\Bundle\IntegrationBundle\Async\Topics;
 use Oro\Bundle\IntegrationBundle\Entity\Channel;
+use Oro\Bundle\MessageQueueBundle\Test\Functional\MessageQueueExtension;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
 /**
@@ -14,6 +13,8 @@ use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
  */
 class IntegrationControllerTest extends WebTestCase
 {
+    use MessageQueueExtension;
+
     /**
      * @var EntityManager
      */
@@ -21,16 +22,11 @@ class IntegrationControllerTest extends WebTestCase
 
     protected function setUp()
     {
-        $this->initClient([], $this->generateWsseAuthHeader());
+        parent::setUp();
+
+        $this->initClient([], $this->generateWsseAuthHeader(), true);
         $this->entityManager = $this->client->getContainer()->get('doctrine')
             ->getManagerForClass('OroIntegrationBundle:Channel');
-    }
-
-    protected function tearDown()
-    {
-        parent::tearDown();
-
-        $this->resetClient();
     }
 
     public function testShouldActivateIntegration()
@@ -107,11 +103,8 @@ class IntegrationControllerTest extends WebTestCase
         $this->assertTrue($channel->getPreviouslyEnabled());
     }
 
-    public function testShouldScheduleSyncJobOnActivation()
+    public function testShouldSendSyncIntegrationMessageOnActivation()
     {
-        //guard
-        $this->assertCount(0, $this->getScheduledSyncJobs());
-
         $channel = $this->createChannel();
         $channel->setEnabled(true);
         $channel->setPreviouslyEnabled(null);
@@ -124,8 +117,10 @@ class IntegrationControllerTest extends WebTestCase
         $this->client->request('GET', $this->getUrl('oro_api_activate_integration', ['id' => $channelId]));
 
         $this->assertResult($this->getJsonResponseContent($this->client->getResponse(), 200));
-
-        $this->assertCount(1, $this->getScheduledSyncJobs());
+        
+        $traces = self::getMessageCollector()->getTopicSentMessages(Topics::SYNC_INTEGRATION);
+        
+        $this->assertCount(1, $traces);
     }
 
     /**
@@ -166,14 +161,5 @@ class IntegrationControllerTest extends WebTestCase
         $channel->setPreviouslyEnabled(null);
         
         return $channel;
-    }
-
-    /**
-     * @return array|Job[]
-     */
-    protected function getScheduledSyncJobs()
-    {
-        return $this->getContainer()->get('doctrine')->getRepository('JMSJobQueueBundle:Job')
-            ->findBy(['command' => SyncCommand::COMMAND_NAME]);
     }
 }

@@ -14,6 +14,7 @@ use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 use Oro\Bundle\ApiBundle\Config\StatusCodesConfig;
 use Oro\Bundle\ApiBundle\Filter\FieldAwareFilterInterface;
 use Oro\Bundle\ApiBundle\Filter\FilterCollection;
+use Oro\Bundle\ApiBundle\Filter\NamedValueFilterInterface;
 use Oro\Bundle\ApiBundle\Filter\StandaloneFilter;
 use Oro\Bundle\ApiBundle\Filter\StandaloneFilterWithDefaultValue;
 use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
@@ -354,45 +355,58 @@ class RestDocHandler implements HandlerInterface
     {
         foreach ($filters as $key => $filter) {
             if ($filter instanceof StandaloneFilter) {
-                $dataType = $filter->getDataType();
-                $isArrayAllowed = $filter->isArrayAllowed();
-                $options = [
-                    'description' => $this->getFilterDescription($filter->getDescription()),
-                    'requirement' => $this->valueNormalizer->getRequirement(
-                        $dataType,
-                        $this->docViewDetector->getRequestType(),
-                        $isArrayAllowed
-                    )
-                ];
-                if ($filter instanceof FieldAwareFilterInterface) {
-                    $options['type'] = $this->getFilterType($dataType, $isArrayAllowed);
+                if ($filter instanceof NamedValueFilterInterface) {
+                    $key .= sprintf('[%s]', $filter->getFilterValueName());
                 }
-                $operators = $filter->getSupportedOperators();
-                if (!empty($operators) && !(count($operators) === 1 && $operators[0] === StandaloneFilter::EQ)) {
-                    $options['operators'] = implode(',', $operators);
-                }
-                if ($filter instanceof StandaloneFilterWithDefaultValue) {
-                    $default = $filter->getDefaultValueString();
-                    if (!empty($default)) {
-                        $options['default'] = $default;
-                    }
-                }
-
-                if ($filter instanceof FieldAwareFilterInterface) {
-                    $association = $metadata->getAssociation($filter->getField());
-                    if (null !== $association && !DataType::isAssociationAsField($association->getDataType())) {
-                        $targetEntityTypes = $this->getFilterTargetEntityTypes(
-                            $association->getAcceptableTargetClassNames()
-                        );
-                        if (!empty($targetEntityTypes)) {
-                            $options['relation'] = implode(',', $targetEntityTypes);
-                        }
-                    }
-                }
-
-                $annotation->addFilter($key, $options);
+                $annotation->addFilter($key, $this->getFilterOptions($filter, $metadata));
             }
         }
+    }
+
+    /**
+     * @param StandaloneFilter $filter
+     * @param EntityMetadata   $metadata
+     *
+     * @return array
+     */
+    protected function getFilterOptions(StandaloneFilter $filter, EntityMetadata $metadata)
+    {
+        $dataType = $filter->getDataType();
+        $isArrayAllowed = $filter->isArrayAllowed();
+        $options = [
+            'description' => $this->getFilterDescription($filter->getDescription()),
+            'requirement' => $this->valueNormalizer->getRequirement(
+                $dataType,
+                $this->docViewDetector->getRequestType(),
+                $isArrayAllowed
+            )
+        ];
+        if ($filter instanceof FieldAwareFilterInterface) {
+            $options['type'] = $this->getFilterType($dataType, $isArrayAllowed);
+        }
+        $operators = $filter->getSupportedOperators();
+        if (!empty($operators) && !(count($operators) === 1 && $operators[0] === StandaloneFilter::EQ)) {
+            $options['operators'] = implode(',', $operators);
+        }
+        if ($filter instanceof StandaloneFilterWithDefaultValue) {
+            $default = $filter->getDefaultValueString();
+            if (!empty($default)) {
+                $options['default'] = $default;
+            }
+        }
+        if ($filter instanceof FieldAwareFilterInterface) {
+            $association = $metadata->getAssociation($filter->getField());
+            if (null !== $association && !DataType::isAssociationAsField($association->getDataType())) {
+                $targetEntityTypes = $this->getFilterTargetEntityTypes(
+                    $association->getAcceptableTargetClassNames()
+                );
+                if (!empty($targetEntityTypes)) {
+                    $options['relation'] = implode(',', $targetEntityTypes);
+                }
+            }
+        }
+
+        return $options;
     }
 
     /**

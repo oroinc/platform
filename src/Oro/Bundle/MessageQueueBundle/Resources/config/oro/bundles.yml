@@ -1,2 +1,2 @@
 bundles:
-    - Oro\Bundle\MessageQueueBundle\OroMessageQueueBundle
+    - { name: Oro\Bundle\MessageQueueBundle\OroMessageQueueBundle, priority: -86 }

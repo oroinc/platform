@@ -57,7 +57,7 @@ define(function(require) {
 
     MultiCheckboxEditorView = SelectEditorView.extend(/** @exports MultiCheckboxEditorView.prototype */{
         className: 'multi-checkbox-editor',
-        template: require('tpl!oroform/templates/multi-checkbox-editor.html'),
+        template: require('tpl!oroform/templates/editor/multi-checkbox-editor.html'),
 
         /**
          * Jquery object that wraps select DOM element with initialized multiselect plugin

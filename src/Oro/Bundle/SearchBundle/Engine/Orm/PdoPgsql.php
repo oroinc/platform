@@ -18,8 +18,8 @@ class PdoPgsql extends BaseDriver
     /**
      * Init additional doctrine functions
      *
-     * @param \Doctrine\ORM\EntityManager         $em
-     * @param \Doctrine\ORM\Mapping\ClassMetadata $class
+     * @param EntityManager $em
+     * @param ClassMetadata $class
      */
     public function initRepo(EntityManager $em, ClassMetadata $class)
     {
@@ -36,11 +36,14 @@ class PdoPgsql extends BaseDriver
     /**
      * Sql plain query to create fulltext index for Postgresql.
      *
+     * @param string $tableName
+     * @param string $indexName
+     *
      * @return string
      */
-    public static function getPlainSql()
+    public static function getPlainSql($tableName = 'oro_search_index_text', $indexName = 'value')
     {
-        return "CREATE INDEX value ON oro_search_index_text USING gin(to_tsvector('english', 'value'))";
+        return sprintf('CREATE INDEX %s ON %s USING gin(to_tsvector(\'english\', value))', $indexName, $tableName);
     }
 
     /**
@@ -66,6 +69,10 @@ class PdoPgsql extends BaseDriver
 
             case Query::OPERATOR_NOT_CONTAINS:
                 $searchString = $this->createNotContainsStringQuery($index, $useFieldName);
+                break;
+
+            case Query::OPERATOR_STARTS_WITH:
+                $searchString = $this->createStartWithStringQuery($index, $useFieldName);
                 break;
 
             case Query::OPERATOR_EQUALS:
@@ -135,6 +142,52 @@ class PdoPgsql extends BaseDriver
     }
 
     /**
+     * @param QueryBuilder $qb
+     * @param string $index
+     * @param string $fieldValue
+     * @param bool $isOrderBy
+     */
+    protected function createContainsQueryParameter(QueryBuilder $qb, $index, $fieldValue, $isOrderBy)
+    {
+        $searchArray = explode(Query::DELIMITER, $fieldValue);
+
+        foreach ($searchArray as $key => $string) {
+            $searchArray[$key] = $string . ':*';
+        }
+
+        $stringParameter = implode(' | ', $searchArray);
+
+        $qb->setParameter('value' . $index, $stringParameter);
+
+        if ($isOrderBy) {
+            $qb->setParameter('orderByValue' . $index, $stringParameter);
+        }
+    }
+
+    /**
+     * @param QueryBuilder $qb
+     * @param string $index
+     * @param string $fieldValue
+     * @param bool $isOrderBy
+     */
+    protected function createNotContainsQueryParameter(QueryBuilder $qb, $index, $fieldValue, $isOrderBy)
+    {
+        $searchArray = explode(Query::DELIMITER, $fieldValue);
+
+        foreach ($searchArray as $key => $string) {
+            $searchArray[$key] = '!' . $string;
+        }
+
+        $stringParameter = implode(' & ', $searchArray);
+
+        $qb->setParameter('value' . $index, $stringParameter);
+
+        if ($isOrderBy) {
+            $qb->setParameter('orderByValue' . $index, $stringParameter);
+        }
+    }
+
+    /**
      * Create search string for string parameters (not contains)
      *
      * @param integer $index
@@ -180,6 +233,8 @@ class PdoPgsql extends BaseDriver
             } else {
                 $qb->setParameter('value' . $index, implode(' | ', $searchArray));
             }
+        } elseif ($searchCondition === Query::OPERATOR_STARTS_WITH) {
+            $qb->setParameter('value' . $index, $fieldValue . '%');
         } else {
             $qb->setParameter('value' . $index, $fieldValue);
         }
@@ -188,15 +243,15 @@ class PdoPgsql extends BaseDriver
     /**
      * Set fulltext range order by
      *
-     * @param \Doctrine\ORM\QueryBuilder $qb
-     * @param int                        $index
+     * @param QueryBuilder $qb
+     * @param int $index
      */
     protected function setTextOrderBy(QueryBuilder $qb, $index)
     {
         $joinAlias = $this->getJoinAlias(Query::TYPE_TEXT, $index);
 
         $qb->addSelect(sprintf('TsRank(%s.value, :value%s) as rankField%s', $joinAlias, $index, $index))
-            ->addOrderBy(sprintf('rankField%s', $index), Criteria::DESC);
+           ->addOrderBy(sprintf('rankField%s', $index), Criteria::DESC);
     }
 
     /**
@@ -212,5 +267,56 @@ class PdoPgsql extends BaseDriver
         }
 
         return $query;
+    }
+
+    /**
+     * @param string $index
+     * @param bool $useFieldName
+     * @return string
+     */
+    public function createEqualsStringQuery($index, $useFieldName)
+    {
+        $joinAlias = $this->getJoinAlias(Query::TYPE_TEXT, $index);
+
+        $stringQuery = $joinAlias . '.value = :equals' . $index;
+
+        if ($useFieldName) {
+            $stringQuery .= ' AND ' . $joinAlias . '.field = :field' . $index;
+        }
+
+        return $stringQuery;
+    }
+
+    /**
+     * @param QueryBuilder $qb
+     * @param string $index
+     * @param string $fieldValue
+     * @param bool $isOrderBy
+     */
+    public function createEqualsQueryParameter(QueryBuilder $qb, $index, $fieldValue, $isOrderBy)
+    {
+        $qb->setParameter('equals' . $index, $fieldValue);
+
+        if ($isOrderBy) {
+            $qb->setParameter('orderByValue' . $index, $fieldValue);
+        }
+    }
+
+    /**
+     * @param string $index
+     * @param bool $useFieldName
+     * @return string
+     */
+    protected function createStartWithStringQuery($index, $useFieldName)
+    {
+        $joinAlias = $this->getJoinAlias(Query::TYPE_TEXT, $index);
+
+        $stringQuery = $joinAlias . '.value LIKE :value' . $index;
+
+        if ($useFieldName) {
+            $stringQuery .= ' AND ' . $joinAlias . '.field = :field' . $index;
+        }
+
+        return $stringQuery;
     }
 }

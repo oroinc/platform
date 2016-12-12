@@ -16,8 +16,14 @@ html{
 }
 
 .responsive-section {
-  .inner-grid {/* todo: need delete negative margins - ask Vova Eremenko for details*/
-    margin:-@contentPadding -@contentPadding @contentPadding -@contentPadding;
+  .inner-grid {/* todo: when it needs to upgrade to bootstrap4, check negative margins*/
+    margin: -@contentPadding -@contentPadding @contentPadding 0;
+  }
+
+  .responsive-cell {
+    .inner-grid {
+      margin: -@contentPadding -@contentPadding @contentPadding -@contentPadding;
+    }
   }
 }
 
@@ -72,6 +78,38 @@ html{
   .responsive-cell:only-child,
   .responsive-block:only-child {
     .responsive-block-position();
+  }
+}
+
+.responsive-section {
+  figure {
+    display: table;
+    margin: 5px auto 1rem;
+  }
+
+  figcaption {
+    display: table-caption;
+    caption-side: bottom;
+    margin: 10px 0 0;
+    
+    font-size: 0.88rem;
+    text-align: center;
+  }
+
+  .cms-page__figure_right,
+  .cms-page__figure_left {
+    clear: both;
+  }
+
+
+  .cms-page__figure_right {
+    float: right;
+    margin-left: 20px;
+  }
+
+  .cms-page__figure_left {
+    float: left;
+    margin-right: 20px;
   }
 }
 
@@ -131,7 +169,7 @@ body.backdrop {
       padding-top: 5px;
       padding-bottom: 4px;
     }
-    i[class^="icon-"] {
+    i[class^="fa-"] {
       color: #444;
       &.pull-right{
         margin: 0 -14px 0 0;

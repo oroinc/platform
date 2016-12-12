@@ -161,6 +161,10 @@ class SendChangedEntitiesToMessageQueueListener implements OptionalListenerInter
                 if ($securityToken instanceof OrganizationContextTokenInterface) {
                     $body['organization_id'] = $securityToken->getOrganizationContext()->getId();
                 }
+
+                if ($securityToken->hasAttribute('IMPERSONATION')) {
+                    $body['impersonation_id'] = $securityToken->getAttribute('IMPERSONATION');
+                }
             }
 
             $body['entities_inserted'] = $this->processInsertions($em);
@@ -176,11 +180,10 @@ class SendChangedEntitiesToMessageQueueListener implements OptionalListenerInter
                 return;
             }
 
-            $message = new Message();
-            $message->setPriority(MessagePriority::VERY_LOW);
-            $message->setBody($body);
-
-            $this->messageProducer->send(Topics::ENTITIES_CHANGED, $message);
+            $this->messageProducer->send(
+                Topics::ENTITIES_CHANGED,
+                new Message($body, MessagePriority::VERY_LOW)
+            );
         } finally {
             $this->allInsertions->detach($em);
             $this->allUpdates->detach($em);

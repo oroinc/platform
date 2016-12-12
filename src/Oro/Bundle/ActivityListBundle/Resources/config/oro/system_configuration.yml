@@ -75,7 +75,7 @@ system_configuration:
                                             - oro_activity_list.sorting_field
                                             - oro_activity_list.sorting_direction
                                             - oro_activity_list.per_page
-                            email_configuration:
+                            user_email_configuration:
                                 children:
                                     email_threads:
                                         children:

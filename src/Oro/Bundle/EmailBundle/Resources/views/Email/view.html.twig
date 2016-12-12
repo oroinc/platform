@@ -57,7 +57,7 @@
         {% set notFoundMessage %}<strong>{{ 'oro.email.unable_to_load_body'|trans}}</strong>{% endset %}
         {% set attributes = attributes | merge([UI.attibuteRow('', notFoundMessage)]) %}
     {% else %}
-        {% if entity.emailBody.hasAttachments %}
+        {% if entity.emailBody.hasAttachments and attachments is defined %}
             {% set attributes = attributes |
                 merge([UI.attibuteRow(
                     'Attachments'|trans,

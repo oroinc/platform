@@ -1,0 +1,49 @@
+operations:
+    oro_test_operation_not_disabled:
+        enabled: true
+        order: 10
+        label: oro.test.operation.disable_operation.label
+        applications: [default]
+        groups: []
+        frontend_options: []
+        routes:
+            - test_operation_route
+        entities:
+            - Oro\Bundle\TestFrameworkBundle\Entity\Item
+        exclude_entities: []
+        for_all_entities: false
+        datagrids: []
+        exclude_datagrids: []
+        for_all_datagrids: false
+
+    oro_test_disable_operation:
+        enabled: true
+        order: 10
+        label: oro.test.operation.disable_operation.label
+        applications: [default]
+        groups: []
+        frontend_options: []
+        routes:
+            - test_operation_route
+        entities: []
+        exclude_entities: []
+        for_all_entities: false
+        datagrids: []
+        exclude_datagrids: []
+        for_all_datagrids: false
+
+    oro_test_disable_operation_by_entity:
+        enabled: true
+        order: 10
+        label: oro.test.operation.disable_operation.label
+        applications: [default]
+        groups: []
+        frontend_options: []
+        routes: []
+        entities:
+            - Oro\Bundle\TestFrameworkBundle\Entity\Item
+        exclude_entities: []
+        for_all_entities: false
+        datagrids: []
+        exclude_datagrids: []
+        for_all_datagrids: false

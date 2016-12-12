@@ -45,7 +45,7 @@ define(function(require) {
 
         /** @property */
         closeButtonTemplate: _.template(
-            '<li class="dropdown-close"><i class="icon-remove hide-text">' + __('Close') + '</i></li>'
+            '<li class="dropdown-close"><i class="fa-close hide-text">' + __('Close') + '</i></li>'
         ),
 
         /** @property */
@@ -79,7 +79,7 @@ define(function(require) {
             'click': '_showDropdown',
             'mouseover .dropdown-toggle': '_showDropdown',
             'mouseleave .dropdown-menu, .dropdown-menu__placeholder': '_hideDropdown',
-            'click .dropdown-close .icon-remove': '_hideDropdown'
+            'click .dropdown-close .fa-close': '_hideDropdown'
         },
 
         /**

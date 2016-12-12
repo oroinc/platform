@@ -18,3 +18,4 @@ Table of content
 * [Layout implementation example of a product page](./Resources/doc/example.md)
 * [Debug Information](./Resources/doc/debug_information.md)
 * [Using PHP Templating instead of Twig](./Resources/doc/using_php_templating.md)
+* [Layout cache](./Resources/doc/layout_cache.md)

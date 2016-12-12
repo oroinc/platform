@@ -16,7 +16,7 @@ class OroImapBundleInstaller implements Installation
      */
     public function getMigrationVersion()
     {
-        return 'v1_4';
+        return 'v1_5';
     }
 
     /**
@@ -48,7 +48,7 @@ class OroImapBundleInstaller implements Installation
         $table->addColumn('imap_port', 'integer', ['notnull' => false]);
         $table->addColumn('imap_ssl', 'string', ['notnull' => false, 'length' => 3]);
         $table->addColumn('imap_user', 'string', ['notnull' => false, 'length' => 100]);
-        $table->addColumn('imap_password', 'string', ['notnull' => false, 'length' => 100]);
+        $table->addColumn('imap_password', 'text', ['notnull' => false, 'length' => 16777216]);
     }
 
     /**

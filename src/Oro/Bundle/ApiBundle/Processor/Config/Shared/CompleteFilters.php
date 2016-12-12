@@ -9,6 +9,7 @@ use Oro\Bundle\ApiBundle\Config\EntityConfigInterface;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 use Oro\Bundle\ApiBundle\Config\FiltersConfig;
 use Oro\Bundle\ApiBundle\Processor\Config\ConfigContext;
+use Oro\Bundle\ApiBundle\Request\DataType;
 
 /**
  * Makes sure that the filters configuration contains all supported filters
@@ -40,6 +41,7 @@ class CompleteFilters extends CompleteSection
         $this->completePreConfiguredFieldFilters($section, $metadata, $definition);
         $this->completeIndexedFieldFilters($section, $metadata, $definition);
         $this->completeAssociationFilters($section, $metadata, $definition);
+        $this->completeExtendedAssociationFilters($section, $metadata, $definition);
     }
 
     /**
@@ -124,6 +126,50 @@ class CompleteFilters extends CompleteSection
                     $filter->setArrayAllowed();
                 }
             }
+        }
+    }
+
+    /**
+     * @param FiltersConfig          $filters
+     * @param ClassMetadata          $metadata
+     * @param EntityDefinitionConfig $definition
+     */
+    protected function completeExtendedAssociationFilters(
+        FiltersConfig $filters,
+        ClassMetadata $metadata,
+        EntityDefinitionConfig $definition
+    ) {
+        $fields = $definition->getFields();
+        foreach ($fields as $fieldName => $field) {
+            if ($field->isExcluded()) {
+                continue;
+            }
+            $dataType = $field->getDataType();
+            if (!DataType::isExtendedAssociation($dataType)) {
+                continue;
+            }
+
+            $filter = $filters->getOrAddField($fieldName);
+            if (!$filter->hasDataType()) {
+                $filter->setDataType(DataType::INTEGER);
+            }
+            if (!$filter->hasType()) {
+                $filter->setType('association');
+            }
+            if (!$filter->hasArrayAllowed()) {
+                $filter->setArrayAllowed();
+            }
+            $options = $filter->getOptions();
+            if (null === $options) {
+                $options = [];
+            }
+            list($associationType, $associationKind) = DataType::parseExtendedAssociation($dataType);
+            $options = array_replace($options, [
+                'associationOwnerClass' => $metadata->name,
+                'associationType'       => $associationType,
+                'associationKind'       => $associationKind
+            ]);
+            $filter->setOptions($options);
         }
     }
 }

@@ -63,9 +63,11 @@ class TranslationServiceProvider
      * merge generated files over downloaded and upload result back to remote
      *
      * @param array|string[] $dirs
+     * @return bool
      */
     public function update($dirs)
     {
+        $dirs       = $this->processDirs($dirs);
         $targetDir  = $this->getTmpDir('oro-trans');
         $pathToSave = $targetDir . DIRECTORY_SEPARATOR . 'update';
         $targetDir  = $targetDir . DIRECTORY_SEPARATOR . self::DEFAULT_SOURCE_LOCALE . DIRECTORY_SEPARATOR;
@@ -104,25 +106,38 @@ class TranslationServiceProvider
 
         $this->upload($targetDir, 'update');
         $this->cleanup($targetDir);
+
+        return true;
     }
 
     /**
      * Upload translations
      *
-     * @param string $dir
+     * @param string|array $dirs
      * @param string $mode
      *
      * @return mixed
      */
-    public function upload($dir, $mode = 'add')
+    public function upload($dirs, $mode = 'add')
     {
-        $finder = Finder::create()->files()->name('*.yml')->in($dir);
+        $dirs = $this->processDirs($dirs);
+
+        $finder = Finder::create()->files()->name('*.yml')->in($dirs);
 
         /** $file \SplFileInfo */
         $files = [];
         foreach ($finder->files() as $file) {
+            $apiPath = (string)$file;
+            foreach ($dirs as $dir) {
+                if (strpos($apiPath, $dir) !== false) {
+                    $apiPath = str_replace($dir, '', $apiPath);
+                    break;
+                }
+            }
+
             // crowdin understand only "/" as directory separator :)
-            $apiPath         = str_replace([$dir, DIRECTORY_SEPARATOR], ['', '/'], (string)$file);
+            $apiPath = str_replace(DIRECTORY_SEPARATOR, '/', $apiPath);
+
             $files[$apiPath] = (string)$file;
         }
 
@@ -145,6 +160,7 @@ class TranslationServiceProvider
 
         return $this->adapter->download($pathToSave, $projects, $locale);
     }
+
     /**
      * @param string      $pathToSave path to save translations
      * @param null|string $locale
@@ -179,6 +195,22 @@ class TranslationServiceProvider
         }
 
         return $isExtracted;
+    }
+
+    /**
+     * @param string|array $dirs
+     * @return array
+     */
+    protected function processDirs($dirs)
+    {
+        $dirs = is_array($dirs) ? $dirs : [$dirs];
+
+        return array_map(
+            function ($path) {
+                return rtrim($path, DIRECTORY_SEPARATOR);
+            },
+            $dirs
+        );
     }
 
     /**

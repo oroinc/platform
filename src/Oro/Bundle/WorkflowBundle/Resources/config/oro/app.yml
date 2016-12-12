@@ -1,0 +1,11 @@
+oro_user:
+    privileges:
+        workflow:
+            label: 'oro.workflow.translation.workflow.label'
+            view_type: 'grid'
+            types:
+                - 'workflow'
+            field_type: 'oro_acl_access_level_selector'
+            fix_values: false
+            default_value: 5
+            show_default: true

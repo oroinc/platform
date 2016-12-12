@@ -7,6 +7,7 @@ define(function(require) {
     var BaseCollectionView = require('oroui/js/app/views/base/collection-view');
     var PermissionReadOnlyView = require('orouser/js/datagrid/permission/permission-readonly-view');
     var ReadonlyFieldView = require('orouser/js/datagrid/action-permissions-readonly-field-view');
+    var PermissionModel = require('orouser/js/models/role/permission-model');
     var BaseView = require('oroui/js/app/views/base/view');
 
     ActionPermissionsReadonlyRowView = BaseView.extend({
@@ -28,6 +29,13 @@ define(function(require) {
             }
             if (!_.isArray(fields)) {
                 fields = _.values(fields);
+            }
+            if (fields.length) {
+                _.each(fields, function(field) {
+                    field.permissions = new BaseCollection(_.values(field.permissions), {
+                        model: PermissionModel
+                    });
+                });
             }
             this.model.set('fields', fields, {silent: true});
         },

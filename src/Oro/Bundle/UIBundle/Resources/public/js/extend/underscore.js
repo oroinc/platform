@@ -25,6 +25,21 @@ define(['underscore', 'asap'], function(_, asap) {
 
         trim: function(text) {
             return text.replace(/^\s*/, '').replace(/\s*$/, '');
+        },
+
+        capitalize: function(text) {
+            return text.charAt(0).toUpperCase() + text.slice(1).toLowerCase();
+        },
+
+        /**
+         * Compares two arrays if they have the same set of elements
+         *
+         * @param firstArray {Array}
+         * @param secondArray {Array}
+         * @returns {boolean}
+         */
+        haveEqualSet: function(firstArray, secondArray) {
+            return firstArray.length === secondArray.length && _.difference(firstArray, secondArray).length === 0;
         }
     });
 

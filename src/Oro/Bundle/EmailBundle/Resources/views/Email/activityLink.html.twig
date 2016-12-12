@@ -8,7 +8,7 @@
             entityId: entity.id
     }),
     'aCss': 'no-hash',
-    'iCss': 'icon-envelope',
+    'iCss': 'fa-envelope',
     'class': cssClass is defined ? cssClass : '',
     'dataId': entity.id,
     'label' : 'oro.email.send_email'|trans,
@@ -31,5 +31,7 @@
 } %}
 
 {% block action_controll %}
-    {{ UI.clientLink(options) }}
+    {% if feature_enabled('email') %}
+        {{ UI.clientLink(options) }}
+    {% endif %}
 {% endblock %}

@@ -14,6 +14,7 @@ class PasswordTooltipProvider
     const BASE = 'oro.user.password_complexity.';
     const UNRESTRICTED = 'oro.user.password_complexity.unrestricted';
     const MIN_LENGTH = 'min_length';
+    const LOWER_CASE = 'lower_case';
     const UPPER_CASE = 'upper_case';
     const NUMBERS = 'numbers';
     const SPECIAL_CHARS = 'special_chars';
@@ -24,6 +25,7 @@ class PasswordTooltipProvider
      */
     public static $tooltipTransKeysMap = [
         PasswordComplexityConfigProvider::CONFIG_MIN_LENGTH => self::MIN_LENGTH,
+        PasswordComplexityConfigProvider::CONFIG_LOWER_CASE => self::LOWER_CASE,
         PasswordComplexityConfigProvider::CONFIG_UPPER_CASE => self::UPPER_CASE,
         PasswordComplexityConfigProvider::CONFIG_NUMBERS => self::NUMBERS,
         PasswordComplexityConfigProvider::CONFIG_SPECIAL_CHARS => self::SPECIAL_CHARS,

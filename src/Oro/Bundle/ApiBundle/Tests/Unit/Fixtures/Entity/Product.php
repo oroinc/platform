@@ -119,7 +119,6 @@ class Product
         $this->updatedAt = $updatedAt;
     }
 
-
     /**
      * @return string
      */

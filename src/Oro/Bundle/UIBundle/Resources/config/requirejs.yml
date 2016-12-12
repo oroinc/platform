@@ -43,6 +43,45 @@ config:
                 - 'jquery'
         'json':
             exports: 'JSON'
+        'bootstrap-affix':
+            deps:
+                - 'jquery'
+        'bootstrap-alert':
+            deps:
+                - 'jquery'
+        'bootstrap-button':
+            deps:
+                - 'jquery'
+        'bootstrap-carousel':
+            deps:
+                - 'jquery'
+        'bootstrap-collapse':
+            deps:
+                - 'jquery'
+        'bootstrap-dropdown':
+            deps:
+                - 'jquery'
+        'bootstrap-modal':
+            deps:
+                - 'jquery'
+        'bootstrap-popover':
+            deps:
+                - 'jquery'
+        'bootstrap-scrollspy':
+            deps:
+                - 'jquery'
+        'bootstrap-tab':
+            deps:
+                - 'jquery'
+        'bootstrap-tooltip':
+            deps:
+                - 'jquery'
+        'bootstrap-transition':
+            deps:
+                - 'jquery'
+        'bootstrap-typeahead':
+            deps:
+                - 'jquery'
     map:
         '*':
             'jquery': 'oroui/js/extend/jquery'

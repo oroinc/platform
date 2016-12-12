@@ -19,4 +19,9 @@ interface ScopeCriteriaProviderInterface
      * @return string
      */
     public function getCriteriaField();
+
+    /**
+     * @return string
+     */
+    public function getCriteriaValueType();
 }

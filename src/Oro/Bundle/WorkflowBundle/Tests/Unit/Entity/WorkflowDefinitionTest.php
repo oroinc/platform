@@ -3,16 +3,21 @@
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
+use Oro\Bundle\ScopeBundle\Entity\Scope;
+use Oro\Bundle\WorkflowBundle\Configuration\WorkflowConfiguration;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowEntityAcl;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowRestriction;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowStep;
+use Oro\Component\Testing\Unit\EntityTestCaseTrait;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
 class WorkflowDefinitionTest extends \PHPUnit_Framework_TestCase
 {
+    use EntityTestCaseTrait;
+
     /**
      * @var WorkflowDefinition
      */
@@ -26,6 +31,58 @@ class WorkflowDefinitionTest extends \PHPUnit_Framework_TestCase
     protected function tearDown()
     {
         unset($this->workflowDefinition);
+    }
+
+    public function testAccessors()
+    {
+        $this->assertPropertyCollections($this->workflowDefinition, [
+            ['scopes', new Scope()],
+        ]);
+    }
+
+    public function testSetScopesConfig()
+    {
+        $this->assertEquals([], $this->workflowDefinition->getScopesConfig());
+
+        $this->workflowDefinition->setScopesConfig(['data']);
+
+        $this->assertSame(['data'], $this->workflowDefinition->getScopesConfig());
+    }
+
+    public function testGetScopesConfig()
+    {
+        $this->assertEquals([], $this->workflowDefinition->getScopesConfig());
+
+        $this->workflowDefinition->setScopesConfig(['data']);
+
+        $this->assertEquals(['data'], $this->workflowDefinition->getScopesConfig());
+    }
+
+    public function testHasScopeConfig()
+    {
+        $this->assertFalse($this->workflowDefinition->hasScopesConfig());
+
+        $this->workflowDefinition->setScopesConfig(['data']);
+
+        $this->assertTrue($this->workflowDefinition->hasScopesConfig());
+    }
+
+    public function testGetHasDisabledOperations()
+    {
+        $definition = new WorkflowDefinition();
+
+        $this->assertEquals([], $definition->getDisabledOperations());
+        $this->assertFalse($definition->hasDisabledOperations());
+
+        $disabledOperationsConfig = [
+            'operation' => ['className'],
+            'operationWithoutClass' => []
+        ];
+
+        $definition->setConfiguration([WorkflowConfiguration::NODE_DISABLE_OPERATIONS => $disabledOperationsConfig]);
+
+        $this->assertEquals($disabledOperationsConfig, $definition->getDisabledOperations());
+        $this->assertTrue($definition->hasDisabledOperations());
     }
 
     public function testName()
@@ -219,20 +276,17 @@ class WorkflowDefinitionTest extends \PHPUnit_Framework_TestCase
         $this->assertEmpty($this->workflowDefinition->getRestrictions()->toArray());
     }
 
-    /**
-     * @param WorkflowDefinition $definition
-     * @return array
-     */
-    protected function getDefinitionAsArray(WorkflowDefinition $definition)
+    public function testGetDisabledOperations()
     {
-        return [
-            'name' => $definition->getName(),
-            'label' => $definition->getLabel(),
-            'steps' => $definition->getSteps(),
-            'start_step' => $definition->getStartStep(),
-            'configuration' => $definition->getConfiguration(),
-            'active_groups' => $definition->getExclusiveActiveGroups(),
-            'record_groups' => $definition->getExclusiveRecordGroups(),
+        $configuration = [
+            WorkflowConfiguration::NODE_DISABLE_OPERATIONS => [
+                'operation' => ['entity']
+            ]
         ];
+        $this->workflowDefinition->setConfiguration($configuration);
+        $this->assertSame(
+            $configuration[WorkflowConfiguration::NODE_DISABLE_OPERATIONS],
+            $this->workflowDefinition->getDisabledOperations()
+        );
     }
 }

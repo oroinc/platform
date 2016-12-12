@@ -58,13 +58,11 @@ class BlockFactory implements BlockFactoryInterface
     /**
      * {@inheritdoc}
      */
-    public function createBlockView(RawLayout $rawLayout, ContextInterface $context, $rootId = null)
+    public function createBlockView(RawLayout $rawLayout, ContextInterface $context)
     {
         $this->initializeState($rawLayout, $context);
         try {
-            $rootId = $rootId
-                ? $this->rawLayout->resolveId($rootId)
-                : $this->rawLayout->getRootId();
+            $rootId = $this->rawLayout->getRootId();
 
             $this->buildBlocks($rootId);
             $this->layoutManipulator->applyChanges($this->context, true);
@@ -223,7 +221,7 @@ class BlockFactory implements BlockFactoryInterface
         $this->processExpressions($resolvedOptions);
         $resolvedOptions = $this->resolveValueBags($resolvedOptions);
 
-        if ($resolvedOptions->get('visible') !== false) {
+        if ($resolvedOptions->get('visible', false) !== false) {
             // point the block builder state to the current block
             $this->blockBuilder->initialize($id);
             // iterate from parent to current

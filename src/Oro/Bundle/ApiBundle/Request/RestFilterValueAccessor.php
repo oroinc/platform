@@ -110,20 +110,6 @@ class RestFilterValueAccessor implements FilterValueAccessorInterface
     }
 
     /**
-     * @param string $operator
-     *
-     * @return string
-     */
-    protected function normalizeOperator($operator)
-    {
-        if ('<>' === $operator) {
-            return '!=';
-        }
-
-        return $operator;
-    }
-
-    /**
      * Makes sure the Request parsed
      */
     protected function ensureRequestParsed()
@@ -151,6 +137,8 @@ class RestFilterValueAccessor implements FilterValueAccessorInterface
      * @param string $path
      * @param mixed  $value
      * @param string $operator
+     *
+     * @return FilterValue
      */
     protected function addParsed($group, $key, $path, $value, $operator)
     {
@@ -161,6 +149,8 @@ class RestFilterValueAccessor implements FilterValueAccessorInterface
         );
         $this->parameters[$key] = $filterValue;
         $this->groups[$group][$key] = $filterValue;
+
+        return $filterValue;
     }
 
     protected function parseQueryString()
@@ -171,8 +161,8 @@ class RestFilterValueAccessor implements FilterValueAccessorInterface
         }
 
         $matchResult = preg_match_all(
-            '/(?P<key>((?P<group>[\w\d-\.]+)(?P<path>((\[[\w\d-\.]+\])|(%5B[\w\d-\.]+%5D))*)))'
-            . '(?P<operator>(!|<|>|%21|%3C|%3E)?=|<>|%3C%3E|(<|>|%3C|%3E))'
+            '/(?P<key>((?P<group>[\w\d-\.]+)(?P<path>((\[[\w\d-\.]*\])|(%5B[\w\d-\.]*%5D))*)))'
+            . '(?P<operator>(' . $this->getOperatorPattern() . ')'
             . '(?P<value>[^&]+)/',
             $queryString,
             $matches,
@@ -184,20 +174,21 @@ class RestFilterValueAccessor implements FilterValueAccessorInterface
                 $key = rawurldecode($match['key']);
                 $group = rawurldecode($match['group']);
                 $path = rawurldecode($match['path']);
+                $normalizedKey = $key;
                 if (empty($path)) {
                     $path = $key;
                 } else {
                     $path = strtr($path, ['][' => ConfigUtil::PATH_DELIMITER, '[' => '', ']' => '']);
-                    $key = $group . '[' . $path . ']';
+                    $normalizedKey = $group . '[' . $path . ']';
                 }
 
                 $this->addParsed(
                     $group,
-                    $key,
+                    $normalizedKey,
                     $path,
                     rawurldecode($match['value']),
                     rawurldecode($match['operator'])
-                );
+                )->setSourceKey($key);
             }
         }
     }
@@ -212,21 +203,27 @@ class RestFilterValueAccessor implements FilterValueAccessorInterface
         foreach ($requestBody as $group => $val) {
             if (is_array($val)) {
                 if ($this->isValueWithOperator($val)) {
-                    $this->addParsed($group, $group, $group, current($val), key($val));
+                    $this->addParsed($group, $group, $group, current($val), key($val))->setSourceKey($group);
                 } elseif (!ArrayUtil::isAssoc($val)) {
-                    $this->addParsed($group, $group, $group, $val, '=');
+                    $this->addParsed($group, $group, $group, $val, '=')->setSourceKey($group);
                 } else {
                     foreach ($val as $subKey => $subValue) {
                         $paramKey = $group . '[' . $subKey . ']';
                         if (is_array($subValue) && $this->isValueWithOperator($subValue)) {
-                            $this->addParsed($group, $paramKey, $subKey, current($subValue), key($subValue));
+                            $this->addParsed(
+                                $group,
+                                $paramKey,
+                                $subKey,
+                                current($subValue),
+                                key($subValue)
+                            )->setSourceKey($paramKey);
                         } else {
-                            $this->addParsed($group, $paramKey, $subKey, $subValue, '=');
+                            $this->addParsed($group, $paramKey, $subKey, $subValue, '=')->setSourceKey($paramKey);
                         }
                     }
                 }
             } else {
-                $this->addParsed($group, $group, $group, $val, '=');
+                $this->addParsed($group, $group, $group, $val, '=')->setSourceKey($group);
             }
         }
     }
@@ -246,6 +243,36 @@ class RestFilterValueAccessor implements FilterValueAccessorInterface
 
         return
             is_string($key)
-            && in_array($key, ['=', '<>', '>', '<', '>=', '<=', '!='], true);
+            && in_array($key, $this->getOperators(), true);
+    }
+
+    /**
+     * @param string $operator
+     *
+     * @return string
+     */
+    protected function normalizeOperator($operator)
+    {
+        if ('<>' === $operator) {
+            return '!=';
+        }
+
+        return $operator;
+    }
+
+    /**
+     * @return string[]
+     */
+    protected function getOperators()
+    {
+        return ['=', '!=', '>', '<', '>=', '<=', '<>'];
+    }
+
+    /**
+     * @return string
+     */
+    protected function getOperatorPattern()
+    {
+        return '!|<|>|%21|%3C|%3E)?=|<>|%3C%3E|(<|>|%3C|%3E)';
     }
 }

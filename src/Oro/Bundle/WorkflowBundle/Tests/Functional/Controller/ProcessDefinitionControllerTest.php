@@ -37,7 +37,6 @@ class ProcessDefinitionControllerTest extends WebTestCase
         $response = $this->client->requestGrid(
             [
                 'gridName' => 'process-definitions-grid',
-                'process-definitions-grid[_sort_by][id]' => 'DESC',
                 'process-definitions-grid[_pager][_per_page]' => '100',
             ]
         );

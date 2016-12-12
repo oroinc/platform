@@ -133,6 +133,9 @@ oro:
             currency:
                 ascending: Low to High
                 descending: High to Low
+            decimal:
+                ascending: Low to High
+                descending: High to Low
         export:
             starting.message: Starting export...
             success.message: Export started successfully. You will receive email notification upon completion.

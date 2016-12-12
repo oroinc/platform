@@ -27,8 +27,16 @@ class ConfigExtensionTest extends \PHPUnit_Framework_TestCase
         $entityClassNameHelper = $this->getMockBuilder('Oro\Bundle\EntityBundle\Tools\EntityClassNameHelper')
             ->disableOriginalConstructor()
             ->getMock();
+        $doctrineHelper = $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\DoctrineHelper')
+            ->disableOriginalConstructor()
+            ->getMock();
 
-        $this->twigExtension = new ConfigExtension($this->configManager, $router, $entityClassNameHelper);
+        $this->twigExtension = new ConfigExtension(
+            $this->configManager,
+            $router,
+            $entityClassNameHelper,
+            $doctrineHelper
+        );
     }
 
     protected function tearDown()
@@ -40,7 +48,7 @@ class ConfigExtensionTest extends \PHPUnit_Framework_TestCase
     public function testGetFunctions()
     {
         $functions = $this->twigExtension->getFunctions();
-        $this->assertCount(7, $functions);
+        $this->assertCount(8, $functions);
 
         /** @var \Twig_SimpleFunction $function */
         $function = $functions[0];
@@ -83,6 +91,12 @@ class ConfigExtensionTest extends \PHPUnit_Framework_TestCase
         $this->assertInstanceOf('\Twig_SimpleFunction', $function);
         $this->assertEquals('oro_entity_view_link', $function->getName());
         $this->assertEquals(array($this->twigExtension, 'getViewLink'), $function->getCallable());
+
+        /** @var \Twig_SimpleFunction $function */
+        $function = $functions[7];
+        $this->assertInstanceOf('\Twig_SimpleFunction', $function);
+        $this->assertEquals('oro_entity_object_view_link', $function->getName());
+        $this->assertEquals(array($this->twigExtension, 'getEntityViewLink'), $function->getCallable());
     }
 
     public function testGetName()

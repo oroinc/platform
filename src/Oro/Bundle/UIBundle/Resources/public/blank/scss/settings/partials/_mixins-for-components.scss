@@ -1,0 +1,21 @@
+@mixin link() {
+    color: $link-color;
+
+    &--current {
+        color: $link-color-current;
+    }
+
+    &:hover {
+        color: $link-color-hover;
+    }
+}
+
+@mixin fa-icon($icon-code: null, $state: before) {
+    @if ($icon-code) {
+        &:#{$state} {
+            content: '#{$icon-code}';
+
+            font-family: $icon-font;
+        }
+    }
+}

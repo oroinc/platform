@@ -2,10 +2,10 @@ system_configuration:
     groups:
         tracking:
             title:  oro.tracking.system_configuration.groups.tracking.title
-            icon:  'icon-screenshot'
+            icon:  'fa-crosshairs'
         tracking_settings:
             title:  oro.tracking.system_configuration.groups.tracking_settings.title
-            icon:  'icon-screenshot'
+            icon:  'fa-crosshairs'
 
     fields:
         oro_tracking.dynamic_tracking_enabled:

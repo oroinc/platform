@@ -110,7 +110,6 @@ class ScopeManager
      */
     public function findRelatedScopeIds($scopeType, $context = null)
     {
-
         $criteria = $this->getCriteriaForRelatedScopes($scopeType, $context);
 
         /** @var ScopeRepository $scopeRepository */
@@ -121,11 +120,29 @@ class ScopeManager
     }
 
     /**
+     * @param string     $scopeType
+     * @param array|null $context
+     *
+     * @return array
+     */
+    public function findRelatedScopeIdsWithPriority($scopeType, $context = null)
+    {
+        $criteria = $this->getCriteria($scopeType, $context);
+
+        /** @var ScopeRepository $scopeRepository */
+        $scopeRepository = $this->registry->getManagerForClass(Scope::class)
+            ->getRepository(Scope::class);
+
+        return $scopeRepository->findIdentifiersByCriteriaWithPriority($criteria);
+    }
+
+    /**
      * @param string $scopeType
      * @param array|object $context
+     * @param bool $flush
      * @return Scope
      */
-    public function findOrCreate($scopeType, $context = null)
+    public function findOrCreate($scopeType, $context = null, $flush = true)
     {
         $criteria = $this->getCriteria($scopeType, $context);
 
@@ -145,7 +162,10 @@ class ScopeManager
             /** @var EntityManager $manager */
             $manager = $this->registry->getManagerForClass(Scope::class);
             $manager->persist($scope);
-            $manager->flush($scope);
+
+            if ($flush) {
+                $manager->flush($scope);
+            }
         }
 
         return $scope;
@@ -158,6 +178,22 @@ class ScopeManager
     public function addProvider($scopeType, $provider)
     {
         $this->providers[$scopeType][] = $provider;
+    }
+
+    /**
+     * @param string $scopeType
+     * @return array
+     */
+    public function getScopeEntities($scopeType)
+    {
+        $entities = [];
+
+        $providers = $this->getProviders($scopeType);
+        foreach ($providers as $provider) {
+            $entities[$provider->getCriteriaField()] = $provider->getCriteriaValueType();
+        }
+
+        return $entities;
     }
 
     /**

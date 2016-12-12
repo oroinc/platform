@@ -9,7 +9,7 @@ elements:
 
   GridRow:
     selector: 'tbody tr'
-    class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Element
+    class: Oro\Bundle\DataGridBundle\Tests\Behat\Element\GridRow
 
   GridHeaderLink:
     selector: 'th a'
@@ -18,6 +18,10 @@ elements:
   GridFilters:
     selector: 'div.filter-box'
     class: Oro\Bundle\DataGridBundle\Tests\Behat\Element\GridFilters
+
+  GridFilersButton:
+    selector: 'div.toolbar div.actions-panel .action[title=Filters]'
+    class: Oro\Bundle\DataGridBundle\Tests\Behat\Element\GridFiltersButton
 
   GridFilterStringItem:
     selector: 'div.filter-item'
@@ -33,6 +37,10 @@ elements:
 
   DateTimePicker:
     class: Oro\Bundle\DataGridBundle\Tests\Behat\Element\DateTimePicker
+
+  TimePicker:
+    selector: 'input.timepicker-input'
+    class: Oro\Bundle\DataGridBundle\Tests\Behat\Element\TimePicker
 
   GridPaginator:
     selector: 'div.toolbar div.pagination'

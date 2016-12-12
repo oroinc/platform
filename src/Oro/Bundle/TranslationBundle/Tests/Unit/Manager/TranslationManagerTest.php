@@ -12,9 +12,8 @@ use Oro\Bundle\TranslationBundle\Entity\Repository\TranslationRepository;
 use Oro\Bundle\TranslationBundle\Entity\Translation;
 use Oro\Bundle\TranslationBundle\Entity\TranslationKey;
 use Oro\Bundle\TranslationBundle\Manager\TranslationManager;
-use Oro\Bundle\TranslationBundle\Provider\JsTranslationDumper;
+use Oro\Bundle\TranslationBundle\Provider\TranslationDomainProvider;
 use Oro\Bundle\TranslationBundle\Translation\DynamicTranslationMetadataCache;
-use Oro\Bundle\TranslationBundle\Translation\Translator;
 
 use Oro\Component\Testing\Unit\EntityTrait;
 
@@ -25,14 +24,11 @@ class TranslationManagerTest extends \PHPUnit_Framework_TestCase
     /** @var \PHPUnit_Framework_MockObject_MockObject|Registry */
     protected $registry;
 
+    /** @var \PHPUnit_Framework_MockObject_MockObject|TranslationDomainProvider */
+    protected $domainProvider;
+
     /** @var \PHPUnit_Framework_MockObject_MockObject|DynamicTranslationMetadataCache */
     protected $dbTranslationMetadataCache;
-
-    /** @var \PHPUnit_Framework_MockObject_MockObject|Translator */
-    protected $translator;
-
-    /** @var \PHPUnit_Framework_MockObject_MockObject|JsTranslationDumper */
-    protected $jsTranslationDumper;
 
     /** @var \PHPUnit_Framework_MockObject_MockObject|ObjectManager */
     protected $objectManager;
@@ -52,15 +48,11 @@ class TranslationManagerTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
+        $this->domainProvider = $this->getMockBuilder(TranslationDomainProvider::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
         $this->dbTranslationMetadataCache = $this->getMockBuilder(DynamicTranslationMetadataCache::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->translator = $this->getMockBuilder(Translator::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->jsTranslationDumper = $this->getMockBuilder(JsTranslationDumper::class)
             ->disableOriginalConstructor()
             ->getMock();
 
@@ -97,9 +89,8 @@ class TranslationManagerTest extends \PHPUnit_Framework_TestCase
     {
         unset(
             $this->registry,
+            $this->domainProvider,
             $this->dbTranslationMetadataCache,
-            $this->translator,
-            $this->jsTranslationDumper,
             $this->objectManager,
             $this->translationKeyRepository,
             $this->languageRepository
@@ -218,6 +209,7 @@ class TranslationManagerTest extends \PHPUnit_Framework_TestCase
     public function testClear()
     {
         $this->translationRepository->expects($this->any())->method('findTranslation')->willReturn(new Translation());
+        $this->domainProvider->expects($this->exactly(2))->method('clearCache');
 
         $manager = $this->getTranslationManager();
         $manager->saveTranslation('key', 'value', 'locale', 'domain');
@@ -271,12 +263,7 @@ class TranslationManagerTest extends \PHPUnit_Framework_TestCase
      */
     protected function getTranslationManager()
     {
-        return new TranslationManager(
-            $this->registry,
-            $this->dbTranslationMetadataCache,
-            $this->translator,
-            $this->jsTranslationDumper
-        );
+        return new TranslationManager($this->registry, $this->domainProvider, $this->dbTranslationMetadataCache);
     }
 
     /**
