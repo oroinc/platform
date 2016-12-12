@@ -1,12 +1,12 @@
 <?php
 
-namespace Oro\Bundle\EmailBundle\Migrations\Schema\v2_0;
+namespace Oro\Bundle\UserBundle\Migrations\Schema\v2_0;
 
 use Doctrine\DBAL\Schema\Schema;
 use Oro\Bundle\MigrationBundle\Migration\Migration;
 use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 
-class OroEmailBundle implements Migration
+class OroUserBundle implements Migration
 {
     /**
      * {@inheritdoc}

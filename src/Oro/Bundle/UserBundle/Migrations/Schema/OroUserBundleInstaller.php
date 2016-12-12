@@ -34,6 +34,7 @@ use Oro\Bundle\UserBundle\Migrations\Schema\v1_19\AddFirstNameLastNameIndex;
 use Oro\Bundle\UserBundle\Migrations\Schema\v1_22\AddImpersonationTable;
 use Oro\Bundle\UserBundle\Migrations\Schema\v1_24\AddAuthStatusColumn;
 use Oro\Bundle\UserBundle\Migrations\Schema\v1_24\AddImpersonationIpColumn;
+use Oro\Bundle\UserBundle\Migrations\Schema\v2_0\OroUserBundle as OroUserBundle20;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyMethods)
@@ -59,7 +60,7 @@ class OroUserBundleInstaller implements
      */
     public function getMigrationVersion()
     {
-        return 'v1_24';
+        return 'v2_0';
     }
 
     /**
@@ -150,6 +151,8 @@ class OroUserBundleInstaller implements
         AddImpersonationTable::createOroUserImpersonationTable($schema);
         AddImpersonationIpColumn::addColumn($schema);
         AddAuthStatusColumn::addAuthStatusFieldAndValues($schema, $queries, $this->extendExtension);
+
+        OroUserBundle20::addEmailUserIndexes($schema);
     }
 
     /**
