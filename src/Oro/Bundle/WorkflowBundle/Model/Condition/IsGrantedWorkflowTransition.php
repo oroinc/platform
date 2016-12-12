@@ -12,6 +12,7 @@ use Oro\Component\ConfigExpression\Exception\InvalidArgumentException;
 
 use Oro\Bundle\SecurityBundle\Acl\Domain\DomainObjectWrapper;
 use Oro\Bundle\SecurityBundle\SecurityFacade;
+use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
 
 /**
  * Used to perform ACL check for ability to perform transition
@@ -29,6 +30,9 @@ class IsGrantedWorkflowTransition extends AbstractCondition implements ContextAc
 
     /** @var string */
     protected $transitionName;
+
+    /** @var string */
+    protected $targetStepName;
 
     /**
      * @param SecurityFacade  $securityFacade
@@ -51,14 +55,17 @@ class IsGrantedWorkflowTransition extends AbstractCondition implements ContextAc
      */
     public function initialize(array $options)
     {
-        if (1 === count($options)) {
-            $this->transitionName = reset($options);
+        if (2 === count($options)) {
+            list($this->transitionName, $this->targetStepName) = $options;
             if (!$this->transitionName) {
-                throw new InvalidArgumentException('ACL object must not be empty.');
+                throw new InvalidArgumentException('Transition name must not be empty.');
+            }
+            if (!$this->targetStepName) {
+                throw new InvalidArgumentException('Target step name must not be empty.');
             }
         } else {
             throw new InvalidArgumentException(
-                sprintf('Options must have 1 elements, but %d given.', count($options))
+                sprintf('Options must have 2 elements, but %d given.', count($options))
             );
         }
 
@@ -70,17 +77,18 @@ class IsGrantedWorkflowTransition extends AbstractCondition implements ContextAc
      */
     protected function isConditionAllowed($context)
     {
+        /** @var WorkflowItem $context */
+
         if (!$this->securityFacade->hasLoggedUser()) {
             return true;
         }
 
-        $entity = $context->getEntity();
-        $workflowName = $context->getWorkflowName();
+        $objectWrapper = new DomainObjectWrapper(
+            $context->getEntity(),
+            new ObjectIdentity('workflow', $context->getWorkflowName())
+        );
 
-        if (!$this->securityFacade->isGranted(
-            'PERFORM_TRANSITIONS',
-            new DomainObjectWrapper($entity, new ObjectIdentity('workflow', $workflowName))
-        )) {
+        if (!$this->securityFacade->isGranted('PERFORM_TRANSITIONS', $objectWrapper)) {
             //performing of transitions is forbidden on workflow level
             return false;
         }
@@ -88,8 +96,13 @@ class IsGrantedWorkflowTransition extends AbstractCondition implements ContextAc
         if (!$this->securityFacade->isGranted(
             'PERFORM_TRANSITION',
             new FieldVote(
-                new DomainObjectWrapper($entity, new ObjectIdentity('workflow', $workflowName)),
-                $this->transitionName
+                $objectWrapper,
+                sprintf(
+                    '%s|%s|%s',
+                    $this->transitionName,
+                    $this->getCurrentStepName($context),
+                    $this->targetStepName
+                )
             )
         )) {
             //performing of given transition is forbidden
@@ -113,5 +126,20 @@ class IsGrantedWorkflowTransition extends AbstractCondition implements ContextAc
     public function compile($factoryAccessor)
     {
         return $this->convertToPhpCode([$this->transitionName], $factoryAccessor);
+    }
+
+    /**
+     * @param WorkflowItem $context
+     *
+     * @return string|null
+     */
+    protected function getCurrentStepName(WorkflowItem $context)
+    {
+        $currentStep = $context->getCurrentStep();
+        if (null !== $currentStep) {
+            return $currentStep->getName();
+        }
+
+        return null;
     }
 }

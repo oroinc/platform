@@ -58,7 +58,7 @@ define(function(require) {
             this.editViewId = null;
             this.entityFieldSelectEl.inputWidget('val', '');
             this.form.get(0).reset();
-            this.submitBtn.html('<i class="icon-plus"></i> ' + __('Add'));
+            this.submitBtn.html('<i class="fa-plus"></i> ' + __('Add'));
             this.resetBtn.addClass('hide');
         },
 
@@ -80,7 +80,7 @@ define(function(require) {
             );
             this.labelEl.val(data.isSystemLabel ? '' : data.label);
             this.requiredEl.get(0).checked = data.required;
-            this.submitBtn.html('<i class="icon-edit"></i> ' + __('Update'));
+            this.submitBtn.html('<i class="fa-pencil-square-o"></i> ' + __('Update'));
             this.resetBtn.removeClass('hide');
         },
 

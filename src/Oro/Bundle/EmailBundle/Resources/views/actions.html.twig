@@ -54,7 +54,7 @@
         {{- UI.clientButton({
             'dataUrl': path('oro_email_email_reply_all', routeParameters),
             'aCss': parameters.aCss is defined ? parameters.aCss ~ ' no-hash' : 'no-hash',
-            'iCss': parameters.iCss is defined ? parameters.iCss ~ ' icon-reply-all' : 'icon-reply-all',
+            'iCss': parameters.iCss is defined ? parameters.iCss ~ ' fa-reply-all' : 'fa-reply-all',
             'label': 'oro.email.reply_all'|trans,
             'widget': {
                 'type': 'dialog',
@@ -89,7 +89,7 @@
         {{- UI.clientButton({
             'dataUrl': path('oro_email_email_reply', routeParameters),
             'aCss': parameters.aCss is defined ? parameters.aCss ~ ' no-hash' : 'no-hash',
-            'iCss': parameters.iCss is defined ? parameters.iCss ~ ' icon-reply' : 'icon-reply',
+            'iCss': parameters.iCss is defined ? parameters.iCss ~ ' fa-reply' : 'fa-reply',
             'label': 'oro.email.reply'|trans,
             'widget': {
                 'type': 'dialog',
@@ -124,7 +124,7 @@
         {{- UI.clientButton({
             'dataUrl': path('oro_email_email_forward', routeParameters),
             'aCss': parameters.aCss is defined ? parameters.aCss ~ ' no-hash' : 'no-hash',
-            'iCss': parameters.iCss is defined ? parameters.iCss ~ ' icon-mail-forward' : 'icon-mail-forward',
+            'iCss': parameters.iCss is defined ? parameters.iCss ~ ' fa-mail-forward' : 'fa-mail-forward',
             'label': 'oro.email.forward'|trans,
             'widget': {
                 'type': 'dialog',
@@ -153,7 +153,7 @@
         {{ UI.clientButton({
             'dataUrl': path('oro_email_email_create', parameters),
             'label': 'oro.email.menu.compose'|trans,
-            'iCss': 'icon-envelope',
+            'iCss': 'fa-envelope',
             'widget': {
                 'type': 'dialog',
                 'multiple': true,
@@ -190,7 +190,7 @@
                 }|json_encode,
             },
             'aCss': 'no-hash',
-            'iCss': 'icon-minus hide-text',
+            'iCss': 'fa-minus hide-text',
             'dataId': emailEntity.id,
             'label' : 'oro.email.menu.mark_unread.label'|trans
         }) }}

@@ -132,7 +132,10 @@ class TransitionAssembler extends BaseAbstractAssembler
                 $this->getOption($options, 'display_type', WorkflowConfiguration::DEFAULT_TRANSITION_DISPLAY_TYPE)
             )
             ->setPageTemplate($this->getOption($options, 'page_template'))
-            ->setDialogTemplate($this->getOption($options, 'dialog_template'));
+            ->setDialogTemplate($this->getOption($options, 'dialog_template'))
+            ->setInitEntities($this->getOption($options, WorkflowConfiguration::NODE_INIT_ENTITIES, []))
+            ->setInitRoutes($this->getOption($options, WorkflowConfiguration::NODE_INIT_ROUTES, []))
+            ->setInitContextAttribute($this->getOption($options, WorkflowConfiguration::NODE_INIT_CONTEXT_ATTRIBUTE));
 
         if (!empty($definition['preactions'])) {
             $preAction = $this->actionFactory->create(ConfigurableAction::ALIAS, $definition['preactions']);
@@ -204,7 +207,14 @@ class TransitionAssembler extends BaseAbstractAssembler
         /**
          * @see IsGrantedWorkflowTransition
          */
-        $precondition = ['@is_granted_workflow_transition' => ['parameters' => [$transitionName]]];
+        $precondition = [
+            '@is_granted_workflow_transition' => [
+                'parameters' => [
+                    $transitionName,
+                    $this->getOption($options, 'step_to')
+                ]
+            ]
+        ];
         if (empty($definition['preconditions'])) {
             $definition['preconditions'] = $precondition;
         } else {

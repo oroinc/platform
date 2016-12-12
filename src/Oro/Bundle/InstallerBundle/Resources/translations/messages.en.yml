@@ -78,6 +78,7 @@ process:
             fixtures:      Load fixtures
             permissions:   Load permissions configuration
             workflows:     Load workflow definitions
+            crons:         Load cron definitions
             processes:     Load processes configuration
         setup:
             header:        Administration setup

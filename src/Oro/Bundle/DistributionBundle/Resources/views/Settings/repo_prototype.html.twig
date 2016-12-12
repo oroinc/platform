@@ -3,7 +3,7 @@
     {{ form_widget(repo.url, {'attr': {'class': 'selector', 'placeholder': 'URL'}}) }}
 
     <a href="#" onclick="javascript:$(this).parent('div').remove();" class="delete-action" title="{{ 'oro.distribution.action.delete'|trans }}">
-        <i class="icon-trash hide-text">{{ 'oro.distribution.action.delete'|trans }}</i>
+        <i class="fa-trash-o hide-text">{{ 'oro.distribution.action.delete'|trans }}</i>
     </a>
     {{ form_errors(repo.url) }}
 </div>
