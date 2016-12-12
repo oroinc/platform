@@ -58,8 +58,8 @@ final class DataType
     }
 
     /**
-     * Checks whether the given data-type represents an expended association.
-     * See EntityExtendBundle/Resources/doc/associations.md for details about expended associations.
+     * Checks whether the given data-type represents an extended association.
+     * See EntityExtendBundle/Resources/doc/associations.md for details about extended associations.
      *
      * @param string $dataType
      *
@@ -71,14 +71,14 @@ final class DataType
     }
 
     /**
-     * Extracts the type and the kind of an expended association.
-     * See EntityExtendBundle/Resources/doc/associations.md for details about expended associations.
+     * Extracts the type and the kind of an extended association.
+     * See EntityExtendBundle/Resources/doc/associations.md for details about extended associations.
      *
      * @param string $dataType
      *
      * @return string[] [association type, association kind]
      *
-     * @throws \InvalidArgumentException if the given data-type does not represent an expended association
+     * @throws \InvalidArgumentException if the given data-type does not represent an extended association
      */
     public static function parseExtendedAssociation($dataType)
     {

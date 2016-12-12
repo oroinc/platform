@@ -2,20 +2,26 @@
 
 namespace Oro\Bundle\NavigationBundle\Menu\Provider;
 
-use Doctrine\ORM\EntityRepository;
+use Doctrine\Common\Persistence\ManagerRegistry;
 
 abstract class AbstractOwnershipProvider implements OwnershipProviderInterface
 {
-    /** @var EntityRepository */
-    protected $repository;
+    /** @var ManagerRegistry */
+    protected $registry;
+
+    /** @var string */
+    protected $entityClass;
 
     /**
-     * @param EntityRepository $repository
+     * @param ManagerRegistry $managerRegistry
+     * @param string          $entityClass
      */
     public function __construct(
-        EntityRepository $repository
+        ManagerRegistry $managerRegistry,
+        $entityClass
     ) {
-        $this->repository = $repository;
+        $this->registry = $managerRegistry;
+        $this->entityClass = $entityClass;
     }
 
     /**
@@ -33,7 +39,9 @@ abstract class AbstractOwnershipProvider implements OwnershipProviderInterface
      */
     public function getMenuUpdates($menuName)
     {
-        return $this->repository->findBy(
+        $repository = $this->registry->getManagerForClass($this->entityClass)->getRepository($this->entityClass);
+
+        return $repository->findBy(
             [
                 'menu' => $menuName,
                 'ownershipType' => $this->getType(),

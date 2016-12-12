@@ -177,6 +177,9 @@ class WorkflowDefinitionConfigurationBuilderTest extends \PHPUnit_Framework_Test
             'start_step' => 'test_step',
             'entity_attribute' => 'my_entity',
             'steps_display_ordered' => true,
+            'scopes' => [
+                ['scope1' => 'value1'],
+            ],
             WorkflowConfiguration::NODE_EXCLUSIVE_ACTIVE_GROUPS => [
                 'active_group1',
                 'active_group2',
@@ -204,12 +207,8 @@ class WorkflowDefinitionConfigurationBuilderTest extends \PHPUnit_Framework_Test
                 [
                     'name' => 'entity_attribute',
                     'type' => 'entity',
-                    'entity_acl' => [
-                        'delete' => false,
-                    ],
-                    'options' => [
-                        'class' => 'TestClass',
-                    ],
+                    'entity_acl' => ['delete' => false],
+                    'options' => ['class' => 'TestClass']
                 ],
             ],
         ];
@@ -264,6 +263,7 @@ class WorkflowDefinitionConfigurationBuilderTest extends \PHPUnit_Framework_Test
     protected function filterConfiguration(array $configuration)
     {
         $configurationKeys = [
+            WorkflowDefinition::CONFIG_SCOPES,
             WorkflowConfiguration::NODE_STEPS,
             WorkflowConfiguration::NODE_ATTRIBUTES,
             WorkflowConfiguration::NODE_TRANSITIONS,

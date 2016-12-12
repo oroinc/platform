@@ -18,6 +18,7 @@ class OroWorkflowExtension extends Extension
         $loader->load('services.yml');
         $loader->load('prototypes.yml');
         $loader->load('actions.yml');
+        $loader->load('conditions.yml');
         $loader->load('assemblers.yml');
         $loader->load('form_types.yml');
         $loader->load('serializer.yml');

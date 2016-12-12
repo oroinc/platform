@@ -337,10 +337,7 @@ define(['underscore', 'orolocale/js/locale-settings/data'
         getCalendarDayOfWeekNames: function(width, asArray) {
             width = (width && this.settings.calendar.dow.hasOwnProperty(width)) ? width : 'wide';
             var result = this.settings.calendar.dow[width];
-            if (asArray) {
-                result = _.map(result, function(v) { return v; });
-            }
-            return result;
+            return asArray ? _.values(result) : _.clone(result);
         },
 
         /**
@@ -351,10 +348,10 @@ define(['underscore', 'orolocale/js/locale-settings/data'
          */
         getSortedDayOfWeekNames: function(width) {
             var dowNames = this.getCalendarDayOfWeekNames(width, true);
-            _.times(this.getCalendarFirstDayOfWeek() - 1, function() {
-                dowNames.push(dowNames.shift());
-            });
-
+            var splitPoint = this.getCalendarFirstDayOfWeek() - 1;
+            if (splitPoint > 0 && splitPoint < dowNames.length) {
+                dowNames = dowNames.slice(splitPoint).concat(dowNames.slice(0, splitPoint));
+            }
             return dowNames;
         },
 

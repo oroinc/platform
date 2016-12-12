@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\EventListener;
 
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Event\PreUpdateEventArgs;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\EventListener\WorkflowDefinitionEntityListener;
@@ -47,7 +48,9 @@ class WorkflowDefinitionEntityListenerTest extends \PHPUnit_Framework_TestCase
         $definitionMock->expects($this->once())->method('isActive')->willReturn(true);
         $definitionMock->expects($this->once())->method('hasExclusiveActiveGroups')->willReturn(true);
         $definitionMock->expects($this->once())->method('getExclusiveActiveGroups')->willReturn(['group1']);
-        $this->workflowRegistry->expects($this->once())->method('getActiveWorkflowsByActiveGroups')->willReturn([]);
+        $this->workflowRegistry->expects($this->once())
+            ->method('getActiveWorkflowsByActiveGroups')
+            ->willReturn(new ArrayCollection());
 
         $this->listener->prePersist($definitionMock);
     }
@@ -67,9 +70,9 @@ class WorkflowDefinitionEntityListenerTest extends \PHPUnit_Framework_TestCase
         $workflowMock->expects($this->once())->method('getDefinition')->willReturn($conflictingDefinitionMock);
         $workflowMock->expects($this->once())->method('getName')->willReturn('conflict_workflow');
 
-        $this->workflowRegistry->expects($this->once())->method('getActiveWorkflowsByActiveGroups')->willReturn([
-            $workflowMock
-        ]);
+        $this->workflowRegistry->expects($this->once())
+            ->method('getActiveWorkflowsByActiveGroups')
+            ->willReturn(new ArrayCollection([$workflowMock]));
 
         $this->setExpectedException(
             WorkflowActivationException::class,
@@ -89,10 +92,12 @@ class WorkflowDefinitionEntityListenerTest extends \PHPUnit_Framework_TestCase
         $definitionMock->expects($this->any())->method('getExclusiveActiveGroups')->willReturn(['group1', 'group2']);
         $definitionMock->expects($this->any())->method('getName')->willReturn('workflow1');
 
-        $this->workflowRegistry->expects($this->once())->method('getActiveWorkflowsByActiveGroups')->willReturn([
-            $this->createWorkflow('conflict_workflow1', ['group1']),
-            $this->createWorkflow('conflict_workflow2', ['group2'])
-        ]);
+        $this->workflowRegistry->expects($this->once())->method('getActiveWorkflowsByActiveGroups')->willReturn(
+            new ArrayCollection([
+                $this->createWorkflow('conflict_workflow1', ['group1']),
+                $this->createWorkflow('conflict_workflow2', ['group2'])
+            ])
+        );
 
         $this->setExpectedException(
             WorkflowActivationException::class,
@@ -115,9 +120,9 @@ class WorkflowDefinitionEntityListenerTest extends \PHPUnit_Framework_TestCase
 
         $conflictingWorkflow = $this->createWorkflow('conflict_workflow', ['group1', 'group2']);
 
-        $this->workflowRegistry->expects($this->once())->method('getActiveWorkflowsByActiveGroups')->with(
-            ['group1']
-        )->willReturn([$workflow, $conflictingWorkflow]);
+        $this->workflowRegistry->expects($this->once())
+            ->method('getActiveWorkflowsByActiveGroups')->with(['group1'])
+            ->willReturn(new ArrayCollection([$workflow, $conflictingWorkflow]));
 
         $this->setExpectedException(
             WorkflowActivationException::class,

@@ -1,0 +1,18 @@
+{% set job = record.rootEntity %}
+{% set percent = job.calculateRootJobProgress|default(0) %}
+
+{% if job.status == constant('STATUS_FAILED', job) %}
+    {% set classOfBar = 'danger'%}
+{% elseif job.status == constant('STATUS_CANCELLED', job) %}
+    {% set classOfBar = 'warning'%}
+{% elseif job.jobProgress == 100 %}
+    {% set classOfBar = 'success'%}
+{% else %}
+    {% set classOfBar = 'info' %}
+{% endif %}
+
+<div class="progress">
+    <div class="progress-bar progress-bar-{{ classOfBar }}" style="width:{{ job.jobProgress }}%; ">
+        {{ job.jobProgress }}%
+    </div>
+</div>

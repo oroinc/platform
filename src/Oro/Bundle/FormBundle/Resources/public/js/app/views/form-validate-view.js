@@ -7,6 +7,7 @@ define(function(require) {
     require('jquery.validate');
 
     FormValidateView = BaseView.extend({
+        keepElement: true,
         autoRender: true,
 
         validationOptions: null,

@@ -5,6 +5,7 @@ parameters:
     oro_test.entity.item_value.class: Oro\Bundle\TestFrameworkBundle\Entity\ItemValue
     oro_test.provider.exclusion_provider.class: Oro\Bundle\TestFrameworkBundle\Provider\EntityExclusionProvider
     oro_test.test_activity_activity_list.provider.class: Oro\Bundle\TestFrameworkBundle\Provider\TestActivityActivityListProvider
+    test.session.listener.class: Oro\Bundle\TestFrameworkBundle\EventListener\TestSessionListener
 
 services:
     oro_test.provider.exclusion_provider:

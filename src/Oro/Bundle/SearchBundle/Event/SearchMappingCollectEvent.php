@@ -37,7 +37,7 @@ class SearchMappingCollectEvent extends Event
      *
      * @param array $mappingConfig
      */
-    public function setMappingConfig($mappingConfig)
+    public function setMappingConfig(array $mappingConfig)
     {
         $this->mappingConfig = $mappingConfig;
     }

@@ -59,8 +59,16 @@ trait FallbackTrait
     private function getLocalizedFallbackValue(Collection $values, Localization $localization = null)
     {
         $value = $this->getValue($values, $localization);
-        if ($value && $localization) {
-            switch ($value->getFallback()) {
+        if ($localization) {
+            if ($value) {
+                $fallbackType = $value->getFallback();
+            } elseif ($localization->getParentLocalization()) {
+                $fallbackType = FallbackType::PARENT_LOCALIZATION;
+            } else {
+                $fallbackType = FallbackType::SYSTEM;
+            }
+
+            switch ($fallbackType) {
                 case FallbackType::PARENT_LOCALIZATION:
                     $value = $this->getLocalizedFallbackValue($values, $localization->getParentLocalization());
                     break;
@@ -93,7 +101,7 @@ trait FallbackTrait
         );
 
         if ($filteredValues->count() > 1) {
-            $title = $localization ? $localization->getName() : 'default';
+            $title = $localization ? $localization->getName() : Localization::DEFAULT_LOCALIZATION;
             throw new \LogicException(sprintf('There must be only one %s title', $title));
         }
 

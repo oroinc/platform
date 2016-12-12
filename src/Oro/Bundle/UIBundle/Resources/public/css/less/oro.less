@@ -401,6 +401,25 @@ body .select2-container {
 .label-info,
 .badge-info { background:#92b2d6; }
 
+.progress {
+  .progress-bar {
+    text-align: center;
+    background-color: @progress-bar-default-bg;
+    &.progress-bar-success {
+      background-color: @progress-bar-success-bg;
+    }
+    &.progress-bar-info {
+      background-color: @progress-bar-info-bg;
+    }
+    &.progress-bar-danger {
+      background-color: @progress-bar-danger-bg;
+    }
+    &.warning {
+      background-color: @progress-bar-warning-bg;
+    }
+  }
+}
+
 .widget-content > .label-info:first-child {
   margin-bottom: 10px;
 }
@@ -1696,6 +1715,9 @@ footer {
       .controls {
         margin-left: 142px;
         .control-label {
+          width: auto;
+        }
+        td > select {
           width: auto;
         }
       }
@@ -3190,6 +3212,36 @@ label .popover-content {
     padding: 0 6px;
     margin-left: 3px;
     height: 30px;
+  }
+  &.entity-create-multi-enabled {
+    .select2-container {
+      width: 216px;
+    }
+    .dropdown-menu {
+      li button {
+        padding: 2px 12px;
+        display: block;
+        clear: both;
+        font-weight: normal;
+        text-align: left;
+        white-space: nowrap;
+        background-color: transparent;
+        border: none;
+        margin: 0;
+        min-width: 100%;
+        -webkit-appearance: none;
+        -moz-appearance: none;
+        appearance: normal;
+      }
+    }
+  }
+  .btn-group.entity-create-dropdown {
+    display: inline-block;
+    vertical-align: top;
+    & > .btn {
+      font-size: 14px;
+      margin-left: 3px;
+    }
   }
 }
 

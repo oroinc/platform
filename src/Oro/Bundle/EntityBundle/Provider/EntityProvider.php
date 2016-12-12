@@ -7,6 +7,7 @@ use Symfony\Component\Translation\TranslatorInterface;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
+use Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker;
 
 class EntityProvider
 {
@@ -33,6 +34,9 @@ class EntityProvider
     /** @var ExclusionProviderInterface */
     protected $exclusionProvider;
 
+    /** @var FeatureChecker */
+    protected $featureChecker;
+
     /**
      * Constructor
      *
@@ -40,17 +44,20 @@ class EntityProvider
      * @param ConfigProvider      $extendConfigProvider
      * @param EntityClassResolver $entityClassResolver
      * @param TranslatorInterface $translator
+     * @param FeatureChecker      $featureChecker
      */
     public function __construct(
         ConfigProvider $entityConfigProvider,
         ConfigProvider $extendConfigProvider,
         EntityClassResolver $entityClassResolver,
-        TranslatorInterface $translator
+        TranslatorInterface $translator,
+        FeatureChecker $featureChecker
     ) {
         $this->entityConfigProvider = $entityConfigProvider;
         $this->extendConfigProvider = $extendConfigProvider;
         $this->entityClassResolver  = $entityClassResolver;
         $this->translator           = $translator;
+        $this->featureChecker       = $featureChecker;
     }
 
     /**
@@ -142,6 +149,10 @@ class EntityProvider
 
             $className = $entityConfigId->getClassName();
             if ($applyExclusions && $this->isIgnoredEntity($className)) {
+                continue;
+            }
+
+            if (!$this->featureChecker->isResourceEnabled($className, 'entities')) {
                 continue;
             }
 

@@ -40,8 +40,7 @@ datagrids:
                     data_name: dashboard.createdAt
                 updatedAt:
                     data_name: dashboard.updatedAt
-            default:
-                dueDate: ASC
+            disable_default_sorting: true
         filters:
             columns:
                 label:

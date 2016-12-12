@@ -11,6 +11,7 @@ oro:
                 upper_case: The password must include an upper case letter
                 numbers:    The password must include a number
                 special_chars:  The password must include a special character
+                min_length_lower_case: The password must be at least {{ length }} characters long and include a lower case letter
                 min_length_upper_case: The password must be at least {{ length }} characters long and include an upper case letter
                 min_length_numbers: The password must be at least {{ length }} characters long and include a number
                 min_length_special_chars: The password must be at least {{ length }} characters long and include a special character
@@ -29,6 +30,9 @@ oro:
                 min_length_lower_case_upper_case_special_chars: The password must be at least {{ length }} characters long and include a lower case letter, an upper case letter, and a special character
                 min_length_lower_case_numbers_special_chars: The password must be at least {{ length }} characters long and include a lower case letter, a number, and a special character
                 min_length_lower_case_upper_case_numbers_special_chars: The password must be at least {{ length }} characters long and include a lower case letter, an upper case letter, a number, and a special character
+                lower_case_upper_case: The password must include a lower case letter and an upper case letter
+                lower_case_numbers: The password must include a lower case letter and a number
+                lower_case_special_chars: The password must include a lower case letter and a special character
                 lower_case_upper_case_numbers: The password must include a lower case letter, an upper case letter and a number
                 lower_case_upper_case_special_chars: The password must include a lower case letter, an upper case letter and a special character
                 lower_case_numbers_special_chars: The password must include a lower case letter, a number and a special character

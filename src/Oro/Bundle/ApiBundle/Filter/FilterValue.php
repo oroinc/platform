@@ -8,13 +8,16 @@ namespace Oro\Bundle\ApiBundle\Filter;
 class FilterValue
 {
     /** @var string */
-    protected $path;
+    private $path;
 
     /** @var mixed */
-    protected $value;
+    private $value;
 
     /** @var string */
-    protected $operator;
+    private $operator;
+
+    /** @var string|null */
+    private $sourceKey;
 
     /**
      * @param string      $path
@@ -86,5 +89,27 @@ class FilterValue
     public function setOperator($operator)
     {
         $this->operator = $operator;
+    }
+
+    /**
+     * Gets a key this value was come from a request.
+     * E.g. it can be URI query parameter for REST API filters.
+     *
+     * @return string|null
+     */
+    public function getSourceKey()
+    {
+        return $this->sourceKey;
+    }
+
+    /**
+     * Sets a key this value was come from a request.
+     * E.g. it can be URI query parameter for REST API filters.
+     *
+     * @param string $sourceKey
+     */
+    public function setSourceKey($sourceKey)
+    {
+        $this->sourceKey = $sourceKey;
     }
 }

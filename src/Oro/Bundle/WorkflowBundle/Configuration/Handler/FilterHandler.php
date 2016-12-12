@@ -3,6 +3,7 @@
 namespace Oro\Bundle\WorkflowBundle\Configuration\Handler;
 
 use Oro\Bundle\WorkflowBundle\Configuration\WorkflowConfiguration;
+use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 
 /**
  * Finalize incoming workflow configuration by clearing unsupported nodes
@@ -62,6 +63,7 @@ class FilterHandler implements ConfigurationHandlerInterface
         'entity_attribute',
         'steps_display_ordered',
         'priority',
+        WorkflowDefinition::CONFIG_SCOPES,
         WorkflowConfiguration::NODE_STEPS,
         WorkflowConfiguration::NODE_ATTRIBUTES,
         WorkflowConfiguration::NODE_TRANSITIONS,

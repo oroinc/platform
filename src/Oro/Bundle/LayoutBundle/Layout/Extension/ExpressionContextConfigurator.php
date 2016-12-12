@@ -16,7 +16,7 @@ class ExpressionContextConfigurator implements ContextConfiguratorInterface
             ->setDefaults(
                 [
                     'expressions_evaluate' => true,
-                    'expressions_evaluate_deferred' => false
+                    'expressions_evaluate_deferred' => true
                 ]
             )
             ->setDefined(['expressions_encoding'])

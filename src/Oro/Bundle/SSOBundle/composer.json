@@ -5,11 +5,11 @@
     "keywords": ["BAP"],
     "license": "MIT",
     "require": {
-        "php": ">=5.5.9",
+        "php": ">=5.6",
         "symfony/symfony": "2.8.*, !=2.8.10",
         "oro/config-bundle": "dev-master",
         "oro/migration-bundle": "dev-master",
-        "hwi/oauth-bundle": "~0.3",
+        "hwi/oauth-bundle": "0.5.*",
         "oro/ui-bundle": "dev-master",
         "oro/google-integration-bundle": "dev-master"
     },
