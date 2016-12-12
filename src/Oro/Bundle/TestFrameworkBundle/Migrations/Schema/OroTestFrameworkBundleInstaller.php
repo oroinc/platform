@@ -12,6 +12,8 @@ use Oro\Bundle\EntityExtendBundle\Migration\Extension\ExtendExtensionAwareInterf
 use Oro\Bundle\EntityExtendBundle\Migration\OroOptions;
 use Oro\Bundle\MigrationBundle\Migration\Installation;
 use Oro\Bundle\MigrationBundle\Migration\QueryBag;
+use Oro\Bundle\ScopeBundle\Migration\Extension\ScopeExtensionAwareInterface;
+use Oro\Bundle\ScopeBundle\Migration\Extension\ScopeExtensionAwareTrait;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyMethods)
@@ -20,8 +22,11 @@ use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 class OroTestFrameworkBundleInstaller implements
     Installation,
     ActivityExtensionAwareInterface,
-    ExtendExtensionAwareInterface
+    ExtendExtensionAwareInterface,
+    ScopeExtensionAwareInterface
 {
+    use ScopeExtensionAwareTrait;
+
     /** @var ActivityExtension */
     protected $activityExtension;
 
@@ -49,7 +54,7 @@ class OroTestFrameworkBundleInstaller implements
      */
     public function getMigrationVersion()
     {
-        return 'v1_2';
+        return 'v1_5';
     }
 
     /**
@@ -66,11 +71,16 @@ class OroTestFrameworkBundleInstaller implements
         $this->createTestSearchProductTable($schema);
         $this->createTestActivityTable($schema);
         $this->createTestCustomEntityTables($schema);
+        $this->createTestDefaultAndNullTable($schema);
         $this->createTestDepartmentTable($schema);
         $this->createTestPersonTable($schema);
         $this->createTestProductTable($schema);
         $this->createTestProductTypeTable($schema);
         $this->createTestAuditDataTables($schema);
+        $this->createTestUserOwnershipTable($schema);
+
+        /** Entity extensions generation */
+        $this->extendScopeForTestActivity($schema);
 
         /** Foreign keys generation **/
         $this->addTestSearchItemForeignKeys($schema);
@@ -78,9 +88,19 @@ class OroTestFrameworkBundleInstaller implements
         $this->addTestActivityForeignKeys($schema);
         $this->addTestPersonForeignKeys($schema);
         $this->addTestProductForeignKeys($schema);
+        $this->addTestUserOwnershipForeignKeys($schema);
 
         $this->activityExtension->addActivityAssociation($schema, 'test_activity', 'test_activity_target', true);
-        $this->activityExtension->addActivityAssociation($schema, 'oro_calendar_event', 'test_activity_target', true);
+
+        // add activity association if calendar package is installed
+        if ($schema->hasTable('oro_calendar_event')) {
+            $this->activityExtension->addActivityAssociation(
+                $schema,
+                'oro_calendar_event',
+                'test_activity_target',
+                true
+            );
+        }
     }
 
     /**
@@ -105,6 +125,28 @@ class OroTestFrameworkBundleInstaller implements
         $table = $schema->createTable('test_workflow_aware_entity');
         $table->addColumn('id', 'integer', ['autoincrement' => true]);
         $table->addColumn('name', 'string', ['notnull' => false, 'length' => 255]);
+        $table->setPrimaryKey(['id']);
+    }
+
+    /**
+     * Create test_default_and_null table
+     *
+     * @param Schema $schema
+     */
+    protected function createTestDefaultAndNullTable(Schema $schema)
+    {
+        $table = $schema->createTable('test_default_and_null');
+        $table->addColumn('id', 'integer', ['autoincrement' => true]);
+        $table->addColumn('with_default_value_string', 'string', ['notnull' => false, 'length' => 255]);
+        $table->addColumn('without_default_value_string', 'string', ['notnull' => false, 'length' => 255]);
+        $table->addColumn('with_default_value_boolean', 'boolean', ['notnull' => false]);
+        $table->addColumn('without_default_value_boolean', 'boolean', ['notnull' => false]);
+        $table->addColumn('with_default_value_integer', 'integer', ['notnull' => false]);
+        $table->addColumn('without_default_value_integer', 'integer', ['notnull' => false]);
+        $table->addColumn('with_df_not_blank', 'string', ['notnull' => false, 'length' => 255]);
+        $table->addColumn('with_df_not_null', 'string', ['notnull' => false, 'length' => 255]);
+        $table->addColumn('with_not_blank', 'string', ['notnull' => false, 'length' => 255]);
+        $table->addColumn('with_not_null', 'string', ['notnull' => false, 'length' => 255]);
         $table->setPrimaryKey(['id']);
     }
 
@@ -491,6 +533,23 @@ class OroTestFrameworkBundleInstaller implements
     }
 
     /**
+     * Create test_user_ownership table
+     *
+     * @param Schema $schema
+     */
+    protected function createTestUserOwnershipTable(Schema $schema)
+    {
+        $table = $schema->createTable('test_user_ownership');
+        $table->addColumn('id', 'integer', ['autoincrement' => true]);
+        $table->addColumn('owner_id', 'integer', ['notnull' => false]);
+        $table->addColumn('organization_id', 'integer', ['notnull' => false]);
+        $table->addColumn('name', 'string', ['notnull' => false, 'length' => 255]);
+        $table->setPrimaryKey(['id']);
+        $table->addIndex(['organization_id'], 'IDX_673C997D32C8A3DE', []);
+        $table->addIndex(['owner_id'], 'IDX_673C997D7E3C61F9', []);
+    }
+
+    /**
      * Add test_person foreign keys.
      *
      * @param Schema $schema
@@ -504,6 +563,14 @@ class OroTestFrameworkBundleInstaller implements
             ['id'],
             ['onDelete' => null, 'onUpdate' => null]
         );
+    }
+
+    /**
+     * @param Schema $schema
+     */
+    private function extendScopeForTestActivity($schema)
+    {
+        $this->scopeExtension->addScopeAssociation($schema, 'test_activity', 'test_activity', 'id');
     }
 
     /**
@@ -578,6 +645,28 @@ class OroTestFrameworkBundleInstaller implements
             $schema->getTable('test_product_type'),
             ['product_type'],
             ['name'],
+            ['onDelete' => 'SET NULL', 'onUpdate' => null]
+        );
+    }
+
+    /**
+     * Add test_user_ownership foreign keys.
+     *
+     * @param Schema $schema
+     */
+    protected function addTestUserOwnershipForeignKeys(Schema $schema)
+    {
+        $table = $schema->getTable('test_user_ownership');
+        $table->addForeignKeyConstraint(
+            $schema->getTable('oro_user'),
+            ['owner_id'],
+            ['id'],
+            ['onDelete' => 'SET NULL', 'onUpdate' => null]
+        );
+        $table->addForeignKeyConstraint(
+            $schema->getTable('oro_organization'),
+            ['organization_id'],
+            ['id'],
             ['onDelete' => 'SET NULL', 'onUpdate' => null]
         );
     }

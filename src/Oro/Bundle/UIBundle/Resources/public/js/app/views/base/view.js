@@ -53,7 +53,7 @@ define([
             }
 
             if ($el) {
-                this.setElement($el, false);
+                this.setElement($el);
             } else {
                 BaseView.__super__._ensureElement.call(this);
             }

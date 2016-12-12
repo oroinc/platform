@@ -59,6 +59,7 @@ class PasswordComplexityExtension extends AbstractTypeExtension
         $constraint->requireMinLength = $this->configProvider->getMinLength();
         $constraint->requireNumbers = $this->configProvider->getNumbers();
         $constraint->requireSpecialCharacter = $this->configProvider->getSpecialChars();
+        $constraint->requireLowerCase = $this->configProvider->getLowerCase();
         $constraint->requireUpperCase = $this->configProvider->getUpperCase();
     }
 

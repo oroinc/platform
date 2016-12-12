@@ -8,9 +8,6 @@ use Doctrine\Common\Persistence\ObjectManager;
 
 use Oro\Bundle\SecurityBundle\Tools\UUIDGenerator;
 
-use Symfony\Component\DependencyInjection\ContainerAwareInterface;
-use Symfony\Component\DependencyInjection\ContainerInterface;
-
 use Oro\Bundle\TestFrameworkBundle\Entity\Item;
 
 class LoadSearchItemData extends AbstractFixture implements OrderedFixtureInterface

@@ -2,11 +2,11 @@
 
 namespace Oro\Bundle\CronBundle\Tests\Functinal\Command;
 
-use Symfony\Component\Console\Tester\CommandTester;
-use Symfony\Bundle\FrameworkBundle\Console\Application;
-
-use Oro\Bundle\CronBundle\Command\CronCommand;
-use Oro\Bundle\ImapBundle\Command\Cron\EmailSyncCommand;
+use Cron\CronExpression;
+use Oro\Bundle\CronBundle\Async\Topics;
+use Oro\Bundle\CronBundle\Helper\CronHelper;
+use Oro\Bundle\CronBundle\Tests\Functional\Command\DataFixtures\LoadScheduleData;
+use Oro\Bundle\MessageQueueBundle\Test\Functional\MessageQueueExtension;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
 /**
@@ -14,110 +14,67 @@ use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
  */
 class CronCommandTest extends WebTestCase
 {
-    /** @var Application */
-    protected $application;
+    use MessageQueueExtension;
 
     protected function setUp()
     {
         $this->initClient();
-        $this->loadFixtures([
-            'Oro\Bundle\CronBundle\Tests\Functional\Command\DataFixtures\LoadScheduleData'
-        ]);
 
-        $kernel = self::getContainer()->get('kernel');
-        $this->application = new Application($kernel);
-        $this->application->add(new CronCommand());
+        $this->loadFixtures([
+            LoadScheduleData::class
+        ]);
     }
 
-    public function testCheckRunDuplicateJob()
+    public function testShouldRunAndScheduleIfCommandDue()
     {
         $this->mockCronHelper(true);
 
-        $result = $this->runCommand(CronCommand::COMMAND_NAME, ['--skipCheckDaemon' => true]);
+        $result = $this->runCommand('oro:cron', ['-vvv']);
         $this->assertNotEmpty($result);
 
-        $this->checkMessage('allJobNew', $result);
-
-        $result = $this->runCommand(CronCommand::COMMAND_NAME, []);
-        $this->checkMessage('AllJobAdded', $result);
-
-        for ($i = 1; $i < EmailSyncCommand::MAX_JOBS_COUNT; $i++) {
-            $result = $this->runCommand(CronCommand::COMMAND_NAME, []);
-            $this->assertRegexp('/Processing command "oro:cron:imap-sync": added to job queue/', $result);
-        }
-
-        $result = $this->runCommand(CronCommand::COMMAND_NAME, []);
-        $this->checkMessage('AllJobAlreadyExist', $result);
+        $this->assertContains('Scheduling run for command oro:test', $result);
+        $this->assertContains('All commands scheduled', $result);
     }
 
-    public function testSkipAllJob()
+    public function testShouldRunAndNotScheduleIfNotCommandDue()
     {
-        $this->mockCronHelper();
-        $command = $this->application->find('oro:cron');
-        $commandTester = new CommandTester($command);
-        $commandTester->execute(array(
-            'command'      => $command->getName(),
-            '--skipCheckDaemon' => true,
-        ));
+        $this->mockCronHelper(false);
 
-        $result = $this->runCommand(CronCommand::COMMAND_NAME, []);
+        $result = $this->runCommand('oro:cron', ['-vvv']);
+
         $this->assertNotEmpty($result);
-
-        $this->checkMessage('AllJobSkip', $result);
+        $this->assertContains('Skipping command oro:test', $result);
+        $this->assertContains('All commands scheduled', $result);
     }
 
-    /**
-     * @param string $key
-     * @param string $result
-     */
-    protected function checkMessage($key, $result)
+    public function testShouldSendMessageIfCommandDue()
     {
-        $messages = [
-            'allJobNew' => [
-                'Processing command "oro:cron:integration:sync": new command found, setting up schedule..',
-                'Processing command "oro:cron:batch:cleanup": new command found, setting up schedule..',
-                'Processing command "oro:cron:cleanup": new command found, setting up schedule..',
-                'Processing command "oro:cron:imap-sync": new command found, setting up schedule..',
-                'Processing command "oro:cron:import-tracking": new command found, setting up schedule..',
-                'Processing command "oro:cron:tracking:parse": new command found, setting up schedule..',
-                'Processing command "oro:cron:send-reminders": new command found, setting up schedule..',
-                'Processing command "oro:cron:cleanup --dry-run": added to job queue'
-            ],
-            'AllJobAlreadyExist' => [
-                'Processing command "oro:cron:integration:sync": already exists in job queue',
-                'Processing command "oro:cron:batch:cleanup": already exists in job queue',
-                'Processing command "oro:cron:cleanup": already exists in job queue',
-                'Processing command "oro:cron:imap-sync": already exists in job queue',
-                'Processing command "oro:cron:import-tracking": already exists in job queue',
-                'Processing command "oro:cron:tracking:parse": already exists in job queue',
-                'Processing command "oro:cron:send-reminders": already exists in job queue',
-                'Processing command "oro:cron:cleanup --dry-run": already exists in job queue'
-            ],
-            'AllJobAdded' => [
-                'Processing command "oro:cron:integration:sync": added to job queue',
-                'Processing command "oro:cron:batch:cleanup": added to job queue',
-                'Processing command "oro:cron:cleanup": added to job queue',
-                'Processing command "oro:cron:imap-sync": added to job queue',
-                'Processing command "oro:cron:import-tracking": added to job queue',
-                'Processing command "oro:cron:tracking:parse": added to job queue',
-                'Processing command "oro:cron:send-reminders": added to job queue',
-                'Processing command "oro:cron:cleanup --dry-run": already exists in job queue'
-            ],
-            'AllJobSkip' => [
-                'Processing command "oro:cron:integration:sync": skipped',
-                'Processing command "oro:cron:batch:cleanup": skipped',
-                'Processing command "oro:cron:cleanup": skipped',
-                'Processing command "oro:cron:imap-sync": skipped',
-                'Processing command "oro:cron:import-tracking": skipped',
-                'Processing command "oro:cron:tracking:parse": skipped',
-                'Processing command "oro:cron:send-reminders": skipped',
-                'Processing command "oro:cron:cleanup --dry-run": skipped'
-            ]
-        ];
+        $this->mockCronHelper(true);
 
-        foreach ($messages[$key] as $message) {
-            $this->assertContains($message, $result);
-        }
+        $this->runCommand('oro:cron');
+
+        $messages = self::getMessageCollector()->getTopicSentMessages(Topics::RUN_COMMAND);
+
+        $this->assertGreaterThan(0, $messages);
+
+        $message = $messages[0];
+
+        $this->assertInternalType('array', $message);
+        $this->assertArrayHasKey('message', $message);
+        $this->assertInternalType('array', $message['message']);
+        $this->assertArrayHasKey('command', $message['message']);
+        $this->assertArrayHasKey('arguments', $message['message']);
+    }
+
+    public function testShouldNotSendMessagesIfNotCommandDue()
+    {
+        $this->mockCronHelper(false);
+
+        $this->runCommand('oro:cron');
+
+        $messages = self::getSentMessages();
+
+        $this->assertCount(0, $messages);
     }
 
     /**
@@ -125,11 +82,11 @@ class CronCommandTest extends WebTestCase
      */
     protected function mockCronHelper($isDue = false)
     {
-        $mockCronHelper = $this->getMockBuilder('Oro\Bundle\CronBundle\Helper\CronHelper')
+        $mockCronHelper = $this->getMockBuilder(CronHelper::class)
             ->disableOriginalConstructor()
             ->getMock();
 
-        $cronExpression = $this->getMockBuilder('Cron\CronExpression')
+        $cronExpression = $this->getMockBuilder(CronExpression::class)
             ->disableOriginalConstructor()
             ->getMock();
         $cronExpression->expects($this->any())->method('isDue')->willReturn($isDue);

@@ -83,4 +83,13 @@ interface ContextInterface extends \ArrayAccess
      * @return ContextDataCollection
      */
     public function data();
+
+    /**
+     * Gets a hash based on context
+     *
+     * @return string
+     *
+     * @throws Exception\LogicException if the context is not resolved.
+     */
+    public function getHash();
 }

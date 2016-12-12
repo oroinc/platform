@@ -214,9 +214,25 @@ services:
         tags:
             - { name: oro.api.processor, action: get_subresource, group: build_query, priority: -150 }
 
+    oro_api.get_subresource.build_query_for_extended_many_to_one_association:
+        class: Oro\Bundle\ApiBundle\Processor\Subresource\Shared\BuildQueryForExtendedManyToOneAssociation
+        arguments:
+            - '@oro_api.doctrine_helper'
+        tags:
+            - { name: oro.api.processor, action: get_subresource, group: build_query, collection: false, priority: -160 }
+
     #
     # load_data
     #
+
+    oro_api.get_subresource.load_entity_by_extended_association.single_item:
+        class: Oro\Bundle\ApiBundle\Processor\Subresource\Shared\LoadEntityByExtendedAssociation
+        arguments:
+            - '@oro_api.entity_serializer'
+            - '@oro_api.config_provider'
+            - '@oro_api.metadata_provider'
+        tags:
+            - { name: oro.api.processor, action: get_subresource, group: load_data, collection: false }
 
     oro_api.get_subresource.load_data_by_entity_serializer.collection:
         class: Oro\Bundle\ApiBundle\Processor\Shared\LoadEntitiesByEntitySerializer
@@ -346,10 +362,15 @@ services:
             - { name: oro.api.processor, action: get_subresource, group: normalize_result, collection: false, requestType: json_api, priority: -55 }
             - { name: monolog.logger, channel: api }
 
+    oro_api.get_subresource.set_result_document:
+        class: Oro\Bundle\ApiBundle\Processor\Shared\SetResultDocument
+        tags:
+            - { name: oro.api.processor, action: get_subresource, group: normalize_result, priority: -150 }
+
     oro_api.get_subresource.rest.process_errors:
         class: Oro\Bundle\ApiBundle\Processor\Shared\ProcessErrors
         tags:
-            - { name: oro.api.processor, action: get_subresource, group: normalize_result, requestType: rest, priority: -100 }
+            - { name: oro.api.processor, action: get_subresource, group: normalize_result, requestType: rest, priority: -190 }
 
     oro_api.get_subresource.validate_normalized_result_exists:
         class: Oro\Bundle\ApiBundle\Processor\Shared\ValidateNormalizedResultExists

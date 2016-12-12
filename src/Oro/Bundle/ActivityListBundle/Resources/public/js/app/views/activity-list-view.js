@@ -45,7 +45,7 @@ define(function(require) {
             'dialogOptions': {
                 'modal': true,
                 'resizable': true,
-                'width': 675,
+                'width': 515,
                 'autoResize': true
             }
         },
@@ -326,7 +326,8 @@ define(function(require) {
                     model = this.collection.findSameActivity(oldViewState.attrs);
                     if (model) {
                         view = this.getItemView(model);
-                        if (view && !oldViewState.collapsed && view.isCollapsed()) {
+                        model.set('is_loaded', false);
+                        if (view && !oldViewState.collapsed) {
                             view.toggle();
                             view.getAccorditionBody().addClass('in');
                             view.getAccorditionToggle().removeClass('collapsed');
@@ -381,7 +382,7 @@ define(function(require) {
                 }, this));
         },
 
-        _editItem: function(model) {
+        _editItem: function(model, extraOptions) {
             if (!this.itemEditDialog) {
                 var unescapeHTML = function unescapeHtml(unsafe) {
                     return unsafe
@@ -393,7 +394,7 @@ define(function(require) {
                         .replace(/&#039;/g, '\'');
                 };
 
-                var dialogConfiguration = $.extend(true, {}, this.EDIT_DIALOG_CONFIGURATION_DEFAULTS, {
+                var dialogConfiguration = $.extend(true, {}, this.EDIT_DIALOG_CONFIGURATION_DEFAULTS, extraOptions, {
                     'url': this._getUrl('itemEdit', model),
                     'title': unescapeHTML(model.get('subject')),
                     'dialogOptions': {

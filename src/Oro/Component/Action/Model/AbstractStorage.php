@@ -2,8 +2,16 @@
 
 namespace Oro\Component\Action\Model;
 
+use Doctrine\Common\Persistence\Proxy;
+use Doctrine\ORM\EntityNotFoundException;
+use Oro\Component\PropertyAccess\PropertyAccessor;
+use Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException;
+use Symfony\Component\PropertyAccess\Exception\RuntimeException;
+use Symfony\Component\PropertyAccess\PropertyPath;
+use Symfony\Component\PropertyAccess\PropertyPathInterface;
+
 /**
- * @SuppressWarnings(PHPMD.TooManyMethods)
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
 abstract class AbstractStorage implements \ArrayAccess, \IteratorAggregate, \Countable
 {
@@ -18,12 +26,39 @@ abstract class AbstractStorage implements \ArrayAccess, \IteratorAggregate, \Cou
     protected $modified;
 
     /**
+     * @var PropertyAccessor
+     */
+    protected $propertyAccessor;
+
+    /**
      * @param array $data
      */
     public function __construct(array $data = [])
     {
         $this->data = $data;
         $this->modified = false;
+        $this->propertyAccessor = new PropertyAccessor();
+    }
+
+    /**
+     * @return bool
+     */
+    public function isModified()
+    {
+        return $this->modified;
+    }
+
+    /**
+     * This method should be called only by system listeners
+     *
+     * @param bool $modified
+     * @return $this
+     */
+    public function setModified($modified)
+    {
+        $this->modified = $modified;
+
+        return $this;
     }
 
     /**
@@ -31,23 +66,31 @@ abstract class AbstractStorage implements \ArrayAccess, \IteratorAggregate, \Cou
      *
      * @param string $name
      * @param mixed $value
+     * @param bool $changeModified
      * @return AbstractStorage
      */
-    public function set($name, $value)
+    public function set($name, $value, $changeModified = true)
     {
-        if (!array_key_exists($name, $this->data) || $this->data[$name] !== $value) {
-            $this->data[$name] = $value;
-            $this->modified = true;
-        }
+        try {
+            $propertyPath = $this->getMappedPath($name);
+            if ($changeModified &&
+                (!$this->has($name) || $this->propertyAccessor->getValue($this->data, $propertyPath) !== $value)
+            ) {
+                $this->modified = true;
+            }
+            $this->propertyAccessor->setValue($this->data, $propertyPath, $value);
 
-        return $this;
+            return $this;
+        } catch (RuntimeException $e) {
+            return $this;
+        }
     }
 
     /**
      * Add values
      *
      * @param array $data
-     * @return AbstractStorage
+     * @return $this
      */
     public function add(array $data)
     {
@@ -66,9 +109,17 @@ abstract class AbstractStorage implements \ArrayAccess, \IteratorAggregate, \Cou
      */
     public function get($name)
     {
-        if (array_key_exists($name, $this->data)) {
-            return $this->data[$name];
-        } else {
+        try {
+            $propertyPath = $this->getMappedPath($name);
+            $value = $this->propertyAccessor->getValue($this->data, $propertyPath);
+            if ($value instanceof Proxy && !$value->__isInitialized()) {
+                // set value as null if entity is not exist
+                $value = $this->extractProxyEntity($value);
+                $this->set($name, $value);
+            }
+
+            return $value;
+        } catch (RuntimeException $e) {
             return null;
         }
     }
@@ -102,18 +153,27 @@ abstract class AbstractStorage implements \ArrayAccess, \IteratorAggregate, \Cou
      */
     public function has($name)
     {
-        return array_key_exists($name, $this->data);
+        if (array_key_exists($name, $this->data)) {
+            return true;
+        } else {
+            try {
+                $this->propertyAccessor->getValue($this->data, $this->getMappedPath($name));
+            } catch (NoSuchPropertyException $e) {
+                return false;
+            }
+            return true;
+        }
     }
 
     /**
      * Remove value by name
      *
      * @param string $name
-     * @return AbstractStorage
+     * @return $this
      */
     public function remove($name)
     {
-        if (array_key_exists($name, $this->data)) {
+        if (isset($this->data[$name])) {
             unset($this->data[$name]);
             $this->modified = true;
         }
@@ -129,27 +189,6 @@ abstract class AbstractStorage implements \ArrayAccess, \IteratorAggregate, \Cou
     public function isEmpty()
     {
         return 0 === count($this->data);
-    }
-
-    /**
-     * @return bool
-     */
-    public function isModified()
-    {
-        return $this->modified;
-    }
-
-    /**
-     * This method should be called only by system listeners
-     *
-     * @param bool $modified
-     * @return AbstractStorage
-     */
-    public function setModified($modified)
-    {
-        $this->modified = $modified;
-
-        return $this;
     }
 
     /**
@@ -241,5 +280,49 @@ abstract class AbstractStorage implements \ArrayAccess, \IteratorAggregate, \Cou
     public function getIterator()
     {
         return new \ArrayIterator($this->data);
+    }
+
+    /**
+     * Get mapped field path by field name.
+     *
+     * @param string|PropertyPathInterface $propertyPath
+     * @return null|string
+     */
+    protected function getMappedPath($propertyPath)
+    {
+        if ($propertyPath instanceof PropertyPathInterface) {
+            return $propertyPath;
+        }
+
+        return $this->getConstructedPropertyPath($propertyPath);
+    }
+
+    /**
+     * Get property path for array as first accessor.
+     *
+     * @param string $path
+     * @return string
+     */
+    protected function getConstructedPropertyPath($path)
+    {
+        $pathParts = explode('.', $path);
+        $pathParts[0] = '[' . $pathParts[0] . ']';
+
+        return new PropertyPath(implode('.', $pathParts));
+    }
+
+    /**
+     * @param Proxy $entity
+     * @return object|Proxy|null
+     */
+    protected function extractProxyEntity(Proxy $entity)
+    {
+        try {
+            $entity->__load();
+        } catch (EntityNotFoundException $exception) {
+            $entity = null;
+        }
+
+        return $entity;
     }
 }

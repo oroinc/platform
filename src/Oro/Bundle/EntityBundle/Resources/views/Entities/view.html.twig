@@ -3,7 +3,7 @@
 
 {% oro_title_set({params : {
     "%entityName%": entity_config.get('label')|default('N/A')|trans,
-    "%recordName%": 'oro.entity.item'|trans({'%id%': entity.id}) },
+    "%recordName%": entity|oro_format_name|default('oro.entity.item'|trans({'%id%': entity.id})) },
 }) %}
 
 {% block navButtons %}
@@ -30,7 +30,7 @@
         'entity':      entity,
         'indexPath':   path('oro_entityconfig_index'),
         'indexLabel': 'oro.entity.plural_label'|trans,
-        'entityTitle': 'oro.entity.item'|trans({'%id%': entity.id}),
+        'entityTitle': entity|oro_format_name|default('oro.entity.item'|trans({'%id%': entity.id})),
         'additional': [{
             'indexPath'  : path('oro_entity_index', {entityName: entity_name}),
             'indexLabel' : entity_config.get('label')|default('N/A')|trans

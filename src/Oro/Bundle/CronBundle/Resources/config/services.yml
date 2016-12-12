@@ -1,23 +1,8 @@
 parameters:
     oro_cron.entity.schedule.class:   Oro\Bundle\CronBundle\Entity\Schedule
-    oro_cron.job_daemon.class:        Oro\Bundle\CronBundle\Job\Daemon
-    oro_cron.job_manager.class:       Oro\Bundle\CronBundle\Entity\Manager\JobManager
     oro_cron.schedule_manager.class:  Oro\Bundle\CronBundle\Entity\Manager\ScheduleManager
 
 services:
-    oro_cron.job_daemon:
-        class: '%oro_cron.job_daemon.class%'
-        arguments:
-            - '%kernel.root_dir%'
-            - '%oro_cron.max_jobs%'
-            - '%oro_cron.max_runtime%'
-            - '%kernel.environment%'
-
-    oro_cron.job_manager:
-        class: '%oro_cron.job_manager.class%'
-        arguments:
-            - '@doctrine.orm.entity_manager'
-
     oro_cron.schedule_manager:
         class: '%oro_cron.schedule_manager.class%'
         arguments:
@@ -55,27 +40,30 @@ services:
         tags:
             - { name: oro_filter.extension.orm_filter.filter, type: command_with_args }
 
-    oro_cron.action.create_job:
-        class: 'Oro\Bundle\CronBundle\Action\CreateJobAction'
-        arguments:
-            - '@oro_action.context_accessor'
-            - '@oro_cron.job_manager'
-            - '@doctrine'
-        tags:
-            - { name: oro_action.action, alias: create_job }
-            - { name: oro_workflow.action, alias: create_job }
-
     oro_cron.helper.cron:
         class: 'Oro\Bundle\CronBundle\Helper\CronHelper'
 
-    oro_cron.listener.load_class_metadata_subscriber:
-        class: Oro\Bundle\CronBundle\EventListener\LoadClassMetadataSubscriber
-        tags:
-            - { name: doctrine.event_subscriber }
 
-    oro_cron.listener.job_subscriber:
-        class: Oro\Bundle\CronBundle\EventListener\JobSubscriber
+    oro_cron.engine.command_runner:
+        class: Oro\Bundle\CronBundle\Engine\CommandRunner
         arguments:
+            - '@kernel'
+
+    oro_cron.async.command_runner_message_processor:
+        class: Oro\Bundle\CronBundle\Async\CommandRunnerMessageProcessor
+        arguments:
+            - '@oro_cron.engine.command_runner'
+            - '@oro_message_queue.job.runner'
             - '@logger'
         tags:
-            - { name: kernel.event_subscriber }
+            - { name: 'oro_message_queue.client.message_processor' }
+
+    oro_cron.async.command_runner:
+        class: Oro\Bundle\CronBundle\Async\CommandRunner
+        arguments:
+            - '@oro_message_queue.client.message_producer'
+
+    oro_cron.listener.schema_column_definition:
+        class: Oro\Bundle\CronBundle\Migrations\Schema\v2_0\SchemaColumnDefinitionListener
+        tags:
+            - {name: doctrine.event_listener, event: onSchemaColumnDefinition, method: onSchemaColumnDefinition}

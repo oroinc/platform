@@ -3,10 +3,13 @@
 namespace Oro\Bundle\NotificationBundle\Provider;
 
 use Symfony\Component\Translation\TranslatorInterface;
+
 use Doctrine\ORM\EntityManager;
+
 use Oro\Bundle\EntityBundle\Provider\EntityProvider;
 use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
+use Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker;
 
 class EmailNotificationEntityProvider extends EntityProvider
 {
@@ -22,6 +25,7 @@ class EmailNotificationEntityProvider extends EntityProvider
      * @param ConfigProvider      $extendConfigProvider
      * @param EntityClassResolver $entityClassResolver
      * @param TranslatorInterface $translator
+     * @param FeatureChecker      $featureChecker
      * @param EntityManager       $em
      */
     public function __construct(
@@ -29,13 +33,15 @@ class EmailNotificationEntityProvider extends EntityProvider
         ConfigProvider $extendConfigProvider,
         EntityClassResolver $entityClassResolver,
         TranslatorInterface $translator,
+        FeatureChecker $featureChecker,
         EntityManager $em
     ) {
         parent::__construct(
             $entityConfigProvider,
             $extendConfigProvider,
             $entityClassResolver,
-            $translator
+            $translator,
+            $featureChecker
         );
         $this->em = $em;
     }

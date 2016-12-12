@@ -40,7 +40,7 @@ result_menu:
                 uri: '#system'
                 divider: false
                 position: 20
-                translateDisabled: false
+                translate_disabled: false
         custom:
             label: 'Custom'
             uri: '#custom'
@@ -48,7 +48,7 @@ result_menu:
                 uri: '#custom'
                 divider: false
                 position: 10
-                translateDisabled: false
+                translate_disabled: false
     tree:
         menu:
             type: menu

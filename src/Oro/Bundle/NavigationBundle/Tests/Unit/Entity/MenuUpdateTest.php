@@ -24,7 +24,7 @@ class MenuUpdateTest extends \PHPUnit_Framework_TestCase
                 'position' => $priority,
                 'divider' => true,
                 'icon' => 'test-icon',
-                'translateDisabled' => false
+                'translate_disabled' => false
             ],
             $update->getExtras()
         );

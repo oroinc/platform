@@ -1,12 +1,23 @@
 layout:
     actions:
         - '@add':
-            id:        embedded_form
+            id:        embedded_form_start
             parentId:  content
-            blockType: form_fields
+            blockType: embed_form_start
             options:
                 form_name: embedded_form
-                split_to_fields: true
+        - '@add':
+            id:        embedded_form
+            parentId:  content
+            blockType: embed_form_fields
+            options:
+                form_name: embedded_form
+        - '@add':
+            id:        embedded_form_end
+            parentId:  content
+            blockType: embed_form_end
+            options:
+                form_name: embedded_form
 
     conditions: 'context["embedded_form_custom_layout"]==""'
 

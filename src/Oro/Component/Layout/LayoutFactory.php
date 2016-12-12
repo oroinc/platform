@@ -2,6 +2,8 @@
 
 namespace Oro\Component\Layout;
 
+use Oro\Component\Layout\ExpressionLanguage\ExpressionProcessor;
+
 class LayoutFactory implements LayoutFactoryInterface
 {
     /** @var LayoutRegistryInterface */
@@ -10,16 +12,28 @@ class LayoutFactory implements LayoutFactoryInterface
     /** @var LayoutRendererRegistryInterface */
     protected $rendererRegistry;
 
+    /** @var ExpressionProcessor */
+    protected $expressionProcessor;
+
+    /** @var BlockViewCache|null */
+    private $blockViewCache;
+
     /**
      * @param LayoutRegistryInterface         $registry
      * @param LayoutRendererRegistryInterface $rendererRegistry
+     * @param ExpressionProcessor             $expressionProcessor
+     * @param BlockViewCache|null             $blockViewCache
      */
     public function __construct(
         LayoutRegistryInterface $registry,
-        LayoutRendererRegistryInterface $rendererRegistry
+        LayoutRendererRegistryInterface $rendererRegistry,
+        ExpressionProcessor $expressionProcessor,
+        BlockViewCache $blockViewCache = null
     ) {
-        $this->registry         = $registry;
-        $this->rendererRegistry = $rendererRegistry;
+        $this->registry            = $registry;
+        $this->rendererRegistry    = $rendererRegistry;
+        $this->expressionProcessor = $expressionProcessor;
+        $this->blockViewCache      = $blockViewCache;
     }
 
     /**
@@ -67,7 +81,7 @@ class LayoutFactory implements LayoutFactoryInterface
      */
     public function createBlockFactory(DeferredLayoutManipulatorInterface $layoutManipulator)
     {
-        return new BlockFactory($this->registry, $layoutManipulator);
+        return new BlockFactory($this->registry, $layoutManipulator, $this->expressionProcessor);
     }
 
     /**
@@ -84,7 +98,9 @@ class LayoutFactory implements LayoutFactoryInterface
             $rawLayoutBuilder,
             $layoutManipulator,
             $blockFactory,
-            $this->rendererRegistry
+            $this->rendererRegistry,
+            $this->expressionProcessor,
+            $this->blockViewCache
         );
     }
 }

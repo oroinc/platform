@@ -9,7 +9,7 @@ use Symfony\Component\PropertyAccess\PropertyPathInterface;
 use Symfony\Component\Translation\TranslatorInterface;
 
 use Oro\Component\Action\Exception\InvalidParameterException;
-use Oro\Component\Action\Model\ContextAccessor;
+use Oro\Component\ConfigExpression\ContextAccessor;
 
 class TranslateAction extends AbstractAction
 {

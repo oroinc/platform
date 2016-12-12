@@ -1,0 +1,31 @@
+Oro\Bundle\TestFrameworkBundle\Entity\TestDepartment:
+    TestDepartment{1..3}:
+        name: TestDepartment<current()>
+Oro\Bundle\TestFrameworkBundle\Entity\TestEmployee:
+    TestEmployee{1..30}:
+        name: TestEmployee<current()>
+        # $this->valueForCurrent is a workaround because $current works only in v3.x
+        # @see https://github.com/nelmio/alice/issues/360
+        department: '@TestDepartment<((int)(((int)$this->valueForCurrent - 1) / 10) + 1)>'
+        position: developer
+Oro\Bundle\OrganizationBundle\Entity\BusinessUnit:
+    TestBusinessUnit1:
+        name: TestBusinessUnit1
+        organization: '@organization'
+        email: TestBusinessUnit1@local.com
+    TestBusinessUnit{2..3}:
+        name: TestBusinessUnit<current()>
+        organization: '@organization'
+        email: TestBusinessUnit<current()>@local.com
+        owner: '@TestBusinessUnit1'
+Oro\Bundle\UserBundle\Entity\User:
+    TestUsername_{1..9}:
+        username: 'TestUsername_<current()>'
+        enabled: true
+        email: 'TestUsername_<current()>@local.com'
+        password: 'TestUsername_<current()>'
+        organization: '@organization'
+        # $this->valueForCurrent is a workaround because $current works only in v3.x
+        # @see https://github.com/nelmio/alice/issues/360
+        owner: '@TestBusinessUnit<((int)(((int)$this->valueForCurrent - 1) / 3) + 1)>'
+        addBusinessUnit: ['@TestBusinessUnit<((int)(((int)$this->valueForCurrent - 1) / 3) + 1)>']

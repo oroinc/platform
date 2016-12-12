@@ -253,6 +253,9 @@ class ProcessorDecorator
                     ->scalarNode('property_path')->end()
                     ->integerNode('priority')->end()
                     ->booleanNode('ui_only')->end()
+                    ->booleanNode('page_reload')
+                        ->defaultValue(false)
+                    ->end()
                 ->end()
                 ->validate()
                     // 'data_type' be specified for all fields except 'ui_only' ones

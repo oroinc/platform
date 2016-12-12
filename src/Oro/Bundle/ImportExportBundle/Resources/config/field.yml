@@ -1,18 +1,10 @@
 parameters:
-    oro_importexport.field.field_helper.class: Oro\Bundle\ImportExportBundle\Field\FieldHelper
     oro_importexport.field.database_helper.class: Oro\Bundle\ImportExportBundle\Field\DatabaseHelper
 
 services:
-    oro_importexport.field.field_helper:
-        class: %oro_importexport.field.field_helper.class%
-        arguments:
-            - '@oro_entity.entity_field_provider'
-            - '@oro_entity_config.provider.importexport'
-            - '@oro_entity_extend.extend.field_type_helper'
-
     oro_importexport.field.field_helper.link:
         tags:
-            - { name: oro_service_link, service: oro_importexport.field.field_helper }
+            - { name: oro_service_link, service: oro_entity.helper.field_helper }
 
     oro_importexport.field.database_helper:
         class: %oro_importexport.field.database_helper.class%

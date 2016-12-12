@@ -7,18 +7,6 @@ use Oro\Bundle\WorkflowBundle\Configuration\WorkflowConfiguration;
 class AttributeHandler extends AbstractHandler
 {
     /**
-     * @var array
-     */
-    protected $attributeKeys = array(
-        'name',
-        'label',
-        'type',
-        'entity_acl',
-        'property_path',
-        'options'
-    );
-
-    /**
      * {@inheritDoc}
      */
     public function handle(array $configuration)
@@ -48,6 +36,6 @@ class AttributeHandler extends AbstractHandler
             $attribute['name'] = uniqid('attribute_');
         }
 
-        return $this->filterKeys($attribute, $this->attributeKeys);
+        return $attribute;
     }
 }

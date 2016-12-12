@@ -7,7 +7,7 @@ use Symfony\Component\EventDispatcher\EventDispatcher;
 use Oro\Bundle\ActionBundle\Action\FormatName;
 use Oro\Bundle\EntityBundle\Provider\EntityNameResolver;
 
-use Oro\Component\Action\Model\ContextAccessor;
+use Oro\Component\ConfigExpression\ContextAccessor;
 
 class FormatNameTest extends \PHPUnit_Framework_TestCase
 {
@@ -28,7 +28,7 @@ class FormatNameTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->contextAccessor = $this->getMockBuilder('Oro\Component\Action\Model\ContextAccessor')
+        $this->contextAccessor = $this->getMockBuilder('Oro\Component\ConfigExpression\ContextAccessor')
             ->disableOriginalConstructor()
             ->getMock();
         $this->entityNameResolver = $this->getMockBuilder('Oro\Bundle\EntityBundle\Provider\EntityNameResolver')

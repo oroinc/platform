@@ -4,6 +4,8 @@ namespace Oro\Bundle\ApiBundle\Metadata;
 
 use Oro\Component\ChainProcessor\ParameterBag;
 use Oro\Component\ChainProcessor\ToArrayInterface;
+use Oro\Component\PhpUtils\ReflectionUtil;
+use Oro\Bundle\ApiBundle\Exception\RuntimeException;
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 
 /**
@@ -593,5 +595,58 @@ class EntityMetadata implements ToArrayInterface
         return
             count($fields) === count($idFields)
             && count(array_diff_key($fields, array_flip($idFields))) === 0;
+    }
+
+    /**
+     * Extracts the identifier value of an entity represented by this metadata.
+     *
+     * @param object $entity
+     *
+     * @return mixed The value of identifier field
+     *               or array ([field name => value, ...]) if the entity has composite identifier
+     */
+    public function getIdentifierValue($entity)
+    {
+        if (!is_object($entity)) {
+            throw new \InvalidArgumentException(
+                sprintf('Expected argument of type "object", "%s" given.', gettype($entity))
+            );
+        }
+
+        $numberOfIdFields = count($this->identifiers);
+        if (0 === $numberOfIdFields) {
+            throw new RuntimeException(
+                sprintf('The entity "%s" does not have identifier field(s).', $this->className)
+            );
+        }
+
+        $reflClass = new \ReflectionClass($entity);
+        if ($numberOfIdFields > 1) {
+            $result = [];
+            foreach ($this->identifiers as $fieldName) {
+                $result[$fieldName] = $this->getPropertyValue($entity, $reflClass, $fieldName);
+            }
+
+            return $result;
+        }
+
+        return $this->getPropertyValue($entity, $reflClass, reset($this->identifiers));
+    }
+
+    /**
+     * @param object           $entity
+     * @param \ReflectionClass $reflClass
+     * @param string           $propertyName
+     *
+     * @return mixed
+     */
+    private function getPropertyValue($entity, \ReflectionClass $reflClass, $propertyName)
+    {
+        $property = ReflectionUtil::getProperty($reflClass, $propertyName);
+        if (!$property->isPublic()) {
+            $property->setAccessible(true);
+        }
+
+        return $property->getValue($entity);
     }
 }

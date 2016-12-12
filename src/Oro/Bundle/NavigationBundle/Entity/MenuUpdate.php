@@ -67,7 +67,7 @@ use Oro\Bundle\NavigationBundle\Model\ExtendMenuUpdate;
  *      routeName="oro_navigation_menu_update_index",
  *      defaultValues={
  *          "entity"={
- *              "icon"="icon-th"
+ *              "icon"="fa-th"
  *          }
  *      }
  * )
@@ -96,7 +96,7 @@ class MenuUpdate extends ExtendMenuUpdate implements
     {
         $extras = [
             'divider' => $this->isDivider(),
-            'translateDisabled' => $this->getId() ? true : false
+            'translate_disabled' => $this->getId() ? true : false
         ];
 
         if ($this->getPriority() !== null) {

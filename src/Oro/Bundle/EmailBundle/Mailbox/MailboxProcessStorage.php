@@ -4,11 +4,23 @@ namespace Oro\Bundle\EmailBundle\Mailbox;
 
 use Oro\Bundle\EmailBundle\Entity\Mailbox;
 use Oro\Bundle\EmailBundle\Entity\MailboxProcessSettings;
+use Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker;
 
 class MailboxProcessStorage
 {
+    /** @var FeatureChecker */
+    protected $featureChecker;
+
     /** @var MailboxProcessProviderInterface[] */
     protected $processes = [];
+
+    /**
+     * @param FeatureChecker $featureChecker
+     */
+    public function __construct(FeatureChecker $featureChecker)
+    {
+        $this->featureChecker = $featureChecker;
+    }
 
     /**
      * Registers mailbox process provider with application.
@@ -82,7 +94,9 @@ class MailboxProcessStorage
     {
         $choices = [];
         foreach ($this->processes as $type => $provider) {
-            if (!$provider->isEnabled($mailbox)) {
+            if (!$provider->isEnabled($mailbox) ||
+                !$this->featureChecker->isResourceEnabled($provider->getProcessDefinitionName(), 'processes')
+            ) {
                 continue;
             }
 

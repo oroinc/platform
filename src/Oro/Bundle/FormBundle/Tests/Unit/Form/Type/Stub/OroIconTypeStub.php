@@ -26,7 +26,7 @@ class OroIconTypeStub extends AbstractType
         $resolver->setDefaults(
             [
                 'placeholder' => 'oro.form.choose_value',
-                'choices' => ['icon-anchor' => 'icon-anchor'],
+                'choices' => ['fa-anchor' => 'fa-anchor'],
                 'empty_value' => '',
                 'configs' => [
                     'placeholder' => 'oro.form.choose_value',

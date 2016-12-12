@@ -1,6 +1,11 @@
 OroActionBundle Documentation
 =============================
 
+Table of Contents
+-----------------
+ - [ActionBundle Glossary](#actionbundle-glossary)
+ - [Console commands](#console-commands)
+
   On top of common [Action Component](/src/Oro/Component/Action/Resources/doc/actions.md) and Oro Platform in general, 
 **ActionBundle** provide a way to bring more complex solutions in ORO based projects with reusable parties of
 configuration. 
@@ -24,6 +29,10 @@ An *Operation* can be enabled or disabled. Other fields of the operation contain
 options, an order of display buttons.
  More options see in [Operation Configuration](#operation-configuration).
  
+  * [**Buttons**](./buttons.md) - bring a way to expose any kind of actions (Operations, for example) to UI for a proper context through a 
+ specific [ButtonsProviderExtension](../../Model/ButtonProviderExtensionInterface.php) together with
+  [Buttons](../../Model/ButtonInterface.php) that were matched by a context.
+     
   * [**ActionGroup**](./action-groups.md) - another one of the main models in ActionBundle. A named bunch of Actions with entry
 `parameters` (required or optional, typed or not) and conditions. 
   *Action groups* can be used (e.g. called) not only from an Operation but within Workflow processes and even more - 
@@ -50,3 +59,39 @@ model itself that describes all behavior, ready to use with its named instance.
 * **Attribute** - an entity that represents a value (mostly in Operation), used to render field value in a step of a form.
 Attribute knows about its type (string, object, entity etc.) and additional options.
 The Attribute contains name and label as additional parameters.
+
+Console commands
+----------------
+
+#### oro:debug:action
+
+This command displays current actions for an application.
+
+```
+  oro:debug:action [<name>]
+  oro:debug:action
+
+Arguments:
+  name (optional): An action name
+```
+
+##### Usage
+
+- Displays list of current actions `php app/console oro:debug:action`
+- Show full description `php app/console oro:debug:action [<name>]`
+
+#### oro:debug:condition
+
+This command displays current conditions for an application.
+
+```
+  oro:debug:condition [<name>]
+
+Arguments:
+  name (optional): A condition name
+```
+
+##### Usage
+
+- Displays list of all conditions `php app/console oro:debug:condition`
+- Show full description `php app/console oro:debug:condition [<name>]`

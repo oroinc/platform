@@ -7,20 +7,6 @@ use Oro\Bundle\WorkflowBundle\Configuration\WorkflowConfiguration;
 class StepHandler extends AbstractHandler
 {
     /**
-     * @var array
-     */
-    protected $stepKeys = array(
-        'name',
-        'label',
-        'order',
-        'is_final',
-        '_is_start',
-        'entity_acl',
-        'allowed_transitions',
-        'position'
-    );
-
-    /**
      * {@inheritDoc}
      */
     public function handle(array $configuration)
@@ -95,10 +81,6 @@ class StepHandler extends AbstractHandler
             $step['name'] = uniqid('step_');
         }
 
-        if (empty($step['label'])) {
-            $step['label'] = $step['name'];
-        }
-
         if (empty($step['_is_start'])) {
             $step['_is_start'] = false;
         }
@@ -112,7 +94,7 @@ class StepHandler extends AbstractHandler
             }
         }
 
-        return $this->filterKeys($step, $this->stepKeys);
+        return $step;
     }
 
     /**

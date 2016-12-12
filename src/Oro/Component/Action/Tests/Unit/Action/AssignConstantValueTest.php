@@ -4,7 +4,7 @@ namespace Oro\Component\Action\Tests\Unit\Action;
 
 use Symfony\Component\PropertyAccess\PropertyPath;
 
-use Oro\Component\Action\Model\ContextAccessor;
+use Oro\Component\ConfigExpression\ContextAccessor;
 use Oro\Component\Action\Action\ActionInterface;
 use Oro\Component\Action\Action\AssignConstantValue;
 

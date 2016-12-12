@@ -46,4 +46,12 @@ class DependencyInjectionExtension implements ExtensionInterface
     {
         return isset($this->serviceIds[$name]);
     }
+
+    /**
+     * @return string[]
+     */
+    public function getServiceIds()
+    {
+        return $this->serviceIds;
+    }
 }

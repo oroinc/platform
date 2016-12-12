@@ -34,12 +34,15 @@
             class: attr.class|default('') ~ ' hidden'
         }) %}
     {%- endif -%}
+    {% set attributesThatContainsUri = ['src', 'href', 'action', 'cite', 'data', 'poster'] %}
     {%- for attrname, attrvalue in attr -%}
         {%- if (attrvalue is iterable) -%}
             {% set attrvalue = attrvalue|json_encode() %}
         {%- endif -%}
         {%- if attrname is same as('title') -%}
-            {{- ' ' ~ attrname }}="{{ attrvalue|block_text(translation_domain) }}"
+            {{- ' ' ~ attrname }}="{{ attrvalue|block_text(translation_domain)|e('html_attr') }}"
+        {% elseif attrname in attributesThatContainsUri %}
+            {{- ' ' ~ attrname }}="{{ attrvalue|e('html')|replace({'&amp;': '&'})|raw }}"
         {% else %}
             {{- ' ' ~ attrname }}="{{ attrvalue }}"
         {%- endif -%}
@@ -62,7 +65,7 @@
 {%- endblock %}
 
 {% block icon_block -%}
-    <i class="icon-{{ icon }}{% if icon_class is defined %} {{ icon_class }}{% endif %}"></i>
+    <i class="fa-{{ icon }}{% if icon_class is defined %} {{ icon_class }}{% endif %}"></i>
 {%- endblock %}
 
 {% block input_widget -%}
@@ -117,18 +120,8 @@
 {% endblock %}
 
 {% block title_widget -%}
-    {% if reverse %}
-        {% set value = value|reverse %}
-    {% endif %}
     {% spaceless %}
-        <title>
-            {%- for element in value -%}
-                {{ element|block_text(translation_domain) }}
-                {%- if not loop.last -%}
-                    {{ separator }}
-                {%- endif -%}
-            {%- endfor -%}
-        </title>
+        <title>{{ value|block_text(translation_domain) }}</title>
     {% endspaceless %}
 {%- endblock %}
 
@@ -250,22 +243,32 @@
 
 {% block form_start_widget %}
     {% set attr = form.vars.attr|merge(attr) %}
-    {% set action = action_path is defined ? action_path : (action_route_name is defined ? path(action_route_name, action_route_parameters) : null) -%}
-    {% if method is defined and method not in ['GET', 'POST'] -%}
-        {% set form_method = 'POST' %}
-    {%- endif -%}
-    <form{{ block('block_attributes') }}{% if action is not same as(null) %} action="{{ action }}"{% endif %}{% if method is defined %} method="{{ form_method|default(method)|lower }}"{% endif %}{% if enctype is defined %} enctype="{{ enctype }}"{% endif %}>
+    {% set options = {attr: attr} %}
+
+    {% set action = form_action is defined ? form_action : (form_route_name is defined ? path(form_route_name, form_route_parameters) : null) -%}
+    {% if action is not same as(null) %}
+        {% set options =  options|merge({action: action}) %}
+    {% endif %}
+
+    {% if form_method is defined %}
+        {% if method not in ['GET', 'POST'] -%}
+            {% set form_method = 'POST' %}
+        {%- endif -%}
+        {% set options =  options|merge({method: form_method}) %}
+    {% endif %}
+
+    {% if form_multipart is defined %}
+        {% set options =  options|merge({multipart: form_multipart}) %}
+    {% endif %}
+
+    {{ form_start(form, options) }}
     {%- if form_method is defined -%}
         <input type="hidden" name="_method" value="{{ method }}" />
     {%- endif -%}
 {% endblock %}
 
 {% block form_fields_widget %}
-    {% if split_to_fields %}
-        {{ block_widget(block) }}
-    {% else %}
-        {{ form_widget(form) }}
-    {% endif %}
+    {{ form_widget(form) }}
 {% endblock %}
 
 {% block form_end_widget %}

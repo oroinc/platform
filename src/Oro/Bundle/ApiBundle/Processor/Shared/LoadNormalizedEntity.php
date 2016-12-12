@@ -11,7 +11,7 @@ use Oro\Bundle\ApiBundle\Processor\RequestActionProcessor;
 use Oro\Bundle\ApiBundle\Request\ApiActions;
 
 /**
- * Loads whole entity by its id using "get" action.
+ * Loads whole entity by its identifier using "get" action.
  * We have to do it because the entity returned by "create" or "update" actions
  * must be the same as the entity returned by "get" action.
  */
@@ -52,29 +52,21 @@ class LoadNormalizedEntity implements ProcessorInterface
 
         /** @var GetContext $getContext */
         $getContext = $getProcessor->createContext();
-        $getContext->setId($entityId);
-        $getContext->skipGroup('security_check');
-        $getContext->skipGroup(RequestActionProcessor::NORMALIZE_RESULT_GROUP);
-        $this->prepareGetContext($getContext, $context);
-
-        $getProcessor->process($getContext);
-
-        $this->processGetResult($getContext, $context);
-    }
-
-    /**
-     * @param GetContext        $getContext
-     * @param SingleItemContext $context
-     */
-    protected function prepareGetContext(GetContext $getContext, SingleItemContext $context)
-    {
         $getContext->setVersion($context->getVersion());
         $getContext->getRequestType()->set($context->getRequestType());
         $getContext->setRequestHeaders($context->getRequestHeaders());
         $getContext->setClassName($context->getClassName());
+        $getContext->setId($entityId);
         if ($this->reuseExistingEntity && $context->hasResult()) {
             $getContext->setResult($context->getResult());
         }
+        $getContext->skipGroup('security_check');
+        $getContext->skipGroup(RequestActionProcessor::NORMALIZE_RESULT_GROUP);
+        $getContext->setSoftErrorsHandling(true);
+
+        $getProcessor->process($getContext);
+
+        $this->processGetResult($getContext, $context);
     }
 
     /**

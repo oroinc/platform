@@ -4,6 +4,7 @@
 namespace Oro\Bundle\CurrencyBundle\Provider;
 
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
+use Oro\Bundle\CurrencyBundle\DependencyInjection\Configuration as CurrencyConfig;
 
 class ViewTypeConfigProvider implements ViewTypeProviderInterface
 {
@@ -12,6 +13,9 @@ class ViewTypeConfigProvider implements ViewTypeProviderInterface
      */
     protected $configManager;
 
+    /**
+     * @param ConfigManager $configManager
+     */
     public function __construct(ConfigManager $configManager)
     {
         $this->configManager = $configManager;
@@ -20,6 +24,6 @@ class ViewTypeConfigProvider implements ViewTypeProviderInterface
     /** {@inheritdoc} */
     public function getViewType()
     {
-        return $this->configManager->get('oro_currency.currency_display');
+        return $this->configManager->get(CurrencyConfig::getConfigKeyByName(CurrencyConfig::KEY_CURRENCY_DISPLAY));
     }
 }

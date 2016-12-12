@@ -43,16 +43,16 @@ class AddressType extends AbstractType
             ->add('nameSuffix', 'text', array('required' => false, 'label' => 'oro.address.name_suffix.label'))
             ->add('organization', 'text', array('required' => false, 'label' => 'oro.address.organization.label'))
             ->add('country', 'oro_country', array('required' => true, 'label' => 'oro.address.country.label'))
-            ->add('street', 'text', array('required' => true, 'label' => 'oro.address.street.label'))
+            ->add('street', 'text', array('required' => false, 'label' => 'oro.address.street.label'))
             ->add('street2', 'text', array('required' => false, 'label' => 'oro.address.street2.label'))
-            ->add('city', 'text', array('required' => true, 'label' => 'oro.address.city.label'))
+            ->add('city', 'text', array('required' => false, 'label' => 'oro.address.city.label'))
             ->add('region', 'oro_region', array('required' => false, 'label' => 'oro.address.region.label'))
             ->add(
                 'region_text',
                 'hidden',
                 array('required' => false, 'random_id' => true, 'label' => 'oro.address.region_text.label')
             )
-            ->add('postalCode', 'text', array('required' => true, 'label' => 'oro.address.postal_code.label'));
+            ->add('postalCode', 'text', array('required' => false, 'label' => 'oro.address.postal_code.label'));
     }
 
     /**

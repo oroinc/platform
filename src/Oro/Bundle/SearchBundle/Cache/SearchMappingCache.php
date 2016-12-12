@@ -2,11 +2,12 @@
 
 namespace Oro\Bundle\SearchBundle\Cache;
 
+use Symfony\Component\HttpKernel\CacheClearer\CacheClearerInterface;
 use Symfony\Component\HttpKernel\CacheWarmer\CacheWarmerInterface;
 
 use Oro\Bundle\SearchBundle\Provider\SearchMappingProvider;
 
-class SearchMappingCache implements CacheWarmerInterface
+class SearchMappingCache implements CacheWarmerInterface, CacheClearerInterface
 {
     /** @var SearchMappingProvider */
     protected $searchMappingProvider;
@@ -20,7 +21,7 @@ class SearchMappingCache implements CacheWarmerInterface
     }
 
     /**
-     * {inheritdoc}
+     * {@inheritdoc}
      */
     public function warmUp($cacheDir)
     {
@@ -28,10 +29,18 @@ class SearchMappingCache implements CacheWarmerInterface
     }
 
     /**
-     * {inheritdoc}
+     * {@inheritdoc}
      */
     public function isOptional()
     {
         return true;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function clear($cacheDir)
+    {
+        $this->searchMappingProvider->clearCache();
     }
 }

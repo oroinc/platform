@@ -3,7 +3,6 @@
 namespace Oro\Bundle\ApiBundle\Form\Extension;
 
 use Symfony\Component\DependencyInjection\ContainerInterface;
-use Symfony\Component\Form\Exception;
 use Symfony\Component\Form\FormExtensionInterface;
 
 class SwitchableDependencyInjectionExtension implements FormExtensionInterface

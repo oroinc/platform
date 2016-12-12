@@ -21,27 +21,27 @@ class QueryStringExpressionVisitor extends ExpressionVisitor
 
         $value = $comparison->getValue()->getValue();
 
-        if (is_array($value)) {
-            $value = sprintf(
-                '(%s)',
-                implode(', ', $value)
-            );
-        };
-
-        if ($type === Query::TYPE_TEXT) {
+        if ($type === Query::TYPE_TEXT && is_string($value)) {
             $value = sprintf(
                 '"%s"',
                 $value
             );
         }
 
-        return sprintf(
+        if (is_array($value)) {
+            $value = sprintf(
+                '(%s)',
+                implode(', ', $value)
+            );
+        }
+
+        return trim(sprintf(
             '%s %s %s %s',
             $type,
             $field,
             Criteria::getSearchOperatorByComparisonOperator($comparison->getOperator()),
             $value
-        );
+        ));
     }
 
     /**

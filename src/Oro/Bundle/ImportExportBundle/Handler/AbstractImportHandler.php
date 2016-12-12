@@ -2,26 +2,11 @@
 
 namespace Oro\Bundle\ImportExportBundle\Handler;
 
-use Symfony\Component\Translation\TranslatorInterface;
-
 use Oro\Bundle\ImportExportBundle\Processor\ProcessorRegistry;
 use Oro\Bundle\ImportExportBundle\Job\JobResult;
 
 abstract class AbstractImportHandler extends AbstractHandler
 {
-    /**
-     * @var TranslatorInterface
-     */
-    protected $translator;
-
-    /**
-     * @param TranslatorInterface $translator
-     */
-    public function setTranslator(TranslatorInterface $translator)
-    {
-        $this->translator = $translator;
-    }
-
     /**
      * Handles import validation action
      *

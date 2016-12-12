@@ -13,9 +13,6 @@ class WidgetAttributesTest extends \PHPUnit_Framework_TestCase
     protected $configProvider;
 
     /** @var \PHPUnit_Framework_MockObject_MockObject */
-    protected $securityFacade;
-
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $resolver;
 
     /** @var \PHPUnit_Framework_MockObject_MockObject */
@@ -27,13 +24,12 @@ class WidgetAttributesTest extends \PHPUnit_Framework_TestCase
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $eventDispatcher;
 
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    protected $widgetConfigVisibilityFilter;
+
     protected function setUp()
     {
         $this->configProvider = $this->getMockBuilder('Oro\Bundle\DashboardBundle\Model\ConfigProvider')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->securityFacade = $this->getMockBuilder('Oro\Bundle\SecurityBundle\SecurityFacade')
             ->disableOriginalConstructor()
             ->getMock();
 
@@ -51,14 +47,31 @@ class WidgetAttributesTest extends \PHPUnit_Framework_TestCase
 
         $this->eventDispatcher = $this->getMock('Symfony\Component\EventDispatcher\EventDispatcherInterface');
 
+        $widgetConfigVisibilityFilter = $this
+            ->getMockBuilder('Oro\Bundle\DashboardBundle\Filter\WidgetConfigVisibilityFilter')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $widgetConfigVisibilityFilter->expects($this->any())
+            ->method('filterConfigs')
+            ->will($this->returnCallback(function (array $configs) {
+                return array_filter(
+                    $configs,
+                    function ($config) {
+                        return (!isset($config['acl']) || $config['acl'] === 'valid_acl') &&
+                            (!isset($config['enabled']) || $config['enabled']) &&
+                            (!isset($config['applicable']) || $config['applicable'] === '@true');
+                    }
+                );
+            }));
+
         $this->target = new WidgetConfigs(
             $this->configProvider,
-            $this->securityFacade,
             $this->resolver,
             $em,
             $this->valueProvider,
             $this->translator,
-            $this->eventDispatcher
+            $this->eventDispatcher,
+            $widgetConfigVisibilityFilter
         );
     }
 
@@ -128,28 +141,6 @@ class WidgetAttributesTest extends \PHPUnit_Framework_TestCase
             ->with($expectedWidgetName)
             ->will($this->returnValue(['items' => $configs]));
 
-        $this->securityFacade->expects($this->exactly(3))
-            ->method('isGranted')
-            ->will(
-                $this->returnValueMap(
-                    [
-                        [['@true'], [], true],
-                        [$allowedAcl, null, true]
-                    ]
-                )
-            );
-        $this->resolver->expects($this->exactly(1))
-            ->method('resolve')
-            ->will(
-                $this->returnValueMap(
-                    [
-
-                        [['@false'], [], [false]],
-                        [['@true'], [], [true]],
-                    ]
-                )
-            );
-
         $result = $this->target->getWidgetItems($expectedWidgetName);
         $this->assertArrayHasKey($applicableItem, $result);
         $this->assertArrayHasKey($expectedItem, $result);
@@ -185,28 +176,6 @@ class WidgetAttributesTest extends \PHPUnit_Framework_TestCase
         $this->configProvider->expects($this->once())
             ->method('getWidgetConfigs')
             ->will($this->returnValue($configs));
-
-        $this->securityFacade->expects($this->exactly(2))
-            ->method('isGranted')
-            ->will(
-                $this->returnValueMap(
-                    [
-                        [['@true'], [], true],
-                        [$allowedAcl, null, true]
-                    ]
-                )
-            );
-        $this->resolver->expects($this->exactly(2))
-            ->method('resolve')
-            ->will(
-                $this->returnValueMap(
-                    [
-
-                        [['@false'], [], [false]],
-                        [['@true'], [], [true]],
-                    ]
-                )
-            );
 
         $result = $this->target->getWidgetConfigs();
         $this->assertArrayHasKey($applicableItem, $result);

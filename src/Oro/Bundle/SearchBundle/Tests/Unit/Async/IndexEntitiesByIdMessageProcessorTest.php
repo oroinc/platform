@@ -1,9 +1,9 @@
 <?php
 namespace Oro\Bundle\SearchBundle\Tests\Unit\Async;
 
+use Oro\Bundle\MessageQueueBundle\Test\Unit\MessageQueueExtension;
 use Oro\Bundle\SearchBundle\Async\IndexEntitiesByIdMessageProcessor;
 use Oro\Bundle\SearchBundle\Async\Topics;
-use Oro\Component\MessageQueue\Client\MessageProducerInterface;
 use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
 use Oro\Component\MessageQueue\Transport\Null\NullMessage;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
@@ -11,10 +11,12 @@ use Psr\Log\LoggerInterface;
 
 class IndexEntitiesByIdMessageProcessorTest extends \PHPUnit_Framework_TestCase
 {
+    use MessageQueueExtension;
+
     public function testCouldBeConstructedByRequiredArguments()
     {
         new IndexEntitiesByIdMessageProcessor(
-            $this->createMessageProducerMock(),
+            self::getMessageProducer(),
             $this->createLoggerMock()
         );
     }
@@ -28,12 +30,6 @@ class IndexEntitiesByIdMessageProcessorTest extends \PHPUnit_Framework_TestCase
 
     public function testShouldRejectMessageIfIsNotArray()
     {
-        $producer = $this->createMessageProducerMock();
-        $producer
-            ->expects($this->never())
-            ->method('send')
-        ;
-
         $logger = $this->createLoggerMock();
         $logger
             ->expects($this->once())
@@ -41,7 +37,7 @@ class IndexEntitiesByIdMessageProcessorTest extends \PHPUnit_Framework_TestCase
             ->with('Expected array but got: "NULL"')
         ;
 
-        $processor = new IndexEntitiesByIdMessageProcessor($producer, $logger);
+        $processor = new IndexEntitiesByIdMessageProcessor(self::getMessageProducer(), $logger);
 
         $message = new NullMessage();
         $message->setBody('');
@@ -49,16 +45,11 @@ class IndexEntitiesByIdMessageProcessorTest extends \PHPUnit_Framework_TestCase
         $result = $processor->process($message, $this->getMock(SessionInterface::class));
 
         $this->assertEquals(MessageProcessorInterface::REJECT, $result);
+        self::assertMessagesEmpty(Topics::INDEX_ENTITY);
     }
 
     public function testShouldLogErrorIfClassWasNotFound()
     {
-        $producer = $this->createMessageProducerMock();
-        $producer
-            ->expects($this->never())
-            ->method('send')
-        ;
-
         $message = new NullMessage();
         $message->setBody(json_encode(
             [[]]
@@ -71,22 +62,16 @@ class IndexEntitiesByIdMessageProcessorTest extends \PHPUnit_Framework_TestCase
             ->with('Message is invalid. Class was not found.', ['entity' => []])
         ;
 
-        $processor = new IndexEntitiesByIdMessageProcessor($producer, $logger);
+        $processor = new IndexEntitiesByIdMessageProcessor(self::getMessageProducer(), $logger);
 
         $result = $processor->process($message, $this->getMock(SessionInterface::class));
 
         $this->assertEquals(MessageProcessorInterface::ACK, $result);
+        self::assertMessagesEmpty(Topics::INDEX_ENTITY);
     }
 
     public function testShouldLogErrorIfIdWasNotFound()
     {
-        $producer = $this->createMessageProducerMock();
-        $producer
-            ->expects($this->never())
-            ->method('send')
-        ;
-
-
         $message = new NullMessage();
         $message->setBody(json_encode(
             [
@@ -103,29 +88,23 @@ class IndexEntitiesByIdMessageProcessorTest extends \PHPUnit_Framework_TestCase
             ->with('Message is invalid. Id was not found.', ['entity' => ['class' => 'class-name']])
         ;
 
-        $processor = new IndexEntitiesByIdMessageProcessor($producer, $logger);
+        $processor = new IndexEntitiesByIdMessageProcessor(self::getMessageProducer(), $logger);
 
         $result = $processor->process($message, $this->getMock(SessionInterface::class));
 
         $this->assertEquals(MessageProcessorInterface::ACK, $result);
+        self::assertMessagesEmpty(Topics::INDEX_ENTITY);
     }
 
     public function testShouldPublishMessageToProducer()
     {
-        $producer = $this->createMessageProducerMock();
-        $producer
-            ->expects($this->once())
-            ->method('send')
-            ->with(Topics::INDEX_ENTITY, ['class' => 'class-name', 'id' => 'id'])
-        ;
-
         $logger = $this->createLoggerMock();
         $logger
             ->expects($this->never())
             ->method('error')
         ;
 
-        $processor = new IndexEntitiesByIdMessageProcessor($producer, $logger);
+        $processor = new IndexEntitiesByIdMessageProcessor(self::getMessageProducer(), $logger);
 
         $message = new NullMessage();
         $message->setBody(json_encode(
@@ -140,6 +119,10 @@ class IndexEntitiesByIdMessageProcessorTest extends \PHPUnit_Framework_TestCase
         $result = $processor->process($message, $this->getMock(SessionInterface::class));
 
         $this->assertEquals(MessageProcessorInterface::ACK, $result);
+        self::assertMessageSent(
+            Topics::INDEX_ENTITY,
+            ['class' => 'class-name', 'id' => 'id']
+        );
     }
 
     /**
@@ -148,13 +131,5 @@ class IndexEntitiesByIdMessageProcessorTest extends \PHPUnit_Framework_TestCase
     protected function createLoggerMock()
     {
         return $this->getMock(LoggerInterface::class);
-    }
-
-    /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|MessageProducerInterface
-     */
-    protected function createMessageProducerMock()
-    {
-        return $this->getMock(MessageProducerInterface::class, [], [], '', false);
     }
 }

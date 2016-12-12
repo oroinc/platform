@@ -35,7 +35,7 @@ class OroTranslationLoadCommand extends ContainerAwareCommand
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        /* @var $translationManager LanguageProvider */
+        /** @var $languageProvider LanguageProvider */
         $languageProvider = $this->getContainer()->get('oro_translation.provider.language');
         $availableLocales = array_keys($languageProvider->getAvailableLanguages());
 
@@ -70,10 +70,11 @@ class OroTranslationLoadCommand extends ContainerAwareCommand
                 $output->write(sprintf('  > loading [%s] (%d) ... ', $domain, count($messages)));
 
                 foreach ($messages as $key => $value) {
-                    $translationManager->saveValue($key, $value, $locale, $domain);
+                    $translationManager->saveTranslation($key, $value, $locale, $domain);
                 }
 
-                $translationManager->flush();
+                $translationManager->flush(true);
+                $translationManager->clear();
 
                 $output->writeln(sprintf('processed %d records.', count($messages)));
             }

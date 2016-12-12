@@ -3,8 +3,9 @@
 namespace Oro\Bundle\WorkflowBundle\Handler;
 
 use Doctrine\Common\Util\ClassUtils;
-
+use Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker;
 use Oro\Bundle\WorkflowBundle\Async\TransitionTriggerMessage;
+use Oro\Bundle\WorkflowBundle\Configuration\FeatureConfigurationExtension;
 use Oro\Bundle\WorkflowBundle\Entity\BaseTransitionTrigger;
 use Oro\Bundle\WorkflowBundle\Entity\TransitionCronTrigger;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
@@ -22,13 +23,23 @@ class TransitionCronTriggerHandler implements TransitionTriggerHandlerInterface
     private $helper;
 
     /**
+     * @var FeatureChecker
+     */
+    private $featureChecker;
+
+    /**
      * @param WorkflowManager $workflowManager
      * @param TransitionCronTriggerHelper $helper
+     * @param FeatureChecker $featureChecker
      */
-    public function __construct(WorkflowManager $workflowManager, TransitionCronTriggerHelper $helper)
-    {
+    public function __construct(
+        WorkflowManager $workflowManager,
+        TransitionCronTriggerHelper $helper,
+        FeatureChecker $featureChecker
+    ) {
         $this->workflowManager = $workflowManager;
         $this->helper = $helper;
+        $this->featureChecker = $featureChecker;
     }
 
     /**
@@ -47,6 +58,14 @@ class TransitionCronTriggerHandler implements TransitionTriggerHandlerInterface
                     ClassUtils::getClass($trigger)
                 )
             );
+        }
+
+        $isWorkflowEnabledInFeatures = $this->featureChecker->isResourceEnabled(
+            $trigger->getWorkflowDefinition()->getName(),
+            FeatureConfigurationExtension::WORKFLOWS_NODE_NAME
+        );
+        if (!$isWorkflowEnabledInFeatures) {
+            return false;
         }
 
         $workflow = $this->workflowManager->getWorkflow($trigger->getWorkflowDefinition()->getName());
@@ -99,7 +118,7 @@ class TransitionCronTriggerHandler implements TransitionTriggerHandlerInterface
             function (WorkflowItem $workflowItem) use ($trigger) {
                 return [
                     'workflowItem' => $workflowItem,
-                    'transition' => $trigger->getTransitionName()
+                    'transition' => $trigger->getTransitionName(),
                 ];
             },
             $workflowItems

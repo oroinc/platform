@@ -100,7 +100,12 @@ class Select2Entity extends Element
     public function open()
     {
         if (!$this->isOpen()) {
-            $this->getParent()->find('css', '.select2-arrow')->click();
+            $openArrow = $this->getParent()->find('css', '.select2-arrow');
+            // Although ajax is already loaded element need some extra time to appear by js animation
+            $openArrow->waitFor(1500, function (NodeElement $element) {
+                return $element->isVisible();
+            });
+            $openArrow->click();
         }
     }
 

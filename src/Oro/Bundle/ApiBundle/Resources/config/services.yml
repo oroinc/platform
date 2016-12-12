@@ -446,6 +446,13 @@ services:
         tags:
             - { name: oro.api.filter_factory, priority: -10 }
 
+    oro_api.filter_factory.extended_association:
+        class: Oro\Bundle\ApiBundle\Filter\ExtendedAssociationFilterFactory
+        public: false
+        arguments:
+            - '@oro_api.value_normalizer'
+            - '@oro_entity_extend.association_manager'
+
     oro_api.constraint_text_extractor:
         class: Oro\Bundle\ApiBundle\Request\ChainConstraintTextExtractor
         public: false

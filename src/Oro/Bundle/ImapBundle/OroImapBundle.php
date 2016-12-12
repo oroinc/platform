@@ -16,7 +16,10 @@ class OroImapBundle extends Bundle
     public function build(ContainerBuilder $container)
     {
         $addTopicPass = AddTopicMetaPass::create()
-            ->add(Topics::CLEAR_INACTIVE_MAILBOX, 'Clear inactive mailbox');
+            ->add(Topics::CLEAR_INACTIVE_MAILBOX, 'Clear inactive mailbox')
+            ->add(Topics::SYNC_EMAIL, 'Synchronization email via IMAP')
+            ->add(Topics::SYNC_EMAILS, 'Synchronization emails via IMAP')
+        ;
         $container->addCompilerPass($addTopicPass);
     }
 }

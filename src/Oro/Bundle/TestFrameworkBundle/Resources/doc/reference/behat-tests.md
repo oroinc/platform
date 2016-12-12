@@ -84,6 +84,14 @@ mkdir $HOME/selenium-server-standalone-2.52.0
 curl -L http://selenium-release.storage.googleapis.com/2.52/selenium-server-standalone-2.52.0.jar > $HOME/selenium-server-standalone-2.52.0/selenium.jar
 ```
 
+Install Firefox v 39.0.3
+
+```bash
+wget sourceforge.net/projects/ubuntuzilla/files/mozilla/apt/pool/main/f/firefox-mozilla-build/firefox-mozilla-build_39.0.3-0ubuntu1_amd64.deb
+sudo dpkg -i firefox-mozilla-build/firefox-mozilla-build_39.0.3-0ubuntu1_amd64.deb
+rm firefox-mozilla-build/firefox-mozilla-build_39.0.3-0ubuntu1_amd64.deb
+```
+
 Run Selenium2:
 
 ```bash
@@ -112,6 +120,13 @@ Run tests with PhantomJs
 ```bash
 vendor/bin/behat
 ```
+
+#### Fail tests
+
+If in some kind of reasons some of your tests was fail, you can view
+**screenshots** at {application_root}/app/logs/
+
+Use ```behat -v``` parameter to behat command, add get more details in verbose output
 
 ### Architecture
 

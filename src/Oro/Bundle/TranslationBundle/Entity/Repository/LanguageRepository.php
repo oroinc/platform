@@ -4,6 +4,9 @@ namespace Oro\Bundle\TranslationBundle\Entity\Repository;
 
 use Doctrine\ORM\EntityRepository;
 
+use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
+use Oro\Bundle\TranslationBundle\Entity\Language;
+
 class LanguageRepository extends EntityRepository
 {
     /**
@@ -21,5 +24,16 @@ class LanguageRepository extends EntityRepository
         $data = $qb->getQuery()->getArrayResult();
 
         return array_column($data, 'code');
+    }
+
+    /**
+     * @param AclHelper $aclHelper
+     *
+     * @return array|Language[]
+     */
+    public function getAvailableLanguagesByCurrentUser(AclHelper $aclHelper)
+    {
+        $qb = $this->createQueryBuilder('language');
+        return $aclHelper->apply($qb)->getResult();
     }
 }

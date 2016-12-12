@@ -33,6 +33,7 @@ services:
             - %oro_ui.placeholders%
             - '@oro_ui.placeholder.resolver'
             - '@oro_security.security_facade'
+            - '@oro_featuretoggle.checker.feature_checker'
 
     oro_ui.placeholder.resolver:
         class: %oro_ui.placeholder.resolver.class%
@@ -141,3 +142,8 @@ services:
             - '@oro_ui.formatter'
         tags:
             - { name: twig.extension }
+
+    oro_ui.config_extension.feature:
+        class: 'Oro\Bundle\UIBundle\Configuration\FeatureConfigurationExtension'
+        tags:
+            - { name: oro_feature.config_extension }

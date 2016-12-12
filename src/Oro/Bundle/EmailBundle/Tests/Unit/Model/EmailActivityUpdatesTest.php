@@ -1,122 +1,82 @@
 <?php
-
 namespace Oro\Bundle\EmailBundle\Tests\Unit\Model;
 
-use JMS\JobQueueBundle\Entity\Job;
-
 use Oro\Bundle\EmailBundle\Model\EmailActivityUpdates;
+use Oro\Bundle\EmailBundle\Provider\EmailOwnersProvider;
 use Oro\Bundle\EmailBundle\Tests\Unit\Entity\TestFixtures\TestEmailOwner;
-use Oro\Bundle\EmailBundle\Tests\Unit\Entity\TestFixtures\TestEmailOwnerWithoutEmail as SecondEmailOwner;
-use Oro\Bundle\EmailBundle\Tests\Unit\Entity\TestFixtures\EmailAddress;
+use Oro\Bundle\EmailBundle\Tests\Unit\Fixtures\Entity\EmailAddress;
 
 class EmailActivityUpdatesTest extends \PHPUnit_Framework_TestCase
 {
-    /** @var EmailActivityUpdates */
-    protected $emailActivityUpdates;
-
-    /** @var array */
-    protected $fixtures;
-
-    public function setUp()
+    public function testShouldFilterOutEntitiesIfOwnerIsMissing()
     {
-        $this->fixtures = [
-            'ownersWithEmails' => [1, 2],
-        ];
+        $emailAddress = new EmailAddress();
+        $emailOwner = new TestEmailOwner(123);
+        $emailAddress->setOwner($emailOwner);
 
-        $emailOwnersProvider = $this->getMockBuilder('Oro\Bundle\EmailBundle\Provider\EmailOwnersProvider')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $emailAddressWithoutOwner = new EmailAddress();
 
-        $emailOwnersProvider->expects($this->any())
+        $emailOwnerProvider = $this->createEmailOwnersProviderMock();
+        $emailOwnerProvider
+            ->expects($this->once())
             ->method('hasEmailsByOwnerEntity')
-            ->will($this->returnCallback(function ($entity) {
-                return ($entity instanceof TestEmailOwner || $entity instanceof SecondEmailOwner) &&
-                    in_array($entity->getId(), $this->fixtures['ownersWithEmails']);
-            }));
+            ->with($this->identicalTo($emailOwner))
+            ->will($this->returnValue(true))
+        ;
 
-        $this->emailActivityUpdates = new EmailActivityUpdates(
-            $emailOwnersProvider
-        );
+        $emailActivityUpdates = new EmailActivityUpdates($emailOwnerProvider);
+        $emailActivityUpdates->processUpdatedEmailAddresses([
+            $emailAddress,
+            $emailAddressWithoutOwner,
+        ]);
+
+        $result = $emailActivityUpdates->getFilteredOwnerEntitiesToUpdate();
+
+        $this->assertCount(1, $result);
+        $this->assertSame($emailOwner, $result[0]);
+    }
+
+    public function testShouldFilterOutEntitiesIfHasEmailsByOwnerEntityIsFalse()
+    {
+        $emailAddress1 = new EmailAddress();
+        $emailOwner1 = new TestEmailOwner(123);
+        $emailAddress1->setOwner($emailOwner1);
+
+        $emailAddress2 = new EmailAddress();
+        $emailOwner2 = new TestEmailOwner(12345);
+        $emailAddress2->setOwner($emailOwner2);
+
+        $emailOwnerProvider = $this->createEmailOwnersProviderMock();
+        $emailOwnerProvider
+            ->expects($this->at(0))
+            ->method('hasEmailsByOwnerEntity')
+            ->with($this->identicalTo($emailOwner1))
+            ->will($this->returnValue(true))
+        ;
+        $emailOwnerProvider
+            ->expects($this->at(1))
+            ->method('hasEmailsByOwnerEntity')
+            ->with($this->identicalTo($emailOwner2))
+            ->will($this->returnValue(false))
+        ;
+
+        $emailActivityUpdates = new EmailActivityUpdates($emailOwnerProvider);
+        $emailActivityUpdates->processUpdatedEmailAddresses([
+            $emailAddress1,
+            $emailAddress2,
+        ]);
+
+        $result = $emailActivityUpdates->getFilteredOwnerEntitiesToUpdate();
+
+        $this->assertCount(1, $result);
+        $this->assertSame($emailOwner1, $result[0]);
     }
 
     /**
-     * @dataProvider testProvider
+     * @return \PHPUnit_Framework_MockObject_MockObject|EmailOwnersProvider
      */
-    public function test(array $entities, array $expectedJobs)
+    private function createEmailOwnersProviderMock()
     {
-        $this->emailActivityUpdates->processUpdatedEmailAddresses($entities);
-        $actualJobs = $this->emailActivityUpdates->createJobs();
-        $this->assertCount(count($actualJobs), $expectedJobs);
-        array_map([$this, 'assertJobs'], $expectedJobs, $actualJobs);
-    }
-
-    public function testProvider()
-    {
-        return [
-            '0 email addresses' => [
-                [],
-                [],
-            ],
-            '3 email email addresses with 2 owners' => [
-                [
-                    (new EmailAddress())
-                        ->setOwner(new TestEmailOwner(1)),
-                    (new EmailAddress())
-                        ->setOwner(new TestEmailOwner(2)),
-                    (new EmailAddress())
-                        ->setOwner(new TestEmailOwner(3)),
-                    (new EmailAddress()),
-                ],
-                [
-                    new Job(
-                        'oro:email:update-email-owner-associations',
-                        [
-                            'Oro\Bundle\EmailBundle\Tests\Unit\Entity\TestFixtures\TestEmailOwner',
-                            1,
-                            2,
-                        ]
-                    ),
-                ],
-            ],
-            '4 email owners of 2 types of owners with emails' => [
-                [
-                    (new EmailAddress())
-                        ->setOwner(new TestEmailOwner(1)),
-                    (new EmailAddress())
-                        ->setOwner(new TestEmailOwner(2)),
-                    (new EmailAddress())
-                        ->setOwner(new TestEmailOwner(3)),
-                    (new EmailAddress())
-                        ->setOwner(new SecondEmailOwner(1)),
-                ],
-                [
-                    new Job(
-                        'oro:email:update-email-owner-associations',
-                        [
-                            'Oro\Bundle\EmailBundle\Tests\Unit\Entity\TestFixtures\TestEmailOwner',
-                            1,
-                            2,
-                        ]
-                    ),
-                    new Job(
-                        'oro:email:update-email-owner-associations',
-                        [
-                            'Oro\Bundle\EmailBundle\Tests\Unit\Entity\TestFixtures\TestEmailOwnerWithoutEmail',
-                            1,
-                        ]
-                    ),
-                ],
-            ],
-        ];
-    }
-
-    /**
-     * @param Job $expected
-     * @param Job $actual
-     */
-    protected function assertJobs(Job $expected, Job $actual)
-    {
-        $this->assertEquals($expected->getCommand(), $actual->getCommand());
-        $this->assertEquals($expected->getArgs(), $actual->getArgs());
+        return $this->getMock(EmailOwnersProvider::class, [], [], '', false);
     }
 }

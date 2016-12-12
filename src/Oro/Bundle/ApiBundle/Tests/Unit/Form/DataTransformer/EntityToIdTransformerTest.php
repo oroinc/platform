@@ -2,34 +2,34 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Form\DateTransformer;
 
+use Oro\Bundle\ApiBundle\Collection\IncludedEntityCollection;
+use Oro\Bundle\ApiBundle\Collection\IncludedEntityData;
 use Oro\Bundle\ApiBundle\Form\DataTransformer\EntityToIdTransformer;
 use Oro\Bundle\ApiBundle\Metadata\AssociationMetadata;
+use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\CompositeKeyEntity;
 use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Group;
 use Oro\Bundle\ApiBundle\Tests\Unit\OrmRelatedTestCase;
 
 class EntityToIdTransformerTest extends OrmRelatedTestCase
 {
-    /** @var EntityToIdTransformer */
-    protected $transformer;
-
-    /** @var AssociationMetadata */
-    protected $metadata;
-
-    protected function setUp()
+    /**
+     * @param string[] $acceptableTargetClassNames
+     *
+     * @return AssociationMetadata
+     */
+    protected function getAssociationMetadata(array $acceptableTargetClassNames = [])
     {
-        parent::setUp();
+        $metadata = new AssociationMetadata();
+        $metadata->setAcceptableTargetClassNames($acceptableTargetClassNames);
 
-        $this->metadata = new AssociationMetadata();
-        $this->metadata->setAcceptableTargetClassNames(
-            ['Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Group']
-        );
-
-        $this->transformer = new EntityToIdTransformer($this->doctrine, $this->metadata);
+        return $metadata;
     }
 
     public function testTransform()
     {
-        $this->assertNull($this->transformer->transform(new \stdClass()));
+        $metadata = $this->getAssociationMetadata([Group::class]);
+        $transformer = new EntityToIdTransformer($this->doctrine, $metadata);
+        $this->assertNull($transformer->transform(new \stdClass()));
     }
 
     /**
@@ -37,7 +37,9 @@ class EntityToIdTransformerTest extends OrmRelatedTestCase
      */
     public function testReverseTransformForEmptyValue($value, $expected)
     {
-        $this->assertEquals($expected, $this->transformer->reverseTransform($value));
+        $metadata = $this->getAssociationMetadata([Group::class]);
+        $transformer = new EntityToIdTransformer($this->doctrine, $metadata);
+        $this->assertEquals($expected, $transformer->reverseTransform($value));
     }
 
     public function reverseTransformForEmptyValueDataProvider()
@@ -51,7 +53,10 @@ class EntityToIdTransformerTest extends OrmRelatedTestCase
 
     public function testReverseTransform()
     {
-        $value = ['class' => 'Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Group', 'id' => 123];
+        $metadata = $this->getAssociationMetadata([Group::class]);
+        $transformer = new EntityToIdTransformer($this->doctrine, $metadata);
+
+        $value = ['class' => Group::class, 'id' => 123];
         $entity = new Group();
         $entity->setId($value['id']);
         $entity->setName('test');
@@ -71,7 +76,69 @@ class EntityToIdTransformerTest extends OrmRelatedTestCase
             ->with('SELECT t0.id AS id_1, t0.name AS name_2 FROM group_table t0 WHERE t0.id = ?')
             ->willReturn($stmt);
 
-        $this->assertEquals($entity, $this->transformer->reverseTransform($value));
+        $this->assertEquals($entity, $transformer->reverseTransform($value));
+    }
+
+    public function testReverseTransformWhenEntityDoesNotFoundInIncludedEntity()
+    {
+        $metadata = $this->getAssociationMetadata([Group::class]);
+        $includedEntities = new IncludedEntityCollection();
+        $transformer = new EntityToIdTransformer($this->doctrine, $metadata, $includedEntities);
+
+        $value = ['class' => Group::class, 'id' => 123];
+        $entity = new Group();
+        $entity->setId($value['id']);
+        $entity->setName('test');
+
+        $stmt = $this->createFetchStatementMock(
+            [
+                [
+                    'id_1'   => $entity->getId(),
+                    'name_2' => $entity->getName()
+                ]
+            ],
+            [1 => $value['id']],
+            [1 => \PDO::PARAM_INT]
+        );
+        $this->getDriverConnectionMock($this->em)->expects($this->any())
+            ->method('prepare')
+            ->with('SELECT t0.id AS id_1, t0.name AS name_2 FROM group_table t0 WHERE t0.id = ?')
+            ->willReturn($stmt);
+
+        $this->assertEquals($entity, $transformer->reverseTransform($value));
+    }
+
+    public function testReverseTransformWhenEntityFoundInIncludedEntity()
+    {
+        $metadata = $this->getAssociationMetadata([Group::class]);
+        $includedEntities = new IncludedEntityCollection();
+        $transformer = new EntityToIdTransformer($this->doctrine, $metadata, $includedEntities);
+
+        $value = ['class' => Group::class, 'id' => 123];
+        $entity = new Group();
+        $entity->setId($value['id']);
+        $entity->setName('test');
+
+        $includedEntities->add($entity, $value['class'], $value['id'], new IncludedEntityData('/included/0', 0));
+
+        $this->assertEquals($entity, $transformer->reverseTransform($value));
+    }
+
+    public function testReverseTransformWhenEntityIsPrimaryEntity()
+    {
+        $metadata = $this->getAssociationMetadata([Group::class]);
+        $includedEntities = new IncludedEntityCollection();
+        $transformer = new EntityToIdTransformer($this->doctrine, $metadata, $includedEntities);
+
+        $value = ['class' => Group::class, 'id' => 123];
+        $entity = new Group();
+        $entity->setId($value['id']);
+        $entity->setName('test');
+
+        $includedEntities->setPrimaryEntityId($value['class'], $value['id']);
+        $includedEntities->setPrimaryEntity($entity);
+
+        $this->assertEquals($entity, $transformer->reverseTransform($value));
     }
 
     // @codingStandardsIgnoreStart
@@ -82,7 +149,10 @@ class EntityToIdTransformerTest extends OrmRelatedTestCase
     // @codingStandardsIgnoreEnd
     public function testReverseTransformWhenEntityNotFound()
     {
-        $value = ['class' => 'Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Group', 'id' => 123];
+        $metadata = $this->getAssociationMetadata([Group::class]);
+        $transformer = new EntityToIdTransformer($this->doctrine, $metadata);
+
+        $value = ['class' => Group::class, 'id' => 123];
 
         $stmt = $this->createFetchStatementMock(
             [],
@@ -93,7 +163,7 @@ class EntityToIdTransformerTest extends OrmRelatedTestCase
             ->method('prepare')
             ->willReturn($stmt);
 
-        $this->transformer->reverseTransform($value);
+        $transformer->reverseTransform($value);
     }
 
     // @codingStandardsIgnoreStart
@@ -104,12 +174,11 @@ class EntityToIdTransformerTest extends OrmRelatedTestCase
     // @codingStandardsIgnoreEnd
     public function testReverseTransformWhenEntityWithCompositeKeyNotFound()
     {
-        $this->metadata->setAcceptableTargetClassNames(
-            ['Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\CompositeKeyEntity']
-        );
+        $metadata = $this->getAssociationMetadata([CompositeKeyEntity::class]);
+        $transformer = new EntityToIdTransformer($this->doctrine, $metadata);
 
         $value = [
-            'class' => 'Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\CompositeKeyEntity',
+            'class' => CompositeKeyEntity::class,
             'id'    => ['id' => 123, 'title' => 'test']
         ];
 
@@ -127,7 +196,7 @@ class EntityToIdTransformerTest extends OrmRelatedTestCase
             )
             ->willReturn($stmt);
 
-        $this->transformer->reverseTransform($value);
+        $transformer->reverseTransform($value);
     }
 
     /**
@@ -136,7 +205,9 @@ class EntityToIdTransformerTest extends OrmRelatedTestCase
      */
     public function testReverseTransformWhenInvalidValueType()
     {
-        $this->transformer->reverseTransform(123);
+        $metadata = $this->getAssociationMetadata([Group::class]);
+        $transformer = new EntityToIdTransformer($this->doctrine, $metadata);
+        $transformer->reverseTransform(123);
     }
 
     /**
@@ -145,7 +216,9 @@ class EntityToIdTransformerTest extends OrmRelatedTestCase
      */
     public function testReverseTransformWhenValueDoesNotHaveClass()
     {
-        $this->transformer->reverseTransform(['id' => 123]);
+        $metadata = $this->getAssociationMetadata([Group::class]);
+        $transformer = new EntityToIdTransformer($this->doctrine, $metadata);
+        $transformer->reverseTransform(['id' => 123]);
     }
 
     /**
@@ -154,7 +227,9 @@ class EntityToIdTransformerTest extends OrmRelatedTestCase
      */
     public function testReverseTransformWhenValueDoesNotHaveId()
     {
-        $this->transformer->reverseTransform(['class' => 'Test\Class']);
+        $metadata = $this->getAssociationMetadata([Group::class]);
+        $transformer = new EntityToIdTransformer($this->doctrine, $metadata);
+        $transformer->reverseTransform(['class' => 'Test\Class']);
     }
 
     // @codingStandardsIgnoreStart
@@ -165,8 +240,11 @@ class EntityToIdTransformerTest extends OrmRelatedTestCase
     // @codingStandardsIgnoreEnd
     public function testReverseTransformForNotAcceptableEntity()
     {
+        $metadata = $this->getAssociationMetadata([Group::class]);
+        $transformer = new EntityToIdTransformer($this->doctrine, $metadata);
+
         $this->notManageableClassNames = ['Test\Class'];
-        $this->transformer->reverseTransform(['class' => 'Test\Class', 'id' => 123]);
+        $transformer->reverseTransform(['class' => 'Test\Class', 'id' => 123]);
     }
 
     /**
@@ -175,9 +253,38 @@ class EntityToIdTransformerTest extends OrmRelatedTestCase
      */
     public function testReverseTransformForNotManageableEntity()
     {
-        $this->metadata->setAcceptableTargetClassNames(['Test\Class']);
+        $metadata = $this->getAssociationMetadata(['Test\Class']);
+        $transformer = new EntityToIdTransformer($this->doctrine, $metadata);
 
         $this->notManageableClassNames = ['Test\Class'];
-        $this->transformer->reverseTransform(['class' => 'Test\Class', 'id' => 123]);
+        $transformer->reverseTransform(['class' => 'Test\Class', 'id' => 123]);
+    }
+
+    public function testReverseTransformWhenAnyEntityTypeIsAcceptable()
+    {
+        $metadata = $this->getAssociationMetadata([]);
+        $transformer = new EntityToIdTransformer($this->doctrine, $metadata);
+
+        $value = ['class' => Group::class, 'id' => 123];
+        $entity = new Group();
+        $entity->setId($value['id']);
+        $entity->setName('test');
+
+        $stmt = $this->createFetchStatementMock(
+            [
+                [
+                    'id_1'   => $entity->getId(),
+                    'name_2' => $entity->getName()
+                ]
+            ],
+            [1 => $value['id']],
+            [1 => \PDO::PARAM_INT]
+        );
+        $this->getDriverConnectionMock($this->em)->expects($this->any())
+            ->method('prepare')
+            ->with('SELECT t0.id AS id_1, t0.name AS name_2 FROM group_table t0 WHERE t0.id = ?')
+            ->willReturn($stmt);
+
+        $this->assertEquals($entity, $transformer->reverseTransform($value));
     }
 }

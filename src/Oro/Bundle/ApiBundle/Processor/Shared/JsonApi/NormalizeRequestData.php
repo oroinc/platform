@@ -10,6 +10,7 @@ use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
 use Oro\Bundle\ApiBundle\Model\Error;
 use Oro\Bundle\ApiBundle\Model\ErrorSource;
 use Oro\Bundle\ApiBundle\Processor\FormContext;
+use Oro\Bundle\ApiBundle\Processor\SingleItemContext;
 use Oro\Bundle\ApiBundle\Request\Constraint;
 use Oro\Bundle\ApiBundle\Request\EntityIdTransformerInterface;
 use Oro\Bundle\ApiBundle\Request\JsonApi\JsonApiDocumentBuilder as JsonApiDoc;
@@ -27,7 +28,7 @@ class NormalizeRequestData implements ProcessorInterface
     /** @var EntityIdTransformerInterface */
     protected $entityIdTransformer;
 
-    /** @var FormContext */
+    /** @var FormContext|SingleItemContext */
     protected $context;
 
     /**
@@ -45,7 +46,7 @@ class NormalizeRequestData implements ProcessorInterface
      */
     public function process(ContextInterface $context)
     {
-        /** @var FormContext $context */
+        /** @var FormContext|SingleItemContext $context */
 
         $requestData = $context->getRequestData();
         if (!array_key_exists(JsonApiDoc::DATA, $requestData)) {
@@ -56,10 +57,8 @@ class NormalizeRequestData implements ProcessorInterface
         $this->context = $context;
         try {
             $context->setRequestData($this->normalizeData($requestData[JsonApiDoc::DATA], $context->getMetadata()));
+        } finally {
             $this->context = null;
-        } catch (\Exception $e) {
-            $this->context = null;
-            throw $e;
         }
     }
 
@@ -199,6 +198,17 @@ class NormalizeRequestData implements ProcessorInterface
      */
     protected function normalizeEntityId($pointer, $entityClass, $entityId)
     {
+        // keep the id of the primary and an included entity as is
+        $includedEntities = $this->context->getIncludedEntities();
+        if (null !== $includedEntities
+            && (
+                $includedEntities->isPrimaryEntity($entityClass, $entityId)
+                || null !== $includedEntities->get($entityClass, $entityId)
+            )
+        ) {
+            return $entityId;
+        }
+
         try {
             return $this->entityIdTransformer->reverseTransform($entityClass, $entityId);
         } catch (\Exception $e) {

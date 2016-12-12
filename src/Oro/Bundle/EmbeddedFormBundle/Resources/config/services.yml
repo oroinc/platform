@@ -87,3 +87,15 @@ services:
             - [setName, ['embed_form_legacy_form']]
         tags:
              - { name: layout.block_type, alias: embed_form_legacy_form }
+
+    oro_embedded_form.form_layout_builder:
+        class: Oro\Bundle\EmbeddedFormBundle\Layout\Form\GroupingFormLayoutBuilder
+        calls:
+            - [addSimpleFormTypes, [['choice', 'datetime', 'date', 'time']]]
+
+    oro_embedded_form.layout_context_configurator.form:
+        class: Oro\Bundle\EmbeddedFormBundle\Layout\Extension\FormContextConfigurator
+        arguments:
+            - '@service_container'
+        tags:
+            - { name: layout.context_configurator, priority: -100 }

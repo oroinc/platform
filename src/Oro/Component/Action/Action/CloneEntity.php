@@ -13,7 +13,7 @@ use Symfony\Component\Translation\TranslatorInterface;
 use Symfony\Component\HttpFoundation\Session\Flash\FlashBagInterface;
 
 use Oro\Component\Action\Exception\NotManageableEntityException;
-use Oro\Component\Action\Model\ContextAccessor;
+use Oro\Component\ConfigExpression\ContextAccessor;
 
 /**
  * Creates a managed entity clone

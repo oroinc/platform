@@ -129,8 +129,8 @@ oro:
                     items:
                         searchable: "Searchable"
                         searchable.tooltip: The field will appear in search results after the completion of reindex job that might take some time.
-                        title_field: "The search result title"
-                        title_field.tooltip: Field value will be included into the search result title
+                        title_field: "The search result title (deprecated)"
+                        title_field.tooltip: This setting is deprecated since 2.0. Create table-column string fields instead to be used as human-readable title.
                 entity:
                     items:
                         searchable.tooltip: The entity will appear in search results after the completion of reindex job that might take some time.

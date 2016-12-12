@@ -3,8 +3,12 @@
     'type' : widgetType,
     'options' : options
 } %}
-<div id="{{ elementId }}" {{ UI.renderWidgetAttributes(widgetComponentOptions) }} data-layout="separate">
-    {% if options.elementFirst %}
-        {% render options.url %}
-    {% endif %}
-</div>
+
+{% set content = render(options.url) %}
+{% if content|length %}
+    <div id="{{ elementId }}" {{ UI.renderWidgetAttributes(widgetComponentOptions) }} data-layout="separate">
+        {% if options.elementFirst %}
+            {{ content|raw }}
+        {% endif %}
+    </div>
+{% endif %}

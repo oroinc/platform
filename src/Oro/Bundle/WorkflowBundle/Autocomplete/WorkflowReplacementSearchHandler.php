@@ -4,9 +4,12 @@ namespace Oro\Bundle\WorkflowBundle\Autocomplete;
 
 use Doctrine\ORM\QueryBuilder;
 
+use Symfony\Component\Translation\TranslatorInterface;
+
 use Oro\Bundle\FormBundle\Autocomplete\SearchHandler;
 
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
+use Oro\Bundle\WorkflowBundle\Helper\WorkflowTranslationHelper;
 use Oro\Bundle\WorkflowBundle\Model\Workflow;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowRegistry;
 
@@ -16,6 +19,9 @@ class WorkflowReplacementSearchHandler extends SearchHandler
 
     /** @var WorkflowRegistry */
     protected $workflowRegistry;
+
+    /** @var TranslatorInterface */
+    protected $translator;
 
     /**
      * {@inheritdoc}
@@ -33,6 +39,14 @@ class WorkflowReplacementSearchHandler extends SearchHandler
     public function setWorkflowRegistry(WorkflowRegistry $workflowRegistry)
     {
         $this->workflowRegistry = $workflowRegistry;
+    }
+
+    /**
+     * @param TranslatorInterface $translator
+     */
+    public function setTranslator(TranslatorInterface $translator)
+    {
+        $this->translator = $translator;
     }
 
     /**
@@ -69,7 +83,18 @@ class WorkflowReplacementSearchHandler extends SearchHandler
         return array_filter(
             $workflows,
             function (WorkflowDefinition $definition) {
-                return $definition->isActive();
+                $isActive = $definition->isActive();
+                if ($isActive) {
+                    $definition->setLabel(
+                        $this->translator->trans(
+                            $definition->getLabel(),
+                            [],
+                            WorkflowTranslationHelper::TRANSLATION_DOMAIN
+                        )
+                    );
+                }
+
+                return $isActive;
             }
         );
     }
@@ -84,7 +109,7 @@ class WorkflowReplacementSearchHandler extends SearchHandler
         $searchTerm = substr($search, 0, $delimiterPos);
         $workflowName = substr($search, $delimiterPos + 1);
 
-        return [$searchTerm, (string) $workflowName];
+        return [$searchTerm, (string)$workflowName];
     }
 
     /**
@@ -93,18 +118,15 @@ class WorkflowReplacementSearchHandler extends SearchHandler
      */
     protected function getWorkflowNamesForExclusion($workflowName)
     {
-        $workflow = $this->workflowRegistry->getWorkflow($workflowName);
+        $workflow = $this->workflowRegistry->getWorkflow($workflowName, false);
         if ($workflow) {
-            $activeWorkflows = $this->workflowRegistry->getActiveWorkflowsByActiveGroups(
+            $workflows = $this->workflowRegistry->getActiveWorkflowsByActiveGroups(
                 $workflow->getDefinition()->getExclusiveActiveGroups()
-            );
-
-            $workflows = array_map(
+            )->map(
                 function (Workflow $workflow) {
                     return $workflow->getName();
-                },
-                $activeWorkflows
-            );
+                }
+            )->getValues();
         }
 
         $workflows[] = $workflowName;

@@ -12,7 +12,6 @@ use Symfony\Component\HttpKernel\Exception\HttpException;
 // Annotations import
 use FOS\RestBundle\Controller\Annotations as Rest;
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
-use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
 
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
@@ -47,7 +46,6 @@ class WorkflowController extends FOSRestController
      *      defaults={"version"="latest", "_format"="json"}
      * )
      * @ApiDoc(description="Start workflow for entity from transition", resource=true)
-     * @AclAncestor("oro_workflow")
      *
      * @param string $workflowName
      * @param string $transitionName
@@ -77,8 +75,16 @@ class WorkflowController extends FOSRestController
 
             $workflow = $workflowManager->getWorkflow($workflowName);
             $entityClass = $workflow->getDefinition()->getRelatedEntity();
-            $entity = $this->getEntityReference($entityClass, $entityId);
 
+            $transition = $workflow->getTransitionManager()->getTransition($transitionName);
+            if (!$transition->isEmptyInitOptions()) {
+                $contextAttribute = $transition->getInitContextAttribute();
+                $dataArray[$contextAttribute] = $this->get('oro_action.provider.button_search_context')
+                    ->getButtonSearchContext();
+                $entityId = null;
+            }
+
+            $entity = $this->getOrCreateEntityReference($entityClass, $entityId);
             $workflowItem = $workflowManager->startWorkflow($workflowName, $entity, $transitionName, $dataArray);
         } catch (HttpException $e) {
             return $this->handleError($e->getMessage(), $e->getStatusCode());
@@ -105,14 +111,14 @@ class WorkflowController extends FOSRestController
     }
 
     /**
-     * Try to get reference to entity
+     * Try to get or create reference to entity
      *
      * @param string $entityClass
      * @param mixed $entityId
      * @throws BadRequestHttpException
      * @return mixed
      */
-    protected function getEntityReference($entityClass, $entityId)
+    protected function getOrCreateEntityReference($entityClass, $entityId)
     {
         /** @var DoctrineHelper $doctrineHelper */
         $doctrineHelper = $this->get('oro_entity.doctrine_helper');
@@ -144,7 +150,6 @@ class WorkflowController extends FOSRestController
      * )
      * @ParamConverter("workflowItem", options={"id"="workflowItemId"})
      * @ApiDoc(description="Perform transition for workflow item", resource=true)
-     * @AclAncestor("oro_workflow")
      *
      * @param WorkflowItem $workflowItem
      * @param string $transitionName
@@ -185,7 +190,6 @@ class WorkflowController extends FOSRestController
      * )
      * @ParamConverter("workflowItem", options={"id"="workflowItemId"})
      * @ApiDoc(description="Get workflow item", resource=true)
-     * @AclAncestor("oro_workflow")
      *
      * @param WorkflowItem $workflowItem
      * @return Response
@@ -215,7 +219,6 @@ class WorkflowController extends FOSRestController
      * )
      * @ParamConverter("workflowItem", options={"id"="workflowItemId"})
      * @ApiDoc(description="Delete workflow item", resource=true)
-     * @AclAncestor("oro_workflow")
      *
      * @param WorkflowItem $workflowItem
      * @return Response
@@ -238,7 +241,6 @@ class WorkflowController extends FOSRestController
      *      defaults={"version"="latest", "_format"="json"}
      * )
      * @ApiDoc(description="Activate workflow", resource=true)
-     * @AclAncestor("oro_workflow")
      *
      * @param WorkflowDefinition $workflowDefinition
      * @return Response
@@ -273,7 +275,6 @@ class WorkflowController extends FOSRestController
      *      defaults={"version"="latest", "_format"="json"}
      * )
      * @ApiDoc(description="Deactivate workflow", resource=true)
-     * @AclAncestor("oro_workflow")
      *
      * @param WorkflowDefinition $workflowDefinition
      * @return Response

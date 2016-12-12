@@ -8,6 +8,10 @@ use Oro\Bundle\TestFrameworkBundle\Entity\Item;
 use Oro\Bundle\TestFrameworkBundle\Entity\Item2;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
+/**
+ * @group search
+ * @dbIsolation
+ */
 class OrmIndexerTest extends WebTestCase
 {
     protected function setUp()

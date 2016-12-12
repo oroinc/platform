@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\LayoutBundle\Tests\Unit\Layout\Extension\Generator;
+namespace Oro\Component\Layout\Tests\Unit\Loader\Generator\Extension;
 
 use CG\Generator\PhpClass;
 use CG\Generator\PhpMethod;

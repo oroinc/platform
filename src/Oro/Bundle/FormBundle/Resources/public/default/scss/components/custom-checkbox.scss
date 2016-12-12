@@ -2,7 +2,8 @@
     &__input {
         &:focus {
             ~ .custom-checkbox__icon {
-                color: transparentize(get-color('ui', 'normal'), .45);
+                outline: $checkbox-outline-checked-focus-state;
+                outline-offset: $checkbox-outline-offset-checked-focus-state;
             }
         }
 
@@ -11,14 +12,7 @@
                 color: get-color('ui', 'focus');
 
                 &:before {
-                    content: '\e834';
-                }
-            }
-
-            &:focus {
-                ~ .custom-checkbox__icon {
-                    outline: $checkbox-outline-checked-focus-state;
-                    outline-offset: $checkbox-outline-offset-checked-focus-state;
+                    content: '#{$checkbox-icon-checked-code}';
                 }
             }
         }
@@ -28,11 +22,11 @@
         color: get-color('additional', 'middle');
 
         &:before {
-            content: '\e835';
+            content: '#{$checkbox-icon-unchecked-code}';
 
             display: inline-block;
 
-            font-family: $base-font-icon;
+            font-family: $checkbox-icon-font;
             font-size: 17px;
             line-height: 1;
         }

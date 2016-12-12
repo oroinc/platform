@@ -6,12 +6,14 @@ use Symfony\Component\Routing\RouterInterface;
 
 use Oro\Bundle\DataGridBundle\Datagrid\ManagerInterface;
 use Oro\Bundle\DataGridBundle\Datagrid\NameStrategyInterface;
+use Oro\Bundle\DataGridBundle\Datagrid\DatagridInterface;
+use Oro\Bundle\DataGridBundle\Tools\DatagridRouteHelper;
 use Oro\Bundle\DataGridBundle\Twig\DataGridExtension;
 use Oro\Bundle\SecurityBundle\SecurityFacade;
-use Oro\Bundle\DataGridBundle\Datagrid\DatagridInterface;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyMethods)
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
 class DataGridExtensionTest extends \PHPUnit_Framework_TestCase
 {
@@ -30,6 +32,9 @@ class DataGridExtensionTest extends \PHPUnit_Framework_TestCase
     /** @var DataGridExtension */
     protected $twigExtension;
 
+    /** @var \PHPUnit_Framework_MockObject_MockObject|DatagridRouteHelper */
+    protected $datagridRouteHelper;
+
     protected function setUp()
     {
         $this->manager = $this->getMock('Oro\\Bundle\\DataGridBundle\\Datagrid\\ManagerInterface');
@@ -38,12 +43,16 @@ class DataGridExtensionTest extends \PHPUnit_Framework_TestCase
         $this->securityFacade = $this->getMockBuilder('Oro\\Bundle\\SecurityBundle\\SecurityFacade')
             ->disableOriginalConstructor()
             ->getMock();
+        $this->datagridRouteHelper = $this->getMockBuilder(DatagridRouteHelper::class)
+            ->disableOriginalConstructor()
+            ->getMock();
 
         $this->twigExtension = new DataGridExtension(
             $this->manager,
             $this->nameStrategy,
             $this->router,
-            $this->securityFacade
+            $this->securityFacade,
+            $this->datagridRouteHelper
         );
     }
 
@@ -55,14 +64,14 @@ class DataGridExtensionTest extends \PHPUnit_Framework_TestCase
     public function testGetFunctions()
     {
         $expectedFunctions = [
-            ['oro_datagrid_build', 'getGrid'],
-            ['oro_datagrid_data', 'getGridData'],
-            ['oro_datagrid_metadata', 'getGridMetadata'],
-            ['oro_datagrid_generate_element_id', 'generateGridElementId'],
-            ['oro_datagrid_build_fullname', 'buildGridFullName'],
-            ['oro_datagrid_build_inputname', 'buildGridInputName'],
+            ['oro_datagrid_build', [$this->twigExtension, 'getGrid']],
+            ['oro_datagrid_data', [$this->twigExtension, 'getGridData']],
+            ['oro_datagrid_metadata', [$this->twigExtension, 'getGridMetadata']],
+            ['oro_datagrid_generate_element_id', [$this->twigExtension, 'generateGridElementId']],
+            ['oro_datagrid_build_fullname', [$this->twigExtension, 'buildGridFullName']],
+            ['oro_datagrid_build_inputname', [$this->twigExtension, 'buildGridInputName']],
+            ['oro_datagrid_link', [$this->datagridRouteHelper, 'generate']],
         ];
-
         /** @var \Twig_SimpleFunction[] $actualFunctions */
         $actualFunctions = $this->twigExtension->getFunctions();
         $this->assertSameSize($expectedFunctions, $actualFunctions);
@@ -72,7 +81,7 @@ class DataGridExtensionTest extends \PHPUnit_Framework_TestCase
 
             $this->assertInstanceOf('\Twig_SimpleFunction', $twigFunction);
             $this->assertEquals($expectedFunction[0], $twigFunction->getName());
-            $this->assertEquals([$this->twigExtension, $expectedFunction[1]], $twigFunction->getCallable());
+            $this->assertEquals($expectedFunction[1], $twigFunction->getCallable());
 
             next($expectedFunctions);
         }
@@ -302,5 +311,17 @@ class DataGridExtensionTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue($expectedFullName));
 
         $this->assertEquals($expectedFullName, $this->twigExtension->buildGridFullName($gridName, $gridScope));
+    }
+
+    protected function tearDown()
+    {
+        unset(
+            $this->datagridRouteHelper,
+            $this->manager,
+            $this->nameStrategy,
+            $this->router,
+            $this->securityFacade,
+            $this->twigExtension
+        );
     }
 }

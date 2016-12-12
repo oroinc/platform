@@ -5,6 +5,7 @@ namespace Oro\Bundle\UIBundle\Tests\Unit\Placeholder;
 use Oro\Bundle\SecurityBundle\SecurityFacade;
 use Oro\Bundle\UIBundle\Placeholder\PlaceholderProvider;
 use Oro\Component\Config\Resolver\ResolverInterface;
+use Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker;
 
 class PlaceholderProviderTest extends \PHPUnit_Framework_TestCase
 {
@@ -20,12 +21,23 @@ class PlaceholderProviderTest extends \PHPUnit_Framework_TestCase
      */
     protected $securityFacade;
 
+    /**
+     * @var \PHPUnit_Framework_MockObject_MockObject|FeatureChecker
+     */
+    protected $featureChecker;
+
     protected function setUp()
     {
         $this->resolver       = $this->getMock('Oro\Component\Config\Resolver\ResolverInterface');
         $this->securityFacade = $this->getMockBuilder('Oro\Bundle\SecurityBundle\SecurityFacade')
             ->disableOriginalConstructor()
             ->getMock();
+        $this->featureChecker = $this->getMockBuilder('Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $this->featureChecker->expects($this->any())
+            ->method('isResourceEnabled')
+            ->will($this->returnValue(true));
     }
 
     public function testOnlyTemplateDefined()
@@ -265,6 +277,6 @@ class PlaceholderProviderTest extends \PHPUnit_Framework_TestCase
             'items' => $items
         ];
 
-        return new PlaceholderProvider($placeholders, $this->resolver, $this->securityFacade);
+        return new PlaceholderProvider($placeholders, $this->resolver, $this->securityFacade, $this->featureChecker);
     }
 }

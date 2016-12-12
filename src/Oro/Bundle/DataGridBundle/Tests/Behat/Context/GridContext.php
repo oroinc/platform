@@ -33,6 +33,9 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
     }
 
     /**
+     * Example: When I click "Delete" link from mass action dropdown
+     * Example: And click Delete mass action
+     *
      * @When /^(?:|I )click "(?P<title>(?:[^"]|\\")*)" link from mass action dropdown$/
      * @When /^(?:|I )click (?P<title>(?:[^"]|\\")*) mass action$/
      */
@@ -43,6 +46,11 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
     }
 
     /**
+     * Example: Then there is one record in grid
+     * Example: And there are two records in grid
+     * Example: And there are 7 records in grid
+     * Example: And number of records should be 34
+     *
      * @Given number of records should be :number
      * @Given /^there (are|is) (?P<number>(?:|one|two|\d+)) record(?:|s) in grid$/
      */
@@ -52,6 +60,9 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
     }
 
     /**
+     * Example: Then number of pages should be 3
+     * Example: Then number of pages should be 15
+     *
      * @Given number of pages should be :number
      */
     public function numberOfPagesShouldBe($number)
@@ -60,6 +71,8 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
     }
 
     /**
+     * This step used for compare number of records after some actions
+     *
      * @Given /^(?:|I )keep in mind number of records in list$/
      */
     public function iKeepInMindNumberOfRecordsInList()
@@ -68,6 +81,10 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
     }
 
     /**
+     * Check two records in grid by one step
+     * E.g. to check check accounts with "Columbia Pictures" and "Warner Brothers" content in it
+     * Example: And check Warner Brothers and Columbia Pictures in grid
+     *
      * @Then /^(?:|I )check ([\w\s]*) and ([\w\s]*) in grid$/
      */
     public function checkTwoRecordsInGrid($record1, $record2)
@@ -77,6 +94,10 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
     }
 
     /**
+     * I select few records == I check first 2 records in grid
+     * Example: When I check first 2 records in grid
+     * Example: I select few records
+     *
      * @When /^(?:|I )check first (?P<number>(?:[^"]|\\")*) records in grid$/
      * @When select few records
      */
@@ -86,6 +107,8 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
     }
 
     /**
+     * Example: And I uncheck first 2 records in grid
+     *
      * @When /^(?:|I )uncheck first (?P<number>(?:[^"]|\\")*) records in grid$/
      */
     public function iUncheckFirstRecordsInGrid($number)
@@ -94,6 +117,13 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
     }
 
     /**
+     * Check how much records was deleted after some actions
+     * Example: Given go to Customers/ Accounts
+     *          And I keep in mind number of records in list
+     *          When I check first 2 records in grid
+     *          And I click "Delete" link from mass action dropdown
+     *          Then the number of records decreased by 2
+     *
      * @Then the number of records decreased by :number
      */
     public function theNumberOfRecordsDecreasedBy($number)
@@ -118,6 +148,8 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
     }
 
     /**
+     * Example: And I select 10 from per page list dropdown
+     *
      * @Given /^(?:|I )select (?P<number>[\d]+) from per page list dropdown$/
      * @Given /^(?:|I )select (?P<number>[\d]+) records per page$/
      */
@@ -127,6 +159,8 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
     }
 
     /**
+     * Proceed forvard oro grid pagination
+     *
      * @When /^(?:|I )press next page button$/
      */
     public function iPressNextPageButton()
@@ -135,6 +169,10 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
     }
 
     /**
+     * Assert number of pages in oro grid
+     * It depends on per page and row count values
+     * Example: Then number of page should be 3
+     *
      * @Then number of page should be :number
      */
     public function numberOfPageShouldBe($number)
@@ -146,6 +184,8 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
     }
 
     /**
+     * Example: When I fill 4 in page number input
+     *
      * @When /^(?:|I )fill (?P<number>[\d]+) in page number input$/
      */
     public function iFillInPageNumberInput($number)
@@ -176,8 +216,11 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
     //@codingStandardsIgnoreEnd
     public function compareRowValues($column, $comparison, $rowNumber1, $rowNumber2)
     {
-        $value1 = $this->getGrid()->getRowValue($column, $this->getNumberFromString($rowNumber1));
-        $value2 = $this->getGrid()->getRowValue($column, $this->getNumberFromString($rowNumber2));
+        $rowNumber1 = $this->getNumberFromString($rowNumber1);
+        $rowNumber2 = $this->getNumberFromString($rowNumber2);
+
+        $value1 = $this->getGrid()->getRowByNumber($rowNumber1)->getCellValue($column);
+        $value2 = $this->getGrid()->getRowByNumber($rowNumber2)->getCellValue($column);
 
         switch ($comparison) {
             case 'lower':
@@ -208,8 +251,7 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
         $grid = $this->elementFactory->findElementContains('Grid', $content);
         /** @var GridHeader $gridHeader */
         $gridHeader = $grid->getElement('GridHeader');
-        $row = $grid->findElementContains('GridRow', $content);
-        self::assertTrue($row->isValid(), sprintf('Row with "%s" not found', $content));
+        $row = $grid->getRowByContent($content);
 
         $crawler = new Crawler($row->getHtml());
         /** @var Crawler[] $columns */
@@ -235,6 +277,11 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
     }
 
     /**
+     * Assert record position in grid
+     * It is find record by text and assert its position
+     * Example: Then Zyta Zywiec must be first record
+     * Example: And John Doe must be first record
+     *
      * @Then /^(?P<content>([\w\s]+)) must be (?P<rowNumber>(first|second|[\d]+)) record$/
      */
     public function assertRowContent($content, $rowNumber)
@@ -244,6 +291,10 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
     }
 
     /**
+     * String filter
+     * Example: When I filter First Name as Contains "Aadi"
+     * Example: And filter Name as is equal to "User"
+     *
      * @When /^(?:|I )filter (?P<filterName>([\w\s]+)) as (?P<type>([\w\s]+)) "(?P<value>([\w\s]+))"$/
      */
     public function applyStringFilter($filterName, $type, $value)
@@ -303,7 +354,7 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
     public function resetFilter($filterName)
     {
         $filterItem = $this->getGridFilters()->getFilterItem('GridFilterDateTimeItem', $filterName);
-        $filterItem->find('css', 'span.reset-filter')->click();
+        $filterItem->reset();
     }
 
     /**
@@ -332,6 +383,11 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
     }
 
     /**
+     * Click on row action. Row will founded by it's content
+     * Example: And click view Charlie in grid
+     * Example: When I click edit Call to Jennyfer in grid
+     * Example: And I click delete Sign a contract with Charlie in grid
+     *
      * @Given /^(?:|I )click (?P<action>((?!on)\w)*) (?P<content>(?:[^"]|\\")*) in grid$/
      */
     public function clickActionInRow($content, $action)

@@ -111,6 +111,7 @@ class ExportHandler extends AbstractHandler
             'url'         => $url,
             'readsCount'  => $readsCount,
             'errorsCount' => $errorsCount,
+            'entities'    => $this->getEntityPluralName($entityName)
         ];
     }
 

@@ -6,7 +6,7 @@ function Util(rootMessagesElements) {
     rootMessagesElements = rootMessagesElements || $('#alerts');
 
     var messageTemplate = '<div class="alert fade in alert-{message-type}"> ' +
-        '<i class="icon icon-{message-type}"></i>' +
+        '<i class="fa-{message-type}"></i>' +
         '<button type="button" class="close" data-dismiss="alert">&times;</button> ' +
         '{message} ' +
         '</div>';

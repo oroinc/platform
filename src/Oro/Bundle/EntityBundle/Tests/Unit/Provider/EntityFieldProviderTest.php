@@ -15,6 +15,7 @@ use Oro\Bundle\EntityConfigBundle\Config\Config;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityConfigBundle\Tests\Unit\ConfigProviderMock;
 use Oro\Bundle\EntityExtendBundle\Extend\FieldTypeHelper;
+use Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker;
 
 /**
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
@@ -52,6 +53,9 @@ class EntityFieldProviderTest extends \PHPUnit_Framework_TestCase
     /** @var ExclusionProviderInterface */
     protected $exclusionProvider;
 
+    /** @var FeatureChecker */
+    protected $featureChecker;
+
     protected function setUp()
     {
         $configManager = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\ConfigManager')
@@ -82,11 +86,17 @@ class EntityFieldProviderTest extends \PHPUnit_Framework_TestCase
 
         $this->exclusionProvider = $this->getMock('Oro\Bundle\EntityBundle\Provider\ExclusionProviderInterface');
 
+        $this->featureChecker = $this->getMockBuilder(FeatureChecker::class)
+            ->setMethods(['isResourceEnabled'])
+            ->disableOriginalConstructor()
+            ->getMock();
+
         $this->entityProvider = new EntityProvider(
             $this->entityConfigProvider,
             $this->extendConfigProvider,
             $this->entityClassResolver,
-            $this->translator
+            $this->translator,
+            $this->featureChecker
         );
         $this->entityProvider->setExclusionProvider($this->exclusionProvider);
 
@@ -139,7 +149,7 @@ class EntityFieldProviderTest extends \PHPUnit_Framework_TestCase
                 'config' => [
                     'label' => 'Test Label',
                     'plural_label' => 'Test Plural Label',
-                    'icon' => 'icon-test',
+                    'icon' => 'fa-test',
                 ],
                 'fields' => [
                     'field1' => [
@@ -358,7 +368,7 @@ class EntityFieldProviderTest extends \PHPUnit_Framework_TestCase
                         'related_entity_name' => 'Acme\Entity\Test1',
                         'related_entity_label' => 'Test1 Label',
                         'related_entity_plural_label' => 'Test1 Plural Label',
-                        'related_entity_icon' => 'icon-test1',
+                        'related_entity_icon' => 'fa-test1',
                     ],
                 ]
             ]
@@ -469,7 +479,7 @@ class EntityFieldProviderTest extends \PHPUnit_Framework_TestCase
                         'related_entity_name' => 'Acme\Entity\Test1',
                         'related_entity_label' => 'Test1 Label',
                         'related_entity_plural_label' => 'Test1 Plural Label',
-                        'related_entity_icon' => 'icon-test1',
+                        'related_entity_icon' => 'fa-test1',
                     ],
                 ]
             ]
@@ -542,7 +552,7 @@ class EntityFieldProviderTest extends \PHPUnit_Framework_TestCase
                 'config' => [
                     'label' => 'Test Label',
                     'plural_label' => 'Test Plural Label',
-                    'icon' => 'icon-test',
+                    'icon' => 'fa-test',
                 ],
                 'fields' => [
                     'field1' => [
@@ -832,7 +842,7 @@ class EntityFieldProviderTest extends \PHPUnit_Framework_TestCase
                 'config' => [
                     'label' => 'Test Label',
                     'plural_label' => 'Test Plural Label',
-                    'icon' => 'icon-test',
+                    'icon' => 'fa-test',
                 ],
                 'fields' => [
                     'field1' => [
@@ -873,7 +883,7 @@ class EntityFieldProviderTest extends \PHPUnit_Framework_TestCase
                 'config' => [
                     'label' => 'Test1 Label',
                     'plural_label' => 'Test1 Plural Label',
-                    'icon' => 'icon-test1',
+                    'icon' => 'fa-test1',
                 ],
                 'fields' => [
                     'id' => [
@@ -904,7 +914,7 @@ class EntityFieldProviderTest extends \PHPUnit_Framework_TestCase
                 'config' => [
                     'label' => 'Test11 Label',
                     'plural_label' => 'Test11 Plural Label',
-                    'icon' => 'icon-test11',
+                    'icon' => 'fa-test11',
                 ],
                 'fields' => [
                     'id' => [
@@ -935,7 +945,7 @@ class EntityFieldProviderTest extends \PHPUnit_Framework_TestCase
                 'config' => [
                     'label' => 'Test111 Label',
                     'plural_label' => 'Test111 Plural Label',
-                    'icon' => 'icon-test111',
+                    'icon' => 'fa-test111',
                 ],
                 'fields' => [
                     'id' => [
@@ -957,7 +967,7 @@ class EntityFieldProviderTest extends \PHPUnit_Framework_TestCase
                 'config' => [
                     'label' => 'Test22 Label',
                     'plural_label' => 'Test22 Plural Label',
-                    'icon' => 'icon-test22',
+                    'icon' => 'fa-test22',
                 ],
                 'fields' => [
                     'id' => [
@@ -1013,7 +1023,7 @@ class EntityFieldProviderTest extends \PHPUnit_Framework_TestCase
                         'related_entity_name' => 'Acme\Entity\Test1',
                         'related_entity_label' => 'Test1 Label',
                         'related_entity_plural_label' => 'Test1 Plural Label',
-                        'related_entity_icon' => 'icon-test1'
+                        'related_entity_icon' => 'fa-test1'
                     ],
                 ]
             ]

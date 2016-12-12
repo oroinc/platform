@@ -62,7 +62,7 @@ define(function(require) {
             } else {
                 if (!data.label && data.attribute_name) {
                     var attribute = this.options.workflow.getAttributeByName(data.attribute_name);
-                    data.label = attribute.get('translated_label');
+                    data.label = attribute.get('label');
                 }
                 data.entityField = data.property_path || data.attribute_name;
             }

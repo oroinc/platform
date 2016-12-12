@@ -29,7 +29,7 @@ class ConfigurableEntityNormalizerTest extends \PHPUnit_Framework_TestCase
             ->getMock();
         $fieldTypeHelper = new FieldTypeHelper([]);
 
-        $this->fieldHelper = $this->getMockBuilder('Oro\Bundle\ImportExportBundle\Field\FieldHelper')
+        $this->fieldHelper = $this->getMockBuilder('Oro\Bundle\EntityBundle\Helper\FieldHelper')
             ->setConstructorArgs([$fieldProvider, $configProvider, $fieldTypeHelper])
             ->setMethods(['hasConfig', 'getConfigValue', 'getFields', 'getObjectValue'])
             ->getMock();

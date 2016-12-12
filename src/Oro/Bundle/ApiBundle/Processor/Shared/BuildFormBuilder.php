@@ -46,6 +46,16 @@ class BuildFormBuilder implements ProcessorInterface
             return;
         }
 
+        $context->setFormBuilder($this->getFormBuilder($context));
+    }
+
+    /**
+     * @param FormContext $context
+     *
+     * @return FormBuilderInterface
+     */
+    protected function getFormBuilder(FormContext $context)
+    {
         $config = $context->getConfig();
         $formType = $config->getFormType() ?: 'form';
 
@@ -58,7 +68,8 @@ class BuildFormBuilder implements ProcessorInterface
         if ('form' === $formType) {
             $this->addFormFields($formBuilder, $context->getMetadata(), $config);
         }
-        $context->setFormBuilder($formBuilder);
+
+        return $formBuilder;
     }
 
     /**

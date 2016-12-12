@@ -98,4 +98,66 @@ class SimpleFilterFactoryTest extends \PHPUnit_Framework_TestCase
             $this->filterFactory->createFilter($filterType, ['data_type' => $dataType])
         );
     }
+
+    public function testWhenFilterShouldBeCreatedByOwnFactory()
+    {
+        $filterType = 'test';
+        $filter = new ComparisonFilter($filterType);
+
+        $this->filterFactory->addFilterFactory(
+            $filterType,
+            new FilterFactoryStub($filter),
+            'create'
+        );
+
+        $this->assertSame(
+            $filter,
+            $this->filterFactory->createFilter($filterType)
+        );
+    }
+
+    // @codingStandardsIgnoreStart
+    /**
+     * @expectedException \InvalidArgumentException
+     * @expectedExceptionMessage The "unknownMethod($dataType)" public method must be declared in the "Oro\Bundle\ApiBundle\Tests\Unit\Filter\FilterFactoryStub" class.
+     */
+    // @codingStandardsIgnoreEnd
+    public function testAddFilterFactoryWhenFactoryMethodDoesNotExist()
+    {
+        $this->filterFactory->addFilterFactory(
+            'test',
+            new FilterFactoryStub(),
+            'unknownMethod'
+        );
+    }
+
+    // @codingStandardsIgnoreStart
+    /**
+     * @expectedException \InvalidArgumentException
+     * @expectedExceptionMessage The "privateCreate($dataType)" public method must be declared in the "Oro\Bundle\ApiBundle\Tests\Unit\Filter\FilterFactoryStub" class.
+     */
+    // @codingStandardsIgnoreEnd
+    public function testAddFilterFactoryWhenFactoryMethodIsNotPublic()
+    {
+        $this->filterFactory->addFilterFactory(
+            'test',
+            new FilterFactoryStub(),
+            'privateCreate'
+        );
+    }
+
+    // @codingStandardsIgnoreStart
+    /**
+     * @expectedException \InvalidArgumentException
+     * @expectedExceptionMessage The "createWithoutDataType($dataType)" public method must be declared in the "Oro\Bundle\ApiBundle\Tests\Unit\Filter\FilterFactoryStub" class.
+     */
+    // @codingStandardsIgnoreEnd
+    public function testAddFilterFactoryWhenFactoryMethodHasInvalidSignature()
+    {
+        $this->filterFactory->addFilterFactory(
+            'test',
+            new FilterFactoryStub(),
+            'createWithoutDataType'
+        );
+    }
 }

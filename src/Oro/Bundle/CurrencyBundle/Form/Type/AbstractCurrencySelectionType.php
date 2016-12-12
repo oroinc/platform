@@ -2,8 +2,11 @@
 
 namespace Oro\Bundle\CurrencyBundle\Form\Type;
 
+use Oro\Bundle\CurrencyBundle\Provider\CurrencyProviderInterface;
 use Oro\Bundle\CurrencyBundle\Provider\ViewTypeProviderInterface;
+use Oro\Bundle\CurrencyBundle\Utils\CurrencyNameHelper;
 use Oro\Bundle\FormBundle\Utils\FormUtils;
+use Oro\Bundle\LocaleBundle\Model\LocaleSettings;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Exception\LogicException;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -15,16 +18,13 @@ use Symfony\Component\Intl\Intl;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-use Oro\Bundle\CurrencyBundle\Config\CurrencyConfigInterface;
-use Oro\Bundle\CurrencyBundle\Utils\CurrencyNameHelper;
-use Oro\Bundle\LocaleBundle\Model\LocaleSettings;
-
 abstract class AbstractCurrencySelectionType extends AbstractType
 {
     /**
-     * $var CurrencyConfigInterface
+     * @var CurrencyProviderInterface
      */
-    protected $currencyConfig;
+    protected $currencyProvider;
+
     /**
      * @var LocaleSettings
      */
@@ -41,18 +41,18 @@ abstract class AbstractCurrencySelectionType extends AbstractType
     protected $currencyNameHelper;
 
     /**
-     * @param CurrencyConfigInterface $currencyConfig
+     * @param CurrencyProviderInterface $currencyProvider
      * @param LocaleSettings $localeSettings
      * @param CurrencyNameHelper $currencyNameHelper
      */
     public function __construct(
-        CurrencyConfigInterface $currencyConfig,
+        CurrencyProviderInterface $currencyProvider,
         LocaleSettings $localeSettings,
         CurrencyNameHelper $currencyNameHelper
     ) {
-        $this->currencyConfig       = $currencyConfig;
-        $this->localeSettings       = $localeSettings;
-        $this->currencyNameHelper   = $currencyNameHelper;
+        $this->currencyProvider = $currencyProvider;
+        $this->localeSettings = $localeSettings;
+        $this->currencyNameHelper = $currencyNameHelper;
     }
 
     /**
@@ -83,10 +83,15 @@ abstract class AbstractCurrencySelectionType extends AbstractType
             'currencies_list' => null,
             'additional_currencies' => null,
             'full_currency_list' => false,
+            'full_currency_name' => false,
         ]);
 
         $resolver->setNormalizer('choice_label', function (Options $options, $value) {
             $viewType = null;
+
+            if ($options['full_currency_name']) {
+                $viewType = ViewTypeProviderInterface::VIEW_TYPE_FULL_NAME;
+            }
 
             if ($options['compact']) {
                 $viewType = ViewTypeProviderInterface::VIEW_TYPE_ISO_CODE;
@@ -98,11 +103,20 @@ abstract class AbstractCurrencySelectionType extends AbstractType
         });
     }
 
+    /**
+     * @param FormView $view
+     * @param FormInterface $form
+     * @param array $options
+     */
     public function buildView(FormView $view, FormInterface $form, array $options)
     {
         $view->vars['hidden_field'] = (count($options['choices']) <= 1);
     }
 
+    /**
+     * @param FormBuilderInterface $builder
+     * @param array $options
+     */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder->addEventListener(FormEvents::PRE_SET_DATA, function (FormEvent $event) use ($options) {
@@ -181,7 +195,7 @@ abstract class AbstractCurrencySelectionType extends AbstractType
      */
     protected function getCurrencies()
     {
-        return $this->currencyConfig->getCurrencyList();
+        return $this->currencyProvider->getCurrencyList();
     }
 
     /**
@@ -189,15 +203,24 @@ abstract class AbstractCurrencySelectionType extends AbstractType
      */
     protected function getDefaultCurrency()
     {
-        return $this->currencyConfig->getDefaultCurrency();
+        return $this->currencyProvider->getDefaultCurrency();
     }
 
-    protected function isMultiple($options)
+    /**
+     * @param array $options
+     * @return bool
+     */
+    protected function isMultiple(array $options)
     {
         return isset($options['multiple']) && $options['multiple'];
     }
 
-    private function isMissedCurrency($currencyCode, $options)
+    /**
+     * @param string $currencyCode
+     * @param array $options
+     * @return bool
+     */
+    private function isMissedCurrency($currencyCode, array $options)
     {
         return (empty($options['choices']) || !isset($options['choices'][$currencyCode]));
     }

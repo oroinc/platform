@@ -14,6 +14,7 @@ use Oro\Bundle\DataGridBundle\Datasource\ResultRecordInterface;
 use Oro\Bundle\DataGridBundle\Extension\Action\ActionExtension as DatagridActionExtension;
 use Oro\Bundle\DataGridBundle\Extension\Action\Event\ConfigureActionsBefore;
 use Oro\Bundle\DataGridBundle\Tools\GridConfigurationHelper;
+use Oro\Bundle\SearchBundle\Datagrid\Datasource\SearchDatasource;
 
 class OperationListener
 {
@@ -77,7 +78,7 @@ class OperationListener
     {
         $config = $event->getConfig();
 
-        // datasource type other than ORM is not handled
+        // datasource types other than ORM are not handled
         if ($config->getDatasourceType() !== OrmDatasource::TYPE) {
             return;
         }
@@ -229,7 +230,7 @@ class OperationListener
     protected function getRowsActionsConfig(Operation $operation)
     {
         $buttonOptions = $operation->getDefinition()->getButtonOptions();
-        $icon = !empty($buttonOptions['icon']) ? str_ireplace('icon-', '', $buttonOptions['icon']) : 'edit';
+        $icon = !empty($buttonOptions['icon']) ? str_ireplace('fa-', '', $buttonOptions['icon']) : 'pencil-square-o';
 
         $datagridOptions = $operation->getDefinition()->getDatagridOptions();
 

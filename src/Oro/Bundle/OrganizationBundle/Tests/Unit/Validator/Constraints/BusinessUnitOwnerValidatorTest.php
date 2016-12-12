@@ -46,9 +46,54 @@ class BusinessUnitOwnerValidatorTest extends \PHPUnit_Framework_TestCase
         $this->businessUnitOwnerValidator->validate($this->businessUnit, $this->constraint);
     }
 
-    public function testUnValidBusinessUnit()
+    public function testValidNewBothBusinessUnits()
+    {
+        $parentBusinessUnit = new BusinessUnit();
+        $this->businessUnit->setOwner($parentBusinessUnit);
+
+        $this->context->expects($this->never())
+            ->method('addViolation');
+
+        $this->businessUnitOwnerValidator->validate($this->businessUnit, $this->constraint);
+    }
+
+    public function testValidNewBusinessUnit()
+    {
+        $parentBusinessUnit = new BusinessUnit();
+        $parentBusinessUnit->setId(1);
+        $this->businessUnit->setOwner($parentBusinessUnit);
+
+        $this->context->expects($this->never())
+            ->method('addViolation');
+
+        $this->businessUnitOwnerValidator->validate($this->businessUnit, $this->constraint);
+    }
+
+    public function testValidNewParentBusinessUnit()
     {
         $this->businessUnit->setId(1);
+        $parentBusinessUnit = new BusinessUnit();
+        $this->businessUnit->setOwner($parentBusinessUnit);
+
+        $this->context->expects($this->never())
+            ->method('addViolation');
+
+        $this->businessUnitOwnerValidator->validate($this->businessUnit, $this->constraint);
+    }
+
+    public function testInvalidBusinessUnit()
+    {
+        $this->businessUnit->setId(1);
+        $this->businessUnit->setOwner($this->businessUnit);
+
+        $this->context->expects($this->once())
+            ->method('addViolation');
+
+        $this->businessUnitOwnerValidator->validate($this->businessUnit, $this->constraint);
+    }
+
+    public function testInvalidNewBusinessUnit()
+    {
         $this->businessUnit->setOwner($this->businessUnit);
 
         $this->context->expects($this->once())

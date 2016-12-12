@@ -8,7 +8,7 @@ use Symfony\Component\PropertyAccess\PropertyPath;
 use Symfony\Component\Translation\TranslatorInterface;
 
 use Oro\Component\Action\Exception\InvalidParameterException;
-use Oro\Component\Action\Model\ContextAccessor;
+use Oro\Component\ConfigExpression\ContextAccessor;
 
 /**
  * Show flash message
@@ -61,9 +61,9 @@ class FlashMessage extends AbstractAction
     }
 
     /**
-     * @param Request $request
+     * @param Request|null $request
      */
-    public function setRequest(Request $request)
+    public function setRequest(Request $request = null)
     {
         $this->request = $request;
     }

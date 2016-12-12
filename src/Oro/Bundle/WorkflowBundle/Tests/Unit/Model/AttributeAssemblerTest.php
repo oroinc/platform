@@ -3,10 +3,22 @@
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Model;
 
 use Oro\Bundle\ActionBundle\Model\Attribute;
+use Oro\Bundle\ActionBundle\Model\AttributeGuesser;
+use Oro\Bundle\ActionBundle\Model\ButtonSearchContext;
+use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Model\AttributeAssembler;
+use Symfony\Component\Translation\TranslatorInterface;
 
 class AttributeAssemblerTest extends \PHPUnit_Framework_TestCase
 {
+    /** @var TranslatorInterface */
+    protected $translator;
+
+    protected function setUp()
+    {
+        $this->translator = $this->getMock(TranslatorInterface::class);
+    }
+
     /**
      * @dataProvider invalidOptionsDataProvider
      *
@@ -18,13 +30,13 @@ class AttributeAssemblerTest extends \PHPUnit_Framework_TestCase
     {
         $this->setExpectedException($exception, $message);
 
-        $assembler = new AttributeAssembler($this->getAttributeGuesser());
+        $assembler = new AttributeAssembler($this->getAttributeGuesser(), $this->translator);
         $definition = $this->getWorkflowDefinition();
         $assembler->assemble($definition, $configuration);
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject
+     * @return WorkflowDefinition|\PHPUnit_Framework_MockObject_MockObject
      */
     protected function getWorkflowDefinition()
     {
@@ -35,7 +47,7 @@ class AttributeAssemblerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject
+     * @return AttributeGuesser|\PHPUnit_Framework_MockObject_MockObject
      */
     protected function getAttributeGuesser()
     {
@@ -120,9 +132,14 @@ class AttributeAssemblerTest extends \PHPUnit_Framework_TestCase
      * @param array $configuration
      * @param Attribute $expectedAttribute
      * @param array $guessedParameters
+     * @param array $transitionConfigurations
      */
-    public function testAssemble($configuration, $expectedAttribute, array $guessedParameters = array())
-    {
+    public function testAssemble(
+        $configuration,
+        $expectedAttribute,
+        array $guessedParameters = array(),
+        array $transitionConfigurations = array()
+    ) {
         $relatedEntity = '\stdClass';
 
         $attributeGuesser = $this->getAttributeGuesser();
@@ -134,7 +151,7 @@ class AttributeAssemblerTest extends \PHPUnit_Framework_TestCase
                 ->will($this->returnValue($guessedParameters));
         }
 
-        $assembler = new AttributeAssembler($attributeGuesser);
+        $assembler = new AttributeAssembler($attributeGuesser, $this->translator);
         $definition = $this->getWorkflowDefinition();
         $definition->expects($this->once())
             ->method('getEntityAttributeName')
@@ -143,12 +160,12 @@ class AttributeAssemblerTest extends \PHPUnit_Framework_TestCase
             ->method('getRelatedEntity')
             ->will($this->returnValue($relatedEntity));
 
-        $expectedAttributesCount = 1;
+        $expectedAttributesCount = count($configuration) + count($transitionConfigurations);
         if (!array_key_exists('entity_attribute', $configuration)) {
             $expectedAttributesCount++;
         }
 
-        $attributes = $assembler->assemble($definition, $configuration);
+        $attributes = $assembler->assemble($definition, $configuration, $transitionConfigurations);
         $this->assertInstanceOf('Doctrine\Common\Collections\ArrayCollection', $attributes);
         $this->assertCount($expectedAttributesCount, $attributes);
         $this->assertTrue($attributes->containsKey($expectedAttribute->getName()));
@@ -295,6 +312,20 @@ class AttributeAssemblerTest extends \PHPUnit_Framework_TestCase
                     'type' => 'object',
                     'options' => array('class' => 'GuessedClass'),
                 ),
+            ),
+            'add_init_context_attribute' => array(
+                array(),
+                $this->getAttribute(
+                    'attribute_one',
+                    'attribute_one',
+                    'object',
+                    array('class' => ButtonSearchContext::class)
+                ),
+                array(),
+                array(
+                    'transition1' => array('init_context_attribute' => 'attribute_one'),
+                    'transition2' => array('init_context_attribute' => 'source')
+                )
             ),
         );
     }

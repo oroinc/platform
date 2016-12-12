@@ -1,12 +1,31 @@
+{% extends 'OroUIBundle:Form:fields.html.twig' %}
+
 {% block form_row %}
     {% spaceless %}
+        {% if hint|default() %}
+            <div{{ block('hint_attributes') }}>{{ hint|raw }}</div>
+        {% endif %}
         <div class="input-prepend{% if errors|length > 0 %} error{% endif %}">
             <span class="add-on">{{ form_label(form, '' , { label_attr: label_attr|merge({ class: 'control-label' })}) }}</span>
-                {{ form_widget(form) }}
-                {{ form_errors(form) }}
+            {{ form_widget(form) }}
         </div>
+        {{ form_errors(form) }}
     {% endspaceless %}
 {% endblock form_row %}
+
+{# Errors #}
+
+{% block form_errors %}
+    {%- spaceless -%}
+        {% if form.parent %}
+            {{ parent() }}
+        {% else %}
+                {%- for error in errors -%}
+                    <div>{{ error.message }}</div>
+                {%- endfor -%}
+        {% endif %}
+    {% endspaceless %}
+{% endblock form_errors %}
 
 {% block form_label %}
     {% spaceless %}

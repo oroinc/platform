@@ -2,6 +2,7 @@
 
 namespace Oro\Component\Layout\Tests\Unit;
 
+use Oro\Component\Layout\ExpressionLanguage\ExpressionProcessor;
 use Oro\Component\Layout\LayoutFactory;
 
 class LayoutFactoryTest extends \PHPUnit_Framework_TestCase
@@ -12,14 +13,25 @@ class LayoutFactoryTest extends \PHPUnit_Framework_TestCase
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $rendererRegistry;
 
+    /** @var ExpressionProcessor|\PHPUnit_Framework_MockObject_MockObject */
+    protected $expressionProcessor;
+
     /** @var LayoutFactory */
     protected $layoutFactory;
 
     protected function setUp()
     {
-        $this->registry         = $this->getMock('Oro\Component\Layout\LayoutRegistryInterface');
-        $this->rendererRegistry = $this->getMock('Oro\Component\Layout\LayoutRendererRegistryInterface');
-        $this->layoutFactory    = new LayoutFactory($this->registry, $this->rendererRegistry);
+        $this->registry            = $this->getMock('Oro\Component\Layout\LayoutRegistryInterface');
+        $this->rendererRegistry    = $this->getMock('Oro\Component\Layout\LayoutRendererRegistryInterface');
+        $this->expressionProcessor = $this
+            ->getMockBuilder('Oro\Component\Layout\ExpressionLanguage\ExpressionProcessor')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $this->layoutFactory       = new LayoutFactory(
+            $this->registry,
+            $this->rendererRegistry,
+            $this->expressionProcessor
+        );
     }
 
     public function testGetRegistry()

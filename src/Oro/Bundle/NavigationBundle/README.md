@@ -88,34 +88,34 @@ menu_config:
             template: <template>              # path to custom template for renderer
             clear_matcher: <option_value>
             depth: <option_value>
-            currentAsLink: <option_value>
-            currentClass: <option_value>
-            ancestorClass: <option_value>
-            firstClass: <option_value>
-            lastClass: <option_value>
+            current_as_link: <option_value>
+            current_class: <option_value>
+            ancestor_class: <option_value>
+            first_class: <option_value>
+            last_class: <option_value>
             compressed: <option_value>
             block: <option_value>
-            rootClass: <option_value>
-            isDropdown: <option_value>
+            root_class: <option_value>
+            is_dropdown: <option_value>
 
     items: #menu items
         <key>: # menu item identifier. used as default value for name, route and label, if it not set in options
-            aclResourceId                     # ACL resource Id
-            translateDomain: <domain_name>    # translation domain
-                translateParameters:          # translation parameters
-            label: <label>                    # label text or translation string template
-            name:  <name>                     # name of menu item, used as default for route
-            uri: <uri_string>                 # uri string, if no route parameter set
-            read_only: <boolean>              # disable ability to edit menu item in UI
-            route: <route_name>               # route name for uri generation, if not set and uri not set - loads from key
-                routeParameters:              # router parameters
-            attributes: <attr_list>           # <li> item attributes
-            linkAttributes: <attr_list>       # <a> anchor attributes
-            labelAttributes: <attr_list>      # <span> attributes for text items without link
-            childrenAttributes: <attr_list>   # <ul> item attributes for nested lists
-            showNonAuthorized: <boolean>      # show for non-authorized users
-            display: <boolean>                # disable showing of menu item
-            displayChildren: <boolean>        # disable showing of menu item children
+            acl_resource_id: <string>           # ACL resource Id
+            translate_domain: <domain_name>     # translation domain
+            translate_parameters:               # translation parameters
+            label: <label>                      # label text or translation string template
+            name:  <name>                       # name of menu item, used as default for route
+            uri: <uri_string>                   # uri string, if no route parameter set
+            read_only: <boolean>                # disable ability to edit menu item in UI
+            route: <route_name>                 # route name for uri generation, if not set and uri not set - loads from key
+            route_parameters:                   # router parameters
+            attributes: <attr_list>             # <li> item attributes
+            link_attributes: <attr_list>        # <a> anchor attributes
+            label_attributes: <attr_list>       # <span> attributes for text items without link
+            children_attributes: <attr_list>    # <ul> item attributes for nested lists
+            show_non_authorized: <boolean>      # show for non-authorized users
+            display: <boolean>                  # disable showing of menu item
+            display_children: <boolean>         # disable showing of menu item children
 
     tree:
         <menu_alias>                            # menu alias

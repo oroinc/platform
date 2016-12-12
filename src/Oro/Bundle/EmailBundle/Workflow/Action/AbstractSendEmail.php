@@ -11,7 +11,7 @@ use Oro\Bundle\EntityBundle\Provider\EntityNameResolver;
 
 use Oro\Component\Action\Exception\InvalidParameterException;
 use Oro\Component\Action\Action\AbstractAction;
-use Oro\Component\Action\Model\ContextAccessor;
+use Oro\Component\ConfigExpression\ContextAccessor;
 
 abstract class AbstractSendEmail extends AbstractAction implements LoggerAwareInterface
 {

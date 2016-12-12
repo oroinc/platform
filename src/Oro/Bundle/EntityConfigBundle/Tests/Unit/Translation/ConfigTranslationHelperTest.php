@@ -149,7 +149,7 @@ class ConfigTranslationHelperTest extends \PHPUnit_Framework_TestCase
         $trans = new Translation();
 
         $this->translationManager->expects($this->once())
-            ->method('saveValue')
+            ->method('saveTranslation')
             ->with($key, $value, self::LOCALE, TranslationManager::DEFAULT_DOMAIN)
             ->willReturn($trans);
 

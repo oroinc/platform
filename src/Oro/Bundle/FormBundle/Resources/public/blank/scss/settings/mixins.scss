@@ -1,8 +1,8 @@
 @mixin placeholder {
-    ::-webkit-input-placeholder {@content}
-    :-moz-placeholder           {@content}
-    ::-moz-placeholder          {@content}
-    :-ms-input-placeholder      {@content}
+    &::-webkit-input-placeholder {@content}
+    &:-moz-placeholder           {@content}
+    &::-moz-placeholder          {@content}
+    &:-ms-input-placeholder      {@content}
 }
 
 @mixin appearance() {
@@ -14,7 +14,7 @@
     $use-base-style:   false,
     $padding:          $base-ui-element-offset,
     $font-size:        $base-ui-element-font-size,
-    $font-family:      $base-ui-font-family,
+    $font-family:      $base-ui-element-font-family,
     $line-height:      $base-ui-element-line-height,
     $border:           $base-ui-element-border,
     $border-radius:    $base-ui-element-border-radius,

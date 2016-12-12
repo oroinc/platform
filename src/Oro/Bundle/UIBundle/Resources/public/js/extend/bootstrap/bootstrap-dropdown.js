@@ -15,6 +15,11 @@ define(function(require) {
             selector = $this.attr('href');
             selector = selector && /#/.test(selector) && selector.replace(/.*(?=#[^\s]*$)/, ''); //strip for ie7
         }
+        if (selector === '#') {
+            // new Sizzle does not support empty id selector '#'
+            // https://jquery.com/upgrade-guide/3.0/#breaking-change-jquery-quot-quot-and-find-quot-quot-are-invalid-syntax
+            selector = '';
+        }
         $parent = selector && $(selector);
         if (!$parent || !$parent.length) {
             $parent = $this.parent();
@@ -29,6 +34,12 @@ define(function(require) {
                 $parent.trigger('hide.bs.dropdown');
             }
             $(this).dropdown('detach', false);
+        });
+    }
+
+    function clearMenus() {
+        $(toggleDropdown).each(function() {
+            getParent($(this)).removeClass('open');
         });
     }
 
@@ -60,18 +71,35 @@ define(function(require) {
     Dropdown.prototype = $.fn.dropdown.Constructor.prototype;
 
     $(document).off('click.dropdown.data-api', toggleDropdown, Dropdown.prototype.toggle);
-    Dropdown.prototype.toggle = _.wrap(Dropdown.prototype.toggle, function(func, event) {
+    Dropdown.prototype.toggle = function() {
         beforeClearMenus();
-        var result = func.apply(this, _.rest(arguments));
 
-        var $parent = getParent($(this));
+        /* original toggle method:start */
+        var $this = $(this);
+
+        if ($this.is('.disabled, :disabled')) {
+            return;
+        }
+
+        var $parent = getParent($this);
+        var isActive = $parent.hasClass('open');
+
+        clearMenus();
+
+        if (!isActive) {
+            $parent.toggleClass('open');
+        }
+
+        $this.focus();
+        /* original:end */
+
         if ($parent.hasClass('open')) {
             $parent.trigger('shown.bs.dropdown');
         }
 
         $(this).dropdown('detach');
-        return result;
-    });
+        return false;
+    };
 
     Dropdown.prototype.detach = function(isActive) {
         var $this = $(this);
@@ -164,7 +192,19 @@ define(function(require) {
         $dropdownMenu.css(css);
     };
 
+    (function() {
+        // unbind original clearMenus handler, because it contains a bug in getParent with empty ID selector -- '#'
+        var documentClickEvents = $._data(document, 'events').click;
+        var event = _.find(documentClickEvents, function(event) {
+            // the only named original handler on click event with "data-api.dropdown" NS is "clearMenus"
+            return event.namespace === 'data-api.dropdown' && event.handler.name;
+        });
+        $(document).off('click', event.handler);
+    })();
+
     $(document)
+        .on('click.dropdown.data-api', beforeClearMenus)
+        .on('click.dropdown.data-api', clearMenus)
         .on('click.dropdown.data-api', toggleDropdown, Dropdown.prototype.toggle)
         .on('tohide.bs.dropdown', toggleDropdown + ', .dropdown.open, .dropup.open', function(e) {
             /**
@@ -299,17 +339,6 @@ define(function(require) {
                     $dropdownMenu.parents().add(window).off('.floating-dropdown');
                 }
             });
-
-        /**
-         * Adds handler beforeClearMenus in front of original clearMenus handler
-         * (for some reason bindFirst here does not work)
-         */
-        $(document).on('click.dropdown.data-api', beforeClearMenus);
-        var clickEvents = $._data(document, 'events').click;
-        var clearMenusHandler = _.find(clickEvents, function(event) {
-            return event.handler.name === 'clearMenus';
-        });
-        clickEvents.splice(clickEvents.indexOf(clearMenusHandler), 0, clickEvents.pop());
     })();
 
     /**
@@ -427,7 +456,7 @@ define(function(require) {
                 var originalDropState = $dropdown.data('original-dropstate');
                 if (originalDropState) {
                     flipToInitial($dropdown);
-                    $dropdown.parents().andSelf().add(window).off('.autoflip-dropdown');
+                    $dropdown.parents().addBack().add(window).off('.autoflip-dropdown');
                 }
             });
     })();

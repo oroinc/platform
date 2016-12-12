@@ -98,7 +98,7 @@ class OroNavigationExtensionTest extends \PHPUnit_Framework_TestCase
 
         $settings = array(
             'resolved' => true,
-            'maxItems' => array(
+            'max_items' => array(
                 'value' => 20,
                 'scope' => 'app'
             ),

@@ -61,6 +61,13 @@ class EmailBodySyncCommand extends ContainerAwareCommand implements CronCommandI
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
+        $featureChecker = $this->getContainer()->get('oro_featuretoggle.checker.feature_checker');
+        if (!$featureChecker->isFeatureEnabled('email')) {
+            $output->writeln('The email feature is disabled. The command will not run.');
+
+            return 0;
+        }
+
         $lock = new LockHandler('oro:cron:email-body-sync');
         if (!$lock->lock()) {
             $output->writeln('The command is already running in another process.');
