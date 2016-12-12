@@ -10,7 +10,7 @@ use Oro\Bundle\ActionBundle\Extension\ButtonProviderExtensionInterface;
 use Oro\Bundle\ActionBundle\Provider\ButtonProvider;
 use Oro\Bundle\TestFrameworkBundle\Test\Stub\CallableStub;
 
-class ButtonProviderTest extends \PHPUnit_Framework_TestCase implements \Calla
+class ButtonProviderTest extends \PHPUnit_Framework_TestCase
 {
     /** @var ButtonProvider */
     protected $buttonProvider;
@@ -28,6 +28,7 @@ class ButtonProviderTest extends \PHPUnit_Framework_TestCase implements \Calla
 
     public function testMatch()
     {
+        /** @var ButtonSearchContext|\PHPUnit_Framework_MockObject_MockObject $searchContext */
         $searchContext = $this->getMock(ButtonSearchContext::class);
 
         $button1 = $this->getButton();
@@ -43,6 +44,7 @@ class ButtonProviderTest extends \PHPUnit_Framework_TestCase implements \Calla
         $this->assertInstanceOf(ButtonsCollection::class, $collection);
 
         //checking correct mapping button => extension at collection
+        /** @var CallableStub|\PHPUnit_Framework_MockObject_MockObject $callable */
         $callable = $this->getMock(CallableStub::class);
         $callable->expects($this->at(0))
             ->method('__invoke')
