@@ -189,7 +189,7 @@ class PermissionGrantingStrategy implements PermissionGrantingStrategyInterface
                 }
 
                 $aceMaskServiceBits = $ace->getMask();
-                if ($isRootOid) {
+                if ($isRootOid && null !== $object) {
                     $aceMaskServiceBits = $extension->adaptRootMask($aceMaskServiceBits, $object);
                 }
                 $aceMaskServiceBits = $extension->getServiceBits($aceMaskServiceBits);
