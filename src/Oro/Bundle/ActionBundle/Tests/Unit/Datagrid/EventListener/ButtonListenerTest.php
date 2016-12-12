@@ -278,7 +278,11 @@ class ButtonListenerTest extends \PHPUnit_Framework_TestCase
                 ),
                 'expected' => true,
                 'expectedConfiguration' => [
-                    'actions' => ['action3' => $this->getRowActionConfig('[trans]Action 3 label[/trans]', ['key1' => 'value1'])],
+                        'actions' => ['action3' => $this->getRowActionConfig(
+                            '[trans]Action 3 label[/trans]',
+                            ['key1' => 'value1']
+                    )
+                    ],
                 ]
             ],
             'should not replace existing default action' => [
@@ -393,8 +397,8 @@ class ButtonListenerTest extends \PHPUnit_Framework_TestCase
                 'record' => new ResultRecord(['id' => 4]),
                 'buttonCollection' => $this->createButtonsCollection(
                     [
-                        $this->createButton('action1', true),
-                        $this->createButton('action3', false)
+                        $this->createButton('action1', true, ['getOrder' => 1]),
+                        $this->createButton('action3', false, ['getOrder' => 2])
                     ]
                 ),
                 'expectedActions' => [
@@ -420,8 +424,8 @@ class ButtonListenerTest extends \PHPUnit_Framework_TestCase
                 'record' => new ResultRecord(['id' => 4]),
                 'buttonCollection' => $this->createButtonsCollection(
                     [
-                        $this->createButton('action1', true),
-                        $this->createButton('action3', false)
+                        $this->createButton('action1', true, ['getOrder' => 1]),
+                        $this->createButton('action3', false, ['getOrder' => 2])
                     ]
                 ),
                 'expectedActions' => [
@@ -487,7 +491,6 @@ class ButtonListenerTest extends \PHPUnit_Framework_TestCase
      */
     protected function createOperationButton($name, $isAvailable, array $datagridOptions, array $extraData = [])
     {
-        /** @var OperationButton $button */
         $button = $this->createButton($name, $isAvailable, $extraData, OperationButton::class);
         $button->expects($this->any())->method('getOperation')->willReturn($this->createOperation($datagridOptions));
 
