@@ -10,6 +10,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 use Oro\Bundle\UserBundle\Entity\Impersonation;
 use Oro\Bundle\UserBundle\Entity\User;
+use Oro\Bundle\UserBundle\Entity\UserManager;
 use Oro\Bundle\UserBundle\Security\ImpersonationAuthenticator;
 
 class ImpersonateUserCommand extends ContainerAwareCommand
@@ -50,6 +51,11 @@ class ImpersonateUserCommand extends ContainerAwareCommand
             throw new \InvalidArgumentException(sprintf('User with username "%s" does not exists', $username));
         }
 
+        if (!$user instanceof User) {
+            // not a CRM user
+            return 0;
+        }
+
         $impersonation = $this->createImpersonation(
             $user,
             $input->getOption('lifetime'),
@@ -71,6 +77,23 @@ class ImpersonateUserCommand extends ContainerAwareCommand
             )
         );
         $output->writeln($url);
+
+        if (!$user->isEnabled()) {
+            $output->writeln(
+                '<comment>Warning: User is Disabled.' .
+                ' You cannot impersonate them until enabled!</comment>'
+            );
+        }
+
+        if ($user->getAuthStatus() && $user->getAuthStatus()->getId() !== UserManager::STATUS_ACTIVE) {
+            $output->writeln(
+                sprintf(
+                    '<comment>Warning: Auth status is \'%s\'.' .
+                    ' You cannot impersonate them until it is set to \'Available\'!</comment>',
+                    $user->getAuthStatus()->getName()
+                )
+            );
+        }
 
         return 0;
     }

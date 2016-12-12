@@ -10,21 +10,27 @@ class FieldSecurityMetadata implements \Serializable
     /** @var string */
     protected $label;
 
+    /** @var string|null */
+    protected $description;
+
     /** @var string[] */
     protected $permissions;
 
     /**
-     * @param string $fieldName
-     * @param string $label
-     * @param array  $permissions
+     * @param string      $fieldName
+     * @param string      $label
+     * @param array       $permissions
+     * @param string|null $description
      */
     public function __construct(
         $fieldName = '',
         $label = '',
-        $permissions = []
+        $permissions = [],
+        $description = null
     ) {
         $this->fieldName = $fieldName;
         $this->label = $label;
+        $this->description = $description;
         $this->permissions = $permissions;
     }
 
@@ -49,6 +55,16 @@ class FieldSecurityMetadata implements \Serializable
     }
 
     /**
+     * Returns field description
+     *
+     * @return string|null
+     */
+    public function getDescription()
+    {
+        return $this->description;
+    }
+
+    /**
      * Returns available field permissions
      *
      * @return string[]
@@ -67,7 +83,8 @@ class FieldSecurityMetadata implements \Serializable
             [
                 $this->fieldName,
                 $this->label,
-                $this->permissions
+                $this->permissions,
+                $this->description
             ]
         );
     }
@@ -80,7 +97,8 @@ class FieldSecurityMetadata implements \Serializable
         list(
             $this->fieldName,
             $this->label,
-            $this->permissions
+            $this->permissions,
+            $this->description
             ) = unserialize($serialized);
     }
 
@@ -98,6 +116,7 @@ class FieldSecurityMetadata implements \Serializable
         $result->fieldName = $data['fieldName'];
         $result->label = $data['label'];
         $result->permissions = $data['permissions'];
+        $result->description = $data['description'];
 
         return $result;
     }

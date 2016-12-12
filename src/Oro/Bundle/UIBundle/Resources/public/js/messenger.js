@@ -13,7 +13,8 @@ define([
         container: '',
         delay: false,
         template: $.noop,
-        insertMethod: 'appendTo'
+        insertMethod: 'appendTo',
+        style: 'default'
     };
     var queue = [];
     var groupedMessages = {};
@@ -25,7 +26,11 @@ define([
      */
     function showMessage(type, message, options) {
         var opt = _.extend({}, defaults, options || {});
-        var $el = $(opt.template({type: type, message: message}))[opt.insertMethod](opt.container);
+        var $el = $(opt.template({
+            type: type,
+            message: message,
+            style: opt.style
+        }))[opt.insertMethod](opt.container);
         if (opt.onClose) {
             $el.find('button.close').click(opt.onClose);
         }

@@ -129,7 +129,22 @@ class PostgresqlGridModifier extends AbstractExtension
         $groupByParts = $queryBuilder->getDQLPart('groupBy');
 
         if (!count($groupByParts)) {
-            return true;
+            // List of functions is from http://docs.doctrine-project.org/projects/doctrine-orm/en/latest/reference/dql-doctrine-query-language.html#aggregate-functions
+            // and https://github.com/orocrm/doctrine-extensions/blob/master/README.md
+            // TODO: It's a hotfix so proper solution should be provided in scope of BAP-12849
+            $forbiddenFunctions = ['sum', 'avg', 'min', 'max', 'count', 'group_concat'];
+            $selectParts = $queryBuilder->getDQLPart('select');
+
+            $selectPartsWithAggregation = array_filter($selectParts, function ($selectPart) use ($forbiddenFunctions) {
+                foreach ($forbiddenFunctions as $functionName) {
+                    if (false !== stripos($selectPart, $functionName)) {
+                        return true;
+                    }
+                }
+                return false;
+            });
+
+            return empty($selectPartsWithAggregation);
         }
 
         foreach ($groupByParts as $groupBy) {

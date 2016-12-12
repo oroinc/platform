@@ -39,6 +39,8 @@ class FeatureContext extends OroFeatureContext implements
     }
 
     /**
+     * Load "emails.yml" alice fixture from EmailBundle suite
+     *
      * @Given /^(?:|I )receive new emails$/
      */
     public function iHaveNewEmails()
@@ -47,6 +49,9 @@ class FeatureContext extends OroFeatureContext implements
     }
 
     /**
+     * Assert number of emails in email notification icon
+     * Example: Then email notification icon show 5 emails
+     *
      * @Then email notification icon show :number emails
      */
     public function emailNotificationIconShowEmails($number)
@@ -55,6 +60,9 @@ class FeatureContext extends OroFeatureContext implements
     }
 
     /**
+     * Example: Then I click on email notification icon
+     *          And I should see 4 emails in email list
+     *
      * @Then /^(?:|I )should see (?P<emailCount>(?:|one|two|\d+)) emails in email list$/
      */
     public function iShouldSeeNewEmailsInEmailList($emailCount)
@@ -77,6 +85,10 @@ class FeatureContext extends OroFeatureContext implements
     }
 
     /**
+     * Example: Then I click on email notification icon
+     *          And I should see 4 emails in email list
+     *          And all emails in email list must be new
+     *
      * @Then /^(?P<emailCount>(?:|one|two|\d+)) emails in email list must be new$/
      */
     public function emailsInEmailListMustBeNew($emailCount)
@@ -86,6 +98,9 @@ class FeatureContext extends OroFeatureContext implements
     }
 
     /**
+     * Example: Then I click on email notification icon
+     *          And I click on "Merry Christmas" email title
+     *
      * @Given I click on :emailTitle email title
      */
     public function iClickOnEmailTitle($emailTitle)
@@ -97,6 +112,11 @@ class FeatureContext extends OroFeatureContext implements
     }
 
     /**
+     * Example: Given 3 emails in email list must be new
+     *          When I click on email notification icon
+     *          And I mark "Merry Christmas" email as unread
+     *          Then 4 emails in email list must be new
+     *
      * @Given I mark :emailTitle email as unread
      */
     public function iMarkEmailAsUnread($emailTitle)
@@ -108,6 +128,8 @@ class FeatureContext extends OroFeatureContext implements
     }
 
     /**
+     * Assert that email form is sown at page
+     *
      * @Then I should see an email form
      */
     public function iShouldSeeAnEmailForm()
@@ -116,6 +138,12 @@ class FeatureContext extends OroFeatureContext implements
     }
 
     /**
+     * Example: Then I should see an email form
+     *          And it must contains next values:
+     *            | From    | "John Doe" <admin@example.com>       |
+     *            | To      | "Charlie Sheen" <charlie@sheen.com>  |
+     *            | Subject | Re: Merry Christmas                  |
+     *
      * @Then it must contains next values:
      */
     public function itMustContainsNextValues(TableNode $table)

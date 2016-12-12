@@ -41,15 +41,15 @@ define(function(require) {
             },
             icons: {
                 new: {
-                    html: '<i class="icon-folder-close-alt"></i>',
+                    html: '<i class="fa-folder-o"></i>',
                     event: 'expandChildItems'
                 },
                 edited: {
-                    html: '<i class="icon-folder-close"></i>',
+                    html: '<i class="fa-folder"></i>',
                     event: 'expandChildItems'
                 },
                 save: {
-                    html: '<i class="icon-folder-open"></i>',
+                    html: '<i class="fa-folder-open"></i>',
                     event: 'collapseChildItems'
                 }
             }

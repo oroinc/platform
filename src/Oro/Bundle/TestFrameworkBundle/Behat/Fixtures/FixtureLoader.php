@@ -7,8 +7,10 @@ use Behat\Testwork\Suite\Suite;
 use Doctrine\ORM\EntityManager;
 use Oro\Bundle\TestFrameworkBundle\Behat\Element\SuiteAwareInterface;
 use Oro\Bundle\TestFrameworkBundle\Behat\Fixtures\OroAliceLoader as AliceLoader;
-use Nelmio\Alice\Persister\Doctrine as AliceDoctrine;
+use Oro\Bundle\TestFrameworkBundle\Behat\Isolation\DbalMessageQueueIsolator;
+use Oro\Bundle\TestFrameworkBundle\Behat\Isolation\DoctrineIsolator;
 use Oro\Bundle\EntityBundle\ORM\Registry;
+use Symfony\Component\HttpKernel\KernelInterface;
 
 class FixtureLoader implements SuiteAwareInterface
 {
@@ -18,14 +20,9 @@ class FixtureLoader implements SuiteAwareInterface
     protected $aliceLoader;
 
     /**
-     * @var EntityManager
+     * @var KernelInterface
      */
-    protected $em;
-
-    /**
-     * @var AliceDoctrine
-     */
-    protected $persister;
+    protected $kernel;
 
     /**
      * @var string
@@ -54,13 +51,12 @@ class FixtureLoader implements SuiteAwareInterface
      * @param OroAliceLoader $aliceLoader
      */
     public function __construct(
-        Registry $registry,
+        KernelInterface $kernel,
         EntityClassResolver $entityClassResolver,
         EntitySupplement $entitySupplement,
         OroAliceLoader $aliceLoader
     ) {
-        $this->em = $registry->getManager();
-        $this->persister = new AliceDoctrine($this->em);
+        $this->kernel = $kernel;
         $this->fallbackPath = str_replace('/', DIRECTORY_SEPARATOR, __DIR__.'/../../Tests/Behat');
         $this->aliceLoader = $aliceLoader;
         $this->entityClassResolver = $entityClassResolver;
@@ -73,8 +69,17 @@ class FixtureLoader implements SuiteAwareInterface
      */
     public function loadFixtureFile($filename)
     {
-        $file = $this->findFile($filename);
+        $file = DoctrineIsolator::findFile($filename, $this->suite);
 
+        $objects = $this->load($file);
+        $this->persist($objects);
+    }
+
+    /**
+     * @param string $file Full path to yml file with fixture
+     */
+    public function loadFile($file)
+    {
         $objects = $this->load($file);
         $this->persist($objects);
     }
@@ -86,6 +91,7 @@ class FixtureLoader implements SuiteAwareInterface
     public function loadTable($entityName, TableNode $table)
     {
         $className = $this->getEntityClass($entityName);
+        $em = $this->getEntityManager();
 
         $rows = $table->getRows();
         $headers = array_shift($rows);
@@ -102,10 +108,11 @@ class FixtureLoader implements SuiteAwareInterface
             $values = array_combine($headers, $row);
             $object = $this->getObjectFromArray($className, $values);
 
-            $this->em->persist($object);
+            $em->persist($object);
         }
 
-        $this->em->flush();
+        $em->flush();
+        DbalMessageQueueIsolator::waitForMessageQueue($em->getConnection());
     }
 
     /**
@@ -135,6 +142,7 @@ class FixtureLoader implements SuiteAwareInterface
     public function loadRandomEntities($entityName, $numberOfEntities)
     {
         $className = $this->getEntityClass($entityName);
+        $em = $this->getEntityManager();
         $entities = [];
 
         for ($i = 0; $i < $numberOfEntities; $i++) {
@@ -144,10 +152,11 @@ class FixtureLoader implements SuiteAwareInterface
 
             $this->entitySupplement->completeRequired($entity);
 
-            $this->em->persist($entity);
+            $em->persist($entity);
         }
 
-        $this->em->flush();
+        $em->flush();
+        DbalMessageQueueIsolator::waitForMessageQueue($em->getConnection());
 
         return $entities;
     }
@@ -158,7 +167,12 @@ class FixtureLoader implements SuiteAwareInterface
      */
     public function load($dataOrFilename)
     {
-        return $this->aliceLoader->load($dataOrFilename);
+        $doctrine = $this->kernel->getContainer()->get('doctrine');
+        $this->aliceLoader->setDoctrine($doctrine);
+        $result = $this->aliceLoader->load($dataOrFilename);
+        DbalMessageQueueIsolator::waitForMessageQueue($doctrine->getManager()->getConnection());
+
+        return $result;
     }
 
     /**
@@ -175,7 +189,14 @@ class FixtureLoader implements SuiteAwareInterface
      */
     public function persist(array $objects)
     {
-        $this->persister->persist($objects);
+        $em = $this->getEntityManager();
+
+        foreach ($objects as $object) {
+            $em->persist($object);
+        }
+
+        $em->flush();
+        DbalMessageQueueIsolator::waitForMessageQueue($em->getConnection());
     }
 
     /**
@@ -184,6 +205,14 @@ class FixtureLoader implements SuiteAwareInterface
     public function setSuite(Suite $suite)
     {
         $this->suite = $suite;
+    }
+
+    /**
+     * @return EntityManager
+     */
+    protected function getEntityManager()
+    {
+        return $this->kernel->getContainer()->get('doctrine')->getManager();
     }
 
     /**
@@ -200,46 +229,5 @@ class FixtureLoader implements SuiteAwareInterface
                 $entityReference => $values
             ]
         ];
-    }
-
-    /**
-     * @param string $filename
-     * @return string Real path to file with fuxtures
-     * @throws \InvalidArgumentException
-     */
-    protected function findFile($filename)
-    {
-        $suitePaths = $this->suite->getSetting('paths');
-
-        if (!$file = $this->findFileInPath($filename, $suitePaths)) {
-            $file = $this->findFileInPath($filename, [$this->fallbackPath]);
-        }
-
-        if (!$file) {
-            throw new \InvalidArgumentException(sprintf(
-                'Can\'t find "%s" in pahts %s',
-                $filename,
-                implode(', ', array_merge($suitePaths, [$this->fallbackPath]))
-            ));
-        }
-
-        return $file;
-    }
-
-    /**
-     * @param string $filename
-     * @param array $paths
-     * @return string|null
-     */
-    private function findFileInPath($filename, array $paths)
-    {
-        foreach ($paths as $path) {
-            $file = $path.DIRECTORY_SEPARATOR.'Fixtures'.DIRECTORY_SEPARATOR.$filename;
-            if (is_file($file)) {
-                return $file;
-            }
-        }
-
-        return null;
     }
 }

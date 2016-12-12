@@ -1,10 +1,10 @@
 system_configuration:
     groups:
         user_settings:
-            icon:  icon-key
+            icon:  fa-key
             title: oro.user.system_configuration.groups.user_settings.title
         password_complexity_rules:
-            icon:  icon-usd
+            icon:  fa-usd
             title: oro.user.system_configuration.groups.password_complexity_rules.title
 
     fields:

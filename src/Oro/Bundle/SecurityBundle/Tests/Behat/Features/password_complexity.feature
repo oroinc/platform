@@ -1,3 +1,4 @@
+@not-automated
 Feature: Password complexity feature
   In order to increase safety of users
   As Administrator

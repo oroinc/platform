@@ -5,7 +5,7 @@
 {% block page_container %}
     {{ oro_widget_render({
         'widgetType': 'block',
-        'url': path('oro_email_thread_widget', {'id': entity.id}),
+        'url': path('oro_email_thread_widget', {'id': entity.id, 'showSingleEmail': not oro_config_value('oro_activity_list.grouping')}),
         'alias': 'thread-view'
     }) }}
 {% endblock %}

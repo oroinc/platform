@@ -4,6 +4,8 @@ namespace Oro\Bundle\LayoutBundle\Assetic;
 
 use Assetic\Factory\Resource\ResourceInterface;
 
+use Psr\Log\LoggerInterface;
+
 use Symfony\Component\Filesystem\Filesystem;
 
 use Oro\Component\Layout\Extension\Theme\Model\Theme;
@@ -23,6 +25,12 @@ class LayoutResource implements ResourceInterface
     /** @var string */
     protected $outputDir;
 
+    /** @var array */
+    protected $mtimeOutputs = [];
+
+    /** @var LoggerInterface */
+    private $logger;
+
     /**
      * @param ThemeManager $themeManager
      * @param Filesystem $filesystem
@@ -39,11 +47,32 @@ class LayoutResource implements ResourceInterface
     }
 
     /**
+     * @param LoggerInterface $logger
+     *
+     * @return LayoutResource
+     */
+    public function setLogger(LoggerInterface $logger)
+    {
+        $this->logger = $logger;
+
+        return $this;
+    }
+
+    /**
      * @inheritdoc
      */
     public function isFresh($timestamp)
     {
-        return true;
+        $maxLastModified = 0;
+
+        foreach ($this->themeManager->getAllThemes() as $theme) {
+            $assets = $this->collectThemeAssets($theme);
+            foreach ($assets as $assetKey => $asset) {
+                $maxLastModified = max($maxLastModified, $this->getLastModified($asset['inputs']));
+            }
+        }
+
+        return $maxLastModified > $timestamp;
     }
 
     /**
@@ -161,17 +190,43 @@ class LayoutResource implements ResourceInterface
         }
         $inputs = array_merge($settingsInputs, $variablesInputs, $restInputs);
 
-        $inputsContent = '';
-        foreach ($inputs as $input) {
-            $inputsContent .= '@import "../'.$input.'"'.";\n";
-        }
-
         $file = realpath($this->outputDir) . '/' . $output . '.'. $extension;
-        $this->filesystem->mkdir(dirname($file), 0777);
-        if (false === @file_put_contents($file, $inputsContent)) {
-            throw new \RuntimeException('Unable to write file ' . $file);
+
+        $mtime = $this->getLastModified($inputs);
+        if (!array_key_exists($file, $this->mtimeOutputs) || $this->mtimeOutputs[$file] < $mtime) {
+            $inputsContent = '';
+            foreach ($inputs as $input) {
+                $inputsContent .= '@import "../' . $input . '"' . ";\n";
+            }
+
+            $this->filesystem->mkdir(dirname($file), 0777);
+            if (false === @file_put_contents($file, $inputsContent)) {
+                throw new \RuntimeException('Unable to write file ' . $file);
+            }
+
+            $this->mtimeOutputs[$file] = $mtime;
         }
 
         return $file;
+    }
+
+    /**
+     * @param array  $inputs
+     *
+     * @return int|mixed
+     */
+    private function getLastModified(array $inputs)
+    {
+        $mtime = 0;
+        foreach ($inputs as $input) {
+            $file = realpath($this->outputDir) . '/' . $input;
+            if (file_exists($file)) {
+                $mtime = max($mtime, filemtime($file));
+            } else {
+                $this->logger->debug(sprintf('Could not find file %s, declared in assets.yml.', $input));
+            }
+        }
+
+        return $mtime;
     }
 }

@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\SyncBundle\DependencyInjection\Compiler;
 
-use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 class SkipTagTrackingPass implements CompilerPassInterface
 {
@@ -22,7 +22,6 @@ class SkipTagTrackingPass implements CompilerPassInterface
         'Oro\Bundle\SearchBundle\Entity\IndexDatetime',
         'Akeneo\Bundle\BatchBundle\Entity\JobExecution',
         'Akeneo\Bundle\BatchBundle\Entity\StepExecution',
-        'JMS\JobQueueBundle\Entity\Job'
     ];
 
     /**
