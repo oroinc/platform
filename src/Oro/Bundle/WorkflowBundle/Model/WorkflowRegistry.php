@@ -102,7 +102,9 @@ class WorkflowRegistry
 
         $activeWorkflowDefinitions = $this->getEntityRepository()->findActiveForRelatedEntity($class);
 
-        $items = $this->processDefinitionFilters(new ArrayCollection($activeWorkflowDefinitions));
+        $items = $this->processDefinitionFilters(
+            $this->getNamedDefinitionsCollection($activeWorkflowDefinitions)
+        );
 
         return !$items->isEmpty();
     }
@@ -112,23 +114,15 @@ class WorkflowRegistry
      *
      * @param string $entityClass
      * @return Workflow[]|Collection Named collection of active Workflow instances
-     *                                    with structure: ['workflowName' => Workflow $worfklowInstance]
+     *                               with structure: ['workflowName' => Workflow $workflowInstance]
      */
     public function getActiveWorkflowsByEntityClass($entityClass)
     {
         $class = ClassUtils::getRealClass($entityClass);
 
-        $definitions = $this->getNamedDefinitionsCollection(
+        return $this->getAssembledWorkflows(
             $this->getEntityRepository()->findActiveForRelatedEntity($class)
         );
-
-        $workflows = $this->processDefinitionFilters($definitions)->map(
-            function (WorkflowDefinition $workflowDefinition) {
-                return $this->getAssembledWorkflow($workflowDefinition);
-            }
-        );
-
-        return $workflows;
     }
 
     /**
@@ -140,10 +134,9 @@ class WorkflowRegistry
     public function getActiveWorkflowsByActiveGroups(array $groupNames)
     {
         $groupNames = array_map('strtolower', $groupNames);
-        $definitions = $this->getNamedDefinitionsCollection($this->getEntityRepository()->findBy(['active' => true]));
 
-        $definitions = $this->processDefinitionFilters(
-            $definitions,
+        $definitions = array_filter(
+            $this->getEntityRepository()->findActive(),
             function (WorkflowDefinition $definition) use ($groupNames) {
                 $exclusiveActiveGroups = $definition->getExclusiveActiveGroups();
 
@@ -151,22 +144,45 @@ class WorkflowRegistry
             }
         );
 
-        return $definitions->map(
-            function ($definition) {
-                return $this->getAssembledWorkflow($definition);
-            }
-        );
+        return $this->getAssembledWorkflows($definitions);
+    }
+
+    /**
+     * Returns named collection of active Workflow instances with structure:
+     *      ['workflowName' => Workflow $workflowInstance]
+     *
+     * @return Workflow[]|ArrayCollection
+     */
+    public function getActiveWorkflows()
+    {
+        return $this->getAssembledWorkflows($this->getEntityRepository()->findActive());
+    }
+
+    /**
+     * @param WorkflowDefinition[] $definitions
+     *
+     * @return ArrayCollection
+     */
+    private function getAssembledWorkflows(array $definitions)
+    {
+        $definitions = $this->getNamedDefinitionsCollection($definitions);
+
+        return $this->processDefinitionFilters($definitions)
+            ->map(
+                function (WorkflowDefinition $workflowDefinition) {
+                    return $this->getAssembledWorkflow($workflowDefinition);
+                }
+            );
     }
 
     /**
      * @param Collection|WorkflowDefinition[] $workflowDefinitions
-     * @param callable $customFilter
      * @return Collection|WorkflowDefinition[]
      */
-    private function processDefinitionFilters(Collection $workflowDefinitions, callable $customFilter = null)
+    private function processDefinitionFilters(Collection $workflowDefinitions)
     {
-        if ($customFilter) {
-            $workflowDefinitions = $workflowDefinitions->filter($customFilter);
+        if ($workflowDefinitions->isEmpty()) {
+            return $workflowDefinitions;
         }
 
         foreach ($this->definitionFilters as $definitionFilter) {

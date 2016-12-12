@@ -1,13 +1,11 @@
-parameters:
-    oro_action.twig.extension.operation.class: Oro\Bundle\ActionBundle\Twig\OperationExtension
-
 services:
     oro_action.twig.extension.operation:
-        class: %oro_action.twig.extension.operation.class%
+        class: 'Oro\Bundle\ActionBundle\Twig\OperationExtension'
         arguments:
-            - '@oro_action.operation_manager'
-            - '@oro_action.helper.applications'
+            - '@oro_action.provider.route'
             - '@oro_action.helper.context'
             - '@oro_action.helper.options'
+            - '@oro_action.provider.button'
+            - '@oro_action.provider.button_search_context'
         tags:
             - { name: twig.extension }

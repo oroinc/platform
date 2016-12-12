@@ -2,3 +2,4 @@ assets:
     css:
       'oroworkflow':
           - 'bundles/oroworkflow/css/less/workflow.less'
+          - 'bundles/oroworkflow/css/less/permissions-grid.less'

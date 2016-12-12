@@ -17,3 +17,8 @@ services:
               - '@assetic.asset_factory'
           tags:
               - { name: twig.extension }
+
+    oro_assetic.decorating_filter.scssphp:
+        class: Oro\Bundle\AsseticBundle\Assetic\Filter\ScssphpFilterDecorator
+        decorates: assetic.filter.scssphp
+        arguments: ['@oro_assetic.decorating_filter.scssphp.inner']

@@ -408,12 +408,4 @@ class UserTest extends AbstractUserTest
             ]
         ];
     }
-
-    public function testLoginDisabled()
-    {
-        $user = $this->getUser();
-        $this->assertNotTrue($user->isLoginDisabled());
-        $user->setLoginDisabled(true);
-        $this->assertTrue($user->isLoginDisabled());
-    }
 }
