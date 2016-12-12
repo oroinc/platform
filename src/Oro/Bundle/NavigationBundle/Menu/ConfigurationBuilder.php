@@ -69,7 +69,7 @@ class ConfigurationBuilder implements BuilderInterface
 
                     $defaultArea = ConfigurationBuilder::DEFAULT_SCOPE_TYPE;
                     $this->setExtraFromConfig($menu, $menuTreeElement, 'type');
-                    $this->setExtraFromConfig($menu, $menuTreeElement, 'area', $defaultArea);
+                    $this->setExtraFromConfig($menu, $menuTreeElement, 'scope_type', $defaultArea);
                     $this->setExtraFromConfig($menu, $menuTreeElement, 'read_only', false);
                     $this->setExtraFromConfig($menu, $menuTreeElement, 'max_nesting_level', 0);
 

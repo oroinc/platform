@@ -58,7 +58,7 @@ class MenuUpdateBuilderTest extends \PHPUnit_Framework_TestCase
         $menuUpdate->setCustom(true);
 
         $menu = $this->getMenu();
-        $menu->setExtra('area', 'menu_default_visibility');
+        $menu->setExtra('scope_type', 'menu_default_visibility');
 
         $this->scopeManager
             ->expects($this->once())
@@ -81,7 +81,7 @@ class MenuUpdateBuilderTest extends \PHPUnit_Framework_TestCase
         $this->builder->build($menu);
 
         $result = $this->getMenu();
-        $result->setExtra('area', 'menu_default_visibility');
+        $result->setExtra('scope_type', 'menu_default_visibility');
         $child = $result->getChild('item-1')
             ->getChild('item-1-1')
             ->getChild('item-1-1-1');
@@ -99,7 +99,7 @@ class MenuUpdateBuilderTest extends \PHPUnit_Framework_TestCase
         $menuUpdate->setParentKey('item-1-1-1');
 
         $menu = $this->getMenu();
-        $menu->setExtra('area', 'menu_default_visibility');
+        $menu->setExtra('scope_type', 'menu_default_visibility');
 
         $this->scopeManager
             ->expects($this->once())
@@ -122,7 +122,7 @@ class MenuUpdateBuilderTest extends \PHPUnit_Framework_TestCase
         $this->builder->build($menu);
 
         $result = $this->getMenu();
-        $result->setExtra('area', 'menu_default_visibility');
+        $result->setExtra('scope_type', 'menu_default_visibility');
 
         $this->assertEquals($result, $menu);
     }
@@ -140,7 +140,7 @@ class MenuUpdateBuilderTest extends \PHPUnit_Framework_TestCase
         $menuUpdate->setCustom(true);
 
         $menu = $this->getMenu();
-        $menu->setExtra('area', 'menu_default_visibility');
+        $menu->setExtra('scope_type', 'menu_default_visibility');
         $menu->setExtra('max_nesting_level', 3);
 
         $this->scopeManager
