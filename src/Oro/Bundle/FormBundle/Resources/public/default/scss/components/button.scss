@@ -51,8 +51,8 @@
         }
     }
 
-    &-primary,
-    &---primary{
+    &.btn-primary,
+    &--primary {
         border-color: get-color('additional', 'middle') ;
         background-color: get-color('additional', 'middle');
         color: get-color('additional', 'ultra');
