@@ -224,8 +224,8 @@ interface AclExtensionInterface
     /**
      * Gets list of available access levels for given object.
      *
-     * @param object      $object
-     * @param string|null $permissionName
+     * @param object|string $object
+     * @param string|null   $permissionName
      *
      * @return array [access level code => access level name, ...]
      */

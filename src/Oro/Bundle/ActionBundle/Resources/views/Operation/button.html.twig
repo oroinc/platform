@@ -8,7 +8,13 @@
         entityId: buttonContext.entityId,
         route: buttonContext.routeName
     } %}
-    {% set options = oro_action_frontend_options(operation, context) %}
+
+    {% if actionData is defined %}
+        {% set options = oro_action_frontend_options(operation, context, actionData) %}
+    {% else %}
+        {% set options = oro_action_frontend_options(operation, context) %}
+    {% endif %}
+
     {% if not onlyLink|default(false) %}<div class="pull-left btn-group icons-holder">{% endif %}
         {% block link %}
             <a {% if (params.id is defined) %}id="{{ params.id }}"{% endif %}
