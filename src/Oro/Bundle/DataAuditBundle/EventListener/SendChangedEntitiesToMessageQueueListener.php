@@ -167,6 +167,14 @@ class SendChangedEntitiesToMessageQueueListener implements OptionalListenerInter
             $body['entities_updated'] = $this->processUpdates($em);
             $body['entities_deleted'] = $this->processDeletions($em);
             $body['collections_updated'] = $this->processCollectionUpdates($em);
+            if (
+                empty($body['entities_inserted']) &&
+                empty($body['entities_updated']) &&
+                empty($body['entities_deleted']) &&
+                empty($body['collections_updated'])
+            ) {
+                return;
+            }
 
             $message = new Message();
             $message->setPriority(MessagePriority::VERY_LOW);
@@ -197,7 +205,14 @@ class SendChangedEntitiesToMessageQueueListener implements OptionalListenerInter
             $insertions[$entity] = $uow->getEntityChangeSet($entity);
         }
 
-        $this->allInsertions[$em] = $insertions;
+// it made for issue with ImportExportTagsSubscriber::postFlush (in this method run flush)
+        if (! $this->allInsertions->contains($em)) {
+            $this->allInsertions[$em] = $insertions;
+        } else {
+            $previousInsertionsInCurrentTransaction = $this->allInsertions->offsetGet($em);
+            $insertions->addAll($previousInsertionsInCurrentTransaction);
+            $this->allInsertions[$em] = $insertions;
+        }
     }
 
     /**
@@ -216,7 +231,13 @@ class SendChangedEntitiesToMessageQueueListener implements OptionalListenerInter
             $updates[$entity] = $uow->getEntityChangeSet($entity);
         }
 
-        $this->allUpdates[$em] = $updates;
+        if (! $this->allUpdates->contains($em)) {
+            $this->allUpdates[$em] = $updates;
+        } else {
+            $previousUpdatesInCurrentTransaction = $this->allUpdates->offsetGet($em);
+            $updates->addAll($previousUpdatesInCurrentTransaction);
+            $this->allUpdates[$em] = $updates;
+        }
     }
 
     /**
@@ -252,7 +273,13 @@ class SendChangedEntitiesToMessageQueueListener implements OptionalListenerInter
             $deletions[$entity] = $this->convertEntityToArray($em, $entity, $changeSet);
         }
 
-        $this->allDeletions[$em] = $deletions;
+        if (! $this->allDeletions->contains($em)) {
+            $this->allDeletions[$em] = $deletions;
+        } else {
+            $previousDeletionsInCurrentTransaction = $this->allDeletions->offsetGet($em);
+            $deletions->addAll($previousDeletionsInCurrentTransaction);
+            $this->allDeletions[$em] = $deletions;
+        }
     }
 
     /**
@@ -280,7 +307,14 @@ class SendChangedEntitiesToMessageQueueListener implements OptionalListenerInter
                 'deleteDiff' => $deleteDiff,
             ];
         }
-        $this->allCollectionUpdates[$em] = $collectionUpdates;
+
+        if (! $this->allCollectionUpdates->contains($em)) {
+            $this->allCollectionUpdates[$em] = $collectionUpdates;
+        } else {
+            $previousCollectionUpdatesInCurrentTransaction = $this->allCollectionUpdates->offsetGet($em);
+            $collectionUpdates->addAll($previousCollectionUpdatesInCurrentTransaction);
+            $this->allCollectionUpdates[$em] = $collectionUpdates;
+        }
     }
 
     /**
