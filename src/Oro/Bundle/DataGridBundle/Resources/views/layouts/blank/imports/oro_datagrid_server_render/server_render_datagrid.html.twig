@@ -2,8 +2,24 @@
     {% set datagrid = oro_datagrid_build(grid_name, grid_parameters) %}
 
     {% set gridId = oro_datagrid_generate_element_id(datagrid) %}
+
+    {% set grid_render_parameters = grid_render_parameters|merge({'themeOptions': themeOptions|merge({
+        'headerHide': true,
+        'currentRowView': current_row_view,
+        'bodyClassName': 'grid-body products__list products__list_' ~ current_row_view,
+        'rowClassName': 'grid-row product-item product-item_' ~ current_row_view ~ compact_view,
+            'rowAttributes': {
+            'data-layout-model': 'productModel'
+        }
+    })}) %}
+
     {% set renderParams = grid_render_parameters %}
+
     {% set themeOptions = renderParams.themeOptions %}
+
+    {% set themeOptions = themeOptions|merge({
+        serverRendered: true
+    })%}
 
     {% set attr = attr|merge({
         id: gridId
@@ -49,7 +65,7 @@
         enableViews: renderParams.enableViews is defined ? renderParams.enableViews : enableFilters,
         showViewsInNavbar: renderParams.showViewsInNavbar is defined ? renderParams.showViewsInNavbar : false,
         inputName: oro_datagrid_build_inputname(datagrid.name),
-        themeOptions: renderParams.themeOptions|default({}),
+        themeOptions: themeOptions|default({}),
         toolbarOptions: renderParams.toolbarOptions|default({})
     } %}
 
@@ -157,7 +173,8 @@
 
 {% block __oro_datagrid_server_render__datagrid_row_widget %}
     {% set attr = attr|merge({
-        class: attr.class|default('') ~ " grid-row"
+        class: attr.class|default('') ~ " grid-row",
+        'data-row-id': datagrid_row.id
     }) %}
 
     <div{{ block('block_attributes') }}>

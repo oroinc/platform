@@ -117,6 +117,7 @@ define(function(require) {
                         self.$el.show();
                         self.grid.shown = true;
                         self.grid.trigger('shown');
+                        options.themeOptions.serverRendered = false;
                     });
                 });
             }, this));
@@ -147,12 +148,22 @@ define(function(require) {
          * @param {Object} options
          */
         initDataGrid: function(options) {
-            this.$el = $('<div>');
             this.$componentEl = options.$el;
-            this.$componentEl.append(this.$el);
+
+            if (options.themeOptions.serverRendered) {
+                this.$el = options.$el.find('.oro-datagrid');
+            } else {
+                this.$el = $('<div>');
+                this.$el.hide();
+                this.$componentEl.append(this.$el);
+            }
+
             this.gridName = options.gridName;
             this.inputName = options.inputName;
             this.data = options.data;
+            //this.views = $({}, {
+            //    grid: Grid;
+            //}, options.views)
             this.metadata = _.defaults(options.metadata, {
                 columns: [],
                 options: {},
@@ -229,7 +240,6 @@ define(function(require) {
             var options = this.combineGridOptions();
             mediator.trigger('datagrid_create_before', options, collection);
 
-            this.$el.hide();
             options.el = this.$el[0];
 
             options.themeOptionsConfigurator(GridConstructor, options);
