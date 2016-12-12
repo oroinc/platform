@@ -15,11 +15,11 @@ class LoadAppearanceTypes extends AbstractFixture
     protected $data = [
         'grid'  => [
             'label' => 'oro.datagrid.appearance.grid',
-            'icon'  => 'icon-table'
+            'icon'  => 'fa-table'
         ],
         'board'  => [
             'label' => 'oro.datagrid.appearance.board',
-            'icon'  => 'icon-th'
+            'icon'  => 'fa-th'
         ],
     ];
 

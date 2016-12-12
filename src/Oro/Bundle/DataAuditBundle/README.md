@@ -30,7 +30,7 @@ use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
  *      routeView="acme_product_view",  # optional
  *      defaultValues={
  *          "entity"={ # entity configuration scope 'entity'
- *              "icon"="icon-product" # default icon class which will be used
+ *              "icon"="fa-product" # default icon class which will be used
  *                                    # can be changed via UI
  *          },
  *          "dataaudit"={ # entity configuration scope 'dataaudit'

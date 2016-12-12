@@ -9,36 +9,30 @@ use Oro\Bundle\SearchBundle\Provider\AbstractSearchMappingProvider;
  */
 abstract class AbstractSearchMappingProviderTest extends \PHPUnit_Framework_TestCase
 {
-    /** @var AbstractSearchMappingProvider */
-    protected $provider;
-
     /** @var array */
     protected $testMapping = [
         'Oro\TestBundle\Entity\TestEntity' => [
             'alias'  => 'test_entity',
             'fields' => [
-                'name'           => 'firstname',
-                'target_type'    => 'text',
-                'target_columns' => ['firstname']
+                [
+                    'name' => 'firstname',
+                    'target_type' => 'text',
+                    'target_columns' => ['firstname']
+                ],
+                [
+                    'name' => 'qty',
+                    'target_type' => 'integer',
+                    'target_columns' => ['qty']
+                ]
             ]
         ]
     ];
-
-    protected function setUp()
-    {
-        $this->provider = $this->getProvider();
-    }
-
-    protected function tearDown()
-    {
-        unset($this->provider);
-    }
 
     public function testGetEntitiesListAliases()
     {
         $this->assertEquals(
             ['Oro\TestBundle\Entity\TestEntity' => 'test_entity'],
-            $this->provider->getEntitiesListAliases()
+            $this->getProvider()->getEntitiesListAliases()
         );
     }
 
@@ -46,7 +40,7 @@ abstract class AbstractSearchMappingProviderTest extends \PHPUnit_Framework_Test
     {
         $this->assertEquals(
             ['Oro\TestBundle\Entity\TestEntity' => 'test_entity'],
-            $this->provider->getEntityAliases(['Oro\TestBundle\Entity\TestEntity'])
+            $this->getProvider()->getEntityAliases(['Oro\TestBundle\Entity\TestEntity'])
         );
     }
 
@@ -56,7 +50,7 @@ abstract class AbstractSearchMappingProviderTest extends \PHPUnit_Framework_Test
      */
     public function testGetEntityAliasesForUnknownEntity()
     {
-        $this->provider->getEntityAliases(
+        $this->getProvider()->getEntityAliases(
             ['Oro\TestBundle\Entity\TestEntity', 'Oro\TestBundle\Entity\UnknownEntity']
         );
     }
@@ -65,7 +59,7 @@ abstract class AbstractSearchMappingProviderTest extends \PHPUnit_Framework_Test
     {
         $this->assertEquals(
             ['Oro\TestBundle\Entity\TestEntity' => 'test_entity'],
-            $this->provider->getEntityAliases()
+            $this->getProvider()->getEntityAliases()
         );
     }
 
@@ -73,14 +67,14 @@ abstract class AbstractSearchMappingProviderTest extends \PHPUnit_Framework_Test
     {
         $this->assertEquals(
             'test_entity',
-            $this->provider->getEntityAlias('Oro\TestBundle\Entity\TestEntity')
+            $this->getProvider()->getEntityAlias('Oro\TestBundle\Entity\TestEntity')
         );
     }
 
     public function testGetEntityAliasForUnknownEntity()
     {
         $this->assertNull(
-            $this->provider->getEntityAlias('Oro\TestBundle\Entity\UnknownEntity')
+            $this->getProvider()->getEntityAlias('Oro\TestBundle\Entity\UnknownEntity')
         );
     }
 
@@ -88,30 +82,30 @@ abstract class AbstractSearchMappingProviderTest extends \PHPUnit_Framework_Test
     {
         $this->assertEquals(
             ['Oro\TestBundle\Entity\TestEntity'],
-            $this->provider->getEntityClasses()
+            $this->getProvider()->getEntityClasses()
         );
     }
 
     public function testIsClassSupported()
     {
-        $this->assertTrue($this->provider->isClassSupported('Oro\TestBundle\Entity\TestEntity'));
-        $this->assertFalse($this->provider->isClassSupported('Oro\TestBundle\Entity\BadEntity'));
+        $this->assertTrue($this->getProvider()->isClassSupported('Oro\TestBundle\Entity\TestEntity'));
+        $this->assertFalse($this->getProvider()->isClassSupported('Oro\TestBundle\Entity\BadEntity'));
     }
 
     public function testHasFieldsMapping()
     {
-        $this->assertTrue($this->provider->hasFieldsMapping('Oro\TestBundle\Entity\TestEntity'));
-        $this->assertFalse($this->provider->hasFieldsMapping('Oro\TestBundle\Entity\BadEntity'));
+        $this->assertTrue($this->getProvider()->hasFieldsMapping('Oro\TestBundle\Entity\TestEntity'));
+        $this->assertFalse($this->getProvider()->hasFieldsMapping('Oro\TestBundle\Entity\BadEntity'));
     }
 
     public function testGetEntityMapParameter()
     {
         $this->assertEquals(
             'test_entity',
-            $this->provider->getEntityMapParameter('Oro\TestBundle\Entity\TestEntity', 'alias')
+            $this->getProvider()->getEntityMapParameter('Oro\TestBundle\Entity\TestEntity', 'alias')
         );
         $this->assertFalse(
-            $this->provider->getEntityMapParameter('Oro\TestBundle\Entity\TestEntity', 'badParameter', false)
+            $this->getProvider()->getEntityMapParameter('Oro\TestBundle\Entity\TestEntity', 'badParameter', false)
         );
     }
 
@@ -119,14 +113,14 @@ abstract class AbstractSearchMappingProviderTest extends \PHPUnit_Framework_Test
     {
         $this->assertEquals(
             'Oro\TestBundle\Entity\TestEntity',
-            $this->provider->getEntityClass('test_entity')
+            $this->getProvider()->getEntityClass('test_entity')
         );
     }
 
     public function testGetEntityClassForUnknownAlias()
     {
         $this->assertNull(
-            $this->provider->getEntityClass('unknown_entity')
+            $this->getProvider()->getEntityClass('unknown_entity')
         );
     }
 

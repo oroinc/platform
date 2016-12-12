@@ -32,7 +32,7 @@ datagrids:
                 type: navigate
                 label: oro.grid.action.view
                 link: view_link
-                icon: eye-open
+                icon: eye
                 acl_resource: oro_locale_localization_view
                 row_action: true
 
@@ -167,3 +167,8 @@ datagrids:
         sorters:
             default:
                 name: %oro_datagrid.extension.orm_sorter.class%::DIRECTION_ASC
+
+    oro-locale-localizations-select-grid:
+        extends: oro-locale-localizations-grid
+        options:
+            entity_pagination: false

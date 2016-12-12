@@ -12,6 +12,9 @@ use Oro\Bundle\WorkflowBundle\Model\Workflow;
 use Oro\Bundle\WorkflowBundle\Tests\Functional\DataFixtures\LoadTestActivitiesForScopes;
 use Oro\Bundle\WorkflowBundle\Tests\Functional\WorkflowTestCase;
 
+/**
+ * @dbIsolation
+ */
 class WorkflowDefinitionScopesRegistryFilterTest extends WorkflowTestCase
 {
     const WORKFLOW_SCOPES_CONFIG_DIR = '/Tests/Functional/DataFixtures/WithScopesAndWithout';

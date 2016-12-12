@@ -130,8 +130,8 @@ class LocaleListener implements EventSubscriberInterface
     public static function getSubscribedEvents()
     {
         return [
-            // must be registered after authentication
-            KernelEvents::REQUEST  => [['onKernelRequest', 7]],
+            // must be registered after authentication and before routing
+            KernelEvents::REQUEST  => [['onKernelRequest', 40]],
             ConsoleEvents::COMMAND => [['onConsoleCommand']],
         ];
     }

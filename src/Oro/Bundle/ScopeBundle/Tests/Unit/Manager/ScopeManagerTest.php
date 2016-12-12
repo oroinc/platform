@@ -158,6 +158,36 @@ class ScopeManagerTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($scopes, $this->manager->findRelatedScopes('test'));
     }
 
+    public function testFindRelatedScopeIdsWithPriority()
+    {
+        $this->entityFieldProvider->method('getRelations')->willReturn(
+            [
+                ['name' => 'fieldName'],
+                ['name' => 'fieldName2'],
+            ]
+        );
+        /** @var ScopeCriteriaProviderInterface|\PHPUnit_Framework_MockObject_MockObject $provider */
+        $provider = $this->getMock(ScopeCriteriaProviderInterface::class);
+        $provider->method('getCriteriaByContext')
+            ->willReturn([]);
+        $provider->method('getCriteriaForCurrentScope')->willReturn(['fieldName' => 1]);
+        $this->manager->addProvider('test', $provider);
+        $repository = $this->getMockBuilder(ScopeRepository::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+        $scopes = [new Scope()];
+        $repository->expects($this->once())
+            ->method('findIdentifiersByCriteriaWithPriority')
+            ->with(new ScopeCriteria(['fieldName' => 1, 'fieldName2' => null]))
+            ->willReturn($scopes);
+
+        $em = $this->getMock(EntityManagerInterface::class);
+        $em->method('getRepository')->willReturn($repository);
+
+        $this->registry->method('getManagerForClass')->willReturn($em);
+        $this->assertSame($scopes, $this->manager->findRelatedScopeIdsWithPriority('test'));
+    }
+
     public function testFindOrCreate()
     {
         $scope = new Scope();
@@ -180,6 +210,40 @@ class ScopeManagerTest extends \PHPUnit_Framework_TestCase
 
         $this->manager->addProvider('testScope', $provider);
         $actualScope = $this->manager->findOrCreate('testScope');
+        $this->assertEquals($scope, $actualScope);
+    }
+
+    public function testFindOrCreateWithoutFlush()
+    {
+        $scope = new Scope();
+        $provider = $this->getMock(ScopeCriteriaProviderInterface::class);
+        $provider->expects($this->once())
+            ->method('getCriteriaForCurrentScope')->willReturn([]);
+
+        $repository = $this->getMockBuilder(ScopeRepository::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+        $repository->expects($this->once())
+            ->method('findOneByCriteria')
+            ->willReturn(null);
+
+        $em = $this->getMock(EntityManagerInterface::class);
+        $em->expects($this->once())
+            ->method('getRepository')
+            ->willReturn($repository);
+        $em->expects($this->once())->method('persist')->with($scope);
+        $em->expects($this->never())->method('flush');
+
+        $this->registry->expects($this->exactly(2))
+            ->method('getManagerForClass')
+            ->willReturn($em);
+
+        $this->entityFieldProvider->expects($this->once())
+            ->method('getRelations')
+            ->willReturn([]);
+
+        $this->manager->addProvider('testScope', $provider);
+        $actualScope = $this->manager->findOrCreate('testScope', null, false);
         $this->assertEquals($scope, $actualScope);
     }
 

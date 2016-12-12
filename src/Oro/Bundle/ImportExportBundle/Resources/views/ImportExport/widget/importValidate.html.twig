@@ -115,7 +115,7 @@
     </div>
 
     {% if errors|length > 0 %}
-    <a href="javascript: void(0)" class="error-toggle error-toggle-head"><i class="icon-chevron-right"></i>{{ 'oro.importexport.import.errors_found'|trans({'%errors%': errors|length}) }}</a>
+    <a href="javascript: void(0)" class="error-toggle error-toggle-head"><i class="fa-chevron-right"></i>{{ 'oro.importexport.import.errors_found'|trans({'%errors%': errors|length}) }}</a>
     <div class="import-errors">
         <ol>
             {% for error in errors %}
@@ -125,7 +125,7 @@
         <div class="clearfix">
             <div class="pull-right">
                 <a href="javascript:void(0);" class="error-toggle">{{ 'Hide'|trans }}</a>
-                <a href="{{ errorsUrl }}" target="_blank" class="btn btn-small no-hash"><i class="icon-download-alt"></i>{{ 'Download log'|trans }}</a>
+                <a href="{{ errorsUrl }}" target="_blank" class="btn btn-small no-hash"><i class="fa-download"></i>{{ 'Download log'|trans }}</a>
             </div>
         </div>
     </div>
@@ -140,12 +140,12 @@
 
                 container.toggleClass('errors-visible');
                 var icon = container.find('.error-toggle-head').find('i');
-                if (icon.hasClass('icon-chevron-right')) {
-                    icon.removeClass('icon-chevron-right');
-                    icon.addClass('icon-chevron-down');
+                if (icon.hasClass('fa-chevron-right')) {
+                    icon.removeClass('fa-chevron-right');
+                    icon.addClass('fa-chevron-down');
                 } else {
-                    icon.removeClass('icon-chevron-down');
-                    icon.addClass('icon-chevron-right');
+                    icon.removeClass('fa-chevron-down');
+                    icon.addClass('fa-chevron-right');
                 }
             };
             container.find('.error-toggle').on('click', toggleErrors);

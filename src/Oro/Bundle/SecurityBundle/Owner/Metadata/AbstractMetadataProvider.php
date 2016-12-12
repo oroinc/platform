@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\SecurityBundle\Owner\Metadata;
 
+use Oro\Bundle\SecurityBundle\Acl\Domain\ObjectIdentityFactory;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -40,6 +41,11 @@ abstract class AbstractMetadataProvider implements MetadataProviderInterface, Co
      * @var array
      */
     protected $owningEntityNames = [];
+
+    /**
+     * @var OwnershipMetadataInterface
+     */
+    private $noOwnershipMetadata;
 
     /**
      * {@inheritdoc}
@@ -107,11 +113,41 @@ abstract class AbstractMetadataProvider implements MetadataProviderInterface, Co
     );
 
     /**
-     * Get instance of OwnershipMetadataInterface
+     * Gets an instance of OwnershipMetadataInterface that represents an entity that does not have an owner
      *
      * @return OwnershipMetadataInterface
      */
-    abstract protected function getNoOwnershipMetadata();
+    protected function getNoOwnershipMetadata()
+    {
+        if (!$this->noOwnershipMetadata) {
+            $this->noOwnershipMetadata = $this->createNoOwnershipMetadata();
+        }
+
+        return $this->noOwnershipMetadata;
+    }
+
+    /**
+     * @return OwnershipMetadataInterface
+     */
+    abstract protected function createNoOwnershipMetadata();
+
+    /**
+     * Gets an instance of OwnershipMetadataInterface that represents a "root" ACL entry
+     *
+     * @return OwnershipMetadataInterface
+     */
+    protected function getRootMetadata()
+    {
+        return $this->createRootMetadata();
+    }
+
+    /**
+     * @return OwnershipMetadataInterface
+     */
+    protected function createRootMetadata()
+    {
+        return new RootOwnershipMetadata();
+    }
 
     /**
      * @return CacheProvider
@@ -185,7 +221,9 @@ abstract class AbstractMetadataProvider implements MetadataProviderInterface, Co
                 $data = $this->getCache()->fetch($className);
             }
             if (!$data) {
-                if ($this->getConfigProvider()->hasConfig($className)) {
+                if (ObjectIdentityFactory::ROOT_IDENTITY_TYPE === $className) {
+                    $data = $this->getRootMetadata();
+                } elseif ($this->getConfigProvider()->hasConfig($className)) {
                     $config = $this->getConfigProvider()->getConfig($className);
                     try {
                         $data = $this->getOwnershipMetadata($config);

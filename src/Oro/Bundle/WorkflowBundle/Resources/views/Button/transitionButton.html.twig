@@ -1,0 +1,36 @@
+{% import 'OroWorkflowBundle::macros.html.twig' as workflowMacros %}
+
+{% set params = {
+    workflowName: workflow.name,
+    transitionName: transition.name,
+    entityClass: context.entityClass,
+    entityId: context.entityId,
+    route: context.routeName,
+    datagrid: context.datagridName,
+    group: context.group,
+} %}
+
+{% if transition.displayType == 'dialog' %}
+    {% if transition.hasForm() %}
+        {% set transitionData = transitionData|merge({'dialog-url': path(transitionData['dialog-route'], params) }) %}
+    {% endif %}
+    {% set transitionData = transitionData|merge({'transition-url': path(transitionData['transition-route'], params) }) %}
+{% else %}
+    {% set transitionData = transitionData|merge({'transition-url': path(transitionData['page-route'], params) }) %}
+{% endif %}
+
+{# Show button for start or transit workflow #}
+{% set transitionMessage = transition.message|trans({},'workflows') %}
+{% if transitionMessage == transition.message %}
+    {# if no translation for message then do not show message #}
+    {% set transitionMessage = '' %}
+{% endif %}
+
+{% set transitionData = transitionData|merge({
+    'transition-label': transition.label|trans({},'workflows'),
+    'message': transitionMessage|nl2br
+}) %}
+
+<div class="pull-left btn-group icons-holder">
+    {{ workflowMacros.renderTransitionButton(workflow, transition, null, transitionData) }}
+</div>
