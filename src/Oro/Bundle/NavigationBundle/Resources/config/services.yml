@@ -375,11 +375,6 @@ services:
         tags:
             - { name: oro_menu.builder, priority: 100 }
 
-    oro_navigation.repository.menu_update:
-        parent: oro_entity.abstract_repository
-        arguments:
-            - '%oro_navigation.entity.menu_update.class%'
-
     oro_navigation.menu_manipulator:
         class: Knp\Menu\Util\MenuManipulator
         public: false
@@ -393,15 +388,12 @@ services:
         tags:
             - { name: oro_datagrid.datasource, type: menu-update-default-provider }
 
-    oro_navigation.manager.menu_update_abstract:
+    oro_navigation.manager.menu_update:
         class: Oro\Bundle\NavigationBundle\Manager\MenuUpdateManager
         arguments:
             - "@doctrine"
             - "@oro_menu.builder_chain"
             - "@oro_navigation.menu_helper.menu_update"
-
-    oro_navigation.manager.menu_update:
-        parent: oro_navigation.manager.menu_update_abstract
         calls:
             - [ setEntityClass, [ '%oro_navigation.entity.menu_update.class%' ]]
 
