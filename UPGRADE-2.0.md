@@ -301,6 +301,9 @@ To migrate all labels from configuration translatable fields automatically you c
 - Changed `Oro\Bundle\WorkflowBundle\Model\WorkflowAssembler::assembleAttributes`, now it pass transition configuration into `AttributeAssembler::assemble()`
 - Added method `getActiveWorkflows()` to `Oro\Bundle\WorkflowBundle\Model\WorkflowRegistry`
 - Added class `Oro\Bundle\WorkflowBundle\Filter\WorkflowOperationFilter` and registered as an additional (tag: `oro_action.operation_registry.filter`) filter for OperationRegistry.
+- Added class `Oro\Bundle\WorkflowBundle\Form\Handler\TransitionFormHandler`
+- Added class `Oro\Bundle\WorkflowBundle\Provider\TransitionDataProvider`
+- Added class `Oro\Bundle\WorkflowBundle\Provider\WorkflowDataProvider`
 
 ####LocaleBundle:
 - Added helper `Oro\Bundle\LocaleBundle\Helper\LocalizationQueryTrait` for adding necessary joins to QueryBuilder
