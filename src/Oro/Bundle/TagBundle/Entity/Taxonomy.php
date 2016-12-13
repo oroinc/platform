@@ -19,7 +19,7 @@ use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
  * @ORM\Table(
  *    name="oro_tag_taxonomy",
  *    indexes={
- *        @ORM\Index(name="name_organization_idx", columns={"name", "organization_id"})
+ *        @ORM\Index(name="tag_taxonomy_name_organization_idx", columns={"name", "organization_id"})
  *    }
  * )
  * @ORM\HasLifecycleCallbacks
