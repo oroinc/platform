@@ -303,12 +303,15 @@ class ContextSearchHandler implements ConverterInterface
             ->addSelect('entityClass', 'entity')
             ->addSelect('entityTitle', 'title');
         foreach ($groupedTargets as $entityClass => $ids) {
-            $nameExpr = $this->nameResolver->getNameDQL($entityClass, 'e');
             $subQb = $em->getRepository($entityClass)->createQueryBuilder('e')
                 ->select(
                     sprintf(
-                        'e.id AS id, \'%s\' AS entityClass, ' . ($nameExpr ?: '\'\'') . ' AS entityTitle',
-                        str_replace('\'', '\'\'', $entityClass)
+                        'e.id AS id, \'%s\' AS entityClass, %s AS entityTitle',
+                        $entityClass,
+                        $this->nameResolver->prepareNameDQL(
+                            $this->nameResolver->getNameDQL($entityClass, 'e'),
+                            true
+                        )
                     )
                 );
             $subQb->where($subQb->expr()->in('e.id', $ids));

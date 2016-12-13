@@ -242,22 +242,19 @@ class AssociationManager
         $targetFieldName
     ) {
         $targetAlias = 'target';
-        $nameExpr = $this->entityNameResolver->getNameDQL($targetEntityClass, $targetAlias);
-        // Need to forcibly convert expression to string when the title is different type.
-        // Example of error: "UNION types text and integer cannot be matched".
-        if ($nameExpr) {
-            $nameExpr = sprintf('CAST(%s AS string)', $nameExpr);
-        }
 
         return $this->doctrineHelper->getEntityManagerForClass($associationOwnerClass)
             ->getRepository($associationOwnerClass)
             ->createQueryBuilder('e')
             ->select(
                 sprintf(
-                    'e.id AS id, target.%s AS entityId, \'%s\' AS entityClass, '
-                    . ($nameExpr ?: '\'\'') . ' AS entityTitle',
+                    'e.id AS id, target.%s AS entityId, \'%s\' AS entityClass, %s AS entityTitle',
                     $this->doctrineHelper->getSingleEntityIdentifierFieldName($targetEntityClass),
-                    str_replace('\'', '\'\'', $targetEntityClass)
+                    $targetEntityClass,
+                    $this->entityNameResolver->prepareNameDQL(
+                        $this->entityNameResolver->getNameDQL($targetEntityClass, $targetAlias),
+                        true
+                    )
                 )
             )
             ->innerJoin('e.' . $targetFieldName, $targetAlias);
@@ -370,17 +367,18 @@ class AssociationManager
         $ownerFieldName,
         $targetIdFieldName
     ) {
-        $nameExpr = $this->entityNameResolver->getNameDQL($associationOwnerClass, 'e');
-
         return $this->doctrineHelper->getEntityManagerForClass($associationOwnerClass)
             ->getRepository($associationOwnerClass)
             ->createQueryBuilder('e')
             ->select(
                 sprintf(
-                    'target.%s AS id, e.id AS entityId, \'%s\' AS entityClass, '
-                    . ($nameExpr ?: '\'\'') . ' AS entityTitle',
+                    'target.%s AS id, e.id AS entityId, \'%s\' AS entityClass, %s AS entityTitle',
                     $targetIdFieldName,
-                    str_replace('\'', '\'\'', $associationOwnerClass)
+                    $associationOwnerClass,
+                    $this->entityNameResolver->prepareNameDQL(
+                        $this->entityNameResolver->getNameDQL($associationOwnerClass, 'e'),
+                        true
+                    )
                 )
             )
             ->innerJoin('e.' . $ownerFieldName, 'target');

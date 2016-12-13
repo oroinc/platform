@@ -122,13 +122,15 @@ class EmailActivitySearchApiEntityManager extends ActivitySearchApiEntityManager
             ->addSelect('entityClass', 'entity')
             ->addSelect('entityTitle', 'title');
         foreach ($this->getAssociatedEntitiesFilters($searchResult) as $entityClass => $ids) {
-            $nameExpr = $this->entityNameResolver->getNameDQL($entityClass, 'e');
-            /** @var QueryBuilder $subQb */
-            $subQb    = $em->getRepository($entityClass)->createQueryBuilder('e')
+            $subQb = $em->getRepository($entityClass)->createQueryBuilder('e')
                 ->select(
                     sprintf(
-                        'e.id AS id, \'%s\' AS entityClass, ' . ($nameExpr ?: '\'\'') . ' AS entityTitle',
-                        str_replace('\'', '\'\'', $entityClass)
+                        'e.id AS id, \'%s\' AS entityClass, %s AS entityTitle',
+                        $entityClass,
+                        $this->entityNameResolver->prepareNameDQL(
+                            $this->entityNameResolver->getNameDQL($entityClass, 'e'),
+                            true
+                        )
                     )
                 );
             $subQb->where($subQb->expr()->in('e.id', $ids));

@@ -385,10 +385,21 @@ class AssociationManagerTest extends OrmTestCase
             ->method('getNameDQL')
             ->with($targetClass1, 'target')
             ->willReturn('CONCAT(target.firstName, CONCAT(\' \', target.lastName))');
-        $this->entityNameResolver->expects($this->at(1))
+        $this->entityNameResolver->expects($this->at(2))
             ->method('getNameDQL')
             ->with($targetClass2, 'target')
             ->willReturn('CONCAT(target.firstName, CONCAT(\' \', target.lastName))');
+        $this->entityNameResolver->expects($this->any())
+            ->method('prepareNameDQL')
+            ->willReturnCallback(
+                function ($expr, $castToString) {
+                    self::assertTrue($castToString);
+
+                    return $expr
+                        ? sprintf('CAST(%s AS string)', $expr)
+                        : '\'\'';
+                }
+            );
 
         $result = $this->associationManager->getMultiAssociationsQueryBuilder(
             $ownerClass,
@@ -453,10 +464,21 @@ class AssociationManagerTest extends OrmTestCase
             ->method('getNameDQL')
             ->with($ownerClass1, 'e')
             ->willReturn('e.name');
-        $this->entityNameResolver->expects($this->at(1))
+        $this->entityNameResolver->expects($this->at(2))
             ->method('getNameDQL')
             ->with($ownerClass2, 'e')
             ->willReturn('e.name');
+        $this->entityNameResolver->expects($this->any())
+            ->method('prepareNameDQL')
+            ->willReturnCallback(
+                function ($expr, $castToString) {
+                    self::assertTrue($castToString);
+
+                    return $expr
+                        ? sprintf('CAST(%s AS string)', $expr)
+                        : '\'\'';
+                }
+            );
 
         $result = $this->associationManager->getMultiAssociationOwnersQueryBuilder(
             $targetClass,
@@ -469,11 +491,11 @@ class AssociationManagerTest extends OrmTestCase
         );
 
         $this->assertEquals(
-            'SELECT entity.id_1 AS id, entity.sclr_2 AS entity, entity.name_3 AS title '
+            'SELECT entity.id_1 AS id, entity.sclr_2 AS entity, entity.sclr_3 AS title '
             . 'FROM ('
             . '(SELECT t0_.id AS id_0, t1_.id AS id_1, '
             . '\'' . $ownerClass1 . '\' AS sclr_2, '
-            . 't1_.name AS name_3 '
+            . 'CAST(t1_.name AS char) AS sclr_3 '
             . 'FROM test_owner1 t1_ '
             . 'INNER JOIN test_owner1_to_target1 t2_ ON t1_.id = t2_.owner_id '
             . 'INNER JOIN test_target1 t0_ ON t0_.id = t2_.target_id '
@@ -481,7 +503,7 @@ class AssociationManagerTest extends OrmTestCase
             . ' UNION ALL '
             . '(SELECT t0_.id AS id_0, t1_.id AS id_1, '
             . '\'' . $ownerClass2 . '\' AS sclr_2, '
-            . 't1_.name AS name_3 '
+            . 'CAST(t1_.name AS char) AS sclr_3 '
             . 'FROM test_owner2 t1_ '
             . 'INNER JOIN test_owner2_to_target1 t2_ ON t1_.id = t2_.owner_id '
             . 'INNER JOIN test_target1 t0_ ON t0_.id = t2_.target_id '
