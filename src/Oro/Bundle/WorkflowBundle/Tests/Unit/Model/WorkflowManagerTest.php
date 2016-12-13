@@ -512,7 +512,7 @@ class WorkflowManagerTest extends \PHPUnit_Framework_TestCase
             ->willReturn($workflow);
 
         $em = $this->getTransactionScopedEntityManager(WorkflowItem::class);
-        $em->expects($this->never())->method('persist');
+        $em->expects($this->once())->method('persist')->with($workflowItem);
         $em->expects($this->once())->method('flush');
 
         $this->doctrineHelper->expects($this->any())
