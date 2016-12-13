@@ -3,7 +3,7 @@
 namespace Oro\Bundle\ActionBundle\Tests\Unit\Helper;
 
 use Symfony\Bundle\FrameworkBundle\Routing\Router;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Bundle\FrameworkBundle\Tests\Templating\Helper\Fixtures\StubTranslator;
 
 use Oro\Bundle\ActionBundle\Helper\OptionsHelper;
 use Oro\Bundle\ActionBundle\Button\ButtonInterface;
@@ -16,9 +16,6 @@ class OptionsHelperTest extends \PHPUnit_Framework_TestCase
     /** @var OptionsHelper */
     protected $helper;
 
-    /** @var TranslatorInterface|\PHPUnit_Framework_MockObject_MockObject */
-    protected $mockTranslator;
-
     /**
      * {@inheritdoc}
      */
@@ -28,11 +25,11 @@ class OptionsHelperTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->mockTranslator = $this->getMockBuilder('Symfony\Component\Translation\TranslatorInterface')->getMock();
+        $this->router->expects($this->any())->method('generate')->willReturn('generated-url');
 
         $this->helper = new OptionsHelper(
             $this->router,
-            $this->mockTranslator
+            new StubTranslator()
         );
     }
 
@@ -51,35 +48,66 @@ class OptionsHelperTest extends \PHPUnit_Framework_TestCase
      */
     public function getFrontendOptionsProvider()
     {
-        return [
-            'empty context and parameters' => [
-                'button' => $this->getButton('test_button', 'test label', []),
-                'expectedData' => [
-                    'options' => [
-                        'hasDialog' => true,
-                        'showDialog' => false,
-                        'dialogOptions' => [
-                            'title' => null,
-                            'dialogOptions' => [],
-                        ],
-                        'dialogUrl' => null,
-                        'executionUrl' => null,
-                        'url' => null,
-                    ],
-                    'data' => [],
+        $defaultData = [
+            'options' => [
+                'hasDialog' => true,
+                'showDialog' => false,
+                'dialogOptions' => [
+                    'title' => '[trans]test label[/trans]',
+                    'dialogOptions' => [],
+                ],
+                'dialogUrl' => 'generated-url',
+                'executionUrl' => 'generated-url',
+                'url' => 'generated-url',
+            ],
+            'data' => [],
+        ];
 
+        return [
+            'empty options' => [
+                'button' => $this->getButton('test label', []),
+                'expectedData' => $defaultData,
+            ],
+            'filled options' => [
+                'button' => $this->getButton('test label', [
+                    'showDialog' => true,
+                    'frontendOptions' => [
+                        'title' => 'custom title',
+                    ],
+                    'buttonOptions' => [
+                        'data' => [
+                            'some' => 'data',
+                        ],
+                    ],
+                ]),
+                'expectedData' => [
+                    'options' => array_merge(
+                        $defaultData['options'],
+                        [
+                            'showDialog' => true,
+                            'dialogOptions' => [
+                                'title' => '[trans]custom title[/trans]',
+                                'dialogOptions' => [],
+                            ]
+                        ]
+                    ),
+                    'data' => array_merge(
+                        $defaultData['data'],
+                        [
+                            'some' => 'data',
+                        ]
+                    ),
                 ],
             ],
         ];
     }
 
     /**
-     * @param string $name
      * @param string $label
      * @param array $templateData
      * @return ButtonInterface|\PHPUnit_Framework_MockObject_MockObject
      */
-    protected function getButton($name, $label, array $templateData)
+    protected function getButton($label, array $templateData)
     {
         $button = $this->getMock(ButtonInterface::class);
         $templateData = array_merge(
@@ -95,7 +123,6 @@ class OptionsHelperTest extends \PHPUnit_Framework_TestCase
         );
 
         $button->expects($this->any())->method('getTemplateData')->willReturn($templateData);
-        $button->expects($this->any())->method('getName')->willReturn($name);
         $button->expects($this->any())->method('getLabel')->willReturn($label);
 
         return $button;

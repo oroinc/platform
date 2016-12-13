@@ -13,9 +13,6 @@ class OperationButtonTest extends \PHPUnit_Framework_TestCase
     /** @var Operation|\PHPUnit_Framework_MockObject_MockObject */
     protected $operation;
 
-    /** @var OperationDefinition|\PHPUnit_Framework_MockObject_MockObject */
-    protected $definition;
-
     /** @var OperationButton */
     protected $button;
 
@@ -140,6 +137,20 @@ class OperationButtonTest extends \PHPUnit_Framework_TestCase
     public function testGetOperation()
     {
         $this->assertEquals($this->operation, $this->button->getOperation());
+    }
+
+    public function testSetData()
+    {
+        $this->assertOperationMethodsCalled(new OperationDefinition());
+        $newData = new ActionData(['test_field' => 'test value']);
+        $this->assertNotEquals($newData, $this->button->getTemplateData()['actionData']);
+        $this->button->setData($newData);
+        $this->assertEquals($newData, $this->button->getTemplateData()['actionData']);
+    }
+
+    public function testGetTranslationDomain()
+    {
+        $this->assertNull($this->button->getTranslationDomain());
     }
 
     /**
