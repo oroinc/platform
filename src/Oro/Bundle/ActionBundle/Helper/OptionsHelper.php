@@ -27,10 +27,16 @@ class OptionsHelper
 
     /**
      * @param ButtonInterface $button
+     * @param ActionData $actionData
+     *
      * @return array
      */
     public function getFrontendOptions(ButtonInterface $button)
     {
+        if (null === $actionData) {
+            $actionData = $this->contextHelper->getActionData($actionContext);
+        }
+
         return [
             'options' => $this->createOptions($button),
             'data' => $this->createData($button)

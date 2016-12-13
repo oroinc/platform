@@ -59,7 +59,7 @@
     </div>
 {% endmacro %}
 
-{% macro activity_context_link() %}
+{% macro activity_context_link(hideText) %}
     {% import 'OroUIBundle::macros.html.twig' as UI %}
     <a href="#" title="{{ 'oro.activity.contexts.placeholder'|trans|raw }}"
        data-url="<%= routing.generate('oro_activity_context', {'id': relatedActivityId, 'activity': relatedActivityClass }) %>"
@@ -82,6 +82,7 @@
             }
         }) }}>
         <i class="fa-link hide-text">{{ 'oro.activity.contexts.placeholder'|trans|raw }}</i>
+        {{ hideText ? '' : 'oro.activity.contexts.placeholder'|trans|raw }}
     </a>
 {% endmacro %}
 

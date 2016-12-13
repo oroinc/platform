@@ -54,11 +54,10 @@ class ButtonsCollection implements \IteratorAggregate, \Countable
     {
         $collection = new static();
 
+
         /** @var ButtonInterface $button */
         foreach ($this->buttonsMap as $button) {
-            /** @var ButtonProviderExtensionInterface $extension */
             $extension = $this->buttonsMap[$button];
-
             if (call_user_func($filter, $button, $extension)) {
                 $collection->addButton($button, $extension);
             }

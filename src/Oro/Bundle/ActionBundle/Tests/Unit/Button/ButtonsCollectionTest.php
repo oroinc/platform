@@ -32,6 +32,8 @@ class ButtonsCollectionTest extends \PHPUnit_Framework_TestCase
         $extension2 = $this->getExtensionMock([$this->getButtonMock()]);
         $extension3 = $this->getExtensionMock();
 
+        $this->assertEmpty($this->collection);
+
         $this->collection->consume($extension1, $this->searchContext);
         $this->collection->consume($extension2, $this->searchContext);
         $this->collection->consume($extension3, $this->searchContext);
@@ -42,8 +44,7 @@ class ButtonsCollectionTest extends \PHPUnit_Framework_TestCase
     public function testToArray()
     {
         $buttons = [$this->getButtonMock(), $this->getButtonMock()];
-        $extension = $this->getExtensionMock($buttons);
-        $this->collection->consume($extension, $this->searchContext);
+        $this->collection->consume($this->getExtensionMock($buttons), $this->searchContext);
 
         $this->assertEquals($buttons, $this->collection->toArray());
     }
@@ -69,7 +70,7 @@ class ButtonsCollectionTest extends \PHPUnit_Framework_TestCase
             return $button->getOrder() === 2;
         });
 
-        $this->assertInstanceOf(ButtonsCollection::class, $filtered, 'Instance of ButtonStorage expected.');
+        $this->assertInstanceOf(ButtonsCollection::class, $filtered, 'Instance of ButtonsCollection expected.');
         $this->assertNotSame($this->collection, $filtered, 'New instance expected.');
 
         $this->assertSame([$button2], $filtered->toArray(), 'Same buttons instances but filtered.');
@@ -82,7 +83,7 @@ class ButtonsCollectionTest extends \PHPUnit_Framework_TestCase
         $extension = $this->getExtensionMock([$button1, $button2]);
         $this->collection->consume($extension, $this->searchContext);
 
-        $mapped = $this->collection->map(function (ButtonInterface $button, ButtonProviderExtensionInterface $extension) {
+        $mapped = $this->collection->map(function (ButtonInterface $button) {
             return clone $button;
         });
 
@@ -91,6 +92,28 @@ class ButtonsCollectionTest extends \PHPUnit_Framework_TestCase
 
         $this->assertNotSame([$button1, $button2], $mapped->toArray(), 'Cloned buttons expected.');
         $this->assertEquals([$button1, $button2], $mapped->toArray(), 'Buttons are equals by data.');
+    }
+
+    public function testMapException()
+    {
+        $button = $this->getButtonMock();
+        $extension = $this->getExtensionMock([$button]);
+        $this->collection->consume($extension, $this->searchContext);
+
+        $this->setExpectedException(
+            'Oro\Bundle\ActionBundle\Exception\ButtonCollectionMapException',
+            sprintf(
+                'Map callback should return `%s` as result got `%s` instead.',
+                ButtonInterface::class,
+                \stdClass::class
+            )
+        );
+
+        $this->collection->map(
+            function () {
+                return new \stdClass();
+            }
+        );
     }
 
     public function testGetIterator()
