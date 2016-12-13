@@ -11,6 +11,11 @@ class OperationButton implements ButtonInterface
     const BUTTON_TEMPLATE_KEY = 'template';
 
     /**
+     * @var string
+     */
+    protected $name;
+
+    /**
      * @var Operation
      */
     protected $operation;
@@ -26,23 +31,26 @@ class OperationButton implements ButtonInterface
     protected $data;
 
     /**
+     * @param string $name Name of origin operation
      * @param Operation $operation
      * @param ButtonContext $buttonContext
      * @param ActionData $data
      */
-    public function __construct(Operation $operation, ButtonContext $buttonContext, ActionData $data)
+    public function __construct($name, Operation $operation, ButtonContext $buttonContext, ActionData $data)
     {
+        $this->name = $name;
         $this->operation = $operation;
         $this->buttonContext = $buttonContext;
         $this->data = $data;
     }
 
     /**
+     * Gets origin operation name
      * {@inheritdoc}
      */
     public function getName()
     {
-        return $this->operation->getName();
+        return $this->name;
     }
 
     /**

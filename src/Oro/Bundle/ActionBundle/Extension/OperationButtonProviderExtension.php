@@ -69,8 +69,9 @@ class OperationButtonProviderExtension implements ButtonProviderExtensionInterfa
         $baseActionData = $this->getActionData($buttonSearchContext);
         $result = [];
 
-        foreach ($operations as $operation) {
+        foreach ($operations as $operationName => $operation) {
             $result[] = new OperationButton(
+                $operationName,
                 $operation,
                 $this->generateButtonContext($operation, $buttonSearchContext),
                 clone $baseActionData
