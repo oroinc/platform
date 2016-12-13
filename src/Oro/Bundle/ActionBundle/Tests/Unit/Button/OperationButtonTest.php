@@ -102,7 +102,7 @@ class OperationButtonTest extends \PHPUnit_Framework_TestCase
             'frontendOptions' => null,
             'buttonOptions' => null,
             'hasForm' => null,
-            'showDialog' => true,
+            'showDialog' => false,
             'routeParams' => [
                 'operationName' => $this->operation->getDefinition()->getName(),
                 'entityClass' => null,
