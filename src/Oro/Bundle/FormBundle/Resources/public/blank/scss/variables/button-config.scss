@@ -1,10 +1,10 @@
 $use-base-style-for-button: true !default;
 
 // Default
-$button-padding: $base-ui-element-offset !default;
+$button-padding: 4px 10px !default;
 $button-font-size: $base-ui-element-font-size !default;
 $button-font-family: $base-ui-element-font-family !default;
-$button-line-height: $base-ui-element-line-height !default;
+$button-line-height: 2 !default;
 $button-border: $base-ui-element-border !default;
 $button-border-radius: $base-ui-element-border-radius !default;
 $button-background-color: $base-ui-element-bg-color !default;
