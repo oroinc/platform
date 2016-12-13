@@ -2,8 +2,6 @@
 
 namespace Oro\Bundle\EmailBundle\Entity;
 
-use BeSimple\SoapBundle\ServiceDefinition\Annotation as Soap;
-
 use Doctrine\ORM\Mapping as ORM;
 
 use JMS\Serializer\Annotation as JMS;
@@ -28,7 +26,6 @@ class EmailAttachment implements FileExtensionInterface
      * @ORM\Column(name="id", type="integer")
      * @ORM\Id
      * @ORM\GeneratedValue(strategy="AUTO")
-     * @Soap\ComplexType("int")
      * @JMS\Type("integer")
      */
     protected $id;
@@ -37,7 +34,6 @@ class EmailAttachment implements FileExtensionInterface
      * @var string
      *
      * @ORM\Column(name="file_name", type="string", length=255)
-     * @Soap\ComplexType("string")
      * @JMS\Type("string")
      */
     protected $fileName;
@@ -46,7 +42,6 @@ class EmailAttachment implements FileExtensionInterface
      * @var string
      *
      * @ORM\Column(name="content_type", type="string", length=100)
-     * @Soap\ComplexType("string")
      * @JMS\Type("string")
      */
     protected $contentType;
@@ -82,7 +77,6 @@ class EmailAttachment implements FileExtensionInterface
      * @var string
      *
      * @ORM\Column(name="embedded_content_id", type="string", length=255, nullable=true)
-     * @Soap\ComplexType("string")
      * @JMS\Type("string")
      */
     protected $embeddedContentId;
