@@ -45,6 +45,7 @@ class ScopeType extends AbstractType
         ]);
         $resolver->setAllowedTypes(self::SCOPE_TYPE_OPTION, ['string']);
         $resolver->setDefaults([
+            'error_bubbling' => false,
             self::SCOPE_FIELDS_OPTION => []
         ]);
 
