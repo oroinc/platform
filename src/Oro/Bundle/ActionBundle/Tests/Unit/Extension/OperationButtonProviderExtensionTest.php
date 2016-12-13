@@ -214,6 +214,7 @@ class OperationButtonProviderExtensionTest extends \PHPUnit_Framework_TestCase
         $operation = $this->getMockBuilder(Operation::class)->disableOriginalConstructor()->getMock();
         $definition = new OperationDefinition();
         $operation->expects($this->any())->method('isAvailable')->willReturn($isAvailable);
+        $operation->expects($this->any())->method('isEnabled')->willReturn(true);
         $operation->expects($this->any())->method('hasForm')->willReturn($withForm);
         $operation->expects($this->any())->method('getDefinition')->willReturn($definition);
 

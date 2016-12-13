@@ -16,6 +16,7 @@ use Oro\Bundle\ActionBundle\Model\Operation;
 use Oro\Bundle\ActionBundle\Model\OperationRegistry;
 use Oro\Bundle\ActionBundle\Model\OptionsAssembler;
 use Oro\Bundle\ActionBundle\Provider\RouteProviderInterface;
+
 use Oro\Component\ConfigExpression\ContextAccessor;
 
 class OperationButtonProviderExtension implements ButtonProviderExtensionInterface
@@ -69,19 +70,10 @@ class OperationButtonProviderExtension implements ButtonProviderExtensionInterfa
         $result = [];
 
         foreach ($operations as $operation) {
-            $operationProcessed = clone $operation;
-            $actionData = clone $baseActionData;
-            $operationProcessed->getDefinition()
-                ->setFrontendOptions(
-                    $this->resolveOptions($actionData, $operationProcessed->getDefinition()->getFrontendOptions())
-                )->setButtonOptions(
-                    $this->resolveOptions($actionData, $operationProcessed->getDefinition()->getButtonOptions())
-                );
-
             $result[] = new OperationButton(
-                $operationProcessed,
-                $this->generateButtonContext($operationProcessed, $buttonSearchContext),
-                $actionData
+                $operation,
+                $this->generateButtonContext($operation, $buttonSearchContext),
+                clone $baseActionData
             );
         }
 
