@@ -49,3 +49,8 @@ services:
             - { name: oro_importexport.formatter.formatter, data_type: percent, format_type: excel }
             - { name: oro_importexport.formatter.formatter, data_type: integer, format_type: excel }
             - { name: oro_importexport.formatter.formatter, data_type: decimal, format_type: excel }
+
+    oro_importexport.async.consolidate_import_job_result_notification_service:
+        class: Oro\Bundle\ImportExportBundle\Async\ConsolidateImportJobResultNotificationService
+        arguments:
+            - '@translator'

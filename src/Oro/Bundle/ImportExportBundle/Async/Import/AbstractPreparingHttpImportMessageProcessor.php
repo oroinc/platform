@@ -9,6 +9,7 @@ use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Component\MessageQueue\Client\MessageProducerInterface;
 use Oro\Component\MessageQueue\Client\TopicSubscriberInterface;
 use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
+use Oro\Component\MessageQueue\Job\DependentJobService;
 use Oro\Component\MessageQueue\Job\JobRunner;
 use Oro\Component\MessageQueue\Transport\MessageInterface;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
@@ -17,6 +18,7 @@ use Psr\Log\LoggerInterface;
 use Symfony\Bridge\Doctrine\RegistryInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Oro\Component\MessageQueue\Job\Job;
+use Oro\Bundle\ImportExportBundle\Async\Topics;
 
 abstract class AbstractPreparingHttpImportMessageProcessor implements MessageProcessorInterface, TopicSubscriberInterface
 {
@@ -56,7 +58,8 @@ abstract class AbstractPreparingHttpImportMessageProcessor implements MessagePro
         MessageProducerInterface $producer,
         LoggerInterface $logger,
         SplitterCsvFile $splitterCsvFileHelper,
-        RegistryInterface $doctrine
+        RegistryInterface $doctrine,
+        DependentJobService $dependentJob
     ) {
         $this->httpImportHandler = $httpImportHandler;
         $this->jobRunner = $jobRunner;
@@ -64,6 +67,7 @@ abstract class AbstractPreparingHttpImportMessageProcessor implements MessagePro
         $this->logger = $logger;
         $this->splitterCsvFileHelper = $splitterCsvFileHelper;
         $this->doctrine = $doctrine;
+        $this->dependentJob = $dependentJob;
     }
 
 
@@ -106,16 +110,27 @@ abstract class AbstractPreparingHttpImportMessageProcessor implements MessagePro
         $result = $this->jobRunner->runUnique(
             $parentMessageId,
             sprintf('%s:%s:%s', static::getMessageName(), $body['processorAlias'], $parentMessageId),
-            function (JobRunner $jobRunner) use ($body, $files, $parentMessageId) {
+            function (JobRunner $jobRunner, Job $job) use ($body, $files, $parentMessageId) {
                 foreach ($files as $key=>$file) {
-                    $body['fileName'] = $file;
                     $jobRunner->createDelayed(
                         sprintf('%s:%s%s:chunk.%s', static::getMessageName(), $body['processorAlias'], $parentMessageId, ++$key),
-                        function (JobRunner $jobRunner, Job $child) use ($body) {
+                        function (JobRunner $jobRunner, Job $child) use ($body, $file) {
+                            $body['fileName'] = $file;
                             $this->producer->send(static::getTopicsForChildJob(), array_merge($body, ['jobId' => $child->getId()]));
                         }
                     );
                 }
+                $context = $this->dependentJob->createDependentJobContext($job->getRootJob());
+                $context->addDependentJob(
+                    Topics::SEND_IMPORT_NOTIFICATION,
+                    [
+                        'rootImportJobId' => $job->getRootJob()->getId(),
+                        'fileName' => $body['fileName'] ,
+                        'userId' => $body['userId'],
+                        'subscribedTopic' => static::getSubscribedTopics(),
+                    ]
+                );
+                $this->dependentJob->saveDependentJob($context);
 
                 return true;
             }

@@ -125,7 +125,11 @@ class Job extends BaseJob
             return 0;
         }
         foreach ($children as $child) {
-            if ($child->getStatus() != self::STATUS_NEW && $child->getStatus() != self::STATUS_RUNNING) {
+            if (
+                $child->getStatus() == self::STATUS_FAILED &&
+                $child->getStatus() == self::STATUS_CANCELLED &&
+                $child->getStatus() == self::STATUS_SUCCESS
+            ) {
                 $processed++;
             }
         }

@@ -1,24 +1,24 @@
 <?php
 namespace Oro\Bundle\ImportExportBundle\Async\Import;
 
-use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\ImportExportBundle\Handler\HttpImportHandler;
 use Oro\Bundle\ImportExportBundle\Job\JobExecutor;
+use Oro\Bundle\MessageQueueBundle\Entity\Job;
 use Oro\Bundle\SecurityProBundle\Tokens\ProUsernamePasswordOrganizationToken;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Component\MessageQueue\Client\MessageProducerInterface;
 use Oro\Component\MessageQueue\Client\TopicSubscriberInterface;
 use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
 use Oro\Component\MessageQueue\Job\JobRunner;
+use Oro\Component\MessageQueue\Job\JobStorage;
 use Oro\Component\MessageQueue\Transport\MessageInterface;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
 use Oro\Component\MessageQueue\Util\JSON;
 use Psr\Log\LoggerInterface;
 use Symfony\Bridge\Doctrine\RegistryInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
-use Oro\Bundle\NotificationBundle\Async\Topics as NotificationTopics;
 
-abstract class AbstractChunkImportMessageProcessor  implements MessageProcessorInterface, TopicSubscriberInterface
+abstract class AbstractChunkImportMessageProcessor implements MessageProcessorInterface, TopicSubscriberInterface
 {
     /**
      * @var HttpImportHandler
@@ -41,11 +41,6 @@ abstract class AbstractChunkImportMessageProcessor  implements MessageProcessorI
     protected $doctrine;
 
     /**
-     * @var ConfigManager
-     */
-    protected $configManager;
-
-    /**
      * @var TokenStorageInterface
      */
     protected $tokenStorage;
@@ -55,22 +50,28 @@ abstract class AbstractChunkImportMessageProcessor  implements MessageProcessorI
      */
     protected $logger;
 
+    /**
+     * @var JobStorage
+     */
+    private $jobStorage;
+
+
     public function __construct(
         HttpImportHandler $httpImportHandler,
         JobRunner $jobRunner,
         MessageProducerInterface $producer,
         RegistryInterface $doctrine,
-        ConfigManager $configManager,
         TokenStorageInterface $tokenStorage,
-        LoggerInterface $logger
+        LoggerInterface $logger,
+        JobStorage $jobStorage
     ) {
         $this->httpImportHandler = $httpImportHandler;
         $this->jobRunner = $jobRunner;
         $this->producer = $producer;
         $this->doctrine = $doctrine;
-        $this->configManager = $configManager;
         $this->tokenStorage = $tokenStorage;
         $this->logger = $logger;
+        $this->jobStorage = $jobStorage;
     }
 
     /**
@@ -80,7 +81,7 @@ abstract class AbstractChunkImportMessageProcessor  implements MessageProcessorI
     {
         $body = JSON::decode($message->getBody());
 
-        $result = $this->jobRunner->runDelayed($body['jobId'], function (JobRunner $jobRunner) use ($body) {
+        $result = $this->jobRunner->runDelayed($body['jobId'], function (JobRunner $jobRunner, Job $job) use ($body) {
                 $body = array_replace_recursive([
                         'fileName' => null,
                         'userId' => null,
@@ -111,12 +112,12 @@ abstract class AbstractChunkImportMessageProcessor  implements MessageProcessorI
 
                 $this->getCreateToken($user);
                 $result = $this->processData($body);
-                $summary = $this->getSummaryMessage(array_merge(['fileName' => $body['fileName']], $result));
-
+                $result = array_merge(['fileName' => $body['fileName']], $result);
+                $summary = $this->getSummaryMessage($result);
                 $this->logger->info($summary);
-                $this->sendNotification($result, $user, $summary);
+                $this->saveJobResult($job, $result);
 
-                return !!$result['success'];
+                return $result['success'];
             }
         );
 
@@ -133,21 +134,14 @@ abstract class AbstractChunkImportMessageProcessor  implements MessageProcessorI
         $this->tokenStorage->setToken($token);
     }
 
-    protected function sendNotification($result, $user, $summary)
+    protected function saveJobResult(Job $job, array $data)
     {
-        $fromEmail = $this->configManager->get('oro_notification.email_notification_sender_email');
-        $fromName = $this->configManager->get('oro_notification.email_notification_sender_name');
-
-        $this->producer->send(
-            NotificationTopics::SEND_NOTIFICATION_EMAIL,
-            [
-                'fromEmail' => $fromEmail,
-                'fromName' => $fromName,
-                'toEmail' => $user->getEmail(),
-                'subject' => $result['message'],
-                'body' => $summary
-            ]
-        );
+        unset($data['errorsUrl']);
+        unset($data['message']);
+        unset($data['importInfo']);
+        $this->jobStorage->saveJob($job, function (Job $job) use ($data) {
+            $job->setData($data);
+        });
     }
 
     /**
