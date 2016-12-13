@@ -18,20 +18,6 @@
     }
 }
 
-// Use: z-index: z('base');
-@function z($layer) {
-    $layers: (
-        'base': 1,
-        'fixed': 50,
-        'dropdown': 100,
-        'popup': 150,
-        'hidden': -1
-    );
-
-    $z-index: map-get($layers, $layer);
-    @return $z-index;
-}
-
 @mixin list-normalize() {
     list-style: none;
     margin: 0;
@@ -74,10 +60,6 @@
             src: url('#{$file-path}.svg##{$font-family}') format('svg');
         }
     }
-}
-
-%base-transition {
-    transition: all linear 150ms;
 }
 
 @import 'mixins-for-components';
