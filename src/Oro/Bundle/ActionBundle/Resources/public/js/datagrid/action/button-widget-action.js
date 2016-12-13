@@ -4,9 +4,9 @@ define(function(require) {
     'use strict';
 
     var ModelAction = require('oro/datagrid/action/model-action');
-    var ActionManager = require('oroaction/js/action-manager');
+    var ButtonManager = require('oroaction/js/button-manager');
 
-    var ActionWidgetAction = ModelAction.extend({
+    var ButtonWidgetAction = ModelAction.extend({
 
         /**
          * @property {Object}
@@ -16,24 +16,24 @@ define(function(require) {
         },
 
         /**
-         * @property {ActionManager}
+         * @property {ButtonManager}
          */
-        actionManager: null,
+        buttonManager: null,
 
         /**
          * @inheritDoc
          */
         initialize: function() {
-            ActionWidgetAction.__super__.initialize.apply(this, arguments);
+            ButtonWidgetAction.__super__.initialize.apply(this, arguments);
 
-            this.actionManager = new ActionManager(this.configuration);
+            this.buttonManager = new ButtonManager(this.configuration);
         },
 
         /**
-         * @inheritdoc
+         * @inheritDoc
          */
         run: function() {
-            this.actionManager.execute();
+            this.buttonManager.execute();
         },
 
         dispose: function() {
@@ -41,11 +41,11 @@ define(function(require) {
                 return;
             }
 
-            delete this.actionManager;
+            delete this.buttonManager;
 
-            ActionWidgetAction.__super__.dispose.call(this);
+            ButtonWidgetAction.__super__.dispose.call(this);
         }
     });
 
-    return ActionWidgetAction;
+    return ButtonWidgetAction;
 });

@@ -4,7 +4,6 @@ namespace Oro\Bundle\WorkflowBundle\Button;
 
 use Oro\Bundle\ActionBundle\Button\ButtonContext;
 use Oro\Bundle\ActionBundle\Button\ButtonInterface;
-use Oro\Bundle\ActionBundle\Model\OperationRegistry;
 use Oro\Bundle\WorkflowBundle\Model\Transition;
 use Oro\Bundle\WorkflowBundle\Model\Workflow;
 
@@ -36,6 +35,32 @@ abstract class AbstractTransitionButton implements ButtonInterface
     /**
      * {@inheritdoc}
      */
+    public function getName()
+    {
+        return sprintf('%s_%s', $this->workflow->getName(), $this->transition->getName());
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getLabel()
+    {
+        return $this->transition->getLabel();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getIcon()
+    {
+        $frontendOptions = $this->transition->getFrontendOptions();
+
+        return isset($frontendOptions['icon']) ? $frontendOptions['icon'] : null;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function getOrder()
     {
         return $this->workflow->getDefinition()->getPriority();
@@ -54,14 +79,38 @@ abstract class AbstractTransitionButton implements ButtonInterface
      */
     public function getTemplateData(array $customData = [])
     {
+        $showDialog = $this->transition->getDisplayType() !== 'page';
+
         return array_merge(
             [
-                'workflow' => $this->workflow,
-                'transition' => $this->transition,
-                'context' => $this->getButtonContext()
+                'frontendOptions' => $this->transition->getFrontendOptions(),
+                'hasForm' => $this->transition->hasForm(),
+                'showDialog' => $showDialog,
+                'routeParams' => [
+                    'workflowName' => $this->workflow->getName(),
+                    'transitionName' => $this->transition->getName(),
+                    'entityClass' => $this->buttonContext->getEntityClass(),
+                    'entityId' => $this->buttonContext->getEntityId(),
+                    'route' => $this->buttonContext->getRouteName(),
+                    'datagrid' => $this->buttonContext->getDatagridName(),
+                    'group' => $this->buttonContext->getGroup(),
+                ],
+                'executionRoute' => $this->buttonContext->getExecutionRoute(),
+                'dialogRoute' => $showDialog
+                    ? $this->buttonContext->getFormDialogRoute()
+                    : $this->buttonContext->getFormPageRoute(),
+                'additionalData' => $this->getDatagridData(),
             ],
             $customData
         );
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getDatagridData()
+    {
+        return [];
     }
 
     /**
@@ -73,11 +122,19 @@ abstract class AbstractTransitionButton implements ButtonInterface
     }
 
     /**
-     * @return string
+     * {@inheritdoc}
      */
     public function getGroup()
     {
         return ButtonInterface::DEFAULT_GROUP;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getTranslationDomain()
+    {
+        return 'workflows';
     }
 
     /**
