@@ -94,3 +94,17 @@ Create Date
         attribute: $sales_funnel_start_date
         date: '2014-04-01' # must use quotes because date parameter requires string value
 ```
+
+
+Copy Values
+-----------
+
+**Class:** Oro\Component\Action\Action\CopyValues
+
+**Alias:** copy_values
+
+**Description:**  Provide copy of values from context or object to provided attribute. Behave same as PHP `array_merge` function.
+
+```
+- @copy_values: [$.to, $.from1, $.from2, {key: 'value'}]
+```

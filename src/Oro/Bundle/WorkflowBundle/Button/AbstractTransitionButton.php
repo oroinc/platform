@@ -4,7 +4,6 @@ namespace Oro\Bundle\WorkflowBundle\Button;
 
 use Oro\Bundle\ActionBundle\Button\ButtonContext;
 use Oro\Bundle\ActionBundle\Button\ButtonInterface;
-use Oro\Bundle\ActionBundle\Model\OperationRegistry;
 use Oro\Bundle\WorkflowBundle\Model\Transition;
 use Oro\Bundle\WorkflowBundle\Model\Workflow;
 
@@ -36,6 +35,32 @@ abstract class AbstractTransitionButton implements ButtonInterface
     /**
      * {@inheritdoc}
      */
+    public function getName()
+    {
+        return sprintf('%s_%s', $this->workflow->getName(), $this->transition->getName());
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getLabel()
+    {
+        return $this->transition->getLabel();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getIcon()
+    {
+        $frontendOptions = $this->transition->getFrontendOptions();
+
+        return isset($frontendOptions['icon']) ? $frontendOptions['icon'] : null;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function getOrder()
     {
         return $this->workflow->getDefinition()->getPriority();
@@ -58,10 +83,19 @@ abstract class AbstractTransitionButton implements ButtonInterface
             [
                 'workflow' => $this->workflow,
                 'transition' => $this->transition,
-                'context' => $this->getButtonContext()
+                'context' => $this->getButtonContext(),
+                'additionalData' => []
             ],
             $customData
         );
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getDatagridData()
+    {
+        return [];
     }
 
     /**
