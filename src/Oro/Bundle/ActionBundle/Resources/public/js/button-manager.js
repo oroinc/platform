@@ -12,11 +12,11 @@ define(function(require) {
     var Backbone = require('backbone');
     var DialogWidget = require('oro/dialog-widget');
 
-    var ActionManager = function(options) {
+    var ButtonManager = function(options) {
         this.initialize(options);
     };
 
-    _.extend(ActionManager.prototype, {
+    _.extend(ButtonManager.prototype, {
 
         /**
          * @type {Object}
@@ -179,7 +179,6 @@ define(function(require) {
 
         /**
          * @param {function} callback
-         * @return {oroui.Modal}
          */
         showConfirmDialog: function(callback) {
             var placeholders = this.options.confirmation.message_parameters || {};
@@ -244,5 +243,5 @@ define(function(require) {
         }
     });
 
-    return ActionManager;
+    return ButtonManager;
 });

@@ -58,22 +58,20 @@ class OperationButtonTest extends \PHPUnit_Framework_TestCase
     public function testGetLabel()
     {
         $label = 'test_label';
-        $definition = $this->getMockBuilder(OperationDefinition::class)->disableOriginalConstructor()->getMock();
-        $definition->expects($this->once())->method('getLabel')->willReturn($label);
+        $this->definition->expects($this->once())->method('getLabel')->willReturn($label);
 
-        $this->assertOperationMethodsCalled($definition);
+        $this->assertOperationMethodsCalled();
         $this->assertEquals($label, $this->button->getLabel());
     }
 
     public function testGetIcon()
     {
-        $definition = $this->getMockBuilder(OperationDefinition::class)->disableOriginalConstructor()->getMock();
-        $this->assertOperationMethodsCalled($definition);
+        $this->assertOperationMethodsCalled();
 
         $this->assertNull($this->button->getIcon());
 
         $icon = 'test-icon';
-        $definition->expects($this->once())->method('getButtonOptions')->willReturn(['icon' => $icon]);
+        $this->definition->expects($this->once())->method('getButtonOptions')->willReturn(['icon' => $icon]);
 
         $this->assertEquals($icon, $this->button->getIcon());
     }

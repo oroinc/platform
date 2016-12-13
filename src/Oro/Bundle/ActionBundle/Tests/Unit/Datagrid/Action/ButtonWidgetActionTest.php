@@ -4,12 +4,12 @@ namespace Oro\Bundle\ActionBundle\Tests\Unit\Unit\Datagrid\Action;
 
 use Symfony\Component\Translation\TranslatorInterface;
 
-use Oro\Bundle\ActionBundle\Datagrid\Action\ActionWidgetAction;
+use Oro\Bundle\ActionBundle\Datagrid\Action\ButtonWidgetAction;
 use Oro\Bundle\DataGridBundle\Extension\Action\ActionConfiguration;
 
-class ActionWidgetActionTest extends \PHPUnit_Framework_TestCase
+class ButtonWidgetActionTest extends \PHPUnit_Framework_TestCase
 {
-    /** @var ActionWidgetAction */
+    /** @var ButtonWidgetAction */
     protected $action;
 
     /** @var \PHPUnit_Framework_MockObject_MockObject|TranslatorInterface */
@@ -18,7 +18,7 @@ class ActionWidgetActionTest extends \PHPUnit_Framework_TestCase
     protected function setUp()
     {
         $this->translator = $this->getMock('Symfony\Component\Translation\TranslatorInterface');
-        $this->action = new ActionWidgetAction($this->translator);
+        $this->action = new ButtonWidgetAction($this->translator);
     }
 
     protected function tearDown()

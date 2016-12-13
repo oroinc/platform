@@ -278,10 +278,11 @@ class ButtonListenerTest extends \PHPUnit_Framework_TestCase
                 ),
                 'expected' => true,
                 'expectedConfiguration' => [
-                        'actions' => ['action3' => $this->getRowActionConfig(
+                    'actions' => [
+                        'action3' => $this->getRowActionConfig(
                             '[trans]Action 3 label[/trans]',
                             ['key1' => 'value1']
-                    )
+                        )
                     ],
                 ]
             ],
@@ -446,7 +447,7 @@ class ButtonListenerTest extends \PHPUnit_Framework_TestCase
     protected function getRowActionConfig($label = null, array $data = [])
     {
         return array_merge([
-            'type' => 'action-widget',
+            'type' => 'button-widget',
             'label' => $label,
             'rowAction' => false,
             'link' => '#',
