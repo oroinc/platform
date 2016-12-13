@@ -35,38 +35,42 @@ class LayoutButtonProvider
     }
 
     /**
-     * @param object $entity
+     * @param object|null $entity
+     * @param string|null $datagrid
      *
      * @return ButtonInterface[]
      */
-    public function getAll($entity = null)
+    public function getAll($entity = null, $datagrid = null)
     {
-        return $this->getByGroup($entity);
+        return $this->getByGroup($entity, $datagrid);
     }
 
     /**
      * @param object|null $entity
+     * @param string|null $datagrid
      * @param string|null $group
      *
      * @return ButtonInterface[]
      */
-    public function getByGroup($entity = null, $group = null)
+    public function getByGroup($entity = null, $datagrid = null, $group = null)
     {
         return $this->buttonProvider->findAvailable(
-            $this->prepareButtonSearchContext($entity, $group)
+            $this->prepareButtonSearchContext($entity, $datagrid, $group)
         );
     }
 
     /**
      * @param object $entity
+     * @param string|null $datagrid
      * @param string|null $group
      *
      * @return ButtonSearchContext
      */
-    private function prepareButtonSearchContext($entity = null, $group = null)
+    private function prepareButtonSearchContext($entity = null, $datagrid = null, $group = null)
     {
-        $buttonSearchContext = $this->contextProvider->getButtonSearchContext();
-        $buttonSearchContext->setDatagrid(null);
+        $buttonSearchContext = $this->contextProvider->getButtonSearchContext()
+            ->setGroup($group)
+            ->setDatagrid($datagrid);
 
         if (is_object($entity)) {
             $entityClass = $this->doctrineHelper->getEntityClass($entity);
@@ -74,11 +78,8 @@ class LayoutButtonProvider
             if (!$this->doctrineHelper->isNewEntity($entity)) {
                 $entityId = $this->doctrineHelper->getSingleEntityIdentifier($entity);
             }
-            $buttonSearchContext->setEntity($entityClass, $entityId);
-        }
 
-        if (null !== $group) {
-            $buttonSearchContext->setGroup($group);
+            $buttonSearchContext->setEntity($entityClass, $entityId);
         }
 
         return $buttonSearchContext;
