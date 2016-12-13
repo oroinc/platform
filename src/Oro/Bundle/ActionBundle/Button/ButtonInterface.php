@@ -51,4 +51,9 @@ interface ButtonInterface
      * @return string
      */
     public function getGroup();
+
+    /**
+     * @return string|null
+     */
+    public function getTranslationDomain();
 }

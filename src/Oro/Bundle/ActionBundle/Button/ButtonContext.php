@@ -29,7 +29,7 @@ class ButtonContext
     protected $formPageRoute;
 
     /** @var bool */
-    protected $enabled;
+    protected $enabled = true;
 
     /** @var array */
     protected $errors = [];

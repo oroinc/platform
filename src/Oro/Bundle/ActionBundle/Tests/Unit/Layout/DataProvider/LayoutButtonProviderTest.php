@@ -65,6 +65,22 @@ class LayoutButtonProviderTest extends \PHPUnit_Framework_TestCase
      */
     public function testGetAll($entity, $isNew, $expectSetEntityClass, $expectSetEntityId)
     {
+        $this->doctrineHelper->expects($this->any())
+            ->method('isNewEntity')
+            ->willReturn($isNew);
+
+        if (!is_null($entity)) {
+            $this->doctrineHelper->expects($this->atLeastOnce())
+                ->method('getEntityClass')
+                ->with($entity)
+                ->willReturn('class');
+            if (!$isNew) {
+                $this->doctrineHelper->expects($this->atLeastOnce())
+                    ->method('getSingleEntityIdentifier')
+                    ->with($entity)
+                    ->willReturn('entity_id');
+            }
+        }
         $this->doctrineHelper->expects($this->any())->method('isNewEntity')->willReturn($isNew);
         $this->doctrineHelper->expects($this->$expectSetEntityClass())
             ->method('getEntityClass')

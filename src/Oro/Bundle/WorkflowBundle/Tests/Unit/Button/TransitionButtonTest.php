@@ -4,7 +4,6 @@ namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Button;
 
 use Oro\Bundle\ActionBundle\Button\ButtonContext;
 use Oro\Bundle\ActionBundle\Button\ButtonInterface;
-use Oro\Bundle\ActionBundle\Model\OperationRegistry;
 
 use Oro\Bundle\WorkflowBundle\Button\TransitionButton;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
@@ -106,11 +105,22 @@ class TransitionButtonTest extends \PHPUnit_Framework_TestCase
      */
     public function testGetTemplateData(array $customData = [])
     {
-        $defaultData = [
-            'workflow' => $this->workflow,
-            'transition' => $this->transition,
-            'context' => $this->buttonContext,
-            'additionalData' => []
+        $defaultData =             [
+            'frontendOptions' => $this->transition->getFrontendOptions(),
+            'hasForm' => $this->transition->hasForm(),
+            'showDialog' => true,
+            'routeParams' => [
+                'workflowName' => $this->workflow->getName(),
+                'transitionName' => $this->transition->getName(),
+                'entityClass' => $this->buttonContext->getEntityClass(),
+                'entityId' => $this->buttonContext->getEntityId(),
+                'route' => $this->buttonContext->getRouteName(),
+                'datagrid' => $this->buttonContext->getDatagridName(),
+                'group' => $this->buttonContext->getGroup(),
+            ],
+            'executionRoute' => $this->buttonContext->getExecutionRoute(),
+            'dialogRoute' => null,
+            'additionalData' => [],
         ];
 
         $this->assertEquals(array_merge($defaultData, $customData), $this->button->getTemplateData($customData));
@@ -145,5 +155,10 @@ class TransitionButtonTest extends \PHPUnit_Framework_TestCase
     public function testGetTransition()
     {
         $this->assertEquals($this->transition, $this->button->getTransition());
+    }
+
+    public function testGetTranslationDomain()
+    {
+        $this->assertEquals('workflows', $this->button->getTranslationDomain());
     }
 }

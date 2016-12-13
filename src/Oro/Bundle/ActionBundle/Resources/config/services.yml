@@ -56,10 +56,7 @@ services:
     oro_action.helper.options:
         class: %oro_action.helper.options.class%
         arguments:
-            - '@oro_action.helper.context'
-            - '@oro_action.options_assembler'
-            - '@oro_action.expression.context_accessor'
-            - '@oro_action.helper.applications_url'
+            - '@router'
             - '@translator'
 
     oro_action.helper.applications_url:
@@ -152,6 +149,7 @@ services:
             - '@oro_action.datagrid.mass_action_provider.registry'
             - '@oro_action.helper.options'
             - '@oro_datagrid.grid_configuration.helper'
+            - '@translator'
         calls:
             - [setGroups, [['', 'datagridRowAction']]]
         tags:
@@ -234,5 +232,7 @@ services:
             - '@oro_action.operation_registry'
             - '@oro_action.helper.context'
             - '@oro_action.provider.route'
+            - '@oro_action.options_assembler'
+            - '@oro_action.expression.context_accessor'
         tags:
             - { name: oro.action.extension.button_provider, priority: 100 }

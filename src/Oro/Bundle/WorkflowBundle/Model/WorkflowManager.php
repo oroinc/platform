@@ -187,7 +187,7 @@ class WorkflowManager implements LoggerAwareInterface
             if (!$workflow->isStartTransitionAvailable($transition, $entity)) {
                 return null;
             }
-        } else {
+        } elseif (is_string($transition)) {
             $transition = $transitionManager->getTransition($transition);
         }
 

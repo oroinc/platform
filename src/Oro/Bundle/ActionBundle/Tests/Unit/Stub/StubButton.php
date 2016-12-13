@@ -90,4 +90,10 @@ class StubButton implements ButtonInterface
     {
         return $this->icon;
     }
+
+    /** {@inheritdoc} */
+    public function getTranslationDomain()
+    {
+        return 'test_domain';
+    }
 }
