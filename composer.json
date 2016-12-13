@@ -114,7 +114,7 @@
         "npm-asset/requirejs": "2.3.*",
         "doctrine/annotations": "1.2.*",
         "robloach/component-installer": "0.2.*",
-        "jms/cg": "~1.1"
+        "jms/cg": "1.2.*"
     },
     "require-dev": {
         "sensio/generator-bundle": "2.5.3",
