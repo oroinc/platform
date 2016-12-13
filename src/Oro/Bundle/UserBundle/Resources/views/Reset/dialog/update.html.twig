@@ -27,7 +27,7 @@
         function($, __) {
             var $passwordInput= $('[data-ftid=oro_set_password_form_password]');
             $passwordInput.after(
-                    '<span class="icon-eye-close" id="show-hide-pass" style="cursor: pointer; font-size: 16px;" ' +
+                    '<span class="fa-eye-slash" id="show-hide-pass" style="cursor: pointer; font-size: 16px;" ' +
                     ' title="' + __("oro.user.show_hide_password.label") + '"/>'
             );
             $passwordInput.parent().after(
@@ -78,14 +78,14 @@
 
             $('#show-hide-pass').on('click', function(e){
                 var target = e.target || window.event.target;
-                if($(target).hasClass('icon-eye-open')) {
+                if($(target).hasClass('fa-eye')) {
                     $passwordInput.attr('type', 'password');
-                    $(target).removeClass('icon-eye-open');
-                    $(target).addClass('icon-eye-close');
+                    $(target).removeClass('fa-eye');
+                    $(target).addClass('fa-eye-slash');
                 } else {
                     $passwordInput.attr('type', 'text');
-                    $(target).removeClass('icon-eye-close');
-                    $(target).addClass('icon-eye-open');
+                    $(target).removeClass('fa-eye-slash');
+                    $(target).addClass('fa-eye');
                 }
             });
         });

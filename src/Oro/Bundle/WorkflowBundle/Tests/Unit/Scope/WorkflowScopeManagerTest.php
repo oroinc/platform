@@ -95,8 +95,8 @@ class WorkflowScopeManagerTest extends \PHPUnit_Framework_TestCase
             ->method('findOrCreate')
             ->willReturnMap(
                 [
-                    [WorkflowScopeManager::SCOPE_TYPE, [self::FIELD_NAME => $entity], $scope1],
-                    [WorkflowScopeManager::SCOPE_TYPE, ['extraField' => $entity], $scope2]
+                    [WorkflowScopeManager::SCOPE_TYPE, [self::FIELD_NAME => $entity], true, $scope1],
+                    [WorkflowScopeManager::SCOPE_TYPE, ['extraField' => $entity], true, $scope2]
                 ]
             );
 

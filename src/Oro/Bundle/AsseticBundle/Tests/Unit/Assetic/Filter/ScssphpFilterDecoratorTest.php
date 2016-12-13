@@ -24,6 +24,86 @@ class ScssphpFilterDecoratorTest extends \PHPUnit_Framework_TestCase
         $this->scssphpFilterDecorator = new ScssphpFilterDecorator($this->scssphpFilter);
     }
 
+    public function testEnableCompass()
+    {
+        $this->scssphpFilter
+            ->expects($this->once())
+            ->method('enableCompass')
+            ->with(true);
+
+        $this->scssphpFilterDecorator->enableCompass(true);
+    }
+
+    public function testIsCompassEnabled()
+    {
+        $this->scssphpFilter
+            ->expects($this->once())
+            ->method('isCompassEnabled')
+            ->willReturn(true);
+
+        $this->assertEquals(true, $this->scssphpFilterDecorator->isCompassEnabled());
+    }
+
+    public function testSetFormatter()
+    {
+        $this->scssphpFilter
+            ->expects($this->once())
+            ->method('setFormatter')
+            ->with('formatter');
+
+        $this->scssphpFilterDecorator->setFormatter('formatter');
+    }
+
+    public function testSetVariables()
+    {
+        $this->scssphpFilter
+            ->expects($this->once())
+            ->method('setVariables')
+            ->with([]);
+
+        $this->scssphpFilterDecorator->setVariables([]);
+    }
+
+    public function testAddVariable()
+    {
+        $this->scssphpFilter
+            ->expects($this->once())
+            ->method('addVariable')
+            ->with('variable');
+
+        $this->scssphpFilterDecorator->addVariable('variable');
+    }
+
+    public function testSetImportPaths()
+    {
+        $this->scssphpFilter
+            ->expects($this->once())
+            ->method('setImportPaths')
+            ->with([]);
+
+        $this->scssphpFilterDecorator->setImportPaths([]);
+    }
+
+    public function testAddImportPath()
+    {
+        $this->scssphpFilter
+            ->expects($this->once())
+            ->method('addImportPath')
+            ->with('path');
+
+        $this->scssphpFilterDecorator->addImportPath('path');
+    }
+
+    public function testRegisterFunction()
+    {
+        $this->scssphpFilter
+            ->expects($this->once())
+            ->method('registerFunction')
+            ->with('name', []);
+
+        $this->scssphpFilterDecorator->registerFunction('name', []);
+    }
+
     public function testGetChildren()
     {
         /** @var AssetFactory|\PHPUnit_Framework_MockObject_MockObject $factory */

@@ -697,7 +697,7 @@ define(function(require) {
                     launcherOptions: {
                         label: __('oro_datagrid.action.refresh'),
                         className: 'btn',
-                        iconClassName: 'icon-repeat'
+                        iconClassName: 'fa-repeat'
                     },
                     order: 100
                 });
@@ -727,7 +727,7 @@ define(function(require) {
                     launcherOptions: {
                         label: __('oro_datagrid.action.reset'),
                         className: 'btn',
-                        iconClassName: 'icon-refresh'
+                        iconClassName: 'fa-refresh'
                     },
                     order: 200
                 });
@@ -772,7 +772,7 @@ define(function(require) {
                         label: __('oro.datagrid.extension.export.label'),
                         title: __('oro.datagrid.extension.export.tooltip'),
                         className: 'btn',
-                        iconClassName: 'icon-upload-alt',
+                        iconClassName: 'fa-upload',
                         links: links
                     }
                 });

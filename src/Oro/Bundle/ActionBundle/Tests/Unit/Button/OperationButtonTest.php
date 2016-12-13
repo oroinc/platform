@@ -16,9 +16,6 @@ class OperationButtonTest extends \PHPUnit_Framework_TestCase
     /** @var OperationDefinition|\PHPUnit_Framework_MockObject_MockObject */
     protected $definition;
 
-    /** @var ButtonContext|\PHPUnit_Framework_MockObject_MockObject */
-    protected $buttonContext;
-
     /** @var OperationButton */
     protected $button;
 
@@ -31,11 +28,7 @@ class OperationButtonTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->buttonContext = $this->getMockBuilder(ButtonContext::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->button = new OperationButton($this->operation, $this->buttonContext, new ActionData());
+        $this->button = new OperationButton($this->operation, new ButtonContext(), new ActionData());
     }
 
     /**
@@ -43,7 +36,7 @@ class OperationButtonTest extends \PHPUnit_Framework_TestCase
      */
     protected function tearDown()
     {
-        unset($this->operation, $this->button, $this->buttonContext);
+        unset($this->operation, $this->button);
     }
 
     public function testGetOrder()
@@ -88,7 +81,8 @@ class OperationButtonTest extends \PHPUnit_Framework_TestCase
                     'operation' => $this->getOperationMock(),
                     'params' => new OperationDefinition(),
                     'aClass' => '',
-                    'actionData' => new ActionData()
+                    'actionData' => new ActionData(),
+                    'buttonContext' => new ButtonContext()
                 ],
             ],
         ];

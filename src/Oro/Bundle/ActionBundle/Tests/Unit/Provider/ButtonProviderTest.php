@@ -28,6 +28,7 @@ class ButtonProviderTest extends \PHPUnit_Framework_TestCase
 
     public function testMatch()
     {
+        /** @var ButtonSearchContext|\PHPUnit_Framework_MockObject_MockObject $searchContext */
         $searchContext = $this->getMock(ButtonSearchContext::class);
 
         $button1 = $this->getButton();
@@ -35,14 +36,15 @@ class ButtonProviderTest extends \PHPUnit_Framework_TestCase
         $button3 = $this->getButton();
 
         $extension1 = $this->extension('one');
-        $extension1->expects($this->once())->method('find')->willReturn([$button1]);
+        $extension1->expects($this->any())->method('find')->willReturn([$button1]);
         $extension2 = $this->extension('two');
-        $extension2->expects($this->once())->method('find')->willReturn([$button2, $button3]);
+        $extension2->expects($this->any())->method('find')->willReturn([$button2, $button3]);
 
         $collection = $this->buttonProvider->match($searchContext);
         $this->assertInstanceOf(ButtonsCollection::class, $collection);
 
         //checking correct mapping button => extension at collection
+        /** @var CallableStub|\PHPUnit_Framework_MockObject_MockObject $callable */
         $callable = $this->getMock(CallableStub::class);
         $callable->expects($this->at(0))
             ->method('__invoke')
@@ -65,7 +67,10 @@ class ButtonProviderTest extends \PHPUnit_Framework_TestCase
                 $this->identicalTo($extension2)
             )->willReturn($button3);
 
-        $collection->map($callable);
+        $result = $collection->map($callable);
+
+        $this->assertInstanceOf(ButtonsCollection::class, $result);
+        $this->assertEquals([$button1, $button2, $button3], $result->toList());
     }
 
     /**
