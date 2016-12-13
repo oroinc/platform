@@ -51,7 +51,7 @@
         "liip/imagine-bundle": "1.6.*",
         "leafo/lessphp": "0.5.0",
         "genemu/form-bundle": "2.3.0",
-        "zendframework/zend-mail": "2.7.1",
+        "zendframework/zend-mail": "2.1.5",
         "a2lix/translation-form-bundle": "1.x-dev",
         "mtdowling/cron-expression": "1.1.0",
         "jdare/clank-bundle": "0.1.*",
