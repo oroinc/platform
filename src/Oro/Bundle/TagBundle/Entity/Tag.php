@@ -118,6 +118,7 @@ class Tag extends ExtendTag
 
     /**
      * @ORM\ManyToOne(targetEntity="Taxonomy", inversedBy="tags", fetch="LAZY")
+     * @ORM\JoinColumn(name="taxonomy_id", referencedColumnName="id", onDelete="SET NULL")
      */
     protected $taxonomy;
 
