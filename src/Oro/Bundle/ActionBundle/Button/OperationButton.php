@@ -99,6 +99,7 @@ class OperationButton implements ButtonInterface
         $defaultData = [
             'aClass' => ''
         ];
+        $frontendOptions = $this->operation->getDefinition()->getFrontendOptions();
 
         return array_merge(
             $defaultData,
@@ -106,10 +107,10 @@ class OperationButton implements ButtonInterface
             [
                 'params' => $this->operation->getDefinition(),
                 'actionData' => $this->data,
-                'frontendOptions' => $this->operation->getDefinition()->getFrontendOptions(),
+                'frontendOptions' => $frontendOptions,
                 'buttonOptions' => $this->operation->getDefinition()->getButtonOptions(),
                 'hasForm' => $this->operation->hasForm(),
-                'showDialog' => true,
+                'showDialog' => !empty($frontendOptions['showDialog']),
                 'routeParams' => [
                     'operationName' => $this->operation->getName(),
                     'entityClass' => $this->buttonContext->getEntityClass(),

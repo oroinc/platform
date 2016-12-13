@@ -11,7 +11,6 @@ parameters:
     oro_action.options_assembler.class: Oro\Bundle\ActionBundle\Model\OptionsAssembler
     oro_action.form_manager.class: Oro\Bundle\ActionBundle\Model\OperationFormManager
     oro_action.api_manager.class: Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager
-    oro_action.datagrid.action.action_widget_action.class: Oro\Bundle\ActionBundle\Datagrid\Action\ActionWidgetAction
     oro_action.datagrid.mass_action_provider.registry.class: Oro\Bundle\ActionBundle\Datagrid\Provider\MassActionProviderRegistry
 
 services:
@@ -165,13 +164,13 @@ services:
         tags:
             - { name: oro_datagrid.extension }
 
-    oro_action.datagrid.action.action_widget_action:
-        class: %oro_action.datagrid.action.action_widget_action.class%
+    oro_action.datagrid.action.button_widget_action:
+        class: Oro\Bundle\ActionBundle\Datagrid\Action\ButtonWidgetAction
         arguments:
             - '@translator'
         scope: prototype
         tags:
-            - { name: oro_datagrid.extension.action.type, type: action-widget }
+            - { name: oro_datagrid.extension.action.type, type: button-widget }
 
     oro_action.datagrid.mass_action_provider.registry:
         class: %oro_action.datagrid.mass_action_provider.registry.class%

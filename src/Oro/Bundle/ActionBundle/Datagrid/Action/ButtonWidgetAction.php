@@ -6,7 +6,7 @@ use Symfony\Component\Translation\TranslatorInterface;
 
 use Oro\Bundle\DataGridBundle\Extension\Action\Actions\AbstractAction;
 
-class ActionWidgetAction extends AbstractAction
+class ButtonWidgetAction extends AbstractAction
 {
     /**
      * @var TranslatorInterface

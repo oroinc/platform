@@ -7,6 +7,7 @@ use Symfony\Component\Translation\TranslatorInterface;
 use Oro\Bundle\ActionBundle\Button\ButtonInterface;
 use Oro\Bundle\ActionBundle\Button\ButtonsCollection;
 use Oro\Bundle\ActionBundle\Button\ButtonSearchContext;
+use Oro\Bundle\ActionBundle\Button\OperationButton;
 use Oro\Bundle\ActionBundle\Datagrid\Provider\MassActionProviderRegistry;
 use Oro\Bundle\ActionBundle\Extension\ButtonProviderExtensionInterface;
 use Oro\Bundle\ActionBundle\Helper\ContextHelper;
@@ -236,6 +237,7 @@ class ButtonListener
         $actionsConfig = $config->offsetGetOr(ActionExtension::ACTION_KEY, []);
 
         foreach ($this->buttons as $button) {
+            /** @var ButtonInterface $button */
             $name = strtolower($button->getName());
 
             $actionsConfig[$name] = $this->getRowsActionsConfig($button);
@@ -254,7 +256,7 @@ class ButtonListener
 
         $config = array_merge(
             [
-                'type' => 'action-widget',
+                'type' => 'button-widget',
                 'label' => $this->translator->trans($button->getLabel(), [], $button->getTranslationDomain()),
                 'rowAction' => false,
                 'link' => '#',
