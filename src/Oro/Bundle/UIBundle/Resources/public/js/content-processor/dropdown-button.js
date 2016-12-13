@@ -16,7 +16,8 @@ define(['jquery', 'underscore', 'jquery-ui'], function($, _) {
             moreLabel: '',
             groupContainer: '<div class="btn-group pull-right"></div>',
             minItemQuantity: 1,
-            moreButtonAttrs: {}
+            moreButtonAttrs: {},
+            decoreClass: null
         },
 
         group: null,
@@ -51,7 +52,7 @@ define(['jquery', 'underscore', 'jquery-ui'], function($, _) {
                 this.main = this._prepareMainButton(this.main);
             }
 
-            this.group.append(this.main);
+            this.group.append(this.main.addClass(this.options.decoreClass || ''));
 
             // pushes rest buttons to dropdown
             $elems = $elems.not(this.group);
@@ -91,6 +92,7 @@ define(['jquery', 'underscore', 'jquery-ui'], function($, _) {
             if (!$main.length) {
                 $main = $buttons.first();
             }
+
             return $main;
         },
 
@@ -106,6 +108,7 @@ define(['jquery', 'underscore', 'jquery-ui'], function($, _) {
                 .attr(this.options.moreButtonAttrs)
                 .attr({'data-toggle': 'dropdown'})
                 .addClass('btn dropdown-toggle')
+                .addClass(this.options.decoreClass || '')
                 .append(this.options.moreLabel)
                 .append('<span class="caret"></span>');
 
@@ -142,7 +145,7 @@ define(['jquery', 'underscore', 'jquery-ui'], function($, _) {
             return $buttons.filter('.btn')
                 .removeClass(function(index, css) {
                     return (css.match(/\bbtn(-\S+)?/g) || []).join(' ');
-                }).wrap('<li></li>').parent();
+                }).addClass('dropdown-item').wrap('<li></li>').parent();
         }
     });
 
