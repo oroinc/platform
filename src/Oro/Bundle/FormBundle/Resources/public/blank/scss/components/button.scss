@@ -1,4 +1,7 @@
-.button {
+.button,
+.btn {
+    cursor: pointer;
+
     @include base-ui-element($use-base-style-for-button,
                              $button-padding,
                              $button-font-size,
@@ -9,12 +12,6 @@
                              $button-background-color,
                              $button-color
                             );
-
-    text-decoration: none;
-
-    touch-action: manipulation;
-    cursor: pointer;
-    user-select: none;
 
     @include element-state('hover') {
         text-decoration: none;
@@ -29,5 +26,9 @@
 
     @include element-state('error') {
         border-color: $button-border-color-error-state;
+    }
+
+    @include element-state('disabled') {
+        cursor: default;
     }
 }

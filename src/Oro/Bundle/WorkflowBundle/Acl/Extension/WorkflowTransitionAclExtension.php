@@ -163,4 +163,30 @@ class WorkflowTransitionAclExtension extends AbstractWorkflowAclExtension
 
         return parent::parseDescriptor($descriptor, $type, $id, $group);
     }
+
+    /**
+     * Process start transition. For the start transitions with init options return null class cause this transition
+     * will start from the entity from the init options.
+     *
+     * {@inheritdoc}
+     */
+    protected function getObjectClassName($object)
+    {
+        if (is_string($object)) {
+            $workflowName = $id = $group = null;
+            $this->parseDescriptor($object, $workflowName, $id, $group);
+            $fieldName = ObjectIdentityHelper::decodeEntityFieldInfo($object)[1];
+            list($transitionName, $fromStep, $toStep) = explode('|', $fieldName);
+            // detect that given transition is start
+            if ('' === $fromStep) {
+                $workflow = $this->workflowRegistry->getWorkflow($workflowName);
+                $transition = $workflow->getTransitionManager()->getTransition($transitionName);
+                if ($transition->isStart() && !$transition->isEmptyInitOptions()) {
+                    return null;
+                }
+            }
+        }
+
+        return parent::getObjectClassName($object);
+    }
 }
