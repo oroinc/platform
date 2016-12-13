@@ -10,6 +10,9 @@ use Oro\Bundle\ActionBundle\Model\OperationDefinition;
 
 class OperationButtonTest extends \PHPUnit_Framework_TestCase
 {
+    /** @var string */
+    protected $originOperationName;
+
     /** @var Operation|\PHPUnit_Framework_MockObject_MockObject */
     protected $operation;
 
@@ -24,11 +27,15 @@ class OperationButtonTest extends \PHPUnit_Framework_TestCase
      */
     protected function setUp()
     {
-        $this->operation = $this->getMockBuilder(Operation::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->originOperationName = 'origin_name';
+        $this->operation = $this->getOperationMock();
 
-        $this->button = new OperationButton($this->operation, new ButtonContext(), new ActionData());
+        $this->button = new OperationButton(
+            $this->originOperationName,
+            $this->operation,
+            new ButtonContext(),
+            new ActionData()
+        );
     }
 
     /**
@@ -37,6 +44,34 @@ class OperationButtonTest extends \PHPUnit_Framework_TestCase
     protected function tearDown()
     {
         unset($this->operation, $this->button);
+    }
+
+    public function testGetName()
+    {
+        $this->assertEquals($this->originOperationName, $this->button->getName());
+    }
+
+    public function testGetLabel()
+    {
+        $label = 'test_label';
+        $definition = $this->getMockBuilder(OperationDefinition::class)->disableOriginalConstructor()->getMock();
+        $definition->expects($this->once())->method('getLabel')->willReturn($label);
+
+        $this->assertOperationMethodsCalled($definition);
+        $this->assertEquals($label, $this->button->getLabel());
+    }
+
+    public function testGetIcon()
+    {
+        $definition = $this->getMockBuilder(OperationDefinition::class)->disableOriginalConstructor()->getMock();
+        $this->assertOperationMethodsCalled($definition);
+
+        $this->assertNull($this->button->getIcon());
+
+        $icon = 'test-icon';
+        $definition->expects($this->once())->method('getButtonOptions')->willReturn(['icon' => $icon]);
+
+        $this->assertEquals($icon, $this->button->getIcon());
     }
 
     public function testGetOrder()
@@ -82,7 +117,8 @@ class OperationButtonTest extends \PHPUnit_Framework_TestCase
                     'params' => new OperationDefinition(),
                     'aClass' => '',
                     'actionData' => new ActionData(),
-                    'buttonContext' => new ButtonContext()
+                    'buttonContext' => new ButtonContext(),
+                    'additionalData' => []
                 ],
             ],
         ];

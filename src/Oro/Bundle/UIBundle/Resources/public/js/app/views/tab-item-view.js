@@ -8,7 +8,7 @@ define(function(require) {
     TabItemView = BaseView.extend({
         tagName: 'li',
         className: function() {
-            var classes = [];
+            var classes = ['nav-item'];
             if (this.model.get('active')) {
                 classes.push('active');
             }
@@ -17,7 +17,7 @@ define(function(require) {
             }
             return classes.join(' ');
         },
-        template: _.template('<a href="#"><%= label %></a>'),
+        template: _.template('<a href="#" class="nav-link"><%= label %></a>'),
         listen: {
             'change:active model': 'updateClasses',
             'change:changed model': 'updateClasses'
