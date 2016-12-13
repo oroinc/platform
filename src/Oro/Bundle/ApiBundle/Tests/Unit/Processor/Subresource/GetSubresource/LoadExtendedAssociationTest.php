@@ -131,19 +131,20 @@ class LoadExtendedAssociationTest extends GetSubresourceProcessorOrmRelatedTestC
                     )
                     ->innerJoin('e.owner', 'target')
             );
+        $sql = 'SELECT entity.id_1 AS id, entity.sclr_2 AS entity, entity.name_3 AS title '
+            . 'FROM (('
+            . 'SELECT p0_.id AS id_0, u1_.id AS id_1, '
+            . '\'' . Entity\User::class . '\' AS sclr_2, u1_.name AS name_3 '
+            . 'FROM product_table p0_ INNER JOIN user_table u1_ ON p0_.owner_id = u1_.id '
+            . 'WHERE p0_.id = 123 AND u1_.id IN (1)'
+            . ')) entity';
+        $data = [
+            ['id' => 1, 'entity' => Entity\User::class, 'title' => 'test user']
+        ];
         $this->getDriverConnectionMock($this->em)->expects($this->once())
             ->method('query')
-            ->with('SELECT entity.id_1 AS id, entity.sclr_2 AS entity, entity.name_3 AS title '
-                . 'FROM (('
-                . 'SELECT p0_.id AS id_0, u1_.id AS id_1, '
-                . '\'' . Entity\User::class . '\' AS sclr_2, u1_.name AS name_3 '
-                . 'FROM product_table p0_ INNER JOIN user_table u1_ ON p0_.owner_id = u1_.id '
-                . 'WHERE p0_.id = 123 AND u1_.id IN (1)'
-                . ')) entity'
-            )
-            ->willReturn($this->createFetchStatementMock([
-                ['id' => 1, 'entity' => Entity\User::class, 'title' => 'test user']
-            ]));
+            ->with($sql)
+            ->willReturn($this->createFetchStatementMock($data));
 
         $this->context->setAssociationName($associationName);
         $this->context->setParentConfig($parentConfig);
@@ -234,19 +235,20 @@ class LoadExtendedAssociationTest extends GetSubresourceProcessorOrmRelatedTestC
                     )
                     ->innerJoin('e.owner', 'target')
             );
+        $sql = 'SELECT entity.id_1 AS id, entity.sclr_2 AS entity, entity.name_3 AS title '
+            . 'FROM (('
+            . 'SELECT p0_.id AS id_0, u1_.id AS id_1, '
+            . '\'' . Entity\User::class . '\' AS sclr_2, u1_.name AS name_3 '
+            . 'FROM product_table p0_ INNER JOIN user_table u1_ ON p0_.owner_id = u1_.id '
+            . 'WHERE p0_.id = 123 AND u1_.id IN (1)'
+            . ')) entity';
+        $data = [
+            ['id' => 1, 'entity' => Entity\User::class, 'title' => 'test user']
+        ];
         $this->getDriverConnectionMock($this->em)->expects($this->once())
             ->method('query')
-            ->with('SELECT entity.id_1 AS id, entity.sclr_2 AS entity, entity.name_3 AS title '
-                . 'FROM (('
-                . 'SELECT p0_.id AS id_0, u1_.id AS id_1, '
-                . '\'' . Entity\User::class . '\' AS sclr_2, u1_.name AS name_3 '
-                . 'FROM product_table p0_ INNER JOIN user_table u1_ ON p0_.owner_id = u1_.id '
-                . 'WHERE p0_.id = 123 AND u1_.id IN (1)'
-                . ')) entity'
-            )
-            ->willReturn($this->createFetchStatementMock([
-                ['id' => 1, 'entity' => Entity\User::class, 'title' => 'test user']
-            ]));
+            ->with($sql)
+            ->willReturn($this->createFetchStatementMock($data));
 
         $this->context->setAssociationName($associationName);
         $this->context->setParentConfig($parentConfig);
