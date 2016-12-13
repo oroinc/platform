@@ -45,7 +45,24 @@ oro:
             feature_enabled:
                 label: Enable User Emails
 
-            smtp_settings: SMTP Settings
+            smtp_settings:
+                label: SMTP Settings
+                host:
+                    label: Host
+                port:
+                    label: Port
+                encryption:
+                    label: Encryption
+                    none:
+                        label: None
+                    ssl:
+                        label: SSL
+                    tls:
+                        label: TLS
+                username:
+                    label: Username
+                password:
+                    label: Password
 
             signature_configuration:
                 label: Signature

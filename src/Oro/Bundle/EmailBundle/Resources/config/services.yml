@@ -139,6 +139,7 @@ parameters:
     oro_email.listener.prepare_context_title_listener.class: Oro\Bundle\EmailBundle\EventListener\PrepareContextTitleListener
     oro_email.listener.activity_list_pre_query_build_listener.class: Oro\Bundle\EmailBundle\EventListener\ActivityListPreQueryBuildListener
     oro_email.model.email_activity_updates.class: Oro\Bundle\EmailBundle\Model\EmailActivityUpdates
+    oro_email.event_listener.smtp_settings_change.class: Oro\Bundle\EmailBundle\EventListener\SmtpSettingsChangeListener
 
 services:
     oro_email.entity.cache.warmer:
@@ -1174,3 +1175,8 @@ services:
             - '@logger'
         tags:
             - { name: 'oro_message_queue.client.message_processor', topicName: 'oro_email.migrate_email_body' }
+
+#    oro_email.event_listener.smtp_settings_change:
+#        class: %oro_email.event_listener.smtp_settings_change.class%
+#        tags:
+#            - { name: kernel.event_listener, event: oro_config.update_after, method: onSmtpConfigUpdate }

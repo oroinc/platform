@@ -31,7 +31,6 @@ use Oro\Bundle\EmailBundle\Migrations\Schema\v1_26\OroEmailBundle as OroEmailBun
 use Oro\Bundle\EmailBundle\Migrations\Schema\v1_27\OroEmailBundle as OroEmailBundle127;
 use Oro\Bundle\EmailBundle\Migrations\Schema\v1_28\OroEmailBundle as OroEmailBundle128;
 use Oro\Bundle\EmailBundle\Migrations\Schema\v1_29\OroEmailBundle as OroEmailBundle129;
-use Oro\Bundle\EmailBundle\Migrations\Schema\v1_30\OroEmailBundle as OroEmailBundle130;
 
 /**
  * Class OroEmailBundleInstaller
@@ -126,6 +125,5 @@ class OroEmailBundleInstaller implements Installation
         OroEmailBundle127::oroEmailFolderTable($schema);
 
         OroEmailBundle128::oroEmailFolderChangeColumn($schema);
-        OroEmailBundle130::createSmtpSettingsTable($schema);
     }
 }

@@ -4,7 +4,7 @@ namespace Oro\Bundle\EmailBundle\Event;
 
 use Symfony\Component\EventDispatcher\Event;
 
-use Oro\Bundle\EmailBundle\Entity\SmtpSettings;
+use Oro\Bundle\EmailBundle\Form\Model\SmtpSettings;
 
 class SmtpSettingsSaved extends Event
 {
@@ -24,7 +24,7 @@ class SmtpSettingsSaved extends Event
     /**
      * @return SmtpSettings
      */
-    public function getMailbox()
+    public function getSmtpSettings()
     {
         return $this->smtpSettings;
     }

@@ -4,6 +4,7 @@ system_configuration:
             icon:  fa-envelope
             title: oro.email.system_configuration.email_configuration
             page_reload: true
+            handler: '@oro_email.form.handler.email_configuration::process'
 
         user_email_configuration:
             icon:  fa-envelope
@@ -14,7 +15,7 @@ system_configuration:
             priority: 130
 
         smtp_settings:
-            title: oro.email.system_configuration.smtp_settings
+            title: oro.email.system_configuration.smtp_settings.label
             priority: 125
 
         email_autocomplete_configuration:
@@ -60,6 +61,7 @@ system_configuration:
             priority: 110
             options:
                 label: oro.email.system_configuration.feature_enabled.label
+
         oro_email.minimum_input_length:
             data_type: integer
             type: number
@@ -121,7 +123,7 @@ system_configuration:
             options:
                 label: oro.email.system_configuration.smtp_settings.encryption.label
                 choices:
-                    #'': oro.email.system_configuration.smtp_settings.encryption.empty.label
+                    ~: oro.email.system_configuration.smtp_settings.encryption.none.label
                     ssl: oro.email.system_configuration.smtp_settings.encryption.ssl.label
                     tls: oro.email.system_configuration.smtp_settings.encryption.tls.label
 
