@@ -105,6 +105,12 @@ services:
         tags:
             - { name: oro_filter.extension.orm_filter.filter, type: boolean }
 
+    oro_filter.duplicate_filter:
+        class: Oro\Bundle\FilterBundle\Filter\DuplicateFilter
+        parent: oro_filter.boolean_filter
+        tags:
+            - { name: oro_filter.extension.orm_filter.filter, type: duplicate, datasource: orm }
+
     oro_filter.date_filter_utility:
         class: %oro_filter.date_filter_utility.class%
         arguments:
