@@ -10,7 +10,7 @@ use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfigExtra;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionFieldConfig;
 use Oro\Bundle\ApiBundle\Config\FilterIdentifierFieldsConfigExtra;
-use Oro\Bundle\ApiBundle\Model\EntityIdentifier;
+use Oro\Bundle\ApiBundle\Model\EntityDescriptor;
 use Oro\Bundle\ApiBundle\Processor\Config\ConfigContext;
 use Oro\Bundle\ApiBundle\Provider\ConfigProvider;
 use Oro\Bundle\ApiBundle\Request\DataType;
@@ -235,7 +235,7 @@ class CompleteDefinition implements ProcessorInterface
                     list($associationType, $associationKind) = DataType::parseExtendedAssociation($dataType);
                     $targetClass = $field->getTargetClass();
                     if (!$targetClass) {
-                        $targetClass = EntityIdentifier::class;
+                        $targetClass = EntityDescriptor::class;
                         $field->setTargetClass($targetClass);
                     }
                     $field->setTargetType($this->getExtendedAssociationTargetType($associationType));

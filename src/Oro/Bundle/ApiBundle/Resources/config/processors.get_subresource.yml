@@ -219,10 +219,11 @@ services:
     #
 
     oro_api.get_subresource.load_extended_association:
-        class: Oro\Bundle\ApiBundle\Processor\Subresource\Shared\LoadExtendedAssociation
+        class: Oro\Bundle\ApiBundle\Processor\Subresource\GetSubresource\LoadExtendedAssociation
         arguments:
             - '@oro_api.entity_serializer'
             - '@oro_api.doctrine_helper'
+            - '@oro_entity_extend.association_manager'
         tags:
             - { name: oro.api.processor, action: get_subresource, group: load_data }
 

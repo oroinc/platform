@@ -3,13 +3,14 @@
 namespace Oro\Bundle\DataGridBundle\Extension\Board\Processor;
 
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\DBAL\Types\Type;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\Query\Parameter;
 use Doctrine\ORM\QueryBuilder;
 
 use Oro\Component\DoctrineUtils\ORM\QueryUtils;
-use Oro\Component\DoctrineUtils\ORM\SqlQueryBuilder;
+use Oro\Component\DoctrineUtils\ORM\UnionQueryBuilder;
 use Oro\Bundle\DataGridBundle\Datasource\DatasourceInterface;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\DataGridBundle\Datasource\Orm\OrmDatasource;
@@ -100,31 +101,15 @@ class DefaultProcessor implements BoardProcessorInterface
             $idKeyField = $metaData->getSingleIdentifierFieldName();
             $idExpr = sprintf('%s.%s', $rootAlias, $idKeyField);
 
-            $options = $boardData['board_options'];
-            $subQueries = [];
-            $selectStmt = null;
-            foreach ($options as $optionIds) {
+            $unionQb = new UnionQueryBuilder($this->em, true, 'ids');
+            $unionQb->addSelect('id', 'id', Type::INTEGER);
+            foreach ($boardData['board_options'] as $optionIds) {
                 /** @var QueryBuilder $queryClone */
                 $qbClone = clone $qb;
                 $this->prepareWhereExpression($qbClone, $boardData['property'], $optionIds);
-                $subQuery = $qbClone->getQuery();
-                $subQueries[] = sprintf('(%s)', QueryUtils::getExecutableSql($subQuery));
-                if (empty($selectStmt)) {
-                    $mapping    = QueryUtils::parseQuery($subQuery)->getResultSetMapping();
-                    $selectStmt = sprintf(
-                        'ids.%s AS id',
-                        QueryUtils::getColumnNameByAlias($mapping, 'id')
-                    );
-                }
+                $unionQb->addSubQuery($qbClone->getQuery());
             }
-            $rsm = QueryUtils::createResultSetMapping($this->em->getConnection()->getDatabasePlatform());
-            $rsm
-                ->addScalarResult('id', 'id', 'integer');
-            $sqlQb = new SqlQueryBuilder($this->em, $rsm);
-            $sqlQb
-                ->select($selectStmt)
-                ->from('(' . implode(' UNION ALL ', $subQueries) . ')', 'ids');
-            $ids = $sqlQb->getQuery()->getArrayResult();
+            $ids = $unionQb->getQuery()->getArrayResult();
             $ids = array_column($ids, 'id');
 
             $qb->resetDQLPart('where');

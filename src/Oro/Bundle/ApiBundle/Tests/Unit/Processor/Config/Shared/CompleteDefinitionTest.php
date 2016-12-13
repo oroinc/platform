@@ -6,7 +6,7 @@ use Doctrine\ORM\Mapping\ClassMetadata;
 
 use Oro\Bundle\ApiBundle\Config\Config;
 use Oro\Bundle\ApiBundle\Config\FilterIdentifierFieldsConfigExtra;
-use Oro\Bundle\ApiBundle\Model\EntityIdentifier;
+use Oro\Bundle\ApiBundle\Model\EntityDescriptor;
 use Oro\Bundle\ApiBundle\Processor\Config\Shared\CompleteDefinition;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\Config\ConfigProcessorTestCase;
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
@@ -1789,7 +1789,7 @@ class CompleteDefinitionTest extends ConfigProcessorTestCase
         $this->configProvider->expects($this->once())
             ->method('getConfig')
             ->with(
-                EntityIdentifier::class,
+                EntityDescriptor::class,
                 $this->context->getVersion(),
                 $this->context->getRequestType()
             )
@@ -1818,7 +1818,7 @@ class CompleteDefinitionTest extends ConfigProcessorTestCase
                     'association1' => [
                         'exclusion_policy'       => 'all',
                         'data_type'              => 'association:manyToOne',
-                        'target_class'           => EntityIdentifier::class,
+                        'target_class'           => EntityDescriptor::class,
                         'target_type'            => 'to-one',
                         'identifier_field_names' => ['id'],
                         'depends_on'             => ['field1'],
@@ -1873,7 +1873,7 @@ class CompleteDefinitionTest extends ConfigProcessorTestCase
         $this->configProvider->expects($this->once())
             ->method('getConfig')
             ->with(
-                EntityIdentifier::class,
+                EntityDescriptor::class,
                 $this->context->getVersion(),
                 $this->context->getRequestType()
             )
@@ -1902,7 +1902,7 @@ class CompleteDefinitionTest extends ConfigProcessorTestCase
                     'association1' => [
                         'exclusion_policy'       => 'all',
                         'data_type'              => 'association:manyToMany:kind',
-                        'target_class'           => EntityIdentifier::class,
+                        'target_class'           => EntityDescriptor::class,
                         'target_type'            => 'to-many',
                         'identifier_field_names' => ['id'],
                         'depends_on'             => ['field1'],
@@ -1957,7 +1957,7 @@ class CompleteDefinitionTest extends ConfigProcessorTestCase
         $this->configProvider->expects($this->once())
             ->method('getConfig')
             ->with(
-                EntityIdentifier::class,
+                EntityDescriptor::class,
                 $this->context->getVersion(),
                 $this->context->getRequestType()
             )
@@ -1986,7 +1986,7 @@ class CompleteDefinitionTest extends ConfigProcessorTestCase
                     'association1' => [
                         'exclusion_policy'       => 'all',
                         'data_type'              => 'association:multipleManyToOne',
-                        'target_class'           => EntityIdentifier::class,
+                        'target_class'           => EntityDescriptor::class,
                         'target_type'            => 'to-many',
                         'identifier_field_names' => ['id'],
                         'depends_on'             => ['field1'],
@@ -2212,7 +2212,7 @@ class CompleteDefinitionTest extends ConfigProcessorTestCase
         $this->configProvider->expects($this->once())
             ->method('getConfig')
             ->with(
-                EntityIdentifier::class,
+                EntityDescriptor::class,
                 $this->context->getVersion(),
                 $this->context->getRequestType()
             )
@@ -2241,7 +2241,7 @@ class CompleteDefinitionTest extends ConfigProcessorTestCase
                     'association1' => [
                         'exclusion_policy'       => 'all',
                         'data_type'              => 'association:manyToOne',
-                        'target_class'           => EntityIdentifier::class,
+                        'target_class'           => EntityDescriptor::class,
                         'target_type'            => 'to-one',
                         'identifier_field_names' => ['id'],
                         'depends_on'             => ['field1', 'field2'],
@@ -2322,7 +2322,7 @@ class CompleteDefinitionTest extends ConfigProcessorTestCase
         $this->configProvider->expects($this->once())
             ->method('getConfig')
             ->with(
-                EntityIdentifier::class,
+                EntityDescriptor::class,
                 $this->context->getVersion(),
                 $this->context->getRequestType()
             )
@@ -2351,7 +2351,7 @@ class CompleteDefinitionTest extends ConfigProcessorTestCase
                     'association1' => [
                         'exclusion_policy'       => 'all',
                         'data_type'              => 'association:manyToOne',
-                        'target_class'           => EntityIdentifier::class,
+                        'target_class'           => EntityDescriptor::class,
                         'target_type'            => 'to-one',
                         'identifier_field_names' => ['id'],
                         'depends_on'             => ['field1', 'field2'],
@@ -2430,7 +2430,7 @@ class CompleteDefinitionTest extends ConfigProcessorTestCase
         $this->configProvider->expects($this->once())
             ->method('getConfig')
             ->with(
-                EntityIdentifier::class,
+                EntityDescriptor::class,
                 $this->context->getVersion(),
                 $this->context->getRequestType()
             )
@@ -2459,7 +2459,7 @@ class CompleteDefinitionTest extends ConfigProcessorTestCase
                     'association1' => [
                         'exclusion_policy'       => 'all',
                         'data_type'              => 'association:manyToOne',
-                        'target_class'           => EntityIdentifier::class,
+                        'target_class'           => EntityDescriptor::class,
                         'target_type'            => 'to-one',
                         'identifier_field_names' => ['id'],
                         'depends_on'             => ['field1', 'field2'],

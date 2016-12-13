@@ -55,14 +55,9 @@ class LoadExtendedAssociation implements ProcessorInterface
             return;
         }
 
-        $result = $this->loadData(
-            $associationName,
-            $context->getParentClassName(),
-            $context->getParentId(),
-            $parentConfig,
-            $this->isCollection($associationType)
+        $context->setResult(
+            $this->loadData($context, $associationName, $this->isCollection($associationType))
         );
-        $context->setResult($result);
 
         // data returned by the EntitySerializer are already normalized
         $context->skipGroup('normalize_data');
@@ -112,24 +107,17 @@ class LoadExtendedAssociation implements ProcessorInterface
     }
 
     /**
-     * @param string                 $associationName
-     * @param string                 $parentEntityClass
-     * @param mixed                  $parentEntityId
-     * @param EntityDefinitionConfig $parentConfig
-     * @param bool                   $isCollection
+     * @param SubresourceContext $context
+     * @param string             $associationName
+     * @param bool               $isCollection
      *
      * @return array|null
      */
-    protected function loadData(
-        $associationName,
-        $parentEntityClass,
-        $parentEntityId,
-        EntityDefinitionConfig $parentConfig,
-        $isCollection
-    ) {
+    protected function loadData(SubresourceContext $context, $associationName, $isCollection)
+    {
         $data = $this->entitySerializer->serialize(
-            $this->getQueryBuilder($parentEntityClass, $parentEntityId),
-            $parentConfig
+            $this->getQueryBuilder($context->getParentClassName(), $context->getParentId()),
+            $context->getParentConfig()
         );
         $data = reset($data);
         if (empty($data) || !array_key_exists($associationName, $data)) {
