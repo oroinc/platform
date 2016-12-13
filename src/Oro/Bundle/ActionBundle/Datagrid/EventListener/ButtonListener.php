@@ -162,7 +162,9 @@ class ButtonListener
                     }
 
                     $newButton = clone $button;
-                    $newButton->getButtonContext()->setEnabled($enabled);
+                    $newButton->getButtonContext()
+                        ->setEnabled($enabled)
+                        ->setEntity($searchContext->getEntityClass(), $searchContext->getEntityId());
 
                     return $newButton;
                 }

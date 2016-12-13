@@ -30,14 +30,14 @@ class OperationButtonProviderExtension implements ButtonProviderExtensionInterfa
     /** @var RouteProviderInterface */
     protected $routeProvider;
 
-    /** @var ButtonContext */
-    private $baseButtonContext;
-
     /** @var OptionsAssembler */
-    private $optionsAssembler;
+    protected $optionsAssembler;
 
     /** @var ContextAccessor */
-    private $contextAccessor;
+    protected $contextAccessor;
+
+    /** @var ButtonContext */
+    private $baseButtonContext;
 
     /**
      * @param OperationRegistry $operationRegistry
