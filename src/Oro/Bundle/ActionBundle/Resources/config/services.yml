@@ -13,7 +13,6 @@ parameters:
     oro_action.api_manager.class: Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager
     oro_action.datagrid.action.action_widget_action.class: Oro\Bundle\ActionBundle\Datagrid\Action\ActionWidgetAction
     oro_action.datagrid.mass_action_provider.registry.class: Oro\Bundle\ActionBundle\Datagrid\Provider\MassActionProviderRegistry
-    oro_action.layout.data_provider.actions_data_provider.class: Oro\Bundle\ActionBundle\Layout\DataProvider\ActionsProvider
 
 services:
     oro_action.handler.delete:
@@ -177,16 +176,6 @@ services:
     oro_action.datagrid.mass_action_provider.registry:
         class: %oro_action.datagrid.mass_action_provider.registry.class%
 
-    oro_action.layout.data_provider.actions_data_provider:
-        class: %oro_action.layout.data_provider.actions_data_provider.class%
-        arguments:
-            - '@oro_action.operation_manager'
-            - '@oro_action.helper.context'
-            - '@oro_action.helper.restrict'
-            - '@translator'
-        tags:
-            - { name: layout.data_provider, alias: actions }
-
     oro_action.layout.data_provider.button_provider:
         class: 'Oro\Bundle\ActionBundle\Layout\DataProvider\LayoutButtonProvider'
         arguments:
@@ -195,14 +184,6 @@ services:
             - '@oro_action.provider.button_search_context'
         tags:
             - { name: layout.data_provider, alias: button_provider }
-
-    oro_action.layout.data_provider.action_buttons:
-        class: 'Oro\Bundle\ActionBundle\Layout\DataProvider\ActionButtonsProvider'
-        arguments:
-            - '@oro_action.provider.route'
-            - '@oro_entity.doctrine_helper'
-        tags:
-            - { name: layout.data_provider, alias: action_buttons }
 
     oro_action.condition.route_exists:
         class: 'Oro\Bundle\ActionBundle\Condition\RouteExists'
