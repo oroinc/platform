@@ -294,7 +294,9 @@ define(function(require) {
                 if (this.header) {
                     this.header = new (this.header.remove().constructor)(headerOptions);
                 }
-                this.body = new (this.body.remove().constructor)(bodyOptions);
+                if (this.body) {
+                    this.body = new (this.body.remove().constructor)(bodyOptions);
+                }
                 if (this.footer) {
                     this.footer = new (this.footer.remove().constructor)(footerOptions);
                 }

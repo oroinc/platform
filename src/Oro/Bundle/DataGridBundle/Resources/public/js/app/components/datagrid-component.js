@@ -11,9 +11,9 @@ define(function(require) {
     var BaseComponent = require('oroui/js/app/components/base/component');
     var PageableCollection = require('orodatagrid/js/pageable-collection');
     var Grid = require('orodatagrid/js/datagrid/grid');
-    var BackendGrid = require('oroproduct/js/app/datagrid/backend-grid');
     var mapActionModuleName = require('orodatagrid/js/map-action-module-name');
     var mapCellModuleName = require('orodatagrid/js/map-cell-module-name');
+    var mapGridModuleName = require('orodatagrid/js/map-grid-module-name');
     var gridContentManager = require('orodatagrid/js/content-manager');
     var PluginManager = require('oroui/js/app/plugins/plugin-manager');
     var FloatingHeaderPlugin = require('orodatagrid/js/app/plugins/grid/floating-header-plugin');
@@ -161,9 +161,11 @@ define(function(require) {
             this.gridName = options.gridName;
             this.inputName = options.inputName;
             this.data = options.data;
-            //this.views = $({}, {
-            //    grid: Grid;
-            //}, options.views)
+
+            this.views = $.extend({}, {
+                grid: Grid
+            }, options.views);
+
             this.metadata = _.defaults(options.metadata, {
                 columns: [],
                 options: {},
@@ -207,19 +209,24 @@ define(function(require) {
                 var type = action.frontend_type;
                 modules[helpers.actionType(type)] = mapActionModuleName(type);
             });
+            // If another Grid view is present
+            if (metadata.GridView) {
+                modules.GridView = mapGridModuleName(metadata.GridView);
+            }
         },
 
         /**
          * Build grid
          */
-        build: function() {
-            var GridConstructor = this.data.backendGrid ? BackendGrid : Grid;
+        build: function(modules) {
             var collectionModels;
             var collectionOptions;
             var grid;
 
             var collectionName = this.gridName;
             var collection = gridContentManager.get(collectionName);
+
+            Grid =  modules.GridView || Grid;
 
             collectionModels = {};
             if (this.data && this.data.data) {
@@ -242,8 +249,8 @@ define(function(require) {
 
             options.el = this.$el[0];
 
-            options.themeOptionsConfigurator(GridConstructor, options);
-            grid = new GridConstructor(_.extend({collection: collection}, options));
+            options.themeOptionsConfigurator(Grid, options);
+            grid = new Grid(_.extend({collection: collection}, options));
 
             this.grid = grid;
             grid.render();

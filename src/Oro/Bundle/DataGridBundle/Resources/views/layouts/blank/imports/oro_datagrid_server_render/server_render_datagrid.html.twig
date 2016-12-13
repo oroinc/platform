@@ -40,6 +40,11 @@
     }) %}
 
     {% set datagridMetaData = oro_datagrid_metadata(datagrid) %}
+
+    {% set datagridMetaData = datagridMetaData|merge({
+        GridView: 'productServerRenderGrid'
+    })%}
+
     {% set toolbarOptions = datagridMetaData.options.toolbarOptions %}
 
     {% do block[id ~ '_toolbar']|merge_context({'datagrid': datagrid}) %}
