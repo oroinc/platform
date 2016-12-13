@@ -12,9 +12,13 @@ use Oro\Bundle\ActionBundle\Helper\ContextHelper;
 use Oro\Bundle\ActionBundle\Model\ActionData;
 use Oro\Bundle\ActionBundle\Model\Criteria\OperationFindCriteria;
 use Oro\Bundle\ActionBundle\Model\Operation;
+use Oro\Bundle\ActionBundle\Model\OperationDefinition;
 use Oro\Bundle\ActionBundle\Model\OperationRegistry;
+use Oro\Bundle\ActionBundle\Model\OptionsAssembler;
 use Oro\Bundle\ActionBundle\Provider\RouteProviderInterface;
 use Oro\Bundle\ActionBundle\Tests\Unit\Stub\StubButton;
+
+use Oro\Component\ConfigExpression\ContextAccessor;
 
 class OperationButtonProviderExtensionTest extends \PHPUnit_Framework_TestCase
 {
@@ -40,6 +44,12 @@ class OperationButtonProviderExtensionTest extends \PHPUnit_Framework_TestCase
     /** @var \PHPUnit_Framework_MockObject_MockObject|RouteProviderInterface */
     protected $routeProvider;
 
+    /** @var OptionsAssembler|\PHPUnit_Framework_MockObject_MockObject|RouteProviderInterface */
+    protected $optionsAssembler;
+
+    /** @var ContextAccessor|\PHPUnit_Framework_MockObject_MockObject|RouteProviderInterface */
+    protected $contextAccessor;
+
     /**
      * {@inheritdoc}
      */
@@ -64,10 +74,21 @@ class OperationButtonProviderExtensionTest extends \PHPUnit_Framework_TestCase
             ->method('getFormPageRoute')
             ->willReturn(self::FORM_PAGE_ROUTE_NAME);
 
+        $this->optionsAssembler = $this->getMock(OptionsAssembler::class);
+        $this->optionsAssembler->expects($this->any())
+            ->method('assemble')
+            ->willReturnCallback(function (array $options) {
+                return $options;
+            });
+
+        $this->contextAccessor = $this->getMock(ContextAccessor::class);
+
         $this->extension = new OperationButtonProviderExtension(
             $this->operationRegistry,
             $this->contextHelper,
-            $this->routeProvider
+            $this->routeProvider,
+            $this->optionsAssembler,
+            $this->contextAccessor
         );
     }
 
@@ -191,8 +212,11 @@ class OperationButtonProviderExtensionTest extends \PHPUnit_Framework_TestCase
     private function createOperationMock($isAvailable = false, $withForm = false)
     {
         $operation = $this->getMockBuilder(Operation::class)->disableOriginalConstructor()->getMock();
+        $definition = new OperationDefinition();
         $operation->expects($this->any())->method('isAvailable')->willReturn($isAvailable);
+        $operation->expects($this->any())->method('isEnabled')->willReturn(true);
         $operation->expects($this->any())->method('hasForm')->willReturn($withForm);
+        $operation->expects($this->any())->method('getDefinition')->willReturn($definition);
 
         return $operation;
     }

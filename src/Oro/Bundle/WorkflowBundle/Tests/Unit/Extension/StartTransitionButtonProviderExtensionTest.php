@@ -11,7 +11,6 @@ use Oro\Bundle\ActionBundle\Button\ButtonSearchContext;
 use Oro\Bundle\ActionBundle\Provider\RouteProviderInterface;
 use Oro\Bundle\ActionBundle\Tests\Unit\Stub\StubButton;
 use Oro\Bundle\WorkflowBundle\Button\StartTransitionButton;
-use Oro\Bundle\WorkflowBundle\Button\TransitionButton;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Extension\StartTransitionButtonProviderExtension;
 use Oro\Bundle\WorkflowBundle\Model\Transition;
@@ -19,9 +18,6 @@ use Oro\Bundle\WorkflowBundle\Model\TransitionManager;
 use Oro\Bundle\WorkflowBundle\Model\Workflow;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowRegistry;
 
-/**
- * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
- */
 class StartTransitionButtonProviderExtensionTest extends \PHPUnit_Framework_TestCase
 {
     const ENTITY_CLASS = 'entity1';
@@ -102,74 +98,6 @@ class StartTransitionButtonProviderExtensionTest extends \PHPUnit_Framework_Test
         );
     }
 
-    public function testFindWithGroupAtContext()
-    {
-        $this->workflowRegistry->expects($this->never())->method('getActiveWorkflows');
-        $this->assertEquals(
-            [],
-            $this->extension->find((new ButtonSearchContext())->setGroup('test_group'))
-        );
-    }
-
-    public function testFindWithExclusiveRecordGroups()
-    {
-        $configuration = [
-            'init_entities' => [
-                'entity1' => [
-                    'transition1',
-                    'transition2',
-                    'transition3',
-                    'transition4',
-                    'transition5',
-                ],
-            ],
-
-        ];
-
-        $workflow1 = $this->getWorkflow(
-            $this->getTransitionManager([$this->getTransition('transition1'), $this->getTransition('transition2')]),
-            $configuration,
-            ['group1', 'group2']
-        );
-
-        $workflow2 = $this->getWorkflow(
-            $this->getTransitionManager([$this->getTransition('transition3'), $this->getTransition('transition4')]),
-            $configuration,
-            ['group2', 'group3']
-        );
-
-        $workflow3 = $this->getWorkflow(
-            $this->getTransitionManager([$this->getTransition('transition5'), $this->getTransition('transition6')]),
-            $configuration,
-            ['group3', 'group4']
-        );
-
-        $this->workflowRegistry->expects($this->once())
-            ->method('getActiveWorkflows')
-            ->willReturn(new ArrayCollection([$workflow1, $workflow2, $workflow3]));
-
-        $this->assertEquals(
-            [
-                new StartTransitionButton(
-                    $this->getTransition('transition1'),
-                    $workflow1,
-                    $this->getButtonContext('entity1')
-                ),
-                new StartTransitionButton(
-                    $this->getTransition('transition2'),
-                    $workflow1,
-                    $this->getButtonContext('entity1')
-                ),
-                new StartTransitionButton(
-                    $this->getTransition('transition5'),
-                    $workflow3,
-                    $this->getButtonContext('entity1')
-                ),
-            ],
-            $this->extension->find((new ButtonSearchContext())->setEntity('entity1'))
-        );
-    }
-
     /**
      * @return array
      */
@@ -196,6 +124,15 @@ class StartTransitionButtonProviderExtensionTest extends \PHPUnit_Framework_Test
                 'entityClass' => 'test_entity',
             ],
         ];
+    }
+
+    public function testFindWithGroupAtContext()
+    {
+        $this->workflowRegistry->expects($this->never())->method('getActiveWorkflows');
+        $this->assertEquals(
+            [],
+            $this->extension->find((new ButtonSearchContext())->setGroup('test_group'))
+        );
     }
 
     /**
@@ -254,26 +191,18 @@ class StartTransitionButtonProviderExtensionTest extends \PHPUnit_Framework_Test
 
     /**
      * @param TransitionManager|\PHPUnit_Framework_MockObject_MockObject $transitionManager
-     * @param array $configuration
-     * @param array $exclusiveRecordGroups
-     *
      * @return Workflow|\PHPUnit_Framework_MockObject_MockObject
      */
-    private function getWorkflow(
-        TransitionManager $transitionManager,
-        array $configuration = [],
-        array $exclusiveRecordGroups = []
-    ) {
-        $workflow = $this->getMockBuilder(Workflow::class)
-            ->setMethods(['getTransitionManager', 'getDefinition'])
-            ->disableOriginalConstructor()
-            ->getMock();
+    private function getWorkflow(TransitionManager $transitionManager)
+    {
+        $workflow = $this->getMockBuilder(Workflow::class)->disableOriginalConstructor()->getMock();
 
         $definition = $this->getMock(WorkflowDefinition::class);
-        $definition->expects($this->any())->method('getDatagrids')->willReturn([self::DATAGRID]);
         $definition->expects($this->any())->method('getRelatedEntity')->willReturn(self::ENTITY_CLASS);
-        $definition->expects($this->any())->method('getConfiguration')->willReturn($configuration);
-        $definition->expects($this->any())->method('getExclusiveRecordGroups')->willReturn($exclusiveRecordGroups);
+
+        $workflow->expects($this->any())
+            ->method('getInitEntities')
+            ->willReturn([self::ENTITY_CLASS => ['transition1', 'transition2']]);
 
         $workflow->expects($this->any())
             ->method('getInitRoutes')
@@ -282,8 +211,6 @@ class StartTransitionButtonProviderExtensionTest extends \PHPUnit_Framework_Test
         $workflow->expects($this->any())
             ->method('getInitDatagrids')
             ->willReturn([self::DATAGRID => ['transition1', 'transition2']]);
-
-        $definition = (new WorkflowDefinition())->setRelatedEntity('entity_related');
 
         $workflow->expects($this->any())->method('getDefinition')->willReturn($definition);
         $workflow->expects($this->any())->method('getTransitionManager')->willReturn($transitionManager);

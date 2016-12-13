@@ -40,6 +40,32 @@ class OperationButton implements ButtonInterface
     /**
      * {@inheritdoc}
      */
+    public function getName()
+    {
+        return $this->operation->getName();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getLabel()
+    {
+        return $this->operation->getDefinition()->getLabel();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getIcon()
+    {
+        $buttonOptions = $this->operation->getDefinition()->getButtonOptions();
+
+        return isset($buttonOptions['icon']) ? $buttonOptions['icon'] : null;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function getOrder()
     {
         return $this->operation->getDefinition()->getOrder();
@@ -66,12 +92,39 @@ class OperationButton implements ButtonInterface
             'aClass' => ''
         ];
 
-        return array_merge($defaultData, $customData, [
-            'operation' => $this->operation,
-            'params' => $this->operation->getDefinition(),
-            'actionData' => $this->data,
-            'buttonContext' => $this->buttonContext,
-        ]);
+        return array_merge(
+            $defaultData,
+            $customData,
+            [
+                'params' => $this->operation->getDefinition(),
+                'actionData' => $this->data,
+                'frontendOptions' => $this->operation->getDefinition()->getFrontendOptions(),
+                'buttonOptions' => $this->operation->getDefinition()->getButtonOptions(),
+                'hasForm' => $this->operation->hasForm(),
+                'showDialog' => true,
+                'routeParams' => [
+                    'operationName' => $this->operation->getName(),
+                    'entityClass' => $this->buttonContext->getEntityClass(),
+                    'entityId' => $this->buttonContext->getEntityId(),
+                    'route' => $this->buttonContext->getRouteName(),
+                    'datagrid' => $this->buttonContext->getDatagridName(),
+                    'group' => $this->buttonContext->getGroup(),
+                ],
+                'executionRoute' => $this->buttonContext->getExecutionRoute(),
+                'dialogRoute' => $this->buttonContext->getFormDialogRoute(),
+                'additionalData' => $this->getDatagridData(),
+            ]
+        );
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    private function getDatagridData()
+    {
+        $datagridOptions = $this->operation->getDefinition()->getDatagridOptions();
+
+        return isset($datagridOptions['data']) ? $datagridOptions['data'] : [];
     }
 
     /**
@@ -83,7 +136,7 @@ class OperationButton implements ButtonInterface
     }
 
     /**
-     * @return string
+     * {@inheritdoc}
      */
     public function getGroup()
     {
@@ -93,10 +146,29 @@ class OperationButton implements ButtonInterface
     }
 
     /**
+     * {@inheritdoc}
+     */
+    public function getTranslationDomain()
+    {
+        return null;
+    }
+
+    /**
      * @return Operation
      */
     public function getOperation()
     {
         return $this->operation;
+    }
+
+    /**
+     * @param ActionData $data
+     * @return Operation
+     */
+    public function setData(ActionData $data)
+    {
+        $this->data = $data;
+
+        return $this;
     }
 }

@@ -36,4 +36,28 @@ class StubButton implements ButtonInterface
     {
         return '';
     }
+
+    /** {@inheritdoc} */
+    public function getLabel()
+    {
+        return 'test label';
+    }
+
+    /** {@inheritdoc} */
+    public function getIcon()
+    {
+        return 'test icon';
+    }
+
+    /** {@inheritdoc} */
+    public function getName()
+    {
+        return 'test_name';
+    }
+
+    /** {@inheritdoc} */
+    public function getTranslationDomain()
+    {
+        return 'test_domain';
+    }
 }

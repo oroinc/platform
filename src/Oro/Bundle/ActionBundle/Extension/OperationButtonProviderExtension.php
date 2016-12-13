@@ -14,7 +14,10 @@ use Oro\Bundle\ActionBundle\Model\ActionData;
 use Oro\Bundle\ActionBundle\Model\Criteria\OperationFindCriteria;
 use Oro\Bundle\ActionBundle\Model\Operation;
 use Oro\Bundle\ActionBundle\Model\OperationRegistry;
+use Oro\Bundle\ActionBundle\Model\OptionsAssembler;
 use Oro\Bundle\ActionBundle\Provider\RouteProviderInterface;
+
+use Oro\Component\ConfigExpression\ContextAccessor;
 
 class OperationButtonProviderExtension implements ButtonProviderExtensionInterface
 {
@@ -30,19 +33,31 @@ class OperationButtonProviderExtension implements ButtonProviderExtensionInterfa
     /** @var ButtonContext */
     private $baseButtonContext;
 
+    /** @var OptionsAssembler */
+    private $optionsAssembler;
+
+    /** @var ContextAccessor */
+    private $contextAccessor;
+
     /**
      * @param OperationRegistry $operationRegistry
      * @param ContextHelper $contextHelper
      * @param RouteProviderInterface $routeProvider
+     * @param OptionsAssembler $optionsAssembler
+     * @param ContextAccessor $contextAccessor
      */
     public function __construct(
         OperationRegistry $operationRegistry,
         ContextHelper $contextHelper,
-        RouteProviderInterface $routeProvider
+        RouteProviderInterface $routeProvider,
+        OptionsAssembler $optionsAssembler,
+        ContextAccessor $contextAccessor
     ) {
         $this->operationRegistry = $operationRegistry;
         $this->contextHelper = $contextHelper;
         $this->routeProvider = $routeProvider;
+        $this->optionsAssembler = $optionsAssembler;
+        $this->contextAccessor = $contextAccessor;
     }
 
     /**
@@ -51,14 +66,14 @@ class OperationButtonProviderExtension implements ButtonProviderExtensionInterfa
     public function find(ButtonSearchContext $buttonSearchContext)
     {
         $operations = $this->getOperations($buttonSearchContext);
-        $actionData = $this->getActionData($buttonSearchContext);
+        $baseActionData = $this->getActionData($buttonSearchContext);
         $result = [];
 
         foreach ($operations as $operation) {
             $result[] = new OperationButton(
                 $operation,
                 $this->generateButtonContext($operation, $buttonSearchContext),
-                clone $actionData
+                clone $baseActionData
             );
         }
 
@@ -86,7 +101,17 @@ class OperationButtonProviderExtension implements ButtonProviderExtensionInterfa
             );
         }
 
-        return $button->getOperation()->isAvailable($this->getActionData($buttonSearchContext));
+        $actionData = $this->getActionData($buttonSearchContext);
+        $result = $button->getOperation()->isAvailable($actionData);
+        $button->getOperation()->getDefinition()
+            ->setFrontendOptions(
+                $this->resolveOptions($actionData, $button->getOperation()->getDefinition()->getFrontendOptions())
+            )->setButtonOptions(
+                $this->resolveOptions($actionData, $button->getOperation()->getDefinition()->getButtonOptions())
+            );
+        $button->setData($actionData);
+
+        return $result;
     }
 
     /**
@@ -152,5 +177,33 @@ class OperationButtonProviderExtension implements ButtonProviderExtensionInterfa
             ContextHelper::FROM_URL_PARAM => $searchContext->getReferrer(),
             ContextHelper::ROUTE_PARAM => $searchContext->getRouteName(),
         ]);
+    }
+
+    /**
+     * @param ActionData $data
+     * @param array $options
+     * @return array
+     */
+    protected function resolveOptions(ActionData $data, array $options)
+    {
+        return $this->resolveValues($data, $this->optionsAssembler->assemble($options));
+    }
+
+    /**
+     * @param ActionData $data
+     * @param array $options
+     * @return array
+     */
+    protected function resolveValues(ActionData $data, array $options)
+    {
+        foreach ($options as &$value) {
+            if (is_array($value)) {
+                $value = $this->resolveValues($data, $value);
+            } else {
+                $value = $this->contextAccessor->getValue($data, $value);
+            }
+        }
+
+        return $options;
     }
 }

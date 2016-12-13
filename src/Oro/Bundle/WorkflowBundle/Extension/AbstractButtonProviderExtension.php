@@ -40,10 +40,13 @@ abstract class AbstractButtonProviderExtension implements ButtonProviderExtensio
     public function find(ButtonSearchContext $buttonSearchContext)
     {
         $buttons = [];
-        $group = $buttonSearchContext->getGroup();
+        $groups = (array) $buttonSearchContext->getGroup();
 
         // Skip if custom buttons group defined
-        if ($group && ($group !== ButtonInterface::DEFAULT_GROUP)) {
+        if ($groups &&
+            !in_array(ButtonInterface::DEFAULT_GROUP, $groups, true) &&
+            !in_array('datagridRowAction', $groups, true)
+        ) {
             return $buttons;
         }
 

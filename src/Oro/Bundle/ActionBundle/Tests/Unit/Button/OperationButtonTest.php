@@ -24,9 +24,7 @@ class OperationButtonTest extends \PHPUnit_Framework_TestCase
      */
     protected function setUp()
     {
-        $this->operation = $this->getMockBuilder(Operation::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->operation = $this->getOperationMock();
 
         $this->button = new OperationButton($this->operation, new ButtonContext(), new ActionData());
     }
@@ -37,6 +35,37 @@ class OperationButtonTest extends \PHPUnit_Framework_TestCase
     protected function tearDown()
     {
         unset($this->operation, $this->button);
+    }
+
+    public function testGetName()
+    {
+        $name = 'test_name';
+        $this->operation->expects($this->once())->method('getName')->willReturn($name);
+
+        $this->assertEquals($name, $this->button->getName());
+    }
+
+    public function testGetLabel()
+    {
+        $label = 'test_label';
+        $definition = $this->getMockBuilder(OperationDefinition::class)->disableOriginalConstructor()->getMock();
+        $definition->expects($this->once())->method('getLabel')->willReturn($label);
+
+        $this->assertOperationMethodsCalled($definition);
+        $this->assertEquals($label, $this->button->getLabel());
+    }
+
+    public function testGetIcon()
+    {
+        $definition = $this->getMockBuilder(OperationDefinition::class)->disableOriginalConstructor()->getMock();
+        $this->assertOperationMethodsCalled($definition);
+
+        $this->assertNull($this->button->getIcon());
+
+        $icon = 'test-icon';
+        $definition->expects($this->once())->method('getButtonOptions')->willReturn(['icon' => $icon]);
+
+        $this->assertEquals($icon, $this->button->getIcon());
     }
 
     public function testGetOrder()
@@ -57,35 +86,38 @@ class OperationButtonTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(OperationButton::DEFAULT_TEMPLATE, $this->button->getTemplate());
     }
 
-    /**
-     * @dataProvider getTemplateDataDataProvider
-     *
-     * @param array $expectedResult
-     */
-    public function testGetTemplateData(array $expectedResult)
+    public function testGetTemplateData()
     {
+        $definition = $this->getMockBuilder(OperationDefinition::class)->disableOriginalConstructor()->getMock();
+        $this->assertOperationMethodsCalled($definition);
+
+        $defaultData = [
+            'params' => $this->operation->getDefinition(),
+            'actionData' => new ActionData(),
+            'frontendOptions' => null,
+            'buttonOptions' => null,
+            'hasForm' => null,
+            'showDialog' => true,
+            'routeParams' => [
+                'operationName' => $this->operation->getDefinition()->getName(),
+                'entityClass' => null,
+                'entityId' => null,
+                'route' => null,
+                'datagrid' => null,
+                'group' => null,
+            ],
+            'executionRoute' => null,
+            'dialogRoute' => null,
+            'additionalData' => [],
+            'aClass' => '',
+        ];
+
         $this->assertOperationMethodsCalled(new OperationDefinition());
 
-        $templateData = $this->button->getTemplateData();
-        $this->assertEquals($expectedResult, $templateData);
-    }
 
-    /**
-     * @return array
-     */
-    public function getTemplateDataDataProvider()
-    {
-        return [
-            'correct' => [
-                'expectedResult' => [
-                    'operation' => $this->getOperationMock(),
-                    'params' => new OperationDefinition(),
-                    'aClass' => '',
-                    'actionData' => new ActionData(),
-                    'buttonContext' => new ButtonContext()
-                ],
-            ],
-        ];
+
+        $templateData = $this->button->getTemplateData();
+        $this->assertEquals($defaultData, $templateData);
     }
 
     public function testGetButtonContext()

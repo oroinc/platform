@@ -2,15 +2,22 @@
 
 namespace Oro\Bundle\ActionBundle\Tests\Unit\Datagrid\EventListener;
 
-use Oro\Bundle\ActionBundle\Datagrid\EventListener\OperationListener;
+use Symfony\Bridge\Twig\Tests\Extension\Fixtures\StubTranslator;
+
+use Oro\Bundle\ActionBundle\Button\ButtonContext;
+use Oro\Bundle\ActionBundle\Button\ButtonInterface;
+use Oro\Bundle\ActionBundle\Button\ButtonsCollection;
+use Oro\Bundle\ActionBundle\Button\ButtonSearchContext;
+use Oro\Bundle\ActionBundle\Button\OperationButton;
+use Oro\Bundle\ActionBundle\Datagrid\EventListener\ButtonListener;
 use Oro\Bundle\ActionBundle\Datagrid\Provider\MassActionProviderInterface;
 use Oro\Bundle\ActionBundle\Datagrid\Provider\MassActionProviderRegistry;
-use Oro\Bundle\ActionBundle\Model\ActionData;
-use Oro\Bundle\ActionBundle\Model\Operation;
-use Oro\Bundle\ActionBundle\Model\OperationDefinition;
-use Oro\Bundle\ActionBundle\Model\OperationManager;
+use Oro\Bundle\ActionBundle\Extension\ButtonProviderExtensionInterface;
 use Oro\Bundle\ActionBundle\Helper\ContextHelper;
 use Oro\Bundle\ActionBundle\Helper\OptionsHelper;
+use Oro\Bundle\ActionBundle\Model\Operation;
+use Oro\Bundle\ActionBundle\Model\OperationDefinition;
+use Oro\Bundle\ActionBundle\Provider\ButtonProvider;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\DataGridBundle\Datasource\Orm\OrmDatasource;
 use Oro\Bundle\DataGridBundle\Datasource\ResultRecord;
@@ -19,13 +26,13 @@ use Oro\Bundle\DataGridBundle\Extension\Action\Event\ConfigureActionsBefore;
 use Oro\Bundle\DataGridBundle\Tools\GridConfigurationHelper;
 use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
 
-class OperationListenerTest extends \PHPUnit_Framework_TestCase
+class ButtonListenerTest extends \PHPUnit_Framework_TestCase
 {
     const PROVIDER_ALIAS = 'test_mass_action_provider';
     const TEST_ROUTE = 'test_route';
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|OperationManager */
-    protected $manager;
+    /** @var \PHPUnit_Framework_MockObject_MockObject|ButtonProvider */
+    protected $buttonProvider;
 
     /** @var \PHPUnit_Framework_MockObject_MockObject|EntityClassResolver */
     protected $entityClassResolver;
@@ -36,7 +43,7 @@ class OperationListenerTest extends \PHPUnit_Framework_TestCase
     /** @var \PHPUnit_Framework_MockObject_MockObject|MassActionProviderRegistry */
     protected $massActionProviderRegistry;
 
-    /** @var OperationListener */
+    /** @var ButtonListener */
     protected $listener;
 
     /**
@@ -44,7 +51,7 @@ class OperationListenerTest extends \PHPUnit_Framework_TestCase
      */
     protected function setUp()
     {
-        $this->manager = $this->getMockBuilder(OperationManager::class)
+        $this->buttonProvider = $this->getMockBuilder(ButtonProvider::class)
             ->disableOriginalConstructor()
             ->getMock();
 
@@ -58,9 +65,6 @@ class OperationListenerTest extends \PHPUnit_Framework_TestCase
         $contextHelper = $this->getMockBuilder(ContextHelper::class)
             ->disableOriginalConstructor()
             ->getMock();
-        $contextHelper->expects($this->any())
-            ->method('getActionData')
-            ->willReturn(new ActionData(['data' => ['param'], 'key1' => 'value1', 'key2' => 2]));
         $contextHelper->expects($this->any())
             ->method('getContext')
             ->willReturn(
@@ -104,12 +108,13 @@ class OperationListenerTest extends \PHPUnit_Framework_TestCase
                 ],
             ]);
 
-        $this->listener = new OperationListener(
-            $this->manager,
+        $this->listener = new ButtonListener(
+            $this->buttonProvider,
             $contextHelper,
             $this->massActionProviderRegistry,
             $optionsHelper,
-            $this->gridConfigurationHelper
+            $this->gridConfigurationHelper,
+            new StubTranslator()
         );
     }
 
@@ -121,7 +126,7 @@ class OperationListenerTest extends \PHPUnit_Framework_TestCase
         unset(
             $this->listener,
             $this->massActionProviderRegistry,
-            $this->manager,
+            $this->buttonProvider,
             $this->entityClassResolver,
             $this->gridConfigurationHelper
         );
@@ -129,7 +134,7 @@ class OperationListenerTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @param DatagridConfiguration $config
-     * @param Operation[] $operations
+     * @param ButtonsCollection $buttonCollection
      * @param bool $expected
      * @param array $expectedConfiguration
      *
@@ -137,13 +142,11 @@ class OperationListenerTest extends \PHPUnit_Framework_TestCase
      */
     public function testOnConfigureActions(
         DatagridConfiguration $config,
-        array $operations,
+        ButtonsCollection $buttonCollection,
         $expected,
         array $expectedConfiguration = []
     ) {
-        $this->manager->expects($this->once())
-            ->method('getOperations')
-            ->willReturn($operations);
+        $this->buttonProvider->expects($this->once())->method('match')->willReturn($buttonCollection);
 
         $this->listener->onConfigureActions(new ConfigureActionsBefore($config));
 
@@ -172,9 +175,8 @@ class OperationListenerTest extends \PHPUnit_Framework_TestCase
     /**
      * @param DatagridConfiguration $datagridConfig
      * @param ResultRecord $record
-     * @param array $actions
+     * @param ButtonsCollection $buttonsCollection
      * @param array $expectedActions
-     * @param array $context
      * @param array $groups
      *
      * @dataProvider getRowConfigurationProvider
@@ -182,15 +184,11 @@ class OperationListenerTest extends \PHPUnit_Framework_TestCase
     public function testGetRowConfiguration(
         DatagridConfiguration $datagridConfig,
         ResultRecord $record,
-        $actions,
+        ButtonsCollection $buttonsCollection,
         array $expectedActions,
-        array $context = null,
         array $groups = null
     ) {
-        $this->manager->expects($this->any())
-            ->method('getOperations')
-            ->with($context, false)
-            ->willReturn($actions);
+        $this->buttonProvider->expects($this->any())->method('match')->willReturn($buttonsCollection);
 
         if ($groups) {
             $this->listener->setGroups($groups);
@@ -223,13 +221,15 @@ class OperationListenerTest extends \PHPUnit_Framework_TestCase
                         'type' => OrmDatasource::TYPE,
                     ],
                 ]),
-                'actions' => ['test_operation' => $this->createOperation(
-                    'test_operation',
-                    true,
+                'buttonCollection' => $this->createButtonsCollection(
                     [
-                        'getDatagridOptions' => ['mass_action_provider' => self::PROVIDER_ALIAS]
+                        $this->createOperationButton(
+                            'test_operation',
+                            true,
+                            ['mass_action_provider' => self::PROVIDER_ALIAS]
+                        )
                     ]
-                )],
+                ),
                 'expected' => true,
                 'expectedConfiguration' => [
                     'mass_actions' => ['test_operationtest_config' => ['label' => 'test_label']]
@@ -242,13 +242,15 @@ class OperationListenerTest extends \PHPUnit_Framework_TestCase
                         'type' => OrmDatasource::TYPE,
                     ],
                 ]),
-                'actions' => ['test_operation' => $this->createOperation(
-                    'test_operation',
-                    true,
+                'buttonCollection' => $this->createButtonsCollection(
                     [
-                        'getDatagridOptions' => ['mass_action' => ['label' => 'test_mass_action_label']]
+                        $this->createOperationButton(
+                            'test_operation',
+                            true,
+                            ['mass_action' => ['label' => 'test_mass_action_label']]
+                        )
                     ]
-                )],
+                ),
                 'expected' => true,
                 'expectedConfiguration' => [
                     'mass_actions' => ['test_operation' => ['label' => 'test_mass_action_label']]
@@ -261,18 +263,26 @@ class OperationListenerTest extends \PHPUnit_Framework_TestCase
                         'type' => OrmDatasource::TYPE,
                     ],
                 ]),
-                'actions' => ['action3' => $this->createOperation(
-                    'action3',
-                    true,
+                'buttonCollection' => $this->createButtonsCollection(
                     [
-                        'getName' => 'action3',
-                        'getLabel' => 'Action 3 label',
-                        'getDatagridOptions' => ['data' => ['key1' => 'value1']]
+                        $this->createOperationButton(
+                            'action3',
+                            true,
+                            ['data' => ['key1' => 'value1']],
+                            [
+                                'getLabel' => 'Action 3 label',
+                                'getTemplateData' => ['additionalData' => ['key1' => 'value1']]
+                            ]
+                        )
                     ]
-                )],
+                ),
                 'expected' => true,
                 'expectedConfiguration' => [
-                    'actions' => ['action3' => $this->getRowActionConfig('Action 3 label', ['key1' => 'value1'])],
+                        'actions' => ['action3' => $this->getRowActionConfig(
+                            '[trans]Action 3 label[/trans]',
+                            ['key1' => 'value1']
+                    )
+                    ],
                 ]
             ],
             'should not replace existing default action' => [
@@ -287,25 +297,27 @@ class OperationListenerTest extends \PHPUnit_Framework_TestCase
                         'type' => OrmDatasource::TYPE,
                     ],
                 ]),
-                'actions' => ['action3' => $this->createOperation(
-                    'action3',
-                    true,
+                'buttonCollection' => $this->createButtonsCollection(
                     [
-                        'getName' => 'action3',
-                        'getLabel' => 'Action 3 label'
+                        $this->createButton(
+                            'action3',
+                            true,
+                            [
+                                'getLabel' => 'Action 3 label'
+                            ]
+                        ),
+                        $this->createOperationButton(
+                            'test_operation',
+                            true,
+                            ['label' => 'test_mass_action_label']
+                        )
                     ]
-                ), 'test_operation' => $this->createOperation(
-                    'test_operation',
-                    true,
-                    [
-                        'getDatagridOptions' => ['mass_action' => ['label' => 'test_mass_action_label']]
-                    ]
-                )],
+                ),
                 'expected' => true,
                 'expectedConfiguration' => [
                     'actions' => [
                         'action3' => ['label' => 'default action3'],
-                        'test_operation' => $this->getRowActionConfig(),
+                        'test_operation' => $this->getRowActionConfig('[trans][/trans]'),
                     ]
                 ]
             ],
@@ -316,7 +328,7 @@ class OperationListenerTest extends \PHPUnit_Framework_TestCase
                         'type' => OrmDatasource::TYPE,
                     ],
                 ]),
-                'actions' => [],
+                'buttonCollection' => $this->createButtonsCollection([]),
                 'expected' => false
             ]
         ];
@@ -324,6 +336,7 @@ class OperationListenerTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @return array
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
     public function getRowConfigurationProvider()
     {
@@ -331,44 +344,44 @@ class OperationListenerTest extends \PHPUnit_Framework_TestCase
             'no actions' => [
                 'config' => DatagridConfiguration::create(['name' => 'datagrid_name']),
                 'record' => new ResultRecord(['id' => 1]),
-                'actions' => [],
+                'buttonCollection' => $this->createButtonsCollection([]),
                 'expectedActions' => [],
-                'context' => ['entityClass' => null, 'datagrid' => 'datagrid_name', 'group' => null],
                 'groups' => null,
             ],
             'no actions and group1' => [
                 'config' => DatagridConfiguration::create(['name' => 'datagrid_name']),
                 'record' => new ResultRecord(['id' => 1]),
-                'actions' => [],
+                'buttonCollection' => $this->createButtonsCollection([]),
                 'expectedActions' => [],
-                'context' => ['entityClass' => null, 'datagrid' => 'datagrid_name', 'group' => ['group1']],
                 'groups' => ['group1'],
             ],
             '2 allowed actions' => [
                 'config' => DatagridConfiguration::create(['name' => 'datagrid_name']),
                 'record' => new ResultRecord(['id' => 2]),
-                'actions' => [
-                    'action1' => $this->createOperation('operation1', true),
-                    'action2' => $this->createOperation('operation2', true)
-                ],
+                'buttonCollection' => $this->createButtonsCollection(
+                    [
+                        $this->createButton('operation1', true),
+                        $this->createButton('operation2', true)
+                    ]
+                ),
                 'expectedActions' => [
                     'action1' => ['option1' => 'value1', 'option2' => 'value2', 'key1' => 'value1'],
                     'action2' => ['option1' => 'value1', 'option2' => 'value2', 'key1' => 'value1'],
                 ],
-                'context' => ['entityClass' => null, 'datagrid' => 'datagrid_name', 'group' => null],
             ],
             '1 allowed action' => [
                 'config' => DatagridConfiguration::create(['name' => 'datagrid_name']),
                 'record' => new ResultRecord(['id' => 3]),
-                'actions' => [
-                    'action1' => $this->createOperation('operation1', true),
-                    'action3' => $this->createOperation('operation3', false)
-                ],
+                'buttonCollection' => $this->createButtonsCollection(
+                    [
+                        $this->createButton('operation1', true),
+                        $this->createButton('operation3', false)
+                    ]
+                ),
                 'expectedActions' => [
                     'action1' => ['option1' => 'value1', 'option2' => 'value2', 'key1' => 'value1'],
                     'action3' => false
                 ],
-                'context' => ['entityClass' => null, 'datagrid' => 'datagrid_name', 'group' => null],
             ],
             '1 allowed action and array parent config' => [
                 'config' => DatagridConfiguration::create([
@@ -382,17 +395,18 @@ class OperationListenerTest extends \PHPUnit_Framework_TestCase
                     ],
                 ]),
                 'record' => new ResultRecord(['id' => 4]),
-                'actions' => [
-                    'action1' => $this->createOperation('operation1', true),
-                    'action3' => $this->createOperation('operation3', false)
-                ],
+                'buttonCollection' => $this->createButtonsCollection(
+                    [
+                        $this->createButton('action1', true, ['getOrder' => 1]),
+                        $this->createButton('action3', false, ['getOrder' => 2])
+                    ]
+                ),
                 'expectedActions' => [
                     'action1' => ['option1' => 'value1', 'option2' => 'value2', 'key1' => 'value1'],
                     'action3' => false,
                     'view' => ['key1' => 'value1'],
                     'update' => false,
                 ],
-                'context' => ['entityClass' => null, 'datagrid' => 'datagrid_name', 'group' => null],
             ],
             '1 allowed action and callable parent config' => [
                 'config' => DatagridConfiguration::create([
@@ -408,18 +422,19 @@ class OperationListenerTest extends \PHPUnit_Framework_TestCase
                     ],
                 ]),
                 'record' => new ResultRecord(['id' => 4]),
-                'actions' => [
-                    'action1' => $this->createOperation('operation1', true),
-                    'action3' => $this->createOperation('operation3', false)
-                ],
+                'buttonCollection' => $this->createButtonsCollection(
+                    [
+                        $this->createButton('action1', true, ['getOrder' => 1]),
+                        $this->createButton('action3', false, ['getOrder' => 2])
+                    ]
+                ),
                 'expectedActions' => [
                     'action1' => ['option1' => 'value1', 'option2' => 'value2', 'key1' => 'value1'],
                     'action3' => false,
                     'view' => ['key2' => 'value2'],
                     'update' => true
                 ],
-                'context' => ['entityClass' => null, 'datagrid' => 'datagrid_name', 'group' => null],
-            ],
+            ]
         ];
     }
 
@@ -442,24 +457,79 @@ class OperationListenerTest extends \PHPUnit_Framework_TestCase
     /**
      * @param string $name
      * @param bool $isAvailable
-     * @param array $definitionParams
+     * @param array $extraData
+     * @param string $class
      *
-     * @return Operation|\PHPUnit_Framework_MockObject_MockObject
+     * @return ButtonInterface|\PHPUnit_Framework_MockObject_MockObject
      */
-    protected function createOperation($name = 'test_operation', $isAvailable = true, array $definitionParams = [])
+    protected function createButton($name, $isAvailable = true, array $extraData = [], $class = ButtonInterface::class)
     {
-        /** @var $definition OperationDefinition|\PHPUnit_Framework_MockObject_MockObject */
-        $definition = $this->getMock(OperationDefinition::class);
+        $buttonContext = new ButtonContext();
+        $buttonContext->setEnabled($isAvailable);
 
-        foreach ($definitionParams as $method => $params) {
-            $definition->expects($this->any())->method($method)->willReturn($params);
+        /** @var $button ButtonInterface|\PHPUnit_Framework_MockObject_MockObject */
+        $button = $this->getMockBuilder($class)->disableOriginalConstructor()->getMock();
+        $button->expects($this->any())->method('getName')->willReturn($name);
+        if (!array_key_exists('getTemplateData', $extraData)) {
+            $button->expects($this->any())->method('getTemplateData')->willReturn(['additionalData' => []]);
+        }
+        $button->expects($this->any())->method('getButtonContext')->willReturn($buttonContext);
+
+        foreach ($extraData as $method => $data) {
+            $button->expects($this->any())->method($method)->willReturn($data);
         }
 
-        /** @var $operation Operation|\PHPUnit_Framework_MockObject_MockObject */
+        return $button;
+    }
+
+    /**
+     * @param string $name
+     * @param bool $isAvailable
+     * @param array $datagridOptions
+     * @param array $extraData
+     * @return ButtonInterface|\PHPUnit_Framework_MockObject_MockObject
+     */
+    protected function createOperationButton($name, $isAvailable, array $datagridOptions, array $extraData = [])
+    {
+        $button = $this->createButton($name, $isAvailable, $extraData, OperationButton::class);
+        $button->expects($this->any())->method('getOperation')->willReturn($this->createOperation($datagridOptions));
+
+        return $button;
+    }
+
+    /**
+     * @param array $buttons
+     * @return ButtonsCollection
+     */
+    protected function createButtonsCollection(array $buttons)
+    {
+        $extension = $this->getMock(ButtonProviderExtensionInterface::class);
+        $extension->expects($this->once())->method('find')->willReturn($buttons);
+        $extension->expects($this->any())
+            ->method('isAvailable')
+            ->willReturnCallback(
+                function (ButtonInterface $button) {
+                    return $button->getButtonContext()->isEnabled();
+                }
+            );
+
+        $collection = new ButtonsCollection();
+        $collection->consume($extension, new ButtonSearchContext());
+
+        return $collection;
+    }
+
+    /**
+     * @param array $datagridOptions
+     * @return Operation|\PHPUnit_Framework_MockObject_MockObject
+     */
+    protected function createOperation(array $datagridOptions)
+    {
+        $definition = $this->getMockBuilder(OperationDefinition::class)->disableOriginalConstructor()->getMock();
+        $definition->expects($this->any())->method('getDatagridOptions')->willReturn($datagridOptions);
+
         $operation = $this->getMockBuilder(Operation::class)->disableOriginalConstructor()->getMock();
         $operation->expects($this->any())->method('getDefinition')->willReturn($definition);
-        $operation->expects($this->any())->method('getName')->willReturn($name);
-        $operation->expects($this->any())->method('isAvailable')->willReturn($isAvailable);
 
         return $operation;
     }

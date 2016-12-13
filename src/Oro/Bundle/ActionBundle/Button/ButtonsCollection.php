@@ -52,7 +52,8 @@ class ButtonsCollection implements \IteratorAggregate, \Countable
      */
     public function filter(callable $filter)
     {
-        $collection = new static;
+        $collection = new static();
+
 
         /** @var ButtonInterface $button */
         foreach ($this->buttonsMap as $button) {
