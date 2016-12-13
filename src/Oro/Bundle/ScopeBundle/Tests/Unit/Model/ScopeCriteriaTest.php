@@ -2,9 +2,11 @@
 
 namespace Oro\Bundle\ScopeBundle\Tests\Unit\Model;
 
+use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\Platforms\MySqlPlatform;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Query\Expr;
 use Doctrine\ORM\QueryBuilder;
-
 use Oro\Bundle\ApiBundle\Collection\Join;
 use Oro\Bundle\ScopeBundle\Entity\Scope;
 use Oro\Bundle\ScopeBundle\Model\ScopeCriteria;
@@ -52,6 +54,11 @@ class ScopeCriteriaTest extends \PHPUnit_Framework_TestCase
     {
         /** @var QueryBuilder|\PHPUnit_Framework_MockObject_MockObject $qb */
         $qb = $this->getMockBuilder(QueryBuilder::class)->disableOriginalConstructor()->getMock();
+
+        $platform = $this->getMockBuilder(MySQLPlatform::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+        $this->platformIsCalled($platform, $qb);
         $criteria = new ScopeCriteria(
             [
                 'nullField' => null,
@@ -132,7 +139,10 @@ class ScopeCriteriaTest extends \PHPUnit_Framework_TestCase
             ]
         );
         $qb = $this->getBaseQbMock();
-
+        $platform = $this->getMockBuilder(MySQLPlatform::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+        $this->platformIsCalled($platform, $qb);
 
         $qb->expects($this->once())
             ->method('innerJoin')
@@ -205,5 +215,26 @@ class ScopeCriteriaTest extends \PHPUnit_Framework_TestCase
                 ]
             );
         return $qb;
+    }
+
+    /**
+     * @param $platform
+     * @param $qb
+     */
+    protected function platformIsCalled($platform, $qb)
+    {
+        $connection = $this->getMockBuilder(Connection::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+        $connection->expects($this->any())
+            ->method('getDatabasePlatform')
+            ->willReturn($platform);
+        $em = $this->getMock(EntityManagerInterface::class);
+        $em->expects($this->any())
+            ->method('getConnection')
+            ->willReturn($connection);
+        $qb->expects($this->any())
+            ->method('getEntityManager')
+            ->willReturn($em);
     }
 }

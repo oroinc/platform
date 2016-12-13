@@ -40,7 +40,7 @@ class ActionGroupTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        /** @var \PHPUnit_Framework_MockObject_MockObject|ParametersResolver $parametersResolver */
+        /** @var \PHPUnit_Framework_MockObject_MockObject|ActionGroup\ParametersResolver $parametersResolver */
         $parametersResolver = $this->getMockBuilder(
             'Oro\Bundle\ActionBundle\Model\ActionGroup\ParametersResolver'
         )->disableOriginalConstructor()->getMock();

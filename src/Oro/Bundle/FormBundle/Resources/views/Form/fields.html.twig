@@ -379,6 +379,7 @@
     {% import 'OroUIBundle::macros.html.twig' as UI %}
     <div {{ UI.renderPageComponentAttributes({
         module: 'oroui/js/app/components/view-component',
+        name: 'from_validation',
         options: {
             _sourceElement: '#' ~ form.vars.id,
             view: 'oroform/js/app/views/form-validate-view',
@@ -684,4 +685,17 @@
          data-layout="separate" >
         {{ form_widget(form) }}
     </div>
+{% endblock %}
+
+{% block oro_entity_tree_select_row %}
+    {{ block('form_row') }}
+{% endblock %}
+
+{% block oro_entity_tree_select_widget %}
+    <div data-page-component-module="{{ form.vars.pageComponentModule }}"
+         data-page-component-options="{{ form.vars.treeOptions|json_encode }}">
+    </div>
+
+    {{ form_widget(form) }}
+    {{ form_errors(form) }}
 {% endblock %}

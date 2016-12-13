@@ -48,6 +48,12 @@ class ActivityContext extends OroFeatureContext implements OroPageObjectAware, S
     }
 
     /**
+     * Get collapsed activity item and comment it
+     * Example: Given collapse "Contact with Charlie" in activity list
+     *          When I add activity comment with:
+     *            | Message    | Ask how his mood |
+     *            | Attachment | cat.jpg          |
+     *
      * @When /^(?:|I )add activity comment with:$/
      */
     public function iAddActivityCommentWith(TableNode $table)
@@ -58,6 +64,11 @@ class ActivityContext extends OroFeatureContext implements OroPageObjectAware, S
     }
 
     /**
+     * Edit comment in collapsed activity item
+     * Example: Given collapse "Contact with Charlie" in activity list
+     *          When I edit "Ask how his mood" activity comment with:
+     *            | Message    | Just wish a nice day |
+     *
      * @When /^(?:|I )edit "(?P<comment>[^"]+)" activity comment with:$/
      */
     public function iEditActivityCommentWith($comment, TableNode $table)
@@ -68,6 +79,10 @@ class ActivityContext extends OroFeatureContext implements OroPageObjectAware, S
     }
 
     /**
+     * Delete comment from collapsed activity item
+     * Example: Given I collapse "Contact with Charlie" in activity list
+     *          And delete "Just wish a nice day" activity comment
+     *
      * @When /^(?:|I )delete "(?P<comment>[^"]+)" activity comment$/
      */
     public function iDeleteActivityCommentWith($comment)
@@ -78,6 +93,8 @@ class ActivityContext extends OroFeatureContext implements OroPageObjectAware, S
     }
 
     /**
+     * Assert that activity list is empty
+     *
      * @Then there is no records in activity list
      */
     public function thereIsNoRecordsInActivityList()
@@ -111,6 +128,10 @@ class ActivityContext extends OroFeatureContext implements OroPageObjectAware, S
     }
 
     /**
+     * Click on paginations buttons in activity list
+     * Example: When go to older activities
+     * Example: When go to newer activities
+     *
      * @When /^(?:|I )go to (?P<linkLocator>(?:[nN]ewer|[oO]lder)) activities$/
      */
     public function goToNewerOrOlderActivities($linkLocator)
@@ -178,6 +199,9 @@ class ActivityContext extends OroFeatureContext implements OroPageObjectAware, S
     }
 
     /**
+     * Assert email thread icon
+     * Example: Then email "Work for you" should have thread icon
+     *
      * @Then email :arg1 should have thread icon
      */
     public function emailShouldHaveThreadIcon($content)
@@ -216,6 +240,7 @@ class ActivityContext extends OroFeatureContext implements OroPageObjectAware, S
 
     /**
      * Assert that one of contexts contains text
+     * Example: And I should see Charlie in Contexts
      *
      * @Then /^(?:|I )should see (?P<text>\w+) in Contexts$/
      */
@@ -229,8 +254,9 @@ class ActivityContext extends OroFeatureContext implements OroPageObjectAware, S
 
     /**
      * Search text in current collapsed activity
+     * Example: Then I should see Ask how his mood text in activity
      *
-     * @Then /^(?:|I )should see (?P<text>.+) text in activity/
+     * @Then /^(?:|I )should see (?P<text>.+) text in activity$/
      */
     public function iShouldSeeTextInCollapsedActivityItem($text)
     {
