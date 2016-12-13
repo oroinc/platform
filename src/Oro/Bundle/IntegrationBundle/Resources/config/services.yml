@@ -29,9 +29,7 @@ parameters:
 
     oro_integration.delete_manager.class:                                 Oro\Bundle\IntegrationBundle\Manager\DeleteManager
     oro_integration.sync_scheduler.class:                                 Oro\Bundle\IntegrationBundle\Manager\SyncScheduler
-    oro_integration.genuine_sync_scheduler.class:                         Oro\Bundle\IntegrationBundle\Manager\GenuineSyncScheduler
 
-    oro_integration.reverse_sync.processor.class:                         Oro\Bundle\IntegrationBundle\Provider\ReverseSyncProcessor
     oro_integration.provider.settings_provider.class:                     Oro\Bundle\IntegrationBundle\Provider\SettingsProvider
 
     oro_integration.config_resolver.class:                                Oro\Component\Config\Resolver\SystemAwareResolver
@@ -208,16 +206,15 @@ services:
     oro_integration.sync_scheduler:
         class: %oro_integration.sync_scheduler.class%
         arguments:
-            - '@doctrine'
-            - '@oro_integration.manager.types_registry'
+            - '@oro_message_queue.message_producer'
 
     oro_integration.genuine_sync_scheduler:
-        class: %oro_integration.genuine_sync_scheduler.class%
+        class: 'Oro\Bundle\IntegrationBundle\Manager\GenuineSyncScheduler'
         arguments:
-            - '@doctrine'
+            - '@oro_message_queue.message_producer'
 
     oro_integration.reverse_sync.processor:
-        class: %oro_integration.reverse_sync.processor.class%
+        class: 'Oro\Bundle\IntegrationBundle\Provider\ReverseSyncProcessor'
         arguments:
             - '@oro_importexport.processor.registry'
             - '@oro_integration.job_executor'
@@ -267,12 +264,12 @@ services:
         arguments:
             - '@doctrine'
         tags:
-            - { name: oro_workflow.condition, alias: 'has_active_integration' }
+            - { name: oro_action.condition, alias: 'has_active_integration' }
 
     oro_integration.action.abstract_fields_changes:
         abstract: true
         arguments:
-            - '@oro_action.context_accessor'
+            - '@oro_action.expression.context_accessor'
         calls:
             - [setFieldsChangesManager, ['@oro_integration.manager.fields_changes']]
 
@@ -280,21 +277,21 @@ services:
         class: %oro_integration.action.save_fields_changes.class%
         parent: oro_integration.action.abstract_fields_changes
         tags:
-            - { name: oro_workflow.action, alias: save_fields_changes }
+            - { name: oro_action.action, alias: save_fields_changes }
 
     oro_integration.action.remove_fields_changes:
         class: %oro_integration.action.remove_fields_changes.class%
         parent: oro_integration.action.abstract_fields_changes
         tags:
-            - { name: oro_workflow.action, alias: remove_fields_changes }
+            - { name: oro_action.action, alias: remove_fields_changes }
 
     oro_integration.workflow.action.populate_integration_owner:
         class: %oro_integration.workflow.action.populate_integration_owner.class%
         arguments:
-            - '@oro_action.context_accessor'
+            - '@oro_action.expression.context_accessor'
             - '@oro_integration.helper.default_owner_helper'
         tags:
-            - { name: oro_workflow.action, alias: populate_integration_owner }
+            - { name: oro_action.action, alias: populate_integration_owner }
 
     oro_integration.twig.integration:
         class: %oro_integration.twig.integration.class%
@@ -302,3 +299,25 @@ services:
             - '@event_dispatcher'
         tags:
             - { name: twig.extension }
+
+    oro_integration.async.sync_integration_processor:
+        class: 'Oro\Bundle\IntegrationBundle\Async\SyncIntegrationProcessor'
+        arguments:
+            - '@doctrine'
+            - '@security.token_storage'
+            - '@oro_integration.processor_registry'
+            - '@oro_message_queue.job.runner'
+            - '@logger'
+        tags:
+            - { name: 'oro_message_queue.client.message_processor' }
+
+    oro_integration.async.revers_sync_integration_processor:
+        class: 'Oro\Bundle\IntegrationBundle\Async\ReversSyncIntegrationProcessor'
+        arguments:
+            - '@oro_entity.doctrine_helper'
+            - '@oro_integration.reverse_sync.processor'
+            - '@oro_integration.manager.types_registry'
+            - '@oro_message_queue.job.runner'
+            - '@logger'
+        tags:
+            - { name: 'oro_message_queue.client.message_processor' }

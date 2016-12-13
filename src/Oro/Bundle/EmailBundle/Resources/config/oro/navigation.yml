@@ -26,7 +26,7 @@ navigation:
                 route: 'oro_email_email_create'
                 extras:
                     description: 'oro.email.menu.shortcut_compose_email.description'
-                    isCustomAction: true
+                    is_custom_action: true
                     dialog: true
                     dialog_config:
                         dataUrl: 'oro_email_email_create'

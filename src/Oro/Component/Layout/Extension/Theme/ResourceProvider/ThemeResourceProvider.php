@@ -7,12 +7,14 @@ use Doctrine\Common\Cache\Cache;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 use Oro\Component\Config\Loader\CumulativeConfigLoader;
-use Oro\Component\Config\Loader\FolderContentCumulativeLoader;
+use Oro\Component\Layout\BlockViewCache;
+use Oro\Component\Layout\Config\Loader\LayoutUpdateCumulativeResourceLoader;
 use Oro\Component\Layout\Loader\LayoutUpdateLoaderInterface;
 
 class ThemeResourceProvider implements ResourceProviderInterface
 {
     const CACHE_KEY = 'oro_layout.theme_updates_resources';
+    const CACHE_LAST_MODIFICATION_DATE = 'oro_layout.last_modification_date';
 
     /** @var LayoutUpdateLoaderInterface */
     private $loader;
@@ -26,14 +28,22 @@ class ThemeResourceProvider implements ResourceProviderInterface
     /** @var Cache */
     private $cache;
 
+    /** @var BlockViewCache */
+    private $blockViewCache;
+
     /**
      * @param LayoutUpdateLoaderInterface $loader
+     * @param BlockViewCache $blockViewCache
      * @param array $excludedPaths
      */
-    public function __construct(LayoutUpdateLoaderInterface $loader, array $excludedPaths = [])
-    {
+    public function __construct(
+        LayoutUpdateLoaderInterface $loader,
+        BlockViewCache $blockViewCache,
+        array $excludedPaths = []
+    ) {
         $this->loader = $loader;
         $this->excludedPaths = $excludedPaths;
+        $this->blockViewCache = $blockViewCache;
     }
 
     /**
@@ -88,6 +98,11 @@ class ThemeResourceProvider implements ResourceProviderInterface
 
         if ($this->cache instanceof Cache) {
             $this->cache->save(self::CACHE_KEY, $this->resources);
+
+            $now = new \DateTime('now', new \DateTimeZone('UTC'));
+            $this->cache->save(self::CACHE_LAST_MODIFICATION_DATE, $now);
+
+            $this->blockViewCache->reset();
         }
     }
 
@@ -124,11 +139,12 @@ class ThemeResourceProvider implements ResourceProviderInterface
     private function getConfigLoader()
     {
         $filenamePatterns = $this->loader->getUpdateFileNamePatterns();
-
-        return new CumulativeConfigLoader(
+        $configLoader = new CumulativeConfigLoader(
             'oro_layout_updates_list',
-            [new FolderContentCumulativeLoader('Resources/views/layouts/', -1, false, $filenamePatterns)]
+            [new LayoutUpdateCumulativeResourceLoader('Resources/views/layouts/', -1, false, $filenamePatterns)]
         );
+
+        return $configLoader;
     }
 
     /**

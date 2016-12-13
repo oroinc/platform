@@ -67,7 +67,7 @@
 {% macro renderTabNavItem(data) %}
     <li {% if data.isActive %}class="active"{% endif %}>
         <a href="{% if data.isActive %}javascript:void(0);{% else %}{{ data.url }}{% endif %}">
-            {% if data.icon is defined and data.icon != '' %}<i class="icon fa {{ data.icon }}"></i>{% endif %}
+            {% if data.icon is defined and data.icon != '' %}<i class="{{ data.icon }}"></i>{% endif %}
             {{ data.title|trans }}
         </a>
     </li>
@@ -88,7 +88,7 @@
             {#div class="clearfix">
                 <div class="input-append">
                     <input type="text" autocomplete="off" value="" name="search" placeholder="Search" class="search">
-                    <button class="btn btn-search" type="submit"><i class="icon-search"></i></button>
+                    <button class="btn btn-search" type="submit"><i class="fa-search"></i></button>
                 </div>
             </div>#}
             <div class="clearfix">
@@ -108,7 +108,7 @@
                 <div class="accordion-heading">
                     <a href="#config_tab_{{ tabData.name }}" data-toggle="collapse"
                        class="accordion-toggle{% if not tabData.isActive %} collapsed{% endif %}">
-                        {%- if tabData.icon is defined and tabData.icon != '' %}<i class="icon fa {{ tabData.icon }}"></i>{% endif -%}
+                        {%- if tabData.icon is defined and tabData.icon != '' %}<i class="{{ tabData.icon }}"></i>{% endif -%}
                         {{- tabData.title|trans -}}
                     </a>
                 </div>
@@ -230,6 +230,7 @@
 {% macro renderFieldset(block) %}
     {% import 'OroUIBundle::macros.html.twig' as ui %}
     <fieldset class="form-horizontal form-horizontal-large">
+        {% if block.title is defined %}
         <h5 class="user-fieldset">
             <span>{{ block.title|trans }}
                 {% if block.tooltip is defined and block.tooltip != '' %}
@@ -237,6 +238,7 @@
                 {% endif %}
             </span>
         </h5>
+        {% endif %}
 
         {% if block.description is defined and block.description != '' %}
             <div class="container-fluid">

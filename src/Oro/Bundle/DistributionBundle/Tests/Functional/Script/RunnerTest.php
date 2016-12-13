@@ -9,6 +9,9 @@ use Psr\Log\LoggerInterface;
 use Oro\Bundle\DistributionBundle\Script\Runner;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
+/**
+ * @group dist
+ */
 class RunnerTest extends WebTestCase
 {
     /**

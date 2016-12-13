@@ -4,12 +4,14 @@ services:
         arguments:
             - '@oro_workflow.manager'
             - '@doctrine'
+            - '@oro_featuretoggle.checker.feature_checker'
 
     oro_workflow.handler.transition_cron_trigger:
         class: 'Oro\Bundle\WorkflowBundle\Handler\TransitionCronTriggerHandler'
         arguments:
             - '@oro_workflow.manager'
             - '@oro_workflow.helper.transition_cron_trigger'
+            - '@oro_featuretoggle.checker.feature_checker'
 
     oro_workflow.async.transition_trigger_processor.abstract:
         class: 'Oro\Bundle\WorkflowBundle\Async\TransitionTriggerProcessor'

@@ -57,6 +57,8 @@ Scenario: Response email
 #  When I click next attachment
 #  Then I should see view of 2 attachment
 
+# todo: unskip when BAP-12843 will resolved
+@skip
 Scenario: Forward email
   Given shouldn't see "Fwd: Re: Work for you" email in activity list
   When I click "Forward" on "Work for you" in activity list
@@ -64,6 +66,8 @@ Scenario: Forward email
   And press "Send"
   Then should see "Fwd: Re: Work for you" email in activity list
 
+# todo: unskip when BAP-12843 will resolved
+@skip
 Scenario: Delete contexts
   When I collapse "Fwd: Re: Work for you" in activity list
   And delete all contexts from collapsed email
@@ -72,6 +76,8 @@ Scenario: Delete contexts
   And click view Brad in grid
   And shouldn't see "Fwd: Re: Work for you" email in activity list
 
+# todo: unskip when BAP-12843 will resolved
+@skip
 Scenario: Add contexts
   Given I click My emails in user menu
   And I click View Work for you in grid

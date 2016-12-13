@@ -21,7 +21,7 @@ class GetRestJsonApiWithTableInheritanceTest extends RestJsonApiTestCase
     {
         parent::setUp();
 
-        $this->loadFixtures(['Oro\Bundle\ApiBundle\Tests\Functional\DataFixtures\LoadTableInheritanceData']);
+        $this->loadFixtures(['@OroApiBundle/Tests/Functional/DataFixtures/table_inheritance.yml']);
     }
 
     /**

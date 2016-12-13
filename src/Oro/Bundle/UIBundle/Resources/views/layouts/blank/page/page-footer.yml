@@ -1,0 +1,10 @@
+layout:
+    actions:
+        - '@setBlockTheme':
+            themes: 'page-footer.html.twig'
+
+        - '@add':
+            id: page_footer
+            parentId: page_container
+            blockType: container
+            prepend: false

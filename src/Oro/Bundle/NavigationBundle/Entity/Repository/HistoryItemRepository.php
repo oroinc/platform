@@ -28,6 +28,7 @@ class HistoryItemRepository extends EntityRepository implements NavigationReposi
                     'ni.id',
                     'ni.url',
                     'ni.title',
+                    'ni.route',
                 )
             )
         )
@@ -42,8 +43,8 @@ class HistoryItemRepository extends EntityRepository implements NavigationReposi
             ->setParameters(array('user' => $user, 'organization' => $organization));
 
         $orderBy = array(array('field' => NavigationHistoryItem::NAVIGATION_HISTORY_COLUMN_VISITED_AT));
-        if (isset($options['orderBy'])) {
-            $orderBy = (array) $options['orderBy'];
+        if (isset($options['order_by'])) {
+            $orderBy = (array) $options['order_by'];
         }
         $fields = $this->_em->getClassMetadata($this->_entityName)->getFieldNames();
         foreach ($orderBy as $order) {
@@ -54,8 +55,8 @@ class HistoryItemRepository extends EntityRepository implements NavigationReposi
                 );
             }
         }
-        if (isset($options['maxItems'])) {
-            $qb->setMaxResults((int) $options['maxItems']);
+        if (isset($options['max_items'])) {
+            $qb->setMaxResults((int) $options['max_items']);
         }
 
         return $qb->getQuery()->getArrayResult();

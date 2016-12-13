@@ -2,6 +2,7 @@
 
 namespace Oro\Component\Layout;
 
+use Oro\Component\Layout\ExpressionLanguage\ExpressionProcessor;
 use Oro\Component\Layout\Extension\ExtensionInterface;
 use Oro\Component\Layout\Extension\PreloadedExtension;
 
@@ -60,6 +61,43 @@ class LayoutFactoryBuilder implements LayoutFactoryBuilderInterface
      * @var string
      */
     private $defaultRenderer;
+
+    /**
+     * @var ExpressionProcessor
+     */
+    private $expressionProcessor;
+
+    /**
+     * @var BlockViewCache|null
+     */
+    private $blockViewCache;
+
+    /**
+     * @var boolean
+     */
+    private $debug = false;
+
+    /**
+     * @param ExpressionProcessor $expressionProcessor
+     * @param BlockViewCache|null $blockViewCache
+     */
+    public function __construct(ExpressionProcessor $expressionProcessor, BlockViewCache $blockViewCache = null)
+    {
+        $this->expressionProcessor = $expressionProcessor;
+        $this->blockViewCache = $blockViewCache;
+    }
+
+    /**
+     * @param boolean $debug
+     *
+     * @return LayoutFactoryBuilder
+     */
+    public function setDebug($debug)
+    {
+        $this->debug = $debug;
+
+        return $this;
+    }
 
     /**
      * {@inheritdoc}
@@ -154,6 +192,14 @@ class LayoutFactoryBuilder implements LayoutFactoryBuilderInterface
             $rendererRegistry->setDefaultRenderer($defaultRenderer);
         }
 
-        return new LayoutFactory($registry, $rendererRegistry);
+        return new LayoutFactory($registry, $rendererRegistry, $this->expressionProcessor, $this->getBlockViewCache());
+    }
+
+    /**
+     * @return BlockViewCache|null
+     */
+    private function getBlockViewCache()
+    {
+        return $this->debug === false ? $this->blockViewCache : null;
     }
 }

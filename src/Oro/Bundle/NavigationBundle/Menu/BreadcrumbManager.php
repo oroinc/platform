@@ -101,7 +101,7 @@ class BreadcrumbManager implements BreadcrumbManagerInterface
             }
 
             if ($item->getChildren() && $currentChild = $this->getMenuItemByRoute($item, $route)) {
-                if ($currentChild->getExtra('skipBreadcrumbs', false)) {
+                if ($currentChild->getExtra('skip_breadcrumbs', false)) {
                     return $item;
                 }
 

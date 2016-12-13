@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\FeatureToggleBundle\Checker;
 
+use Oro\Component\PhpUtils\ArrayUtil;
+
 use Oro\Bundle\FeatureToggleBundle\Checker\Voter\VoterInterface;
 use Oro\Bundle\FeatureToggleBundle\Configuration\ConfigurationManager;
 
@@ -125,6 +127,25 @@ class FeatureChecker
         }
 
         return true;
+    }
+
+    /**
+     * @param string $resourceType
+     *
+     * @return array
+     */
+    public function getDisabledResourcesByType($resourceType)
+    {
+        $resources = $this->configManager->getResourcesByType($resourceType);
+
+        $disabledResources = [];
+        foreach ($resources as $resource => $features) {
+            if (!ArrayUtil::some([$this, 'isFeatureEnabled'], $features)) {
+                $disabledResources[] = $resource;
+            }
+        }
+
+        return $disabledResources;
     }
 
     public function resetCache()

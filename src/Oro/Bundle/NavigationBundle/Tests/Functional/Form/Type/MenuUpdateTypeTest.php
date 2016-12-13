@@ -73,14 +73,14 @@ class MenuUpdateTypeTest extends FormIntegrationTestCase
                         'default' => self::TEST_DESCRIPTION
                     ]
                 ],
-                'icon'=> 'icon-anchor',
+                'icon'=> 'fa-anchor',
             ]
         );
 
         $expected = new MenuUpdate();
         $expectedTitle = (new LocalizedFallbackValue)->setString(self::TEST_TITLE);
         $expected->addTitle($expectedTitle);
-        $expected->setIcon('icon-anchor');
+        $expected->setIcon('fa-anchor');
 
         $expectedDescription = (new LocalizedFallbackValue)->setText(self::TEST_DESCRIPTION);
         $expected->addDescription($expectedDescription);
@@ -171,7 +171,7 @@ class MenuUpdateTypeTest extends FormIntegrationTestCase
         $menuItem = $this->getMock(ItemInterface::class);
         $menuItem->expects($this->any())
             ->method('getExtra')
-            ->with('aclResourceId')
+            ->with('acl_resource_id')
             ->willReturn(self::TEST_ACL_RESOURCE_ID);
 
         $form = $this->factory->create(new MenuUpdateType(), $menuUpdate, ['menu_item' => $menuItem]);

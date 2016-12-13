@@ -54,7 +54,6 @@ class OroCommentBundleInstaller implements
     {
         OroCommentBundle10::createCommentTable($schema);
         OroCommentBundle10::addCommentToEmail($schema, $this->comment);
-        OroCommentBundle10::addCommentToCalendarEvent($schema, $this->comment);
         OroCommentBundle10::addCommentToNote($schema, $this->comment);
         OroCommentBundle10::addAttachment($schema, $this->attachmentExtension);
     }

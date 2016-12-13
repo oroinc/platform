@@ -51,6 +51,7 @@ Table of Contents
    - [Workflow Data Normalizer](#workflow-data-normalizer)
    - [Attribute Normalizer](#attribute-normalizer)
    - [Parameter Pass](#parameter-pass)
+   - [Workflow Scope Manager](#workflow-scope-manager)
 
 Main Entities
 =============
@@ -143,6 +144,7 @@ list of errors;
 * **hasForm()** - if transition has form or not;
 * **isHidden()** - check is current transition can be displayed;
 * **isUnavailableHidden()** - check is current transition can be hidden;
+* **isEmptyInitOptions()** - check that the not set init options: init_routes, init_entities for current transition
 
 Attribute
 ---------
@@ -150,7 +152,7 @@ Attribute
 Oro\Bundle\ActionBundle\Model\Attribute
 
 **Description:**
-Encapsulates attribute parameters, has label, type and options. Also has possibility manage ACL permission
+Encapsulates attribute parameters, has type and options. Also has possibility manage ACL permission
 for the entity actions.
 
 **Methods:**
@@ -320,7 +322,7 @@ Workflow Step
 Oro\Bundle\WorkflowBundle\Entity\WorkflowStep
 
 **Description:**
-This class is the representation of Step entity, it stores only data that be used in DB requests: name, label,
+This class is the representation of Step entity, it stores only data that be used in DB requests: name,
 step order and final flag. Also Workflow Step knows about Workflow Definition that it attached to.
 
 **Methods:**
@@ -527,7 +529,7 @@ and list of additional functions applicable to attributes.
 Context Accessor
 ----------------
 **Class:**
-Oro\Component\Action\Model\ContextAccessor
+Oro\Component\ConfigExpression\ContextAccessor
 
 **Description:**
 Context is used in action and conditions and thereby it's usually an instance of Workflow Item.
@@ -665,3 +667,17 @@ Passes through configuration and replaces access properties (f.e. $property) wit
 
 **Methods:**
 * **pass(data)** - replaces access properties with Property Path instances.
+
+Workflow Scope Manager
+----------------------
+**Class:**
+Oro\Bundle\WorkflowBundle\Scope\WorkflowScopeManager
+
+**Description:**
+Responsible for updating collection of relations to `Oro\Bundle\ScopeBundle\Entity\Scope` entity from
+`Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition` entity and represents as property `scopes` of `WorkflowDefinition`
+entity. To generate relations it uses data from node `scopes` of Workflow configuration.
+
+**Methods:**
+* **setEnabled(bool)** - enable or disable (enabled by default) logic of manager, it helps to reload workflow configuration without any changes in table of WorkflowScope
+* **updateScopes(WorkflowDefinition)** - update list of WorkflowScope entities in database by scope configuration of current WorkflowDefinition

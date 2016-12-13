@@ -48,7 +48,7 @@ datagrids:
                 type:         dialog
                 acl_resource: oro_email_autoresponserule_update
                 label:        oro.grid.action.update
-                icon:         edit
+                icon:         pencil-square-o
                 link:         update_link
                 rowAction:    true
                 widgetOptions:
@@ -66,7 +66,7 @@ datagrids:
                 type:         delete
                 acl_resource: oro_email_autoresponserule_delete
                 label:        oro.grid.action.delete
-                icon:         trash
+                icon:         trash-o
                 link:         delete_link
         options:
             toolbarOptions:
@@ -100,6 +100,7 @@ datagrids:
                 select:
                     - partial eu.{id, email}
                     - e
+                    - eu.receivedAt as receivedAt
                     - eb.textBody AS body_content
                     - >
                         (SELECT COUNT(_ec.id)
@@ -163,8 +164,8 @@ datagrids:
                 label:
                 frontend_type: html
                 template: OroEmailBundle:Email:Datagrid/Property/attachments.html.twig
-            sentAt:
-                data_name: email.sentAt
+            receivedAt:
+                data_name: receivedAt
                 type: twig
                 label: oro.email.date.label
                 frontend_type: html
@@ -174,8 +175,8 @@ datagrids:
         sorters:
             columns:
                 subject:  { data_name: e.subject }
-                sentAt:   { data_name: e.sentAt }
-            default: { sentAt: %oro_datagrid.extension.orm_sorter.class%::DIRECTION_DESC }
+                receivedAt:   { data_name: receivedAt }
+            default: { receivedAt: %oro_datagrid.extension.orm_sorter.class%::DIRECTION_DESC }
         options:
             entityHint: email
 
@@ -273,13 +274,13 @@ datagrids:
                 type: navigate
                 label: oro.grid.action.view
                 link: view_thread_link
-                icon: eye-open
+                icon: eye
                 rowAction: true
             mark_as_read:
                 type: ajax
                 label: oro.email.datagrid.emails.action.mark_as_read
                 link:  toggle_seen_link
-                icon: check
+                icon: check-square-o
                 defaultMessages:
                     success: oro.email.action.success_mark_read
                     error: oro.email.action.error
@@ -298,7 +299,7 @@ datagrids:
                 entity_name: %oro_email.email_user.entity.class%
                 data_identifier: eu.id
                 label: oro.email.datagrid.emails.action.mark_as_read
-                icon: check
+                icon: check-square-o
             emailmarkunread:
                 type: emailmarkunread
                 entity_name: %oro_email.email_user.entity.class%
@@ -341,6 +342,15 @@ datagrids:
                 type: callback
                 className: 'email-row-is-readed'
                 callable: "@oro_email.helper.datagrid.emails->getReadedRowClosure"
+            email.id: ~
+            view_thread_link:
+                type: url
+                route: oro_email_thread_widget
+                params: { id: email.id }
+            reply_email_link:
+                type: url
+                route: oro_email_email_reply
+                params: { id: email.id }
         options:
             entityHint: email
             toolbarOptions:
@@ -350,6 +360,38 @@ datagrids:
                 pageSize:
                     items: [10]
                     default_per_page: 10
+        actions:
+            reply:
+                type: dialog
+                label: oro.email.datagrid.emails.action.reply
+                link:  reply_email_link
+                icon: reply
+                widgetOptions:
+                    options:
+                        dialogOptions:
+                            title:         "@translator->trans(oro.dashboard.recent_emails.reply)"
+                            allowMaximize: false
+                            allowMinimize: false
+                            modal:         true
+                            dblclick:      maximize
+                            maximizedHeightDecreaseBy: minimize-bar
+                            width: 700
+            view_thread:
+                type: dialog
+                label: oro.email.datagrid.emails.action.view
+                link: view_thread_link
+                icon: eye
+                rowAction: true
+                widgetOptions:
+                    options:
+                        dialogOptions:
+                            title:         "@translator->trans(oro.dashboard.recent_emails.view_email)"
+                            allowMaximize: false
+                            allowMinimize: false
+                            modal:         true
+                            dblclick:      maximize
+                            maximizedHeightDecreaseBy: minimize-bar
+                            width: 700
 
     dashboard-recent-emails-inbox-grid:
         extends: dashboard-recent-emails-grid
@@ -358,6 +400,7 @@ datagrids:
                 where:
                     and:
                         - f.type IN ('%oro_email.email_folder.model.class%::INBOX', '%oro_email.email_folder.model.class%::OTHER')
+                        - f.id > 0
         columns:
             receivedAt:
                 type: twig
@@ -389,6 +432,7 @@ datagrids:
                 where:
                     and:
                         - f.type = '%oro_email.email_folder.model.class%::SENT'
+                        - f.id > 0
         columns:
             sentAt:
                 data_name: email.sentAt
@@ -442,6 +486,9 @@ datagrids:
                 receivedAt:  { data_name: eu.receivedAt }
             default:
                 receivedAt: %oro_datagrid.extension.orm_sorter.class%::DIRECTION_DESC
+        options:
+            requireJSModules:
+                - oroemail/js/datagrid/listen-to-read-email-extension
 
     email-templates:
         acl_resource: oro_email_emailtemplate_index
@@ -528,20 +575,20 @@ datagrids:
                 type:         navigate
                 label:        oro.grid.action.update
                 link:         update_link
-                icon:         edit
+                icon:         pencil-square-o
                 acl_resource: oro_email_emailtemplate_update
                 rowAction:    true
             clone:
                 type:         navigate
                 label:        oro.grid.action.clone
                 link:         clone_link
-                icon:         copy
+                icon:         files-o
                 acl_resource: oro_email_emailtemplate_create
             delete:
                 type:         delete
                 label:        oro.grid.action.delete
                 acl_resource: oro_email_emailtemplate_delete
-                icon:         trash
+                icon:         trash-o
                 link:         delete_link
         options:
             entity_pagination: true
@@ -604,12 +651,12 @@ datagrids:
                 type:         navigate
                 label:        oro.grid.action.update
                 link:         update_link
-                icon:         edit
+                icon:         pencil-square-o
                 rowAction:    true
             delete:
                 type:         delete
                 label:        oro.grid.action.delete
-                icon:         trash
+                icon:         trash-o
                 link:         delete_link
 
     email-for-context-grid:

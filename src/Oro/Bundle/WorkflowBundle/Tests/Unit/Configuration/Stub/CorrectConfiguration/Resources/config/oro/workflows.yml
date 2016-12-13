@@ -1,12 +1,17 @@
 workflows:
     first_workflow:
-        label: 'First Workflow'
         is_system: true
         entity: First\Entity
         start_step: first_step
         entity_attribute: my_entity
         steps_display_ordered: true
         priority: 1
+        scopes:
+            - 
+                scope1: value1
+                scope2: value2
+            -
+                scope1: value3
         defaults:
             active: true
         exclusive_active_groups:
@@ -15,7 +20,6 @@ workflows:
             - 'record_group1'
         steps:
             first_step:
-                label: 'First Step'
                 order: 1
                 is_final: true
                 entity_acl:
@@ -25,28 +29,26 @@ workflows:
                     - first_transition
         attributes:
             first_attribute:
-                label: 'First Attribute'
                 type: object
                 options:
                     class: DateTime
             second_attribute:
-                label: 'Second Attribute'
                 type: entity
                 property_path: first_attribute.test
                 entity_acl:
                     delete: false
                 options:
                     class: DateTime
+        disable_operations:
+            operation1: [entity1, entity2]
         transitions:
             first_transition:
-                label: 'First Transition'
                 step_to: first_step
                 is_start: true
                 is_hidden: true
                 is_unavailable_hidden: true
                 acl_resource: some_acl
                 acl_message: "Test ACL message"
-                message: "Test message"
                 transition_definition: first_transition_definition
                 frontend_options:
                     class: foo
@@ -54,6 +56,11 @@ workflows:
                 display_type: page
                 page_template: Workflow:Test:pageTemplate.html.twig
                 dialog_template: Workflow:Test:dialogTemplate.html.twig
+                init_entities:
+                    - entity1
+                init_routes:
+                    - route1
+                init_context_attribute: test_init_context
                 form_options:
                     attribute_fields:
                         first_attribute:
@@ -104,13 +111,11 @@ workflows:
                 post_actions:
                     - '@custom_action': ~
     second_workflow:
-        label: 'Second Workflow'
         entity: Second\Entity
         start_step: second_step
         steps:
             -
                 name: second_step
-                label: 'Second Step'
                 order: 1
                 is_final: false
                 allowed_transitions: []
@@ -118,7 +123,6 @@ workflows:
         transitions:
             -
                 name: second_transition
-                label: 'Second Transition'
                 step_to: second_step
                 transition_definition: second_transition_definition
                 frontend_options:

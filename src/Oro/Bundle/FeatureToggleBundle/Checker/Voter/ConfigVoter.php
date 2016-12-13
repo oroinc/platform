@@ -36,7 +36,9 @@ class ConfigVoter implements VoterInterface
     {
         $toggle = $this->featureConfigManager->get($feature, self::TOGGLE_KEY);
 
-        if ($this->configManager->get($toggle, false, false, $scopeIdentifier)) {
+        if (!$toggle) {
+            return self::FEATURE_ABSTAIN;
+        } elseif ($this->configManager->get($toggle, false, false, $scopeIdentifier)) {
             return self::FEATURE_ENABLED;
         } else {
             return self::FEATURE_DISABLED;

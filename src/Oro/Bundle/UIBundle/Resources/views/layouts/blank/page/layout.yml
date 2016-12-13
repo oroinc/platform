@@ -8,6 +8,9 @@ layout:
                     blockType: head
                 title:
                     blockType: title
+                    options:
+                        value: '=data["title_provider"].getTitle(context["route_name"], params)'
+                        params: []
                 meta_charset:
                     blockType: meta
                     options:
@@ -29,6 +32,19 @@ layout:
                         src: '=data["asset"].getUrl(data["theme"].getStylesOutput(context["theme"]))'
                 body:
                     blockType: body
+                wrapper:
+                      options:
+                          attr:
+                              id: 'container'
+                      blockType: container
+                page_container:
+                    blockType: container
+                page_main:
+                    blockType: container
+                page_sidebar:
+                    blockType: container
+                page_content:
+                    blockType: container
                 require_js:
                     blockType: container
                 requirejs_scripts:
@@ -53,4 +69,9 @@ layout:
                             requirejs_scripts: ~
                         require_modules:
                             app_script: ~
-                    body: ~
+                    body:
+                        wrapper:
+                            page_container:
+                                page_main:
+                                    page_sidebar: ~
+                                    page_content: ~

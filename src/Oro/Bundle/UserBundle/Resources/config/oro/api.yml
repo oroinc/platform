@@ -20,6 +20,14 @@ api:
                     exclude: false # set manually because this entity is marked as a dictionary
                 create:
                     exclude: false # set manually because this entity is marked as a dictionary
+                    fields:
+                        password:
+                            exclude: false # set manually because this field is excluded globally
+                            form_options:
+                                property_path: plainPassword
+                                constraints:
+                                    - NotNull: ~
+                                    - NotBlank: ~
                 update:
                     exclude: false # set manually because this entity is marked as a dictionary
 

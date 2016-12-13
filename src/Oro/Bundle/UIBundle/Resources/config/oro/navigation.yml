@@ -3,8 +3,8 @@ navigation:
         templates:
             application_menu:
                 template: 'OroUIBundle:Menu:application_menu.html.twig'
-                currentClass: 'active'
-                ancestorClass: 'active'
+                current_class: 'active'
+                ancestor_class: 'active'
 
             dots_menu:
                 template: 'OroUIBundle:Menu:dots_menu.html.twig'

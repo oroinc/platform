@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\LocaleBundle\DQL;
 
-use Oro\Bundle\EntityBundle\ORM\QueryUtils;
 use Oro\Bundle\LocaleBundle\Formatter\NameFormatter;
 
 class DQLNameFormatter
@@ -111,32 +110,34 @@ class DQLNameFormatter
     protected function buildConcatExpression($parts, $prefix, $separators)
     {
         $count = count($parts);
-        if ($count > 1 || (!empty($prefix) && $count === 1)) {
-            $items = [];
-            if (!empty($prefix)) {
-                $items[] = sprintf('\'%s\'', $prefix);
-            }
-            for ($i = 0; $i < $count; $i++) {
-                if (empty($separators[$i])) {
-                    $items[] = sprintf(
-                        'CASE WHEN NULLIF(%1$s, \'\') IS NULL THEN \'\' ELSE %1$s END',
-                        $parts[$i]
-                    );
-                } else {
-                    $items[] = sprintf(
-                        'CASE WHEN NULLIF(%1$s, \'\') IS NULL THEN \'\' ELSE CONCAT(%1$s, \'%2$s\') END',
-                        $parts[$i],
-                        $separators[$i]
-                    );
-                }
-            }
 
-            return QueryUtils::buildConcatExpr($items);
-        } elseif ($count === 1) {
-            return reset($parts);
-        } else {
+        if ($count === 0) {
             return '';
         }
+
+        if ($count === 1 && empty($prefix)) {
+            return sprintf('CAST(%s as string)', reset($parts));
+        }
+
+        $items = [];
+        if (!empty($prefix)) {
+            // add prefix as first item
+            $items[] = sprintf('\'%s\'', $prefix);
+        }
+
+        for ($i = 0; $i < $count; $i++) {
+            // fix collation and type for CONCAT
+            $item = sprintf('CAST(%s as string)', $parts[$i]);
+            if (!empty($separators[$i])) {
+                // add the separator
+                $item = sprintf('CONCAT(%s, \'%s\')', $item, $separators[$i]);
+            }
+            // make sure we don't have null, because CONCAT will return null
+            $items[] = sprintf('COALESCE(%s, \'\')', $item);
+        }
+
+        // join all as concat params
+        return sprintf('TRIM(CONCAT(%s))', join(', ', $items));
     }
 
     /**

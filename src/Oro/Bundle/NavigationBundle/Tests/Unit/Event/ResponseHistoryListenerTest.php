@@ -8,6 +8,7 @@ use Oro\Bundle\NavigationBundle\Event\ResponseHistoryListener;
 use Oro\Bundle\NavigationBundle\Provider\TitleService;
 use Oro\Bundle\UserBundle\Entity\User;
 
+use Symfony\Component\HttpFoundation\ParameterBag;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 
@@ -147,6 +148,35 @@ class ResponseHistoryListenerTest extends \PHPUnit_Framework_TestCase
 
         $titleService = $this->getMock('Oro\Bundle\NavigationBundle\Provider\TitleServiceInterface');
 
+        $listener = new ResponseHistoryListener($this->factory, $this->securityContext, $registry, $titleService);
+        $listener->onResponse($event);
+    }
+
+    public function testSkipErrorPages()
+    {
+        $event = $this->getMockBuilder('Symfony\Component\HttpKernel\Event\FilterResponseEvent')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $request = $this->getMockBuilder(Request::class)->disableOriginalConstructor()->getMock();
+        $request->attributes = $this->getMock(ParameterBag::class);
+        $request->attributes->expects($this->once())
+            ->method('get')
+            ->with('_controller')
+            ->willReturn('Oro\Bundle\FrontendBundle\Controller\FrontendController::exceptionAction');
+
+        $event->expects($this->once())
+            ->method('getRequest')
+            ->willReturn($request);
+        $event->expects($this->never())
+            ->method('getResponse');
+        $event->expects($this->once())
+            ->method('getRequestType')
+            ->will($this->returnValue(HttpKernelInterface::MASTER_REQUEST));
+
+        $registry = $this->getMock('Doctrine\Common\Persistence\ManagerRegistry');
+        $registry->expects($this->never())->method('getManagerForClass');
+
+        $titleService = $this->getMock('Oro\Bundle\NavigationBundle\Provider\TitleServiceInterface');
         $listener = new ResponseHistoryListener($this->factory, $this->securityContext, $registry, $titleService);
         $listener->onResponse($event);
     }

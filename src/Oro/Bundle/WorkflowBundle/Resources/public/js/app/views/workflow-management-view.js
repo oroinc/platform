@@ -27,7 +27,9 @@ define(function(require) {
         options: {
             stepsEl: null,
             model: null,
-            entities: []
+            entities: [],
+            templateTranslateLink: null,
+            selectorTranslateLinkContainer: '#workflow_translate_link_label'
         },
 
         initialize: function(options) {
@@ -42,12 +44,21 @@ define(function(require) {
             });
 
             this.$entitySelectEl = this.$('[name$="[related_entity]"]');
+
+            var template = this.options.templateTranslateLink || $('#workflow-translate-link-template').html();
+            this.templateTranslateLink = _.template(template);
+
             this.initEntityFieldsLoader();
             this.listenTo(this.model.get('steps'), 'destroy ', this.onStepRemove);
         },
 
         render: function() {
             this.renderSteps();
+            if (this.model.translateLinkLabel) {
+                $(this.options.selectorTranslateLinkContainer)
+                    .html(this.templateTranslateLink({translateLink: this.model.translateLinkLabel}));
+            }
+
             return this;
         },
 
@@ -117,16 +128,11 @@ define(function(require) {
                 router: 'oro_api_workflow_entity_get',
                 routingParams: {},
                 confirm: confirm,
-                requireConfirm: _.bind(function() {
-                    return this.model.get('steps').length > 1 &&
-                        (this.model.get('transitions').length +
-                            this.model.get('transition_definitions').length +
-                            this.model.get('attributes').length) > 0;
-                }, this)
+                requireConfirm: _.bind(this._requireConfirm, this)
             });
 
             this.$entitySelectEl.on('change', _.bind(function() {
-                if (!this.model.get('entity')) {
+                if (!this._requireConfirm()) {
                     this.model.set('entity', this.$entitySelectEl.val());
                 }
             }, this));
@@ -136,6 +142,13 @@ define(function(require) {
             }, this));
 
             this._preloadEntityFieldsData();
+        },
+
+        _requireConfirm: function() {
+            return (this.model.get('steps').length +
+                this.model.get('transitions').length +
+                this.model.get('transition_definitions').length +
+                this.model.get('attributes').length) > 1;
         },
 
         _preloadEntityFieldsData: function() {

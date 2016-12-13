@@ -2,3 +2,5 @@ layout:
     actions:
         - '@setBlockTheme':
             themes: 'layout.html.twig'
+        - '@setFormTheme':
+            themes: 'form_theme.html.twig'

@@ -4,9 +4,14 @@ namespace Oro\Bundle\WorkflowBundle\Model;
 
 use Doctrine\Common\Collections\ArrayCollection;
 
+use Symfony\Component\Translation\TranslatorInterface;
+
 use Oro\Bundle\ActionBundle\Model\Attribute as BaseAttribute;
 use Oro\Bundle\ActionBundle\Model\AttributeGuesser;
+use Oro\Bundle\ActionBundle\Model\ButtonSearchContext;
+use Oro\Bundle\WorkflowBundle\Configuration\WorkflowConfiguration;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
+use Oro\Bundle\WorkflowBundle\Helper\WorkflowTranslationHelper;
 
 use Oro\Component\Action\Exception\AssemblerException;
 use Oro\Component\Action\Model\AbstractAssembler as BaseAbstractAssembler;
@@ -19,20 +24,29 @@ class AttributeAssembler extends BaseAbstractAssembler
     protected $attributeGuesser;
 
     /**
-     * @param AttributeGuesser $attributeGuesser
+     * @var TranslatorInterface
      */
-    public function __construct(AttributeGuesser $attributeGuesser)
+    protected $translator;
+
+    /**
+     * @param AttributeGuesser $attributeGuesser
+     * @param TranslatorInterface $translator
+     */
+    public function __construct(AttributeGuesser $attributeGuesser, TranslatorInterface $translator)
     {
         $this->attributeGuesser = $attributeGuesser;
+        $this->translator = $translator;
     }
 
     /**
      * @param WorkflowDefinition $definition,
      * @param array $configuration
+     * @param array $transitionConfigurations
+     *
      * @return ArrayCollection
      * @throws AssemblerException If configuration is invalid
      */
-    public function assemble(WorkflowDefinition $definition, array $configuration)
+    public function assemble(WorkflowDefinition $definition, array $configuration, array $transitionConfigurations = [])
     {
         $entityAttributeName = $definition->getEntityAttributeName();
         if (!array_key_exists($entityAttributeName, $configuration)) {
@@ -43,6 +57,23 @@ class AttributeAssembler extends BaseAbstractAssembler
                     'class' => $definition->getRelatedEntity(),
                 ),
             );
+        }
+
+        foreach ($transitionConfigurations as $transition) {
+            if (!array_key_exists(WorkflowConfiguration::NODE_INIT_CONTEXT_ATTRIBUTE, $transition)) {
+                continue;
+            }
+
+            $initContextAttribute = $transition[WorkflowConfiguration::NODE_INIT_CONTEXT_ATTRIBUTE];
+            if (!array_key_exists($initContextAttribute, $configuration)) {
+                $configuration[$initContextAttribute] = [
+                    'label' => $initContextAttribute,
+                    'type' => 'object',
+                    'options' => [
+                        'class' => ButtonSearchContext::class
+                    ],
+                ];
+            }
         }
 
         $attributes = new ArrayCollection();
@@ -106,13 +137,33 @@ class AttributeAssembler extends BaseAbstractAssembler
         $attributeParameters = $this->attributeGuesser->guessAttributeParameters($rootClass, $propertyPath);
         if ($attributeParameters) {
             foreach ($guessedOptions as $option) {
-                if (empty($options[$option]) && !empty($attributeParameters[$option])) {
-                    $options[$option] = $attributeParameters[$option];
+                if (!empty($attributeParameters[$option])) {
+                    if (empty($options[$option])) {
+                        $options[$option] = $attributeParameters[$option];
+                    } elseif ($option === 'label') {
+                        $options[$option] = $this->guessOptionLabel($options, $attributeParameters);
+                    }
                 }
             }
         }
 
         return $options;
+    }
+
+    /**
+     * @param array $options
+     * @param array $attributeParameters
+     * @return string
+     */
+    private function guessOptionLabel(array $options, array $attributeParameters)
+    {
+        $domain = WorkflowTranslationHelper::TRANSLATION_DOMAIN;
+
+        if ($this->translator->trans($options['label'], [], $domain) === $options['label']) {
+            $options['label'] = $attributeParameters['label'];
+        }
+
+        return $options['label'];
     }
 
     /**

@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\ImportExportBundle\Converter;
 
-use Oro\Bundle\ImportExportBundle\Field\FieldHelper;
+use Oro\Bundle\EntityBundle\Helper\FieldHelper;
 use Oro\Bundle\ImportExportBundle\TemplateFixture\TemplateManager;
 
 class TemplateFixtureRelationCalculator implements RelationCalculatorInterface

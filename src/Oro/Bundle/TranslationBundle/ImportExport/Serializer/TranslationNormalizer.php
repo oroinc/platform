@@ -30,7 +30,7 @@ class TranslationNormalizer implements DenormalizerInterface
             throw new UnexpectedValueException('Incorrect record format');
         }
 
-        $translation = $this->translationManager->createValue(
+        $translation = $this->translationManager->createTranslation(
             $data['key'],
             $data['value'],
             $context['language_code'],

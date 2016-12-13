@@ -3,7 +3,6 @@
 namespace Oro\Bundle\ActionBundle\Tests\Unit\DependencyInjection\CompilerPass;
 
 use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Definition;
 
 use Oro\Bundle\ActionBundle\DependencyInjection\CompilerPass\AbstractPass;
@@ -104,13 +103,13 @@ abstract class AbstractPassTest extends \PHPUnit_Framework_TestCase
     {
         $definition = $this->definitionBuilder->getMock();
         $definition->expects($this->once())
-            ->method('setScope')
-            ->with(ContainerInterface::SCOPE_PROTOTYPE)
-            ->willReturn($definition);
+            ->method('setShared')
+            ->with(false)
+            ->willReturnSelf();
         $definition->expects($this->once())
             ->method('setPublic')
             ->with(false)
-            ->willReturn($definition);
+            ->willReturnSelf();
 
         return $definition;
     }

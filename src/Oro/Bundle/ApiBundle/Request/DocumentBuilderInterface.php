@@ -36,6 +36,16 @@ interface DocumentBuilderInterface
     public function setDataCollection($collection, EntityMetadata $metadata = null);
 
     /**
+     * Adds an object related to the primary data.
+     * E.g. in JSON.API this object is added to the "included" section.
+     * @link http://jsonapi.org/format/#fetching-includes
+     *
+     * @param mixed               $object
+     * @param EntityMetadata|null $metadata
+     */
+    public function addIncludedObject($object, EntityMetadata $metadata = null);
+
+    /**
      * Sets an error.
      *
      * @param Error $error

@@ -11,7 +11,7 @@ use Oro\Bundle\ActionBundle\Action\RunActionGroup;
 use Oro\Bundle\ActionBundle\Model\ActionData;
 use Oro\Bundle\ActionBundle\Model\ActionGroupRegistry;
 
-use Oro\Component\Action\Model\ContextAccessor;
+use Oro\Component\ConfigExpression\ContextAccessor;
 
 class RunActionGroupTest extends \PHPUnit_Framework_TestCase
 {

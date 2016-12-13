@@ -13,9 +13,9 @@ services:
         tags:
             - { name: layout.block_type, alias: widget_actions }
 
-    oro_ui.layout.block_type.centered_container:
+    oro_ui.layout.block_type.vertical_container:
         parent: oro_layout.block_type.abstract_configurable_container
         calls:
-            - [setName, ['centered_container']]
+            - [setName, ['vertical_container']]
         tags:
-            - { name: layout.block_type, alias: centered_container }
+            - { name: layout.block_type, alias: vertical_container }

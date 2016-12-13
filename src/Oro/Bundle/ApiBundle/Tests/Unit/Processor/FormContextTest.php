@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor;
 
+use Oro\Bundle\ApiBundle\Collection\IncludedEntityCollection;
 use Oro\Bundle\ApiBundle\Processor\FormContext;
 
 class FormContextTest extends \PHPUnit_Framework_TestCase
@@ -26,6 +27,25 @@ class FormContextTest extends \PHPUnit_Framework_TestCase
         $requestData = [];
         $this->context->setRequestData($requestData);
         $this->assertSame($requestData, $this->context->getRequestData());
+    }
+
+    public function testIncludedData()
+    {
+        $includedData = [];
+        $this->context->setIncludedData($includedData);
+        $this->assertSame($includedData, $this->context->getIncludedData());
+    }
+
+    public function testIncludedEntities()
+    {
+        $this->assertNull($this->context->getIncludedEntities());
+
+        $includedEntities = $this->getMock(IncludedEntityCollection::class);
+        $this->context->setIncludedEntities($includedEntities);
+        $this->assertSame($includedEntities, $this->context->getIncludedEntities());
+
+        $this->context->setIncludedEntities();
+        $this->assertNull($this->context->getIncludedEntities());
     }
 
     public function testFormBuilder()

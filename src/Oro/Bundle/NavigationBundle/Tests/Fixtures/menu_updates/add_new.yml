@@ -28,7 +28,7 @@ result_menu:
             uri: '#custom'
             extras:
                 divider: false
-                translateDisabled: false
+                translate_disabled: false
     tree:
         menu:
             type: menu

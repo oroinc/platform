@@ -567,7 +567,7 @@ class ConfigurableTableDataConverterTest extends \PHPUnit_Framework_TestCase
             ->getMock();
         $fieldTypeHelper = new FieldTypeHelper([]);
 
-        $fieldHelper = $this->getMockBuilder('Oro\Bundle\ImportExportBundle\Field\FieldHelper')
+        $fieldHelper = $this->getMockBuilder('Oro\Bundle\EntityBundle\Helper\FieldHelper')
             ->setConstructorArgs([$fieldProvider, $configProvider, $fieldTypeHelper])
             ->setMethods(array('getConfigValue', 'getFields', 'processRelationAsScalar'))
             ->getMock();

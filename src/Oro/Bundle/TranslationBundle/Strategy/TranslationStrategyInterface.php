@@ -27,4 +27,9 @@ interface TranslationStrategyInterface
      * @return array
      */
     public function getLocaleFallbacks();
+
+    /**
+     * @return bool
+     */
+    public function isApplicable();
 }

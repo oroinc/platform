@@ -60,7 +60,7 @@ abstract class AbstractEngine implements EngineV2Interface
     /**
      * {@inheritdoc}
      */
-    public function search(Query $query, $context = [])
+    public function search(Query $query, array $context = [])
     {
         $event = new BeforeSearchEvent($query);
         $this->eventDispatcher->dispatch(BeforeSearchEvent::EVENT_NAME, $event);

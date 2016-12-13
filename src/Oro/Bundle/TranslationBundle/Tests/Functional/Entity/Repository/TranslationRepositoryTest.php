@@ -74,26 +74,64 @@ class TranslationRepositoryTest extends WebTestCase
     }
 
     /**
-     * @dataProvider findValueDataProvider
+     * @param string $keyPrefix
+     * @param string $locale
+     * @param string $domain
+     * @param array $values
+     *
+     * @dataProvider findValuesProvider
+     */
+    public function testFindValues($keyPrefix, $locale, $domain, array $values)
+    {
+        $this->assertEquals($values, $this->repository->findValues($keyPrefix, $locale, $domain));
+    }
+
+    /**
+     * @return array
+     */
+    public function findValuesProvider()
+    {
+        return [
+            'language2' => [
+                'prefix' => 'translation.',
+                'locale' => LoadLanguages::LANGUAGE2,
+                'domain' => LoadTranslations::TRANSLATION_KEY_DOMAIN,
+                'values' => [
+                    LoadTranslations::TRANSLATION3 => LoadTranslations::TRANSLATION3,
+                    LoadTranslations::TRANSLATION4 => LoadTranslations::TRANSLATION4,
+                    LoadTranslations::TRANSLATION5 => LoadTranslations::TRANSLATION5,
+                ],
+            ],
+            'no translations' => [
+                'prefix' => 'unknown_key_prefix',
+                'locale' => LoadLanguages::LANGUAGE2,
+                'domain' => LoadTranslations::TRANSLATION_KEY_DOMAIN,
+                'values' => [],
+            ],
+        ];
+    }
+
+    /**
+     * @dataProvider findTranslationDataProvider
      *
      * @param string $key
      * @param string $locale
      * @param string $domain
      * @param bool $hasResult
      */
-    public function testFindValue($key, $locale, $domain, $hasResult = false)
+    public function testFindTranslation($key, $locale, $domain, $hasResult = false)
     {
         if (!$hasResult) {
-            $this->assertNull($this->repository->findValue($key, $locale, $domain));
+            $this->assertNull($this->repository->findTranslation($key, $locale, $domain));
         } else {
-            $this->assertEquals($this->repository->findValue($key, $locale, $domain), $this->getReference($key));
+            $this->assertEquals($this->getReference($key), $this->repository->findTranslation($key, $locale, $domain));
         }
     }
 
     /**
      * @return array
      */
-    public function findValueDataProvider()
+    public function findTranslationDataProvider()
     {
         return [
             'existing' => [

@@ -4,7 +4,7 @@ namespace Oro\Component\Action\Action;
 
 use Symfony\Component\PropertyAccess\PropertyPathInterface;
 
-use Oro\Component\Action\Model\ContextAccessor;
+use Oro\Component\ConfigExpression\ContextAccessor;
 use Oro\Component\Action\Exception\InvalidParameterException;
 
 class Traverse extends AbstractAction

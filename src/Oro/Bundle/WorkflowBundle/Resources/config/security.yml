@@ -16,3 +16,35 @@ services:
             - '@oro_workflow.permission_registry'
         tags:
             - { name: security.voter, priority: 500 }
+
+    oro_workflow.acl.metadata_provider:
+        public: false
+        class: Oro\Bundle\WorkflowBundle\Acl\Extension\WorkflowAclMetadataProvider
+        arguments:
+            - '@doctrine'
+            - '@translator'
+            - '@oro_featuretoggle.checker.feature_checker'
+
+    oro_workflow.acl.extension.workflow:
+        public: false
+        class: Oro\Bundle\WorkflowBundle\Acl\Extension\WorkflowAclExtension
+        arguments:
+            - '@oro_security.acl.object_id_accessor'
+            - '@oro_security.owner.metadata_provider.chain'
+            - '@oro_security.owner.entity_owner_accessor'
+            - '@oro_security.owner.ownership_decision_maker.chain'
+            - '@oro_workflow.registry'
+            - '@oro_workflow.acl.metadata_provider'
+            - '@oro_workflow.acl.extension.workflow_transition'
+        tags:
+            - { name: oro_security.acl.extension }
+
+    oro_workflow.acl.extension.workflow_transition:
+        public: false
+        class: Oro\Bundle\WorkflowBundle\Acl\Extension\WorkflowTransitionAclExtension
+        arguments:
+            - '@oro_security.acl.object_id_accessor'
+            - '@oro_security.owner.metadata_provider.chain'
+            - '@oro_security.owner.entity_owner_accessor'
+            - '@oro_security.owner.ownership_decision_maker.chain'
+            - '@oro_workflow.registry'

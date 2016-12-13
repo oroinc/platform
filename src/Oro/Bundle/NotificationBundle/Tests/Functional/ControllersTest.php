@@ -2,11 +2,11 @@
 
 namespace Oro\Bundle\NotificationBundle\Tests\Functional;
 
+use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Component\Testing\ResponseExtension;
-use Symfony\Component\DomCrawler\Form;
 use Symfony\Component\DomCrawler\Field\ChoiceFormField;
 
-use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
+use Symfony\Component\DomCrawler\Form;
 
 /**
  * @dbIsolation
@@ -15,7 +15,7 @@ class ControllersTest extends WebTestCase
 {
     use ResponseExtension;
 
-    const ENTITY_NAME = 'Oro\Bundle\CalendarBundle\Entity\CalendarEvent';
+    const ENTITY_NAME = 'Oro\Bundle\UserBundle\Entity\User';
 
     protected $eventUpdate;
     protected $eventCreate;
@@ -24,8 +24,8 @@ class ControllersTest extends WebTestCase
     protected function setUp()
     {
         $this->initClient(
-            array(),
-            array_merge($this->generateBasicAuthHeader(), array('HTTP_X-CSRF-Header' => 1))
+            [],
+            array_merge($this->generateBasicAuthHeader(), ['HTTP_X-CSRF-Header' => 1])
         );
         $this->client->useHashNavigation(true);
     }
@@ -35,21 +35,21 @@ class ControllersTest extends WebTestCase
         $notificationManager = $this->getContainer()->get('doctrine');
         $this->eventUpdate  = $notificationManager
             ->getRepository('OroNotificationBundle:Event')
-            ->findOneBy(array('name' => 'oro.notification.event.entity_post_update'));
+            ->findOneBy(['name' => 'oro.notification.event.entity_post_update']);
 
         $this->eventCreate  = $notificationManager
             ->getRepository('OroNotificationBundle:Event')
-            ->findOneBy(array('name' => 'oro.notification.event.entity_post_persist'));
+            ->findOneBy(['name' => 'oro.notification.event.entity_post_persist']);
 
         $this->templateUpdate  = $notificationManager
             ->getRepository('OroEmailBundle:EmailTemplate')
-            ->findOneBy(array('entityName' => self::ENTITY_NAME));
+            ->findOneBy(['entityName' => self::ENTITY_NAME]);
     }
 
     public function testIndex()
     {
         $this->client->request('GET', $this->getUrl('oro_notification_emailnotification_index'));
-        
+
         $this->assertLastResponseStatus(200);
         $this->assertLastResponseContentTypeHtml();
     }
@@ -92,10 +92,10 @@ class ControllersTest extends WebTestCase
     {
         $response = $this->client->requestGrid(
             'email-notification-grid',
-            array(
+            [
                 'email-notification-grid[_pager][_page]' => 1,
                 'email-notification-grid[_pager][_per_page]' => 1
-            )
+            ]
         );
 
         $result = $this->getJsonResponseContent($response, 200);
@@ -103,7 +103,7 @@ class ControllersTest extends WebTestCase
 
         $crawler = $this->client->request(
             'GET',
-            $this->getUrl('oro_notification_emailnotification_update', array('id' => $result['id']))
+            $this->getUrl('oro_notification_emailnotification_update', ['id' => $result['id']])
         );
 
         // prepare data for next tests
@@ -135,10 +135,10 @@ class ControllersTest extends WebTestCase
     {
         $response = $this->client->requestGrid(
             'email-notification-grid',
-            array(
+            [
                 'email-notification-grid[_pager][_page]' => 1,
                 'email-notification-grid[_pager][_per_page]' => 1,
-            )
+            ]
         );
 
         $result = $this->getJsonResponseContent($response, 200);
@@ -146,7 +146,7 @@ class ControllersTest extends WebTestCase
 
         $this->client->request(
             'DELETE',
-            $this->getUrl('oro_api_delete_emailnotication', array('id' => $result['id']))
+            $this->getUrl('oro_api_delete_emailnotication', ['id' => $result['id']])
         );
 
         $result = $this->client->getResponse();

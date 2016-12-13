@@ -55,7 +55,7 @@ class Configuration implements ConfigurationInterface
         $builder->root('board')
                 ->children()
                     ->scalarNode(static::LABEL_KEY)->defaultValue('oro.datagrid.appearance.board')->end()
-                    ->scalarNode(static::ICON_KEY)->defaultValue('icon-th')->end()
+                    ->scalarNode(static::ICON_KEY)->defaultValue('fa-th')->end()
                     ->scalarNode(static::PROCESSOR_KEY)->defaultValue(DefaultProcessor::NAME)->end()
                     ->scalarNode(static::ACL_RESOURCE_KEY)->end()
                     ->arrayNode(static::GROUP_KEY)

@@ -7,7 +7,7 @@ use Symfony\Component\PropertyAccess\PropertyPath;
 use Oro\Bundle\IntegrationBundle\Model\Action\PopulateIntegrationOwner;
 
 use Oro\Component\Action\Action\ActionInterface;
-use Oro\Component\Action\Model\ContextAccessor;
+use Oro\Component\ConfigExpression\ContextAccessor;
 
 class PopulateIntegrationOwnerTest extends \PHPUnit_Framework_TestCase
 {

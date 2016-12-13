@@ -6,21 +6,41 @@ use Oro\Component\Layout\Block\Type\Options;
 use Oro\Component\Layout\BlockBuilderInterface;
 use Oro\Component\Layout\BlockTypeExtensionInterface;
 use Oro\Component\Layout\BlockTypeInterface;
+use Oro\Component\Layout\BlockViewCache;
+use Oro\Component\Layout\ExpressionLanguage\ExpressionProcessor;
 use Oro\Component\Layout\Extension\ExtensionInterface;
+use Oro\Component\Layout\LayoutFactory;
 use Oro\Component\Layout\LayoutFactoryBuilder;
 use Oro\Component\Layout\LayoutItemInterface;
+use Oro\Component\Layout\LayoutRegistry;
 use Oro\Component\Layout\LayoutRendererInterface;
+use Oro\Component\Layout\LayoutRendererRegistry;
 use Oro\Component\Layout\LayoutUpdateInterface;
 use Oro\Component\Layout\DeferredLayoutManipulatorInterface;
 
 class LayoutFactoryBuilderTest extends \PHPUnit_Framework_TestCase
 {
+    /** @var ExpressionProcessor|\PHPUnit_Framework_MockObject_MockObject */
+    protected $expressionProcessor;
+
+    /** @var BlockViewCache|\PHPUnit_Framework_MockObject_MockObject */
+    protected $blockViewCache;
+
     /** @var LayoutFactoryBuilder */
     protected $layoutFactoryBuilder;
 
     protected function setUp()
     {
-        $this->layoutFactoryBuilder = new LayoutFactoryBuilder();
+        $this->expressionProcessor = $this
+            ->getMockBuilder('Oro\Component\Layout\ExpressionLanguage\ExpressionProcessor')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $this->blockViewCache = $this
+            ->getMockBuilder('Oro\Component\Layout\BlockViewCache')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $this->layoutFactoryBuilder = new LayoutFactoryBuilder($this->expressionProcessor, $this->blockViewCache);
     }
 
     public function testGetEmptyLayoutFactory()
@@ -79,6 +99,31 @@ class LayoutFactoryBuilderTest extends \PHPUnit_Framework_TestCase
         $this->assertSame(
             $renderer2,
             $layoutFactory->getRendererRegistry()->getRenderer()
+        );
+    }
+
+    public function testGetLayoutFactoryWithDebug()
+    {
+        $this->layoutFactoryBuilder->setDebug(true);
+        $layoutFactory = $this->layoutFactoryBuilder->getLayoutFactory();
+
+        $registry = new LayoutRegistry();
+        $rendererRegistry = new LayoutRendererRegistry();
+        $this->assertEquals(
+            new LayoutFactory($registry, $rendererRegistry, $this->expressionProcessor),
+            $layoutFactory
+        );
+    }
+
+    public function testGetLayoutFactoryWithoutDebug()
+    {
+        $layoutFactory = $this->layoutFactoryBuilder->getLayoutFactory();
+
+        $registry = new LayoutRegistry();
+        $rendererRegistry = new LayoutRendererRegistry();
+        $this->assertEquals(
+            new LayoutFactory($registry, $rendererRegistry, $this->expressionProcessor, $this->blockViewCache),
+            $layoutFactory
         );
     }
 

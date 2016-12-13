@@ -4,8 +4,9 @@ namespace Oro\Bundle\WorkflowBundle\Handler;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\EntityNotFoundException;
-
+use Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker;
 use Oro\Bundle\WorkflowBundle\Async\TransitionTriggerMessage;
+use Oro\Bundle\WorkflowBundle\Configuration\FeatureConfigurationExtension;
 use Oro\Bundle\WorkflowBundle\Entity\BaseTransitionTrigger;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowManager;
 
@@ -18,13 +19,23 @@ class TransitionEventTriggerHandler implements TransitionTriggerHandlerInterface
     private $registry;
 
     /**
+     * @var FeatureChecker
+     */
+    private $featureChecker;
+
+    /**
      * @param WorkflowManager $workflowManager
      * @param ManagerRegistry $registry
+     * @param FeatureChecker $featureChecker
      */
-    public function __construct(WorkflowManager $workflowManager, ManagerRegistry $registry)
-    {
+    public function __construct(
+        WorkflowManager $workflowManager,
+        ManagerRegistry $registry,
+        FeatureChecker $featureChecker
+    ) {
         $this->workflowManager = $workflowManager;
         $this->registry = $registry;
+        $this->featureChecker = $featureChecker;
     }
 
     /**
@@ -35,6 +46,14 @@ class TransitionEventTriggerHandler implements TransitionTriggerHandlerInterface
      */
     public function process(BaseTransitionTrigger $trigger, TransitionTriggerMessage $message)
     {
+        $isWorkflowEnabledInFeatures = $this->featureChecker->isResourceEnabled(
+            $trigger->getWorkflowDefinition()->getName(),
+            FeatureConfigurationExtension::WORKFLOWS_NODE_NAME
+        );
+        if (!$isWorkflowEnabledInFeatures) {
+            return false;
+        }
+
         $mainEntity = $this->resolveEntity(
             $trigger->getWorkflowDefinition()->getRelatedEntity(),
             $message->getMainEntityId()

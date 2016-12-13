@@ -98,7 +98,7 @@ class MenuUpdateTreeHandler
         $text = $entity->getLabel();
         if ($entity->getExtra('divider', false)) {
             $text = self::MENU_ITEM_DIVIDER_LABEL;
-        } elseif (!$entity->getExtra('translateDisabled', false)) {
+        } elseif (!$entity->getExtra('translate_disabled', false)) {
             $text = $this->translator->trans($text);
         }
 

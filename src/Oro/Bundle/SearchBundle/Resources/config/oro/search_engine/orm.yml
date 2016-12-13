@@ -25,7 +25,7 @@ services:
             - '@doctrine'
             - '@oro_entity.doctrine_helper'
             - '@oro_search.mapper'
-            - '@oro_search.resolver.entity_title'
+            - '@oro_entity.entity_name_resolver'
             - '@oro_search.search.engine.storer'
         calls:
             - ['setDrivers', ['%oro_search.drivers%']]

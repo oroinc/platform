@@ -119,8 +119,8 @@ class Builder
         $acceptor = $this->createAcceptor($config, $parameters);
         $datagrid->setAcceptor($acceptor);
 
-        $this->buildDataSource($datagrid, $config);
         $acceptor->processConfiguration();
+        $this->buildDataSource($datagrid, $config);
 
         $event = new BuildAfter($datagrid);
         $this->eventDispatcher->dispatch(BuildAfter::NAME, $event);

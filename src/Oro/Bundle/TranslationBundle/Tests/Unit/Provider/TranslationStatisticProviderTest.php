@@ -4,6 +4,8 @@ namespace Oro\Bundle\TranslationBundle\Tests\Unit\Provider;
 
 use Doctrine\Common\Cache\Cache;
 
+use Psr\Log\LoggerInterface;
+
 use Oro\Bundle\TranslationBundle\Provider\OroTranslationAdapter;
 use Oro\Bundle\TranslationBundle\Provider\PackagesProvider;
 use Oro\Bundle\TranslationBundle\Provider\TranslationStatisticProvider;
@@ -19,6 +21,9 @@ class TranslationStatisticProviderTest extends \PHPUnit_Framework_TestCase
     /** @var PackagesProvider|\PHPUnit_Framework_MockObject_MockObject */
     protected $packagesProvider;
 
+    /** @var LoggerInterface|\PHPUnit_Framework_MockObject_MockObject */
+    protected $logger;
+
     /** @var TranslationStatisticProvider */
     protected $provider;
 
@@ -31,8 +36,15 @@ class TranslationStatisticProviderTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()->getMock();
         $this->packagesProvider->expects($this->any())->method('getInstalledPackages')
             ->will($this->returnValue([]));
+        $this->logger           = $this->getMockBuilder('Psr\Log\LoggerInterface')
+            ->disableOriginalConstructor()->getMock();
 
-        $this->provider = new TranslationStatisticProvider($this->cache, $this->adapter, $this->packagesProvider);
+        $this->provider = new TranslationStatisticProvider(
+            $this->cache,
+            $this->adapter,
+            $this->packagesProvider,
+            $this->logger
+        );
     }
 
     protected function tearDown()

@@ -8,9 +8,9 @@
                 timeout:   2000
             };
 
-            $.ajax(options).done(function() {
+            $.ajax(options).then(function() {
                 new ORO.EmbedRequestForm(options);
-            }).error(function() {
+            }, function() {
                 if (typeof(console) != 'undefined' && console.hasOwnProperty('error')) {
                     console.error('Unable to load external script.');
                 }

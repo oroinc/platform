@@ -9,12 +9,12 @@ response:
         data:
             -
                 entity_name: Oro\Bundle\TestFrameworkBundle\Entity\Item
-                record_string: item2@mail.com
+                record_string: item2@mail.com 200987654
                 record_url: http://localhost%oro_default_prefix%search/
     soap:
         item:
             -
                 entityName: Oro\Bundle\TestFrameworkBundle\Entity\Item
-                recordTitle: item2@mail.com
+                recordTitle: item2@mail.com 200987654
                 recordUrl: http://localhost%oro_default_prefix%search/
                 selectedData: []

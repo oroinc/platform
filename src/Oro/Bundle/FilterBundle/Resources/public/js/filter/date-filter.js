@@ -517,8 +517,8 @@ define(function(require) {
                     if (!this.dateVariableHelper.isDateVariable(value.value.end) &&
                         !this.dateVariableHelper.isDateVariable(value.value.start)) {
                         //swap end/start date if no variables are used and end date is behind start date
-                        var end = datetimeFormatter.getMomentForBackendDateTime(value.value.end);
-                        var start = datetimeFormatter.getMomentForBackendDateTime(value.value.start);
+                        var end = datetimeFormatter.getMomentForFrontendDateTime(value.value.end);
+                        var start = datetimeFormatter.getMomentForFrontendDateTime(value.value.start);
                         if (end < start) {
                             var endValue = value.value.end;
                             value.value.end = value.value.start;

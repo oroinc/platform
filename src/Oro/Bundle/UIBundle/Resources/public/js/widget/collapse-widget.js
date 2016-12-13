@@ -7,8 +7,11 @@ define(['jquery', 'oroui/js/mediator', 'underscore', 'jquery-ui'], function($, m
         options: {
             trigger: '[data-collapse-trigger]',
             container: '[data-collapse-container]',
+            hideSibling: false,
+            breakpoint: 0,
             storageKey: '',
             open: null,
+            forcedState: null,
             uid: '',
             openClass: 'expanded',
             animationSpeed: 250
@@ -28,13 +31,24 @@ define(['jquery', 'oroui/js/mediator', 'underscore', 'jquery-ui'], function($, m
             this.$trigger = this.$el.find(this.options.trigger);
             this.$container = this.$el.find(this.options.container);
 
-            this.options.open = _.isBoolean(storedState) ? storedState : this.options.open;
-
-            this.$el.toggleClass(this.options.openClass, this.options.open);
+            if (_.isBoolean(this.options.forcedState)) {
+                this.options.open = this.options.forcedState;
+            } else if (_.isBoolean(storedState)) {
+                this.options.open = storedState;
+            }
 
             this.$el.addClass('init');
 
             this._initEvents();
+
+            if (this._isEnabled()) {
+                this.$el.toggleClass(this.options.openClass, this.options.open);
+                if (this.options.open) {
+                    this.$container.show();
+                } else {
+                    this.$container.hide();
+                }
+            }
         },
 
         _initEvents: function() {
@@ -44,6 +58,9 @@ define(['jquery', 'oroui/js/mediator', 'underscore', 'jquery-ui'], function($, m
         },
 
         _toggle: function(event) {
+            if (!this._isEnabled()) {
+                return;
+            }
             var self = this;
             var $trigger = $(event.currentTarget);
             var $container = this.$container;
@@ -66,6 +83,11 @@ define(['jquery', 'oroui/js/mediator', 'underscore', 'jquery-ui'], function($, m
                 };
 
                 self.$el.toggleClass(self.options.openClass, isOpen);
+
+                if (self.options.hideSibling) {
+                    self._hideSiblings(isOpen);
+                }
+
                 $trigger.trigger('collapse:toggle', params);
                 mediator.trigger('layout:adjustHeight');
 
@@ -73,6 +95,21 @@ define(['jquery', 'oroui/js/mediator', 'underscore', 'jquery-ui'], function($, m
                     localStorage.setItem(self.options.storageKey + self.options.uid, isOpen);
                 }
             });
+        },
+
+        _hideSiblings: function(isOpen) {
+            if (isOpen) {
+                this.$el.siblings().hide(this.options.animationSpeed);
+            } else {
+                this.$el.siblings().show(this.options.animationSpeed);
+            }
+        },
+
+        _isEnabled: function() {
+            if (this.options.breakpoint && $(window).outerWidth() >= this.options.breakpoint) {
+                return false;
+            }
+            return true;
         }
     });
 

@@ -134,7 +134,7 @@ class RolePermissionDatasourceTest extends \PHPUnit_Framework_TestCase
     protected function checkResult(ResultRecord $result)
     {
         $this->assertEquals('entity:Acme\Test1Entity', $result->getValue('identity'));
-        $this->assertEquals('test entity', $result->getValue('entity'));
+        $this->assertEquals('test entity', $result->getValue('label'));
         $this->assertEquals('testCategory', $result->getValue('group'));
         $this->assertEquals(
             [
@@ -174,7 +174,7 @@ class RolePermissionDatasourceTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(
             [
                 [
-                    'identity' => 'entity:Acme\Test1Entity::field1', 'name' => 'field1', 'label' => 'field1',
+                    'identity' => 'entity:Acme\Test1Entity::field1', 'label' => 'field1',
                     'permissions' => [
                         [
                             'id' => null, 'name' => 'VIEW', 'label' => 'VIEW', 'description' => '',
@@ -194,7 +194,7 @@ class RolePermissionDatasourceTest extends \PHPUnit_Framework_TestCase
                     ]
                 ],
                 [
-                    'identity' => 'entity:Acme\Test1Entity::field2', 'name' => 'field2', 'label' => 'field2',
+                    'identity' => 'entity:Acme\Test1Entity::field2', 'label' => 'field2',
                     'permissions' => [
                         [
                             'id' => null, 'name' => 'VIEW', 'label' => 'VIEW', 'description' => '',

@@ -3,6 +3,7 @@
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Util;
 
 use Doctrine\ORM\Mapping\ClassMetadata;
+use Doctrine\ORM\Query\Parameter;
 
 use Oro\Bundle\ApiBundle\Tests\Unit\OrmRelatedTestCase;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
@@ -184,6 +185,101 @@ class DoctrineHelperTest extends OrmRelatedTestCase
         );
 
         $this->doctrineHelper->setEntityIdentifier($entity, $entityId);
+    }
+
+    public function testApplyEntityIdentifierRestrictionForSingleIdEntity()
+    {
+        $entityClass = self::ENTITY_NAMESPACE . 'User';
+        $entityId = 123;
+
+        $qb = $this->em->createQueryBuilder();
+        $qb->from($entityClass, 'e')->select('e');
+
+        $this->doctrineHelper->applyEntityIdentifierRestriction($qb, $entityClass, $entityId);
+
+        self::assertEquals(
+            sprintf('SELECT e FROM %s e WHERE e.id = :id', $entityClass),
+            $qb->getDQL()
+        );
+        /** @var Parameter $parameter */
+        $parameter = $qb->getParameters()->first();
+        $this->assertEquals('id', $parameter->getName());
+        $this->assertEquals($entityId, $parameter->getValue());
+    }
+
+    // @codingStandardsIgnoreStart
+    /**
+     * @expectedException \Oro\Bundle\ApiBundle\Exception\RuntimeException
+     * @expectedExceptionMessage The entity identifier cannot be an array because the entity "Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\User" has single primary key.
+     */
+    // @codingStandardsIgnoreEnd
+    public function testApplyEntityIdentifierRestrictionForSingleIdEntityWithArrayId()
+    {
+        $entityClass = self::ENTITY_NAMESPACE . 'User';
+        $entityId = [1, 2];
+
+        $qb = $this->em->createQueryBuilder();
+        $qb->from($entityClass, 'e')->select('e');
+
+        $this->doctrineHelper->applyEntityIdentifierRestriction($qb, $entityClass, $entityId);
+    }
+
+    public function testApplyEntityIdentifierRestrictionForCompositeIdEntity()
+    {
+        $entityClass = self::ENTITY_NAMESPACE . 'CompositeKeyEntity';
+        $entityId = ['id' => 123, 'title' => 'test'];
+
+        $qb = $this->em->createQueryBuilder();
+        $qb->from($entityClass, 'e')->select('e');
+
+        $this->doctrineHelper->applyEntityIdentifierRestriction($qb, $entityClass, $entityId);
+
+        $this->assertEquals(
+            sprintf('SELECT e FROM %s e WHERE e.id = :id1 AND e.title = :id2', $entityClass),
+            $qb->getDQL()
+        );
+        /** @var Parameter $parameter */
+        $parameters = $qb->getParameters();
+        $idParameter = $parameters[0];
+        $this->assertEquals('id1', $idParameter->getName());
+        $this->assertEquals($entityId['id'], $idParameter->getValue());
+        $titleParameter = $parameters[1];
+        $this->assertEquals('id2', $titleParameter->getName());
+        $this->assertEquals($entityId['title'], $titleParameter->getValue());
+    }
+
+    // @codingStandardsIgnoreStart
+    /**
+     * @expectedException \Oro\Bundle\ApiBundle\Exception\RuntimeException
+     * @expectedExceptionMessage The entity identifier must be an array because the entity "Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\CompositeKeyEntity" has composite primary key.
+     */
+    // @codingStandardsIgnoreEnd
+    public function testApplyEntityIdentifierRestrictionForCompositeIdEntityWithScalarId()
+    {
+        $entityClass = self::ENTITY_NAMESPACE . 'CompositeKeyEntity';
+        $entityId = 123;
+
+        $qb = $this->em->createQueryBuilder();
+        $qb->from($entityClass, 'e')->select('e');
+
+        $this->doctrineHelper->applyEntityIdentifierRestriction($qb, $entityClass, $entityId);
+    }
+
+    // @codingStandardsIgnoreStart
+    /**
+     * @expectedException \Oro\Bundle\ApiBundle\Exception\RuntimeException
+     * @expectedExceptionMessage The entity identifier array must have the key "title" because the entity "Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\CompositeKeyEntity" has composite primary key.
+     */
+    // @codingStandardsIgnoreEnd
+    public function testApplyEntityIdentifierRestrictionForCompositeIdEntityWithWrongId()
+    {
+        $entityClass = self::ENTITY_NAMESPACE . 'CompositeKeyEntity';
+        $entityId = ['id' => 123];
+
+        $qb = $this->em->createQueryBuilder();
+        $qb->from($entityClass, 'e')->select('e');
+
+        $this->doctrineHelper->applyEntityIdentifierRestriction($qb, $entityClass, $entityId);
     }
 
     /**

@@ -11,28 +11,24 @@ class OroWorkflowExtensionTest extends \PHPUnit_Framework_TestCase
     /**
      * @var array
      */
-    protected $expectedDefinitions = array(
-        'oro_workflow.configuration_pass.replace_property_path',
-        'oro_workflow.action_factory',
+    protected $expectedDefinitions = [
         'oro_workflow.configuration.provider.workflow_config',
-    );
+    ];
 
     /**
      * @var array
      */
-    protected $expectedParameters = array(
-        'oro_workflow.configuration_pass.replace_property_path.class',
-        'oro_workflow.action_factory.class',
+    protected $expectedParameters = [
         'oro_workflow.configuration.provider.workflow_config.class',
-    );
+    ];
 
     public function testLoad()
     {
-        $actualDefinitions = array();
-        $actualParameters  = array();
+        $actualDefinitions = [];
+        $actualParameters  = [];
 
         $container = $this->getMockBuilder('Symfony\Component\DependencyInjection\ContainerBuilder')
-            ->setMethods(array('setDefinition', 'setParameter'))
+            ->setMethods(['setDefinition', 'setParameter'])
             ->getMock();
         $container->expects($this->any())
             ->method('setDefinition')
@@ -54,7 +50,7 @@ class OroWorkflowExtensionTest extends \PHPUnit_Framework_TestCase
             );
 
         $extension = new OroWorkflowExtension();
-        $extension->load(array(), $container);
+        $extension->load([], $container);
 
         foreach ($this->expectedDefinitions as $serviceId) {
             $this->assertArrayHasKey($serviceId, $actualDefinitions);

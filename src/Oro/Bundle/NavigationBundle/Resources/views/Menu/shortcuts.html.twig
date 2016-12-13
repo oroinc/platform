@@ -3,7 +3,7 @@
 {% block list %}
     {% if item.hasChildren and options.depth is not sameas(0) and item.displayChildren %}
             <div class="dropdown header-dropdown-shortcut header-utility-dropdown">
-                <a href="javascript:void(0);" class="dropdown-toggle" data-toggle="dropdown" title="{{ 'oro.navigation.shortcuts.title'|trans }}"><i class="icon-share-sign"></i></a>
+                <a href="javascript:void(0);" class="dropdown-toggle" data-toggle="dropdown" title="{{ 'oro.navigation.shortcuts.title'|trans }}"><i class="fa-share-square"></i></a>
                 <ul class="dropdown-menu">
                     <li class="nav-header nav-header-title">{{ 'oro.navigation.shortcuts.title'|trans }}</li>
                     <li class="dark">
@@ -29,7 +29,7 @@
 {% endblock %}
 
 {% block item %}
-    {% if item.extras.isCustomAction is defined %}
+    {% if item.extras.is_custom_action is defined %}
         {{ block('item_renderer') }}
     {% endif %}
 {% endblock %}

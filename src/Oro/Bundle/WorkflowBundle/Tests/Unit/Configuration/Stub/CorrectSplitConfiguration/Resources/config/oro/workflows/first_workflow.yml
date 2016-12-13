@@ -3,12 +3,17 @@ imports:
 
 workflows:
     first_workflow:
-        label: 'First Workflow'
         is_system: true
         entity: First\Entity
         start_step: first_step
         entity_attribute: my_entity
         priority: 1
+        scopes:
+            -
+                scope1: value1
+                scope2: value2
+            -
+                scope1: value3
         defaults:
             active: true
         exclusive_active_groups:
@@ -16,9 +21,10 @@ workflows:
         exclusive_record_groups:
             - 'record_group1'
         steps_display_ordered: true
+        disable_operations:
+            operation1: [entity1, entity2]
         steps:
             first_step:
-                label: 'First Step'
                 order: 1
                 is_final: true
                 entity_acl:
@@ -28,14 +34,12 @@ workflows:
                     - first_transition
         transitions:
             first_transition:
-                label: 'First Transition'
                 step_to: first_step
                 is_start: true
                 is_hidden: true
                 is_unavailable_hidden: true
                 acl_resource: some_acl
                 acl_message: "Test ACL message"
-                message: "Test message"
                 transition_definition: first_transition_definition
                 frontend_options:
                     class: foo
@@ -43,6 +47,11 @@ workflows:
                 display_type: page
                 page_template: Workflow:Test:pageTemplate.html.twig
                 dialog_template: Workflow:Test:dialogTemplate.html.twig
+                init_entities:
+                    - entity1
+                init_routes:
+                    - route1
+                init_context_attribute: test_init_context
                 form_options:
                     attribute_fields:
                         first_attribute:

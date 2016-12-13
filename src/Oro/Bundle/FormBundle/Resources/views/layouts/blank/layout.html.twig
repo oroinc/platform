@@ -1,19 +1,33 @@
 {% extends "OroLayoutBundle:Layout:div_layout.html.twig" %}
 
+{% block form_start_widget %}
+    {% if attr.id is not defined %}
+        {% set attr = attr|merge({
+        id: form.vars.id
+        }) %}
+    {% endif %}
+    {{ parent() }}
+{% endblock %}
+
+{% block form_end_widget %}
+    {{ parent() }}
+    {{ oro_form_js_validation(form, js_validation_options|default({})) }}
+{% endblock %}
+
 {% block input_widget %}
     {% if type == 'checkbox' %}
         {% set attr = layout_attr_defaults(attr, {
-        '~class': ' custom-checkbox__input'
+            '~class': ' custom-checkbox__input'
         }) %}
 
-        <label for="{{ id }}" class="custom-checkbox">
+        <label {% if attr.id is not empty %} for="{{ attr.id }}" {% endif %} class="custom-checkbox">
             {{ parent() }}
             <span class="custom-checkbox__icon"></span>
             <span class="custom-checkbox__text">{{ label|block_text(translation_domain) }} </span>
         </label>
     {% else %}
         {% set attr = layout_attr_defaults(attr, {
-        '~class': ' input'
+            '~class': ' input'
         }) %}
 
         {{ parent() }}

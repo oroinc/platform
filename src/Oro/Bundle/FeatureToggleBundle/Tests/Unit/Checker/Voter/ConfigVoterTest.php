@@ -69,4 +69,21 @@ class ConfigVoterTest extends \PHPUnit_Framework_TestCase
             [false, VoterInterface::FEATURE_DISABLED]
         ];
     }
+
+    public function testVoteAbstain()
+    {
+        $feature = 'test';
+        $scopeIdentifier = new \stdClass();
+        $toggle = null;
+
+        $this->featureConfigManager->expects($this->once())
+            ->method('get')
+            ->with($feature, ConfigVoter::TOGGLE_KEY)
+            ->willReturn($toggle);
+
+        $this->configManager->expects($this->never())
+            ->method($this->anything());
+
+        $this->assertEquals(VoterInterface::FEATURE_ABSTAIN, $this->configVoter->vote($feature, $scopeIdentifier));
+    }
 }

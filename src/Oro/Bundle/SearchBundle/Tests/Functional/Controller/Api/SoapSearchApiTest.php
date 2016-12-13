@@ -3,13 +3,14 @@
 namespace Oro\Bundle\SearchBundle\Tests\Functional\Controller\Api;
 
 use Oro\Bundle\SearchBundle\Tests\Functional\Controller\DataFixtures\LoadSearchItemData;
+use Oro\Bundle\SearchBundle\Tests\Functional\SearchExtensionTrait;
 use Oro\Bundle\TestFrameworkBundle\Entity\Item;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
-use Oro\Component\Testing\SearchExtensionTrait;
 
 /**
  * @outputBuffering enabled
  * @group soap
+ * @group search
  */
 class SoapSearchApiTest extends WebTestCase
 {
@@ -25,8 +26,14 @@ class SoapSearchApiTest extends WebTestCase
         $this->initClient([], $this->generateWsseAuthHeader(), true);
         $this->initSoapClient();
         $this->startTransaction();
+
+        $alias = $this->getSearchObjectMapper()->getEntityAlias(Item::class);
+        $this->getSearchIndexer()->resetIndex(Item::class);
+        $this->ensureItemsLoaded($alias, 0);
+
         $this->loadFixtures([LoadSearchItemData::class], true);
         $this->getSearchIndexer()->reindex(Item::class);
+        $this->ensureItemsLoaded($alias, LoadSearchItemData::COUNT);
     }
 
     protected function tearDown()

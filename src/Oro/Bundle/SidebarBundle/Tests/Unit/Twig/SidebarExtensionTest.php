@@ -32,6 +32,11 @@ class SidebarExtensionTest extends \PHPUnit_Framework_TestCase
      */
     protected $extension;
 
+    /**
+     * @var \PHPUnit_Framework_MockObject_MockObject
+     */
+    protected $featureChecker;
+
     protected function setUp()
     {
         $this->widgetDefinitionsRegistry = $this
@@ -52,6 +57,10 @@ class SidebarExtensionTest extends \PHPUnit_Framework_TestCase
             $this->translator,
             $this->assetHelper
         );
+
+        $this->featureChecker = $this->getMockBuilder('Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker')
+            ->disableOriginalConstructor()
+            ->getMock();
     }
 
     public function testGetFunctions()
@@ -76,8 +85,10 @@ class SidebarExtensionTest extends \PHPUnit_Framework_TestCase
         $title = 'Foo';
         $definitions = new ArrayCollection();
         $dialogIcon = 'test-icon.png';
+
+        $definitionKey = 'test';
         $definitions->set(
-            'test',
+            $definitionKey,
             array(
                 'title' => $title,
                 'icon' => 'test.ico',
@@ -102,6 +113,12 @@ class SidebarExtensionTest extends \PHPUnit_Framework_TestCase
             ->method('getUrl')
             ->with($dialogIcon)
             ->will($this->returnValue('/' . $dialogIcon));
+
+        $this->featureChecker
+            ->method('isResourceEnabled')
+            ->with($definitionKey, 'sidebar_widgets')
+            ->willReturn(true);
+        $this->extension->setFeatureChecker($this->featureChecker);
 
         $expected = array(
             'test' => array(

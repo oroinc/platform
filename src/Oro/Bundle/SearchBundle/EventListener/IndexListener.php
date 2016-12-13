@@ -133,7 +133,7 @@ class IndexListener implements OptionalListenerInterface
 
         foreach ($uow->getScheduledEntityUpdates() as $hash => $entity) {
             $className = ClassUtils::getClass($entity);
-            if (!$this->mappingProvider->isFieldsMappingExists($className)) {
+            if (!$this->mappingProvider->hasFieldsMapping($className)) {
                 continue;
             }
 

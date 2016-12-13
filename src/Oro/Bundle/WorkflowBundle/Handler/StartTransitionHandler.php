@@ -4,6 +4,8 @@ namespace Oro\Bundle\WorkflowBundle\Handler;
 
 use Exception;
 
+use Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker;
+use Oro\Bundle\WorkflowBundle\Configuration\FeatureConfigurationExtension;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 
@@ -30,18 +32,26 @@ class StartTransitionHandler
     protected $transitionHelper;
 
     /**
+     * @var FeatureChecker
+     */
+    protected $featureChecker;
+
+    /**
      * @param WorkflowManager $workflowManager
      * @param WorkflowAwareSerializer $serializer
      * @param TransitionHelper $transitionHelper
+     * @param FeatureChecker $featureChecker
      */
     public function __construct(
         WorkflowManager $workflowManager,
         WorkflowAwareSerializer $serializer,
-        TransitionHelper $transitionHelper
+        TransitionHelper $transitionHelper,
+        FeatureChecker $featureChecker
     ) {
         $this->workflowManager = $workflowManager;
         $this->serializer = $serializer;
         $this->transitionHelper = $transitionHelper;
+        $this->featureChecker = $featureChecker;
     }
 
     /**
@@ -63,6 +73,13 @@ class StartTransitionHandler
         try {
             $dataArray = [];
             $workflowName = $workflow->getName();
+
+            if (!$this->featureChecker
+                ->isResourceEnabled($workflowName, FeatureConfigurationExtension::WORKFLOWS_NODE_NAME)
+            ) {
+                throw new ForbiddenTransitionException();
+            }
+
             if ($data) {
                 $this->serializer->setWorkflowName($workflowName);
                 /* @var $data WorkflowData */

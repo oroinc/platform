@@ -1,57 +1,47 @@
 workflows:
     test_flow:
-        label: 'Test Flow'
         entity: Oro\Bundle\TestFrameworkBundle\Entity\WorkflowAwareEntity
         priority: 60
         steps:
             open:
-                label: 'Open'
                 order: 10
                 allowed_transitions: ['start_transition']
         transition_definitions:
             start_transiotion_definition: ~
         transitions:
             start_transition:
-                label: 'Start transition'
                 step_to: open
                 is_start: true
                 transition_definition: start_transiotion_definition
 
     test_start_step_flow:
-        label: 'Test Flow With Start Step'
         entity: Oro\Bundle\TestFrameworkBundle\Entity\WorkflowAwareEntity
         priority: 20
         start_step: open
         steps:
             open:
-                label: 'Open'
                 order: 10
                 allowed_transitions: ['start_transition']
         transition_definitions:
             start_transiotion_definition: ~
         transitions:
             start_transition:
-                label: 'Start transition'
                 step_to: open
                 transition_definition: start_transiotion_definition
 
     test_multistep_flow:
-        label: 'Test MultiStep Flow'
         entity: Oro\Bundle\TestFrameworkBundle\Entity\WorkflowAwareEntity
         priority: 50
         start_step: starting_point
         steps:
             starting_point:
-                 label: '(Start)'
                  order: -1
                  _is_start: true
                  allowed_transitions: ['starting_point_transition']
             second_point:
-                  label: '(Second)'
                   order: 0
                   allowed_transitions: ['second_point_transition']
             third_point:
-                  label: '(Final)'
                   order: 1
                   is_final: true
                   allowed_transitions: ['second_point_transition']
@@ -60,17 +50,14 @@ workflows:
             second_point_transition_definition: ~
         transitions:
             starting_point_transition:
-                 label: 'Start transition'
                  step_to: second_point
                  is_start: true
                  transition_definition: starting_point_transition_definition
             second_point_transition:
-                 label: 'Start transition'
                  step_to: third_point
                  transition_definition: second_point_transition_definition
 
     test_groups_flow1:
-        label: 'Test Groups Flow 1'
         entity: Oro\Bundle\TestFrameworkBundle\Entity\WorkflowAwareEntity
         start_step: starting_point
         priority: 40
@@ -82,16 +69,13 @@ workflows:
             - record_group2
         steps:
             starting_point:
-                 label: '(Start)'
                  order: -1
                  _is_start: true
                  allowed_transitions: ['starting_point_transition', 'second_point_transition']
             second_point:
-                  label: '(Second)'
                   order: 0
                   allowed_transitions: ['second_point_transition']
             third_point:
-                  label: '(Final)'
                   order: 1
                   is_final: true
                   allowed_transitions: ['second_point_transition']
@@ -100,17 +84,14 @@ workflows:
             second_point_transition_definition: ~
         transitions:
             starting_point_transition:
-                 label: 'Start transition'
                  step_to: second_point
                  is_start: true
                  transition_definition: starting_point_transition_definition
             second_point_transition:
-                 label: 'Start transition'
                  step_to: third_point
                  transition_definition: second_point_transition_definition
 
     test_groups_flow2:
-        label: 'Test Groups Flow 2'
         entity: Oro\Bundle\TestFrameworkBundle\Entity\WorkflowAwareEntity
         start_step: starting_point
         exclusive_active_groups:
@@ -121,16 +102,13 @@ workflows:
             - record_group2
         steps:
             starting_point:
-                 label: '(Start)'
                  order: -1
                  _is_start: true
                  allowed_transitions: ['starting_point_transition']
             second_point:
-                  label: '(Second)'
                   order: 0
                   allowed_transitions: ['second_point_transition']
             third_point:
-                  label: '(Final)'
                   order: 1
                   is_final: true
                   allowed_transitions: ['second_point_transition']
@@ -139,47 +117,94 @@ workflows:
             second_point_transition_definition: ~
         transitions:
             starting_point_transition:
-                 label: 'Start transition'
                  step_to: second_point
                  is_start: true
                  transition_definition: starting_point_transition_definition
             second_point_transition:
-                 label: 'Start transition'
                  step_to: third_point
                  transition_definition: second_point_transition_definition
                  
     test_active_flow1:
-        label: 'Test Active Flow1'
         entity: Oro\Bundle\TestFrameworkBundle\Entity\WorkflowAwareEntity
         defaults:
             active: true
         priority: 10
         steps:
-            step1:
-                label: 'Step1'
+            step1: ~
         transitions:
             transition1:
-                label: 'Transition1'
+                step_to: step1
+                transition_definition: definition1
+                is_start: true
+        transition_definitions:
+            definition1: ~
+        disable_operations:
+            oro_test_disable_operation: ~
+            oro_test_disable_operation_by_entity:
+                - Oro\Bundle\TestFrameworkBundle\Entity\Item
+                - stdClass
+
+    test_active_flow2:
+        entity: Oro\Bundle\TestFrameworkBundle\Entity\WorkflowAwareEntity
+        defaults:
+            active: true
+        priority: 20
+        steps:
+            step1: ~
+        transitions:
+            transition1:
                 step_to: step1
                 transition_definition: definition1
                 is_start: true
         transition_definitions:
             definition1: ~
 
-    test_active_flow2:
-        label: 'Test Active Flow2'
+    test_start_init_option:
         entity: Oro\Bundle\TestFrameworkBundle\Entity\WorkflowAwareEntity
-        defaults:
-            active: true
-        priority: 20
+        attributes:
+            test_name:
+                type: string
+        priority: 10
+        start_step: step1
         steps:
             step1:
-                label: 'Step1'
-        transitions:
-            transition1:
-                label: 'Transition1'
-                step_to: step1
-                transition_definition: definition1
-                is_start: true
+                order: 10
+                allowed_transitions:
+                    - start_transition
+            step2:
+                order: 20
+                allowed_transitions:
+                    - start_transition_from_entity
+                    - start_transition_from_routes
         transition_definitions:
-            definition1: ~
+            start_transiotion_definition: ~
+            start_transition_from_non_related_entities:
+                actions:
+                    - '@flush_entity': $entity
+        transitions:
+            start_transition:
+                step_to: step1
+                transition_definition: start_transiotion_definition
+            start_transition_from_entities:
+                step_to: step2
+                is_start: true
+                transition_definition: start_transition_from_non_related_entities
+                form_options:
+                    attribute_fields:
+                        test_name:
+                            form_type: text
+                init_entities: ['entity1', 'entity2']
+            start_transition_from_routes:
+                step_to: step2
+                is_start: true
+                transition_definition: start_transition_from_non_related_entities
+                init_routes: ['route1']
+            start_transition_from_routes_with_form:
+                step_to: step2
+                is_start: true
+                init_routes: ['route1']
+                transition_definition: start_transition_from_non_related_entities
+                form_options:
+                    attribute_fields:
+                        test_name:
+                            form_type: text

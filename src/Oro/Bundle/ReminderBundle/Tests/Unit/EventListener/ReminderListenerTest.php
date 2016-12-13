@@ -6,10 +6,10 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\ORM\Event\LifecycleEventArgs;
 
-use Oro\Bundle\CalendarBundle\Entity\CalendarEvent;
 use Oro\Bundle\ReminderBundle\Entity\Manager\ReminderManager;
 use Oro\Bundle\ReminderBundle\Entity\Reminder;
 use Oro\Bundle\ReminderBundle\EventListener\ReminderListener;
+use Oro\Bundle\ReminderBundle\Tests\Unit\Fixtures\RemindableEntity;
 
 class ReminderListenerTest extends \PHPUnit_Framework_TestCase
 {
@@ -89,13 +89,13 @@ class ReminderListenerTest extends \PHPUnit_Framework_TestCase
      */
     public function entityDataProvider()
     {
-        $event = new CalendarEvent();
+        $event = new RemindableEntity();
         $event->setReminders(new ArrayCollection([new Reminder()]));
 
         return [
             [null, false],
             [new \stdClass(), false],
-            [new CalendarEvent(), false],
+            [new RemindableEntity(), false],
             [$event, true],
         ];
     }

@@ -1,8 +1,0 @@
-oro_entity:
-    entity_aliases:
-        Extend\Entity\EV_Ce_Attendee_Status:
-            alias:        attendeestatus
-            plural_alias: attendeestatuses
-        Extend\Entity\EV_Ce_Attendee_Type:
-            alias:        attendeetype
-            plural_alias: attendeetypes

@@ -8,8 +8,8 @@ use Doctrine\ORM\UnitOfWork;
 
 use Symfony\Component\PropertyAccess\PropertyAccess;
 
+use Oro\Bundle\EntityBundle\Helper\FieldHelper;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
-use Oro\Bundle\ImportExportBundle\Field\FieldHelper;
 use Oro\Bundle\ImportExportBundle\Writer\EntityDetachFixer;
 
 class EntityDetachFixerTest extends \PHPUnit_Framework_TestCase
@@ -40,7 +40,7 @@ class EntityDetachFixerTest extends \PHPUnit_Framework_TestCase
             ->method('getEntityManager')
             ->will($this->returnValue($this->entityManager));
 
-        $this->fieldHelper = $this->getMockBuilder('Oro\Bundle\ImportExportBundle\Field\FieldHelper')
+        $this->fieldHelper = $this->getMockBuilder('Oro\Bundle\EntityBundle\Helper\FieldHelper')
             ->disableOriginalConstructor()
             ->getMock();
 

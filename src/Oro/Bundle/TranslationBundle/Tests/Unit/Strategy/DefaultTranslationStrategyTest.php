@@ -5,7 +5,6 @@ namespace Oro\Bundle\TranslationBundle\Tests\Unit\Strategy;
 use Oro\Bundle\LocaleBundle\DependencyInjection\Configuration;
 use Oro\Bundle\TranslationBundle\Provider\LanguageProvider;
 use Oro\Bundle\TranslationBundle\Strategy\DefaultTranslationStrategy;
-use Oro\Bundle\TranslationBundle\Translation\TranslationStatusInterface;
 
 class DefaultTranslationStrategyTest extends \PHPUnit_Framework_TestCase
 {
@@ -31,6 +30,11 @@ class DefaultTranslationStrategyTest extends \PHPUnit_Framework_TestCase
     public function testGetName()
     {
         $this->assertEquals(DefaultTranslationStrategy::NAME, $this->strategy->getName());
+    }
+
+    public function testIsApplicable()
+    {
+        $this->assertTrue($this->strategy->isApplicable());
     }
 
     public function testGetLocaleFallbacks()

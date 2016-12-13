@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\UIBundle\Placeholder;
 
+use Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker;
 use Oro\Bundle\SecurityBundle\SecurityFacade;
 use Oro\Component\Config\Resolver\ResolverInterface;
 
@@ -18,16 +19,25 @@ class PlaceholderProvider
     /** @var SecurityFacade */
     protected $securityFacade;
 
+    /** @var FeatureChecker */
+    protected $featureChecker;
+
     /**
      * @param array             $placeholders
      * @param ResolverInterface $resolver
      * @param SecurityFacade    $securityFacade
+     * @param FeatureChecker    $featureChecker
      */
-    public function __construct(array $placeholders, ResolverInterface $resolver, SecurityFacade $securityFacade)
-    {
+    public function __construct(
+        array $placeholders,
+        ResolverInterface $resolver,
+        SecurityFacade $securityFacade,
+        FeatureChecker $featureChecker
+    ) {
         $this->placeholders   = $placeholders;
         $this->resolver       = $resolver;
         $this->securityFacade = $securityFacade;
+        $this->featureChecker = $featureChecker;
     }
 
     /**
@@ -72,6 +82,9 @@ class PlaceholderProvider
         }
 
         $item = $this->placeholders['items'][$itemName];
+        if (!$this->featureChecker->isResourceEnabled($itemName, 'placeholder_items')) {
+            return null;
+        }
         if (isset($item['acl'])) {
             if ($this->isGranted($item['acl'])) {
                 // remove 'acl' attribute as it is not needed anymore

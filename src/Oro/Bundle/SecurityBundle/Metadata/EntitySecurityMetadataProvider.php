@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\SecurityBundle\Metadata;
 
+use Symfony\Component\Translation\TranslatorInterface;
 use Symfony\Bridge\Doctrine\ManagerRegistry;
 
 use Doctrine\Common\Cache\CacheProvider;
@@ -30,6 +31,9 @@ class EntitySecurityMetadataProvider
     /** @var ManagerRegistry */
     protected $doctrine;
 
+    /** @var TranslatorInterface */
+    protected $translator;
+
     /**  @var CacheProvider */
     protected $cache;
 
@@ -40,26 +44,30 @@ class EntitySecurityMetadataProvider
      *         key = class name
      *         value = EntitySecurityMetadata
      */
-    protected $localCache = array();
+    protected $localCache = [];
 
     /**
-     * @param ConfigProvider     $securityConfigProvider
-     * @param ConfigProvider     $entityConfigProvider
-     * @param ConfigProvider     $extendConfigProvider
-     * @param CacheProvider|null $cache
+     * @param ConfigProvider      $securityConfigProvider
+     * @param ConfigProvider      $entityConfigProvider
+     * @param ConfigProvider      $extendConfigProvider
+     * @param ManagerRegistry     $doctrine
+     * @param TranslatorInterface $translator
+     * @param CacheProvider|null  $cache
      */
     public function __construct(
         ConfigProvider $securityConfigProvider,
         ConfigProvider $entityConfigProvider,
         ConfigProvider $extendConfigProvider,
         ManagerRegistry $doctrine,
+        TranslatorInterface $translator,
         CacheProvider  $cache = null
     ) {
         $this->securityConfigProvider = $securityConfigProvider;
-        $this->entityConfigProvider   = $entityConfigProvider;
-        $this->extendConfigProvider   = $extendConfigProvider;
-        $this->doctrine               = $doctrine;
-        $this->cache                  = $cache;
+        $this->entityConfigProvider = $entityConfigProvider;
+        $this->extendConfigProvider = $extendConfigProvider;
+        $this->doctrine = $doctrine;
+        $this->translator = $translator;
+        $this->cache = $cache;
     }
 
     /**
@@ -96,7 +104,7 @@ class EntitySecurityMetadataProvider
      */
     public function warmUpCache()
     {
-        $securityTypes = array();
+        $securityTypes = [];
         foreach ($this->securityConfigProvider->getConfigs() as $securityConfig) {
             $securityType = $securityConfig->get('type');
             if ($securityType && !in_array($securityType, $securityTypes, true)) {
@@ -127,7 +135,7 @@ class EntitySecurityMetadataProvider
         if ($securityType !== null) {
             unset($this->localCache[$securityType]);
         } else {
-            $this->localCache = array();
+            $this->localCache = [];
         }
     }
 
@@ -191,15 +199,15 @@ class EntitySecurityMetadataProvider
                     [ExtendScope::STATE_ACTIVE, ExtendScope::STATE_UPDATE]
                 )
             ) {
-                $label = '';
-
-                if ($this->entityConfigProvider->hasConfig($className)) {
-                    $label = $this->entityConfigProvider
-                        ->getConfig($className)
-                        ->get('label');
+                $label = $this->entityConfigProvider->getConfig($className)->get('label');
+                if ($label) {
+                    $label = $this->translator->trans($label);
                 }
 
-                $description = $securityConfig->get('description', false, '');
+                $description = $securityConfig->get('description');
+                if ($description) {
+                    $description = $this->translator->trans($description);
+                }
                 $permissions = $this->getPermissionsList($securityConfig);
 
                 $data[$className] = new EntitySecurityMetadata(
@@ -250,9 +258,13 @@ class EntitySecurityMetadataProvider
 
                 $fields[$fieldName] = new FieldSecurityMetadata(
                     $fieldName,
-                    $this->getFieldLabel($classMetadata, $fieldName),
+                    $this->translator->trans($this->getFieldLabel($classMetadata, $fieldName)),
                     $permissions
                 );
+
+                uasort($fields, function (FieldSecurityMetadata $a, FieldSecurityMetadata $b) {
+                    return strcmp($a->getLabel(), $b->getLabel());
+                });
             }
         }
 

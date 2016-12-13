@@ -6,9 +6,9 @@ use Doctrine\ORM\EntityManager;
 
 use Symfony\Component\Routing\Router;
 
+use Oro\Bundle\EntityBundle\Provider\EntityNameResolver;
 use Oro\Bundle\SearchBundle\Engine\ObjectMapper;
 use Oro\Bundle\SearchBundle\Event\PrepareResultItemEvent;
-use Oro\Bundle\SearchBundle\Resolver\EntityTitleResolverInterface;
 
 class PrepareResultItemListener
 {
@@ -27,24 +27,27 @@ class PrepareResultItemListener
      */
     protected $em;
 
+    /** @var EntityNameResolver */
+    protected $entityNameResolver;
+
     /**
      * Constructor
      *
      * @param Router $router
      * @param ObjectMapper $mapper
      * @param EntityManager $em
-     * @param EntityTitleResolverInterface $entityTitleResolver
+     * @param EntityNameResolver $entityNameResolver
      */
     public function __construct(
         Router $router,
         ObjectMapper $mapper,
         EntityManager $em,
-        EntityTitleResolverInterface $entityTitleResolver
+        EntityNameResolver $entityNameResolver
     ) {
         $this->router = $router;
         $this->mapper = $mapper;
         $this->em = $em;
-        $this->entityTitleResolver = $entityTitleResolver;
+        $this->entityNameResolver = $entityNameResolver;
     }
 
     /**
@@ -134,7 +137,7 @@ class PrepareResultItemListener
             $entity = $this->em->getRepository($name)->find($item->getRecordId());
         }
 
-        return $this->entityTitleResolver->resolve($entity);
+        return $this->entityNameResolver->getName($entity);
     }
 
     /**

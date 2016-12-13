@@ -3,7 +3,6 @@
 namespace Oro\Bundle\ReminderBundle\Tests\Unit\Model\Email;
 
 use Doctrine\Common\Collections\ArrayCollection;
-use Oro\Bundle\CalendarBundle\Entity\CalendarEvent;
 use Oro\Bundle\EmailBundle\Entity\EmailTemplate;
 use Oro\Bundle\EmailBundle\Entity\EmailTemplateTranslation;
 use Oro\Bundle\ReminderBundle\Entity\Reminder;
@@ -184,7 +183,7 @@ class EmailNotificationTest extends \PHPUnit_Framework_TestCase
         $repository
             ->expects($this->any())
             ->method('find')
-            ->will($this->returnValue(new CalendarEvent()));
+            ->will($this->returnValue(new \stdClass()));
 
         $templates = is_array($templates) ? $templates : [$this->createTemplate()];
         $repository

@@ -86,7 +86,7 @@ class DatabasePersisterTest extends \PHPUnit_Framework_TestCase
         $this->em->expects($this->once())->method('commit');
         $this->em->expects($this->never())->method('rollback');
 
-        $this->translationManager->expects($this->exactly(5))->method('saveValue')->willReturn(new Translation());
+        $this->translationManager->expects($this->exactly(5))->method('saveTranslation')->willReturn(new Translation());
         $this->translationManager->expects($this->exactly(3))->method('flush');
         $this->translationManager->expects($this->exactly(3))->method('clear');
 
@@ -105,7 +105,7 @@ class DatabasePersisterTest extends \PHPUnit_Framework_TestCase
         $this->em->expects($this->once())->method('commit')->will($this->throwException($exception));
         $this->em->expects($this->once())->method('rollback');
 
-        $this->translationManager->expects($this->exactly(5))->method('saveValue')->willReturn(new Translation());
+        $this->translationManager->expects($this->exactly(5))->method('saveTranslation')->willReturn(new Translation());
         $this->translationManager->expects($this->exactly(3))->method('flush');
         $this->translationManager->expects($this->exactly(3))->method('clear');
 

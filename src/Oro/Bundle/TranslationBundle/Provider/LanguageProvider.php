@@ -7,6 +7,8 @@ use Doctrine\Common\Persistence\ObjectRepository;
 use Symfony\Component\Intl\Intl;
 
 use Oro\Bundle\LocaleBundle\Model\LocaleSettings;
+use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
+use Oro\Bundle\TranslationBundle\Entity\Language;
 use Oro\Bundle\TranslationBundle\Entity\Repository\LanguageRepository;
 
 class LanguageProvider
@@ -17,14 +19,19 @@ class LanguageProvider
     /** @var LocaleSettings */
     protected $localeSettings;
 
+    /** @var AclHelper */
+    protected $aclHelper;
+
     /**
      * @param ObjectRepository $repository
      * @param LocaleSettings $localeSettings
+     * @param AclHelper $aclHelper
      */
-    public function __construct(ObjectRepository $repository, LocaleSettings $localeSettings)
+    public function __construct(ObjectRepository $repository, LocaleSettings $localeSettings, AclHelper $aclHelper)
     {
         $this->repository = $repository;
         $this->localeSettings = $localeSettings;
+        $this->aclHelper = $aclHelper;
     }
 
     /**
@@ -44,5 +51,13 @@ class LanguageProvider
     public function getEnabledLanguages()
     {
         return $this->repository->getAvailableLanguageCodes(true);
+    }
+
+    /**
+     * @return array|Language[]
+     */
+    public function getAvailableLanguagesByCurrentUser()
+    {
+        return $this->repository->getAvailableLanguagesByCurrentUser($this->aclHelper);
     }
 }

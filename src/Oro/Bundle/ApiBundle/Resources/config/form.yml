@@ -1,4 +1,8 @@
 services:
+    oro_api.form.state:
+        public: false
+        class: Oro\Bundle\ApiBundle\Form\FormExtensionState
+
     oro_api.form.switchable_extension:
         public: false
         class: Oro\Bundle\ApiBundle\Form\Extension\SwitchableDependencyInjectionExtension
@@ -13,6 +17,13 @@ services:
             - [] # All services with tag "oro.api.form.type" are inserted here by ConfigurationCompilerPass
             - [] # All services with tag "oro.api.form.type_extension" are inserted here by ConfigurationCompilerPass
             - [] # All services with tag "oro.api.form.type_guesser" are inserted here by ConfigurationCompilerPass
+
+    oro_api.form.extension.empty_data:
+        class: Oro\Bundle\ApiBundle\Form\Extension\EmptyDataExtension
+        arguments:
+            - '@oro_api.entity_instantiator'
+        tags:
+            - { name: oro.api.form.type_extension, alias: form, extended_type: 'Symfony\Component\Form\Extension\Core\Type\FormType' }
 
     oro_api.form.extension.customize_form_data:
         class: Oro\Bundle\ApiBundle\Form\Extension\CustomizeFormDataExtension

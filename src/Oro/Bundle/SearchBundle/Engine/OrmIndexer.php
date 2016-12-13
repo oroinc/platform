@@ -1,19 +1,21 @@
 <?php
+
 namespace Oro\Bundle\SearchBundle\Engine;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
+
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityBundle\ORM\OroEntityManager;
+use Oro\Bundle\EntityBundle\Provider\EntityNameResolver;
 use Oro\Bundle\SearchBundle\Engine\Orm\DbalStorer;
 use Oro\Bundle\SearchBundle\Entity\Item;
 use Oro\Bundle\SearchBundle\Entity\Repository\SearchIndexRepository;
-use Oro\Bundle\SearchBundle\Resolver\EntityTitleResolverInterface;
 
 class OrmIndexer extends AbstractIndexer
 {
     /** @var array */
     protected $drivers = [];
-    
+
     /** @var SearchIndexRepository */
     private $indexRepository;
 
@@ -24,20 +26,21 @@ class OrmIndexer extends AbstractIndexer
     protected $dbalStorer;
 
     /**
-     * @param ManagerRegistry              $registry
-     * @param DoctrineHelper               $doctrineHelper
-     * @param ObjectMapper                 $mapper
-     * @param EntityTitleResolverInterface $entityTitleResolver
-     * @param DbalStorer                   $dbalStorer
+     * @param ManagerRegistry $registry
+     * @param DoctrineHelper $doctrineHelper
+     * @param ObjectMapper $mapper
+     * @param EntityNameResolver $entityNameResolver
+     * @param DbalStorer $dbalStorer
      */
     public function __construct(
         ManagerRegistry $registry,
         DoctrineHelper $doctrineHelper,
         ObjectMapper $mapper,
-        EntityTitleResolverInterface $entityTitleResolver,
+        EntityNameResolver $entityNameResolver,
         DbalStorer $dbalStorer
     ) {
-        parent::__construct($registry, $doctrineHelper, $mapper, $entityTitleResolver);
+        parent::__construct($registry, $doctrineHelper, $mapper, $entityNameResolver);
+
         $this->dbalStorer = $dbalStorer;
     }
 
@@ -52,7 +55,7 @@ class OrmIndexer extends AbstractIndexer
     /**
      * {@inheritdoc}
      */
-    public function save($entity, $context = [])
+    public function save($entity, array $context = [])
     {
         $entities = $this->getEntitiesArray($entity);
         if (false == $entities) {
@@ -74,7 +77,7 @@ class OrmIndexer extends AbstractIndexer
     /**
      * {@inheritdoc}
      */
-    public function delete($entity, $context = [])
+    public function delete($entity, array $context = [])
     {
         $entities = $this->getEntitiesArray($entity);
         if (!$entities) {
@@ -100,7 +103,7 @@ class OrmIndexer extends AbstractIndexer
     /**
      * {@inheritdoc}
      */
-    public function resetIndex($class = null, $context = [])
+    public function resetIndex($class = null, array $context = [])
     {
         if (false == $class) {
             $this->clearAllSearchIndexes();

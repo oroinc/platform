@@ -162,6 +162,8 @@ class EmbedFormController extends Controller
             if ('*' === $allowedDomain || preg_match($regexp, $origin)) {
                 $response->headers->set('Access-Control-Allow-Origin', $origin);
                 $response->headers->set('Access-Control-Allow-Credentials', 'true');
+                $response->headers->set('Access-Control-Allow-Headers', 'Accept-Encoding');
+
                 break;
             }
         }

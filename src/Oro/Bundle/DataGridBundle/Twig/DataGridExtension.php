@@ -7,6 +7,7 @@ use Symfony\Component\Routing\RouterInterface;
 use Oro\Bundle\DataGridBundle\Datagrid\DatagridInterface;
 use Oro\Bundle\DataGridBundle\Datagrid\ManagerInterface;
 use Oro\Bundle\DataGridBundle\Datagrid\NameStrategyInterface;
+use Oro\Bundle\DataGridBundle\Tools\DatagridRouteHelper;
 
 use Oro\Bundle\SecurityBundle\SecurityFacade;
 
@@ -26,22 +27,28 @@ class DataGridExtension extends \Twig_Extension
     /** @var SecurityFacade $securityFacade */
     protected $securityFacade;
 
+    /** @var DatagridRouteHelper */
+    protected $datagridRouteHelper;
+
     /**
-     * @param ManagerInterface      $manager
+     * @param ManagerInterface $manager
      * @param NameStrategyInterface $nameStrategy
-     * @param RouterInterface       $router
-     * @param SecurityFacade        $securityFacade
+     * @param RouterInterface $router
+     * @param SecurityFacade $securityFacade
+     * @param DatagridRouteHelper $datagridRouteHelper
      */
     public function __construct(
         ManagerInterface $manager,
         NameStrategyInterface $nameStrategy,
         RouterInterface $router,
-        SecurityFacade $securityFacade
+        SecurityFacade $securityFacade,
+        DatagridRouteHelper $datagridRouteHelper
     ) {
-        $this->manager        = $manager;
-        $this->nameStrategy   = $nameStrategy;
-        $this->router         = $router;
+        $this->manager = $manager;
+        $this->nameStrategy = $nameStrategy;
+        $this->router = $router;
         $this->securityFacade = $securityFacade;
+        $this->datagridRouteHelper = $datagridRouteHelper;
     }
 
     /**
@@ -64,6 +71,7 @@ class DataGridExtension extends \Twig_Extension
             new \Twig_SimpleFunction('oro_datagrid_generate_element_id', [$this, 'generateGridElementId']),
             new \Twig_SimpleFunction('oro_datagrid_build_fullname', [$this, 'buildGridFullName']),
             new \Twig_SimpleFunction('oro_datagrid_build_inputname', [$this, 'buildGridInputName']),
+            new \Twig_SimpleFunction('oro_datagrid_link', [$this->datagridRouteHelper, 'generate']),
         ];
     }
 

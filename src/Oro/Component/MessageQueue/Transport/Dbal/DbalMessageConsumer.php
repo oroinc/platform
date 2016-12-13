@@ -88,7 +88,7 @@ class DbalMessageConsumer implements MessageConsumerInterface
      */
     public function receive($timeout = 0)
     {
-        $startAt = time();
+        $startAt = microtime(true);
 
         while (true) {
             $message = $this->receiveMessage();
@@ -97,13 +97,13 @@ class DbalMessageConsumer implements MessageConsumerInterface
                 return $message;
             }
 
-            if ($timeout && (time() - $startAt) >= $timeout) {
+            if ($timeout && (microtime(true) - $startAt) * 1000 >= $timeout) {
                 return;
             }
 
             usleep($this->pollingInterval);
 
-            if ($timeout && (time() - $startAt) >= $timeout) {
+            if ($timeout && (microtime(true) - $startAt) * 1000 >= $timeout) {
                 return;
             }
         }
@@ -200,13 +200,12 @@ class DbalMessageConsumer implements MessageConsumerInterface
          * more sub query.
          */
         $sql = sprintf(
-            'UPDATE %s SET consumer_id=:consumerId, delivered_at=:deliveredAt '.
+            'UPDATE %1$s SET consumer_id=:consumerId, delivered_at=:deliveredAt '.
             'WHERE id = (SELECT id FROM ('.
-            'SELECT id FROM %s WHERE queue=:queue AND consumer_id IS NULL AND '.
+            'SELECT id FROM %1$s WHERE queue=:queue AND consumer_id IS NULL AND '.
             '(delayed_until IS NULL OR delayed_until<=:delayedUntil) '.
             'ORDER BY priority DESC, id ASC LIMIT 1'.
             ') AS x )',
-            $this->connection->getTableName(),
             $this->connection->getTableName()
         );
 

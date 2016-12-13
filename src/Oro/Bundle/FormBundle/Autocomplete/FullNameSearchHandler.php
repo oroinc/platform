@@ -42,6 +42,7 @@ class FullNameSearchHandler extends SearchHandler
         if (!$this->entityNameResolver) {
             throw new \RuntimeException('Name resolver must be configured');
         }
+
         return $this->entityNameResolver->getName($entity);
     }
 

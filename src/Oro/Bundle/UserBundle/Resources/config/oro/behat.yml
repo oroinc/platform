@@ -21,7 +21,7 @@ elements:
 
   UserMenu:
     selector: {type: 'xpath', locator: '//li[@id="user-menu"]'}
-    class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Element
+    class: Oro\Bundle\UserBundle\Tests\Behat\Element\UserMenu
 
   UserRoleForm:
     selector: "form[id^='oro_user_role_form']"
@@ -51,3 +51,7 @@ pages:
   User View:
     class: Oro\Bundle\UserBundle\Tests\Behat\Page\UserView
     route: 'oro_user_view'
+
+  User Edit:
+    class: Oro\Bundle\UserBundle\Tests\Behat\Page\UserEdit
+    route: 'oro_user_edit'

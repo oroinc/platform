@@ -3,27 +3,49 @@
 namespace Oro\Bundle\TranslationBundle\Tests\Functional\DataFixtures;
 
 use Doctrine\Common\DataFixtures\AbstractFixture;
+use Doctrine\Common\DataFixtures\DependentFixtureInterface;
 use Doctrine\Common\Persistence\ObjectManager;
 
-use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\TranslationBundle\Entity\Language;
 use Oro\Bundle\UserBundle\Entity\User;
 
-class LoadLanguages extends AbstractFixture
+class LoadLanguages extends AbstractFixture implements DependentFixtureInterface
 {
     const LANGUAGE1 = 'en_CA';
     const LANGUAGE2 = 'fr_FR';
+    const LANGUAGE3 = 'en_US';
 
-    const LANGUAGE1_NAME = 'English (Canada)';
-    const LANGUAGE2_NAME = 'French (France)';
+    /**
+     * @var array
+     */
+    protected $languages = [
+        self::LANGUAGE1 => [
+        ],
+        self::LANGUAGE2 => [
+            'enabled' => true,
+        ],
+        self::LANGUAGE3 => [
+            'enabled' => true,
+            'user' => LoadTranslationUsers::TRANSLATOR_USERNAME,
+        ],
+    ];
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getDependencies()
+    {
+        return [LoadTranslationUsers::class];
+    }
 
     /**
      * {@inheritdoc}
      */
     public function load(ObjectManager $manager)
     {
-        $this->createLanguage($manager, self::LANGUAGE1, false);
-        $this->createLanguage($manager, self::LANGUAGE2, true);
+        foreach ($this->languages as $language => $definition) {
+            $this->createLanguage($manager, $language, $definition);
+        }
 
         $manager->flush();
     }
@@ -31,21 +53,27 @@ class LoadLanguages extends AbstractFixture
     /**
      * @param ObjectManager $manager
      * @param string $code
-     * @param bool $isEnabled
+     * @param array $options
      *
      * @return Language
      */
-    protected function createLanguage(ObjectManager $manager, $code, $isEnabled)
+    protected function createLanguage(ObjectManager $manager, $code, array $options)
     {
-        $language = new Language();
-        $user = $manager->getRepository(User::class)->findOneBy([]);
-        $organization = $manager->getRepository(Organization::class)->findOneBy([]);
+        $criteria = [];
+        if (!empty($options['user'])) {
+            $criteria = ['username' => $options['user']];
+        }
 
+        /* @var $user User */
+        $user = $manager->getRepository(User::class)->findOneBy($criteria);
+
+        $language = new Language();
         $language
             ->setCode($code)
-            ->setEnabled($isEnabled)
+            ->setEnabled(!empty($options['enabled']))
             ->setOwner($user)
-            ->setOrganization($organization);
+            ->setOrganization($user->getOrganization());
+
         $manager->persist($language);
         $this->addReference($code, $language);
 

@@ -13,7 +13,7 @@ use Oro\Bundle\ActionBundle\Model\Operation;
 use Oro\Bundle\ActionBundle\Model\OptionsAssembler;
 use Oro\Bundle\ActionBundle\Model\OperationDefinition;
 
-use Oro\Component\Action\Model\ContextAccessor;
+use Oro\Component\ConfigExpression\ContextAccessor;
 
 class OptionsHelperTest extends \PHPUnit_Framework_TestCase
 {
@@ -68,15 +68,22 @@ class OptionsHelperTest extends \PHPUnit_Framework_TestCase
      */
     public function testGetFrontendOptions(array $inputData, array $expectedData)
     {
-        $this->contextHelper->expects($this->once())
-            ->method('getContext')
-            ->with($inputData['context'])
-            ->willReturn($inputData['context']);
+        $args = $inputData['args'];
 
         $this->contextHelper->expects($this->once())
-            ->method('getActionData')
-            ->with($inputData['context'])
-            ->willReturn($inputData['actionData']);
+            ->method('getContext')
+            ->with($args['context'])
+            ->willReturn($args['context']);
+
+        $callGetActionDataTimes = (int)!isset($args['actionData']);
+
+        $methodCalls = $this->contextHelper->expects($this->exactly($callGetActionDataTimes))
+            ->method('getActionData');
+
+        if ($callGetActionDataTimes) {
+            $methodCalls->with($args['context'])
+                ->willReturn($inputData['actionData']);
+        }
 
         $this->optionsAssembler->expects($this->at(0))
             ->method('assemble')
@@ -114,7 +121,11 @@ class OptionsHelperTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals(
             $expectedData,
-            $this->helper->getFrontendOptions($inputData['operation'], $inputData['context'])
+            $this->helper->getFrontendOptions(
+                $args['operation'],
+                $args['context'],
+                isset($args['actionData']) ? $args['actionData'] : null
+            )
         );
     }
 
@@ -128,9 +139,11 @@ class OptionsHelperTest extends \PHPUnit_Framework_TestCase
         return [
             'empty context and parameters' => [
                 'input' => [
-                    'context' => [],
+                    'args' => [
+                        'context' => [],
+                        'operation' => $this->getOperation('operation1'),
+                    ],
                     'actionData' => new ActionData(),
-                    'operation' => $this->getOperation('operation1'),
                     'buttonOptions' => [],
                     'frontendOptions' => [],
                     'formOptions' => [],
@@ -157,9 +170,59 @@ class OptionsHelperTest extends \PHPUnit_Framework_TestCase
             ],
             'optional parameters' => [
                 'input' => [
-                    'context' => [],
+                    'args' => [
+                        'context' => [],
+                        'operation' => $this->getOperation('operation2'),
+                    ],
                     'actionData' => new ActionData(['key1' => 'value1']),
-                    'operation' => $this->getOperation('operation2'),
+                    'frontendOptions' => [
+                        'confirmation' => [
+                            'option1' => 'value1',
+                            'key1' => new PropertyPath('key1')
+                        ],
+                    ],
+                    'buttonOptions' => [
+                        'page_component_module' => 'module1',
+                        'page_component_options' => ['option2' => 'value2'],
+                        'data' => ['key1' => 'value1'],
+                    ],
+                    'formOptions' => [],
+                    'routerContext' => [
+                        'operationName' => 'operation2',
+                    ],
+                    'executionUrl' => 'execution-url2',
+                    'dialogUrl' => 'dialog-url2',
+                ],
+                'expected' => [
+                    'options' => [
+                        'hasDialog' => false,
+                        'showDialog' => false,
+                        'dialogOptions' => [
+                            'title' => 'OPERATION2', //translated
+                            'dialogOptions' => [],
+                        ],
+                        'executionUrl' => 'execution-url2',
+                        'dialogUrl' => 'dialog-url2',
+                        'url' => 'execution-url2',
+                        'confirmation' => [
+                            'option1' => 'value1',
+                            'key1' => 'value1',
+                        ],
+                    ],
+                    'data' => [
+                        'page-component-module' => 'module1',
+                        'page-component-options' => ['option2' => 'value2'],
+                        'key1' => 'value1',
+                    ],
+                ],
+            ],
+            'use action data from argument' => [
+                'input' => [
+                    'args' => [
+                        'context' => [],
+                        'operation' => $this->getOperation('operation2'),
+                        'actionData' => new ActionData(['key1' => 'value1']),
+                    ],
                     'frontendOptions' => [
                         'confirmation' => [
                             'option1' => 'value1',
@@ -203,11 +266,13 @@ class OptionsHelperTest extends \PHPUnit_Framework_TestCase
             ],
             'not translated title' => [
                 'input' => [
-                    'context' => [
-                        'param1' => 'value1',
+                    'args' => [
+                        'context' => [
+                            'param1' => 'value1',
+                        ],
+                        'operation' => $this->getOperation('operation3', true),
                     ],
                     'actionData' => new ActionData(),
-                    'operation' => $this->getOperation('operation3', true),
                     'buttonOptions' => [],
                     'frontendOptions' => [],
                     'routerContext' => [
@@ -234,11 +299,13 @@ class OptionsHelperTest extends \PHPUnit_Framework_TestCase
             ],
             'full context and parameters' => [
                 'input' => [
-                    'context' => [
-                        'param1' => 'value1',
+                    'args' => [
+                        'context' => [
+                            'param1' => 'value1',
+                        ],
+                        'operation' => $this->getOperation('operation3', true),
                     ],
                     'actionData' => new ActionData(),
-                    'operation' => $this->getOperation('operation3', true),
                     'buttonOptions' => [],
                     'frontendOptions' => [
                         'show_dialog' => true,

@@ -8,7 +8,7 @@ use Symfony\Component\PropertyAccess\PropertyPath;
 use Oro\Bundle\ActionBundle\Action\CreateDate;
 use Oro\Bundle\LocaleBundle\Model\LocaleSettings;
 
-use Oro\Component\Action\Model\ContextAccessor;
+use Oro\Component\ConfigExpression\ContextAccessor;
 use Oro\Component\ConfigExpression\Tests\Unit\Fixtures\ItemStub;
 
 class CreateDateTest extends \PHPUnit_Framework_TestCase

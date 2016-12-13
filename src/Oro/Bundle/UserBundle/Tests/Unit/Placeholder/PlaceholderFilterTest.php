@@ -3,7 +3,7 @@
 namespace Oro\Bundle\UserBundle\Tests\Unit\Placeholder;
 
 use Oro\Bundle\SecurityBundle\SecurityFacade;
-use Oro\Bundle\UserBundle\Entity\User;
+use Oro\Bundle\UserBundle\Tests\Unit\Stub\UserStub as User;
 use Oro\Bundle\UserBundle\Placeholder\PlaceholderFilter;
 
 class PlaceholderFilterTest extends \PHPUnit_Framework_TestCase

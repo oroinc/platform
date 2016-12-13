@@ -24,7 +24,7 @@ class Configuration implements ConfigurationInterface
                     ->addDefaultsIfNotSet()
                     ->children()
                         ->scalarNode(static::LABEL_KEY)->defaultValue('oro.datagrid.appearance.grid')->end()
-                        ->scalarNode(static::ICON_KEY)->defaultValue('icon-table')->end()
+                        ->scalarNode(static::ICON_KEY)->defaultValue('fa-table')->end()
                         ->scalarNode(static::DEFAULT_PROCESSING_KEY)->defaultValue(true)->end()
                     ->end()
                 ->end()

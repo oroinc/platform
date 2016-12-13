@@ -11,7 +11,7 @@ use Symfony\Component\Translation\TranslatorInterface;
 
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityBundle\Provider\ChainEntityClassNameProvider;
-use Oro\Bundle\ImportExportBundle\Field\FieldHelper;
+use Oro\Bundle\EntityBundle\Helper\FieldHelper;
 use Oro\Bundle\ImportExportBundle\Field\DatabaseHelper;
 
 class ConfigurableAddOrReplaceStrategy extends AbstractImportStrategy
@@ -357,7 +357,10 @@ class ConfigurableAddOrReplaceStrategy extends AbstractImportStrategy
             if (null !== $value) {
                 if ('' !== $value) {
                     if (is_object($value)) {
-                        $notEmptyValues[$fieldName] = $this->databaseHelper->getIdentifier($value);
+                        $identifier = $this->databaseHelper->getIdentifier($value);
+                        if ($identifier !== null) {
+                            $notEmptyValues[$fieldName] = $identifier;
+                        }
                     } else {
                         $notEmptyValues[$fieldName] = $value;
                     }

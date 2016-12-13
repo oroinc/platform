@@ -3,7 +3,7 @@
 namespace Oro\Bundle\WorkflowBundle\Form\Type;
 
 use Symfony\Component\Form\AbstractType;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\OptionsResolver\Options;
 
 use Oro\Bundle\WorkflowBundle\Validator\Constraints\TransitionIsAllowed;
@@ -41,9 +41,9 @@ class WorkflowTransitionType extends AbstractType
      * - "workflow_item" - required, instance of WorkflowItem entity
      * - "transition_name" - required, name of transition
      *
-     * @param OptionsResolverInterface $resolver
+     * {@inheritdoc}
      */
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setRequired(array('workflow_item', 'transition_name'));
 
@@ -53,21 +53,20 @@ class WorkflowTransitionType extends AbstractType
             )
         );
 
-        $resolver->setNormalizers(
-            array(
-                'constraints' => function (Options $options, $constraints) {
-                    if (!$constraints) {
-                        $constraints = array();
-                    }
-
-                    $constraints[] = new TransitionIsAllowed(
-                        $options['workflow_item'],
-                        $options['transition_name']
-                    );
-
-                    return $constraints;
+        $resolver->setNormalizer(
+            'constraints',
+            function (Options $options, $constraints) {
+                if (!$constraints) {
+                    $constraints = [];
                 }
-            )
+
+                $constraints[] = new TransitionIsAllowed(
+                    $options['workflow_item'],
+                    $options['transition_name']
+                );
+
+                return $constraints;
+            }
         );
     }
 }

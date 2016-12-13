@@ -5,6 +5,7 @@ namespace Oro\Bundle\DataGridBundle\Extension\MassAction;
 use Doctrine\ORM\Query;
 use Doctrine\ORM\QueryBuilder;
 
+use Oro\Bundle\SearchBundle\Datagrid\Datasource\SearchDatasource;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\File\Exception\UnexpectedTypeException;
 use Symfony\Component\HttpFoundation\Request;
@@ -109,7 +110,9 @@ class MassActionDispatcher
         //prepare query builder
         $qb->setMaxResults(null);
 
-        if (!$datagrid->getConfig()->isDatasourceSkipAclApply()) {
+        if ($datagrid->getDatasource() instanceof OrmDatasource
+            && !$datagrid->getConfig()->isDatasourceSkipAclApply()
+        ) {
             $qb = $this->aclHelper->apply($qb);
         }
 
@@ -139,12 +142,13 @@ class MassActionDispatcher
         $values = []
     ) {
         $datasource = $datagrid->getDatasource();
-        if (!$datasource instanceof OrmDatasource) {
+        if ($datasource instanceof SearchDatasource) {
             throw new LogicException("Mass actions applicable only for datagrids with ORM datasource.");
         }
 
         /** @var QueryBuilder $qb */
         $qb = $datagrid->getAcceptedDatasource()->getQueryBuilder();
+
         if ($values) {
             $valueWhereCondition =
                 $inset

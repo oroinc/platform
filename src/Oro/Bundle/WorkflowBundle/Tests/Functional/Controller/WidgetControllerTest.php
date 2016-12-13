@@ -12,6 +12,7 @@ use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowManager;
 use Oro\Bundle\WorkflowBundle\Tests\Functional\DataFixtures\LoadWorkflowDefinitions;
+use Oro\Bundle\WorkflowBundle\Translation\KeyTemplate\WorkflowTemplate;
 
 /**
  * @dbIsolation
@@ -43,6 +44,7 @@ class WidgetControllerTest extends WebTestCase
         $this->workflowManager = $this->client->getContainer()->get('oro_workflow.manager');
         $this->workflowManager->activateWorkflow(LoadWorkflowDefinitions::MULTISTEP);
         $this->workflowManager->activateWorkflow(LoadWorkflowDefinitions::WITH_START_STEP);
+        $this->workflowManager->activateWorkflow(LoadWorkflowDefinitions::WITH_INIT_OPTION);
         $this->entity = $this->createNewEntity();
     }
 
@@ -66,8 +68,20 @@ class WidgetControllerTest extends WebTestCase
         $this->assertNotEmpty($crawler->html());
         $this->assertContains('transition-test_multistep_flow-starting_point_transition', $crawler->html());
         $this->assertContains('transition-test_start_step_flow-start_transition', $crawler->html());
-        $this->assertContains('Open', $crawler->html());
-        $this->assertContains('(Start)', $crawler->html());
+        $this->assertContains($this->getStepLabel('test_active_flow1', 'step1'), $crawler->html());
+        $this->assertContains($this->getStepLabel('test_active_flow2', 'step1'), $crawler->html());
+        $this->assertContains($this->getStepLabel('test_start_step_flow', 'open'), $crawler->html());
+        $this->assertContains($this->getStepLabel('test_multistep_flow', 'starting_point'), $crawler->html());
+    }
+
+    /**
+     * @param string $workflowName
+     * @param string $stepName
+     * @return string
+     */
+    protected function getStepLabel($workflowName, $stepName)
+    {
+        return WorkflowTemplate::KEY_PREFIX . '.' . $workflowName . '.step.' . $stepName . '.label';
     }
 
     public function testStartTransitionFormAction()
@@ -90,6 +104,36 @@ class WidgetControllerTest extends WebTestCase
         $this->assertHtmlResponseStatusCodeEquals($response, 200);
         $this->assertNotEmpty($crawler->html());
         $this->assertTransitionFromSubmit($crawler, $workflowItem);
+    }
+
+    public function testStartTransitionFormActionFromNonRelatedEntity()
+    {
+        $crawler = $this->client->request(
+            'GET',
+            $this->getUrl('oro_workflow_widget_start_transition_form', [
+                '_widgetContainer' => 'dialog',
+                'workflowName' => LoadWorkflowDefinitions::WITH_INIT_OPTION,
+                'transitionName' => LoadWorkflowDefinitions::START_FROM_ROUTE_TRANSITION_WITH_FORM,
+            ]),
+            [
+                'entityClass' => 'class1',
+                'route' => 'route1'
+            ],
+            [],
+            $this->generateBasicAuthHeader()
+        );
+
+        $response = $this->client->getResponse();
+        $this->assertHtmlResponseStatusCodeEquals($response, 200);
+        $this->assertNotEmpty($crawler->html());
+
+        $form = $crawler->selectButton('Submit')->form();
+        $this->client->followRedirects(true);
+        $crawler = $this->client->submit($form);
+
+        $result = $this->client->getResponse();
+        $this->assertHtmlResponseStatusCodeEquals($result, 200);
+        $this->assertContains(LoadWorkflowDefinitions::WITH_INIT_OPTION, $crawler->html());
     }
 
     public function testTransitionFormAction()

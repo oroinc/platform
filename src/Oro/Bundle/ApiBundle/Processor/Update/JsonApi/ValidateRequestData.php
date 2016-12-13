@@ -4,7 +4,6 @@ namespace Oro\Bundle\ApiBundle\Processor\Update\JsonApi;
 
 use Oro\Bundle\ApiBundle\Processor\Shared\JsonApi\ValidateRequestData as BaseProcessor;
 use Oro\Bundle\ApiBundle\Request\JsonApi\JsonApiDocumentBuilder as JsonApiDoc;
-use Symfony\Component\HttpFoundation\Response;
 
 /**
  * Validates that the request data contains valid JSON.API object.
@@ -19,6 +18,7 @@ class ValidateRequestData extends BaseProcessor
         if ($this->validateResourceObject($data, $pointer)) {
             $this->validatePrimaryDataObjectId($data, $pointer);
             $this->validatePrimaryDataObjectType($data, $pointer);
+            $this->validateAttributesOrRelationshipsExist($data, $pointer);
         }
     }
 
@@ -30,7 +30,9 @@ class ValidateRequestData extends BaseProcessor
      */
     protected function validatePrimaryDataObjectId(array $data, $pointer)
     {
-        if ($this->context->getId() !== $data[JsonApiDoc::ID]) {
+        // do matching only if the identifier is not normalized yet
+        $id = $this->context->getId();
+        if (is_string($id) && $id !== $data[JsonApiDoc::ID]) {
             $this->addError(
                 $this->buildPointer($pointer, JsonApiDoc::ID),
                 sprintf(
@@ -44,5 +46,25 @@ class ValidateRequestData extends BaseProcessor
         }
 
         return true;
+    }
+
+    /**
+     * @param array  $data
+     * @param string $pointer
+     */
+    protected function validateAttributesOrRelationshipsExist(array $data, $pointer)
+    {
+        if (!array_key_exists(JsonApiDoc::ATTRIBUTES, $data)
+            && !array_key_exists(JsonApiDoc::RELATIONSHIPS, $data)
+        ) {
+            $this->addError(
+                $pointer,
+                sprintf(
+                    'The primary data object should contain \'%s\' or \'%s\' block',
+                    JsonApiDoc::ATTRIBUTES,
+                    JsonApiDoc::RELATIONSHIPS
+                )
+            );
+        }
     }
 }

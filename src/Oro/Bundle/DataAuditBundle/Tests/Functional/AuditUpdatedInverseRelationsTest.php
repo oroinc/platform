@@ -710,7 +710,7 @@ class AuditUpdatedInverseRelationsTest extends WebTestCase
         $this->assertSame('text', $auditField->getDataType());
         $this->assertSame('childrenOneToMany', $auditField->getField());
         $this->assertEquals(
-            "\nChanged: " . $child->getId(),
+            "\nChanged: Item #" . $child->getId(),
             $auditField->getNewValue()
         );
         $this->assertEquals(null, $auditField->getOldValue());

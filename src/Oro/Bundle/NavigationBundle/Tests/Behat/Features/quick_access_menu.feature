@@ -34,8 +34,8 @@ Feature: Quick access menu
     And I press "Create User"
     And I fill "User Form" with:
       | Username          | userName       |
-      | Password          | 123123123Q        |
-      | Re-Enter Password | 123123123Q        |
+      | Password          | Pa$$w0rd       |
+      | Re-Enter Password | Pa$$w0rd       |
       | First Name        | First Name     |
       | Last Name         | Last Name      |
       | Primary Email     | email@test.com |
@@ -45,15 +45,15 @@ Feature: Quick access menu
     When I click icon bars
     And choose Favorites tab
     Then Favorites must looks like:
-      | Create User - Users - User Management - System |
-      | All - Users - User Management - System         |
-    And I click on "All - Users - User Management - System" in Favorites
+      | Create User - Users - User Management - System  |
+      | Active Users - Users - User Management - System |
+    And I click on "Active Users - Users - User Management - System" in Favorites
     And John Doe must be first record
 
   Scenario: Remove page from favorite
     Given I click icon bars
     And choose Favorites tab
-    And I remove "All - Users - User Management - System" from favorites
+    And I remove "Active Users - Users - User Management - System" from favorites
     And Favorites must looks like:
       | Create User - Users - User Management - System |
     When I click on "Create User - Users - User Management - System" in Favorites

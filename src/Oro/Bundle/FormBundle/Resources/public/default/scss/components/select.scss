@@ -2,6 +2,10 @@
 .select {
     max-width: 100%;
 
+    @include placeholder {
+        color: get-color('additional', 'middle');
+    }
+
     &--size-m {
         padding: $select-padding--m;
     }

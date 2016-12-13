@@ -2,10 +2,10 @@
 
 namespace Oro\Component\Layout\Tests\Unit;
 
+use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
+
 use Oro\Component\Layout\Block\OptionsResolver\OptionsResolver;
 use Oro\Component\Layout\Block\Type\Options;
-use Oro\Component\Layout\ContextInterface;
-use Oro\Component\Layout\DataAccessorInterface;
 use Oro\Component\Layout\Block\Type\BaseType;
 use Oro\Component\Layout\Block\Type\ContainerType;
 use Oro\Component\Layout\BlockBuilderInterface;
@@ -13,12 +13,15 @@ use Oro\Component\Layout\BlockFactory;
 use Oro\Component\Layout\BlockInterface;
 use Oro\Component\Layout\BlockView;
 use Oro\Component\Layout\DeferredLayoutManipulator;
+use Oro\Component\Layout\ExpressionLanguage\Encoder\ExpressionEncoderRegistry;
+use Oro\Component\Layout\ExpressionLanguage\ExpressionProcessor;
 use Oro\Component\Layout\Extension\Core\CoreExtension;
 use Oro\Component\Layout\Extension\PreloadedExtension;
 use Oro\Component\Layout\LayoutContext;
 use Oro\Component\Layout\LayoutItemInterface;
 use Oro\Component\Layout\LayoutManipulatorInterface;
 use Oro\Component\Layout\LayoutRegistry;
+use Oro\Component\Layout\OptionValueBag;
 use Oro\Component\Layout\RawLayoutBuilder;
 use Oro\Component\Layout\Tests\Unit\Fixtures\AbstractExtensionStub;
 use Oro\Component\Layout\Tests\Unit\Fixtures\Layout\Block\Type;
@@ -36,6 +39,9 @@ class BlockFactoryTest extends LayoutTestCase
 
     /** @var LayoutRegistry */
     protected $registry;
+
+    /** @var ExpressionLanguage */
+    protected $expressionLanguage;
 
     /** @var BlockFactory */
     protected $blockFactory;
@@ -55,10 +61,19 @@ class BlockFactoryTest extends LayoutTestCase
             )
         );
 
-        $this->context           = new LayoutContext();
-        $this->rawLayoutBuilder  = new RawLayoutBuilder();
-        $this->layoutManipulator = new DeferredLayoutManipulator($this->registry, $this->rawLayoutBuilder);
-        $this->blockFactory      = new BlockFactory($this->registry, $this->layoutManipulator);
+        $this->context            = new LayoutContext();
+        $this->rawLayoutBuilder   = new RawLayoutBuilder();
+        $this->layoutManipulator  = new DeferredLayoutManipulator($this->registry, $this->rawLayoutBuilder);
+        $this->expressionLanguage = new ExpressionLanguage();
+        $expressionProcessor      = new ExpressionProcessor(
+            $this->expressionLanguage,
+            new ExpressionEncoderRegistry([])
+        );
+        $this->blockFactory       = new BlockFactory(
+            $this->registry,
+            $this->layoutManipulator,
+            $expressionProcessor
+        );
     }
 
     /**
@@ -250,20 +265,9 @@ class BlockFactoryTest extends LayoutTestCase
                         $resolver->setDefaults(
                             [
                                 'test_option_1' => '',
-                                'test_option_2' => '{BG}:red'
+                                'test_option_2' => ['background'=> 'red']
                             ]
                         );
-                    }
-                )
-            );
-        $headerBlockTypeExtension->expects($this->once())
-            ->method('normalizeOptions')
-            ->will(
-                $this->returnCallback(
-                    function (Options $options, ContextInterface $context, DataAccessorInterface $data) {
-                        if ($options['test_option_2'] === '{BG}:red') {
-                            $options['test_option_2'] = ['background'=> 'red'];
-                        }
                     }
                 )
             );
@@ -346,6 +350,125 @@ class BlockFactoryTest extends LayoutTestCase
                     ],
                     [ // logo
                         'vars' => ['id' => 'logo', 'title' => 'test']
+                    ]
+                ]
+            ],
+            $view
+        );
+    }
+
+    /**
+     * @dataProvider expressionsProvider
+     *
+     * @param bool $deferred
+     */
+    public function testProcessingExpressionsInBuildView($deferred)
+    {
+        $this->context->set('expressions_evaluate', true);
+        $this->context->set('expressions_evaluate_deferred', $deferred);
+        $this->context->set('title', 'test title');
+
+        $this->layoutManipulator
+            ->add('root', null, 'root')
+            ->add('header', 'root', 'header')
+            ->add('logo', 'header', 'logo', [
+                'title' => $this->expressionLanguage->parse('context["title"]', ['context'])
+            ]);
+
+        $view = $this->getLayoutView();
+
+        $this->assertBlockView(
+            [ // root
+                'vars'     => ['id' => 'root'],
+                'children' => [
+                    [ // header
+                        'vars'     => ['id' => 'header'],
+                        'children' => [
+                            [ // logo
+                                'vars' => ['id' => 'logo', 'title' => 'test title']
+                            ]
+                        ]
+                    ]
+                ]
+            ],
+            $view
+        );
+    }
+
+    /**
+     * @return array
+     */
+    public function expressionsProvider()
+    {
+        return [
+            ['deferred' => false],
+            ['deferred' => true],
+        ];
+    }
+
+    /**
+     * @expectedException \InvalidArgumentException
+     */
+    public function testBuildViewShouldFailWhenUsingNonProcessedExpressions()
+    {
+        $this->context->set('expressions_evaluate', false);
+        $this->context->set('title', 'test title');
+
+        $this->layoutManipulator
+            ->add('root', null, 'root')
+            ->add('header', 'root', 'header')
+            ->add('logo', 'header', 'logo', [
+                'title' => $this->expressionLanguage->parse('context["title"]', ['context'])
+            ]);
+
+        $this->getLayoutView();
+    }
+
+    /**
+     * @expectedException \InvalidArgumentException
+     */
+    public function testBuildViewShouldFailWhenUsingDataInExpressionsInDeferredMode()
+    {
+        $this->context->set('expressions_evaluate', true);
+        $this->context->set('expressions_evaluate_deferred', true);
+        $this->context->data()->set('title', 'test title');
+
+        $this->layoutManipulator
+            ->add('root', null, 'root')
+            ->add('header', 'root', 'header')
+            ->add('logo', 'header', 'logo', [
+                'title' => $this->expressionLanguage->parse('data["title"]', ['data'])
+            ]);
+
+        $this->getLayoutView();
+    }
+
+    public function testResolvingValueBags()
+    {
+        $valueBag = new OptionValueBag();
+        $valueBag->add('one');
+        $valueBag->add('two');
+
+        $this->context->set('expressions_evaluate', true);
+
+        $this->layoutManipulator
+            ->add('root', null, 'root')
+            ->add('header', 'root', 'header')
+            ->add('logo', 'header', 'logo', ['title' => $valueBag]);
+
+        $view = $this->getLayoutView();
+
+        $this->assertBlockView(
+            [ // root
+                'vars'     => ['id' => 'root'],
+                'children' => [
+                    [ // header
+                        'vars'     => ['id' => 'header'],
+                        'children' => [
+                            [ // logo
+                                'vars' => ['id' => 'logo', 'title' => 'one two']
+                            ]
+                        ]
                     ]
                 ]
             ],

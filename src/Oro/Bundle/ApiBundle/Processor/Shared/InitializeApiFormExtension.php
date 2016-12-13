@@ -4,43 +4,31 @@ namespace Oro\Bundle\ApiBundle\Processor\Shared;
 
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
-use Oro\Bundle\ApiBundle\Form\FormExtensionSwitcherInterface;
-use Oro\Bundle\ApiBundle\Form\Guesser\MetadataTypeGuesser;
 use Oro\Bundle\ApiBundle\Processor\Context;
 use Oro\Bundle\ApiBundle\Processor\ContextConfigAccessor;
 use Oro\Bundle\ApiBundle\Processor\ContextMetadataAccessor;
+use Oro\Bundle\ApiBundle\Processor\FormContext;
 
 /**
  * Switches to Data API form extension.
  */
-class InitializeApiFormExtension implements ProcessorInterface
+class InitializeApiFormExtension extends SwitchFormExtension implements ProcessorInterface
 {
-    /** @var FormExtensionSwitcherInterface */
-    protected $formExtensionSwitcher;
-
-    /** @var MetadataTypeGuesser */
-    protected $metadataTypeGuesser;
-
-    /**
-     * @param FormExtensionSwitcherInterface $formExtensionSwitcher
-     * @param MetadataTypeGuesser            $metadataTypeGuesser
-     */
-    public function __construct(
-        FormExtensionSwitcherInterface $formExtensionSwitcher,
-        MetadataTypeGuesser $metadataTypeGuesser
-    ) {
-        $this->formExtensionSwitcher = $formExtensionSwitcher;
-        $this->metadataTypeGuesser = $metadataTypeGuesser;
-    }
-
     /**
      * {@inheritdoc}
      */
     public function process(ContextInterface $context)
     {
-        /** @var Context $context */
+        /** @var Context|FormContext $context */
 
-        $this->formExtensionSwitcher->switchToApiFormExtension();
+        if ($this->isApiFormExtensionActivated($context)) {
+            // the API form extension is already activated
+            return;
+        }
+
+        $this->switchToApiFormExtension($context);
+        $this->rememberContext($context);
+        $this->metadataTypeGuesser->setIncludedEntities($context->getIncludedEntities());
         $this->metadataTypeGuesser->setMetadataAccessor(new ContextMetadataAccessor($context));
         $this->metadataTypeGuesser->setConfigAccessor(new ContextConfigAccessor($context));
     }

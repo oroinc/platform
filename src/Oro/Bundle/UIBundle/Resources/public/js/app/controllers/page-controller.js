@@ -182,12 +182,23 @@ define([
 
             this.publishEvent('page:update', pageData, actionArgs, jqXHR, updatePromises);
 
-            // once all views has been updated, trigger page:afterChange
-            $.when.apply($, updatePromises).done(function() {
-                // let all embedded inline scripts finish their execution
-                asap(function() {
-                    self.publishEvent('page:afterChange');
+            // execute callback function when all promises are either resolved or rejected
+            function waitPromises(promises, callback) {
+                $.when.apply($, promises).always(function() {
+                    var pendingPromises = _.filter(promises, function(promise) {
+                        return promise.state() === 'pending';
+                    });
+                    if (pendingPromises.length) {
+                        waitPromises(pendingPromises, callback);
+                    } else {
+                        callback();
+                    }
                 });
+            }
+
+            // once all views has been updated, trigger page:afterChange
+            waitPromises(updatePromises, function() {
+                self.publishEvent('page:afterChange');
             });
         },
 
