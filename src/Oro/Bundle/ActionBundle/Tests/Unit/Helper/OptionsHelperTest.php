@@ -50,7 +50,7 @@ class OptionsHelperTest extends \PHPUnit_Framework_TestCase
     {
         $defaultData = [
             'options' => [
-                'hasDialog' => true,
+                'hasDialog' => null,
                 'showDialog' => false,
                 'dialogOptions' => [
                     'title' => '[trans]test label[/trans]',
@@ -70,6 +70,7 @@ class OptionsHelperTest extends \PHPUnit_Framework_TestCase
             ],
             'filled options' => [
                 'button' => $this->getButton('test label', [
+                    'hasDialog' => true,
                     'showDialog' => true,
                     'frontendOptions' => [
                         'title' => 'custom title',
@@ -110,18 +111,6 @@ class OptionsHelperTest extends \PHPUnit_Framework_TestCase
     protected function getButton($label, array $templateData)
     {
         $button = $this->getMock(ButtonInterface::class);
-        $templateData = array_merge(
-            [
-                'executionRoute' => 'test_route',
-                'dialogRoute' => 'test_route',
-                'hasForm' => true,
-                'routeParams' => [],
-                'frontendOptions' => [],
-                'buttonOptions' => [],
-            ],
-            $templateData
-        );
-
         $button->expects($this->any())->method('getTemplateData')->willReturn($templateData);
         $button->expects($this->any())->method('getLabel')->willReturn($label);
 

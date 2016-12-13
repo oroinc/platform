@@ -57,7 +57,7 @@ class OptionsHelper
      */
     protected function createOptions(ButtonInterface $button)
     {
-        $data = $button->getTemplateData();
+        $data = $this->normalizeTemplateData($button->getTemplateData());
         $executionUrl = $this->router->generate($data['executionRoute'], $data['routeParams']);
         $dialogUrl = $this->router->generate($data['dialogRoute'], $data['routeParams']);
 
@@ -103,15 +103,34 @@ class OptionsHelper
     protected function createData(ButtonInterface $button)
     {
         $data = [];
-        $templateData = $button->getTemplateData();
-        $buttonOptions = isset($templateData['buttonOptions']) ? $templateData['buttonOptions'] : [];
-        $this->addOption($data, $buttonOptions, 'page_component_module');
-        $this->addOption($data, $buttonOptions, 'page_component_options');
+        $templateData = $this->normalizeTemplateData($button->getTemplateData());
+        $this->addOption($data, $templateData['buttonOptions'], 'page_component_module');
+        $this->addOption($data, $templateData['buttonOptions'], 'page_component_options');
 
-        if (!empty($buttonOptions['data'])) {
-            $data = array_merge($data, $buttonOptions['data']);
+        if (!empty($templateData['buttonOptions']['data'])) {
+            $data = array_merge($data, $templateData['buttonOptions']['data']);
         }
 
         return $data;
+    }
+
+    /**
+     * @param array $data
+     * @return array
+     */
+    protected function normalizeTemplateData(array $data)
+    {
+        return array_merge(
+            [
+                'hasForm' => null,
+                'showDialog' => null,
+                'executionRoute' => null,
+                'dialogRoute' => null,
+                'routeParams' => [],
+                'frontendOptions' => [],
+                'buttonOptions' => [],
+            ],
+            $data
+        );
     }
 }
