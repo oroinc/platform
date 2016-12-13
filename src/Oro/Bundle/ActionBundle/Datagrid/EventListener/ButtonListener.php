@@ -7,13 +7,12 @@ use Symfony\Component\Translation\TranslatorInterface;
 use Oro\Bundle\ActionBundle\Button\ButtonInterface;
 use Oro\Bundle\ActionBundle\Button\ButtonsCollection;
 use Oro\Bundle\ActionBundle\Button\ButtonSearchContext;
-use Oro\Bundle\ActionBundle\Button\OperationButton;
 use Oro\Bundle\ActionBundle\Datagrid\Provider\MassActionProviderRegistry;
 use Oro\Bundle\ActionBundle\Extension\ButtonProviderExtensionInterface;
 use Oro\Bundle\ActionBundle\Helper\ContextHelper;
 use Oro\Bundle\ActionBundle\Helper\OptionsHelper;
-
 use Oro\Bundle\ActionBundle\Provider\ButtonProvider;
+
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\DataGridBundle\Datasource\Orm\OrmDatasource;
 use Oro\Bundle\DataGridBundle\Datasource\ResultRecordInterface;
@@ -162,7 +161,9 @@ class ButtonListener
                     }
 
                     $newButton = clone $button;
-                    $newButton->getButtonContext()->setEnabled($enabled);
+                    $newButton->getButtonContext()
+                        ->setEnabled($enabled)
+                        ->setEntity($searchContext->getEntityClass(), $searchContext->getEntityId());
 
                     return $newButton;
                 }

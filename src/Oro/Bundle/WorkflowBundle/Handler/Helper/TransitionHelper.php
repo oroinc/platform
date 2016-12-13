@@ -30,12 +30,12 @@ class TransitionHelper
     }
 
     /**
-     * @param WorkflowItem $workflowItem
+     * @param WorkflowItem|null $workflowItem
      * @param int $responseCode
      *
      * @return Response
      */
-    public function createCompleteResponse(WorkflowItem $workflowItem, $responseCode = null)
+    public function createCompleteResponse(WorkflowItem $workflowItem = null, $responseCode = null)
     {
         $transitResponseContent = null;
         if (!$responseCode) {

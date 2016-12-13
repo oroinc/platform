@@ -4,7 +4,6 @@ namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Button;
 
 use Oro\Bundle\ActionBundle\Button\ButtonContext;
 use Oro\Bundle\ActionBundle\Button\ButtonInterface;
-use Oro\Bundle\ActionBundle\Model\OperationRegistry;
 
 use Oro\Bundle\WorkflowBundle\Button\TransitionButton;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
@@ -156,5 +155,10 @@ class TransitionButtonTest extends \PHPUnit_Framework_TestCase
     public function testGetTransition()
     {
         $this->assertEquals($this->transition, $this->button->getTransition());
+    }
+
+    public function testGetTranslationDomain()
+    {
+        $this->assertEquals('workflows', $this->button->getTranslationDomain());
     }
 }

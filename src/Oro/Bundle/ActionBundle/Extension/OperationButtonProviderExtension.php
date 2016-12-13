@@ -30,14 +30,14 @@ class OperationButtonProviderExtension implements ButtonProviderExtensionInterfa
     /** @var RouteProviderInterface */
     protected $routeProvider;
 
-    /** @var ButtonContext */
-    private $baseButtonContext;
-
     /** @var OptionsAssembler */
-    private $optionsAssembler;
+    protected $optionsAssembler;
 
     /** @var ContextAccessor */
-    private $contextAccessor;
+    protected $contextAccessor;
+
+    /** @var ButtonContext */
+    private $baseButtonContext;
 
     /**
      * @param OperationRegistry $operationRegistry
@@ -69,8 +69,9 @@ class OperationButtonProviderExtension implements ButtonProviderExtensionInterfa
         $baseActionData = $this->getActionData($buttonSearchContext);
         $result = [];
 
-        foreach ($operations as $operation) {
+        foreach ($operations as $operationName => $operation) {
             $result[] = new OperationButton(
+                $operationName,
                 $operation,
                 $this->generateButtonContext($operation, $buttonSearchContext),
                 clone $baseActionData
