@@ -8,10 +8,16 @@ use Oro\Bundle\ActionBundle\Model\ActionData;
 use Oro\Bundle\ActionBundle\Model\Operation;
 use Oro\Bundle\ActionBundle\Model\OperationDefinition;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class OperationButtonTest extends \PHPUnit_Framework_TestCase
 {
     /** @var Operation|\PHPUnit_Framework_MockObject_MockObject */
     protected $operation;
+
+    /** @var OperationDefinition|\PHPUnit_Framework_MockObject_MockObject */
+    protected $definition;
 
     /** @var OperationButton */
     protected $button;
@@ -21,7 +27,8 @@ class OperationButtonTest extends \PHPUnit_Framework_TestCase
      */
     protected function setUp()
     {
-        $this->operation = $this->getOperationMock();
+        $this->operation = $this->getMockBuilder(Operation::class)->disableOriginalConstructor()->getMock();
+        $this->definition = $this->getMock(OperationDefinition::class);
 
         $this->button = new OperationButton($this->operation, new ButtonContext(), new ActionData());
     }
@@ -45,22 +52,20 @@ class OperationButtonTest extends \PHPUnit_Framework_TestCase
     public function testGetLabel()
     {
         $label = 'test_label';
-        $definition = $this->getMockBuilder(OperationDefinition::class)->disableOriginalConstructor()->getMock();
-        $definition->expects($this->once())->method('getLabel')->willReturn($label);
+        $this->definition->expects($this->once())->method('getLabel')->willReturn($label);
 
-        $this->assertOperationMethodsCalled($definition);
+        $this->assertOperationMethodsCalled();
         $this->assertEquals($label, $this->button->getLabel());
     }
 
     public function testGetIcon()
     {
-        $definition = $this->getMockBuilder(OperationDefinition::class)->disableOriginalConstructor()->getMock();
-        $this->assertOperationMethodsCalled($definition);
+        $this->assertOperationMethodsCalled();
 
         $this->assertNull($this->button->getIcon());
 
         $icon = 'test-icon';
-        $definition->expects($this->once())->method('getButtonOptions')->willReturn(['icon' => $icon]);
+        $this->definition->expects($this->once())->method('getButtonOptions')->willReturn(['icon' => $icon]);
 
         $this->assertEquals($icon, $this->button->getIcon());
     }
@@ -68,25 +73,22 @@ class OperationButtonTest extends \PHPUnit_Framework_TestCase
     public function testGetOrder()
     {
         $order = mt_rand(10, 100);
-        $definition = $this->getMockBuilder(OperationDefinition::class)->disableOriginalConstructor()->getMock();
-        $definition->expects($this->once())->method('getOrder')->willReturn($order);
+        $this->definition->expects($this->once())->method('getOrder')->willReturn($order);
 
-        $this->assertOperationMethodsCalled($definition);
+        $this->assertOperationMethodsCalled();
 
         $this->assertEquals($order, $this->button->getOrder());
     }
 
     public function testGetTemplate()
     {
-        $definition = $this->getMockBuilder(OperationDefinition::class)->disableOriginalConstructor()->getMock();
-        $this->assertOperationMethodsCalled($definition);
+        $this->assertOperationMethodsCalled();
         $this->assertEquals(OperationButton::DEFAULT_TEMPLATE, $this->button->getTemplate());
     }
 
     public function testGetTemplateData()
     {
-        $definition = $this->getMockBuilder(OperationDefinition::class)->disableOriginalConstructor()->getMock();
-        $this->assertOperationMethodsCalled($definition);
+        $this->assertOperationMethodsCalled();
 
         $defaultData = [
             'params' => $this->operation->getDefinition(),
@@ -109,10 +111,6 @@ class OperationButtonTest extends \PHPUnit_Framework_TestCase
             'aClass' => '',
         ];
 
-        $this->assertOperationMethodsCalled(new OperationDefinition());
-
-
-
         $templateData = $this->button->getTemplateData();
         $this->assertEquals($defaultData, $templateData);
     }
@@ -125,11 +123,10 @@ class OperationButtonTest extends \PHPUnit_Framework_TestCase
     public function testGetTemplateWithConfiguredFrontendOptions()
     {
         $templateName = uniqid('test_template', true);
-        $definition = $this->getMockBuilder(OperationDefinition::class)->disableOriginalConstructor()->getMock();
-        $definition->expects($this->once())->method('getButtonOptions')->willReturn(
+        $this->definition->expects($this->once())->method('getButtonOptions')->willReturn(
             [OperationButton::BUTTON_TEMPLATE_KEY => $templateName]
         );
-        $this->assertOperationMethodsCalled($definition);
+        $this->assertOperationMethodsCalled();
 
         $this->assertEquals($templateName, $this->button->getTemplate());
     }
@@ -141,7 +138,7 @@ class OperationButtonTest extends \PHPUnit_Framework_TestCase
 
     public function testSetData()
     {
-        $this->assertOperationMethodsCalled(new OperationDefinition());
+        $this->assertOperationMethodsCalled();
         $newData = new ActionData(['test_field' => 'test value']);
         $this->assertNotEquals($newData, $this->button->getTemplateData()['actionData']);
         $this->button->setData($newData);
@@ -153,19 +150,8 @@ class OperationButtonTest extends \PHPUnit_Framework_TestCase
         $this->assertNull($this->button->getTranslationDomain());
     }
 
-    /**
-     * @param OperationDefinition $definition
-     */
-    private function assertOperationMethodsCalled(OperationDefinition $definition)
+    private function assertOperationMethodsCalled()
     {
-        $this->operation->expects($this->atLeastOnce())->method('getDefinition')->willReturn($definition);
-    }
-
-    /**
-     * @return Operation|\PHPUnit_Framework_MockObject_MockObject
-     */
-    private function getOperationMock()
-    {
-        return $this->getMockBuilder(Operation::class)->disableOriginalConstructor()->getMock();
+        $this->operation->expects($this->atLeastOnce())->method('getDefinition')->willReturn($this->definition);
     }
 }
