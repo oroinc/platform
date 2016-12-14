@@ -59,3 +59,5 @@ oro:
                 saved: Organization saved
         menu.list.description: Edit organization info
 
+    scope:
+        organization.label: Organization

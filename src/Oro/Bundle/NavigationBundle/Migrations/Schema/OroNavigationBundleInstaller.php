@@ -162,7 +162,7 @@ class OroNavigationBundleInstaller implements Installation
         $table->addColumn('priority', 'integer', ['notnull' => false]);
         $table->addColumn('scope_id', 'integer', ['notnull' => true]);
         $table->setPrimaryKey(['id']);
-        $table->addUniqueIndex(['key', 'scope_id'], 'oro_navigation_menu_upd_uidx');
+        $table->addUniqueIndex(['key', 'scope_id', 'menu'], 'oro_navigation_menu_upd_uidx');
     }
 
     /**
@@ -325,8 +325,7 @@ class OroNavigationBundleInstaller implements Installation
         $table->addForeignKeyConstraint(
             $schema->getTable('oro_scope'),
             ['scope_id'],
-            ['id'],
-            ['onUpdate' => null, 'onDelete' => 'CASCADE']
+            ['id']
         );
     }
 }

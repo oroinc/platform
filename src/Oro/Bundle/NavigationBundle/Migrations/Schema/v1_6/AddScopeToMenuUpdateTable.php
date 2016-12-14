@@ -38,7 +38,7 @@ class AddScopeToMenuUpdateTable implements Migration, OrderedMigrationInterface
         $table = $schema->getTable('oro_navigation_menu_upd');
         $table->dropIndex('oro_navigation_menu_upd_uidx');
         $table->addColumn('scope_id', 'integer', ['notnull' => true]);
-        $table->addUniqueIndex(['key', 'scope_id'], 'oro_navigation_menu_upd_uidx');
+        $table->addUniqueIndex(['key', 'scope_id', 'menu'], 'oro_navigation_menu_upd_uidx');
     }
 
     /**
@@ -52,8 +52,7 @@ class AddScopeToMenuUpdateTable implements Migration, OrderedMigrationInterface
         $table->addForeignKeyConstraint(
             $schema->getTable('oro_scope'),
             ['scope_id'],
-            ['id'],
-            ['onUpdate' => null, 'onDelete' => 'CASCADE']
+            ['id']
         );
     }
 }

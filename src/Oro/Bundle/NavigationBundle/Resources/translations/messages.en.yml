@@ -43,6 +43,7 @@ oro:
             titles.label: Title
             description.label: Description
             uri.label: URI
+            scope.label: Scope
             active.label: Active
             priority.label: Priority
             acl_resource_id.label: ACL Resource Id

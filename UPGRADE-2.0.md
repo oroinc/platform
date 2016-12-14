@@ -721,10 +721,8 @@ placeholders:
 - Added new exceptions:
     * `Oro\Bundle\NavigationBundle\Exception\MaxNestingLevelExceededException`
     * `Oro\Bundle\NavigationBundle\Exception\NotFoundParentException`
-- Added interface `Oro\Bundle\NavigationBundle\Menu\Provider\OwnershipProviderInterface`.
-- Added class `Oro\Bundle\NavigationBundle\Menu\Provider\AbstractOwnershipProvider` that implements `Oro\Bundle\NavigationBundle\Menu\Provider\OwnershipProviderInterface`.
 - Added class `Oro\Bundle\NavigationBundle\JsTree\MenuUpdateTreeHandler` that provides menu tree data in format used by `jstree`.
-- Added class `Oro\Bundle\NavigationBundle\Manager\MenuUpdateManager` with service `oro_navigation.manager.menu_update_default`.
+- Added class `Oro\Bundle\NavigationBundle\Manager\MenuUpdateManager` with service `oro_navigation.manager.menu_update`.
 - Added class `Oro\Bundle\NavigationBundle\Utils\MenuUpdateUtils`.
 - Moved class `Oro\Bundle\NavigationBundle\Menu\FeatureAwareMenuFactoryExtension` to `Oro\Bundle\FeatureToggleBundle\Menu\FeatureAwareMenuFactoryExtension`.
 - Moved class `Oro\Bundle\NavigationBundle\Event\DoctrineTagEventListener` to `Oro\Bundle\SyncBundle\Event\DoctrineTagEventListener`.

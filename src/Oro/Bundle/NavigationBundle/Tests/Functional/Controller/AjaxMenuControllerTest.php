@@ -2,12 +2,12 @@
 
 namespace Oro\Bundle\NavigationBundle\Tests\Functional\Controller;
 
-use Symfony\Component\HttpFoundation\Response;
-
-use Oro\Bundle\NavigationBundle\Menu\Provider\GlobalOwnershipProvider;
-use Oro\Bundle\NavigationBundle\Menu\Provider\UserOwnershipProvider;
 use Oro\Bundle\NavigationBundle\Tests\Functional\DataFixtures\LoadMenuUpdateData;
+
+use Oro\Bundle\ScopeBundle\Tests\DataFixtures\LoadScopeData;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
+use Oro\Bundle\UserBundle\Tests\Functional\DataFixtures\LoadScopeUserData;
+use Symfony\Component\HttpFoundation\Response;
 
 /**
  * @dbIsolation
@@ -24,7 +24,7 @@ class AjaxMenuControllerTest extends WebTestCase
         $this->initClient([], $this->generateWsseAuthHeader());
 
         $this->loadFixtures([
-            'Oro\Bundle\NavigationBundle\Tests\Functional\DataFixtures\LoadMenuUpdateData'
+            LoadMenuUpdateData::class
         ]);
     }
 
@@ -33,14 +33,13 @@ class AjaxMenuControllerTest extends WebTestCase
         $parameters = [
             'menuName' => self::MENU_NAME,
             'parentKey' => LoadMenuUpdateData::MENU_UPDATE_1,
-            'ownershipType' => GlobalOwnershipProvider::TYPE
+            'scopeId' => $this->getReference(LoadScopeData::DEFAULT_SCOPE)->getId()
         ];
 
         $this->client->request(
             'POST',
             $this->getUrl('oro_navigation_menuupdate_create', $parameters),
             [
-                'ownerId' => 0,
                 'isDivider' => true
             ]
         );
@@ -55,7 +54,7 @@ class AjaxMenuControllerTest extends WebTestCase
         $parameters = [
             'menuName' => self::MENU_NAME,
             'parentKey' => 'menu_list_default',
-            'ownershipType' => UserOwnershipProvider::TYPE
+            'scopeId' => $this->getReference(LoadScopeUserData::SIMPLE_USER_SCOPE)->getId()
         ];
 
         $this->client->request(
@@ -77,7 +76,7 @@ class AjaxMenuControllerTest extends WebTestCase
         $parameters = [
             'menuName' => self::MENU_NAME,
             'key' => LoadMenuUpdateData::MENU_UPDATE_1_1,
-            'ownershipType' => GlobalOwnershipProvider::TYPE
+            'scopeId' => $this->getReference(LoadScopeData::DEFAULT_SCOPE)->getId()
         ];
 
         $this->client->request(
@@ -96,7 +95,7 @@ class AjaxMenuControllerTest extends WebTestCase
         $parameters = [
             'menuName' => self::MENU_NAME,
             'key' => LoadMenuUpdateData::MENU_UPDATE_3_1,
-            'ownershipType' => UserOwnershipProvider::TYPE
+            'scopeId' => $this->getReference(LoadScopeUserData::SIMPLE_USER_SCOPE)->getId()
         ];
 
         $this->client->request(
@@ -115,7 +114,7 @@ class AjaxMenuControllerTest extends WebTestCase
         $parameters = [
             'menuName' => self::MENU_NAME,
             'key' => LoadMenuUpdateData::MENU_UPDATE_2_1,
-            'ownershipType' => GlobalOwnershipProvider::TYPE
+            'scopeId' => $this->getReference(LoadScopeData::DEFAULT_SCOPE)->getId()
         ];
 
         $this->client->request(
@@ -134,7 +133,7 @@ class AjaxMenuControllerTest extends WebTestCase
         $parameters = [
             'menuName' => self::MENU_NAME,
             'key' => LoadMenuUpdateData::MENU_UPDATE_3,
-            'ownershipType' => UserOwnershipProvider::TYPE
+            'scopeId' => $this->getReference(LoadScopeUserData::SIMPLE_USER_SCOPE)->getId()
         ];
 
         $this->client->request(
@@ -153,7 +152,7 @@ class AjaxMenuControllerTest extends WebTestCase
         $parameters = [
             'menuName' => self::MENU_NAME,
             'key' => LoadMenuUpdateData::MENU_UPDATE_2,
-            'ownershipType' => GlobalOwnershipProvider::TYPE
+            'scopeId' => $this->getReference(LoadScopeData::DEFAULT_SCOPE)->getId()
         ];
 
         $this->client->request(
@@ -172,7 +171,7 @@ class AjaxMenuControllerTest extends WebTestCase
         $parameters = [
             'menuName' => self::MENU_NAME,
             'key' => LoadMenuUpdateData::MENU_UPDATE_3,
-            'ownershipType' => UserOwnershipProvider::TYPE
+            'scopeId' => $this->getReference(LoadScopeUserData::SIMPLE_USER_SCOPE)->getId()
         ];
 
         $this->client->request(
@@ -190,7 +189,7 @@ class AjaxMenuControllerTest extends WebTestCase
     {
         $parameters = [
             'menuName' => self::MENU_NAME,
-            'ownershipType' => GlobalOwnershipProvider::TYPE
+            'scopeId' => $this->getReference(LoadScopeData::DEFAULT_SCOPE)->getId()
         ];
 
         $this->client->request(
@@ -208,7 +207,7 @@ class AjaxMenuControllerTest extends WebTestCase
     {
         $parameters = [
             'menuName' => self::MENU_NAME,
-            'ownershipType' => UserOwnershipProvider::TYPE
+            'scopeId' => $this->getReference(LoadScopeUserData::SIMPLE_USER_SCOPE)->getId()
         ];
 
         $this->client->request(
@@ -226,7 +225,7 @@ class AjaxMenuControllerTest extends WebTestCase
     {
         $parameters = [
             'menuName' => self::MENU_NAME,
-            'ownershipType' => GlobalOwnershipProvider::TYPE
+            'scopeId' => $this->getReference(LoadScopeData::DEFAULT_SCOPE)->getId()
         ];
 
         $this->client->request(
@@ -249,7 +248,7 @@ class AjaxMenuControllerTest extends WebTestCase
     {
         $parameters = [
             'menuName' => self::MENU_NAME,
-            'ownershipType' => UserOwnershipProvider::TYPE
+            'scopeId' => $this->getReference(LoadScopeUserData::SIMPLE_USER_SCOPE)->getId()
         ];
 
         $this->client->request(

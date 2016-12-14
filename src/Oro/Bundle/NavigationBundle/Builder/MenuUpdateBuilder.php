@@ -105,7 +105,7 @@ class MenuUpdateBuilder implements BuilderInterface
      *
      * @return array
      */
-    public function getUpdates($menuName, $scopeType, $scopeContext = null)
+    private function getUpdates($menuName, $scopeType, $scopeContext = null)
     {
         $scopeIds = $this->scopeManager->findRelatedScopeIdsWithPriority($scopeType, $scopeContext);
 

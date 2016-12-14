@@ -2,16 +2,19 @@
 
 namespace Oro\Bundle\NavigationBundle\Tests\Functional;
 
+use Doctrine\Common\Persistence\ManagerRegistry;
+use Doctrine\Common\Persistence\ObjectManager;
 use Knp\Menu\ItemInterface;
 use Knp\Menu\Util\MenuManipulator;
 
-use Symfony\Component\Yaml\Yaml;
-
-use Oro\Component\Config\Loader\FolderContentCumulativeLoader;
-use Oro\Component\Testing\Unit\EntityTrait;
 use Oro\Bundle\NavigationBundle\Builder\MenuUpdateBuilder;
 use Oro\Bundle\NavigationBundle\Entity\MenuUpdate;
+
+use Oro\Bundle\NavigationBundle\Entity\Repository\MenuUpdateRepository;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
+use Oro\Component\Config\Loader\FolderContentCumulativeLoader;
+use Oro\Component\Testing\Unit\EntityTrait;
+use Symfony\Component\Yaml\Yaml;
 
 class MenuUpdateBuilderTest extends WebTestCase
 {
@@ -33,17 +36,20 @@ class MenuUpdateBuilderTest extends WebTestCase
         $this->manipulator = new MenuManipulator();
     }
 
-    public function testMenuTreeBuilder()
+    public function testBuild()
     {
-        $loader = new FolderContentCumulativeLoader(realpath(dirname(__DIR__) . '/Fixtures/menu_updates'));
+        $loader = new FolderContentCumulativeLoader(realpath(dirname(__DIR__).'/Fixtures/menu_updates'));
         $resources = $loader->load('TestBundle', '/');
         foreach ($resources->data as $resource) {
             $fixtures = Yaml::parse(file_get_contents($resource));
-
             $menus = $this->getMenus($fixtures['menu'], ['menu']);
             $updates = $this->getMenuUpdates($fixtures['updates']);
 
-            $this->applyMenuUpdate($menus, $updates);
+            $this->applyMenuUpdate(
+                $menus,
+                $updates,
+                $this->getContainer()->getParameter('oro_navigation.menu_update.scope_type')
+            );
 
             $result = $this->getMenus($fixtures['result_menu'], ['menu']);
 
@@ -73,14 +79,14 @@ class MenuUpdateBuilderTest extends WebTestCase
      */
     protected function getFixtures($fileName)
     {
-        $fixturesPath = realpath(dirname(__DIR__) . '/Fixtures/menu_updates');
+        $fixturesPath = realpath(dirname(__DIR__).'/Fixtures/menu_updates');
 
-        return Yaml::parse(file_get_contents($fixturesPath . '/' . $fileName));
+        return Yaml::parse(file_get_contents($fixturesPath.'/'.$fileName));
     }
 
     /**
-     * @param array  $configuration
-     * @param array  $aliases
+     * @param array $configuration
+     * @param array $aliases
      *
      * @return ItemInterface[]
      */
@@ -102,14 +108,35 @@ class MenuUpdateBuilderTest extends WebTestCase
     /**
      * @param ItemInterface[] $menus
      * @param array           $updates
-     * @param string          $area
+     * @param string          $scopeType
      */
-    protected function applyMenuUpdate(array $menus, array $updates, $area = 'default')
+    protected function applyMenuUpdate(array $menus, array $updates, $scopeType)
     {
-        $provider = new OwnershipProviderStub($updates);
+        $repo = $this->getMockBuilder(MenuUpdateRepository::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+        $manager = $this->getMock(ObjectManager::class);
+        $manager->expects($this->any())
+            ->method('getRepository')
+            ->with(MenuUpdate::class)
+            ->willReturn($repo);
+        $doctrine = $this->getMock(ManagerRegistry::class);
+        $doctrine->expects($this->any())
+            ->method('getManagerForClass')
+            ->with(MenuUpdate::class)
+            ->willReturn($manager);
 
-        $builder = new MenuUpdateBuilder($this->getContainer()->get('oro_locale.helper.localization'));
-        $builder->addProvider($provider, $area, 0);
+        $repo->expects($this->any())
+            ->method('findMenuUpdatesByScopeIds')
+            ->willReturn($updates);
+
+        $builder = new MenuUpdateBuilder(
+            $this->getContainer()->get('oro_locale.helper.localization'),
+            $this->getContainer()->get('oro_scope.scope_manager'),
+            $doctrine
+        );
+        $builder->setScopeType($scopeType);
+        $builder->setClassName(MenuUpdate::class);
 
         foreach ($menus as $menu) {
             $builder->build($menu);

@@ -15,7 +15,7 @@ use Oro\Bundle\NavigationBundle\Model\ExtendMenuUpdate;
  *      uniqueConstraints={
  *          @ORM\UniqueConstraint(
  *              name="oro_navigation_menu_upd_uidx",
- *              columns={"key", "scope_id"}
+ *              columns={"key", "scope_id", "menu"}
  *          )
  *      }
  * )

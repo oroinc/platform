@@ -76,7 +76,7 @@ trait MenuUpdateTrait
      * @var Scope
      *
      * @ORM\ManyToOne(targetEntity="Oro\Bundle\ScopeBundle\Entity\Scope")
-     * @ORM\JoinColumn(name="scope_id", referencedColumnName="id", nullable=false, onDelete="CASCADE")
+     * @ORM\JoinColumn(name="scope_id", referencedColumnName="id", nullable=false)
      */
     protected $scope;
 

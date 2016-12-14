@@ -314,3 +314,6 @@ oro:
                     label: Require a special character
                     tooltip: >
                         Special chars: !"#$%&'()*+,-./:;<=>?@[\]^_`{|}~ and space
+
+    scope:
+        user.label: User
