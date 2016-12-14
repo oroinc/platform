@@ -83,13 +83,12 @@ class IsGrantedWorkflowTransition extends AbstractCondition implements ContextAc
             return true;
         }
 
-        $entity = $context->getEntity();
-        $workflowName = $context->getWorkflowName();
+        $objectWrapper = new DomainObjectWrapper(
+            $context->getEntity(),
+            new ObjectIdentity('workflow', $context->getWorkflowName())
+        );
 
-        if (!$this->securityFacade->isGranted(
-            'PERFORM_TRANSITIONS',
-            new DomainObjectWrapper($entity, new ObjectIdentity('workflow', $workflowName))
-        )) {
+        if (!$this->securityFacade->isGranted('PERFORM_TRANSITIONS', $objectWrapper)) {
             //performing of transitions is forbidden on workflow level
             return false;
         }
@@ -97,7 +96,7 @@ class IsGrantedWorkflowTransition extends AbstractCondition implements ContextAc
         if (!$this->securityFacade->isGranted(
             'PERFORM_TRANSITION',
             new FieldVote(
-                new DomainObjectWrapper($entity, new ObjectIdentity('workflow', $workflowName)),
+                $objectWrapper,
                 sprintf(
                     '%s|%s|%s',
                     $this->transitionName,

@@ -20,17 +20,6 @@ class LocalizedFallbackValueAwareStrategy extends ConfigurableAddOrReplaceStrate
     /** @var \ReflectionProperty[] */
     protected $reflectionProperties = [];
 
-    /** @var DoctrineHelper */
-    protected $doctrineHelper;
-
-    /**
-     * @param DoctrineHelper $doctrineHelper
-     */
-    public function setDoctrineHelper(DoctrineHelper $doctrineHelper)
-    {
-        $this->doctrineHelper = $doctrineHelper;
-    }
-
     /**
      * @param string $localizedFallbackValueClass
      */
