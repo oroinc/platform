@@ -24,6 +24,6 @@ class UpdateNotesWithOrganization extends UpdateWithOrganization implements Depe
      */
     public function load(ObjectManager $manager)
     {
-        $this->update($manager, 'OroNoteBundle:Note');
+        $this->update($manager, 'OroNoteBundle:Note', 'organization', true);
     }
 }
