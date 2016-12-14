@@ -55,11 +55,11 @@ class SmtpSettings
         $username = self::DEFAULT_USERNAME,
         $password = self::DEFAULT_PASSWORD
     ) {
-        $this->host = $host;
-        $this->port = $port;
+        $this->host = (string) $host;
+        $this->port = (int) $port;
         $this->encryption = $encryption;
-        $this->username = $username;
-        $this->password = $password;
+        $this->username = (string) $username;
+        $this->password = (string) $password;
     }
 
     /**

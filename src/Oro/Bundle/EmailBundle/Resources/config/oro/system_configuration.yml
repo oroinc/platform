@@ -235,6 +235,7 @@ system_configuration:
                                     mailboxes:
                                         children:
                                             - oro_email.mailbox_grid
+
         user_configuration:
             platform:
                 children:
