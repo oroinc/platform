@@ -197,9 +197,14 @@ define(function(require) {
         var documentClickEvents = $._data(document, 'events').click;
         var event = _.find(documentClickEvents, function(event) {
             // the only named original handler on click event with "data-api.dropdown" NS is "clearMenus"
-            return event.namespace === 'data-api.dropdown' && event.handler.name;
+            // since minification of javascript code leads to loosing original function names
+            // search just for non anonymous function
+            return event.namespace === 'data-api.dropdown' &&
+                !/^function\s*\(/.test(event.handler.toString());
         });
-        $(document).off('click', event.handler);
+        if (event) {
+            $(document).off('click', event.handler);
+        }
     })();
 
     $(document)

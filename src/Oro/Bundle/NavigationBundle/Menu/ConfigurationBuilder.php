@@ -148,7 +148,10 @@ class ConfigurationBuilder implements BuilderInterface
                 $isAllowed = $isAllowed || $newMenuItem->getExtra('isAllowed');
             }
         }
-        $menu->setExtra('isAllowed', $isAllowed);
+
+        if ($menu->getExtra('isAllowed')) {
+            $menu->setExtra('isAllowed', $isAllowed);
+        }
     }
 
     /**
