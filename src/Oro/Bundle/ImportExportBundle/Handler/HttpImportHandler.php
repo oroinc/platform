@@ -3,7 +3,6 @@
 namespace Oro\Bundle\ImportExportBundle\Handler;
 
 use Oro\Bundle\ImportExportBundle\Context\StepExecutionProxyContext;
-
 use Oro\Bundle\ImportExportBundle\Processor\ProcessorRegistry;
 use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\Routing\RouterInterface;
@@ -93,7 +92,7 @@ class HttpImportHandler extends AbstractImportHandler
         $jobResult = $this->executeJob($jobName, $processorAlias, $options);
         $counts = $this->getValidationCounts($jobResult);
         $importInfo = '';
-        
+
         if ($jobResult->isSuccessful()) {
             $message = $this->translator->trans('oro.importexport.import.success');
 
@@ -108,18 +107,27 @@ class HttpImportHandler extends AbstractImportHandler
         }
 
         $errorsUrl = null;
+        $errors = [];
+        if ($context = $jobResult->getContext()) {
+            $errors = $context->getErrors();
+        }
         if ($jobResult->getFailureExceptions()) {
+            $errors = array_merge($errors, $jobResult->getFailureExceptions());
             $errorsUrl = $this->router->generate(
                 'oro_importexport_error_log',
                 ['jobCode' => $jobResult->getJobCode()]
             );
         }
 
+        $errorsAndExceptions = array_slice($errors, 0, 100);
+
         return [
             'success'    => $jobResult->isSuccessful(),
             'message'    => $message,
             'importInfo' => $importInfo,
             'errorsUrl'  => $errorsUrl,
+            'errors'     => $errorsAndExceptions,
+            'counts'     => $counts,
         ];
     }
 

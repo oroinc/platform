@@ -2,6 +2,8 @@
 namespace Oro\Component\MessageQueue\Job;
 
 use Oro\Component\MessageQueue\Client\MessageProducerInterface;
+use Oro\Component\MessageQueue\Client\Message;
+use Oro\Component\MessageQueue\Client\MessagePriority;
 
 class JobProcessor
 {
@@ -58,6 +60,7 @@ class JobProcessor
         $job->setName($jobName);
         $job->setCreatedAt(new \DateTime());
         $job->setStartedAt(new \DateTime());
+        $job->setJobProgress(0);
         $job->setUnique((bool) $unique);
 
         try {
@@ -94,12 +97,14 @@ class JobProcessor
         $job->setName($jobName);
         $job->setCreatedAt(new \DateTime());
         $job->setRootJob($rootJob);
-
+        $job->setJobProgress(0);
         $this->jobStorage->saveJob($job);
 
         $this->producer->send(Topics::CALCULATE_ROOT_JOB_STATUS, [
             'jobId' => $job->getId()
         ]);
+
+        $this->sendRecalculateJobProgressMessage($job);
 
         return $job;
     }
@@ -153,13 +158,15 @@ class JobProcessor
         }
 
         $job->setStatus(Job::STATUS_SUCCESS);
+        $job->setJobProgress(100);
         $job->setStoppedAt(new \DateTime());
-
         $this->jobStorage->saveJob($job);
 
         $this->producer->send(Topics::CALCULATE_ROOT_JOB_STATUS, [
             'jobId' => $job->getId()
         ]);
+
+        $this->sendRecalculateJobProgressMessage($job);
     }
 
     /**
@@ -189,6 +196,8 @@ class JobProcessor
         $this->producer->send(Topics::CALCULATE_ROOT_JOB_STATUS, [
             'jobId' => $job->getId()
         ]);
+
+        $this->sendRecalculateJobProgressMessage($job);
     }
 
     /**
@@ -222,6 +231,8 @@ class JobProcessor
         $this->producer->send(Topics::CALCULATE_ROOT_JOB_STATUS, [
             'jobId' => $job->getId()
         ]);
+
+        $this->sendRecalculateJobProgressMessage($job);
     }
 
     /**
@@ -249,5 +260,18 @@ class JobProcessor
                 $job->setStoppedAt(new \DateTime());
             }
         });
+    }
+
+    /**
+     * @param $job
+     * @return void
+     */
+    protected function sendRecalculateJobProgressMessage($job)
+    {
+        $message = new Message();
+        $message->setBody(['jobId' => $job->getId()]);
+        $message->setPriority(MessagePriority::HIGH);
+
+        $this->producer->send(Topics::CALCULATE_ROOT_JOB_PROGRESS, $message);
     }
 }

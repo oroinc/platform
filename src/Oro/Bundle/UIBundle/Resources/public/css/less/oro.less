@@ -401,6 +401,25 @@ body .select2-container {
 .label-info,
 .badge-info { background:#92b2d6; }
 
+.progress {
+  .progress-bar {
+    text-align: center;
+    background-color: @progress-bar-default-bg;
+    &.progress-bar-success {
+      background-color: @progress-bar-success-bg;
+    }
+    &.progress-bar-info {
+      background-color: @progress-bar-info-bg;
+    }
+    &.progress-bar-danger {
+      background-color: @progress-bar-danger-bg;
+    }
+    &.warning {
+      background-color: @progress-bar-warning-bg;
+    }
+  }
+}
+
 .widget-content > .label-info:first-child {
   margin-bottom: 10px;
 }

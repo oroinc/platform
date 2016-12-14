@@ -154,7 +154,7 @@ class ImportExportController extends Controller
         $fileName = $request->get('fileName', null);
 
         $this->getMessageProducer()->send(
-            Topics::IMPORT_HTTP_VALIDATION,
+            Topics::IMPORT_HTTP_VALIDATION_PREPARING,
             [
                 'fileName' => $fileName,
                 'userId' => $this->getUser()->getId(),
@@ -182,7 +182,7 @@ class ImportExportController extends Controller
         $fileName = $request->get('fileName', null);
 
         $this->getMessageProducer()->send(
-            Topics::IMPORT_HTTP,
+            Topics::IMPORT_HTTP_PREPARING,
             [
                 'fileName' => $fileName,
                 'userId' => $this->getUser()->getId(),

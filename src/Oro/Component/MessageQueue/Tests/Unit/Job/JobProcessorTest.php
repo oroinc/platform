@@ -1,12 +1,14 @@
 <?php
 namespace Oro\Component\MessageQueue\Tests\Unit\Job;
 
+use Oro\Component\MessageQueue\Client\Message;
 use Oro\Component\MessageQueue\Client\MessageProducer;
 use Oro\Component\MessageQueue\Job\DuplicateJobException;
 use Oro\Component\MessageQueue\Job\Job;
 use Oro\Component\MessageQueue\Job\JobProcessor;
 use Oro\Component\MessageQueue\Job\JobStorage;
 use Oro\Component\MessageQueue\Job\Topics;
+use Oro\Component\MessageQueue\Client\MessagePriority;
 
 class JobProcessorTest extends \PHPUnit_Framework_TestCase
 {
@@ -164,13 +166,18 @@ class JobProcessorTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue($job))
         ;
 
+        $message = new Message();
+        $message->setBody(['jobId' => 12345]);
+        $message->setPriority(MessagePriority::HIGH);
         $producer = $this->createMessageProducerMock();
         $producer
-            ->expects($this->once())
+            ->expects($this->exactly(2))
             ->method('send')
-            ->with(Topics::CALCULATE_ROOT_JOB_STATUS, ['jobId' => 12345])
+            ->withConsecutive(
+                [$this->equalTo(Topics::CALCULATE_ROOT_JOB_STATUS), ['jobId' => 12345]],
+                [$this->equalTo(Topics::CALCULATE_ROOT_JOB_PROGRESS), $message]
+            )
         ;
-
         $processor = new JobProcessor($storage, $producer);
 
         $result = $processor->findOrCreateChildJob('job-name', $job);
@@ -313,7 +320,7 @@ class JobProcessorTest extends \PHPUnit_Framework_TestCase
 
         $producer = $this->createMessageProducerMock();
         $producer
-            ->expects($this->once())
+            ->expects($this->exactly(2))
             ->method('send')
         ;
 
@@ -383,7 +390,7 @@ class JobProcessorTest extends \PHPUnit_Framework_TestCase
 
         $producer = $this->createMessageProducerMock();
         $producer
-            ->expects($this->once())
+            ->expects($this->exactly(2))
             ->method('send')
         ;
 
@@ -453,7 +460,7 @@ class JobProcessorTest extends \PHPUnit_Framework_TestCase
 
         $producer = $this->createMessageProducerMock();
         $producer
-            ->expects($this->once())
+            ->expects($this->exactly(2))
             ->method('send')
         ;
 

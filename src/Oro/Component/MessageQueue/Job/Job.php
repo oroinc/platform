@@ -69,6 +69,11 @@ class Job
      */
     protected $data;
 
+    /**
+     * @var decimal
+     */
+    protected $jobProgress;
+
     public function __construct()
     {
         $this->interrupted = false;
@@ -316,6 +321,13 @@ class Job
     }
 
     /**
+     * @param Job $childJob
+     */
+    public function addChildJob(Job $childJob)
+    {
+        $this->childJobs[] = $childJob;
+    }
+    /**
      * @return array
      */
     public function getData()
@@ -329,5 +341,21 @@ class Job
     public function setData(array $data)
     {
         $this->data = $data;
+    }
+
+    /**
+     * @return decimal
+     */
+    public function getJobProgress()
+    {
+        return $this->jobProgress;
+    }
+
+    /**
+     * @param decimal $jobProgress
+     */
+    public function setJobProgress($jobProgress)
+    {
+        $this->jobProgress = $jobProgress;
     }
 }

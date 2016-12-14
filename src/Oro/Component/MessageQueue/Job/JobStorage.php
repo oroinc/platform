@@ -66,6 +66,20 @@ class JobStorage
     }
 
     /**
+     * @param Job $job
+     * @param float $progress
+     * @return Job
+     */
+    public function updateJobProgress(Job $job, $progress)
+    {
+        $job->setJobProgress($progress);
+        $this->getEntityManager()->persist($job);
+        $this->getEntityManager()->flush();
+
+        return $job;
+    }
+
+    /**
      * @param string $ownerId
      * @param string $jobName
      *

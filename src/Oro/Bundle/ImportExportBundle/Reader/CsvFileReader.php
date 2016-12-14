@@ -49,7 +49,7 @@ class CsvFileReader extends AbstractReader
     /**
      * {@inheritdoc}
      */
-    public function read()
+    public function read($context = null)
     {
         if ($this->getFile()->eof()) {
             $this->getFile()->rewind();
@@ -59,7 +59,9 @@ class CsvFileReader extends AbstractReader
 
         $data = $this->getFile()->fgetcsv();
         if (false !== $data) {
-            $context = $this->getContext();
+            if (! $context instanceof ContextInterface) {
+                $context = $this->getContext();
+            }
             $context->incrementReadOffset();
             if (null === $data || [null] === $data) {
                 if ($this->getFile()->eof()) {
@@ -166,5 +168,20 @@ class CsvFileReader extends AbstractReader
         } elseif (!$this->fileInfo->isReadable()) {
             throw new InvalidArgumentException(sprintf('File "%s" is not readable.', $this->fileInfo->getRealPath()));
         }
+    }
+
+    /**
+     * @param ContextInterface $context
+     */
+    public function initializeByContext(ContextInterface $context)
+    {
+        $this->initializeFromContext($context);
+    }
+
+    public function resetFile()
+    {
+        $this->file = null;
+        $this->fileInfo = null;
+        $this->header = null;
     }
 }
