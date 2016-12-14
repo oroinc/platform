@@ -5,8 +5,6 @@
 {% block button %}
     {% set options = oro_action_frontend_options(button) %}
     {% if not onlyLink|default(false) %}<div class="pull-left btn-group icons-holder">{% endif %}
-
-
         {% block link %}
             <a {% if (params.id is defined) %}id="{{ params.id }}"{% endif %}
                 href="{{ (options.options.url and not isAjax) ? options.options.url : 'javascript:void(0);' }}"
