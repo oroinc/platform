@@ -16,7 +16,7 @@ All that your provider should do - is to return an array of ButtonInterface impl
 For example, Operations are implemented in the same way and the button provider service looks like:
 ```YAML
 
-    oro_ui.provider.button.extension.operation:
+    oro_action.provider.button.extension.operation:
         class: 'Oro\Bundle\ActionBundle\Extension\OperationButtonProviderExtension'
         arguments:
             - '@oro_action.operation_registry'
