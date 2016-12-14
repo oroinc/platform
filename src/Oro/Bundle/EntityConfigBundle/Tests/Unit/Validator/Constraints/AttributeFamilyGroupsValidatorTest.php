@@ -54,13 +54,29 @@ class AttributeFamilyGroupsValidatorTest extends \PHPUnit_Framework_TestCase
         $this->validator->validate($entity, $this->constraint);
     }
 
+    public function testValidateSameLabelsConstraint()
+    {
+        $entity = new AttributeFamily();
+        $entity->setEntityClass('entityClass');
+        $group1 = new AttributeGroupStub(1, 'default label 1');
+        $entity->addAttributeGroup($group1);
+        $group2 = new AttributeGroupStub(2, 'default label 1');
+        $entity->addAttributeGroup($group2);
+
+        $this->context->expects($this->once())
+            ->method('addViolation')
+            ->with($this->constraint->sameLabelsMessage);
+
+        $this->validator->validate($entity, $this->constraint);
+    }
+
     public function testValidateValid()
     {
         $entity = new AttributeFamily();
         $entity->setEntityClass('entityClass');
-        $group1 = new AttributeGroup();
+        $group1 = new AttributeGroupStub(1, 'default label 1');
         $entity->addAttributeGroup($group1);
-        $group2 = new AttributeGroup();
+        $group2 = new AttributeGroupStub(2, 'default label 2');
         $entity->addAttributeGroup($group2);
 
         $this->context->expects($this->never())

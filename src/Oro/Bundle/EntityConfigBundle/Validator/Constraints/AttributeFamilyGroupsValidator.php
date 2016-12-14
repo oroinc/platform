@@ -29,5 +29,16 @@ class AttributeFamilyGroupsValidator extends ConstraintValidator
 
             return;
         }
+
+        $labels = [];
+        foreach ($attributeGroups as $group) {
+            $label = (string) $group->getDefaultLabel();
+            if (in_array($label, $labels, true)) {
+                $this->context->addViolation($constraint->sameLabelsMessage);
+
+                return;
+            }
+            $labels[] = $label;
+        }
     }
 }
