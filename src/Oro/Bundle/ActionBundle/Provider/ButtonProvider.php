@@ -41,7 +41,13 @@ class ButtonProvider
      */
     public function findAvailable(ButtonSearchContext $searchContext)
     {
-        return $this->match($searchContext)->filterAvailable($searchContext)->toArray();
+        $storage = $this->match($searchContext)->filter(
+            function (ButtonInterface $button, ButtonProviderExtensionInterface $extension) use ($searchContext) {
+                return $extension->isAvailable($button, $searchContext);
+            }
+        );
+
+        return $storage->toList();
     }
 
     /**
@@ -50,17 +56,18 @@ class ButtonProvider
      */
     public function findAll(ButtonSearchContext $searchContext)
     {
-        $mappedState = $this->match($searchContext)->map(
+        $mapped = $this->match($searchContext)->map(
             function (ButtonInterface $button, ButtonProviderExtensionInterface $extension) use ($searchContext) {
                 $newButton = clone $button;
                 $newButton->getButtonContext()->setEnabled(
                     $extension->isAvailable($newButton, $searchContext)
                 );
+
                 return $newButton;
             }
         );
 
-        return $mappedState->toArray();
+        return $mapped->toList();
     }
 
     /**

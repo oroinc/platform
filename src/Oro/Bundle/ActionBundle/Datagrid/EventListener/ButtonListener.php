@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\ActionBundle\Datagrid\EventListener;
 
+use Symfony\Component\Translation\TranslatorInterface;
+
 use Oro\Bundle\ActionBundle\Button\ButtonInterface;
 use Oro\Bundle\ActionBundle\Button\ButtonsCollection;
 use Oro\Bundle\ActionBundle\Button\ButtonSearchContext;
@@ -10,8 +12,8 @@ use Oro\Bundle\ActionBundle\Datagrid\Provider\MassActionProviderRegistry;
 use Oro\Bundle\ActionBundle\Extension\ButtonProviderExtensionInterface;
 use Oro\Bundle\ActionBundle\Helper\ContextHelper;
 use Oro\Bundle\ActionBundle\Helper\OptionsHelper;
-
 use Oro\Bundle\ActionBundle\Provider\ButtonProvider;
+
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\DataGridBundle\Datasource\Orm\OrmDatasource;
 use Oro\Bundle\DataGridBundle\Datasource\ResultRecordInterface;
@@ -36,6 +38,9 @@ class ButtonListener
     /** @var GridConfigurationHelper */
     protected $gridConfigurationHelper;
 
+    /** @var TranslatorInterface */
+    protected $translator;
+
     /** @var ButtonSearchContext */
     protected $searchContext;
 
@@ -51,19 +56,22 @@ class ButtonListener
      * @param MassActionProviderRegistry $providerRegistry
      * @param OptionsHelper $optionsHelper
      * @param GridConfigurationHelper $gridConfigurationHelper
+     * @param TranslatorInterface $translator
      */
     public function __construct(
         ButtonProvider $buttonProvider,
         ContextHelper $contextHelper,
         MassActionProviderRegistry $providerRegistry,
         OptionsHelper $optionsHelper,
-        GridConfigurationHelper $gridConfigurationHelper
+        GridConfigurationHelper $gridConfigurationHelper,
+        TranslatorInterface $translator
     ) {
         $this->buttonProvider = $buttonProvider;
         $this->contextHelper = $contextHelper;
         $this->providerRegistry = $providerRegistry;
         $this->optionsHelper = $optionsHelper;
         $this->gridConfigurationHelper = $gridConfigurationHelper;
+        $this->translator = $translator;
     }
 
     /**
@@ -154,7 +162,9 @@ class ButtonListener
                     }
 
                     $newButton = clone $button;
-                    $newButton->getButtonContext()->setEnabled($enabled);
+                    $newButton->getButtonContext()
+                        ->setEnabled($enabled)
+                        ->setEntity($searchContext->getEntityClass(), $searchContext->getEntityId());
 
                     return $newButton;
                 }
@@ -202,9 +212,7 @@ class ButtonListener
             return false;
         }
 
-        //TODO should be refactored in https://magecore.atlassian.net/browse/BAP-12873
-        //$frontendOptions = $this->optionsHelper->getFrontendOptions($operation, $context);
-        $frontendOptions = ['options' => [], 'data' => []];
+        $frontendOptions = $this->optionsHelper->getFrontendOptions($button);
 
         return array_merge($frontendOptions['options'], $frontendOptions['data']);
     }
@@ -229,6 +237,7 @@ class ButtonListener
         $actionsConfig = $config->offsetGetOr(ActionExtension::ACTION_KEY, []);
 
         foreach ($this->buttons as $button) {
+            /** @var ButtonInterface $button */
             $name = strtolower($button->getName());
 
             $actionsConfig[$name] = $this->getRowsActionsConfig($button);
@@ -243,12 +252,12 @@ class ButtonListener
      */
     protected function getRowsActionsConfig(ButtonInterface $button)
     {
-        $icon = $button->getIcon() ? str_ireplace('icon-', '', $button->getIcon()) : 'edit';
+        $icon = $button->getIcon() ? str_ireplace('fa-', '', $button->getIcon()) : 'pencil-square-o';
 
         $config = array_merge(
             [
-                'type' => 'action-widget',
-                'label' => $button->getLabel(),
+                'type' => 'button-widget',
+                'label' => $this->translator->trans($button->getLabel(), [], $button->getTranslationDomain()),
                 'rowAction' => false,
                 'link' => '#',
                 'icon' => $icon,
@@ -275,21 +284,20 @@ class ButtonListener
                 continue;
             }
 
-            $operation = $button->getOperation();
-            $datagridOptions = $operation->getDefinition()->getDatagridOptions();
+            $datagridOptions = $button->getOperation()->getDefinition()->getDatagridOptions();
 
             if (!empty($datagridOptions['mass_action_provider'])) {
                 $provider = $this->providerRegistry->getProvider($datagridOptions['mass_action_provider']);
 
                 if ($provider) {
                     foreach ($provider->getActions() as $name => $massAction) {
-                        $actions[$operation->getName() . $name] = $massAction;
+                        $actions[$button->getName() . $name] = $massAction;
                     }
                 }
             } elseif (!empty($datagridOptions['mass_action'])) {
-                $actions[$operation->getName()] = array_merge(
+                $actions[$button->getName()] = array_merge(
                     [
-                        'label' => $operation->getDefinition()->getLabel()
+                        'label' => $this->translator->trans($button->getLabel(), [], $button->getTranslationDomain()),
                     ],
                     $datagridOptions['mass_action']
                 );

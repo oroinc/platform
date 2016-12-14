@@ -105,7 +105,7 @@ class WidgetController extends Controller
         }
 
         $entity = $this->getOrCreateEntityReference($entityClass, $entityId);
-        $workflowItem = $workflow->createWorkflowItem($entity);
+        $workflowItem = $workflow->createWorkflowItem($entity, $dataArray);
         $transitionForm = $this->getTransitionForm($workflowItem, $transition);
         $formOptions = $transition->getFormOptions();
         $formAttributes = $workflowItem->getData()->getValues(

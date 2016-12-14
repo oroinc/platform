@@ -4,7 +4,6 @@ namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Button;
 
 use Oro\Bundle\ActionBundle\Button\ButtonContext;
 use Oro\Bundle\ActionBundle\Button\ButtonInterface;
-use Oro\Bundle\ActionBundle\Model\OperationRegistry;
 
 use Oro\Bundle\WorkflowBundle\Button\TransitionButton;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
@@ -62,6 +61,32 @@ class TransitionButtonTest extends \PHPUnit_Framework_TestCase
         unset($this->workflow, $this->definition, $this->button, $this->buttonContext, $this->transition);
     }
 
+    public function testGetName()
+    {
+        $this->workflow->expects($this->once())->method('getName')->willReturn('test_workflow_name');
+        $this->transition->expects($this->once())->method('getName')->willReturn('test_transition_name');
+
+        $this->assertEquals('test_workflow_name_test_transition_name', $this->button->getName());
+    }
+
+    public function testGetLabel()
+    {
+        $label = 'test_label';
+        $this->transition->expects($this->once())->method('getLabel')->willReturn($label);
+
+        $this->assertEquals($label, $this->button->getLabel());
+    }
+
+    public function testGetIcon()
+    {
+        $this->assertNull($this->button->getIcon());
+
+        $icon = 'test-icon';
+        $this->transition->expects($this->once())->method('getFrontendOptions')->willReturn(['icon' => $icon]);
+
+        $this->assertEquals($icon, $this->button->getIcon());
+    }
+
     public function testGetOrder()
     {
         $this->definition->expects($this->once())->method('getPriority')->willReturn(1);
@@ -80,10 +105,22 @@ class TransitionButtonTest extends \PHPUnit_Framework_TestCase
      */
     public function testGetTemplateData(array $customData = [])
     {
-        $defaultData = [
-            'workflow' => $this->workflow,
-            'transition' => $this->transition,
-            'context' => $this->buttonContext
+        $defaultData =             [
+            'frontendOptions' => $this->transition->getFrontendOptions(),
+            'hasForm' => $this->transition->hasForm(),
+            'showDialog' => true,
+            'routeParams' => [
+                'workflowName' => $this->workflow->getName(),
+                'transitionName' => $this->transition->getName(),
+                'entityClass' => $this->buttonContext->getEntityClass(),
+                'entityId' => $this->buttonContext->getEntityId(),
+                'route' => $this->buttonContext->getRouteName(),
+                'datagrid' => $this->buttonContext->getDatagridName(),
+                'group' => $this->buttonContext->getGroup(),
+            ],
+            'executionRoute' => $this->buttonContext->getExecutionRoute(),
+            'dialogRoute' => null,
+            'additionalData' => [],
         ];
 
         $this->assertEquals(array_merge($defaultData, $customData), $this->button->getTemplateData($customData));
@@ -118,5 +155,10 @@ class TransitionButtonTest extends \PHPUnit_Framework_TestCase
     public function testGetTransition()
     {
         $this->assertEquals($this->transition, $this->button->getTransition());
+    }
+
+    public function testGetTranslationDomain()
+    {
+        $this->assertEquals('workflows', $this->button->getTranslationDomain());
     }
 }

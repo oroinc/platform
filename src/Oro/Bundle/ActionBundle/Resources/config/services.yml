@@ -11,9 +11,7 @@ parameters:
     oro_action.options_assembler.class: Oro\Bundle\ActionBundle\Model\OptionsAssembler
     oro_action.form_manager.class: Oro\Bundle\ActionBundle\Model\OperationFormManager
     oro_action.api_manager.class: Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager
-    oro_action.datagrid.action.action_widget_action.class: Oro\Bundle\ActionBundle\Datagrid\Action\ActionWidgetAction
     oro_action.datagrid.mass_action_provider.registry.class: Oro\Bundle\ActionBundle\Datagrid\Provider\MassActionProviderRegistry
-    oro_action.layout.data_provider.actions_data_provider.class: Oro\Bundle\ActionBundle\Layout\DataProvider\ActionsProvider
 
 services:
     oro_action.handler.delete:
@@ -56,10 +54,7 @@ services:
     oro_action.helper.options:
         class: %oro_action.helper.options.class%
         arguments:
-            - '@oro_action.helper.context'
-            - '@oro_action.options_assembler'
-            - '@oro_action.expression.context_accessor'
-            - '@oro_action.helper.applications_url'
+            - '@router'
             - '@translator'
 
     oro_action.helper.applications_url:
@@ -159,6 +154,7 @@ services:
             - '@oro_action.datagrid.mass_action_provider.registry'
             - '@oro_action.helper.options'
             - '@oro_datagrid.grid_configuration.helper'
+            - '@translator'
         calls:
             - [setGroups, [['', 'datagridRowAction']]]
         tags:
@@ -175,26 +171,16 @@ services:
         tags:
             - { name: oro_datagrid.extension }
 
-    oro_action.datagrid.action.action_widget_action:
-        class: %oro_action.datagrid.action.action_widget_action.class%
+    oro_action.datagrid.action.button_widget_action:
+        class: Oro\Bundle\ActionBundle\Datagrid\Action\ButtonWidgetAction
         arguments:
             - '@translator'
         scope: prototype
         tags:
-            - { name: oro_datagrid.extension.action.type, type: action-widget }
+            - { name: oro_datagrid.extension.action.type, type: button-widget }
 
     oro_action.datagrid.mass_action_provider.registry:
         class: %oro_action.datagrid.mass_action_provider.registry.class%
-
-    oro_action.layout.data_provider.actions_data_provider:
-        class: %oro_action.layout.data_provider.actions_data_provider.class%
-        arguments:
-            - '@oro_action.operation_manager'
-            - '@oro_action.helper.context'
-            - '@oro_action.helper.restrict'
-            - '@translator'
-        tags:
-            - { name: layout.data_provider, alias: actions }
 
     oro_action.layout.data_provider.button_provider:
         class: 'Oro\Bundle\ActionBundle\Layout\DataProvider\LayoutButtonProvider'
@@ -204,14 +190,6 @@ services:
             - '@oro_action.provider.button_search_context'
         tags:
             - { name: layout.data_provider, alias: button_provider }
-
-    oro_action.layout.data_provider.action_buttons:
-        class: 'Oro\Bundle\ActionBundle\Layout\DataProvider\ActionButtonsProvider'
-        arguments:
-            - '@oro_action.provider.route'
-            - '@oro_entity.doctrine_helper'
-        tags:
-            - { name: layout.data_provider, alias: action_buttons }
 
     oro_action.condition.route_exists:
         class: 'Oro\Bundle\ActionBundle\Condition\RouteExists'
@@ -241,5 +219,7 @@ services:
             - '@oro_action.operation_registry'
             - '@oro_action.helper.context'
             - '@oro_action.provider.route'
+            - '@oro_action.options_assembler'
+            - '@oro_action.expression.context_accessor'
         tags:
             - { name: oro.action.extension.button_provider, priority: 100 }

@@ -278,11 +278,6 @@ class FieldHelper
     {
         $propertyPath = new PropertyPath($fieldName);
 
-        if (null === $value && $propertyPath->getLength() === 1) {
-            $this->setObjectValueWithReflection($object, $fieldName, $value);
-            return;
-        }
-
         try {
             $this->getPropertyAccessor()->setValue($object, $propertyPath, $value);
         } catch (NoSuchPropertyException $e) {

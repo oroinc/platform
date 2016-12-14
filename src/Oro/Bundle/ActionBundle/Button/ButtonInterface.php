@@ -42,11 +42,6 @@ interface ButtonInterface
      */
     public function getTemplateData(array $customData = []);
 
-//    /**
-//     * @return array
-//     */
-//    public function getDatagridData();
-
     /**
      * @return ButtonContext
      */
@@ -56,4 +51,9 @@ interface ButtonInterface
      * @return string
      */
     public function getGroup();
+
+    /**
+     * @return string|null
+     */
+    public function getTranslationDomain();
 }

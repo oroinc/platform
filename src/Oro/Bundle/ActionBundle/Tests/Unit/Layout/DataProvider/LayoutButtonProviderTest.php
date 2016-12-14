@@ -65,6 +65,22 @@ class LayoutButtonProviderTest extends \PHPUnit_Framework_TestCase
      */
     public function testGetAll($entity, $isNew, $expectSetEntityClass, $expectSetEntityId)
     {
+        $this->doctrineHelper->expects($this->any())
+            ->method('isNewEntity')
+            ->willReturn($isNew);
+
+        if (!is_null($entity)) {
+            $this->doctrineHelper->expects($this->atLeastOnce())
+                ->method('getEntityClass')
+                ->with($entity)
+                ->willReturn('class');
+            if (!$isNew) {
+                $this->doctrineHelper->expects($this->atLeastOnce())
+                    ->method('getSingleEntityIdentifier')
+                    ->with($entity)
+                    ->willReturn('entity_id');
+            }
+        }
         $this->doctrineHelper->expects($this->any())->method('isNewEntity')->willReturn($isNew);
         $this->doctrineHelper->expects($this->$expectSetEntityClass())
             ->method('getEntityClass')
@@ -76,7 +92,7 @@ class LayoutButtonProviderTest extends \PHPUnit_Framework_TestCase
             ->willReturn('entity_id');
 
         $this->buttonProvider->expects($this->once())
-            ->method('findAll')
+            ->method('findAvailable')
             ->with(
                 $this->callback(
                     function (ButtonSearchContext $searchContext) use ($expectSetEntityClass, $expectSetEntityId) {
@@ -98,19 +114,21 @@ class LayoutButtonProviderTest extends \PHPUnit_Framework_TestCase
     /**
      * @dataProvider dataGroupsProvider
      *
-     * @param string $group
+     * @param string|null $datagrid
+     * @param string|null $group
      */
-    public function testGetByGroup($group)
+    public function testGetByGroup($datagrid, $group)
     {
         $this->buttonProvider->expects($this->once())
-            ->method('findAll')
+            ->method('findAvailable')
             ->with(
-                $this->callback(function (ButtonSearchContext $buttonSearchContext) use ($group) {
-                    return ($group !== null) ? $buttonSearchContext->getGroup() === $group : true;
+                $this->callback(function (ButtonSearchContext $buttonSearchContext) use ($group, $datagrid) {
+                    return ($buttonSearchContext->getGroup() === $group) &&
+                    ($buttonSearchContext->getDatagrid() === $datagrid);
                 })
             );
 
-        $this->layoutButtonProvider->getByGroup(null, $group);
+        $this->layoutButtonProvider->getByGroup(null, $datagrid, $group);
     }
 
     /**
@@ -146,9 +164,11 @@ class LayoutButtonProviderTest extends \PHPUnit_Framework_TestCase
     public function dataGroupsProvider()
     {
         return [
-            ['groups1'],
-            ['groups2'],
-            [null]
+            ['datagrid', 'groups1'],
+            ['datagrid', 'groups2'],
+            ['datagrid', null],
+            [null, 'group'],
+            [null, null],
         ];
     }
 }
