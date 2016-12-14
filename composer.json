@@ -23,7 +23,7 @@
         "ext-xml": "*",
         "ext-zip": "*",
         "symfony/symfony": "2.8.*, !=2.8.10",
-        "twig/twig": "1.28.*",
+        "twig/twig": "1.29.*",
         "doctrine/orm": "2.5.5",
         "doctrine/doctrine-bundle": "1.6.4",
         "doctrine/dbal": "2.5.5",
