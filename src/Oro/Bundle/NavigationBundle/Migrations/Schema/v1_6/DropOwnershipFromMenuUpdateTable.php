@@ -26,5 +26,8 @@ class DropOwnershipFromMenuUpdateTable implements Migration, OrderedMigrationInt
         $table = $schema->getTable('oro_navigation_menu_upd');
         $table->dropColumn('ownership_type');
         $table->dropColumn('owner_id');
+        if ($table->hasIndex('oro_navigation_menu_upd_uidx')) {
+            $table->dropIndex('oro_navigation_menu_upd_uidx');
+        }
     }
 }
