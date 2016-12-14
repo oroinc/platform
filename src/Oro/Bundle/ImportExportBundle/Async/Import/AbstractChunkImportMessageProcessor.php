@@ -118,8 +118,7 @@ abstract class AbstractChunkImportMessageProcessor implements MessageProcessorIn
                 $this->saveJobResult($job, $result);
 
                 return $result['success'];
-            }
-        );
+        });
 
         return $result ? self::ACK : self::REJECT;
     }
@@ -130,7 +129,13 @@ abstract class AbstractChunkImportMessageProcessor implements MessageProcessorIn
 
     protected function getCreateToken($user)
     {
-        $token = new ProUsernamePasswordOrganizationToken($user, null, 'import', $user->getOrganization(), $user->getRoles());
+        $token = new ProUsernamePasswordOrganizationToken(
+            $user,
+            null,
+            'import',
+            $user->getOrganization(),
+            $user->getRoles()
+        );
         $this->tokenStorage->setToken($token);
     }
 

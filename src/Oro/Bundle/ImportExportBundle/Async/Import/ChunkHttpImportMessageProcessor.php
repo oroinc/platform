@@ -7,7 +7,7 @@ use Symfony\Bridge\Doctrine\RegistryInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Oro\Bundle\ImportExportBundle\Async\Topics;
 
-class ChunkHttpImportMessageProcessor extends  AbstractChunkImportMessageProcessor
+class ChunkHttpImportMessageProcessor extends AbstractChunkImportMessageProcessor
 {
     protected function processData(array $body)
     {
@@ -30,7 +30,7 @@ class ChunkHttpImportMessageProcessor extends  AbstractChunkImportMessageProcess
             $data['errorsUrl'],
             $data['message']
         );
-}
+    }
 
     /**
      * {@inheritdoc}

@@ -20,7 +20,8 @@ use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInt
 use Oro\Component\MessageQueue\Job\Job;
 use Oro\Bundle\ImportExportBundle\Async\Topics;
 
-abstract class AbstractPreparingHttpImportMessageProcessor implements MessageProcessorInterface, TopicSubscriberInterface
+abstract class AbstractPreparingHttpImportMessageProcessor implements
+    MessageProcessorInterface, TopicSubscriberInterface
 {
     /**
      * @var HttpImportHandler
@@ -111,12 +112,21 @@ abstract class AbstractPreparingHttpImportMessageProcessor implements MessagePro
             $parentMessageId,
             sprintf('%s:%s:%s', static::getMessageName(), $body['processorAlias'], $parentMessageId),
             function (JobRunner $jobRunner, Job $job) use ($body, $files, $parentMessageId) {
-                foreach ($files as $key=>$file) {
+                foreach ($files as $key => $file) {
                     $jobRunner->createDelayed(
-                        sprintf('%s:%s%s:chunk.%s', static::getMessageName(), $body['processorAlias'], $parentMessageId, ++$key),
+                        sprintf(
+                            '%s:%s%s:chunk.%s',
+                            static::getMessageName(),
+                            $body['processorAlias'],
+                            $parentMessageId,
+                            ++$key
+                        ),
                         function (JobRunner $jobRunner, Job $child) use ($body, $file) {
                             $body['fileName'] = $file;
-                            $this->producer->send(static::getTopicsForChildJob(), array_merge($body, ['jobId' => $child->getId()]));
+                            $this->producer->send(
+                                static::getTopicsForChildJob(),
+                                array_merge($body, ['jobId' => $child->getId()])
+                            );
                         }
                     );
                 }

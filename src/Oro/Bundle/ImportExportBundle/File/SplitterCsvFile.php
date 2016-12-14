@@ -65,12 +65,11 @@ class SplitterCsvFile
 
     protected function createBatchFile(array $data, $filename, $numberOfChunk)
     {
-        $fileName = sprintf('%s/chunk_%s_%s', $this->storagePath,$numberOfChunk, $filename);
+        $fileName = sprintf('%s/chunk_%s_%s', $this->storagePath, $numberOfChunk, $filename);
         $file = new \SplFileObject($fileName, 'w+');
         $firstRow = current($data);
         $file->fputcsv(array_keys($firstRow));
         foreach ($data as $row) {
-
             $file->fputcsv($row);
         }
 

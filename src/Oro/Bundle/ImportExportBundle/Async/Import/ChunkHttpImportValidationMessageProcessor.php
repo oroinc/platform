@@ -4,7 +4,7 @@ namespace Oro\Bundle\ImportExportBundle\Async\Import;
 
 use Oro\Bundle\ImportExportBundle\Async\Topics;
 
-class ChunkHttpImportValidationMessageProcessor extends  AbstractChunkImportMessageProcessor
+class ChunkHttpImportValidationMessageProcessor extends AbstractChunkImportMessageProcessor
 {
     protected function processData(array $body)
     {

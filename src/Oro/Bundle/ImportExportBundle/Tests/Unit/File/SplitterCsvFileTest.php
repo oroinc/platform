@@ -51,7 +51,6 @@ class SplitterCsvFileTest extends \PHPUnit_Framework_TestCase
             ['test3', 'test3'],
             ['test4', 'test4'],
             ['test5', 'test5']
-
         );
         $csvReader
             ->expects($this->exactly(6))
@@ -77,14 +76,14 @@ class SplitterCsvFileTest extends \PHPUnit_Framework_TestCase
             ->expects($this->exactly(151))
             ->method('read')
             ->will($this->returnCallback(
-                    function() use (&$i) {
-                        $i++;
-                        if ($i > 150) {
-                            return null;
-                        }
-                        return [1,2];
+                function () use (&$i) {
+                    $i++;
+                    if ($i > 150) {
+                        return null;
                     }
-                ));
+                    return [1,2];
+                }
+            ));
         $csvReader
             ->expects($this->once())
             ->method('resetFile');
