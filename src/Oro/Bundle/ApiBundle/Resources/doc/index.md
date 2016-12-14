@@ -61,3 +61,4 @@ OroApiBundle Documentation
    - [Configure nested object](./how_to.md#configure-nested-object)
    - [Turn on Extended Many-To-One Associations](./how_to.md#turn-on-extended-many-to-one-associations)
    - [Turn on Extended Many-To-Many Associations](./how_to.md#turn-on-extended-many-to-many-associations)
+   - [Turn on Extended Multiple Many-To-One Associations](./how_to.md#turn-on-extended-multiple-many-to-one-associations)
