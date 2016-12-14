@@ -15,6 +15,10 @@ class TransitionFormHandler
     /** @var DoctrineHelper */
     private $doctrineHelper;
 
+    /**
+     * @param RequestStack $requestStack
+     * @param DoctrineHelper $doctrineHelper
+     */
     public function __construct(RequestStack $requestStack, DoctrineHelper $doctrineHelper)
     {
         $this->requestStack = $requestStack;
