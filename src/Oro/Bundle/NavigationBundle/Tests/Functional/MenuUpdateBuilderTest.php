@@ -4,16 +4,17 @@ namespace Oro\Bundle\NavigationBundle\Tests\Functional;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\Common\Persistence\ObjectManager;
+
 use Knp\Menu\ItemInterface;
 use Knp\Menu\Util\MenuManipulator;
 
 use Oro\Bundle\NavigationBundle\Builder\MenuUpdateBuilder;
 use Oro\Bundle\NavigationBundle\Entity\MenuUpdate;
-
 use Oro\Bundle\NavigationBundle\Entity\Repository\MenuUpdateRepository;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Component\Config\Loader\FolderContentCumulativeLoader;
 use Oro\Component\Testing\Unit\EntityTrait;
+
 use Symfony\Component\Yaml\Yaml;
 
 class MenuUpdateBuilderTest extends WebTestCase

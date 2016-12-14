@@ -6,13 +6,13 @@ use Oro\Bundle\LocaleBundle\Helper\LocalizationHelper;
 use Oro\Bundle\NavigationBundle\Provider\BuilderChainProvider;
 use Oro\Bundle\NavigationBundle\Tests\Unit\Entity\Stub\MenuUpdateStub;
 use Oro\Bundle\NavigationBundle\Tests\Unit\MenuItemTestTrait;
-
 use Oro\Bundle\NavigationBundle\Validator\Constraints\MaxNestedLevel;
 use Oro\Bundle\NavigationBundle\Validator\Constraints\MaxNestedLevelValidator;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\ScopeBundle\Entity\Scope;
 use Oro\Bundle\UserBundle\Entity\User;
-use Symfony\Component\Validator\ExecutionContextInterface;
+
+use Symfony\Component\Validator\Context\ExecutionContextInterface;
 
 class MaxNestedLevelValidatorTest extends \PHPUnit_Framework_TestCase
 {
