@@ -747,6 +747,7 @@ placeholders:
 - Removed class `Oro\Bundle\NavigationBundle\Title\StoredTitle`.
 - Changed signature of constructor of `Oro\Bundle\NavigationBundle\Provider\TitleService`. Parameter `Serializer $serializer` was removed.
 - Added new datagrid data source `Oro\Bundle\NavigationBundle\Datagrid\MenuUpdateDatasource`.
+- Added new entity repository `Oro\Bundle\NavigationBundle\Entity\Repository\MenuUpdateRepository`.
 
 
 ####EmailBundle
