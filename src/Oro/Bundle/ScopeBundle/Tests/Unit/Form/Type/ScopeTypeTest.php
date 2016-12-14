@@ -49,7 +49,8 @@ class ScopeTypeTest extends \PHPUnit_Framework_TestCase
         $resolver->expects($this->once())
             ->method('setDefaults')
             ->with([
-                ScopeType::SCOPE_FIELDS_OPTION => []
+                ScopeType::SCOPE_FIELDS_OPTION => [],
+                'error_bubbling' => false
             ]);
 
         $resolver->expects($this->once())

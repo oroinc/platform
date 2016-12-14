@@ -1,4 +1,5 @@
 {% extends 'OroActivityListBundle:ActivityList/js:activityItemTemplate.html.twig' %}
+{% import 'OroActivityBundle::macros.html.twig' as AC %}
 {% set entityClass = 'Oro\\Bundle\\NoteBundle\\Entity\\Note' %}
 {% set entityName = oro_entity_config_value(entityClass, 'label')|trans %}
 
@@ -18,6 +19,14 @@
 
 {% block activityActions %}
     {% set action %}
+        {# Add button for add context in the activity list item #}
+        <% if (editable) { %>
+            {{ AC.activity_context_link() }}
+        <% } %>
+    {% endset %}
+    {% set actions = [action] %}
+
+    {% set action %}
         <% if (editable) { %>
         <a href="#" class="action item-edit-button"
            title="{{ 'oro.note.note_update'|trans({'{{ entity }}': entityName}) }}"
@@ -27,7 +36,7 @@
         </a>
         <% } %>
     {% endset %}
-    {% set actions = [action] %}
+    {% set actions = actions|merge([action]) %}
 
     {% set action %}
         <% if (removable) { %>
