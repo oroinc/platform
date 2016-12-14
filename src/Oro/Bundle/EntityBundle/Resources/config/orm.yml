@@ -3,6 +3,7 @@ parameters:
     doctrine.orm.configuration.class:  Oro\Bundle\EntityBundle\ORM\OrmConfiguration
 
     oro_entity.doctrine_helper.class:                          Oro\Bundle\EntityBundle\ORM\DoctrineHelper
+    oro_entity.repository.factory.class:                       Oro\Bundle\EntityBundle\ORM\Repository\EntityRepositoryFactory
     oro_entity.entity_identifier_accessor.class:               Oro\Bundle\EntityBundle\ORM\EntityIdAccessor
     oro_entity.orm.entity_class_resolver.class:                Oro\Bundle\EntityBundle\ORM\EntityClassResolver
     oro_entity.orm.native_query_executor_helper.class:         Oro\Bundle\EntityBundle\ORM\NativeQueryExecutorHelper
@@ -22,9 +23,8 @@ services:
 
     oro_entity.abstract_repository:
         class: Doctrine\ORM\EntityRepository
-        factory: ['@oro_entity.doctrine_helper', getEntityRepository]
+        factory: ['@oro_entity.repository.factory', 'getDefaultRepository']
         abstract: true
-        lazy: true
 
     oro_entity.abstract_entity_manager:
         class: Doctrine\ORM\EntityManager
@@ -54,3 +54,10 @@ services:
         class: %oro_entity.orm.insert_from_select_query_executor.class%
         arguments:
             - '@oro_entity.orm.native_query_executor_helper'
+
+    oro_entity.repository.factory:
+        class: '%oro_entity.repository.factory.class%'
+        public: false
+        arguments:
+            - '@service_container'
+            - [] # will be replaced with repository services array
