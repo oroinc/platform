@@ -7,6 +7,10 @@ define(function(require) {
     require('jquery.select2');
 
     Select2View = BaseView.extend({
+        events: {
+            'change': 'onValueChange',
+            'select2-data-loaded': 'onValueChange'
+        },
 
         /**
          * Use for jQuery select2 plugin initialization
@@ -38,6 +42,13 @@ define(function(require) {
 
         dispose: function() {
             this.$el.inputWidget('dispose');
+        },
+
+        onValueChange: function() {
+            if (this.select2Config.multiple) {
+                // to update size of container, e.g. dialog
+                this.$el.trigger('content:changed');
+            }
         }
     });
 

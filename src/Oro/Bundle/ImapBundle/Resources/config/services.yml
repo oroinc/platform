@@ -16,7 +16,6 @@ parameters:
     oro_imap.email_sync_processor_factory.class:     Oro\Bundle\ImapBundle\Sync\ImapEmailSynchronizationProcessorFactory
     oro_imap.imap_email_remove_manager.class:        Oro\Bundle\ImapBundle\Sync\ImapEmailRemoveManager
     oro_imap.imap_clear_manager.class:               Oro\Bundle\ImapBundle\Manager\ImapClearManager
-    oro_imap.workflow.action.dependency_job.class:   Oro\Bundle\ImapBundle\Workflow\Action\DependencyJob
 
     oro_imap.form.type.configuration.class:          Oro\Bundle\ImapBundle\Form\Type\ConfigurationType
     oro_imap.form.type.check_button.class:           Oro\Bundle\ImapBundle\Form\Type\CheckButtonType
@@ -145,14 +144,6 @@ services:
             - '@oro_entity.event_listener.entity_modify_created_updated_properties_listener'
         calls:
             - [setLogger, ['@logger']]
-
-    oro_imap.workflow.action.dependency_job:
-        class: %oro_imap.workflow.action.dependency_job.class%
-        arguments:
-            - '@oro_action.expression.context_accessor'
-            - '@doctrine'
-        tags:
-            - { name: oro_action.action, alias: job_add_dependency }
 
     oro_imap.form.type.google_sync_checkbox:
         class: %oro_imap.form.type.google_sync_checkbox.class%

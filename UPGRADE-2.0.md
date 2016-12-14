@@ -88,6 +88,7 @@ Please use `Oro\Bundle\ActionBundle\Provider\CurrentApplicationProvider` and `Or
 - Added fourth argument `Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider $entityConfigProvider` to `__construct` method of `Oro\Bundle\ImportExportBundle\Handler\AbstractHandler`.
 - Added fifth argument `Symfony\Component\Translation\TranslatorInterface $translator` to `__construct` method of `Oro\Bundle\ImportExportBundle\Handler\AbstractHandler`.
 - Removed method `public function setTranslator(TranslatorInterface $translator)` from `Oro\Bundle\ImportExportBundle\Handler\AbstractImportHandler`.
+- Method `setSourceIterator` of `Oro\Bundle\ImportExportBundle\Reader\IteratorBasedReader` now can set null value.
 
 ####WorkflowBundle
 - Class `Oro\Bundle\WorkflowBundle\Model\WorkflowManager`
@@ -888,6 +889,29 @@ to the [Fallback documentation](./src/Oro/Bundle/EntityBundle/Resources/doc/enti
 - `Oro\Bundle\DataAuditBundle\EventListener\AuditGridListener` was removed. Similar functionality can be found in `Oro\Bundle\DataAuditBundle\Datagrid\EntityTypeProvider`.
 - `Oro\Bundle\DataAuditBundle\Loggable\AuditEntityMapper` was renamed to `Oro\Bundle\DataAuditBundle\Provider\AuditEntityMapper`.
 
+####ImapBundle
+ - The command `oro:imap:clear-mailbox` was removed. Produce message to the topic `Oro\Bundle\ImapBundle\Async\Topics::CLEAR_INACTIVE_MAILBOX` instead.
+
+
+####CronBundle
+- Removed class `Oro\Bundle\CronBundle\Action\CreateJobAction`, service `oro_cron.action.create_job` and action `@create_job`
+- Removed class `Oro\Bundle\CronBundle\Controller\JobController`.
+- Removed class `Oro\Bundle\CronBundle\DependencyInjection\Compiler\JobSerializerMetadataPass`.
+- Removed class `Oro\Bundle\CronBundle\DependencyInjection\Compiler\JobStatisticParameterPass`.
+- Removed class `Oro\Bundle\CronBundle\Entity\Manager\JobManager` and service `oro_cron.job_manager`.
+- Removed class `Oro\Bundle\CronBundle\Entity\Repository\JobRepository`.
+- Removed class `Oro\Bundle\CronBundle\Job\Daemon` and service `oro_cron.job_daemon`
+- Removed class `Oro\Bundle\CronBundle\JobQueue\JMSJobQueueBundle`
+- Added command `oro:cron:definitions:load` (class `Oro\Bundle\CronBundle\Command\CronDefinitionsLoadCommand`) to load cron command definitions to schedule table
+- Temporary added listener `Oro\Bundle\CronBundle\Migrations\Schema\v2_0\SchemaColumnDefinitionListener` to prevent default behavior for `jms_job_safe_object` type. 
+- Removed command `oro:cron:cleanup` (class `Oro\Bundle\CronBundle\Command\CleanupCommand`).
+- Removed command `oro:daemon` (class `Oro\Bundle\CronBundle\Command\DaemonMonitorCommand`).
+- Removed command `oro:jms-job-queue:count` (class `Oro\Bundle\CronBundle\Command\JmsJobCountCommand`).
+- Command `oro:cron` (class `Oro\Bundle\CronBundle\Command\CronCommand`)  doesn't have option `skipCheckDaemon` any more.
+- Parameters `max_concurrent_jobs`, `max_runtime`, `jms_statistics` under `oro_cron` root were removed.
+- Removed listener `Oro\Bundle\CronBundle\EventListener\JobSubscriber`
+- Removed listener `Oro\Bundle\CronBundle\EventListener\LoadClassMetadataSubscriber` and service `oro_cron.listener.load_class_metadata_subscriber`
+
 ####UserBundle
 - Added `auth_status` extended enum property to `Oro\Bundle\UserBundle\Entity\User` entity.
 - Added `Oro\Bundle\UserBundle\Validator\Constraints\PasswordComplexity` to User model.
@@ -899,6 +923,7 @@ to the [Fallback documentation](./src/Oro/Bundle/EntityBundle/Resources/doc/enti
 
 ####ImapBundle
 - The command `oro:imap:clear-mailbox` was removed. Produce message to the topic `oro.imap.clear_inactive_mailbox` instead.
+- Removed action `@job_add_dependency`
 - Changed property name from `$possibleSentFolderNameMap` to `$knownFolderNameMap` in `Oro\Bundle\ImapBundle\Mail\Storage\Folder` 
 - Changed method name from `guessSentTypeByName` to `guessFolderTypeByName` in `Oro\Bundle\ImapBundle\Mail\Storage\Folder` 
 
@@ -907,3 +932,49 @@ to the [Fallback documentation](./src/Oro/Bundle/EntityBundle/Resources/doc/enti
 
 ####OroInstallerBundle
 - Added interface `Oro\Bundle\InstallerBundle\CacheWarmer\NamespaceMigrationProviderInterface`. it makes available add the rules for command "oro:platform:upgrade20"
+
+#### CurrencyBundle
+- `getViewType` method was removed form `Oro\Bundle\CurrencyBundle\Config\CurrencyConfigInterface`
+- `VIEW_TYPE_SYMBOL` and `VIEW_TYPE_ISO_CODE` constants were removed from `Oro\Bundle\CurrencyBundle\Config\CurrencyConfigInterface` 
+- `Oro\Bundle\CurrencyBundle\Provider\CurrencyProviderInterface` was renamed to `CurrencyListProviderInterface`
+- `Oro\Bundle\CurrencyBundle\Provider\DefaultCurrencyProviderInterface` was added
+- `Oro\Bundle\CurrencyBundle\Config\CurrencyConfigInterface` was renamed to `Oro\Bundle\CurrencyBundle\Provider\CurrencyProviderInterface`
+- `Oro\Bundle\CurrencyBundle\Provider\CurrencyProviderInterface` extends `Oro\Bundle\CurrencyBundle\Provider\CurrencyListProviderInterface` and `Oro\Bundle\CurrencyBundle\Provider\DefaultCurrencyProviderInterface` 
+- `Oro\Bundle\CurrencyBundle\Config\CurrencyConfigManager` was renamed to `DefaultCurrencyConfigProvider`
+
+####OroNoteBundle
+- Implementation of activity list relation with entity  `Oro\Bundle\NoteBundle\Entity\Note` was changed. Now the entity is a regular activity entity like others: Email, Task, Call, Email, etc.
+
+Before
+- One Note could be related only to one entity in the Activity List.
+
+After
+- One Note could be related to many entities in the Activity List. Context field can be used to add Note to multiple entities.
+
+- Removed property `entityId` from SOAP API for entity `Oro\Bundle\NoteBundle\Entity\Note`.
+- Added use of `Oro\Bundle\ActivityBundle\Model\ActivityInterface` into class `Oro\Bundle\NoteBundle\Entity\Note`.
+- Removed methods from entity `Oro\Bundle\NoteBundle\Entity\Note`: `supportTarget`, `getTarget`, `setTarget`. Methods of `Oro\Bundle\ActivityBundle\Model\ActivityInterface` should be used to access target entities instead.
+- Removed extra classes and services were as unnecessary after Note entity became a regular activity entity. See detailed list of removed items below. 
+- Removed class `Oro\Bundle\NoteBundle\Migration\Extension\NoteExtension`. Generic extension `Oro\Bundle\ActivityBundle\Migration\Extension\ActivityExtension` is used to add relation of entity with Note as Activity.
+- Removed class `Oro\Bundle\NoteBundle\Migration\Extension\NoteExtensionAwareInterface`. Generic interface `\Oro\Bundle\ActivityBundle\Migration\Extension\ActivityExtensionAwareInterface` should be used instead in schema migrations.
+- Removed entity config with scope "note" after Note entity became a regular Activity entity.
+- Removed class `Oro\Bundle\NoteBundle\Placeholder\PlaceholderFilter` and service `oro_note.placeholder.filter`.
+- Removed class `Oro\Bundle\NoteBundle\Provider\NoteExclusionProvider` and service `oro_note.exclusion_provider`.
+- Removed class `Oro\Bundle\NoteBundle\Tools\NoteAssociationHelper` and service `oro_note.association_helper`.
+- Removed class `Oro\Bundle\NoteBundle\Tools\NoteEntityConfigDumperExtension` and service `oro_note.entity_config_dumper.extension`.
+- Removed class `Oro\Bundle\NoteBundle\Tools\NoteEntityGeneratorExtension` and service `oro_note.entity_generator.extension`.
+- Removed class `Oro\Bundle\NoteBundle\EventListener\MergeListener` and service `oro_note.listener.merge_listener`. Generic class `Oro\Bundle\ActivityListBundle\EventListener\MergeListener` applicable for activity entities now is used instead.
+- Removed class `Oro\Bundle\NoteBundle\Model\MergeModes`. Generic class `Oro\Bundle\ActivityListBundle\Model\MergeModes` applicable for activity entities now is used instead.
+- Removed class `Oro\Bundle\NoteBundle\Model\Strategy\ReplaceStrategy` and service `oro_note.strategy.replace`. Generic class `Oro\Bundle\ActivityListBundle\Model\Strategy\ReplaceStrategy` applicable for activity entities now is used instead.
+- Removed class `Oro\Bundle\NoteBundle\Model\Stratgy\UniteStrategy` and service `oro_note.strategy.unite`. Generic class `Oro\Bundle\ActivityListBundle\Model\Strategy\UniteStrategy` applicable for activity entities now is used instead.
+- Removed service `oro_note.widget_provider.actions`.
+- Added parameter `renderContexts` to route controller action `Oro\Bundle\NoteBundle\Controller\Note::infoAction` (route `oro_note_widget_info`). Default value of the parameter is `true`. 
+- Changed signature of controller action `Oro\Bundle\NoteBundle\Controller\Note::createAction`. The parameters of route `oro_note_create` remain the same as before - `entityClass` and `entityId`.
+- Changed signature of method `Oro\Bundle\NoteBundle\Form\Handler\NoteHandler::__construct`.
+- Changed signature of method `Oro\Bundle\NoteBundle\Provider\NoteActivityListProvider::__construct`.
+- Replaced method `Oro\Bundle\NoteBundle\Form\Type\NoteType::setDefaultOptions` with `Oro\Bundle\NoteBundle\Form\Type\NoteType::configureOptions`.
+- Changed view template `OroNoteBundle:Note:js/activityItemTemplate.html.twig`. 
+- Changed view template `OroNoteBundle:Note:widget/info.html.twig`.
+- Removed parameter `oro_note.manager.api.class` from DIC.
+- Removed parameter `oro_note.activity_list.provider.class` from DIC.
+- Removed parameter `oro_note.manager.class` from DIC.
