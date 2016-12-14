@@ -10,7 +10,7 @@ use Oro\Bundle\EntityExtendBundle\Entity\Manager\AssociationManager;
 use Oro\Bundle\EntityExtendBundle\Extend\RelationType;
 
 /**
- * Computes values of fields that represent nested objects.
+ * Computes values of fields that represent extended associations.
  */
 class BuildExtendedAssociations implements ProcessorInterface
 {
