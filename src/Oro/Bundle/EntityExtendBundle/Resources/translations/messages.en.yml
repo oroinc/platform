@@ -154,3 +154,46 @@ oro:
             priority.description:   A number is used to sort options
             default.label:          Is Default
             default.description:    Determines if this option is selected by default for new records
+        attributefamily:
+            entity_label: Attribute family
+            entity_plural_label: Attribute families
+            code:
+                label: Code
+            entity_class:
+                label: AttributeFamily
+            id:
+                label: ID
+            is_enabled:
+                label: Is enabled
+            image:
+                label: Image
+            labels:
+                label: Labels
+            owner:
+                label: Owner
+            form:
+                block_titles:
+                    settings:
+                        label: Settings
+                code_label: Code
+                enabled_label: Enabled
+                image_label: Image
+            new_attribute_family: New attribute family
+            labels:
+                blank: Labels are blank
+            attribute_groups:
+                label: Attribute groups
+            attribute_labels: Attribute labels
+            navigation:
+                sections:
+                    general: 'General'
+        attributegroup:
+            entity_label: Attribute group
+            entity_plural_label: Attribute groups
+            id.label: ID
+            is_default.label: Default
+            is_deletable.label: Deletable
+            attribute_family.label: Attribute family
+            labels.label: Labels
+            label_title: Label
+            code: Code

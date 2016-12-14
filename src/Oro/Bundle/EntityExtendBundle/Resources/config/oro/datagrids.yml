@@ -1,0 +1,115 @@
+datagrids:
+    attribute-family-grid:
+        source:
+            type:         orm
+            query:
+                select:
+                    - attributeFamily.id
+                    - attributeFamily.code
+                from:
+                    - { table: 'OroEntityExtendBundle:AttributeFamily', alias: attributeFamily }
+                where:
+                    and:
+                        - attributeFamily.entityClass = :entity_class
+            bind_parameters:
+                - entity_class
+        columns:
+            code:
+                label: oro.entity_extend.attribute_family.code.label
+            familyLabel:
+                label: oro.entity_extend.attribute_family.label_title
+        properties:
+            id: ~
+            familyLabel:
+                type: localized_value
+                data_name: labels
+            view_link:
+                type:  url
+                route: oro_attribute_family_view
+                params:
+                    - id
+            edit_link:
+                type:  url
+                route: oro_attribute_family_edit
+                params:
+                    - id
+            delete_link:
+                type:  url
+                route: oro_attribute_family_delete
+                params:
+                    - id
+        sorters:
+            columns:
+                code:
+                    data_name: attributeFamily.code
+                familyLabel:
+                    data_name: familyLabel
+        filters:
+            columns:
+                code:
+                    type:      string
+                    data_name: attributeFamily.code
+                familyLabel:
+                    type:      string
+                    data_name: familyLabel
+        actions:
+            view:
+                type:          navigate
+                label:         oro.entity_extend.attribute_family.view
+                link:          view_link
+                icon:          eye-open
+                acl_resource:  oro_attribute_family_edit
+                rowAction:     true
+            edit:
+                type:          navigate
+                label:         oro.entity_extend.attribute_family.edit
+                link:          edit_link
+                icon:          edit
+                acl_resource:  oro_attribute_family_edit
+                rowAction:     true
+            delete:
+                type:          ajaxdelete
+                label:         oro.entity_extend.attribute_family.delete
+                link:          delete_link
+                icon:          trash
+                acl_resource:  oro_attribute_family_edit
+                rowAction:     true
+    attribute-groups-grid:
+        source:
+            type: orm
+            query:
+                select:
+                    - attributeGroup.id
+                    - attributeGroup.code
+                from:
+                    - { table: 'OroEntityExtendBundle:AttributeGroup', alias: attributeGroup }
+                join:
+                    inner:
+                        - { join: attributeGroup.attributeFamily, alias: attributeFamily }
+                where:
+                    and:
+                        - attributeFamily.id = :family_id
+            bind_parameters:
+                - family_id
+        columns:
+            groupLabel:
+                label: oro.entityextend.attributegroup.label_title
+            code:
+                label: oro.entityextend.attributegroup.code
+            attributes:
+                label: oro.entity_extend.attribute.attributes
+                renderable: true
+                type: twig
+                template: 'OroEntityExtendBundle:Datagrid:Property/attributes.html.twig'
+                frontend_type: html
+        properties:
+            id: ~
+            groupLabel:
+                type: localized_value
+                data_name: labels
+        sorters:
+            columns:
+                groupLabel:
+                    data_name: groupLabel
+                code:
+                    data_name: code
