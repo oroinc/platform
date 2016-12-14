@@ -2,20 +2,18 @@
 
 namespace Oro\Bundle\ActionBundle\Twig;
 
-use Oro\Bundle\ActionBundle\Helper\ApplicationsHelper;
 use Oro\Bundle\ActionBundle\Helper\ContextHelper;
 use Oro\Bundle\ActionBundle\Helper\OptionsHelper;
-use Oro\Bundle\ActionBundle\Model\OperationManager;
+use Oro\Bundle\ActionBundle\Provider\ButtonProvider;
+use Oro\Bundle\ActionBundle\Provider\ButtonSearchContextProvider;
+use Oro\Bundle\ActionBundle\Provider\RouteProviderInterface;
 
 class OperationExtension extends \Twig_Extension
 {
     const NAME = 'oro_action';
 
-    /** @var OperationManager */
-    protected $manager;
-
-    /** @var ApplicationsHelper */
-    protected $appsHelper;
+    /** @var RouteProviderInterface */
+    protected $routeProvider;
 
     /** @var ContextHelper */
     protected $contextHelper;
@@ -23,22 +21,31 @@ class OperationExtension extends \Twig_Extension
     /** @var OptionsHelper */
     protected $optionsHelper;
 
+    /** @var ButtonProvider */
+    protected $buttonProvider;
+
+    /** @var ButtonSearchContextProvider */
+    protected $searchContextProvider;
+
     /**
-     * @param OperationManager $manager
-     * @param ApplicationsHelper $appsHelper
+     * @param RouteProviderInterface $routeProvider
      * @param ContextHelper $contextHelper
      * @param OptionsHelper $optionsHelper
+     * @param ButtonProvider $buttonProvider
+     * @param ButtonSearchContextProvider $searchContextProvider
      */
     public function __construct(
-        OperationManager $manager,
-        ApplicationsHelper $appsHelper,
+        RouteProviderInterface $routeProvider,
         ContextHelper $contextHelper,
-        OptionsHelper $optionsHelper
+        OptionsHelper $optionsHelper,
+        ButtonProvider $buttonProvider,
+        ButtonSearchContextProvider $searchContextProvider
     ) {
-        $this->manager = $manager;
-        $this->appsHelper = $appsHelper;
+        $this->routeProvider = $routeProvider;
         $this->contextHelper = $contextHelper;
         $this->optionsHelper = $optionsHelper;
+        $this->buttonProvider = $buttonProvider;
+        $this->searchContextProvider = $searchContextProvider;
     }
 
     /**
@@ -54,15 +61,27 @@ class OperationExtension extends \Twig_Extension
      */
     public function getFunctions()
     {
-        return array(
+        return [
             new \Twig_SimpleFunction(
                 'oro_action_widget_parameters',
                 [$this->contextHelper, 'getActionParameters'],
                 ['needs_context' => true]
             ),
-            new \Twig_SimpleFunction('oro_action_widget_route', [$this->appsHelper, 'getWidgetRoute']),
-            new \Twig_SimpleFunction('has_operations', [$this->manager, 'hasOperations']),
+            new \Twig_SimpleFunction('oro_action_widget_route', [$this->routeProvider, 'getWidgetRoute']),
             new \Twig_SimpleFunction('oro_action_frontend_options', [$this->optionsHelper, 'getFrontendOptions']),
+            new \Twig_SimpleFunction('oro_action_has_buttons', [$this, 'hasButtons']),
+        ];
+    }
+
+    /**
+     * @param array $context
+     *
+     * @return bool
+     */
+    public function hasButtons(array $context)
+    {
+        return $this->buttonProvider->hasButtons(
+            $this->searchContextProvider->getButtonSearchContext($this->contextHelper->getContext($context))
         );
     }
 }

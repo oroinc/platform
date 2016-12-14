@@ -3,7 +3,7 @@ namespace Oro\Bundle\ImportExportBundle\Async;
 
 use Psr\Log\LoggerInterface;
 
-use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorage;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
@@ -55,7 +55,7 @@ class ExportMessageProcessor implements MessageProcessorInterface, TopicSubscrib
     private $securityFacade;
 
     /**
-     * @var TokenStorage
+     * @var TokenStorageInterface
      */
     private $tokenStorage;
 
@@ -71,7 +71,7 @@ class ExportMessageProcessor implements MessageProcessorInterface, TopicSubscrib
      * @param ConfigManager $configManager
      * @param DoctrineHelper $doctrineHelper
      * @param SecurityFacade $securityFacade
-     * @param TokenStorage $tokenStorage
+     * @param TokenStorageInterface $tokenStorage
      * @param LoggerInterface $logger
      */
     public function __construct(
@@ -81,7 +81,7 @@ class ExportMessageProcessor implements MessageProcessorInterface, TopicSubscrib
         ConfigManager $configManager,
         DoctrineHelper $doctrineHelper,
         SecurityFacade $securityFacade,
-        TokenStorage $tokenStorage,
+        TokenStorageInterface $tokenStorage,
         LoggerInterface $logger
     ) {
         $this->exportHandler = $exportHandler;

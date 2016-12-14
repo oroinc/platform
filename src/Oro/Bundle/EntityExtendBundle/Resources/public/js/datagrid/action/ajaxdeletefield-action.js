@@ -23,7 +23,7 @@ define([
 
         defaultMessages: {
             confirm_title: 'Delete Confirmation',
-            confirm_content: 'oro.entityextend.delete_field.confirm_content',
+            confirm_content: 'oro.entity_extend.delete_field.confirm_content',
             confirm_ok: 'Yes',
             confirm_cancel: 'Cancel',
             success: 'Removed.',

@@ -98,7 +98,7 @@ class ImportStrategyHelper
      * @param  string         $property
      * @return bool
      */
-    public function isGranted($attributes, $obj, $property=null)
+    public function isGranted($attributes, $obj, $property = null)
     {
         if (!$this->securityFacade->hasLoggedUser()) {
             return true;

@@ -26,21 +26,14 @@ class WidgetController extends Controller
      * @Route("/buttons", name="oro_action_widget_buttons")
      * @Template()
      *
-     * @param Request $request
      * @return array
      */
-    public function buttonsAction(Request $request)
+    public function buttonsAction()
     {
-        $contextHelper = $this->getContextHelper();
-        $applicationsHelper = $this->getApplicationsHelper();
+        $buttonSearchContext = $this->get('oro_action.provider.button_search_context')->getButtonSearchContext();
 
         return [
-            'operations' => $this->getOperationManager()->getOperations(),
-            'context' => $contextHelper->getContext(),
-            'actionData' => $contextHelper->getActionData(),
-            'dialogRoute' => $applicationsHelper->getDialogRoute(),
-            'executionRoute' => $applicationsHelper->getExecutionRoute(),
-            'fromUrl' => $request->get('fromUrl'),
+            'buttons' => $this->get('oro_action.provider.button')->findAll($buttonSearchContext),
         ];
     }
 
@@ -49,6 +42,7 @@ class WidgetController extends Controller
      *
      * @param Request $request
      * @param string $operationName
+     *
      * @return Response
      */
     public function formAction(Request $request, $operationName)
@@ -99,6 +93,7 @@ class WidgetController extends Controller
 
     /**
      * @param array $params
+     *
      * @return bool
      */
     protected function hasRedirect(array $params)
@@ -123,16 +118,9 @@ class WidgetController extends Controller
     }
 
     /**
-     * @return ApplicationsHelper
-     */
-    protected function getApplicationsHelper()
-    {
-        return $this->get('oro_action.helper.applications');
-    }
-
-    /**
      * @param \Exception $e
      * @param Collection $errors
+     *
      * @return ArrayCollection
      */
     protected function getErrorMessages(\Exception $e, Collection $errors = null)
@@ -156,6 +144,7 @@ class WidgetController extends Controller
     /**
      * @param array $params
      * @param Collection $messages
+     *
      * @return array
      */
     protected function getErrorResponse(array $params, Collection $messages)
@@ -182,6 +171,7 @@ class WidgetController extends Controller
 
     /**
      * @param ActionData $context
+     *
      * @return array
      */
     protected function getResponse(ActionData $context)

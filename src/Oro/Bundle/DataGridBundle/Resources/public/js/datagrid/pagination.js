@@ -38,13 +38,13 @@ define([
                 label: 'Prev',
                 direction: 'prev',
                 arrow: 'left',
-                wrapClass: 'icon-chevron-left hide-text'
+                wrapClass: 'fa-chevron-left hide-text'
             },
             next: {
                 label: 'Next',
                 direction: 'next',
                 arrow: 'right',
-                wrapClass: 'icon-chevron-right hide-text'
+                wrapClass: 'fa-chevron-right hide-text'
             }
         },
 

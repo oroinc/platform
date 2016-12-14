@@ -3,6 +3,7 @@ define(function(require) {
 
     var MultiCurrencyControlView;
     var _ = require('underscore');
+    var $ = require('jquery');
     var localeSettings = require('orolocale/js/locale-settings');
     var formatter = require('orolocale/js/formatter/number');
     var BaseView = require('oroui/js/app/views/base/view');
@@ -12,10 +13,11 @@ define(function(require) {
          * @property {Object} keys are ISO3 of currencies and values are multipliers to use in convertation
          */
         rates: null,
+        baseField: null,
 
         events: {
-            'change': 'render',
-            'keyup': 'render'
+            'change .value-field': 'render',
+            'keyup .value-field': 'render'
         },
 
         /**
@@ -24,9 +26,34 @@ define(function(require) {
         initialize: function(options) {
             MultiCurrencyControlView.__super__.initialize.apply(this, arguments);
             _.extend(this, _.pick(options, 'rates'));
+            this.baseFieldValue = this.$('[name$="[baseCurrencyValue]"]').val();
         },
 
         render: function() {
+            var baseField = this.$('[name$="[baseCurrencyValue]"]');
+            var baseFieldContainer = this.$('.base-currency-field');
+            var error = $('.alert-error');
+            if (!this.baseFieldValue && !error.length) {
+                baseFieldContainer.hide();
+                this.renderLabel();
+            } else {
+                this.renderBaseField(baseField, baseFieldContainer);
+            }
+        },
+
+        renderBaseField: function(baseField, baseFieldContainer) {
+            if (this.baseFieldValue) {
+                baseField.val(formatter.formatMonetary(this.baseFieldValue));
+                var currency = this.$('[name$="[currency]"]').val();
+                if (currency === localeSettings.getCurrency()) {
+                    baseFieldContainer.hide().val(0);
+                } else {
+                    baseFieldContainer.show();
+                }
+            }
+        },
+
+        renderLabel: function() {
             if (!_.isEmpty(this.rates)) {
                 var rate;
                 var value = this._toNumber(this.$('[name$="[value]"]').val());

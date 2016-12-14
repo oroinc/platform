@@ -43,7 +43,10 @@ define(function(require) {
             this.$templateButton = this.$el.find(this.options.selectors.templateButton);
 
             this.$importButton.on('click' + this.eventNamespace(), _.bind(this.onImportClick, this));
-            this.$importValidationButton.on('click' + this.eventNamespace(), _.bind(this.onImportValidationClick, this));
+            this.$importValidationButton.on(
+                'click' + this.eventNamespace(),
+                _.bind(this.onImportValidationClick, this)
+            );
             this.$exportButton.on('click' + this.eventNamespace(), _.bind(this.onExportClick, this));
             this.$templateButton.on('click' + this.eventNamespace(), _.bind(this.onTemplateClick, this));
 

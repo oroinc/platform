@@ -48,70 +48,70 @@ class ImportExportControllerTest extends WebTestCase
     public function testValidateExportTemplate()
     {
         // @todo - must be fixed in BAP-12713
-//        $crawler = $this->client->request(
-//            'GET',
-//            $this->getUrl(
-//                'oro_importexport_import_form',
-//                array(
-//                    'entity'           => 'Oro\Bundle\UserBundle\Entity\User',
-//                    '_widgetContainer' => 'dialog'
-//                )
-//            )
-//        );
-//        $response = $this->client->getResponse();
-//        $this->assertHtmlResponseStatusCodeEquals($response, 200);
-//
-//        $file = $this->getImportTemplate();
-//        $this->assertTrue(file_exists($file));
-//
-//        /* @var $form Form */
-//        $form = $crawler->selectButton('Submit')->form();
-//        $form->getFormNode()->setAttribute(
-//            'action',
-//            $form->getFormNode()->getAttribute('action') . '&_widgetContainer=dialog'
-//        );
-//        $form['oro_importexport_import[file]']->upload($file);
-//        $form['oro_importexport_import[processorAlias]'] = 'oro_user.add_or_replace';
-//        $this->client->followRedirects(true);
-//        $this->client->submit($form);
-//        $response = $this->client->getResponse();
-//        $this->assertHtmlResponseStatusCodeEquals($response, 200);
+        $crawler = $this->client->request(
+            'GET',
+            $this->getUrl(
+                'oro_importexport_import_form',
+                array(
+                    'entity'           => 'Oro\Bundle\UserBundle\Entity\User',
+                    '_widgetContainer' => 'dialog'
+                )
+            )
+        );
+        $response = $this->client->getResponse();
+        $this->assertHtmlResponseStatusCodeEquals($response, 200);
+
+        $file = $this->getImportTemplate();
+        $this->assertTrue(file_exists($file));
+
+        /* @var $form Form */
+        $form = $crawler->selectButton('Submit')->form();
+        $form->getFormNode()->setAttribute(
+            'action',
+            $form->getFormNode()->getAttribute('action') . '&_widgetContainer=dialog'
+        );
+        $form['oro_importexport_import[file]']->upload($file);
+        $form['oro_importexport_import[processorAlias]'] = 'oro_user.add_or_replace';
+        $this->client->followRedirects(true);
+        $this->client->submit($form);
+        $response = $this->client->getResponse();
+        $this->assertHtmlResponseStatusCodeEquals($response, 200);
     }
 
     public function testImportEntityWithTag()
     {
         // @todo - must be fixed in BAP-12713
-//        $this->assertNull(
-//            $this->getTaggingRepository()->findOneByEntityName('Oro\Bundle\UserBundle\Entity\User')
-//        );
-//
-//        $this->client->followRedirects(false);
-//        $this->client->request(
-//            'GET',
-//            $this->getUrl(
-//                'oro_importexport_import_process',
-//                array(
-//                    'processorAlias' => 'oro_user.add_or_replace',
-//                    '_format'        => 'json'
-//                )
-//            )
-//        );
-//
-//        $data = $this->getJsonResponseContent($this->client->getResponse(), 200);
-//
-//        $this->assertEquals(
-//            array(
-//                'success'   => true,
-//                'message'   => 'File was successfully imported.',
-//                'errorsUrl' => null,
-//                'importInfo' => sprintf('%s users were added, %s users were updated', 0, 1)
-//            ),
-//            $data
-//        );
-//
-//        $this->assertNotNull(
-//            $this->getTaggingRepository()->findOneByEntityName('Oro\Bundle\UserBundle\Entity\User')
-//        );
+        $this->assertNull(
+            $this->getTaggingRepository()->findOneByEntityName('Oro\Bundle\UserBundle\Entity\User')
+        );
+
+        $this->client->followRedirects(false);
+        $this->client->request(
+            'GET',
+            $this->getUrl(
+                'oro_importexport_import_process',
+                array(
+                    'processorAlias' => 'oro_user.add_or_replace',
+                    '_format'        => 'json'
+                )
+            )
+        );
+
+        $data = $this->getJsonResponseContent($this->client->getResponse(), 200);
+
+        $this->assertEquals(
+            array(
+                'success'   => true,
+                'message'   => 'File was successfully imported.',
+                'errorsUrl' => null,
+                'importInfo' => sprintf('%s users were added, %s users were updated', 0, 1)
+            ),
+            $data
+        );
+
+        $this->assertNotNull(
+            $this->getTaggingRepository()->findOneByEntityName('Oro\Bundle\UserBundle\Entity\User')
+        );
     }
 
     /**

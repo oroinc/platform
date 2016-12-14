@@ -69,9 +69,9 @@ class ImportExportTest extends WebTestCase
         $this->validateImportFile($this->doExportTemplate());
 
         // @todo - must be refactored in BAP-12713
-//        $this->doImport(16, 0);
+        $this->doImport(16, 0);
 
-//        $this->assertCount(count($this->fields) + 16, $this->getEntityFields());
+        $this->assertCount(count($this->fields) + 16, $this->getEntityFields());
     }
 
     public function testChangeFieldTypeError()
@@ -81,13 +81,13 @@ class ImportExportTest extends WebTestCase
         );
 
         // @todo - must be refactored in BAP-12713
-//        $this->doImport(1, 0);
-//        $this->assertCount(count($this->fields) + 1, $this->getEntityFields());
+        $this->doImport(1, 0);
+        $this->assertCount(count($this->fields) + 1, $this->getEntityFields());
 
-//        $this->assertErrors(
-//            '@OroEntityConfigBundle/Tests/Functional/ImportExport/data/change_field_type.csv',
-//            'Error in row #1. Changing type of existing fields is not allowed.'
-//        );
+        $this->assertErrors(
+            '@OroEntityConfigBundle/Tests/Functional/ImportExport/data/change_field_type.csv',
+            'Error in row #1. Changing type of existing fields is not allowed.'
+        );
     }
 
     public function testImportSystemField()
@@ -97,28 +97,28 @@ class ImportExportTest extends WebTestCase
         );
 
         // @todo - must be refactored in BAP-12713
-//        $this->doImport(0, 0);
-//        $this->assertCount(count($this->fields), $this->getEntityFields());
+        $this->doImport(0, 0);
+        $this->assertCount(count($this->fields), $this->getEntityFields());
     }
 
     public function testValidationError()
     {
         // @todo - must be refactored in BAP-12713
-//        $this->assertErrors(
-//            '@OroEntityConfigBundle/Tests/Functional/ImportExport/data/invalid_field_name.csv',
-//            ['Data does not contain required properties: type, fieldType or entity_id']
-//        );
+        $this->assertErrors(
+            '@OroEntityConfigBundle/Tests/Functional/ImportExport/data/invalid_field_name.csv',
+            ['Data does not contain required properties: type, fieldType or entity_id']
+        );
 
-//        $this->assertErrors(
-//            '@OroEntityConfigBundle/Tests/Functional/ImportExport/data/invalid_field_parameters.csv',
-//            [
-//                'Error in row #1. attachment.maxsize: This value should be 1 or more.',
-//                'Error in row #2. Invalid field type.',
-//                'Error in row #4. enum.enum_options.0: [label]: This value should contain only alphabetic symbols, ' .
-//                    'underscore, hyphen, spaces and numbers.',
-//                'Error in row #5. entity.label: This value is too long. It should have 50 characters or less.'
-//            ]
-//        );
+        $this->assertErrors(
+            '@OroEntityConfigBundle/Tests/Functional/ImportExport/data/invalid_field_parameters.csv',
+            [
+                'Error in row #1. attachment.maxsize: This value should be 1 or more.',
+                'Error in row #2. Invalid field type.',
+                'Error in row #4. enum.enum_options.0: [label]: This value should contain only alphabetic symbols, ' .
+                    'underscore, hyphen, spaces and numbers.',
+                'Error in row #5. entity.label: This value is too long. It should have 50 characters or less.'
+            ]
+        );
     }
 
     /**

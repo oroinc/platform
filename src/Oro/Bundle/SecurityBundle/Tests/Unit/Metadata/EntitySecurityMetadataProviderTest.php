@@ -4,6 +4,8 @@ namespace Oro\Bundle\SecurityBundle\Tests\Unit\Metadata;
 
 use Doctrine\ORM\Mapping\ClassMetadata;
 
+use Symfony\Component\Translation\TranslatorInterface;
+
 use Oro\Bundle\EntityConfigBundle\Config\Config;
 use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
@@ -68,14 +70,26 @@ class EntitySecurityMetadataProviderTest extends \PHPUnit_Framework_TestCase
             Provider::ACL_SECURITY_TYPE,
             'SomeClass',
             'SomeGroup',
-            'SomeLabel',
+            'translated: SomeLabel',
             [],
-            '',
+            null,
             '',
             [
-                'firstName' => new FieldSecurityMetadata('firstName', 'someclass.first_name.label', ['VIEW', 'CREATE']),
-                'lastName' => new FieldSecurityMetadata('lastName', 'someclass.last_name.label', []),
-                'cityName' => new FieldSecurityMetadata('cityName', 'someclass.city_name.label', [])
+                'cityName'  => new FieldSecurityMetadata(
+                    'cityName',
+                    'translated: someclass.city_name.label',
+                    []
+                ),
+                'firstName' => new FieldSecurityMetadata(
+                    'firstName',
+                    'translated: someclass.first_name.label',
+                    ['VIEW', 'CREATE']
+                ),
+                'lastName'  => new FieldSecurityMetadata(
+                    'lastName',
+                    'translated: someclass.last_name.label',
+                    []
+                )
             ]
         );
 
@@ -96,6 +110,7 @@ class EntitySecurityMetadataProviderTest extends \PHPUnit_Framework_TestCase
             $this->entityConfigProvider,
             $this->extendConfigProvider,
             $this->doctrine,
+            $this->getMock(TranslatorInterface::class),
             $this->cache
         );
 
@@ -113,10 +128,6 @@ class EntitySecurityMetadataProviderTest extends \PHPUnit_Framework_TestCase
             ->with('label')
             ->will($this->returnValue('SomeLabel'));
 
-        $this->entityConfigProvider->expects($this->once())
-            ->method('hasConfig')
-            ->with('SomeClass')
-            ->will($this->returnValue(true));
         $this->entityConfigProvider->expects($this->once())
             ->method('getConfig')
             ->with('SomeClass')
@@ -146,11 +157,19 @@ class EntitySecurityMetadataProviderTest extends \PHPUnit_Framework_TestCase
             ->method('save')
             ->with(Provider::ACL_SECURITY_TYPE, array('SomeClass' => $this->entity));
 
+        $translator = $this->getMock(TranslatorInterface::class);
+        $translator->expects(self::any())
+            ->method('trans')
+            ->willReturnCallback(function ($value) {
+                return 'translated: ' . $value;
+            });
+
         $provider = new Provider(
             $this->securityConfigProvider,
             $this->entityConfigProvider,
             $this->extendConfigProvider,
             $this->doctrine,
+            $translator,
             $this->cache
         );
 
@@ -172,6 +191,7 @@ class EntitySecurityMetadataProviderTest extends \PHPUnit_Framework_TestCase
             $this->entityConfigProvider,
             $this->extendConfigProvider,
             $this->doctrine,
+            $this->getMock(TranslatorInterface::class),
             $this->cache
         );
         $result = $provider->getEntities();
@@ -193,6 +213,7 @@ class EntitySecurityMetadataProviderTest extends \PHPUnit_Framework_TestCase
             $this->entityConfigProvider,
             $this->extendConfigProvider,
             $this->doctrine,
+            $this->getMock(TranslatorInterface::class),
             $this->cache
         );
 

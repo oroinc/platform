@@ -31,7 +31,7 @@ services:
 
     #currencyConfig
     oro_currency.config.currency:
-        class: 'Oro\Bundle\CurrencyBundle\Config\CurrencyConfigManager'
+        class: 'Oro\Bundle\CurrencyBundle\Config\DefaultCurrencyConfigProvider'
         lazy: true
         arguments:
             - '@oro_config.manager'
@@ -79,7 +79,7 @@ services:
         arguments:
             - '@oro_config.user'
             - '@oro_locale.calendar_factory'
-            - '@oro_currency.config.currency'
+            - '@oro_currency.provider.view_type'
         calls:
             - [addNameFormats, [%oro_locale.format.name%]]
             - [addAddressFormats, [%oro_locale.format.address%]]
@@ -107,5 +107,13 @@ services:
         decorates: oro_locale.formatter.number
         arguments:
             - '@oro_locale.settings'
-            - '@oro_currency.config.currency'
+            - '@oro_currency.provider.view_type'
+
+    oro_currency.converter.rate:
+        class: Oro\Bundle\CurrencyBundle\Converter\RateConverter
+        public: false
+
+    oro_currency.converter.rate.link:
+        tags:
+            - { name: oro_service_link, service: oro_currency.converter.rate }
 

@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\TestFrameworkBundle\Behat\Fixtures;
 
+use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
 use Faker\Factory;
 use Faker\ORM\Doctrine\ColumnTypeGuesser;
@@ -9,6 +10,7 @@ use Nelmio\Alice\Instances\Collection as AliceCollection;
 use Oro\Bundle\EntityBundle\ORM\Registry;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\MetadataProviderInterface;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadata;
+use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
 use Symfony\Component\Security\Core\Util\ClassUtils;
@@ -16,9 +18,9 @@ use Symfony\Component\Security\Core\Util\ClassUtils;
 class EntitySupplement
 {
     /**
-     * @var Registry
+     * @var KernelInterface
      */
-    protected $registry;
+    protected $kernel;
 
     /**
      * @var AliceCollection
@@ -52,11 +54,11 @@ class EntitySupplement
      * @param MetadataProviderInterface $metadataProvider
      */
     public function __construct(
-        Registry $registry,
+        KernelInterface $kernel,
         AliceCollection $referenceRepository,
         MetadataProviderInterface $metadataProvider
     ) {
-        $this->registry = $registry;
+        $this->kernel = $kernel;
         $this->referenceRepository = $referenceRepository;
         $this->accessor = PropertyAccess::createPropertyAccessor();
         $this->faker = Factory::create();
@@ -72,11 +74,19 @@ class EntitySupplement
     {
         $className = get_class($entity);
         /** @var ClassMetadataInfo $metadata */
-        $metadata = $this->registry->getManagerForClass($className)->getClassMetadata($className);
+        $metadata = $this->getEntityManager()->getClassMetadata($className);
 
         $this->setValues($entity, $values);
         $this->completeFields($entity, $metadata);
         $this->setOwnership($entity);
+    }
+
+    /**
+     * @return EntityManager
+     */
+    protected function getEntityManager()
+    {
+        return $this->kernel->getContainer()->get('doctrine')->getManager();
     }
 
     /**

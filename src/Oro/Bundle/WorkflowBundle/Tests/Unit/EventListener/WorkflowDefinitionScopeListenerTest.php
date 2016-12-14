@@ -37,6 +37,28 @@ class WorkflowDefinitionScopeListenerTest extends \PHPUnit_Framework_TestCase
         unset($this->listener, $this->workflowScopeManager);
     }
 
+    public function testOnActivationWorkflowDefinition()
+    {
+        $event = new WorkflowChangesEvent($this->createWorkflowDefinition());
+
+        $this->workflowScopeManager->expects($this->once())
+            ->method('updateScopes')
+            ->with($event->getDefinition(), false);
+
+        $this->listener->onActivationWorkflowDefinition($event);
+    }
+
+    public function testOnDeactivationWorkflowDefinition()
+    {
+        $event = new WorkflowChangesEvent($this->createWorkflowDefinition());
+
+        $this->workflowScopeManager->expects($this->once())
+            ->method('updateScopes')
+            ->with($event->getDefinition(), true);
+
+        $this->listener->onDeactivationWorkflowDefinition($event);
+    }
+
     public function testOnCreateWorkflowDefinitionWithEmptyScopesConfig()
     {
         $event = new WorkflowChangesEvent($this->createWorkflowDefinition());
@@ -46,13 +68,17 @@ class WorkflowDefinitionScopeListenerTest extends \PHPUnit_Framework_TestCase
         $this->listener->onCreateWorkflowDefinition($event);
     }
 
-    public function testOnCreateWorkflowDefinition()
+    /**
+     * @dataProvider onCreateOrUpdateDataProvider
+     *
+     * @param WorkflowDefinition $definition
+     * @param bool $expectedReset
+     */
+    public function testOnCreateWorkflowDefinition(WorkflowDefinition $definition, $expectedReset)
     {
-        $event = new WorkflowChangesEvent($this->createWorkflowDefinition([[self::FIELD_NAME => self::ENTITY_ID]]));
+        $this->workflowScopeManager->expects($this->once())->method('updateScopes')->with($definition, $expectedReset);
 
-        $this->workflowScopeManager->expects($this->once())->method('updateScopes')->with($event->getDefinition());
-
-        $this->listener->onCreateWorkflowDefinition($event);
+        $this->listener->onCreateWorkflowDefinition(new WorkflowChangesEvent($definition));
     }
 
     public function testOnUpdateWorkflowDefinitionWithoutScopesConfigChanges()
@@ -75,27 +101,49 @@ class WorkflowDefinitionScopeListenerTest extends \PHPUnit_Framework_TestCase
         $this->listener->onUpdateWorkflowDefinition($event);
     }
 
-    public function testOnUpdateWorkflowDefinition()
+    /**
+     * @dataProvider onCreateOrUpdateDataProvider
+     *
+     * @param WorkflowDefinition $definition
+     * @param bool $expectedReset
+     */
+    public function testOnUpdateWorkflowDefinition(WorkflowDefinition $definition, $expectedReset)
     {
-        $event = new WorkflowChangesEvent(
-            $this->createWorkflowDefinition([[self::FIELD_NAME => self::ENTITY_ID]]),
-            $this->createWorkflowDefinition()
+        $this->workflowScopeManager->expects($this->once())->method('updateScopes')->with($definition, $expectedReset);
+
+        $this->listener->onUpdateWorkflowDefinition(
+            new WorkflowChangesEvent($definition, $this->createWorkflowDefinition())
         );
+    }
 
-        $this->workflowScopeManager->expects($this->once())->method('updateScopes')->with($event->getDefinition());
-
-        $this->listener->onUpdateWorkflowDefinition($event);
+    /**
+     * @return array
+     */
+    public function onCreateOrUpdateDataProvider()
+    {
+        return [
+            [
+                'definition' => $this->createWorkflowDefinition([[self::FIELD_NAME => self::ENTITY_ID]]),
+                'expectedReset' => true
+            ],
+            [
+                'definition' => $this->createWorkflowDefinition([[self::FIELD_NAME => self::ENTITY_ID]], true),
+                'expectedReset' => false
+            ]
+        ];
     }
 
     /**
      * @param array $scopesConfig
+     * @param bool $active
      * @return WorkflowDefinition
      */
-    protected function createWorkflowDefinition(array $scopesConfig = [])
+    protected function createWorkflowDefinition(array $scopesConfig = [], $active = false)
     {
         return $this->getEntity(
             WorkflowDefinition::class,
             [
+                'active' => $active,
                 'configuration' => [WorkflowDefinition::CONFIG_SCOPES => $scopesConfig],
             ]
         );
