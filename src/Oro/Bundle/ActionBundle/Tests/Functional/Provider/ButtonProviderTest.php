@@ -147,7 +147,7 @@ class ButtonProviderTest extends WebTestCase
     {
         $config = [
             $name => [
-                'label' => uniqid(),
+                'label' => 'test_label',
                 'enabled' => true,
                 'order' => 10,
                 'applications' => [],

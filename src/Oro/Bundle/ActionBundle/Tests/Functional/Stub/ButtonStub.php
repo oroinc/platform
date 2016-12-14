@@ -52,4 +52,36 @@ class ButtonStub implements ButtonInterface
     {
         return null;
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getName()
+    {
+        return 'test_name';
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getLabel()
+    {
+        return 'test label';
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getIcon()
+    {
+        return 'test_icon';
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getTranslationDomain()
+    {
+        return 'test_domain';
+    }
 }
