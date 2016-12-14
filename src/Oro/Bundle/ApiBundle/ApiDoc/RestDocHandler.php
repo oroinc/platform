@@ -38,31 +38,25 @@ class RestDocHandler implements HandlerInterface
     /** @var RestDocFiltersHandler */
     protected $filtersHandler;
 
-    /** @var RestDocStatusCodesHandler */
-    protected $statusCodesHandler;
-
     /**
      * @param RestDocViewDetector         $docViewDetector
      * @param ActionProcessorBagInterface $processorBag
      * @param ValueNormalizer             $valueNormalizer
      * @param RestDocIdentifierHandler    $identifierHandler
      * @param RestDocFiltersHandler       $filtersHandler
-     * @param RestDocStatusCodesHandler   $statusCodesHandler
      */
     public function __construct(
         RestDocViewDetector $docViewDetector,
         ActionProcessorBagInterface $processorBag,
         ValueNormalizer $valueNormalizer,
         RestDocIdentifierHandler $identifierHandler,
-        RestDocFiltersHandler $filtersHandler,
-        RestDocStatusCodesHandler $statusCodesHandler
+        RestDocFiltersHandler $filtersHandler
     ) {
         $this->docViewDetector = $docViewDetector;
         $this->processorBag = $processorBag;
         $this->valueNormalizer = $valueNormalizer;
         $this->identifierHandler = $identifierHandler;
         $this->filtersHandler = $filtersHandler;
-        $this->statusCodesHandler = $statusCodesHandler;
     }
 
     /**
@@ -103,7 +97,7 @@ class RestDocHandler implements HandlerInterface
         $this->setInputMetadata($annotation, $action, $config, $metadata);
         $this->setOutputMetadata($annotation, $entityClass, $action, $config, $metadata, $associationName);
         $this->filtersHandler->handle($annotation, $context->getFilters(), $metadata);
-        $this->statusCodesHandler->handle($annotation, $config);
+        $this->setStatusCodes($annotation, $config);
     }
 
     /**
@@ -279,5 +273,22 @@ class RestDocHandler implements HandlerInterface
         $outputProperty = ReflectionUtil::getProperty(new \ReflectionClass($annotation), $direction);
         $outputProperty->setAccessible(true);
         $outputProperty->setValue($annotation, $value);
+    }
+
+    /**
+     * @param ApiDoc                 $annotation
+     * @param EntityDefinitionConfig $config
+     */
+    public function setStatusCodes(ApiDoc $annotation, EntityDefinitionConfig $config)
+    {
+        $statusCodes = $config->getStatusCodes();
+        if (null !== $statusCodes) {
+            $codes = $statusCodes->getCodes();
+            foreach ($codes as $statusCode => $code) {
+                if (!$code->isExcluded()) {
+                    $annotation->addStatusCode($statusCode, $code->getDescription());
+                }
+            }
+        }
     }
 }
