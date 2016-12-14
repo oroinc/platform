@@ -20,23 +20,6 @@ use Oro\Bundle\WorkflowBundle\Model\WorkflowRegistry;
 
 class TransitionButtonProviderExtension extends AbstractButtonProviderExtension
 {
-    /** @var DoctrineHelper */
-    protected $doctrineHelper;
-
-    /**
-     * @param WorkflowRegistry $workflowRegistry
-     * @param RouteProviderInterface $routeProvider
-     * @param DoctrineHelper $doctrineHelper
-     */
-    public function __construct(
-        WorkflowRegistry $workflowRegistry,
-        RouteProviderInterface $routeProvider,
-        DoctrineHelper $doctrineHelper
-    ) {
-        $this->doctrineHelper = $doctrineHelper;
-        parent::__construct($workflowRegistry, $routeProvider);
-    }
-
     /**
      * {@inheritdoc}
      */
@@ -58,7 +41,7 @@ class TransitionButtonProviderExtension extends AbstractButtonProviderExtension
             throw $this->createUnsupportedButtonException($button);
         }
 
-        $workflowItem = $this->getWorkflowItem($button->getWorkflow(), $buttonSearchContext);
+        $workflowItem = $button->getWorkflow()->getWorkflowItemByEntityId($buttonSearchContext->getEntityId());
 
         if ($workflowItem === null) {
             return false;
@@ -106,28 +89,5 @@ class TransitionButtonProviderExtension extends AbstractButtonProviderExtension
         ButtonContext $buttonContext
     ) {
         return new TransitionButton($transition, $workflow, $buttonContext);
-    }
-
-    /**
-     * @param Workflow $workflow
-     * @param ButtonSearchContext $searchContext
-     *
-     * @return null|WorkflowItem
-     */
-    protected function getWorkflowItem(Workflow $workflow, ButtonSearchContext $searchContext)
-    {
-        return $this->getWorkflowItemRepository()->findOneByEntityMetadata(
-            $searchContext->getEntityClass(),
-            $searchContext->getEntityId(),
-            $workflow->getName()
-        );
-    }
-
-    /**
-     * @return WorkflowItemRepository
-     */
-    protected function getWorkflowItemRepository()
-    {
-        return $this->doctrineHelper->getEntityRepositoryForClass(WorkflowItem::class);
     }
 }
