@@ -33,7 +33,7 @@ services:
         tags:
             - { name: 'oro_message_queue.client.message_processor' }
 
-    oro_importexport.async.abstract_http_import:
+    oro_importexport.async.abstract_chunk_http_import:
         class: Oro\Bundle\ImportExportBundle\Async\Import\AbstractChunkImportMessageProcessor
         abstract:  true
         arguments:
@@ -45,19 +45,19 @@ services:
             - '@logger'
             - '@oro_message_queue.job.storage'
 
-    oro_importexport.async.http_import:
+    oro_importexport.async.chunck_http_import:
         class: Oro\Bundle\ImportExportBundle\Async\Import\ChunkHttpImportMessageProcessor
-        parent: oro_importexport.async.abstract_http_import
+        parent: oro_importexport.async.abstract_chunk_http_import
         tags:
             - { name: 'oro_message_queue.client.message_processor' }
 
-    oro_importexport.async.http_import_validation:
+    oro_importexport.async.chunck_http_import_validation:
         class: Oro\Bundle\ImportExportBundle\Async\Import\ChunkHttpImportValidationMessageProcessor
-        parent: oro_importexport.async.abstract_http_import
+        parent: oro_importexport.async.abstract_chunk_http_import
         tags:
             - { name: 'oro_message_queue.client.message_processor' }
 
-    oro_importexport.async.abstract_http_import_preparing:
+    oro_importexport.async.abstract_preparing_http_import:
         class: Oro\Bundle\ImportExportBundle\Async\Import\AbstractPreparingHttpImportMessageProcessor
         abstract:  true
         arguments:
@@ -69,15 +69,15 @@ services:
             - '@doctrine'
             - '@oro_message_queue.job.dependent_job_service'
 
-    oro_importexport.async.http_import_validation_preparing:
+    oro_importexport.async.preparing_http_import_validation:
         class: Oro\Bundle\ImportExportBundle\Async\Import\PreparingHttpImportValidationMessageProcessor
-        parent: oro_importexport.async.abstract_http_import_preparing
+        parent: oro_importexport.async.abstract_preparing_http_import
         tags:
             - { name: 'oro_message_queue.client.message_processor' }
 
-    oro_importexport.async.http_import_preparing:
+    oro_importexport.async.preparing_http_import:
         class: Oro\Bundle\ImportExportBundle\Async\Import\PreparingHttpImportMessageProcessor
-        parent: oro_importexport.async.abstract_http_import_preparing
+        parent: oro_importexport.async.abstract_preparing_http_import
         tags:
             - { name: 'oro_message_queue.client.message_processor' }
 

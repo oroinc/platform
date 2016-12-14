@@ -147,7 +147,7 @@ abstract class AbstractPreparingHttpImportMessageProcessor implements MessagePro
     abstract public static function getTopicsForChildJob();
 
     /**
-     * retunr message name that will be show in  Message
+     * return message name that will be show in Message
      * @return string
      */
     abstract public static function getMessageName();
