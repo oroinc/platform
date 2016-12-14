@@ -2,34 +2,53 @@
 
 namespace Oro\Bundle\NoteBundle\Form\Handler;
 
-use Doctrine\Common\Persistence\ObjectManager;
+use Doctrine\Common\Persistence\ManagerRegistry;
+use Doctrine\ORM\EntityManager;
 
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Request;
 
+use Oro\Bundle\ActivityBundle\Manager\ActivityManager;
 use Oro\Bundle\NoteBundle\Entity\Note;
 
 class NoteHandler
 {
-    /** @var FormInterface */
+    /**
+     * @var FormInterface
+     */
     protected $form;
 
-    /** @var Request */
+    /**
+     * @var Request
+     */
     protected $request;
 
-    /** @var ObjectManager */
-    protected $manager;
+    /**
+     * @var ManagerRegistry
+     */
+    protected $managerRegistry;
 
     /**
-     * @param FormInterface $form
-     * @param Request       $request
-     * @param ObjectManager $manager
+     * @var ActivityManager
      */
-    public function __construct(FormInterface $form, Request $request, ObjectManager $manager)
-    {
-        $this->form    = $form;
+    protected $activityManager;
+
+    /**
+     * @param FormInterface   $form
+     * @param Request         $request
+     * @param ManagerRegistry $managerRegistry
+     * @param ActivityManager $activityManager
+     */
+    public function __construct(
+        FormInterface $form,
+        Request $request,
+        ManagerRegistry $managerRegistry,
+        ActivityManager $activityManager
+    ) {
+        $this->form = $form;
         $this->request = $request;
-        $this->manager = $manager;
+        $this->managerRegistry = $managerRegistry;
+        $this->activityManager = $activityManager;
     }
 
     /**
@@ -61,8 +80,22 @@ class NoteHandler
      */
     protected function onSuccess(Note $entity)
     {
-        $entity->setUpdatedAt(new \DateTime());
-        $this->manager->persist($entity);
-        $this->manager->flush();
+        $em = $this->getEntityManager();
+        if ($this->form->has('contexts')) {
+            $contexts = $this->form->get('contexts')->getData();
+            $this->activityManager->setActivityTargets($entity, $contexts);
+        }
+        $entity->setUpdatedAt(new \DateTime('now', new \DateTimeZone('UTC')));
+
+        $em->persist($entity);
+        $em->flush();
+    }
+
+    /**
+     * @return EntityManager
+     */
+    protected function getEntityManager()
+    {
+        return $this->managerRegistry->getManagerForClass(Note::class);
     }
 }
