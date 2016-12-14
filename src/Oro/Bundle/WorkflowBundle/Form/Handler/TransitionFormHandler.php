@@ -39,7 +39,6 @@ class TransitionFormHandler
         $doctrineHelper = $this->doctrineHelper;
         $transitionForm->submit($request);
         if ($transitionForm->isValid()) {
-
             $formAttributes = $transitionForm->getData()->getValues($attributeNames);
 
             foreach ($formAttributes as $value) {
