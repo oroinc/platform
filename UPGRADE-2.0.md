@@ -778,7 +778,9 @@ placeholders:
 - The command `oro:email:update-email-owner-associations` (class `Oro/Bundle/EmailBundle/Command/UpdateEmailOwnerAssociationsCommand`) was removed. Produce message to the topic `oro.email.update_email_owner_association` or `oro.email.update_email_owner_associations` instead.
 
 ####EntityBundle
-- `oro_entity.abstract_repository` introduced. Please inherit all your doctrine repository factory services
+- Added possibility to define
+[entity repositories as a services](./src/Oro/Bundle/EntityBundle/Resources/doc/repositories_as_a_services.md)
+by the usage of `oro_entity.abstract_repository` as a parent service
 - `Oro\Bundle\EntityBundle\ORM\DatabaseDriverInterface::getName` introduced
 
 Before
