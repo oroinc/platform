@@ -6,6 +6,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Routing\RouterInterface;
 
 use Oro\Bundle\ImportExportBundle\Processor\ProcessorRegistry;
@@ -92,7 +93,8 @@ class ExportHandler extends AbstractHandler
         if ($jobResult->isSuccessful()) {
             $url = $this->router->generate(
                 'oro_importexport_export_download',
-                ['fileName' => basename($fileName)]
+                ['fileName' => basename($fileName)],
+                UrlGeneratorInterface::ABSOLUTE_URL
             );
             $context = $jobResult->getContext();
             if ($context) {
@@ -101,7 +103,8 @@ class ExportHandler extends AbstractHandler
         } else {
             $url = $this->router->generate(
                 'oro_importexport_error_log',
-                ['jobCode' => $jobResult->getJobCode()]
+                ['jobCode' => $jobResult->getJobCode()],
+                UrlGeneratorInterface::ABSOLUTE_URL
             );
             $errorsCount = count($jobResult->getFailureExceptions());
         }

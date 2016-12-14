@@ -29,12 +29,16 @@ class ImportExportControllerTest extends WebTestCase
         $this->assertCount(1, $result);
         $this->assertTrue($result['success']);
 
+        $organization = $this->getSecurityFacade()->getOrganization();
+        $organizationId = $organization ? $organization->getId() : null;
+
         $this->assertMessageSent(Topics::EXPORT, [
             'jobName' => JobExecutor::JOB_EXPORT_TO_CSV,
             'processorAlias' => 'oro_account',
             'outputFilePrefix' => null,
-            'options' => ['organization' => (string) $this->getSecurityFacade()->getOrganization()],
+            'options' => [],
             'userId' => $this->getCurrentUser()->getId(),
+            'organizationId' => $organizationId,
         ]);
     }
 
@@ -59,6 +63,9 @@ class ImportExportControllerTest extends WebTestCase
         $this->assertCount(1, $result);
         $this->assertTrue($result['success']);
 
+        $organization = $this->getSecurityFacade()->getOrganization();
+        $organizationId = $organization ? $organization->getId() : null;
+
         $this->assertMessageSent(Topics::EXPORT, [
             'jobName' => JobExecutor::JOB_EXPORT_TEMPLATE_TO_CSV,
             'processorAlias' => 'oro_account',
@@ -66,9 +73,9 @@ class ImportExportControllerTest extends WebTestCase
             'options' => [
                 'first' => 'first value',
                 'second' => 'second value',
-                'organization' => (string) $this->getSecurityFacade()->getOrganization()
             ],
             'userId' => $this->getCurrentUser()->getId(),
+            'organizationId' => $organizationId,
         ]);
     }
 

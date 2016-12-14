@@ -6,7 +6,6 @@ define(function(require) {
     var _ = require('underscore');
     var $ = require('jquery');
     var routing = require('routing');
-    var mediator = require('oroui/js/mediator');
     var DialogWidget = require('oro/dialog-widget');
     var exportHandler = require('oroimportexport/js/export-handler');
 

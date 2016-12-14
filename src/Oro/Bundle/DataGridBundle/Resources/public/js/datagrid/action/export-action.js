@@ -86,7 +86,7 @@ define([
          * {@inheritdoc}
          */
         getActionParameters: function() {
-            return _.extend({format: this.actionKey}, this.collection.getFetchData())
+            return _.extend({format: this.actionKey}, this.collection.getFetchData());
         },
 
         /**
