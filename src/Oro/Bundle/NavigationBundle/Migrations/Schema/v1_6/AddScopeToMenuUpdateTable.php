@@ -24,8 +24,8 @@ class AddScopeToMenuUpdateTable implements Migration, OrderedMigrationInterface
     public function up(Schema $schema, QueryBag $queries)
     {
         /** Table updates **/
-        $this->updateOroCommerceMenuUpdateTable($schema);
-        $this->addOroCommerceMenuUpdateForeignKeys($schema);
+        $this->updateOroNavigationMenuUpdateTable($schema);
+        $this->addOroNavigationMenuUpdateForeignKeys($schema);
     }
 
     /**
@@ -33,10 +33,12 @@ class AddScopeToMenuUpdateTable implements Migration, OrderedMigrationInterface
      *
      * @param Schema $schema
      */
-    protected function updateOroCommerceMenuUpdateTable(Schema $schema)
+    protected function updateOroNavigationMenuUpdateTable(Schema $schema)
     {
         $table = $schema->getTable('oro_navigation_menu_upd');
-        $table->dropIndex('oro_navigation_menu_upd_uidx');
+        if ($table->hasIndex('oro_navigation_menu_upd_uidx')) {
+            $table->dropIndex('oro_navigation_menu_upd_uidx');
+        }
         $table->addColumn('scope_id', 'integer', ['notnull' => true]);
         $table->addUniqueIndex(['key', 'scope_id', 'menu'], 'oro_navigation_menu_upd_uidx');
     }
@@ -46,7 +48,7 @@ class AddScopeToMenuUpdateTable implements Migration, OrderedMigrationInterface
      *
      * @param Schema $schema
      */
-    protected function addOroCommerceMenuUpdateForeignKeys(Schema $schema)
+    protected function addOroNavigationMenuUpdateForeignKeys(Schema $schema)
     {
         $table = $schema->getTable('oro_navigation_menu_upd');
         $table->addForeignKeyConstraint(
