@@ -405,8 +405,29 @@ services:
             - '@oro_api.rest.doc_view_detector'
             - '@oro_api.action_processor_bag'
             - '@oro_api.value_normalizer'
+            - '@oro_api.rest.doc_handler.identifier'
+            - '@oro_api.rest.doc_handler.filters'
+            - '@oro_api.rest.doc_handler.status_codes'
         tags:
             - { name: nelmio_api_doc.extractor.handler }
+
+    oro_api.rest.doc_handler.identifier:
+        class: Oro\Bundle\ApiBundle\ApiDoc\RestDocIdentifierHandler
+        public: false
+        arguments:
+            - '@oro_api.rest.doc_view_detector'
+            - '@oro_api.value_normalizer'
+
+    oro_api.rest.doc_handler.filters:
+        class: Oro\Bundle\ApiBundle\ApiDoc\RestDocFiltersHandler
+        public: false
+        arguments:
+            - '@oro_api.rest.doc_view_detector'
+            - '@oro_api.value_normalizer'
+
+    oro_api.rest.doc_handler.status_codes:
+        class: Oro\Bundle\ApiBundle\ApiDoc\RestDocStatusCodesHandler
+        public: false
 
     oro_api.rest.doc_view_detector:
         class: Oro\Bundle\ApiBundle\ApiDoc\RestDocViewDetector
