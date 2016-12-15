@@ -30,8 +30,12 @@ class WorkflowDataProviderTest extends \PHPUnit_Framework_TestCase
      */
     protected function setUp()
     {
-        $this->transitionDataProvider = $this->getMockWithoutConstructor(TransitionDataProvider::class);
-        $this->workflowManager = $this->getMockWithoutConstructor(WorkflowManager::class);
+        $this->transitionDataProvider = $this->getMockBuilder(TransitionDataProvider::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $this->workflowManager = $this->getMockBuilder(WorkflowManager::class)->disableOriginalConstructor()->getMock();
+
         $this->workflowDataProvider = new WorkflowDataProvider($this->workflowManager, $this->transitionDataProvider);
     }
 
@@ -60,8 +64,7 @@ class WorkflowDataProviderTest extends \PHPUnit_Framework_TestCase
     {
         $workflowItem = $this->getMock(WorkflowItem::class);
 
-        $this->workflowManager->expects($this->once())->method('getWorkflowItem')
-            ->willReturn($workflowItem);
+        $this->workflowManager->expects($this->once())->method('getWorkflowItem')->willReturn($workflowItem);
 
         $this->transitionDataProvider->expects($this->once())
             ->method('getAvailableTransitionsDataByWorkflowItem')
@@ -87,7 +90,7 @@ class WorkflowDataProviderTest extends \PHPUnit_Framework_TestCase
         $step->expects($this->any())
             ->method('getAllowedTransitions')->willReturn([]);
 
-        $stepManager = $this->getMockWithoutConstructor(StepManager::class);
+        $stepManager = $this->getMockBuilder(StepManager::class)->disableOriginalConstructor()->getMock();
         $stepManager->expects($this->once())->method('getStep')
             ->with('name1')->willReturn($step);
         $stepManager->expects($this->any())
@@ -123,16 +126,11 @@ class WorkflowDataProviderTest extends \PHPUnit_Framework_TestCase
             $workflowDefinition = $this->getMock(WorkflowDefinition::class);
         }
 
-        $workflow = $this->getMockWithoutConstructor(Workflow::class);
+        $workflow = $this->getMockBuilder(Workflow::class)->disableOriginalConstructor()->getMock();
         $workflow->expects($this->once())->method('getDefinition')->willReturn($workflowDefinition);
         $workflow->expects($this->any())->method('getStepManager')->willReturn($stepManager);
 
         return $workflow;
-    }
-
-    private function getMockWithoutConstructor($className)
-    {
-        return $this->getMockBuilder($className)->disableOriginalConstructor()->getMock();
     }
 
     /**
