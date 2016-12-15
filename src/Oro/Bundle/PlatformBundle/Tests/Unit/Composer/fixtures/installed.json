@@ -18,7 +18,6 @@
             "a2lix/translation-form-bundle": "1.2",
             "akeneo/batch-bundle": "0.1.2",
             "ass/xmlsecurity": "1.0.0",
-            "besimple/soap": "0.2.2",
             "composer/composer": "1.0.0-alpha8",
             "doctrine/data-fixtures": "1.0.0",
             "doctrine/doctrine-bundle": "1.2.0",
