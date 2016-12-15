@@ -1184,4 +1184,5 @@ services:
     oro_email.provider.smtp_settings:
         class: Oro\Bundle\EmailBundle\Provider\SmtpSettingsProvider
         arguments:
+            - '@oro_config.manager'
             - '@oro_config.global'

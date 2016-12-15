@@ -20,12 +20,6 @@ class SmtpSettingsProviderTest extends \PHPUnit_Framework_TestCase
     /** @var ConfigManager */
     protected $manager;
 
-    /** @var ConfigDefinitionImmutableBag */
-    protected $bag;
-
-    /** @var EventDispatcher|\PHPUnit_Framework_MockObject_MockObject */
-    protected $dispatcher;
-
     /** @var GlobalScopeManager|\PHPUnit_Framework_MockObject_MockObject */
     protected $globalScopeManager;
 
@@ -35,23 +29,23 @@ class SmtpSettingsProviderTest extends \PHPUnit_Framework_TestCase
     protected $settings = [
         'oro_email' => [
             'smtp_settings_host' => [
-                'value' => '',
+                'value' => 'smtp.orocrm.com',
                 'type'  => 'scalar',
             ],
             'smtp_settings_port' => [
-                'value' => null,
+                'value' => 465,
                 'type'  => 'integer',
             ],
             'smtp_settings_encryption' => [
-                'value' => null,
+                'value' => 'ssl',
                 'type'  => 'scalar',
             ],
             'smtp_settings_username' => [
-                'value' => '',
+                'value' => 'user',
                 'type'  => 'scalar',
             ],
             'smtp_settings_password' => [
-                'value' => '',
+                'value' => 'pass',
                 'type'  => 'scalar',
             ],
         ],
@@ -59,40 +53,89 @@ class SmtpSettingsProviderTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->bag = new ConfigDefinitionImmutableBag($this->settings);
-        $this->dispatcher = $this->getMockBuilder('Symfony\Component\EventDispatcher\EventDispatcher')
+        $bag = new ConfigDefinitionImmutableBag($this->settings);
+        $dispatcher = $this->getMockBuilder(EventDispatcher::class)
             ->disableOriginalConstructor()
             ->getMock();
 
         $this->manager = new ConfigManager(
             'global',
-            $this->bag,
-            $this->dispatcher,
+            $bag,
+            $dispatcher,
             new ConfigValueBag()
         );
 
-        $this->globalScopeManager = $this->getMockBuilder('Oro\Bundle\ConfigBundle\Config\GlobalScopeManager')
+        $this->globalScopeManager = $this->getMockBuilder(GlobalScopeManager::class)
             ->disableOriginalConstructor()
             ->getMock();
 
         $this->manager->addManager('global', $this->globalScopeManager);
 
-        $this->provider = new SmtpSettingsProvider($this->globalScopeManager);
+        $this->provider = new SmtpSettingsProvider($this->manager, $this->globalScopeManager);
     }
 
-    public function testGetSmtpSettings()
+    public function testSmtpSettingsProvider()
+    {
+        $smtpSettings = new SmtpSettings();
+
+        $providerMock = $this->getMockBuilder(SmtpSettingsProvider::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $providerMock
+            ->expects($this->once())
+            ->method('getSmtpSettings')
+            ->with(null)
+            ->will($this->returnValue($smtpSettings))
+        ;
+
+        $this->assertInstanceOf(SmtpSettings::class, $smtpSettings);
+        $this->assertEquals($smtpSettings, $providerMock->getSmtpSettings());
+    }
+
+    public function testDefaultSmtpSettings()
+    {
+        $smtpSettings = new SmtpSettings();
+
+        $this->assertSame($smtpSettings->getHost(), SmtpSettings::DEFAULT_HOST);
+        $this->assertSame($smtpSettings->getPort(), SmtpSettings::DEFAULT_PORT);
+        $this->assertSame($smtpSettings->getEncryption(), SmtpSettings::DEFAULT_ENCRYPTION);
+        $this->assertSame($smtpSettings->getUsername(), SmtpSettings::DEFAULT_USERNAME);
+        $this->assertSame($smtpSettings->getPassword(), SmtpSettings::DEFAULT_PASSWORD);
+    }
+
+    public function testGetSmtpSettingsAttributes()
     {
         $smtpSettings = $this->provider->getSmtpSettings();
 
-        $this->assertInstanceOf(SmtpSettings::class, $smtpSettings);
+        $this->assertObjectHasAttribute('host', $smtpSettings);
+        $this->assertObjectHasAttribute('port', $smtpSettings);
+        $this->assertObjectHasAttribute('encryption', $smtpSettings);
+        $this->assertObjectHasAttribute('username', $smtpSettings);
+        $this->assertObjectHasAttribute('password', $smtpSettings);
     }
 
-    public function testSetAndRetrieveSmtpSettings()
+    public function testSmtpSettingValues()
     {
-        $this->provider->
-
         $smtpSettings = $this->provider->getSmtpSettings();
 
-        $this->assertInstanceOf(SmtpSettings::class, $smtpSettings);
+        // check values
+        $this->assertSame($smtpSettings->getHost(), $this->getSettingValue('oro_email.smtp_settings_host'));
+        $this->assertSame($smtpSettings->getPort(), $this->getSettingValue('oro_email.smtp_settings_port'));
+        $this->assertSame($smtpSettings->getEncryption(), $this->getSettingValue('oro_email.smtp_settings_encryption'));
+        $this->assertSame($smtpSettings->getUsername(), $this->getSettingValue('oro_email.smtp_settings_username'));
+        $this->assertSame($smtpSettings->getPassword(), $this->getSettingValue('oro_email.smtp_settings_password'));
+
+        // check types
+        $this->assertInternalType('string', $smtpSettings->getHost());
+        $this->assertInternalType('integer', $smtpSettings->getPort());
+        $this->assertInternalType('string', $smtpSettings->getEncryption());
+        $this->assertInternalType('string', $smtpSettings->getUsername());
+        $this->assertInternalType('string', $smtpSettings->getPassword());
+    }
+
+    private function getSettingValue($key)
+    {
+        return $this->manager->get($key);
     }
 }

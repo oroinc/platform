@@ -2,62 +2,84 @@
 
 namespace Oro\Bundle\EmailBundle\Provider;
 
-use Oro\Bundle\ConfigBundle\Config\AbstractScopeManager;
+use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\ConfigBundle\Config\GlobalScopeManager;
 use Oro\Bundle\EmailBundle\DependencyInjection\Configuration as Config;
 use Oro\Bundle\EmailBundle\Form\Model\SmtpSettings;
 
 abstract class AbstractSmtpSettingsProvider
 {
+    /** @var ConfigManager */
+    protected $configManager;
+
     /** @var GlobalScopeManager */
-    protected $globalConfigManager;
+    protected $globalScopeManager;
 
     /**
      * SmtpSettingsProvider constructor.
      *
-     * @param GlobalScopeManager $globalConfigManager
+     * @param ConfigManager      $configManager
+     * @param GlobalScopeManager $globalScopeManager
      */
-    public function __construct(GlobalScopeManager $globalConfigManager)
-    {
-        $this->globalConfigManager = $globalConfigManager;
+    public function __construct(
+        ConfigManager $configManager,
+        GlobalScopeManager $globalScopeManager
+    ) {
+        $this->configManager = $configManager;
+        $this->globalScopeManager = $globalScopeManager;
     }
 
     /**
-     * @param string|null $scope
+     * @param null|int|object $scopeIdentifier
      *
      * @return SmtpSettings
      */
-    abstract public function getSmtpSettings($scope = null);
+    abstract public function getSmtpSettings($scopeIdentifier = null);
 
     /**
      * @return SmtpSettings
      */
     protected function getGlobalSmtpSettings()
     {
-        return $this->getConfigurationSmtpSettings($this->globalConfigManager);
+        return $this->getConfigurationSmtpSettings($this->globalScopeManager->getScopeId());
     }
 
     /**
-     * @param AbstractScopeManager $manager
+     * @param null|int|object $scopeIdentifier
      *
      * @return SmtpSettings
      */
-    protected function getConfigurationSmtpSettings(AbstractScopeManager $manager)
+    protected function getConfigurationSmtpSettings($scopeIdentifier = null)
     {
-        $host = $manager->getSettingValue(
-            Config::getConfigKeyByName(Config::KEY_SMTP_SETTINGS_HOST)
+        $host = $this->configManager->get(
+            Config::getConfigKeyByName(Config::KEY_SMTP_SETTINGS_HOST),
+            false,
+            false,
+            $scopeIdentifier
         );
-        $port = $manager->getSettingValue(
-            Config::getConfigKeyByName(Config::KEY_SMTP_SETTINGS_PORT)
+        $port = $this->configManager->get(
+            Config::getConfigKeyByName(Config::KEY_SMTP_SETTINGS_PORT),
+            false,
+            false,
+            $scopeIdentifier
         );
-        $encryption  = $manager->getSettingValue(
-            Config::getConfigKeyByName(Config::KEY_SMTP_SETTINGS_ENC)
+        $encryption  = $this->configManager->get(
+            Config::getConfigKeyByName(Config::KEY_SMTP_SETTINGS_ENC),
+            false,
+            false,
+            $scopeIdentifier
         );
-        $username = $manager->getSettingValue(
-            Config::getConfigKeyByName(Config::KEY_SMTP_SETTINGS_USER)
+        $username = $this->configManager->get(
+            Config::getConfigKeyByName(Config::KEY_SMTP_SETTINGS_USER),
+            false,
+            false,
+            $scopeIdentifier
         );
-        $password = $manager->getSettingValue(
-            Config::getConfigKeyByName(Config::KEY_SMTP_SETTINGS_PASS)
+        $password = $this->configManager->get(
+            Config::getConfigKeyByName(Config::KEY_SMTP_SETTINGS_PASS),
+            false,
+            false,
+            $scopeIdentifier
         );
 
         return new SmtpSettings(

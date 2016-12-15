@@ -2,17 +2,13 @@
 
 namespace Oro\Bundle\EmailBundle\Provider;
 
-use Oro\Bundle\EmailBundle\Form\Model\SmtpSettings;
-
 class SmtpSettingsProvider extends AbstractSmtpSettingsProvider
 {
     /**
-     * @param string|null $scope
-     *
-     * @return SmtpSettings
+     * @inheritdoc
      */
-    public function getSmtpSettings($scope = null)
+    public function getSmtpSettings($scopeIdentifier = null)
     {
-        return $this->getConfigurationSmtpSettings($this->globalConfigManager);
+        return $this->getGlobalSmtpSettings();
     }
 }
