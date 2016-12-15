@@ -287,3 +287,7 @@ services:
             - [setName, ['form_errors']]
         tags:
              - { name: layout.block_type, alias: form_errors }
+
+    oro_layout.block_type.abstract_attribute_type:
+        abstract: true
+        class: Oro\Bundle\LayoutBundle\Layout\Block\Type\AbstractAttributeType
