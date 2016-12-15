@@ -45,7 +45,7 @@ class TagType extends AbstractType
     }
 
     /**
-     *M-BM- {@inheritdoc}
+     * {@inheritdoc}
      */
     public function getName()
     {
