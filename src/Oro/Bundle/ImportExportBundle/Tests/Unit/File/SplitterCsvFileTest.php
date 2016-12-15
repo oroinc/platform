@@ -57,11 +57,7 @@ class SplitterCsvFileTest extends \PHPUnit_Framework_TestCase
             ->method('read')
             ->will($parsedData);
 
-        $csvReader
-            ->expects($this->once())
-            ->method('resetFile');
-
-        $self = new SplitterCsvFile($csvReader, $storage);
+        $self = new SplitterCsvFile($csvReader, $storage, 100);
         $files = $self->getSplitFiles($importFile);
         $this->assertCount(1, $files);
         $this->assertContains(current($files), $importFile);
@@ -84,11 +80,7 @@ class SplitterCsvFileTest extends \PHPUnit_Framework_TestCase
                     return [1,2];
                 }
             ));
-        $csvReader
-            ->expects($this->once())
-            ->method('resetFile');
-
-        $self = new SplitterCsvFile($csvReader, $storage);
+        $self = new SplitterCsvFile($csvReader, $storage, 100);
         $files = $self->getSplitFiles($importFile);
         $this->assertCount(2, $files);
         $file1 = dirname(current($files));
