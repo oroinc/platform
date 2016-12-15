@@ -1,20 +1,11 @@
 {% extends 'OroUIBundle:actions:index.html.twig' %}
-
 {% import 'OroUIBundle::macros.html.twig' as UI %}
+{% set gridName = gridName %}
+{% set pageTitle = pageTitle|trans %}
 
-{% oro_title_set({params : {'%report.name%': pageTitle|title, '%report.group%': gridName|trans } }) %}
-
-{% block content %}
-    {% set buttons = [] %}
-    {% set renderParams = {'enableViews': false}|merge(renderParams|default({})) %}
-    {% set params = params|default({})|merge({
-    '_grid_view': {
-    '_disabled': true
-    },
-    '_tags': {
-    '_disabled': true
-    }
-    })
-    %}
-    {{ parent() }}
-{% endblock %}
+{% oro_title_set({
+titleTemplate : "%title%",
+params : {
+"%title%": pageTitle|trans|capitalize,
+}
+}) %}

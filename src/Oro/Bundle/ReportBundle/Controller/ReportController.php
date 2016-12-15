@@ -75,7 +75,7 @@ class ReportController extends Controller
     }
 
     /**
-     * @Route("/view/{gridName}", name="oro_report_view", requirements={"gridName"="[-\w]+"})
+     * @Route("/view/{gridName}", name="oro_report_view_grid", requirements={"gridName"="[-\w]+"})
      *
      * @Template
      * @Acl(
