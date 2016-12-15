@@ -72,15 +72,22 @@ class SmtpSettings
 
     /**
      * Checks host, port and encryption to not have default values.
+     * Host and port cannot be empty.
      * Username and password can be empty in certain setups and still have a valid connection (eg. localhost).
      *
      * @return bool
      */
     public function isEligible()
     {
-        return ($this->host !== self::DEFAULT_HOST
+        $notDefault = ($this->host !== self::DEFAULT_HOST
             || $this->port !== self::DEFAULT_PORT
             || $this->encryption !== self::DEFAULT_ENCRYPTION);
+
+        $isValid = (!empty($this->host)
+            && is_numeric($this->port)
+            && ($this->port >= 0 && $this->port <= 65535));
+
+        return ($notDefault && $isValid);
     }
 
     /**
