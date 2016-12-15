@@ -4,9 +4,8 @@ define([
     'backbone',
     'chaplin',
     'backgrid',
-    './row',
-    '../pageable-collection'
-], function(_, mediator, Backbone, Chaplin, Backgrid, Row, PageableCollection) {
+    './row'
+], function(_, mediator, Backbone, Chaplin, Backgrid, Row) {
     'use strict';
 
     var Body;
@@ -91,15 +90,6 @@ define([
         },
 
         /**
-         * Create this function instead of original Body.__super__.refresh to customize options for subviews
-         */
-        backgridRefresh: function() {
-            this.render();
-            this.collection.trigger('backgrid:refresh', this);
-            return this;
-        },
-
-        /**
          * @inheritDoc
          */
         insertView: function(model, view) {
@@ -141,100 +131,6 @@ define([
                 this.$('> *').addClass(this.rowClassName);
             }
             this._resolveDeferredRender();
-            return this;
-        },
-
-        makeComparator: function(attr, order, func) {
-
-            return function(left, right) {
-                // extract the values from the models
-                var t;
-                var l = func(left, attr);
-                var r = func(right, attr);
-                // if descending order, swap left and right
-                if (order === 1) {
-                    t = l;
-                    l = r;
-                    r = t;
-                }
-                // compare as usual
-                if (l === r) {
-                    return 0;
-                } else if (l < r) {
-                    return -1;
-                }
-                return 1;
-            };
-        },
-
-        /**
-         * @param {string} column
-         * @param {null|"ascending"|"descending"} direction
-         */
-        sort: function(column, direction) {
-            if (!_.contains(['ascending', 'descending', null], direction)) {
-                throw new RangeError('direction must be one of "ascending", "descending" or `null`');
-            }
-            if (_.isString(column) && column.length) {
-                column = this.columns.findWhere({name: column});
-            }
-
-            var columnName = null;
-            var columnSortValue = null;
-            if (_.isObject(column)) {
-                columnName = column.get('name');
-                columnSortValue = column.sortValue();
-            } else {
-                column = null;
-            }
-
-            var collection = this.collection;
-
-            var order;
-
-            if (direction === 'ascending') {
-                order = '-1';
-            } else if (direction === 'descending') {
-                order = '1';
-            } else {
-                order = null;
-            }
-
-            var extractorDelegate;
-            if (order) {
-                extractorDelegate = columnSortValue;
-            } else {
-                extractorDelegate = function(model) {
-                    return model.cid.replace('c', '') * 1;
-                };
-            }
-            var comparator = this.makeComparator(columnName, order, extractorDelegate);
-
-            if (collection instanceof PageableCollection) {
-                collection.setSorting(columnName, order, {sortValue: columnSortValue});
-
-                if (collection.fullCollection) {
-                    if (collection.fullCollection.comparator === null ||
-                        collection.fullCollection.comparator === undefined) {
-                        collection.fullCollection.comparator = comparator;
-                    }
-                    collection.fullCollection.sort();
-                    collection.trigger('backgrid:sorted', column, direction, collection);
-                } else {
-                    collection.fetch({reset: true, success: function() {
-                        collection.trigger('backgrid:sorted', column, direction, collection);
-                    }});
-                }
-            } else {
-                collection.comparator = comparator;
-                collection.sort();
-                collection.trigger('backgrid:sorted', column, direction, collection);
-            }
-
-            if (column) {
-                column.set('direction', direction);
-            }
-
             return this;
         }
     });

@@ -115,6 +115,21 @@ define([
                     self._callViewMethod(eventBlockIds, 'contentLoadingFail');
                     Error.handle({}, jqxhr, {enforce: true});
                 });
+        },
+        get: function(blockId, data, callback) {
+            data.layout_block_ids = [blockId];
+            $.ajax({
+                    url: document.location.pathname,
+                    type: this.method,
+                    data: data
+                })
+                .done(function(content) {
+                    callback(content[blockId] || '');
+                })
+                .fail(function(jqxhr) {
+                    callback('');
+                    Error.handle({}, jqxhr, {enforce: true});
+                });
         }
     };
 

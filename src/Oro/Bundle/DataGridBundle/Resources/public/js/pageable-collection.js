@@ -5,8 +5,9 @@ define([
     'backbone-pageable-collection',
     'oroui/js/mediator',
     'orotranslation/js/translator',
-    'oroui/js/tools'
-], function($, _, Backbone, BackbonePageableCollection, mediator, __, tools) {
+    'oroui/js/tools',
+    'oroui/js/layout-subtree-manager'
+], function($, _, Backbone, BackbonePageableCollection, mediator, __, tools, LayoutSubtreeManager) {
     'use strict';
 
     var PageableCollection;
@@ -797,7 +798,15 @@ define([
                 return BBColProto.fetch.call(self, _.extend({}, options, {silent: true}));
             }
 
-            return BBColProto.fetch.call(this, options);
+            LayoutSubtreeManager.get('product_datagrid', options.data, function(content) {
+                var $data = $('<div/>').append(content);
+                var collection = $data
+                                    .find('[data-page-component-name=frontend-product-search-grid]')
+                                    .data('page-component-options').data.data;
+
+                $data = $data.find('.grid-body');
+                mediator.trigger('grid-content-loaded', {content: $data, collection: collection});
+            });
         },
 
         hasExtraRecordsToLoad: function() {
