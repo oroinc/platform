@@ -7,11 +7,11 @@ use Akeneo\Bundle\BatchBundle\Item\ItemWriterInterface;
 
 use Psr\Log\LoggerInterface;
 
-use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Routing\RouterInterface;
 
 use Oro\Bundle\BatchBundle\Step\StepExecutor;
 use Oro\Bundle\BatchBundle\Step\StepExecutionWarningHandlerInterface;
+use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\DataGridBundle\Exception\InvalidArgumentException;
 use Oro\Bundle\ImportExportBundle\Processor\ExportProcessor;
 use Oro\Bundle\ImportExportBundle\Context\ContextAwareInterface;
@@ -34,6 +34,11 @@ class ExportHandler implements StepExecutionWarningHandlerInterface
      * @var LoggerInterface
      */
     protected $logger;
+
+    /**
+     * @var ConfigManager
+     */
+    protected $configManager;
 
     /**
      * @var bool
@@ -62,6 +67,14 @@ class ExportHandler implements StepExecutionWarningHandlerInterface
     public function setLogger(LoggerInterface $logger)
     {
         $this->logger = $logger;
+    }
+
+    /**
+     * @param ConfigManager $configManager
+     */
+    public function setConfigManager(ConfigManager $configManager)
+    {
+        $this->configManager = $configManager;
     }
 
     /**
@@ -109,10 +122,9 @@ class ExportHandler implements StepExecutionWarningHandlerInterface
 
         $url = null;
         if (! $this->exportFailed) {
-            $url = $this->router->generate(
+            $url = $this->configManager->get('oro_ui.application_url') . $this->router->generate(
                 'oro_importexport_export_download',
-                ['fileName' => basename($filePath)],
-                UrlGeneratorInterface::ABSOLUTE_URL
+                ['fileName' => basename($filePath)]
             );
         }
 

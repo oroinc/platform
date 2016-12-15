@@ -194,7 +194,7 @@ class ExportMessageProcessor implements MessageProcessorInterface, TopicSubscrib
             }
         } else {
             $body = sprintf(
-                'Export operation fails, %s error(s) found. Error log: %s',
+                'Export operation failed, %s error(s) found. Error log: %s',
                 $exportResult['errorsCount'],
                 $exportResult['url']
             );

@@ -123,11 +123,9 @@ define(function(require) {
                     filePrefix: this.options.filePrefix
                 }));
 
-                var exportStartedMessage = exportHandler.startExportNotificationMessage();
                 $.getJSON(
                     exportUrl,
                     function(data) {
-                        exportStartedMessage.close();
                         exportHandler.handleExportResponse(data);
                     }
                 );

@@ -273,6 +273,7 @@ services:
         calls:
             - [setRouter, ['@router']]
             - [setLogger, ['@logger']]
+            - [setConfigManager, ['@oro_config.global']]
 
     oro_datagrid.columns.helper:
         class: %oro_datagrid.columns.helper.class%

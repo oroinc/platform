@@ -6,9 +6,9 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
-use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Routing\RouterInterface;
 
+use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\ImportExportBundle\Processor\ProcessorRegistry;
 use Oro\Bundle\ImportExportBundle\MimeType\MimeTypeGuesser;
 
@@ -25,6 +25,11 @@ class ExportHandler extends AbstractHandler
     protected $router;
 
     /**
+     * @var ConfigManager
+     */
+    protected $configManager;
+
+    /**
      * @param MimeTypeGuesser $mimeTypeGuesser
      */
     public function setMimeTypeGuesser(MimeTypeGuesser $mimeTypeGuesser)
@@ -38,6 +43,14 @@ class ExportHandler extends AbstractHandler
     public function setRouter(RouterInterface $router)
     {
         $this->router = $router;
+    }
+
+    /**
+     * @param ConfigManager $configManager
+     */
+    public function setConfigManager(ConfigManager $configManager)
+    {
+        $this->configManager = $configManager;
     }
 
     /**
@@ -90,31 +103,24 @@ class ExportHandler extends AbstractHandler
             $configuration
         );
 
+        $url = $this->configManager->get('oro_ui.application_url');
         if ($jobResult->isSuccessful()) {
-            $url = $this->router->generate(
-                'oro_importexport_export_download',
-                ['fileName' => basename($fileName)],
-                UrlGeneratorInterface::ABSOLUTE_URL
-            );
+            $url .= $this->router->generate('oro_importexport_export_download', ['fileName' => basename($fileName)]);
             $context = $jobResult->getContext();
             if ($context) {
                 $readsCount = $context->getReadCount();
             }
         } else {
-            $url = $this->router->generate(
-                'oro_importexport_error_log',
-                ['jobCode' => $jobResult->getJobCode()],
-                UrlGeneratorInterface::ABSOLUTE_URL
-            );
+            $url .= $this->router->generate('oro_importexport_error_log', ['jobCode' => $jobResult->getJobCode()]);
             $errorsCount = count($jobResult->getFailureExceptions());
         }
 
         return [
-            'success'     => $jobResult->isSuccessful(),
-            'url'         => $url,
-            'readsCount'  => $readsCount,
+            'success' => $jobResult->isSuccessful(),
+            'url' => $url,
+            'readsCount' => $readsCount,
             'errorsCount' => $errorsCount,
-            'entities'    => $this->getEntityPluralName($entityName)
+            'entities' => $this->getEntityPluralName($entityName)
         ];
     }
 

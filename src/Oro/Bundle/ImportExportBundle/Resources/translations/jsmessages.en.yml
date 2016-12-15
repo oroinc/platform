@@ -1,7 +1,6 @@
 oro:
     importexport:
         export:
-            starting.message: 'Starting export...'
             success.message: 'Export started successfully. You will receive email notification upon completion.'
             fail.message: 'Could not start export, please try again.'
             error_template_download.message: 'Errors occured while downloading the template.'

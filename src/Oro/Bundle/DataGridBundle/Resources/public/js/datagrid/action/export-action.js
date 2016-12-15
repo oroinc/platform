@@ -25,7 +25,6 @@ define([
         isModalBinded: false,
 
         messages: {
-            starting: 'oro.datagrid.export.starting.message',
             success: 'oro.datagrid.export.success.message',
             fail: 'oro.datagrid.export.fail.message',
         },
@@ -73,13 +72,6 @@ define([
             });
 
             return launcher;
-        },
-
-        /**
-         * {@inheritdoc}
-         */
-        _preExecuteSubscriber: function() {
-            mediator.execute('showFlashMessage', 'success', this.messages.starting);
         },
 
         /**

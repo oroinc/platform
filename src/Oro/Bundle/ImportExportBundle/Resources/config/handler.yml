@@ -34,6 +34,7 @@ services:
         calls:
             - [setMimeTypeGuesser, ['@oro_importexport.file.mime_type_guesser']]
             - [setRouter, ['@router']]
+            - [setConfigManager, ['@oro_config.global']]
         lazy: true
 
     oro_importexport.handler.import.cli:
