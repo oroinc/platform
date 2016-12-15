@@ -32,10 +32,10 @@ class DropOwnershipFromMenuUpdateTable implements Migration, OrderedMigrationInt
         }
 
         $queries->addPostQuery(
-            $this->getDropEntityConfigFieldQuery('Oro\Bundle\NavigationBundle\Entity\MenuUpdate', 'ownership_type')
+            $this->getDropEntityConfigFieldQuery('Oro\Bundle\NavigationBundle\Entity\MenuUpdate', 'ownershipType')
         );
         $queries->addPostQuery(
-            $this->getDropEntityConfigFieldQuery('Oro\Bundle\NavigationBundle\Entity\MenuUpdate', 'owner_id')
+            $this->getDropEntityConfigFieldQuery('Oro\Bundle\NavigationBundle\Entity\MenuUpdate', 'ownerId')
         );
     }
 
