@@ -16,13 +16,21 @@ class SplitterCsvFile
      * @var string
      */
     protected $storagePath;
+    /**
+     * @var integer
+     */
+    protected $sizeOfBatch;
 
-    const SIZE_OF_BATCH = 100;
-
-    public function __construct($csvReader, $storagePath)
+    /**
+     * @param $csvReader CsvFileReader
+     * @param $storagePath string
+     * @param $sizeOfBatch integer
+     */
+    public function __construct(CsvFileReader $csvReader, $storagePath, $sizeOfBatch)
     {
         $this->csvReader = $csvReader;
         $this->storagePath = $storagePath;
+        $this->sizeOfBatch = $sizeOfBatch;
     }
 
     protected function readFile($pathFile)
@@ -48,17 +56,15 @@ class SplitterCsvFile
 
         $files = [];
         $data = $this->readFile($pathFile);
-        if (count($data) > self::SIZE_OF_BATCH) {
+        if (count($data) > $this->sizeOfBatch) {
             $numberOfChunk = 0;
-            $dataOfBatch = array_chunk($data, self::SIZE_OF_BATCH);
+            $dataOfBatch = array_chunk($data, $this->sizeOfBatch);
             foreach ($dataOfBatch as $chunk) {
                 $files[] = $this->createBatchFile($chunk, $filename, ++$numberOfChunk);
             }
         } else {
             $files = [$pathFile];
         }
-
-        $this->csvReader->resetFile();
 
         return $files;
     }
