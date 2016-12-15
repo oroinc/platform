@@ -28,9 +28,7 @@ class FormOptionsAssemblerTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->actionFactory = $this->getMockBuilder('Oro\Component\Action\Action\ActionFactory')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->actionFactory = $this->getMock('Oro\Component\Action\Action\ActionFactoryInterface');
 
         $this->configurationPass = $this->getMockBuilder(
             'Oro\Component\ConfigExpression\ConfigurationPass\ConfigurationPassInterface'

@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\EmbeddedFormBundle\Tests\Unit;
 
+use Oro\Bundle\EmbeddedFormBundle\DependencyInjection\Compiler\EmbeddedFormPass;
+use Oro\Bundle\EmbeddedFormBundle\DependencyInjection\Compiler\LayoutManagerPass;
 use Oro\Bundle\EmbeddedFormBundle\OroEmbeddedFormBundle;
 
 class OroEmbeddedFormBundleTest extends \PHPUnit_Framework_TestCase
@@ -14,9 +16,13 @@ class OroEmbeddedFormBundleTest extends \PHPUnit_Framework_TestCase
         $container = $this->getMock('Symfony\Component\DependencyInjection\ContainerBuilder');
         $bundle = new OroEmbeddedFormBundle();
 
-        $container->expects($this->once())
+        $container->expects($this->at(0))
             ->method('addCompilerPass')
-            ->with($this->isInstanceOf('Oro\Bundle\EmbeddedFormBundle\DependencyInjection\Compiler\EmbeddedFormPass'));
+            ->with($this->isInstanceOf(EmbeddedFormPass::class));
+
+        $container->expects($this->at(1))
+            ->method('addCompilerPass')
+            ->with($this->isInstanceOf(LayoutManagerPass::class));
 
         $bundle->build($container);
     }

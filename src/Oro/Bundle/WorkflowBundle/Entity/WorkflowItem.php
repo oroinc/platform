@@ -229,6 +229,18 @@ class WorkflowItem extends ExtendWorkflowItem implements EntityAwareInterface
     }
 
     /**
+     * @param WorkflowItem $source
+     * @return $this
+     */
+    public function merge(WorkflowItem $source)
+    {
+        $this->getData()->add($source->getData()->toArray());
+        $this->getResult()->add($source->getResult()->toArray());
+
+        return $this;
+    }
+
+    /**
      * Get id
      *
      * @return integer
