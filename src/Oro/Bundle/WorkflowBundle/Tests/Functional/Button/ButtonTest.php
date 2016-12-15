@@ -36,6 +36,7 @@ class ButtonTest extends WebTestCase
         $this->workflowManager->activateWorkflow(LoadWorkflowDefinitions::MULTISTEP);
         $this->workflowManager->activateWorkflow(LoadWorkflowDefinitions::WITH_START_STEP);
         $this->workflowManager->activateWorkflow(LoadWorkflowDefinitions::WITH_INIT_OPTION);
+        $this->workflowManager->activateWorkflow(LoadWorkflowDefinitions::WITH_DATAGRIDS);
         $this->entity = $this->createNewEntity();
     }
 
@@ -45,11 +46,22 @@ class ButtonTest extends WebTestCase
      * @param array $context
      * @param array $expected
      */
-    public function testDisplayButtons(array $context, array $expected = [], array $notExpected = [])
+    public function testDisplayButtons(array $context, array $expected = [])
     {
+        $allItems = [
+            'transition-test_start_init_option-start_transition_from_routes"',
+            'transition-test_start_init_option-start_transition_from_datagrids"',
+            'transition-test_start_step_flow-start_transition"',
+            'transition-test_start_init_option-start_transition"',
+            'transition-test_start_init_option-transition_for_datagrid"',
+            'transition-test_flow_datagrids-transition1"',
+        ];
         $crawler = $this->client->request(
             'GET',
-            $this->getUrl('oro_action_widget_buttons', array_merge(['_widgetContainer' => 'dialog'], $context)),
+            $this->getUrl(
+                'oro_action_widget_buttons',
+                array_merge(['_widgetContainer' => 'dialog', 'entityId'  => $this->entity->getId()], $context)
+            ),
             [],
             [],
             $this->generateBasicAuthHeader()
@@ -58,6 +70,9 @@ class ButtonTest extends WebTestCase
         $this->assertHtmlResponseStatusCodeEquals($response, 200);
         if (0 === count($expected)) {
             $this->assertEmpty($response->getContent());
+            $notExpected = [];
+        } else {
+            $notExpected = array_diff($allItems, $expected);
         }
         foreach ($expected as $item) {
             $this->assertContains($item, $crawler->html());
@@ -66,7 +81,6 @@ class ButtonTest extends WebTestCase
             $this->assertNotContains($item, $crawler->html());
         }
     }
-
 
     /**
      * @return array
@@ -83,35 +97,17 @@ class ButtonTest extends WebTestCase
                 'expected' => [
                     'transition-test_start_init_option-start_transition_from_entities"',
                 ],
-                'notExpected' => [
-                    'transition-test_start_init_option-start_transition_from_routes"',
-                    'transition-test_start_init_option-start_transition_from_datagrids"',
-                    'transition-test_start_step_flow-start_transition"',
-                    'transition-test_start_init_option-start_transition"',
-                ],
             ],
             'route context' => [
                 'context' => ['route' => 'route1'],
                 'expected' => [
                     'transition-test_start_init_option-start_transition_from_routes"',
                 ],
-                'notExpected' => [
-                    'transition-test_start_init_option-start_transition_from_entities"',
-                    'transition-test_start_init_option-start_transition_from_datagrids"',
-                    'transition-test_start_step_flow-start_transition"',
-                    'transition-test_start_init_option-start_transition"',
-                ],
             ],
             'datagrid context' => [
                 'context' => ['datagrid' => 'datagrid1'],
                 'expected' => [
                     'transition-test_start_init_option-start_transition_from_datagrids"',
-                ],
-                'notExpected' => [
-                    'transition-test_start_init_option-start_transition_from_entities"',
-                    'transition-test_start_init_option-start_transition_from_routes"',
-                    'transition-test_start_step_flow-start_transition"',
-                    'transition-test_start_init_option-start_transition"',
                 ],
             ],
             'entity and datagrid context' => [
@@ -120,16 +116,17 @@ class ButtonTest extends WebTestCase
                     'transition-test_start_init_option-start_transition_from_datagrids"',
                     'transition-test_start_init_option-start_transition_from_entities"',
                 ],
-                'notExpected' => [
-                    'transition-test_start_init_option-start_transition_from_routes"',
-                    'transition-test_start_step_flow-start_transition"',
-                    'transition-test_start_init_option-start_transition"',
+            ],
+            'workflow datagrid context' => [
+                'context' => ['entityClass' => WorkflowAwareEntity::class, 'datagrid' => 'datagrid1'],
+                'expected' => [
+                    'transition-test_flow_datagrids-transition1"',
+                    'transition-test_start_init_option-start_transition_from_datagrids"',
                 ],
             ],
             'not matched context' => [
                 'context' => ['entityClass' => 'some_other_entity_class'],
-                'expected' => [
-                ],
+                'expected' => [],
             ],
         ];
     }
@@ -146,5 +143,4 @@ class ButtonTest extends WebTestCase
 
         return $testEntity;
     }
-
 }
