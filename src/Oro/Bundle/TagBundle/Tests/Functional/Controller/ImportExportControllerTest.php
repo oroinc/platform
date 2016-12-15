@@ -75,7 +75,7 @@ class ImportExportControllerTest extends WebTestCase
         $this->client->followRedirects(true);
         $this->client->submit($form);
         $response = $this->client->getResponse();
-        $this->assertHtmlResponseStatusCodeEquals($response, 200);
+        $this->assertJsonResponseStatusCodeEquals($response, 200);
     }
 
     public function testImportEntityWithTag()
