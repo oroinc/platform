@@ -39,7 +39,7 @@ Oro\Bundle\EmailBundle\Entity\Mailbox:
         origin:
             - Oro\Bundle\EmailBundle\Validator\Constraints\MailboxOrigin: ~
 
-Oro\Bundle\EmailBundle\Entity\SmtpSettings:
+Oro\Bundle\EmailBundle\Form\Model\SmtpSettings:
     properties:
         host:
             - NotBlank: ~

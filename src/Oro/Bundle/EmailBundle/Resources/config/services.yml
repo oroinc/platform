@@ -1180,3 +1180,9 @@ services:
 #        class: %oro_email.event_listener.smtp_settings_change.class%
 #        tags:
 #            - { name: kernel.event_listener, event: oro_config.update_after, method: onSmtpConfigUpdate }
+
+    oro_email.provider.smtp_settings:
+        class: Oro\Bundle\EmailBundle\Provider\SmtpSettingsProvider
+        arguments:
+            - '@oro_config.manager'
+            - '@oro_config.global'
