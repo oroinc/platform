@@ -100,6 +100,10 @@ class CsvFileReader extends AbstractReader
      */
     protected function getFile()
     {
+        if ($this->file instanceof \SplFileObject && $this->file->getFilename() != $this->fileInfo->getFilename()) {
+            $this->file = null;
+            $this->header = null;
+        }
         if (!$this->file instanceof \SplFileObject) {
             $this->file = $this->fileInfo->openFile();
             $this->file->setFlags(
@@ -176,12 +180,5 @@ class CsvFileReader extends AbstractReader
     public function initializeByContext(ContextInterface $context)
     {
         $this->initializeFromContext($context);
-    }
-
-    public function resetFile()
-    {
-        $this->file = null;
-        $this->fileInfo = null;
-        $this->header = null;
     }
 }
