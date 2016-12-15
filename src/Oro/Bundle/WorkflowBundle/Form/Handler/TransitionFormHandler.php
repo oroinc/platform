@@ -15,6 +15,10 @@ class TransitionFormHandler
     /** @var DoctrineHelper */
     private $doctrineHelper;
 
+    /**
+     * @param RequestStack $requestStack
+     * @param DoctrineHelper $doctrineHelper
+     */
     public function __construct(RequestStack $requestStack, DoctrineHelper $doctrineHelper)
     {
         $this->requestStack = $requestStack;
@@ -23,10 +27,10 @@ class TransitionFormHandler
 
     /**
      * @param Form $transitionForm
-     * @param array $formAttributes
+     * @param array $attributeNames
      * @return bool
      */
-    public function handleTransitionForm(Form $transitionForm, array $formAttributes)
+    public function handleTransitionForm(Form $transitionForm, array $attributeNames)
     {
         $request = $this->requestStack->getCurrentRequest();
         if (!$request->isMethod('POST')) {
@@ -35,6 +39,8 @@ class TransitionFormHandler
         $doctrineHelper = $this->doctrineHelper;
         $transitionForm->submit($request);
         if ($transitionForm->isValid()) {
+            $formAttributes = $transitionForm->getData()->getValues($attributeNames);
+
             foreach ($formAttributes as $value) {
                 // Need to persist all new entities to allow serialization
                 // and correct passing to API start method of all input data.
