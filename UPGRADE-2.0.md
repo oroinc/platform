@@ -904,6 +904,9 @@ to the [Fallback documentation](./src/Oro/Bundle/EntityBundle/Resources/doc/enti
 - Updated view template My Calendar widget `OroCalendarBundle:::templates.html.twig`.
 - Updated macroses in `OroCalendarBundle::invitations.html.twig`: `calendar_event_invitation_status`, `calendar_event_invitation_action` (removed), `calendar_event_invitation_going_status` (added).
 - Removed template `OroCalendarBundle:CalendarEvent:widget\invitationButtons.html.twig`. A new widget to change invitation status added in `OroCalendarBundle:CalendarEvent:widget\invitationControl.html.twig` and JS module `orocalendar/js/app/views/change-status-view`.
+- Removed method `Oro\Bundle\CalendarBundle\Manager\AttendeeRelationManager::createAttendee`, added new methods instead: `Oro\Bundle\CalendarBundle\Manager\AttendeeRelationManager::setRelatedEntity`, `Oro\Bundle\CalendarBundle\Manager\AttendeeManager::createAttendee`.
+- Renamed method `Oro\Bundle\CalendarBundle\Manager\AttendeeRelationManager::getRelatedDisplayName` to `Oro\Bundle\CalendarBundle\Manager\AttendeeRelationManager::getDisplayName`.
+- Removed method `Oro\Bundle\CalendarBundle\Autocomplete\AttendeeSearchHandler::setAttendeeRelationManager`. Dependency to `Oro\Bundle\CalendarBundle\Manager\AttendeeRelationManager` is replaced with `Oro\Bundle\CalendarBundle\Manager\AttendeeManager` and method `Oro\Bundle\CalendarBundle\Autocomplete\AttendeeSearchHandler::setAttendeeManager`.
 
 ####ReminderBundle
 - Constructor of `Oro\Bundle\ReminderBundle\Model\Email\EmailSendProcessor` was changed: the first argument type is `Oro\Bundle\NotificationBundle\Manager\EmailNotificationManager` instead of `Oro\Bundle\NotificationBundle\Processor\EmailNotificationProcessor`
