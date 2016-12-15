@@ -54,3 +54,5 @@ services:
         class: Oro\Bundle\ImportExportBundle\Async\ConsolidateImportJobResultNotificationService
         arguments:
             - '@translator'
+            - '@router'
+            - '@oro_config.global'

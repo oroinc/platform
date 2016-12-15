@@ -27,18 +27,19 @@ oro:
 
         import:
             error:          "Errors occurred during file import."
+            download_error_log: "Error log"
             errors_found:   "Errors found: %errors%"
             error %number%: "Error in row #%number%."
-            label:          Import
+            label:          "Import file"
             validation_label: "Validate Data File"
             success:        "File was successfully imported."
             alert:          "%added% %entities% were added, %updated% %entities% were updated"
-            notification.result: "Import for the %file_name% was completed. Part(s) %success_parts% of %total_parts% were imported."
-            notification.detail: "Errors: %errors%, process: %process%, read: %read%, add: %add%, update: %update%, replace: %replace%"
-            validation.notification.result: "Import validation from file %file_name% was completed. Part(s) %success_parts% of %total_parts% were validated."
+            notification.result: "Import of the %file_name% was completed. Part(s) %success_parts% of %total_parts% were imported."
+            notification.detail: "Errors: %errors%, processed: %process%, read: %read%, added: %add%, updated: %update%, replaced: %replace%"
+            validation.notification.result: "Import validation of the file %file_name% was completed. Part(s) %success_parts% of %total_parts% were validated."
             validation.notification.detail: "Errors: %errors%, process: %process%, read: %read%"
-            async_import:                   "Result of Async import"
-            async_validation_import:        "Result of Async validation import"
+            async_import:                   "Result of importing file %origin_file_name%"
+            async_validation_import:        "Result of import validation file %origin_file_name%"
             entity:         Import %entityName%
             entity_validation:         Import %entityName% Validation
             tempate:        Download Data Template
