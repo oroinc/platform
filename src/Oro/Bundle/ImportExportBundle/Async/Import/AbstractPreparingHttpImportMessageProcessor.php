@@ -81,18 +81,16 @@ abstract class AbstractPreparingHttpImportMessageProcessor implements
         $body = JSON::decode($message->getBody());
 
         $body = array_replace_recursive([
-                'fileName' => null,
+                'filePath' => null,
+                'originFileName' => null,
                 'userId' => null,
                 'jobName' => JobExecutor::JOB_IMPORT_FROM_CSV,
                 'processorAlias' => null,
                 'options' => [],
             ], $body);
 
-        if (! $body['fileName'] || ! $body['processorAlias'] || ! $body['userId']) {
-            $this->logger->critical(
-                sprintf('Invalid message: %s', $body),
-                ['message' => $message]
-            );
+        if (! $body['filePath'] || ! $body['processorAlias'] || ! $body['userId']) {
+            $this->logger->critical('Invalid message', ['message' => $message]);
 
             return self::REJECT;
         }
@@ -107,7 +105,7 @@ abstract class AbstractPreparingHttpImportMessageProcessor implements
             return self::REJECT;
         }
 
-        $files = $this->splitterCsvFileHelper->getSplitFiles($body['fileName']);
+        $files = $this->splitterCsvFileHelper->getSplitFiles($body['filePath']);
         $parentMessageId = $message->getMessageId();
         $result = $this->jobRunner->runUnique(
             $parentMessageId,
@@ -122,9 +120,9 @@ abstract class AbstractPreparingHttpImportMessageProcessor implements
                             $parentMessageId,
                             ++$key
                         ),
-                        function (JobRunner $jobRunner, Job $child) use ($body, $file) {
-                            $body['fileName'] = $file;
-                            $this->producer->send(
+                        function (JobRunner $jobRunner, Job $child) use ($body, $file, $key) {
+                            $body['filePath'] = $file;
+                                $this->producer->send(
                                 static::getTopicsForChildJob(),
                                 array_merge($body, ['jobId' => $child->getId()])
                             );
@@ -136,7 +134,8 @@ abstract class AbstractPreparingHttpImportMessageProcessor implements
                     Topics::SEND_IMPORT_NOTIFICATION,
                     [
                         'rootImportJobId' => $job->getRootJob()->getId(),
-                        'fileName' => $body['fileName'] ,
+                        'filePath' => $body['filePath'] ,
+                        'originFileName' => $body['originFileName'] ,
                         'userId' => $body['userId'],
                         'subscribedTopic' => static::getSubscribedTopics(),
                     ]

@@ -103,11 +103,17 @@ class SendImportNotificationMessageProcessor implements MessageProcessorInterfac
             return self::REJECT;
         }
         if (in_array(Topics::IMPORT_HTTP_PREPARING, $body['subscribedTopic'])) {
-            $summary = $this->consolidateJobNotificationService->getImportSummary($job, $body['fileName']);
-            $subject = $this->translator->trans('oro.importexport.import.async_import');
+            $summary = $this->consolidateJobNotificationService->getImportSummary($job, $body['originFileName']);
+            $subject = $this->translator->trans(
+                'oro.importexport.import.async_import',
+                ['%origin_file_name%' => $body['originFileName']]
+            );
         } else {
-            $summary = $this->consolidateJobNotificationService->getValidationImportSummary($job, $body['fileName']);
-            $subject = $this->translator->trans('oro.importexport.import.async_validation_import');
+            $summary = $this->consolidateJobNotificationService->getValidationImportSummary($job, $body['originFileName']);
+            $subject = $this->translator->trans(
+                'oro.importexport.import.async_validation_import',
+                ['%origin_file_name%' => $body['originFileName']]
+            );
         }
 
         $this->sendNotification($subject, $user->getEmail(), $summary);
@@ -117,7 +123,6 @@ class SendImportNotificationMessageProcessor implements MessageProcessorInterfac
 
     protected function sendNotification($subject, $toEmail, $summary)
     {
-
         $fromEmail = $this->configManager->get('oro_notification.email_notification_sender_email');
         $fromName = $this->configManager->get('oro_notification.email_notification_sender_name');
         $this->producer->send(

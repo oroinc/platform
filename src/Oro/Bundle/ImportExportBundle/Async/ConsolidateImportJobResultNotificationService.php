@@ -2,16 +2,28 @@
 namespace Oro\Bundle\ImportExportBundle\Async;
 
 use Oro\Bundle\MessageQueueBundle\Entity\Job;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Symfony\Component\Routing\Router;
 use Symfony\Component\Translation\TranslatorInterface;
+use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 
 class ConsolidateImportJobResultNotificationService
 {
+
+    protected $translator;
+    protected $router;
+    protected $configManager;
+
     /**
      * @param TranslatorInterface $translator
+     * @param Router $router
+     * @param ConfigManager $configManager
      */
-    public function __construct(TranslatorInterface $translator)
+    public function __construct(TranslatorInterface $translator, Router $router, ConfigManager $configManager)
     {
         $this->translator = $translator;
+        $this->router = $router;
+        $this->configManager = $configManager;
     }
 
     /**
@@ -23,6 +35,10 @@ class ConsolidateImportJobResultNotificationService
     {
         $job = $job->isRoot() ? $job : $job->getRootJob();
         $data = $this->getImportResultAsArray($job);
+        $downloadErrorLog = '';
+        if ($data['hasError']) {
+            $downloadErrorLog = $this->getImportDownloadLogUrl($job->getId());
+        }
 
         return $this->translator->trans(
             'oro.importexport.import.notification.result',
@@ -31,18 +47,32 @@ class ConsolidateImportJobResultNotificationService
                 '%success_parts%' => $data['successParts'],
                 '%total_parts%' => $data['totalParts']
             ]
-        ) .PHP_EOL .
-            $this->translator->trans(
-                'oro.importexport.import.notification.detail',
-                [
-                    '%errors%' => $data['errors'],
-                    '%process%' => $data['process'],
-                    '%read%' => $data['read'],
-                    '%add%' => $data['add'],
-                    '%update%' => $data['update'],
-                    '%replace%' => $data['replace'],
-                ]
-            ) .PHP_EOL .PHP_EOL . $data['errorMessages'];
+        ). PHP_EOL . $this->translator->trans(
+            'oro.importexport.import.notification.detail',
+            [
+                '%errors%' => $data['errors'],
+                '%process%' => $data['process'],
+                '%read%' => $data['read'],
+                '%add%' => $data['add'],
+                '%update%' => $data['update'],
+                '%replace%' => $data['replace'],
+            ]
+        ) . $downloadErrorLog;
+    }
+
+    protected function getImportDownloadLogUrl($jobId)
+    {
+        $fileName = $this->translator->trans('oro.importexport.import.download_error_log');
+        $url = $this->configManager->get('oro_ui.application_url') . $this->router->generate(
+            'oro_importexport_import_error_log',
+            ['jobId' => $jobId]
+        );
+
+        return sprintf(
+            '<br/><a href="%s" target="_blank">%s</a>',
+            $url,
+            $fileName
+        );
     }
 
     /**
@@ -52,8 +82,12 @@ class ConsolidateImportJobResultNotificationService
      */
     public function getValidationImportSummary(Job $job, $fileName)
     {
+        $downloadErrorLog = '';
         $job = $job->isRoot() ? $job : $job->getRootJob();
         $data = $this->getImportResultAsArray($job);
+        if ($data['hasError']) {
+            $downloadErrorLog = $this->getImportDownloadLogUrl($job->getId());
+        }
 
         return $this->translator->trans(
             'oro.importexport.import.validation.notification.result',
@@ -70,14 +104,28 @@ class ConsolidateImportJobResultNotificationService
                     '%process%' => $data['process'],
                     '%read%' => $data['read'],
                 ]
-            ) .PHP_EOL .PHP_EOL . $data['errorMessages'];
+            ) . $downloadErrorLog;
     }
 
+    public function getErrorLog(Job $job)
+    {
+        $errorLog =  null;
+        foreach ($job->getChildJobs() as $key => $childrenJob) {
+            $childrenJobData = $childrenJob->getData();
+            if (empty($childrenJobData)) {
+                continue;
+            }
+            foreach ($childrenJobData['errors'] as $errorMessage) {
+                $errorLog .= sprintf("error in part #%s: %s\n\r", $key, $errorMessage);
+            }
+        }
+        return $errorLog;
+    }
 
     protected function getImportResultAsArray(Job $job)
     {
         $data = [];
-        $data['errorMessages'] = '';
+        $data['hasError'] = false;
         $data['successParts'] = 0;
         $data['totalParts'] = 0;
         $data['errors'] = 0;
@@ -99,8 +147,8 @@ class ConsolidateImportJobResultNotificationService
             $data['successParts'] += (int)$childrenJobData['success'];
             $data['totalParts'] += 1;
             $totalDataImportJob = $childrenJobData['counts'];
-            foreach ($childrenJobData['errors'] as $errorMessage) {
-                $data['errorMessages'] .= sprintf("%s: %s\n\r", $childrenJobData['fileName'], $errorMessage);
+            if  (count($childrenJobData['errors'])) {
+                $data['hasError'] = true;
             }
             $data['errors'] += isset($totalDataImportJob['errors']) ? $totalDataImportJob['errors'] : 0;
             $data['process'] += isset($totalDataImportJob['process']) ? $totalDataImportJob['process'] : 0;

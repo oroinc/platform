@@ -11,7 +11,7 @@ class ChunkHttpImportMessageProcessor extends AbstractChunkImportMessageProcesso
 {
     protected function processData(array $body)
     {
-        $this->httpImportHandler->setImportingFileName($body['fileName']);
+        $this->httpImportHandler->setImportingFileName($body['filePath']);
 
         return $this->httpImportHandler->handleImport(
             $body['jobName'],
@@ -24,7 +24,7 @@ class ChunkHttpImportMessageProcessor extends AbstractChunkImportMessageProcesso
     {
         return sprintf(
             'Import for the %s is completed, success: %s, info: %s, errors url: %s, message: %s',
-            $data['fileName'],
+            $data['filePath'],
             $data['success'],
             $data['importInfo'],
             $data['errorsUrl'],
