@@ -83,7 +83,7 @@ abstract class AbstractChunkImportMessageProcessor implements MessageProcessorIn
 
         $result = $this->jobRunner->runDelayed($body['jobId'], function (JobRunner $jobRunner, Job $job) use ($body) {
                 $body = array_replace_recursive([
-                        'fileName' => null,
+                        'filePath' => null,
                         'userId' => null,
                         'jobName' => JobExecutor::JOB_IMPORT_FROM_CSV,
                         'processorAlias' => null,
@@ -91,7 +91,7 @@ abstract class AbstractChunkImportMessageProcessor implements MessageProcessorIn
                     ], $body);
 
 
-                if (! $body['fileName'] || ! $body['processorAlias'] || ! $body['userId']) {
+                if (! $body['filePath'] || ! $body['processorAlias'] || ! $body['userId']) {
                     $this->logger->critical(
                         'Invalid message',
                         ['message' => $body]
@@ -112,10 +112,9 @@ abstract class AbstractChunkImportMessageProcessor implements MessageProcessorIn
 
                 $this->getCreateToken($user);
                 $result = $this->processData($body);
-                $result = array_merge(['fileName' => $body['fileName']], $result);
-                $summary = $this->getSummaryMessage($result);
-                $this->logger->info($summary);
                 $this->saveJobResult($job, $result);
+                $summary = $this->getSummaryMessage(array_merge(['filePath' => $body['filePath']], $result));
+                $this->logger->info($summary);
 
                 return $result['success'];
         });
