@@ -69,11 +69,13 @@ class CreateObjectTest extends \PHPUnit_Framework_TestCase
      * @expectedException \Oro\Component\Action\Exception\InvalidParameterException
      * @expectedExceptionMessage Object data must be an array.
      */
-    public function testInitializeExceptionInvalidData()
+    public function testExceptionInvalidData()
     {
         $this->action->initialize(
             ['class' => 'stdClass', 'attribute' => $this->getPropertyPath(), 'data' => 'string_value']
         );
+
+        $this->action->execute(new ItemStub());
     }
 
     /**
@@ -96,8 +98,8 @@ class CreateObjectTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @param array $options
-     * @param array $expectedData
-     * @param null|array $contextData
+     * @param array $contextData
+     * @param null|array $expectedData
      * @dataProvider executeDataProvider
      */
     public function testExecute(array $options, array $contextData = [], array $expectedData = null)
@@ -156,6 +158,16 @@ class CreateObjectTest extends \PHPUnit_Framework_TestCase
                 ],
                 ['test_attribute' => 'test_value'],
                 ['test', 'test_value']
+            ],
+            'with property data' => [
+                'options' => [
+                    'class'     => ItemStub::class,
+                    'attribute' => new PropertyPath('test_attribute'),
+                    'arguments' => [],
+                    'data' => new PropertyPath('data_attr'),
+                ],
+                ['data_attr' => ['key1' => 'val1']],
+                ['key1' => 'val1']
             ]
         ];
     }
