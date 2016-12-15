@@ -139,7 +139,7 @@
                 });
             {% endif %}
 
-            {% if hasExportProcessor %}
+            {% if exportAllowed and hasExportProcessor %}
                 $('.export-btn').on('click', function(e) {
                     e.preventDefault();
 
