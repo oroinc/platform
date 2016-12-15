@@ -110,12 +110,24 @@ system_configuration:
             type: text
             options:
                 label: oro.email.system_configuration.smtp_settings.host.label
+                constraints:
+                    - NotBlank: ~
+                    - Length:
+                        min: 3
+                        max: 255
 
         oro_email.smtp_settings_port:
             data_type: number
             type: number
             options:
                 label: oro.email.system_configuration.smtp_settings.port.label
+                constraints:
+                    - NotBlank: ~
+                    - Range:
+                        min: 0
+                        max: 65535
+                    - Type:
+                        type: integer
 
         oro_email.smtp_settings_encryption:
             data_type: string
@@ -126,18 +138,23 @@ system_configuration:
                     ~: oro.email.system_configuration.smtp_settings.encryption.none.label
                     ssl: oro.email.system_configuration.smtp_settings.encryption.ssl.label
                     tls: oro.email.system_configuration.smtp_settings.encryption.tls.label
+                constraints:
+                    - Choice:
+                        choices: [~, ssl, tls]
 
         oro_email.smtp_settings_username:
             data_type: string
             type: text
             options:
                 label: oro.email.system_configuration.smtp_settings.username.label
+                required: false
 
         oro_email.smtp_settings_password:
             data_type: string
             type: password
             options:
                 label: oro.email.system_configuration.smtp_settings.password.label
+                required: false
 
         oro_email.show_recent_emails_in_user_bar:
             data_type: boolean

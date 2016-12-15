@@ -79,15 +79,11 @@ class SmtpSettings
      */
     public function isEligible()
     {
-        $notDefault = ($this->host !== self::DEFAULT_HOST
-            || $this->port !== self::DEFAULT_PORT
-            || $this->encryption !== self::DEFAULT_ENCRYPTION);
-
-        $isValid = (!empty($this->host)
-            && is_numeric($this->port)
-            && ($this->port >= 0 && $this->port <= 65535));
-
-        return ($notDefault && $isValid);
+        return (self::DEFAULT_HOST !== $this->host
+            && self::DEFAULT_PORT !== $this->port
+            && self::DEFAULT_ENCRYPTION !== $this->encryption
+            && !empty($this->host)
+            && is_numeric($this->port));
     }
 
     /**
