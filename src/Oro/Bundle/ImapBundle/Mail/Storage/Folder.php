@@ -24,9 +24,27 @@ class Folder extends BaseFolder
         self::FLAG_SPAM   => FolderType::SPAM,
     ];
 
+    // Quite a few IMAP servers don't support the SPECIAL-USE capability: https://tools.ietf.org/html/rfc6154
     /** @var array */
-    protected $possibleSentFolderNameMap = [
-        'SentBox', 'Sent'
+    protected $knownSpecialFolderNameMap = [
+        'Inbox'            => FolderType::INBOX,
+        'INBOX'            => FolderType::INBOX,
+
+        'Drafts'           => FolderType::DRAFTS,
+
+        'Spam'             => FolderType::SPAM,
+        'Junk'             => FolderType::SPAM,
+        'Junk E-mail'      => FolderType::SPAM,
+
+        'Sent'             => FolderType::SENT,
+        'SentBox'          => FolderType::SENT,
+        'Sent Items'       => FolderType::SENT,
+        'Sent Messages'    => FolderType::SENT,
+
+        'Trash'            => FolderType::TRASH,
+        'Deleted'          => FolderType::TRASH,
+        'Deleted Items'    => FolderType::TRASH,
+        'Deleted Messages' => FolderType::TRASH
     ];
 
     /** @var string[] */
@@ -134,24 +152,27 @@ class Folder extends BaseFolder
                 break;
             }
         }
-        // if sent box do not include flag for correct type guess
-        if ($this->type === FolderType::OTHER && $this->guessSentTypeByName()) {
-            $this->type = FolderType::SENT;
+
+        // In case the IMAP server doesn't support the special-use mailboxes extension,
+        // try to guess the type using hard-coded folder names.
+        if ($this->type == FolderType::OTHER) {
+            $guessedType = $this->guessFolderTypeByName();
+
+            if ($guessedType) {
+                $this->type = $guessedType;
+            }
         }
 
         return $this->type;
     }
 
     /**
-     * Try to guess sent folder by folder name
+     * Try to guess folder type using known special folder names.
      *
-     * @return bool
+     * @return FolderType|null
      */
-    public function guessSentTypeByName()
+    public function guessFolderTypeByName()
     {
-        if (in_array($this->getGlobalName(), $this->possibleSentFolderNameMap, true)) {
-            return true;
-        }
-        return false;
+        return $this->knownSpecialFolderNameMap[$this->getGlobalName()];
     }
 }
