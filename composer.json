@@ -41,12 +41,14 @@
         "kriswallsmith/assetic": "1.4.0",
         "knplabs/knp-menu": "2.2.*",
         "knplabs/knp-menu-bundle": "2.1.*",
-        "friendsofsymfony/rest-bundle": "1.7.1",
+        "friendsofsymfony/rest-bundle": "1.7.9",
         "friendsofsymfony/jsrouting-bundle": "1.6.0",
         "nelmio/api-doc-bundle": "2.13.0",
         "ass/xmlsecurity": "1.1.1",
         "stof/doctrine-extensions-bundle": "1.2.2",
+
         "escapestudios/wsse-authentication-bundle": "1.0.2",
+
         "liip/imagine-bundle": "1.6.*",
         "leafo/lessphp": "0.4.0",
         "genemu/form-bundle": "2.3.0",
