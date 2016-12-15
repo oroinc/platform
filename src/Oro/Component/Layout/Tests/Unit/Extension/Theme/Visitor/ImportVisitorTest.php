@@ -15,6 +15,7 @@ use Oro\Component\Layout\Loader\LayoutUpdateLoaderInterface;
 use Oro\Component\Layout\Tests\Unit\Extension\Theme\Stubs\ImportedLayoutUpdate;
 use Oro\Component\Layout\Tests\Unit\Extension\Theme\Stubs\ImportedLayoutUpdateWithImports;
 use Oro\Component\Layout\Tests\Unit\Extension\Theme\Stubs\LayoutUpdateWithImports;
+use Oro\Component\Layout\Tests\Unit\Stubs\NotApplicableImportAwareLayoutUpdateStub;
 
 class ImportVisitorTest extends \PHPUnit_Framework_TestCase
 {
@@ -329,6 +330,19 @@ class ImportVisitorTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue('string'));
 
         $updates = ['root' => [$update]];
+
+        $this->visitor->walkUpdates($updates, $context);
+    }
+
+    public function testImportsAreNotLoadedIfUpdateIsNotApplicable()
+    {
+        $update = new NotApplicableImportAwareLayoutUpdateStub();
+        $updates = ['root' => [$update]];
+
+        /** @var ContextInterface|\PHPUnit_Framework_MockObject_MockObject $context */
+        $context = $this->getMock(ContextInterface::class);
+
+        $this->themeManager->expects($this->never())->method('getTheme');
 
         $this->visitor->walkUpdates($updates, $context);
     }
