@@ -27,6 +27,7 @@ class OptionsHelper
 
     /**
      * @param ButtonInterface $button
+     *
      * @return array
      */
     public function getFrontendOptions(ButtonInterface $button)
@@ -53,30 +54,39 @@ class OptionsHelper
 
     /**
      * @param ButtonInterface $button
+     *
      * @return array
      */
     protected function createOptions(ButtonInterface $button)
     {
         $data = $this->normalizeTemplateData($button->getTemplateData());
         $executionUrl = $this->router->generate($data['executionRoute'], $data['routeParams']);
-        $dialogUrl = $this->router->generate($data['dialogRoute'], $data['routeParams']);
 
         $frontendOptions = $data['frontendOptions'];
 
         $options = [
             'hasDialog' => $data['hasForm'],
             'showDialog' => !empty($data['showDialog']),
-            'dialogOptions' => [
-                'title' => $this->getTitle(
-                    $button,
-                    $frontendOptions
-                ),
-                'dialogOptions' => !empty($frontendOptions['options']) ? $frontendOptions['options'] : []
-            ],
             'executionUrl' => $executionUrl,
-            'dialogUrl' => $dialogUrl,
-            'url' => $data['hasForm'] ? $dialogUrl : $executionUrl,
+            'url' => $executionUrl,
         ];
+
+        if ($data['hasForm']) {
+            $dialogUrl = $this->router->generate($data['dialogRoute'], $data['routeParams']);
+
+            $options = array_merge($options, [
+                'dialogOptions' => [
+                    'title' => $this->getTitle(
+                        $button,
+                        $frontendOptions
+                    ),
+                    'dialogOptions' => !empty($frontendOptions['options']) ? $frontendOptions['options'] : []
+                ],
+                'executionUrl' => $executionUrl,
+                'dialogUrl' => $dialogUrl,
+                'url' => $dialogUrl,
+            ]);
+        }
 
         $this->addOption($options, $frontendOptions, 'confirmation');
 
@@ -86,6 +96,7 @@ class OptionsHelper
     /**
      * @param ButtonInterface $button
      * @param array $frontendOptions
+     *
      * @return string
      */
     protected function getTitle(ButtonInterface $button, array $frontendOptions)
@@ -98,6 +109,7 @@ class OptionsHelper
 
     /**
      * @param ButtonInterface $button
+     *
      * @return array
      */
     protected function createData(ButtonInterface $button)
@@ -116,6 +128,7 @@ class OptionsHelper
 
     /**
      * @param array $data
+     *
      * @return array
      */
     protected function normalizeTemplateData(array $data)

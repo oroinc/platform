@@ -345,7 +345,6 @@ services:
         arguments:
             - '@oro_workflow.registry'
             - '@oro_workflow.provider.transition_route'
-            - '@oro_entity.doctrine_helper'
         tags:
            - { name: oro.action.extension.button_provider, priority: 120 }
 

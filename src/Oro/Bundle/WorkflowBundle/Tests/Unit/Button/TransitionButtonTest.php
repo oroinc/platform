@@ -117,6 +117,7 @@ class TransitionButtonTest extends \PHPUnit_Framework_TestCase
                 'route' => $this->buttonContext->getRouteName(),
                 'datagrid' => $this->buttonContext->getDatagridName(),
                 'group' => $this->buttonContext->getGroup(),
+                'workflowItemId' => null
             ],
             'executionRoute' => $this->buttonContext->getExecutionRoute(),
             'dialogRoute' => null,

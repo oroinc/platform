@@ -10,6 +10,22 @@ class ButtonStub implements ButtonInterface
     const TITLE = 'Stub button title';
     const LABEL = 'Stub button label';
 
+    /** @var array */
+    protected $buttonOptions;
+
+    public function __construct(array $buttonOptions = [])
+    {
+        $this->buttonOptions = array_replace_recursive(
+            [
+                'name' => 'name',
+                'label' => 'Label',
+                'icon' => 'icon',
+                'translationDomain' => 'de_de'
+            ],
+            $buttonOptions
+        );
+    }
+
     /**
      * {@inheritdoc}
      */
@@ -54,34 +70,34 @@ class ButtonStub implements ButtonInterface
     }
 
     /**
-     * {@inheritdoc}
+     * @return string
      */
     public function getName()
     {
-        return 'test_name';
+        return $this->buttonOptions['name'];
     }
 
     /**
-     * {@inheritdoc}
+     * @return string
      */
     public function getLabel()
     {
-        return 'test label';
+        return $this->buttonOptions['label'];
     }
 
     /**
-     * {@inheritdoc}
+     * @return string
      */
     public function getIcon()
     {
-        return 'test_icon';
+        return $this->buttonOptions['icon'];
     }
 
     /**
-     * {@inheritdoc}
+     * @return string|null
      */
     public function getTranslationDomain()
     {
-        return 'test_domain';
+        return $this->buttonOptions['translationDomain'];
     }
 }

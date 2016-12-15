@@ -110,7 +110,7 @@ class OperationButton implements ButtonInterface
                 'frontendOptions' => $frontendOptions,
                 'buttonOptions' => $this->operation->getDefinition()->getButtonOptions(),
                 'hasForm' => $this->operation->hasForm(),
-                'showDialog' => !empty($frontendOptions['showDialog']),
+                'showDialog' => !empty($frontendOptions['show_dialog']),
                 'routeParams' => [
                     'operationName' => $this->operation->getName(),
                     'entityClass' => $this->buttonContext->getEntityClass(),

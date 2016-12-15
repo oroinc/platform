@@ -32,9 +32,6 @@ class TransitionButtonProviderExtensionTest extends \PHPUnit_Framework_TestCase
     /** @var RouteProviderInterface|\PHPUnit_Framework_MockObject_MockObject */
     protected $routeProvider;
 
-    /** @var DoctrineHelper|\PHPUnit_Framework_MockObject_MockObject */
-    protected $doctrineHelper;
-
     /** @var TransitionButtonProviderExtension */
     protected $extension;
 
@@ -45,15 +42,12 @@ class TransitionButtonProviderExtensionTest extends \PHPUnit_Framework_TestCase
     {
         $this->workflowRegistry = $this->getMockBuilder(WorkflowRegistry::class)
             ->disableOriginalConstructor()->getMock();
-        $this->doctrineHelper = $this->getMockBuilder(DoctrineHelper::class)
-            ->disableOriginalConstructor()->getMock();
 
         $this->routeProvider = $this->getMock(RouteProviderInterface::class);
 
         $this->extension = new TransitionButtonProviderExtension(
             $this->workflowRegistry,
-            $this->routeProvider,
-            $this->doctrineHelper
+            $this->routeProvider
         );
     }
 
@@ -191,17 +185,9 @@ class TransitionButtonProviderExtensionTest extends \PHPUnit_Framework_TestCase
      *
      * @param bool $expected
      * @param ButtonInterface $button
-     * @param WorkflowItem $workflowItem
      */
-    public function testIsAvailable($expected, ButtonInterface $button, WorkflowItem $workflowItem = null)
+    public function testIsAvailable($expected, ButtonInterface $button)
     {
-        $repo = $this->getMockBuilder(WorkflowItemRepository::class)
-            ->disableOriginalConstructor()->getMock();
-        $repo->expects($this->once())->method('findOneByEntityMetadata')->willReturn($workflowItem);
-
-        $this->doctrineHelper->expects($this->once())
-            ->method('getEntityRepositoryForClass')->willReturn($repo);
-
         $this->assertEquals($expected, $this->extension->isAvailable($button, new ButtonSearchContext()));
     }
 
@@ -210,7 +196,7 @@ class TransitionButtonProviderExtensionTest extends \PHPUnit_Framework_TestCase
      */
     public function isAvailableDataProvider()
     {
-        $createTransitionButton = function ($isAvailable) {
+        $createTransitionButton = function ($isAvailable, $isExistWorkflowItem = true) {
             $transition = $this->getMock(Transition::class);
             $transition->expects($this->any())
                 ->method('isStart')->willReturn(false);
@@ -219,6 +205,12 @@ class TransitionButtonProviderExtensionTest extends \PHPUnit_Framework_TestCase
                 ->disableOriginalConstructor()->getMock();
             $workflow->expects($this->any())->method('isTransitionAllowed')
                 ->willReturn($isAvailable);
+
+            if (true === $isExistWorkflowItem) {
+                $workflow->expects($this->once())
+                    ->method('getWorkflowItemByEntityId')
+                    ->willReturn($this->getMock(WorkflowItem::class));
+            }
 
             $button = $this->getMockBuilder(TransitionButton::class)
                 ->disableOriginalConstructor()->getMock();
@@ -231,21 +223,19 @@ class TransitionButtonProviderExtensionTest extends \PHPUnit_Framework_TestCase
         return [
             [
                 'expected' => false,
-                'button' => $createTransitionButton(true),
+                'button' => $createTransitionButton(true, false),
+            ],
+            [
+                'expected' => false,
+                'button' => $createTransitionButton(false, false),
             ],
             [
                 'expected' => false,
                 'button' => $createTransitionButton(false),
-            ],
-            [
-                'expected' => false,
-                'button' => $createTransitionButton(false),
-                'workflowItem' => $this->getMock(WorkflowItem::class)
             ],
             [
                 'expected' => true,
                 'button' => $createTransitionButton(true),
-                'workflowItem' => $this->getMock(WorkflowItem::class)
             ]
         ];
     }
