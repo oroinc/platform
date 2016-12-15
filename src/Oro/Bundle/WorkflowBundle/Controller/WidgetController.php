@@ -108,20 +108,22 @@ class WidgetController extends Controller
         $workflowItem = $workflow->createWorkflowItem($entity, $dataArray);
         $transitionForm = $this->getTransitionForm($workflowItem, $transition);
         $formOptions = $transition->getFormOptions();
-        $formAttributes = $workflowItem->getData()->getValues(
-            array_keys($formOptions['attribute_fields'])
-        );
+
+        $attributeNames = array_keys($formOptions['attribute_fields']);
 
         $saved = $this->get('oro_workflow.handler.transition.form')
-            ->handleTransitionForm($transitionForm, $formAttributes);
+            ->handleTransitionForm($transitionForm, $attributeNames);
 
         $data = null;
         if ($saved) {
+            $formAttributes = $transitionForm->getData()->getValues($attributeNames);
+
             $serializer = $this->get('oro_workflow.serializer.data.serializer');
             $serializer->setWorkflowName($workflow->getName());
             $data = $serializer->serialize(new WorkflowData(array_merge($formAttributes, $dataArray)), 'json');
             $response = $this->get('oro_workflow.handler.start_transition_handler')
                 ->handle($workflow, $transition, $data, $entity);
+
             if ($response) {
                 return $response;
             }

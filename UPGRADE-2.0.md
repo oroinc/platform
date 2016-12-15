@@ -778,7 +778,9 @@ placeholders:
 - The command `oro:email:update-email-owner-associations` (class `Oro/Bundle/EmailBundle/Command/UpdateEmailOwnerAssociationsCommand`) was removed. Produce message to the topic `oro.email.update_email_owner_association` or `oro.email.update_email_owner_associations` instead.
 
 ####EntityBundle
-- `oro_entity.abstract_repository` introduced. Please inherit all your doctrine repository factory services
+- Added possibility to define
+[entity repositories as a services](./src/Oro/Bundle/EntityBundle/Resources/doc/repositories_as_a_services.md)
+by the usage of `oro_entity.abstract_repository` as a parent service
 - `Oro\Bundle\EntityBundle\ORM\DatabaseDriverInterface::getName` introduced
 
 Before
@@ -878,6 +880,33 @@ to the [Fallback documentation](./src/Oro/Bundle/EntityBundle/Resources/doc/enti
 ####CalendarBundle
 - Constructor of `Oro\Bundle\CalendarBundle\Model\Email\EmailSendProcessor` was changed: the first argument type is `Oro\Bundle\NotificationBundle\Manager\EmailNotificationManager` instead of `Oro\Bundle\NotificationBundle\Processor\EmailNotificationProcessor`
 - CalendarBundle moved to a separate package
+- A new property `editableInvitationStatus` was added to the API of calendar events. This property is read-only and means that current API user is able to change invitation status of the event.
+- A new property `updateExceptions` was added to the API of calendar events. By default is FALSE. Passing TRUE value will trigger synchronization of exceptions of recurring calendar events. 
+- Deprecated property `invitedUsers` was removed from the API.
+- Renamed method `Oro\Bundle\CalendarBundle\Manager\CalendarEventManager::changeStatus` to `Oro\Bundle\CalendarBundle\Manager\CalendarEventManager::changeInvitationStatus`. Added a new argument to this method which represent a user instance.
+- Removed classes `Oro\Bundle\CalendarBundle\Exception\StatusNotFoundException` and `Oro\Bundle\CalendarBundle\Exception\CalendarEventRelatedAttendeeNotFoundException`. Added class `Oro\Bundle\CalendarBundle\Exception\ChangeInvitationStatusException` instead.
+- Removed constant `Oro\Bundle\CalendarBundle\Model\Recurrence::STRING_KEY`. New constant `Oro\Bundle\CalendarBundle\Entity\Repository\CalendarEventRepository::RECURRENCE_FIELD_PREFIX` is added instead.
+- Changed implementation of method `Oro\Bundle\CalendarBundle\Entity\Repository\CalendarEventRepository::getUserEventListQueryBuilder`. Item "relatedAttendeeUserId" added to SELECT, default value added for item "invitationStatus" in the SELECT.
+- Removed entity configuration with scope "security" from `Oro\Bundle\CalendarBundle\Entity\Attendee`.
+- Added support NULL value for entity field `Oro\Bundle\CalendarBundle\Entity\Attendee::$calendarEvent`.
+- Removed deprecated constants of `Oro\Bundle\CalendarBundle\Entity\CalendarEvent`: `NOT_RESPONDED`, `TENTATIVELY_ACCEPTED`, `ACCEPTED`, `DECLINED`.
+- Removed deprecation of method `Oro\Bundle\CalendarBundle\Entity\CalendarEvent::getInvitationStatus`.
+- Removed method `Oro\Bundle\CalendarBundle\Entity\CalendarEvent::getEventByAttendee`. Added method `Oro\Bundle\CalendarBundle\Entity\CalendarEvent::getChildEventByAttendee` instead.
+- Refactored form subscribers and event listeners in `Oro\Bundle\CalendarBundle\Form\EventListener`. Changed signature of constructors of these classes.
+- Removed class `Oro\Bundle\CalendarBundle\Form\\EventListener\ChildEventsSubscriber`. The logic was refactored moved to classes in `Oro\Bundle\CalendarBundle\Manager\CalendarEvent` namespace.
+- Refactored form handlers in `Oro\Bundle\CalendarBundle\Form\Handler` namespace. Changed signature of constructors of these classes.
+- Refactored form types in `Oro\Bundle\CalendarBundle\Form\Type`. Changed signature of constructors of these classes. 
+- Removed method `Oro\Bundle\CalendarBundle\Model\Recurrence\StrategyInterface::getValidationErrorMessage`. Added methods to the interface: `getMaxInterval`, `getIntervalMultipleOf`, `getRequiredProperties`. Removed method `Oro\Bundle\CalendarBundle\Model\Recurrence::getValidationErrorMessage`. 
+- Validation logic is moved from strategies to `Oro\Bundle\CalendarBundle\Validator\RecurrenceValidator`. Changed validation rules of entity `Oro\Bundle\CalendarBundle\Entity\Recurrence`.
+- Refactored normalizers in `Oro\Bundle\CalendarBundle\Provider`. Changed signature of the constructors. Protected methods were removedL `applyAdditionalData`, `applyPermissions`, `addAttendeesToCalendarEvents`.
+- Changed configuration of the grids `calendar-event-grid`. `base-system-calendar-event-grid`, `calendar-event-for-context-grid`.
+- Removed class `Oro\Bundle\CalendarBundle\Form\Type\ExceptionFormType`.
+- Updated view templates `OroCalendarBundle:CalendarEvent:view.html.twig` and `OroCalendarBundle:CalendarEvent:widget\info.html.twig`. Added property `canChangeInvitationStatus` into the templates which is passed from the respective controller action. 
+- Updated view template `OroCalendarBundle:CalendarEvent:update.html.twig`.
+- Updated view template `OroCalendarBundle:SystemCalendarEvent:update.html.twig`.
+- Updated view template My Calendar widget `OroCalendarBundle:::templates.html.twig`.
+- Updated macroses in `OroCalendarBundle::invitations.html.twig`: `calendar_event_invitation_status`, `calendar_event_invitation_action` (removed), `calendar_event_invitation_going_status` (added).
+- Removed template `OroCalendarBundle:CalendarEvent:widget\invitationButtons.html.twig`. A new widget to change invitation status added in `OroCalendarBundle:CalendarEvent:widget\invitationControl.html.twig` and JS module `orocalendar/js/app/views/change-status-view`.
 
 ####ReminderBundle
 - Constructor of `Oro\Bundle\ReminderBundle\Model\Email\EmailSendProcessor` was changed: the first argument type is `Oro\Bundle\NotificationBundle\Manager\EmailNotificationManager` instead of `Oro\Bundle\NotificationBundle\Processor\EmailNotificationProcessor`
@@ -928,9 +957,6 @@ to the [Fallback documentation](./src/Oro/Bundle/EntityBundle/Resources/doc/enti
 - The command `oro:imap:clear-mailbox` was removed. Produce message to the topic `oro.imap.clear_inactive_mailbox` instead.
 - Removed action `@job_add_dependency`
 
-####OroCalendarBundle
-- OroCalendarBundle moved to a separate package
-
 ####OroInstallerBundle
 - Added interface `Oro\Bundle\InstallerBundle\CacheWarmer\NamespaceMigrationProviderInterface`. it makes available add the rules for command "oro:platform:upgrade20"
 
@@ -942,3 +968,40 @@ to the [Fallback documentation](./src/Oro/Bundle/EntityBundle/Resources/doc/enti
 - `Oro\Bundle\CurrencyBundle\Config\CurrencyConfigInterface` was renamed to `Oro\Bundle\CurrencyBundle\Provider\CurrencyProviderInterface`
 - `Oro\Bundle\CurrencyBundle\Provider\CurrencyProviderInterface` extends `Oro\Bundle\CurrencyBundle\Provider\CurrencyListProviderInterface` and `Oro\Bundle\CurrencyBundle\Provider\DefaultCurrencyProviderInterface` 
 - `Oro\Bundle\CurrencyBundle\Config\CurrencyConfigManager` was renamed to `DefaultCurrencyConfigProvider`
+
+####OroNoteBundle
+- Implementation of activity list relation with entity  `Oro\Bundle\NoteBundle\Entity\Note` was changed. Now the entity is a regular activity entity like others: Email, Task, Call, Email, etc.
+
+Before
+- One Note could be related only to one entity in the Activity List.
+
+After
+- One Note could be related to many entities in the Activity List. Context field can be used to add Note to multiple entities.
+
+- Removed property `entityId` from SOAP API for entity `Oro\Bundle\NoteBundle\Entity\Note`.
+- Added use of `Oro\Bundle\ActivityBundle\Model\ActivityInterface` into class `Oro\Bundle\NoteBundle\Entity\Note`.
+- Removed methods from entity `Oro\Bundle\NoteBundle\Entity\Note`: `supportTarget`, `getTarget`, `setTarget`. Methods of `Oro\Bundle\ActivityBundle\Model\ActivityInterface` should be used to access target entities instead.
+- Removed extra classes and services were as unnecessary after Note entity became a regular activity entity. See detailed list of removed items below. 
+- Removed class `Oro\Bundle\NoteBundle\Migration\Extension\NoteExtension`. Generic extension `Oro\Bundle\ActivityBundle\Migration\Extension\ActivityExtension` is used to add relation of entity with Note as Activity.
+- Removed class `Oro\Bundle\NoteBundle\Migration\Extension\NoteExtensionAwareInterface`. Generic interface `\Oro\Bundle\ActivityBundle\Migration\Extension\ActivityExtensionAwareInterface` should be used instead in schema migrations.
+- Removed entity config with scope "note" after Note entity became a regular Activity entity.
+- Removed class `Oro\Bundle\NoteBundle\Placeholder\PlaceholderFilter` and service `oro_note.placeholder.filter`.
+- Removed class `Oro\Bundle\NoteBundle\Provider\NoteExclusionProvider` and service `oro_note.exclusion_provider`.
+- Removed class `Oro\Bundle\NoteBundle\Tools\NoteAssociationHelper` and service `oro_note.association_helper`.
+- Removed class `Oro\Bundle\NoteBundle\Tools\NoteEntityConfigDumperExtension` and service `oro_note.entity_config_dumper.extension`.
+- Removed class `Oro\Bundle\NoteBundle\Tools\NoteEntityGeneratorExtension` and service `oro_note.entity_generator.extension`.
+- Removed class `Oro\Bundle\NoteBundle\EventListener\MergeListener` and service `oro_note.listener.merge_listener`. Generic class `Oro\Bundle\ActivityListBundle\EventListener\MergeListener` applicable for activity entities now is used instead.
+- Removed class `Oro\Bundle\NoteBundle\Model\MergeModes`. Generic class `Oro\Bundle\ActivityListBundle\Model\MergeModes` applicable for activity entities now is used instead.
+- Removed class `Oro\Bundle\NoteBundle\Model\Strategy\ReplaceStrategy` and service `oro_note.strategy.replace`. Generic class `Oro\Bundle\ActivityListBundle\Model\Strategy\ReplaceStrategy` applicable for activity entities now is used instead.
+- Removed class `Oro\Bundle\NoteBundle\Model\Stratgy\UniteStrategy` and service `oro_note.strategy.unite`. Generic class `Oro\Bundle\ActivityListBundle\Model\Strategy\UniteStrategy` applicable for activity entities now is used instead.
+- Removed service `oro_note.widget_provider.actions`.
+- Added parameter `renderContexts` to route controller action `Oro\Bundle\NoteBundle\Controller\Note::infoAction` (route `oro_note_widget_info`). Default value of the parameter is `true`. 
+- Changed signature of controller action `Oro\Bundle\NoteBundle\Controller\Note::createAction`. The parameters of route `oro_note_create` remain the same as before - `entityClass` and `entityId`.
+- Changed signature of method `Oro\Bundle\NoteBundle\Form\Handler\NoteHandler::__construct`.
+- Changed signature of method `Oro\Bundle\NoteBundle\Provider\NoteActivityListProvider::__construct`.
+- Replaced method `Oro\Bundle\NoteBundle\Form\Type\NoteType::setDefaultOptions` with `Oro\Bundle\NoteBundle\Form\Type\NoteType::configureOptions`.
+- Changed view template `OroNoteBundle:Note:js/activityItemTemplate.html.twig`. 
+- Changed view template `OroNoteBundle:Note:widget/info.html.twig`.
+- Removed parameter `oro_note.manager.api.class` from DIC.
+- Removed parameter `oro_note.activity_list.provider.class` from DIC.
+- Removed parameter `oro_note.manager.class` from DIC.

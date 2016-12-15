@@ -180,15 +180,12 @@ class WorkflowManager implements LoggerAwareInterface
             return null;
         }
 
-        $transitionManager = $workflow->getTransitionManager();
         if (!$transition) {
-            $transition = $transitionManager->getDefaultStartTransition();
+            $transition = $workflow->getTransitionManager()->getDefaultStartTransition();
 
             if (!$workflow->isStartTransitionAvailable($transition, $entity)) {
                 return null;
             }
-        } elseif (is_string($transition)) {
-            $transition = $transitionManager->getTransition($transition);
         }
 
         if ($this->doctrineHelper->getSingleEntityIdentifier($entity) !== null &&

@@ -28,10 +28,6 @@ define([
             return function(response) {
                 pageRefresh = _.isUndefined(pageRefresh) ? true : pageRefresh;
 
-                if (pageRefresh) {
-                    mediator.execute('hideLoading');
-                }
-
                 function doRedirect(redirectUrl) {
                     mediator.execute('redirectTo', {url: redirectUrl});
                 }

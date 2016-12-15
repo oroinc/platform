@@ -166,6 +166,20 @@ class Workflow
         $workflowItem = $this->createWorkflowItem($entity, $data);
         $this->transit($workflowItem, $startTransition);
 
+        // transition started without related entity, workflow item must be created for specified entity
+        if (!$this->doctrineHelper->getSingleEntityIdentifier($entity)) {
+            $currentEntity = $workflowItem->getData()->get($this->getDefinition()->getEntityAttributeName());
+            $entityClass = $this->doctrineHelper->getEntityClass($currentEntity);
+            $entityId = $this->doctrineHelper->getSingleEntityIdentifier($currentEntity);
+
+            // find existing workflow item, if transition autostarted inside transit, data will be updated
+            if (null === ($currentItem = $this->findWorkflowItem($entityClass, $entityId))) {
+                $currentItem = $this->createWorkflowItem($currentEntity, $data);
+            }
+
+            return $currentItem->merge($workflowItem);
+        }
+
         return $workflowItem;
     }
 
@@ -275,6 +289,26 @@ class Workflow
     }
 
     /**
+     * @param string $entityClass
+     * @param int|string $entityId
+     * @return null|WorkflowItem
+     */
+    protected function findWorkflowItem($entityClass, $entityId)
+    {
+        if (null === $entityId) {
+            return null;
+        }
+
+        $repo = $this->doctrineHelper->getEntityRepositoryForClass(WorkflowItem::class);
+
+        return $repo->findOneBy([
+            'workflowName' => $this->getName(),
+            'entityId' => $entityId,
+            'entityClass' => $entityClass
+        ]);
+    }
+
+    /**
      * Create workflow item.
      *
      * @param object $entity
@@ -286,19 +320,9 @@ class Workflow
     {
         $entityAttributeName = $this->attributeManager->getEntityAttribute()->getName();
 
-        $repo = $this->doctrineHelper->getEntityRepositoryForClass('Oro\Bundle\WorkflowBundle\Entity\WorkflowItem');
-
-        $workflowItem = null;
         $entityClass = $this->doctrineHelper->getEntityClass($entity);
         $entityId = $this->doctrineHelper->getSingleEntityIdentifier($entity);
-
-        if ($entityId !== null) {
-            $workflowItem = $repo->findOneBy([
-                'workflowName' => $this->getName(),
-                'entityId' => $entityId,
-                'entityClass' => $entityClass
-            ]);
-        }
+        $workflowItem = $this->findWorkflowItem($entityClass, $entityId);
 
         if (!$workflowItem) {
             $workflowItem = new WorkflowItem();
