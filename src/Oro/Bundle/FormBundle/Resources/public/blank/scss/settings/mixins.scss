@@ -44,6 +44,8 @@
 
         user-select: none;
 
+        box-sizing: border-box;
+
         &--full,
         &.full {
             width: 100%;
