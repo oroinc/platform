@@ -50,16 +50,6 @@
                     widget.remove();
                 };
 
-                widget.getAction('form_submit', 'adopted', function(action) {
-                    action.on('click', function() {
-                        Messenger.notificationFlashMessage(
-                            'success',
-                            __('oro.importexport.import_validation.starting.message')
-                        );
-
-                        widget.hide();
-                    });
-                });
             });
         });
     </script>

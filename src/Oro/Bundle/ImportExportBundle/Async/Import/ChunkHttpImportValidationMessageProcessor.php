@@ -8,7 +8,7 @@ class ChunkHttpImportValidationMessageProcessor extends AbstractChunkImportMessa
 {
     protected function processData(array $body)
     {
-        $this->httpImportHandler->setImportingFileName($body['fileName']);
+        $this->httpImportHandler->setImportingFileName($body['filePath']);
 
         return $this->httpImportHandler->handleImportValidation(
             $body['jobName'],
@@ -25,7 +25,7 @@ class ChunkHttpImportValidationMessageProcessor extends AbstractChunkImportMessa
                      Info: %s.
                      Errors url: %s.
                      Errors: %s',
-            $data['fileName'],
+            $data['filePath'],
             $data['entityName'],
             $data['success'] ? 'true' : 'false',
             json_encode($data['counts']),
