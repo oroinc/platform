@@ -248,7 +248,7 @@ services:
             # custom types
             - [addExtendTypeMapping, ["percent", "oro_percent"]]
             - [addExtendTypeMapping, ["money", "oro_money"]]
-            - [addExtendTypeMapping, ["boolean", "choice"]] # extended boolean fields should be choice type
+            - [addExtendTypeMapping, ["boolean", "oro_choice"]]
 
             - [addExtendTypeMapping, ["file", "oro_file"]]
             - [addExtendTypeMapping, ["image", "oro_image"]]
