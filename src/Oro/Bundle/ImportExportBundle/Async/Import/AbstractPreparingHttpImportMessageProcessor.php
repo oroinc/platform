@@ -1,8 +1,12 @@
 <?php
 namespace Oro\Bundle\ImportExportBundle\Async\Import;
 
-use Oro\Bundle\ImportExportBundle\File\SplitterCsvFile;
+use Psr\Log\LoggerInterface;
 
+use Symfony\Bridge\Doctrine\RegistryInterface;
+
+use Oro\Bundle\ImportExportBundle\Async\Topics;
+use Oro\Bundle\ImportExportBundle\File\SplitterCsvFile;
 use Oro\Bundle\ImportExportBundle\Handler\HttpImportHandler;
 use Oro\Bundle\ImportExportBundle\Job\JobExecutor;
 use Oro\Bundle\UserBundle\Entity\User;
@@ -10,18 +14,15 @@ use Oro\Component\MessageQueue\Client\MessageProducerInterface;
 use Oro\Component\MessageQueue\Client\TopicSubscriberInterface;
 use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
 use Oro\Component\MessageQueue\Job\DependentJobService;
+use Oro\Component\MessageQueue\Job\Job;
 use Oro\Component\MessageQueue\Job\JobRunner;
 use Oro\Component\MessageQueue\Transport\MessageInterface;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
 use Oro\Component\MessageQueue\Util\JSON;
-use Psr\Log\LoggerInterface;
-use Symfony\Bridge\Doctrine\RegistryInterface;
-use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
-use Oro\Component\MessageQueue\Job\Job;
-use Oro\Bundle\ImportExportBundle\Async\Topics;
 
 abstract class AbstractPreparingHttpImportMessageProcessor implements
-    MessageProcessorInterface, TopicSubscriberInterface
+    MessageProcessorInterface,
+    TopicSubscriberInterface
 {
     /**
      * @var HttpImportHandler
