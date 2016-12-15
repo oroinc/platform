@@ -9,7 +9,7 @@ use Oro\Bundle\ActionBundle\Model\Attribute;
 use Oro\Bundle\WorkflowBundle\Configuration\WorkflowConfiguration;
 use Oro\Bundle\WorkflowBundle\Form\Type\WorkflowTransitionType;
 
-use Oro\Component\Action\Action\ActionFactory;
+use Oro\Component\Action\Action\ActionFactoryInterface;
 use Oro\Component\Action\Action\Configurable as ConfigurableAction;
 use Oro\Component\Action\Condition\Configurable as ConfigurableCondition;
 use Oro\Component\Action\Exception\AssemblerException;
@@ -29,19 +29,19 @@ class TransitionAssembler extends BaseAbstractAssembler
     protected $conditionFactory;
 
     /**
-     * @var ActionFactory
+     * @var ActionFactoryInterface
      */
     protected $actionFactory;
 
     /**
      * @param FormOptionsAssembler $formOptionsAssembler
      * @param ConditionFactory $conditionFactory
-     * @param ActionFactory $actionFactory
+     * @param ActionFactoryInterface $actionFactory
      */
     public function __construct(
         FormOptionsAssembler $formOptionsAssembler,
         ConditionFactory $conditionFactory,
-        ActionFactory $actionFactory
+        ActionFactoryInterface $actionFactory
     ) {
         $this->formOptionsAssembler = $formOptionsAssembler;
         $this->conditionFactory = $conditionFactory;
@@ -132,14 +132,18 @@ class TransitionAssembler extends BaseAbstractAssembler
                 $this->getOption($options, 'display_type', WorkflowConfiguration::DEFAULT_TRANSITION_DISPLAY_TYPE)
             )
             ->setPageTemplate($this->getOption($options, 'page_template'))
-            ->setDialogTemplate($this->getOption($options, 'dialog_template'));
+            ->setDialogTemplate($this->getOption($options, 'dialog_template'))
+            ->setInitEntities($this->getOption($options, WorkflowConfiguration::NODE_INIT_ENTITIES, []))
+            ->setInitRoutes($this->getOption($options, WorkflowConfiguration::NODE_INIT_ROUTES, []))
+            ->setInitContextAttribute($this->getOption($options, WorkflowConfiguration::NODE_INIT_CONTEXT_ATTRIBUTE));
 
         if (!empty($definition['preactions'])) {
             $preAction = $this->actionFactory->create(ConfigurableAction::ALIAS, $definition['preactions']);
             $transition->setPreAction($preAction);
         }
 
-        $definition['preconditions'] = $this->addAclPreConditions($options, $definition);
+        $definition['preconditions'] = $this->addAclPreConditions($options, $definition, $name);
+
         if (!empty($definition['preconditions'])) {
             $condition = $this->conditionFactory->create(ConfigurableCondition::ALIAS, $definition['preconditions']);
             $transition->setPreCondition($condition);
@@ -167,35 +171,62 @@ class TransitionAssembler extends BaseAbstractAssembler
     }
 
     /**
-     * @param array $options
-     * @param array $definition
+     * @param array  $options
+     * @param array  $definition
+     * @param string $transitionName
      * @return array
      */
-    protected function addAclPreConditions(array $options, array $definition)
+    protected function addAclPreConditions(array $options, array $definition, $transitionName)
     {
         $aclResource = $this->getOption($options, 'acl_resource');
 
         if ($aclResource) {
-            $aclPreConditionDefinition = array('parameters' => array($aclResource));
+            $aclPreConditionDefinition = ['parameters' => [$aclResource]];
             $aclMessage = $this->getOption($options, 'acl_message');
             if ($aclMessage) {
                 $aclPreConditionDefinition['message'] = $aclMessage;
             }
-            $aclPreCondition = array('@acl_granted' => $aclPreConditionDefinition);
+
+            /**
+             * @see AclGranted
+             */
+            $aclPreCondition = ['@acl_granted' => $aclPreConditionDefinition];
 
             if (empty($definition['preconditions'])) {
                 $definition['preconditions'] = $aclPreCondition;
             } else {
-                $definition['preconditions'] = array(
-                    '@and' => array(
+                $definition['preconditions'] = [
+                    '@and' => [
                         $aclPreCondition,
                         $definition['preconditions']
-                    )
-                );
+                    ]
+                ];
             }
         }
 
-        return !empty($definition['preconditions']) ? $definition['preconditions'] : array();
+        /**
+         * @see IsGrantedWorkflowTransition
+         */
+        $precondition = [
+            '@is_granted_workflow_transition' => [
+                'parameters' => [
+                    $transitionName,
+                    $this->getOption($options, 'step_to')
+                ]
+            ]
+        ];
+        if (empty($definition['preconditions'])) {
+            $definition['preconditions'] = $precondition;
+        } else {
+            $definition['preconditions'] = [
+                '@and' => [
+                    $precondition,
+                    $definition['preconditions']
+                ]
+            ];
+        }
+
+        return !empty($definition['preconditions']) ? $definition['preconditions'] : [];
     }
 
     /**

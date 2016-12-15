@@ -380,4 +380,13 @@ class EntityReaderTest extends \PHPUnit_Framework_TestCase
 
         return $stepExecution;
     }
+
+    public function testSetNullIterator()
+    {
+        $iterator = $this->getMock('\Iterator');
+        $this->reader->setSourceIterator($iterator);
+        $this->assertSame($iterator, $this->reader->getSourceIterator());
+        $this->reader->setSourceIterator();
+        $this->assertNull($this->reader->getSourceIterator());
+    }
 }

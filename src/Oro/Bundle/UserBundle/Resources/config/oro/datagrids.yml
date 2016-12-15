@@ -137,14 +137,14 @@ datagrids:
                 type:          navigate
                 label:         oro.grid.action.view
                 link:          view_link
-                icon:          eye-open
+                icon:          eye
                 acl_resource:  oro_user_user_view
                 rowAction:     true
             update:
                 type:          navigate
                 label:         oro.grid.action.update
                 link:          update_link
-                icon:          edit
+                icon:          pencil-square-o
                 acl_resource:  oro_user_user_update
             config:
                 type:          navigate
@@ -156,7 +156,7 @@ datagrids:
                 type:          delete
                 label:         oro.grid.action.delete
                 link:          delete_link
-                icon:          trash
+                icon:          trash-o
                 acl_resource:  oro_user_user_delete
 
     groups-grid:
@@ -196,14 +196,14 @@ datagrids:
                 type:          navigate
                 label:         oro.grid.action.update
                 link:          update_link
-                icon:          edit
+                icon:          pencil-square-o
                 acl_resource:  oro_user_group_update
                 rowAction:     true
             delete:
                 type:          delete
                 label:         oro.grid.action.delete
                 link:          delete_link
-                icon:          trash
+                icon:          trash-o
                 acl_resource:  oro_user_group_delete
 
         sorters:
@@ -265,19 +265,19 @@ datagrids:
                 type:          navigate
                 label:         oro.grid.action.view
                 link:          view_link
-                icon:          eye-open
+                icon:          eye
                 rowAction:     true
             update:
                 type:          navigate
                 label:         oro.grid.action.update
                 link:          update_link
-                icon:          edit
+                icon:          pencil-square-o
                 acl_resource:  oro_user_role_update
             delete:
                 type:          delete
                 label:         oro.grid.action.delete
                 link:          delete_link
-                icon:          trash
+                icon:          trash-o
                 acl_resource:  oro_user_role_delete
 
         action_configuration: "@oro_user.role.datagrid_helper->getActionConfigurationClosure"
@@ -409,40 +409,40 @@ datagrids:
                     excluded: '#roleRemoveUsers'
 
     role-permission-grid:
-            acl_resource: oro_user_role_update
-            source:
-                type: role-permission-provider
-            columns:
-                entity:
-                    label: "Entity"
-                    data_name: entity
-                    frontend_type: string
-                    translatable: true
-                permissions:
-                    label: "Permissions"
-                    data_name: permissions
-                    frontend_type: action-permissions
-                identity:
-                    data_name: identity
-                    frontend_type: string
-                    renderable: false
-                group:
-                    data_name: group
-                    frontend_type: string
-                    renderable: false
-                fields:
-                    data_name: fields
-                    frontend_type: array
-                    renderable: false
-            filters: ~
-            sorters: ~
-            options:
-                requireJSModules:
-                    - orouser/js/datagrid/roles-datagrid-builder
-                toolbarOptions:
-                    placement:
-                        top: false
-                        bottom: false
+        acl_resource: oro_user_role_update
+        source:
+            type: role-permission-provider
+        columns:
+            label:
+                label: "Entity"
+                data_name: label
+                frontend_type: string
+                translatable: true
+            permissions:
+                label: "Permissions"
+                data_name: permissions
+                frontend_type: action-permissions
+            identity:
+                data_name: identity
+                frontend_type: string
+                renderable: false
+            group:
+                data_name: group
+                frontend_type: string
+                renderable: false
+            fields:
+                data_name: fields
+                frontend_type: array
+                renderable: false
+        filters: ~
+        sorters: ~
+        options:
+            requireJSModules:
+                - orouser/js/datagrid/roles-datagrid-builder
+            toolbarOptions:
+                placement:
+                    top: false
+                    bottom: false
 
     group-users-grid:
         extends: user-relation-grid

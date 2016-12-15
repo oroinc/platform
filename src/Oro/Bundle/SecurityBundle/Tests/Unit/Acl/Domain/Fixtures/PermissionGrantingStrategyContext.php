@@ -58,7 +58,7 @@ class PermissionGrantingStrategyContext implements PermissionGrantingStrategyCon
         $this->oneShotIsGrantedObserver = $observer;
     }
 
-    public function setTriggeredMask($mask)
+    public function setTriggeredMask($mask, $accessLevel)
     {
     }
 }

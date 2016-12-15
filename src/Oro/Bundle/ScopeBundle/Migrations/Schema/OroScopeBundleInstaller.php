@@ -15,7 +15,7 @@ class OroScopeBundleInstaller implements Installation
      */
     public function getMigrationVersion()
     {
-        return 'v1.0';
+        return 'v1_0';
     }
 
     /**

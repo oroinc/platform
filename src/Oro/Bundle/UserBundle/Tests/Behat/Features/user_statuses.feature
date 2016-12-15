@@ -1,3 +1,5 @@
+@skip
+# todo: unskip this feature while resolve BAP-12862
 Feature: User statuses
   In order to allow or deny users to login
   As Administrator

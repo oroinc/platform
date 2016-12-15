@@ -166,7 +166,7 @@ class Configuration implements ConfigurationInterface
                                             ->cannotBeEmpty()
                                         ->end()
                                         ->scalarNode('icon')
-                                            ->info('The name of item icon. Use only icon name without "icon-" prefix')
+                                            ->info('The name of item icon. Use only icon name without "fa-" prefix')
                                             ->cannotBeEmpty()
                                         ->end()
                                         ->scalarNode('class')

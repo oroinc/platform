@@ -150,6 +150,7 @@ oro:
             user.label: User
             notify.label: Notify
             notification_error: Error while sending impersonation notification
+            ip_address.label: IP Address
 
         # extended field added in migrations
         title.label:                 Title

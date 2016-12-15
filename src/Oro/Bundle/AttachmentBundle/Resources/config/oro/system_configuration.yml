@@ -1,7 +1,7 @@
 system_configuration:
     groups:
         attachment_settings:
-            icon:   icon-file
+            icon:   fa-file
             title:  oro.attachment.config.attachment.label
         attachment_mime_types_settings:
             title:  oro.attachment.config.mime_types.label

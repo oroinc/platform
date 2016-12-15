@@ -93,7 +93,7 @@
             <div id="alerts">
                 {% if errors is defined and errors|length > 0 %}
                     <div class="alert fade in alert-error">
-                        <i class="icon icon-error"></i>
+                        <i class="fa-error"></i>
                         {{ 'oro.distribution.messages.unexpected_error'|trans }}:
                         <ul>
                             {% for error in errors %}
@@ -104,7 +104,7 @@
                 {% endif %}
                 {% if notWritableSystemPaths|length > 0 %}
                     <div class="alert fade in alert-notice">
-                        <i class="icon icon-info-sign"></i>
+                        <i class="fa-info-circle"></i>
                         {{ 'oro.distribution.messages.not_writable'|trans }}:
                         <ul>
                             {% for path in notWritableSystemPaths %}

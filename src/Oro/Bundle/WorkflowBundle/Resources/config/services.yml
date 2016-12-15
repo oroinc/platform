@@ -144,6 +144,12 @@ services:
             - '@oro_workflow.handler.transition_helper'
             - '@oro_featuretoggle.checker.feature_checker'
 
+    oro_workflow.handler.transition.form:
+        class: 'Oro\Bundle\WorkflowBundle\Form\Handler\TransitionFormHandler'
+        arguments:
+            - '@request_stack'
+            - '@oro_entity.doctrine_helper'
+
     oro_workflow.validation_loader:
         class: 'Oro\Bundle\WorkflowBundle\Validator\WorkflowValidationLoader'
         public: false
@@ -227,6 +233,14 @@ services:
         public: false
         arguments:
             - '@oro_workflow.manager'
+
+    oro_workflow.data_helper:
+        class: 'Oro\Bundle\WorkflowBundle\Helper\WorkflowDataHelper'
+        arguments:
+            - '@oro_workflow.manager'
+            - '@oro_security.security_facade'
+            - '@translator'
+            - '@router'
 
     oro_workflow.helper.transition_cron_trigger:
         class: 'Oro\Bundle\WorkflowBundle\Helper\TransitionCronTriggerHelper'
@@ -318,6 +332,14 @@ services:
         tags:
             - { name: oro_translation.extension.translation_context_resolver }
 
+    oro_workflow.extension.transition_button_provider:
+        class: 'Oro\Bundle\WorkflowBundle\Extension\TransitionButtonProviderExtension'
+        arguments:
+            - '@oro_workflow.registry'
+            - '@oro_workflow.provider.route'
+        tags:
+           - { name: oro.action.extension.button_provider, priority: 110 }
+
     oro_workflow.translation.key_template_parameters_resolver:
         class: 'Oro\Bundle\WorkflowBundle\Translation\KeyTemplateParametersResolver'
         arguments:
@@ -357,3 +379,28 @@ services:
             - '@logger'
         tags:
             - { name: monolog.logger, channel: oro_workflow }
+
+    oro_workflow.provider.route:
+        class: 'Oro\Bundle\ActionBundle\Provider\RouteProvider'
+        arguments:
+            - 'oro_workflow_widget_start_transition_form'
+            - 'oro_workflow_start_transition_form'
+            - 'oro_api_workflow_start'
+
+    oro_workflow.operation_registry.filter:
+        class: Oro\Bundle\WorkflowBundle\Filter\WorkflowOperationFilter
+        arguments:
+            - '@doctrine'
+        tags:
+            - { name: oro_action.operation_registry.filter }
+
+    oro_workflow.transition_data.provider:
+        class: 'Oro\Bundle\WorkflowBundle\Provider\TransitionDataProvider'
+        arguments:
+            - '@oro_workflow.manager'
+
+    oro_workflow.workflow_data.provider:
+        class: 'Oro\Bundle\WorkflowBundle\Provider\WorkflowDataProvider'
+        arguments:
+            - '@oro_workflow.manager'
+            - '@oro_workflow.transition_data.provider'
