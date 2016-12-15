@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Form\Extension;
+namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Form\Handler;
 
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\UnitOfWork;
@@ -11,6 +11,7 @@ use Symfony\Component\HttpFoundation\RequestStack;
 
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\WorkflowBundle\Form\Handler\TransitionFormHandler;
+use Oro\Bundle\WorkflowBundle\Model\WorkflowData;
 
 class TransitionFormHandlerTest extends \PHPUnit_Framework_TestCase
 {
@@ -34,32 +35,19 @@ class TransitionFormHandlerTest extends \PHPUnit_Framework_TestCase
      */
     protected function setUp()
     {
-        $requestStack = $this->getMockBuilder(RequestStack::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->request = $this->getMockBuilder(Request::class)->disableOriginalConstructor()->getMock();
 
-        $this->request =  $this->getMockBuilder(Request::class)
-            ->disableOriginalConstructor()->getMock();
+        $requestStack = $this->getMockBuilder(RequestStack::class)->disableOriginalConstructor()->getMock();
+        $requestStack->expects($this->once())->method('getCurrentRequest')->willReturn($this->request);
 
-        $requestStack->expects($this->once())
-            ->method('getCurrentRequest')
-            ->willReturn($this->request);
+        $this->unitOfWork = $this->getMockBuilder(UnitOfWork::class)->disableOriginalConstructor()->getMock();
 
-        $this->unitOfWork = $this->getMockBuilder(UnitOfWork::class)
-            ->disableOriginalConstructor()->getMock();
+        $this->entityManager = $this->getMockBuilder(EntityManager::class)->disableOriginalConstructor()->getMock();
+        $this->entityManager->expects($this->any())->method('getUnitOfWork')->willReturn($this->unitOfWork);
+        $this->entityManager->expects($this->any())->method('isManageableEntity')->willReturn(true);
 
-        $this->entityManager = $this->getMockBuilder(EntityManager::class)
-            ->disableOriginalConstructor()->getMock();
-        $this->entityManager->expects($this->any())
-            ->method('getUnitOfWork')
-            ->willReturn($this->unitOfWork);
-        $this->entityManager->expects($this->any())
-            ->method('isManageableEntity')->willReturn(true);
-
-        $this->doctrineHelper = $this->getMockBuilder(DoctrineHelper::class)
-            ->disableOriginalConstructor()->getMock();
-        $this->doctrineHelper->expects($this->any())->method('getEntityManager')
-            ->willReturn($this->entityManager);
+        $this->doctrineHelper = $this->getMockBuilder(DoctrineHelper::class)->disableOriginalConstructor()->getMock();
+        $this->doctrineHelper->expects($this->any())->method('getEntityManager')->willReturn($this->entityManager);
 
         $this->formHandler = new TransitionFormHandler($requestStack, $this->doctrineHelper);
     }
@@ -71,7 +59,7 @@ class TransitionFormHandlerTest extends \PHPUnit_Framework_TestCase
      *
      * @dataProvider formDataProvider
      */
-    public function testHandlerRequest($result, $isMethod, $isValid = false)
+    public function testHandleRequest($result, $isMethod, $isValid = false)
     {
         $this->request->expects($this->once())->method('isMethod')
             ->with('POST')
@@ -83,11 +71,10 @@ class TransitionFormHandlerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return array
+     * @return \Generator
      */
     public function formDataProvider()
     {
-
         yield 'testSubmitWhenMethodIsNotPost' => [
             'result' => false,
             'isMethod' => false,
@@ -108,6 +95,7 @@ class TransitionFormHandlerTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @param bool $isFlush
+     * @param array $formAttributes
      * @param bool $isInIdentityMap
      * @param bool $isScheduled
      * @param array $formAttributes
@@ -116,26 +104,23 @@ class TransitionFormHandlerTest extends \PHPUnit_Framework_TestCase
      */
     public function testFlushAttribute($isFlush, array $formAttributes, $isInIdentityMap = true, $isScheduled = false)
     {
-        $this->request->expects($this->once())->method('isMethod')
-            ->with('POST')
-            ->willReturn(true);
+        $this->request->expects($this->once())->method('isMethod')->with('POST')->willReturn(true);
 
-        $form = $this->createTransitionForm(true, true);
-        $this->unitOfWork->expects($this->any())->method('isInIdentityMap')
-            ->willReturn($isInIdentityMap);
-        $this->unitOfWork->expects($this->any())->method('isScheduledForInsert')
-            ->willReturn($isScheduled);
-        $this->doctrineHelper->expects($this->any())
-            ->method('isManageableEntity')->willReturn(true);
+        $this->unitOfWork->expects($this->any())->method('isInIdentityMap')->willReturn($isInIdentityMap);
+        $this->unitOfWork->expects($this->any())->method('isScheduledForInsert')->willReturn($isScheduled);
+
+        $this->doctrineHelper->expects($this->any())->method('isManageableEntity')->willReturn(true);
 
         $expected = $isFlush ? $this->once() : $this->never();
         $this->entityManager->expects(clone $expected)->method('persist');
         $this->entityManager->expects(clone $expected)->method('flush');
-        $this->assertSame(true, $this->formHandler->handleTransitionForm($form, $formAttributes));
+
+        $form = $this->createTransitionForm(true, true, $formAttributes);
+        $this->assertTrue($this->formHandler->handleTransitionForm($form, array_keys($formAttributes)));
     }
 
     /**
-     * @return array
+     * @return \Generator
      */
     public function formAttributesDataProvider()
     {
@@ -173,10 +158,11 @@ class TransitionFormHandlerTest extends \PHPUnit_Framework_TestCase
     /**
      * @param bool $submit
      * @param bool $isValid
+     * @param array $attributes
      *
      * @return Form|\PHPUnit_Framework_MockObject_MockObject
      */
-    private function createTransitionForm($submit, $isValid = true)
+    private function createTransitionForm($submit, $isValid = true, array $attributes = [])
     {
         $form = $this->getMockBuilder(Form::class)
             ->disableOriginalConstructor()->getMock();
@@ -184,6 +170,8 @@ class TransitionFormHandlerTest extends \PHPUnit_Framework_TestCase
             ->method('submit');
         $form->expects($submit ? $this->once() : $this->never())
             ->method('isValid')->willReturn($isValid);
+        $form->expects($isValid ? $this->atLeastOnce() : $this->never())
+            ->method('getData')->willReturn(new WorkflowData($attributes));
 
         return $form;
     }
