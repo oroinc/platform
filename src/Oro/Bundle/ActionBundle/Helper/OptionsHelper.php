@@ -74,18 +74,17 @@ class OptionsHelper
         if ($data['hasForm']) {
             $dialogUrl = $this->router->generate($data['dialogRoute'], $data['routeParams']);
 
-            $options = array_merge($options, [
-                'dialogOptions' => [
-                    'title' => $this->getTitle(
-                        $button,
-                        $frontendOptions
-                    ),
-                    'dialogOptions' => !empty($frontendOptions['options']) ? $frontendOptions['options'] : []
-                ],
-                'executionUrl' => $executionUrl,
-                'dialogUrl' => $dialogUrl,
-                'url' => $dialogUrl,
-            ]);
+            $options = array_merge(
+                $options,
+                [
+                    'dialogOptions' => [
+                        'title' => $this->getTitle($button, $frontendOptions),
+                        'dialogOptions' => !empty($frontendOptions['options']) ? $frontendOptions['options'] : []
+                    ],
+                    'dialogUrl' => $dialogUrl,
+                    'url' => $dialogUrl,
+                ]
+            );
         }
 
         $this->addOption($options, $frontendOptions, 'confirmation');

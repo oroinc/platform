@@ -299,13 +299,10 @@ class Workflow
             return null;
         }
 
+        /** @var WorkflowItemRepository $repo */
         $repo = $this->doctrineHelper->getEntityRepositoryForClass(WorkflowItem::class);
 
-        return $repo->findOneBy([
-            'workflowName' => $this->getName(),
-            'entityId' => $entityId,
-            'entityClass' => $entityClass
-        ]);
+        return $repo->findOneByEntityMetadata($entityClass, $entityId, $this->getName());
     }
 
     /**
@@ -352,13 +349,7 @@ class Workflow
      */
     public function getWorkflowItemByEntityId($entityId)
     {
-        /** @var WorkflowItemRepository $repo */
-        $repository = $this->doctrineHelper->getEntityRepositoryForClass(WorkflowItem::class);
-        return $repository->findOneByEntityMetadata(
-            $this->getDefinition()->getRelatedEntity(),
-            $entityId,
-            $this->getName()
-        );
+        return $this->findWorkflowItem($this->getDefinition()->getRelatedEntity(), $entityId);
     }
 
     /**

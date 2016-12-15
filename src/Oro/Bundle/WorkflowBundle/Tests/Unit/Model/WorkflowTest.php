@@ -17,7 +17,6 @@ use Oro\Bundle\WorkflowBundle\Model\TransitionManager;
 use Oro\Bundle\WorkflowBundle\Model\Workflow;
 use Oro\Bundle\WorkflowBundle\Model\Step;
 use Oro\Bundle\WorkflowBundle\Model\Transition;
-use Oro\Bundle\WorkflowBundle\Entity\Repository\WorkflowItemRepository;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowTransitionRecord;
 use Oro\Bundle\WorkflowBundle\Exception\InvalidTransitionException;
@@ -26,6 +25,7 @@ use Oro\Bundle\WorkflowBundle\Tests\Unit\Model\Stub\EntityWithWorkflow;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ * @SuppressWarnings(PHPMD.TooManyMethods)
  */
 class WorkflowTest extends \PHPUnit_Framework_TestCase
 {
@@ -961,7 +961,6 @@ class WorkflowTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($data, $workflow->getInitDatagrids());
     }
 
-
     public function testGetWorkflowItemByEntityId()
     {
         $workflow = $this->createWorkflow('test_workflow');
@@ -984,7 +983,7 @@ class WorkflowTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($entity, $workflow->getWorkflowItemByEntityId(10));
     }
 
-        /**
+    /**
      * @param object $entity
      * @param string $workflowName
      */
@@ -997,8 +996,8 @@ class WorkflowTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
         $repository->expects($this->once())
-            ->method('findOneBy')
-            ->with(['workflowName' => $workflowName, 'entityId' => $entityId, 'entityClass' => $entityClass])
+            ->method('findOneByEntityMetadata')
+            ->with($entityClass, $entityId, $workflowName)
             ->willReturn(null);
 
         $this->doctrineHelper->expects($this->once())
