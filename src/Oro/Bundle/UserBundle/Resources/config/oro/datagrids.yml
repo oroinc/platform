@@ -137,14 +137,14 @@ datagrids:
                 type:          navigate
                 label:         oro.grid.action.view
                 link:          view_link
-                icon:          eye-open
+                icon:          eye
                 acl_resource:  oro_user_user_view
                 rowAction:     true
             update:
                 type:          navigate
                 label:         oro.grid.action.update
                 link:          update_link
-                icon:          edit
+                icon:          pencil-square-o
                 acl_resource:  oro_user_user_update
             config:
                 type:          navigate
@@ -156,7 +156,7 @@ datagrids:
                 type:          delete
                 label:         oro.grid.action.delete
                 link:          delete_link
-                icon:          trash
+                icon:          trash-o
                 acl_resource:  oro_user_user_delete
 
     groups-grid:
@@ -196,14 +196,14 @@ datagrids:
                 type:          navigate
                 label:         oro.grid.action.update
                 link:          update_link
-                icon:          edit
+                icon:          pencil-square-o
                 acl_resource:  oro_user_group_update
                 rowAction:     true
             delete:
                 type:          delete
                 label:         oro.grid.action.delete
                 link:          delete_link
-                icon:          trash
+                icon:          trash-o
                 acl_resource:  oro_user_group_delete
 
         sorters:
@@ -265,19 +265,19 @@ datagrids:
                 type:          navigate
                 label:         oro.grid.action.view
                 link:          view_link
-                icon:          eye-open
+                icon:          eye
                 rowAction:     true
             update:
                 type:          navigate
                 label:         oro.grid.action.update
                 link:          update_link
-                icon:          edit
+                icon:          pencil-square-o
                 acl_resource:  oro_user_role_update
             delete:
                 type:          delete
                 label:         oro.grid.action.delete
                 link:          delete_link
-                icon:          trash
+                icon:          trash-o
                 acl_resource:  oro_user_role_delete
 
         action_configuration: "@oro_user.role.datagrid_helper->getActionConfigurationClosure"

@@ -22,7 +22,7 @@ use Oro\Bundle\AttachmentBundle\Model\ExtendFile;
  * @Config(
  *      defaultValues={
  *          "entity"={
- *              "icon"="icon-file"
+ *              "icon"="fa-file"
  *          },
  *          "note"={
  *              "immutable"=true

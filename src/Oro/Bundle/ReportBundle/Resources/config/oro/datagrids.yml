@@ -73,14 +73,14 @@ datagrids:
                 type:          navigate
                 acl_resource:  oro_report_view
                 label:         oro.grid.action.view
-                icon:          eye-open
+                icon:          eye
                 link:          view_link
                 rowAction:     true
             update:
                 type:          navigate
                 acl_resource:  oro_report_update
                 label:         oro.grid.action.update
-                icon:          edit
+                icon:          pencil-square-o
                 link:          update_link
                 launcherOptions:
                     className: 'no-hash mobile-hide'
@@ -88,7 +88,7 @@ datagrids:
                 type:          delete
                 acl_resource:  oro_report_delete
                 label:         oro.grid.action.delete
-                icon:          trash
+                icon:          trash-o
                 link:          delete_link
                 launcherOptions:
                     className: 'no-hash mobile-hide'

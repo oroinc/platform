@@ -19,7 +19,7 @@ services:
             - "@?logger"
         tags:
             - { name: oro_action.action, alias: tree }
-            - { name: monolog.logger, channel: oro_workflow }
+            - { name: monolog.logger, channel: oro_action }
 
     oro_action.action.configurable:
         class: 'Oro\Component\Action\Action\Configurable'
@@ -48,6 +48,13 @@ services:
             - '@oro_action.expression.context_accessor'
         tags:
             - { name: oro_action.action, alias: assign_value }
+
+    oro_action.action.copy_values:
+        class: 'Oro\Component\Action\Action\CopyValues'
+        arguments:
+            - '@oro_action.expression.context_accessor'
+        tags:
+            - { name: oro_action.action, alias: copy_values }
 
     oro_action.action.unset_value:
         class: 'Oro\Component\Action\Action\UnsetValue'

@@ -1,12 +1,12 @@
 system_configuration:
     groups:
         email_configuration:
-            icon:  icon-envelope
+            icon:  fa-envelope
             title: oro.email.system_configuration.email_configuration
             page_reload: true
 
         user_email_configuration:
-            icon:  icon-envelope
+            icon:  fa-envelope
             title: oro.email.system_configuration.email_configuration
 
         email_settings:

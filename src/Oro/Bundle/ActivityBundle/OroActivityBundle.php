@@ -5,6 +5,7 @@ namespace Oro\Bundle\ActivityBundle;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 
+use Oro\Bundle\ActivityBundle\DependencyInjection\Compiler\ActivityEntityDeleteHandlerCompilerPass;
 use Oro\Bundle\ActivityBundle\DependencyInjection\Compiler\ActivityWidgetProviderPass;
 
 class OroActivityBundle extends Bundle
@@ -17,5 +18,6 @@ class OroActivityBundle extends Bundle
         parent::build($container);
 
         $container->addCompilerPass(new ActivityWidgetProviderPass());
+        $container->addCompilerPass(new ActivityEntityDeleteHandlerCompilerPass());
     }
 }

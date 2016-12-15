@@ -43,7 +43,7 @@ class SchemaTest extends WebTestCase
     }
 
     /**
-     * @see Oro\Bundle\EntityExtendBundle\Command\UpdateSchemaCommand::execute
+     * @see \Oro\Bundle\EntityExtendBundle\Command\UpdateSchemaCommand::execute
      */
     public function testSchema()
     {

@@ -19,13 +19,13 @@ oro:
                 stoppedAt: Stopped At
 
         menu:
-            label: Message Queue Jobs
-            shortcut.label: Message Queue Jobs List
+            label: Jobs
+            shortcut.label: Jobs List
             shortcut.description: List of Message Queue Jobs
 
         header:
-            root_jobs: Message Queue Jobs List
-            child_jobs: Child Message Queue Jobs List
+            root_jobs: Jobs List
+            child_jobs: Child Jobs List
             startedAt: Started At
             stoppedAt: Stopped At
             unique: Unique

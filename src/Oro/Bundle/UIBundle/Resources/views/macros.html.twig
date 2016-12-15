@@ -57,7 +57,7 @@
             ~ '</div>'
         %}
 
-        <i class="icon-info-sign tooltip-icon"
+        <i class="fa-info-circle tooltip-icon"
            {% if tooltip_placement %}data-placement="{{ tooltip_placement }}"{% endif %}
            data-content="{{ tooltip }}"
            data-toggle="popover"></i>
@@ -176,9 +176,13 @@
 {% macro link(parameters) %}
     {# need to remove spaces just before label #}
     {% set iconHtml = '' %}
-    {% if parameters.iCss is defined %}
+    {% if parameters.iCss is defined and parameters.iCss %}
         {% set iconHtml %}
-        <i class="{{ parameters.iCss }} hide-text" >{{ parameters.label }}</i>
+        <i class="{{ parameters.iCss }} hide-text" >
+            {% if not parameters.noIconText|default(false)%}
+                {{ parameters.label }}
+            {% endif %}
+        </i>
         {% endset %}
     {% else %}
     {% endif %}
@@ -192,8 +196,10 @@
                 data-{{ dataItemName }}="{{ dataItemValue|e('html_attr')|raw }}"
             {% endfor %}
         {% endif %}
-       class="{{ parameters.class is defined? parameters.class : '' }} {{ parameters.aCss is defined? parameters.aCss : '' }}"
-       {% if parameters.title is defined %}title="{{ parameters.title }}"{% endif %}>{{ iconHtml|trim|raw }}{{ parameters.label|trim }}</a>
+        class="{{ parameters.class is defined? parameters.class : '' }} {{ parameters.aCss is defined? parameters.aCss : '' }}"
+        {% if parameters.title is defined %}title="{{ parameters.title }}"{% endif %}>{{ iconHtml|trim|raw }}
+        {{ parameters.label|trim }}
+    </a>
     {% endspaceless %}
 {% endmacro %}
 
@@ -333,7 +339,7 @@
         ]
 #}
 {% macro editButton(parameters) %}
-    {% set iCss = ['icon-edit'] %}
+    {% set iCss = ['fa-pencil-square-o'] %}
     {% set aCss = ['edit-button', 'main-group'] %}
     {% if parameters.iCss is defined %}
         {% set iCss = parameters.iCss|split(' ')|merge(iCss) %}
@@ -456,7 +462,7 @@
             'success-message': successMessage,
             'url': url
         },
-        'iCss': parameters.iCss is defined ? parameters.iCss: 'icon-trash',
+        'iCss': parameters.iCss is defined ? parameters.iCss: 'fa-trash-o',
         'aCss': parameters.aCss,
         'title': title,
         'label': label,
@@ -495,6 +501,7 @@
             'successMessage' - a message which will be shown after an operation finished
             'title' - button title
             'label' - button label
+            'labelInIcon' - determine whether the label is include in icon or not. Defaults to true
             'visible' - determined whether the button is visible or not. Defaults to true,
             'dataAttributes' - additional data attributes
         ]
@@ -538,8 +545,9 @@
             {%- if parameters.dataAttributes is defined and parameters.dataAttributes|length -%}
                 {{ _self.renderAttributes(parameters.dataAttributes) }}
             {%- endif -%}>
+            {%- set labelInIcon = parameters.labelInIcon|default(true) -%}
             {%- if (parameters.iCss is defined) -%}
-                <i class="{{ parameters.iCss }} hide-text">{{ parameters.label is defined ? parameters.label : '' }}</i>
+                <i class="{{ parameters.iCss }}{% if labelInIcon %} hide-text{% endif %}">{{ (parameters.label is defined and labelInIcon) ? parameters.label : '' }}</i>
             {%- endif %}
             {{- parameters.label is defined ? parameters.label : '' -}}
         </a>
