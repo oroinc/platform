@@ -109,6 +109,7 @@ system_configuration:
             data_type: string
             type: text
             options:
+                attr: {data-class: smtp_settings}
                 label: oro.email.system_configuration.smtp_settings.host.label
                 constraints:
                     - NotBlank: ~
@@ -120,6 +121,7 @@ system_configuration:
             data_type: number
             type: number
             options:
+                attr: {data-class: smtp_settings}
                 label: oro.email.system_configuration.smtp_settings.port.label
                 constraints:
                     - NotBlank: ~
@@ -131,6 +133,7 @@ system_configuration:
             data_type: string
             type: choice
             options:
+                attr: {data-class: smtp_settings}
                 label: oro.email.system_configuration.smtp_settings.encryption.label
                 choices:
                     ~: oro.email.system_configuration.smtp_settings.encryption.none.label
@@ -144,6 +147,7 @@ system_configuration:
             data_type: string
             type: text
             options:
+                attr: {data-class: smtp_settings}
                 label: oro.email.system_configuration.smtp_settings.username.label
                 required: false
 
@@ -151,6 +155,7 @@ system_configuration:
             data_type: string
             type: password
             options:
+                attr: {data-class: smtp_settings}
                 label: oro.email.system_configuration.smtp_settings.password.label
                 required: false
 

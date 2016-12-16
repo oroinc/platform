@@ -8,6 +8,9 @@ use Doctrine\ORM\Query;
 
 use FOS\RestBundle\Util\Codes;
 
+use Oro\Bundle\EmailBundle\Form\Model\SmtpSettings;
+use Oro\Bundle\EmailBundle\Form\Model\SmtpSettingsFactory;
+use Swift_SmtpTransport;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -47,6 +50,20 @@ use Oro\Component\MessageQueue\Client\MessageProducer;
  */
 class EmailController extends Controller
 {
+    /**
+     * @Route("/check-smtp-connection", name="oro_email_check_smtp_connection")
+     * @AclAncestor("oro_config_system")
+     */
+    public function checkSmtpConnectionAction(Request $request)
+    {
+        $smtpSettings = SmtpSettingsFactory::createFromRequest($request);
+        $smtpSettingsChecker = $this->get('oro_email.mailer.checker.smtp_settings');
+
+        return new JsonResponse(
+            $smtpSettingsChecker->checkSmtpSettingsConnection($smtpSettings)
+        );
+    }
+
     /**
      * @Route("/purge-emails-attachments", name="oro_email_purge_emails_attachments")
      * @AclAncestor("oro_config_system")
