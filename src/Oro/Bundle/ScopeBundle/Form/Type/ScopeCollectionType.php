@@ -26,6 +26,7 @@ class ScopeCollectionType extends AbstractType
         $resolver->setDefaults(
             [
                 'type' => ScopeType::NAME,
+                'error_bubbling' => false,
                 'handle_primary' => false
             ]
         );

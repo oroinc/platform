@@ -5,12 +5,12 @@ namespace Oro\Bundle\ActionBundle\Model\Assembler;
 use Oro\Bundle\ActionBundle\Model\ActionGroup;
 use Oro\Bundle\ActionBundle\Model\ActionGroupDefinition;
 
-use Oro\Component\Action\Action\ActionFactory;
+use Oro\Component\Action\Action\ActionFactoryInterface;
 use Oro\Component\ConfigExpression\ExpressionFactory as ConditionFactory;
 
 class ActionGroupAssembler extends AbstractAssembler
 {
-    /** @var ActionFactory */
+    /** @var ActionFactoryInterface */
     private $actionFactory;
 
     /** @var ConditionFactory */
@@ -23,13 +23,13 @@ class ActionGroupAssembler extends AbstractAssembler
     private $parametersResolver;
 
     /**
-     * @param ActionFactory $actionFactory
+     * @param ActionFactoryInterface $actionFactory
      * @param ConditionFactory $conditionFactory
      * @param ParameterAssembler $parameterAssembler
      * @param ActionGroup\ParametersResolver $parametersResolver
      */
     public function __construct(
-        ActionFactory $actionFactory,
+        ActionFactoryInterface $actionFactory,
         ConditionFactory $conditionFactory,
         ParameterAssembler $parameterAssembler,
         ActionGroup\ParametersResolver $parametersResolver

@@ -176,9 +176,13 @@
 {% macro link(parameters) %}
     {# need to remove spaces just before label #}
     {% set iconHtml = '' %}
-    {% if parameters.iCss is defined %}
+    {% if parameters.iCss is defined and parameters.iCss %}
         {% set iconHtml %}
-        <i class="{{ parameters.iCss }} hide-text" >{{ parameters.label }}</i>
+        <i class="{{ parameters.iCss }} hide-text" >
+            {% if not parameters.noIconText|default(false)%}
+                {{ parameters.label }}
+            {% endif %}
+        </i>
         {% endset %}
     {% else %}
     {% endif %}
@@ -192,8 +196,10 @@
                 data-{{ dataItemName }}="{{ dataItemValue|e('html_attr')|raw }}"
             {% endfor %}
         {% endif %}
-       class="{{ parameters.class is defined? parameters.class : '' }} {{ parameters.aCss is defined? parameters.aCss : '' }}"
-       {% if parameters.title is defined %}title="{{ parameters.title }}"{% endif %}>{{ iconHtml|trim|raw }}{{ parameters.label|trim }}</a>
+        class="{{ parameters.class is defined? parameters.class : '' }} {{ parameters.aCss is defined? parameters.aCss : '' }}"
+        {% if parameters.title is defined %}title="{{ parameters.title }}"{% endif %}>{{ iconHtml|trim|raw }}
+        {{ parameters.label|trim }}
+    </a>
     {% endspaceless %}
 {% endmacro %}
 
