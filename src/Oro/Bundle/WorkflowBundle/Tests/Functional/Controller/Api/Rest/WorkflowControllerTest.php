@@ -323,6 +323,11 @@ class WorkflowControllerTest extends WebTestCase
 
         $result = $this->getJsonResponseContent($this->client->getResponse(), 200);
 
+        $this->assertArrayHasKey('id', $result['workflowItem']);
+        $this->assertArrayHasKey('entity_id', $result['workflowItem']);
+        $this->assertArrayHasKey('entity_class', $result['workflowItem']);
+        $this->assertArrayHasKey('workflow_name', $result['workflowItem']);
+
         $workflowItem = $this->getRepository(WorkflowItem::class)
             ->find($result['workflowItem']['id']);
         /** @var ButtonSearchContext $initContext */

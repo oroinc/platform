@@ -4,11 +4,6 @@ namespace Oro\Component\Layout;
 
 /**
  * Provides an interface for builders which can be used to build {@see RawLayout}.
- *
- * NOTES: we have to re-declare all methods from {@see LayoutManipulatorInterface} here
- * because in other case "@return self" points to {@see LayoutManipulatorInterface}
- * rather than {@see RawLayoutBuilderInterface}.
- * But it is important for a client code because this interface provides "fluent" operations.
  */
 interface RawLayoutBuilderInterface extends LayoutManipulatorInterface
 {
