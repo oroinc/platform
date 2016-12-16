@@ -2,19 +2,24 @@
 
 namespace Oro\Bundle\ActionBundle\Controller;
 
-use Doctrine\Common\Collections\Collection;
-use Doctrine\Common\Collections\ArrayCollection;
-
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-use Oro\Bundle\ActionBundle\Model\ActionData;
-use Oro\Bundle\ActionBundle\Exception\OperationNotFoundException;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
+
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
+
 use Oro\Bundle\ActionBundle\Exception\ForbiddenOperationException;
+use Oro\Bundle\ActionBundle\Exception\OperationNotFoundException;
+use Oro\Bundle\ActionBundle\Helper\ContextHelper;
+use Oro\Bundle\ActionBundle\Model\ActionData;
+use Oro\Bundle\ActionBundle\Model\Operation;
+use Oro\Bundle\ActionBundle\Model\OperationRegistry;
+
 use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
 
 class AjaxController extends Controller
@@ -29,26 +34,31 @@ class AjaxController extends Controller
      */
     public function executeAction(Request $request, $operationName)
     {
+        $data = $this->getContextHelper()->getActionData();
+
         $errors = new ArrayCollection();
         $code = Response::HTTP_OK;
         $message = '';
 
-        $handler = $this->get('oro_action.handler.operation_execution');
-
-        $data = $handler->getData($request);
-
         try {
-            $data = $handler->execute($operationName, $data, $request, $errors);
-        } catch (OperationNotFoundException $exception) {
+            $registry = $this->getOperationRegistry();
+            $operation = $registry->findByName($operationName);
+
+            if (!$operation instanceof Operation || !$operation->isAvailable($data)) {
+                throw new OperationNotFoundException($operationName);
+            }
+
+            $operation->execute($data, $errors);
+        } catch (OperationNotFoundException $e) {
             $code = Response::HTTP_NOT_FOUND;
-        } catch (ForbiddenOperationException $exception) {
+        } catch (ForbiddenOperationException $e) {
             $code = Response::HTTP_FORBIDDEN;
-        } catch (\Exception $exception) {
+        } catch (\Exception $e) {
             $code = Response::HTTP_INTERNAL_SERVER_ERROR;
         }
 
-        if (isset($exception)) {
-            $message = $exception->getMessage();
+        if (!empty($e)) {
+            $message = $e->getMessage();
         }
 
         return $this->handleResponse($request, $data, $code, $message, $errors);
@@ -73,6 +83,7 @@ class AjaxController extends Controller
         // handle redirect for failure response on non ajax requests
         if (!$request->isXmlHttpRequest() && !$response['success'] && null !== ($routeName = $request->get('route'))) {
             $this->get('session')->getFlashBag()->add('error', $response['message']);
+
             return $this->redirect($this->generateUrl($routeName));
         }
 
@@ -104,5 +115,21 @@ class AjaxController extends Controller
         }
 
         return $result;
+    }
+
+    /**
+     * @return OperationRegistry
+     */
+    protected function getOperationRegistry()
+    {
+        return $this->get('oro_action.operation_registry');
+    }
+
+    /**
+     * @return ContextHelper
+     */
+    protected function getContextHelper()
+    {
+        return $this->get('oro_action.helper.context');
     }
 }

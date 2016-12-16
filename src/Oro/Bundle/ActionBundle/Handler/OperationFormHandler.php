@@ -18,11 +18,8 @@ use Oro\Bundle\ActionBundle\Model\ActionData;
 use Oro\Bundle\ActionBundle\Model\Operation;
 use Oro\Bundle\ActionBundle\Model\OperationRegistry;
 
-class OperationWidgetFormHandler
+class OperationFormHandler
 {
-    const DEFAULT_FORM_TEMPLATE = 'OroActionBundle:Operation:form.html.twig';
-    const DEFAULT_PAGE_TEMPLATE = 'OroActionBundle:Operation:page.html.twig';
-
     /** @var ContextHelper */
     private $contextHelper;
 
@@ -54,15 +51,15 @@ class OperationWidgetFormHandler
     }
 
     /**
-     * @param string $name
+     * @param string $operationName
      * @param Request $request
      * @return array
      */
-    public function getData($name, Request $request)
+    private function getData($operationName, Request $request)
     {
         $data = $this->contextHelper->getActionData();
 
-        $operation = $this->getOperation($name, $data);
+        $operation = $this->getOperation($operationName, $data);
 
         return [
             '_wid' => $request->get('_wid'),
@@ -75,15 +72,15 @@ class OperationWidgetFormHandler
     }
 
     /**
-     * @param array $data
+     * @param string $operationName
      * @param Request $request
      * @param FlashBagInterface $flashBag
      *
      * @return string The view name
      */
-    public function handle(array $data, Request $request, FlashBagInterface $flashBag)
+    public function process($operationName, Request $request, FlashBagInterface $flashBag)
     {
-        $this->validateData($data);
+        $data = $this->getData($operationName, $request);
 
         /**
          * @var ActionData $actionData
@@ -92,21 +89,25 @@ class OperationWidgetFormHandler
         $actionData = $data['actionData'];
         $operation = $data['operation'];
 
-        /** @var FormInterface $form */
-        $form = $this->getOperationForm($operation, $actionData);
+        try {
+            /** @var FormInterface $form */
+            $form = $this->getOperationForm($operation, $actionData);
 
-        $actionData['form'] = $form;
+            $actionData['form'] = $form;
 
-        $form->handleRequest($request);
+            $form->handleRequest($request);
 
-        if ($form->isValid()) {
-            $operation->execute($actionData, $data['errors']);
+            if ($form->isValid()) {
+                $operation->execute($actionData, $data['errors']);
 
-            $data['response'] = $this->getResponseData($actionData, $flashBag);
+                $data['response'] = $this->getResponseData($actionData, $flashBag);
 
-            if ($this->hasRedirect($data)) {
-                return new RedirectResponse($data['response']['redirectUrl'], 302);
+                if ($this->hasRedirect($data)) {
+                    return new RedirectResponse($data['response']['redirectUrl'], 302);
+                }
             }
+        } catch (\Exception $e) {
+            $data = $this->handleError($data, $e, $flashBag);
         }
 
         $data['form'] = $form->createView();
@@ -116,34 +117,12 @@ class OperationWidgetFormHandler
     }
 
     /**
-     * @param array $data
-     * @return string
-     * @internal param string $operationName
-     */
-    public function getTemplate(array $data)
-    {
-        $template = self::DEFAULT_FORM_TEMPLATE;
-
-        if (isset($data['operation']) && $data['operation'] instanceof Operation) {
-            $frontendOptions = $data['operation']->getDefinition()->getFrontendOptions();
-
-            if (array_key_exists('template', $frontendOptions)) {
-                $template = $frontendOptions['template'];
-            } elseif (array_key_exists('show_dialog', $frontendOptions) && !$frontendOptions['show_dialog']) {
-                $template = self::DEFAULT_PAGE_TEMPLATE;
-            }
-        }
-
-        return $template;
-    }
-
-    /**
      * @param array $params
      * @param \Exception $exception
      * @param FlashBagInterface $flashBag
      * @return array of updated params
      */
-    public function handleError(array $params, \Exception $exception, FlashBagInterface $flashBag)
+    protected function handleError(array $params, \Exception $exception, FlashBagInterface $flashBag)
     {
         return array_merge($params, $this->getErrorResponse(
             $params,
@@ -258,23 +237,5 @@ class OperationWidgetFormHandler
     private function hasRedirect(array $params)
     {
         return empty($params['_wid']) && !empty($params['response']['redirectUrl']);
-    }
-
-    /**
-     * @param array $data
-     */
-    private function validateData(array $data)
-    {
-        if (!isset($data['actionData']) || !$data['actionData'] instanceof ActionData) {
-            throw new \DomainException(
-                'No action data specified. Cannot handle.'
-            );
-        }
-
-        if (!isset($data['operation']) || !$data['operation'] instanceof Operation) {
-            throw new \DomainException(
-                'Operation is not defined. Cannot handle.'
-            );
-        }
     }
 }
