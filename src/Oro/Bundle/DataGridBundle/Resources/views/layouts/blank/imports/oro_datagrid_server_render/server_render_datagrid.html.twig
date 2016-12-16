@@ -42,7 +42,8 @@
     {% set datagridMetaData = oro_datagrid_metadata(datagrid) %}
 
     {% set datagridMetaData = datagridMetaData|merge({
-        GridView: 'productServerRenderGrid'
+        GridView: 'productServerRenderGrid',
+        PageableCollection: 'productPageableCollection'
     })%}
 
     {% set toolbarOptions = datagridMetaData.options.toolbarOptions %}

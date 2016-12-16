@@ -1,8 +1,9 @@
 define([
     'jquery',
+    'underscore',
     'oroui/js/mediator',
     'oroui/js/error'
-], function($, mediator, Error) {
+], function($, _, mediator, Error) {
     'use strict';
 
     var layoutSubtreeManager;
@@ -116,18 +117,31 @@ define([
                     Error.handle({}, jqxhr, {enforce: true});
                 });
         },
+
+        /**
+         * Send ajax request to server and update block for layout by ID.
+         *
+         * @param {String} blockId
+         * @param {object} data
+         * @param {Function} callback
+         */
         get: function(blockId, data, callback) {
+            data = data || {};
             data.layout_block_ids = [blockId];
             $.ajax({
                     url: document.location.pathname,
                     type: this.method,
-                    data: data
+                    data: data || {}
                 })
                 .done(function(content) {
-                    callback(content[blockId] || '');
+                    if (_.isFunction(callback)) {
+                        callback(content[blockId] || '');
+                    }
                 })
                 .fail(function(jqxhr) {
-                    callback('');
+                    if (_.isFunction(callback)) {
+                        callback('');
+                    }
                     Error.handle({}, jqxhr, {enforce: true});
                 });
         }

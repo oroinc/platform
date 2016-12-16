@@ -13,7 +13,7 @@ define(function(require) {
     var Grid = require('orodatagrid/js/datagrid/grid');
     var mapActionModuleName = require('orodatagrid/js/map-action-module-name');
     var mapCellModuleName = require('orodatagrid/js/map-cell-module-name');
-    var mapGridModuleName = require('orodatagrid/js/map-grid-module-name');
+    var mapCustomModuleName = require('orodatagrid/js/map-custom-module-name');
     var gridContentManager = require('orodatagrid/js/content-manager');
     var PluginManager = require('oroui/js/app/plugins/plugin-manager');
     var FloatingHeaderPlugin = require('orodatagrid/js/app/plugins/grid/floating-header-plugin');
@@ -211,7 +211,11 @@ define(function(require) {
             });
             // If another Grid view is present
             if (metadata.GridView) {
-                modules.GridView = mapGridModuleName(metadata.GridView);
+                modules.GridView = mapCustomModuleName(metadata.GridView);
+            }
+            // if If another PageableCollection view is present
+            if (metadata.PageableCollection) {
+                modules.PageableCollection = mapCustomModuleName(metadata.PageableCollection);
             }
         },
 
@@ -227,6 +231,7 @@ define(function(require) {
             var collection = gridContentManager.get(collectionName);
 
             Grid =  modules.GridView || Grid;
+            PageableCollection = modules.PageableCollection || PageableCollection;
 
             collectionModels = {};
             if (this.data && this.data.data) {

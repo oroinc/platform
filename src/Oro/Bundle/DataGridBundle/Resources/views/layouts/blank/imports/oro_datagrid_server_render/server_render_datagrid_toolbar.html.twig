@@ -37,8 +37,11 @@
         </div>
 
         <span class="hidden-sm hidden-xs">
-            {{ "oro.datagrid.pagination.totalPages"|trans({'%totalPages%': totalPages}) }}&nbsp;|
-            {{ "oro.datagrid.pagination.totalRecords"|trans({'%totalRecords%': totalRecords}) }}
+            {% set totalPages =  '<span data-grid-pagination-pages>' ~ totalPages ~ '</span>' %}
+            {% set totalRecords = '<span data-grid-pagination-records>' ~ totalRecords ~ '</span>' %}
+
+            {{ "oro.datagrid.pagination.totalPages"|trans({'%totalPages%': totalPages})|raw }}&nbsp;|
+            {{ "oro.datagrid.pagination.totalRecords"|trans({'%totalRecords%': totalRecords})|raw }}
         </span>
     </div>
 {% endblock %}

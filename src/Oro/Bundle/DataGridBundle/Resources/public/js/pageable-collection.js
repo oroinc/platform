@@ -5,9 +5,8 @@ define([
     'backbone-pageable-collection',
     'oroui/js/mediator',
     'orotranslation/js/translator',
-    'oroui/js/tools',
-    'oroui/js/layout-subtree-manager'
-], function($, _, Backbone, BackbonePageableCollection, mediator, __, tools, LayoutSubtreeManager) {
+    'oroui/js/tools'
+], function($, _, Backbone, BackbonePageableCollection, mediator, __, tools) {
     'use strict';
 
     var PageableCollection;
@@ -468,7 +467,7 @@ define([
                     }
                     models[i] = existing;
 
-                // If this is a new, valid model, push it to the `toAdd` list.
+                    // If this is a new, valid model, push it to the `toAdd` list.
                 } else if (add) {
                     model = models[i] = this._prepareModel(attrs, options);
                     if (!model) {
@@ -771,7 +770,7 @@ define([
                     } else if (links[currentPage]) { // refetching a page
                         var pageSize = state.pageSize;
                         var pageStart = (state.firstPage === 0 ?
-                            currentPage :
+                                currentPage :
                             currentPage - 1) * pageSize;
                         var fullModels = fullCollection.models;
                         var head = fullModels.slice(0, pageStart);
@@ -798,15 +797,7 @@ define([
                 return BBColProto.fetch.call(self, _.extend({}, options, {silent: true}));
             }
 
-            LayoutSubtreeManager.get('product_datagrid', options.data, function(content) {
-                var $data = $('<div/>').append(content);
-                var collection = $data
-                                    .find('[data-page-component-name=frontend-product-search-grid]')
-                                    .data('page-component-options').data.data;
-
-                $data = $data.find('.grid-body');
-                mediator.trigger('grid-content-loaded', {content: $data, collection: collection});
-            });
+            return BBColProto.fetch.call(this, options);
         },
 
         hasExtraRecordsToLoad: function() {
@@ -1021,6 +1012,9 @@ define([
 
             // getPage has inconsistent return value: collection or promise,
             // so we have to check it's a promise
+
+            result = result || {};
+
             if (_.isFunction(result.fail)) {
                 result.fail(_.bind(function() {
                     // revert state if page change fail
