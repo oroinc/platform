@@ -15,7 +15,7 @@ use Oro\Component\Layout\Loader\LayoutUpdateLoaderInterface;
 use Oro\Component\Layout\Tests\Unit\Extension\Theme\Stubs\ImportedLayoutUpdate;
 use Oro\Component\Layout\Tests\Unit\Extension\Theme\Stubs\ImportedLayoutUpdateWithImports;
 use Oro\Component\Layout\Tests\Unit\Extension\Theme\Stubs\LayoutUpdateWithImports;
-use Oro\Component\Layout\Tests\Unit\Stubs\NotApplicableImportAwareLayoutUpdateStub;
+use Oro\Component\Layout\Tests\Unit\Extension\Theme\Stubs\NotApplicableImportAwareLayoutUpdateStub;
 
 class ImportVisitorTest extends \PHPUnit_Framework_TestCase
 {
