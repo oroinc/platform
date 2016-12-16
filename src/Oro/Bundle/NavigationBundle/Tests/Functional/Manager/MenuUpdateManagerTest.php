@@ -41,7 +41,7 @@ class MenuUpdateManagerTest extends WebTestCase
 
         $this->loadFixtures(
             [
-                'Oro\Bundle\NavigationBundle\Tests\Functional\DataFixtures\LoadMenuUpdateData'
+                LoadMenuUpdateData::class
             ]
         );
 
