@@ -516,3 +516,8 @@ services:
         decoration_inner_name: cache_warmer.inner
         arguments:
             - '@cache_warmer.inner'
+
+    oro_entity_extend.form.handler.config_helper_handler:
+        class: 'Oro\Bundle\EntityExtendBundle\Form\Handler\ConfigHelperHandler'
+        arguments:
+            - '@form.factory'
