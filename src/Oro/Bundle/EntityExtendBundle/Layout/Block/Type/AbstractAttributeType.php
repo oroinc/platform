@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\LayoutBundle\Layout\Block\Type;
+namespace Oro\Bundle\EntityExtendBundle\Layout\Block\Type;
 
 use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
 use Oro\Bundle\EntityExtendBundle\Manager\AttributeManager;
@@ -35,11 +35,7 @@ abstract class AbstractAttributeType extends AbstractType
      */
     public function configureOptions(OptionsResolver $resolver)
     {
-        $resolver->setRequired(
-            [
-                'attribute' => ''
-            ]
-        );
+        $resolver->setRequired(['attribute']);
     }
 
     /**
@@ -47,8 +43,7 @@ abstract class AbstractAttributeType extends AbstractType
      */
     public function buildView(BlockView $view, BlockInterface $block, Options $options)
     {
-        /** @var object $entity */
-        $entity = $block->getContext()->get('entity');
+        $entity = $block->getData()->get('entity');
         /** @var FieldConfigModel $attribute */
         $attribute = $options['attribute'];
         $view->vars['value'] = $this->propertyAccessor->getValue($entity, $attribute->getFieldName());
