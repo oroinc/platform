@@ -1,8 +1,8 @@
 <?php
 
-namespace Oro\Bundle\ImportExportBundle\Tests\Functional\Async;
+namespace Oro\Bundle\ImportExportBundle\Tests\Functional\Async\Import;
 
-use Oro\Bundle\ImportExportBundle\Async\CliImportValidationMessageProcessor;
+use Oro\Bundle\ImportExportBundle\Async\Import\ CliImportValidationMessageProcessor;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
 class CliImportValidationMessageProcessorTest extends WebTestCase
@@ -18,6 +18,6 @@ class CliImportValidationMessageProcessorTest extends WebTestCase
     {
         $instance = $this->getContainer()->get('oro_importexport.async.cli_import_validation');
 
-        $this->assertInstanceOf(CliImportValidationMessageProcessor::class, $instance);
+        $this->assertInstanceOf( CliImportValidationMessageProcessor::class, $instance);
     }
 }

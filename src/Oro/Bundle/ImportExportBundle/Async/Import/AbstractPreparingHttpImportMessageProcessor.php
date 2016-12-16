@@ -90,7 +90,12 @@ abstract class AbstractPreparingHttpImportMessageProcessor implements
             ], $body);
 
         if (! $body['filePath'] || ! $body['processorAlias'] || ! $body['userId']) {
-            $this->logger->critical('Invalid message', ['message' => $message]);
+            $this
+                ->logger
+                ->critical(
+                    sprintf('Got invalid message. body: %s', $message->getBody()),
+                    ['message' => $message]
+                );
 
             return self::REJECT;
         }
@@ -98,7 +103,7 @@ abstract class AbstractPreparingHttpImportMessageProcessor implements
         $user = $this->doctrine->getRepository(User::class)->find($body['userId']);
         if (! $user instanceof User) {
             $this->logger->error(
-                sprintf('User not found: %s', $body['userId']),
+                sprintf('User not found. id: %s', $body['userId']),
                 ['message' => $message]
             );
 
@@ -114,7 +119,7 @@ abstract class AbstractPreparingHttpImportMessageProcessor implements
                 foreach ($files as $key => $file) {
                     $jobRunner->createDelayed(
                         sprintf(
-                            '%s:%s%s:chunk.%s',
+                            '%s:%s:%s:chunk.%s',
                             static::getMessageName(),
                             $body['processorAlias'],
                             $parentMessageId,
@@ -123,9 +128,9 @@ abstract class AbstractPreparingHttpImportMessageProcessor implements
                         function (JobRunner $jobRunner, Job $child) use ($body, $file, $key) {
                             $body['filePath'] = $file;
                                 $this->producer->send(
-                                static::getTopicsForChildJob(),
-                                array_merge($body, ['jobId' => $child->getId()])
-                            );
+                                    static::getTopicsForChildJob(),
+                                    array_merge($body, ['jobId' => $child->getId()])
+                                );
                         }
                     );
                 }

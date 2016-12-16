@@ -145,7 +145,7 @@ class CalculateRootJobProgressProcessorTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|JobStorage
+     * @return \PHPUnit_Framework_MockObject_MockObject|MessageInterface
      */
     private function createMessageMock()
     {

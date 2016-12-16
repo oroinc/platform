@@ -96,7 +96,7 @@ class SendImportNotificationMessageProcessor implements MessageProcessorInterfac
         $user = $this->doctrine->getRepository(User::class)->find($body['userId']);
         if (! $user instanceof User) {
             $this->logger->error(
-                sprintf('User not found: %s', $body['userId']),
+                sprintf('User not found. Id: %s', $body['userId']),
                 ['message' => $message]
             );
 
@@ -125,16 +125,20 @@ class SendImportNotificationMessageProcessor implements MessageProcessorInterfac
     {
         $fromEmail = $this->configManager->get('oro_notification.email_notification_sender_email');
         $fromName = $this->configManager->get('oro_notification.email_notification_sender_name');
+        $message = [
+            'fromEmail' => $fromEmail,
+            'fromName' => $fromName,
+            'toEmail' => $toEmail,
+            'subject' => $subject,
+            'body' => $summary
+        ];
+
         $this->producer->send(
             NotificationTopics::SEND_NOTIFICATION_EMAIL,
-            [
-                'fromEmail' => $fromEmail,
-                'fromName' => $fromName,
-                'toEmail' => $toEmail,
-                'subject' => $subject,
-                'body' => $summary
-            ]
+            $message
         );
+
+        $this->logger->info('Sent notification message.', ['message' => $message]);
     }
 
     /**

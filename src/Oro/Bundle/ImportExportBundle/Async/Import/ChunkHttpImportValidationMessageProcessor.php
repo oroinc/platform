@@ -20,11 +20,11 @@ class ChunkHttpImportValidationMessageProcessor extends AbstractChunkImportMessa
     protected function getSummaryMessage(array $data)
     {
         return sprintf(
-            'Import validation for the %s from %s is completed.
-                     Success: %s.
-                     Info: %s.
-                     Errors url: %s.
-                     Errors: %s',
+            'Import validation of the %s from %s is completed.
+                 Success: %s.
+                 Info: %s.
+                 Errors url: %s.
+                 Errors: %s',
             $data['filePath'],
             $data['entityName'],
             $data['success'] ? 'true' : 'false',
