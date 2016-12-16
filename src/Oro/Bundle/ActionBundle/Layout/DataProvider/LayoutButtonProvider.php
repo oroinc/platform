@@ -70,11 +70,12 @@ class LayoutButtonProvider
         $buttonSearchContext = $this->contextProvider->getButtonSearchContext();
         $buttonSearchContext->setGridName(null);
 
-        if (is_object($entity) &&
-            !$this->doctrineHelper->isNewEntity($entity)
-        ) {
+        if (is_object($entity)) {
             $entityClass = $this->doctrineHelper->getEntityClass($entity);
-            $entityId = $this->doctrineHelper->getEntityIdentifier($entity);
+            $entityId = null;
+            if (!$this->doctrineHelper->isNewEntity($entity)) {
+                $entityId = $this->doctrineHelper->getSingleEntityIdentifier($entity);
+            }
             $buttonSearchContext->setEntity($entityClass, $entityId);
         }
 

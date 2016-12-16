@@ -48,7 +48,7 @@
         {% endset %}
     {% elseif type == 'html' %}
         {{ value|default('N/A'|trans)|raw }}
-    {% elseif type == 'boolean' %}
+    {% elseif type == 'boolean' and value is not null %}
         {% set value = value ? 'Yes'|trans : 'No'|trans %}
     {% elseif type == 'money' %}
         {% set value = value ? value | oro_format_currency : null %}

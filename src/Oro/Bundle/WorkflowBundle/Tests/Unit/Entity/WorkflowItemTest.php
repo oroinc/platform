@@ -40,6 +40,27 @@ class WorkflowItemTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($value, $this->workflowItem->getId());
     }
 
+    public function testMerge()
+    {
+        $object = (object)['prop1' => 'val1'];
+
+        $source = new WorkflowItem();
+        $source->getData()->add(['key11' => 'val11', 'obj' => $object]);
+        $source->getResult()->add(['key12' => 'val12', 'obj' => $object]);
+
+        $dest = new WorkflowItem();
+        $dest->getData()->add(['key21' => 'val21']);
+        $dest->getResult()->add(['key22' => 'val22']);
+
+        $exp = new WorkflowItem();
+        $exp->getData()->add(['key11' => 'val11', 'key21' => 'val21', 'obj' => $object]);
+        $exp->getResult()->add(['key12' => 'val12', 'key22' => 'val22', 'obj' => $object]);
+
+        $this->assertEquals($exp, $dest->merge($source));
+        $this->assertSame($object, $dest->getData()->get('obj'));
+        $this->assertSame($object, $dest->getResult()->get('obj'));
+    }
+
     public function testWorkflowName()
     {
         $this->assertNull($this->workflowItem->getWorkflowName());
