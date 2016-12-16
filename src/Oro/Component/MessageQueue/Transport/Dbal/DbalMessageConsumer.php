@@ -199,76 +199,87 @@ class DbalMessageConsumer implements MessageConsumerInterface
          * same table as update query and the solution is to use one
          * more sub query.
          */
-        $sql = sprintf(
-            'UPDATE %1$s SET consumer_id=:consumerId, delivered_at=:deliveredAt '.
-            'WHERE id = (SELECT id FROM ('.
-            'SELECT id FROM %1$s WHERE queue=:queue AND consumer_id IS NULL AND '.
-            '(delayed_until IS NULL OR delayed_until<=:delayedUntil) '.
-            'ORDER BY priority DESC, id ASC LIMIT 1'.
-            ') AS x )',
-            $this->connection->getTableName()
-        );
+        $this->dbal->beginTransaction();
+        $row = null;
+        try {
+            $now = time();
 
-        $now = time();
-
-        $affectedRows = $this->dbal->executeUpdate(
-            $sql,
-            [
-                'consumerId' => $this->consumerId,
-                'deliveredAt' => $now,
-                'queue' => $this->queue->getQueueName(),
-                'delayedUntil' => $now,
-            ],
-            [
-                'consumerId' => Type::STRING,
-                'deliveredAt' => Type::INTEGER,
-                'queue' => Type::STRING,
-                'delayedUntil' => Type::INTEGER,
-            ]
-        );
-
-        if (0 === $affectedRows) {
-            return;
-        }
-
-        if (1 === $affectedRows) {
             $sql = sprintf(
-                'SELECT * FROM %s WHERE consumer_id=:consumerId AND queue=:queue LIMIT 1',
+                'SELECT id FROM %s WHERE queue=:queue AND consumer_id IS NULL AND ' .
+                '(delayed_until IS NULL OR delayed_until<=:delayedUntil) ' .
+                'ORDER BY priority DESC, id ASC LIMIT 1 FOR UPDATE',
                 $this->connection->getTableName()
             );
 
-            $dbalMessage = $this->dbal->executeQuery(
+            $row = $this->dbal->executeQuery(
                 $sql,
                 [
-                    'consumerId' => $this->consumerId,
                     'queue' => $this->queue->getQueueName(),
+                    'delayedUntil' => $now,
                 ],
                 [
-                    'consumerId' => Type::STRING,
                     'queue' => Type::STRING,
+                    'delayedUntil' => Type::INTEGER,
                 ]
             )->fetch();
 
-            if (false == $dbalMessage) {
-                throw new \LogicException(sprintf(
-                    'Expected one record but got nothing. consumer_id: "%s"',
-                    $this->consumerId
-                ));
+            if ($row) {
+                $messageId = $row['id'];
+
+                $sql = sprintf(
+                    'UPDATE %s SET consumer_id=:consumerId, delivered_at=:deliveredAt WHERE id = :messageId',
+                    $this->connection->getTableName()
+                );
+
+                $this->dbal->executeUpdate(
+                    $sql,
+                    [
+                        'messageId' => $messageId,
+                        'consumerId' => $this->consumerId,
+                        'deliveredAt' => $now,
+                    ],
+                    [
+                        'messageId' => Type::STRING,
+                        'consumerId' => Type::STRING,
+                        'deliveredAt' => Type::INTEGER,
+                    ]
+                );
+
+                $sql = sprintf(
+                    'SELECT * FROM %s WHERE consumer_id=:consumerId AND queue=:queue LIMIT 1',
+                    $this->connection->getTableName()
+                );
+
+                $dbalMessage = $this->dbal->executeQuery(
+                    $sql,
+                    [
+                        'consumerId' => $this->consumerId,
+                        'queue' => $this->queue->getQueueName(),
+                    ],
+                    [
+                        'consumerId' => Type::STRING,
+                        'queue' => Type::STRING,
+                    ]
+                )->fetch();
+
+                if (false == $dbalMessage) {
+                    throw new \LogicException(sprintf(
+                        'Expected one record but got nothing. consumer_id: "%s"',
+                        $this->consumerId
+                    ));
+                }
+                $this->dbal->commit();
+
+                return $this->convertMessage($dbalMessage);
             }
 
-            return $this->convertMessage($dbalMessage);
+            $this->dbal->commit();
+        } catch (\LogicException $e) {
+            $this->dbal->rollBack();
+            throw ($e);
+        } catch (\Exception $e) {
+            $this->dbal->rollBack();
         }
-
-        if ($affectedRows > 1) {
-            throw new \LogicException(sprintf(
-                'Expected only one record but got more. consumer_id: "%s", count: "%s"',
-                $this->consumerId,
-                $affectedRows
-            ));
-        }
-
-        // should never reach this line
-        throw new \LogicException('Unpredictable error happened');
     }
 
     /**

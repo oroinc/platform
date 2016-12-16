@@ -260,22 +260,25 @@ abstract class ApiTestCase extends WebTestCase
      *
      * @param Response  $response
      * @param int|int[] $statusCode
+     * @param string|null $message
      */
-    public static function assertResponseStatusCodeEquals(Response $response, $statusCode)
+    public static function assertResponseStatusCodeEquals(Response $response, $statusCode, $message = null)
     {
         try {
             if (is_array($statusCode)) {
                 if (!in_array($response->getStatusCode(), $statusCode, true)) {
-                    throw new \PHPUnit_Framework_ExpectationFailedException(
-                        sprintf(
-                            'Failed asserting that %s is one of %s',
-                            $response->getStatusCode(),
-                            implode(', ', $statusCode)
-                        )
+                    $failureMessage = sprintf(
+                        'Failed asserting that %s is one of %s',
+                        $response->getStatusCode(),
+                        implode(', ', $statusCode)
                     );
+                    if (!empty($message)) {
+                        $failureMessage = $message . "\n" . $failureMessage;
+                    }
+                    throw new \PHPUnit_Framework_ExpectationFailedException($failureMessage);
                 }
             } else {
-                \PHPUnit_Framework_TestCase::assertEquals($statusCode, $response->getStatusCode());
+                \PHPUnit_Framework_TestCase::assertEquals($statusCode, $response->getStatusCode(), $message);
             }
         } catch (\PHPUnit_Framework_ExpectationFailedException $e) {
             if ((is_array($statusCode) ? min($statusCode) : $statusCode) <= 400

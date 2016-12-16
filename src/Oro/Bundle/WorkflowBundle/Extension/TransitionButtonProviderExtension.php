@@ -57,7 +57,7 @@ class TransitionButtonProviderExtension implements ButtonProviderExtensionInterf
             return $buttons;
         }
 
-        foreach ($this->workflowRegistry->getActiveWorkflows() as $workflow) {
+        foreach ($this->getActiveWorkflows() as $workflow) {
             $transitions = $this->getInitTransitions($workflow, $buttonSearchContext);
 
             foreach ($transitions as $transition) {
@@ -81,6 +81,27 @@ class TransitionButtonProviderExtension implements ButtonProviderExtensionInterf
         $this->baseButtonContext = null;
 
         return $buttons;
+    }
+
+    /**
+     * @return Workflow[]
+     */
+    protected function getActiveWorkflows()
+    {
+        $exclusiveGroups = [];
+        return $this->workflowRegistry->getActiveWorkflows()->filter(
+            function (Workflow $workflow) use (&$exclusiveGroups) {
+                $currentGroups = $workflow->getDefinition()->getExclusiveRecordGroups();
+
+                if (array_intersect($exclusiveGroups, $currentGroups)) {
+                    return false;
+                }
+
+                $exclusiveGroups += $currentGroups;
+
+                return true;
+            }
+        );
     }
 
     /**
