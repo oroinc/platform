@@ -7,8 +7,10 @@ use Symfony\Component\DependencyInjection\IntrospectableContainerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 use Oro\Bundle\EmailBundle\Entity\EmailOrigin;
-use Oro\Bundle\EmailBundle\Event\SendEmailTransport;
 use Oro\Bundle\EmailBundle\Exception\NotSupportedException;
+use Oro\Bundle\EmailBundle\Event\SendEmailTransport;
+use Oro\Bundle\ImapBundle\Entity\UserEmailOrigin;
+use Oro\Bundle\EmailBundle\Provider\AbstractSmtpSettingsProvider;
 
 /**
  * The goal of this class is to send an email directly, not using a mail spool
@@ -30,9 +32,12 @@ class DirectMailer extends \Swift_Mailer
      *
      * @param \Swift_Mailer      $baseMailer
      * @param ContainerInterface $container
+     * @param AbstractSmtpSettingsProvider $smtpSettingsProvider
      */
-    public function __construct(\Swift_Mailer $baseMailer, ContainerInterface $container)
-    {
+    public function __construct(
+        \Swift_Mailer $baseMailer,
+        ContainerInterface $container
+    ) {
         $this->baseMailer = $baseMailer;
         $this->container  = $container;
 
@@ -58,6 +63,21 @@ class DirectMailer extends \Swift_Mailer
      */
     public function prepareSmtpTransport($emailOrigin)
     {
+        if ($emailOrigin instanceof UserEmailOrigin) {
+            /* Modify transport smtp settings */
+            if ($emailOrigin->isSmtpConfigured()) {
+                $this->prepareEmailOriginSmtpTransport($emailOrigin);
+            }
+        }
+
+        $this->postPrepareSmtpTransport();
+    }
+
+    /**
+     * @param EmailOrigin $emailOrigin
+     */
+    public function prepareEmailOriginSmtpTransport($emailOrigin)
+    {
         if (!$this->smtpTransport) {
             /** @var EventDispatcherInterface $eventDispatcher */
             $eventDispatcher = $this->container->get('event_dispatcher');
@@ -66,6 +86,41 @@ class DirectMailer extends \Swift_Mailer
                 new SendEmailTransport($emailOrigin, $this->getTransport())
             );
             $this->smtpTransport = $event->getTransport();
+        }
+    }
+
+    /**
+     * Last change to modify smtp transport
+     */
+    protected function postPrepareSmtpTransport()
+    {
+        if (!$this->smtpTransport) {
+            $provider = $this->container->get('oro_email.provider.smtp_settings');
+            $smtpSettings = $provider->getSmtpSettings();
+
+            if ($smtpSettings->isEligible()) {
+                $transport = $this->getTransport();
+                $host = $smtpSettings->getHost();
+                $port = $smtpSettings->getPort();
+                $encryption = $smtpSettings->getEncryption();
+
+                if ($transport instanceof \Swift_SmtpTransport
+                    || $transport instanceof \Swift_Transport_EsmtpTransport
+                ) {
+                    $transport->setHost($host);
+                    $transport->setPort($port);
+                    $transport->setEncryption($encryption);
+                } else {
+                    $transport = \Swift_SmtpTransport::newInstance($host, $port, $encryption);
+                }
+
+                $transport
+                    ->setUsername($smtpSettings->getUsername())
+                    ->setPassword($smtpSettings->getPassword())
+                ;
+
+                $this->smtpTransport = $transport;
+            }
         }
     }
 

@@ -7,7 +7,7 @@ use Oro\Bundle\ConfigBundle\Config\GlobalScopeManager;
 use Oro\Bundle\EmailBundle\DependencyInjection\Configuration as Config;
 use Oro\Bundle\EmailBundle\Form\Model\SmtpSettings;
 
-abstract class AbstractSmtpSettingsProvider
+abstract class AbstractSmtpSettingsProvider implements SmtpSettingsProviderInterface
 {
     /** @var ConfigManager */
     protected $configManager;
@@ -30,9 +30,7 @@ abstract class AbstractSmtpSettingsProvider
     }
 
     /**
-     * @param null|int|object $scopeIdentifier
-     *
-     * @return SmtpSettings
+     * @inheritdoc
      */
     abstract public function getSmtpSettings($scopeIdentifier = null);
 
