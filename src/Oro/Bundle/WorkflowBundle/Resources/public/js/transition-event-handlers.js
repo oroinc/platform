@@ -28,10 +28,6 @@ define([
             return function(response) {
                 pageRefresh = _.isUndefined(pageRefresh) ? true : pageRefresh;
 
-                if (pageRefresh) {
-                    mediator.execute('hideLoading');
-                }
-
                 function doRedirect(redirectUrl) {
                     mediator.execute('redirectTo', {url: redirectUrl});
                 }
@@ -70,6 +66,7 @@ define([
                     messenger.notificationFlashMessage('error', __('Could not perform transition'));
                 });
                 element.trigger('transitions_failure', [jqxhr, textStatus, error]);
+                mediator.trigger('workflow:transitions_failure', element, jqxhr, textStatus, error);
             };
         }
     };
