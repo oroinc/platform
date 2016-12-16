@@ -8,9 +8,6 @@ use Doctrine\ORM\Query;
 
 use FOS\RestBundle\Util\Codes;
 
-use Oro\Bundle\EmailBundle\Form\Model\SmtpSettings;
-use Oro\Bundle\EmailBundle\Form\Model\SmtpSettingsFactory;
-use Swift_SmtpTransport;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -29,6 +26,7 @@ use Oro\Bundle\EmailBundle\Entity\EmailAttachment;
 use Oro\Bundle\EmailBundle\Entity\EmailBody;
 use Oro\Bundle\EmailBundle\Entity\EmailUser;
 use Oro\Bundle\EmailBundle\Form\Model\Email as EmailModel;
+use Oro\Bundle\EmailBundle\Form\Model\SmtpSettingsFactory;
 use Oro\Bundle\EmailBundle\Decoder\ContentDecoder;
 use Oro\Bundle\EmailBundle\Provider\EmailRecipientsProvider;
 use Oro\Bundle\EmailBundle\Exception\LoadEmailBodyException;
@@ -60,7 +58,7 @@ class EmailController extends Controller
         $smtpSettingsChecker = $this->get('oro_email.mailer.checker.smtp_settings');
 
         return new JsonResponse(
-            $smtpSettingsChecker->checkSmtpSettingsConnection($smtpSettings)
+            $smtpSettingsChecker->checkConnection($smtpSettings)
         );
     }
 

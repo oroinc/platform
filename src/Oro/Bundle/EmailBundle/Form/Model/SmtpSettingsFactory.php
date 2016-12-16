@@ -4,46 +4,27 @@ namespace Oro\Bundle\EmailBundle\Form\Model;
 
 use Symfony\Component\HttpFoundation\Request;
 
-use Oro\Bundle\ConfigBundle\Config\ConfigManager;
-use Oro\Bundle\EmailBundle\DependencyInjection\Configuration as Config;
-
 class SmtpSettingsFactory
 {
+    const REQUEST_HOST = 'host';
+    const REQUEST_PORT = 'port';
+    const REQUEST_ENCRYPTION = 'encryption';
+    const REQUEST_USERNAME = 'username';
+    const REQUEST_PASSWORD = 'password';
+
     /**
      * @param Request $request
-     * @param string $section
      *
      * @return SmtpSettings
      */
-    public static function createFromRequest(Request $request, $section = 'email_configuration')
+    public static function createFromRequest(Request $request)
     {
-//        $host = self::getRequestParamKey('smtp_settings_host', $section);
-//        $port = self::getRequestParamKey('smtp_settings_port', $section);
-//        $encryption = self::getRequestParamKey('smtp_settings_encryption', $section);
-//        $username = self::getRequestParamKey('smtp_settings_username', $section);
-//        $password = self::getRequestParamKey('smtp_settings_password', $section);
-
         return new SmtpSettings(
-            $request->get('host', SmtpSettings::DEFAULT_HOST),
-            $request->get('port', SmtpSettings::DEFAULT_PORT),
-            $request->get('encryption', SmtpSettings::DEFAULT_ENCRYPTION),
-            $request->get('username', SmtpSettings::DEFAULT_USERNAME),
-            $request->get('password', SmtpSettings::DEFAULT_PASSWORD)
-        );
-    }
-
-    /**
-     * @param string $key
-     * @param string $section
-     *
-     * @return string
-     */
-    public static function getRequestParamKey($key, $section)
-    {
-        return sprintf(
-            '%s[%s][value]',
-            $section,
-            Config::getConfigKeyByName($key, ConfigManager::SECTION_VIEW_SEPARATOR)
+            $request->get(self::REQUEST_HOST, SmtpSettings::DEFAULT_HOST),
+            $request->get(self::REQUEST_PORT, SmtpSettings::DEFAULT_PORT),
+            $request->get(self::REQUEST_ENCRYPTION, SmtpSettings::DEFAULT_ENCRYPTION),
+            $request->get(self::REQUEST_USERNAME, SmtpSettings::DEFAULT_USERNAME),
+            $request->get(self::REQUEST_PASSWORD, SmtpSettings::DEFAULT_PASSWORD)
         );
     }
 }

@@ -38,16 +38,15 @@ define(function(require) {
                 url: this.getUrl(),
                 data: this.prepareData(data),
                 success: _.bind(function(response) {
-                    console.log(response);
                     if (response) {
                         console.log(true);
-                        this.showMessage('error', 'oro.imap.connection.smtp.error', $messageContainer);
+                        this.showMessage('error', 'oro.email.smtp_connection.error', $messageContainer);
                     } else {
-                        this.showMessage('success', 'oro.imap.connection.smtp.success', $messageContainer);
+                        this.showMessage('success', 'oro.email.smtp_connection.success', $messageContainer);
                     }
                 }, this),
                 error: _.bind(function() {
-                    this.showMessage('error', 'oro.imap.connection.error', $messageContainer);
+                    this.showMessage('error', 'oro.email.smtp_connection.error', $messageContainer);
                 }, this),
                 complete: function() {
                     mediator.execute('hideLoading');

@@ -63,6 +63,8 @@ oro:
                     label: Username
                 password:
                     label: Password
+                check_connection:
+                  label: Check SMTP Settings Connection
 
             signature_configuration:
                 label: Signature

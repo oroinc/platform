@@ -2,10 +2,6 @@
 
 namespace Oro\Bundle\EmailBundle\Mailer\Checker;
 
-use Swift_Mailer;
-use Swift_SmtpTransport;
-use Swift_Transport;
-
 use Oro\Bundle\EmailBundle\Form\Model\SmtpSettings;
 
 class SmtpSettingsChecker
@@ -15,13 +11,12 @@ class SmtpSettingsChecker
      *
      * @return bool|string
      */
-    public function checkSmtpSettingsConnection(SmtpSettings $smtpSettings)
+    public function checkConnection(SmtpSettings $smtpSettings)
     {
         $error = false;
 
         try {
-            $transport = $this->createTransportToCheck($smtpSettings);
-            $mailer = $this->createMailerToCheck($transport);
+            $mailer = $this->createMailerInstance($smtpSettings);
             $mailer->getTransport()->start();
         } catch (\Exception $e) {
             $error = $e->getMessage();
@@ -30,9 +25,9 @@ class SmtpSettingsChecker
         return $error;
     }
 
-    protected function createTransportToCheck(SmtpSettings $smtpSettings)
+    protected function createMailerInstance(SmtpSettings $smtpSettings)
     {
-        $transport = Swift_SmtpTransport::newInstance(
+        $transport = \Swift_SmtpTransport::newInstance(
             $smtpSettings->getHost(),
             $smtpSettings->getPort(),
             $smtpSettings->getEncryption()
@@ -40,10 +35,7 @@ class SmtpSettingsChecker
 
         $transport->setUsername($smtpSettings->getUsername());
         $transport->setPassword($smtpSettings->getPassword());
-    }
 
-    protected function createMailerToCheck(Swift_Transport $transport)
-    {
-        return Swift_Mailer::newInstance($transport);
+        return \Swift_Mailer::newInstance($transport);
     }
 }
