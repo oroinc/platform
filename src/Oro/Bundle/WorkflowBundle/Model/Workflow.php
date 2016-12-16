@@ -12,6 +12,7 @@ use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 
 use Oro\Bundle\WorkflowBundle\Acl\AclManager;
 use Oro\Bundle\WorkflowBundle\Configuration\WorkflowConfiguration;
+use Oro\Bundle\WorkflowBundle\Entity\Repository\WorkflowItemRepository;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowTransitionRecord;
@@ -298,13 +299,10 @@ class Workflow
             return null;
         }
 
+        /** @var WorkflowItemRepository $repo */
         $repo = $this->doctrineHelper->getEntityRepositoryForClass(WorkflowItem::class);
 
-        return $repo->findOneBy([
-            'workflowName' => $this->getName(),
-            'entityId' => $entityId,
-            'entityClass' => $entityClass
-        ]);
+        return $repo->findOneByEntityMetadata($entityClass, $entityId, $this->getName());
     }
 
     /**
@@ -343,6 +341,15 @@ class Workflow
         $workflowItem->setDefinition($this->getDefinition());
 
         return $workflowItem;
+    }
+
+    /**
+     * @param string $entityId
+     * @return null|WorkflowItem
+     */
+    public function getWorkflowItemByEntityId($entityId)
+    {
+        return $this->findWorkflowItem($this->getDefinition()->getRelatedEntity(), $entityId);
     }
 
     /**

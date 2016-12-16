@@ -36,6 +36,7 @@ class OptionsHelperTest extends \PHPUnit_Framework_TestCase
     /**
      * @param ButtonInterface $button
      * @param array $expectedData
+     *
      * @dataProvider getFrontendOptionsProvider
      */
     public function testGetFrontendOptions(ButtonInterface $button, array $expectedData)
@@ -52,11 +53,6 @@ class OptionsHelperTest extends \PHPUnit_Framework_TestCase
             'options' => [
                 'hasDialog' => null,
                 'showDialog' => false,
-                'dialogOptions' => [
-                    'title' => '[trans]test label[/trans]',
-                    'dialogOptions' => [],
-                ],
-                'dialogUrl' => 'generated-url',
                 'executionUrl' => 'generated-url',
                 'url' => 'generated-url',
             ],
@@ -70,6 +66,7 @@ class OptionsHelperTest extends \PHPUnit_Framework_TestCase
             ],
             'filled options' => [
                 'button' => $this->getButton('test label', [
+                    'hasForm' => true,
                     'hasDialog' => true,
                     'showDialog' => true,
                     'frontendOptions' => [
@@ -82,22 +79,20 @@ class OptionsHelperTest extends \PHPUnit_Framework_TestCase
                     ],
                 ]),
                 'expectedData' => [
-                    'options' => array_merge(
-                        $defaultData['options'],
-                        [
-                            'showDialog' => true,
-                            'dialogOptions' => [
-                                'title' => '[trans]custom title[/trans]',
-                                'dialogOptions' => [],
-                            ]
-                        ]
-                    ),
-                    'data' => array_merge(
-                        $defaultData['data'],
-                        [
-                            'some' => 'data',
-                        ]
-                    ),
+                    'options' => [
+                        'hasDialog' => true,
+                        'showDialog' => true,
+                        'dialogOptions' => [
+                            'title' => '[trans]custom title[/trans]',
+                            'dialogOptions' => [],
+                        ],
+                        'dialogUrl' => 'generated-url',
+                        'executionUrl' => 'generated-url',
+                        'url' => 'generated-url',
+                    ],
+                    'data' => [
+                        'some' => 'data',
+                    ],
                 ],
             ],
         ];
@@ -106,6 +101,7 @@ class OptionsHelperTest extends \PHPUnit_Framework_TestCase
     /**
      * @param string $label
      * @param array $templateData
+     *
      * @return ButtonInterface|\PHPUnit_Framework_MockObject_MockObject
      */
     protected function getButton($label, array $templateData)
