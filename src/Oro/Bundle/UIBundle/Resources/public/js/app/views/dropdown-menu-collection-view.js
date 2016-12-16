@@ -46,6 +46,7 @@ define(function(require) {
         listSelector: '[data-name="list"]',
         loadingSelector: '[data-name="loading"]',
         fallbackSelector: '[data-name="fallback"]',
+        dropdownMenuOptions: null,
 
         /**
          * @type {string}
@@ -61,6 +62,11 @@ define(function(require) {
             'click li': 'onItemClick'
         },
 
+        listen: {
+            'sync collection': 'onCollectionSync',
+            'syncStateChange collection': 'onCollectionSyncStateChange'
+        },
+
         template: _.template([
             '<div class="dropdown-menu-collection__fallback" data-name="fallback"><%= fallbackText %></div>',
             '<div class="dropdown-menu-collection__loading" data-name="loading"><%= loadingText %></div>',
@@ -68,7 +74,7 @@ define(function(require) {
         ].join('')),
 
         initialize: function(options) {
-            _.extend(this, _.pick(options, ['loadingText', 'fallbackText', 'keysMap']));
+            _.extend(this, _.pick(options, ['loadingText', 'fallbackText', 'keysMap', 'dropdownMenuOptions']));
             if (options.keysMap) {
                 var keysMap = options.keysMap;
                 var ItemView = this.itemView = this.itemView.extend({
@@ -81,6 +87,14 @@ define(function(require) {
                 });
             }
             DropdownMenuCollectionView.__super__.initialize.call(this, options);
+        },
+
+        render: function() {
+            DropdownMenuCollectionView.__super__.render.call(this);
+            if (this.dropdownMenuOptions) {
+                this.$el.data('options', this.dropdownMenuOptions);
+            }
+            return this;
         },
 
         getTemplateData: function() {
@@ -103,6 +117,16 @@ define(function(require) {
             if (subview) {
                 this.trigger('selected', subview.model.toJSON());
             }
+        },
+
+        onCollectionSync: function() {
+            this.$el.trigger('content:changed');
+        },
+
+        onCollectionSyncStateChange: function() {
+            _.defer(_.bind(function() {
+                this.$el.trigger('content:changed');
+            }, this));
         }
     });
 
