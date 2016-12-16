@@ -28,7 +28,7 @@ class RolePrivilegeCategoryProvider
     {
         $this->translator = $translator;
     }
-    
+
     /**
      * Add provider to registry
      *
@@ -137,7 +137,7 @@ class RolePrivilegeCategoryProvider
         }
         ksort($orderedCategoryList);
         $categoryList = call_user_func_array('array_merge', $orderedCategoryList);
-        
+
         return $categoryList;
     }
 
@@ -150,10 +150,10 @@ class RolePrivilegeCategoryProvider
     {
         $tabs = $this->getTabList();
 
-        return array_filter($this->getPermissionCategories(), function ($category) use ($tabs) {
+        return array_values(array_filter($this->getPermissionCategories(), function ($category) use ($tabs) {
             /** @var PrivilegeCategory $category */
             return in_array($category->getId(), $tabs, true);
-        });
+        }));
     }
 
     /**
