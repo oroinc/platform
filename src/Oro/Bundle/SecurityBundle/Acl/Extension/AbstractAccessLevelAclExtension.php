@@ -185,7 +185,7 @@ abstract class AbstractAccessLevelAclExtension extends AbstractAclExtension
      *
      * @param mixed $object
      *
-     * @return string
+     * @return string|null
      */
     protected function getObjectClassName($object)
     {

@@ -13,6 +13,8 @@ use Oro\Component\ConfigExpression\Tests\Unit\Fixtures\ItemStub;
 
 class RequestEntityTest extends \PHPUnit_Framework_TestCase
 {
+    const PROPERTY_PATH_VALUE = 'property_path_value';
+
     /**
      * @var RequestEntity
      */
@@ -157,6 +159,9 @@ class RequestEntityTest extends \PHPUnit_Framework_TestCase
         $this->assertAttributeEquals($expected, 'options', $this->action);
     }
 
+    /**
+     * @return array
+     */
     public function initializeDataProvider()
     {
         return array(
@@ -208,7 +213,8 @@ class RequestEntityTest extends \PHPUnit_Framework_TestCase
             $options['identifier'] = trim($options['identifier']);
         }
 
-        $expectedIdentifier = $this->convertIdentifier($context, $options['identifier']);
+        $expectedIdentifier = $this->processAttribute($context, $options['identifier']);
+        $expectedClass = $this->processAttribute($context, $options['class']);
         if (!empty($options['case_insensitive'])) {
             $expectedIdentifier = strtolower($expectedIdentifier);
         }
@@ -218,12 +224,12 @@ class RequestEntityTest extends \PHPUnit_Framework_TestCase
             ->getMock();
         $em->expects($this->once())
             ->method('getReference')
-            ->with($options['class'], $expectedIdentifier)
+            ->with($expectedClass, $expectedIdentifier)
             ->will($this->returnValue($entity));
 
         $this->registry->expects($this->once())
             ->method('getManagerForClass')
-            ->with($options['class'])
+            ->with($expectedClass)
             ->will($this->returnValue($em));
 
         $this->action->initialize($options);
@@ -242,6 +248,13 @@ class RequestEntityTest extends \PHPUnit_Framework_TestCase
             'scalar_identifier' => array(
                 'options' => array(
                     'class' => '\stdClass',
+                    'identifier' => 1,
+                    'attribute' => new PropertyPath('entity_attribute'),
+                )
+            ),
+            'attribute_class' => array(
+                'options' => array(
+                    'class' => new PropertyPath('class'),
                     'identifier' => 1,
                     'attribute' => new PropertyPath('entity_attribute'),
                 )
@@ -274,6 +287,19 @@ class RequestEntityTest extends \PHPUnit_Framework_TestCase
                     'attribute' => new PropertyPath('entity_attribute'),
                 )
             ),
+            'property_identifier' => [
+                'options' => [
+                    'class' => '\stdClass',
+                    'identifier' => new PropertyPath('ident'),
+                    'attribute' => new PropertyPath('entity_attribute'),
+                ],
+                'data' => [
+                    'ident' => [
+                        'id'   => 1,
+                        'name' => 'unique_key',
+                    ],
+                ],
+            ],
             'array_attribute_identifier' => array(
                 'options' => array(
                     'class' => '\stdClass',
@@ -367,7 +393,7 @@ class RequestEntityTest extends \PHPUnit_Framework_TestCase
      * @param mixed $identifier
      * @return mixed
      */
-    protected function convertIdentifier($context, $identifier)
+    protected function processAttribute($context, $identifier)
     {
         if (is_array($identifier)) {
             foreach ($identifier as $key => $value) {
