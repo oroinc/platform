@@ -126,8 +126,6 @@ system_configuration:
                     - Range:
                         min: 0
                         max: 65535
-                    - Type:
-                        type: integer
 
         oro_email.smtp_settings_encryption:
             data_type: string
