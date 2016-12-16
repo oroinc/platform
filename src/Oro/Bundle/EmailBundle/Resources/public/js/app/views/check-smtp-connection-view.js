@@ -39,7 +39,6 @@ define(function(require) {
                 data: this.prepareData(data),
                 success: _.bind(function(response) {
                     if (response) {
-                        console.log(true);
                         this.showMessage('error', 'oro.email.smtp_connection.error', $messageContainer);
                     } else {
                         this.showMessage('success', 'oro.email.smtp_connection.success', $messageContainer);
