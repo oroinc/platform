@@ -19,6 +19,20 @@ entity_config:
                 # target entity classes whose activities will be shown in current entity
                 # if entity one has relation with entity two and for both enabled activity
                 # we can configure entity one using this option for show activities from related entity two
+                #
+                # Example of configuration for Unidirectional relations
+                # (join "user" relation to the "Test" entity throught "Example" entity relation)
+                # [
+                #   [target] => Oro\Bundle\ExampleBundle\Entity\Test
+                #   [path] => [
+                #       [0] => [
+                #              [join] => Oro\Bundle\ExampleBundle\Entity\Example
+                #              [conditionType] => WITH
+                #              [field] => test_id
+                #      ],
+                #      [1] => user
+                #   ]
+                #]
                 inheritance_targets: # array of strings
                     options: []
 
