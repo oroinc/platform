@@ -8,33 +8,31 @@
         }
 
         &:checked {
-            ~ .custom-checkbox__icon,
-            ~ .custom-checkbox .custom-checkbox__icon {
+            ~ .custom-checkbox__icon {
+                color: get-color('ui', 'focus');
+
                 &:before {
-                    content: '';
-
-                    position: absolute;
-                    top: $checkbox-icon-check-position-top;
-                    left: $checkbox-icon-check-position-left;
-                    transform: $checkbox-icon-check-transform-translate $checkbox-icon-check-transform-rotate;
-
-                    width: $checkbox-icon-check-width;
-                    height: $checkbox-icon-check-height;
-
-                    border-left: $checkbox-icon-check-thickness solid $checkbox-icon-check-color;
-                    border-bottom: $checkbox-icon-check-thickness solid $checkbox-icon-check-color;
+                    content: '#{$checkbox-icon-checked-code}';
                 }
             }
         }
     }
 
     &__icon {
-        position: relative;
+        color: get-color('additional', 'middle');
 
-        border-radius: 3px;
+        &:before {
+            content: '#{$checkbox-icon-unchecked-code}';
+
+            display: inline-block;
+
+            font-family: $checkbox-icon-font;
+            font-size: 17px;
+            line-height: 1;
+        }
     }
 
     &__text {
-        margin-left: $offset-x-s;
+        margin-left: $offset-x-s / 2;
     }
 }
