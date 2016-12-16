@@ -4,7 +4,7 @@ namespace Oro\Component\Action\Action;
 
 use Oro\Component\Action\Condition\Configurable as ConfigurableCondition;
 use Oro\Component\Action\Model\AbstractAssembler;
-use Oro\Component\ConfigExpression\ExpressionFactory as ConditionFactory;
+use Oro\Component\ConfigExpression\ExpressionFactoryInterface as ConditionFactoryInterface;
 
 class ActionAssembler extends AbstractAssembler
 {
@@ -14,20 +14,20 @@ class ActionAssembler extends AbstractAssembler
     const CONDITIONS_KEY = 'conditions';
 
     /**
-     * @var ActionFactory
+     * @var ActionFactoryInterface
      */
     protected $actionFactory;
 
     /**
-     * @var ConditionFactory
+     * @var ConditionFactoryInterface
      */
     protected $conditionFactory;
 
     /**
-     * @param ActionFactory $actionFactory
-     * @param ConditionFactory $conditionFactory
+     * @param ActionFactoryInterface $actionFactory
+     * @param ConditionFactoryInterface $conditionFactory
      */
-    public function __construct(ActionFactory $actionFactory, ConditionFactory $conditionFactory)
+    public function __construct(ActionFactoryInterface $actionFactory, ConditionFactoryInterface $conditionFactory)
     {
         $this->actionFactory = $actionFactory;
         $this->conditionFactory  = $conditionFactory;

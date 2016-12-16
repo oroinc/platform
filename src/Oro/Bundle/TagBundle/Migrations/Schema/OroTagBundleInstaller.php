@@ -17,7 +17,7 @@ class OroTagBundleInstaller implements Installation
      */
     public function getMigrationVersion()
     {
-        return 'v1_7';
+        return 'v1_8';
     }
 
     /**
@@ -32,6 +32,9 @@ class OroTagBundleInstaller implements Installation
         /** Foreign keys generation **/
         $this->addOroTagTaggingForeignKeys($schema);
         $this->addOroTagTagForeignKeys($schema);
+
+        $this->addTaxonomy($schema);
+        $this->addOroTaxonomyForeignKeys($schema);
     }
 
     /**
@@ -105,6 +108,59 @@ class OroTagBundleInstaller implements Installation
     protected function addOroTagTagForeignKeys(Schema $schema)
     {
         $table = $schema->getTable('oro_tag_tag');
+        $table->addForeignKeyConstraint(
+            $schema->getTable('oro_organization'),
+            ['organization_id'],
+            ['id'],
+            ['onUpdate' => null, 'onDelete' => 'SET NULL']
+        );
+        $table->addForeignKeyConstraint(
+            $schema->getTable('oro_user'),
+            ['user_owner_id'],
+            ['id'],
+            ['onUpdate' => null, 'onDelete' => 'SET NULL']
+        );
+    }
+
+    /**
+     * @param Schema $schema
+     */
+    protected function addTaxonomy(Schema $schema)
+    {
+        /** Generate table oro_tag_tag **/
+        $table = $schema->createTable('oro_tag_taxonomy');
+
+        $table->addColumn('id', 'integer', ['autoincrement' => true]);
+        $table->addColumn('organization_id', 'integer', ['notnull' => false]);
+        $table->addColumn('user_owner_id', 'integer', ['notnull' => false]);
+        $table->addColumn('name', 'string', ['length' => 50]);
+        $table->addColumn('background_color', 'string', ['length' => 7, 'notnull' => false]);
+        $table->addColumn('created', 'datetime', []);
+        $table->addColumn('updated', 'datetime', []);
+        $table->setPrimaryKey(['id']);
+        $table->addIndex(['name', 'organization_id'], 'tag_taxonomy_name_organization_idx');
+        $table->addIndex(['user_owner_id'], 'tag_taxonomy_user_owner_idx', []);
+        /** End of generate table oro_tag_tag **/
+
+        $tagTable = $schema->getTable('oro_tag_tag');
+        $tagTable->addColumn('taxonomy_id', 'integer', ['notnull' => false]);
+
+        $tagTable->addForeignKeyConstraint(
+            $table,
+            ['taxonomy_id'],
+            ['id'],
+            ['onDelete' => 'SET NULL', 'onUpdate' => null]
+        );
+    }
+
+    /**
+     * Add oro_tag_taxonomy foreign keys.
+     *
+     * @param Schema $schema
+     */
+    protected function addOroTaxonomyForeignKeys(Schema $schema)
+    {
+        $table = $schema->getTable('oro_tag_taxonomy');
         $table->addForeignKeyConstraint(
             $schema->getTable('oro_organization'),
             ['organization_id'],

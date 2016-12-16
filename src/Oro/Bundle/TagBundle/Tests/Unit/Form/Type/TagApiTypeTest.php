@@ -37,7 +37,7 @@ class TagApiTypeTest extends \PHPUnit_Framework_TestCase
         $builder = $this->getMockBuilder('Symfony\Component\Form\FormBuilder')
             ->disableOriginalConstructor()
             ->getMock();
-        $builder->expects($this->once())
+        $builder->expects($this->exactly(2))
             ->method('add')
             ->will($this->returnSelf());
 

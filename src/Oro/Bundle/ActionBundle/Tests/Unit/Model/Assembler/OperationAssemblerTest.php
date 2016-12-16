@@ -232,9 +232,7 @@ class OperationAssemblerTest extends \PHPUnit_Framework_TestCase
      */
     protected function getActionFactory()
     {
-        return $this->getMockBuilder('Oro\Component\Action\Action\ActionFactory')
-            ->disableOriginalConstructor()
-            ->getMock();
+        return $this->getMock('Oro\Component\Action\Action\ActionFactoryInterface');
     }
 
     /**

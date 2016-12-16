@@ -36,10 +36,16 @@ services:
         tags:
             - { name: form.type, alias: embedded_form }
 
+    oro_embedded_form.layout_factory_builder:
+        synthetic: true
+
+    oro_embedded_form.layout_manager:
+        synthetic: true
+
     oro_embedded_form.embed_form_layout_manager:
         class: %oro_embedded_form.embed_form_layout_manager.class%
         arguments:
-            - '@oro_layout.layout_manager'
+            - '@oro_embedded_form.layout_manager'
             - '@oro_embedded_form.manager'
         calls:
             - [setSessionIdProvider, ['@oro_embedded_form.session_id_provider']]
