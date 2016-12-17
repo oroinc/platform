@@ -114,10 +114,10 @@ class InstallCommand extends AbstractCommand implements InstallCommandInterface
             $this->updateInstalledFlag(false);
             $commandExecutor->runCommand(
                 'cache:clear',
-                array(
+                [
                     '--no-optional-warmers' => true,
                     '--process-isolation'   => true
-                )
+                ]
             );
         }
 
@@ -451,7 +451,7 @@ class InstallCommand extends AbstractCommand implements InstallCommandInterface
                 [
                     '--force'             => true,
                     '--process-isolation' => true,
-                    '--timeout'           => $commandExecutor->getDefaultOption('process-timeout')
+                    '--timeout'           => $commandExecutor->getDefaultOption('process-timeout'),
                 ]
             )
             ->runCommand(
@@ -467,6 +467,12 @@ class InstallCommand extends AbstractCommand implements InstallCommandInterface
                 ]
             )
             ->runCommand(
+                'oro:cron:definitions:load',
+                [
+                    '--process-isolation' => true
+                ]
+            )
+            ->runCommand(
                 'oro:process:configuration:load',
                 [
                     '--process-isolation' => true
@@ -476,7 +482,7 @@ class InstallCommand extends AbstractCommand implements InstallCommandInterface
                 'oro:migration:data:load',
                 [
                     '--process-isolation' => true,
-                    '--no-interaction'    => true
+                    '--no-interaction'    => true,
                 ]
             );
 
@@ -498,10 +504,10 @@ class InstallCommand extends AbstractCommand implements InstallCommandInterface
             // load demo fixtures
             $commandExecutor->runCommand(
                 'oro:migration:data:load',
-                array(
+                [
                     '--process-isolation'  => true,
-                    '--fixtures-type'      => 'demo'
-                )
+                    '--fixtures-type'      => 'demo',
+                ]
             );
         }
 
@@ -525,9 +531,9 @@ class InstallCommand extends AbstractCommand implements InstallCommandInterface
     ) {
         $output->writeln('<info>Preparing application.</info>');
 
-        $assetsOptions = array(
-            '--exclude' => array('OroInstallerBundle')
-        );
+        $assetsOptions = [
+            '--exclude' => ['OroInstallerBundle']
+        ];
         if ($input->hasOption('symlink') && $input->getOption('symlink')) {
             $assetsOptions['--symlink'] = true;
         }
@@ -539,17 +545,17 @@ class InstallCommand extends AbstractCommand implements InstallCommandInterface
 
         $commandExecutor->runCommand(
             'oro:navigation:init',
-            array(
+            [
                 '--process-isolation' => true,
-            )
+            ]
         );
 
         if (!$skipAssets) {
             $commandExecutor->runCommand(
                 'fos:js-routing:dump',
-                array(
+                [
                     '--process-isolation' => true,
-                )
+                ]
             )
                 ->runCommand('oro:localization:dump')
                 ->runCommand(
@@ -558,22 +564,22 @@ class InstallCommand extends AbstractCommand implements InstallCommandInterface
                 )
                 ->runCommand(
                     'assetic:dump',
-                    array(
+                    [
                         '--process-isolation' => true,
-                    )
+                    ]
                 )
                 ->runCommand(
                     'oro:translation:dump',
-                    array(
+                    [
                         '--process-isolation' => true,
-                    )
+                    ]
                 )
                 ->runCommand(
                     'oro:requirejs:build',
-                    array(
+                    [
                         '--ignore-errors' => true,
                         '--process-isolation' => true,
-                    )
+                    ]
                 );
         }
         // run installer scripts
@@ -638,19 +644,19 @@ class InstallCommand extends AbstractCommand implements InstallCommandInterface
         $table = $this->getHelperSet()->get('table');
 
         $table
-            ->setHeaders(array('Check  ', $header))
-            ->setRows(array());
+            ->setHeaders(['Check  ', $header])
+            ->setRows([]);
 
         /** @var \Requirement $requirement */
         foreach ($collection as $requirement) {
             if ($requirement->isFulfilled()) {
-                $table->addRow(array('OK', $requirement->getTestMessage()));
+                $table->addRow(['OK', $requirement->getTestMessage()]);
             } else {
                 $table->addRow(
-                    array(
+                    [
                         $requirement->isOptional() ? 'WARNING' : 'ERROR',
                         $requirement->getHelpText()
-                    )
+                    ]
                 );
             }
         }

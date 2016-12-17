@@ -4,6 +4,7 @@ parameters:
     oro_form.type.time_interval.class:                           Oro\Bundle\FormBundle\Form\Type\OroTimeIntervalType
     oro_form.type.duration.class:                                Oro\Bundle\FormBundle\Form\Type\OroDurationType
     oro_form.type.money.class:                                   Oro\Bundle\FormBundle\Form\Type\OroMoneyType
+    oro_form.type.choice.class:                                  Oro\Bundle\FormBundle\Form\Type\OroChoiceType
     oro_form.type.percent.class:                                 Oro\Bundle\FormBundle\Form\Type\OroPercentType
     oro_form.type.entity_identifier.class:                       Oro\Bundle\FormBundle\Form\Type\EntityIdentifierType
     oro_form.type.jqueryselect2_hidden.class:                    Oro\Bundle\FormBundle\Form\Type\OroJquerySelect2HiddenType
@@ -74,6 +75,11 @@ services:
         tags:
             - { name: form.type, alias: oro_money }
 
+    oro_form.type.choice:
+        class: %oro_form.type.choice.class%
+        tags:
+            - { name: form.type, alias: oro_choice }
+
     oro_form.type.percent:
         class: %oro_form.type.percent.class%
         tags:
@@ -91,6 +97,11 @@ services:
         arguments: ["@doctrine"]
         tags:
             - { name: form.type, alias: oro_entity_identifier }
+
+    oro_form.type.entity_tree_select:
+        class: Oro\Bundle\FormBundle\Form\Type\EntityTreeSelectType
+        tags:
+            - { name: form.type, alias: oro_entity_tree_select }
 
     oro_form.type.jqueryselect2_hidden:
         class: %oro_form.type.jqueryselect2_hidden.class%

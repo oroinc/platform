@@ -18,7 +18,7 @@ use Symfony\Component\Security\Acl\Model\DomainObjectInterface;
  *      routeView="oro_process_definition_view",
  *      defaultValues={
  *          "entity"={
- *              "icon"="icon-inbox"
+ *              "icon"="fa-inbox"
  *          },
  *          "security"={
  *              "type"="ACL",

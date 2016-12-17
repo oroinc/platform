@@ -1,0 +1,51 @@
+// @theme: blank;
+
+// @return the value in a map associated with a given key;
+// Use: color: get-color('primary', 'base') => color: #000;
+
+@function get-color($palette: 'primary', $key: 'main') {
+    $current-palette: map-get($color-palette,  $palette);
+
+    @return map-get($current-palette, $key);
+}
+
+
+// @return: the value in a map associated with a given key
+// Use: z-index: z('base');
+
+@function z($layer: 'base') {
+    $layers: (
+            'base': 1,
+            'fixed': 50,
+            'dropdown': 100,
+            'popup': 150,
+            'hidden': -1
+    );
+
+    $z-index: map-get($layers, $layer);
+    @return $z-index;
+}
+
+
+// Remove the unit of a length
+// @return number
+// Use: $value: strip-units(10px); -> 10
+
+@function strip-units($value) {
+    @return $value / ($value * 0 + 1);
+}
+
+
+// In SASS we can only once set a value to variable with flag !default, all others values will be ignored.
+// The variable must be declared.
+// @return new value with flag !default;
+// Use: $component-var: reset-var($component-var, 10);
+
+@function update-default($var, $value: null) {
+    @if ($var) {
+        $var: null;
+        $var: $value !default;
+
+        @return $var;
+    }
+}

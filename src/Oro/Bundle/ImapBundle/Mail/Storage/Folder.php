@@ -25,8 +25,25 @@ class Folder extends BaseFolder
     ];
 
     /** @var array */
-    protected $possibleSentFolderNameMap = [
-        'SentBox', 'Sent'
+    protected $knownFolderNameMap = [
+        'Inbox'            => FolderType::INBOX,
+        'INBOX'            => FolderType::INBOX,
+
+        'Drafts'           => FolderType::DRAFTS,
+
+        'Spam'             => FolderType::SPAM,
+        'Junk'             => FolderType::SPAM,
+        'Junk E-mail'      => FolderType::SPAM,
+
+        'Sent'             => FolderType::SENT,
+        'SentBox'          => FolderType::SENT,
+        'Sent Items'       => FolderType::SENT,
+        'Sent Messages'    => FolderType::SENT,
+
+        'Trash'            => FolderType::TRASH,
+        'Deleted'          => FolderType::TRASH,
+        'Deleted Items'    => FolderType::TRASH,
+        'Deleted Messages' => FolderType::TRASH
     ];
 
     /** @var string[] */
@@ -134,24 +151,30 @@ class Folder extends BaseFolder
                 break;
             }
         }
-        // if sent box do not include flag for correct type guess
-        if ($this->type === FolderType::OTHER && $this->guessSentTypeByName()) {
-            $this->type = FolderType::SENT;
+        // In case the IMAP server doesn't support the special-use mailboxes extension,
+        // try to guess the type using hard-coded folder names.
+        if ($this->type === FolderType::OTHER) {
+            $guessedType = $this->guessFolderTypeByName();
+
+            if ($guessedType) {
+                $this->type = $guessedType;
+            }
         }
 
         return $this->type;
     }
 
     /**
-     * Try to guess sent folder by folder name
+     * Try to guess folder type using known special folder names.
      *
-     * @return bool
+     * @return string|bool
      */
-    public function guessSentTypeByName()
+    public function guessFolderTypeByName()
     {
-        if (in_array($this->getGlobalName(), $this->possibleSentFolderNameMap, true)) {
-            return true;
+        if (array_key_exists($this->getGlobalName(), $this->knownFolderNameMap)) {
+            return $this->knownFolderNameMap[$this->getGlobalName()];
         }
+
         return false;
     }
 }

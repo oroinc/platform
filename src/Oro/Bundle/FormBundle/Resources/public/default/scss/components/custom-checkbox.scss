@@ -12,7 +12,7 @@
                 color: get-color('ui', 'focus');
 
                 &:before {
-                    content: '\e834';
+                    content: '#{$checkbox-icon-checked-code}';
                 }
             }
         }
@@ -22,11 +22,11 @@
         color: get-color('additional', 'middle');
 
         &:before {
-            content: '\e835';
+            content: '#{$checkbox-icon-unchecked-code}';
 
             display: inline-block;
 
-            font-family: $base-font-icon;
+            font-family: $checkbox-icon-font;
             font-size: 17px;
             line-height: 1;
         }

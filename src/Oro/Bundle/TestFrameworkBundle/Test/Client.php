@@ -218,13 +218,23 @@ class Client extends BaseClient
     }
 
     /**
+     * @param bool|true $hasPerformedRequest
+     */
+    public function reboot($hasPerformedRequest = true)
+    {
+        $this->kernel->shutdown();
+        $this->kernel->boot();
+
+        $this->hasPerformedRequest = $hasPerformedRequest;
+    }
+
+    /**
      * {@inheritdoc}
      */
     protected function doRequest($request)
     {
         if ($this->hasPerformedRequest) {
-            $this->kernel->shutdown();
-            $this->kernel->boot();
+            $this->reboot();
         } else {
             $this->hasPerformedRequest = true;
         }

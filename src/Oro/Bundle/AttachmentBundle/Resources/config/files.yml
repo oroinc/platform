@@ -1,5 +1,5 @@
 file-icons:
-    default: icon-file-alt
+    default: fa-file-o
     doc: fa-file-text-o
     docx: fa-file-text-o
     xls: fa-file-excel-o

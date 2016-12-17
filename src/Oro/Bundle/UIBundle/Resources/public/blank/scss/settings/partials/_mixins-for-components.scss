@@ -9,3 +9,17 @@
         color: $link-color-hover;
     }
 }
+
+@mixin fa-icon($icon-code: null, $state: before) {
+    @if ($icon-code) {
+        &:#{$state} {
+            content: '#{$icon-code}';
+
+            font-family: $icon-font;
+        }
+    }
+}
+
+%base-transition {
+    transition: all linear 100ms;
+}

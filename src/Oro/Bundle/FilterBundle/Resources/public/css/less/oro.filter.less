@@ -14,7 +14,7 @@
         padding-left: 36px;
     }
 }
-.filter-item .reset-filter:hover [class^='icon-']:before {
+.filter-item .reset-filter:hover [class^="fa-"]:before {
     color: #666;
 }
 .filter-item .reset-filter {
@@ -31,7 +31,7 @@
     display: inline-block;
 }
 
-.filter-box .btn-group [class^='icon-'] {
+.filter-box .btn-group [class^="fa-"] {
   padding-top:2px;
   vertical-align:middle;
 }
@@ -350,48 +350,15 @@ button.ui-multiselect.select-filter-widget.ui-state-hover{
         margin-bottom: 0;
       }
       .select2-container {
-        display: block;
-        margin: 0 0 15px;
-        padding: 0 4px;
-        border: 1px solid #ebebeb;
-        border-radius: 5px;
-        background: none;
-
-        &-active {
-          outline: 0;
-          border-color: #4597ca;
-          box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075),
-                      0 0 8px rgba(102, 175, 233, .6);
-        }
-
+        border: 0 none;
         .select2-choices {
-          margin: 0;
-          padding: 4px 0;
-          border: 0;
+          border-left: 0;
+          border-right: 0;
           border-radius: 0;
-          min-height: 0;
-
-          .select2-search-field {
-            &:not(:first-child) {
-              display: inline;
-              width: 10px;
-            }
-
-            input[type=text] {
-              margin: 0 0 0 5px;
-              padding: 4px 0;
-              border: 0;
-
-              &:focus {
-                border: none;
-                box-shadow: none;
-              }
-            }
-          }
+          min-height: 29px;
         }
         .select2-search-choice {
           line-height: 15px;
-          margin-bottom: 5px;
         }
       }
       .filter-update {

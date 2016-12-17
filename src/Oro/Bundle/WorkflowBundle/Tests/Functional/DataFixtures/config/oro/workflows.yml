@@ -138,6 +138,11 @@ workflows:
                 is_start: true
         transition_definitions:
             definition1: ~
+        disable_operations:
+            oro_test_disable_operation: ~
+            oro_test_disable_operation_by_entity:
+                - Oro\Bundle\TestFrameworkBundle\Entity\Item
+                - stdClass
 
     test_active_flow2:
         entity: Oro\Bundle\TestFrameworkBundle\Entity\WorkflowAwareEntity
