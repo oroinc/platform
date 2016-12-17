@@ -277,4 +277,18 @@ class CumulativeConfigLoaderTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals([$resource1], $result);
     }
+
+    public function testYamlCumulativeFileLoaderImports()
+    {
+        $bundle1      = new TestBundle1();
+        $bundleClass = get_class($bundle1);
+        $bundleDir   = dirname((new \ReflectionClass($bundle1))->getFileName());
+
+        $resourceLoader1 = new YamlCumulativeFileLoader('Resources/config/import/parent.yml');
+        $resource = $resourceLoader1->load($bundleClass, $bundleDir);
+
+        $this->assertArrayNotHasKey('imports', $resource->data); // import must be transparent
+        $this->assertArrayHasKey('test', $resource->data);
+        $this->assertEquals($resource->data['test'], 'success');
+    }
 }
