@@ -266,3 +266,39 @@ services:
             - '@router'
         tags:
             - { name: form.type, alias: oro_entity_extend_multiple_entity }
+
+    oro_entity_extend.form.extension.attribute_field_config_extension:
+        class: Oro\Bundle\EntityExtendBundle\Form\Extension\AttributeFieldConfigExtension
+        arguments:
+            - '@oro_entity_config.provider.attribute'
+        tags:
+            - { name: form.type_extension, alias: oro_entity_extend_field_type }
+
+    oro_entity_extend.form.handler.create_update_config_field_handler:
+        class: Oro\Bundle\EntityExtendBundle\Form\Handler\CreateUpdateConfigFieldHandler
+        scope: request
+        arguments:
+            - '@oro_entity_extend.form.handler.config_helper_handler'
+            - '@oro_entity_config.config_manager'
+            - '@oro_ui.router'
+            - '@oro_entity_config.config.config_helper'
+            - '@oro_entity_extend.form.util.field_session_storage'
+
+    oro_entity_extend.form.util.field_session_storage:
+        class: 'Oro\Bundle\EntityExtendBundle\Form\Util\FieldSessionStorage'
+        public: false
+        arguments:
+            - '@session'
+
+    oro_entity_extend.form.handler.remove_restore_field_handler:
+        class: Oro\Bundle\EntityExtendBundle\Form\Handler\RemoveRestoreConfigFieldHandler
+        arguments:
+            - '@oro_entity_config.config_manager'
+            - '@oro_entity_extend.extend.field_name_validation_helper'
+            - '@oro_entity_config.config.config_helper'
+            - '@session'
+
+    oro_entity_config.config.config_helper:
+        class: 'Oro\Bundle\EntityConfigBundle\Config\ConfigHelper'
+        arguments:
+            - '@oro_entity_config.config_manager'
