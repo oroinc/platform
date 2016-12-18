@@ -11,6 +11,9 @@
             {% endfor %}
         </tr>
     </table>
+    <div>
+        {{ form_errors(form) }}
+    </div>
 {% endblock %}
 
 {% block oro_scope_collection_widget %}

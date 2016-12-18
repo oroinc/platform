@@ -8,9 +8,6 @@
     "require": {
         "php": ">=5.6",
         "symfony/symfony": "2.8.*, !=2.8.10",
-        "besimple/soap-common": "dev-master",
-        "besimple/soap-server": "dev-master",
-        "besimple/soap-bundle": "dev-master",
         "oro/config": "dev-master"
     },
     "autoload": {

@@ -51,6 +51,11 @@ class UpdateHandlerTest extends \PHPUnit_Framework_TestCase
     protected $form;
 
     /**
+     * @var bool
+     */
+    protected $resultCallbackInvoked;
+
+    /**
      * @var UpdateHandler
      */
     protected $handler;
@@ -74,6 +79,8 @@ class UpdateHandlerTest extends \PHPUnit_Framework_TestCase
             ->getMock();
         $this->form = $this->getMock('Symfony\Component\Form\FormInterface');
 
+        $this->resultCallbackInvoked = false;
+
         $this->handler = new UpdateHandler(
             $this->request,
             $this->session,
@@ -89,6 +96,20 @@ class UpdateHandlerTest extends \PHPUnit_Framework_TestCase
     protected function getObject()
     {
         return new \stdClass();
+    }
+
+    /**
+     * @param FormInterface $expectedForm
+     * @return \Closure
+     */
+    protected function getResultCallback(FormInterface $expectedForm)
+    {
+        $resultCallback = function () use (&$called, $expectedForm) {
+            $this->resultCallbackInvoked = true;
+            return ['form' => $expectedForm, 'test' => 1];
+        };
+
+        return $resultCallback;
     }
 
     /**
@@ -512,12 +533,8 @@ class UpdateHandlerTest extends \PHPUnit_Framework_TestCase
         $saveAndCloseCallback = function () use ($saveAndCloseRoute) {
             return $saveAndCloseRoute;
         };
-        $called = false;
-        $expectedForm = $this->getMock('Symfony\Component\Form\FormInterface');
-        $resultCallback = function () use (&$called, $expectedForm) {
-            $called = true;
-            return ['form' => $expectedForm, 'test' => 1];
-        };
+        /** @var FormInterface|\PHPUnit_Framework_MockObject_MockObject $expectedForm */
+        $expectedForm = $this->getMock(FormInterface::class);
 
         $expected = $this->getExpectedSaveData($this->form, $entity);
         $expected['savedId'] = 1;
@@ -531,9 +548,9 @@ class UpdateHandlerTest extends \PHPUnit_Framework_TestCase
             $saveAndCloseCallback,
             'Saved',
             $handler,
-            $resultCallback
+            $this->getResultCallback($expectedForm)
         );
-        $this->assertTrue($called);
+        $this->assertTrue($this->resultCallbackInvoked);
         $this->assertEquals($expected, $result);
     }
 
@@ -612,6 +629,25 @@ class UpdateHandlerTest extends \PHPUnit_Framework_TestCase
         $expected['savedId'] = 1;
 
         $result = $this->handler->update($data, $this->form, 'Saved', $handler);
+        $this->assertEquals($expected, $result);
+    }
+
+    public function testUpdateWorksWithoutFormHandlerAndWithResultCallback()
+    {
+        $data = $this->getObject();
+
+        $handler = $this->getHandlerStub($data);
+        $this->doctrineHelper->expects($this->once())
+            ->method('getSingleEntityIdentifier')
+            ->with($data)
+            ->will($this->returnValue(1));
+
+        $expected = $this->getExpectedSaveData($this->form, $data);
+        $expected['savedId'] = 1;
+        $expected['form'] = $this->form;
+        $expected['test'] = 1;
+
+        $result = $this->handler->update($data, $this->form, 'Saved', $handler, $this->getResultCallback($this->form));
         $this->assertEquals($expected, $result);
     }
 

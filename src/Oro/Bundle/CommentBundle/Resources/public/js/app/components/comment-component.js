@@ -34,7 +34,7 @@ define(function(require) {
             this._deferredInit();
 
             this.collection.fetch();
-            this.collection.once('sync', this.onCollectionSynced, this);
+            this.listenToOnce(this.collection, 'sync', this.onCollectionSynced);
         },
 
         onCollectionSynced: function() {

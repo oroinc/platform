@@ -4,3 +4,4 @@ config:
         'oroentityextend/js/init-entity-extend-relation': 'bundles/oroentityextend/js/init-entity-extend-relation.js'
         'oro/datagrid/action/ajaxdeletefield-action': 'bundles/oroentityextend/js/datagrid/action/ajaxdeletefield-action.js'
         'oro/datagrid/action/ajaxrestorefield-action': 'bundles/oroentityextend/js/datagrid/action/ajaxrestorefield-action.js'
+        'oroentityextend/js/extend-field-form-component': 'bundles/oroentityextend/js/components/extend-field-form-component.js'
