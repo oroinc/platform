@@ -20,30 +20,38 @@ class YamlCumulativeFileLoader extends CumulativeFileLoader
      * Parses a YAML file.
      *
      * @param string $file Path to a file
-     * @param string[] $parsedPaths already parsed paths
+     * @param string[] $importedPaths already parsed paths, for circular check
      * @return array|null
      * @throws \InvalidArgumentException When loading of YAML file returns error
      */
-    protected function parseFile($file, $parsedPaths = [])
+    protected function parseFile($file, $importedPaths = [])
     {
         try {
-            $configData = Yaml::parse(file_get_contents($file)) ? : [];
+            $configData = Yaml::parse(file_get_contents($file)) ?: [];
 
             if (array_key_exists('imports', $configData) && is_array($configData['imports'])) {
+                $info = new \SplFileInfo($file);
+                $importedPaths[] = $info->getRealPath(); // for the circular import check
                 $imports = $configData['imports'];
                 unset($configData['imports']);
 
                 foreach ($imports as $importData) {
                     if (array_key_exists('resource', $importData)) {
-                        $info = new \SplFileInfo($file);
                         $import = new \SplFileInfo($info->getPath() . DIRECTORY_SEPARATOR . $importData['resource']);
+                        $importPath = $import->getRealPath();
 
-                        if (in_array($import->getRealPath(), $parsedPaths, true)) {
-                            throw new \InvalidArgumentException('Circular import detected in ' . $file);
+                        if (in_array($importPath, $importedPaths, true)) {
+                            throw new \InvalidArgumentException(
+                                sprintf(
+                                    'Circular import detected in "%s" [%s].',
+                                    array_shift($importedPaths),
+                                    implode(' > ', $importedPaths)
+                                )
+                            );
                         }
 
-                        $parsedPaths[] = $import->getRealPath();
-                        $configData = array_merge_recursive($configData, $this->parseFile($import, $parsedPaths));
+                        $importedPaths[] = $importPath;
+                        $configData = array_merge_recursive($configData, $this->parseFile($importPath, $importedPaths));
                     }
                 }
             }
