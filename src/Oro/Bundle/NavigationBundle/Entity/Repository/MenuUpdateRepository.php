@@ -21,6 +21,7 @@ class MenuUpdateRepository extends EntityRepository
         $qb->innerJoin('u.scope', 's');
         $qb->where($qb->expr()->eq('u.menu', ':menuName'));
         $qb->andWhere($qb->expr()->in('s.id', ':scopeIds'));
+        $qb->orderBy('u.id');
         $qb->setParameters([
             'menuName' => $menuName,
             'scopeIds' => $scopeIds
