@@ -29,11 +29,12 @@ class ImportExportControllerTest extends WebTestCase
             'GET',
             $this->getUrl('oro_importexport_export_template', ['processorAlias' => 'oro_user'])
         );
+
         /* @var $response BinaryFileResponse */
         $response = $this->getClientInstance()->getResponse();
         $this->assertResponseStatusCodeEquals($response, 200);
         $this->assertInstanceOf('Symfony\Component\HttpFoundation\BinaryFileResponse', $response);
-        
+
         $handle = fopen($response->getFile()->getPathname(), 'r');
         $lines = [];
         while (($row = fgetcsv($handle)) !== false) {
@@ -47,7 +48,6 @@ class ImportExportControllerTest extends WebTestCase
 
     public function testValidateExportTemplate()
     {
-        // @todo - must be fixed in BAP-12713
         $crawler = $this->client->request(
             'GET',
             $this->getUrl(

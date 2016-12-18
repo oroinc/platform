@@ -24,6 +24,12 @@ class ExportMessageProcessorTest extends WebTestCase
 
         $this->initClient();
     }
+    protected function tearDown()
+    {
+        $this->tearDownMessageCollector();
+
+        parent::tearDown();
+    }
 
     public function testCouldBeConstructedByContainer()
     {
@@ -40,7 +46,7 @@ class ExportMessageProcessorTest extends WebTestCase
         $resultReadsCount,
         $resultErrorsCount,
         $expectedEmailBody,
-        $expectedProcessResult
+        $expectedResult
     ) {
         /** @var User $user */
         $user = $this->getContainer()->get('oro_entity.doctrine_helper')->getEntityRepository(User::class)->find(1);
@@ -79,7 +85,7 @@ class ExportMessageProcessorTest extends WebTestCase
         $processor = $this->getContainer()->get('oro_importexport.async.export');
 
         $result = $processor->process($message, $this->createSessionMock());
-        $this->assertEquals($expectedProcessResult, $result);
+        $this->assertEquals($expectedResult, $result);
 
         $this->assertMessageSent(NotificationTopics::SEND_NOTIFICATION_EMAIL, [
             'fromEmail' => $this->getConfigManager()->get('oro_notification.email_notification_sender_email'),
@@ -109,7 +115,7 @@ class ExportMessageProcessorTest extends WebTestCase
                 'resultSuccess' => false,
                 'readsCount' => 0,
                 'errorsCount' => 5,
-                'emailBody' => 'Export operation fails, 5 error(s) found. Error log: http://localhost',
+                'emailBody' => 'Export operation failed, 5 error(s) found. Error log: http://localhost',
                 'processResult' => ExportMessageProcessor::REJECT,
             ],
         ];
