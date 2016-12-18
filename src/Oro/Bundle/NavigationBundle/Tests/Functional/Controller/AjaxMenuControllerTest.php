@@ -2,12 +2,12 @@
 
 namespace Oro\Bundle\NavigationBundle\Tests\Functional\Controller;
 
-use Oro\Bundle\NavigationBundle\Tests\Functional\DataFixtures\LoadMenuUpdateData;
+use Symfony\Component\HttpFoundation\Response;
 
+use Oro\Bundle\NavigationBundle\Tests\Functional\DataFixtures\LoadMenuUpdateData;
 use Oro\Bundle\ScopeBundle\Tests\DataFixtures\LoadScopeData;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Bundle\UserBundle\Tests\Functional\DataFixtures\LoadScopeUserData;
-use Symfony\Component\HttpFoundation\Response;
 
 /**
  * @dbIsolation
