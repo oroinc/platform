@@ -302,6 +302,5 @@ class CumulativeConfigLoaderTest extends \PHPUnit_Framework_TestCase
 
         $resourceLoader1 = new YamlCumulativeFileLoader('Resources/config/loop/parent.yml');
         $resourceLoader1->load($bundleClass, $bundleDir);
-
     }
 }

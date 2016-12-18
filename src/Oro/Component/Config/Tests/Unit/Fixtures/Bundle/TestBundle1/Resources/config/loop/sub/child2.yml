@@ -1,2 +1,2 @@
 imports:
-    - { resource: 'child1.yml' }
+    - { resource: '..\parent.yml' }
