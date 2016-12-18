@@ -6,6 +6,7 @@ use Doctrine\ORM\QueryBuilder;
 
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
@@ -205,60 +206,17 @@ class ConfigController extends Controller
      *      group_name=""
      * )
      * @Template()
-     *
-     * @param string $id
-     *
+     * @param FieldConfigModel $fieldConfigModel
      * @return array|RedirectResponse
      */
-    public function fieldUpdateAction($id)
+    public function fieldUpdateAction(FieldConfigModel $fieldConfigModel)
     {
-        /** @var FieldConfigModel $field */
-        $field   = $this->getConfigManager()
-            ->getEntityManager()
-            ->getRepository('Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel')
-            ->find($id);
-        $request = $this->getRequest();
-
-        $form = $this->createForm(
-            'oro_entity_config_type',
-            null,
-            ['config_model' => $field]
-        );
-
-        if ($request->getMethod() == 'POST') {
-            $form->submit($request);
-
-            if ($form->isValid()) {
-                //persist data inside the form
-                $this->get('session')->getFlashBag()->add(
-                    'success',
-                    $this->get('translator')->trans('oro.entity_config.controller.config_field.message.saved')
-                );
-
-                return $this->get('oro_ui.router')->redirect($field);
-            }
-        }
-
-        /** @var ConfigProvider $entityConfigProvider */
-        $entityConfigProvider = $this->get('oro_entity_config.provider.entity');
-
-        /** @var ConfigProvider $entityExtendProvider */
-        $entityExtendProvider = $this->get('oro_entity_config.provider.extend');
-
-        $entityConfig = $entityConfigProvider->getConfig($field->getEntity()->getClassName());
-        $fieldConfig  = $entityConfigProvider->getConfig(
-            $field->getEntity()->getClassName(),
-            $field->getFieldName()
-        );
-
-        return [
-            'entity_config' => $entityConfig,
-            'field_config'  => $fieldConfig,
-            'field'         => $field,
-            'form'          => $form->createView(),
-            'formAction'    => $this->generateUrl('oro_entityconfig_field_update', ['id' => $field->getId()]),
-            'require_js'    => $entityExtendProvider->getPropertyConfig()->getRequireJsModules()
-        ];
+        $formAction = $this->generateUrl('oro_entityconfig_field_update', ['id' => $fieldConfigModel->getId()]);
+        $successMessage = $this->get('translator')->trans('oro.entity_config.controller.config_field.message.saved');
+        
+        return $this
+            ->get('oro_entity_config.form.handler.config_field_handler')
+            ->handleUpdate($fieldConfigModel, $formAction, $successMessage);
     }
 
     /**
@@ -351,7 +309,7 @@ class ConfigController extends Controller
     {
         $className = $entity->getClassName();
 
-        /** @var ConfigProvider $extendConfigProvider */
+        /** @var ConfigProvider $entityConfigProvider */
         $entityConfigProvider = $this->get('oro_entity_config.provider.entity');
         $entityConfig         = $entityConfigProvider->getConfig($className);
         $translator           = $this->get('translator');

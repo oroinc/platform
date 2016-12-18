@@ -11,7 +11,7 @@ use Oro\Bundle\EntityConfigBundle\Entity\ConfigModel;
 use Oro\Bundle\EntityConfigBundle\Entity\EntityConfigModel;
 use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
 use Oro\Bundle\EntityConfigBundle\Exception\RuntimeException;
-use Oro\Bundle\EntityConfigBundle\Tools\ConfigHelper;
+use Oro\Bundle\EntityConfigBundle\Tools\ConfigHelper as ToolConfigHelper;
 
 /**
  * IMPORTANT: A performance of this class is very crucial, be careful during a refactoring.
@@ -103,7 +103,7 @@ class ConfigModelManager
      */
     public function findEntityModel($className)
     {
-        if (empty($className) || ConfigHelper::isConfigModelEntity($className)) {
+        if (empty($className) || ToolConfigHelper::isConfigModelEntity($className)) {
             return null;
         }
 
@@ -149,7 +149,7 @@ class ConfigModelManager
      */
     public function findFieldModel($className, $fieldName)
     {
-        if (empty($className) || empty($fieldName) || ConfigHelper::isConfigModelEntity($className)) {
+        if (empty($className) || empty($fieldName) || ToolConfigHelper::isConfigModelEntity($className)) {
             return null;
         }
 

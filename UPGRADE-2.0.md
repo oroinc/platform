@@ -10,6 +10,77 @@ UPGRADE FROM 1.10 to 2.0
   was added the command "oro:platform:upgrade20". Before run this command the cache has to be deleted.
   Command have to be run only one time. In next releases 2.x to apply release changes it will be enough run the command "oro:platform:update".
   Upgrade from version less then 1.10 is not supported.
+  
+####SOAP API was removed
+- removed all dependencies to the `besimple/soap-bundle` bundle. 
+- removed SOAP annotations from the entities. Updated entities:
+    - Oro\Bundle\ActivityListBundle\Entity\ActivityList
+    - Oro\Bundle\ActivityListBundle\Entity\ActivityOwner
+    - Oro\Bundle\AddressBundle\Entity\AbstractAddress
+    - Oro\Bundle\AddressBundle\Entity\AbstractEmail
+    - Oro\Bundle\AddressBundle\Entity\AbstractPhone
+    - Oro\Bundle\AddressBundle\Entity\AbstractTypedAddress
+    - Oro\Bundle\DataAuditBundle\Entity\Audit
+    - Oro\Bundle\EmailBundle\Entity\Email
+    - Oro\Bundle\EmailBundle\Entity\EmailAttachment
+    - Oro\Bundle\EmailBundle\Entity\EmailAttachmentContent
+    - Oro\Bundle\EmailBundle\Entity\EmailBody
+    - Oro\Bundle\EmailBundle\Entity\EmailFolder
+    - Oro\Bundle\EmailBundle\Entity\EmailRecipient
+    - Oro\Bundle\EmailBundle\Entity\EmailThread
+    - Oro\Bundle\EmailBundle\Entity\EmailUser
+    - Oro\Bundle\EmailBundle\Entity\InternalEmailOrigin
+    - Oro\Bundle\SearchBundle\Query\Result
+    - Oro\Bundle\SearchBundle\Query\Result\Item
+- removed classes:
+    - Oro\Bundle\ActivityListBundle\Controller\Api\Soap\ActivityListController
+    - Oro\Bundle\AddressBundle\Controller\Api\Soap\AddressTypeController
+    - Oro\Bundle\AddressBundle\Controller\Api\Soap\CountryController
+    - Oro\Bundle\AddressBundle\Controller\Api\Soap\RegionController
+    - Oro\Bundle\DataAuditBundle\Controller\Api\Soap\AuditController
+    - Oro\Bundle\EmailBundle\Controller\Api\Soap\EmailController
+    - Oro\Bundle\NoteBundle\Controller\Api\Soap\NoteController
+    - Oro\Bundle\OrganizationBundle\Controller\Api\Soap\BusinessUnitController
+    - Oro\Bundle\OrganizationBundle\Controller\Api\Soap\OrganizationController
+    - Oro\Bundle\SearchBundle\Controller\Api\SoapController
+    - Oro\Bundle\UserBundle\Controller\Api\Soap\GroupController
+    - Oro\Bundle\UserBundle\Controller\Api\Soap\RoleController
+    - Oro\Bundle\UserBundle\Controller\Api\Soap\UserController
+    - Oro\Bundle\AddressBundle\Entity\AddressTypeSoap
+    - Oro\Bundle\AddressBundle\Entity\CountrySoap
+    - Oro\Bundle\AddressBundle\Entity\RegionSoap
+    - Oro\Bundle\NoteBundle\Entity\NoteSoap
+    - Oro\Bundle\OrganizationBundle\Entity\BusinessUnitSoap
+    - Oro\Bundle\OrganizationBundle\Entity\OrganizationSoap
+    - Oro\Bundle\UserBundle\Entity\GroupSoap
+    - Oro\Bundle\UserBundle\Entity\RoleSoap
+    - Oro\Bundle\UserBundle\Entity\UserSoap
+    - Oro\Bundle\TaskBundle\Entity\TaskSoap
+    - Oro\Bundle\DataAuditBundle\Entity\AuditData
+    - Oro\Bundle\EntityBundle\Model\EntityIdSoap
+    - Oro\Bundle\SearchBundle\Soap\Type\SelectedValue
+    - Oro\Bundle\SoapBundle\DependencyInjection\Compiler\LoadPass
+    - Oro\Bundle\SoapBundle\ServiceDefinition\Loader\OroSoapLoader
+    - Oro\Bundle\SoapBundle\ServiceDefinition\Loader\AnnotationComplexTypeLoader
+    - Oro\Bundle\SoapBundle\ServiceDefinition\Loader\FilterableLoaderInterface
+    - Oro\Bundle\SoapBundle\ServiceDefinition\Loader\ComplexTypeFilterInterface
+    - Oro\Bundle\SoapBundle\ServiceDefinition\Loader\SoapAclFieldFilter
+    - Oro\Bundle\SoapBundle\Type\KeyValue\StringType
+    - Oro\Bundle\AddressBundle\Tests\Functional\API\SoapAddressTypeApiTest
+    - Oro\Bundle\AddressBundle\Tests\Functional\API\SoapApiTest
+    - Oro\Bundle\DataAuditBundle\Tests\Functional\API\SoapDataAuditApiTest
+    - Oro\Bundle\DataAuditBundle\Tests\Functional\Controller\Api\Soap\AuditControllerTest
+    - Oro\Bundle\OrganizationBundle\Tests\Functional\API\SoapApiTest
+    - Oro\Bundle\SearchBundle\Tests\Functional\Controller\Api\SoapAdvancedSearchApiTest
+    - Oro\Bundle\SearchBundle\Tests\Functional\Controller\Api\SoapSearchApiTest
+    - Oro\Bundle\SearchBundle\Tests\Functional\Controller\Api\SoapSearchApiTest
+    - Oro\Bundle\UserBundle\Tests\Functional\API\SoapApiAclTest
+    - Oro\Bundle\UserBundle\Tests\Functional\API\SoapGroupsTest
+    - Oro\Bundle\UserBundle\Tests\Functional\API\SoapInvalidUsersTest
+    - Oro\Bundle\UserBundle\Tests\Functional\API\SoapRolesTest
+    - Oro\Bundle\UserBundle\Tests\Functional\API\SoapUsersACLTest
+    - Oro\Bundle\UserBundle\Tests\Functional\API\SoapUsersTest
+    - Oro\Bundle\DataAuditBundle\Tests\Unit\Entity\AuditDataTest
 
 ####Action Component
 - Deprecated constant `Oro\Component\Action\Event\ExecuteActionEvents::DEPRECATED_HANDLE_BEFORE` removed. Use `Oro\Component\Action\Event\ExecuteActionEvents::HANDLE_BEFORE` instead.
