@@ -1,0 +1,54 @@
+.jstree-wrapper {
+    position: relative;
+
+    min-height: 200px;
+    padding: 10px;
+
+    &__title {
+        display: flex;
+
+        justify-content: space-between;
+    }
+
+    &__label {
+        display: flex;
+        margin-bottom: 10px;
+
+        &:before {
+            display: inline-block;
+
+            width: 9px;
+            margin-right: 5px;
+
+            font-family: 'FontAwesome';
+            font-size: 9px;
+            font-weight: normal;
+            font-style: normal;
+
+            content: '\f078';
+
+            color: #969696;
+        }
+    }
+
+    &.expanded &__label::before {
+        content: '\f054';
+    }
+
+    &.expanded .jstree-actions {
+        display: inline-block;
+    }
+
+    &__text {
+        font-weight: bold;
+
+        cursor: pointer;
+        text-transform: uppercase;
+
+        color: #565656;
+    }
+
+    &__checkbox {
+        display: none;
+    }
+}
