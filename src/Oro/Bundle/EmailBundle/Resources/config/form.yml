@@ -26,6 +26,7 @@ parameters:
     oro_email.form.type.mailbox.class:                    Oro\Bundle\EmailBundle\Form\Type\MailboxType
     oro_email.form.handler.mailbox.class:                 Oro\Bundle\EmailBundle\Form\Handler\MailboxHandler
     oro_email.form.handler.email_configuration.class:     Oro\Bundle\EmailBundle\Form\Handler\EmailConfigurationHandler
+    oro_email.form.configurator.email_configuration.class: Oro\Bundle\EmailBundle\Form\Configurator\EmailConfigurationConfigurator
     oro_email.form.factory.class:                         Oro\Bundle\EmailBundle\Form\Model\Factory
     oro_email.form.type.email_folder_tree.class:          Oro\Bundle\EmailBundle\Form\Type\EmailFolderTreeType
     oro_email.form.type.filter.originfolder.class:        Oro\Bundle\EmailBundle\Form\Type\Filter\ChoiceOriginFolderFilterType
@@ -241,6 +242,11 @@ services:
         class: %oro_email.form.handler.email_configuration.class%
         arguments:
             - '@event_dispatcher'
+
+    oro_email.form.configurator.email_configuration:
+        class: %oro_email.form.configurator.email_configuration.class%
+        arguments:
+            - '@oro_security.encoder.mcrypt'
 
     oro_email.form.factory:
         class: %oro_email.form.factory.class%

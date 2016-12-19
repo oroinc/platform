@@ -1181,6 +1181,7 @@ services:
         arguments:
             - '@oro_config.manager'
             - '@oro_config.scope.global'
+            - '@oro_security.encoder.mcrypt'
 
     oro_email.mailer.checker.smtp_settings:
         class: Oro\Bundle\EmailBundle\Mailer\Checker\SmtpSettingsChecker
