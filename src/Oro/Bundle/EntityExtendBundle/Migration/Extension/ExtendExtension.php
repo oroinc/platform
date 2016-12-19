@@ -913,7 +913,7 @@ class ExtendExtension implements NameGeneratorAwareInterface
      *
      * @throws SchemaException if valid primary key does not exist
      */
-    protected function getPrimaryKeyColumnName(Table $table)
+    public function getPrimaryKeyColumnName(Table $table)
     {
         if (!$table->hasPrimaryKey()) {
             throw new SchemaException(
