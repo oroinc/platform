@@ -454,3 +454,12 @@ services:
         parent: oro_user.scope_criteria_provider.user
         tags:
             - {name: oro_scope.provider, scopeType: '%oro_navigation.menu_update.scope_type%', priority: 20}
+
+    oro_navigation.event_listener.scope_grid_listener:
+        class: 'Oro\Bundle\NavigationBundle\EventListener\ScopeGridListener'
+        arguments:
+           - '@oro_scope.scope_manager'
+        calls:
+           - [setScopeType, ['%oro_navigation.menu_update.scope_type%']]
+        tags:
+            - { name: kernel.event_listener, event: oro_datagrid.datagrid.build.pre.menu-by-scope-grid, method: onPreBefore }
