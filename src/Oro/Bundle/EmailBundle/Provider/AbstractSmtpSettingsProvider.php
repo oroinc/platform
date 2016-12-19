@@ -6,6 +6,7 @@ use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\ConfigBundle\Config\GlobalScopeManager;
 use Oro\Bundle\EmailBundle\DependencyInjection\Configuration as Config;
 use Oro\Bundle\EmailBundle\Form\Model\SmtpSettings;
+use Oro\Bundle\SecurityBundle\Encoder\Mcrypt;
 
 abstract class AbstractSmtpSettingsProvider implements SmtpSettingsProviderInterface
 {
@@ -15,18 +16,24 @@ abstract class AbstractSmtpSettingsProvider implements SmtpSettingsProviderInter
     /** @var GlobalScopeManager */
     protected $globalScopeManager;
 
+    /** @var Mcrypt */
+    protected $encryptor;
+
     /**
      * SmtpSettingsProvider constructor.
      *
      * @param ConfigManager      $configManager
      * @param GlobalScopeManager $globalScopeManager
+     * @param Mcrypt             $encryptor
      */
     public function __construct(
         ConfigManager $configManager,
-        GlobalScopeManager $globalScopeManager
+        GlobalScopeManager $globalScopeManager,
+        Mcrypt $encryptor
     ) {
         $this->configManager = $configManager;
         $this->globalScopeManager = $globalScopeManager;
+        $this->encryptor = $encryptor;
     }
 
     /**
@@ -85,7 +92,7 @@ abstract class AbstractSmtpSettingsProvider implements SmtpSettingsProviderInter
             $port,
             $encryption,
             $username,
-            $password
+            $this->encryptor->decryptData($password)
         );
     }
 }

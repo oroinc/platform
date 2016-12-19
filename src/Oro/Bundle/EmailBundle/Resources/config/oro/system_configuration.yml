@@ -5,6 +5,7 @@ system_configuration:
             title: oro.email.system_configuration.email_configuration
             page_reload: true
             handler: '@oro_email.form.handler.email_configuration::process'
+            configurator: '@oro_email.form.configurator.email_configuration::configure'
 
         user_email_configuration:
             icon:  fa-envelope
