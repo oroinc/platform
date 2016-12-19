@@ -8,11 +8,13 @@ use FOS\RestBundle\Controller\Annotations\QueryParam;
 use FOS\RestBundle\Controller\Annotations\Get;
 use FOS\RestBundle\Controller\Annotations\Delete;
 use FOS\RestBundle\Controller\Annotations\Post;
+use FOS\RestBundle\Util\Codes;
 
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 
 use Symfony\Component\HttpFoundation\Response;
 
+use Oro\Bundle\ActivityBundle\Exception\InvalidArgumentException;
 use Oro\Bundle\ActivityBundle\Entity\Manager\ActivityEntityApiEntityManager;
 use Oro\Bundle\SoapBundle\Controller\Api\Rest\RestController;
 use Oro\Bundle\SoapBundle\Model\RelationIdentifier;
@@ -117,7 +119,36 @@ class ActivityEntityController extends RestController
             $entityId
         );
 
-        return $this->handleDeleteRequest($id);
+        try {
+            return $this->handleDeleteRequest($id);
+        } catch (InvalidArgumentException $exception) {
+            return $this->handleDeleteError($exception->getMessage(), Codes::HTTP_BAD_REQUEST, $id);
+        } catch (\Exception $e) {
+            return $this->handleDeleteError($e->getMessage(), Codes::HTTP_INTERNAL_SERVER_ERROR, $id);
+        }
+    }
+
+    /**
+     * @param string             $message
+     * @param int                $code
+     * @param RelationIdentifier $id
+     *
+     * @return Response
+     */
+    protected function handleDeleteError($message, $code, RelationIdentifier $id)
+    {
+        $view = $this->view(['message' => $message], $code);
+        return $this->buildResponse(
+            $view,
+            self::ACTION_DELETE,
+            [
+                'ownerEntityClass'  => $id->getOwnerEntityClass(),
+                'ownerEntityId'     => $id->getOwnerEntityId(),
+                'targetEntityClass' => $id->getTargetEntityClass(),
+                'targetEntityId'    => $id->getTargetEntityId(),
+                'success'           => false
+            ]
+        );
     }
 
     /**
@@ -143,6 +174,6 @@ class ActivityEntityController extends RestController
      */
     protected function getDeleteHandler()
     {
-        return $this->get('oro_activity.handler.delete.activity_entity');
+        return $this->get('oro_activity.handler.delete.activity_entity_proxy');
     }
 }

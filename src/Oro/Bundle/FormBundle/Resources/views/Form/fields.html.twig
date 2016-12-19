@@ -17,6 +17,10 @@
     {% if configs.selection_template_twig is defined and configs.selection_template_twig %}
         {% set configs = configs|merge({'selection_template': include(configs.selection_template_twig) }) %}
     {% endif %}
+    {% set configs = {
+        containerCssClass: 'oro-select2',
+        dropdownCssClass: 'oro-select2__dropdown'
+    }|merge(configs) %}
     {% if configs.component is defined %}
         {% set component = 'oro/select2-'~configs.component~'-component' %}
     {%  else %}
@@ -379,7 +383,6 @@
     {% import 'OroUIBundle::macros.html.twig' as UI %}
     <div {{ UI.renderPageComponentAttributes({
         module: 'oroui/js/app/components/view-component',
-        name: 'from_validation',
         options: {
             _sourceElement: '#' ~ form.vars.id,
             view: 'oroform/js/app/views/form-validate-view',

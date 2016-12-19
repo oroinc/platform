@@ -82,6 +82,17 @@ class FieldType extends AbstractType
             'genemu_jqueryselect2_choice',
             [
                 'choices'     => $this->getFieldTypeChoices($reverseRelationTypes),
+                'choice_attr' => function ($choiceKey) {
+                    $relationTypeParts = explode('||', $choiceKey);
+
+                    if (count($relationTypeParts) !== 2 || count(explode('|', $relationTypeParts[0])) !== 4) {
+                        return [];
+                    }
+
+                    return [
+                        'data-fieldname' => $relationTypeParts[1]
+                    ];
+                },
                 'empty_value' => '',
                 'block'       => 'general',
                 'configs'     => [
@@ -136,17 +147,8 @@ class FieldType extends AbstractType
      */
     protected function getFieldTypeChoices($reverseRelationTypes)
     {
-        $fieldTypes = $relationTypes = [];
-
-        foreach ($this->fieldTypeProvider->getSupportedFieldTypes() as $type) {
-            $fieldTypes[$type] = $this->translator->trans(self::TYPE_LABEL_PREFIX . $type);
-        }
-        foreach ($this->fieldTypeProvider->getSupportedRelationTypes() as $type) {
-            $relationTypes[$type] = $this->translator->trans(self::TYPE_LABEL_PREFIX . $type);
-        }
-
-        uasort($fieldTypes, 'strcasecmp');
-        uasort($relationTypes, 'strcasecmp');
+        $fieldTypes = $this->getTranslatedFieldTypes();
+        $relationTypes = $this->getTranslatedRelationTypes();
 
         if (!empty($reverseRelationTypes)) {
             uasort($reverseRelationTypes, 'strcasecmp');
@@ -159,6 +161,43 @@ class FieldType extends AbstractType
         ];
 
         return $result;
+    }
+
+    /**
+     * @return array
+     */
+    private function getTranslatedFieldTypes()
+    {
+        foreach ($this->fieldTypeProvider->getSupportedFieldTypes() as $type) {
+            $fieldTypes[$type] = $this->translator->trans(self::TYPE_LABEL_PREFIX . $type);
+        }
+
+        uasort($fieldTypes, 'strcasecmp');
+
+        return $fieldTypes;
+    }
+
+    /**
+     * @return array
+     */
+    private function getTranslatedRelationTypes()
+    {
+        $relationTypes = [];
+        foreach ($this->fieldTypeProvider->getSupportedRelationTypes() as $type) {
+            $relationTypes[$type] = $this->translator->trans(self::TYPE_LABEL_PREFIX . $type);
+        }
+
+        uasort($relationTypes, 'strcasecmp');
+
+        return $relationTypes;
+    }
+
+    /**
+     * @return array
+     */
+    public function getTranslatedTypeChoices()
+    {
+        return array_merge($this->getTranslatedFieldTypes(), $this->getTranslatedRelationTypes());
     }
 
     /**

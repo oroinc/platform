@@ -117,6 +117,12 @@ class Tag extends ExtendTag
     protected $tagging;
 
     /**
+     * @ORM\ManyToOne(targetEntity="Taxonomy", inversedBy="tags", fetch="LAZY")
+     * @ORM\JoinColumn(name="taxonomy_id", referencedColumnName="id", onDelete="SET NULL")
+     */
+    protected $taxonomy;
+
+    /**
      * @var User
      * @ORM\ManyToOne(targetEntity="Oro\Bundle\UserBundle\Entity\User")
      * @ORM\JoinColumn(name="user_owner_id", referencedColumnName="id", onDelete="SET NULL")
@@ -313,5 +319,34 @@ class Tag extends ExtendTag
     public function getOrganization()
     {
         return $this->organization;
+    }
+
+
+    /**
+     * @return Taxonomy
+     */
+    public function getTaxonomy()
+    {
+        return $this->taxonomy;
+    }
+
+    /**
+     * @param Taxonomy $taxonomy
+     */
+    public function setTaxonomy($taxonomy)
+    {
+        $this->taxonomy = $taxonomy;
+    }
+
+    /**
+     * @return string
+     */
+    public function getBackgroundColor()
+    {
+        if ($this->getTaxonomy() === null) {
+            return null;
+        }
+
+        return $this->getTaxonomy()->getBackgroundColor();
     }
 }

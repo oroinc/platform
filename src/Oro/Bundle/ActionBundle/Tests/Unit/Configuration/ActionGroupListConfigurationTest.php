@@ -162,19 +162,6 @@ class ActionGroupListConfigurationTest extends \PHPUnit_Framework_TestCase
                 'message' => 'Invalid type for path "action_groups.group1.parameters.arg1.message". ' .
                     'Expected scalar, but got array'
             ],
-            'incorrect action_groups[parameters][default]' => [
-                'input' => [
-                    'group1' => [
-                        'parameters' => [
-                            'arg1' => [
-                                'default' => []
-                            ]
-                        ]
-                    ]
-                ],
-                'message' => 'Invalid type for path "action_groups.group1.parameters.arg1.default". ' .
-                    'Expected scalar, but got array'
-            ],
             'incorrect action_groups[conditions]' => [
                 'input' => [
                     'group1' => [

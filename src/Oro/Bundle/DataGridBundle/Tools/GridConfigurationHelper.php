@@ -3,10 +3,7 @@
 namespace Oro\Bundle\DataGridBundle\Tools;
 
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
-use Oro\Bundle\DataGridBundle\Datasource\Orm\OrmDatasource;
 use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
-use Oro\Bundle\SearchBundle\Datagrid\Datasource\SearchDatasource;
-use Oro\Bundle\SearchBundle\Provider\AbstractSearchMappingProvider;
 
 class GridConfigurationHelper
 {
