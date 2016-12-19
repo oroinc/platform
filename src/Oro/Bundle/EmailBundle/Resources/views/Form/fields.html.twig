@@ -15,13 +15,13 @@
     {{ form_widget(form) }}
     {% if resource_granted('oro_config_system') %}
         <span class="help-block">
-            <button class="btn btn-primary"
+            <button class="btn btn-primary check-connection-messages"
                data-role="check-smtp-connection"
                data-page-component-module="{{ 'oroemail/js/app/components/check-smtp-connection-component' }}"
                data-page-component-options="{{ options|json_encode }}"
             >{{ 'oro.email.system_configuration.smtp_settings.check_connection.label'|trans }}</button>
         </span>
-    <div class="check-smtp-connection-messages"></div>
+    <div class="check-connection-messages check-smtp-connection-messages"></div>
     {% endif %}
 {% endblock %}
 
