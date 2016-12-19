@@ -1,1 +1,6 @@
-{{ record.getValue('key')|trans({}, record.getValue('domain'), 'en') }}
+{% set originalValue = record.getValue('key')|trans({}, record.getValue('domain'), 'en') %}
+{% if originalValue is empty %}
+    {{ record.getValue('key') }}
+{% else %}
+    {{ originalValue }}
+{% endif %}
