@@ -31,20 +31,20 @@ class YamlCumulativeFileLoader extends CumulativeFileLoader
 
             if (array_key_exists('imports', $configData) && is_array($configData['imports'])) {
                 if (empty($importedPaths)) {
-                    $importedPaths[] = $file; // for checking circular own-import
+                    $importedPaths[] = $file; // for checking circular self-import
                 }
 
+                $parent = new \SplFileInfo($file);
                 $imports = $configData['imports'];
                 unset($configData['imports']);
 
                 foreach ($imports as $importData) {
                     if (array_key_exists('resource', $importData)) {
-                        $parent = new \SplFileInfo($file);
                         $import = new \SplFileInfo($parent->getPath() . DIRECTORY_SEPARATOR . $importData['resource']);
                         $importPath = $import->getRealPath();
 
                         if (in_array($importPath, $importedPaths, true)) {
-                            $importedPaths[] = $importPath; // for a complete tree in the message
+                            $importedPaths[] = $importPath; // for a complete tree in the exception message
 
                             throw new \InvalidArgumentException(
                                 sprintf('Circular import detected in for "%s".', implode(' >> ', $importedPaths))
