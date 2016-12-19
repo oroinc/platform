@@ -147,9 +147,7 @@ class ConsolidateImportJobResultNotificationService
         $data['update'] = 0;
         $data['delete'] = 0;
         $data['error_entries'] = 0;
-        /**
-         * @var $childrenJob Job
-         */
+
         foreach ($job->getChildJobs() as $childrenJob) {
             $childrenJobData = $childrenJob->getData();
             if (empty($childrenJobData)) {
