@@ -1,17 +1,28 @@
 <?php
 namespace Oro\Bundle\ImportExportBundle\Async;
 
-use Oro\Bundle\MessageQueueBundle\Entity\Job;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Routing\Router;
 use Symfony\Component\Translation\TranslatorInterface;
+
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
+use Oro\Bundle\MessageQueueBundle\Entity\Job;
 
 class ConsolidateImportJobResultNotificationService
 {
-
+    /**
+     * @var TranslatorInterface
+     */
     protected $translator;
+
+    /**
+     * @var Router
+     */
     protected $router;
+
+    /**
+     * @var ConfigManager
+     */
     protected $configManager;
 
     /**
@@ -116,7 +127,7 @@ class ConsolidateImportJobResultNotificationService
                 continue;
             }
             foreach ($childrenJobData['errors'] as $errorMessage) {
-                $errorLog .= sprintf("error in part #%s: %s\n\r", $key, $errorMessage);
+                $errorLog .= sprintf("error in part #%s: %s\n\r", ++$key, $errorMessage);
             }
         }
         return $errorLog;

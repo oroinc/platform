@@ -1,8 +1,8 @@
 <?php
 
-namespace Oro\Bundle\ImportExportBundle\Tests\Functional\Async;
+namespace Oro\Bundle\ImportExportBundle\Tests\Functional\Async\Import;
 
-use Oro\Bundle\ImportExportBundle\Async\CliImportMessageProcessor;
+use Oro\Bundle\ImportExportBundle\Async\Import\CliImportMessageProcessor;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
 class CliImportMessageProcessorTest extends WebTestCase

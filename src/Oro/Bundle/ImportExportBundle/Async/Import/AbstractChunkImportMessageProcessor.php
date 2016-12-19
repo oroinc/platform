@@ -53,7 +53,7 @@ abstract class AbstractChunkImportMessageProcessor implements MessageProcessorIn
     /**
      * @var JobStorage
      */
-    private $jobStorage;
+    protected $jobStorage;
 
 
     public function __construct(
@@ -81,35 +81,37 @@ abstract class AbstractChunkImportMessageProcessor implements MessageProcessorIn
     {
         $body = JSON::decode($message->getBody());
 
-        $result = $this->jobRunner->runDelayed($body['jobId'], function (JobRunner $jobRunner, Job $job) use ($body) {
-                $body = array_replace_recursive([
-                        'filePath' => null,
-                        'userId' => null,
-                        'jobName' => JobExecutor::JOB_IMPORT_FROM_CSV,
-                        'processorAlias' => null,
-                        'options' => [],
-                    ], $body);
+        if (! isset($body['jobId'], $body['userId'], $body['processorAlias'], $body['filePath'])) {
+            $this->logger->critical(
+                sprintf('Got invalid message. body: %s', $message->getBody()),
+                ['message' => $message]
+            );
 
+            return self::REJECT;
+        }
 
-                if (! $body['filePath'] || ! $body['processorAlias'] || ! $body['userId']) {
-                    $this->logger->critical(
-                        'Invalid message',
-                        ['message' => $body]
-                    );
+        $body = array_replace_recursive(
+            [
+                'filePath' => null,
+                'userId' => null,
+                'jobId' => null,
+                'jobName' => JobExecutor::JOB_IMPORT_FROM_CSV,
+                'processorAlias' => null,
+                'options' => [],
+            ], $body);
 
-                    return false;
-                }
+            if (! ($user = $this->doctrine->getRepository(User::class)->find($body['userId'])) instanceof User) {
+                $this->logger->error(
+                    sprintf('User not found. id: %s', $body['userId']),
+                    ['message' => $body]
+                );
 
-                $user = $this->doctrine->getRepository(User::class)->find($body['userId']);
-                if (! $user instanceof User) {
-                    $this->logger->error(
-                        sprintf('User not found: %s', $body['userId']),
-                        ['message' => $body]
-                    );
+            return self::REJECT;
+        }
 
-                    return false;
-                }
-
+        $result = $this
+            ->jobRunner
+            ->runDelayed($body['jobId'], function (JobRunner $jobRunner, Job $job) use ($body, $user) {
                 $this->getCreateToken($user);
                 $result = $this->processData($body);
                 $this->saveJobResult($job, $result);

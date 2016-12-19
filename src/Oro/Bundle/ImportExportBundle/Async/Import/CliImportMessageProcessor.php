@@ -74,7 +74,7 @@ class CliImportMessageProcessor implements MessageProcessorInterface, TopicSubsc
 
         if (! $body['processorAlias'] || ! $body['fileName']) {
             $this->logger->critical(
-                sprintf('Invalid message: %s', $body),
+                sprintf('Invalid message'),
                 ['message' => $message]
             );
 

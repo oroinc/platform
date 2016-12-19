@@ -23,7 +23,7 @@ class ChunkHttpImportMessageProcessor extends AbstractChunkImportMessageProcesso
     protected function getSummaryMessage(array $data)
     {
         return sprintf(
-            'Import for the %s is completed, success: %s, info: %s, errors url: %s, message: %s',
+            'Import of the %s is completed, success: %s, info: %s, errors url: %s, message: %s',
             $data['filePath'],
             $data['success'],
             $data['importInfo'],

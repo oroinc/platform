@@ -73,7 +73,7 @@ class CliImportValidationMessageProcessor implements MessageProcessorInterface, 
 
         if (! $body['processorAlias'] || ! $body['fileName'] || ! $body['notifyEmail']) {
             $this->logger->critical(
-                sprintf('Invalid message:  %s', $body),
+                sprintf('Invalid message'),
                 ['message' => $message]
             );
 
