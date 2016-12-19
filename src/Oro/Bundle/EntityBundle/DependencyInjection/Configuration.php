@@ -67,6 +67,7 @@ class Configuration implements ConfigurationInterface
                                                 ->cannotBeEmpty()
                                             ->end()
                                             ->scalarNode('return_type')->end()
+                                            ->booleanNode('translatable')->defaultTrue()->end()
                                             ->scalarNode('label')->end()
                                             // set to true if original field name should be used in WHERE expression
                                             // rather that virtual field select expression.

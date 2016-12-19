@@ -284,6 +284,8 @@ class EntityFieldProvider
     }
 
     /**
+     * @SuppressWarnings(PHPMD.NPathComplexity)
+     *
      * Adds entity virtual fields to $result
      *
      * @param array  $result
@@ -305,6 +307,11 @@ class EntityFieldProvider
             }
 
             $query      = $this->virtualFieldProvider->getVirtualFieldQuery($className, $fieldName);
+
+            if (isset($query['select']['translatable'])) {
+                $translate = (bool) $query['select']['translatable'];
+            }
+
             $fieldLabel = !empty($query['select']['label'])
                 ? $query['select']['label']
                 : $this->getFieldLabel($metadata, $fieldName);
