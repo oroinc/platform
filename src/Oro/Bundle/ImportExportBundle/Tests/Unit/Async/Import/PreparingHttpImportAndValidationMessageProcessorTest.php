@@ -257,7 +257,7 @@ class PreparingHttpImportMessageProcessorTest extends \PHPUnit_Framework_TestCas
         $jobRunner
             ->expects($this->at(0))
             ->method('createDelayed')
-            ->with('oro:import:http:processor_test1:chunk.1')
+            ->with('oro:import:http:processor_test:1:chunk.1')
             ->will(
                 $this->returnCallback(function ($jobId, $callback) use ($jobRunner, $childJob1) {
                     return $callback($jobRunner, $childJob1);
@@ -266,7 +266,7 @@ class PreparingHttpImportMessageProcessorTest extends \PHPUnit_Framework_TestCas
         $jobRunner
             ->expects($this->at(1))
             ->method('createDelayed')
-            ->with('oro:import:http:processor_test1:chunk.2')
+            ->with('oro:import:http:processor_test:1:chunk.2')
             ->will(
                 $this->returnCallback(function ($jobId, $callback) use ($jobRunner, $childJob2) {
                     return $callback($jobRunner, $childJob2);
