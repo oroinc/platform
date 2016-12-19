@@ -2,17 +2,22 @@
 
 namespace Oro\Bundle\ActionBundle\Handler;
 
+use Symfony\Component\Form\FormFactoryInterface;
+use Symfony\Component\Form\FormInterface;
+use Symfony\Component\Form\FormView;
+use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Session\Flash\FlashBagInterface;
+use Symfony\Component\Translation\TranslatorInterface;
+
+use Doctrine\Common\Collections\ArrayCollection;
+
+use Oro\Bundle\ActionBundle\Exception\OperationNotFoundException;
 use Oro\Bundle\ActionBundle\Helper\ContextHelper;
 use Oro\Bundle\ActionBundle\Model\ActionData;
 use Oro\Bundle\ActionBundle\Model\Operation;
 use Oro\Bundle\ActionBundle\Model\OperationDefinition;
 use Oro\Bundle\ActionBundle\Model\OperationRegistry;
-use Oro\Component\Layout\ArrayCollection;
-use Symfony\Component\Form\FormFactoryInterface;
-use Symfony\Component\Form\FormInterface;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Session\Flash\FlashBagInterface;
-use Symfony\Component\Translation\TranslatorInterface;
 
 class OperationFormHandlerTest extends \PHPUnit_Framework_TestCase
 {
@@ -49,41 +54,284 @@ class OperationFormHandlerTest extends \PHPUnit_Framework_TestCase
         );
     }
 
-    /**
-     * @dataProvider processDataProvider
-     *
-     * @param Request $request
-     * @param FlashBagInterface $flashBag
-     * @param array $expected
-     */
-    public function testProcess(Request $request, FlashBagInterface $flashBag, array $expected)
+    public function testProcessSimple()
     {
+        $actionData = $this->actionDataFromContext();
+
+        $operation = $this->operationRetrieval('form_type', $actionData, ['formOption' => 'formOptionValue']);
+
+        $request = new Request(['_wid' => 'widValue', 'fromUrl' => 'fromUrlValue']);
+
+        $form = $this->formProcessing($request, $actionData, $operation);
+
+        $formView = $this->formViewRetrieval($form);
+
+        $errors = new ArrayCollection();
+        $operation->expects($this->once())->method('execute')->with($actionData, $errors);
+
+        $expected = [
+            '_wid' => 'widValue',
+            'fromUrl' => 'fromUrlValue',
+            'operation' => $operation,
+            'actionData' => $actionData,
+            'errors' => $errors,
+            'messages' => [],
+            'form' => $formView,
+            'context' => [
+                'form' => $form
+            ],
+            'response' => [
+                'success' => true
+            ]
+        ];
+
+        /** @var FlashBagInterface|\PHPUnit_Framework_MockObject_MockObject $flashBag */
+        $flashBag = $this->getMock(FlashBagInterface::class);
+
+        $this->assertEquals($expected, $this->handler->process('operation', $request, $flashBag));
+    }
+
+    public function testProcessRedirect()
+    {
+        $actionData = $this->actionDataFromContext();
+
+        $operation = $this->operationRetrieval('form_type', $actionData, ['formOption' => 'formOptionValue']);
+
+        $request = new Request(['_wid' => null, 'fromUrl' => 'fromUrlValue']);
+
+        $this->formProcessing($request, $actionData, $operation);
+
+        $operation->expects($this->once())->method('execute')->with($this->callback(
+            function (ActionData $actionData, ArrayCollection $errors = null) {
+                $actionData['redirectUrl'] = 'http://redirect.url/';
+
+                return true;
+            }
+        ));
+
+        /** @var FlashBagInterface|\PHPUnit_Framework_MockObject_MockObject $flashBag */
+        $flashBag = $this->getMock(FlashBagInterface::class);
+
+        $this->assertEquals(
+            new RedirectResponse('http://redirect.url/', 302),
+            $this->handler->process('operation', $request, $flashBag)
+        );
+    }
+
+    public function testProcessRefreshDatagrid()
+    {
+        $actionData = $this->actionDataFromContext();
+
+        $operation = $this->operationRetrieval('form_type', $actionData, ['formOption' => 'formOptionValue']);
+
+        $request = new Request(['_wid' => 'widValue', 'fromUrl' => 'fromUrlValue']);
+
+        $form = $this->formProcessing($request, $actionData, $operation);
+
+        $formView = $this->formViewRetrieval($form);
+
+        $errors = new ArrayCollection();
+        $operation->expects($this->once())->method('execute')->with($this->callback(
+            function (ActionData $actionData, ArrayCollection $errors = null) {
+                $actionData['refreshGrid'] = ['refreshed-grid'];
+
+                return true;
+            }
+        ));
+
+        $expected = [
+            '_wid' => 'widValue',
+            'fromUrl' => 'fromUrlValue',
+            'operation' => $operation,
+            'actionData' => $actionData,
+            'errors' => $errors,
+            'messages' => [],
+            'form' => $formView,
+            'context' => [
+                'form' => $form,
+                'refreshGrid' => ['refreshed-grid']
+            ],
+            'response' => [
+                'success' => true,
+                'refreshGrid' => ['refreshed-grid'],
+                'flashMessages' => ['message1']
+            ]
+        ];
+
+        /** @var FlashBagInterface|\PHPUnit_Framework_MockObject_MockObject $flashBag */
+        $flashBag = $this->getMock(FlashBagInterface::class);
+        $flashBag->expects($this->once())->method('all')->willReturn(['message1']);
+
+        $this->assertEquals($expected, $this->handler->process('operation', $request, $flashBag));
+    }
+
+    public function testProcessOperationNotFoundException()
+    {
+        $this->operationRegistry->expects($this->once())
+            ->method('findByName')->with('operation')->willReturn(null);
+
+        $this->actionDataFromContext();
+
+        $this->setExpectedException(OperationNotFoundException::class, 'Operation with name "operation" not found');
+
+        /** @var FlashBagInterface|\PHPUnit_Framework_MockObject_MockObject $flashBag */
+        $flashBag = $this->getMock(FlashBagInterface::class);
+
+        $this->handler->process('operation', new Request(), $flashBag);
+    }
+
+    public function testProcessErrorHandlingForWidget()
+    {
+        $actionData = $this->actionDataFromContext();
+
+        $operation = $this->operationRetrieval('form_type', $actionData, ['formOption' => 'formOptionValue']);
+
+        $request = new Request(['_wid' => 'widValue', 'fromUrl' => 'fromUrlValue']);
+
+        $form = $this->formProcessing($request, $actionData, $operation);
+
+        $formView = $this->formViewRetrieval($form);
+
+        $operation->expects($this->once())->method('execute')->willThrowException(new \Exception('err msg'));
+
+        $expected = [
+            '_wid' => 'widValue',
+            'fromUrl' => 'fromUrlValue',
+            'operation' => $operation,
+            'actionData' => $actionData,
+            'errors' => new ArrayCollection([['message' => 'err msg', 'parameters' => []]]),
+            'messages' => ['flash bag message'],
+            'form' => $formView,
+            'context' => [
+                'form' => $form
+            ]
+        ];
+
+        /** @var FlashBagInterface|\PHPUnit_Framework_MockObject_MockObject $flashBag */
+        $flashBag = $this->getMock(FlashBagInterface::class);
+        $flashBag->expects($this->once())->method('all')->willReturn(['flash bag message']);
+
+        $this->assertEquals($expected, $this->handler->process('operation', $request, $flashBag));
+    }
+
+    public function testProcessErrorHandlingForWidgetWithManyErrors()
+    {
+        $actionData = $this->actionDataFromContext();
+
+        $operation = $this->operationRetrieval('form_type', $actionData, ['formOption' => 'formOptionValue']);
+
+        $request = new Request(['_wid' => null, 'fromUrl' => 'fromUrlValue']);
+
+        $form = $this->formProcessing($request, $actionData, $operation);
+
+        $formView = $this->formViewRetrieval($form);
+
+        $operation->expects($this->once())->method('execute')->with(
+            $this->callback(function (ActionData $actionData) {
+                $actionData['refreshGrid'] = ['grid'];
+
+                return true;
+            }),
+            $this->callback(function (ArrayCollection $collection) {
+                $collection->add(['message' => 'message', 'parameters' => []]);
+
+                return true;
+            })
+        );
+
+        $expected = [
+            '_wid' => null,
+            'fromUrl' => 'fromUrlValue',
+            'operation' => $operation,
+            'actionData' => $actionData,
+            'errors' => new ArrayCollection([['message' => 'message', 'parameters' => []]]),
+            'messages' => [],
+            'form' => $formView,
+            'context' => [
+                'form' => $form,
+                'refreshGrid' => ['grid']
+
+            ]
+        ];
+
+        /** @var FlashBagInterface|\PHPUnit_Framework_MockObject_MockObject $flashBag */
+        $flashBag = $this->getMock(FlashBagInterface::class);
+        //will throw custom exception in getResponseData
+        $flashBag->expects($this->once())->method('all')->willThrowException(new \Exception('exception message'));
+
+        $this->translator->expects($this->any())->method('trans')->willReturnArgument(0);
+        $flashBag->expects($this->at(1))->method('add')->with('error', 'exception message: message');
+
+        $this->assertEquals($expected, $this->handler->process('operation', $request, $flashBag));
+    }
+
+    public function testProcessErrorHandlingForNotWidget()
+    {
+        $actionData = $this->actionDataFromContext();
+
+        $operation = $this->operationRetrieval('form_type', $actionData, ['formOption' => 'formOptionValue']);
+
+        $request = new Request(['_wid' => null, 'fromUrl' => 'fromUrlValue']);
+
+        $form = $this->formProcessing($request, $actionData, $operation);
+
+        $formView = $this->formViewRetrieval($form);
+
+        $operation->expects($this->once())->method('execute')->willThrowException(new \Exception('err msg'));
+
+        $expected = [
+            '_wid' => null,
+            'fromUrl' => 'fromUrlValue',
+            'operation' => $operation,
+            'actionData' => $actionData,
+            'errors' => new ArrayCollection([]),
+            'messages' => [],
+            'form' => $formView,
+            'context' => [
+                'form' => $form
+            ]
+        ];
+
+        /** @var FlashBagInterface|\PHPUnit_Framework_MockObject_MockObject $flashBag */
+        $flashBag = $this->getMock(FlashBagInterface::class);
+        $this->translator->expects($this->once())->method('trans')->with('err msg')->willReturnArgument(0);
+        $flashBag->expects($this->once())->method('add')->with('error', 'err msg');
+
         $this->assertEquals($expected, $this->handler->process('operation', $request, $flashBag));
     }
 
     /**
-     * @return \Generator
+     * @param string $formType
+     * @param ActionData $actionData
+     * @param array $formOptions
+     * @return Operation|\PHPUnit_Framework_MockObject_MockObject
      */
-    public function processDataProvider()
+    private function operationRetrieval($formType, ActionData $actionData, array $formOptions)
     {
-        return [$this->caseSimpleProcess()];
+        $operation = $this->getMockBuilder(Operation::class)->disableOriginalConstructor()->getMock();
+
+        $this->operationRegistry->expects($this->once())
+            ->method('findByName')->with('operation')->willReturn($operation);
+
+        $definition = $this->getMockBuilder(OperationDefinition::class)->disableOriginalConstructor()->getMock();
+
+        $operation->expects($this->once())->method('isAvailable')->with($actionData)->willReturn(true);
+        $operation->expects($this->once())->method('getDefinition')->willReturn($definition);
+        $definition->expects($this->once())->method('getFormType')->willReturn($formType);
+        $operation->expects($this->once())->method('getFormOptions')->with($actionData)->willReturn($formOptions);
+
+        return $operation;
     }
 
-    private function caseSimpleProcess()
+    /**
+     * @param Request $request
+     * @param ActionData $actionData
+     * @param Operation $operation
+     * @return  FormInterface|\PHPUnit_Framework_MockObject_MockObject
+     */
+    protected function formProcessing($request, $actionData, $operation)
     {
-        $actionData = new ActionData();
-        $this->contextHelper->expects($this->once())
-            ->method('getActionData')->willReturn($actionData);
-
-        $operation = $this->getOperation('form_type', $actionData, ['formOption' => 'formOptionValue']);
-
-        $request = new Request(['_wid' => 'widValue', 'formUrl' => 'formUrlValue']);
-
         $form = $this->getMock(FormInterface::class);
-
-        $form->expects($this->once())->method('handleRequest')->with($request);
-        $form->expects($this->once())->method('isValid')->willReturn(true);
-        $operation->expects($this->once())->method('execute')->with($actionData, new ArrayCollection());
 
         $this->formFactory->expects($this->once())
             ->method('create')
@@ -97,35 +345,34 @@ class OperationFormHandlerTest extends \PHPUnit_Framework_TestCase
             )
             ->willReturn($form);
 
-        $flashBug = $this->getMock(FlashBagInterface::class);
-        $flashBug->expects($this->once())->method('all')->willReturn([]);
+        $form->expects($this->once())->method('handleRequest')->with($request);
+        $form->expects($this->once())->method('isValid')->willReturn(true);
 
-        $expected = [
-            'data' => 'blah'
-        ];
-
-        return [$request, $flashBug, $expected];
+        return $form;
     }
 
     /**
-     * @param string $formType
-     * @param ActionData $actionData
-     * @param array $formOptions
-     * @return Operation|\PHPUnit_Framework_MockObject_MockObject
+     * @param FormInterface|\PHPUnit_Framework_MockObject_MockObject $form
+     * @return FormView|\PHPUnit_Framework_MockObject_MockObject
      */
-    private function getOperation($formType, ActionData $actionData, array $formOptions)
+    protected function formViewRetrieval($form)
     {
-        $operation = $this->getMockBuilder(Operation::class)->disableOriginalConstructor()->getMock();
-        $definition = $this->getMockBuilder(OperationDefinition::class)->disableOriginalConstructor()->getMock();
+        $formView = $this->getMockBuilder(FormView::class)
+            ->disableOriginalConstructor()->getMock();
+        $form->expects($this->once())->method('createView')->willReturn($formView);
 
-        $operation->expects($this->once())->method('getDefinition')->willReturn($definition);
+        return $formView;
+    }
 
-        $definition->expects($this->once())->method('getFormType')->willReturn($formType);
-        $definition->expects($this->once())->method('getFormOptions')->with($actionData)->willReturn($formOptions);
+    /**
+     * @return ActionData
+     */
+    protected function actionDataFromContext()
+    {
+        $actionData = new ActionData();
+        $this->contextHelper->expects($this->once())
+            ->method('getActionData')->willReturn($actionData);
 
-        $this->operationRegistry->expects($this->once())
-            ->method('findByName')->with('operation')->willReturn($operation);
-
-        return $operation;
+        return $actionData;
     }
 }
