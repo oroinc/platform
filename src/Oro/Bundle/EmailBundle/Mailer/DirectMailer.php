@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\EmailBundle\Mailer;
 
+
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\IntrospectableContainerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -10,7 +11,7 @@ use Oro\Bundle\EmailBundle\Entity\EmailOrigin;
 use Oro\Bundle\EmailBundle\Exception\NotSupportedException;
 use Oro\Bundle\EmailBundle\Event\SendEmailTransport;
 use Oro\Bundle\ImapBundle\Entity\UserEmailOrigin;
-use Oro\Bundle\EmailBundle\Provider\AbstractSmtpSettingsProvider;
+use Oro\Bundle\EmailBundle\Form\Model\SmtpSettings;
 
 /**
  * The goal of this class is to send an email directly, not using a mail spool
@@ -32,7 +33,6 @@ class DirectMailer extends \Swift_Mailer
      *
      * @param \Swift_Mailer      $baseMailer
      * @param ContainerInterface $container
-     * @param AbstractSmtpSettingsProvider $smtpSettingsProvider
      */
     public function __construct(
         \Swift_Mailer $baseMailer,
@@ -90,13 +90,15 @@ class DirectMailer extends \Swift_Mailer
     }
 
     /**
-     * Last change to modify smtp transport
+     * Last chance to modify SMTP transport
      */
-    protected function postPrepareSmtpTransport()
+    public function postPrepareSmtpTransport(SmtpSettings $smtpSettings = null)
     {
         if (!$this->smtpTransport) {
-            $provider = $this->container->get('oro_email.provider.smtp_settings');
-            $smtpSettings = $provider->getSmtpSettings();
+            if (!$smtpSettings instanceof SmtpSettings) {
+                $provider = $this->container->get('oro_email.provider.smtp_settings');
+                $smtpSettings = $provider->getSmtpSettings();
+            }
 
             if ($smtpSettings->isEligible()) {
                 $transport = $this->getTransport();

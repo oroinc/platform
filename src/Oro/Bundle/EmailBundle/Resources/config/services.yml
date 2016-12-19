@@ -1185,3 +1185,5 @@ services:
 
     oro_email.mailer.checker.smtp_settings:
         class: Oro\Bundle\EmailBundle\Mailer\Checker\SmtpSettingsChecker
+        arguments:
+            - '@oro_email.direct_mailer'

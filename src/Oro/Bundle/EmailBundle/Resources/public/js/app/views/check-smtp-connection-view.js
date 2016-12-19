@@ -28,7 +28,7 @@ define(function(require) {
         },
 
         checkSmtpConnection: function(event) {
-            var data = this.$el.find('input[data-class="smtp_settings"]').serializeArray();
+            var data = this.$el.find('[data-class="smtp_settings"]').serializeArray();
             var $messageContainer = this.$el.find('.check-smtp-connection-messages');
             mediator.execute('showLoading');
             this.clear();
