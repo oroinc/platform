@@ -222,7 +222,7 @@ define(function(require) {
     }
     function highlightSelection(str, selection) {
         return str && selection && selection.term ?
-            str.replace(tools.safeRegExp(selection.term, 'ig'), '<span class="select2-match">$&</span>') : str;
+            str.replace(tools.safeRegExp(selection.term.trim(), 'ig'), '<span class="select2-match">$&</span>') : str;
     }
 
     function getTitle(data, properties) {
@@ -251,11 +251,13 @@ define(function(require) {
         }
 
         return function(object, container, query) {
+            debugger;
             if ($.isEmptyObject(object)) {
                 return undefined;
             }
             var result = '';
             var highlight = function(str) {
+                    debugger;
                     return object.children ? str : highlightSelection(str, query);
                 };
             if (object._html !== undefined) {
