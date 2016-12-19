@@ -219,7 +219,7 @@ class WorkflowDefinition implements DomainObjectInterface
     /**
      * @var array
      *
-     * @ORM\Column(name="applications", type="simple_array")
+     * @ORM\Column(name="applications", type="simple_array", nullable=false)
      */
     protected $applications = [CurrentApplicationProviderInterface::DEFAULT_APPLICATION];
 

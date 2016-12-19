@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\WorkflowBundle\Command;
 
+use Oro\Bundle\WorkflowBundle\Configuration\WorkflowConfiguration;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 
 use Symfony\Component\Console\Helper\Table;
@@ -27,6 +28,7 @@ class DebugWorkflowDefinitionsCommand extends ContainerAwareCommand
         'Related Entity',
         'Type',
         'Priority',
+        'Applications',
         'Exclusive Active Group',
         'Exclusive Record Groups'
     ];
@@ -84,12 +86,15 @@ class DebugWorkflowDefinitionsCommand extends ContainerAwareCommand
                     $recordGroups = 'N/A';
                 }
 
+                $applications = implode(', ', $workflow->getApplications());
+
                 $row = [
                     $workflow->getName(),
                     $translator->trans($workflow->getLabel(), [], WorkflowTranslationHelper::TRANSLATION_DOMAIN),
                     $workflow->getRelatedEntity(),
                     $workflow->isSystem() ? 'System' : 'Custom',
                     (int)$workflow->getPriority(),
+                    $applications,
                     $activeGroups,
                     $recordGroups
                 ];
@@ -125,6 +130,7 @@ class DebugWorkflowDefinitionsCommand extends ContainerAwareCommand
                 'defaults' => [
                     'active' => $workflow->isActive()
                 ],
+                WorkflowConfiguration::NODE_APPLICATIONS => $workflow->getApplications()
             ];
 
             $startStep = $workflow->getStartStep();

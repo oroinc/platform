@@ -111,6 +111,10 @@ class DebugWorkflowDefinitionsCommandTest extends WebTestCase
                 $initialWorkflow->getExclusiveRecordGroups(),
                 $workflowDefinition->getExclusiveRecordGroups()
             );
+            $this->assertEquals(
+                $initialWorkflow->getApplications(),
+                $workflowDefinition->getApplications()
+            );
         } else {
             $this->assertContains('No workflow definitions found.', $result);
         }
