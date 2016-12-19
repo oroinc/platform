@@ -66,9 +66,10 @@ class ImportExportTest extends WebTestCase
 
     public function testImport()
     {
+        $this->markTestSkipped(
+            'This test will be completely removed and replaced with a set of smaller functional tests (see BAP-13063)'
+        );
         $this->validateImportFile($this->doExportTemplate());
-
-        // @todo - must be refactored in BAP-12713
         $this->doImport(16, 0);
 
         $this->assertCount(count($this->fields) + 16, $this->getEntityFields());
@@ -80,7 +81,9 @@ class ImportExportTest extends WebTestCase
             $this->getFilePath('@OroEntityConfigBundle/Tests/Functional/ImportExport/data/string_field.csv')
         );
 
-        // @todo - must be refactored in BAP-12713
+        $this->markTestSkipped(
+            'This test will be completely removed and replaced with a set of smaller functional tests (see BAP-13063)'
+        );
         $this->doImport(1, 0);
         $this->assertCount(count($this->fields) + 1, $this->getEntityFields());
 
@@ -103,7 +106,9 @@ class ImportExportTest extends WebTestCase
 
     public function testValidationError()
     {
-        // @todo - must be refactored in BAP-12713
+        $this->markTestSkipped(
+            'This test will be completely removed and replaced with a set of smaller functional tests (see BAP-13063)'
+        );
         $this->assertErrors(
             '@OroEntityConfigBundle/Tests/Functional/ImportExport/data/invalid_field_name.csv',
             ['Data does not contain required properties: type, fieldType or entity_id']
@@ -216,9 +221,6 @@ class ImportExportTest extends WebTestCase
         $this->assertEquals(
             [
                 'success' => true,
-                'message' => 'File was successfully imported.',
-                'errorsUrl' => null,
-                'importInfo' => sprintf('%s entities were added, %s entities were updated', $added, $replaced)
             ],
             $data
         );

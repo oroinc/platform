@@ -144,6 +144,9 @@ class ControllersTest extends WebTestCase
      */
     public function testExport(array $report, array $reportResult, array $segmentExport, $segmentExportFilter)
     {
+        $this->markTestSkipped(
+            'This test will be completely removed and replaced with a set of smaller functional tests (see BAP-13064)'
+        );
         $response = $this->client->requestGrid(
             'oro_segments-grid',
             array('oro_segments-grid[_filter][name][value]' => $report['oro_segment_form[name]'] . '_updated')
