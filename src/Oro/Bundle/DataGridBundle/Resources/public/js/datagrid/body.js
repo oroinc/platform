@@ -37,10 +37,6 @@ define([
             className: 'grid-body'
         },
 
-        listen: {
-            'backgrid:sort collection': 'sort'
-        },
-
         /**
          * @inheritDoc
          */

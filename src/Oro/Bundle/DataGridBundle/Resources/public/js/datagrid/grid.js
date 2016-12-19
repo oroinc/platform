@@ -462,7 +462,8 @@ define(function(require) {
                 this._$boundScrollHandlerParents = $parents;
             }
 
-            this.collection.on('backgrid:sort', _.debounce(this.sort, 100), this);
+            this.listenTo(this.collection, 'backgrid:sort', this.sort);
+            this.listenTo(this.collection, 'updateState', this.render);
 
             return this;
         },

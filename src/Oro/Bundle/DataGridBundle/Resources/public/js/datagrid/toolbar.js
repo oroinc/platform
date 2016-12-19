@@ -106,7 +106,7 @@ define([
 
             if (_.isFunction(options.template)) {
                 this.template = options.template;
-            } else if (options.template) {
+            } else if (options.template || this.template) {
                 this.template = _.template($(options.template || this.template).html());
             }
 
