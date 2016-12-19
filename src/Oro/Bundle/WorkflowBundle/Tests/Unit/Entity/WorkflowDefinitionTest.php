@@ -38,6 +38,8 @@ class WorkflowDefinitionTest extends \PHPUnit_Framework_TestCase
         $this->assertPropertyCollections($this->workflowDefinition, [
             ['scopes', new Scope()],
         ]);
+
+        $this->assertPropertyAccessors($this->workflowDefinition, [['applications', ['some_application'], true]]);
     }
 
     public function testSetScopesConfig()

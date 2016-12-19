@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\WorkflowBundle\Entity;
 
+use Oro\Bundle\ActionBundle\Provider\CurrentApplicationProviderInterface;
 use Symfony\Component\Security\Acl\Model\DomainObjectInterface;
 
 use Doctrine\ORM\Mapping as ORM;
@@ -214,6 +215,13 @@ class WorkflowDefinition implements DomainObjectInterface
      * )
      */
     protected $updatedAt;
+
+    /**
+     * @var array
+     *
+     * @ORM\Column(name="applications", type="simple_array")
+     */
+    protected $applications = [CurrentApplicationProviderInterface::DEFAULT_APPLICATION];
 
     /**
      * Constructor
@@ -900,6 +908,26 @@ class WorkflowDefinition implements DomainObjectInterface
     public function setExclusiveRecordGroups(array $groups)
     {
         $this->groups[self::GROUP_TYPE_EXCLUSIVE_RECORD] = $groups;
+
+        return $this;
+    }
+
+    /**
+     * @return array
+     */
+    public function getApplications()
+    {
+        return $this->applications;
+    }
+
+    /**
+     * @param array $applications
+     *
+     * @return $this
+     */
+    public function setApplications(array $applications)
+    {
+        $this->applications = array_map('strtolower', $applications);
 
         return $this;
     }

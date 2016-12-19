@@ -1,5 +1,7 @@
 <?php
 
+use Oro\Bundle\ActionBundle\Provider\CurrentApplicationProviderInterface;
+use Oro\Bundle\WorkflowBundle\Configuration\WorkflowConfiguration;
 use Oro\Bundle\WorkflowBundle\Form\Type\WorkflowTransitionType;
 
 return [
@@ -166,7 +168,7 @@ return [
         'entity_restrictions' => [],
         'exclusive_active_groups' => ['active_group1'],
         'exclusive_record_groups' => ['record_group1'],
-        'applications' => ['default'],
+        WorkflowConfiguration::NODE_APPLICATIONS => [CurrentApplicationProviderInterface::DEFAULT_APPLICATION],
     ],
     'second_workflow' => [
         'entity' => 'Second\Entity',
@@ -225,6 +227,6 @@ return [
         'entity_restrictions' => [],
         'exclusive_active_groups' => [],
         'exclusive_record_groups' => [],
-        'applications' => ['other_application'],
+        WorkflowConfiguration::NODE_APPLICATIONS => ['other_application'],
     ]
 ];
