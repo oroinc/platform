@@ -27,6 +27,7 @@ For example:
                     data_name: g.id
                     enabled: true|false #whether filter enabled or not. If filter is not enabled it will not be displayed in filter list but will be accessible in filter management.
                     disabled: true|false #If filter is disabled it will not be displayed in filter list and will not be available in filter management.
+                    visible: true|false #If set to "false" - filter will not be displayed anywhere in UI. However, one can still set filter's value in backend or via url in frontend
 
 ```
 
