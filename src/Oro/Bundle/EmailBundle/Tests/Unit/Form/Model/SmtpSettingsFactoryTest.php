@@ -82,22 +82,22 @@ class SmtpSettingsFactoryTest extends \PHPUnit_Framework_TestCase
                 'uri' => 'http://localhost',
                 'method' => 'GET',
                 'parameters' => [
-                    'email_configuration[oro_email___smtp_settings_host][value]' => 'smtp.orocrm.com',
-                    'email_configuration[oro_email___smtp_settings_port][value]' => '465',
-                    'email_configuration[oro_email___smtp_settings_encryption][value]' => 'ssl',
-                    'email_configuration[oro_email___smtp_settings_username][value]' => 'some_user',
-                    'email_configuration[oro_email___smtp_settings_password][value]' => 'some_pass',
+                    'host' => 'smtp.orocrm.com',
+                    'port' => '465',
+                    'encryption' => 'ssl',
+                    'username' => 'some_user',
+                    'password' => 'some_pass',
                 ]
             ],
             [
                 'uri' => 'http://localhost',
                 'method' => 'POST',
                 'parameters' => [
-                    'email_configuration[oro_email___smtp_settings_host][value]' => 'smtp.orocrm.com',
-                    'email_configuration[oro_email___smtp_settings_port][value]' => '587',
-                    'email_configuration[oro_email___smtp_settings_encryption][value]' => 'tls',
-                    'email_configuration[oro_email___smtp_settings_username][value]' => 'some_user',
-                    'email_configuration[oro_email___smtp_settings_password][value]' => 'some_pass',
+                    'host' => 'smtp.orocrm.com',
+                    'port' => '587',
+                    'encryption' => 'tls',
+                    'username' => 'some_user',
+                    'password' => 'some_pass',
                 ]
             ],
         ];
@@ -110,18 +110,18 @@ class SmtpSettingsFactoryTest extends \PHPUnit_Framework_TestCase
                 'uri' => 'http://localhost',
                 'method' => 'GET',
                 'parameters' => [
-                    'email_configuration[oro_email___smtp_settings_host][value]' => 'smtp.orocrm.com',
-                    'email_configuration[oro_email___smtp_settings_port][value]' => '465',
-                    'email_configuration[oro_email___smtp_settings_encryption][value]' => '',
+                    'host' => 'smtp.orocrm.com',
+                    'port' => '465',
+                    'encryption' => '',
                 ]
             ],
             [
                 'uri' => 'http://localhost',
                 'method' => 'POST',
                 'parameters' => [
-                    'email_configuration[oro_email___smtp_settings_host][value]' => 'smtp.orocrm.com',
-                    'email_configuration[oro_email___smtp_settings_port][value]' => '587',
-                    'email_configuration[oro_email___smtp_settings_encryption][value]' => 'tls',
+                    'host' => 'smtp.orocrm.com',
+                    'port' => '587',
+                    'encryption' => 'tls',
                 ]
             ],
         ];
@@ -134,18 +134,18 @@ class SmtpSettingsFactoryTest extends \PHPUnit_Framework_TestCase
                 'uri' => 'http://localhost',
                 'method' => 'GET',
                 'parameters' => [
-                    'email_configuration[oro_email___smtp_settings_host][value]' => '',
-                    'email_configuration[oro_email___smtp_settings_port][value]' => '',
-                    'email_configuration[oro_email___smtp_settings_encryption][value]' => '',
+                    'host' => '',
+                    'port' => '',
+                    'encryption' => '',
                 ]
             ],
             [
                 'uri' => 'http://localhost',
                 'method' => 'POST',
                 'parameters' => [
-                    'email_configuration[oro_email___smtp_settings_host][value]' => '',
-                    'email_configuration[oro_email___smtp_settings_port][value]' => '',
-                    'email_configuration[oro_email___smtp_settings_encryption][value]' => '',
+                    'host' => '',
+                    'port' => '',
+                    'encryption' => '',
                 ]
             ],
         ];
