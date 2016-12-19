@@ -48,8 +48,6 @@ define([
             this.reloadData = false;
             this.frontend_handle = 'ajax';
 
-            this.on('preExecute', _.bind(this._preExecuteSubscriber, this));
-
             ExportAction.__super__.initialize.apply(this, arguments);
         },
 
