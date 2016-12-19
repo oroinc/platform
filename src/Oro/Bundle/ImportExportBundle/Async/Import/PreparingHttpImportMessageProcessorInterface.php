@@ -13,5 +13,4 @@ interface PreparingHttpImportMessageProcessorInterface
      * @return string
      */
     public static function getMessageName();
-
-} 
+}
