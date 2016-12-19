@@ -8,7 +8,6 @@ use Oro\Bundle\ActionBundle\Model\ActionGroupRegistry;
 use Oro\Bundle\ActionBundle\Model\Assembler\ActionGroupAssembler;
 use Oro\Bundle\ActionBundle\Model\Assembler\ParameterAssembler;
 
-use Oro\Component\Action\Action\ActionFactory;
 use Oro\Component\ConfigExpression\ExpressionFactory;
 
 class ActionGroupRegistryTest extends \PHPUnit_Framework_TestCase
@@ -28,9 +27,7 @@ class ActionGroupRegistryTest extends \PHPUnit_Framework_TestCase
             $this->getMock('Oro\Bundle\ActionBundle\Configuration\ConfigurationProviderInterface');
 
         /** @var \PHPUnit_Framework_MockObject_MockObject|ActionFactory $actionFactory */
-        $actionFactory = $this->getMockBuilder('Oro\Component\Action\Action\ActionFactory')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $actionFactory = $this->getMock('Oro\Component\Action\Action\ActionFactoryInterface');
 
         /** @var \PHPUnit_Framework_MockObject_MockObject|ExpressionFactory $conditionFactory */
         $conditionFactory = $this->getMockBuilder('Oro\Component\ConfigExpression\ExpressionFactory')

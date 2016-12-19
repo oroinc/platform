@@ -54,6 +54,7 @@ define(function(require) {
                 config: {
                     source: _.bind(this.source, this),
                     matcher: _.bind(this.matcher, this),
+                    updater: _.bind(this.updater, this),
                     sorter: _.bind(this.sorter, this),
                     show: this.show
                 }
@@ -129,6 +130,14 @@ define(function(require) {
          */
         matcher: function(item) {
             return true;//matched on server
+        },
+
+        /**
+         * @param {String} item
+         * @returns {String}
+         */
+        updater: function(item) {
+            return item;
         },
 
         /**
