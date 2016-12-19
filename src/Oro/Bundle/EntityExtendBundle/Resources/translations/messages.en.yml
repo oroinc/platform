@@ -159,6 +159,8 @@ oro:
             manage: Access attributes management
             create: Create an attribute
             update: Update an attribute
+            remove: Remove an attribute
+            restore: Restore an attribure
             attributes: Attributes
             new_attribute: New attribute
             edit_attribute: Edit attribute
