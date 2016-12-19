@@ -4,6 +4,7 @@ namespace Oro\Bundle\NavigationBundle\Manager;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityRepository;
 
 use Knp\Menu\ItemInterface;
 
@@ -263,8 +264,6 @@ class MenuUpdateManager
     }
 
     /**
-     * @SuppressWarnings(PHPMD.NPathComplexity)
-     *
      * @param string $menuName
      * @param string $key
      * @param Scope  $scope
@@ -367,7 +366,7 @@ class MenuUpdateManager
     }
 
     /**
-     * @return MenuUpdateRepository
+     * @return MenuUpdateRepository|EntityRepository
      */
     public function getRepository()
     {

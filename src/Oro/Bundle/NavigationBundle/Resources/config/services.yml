@@ -450,11 +450,6 @@ services:
         tags:
             - { name: layout.data_provider, alias: title_provider }
 
-#    oro_navigation.scope_criteria_provider.global:
-#        parent: oro_organization.scope_criteria_provider.organization
-#        tags:
-#            - {name: oro_scope.provider, scopeType: '%oro_navigation.menu_update.scope_type%', priority: 10}
-
     oro_navigation.scope_criteria_provider.user:
         parent: oro_user.scope_criteria_provider.user
         tags:
