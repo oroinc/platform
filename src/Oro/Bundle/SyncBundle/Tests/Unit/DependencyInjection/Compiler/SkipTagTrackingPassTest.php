@@ -50,11 +50,10 @@ class SkipTagTrackingPassTest extends \PHPUnit_Framework_TestCase
 
         /** @var Definition|\PHPUnit_Framework_MockObject_MockObject $definition */
         $definition = $this->getMock(Definition::class);
-        $definition->expects($this->exactly(11))
+        $definition->expects($this->exactly(10))
             ->method('addMethodCall')
             ->withConsecutive(
                 ['markSkipped', ['Oro\Bundle\DataAuditBundle\Entity\Audit']],
-                ['markSkipped', ['Oro\Bundle\DataAuditBundle\Entity\AuditData']],
                 ['markSkipped', ['Oro\Bundle\NavigationBundle\Entity\PageState']],
                 ['markSkipped', ['Oro\Bundle\NavigationBundle\Entity\NavigationHistoryItem']],
                 ['markSkipped', ['Oro\Bundle\SearchBundle\Entity\Item']],

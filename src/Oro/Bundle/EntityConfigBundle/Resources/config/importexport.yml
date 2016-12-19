@@ -1,20 +1,26 @@
 parameters:
     oro_entity_config.importexport.data_converter.entity_field.class: Oro\Bundle\EntityConfigBundle\ImportExport\DataConverter\EntityFieldDataConverter
-    oro_entity_config.importexport.template_data_converter.entity_field.class: Oro\Bundle\EntityConfigBundle\ImportExport\DataConverter\EntityFieldTemplateDataConverter
     oro_entity_config.importexport.normalizer.entity_field.class: Oro\Bundle\EntityConfigBundle\ImportExport\Serializer\EntityFieldNormalizer
     oro_entity_config.importexport.strategy.entity_field.add_or_replace.class: Oro\Bundle\EntityConfigBundle\ImportExport\Strategy\EntityFieldImportStrategy
-    oro_entity_config.importexport.template_fixture.entity_field.class: Oro\Bundle\EntityConfigBundle\ImportExport\TemplateFixture\EntityFieldFixture
-    oro_entity_config.importexport.writer.entity_field.class: Oro\Bundle\EntityConfigBundle\ImportExport\Writer\EntityFieldWriter
 
 services:
     # Converter
     oro_entity_config.importexport.data_converter.entity_field:
         class: %oro_entity_config.importexport.data_converter.entity_field.class%
 
-    oro_entity_config.importexport.template_data_converter.entity_field:
-        class: %oro_entity_config.importexport.template_data_converter.entity_field.class%
+    oro_entity_config.importexport.template_data_converter.abstract_field:
+        class: 'Oro\Bundle\EntityConfigBundle\ImportExport\DataConverter\AbstractFieldTemplateDataConverter'
+        abstract: true
         arguments:
             - '@oro_entity_extend.field_type_provider'
+
+    oro_entity_config.importexport.template_data_converter.entity_field:
+        class: 'Oro\Bundle\EntityConfigBundle\ImportExport\DataConverter\EntityFieldTemplateDataConverter'
+        parent: oro_entity_config.importexport.template_data_converter.abstract_field
+
+    oro_entity_config.importexport.template_data_converter.attribute:
+        class: 'Oro\Bundle\EntityConfigBundle\ImportExport\DataConverter\AttributeTemplateDataConverter'
+        parent: oro_entity_config.importexport.template_data_converter.abstract_field
 
     # Strategy
     oro_entity_config.importexport.strategy.entity_field.add_or_replace:
@@ -27,7 +33,7 @@ services:
 
     # Template Fixture
     oro_entity_config.importexport.template_fixture.entity_field:
-        class: %oro_entity_config.importexport.template_fixture.entity_field.class%
+        class: 'Oro\Bundle\EntityConfigBundle\ImportExport\TemplateFixture\EntityFieldFixture'
         arguments:
             - '@oro_entity_extend.field_type_provider'
         tags:
@@ -49,7 +55,14 @@ services:
         calls:
             - [setDataConverter, ['@oro_entity_config.importexport.template_data_converter.entity_field']]
         tags:
-            - { name: oro_importexport.processor, type: export_template, entity: %oro_entity_config.entity.entity_field.class%, alias: oro_entity_config_entity_field.export_template }
+            - { name: oro_importexport.processor, type: export_template, entity: '%oro_entity_config.entity.entity_field.class%', alias: oro_entity_config_entity_field.export_template }
+
+    oro_entity_config.importexport.processor.export_template.attribute:
+        parent: oro_importexport.processor.export_abstract
+        calls:
+            - [setDataConverter, ['@oro_entity_config.importexport.template_data_converter.attribute']]
+        tags:
+            - { name: oro_importexport.processor, type: export_template, entity: '%oro_entity_config.entity.entity_field.class%', alias: oro_entity_config_attribute.export_template }
 
     oro_entity_config.importexport.normalizer.entityfield:
         class: %oro_entity_config.importexport.normalizer.entity_field.class%
@@ -61,8 +74,22 @@ services:
             - { name: oro_importexport.normalizer, priority: 20 }
 
     oro_entity_config.importexport.writer.entity_field:
-        class: %oro_entity_config.importexport.writer.entity_field.class%
+        class: 'Oro\Bundle\EntityConfigBundle\ImportExport\Writer\EntityFieldWriter'
         arguments:
             - '@oro_entity_config.config_manager'
             - '@oro_entity_config.translation.helper'
             - '@oro_entity_extend.enum_synchronizer'
+
+    oro_entity_config.importexport.writer.attribute:
+        class: 'Oro\Bundle\EntityConfigBundle\ImportExport\Writer\AttributeWriter'
+        parent: oro_entity_config.importexport.writer.entity_field
+        calls:
+            - [setSerializedFieldProvider, ['@oro_entity_config.provider.serialized_field_provider']]
+
+    oro_entity_config.import_strategy.listener:
+        class: 'Oro\Bundle\EntityConfigBundle\EventListener\ImportStrategyListener'
+        arguments:
+            - '@translator'
+            - '@oro_importexport.strategy.import.helper'
+        tags:
+            - { name: kernel.event_listener, event: oro_importexport.strategy.process_after, method: onProcessAfter }

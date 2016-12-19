@@ -2,7 +2,7 @@
     "name": "oro/api-bundle",
     "type": "symfony-bundle",
     "description": "BAP API Bundle",
-    "keywords": ["BAP", "API", "REST", "SOAP"],
+    "keywords": ["BAP", "API", "REST"],
     "homepage": "https://github.com/laboro/ApiBundle",
     "license": "MIT",
     "require": {

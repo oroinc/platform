@@ -1,8 +1,9 @@
 define([
     'chaplin',
     'oroui/js/mediator',
-    './ready-state-tracker'
-], function(Chaplin, mediator, readyStateTracker) {
+    './ready-state-tracker',
+    'oroui/js/tools'
+], function(Chaplin, mediator, readyStateTracker, tools) {
     'use strict';
 
     var Application;
@@ -10,6 +11,11 @@ define([
     Application = Chaplin.Application.extend({
         initialize: function(options) {
             this.options = options || {};
+
+            if (this.options.debug !== undefined) {
+                tools.debug = this.options.debug;
+            }
+
             mediator.setHandler('retrieveOption', this.retrieveOption, this);
             mediator.setHandler('retrievePath', this.retrievePath, this);
             mediator.setHandler('combineFullUrl', this.combineFullUrl, this);

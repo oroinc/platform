@@ -3,7 +3,9 @@
 
 {% oro_title_set({params : {"%entityName%": entity_config.get('label')|default('N/A')|trans }}) %}
 
-{% set formAction = path('oro_entityextend_field_create', {id: entity_id}) %}
+{% if not formAction is defined %}
+    {% set formAction = path('oro_entityextend_field_create', {id: entity_id}) %}
+{% endif %}
 
 {% block navButtons %}
     {{ UI.cancelButton(path('oro_entityconfig_view', {'id':entity_id})) }}
@@ -15,18 +17,20 @@
 {% endblock navButtons %}
 
 {% block pageHeader %}
-    {% set breadcrumbs = {
-        'entity':      'entity',
-        'indexPath':   path('oro_entityconfig_index'),
-        'indexLabel': 'oro.entity_extend.config_grid.entities'|trans,
-        'entityTitle': 'oro.entity_extend.config_grid.new_field'|trans,
-        'additional': [
-            {
-                'indexPath'  : path('oro_entityconfig_view', {id: entity_id}),
-                'indexLabel' : entity_config.get('label')|default('N/A')|trans
-            },
-        ]
-    } %}
+    {% if not breadcrumbs is defined %}
+        {% set breadcrumbs = {
+            'entity':      'entity',
+            'indexPath':   path('oro_entityconfig_index'),
+            'indexLabel': 'oro.entity_extend.config_grid.entities'|trans,
+            'entityTitle': 'oro.entity_extend.config_grid.new_field'|trans,
+            'additional': [
+                {
+                    'indexPath'  : path('oro_entityconfig_view', {id: entity_id}),
+                    'indexLabel' : entity_config.get('label')|default('N/A')|trans
+                },
+            ]
+        } %}
+    {% endif %}
 
     {{ parent() }}
 {% endblock pageHeader %}
@@ -39,26 +43,13 @@
         'hiddenData': form_rest(form)
     } %}
 
-    <script type="text/javascript">
-        require(['jquery'], function($) {
-            'use strict';
-            $(function() {
-                $(document).on('change', 'form select#{{ form.type.vars.id }}', function (e) {
-                    var complexFieldType = $(this).find('option:selected').attr('value').split('||'),
-                        $field_name = $('input#{{ form.fieldName.vars.id }}');
+    {% set options = {
+        'typeId' : form.type.vars.id,
+        'fieldId' : form.fieldName.vars.id
+    } %}
 
-                    if (complexFieldType !== 'undefined'
-                        && complexFieldType.length > 1
-                        && complexFieldType[0].split('|').length === 4
-                        && complexFieldType[1]) {
-                        $field_name.val(complexFieldType[1]).prop('readonly', true);
-                    } else if ($field_name.prop('readonly')) {
-                        $field_name.val('').prop('readonly', false);
-                    }
-                });
-            })
-        });
-    </script>
-
-    {{ parent() }}
+    <div data-page-component-module="oroentityextend/js/extend-field-form-component"
+         data-page-component-options="{{ options|json_encode }}">
+        {{ parent() }}
+    </div>
 {% endblock content_data %}

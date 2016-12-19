@@ -271,3 +271,9 @@ services:
         tags:
             - { name: oro_form.autocomplete.search_handler, alias: business_units_tree_search_handler }
         lazy: true
+
+    oro_organization.scope_criteria_provider.organization:
+        class: Oro\Bundle\OrganizationBundle\Provider\ScopeOrganizationCriteriaProvider
+        public: false
+        arguments:
+            - "@security.token_storage"

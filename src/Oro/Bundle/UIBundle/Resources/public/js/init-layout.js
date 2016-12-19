@@ -247,6 +247,18 @@ require(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/tools
     //@TODO should be refactored in BAP-4020
     $(function() {
         var adjustHeight;
+        var anchor = $('#bottom-anchor');
+        if (!anchor.length) {
+            anchor = $('<div id="bottom-anchor"/>')
+                .css({
+                    position: 'fixed',
+                    bottom: '0',
+                    left: '0',
+                    width: '1px',
+                    height: '1px'
+                })
+                .appendTo($(document.body));
+        }
 
         if (tools.isMobile()) {
             adjustHeight = function() {
@@ -255,7 +267,6 @@ require(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/tools
             };
         } else {
             /* dynamic height for central column */
-            var anchor = $('#bottom-anchor');
             var content = false;
 
             var initializeContent = function() {
@@ -311,18 +322,6 @@ require(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/tools
 
                 mediator.trigger('layout:reposition');
             };
-
-            if (!anchor.length) {
-                anchor = $('<div id="bottom-anchor"/>')
-                    .css({
-                        position: 'fixed',
-                        bottom: '0',
-                        left: '0',
-                        width: '1px',
-                        height: '1px'
-                    })
-                    .appendTo($(document.body));
-            }
         }
 
         var adjustReloaded = function() {

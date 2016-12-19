@@ -150,7 +150,7 @@ class Configuration implements ConfigurationInterface
                 ->prototype('array')
                     ->children()
                         ->scalarNode('type')->end()
-                        ->scalarNode('area')->end()
+                        ->scalarNode('scope_type')->end()
                         ->scalarNode('read_only')->end()
                         ->scalarNode('max_nesting_level')->end()
                         ->arrayNode('extras')
