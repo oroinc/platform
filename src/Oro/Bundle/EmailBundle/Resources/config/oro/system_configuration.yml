@@ -14,10 +14,6 @@ system_configuration:
             title: oro.email.system_configuration.email_settings
             priority: 130
 
-        smtp_settings:
-            title: oro.email.system_configuration.smtp_settings.label
-            priority: 125
-
         email_autocomplete_configuration:
             title: oro.email.system_configuration.email_autocomplete_configuration.label
             priority: 120
@@ -37,6 +33,10 @@ system_configuration:
         attachment_configuration:
             title: oro.email.system_configuration.attachment_configuration.label
             priority: 70
+
+        smtp_settings:
+            title: oro.email.system_configuration.smtp_settings.label
+            priority: 65
 
         template_configuration:
             title: oro.email.system_configuration.template_configuration.label
