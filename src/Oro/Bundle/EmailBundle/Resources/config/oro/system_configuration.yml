@@ -228,13 +228,6 @@ system_configuration:
                                     email_settings:
                                         children:
                                             - oro_email.feature_enabled
-                                    smtp_settings:
-                                        children:
-                                            - oro_email.smtp_settings_host
-                                            - oro_email.smtp_settings_port
-                                            - oro_email.smtp_settings_encryption
-                                            - oro_email.smtp_settings_username
-                                            - oro_email.smtp_settings_password
                                     email_autocomplete_configuration:
                                         children:
                                             - oro_email.minimum_input_length
@@ -250,6 +243,13 @@ system_configuration:
                                             - oro_email.attachment_sync_enable
                                             - oro_email.attachment_sync_max_size
                                             - oro_email.attachment_preview_limit
+                                    smtp_settings:
+                                        children:
+                                            - oro_email.smtp_settings_host
+                                            - oro_email.smtp_settings_port
+                                            - oro_email.smtp_settings_encryption
+                                            - oro_email.smtp_settings_username
+                                            - oro_email.smtp_settings_password
                                     template_configuration:
                                         children:
                                             - oro_email.sanitize_html
