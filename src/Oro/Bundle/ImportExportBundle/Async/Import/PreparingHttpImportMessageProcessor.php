@@ -5,12 +5,13 @@ namespace Oro\Bundle\ImportExportBundle\Async\Import;
 use Psr\Log\LoggerInterface;
 use Symfony\Bridge\Doctrine\RegistryInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
+
 use Oro\Bundle\ImportExportBundle\Async\Topics;
 
 class PreparingHttpImportMessageProcessor extends AbstractPreparingHttpImportMessageProcessor
 {
     /**
-     * @return string
+     * {@inheritdoc}
      */
     public static function getMessageName()
     {
@@ -28,7 +29,7 @@ class PreparingHttpImportMessageProcessor extends AbstractPreparingHttpImportMes
     /**
      * {@inheritdoc}
      */
-    public static function getTopicsForChildJob()
+    public static function getTopicForChildJob()
     {
         return Topics::IMPORT_HTTP;
     }

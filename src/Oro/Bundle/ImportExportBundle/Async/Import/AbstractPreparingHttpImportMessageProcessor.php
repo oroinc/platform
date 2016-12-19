@@ -22,7 +22,8 @@ use Oro\Component\MessageQueue\Util\JSON;
 
 abstract class AbstractPreparingHttpImportMessageProcessor implements
     MessageProcessorInterface,
-    TopicSubscriberInterface
+    TopicSubscriberInterface,
+    PreparingHttpImportMessageProcessorInterface
 {
     /**
      * @var HttpImportHandler
@@ -128,7 +129,7 @@ abstract class AbstractPreparingHttpImportMessageProcessor implements
                         function (JobRunner $jobRunner, Job $child) use ($body, $file, $key) {
                             $body['filePath'] = $file;
                                 $this->producer->send(
-                                    static::getTopicsForChildJob(),
+                                    static::getTopicForChildJob(),
                                     array_merge($body, ['jobId' => $child->getId()])
                                 );
                         }
@@ -153,17 +154,4 @@ abstract class AbstractPreparingHttpImportMessageProcessor implements
 
         return $result ? self::ACK : self::REJECT;
     }
-
-    /**
-     * {@inheritdoc}
-     */
-    abstract public static function getSubscribedTopics();
-
-    abstract public static function getTopicsForChildJob();
-
-    /**
-     * return message name that will be show in Message
-     * @return string
-     */
-    abstract public static function getMessageName();
 }

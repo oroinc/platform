@@ -344,7 +344,7 @@ class PreparingHttpImportMessageProcessorTest extends \PHPUnit_Framework_TestCas
         $this->assertEquals(MessageProcessorInterface::ACK, $result);
     }
 
-    public function testIValidationImportProcessCanBeConstructedWithRequiredAttributes()
+    public function testValidationImportProcessCanBeConstructedWithRequiredAttributes()
     {
         $chunkHttpImportMessageProcessor = new PreparingHttpImportValidationMessageProcessor(
             $this->createHttpImportHandlerMock(),

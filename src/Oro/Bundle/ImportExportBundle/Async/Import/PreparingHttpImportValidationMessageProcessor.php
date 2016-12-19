@@ -26,7 +26,7 @@ class PreparingHttpImportValidationMessageProcessor extends AbstractPreparingHtt
     /**
      * {@inheritdoc}
      */
-    public static function getTopicsForChildJob()
+    public static function getTopicForChildJob()
     {
         return Topics::IMPORT_HTTP_VALIDATION;
     }

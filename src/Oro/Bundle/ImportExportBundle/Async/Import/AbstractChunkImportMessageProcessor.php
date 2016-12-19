@@ -151,9 +151,4 @@ abstract class AbstractChunkImportMessageProcessor implements MessageProcessorIn
             $job->setData($data);
         });
     }
-
-    /**
-     * {@inheritdoc}
-     */
-    abstract  public static function getSubscribedTopics();
 }
