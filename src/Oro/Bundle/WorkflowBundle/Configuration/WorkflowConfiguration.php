@@ -4,6 +4,7 @@ namespace Oro\Bundle\WorkflowBundle\Configuration;
 
 use Cron\CronExpression;
 
+use Oro\Bundle\ActionBundle\Provider\CurrentApplicationProviderInterface;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\Config\Definition\Builder\NodeBuilder;
 use Symfony\Component\Config\Definition\Builder\NodeDefinition;
@@ -31,6 +32,7 @@ class WorkflowConfiguration extends AbstractConfiguration implements Configurati
     const NODE_INIT_ROUTES = 'init_routes';
     const NODE_INIT_CONTEXT_ATTRIBUTE = 'init_context_attribute';
     const NODE_DISABLE_OPERATIONS = 'disable_operations';
+    const NODE_APPLICATIONS = 'applications';
 
     const DEFAULT_TRANSITION_DISPLAY_TYPE = 'dialog';
     const DEFAULT_ENTITY_ATTRIBUTE = 'entity';
@@ -102,6 +104,7 @@ class WorkflowConfiguration extends AbstractConfiguration implements Configurati
                 ->prototype('variable')->end()
             ->end()
             ->append($this->getDisableOperationsNode())
+            ->append($this->getApplicationsNode())
             ->append($this->getStepsNode())
             ->append($this->getAttributesNode())
             ->append($this->getTransitionsNode())
@@ -520,6 +523,27 @@ class WorkflowConfiguration extends AbstractConfiguration implements Configurati
             ->end()
             ->prototype('scalar')
             ->end();
+
+        return $rootNode;
+    }
+
+    /**
+     * @return NodeDefinition
+     */
+    protected function getApplicationsNode()
+    {
+        $treeBuilder = new TreeBuilder();
+        $rootNode = $treeBuilder->root(self::NODE_APPLICATIONS);
+        $rootNode
+            ->beforeNormalization()
+                ->always()
+                ->then(function ($v) {
+                    return array_map('strtolower', $v);
+                })
+            ->end()
+            ->prototype('scalar')->end()
+            ->defaultValue([CurrentApplicationProviderInterface::DEFAULT_APPLICATION])
+        ;
 
         return $rootNode;
     }

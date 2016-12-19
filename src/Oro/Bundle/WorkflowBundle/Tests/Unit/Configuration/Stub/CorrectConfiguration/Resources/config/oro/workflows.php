@@ -166,6 +166,7 @@ return [
         'entity_restrictions' => [],
         'exclusive_active_groups' => ['active_group1'],
         'exclusive_record_groups' => ['record_group1'],
+        'applications' => ['default'],
     ],
     'second_workflow' => [
         'entity' => 'Second\Entity',
@@ -224,5 +225,6 @@ return [
         'entity_restrictions' => [],
         'exclusive_active_groups' => [],
         'exclusive_record_groups' => [],
+        'applications' => ['other_application'],
     ]
 ];

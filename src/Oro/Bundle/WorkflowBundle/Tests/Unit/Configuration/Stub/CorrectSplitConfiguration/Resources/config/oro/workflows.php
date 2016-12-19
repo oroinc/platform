@@ -143,5 +143,6 @@ return array(
                 'actions' => array()
             )
         ),
+        //'applications' => ['other_application'],
     )
 );

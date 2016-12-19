@@ -18,6 +18,7 @@ workflows:
             - 'active_group1'
         exclusive_record_groups:
             - 'record_group1'
+        applications: ['default']
         steps:
             first_step:
                 order: 1
@@ -130,3 +131,4 @@ workflows:
         transition_definitions:
             -
                 name: second_transition_definition
+        applications: ['other_application']
