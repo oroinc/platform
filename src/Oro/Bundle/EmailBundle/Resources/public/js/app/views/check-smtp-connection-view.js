@@ -7,7 +7,6 @@ define(function(require) {
     var __ = require('orotranslation/js/translator');
     var routing = require('routing');
     var mediator = require('oroui/js/mediator');
-    var layout = require('oroui/js/layout');
     var messenger = require('oroui/js/messenger');
     var BaseView = require('oroui/js/app/views/base/view');
 
