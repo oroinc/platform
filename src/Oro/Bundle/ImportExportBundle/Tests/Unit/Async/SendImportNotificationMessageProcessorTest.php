@@ -2,11 +2,16 @@
 
 namespace Oro\Bundle\ImportExportBundle\Tests\Unit\Async;
 
+use Psr\Log\LoggerInterface;
+use Symfony\Bridge\Doctrine\RegistryInterface;
+use Symfony\Component\Translation\TranslatorInterface;
 
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\ImportExportBundle\Async\ConsolidateImportJobResultNotificationService;
 use Oro\Bundle\ImportExportBundle\Async\SendImportNotificationMessageProcessor;
+use Oro\Bundle\ImportExportBundle\Async\Topics;
 use Oro\Bundle\MessageQueueBundle\Entity\Job;
+use Oro\Bundle\NotificationBundle\Async\Topics as NotificationTopics;
 use Oro\Bundle\UserBundle\Entity\Repository\UserRepository;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Component\MessageQueue\Client\MessageProducerInterface;
@@ -15,11 +20,6 @@ use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
 use Oro\Component\MessageQueue\Job\JobStorage;
 use Oro\Component\MessageQueue\Transport\MessageInterface;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
-use Psr\Log\LoggerInterface;
-use Symfony\Bridge\Doctrine\RegistryInterface;
-use Symfony\Component\Translation\TranslatorInterface;
-use Oro\Bundle\ImportExportBundle\Async\Topics;
-use Oro\Bundle\NotificationBundle\Async\Topics as NotificationTopics;
 
 class SendImportNotificationMessageProcessorTest extends \PHPUnit_Framework_TestCase
 {

@@ -55,9 +55,11 @@ class PreparingHttpImportMessageProcessorTest extends WebTestCase
             'oro:import:http:oro_test.add_or_replace:test_import_message'
         );
         $childJob = $this->getJobProcessor()->findOrCreateChildJob(
-            'oro:import:http:oro_test.add_or_replace:test_import_message:chunk.1', $rootJob
+            'oro:import:http:oro_test.add_or_replace:test_import_message:chunk.1',
+            $rootJob
         );
-        $this->assertMessageSent(Topics::IMPORT_HTTP,
+        $this->assertMessageSent(
+            Topics::IMPORT_HTTP,
             array_merge($messageData, ['jobId' => $childJob->getId()])
         );
 
@@ -98,5 +100,4 @@ class PreparingHttpImportMessageProcessorTest extends WebTestCase
     {
         return $this->getMock(SessionInterface::class);
     }
-
 }

@@ -90,36 +90,38 @@ abstract class AbstractChunkImportMessageProcessor implements MessageProcessorIn
             return self::REJECT;
         }
 
-        $body = array_replace_recursive(
-            [
-                'filePath' => null,
-                'userId' => null,
-                'jobId' => null,
-                'jobName' => JobExecutor::JOB_IMPORT_FROM_CSV,
-                'processorAlias' => null,
-                'options' => [],
+        $body = array_replace_recursive([
+            'filePath' => null,
+            'userId' => null,
+            'jobId' => null,
+            'jobName' => JobExecutor::JOB_IMPORT_FROM_CSV,
+            'processorAlias' => null,
+            'options' => [],
             ], $body);
 
-            if (! ($user = $this->doctrine->getRepository(User::class)->find($body['userId'])) instanceof User) {
-                $this->logger->error(
-                    sprintf('User not found. id: %s', $body['userId']),
-                    ['message' => $body]
-                );
+        if (! ($user = $this->doctrine->getRepository(User::class)->find($body['userId'])) instanceof User) {
+            $this->logger->error(
+                sprintf('User not found. id: %s', $body['userId']),
+                ['message' => $body]
+            );
 
             return self::REJECT;
         }
 
         $result = $this
             ->jobRunner
-            ->runDelayed($body['jobId'], function (JobRunner $jobRunner, Job $job) use ($body, $user) {
-                $this->getCreateToken($user);
-                $result = $this->processData($body);
-                $this->saveJobResult($job, $result);
-                $summary = $this->getSummaryMessage(array_merge(['filePath' => $body['filePath']], $result));
-                $this->logger->info($summary);
+            ->runDelayed(
+                $body['jobId'],
+                function (JobRunner $jobRunner, Job $job) use ($body, $user) {
+                    $this->getCreateToken($user);
+                    $result = $this->processData($body);
+                    $this->saveJobResult($job, $result);
+                    $summary = $this->getSummaryMessage(array_merge(['filePath' => $body['filePath']], $result));
+                    $this->logger->info($summary);
 
-                return $result['success'];
-        });
+                    return $result['success'];
+                }
+            );
 
         return $result ? self::ACK : self::REJECT;
     }

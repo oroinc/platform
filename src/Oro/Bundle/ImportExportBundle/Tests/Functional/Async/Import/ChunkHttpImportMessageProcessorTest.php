@@ -30,14 +30,15 @@ class ChunkHttpImportMessageProcessorTest extends WebTestCase
         $this->assertInstanceOf(AbstractChunkImportMessageProcessor::class, $instance);
     }
 
-    public function testShouldProcessChunckImport()
+    public function testShouldProcessChunkImport()
     {
         $rootJob = $this->getJobProcessor()->findOrCreateRootJob(
             'test_import_message',
             'oro:import:http:oro_test.add_or_replace:test_import_message'
         );
         $childJob = $this->getJobProcessor()->findOrCreateChildJob(
-            'oro:import:http:oro_test.add_or_replace:test_import_message:chunk.1', $rootJob
+            'oro:import:http:oro_test.add_or_replace:test_import_message:chunk.1',
+            $rootJob
         );
         $messageData = [
             'filePath' => $this->fixturePath . 'import.csv',

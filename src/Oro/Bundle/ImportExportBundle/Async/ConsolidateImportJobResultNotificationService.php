@@ -156,7 +156,7 @@ class ConsolidateImportJobResultNotificationService
             $data['successParts'] += (int)$childrenJobData['success'];
             $data['totalParts'] += 1;
             $totalDataImportJob = $childrenJobData['counts'];
-            if  (count($childrenJobData['errors'])) {
+            if (count($childrenJobData['errors'])) {
                 $data['hasError'] = true;
             }
             $data['errors'] += isset($totalDataImportJob['errors']) ? $totalDataImportJob['errors'] : 0;

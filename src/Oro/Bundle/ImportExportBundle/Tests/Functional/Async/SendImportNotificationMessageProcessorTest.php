@@ -156,18 +156,19 @@ Errors: 5, processed: 12, read: 12, added: 2, updated: 0, replaced: 5<br/><a hre
         array $resultOfImportJob1,
         array $resultOfImportJob2,
         array $notificationExpectedMessage
-    )
-    {
+    ) {
         $rootJob = $this->getJobProcessor()->findOrCreateRootJob(
             'test_import_message',
             'oro:import:http:oro_test.add_or_replace:test_import_message'
         );
         $childJob1 = $this->getJobProcessor()->findOrCreateChildJob(
-            'oro:import:http:oro_test.add_or_replace:test_import_message:chunk.1', $rootJob
+            'oro:import:http:oro_test.add_or_replace:test_import_message:chunk.1',
+            $rootJob
         );
 
         $childJob2 = $this->getJobProcessor()->findOrCreateChildJob(
-            'oro:import:http:oro_test.add_or_replace:test_import_message:chunk.2', $rootJob
+            'oro:import:http:oro_test.add_or_replace:test_import_message:chunk.2',
+            $rootJob
         );
 
         $childJob1->setData($resultOfImportJob1);

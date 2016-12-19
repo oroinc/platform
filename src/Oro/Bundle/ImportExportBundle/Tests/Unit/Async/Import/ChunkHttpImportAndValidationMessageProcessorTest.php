@@ -174,16 +174,15 @@ class ChunkHttpImportAndValidationMessageProcessorTest extends \PHPUnit_Framewor
         $message
             ->expects($this->once())
             ->method('getBody')
-            ->willReturn(json_encode(
-                    [
-                        'filePath' => 'test.csv',
-                        'userId' => '1',
-                        'jobId' => '1',
-                        'jobName' => 'test',
-                        'processorAlias' => 'test',
-                        'options' => [],
-                    ]
-                )
+            ->willReturn(
+                json_encode([
+                    'filePath' => 'test.csv',
+                    'userId' => '1',
+                    'jobId' => '1',
+                    'jobName' => 'test',
+                    'processorAlias' => 'test',
+                    'options' => [],
+                ])
             )
         ;
         $result = $processor->process($message, $this->createSessionMock());
@@ -222,7 +221,9 @@ class ChunkHttpImportAndValidationMessageProcessorTest extends \PHPUnit_Framewor
             ->expects($this->once())
             ->method('runDelayed')
             ->with(1)
-            ->will($this->returnCallback(function ($jobId, $callback) use ($jobRunner, $job) {
+            ->will(
+                $this->returnCallback(
+                    function ($jobId, $callback) use ($jobRunner, $job) {
                         return $callback($jobRunner, $job);
                     }
                 )
@@ -276,7 +277,8 @@ class ChunkHttpImportAndValidationMessageProcessorTest extends \PHPUnit_Framewor
         $message
             ->expects($this->once())
             ->method('getBody')
-            ->willReturn(json_encode(
+            ->willReturn(
+                json_encode(
                     [
                         'filePath' => 'test.csv',
                         'userId' => '1',
@@ -295,7 +297,7 @@ class ChunkHttpImportAndValidationMessageProcessorTest extends \PHPUnit_Framewor
 
     public function testValidationProcessCanBeConstructedWithRequiredAttributes()
     {
-        $chunkHttpImportValidationMessageProcessor = new ChunkHttpImportValidationMessageProcessor (
+        $chunkHttpImportValidationMessageProcessor = new ChunkHttpImportValidationMessageProcessor(
             $this->createHttpImportHandlerMock(),
             $this->createJobRunnerMock(),
             $this->createMessageProducerInterfaceMock(),
@@ -313,7 +315,10 @@ class ChunkHttpImportAndValidationMessageProcessorTest extends \PHPUnit_Framewor
     public function testValidationProcessShouldReturnSubscribedTopics()
     {
         $expectedSubscribedTopics = [Topics::IMPORT_HTTP_VALIDATION,];
-        $this->assertEquals($expectedSubscribedTopics, ChunkHttpImportValidationMessageProcessor::getSubscribedTopics());
+        $this->assertEquals(
+            $expectedSubscribedTopics,
+            ChunkHttpImportValidationMessageProcessor::getSubscribedTopics()
+        );
     }
 
 
@@ -349,10 +354,10 @@ class ChunkHttpImportAndValidationMessageProcessorTest extends \PHPUnit_Framewor
             ->expects($this->once())
             ->method('runDelayed')
             ->with(1)
-            ->will($this->returnCallback(function ($jobId, $callback) use ($jobRunner, $job) {
+            ->will(
+                $this->returnCallback(function ($jobId, $callback) use ($jobRunner, $job) {
                         return $callback($jobRunner, $job);
-                    }
-                )
+                })
             )
         ;
 
@@ -410,7 +415,8 @@ class ChunkHttpImportAndValidationMessageProcessorTest extends \PHPUnit_Framewor
         $message
             ->expects($this->once())
             ->method('getBody')
-            ->willReturn(json_encode(
+            ->willReturn(
+                json_encode(
                     [
                         'filePath' => 'test.csv',
                         'userId' => '1',

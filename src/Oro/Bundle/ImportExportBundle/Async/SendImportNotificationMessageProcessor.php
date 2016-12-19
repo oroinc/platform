@@ -109,7 +109,10 @@ class SendImportNotificationMessageProcessor implements MessageProcessorInterfac
                 ['%origin_file_name%' => $body['originFileName']]
             );
         } else {
-            $summary = $this->consolidateJobNotificationService->getValidationImportSummary($job, $body['originFileName']);
+            $summary = $this->consolidateJobNotificationService->getValidationImportSummary(
+                $job,
+                $body['originFileName']
+            );
             $subject = $this->translator->trans(
                 'oro.importexport.import.async_validation_import',
                 ['%origin_file_name%' => $body['originFileName']]

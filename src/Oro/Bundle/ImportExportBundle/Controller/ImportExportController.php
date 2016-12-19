@@ -391,7 +391,7 @@ class ImportExportController extends Controller
         $job = $this->getDoctrine()->getManager()->getRepository(Job::class)->find($jobId);
 
         if (!$job) {
-            throw new NotFoundHttpException(sprintf('Job %s not found', $jobId ));
+            throw new NotFoundHttpException(sprintf('Job %s not found', $jobId));
         }
 
         $content = $this->getConsolidateImportJobResultService()->getErrorLog($job);

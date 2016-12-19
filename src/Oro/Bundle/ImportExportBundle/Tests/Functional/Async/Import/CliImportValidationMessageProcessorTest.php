@@ -18,6 +18,6 @@ class CliImportValidationMessageProcessorTest extends WebTestCase
     {
         $instance = $this->getContainer()->get('oro_importexport.async.cli_import_validation');
 
-        $this->assertInstanceOf( CliImportValidationMessageProcessor::class, $instance);
+        $this->assertInstanceOf(CliImportValidationMessageProcessor::class, $instance);
     }
 }

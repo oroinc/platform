@@ -2,29 +2,27 @@
 
 namespace Oro\Bundle\ImportExportBundle\Tests\Unit\Async\Import;
 
+use Psr\Log\LoggerInterface;
+use Symfony\Bridge\Doctrine\RegistryInterface;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
 use Oro\Bundle\ImportExportBundle\Async\Import\AbstractPreparingHttpImportMessageProcessor;
 use Oro\Bundle\ImportExportBundle\Async\Import\PreparingHttpImportMessageProcessor;
+use Oro\Bundle\ImportExportBundle\Async\Topics;
 use Oro\Bundle\ImportExportBundle\Async\Import\PreparingHttpImportValidationMessageProcessor;
 use Oro\Bundle\ImportExportBundle\File\SplitterCsvFile;
-use Oro\Bundle\OrganizationBundle\Entity\Organization;
-use Oro\Component\MessageQueue\Client\TopicSubscriberInterface;
-use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
-use Oro\Component\MessageQueue\Job\DependentJobContext;
-use Oro\Component\MessageQueue\Job\DependentJobService;
-use Oro\Bundle\ImportExportBundle\Async\Topics;
-
-use Oro\Component\MessageQueue\Job\Job;
-use Symfony\Bridge\Doctrine\RegistryInterface;
-use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
-use Psr\Log\LoggerInterface;
-
 use Oro\Bundle\ImportExportBundle\Handler\HttpImportHandler;
+use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\UserBundle\Entity\Repository\UserRepository;
 use Oro\Bundle\UserBundle\Entity\User;
+use Oro\Component\MessageQueue\Client\TopicSubscriberInterface;
 use Oro\Component\MessageQueue\Client\MessageProducerInterface;
+use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
 use Oro\Component\MessageQueue\Transport\MessageInterface;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
+use Oro\Component\MessageQueue\Job\DependentJobContext;
+use Oro\Component\MessageQueue\Job\DependentJobService;
+use Oro\Component\MessageQueue\Job\Job;
 use Oro\Component\MessageQueue\Job\JobRunner;
 
 class PreparingHttpImportMessageProcessorTest extends \PHPUnit_Framework_TestCase
@@ -250,29 +248,29 @@ class PreparingHttpImportMessageProcessorTest extends \PHPUnit_Framework_TestCas
             ->expects($this->once())
             ->method('runUnique')
             ->with(1, 'oro:import:http:processor_test:1')
-            ->will($this->returnCallback(function ($jobId, $name, $callback) use ($jobRunner, $childJob) {
-                        return $callback($jobRunner, $childJob);
-                    }
-                )
+            ->will(
+                $this->returnCallback(function ($jobId, $name, $callback) use ($jobRunner, $childJob) {
+                    return $callback($jobRunner, $childJob);
+                })
             )
         ;
         $jobRunner
             ->expects($this->at(0))
             ->method('createDelayed')
             ->with('oro:import:http:processor_test1:chunk.1')
-            ->will($this->returnCallback(function ($jobId,  $callback) use ($jobRunner, $childJob1) {
-                        return $callback($jobRunner, $childJob1);
-                    }
-                )
+            ->will(
+                $this->returnCallback(function ($jobId, $callback) use ($jobRunner, $childJob1) {
+                    return $callback($jobRunner, $childJob1);
+                })
             );
         $jobRunner
             ->expects($this->at(1))
             ->method('createDelayed')
             ->with('oro:import:http:processor_test1:chunk.2')
-            ->will($this->returnCallback(function ($jobId,  $callback) use ($jobRunner, $childJob2) {
-                        return $callback($jobRunner, $childJob2);
-                    }
-                )
+            ->will(
+                $this->returnCallback(function ($jobId, $callback) use ($jobRunner, $childJob2) {
+                    return $callback($jobRunner, $childJob2);
+                })
             )
         ;
 
@@ -344,7 +342,6 @@ class PreparingHttpImportMessageProcessorTest extends \PHPUnit_Framework_TestCas
 
         $result = $processor->process($message, $this->createSessionMock());
         $this->assertEquals(MessageProcessorInterface::ACK, $result);
-
     }
 
     public function testIValidationImportProcessCanBeConstructedWithRequiredAttributes()
@@ -367,7 +364,10 @@ class PreparingHttpImportMessageProcessorTest extends \PHPUnit_Framework_TestCas
     public function testValidationImportProcessShouldReturnSubscribedTopics()
     {
         $expectedSubscribedTopics = [Topics::IMPORT_HTTP_VALIDATION_PREPARING,];
-        $this->assertEquals($expectedSubscribedTopics, PreparingHttpImportValidationMessageProcessor::getSubscribedTopics());
+        $this->assertEquals(
+            $expectedSubscribedTopics,
+            PreparingHttpImportValidationMessageProcessor::getSubscribedTopics()
+        );
     }
 
     /**
