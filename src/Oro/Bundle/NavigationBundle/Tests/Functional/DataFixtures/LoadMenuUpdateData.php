@@ -6,12 +6,14 @@ use Doctrine\Common\DataFixtures\AbstractFixture;
 use Doctrine\Common\DataFixtures\DependentFixtureInterface;
 use Doctrine\Common\Persistence\ObjectManager;
 
-use Oro\Component\Testing\Unit\EntityTrait;
 use Oro\Bundle\LocaleBundle\Entity\LocalizedFallbackValue;
+use Oro\Bundle\LocaleBundle\Tests\Functional\DataFixtures\LoadLocalizationData;
 use Oro\Bundle\NavigationBundle\Entity\MenuUpdate;
-use Oro\Bundle\NavigationBundle\Menu\Provider\GlobalOwnershipProvider;
-use Oro\Bundle\NavigationBundle\Menu\Provider\UserOwnershipProvider;
+use Oro\Bundle\ScopeBundle\Tests\DataFixtures\LoadScopeData;
 use Oro\Bundle\UserBundle\DataFixtures\UserUtilityTrait;
+use Oro\Bundle\UserBundle\Tests\Functional\DataFixtures\LoadScopeUserData;
+use Oro\Bundle\UserBundle\Tests\Functional\DataFixtures\LoadUserData;
+use Oro\Component\Testing\Unit\EntityTrait;
 
 class LoadMenuUpdateData extends AbstractFixture implements DependentFixtureInterface
 {
@@ -43,8 +45,7 @@ class LoadMenuUpdateData extends AbstractFixture implements DependentFixtureInte
             ],
             'uri' => '#menu_update.1',
             'menu' => 'application_menu',
-            'ownership_type' => GlobalOwnershipProvider::TYPE,
-            'owner_id' => 0,
+            'scope' => LoadScopeData::DEFAULT_SCOPE,
             'active' => true,
             'priority' => 10,
             'divider' => false,
@@ -59,8 +60,7 @@ class LoadMenuUpdateData extends AbstractFixture implements DependentFixtureInte
             'descriptions' => [],
             'uri' => '#menu_update.1_1',
             'menu' => 'application_menu',
-            'ownership_type' => GlobalOwnershipProvider::TYPE,
-            'owner_id' => 0,
+            'scope' => LoadScopeData::DEFAULT_SCOPE,
             'active' => true,
             'priority' => 10,
             'divider' => false,
@@ -75,8 +75,7 @@ class LoadMenuUpdateData extends AbstractFixture implements DependentFixtureInte
             'descriptions' => [],
             'uri' => '#menu_update.2',
             'menu' => 'application_menu',
-            'ownership_type' => GlobalOwnershipProvider::TYPE,
-            'owner_id' => 0,
+            'scope' => LoadScopeData::DEFAULT_SCOPE,
             'active' => false,
             'priority' => 10,
             'divider' => false,
@@ -91,8 +90,7 @@ class LoadMenuUpdateData extends AbstractFixture implements DependentFixtureInte
             'descriptions' => [],
             'uri' => '#menu_update.2_1',
             'menu' => 'application_menu',
-            'ownership_type' => GlobalOwnershipProvider::TYPE,
-            'owner_id' => 0,
+            'scope' => LoadScopeData::DEFAULT_SCOPE,
             'active' => false,
             'priority' => 10,
             'divider' => false,
@@ -105,8 +103,7 @@ class LoadMenuUpdateData extends AbstractFixture implements DependentFixtureInte
             'descriptions' => [],
             'uri' => '#',
             'menu' => 'application_menu',
-            'ownership_type' => GlobalOwnershipProvider::TYPE,
-            'owner_id' => 0,
+            'scope' => LoadScopeData::DEFAULT_SCOPE,
             'active' => false,
             'priority' => 10,
             'divider' => true,
@@ -121,8 +118,7 @@ class LoadMenuUpdateData extends AbstractFixture implements DependentFixtureInte
             'descriptions' => [],
             'uri' => '#menu_update.3',
             'menu' => 'application_menu',
-            'ownership_type' => UserOwnershipProvider::TYPE,
-            'owner_id' => 'simple_user',
+            'scope' => LoadScopeUserData::SIMPLE_USER_SCOPE,
             'active' => true,
             'priority' => 20,
             'divider' => false,
@@ -137,8 +133,7 @@ class LoadMenuUpdateData extends AbstractFixture implements DependentFixtureInte
             'descriptions' => [],
             'uri' => '#menu_update.3_1',
             'menu' => 'application_menu',
-            'ownership_type' => UserOwnershipProvider::TYPE,
-            'owner_id' => 'simple_user',
+            'scope' => LoadScopeUserData::SIMPLE_USER_SCOPE,
             'active' => true,
             'priority' => 10,
             'divider' => false,
@@ -152,8 +147,10 @@ class LoadMenuUpdateData extends AbstractFixture implements DependentFixtureInte
     public function getDependencies()
     {
         return [
-            'Oro\Bundle\LocaleBundle\Tests\Functional\DataFixtures\LoadLocalizationData',
-            'Oro\Bundle\UserBundle\Tests\Functional\DataFixtures\LoadUserData'
+            LoadLocalizationData::class,
+            LoadUserData::class,
+            LoadScopeData::class,
+            LoadScopeUserData::class
         ];
     }
 
@@ -169,16 +166,11 @@ class LoadMenuUpdateData extends AbstractFixture implements DependentFixtureInte
             $descriptions = $data['descriptions'];
             unset($data['descriptions']);
 
-            if ($data['owner_id']) {
-                $owner = $this->getReference($data['owner_id']);
-                unset($data['owner_id']);
-                $ownerId = $owner->getId();
-            } else {
-                $ownerId = 0;
-            }
-            $entity = $this->getEntity(MenuUpdate::class, $data);
+            $scope = $this->getReference($data['scope']);
+            unset($data['scope']);
 
-            $entity->setOwnerId($ownerId);
+            $entity = $this->getEntity(MenuUpdate::class, $data);
+            $entity->setScope($scope);
 
             foreach ($titles as $localization => $title) {
                 $fallbackValue = new LocalizedFallbackValue();

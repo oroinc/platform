@@ -1057,6 +1057,20 @@ class ContextTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse($this->context->has(Context::SOFT_ERRORS_HANDLING));
     }
 
+    public function testProcessed()
+    {
+        $this->assertFalse($this->context->isProcessed('test'));
+
+        $this->context->setProcessed('test');
+        $this->context->setProcessed('another');
+        $this->assertTrue($this->context->isProcessed('test'));
+        $this->assertTrue($this->context->isProcessed('another'));
+
+        $this->context->clearProcessed('test');
+        $this->assertFalse($this->context->isProcessed('test'));
+        $this->assertTrue($this->context->isProcessed('another'));
+    }
+
     /**
      * @param array $data
      *

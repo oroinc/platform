@@ -35,7 +35,12 @@ define(function(require) {
          * @inheritDoc
          */
         dispose: function() {
-            this.$el[this.widgetName]('destroy');
+            if (this.disposed) {
+                return;
+            }
+            if (this.$el[this.widgetName]('instance')) {
+                this.$el[this.widgetName]('destroy');
+            }
             return JqueryWidgetComponent.__super__.dispose.apply(this, arguments);
         }
     });

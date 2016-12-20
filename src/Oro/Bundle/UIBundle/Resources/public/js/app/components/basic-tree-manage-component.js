@@ -64,6 +64,7 @@ define(function(require) {
 
             this.$tree.on('select_node.jstree', _.bind(this.onSelect, this));
             this.$tree.on('move_node.jstree', _.bind(this.onMove, this));
+            this.$tree.on('select-subcategories:change', _.bind(this.onSelectSubcategoriesChange, this));
         },
 
         /**
@@ -72,14 +73,25 @@ define(function(require) {
          * @returns {Object}
          */
         customizeTreeConfig: function(options, config) {
+            BasicTreeManageComponent.__super__.customizeTreeConfig.call(this, options, config);
             if (options.updateAllowed) {
                 config.plugins.push('dnd');
                 config.dnd = {
                     'copy': false
                 };
             }
-
             return config;
+        },
+
+        /**
+         * Triggers after switching selectSubCategories
+         *
+         * @param {Object} data
+         */
+        onSelectSubcategoriesChange: function(data) {
+            this.jsTreeInstance.settings.checkbox.cascade = data.selectSubcategories ?
+                'up+down+undetermined' :
+                'undetermined';
         },
 
         /**
@@ -158,7 +170,8 @@ define(function(require) {
             }
             this.$tree
                 .off('select_node.jstree')
-                .off('move_node.jstree');
+                .off('move_node.jstree')
+                .off('select-subcategories:change');
 
             BasicTreeManageComponent.__super__.dispose.call(this);
         }

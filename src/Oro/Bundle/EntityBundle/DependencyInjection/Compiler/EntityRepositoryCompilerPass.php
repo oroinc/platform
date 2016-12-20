@@ -30,20 +30,28 @@ class EntityRepositoryCompilerPass implements CompilerPassInterface
 
         // set correct repository service arguments for factory and merge repository definitions by class
         // there might be several repositories with the same class in case of service inheritance or service decoration
-        $definitionsByClass = [];
-        foreach ($repositoryDefinitions as $definitionId => $definition) {
-            $className = $this->getRepositoryEntityClass($container, $definition, $definitionId);
-
-            $repositoryClassName = $this->getRepositoryClass($container, $definition);
-            if ($repositoryClassName) {
-                $definition->setArguments([$className, $repositoryClassName]);
-            }
-
-            $definitionsByClass[$className] = ['id' => $definitionId, 'definition' => $definition];
-        }
+        $definitionsByClass = $this->getDefinitionsByClass($container, $repositoryDefinitions);
 
         // check for private services, validation should be applied after merge of definitions by class
         // because parent services already might become private
+        $definitionIdsByClass = $this->getDefinitionIdsByClass($definitionsByClass);
+
+        // set repository services array to repository factory
+        $repositoryFactory = $container->getDefinition(static::REPOSITORY_FACTORY);
+        $repositoryFactory->replaceArgument(1, $definitionIdsByClass);
+
+        // use entity repository factory instead of default one
+        $doctrineConfiguration = $container->getDefinition(static::ORM_CONFIGURATION);
+        $doctrineConfiguration->addMethodCall('setRepositoryFactory', [$repositoryFactory]);
+    }
+
+    /**
+     * @param array $definitionsByClass
+     * @return array ['<className>' => '<definitionId>'], ...]
+     * @throws LogicException
+     */
+    private function getDefinitionIdsByClass(array $definitionsByClass)
+    {
         $definitionIdsByClass = [];
         foreach ($definitionsByClass as $className => $definitionData) {
             /** @var Definition $definition */
@@ -59,13 +67,29 @@ class EntityRepositoryCompilerPass implements CompilerPassInterface
             $definitionIdsByClass[$className] = $definitionId;
         }
 
-        // set repository services array to repository factory
-        $repositoryFactory = $container->getDefinition(static::REPOSITORY_FACTORY);
-        $repositoryFactory->replaceArgument(1, $definitionIdsByClass);
+        return $definitionIdsByClass;
+    }
 
-        // use entity repository factory instead of default one
-        $doctrineConfiguration = $container->getDefinition(static::ORM_CONFIGURATION);
-        $doctrineConfiguration->addMethodCall('setRepositoryFactory', [$repositoryFactory]);
+    /**
+     * @param ContainerBuilder $container
+     * @param Definition[] $repositoryDefinitions
+     * @return array ['<className>' => ['id' => '<definitionId>', 'definition' => <Definition>], ...]
+     */
+    private function getDefinitionsByClass(ContainerBuilder $container, array $repositoryDefinitions)
+    {
+        $definitionsByClass = [];
+        foreach ($repositoryDefinitions as $definitionId => $definition) {
+            $className = $this->getRepositoryEntityClass($container, $definition, $definitionId);
+
+            $repositoryClassName = $this->getRepositoryClass($container, $definition);
+            if ($repositoryClassName) {
+                $definition->setArguments([$className, $repositoryClassName]);
+            }
+
+            $definitionsByClass[$className] = ['id' => $definitionId, 'definition' => $definition];
+        }
+
+        return $definitionsByClass;
     }
 
     /**
@@ -75,7 +99,7 @@ class EntityRepositoryCompilerPass implements CompilerPassInterface
      * @return string
      * @throws LogicException
      */
-    protected function getRepositoryEntityClass(ContainerBuilder $container, Definition $definition, $definitionId)
+    private function getRepositoryEntityClass(ContainerBuilder $container, Definition $definition, $definitionId)
     {
         $arguments = $this->getArguments($container, $definition);
 
@@ -107,7 +131,7 @@ class EntityRepositoryCompilerPass implements CompilerPassInterface
      * @param Definition $definition
      * @return null|string
      */
-    protected function getRepositoryClass(ContainerBuilder $container, Definition $definition)
+    private function getRepositoryClass(ContainerBuilder $container, Definition $definition)
     {
         $repositoryClass = $definition->getClass();
 
@@ -132,7 +156,7 @@ class EntityRepositoryCompilerPass implements CompilerPassInterface
      * @param Definition $definition
      * @return array
      */
-    protected function getArguments(ContainerBuilder $container, Definition $definition)
+    private function getArguments(ContainerBuilder $container, Definition $definition)
     {
         $arguments = $definition->getArguments();
         if (0 !== count($arguments)) {
@@ -150,7 +174,7 @@ class EntityRepositoryCompilerPass implements CompilerPassInterface
      * @param string $parentDefinitionId
      * @return DefinitionDecorator[]
      */
-    protected function getChildDefinitions(ContainerBuilder $container, $parentDefinitionId)
+    private function getChildDefinitions(ContainerBuilder $container, $parentDefinitionId)
     {
         $definitions = [];
 

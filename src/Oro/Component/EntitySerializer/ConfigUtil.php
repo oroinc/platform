@@ -130,7 +130,7 @@ class ConfigUtil
      * @param array  $config The config of an entity the specified field belongs
      * @param string $field  The name of the field
      *
-     * @return array
+     * @return bool
      */
     public static function hasFieldConfig($config, $field)
     {
@@ -160,6 +160,8 @@ class ConfigUtil
      * @param string $propertyPath
      *
      * @return bool
+     *
+     * @deprecated since 2.0. Use Oro\Component\EntitySerializer\FieldAccessor::isMetadataProperty instead
      */
     public static function isMetadataProperty($propertyPath)
     {

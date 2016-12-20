@@ -66,6 +66,27 @@ class ObjectMetadataFactoryTest extends LoaderTestCase
         self::assertEquals($expected, $result);
     }
 
+    public function testCreateAndAddMetaPropertyMetadataWhenResultNameExistsInConfig()
+    {
+        $entityMetadata = new EntityMetadata();
+        $field = new EntityDefinitionFieldConfig();
+        $field->setDataType('string');
+        $field->setMetaPropertyResultName('resultName');
+
+        $expected = $this->createMetaPropertyMetadata('testField', 'string');
+        $expected->setResultName('resultName');
+
+        $result = $this->objectMetadataFactory->createAndAddMetaPropertyMetadata(
+            $entityMetadata,
+            'Test\Class',
+            'testField',
+            $field,
+            'test'
+        );
+        self::assertSame($result, $entityMetadata->getMetaProperty('testField'));
+        self::assertEquals($expected, $result);
+    }
+
     public function testCreateAndAddFieldMetadata()
     {
         $entityMetadata = new EntityMetadata();

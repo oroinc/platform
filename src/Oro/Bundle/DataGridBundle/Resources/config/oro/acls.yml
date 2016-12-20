@@ -20,3 +20,11 @@ acls:
         group_name: ""
         bindings: ~
         category: "application"
+
+    oro_datagrid_gridview_export:
+        label: oro.grid.action.gridview_export.label
+        description: oro.grid.action.gridview_export.description
+        type: action
+        group_name: ""
+        bindings: ~
+        category: "application"

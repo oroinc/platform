@@ -98,6 +98,9 @@ UPGRADE FROM 1.10 to 2.0
 - Added interface `Oro\Component\ConfigExpression\FactoryWithTypesInterface` with method `FactoryWithTypesInterface::getTypes()`
 - Class `Oro\Component\ConfigExpression\ExpressionFactory` now implements interface `Oro\Component\ConfigExpression\FactoryWithTypesInterface`
 
+####EntitySerializer Component
+- Method `isMetadataProperty` of `Oro\Component\EntitySerializer\ConfigUtil` marked as deprecated. Use `isMetadataProperty` of `Oro\Component\EntitySerializer\FieldAccessor` instead
+
 ####ActionBundle
 - Class `Oro\Bundle\ActionBundle\Layout\Block\Type\ActionLineButtonsType` was removed -> block type `action_buttons` replaced with DI configuration.
 - Added class `Oro\Bundle\ActionBundle\Layout\DataProvider\ActionButtonsProvider` - layout data provider.
@@ -651,6 +654,8 @@ tag if it works with extend classes
 - Changed `Oro\Bundle\EntityExtendBundle\Tools\EnumSynchronizer`, now it use `Oro\Bundle\EntityConfigBundle\Translation\ConfigTranslationHelper` to save translations instead of `Doctrine\Common\Persistence\ManagerRegistry` and `Oro\Bundle\TranslationBundle\Translation\DynamicTranslationMetadataCache`.
 - `Oro\Bundle\EntityExtendBundle\EventListener\ExtendFieldValueRenderListener::getValueForCollection` always return array
 - `Oro\Bundle\EntityExtendBundle\Grid\AbstractFieldsExtension` added support of to-one relations
+- Method `get*TargetEntities` is generated as deprecated for both `many-to-many` and `many-to-one` associations.
+- Changed signature of auto-generated `get*Targets` method of `many-to-many` association. The parameter `$targetClass` is optional now. If this parameter is not specified this method returns all target entities without filtering them by type.
 
 ####ApiBundle:
 - API configuration file now loads from `Resources/config/oro/api.yml` instead of `Resources/config/api.yml`.
@@ -731,7 +736,10 @@ tag if it works with extend classes
 
 ####ActivityBundle:
 - Changed constructor of `Oro\Bundle\ActivityBundle\Autocomplete\ContextSearchHandler`. Replaced `ObjectMapper` with `EntityNameResolver`. Class now use EntityNameResolver instead of `title_fields`.
+- Removed method `getActivityTargetEntities` from `Oro\Bundle\ActivityBundle\Model\ActivityInterface` and `Oro\Bundle\ActivityBundle\Model\ExtendActivity`. To avoid BC break this method is still generated, but it is marked as deprecated.
 
+####ActivityListBundle:
+- Removed method `getActivityListTargetEntities` from `Oro\Bundle\ActivityListBundle\Entity\ActivityList`. To avoid BC break this method is still generated, but it is marked as deprecated.
 
 ####UIBundle:
 - Placeholders configuration now loads from `Resources/config/oro/placeholders.yml` file instead of `Resources/config/placeholders.yml`.
@@ -788,20 +796,15 @@ placeholders:
     * `oro_navigation_elements` to `navigation_elements`
 - All configuration nodes in `Resources/config/oro/navigation.yml` were renamed to snake case
 - Added class `Oro\Bundle\NavigationBundle\Builder\MenuUpdateBuilder` that implements `Oro\Bundle\NavigationBundle\Menu\BuilderInterface`.
-- Added class `Oro\Bundle\NavigationBundle\DependencyInjection\Compiler\MenuUpdateProviderPass`.
-- Added `tree.$.areas`, `tree.$.max_nesting_level`, `tree.$.read_only` and `items.$.read_only` nodes to `Oro\Bundle\NavigationBundle\DependencyInjection\Configuration`.
+- Added `tree.$.scope_type`, `tree.$.max_nesting_level`, `tree.$.read_only` and `items.$.read_only` nodes to `Oro\Bundle\NavigationBundle\DependencyInjection\Configuration`.
 - Added interface `Oro\Bundle\NavigationBundle\Entity\MenuUpdateInterface`.
 - Added trait `Oro\Bundle\NavigationBundle\Entity\MenuUpdateTrait`.
 - Added entity `Oro\Bundle\NavigationBundle\Entity\MenuUpdate` that extends `Oro\Bundle\NavigationBundle\Model\ExtendMenuUpdate` and implements `Oro\Bundle\NavigationBundle\Entity\MenuUpdateInterface`.
 - Added new exceptions:
     * `Oro\Bundle\NavigationBundle\Exception\MaxNestingLevelExceededException`
     * `Oro\Bundle\NavigationBundle\Exception\NotFoundParentException`
-- Added interface `Oro\Bundle\NavigationBundle\Menu\Provider\OwnershipProviderInterface`.
-- Added class `Oro\Bundle\NavigationBundle\Menu\Provider\AbstractOwnershipProvider` that implements `Oro\Bundle\NavigationBundle\Menu\Provider\OwnershipProviderInterface`.
-- Added class `Oro\Bundle\NavigationBundle\Menu\Provider\GlobalOwnershipProvider` with service `oro_commerce_menu.ownership_provider.global`.
-- Added class `Oro\Bundle\NavigationBundle\Menu\Provider\UserOwnershipProvider` with service `oro_navigation.ownership_provider.user`.
 - Added class `Oro\Bundle\NavigationBundle\JsTree\MenuUpdateTreeHandler` that provides menu tree data in format used by `jstree`.
-- Added class `Oro\Bundle\NavigationBundle\Manager\MenuUpdateManager` with service `oro_navigation.manager.menu_update_default`.
+- Added class `Oro\Bundle\NavigationBundle\Manager\MenuUpdateManager` with service `oro_navigation.manager.menu_update`.
 - Added class `Oro\Bundle\NavigationBundle\Utils\MenuUpdateUtils`.
 - Moved class `Oro\Bundle\NavigationBundle\Menu\FeatureAwareMenuFactoryExtension` to `Oro\Bundle\FeatureToggleBundle\Menu\FeatureAwareMenuFactoryExtension`.
 - Moved class `Oro\Bundle\NavigationBundle\Event\DoctrineTagEventListener` to `Oro\Bundle\SyncBundle\Event\DoctrineTagEventListener`.
@@ -825,7 +828,10 @@ placeholders:
         - `MenuManipulator` $manipulator
 - Added new command `oro:navigation:menu:reset` that removes changes in menus for different scopes.
 - Removed class `Oro\Bundle\NavigationBundle\Title\StoredTitle`.
-- Changed signature of constructor of `Oro\Bundle\NavigationBundle\Provider\TitleService`. Parameter `Serializer $serializer` was removed. 
+- Changed signature of constructor of `Oro\Bundle\NavigationBundle\Provider\TitleService`. Parameter `Serializer $serializer` was removed.
+- Added new datagrid data source `Oro\Bundle\NavigationBundle\Datagrid\MenuUpdateDatasource`.
+- Added new entity repository `Oro\Bundle\NavigationBundle\Entity\Repository\MenuUpdateRepository`.
+
 
 ####EmailBundle
 - Constructor of `Oro\Bundle\EmailBundle\Form\DataTransformer\EmailTemplateTransformer` was changed. Removed the arguments.
@@ -949,35 +955,7 @@ to the [Fallback documentation](./src/Oro/Bundle/EntityBundle/Resources/doc/enti
 - Constructor of `Oro\Bundle\NotificationBundle\Model\MassNotificationSender` was changed: the first argument type is `Oro\Bundle\NotificationBundle\Manager\EmailNotificationManager` instead of `Oro\Bundle\NotificationBundle\Processor\EmailNotificationProcessor`
 
 ####CalendarBundle
-- Constructor of `Oro\Bundle\CalendarBundle\Model\Email\EmailSendProcessor` was changed: the first argument type is `Oro\Bundle\NotificationBundle\Manager\EmailNotificationManager` instead of `Oro\Bundle\NotificationBundle\Processor\EmailNotificationProcessor`
 - CalendarBundle moved to a separate package
-- A new property `editableInvitationStatus` was added to the API of calendar events. This property is read-only and means that current API user is able to change invitation status of the event.
-- A new property `updateExceptions` was added to the API of calendar events. By default is FALSE. Passing TRUE value will trigger synchronization of exceptions of recurring calendar events. 
-- Deprecated property `invitedUsers` was removed from the API.
-- Renamed method `Oro\Bundle\CalendarBundle\Manager\CalendarEventManager::changeStatus` to `Oro\Bundle\CalendarBundle\Manager\CalendarEventManager::changeInvitationStatus`. Added a new argument to this method which represent a user instance.
-- Removed classes `Oro\Bundle\CalendarBundle\Exception\StatusNotFoundException` and `Oro\Bundle\CalendarBundle\Exception\CalendarEventRelatedAttendeeNotFoundException`. Added class `Oro\Bundle\CalendarBundle\Exception\ChangeInvitationStatusException` instead.
-- Removed constant `Oro\Bundle\CalendarBundle\Model\Recurrence::STRING_KEY`. New constant `Oro\Bundle\CalendarBundle\Entity\Repository\CalendarEventRepository::RECURRENCE_FIELD_PREFIX` is added instead.
-- Changed implementation of method `Oro\Bundle\CalendarBundle\Entity\Repository\CalendarEventRepository::getUserEventListQueryBuilder`. Item "relatedAttendeeUserId" added to SELECT, default value added for item "invitationStatus" in the SELECT.
-- Removed entity configuration with scope "security" from `Oro\Bundle\CalendarBundle\Entity\Attendee`.
-- Added support NULL value for entity field `Oro\Bundle\CalendarBundle\Entity\Attendee::$calendarEvent`.
-- Removed deprecated constants of `Oro\Bundle\CalendarBundle\Entity\CalendarEvent`: `NOT_RESPONDED`, `TENTATIVELY_ACCEPTED`, `ACCEPTED`, `DECLINED`.
-- Removed deprecation of method `Oro\Bundle\CalendarBundle\Entity\CalendarEvent::getInvitationStatus`.
-- Removed method `Oro\Bundle\CalendarBundle\Entity\CalendarEvent::getEventByAttendee`. Added method `Oro\Bundle\CalendarBundle\Entity\CalendarEvent::getChildEventByAttendee` instead.
-- Refactored form subscribers and event listeners in `Oro\Bundle\CalendarBundle\Form\EventListener`. Changed signature of constructors of these classes.
-- Removed class `Oro\Bundle\CalendarBundle\Form\\EventListener\ChildEventsSubscriber`. The logic was refactored moved to classes in `Oro\Bundle\CalendarBundle\Manager\CalendarEvent` namespace.
-- Refactored form handlers in `Oro\Bundle\CalendarBundle\Form\Handler` namespace. Changed signature of constructors of these classes.
-- Refactored form types in `Oro\Bundle\CalendarBundle\Form\Type`. Changed signature of constructors of these classes. 
-- Removed method `Oro\Bundle\CalendarBundle\Model\Recurrence\StrategyInterface::getValidationErrorMessage`. Added methods to the interface: `getMaxInterval`, `getIntervalMultipleOf`, `getRequiredProperties`. Removed method `Oro\Bundle\CalendarBundle\Model\Recurrence::getValidationErrorMessage`. 
-- Validation logic is moved from strategies to `Oro\Bundle\CalendarBundle\Validator\RecurrenceValidator`. Changed validation rules of entity `Oro\Bundle\CalendarBundle\Entity\Recurrence`.
-- Refactored normalizers in `Oro\Bundle\CalendarBundle\Provider`. Changed signature of the constructors. Protected methods were removedL `applyAdditionalData`, `applyPermissions`, `addAttendeesToCalendarEvents`.
-- Changed configuration of the grids `calendar-event-grid`. `base-system-calendar-event-grid`, `calendar-event-for-context-grid`.
-- Removed class `Oro\Bundle\CalendarBundle\Form\Type\ExceptionFormType`.
-- Updated view templates `OroCalendarBundle:CalendarEvent:view.html.twig` and `OroCalendarBundle:CalendarEvent:widget\info.html.twig`. Added property `canChangeInvitationStatus` into the templates which is passed from the respective controller action. 
-- Updated view template `OroCalendarBundle:CalendarEvent:update.html.twig`.
-- Updated view template `OroCalendarBundle:SystemCalendarEvent:update.html.twig`.
-- Updated view template My Calendar widget `OroCalendarBundle:::templates.html.twig`.
-- Updated macroses in `OroCalendarBundle::invitations.html.twig`: `calendar_event_invitation_status`, `calendar_event_invitation_action` (removed), `calendar_event_invitation_going_status` (added).
-- Removed template `OroCalendarBundle:CalendarEvent:widget\invitationButtons.html.twig`. A new widget to change invitation status added in `OroCalendarBundle:CalendarEvent:widget\invitationControl.html.twig` and JS module `orocalendar/js/app/views/change-status-view`.
 
 ####ReminderBundle
 - Constructor of `Oro\Bundle\ReminderBundle\Model\Email\EmailSendProcessor` was changed: the first argument type is `Oro\Bundle\NotificationBundle\Manager\EmailNotificationManager` instead of `Oro\Bundle\NotificationBundle\Processor\EmailNotificationProcessor`

@@ -51,23 +51,33 @@ class Entity
     }
 
     /**
-     * Gets entities of the given type associated with this entity
+     * Gets entities associated with this entity
      *
-     * @param string $targetClass The class name of the target entity
+     * @param string|null $targetClass The class name of the target entity
      * @return object[]
      */
-    public function getTestTargets($targetClass)
+    public function getTestTargets($targetClass = NULL)
     {
-        $className = \Doctrine\Common\Util\ClassUtils::getRealClass($targetClass);
-        if ($className === 'Test\TargetEntity1') { return $this->target_entity1_2ce134a6; }
-        if ($className === 'Test\TargetEntity2') { return $this->target_entity2_b5e8651c; }
-        throw new \RuntimeException(sprintf('The association with "%s" entity was not configured.', $className));
+        if (null === $targetClass) {
+            $targets = [];
+            $entities = $this->target_entity1_2ce134a6->toArray();
+            if (!empty($entities)) { $targets = array_merge($targets, $entities); }
+            $entities = $this->target_entity2_b5e8651c->toArray();
+            if (!empty($entities)) { $targets = array_merge($targets, $entities); }
+            return $targets;
+        } else {
+            $className = \Doctrine\Common\Util\ClassUtils::getRealClass($targetClass);
+            if ($className === 'Test\TargetEntity1') { return $this->target_entity1_2ce134a6; }
+            if ($className === 'Test\TargetEntity2') { return $this->target_entity2_b5e8651c; }
+            throw new \RuntimeException(sprintf('The association with "%s" entity was not configured.', $className));
+        }
     }
 
     /**
      * Returns array with all associated entities
      *
      * @return array
+     * @deprecated since 2.0. Method "getTestTargets" without parameters should be used instead of "getTestTargetEntities"
      */
     public function getTestTargetEntities()
     {

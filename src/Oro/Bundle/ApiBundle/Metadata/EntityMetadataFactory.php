@@ -46,7 +46,7 @@ class EntityMetadataFactory
      */
     public function createMetaPropertyMetadata(ClassMetadata $classMetadata, $fieldName, $fieldType = null)
     {
-        if (!$fieldType) {
+        if (!$fieldType && $classMetadata->hasField($fieldName)) {
             $fieldType = (string)$classMetadata->getTypeOfField($fieldName);
         }
         $fieldMetadata = new MetaPropertyMetadata();
