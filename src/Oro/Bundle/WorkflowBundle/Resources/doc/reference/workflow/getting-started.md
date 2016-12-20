@@ -6,10 +6,12 @@ Table of Contents
  - [What is Workflow?](#what-is-workflow)
  - [Main Entities](#main-entities)
  - [How it works?](#how-it-works)
+ - [Workflow Related Entity](#workflow-related-entity)
  - [Workflow Fields](#workflow-fields)
  - [Activation State](#activation-state)
  - [Mutually Exclusive Workflows](#mutually-exclusive-workflows)
  - [Filtering by Scopes](#filtering-by-scopes)
+ - [Initial Transitions](#initial-transitions)
  - [Disabling Operations](#disabling-operations)
  - [Configuration](#configuration)
  - [Console commands](#console-commands)
@@ -62,7 +64,7 @@ associated workflow.
 
 * **TransitionTriggerEvent** - allows to perform transition when needed entity trigger needed Doctrine Event. 
 
-* **TransitionTriggerCron** - allows to perform transition by cron definition. 
+* **TransitionTriggerCron** - allows to perform transition by cron definition.
 
 How it works?
 -------------
@@ -89,6 +91,13 @@ To be able to attach an entity to specific workflow (e.g. make entity workflow r
 - Entity can not have composite fields as its primary keys.
 - Entity primary key can be integer or string (for doctrine types it is: BIGINT, DECIMAL, INTEGER, SMALLINT, STRING). In other words - all types that can be casted by SQL CAST to text representation.
 - Entity should be configurable see [Annotation](./#annotation) section.
+
+Workflow Related Entity
+-----------------------
+
+The main entity for workflow that used as a central point of all business processes described in concrete workflow configuration.
+The entity class is declared through `entity` node as FQCN of workflow configuration.
+All **OTHER** entities in context of this documentation called *not related entities* or *not directly related*.
 
 Activation State
 ----------------
@@ -184,6 +193,13 @@ Example of scope configuration in :
 **Note**: The scopeField1, scopeField2, and scopeField3 are scope criteria that are delivered by scope providers. Scope provider should be registered in Oro application for the `workflow_definition` scope type.  
 
 For more information about scopes see [ScopeBundle documentation](../../../../../ScopeBundle/Resources/doc/scope.md).
+
+Initial Transitions
+-------------------
+
+To provide ability to start some workflow from *not related entity* we have special functionality that called initial transitions.
+TBD...
+
 
 Disabling Operations
 --------------------
