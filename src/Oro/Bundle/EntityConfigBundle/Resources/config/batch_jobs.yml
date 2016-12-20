@@ -13,3 +13,15 @@ connector:
                         processor: oro_importexport.processor.import_delegate
                         writer:    oro_entity_config.importexport.writer.entity_field
                     parameters: ~
+        attribute_import_from_csv:
+            title: "Attribute Import from CSV"
+            type: import
+            steps:
+                import:
+                    title:     import
+                    class:     Oro\Bundle\BatchBundle\Step\ItemStep
+                    services:
+                        reader:    oro_importexport.reader.csv
+                        processor: oro_importexport.processor.import_delegate
+                        writer:    oro_entity_config.importexport.writer.attribute
+                    parameters: ~

@@ -2,8 +2,6 @@
 
 namespace Oro\Bundle\SearchBundle\Query\Result;
 
-use BeSimple\SoapBundle\ServiceDefinition\Annotation as Soap;
-
 use Doctrine\Common\Persistence\ObjectManager;
 
 use JMS\Serializer\Annotation\Type;
@@ -16,25 +14,21 @@ class Item
     /**
      * @var string
      * @Type("string")
-     * @Soap\ComplexType("string")
      */
     protected $entityName;
 
     /**
      * @var int
      * @Type("integer")
-     * @Soap\ComplexType("int")
      */
     protected $recordId;
 
     /**
-     * @Soap\ComplexType("string")
      * @var string
      */
     protected $recordTitle;
 
     /**
-     * @Soap\ComplexType("string")
      * @var string
      */
     protected $recordUrl;
@@ -51,7 +45,6 @@ class Item
     protected $em;
 
     /**
-     * @Soap\ComplexType("Oro\Bundle\SearchBundle\Soap\Type\SelectedValue[]")
      * @var string[]
      */
     protected $selectedData = [];

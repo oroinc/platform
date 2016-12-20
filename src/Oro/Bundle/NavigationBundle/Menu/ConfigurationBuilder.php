@@ -12,7 +12,7 @@ use Oro\Component\Config\Resolver\ResolverInterface;
 
 class ConfigurationBuilder implements BuilderInterface
 {
-    const DEFAULT_AREA = 'default';
+    const DEFAULT_SCOPE_TYPE = 'menu_default_visibility';
 
     /** @var array */
     protected $configuration;
@@ -67,9 +67,9 @@ class ConfigurationBuilder implements BuilderInterface
                         $menu->setExtras($menuTreeElement['extras']);
                     }
 
-                    $defaultArea = ConfigurationBuilder::DEFAULT_AREA;
+                    $defaultArea = ConfigurationBuilder::DEFAULT_SCOPE_TYPE;
                     $this->setExtraFromConfig($menu, $menuTreeElement, 'type');
-                    $this->setExtraFromConfig($menu, $menuTreeElement, 'area', $defaultArea);
+                    $this->setExtraFromConfig($menu, $menuTreeElement, 'scope_type', $defaultArea);
                     $this->setExtraFromConfig($menu, $menuTreeElement, 'read_only', false);
                     $this->setExtraFromConfig($menu, $menuTreeElement, 'max_nesting_level', 0);
 
@@ -148,7 +148,10 @@ class ConfigurationBuilder implements BuilderInterface
                 $isAllowed = $isAllowed || $newMenuItem->getExtra('isAllowed');
             }
         }
-        $menu->setExtra('isAllowed', $isAllowed);
+
+        if ($menu->getExtra('isAllowed')) {
+            $menu->setExtra('isAllowed', $isAllowed);
+        }
     }
 
     /**

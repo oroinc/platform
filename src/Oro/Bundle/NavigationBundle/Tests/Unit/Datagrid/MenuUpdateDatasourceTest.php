@@ -21,7 +21,7 @@ class MenuUpdateDatasourceTest extends \PHPUnit_Framework_TestCase
     protected $menuManipulator;
 
     /** @var string */
-    protected $area = 'default';
+    protected $scopeType = 'default';
 
     /**
      * {@inheritdoc}
@@ -31,7 +31,7 @@ class MenuUpdateDatasourceTest extends \PHPUnit_Framework_TestCase
         $this->chainProvider = $this->getMock(BuilderChainProvider::class, [], [], '', false);
         $this->menuManipulator = $this->getMock(MenuManipulator::class);
 
-        $this->datasource = new MenuUpdateDatasource($this->chainProvider, $this->menuManipulator, $this->area);
+        $this->datasource = new MenuUpdateDatasource($this->chainProvider, $this->menuManipulator, $this->scopeType);
     }
 
     public function testProcess()
@@ -84,14 +84,14 @@ class MenuUpdateDatasourceTest extends \PHPUnit_Framework_TestCase
             [
                 [
                     'name' => 'default_menu',
-                    'extras' => ['area' => 'default']
+                    'extras' => ['scope_type' => 'default']
                 ],
                 'result_count' => 1
             ],
             [
                 [
                     'name' => 'default_menu',
-                    'extras' => ['area' => 'custom']
+                    'extras' => ['scope_type' => 'custom']
                 ],
                 'result_count' => 0
             ],
