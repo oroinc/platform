@@ -174,7 +174,7 @@ class EntityTitleProvider
     protected function getEntityManager(array $targets)
     {
         $em = null;
-        foreach ($targets as $entityClass) {
+        foreach ($targets as $entityClass => $ids) {
             $em = $this->doctrineHelper->getEntityManagerForClass($entityClass, false);
             if (null !== $em) {
                 break;
