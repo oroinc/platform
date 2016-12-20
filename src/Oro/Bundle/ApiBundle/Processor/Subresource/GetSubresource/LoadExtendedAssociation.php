@@ -7,6 +7,7 @@ use Doctrine\DBAL\Types\Type;
 use Oro\Component\DoctrineUtils\ORM\UnionQueryBuilder;
 use Oro\Component\EntitySerializer\EntitySerializer;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionFieldConfig;
+use Oro\Bundle\ApiBundle\Processor\Shared\LoadTitleMetaProperty;
 use Oro\Bundle\ApiBundle\Processor\Subresource\Shared\LoadExtendedAssociation as BaseLoadExtendedAssociation;
 use Oro\Bundle\ApiBundle\Processor\Subresource\SubresourceContext;
 use Oro\Bundle\ApiBundle\Request\DataType;
@@ -16,7 +17,7 @@ use Oro\Bundle\EntityExtendBundle\Entity\Manager\AssociationManager;
 
 /**
  * Loads extended association data using the EntitySerializer component
- * and adds "title" value for each result item.
+ * and, if it was requested, adds "title" meta property value to each result item.
  * As returned data is already normalized, the "normalize_data" group will be skipped.
  */
 class LoadExtendedAssociation extends BaseLoadExtendedAssociation
@@ -45,10 +46,12 @@ class LoadExtendedAssociation extends BaseLoadExtendedAssociation
     {
         $data = parent::loadData($context, $associationName, $isCollection);
 
-        if (!empty($data)) {
-            $config = $context->getConfig();
-            $titleFieldName = $config->findFieldNameByPropertyPath('title');
-            if ($titleFieldName && !$config->getField($titleFieldName)->isExcluded()) {
+        if (!empty($data) && !$context->isProcessed(LoadTitleMetaProperty::OPERATION_NAME)) {
+            $titlePropertyPath = ConfigUtil::getPropertyPathOfMetaProperty(
+                LoadTitleMetaProperty::TITLE_META_PROPERTY_NAME,
+                $context->getConfig()
+            );
+            if ($titlePropertyPath) {
                 if (!$isCollection) {
                     $data = [$data];
                 }
@@ -57,11 +60,12 @@ class LoadExtendedAssociation extends BaseLoadExtendedAssociation
                     $context->getParentClassName(),
                     $context->getParentId(),
                     $context->getParentConfig()->getField($associationName),
-                    $titleFieldName
+                    $titlePropertyPath
                 );
                 if (!$isCollection) {
                     $data = reset($data);
                 }
+                $context->setProcessed(LoadTitleMetaProperty::OPERATION_NAME);
             }
         }
 
@@ -112,7 +116,7 @@ class LoadExtendedAssociation extends BaseLoadExtendedAssociation
      * @param string $ownerEntityId
      * @param array  $targets
      *
-     * @return array
+     * @return array [['entity' => entity class, 'id' => entity id, 'title' => entity title], ...]
      */
     protected function getTitles($associationOwnerClass, $ownerEntityId, array $targets)
     {

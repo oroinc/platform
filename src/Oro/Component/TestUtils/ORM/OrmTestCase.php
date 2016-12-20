@@ -167,6 +167,66 @@ abstract class OrmTestCase extends \PHPUnit_Framework_TestCase
         return $countStatement;
     }
 
+    /**
+     * @param \PHPUnit_Framework_MockObject_MockObject $conn
+     * @param string                                   $sql
+     * @param array                                    $result
+     * @param array                                    $params
+     * @param array                                    $types
+     */
+    protected function setQueryExpectation(
+        \PHPUnit_Framework_MockObject_MockObject $conn,
+        $sql,
+        $result,
+        $params = [],
+        $types = []
+    ) {
+        $stmt = $this->createFetchStatementMock($result, $params, $types);
+        if ($params) {
+            $conn->expects($this->once())
+                ->method('prepare')
+                ->with($sql)
+                ->will($this->returnValue($stmt));
+        } else {
+            $conn
+                ->expects($this->once())
+                ->method('query')
+                ->with($sql)
+                ->will($this->returnValue($stmt));
+        }
+    }
+
+    /**
+     * @param \PHPUnit_Framework_MockObject_MockObject $conn
+     * @param int                                      $expectsAt
+     * @param string                                   $sql
+     * @param array                                    $result
+     * @param array                                    $params
+     * @param array                                    $types
+     */
+    protected function setQueryExpectationAt(
+        \PHPUnit_Framework_MockObject_MockObject $conn,
+        $expectsAt,
+        $sql,
+        $result,
+        $params = [],
+        $types = []
+    ) {
+        $stmt = $this->createFetchStatementMock($result, $params, $types);
+        if ($params) {
+            $conn->expects($this->at($expectsAt))
+                ->method('prepare')
+                ->with($sql)
+                ->will($this->returnValue($stmt));
+        } else {
+            $conn
+                ->expects($this->at($expectsAt))
+                ->method('query')
+                ->with($sql)
+                ->will($this->returnValue($stmt));
+        }
+    }
+
     private static function getSharedMetadataCacheImpl()
     {
         if (self::$metadataCacheImpl === null) {

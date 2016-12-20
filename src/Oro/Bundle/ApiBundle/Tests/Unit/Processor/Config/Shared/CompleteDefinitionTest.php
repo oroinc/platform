@@ -6,7 +6,7 @@ use Doctrine\ORM\Mapping\ClassMetadata;
 
 use Oro\Bundle\ApiBundle\Config\Config;
 use Oro\Bundle\ApiBundle\Config\FilterIdentifierFieldsConfigExtra;
-use Oro\Bundle\ApiBundle\Model\EntityDescriptor;
+use Oro\Bundle\ApiBundle\Model\EntityIdentifier;
 use Oro\Bundle\ApiBundle\Processor\Config\Shared\CompleteDefinition;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\Config\ConfigProcessorTestCase;
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
@@ -203,7 +203,8 @@ class CompleteDefinitionTest extends ConfigProcessorTestCase
         $config = [
             'fields' => [
                 'association1' => [
-                    'target_class' => 'Test\Association1Target'
+                    'target_class' => 'Test\Association1Target',
+                    'target_type'  => 'to-many'
                 ],
             ]
         ];
@@ -244,6 +245,7 @@ class CompleteDefinitionTest extends ConfigProcessorTestCase
                 'fields'           => [
                     'association1' => [
                         'target_class'           => 'Test\Association1Target',
+                        'target_type'            => 'to-many',
                         'exclusion_policy'       => 'all',
                         'collapse'               => true,
                         'identifier_field_names' => ['id'],
@@ -524,7 +526,14 @@ class CompleteDefinitionTest extends ConfigProcessorTestCase
             ->willReturn(['id']);
         $rootEntityMetadata->expects($this->once())
             ->method('getAssociationMappings')
-            ->willReturn(['association1' => ['targetEntity' => 'Test\Association1Target']]);
+            ->willReturn(
+                [
+                    'association1' => [
+                        'targetEntity' => 'Test\Association1Target',
+                        'type'         => ClassMetadata::MANY_TO_ONE
+                    ]
+                ]
+            );
 
         $this->doctrineHelper->expects($this->once())
             ->method('isManageableEntityClass')
@@ -572,6 +581,7 @@ class CompleteDefinitionTest extends ConfigProcessorTestCase
                     'association1' => [
                         'exclusion_policy'       => 'all',
                         'target_class'           => 'Test\Association1Target',
+                        'target_type'            => 'to-one',
                         'identifier_field_names' => ['id']
                     ],
                 ]
@@ -597,7 +607,14 @@ class CompleteDefinitionTest extends ConfigProcessorTestCase
             ->willReturn(['id']);
         $rootEntityMetadata->expects($this->once())
             ->method('getAssociationMappings')
-            ->willReturn(['association1' => ['targetEntity' => 'Test\Association1Target']]);
+            ->willReturn(
+                [
+                    'association1' => [
+                        'targetEntity' => 'Test\Association1Target',
+                        'type'         => ClassMetadata::MANY_TO_ONE
+                    ]
+                ]
+            );
 
         $this->doctrineHelper->expects($this->once())
             ->method('isManageableEntityClass')
@@ -655,7 +672,14 @@ class CompleteDefinitionTest extends ConfigProcessorTestCase
             ->willReturn(['id']);
         $rootEntityMetadata->expects($this->once())
             ->method('getAssociationMappings')
-            ->willReturn(['association1' => ['targetEntity' => 'Test\Association1Target']]);
+            ->willReturn(
+                [
+                    'association1' => [
+                        'targetEntity' => 'Test\Association1Target',
+                        'type'         => ClassMetadata::MANY_TO_ONE
+                    ]
+                ]
+            );
 
         $this->doctrineHelper->expects($this->once())
             ->method('isManageableEntityClass')
@@ -703,6 +727,7 @@ class CompleteDefinitionTest extends ConfigProcessorTestCase
                     'association1' => [
                         'exclusion_policy'       => 'all',
                         'target_class'           => 'Test\Association1Target',
+                        'target_type'            => 'to-one',
                         'collapse'               => true,
                         'identifier_field_names' => ['id'],
                         'fields'                 => [
@@ -730,7 +755,14 @@ class CompleteDefinitionTest extends ConfigProcessorTestCase
             ->willReturn(['id']);
         $rootEntityMetadata->expects($this->once())
             ->method('getAssociationMappings')
-            ->willReturn(['association1' => ['targetEntity' => 'Test\Association1Target']]);
+            ->willReturn(
+                [
+                    'association1' => [
+                        'targetEntity' => 'Test\Association1Target',
+                        'type'         => ClassMetadata::MANY_TO_ONE
+                    ]
+                ]
+            );
 
         $this->doctrineHelper->expects($this->once())
             ->method('isManageableEntityClass')
@@ -778,6 +810,7 @@ class CompleteDefinitionTest extends ConfigProcessorTestCase
                     'association1' => [
                         'exclusion_policy'       => 'all',
                         'target_class'           => 'Test\Association1Target',
+                        'target_type'            => 'to-one',
                         'collapse'               => true,
                         'identifier_field_names' => ['id'],
                         'fields'                 => [
@@ -811,7 +844,14 @@ class CompleteDefinitionTest extends ConfigProcessorTestCase
             ->willReturn(['id']);
         $rootEntityMetadata->expects($this->once())
             ->method('getAssociationMappings')
-            ->willReturn(['realAssociation1' => ['targetEntity' => 'Test\Association1Target']]);
+            ->willReturn(
+                [
+                    'realAssociation1' => [
+                        'targetEntity' => 'Test\Association1Target',
+                        'type'         => ClassMetadata::MANY_TO_ONE
+                    ]
+                ]
+            );
 
         $this->doctrineHelper->expects($this->once())
             ->method('isManageableEntityClass')
@@ -860,6 +900,7 @@ class CompleteDefinitionTest extends ConfigProcessorTestCase
                         'property_path'          => 'realAssociation1',
                         'exclusion_policy'       => 'all',
                         'target_class'           => 'Test\Association1Target',
+                        'target_type'            => 'to-one',
                         'collapse'               => true,
                         'identifier_field_names' => ['id'],
                         'fields'                 => [
@@ -893,7 +934,14 @@ class CompleteDefinitionTest extends ConfigProcessorTestCase
             ->willReturn(['id']);
         $rootEntityMetadata->expects($this->once())
             ->method('getAssociationMappings')
-            ->willReturn(['association1' => ['targetEntity' => 'Test\Association1Target']]);
+            ->willReturn(
+                [
+                    'association1' => [
+                        'targetEntity' => 'Test\Association1Target',
+                        'type'         => ClassMetadata::MANY_TO_ONE
+                    ]
+                ]
+            );
 
         $this->doctrineHelper->expects($this->once())
             ->method('isManageableEntityClass')
@@ -940,6 +988,7 @@ class CompleteDefinitionTest extends ConfigProcessorTestCase
                         'exclude'                => true,
                         'exclusion_policy'       => 'all',
                         'target_class'           => 'Test\Association1Target',
+                        'target_type'            => 'to-one',
                         'collapse'               => true,
                         'identifier_field_names' => ['id'],
                         'fields'                 => [
@@ -973,7 +1022,14 @@ class CompleteDefinitionTest extends ConfigProcessorTestCase
             ->willReturn(['id']);
         $rootEntityMetadata->expects($this->once())
             ->method('getAssociationMappings')
-            ->willReturn(['association1' => ['targetEntity' => 'Test\Association1Target']]);
+            ->willReturn(
+                [
+                    'association1' => [
+                        'targetEntity' => 'Test\Association1Target',
+                        'type'         => ClassMetadata::MANY_TO_ONE
+                    ]
+                ]
+            );
 
         $this->doctrineHelper->expects($this->once())
             ->method('isManageableEntityClass')
@@ -1019,6 +1075,7 @@ class CompleteDefinitionTest extends ConfigProcessorTestCase
                     'association1' => [
                         'exclusion_policy'       => 'all',
                         'target_class'           => 'Test\Association1Target',
+                        'target_type'            => 'to-one',
                         'collapse'               => true,
                         'identifier_field_names' => ['id'],
                         'fields'                 => [
@@ -1050,7 +1107,14 @@ class CompleteDefinitionTest extends ConfigProcessorTestCase
             ->willReturn(['id']);
         $rootEntityMetadata->expects($this->once())
             ->method('getAssociationMappings')
-            ->willReturn(['association1' => ['targetEntity' => 'Test\Association1Target']]);
+            ->willReturn(
+                [
+                    'association1' => [
+                        'targetEntity' => 'Test\Association1Target',
+                        'type'         => ClassMetadata::MANY_TO_ONE
+                    ]
+                ]
+            );
 
         $this->doctrineHelper->expects($this->once())
             ->method('isManageableEntityClass')
@@ -1099,6 +1163,7 @@ class CompleteDefinitionTest extends ConfigProcessorTestCase
                         'exclude'                => true,
                         'exclusion_policy'       => 'all',
                         'target_class'           => 'Test\Association1Target',
+                        'target_type'            => 'to-one',
                         'collapse'               => true,
                         'identifier_field_names' => ['id'],
                         'fields'                 => [
@@ -1132,7 +1197,14 @@ class CompleteDefinitionTest extends ConfigProcessorTestCase
             ->willReturn(['id']);
         $rootEntityMetadata->expects($this->once())
             ->method('getAssociationMappings')
-            ->willReturn(['association1' => ['targetEntity' => 'Test\Association1Target']]);
+            ->willReturn(
+                [
+                    'association1' => [
+                        'targetEntity' => 'Test\Association1Target',
+                        'type'         => ClassMetadata::MANY_TO_ONE
+                    ]
+                ]
+            );
 
         $this->doctrineHelper->expects($this->once())
             ->method('isManageableEntityClass')
@@ -1181,6 +1253,7 @@ class CompleteDefinitionTest extends ConfigProcessorTestCase
                         'data_type'              => 'string',
                         'exclusion_policy'       => 'all',
                         'target_class'           => 'Test\Association1Target',
+                        'target_type'            => 'to-one',
                         'collapse'               => true,
                         'identifier_field_names' => ['id'],
                         'fields'                 => [
@@ -1212,7 +1285,14 @@ class CompleteDefinitionTest extends ConfigProcessorTestCase
             ->willReturn(['id']);
         $rootEntityMetadata->expects($this->once())
             ->method('getAssociationMappings')
-            ->willReturn(['association1' => ['targetEntity' => 'Test\Association1Target']]);
+            ->willReturn(
+                [
+                    'association1' => [
+                        'targetEntity' => 'Test\Association1Target',
+                        'type'         => ClassMetadata::MANY_TO_ONE
+                    ]
+                ]
+            );
 
         $this->doctrineHelper->expects($this->once())
             ->method('isManageableEntityClass')
@@ -1263,6 +1343,7 @@ class CompleteDefinitionTest extends ConfigProcessorTestCase
                     'association1' => [
                         'exclusion_policy'       => 'all',
                         'target_class'           => 'Test\Association1Target',
+                        'target_type'            => 'to-one',
                         'collapse'               => true,
                         'identifier_field_names' => ['id1', 'id2'],
                         'fields'                 => [
@@ -1695,7 +1776,14 @@ class CompleteDefinitionTest extends ConfigProcessorTestCase
             ->willReturn(['id']);
         $rootEntityMetadata->expects($this->once())
             ->method('getAssociationMappings')
-            ->willReturn(['association1' => ['targetEntity' => 'Test\Association1Target']]);
+            ->willReturn(
+                [
+                    'association1' => [
+                        'targetEntity' => 'Test\Association1Target',
+                        'type'         => ClassMetadata::MANY_TO_MANY
+                    ]
+                ]
+            );
 
         $this->doctrineHelper->expects($this->once())
             ->method('isManageableEntityClass')
@@ -1738,6 +1826,7 @@ class CompleteDefinitionTest extends ConfigProcessorTestCase
                     'association1' => [
                         'exclusion_policy'       => 'all',
                         'target_class'           => 'Test\Association1Target',
+                        'target_type'            => 'to-many',
                         'collapse'               => true,
                         'identifier_field_names' => ['id'],
                         'fields'                 => [
@@ -1789,7 +1878,7 @@ class CompleteDefinitionTest extends ConfigProcessorTestCase
         $this->configProvider->expects($this->once())
             ->method('getConfig')
             ->with(
-                EntityDescriptor::class,
+                EntityIdentifier::class,
                 $this->context->getVersion(),
                 $this->context->getRequestType()
             )
@@ -1818,7 +1907,7 @@ class CompleteDefinitionTest extends ConfigProcessorTestCase
                     'association1' => [
                         'exclusion_policy'       => 'all',
                         'data_type'              => 'association:manyToOne',
-                        'target_class'           => EntityDescriptor::class,
+                        'target_class'           => EntityIdentifier::class,
                         'target_type'            => 'to-one',
                         'identifier_field_names' => ['id'],
                         'depends_on'             => ['field1'],
@@ -1873,7 +1962,7 @@ class CompleteDefinitionTest extends ConfigProcessorTestCase
         $this->configProvider->expects($this->once())
             ->method('getConfig')
             ->with(
-                EntityDescriptor::class,
+                EntityIdentifier::class,
                 $this->context->getVersion(),
                 $this->context->getRequestType()
             )
@@ -1902,7 +1991,7 @@ class CompleteDefinitionTest extends ConfigProcessorTestCase
                     'association1' => [
                         'exclusion_policy'       => 'all',
                         'data_type'              => 'association:manyToMany:kind',
-                        'target_class'           => EntityDescriptor::class,
+                        'target_class'           => EntityIdentifier::class,
                         'target_type'            => 'to-many',
                         'identifier_field_names' => ['id'],
                         'depends_on'             => ['field1'],
@@ -1957,7 +2046,7 @@ class CompleteDefinitionTest extends ConfigProcessorTestCase
         $this->configProvider->expects($this->once())
             ->method('getConfig')
             ->with(
-                EntityDescriptor::class,
+                EntityIdentifier::class,
                 $this->context->getVersion(),
                 $this->context->getRequestType()
             )
@@ -1986,7 +2075,7 @@ class CompleteDefinitionTest extends ConfigProcessorTestCase
                     'association1' => [
                         'exclusion_policy'       => 'all',
                         'data_type'              => 'association:multipleManyToOne',
-                        'target_class'           => EntityDescriptor::class,
+                        'target_class'           => EntityIdentifier::class,
                         'target_type'            => 'to-many',
                         'identifier_field_names' => ['id'],
                         'depends_on'             => ['field1'],
@@ -2212,7 +2301,7 @@ class CompleteDefinitionTest extends ConfigProcessorTestCase
         $this->configProvider->expects($this->once())
             ->method('getConfig')
             ->with(
-                EntityDescriptor::class,
+                EntityIdentifier::class,
                 $this->context->getVersion(),
                 $this->context->getRequestType()
             )
@@ -2241,7 +2330,7 @@ class CompleteDefinitionTest extends ConfigProcessorTestCase
                     'association1' => [
                         'exclusion_policy'       => 'all',
                         'data_type'              => 'association:manyToOne',
-                        'target_class'           => EntityDescriptor::class,
+                        'target_class'           => EntityIdentifier::class,
                         'target_type'            => 'to-one',
                         'identifier_field_names' => ['id'],
                         'depends_on'             => ['field1', 'field2'],
@@ -2322,7 +2411,7 @@ class CompleteDefinitionTest extends ConfigProcessorTestCase
         $this->configProvider->expects($this->once())
             ->method('getConfig')
             ->with(
-                EntityDescriptor::class,
+                EntityIdentifier::class,
                 $this->context->getVersion(),
                 $this->context->getRequestType()
             )
@@ -2351,7 +2440,7 @@ class CompleteDefinitionTest extends ConfigProcessorTestCase
                     'association1' => [
                         'exclusion_policy'       => 'all',
                         'data_type'              => 'association:manyToOne',
-                        'target_class'           => EntityDescriptor::class,
+                        'target_class'           => EntityIdentifier::class,
                         'target_type'            => 'to-one',
                         'identifier_field_names' => ['id'],
                         'depends_on'             => ['field1', 'field2'],
@@ -2430,7 +2519,7 @@ class CompleteDefinitionTest extends ConfigProcessorTestCase
         $this->configProvider->expects($this->once())
             ->method('getConfig')
             ->with(
-                EntityDescriptor::class,
+                EntityIdentifier::class,
                 $this->context->getVersion(),
                 $this->context->getRequestType()
             )
@@ -2459,7 +2548,7 @@ class CompleteDefinitionTest extends ConfigProcessorTestCase
                     'association1' => [
                         'exclusion_policy'       => 'all',
                         'data_type'              => 'association:manyToOne',
-                        'target_class'           => EntityDescriptor::class,
+                        'target_class'           => EntityIdentifier::class,
                         'target_type'            => 'to-one',
                         'identifier_field_names' => ['id'],
                         'depends_on'             => ['field1', 'field2'],

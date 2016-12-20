@@ -4,6 +4,7 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\Subresource\GetSubresource;
 
 use Oro\Component\EntitySerializer\EntitySerializer;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
+use Oro\Bundle\ApiBundle\Processor\Shared\LoadTitleMetaProperty;
 use Oro\Bundle\ApiBundle\Processor\Subresource\GetSubresource\LoadExtendedAssociation;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\Subresource\GetSubresourceProcessorOrmRelatedTestCase;
 use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity;
@@ -89,7 +90,7 @@ class LoadExtendedAssociationTest extends GetSubresourceProcessorOrmRelatedTestC
         $this->processor->process($this->context);
     }
 
-    public function testProcessForExtendedManyToOneAssociation()
+    public function testProcessForExtendedManyToOneAssociationWithoutTitle()
     {
         $associationName = 'testAssociation';
         $parentConfig = new EntityDefinitionConfig();
@@ -97,7 +98,49 @@ class LoadExtendedAssociationTest extends GetSubresourceProcessorOrmRelatedTestC
         $parentClassName = Entity\Product::class;
         $parentId = 123;
         $config = new EntityDefinitionConfig();
-        $config->addField('title');
+
+        $loadedData = [
+            [
+                'id'             => $parentId,
+                $associationName => ['id' => 1, ConfigUtil::CLASS_NAME => Entity\User::class]
+            ]
+        ];
+
+        $expectedQueryBuilder = $this->doctrineHelper->getEntityRepositoryForClass($parentClassName)
+            ->createQueryBuilder('e')
+            ->andWhere('e.id = :id')
+            ->setParameter('id', $parentId);
+        $this->entitySerializer->expects(self::once())
+            ->method('serialize')
+            ->with($expectedQueryBuilder, $parentConfig)
+            ->willReturn($loadedData);
+
+        $this->context->setAssociationName($associationName);
+        $this->context->setParentConfig($parentConfig);
+        $this->context->setParentClassName($parentClassName);
+        $this->context->setParentId($parentId);
+        $this->context->setConfig($config);
+        $this->processor->process($this->context);
+        self::assertEquals(
+            [
+                'id'                   => 1,
+                ConfigUtil::CLASS_NAME => Entity\User::class,
+            ],
+            $this->context->getResult()
+        );
+        self::assertEquals(['normalize_data'], $this->context->getSkippedGroups());
+        self::assertFalse($this->context->isProcessed(LoadTitleMetaProperty::OPERATION_NAME));
+    }
+
+    public function testProcessForExtendedManyToOneAssociationWithTitle()
+    {
+        $associationName = 'testAssociation';
+        $parentConfig = new EntityDefinitionConfig();
+        $parentConfig->addField($associationName)->setDataType('association:manyToOne:kind');
+        $parentClassName = Entity\Product::class;
+        $parentId = 123;
+        $config = new EntityDefinitionConfig();
+        $config->addField('__title__')->setMetaProperty(true);
 
         $loadedData = [
             [
@@ -131,20 +174,19 @@ class LoadExtendedAssociationTest extends GetSubresourceProcessorOrmRelatedTestC
                     )
                     ->innerJoin('e.owner', 'target')
             );
-        $sql = 'SELECT entity.id_1 AS id, entity.sclr_2 AS entity, entity.name_3 AS title '
+        $this->setQueryExpectation(
+            $this->getDriverConnectionMock($this->em),
+            'SELECT entity.id_1 AS id, entity.sclr_2 AS entity, entity.name_3 AS title '
             . 'FROM (('
             . 'SELECT p0_.id AS id_0, u1_.id AS id_1, '
             . '\'' . Entity\User::class . '\' AS sclr_2, u1_.name AS name_3 '
             . 'FROM product_table p0_ INNER JOIN user_table u1_ ON p0_.owner_id = u1_.id '
             . 'WHERE p0_.id = 123 AND u1_.id IN (1)'
-            . ')) entity';
-        $data = [
-            ['id' => 1, 'entity' => Entity\User::class, 'title' => 'test user']
-        ];
-        $this->getDriverConnectionMock($this->em)->expects($this->once())
-            ->method('query')
-            ->with($sql)
-            ->willReturn($this->createFetchStatementMock($data));
+            . ')) entity',
+            [
+                ['id' => 1, 'entity' => Entity\User::class, 'title' => 'test user']
+            ]
+        );
 
         $this->context->setAssociationName($associationName);
         $this->context->setParentConfig($parentConfig);
@@ -156,11 +198,56 @@ class LoadExtendedAssociationTest extends GetSubresourceProcessorOrmRelatedTestC
             [
                 'id'                   => 1,
                 ConfigUtil::CLASS_NAME => Entity\User::class,
-                'title'                => 'test user'
+                '__title__'            => 'test user'
             ],
             $this->context->getResult()
         );
         self::assertEquals(['normalize_data'], $this->context->getSkippedGroups());
+        self::assertTrue($this->context->isProcessed(LoadTitleMetaProperty::OPERATION_NAME));
+    }
+
+    public function testProcessForExtendedManyToOneAssociationWhenTitleAlreadyLoaded()
+    {
+        $associationName = 'testAssociation';
+        $parentConfig = new EntityDefinitionConfig();
+        $parentConfig->addField($associationName)->setDataType('association:manyToOne:kind');
+        $parentClassName = Entity\Product::class;
+        $parentId = 123;
+        $config = new EntityDefinitionConfig();
+        $config->addField('__title__')->setMetaProperty(true);
+
+        $loadedData = [
+            [
+                'id'             => $parentId,
+                $associationName => ['id' => 1, ConfigUtil::CLASS_NAME => Entity\User::class]
+            ]
+        ];
+
+        $expectedQueryBuilder = $this->doctrineHelper->getEntityRepositoryForClass($parentClassName)
+            ->createQueryBuilder('e')
+            ->andWhere('e.id = :id')
+            ->setParameter('id', $parentId);
+        $this->entitySerializer->expects(self::once())
+            ->method('serialize')
+            ->with($expectedQueryBuilder, $parentConfig)
+            ->willReturn($loadedData);
+
+        $this->context->setAssociationName($associationName);
+        $this->context->setParentConfig($parentConfig);
+        $this->context->setParentClassName($parentClassName);
+        $this->context->setParentId($parentId);
+        $this->context->setConfig($config);
+        $this->context->setProcessed(LoadTitleMetaProperty::OPERATION_NAME);
+        $this->processor->process($this->context);
+        self::assertEquals(
+            [
+                'id'                   => 1,
+                ConfigUtil::CLASS_NAME => Entity\User::class
+            ],
+            $this->context->getResult()
+        );
+        self::assertEquals(['normalize_data'], $this->context->getSkippedGroups());
+        self::assertTrue($this->context->isProcessed(LoadTitleMetaProperty::OPERATION_NAME));
     }
 
     public function testProcessForEmptyResultOfManyToOneExtendedAssociation()
@@ -191,9 +278,10 @@ class LoadExtendedAssociationTest extends GetSubresourceProcessorOrmRelatedTestC
         $this->processor->process($this->context);
         self::assertNull($this->context->getResult());
         self::assertEquals(['normalize_data'], $this->context->getSkippedGroups());
+        self::assertFalse($this->context->isProcessed(LoadTitleMetaProperty::OPERATION_NAME));
     }
 
-    public function testProcessForExtendedManyToManyAssociation()
+    public function testProcessForExtendedManyToManyAssociationWithTitle()
     {
         $associationName = 'testAssociation';
         $parentConfig = new EntityDefinitionConfig();
@@ -201,7 +289,7 @@ class LoadExtendedAssociationTest extends GetSubresourceProcessorOrmRelatedTestC
         $parentClassName = Entity\Product::class;
         $parentId = 123;
         $config = new EntityDefinitionConfig();
-        $config->addField('title');
+        $config->addField('__title__')->setMetaProperty(true);
 
         $loadedData = [
             [
@@ -235,20 +323,19 @@ class LoadExtendedAssociationTest extends GetSubresourceProcessorOrmRelatedTestC
                     )
                     ->innerJoin('e.owner', 'target')
             );
-        $sql = 'SELECT entity.id_1 AS id, entity.sclr_2 AS entity, entity.name_3 AS title '
+        $this->setQueryExpectation(
+            $this->getDriverConnectionMock($this->em),
+            'SELECT entity.id_1 AS id, entity.sclr_2 AS entity, entity.name_3 AS title '
             . 'FROM (('
             . 'SELECT p0_.id AS id_0, u1_.id AS id_1, '
             . '\'' . Entity\User::class . '\' AS sclr_2, u1_.name AS name_3 '
             . 'FROM product_table p0_ INNER JOIN user_table u1_ ON p0_.owner_id = u1_.id '
             . 'WHERE p0_.id = 123 AND u1_.id IN (1)'
-            . ')) entity';
-        $data = [
-            ['id' => 1, 'entity' => Entity\User::class, 'title' => 'test user']
-        ];
-        $this->getDriverConnectionMock($this->em)->expects($this->once())
-            ->method('query')
-            ->with($sql)
-            ->willReturn($this->createFetchStatementMock($data));
+            . ')) entity',
+            [
+                ['id' => 1, 'entity' => Entity\User::class, 'title' => 'test user']
+            ]
+        );
 
         $this->context->setAssociationName($associationName);
         $this->context->setParentConfig($parentConfig);
@@ -261,12 +348,13 @@ class LoadExtendedAssociationTest extends GetSubresourceProcessorOrmRelatedTestC
                 [
                     'id'                   => 1,
                     ConfigUtil::CLASS_NAME => Entity\User::class,
-                    'title'                => 'test user'
+                    '__title__'            => 'test user'
                 ]
             ],
             $this->context->getResult()
         );
         self::assertEquals(['normalize_data'], $this->context->getSkippedGroups());
+        self::assertTrue($this->context->isProcessed(LoadTitleMetaProperty::OPERATION_NAME));
     }
 
     public function testProcessForEmptyResultOfManyToManyExtendedAssociation()
@@ -297,6 +385,7 @@ class LoadExtendedAssociationTest extends GetSubresourceProcessorOrmRelatedTestC
         $this->processor->process($this->context);
         self::assertSame([], $this->context->getResult());
         self::assertEquals(['normalize_data'], $this->context->getSkippedGroups());
+        self::assertFalse($this->context->isProcessed(LoadTitleMetaProperty::OPERATION_NAME));
     }
 
     public function testProcessForEmptyResultOfMultipleManyToOneExtendedAssociation()
@@ -327,6 +416,7 @@ class LoadExtendedAssociationTest extends GetSubresourceProcessorOrmRelatedTestC
         $this->processor->process($this->context);
         self::assertSame([], $this->context->getResult());
         self::assertEquals(['normalize_data'], $this->context->getSkippedGroups());
+        self::assertFalse($this->context->isProcessed(LoadTitleMetaProperty::OPERATION_NAME));
     }
 
     public function testProcessForManyToOneExtendedAssociationWhenParentEntityWasNotFound()
@@ -355,6 +445,7 @@ class LoadExtendedAssociationTest extends GetSubresourceProcessorOrmRelatedTestC
         $this->processor->process($this->context);
         self::assertNull($this->context->getResult());
         self::assertEquals(['normalize_data'], $this->context->getSkippedGroups());
+        self::assertFalse($this->context->isProcessed(LoadTitleMetaProperty::OPERATION_NAME));
     }
 
     public function testProcessForManyToManyExtendedAssociationWhenParentEntityWasNotFound()
@@ -383,6 +474,7 @@ class LoadExtendedAssociationTest extends GetSubresourceProcessorOrmRelatedTestC
         $this->processor->process($this->context);
         self::assertSame([], $this->context->getResult());
         self::assertEquals(['normalize_data'], $this->context->getSkippedGroups());
+        self::assertFalse($this->context->isProcessed(LoadTitleMetaProperty::OPERATION_NAME));
     }
 
     public function testProcessForMultipleManyToOneExtendedAssociationWhenParentEntityWasNotFound()
@@ -411,5 +503,6 @@ class LoadExtendedAssociationTest extends GetSubresourceProcessorOrmRelatedTestC
         $this->processor->process($this->context);
         self::assertSame([], $this->context->getResult());
         self::assertEquals(['normalize_data'], $this->context->getSkippedGroups());
+        self::assertFalse($this->context->isProcessed(LoadTitleMetaProperty::OPERATION_NAME));
     }
 }

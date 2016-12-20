@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Normalizer;
 
-use Oro\Component\EntitySerializer\EntityDataAccessor;
+use Oro\Bundle\ApiBundle\Model\EntityIdentifier;
 use Oro\Component\EntitySerializer\EntityDataTransformer;
 use Oro\Bundle\ApiBundle\Config\ConfigExtensionRegistry;
 use Oro\Bundle\ApiBundle\Config\ConfigLoaderFactory;
@@ -17,6 +17,7 @@ use Oro\Bundle\ApiBundle\Normalizer\ObjectNormalizerRegistry;
 use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity;
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
+use Oro\Bundle\ApiBundle\Util\EntityDataAccessor;
 
 class ByConfigObjectNormalizerTest extends \PHPUnit_Framework_TestCase
 {
@@ -853,6 +854,46 @@ class ByConfigObjectNormalizerTest extends \PHPUnit_Framework_TestCase
             [
                 'id'   => 123,
                 'name' => 'test_name',
+            ],
+            $result
+        );
+    }
+
+    public function testNormalizeObjectWhenRelationRepresentedByEntityIdentifierClass()
+    {
+        $config = [
+            'exclusion_policy' => 'all',
+            'fields'           => [
+                'id'       => null,
+                'name'     => ['exclude' => true],
+                'category' => [
+                    'exclusion_policy' => 'all',
+                    'fields'           => [
+                        'id'        => null,
+                        '__class__' => [
+                            'meta_property' => true
+                        ]
+                    ]
+                ]
+            ]
+        ];
+
+        $object = new Entity\EntityWithoutGettersAndSetters();
+        $object->id = 123;
+        $object->category = new EntityIdentifier('category1', 'Test\Category');
+
+        $result = $this->objectNormalizer->normalizeObject(
+            $object,
+            $this->createConfigObject($config)
+        );
+
+        $this->assertEquals(
+            [
+                'id'       => 123,
+                'category' => [
+                    'id'        => 'category1',
+                    '__class__' => 'Test\Category'
+                ]
             ],
             $result
         );

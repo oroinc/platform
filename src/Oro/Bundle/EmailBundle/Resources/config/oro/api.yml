@@ -23,7 +23,7 @@ api:
                 recipients:
                     exclude: true
                 suggestions:
-                    target_class: Oro\Bundle\ApiBundle\Model\EntityDescriptor
+                    target_class: Oro\Bundle\ApiBundle\Model\EntityIdentifier
                     target_type: collection
                     actions:
                         get_subresource:

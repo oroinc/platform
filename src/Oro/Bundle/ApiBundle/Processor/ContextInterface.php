@@ -201,6 +201,49 @@ interface ContextInterface extends ComponentContextInterface
     public function resetErrors();
 
     /**
+     * Gets a value indicates whether errors should just stop processing
+     * or an exception should be thrown is any error occurred.
+     *
+     * @return bool
+     */
+    public function isSoftErrorsHandling();
+
+    /**
+     * Sets a value indicates whether errors should just stop processing
+     * or an exception should be thrown is any error occurred.
+     *
+     * @param bool $softErrorsHandling
+     */
+    public function setSoftErrorsHandling($softErrorsHandling);
+
+    /**
+     * Marks a work as already done.
+     * In the most cases this method is useless because it is easy to determine
+     * when a work is already done just checking a state of a context.
+     * But in case if a processor does a complex work, it might be required
+     * to mark a work as already done directly.
+     *
+     * @param string $operationName The name of an opperation that represents some work
+     */
+    public function setProcessed($operationName);
+
+    /**
+     * Marks a work as not done yet.
+     *
+     * @param string $operationName The name of an opperation that represents some work
+     */
+    public function clearProcessed($operationName);
+
+    /**
+     * Checks whether a work is already done.
+     *
+     * @param string $operationName The name of an opperation that represents some work
+     *
+     * @return bool
+     */
+    public function isProcessed($operationName);
+
+    /**
      * Gets a list of requests for configuration data.
      *
      * @return ConfigExtraInterface[]

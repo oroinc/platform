@@ -10,6 +10,7 @@ use Oro\Component\EntitySerializer\DataTransformerInterface;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionFieldConfig;
 use Oro\Bundle\ApiBundle\Exception\RuntimeException;
+use Oro\Bundle\ApiBundle\Model\EntityIdentifier;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 
 class ObjectNormalizer
@@ -160,26 +161,30 @@ class ObjectNormalizer
         }
 
         $result = [];
-        $entityClass = ClassUtils::getClass($object);
+        $entityClass = $this->getEntityClass($object);
         $fields = $config->getFields();
         foreach ($fields as $fieldName => $field) {
             if ($field->isExcluded()) {
                 continue;
             }
 
-            $value = null;
             $propertyPath = $field->getPropertyPath($fieldName);
-            if (ConfigUtil::isMetadataProperty($propertyPath)) {
-                $value = $this->getMetadataProperty($entityClass, $propertyPath);
-            } elseif ($this->dataAccessor->tryGetValue($object, $propertyPath, $value) && null !== $value) {
-                $targetEntity = $field->getTargetEntity();
-                if (null !== $targetEntity) {
-                    $value = $this->normalizeValue($value, $level + 1, $context, $targetEntity);
-                } else {
-                    $value = $this->transformValue($entityClass, $fieldName, $value, $context, $field);
+            if ($this->isMetadataProperty($propertyPath)) {
+                $result[$propertyPath] = $this->getMetadataProperty($entityClass, $propertyPath);
+            } else {
+                $value = null;
+                if ($this->dataAccessor->tryGetValue($object, $propertyPath, $value)) {
+                    if (null !== $value) {
+                        $targetEntity = $field->getTargetEntity();
+                        if (null !== $targetEntity) {
+                            $value = $this->normalizeValue($value, $level + 1, $context, $targetEntity);
+                        } else {
+                            $value = $this->transformValue($entityClass, $fieldName, $value, $context, $field);
+                        }
+                    }
+                    $result[$propertyPath] = $value;
                 }
             }
-            $result[$propertyPath] = $value;
         }
 
         $postSerializeHandler = $config->getPostSerializeHandler();
@@ -282,6 +287,32 @@ class ObjectNormalizer
     }
 
     /**
+     * Gets the real class name of an entity.
+     *
+     * @param object $object
+     *
+     * @return string
+     */
+    protected function getEntityClass($object)
+    {
+        return $object instanceof EntityIdentifier
+            ? $object->getClass()
+            : ClassUtils::getClass($object);
+    }
+
+    /**
+     * Checks whether the given property path represents a metadata property
+     *
+     * @param string $propertyPath
+     *
+     * @return mixed
+     */
+    protected function isMetadataProperty($propertyPath)
+    {
+        return ConfigUtil::CLASS_NAME === $propertyPath || ConfigUtil::DISCRIMINATOR === $propertyPath;
+    }
+
+    /**
      * Returns a value of a metadata property
      *
      * @param string $entityClass
@@ -289,13 +320,13 @@ class ObjectNormalizer
      *
      * @return mixed
      */
-    public function getMetadataProperty($entityClass, $propertyPath)
+    protected function getMetadataProperty($entityClass, $propertyPath)
     {
         switch ($propertyPath) {
-            case ConfigUtil::DISCRIMINATOR:
-                return $this->getEntityDiscriminator($entityClass);
             case ConfigUtil::CLASS_NAME:
                 return $entityClass;
+            case ConfigUtil::DISCRIMINATOR:
+                return $this->getEntityDiscriminator($entityClass);
         }
 
         return null;
@@ -306,7 +337,7 @@ class ObjectNormalizer
      *
      * @return string|null
      */
-    public function getEntityDiscriminator($entityClass)
+    protected function getEntityDiscriminator($entityClass)
     {
         $metadata = $this->doctrineHelper->getEntityMetadataForClass($entityClass, false);
         if (null === $metadata) {

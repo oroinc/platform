@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Normalizer;
 
-use Oro\Component\EntitySerializer\EntityDataAccessor;
 use Oro\Component\EntitySerializer\EntityDataTransformer;
 use Oro\Bundle\ApiBundle\Normalizer\ConfigNormalizer;
 use Oro\Bundle\ApiBundle\Normalizer\DataNormalizer;
@@ -12,6 +11,7 @@ use Oro\Bundle\ApiBundle\Normalizer\ObjectNormalizerRegistry;
 use Oro\Bundle\ApiBundle\Normalizer\SearchItemNormalizer;
 use Oro\Bundle\ApiBundle\Tests\Unit\OrmRelatedTestCase;
 use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity;
+use Oro\Bundle\ApiBundle\Util\EntityDataAccessor;
 use Oro\Bundle\SearchBundle\Query\Result\Item as SearchResultItem;
 
 class EntityObjectNormalizerTest extends OrmRelatedTestCase
