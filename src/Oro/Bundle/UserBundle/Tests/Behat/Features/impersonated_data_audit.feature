@@ -6,7 +6,7 @@ Feature: Identify changes made by impersonated user in Data Audit
 
   Scenario: Create entity by impersonated user
     Given I login as Impersonated user
-    And I go to Customers/Contacts
+    And I go to Contacts
     And I create Contact with:
     | Username | First Name | Last Name | Phone      | Email              |
     | ncave    | Nick       | Cave      | 555-NICKK  | nickcave@music.com |
@@ -17,7 +17,7 @@ Feature: Identify changes made by impersonated user in Data Audit
     And I should see my IP address
 
   Scenario: Change entity by impersonated user
-    Given I go to Customers/Contacts
+    Given I go to Contacts
     And I edit "ncave" entity
     And I fill in "Middle Name" with "Johnson"
     And save form
@@ -27,7 +27,7 @@ Feature: Identify changes made by impersonated user in Data Audit
     And I should see my IP address
 
   Scenario: Delete entity by impersonated user
-    Given I go to Customers/Contacts
+    Given I go to Contacts
     And I delete "ncave" entity
     And log out
     And I login as "Administrator" user
