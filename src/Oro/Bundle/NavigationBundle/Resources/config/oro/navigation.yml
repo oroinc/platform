@@ -58,7 +58,7 @@ navigation:
                 extras:
                     position: 90
                     routes: ['/^oro_navigation_global_menu_[\w_]+$/']
-                    description: 'Manage menus in default area'
+                    description: 'Manage menus in default scope type'
 
         tree:
             application_menu:

@@ -52,7 +52,7 @@ class GlobalMenuController extends AbstractMenuController
      */
     public function createAction($menuName, $parentKey = null)
     {
-        return parent::create($menuName, $parentKey, $this->getOwnerId());
+        return parent::create($menuName, $parentKey);
     }
 
     /**
@@ -67,31 +67,23 @@ class GlobalMenuController extends AbstractMenuController
      */
     public function updateAction($menuName, $key)
     {
-        return parent::update($menuName, $key, $this->getOwnerId());
+        return parent::update($menuName, $key);
     }
 
     /**
      * {@inheritdoc}
      */
-    protected function getOwnershipType()
+    protected function getScopeType()
     {
-        return $this->getOwnershipProvider()->getType();
+        return $this->getParameter('oro_navigation.menu_update.scope_type');
     }
 
     /**
-     * @return int
+     * {@inheritdoc}
      */
-    protected function getOwnerId()
+    protected function getMenuUpdateManager()
     {
-        return $this->getOwnershipProvider()->getId();
-    }
-
-    /**
-     * @return \Oro\Bundle\NavigationBundle\Menu\Provider\GlobalOwnershipProvider
-     */
-    protected function getOwnershipProvider()
-    {
-        return $this->get('oro_navigation.ownership_provider.global');
+        return $this->get('oro_navigation.manager.menu_update');
     }
 
     /**

@@ -695,9 +695,14 @@
 {% endblock %}
 
 {% block oro_entity_tree_select_widget %}
-    <div data-page-component-module="{{ form.vars.pageComponentModule }}"
-         data-page-component-options="{{ form.vars.treeOptions|json_encode }}">
-    </div>
+    {% import 'OroUIBundle::macros.html.twig' as UI %}
+    {{ UI.renderJsTree(
+        {
+            'module': form.vars.pageComponentModule,
+            'treeOptions': form.vars.treeOptions
+        },
+        ['expand', 'collapse']
+    ) }}
 
     {{ form_widget(form) }}
     {{ form_errors(form) }}

@@ -4,10 +4,10 @@ namespace Oro\Bundle\NavigationBundle\Command;
 
 use Oro\Bundle\UserBundle\Entity\User;
 
+use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Question\ConfirmationQuestion;
 
 /**
@@ -95,30 +95,25 @@ class ResetMenuUpdatesCommand extends ContainerAwareCommand
         $output->writeln($message);
     }
 
-    /**=
-     * @param User|null $user
+    /**
+     * @param User|null   $user
      * @param string|null $menuName
      */
     private function resetMenuUpdates($user = null, $menuName = null)
     {
-        $ownerId = null;
+        $scopeType = $this->getContainer()->getParameter('oro_navigation.menu_update.scope_type');
+        $scopeManager = $this
+            ->getContainer()
+            ->get('oro_scope.scope_manager');
         if (null !== $user) {
-            $ownershipType = $this
-                ->getContainer()
-                ->get('oro_navigation.ownership_provider.user')
-                ->getType();
-
-            $ownerId = $user->getId();
+            $scope = $scopeManager->findOrCreate($scopeType, ['user' => $user]);
         } else {
-            $ownershipType = $this
-                ->getContainer()
-                ->get('oro_navigation.ownership_provider.global')
-                ->getType();
+            $scope = $scopeManager->findOrCreate($scopeType);
         }
 
         $this
             ->getContainer()
-            ->get('oro_navigation.manager.menu_update_default')
-            ->resetMenuUpdatesWithOwnershipType($ownershipType, $ownerId, $menuName);
+            ->get('oro_navigation.manager.menu_update')
+            ->deleteMenuUpdates($scope, $menuName);
     }
 }
