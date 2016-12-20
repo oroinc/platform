@@ -131,7 +131,8 @@ class LocaleListener implements EventSubscriberInterface
     {
         return [
             // must be registered after authentication and before routing
-            KernelEvents::REQUEST  => [['onKernelRequest', 40]],
+            // It was 40 but changed back to 7 as hot-fix, proper fix in BB-6429
+            KernelEvents::REQUEST  => [['onKernelRequest', 7]],
             ConsoleEvents::COMMAND => [['onConsoleCommand']],
         ];
     }

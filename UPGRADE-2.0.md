@@ -10,6 +10,77 @@ UPGRADE FROM 1.10 to 2.0
   was added the command "oro:platform:upgrade20". Before run this command the cache has to be deleted.
   Command have to be run only one time. In next releases 2.x to apply release changes it will be enough run the command "oro:platform:update".
   Upgrade from version less then 1.10 is not supported.
+  
+####SOAP API was removed
+- removed all dependencies to the `besimple/soap-bundle` bundle. 
+- removed SOAP annotations from the entities. Updated entities:
+    - Oro\Bundle\ActivityListBundle\Entity\ActivityList
+    - Oro\Bundle\ActivityListBundle\Entity\ActivityOwner
+    - Oro\Bundle\AddressBundle\Entity\AbstractAddress
+    - Oro\Bundle\AddressBundle\Entity\AbstractEmail
+    - Oro\Bundle\AddressBundle\Entity\AbstractPhone
+    - Oro\Bundle\AddressBundle\Entity\AbstractTypedAddress
+    - Oro\Bundle\DataAuditBundle\Entity\Audit
+    - Oro\Bundle\EmailBundle\Entity\Email
+    - Oro\Bundle\EmailBundle\Entity\EmailAttachment
+    - Oro\Bundle\EmailBundle\Entity\EmailAttachmentContent
+    - Oro\Bundle\EmailBundle\Entity\EmailBody
+    - Oro\Bundle\EmailBundle\Entity\EmailFolder
+    - Oro\Bundle\EmailBundle\Entity\EmailRecipient
+    - Oro\Bundle\EmailBundle\Entity\EmailThread
+    - Oro\Bundle\EmailBundle\Entity\EmailUser
+    - Oro\Bundle\EmailBundle\Entity\InternalEmailOrigin
+    - Oro\Bundle\SearchBundle\Query\Result
+    - Oro\Bundle\SearchBundle\Query\Result\Item
+- removed classes:
+    - Oro\Bundle\ActivityListBundle\Controller\Api\Soap\ActivityListController
+    - Oro\Bundle\AddressBundle\Controller\Api\Soap\AddressTypeController
+    - Oro\Bundle\AddressBundle\Controller\Api\Soap\CountryController
+    - Oro\Bundle\AddressBundle\Controller\Api\Soap\RegionController
+    - Oro\Bundle\DataAuditBundle\Controller\Api\Soap\AuditController
+    - Oro\Bundle\EmailBundle\Controller\Api\Soap\EmailController
+    - Oro\Bundle\NoteBundle\Controller\Api\Soap\NoteController
+    - Oro\Bundle\OrganizationBundle\Controller\Api\Soap\BusinessUnitController
+    - Oro\Bundle\OrganizationBundle\Controller\Api\Soap\OrganizationController
+    - Oro\Bundle\SearchBundle\Controller\Api\SoapController
+    - Oro\Bundle\UserBundle\Controller\Api\Soap\GroupController
+    - Oro\Bundle\UserBundle\Controller\Api\Soap\RoleController
+    - Oro\Bundle\UserBundle\Controller\Api\Soap\UserController
+    - Oro\Bundle\AddressBundle\Entity\AddressTypeSoap
+    - Oro\Bundle\AddressBundle\Entity\CountrySoap
+    - Oro\Bundle\AddressBundle\Entity\RegionSoap
+    - Oro\Bundle\NoteBundle\Entity\NoteSoap
+    - Oro\Bundle\OrganizationBundle\Entity\BusinessUnitSoap
+    - Oro\Bundle\OrganizationBundle\Entity\OrganizationSoap
+    - Oro\Bundle\UserBundle\Entity\GroupSoap
+    - Oro\Bundle\UserBundle\Entity\RoleSoap
+    - Oro\Bundle\UserBundle\Entity\UserSoap
+    - Oro\Bundle\TaskBundle\Entity\TaskSoap
+    - Oro\Bundle\DataAuditBundle\Entity\AuditData
+    - Oro\Bundle\EntityBundle\Model\EntityIdSoap
+    - Oro\Bundle\SearchBundle\Soap\Type\SelectedValue
+    - Oro\Bundle\SoapBundle\DependencyInjection\Compiler\LoadPass
+    - Oro\Bundle\SoapBundle\ServiceDefinition\Loader\OroSoapLoader
+    - Oro\Bundle\SoapBundle\ServiceDefinition\Loader\AnnotationComplexTypeLoader
+    - Oro\Bundle\SoapBundle\ServiceDefinition\Loader\FilterableLoaderInterface
+    - Oro\Bundle\SoapBundle\ServiceDefinition\Loader\ComplexTypeFilterInterface
+    - Oro\Bundle\SoapBundle\ServiceDefinition\Loader\SoapAclFieldFilter
+    - Oro\Bundle\SoapBundle\Type\KeyValue\StringType
+    - Oro\Bundle\AddressBundle\Tests\Functional\API\SoapAddressTypeApiTest
+    - Oro\Bundle\AddressBundle\Tests\Functional\API\SoapApiTest
+    - Oro\Bundle\DataAuditBundle\Tests\Functional\API\SoapDataAuditApiTest
+    - Oro\Bundle\DataAuditBundle\Tests\Functional\Controller\Api\Soap\AuditControllerTest
+    - Oro\Bundle\OrganizationBundle\Tests\Functional\API\SoapApiTest
+    - Oro\Bundle\SearchBundle\Tests\Functional\Controller\Api\SoapAdvancedSearchApiTest
+    - Oro\Bundle\SearchBundle\Tests\Functional\Controller\Api\SoapSearchApiTest
+    - Oro\Bundle\SearchBundle\Tests\Functional\Controller\Api\SoapSearchApiTest
+    - Oro\Bundle\UserBundle\Tests\Functional\API\SoapApiAclTest
+    - Oro\Bundle\UserBundle\Tests\Functional\API\SoapGroupsTest
+    - Oro\Bundle\UserBundle\Tests\Functional\API\SoapInvalidUsersTest
+    - Oro\Bundle\UserBundle\Tests\Functional\API\SoapRolesTest
+    - Oro\Bundle\UserBundle\Tests\Functional\API\SoapUsersACLTest
+    - Oro\Bundle\UserBundle\Tests\Functional\API\SoapUsersTest
+    - Oro\Bundle\DataAuditBundle\Tests\Unit\Entity\AuditDataTest
 
 ####Action Component
 - Deprecated constant `Oro\Component\Action\Event\ExecuteActionEvents::DEPRECATED_HANDLE_BEFORE` removed. Use `Oro\Component\Action\Event\ExecuteActionEvents::HANDLE_BEFORE` instead.
@@ -51,18 +122,29 @@ Please use `Oro\Bundle\ActionBundle\Provider\CurrentApplicationProvider` and `Or
 - Changes in `Oro\Bundle\ActionBundle\Layout\DataProvider`:
     - type of first argument of `__construct()` changed to `Oro\Bundle\ActionBundle\Provider\CurrentApplicationProviderInterface`
     - implemented method `getPageRoute()`
-- Added `Oro\Bundle\ActionBundle\Model\ButtonSearchContext`, that wrap parameters needed for searching of a buttons
+- Added `Oro\Bundle\ActionBundle\Button\ButtonSearchContext`, that wrap parameters needed for searching of a buttons
 - Added `Oro\Bundle\ActionBundle\Provider\ButtonSearchContextProvider` for providing ButtonSearchContext by array context
-- Added `Oro\Bundle\ActionBundle\Model\ButtonInterface`, that declare methods for rendering of a button, `getOrder()`, `getTemplate()`, `getTemplateData()`, `getButtonContext()` and `getGroup()`
-- Added `Oro\Bundle\ActionBundle\Model\ButtonContext`, that should be used to provide required context data to `ButtonInterface`
-- Added `Oro\Bundle\ActionBundle\Model\ButtonProviderExtensionInterface`, that declare method `find()` for collect buttons from extensions
+- Added `Oro\Bundle\ActionBundle\Button\ButtonInterface`, that declare methods for rendering of a button, `getOrder()`, `getTemplate()`, `getTemplateData()`, `getButtonContext()` and `getGroup()`, `getName()`, `getLabel()`, `getIcon()`, `getTranslationDomain()`
+- Added `Oro\Bundle\ActionBundle\Button\ButtonContext`, that should be used to provide required context data to `ButtonInterface`
+- Added `Oro\Bundle\ActionBundle\Button\ButtonProviderExtensionInterface`, that declare method `find()` for collect buttons from extensions
+- Added `Oro\Bundle\ActionBundle\Button\ButtonsCollection` to handle relation between button (ButtonInterface) and its extension (ButtonProviderExtensionInterface), so it can be used in its `map` or `filter` methods as arguments.
+    the collection can be used to keep matched buttons under single structure fot further reuse
+    - method `filter():ButtonsCollection`filter to a new collection instance by provided filter callback  
+    - method `map():ButtonsCollection` to a new collection instance through provided map callback
+    - method `toList():ButtonInterface[]` gets ordered array of buttons by (ButtonInterface::getOrder()) 
+    - method `toArray():ButtonInterface[]` gets all buttons that handle the collection
+    - can be iterated (implements `\IteratorAggregate`) through `\ArrayIterator` of `toList()` result.
+    - implements `\Countable`
 - Added `Oro\Bundle\ActionBundle\Provider\ButtonProvider` for providing buttons from extensions
-    - methods `findAll()` and `hasButtons()` 
+    methods:
+    - `findAll(ButtonSearchContext):ButtonInterface[]` - search by context through provider, sets ButtonContext enabled flag by availability
+    - `findAvailable(ButtonSearchContext):ButtonInterface` - only available buttons
+    - `match(ButtonSearchContext):ButtonsCollection` - returns instance that contains matched buttons and its corresponded button extension
+    - `hasButtons(ButtonSearchContext):bool` - any matched button met
     - registered as service `oro_action.provider.button`
 - Added `Oro\Bundle\ActionBundle\DependencyInjection\CompilerPass\ButtonProviderPass`, that collect button providers by tag `oro.action.extension.button_provider` and inject it to `oro_action.provider.button`
 - Added `Oro\Bundle\ActionBundle\Model\OperationButton`, that implements `ButtonInterface` and specific logic for operation buttons
 - Added `Oro\Bundle\ActionBundle\Extension\OperationButtonProviderExtension`, that provide operation buttons
-    - implemented `find()` method
     - registered by tag `oro.action.extension.button_provider`
 - Changed `Oro\Bundle\ActionBundle\Controller\WidgetController::buttonsAction`, now it use `oro_action.provider.button` and `oro_action.provider.button_search_context` to provide buttons
 - Added `Oro\Bundle\ActionBundle\Layout\DataProvider\LayoutButtonProvider`, that provide buttons for layouts
@@ -78,6 +160,7 @@ Please use `Oro\Bundle\ActionBundle\Provider\CurrentApplicationProvider` and `Or
 - Renamed js component `oroaction/js/app/components/buttons-component` to `oroaction/js/app/components/button-component` (from plural to single)
 - Added tag `oro_action.operation_registry.filter` to be able to register custom final filters for `Oro\Bundle\ActionBundle\Model\OperationRegistry::find` result. Custom filter must implement `Oro\Bundle\ActionBundle\Model\OperationRegistryFilterInterface`
 - Changed signature for `Oro\Bundle\ActionBundle\Model\OperationRegistry::find` it now accepts only one argument `Oro\Bundle\ActionBundle\Model\Criteria\OperationFindCriteria`.
+- Class `Oro\Bundle\ActionBundle\Datagrid\EventListener\OperationListener` renamed to `Oro\Bundle\ActionBundle\Datagrid\EventListener\ButtonListener` to support all buttons from `ButtonProvider`
 - Changed constructor dependencies on `\Oro\Bundle\ActionBundle\Datagrid\Extension\DeleteMassActionExtension`
  - third argument `Oro\Bundle\ActionBundle\Model\OperationManager` replaced with `Oro\Bundle\ActionBundle\Model\OperationRegistry` and additional `Oro\Bundle\ActionBundle\Helper\ContextHelper` as fourth argument.
 - Class `Oro\Bundle\ActionBundle\Form\Type\OperationType` first constructor argument (OperationManager) removed.
@@ -85,7 +168,7 @@ Please use `Oro\Bundle\ActionBundle\Provider\CurrentApplicationProvider` and `Or
  - `Oro\Bundle\ActionBundle\Model\OperationRegistry` (`@oro_action.operation_registry`) to retrieve an Operation directly
  - `Oro\Bundle\ActionBundle\Extension\OperationButtonProviderExtension` (`@oro_action.provider.button.extension.operation`) for OperationButtons
  - `Oro\Bundle\ActionBundle\Provider\ButtonProvider` (`@oro_action.provider.button`) - to operate all buttons
-
+ 
 ####ApiBundle
 - The `oro.api.action_processor` DI tag was removed. To add a new action processor, use `oro_api.actions` section of the ApiBundle configuration.
 - The `oro_api.config_extension` DI tag was removed. To add a new configuration extension, use `oro_api.config_extensions` section of the ApiBundle configuration.
@@ -292,15 +375,16 @@ To migrate all labels from configuration translatable fields automatically you c
     - added constants `NODE_INIT_ENTITIES`, `NODE_INIT_ROUTES`, `NODE_INIT_CONTEXT_ATTRIBUTE`, `DEFAULT_INIT_CONTEXT_ATTRIBUTE`
     - added nodes for constants `NODE_INIT_ENTITIES`, `NODE_INIT_ROUTES`, `NODE_INIT_CONTEXT_ATTRIBUTE` into `transitions`
 - Changes in `Oro\Bundle\WorkflowBundle\Configuration\WorkflowDefinitionConfigurationBuilder`:
-    - added processing of a init context from all transitions (`NODE_INIT_ENTITIES`, `NODE_INIT_ROUTES`, `NODE_INIT_CONTEXT_ATTRIBUTE`)
-    - added nodes `NODE_INIT_ENTITIES`, `NODE_INIT_ROUTES`, `NODE_INIT_CONTEXT_ATTRIBUTE` into white list of a transition configuration filter
+    - added processing of a init context from all transitions (`NODE_INIT_ENTITIES`, `NODE_INIT_ROUTES`, `NODE_INIT_CONTEXT_ATTRIBUTE`, `NODE_INIT_DATAGRIDS`)
+    - added nodes `NODE_INIT_ENTITIES`, `NODE_INIT_ROUTES`, `NODE_INIT_CONTEXT_ATTRIBUTE`, `NODE_INIT_DATAGRIDS` into white list of a transition configuration filter
 - Changed `Oro\Bundle\WorkflowBundle\Controller\Api\Rest\WorkflowController::startAction`, now it use transition init options and `oro_action.provider.button_search_context`
 - Changed `Oro\Bundle\WorkflowBundle\Controller\WidgetController::startTransitionFormAction`, now it use transition init options and `oro_action.provider.button_search_context`
 - Changed `Oro\Bundle\WorkflowBundle\Controller\WorkflowController::startTransitionAction`, now it use transition init options
 - Added method `findActive()` to `Oro\Bundle\WorkflowBundle\Entity\Repository\WorkflowDefinitionRepository`
-- Added `Oro\Bundle\WorkflowBundle\Extension\TransitionButtonProviderExtension`, that provide transition buttons
-    - implemented `find()` method
-    - registered by tag `oro.action.extension.button_provider`
+- Added `Oro\Bundle\WorkflowBundle\Extension\TransitionButtonProviderExtension` as `Oro\Bundle\ActionBundle\Extension\ButtonProviderExtensionInterface`, that provide transition buttons
+- Added `Oro\Bundle\WorkflowBundle\Extension\StartTransitionButtonProviderExtension` as `Oro\Bundle\ActionBundle\Extension\ButtonProviderExtensionInterface`, that provide start transition buttons
+- Added `Oro\Bundle\WorkflowBundle\Button\TransitionButton`
+- Added `Oro\Bundle\WorkflowBundle\Button\StartTransitionButton` 
 - Changed `Oro\Bundle\WorkflowBundle\Model\AttributeAssembler::assemble`, now it processing WorkflowConfiguration::NODE_INIT_CONTEXT_ATTRIBUTE
 - Changed `Oro\Bundle\WorkflowBundle\Model\Transition`, added properties $initEntities, $initRoutes, $initContextAttribute and getters/setters for it
 - Changed `Oro\Bundle\WorkflowBundle\Model\TransitionAssembler::assembleTransition`, now it process NODE_INIT_ENTITIES, NODE_INIT_ROUTES, NODE_INIT_CONTEXT_ATTRIBUTE
@@ -311,7 +395,7 @@ To migrate all labels from configuration translatable fields automatically you c
 - Added class `Oro\Bundle\WorkflowBundle\Filter\WorkflowOperationFilter` and registered as an additional (tag: `oro_action.operation_registry.filter`) filter for OperationRegistry.
 - Added class `Oro\Bundle\WorkflowBundle\Form\Handler\TransitionFormHandler`
 - Added class `Oro\Bundle\WorkflowBundle\Provider\TransitionDataProvider`
-- Added class `Oro\Bundle\WorkflowBundle\Provider\WorkflowDataProvider`
+- Added class `Oro\Bundle\WorkflowBundle\Provider\WorkflowDataProvider`  
 
 ####LocaleBundle:
 - Added helper `Oro\Bundle\LocaleBundle\Helper\LocalizationQueryTrait` for adding necessary joins to QueryBuilder
@@ -476,6 +560,8 @@ To migrate all labels from configuration translatable fields automatically you c
     - construction signature was changed now it takes new argument:
         `MessageProducerInterface` $producer
 - Added helper `Oro\Bundle\DataGridBundle\Tools\DatagridRouteHelper`
+- Class `Oro\Bundle\DataGridBundle\Extension\Action\Actions\AbstractAction\ActionWidgetAction` renamed to `Oro\Bundle\DataGridBundle\Extension\Action\Actions\AbstractAction\ActionWidgetAction\ButtonWidgetAction`
+
 
 ####SecurityBundle
 - Removed layout context configurator `Oro\Bundle\SecurityBundle\Layout\Extension\SecurityFacadeContextConfigurator`.
@@ -598,6 +684,7 @@ tag if it works with extend classes
 ####TestFrameworkBundle:
 - Behat elements now loads from `Resources/config/oro/behat.yml` file instead of `Resources/config/behat_elements.yml`.
 - `Oro\Bundle\TestFrameworkBundle\Test\Client::requestGrid` accepts route to test grid as optional last argument. Request pushed to `@request_stack` for proper request emulation
+- Added `Oro\Bundle\TestFrameworkBundle\Test\Stub\CallableStub` to be able to easily mock callbacks.
 
 ####ChartBundle:
 - Charts configurations now loads from `Resources/config/oro/charts.yml` file instead of `Resources/config/oro/chart.yml`.
@@ -724,20 +811,15 @@ placeholders:
     * `oro_navigation_elements` to `navigation_elements`
 - All configuration nodes in `Resources/config/oro/navigation.yml` were renamed to snake case
 - Added class `Oro\Bundle\NavigationBundle\Builder\MenuUpdateBuilder` that implements `Oro\Bundle\NavigationBundle\Menu\BuilderInterface`.
-- Added class `Oro\Bundle\NavigationBundle\DependencyInjection\Compiler\MenuUpdateProviderPass`.
-- Added `tree.$.areas`, `tree.$.max_nesting_level`, `tree.$.read_only` and `items.$.read_only` nodes to `Oro\Bundle\NavigationBundle\DependencyInjection\Configuration`.
+- Added `tree.$.scope_type`, `tree.$.max_nesting_level`, `tree.$.read_only` and `items.$.read_only` nodes to `Oro\Bundle\NavigationBundle\DependencyInjection\Configuration`.
 - Added interface `Oro\Bundle\NavigationBundle\Entity\MenuUpdateInterface`.
 - Added trait `Oro\Bundle\NavigationBundle\Entity\MenuUpdateTrait`.
 - Added entity `Oro\Bundle\NavigationBundle\Entity\MenuUpdate` that extends `Oro\Bundle\NavigationBundle\Model\ExtendMenuUpdate` and implements `Oro\Bundle\NavigationBundle\Entity\MenuUpdateInterface`.
 - Added new exceptions:
     * `Oro\Bundle\NavigationBundle\Exception\MaxNestingLevelExceededException`
     * `Oro\Bundle\NavigationBundle\Exception\NotFoundParentException`
-- Added interface `Oro\Bundle\NavigationBundle\Menu\Provider\OwnershipProviderInterface`.
-- Added class `Oro\Bundle\NavigationBundle\Menu\Provider\AbstractOwnershipProvider` that implements `Oro\Bundle\NavigationBundle\Menu\Provider\OwnershipProviderInterface`.
-- Added class `Oro\Bundle\NavigationBundle\Menu\Provider\GlobalOwnershipProvider` with service `oro_commerce_menu.ownership_provider.global`.
-- Added class `Oro\Bundle\NavigationBundle\Menu\Provider\UserOwnershipProvider` with service `oro_navigation.ownership_provider.user`.
 - Added class `Oro\Bundle\NavigationBundle\JsTree\MenuUpdateTreeHandler` that provides menu tree data in format used by `jstree`.
-- Added class `Oro\Bundle\NavigationBundle\Manager\MenuUpdateManager` with service `oro_navigation.manager.menu_update_default`.
+- Added class `Oro\Bundle\NavigationBundle\Manager\MenuUpdateManager` with service `oro_navigation.manager.menu_update`.
 - Added class `Oro\Bundle\NavigationBundle\Utils\MenuUpdateUtils`.
 - Moved class `Oro\Bundle\NavigationBundle\Menu\FeatureAwareMenuFactoryExtension` to `Oro\Bundle\FeatureToggleBundle\Menu\FeatureAwareMenuFactoryExtension`.
 - Moved class `Oro\Bundle\NavigationBundle\Event\DoctrineTagEventListener` to `Oro\Bundle\SyncBundle\Event\DoctrineTagEventListener`.
@@ -761,7 +843,10 @@ placeholders:
         - `MenuManipulator` $manipulator
 - Added new command `oro:navigation:menu:reset` that removes changes in menus for different scopes.
 - Removed class `Oro\Bundle\NavigationBundle\Title\StoredTitle`.
-- Changed signature of constructor of `Oro\Bundle\NavigationBundle\Provider\TitleService`. Parameter `Serializer $serializer` was removed. 
+- Changed signature of constructor of `Oro\Bundle\NavigationBundle\Provider\TitleService`. Parameter `Serializer $serializer` was removed.
+- Added new datagrid data source `Oro\Bundle\NavigationBundle\Datagrid\MenuUpdateDatasource`.
+- Added new entity repository `Oro\Bundle\NavigationBundle\Entity\Repository\MenuUpdateRepository`.
+
 
 ####EmailBundle
 - Constructor of `Oro\Bundle\EmailBundle\Form\DataTransformer\EmailTemplateTransformer` was changed. Removed the arguments.
@@ -963,6 +1048,8 @@ to the [Fallback documentation](./src/Oro/Bundle/EntityBundle/Resources/doc/enti
 ####ImapBundle
 - The command `oro:imap:clear-mailbox` was removed. Produce message to the topic `oro.imap.clear_inactive_mailbox` instead.
 - Removed action `@job_add_dependency`
+- Changed property name from `$possibleSentFolderNameMap` to `$knownFolderNameMap` in `Oro\Bundle\ImapBundle\Mail\Storage\Folder` 
+- Changed method name from `guessSentTypeByName` to `guessFolderTypeByName` in `Oro\Bundle\ImapBundle\Mail\Storage\Folder` 
 
 ####OroInstallerBundle
 - Added interface `Oro\Bundle\InstallerBundle\CacheWarmer\NamespaceMigrationProviderInterface`. it makes available add the rules for command "oro:platform:upgrade20"
