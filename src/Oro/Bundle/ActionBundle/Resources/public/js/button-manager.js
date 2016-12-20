@@ -123,8 +123,6 @@ define(function(require) {
          * @param {jQuery.Event} e
          */
         doResponse: function(response, e) {
-            mediator.execute('hideLoading');
-
             if (response.flashMessages) {
                 _.each(response.flashMessages, function(messages, type) {
                     _.each(messages, function(message) {
@@ -134,6 +132,7 @@ define(function(require) {
             }
 
             if (!response.success) {
+                mediator.execute('hideLoading');
                 var messages = response.messages || {};
 
                 if (_.isEmpty(messages)) {
@@ -151,6 +150,7 @@ define(function(require) {
                 }
                 this.doRedirect(response.redirectUrl);
             } else if (response.refreshGrid) {
+                mediator.execute('hideLoading');
                 _.each(response.refreshGrid, function(gridname) {
                     mediator.trigger('datagrid:doRefresh:' + gridname);
                 });

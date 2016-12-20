@@ -11,7 +11,8 @@ define(function(require) {
         className: 'action-permissions__item dropdown',
         template: require('tpl!orouser/templates/datagrid/permission/permission-view.html'),
         events: {
-            'shown.bs.dropdown': 'onDropdownOpen'
+            'shown.bs.dropdown': 'onDropdownOpen',
+            'hide.bs.dropdown': 'onDropdownClose'
         },
         listen: {
             'change:access_level model': 'render'
@@ -48,6 +49,9 @@ define(function(require) {
                     keysMap: {
                         id: 'access_level',
                         text: 'access_level_label'
+                    },
+                    dropdownMenuOptions: {
+                        flipMode: true
                     }
                 });
                 this.listenTo(dropdown, 'selected', this.onAccessLevelSelect);
@@ -65,6 +69,11 @@ define(function(require) {
                     }
                 });
             }
+            this.$('.action-permissions__item-wrapper').addClass('active');
+        },
+
+        onDropdownClose: function(e) {
+            this.$('.action-permissions__item-wrapper').removeClass('active');
         },
 
         onAccessLevelSelect: function(patch) {

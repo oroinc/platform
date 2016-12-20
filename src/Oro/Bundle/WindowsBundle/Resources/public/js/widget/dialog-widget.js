@@ -6,7 +6,6 @@ define(function(require) {
     var _ = require('underscore');
     var __ = require('orotranslation/js/translator');
     var tools = require('oroui/js/tools');
-    var error = require('oroui/js/error');
     var messenger = require('oroui/js/messenger');
     var mediator = require('oroui/js/mediator');
     var layout = require('oroui/js/layout');
@@ -145,12 +144,10 @@ define(function(require) {
             dialogManager.remove(this);
             if (this.model && !this.options.preventModelRemoval) {
                 this.model.destroy({
-                    error: _.bind(function(model, xhr) {
+                    errorOutput: function(event, xhr) {
                         // Suppress error if it's 404 response and not debug mode
-                        if (xhr.status !== 404 || tools.debug) {
-                            error.handle({}, xhr, {enforce: true});
-                        }
-                    }, this)
+                        return xhr.status !== 404 || tools.debug;
+                    }
                 });
             }
             this._hideLoading();
