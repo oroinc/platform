@@ -2,16 +2,12 @@
 
 namespace Oro\Component\Testing\Unit;
 
+use Oro\Component\Testing\Unit\PropertyAccess\PropertyAccessTrait;
 use Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException;
-use Symfony\Component\PropertyAccess\PropertyAccess;
-use Symfony\Component\PropertyAccess\PropertyAccessor;
 
 trait EntityTrait
 {
-    /**
-     * @var PropertyAccessor
-     */
-    private $propertyAccessor;
+    use PropertyAccessTrait;
 
     /**
      * @param string $className
@@ -65,22 +61,10 @@ trait EntityTrait
     }
 
     /**
-     * @return PropertyAccessor
-     */
-    public function getPropertyAccessor()
-    {
-        if (!$this->propertyAccessor) {
-            $this->propertyAccessor = PropertyAccess::createPropertyAccessor();
-        }
-
-        return $this->propertyAccessor;
-    }
-
-    /**
      * @param array $data
      * @return array|object
      */
-    public function convertArrayToEntities(array $data)
+    protected function convertArrayToEntities(array $data)
     {
         foreach ($data as $key => $value) {
             if (is_array($value)) {

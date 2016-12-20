@@ -40,8 +40,10 @@ html{
 
 // big screen, cells: inline, blocks: wrapped
 .responsive-section.responsive-big {
-  .responsive-block {
-    .responsive-block-position();
+  .responsive-cell:not(:only-child) {
+    .responsive-block {
+      .responsive-block-position();
+    }
   }
 }
 

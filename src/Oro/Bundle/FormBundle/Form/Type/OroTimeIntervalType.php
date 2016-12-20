@@ -15,7 +15,7 @@ class OroTimeIntervalType extends AbstractType
     const NAME = 'oro_time_interval';
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function getName()
     {
@@ -31,7 +31,7 @@ class OroTimeIntervalType extends AbstractType
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function getParent()
     {
@@ -43,14 +43,12 @@ class OroTimeIntervalType extends AbstractType
      */
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
-        $resolver->setDefaults(
-            array(
-                'widget'         => 'single_text',
-                'with_seconds'   => true,
-                'model_timezone' => 'UTC',
-                'view_timezone'  => 'UTC',
-            )
-        );
+        $resolver->setDefaults([
+            'widget'         => 'single_text',
+            'with_seconds'   => true,
+            'model_timezone' => 'UTC',
+            'view_timezone'  => 'UTC',
+        ]);
     }
 
     /**

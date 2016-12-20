@@ -116,6 +116,7 @@ class UpdateHandler
      * @param string $saveMessage Message added to session flash bag in case if form will be saved successfully
      *               and if form is not submitted from widget.
      * @param null|callable $formHandler Callback to handle form, by default method saveForm used.
+     * @param callable|null $resultCallback
      * @return array|RedirectResponse Returns an array
      *                                  if form wasn't successfully submitted
      *                                  or when request method is not PUT and POST,
@@ -128,12 +129,13 @@ class UpdateHandler
         $data,
         FormInterface $form,
         $saveMessage,
-        $formHandler = null
+        $formHandler = null,
+        $resultCallback = null
     ) {
         if ($formHandler) {
             if (is_object($formHandler) && method_exists($formHandler, 'process')) {
                 if ($formHandler->process($data)) {
-                    return $this->constructResponse($form, $data, $saveMessage);
+                    return $this->constructResponse($form, $data, $saveMessage, $resultCallback);
                 }
             } else {
                 throw new \InvalidArgumentException(
@@ -144,10 +146,10 @@ class UpdateHandler
                 );
             }
         } elseif ($this->saveForm($form, $data)) {
-            return $this->constructResponse($form, $data, $saveMessage);
+            return $this->constructResponse($form, $data, $saveMessage, $resultCallback);
         }
 
-        return $this->getResult($data, $form);
+        return $this->getResult($data, $form, $resultCallback);
     }
 
     /**
