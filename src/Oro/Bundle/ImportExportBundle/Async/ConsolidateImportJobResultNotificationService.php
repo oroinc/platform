@@ -8,6 +8,13 @@ use Symfony\Component\Translation\TranslatorInterface;
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\MessageQueueBundle\Entity\Job;
 
+/**
+ * Class ConsolidateImportJobResultNotificationService
+ * @package Oro\Bundle\ImportExportBundle\Async
+ * @SuppressWarnings(PHPMD.NPathComplexity)
+ * @SuppressWarnings(PHPMD.CyclomaticComplexity)
+ */
+
 class ConsolidateImportJobResultNotificationService
 {
     /**

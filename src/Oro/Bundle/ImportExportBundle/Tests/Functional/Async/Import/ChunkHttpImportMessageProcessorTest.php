@@ -6,6 +6,7 @@ use Oro\Bundle\ImportExportBundle\Async\Import\AbstractChunkImportMessageProcess
 use Oro\Bundle\ImportExportBundle\Async\Import\ChunkHttpImportMessageProcessor;
 use Oro\Bundle\ImportExportBundle\Handler\HttpImportHandler;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
+use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
 use Oro\Component\MessageQueue\Transport\Null\NullMessage;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
@@ -78,6 +79,10 @@ class ChunkHttpImportMessageProcessorTest extends WebTestCase
         $processor = $this->getChunkHttpImportMessageProcessor();
         $result = $processor->process($message, $this->createSessionMock());
         $this->assertEquals(MessageProcessorInterface::ACK, $result);
+        $childJob = $this->getJobProcessor()->findOrCreateChildJob(
+            'oro:import:http:oro_test.add_or_replace:test_import_message:chunk.1',
+            $rootJob
+        );
         $this->assertCount(3, $childJob->getData());
     }
 

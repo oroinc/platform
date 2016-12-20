@@ -26,6 +26,7 @@ use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInt
  * Collection::removeElement - in case of "fetch extra lazy" does not schedule anything
  * "Doctrine will only check the owning side of an association for changes."
  * http://doctrine-orm.readthedocs.io/projects/doctrine-orm/en/latest/reference/unitofwork-associations.html
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
 class SendChangedEntitiesToMessageQueueListener implements OptionalListenerInterface
 {
@@ -122,6 +123,33 @@ class SendChangedEntitiesToMessageQueueListener implements OptionalListenerInter
         $this->findAuditableCollectionUpdates($em);
     }
 
+    private function emHasChanges($em)
+    {
+        return
+            $this->hasChanges($this->allInsertions, $em) ||
+            $this->hasChanges($this->allUpdates, $em) ||
+            $this->hasChanges($this->allDeletions, $em) ||
+            $this->hasChanges($this->allCollectionUpdates, $em);
+    }
+
+    private function processMessageBody($em, &$body)
+    {
+        $body['entities_inserted'] = $this->processInsertions($em);
+        $body['entities_updated'] = $this->processUpdates($em);
+        $body['entities_deleted'] = $this->processDeletions($em);
+        $body['collections_updated'] = $this->processCollectionUpdates($em);
+
+        if (empty($body['entities_inserted']) &&
+            empty($body['entities_updated']) &&
+            empty($body['entities_deleted']) &&
+            empty($body['collections_updated'])
+        ) {
+            $body = [];
+        }
+
+        return $body;
+    }
+
     /**
      * @param PostFlushEventArgs $eventArgs
      */
@@ -133,11 +161,7 @@ class SendChangedEntitiesToMessageQueueListener implements OptionalListenerInter
 
         $em = $eventArgs->getEntityManager();
 
-        if (!$this->hasChanges($this->allInsertions, $em)
-            && !$this->hasChanges($this->allUpdates, $em)
-            && !$this->hasChanges($this->allDeletions, $em)
-            && !$this->hasChanges($this->allCollectionUpdates, $em)
-        ) {
+        if (!$this->emHasChanges($em)) {
             return;
         }
 
@@ -166,16 +190,7 @@ class SendChangedEntitiesToMessageQueueListener implements OptionalListenerInter
                     $body['impersonation_id'] = $securityToken->getAttribute('IMPERSONATION');
                 }
             }
-
-            $body['entities_inserted'] = $this->processInsertions($em);
-            $body['entities_updated'] = $this->processUpdates($em);
-            $body['entities_deleted'] = $this->processDeletions($em);
-            $body['collections_updated'] = $this->processCollectionUpdates($em);
-            if (empty($body['entities_inserted']) &&
-                empty($body['entities_updated']) &&
-                empty($body['entities_deleted']) &&
-                empty($body['collections_updated'])
-            ) {
+            if (empty($body = $this->processMessageBody($em, $body))) {
                 return;
             }
 
@@ -207,7 +222,7 @@ class SendChangedEntitiesToMessageQueueListener implements OptionalListenerInter
             $insertions[$entity] = $uow->getEntityChangeSet($entity);
         }
 
-// it made for issue with ImportExportTagsSubscriber::postFlush (in this method run flush)
+        /** it made for issue with ImportExportTagsSubscriber::postFlush (in this method run flush) */
         if (! $this->allInsertions->contains($em)) {
             $this->allInsertions[$em] = $insertions;
         } else {

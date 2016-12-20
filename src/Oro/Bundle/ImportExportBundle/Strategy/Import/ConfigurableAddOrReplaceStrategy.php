@@ -12,6 +12,11 @@ use Oro\Bundle\EntityBundle\Provider\ChainEntityClassNameProvider;
 use Oro\Bundle\EntityBundle\Helper\FieldHelper;
 use Oro\Bundle\ImportExportBundle\Field\DatabaseHelper;
 
+/**
+ * Class ConfigurableAddOrReplaceStrategy
+ * @package Oro\Bundle\ImportExportBundle\Strategy\Import
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
+ */
 class ConfigurableAddOrReplaceStrategy extends AbstractImportStrategy
 {
     const STRATEGY_CONTEXT = 'configurable_add_or_replace_strategy';

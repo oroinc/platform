@@ -136,26 +136,21 @@ class SendImportNotificationMessageProcessorTest extends \PHPUnit_Framework_Test
     {
         $job = new Job();
         $job->setId(1);
-
         $user = new User();
         $user->setId(1);
         $user->setFirstName('John');
         $user->setEmail('user@email.com');
-
         $logger = $this->createLoggerInterfaceMock();
         $logger
             ->expects($this->once())
             ->method('info')
-            ->with('Sent notification message.')
-        ;
+            ->with('Sent notification message.');
         $logger
             ->expects($this->any())
-            ->method('error')
-        ;
+            ->method('error');
         $logger
             ->expects($this->any())
-            ->method('critical')
-        ;
+            ->method('critical');
 
         $userRepo = $this->createUserRepositoryMock();
         $userRepo
@@ -163,54 +158,41 @@ class SendImportNotificationMessageProcessorTest extends \PHPUnit_Framework_Test
             ->method('find')
             ->with(1)
             ->willReturn($user);
-        ;
-
         $doctrine = $this->createDoctrineMock();
         $doctrine
             ->expects($this->once())
             ->method('getRepository')
             ->with(User::class)
-            ->will($this->returnValue($userRepo))
-        ;
-
+            ->will($this->returnValue($userRepo));
         $jobStorage = $this->createJobStorageMock();
         $jobStorage
             ->expects($this->once())
             ->method('findJobById')
             ->with(1)
-            ->willReturn($job)
-        ;
-
+            ->willReturn($job);
         $consolidateImportJobResultNotification = $this->createConsolidateImportJobResultNotificationServiceMock();
            $consolidateImportJobResultNotification
             ->expects($this->once())
             ->method('getImportSummary')
             ->with($job, 'import.csv')
-            ->willReturn('summary import information')
-            ;
-
+            ->willReturn('summary import information');
         $translator = $this->createTranslatorInterfaceMock();
         $translator
             ->expects($this->once())
             ->method('trans')
             ->with('oro.importexport.import.async_import', ['%origin_file_name%' => 'import.csv'])
-            ->willReturn('Subject of import email')
-        ;
-
+            ->willReturn('Subject of import email');
         $configManager = $this->createConfigManagerMock();
         $configManager
             ->expects($this->at(0))
             ->method('get')
             ->with('oro_notification.email_notification_sender_email')
-            ->willReturn('test@mail.com')
-            ;
+            ->willReturn('test@mail.com');
         $configManager
             ->expects($this->at(1))
             ->method('get')
             ->with('oro_notification.email_notification_sender_name')
-            ->willReturn('John')
-            ;
-
+            ->willReturn('John');
         $producer = $this->createMessageProducerInterfaceMock();
         $producer
             ->expects($this->once())
@@ -224,9 +206,7 @@ class SendImportNotificationMessageProcessorTest extends \PHPUnit_Framework_Test
                     'subject' => 'Subject of import email',
                     'body' => 'summary import information'
                 ]
-            )
-        ;
-
+            );
         $processor = new SendImportNotificationMessageProcessor(
             $producer,
             $logger,
@@ -236,7 +216,6 @@ class SendImportNotificationMessageProcessorTest extends \PHPUnit_Framework_Test
             $translator,
             $doctrine
         );
-
         $message = $this->createMessageMock();
         $message
             ->expects($this->once())
@@ -247,8 +226,7 @@ class SendImportNotificationMessageProcessorTest extends \PHPUnit_Framework_Test
                         'originFileName' => 'import.csv',
                         'userId' => 1,
                         'subscribedTopic' => [Topics::IMPORT_HTTP_PREPARING,]
-                    ]))
-        ;
+                    ]));
         $result = $processor->process($message, $this->createSessionMock());
         $this->assertEquals(MessageProcessorInterface::ACK, $result);
     }

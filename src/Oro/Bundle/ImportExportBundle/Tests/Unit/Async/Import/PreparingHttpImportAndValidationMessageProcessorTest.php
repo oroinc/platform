@@ -25,6 +25,10 @@ use Oro\Component\MessageQueue\Job\DependentJobService;
 use Oro\Component\MessageQueue\Job\Job;
 use Oro\Component\MessageQueue\Job\JobRunner;
 
+/**
+ * Class PreparingHttpImportMessageProcessorTest
+ * @package Oro\Bundle\ImportExportBundle\Tests\Unit\Async\Import
+ */
 class PreparingHttpImportMessageProcessorTest extends \PHPUnit_Framework_TestCase
 {
     public function testImportProcessCanBeConstructedWithRequiredAttributes()
@@ -135,12 +139,7 @@ class PreparingHttpImportMessageProcessorTest extends \PHPUnit_Framework_TestCas
 
     public function testShouldRunRunUniqueAndACKMessage()
     {
-        $user = new User();
-        $user->setId(1);
-        $user->setFirstName('John');
-        $organization = new Organization();
-        $organization->setId(1);
-        $user->setOrganization($organization);
+        $user = $this->getUser();
 
         $userRepo = $this->createUserRepositoryMock();
         $userRepo
@@ -199,6 +198,9 @@ class PreparingHttpImportMessageProcessorTest extends \PHPUnit_Framework_TestCas
         $this->assertEquals(MessageProcessorInterface::ACK, $result);
     }
 
+    /**
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
+     */
     public function testShouldProcessPreparingMessageAndSendImportAndNotificationMessagesAndACKMessage()
     {
         $messageData = [
@@ -210,23 +212,11 @@ class PreparingHttpImportMessageProcessorTest extends \PHPUnit_Framework_TestCas
             'processorAlias' => 'processor_test',
             'options' => [],
         ];
-        $job = new Job();
-        $job->setId(1);
-        $childJob1 = new Job();
-        $childJob1->setId(2);
-        $childJob1->setRootJob($job);
-        $childJob2 = new Job();
-        $childJob2->setId(3);
-        $childJob2->setRootJob($job);
-        $childJob = new Job();
-        $childJob->setId(10);
-        $childJob->setRootJob($job);
-        $user = new User();
-        $user->setId(1);
-        $user->setFirstName('John');
-        $organization = new Organization();
-        $organization->setId(1);
-        $user->setOrganization($organization);
+        $job = $this->getJob(1);
+        $childJob1 = $this->getJob(2, $job);
+        $childJob2 = $this->getJob(3, $job);
+        $childJob = $this->getJob(10, $job);
+        $user = $this->getUser();
 
         $userRepo = $this->createUserRepositoryMock();
         $userRepo
@@ -234,15 +224,14 @@ class PreparingHttpImportMessageProcessorTest extends \PHPUnit_Framework_TestCas
             ->method('find')
             ->with(1)
             ->willReturn($user);
-        ;
 
         $doctrine = $this->createDoctrineMock();
         $doctrine
             ->expects($this->once())
             ->method('getRepository')
             ->with(User::class)
-            ->will($this->returnValue($userRepo))
-        ;
+            ->will($this->returnValue($userRepo));
+
         $jobRunner = $this->createJobRunnerMock();
         $jobRunner
             ->expects($this->once())
@@ -252,8 +241,8 @@ class PreparingHttpImportMessageProcessorTest extends \PHPUnit_Framework_TestCas
                 $this->returnCallback(function ($jobId, $name, $callback) use ($jobRunner, $childJob) {
                     return $callback($jobRunner, $childJob);
                 })
-            )
-        ;
+            );
+
         $jobRunner
             ->expects($this->at(0))
             ->method('createDelayed')
@@ -263,6 +252,7 @@ class PreparingHttpImportMessageProcessorTest extends \PHPUnit_Framework_TestCas
                     return $callback($jobRunner, $childJob1);
                 })
             );
+
         $jobRunner
             ->expects($this->at(1))
             ->method('createDelayed')
@@ -271,16 +261,15 @@ class PreparingHttpImportMessageProcessorTest extends \PHPUnit_Framework_TestCas
                 $this->returnCallback(function ($jobId, $callback) use ($jobRunner, $childJob2) {
                     return $callback($jobRunner, $childJob2);
                 })
-            )
-        ;
+            );
 
         $csvSplitter = $this->createSplitterCsvFileMock();
         $csvSplitter
             ->expects($this->once())
             ->method('getSplitFiles')
             ->with('test.csv')
-            ->willReturn(['1_test.csv', '2_test.csv'])
-            ;
+            ->willReturn(['1_test.csv', '2_test.csv']);
+
         $messageData1 = $messageData;
         $messageData1['filePath'] = '1_test.csv';
         $messageData1['jobId'] = 2;
@@ -295,28 +284,25 @@ class PreparingHttpImportMessageProcessorTest extends \PHPUnit_Framework_TestCas
             ->withConsecutive(
                 ['oro.importexport.import_http', $messageData1],
                 ['oro.importexport.import_http', $messageData2]
-            )
-        ;
+            );
 
         $dependentContext = $this->createDependentJobContextMock();
         $dependentContext
             ->expects($this->once())
             ->method('addDependentJob')
-            ->with('oro.importexport.send_notification')
-        ;
+            ->with('oro.importexport.send_notification');
 
         $dependentJob = $this->createDependentJobMock();
         $dependentJob
             ->expects($this->once())
             ->method('createDependentJobContext')
             ->with($job)
-            ->willReturn($dependentContext)
-        ;
+            ->willReturn($dependentContext);
+
         $dependentJob
             ->expects($this->once())
             ->method('saveDependentJob')
-            ->with($dependentContext)
-        ;
+            ->with($dependentContext);
 
         $processor = new PreparingHttpImportMessageProcessor(
             $this->createHttpImportHandlerMock(),
@@ -332,9 +318,7 @@ class PreparingHttpImportMessageProcessorTest extends \PHPUnit_Framework_TestCas
         $message
             ->expects($this->once())
             ->method('getBody')
-            ->willReturn(json_encode($messageData))
-        ;
-
+            ->willReturn(json_encode($messageData));
         $message
             ->expects($this->once())
             ->method('getMessageId')
@@ -368,6 +352,29 @@ class PreparingHttpImportMessageProcessorTest extends \PHPUnit_Framework_TestCas
             $expectedSubscribedTopics,
             PreparingHttpImportValidationMessageProcessor::getSubscribedTopics()
         );
+    }
+
+    protected function getJob($id, $rootJob = null)
+    {
+        $job = new Job();
+        $job->setId($id);
+        if ($rootJob instanceof Job) {
+            $job->setRootJob($rootJob);
+        }
+
+        return $job;
+    }
+
+    protected function getUser()
+    {
+        $user = new User();
+        $user->setId(1);
+        $user->setFirstName('John');
+        $organization = new Organization();
+        $organization->setId(1);
+        $user->setOrganization($organization);
+
+        return $user;
     }
 
     /**
