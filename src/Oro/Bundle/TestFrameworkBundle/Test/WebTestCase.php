@@ -792,52 +792,10 @@ abstract class WebTestCase extends BaseWebTestCase
     }
 
     /**
-     * Assert that intersect of $actual with $expected equals $expected
-     *
-     * @param array  $expected
-     * @param array  $actual
-     * @param string $message
-     */
-    public static function assertArrayIntersectEquals(array $expected, array $actual, $message = null)
-    {
-        $actualIntersect = self::getRecursiveArrayIntersect($actual, $expected);
-        \PHPUnit_Framework_TestCase::assertEquals(
-            $expected,
-            $actualIntersect,
-            $message
-        );
-    }
-
-    /**
-     * Get intersect of $target array with values of keys in $source array. If key is an array in both places then
-     * the value of this key will be returned as intersection as well.
-     *
-     * @param array $source
-     * @param array $target
-     * @return array
-     */
-    public static function getRecursiveArrayIntersect(array $target, array $source)
-    {
-        $result = [];
-        foreach (array_keys($source) as $key) {
-            if (array_key_exists($key, $target)) {
-                if (is_array($target[$key]) && is_array($source[$key])) {
-                    $result[$key] = self::getRecursiveArrayIntersect($target[$key], $source[$key]);
-                } else {
-                    $result[$key] = $target[$key];
-                }
-            }
-        }
-
-        return $result;
-    }
-
-    /**
      * Sorts array by key recursively. This method is used to output failures of array response comparison in
      * a more comprehensive way.
      *
      * @param array $array
-     * @return mixed
      */
     protected static function sortArrayByKeyRecursively(array &$array)
     {
