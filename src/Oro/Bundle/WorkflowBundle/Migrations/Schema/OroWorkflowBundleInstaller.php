@@ -205,7 +205,7 @@ class OroWorkflowBundleInstaller implements Installation
         $table->addColumn(
             'applications',
             'simple_array',
-            ['default' => 'default', 'comment' => '(DC2Type:simple_array)']
+            ['comment' => '(DC2Type:simple_array)']
         );
         $table->addIndex(['start_step_id'], 'idx_6f737c368377424f', []);
         $table->setPrimaryKey(['name']);
