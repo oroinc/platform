@@ -463,8 +463,6 @@ define(function(require) {
             }
 
             this.listenTo(this.collection, 'backgrid:sort', this.sort);
-            this.listenTo(this.collection, 'updateState', this.render);
-
             return this;
         },
 
