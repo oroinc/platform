@@ -108,8 +108,9 @@ define(function(require) {
 
         dropdownUpdate: function() {
             var self = this;
-            var dropdownContainerWidth = this.getElement('tabsContainer').width();
-            if (this.dropdownContainerWidth === dropdownContainerWidth) {
+            var $tabsContainer = this.getElement('tabsContainer');
+            var dropdownContainerWidth = $tabsContainer.width();
+            if (!$tabsContainer.is(':visible') || this.dropdownContainerWidth === dropdownContainerWidth) {
                 return;
             }
             this.dropdownContainerWidth = dropdownContainerWidth;

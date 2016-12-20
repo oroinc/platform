@@ -125,6 +125,7 @@ Configuration format is different depending on column type, but there are list o
 - `order` - number of column's position, allows to change columns order over [Column Manager](../frontend/column_manager.md) and save it in [Grid View](./extensions/grid_views.md) (by default is not defined and columns are rendered in order they are declared in configuration)
 - `required` - if it is `true` the column can not be hidden over [Column Manager](../frontend/column_manager.md) (by default is not defined)
 - `manageable` - if it is `true` the column does not appear in [Column Manager](../frontend/column_manager.md) (by default is not defined)
+- `shortenableLabel` - could column label be abbreviated or shortened with ellipsis (`true` - by default)
 
 For detailed explanation [see](./extensions/formatter.md).
 

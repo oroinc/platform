@@ -12,7 +12,6 @@ class SkipTagTrackingPass implements CompilerPassInterface
     /** @var array */
     protected $skippedEntityClasses = [
         'Oro\Bundle\DataAuditBundle\Entity\Audit',
-        'Oro\Bundle\DataAuditBundle\Entity\AuditData',
         'Oro\Bundle\NavigationBundle\Entity\PageState',
         'Oro\Bundle\NavigationBundle\Entity\NavigationHistoryItem',
         'Oro\Bundle\SearchBundle\Entity\Item',

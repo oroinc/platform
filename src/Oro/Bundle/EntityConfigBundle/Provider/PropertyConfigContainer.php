@@ -379,6 +379,33 @@ class PropertyConfigContainer
     }
 
     /**
+     * @param string $type
+     * @return array
+     */
+    public function getRequiredPropertiesValues($type = self::TYPE_ENTITY)
+    {
+        $type = $this->getConfigType($type);
+
+        if (empty($this->config[$type]['items'])) {
+            return [];
+        }
+
+        if (isset($this->cache['required_properties'][$type])) {
+            return $this->cache['required_properties'][$type];
+        }
+
+        $result = [];
+        foreach ($this->config[$type]['items'] as $code => $item) {
+            if (isset($item['options']['required_properties'])) {
+                $result[$code] = $item['options']['required_properties'];
+            }
+        }
+        $this->cache['required_properties'][$type] = $result;
+
+        return $result;
+    }
+
+    /**
      * @param string|ConfigIdInterface $type
      *
      * @return array
