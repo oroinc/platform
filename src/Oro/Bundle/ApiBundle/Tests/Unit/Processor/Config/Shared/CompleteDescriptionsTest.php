@@ -107,7 +107,7 @@ class CompleteDescriptionsTest extends ConfigProcessorTestCase
                 'exclusion_policy'       => 'all',
                 'fields'                 => [
                     'id'     => [
-                        'description' => 'The identifier of an entity'
+                        'description' =>  CompleteDescriptions::ID_DESCRIPTION
                     ],
                     'field1' => null,
                 ]
@@ -170,7 +170,7 @@ class CompleteDescriptionsTest extends ConfigProcessorTestCase
                 'fields'                 => [
                     'id'  => null,
                     'id1' => [
-                        'description' => 'The identifier of an entity'
+                        'description' => CompleteDescriptions::ID_DESCRIPTION
                     ],
                 ]
             ],
@@ -252,7 +252,7 @@ class CompleteDescriptionsTest extends ConfigProcessorTestCase
                 'fields' => [
                     'id'        => null,
                     'createdAt' => [
-                        'description' => 'The date and time of resource record creation'
+                        'description' => CompleteDescriptions::CREATED_AT_DESCRIPTION
                     ]
                 ]
             ],
@@ -308,7 +308,7 @@ class CompleteDescriptionsTest extends ConfigProcessorTestCase
                     'id'        => null,
                     'created'   => null,
                     'updatedAt' => [
-                        'description' => 'The date and time of the last update of the resource record'
+                        'description' => CompleteDescriptions::UPDATED_AT_DESCRIPTION
                     ]
                 ]
             ],
@@ -413,7 +413,7 @@ class CompleteDescriptionsTest extends ConfigProcessorTestCase
                 'exclusion_policy' => 'all',
                 'fields'           => [
                     'owner'        => [
-                        'description' => 'An Owner record represents the ownership capabilities of the record'
+                        'description' => CompleteDescriptions::OWNER_DESCRIPTION
                     ],
                     'organization' => null,
                 ]
@@ -448,8 +448,7 @@ class CompleteDescriptionsTest extends ConfigProcessorTestCase
                 'fields'           => [
                     'owner'        => null,
                     'organization' => [
-                        'description' => 'An Organization record represents a real enterprise, business, firm, '
-                            . 'company or another organization, to which the record belongs'
+                        'description' => CompleteDescriptions::ORGANIZATION_DESCRIPTION
                     ]
                 ]
 
@@ -483,7 +482,7 @@ class CompleteDescriptionsTest extends ConfigProcessorTestCase
                 'fields'           => [
                     'owner2'       => [
                         'property_path' => 'owner1',
-                        'description'   => 'An Owner record represents the ownership capabilities of the record'
+                        'description'   => CompleteDescriptions::OWNER_DESCRIPTION
                     ],
                     'organization' => null,
                 ]
@@ -519,8 +518,7 @@ class CompleteDescriptionsTest extends ConfigProcessorTestCase
                     'owner'         => null,
                     'organization2' => [
                         'property_path' => 'organization1',
-                        'description'   => 'An Organization record represents a real enterprise, business, firm, '
-                            . 'company or another organization, to which the record belongs'
+                        'description'   => CompleteDescriptions::ORGANIZATION_DESCRIPTION
                     ]
                 ]
 

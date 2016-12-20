@@ -36,7 +36,7 @@ abstract class AbstractEntityGeneratorExtension
      *
      * @return PhpMethod
      */
-    protected function generateClassMethod($methodName, $methodBody, $methodArgs = [])
+    protected function generateClassMethod($methodName, $methodBody, array $methodArgs = [])
     {
         $writer = new Writer();
 
@@ -44,10 +44,11 @@ abstract class AbstractEntityGeneratorExtension
             $writer->write($methodBody)->getContent()
         );
 
-        if (count($methodArgs)) {
-            foreach ($methodArgs as $arg) {
-                $method->addParameter(PhpParameter::create($arg));
-            }
+        foreach ($methodArgs as $arg) {
+            $parameter = is_array($arg)
+                ? PhpParameter::create($arg[0])->setDefaultValue($arg[1])
+                : PhpParameter::create($arg);
+            $method->addParameter($parameter);
         }
 
         return $method;

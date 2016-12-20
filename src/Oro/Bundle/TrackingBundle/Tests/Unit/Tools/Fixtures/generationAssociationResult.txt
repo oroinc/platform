@@ -17,6 +17,40 @@ class Entity
     }
 
     /**
+     * Removes the association of the given entity and this entity
+     *
+     * @param object $target Any configurable entity that can be associated with this type of entity
+     * @return object This object
+     */
+    public function removeAssociationTarget($target)
+    {
+        $className = \Doctrine\Common\Util\ClassUtils::getClass($target);
+        if ($className === 'Test\TargetEntity1') {
+            if ($this->target_entity1_78f809cf === $target) { $this->target_entity1_78f809cf = null; }
+            return $this;
+        }
+        if ($className === 'Test\TargetEntity2') {
+            if ($this->target_entity2_e1f15875 === $target) { $this->target_entity2_e1f15875 = null; }
+            return $this;
+        }
+        throw new \RuntimeException(sprintf('The association with "%s" entity was not configured.', $className));
+    }
+
+    /**
+     * Checks is the given entity is associated with this entity
+     *
+     * @param object $target Any configurable entity that can be associated with this type of entity
+     * @return bool
+     */
+    public function hasAssociationTarget($target)
+    {
+        $className = \Doctrine\Common\Util\ClassUtils::getClass($target);
+        if ($className === 'Test\TargetEntity1') { return $this->target_entity1_78f809cf === $target; }
+        if ($className === 'Test\TargetEntity2') { return $this->target_entity2_e1f15875 === $target; }
+        return false;
+    }
+
+    /**
      * Gets the entities this entity is associated with
      *
      * @return object[]
@@ -36,24 +70,17 @@ class Entity
     }
 
     /**
-     * Sets the entity this entity is associated with
+     * Associates the given entity with this entity
      *
      * @param object $target Any configurable entity that can be associated with this type of entity
      * @return object This object
      */
     public function addAssociationTarget($target)
     {
-        if (null === $target) { $this->resetAssociationTargets(); return $this; }
         $className = \Doctrine\Common\Util\ClassUtils::getClass($target);
         if ($className === 'Test\TargetEntity1') { $this->target_entity1_78f809cf = $target; return $this; }
         if ($className === 'Test\TargetEntity2') { $this->target_entity2_e1f15875 = $target; return $this; }
         throw new \RuntimeException(sprintf('The association with "%s" entity was not configured.', $className));
-    }
-
-    private function resetAssociationTargets()
-    {
-        $this->target_entity1_78f809cf = null;
-        $this->target_entity2_e1f15875 = null;
     }
 }
 

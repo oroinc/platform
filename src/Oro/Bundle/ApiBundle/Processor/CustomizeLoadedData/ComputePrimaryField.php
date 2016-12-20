@@ -54,6 +54,10 @@ class ComputePrimaryField implements ProcessorInterface
         }
 
         $config = $context->getConfig();
+        if (null === $config) {
+            return;
+        }
+
         $primaryField = $config->getField($this->primaryFieldName);
         if (!$primaryField || $primaryField->isExcluded()) {
             // undefined or excluded primary field
