@@ -12,6 +12,8 @@ use Oro\Bundle\ConfigBundle\Config\GlobalScopeManager;
 
 use Oro\Bundle\EmailBundle\Provider\SmtpSettingsProvider;
 
+use Oro\Bundle\SecurityBundle\Encoder\Mcrypt;
+
 class SmtpSettingsProviderTest extends \PHPUnit_Framework_TestCase
 {
     /** @var SmtpSettingsProvider */
@@ -22,6 +24,9 @@ class SmtpSettingsProviderTest extends \PHPUnit_Framework_TestCase
 
     /** @var GlobalScopeManager|\PHPUnit_Framework_MockObject_MockObject */
     protected $globalScopeManager;
+
+    /** @var Mcrypt|\PHPUnit_Framework_MockObject_MockObject */
+    protected $mcrypt;
 
     /**
      * @var array
@@ -53,6 +58,11 @@ class SmtpSettingsProviderTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
+        $this->mcrypt = new Mcrypt();
+        $this->settings['oro_email']['smtp_settings_password']['value'] = $this->mcrypt->encryptData(
+            $this->settings['oro_email']['smtp_settings_password']['value']
+        );
+
         $bag = new ConfigDefinitionImmutableBag($this->settings);
         $dispatcher = $this->getMockBuilder(EventDispatcher::class)
             ->disableOriginalConstructor()
@@ -71,7 +81,7 @@ class SmtpSettingsProviderTest extends \PHPUnit_Framework_TestCase
 
         $this->manager->addManager('global', $this->globalScopeManager);
 
-        $this->provider = new SmtpSettingsProvider($this->manager, $this->globalScopeManager);
+        $this->provider = new SmtpSettingsProvider($this->manager, $this->globalScopeManager, $this->mcrypt);
     }
 
     public function testSmtpSettingsProvider()
@@ -124,7 +134,10 @@ class SmtpSettingsProviderTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($smtpSettings->getPort(), $this->getSettingValue('oro_email.smtp_settings_port'));
         $this->assertSame($smtpSettings->getEncryption(), $this->getSettingValue('oro_email.smtp_settings_encryption'));
         $this->assertSame($smtpSettings->getUsername(), $this->getSettingValue('oro_email.smtp_settings_username'));
-        $this->assertSame($smtpSettings->getPassword(), $this->getSettingValue('oro_email.smtp_settings_password'));
+        $this->assertSame(
+            $smtpSettings->getPassword(),
+            $this->mcrypt->decryptData($this->getSettingValue('oro_email.smtp_settings_password'))
+        );
 
         // check types
         $this->assertInternalType('string', $smtpSettings->getHost());
