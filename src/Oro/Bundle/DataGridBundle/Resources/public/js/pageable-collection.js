@@ -467,7 +467,7 @@ define([
                     }
                     models[i] = existing;
 
-                    // If this is a new, valid model, push it to the `toAdd` list.
+                // If this is a new, valid model, push it to the `toAdd` list.
                 } else if (add) {
                     model = models[i] = this._prepareModel(attrs, options);
                     if (!model) {
@@ -770,7 +770,7 @@ define([
                     } else if (links[currentPage]) { // refetching a page
                         var pageSize = state.pageSize;
                         var pageStart = (state.firstPage === 0 ?
-                                currentPage :
+                            currentPage :
                             currentPage - 1) * pageSize;
                         var fullModels = fullCollection.models;
                         var head = fullModels.slice(0, pageStart);

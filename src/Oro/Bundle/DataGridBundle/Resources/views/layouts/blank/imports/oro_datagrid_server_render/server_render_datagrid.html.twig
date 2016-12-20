@@ -3,21 +3,9 @@
 
     {% set gridId = oro_datagrid_generate_element_id(datagrid) %}
 
-    {% set grid_render_parameters = grid_render_parameters|merge({'themeOptions': themeOptions|merge({
-        'headerHide': true,
-        'currentRowView': current_row_view,
-        'bodyClassName': 'grid-body products__list products__list_' ~ current_row_view,
-        'rowClassName': 'grid-row product-item product-item_' ~ current_row_view ~ compact_view,
-            'rowAttributes': {
-            'data-layout-model': 'productModel'
-        }
-    })}) %}
-
     {% set renderParams = grid_render_parameters %}
 
-    {% set themeOptions = renderParams.themeOptions %}
-
-    {% set themeOptions = themeOptions|merge({
+    {% set themeOptions = renderParams.themeOptions|merge({
         serverRendered: true
     })%}
 
