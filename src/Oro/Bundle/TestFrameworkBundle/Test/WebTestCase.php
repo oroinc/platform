@@ -20,6 +20,7 @@ use Oro\Bundle\TestFrameworkBundle\Test\DataFixtures\AliceFixtureIdentifierResol
 use Oro\Bundle\TestFrameworkBundle\Test\DataFixtures\DataFixturesExecutor;
 use Oro\Bundle\TestFrameworkBundle\Test\DataFixtures\DataFixturesLoader;
 use Oro\Component\Testing\DbIsolationExtension;
+use Oro\Component\PhpUtils\ArrayUtil;
 
 /**
  * Abstract class for functional and integration tests
@@ -789,6 +790,61 @@ abstract class WebTestCase extends BaseWebTestCase
         $message .= PHP_EOL . $response->headers;
 
         \PHPUnit_Framework_TestCase::assertTrue($response->headers->contains('Content-Type', $contentType), $message);
+    }
+
+    /**
+     * Assert that intersect of $actual with $expected equals $expected
+     *
+     * @param array  $expected
+     * @param array  $actual
+     * @param string $message
+     */
+    public static function assertArrayIntersectEquals(array $expected, array $actual, $message = null)
+    {
+        $actualIntersect = self::getRecursiveArrayIntersect($actual, $expected);
+        \PHPUnit_Framework_TestCase::assertEquals(
+            $expected,
+            $actualIntersect,
+            $message
+        );
+    }
+
+    /**
+     * Get intersect of $target array with values of keys in $source array. If key is an array in both places then
+     * the value of this key will be returned as intersection as well.
+     *
+     * @param array $source
+     * @param array $target
+     * @return array
+     */
+    public static function getRecursiveArrayIntersect(array $target, array $source)
+    {
+        $result = [];
+
+        $isSourceAssociative = ArrayUtil::isAssoc($source);
+        $isTargetAssociative = ArrayUtil::isAssoc($target);
+        if (!$isSourceAssociative || !$isTargetAssociative) {
+            foreach ($target as $key => $value) {
+                if (array_key_exists($key, $source) && is_array($value) && is_array($source[$key])) {
+                    $result[$key] = self::getRecursiveArrayIntersect($value, $source[$key]);
+                } else {
+                    $result[$key] = $value;
+                }
+            }
+        } else {
+            foreach (array_keys($source) as $key) {
+                if (array_key_exists($key, $target)) {
+                    if (is_array($target[$key]) && is_array($source[$key])) {
+                        $result[$key] = self::getRecursiveArrayIntersect($target[$key], $source[$key]);
+                    } else {
+                        $result[$key] = $target[$key];
+                    }
+                }
+            }
+        }
+
+
+        return $result;
     }
 
     /**
