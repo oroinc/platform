@@ -31,7 +31,7 @@ services:
 
     #currencyConfig
     oro_currency.config.currency:
-        class: 'Oro\Bundle\CurrencyBundle\Config\CurrencyConfigManager'
+        class: 'Oro\Bundle\CurrencyBundle\Config\DefaultCurrencyConfigProvider'
         lazy: true
         arguments:
             - '@oro_config.manager'
@@ -55,6 +55,7 @@ services:
         class: Oro\Bundle\CurrencyBundle\Datagrid\InlineEditing\InlineEditColumnOptions\MultiCurrencyGuesser
         arguments:
             - '@oro_currency.helper.currency_name'
+            - '@oro_currency.converter.currency_to_string'
         tags:
             - { name: oro_datagrid.inline_edit_column_options_guesser, priority: 91 }
 
@@ -79,7 +80,7 @@ services:
         arguments:
             - '@oro_config.user'
             - '@oro_locale.calendar_factory'
-            - '@oro_currency.config.currency'
+            - '@oro_currency.provider.view_type'
         calls:
             - [addNameFormats, [%oro_locale.format.name%]]
             - [addAddressFormats, [%oro_locale.format.address%]]
@@ -107,5 +108,20 @@ services:
         decorates: oro_locale.formatter.number
         arguments:
             - '@oro_locale.settings'
-            - '@oro_currency.config.currency'
+            - '@oro_currency.provider.view_type'
+
+    oro_currency.converter.rate:
+        class: Oro\Bundle\CurrencyBundle\Converter\RateConverter
+        public: false
+
+    oro_currency.converter.rate.link:
+        tags:
+            - { name: oro_service_link, service: oro_currency.converter.rate }
+
+    oro_currency.datagrid.listener.column_config:
+        class: Oro\Bundle\CurrencyBundle\Datagrid\EventListener\ColumnConfigListener
+        arguments:
+            - '@oro_entity.doctrine_helper'
+        tags:
+            - { name: kernel.event_listener, event: oro_datagrid.datagrid.build.before, method: onBuildBefore, priority: 255 }
 

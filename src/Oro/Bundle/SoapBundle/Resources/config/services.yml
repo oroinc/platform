@@ -1,5 +1,4 @@
 parameters:
-    oro_soap.loader.class:                        Oro\Bundle\SoapBundle\ServiceDefinition\Loader\OroSoapLoader
     oro_soap.handler.delete.class:                Oro\Bundle\SoapBundle\Handler\DeleteHandler
     oro_soap.handler.include_delegate.class:      Oro\Bundle\SoapBundle\Handler\DelegateIncludeHandler
     oro_soap.handler.include_total_header.class:  Oro\Bundle\SoapBundle\Handler\TotalHeaderHandler
@@ -13,19 +12,7 @@ parameters:
 
     oro_soap.locale_listener.class:               Oro\Bundle\SoapBundle\EventListener\LocaleListener
 
-    # override BeSimple annotation complex type loader
-    besimple.soap.definition.loader.annot_complextype.class: Oro\Bundle\SoapBundle\ServiceDefinition\Loader\AnnotationComplexTypeLoader
-
 services:
-    oro_soap.loader:
-        class: %oro_soap.loader.class%
-        public: false
-        arguments:
-            - '@file_locator'
-            - '@besimple.soap.definition.loader.annot_class'
-        tags:
-            - { name: besimple.soap.definition.loader }
-
     oro_soap.handler.delete.abstract:
         abstract: true
         calls:
@@ -118,12 +105,3 @@ services:
         public: false
         tags:
             - { name: nelmio_api_doc.extractor.handler }
-
-#    disable soap property filter until user-level wsdl cache implemented
-#    oro_soap.definition.field_filter:
-#        class: Oro\Bundle\SoapBundle\ServiceDefinition\Loader\SoapAclFieldFilter
-#        public: false
-#        arguments:
-#            - @security.authorization_checker
-#        tags:
-#            - { name: oro_soap.definition.loader_filter }

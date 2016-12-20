@@ -331,10 +331,10 @@ abstract class AbstractPageEntity extends AbstractPage
         $this->assertElementPresent("//div[@id='entity-pagination']", 'Pagination not available at entity view page');
         switch ($value) {
             case 'Next':
-                $this->test->byXPath("//div[@class='pagination']//i[@class='icon-chevron-right hide-text']")->click();
+                $this->test->byXPath("//div[@class='pagination']//i[@class='fa-chevron-right hide-text']")->click();
                 break;
             case 'Previous':
-                $this->test->byXPath("//div[@class='pagination']//i[@class='icon-chevron-left hide-text']")->click();
+                $this->test->byXPath("//div[@class='pagination']//i[@class='fa-chevron-left hide-text']")->click();
                 break;
             case 'Last':
                 $this->test->byXPath("//div[@class='pagination']//a[normalize-space()='Last']")->click();

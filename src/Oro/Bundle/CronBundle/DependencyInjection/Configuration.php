@@ -8,7 +8,7 @@ use Symfony\Component\Config\Definition\ConfigurationInterface;
 class Configuration implements ConfigurationInterface
 {
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function getConfigTreeBuilder()
     {
@@ -16,15 +16,7 @@ class Configuration implements ConfigurationInterface
 
         $builder
             ->root('oro_cron')
-            ->children()
-                ->scalarNode('max_concurrent_jobs')
-                    ->defaultValue(5)
-                ->end()
-                ->scalarNode('max_runtime')
-                    ->defaultValue(3600)
-                ->end()
-                ->booleanNode('jms_statistics')->defaultTrue()->end()
-            ->end();
+        ;
 
         return $builder;
     }

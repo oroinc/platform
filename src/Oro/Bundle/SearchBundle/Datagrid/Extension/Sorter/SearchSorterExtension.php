@@ -16,6 +16,7 @@ class SearchSorterExtension extends AbstractSorterExtension
     protected static $typeMapping = [
         'string'  => 'text',
         'integer' => 'integer',
+        'decimal' => 'decimal',
     ];
 
     /**

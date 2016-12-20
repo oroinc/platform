@@ -9,6 +9,7 @@ use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\EntityManager;
 
 use Oro\Bundle\UIBundle\Event\BeforeListRenderEvent;
+use Oro\Bundle\UIBundle\View\ScrollData;
 
 abstract class AbstractFallbackFieldsFormView
 {
@@ -46,14 +47,16 @@ abstract class AbstractFallbackFieldsFormView
      * @param BeforeListRenderEvent $event
      * @param string $templateName
      * @param object $entity
+     * @param string|null $sectionTitle
      * @param int $blockId
      * @param int $subBlockId
+     * @return int|string|void
      */
     public function addBlockToEntityView(
-        BeforeListRenderEvent
-        $event,
+        BeforeListRenderEvent $event,
         $templateName,
         $entity,
+        $sectionTitle = null,
         $blockId = 0,
         $subBlockId = 0
     ) {
@@ -62,7 +65,7 @@ abstract class AbstractFallbackFieldsFormView
             ['entity' => $entity]
         );
 
-        $event->getScrollData()->addSubBlockData($blockId, $subBlockId, $template);
+        $this->addBlockWithSectionTitle($event->getScrollData(), $sectionTitle, $blockId, $subBlockId, $template);
     }
 
     /**
@@ -84,22 +87,7 @@ abstract class AbstractFallbackFieldsFormView
             ['form' => $event->getFormView()]
         );
 
-        $scrollData = $event->getScrollData();
-        if ($sectionTitle === null) {
-            $scrollData->addSubBlockData($blockId, $subBlockId, $template);
-
-            return;
-        }
-
-        $data = $scrollData->getData();
-        $expectedLabel = $this->translator->trans($sectionTitle);
-        foreach ($data['dataBlocks'] as $blockId => $blockData) {
-            if ($blockData['title'] == $expectedLabel) {
-                $scrollData->addSubBlockData($blockId, $subBlockId, $template);
-
-                return;
-            }
-        }
+        $this->addBlockWithSectionTitle($event->getScrollData(), $sectionTitle, $blockId, $subBlockId, $template);
     }
 
     /**
@@ -121,6 +109,38 @@ abstract class AbstractFallbackFieldsFormView
 
         /** @var EntityManager $em */
         $em = $this->doctrine->getManagerForClass($entityPath);
+
         return $em->getReference($entityPath, $entityId);
+    }
+
+    /**
+     * @param ScrollData $scrollData
+     * @param $sectionTitle
+     * @param $blockId
+     * @param $subBlockId
+     * @param $template
+     */
+    protected function addBlockWithSectionTitle(
+        ScrollData $scrollData,
+        $sectionTitle,
+        $blockId,
+        $subBlockId,
+        $template
+    ) {
+        if ($sectionTitle === null) {
+            $scrollData->addSubBlockData($blockId, $subBlockId, $template);
+
+            return;
+        }
+
+        $data = $scrollData->getData();
+        $expectedLabel = $this->translator->trans($sectionTitle);
+        foreach ($data[ScrollData::DATA_BLOCKS] as $searchBlockId => $blockData) {
+            if ($blockData[ScrollData::TITLE] === $expectedLabel) {
+                $scrollData->addSubBlockData($searchBlockId, $subBlockId, $template);
+
+                return;
+            }
+        }
     }
 }

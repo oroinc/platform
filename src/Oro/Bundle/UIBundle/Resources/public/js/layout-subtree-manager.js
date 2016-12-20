@@ -1,9 +1,8 @@
 define([
     'jquery',
     'underscore',
-    'oroui/js/mediator',
-    'oroui/js/error'
-], function($, _, mediator, Error) {
+    'oroui/js/mediator'
+], function($, _, mediator) {
     'use strict';
 
     var layoutSubtreeManager;
@@ -114,7 +113,6 @@ define([
                 })
                 .fail(function(jqxhr) {
                     self._callViewMethod(eventBlockIds, 'contentLoadingFail');
-                    Error.handle({}, jqxhr, {enforce: true});
                 });
         },
 
@@ -142,7 +140,6 @@ define([
                     if (_.isFunction(callback)) {
                         callback('');
                     }
-                    Error.handle({}, jqxhr, {enforce: true});
                 });
         }
     };

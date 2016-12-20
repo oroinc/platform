@@ -29,7 +29,7 @@ elements:
     class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Element
 
   ReadUnreadIcon:
-    selector: 'i.icon-envelope'
+    selector: 'i.fa-envelope'
     class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Element
 
 pages:

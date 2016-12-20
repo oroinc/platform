@@ -11,7 +11,7 @@ define(function(require) {
         inputName: '',
 
         events: {
-            'click i.icon-remove': 'removeClick'
+            'click i.fa-close': 'removeClick'
         },
 
         listen: {

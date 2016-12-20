@@ -50,11 +50,10 @@ class SkipTagTrackingPassTest extends \PHPUnit_Framework_TestCase
 
         /** @var Definition|\PHPUnit_Framework_MockObject_MockObject $definition */
         $definition = $this->getMock(Definition::class);
-        $definition->expects($this->exactly(12))
+        $definition->expects($this->exactly(10))
             ->method('addMethodCall')
             ->withConsecutive(
                 ['markSkipped', ['Oro\Bundle\DataAuditBundle\Entity\Audit']],
-                ['markSkipped', ['Oro\Bundle\DataAuditBundle\Entity\AuditData']],
                 ['markSkipped', ['Oro\Bundle\NavigationBundle\Entity\PageState']],
                 ['markSkipped', ['Oro\Bundle\NavigationBundle\Entity\NavigationHistoryItem']],
                 ['markSkipped', ['Oro\Bundle\SearchBundle\Entity\Item']],
@@ -63,8 +62,7 @@ class SkipTagTrackingPassTest extends \PHPUnit_Framework_TestCase
                 ['markSkipped', ['Oro\Bundle\SearchBundle\Entity\IndexDecimal']],
                 ['markSkipped', ['Oro\Bundle\SearchBundle\Entity\IndexDatetime']],
                 ['markSkipped', ['Akeneo\Bundle\BatchBundle\Entity\JobExecution']],
-                ['markSkipped', ['Akeneo\Bundle\BatchBundle\Entity\StepExecution']],
-                ['markSkipped', ['JMS\JobQueueBundle\Entity\Job']]
+                ['markSkipped', ['Akeneo\Bundle\BatchBundle\Entity\StepExecution']]
             );
 
         $this->container

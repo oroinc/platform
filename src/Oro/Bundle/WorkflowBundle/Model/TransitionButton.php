@@ -4,7 +4,6 @@ namespace Oro\Bundle\WorkflowBundle\Model;
 
 use Oro\Bundle\ActionBundle\Model\ButtonContext;
 use Oro\Bundle\ActionBundle\Model\ButtonInterface;
-use Oro\Bundle\ActionBundle\Model\OperationRegistry;
 
 class TransitionButton implements ButtonInterface
 {
@@ -84,6 +83,6 @@ class TransitionButton implements ButtonInterface
      */
     public function getGroup()
     {
-        return OperationRegistry::DEFAULT_GROUP;
+        return ButtonInterface::DEFAULT_GROUP;
     }
 }

@@ -18,19 +18,41 @@ define([
     ComponentManager.prototype = {
         eventNamespace: '.component-manager',
 
+        /**
+         * Initializes Page Components for DOM element
+         *
+         * @param {Object?} options
+         * @return {Promise}
+         */
         init: function(options) {
-            var promises = [];
-            var elements = [];
-            var modules = [];
+            var elements = this._collectElements();
+            var items = this._readElementsData(elements, options);
 
-            this._analyseDom(elements, modules);
+            // collect nested elements' data
+            _.each(items, function(item) {
+                item.subItems = _.filter(items, function(subItem) {
+                    return item.options._sourceElement.has(subItem.options._sourceElement).length;
+                });
+            });
 
-            _.each(elements, _.bind(function(element) {
-                promises.push(this._initComponent(element, options));
-            }, this));
+            // order init data by their dependencies (dependant components go after)
+            items.sort(function(item1, item2) {
+                if (item1.subItems.indexOf(item2) !== -1) {
+                    return 1;
+                } else if (item2.subItems.indexOf(item1) !== -1) {
+                    return -1;
+                }
+                return 0;
+            });
 
-            // optimize load time - preload components in separate layouts
-            require(modules, _.noop);
+            var promises = _.map(items, function(item) {
+                // collect promises of dependencies
+                item.options._subPromises = _.object(_.map(item.subItems, function(subItem) {
+                    return [subItem.options.name, subItem.promise];
+                }));
+                return (item.promise = this._initComponent(item));
+            }, this);
+
             return $.when.apply($, _.compact(promises)).then(function() {
                 return _.compact(arguments);
             });
@@ -71,20 +93,17 @@ define([
         },
 
         /**
-         * Collect all elements that have components declaration
+         * Collect all elements that have components declaration from current layout
          *
-         * @param {Array.<jQuery>} elements
-         * @param {Array.<string>} modules
+         * @returns {Array.<jQuery>} elements
          * @protected
          */
-        _analyseDom: function(elements, modules) {
+        _collectElements: function() {
+            var elements = [];
             var el = this.$el[0];
 
             this.$el.find('[data-page-component-module]').each(function() {
                 var $elem = $(this);
-
-                // optimize load time - push components to preload queue
-                modules.push($elem.data('pageComponentModule'));
 
                 // find nearest marked container with separate layout
                 var $separateLayout = $elem.parents('[data-layout="separate"]:first');
@@ -94,18 +113,43 @@ define([
                     elements.push($elem);
                 }
             });
+
+            return elements;
+        },
+
+        /**
+         * Reads initialization data from element, throws error if data is invalid
+         *
+         * @param {Array.<jQuery>} elements
+         * @param {Object?} options extra options
+         * @returns {Array.<{element: jQuery, module: string, options: Object}>}
+         * @protected
+         */
+        _readElementsData: function(elements, options) {
+            return _.compact(_.map(elements, function($elem) {
+                var item;
+                try {
+                    item = this._readData($elem, options);
+                    item.element = $elem;
+                } catch (e) {
+                    this._handleError(e.message, e);
+                }
+                return item;
+            }, this));
         },
 
         /**
          * Read component's data attributes from the DOM element
          *
          * @param {jQuery} $elem
+         * @param {Object?} options extra options
+         * @throws {Error}
          * @protected
          */
-        _readData: function($elem) {
+        _readData: function($elem, options) {
             var data = {
                 module: $elem.data('pageComponentModule'),
-                options: $elem.data('pageComponentOptions') || {}
+                options: $.extend(true, {}, options, $elem.data('pageComponentOptions'))
             };
 
             if (data.options._sourceElement) {
@@ -114,10 +158,14 @@ define([
                 data.options._sourceElement = $elem;
             }
 
-            var name = $elem.data('pageComponentName') || $elem.attr('data-ftid');
-            if (name) {
-                data.options.name = name;
+            data.options.name = $elem.data('pageComponentName') ||
+                $elem.attr('data-ftid') || _.uniqueId('pageComponent');
+
+            if (!data.options._sourceElement.get(0)) {
+                throw new Error('Cannot resolve _sourceElement for component name "' +
+                    data.options.name + '"');
             }
+
             return data;
         },
 
@@ -138,31 +186,19 @@ define([
         /**
          * Initializes component for the element
          *
-         * @param {jQuery} $elem
-         * @param {Object|null} options
+         * @param {{element: jQuery, module: string, options: Object}} data
          * @returns {Promise}
          * @protected
          */
-        _initComponent: function($elem, options) {
-            var data = this._readData($elem);
-            this._cleanupData($elem);
-
-            // mark elem
-            $elem.attr('data-bound-component', data.module);
-
+        _initComponent: function(data) {
             var initDeferred = $.Deferred();
 
-            if (!data.options._sourceElement.get(0)) {
-                var message = 'Cannot resolve _sourceElement by selector "' +
-                    data.options._sourceElement.selector + '"';
-                this._handleError(message, Error(message));
-                initDeferred.resolve();
-            }
+            this._cleanupData(data.element);
+            data.element.attr('data-bound-component', data.module);
 
-            var componentOptions = $.extend(true, {}, options || {}, data.options);
             require(
                 [data.module],
-                _.bind(this._onComponentLoaded, this, initDeferred, componentOptions),
+                _.bind(this._onComponentLoaded, this, initDeferred, data.options),
                 _.bind(this._onRequireJsError, this, initDeferred)
             );
 
@@ -188,7 +224,7 @@ define([
             var $elem = options._sourceElement;
             var name = options.name;
 
-            if (name && this.components.hasOwnProperty(name)) {
+            if (this.components.hasOwnProperty(name)) {
                 var message = 'Component with the name "' + name + '" is already registered in the layout';
                 this._handleError(message, Error(message));
 
@@ -199,7 +235,7 @@ define([
 
             var component = new Component(options);
             if (component instanceof BaseComponent) {
-                this.add(name || component.cid, component, $elem[0]);
+                this.add(name, component, $elem[0]);
             }
 
             if (component.deferredInit) {

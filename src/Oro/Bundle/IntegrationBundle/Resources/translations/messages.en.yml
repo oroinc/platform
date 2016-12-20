@@ -105,3 +105,6 @@ oro:
             channel:
                 activated: Integration has been activated successfully
                 deactivated: Integration has been deactivated successfully
+
+        action:
+            assign.label: Select the assignee of the integration
