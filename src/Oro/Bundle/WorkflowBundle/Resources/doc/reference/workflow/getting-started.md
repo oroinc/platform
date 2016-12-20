@@ -196,10 +196,11 @@ For more information about scopes see [ScopeBundle documentation](../../../../..
 
 Initial Transitions
 -------------------
-
-To provide ability to start some workflow from *not related entity* we have special functionality that called initial transitions.
-TBD...
-
+To provide an ability to start some workflow from *not related entity* we have special functionality that called **initial transitions**.
+It is a special type of transition configuration that allows us to use transition as an initiative (as it comes from the name) for new workflow instance (workflow item) creation.
+The main difference from *start transitions* is that *init transition* can be invoked from almost any part of an application within indirect relation to main workflow entity or without it (if we able to fill all necessary data of main entity).
+Distinctive configuration features of *init transitions* are special nodes `init_entities`, `init_routes`, `init_datagrids` in transition configuration together with `is_start: true`.
+For more details see [configuration reference](./configuration-reference.md#transitions-configuration) section.
 
 Disabling Operations
 --------------------
