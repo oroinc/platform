@@ -58,7 +58,6 @@ class YamlCumulativeFileLoader extends CumulativeFileLoader
             }
 
             return $configData;
-
         } catch (ParseException $e) {
             $e->setParsedFile($file);
             throw new \InvalidArgumentException(sprintf('Unable to parse file "%s".', $file), $e->getCode(), $e);
