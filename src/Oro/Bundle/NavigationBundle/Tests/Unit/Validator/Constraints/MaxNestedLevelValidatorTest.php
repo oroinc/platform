@@ -2,19 +2,22 @@
 
 namespace Oro\Bundle\NavigationBundle\Tests\Unit\Validator\Constraints;
 
-use Symfony\Component\Validator\ExecutionContextInterface;
-
 use Oro\Bundle\LocaleBundle\Helper\LocalizationHelper;
-use Oro\Bundle\NavigationBundle\Tests\Unit\Entity\Stub\MenuUpdateStub;
 use Oro\Bundle\NavigationBundle\Provider\BuilderChainProvider;
+use Oro\Bundle\NavigationBundle\Tests\Unit\Entity\Stub\MenuUpdateStub;
 use Oro\Bundle\NavigationBundle\Tests\Unit\MenuItemTestTrait;
 use Oro\Bundle\NavigationBundle\Validator\Constraints\MaxNestedLevel;
 use Oro\Bundle\NavigationBundle\Validator\Constraints\MaxNestedLevelValidator;
+use Oro\Bundle\OrganizationBundle\Entity\Organization;
+use Oro\Bundle\ScopeBundle\Entity\Scope;
+use Oro\Bundle\UserBundle\Entity\User;
+
+use Symfony\Component\Validator\Context\ExecutionContextInterface;
 
 class MaxNestedLevelValidatorTest extends \PHPUnit_Framework_TestCase
 {
     use MenuItemTestTrait;
-    
+
     /** @var MaxNestedLevelValidator */
     protected $validator;
 
@@ -47,8 +50,18 @@ class MaxNestedLevelValidatorTest extends \PHPUnit_Framework_TestCase
         $menu = $this->getMenu();
         $menu->setExtra('max_nesting_level', 2);
 
+        $scope = $this->getMock(Scope::class, ['getOrganization', 'getUser']);
+        $user = new User();
+        $organization = new Organization();
+        $scope->expects($this->once())
+            ->method('getUser')
+            ->willReturn($user);
+        $scope->expects($this->once())
+            ->method('getOrganization')
+            ->willReturn($organization);
+
         $update = new MenuUpdateStub();
-        $update->setOwnershipType(1);
+        $update->setScope($scope);
         $update->setMenu('menu');
         $update->setKey('item-1-1-1');
         $update->setParentKey('item-1-1');
@@ -57,10 +70,13 @@ class MaxNestedLevelValidatorTest extends \PHPUnit_Framework_TestCase
         $this->builderChainProvider
             ->expects($this->once())
             ->method('get')
-            ->with('menu', [
-                'ignoreCache' => true,
-                'ownershipType' => $update->getOwnershipType()
-            ])
+            ->with(
+                'menu',
+                [
+                    'ignoreCache' => true,
+                    'scopeContext' => ['user' => $user, 'organization' => $organization]
+                ]
+            )
             ->will($this->returnValue($menu));
 
         $this->context
@@ -85,8 +101,17 @@ class MaxNestedLevelValidatorTest extends \PHPUnit_Framework_TestCase
         $menu = $this->getMenu();
         $menu->setExtra('max_nesting_level', 3);
 
+        $scope = $this->getMock(Scope::class, ['getOrganization', 'getUser']);
+        $user = new User();
+        $organization = new Organization();
+        $scope->expects($this->once())
+            ->method('getUser')
+            ->willReturn($user);
+        $scope->expects($this->once())
+            ->method('getOrganization')
+            ->willReturn($organization);
         $update = new MenuUpdateStub();
-        $update->setOwnershipType(1);
+        $update->setScope($scope);
         $update->setMenu('menu');
         $update->setKey('item-1-1-1-1');
         $update->setParentKey('item-1-1-1');
@@ -96,10 +121,13 @@ class MaxNestedLevelValidatorTest extends \PHPUnit_Framework_TestCase
         $this->builderChainProvider
             ->expects($this->once())
             ->method('get')
-            ->with('menu', [
-                'ignoreCache' => true,
-                'ownershipType' => $update->getOwnershipType()
-            ])
+            ->with(
+                'menu',
+                [
+                    'ignoreCache' => true,
+                    'scopeContext' => ['user' => $user, 'organization' => $organization]
+                ]
+            )
             ->will($this->returnValue($menu));
 
         $this->context
@@ -125,7 +153,18 @@ class MaxNestedLevelValidatorTest extends \PHPUnit_Framework_TestCase
         $menu->setExtra('max_nesting_level', 4);
 
         $update = new MenuUpdateStub();
-        $update->setOwnershipType(1);
+
+        $scope = $this->getMock(Scope::class, ['getOrganization', 'getUser']);
+        $user = new User();
+        $organization = new Organization();
+        $scope->expects($this->once())
+            ->method('getUser')
+            ->willReturn($user);
+        $scope->expects($this->once())
+            ->method('getOrganization')
+            ->willReturn($organization);
+
+        $update->setScope($scope);
         $update->setMenu('menu');
         $update->setKey('item-1-1-1-1');
         $update->setParentKey('item-1-1-1');
@@ -134,10 +173,13 @@ class MaxNestedLevelValidatorTest extends \PHPUnit_Framework_TestCase
         $this->builderChainProvider
             ->expects($this->once())
             ->method('get')
-            ->with('menu', [
-                'ignoreCache' => true,
-                'ownershipType' => $update->getOwnershipType()
-            ])
+            ->with(
+                'menu',
+                [
+                    'ignoreCache' => true,
+                    'scopeContext' => ['user' => $user, 'organization' => $organization]
+                ]
+            )
             ->will($this->returnValue($menu));
 
         $this->validator->validate($update, $constraint);

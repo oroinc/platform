@@ -2,9 +2,8 @@ define([
     'jquery',
     'underscore',
     'oroui/js/mediator',
-    'oroui/js/app/components/base/component',
-    'oroui/js/error'
-], function($, _, mediator, BaseComponent, error) {
+    'oroui/js/app/components/base/component'
+], function($, _, mediator, BaseComponent) {
     'use strict';
 
     var BaseBookmarkComponent;
@@ -56,12 +55,14 @@ define([
         toRemove: function(model) {
             model.destroy({
                 wait: true,
+                errorOutput: function(event, xhr) {
+                    // Suppress error if it's 404 response and not debug mode
+                    return xhr.status !== 404 || mediator.execute('retrieveOption', 'debug');
+                },
                 error: function(model, xhr) {
                     if (xhr.status === 404 && !mediator.execute('retrieveOption', 'debug')) {
                         // Suppress error if it's 404 response and not debug mode
                         model.unset('id').destroy();
-                    } else {
-                        error.handle({}, xhr, {enforce: true});
                     }
                 }
             });

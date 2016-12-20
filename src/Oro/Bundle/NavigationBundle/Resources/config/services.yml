@@ -48,7 +48,7 @@ parameters:
     oro_navigation.breadcrumbs_manager.class:                  Oro\Bundle\NavigationBundle\Menu\BreadcrumbManager
     oro_navigation.chain_breadcrumbs_manager.class:            Oro\Bundle\NavigationBundle\Menu\ChainBreadcrumbManager
 
-    oro_navigation.area:                                       default
+    oro_navigation.menu_update.scope_type:                     menu_default_visibility
 
 services:
     oro_menu.cache:
@@ -333,7 +333,7 @@ services:
         arguments:
             - '@security.context'
             - '@templating'
-            - %kernel.debug%
+            - '%kernel.debug%'
         tags:
             - { name: kernel.event_listener, event: kernel.response, method: onResponse }
 
@@ -359,29 +359,21 @@ services:
         calls:
           - [ setDefaultManager, [ '@oro_navigation.breadcrumb_manager' ]]
 
-    oro_navigation.menu_update.builder:
+    oro_navigation.menu_update.builder.abstract:
         class: Oro\Bundle\NavigationBundle\Builder\MenuUpdateBuilder
+        abstract: true
         arguments:
             - '@oro_locale.helper.localization'
+            - '@oro_scope.scope_manager'
+            - '@doctrine'
+
+    oro_navigation.menu_update.builder.menu_default_visibility:
+        parent: oro_navigation.menu_update.builder.abstract
+        calls:
+          - [setClassName, ['%oro_navigation.entity.menu_update.class%']]
+          - [setScopeType, ['%oro_navigation.menu_update.scope_type%']]
         tags:
             - { name: oro_menu.builder, priority: 100 }
-
-    oro_navigation.ownership_provider.global:
-        class: Oro\Bundle\NavigationBundle\Menu\Provider\GlobalOwnershipProvider
-        arguments:
-            - '@doctrine'
-            - '%oro_navigation.entity.menu_update.class%'
-        tags:
-            - { name: oro_navigation.ownership_provider, area: default, priority: 100 }
-
-    oro_navigation.ownership_provider.user:
-        class: Oro\Bundle\NavigationBundle\Menu\Provider\UserOwnershipProvider
-        arguments:
-            - '@doctrine'
-            - '%oro_navigation.entity.menu_update.class%'
-            - '@security.token_storage'
-        tags:
-            - { name: oro_navigation.ownership_provider, area: default, priority: 200 }
 
     oro_navigation.menu_manipulator:
         class: Knp\Menu\Util\MenuManipulator
@@ -392,19 +384,16 @@ services:
         arguments:
             - '@oro_menu.builder_chain'
             - '@oro_navigation.menu_manipulator'
-            - '%oro_navigation.area%'
+            - '%oro_navigation.menu_update.scope_type%'
         tags:
             - { name: oro_datagrid.datasource, type: menu-update-default-provider }
 
-    oro_navigation.manager.menu_update_abstract:
+    oro_navigation.manager.menu_update:
         class: Oro\Bundle\NavigationBundle\Manager\MenuUpdateManager
         arguments:
             - "@doctrine"
             - "@oro_menu.builder_chain"
             - "@oro_navigation.menu_helper.menu_update"
-
-    oro_navigation.manager.menu_update_default:
-        parent: oro_navigation.manager.menu_update_abstract
         calls:
             - [ setEntityClass, [ '%oro_navigation.entity.menu_update.class%' ]]
 
@@ -461,3 +450,7 @@ services:
         tags:
             - { name: layout.data_provider, alias: title_provider }
 
+    oro_navigation.scope_criteria_provider.user:
+        parent: oro_user.scope_criteria_provider.user
+        tags:
+            - {name: oro_scope.provider, scopeType: '%oro_navigation.menu_update.scope_type%', priority: 20}

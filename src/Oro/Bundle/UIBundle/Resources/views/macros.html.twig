@@ -176,9 +176,13 @@
 {% macro link(parameters) %}
     {# need to remove spaces just before label #}
     {% set iconHtml = '' %}
-    {% if parameters.iCss is defined %}
+    {% if parameters.iCss is defined and parameters.iCss %}
         {% set iconHtml %}
-        <i class="{{ parameters.iCss }} hide-text" >{{ parameters.label }}</i>
+        <i class="{{ parameters.iCss }} hide-text" >
+            {% if not parameters.noIconText|default(false)%}
+                {{ parameters.label }}
+            {% endif %}
+        </i>
         {% endset %}
     {% else %}
     {% endif %}
@@ -192,8 +196,10 @@
                 data-{{ dataItemName }}="{{ dataItemValue|e('html_attr')|raw }}"
             {% endfor %}
         {% endif %}
-       class="{{ parameters.class is defined? parameters.class : '' }} {{ parameters.aCss is defined? parameters.aCss : '' }}"
-       {% if parameters.title is defined %}title="{{ parameters.title }}"{% endif %}>{{ iconHtml|trim|raw }}{{ parameters.label|trim }}</a>
+        class="{{ parameters.class is defined? parameters.class : '' }} {{ parameters.aCss is defined? parameters.aCss : '' }}"
+        {% if parameters.title is defined %}title="{{ parameters.title }}"{% endif %}>{{ iconHtml|trim|raw }}
+        {{ parameters.label|trim }}
+    </a>
     {% endspaceless %}
 {% endmacro %}
 
@@ -1189,4 +1195,86 @@
             {{ 'view %entityName%'|trans({'%entityName%' : entityLabelIfNotGranted|trans}) }}
         {% endif %}
     {% endif %}
+{%- endmacro -%}
+
+{%- macro renderJsTree(data, actions) -%}
+    {% set defaultActions = {
+        'expand': {
+            'view': 'oroui/js/app/views/jstree/expand-action-view'
+        },
+        'collapse': {
+            'view': 'oroui/js/app/views/jstree/collapse-action-view'
+        },
+        'subcategories': {
+            'view': 'oroui/js/app/views/jstree/subcategories-action-view'
+        }
+    } %}
+
+    {% set enabledActions = [] %}
+
+    {% for key, action in actions %}
+        {% if action is iterable %}
+            {% set enabledActions = enabledActions|merge({
+                (key): action
+            }) %}
+        {% else %}
+            {% set enabledActions = enabledActions|merge({
+                (action): defaultActions[action]
+            }) %}
+        {% endif %}
+    {% endfor %}
+
+    <div class="jstree-wrapper collapse-view expanded"
+        data-page-component-module="oroui/js/app/components/jquery-widget-component"
+        data-page-component-options="{{ {
+            widgetModule: 'oroui/js/widget/collapse-widget'
+        }|json_encode() }}"
+        data-role="jstree-wrapper">
+
+        {% if data.label|default('') %}
+        <div class="jstree-wrapper__title">
+            <span class="jstree-wrapper__label">
+                <label class="custom-checkbox jstree-wrapper__checkbox"
+                       data-role="jstree-checkall">
+                    <input class="custom-checkbox__input"
+                           type="checkbox"
+                           name="categories"
+                           data-action-type="checkAll"/>
+                    <span class="custom-checkbox__text"></span>
+                </label>
+                <span class="jstree-wrapper__text"
+                    data-collapse-trigger>
+                    {{ data.label }}
+                </span>
+            </span>
+            {% if enabledActions|length %}
+            <div class="jstree-actions dropdown btn-group"
+                 data-page-component-module="oroui/js/app/components/view-component"
+                 data-page-component-options="{{ {
+                     'view': 'oroui/js/app/views/jstree/action-manager-view',
+                    'actions': enabledActions
+                 }|json_encode}}">
+                <button type="button" class="jstree-actions__handle btn btn-default btn-small dropdown-toggle"
+                        data-toggle="dropdown" title="Mass Actions">
+                    <i class="fa-ellipsis-h"></i>
+                    <i class="caret"></i>
+                </button>
+                <ul class="jstree-actions__menu dropdown-menu dropdown-menu__action-column" data-role="jstree-actions">
+                </ul>
+            </div>
+            {% endif %}
+        </div>
+        {% endif %}
+
+        <div data-page-component-module="{{ data.module }}"
+             data-page-component-options="{{ data.treeOptions|json_encode }}"
+             data-collapse-container>
+            {% if data.treeOptions.data|default([]) %}
+            <div class="jstree-search-component">
+                <input type="search" placeholder="Quick Search" class="jstree-search-component__input" data-name="search"/>
+            </div>
+            {% endif %}
+            <div data-role="jstree-container"></div>
+        </div>
+     </div>
 {%- endmacro -%}

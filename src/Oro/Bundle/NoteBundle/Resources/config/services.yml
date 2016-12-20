@@ -1,20 +1,9 @@
 parameters:
     oro_note.entity.class:                              Oro\Bundle\NoteBundle\Entity\Note
-    oro_note.placeholder.filter.class:                  Oro\Bundle\NoteBundle\Placeholder\PlaceholderFilter
-    oro_note.migration.extension.note.class:            Oro\Bundle\NoteBundle\Migration\Extension\NoteExtension
-    oro_note.entity_config_dumper.extension.class:      Oro\Bundle\NoteBundle\Tools\NoteEntityConfigDumperExtension
-    oro_note.entity_generator.extension.class:          Oro\Bundle\NoteBundle\Tools\NoteEntityGeneratorExtension
-    oro_note.manager.class:                             Oro\Bundle\NoteBundle\Entity\Manager\NoteManager
-    oro_note.manager.api.class:                         Oro\Bundle\NoteBundle\Entity\Manager\ApiEntityManager
-    oro_note.activity_list.provider.class:              Oro\Bundle\NoteBundle\Provider\NoteActivityListProvider
-    oro_note.listener.merge_listener.class:             Oro\Bundle\NoteBundle\EventListener\MergeListener
 
-    # Strategies
-    oro_note.strategy.replace.class: Oro\Bundle\NoteBundle\Model\Strategy\ReplaceStrategy
-    oro_note.strategy.unite.class: Oro\Bundle\NoteBundle\Model\Strategy\UniteStrategy
 services:
     oro_note.manager:
-        class: %oro_note.manager.class%
+        class: Oro\Bundle\NoteBundle\Entity\Manager\NoteManager
         arguments:
             - '@doctrine.orm.entity_manager'
             - '@oro_security.security_facade'
@@ -23,89 +12,31 @@ services:
             - '@oro_attachment.provider.attachment'
             - '@oro_attachment.manager'
 
-    oro_note.association_helper:
-        class: Oro\Bundle\NoteBundle\Tools\NoteAssociationHelper
-        public: false
-        arguments:
-            - '@oro_entity_config.config_manager'
-
     oro_note.manager.api:
-        class: %oro_note.manager.api.class%
+        class: Oro\Bundle\NoteBundle\Entity\Manager\ApiEntityManager
         parent: oro_soap.manager.entity_manager.abstract
         arguments:
             - %oro_note.entity.class%
             - '@doctrine.orm.entity_manager'
 
-    oro_note.placeholder.filter:
-        class: %oro_note.placeholder.filter.class%
-        arguments:
-            - '@oro_note.association_helper'
-            - '@oro_entity.doctrine_helper'
-
-    oro_note.entity_config_dumper.extension:
-        class: %oro_note.entity_config_dumper.extension.class%
-        parent: oro_entity_extend.entity_config_dumper.extension.association
-        tags:
-            - { name: oro_entity_extend.entity_config_dumper_extension }
-
-    oro_note.entity_generator.extension:
-        class: %oro_note.entity_generator.extension.class%
-        tags:
-            - { name: oro_entity_extend.entity_generator_extension }
-
-    oro_note.migration.extension.note:
-        class: %oro_note.migration.extension.note.class%
-        tags:
-            - { name: oro_migration.extension, extension_name: note }
-
-    oro_note.widget_provider.actions:
-        parent: oro_ui.widget_provider.action_button.abstract
-        arguments:
-            - oro_add_note_button
-            - oro_add_note_link
-        tags:
-            - { name: oro_ui.view_action_provider, group: activity, priority: -100 }
-            - { name: oro_ui.update_action_provider, group: activity, priority: -100 }
-
     oro_note.activity_list.provider:
-        class: %oro_note.activity_list.provider.class%
+        class: Oro\Bundle\NoteBundle\Provider\NoteActivityListProvider
         arguments:
            - '@oro_entity.doctrine_helper'
            - '@oro_security.owner.entity_owner_accessor.link'
-           - '@oro_note.association_helper'
+           - '@oro_activity.association_helper'
            - '@oro_comment.association_helper'
         tags:
            - {name: oro_activity_list.provider, priority: 40}
 
-    # Merge listener
-    oro_note.listener.merge_listener:
-        class: %oro_note.listener.merge_listener.class%
-        arguments:
-          - '@translator'
-          - '@oro_entity_config.provider.entity'
-          - '@oro_activity_list.provider.chain'
+    oro_note.handler.delete.activity_entity:
+        class: Oro\Bundle\NoteBundle\Entity\Manager\NoteActivityEntityDeleteHandler
+        parent: oro_activity.handler.delete.activity_entity
         tags:
-          - { name: kernel.event_listener, event: oro.entity_merge.build_metadata, method: onBuildMetadata, priority: -10 }
+            - { name: oro_activity.activity_entity_delete_handler, priority: -10 }
 
-    # Strategies
-    oro_note.strategy.replace:
-        class: %oro_note.strategy.replace.class%
-        arguments:
-            - '@oro_entity.doctrine_helper'
-            - '@oro_activity_list.manager'
+    oro_note.listener.remove_note_configuration_scope:
+        class: Oro\Bundle\NoteBundle\EventListener\RemoveNoteConfigurationScopeListener
         tags:
-            - { name: oro_entity_merge.strategy }
-
-    oro_note.strategy.unite:
-        class: %oro_note.strategy.unite.class%
-        arguments:
-            - '@oro_activity_list.manager'
-            - '@oro_entity.doctrine_helper'
-        tags:
-            - { name: oro_entity_merge.strategy }
-
-    oro_note.exclusion_provider:
-        class: Oro\Bundle\NoteBundle\Provider\NoteExclusionProvider
-        public: false
-        tags:
-            - { name: oro_entity.exclusion_provider.api }
+            - { name: kernel.event_listener, event: oro_migration.post_up, method: onPostUp, priority: 200 }
+            - { name: kernel.event_listener, event: oro_migration.pre_up, method: onPreUp }

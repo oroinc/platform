@@ -16,11 +16,19 @@ class TagType extends AbstractType
         $builder->add(
             'name',
             'text',
-            array(
+            [
                 'label'    => 'oro.tag.name.label',
-                'required' => true
-            )
-        );
+                'required' => true,
+            ]
+        )
+            ->add(
+                'taxonomy',
+                'oro_taxonomy_select',
+                [
+                    'required' => false,
+                    'label'    => 'oro.taxonomy.entity_label',
+                ]
+            );
     }
 
     /**
@@ -29,15 +37,15 @@ class TagType extends AbstractType
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
         $resolver->setDefaults(
-            array(
+            [
                 'data_class' => 'Oro\Bundle\TagBundle\Entity\Tag',
                 'intention'  => 'tag',
-            )
+            ]
         );
     }
 
     /**
-     *M-BM- {@inheritdoc}
+     * {@inheritdoc}
      */
     public function getName()
     {

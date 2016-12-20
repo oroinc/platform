@@ -8,3 +8,10 @@ Oro\Bundle\TagBundle\Entity\Tag:
                 max:        50
         organization:
             - NotBlank: ~
+
+Oro\Bundle\TagBundle\Entity\Taxonomy:
+    properties:
+        name:
+            - NotBlank:     ~
+            - Length:
+                max:        50

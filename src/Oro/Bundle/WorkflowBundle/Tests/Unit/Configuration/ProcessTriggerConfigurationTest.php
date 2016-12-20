@@ -162,7 +162,7 @@ class ProcessTriggerConfigurationTest extends \PHPUnit_Framework_TestCase
                     'cron' => 'a b * * *'
                 ],
                 'exception' => 'Symfony\Component\Config\Definition\Exception\InvalidConfigurationException',
-                'message' => 'Invalid configuration for path "configuration.cron": Invalid CRON field value a as ' .
+                'message' => 'Invalid configuration for path "configuration.cron": Invalid CRON field value a at ' .
                     'position 0'
             ],
             'not allowed property "field" with cron node' => [

@@ -106,6 +106,10 @@ define(function(require) {
             instance = this.element.data('select2');
         },
 
+        _destroy: function() {
+            this.element.data('select2').destroy();
+        },
+
         _setOption: function(key, value) {
             if ($.isPlainObject(value)) {
                 $.extend(this.options[key], value);
