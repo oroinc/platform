@@ -1,10 +1,14 @@
 <?php
 namespace Oro\Bundle\ImportExportBundle\Async\Import;
 
+use Psr\Log\LoggerInterface;
+use Symfony\Bridge\Doctrine\RegistryInterface;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
+
 use Oro\Bundle\ImportExportBundle\Handler\HttpImportHandler;
 use Oro\Bundle\ImportExportBundle\Job\JobExecutor;
 use Oro\Bundle\MessageQueueBundle\Entity\Job;
-use Oro\Bundle\SecurityProBundle\Tokens\ProUsernamePasswordOrganizationToken;
+use Oro\Bundle\SecurityBundle\Authentication\Token\UsernamePasswordOrganizationToken;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Component\MessageQueue\Client\MessageProducerInterface;
 use Oro\Component\MessageQueue\Client\TopicSubscriberInterface;
@@ -14,9 +18,6 @@ use Oro\Component\MessageQueue\Job\JobStorage;
 use Oro\Component\MessageQueue\Transport\MessageInterface;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
 use Oro\Component\MessageQueue\Util\JSON;
-use Psr\Log\LoggerInterface;
-use Symfony\Bridge\Doctrine\RegistryInterface;
-use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
 abstract class AbstractChunkImportMessageProcessor implements MessageProcessorInterface, TopicSubscriberInterface
 {
@@ -132,7 +133,7 @@ abstract class AbstractChunkImportMessageProcessor implements MessageProcessorIn
 
     protected function getCreateToken($user)
     {
-        $token = new ProUsernamePasswordOrganizationToken(
+        $token = new UsernamePasswordOrganizationToken(
             $user,
             null,
             'import',
