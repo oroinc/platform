@@ -7,8 +7,6 @@ use Doctrine\ORM\Mapping as ORM;
 use JMS\Serializer\Annotation\Type;
 use JMS\Serializer\Annotation\SerializedName;
 
-use BeSimple\SoapBundle\ServiceDefinition\Annotation as Soap;
-
 use Oro\Bundle\UserBundle\Entity\AbstractUser;
 
 /**
@@ -22,7 +20,6 @@ class Audit extends AbstractAudit
      * @ORM\Column(type="integer")
      * @ORM\Id
      * @ORM\GeneratedValue(strategy="AUTO")
-     * @Soap\ComplexType("int", nillable=true)
      */
     protected $id;
 
@@ -30,7 +27,6 @@ class Audit extends AbstractAudit
      * @var string $loggedAt
      *
      * @ORM\Column(name="logged_at", type="datetime", nullable=true)
-     * @Soap\ComplexType("dateTime", nillable=true)
      */
     protected $loggedAt;
 
@@ -38,7 +34,6 @@ class Audit extends AbstractAudit
      * @var string $objectId
      *
      * @ORM\Column(name="object_id", type="integer", nullable=true)
-     * @Soap\ComplexType("int", nillable=true)
      */
     protected $objectId;
 
@@ -46,7 +41,6 @@ class Audit extends AbstractAudit
      * @var string $objectClass
      *
      * @ORM\Column(name="object_class", type="string", length=255)
-     * @Soap\ComplexType("string", nillable=true)
      */
     protected $objectClass;
 
@@ -54,7 +48,6 @@ class Audit extends AbstractAudit
      * @var string $objectName
      *
      * @ORM\Column(name="object_name", type="string", length=255, nullable=true)
-     * @Soap\ComplexType("string", nillable=true)
      */
     protected $objectName;
 
@@ -62,14 +55,11 @@ class Audit extends AbstractAudit
      * @var integer $version
      *
      * @ORM\Column(type="integer", nullable=true)
-     * @Soap\ComplexType("string", nillable=true)
      */
     protected $version;
 
     /**
      * @var string $username
-     *
-     * @Soap\ComplexType("string", nillable=true)
      */
     protected $username;
 

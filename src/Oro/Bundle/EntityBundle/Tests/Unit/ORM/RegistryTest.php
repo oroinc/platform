@@ -33,6 +33,8 @@ class RegistryTest extends \PHPUnit_Framework_TestCase
         $this->registry->expects($this->at(1))
             ->method('resetService');
         $this->registry->expects($this->at(2))
+            ->method('getManager');
+        $this->registry->expects($this->at(3))
             ->method('getService')
             ->willReturn($manager2);
 

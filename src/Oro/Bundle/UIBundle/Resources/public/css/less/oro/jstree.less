@@ -1,0 +1,142 @@
+@import "jstree-actions";
+@import "jstree-wrapper";
+
+.jstree-wholerow-ul {
+  width: 100%;
+  margin-bottom: 10px;
+}
+
+.jstree-default {
+  .jstree-open > .jstree-ocl,
+  .jstree-closed > .jstree-ocl,
+  .jstree-leaf > .jstree-ocl,
+  .jstree-node {
+    position: relative;
+
+    background: transparent;
+  }
+
+  .jstree-themeicon {
+    display: none;
+  }
+
+  .jstree-open > .jstree-ocl:before,
+  .jstree-closed > .jstree-ocl:before {
+    font-family: 'FontAwesome';
+    font-size: 10px;
+    font-weight: normal;
+    font-style: normal;
+    color: @treeIconColor;
+  }
+
+  .jstree-open > .jstree-ocl:before {
+    content: '\f078';
+  }
+
+  .jstree-closed > .jstree-ocl:before {
+    content: '\f054';
+  }
+
+  .jstree-icon,
+  .jstree-icon:empty {
+    width: 26px;
+    height: 36px;
+
+    line-height: 36px;
+  }
+
+  .jstree-clicked {
+    font-weight: bold;
+  }
+
+  .jstree-wholerow-clicked,
+  .jstree-wholerow-hovered {
+    height: 35px;
+    background: @treeLinkBgColor;
+  }
+
+  .jstree-anchor {
+    display: inline-block;
+
+    width: 85%;
+    height: 36px;
+    padding: 0 8px 7px 8px;
+
+    line-height: 36px;
+
+    color: @treeLinkColor;
+    border-radius: 0;
+    box-shadow: none;
+
+    text-overflow: ellipsis;
+    overflow: hidden;
+
+    &:link,
+    &:visited,
+    &:hover,
+    &:active {
+      color: #858585;
+    }
+  }
+
+  .jstree-anchor,
+  .jstree-animated,
+  .jstree-wholerow {
+    transition: none;
+  }
+
+  .jstree-search {
+    font-style: normal;
+  }
+
+  .jstree-icon.jstree-checkbox {
+    background-image: none;
+    font-family: 'FontAwesome';
+    font-size: 18px;
+    font-weight: normal;
+    font-style: normal;
+    color: #a8a8a8;
+    width: 30px;
+    height: 30px;
+    margin: 1px 0 0 -14px;
+
+    &:before {
+      content: '\f096';
+    }
+  }
+
+  .jstree-checked {
+    .jstree-checkbox {
+      color: #48acfd;
+
+      &:before {
+        content: '\f046';
+        margin-left: 2px;
+      }
+    }
+  }
+}
+
+.jstree-search-component {
+  position: relative;
+
+  &__input {
+    width: 100%;
+    height: 30px !important;
+    box-sizing: border-box !important;
+    padding-right: 28px !important;
+  }
+
+  &:before {
+    position: absolute;
+    font-family: 'FontAwesome';
+    font-size: 16px;
+    font-weight: normal;
+    font-style: normal;
+    content: '\f002';
+    color: @treeIconColor;
+    right: 10px;
+    top: 5px;
+    pointer-events: none;
+  }
+}

@@ -2,8 +2,6 @@
 
 namespace Oro\Bundle\EmailBundle\Entity;
 
-use BeSimple\SoapBundle\ServiceDefinition\Annotation as Soap;
-
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\ArrayCollection;
 
@@ -58,7 +56,6 @@ class EmailUser
      * @ORM\Column(name="id", type="integer")
      * @ORM\Id
      * @ORM\GeneratedValue(strategy="AUTO")
-     * @Soap\ComplexType("int")
      * @JMS\Type("integer")
      */
     protected $id;
@@ -108,7 +105,6 @@ class EmailUser
      * @var \DateTime
      *
      * @ORM\Column(name="received", type="datetime")
-     * @Soap\ComplexType("dateTime")
      * @JMS\Type("dateTime")
      */
     protected $receivedAt;
@@ -117,7 +113,6 @@ class EmailUser
      * @var bool
      *
      * @ORM\Column(name="is_seen", type="boolean", options={"default"=true})
-     * @Soap\ComplexType("boolean")
      * @JMS\Type("boolean")
      */
     protected $seen = false;

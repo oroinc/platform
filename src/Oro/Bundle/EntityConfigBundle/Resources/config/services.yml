@@ -49,6 +49,9 @@ services:
             - '@oro_entity_config.link.entity_manager'
             - '@oro_entity_config.config_model_lock_object'
 
+    oro_entity_config.attribute.config_model_manager:
+        alias: oro_entity_config.config_model_manager
+
     oro_entity_config.helper.entity_config:
         class: %oro_entity_config.helper.entity_config.class%
         arguments:
@@ -119,7 +122,8 @@ services:
             - '@oro_entity_config.config_manager'
             - '@oro_datagrid.provider.resolver'
         tags:
-            - { name: kernel.event_subscriber }
+            - { name: kernel.event_listener, event: oro_datagrid.datagrid.build.before.entityconfig-grid, method: onBuildBefore }
+            - { name: kernel.event_listener, event: oro_datagrid.datagrid.build.after.entityconfig-grid, method: onBuildAfter }
 
     oro_entity_config.event_listener.entityfields_grid_listener:
         class: %oro_entity_config.event_listener.entityfields_grid_listener.class%
@@ -127,7 +131,10 @@ services:
             - '@oro_entity_config.config_manager'
             - '@oro_datagrid.provider.resolver'
         tags:
-            - { name: kernel.event_subscriber }
+            - { name: kernel.event_listener, event: oro_datagrid.datagrid.build.before.entityfields-grid, method: onBuildBefore }
+            - { name: kernel.event_listener, event: oro_datagrid.datagrid.build.after.entityfields-grid, method: onBuildAfter }
+            - { name: kernel.event_listener, event: oro_datagrid.datagrid.build.before.attributes-grid, method: onBuildBefore }
+            - { name: kernel.event_listener, event: oro_datagrid.datagrid.build.after.attributes-grid, method: onBuildAfter }
 
     oro_entity_config.event_listener.audit_log_grid_listener:
         class: 'Oro\Bundle\DataAuditBundle\EventListener\AuditHistoryGridListener'
@@ -161,3 +168,8 @@ services:
         arguments:
             - '@oro_translation.manager.translation'
             - '@translator.default'
+
+    oro_entity_config.provider.serialized_field_provider:
+        class: 'Oro\Bundle\EntityConfigBundle\Provider\SerializedFieldProvider'
+        arguments:
+            - '@oro_entity_config.provider.extend'

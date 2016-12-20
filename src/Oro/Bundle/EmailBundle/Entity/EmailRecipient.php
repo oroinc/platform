@@ -4,7 +4,6 @@ namespace Oro\Bundle\EmailBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use JMS\Serializer\Annotation as JMS;
-use BeSimple\SoapBundle\ServiceDefinition\Annotation as Soap;
 
 /**
  * Email Recipient
@@ -34,7 +33,6 @@ class EmailRecipient
      * @var string
      *
      * @ORM\Column(name="name", type="string", length=255)
-     * @Soap\ComplexType("string", name="email")
      * @JMS\Type("string")
      */
     protected $name;
@@ -43,7 +41,6 @@ class EmailRecipient
      * @var string
      *
      * @ORM\Column(name="type", type="string", length=3)
-     * @Soap\ComplexType("string")
      * @JMS\Type("string")
      */
     protected $type;

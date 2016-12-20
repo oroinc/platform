@@ -83,10 +83,15 @@ abstract class AbstractCurrencySelectionType extends AbstractType
             'currencies_list' => null,
             'additional_currencies' => null,
             'full_currency_list' => false,
+            'full_currency_name' => false,
         ]);
 
         $resolver->setNormalizer('choice_label', function (Options $options, $value) {
             $viewType = null;
+
+            if ($options['full_currency_name']) {
+                $viewType = ViewTypeProviderInterface::VIEW_TYPE_FULL_NAME;
+            }
 
             if ($options['compact']) {
                 $viewType = ViewTypeProviderInterface::VIEW_TYPE_ISO_CODE;
