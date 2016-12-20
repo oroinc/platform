@@ -249,7 +249,7 @@ Now, let's add another scope criterion provider in a `WebsiteBundle` for the *we
 In the bundle's *service.yml* file we add:
 ```
 oro_website.website_scope_criteria_provider:
-    class: 'Oro\Bundle\WebsiteBundle\Provider\ScopeCriteriaProvider'
+    class: 'Oro\Bundle\WebsiteBundle\Provider\WebsiteCriteriaProvider'
     tags:
         - { name: oro_scope.provider, scopeType: web_content, priority: 100 }
 ```

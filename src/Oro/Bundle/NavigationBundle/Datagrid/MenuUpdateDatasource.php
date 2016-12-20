@@ -52,7 +52,11 @@ class MenuUpdateDatasource implements DatasourceInterface
      */
     public function process(DatagridInterface $grid, array $config)
     {
-        $grid->setDatasource(clone $this);
+        $datasource = clone $this;
+        if(isset($config['scope_type'])) {
+            $datasource->scopeType = $config['scope_type'];
+        }
+        $grid->setDatasource($datasource);
     }
 
     /**
@@ -61,7 +65,6 @@ class MenuUpdateDatasource implements DatasourceInterface
     public function getResults()
     {
         $rows = [];
-
         foreach ($this->menuConfiguration['tree'] as $name => $item) {
             $menuItem = $this->chainProvider->get($name);
             if ($menuItem->getExtra('scope_type') === $this->scopeType && !$menuItem->getExtra('read_only')) {

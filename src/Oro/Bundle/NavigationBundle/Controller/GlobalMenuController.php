@@ -23,7 +23,7 @@ class GlobalMenuController extends AbstractMenuController
      */
     public function indexAction()
     {
-        return $this->index();
+        return $this->index($this->getScope());
     }
 
     /**
@@ -37,7 +37,7 @@ class GlobalMenuController extends AbstractMenuController
      */
     public function viewAction($menuName)
     {
-        return $this->view($menuName);
+        return $this->view($menuName, $this->getScope());
     }
 
     /**
@@ -52,7 +52,7 @@ class GlobalMenuController extends AbstractMenuController
      */
     public function createAction($menuName, $parentKey = null)
     {
-        return parent::create($menuName, $parentKey);
+        return parent::create($menuName, $parentKey, $this->getScope());
     }
 
     /**
@@ -67,23 +67,7 @@ class GlobalMenuController extends AbstractMenuController
      */
     public function updateAction($menuName, $key)
     {
-        return parent::update($menuName, $key);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    protected function getScopeType()
-    {
-        return $this->getParameter('oro_navigation.menu_update.scope_type');
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    protected function getMenuUpdateManager()
-    {
-        return $this->get('oro_navigation.manager.menu_update');
+        return parent::update($menuName, $key, $this->getScope());
     }
 
     /**

@@ -1,7 +1,7 @@
 datagrids:
     menu-global-grid:
         source:
-            type: menu-update-default-provider
+            type: menu-update
         columns:
             name:
                 label: oro.navigation.menuitem.name.label
