@@ -116,7 +116,6 @@ define(function(require) {
                         self.$el.show();
                         self.grid.shown = true;
                         self.grid.trigger('shown');
-                        options.themeOptions.serverRendered = false;
                     });
                 });
             }, this));
@@ -149,13 +148,7 @@ define(function(require) {
         initDataGrid: function(options) {
             this.$componentEl = options.$el;
 
-            if (options.themeOptions.serverRendered) {
-                this.$el = options.$el.find('.oro-datagrid');
-            } else {
-                this.$el = $('<div>');
-                this.$el.hide();
-                this.$componentEl.append(this.$el);
-            }
+            this.insertDataGrid(options);
 
             this.gridName = options.gridName;
             this.inputName = options.inputName;
@@ -181,6 +174,15 @@ define(function(require) {
             this.listenTo(this.metadataModel, 'change:massActions', function(model, massActions) {
                 this.grid.massActions.reset(this.buildMassActionsOptions(massActions));
             }, this);
+        },
+
+        /**
+         * Insert Grid to DOM
+         * @param {Object} options
+         */
+        insertDataGrid: function(options) {
+            this.$el = $('<div>');
+            this.$componentEl.append(this.$el);
         },
 
         /**

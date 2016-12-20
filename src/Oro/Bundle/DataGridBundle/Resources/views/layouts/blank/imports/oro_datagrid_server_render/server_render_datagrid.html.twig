@@ -5,10 +5,6 @@
 
     {% set renderParams = grid_render_parameters %}
 
-    {% set themeOptions = renderParams.themeOptions|merge({
-        serverRendered: true
-    })%}
-
     {% set attr = attr|merge({
         id: gridId
     }) %}
@@ -60,7 +56,8 @@
         showViewsInNavbar: renderParams.showViewsInNavbar is defined ? renderParams.showViewsInNavbar : false,
         inputName: oro_datagrid_build_inputname(datagrid.name),
         themeOptions: themeOptions|default({}),
-        toolbarOptions: renderParams.toolbarOptions|default({})
+        toolbarOptions: renderParams.toolbarOptions|default({}),
+        gridMainContainer: '.oro-datagrid'
     } %}
 
     <div id="{{ gridId }}"
