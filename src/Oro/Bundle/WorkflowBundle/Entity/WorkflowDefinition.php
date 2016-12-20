@@ -2,13 +2,13 @@
 
 namespace Oro\Bundle\WorkflowBundle\Entity;
 
-use Oro\Bundle\ActionBundle\Provider\CurrentApplicationProviderInterface;
 use Symfony\Component\Security\Acl\Model\DomainObjectInterface;
 
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\Collections\ArrayCollection;
 
+use Oro\Bundle\ActionBundle\Provider\CurrentApplicationProviderInterface;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
 use Oro\Bundle\ScopeBundle\Entity\Scope;
