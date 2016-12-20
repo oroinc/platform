@@ -9,13 +9,13 @@ use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
 use Oro\Bundle\NavigationBundle\Model\ExtendMenuUpdate;
 
 /**
- * @ORM\Entity
+ * @ORM\Entity(repositoryClass="Oro\Bundle\NavigationBundle\Entity\Repository\MenuUpdateRepository")
  * @ORM\Table(
  *      name="oro_navigation_menu_upd",
  *      uniqueConstraints={
  *          @ORM\UniqueConstraint(
  *              name="oro_navigation_menu_upd_uidx",
- *              columns={"key", "ownership_type", "owner_id"}
+ *              columns={"key", "scope_id", "menu"}
  *          )
  *      }
  * )
@@ -67,7 +67,7 @@ use Oro\Bundle\NavigationBundle\Model\ExtendMenuUpdate;
  *      routeName="oro_navigation_menu_update_index",
  *      defaultValues={
  *          "entity"={
- *              "icon"="icon-th"
+ *              "icon"="fa-th"
  *          }
  *      }
  * )

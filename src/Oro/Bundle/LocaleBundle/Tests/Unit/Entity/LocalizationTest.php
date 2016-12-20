@@ -170,4 +170,17 @@ class LocalizationTest extends \PHPUnit_Framework_TestCase
 
         return $localized;
     }
+
+    public function testGetHierarchy()
+    {
+        $parentLocalizationId = 42;
+        $parentLocalization = $this->getEntity(
+            'Oro\Bundle\LocaleBundle\Entity\Localization',
+            ['id' => $parentLocalizationId]
+        );
+        $localization = new Localization();
+        $localization->setParentLocalization($parentLocalization);
+
+        $this->assertEquals([$parentLocalizationId, null], $localization->getHierarchy());
+    }
 }

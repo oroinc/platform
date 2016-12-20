@@ -80,8 +80,9 @@ class RequestEntity extends AbstractAction
             );
         }
 
-        if (!empty($options['where']) && !is_array($options['where'])) {
-            throw new InvalidParameterException('Parameter "where" must be array');
+        if (!empty($options['where']) && !is_array($options['where']) &&
+                !$options['where'] instanceof PropertyPathInterface) {
+            throw new InvalidParameterException('Parameter "where" must be array or property');
         } elseif (empty($options['where'])) {
             $options['where'] = [];
         }
@@ -108,7 +109,7 @@ class RequestEntity extends AbstractAction
      */
     protected function getEntityReference($context)
     {
-        $entityClassName = $this->getEntityClassName();
+        $entityClassName = $this->getEntityClassName($context);
         $entityManager = $this->getEntityManager($entityClassName);
 
         $entityIdentifier = $this->getEntityIdentifier($context);
@@ -126,7 +127,7 @@ class RequestEntity extends AbstractAction
      */
     protected function getEntityByConditions($context)
     {
-        $entityClassName = $this->getEntityClassName();
+        $entityClassName = $this->getEntityClassName($context);
         $entityManager = $this->getEntityManager($entityClassName);
 
         $where = $this->getWhere($context);
@@ -178,11 +179,14 @@ class RequestEntity extends AbstractAction
     }
 
     /**
+     * @param mixed $context
      * @return string
      */
-    protected function getEntityClassName()
+    protected function getEntityClassName($context)
     {
-        return $this->options['class'];
+        $class = $this->options['class'];
+
+        return $this->contextAccessor->getValue($context, $class);
     }
 
     /**
@@ -208,7 +212,15 @@ class RequestEntity extends AbstractAction
      */
     protected function getWhere($context)
     {
-        return $this->parseArrayValues($context, $this->options['where']);
+        $where = $this->options['where'];
+
+        if (is_array($where)) {
+            $where = $this->parseArrayValues($context, $where);
+        } else {
+            $where = $this->contextAccessor->getValue($context, $where);
+        }
+
+        return $where;
     }
 
     /**
@@ -274,7 +286,7 @@ class RequestEntity extends AbstractAction
         if (is_array($data)) {
             foreach ($data as $key => $value) {
                 if (is_scalar($value)) {
-                    $data[$key] = trim($value);
+                    $data[$key] = is_bool($value) ? $value : trim($value);
                 }
             }
         } elseif (is_string($data)) {

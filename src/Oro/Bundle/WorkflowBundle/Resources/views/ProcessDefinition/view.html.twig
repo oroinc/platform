@@ -8,7 +8,7 @@
         {% if entity.enabled %}
             {{ UI.button({
                 'aCss':  'no-hash btn-danger',
-                'iCss':  'icon-remove',
+                'iCss':  'fa-close',
                 'id':    idButton,
                 'label': 'oro.workflow.action.process.deactivate'|trans,
                 'path':  path('oro_api_process_deactivate', {'processDefinition': entity.name}),
@@ -16,7 +16,7 @@
             }) }}
         {% else %}
             {{ UI.button({
-                'iCss':  'icon-ok',
+                'iCss':  'fa-check',
                 'aCss':  'no-hash btn-success',
                 'id':    idButton,
                 'label': 'oro.workflow.action.process.activate'|trans,
@@ -25,8 +25,8 @@
             }) }}
         {% endif %}
         <script type="text/javascript">
-            require(['jquery', 'oroui/js/mediator', 'oroui/js/error'],
-            function($, mediator, Error) {
+            require(['jquery', 'oroui/js/mediator'],
+            function($, mediator) {
                 $('#{{ idButton }}').on('click', function(e) {
                     e.preventDefault();
                     var el = $(this);
@@ -40,9 +40,6 @@
                                 });
                             }
                             mediator.execute('refreshPage');
-                        },
-                        error: function(xhr) {
-                            Error.handle({}, xhr, {enforce: true});
                         }
                     })
                 });
@@ -56,9 +53,9 @@
 
     <div class="pull-left">
         {% if entity.enabled %}
-            <div class="badge badge-enabled status-enabled"><i class="icon-status-enabled icon-circle"></i>{{ 'Active'|trans }}</div>
+            <div class="badge badge-enabled status-enabled"><i class="icon-status-enabled fa-circle"></i>{{ 'Active'|trans }}</div>
         {% else %}
-            <div class="badge badge-disabled status-disabled"><i class="icon-status-disabled icon-circle"></i>{{ 'Inactive'|trans }}</div>
+            <div class="badge badge-disabled status-disabled"><i class="icon-status-disabled fa-circle"></i>{{ 'Inactive'|trans }}</div>
         {% endif %}
     </div>
 {% endblock breadcrumbs %}

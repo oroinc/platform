@@ -45,6 +45,8 @@ define([
 
     // defines own properties and methods
     _.extend(BaseComponent.prototype, {
+        AUXILIARY_OPTIONS: ['_sourceElement', '_subPromises', 'name'],
+
         /**
          * Defer object, helps to notify environment that component is initialized
          * in case it work in asynchronous way
@@ -78,6 +80,15 @@ define([
             this.off();
             // dispose and remove all own properties
             _.each(this, function(item, name) {
+                if (componentOptions.indexOf(name) !== -1) {
+                    /**
+                     * Do not dispose auto-assigned props, that were passed over options.
+                     * Just delete a reference.
+                     * Parent view or component have to take care of them, to dispose them properly.
+                     */
+                    delete this[name];
+                    return;
+                }
                 if (item && typeof item.dispose === 'function' && !item.disposed) {
                     item.dispose();
                 }

@@ -17,6 +17,12 @@
 The bundle integrates OroMessageQueue component.
 It adds easy to use configuration layer, register services and tie them together, register handy cli commands.
 
+## Jobs
+
+The bundle provides an entity and a web gui for [the jobs](../../Component/MessageQueue/README.md#jobs). So the jobs are created in the db and have
+a web gui where you can monitor jobs status and interrupt jobs.
+
+
 ## Usage
 
 First, you have to configure a transport layer and set one to be default.

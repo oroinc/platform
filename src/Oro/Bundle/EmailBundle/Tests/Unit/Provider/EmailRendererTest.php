@@ -48,7 +48,7 @@ class EmailRendererTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->sandbox->expects($this->once())->method('getName')
+        $this->sandbox->expects($this->exactly(3))->method('getName')
             ->will($this->returnValue('sandbox'));
         $this->sandbox->expects($this->once())->method('getSecurityPolicy')
             ->will($this->returnValue($this->securityPolicy));

@@ -10,6 +10,7 @@ use Oro\Bundle\ActivityBundle\Migration\Extension\ActivityExtension;
 use Oro\Bundle\ActivityBundle\Migration\Extension\ActivityExtensionAwareInterface;
 use Oro\Bundle\EntityBundle\EntityConfig\DatagridScope;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
+use Oro\Bundle\EntityExtendBundle\Extend\RelationType;
 use Oro\Bundle\EntityExtendBundle\Migration\Extension\ExtendExtension;
 use Oro\Bundle\EntityExtendBundle\Migration\Extension\ExtendExtensionAwareInterface;
 use Oro\Bundle\MigrationBundle\Migration\Installation;
@@ -150,6 +151,8 @@ class OroUserBundleInstaller implements
         AddImpersonationTable::createOroUserImpersonationTable($schema);
         AddImpersonationIpColumn::addColumn($schema);
         AddAuthStatusColumn::addAuthStatusFieldAndValues($schema, $queries, $this->extendExtension);
+
+        $this->addRelationsToScope($schema);
     }
 
     /**
@@ -539,5 +542,30 @@ class OroUserBundleInstaller implements
         $table = $schema->getTable('oro_access_group');
         $table->addUniqueIndex(['name', 'organization_id'], 'uq_name_org_idx');
         $table->addIndex(['business_unit_owner_id'], 'IDX_FEF9EDB759294170', []);
+    }
+
+    /**
+     * @param Schema $schema
+     */
+    protected function addRelationsToScope(Schema $schema)
+    {
+        if ($schema->hasTable('oro_scope')) {
+            $this->extendExtension->addManyToOneRelation(
+                $schema,
+                'oro_scope',
+                'user',
+                'oro_user',
+                'id',
+                [
+                    'extend' => [
+                        'owner' => ExtendScope::OWNER_CUSTOM,
+                        'cascade' => ['all'],
+                        'on_delete' => 'CASCADE',
+                        'nullable' => true
+                    ]
+                ],
+                RelationType::MANY_TO_ONE
+            );
+        }
     }
 }

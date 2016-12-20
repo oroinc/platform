@@ -63,6 +63,46 @@
       &:hover {
         background-color: transparent;
       }
+      .actions {
+        position: static;
+        .vertical-actions .dropdown-toggle {
+          padding: 0;
+          color: #999;
+          font-size: 16px;
+          line-height: .7em;
+          width: 23px;
+          height: 19px;
+          float: left;
+          &:hover,
+          &:focus {
+            border: 0;
+            text-decoration: none;
+          }
+        }
+        .vertical-actions .dropdown-menu {
+          right: 30px;
+          top: -5px;
+
+          &.pull-right:before {
+            position: absolute;
+            top: 9px;
+            right: -14px;
+            display: inline-block;
+            border: 7px solid transparent;
+            border-left-color: rgba(0, 0, 0, 0.2);
+            content: '';
+          }
+          &.pull-right:after {
+            position: absolute;
+            top: 10px;
+            right: -12px;
+            display: inline-block;
+            border: 6px solid transparent;
+            border-left-color: white;
+            content: '';
+          }
+        }
+      }
       .user {
         font-style: normal;
       }
@@ -109,21 +149,21 @@
 
     > .accordion-icon {
       padding: 0;
-      margin: 7px 0 0 5px;
+      margin: 8px 0 0 5px;
       float: left;
       line-height: 20px;
       height: 20px;
       &:before {
-        content: '\f117';
+        content: '\f147';
         font-family: FontAwesome;
-        font-size: 20px;
+        font-size: 18px;
         color: #999;
       }
       &:hover:before {
         color: #444;
       }
       &.collapsed:before {
-        content: '\f116';
+        content: '\f196';
       }
     }
     > .icon {
@@ -138,7 +178,6 @@
       float: right;
       margin: 8px 0 0 8px;
       overflow: visible;
-      .horizontal-icon-menu;
     }
     > .details {
       margin: 9px 7px 0 0;
@@ -155,7 +194,7 @@
     > .extra-info {
       padding-top: 9px;
       padding-bottom: 4px;
-      width: calc(~"100% - 350px");
+      width: calc(~"100% - 351px");
       display: -webkit-flex;
       display: flex;
       flex-flow: row nowrap;
@@ -236,7 +275,7 @@ li[data-criteria="condition-activity"] {
     .filter-item {
         margin-right: 0;
 
-        .icon-remove {
+        .fa-close {
             margin-right: 0;
         }
     }

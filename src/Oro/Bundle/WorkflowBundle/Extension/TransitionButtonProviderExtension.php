@@ -6,8 +6,8 @@ use Doctrine\Common\Collections\ArrayCollection;
 
 use Oro\Bundle\ActionBundle\Extension\ButtonProviderExtensionInterface;
 use Oro\Bundle\ActionBundle\Model\ButtonContext;
+use Oro\Bundle\ActionBundle\Model\ButtonInterface;
 use Oro\Bundle\ActionBundle\Model\ButtonSearchContext;
-use Oro\Bundle\ActionBundle\Model\OperationRegistry;
 use Oro\Bundle\ActionBundle\Provider\RouteProviderInterface;
 
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
@@ -48,7 +48,7 @@ class TransitionButtonProviderExtension implements ButtonProviderExtensionInterf
         $group = $buttonSearchContext->getGroup();
 
         // Skip if custom buttons group defined
-        if ($group && ($group !== OperationRegistry::DEFAULT_GROUP)) {
+        if ($group && ($group !== ButtonInterface::DEFAULT_GROUP)) {
             return $buttons;
         }
 
@@ -57,7 +57,7 @@ class TransitionButtonProviderExtension implements ButtonProviderExtensionInterf
             return $buttons;
         }
 
-        foreach ($this->workflowRegistry->getActiveWorkflows() as $workflow) {
+        foreach ($this->getActiveWorkflows() as $workflow) {
             $transitions = $this->getInitTransitions($workflow, $buttonSearchContext);
 
             foreach ($transitions as $transition) {
@@ -81,6 +81,27 @@ class TransitionButtonProviderExtension implements ButtonProviderExtensionInterf
         $this->baseButtonContext = null;
 
         return $buttons;
+    }
+
+    /**
+     * @return Workflow[]
+     */
+    protected function getActiveWorkflows()
+    {
+        $exclusiveGroups = [];
+        return $this->workflowRegistry->getActiveWorkflows()->filter(
+            function (Workflow $workflow) use (&$exclusiveGroups) {
+                $currentGroups = $workflow->getDefinition()->getExclusiveRecordGroups();
+
+                if (array_intersect($exclusiveGroups, $currentGroups)) {
+                    return false;
+                }
+
+                $exclusiveGroups += $currentGroups;
+
+                return true;
+            }
+        );
     }
 
     /**

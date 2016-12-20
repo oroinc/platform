@@ -6,10 +6,9 @@ define([
     'orotranslation/js/translator',
     'oroui/js/mediator',
     'oroui/js/tools',
-    'oroui/js/error',
     'oroui/js/modal',
     'orodatagrid/js/datagrid/action-launcher'
-], function($, _, Backbone, routing, __, mediator, tools, error, Modal, ActionLauncher) {
+], function($, _, Backbone, routing, __, mediator, tools, Modal, ActionLauncher) {
     'use strict';
 
     var AbstractAction;
@@ -81,6 +80,7 @@ define([
         defaultMessages: {
             confirm_title: 'Execution Confirmation',
             confirm_content: 'Are you sure you want to do this?',
+            confirm_content_params: {},
             confirm_ok: 'Yes, do it',
             confirm_cancel: 'Cancel',
             success: 'Action performed.',
@@ -254,7 +254,6 @@ define([
         },
 
         _onAjaxError: function(jqXHR) {
-            error.handle({}, jqXHR, {enforce: true});
             if (this.reloadData) {
                 this.datagrid.hideLoading();
             }
@@ -340,7 +339,7 @@ define([
          * @return {String}
          */
         getConfirmContentMessage: function() {
-            return __(this.messages.confirm_content);
+            return __(this.messages.confirm_content, this.messages.confirm_content_params);
         },
 
         /**

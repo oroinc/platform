@@ -8,9 +8,9 @@ define(['jquery', 'oroui/js/mediator', 'underscore', 'jquery-ui'], function($, m
             trigger: '[data-collapse-trigger]',
             container: '[data-collapse-container]',
             hideSibling: false,
-            breakpoint: 0,
             storageKey: '',
-            open: null,
+            open: true,
+            forcedState: null,
             uid: '',
             openClass: 'expanded',
             animationSpeed: 250
@@ -30,20 +30,30 @@ define(['jquery', 'oroui/js/mediator', 'underscore', 'jquery-ui'], function($, m
             this.$trigger = this.$el.find(this.options.trigger);
             this.$container = this.$el.find(this.options.container);
 
-            this.options.open = _.isBoolean(storedState) ? storedState : this.options.open;
+            if (_.isBoolean(this.options.forcedState)) {
+                this.options.open = this.options.forcedState;
+            } else if (_.isBoolean(storedState)) {
+                this.options.open = storedState;
+            }
 
             this.$el.addClass('init');
 
             this._initEvents();
 
-            if (this._isEnabled()) {
-                this.$el.toggleClass(this.options.openClass, this.options.open);
-                if (this.options.open) {
-                    this.$container.show();
-                } else {
-                    this.$container.hide();
-                }
+            this.$el.toggleClass(this.options.openClass, this.options.open);
+            if (this.options.open) {
+                this.$container.show();
+            } else {
+                this.$container.hide();
             }
+        },
+
+        _destroy: function() {
+            this._setState(true, true);
+            this.$el.removeClass('init');
+            this.$container.css('display', '');
+            this._off(this.$trigger, 'click');
+            this._super();
         },
 
         _initEvents: function() {
@@ -52,43 +62,42 @@ define(['jquery', 'oroui/js/mediator', 'underscore', 'jquery-ui'], function($, m
             });
         },
 
-        _toggle: function(event) {
-            if (!this._isEnabled()) {
-                return;
+        _setState: function(isOpen, isDestroy) {
+            var params = {
+                isOpen: isOpen,
+                $el: this.$el,
+                $trigger: this.$trigger,
+                $container: this.$container
+            };
+
+            this.$el.toggleClass(this.options.openClass, isOpen);
+
+            if (this.options.hideSibling) {
+                this._hideSiblings(isOpen && !isDestroy);
             }
-            var self = this;
+
+            this.$trigger.trigger('collapse:toggle', params);
+            mediator.trigger('layout:adjustHeight');
+
+            if (this.options.storageKey) {
+                localStorage.setItem(this.options.storageKey + this.options.uid, isOpen);
+            }
+        },
+
+        _toggle: function(event) {
             var $trigger = $(event.currentTarget);
-            var $container = this.$container;
 
             if ($trigger.attr('href')) {
                 event.preventDefault();
             }
 
-            if ($container.is(':animated')) {
+            if (this.$container.is(':animated')) {
                 return false;
             }
 
-            $container.slideToggle(this.options.animationSpeed, function() {
-                var isOpen = $(this).is(':visible');
-                var params = {
-                    isOpen: isOpen,
-                    $el: self.$el,
-                    $rigger: $trigger,
-                    $container: $container
-                };
-
-                self.$el.toggleClass(self.options.openClass, isOpen);
-
-                if (self.options.hideSibling) {
-                    self._hideSiblings(isOpen);
-                }
-
-                $trigger.trigger('collapse:toggle', params);
-                mediator.trigger('layout:adjustHeight');
-
-                if (self.options.storageKey) {
-                    localStorage.setItem(self.options.storageKey + self.options.uid, isOpen);
-                }
+            var self = this;
+            this.$container.slideToggle(this.options.animationSpeed, function() {
+                self._setState($(this).is(':visible'));
             });
         },
 
@@ -98,13 +107,6 @@ define(['jquery', 'oroui/js/mediator', 'underscore', 'jquery-ui'], function($, m
             } else {
                 this.$el.siblings().show(this.options.animationSpeed);
             }
-        },
-
-        _isEnabled: function() {
-            if (this.options.breakpoint && $(window).outerWidth() >= this.options.breakpoint) {
-                return false;
-            }
-            return true;
         }
     });
 

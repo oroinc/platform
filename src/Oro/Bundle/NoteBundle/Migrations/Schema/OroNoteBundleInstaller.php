@@ -20,9 +20,11 @@ class OroNoteBundleInstaller implements Installation, AttachmentExtensionAwareIn
     /**
      * {@inheritdoc}
      */
-    public function setAttachmentExtension(AttachmentExtension $attachmentExtension)
+    public function up(Schema $schema, QueryBag $queries)
     {
-        $this->attachmentExtension = $attachmentExtension;
+        OroNoteBundle::addNoteTable($schema);
+        NoteOrganization::addOrganizationFields($schema);
+        NoteAttachment::addAttachment($schema, $this->attachmentExtension);
     }
 
     /**
@@ -30,16 +32,14 @@ class OroNoteBundleInstaller implements Installation, AttachmentExtensionAwareIn
      */
     public function getMigrationVersion()
     {
-        return 'v1_2';
+        return 'v1_3';
     }
 
     /**
      * {@inheritdoc}
      */
-    public function up(Schema $schema, QueryBag $queries)
+    public function setAttachmentExtension(AttachmentExtension $attachmentExtension)
     {
-        OroNoteBundle::addNoteTable($schema);
-        NoteOrganization::addOrganizationFields($schema);
-        NoteAttachment::addAttachment($schema, $this->attachmentExtension);
+        $this->attachmentExtension = $attachmentExtension;
     }
 }

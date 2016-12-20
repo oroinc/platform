@@ -43,10 +43,6 @@ class CreateObject extends AbstractAction
             throw new InvalidParameterException('Attribute must be valid property definition.');
         }
 
-        if (!empty($options[self::OPTION_KEY_DATA]) && !is_array($options[self::OPTION_KEY_DATA])) {
-            throw new InvalidParameterException('Object data must be an array.');
-        }
-
         if (!empty($options[self::OPTION_KEY_ARGUMENTS]) && !is_array($options[self::OPTION_KEY_ARGUMENTS])) {
             throw new InvalidParameterException('Object constructor arguments must be an array.');
         }
@@ -72,7 +68,7 @@ class CreateObject extends AbstractAction
             $object = new $objectClassName();
         }
 
-        $objectData = $this->getObjectData();
+        $objectData = $this->getObjectData($context);
         if ($objectData) {
             $this->assignObjectData($context, $object, $objectData);
         }
@@ -106,11 +102,22 @@ class CreateObject extends AbstractAction
     }
 
     /**
+     * @param mixed $context
      * @return array
      */
-    protected function getObjectData()
+    protected function getObjectData($context)
     {
-        return $this->getOption($this->options, self::OPTION_KEY_DATA, []);
+        $data = $this->getOption($this->options, self::OPTION_KEY_DATA, []);
+
+        if ($data instanceof PropertyPathInterface) {
+            $data = $this->contextAccessor->getValue($context, $data);
+        }
+
+        if (!empty($data) && !is_array($data)) {
+            throw new InvalidParameterException('Object data must be an array.');
+        }
+
+        return $data;
     }
 
     /**

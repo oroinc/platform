@@ -24,6 +24,7 @@ use Oro\Bundle\EntityBundle\Provider\EntityNameResolver;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 use Oro\Bundle\FeatureToggleBundle\Checker\FeatureToggleableInterface;
 use Oro\Bundle\SecurityBundle\SecurityFacade;
+use Oro\Bundle\WorkflowBundle\Helper\WorkflowDataHelper;
 
 /**
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
@@ -62,6 +63,9 @@ class ActivityListManager
     /** @var EventDispatcherInterface */
     protected $eventDispatcher;
 
+    /** @var WorkflowDataHelper */
+    protected $workflowHelper;
+
     /**
      * @param SecurityFacade                   $securityFacade
      * @param EntityNameResolver               $entityNameResolver
@@ -73,7 +77,7 @@ class ActivityListManager
      * @param ActivityListAclCriteriaHelper    $aclHelper
      * @param ActivityInheritanceTargetsHelper $activityInheritanceTargetsHelper
      * @param EventDispatcherInterface         $eventDispatcher
-     *
+     * @param WorkflowDataHelper               $workflowHelper
      * @SuppressWarnings(PHPMD.ExcessiveParameterList)
      */
     public function __construct(
@@ -86,7 +90,8 @@ class ActivityListManager
         DoctrineHelper $doctrineHelper,
         ActivityListAclCriteriaHelper $aclHelper,
         ActivityInheritanceTargetsHelper $activityInheritanceTargetsHelper,
-        EventDispatcherInterface $eventDispatcher
+        EventDispatcherInterface $eventDispatcher,
+        WorkflowDataHelper $workflowHelper
     ) {
         $this->securityFacade = $securityFacade;
         $this->entityNameResolver = $entityNameResolver;
@@ -98,6 +103,7 @@ class ActivityListManager
         $this->activityListAclHelper = $aclHelper;
         $this->activityInheritanceTargetsHelper = $activityInheritanceTargetsHelper;
         $this->eventDispatcher = $eventDispatcher;
+        $this->workflowHelper = $workflowHelper;
     }
 
     /**
@@ -114,7 +120,7 @@ class ActivityListManager
      * @param array   $filter
      * @param array   $pageFilter
      *
-     * @return array ('data' => [], 'count' => int)
+     * @return array ['data' => [], 'count' => int]
      */
     public function getListData($entityClass, $entityId, $filter, $pageFilter = [])
     {
@@ -354,6 +360,8 @@ class ActivityListManager
             $isHead = false;
         }
 
+        $workflowsData = $this->workflowHelper->getEntityWorkflowsData($activity);
+
         $result = [
             'id'                   => $entity->getId(),
             'owner'                => $ownerName,
@@ -372,6 +380,7 @@ class ActivityListManager
             'removable'            => $this->securityFacade->isGranted('DELETE', $activity),
             'commentCount'         => $numberOfComments,
             'commentable'          => $this->commentManager->isCommentable(),
+            'workflowsData'        => $workflowsData,
             'targetEntityData'     => $targetEntityData,
             'is_head'              => $isHead,
         ];
@@ -539,15 +548,22 @@ class ActivityListManager
             $activityField = current(array_keys($association['relationToSourceKeyColumns']));
             $targetField = current(array_keys($association['relationToTargetKeyColumns']));
 
-            $where = "WHERE $targetField = :sourceEntityId AND $activityField IN(" . implode(',', $activityIds) . ")";
             $dbConnection = $this->doctrineHelper
                 ->getEntityManager(ActivityList::ENTITY_NAME)
-                ->getConnection()
-                ->prepare("UPDATE $tableName SET $targetField = :masterEntityId $where");
+                ->getConnection();
 
-            $dbConnection->bindValue('masterEntityId', $newTargetId);
-            $dbConnection->bindValue('sourceEntityId', $oldTargetId);
-            $dbConnection->execute();
+            // to avoid of duplication activity lists and activities items we need to clear these relations
+            // from the master record before update
+            $where = "WHERE $targetField = :masterEntityId AND $activityField IN(" . implode(',', $activityIds) . ")";
+            $stmt = $dbConnection->prepare("DELETE FROM $tableName $where");
+            $stmt->bindValue('masterEntityId', $newTargetId);
+            $stmt->execute();
+
+            $where = "WHERE $targetField = :sourceEntityId AND $activityField IN(" . implode(',', $activityIds) . ")";
+            $stmt = $dbConnection->prepare("UPDATE $tableName SET $targetField = :masterEntityId $where");
+            $stmt->bindValue('masterEntityId', $newTargetId);
+            $stmt->bindValue('sourceEntityId', $oldTargetId);
+            $stmt->execute();
         }
 
         return $this;

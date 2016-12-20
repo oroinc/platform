@@ -33,24 +33,24 @@ navigation:
             pinbar:
                 label: 'oro.navigation.menu.pinbar.label'
                 extras:
-                    icon: 'icon-folder-close'
+                    icon: 'fa-folder'
                     max_items: 10
                 uri: '#'
             history:
                 label: 'oro.navigation.menu.history.label'
                 extras:
-                    icon: 'icon-time'
+                    icon: 'fa-clock-o'
                     active_if_first_is_empty: true
                 uri: '#'
             favorite:
                 label: 'oro.navigation.menu.favorite.label'
                 extras:
-                    icon: 'icon-star-empty'
+                    icon: 'fa-star-o'
                 uri: '#'
             mostviewed:
                 label: 'oro.navigation.menu.mostviewed.label'
                 extras:
-                    icon: 'icon-flag'
+                    icon: 'fa-flag'
                 uri: '#'
             menu_list_default:
                 label: 'oro.navigation.menu.menu_list_default.label'
@@ -58,7 +58,7 @@ navigation:
                 extras:
                     position: 90
                     routes: ['/^oro_navigation_global_menu_[\w_]+$/']
-                    description: 'Manage menus in default area'
+                    description: 'Manage menus in default scope type'
 
         tree:
             application_menu:

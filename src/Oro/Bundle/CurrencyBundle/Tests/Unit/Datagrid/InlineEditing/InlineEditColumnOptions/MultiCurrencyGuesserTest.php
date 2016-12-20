@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\CurrencyBundle\Tests\Unit\Extension\InlineEditing\InlineEditColumnOption;
 
+use Oro\Bundle\CurrencyBundle\Converter\CurrencyToString;
 use Oro\Bundle\CurrencyBundle\Datagrid\InlineEditing\InlineEditColumnOptions\MultiCurrencyGuesser;
 
 class MultiCurrencyGuesserTest extends \PHPUnit_Framework_TestCase
@@ -14,6 +15,9 @@ class MultiCurrencyGuesserTest extends \PHPUnit_Framework_TestCase
     /** @var MultiCurrencyGuesser */
     protected $guesser;
 
+    /** @var CurrencyToString */
+    protected $currencyToStringConverter;
+
     public function setUp()
     {
         $this->currencyHelper = $this
@@ -21,85 +25,176 @@ class MultiCurrencyGuesserTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->guesser = new MultiCurrencyGuesser($this->currencyHelper);
+        $this->guesser = new MultiCurrencyGuesser($this->currencyHelper, $this->getCurrencyToStringConverter());
+    }
+
+    protected function getCurrencyToStringConverter()
+    {
+        if (null === $this->currencyToStringConverter) {
+            $this->currencyToStringConverter = $this
+                ->getMockBuilder('Oro\Bundle\CurrencyBundle\Converter\CurrencyToString')
+                ->disableOriginalConstructor()
+                ->getMock();
+        }
+
+        return $this->currencyToStringConverter;
     }
 
     /**
      * @param array $column
      * @param array $expected
+     * @param bool  $isEnabledInline
+     * @param array $choices
      *
      * @dataProvider setParametersDataProvider
      */
-    public function testRelationGuess($column, $expected)
+    public function testRelationGuess($column, $expected, $isEnabledInline, $choices)
     {
-        $this->currencyHelper->expects($this->once())->method('getCurrencyChoices')
-            ->willReturn($expected['choices']);
+        if (empty($choices)) {
+            $this
+                ->currencyHelper
+                ->expects($this->never())
+                ->method('getCurrencyChoices');
+        } else {
+            $this
+                ->currencyHelper
+                ->expects($this->once())
+                ->method('getCurrencyChoices')
+                ->willReturn($choices);
+        }
 
-        $guessed = $this->guesser->guessColumnOptions('test', 'test', $column);
-        $expected['choices'] = array_keys($expected['choices']);
+        $guessed = $this->guesser->guessColumnOptions('test', 'test', $column, $isEnabledInline);
         $this->assertEquals($expected, $guessed);
     }
 
-    public function testWrongConfig()
-    {
-        try {
-            $this->currencyHelper->expects($this->once())->method('getCurrencyChoices')
-                ->willReturn(['USD' => 'USD']);
-            $this->guesser->guessColumnOptions('test', 'test', ['frontend_type' => 'multi-currency']);
-            $this->fail('Expected exception not thrown');
-        } catch (\LogicException $e) {
-             $this->assertEquals(0, $e->getCode());
-            $this->assertEquals(
-                sprintf(
-                    'You need to specify %s for multicurrency column',
-                    MultiCurrencyGuesser::MULTI_CURRENCY_CONFIG
-                ),
-                $e->getMessage()
-            );
-        }
-    }
-
+    /**
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
+     *
+     * @return array
+     */
     public function setParametersDataProvider()
     {
         return [
-            'empty' => [
+            'Not applicable column type' => [
                 [
-                    'frontend_type' => 'multi-currency',
-                    'multicurrency_config' => [
-                        'original_field' => 'test',
-                        'value_field'    => 'testValue',
-                        'currency_field' => 'testCurrency'
-                    ]
+                    'frontend_type' => 'test'
                 ],
-                [
-                    'inline_editing' => [
-                        'editor' => [
-                            'view' => 'orocurrency/js/app/views/editor/multi-currency-editor-view'
-                        ],
-                        'save_api_accessor' => [
-                            'class' => 'orocurrency/js/datagrid/inline-editing/currency-save-api-accessor',
-                            'cell_field' => 'test',
-                            'value_field'    => 'testValue',
-                            'currency_field' => 'testCurrency'
-                        ]
-                    ],
-                    'frontend_type' => 'multi-currency',
-                    'type' => 'callback',
-                    'choices' => [
-                        'USD' => 'USD',
-                        'UAH' => 'UAH'
-                    ],
-                    'params' => [
-                        'value' => 'test',
-                        'currency' => 'testCurrency'
-                    ]
-                ],
-                true
+                [],
+                true,
+                []
             ],
-            'incorrect type fix' => [
+            'Fully configured column' => [
+                [
+                    'inline_editing' => [
+                        'editor' => [
+                            'view' => 'orocurrency/js/app/views/editor/multi-currency-editor-view'
+                        ],
+                        'save_api_accessor' => [
+                            'class' => 'orocurrency/js/datagrid/inline-editing/currency-save-api-accessor',
+                            'cell_field' => 'test',
+                            'value_field'    => 'testValue',
+                            'currency_field' => 'testCurrency'
+                        ]
+                    ],
+                    'frontend_type' => 'multi-currency',
+                    'type' => 'callback',
+                    'callable' => [
+                        $this->getCurrencyToStringConverter(),
+                        'convert'
+                    ],
+                    'choices' => [
+                        'USD' => 'USD',
+                        'UAH' => 'UAH'
+                    ]
+                ],
+                [
+                    'inline_editing' => [
+                        'enable' => true,
+                    ]
+                ],
+                true,
+                []
+            ],
+            'Without column convertation options' => [
+                [
+                    'inline_editing' => [
+                        'editor' => [
+                            'view' => 'orocurrency/js/app/views/editor/multi-currency-editor-view'
+                        ],
+                        'save_api_accessor' => [
+                            'class' => 'orocurrency/js/datagrid/inline-editing/currency-save-api-accessor',
+                            'cell_field' => 'test',
+                            'value_field'    => 'testValue',
+                            'currency_field' => 'testCurrency'
+                        ]
+                    ],
+                    'frontend_type' => 'multi-currency',
+                    'type' => 'twig',
+                    'choices' => [
+                        'USD' => 'USD',
+                        'UAH' => 'UAH'
+                    ]
+                ],
+                [
+                    'inline_editing' => [
+                        'enable' => true,
+                    ],
+                    'type' => 'callback',
+                    'callable' => [
+                        $this->getCurrencyToStringConverter(),
+                        'convert'
+                    ]
+                ],
+                true,
+                []
+            ],
+            'Without choices' => [
+                [
+                    'inline_editing' => [
+                        'editor' => [
+                            'view' => 'orocurrency/js/app/views/editor/multi-currency-editor-view'
+                        ],
+                        'save_api_accessor' => [
+                            'class' => 'orocurrency/js/datagrid/inline-editing/currency-save-api-accessor',
+                            'cell_field' => 'test',
+                            'value_field'    => 'testValue',
+                            'currency_field' => 'testCurrency'
+                        ]
+                    ],
+                    'frontend_type' => 'multi-currency',
+                    'type' => 'callback',
+                    'callable' => [
+                        $this->getCurrencyToStringConverter(),
+                        'convert'
+                    ],
+                ],
+                [
+                    'inline_editing' => [
+                        'enable' => true,
+                    ],
+                    'choices' => [
+                        'USD',
+                        'UAH'
+                    ]
+                ],
+                true,
+                [
+                    'USD' => 'US Dollar',
+                    'UAH' => 'Ukrainian grivna'
+                ]
+            ],
+            'Without inline edit options' => [
                 [
                     'frontend_type' => 'multi-currency',
-                    'type' => 'field',
+                    'choices' => [
+                        'USD' => 'USD',
+                        'UAH' => 'UAH'
+                    ],
+                    'type' => 'callback',
+                    'callable' => [
+                        $this->getCurrencyToStringConverter(),
+                        'convert'
+                    ],
                     'multicurrency_config' => [
                         'original_field' => 'test',
                         'value_field'    => 'testValue',
@@ -116,20 +211,12 @@ class MultiCurrencyGuesserTest extends \PHPUnit_Framework_TestCase
                             'cell_field' => 'test',
                             'value_field'    => 'testValue',
                             'currency_field' => 'testCurrency'
-                        ]
-                    ],
-                    'frontend_type' => 'multi-currency',
-                    'type' => 'callback',
-                    'choices' => [
-                        'USD' => 'USD',
-                        'UAH' => 'UAH'
-                    ],
-                    'params' => [
-                        'value' => 'test',
-                        'currency' => 'testCurrency'
+                        ],
+                        'enable' => true,
                     ]
                 ],
-                true
+                true,
+                []
             ]
         ];
     }
