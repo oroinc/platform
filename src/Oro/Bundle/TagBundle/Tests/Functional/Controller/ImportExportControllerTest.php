@@ -83,9 +83,9 @@ class ImportExportControllerTest extends WebTestCase
 
     public function testImportEntityWithTag()
     {
-        /**
-         * @TODO This test will be completely removed and replaced with a set of smaller functional tests(see BAP-13064)
-         */
+        $this->markTestSkipped(
+            'This test will be completely removed and replaced with a set of smaller functional tests (see BAP-13064)'
+        );
         $this->client->followRedirects(false);
         $this->client->request(
             'GET',
