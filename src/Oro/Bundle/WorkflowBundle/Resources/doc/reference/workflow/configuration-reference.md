@@ -150,7 +150,8 @@ Single workflow configuration has next properties:
 * **defaults** - node for default workflow configuration values that can be changed in UI later. 
     * **active** - determine if workflow should be active right after first load of configuration.
 * **scopes** - list of scopes configurations used for filtering workflow by scopes
-* **disable_operations** - an array of [operation](../../../../../ActionBundle/Resources/doc/operations.md) names (as keys) and related entities for witch the operation should be disabled. 
+* **datagrids** - list of datagrid names on which rows currently available transitions should be displayed as buttons.
+* **disable_operations** - an array of [operation](../../../../../ActionBundle/Resources/doc/operations.md) names (as keys) and related entities for which the operation should be disabled. 
 
 Example
 -------
@@ -160,6 +161,8 @@ workflows:                                                    # Root elements
         defaults:
             active: true                                      # Active by default (when config is loaded)
         entity: Oro\Bundle\SalesBundle\Entity\Opportunity  # Workflow will be used for this entity
+        datagrids:                                            # datagrid names on which rows available transitions from currently started workflow should be displayed
+            - opportunity_grid
         entity_attribute: opportunity                         # Attribute name used to store root entity
         is_system: true                                       # Workflow is system, i.e. not editable and not deletable
         start_step: qualify                                   # Name of start step
@@ -369,6 +372,10 @@ Transition configuration has next options:
 * **init_entities**
     *array*
     List of entities where will be displayed transition button. It's needed for start workflow from entities that not 
+    directly related to that workflow.
+* **init_datagrids**
+    *array*
+    List of datagrid names for which rows transition button should be displayed. It's needed for start workflow from entities that not 
     directly related to that workflow.
 * **init_context_attribute**
     *string*
@@ -825,6 +832,9 @@ workflows:
                 init_entities:                         # list of view page entities where will be displayed transition button
                     - 'Oro\Bundle\UserBundle\Entity\User'
                     - 'Oro\Bundle\TaskBundle\Entity\Task'
+                init_datagrids:                        # list of datagrids on which rows start transition buttons should be shown for start transition from not related entity 
+                    - user_entity_grid
+                    - task_entity_grid
             connected:
                 step_to: start_conversation
                 transition_definition: connected_definition
