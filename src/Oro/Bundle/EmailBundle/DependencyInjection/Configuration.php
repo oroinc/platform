@@ -65,11 +65,11 @@ class Configuration implements ConfigurationInterface
                 'attachment_sync_max_size' => ['value' => 50],
                 'attachment_preview_limit' => ['value' => 8],
                 'sanitize_html' => ['value' => false],
-                self::KEY_SMTP_SETTINGS_HOST => ['value' => SmtpSettings::DEFAULT_HOST],
-                self::KEY_SMTP_SETTINGS_PORT => ['value' => SmtpSettings::DEFAULT_PORT, 'type' => 'integer'],
-                self::KEY_SMTP_SETTINGS_ENC => ['value' => SmtpSettings::DEFAULT_ENCRYPTION],
-                self::KEY_SMTP_SETTINGS_USER => ['value' => SmtpSettings::DEFAULT_USERNAME],
-                self::KEY_SMTP_SETTINGS_PASS => ['value' => SmtpSettings::DEFAULT_PASSWORD],
+                self::KEY_SMTP_SETTINGS_HOST => ['value' => ''],
+                self::KEY_SMTP_SETTINGS_PORT => ['value' => null, 'type' => 'integer'],
+                self::KEY_SMTP_SETTINGS_ENC => ['value' => ''],
+                self::KEY_SMTP_SETTINGS_USER => ['value' => ''],
+                self::KEY_SMTP_SETTINGS_PASS => ['value' => ''],
             ]
         );
 

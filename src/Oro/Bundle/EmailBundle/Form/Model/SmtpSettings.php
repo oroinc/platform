@@ -4,12 +4,6 @@ namespace Oro\Bundle\EmailBundle\Form\Model;
 
 class SmtpSettings
 {
-    const DEFAULT_HOST = '';
-    const DEFAULT_PORT = null;
-    const DEFAULT_ENCRYPTION = null;
-    const DEFAULT_USERNAME = null;
-    const DEFAULT_PASSWORD = null;
-
     /**
      * @var string
      */
@@ -49,11 +43,11 @@ class SmtpSettings
      * @param string|null $password
      */
     public function __construct(
-        $host = self::DEFAULT_HOST,
-        $port = self::DEFAULT_PORT,
-        $encryption = self::DEFAULT_ENCRYPTION,
-        $username = self::DEFAULT_USERNAME,
-        $password = self::DEFAULT_PASSWORD
+        $host = null,
+        $port = null,
+        $encryption = null,
+        $username = null,
+        $password = null
     ) {
         $this->host = $host;
         $this->port = $port;
@@ -79,9 +73,9 @@ class SmtpSettings
      */
     public function isEligible()
     {
-        return (self::DEFAULT_HOST !== $this->host
-            && self::DEFAULT_PORT !== $this->port
-            && self::DEFAULT_ENCRYPTION !== $this->encryption
+        return (null !== $this->host
+            && null !== $this->port
+            && null !== $this->encryption
             && !empty($this->host)
             && is_numeric($this->port));
     }

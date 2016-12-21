@@ -107,11 +107,11 @@ class SmtpSettingsProviderTest extends \PHPUnit_Framework_TestCase
     {
         $smtpSettings = new SmtpSettings();
 
-        $this->assertSame($smtpSettings->getHost(), SmtpSettings::DEFAULT_HOST);
-        $this->assertSame($smtpSettings->getPort(), SmtpSettings::DEFAULT_PORT);
-        $this->assertSame($smtpSettings->getEncryption(), SmtpSettings::DEFAULT_ENCRYPTION);
-        $this->assertSame($smtpSettings->getUsername(), SmtpSettings::DEFAULT_USERNAME);
-        $this->assertSame($smtpSettings->getPassword(), SmtpSettings::DEFAULT_PASSWORD);
+        $this->assertNull($smtpSettings->getHost());
+        $this->assertNull($smtpSettings->getPort());
+        $this->assertNull($smtpSettings->getEncryption());
+        $this->assertNull($smtpSettings->getUsername());
+        $this->assertNull($smtpSettings->getPassword());
     }
 
     public function testGetSmtpSettingsAttributes()
