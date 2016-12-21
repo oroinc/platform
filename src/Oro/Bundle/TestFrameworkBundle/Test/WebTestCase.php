@@ -810,8 +810,9 @@ abstract class WebTestCase extends BaseWebTestCase
     }
 
     /**
-     * Get intersect of $target array with values of keys in $source array. If key is an array in both places then
-     * the value of this key will be returned as intersection as well.
+     * Get intersect of $target array with values of keys in $source array.
+     * If key is an array in both places then the value of this key will be returned as intersection as well.
+     * Not associative arrays will be returned completely
      *
      * @param array $source
      * @param array $target
