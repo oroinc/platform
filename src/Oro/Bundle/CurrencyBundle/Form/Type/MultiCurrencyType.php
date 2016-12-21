@@ -3,15 +3,13 @@
 namespace Oro\Bundle\CurrencyBundle\Form\Type;
 
 use Oro\Bundle\CurrencyBundle\Entity\MultiCurrency;
-use Oro\Bundle\CurrencyBundle\Entity\MultiCurrencyHolderInterface;
-use Oro\Bundle\CurrencyBundle\Form\DataTransformer\MultiCurrencyTransformer;
-
-use Oro\Bundle\FormBundle\Utils\FormUtils;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
-use Symfony\Component\Form\FormInterface;
-use Symfony\Component\Form\FormView;
+
+use Oro\Bundle\CurrencyBundle\Entity\MultiCurrencyHolderInterface;
+use Oro\Bundle\CurrencyBundle\Form\DataTransformer\MultiCurrencyTransformer;
+use Symfony\Component\Validator\Constraints\NotBlank;
 
 class MultiCurrencyType extends PriceType
 {
@@ -61,18 +59,24 @@ class MultiCurrencyType extends PriceType
                     'full_currency_list' => $options['full_currency_list'],
                     'compact' => false,
                     'required' => $isRequired,
-                    'empty_value' => $options['currency_empty_value']
+                    'empty_value' => false
                 ]
             );
 
-        $builder->addViewTransformer(new MultiCurrencyTransformer());
         $builder->addEventListener(
-            FormEvents::POST_SUBMIT,
+            FormEvents::PRE_SET_DATA,
             function (FormEvent $event) {
-                $multiCurrencyHolder = $event->getForm()->getParent()->getData();
-                if ($multiCurrencyHolder instanceof MultiCurrencyHolderInterface) {
-                    $multiCurrencyHolder->updateMultiCurrencyFields();
+                /** @var MultiCurrency $initialData */
+                $initialData = $event->getData();
+                $options = ['required' => false];
+
+                if ($initialData && null !== $initialData->getBaseCurrencyValue()) {
+                    $options['constraints'] = [
+                        new NotBlank()
+                    ];
                 }
+
+                $event->getForm()->add('baseCurrencyValue', 'oro_money', $options);
             }
         );
     }

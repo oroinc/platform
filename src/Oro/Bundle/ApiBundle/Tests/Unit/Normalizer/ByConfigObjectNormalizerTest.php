@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Normalizer;
 
-use Oro\Component\EntitySerializer\EntityDataAccessor;
+use Oro\Bundle\ApiBundle\Model\EntityIdentifier;
 use Oro\Component\EntitySerializer\EntityDataTransformer;
 use Oro\Bundle\ApiBundle\Config\ConfigExtensionRegistry;
 use Oro\Bundle\ApiBundle\Config\ConfigLoaderFactory;
@@ -10,12 +10,14 @@ use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 use Oro\Bundle\ApiBundle\Config\FiltersConfigExtension;
 use Oro\Bundle\ApiBundle\Config\SortersConfigExtension;
 use Oro\Bundle\ApiBundle\Normalizer\ConfigNormalizer;
+use Oro\Bundle\ApiBundle\Normalizer\DataNormalizer;
 use Oro\Bundle\ApiBundle\Normalizer\DateTimeNormalizer;
 use Oro\Bundle\ApiBundle\Normalizer\ObjectNormalizer;
 use Oro\Bundle\ApiBundle\Normalizer\ObjectNormalizerRegistry;
 use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity;
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
+use Oro\Bundle\ApiBundle\Util\EntityDataAccessor;
 
 class ByConfigObjectNormalizerTest extends \PHPUnit_Framework_TestCase
 {
@@ -37,7 +39,8 @@ class ByConfigObjectNormalizerTest extends \PHPUnit_Framework_TestCase
             new DoctrineHelper($doctrine),
             new EntityDataAccessor(),
             new EntityDataTransformer($this->getMock('Symfony\Component\DependencyInjection\ContainerInterface')),
-            new ConfigNormalizer()
+            new ConfigNormalizer(),
+            new DataNormalizer()
         );
 
         $normalizers->addNormalizer(
@@ -259,6 +262,7 @@ class ByConfigObjectNormalizerTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(
             [
                 'id'        => 123,
+                'category'  => null,
                 'category1' => null,
                 'owner'     => null
             ],
@@ -388,6 +392,7 @@ class ByConfigObjectNormalizerTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(
             [
                 'id'        => 123,
+                'category'  => null,
                 'category1' => null,
                 'owner'     => [
                     'name'    => 'user_name',
@@ -398,12 +403,10 @@ class ByConfigObjectNormalizerTest extends \PHPUnit_Framework_TestCase
         );
     }
 
-    // @codingStandardsIgnoreStart
     /**
-     * @expectedException \Oro\Bundle\ApiBundle\Exception\RuntimeException
-     * @expectedExceptionMessage A value of "groups" field of entity "Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\User" should be "\Traversable or array". Got: string.
+     * @expectedException \RuntimeException
+     * @expectedExceptionMessage A value of "groups" field should be "null or array". Got: string.
      */
-    // @codingStandardsIgnoreEnd
     public function testNormalizeObjectWithInvalidValueForToManyRelation()
     {
         $data = $this->createProductObject();
@@ -851,6 +854,46 @@ class ByConfigObjectNormalizerTest extends \PHPUnit_Framework_TestCase
             [
                 'id'   => 123,
                 'name' => 'test_name',
+            ],
+            $result
+        );
+    }
+
+    public function testNormalizeObjectWhenRelationRepresentedByEntityIdentifierClass()
+    {
+        $config = [
+            'exclusion_policy' => 'all',
+            'fields'           => [
+                'id'       => null,
+                'name'     => ['exclude' => true],
+                'category' => [
+                    'exclusion_policy' => 'all',
+                    'fields'           => [
+                        'id'        => null,
+                        '__class__' => [
+                            'meta_property' => true
+                        ]
+                    ]
+                ]
+            ]
+        ];
+
+        $object = new Entity\EntityWithoutGettersAndSetters();
+        $object->id = 123;
+        $object->category = new EntityIdentifier('category1', 'Test\Category');
+
+        $result = $this->objectNormalizer->normalizeObject(
+            $object,
+            $this->createConfigObject($config)
+        );
+
+        $this->assertEquals(
+            [
+                'id'       => 123,
+                'category' => [
+                    'id'        => 'category1',
+                    '__class__' => 'Test\Category'
+                ]
             ],
             $result
         );

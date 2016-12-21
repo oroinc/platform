@@ -17,6 +17,10 @@
     {% if configs.selection_template_twig is defined and configs.selection_template_twig %}
         {% set configs = configs|merge({'selection_template': include(configs.selection_template_twig) }) %}
     {% endif %}
+    {% set configs = {
+        containerCssClass: 'oro-select2',
+        dropdownCssClass: 'oro-select2__dropdown'
+    }|merge(configs) %}
     {% if configs.component is defined %}
         {% set component = 'oro/select2-'~configs.component~'-component' %}
     {%  else %}
@@ -684,4 +688,22 @@
          data-layout="separate" >
         {{ form_widget(form) }}
     </div>
+{% endblock %}
+
+{% block oro_entity_tree_select_row %}
+    {{ block('form_row') }}
+{% endblock %}
+
+{% block oro_entity_tree_select_widget %}
+    {% import 'OroUIBundle::macros.html.twig' as UI %}
+    {{ UI.renderJsTree(
+        {
+            'module': form.vars.pageComponentModule,
+            'treeOptions': form.vars.treeOptions
+        },
+        ['expand', 'collapse']
+    ) }}
+
+    {{ form_widget(form) }}
+    {{ form_errors(form) }}
 {% endblock %}

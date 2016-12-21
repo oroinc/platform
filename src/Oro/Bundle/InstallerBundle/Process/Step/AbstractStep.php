@@ -7,9 +7,9 @@ use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Console\Output\StreamOutput;
 
-use Sylius\Bundle\FlowBundle\Process\Step\ControllerStep;
+use Sylius\Bundle\FlowBundle\Process\Step\AbstractControllerStep;
 
-abstract class AbstractStep extends ControllerStep
+abstract class AbstractStep extends AbstractControllerStep
 {
     /**
      * @var Application
@@ -27,7 +27,7 @@ abstract class AbstractStep extends ControllerStep
      * @param  array  $params
      * @return mixed
      */
-    protected function handleAjaxAction($command, $params = array())
+    protected function handleAjaxAction($command, $params = [])
     {
         $exitCode = $this->runCommand($command, $params);
 
@@ -41,14 +41,14 @@ abstract class AbstractStep extends ControllerStep
     protected function getAjaxActionResponse($exitCode)
     {
         return $this->getRequest()->isXmlHttpRequest()
-            ? new JsonResponse(array('result' => true, 'exitCode' => $exitCode))
+            ? new JsonResponse(['result' => true, 'exitCode' => $exitCode])
             : $this->redirect(
                 $this->generateUrl(
                     'sylius_flow_display',
-                    array(
+                    [
                         'scenarioAlias' => 'oro_installer',
                         'stepName'      => $this->getName(),
-                    )
+                    ]
                 )
             );
     }
@@ -62,7 +62,7 @@ abstract class AbstractStep extends ControllerStep
      * @throws \Exception
      * @throws \RuntimeException
      */
-    protected function runCommand($command, $params = array())
+    protected function runCommand($command, $params = [])
     {
         $application     = $this->getApplication();
         $output          = $this->getOutput();

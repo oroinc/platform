@@ -109,7 +109,16 @@ class ActivityInheritanceTargetsHelper
 
         foreach ($path as $key => $field) {
             $newAlias = 't_' . $uniqueKey . '_' . $key;
-            $subQueryBuilder->join($alias . '.' . $field, $newAlias);
+            if (is_array($field)) {
+                $subQueryBuilder->join(
+                    $field['join'],
+                    $newAlias,
+                    $field['conditionType'],
+                    sprintf('%s.%s = %s', $newAlias, $field['field'], $alias)
+                );
+            } else {
+                $subQueryBuilder->join($alias . '.' . $field, $newAlias);
+            }
             $alias = $newAlias;
         }
 

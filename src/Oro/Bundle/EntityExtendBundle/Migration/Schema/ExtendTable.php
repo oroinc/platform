@@ -88,4 +88,14 @@ class ExtendTable extends TableWithNameGenerator
 
         return $column;
     }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function dropColumn($columnName)
+    {
+        $this->extendOptionsManager->removeColumnOptions($this->getName(), $columnName);
+
+        return parent::dropColumn($columnName);
+    }
 }

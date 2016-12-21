@@ -123,11 +123,12 @@ class EmailActivityListProviderTest extends \PHPUnit_Framework_TestCase
 
         $emailMock = $this->getMockBuilder('Oro\Bundle\EmailBundle\Entity\EmailUser')
             ->setMethods(
-                ['getFromEmailAddress',
+                [
+                    'getFromEmailAddress',
                     'hasOwner',
                     'getOwner',
                     'getOrganization',
-                    'getActivityTargetEntities'
+                    'getActivityTargets'
                 ]
             )
             ->disableOriginalConstructor()
@@ -142,7 +143,7 @@ class EmailActivityListProviderTest extends \PHPUnit_Framework_TestCase
             ->method('getOrganization')
             ->willReturn($organization);
         $emailMock->expects($this->exactly(1))
-            ->method('getActivityTargetEntities')
+            ->method('getActivityTargets')
             ->willReturn([]);
 
         $activityListMock = $this->getMockBuilder('Oro\Bundle\ActivityListBundle\Entity\ActivityList')

@@ -16,6 +16,8 @@ class NormalizeFilterKeys implements ProcessorInterface
 {
     const FILTER_KEY_TEMPLATE = 'filter[%s]';
 
+    const ID_FILTER_DESCRIPTION = 'Filter records by the identifier field';
+
     /** @var DoctrineHelper */
     protected $doctrineHelper;
 
@@ -53,7 +55,7 @@ class NormalizeFilterKeys implements ProcessorInterface
             $filterCollection->remove($filterKey);
             if ($filter instanceof ComparisonFilter && $filter->getField() === $idFieldName) {
                 $filterKey = 'id';
-                $filter->setDescription('Filter records by the identifier field');
+                $filter->setDescription(self::ID_FILTER_DESCRIPTION);
             }
             $filterCollection->add(
                 sprintf(self::FILTER_KEY_TEMPLATE, $filterKey),
