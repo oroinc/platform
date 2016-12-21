@@ -242,7 +242,7 @@ class AttributeController extends Controller
      * )
      * @Acl(
      *      id="oro_attribute_remove",
-     *      label="oro.attribute.action.remove",
+     *      label="oro.entity_extend.attribute.remove",
      *      type="action",
      *      group_name=""
      * )
@@ -269,7 +269,7 @@ class AttributeController extends Controller
      * )
      * @Acl(
      *      id="oro_attribute_unremove",
-     *      label="oro.attribute.action.unremove",
+     *      label="oro.entity_extend.attribute.restore",
      *      type="action",
      *      group_name=""
      * )

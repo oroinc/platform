@@ -69,6 +69,18 @@ enable_fieldset:
     expected:
         disable_fieldset: false
 
+disable_meta_properties:
+    config:
+        disable_meta_properties: true
+    expected:
+        disable_meta_properties: true
+
+enable_meta_properties:
+    config:
+        disable_meta_properties: false
+    expected:
+        disable_meta_properties: false
+
 empty_identifier_field_names:
     config:
         identifier_field_names: []
