@@ -2,13 +2,26 @@
 
 namespace Oro\Bundle\NavigationBundle\Entity\Repository;
 
+use Doctrine\Common\Cache\ArrayCache;
+use Doctrine\Common\Cache\CacheProvider;
 use Doctrine\ORM\EntityRepository;
 
 use Oro\Bundle\NavigationBundle\Entity\MenuUpdateInterface;
+use Oro\Bundle\NavigationBundle\Utils\MenuUpdateUtils;
 use Oro\Bundle\ScopeBundle\Entity\Scope;
 
 class MenuUpdateRepository extends EntityRepository
 {
+    /**
+     * @var CacheProvider
+     */
+    private $queryResultCache;
+
+    public function setQueryResultCache(CacheProvider $queryResultCache)
+    {
+        $this->queryResultCache = $queryResultCache;
+    }
+
     /**
      * @param string $menuName
      * @param array  $scopeIds
@@ -17,19 +30,19 @@ class MenuUpdateRepository extends EntityRepository
      */
     public function findMenuUpdatesByScopeIds($menuName, array $scopeIds)
     {
-        $qb = $this->createQueryBuilder('u');
-        $qb->innerJoin('u.scope', 's');
-        $qb->where($qb->expr()->eq('u.menu', ':menuName'));
-        $qb->andWhere($qb->expr()->in('s.id', ':scopeIds'));
-        $qb->orderBy('u.id');
-        $qb->setParameters([
-            'menuName' => $menuName,
-            'scopeIds' => $scopeIds
-        ]);
+        $result = [];
 
-        $result = $qb->getQuery()->getResult();
+        foreach ($scopeIds as $scopeId) {
+            $result = array_merge(
+                $result,
+                $this->findMenuUpdatesByScope(
+                    $menuName,
+                    $this->getEntityManager()->getReference(Scope::class, $scopeId)
+                )
+            );
+        }
 
-        return $this->applyScopeOrder($result, $scopeIds);
+        return $result;
     }
 
     /**
@@ -40,35 +53,33 @@ class MenuUpdateRepository extends EntityRepository
      */
     public function findMenuUpdatesByScope($menuName, $scope)
     {
-        return $this->findBy([
-            'menu' => $menuName,
-            'scope' => $scope,
-        ]);
+        $qb = $this->createQueryBuilder('u');
+
+        $qb->where($qb->expr()->eq('u.menu', ':menuName'))
+            ->andWhere($qb->expr()->eq('u.scope', ':scope'))
+            ->orderBy('u.id')
+            ->setParameters([
+                'menuName' => $menuName,
+                'scope' => $scope
+            ]);
+
+        $query = $qb->getQuery()
+            ->useResultCache(true)
+            ->setResultCacheDriver($this->getQueryResultCache())
+            ->setResultCacheId(MenuUpdateUtils::generateKey($menuName, $scope));
+
+        return $query->getResult();
     }
 
     /**
-     * @param MenuUpdateInterface[] $updates
-     * @param array                 $scopeIds
-     *
-     * @return MenuUpdateInterface[]
+     * @return CacheProvider
      */
-    private function applyScopeOrder(array $updates, array $scopeIds)
+    private function getQueryResultCache()
     {
-        $scopeIds = array_reverse($scopeIds);
-
-        $groupedResult = array_fill_keys($scopeIds, []);
-        foreach ($updates as $update) {
-            $groupedResult[$update->getScope()->getId()][] = $update;
+        if (!$this->queryResultCache) {
+            $this->queryResultCache = new ArrayCache();
         }
 
-        $result = [];
-        foreach ($groupedResult as $group) {
-            /** @var MenuUpdateInterface $update */
-            foreach ($group as $update) {
-                $result[$update->getKey()] = $update;
-            }
-        }
-
-        return array_values($result);
+        return $this->queryResultCache;
     }
 }

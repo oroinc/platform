@@ -441,6 +441,19 @@ services:
             - '@translator'
             - '@oro_locale.helper.localization'
 
+    oro_navigation.repository.menu_update:
+        class: 'Oro\Bundle\NavigationBundle\Entity\Repository\MenuUpdateRepository'
+        parent: oro_entity.abstract_repository
+        arguments:
+            - '%oro_navigation.entity.menu_update.class%'
+        calls:
+            - [ setQueryResultCache, [ '@oro_navigation.menu_update.cache' ] ]
+
+    oro_navigation.menu_update.cache:
+        parent: oro.cache.abstract
+        calls:
+            - [ setNamespace, [ 'oro_navigation_menu_updates' ] ]
+
     oro_navigation.data_provider.title:
         class: Oro\Bundle\NavigationBundle\Layout\DataProvider\NavigationTitleProvider
         scope: request
