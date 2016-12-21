@@ -15,27 +15,12 @@ use Oro\Bundle\ImportExportBundle\Handler\ExportHandler;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\SecurityBundle\SecurityFacade;
 use Oro\Component\MessageQueue\Client\MessageProducerInterface;
-use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
 use Oro\Component\MessageQueue\Job\JobRunner;
 use Oro\Component\MessageQueue\Transport\Null\NullMessage;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
 
 class ExportMessageProcessorTest extends \PHPUnit_Framework_TestCase
 {
-    public function testCouldBeConstructedWithRequiredArguments()
-    {
-        new ExportMessageProcessor(
-            $this->createExportHandlerMock(),
-            $this->createJobRunnerMock(),
-            $this->createMessageProducerMock(),
-            $this->createConfigManagerMock(),
-            $this->createDoctrineHelperMock(),
-            $this->createSecurityFacadeMock(),
-            $this->createTokenStorageInterfaceMock(),
-            $this->createLoggerInterfaceMock()
-        );
-    }
-
     public function messageBodyLoggerCriticalDataProvider()
     {
         return [
@@ -72,7 +57,7 @@ class ExportMessageProcessorTest extends \PHPUnit_Framework_TestCase
         $processor = new ExportMessageProcessor(
             $this->createExportHandlerMock(),
             $this->createJobRunnerMock(),
-            $this->createMessageProducerMock(),
+            $this->createMessageProducerInterfaceMock(),
             $this->createConfigManagerMock(),
             $this->createDoctrineHelperMock(),
             $this->createSecurityFacadeMock(),
@@ -82,7 +67,7 @@ class ExportMessageProcessorTest extends \PHPUnit_Framework_TestCase
 
         $result = $processor->process($message, $this->createSessionInterfaceMock());
 
-        $this->assertEquals(MessageProcessorInterface::REJECT, $result);
+        $this->assertEquals(ExportMessageProcessor::REJECT, $result);
     }
 
     public function testShouldRejectMessageAndLogCriticalIfUserNotFound()
@@ -120,7 +105,7 @@ class ExportMessageProcessorTest extends \PHPUnit_Framework_TestCase
         $processor = new ExportMessageProcessor(
             $this->createExportHandlerMock(),
             $this->createJobRunnerMock(),
-            $this->createMessageProducerMock(),
+            $this->createMessageProducerInterfaceMock(),
             $this->createConfigManagerMock(),
             $doctrineHelper,
             $this->createSecurityFacadeMock(),
@@ -130,7 +115,7 @@ class ExportMessageProcessorTest extends \PHPUnit_Framework_TestCase
 
         $result = $processor->process($message, $this->createSessionInterfaceMock());
 
-        $this->assertEquals(MessageProcessorInterface::REJECT, $result);
+        $this->assertEquals(ExportMessageProcessor::REJECT, $result);
     }
 
     public function testShouldReturnSubscribedTopics()
@@ -160,9 +145,9 @@ class ExportMessageProcessorTest extends \PHPUnit_Framework_TestCase
     /**
      * @return \PHPUnit_Framework_MockObject_MockObject|MessageProducerInterface
      */
-    private function createMessageProducerMock()
+    private function createMessageProducerInterfaceMock()
     {
-        return $this->getMock(MessageProducerInterface::class, [], [], '', false);
+        return $this->getMock(MessageProducerInterface::class);
     }
 
     /**
@@ -186,7 +171,7 @@ class ExportMessageProcessorTest extends \PHPUnit_Framework_TestCase
      */
     private function createLoggerInterfaceMock()
     {
-        return $this->getMock(LoggerInterface::class, [], [], '', false);
+        return $this->getMock(LoggerInterface::class);
     }
 
     /**
@@ -194,7 +179,7 @@ class ExportMessageProcessorTest extends \PHPUnit_Framework_TestCase
      */
     private function createSessionInterfaceMock()
     {
-        return $this->getMock(SessionInterface::class, [], [], '', false);
+        return $this->getMock(SessionInterface::class);
     }
 
     /**
@@ -210,6 +195,6 @@ class ExportMessageProcessorTest extends \PHPUnit_Framework_TestCase
      */
     private function createTokenStorageInterfaceMock()
     {
-        return $this->getMock(TokenStorageInterface::class, [], [], '', false);
+        return $this->getMock(TokenStorageInterface::class);
     }
 }

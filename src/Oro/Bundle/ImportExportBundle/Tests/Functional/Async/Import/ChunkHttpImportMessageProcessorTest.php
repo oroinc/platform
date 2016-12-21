@@ -6,7 +6,6 @@ use Oro\Bundle\ImportExportBundle\Async\Import\AbstractChunkImportMessageProcess
 use Oro\Bundle\ImportExportBundle\Async\Import\ChunkHttpImportMessageProcessor;
 use Oro\Bundle\ImportExportBundle\Handler\HttpImportHandler;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
-use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
 use Oro\Component\MessageQueue\Transport\Null\NullMessage;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
@@ -64,7 +63,6 @@ class ChunkHttpImportMessageProcessorTest extends WebTestCase
                     'success'    => true,
                     'message'    => 'import was done',
                     'importInfo' => '',
-                    'errorsUrl'  => '',
                     'errors'     => [],
                     'counts'     => [],
                 ])
@@ -109,6 +107,7 @@ class ChunkHttpImportMessageProcessorTest extends WebTestCase
     {
         return $this->getMock(SessionInterface::class);
     }
+
     /**
      * @return \PHPUnit_Framework_MockObject_MockObject|HttpImportHandler
      */

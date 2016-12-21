@@ -5,23 +5,9 @@ namespace Oro\Bundle\ImportExportBundle\Handler;
 use Oro\Bundle\ImportExportBundle\Context\StepExecutionProxyContext;
 use Oro\Bundle\ImportExportBundle\Processor\ProcessorRegistry;
 use Symfony\Component\HttpFoundation\File\File;
-use Symfony\Component\Routing\RouterInterface;
 
 class HttpImportHandler extends AbstractImportHandler
 {
-    /**
-     * @var RouterInterface
-     */
-    protected $router;
-
-    /**
-     * @param RouterInterface $router
-     */
-    public function setRouter(RouterInterface $router)
-    {
-        $this->router = $router;
-    }
-
     /**
      * {@inheritdoc}
      */
@@ -44,16 +30,9 @@ class HttpImportHandler extends AbstractImportHandler
 
         $counts = $this->getValidationCounts($jobResult);
 
-        $errorsUrl           = null;
         $errorsAndExceptions = [];
         $context = $jobResult->getContext();
         if (!empty($counts['errors'])) {
-            $errorsUrl = $this->router->generate(
-                'oro_importexport_error_log',
-                ['jobCode' => $jobResult->getJobCode()],
-                RouterInterface::ABSOLUTE_URL
-            );
-
             $contextErrors = [];
             if ($context) {
                 $contextErrors = $context->getErrors();
@@ -74,7 +53,6 @@ class HttpImportHandler extends AbstractImportHandler
             'success'        => $jobResult->isSuccessful() && isset($counts['process']) && $counts['process'] > 0,
             'processorAlias' => $processorAlias,
             'counts'         => $counts,
-            'errorsUrl'      => $errorsUrl,
             'errors'         => $errorsAndExceptions,
             'entityName'     => $entityName,
             'options'        => $options
@@ -106,17 +84,12 @@ class HttpImportHandler extends AbstractImportHandler
             $message = $this->translator->trans('oro.importexport.import.error');
         }
 
-        $errorsUrl = null;
         $errors = [];
         if ($context = $jobResult->getContext()) {
             $errors = $context->getErrors();
         }
         if ($jobResult->getFailureExceptions()) {
             $errors = array_merge($errors, $jobResult->getFailureExceptions());
-            $errorsUrl = $this->router->generate(
-                'oro_importexport_error_log',
-                ['jobCode' => $jobResult->getJobCode()]
-            );
         }
 
         $errorsAndExceptions = array_slice($errors, 0, 100);
@@ -125,7 +98,6 @@ class HttpImportHandler extends AbstractImportHandler
             'success'    => $jobResult->isSuccessful(),
             'message'    => $message,
             'importInfo' => $importInfo,
-            'errorsUrl'  => $errorsUrl,
             'errors'     => $errorsAndExceptions,
             'counts'     => $counts,
         ];
@@ -147,16 +119,6 @@ class HttpImportHandler extends AbstractImportHandler
         $file->move(dirname($tmpFileName), basename($tmpFileName));
 
         return $tmpFileName;
-    }
-
-    /**
-     * @param string $inputFilePrefix
-     * @param string $inputFormat
-     * @return string
-     */
-    protected function getImportFileSessionKey($inputFilePrefix, $inputFormat)
-    {
-        return sprintf('oro_importexport_import_%s_%s', $inputFilePrefix, $inputFormat);
     }
 
     /**

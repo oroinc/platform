@@ -146,7 +146,6 @@ class ImportExportController extends Controller
      *
      * @Route("/import/validate/{processorAlias}", name="oro_importexport_import_validate")
      * @AclAncestor("oro_importexport_import")
-     * @Template("OroImportExportBundle:ImportExport:importValidate.html.twig")
      *
      * @param Request $request
      * @param string $processorAlias

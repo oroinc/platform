@@ -130,7 +130,7 @@ class GridController extends Controller
      */
     public function exportAction(Request $request, $gridName)
     {
-        $result['successful'] = false;
+        $isSuccessful = false;
 
         $format = $request->query->get('format');
         $formatType = $request->query->get('format_type', 'excel');
@@ -151,10 +151,12 @@ class GridController extends Controller
                 'userId' => $userId,
             ]);
 
-            $result['successful'] = true;
+            $isSuccessful = true;
         }
 
-        return new JsonResponse($result);
+        return new JsonResponse([
+            'successful' => $isSuccessful,
+        ]);
     }
 
     /**

@@ -24,8 +24,6 @@ services:
     oro_importexport.handler.import.http:
         class: %oro_importexport.handler.import.http.class%
         parent: oro_importexport.handler.import.abstract
-        calls:
-            - [setRouter, ['@router']]
         lazy: true
 
     oro_importexport.handler.export:

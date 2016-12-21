@@ -13,8 +13,19 @@ class Topics
      */
     public static function getTopicNameByExportFormat($format)
     {
-        $topicName = sprintf("self::EXPORT_%s", strtoupper($format));
+        $topic = null;
 
-        return defined($topicName) ? constant($topicName) : null;
+        switch (strtolower($format)) {
+            case 'csv':
+                $topic = self::EXPORT_CSV;
+                break;
+            case 'xlsx':
+                $topic = self::EXPORT_XLSX;
+                break;
+            default:
+                break;
+        }
+
+        return $topic;
     }
 }

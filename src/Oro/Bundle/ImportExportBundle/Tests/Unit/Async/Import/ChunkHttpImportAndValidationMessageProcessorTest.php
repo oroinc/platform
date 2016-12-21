@@ -248,7 +248,6 @@ class ChunkHttpImportAndValidationMessageProcessorTest extends \PHPUnit_Framewor
                     'success' => true,
                     'filePath' => 'csv',
                     'importInfo' => 'imports was done',
-                    'errorsUrl' => '',
                     'message' => '',
                 ]
             );
@@ -371,7 +370,6 @@ class ChunkHttpImportAndValidationMessageProcessorTest extends \PHPUnit_Framewor
                     'success' => true,
                     'filePath' => 'csv',
                     'importInfo' => 'imports was done',
-                    'errorsUrl' => '',
                     'message' => '',
                     'entityName' => 'Test',
                     'counts' => '[]',

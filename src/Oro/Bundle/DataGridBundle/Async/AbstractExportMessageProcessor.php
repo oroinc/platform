@@ -135,7 +135,8 @@ abstract class AbstractExportMessageProcessor implements MessageProcessorInterfa
             'userId' => null,
         ], $body);
 
-        if (! isset($body['userId'], $body['parameters'], $body['parameters']['gridName'], $body['format'])) {
+        if (! is_array($body['parameters'])
+                || ! isset($body['userId'], $body['parameters'], $body['parameters']['gridName'], $body['format'])) {
             $this->logger->critical(
                 sprintf('[DataGridExportMessageProcessor] Got invalid message: "%s"', $message->getBody()),
                 ['message' => $message]
@@ -162,10 +163,9 @@ abstract class AbstractExportMessageProcessor implements MessageProcessorInterfa
         $body['parameters']['gridParameters'] = $contextParameters;
 
         $jobUniqueName = sprintf(
-            'datagrid_export_%s_%s_%s',
-            $body['format'],
+            'datagrid_export_%s_%s',
             $body['parameters']['gridName'],
-            $message->getMessageId()
+            $body['format']
         );
 
         $result = $this->jobRunner->runUnique(

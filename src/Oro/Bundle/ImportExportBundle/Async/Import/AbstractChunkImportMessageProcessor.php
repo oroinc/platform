@@ -145,7 +145,6 @@ abstract class AbstractChunkImportMessageProcessor implements MessageProcessorIn
 
     protected function saveJobResult(Job $job, array $data)
     {
-        unset($data['errorsUrl']);
         unset($data['message']);
         unset($data['importInfo']);
         $this->jobStorage->saveJob($job, function (Job $job) use ($data) {

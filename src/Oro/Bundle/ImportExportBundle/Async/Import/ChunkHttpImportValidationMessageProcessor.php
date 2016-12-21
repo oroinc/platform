@@ -23,13 +23,11 @@ class ChunkHttpImportValidationMessageProcessor extends AbstractChunkImportMessa
             'Import validation of the %s from %s is completed.
                  Success: %s.
                  Info: %s.
-                 Errors url: %s.
                  Errors: %s',
             $data['filePath'],
             $data['entityName'],
             $data['success'] ? 'true' : 'false',
             json_encode($data['counts']),
-            $data['errorsUrl'],
             json_encode($data['errors'])
         );
     }

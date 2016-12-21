@@ -100,7 +100,8 @@ class ExportHandler implements StepExecutionWarningHandlerInterface
             throw new InvalidArgumentException('Parameter "gridName" must be provided.');
         }
 
-        $filePath = $this->fileSystemOperator
+        $filePath = $this
+            ->fileSystemOperator
             ->generateTemporaryFileName(sprintf('datagrid_%s', $contextParameters['gridName']), $format);
 
         $contextParameters['filePath'] = $filePath;
