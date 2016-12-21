@@ -58,7 +58,7 @@ class TaggableDatagridExtensionTest extends \PHPUnit_Framework_TestCase
     {
         $view = new BlockView();
         /** @var BlockInterface $block */
-        $block = $this->getMock('Oro\Component\Layout\BlockInterface');
+        $block = $this->createMock('Oro\Component\Layout\BlockInterface');
         $this->extension->buildView($view, $block, new Options(['enable_tagging' => true]));
         $this->assertTrue($view->vars['enable_tagging']);
     }
@@ -68,7 +68,7 @@ class TaggableDatagridExtensionTest extends \PHPUnit_Framework_TestCase
         $view = new BlockView();
         $view->vars['block_prefixes'] = [];
         /** @var BlockInterface $block */
-        $block = $this->getMock('Oro\Component\Layout\BlockInterface');
+        $block = $this->createMock('Oro\Component\Layout\BlockInterface');
         $this->extension->finishView($view, $block, new Options(['enable_tagging' => true]));
         $this->assertEquals('taggable_datagrid', $view->vars['block_prefixes'][0]);
     }

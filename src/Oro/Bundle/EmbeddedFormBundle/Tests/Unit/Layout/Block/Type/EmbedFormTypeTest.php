@@ -16,12 +16,12 @@ class FormTypeTest extends BlockTypeTestCase
         $formName = 'test_form';
 
         /** @var BlockBuilderInterface|\PHPUnit_Framework_MockObject_MockObject $builder */
-        $builder = $this->getMock('Oro\Component\Layout\BlockBuilderInterface');
+        $builder = $this->createMock('Oro\Component\Layout\BlockBuilderInterface');
         $builder->expects($this->any())
             ->method('getId')
             ->will($this->returnValue('form_id'));
 
-        $layoutManipulator = $this->getMock('Oro\Component\Layout\LayoutManipulatorInterface');
+        $layoutManipulator = $this->createMock('Oro\Component\Layout\LayoutManipulatorInterface');
         $builder->expects($this->exactly(3))
             ->method('getLayoutManipulator')
             ->willReturn($layoutManipulator);

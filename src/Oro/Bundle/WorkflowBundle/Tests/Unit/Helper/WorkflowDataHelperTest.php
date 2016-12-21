@@ -289,20 +289,9 @@ class WorkflowDataHelperTest extends \PHPUnit_Framework_TestCase
             }
         );
 
-        $transitions = array_filter(
-            array_column($extractTransitionsMap, 1),
-            function (Transition $transition) {
-                return !$transition->isStart();
-            }
-        );
-
         $transitionManager->expects($this->any())
             ->method('getStartTransitions')
             ->willReturn($startTransitions);
-
-        $transitionManager->expects($this->any())
-            ->method('getTransitionsByWorkflowItem')
-            ->willReturn($transitions);
 
         /** @var TransitionManager $transitionManager */
         return $transitionManager;

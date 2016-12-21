@@ -202,7 +202,7 @@ class AclExtensionSelectorTest extends \PHPUnit_Framework_TestCase
      */
     protected function getMockExtension($supportedType, $setSupportsExpectation = true)
     {
-        $extension = $this->getMock('Oro\Bundle\SecurityBundle\Acl\Extension\AclExtensionInterface');
+        $extension = $this->createMock('Oro\Bundle\SecurityBundle\Acl\Extension\AclExtensionInterface');
         if ($setSupportsExpectation) {
             $extension->expects($this->any())
                 ->method('supports')

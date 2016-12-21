@@ -298,7 +298,9 @@ class DoctrineTagGeneratorTest extends \PHPUnit_Framework_TestCase
     protected function getFormMock($data)
     {
         $form = $this->getMockBuilder('Symfony\Component\Form\Form')
-            ->disableOriginalConstructor()->getMock();
+            ->disableOriginalConstructor()
+            ->disableOriginalClone()
+            ->getMock();
         $form->expects($this->any())->method('getData')
             ->will($this->returnValue($data));
 

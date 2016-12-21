@@ -35,10 +35,10 @@ class PersistentBatchWriterTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->registry        = $this->getMock('Symfony\Bridge\Doctrine\RegistryInterface');
-        $this->eventDispatcher = $this->getMock('Symfony\Component\EventDispatcher\EventDispatcherInterface');
-        $this->contextRegistry = $this->getMock('Oro\Bundle\ImportExportBundle\Context\ContextRegistry');
-        $this->logger          = $this->getMock('Psr\Log\LoggerInterface');
+        $this->registry        = $this->createMock('Symfony\Bridge\Doctrine\RegistryInterface');
+        $this->eventDispatcher = $this->createMock('Symfony\Component\EventDispatcher\EventDispatcherInterface');
+        $this->contextRegistry = $this->createMock('Oro\Bundle\ImportExportBundle\Context\ContextRegistry');
+        $this->logger          = $this->createMock('Psr\Log\LoggerInterface');
         $this->entityManager   = $this->getMockBuilder('Doctrine\ORM\EntityManager')
             ->disableOriginalConstructor()->getMock();
 
@@ -55,8 +55,8 @@ class PersistentBatchWriterTest extends \PHPUnit_Framework_TestCase
     {
         $this->entityManager->expects($this->once())->method('beginTransaction');
 
-        $fooItem = $this->getMock('FooItem');
-        $barItem = $this->getMock('BarItem');
+        $fooItem = $this->createMock(\stdClass::class);
+        $barItem = $this->createMock(\ArrayObject::class);
 
         $this->entityManager->expects($this->exactly(2))->method('persist')
             ->with($this->logicalOr($this->equalTo($fooItem), $this->equalTo($barItem)));
@@ -73,7 +73,7 @@ class PersistentBatchWriterTest extends \PHPUnit_Framework_TestCase
 
         $this->expectGetJobName($stepExecution);
 
-        $context = $this->getMock('Oro\Bundle\ImportExportBundle\Context\ContextInterface');
+        $context = $this->createMock('Oro\Bundle\ImportExportBundle\Context\ContextInterface');
         $context->expects($this->once())
             ->method('getConfiguration')
             ->will($this->returnValue($configuration));
@@ -98,8 +98,8 @@ class PersistentBatchWriterTest extends \PHPUnit_Framework_TestCase
      */
     public function testWriteRollback($couldBeSkipped)
     {
-        $fooItem = $this->getMock('FooItem');
-        $barItem = $this->getMock('BarItem');
+        $fooItem = $this->createMock(\stdClass::class);
+        $barItem = $this->createMock(\ArrayObject::class);
 
         $this->entityManager->expects($this->once())->method('beginTransaction');
         $this->entityManager->expects($this->exactly(2))->method('persist')
@@ -130,7 +130,7 @@ class PersistentBatchWriterTest extends \PHPUnit_Framework_TestCase
         if ($couldBeSkipped) {
             $context = $this->getCouldBeSkippedExpects($stepExecution);
         } else {
-            $this->setExpectedException('Exception');
+            $this->expectException('Exception');
         }
 
         $writer = $this->getWriter();
@@ -180,7 +180,7 @@ class PersistentBatchWriterTest extends \PHPUnit_Framework_TestCase
             ->with($stepExecution)
             ->will($this->returnValue($context));
 
-        $this->setExpectedException('Akeneo\Bundle\BatchBundle\Item\InvalidItemException');
+        $this->expectException('Akeneo\Bundle\BatchBundle\Item\InvalidItemException');
 
         return $context;
     }

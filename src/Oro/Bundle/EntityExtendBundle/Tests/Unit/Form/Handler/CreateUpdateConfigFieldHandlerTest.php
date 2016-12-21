@@ -149,14 +149,14 @@ class CreateUpdateConfigFieldHandlerTest extends \PHPUnit_Framework_TestCase
         FieldConfigModel $fieldConfigModel,
         Request $request
     ) {
-        $formView = $this->getMock(FormView::class);
+        $formView = $this->createMock(FormView::class);
 
         $form
             ->expects($this->once())
             ->method('createView')
             ->willReturn($formView);
 
-        $entityConfig = $this->getMock(ConfigInterface::class);
+        $entityConfig = $this->createMock(ConfigInterface::class);
         $this->configHelper
             ->expects($this->once())
             ->method('getEntityConfig')
@@ -176,7 +176,7 @@ class CreateUpdateConfigFieldHandlerTest extends \PHPUnit_Framework_TestCase
 
     public function testHandleCreateWhenFormIsNotValidAfterSubmit()
     {
-        $form = $this->getMock(FormInterface::class);
+        $form = $this->createMock(FormInterface::class);
         $request = $this->createRequest();
 
         $this->configHelperHandler
@@ -227,7 +227,7 @@ class CreateUpdateConfigFieldHandlerTest extends \PHPUnit_Framework_TestCase
      */
     public function testHandleCreateWhenRedirectResponseIsReturned($originalFieldNames, $fieldName, $expectedFieldName)
     {
-        $form = $this->getMock(FormInterface::class);
+        $form = $this->createMock(FormInterface::class);
         $request = $this->createRequest();
 
         $this->configHelperHandler
@@ -236,7 +236,7 @@ class CreateUpdateConfigFieldHandlerTest extends \PHPUnit_Framework_TestCase
             ->with($request, $form)
             ->willReturn(true);
 
-        $formConfig = $this->getMock(FormConfigInterface::class);
+        $formConfig = $this->createMock(FormConfigInterface::class);
 
         $formConfig
             ->expects($this->once())
@@ -300,7 +300,7 @@ class CreateUpdateConfigFieldHandlerTest extends \PHPUnit_Framework_TestCase
             ->with($entityConfigModel)
             ->willReturn([self::FIELD_NAME, self::FIELD_TYPE]);
 
-        $extendEntityConfig = $this->getMock(ConfigInterface::class);
+        $extendEntityConfig = $this->createMock(ConfigInterface::class);
         $this->configHelper
             ->expects($this->once())
             ->method('getEntityConfig')
@@ -404,14 +404,14 @@ class CreateUpdateConfigFieldHandlerTest extends \PHPUnit_Framework_TestCase
             ->method('getExtendRequireJsModules')
             ->willReturn($requireJsModules);
 
-        $fieldConfig = $this->getMock(ConfigInterface::class);
+        $fieldConfig = $this->createMock(ConfigInterface::class);
         $this->configHelper
             ->expects($this->once())
             ->method('getFieldConfig')
             ->with($newFieldModel, 'entity')
             ->willReturn($fieldConfig);
 
-        $entityConfig = $this->getMock(ConfigInterface::class);
+        $entityConfig = $this->createMock(ConfigInterface::class);
         $this->configHelper
             ->expects($this->once())
             ->method('getEntityConfigByField')
@@ -448,7 +448,7 @@ class CreateUpdateConfigFieldHandlerTest extends \PHPUnit_Framework_TestCase
         );
 
         $request = $this->createRequest();
-        $form = $this->getMock(FormInterface::class);
+        $form = $this->createMock(FormInterface::class);
 
         $this->configHelperHandler
             ->expects($this->once())
@@ -480,7 +480,7 @@ class CreateUpdateConfigFieldHandlerTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $flashBag = $this->getMock(FlashBag::class);
+        $flashBag = $this->createMock(FlashBag::class);
         $flashBag
             ->expects($this->once())
             ->method('add')
@@ -531,7 +531,7 @@ class CreateUpdateConfigFieldHandlerTest extends \PHPUnit_Framework_TestCase
         );
 
         $request = $this->createRequest();
-        $form = $this->getMock(FormInterface::class);
+        $form = $this->createMock(FormInterface::class);
 
         $this->configHelperHandler
             ->expects($this->once())

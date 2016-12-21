@@ -24,9 +24,9 @@ class SearchNumberFilterTest extends \PHPUnit_Framework_TestCase
     protected function setUp()
     {
         /* @var $formFactory FormFactoryInterface|\PHPUnit_Framework_MockObject_MockObject */
-        $formFactory = $this->getMock(FormFactoryInterface::class);
+        $formFactory = $this->createMock(FormFactoryInterface::class);
         /* @var $filterUtility FilterUtility|\PHPUnit_Framework_MockObject_MockObject */
-        $filterUtility = $this->getMock(FilterUtility::class);
+        $filterUtility = $this->createMock(FilterUtility::class);
 
         $this->filter = new SearchNumberFilter($formFactory, $filterUtility);
     }
@@ -37,7 +37,7 @@ class SearchNumberFilterTest extends \PHPUnit_Framework_TestCase
      */
     public function testThrowsExceptionForWrongFilterDatasourceAdapter()
     {
-        $ds = $this->getMock(FilterDatasourceAdapterInterface::class);
+        $ds = $this->createMock(FilterDatasourceAdapterInterface::class);
         $this->filter->apply($ds, ['type' => NumberFilterType::TYPE_GREATER_EQUAL, 'value' => 123]);
     }
 

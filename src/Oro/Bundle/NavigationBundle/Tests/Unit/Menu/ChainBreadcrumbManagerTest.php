@@ -46,7 +46,7 @@ class ChainBreadcrumbManagerTest extends \PHPUnit_Framework_TestCase
      */
     protected function getManagerMock()
     {
-        return $this->getMock('Oro\Bundle\NavigationBundle\Menu\BreadcrumbManagerInterface');
+        return $this->createMock('Oro\Bundle\NavigationBundle\Menu\BreadcrumbManagerInterface');
     }
 
     public function testAddProvider()

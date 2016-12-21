@@ -205,7 +205,8 @@ class OrmSorterExtensionTest extends \PHPUnit_Framework_TestCase
      */
     public function testVisitMetadataUnknownColumn(array $sorters, array $columns, $expectedMessage)
     {
-        $this->setExpectedException('\Oro\Bundle\DataGridBundle\Exception\LogicException', $expectedMessage);
+        $this->expectException('\Oro\Bundle\DataGridBundle\Exception\LogicException');
+        $this->expectExceptionMessage($expectedMessage);
         $config = DatagridConfiguration::create(['sorters' => $sorters]);
 
         $data = MetadataObject::create(['columns' => $columns]);

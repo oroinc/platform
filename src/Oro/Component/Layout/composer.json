@@ -10,9 +10,7 @@
         "symfony/options-resolver": "2.8.*",
         "symfony/templating": "2.8.*",
         "oro/php-utils": "dev-master",
-        "oro/property-access": "dev-master"
-    },
-    "require-dev": {
+        "oro/property-access": "dev-master",
         "jms/cg": "1.2.*",
         "symfony/filesystem": "2.8.*",
         "symfony/yaml": "2.8.*",
@@ -22,7 +20,6 @@
         "psr-0": { "Oro\\Component\\Layout": "" }
     },
     "target-dir": "Oro/Component/Layout",
-    "minimum-stability": "dev",
     "extra": {
         "branch-alias": {
             "dev-master": "1.0-dev"

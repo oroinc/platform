@@ -30,7 +30,7 @@ class EmbedFormStartTypeTest extends BlockTypeTestCase
         $formEnctype    = 'test_enctype';
         $formView       = new FormView();
 
-        $formAccessor = $this->getMock('Oro\Bundle\EmbeddedFormBundle\Layout\Form\FormAccessorInterface');
+        $formAccessor = $this->createMock('Oro\Bundle\EmbeddedFormBundle\Layout\Form\FormAccessorInterface');
         $formAccessor->expects($this->never())
             ->method('getForm');
         $formAccessor->expects($this->once())
@@ -68,7 +68,7 @@ class EmbedFormStartTypeTest extends BlockTypeTestCase
         $formEnctype           = 'test_enctype';
         $formView              = new FormView();
 
-        $formAccessor = $this->getMock('Oro\Bundle\EmbeddedFormBundle\Layout\Form\FormAccessorInterface');
+        $formAccessor = $this->createMock('Oro\Bundle\EmbeddedFormBundle\Layout\Form\FormAccessorInterface');
         $formAccessor->expects($this->never())
             ->method('getForm');
         $formAccessor->expects($this->once())
@@ -105,7 +105,7 @@ class EmbedFormStartTypeTest extends BlockTypeTestCase
         $formEnctype     = 'test_enctype';
         $formView        = new FormView();
 
-        $formAccessor = $this->getMock('Oro\Bundle\EmbeddedFormBundle\Layout\Form\FormAccessorInterface');
+        $formAccessor = $this->createMock('Oro\Bundle\EmbeddedFormBundle\Layout\Form\FormAccessorInterface');
         $formAccessor->expects($this->never())
             ->method('getForm');
         $formAccessor->expects($this->once())
@@ -139,7 +139,7 @@ class EmbedFormStartTypeTest extends BlockTypeTestCase
         $formName = 'test_form';
         $formView = new FormView();
 
-        $formAccessor = $this->getMock('Oro\Bundle\EmbeddedFormBundle\Layout\Form\FormAccessorInterface');
+        $formAccessor = $this->createMock('Oro\Bundle\EmbeddedFormBundle\Layout\Form\FormAccessorInterface');
         $formAccessor->expects($this->never())
             ->method('getForm');
         $formAccessor->expects($this->once())
@@ -176,7 +176,7 @@ class EmbedFormStartTypeTest extends BlockTypeTestCase
         $formEnctype    = 'test_enctype';
         $formView       = new FormView();
 
-        $formAccessor = $this->getMock('Oro\Bundle\EmbeddedFormBundle\Layout\Form\FormAccessorInterface');
+        $formAccessor = $this->createMock('Oro\Bundle\EmbeddedFormBundle\Layout\Form\FormAccessorInterface');
         $formAccessor->expects($this->never())
             ->method('getForm');
         $formAccessor->expects($this->once())
@@ -219,7 +219,7 @@ class EmbedFormStartTypeTest extends BlockTypeTestCase
         $formEnctype           = 'test_enctype';
         $formView              = new FormView();
 
-        $formAccessor = $this->getMock('Oro\Bundle\EmbeddedFormBundle\Layout\Form\FormAccessorInterface');
+        $formAccessor = $this->createMock('Oro\Bundle\EmbeddedFormBundle\Layout\Form\FormAccessorInterface');
         $formAccessor->expects($this->never())
             ->method('getForm');
         $formAccessor->expects($this->once())
@@ -262,7 +262,7 @@ class EmbedFormStartTypeTest extends BlockTypeTestCase
         $formEnctype     = 'test_enctype';
         $formView        = new FormView();
 
-        $formAccessor = $this->getMock('Oro\Bundle\EmbeddedFormBundle\Layout\Form\FormAccessorInterface');
+        $formAccessor = $this->createMock('Oro\Bundle\EmbeddedFormBundle\Layout\Form\FormAccessorInterface');
         $formAccessor->expects($this->never())
             ->method('getForm');
         $formAccessor->expects($this->once())

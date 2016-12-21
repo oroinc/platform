@@ -23,7 +23,7 @@ class RoleManagerTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->repository = $this->getMock(
+        $this->repository = $this->createPartialMock(
             'Doctrine\Common\Persistence\ObjectRepository',
             array('find', 'findAll', 'findBy', 'findOneBy', 'getClassName', 'getUserQueryBuilder')
         );

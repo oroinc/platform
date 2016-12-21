@@ -91,7 +91,7 @@ class MessageQueueCollectorTest extends \PHPUnit_Framework_TestCase
      */
     protected function createMessageProducerMock()
     {
-        return $this->getMock(MessageProducerInterface::class);
+        return $this->createMock(MessageProducerInterface::class);
     }
 
     /**
@@ -99,6 +99,6 @@ class MessageQueueCollectorTest extends \PHPUnit_Framework_TestCase
      */
     protected function createTraceableMessageProducerMock()
     {
-        return $this->getMock(TraceableMessageProducer::class, [], [], '', false);
+        return $this->createMock(TraceableMessageProducer::class);
     }
 }

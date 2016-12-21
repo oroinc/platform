@@ -53,7 +53,7 @@ class TagListenerTest extends \PHPUnit_Framework_TestCase
             ->method('deleteTagging')
             ->with($this->resource, []);
 
-        $container = $this->getMock('Symfony\Component\DependencyInjection\ContainerInterface');
+        $container = $this->createMock('Symfony\Component\DependencyInjection\ContainerInterface');
         $container->expects($this->once())
             ->method('get')
             ->with($this->equalTo('oro_tag.tag.manager'))

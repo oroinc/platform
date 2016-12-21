@@ -18,7 +18,7 @@ class ScopeUserCriteriaProviderTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->tokenStorage = $this->getMock(TokenStorageInterface::class);
+        $this->tokenStorage = $this->createMock(TokenStorageInterface::class);
         $this->provider = new ScopeUserCriteriaProvider($this->tokenStorage);
     }
 
@@ -27,7 +27,7 @@ class ScopeUserCriteriaProviderTest extends \PHPUnit_Framework_TestCase
         $user = new User();
 
         /** @var TokenInterface|\PHPUnit_Framework_MockObject_MockObject $token */
-        $token = $this->getMock(TokenInterface::class);
+        $token = $this->createMock(TokenInterface::class);
         $token->expects($this->once())
             ->method('getUser')
             ->willReturn($user);
@@ -57,7 +57,7 @@ class ScopeUserCriteriaProviderTest extends \PHPUnit_Framework_TestCase
         $user = new \stdClass();
 
         /** @var TokenInterface|\PHPUnit_Framework_MockObject_MockObject $token */
-        $token = $this->getMock(TokenInterface::class);
+        $token = $this->createMock(TokenInterface::class);
         $token->expects($this->once())
             ->method('getUser')
             ->willReturn($user);

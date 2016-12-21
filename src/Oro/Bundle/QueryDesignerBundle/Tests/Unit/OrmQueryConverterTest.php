@@ -8,7 +8,7 @@ abstract class OrmQueryConverterTest extends \PHPUnit_Framework_TestCase
 {
     protected function getVirtualFieldProvider(array $config = [])
     {
-        $provider = $this->getMock('Oro\Bundle\EntityBundle\Provider\VirtualFieldProviderInterface');
+        $provider = $this->createMock('Oro\Bundle\EntityBundle\Provider\VirtualFieldProviderInterface');
         $provider->expects($this->any())
             ->method('isVirtualField')
             ->will(
@@ -49,7 +49,7 @@ abstract class OrmQueryConverterTest extends \PHPUnit_Framework_TestCase
 
     protected function getFunctionProvider(array $config = [])
     {
-        $provider = $this->getMock('Oro\Bundle\QueryDesignerBundle\QueryDesigner\FunctionProviderInterface');
+        $provider = $this->createMock('Oro\Bundle\QueryDesignerBundle\QueryDesigner\FunctionProviderInterface');
         if (empty($config)) {
             $provider->expects($this->never())
                 ->method('getFunction');

@@ -44,7 +44,7 @@ class QueryValidatorTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->chainConfigurationProvider = $this->getMock(
+        $this->chainConfigurationProvider = $this->createMock(
             'Oro\Bundle\DataGridBundle\Provider\ChainConfigurationProvider'
         );
 
@@ -53,7 +53,7 @@ class QueryValidatorTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->translator = $this->getMock('Symfony\Component\Translation\TranslatorInterface');
+        $this->translator = $this->createMock('Symfony\Component\Translation\TranslatorInterface');
 
         $this->validator = new QueryValidator(
             $this->chainConfigurationProvider,
@@ -62,7 +62,7 @@ class QueryValidatorTest extends \PHPUnit_Framework_TestCase
             false
         );
 
-        $this->context = $this->getMock('\Symfony\Component\Validator\ExecutionContextInterface');
+        $this->context = $this->createMock('\Symfony\Component\Validator\ExecutionContextInterface');
         $this->validator->initialize($this->context);
 
         $this->constraint = new QueryConstraint();
@@ -131,7 +131,7 @@ class QueryValidatorTest extends \PHPUnit_Framework_TestCase
                 ->method('getConfiguration')
                 ->will($this->returnValue($configuration));
         }
-        $datagrid = $this->getMock('Oro\Bundle\DataGridBundle\Datagrid\DatagridInterface');
+        $datagrid = $this->createMock('Oro\Bundle\DataGridBundle\Datagrid\DatagridInterface');
 
         $this->gridBuilder
             ->expects($this->exactly($expectsCount))
@@ -188,21 +188,21 @@ class QueryValidatorTest extends \PHPUnit_Framework_TestCase
     {
         return [
             [
-                $this->getDataSourceInterfaceMock(),
+                $this->getOrmDataSourceInterfaceMock(),
                 false,
                 new DBALException('failed'),
                 null,
                 1
             ],
             [
-                $this->getDataSourceInterfaceMock(),
+                $this->getOrmDataSourceInterfaceMock(),
                 false,
                 new InvalidConfigurationException(),
                 null,
                 1
             ],
             [
-                $this->getDataSourceInterfaceMock(),
+                $this->getOrmDataSourceInterfaceMock(),
                 false,
                 null,
                 null,
@@ -235,21 +235,12 @@ class QueryValidatorTest extends \PHPUnit_Framework_TestCase
     /**
      * @return \PHPUnit_Framework_MockObject_MockObject
      */
-    protected function getDataSourceInterfaceMock()
-    {
-        return $this->getMockBuilder('Oro\Bundle\DataGridBundle\Datasource\Orm\OrmDatasource')
-                    ->disableOriginalConstructor()
-                    ->getMock();
-    }
-
-    /**
-     * @return \PHPUnit_Framework_MockObject_MockObject
-     */
     protected function getOrmDataSourceInterfaceMock()
     {
         return $this
             ->getMockBuilder('Oro\Bundle\DataGridBundle\Datasource\Orm\OrmDatasource')
             ->disableOriginalConstructor()
+            ->disableOriginalClone()
             ->getMock();
     }
 

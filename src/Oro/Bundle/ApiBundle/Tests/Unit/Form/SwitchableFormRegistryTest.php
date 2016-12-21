@@ -19,14 +19,14 @@ class SwitchableFormRegistryTest extends \PHPUnit_Framework_TestCase
     public function testConstructorWithSeveralFormExtensions()
     {
         $extensions = [
-            $this->getMock(FormExtensionInterface::class),
-            $this->getMock(FormExtensionInterface::class),
+            $this->createMock(FormExtensionInterface::class),
+            $this->createMock(FormExtensionInterface::class),
         ];
 
         new SwitchableFormRegistry(
             $extensions,
-            $this->getMock(ResolvedFormTypeFactoryInterface::class),
-            $this->getMock(FormExtensionState::class)
+            $this->createMock(ResolvedFormTypeFactoryInterface::class),
+            $this->createMock(FormExtensionState::class)
         );
     }
 
@@ -39,13 +39,13 @@ class SwitchableFormRegistryTest extends \PHPUnit_Framework_TestCase
     public function testConstructorWithUnexpectedFormExtensions()
     {
         $extensions = [
-            $this->getMock(FormExtensionInterface::class),
+            $this->createMock(FormExtensionInterface::class),
         ];
 
         new SwitchableFormRegistry(
             $extensions,
-            $this->getMock(ResolvedFormTypeFactoryInterface::class),
-            $this->getMock(FormExtensionState::class)
+            $this->createMock(ResolvedFormTypeFactoryInterface::class),
+            $this->createMock(FormExtensionState::class)
         );
     }
 
@@ -57,8 +57,8 @@ class SwitchableFormRegistryTest extends \PHPUnit_Framework_TestCase
 
         $formRegistry = new SwitchableFormRegistry(
             [$extension],
-            $this->getMock(ResolvedFormTypeFactoryInterface::class),
-            $this->getMock(FormExtensionState::class)
+            $this->createMock(ResolvedFormTypeFactoryInterface::class),
+            $this->createMock(FormExtensionState::class)
         );
 
         $this->setPrivatePropertyValue($formRegistry, 'types', null);
@@ -73,11 +73,11 @@ class SwitchableFormRegistryTest extends \PHPUnit_Framework_TestCase
             ->getMockBuilder('Oro\Bundle\ApiBundle\Form\Extension\SwitchableDependencyInjectionExtension')
             ->disableOriginalConstructor()
             ->getMock();
-        $formExtensionState = $this->getMock(FormExtensionState::class);
+        $formExtensionState = $this->createMock(FormExtensionState::class);
 
         $formRegistry = new SwitchableFormRegistry(
             [$extension],
-            $this->getMock(ResolvedFormTypeFactoryInterface::class),
+            $this->createMock(ResolvedFormTypeFactoryInterface::class),
             $formExtensionState
         );
 
@@ -99,11 +99,11 @@ class SwitchableFormRegistryTest extends \PHPUnit_Framework_TestCase
             ->getMockBuilder('Oro\Bundle\ApiBundle\Form\Extension\SwitchableDependencyInjectionExtension')
             ->disableOriginalConstructor()
             ->getMock();
-        $formExtensionState = $this->getMock(FormExtensionState::class);
+        $formExtensionState = $this->createMock(FormExtensionState::class);
 
         $formRegistry = new SwitchableFormRegistry(
             [$extension],
-            $this->getMock(ResolvedFormTypeFactoryInterface::class),
+            $this->createMock(ResolvedFormTypeFactoryInterface::class),
             $formExtensionState
         );
 
@@ -138,11 +138,11 @@ class SwitchableFormRegistryTest extends \PHPUnit_Framework_TestCase
         $extension = $this->getMockBuilder(SwitchableDependencyInjectionExtension::class)
             ->disableOriginalConstructor()
             ->getMock();
-        $formExtensionState = $this->getMock(FormExtensionState::class);
+        $formExtensionState = $this->createMock(FormExtensionState::class);
 
         $formRegistry = new SwitchableFormRegistry(
             [$extension],
-            $this->getMock(ResolvedFormTypeFactoryInterface::class),
+            $this->createMock(ResolvedFormTypeFactoryInterface::class),
             $formExtensionState
         );
 

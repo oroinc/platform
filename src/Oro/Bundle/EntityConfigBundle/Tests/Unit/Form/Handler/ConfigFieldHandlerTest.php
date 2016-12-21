@@ -128,14 +128,14 @@ class ConfigFieldHandlerTest extends \PHPUnit_Framework_TestCase
             ->method('createView')
             ->willReturn($formView);
 
-        $entityConfig = $this->getMock(ConfigInterface::class);
+        $entityConfig = $this->createMock(ConfigInterface::class);
         $this->configHelper
             ->expects($this->once())
             ->method('getEntityConfigByField')
             ->with($this->fieldConfigModel, 'entity')
             ->willReturn($entityConfig);
 
-        $fieldConfig = $this->getMock(ConfigInterface::class);
+        $fieldConfig = $this->createMock(ConfigInterface::class);
         $this->configHelper
             ->expects($this->once())
             ->method('getFieldConfig')

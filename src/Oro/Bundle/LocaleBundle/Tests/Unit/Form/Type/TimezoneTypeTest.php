@@ -39,7 +39,7 @@ class TimezoneTypeTest extends \PHPUnit_Framework_TestCase
     {
         $timezones = array('Test' => '(UTC +0) Test');
 
-        $cache = $this->getMock('Doctrine\Common\Cache\Cache');
+        $cache = $this->createMock('Doctrine\Common\Cache\Cache');
         $cache->expects($this->once())
             ->method('contains')
             ->with('timezones')
@@ -64,7 +64,7 @@ class TimezoneTypeTest extends \PHPUnit_Framework_TestCase
      */
     public function testFormTypeWithEmptyCache()
     {
-        $cache = $this->getMock('Doctrine\Common\Cache\Cache');
+        $cache = $this->createMock('Doctrine\Common\Cache\Cache');
         $cache->expects($this->once())
             ->method('contains')
             ->with('timezones')

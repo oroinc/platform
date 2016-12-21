@@ -43,8 +43,8 @@ class RouteChoiceTypeTest extends FormIntegrationTestCase
     {
 
         $this->translator = $this->getTranslator();
-        $this->registry = $this->getMock(ManagerRegistry::class);
-        $this->router = $this->getMock(RouterInterface::class);
+        $this->registry = $this->createMock(ManagerRegistry::class);
+        $this->router = $this->createMock(RouterInterface::class);
 
         $this->formType = new RouteChoiceType($this->router, $this->registry, $this->translator);
 
@@ -273,7 +273,7 @@ class RouteChoiceTypeTest extends FormIntegrationTestCase
             );
 
         /** @var EntityManagerInterface|\PHPUnit_Framework_MockObject_MockObject $em */
-        $em = $this->getMock(EntityManagerInterface::class);
+        $em = $this->createMock(EntityManagerInterface::class);
         $em->expects($this->once())
             ->method('getRepository')
             ->with(Title::class)

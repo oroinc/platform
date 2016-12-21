@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\src\Oro\Bundle\EmailBundle\Tests\Unit\Manager;
+namespace Oro\Bundle\EmailBundle\Tests\Unit\Manager;
 
 use Doctrine\Bundle\DoctrineBundle\Registry;
 use Doctrine\Common\Persistence\ObjectManager;
@@ -25,7 +25,7 @@ use Oro\Bundle\AttachmentBundle\Entity\Attachment;
 /**
  * Class EmailAttachmentManagerTest
  *
- * @package Oro\src\Oro\Bundle\EmailBundle\Tests\Unit\Manager
+ * @package Oro\Bundle\EmailBundle\Tests\Unit\Manager
  * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
  */
 class EmailAttachmentManagerTest extends \PHPUnit_Framework_TestCase
@@ -160,7 +160,7 @@ class EmailAttachmentManagerTest extends \PHPUnit_Framework_TestCase
             ->willReturn($file);
         $this->configFileValidator->expects($this->once())
             ->method('validate')
-            ->willReturn($this->getMock('Countable'));
+            ->willReturn($this->createMock('Countable'));
 
         $this->emailAttachmentManager->linkEmailAttachmentToTargetEntity($emailAttachment, new SomeEntity());
 

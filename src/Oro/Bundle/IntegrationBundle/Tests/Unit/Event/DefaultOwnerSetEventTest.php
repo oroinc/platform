@@ -10,7 +10,7 @@ class DefaultOwnerSetEventTest extends \PHPUnit_Framework_TestCase
     public function testInterface()
     {
         $channel   = new Integration();
-        $someOwner = $this->getMock('Oro\Bundle\UserBundle\Entity\User');
+        $someOwner = $this->createMock('Oro\Bundle\UserBundle\Entity\User');
         $channel->setDefaultUserOwner($someOwner);
 
         $event = new DefaultOwnerSetEvent($channel);

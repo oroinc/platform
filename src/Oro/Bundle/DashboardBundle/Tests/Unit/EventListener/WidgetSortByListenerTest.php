@@ -32,7 +32,7 @@ class WidgetSortByListenerTest extends OrmTestCase
             )
         );
 
-        $datagrid = $this->getMock('Oro\Bundle\DataGridBundle\Datagrid\DatagridInterface');
+        $datagrid = $this->createMock('Oro\Bundle\DataGridBundle\Datagrid\DatagridInterface');
 
         $qb = $em->createQueryBuilder();
         $originalDQL = $qb->getQuery()->getDQL();
@@ -89,7 +89,7 @@ class WidgetSortByListenerTest extends OrmTestCase
             ->from('Oro\Bundle\DashboardBundle\Tests\Unit\Fixtures\Entity\TestClass', 'tc')
             ->orderBy('tc.id', 'DESC');
 
-        $datagrid = $this->getMock('Oro\Bundle\DataGridBundle\Datagrid\DatagridInterface');
+        $datagrid = $this->createMock('Oro\Bundle\DataGridBundle\Datagrid\DatagridInterface');
 
         $widgetSortByListener = new WidgetSortByListener($widgetConfigs);
         $widgetSortByListener->onResultBeforeQuery(new OrmResultBeforeQuery($datagrid, $qb));

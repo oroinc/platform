@@ -34,8 +34,8 @@ class EntityDescriptionProviderTest extends OrmRelatedTestCase
     {
         parent::setUp();
 
-        $this->entityClassNameProvider = $this->getMock(EntityClassNameProviderInterface::class);
-        $this->translator = $this->getMock(TranslatorInterface::class);
+        $this->entityClassNameProvider = $this->createMock(EntityClassNameProviderInterface::class);
+        $this->translator = $this->createMock(TranslatorInterface::class);
 
         $this->configManager = $this->getMockBuilder(ConfigManager::class)
             ->disableOriginalConstructor()

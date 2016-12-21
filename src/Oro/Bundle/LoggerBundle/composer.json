@@ -9,16 +9,13 @@
         "symfony/symfony": "2.8.*, !=2.8.10",
         "oro/notification-bundle": "dev-master",
         "oro/config-bundle": "dev-master",
-        "oro/user-bundle": "dev-master"
-    },
-    "require-dev": {
+        "oro/user-bundle": "dev-master",
         "oro/testframework-bundle": "dev-master"
     },
     "autoload": {
         "psr-0": { "Oro\\Bundle\\LoggerBundle": "" }
     },
     "target-dir": "Oro/Bundle/LoggerBundle",
-    "minimum-stability": "dev",
     "extra": {
         "branch-alias": {
             "dev-master": "1.0-dev"

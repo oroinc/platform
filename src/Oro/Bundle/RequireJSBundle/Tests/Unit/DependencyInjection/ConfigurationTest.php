@@ -12,7 +12,7 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
      */
     public function testExceptionConfigTree($options, $exception)
     {
-        $this->setExpectedException($exception);
+        $this->expectException($exception);
 
         $processor = new Processor();
         $configuration = new Configuration(array());

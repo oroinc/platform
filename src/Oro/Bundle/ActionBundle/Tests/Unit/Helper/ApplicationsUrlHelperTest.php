@@ -24,7 +24,7 @@ class ApplicationsUrlHelperTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->mockRouter = $this->getMock('Symfony\Component\Routing\RouterInterface');
+        $this->mockRouter = $this->createMock('Symfony\Component\Routing\RouterInterface');
 
         $this->instance = new ApplicationsUrlHelper($this->routerProvider, $this->mockRouter);
     }
