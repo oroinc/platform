@@ -14,7 +14,7 @@ class WorkflowTransitionTriggersAssemblerTest extends \PHPUnit_Framework_TestCas
     public function testAssembler()
     {
         $assembler = new WorkflowTransitionTriggersAssembler();
-        $someAssembler = $this->getMock(TransitionTriggerAssemblerInterface::class);
+        $someAssembler = $this->createMock(TransitionTriggerAssemblerInterface::class);
         $someAssembler->expects($this->once())->method('canAssemble')->willReturn(true);
         $trigger = $this->getMockForAbstractClass(BaseTransitionTrigger::class);
         $someAssembler->expects($this->once())->method('assemble')->willReturn($trigger);
@@ -41,8 +41,8 @@ class WorkflowTransitionTriggersAssemblerTest extends \PHPUnit_Framework_TestCas
 
     public function testAssemblerException()
     {
-        $this->setExpectedException(
-            AssemblerException::class,
+        $this->expectException(AssemblerException::class);
+        $this->expectExceptionMessage(
             sprintf(
                 'Can\'t assemble trigger for %s workflow in transition %s by given options: %s',
                 'workflowName',

@@ -34,7 +34,7 @@ class ParameterBinderTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->datagrid = $this->getMock('Oro\\Bundle\\DataGridBundle\\Datagrid\\DatagridInterface');
+        $this->datagrid = $this->createMock('Oro\\Bundle\\DataGridBundle\\Datagrid\\DatagridInterface');
 
         $this->datasource = $this->getMockBuilder('Oro\\Bundle\\DataGridBundle\\Datasource\\Orm\\OrmDatasource')
             ->disableOriginalConstructor()
@@ -250,14 +250,14 @@ class ParameterBinderTest extends \PHPUnit_Framework_TestCase
 
     public function testBindParametersFailsWithInvalidPath()
     {
-        $datasource = $this->getMock('Oro\\Bundle\\DataGridBundle\\Datagrid\\DatagridInterface');
+        $datasource = $this->createMock('Oro\\Bundle\\DataGridBundle\\Datagrid\\DatagridInterface');
 
         $this->datagrid->expects($this->once())
             ->method('getDatasource')
             ->will($this->returnValue($datasource));
 
-        $this->setExpectedException(
-            'InvalidArgumentException',
+        $this->expectException('InvalidArgumentException');
+        $this->expectExceptionMessage(
             'Datagrid datasource has unexpected type "' . get_class($datasource) . '", ' .
             '"Oro\Bundle\DataGridBundle\Datasource\Orm\OrmDatasource" is expected.'
         );
@@ -322,8 +322,8 @@ class ParameterBinderTest extends \PHPUnit_Framework_TestCase
             ->method('getParameters')
             ->will($this->returnValue(new ParameterBag()));
 
-        $this->setExpectedException(
-            'InvalidArgumentException',
+        $this->expectException('InvalidArgumentException');
+        $this->expectExceptionMessage(
             'Cannot bind parameter to data source, expected bind parameter format is a string or array with ' .
             'required "name" key, actual array keys are "foo"'
         );

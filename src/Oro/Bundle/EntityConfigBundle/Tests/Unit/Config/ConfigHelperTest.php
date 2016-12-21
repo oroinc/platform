@@ -32,7 +32,7 @@ class ConfigHelperTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->fieldConfigModel = $this->getMock(FieldConfigModel::class);
+        $this->fieldConfigModel = $this->createMock(FieldConfigModel::class);
 
         $this->configHelper = new ConfigHelper($this->configManager);
     }
@@ -72,9 +72,9 @@ class ConfigHelperTest extends \PHPUnit_Framework_TestCase
     {
         $scope = 'scope';
         $className = 'className';
-        $fieldConfigModel = $this->getMock(FieldConfigModel::class);
+        $fieldConfigModel = $this->createMock(FieldConfigModel::class);
 
-        $entityConfigModel = $this->getMock(EntityConfigModel::class);
+        $entityConfigModel = $this->createMock(EntityConfigModel::class);
 
         $entityConfigModel
             ->expects($this->once())
@@ -90,7 +90,7 @@ class ConfigHelperTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $entityConfig = $this->getMock(ConfigInterface::class);
+        $entityConfig = $this->createMock(ConfigInterface::class);
 
         $configProvider
             ->expects($this->once())
@@ -118,7 +118,7 @@ class ConfigHelperTest extends \PHPUnit_Framework_TestCase
             ->method('getFieldName')
             ->willReturn($fieldName);
 
-        $entityConfigModel = $this->getMock(EntityConfigModel::class);
+        $entityConfigModel = $this->createMock(EntityConfigModel::class);
 
         $entityConfigModel
             ->expects($this->once())
@@ -130,7 +130,7 @@ class ConfigHelperTest extends \PHPUnit_Framework_TestCase
             ->method('getEntity')
             ->willReturn($entityConfigModel);
 
-        $fieldConfig = $this->getMock(ConfigInterface::class);
+        $fieldConfig = $this->createMock(ConfigInterface::class);
 
         $configProvider = $this->getMockBuilder(ConfigProvider::class)
             ->disableOriginalConstructor()
@@ -159,7 +159,7 @@ class ConfigHelperTest extends \PHPUnit_Framework_TestCase
         $callback = function () {
         };
 
-        $entityConfigModel = $this->getMock(EntityConfigModel::class);
+        $entityConfigModel = $this->createMock(EntityConfigModel::class);
 
         $entityConfigModel
             ->expects($this->once())
@@ -280,7 +280,7 @@ class ConfigHelperTest extends \PHPUnit_Framework_TestCase
         $expectedFieldType,
         $expectedAdditionalFieldOptions
     ) {
-        $extendEntityConfig = $this->getMock(ConfigInterface::class);
+        $extendEntityConfig = $this->createMock(ConfigInterface::class);
 
         $result = $this->configHelper->createFieldOptions($extendEntityConfig, $fieldType, $additionalFieldOptions);
 
@@ -292,13 +292,13 @@ class ConfigHelperTest extends \PHPUnit_Framework_TestCase
         $className = 'Oro\Bundle\SomeBundle\Entity\SomeEntity';
         $scope = 'scope';
 
-        $entityConfigModel = $this->getMock(EntityConfigModel::class);
+        $entityConfigModel = $this->createMock(EntityConfigModel::class);
         $entityConfigModel
             ->expects($this->once())
             ->method('getClassName')
             ->willReturn($className);
 
-        $entityConfig = $this->getMock(ConfigInterface::class);
+        $entityConfig = $this->createMock(ConfigInterface::class);
 
         $configProvider = $this->getMockBuilder(ConfigProvider::class)
             ->disableOriginalConstructor()
@@ -326,7 +326,7 @@ class ConfigHelperTest extends \PHPUnit_Framework_TestCase
             ->method('getFieldName')
             ->willReturn(self::FIELD_NAME);
 
-        $entityConfigModel = $this->getMock(EntityConfigModel::class);
+        $entityConfigModel = $this->createMock(EntityConfigModel::class);
         $entityConfigModel
             ->expects($this->once())
             ->method('getClassName')
@@ -374,7 +374,7 @@ class ConfigHelperTest extends \PHPUnit_Framework_TestCase
 
         $this->expectsGetClassNameAndFieldName();
 
-        $config = $this->getMock(ConfigInterface::class);
+        $config = $this->createMock(ConfigInterface::class);
         $configProvider = $this->expectsGetProviderByScope('extend', $config);
         $configProvider
             ->expects($this->never())
@@ -412,7 +412,7 @@ class ConfigHelperTest extends \PHPUnit_Framework_TestCase
 
         $this->expectsGetClassNameAndFieldName();
 
-        $config = $this->getMock(ConfigInterface::class);
+        $config = $this->createMock(ConfigInterface::class);
         $configProvider = $this->expectsGetProviderByScope($scope, $config);
 
         $propertyConfigContainer = $this->getMockBuilder(PropertyConfigContainer::class)
@@ -440,7 +440,7 @@ class ConfigHelperTest extends \PHPUnit_Framework_TestCase
             ->method('all')
             ->willReturn($all);
 
-        $configId = $this->getMock(ConfigIdInterface::class);
+        $configId = $this->createMock(ConfigIdInterface::class);
 
         $configId
             ->expects($this->once())

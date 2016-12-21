@@ -21,7 +21,7 @@ class DataCollectorExtensionTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->dataCollector = $this->getMock(LayoutDataCollector::class, [], [], '', false);
+        $this->dataCollector = $this->createMock(LayoutDataCollector::class);
 
         $this->extension = new DataCollectorExtension($this->dataCollector);
     }
@@ -38,7 +38,7 @@ class DataCollectorExtensionTest extends \PHPUnit_Framework_TestCase
         $options = new Options(['optionKey' => 'optionValue']);
 
         /** @var BlockBuilderInterface|\PHPUnit_Framework_MockObject_MockObject $builder */
-        $builder = $this->getMock(BlockBuilderInterface::class);
+        $builder = $this->createMock(BlockBuilderInterface::class);
         $builder->expects($this->once())
             ->method('getId')
             ->will($this->returnValue($blockId));
@@ -57,9 +57,9 @@ class DataCollectorExtensionTest extends \PHPUnit_Framework_TestCase
     public function testBuildView()
     {
         /** @var BlockView|\PHPUnit_Framework_MockObject_MockObject $view */
-        $view = $this->getMock(BlockView::class);
+        $view = $this->createMock(BlockView::class);
         /** @var BlockInterface|\PHPUnit_Framework_MockObject_MockObject $block */
-        $block = $this->getMock(BlockInterface::class);
+        $block = $this->createMock(BlockInterface::class);
         $options = new Options(['optionKey' => 'optionValue']);
 
         $this->dataCollector

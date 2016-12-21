@@ -25,11 +25,11 @@ class EmailNotificationTypeTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $configId = $this->getMock('Oro\Bundle\EntityConfigBundle\Config\Id\ConfigIdInterface');
+        $configId = $this->createMock('Oro\Bundle\EntityConfigBundle\Config\Id\ConfigIdInterface');
         $configId->expects($this->once())
             ->method('getClassName')
             ->will($this->returnValue('Oro\Bundle\UserBundle\Entity\User'));
-        $config = $this->getMock('Oro\Bundle\EntityConfigBundle\Config\ConfigInterface');
+        $config = $this->createMock('Oro\Bundle\EntityConfigBundle\Config\ConfigInterface');
         $config->expects($this->once())
             ->method('get')
             ->will($this->returnValue(OwnershipType::OWNER_TYPE_BUSINESS_UNIT));
@@ -46,7 +46,7 @@ class EmailNotificationTypeTest extends \PHPUnit_Framework_TestCase
 
     public function testSetDefaultOptions()
     {
-        $resolver = $this->getMock('Symfony\Component\OptionsResolver\OptionsResolverInterface');
+        $resolver = $this->createMock('Symfony\Component\OptionsResolver\OptionsResolverInterface');
         $resolver->expects($this->once())
             ->method('setDefaults')
             ->with($this->isType('array'));

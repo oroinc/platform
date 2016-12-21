@@ -267,10 +267,8 @@ class OperationManagerTest extends \PHPUnit_Framework_TestCase
     public function testGetOperation($operationName, $operation, $isAvailable)
     {
         if (!$operation || !$isAvailable) {
-            $this->setExpectedException(
-                '\Oro\Bundle\ActionBundle\Exception\OperationNotFoundException',
-                sprintf('Operation with name "%s" not found', $operationName)
-            );
+            $this->expectException('\Oro\Bundle\ActionBundle\Exception\OperationNotFoundException');
+            $this->expectExceptionMessage(sprintf('Operation with name "%s" not found', $operationName));
         }
 
         $this->operationRegistry->expects($this->once())
@@ -597,7 +595,7 @@ class OperationManagerTest extends \PHPUnit_Framework_TestCase
             ->setFrontendOptions($frontendOptions);
 
         /* @var $actionFactory \PHPUnit_Framework_MockObject_MockObject|ActionFactory */
-        $actionFactory = $this->getMock('Oro\Component\Action\Action\ActionFactoryInterface');
+        $actionFactory = $this->createMock('Oro\Component\Action\Action\ActionFactoryInterface');
 
         /* @var $conditionFactory \PHPUnit_Framework_MockObject_MockObject|ExpressionFactory */
         $conditionFactory = $this->getMockBuilder('Oro\Component\ConfigExpression\ExpressionFactory')

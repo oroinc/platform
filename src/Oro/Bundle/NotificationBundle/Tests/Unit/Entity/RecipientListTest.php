@@ -30,7 +30,7 @@ class RecipientListTest extends \PHPUnit_Framework_TestCase
     public function testSetterGetterForUsers()
     {
         // test adding through array collection interface
-        $user = $this->getMock('Oro\Bundle\UserBundle\Entity\User');
+        $user = $this->createMock('Oro\Bundle\UserBundle\Entity\User');
         $this->entity->getUsers()->add($user);
 
         $this->assertContains($user, $this->entity->getUsers());
@@ -52,7 +52,7 @@ class RecipientListTest extends \PHPUnit_Framework_TestCase
     public function testSetterGetterForGroups()
     {
         // test adding through array collection interface
-        $group = $this->getMock('Oro\Bundle\UserBundle\Entity\Group');
+        $group = $this->createMock('Oro\Bundle\UserBundle\Entity\Group');
         $this->entity->getGroups()->add($group);
 
         $this->assertContains($group, $this->entity->getGroups());
@@ -89,8 +89,8 @@ class RecipientListTest extends \PHPUnit_Framework_TestCase
 
     public function testToString()
     {
-        $group = $this->getMock('Oro\Bundle\UserBundle\Entity\Group');
-        $user = $this->getMock('Oro\Bundle\UserBundle\Entity\User');
+        $group = $this->createMock('Oro\Bundle\UserBundle\Entity\Group');
+        $user = $this->createMock('Oro\Bundle\UserBundle\Entity\User');
 
         // test when owner filled
         $this->entity->setOwner(true);
@@ -126,7 +126,7 @@ class RecipientListTest extends \PHPUnit_Framework_TestCase
 
     public function testNotValidData()
     {
-        $context = $this->getMock('Symfony\Component\Validator\Context\ExecutionContextInterface');
+        $context = $this->createMock('Symfony\Component\Validator\Context\ExecutionContextInterface');
 
         $context->expects($this->once())
             ->method('getPropertyPath')
@@ -139,10 +139,10 @@ class RecipientListTest extends \PHPUnit_Framework_TestCase
 
     public function testValidData()
     {
-        $group = $this->getMock('Oro\Bundle\UserBundle\Entity\Group');
-        $user = $this->getMock('Oro\Bundle\UserBundle\Entity\User');
+        $group = $this->createMock('Oro\Bundle\UserBundle\Entity\Group');
+        $user = $this->createMock('Oro\Bundle\UserBundle\Entity\User');
 
-        $context = $this->getMock('Symfony\Component\Validator\Context\ExecutionContextInterface');
+        $context = $this->createMock('Symfony\Component\Validator\Context\ExecutionContextInterface');
 
         $context->expects($this->never())
             ->method('getPropertyPath');

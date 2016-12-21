@@ -116,7 +116,7 @@ class AddressTypeTest extends \PHPUnit_Framework_TestCase
     public function testBuildView()
     {
         $view = new FormView();
-        $form = $this->getMock('Symfony\Component\Form\FormInterface');
+        $form = $this->createMock('Symfony\Component\Form\FormInterface');
         $this->type->buildView($view, $form, ['region_route' => 'test']);
 
         $this->assertArrayHasKey('region_route', $view->vars);

@@ -26,7 +26,7 @@ class DataGridTagListenerTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->generator = $this->getMock('Oro\Bundle\SyncBundle\Content\TagGeneratorChain');
+        $this->generator = $this->createMock('Oro\Bundle\SyncBundle\Content\TagGeneratorChain');
         $this->listener  = new DataGridTagListener($this->generator);
     }
 
@@ -40,7 +40,7 @@ class DataGridTagListenerTest extends \PHPUnit_Framework_TestCase
         $config     = DatagridConfiguration::createNamed(self::TEST_GRID_NAME, []);
         $acceptor   = new Acceptor();
         $acceptor->setConfig($config);
-        $parameters = $this->getMock('Oro\Bundle\DataGridBundle\Datagrid\ParameterBag');
+        $parameters = $this->createMock('Oro\Bundle\DataGridBundle\Datagrid\ParameterBag');
         $grid       = new Datagrid(self::TEST_GRID_NAME, $config, $parameters);
         $grid->setAcceptor($acceptor);
 

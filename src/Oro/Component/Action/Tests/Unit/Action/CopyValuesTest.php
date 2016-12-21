@@ -42,13 +42,15 @@ class CopyValuesTest extends \PHPUnit_Framework_TestCase
 
     public function testInitializeWithEmptyOptions()
     {
-        $this->setExpectedException(InvalidParameterException::class, 'Attribute and data parameters are required');
+        $this->expectException(InvalidParameterException::class);
+        $this->expectExceptionMessage('Attribute and data parameters are required');
         $this->action->initialize([]);
     }
 
     public function testInitializeWithIncorrectAttribute()
     {
-        $this->setExpectedException(InvalidParameterException::class, 'Attribute must be valid property definition');
+        $this->expectException(InvalidParameterException::class);
+        $this->expectExceptionMessage('Attribute must be valid property definition');
         $this->action->initialize(['var1', 'var2']);
     }
 

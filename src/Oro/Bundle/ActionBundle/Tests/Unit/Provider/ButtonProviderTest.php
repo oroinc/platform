@@ -21,7 +21,7 @@ class ButtonProviderTest extends \PHPUnit_Framework_TestCase
     protected function setUp()
     {
         $this->buttonProvider = new ButtonProvider();
-        $this->buttonExtension = $this->getMock(ButtonProviderExtensionInterface::class);
+        $this->buttonExtension = $this->createMock(ButtonProviderExtensionInterface::class);
         $this->buttonProvider->addExtension($this->buttonExtension);
     }
 
@@ -34,7 +34,7 @@ class ButtonProviderTest extends \PHPUnit_Framework_TestCase
     public function testFindAll(array $input, array $output)
     {
         /** @var ButtonSearchContext $searchContext */
-        $searchContext = $this->getMock(ButtonSearchContext::class);
+        $searchContext = $this->createMock(ButtonSearchContext::class);
 
         $this->buttonExtension->expects($this->once())
             ->method('find')
@@ -79,7 +79,7 @@ class ButtonProviderTest extends \PHPUnit_Framework_TestCase
      */
     private function getButton($order)
     {
-        $button = $this->getMock(ButtonInterface::class);
+        $button = $this->createMock(ButtonInterface::class);
         $button->expects($this->any())->method('getOrder')->willReturn($order);
 
         return $button;

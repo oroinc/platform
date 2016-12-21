@@ -175,7 +175,7 @@ class AutoResponseListenerTest extends \PHPUnit_Framework_TestCase
      */
     private function createAutoResponseManagerMock()
     {
-        return $this->getMock(AutoResponseManager::class, [], [], '', false);
+        return $this->createMock(AutoResponseManager::class);
     }
 
     /**
@@ -183,7 +183,7 @@ class AutoResponseListenerTest extends \PHPUnit_Framework_TestCase
      */
     private function createMessageProducerMock()
     {
-        return $this->getMock(MessageProducerInterface::class);
+        return $this->createMock(MessageProducerInterface::class);
     }
 
     /**
@@ -191,6 +191,6 @@ class AutoResponseListenerTest extends \PHPUnit_Framework_TestCase
      */
     private function createPostFlushEventArgsMock()
     {
-        return $this->getMock(PostFlushEventArgs::class, [], [], '', false);
+        return $this->createMock(PostFlushEventArgs::class);
     }
 }

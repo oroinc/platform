@@ -19,7 +19,7 @@ class PrimaryItemCollectionNormalizerTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->serializer = $this->getMock('Oro\Bundle\ImportExportBundle\Serializer\Serializer');
+        $this->serializer = $this->createMock('Oro\Bundle\ImportExportBundle\Serializer\Serializer');
         $this->normalizer = new PrimaryItemCollectionNormalizer();
         $this->normalizer->setSerializer($this->serializer);
     }
@@ -34,7 +34,7 @@ class PrimaryItemCollectionNormalizerTest extends \PHPUnit_Framework_TestCase
 
     public function supportsNormalizationDataProvider()
     {
-        $primaryItem = $this->getMock(PrimaryItemCollectionNormalizer::PRIMARY_ITEM_TYPE);
+        $primaryItem = $this->createMock(PrimaryItemCollectionNormalizer::PRIMARY_ITEM_TYPE);
         return array(
             array('stdClass', false),
             array(new ArrayCollection(), false),
@@ -94,7 +94,7 @@ class PrimaryItemCollectionNormalizerTest extends \PHPUnit_Framework_TestCase
 
     protected function getMockPrimaryItem($primary)
     {
-        $result = $this->getMock(PrimaryItemCollectionNormalizer::PRIMARY_ITEM_TYPE);
+        $result = $this->createMock(PrimaryItemCollectionNormalizer::PRIMARY_ITEM_TYPE);
         $result->expects($this->once())->method('isPrimary')->will($this->returnValue($primary));
         return $result;
     }
@@ -107,13 +107,13 @@ class PrimaryItemCollectionNormalizerTest extends \PHPUnit_Framework_TestCase
 
         $primaryItemClass = $this->getMockClass(PrimaryItemCollectionNormalizer::PRIMARY_ITEM_TYPE);
 
-        $firstElement = $this->getMock(PrimaryItemCollectionNormalizer::PRIMARY_ITEM_TYPE);
+        $firstElement = $this->createMock(PrimaryItemCollectionNormalizer::PRIMARY_ITEM_TYPE);
         $firstElement->expects($this->once())->method('setPrimary')->with(true); // first is primary
 
-        $secondElement = $this->getMock(PrimaryItemCollectionNormalizer::PRIMARY_ITEM_TYPE);
+        $secondElement = $this->createMock(PrimaryItemCollectionNormalizer::PRIMARY_ITEM_TYPE);
         $secondElement->expects($this->once())->method('setPrimary')->with(false);
 
-        $thirdElement = $this->getMock(PrimaryItemCollectionNormalizer::PRIMARY_ITEM_TYPE);
+        $thirdElement = $this->createMock(PrimaryItemCollectionNormalizer::PRIMARY_ITEM_TYPE);
         $thirdElement->expects($this->once())->method('setPrimary')->with(false);
 
         $this->serializer->expects($this->exactly(3))

@@ -38,7 +38,7 @@ class DictionaryHelperTest extends \PHPUnit_Framework_TestCase
     public function testGetNamePrimaryKeyField($identifierFieldNames, $expected, $exception = false)
     {
         if ($exception) {
-            $this->setExpectedException('Oro\Bundle\EntityBundle\Exception\RuntimeException');
+            $this->expectException('Oro\Bundle\EntityBundle\Exception\RuntimeException');
         }
 
         $this->classMetadataMock
@@ -86,7 +86,7 @@ class DictionaryHelperTest extends \PHPUnit_Framework_TestCase
     public function testGetSearchFields($fieldNames, $searchFields, $expected, $exception = false)
     {
         if ($exception) {
-            $this->setExpectedException('\LogicException');
+            $this->expectException('\LogicException');
         }
 
         $this->classMetadataMock

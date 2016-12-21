@@ -33,7 +33,7 @@ class PhoneProviderTest extends \PHPUnit_Framework_TestCase
      */
     public function testGetPhoneNumber($object, $expected)
     {
-        $testPhoneHolderProvider = $this->getMock('Oro\Bundle\AddressBundle\Provider\PhoneProviderInterface');
+        $testPhoneHolderProvider = $this->createMock('Oro\Bundle\AddressBundle\Provider\PhoneProviderInterface');
         $testPhoneHolderProvider->expects($this->any())
             ->method('getPhoneNumber')
             ->will(
@@ -57,7 +57,7 @@ class PhoneProviderTest extends \PHPUnit_Framework_TestCase
      */
     public function testGetPhoneNumbers($object, $expected)
     {
-        $testPhoneHolderProvider = $this->getMock('Oro\Bundle\AddressBundle\Provider\PhoneProviderInterface');
+        $testPhoneHolderProvider = $this->createMock('Oro\Bundle\AddressBundle\Provider\PhoneProviderInterface');
         $testPhoneHolderProvider->expects($this->any())
             ->method('getPhoneNumbers')
             ->will(
@@ -197,7 +197,7 @@ class PhoneProviderTest extends \PHPUnit_Framework_TestCase
         $object->setPhoneHolder(new TestPhoneHolder('123-123'));
         $object->setOther(new SomeEntity());
 
-        $testPhoneHolderProvider = $this->getMock('Oro\Bundle\AddressBundle\Provider\PhoneProviderInterface');
+        $testPhoneHolderProvider = $this->createMock('Oro\Bundle\AddressBundle\Provider\PhoneProviderInterface');
         $testPhoneHolderProvider->expects($this->any())
             ->method('getPhoneNumber')
             ->will(
@@ -259,7 +259,7 @@ class PhoneProviderTest extends \PHPUnit_Framework_TestCase
         $object->setPhoneHolder($testPhoneHolder);
         $object->setOther(new SomeEntity());
 
-        $testPhoneHolderProvider = $this->getMock('Oro\Bundle\AddressBundle\Provider\PhoneProviderInterface');
+        $testPhoneHolderProvider = $this->createMock('Oro\Bundle\AddressBundle\Provider\PhoneProviderInterface');
         $testPhoneHolderProvider->expects($this->any())
             ->method('getPhoneNumbers')
             ->will(

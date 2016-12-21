@@ -34,7 +34,7 @@ class AbstractEmailSynchronizerTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->logger = $this->getMock('Psr\Log\LoggerInterface');
+        $this->logger = $this->createMock('Psr\Log\LoggerInterface');
         $this->em = $this->getMockBuilder('Doctrine\ORM\EntityManager')
             ->disableOriginalConstructor()
             ->getMock();
@@ -607,7 +607,8 @@ class AbstractEmailSynchronizerTest extends \PHPUnit_Framework_TestCase
 
     public function testScheduleSyncOriginsJobShouldThrowExceptionIfMessageQueueTopicIsNotSet()
     {
-        $this->setExpectedException(\LogicException::class, 'Message queue topic is not set');
+        $this->expectException(\LogicException::class);
+        $this->expectExceptionMessage('Message queue topic is not set');
 
         $this->sync->scheduleSyncOriginsJob([1,2,3]);
     }
@@ -619,7 +620,8 @@ class AbstractEmailSynchronizerTest extends \PHPUnit_Framework_TestCase
         $refProp->setValue($this->sync, 'topic-name');
         $refProp->setAccessible(false);
 
-        $this->setExpectedException(\LogicException::class, 'Message producer is not set');
+        $this->expectException(\LogicException::class);
+        $this->expectExceptionMessage('Message producer is not set');
 
         $this->sync->scheduleSyncOriginsJob([1,2,3]);
     }
@@ -657,6 +659,6 @@ class AbstractEmailSynchronizerTest extends \PHPUnit_Framework_TestCase
      */
     private function createMessageProducerMock()
     {
-        return $this->getMock(MessageProducerInterface::class);
+        return $this->createMock(MessageProducerInterface::class);
     }
 }

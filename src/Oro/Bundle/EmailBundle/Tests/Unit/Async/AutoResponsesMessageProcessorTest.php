@@ -64,7 +64,7 @@ class AutoResponsesMessageProcessorTest extends \PHPUnit_Framework_TestCase
             ['ids' => [1]]
         ));
 
-        $result = $processor->process($message, $this->getMock(SessionInterface::class));
+        $result = $processor->process($message, $this->createMock(SessionInterface::class));
 
         $this->assertEquals(MessageProcessorInterface::ACK, $result);
     }
@@ -79,7 +79,7 @@ class AutoResponsesMessageProcessorTest extends \PHPUnit_Framework_TestCase
      */
     private function createSessionMock()
     {
-        return $this->getMock(SessionInterface::class);
+        return $this->createMock(SessionInterface::class);
     }
 
     /**
@@ -87,7 +87,7 @@ class AutoResponsesMessageProcessorTest extends \PHPUnit_Framework_TestCase
      */
     private function createLoggerMock()
     {
-        return $this->getMock(LoggerInterface::class);
+        return $this->createMock(LoggerInterface::class);
     }
 
     /**
@@ -95,6 +95,6 @@ class AutoResponsesMessageProcessorTest extends \PHPUnit_Framework_TestCase
      */
     private function createMessageProducerMock()
     {
-        return $this->getMock(MessageProducerInterface::class);
+        return $this->createMock(MessageProducerInterface::class);
     }
 }

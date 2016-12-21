@@ -49,7 +49,7 @@ class EmailAttachmentTypeTest extends \PHPUnit_Framework_TestCase
 
     public function testSetDefaultOptions()
     {
-        $resolver = $this->getMock('Symfony\Component\OptionsResolver\OptionsResolverInterface');
+        $resolver = $this->createMock('Symfony\Component\OptionsResolver\OptionsResolverInterface');
         $resolver->expects($this->once())
             ->method('setDefaults')
             ->with(
@@ -96,7 +96,7 @@ class EmailAttachmentTypeTest extends \PHPUnit_Framework_TestCase
         $oroToEntityCalls,
         $entityFromUploadedFileCalls
     ) {
-        $attachment = $this->getMock('Oro\Bundle\EmailBundle\Form\Model\EmailAttachment');
+        $attachment = $this->createMock('Oro\Bundle\EmailBundle\Form\Model\EmailAttachment');
         $attachment->expects($this->once())
             ->method('setEmailAttachment');
 
@@ -159,7 +159,7 @@ class EmailAttachmentTypeTest extends \PHPUnit_Framework_TestCase
                 'type' => EmailAttachment::TYPE_ATTACHMENT,
                 'getRepositoryCalls' => 1,
                 'getRepositoryArgument' => 'OroAttachmentBundle:Attachment',
-                'repoReturnObject' => $this->getMock('Oro\Bundle\AttachmentBundle\Entity\Attachment'),
+                'repoReturnObject' => $this->createMock('Oro\Bundle\AttachmentBundle\Entity\Attachment'),
                 'oroToEntityCalls' => 1,
                 'entityFromUploadedFileCalls' => 0,
             ],
@@ -167,7 +167,7 @@ class EmailAttachmentTypeTest extends \PHPUnit_Framework_TestCase
                 'type' => EmailAttachment::TYPE_EMAIL_ATTACHMENT,
                 'getRepositoryCalls' => 1,
                 'getRepositoryArgument' => 'OroEmailBundle:EmailAttachment',
-                'repoReturnObject' => $this->getMock('Oro\Bundle\EmailBundle\Entity\EmailAttachment'),
+                'repoReturnObject' => $this->createMock('Oro\Bundle\EmailBundle\Entity\EmailAttachment'),
                 'oroToEntityCalls' => 0,
                 'entityFromUploadedFileCalls' => 0,
             ],

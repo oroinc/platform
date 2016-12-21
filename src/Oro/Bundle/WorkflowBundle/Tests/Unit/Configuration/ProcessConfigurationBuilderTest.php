@@ -249,7 +249,8 @@ class ProcessConfigurationBuilderTest extends \PHPUnit_Framework_TestCase
      */
     public function testBuildProcessTriggerException(array $configuration, $exception, $message)
     {
-        $this->setExpectedException($exception, $message);
+        $this->expectException($exception);
+        $this->expectExceptionMessage($message);
         $this->builder->buildProcessTrigger($configuration, new ProcessDefinition());
     }
 

@@ -70,7 +70,7 @@ class EmailAttachmentTransformerTest extends \PHPUnit_Framework_TestCase
 
     public function testEntityToModel()
     {
-        $attachmentEntity = $this->getMock('Oro\Bundle\EmailBundle\Entity\EmailAttachment');
+        $attachmentEntity = $this->createMock('Oro\Bundle\EmailBundle\Entity\EmailAttachment');
 
         $attachmentEntity->expects($this->once())
             ->method('getId')
@@ -80,7 +80,7 @@ class EmailAttachmentTransformerTest extends \PHPUnit_Framework_TestCase
             ->method('getSize')
             ->willReturn(12);
 
-        $emailBody = $this->getMock('Oro\Bundle\EmailBundle\Entity\EmailBody');
+        $emailBody = $this->createMock('Oro\Bundle\EmailBundle\Entity\EmailBody');
         $emailBody->expects($this->once())
             ->method('getCreated')
             ->willReturn('2015-04-13 19:09:32');

@@ -19,19 +19,19 @@ class SearchFilterDatasourceAdapterTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->searchQuery = $this->getMock(SearchQueryInterface::class);
+        $this->searchQuery = $this->createMock(SearchQueryInterface::class);
     }
 
     public function testAddRestrictionAndCondition()
     {
         $restriction = Criteria::expr()->eq('foo', 'bar');
 
-        $criteria = $this->getMock(Criteria::class);
+        $criteria = $this->createMock(Criteria::class);
         $criteria->expects($this->once())
             ->method('andWhere')
             ->with($restriction);
 
-        $query = $this->getMock(Query::class);
+        $query = $this->createMock(Query::class);
         $query->expects($this->once())
             ->method('getCriteria')
             ->willReturn($criteria);
@@ -48,12 +48,12 @@ class SearchFilterDatasourceAdapterTest extends \PHPUnit_Framework_TestCase
     {
         $restriction = Criteria::expr()->eq('foo', 'bar');
 
-        $criteria = $this->getMock(Criteria::class);
+        $criteria = $this->createMock(Criteria::class);
         $criteria->expects($this->once())
             ->method('orWhere')
             ->with($restriction);
 
-        $query = $this->getMock(Query::class);
+        $query = $this->createMock(Query::class);
         $query->expects($this->once())
             ->method('getCriteria')
             ->willReturn($criteria);
@@ -88,12 +88,12 @@ class SearchFilterDatasourceAdapterTest extends \PHPUnit_Framework_TestCase
 
     public function testInApplyFromStringFilter()
     {
-        $criteria = $this->getMock(Criteria::class);
+        $criteria = $this->createMock(Criteria::class);
         $criteria->expects($this->once())
             ->method('andWhere')
             ->with(Criteria::expr()->contains('foo', 'bar'));
 
-        $query = $this->getMock(Query::class);
+        $query = $this->createMock(Query::class);
         $query->expects($this->once())
             ->method('getCriteria')
             ->willReturn($criteria);
@@ -102,7 +102,7 @@ class SearchFilterDatasourceAdapterTest extends \PHPUnit_Framework_TestCase
             ->method('getQuery')
             ->willReturn($query);
 
-        $formFactory = $this->getMock(FormFactoryInterface::class);
+        $formFactory = $this->createMock(FormFactoryInterface::class);
 
         $stringFilter = new SearchStringFilter($formFactory, new FilterUtility());
         $stringFilter->init('test', [FilterUtility::DATA_NAME_KEY => 'foo']);
@@ -163,7 +163,7 @@ class SearchFilterDatasourceAdapterTest extends \PHPUnit_Framework_TestCase
 
     public function testGetWrappedSearchQuery()
     {
-        $query = $this->getMock(Query::class);
+        $query = $this->createMock(Query::class);
         $this->searchQuery->expects($this->any())
             ->method('getQuery')
             ->willReturn($query);

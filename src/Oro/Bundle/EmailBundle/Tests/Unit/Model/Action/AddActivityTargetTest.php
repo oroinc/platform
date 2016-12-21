@@ -31,7 +31,7 @@ class AddActivityTargetTest extends \PHPUnit_Framework_TestCase
 
     public function setUp()
     {
-        $this->contextAccessor = $this->getMock('Oro\Component\ConfigExpression\ContextAccessor');
+        $this->contextAccessor = $this->createMock('Oro\Component\ConfigExpression\ContextAccessor');
 
         $this->emailActivityManager = $this->getMockBuilder(
             'Oro\Bundle\EmailBundle\Entity\Manager\EmailActivityManager'
@@ -58,7 +58,7 @@ class AddActivityTargetTest extends \PHPUnit_Framework_TestCase
             $this->entityManager
         );
 
-        $this->action->setDispatcher($this->getMock('Symfony\Component\EventDispatcher\EventDispatcherInterface'));
+        $this->action->setDispatcher($this->createMock('Symfony\Component\EventDispatcher\EventDispatcherInterface'));
     }
 
     public function testInitializeWithNamedOptions()

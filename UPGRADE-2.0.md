@@ -3,6 +3,7 @@ UPGRADE FROM 1.10 to 2.0
 
 ####General
 - Changed minimum required php version to 5.6
+- PhpUnit 5.7 support
 - LiipImagineBundle was updated to 1.5.* version.
 - Added dependency to [fxpio/composer-asset-plugin](https://github.com/fxpio/composer-asset-plugin) composer plugin.
 - All original third-party asset libraries were moved out from platform and added to composer.json as bower-asset/npm-asset dependency.

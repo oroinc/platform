@@ -202,7 +202,7 @@ class WorkflowDataTest extends \PHPUnit_Framework_TestCase
     {
         $name = 'entity';
 
-        $existingEntity = $this->getMock('Doctrine\Common\Persistence\Proxy');
+        $existingEntity = $this->createMock('Doctrine\Common\Persistence\Proxy');
         $existingEntity->expects($this->once())
             ->method('__isInitialized')
             ->will($this->returnValue(false));
@@ -212,7 +212,7 @@ class WorkflowDataTest extends \PHPUnit_Framework_TestCase
         $this->data->set($name, $existingEntity);
         $this->assertEquals($existingEntity, $this->data->get($name));
 
-        $removedEntity = $this->getMock('Doctrine\Common\Persistence\Proxy');
+        $removedEntity = $this->createMock('Doctrine\Common\Persistence\Proxy');
         $removedEntity->expects($this->once())
             ->method('__isInitialized')
             ->will($this->returnValue(false));

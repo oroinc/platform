@@ -8,11 +8,11 @@ class ChainProcessorFactoryTest extends \PHPUnit_Framework_TestCase
 {
     public function testFactory()
     {
-        $processor1 = $this->getMock('Oro\Component\ChainProcessor\ProcessorInterface');
-        $processor2 = $this->getMock('Oro\Component\ChainProcessor\ProcessorInterface');
+        $processor1 = $this->createMock('Oro\Component\ChainProcessor\ProcessorInterface');
+        $processor2 = $this->createMock('Oro\Component\ChainProcessor\ProcessorInterface');
 
-        $factory1 = $this->getMock('Oro\Component\ChainProcessor\ProcessorFactoryInterface');
-        $factory2 = $this->getMock('Oro\Component\ChainProcessor\ProcessorFactoryInterface');
+        $factory1 = $this->createMock('Oro\Component\ChainProcessor\ProcessorFactoryInterface');
+        $factory2 = $this->createMock('Oro\Component\ChainProcessor\ProcessorFactoryInterface');
 
         $chainFactory = new ChainProcessorFactory();
         $chainFactory->addFactory($factory2);

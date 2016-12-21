@@ -190,7 +190,7 @@ class WebSocketSendProcessorTest extends \PHPUnit_Framework_TestCase
 
     protected function createReminder($recipient)
     {
-        $result = $this->getMock('Oro\Bundle\ReminderBundle\Entity\Reminder');
+        $result = $this->createMock('Oro\Bundle\ReminderBundle\Entity\Reminder');
         $result->expects($this->atLeastOnce())
             ->method('getRecipient')
             ->will($this->returnValue($recipient));
@@ -199,7 +199,7 @@ class WebSocketSendProcessorTest extends \PHPUnit_Framework_TestCase
 
     protected function createUser($userId)
     {
-        $result = $this->getMock('Oro\Bundle\UserBundle\Entity\User');
+        $result = $this->createMock('Oro\Bundle\UserBundle\Entity\User');
         $result->expects($this->atLeastOnce())->method('getId')->will($this->returnValue($userId));
         return $result;
     }

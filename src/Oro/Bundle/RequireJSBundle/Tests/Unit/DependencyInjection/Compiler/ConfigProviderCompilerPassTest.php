@@ -24,21 +24,21 @@ class ConfigProviderCompilerTest extends \PHPUnit_Framework_TestCase
     public function testProcess()
     {
         /** @var ContainerBuilder|\PHPUnit_Framework_MockObject_MockObject $container */
-        $container = $this->getMock('Symfony\Component\DependencyInjection\ContainerBuilder');
+        $container = $this->createMock('Symfony\Component\DependencyInjection\ContainerBuilder');
         $container->expects($this->once())
             ->method('hasDefinition')
             ->with(ConfigProviderCompilerPass::PROVIDER_SERVICE)
             ->will($this->returnValue(true));
 
         /** @var Definition|\PHPUnit_Framework_MockObject_MockObject $definition */
-        $definition = $this->getMock('Symfony\Component\DependencyInjection\Definition', [], [], '', false);
+        $definition = $this->createMock('Symfony\Component\DependencyInjection\Definition');
         $container->expects($this->once())
             ->method('getDefinition')
             ->with(ConfigProviderCompilerPass::PROVIDER_SERVICE)
             ->will($this->returnValue($definition));
 
         /** @var ConfigProvider|\PHPUnit_Framework_MockObject_MockObject $configProvider */
-        $configProvider = $this->getMock('Oro\Bundle\RequireJSBundle\Provider\Config', [], [], '', false);
+        $configProvider = $this->createMock('Oro\Bundle\RequireJSBundle\Provider\Config');
         $container->expects($this->once())
             ->method('findTaggedServiceIds')
             ->with(ConfigProviderCompilerPass::TAG_NAME)

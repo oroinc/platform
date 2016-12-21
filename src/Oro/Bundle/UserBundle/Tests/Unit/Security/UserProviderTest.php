@@ -56,7 +56,7 @@ class UserProviderTest extends \PHPUnit_Framework_TestCase
             ->setMethods(array('getId'))
             ->getMock();
 
-        $refreshedUser = $this->getMock('Oro\Bundle\UserBundle\Entity\User');
+        $refreshedUser = $this->createMock('Oro\Bundle\UserBundle\Entity\User');
 
         $this->userManager
             ->expects($this->once())

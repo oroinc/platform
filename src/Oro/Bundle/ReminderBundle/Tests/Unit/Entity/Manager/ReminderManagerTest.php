@@ -59,7 +59,7 @@ class ReminderManagerTest extends \PHPUnit_Framework_TestCase
 
         $entityId = 101;
         /** @var \PHPUnit_Framework_MockObject_MockObject|RemindableInterface $entity */
-        $entity = $this->getMock('Oro\Bundle\ReminderBundle\Entity\RemindableInterface');
+        $entity = $this->createMock('Oro\Bundle\ReminderBundle\Entity\RemindableInterface');
         $entityClass = get_class($entity);
 
         $entity->expects($this->once())
@@ -97,7 +97,7 @@ class ReminderManagerTest extends \PHPUnit_Framework_TestCase
     public function testSaveEmptyEntityId()
     {
         /** @var \PHPUnit_Framework_MockObject_MockObject|RemindableInterface $entity */
-        $entity = $this->getMock('Oro\Bundle\ReminderBundle\Entity\RemindableInterface');
+        $entity = $this->createMock('Oro\Bundle\ReminderBundle\Entity\RemindableInterface');
 
         $this->doctrineHelper
             ->expects($this->once())
@@ -140,7 +140,7 @@ class ReminderManagerTest extends \PHPUnit_Framework_TestCase
 
         $entityId = 101;
         /** @var \PHPUnit_Framework_MockObject_MockObject|RemindableInterface $entity */
-        $entity = $this->getMock('Oro\Bundle\ReminderBundle\Entity\RemindableInterface');
+        $entity = $this->createMock('Oro\Bundle\ReminderBundle\Entity\RemindableInterface');
         $entityClass = get_class($entity);
 
         $entity->expects($this->once())
@@ -183,7 +183,7 @@ class ReminderManagerTest extends \PHPUnit_Framework_TestCase
     {
         $entityId = 101;
         /** @var \PHPUnit_Framework_MockObject_MockObject|RemindableInterface $entity */
-        $entity = $this->getMock('Oro\Bundle\ReminderBundle\Entity\RemindableInterface');
+        $entity = $this->createMock('Oro\Bundle\ReminderBundle\Entity\RemindableInterface');
         $entityClass = get_class($entity);
 
         $entity->expects($this->once())
@@ -227,7 +227,7 @@ class ReminderManagerTest extends \PHPUnit_Framework_TestCase
     {
         $entityId = 101;
         /** @var \PHPUnit_Framework_MockObject_MockObject|RemindableInterface $entity */
-        $entity = $this->getMock('Oro\Bundle\ReminderBundle\Entity\RemindableInterface');
+        $entity = $this->createMock('Oro\Bundle\ReminderBundle\Entity\RemindableInterface');
         $entityClass = get_class($entity);
 
         $repository = $this->getReminderRepository();
@@ -446,7 +446,7 @@ class ReminderManagerTest extends \PHPUnit_Framework_TestCase
      */
     protected function createReminder($id)
     {
-        $result = $this->getMock('Oro\Bundle\ReminderBundle\Entity\Reminder');
+        $result = $this->createMock('Oro\Bundle\ReminderBundle\Entity\Reminder');
         $result->expects($this->any())
             ->method('getId')
             ->will($this->returnValue($id));
@@ -459,7 +459,7 @@ class ReminderManagerTest extends \PHPUnit_Framework_TestCase
      */
     protected function createReminderData()
     {
-        return $this->getMock('Oro\Bundle\ReminderBundle\Model\ReminderDataInterface');
+        return $this->createMock('Oro\Bundle\ReminderBundle\Model\ReminderDataInterface');
     }
 
     /**

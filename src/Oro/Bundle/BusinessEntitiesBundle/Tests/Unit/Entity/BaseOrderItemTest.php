@@ -44,7 +44,7 @@ class BaseOrderItemTest extends \PHPUnit_Framework_TestCase
      */
     public function getSetDataProvider()
     {
-        $order = $this->getMock('Oro\Bundle\BusinessEntitiesBundle\Entity\BaseOrder');
+        $order = $this->createMock('Oro\Bundle\BusinessEntitiesBundle\Entity\BaseOrder');
 
         return [
             'id'        => ['id', self::TEST_ID, self::TEST_ID],

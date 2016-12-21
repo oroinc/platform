@@ -31,7 +31,7 @@ class OwnershipMetadataProviderStub extends OwnershipMetadataProvider
 
         $entityClassResolver->expects($testCase->any())->method('getEntityClass')->willReturnArgument(0);
 
-        $container = $testCase->getMock('Symfony\Component\DependencyInjection\ContainerInterface');
+        $container = $testCase->getMockBuilder('Symfony\Component\DependencyInjection\ContainerInterface')->getMock();
         $container->expects($testCase->any())
             ->method('get')
             ->will(

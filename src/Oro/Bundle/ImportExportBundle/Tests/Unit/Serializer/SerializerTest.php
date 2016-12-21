@@ -24,21 +24,21 @@ class SerializerTest extends \PHPUnit_Framework_TestCase
     public function testGetNormalizer()
     {
         $supportedNormalizer = $this
-            ->getMock('Oro\Bundle\ImportExportBundle\Serializer\Normalizer\NormalizerInterface');
+            ->createMock('Oro\Bundle\ImportExportBundle\Serializer\Normalizer\NormalizerInterface');
         $supportedNormalizer
             ->expects($this->once())
             ->method('supportsNormalization')
             ->will($this->returnValue(true));
 
         $nonSupportedNormalizer = $this
-            ->getMock('Oro\Bundle\ImportExportBundle\Serializer\Normalizer\NormalizerInterface');
+            ->createMock('Oro\Bundle\ImportExportBundle\Serializer\Normalizer\NormalizerInterface');
         $nonSupportedNormalizer
             ->expects($this->once())
             ->method('supportsNormalization')
             ->will($this->returnValue(false));
 
         $denormalizer = $this
-            ->getMock('Oro\Bundle\ImportExportBundle\Serializer\Normalizer\DenormalizerInterface');
+            ->createMock('Oro\Bundle\ImportExportBundle\Serializer\Normalizer\DenormalizerInterface');
         $denormalizer
             ->expects($this->never())
             ->method('supportsDenormalization')
@@ -52,21 +52,21 @@ class SerializerTest extends \PHPUnit_Framework_TestCase
     public function testGetDenormalizer()
     {
         $normalizer = $this
-            ->getMock('Oro\Bundle\ImportExportBundle\Serializer\Normalizer\NormalizerInterface');
+            ->createMock('Oro\Bundle\ImportExportBundle\Serializer\Normalizer\NormalizerInterface');
         $normalizer
             ->expects($this->never())
             ->method('supportsNormalization')
             ->will($this->returnValue(true));
 
         $supportedDenormalizer = $this
-            ->getMock('Oro\Bundle\ImportExportBundle\Serializer\Normalizer\DenormalizerInterface');
+            ->createMock('Oro\Bundle\ImportExportBundle\Serializer\Normalizer\DenormalizerInterface');
         $supportedDenormalizer
             ->expects($this->once())
             ->method('supportsDenormalization')
             ->will($this->returnValue(true));
 
         $nonSupportedDenormalizer = $this
-            ->getMock('Oro\Bundle\ImportExportBundle\Serializer\Normalizer\DenormalizerInterface');
+            ->createMock('Oro\Bundle\ImportExportBundle\Serializer\Normalizer\DenormalizerInterface');
         $nonSupportedDenormalizer
             ->expects($this->once())
             ->method('supportsDenormalization')
@@ -98,17 +98,17 @@ class SerializerTest extends \PHPUnit_Framework_TestCase
     public function testDenormalize($proc, $procForCompare, $iterations)
     {
         $normalizer = $this
-            ->getMock('Oro\Bundle\ImportExportBundle\Serializer\Normalizer\NormalizerInterface');
+            ->createMock('Oro\Bundle\ImportExportBundle\Serializer\Normalizer\NormalizerInterface');
 
         $supportedDenormalizer = $this
-            ->getMock('Oro\Bundle\ImportExportBundle\Serializer\Normalizer\DenormalizerInterface');
+            ->createMock('Oro\Bundle\ImportExportBundle\Serializer\Normalizer\DenormalizerInterface');
         $supportedDenormalizer
             ->expects($this->exactly($iterations))
             ->method('supportsDenormalization')
             ->will($this->returnValue(true));
 
         $nonSupportedDenormalizer = $this
-            ->getMock('Oro\Bundle\ImportExportBundle\Serializer\Normalizer\DenormalizerInterface');
+            ->createMock('Oro\Bundle\ImportExportBundle\Serializer\Normalizer\DenormalizerInterface');
         $nonSupportedDenormalizer
             ->expects($this->exactly($iterations))
             ->method('supportsDenormalization')
@@ -141,21 +141,21 @@ class SerializerTest extends \PHPUnit_Framework_TestCase
     public function testNormalize($proc, $procForCompare, $iterations)
     {
         $supportedNormalizer = $this
-            ->getMock('Oro\Bundle\ImportExportBundle\Serializer\Normalizer\NormalizerInterface');
+            ->createMock('Oro\Bundle\ImportExportBundle\Serializer\Normalizer\NormalizerInterface');
         $supportedNormalizer
             ->expects($this->exactly($iterations))
             ->method('supportsNormalization')
             ->will($this->returnValue(true));
 
         $nonSupportedNormalizer = $this
-            ->getMock('Oro\Bundle\ImportExportBundle\Serializer\Normalizer\NormalizerInterface');
+            ->createMock('Oro\Bundle\ImportExportBundle\Serializer\Normalizer\NormalizerInterface');
         $nonSupportedNormalizer
             ->expects($this->exactly($iterations))
             ->method('supportsNormalization')
             ->will($this->returnValue(false));
 
         $denormalizer = $this
-            ->getMock('Oro\Bundle\ImportExportBundle\Serializer\Normalizer\DenormalizerInterface');
+            ->createMock('Oro\Bundle\ImportExportBundle\Serializer\Normalizer\DenormalizerInterface');
 
         $this->serializer = new Serializer([$denormalizer, $nonSupportedNormalizer, $supportedNormalizer]);
 

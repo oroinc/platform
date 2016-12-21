@@ -41,7 +41,7 @@ class ConfigHelperHandlerTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->form = $this->getMock(FormInterface::class);
+        $this->form = $this->createMock(FormInterface::class);
         $this->request = $this->getMockBuilder(Request::class)
             ->disableOriginalConstructor()
             ->getMock();

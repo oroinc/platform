@@ -31,11 +31,11 @@ class OperationConfigurationValidatorTest extends \PHPUnit_Framework_TestCase
 
     public function setUp()
     {
-        $this->router = $this->getMock('Symfony\Component\Routing\RouterInterface');
+        $this->router = $this->createMock('Symfony\Component\Routing\RouterInterface');
 
-        $this->twigLoader = $this->getMock('Twig_Loader_Filesystem');
+        $this->twigLoader = $this->createMock('Twig_Loader_Filesystem');
 
-        $this->logger = $this->getMock('Symfony\Component\HttpKernel\Log\LoggerInterface');
+        $this->logger = $this->createMock('Symfony\Component\HttpKernel\Log\LoggerInterface');
 
         $this->doctrineHelper = $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\DoctrineHelper')
             ->disableOriginalConstructor()
@@ -69,7 +69,7 @@ class OperationConfigurationValidatorTest extends \PHPUnit_Framework_TestCase
         $this->createValidator($inputData['debug']);
 
         /* @var $collection RouteCollection|\PHPUnit_Framework_MockObject_MockObject */
-        $collection = $this->getMock('Symfony\Component\Routing\RouteCollection');
+        $collection = $this->createMock('Symfony\Component\Routing\RouteCollection');
 
         $this->doctrineHelper->expects($this->any())
             ->method('getEntityClass')
@@ -117,7 +117,8 @@ class OperationConfigurationValidatorTest extends \PHPUnit_Framework_TestCase
             ->method('exists')
             ->willReturn(false);
 
-        $this->setExpectedException($exceptionName, $exceptionMessage);
+        $this->expectException($exceptionName);
+        $this->expectExceptionMessage($exceptionMessage);
 
         $this->validator->validate($config);
     }

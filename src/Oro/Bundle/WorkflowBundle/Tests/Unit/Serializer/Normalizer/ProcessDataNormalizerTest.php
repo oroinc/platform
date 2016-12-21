@@ -107,7 +107,8 @@ class ProcessDataNormalizerTest extends \PHPUnit_Framework_TestCase
      */
     public function testNormalizeException($object, array $context, $exception, $message)
     {
-        $this->setExpectedException($exception, $message);
+        $this->expectException($exception);
+        $this->expectExceptionMessage($message);
         $this->normalizer->normalize($object, 'json', $context);
     }
 

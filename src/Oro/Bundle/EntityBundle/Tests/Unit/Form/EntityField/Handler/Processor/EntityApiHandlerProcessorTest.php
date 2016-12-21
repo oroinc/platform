@@ -137,7 +137,8 @@ class EntityApiHandlerProcessorTest extends \PHPUnit_Framework_TestCase
      */
     protected function getHandlerMock()
     {
-        return $this->getMock('Oro\Bundle\EntityBundle\Form\EntityField\Handler\Processor\EntityApiHandlerInterface');
+        return $this
+            ->createMock('Oro\Bundle\EntityBundle\Form\EntityField\Handler\Processor\EntityApiHandlerInterface');
     }
 
     /**
