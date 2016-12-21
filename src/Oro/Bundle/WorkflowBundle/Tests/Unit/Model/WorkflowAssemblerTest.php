@@ -161,7 +161,7 @@ class WorkflowAssemblerTest extends \PHPUnit_Framework_TestCase
      */
     protected function createTranslatorMock()
     {
-        $translator = $this->getMock('Symfony\Component\Translation\TranslatorInterface');
+        $translator = $this->createMock('Symfony\Component\Translation\TranslatorInterface');
         $translator->expects($this->any())->method('trans')
             ->with($this->isType('string'), $this->isType('array'))
             ->will(

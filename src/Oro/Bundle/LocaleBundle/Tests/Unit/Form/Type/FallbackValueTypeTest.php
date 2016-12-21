@@ -39,7 +39,7 @@ class FallbackValueTypeTest extends FormIntegrationTestCase
     protected function getExtensions()
     {
         /** @var \PHPUnit_Framework_MockObject_MockObject|TranslatorInterface $translator */
-        $translator = $this->getMock('Symfony\Component\Translation\TranslatorInterface');
+        $translator = $this->createMock('Symfony\Component\Translation\TranslatorInterface');
 
         return [
             new PreloadedExtension(
@@ -157,7 +157,7 @@ class FallbackValueTypeTest extends FormIntegrationTestCase
         $groupFallbackFields = 'test value';
 
         /** @var \PHPUnit_Framework_MockObject_MockObject|FormInterface $formMock */
-        $formMock = $this->getMock('Symfony\Component\Form\FormInterface');
+        $formMock = $this->createMock('Symfony\Component\Form\FormInterface');
 
         $formView = new FormView();
         $this->formType->finishView($formView, $formMock, ['group_fallback_fields' => $groupFallbackFields]);

@@ -20,7 +20,7 @@ class SystemAwareResolverTest extends \PHPUnit_Framework_TestCase
      */
     protected function setUp()
     {
-        $this->container = $this->getMock('Symfony\Component\DependencyInjection\ContainerInterface');
+        $this->container = $this->createMock('Symfony\Component\DependencyInjection\ContainerInterface');
         $this->container->expects($this->any())
             ->method('get')
             ->will($this->returnValueMap([

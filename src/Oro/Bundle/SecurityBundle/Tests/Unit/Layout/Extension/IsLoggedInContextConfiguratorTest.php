@@ -20,7 +20,7 @@ class IsLoggedInContextConfiguratorTest extends \PHPUnit_Framework_TestCase
      */
     protected function setUp()
     {
-        $this->securityFacade = $this->getMock(SecurityFacade::class, [], [], '', false);
+        $this->securityFacade = $this->createMock(SecurityFacade::class);
         $this->contextConfigurator = new IsLoggedInContextConfigurator($this->securityFacade);
     }
 

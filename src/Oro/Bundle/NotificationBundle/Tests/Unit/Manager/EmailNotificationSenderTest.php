@@ -17,7 +17,7 @@ class EmailNotificationSenderTest extends \PHPUnit_Framework_TestCase
     {
         new EmailNotificationSender(
             $this->createConfigManagerMock(),
-            $this->getMock(MessageProducerInterface::class)
+            $this->createMock(MessageProducerInterface::class)
         );
     }
 
@@ -45,14 +45,6 @@ class EmailNotificationSenderTest extends \PHPUnit_Framework_TestCase
         $notification->expects($this->once())
             ->method('getRecipientEmails')
             ->will($this->returnValue([$testReceiverEmail]))
-        ;
-
-        $notification->expects($this->never())
-            ->method('getSenderEmail')
-        ;
-
-        $notification->expects($this->never())
-            ->method('getSenderName')
         ;
 
         $sender = new EmailNotificationSender(
@@ -199,7 +191,7 @@ class EmailNotificationSenderTest extends \PHPUnit_Framework_TestCase
      */
     private function createEmailNotificationMock()
     {
-        return $this->getMock(EmailNotificationInterface::class);
+        return $this->createMock(EmailNotificationInterface::class);
     }
 
     /**
@@ -207,6 +199,6 @@ class EmailNotificationSenderTest extends \PHPUnit_Framework_TestCase
      */
     private function createSenderAwareEmailNotificationMock()
     {
-        return $this->getMock(SenderAwareEmailNotificationInterface::class);
+        return $this->createMock(SenderAwareEmailNotificationInterface::class);
     }
 }

@@ -16,13 +16,13 @@ class ImapClearManagerTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->logger = $this->getMock('Psr\Log\LoggerInterface');
+        $this->logger = $this->createMock('Psr\Log\LoggerInterface');
         $this->em = $this->getMockBuilder('Doctrine\ORM\EntityManager')
             ->setMethods(['select', 'getRepository', 'flush'])
             ->disableOriginalConstructor()
             ->getMock();
 
-        $listener = $this->getMock('Oro\Bundle\PlatformBundle\EventListener\OptionalListenerInterface');
+        $listener = $this->createMock('Oro\Bundle\PlatformBundle\EventListener\OptionalListenerInterface');
 
         $this->manager = new ImapClearManager($this->em, $listener);
         $this->manager->setLogger($this->logger);

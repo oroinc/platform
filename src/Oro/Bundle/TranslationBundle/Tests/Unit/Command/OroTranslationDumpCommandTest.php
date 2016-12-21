@@ -36,15 +36,15 @@ class OroTranslationDumpCommandTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->container = $this->getMock(ContainerInterface::class);
+        $this->container = $this->createMock(ContainerInterface::class);
         $this->container->expects($this->any())
             ->method('get')
             ->will($this->returnValueMap([
                 ['oro_translation.js_dumper', 1, $this->jsDumper],
             ]));
 
-        $this->input = $this->getMock(InputInterface::class);
-        $this->output = $this->getMock(OutputInterface::class);
+        $this->input = $this->createMock(InputInterface::class);
+        $this->output = $this->createMock(OutputInterface::class);
 
         $this->command = new OroTranslationDumpCommand();
         $this->command->setContainer($this->container);

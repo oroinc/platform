@@ -24,14 +24,14 @@ class OroTranslationAdapterTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->client  = $this->getMock('Guzzle\Http\Client');
+        $this->client  = $this->createMock('Guzzle\Http\Client');
         $this->request = $this->getMockBuilder('Guzzle\Http\Message\Request')
             ->disableOriginalConstructor()
             ->getMock();
         $this->response = $this->getMockBuilder('Guzzle\Http\Message\Response')
             ->disableOriginalConstructor()
             ->getMock();
-        $this->query = $this->getMock('Guzzle\Http\QueryString');
+        $this->query = $this->createMock('Guzzle\Http\QueryString');
 
         $this->adapter = new OroTranslationAdapter($this->client);
         $this->adapter->setApiKey(uniqid());
@@ -93,7 +93,7 @@ class OroTranslationAdapterTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue($fetchedData));
 
         if ($exceptionExpected) {
-            $this->setExpectedException($exceptionExpected);
+            $this->expectException($exceptionExpected);
         }
 
         $result = $this->adapter->fetchStatistic();

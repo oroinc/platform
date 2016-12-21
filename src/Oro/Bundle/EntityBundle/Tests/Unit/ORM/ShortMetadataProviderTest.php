@@ -10,17 +10,17 @@ class ShortMetadataProviderTest extends \PHPUnit_Framework_TestCase
 {
     public function testGetAllShortMetadataWithEmptyCache()
     {
-        $manager = $this->getMock('Doctrine\Common\Persistence\ObjectManager');
+        $manager = $this->createMock('Doctrine\Common\Persistence\ObjectManager');
         $metadataFactory = $this->getMockBuilder('Doctrine\Common\Persistence\Mapping\AbstractClassMetadataFactory')
             ->disableOriginalConstructor()
             ->setMethods(['getCacheDriver', 'getAllMetadata'])
             ->getMockForAbstractClass();
-        $cacheDriver = $this->getMock('Doctrine\Common\Cache\Cache');
+        $cacheDriver = $this->createMock('Doctrine\Common\Cache\Cache');
 
         $metadata1 = new ClassMetadata('Test\Entity1');
         $metadata2 = new ClassMetadata('Test\Entity2');
         $metadata2->isMappedSuperclass = true;
-        $metadata3 = $this->getMock('Doctrine\Common\Persistence\Mapping\ClassMetadata');
+        $metadata3 = $this->createMock('Doctrine\Common\Persistence\Mapping\ClassMetadata');
         $metadata3->expects($this->once())->method('getName')->willReturn('Test\Entity3');
 
         $expectedResult = [
@@ -65,12 +65,12 @@ class ShortMetadataProviderTest extends \PHPUnit_Framework_TestCase
 
     public function testGetAllShortMetadataWhenDataExistInCache()
     {
-        $manager = $this->getMock('Doctrine\Common\Persistence\ObjectManager');
+        $manager = $this->createMock('Doctrine\Common\Persistence\ObjectManager');
         $metadataFactory = $this->getMockBuilder('Doctrine\Common\Persistence\Mapping\AbstractClassMetadataFactory')
             ->disableOriginalConstructor()
             ->setMethods(['getCacheDriver', 'getAllMetadata'])
             ->getMockForAbstractClass();
-        $cacheDriver = $this->getMock('Doctrine\Common\Cache\Cache');
+        $cacheDriver = $this->createMock('Doctrine\Common\Cache\Cache');
 
         $expectedResult = [
             new ShortClassMetadata('Test\Entity1'),
@@ -112,7 +112,7 @@ class ShortMetadataProviderTest extends \PHPUnit_Framework_TestCase
 
     public function testGetAllShortMetadataWithoutCache()
     {
-        $manager = $this->getMock('Doctrine\Common\Persistence\ObjectManager');
+        $manager = $this->createMock('Doctrine\Common\Persistence\ObjectManager');
         $metadataFactory = $this->getMockBuilder('Doctrine\Common\Persistence\Mapping\AbstractClassMetadataFactory')
             ->disableOriginalConstructor()
             ->setMethods(['getCacheDriver', 'getAllMetadata'])
@@ -121,7 +121,7 @@ class ShortMetadataProviderTest extends \PHPUnit_Framework_TestCase
         $metadata1 = new ClassMetadata('Test\Entity1');
         $metadata2 = new ClassMetadata('Test\Entity2');
         $metadata2->isMappedSuperclass = true;
-        $metadata3 = $this->getMock('Doctrine\Common\Persistence\Mapping\ClassMetadata');
+        $metadata3 = $this->createMock('Doctrine\Common\Persistence\Mapping\ClassMetadata');
         $metadata3->expects($this->once())->method('getName')->willReturn('Test\Entity3');
 
         $expectedResult = [
@@ -159,7 +159,7 @@ class ShortMetadataProviderTest extends \PHPUnit_Framework_TestCase
 
     public function testGetAllShortMetadataWithoutCacheAndIgnoreExceptionsRequested()
     {
-        $manager = $this->getMock('Doctrine\Common\Persistence\ObjectManager');
+        $manager = $this->createMock('Doctrine\Common\Persistence\ObjectManager');
         $metadataFactory = $this->getMockBuilder('Doctrine\Common\Persistence\Mapping\AbstractClassMetadataFactory')
             ->disableOriginalConstructor()
             ->setMethods(['getCacheDriver', 'getAllMetadata'])

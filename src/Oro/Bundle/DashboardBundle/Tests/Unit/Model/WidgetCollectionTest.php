@@ -34,12 +34,12 @@ class WidgetsModelCollectionTest extends \PHPUnit_Framework_TestCase
 
     public function testInitialize()
     {
-        $fooWidget = $this->getMock('Oro\Bundle\DashboardBundle\Entity\Widget');
+        $fooWidget = $this->createMock('Oro\Bundle\DashboardBundle\Entity\Widget');
         $fooWidgetModel = $this->getMockBuilder('Oro\Bundle\DashboardBundle\Model\WidgetModel')
             ->disableOriginalConstructor()
             ->getMock();
 
-        $barWidget = $this->getMock('Oro\Bundle\DashboardBundle\Entity\Widget');
+        $barWidget = $this->createMock('Oro\Bundle\DashboardBundle\Entity\Widget');
         $barWidgetModel = $this->getMockBuilder('Oro\Bundle\DashboardBundle\Model\WidgetModel')
             ->disableOriginalConstructor()
             ->getMock();

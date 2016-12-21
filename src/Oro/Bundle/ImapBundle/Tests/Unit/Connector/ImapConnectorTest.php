@@ -26,7 +26,7 @@ class ImapConnectorTest extends \PHPUnit_Framework_TestCase
             ->method('__destruct');
 
         $this->searchStringManager =
-            $this->getMock('Oro\Bundle\ImapBundle\Connector\Search\SearchStringManagerInterface');
+            $this->createMock('Oro\Bundle\ImapBundle\Connector\Search\SearchStringManagerInterface');
         $this->searchStringManager->expects($this->any())
             ->method('isAcceptableItem')
             ->will($this->returnValue(true));

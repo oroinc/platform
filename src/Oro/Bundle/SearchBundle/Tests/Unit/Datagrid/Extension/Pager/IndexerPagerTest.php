@@ -47,7 +47,7 @@ class IndexerPagerTest extends \PHPUnit_Framework_TestCase
     {
         $totalCount = 123;
 
-        $indexerQuery = $this->getMock(
+        $indexerQuery = $this->createMock(
             IndexerQuery::class,
             ['getTotalCount'],
             [],
@@ -92,7 +92,7 @@ class IndexerPagerTest extends \PHPUnit_Framework_TestCase
      */
     public function testSetGetMaxPerPage($maxPerPage, $maxResults, $firstResult)
     {
-        $indexerQuery = $this->getMock(
+        $indexerQuery = $this->createMock(
             IndexerQuery::class,
             ['setMaxResults', 'setFirstResult'],
             [],
@@ -118,7 +118,7 @@ class IndexerPagerTest extends \PHPUnit_Framework_TestCase
         $page        = 2;
         $firstResult = 10;
 
-        $indexerQuery = $this->getMock(
+        $indexerQuery = $this->createMock(
             IndexerQuery::class,
             ['setFirstResult'],
             [],
@@ -146,7 +146,7 @@ class IndexerPagerTest extends \PHPUnit_Framework_TestCase
         $previousPage = 1;
         $nextPage     = 3;
 
-        $indexerQuery = $this->getMock(
+        $indexerQuery = $this->createMock(
             IndexerQuery::class,
             ['getTotalCount', 'setMaxResults', 'setFirstResult'],
             [],
@@ -206,7 +206,7 @@ class IndexerPagerTest extends \PHPUnit_Framework_TestCase
      */
     public function testHaveToPaginate($expected, $page, $maxPerPage, $totalCount)
     {
-        $indexerQuery = $this->getMock(
+        $indexerQuery = $this->createMock(
             IndexerQuery::class,
             ['getTotalCount', 'setMaxResults', 'setFirstResult'],
             [],

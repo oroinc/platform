@@ -25,7 +25,7 @@ class LoadNormalizedEntityTest extends FormProcessorTestCase
     {
         parent::setUp();
 
-        $this->processorBag = $this->getMock('Oro\Bundle\ApiBundle\Processor\ActionProcessorBagInterface');
+        $this->processorBag = $this->createMock('Oro\Bundle\ApiBundle\Processor\ActionProcessorBagInterface');
 
         $this->processor = new LoadNormalizedEntity($this->processorBag);
     }
@@ -57,7 +57,7 @@ class LoadNormalizedEntityTest extends FormProcessorTestCase
         ];
 
         $getContext = new GetContext($this->configProvider, $this->metadataProvider);
-        $getProcessor = $this->getMock('Oro\Component\ChainProcessor\ActionProcessorInterface');
+        $getProcessor = $this->createMock('Oro\Component\ChainProcessor\ActionProcessorInterface');
 
         $this->processorBag->expects($this->once())
             ->method('getProcessor')
@@ -136,7 +136,7 @@ class LoadNormalizedEntityTest extends FormProcessorTestCase
         $getError = Error::create('test error');
 
         $getContext = new GetContext($this->configProvider, $this->metadataProvider);
-        $getProcessor = $this->getMock('Oro\Component\ChainProcessor\ActionProcessorInterface');
+        $getProcessor = $this->createMock('Oro\Component\ChainProcessor\ActionProcessorInterface');
 
         $this->processorBag->expects($this->once())
             ->method('getProcessor')

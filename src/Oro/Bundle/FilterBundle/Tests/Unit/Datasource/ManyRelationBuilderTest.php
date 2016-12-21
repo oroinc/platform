@@ -14,7 +14,7 @@ class ManyRelationBuilderTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->childBuilder1 = $this->getMock('Oro\Bundle\FilterBundle\Datasource\ManyRelationBuilderInterface');
+        $this->childBuilder1 = $this->createMock('Oro\Bundle\FilterBundle\Datasource\ManyRelationBuilderInterface');
 
         $this->builder = new ManyRelationBuilder();
         $this->builder->addBuilder($this->childBuilder1);
@@ -22,7 +22,7 @@ class ManyRelationBuilderTest extends \PHPUnit_Framework_TestCase
 
     public function testBuildComparisonExpr()
     {
-        $ds            = $this->getMock('Oro\Bundle\FilterBundle\Datasource\FilterDatasourceAdapterInterface');
+        $ds            = $this->createMock('Oro\Bundle\FilterBundle\Datasource\FilterDatasourceAdapterInterface');
         $fieldName     = 'o.testField';
         $parameterName = 'param1';
         $filterName    = 'testFilter';
@@ -41,7 +41,7 @@ class ManyRelationBuilderTest extends \PHPUnit_Framework_TestCase
 
     public function testBuildComparisonExprNoAppropriateChildBuilder()
     {
-        $ds            = $this->getMock('Oro\Bundle\FilterBundle\Datasource\FilterDatasourceAdapterInterface');
+        $ds            = $this->createMock('Oro\Bundle\FilterBundle\Datasource\FilterDatasourceAdapterInterface');
         $fieldName     = 'o.testField';
         $parameterName = 'param1';
         $filterName    = 'testFilter';
@@ -54,17 +54,15 @@ class ManyRelationBuilderTest extends \PHPUnit_Framework_TestCase
         $this->childBuilder1->expects($this->never())
             ->method('buildComparisonExpr');
 
-        $this->setExpectedException(
-            '\RuntimeException',
-            sprintf('The "%s" datasource adapter is not supported.', get_class($ds))
-        );
+        $this->expectException('\RuntimeException');
+        $this->expectExceptionMessage(sprintf('The "%s" datasource adapter is not supported.', get_class($ds)));
 
         $this->builder->buildComparisonExpr($ds, $fieldName, $parameterName, $filterName, $inverse);
     }
 
     public function testBuildNullValueExpr()
     {
-        $ds            = $this->getMock('Oro\Bundle\FilterBundle\Datasource\FilterDatasourceAdapterInterface');
+        $ds            = $this->createMock('Oro\Bundle\FilterBundle\Datasource\FilterDatasourceAdapterInterface');
         $fieldName     = 'o.testField';
         $filterName    = 'testFilter';
         $inverse       = true;
@@ -82,7 +80,7 @@ class ManyRelationBuilderTest extends \PHPUnit_Framework_TestCase
 
     public function testBuildNullValueExprNoAppropriateChildBuilder()
     {
-        $ds            = $this->getMock('Oro\Bundle\FilterBundle\Datasource\FilterDatasourceAdapterInterface');
+        $ds            = $this->createMock('Oro\Bundle\FilterBundle\Datasource\FilterDatasourceAdapterInterface');
         $fieldName     = 'o.testField';
         $filterName    = 'testFilter';
         $inverse       = true;
@@ -94,10 +92,8 @@ class ManyRelationBuilderTest extends \PHPUnit_Framework_TestCase
         $this->childBuilder1->expects($this->never())
             ->method('buildNullValueExpr');
 
-        $this->setExpectedException(
-            '\RuntimeException',
-            sprintf('The "%s" datasource adapter is not supported.', get_class($ds))
-        );
+        $this->expectException('\RuntimeException');
+        $this->expectExceptionMessage(sprintf('The "%s" datasource adapter is not supported.', get_class($ds)));
 
         $this->builder->buildNullValueExpr($ds, $fieldName, $filterName, $inverse);
     }

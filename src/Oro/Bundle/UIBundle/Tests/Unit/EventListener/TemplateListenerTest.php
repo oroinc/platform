@@ -29,7 +29,7 @@ class TemplateListenerTest extends \PHPUnit_Framework_TestCase
         $this->event = $this->getMockBuilder('Symfony\Component\HttpKernel\Event\GetResponseForControllerResultEvent')
             ->disableOriginalConstructor()
             ->getMock();
-        $this->container = $this->getMock('Symfony\Component\DependencyInjection\ContainerInterface');
+        $this->container = $this->createMock('Symfony\Component\DependencyInjection\ContainerInterface');
         $this->listener = new TemplateListener($this->container);
     }
 
@@ -37,7 +37,7 @@ class TemplateListenerTest extends \PHPUnit_Framework_TestCase
     public function testOnKernelViewNoContainer()
     {
         $request = Request::create('/test/url');
-        $request->attributes = $this->getMock('Symfony\Component\HttpFoundation\ParameterBag');
+        $request->attributes = $this->createMock('Symfony\Component\HttpFoundation\ParameterBag');
 
         $request->attributes->expects($this->never())
             ->method('set');

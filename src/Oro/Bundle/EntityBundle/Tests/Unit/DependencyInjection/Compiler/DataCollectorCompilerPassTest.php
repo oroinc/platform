@@ -32,7 +32,7 @@ class DataCollectorCompilerPassTest extends \PHPUnit_Framework_TestCase
         $collectorDefinition = new Definition(DuplicateQueriesDataCollector::class);
 
         /** @var ContainerBuilder|\PHPUnit_Framework_MockObject_MockObject $containerBuilder */
-        $containerBuilder = $this->getMock(ContainerBuilder::class);
+        $containerBuilder = $this->createMock(ContainerBuilder::class);
 
         $containerBuilder->expects($this->once())
             ->method('getDefinition')
@@ -44,7 +44,7 @@ class DataCollectorCompilerPassTest extends \PHPUnit_Framework_TestCase
             ->willReturn(true);
 
         /** @var RegistryInterface|\PHPUnit_Framework_MockObject_MockObject $doctrine */
-        $doctrine = $this->getMock(RegistryInterface::class);
+        $doctrine = $this->createMock(RegistryInterface::class);
 
         $doctrine->expects($this->once())
             ->method('getConnectionNames')

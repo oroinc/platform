@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\src\Oro\Bundle\EmailBundle\Tests\Unit\Manager;
+namespace Oro\Bundle\EmailBundle\Tests\Unit\Manager;
 
 use Oro\Bundle\EmailBundle\Entity\EmailBody;
 use Oro\Bundle\EmailBundle\Entity\EmailOwnerInterface;
@@ -14,7 +14,7 @@ use Oro\Bundle\UIBundle\Tools\HtmlTagHelper;
 /**
  * Class EmailNotificationManagerTest
  *
- * @package Oro\src\Oro\Bundle\EmailBundle\Tests\Unit\Manager
+ * @package Oro\Bundle\EmailBundle\Tests\Unit\Manager
  * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
  */
 class EmailNotificationManagerTest extends \PHPUnit_Framework_TestCase

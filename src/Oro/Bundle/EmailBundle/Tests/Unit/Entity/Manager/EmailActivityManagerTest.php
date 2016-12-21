@@ -182,7 +182,7 @@ class EmailActivityManagerTest extends \PHPUnit_Framework_TestCase
     protected function getEmailEntity($id = null, $thread = null)
     {
         /** @var Email $email */
-        $email = $this->getMock('Oro\Bundle\EmailBundle\Entity\Email', ['addActivityTarget','getId']);
+        $email = $this->createPartialMock('Oro\Bundle\EmailBundle\Entity\Email', ['addActivityTarget','getId']);
 
         $email->method('getId')
             ->will($this->returnValue($id));

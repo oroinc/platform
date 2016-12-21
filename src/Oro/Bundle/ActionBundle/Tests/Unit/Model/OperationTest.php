@@ -48,7 +48,7 @@ class OperationTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->actionFactory = $this->getMock('Oro\Component\Action\Action\ActionFactoryInterface');
+        $this->actionFactory = $this->createMock('Oro\Component\Action\Action\ActionFactoryInterface');
 
         $this->conditionFactory = $this->getMockBuilder('Oro\Component\ConfigExpression\ExpressionFactory')
             ->disableOriginalConstructor()
@@ -159,10 +159,8 @@ class OperationTest extends \PHPUnit_Framework_TestCase
             });
 
         if ($exceptionMessage) {
-            $this->setExpectedException(
-                'Oro\Bundle\ActionBundle\Exception\ForbiddenOperationException',
-                $exceptionMessage
-            );
+            $this->expectException('Oro\Bundle\ActionBundle\Exception\ForbiddenOperationException');
+            $this->expectExceptionMessage($exceptionMessage);
         }
 
         $errors = new ArrayCollection();

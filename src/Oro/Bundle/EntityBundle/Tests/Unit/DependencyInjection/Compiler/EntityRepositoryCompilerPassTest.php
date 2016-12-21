@@ -154,8 +154,8 @@ class EntityRepositoryCompilerPassTest extends \PHPUnit_Framework_TestCase
                 ],
             ]
         );
-        $this->setExpectedException(
-            LogicException::class,
+        $this->expectException(LogicException::class);
+        $this->expectExceptionMessage(
             sprintf('Repository service %s for class %s must be public', 'test.repository.first', FirstEntity::class)
         );
 
@@ -174,8 +174,8 @@ class EntityRepositoryCompilerPassTest extends \PHPUnit_Framework_TestCase
                 ],
             ]
         );
-        $this->setExpectedException(
-            LogicException::class,
+        $this->expectException(LogicException::class);
+        $this->expectExceptionMessage(
             sprintf(
                 'Repository service %s might accept only entity class and repository class as arguments',
                 'test.repository.first'
@@ -198,8 +198,8 @@ class EntityRepositoryCompilerPassTest extends \PHPUnit_Framework_TestCase
                 ],
             ]
         );
-        $this->setExpectedException(
-            LogicException::class,
+        $this->expectException(LogicException::class);
+        $this->expectExceptionMessage(
             sprintf(
                 'Repository service %s might accept only entity class and repository class as arguments',
                 'test.repository.first'
@@ -223,8 +223,8 @@ class EntityRepositoryCompilerPassTest extends \PHPUnit_Framework_TestCase
                 ],
             ]
         );
-        $this->setExpectedException(
-            LogicException::class,
+        $this->expectException(LogicException::class);
+        $this->expectExceptionMessage(
             sprintf('Entity class NotExistingEntity defined at repository service test.repository.first doesn\'t exist')
         );
 

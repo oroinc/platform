@@ -63,14 +63,14 @@ abstract class EntitySerializerTestCase extends OrmTestCase
                 )
             );
 
-        $this->entityFieldFilter = $this->getMock('Oro\Component\EntitySerializer\EntityFieldFilterInterface');
+        $this->entityFieldFilter = $this->createMock('Oro\Component\EntitySerializer\EntityFieldFilterInterface');
         $this->entityFieldFilter->expects($this->any())
             ->method('isApplicableField')
             ->willReturn(true);
 
-        $this->container = $this->getMock('Symfony\Component\DependencyInjection\ContainerInterface');
+        $this->container = $this->createMock('Symfony\Component\DependencyInjection\ContainerInterface');
 
-        $queryHintResolver = $this->getMock('Oro\Component\DoctrineUtils\ORM\QueryHintResolverInterface');
+        $queryHintResolver = $this->createMock('Oro\Component\DoctrineUtils\ORM\QueryHintResolverInterface');
 
         $doctrineHelper   = new DoctrineHelper($doctrine);
         $dataAccessor     = new EntityDataAccessor();

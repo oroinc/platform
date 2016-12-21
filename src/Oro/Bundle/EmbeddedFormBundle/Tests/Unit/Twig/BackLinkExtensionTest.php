@@ -54,13 +54,13 @@ class BackLinkExtensionTest extends \PHPUnit_Framework_TestCase
         $originalString = 'Before link {back_link|' . $text . '} After link';
         $expectedString = 'Before link <a href="' . $url . '">' . $translatedText . '</a> After link';
 
-        $router = $this->getMock('Symfony\Component\Routing\Router', [], [], '', false);
+        $router = $this->createMock('Symfony\Component\Routing\Router');
         $router->expects($this->once())
             ->method('generate')
             ->with('oro_embedded_form_submit', ['id' => $id])
             ->will($this->returnValue($url));
 
-        $translator = $this->getMock('Symfony\Component\Translation\TranslatorInterface', [], [], '', false);
+        $translator = $this->createMock('Symfony\Component\Translation\TranslatorInterface');
         $translator->expects($this->once())
             ->method('trans')
             ->with($text)
@@ -83,9 +83,9 @@ class BackLinkExtensionTest extends \PHPUnit_Framework_TestCase
                         . '</a>';
         $expectedString = 'Before link ' . $expectedLink . ' After link';
 
-        $router = $this->getMock('Symfony\Component\Routing\Router', [], [], '', false);
+        $router = $this->createMock('Symfony\Component\Routing\Router');
 
-        $translator = $this->getMock('Symfony\Component\Translation\TranslatorInterface', [], [], '', false);
+        $translator = $this->createMock('Symfony\Component\Translation\TranslatorInterface');
         $translator->expects($this->once())
                    ->method('trans')
                    ->with($text)
@@ -108,13 +108,13 @@ class BackLinkExtensionTest extends \PHPUnit_Framework_TestCase
         $originalString = 'Before link {back_link} After link';
         $expectedString = 'Before link <a href="' . $url . '">Back</a> After link';
 
-        $router = $this->getMock('Symfony\Component\Routing\Router', [], [], '', false);
+        $router = $this->createMock('Symfony\Component\Routing\Router');
         $router->expects($this->once())
             ->method('generate')
             ->with('oro_embedded_form_submit', ['id' => $id])
             ->will($this->returnValue($url));
 
-        $translator = $this->getMock('Symfony\Component\Translation\TranslatorInterface', [], [], '', false);
+        $translator = $this->createMock('Symfony\Component\Translation\TranslatorInterface');
         $translator->expects($this->once())
             ->method('trans')
             ->with('oro.embeddedform.back_link_default_text')
@@ -149,10 +149,10 @@ class BackLinkExtensionTest extends \PHPUnit_Framework_TestCase
     protected function createBackLinkExtension($router = null, $translator = null)
     {
         if (!$router) {
-            $router = $this->getMock('Symfony\Component\Routing\Router', [], [], '', false);
+            $router = $this->createMock('Symfony\Component\Routing\Router');
         }
         if (!$translator) {
-            $translator = $this->getMock('Symfony\Component\Translation\TranslatorInterface', [], [], '', false);
+            $translator = $this->createMock('Symfony\Component\Translation\TranslatorInterface');
         }
 
         return new BackLinkExtension($router, $translator);

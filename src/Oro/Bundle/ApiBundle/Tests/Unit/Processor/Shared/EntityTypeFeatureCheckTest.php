@@ -42,7 +42,7 @@ class EntityTypeFeatureCheckTest extends \PHPUnit_Framework_TestCase
             ->method('isResourceEnabled')
             ->with($className, 'api_resources')
             ->willReturn(false);
-        $this->setExpectedException(AccessDeniedException::class);
+        $this->expectException(AccessDeniedException::class);
 
         $this->processor->process($context);
     }

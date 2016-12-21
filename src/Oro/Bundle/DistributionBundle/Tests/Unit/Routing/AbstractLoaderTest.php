@@ -38,9 +38,9 @@ abstract class AbstractLoaderTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->kernel = $this->getMock('Symfony\Component\HttpKernel\KernelInterface');
-        $this->routeOptionsResolver = $this->getMock('Oro\Component\Routing\Resolver\RouteOptionsResolverInterface');
-        $this->eventDispatcher = $this->getMock('Symfony\Component\EventDispatcher\EventDispatcherInterface');
+        $this->kernel = $this->createMock('Symfony\Component\HttpKernel\KernelInterface');
+        $this->routeOptionsResolver = $this->createMock('Oro\Component\Routing\Resolver\RouteOptionsResolverInterface');
+        $this->eventDispatcher = $this->createMock('Symfony\Component\EventDispatcher\EventDispatcherInterface');
 
         $this->loaderResolver = new LoaderResolver([new YamlFileLoader(new FileLocator())]);
     }
@@ -63,7 +63,7 @@ abstract class AbstractLoaderTest extends \PHPUnit_Framework_TestCase
     public function testLoad(array $expected)
     {
         $dir = __DIR__ . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . 'Fixtures';
-        $bundle = $this->getMock('Symfony\Component\HttpKernel\Bundle\BundleInterface');
+        $bundle = $this->createMock('Symfony\Component\HttpKernel\Bundle\BundleInterface');
         $bundle->expects($this->any())->method('getPath')->willReturn($dir);
 
         $this->kernel->expects($this->once())->method('getBundles')->willReturn([$bundle, $bundle]);
@@ -95,7 +95,7 @@ abstract class AbstractLoaderTest extends \PHPUnit_Framework_TestCase
     public function testLoadWithEmptyCache()
     {
         $dir = __DIR__ . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . 'Fixtures';
-        $bundle = $this->getMock('Symfony\Component\HttpKernel\Bundle\BundleInterface');
+        $bundle = $this->createMock('Symfony\Component\HttpKernel\Bundle\BundleInterface');
         $bundle->expects($this->any())->method('getPath')->willReturn($dir);
         $this->kernel->expects($this->once())->method('getBundles')->willReturn([$bundle]);
 
@@ -118,7 +118,7 @@ abstract class AbstractLoaderTest extends \PHPUnit_Framework_TestCase
     public function testLoadWithCachedData()
     {
         $dir = __DIR__ . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . 'Fixtures';
-        $bundle = $this->getMock('Symfony\Component\HttpKernel\Bundle\BundleInterface');
+        $bundle = $this->createMock('Symfony\Component\HttpKernel\Bundle\BundleInterface');
         $bundle->expects($this->any())->method('getPath')->willReturn($dir);
         $this->kernel->expects($this->once())->method('getBundles')->willReturn([$bundle]);
 

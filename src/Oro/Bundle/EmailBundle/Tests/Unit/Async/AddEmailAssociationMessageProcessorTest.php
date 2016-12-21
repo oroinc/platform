@@ -139,7 +139,7 @@ class AddEmailAssociationMessageProcessorTest extends \PHPUnit_Framework_TestCas
      */
     private function createSessionMock()
     {
-        return $this->getMock(SessionInterface::class);
+        return $this->createMock(SessionInterface::class);
     }
 
     /**
@@ -147,7 +147,7 @@ class AddEmailAssociationMessageProcessorTest extends \PHPUnit_Framework_TestCas
      */
     private function createAssociationManagerMock()
     {
-        return $this->getMock(AssociationManager::class, [], [], '', false);
+        return $this->createMock(AssociationManager::class);
     }
 
     /**
@@ -155,6 +155,6 @@ class AddEmailAssociationMessageProcessorTest extends \PHPUnit_Framework_TestCas
      */
     private function createLoggerMock()
     {
-        return $this->getMock(LoggerInterface::class);
+        return $this->createMock(LoggerInterface::class);
     }
 }

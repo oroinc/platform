@@ -120,7 +120,7 @@ class DataTransformerEntitySerializerTest extends EntitySerializerTestCase
         );
 
         $context = ['key' => 'context value'];
-        $transformer = $this->getMock('Oro\Component\EntitySerializer\DataTransformerInterface');
+        $transformer = $this->createMock('Oro\Component\EntitySerializer\DataTransformerInterface');
         $transformer->expects($this->once())
             ->method('transform')
             ->with(
@@ -183,7 +183,7 @@ class DataTransformerEntitySerializerTest extends EntitySerializerTestCase
             [1 => \PDO::PARAM_INT]
         );
 
-        $transformer = $this->getMock('Symfony\Component\Form\DataTransformerInterface');
+        $transformer = $this->createMock('Symfony\Component\Form\DataTransformerInterface');
         $transformer->expects($this->once())
             ->method('transform')
             ->with('group_name')
@@ -288,7 +288,7 @@ class DataTransformerEntitySerializerTest extends EntitySerializerTestCase
             [1 => \PDO::PARAM_INT]
         );
 
-        $transformer = $this->getMock('Oro\Component\EntitySerializer\DataTransformerInterface');
+        $transformer = $this->createMock('Oro\Component\EntitySerializer\DataTransformerInterface');
         $transformer->expects($this->once())
             ->method('transform')
             ->with(
@@ -360,7 +360,7 @@ class DataTransformerEntitySerializerTest extends EntitySerializerTestCase
             [1 => \PDO::PARAM_INT]
         );
 
-        $transformer = $this->getMock('Oro\Component\EntitySerializer\DataTransformerInterface');
+        $transformer = $this->createMock('Oro\Component\EntitySerializer\DataTransformerInterface');
         $transformer->expects($this->once())
             ->method('transform')
             ->with(

@@ -18,7 +18,7 @@ class MessageCollectorTest extends \PHPUnit_Framework_TestCase
      */
     protected function setUp()
     {
-        $this->messageProducer = $this->getMock(MessageProducerInterface::class);
+        $this->messageProducer = $this->createMock(MessageProducerInterface::class);
 
         $this->messageCollector = new MessageCollector($this->messageProducer);
     }
@@ -66,7 +66,8 @@ class MessageCollectorTest extends \PHPUnit_Framework_TestCase
             ->method('send')
             ->willThrowException($exception);
 
-        $this->setExpectedException(get_class($exception), $exception->getMessage());
+        $this->expectException(get_class($exception));
+        $this->expectExceptionMessage($exception->getMessage());
 
         $this->messageCollector->send('test topic', 'test message');
     }

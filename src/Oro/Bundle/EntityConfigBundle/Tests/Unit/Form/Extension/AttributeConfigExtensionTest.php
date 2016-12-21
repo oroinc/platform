@@ -147,7 +147,7 @@ class AttributeConfigExtensionTest extends TypeTestCase
             ->method('isValid')
             ->willReturn(true);
 
-        $formConfig = $this->getMock(FormConfigInterface::class);
+        $formConfig = $this->createMock(FormConfigInterface::class);
         $formConfig->expects($this->once())
             ->method('getOption')
             ->with('config_model')
