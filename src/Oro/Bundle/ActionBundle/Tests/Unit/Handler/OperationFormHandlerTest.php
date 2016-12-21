@@ -52,7 +52,7 @@ class OperationFormHandlerTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->translator = $this->getMock(TranslatorInterface::class);
+        $this->translator = $this->createMock(TranslatorInterface::class);
 
         $this->handler = new OperationFormHandler(
             $this->formFactory,
@@ -61,7 +61,7 @@ class OperationFormHandlerTest extends \PHPUnit_Framework_TestCase
             $this->translator
         );
 
-        $this->flashBag = $this->getMock(FlashBagInterface::class);
+        $this->flashBag = $this->createMock(FlashBagInterface::class);
     }
 
     public function testProcessSimple()
@@ -171,7 +171,8 @@ class OperationFormHandlerTest extends \PHPUnit_Framework_TestCase
             ->with('operation')
             ->willReturn(null);
 
-        $this->setExpectedException(OperationNotFoundException::class, 'Operation with name "operation" not found');
+        $this->expectException(OperationNotFoundException::class);
+        $this->expectExceptionMessage('Operation with name "operation" not found');
 
         $this->handler->process('operation', new Request(), $this->flashBag);
     }
@@ -318,7 +319,7 @@ class OperationFormHandlerTest extends \PHPUnit_Framework_TestCase
      */
     protected function formProcessing($request, $actionData, $operation)
     {
-        $form = $this->getMock(FormInterface::class);
+        $form = $this->createMock(FormInterface::class);
 
         $this->formFactory->expects($this->once())
             ->method('create')

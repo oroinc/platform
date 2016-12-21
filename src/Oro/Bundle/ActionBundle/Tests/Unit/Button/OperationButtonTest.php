@@ -32,7 +32,7 @@ class OperationButtonTest extends \PHPUnit_Framework_TestCase
     {
         $this->originOperationName = 'origin_name';
         $this->operation = $this->getMockBuilder(Operation::class)->disableOriginalConstructor()->getMock();
-        $this->definition = $this->getMock(OperationDefinition::class);
+        $this->definition = $this->createMock(OperationDefinition::class);
 
         $this->button = new OperationButton(
             $this->originOperationName,

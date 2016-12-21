@@ -9,9 +9,6 @@ use Oro\Bundle\ActionBundle\Button\ButtonInterface;
 use Oro\Bundle\ActionBundle\Button\ButtonSearchContext;
 use Oro\Bundle\ActionBundle\Provider\RouteProviderInterface;
 
-use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
-
-use Oro\Bundle\WorkflowBundle\Entity\Repository\WorkflowItemRepository;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
 use Oro\Bundle\WorkflowBundle\Extension\TransitionButtonProviderExtension;
@@ -75,17 +72,14 @@ class TransitionButtonProviderExtensionTest extends \PHPUnit_Framework_TestCase
      */
     public function buttonDataProvider()
     {
-        $transition = $this->getMock(Transition::class);
+        $transition = $this->createMock(Transition::class);
 
         $createButtonInstance = function ($className, $isStart) use ($transition) {
             $cloneTransition = clone $transition;
+            $cloneTransition->expects($this->once())->method('isStart')->willReturn($isStart);
 
-            $mockButton = $this->getMockBuilder($className)
-                ->disableOriginalConstructor()->getMock();
-            $cloneTransition->expects($this->once())
-                ->method('isStart')->willReturn($isStart);
-            $mockButton->expects($this->once())
-                ->method('getTransition')->willReturn($cloneTransition);
+            $mockButton = $this->getMockBuilder($className)->disableOriginalConstructor()->getMock();
+            $mockButton->expects($this->once())->method('getTransition')->willReturn($cloneTransition);
 
             return $mockButton;
         };
@@ -96,7 +90,7 @@ class TransitionButtonProviderExtensionTest extends \PHPUnit_Framework_TestCase
                 'expected' => false
             ],
             'unSupportedButton' => [
-                'button' => $createButtonInstance(ButtonInterface::class, false),
+                'button' => $this->createMock(ButtonInterface::class),
                 'expected' => false
             ],
             'validTransitionButton' => [
@@ -116,7 +110,7 @@ class TransitionButtonProviderExtensionTest extends \PHPUnit_Framework_TestCase
     public function testFind($expected, $entityClass = null, $datagrid = null)
     {
         /** @var Transition|\PHPUnit_Framework_MockObject_MockObject $transition */
-        $transition = $this->getMock(Transition::class);
+        $transition = $this->createMock(Transition::class);
 
         $transitionManager = $this->createMock(TransitionManager::class);
         $transitionManager->expects($this->any())
@@ -175,8 +169,8 @@ class TransitionButtonProviderExtensionTest extends \PHPUnit_Framework_TestCase
     public function testIsAvailableWhenButtonNotSupported()
     {
         $this->extension->isAvailable(
-            $this->getMock(ButtonInterface::class),
-            $this->getMock(ButtonSearchContext::class)
+            $this->createMock(ButtonInterface::class),
+            $this->createMock(ButtonSearchContext::class)
         );
     }
 
@@ -197,7 +191,7 @@ class TransitionButtonProviderExtensionTest extends \PHPUnit_Framework_TestCase
     public function isAvailableDataProvider()
     {
         $createTransitionButton = function ($isAvailable, $isExistWorkflowItem = true) {
-            $transition = $this->getMock(Transition::class);
+            $transition = $this->createMock(Transition::class);
             $transition->expects($this->any())
                 ->method('isStart')->willReturn(false);
 
@@ -252,7 +246,7 @@ class TransitionButtonProviderExtensionTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $definition = $this->getMock(WorkflowDefinition::class);
+        $definition = $this->createMock(WorkflowDefinition::class);
         $definition->expects($this->any())->method('getDatagrids')->willReturn([self::DATAGRID_NAME]);
         $definition->expects($this->any())->method('getRelatedEntity')->willReturn(self::ENTITY);
 

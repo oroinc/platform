@@ -7,16 +7,10 @@ use Doctrine\Common\Collections\Collection;
 use Oro\Bundle\ActionBundle\Button\ButtonContext;
 use Oro\Bundle\ActionBundle\Button\ButtonInterface;
 use Oro\Bundle\ActionBundle\Button\ButtonSearchContext;
-use Oro\Bundle\ActionBundle\Provider\RouteProviderInterface;
 
-use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
-
-use Oro\Bundle\WorkflowBundle\Entity\Repository\WorkflowItemRepository;
-use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
 use Oro\Bundle\WorkflowBundle\Model\Transition;
 use Oro\Bundle\WorkflowBundle\Button\TransitionButton;
 use Oro\Bundle\WorkflowBundle\Model\Workflow;
-use Oro\Bundle\WorkflowBundle\Model\WorkflowRegistry;
 
 class TransitionButtonProviderExtension extends AbstractButtonProviderExtension
 {

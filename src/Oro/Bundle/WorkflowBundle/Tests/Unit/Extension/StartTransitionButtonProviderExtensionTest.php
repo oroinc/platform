@@ -42,7 +42,7 @@ class StartTransitionButtonProviderExtensionTest extends \PHPUnit_Framework_Test
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->routeProvider = $this->getMock(RouteProviderInterface::class);
+        $this->routeProvider = $this->createMock(RouteProviderInterface::class);
 
         $this->extension = new StartTransitionButtonProviderExtension($this->workflowRegistry, $this->routeProvider);
     }
@@ -71,7 +71,7 @@ class StartTransitionButtonProviderExtensionTest extends \PHPUnit_Framework_Test
             ->setInitRoutes($routeName ? [$routeName] : [])
             ->setInitDatagrids($datagrid ? [$datagrid] : []);
 
-        $transitionManager = $this->getMock(TransitionManager::class);
+        $transitionManager = $this->createMock(TransitionManager::class);
         $transitionManager->expects($this->once())
             ->method('getStartTransitions')
             ->willReturn(new ArrayCollection([$transition]));
@@ -167,8 +167,8 @@ class StartTransitionButtonProviderExtensionTest extends \PHPUnit_Framework_Test
     {
         $stubButton = new StubButton();
 
-        $this->setExpectedException(
-            UnsupportedButtonException::class,
+        $this->expectException(UnsupportedButtonException::class);
+        $this->expectExceptionMessage(
             'Button Oro\Bundle\ActionBundle\Tests\Unit\Stub\StubButton is not supported by ' .
             'Oro\Bundle\WorkflowBundle\Extension\StartTransitionButtonProviderExtension. Can not determine availability'
         );
@@ -184,7 +184,7 @@ class StartTransitionButtonProviderExtensionTest extends \PHPUnit_Framework_Test
         $this->assertFalse($this->extension->supports($this->createTransitionButton(false, false)));
 
         /** @var ButtonInterface|\PHPUnit_Framework_MockObject_MockObject $notTransitionButton */
-        $notTransitionButton = $this->getMock(ButtonInterface::class);
+        $notTransitionButton = $this->createMock(ButtonInterface::class);
         // for not supported button
         $this->assertFalse($this->extension->supports($notTransitionButton));
     }
@@ -197,7 +197,7 @@ class StartTransitionButtonProviderExtensionTest extends \PHPUnit_Framework_Test
     {
         $workflow = $this->getMockBuilder(Workflow::class)->disableOriginalConstructor()->getMock();
 
-        $definition = $this->getMock(WorkflowDefinition::class);
+        $definition = $this->createMock(WorkflowDefinition::class);
         $definition->expects($this->any())->method('getRelatedEntity')->willReturn(self::ENTITY_CLASS);
 
         $workflow->expects($this->any())
@@ -238,7 +238,7 @@ class StartTransitionButtonProviderExtensionTest extends \PHPUnit_Framework_Test
      */
     protected function getTransitionManager(array $transitions)
     {
-        $manager = $this->getMock(TransitionManager::class);
+        $manager = $this->createMock(TransitionManager::class);
         $manager->expects($this->any())
             ->method('getStartTransitions')
             ->willReturn(new ArrayCollection($transitions));
@@ -267,10 +267,10 @@ class StartTransitionButtonProviderExtensionTest extends \PHPUnit_Framework_Test
     private function createTransitionButton($isAvailable = false, $isStart = true)
     {
         /** @var Transition|\PHPUnit_Framework_MockObject_MockObject $transition */
-        $transition = $this->getMock(Transition::class);
+        $transition = $this->createMock(Transition::class);
         $transition->expects($this->any())->method('isAvailable')->willReturn($isAvailable);
         $transition->expects($this->any())->method('isStart')->willReturn($isStart);
-        $transitionManager = $this->getMock(TransitionManager::class);
+        $transitionManager = $this->createMock(TransitionManager::class);
 
         $workflow = $this->getWorkflow($transitionManager);
 

@@ -74,14 +74,14 @@ class OperationButtonProviderExtensionTest extends \PHPUnit_Framework_TestCase
             ->method('getFormPageRoute')
             ->willReturn(self::FORM_PAGE_ROUTE_NAME);
 
-        $this->optionsAssembler = $this->getMock(OptionsAssembler::class);
+        $this->optionsAssembler = $this->createMock(OptionsAssembler::class);
         $this->optionsAssembler->expects($this->any())
             ->method('assemble')
             ->willReturnCallback(function (array $options) {
                 return $options;
             });
 
-        $this->contextAccessor = $this->getMock(ContextAccessor::class);
+        $this->contextAccessor = $this->createMock(ContextAccessor::class);
 
         $this->extension = new OperationButtonProviderExtension(
             $this->operationRegistry,
@@ -208,8 +208,8 @@ class OperationButtonProviderExtensionTest extends \PHPUnit_Framework_TestCase
 
         $stubButton = new StubButton();
 
-        $this->setExpectedException(
-            UnsupportedButtonException::class,
+        $this->expectException(UnsupportedButtonException::class);
+        $this->expectExceptionMessage(
             'Button Oro\Bundle\ActionBundle\Tests\Unit\Stub\StubButton is not supported by ' .
             'Oro\Bundle\ActionBundle\Extension\OperationButtonProviderExtension. Can not determine availability'
         );
@@ -220,7 +220,7 @@ class OperationButtonProviderExtensionTest extends \PHPUnit_Framework_TestCase
     public function testSupports()
     {
         $this->assertTrue($this->extension->supports($this->createOperationButton()));
-        $this->assertFalse($this->extension->supports($this->getMock(ButtonInterface::class)));
+        $this->assertFalse($this->extension->supports($this->createMock(ButtonInterface::class)));
     }
 
     /**
