@@ -416,7 +416,11 @@
         </h2>
         <div class="sf-tabs">
             {% if data.context.items|length %}
-                {{ tree.view_block_details(data.id, 'Context', {'Items': data.context.items, 'Data Items': data.context.data}, 'context_items', true) }}
+                {{ tree.view_block_details(data.id, 'Context', {'Items': data.context.items}, 'context_items', true) }}
+            {% endif %}
+
+            {% if data.context.data|length %}
+                {{ tree.view_block_details(data.id, 'Context Data', {'Items': data.context.data}, 'context_items', true) }}
             {% endif %}
 
             {% if data.build_block_options is defined %}
