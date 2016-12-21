@@ -143,6 +143,6 @@ return array(
                 'actions' => array()
             )
         ),
-        //'applications' => ['other_application'],
+        'applications' => ['other_application'],
     )
 );
